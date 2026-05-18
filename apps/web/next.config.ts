@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
@@ -14,10 +15,11 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ["pg", "bcryptjs", "jsonwebtoken", "stripe"],
   webpack: (config) => {
+    const backendTsConfig = path.resolve(__dirname, "../../backend/tsconfig.json");
     config.module.rules.push({
       test: /\.(ts|tsx)$/,
       include: /backend/,
-      use: [{ loader: "ts-loader", options: { transpileOnly: true } }],
+      use: [{ loader: "ts-loader", options: { transpileOnly: true, configFile: backendTsConfig } }],
     });
     return config;
   },

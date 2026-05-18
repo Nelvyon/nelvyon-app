@@ -1,0 +1,4 @@
+{
+  "build": { "builder": "DOCKERFILE", "dockerfilePath": "apps/web/Dockerfile" },
+  "deploy": { "startCommand": "pnpm -C apps/web start", "restartPolicyType": "ON_FAILURE" }
+}
