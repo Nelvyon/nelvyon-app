@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 
 import { EarlyAdopterService } from "../../../../../../../backend/billing/earlyAdopterService";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-export const revalidate = 60;
 
 export async function GET() {
   const service = EarlyAdopterService.getInstance();
