@@ -1,4 +1,7 @@
 {
-  "build": { "builder": "DOCKERFILE", "dockerfilePath": "apps/web/Dockerfile" },
-  "deploy": { "startCommand": "pnpm -C apps/web start", "restartPolicyType": "ON_FAILURE" }
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "apps/web/Dockerfile"
+  }
 }
