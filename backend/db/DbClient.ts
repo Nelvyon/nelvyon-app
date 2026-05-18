@@ -1,15 +1,11 @@
 import pg from "pg";
 
-/**
- * Singleton Postgres pool for OS persistence and reporting queries.
- * Exists to centralize connection lifecycle and typed query helpers for Db-backed stores.
- *
- * MIG 279 (RLS): use `DATABASE_URL` with the Supabase **service_role** connection string
- * (or another role that bypasses RLS). The backend must NEVER use the anon key.
- * Set `SUPABASE_SERVICE_ROLE_KEY` for optional Supabase REST; this pool uses `DATABASE_URL` only.
- */
+// Singleton Postgres pool for OS persistence and reporting queries.
+// MIG 279 (RLS): DATABASE_URL must use the Supabase service_role URL (bypasses RLS). NEVER use the anon key.
+
+let dbClientSingleton: DbClient | undefined;
+
 export class DbClient {
-  private static instance: DbClient | undefined;
   private readonly pool: pg.Pool;
 
   private constructor(connectionString: string) {
@@ -17,8 +13,8 @@ export class DbClient {
   }
 
   static getInstance(): DbClient {
-    if (DbClient.instance) {
-      return DbClient.instance;
+    if (dbClientSingleton) {
+      return dbClientSingleton;
     }
     const url = process.env.DATABASE_URL;
     if (typeof url !== "string" || url.trim().length === 0) {
@@ -30,8 +26,8 @@ export class DbClient {
     if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && trimmed.includes("NEXT_PUBLIC_SUPABASE_ANON_KEY")) {
       throw new Error("DbClient: DATABASE_URL must not reference the anon key. Use service_role.");
     }
-    DbClient.instance = new DbClient(trimmed);
-    return DbClient.instance;
+    dbClientSingleton = new DbClient(trimmed);
+    return dbClientSingleton;
   }
 
   async query<T>(sql: string, params?: unknown[]): Promise<T[]> {
@@ -41,6 +37,6 @@ export class DbClient {
 
   async end(): Promise<void> {
     await this.pool.end();
-    DbClient.instance = undefined;
+    dbClientSingleton = undefined;
   }
 }

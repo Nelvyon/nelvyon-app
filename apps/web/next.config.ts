@@ -9,6 +9,18 @@ import {
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  experimental: {
+    externalDir: true,
+  },
+  serverExternalPackages: ["pg", "bcryptjs", "jsonwebtoken", "stripe"],
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(ts|tsx)$/,
+      include: /backend/,
+      use: [{ loader: "ts-loader", options: { transpileOnly: true } }],
+    });
+    return config;
+  },
   async redirects() {
     return [
       { source: "/legal/privacy", destination: "/privacy", permanent: true },
