@@ -75,3 +75,8 @@ export async function authenticateApiKeyAppRouter(req: Request): Promise<
     rateHeaders,
   };
 }
+
+/** Not a public endpoint — satisfies Pages API route typing for this helper module. */
+export default function handler(_req: NextApiRequest, res: NextApiResponse) {
+  res.status(404).end();
+}
