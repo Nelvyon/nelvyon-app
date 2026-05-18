@@ -4,6 +4,7 @@ import { applyNelvyonAuthCookie } from "@/lib/authCookies";
 import { getAuthService } from "@nelvyon/auth";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function isRecord(v: unknown): v is Record<string, unknown> {

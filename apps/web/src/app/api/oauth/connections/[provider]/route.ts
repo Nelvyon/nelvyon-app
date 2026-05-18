@@ -5,6 +5,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { OAuthService, type OAuthProvider } from "../../../../../../../../backend/oauth/OAuthService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const ALLOWED: OAuthProvider[] = ["google", "meta", "tiktok", "linkedin"];

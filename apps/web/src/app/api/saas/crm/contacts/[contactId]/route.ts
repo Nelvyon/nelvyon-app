@@ -4,6 +4,7 @@ import { authenticate } from "@nelvyon/auth";
 import { getSaasCrmService, getSaasOnboardingService, SaasCrmError, type ContactStatus, type PipelineStage } from "@nelvyon/saas";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function mapError(e: SaasCrmError): NextResponse {

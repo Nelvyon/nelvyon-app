@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { SupportService } from "../../../../../../../backend/support/SupportService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const CATEGORIES = new Set(["billing", "technical", "feature_request", "other"]);

@@ -5,6 +5,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { CancellationService } from "../../../../../../../backend/billing/cancellationService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const VALID_REASONS = new Set(["precio", "no_lo_uso", "faltan_funciones", "competencia", "otro"]);

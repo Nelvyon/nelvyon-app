@@ -5,6 +5,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { DunningService } from "../../../../../../../backend/billing/dunningService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {

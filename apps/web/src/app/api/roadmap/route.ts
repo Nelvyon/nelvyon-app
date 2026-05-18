@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { ChangelogService } from "../../../../../../backend/changelog/ChangelogService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET() {

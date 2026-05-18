@@ -22,6 +22,7 @@ import {
   isAsyncQueueEnabled,
 } from "../../../../../../../backend/queue";
 
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function isRecord(v: unknown): v is Record<string, unknown> {

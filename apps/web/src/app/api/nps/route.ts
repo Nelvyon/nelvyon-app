@@ -10,6 +10,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 import { DbClient } from "../../../../../../backend/db/DbClient";
 import { FeedbackService } from "../../../../../../backend/feedback/FeedbackService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {

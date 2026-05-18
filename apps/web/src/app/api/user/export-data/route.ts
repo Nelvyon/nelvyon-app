@@ -6,6 +6,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 import { sendEmail } from "../../../../../../../backend/email/emailService";
 import { DataSubjectService } from "../../../../../../../backend/gdpr/dataSubjectService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {

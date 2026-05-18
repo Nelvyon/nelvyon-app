@@ -6,6 +6,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { GoogleAdsExecutor } from "../../../../../../../../backend/integrations/google/GoogleAdsExecutor";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const logger = createLogger("google_ads");

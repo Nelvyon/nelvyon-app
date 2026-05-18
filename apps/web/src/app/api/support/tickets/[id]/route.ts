@@ -9,6 +9,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { SupportService } from "../../../../../../../../backend/support/SupportService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 type RouteCtx = { params: Promise<{ id: string }> };

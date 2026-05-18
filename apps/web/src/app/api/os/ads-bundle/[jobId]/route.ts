@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { downloadArtifactZip } from "../../_lib/downloadArtifactZip";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 type RouteContext = { params: Promise<{ jobId: string }> };

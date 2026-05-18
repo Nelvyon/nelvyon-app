@@ -5,6 +5,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { CancellationService } from "../../../../../../../backend/billing/cancellationService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {

@@ -4,6 +4,7 @@ import { authenticate } from "@nelvyon/auth";
 import { getSaasDashboardService, getSaasOnboardingService, SaasDashboardError } from "@nelvyon/saas";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function isRecord(v: unknown): v is Record<string, unknown> {

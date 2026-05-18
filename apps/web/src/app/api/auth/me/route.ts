@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { authenticate, getAuthService } from "@nelvyon/auth";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {

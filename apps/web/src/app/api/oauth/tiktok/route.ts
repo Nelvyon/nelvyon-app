@@ -5,6 +5,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { TikTokOAuthProvider } from "../../../../../../../backend/oauth/TikTokOAuthProvider";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {

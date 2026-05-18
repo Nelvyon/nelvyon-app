@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { LinkedInOAuthProvider } from "../../../../../../../../backend/oauth/LinkedInOAuthProvider";
 import { OAuthService } from "../../../../../../../../backend/oauth/OAuthService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const INTEGRATIONS_PATH = "/saas/dashboard/integrations";

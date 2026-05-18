@@ -9,6 +9,7 @@ import { RateLimitExceededError } from "@nelvyon/usage";
 import { saasPublicApiService } from "../../../../../../../../../backend/saas/SaasPublicApiService";
 import { authenticateApiKeyAppRouter } from "../../../../../../pages/api/public/v1/_auth";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function mergeHeaders(

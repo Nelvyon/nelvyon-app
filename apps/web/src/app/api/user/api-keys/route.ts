@@ -5,6 +5,7 @@ import { authenticate } from "@nelvyon/auth";
 import { deleteApiKey, isApiKeyProvider, listUserProviders, saveApiKey, type ApiKeyProvider } from "@nelvyon/apikeys";
 import { toClientError } from "@nelvyon/errors";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {

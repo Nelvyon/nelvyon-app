@@ -5,6 +5,7 @@ import { getAuthService, issueEmailVerification } from "@nelvyon/auth";
 import { initOnboarding } from "@nelvyon/onboarding";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function isRecord(v: unknown): v is Record<string, unknown> {

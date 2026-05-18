@@ -6,6 +6,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { DataSubjectService } from "../../../../../../../backend/gdpr/dataSubjectService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const REQUIRED = "ELIMINAR MI CUENTA";

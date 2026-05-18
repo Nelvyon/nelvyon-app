@@ -4,6 +4,7 @@ import { authenticate } from "@nelvyon/auth";
 import { getSaasCampaniasService, getSaasOnboardingService, SaasCampaniasError, type CampaniaChannel, type CampaniaStatus } from "@nelvyon/saas";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function mapError(e: SaasCampaniasError): NextResponse {

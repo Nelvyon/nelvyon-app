@@ -9,6 +9,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { SupportService } from "../../../../../../../backend/support/SupportService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const CATEGORIES = new Set(["billing", "technical", "feature_request", "other"]);

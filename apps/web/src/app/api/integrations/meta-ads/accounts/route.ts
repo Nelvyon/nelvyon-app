@@ -5,6 +5,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { MetaAdsExecutor } from "../../../../../../../../backend/integrations/meta/MetaAdsExecutor";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {

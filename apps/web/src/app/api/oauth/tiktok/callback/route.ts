@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { OAuthService } from "../../../../../../../../backend/oauth/OAuthService";
 import { TikTokOAuthProvider } from "../../../../../../../../backend/oauth/TikTokOAuthProvider";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const INTEGRATIONS_PATH = "/saas/dashboard/integrations";

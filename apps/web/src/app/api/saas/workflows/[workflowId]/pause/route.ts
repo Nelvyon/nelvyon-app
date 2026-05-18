@@ -4,6 +4,7 @@ import { authenticate } from "@nelvyon/auth";
 import { getSaasOnboardingService, getSaasWorkflowService, SaasWorkflowError } from "@nelvyon/saas";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function POST(req: Request, ctx: { params: Promise<{ workflowId: string }> }) {

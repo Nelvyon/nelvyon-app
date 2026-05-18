@@ -5,6 +5,7 @@ import { OsAgentError, osJobStore } from "@nelvyon/os-agents";
 
 import { QueueClient, type JobStatus } from "../../../../../../../../backend/queue";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 interface RouteContext {

@@ -8,6 +8,7 @@ import { DbClient } from "../../../../../../../backend/db/DbClient";
 import { EarlyAdopterService } from "../../../../../../../backend/billing/earlyAdopterService";
 import { createSubscriptionCheckoutSession } from "../../../../../../../backend/stripe/stripeApi";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 type CheckoutBody = { planId?: string };

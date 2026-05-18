@@ -4,6 +4,7 @@ import { authenticate } from "@nelvyon/auth";
 import { getOnboardingStatus } from "@nelvyon/onboarding";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {

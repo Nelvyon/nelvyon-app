@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { authenticate } from "@nelvyon/auth";
 import { OsAgentError, OsQueueWorker, initOsQueueWorker } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(_req: Request): Promise<Response> {

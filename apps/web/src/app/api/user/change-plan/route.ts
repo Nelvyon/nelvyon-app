@@ -7,6 +7,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 import { updateSubscriptionItemsWithProration } from "../../../../../../../backend/stripe/stripeApi";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const MANAGEABLE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing", "past_due", "paused"]);

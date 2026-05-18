@@ -4,6 +4,7 @@ import { authenticate } from "@nelvyon/auth";
 import { getUsageSummary } from "@nelvyon/usage";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(_req: Request) {

@@ -4,6 +4,7 @@ import { authenticate } from "@nelvyon/auth";
 import { getSaasCampaniasService, getSaasOnboardingService, SaasCampaniasError } from "@nelvyon/saas";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request, ctx: { params: Promise<{ campaniaId: string }> }) {

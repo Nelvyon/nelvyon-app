@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { MetaOAuthProvider } from "../../../../../../../../backend/oauth/MetaOAuthProvider";
 import { OAuthService } from "../../../../../../../../backend/oauth/OAuthService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const INTEGRATIONS_PATH = "/saas/dashboard/integrations";

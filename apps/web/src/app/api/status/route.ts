@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { DbClient } from "../../../../../../backend/db/DbClient";
 import { getCurrentStatus } from "@nelvyon/monitoring";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET() {

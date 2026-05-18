@@ -10,6 +10,7 @@ import {
   resolveStripePaymentMethodContext,
 } from "../../../../../../../backend/stripe/stripeApi";
 
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due", "paused"]);

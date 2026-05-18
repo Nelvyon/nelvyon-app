@@ -5,6 +5,7 @@ import { OsAgentError } from "@nelvyon/os-agents";
 
 import { EarlyAdopterService } from "../../../../../../../backend/billing/earlyAdopterService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {

@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { getClientIp } from "@/lib/security/rateLimit";
 import { AffiliateService } from "../../../../../../../backend/affiliates/AffiliateService";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function hashIp(ip: string): string {

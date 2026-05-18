@@ -4,6 +4,7 @@ import { authenticate } from "@nelvyon/auth";
 import { completeStep, type OnboardingStep } from "@nelvyon/onboarding";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 const VALID_STEPS: OnboardingStep[] = ["welcome_email_sent", "profile_completed", "first_agent_used", "plan_activated"];

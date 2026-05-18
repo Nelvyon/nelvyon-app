@@ -5,6 +5,7 @@ import { authenticate } from "@nelvyon/auth";
 import { OsAgentError, getSchemaForService, normalizeStoredIntake, osJobStore, validateIntake } from "@nelvyon/os-agents";
 import { OS_PREMIUM_SERVICE_IDS } from "@nelvyon/os-agents/constants";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function isRecord(v: unknown): v is Record<string, unknown> {

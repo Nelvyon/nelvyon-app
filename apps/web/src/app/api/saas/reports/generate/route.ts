@@ -5,6 +5,7 @@ import { getSaasDashboardReportService } from "@nelvyon/saas-reports";
 import { getSaasOnboardingService } from "@nelvyon/saas";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 /** Genera informe ZIP del dashboard con métricas reales del cliente y devuelve URL de descarga. */

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 import { handleStripeWebhook } from "../../../../../../../backend/stripe/webhookHandler";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {

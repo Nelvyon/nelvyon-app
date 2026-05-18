@@ -5,6 +5,7 @@ import { getNelvyonEmailService } from "@nelvyon/email";
 import { getSaasOnboardingService, SaasOnboardingError } from "@nelvyon/saas";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 function mapSaasError(e: SaasOnboardingError): { status: number; body: { error: string; code: string } } {

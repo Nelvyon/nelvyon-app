@@ -6,6 +6,7 @@ import { authenticate } from "@nelvyon/auth";
 import { resolveArtifactZipPath } from "@nelvyon/os-agents/artifacts/artifactPublisher";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 type RouteContext = { params: Promise<{ reportId: string }> };

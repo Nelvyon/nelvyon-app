@@ -4,6 +4,7 @@ import { getNelvyonAdminService } from "@nelvyon/admin";
 import { OsAgentError } from "@nelvyon/os-agents";
 import { assertAdmin } from "../_utils";
 
+export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
