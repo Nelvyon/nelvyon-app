@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { UsageSummary } from "@nelvyon/usage";
+import type { UsageSummary } from "@/types/usage";
 
 export function useUsage() {
   const [usage, setUsage] = useState<UsageSummary | null>(null);

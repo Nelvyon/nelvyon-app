@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import type { CreateInvoiceInput, InvoiceItemInput, InvoiceRecord, InvoiceStats, InvoiceStatus } from "@nelvyon/saas";
+import type { CreateInvoiceInput, InvoiceItemInput, InvoiceRecord, InvoiceStats, InvoiceStatus } from "@/types/saas-client";
 
 type Tab = "facturas" | "nueva" | "stats";
 

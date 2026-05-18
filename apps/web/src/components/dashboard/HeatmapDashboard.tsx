@@ -9,7 +9,7 @@ import type {
   HeatmapPoint,
   SessionRow,
   SiteConfig,
-} from "@nelvyon/saas";
+} from "@/types/saas-client";
 
 type Tab = "heatmap" | "sessions" | "funnel" | "analyze" | "alerts" | "install";
 

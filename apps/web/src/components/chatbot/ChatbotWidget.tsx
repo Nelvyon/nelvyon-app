@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { ChatMessage } from "@nelvyon/saas";
+import type { ChatMessage } from "@/types/saas-client";
 
 export type ChatbotWidgetProps = {
   chatbotId: string;

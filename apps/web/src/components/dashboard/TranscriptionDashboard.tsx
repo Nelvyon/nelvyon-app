@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { AnalysisResult, TranscriptionContext, TranscriptionListItem, TranscriptionRecord } from "@nelvyon/saas";
+import type { AnalysisResult, TranscriptionContext, TranscriptionListItem, TranscriptionRecord } from "@/types/saas-client";
 
 type Tab = "nueva" | "resultado" | "historial";
 

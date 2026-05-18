@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getPremiumProduct } from "@nelvyon/billing";
 import { authenticate } from "@nelvyon/auth";
 import { OsAgentError, getSchemaForService, normalizeStoredIntake, osJobStore, validateIntake } from "@nelvyon/os-agents";
 import { OS_PREMIUM_SERVICE_IDS } from "@nelvyon/os-agents/constants";
@@ -29,7 +30,11 @@ export async function GET(req: Request, ctx: { params: Promise<{ serviceId: stri
     return NextResponse.json({ error: "Unknown serviceId" }, { status: 400 });
   }
 
-  return NextResponse.json({ fields: getSchemaForService(serviceId) });
+  const product = getPremiumProduct(serviceId);
+  return NextResponse.json({
+    fields: getSchemaForService(serviceId),
+    serviceLabel: product?.name ?? serviceId,
+  });
 }
 
 export async function POST(req: Request, ctx: { params: Promise<{ serviceId: string }> }): Promise<Response> {

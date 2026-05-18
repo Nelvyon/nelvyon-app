@@ -11,7 +11,7 @@ import { UsagePanel } from "@/components/dashboard/UsagePanel";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
 import Link from "next/link";
-import { OS_PREMIUM_SERVICE_IDS } from "@nelvyon/os-agents/constants";
+import { OS_PREMIUM_SERVICE_IDS } from "@/lib/os/premiumServiceIds";
 
 type OsJobStepState = {
   name: string;

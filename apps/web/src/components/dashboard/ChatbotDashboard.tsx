@@ -8,7 +8,7 @@ import type {
   ChatbotConfigInput,
   ChatbotStats,
   ConversationSummary,
-} from "@nelvyon/saas";
+} from "@/types/saas-client";
 
 type Tab = "config" | "conversations" | "stats" | "embed";
 

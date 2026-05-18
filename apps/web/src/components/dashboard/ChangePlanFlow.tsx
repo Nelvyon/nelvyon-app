@@ -10,7 +10,7 @@ import {
   PLAN_NAMES,
   PLAN_PRICES,
   type BillablePlan,
-} from "@nelvyon/billing";
+} from "@/lib/billing/plans";
 import { cn } from "@/core/ui/utils";
 import { emitToast } from "@/core/ui/toastEvents";
 import { NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";

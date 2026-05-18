@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { OnboardingStatus, OnboardingStep } from "@nelvyon/onboarding";
+import type { OnboardingStatus, OnboardingStep } from "@/types/onboarding";
 
 export function useOnboarding() {
   const [status, setStatus] = useState<OnboardingStatus | null>(null);

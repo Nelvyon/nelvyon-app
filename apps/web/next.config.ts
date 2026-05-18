@@ -13,14 +13,38 @@ const nextConfig: NextConfig = {
   experimental: {
     externalDir: true,
   },
-  serverExternalPackages: ["pg", "bcryptjs", "jsonwebtoken", "stripe"],
-  webpack: (config) => {
-    const backendTsConfig = path.resolve(__dirname, "../../backend/tsconfig.json");
-    config.module.rules.push({
-      test: /\.(ts|tsx)$/,
-      include: /backend/,
-      use: [{ loader: "ts-loader", options: { transpileOnly: true, configFile: backendTsConfig } }],
-    });
+  serverExternalPackages: [
+    "pg",
+    "bcryptjs",
+    "jsonwebtoken",
+    "stripe",
+    "@sentry/node",
+    "@opentelemetry/core",
+    "@opentelemetry/api",
+    "node:http",
+    "node:https",
+    "node:net",
+    "node:tls",
+    "node:fs",
+    "node:path",
+    "node:os",
+    "node:crypto",
+    "node:stream",
+    "node:events",
+    "node:buffer",
+    "node:util",
+    "node:url",
+    "node:zlib",
+  ],
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      const backendTsConfig = path.resolve(__dirname, "../../backend/tsconfig.json");
+      config.module.rules.push({
+        test: /\.(ts|tsx)$/,
+        include: /backend/,
+        use: [{ loader: "ts-loader", options: { transpileOnly: true, configFile: backendTsConfig } }],
+      });
+    }
     return config;
   },
   async redirects() {

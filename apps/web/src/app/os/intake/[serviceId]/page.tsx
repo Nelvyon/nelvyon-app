@@ -6,10 +6,8 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import { useAuth } from "@/core/auth/AuthContext";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { getPremiumProduct } from "@nelvyon/billing";
-import type { IntakeField } from "@nelvyon/os-agents";
-import { validateIntake } from "@nelvyon/os-agents";
-import { OS_PREMIUM_SERVICE_IDS } from "@nelvyon/os-agents/constants";
+import type { IntakeField } from "@/lib/os/intakeTypes";
+import { isPremiumServiceId } from "@/lib/os/premiumServiceIds";
 
 const FIELD_TU_EMPRESA = new Set(["clientName", "industry", "targetAudience"]);
 const FIELD_IDENTIDAD = new Set(["tone", "competitors", "primaryColor", "secondaryColor", "logoUrl", "referenceUrls"]);
@@ -226,10 +224,6 @@ function FieldBlock({
   );
 }
 
-function isPremiumServiceId(id: string): boolean {
-  return (OS_PREMIUM_SERVICE_IDS as readonly string[]).includes(id);
-}
-
 export default function OsIntakePage() {
   const params = useParams();
   const serviceIdRaw = typeof params?.serviceId === "string" ? params.serviceId : "";
@@ -243,11 +237,7 @@ export default function OsIntakePage() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
-  const serviceLabel = useMemo(() => {
-    if (!isPremiumServiceId(serviceId)) return serviceId;
-    return getPremiumProduct(serviceId)?.name ?? serviceId;
-  }, [serviceId]);
+  const [serviceLabel, setServiceLabel] = useState(serviceId);
 
   const grouped = useMemo(() => groupFields(fields), [fields]);
 
@@ -270,9 +260,12 @@ export default function OsIntakePage() {
           if (!cancelled) setLoadError(`No se pudo cargar el formulario (${res.status})`);
           return;
         }
-        const data = (await res.json()) as { fields?: IntakeField[] };
+        const data = (await res.json()) as { fields?: IntakeField[]; serviceLabel?: string };
         const list = Array.isArray(data.fields) ? data.fields : [];
         if (!cancelled) {
+          if (typeof data.serviceLabel === "string" && data.serviceLabel.length > 0) {
+            setServiceLabel(data.serviceLabel);
+          }
           setFields(list);
           setValues((prev) => {
             const next = { ...prev };
@@ -309,11 +302,6 @@ export default function OsIntakePage() {
       if (!isPremiumServiceId(serviceId) || !tenantId) return;
 
       const record = buildSubmissionRecord(fields, values);
-      const local = validateIntake(serviceId, record);
-      if (!local.valid) {
-        setFieldErrors(local.errors);
-        return;
-      }
       setFieldErrors({});
 
       setSubmitting(true);
