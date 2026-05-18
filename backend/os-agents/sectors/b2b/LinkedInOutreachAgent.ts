@@ -1,0 +1,56 @@
+import type { ILlmClient } from "../../LlmClient";
+import { ClientProfileService } from "../../client-profile";
+import { LlmClient } from "../../LlmClient";
+import { llmOpts, parseJson } from "./shared";
+
+export type LinkedInOutreachInput = { role: string; sector: string; offer: string };
+export type LinkedInOutreachResult = { connectionRequest: string; followUp1: string; followUp2: string; variants: string[] };
+export type LinkedInOutreachAgentDeps = { llm?: ILlmClient };
+export class LinkedInOutreachAgent {
+  constructor(private readonly deps: LinkedInOutreachAgentDeps = {}) {}
+  private get llm(): ILlmClient { return this.deps.llm ?? LlmClient.getInstance(); }
+  async createSequence(userId: string, input: LinkedInOutreachInput): Promise<LinkedInOutreachResult> {
+    const enriched = (await ClientProfileService.enrichInput(
+    userId,
+    String((input as { brandName?: string }).brandName ?? ""),
+    input as object,
+    )) as typeof input & { _clientProfileBrief?: string };
+
+        
+
+const prompt = `### ESTÁNDAR NELVYON OS — PROMPTS ÉLITE v1
+1. ROL EXPERTO verificable · 2. CONTEXTO del cliente · 3. TAREA con formato estructurado · 4. Ejemplos concretos · 5. Sin relleno genérico · 6. Calidad top 1% mundial.
+
+${enriched._clientProfileBrief ? `${String(enriched._clientProfileBrief).trim()}\n\n` : ""}ROLE: Eres un estratega senior, editor y copywriter de élite en el vertical del cliente, con criterio de producto y estándares editoriales exigentes.
+
+CONTEXT:
+Usa los datos reales del contacto para personalizar cada párrafo.
+Ninguna frase debe poder aplicarse a otro contacto distinto.
+- Toda la información de negocio, restricciones, tono y datos concretos está en el bloque "### BRIEF OPERATIVO" más abajo; intégralos todos en tu razonamiento.
+- No contradigas el brief; si algo es ambiguo, explicita la suposición en una línea.
+
+FRAMEWORK: Integra SPIN Selling (Situación, Problema, Implicación, Necesidad de pago), criterios MEDDIC (Metrics, Economic buyer, Decision criteria, Decision process, Identify pain, Champion) y Challenger Sale (enseña un insight, personaliza el mensaje, guía la conversación con rigor).
+
+OUTPUT FORMAT: Respuesta ÚNICAMENTE como JSON válido UTF-8, sin markdown ni texto antes/después. Esquema: {"connectionRequest":"","followUp1":"","followUp2":"","variants":[]}
+
+QUALITY BAR: Nivel de calidad: top 1% mundial. Cada output debe ser accionable, específico y superior a cualquier herramienta genérica del mercado. Sin relleno: donde falte dato usa [PLACEHOLDER] con instrucción breve de cómo completarlo. Respeta compliance sectorial y marcas legales cuando aplique.
+
+### EJEMPLOS DE CALIDAD ÉLITE
+Ejemplo 1:
+Input: b2b con datos reales: presupuesto 3500 EUR, objetivo 42 leads cualificados en 30 dias, audiencia principal 30-45, ciudad principal y KPI historico CTR 2.1%.
+Output: Plan especifico para b2b con hipotesis cuantificada, copy exacto por canal, cadencia semanal y criterio de corte por KPI. Incluye segmentacion, mensaje principal y accion concreta del dia 1 al dia 7.
+
+Ejemplo 2:
+Input: b2b con estacionalidad alta, ticket medio 120 EUR, margen 38%, base activa 1800 contactos, objetivo subir conversion un 18% sin aumentar CPC.
+Output: Propuesta accionable para b2b con dos variantes diferenciadas, ofertas con limites claros, calendario por franja horaria y mecanismo de seguimiento con metrica objetivo por etapa.
+### FIN EJEMPLOS
+
+### BRIEF OPERATIVO
+Crea secuencia LinkedIn B2B para cargo ${enriched.role}, sector ${enriched.sector}, oferta ${enriched.offer}. Incluye connection request + follow-up 1 + follow-up 2 + variantes. Frameworks Challenger/Gap Selling. SOLO JSON {"connectionRequest":"","followUp1":"","followUp2":"","variants":[]}`;
+    return parseJson<LinkedInOutreachResult>(await this.llm.complete(prompt, llmOpts(0.5)), "LinkedInOutreachAgent");
+  }
+}
+let cached: LinkedInOutreachAgent | undefined;
+export function getLinkedInOutreachAgent(): LinkedInOutreachAgent { if (!cached) cached = new LinkedInOutreachAgent(); return cached; }
+export function resetLinkedInOutreachAgentForTests(): void { cached = undefined; }
+

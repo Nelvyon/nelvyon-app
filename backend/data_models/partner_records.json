@@ -1,0 +1,69 @@
+{
+    "title": "partner_records",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "partner_name": {
+            "type": "string",
+            "description": "Partner name"
+        },
+        "company": {
+            "type": "string",
+            "description": "Company name"
+        },
+        "email": {
+            "type": "string",
+            "description": "Email"
+        },
+        "tier": {
+            "type": "string",
+            "description": "Tier: bronze, silver, gold, platinum"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: active, pending, inactive"
+        },
+        "referrals_count": {
+            "type": "integer",
+            "description": "Total referrals"
+        },
+        "conversions_count": {
+            "type": "integer",
+            "description": "Total conversions"
+        },
+        "revenue_generated": {
+            "type": "number",
+            "description": "Revenue generated"
+        },
+        "commission_rate": {
+            "type": "number",
+            "description": "Commission rate percentage"
+        },
+        "commission_earned": {
+            "type": "number",
+            "description": "Total commission earned"
+        },
+        "joined_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Join date"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "partner_name"
+    ]
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640" fill="none" role="img" aria-labelledby="hp-title">
+  <title id="hp-title">Abstract hero graphic</title>
+  <defs>
+    <linearGradient id="g" x1="120" y1="80" x2="880" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E2E8F0"/>
+      <stop offset="1" stop-color="#CBD5F5"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="640" rx="32" fill="#F8FAFC"/>
+  <path d="M0 440c180-72 336-104 536-92s344 132 424 292H0V440Z" fill="url(#g)" opacity=".9"/>
+  <circle cx="720" cy="200" r="120" fill="#94A3B8" opacity=".25"/>
+  <rect x="120" y="160" width="280" height="40" rx="8" fill="#64748B" opacity=".2"/>
+  <rect x="120" y="220" width="200" height="24" rx="6" fill="#64748B" opacity=".15"/>
+  <rect x="120" y="256" width="240" height="24" rx="6" fill="#64748B" opacity=".12"/>
+</svg>

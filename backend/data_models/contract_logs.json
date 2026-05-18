@@ -1,0 +1,61 @@
+{
+    "title": "contract_logs",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID who made the change"
+        },
+        "contract_id": {
+            "type": "integer",
+            "description": "Reference to contract ID"
+        },
+        "action": {
+            "type": "string",
+            "description": "Action type: created, status_changed, edited, signed, downloaded, shared, deleted"
+        },
+        "field_changed": {
+            "type": "string",
+            "description": "Which field was changed"
+        },
+        "old_value": {
+            "type": "string",
+            "description": "Previous value"
+        },
+        "new_value": {
+            "type": "string",
+            "description": "New value"
+        },
+        "actor_name": {
+            "type": "string",
+            "description": "Name of the person who made the change"
+        },
+        "actor_role": {
+            "type": "string",
+            "description": "Role of the actor: admin, manager, agent, viewer"
+        },
+        "ip_address": {
+            "type": "string",
+            "description": "IP address of the actor"
+        },
+        "notes": {
+            "type": "string",
+            "description": "Additional notes"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the change"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "contract_id",
+        "action"
+    ]
+}

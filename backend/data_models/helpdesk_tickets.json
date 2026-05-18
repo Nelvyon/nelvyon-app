@@ -1,0 +1,77 @@
+{
+    "title": "helpdesk_tickets",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "subject": {
+            "type": "string",
+            "description": "Ticket subject"
+        },
+        "description": {
+            "type": "string",
+            "description": "Ticket description"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: open, in_progress, resolved, closed"
+        },
+        "priority": {
+            "type": "string",
+            "description": "Priority: low, medium, high, urgent"
+        },
+        "category": {
+            "type": "string",
+            "description": "Category"
+        },
+        "assigned_to": {
+            "type": "string",
+            "description": "Assigned agent name"
+        },
+        "client_name": {
+            "type": "string",
+            "description": "Client name"
+        },
+        "client_email": {
+            "type": "string",
+            "description": "Client email"
+        },
+        "channel": {
+            "type": "string",
+            "description": "Channel: email, chat, phone, whatsapp"
+        },
+        "resolution_notes": {
+            "type": "string",
+            "description": "Resolution notes"
+        },
+        "satisfaction_score": {
+            "type": "integer",
+            "description": "CSAT score 1-5"
+        },
+        "first_response_minutes": {
+            "type": "integer",
+            "description": "First response time in minutes"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        },
+        "resolved_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Resolved timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "subject"
+    ]
+}

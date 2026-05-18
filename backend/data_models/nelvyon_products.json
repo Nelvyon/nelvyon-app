@@ -1,0 +1,69 @@
+{
+    "title": "nelvyon_products",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "project_id": {
+            "type": "integer",
+            "description": "Project ID"
+        },
+        "client_id": {
+            "type": "integer",
+            "description": "Client ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Product name"
+        },
+        "description": {
+            "type": "string",
+            "description": "Description"
+        },
+        "benefits": {
+            "type": "string",
+            "description": "Benefits"
+        },
+        "specs": {
+            "type": "string",
+            "description": "Specifications"
+        },
+        "price": {
+            "type": "number",
+            "description": "Price"
+        },
+        "currency": {
+            "type": "string",
+            "description": "Currency"
+        },
+        "category": {
+            "type": "string",
+            "description": "Category"
+        },
+        "images": {
+            "type": "string",
+            "description": "Images JSON"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "project_id",
+        "name"
+    ]
+}

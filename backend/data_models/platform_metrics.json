@@ -1,0 +1,57 @@
+{
+    "title": "platform_metrics",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "metric_type": {
+            "type": "string",
+            "description": "Type: api_call, page_view, ai_call, error, health_snapshot"
+        },
+        "module_name": {
+            "type": "string",
+            "description": "Module name e.g. crm, pipelines, dashboard"
+        },
+        "endpoint": {
+            "type": "string",
+            "description": "API endpoint called"
+        },
+        "latency_ms": {
+            "type": "integer",
+            "description": "Response latency in milliseconds"
+        },
+        "status": {
+            "type": "string",
+            "description": "success, error, timeout"
+        },
+        "status_code": {
+            "type": "integer",
+            "description": "HTTP status code"
+        },
+        "is_ai": {
+            "type": "boolean",
+            "description": "Whether this was an AI call"
+        },
+        "extra_data": {
+            "type": "string",
+            "description": "JSON string with additional data"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "metric_type",
+        "module_name"
+    ]
+}

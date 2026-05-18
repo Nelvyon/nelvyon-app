@@ -1,0 +1,56 @@
+{
+    "title": "presentation_history",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "title": {
+            "type": "string",
+            "description": "Presentation title"
+        },
+        "pres_type": {
+            "type": "string",
+            "description": "Type: pitch_deck, proposal, quarterly, case_study, onboarding, sales"
+        },
+        "client_name": {
+            "type": "string",
+            "description": "Client name"
+        },
+        "client_sector": {
+            "type": "string",
+            "description": "Client sector"
+        },
+        "slides_count": {
+            "type": "integer",
+            "description": "Number of slides"
+        },
+        "language": {
+            "type": "string",
+            "description": "Language code"
+        },
+        "slides_json": {
+            "type": "string",
+            "description": "Full slides JSON data"
+        },
+        "status": {
+            "type": "string",
+            "description": "completed, draft, generating"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "title"
+    ]
+}

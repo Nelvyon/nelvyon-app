@@ -1,0 +1,75 @@
+{
+    "title": "nelvyon_quality_metrics",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "service_id": {
+            "type": "string",
+            "description": "Unique service identifier"
+        },
+        "service_name": {
+            "type": "string",
+            "description": "Service display name"
+        },
+        "category": {
+            "type": "string",
+            "description": "Service category"
+        },
+        "score": {
+            "type": "integer",
+            "description": "Quality score 0-100"
+        },
+        "has_backend": {
+            "type": "boolean",
+            "description": "Has real backend connection"
+        },
+        "has_ai": {
+            "type": "boolean",
+            "description": "Has AI integration"
+        },
+        "has_crud": {
+            "type": "boolean",
+            "description": "Has CRUD operations"
+        },
+        "has_real_data": {
+            "type": "boolean",
+            "description": "Uses real data"
+        },
+        "uptime": {
+            "type": "number",
+            "description": "Uptime percentage"
+        },
+        "response_time": {
+            "type": "integer",
+            "description": "Response time in ms"
+        },
+        "description": {
+            "type": "string",
+            "description": "Service description"
+        },
+        "real_features": {
+            "type": "string",
+            "description": "JSON array of real features"
+        },
+        "limitations": {
+            "type": "string",
+            "description": "JSON array of limitations"
+        },
+        "route": {
+            "type": "string",
+            "description": "Frontend route path"
+        },
+        "last_checked": {
+            "type": "string",
+            "description": "Last quality check timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "service_id",
+        "service_name"
+    ]
+}

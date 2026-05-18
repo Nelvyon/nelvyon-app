@@ -1,0 +1,79 @@
+# --- Node / pnpm / monorepo ---
+node_modules/
+.pnpm-store/
+**/node_modules/
+
+# Lockfile alternativo si solo usas pnpm (evita commits duplicados)
+package-lock.json
+
+# Lock único del workspace en la raíz (evita divergencia con npm/pnpm mezclados)
+frontend/pnpm-lock.yaml
+
+# --- Python ---
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# --- Build / artefactos ---
+dist/
+build/
+out/
+.next/
+.nuxt/
+.turbo/
+.nx/
+.cache/
+*.tsbuildinfo
+coverage/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+
+# --- Tests / calidad ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# --- Entorno y secretos (nunca al repo) ---
+.env
+.env.local
+.env.*.local
+.env.*
+!.env.example
+!.env*.example
+secrets.*
+*.pem
+*.key
+*.p12
+
+# --- Datos locales / logs ---
+*.log
+logs/
+*.db
+*.sqlite3
+
+# --- IDE / OS ---
+.idea/
+.vscode/*.local.json
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# --- E2E / Playwright ---
+playwright-report/
+test-results/
+blob-report/
+
+# --- Misc ---
+*.local
+.turbo/cache

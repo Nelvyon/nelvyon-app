@@ -1,0 +1,49 @@
+{
+    "title": "workspace_members",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "workspace_id": {
+            "type": "integer",
+            "description": "Workspace ID"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "email": {
+            "type": "string",
+            "description": "Member email"
+        },
+        "role": {
+            "type": "string",
+            "description": "Role: owner, admin, member, viewer"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: active, invited, suspended"
+        },
+        "invited_by": {
+            "type": "string",
+            "description": "Who invited this member"
+        },
+        "joined_at": {
+            "type": "string",
+            "description": "When the member joined"
+        },
+        "created_at": {
+            "type": "string",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "workspace_id",
+        "user_id",
+        "role",
+        "status"
+    ]
+}

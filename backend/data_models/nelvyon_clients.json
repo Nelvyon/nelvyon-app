@@ -1,0 +1,100 @@
+{
+    "title": "nelvyon_clients",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "business_name": {
+            "type": "string",
+            "description": "Business name"
+        },
+        "sector": {
+            "type": "string",
+            "description": "Business sector"
+        },
+        "country": {
+            "type": "string",
+            "description": "Country"
+        },
+        "city": {
+            "type": "string",
+            "description": "City"
+        },
+        "ideal_customer": {
+            "type": "string",
+            "description": "Ideal customer profile"
+        },
+        "value_proposition": {
+            "type": "string",
+            "description": "Value proposition"
+        },
+        "differentiator": {
+            "type": "string",
+            "description": "Key differentiator"
+        },
+        "services": {
+            "type": "string",
+            "description": "Services offered"
+        },
+        "objectives": {
+            "type": "string",
+            "description": "Business objectives"
+        },
+        "brand_tone": {
+            "type": "string",
+            "description": "Brand tone"
+        },
+        "visual_style": {
+            "type": "string",
+            "description": "Visual style"
+        },
+        "brand_colors": {
+            "type": "string",
+            "description": "Brand colors"
+        },
+        "logo_url": {
+            "type": "string",
+            "description": "Logo URL"
+        },
+        "competition": {
+            "type": "string",
+            "description": "Competition info"
+        },
+        "testimonials": {
+            "type": "string",
+            "description": "Testimonials"
+        },
+        "case_studies": {
+            "type": "string",
+            "description": "Case studies"
+        },
+        "budget": {
+            "type": "string",
+            "description": "Budget range"
+        },
+        "language": {
+            "type": "string",
+            "description": "Language"
+        },
+        "market": {
+            "type": "string",
+            "description": "Target market"
+        },
+        "website_url": {
+            "type": "string",
+            "description": "Website URL"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "business_name",
+        "sector"
+    ]
+}

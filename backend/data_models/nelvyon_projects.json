@@ -1,0 +1,67 @@
+{
+    "title": "nelvyon_projects",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "client_id": {
+            "type": "integer",
+            "description": "Client ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Project name"
+        },
+        "project_type": {
+            "type": "string",
+            "description": "Project type"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status"
+        },
+        "progress": {
+            "type": "integer",
+            "description": "Progress percentage"
+        },
+        "brief": {
+            "type": "string",
+            "description": "Project brief"
+        },
+        "deliverables": {
+            "type": "string",
+            "description": "Deliverables JSON"
+        },
+        "deadline": {
+            "type": "string",
+            "description": "Deadline"
+        },
+        "priority": {
+            "type": "string",
+            "description": "Priority"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        },
+        "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Update timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "client_id",
+        "name",
+        "project_type"
+    ]
+}

@@ -1,0 +1,62 @@
+[
+    {
+        "user_id": "demo-user-001",
+        "workspace_id": 1,
+        "contact_id": 1,
+        "contact_name": "Carlos Mendoza",
+        "title": "Revisión propuesta marketing",
+        "description": "Revisión final de la propuesta de marketing digital",
+        "type": "video_call",
+        "start_time": "2026-04-07 10:00:00",
+        "end_time": "2026-04-07 11:00:00",
+        "status": "confirmed",
+        "location": "Google Meet",
+        "reminder_sent": false,
+        "created_at": "2026-04-02 18:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "workspace_id": 1,
+        "contact_id": 3,
+        "contact_name": "Andrés López",
+        "title": "Presentación branding",
+        "description": "Presentar opciones de branding para la cadena",
+        "type": "in_person",
+        "start_time": "2026-04-08 14:00:00",
+        "end_time": "2026-04-08 15:30:00",
+        "status": "confirmed",
+        "location": "Oficinas Cadena Gastronómica, CDMX",
+        "reminder_sent": false,
+        "created_at": "2026-04-01 10:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "workspace_id": 1,
+        "contact_id": 5,
+        "contact_name": "Diego Torres",
+        "title": "Discovery call - FitnessGym",
+        "description": "Primera llamada para entender necesidades",
+        "type": "phone_call",
+        "start_time": "2026-04-04 16:00:00",
+        "end_time": "2026-04-04 16:30:00",
+        "status": "pending",
+        "location": "Teléfono",
+        "reminder_sent": true,
+        "created_at": "2026-03-30 09:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "workspace_id": 1,
+        "contact_id": 2,
+        "contact_name": "María García",
+        "title": "Review mensual campañas",
+        "description": "Revisión de resultados mensuales y planificación",
+        "type": "video_call",
+        "start_time": "2026-04-10 11:00:00",
+        "end_time": "2026-04-10 12:00:00",
+        "status": "confirmed",
+        "location": "Zoom",
+        "reminder_sent": false,
+        "created_at": "2026-04-01 14:00:00"
+    }
+]

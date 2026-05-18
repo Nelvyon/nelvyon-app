@@ -1,0 +1,17 @@
+groups:
+  - name: nelvyon-phase9
+    rules:
+      - alert: NelvyonApiHigh5xxRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.05
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "High 5xx ratio in NELVYON API"
+      - alert: NelvyonJobFailureRatioHigh
+        expr: sum(rate(job_outcomes_total{terminal="failed"}[10m])) / sum(rate(job_outcomes_total[10m])) > 0.1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High failed job ratio"

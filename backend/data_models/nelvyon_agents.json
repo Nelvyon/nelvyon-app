@@ -1,0 +1,96 @@
+{
+    "title": "nelvyon_agents",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "agent_id": {
+            "type": "string",
+            "description": "Unique agent identifier slug"
+        },
+        "name": {
+            "type": "string",
+            "description": "Agent display name"
+        },
+        "codename": {
+            "type": "string",
+            "description": "Agent codename"
+        },
+        "description": {
+            "type": "string",
+            "description": "Short description"
+        },
+        "long_description": {
+            "type": "string",
+            "description": "Detailed description"
+        },
+        "color": {
+            "type": "string",
+            "description": "Theme color hex"
+        },
+        "gradient": {
+            "type": "string",
+            "description": "CSS gradient string"
+        },
+        "icon_name": {
+            "type": "string",
+            "description": "Lucide icon name"
+        },
+        "status": {
+            "type": "string",
+            "description": "active|processing|idle|error"
+        },
+        "uptime": {
+            "type": "string",
+            "description": "Uptime percentage string"
+        },
+        "tasks_completed": {
+            "type": "integer",
+            "description": "Total tasks completed"
+        },
+        "tasks_today": {
+            "type": "integer",
+            "description": "Tasks completed today"
+        },
+        "success_rate": {
+            "type": "number",
+            "description": "Success rate 0-100"
+        },
+        "functionality_level": {
+            "type": "string",
+            "description": "full|partial|ui_only|planned"
+        },
+        "functionality_note": {
+            "type": "string",
+            "description": "Note about functionality"
+        },
+        "capabilities": {
+            "type": "string",
+            "description": "JSON array of capability strings"
+        },
+        "metrics": {
+            "type": "string",
+            "description": "JSON array of metric objects"
+        },
+        "recent_tasks": {
+            "type": "string",
+            "description": "JSON array of recent task objects"
+        },
+        "logs": {
+            "type": "string",
+            "description": "JSON array of log objects"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "agent_id",
+        "name"
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "title": "segment_results",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "total_contacts": {
+            "type": "integer",
+            "description": "Total contacts segmented"
+        },
+        "segments_count": {
+            "type": "integer",
+            "description": "Number of segments found"
+        },
+        "top_segment": {
+            "type": "string",
+            "description": "Name of top segment"
+        },
+        "data_quality_score": {
+            "type": "integer",
+            "description": "Data quality score 0-100"
+        },
+        "result_json": {
+            "type": "string",
+            "description": "Full segmentation result JSON"
+        },
+        "contacts_json": {
+            "type": "string",
+            "description": "Original contacts JSON"
+        },
+        "status": {
+            "type": "string",
+            "description": "completed, processing"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id"
+    ]
+}

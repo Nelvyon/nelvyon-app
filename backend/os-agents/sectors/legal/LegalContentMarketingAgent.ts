@@ -1,0 +1,73 @@
+import type { ILlmClient } from "../../LlmClient";
+import { LearningService } from "../../learning/LearningService";
+import { tryLogCrmAgentOutput } from "../../crm/agentRunHook";
+import { ClientProfileService } from "../../client-profile";
+import { LlmClient } from "../../LlmClient";
+import type { LegalMarketingInput, LegalMarketingOutput } from "./legalMarketingShared";
+import { legalMarketingLlmOpts } from "./legalMarketingShared";
+
+export type LegalContentMarketingAgentDeps = { llm?: ILlmClient };
+export class LegalContentMarketingAgent {
+  constructor(private readonly deps: LegalContentMarketingAgentDeps = {}) {}
+  private get llm(): ILlmClient { return this.deps.llm ?? LlmClient.getInstance(); }
+  async run(userId: string, input: LegalMarketingInput): Promise<LegalMarketingOutput> {
+    const enriched = (await ClientProfileService.enrichInput(
+    userId,
+    String((input as { brandName?: string }).brandName ?? ""),
+    input as object,
+    )) as typeof input & { _clientProfileBrief?: string };
+
+        
+
+const prompt = `### ESTÁNDAR NELVYON OS — PROMPTS ÉLITE v1
+1. ROL EXPERTO verificable · 2. CONTEXTO del cliente · 3. TAREA con formato estructurado · 4. Ejemplos concretos · 5. Sin relleno genérico · 6. Calidad top 1% mundial.
+
+${enriched._clientProfileBrief ? `${String(enriched._clientProfileBrief).trim()}\n\n` : ""}ROLE: Eres un estratega senior, editor y copywriter de élite en el vertical del cliente, con criterio de producto y estándares editoriales exigentes.
+
+CONTEXT:
+- Toda la información de negocio, restricciones, tono y datos concretos está en el bloque "### BRIEF OPERATIVO" más abajo; intégralos todos en tu razonamiento.
+- No contradigas el brief; si algo es ambiguo, explicita la suposición en una línea.
+
+FRAMEWORK: AIDA + PAS y narrativa antes / después / puente (dolor actual → amplificación creíble → puente con tu propuesta → estado futuro).
+
+OUTPUT FORMAT: Responde en español salvo que el brief pida otro idioma. Usa secciones con encabezados ###, bullets densos donde aporte, y checklist o próximos pasos cuando sea útil. Longitud acorde a la tarea (ni genérico ni verboso).
+
+QUALITY BAR: Nivel de calidad: top 1% mundial. Cada output debe ser accionable, específico y superior a cualquier herramienta genérica del mercado. Sin relleno: donde falte dato usa [PLACEHOLDER] con instrucción breve de cómo completarlo. Respeta compliance sectorial y marcas legales cuando aplique.
+
+### EJEMPLOS DE CALIDAD ÉLITE
+Ejemplo 1:
+Input: legal con datos reales: presupuesto 3500 EUR, objetivo 42 leads cualificados en 30 dias, audiencia principal 30-45, ciudad principal y KPI historico CTR 2.1%.
+Output: Plan especifico para legal con hipotesis cuantificada, copy exacto por canal, cadencia semanal y criterio de corte por KPI. Incluye segmentacion, mensaje principal y accion concreta del dia 1 al dia 7.
+
+Ejemplo 2:
+Input: legal con estacionalidad alta, ticket medio 120 EUR, margen 38%, base activa 1800 contactos, objetivo subir conversion un 18% sin aumentar CPC.
+Output: Propuesta accionable para legal con dos variantes diferenciadas, ofertas con limites claros, calendario por franja horaria y mecanismo de seguimiento con metrica objetivo por etapa.
+### FIN EJEMPLOS
+
+### BRIEF OPERATIVO
+Estrategia de contenido jurídico de autoridad para "${enriched.firmName}" (${enriched.practiceArea}, ${enriched.targetClient}, tono ${enriched.tone}, ${enriched.location ?? "España"}):
+1) 20 ideas de artículos de blog agrupadas por área de práctica.
+2) Un artículo explicativo ~1000 palabras en lenguaje ciudadano sobre un tema legal frecuente en esa práctica (estructura: introducción, qué dice la ley en términos simples, pasos prácticos, cuándo acudir a abogado, disclaimer genérico de no es asesoramiento).
+3) FAQ con las 10 dudas más comunes de clientes y respuestas breves.
+4) Esquema de guía descargable (lead magnet) sobre un proceso legal concreto (índice + bullets de contenido).
+5) Borrador de newsletter mensual con novedades legislativas relevantes (estilo informativo).
+6) Política de contenido que respete deontología del colegio de abogados español: sin promesas de resultado, sin comparaciones denigratorias, transparencia publicitaria.
+Organiza con secciones claras.`;
+    const __crmOut = { agentId: "legal-content-marketing", result: await this.llm.complete(prompt, legalMarketingLlmOpts(0.7)), generatedAt: new Date().toISOString() };
+    await tryLogCrmAgentOutput(userId, input, __crmOut);
+    try {
+      await new LearningService().recordOutcome(
+        userId,
+        __crmOut.agentId,
+        "legal",
+        input,
+        __crmOut,
+        "generated",
+      );
+    } catch {}
+    return __crmOut;
+  }
+}
+let legalContentMarketingCached: LegalContentMarketingAgent | undefined;
+export function getLegalContentMarketingAgent(): LegalContentMarketingAgent { if (!legalContentMarketingCached) legalContentMarketingCached = new LegalContentMarketingAgent(); return legalContentMarketingCached; }
+export function resetLegalContentMarketingAgentForTests(): void { legalContentMarketingCached = undefined; }

@@ -1,0 +1,61 @@
+{
+    "title": "pipeline_deals",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Deal name"
+        },
+        "company": {
+            "type": "string",
+            "description": "Company name"
+        },
+        "value": {
+            "type": "number",
+            "description": "Deal value"
+        },
+        "probability": {
+            "type": "integer",
+            "description": "Win probability percentage"
+        },
+        "stage": {
+            "type": "string",
+            "description": "Pipeline stage: lead, qualified, proposal, negotiation, closed_won, closed_lost"
+        },
+        "owner": {
+            "type": "string",
+            "description": "Deal owner name"
+        },
+        "tags": {
+            "type": "string",
+            "description": "Comma-separated tags"
+        },
+        "days_in_stage": {
+            "type": "integer",
+            "description": "Days in current stage"
+        },
+        "last_activity": {
+            "type": "string",
+            "description": "Last activity description"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name",
+        "stage"
+    ]
+}

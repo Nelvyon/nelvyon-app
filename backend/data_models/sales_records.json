@@ -1,0 +1,62 @@
+{
+    "title": "sales_records",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "client_name": {
+            "type": "string",
+            "description": "Client name"
+        },
+        "product": {
+            "type": "string",
+            "description": "Product/service sold"
+        },
+        "amount": {
+            "type": "number",
+            "description": "Sale amount"
+        },
+        "currency": {
+            "type": "string",
+            "description": "Currency"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: completed, pending, refunded"
+        },
+        "payment_method": {
+            "type": "string",
+            "description": "Payment method"
+        },
+        "invoice_number": {
+            "type": "string",
+            "description": "Invoice number"
+        },
+        "notes": {
+            "type": "string",
+            "description": "Sale notes"
+        },
+        "closed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Close date"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "client_name",
+        "amount"
+    ]
+}

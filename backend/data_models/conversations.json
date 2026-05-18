@@ -1,0 +1,66 @@
+{
+    "title": "conversations",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "workspace_id": {
+            "type": "integer",
+            "description": "Workspace ID"
+        },
+        "contact_id": {
+            "type": "integer",
+            "description": "Contact ID"
+        },
+        "contact_name": {
+            "type": "string",
+            "description": "Contact name"
+        },
+        "channel": {
+            "type": "string",
+            "description": "Communication channel"
+        },
+        "subject": {
+            "type": "string",
+            "description": "Conversation subject"
+        },
+        "last_message": {
+            "type": "string",
+            "description": "Last message preview"
+        },
+        "last_message_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last message timestamp"
+        },
+        "status": {
+            "type": "string",
+            "description": "Conversation status"
+        },
+        "unread_count": {
+            "type": "integer",
+            "description": "Unread messages count"
+        },
+        "priority": {
+            "type": "string",
+            "description": "Priority level"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "contact_name",
+        "channel"
+    ]
+}

@@ -1,0 +1,73 @@
+{
+    "title": "subscriptions",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID from auth"
+        },
+        "plan_id": {
+            "type": "string",
+            "description": "Plan identifier: starter, pro, enterprise, partner"
+        },
+        "billing_cycle": {
+            "type": "string",
+            "description": "Billing cycle: monthly, quarterly, semiannual, annual, biennial"
+        },
+        "status": {
+            "type": "string",
+            "description": "Subscription status: active, cancelled, expired, pending"
+        },
+        "stripe_session_id": {
+            "type": "string",
+            "description": "Stripe checkout session ID"
+        },
+        "stripe_subscription_id": {
+            "type": "string",
+            "description": "Stripe subscription ID if recurring"
+        },
+        "amount_paid": {
+            "type": "number",
+            "description": "Amount paid in euros"
+        },
+        "currency": {
+            "type": "string",
+            "description": "Currency code, default EUR"
+        },
+        "promo_code": {
+            "type": "string",
+            "description": "Promotional code applied if any"
+        },
+        "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Subscription start date"
+        },
+        "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Subscription expiration date"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Record creation timestamp"
+        },
+        "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Record last update timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "plan_id",
+        "billing_cycle",
+        "status"
+    ]
+}

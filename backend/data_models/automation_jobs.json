@@ -1,0 +1,80 @@
+{
+    "title": "automation_jobs",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "client_id": {
+            "type": "integer",
+            "description": "Client ID"
+        },
+        "client_name": {
+            "type": "string",
+            "description": "Client name"
+        },
+        "job_type": {
+            "type": "string",
+            "description": "Job type"
+        },
+        "status": {
+            "type": "string",
+            "description": "Job status"
+        },
+        "input_data": {
+            "type": "string",
+            "description": "Input data JSON"
+        },
+        "output_data": {
+            "type": "string",
+            "description": "Output data JSON"
+        },
+        "output_id": {
+            "type": "integer",
+            "description": "Output ID"
+        },
+        "project_id": {
+            "type": "integer",
+            "description": "Project ID"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source"
+        },
+        "webhook_id": {
+            "type": "string",
+            "description": "Webhook ID"
+        },
+        "priority": {
+            "type": "string",
+            "description": "Priority"
+        },
+        "error_message": {
+            "type": "string",
+            "description": "Error message"
+        },
+        "processing_time_ms": {
+            "type": "integer",
+            "description": "Processing time in ms"
+        },
+        "delivered_at": {
+            "type": "string",
+            "description": "Delivered timestamp"
+        },
+        "created_at": {
+            "type": "string",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "job_type",
+        "status"
+    ]
+}

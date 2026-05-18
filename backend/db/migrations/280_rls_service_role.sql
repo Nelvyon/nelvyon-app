@@ -1,0 +1,37 @@
+-- MIG 279/280 — Service role vs client roles (documentation)
+--
+-- Supabase project: lezzkqpkxcoxqqcgohof
+--
+-- BACKEND (Next.js API routes, workers, migrations):
+--   · Connection: DATABASE_URL (Postgres direct pool via DbClient)
+--   · MUST use the service_role connection string OR a DB role that bypasses RLS
+--   · NEVER use NEXT_PUBLIC_SUPABASE_ANON_KEY in server code
+--   · Env: SUPABASE_SERVICE_ROLE_KEY (for optional Supabase REST); DATABASE_URL for pg pool
+--
+-- FRONTEND (browser, if Supabase JS SDK is introduced):
+--   · NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY only
+--   · Role `authenticated` when user has Supabase Auth session JWT
+--   · Role `anon` for unauthenticated reads where policies allow
+--   · RLS policies in 279_rls_audit.sql enforce tenant isolation
+--
+-- TABLES — access matrix (May 2026):
+--
+-- | Table group              | RLS | Client (anon/auth) | Backend (service) |
+-- |--------------------------|-----|--------------------|-------------------|
+-- | nelvyon_users            | YES | own row            | full              |
+-- | subscriptions            | YES | own row            | full              |
+-- | usage_events             | YES | own rows           | full              |
+-- | api_keys                 | YES | own rows           | full              |
+-- | onboarding               | YES | own row            | full              |
+-- | dunning_log              | YES | own tenant         | full              |
+-- | os_jobs                  | YES | own client_id      | full              |
+-- | *_results (all agents)   | YES | own user_id        | full              |
+-- | usage_limits             | NO  | —                  | full (catalog)    |
+-- | status_checks, incidents | NO  | —                  | full (platform)   |
+-- | waitlist                 | NO  | insert public*     | full              |
+-- | _migrations              | NO  | —                  | full              |
+--
+-- * waitlist: consider RLS in a future mig if exposed via Supabase client
+--
+-- service_role bypasses RLS automatically in Supabase — required for webhooks,
+-- Paddle, SES, cron, and agent workers.

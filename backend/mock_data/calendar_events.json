@@ -1,0 +1,72 @@
+[
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "Reunion de equipo semanal",
+        "description": "Revision de KPIs y planificacion sprint",
+        "start_time": "2026-04-10 10:00:00",
+        "end_time": "2026-04-10 11:00:00",
+        "event_type": "meeting",
+        "status": "confirmed",
+        "location": "Sala Virtual Zoom",
+        "attendees": "equipo@nelvyon.com",
+        "color": "#3B82F6",
+        "is_recurring": true,
+        "created_at": "2026-03-01 09:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "Demo cliente TechCorp",
+        "description": "Presentacion de la plataforma NELVYON al equipo de TechCorp",
+        "start_time": "2026-04-11 15:00:00",
+        "end_time": "2026-04-11 16:30:00",
+        "event_type": "demo",
+        "status": "confirmed",
+        "location": "Google Meet",
+        "attendees": "maria@techcorp.es, ventas@nelvyon.com",
+        "color": "#10B981",
+        "is_recurring": false,
+        "created_at": "2026-04-05 14:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "Webinar: IA para Marketing",
+        "description": "Webinar publico sobre como usar IA en estrategias de marketing",
+        "start_time": "2026-04-14 18:00:00",
+        "end_time": "2026-04-14 19:30:00",
+        "event_type": "webinar",
+        "status": "confirmed",
+        "location": "YouTube Live",
+        "attendees": "publico",
+        "color": "#F59E0B",
+        "is_recurring": false,
+        "created_at": "2026-04-01 10:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "Seguimiento lead InnovaDigital",
+        "description": "Llamada de seguimiento con Carlos de InnovaDigital",
+        "start_time": "2026-04-10 14:00:00",
+        "end_time": "2026-04-10 14:30:00",
+        "event_type": "call",
+        "status": "pending",
+        "location": "Telefono",
+        "attendees": "carlos@innovadigital.com",
+        "color": "#8B5CF6",
+        "is_recurring": false,
+        "created_at": "2026-04-08 09:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "Revision trimestral Q1",
+        "description": "Analisis de resultados del primer trimestre 2026",
+        "start_time": "2026-04-12 09:00:00",
+        "end_time": "2026-04-12 12:00:00",
+        "event_type": "meeting",
+        "status": "confirmed",
+        "location": "Oficina Central",
+        "attendees": "directivos@nelvyon.com",
+        "color": "#EF4444",
+        "is_recurring": false,
+        "created_at": "2026-04-02 08:00:00"
+    }
+]

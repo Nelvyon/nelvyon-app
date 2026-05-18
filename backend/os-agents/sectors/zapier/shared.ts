@@ -1,0 +1,163 @@
+import type { ILlmClient, LlmOptions } from "../../LlmClient";
+import { LlmClient } from "../../LlmClient";
+import { ModelRouter } from "../../llm/ModelRouter";
+import { LearningService } from "../../learning/LearningService";
+
+import { ELITE_V300_STANDARDS } from "../../prompts/elitePromptLibrary";
+export type ZapierIntegrationPlatform = "zapier" | "make" | "both";
+
+/** Triggers NAT disponibles hacia Zapier/Make */
+export type ZapierTriggerEvent =
+  | "agent.completed"
+  | "client.created"
+  | "billing.paid"
+  | "report.generated"
+  | "churn.detected"
+  | "review.received";
+
+/** Acciones desde Zapier/Make hacia NELVYON */
+export type ZapierActionType =
+  | "run_agent"
+  | "create_client"
+  | "send_report"
+  | "trigger_campaign"
+  | "update_crm";
+
+export interface ZapierInput {
+  userId: string;
+  sector: string;
+  brand: string;
+  /** Destino del conector */
+  platform?: ZapierIntegrationPlatform;
+  triggerEvent?: ZapierTriggerEvent | string;
+  actionType?: ZapierActionType | string;
+  workflowBrief?: string;
+  metricsBrief?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ZapierOutput {
+  agentId: string;
+  content: string;
+  score: number;
+  highlights: string[];
+  metrics: string[];
+}
+
+function parseJson<T>(raw: string, label: string): T {
+  const trimmed = raw.trim();
+  const fenced = /^```(?:json)?\s*([\s\S]*?)```/m.exec(trimmed);
+  const payload = fenced?.[1] ? fenced[1].trim() : trimmed;
+  try {
+    return JSON.parse(payload) as T;
+  } catch {
+    throw new Error(`${label}: JSON inválido`);
+  }
+}
+
+export function llmOpts(agentId: string, temperature: number): LlmOptions {
+  const _routed = ModelRouter.getModel(agentId);
+  return {
+    ..._routed,
+    model: "gpt-4.1",
+    fallback: "gpt-4o",
+    maxTokens: 2000,
+    temperature,
+  };
+}
+
+function clampScore(n: number): number {
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(100, Math.round(n)));
+}
+
+export function parseZapierLlmJson(raw: string, label: string): Omit<ZapierOutput, "agentId"> {
+  const p = parseJson<{ content?: unknown; score?: unknown; highlights?: unknown; metrics?: unknown }>(raw, label);
+  const content = typeof p.content === "string" ? p.content : String(p.content ?? "");
+  const score = clampScore(typeof p.score === "number" ? p.score : Number(p.score));
+  const h = p.highlights;
+  const highlights = Array.isArray(h)
+    ? h.map((x) => (typeof x === "string" ? x : String(x))).filter(Boolean)
+    : [];
+  const m = p.metrics;
+  const metrics = Array.isArray(m) ? m.map((x) => (typeof x === "string" ? x : String(x))).filter(Boolean) : [];
+  return { content, score, highlights, metrics };
+}
+
+export function buildZapierPrompt(params: {
+  eliteRole: string;
+  mission: string;
+  fewShotExample: string;
+  input: ZapierInput;
+}): string {
+  const metrics = params.input.metricsBrief?.trim() ? params.input.metricsBrief.trim() : "no indicado";
+  const meta =
+    params.input.metadata && Object.keys(params.input.metadata).length > 0
+      ? JSON.stringify(params.input.metadata, null, 0)
+      : "{}";
+  const plat = params.input.platform ?? "zapier y make (webhooks estándar)";
+  const te = params.input.triggerEvent?.toString().trim() ? String(params.input.triggerEvent).trim() : "no indicado";
+  const at = params.input.actionType?.toString().trim() ? String(params.input.actionType).trim() : "no indicado";
+  const wf = params.input.workflowBrief?.trim() ? params.input.workflowBrief.trim() : "no indicado";
+
+  return `${params.eliteRole}
+
+${ELITE_V300_STANDARDS}
+
+INTEGRACIÓN ZAPIER / MAKE (v1) NELVYON OS:
+- **Compatible con Zapier y Make** a la vez mediante **webhooks HTTP estándar** y payloads JSON documentados.
+- **Triggers NAT** (hacia integraciones): **agent.completed**, **client.created**, **billing.paid**, **report.generated**, **churn.detected**, **review.received**.
+- **Acciones** (desde integraciones hacia NELVYON): **run_agent**, **create_client**, **send_report**, **trigger_campaign**, **update_crm**.
+- **Plantillas predefinidas** (orientativas): "Nuevo cliente → CRM", "Reporte listo → Slack", "Churn detectado → Email rescate", "Review negativa → Alerta", "Billing fallido → SMS".
+
+FEW-SHOT (alto rendimiento):
+${params.fewShotExample}
+
+### BRIEF
+- Sector / cuenta: ${params.input.sector}
+- Marca / workspace: ${params.input.brand}
+- Plataforma: ${plat}
+- Trigger: ${te}
+- Acción: ${at}
+- Workflow / caso: ${wf}
+- Métricas / contexto: ${metrics}
+- metadata: ${meta}
+
+MISIÓN DEL AGENTE:
+${params.mission}
+
+OUTPUT: Responde **solo** JSON válido UTF-8 (sin markdown):
+{"content":"documento maestro en español salvo brief","score":0-100,"highlights":["bullets"],"metrics":["líneas KPI"]}`;
+}
+
+export async function runZapierAgentCore(
+  agentId: string,
+  llm: ILlmClient,
+  params: {
+    eliteRole: string;
+    mission: string;
+    fewShotExample: string;
+  },
+  input: ZapierInput,
+  temperature: number,
+): Promise<ZapierOutput> {
+  const prompt = buildZapierPrompt({
+    eliteRole: params.eliteRole,
+    mission: params.mission,
+    fewShotExample: params.fewShotExample,
+    input,
+  });
+  const raw = await llm.complete(prompt, llmOpts(agentId, temperature));
+  const parsed = parseZapierLlmJson(raw, agentId);
+  const out: ZapierOutput = { agentId, ...parsed };
+  try {
+    await new LearningService().recordOutcome(input.userId, agentId, input.sector, input, out, "generated");
+  } catch {
+    /* sin DB en tests */
+  }
+  return out;
+}
+
+export function getDefaultZapierLlm(): ILlmClient {
+  return LlmClient.getInstance();
+}

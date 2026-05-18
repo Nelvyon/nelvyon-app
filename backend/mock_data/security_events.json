@@ -1,0 +1,62 @@
+[
+    {
+        "user_id": "demo-nelvyon-admin",
+        "event_type": "login_success",
+        "severity": "info",
+        "source_ip": "192.168.1.45",
+        "description": "Login exitoso desde Chrome/Windows",
+        "user_agent": "Chrome 120 / Windows 11",
+        "status": "resolved",
+        "created_at": "2026-04-10 09:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "event_type": "login_failed",
+        "severity": "warning",
+        "source_ip": "45.33.22.11",
+        "description": "3 intentos fallidos de login - cuenta bloqueada temporalmente",
+        "user_agent": "Firefox 119 / Linux",
+        "status": "blocked",
+        "created_at": "2026-04-09 23:15:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "event_type": "api_rate_limit",
+        "severity": "warning",
+        "source_ip": "103.45.67.89",
+        "description": "Rate limit excedido en endpoint /api/v1/contacts - 500 req/min",
+        "user_agent": "Python/requests 2.31",
+        "status": "blocked",
+        "created_at": "2026-04-09 14:30:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "event_type": "data_export",
+        "severity": "info",
+        "source_ip": "192.168.1.45",
+        "description": "Exportacion de 1500 contactos a CSV por admin",
+        "user_agent": "Chrome 120 / Windows 11",
+        "status": "resolved",
+        "created_at": "2026-04-08 16:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "event_type": "suspicious_activity",
+        "severity": "critical",
+        "source_ip": "185.220.101.34",
+        "description": "Intento de SQL injection detectado en formulario de contacto",
+        "user_agent": "curl/7.88",
+        "status": "blocked",
+        "created_at": "2026-04-07 03:22:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "event_type": "permission_change",
+        "severity": "info",
+        "source_ip": "192.168.1.50",
+        "description": "Rol de usuario cambiado de viewer a editor",
+        "user_agent": "Chrome 120 / macOS",
+        "status": "resolved",
+        "created_at": "2026-04-06 11:00:00"
+    }
+]

@@ -1,0 +1,48 @@
+{
+    "title": "automation_webhooks",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Webhook name"
+        },
+        "webhook_key": {
+            "type": "string",
+            "description": "Webhook key"
+        },
+        "job_type": {
+            "type": "string",
+            "description": "Job type"
+        },
+        "is_active": {
+            "type": "boolean",
+            "description": "Active flag"
+        },
+        "total_calls": {
+            "type": "integer",
+            "description": "Total calls"
+        },
+        "last_called_at": {
+            "type": "string",
+            "description": "Last called timestamp"
+        },
+        "created_at": {
+            "type": "string",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name",
+        "webhook_key"
+    ]
+}

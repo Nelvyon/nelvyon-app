@@ -1,0 +1,49 @@
+{
+    "title": "messages",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "conversation_id": {
+            "type": "integer",
+            "description": "Conversation ID"
+        },
+        "sender_type": {
+            "type": "string",
+            "description": "Sender type (user/contact/bot)"
+        },
+        "sender_name": {
+            "type": "string",
+            "description": "Sender name"
+        },
+        "content": {
+            "type": "string",
+            "description": "Message content"
+        },
+        "channel": {
+            "type": "string",
+            "description": "Channel"
+        },
+        "status": {
+            "type": "string",
+            "description": "Message status"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "conversation_id",
+        "content"
+    ]
+}

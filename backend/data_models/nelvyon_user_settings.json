@@ -1,0 +1,58 @@
+{
+    "title": "nelvyon_user_settings",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "display_name": {
+            "type": "string",
+            "description": "User display name"
+        },
+        "role": {
+            "type": "string",
+            "description": "User role"
+        },
+        "two_fa_enabled": {
+            "type": "boolean",
+            "description": "2FA enabled"
+        },
+        "notification_new_clients": {
+            "type": "boolean",
+            "description": "Notify on new clients"
+        },
+        "notification_qa_complete": {
+            "type": "boolean",
+            "description": "Notify on QA complete"
+        },
+        "notification_deploys": {
+            "type": "boolean",
+            "description": "Notify on deploys"
+        },
+        "notification_errors": {
+            "type": "boolean",
+            "description": "Notify on errors"
+        },
+        "notification_weekly_email": {
+            "type": "boolean",
+            "description": "Weekly email digest"
+        },
+        "theme_id": {
+            "type": "string",
+            "description": "Current theme ID"
+        },
+        "custom_theme_json": {
+            "type": "string",
+            "description": "Custom theme JSON"
+        }
+    },
+    "required": [
+        "id",
+        "user_id"
+    ]
+}

@@ -1,0 +1,48 @@
+{
+    "title": "security_events",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "event_type": {
+            "type": "string",
+            "description": "Type: login, threat_blocked, scan, alert, audit"
+        },
+        "severity": {
+            "type": "string",
+            "description": "Severity: low, medium, high, critical"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source IP or system"
+        },
+        "description": {
+            "type": "string",
+            "description": "Event description"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: resolved, active, investigating"
+        },
+        "details_json": {
+            "type": "string",
+            "description": "JSON details"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "event_type"
+    ]
+}

@@ -1,0 +1,85 @@
+{
+    "title": "contracts",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "workspace_id": {
+            "type": "integer",
+            "description": "Workspace ID"
+        },
+        "title": {
+            "type": "string",
+            "description": "Contract title"
+        },
+        "contract_type": {
+            "type": "string",
+            "description": "Type of contract"
+        },
+        "client_name": {
+            "type": "string",
+            "description": "Client name"
+        },
+        "company_name": {
+            "type": "string",
+            "description": "Company name"
+        },
+        "content": {
+            "type": "string",
+            "description": "Full contract content text"
+        },
+        "jurisdiction": {
+            "type": "string",
+            "description": "Legal jurisdiction"
+        },
+        "language": {
+            "type": "string",
+            "description": "Contract language"
+        },
+        "status": {
+            "type": "string",
+            "description": "Contract status: draft, signed, expired"
+        },
+        "signature_data": {
+            "type": "string",
+            "description": "Signature image data"
+        },
+        "price": {
+            "type": "string",
+            "description": "Contract price"
+        },
+        "duration": {
+            "type": "string",
+            "description": "Contract duration"
+        },
+        "template_id": {
+            "type": "string",
+            "description": "Template ID used"
+        },
+        "audit_trail": {
+            "type": "string",
+            "description": "JSON audit trail"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        },
+        "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Update timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "title"
+    ]
+}

@@ -1,0 +1,131 @@
+{
+  "hero": {
+    "title": "The first AI-powered digital marketing OS",
+    "subtitle": "22 premium services executed automatically. No team. No delays. World-class agency quality.",
+    "cta_primary": "Start free",
+    "cta_secondary": "View services"
+  },
+  "pricing": {
+    "title": "NELVYON Plans",
+    "starter": "STARTER",
+    "pro": "PRO",
+    "enterprise": "ENTERPRISE",
+    "monthly": "Monthly",
+    "annual": "Annual (2 months free)",
+    "most_popular": "Most popular"
+  },
+  "partners": {
+    "title": "Earn by selling NELVYON",
+    "subtitle": "30% monthly commission for every customer you bring. Unlimited earnings. No entry cost.",
+    "how_it_works": "How it works"
+  },
+  "nav": {
+    "services": "Services",
+    "pricing": "Pricing",
+    "partners": "Partners",
+    "login": "Login"
+  },
+  "footer": {
+    "rights": "© 2026 NELVYON"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in to NELVYON OS",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "no_account": "No account yet?"
+    },
+    "register": {
+      "title": "Create account",
+      "name": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Create account",
+      "has_account": "Already have an account?"
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome, {company}",
+    "active_jobs": "Active services",
+    "completed_jobs": "Completed services",
+    "total_spend": "Total spend",
+    "current_plan": "Current plan",
+    "recent_activity": "Recent activity",
+    "empty_state": "No services have been executed yet. Start now from Services.",
+    "quick_actions": "Quick actions"
+  },
+  "crm": {
+    "title": "Integrated CRM",
+    "contacts": "Contacts",
+    "pipeline": "Pipeline",
+    "new_contact": "New contact",
+    "search": "Search name or email",
+    "filter": "Filter",
+    "no_contacts": "No contacts yet."
+  },
+  "workflows": {
+    "title": "Workflows",
+    "new_workflow": "New workflow",
+    "no_workflows": "No workflows",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "paused": "Paused"
+    }
+  },
+  "campanias": {
+    "title": "Campaigns",
+    "new": "New campaign",
+    "no_campanias": "No campaigns",
+    "status": {
+      "draft": "Draft",
+      "running": "Running",
+      "completed": "Completed"
+    }
+  },
+  "admin": {
+    "title": "Admin",
+    "tenants": "Tenants",
+    "jobs": "Jobs",
+    "activity": "Activity",
+    "stats": {
+      "total_tenants": "Total tenants",
+      "active_tenants": "Active tenants",
+      "total_jobs": "Total jobs",
+      "running_jobs": "Running jobs"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "search": "Search",
+    "filter": "Filter",
+    "empty_state": "No results",
+    "view_all": "View all"
+  },
+  "os": {
+    "execution": {
+      "title": "OS execution",
+      "no_jobs": "No jobs"
+    },
+    "intake": {
+      "title": "Service intake"
+    },
+    "status": {
+      "pending": "Pending",
+      "running": "Running",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  }
+}

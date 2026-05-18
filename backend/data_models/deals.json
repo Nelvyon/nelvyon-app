@@ -1,0 +1,83 @@
+{
+    "title": "deals",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "workspace_id": {
+            "type": "integer",
+            "description": "Workspace ID"
+        },
+        "contact_id": {
+            "type": "integer",
+            "description": "Contact ID"
+        },
+        "title": {
+            "type": "string",
+            "description": "Deal title"
+        },
+        "value": {
+            "type": "number",
+            "description": "Deal value"
+        },
+        "currency": {
+            "type": "string",
+            "description": "Currency code"
+        },
+        "stage": {
+            "type": "string",
+            "description": "Deal stage"
+        },
+        "pipeline": {
+            "type": "string",
+            "description": "Pipeline name"
+        },
+        "probability": {
+            "type": "integer",
+            "description": "Win probability 0-100"
+        },
+        "expected_close": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Expected close date"
+        },
+        "assigned_to": {
+            "type": "string",
+            "description": "Assigned salesperson"
+        },
+        "tags": {
+            "type": "string",
+            "description": "Comma-separated tags"
+        },
+        "notes": {
+            "type": "string",
+            "description": "Deal notes"
+        },
+        "days_in_stage": {
+            "type": "integer",
+            "description": "Days in current stage"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created at"
+        },
+        "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Updated at"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "title",
+        "stage"
+    ]
+}

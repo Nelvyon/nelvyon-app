@@ -1,0 +1,29 @@
+{
+  "name": "nelvyon-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.600.0",
+    "@sentry/node": "^10.51.0",
+    "bcryptjs": "^2.4.3",
+    "fflate": "0.8.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/ws": "^8.18.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.1.16",
+      "@types/react-dom": "19.1.9"
+    }
+  },
+  "scripts": {
+    "dev:frontend": "pnpm -C frontend dev",
+    "dev:backend": "cd backend && python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000",
+    "lint": "pnpm -C frontend lint",
+    "test:fast": "cd backend && python -m pytest tests/test_audit_rbac_phase1.py tests/test_secrets_phase1.py tests/test_messages_workspace_consistency.py tests/test_regression_abcd_smoke.py tests/test_voice_pilot_v2.py tests/test_os_observability_v1.py tests/test_tenant_branding_v2_policy.py tests/test_os_global_v2.py tests/test_os_excellence_v1.py -q --tb=short"
+  }
+}

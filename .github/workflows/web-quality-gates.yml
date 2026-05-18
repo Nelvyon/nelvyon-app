@@ -1,0 +1,46 @@
+name: Web Quality Gates
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/web-quality-gates.yml"
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/web-quality-gates.yml"
+
+jobs:
+  web-gates:
+    name: Typecheck, lint, smoke, bot evals
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Quality gate
+        run: pnpm gate
+
+      - name: Full regression tests (non-blocking signal)
+        run: pnpm test:regression
+        continue-on-error: true

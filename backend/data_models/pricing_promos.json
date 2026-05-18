@@ -1,0 +1,59 @@
+{
+    "title": "pricing_promos",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Promo name"
+        },
+        "promo_type": {
+            "type": "string",
+            "description": "Type: seasonal, flash, loyalty, volume, referral"
+        },
+        "discount_percent": {
+            "type": "integer",
+            "description": "Discount percentage"
+        },
+        "code": {
+            "type": "string",
+            "description": "Promo code"
+        },
+        "plan_id": {
+            "type": "string",
+            "description": "Plan ID"
+        },
+        "billing_cycle": {
+            "type": "string",
+            "description": "Billing cycle"
+        },
+        "active": {
+            "type": "boolean",
+            "description": "Is active"
+        },
+        "valid_from": {
+            "type": "string",
+            "description": "Valid from ISO date"
+        },
+        "valid_until": {
+            "type": "string",
+            "description": "Valid until ISO date"
+        },
+        "created_at": {
+            "type": "string",
+            "description": "Created at ISO date"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name"
+    ]
+}

@@ -1,0 +1,72 @@
+{
+    "title": "appointments",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "workspace_id": {
+            "type": "integer",
+            "description": "Workspace ID"
+        },
+        "contact_id": {
+            "type": "integer",
+            "description": "Contact ID"
+        },
+        "contact_name": {
+            "type": "string",
+            "description": "Contact name"
+        },
+        "title": {
+            "type": "string",
+            "description": "Appointment title"
+        },
+        "description": {
+            "type": "string",
+            "description": "Description"
+        },
+        "type": {
+            "type": "string",
+            "description": "Appointment type"
+        },
+        "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start time"
+        },
+        "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End time"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status"
+        },
+        "location": {
+            "type": "string",
+            "description": "Location"
+        },
+        "reminder_sent": {
+            "type": "boolean",
+            "description": "Reminder sent flag"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "title",
+        "start_time",
+        "end_time"
+    ]
+}

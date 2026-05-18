@@ -1,0 +1,58 @@
+{
+    "title": "workflows",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "workspace_id": {
+            "type": "integer",
+            "description": "Workspace ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Workflow name"
+        },
+        "description": {
+            "type": "string",
+            "description": "Description"
+        },
+        "trigger_type": {
+            "type": "string",
+            "description": "Trigger type"
+        },
+        "nodes_json": {
+            "type": "string",
+            "description": "Workflow nodes JSON"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status"
+        },
+        "runs_count": {
+            "type": "integer",
+            "description": "Total runs"
+        },
+        "last_run_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last run timestamp"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name",
+        "trigger_type"
+    ]
+}

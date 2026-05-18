@@ -1,0 +1,74 @@
+{
+    "title": "campaigns",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "workspace_id": {
+            "type": "integer",
+            "description": "Workspace ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Campaign name"
+        },
+        "type": {
+            "type": "string",
+            "description": "Campaign type"
+        },
+        "status": {
+            "type": "string",
+            "description": "Campaign status"
+        },
+        "subject": {
+            "type": "string",
+            "description": "Email subject"
+        },
+        "content": {
+            "type": "string",
+            "description": "Campaign content"
+        },
+        "recipients_count": {
+            "type": "integer",
+            "description": "Total recipients"
+        },
+        "sent_count": {
+            "type": "integer",
+            "description": "Sent count"
+        },
+        "open_count": {
+            "type": "integer",
+            "description": "Open count"
+        },
+        "click_count": {
+            "type": "integer",
+            "description": "Click count"
+        },
+        "reply_count": {
+            "type": "integer",
+            "description": "Reply count"
+        },
+        "scheduled_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Scheduled time"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name",
+        "type"
+    ]
+}

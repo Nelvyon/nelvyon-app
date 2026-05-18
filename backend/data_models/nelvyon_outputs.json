@@ -1,0 +1,69 @@
+{
+    "title": "nelvyon_outputs",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "project_id": {
+            "type": "integer",
+            "description": "Project ID"
+        },
+        "client_id": {
+            "type": "integer",
+            "description": "Client ID"
+        },
+        "output_type": {
+            "type": "string",
+            "description": "Output type"
+        },
+        "title": {
+            "type": "string",
+            "description": "Title"
+        },
+        "content": {
+            "type": "string",
+            "description": "Content"
+        },
+        "qa_score": {
+            "type": "integer",
+            "description": "QA score"
+        },
+        "qa_status": {
+            "type": "string",
+            "description": "QA status"
+        },
+        "qa_feedback": {
+            "type": "string",
+            "description": "QA feedback"
+        },
+        "qa_attempts": {
+            "type": "integer",
+            "description": "QA attempts"
+        },
+        "version": {
+            "type": "integer",
+            "description": "Version number"
+        },
+        "extra_data": {
+            "type": "string",
+            "description": "Extra data JSON"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "project_id",
+        "output_type"
+    ]
+}

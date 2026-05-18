@@ -1,0 +1,63 @@
+{
+    "title": "calendar_events",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "title": {
+            "type": "string",
+            "description": "Event title"
+        },
+        "client_name": {
+            "type": "string",
+            "description": "Client name"
+        },
+        "event_type": {
+            "type": "string",
+            "description": "Type: meeting, call, demo, followup"
+        },
+        "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start time"
+        },
+        "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End time"
+        },
+        "duration_minutes": {
+            "type": "integer",
+            "description": "Duration in minutes"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: confirmed, pending, completed, cancelled"
+        },
+        "channel": {
+            "type": "string",
+            "description": "Channel: Zoom, Google Meet, Phone, In-person"
+        },
+        "notes": {
+            "type": "string",
+            "description": "Event notes"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "title",
+        "start_time"
+    ]
+}

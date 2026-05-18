@@ -1,0 +1,56 @@
+[
+    {
+        "user_id": "demo-nelvyon-admin",
+        "type": "call",
+        "title": "Consulta sobre integracion API",
+        "description": "Cliente pregunta sobre endpoints disponibles para integracion con su CRM",
+        "is_completed": false,
+        "due_date": "2026-04-10 16:30:00",
+        "created_at": "2026-04-10 09:30:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "type": "call",
+        "title": "Llamada de seguimiento propuesta comercial",
+        "description": "Seguimiento con InnovaDigital sobre propuesta Plan Pro",
+        "is_completed": true,
+        "due_date": "2026-04-09 15:00:00",
+        "created_at": "2026-04-09 15:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "type": "email",
+        "title": "Envio de propuesta comercial personalizada",
+        "description": "Propuesta enviada a Ventas360 con descuento del 15%",
+        "is_completed": true,
+        "due_date": "2026-04-09 11:00:00",
+        "created_at": "2026-04-09 11:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "type": "meeting",
+        "title": "Demostracion completa de la plataforma",
+        "description": "Demo de 90 min con equipo de TechCorp - 5 asistentes",
+        "is_completed": true,
+        "due_date": "2026-04-08 16:00:00",
+        "created_at": "2026-04-08 16:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "type": "task",
+        "title": "Cliente reporta problema con bot de WhatsApp",
+        "description": "Roberto de Ventas360 reporta que el bot dejo de responder",
+        "is_completed": false,
+        "due_date": "2026-04-10 12:00:00",
+        "created_at": "2026-04-10 08:15:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "type": "task",
+        "title": "Revisar pipeline para Q2",
+        "description": "Priorizar leads enterprise y preparar forecast trimestral",
+        "is_completed": false,
+        "due_date": "2026-04-12 10:00:00",
+        "created_at": "2026-04-07 10:00:00"
+    }
+]

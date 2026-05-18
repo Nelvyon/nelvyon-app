@@ -1,0 +1,58 @@
+{
+    "title": "activities",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "workspace_id": {
+            "type": "integer",
+            "description": "Workspace ID"
+        },
+        "contact_id": {
+            "type": "integer",
+            "description": "Contact ID"
+        },
+        "deal_id": {
+            "type": "integer",
+            "description": "Deal ID"
+        },
+        "type": {
+            "type": "string",
+            "description": "Activity type: call, email, meeting, task, note, stage_change"
+        },
+        "title": {
+            "type": "string",
+            "description": "Activity title"
+        },
+        "description": {
+            "type": "string",
+            "description": "Activity description"
+        },
+        "is_completed": {
+            "type": "boolean",
+            "description": "Whether activity is completed"
+        },
+        "due_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Due date"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created at"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "type",
+        "title"
+    ]
+}

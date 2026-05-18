@@ -1,0 +1,44 @@
+[
+    {
+        "user_id": "demo-user-001",
+        "project_id": 1,
+        "client_id": 1,
+        "name": "Landing Page TechStartup",
+        "description": "Landing page de alta conversión para captación de leads",
+        "benefits": "Diseño responsive, A/B testing integrado, tracking completo",
+        "specs": "React, Tailwind CSS, Analytics integrado",
+        "price": 3500.0,
+        "currency": "USD",
+        "category": "web_design",
+        "status": "delivered",
+        "created_at": "2026-03-10 10:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "project_id": 2,
+        "client_id": 2,
+        "name": "Pack Creativos Instagram Abril",
+        "description": "30 creativos para feed de Instagram incluyendo carruseles y reels",
+        "benefits": "Diseño on-brand, copy optimizado, hashtags research",
+        "specs": "1080x1080, 1080x1350, 1080x1920",
+        "price": 2800.0,
+        "currency": "USD",
+        "category": "social_media",
+        "status": "in_progress",
+        "created_at": "2026-03-20 14:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "project_id": 3,
+        "client_id": 3,
+        "name": "Funnel Webinar EduTech",
+        "description": "Funnel completo para captación vía webinar automatizado",
+        "benefits": "Automatización completa, seguimiento post-webinar, scoring de leads",
+        "specs": "ClickFunnels, ActiveCampaign, Zoom integration",
+        "price": 4500.0,
+        "currency": "USD",
+        "category": "funnel",
+        "status": "delivered",
+        "created_at": "2026-01-15 08:00:00"
+    }
+]

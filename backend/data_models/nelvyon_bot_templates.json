@@ -1,0 +1,59 @@
+{
+    "title": "nelvyon_bot_templates",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "template_id": {
+            "type": "string",
+            "description": "Unique template slug"
+        },
+        "name": {
+            "type": "string",
+            "description": "Template name"
+        },
+        "description": {
+            "type": "string",
+            "description": "Template description"
+        },
+        "category": {
+            "type": "string",
+            "description": "Category: Ventas, Soporte, Citas, etc."
+        },
+        "channels": {
+            "type": "string",
+            "description": "JSON array of channel strings"
+        },
+        "rating": {
+            "type": "number",
+            "description": "Rating 0-5"
+        },
+        "uses": {
+            "type": "integer",
+            "description": "Number of uses"
+        },
+        "icon_name": {
+            "type": "string",
+            "description": "Lucide icon name"
+        },
+        "color": {
+            "type": "string",
+            "description": "CSS gradient classes"
+        },
+        "features": {
+            "type": "string",
+            "description": "JSON array of feature strings"
+        },
+        "is_active": {
+            "type": "boolean",
+            "description": "Whether template is active"
+        }
+    },
+    "required": [
+        "id",
+        "template_id",
+        "name"
+    ]
+}

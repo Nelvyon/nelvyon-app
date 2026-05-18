@@ -1,0 +1,62 @@
+[
+    {
+        "user_id": "demo-user-001",
+        "conversation_id": 1,
+        "sender_type": "user",
+        "sender_name": "Nelvyon",
+        "content": "Hola Carlos, te envío la propuesta actualizada con los cambios que discutimos",
+        "channel": "whatsapp",
+        "status": "delivered",
+        "created_at": "2026-04-02 17:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "conversation_id": 1,
+        "sender_type": "contact",
+        "sender_name": "Carlos Mendoza",
+        "content": "Perfecto, revisaré la propuesta y te confirmo mañana",
+        "channel": "whatsapp",
+        "status": "read",
+        "created_at": "2026-04-02 18:30:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "conversation_id": 2,
+        "sender_type": "user",
+        "sender_name": "Nelvyon",
+        "content": "María, aquí tienes el reporte de marzo con todos los KPIs",
+        "channel": "email",
+        "status": "delivered",
+        "created_at": "2026-04-01 10:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "conversation_id": 2,
+        "sender_type": "contact",
+        "sender_name": "María García",
+        "content": "Los resultados de marzo están increíbles, gracias!",
+        "channel": "email",
+        "status": "read",
+        "created_at": "2026-04-01 14:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "conversation_id": 4,
+        "sender_type": "contact",
+        "sender_name": "Valentina Herrera",
+        "content": "Me encantan los diseños! Aprobados todos",
+        "channel": "instagram",
+        "status": "read",
+        "created_at": "2026-04-02 20:00:00"
+    },
+    {
+        "user_id": "demo-user-001",
+        "conversation_id": 5,
+        "sender_type": "contact",
+        "sender_name": "Camila Ortiz",
+        "content": "Listo, aprobado el calendario. Empezamos el lunes",
+        "channel": "whatsapp",
+        "status": "read",
+        "created_at": "2026-04-03 09:30:00"
+    }
+]

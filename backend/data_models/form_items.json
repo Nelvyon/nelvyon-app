@@ -1,0 +1,65 @@
+{
+    "title": "form_items",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Form name"
+        },
+        "form_type": {
+            "type": "string",
+            "description": "Type: survey, contact, lead, feedback, quiz, registration"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: active, draft, paused"
+        },
+        "fields_count": {
+            "type": "integer",
+            "description": "Number of fields"
+        },
+        "responses_count": {
+            "type": "integer",
+            "description": "Total responses"
+        },
+        "completion_rate": {
+            "type": "integer",
+            "description": "Completion rate percentage"
+        },
+        "conversion_rate": {
+            "type": "number",
+            "description": "Conversion rate percentage"
+        },
+        "avg_time_seconds": {
+            "type": "integer",
+            "description": "Average completion time in seconds"
+        },
+        "fields_json": {
+            "type": "string",
+            "description": "JSON of form fields configuration"
+        },
+        "ai_optimized": {
+            "type": "boolean",
+            "description": "Whether AI optimized"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name",
+        "form_type"
+    ]
+}

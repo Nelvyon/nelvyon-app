@@ -1,0 +1,66 @@
+{
+    "title": "website_pages",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "website_id": {
+            "type": "integer",
+            "description": "Parent website item ID"
+        },
+        "page_name": {
+            "type": "string",
+            "description": "Page name e.g. home, about, contact"
+        },
+        "slug": {
+            "type": "string",
+            "description": "URL slug for the page"
+        },
+        "sections_json": {
+            "type": "string",
+            "description": "JSON string containing all sections data"
+        },
+        "seo_title": {
+            "type": "string",
+            "description": "SEO meta title"
+        },
+        "seo_description": {
+            "type": "string",
+            "description": "SEO meta description"
+        },
+        "seo_keywords": {
+            "type": "string",
+            "description": "SEO keywords comma separated"
+        },
+        "is_published": {
+            "type": "boolean",
+            "description": "Whether page is published"
+        },
+        "sort_order": {
+            "type": "integer",
+            "description": "Page sort order"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        },
+        "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "website_id",
+        "page_name"
+    ]
+}

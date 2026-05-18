@@ -1,0 +1,177 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@nelvyon/os-agents": [
+        "../../backend/os-agents/index.ts"
+      ],
+      "@nelvyon/os-agents/*": [
+        "../../backend/os-agents/*"
+      ],
+      "@nelvyon/auth": [
+        "../../backend/auth/index.ts"
+      ],
+      "@nelvyon/auth/*": [
+        "../../backend/auth/*"
+      ],
+      "@nelvyon/billing": [
+        "../../backend/billing/index.ts"
+      ],
+      "@nelvyon/billing/*": [
+        "../../backend/billing/*"
+      ],
+      "@nelvyon/saas": [
+        "../../backend/saas/index.ts"
+      ],
+      "@nelvyon/saas/*": [
+        "../../backend/saas/*"
+      ],
+      "@nelvyon/saas-reports": [
+        "../../backend/saas-reports/index.ts"
+      ],
+      "@nelvyon/saas-reports/*": [
+        "../../backend/saas-reports/*"
+      ],
+      "@nelvyon/admin": [
+        "../../backend/admin/index.ts"
+      ],
+      "@nelvyon/admin/*": [
+        "../../backend/admin/*"
+      ],
+      "@nelvyon/email": [
+        "../../backend/email/index.ts"
+      ],
+      "@nelvyon/email/*": [
+        "../../backend/email/*"
+      ],
+      "@nelvyon/monitoring": [
+        "../../backend/monitoring/index.ts"
+      ],
+      "@nelvyon/monitoring/*": [
+        "../../backend/monitoring/*"
+      ],
+      "@nelvyon/onboarding": [
+        "../../backend/onboarding/index.ts"
+      ],
+      "@nelvyon/onboarding/*": [
+        "../../backend/onboarding/*"
+      ],
+      "@nelvyon/usage": [
+        "../../backend/usage/index.ts"
+      ],
+      "@nelvyon/usage/*": [
+        "../../backend/usage/*"
+      ],
+      "@nelvyon/errors": [
+        "../../backend/errors/index.ts"
+      ],
+      "@nelvyon/errors/*": [
+        "../../backend/errors/*"
+      ],
+      "@nelvyon/logger": [
+        "../../backend/logger/index.ts"
+      ],
+      "@nelvyon/logger/*": [
+        "../../backend/logger/*"
+      ],
+      "@nelvyon/apikeys": [
+        "../../backend/apikeys/index.ts"
+      ],
+      "@nelvyon/apikeys/*": [
+        "../../backend/apikeys/*"
+      ],
+      "@nelvyon/gdpr": [
+        "../../backend/gdpr/index.ts"
+      ],
+      "@nelvyon/gdpr/*": [
+        "../../backend/gdpr/*"
+      ],
+      "@upstash/redis": [
+        "./node_modules/@upstash/redis"
+      ],
+      "@sentry/nextjs": [
+        "./node_modules/@sentry/nextjs"
+      ],
+      "stripe": [
+        "./node_modules/stripe"
+      ]
+    },
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.d.ts",
+    ".next/types/**/*.ts",
+    "../../backend/os-agents/**/*.ts",
+    "../../backend/db/**/*.ts",
+    "../../backend/auth/**/*.ts",
+    "../../backend/billing/**/*.ts",
+    "../../backend/saas/**/*.ts",
+    "../../backend/admin/**/*.ts",
+    "../../backend/gdpr/**/*.ts",
+    "../../backend/email/**/*.ts",
+    "../../backend/monitoring/**/*.ts",
+    "../../backend/paddle/**/*.ts",
+    "../../backend/stripe/**/*.ts",
+    "../../backend/onboarding/**/*.ts",
+    "../../backend/usage/**/*.ts",
+    "../../backend/errors/**/*.ts",
+    "../../backend/apikeys/**/*.ts",
+    "../../backend/queue/**/*.ts",
+    "../../backend/logger/**/*.ts",
+    "../../backend/support/**/*.ts",
+    "../../backend/feedback/**/*.ts",
+    "../../backend/changelog/**/*.ts",
+    "../../backend/affiliates/**/*.ts",
+    "../../backend/oauth/**/*.ts",
+    "../../backend/integrations/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "../../backend/os-agents/__tests__/**/*",
+    "../../backend/saas/__tests__/**/*",
+    "../../backend/admin/__tests__/**/*",
+    "../../backend/email/__tests__/**/*",
+    "../../backend/monitoring/__tests__/**/*",
+    "../../backend/gdpr/__tests__/**/*",
+    "../../backend/logger/__tests__/**/*",
+    "../../backend/support/__tests__/**/*",
+    "../../backend/feedback/__tests__/**/*",
+    "../../backend/changelog/__tests__/**/*",
+    "../../backend/affiliates/__tests__/**/*",
+    "../../backend/oauth/__tests__/**/*",
+    "../../backend/integrations/**/__tests__/**/*",
+    "../../backend/qa/**/__tests__/**/*",
+    "../../backend/stripe/__tests__/**/*"
+  ]
+}

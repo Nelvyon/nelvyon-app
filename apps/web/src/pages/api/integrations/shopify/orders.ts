@@ -1,0 +1,34 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+
+import { getAuthService } from "@nelvyon/auth";
+import { OsAgentError } from "@nelvyon/os-agents";
+
+import { getShopifyService } from "../../../../../../../backend/integrations/ShopifyService";
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  try {
+    const token = req.cookies.nelvyon_token;
+    if (!token) return res.status(401).json({ error: "No autenticado" });
+
+    const user = await getAuthService().verifyToken(token);
+    const createdAtMin = typeof req.query.createdAtMin === "string" ? req.query.createdAtMin.trim() : "";
+    const createdAtMax = typeof req.query.createdAtMax === "string" ? req.query.createdAtMax.trim() : "";
+
+    if ((createdAtMin && !createdAtMax) || (!createdAtMin && createdAtMax)) {
+      return res.status(400).json({ error: "createdAtMin y createdAtMax deben enviarse juntos (ISO 8601)" });
+    }
+
+    const dateRange =
+      createdAtMin && createdAtMax ? { createdAtMin, createdAtMax } : undefined;
+
+    const orders = await getShopifyService().getOrders(user.userId, dateRange);
+    return res.status(200).json({ orders });
+  } catch (e: unknown) {
+    if (e instanceof OsAgentError && e.message === "Unauthorized") return res.status(401).json({ error: "Token inválido" });
+    if (e instanceof OsAgentError && e.code === "shopify_auth") return res.status(400).json({ error: e.message });
+    if (e instanceof OsAgentError && e.code === "shopify_api") return res.status(502).json({ error: e.message });
+    return res.status(500).json({ error: "Error interno" });
+  }
+}

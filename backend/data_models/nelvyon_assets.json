@@ -1,0 +1,66 @@
+{
+    "title": "nelvyon_assets",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "client_id": {
+            "type": "integer",
+            "description": "Client ID"
+        },
+        "asset_type": {
+            "type": "string",
+            "description": "Asset type"
+        },
+        "file_name": {
+            "type": "string",
+            "description": "File name"
+        },
+        "object_key": {
+            "type": "string",
+            "description": "Object storage key"
+        },
+        "file_size": {
+            "type": "integer",
+            "description": "File size in bytes"
+        },
+        "mime_type": {
+            "type": "string",
+            "description": "MIME type"
+        },
+        "classification": {
+            "type": "string",
+            "description": "Classification"
+        },
+        "dimensions": {
+            "type": "string",
+            "description": "Dimensions"
+        },
+        "tags": {
+            "type": "string",
+            "description": "Tags"
+        },
+        "visibility": {
+            "type": "string",
+            "description": "Visibility"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "client_id",
+        "asset_type",
+        "file_name"
+    ]
+}

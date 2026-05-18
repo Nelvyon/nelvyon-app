@@ -1,0 +1,8 @@
+{
+  "name": "@nelvyon/backend",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "posthog-node": "^5.8.4"
+  }
+}

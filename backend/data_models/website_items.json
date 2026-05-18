@@ -1,0 +1,60 @@
+{
+    "title": "website_items",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Website name"
+        },
+        "domain": {
+            "type": "string",
+            "description": "Domain URL"
+        },
+        "template": {
+            "type": "string",
+            "description": "Template used"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: published, draft, building"
+        },
+        "pages_count": {
+            "type": "integer",
+            "description": "Number of pages"
+        },
+        "visits": {
+            "type": "integer",
+            "description": "Total visits"
+        },
+        "ssl_enabled": {
+            "type": "boolean",
+            "description": "SSL enabled"
+        },
+        "seo_score": {
+            "type": "integer",
+            "description": "SEO score"
+        },
+        "performance_score": {
+            "type": "integer",
+            "description": "Performance score"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name"
+    ]
+}

@@ -1,0 +1,64 @@
+{
+    "title": "funnel_items",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Funnel name"
+        },
+        "funnel_type": {
+            "type": "string",
+            "description": "Type: sales, webinar, lead_magnet, launch, tripwire"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status: active, draft, paused"
+        },
+        "stages_count": {
+            "type": "integer",
+            "description": "Number of stages"
+        },
+        "stages_json": {
+            "type": "string",
+            "description": "JSON of funnel stages"
+        },
+        "visitors": {
+            "type": "integer",
+            "description": "Total visitors"
+        },
+        "leads": {
+            "type": "integer",
+            "description": "Total leads captured"
+        },
+        "conversions": {
+            "type": "integer",
+            "description": "Total conversions"
+        },
+        "conversion_rate": {
+            "type": "number",
+            "description": "Overall conversion rate"
+        },
+        "revenue": {
+            "type": "number",
+            "description": "Revenue generated"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name"
+    ]
+}

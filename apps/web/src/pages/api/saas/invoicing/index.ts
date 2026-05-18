@@ -1,0 +1,33 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+
+import { getAuthService } from "@nelvyon/auth";
+import { OsAgentError } from "@nelvyon/os-agents";
+
+import type { InvoiceFilters, InvoiceStatus } from "../../../../../../../backend/saas/InvoicingService";
+import { getInvoicingService } from "../../../../../../../backend/saas/InvoicingService";
+
+const VALID_STATUS: InvoiceStatus[] = ["draft", "sent", "paid", "overdue", "void"];
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  try {
+    const token = req.cookies.nelvyon_token;
+    if (!token) return res.status(401).json({ error: "No autenticado" });
+    const user = await getAuthService().verifyToken(token);
+
+    const filters: InvoiceFilters = {};
+    const qStatus = typeof req.query.status === "string" ? req.query.status : "";
+    if (qStatus && VALID_STATUS.includes(qStatus as InvoiceStatus)) filters.status = qStatus as InvoiceStatus;
+    const fromDate = typeof req.query.fromDate === "string" ? req.query.fromDate : "";
+    const toDate = typeof req.query.toDate === "string" ? req.query.toDate : "";
+    if (fromDate) filters.fromDate = fromDate;
+    if (toDate) filters.toDate = toDate;
+
+    const invoices = await getInvoicingService().getInvoices(user.userId, filters);
+    return res.status(200).json({ invoices });
+  } catch (e: unknown) {
+    if (e instanceof OsAgentError && e.message === "Unauthorized") return res.status(401).json({ error: "Token inválido" });
+    return res.status(500).json({ error: "Error interno" });
+  }
+}

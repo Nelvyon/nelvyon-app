@@ -1,0 +1,79 @@
+[
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "TechCorp Enterprise Anual",
+        "value": 14400,
+        "currency": "USD",
+        "stage": "closed_won",
+        "probability": 100,
+        "expected_close": "2026-04-05 00:00:00",
+        "notes": "Contrato firmado 12 meses",
+        "created_at": "2026-03-01 10:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "InnovaDigital Plan Pro",
+        "value": 2388,
+        "currency": "USD",
+        "stage": "proposal",
+        "probability": 75,
+        "expected_close": "2026-04-15 00:00:00",
+        "notes": "Pendiente aprobacion presupuesto",
+        "created_at": "2026-03-20 14:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "MarketFlow Enterprise + IA",
+        "value": 24000,
+        "currency": "USD",
+        "stage": "closed_won",
+        "probability": 100,
+        "expected_close": "2026-03-28 00:00:00",
+        "notes": "Incluye modulo IA y soporte premium",
+        "created_at": "2026-02-15 09:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "Ventas360 Pro Anual",
+        "value": 2388,
+        "currency": "USD",
+        "stage": "demo",
+        "probability": 50,
+        "expected_close": "2026-04-20 00:00:00",
+        "notes": "Interesados en WhatsApp automation",
+        "created_at": "2026-04-02 16:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "StartupFast Starter",
+        "value": 588,
+        "currency": "USD",
+        "stage": "qualification",
+        "probability": 30,
+        "expected_close": "2026-04-25 00:00:00",
+        "notes": "En trial, evaluando opciones",
+        "created_at": "2026-04-07 13:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "EcomPlus Pro Mensual",
+        "value": 199,
+        "currency": "USD",
+        "stage": "negotiation",
+        "probability": 60,
+        "expected_close": "2026-04-18 00:00:00",
+        "notes": "Quiere descuento por referencia",
+        "created_at": "2026-03-18 10:00:00"
+    },
+    {
+        "user_id": "demo-nelvyon-admin",
+        "title": "AgenciaCreativa Enterprise",
+        "value": 14400,
+        "currency": "USD",
+        "stage": "closed_lost",
+        "probability": 0,
+        "expected_close": "2026-03-25 00:00:00",
+        "notes": "Eligio competidor por precio",
+        "created_at": "2026-02-28 10:00:00"
+    }
+]

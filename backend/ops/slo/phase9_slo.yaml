@@ -1,0 +1,12 @@
+version: 1
+service: nelvyon-backend
+slo:
+  - name: api_availability
+    sli: "sum(rate(http_requests_total{status!~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))"
+    target: 0.995
+  - name: api_latency_p95
+    sli: "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))"
+    target_seconds: 0.8
+  - name: job_failure_ratio
+    sli: "sum(rate(job_outcomes_total{terminal=\"failed\"}[5m])) / sum(rate(job_outcomes_total[5m]))"
+    target_max: 0.01

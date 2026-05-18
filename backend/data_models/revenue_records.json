@@ -1,0 +1,61 @@
+{
+    "title": "revenue_records",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "source": {
+            "type": "string",
+            "description": "Revenue source: subscription, service, addon, partner"
+        },
+        "amount": {
+            "type": "number",
+            "description": "Amount in EUR"
+        },
+        "currency": {
+            "type": "string",
+            "description": "Currency code default EUR"
+        },
+        "period": {
+            "type": "string",
+            "description": "Period label e.g. 2026-W15, 2026-04, 2026-Q1"
+        },
+        "period_type": {
+            "type": "string",
+            "description": "day, week, month, quarter, year"
+        },
+        "client_name": {
+            "type": "string",
+            "description": "Client name if applicable"
+        },
+        "plan_id": {
+            "type": "string",
+            "description": "Plan if subscription revenue"
+        },
+        "notes": {
+            "type": "string",
+            "description": "Notes"
+        },
+        "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the revenue was recorded"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "amount"
+    ]
+}

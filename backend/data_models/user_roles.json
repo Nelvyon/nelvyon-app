@@ -1,0 +1,49 @@
+{
+    "title": "user_roles",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID from auth"
+        },
+        "email": {
+            "type": "string",
+            "description": "User email for lookup"
+        },
+        "role": {
+            "type": "string",
+            "description": "Role: super_admin, admin, manager, user, viewer"
+        },
+        "permissions_json": {
+            "type": "string",
+            "description": "JSON override of specific permissions"
+        },
+        "assigned_by": {
+            "type": "string",
+            "description": "Who assigned this role"
+        },
+        "is_active": {
+            "type": "boolean",
+            "description": "Whether role assignment is active"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Created timestamp"
+        },
+        "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Updated timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "role"
+    ]
+}

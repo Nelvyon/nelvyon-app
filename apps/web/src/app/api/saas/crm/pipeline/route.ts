@@ -1,0 +1,28 @@
+import { NextResponse } from "next/server";
+
+import { authenticate } from "@nelvyon/auth";
+import { getSaasCrmService, getSaasOnboardingService, SaasCrmError } from "@nelvyon/saas";
+import { OsAgentError } from "@nelvyon/os-agents";
+
+export const runtime = "nodejs";
+
+export async function GET(req: Request) {
+  try {
+    const claims = await authenticate(req);
+    const onboarding = getSaasOnboardingService();
+    const tenant = await onboarding.getTenant(claims.userId);
+    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+    const crm = getSaasCrmService();
+    const pipeline = await crm.getPipelineSummary(tenant.id);
+    return NextResponse.json({ pipeline });
+  } catch (e: unknown) {
+    if (e instanceof OsAgentError && e.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (e instanceof SaasCrmError) {
+      const status = e.code === "NOT_FOUND" ? 404 : e.code === "FORBIDDEN" ? 403 : 400;
+      return NextResponse.json({ error: e.message, code: e.code }, { status });
+    }
+    throw e;
+  }
+}

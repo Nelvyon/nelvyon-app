@@ -1,0 +1,52 @@
+{
+    "title": "workspaces",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Workspace name"
+        },
+        "slug": {
+            "type": "string",
+            "description": "URL slug"
+        },
+        "logo_url": {
+            "type": "string",
+            "description": "Logo URL"
+        },
+        "primary_color": {
+            "type": "string",
+            "description": "Brand primary color"
+        },
+        "domain": {
+            "type": "string",
+            "description": "Custom domain"
+        },
+        "plan": {
+            "type": "string",
+            "description": "Subscription plan"
+        },
+        "status": {
+            "type": "string",
+            "description": "Workspace status"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name"
+    ]
+}
