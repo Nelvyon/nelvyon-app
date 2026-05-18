@@ -1,6 +1,5 @@
 import path from "node:path";
 import type { NextConfig } from "next";
-import { withSentryConfig } from "@sentry/nextjs";
 
 import {
   SECURITY_HEADERS_WITH_CSP,
@@ -10,6 +9,9 @@ import {
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  env: {
+    SENTRY_SUPPRESS_INSTRUMENTATION_FILE_WARNING: "1",
+  },
   experimental: {
     externalDir: true,
   },
@@ -69,14 +71,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
-  org: process.env.SENTRY_ORG ?? "nelvyon",
-  project: process.env.SENTRY_PROJECT ?? "nelvyon-web",
-  silent: true,
-  widenClientFileUpload: true,
-  sourcemaps: {
-    disable: true,
-  },
-  disableLogger: true,
-  automaticVercelMonitors: false,
-});
+export default nextConfig;
