@@ -1,13 +1,13 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
+  "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
     "buildCommand": "pnpm install --frozen-lockfile && pnpm -C apps/web build:prod"
   },
   "deploy": {
-    "startCommand": "pnpm -C apps/web migrate:prod && HOSTNAME=0.0.0.0 node apps/web/.next/standalone/apps/web/server.js",
-    "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 120,
+    "healthcheckPath": "/api/health/live",
+    "healthcheckTimeout": 300,
+    "startCommand": "node apps/web/server.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
   }
