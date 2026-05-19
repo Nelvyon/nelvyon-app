@@ -1,7 +1,7 @@
--- MIG 293 — Affiliate program (nelvyon_users.user_id is TEXT)
+-- MIG 293 — Affiliate program (nelvyon_users.user_id is UUID)
 CREATE TABLE IF NOT EXISTS affiliate_profiles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id text NOT NULL UNIQUE REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
+  user_id UUID NOT NULL UNIQUE REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
   code text NOT NULL UNIQUE,
   commission_rate numeric(5, 2) NOT NULL DEFAULT 20.00,
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused', 'banned')),
@@ -29,7 +29,7 @@ CREATE INDEX IF NOT EXISTS idx_affiliate_clicks_code ON affiliate_clicks (code);
 CREATE TABLE IF NOT EXISTS affiliate_conversions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   code text NOT NULL,
-  converted_user_id text REFERENCES nelvyon_users (user_id) ON DELETE SET NULL,
+  converted_user_id UUID REFERENCES nelvyon_users (user_id) ON DELETE SET NULL,
   plan text NOT NULL,
   amount numeric(10, 2) NOT NULL,
   commission numeric(10, 2) NOT NULL,

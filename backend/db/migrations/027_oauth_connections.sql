@@ -1,7 +1,7 @@
 -- MIG 294 — OAuth connections (server-side tokens, encrypted at app layer)
 CREATE TABLE IF NOT EXISTS oauth_connections (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id text NOT NULL REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
   provider text NOT NULL CHECK (provider IN ('google', 'meta', 'tiktok', 'linkedin')),
   scopes text[] NOT NULL DEFAULT '{}',
   access_token text NOT NULL,

@@ -1,3 +1,4 @@
+-- nelvyon_users.user_id must be UUID (see 003_auth.sql)
 CREATE TABLE IF NOT EXISTS saas_api_keys (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES nelvyon_users(user_id) ON DELETE CASCADE,

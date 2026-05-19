@@ -1,7 +1,7 @@
--- Client onboarding progress (aligned with nelvyon_users.user_id as text)
+-- Client onboarding progress (aligned with nelvyon_users.user_id as uuid)
 CREATE TABLE IF NOT EXISTS onboarding (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id text NOT NULL UNIQUE,
+  user_id UUID NOT NULL UNIQUE REFERENCES nelvyon_users(user_id) ON DELETE CASCADE,
   welcome_email_sent boolean NOT NULL DEFAULT false,
   profile_completed boolean NOT NULL DEFAULT false,
   first_agent_used boolean NOT NULL DEFAULT false,

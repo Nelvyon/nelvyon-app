@@ -1,7 +1,7 @@
--- MIG 291 — NPS + feedback loop (nelvyon_users.user_id is TEXT)
+-- MIG 291 — NPS + feedback loop (nelvyon_users.user_id is UUID)
 CREATE TABLE IF NOT EXISTS nps_responses (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id text NOT NULL REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
   score integer NOT NULL CHECK (score >= 0 AND score <= 10),
   comment text,
   category text GENERATED ALWAYS AS (
@@ -20,7 +20,7 @@ CREATE INDEX IF NOT EXISTS idx_nps_responses_user_version ON nps_responses (user
 
 CREATE TABLE IF NOT EXISTS feedback_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id text NOT NULL REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
   type text NOT NULL CHECK (type IN ('bug', 'feature', 'praise', 'other')),
   title text NOT NULL,
   body text NOT NULL,

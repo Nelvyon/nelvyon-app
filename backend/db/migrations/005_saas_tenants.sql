@@ -1,7 +1,7 @@
 -- SaaS customer onboarding (independent from OS jobs)
 CREATE TABLE IF NOT EXISTS saas_tenants (
   id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id                 TEXT NOT NULL REFERENCES nelvyon_users(user_id) ON DELETE CASCADE,
+  user_id                 UUID NOT NULL REFERENCES nelvyon_users(user_id) ON DELETE CASCADE,
   company_name            TEXT NOT NULL,
   industry                TEXT NOT NULL,
   plan                    TEXT NOT NULL DEFAULT 'starter' CHECK (plan IN ('starter', 'pro', 'enterprise')),

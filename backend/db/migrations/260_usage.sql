@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS usage_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id text NOT NULL,
+  user_id UUID NOT NULL REFERENCES nelvyon_users(user_id) ON DELETE CASCADE,
   agent_id text NOT NULL,
   sector text NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now()

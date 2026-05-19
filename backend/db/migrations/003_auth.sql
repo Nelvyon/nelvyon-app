@@ -1,6 +1,6 @@
 -- NELVYON OS / SaaS — real auth users (multi-tenant via tenant_id)
 CREATE TABLE IF NOT EXISTS nelvyon_users (
-  user_id       TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
+  user_id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email         TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   full_name     TEXT NOT NULL,

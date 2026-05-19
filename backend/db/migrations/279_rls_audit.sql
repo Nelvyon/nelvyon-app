@@ -1,5 +1,5 @@
 -- MIG 279 — Row Level Security audit (Supabase multi-tenant isolation)
--- Requires Supabase Auth JWT (auth.uid()) aligned with nelvyon_users.user_id (text).
+-- Requires Supabase Auth JWT (auth.uid()) aligned with nelvyon_users.user_id (uuid).
 
 -- ── Helpers ───────────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.nelvyon_jwt_user_id()

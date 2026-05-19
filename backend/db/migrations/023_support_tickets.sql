@@ -1,4 +1,4 @@
--- MIG 290 — In-app support tickets + templates (nelvyon_users.user_id is TEXT)
+-- MIG 290 — In-app support tickets + templates (nelvyon_users.user_id is UUID)
 CREATE TABLE IF NOT EXISTS support_templates (
   id text PRIMARY KEY,
   category text NOT NULL CHECK (category IN ('billing', 'technical', 'feature_request', 'other')),
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS support_templates (
 
 CREATE TABLE IF NOT EXISTS support_tickets (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id text NOT NULL REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES nelvyon_users (user_id) ON DELETE CASCADE,
   subject text NOT NULL,
   body text NOT NULL,
   category text NOT NULL CHECK (category IN ('billing', 'technical', 'feature_request', 'other')),
