@@ -17,7 +17,9 @@ const nextConfig: NextConfig = {
     externalDir: true,
   },
   serverExternalPackages: [
+    "ioredis",
     "pg",
+    "tsx",
     "bcryptjs",
     "jsonwebtoken",
     "stripe",
@@ -47,6 +49,13 @@ const nextConfig: NextConfig = {
         include: /backend/,
         use: [{ loader: "ts-loader", options: { transpileOnly: true, configFile: backendTsConfig } }],
       });
+    } else {
+      config.resolve ??= {};
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        ioredis: false,
+        [path.resolve(__dirname, "../../backend/db/RedisClient.ts")]: false,
+      };
     }
     return config;
   },

@@ -24,6 +24,9 @@ importers:
       fflate:
         specifier: 0.8.2
         version: 0.8.2
+      ioredis:
+        specifier: ^5.10.1
+        version: 5.10.1
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3
@@ -70,6 +73,9 @@ importers:
       fflate:
         specifier: 0.8.2
         version: 0.8.2
+      ioredis:
+        specifier: ^5.10.1
+        version: 5.10.1
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3

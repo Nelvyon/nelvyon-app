@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "dependencies": {
+    "ioredis": "^5.8.2",
     "posthog-node": "^5.8.4"
   }
 }

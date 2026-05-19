@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { getAuthService } from "@nelvyon/auth";
-import { OsAgentError } from "@nelvyon/os-agents";
+import { OsAgentError } from "@nelvyon/os-agents/OsAgentError";
 
 import { osAssetStore } from "../../../../../../../backend/os-agents/assets/OsAssetStore";
 
