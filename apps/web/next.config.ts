@@ -8,6 +8,7 @@ import {
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  outputFileTracingRoot: path.join(__dirname, "../.."),
   reactStrictMode: true,
   env: {
     SENTRY_SUPPRESS_INSTRUMENTATION_FILE_WARNING: "1",
