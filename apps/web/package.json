@@ -7,7 +7,7 @@
     "build": "next build",
     "build:prod": "next build && node ./scripts/copy-standalone-assets.mjs",
     "start": "next start",
-    "start:prod": "node .next/standalone/apps/web/server.js",
+    "start:prod": "node .next/standalone/server.js",
     "migrate": "tsx ../../backend/db/migrate.ts",
     "migrate:prod": "tsx ./scripts/migrate-prod.ts",
     "lint": "eslint .",
