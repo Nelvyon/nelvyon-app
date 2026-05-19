@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS usage_events (
 CREATE INDEX IF NOT EXISTS idx_usage_events_user_id ON usage_events(user_id);
 CREATE INDEX IF NOT EXISTS idx_usage_events_created_at ON usage_events(created_at);
 CREATE INDEX IF NOT EXISTS idx_usage_events_user_month
-  ON usage_events(user_id, date_trunc('month', created_at));
+  ON usage_events(user_id, date_trunc('month', created_at AT TIME ZONE 'UTC'));
 
 CREATE TABLE IF NOT EXISTS usage_limits (
   plan text PRIMARY KEY,

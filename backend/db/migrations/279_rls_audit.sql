@@ -3,14 +3,14 @@
 
 -- ── Helpers ───────────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.nelvyon_jwt_user_id()
-RETURNS text
+RETURNS uuid
 LANGUAGE sql
 STABLE
 SET search_path = public
 AS $$
   SELECT COALESCE(
-    NULLIF(auth.uid()::text, ''),
-    NULLIF(current_setting('request.jwt.claim.sub', true), '')
+    auth.uid(),
+    NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid
   );
 $$;
 
@@ -46,24 +46,24 @@ BEGIN
   EXECUTE format('DROP POLICY IF EXISTS %I ON %I', p_table || '_delete_own', p_table);
 
   EXECUTE format(
-    'CREATE POLICY %I ON %I FOR SELECT USING (user_id::text = public.nelvyon_jwt_user_id())',
+    'CREATE POLICY %I ON %I FOR SELECT USING (user_id::text = public.nelvyon_jwt_user_id()::text)',
     p_table || '_select_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
-    'CREATE POLICY %I ON %I FOR INSERT WITH CHECK (user_id::text = public.nelvyon_jwt_user_id())',
+    'CREATE POLICY %I ON %I FOR INSERT WITH CHECK (user_id::text = public.nelvyon_jwt_user_id()::text)',
     p_table || '_insert_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
-    'CREATE POLICY %I ON %I FOR UPDATE USING (user_id::text = public.nelvyon_jwt_user_id()) WITH CHECK (user_id::text = public.nelvyon_jwt_user_id())',
+    'CREATE POLICY %I ON %I FOR UPDATE USING (user_id::text = public.nelvyon_jwt_user_id()::text) WITH CHECK (user_id::text = public.nelvyon_jwt_user_id()::text)',
     p_table || '_update_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
-    'CREATE POLICY %I ON %I FOR DELETE USING (user_id::text = public.nelvyon_jwt_user_id())',
+    'CREATE POLICY %I ON %I FOR DELETE USING (user_id::text = public.nelvyon_jwt_user_id()::text)',
     p_table || '_delete_own',
-    p_table,
+    p_table
   );
 END;
 $$;
@@ -89,22 +89,22 @@ BEGIN
   EXECUTE format(
     'CREATE POLICY %I ON %I FOR SELECT USING (tenant_id = public.nelvyon_current_tenant_id())',
     p_table || '_select_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
     'CREATE POLICY %I ON %I FOR INSERT WITH CHECK (tenant_id = public.nelvyon_current_tenant_id())',
     p_table || '_insert_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
     'CREATE POLICY %I ON %I FOR UPDATE USING (tenant_id = public.nelvyon_current_tenant_id()) WITH CHECK (tenant_id = public.nelvyon_current_tenant_id())',
     p_table || '_update_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
     'CREATE POLICY %I ON %I FOR DELETE USING (tenant_id = public.nelvyon_current_tenant_id())',
     p_table || '_delete_own',
-    p_table,
+    p_table
   );
 END;
 $$;
@@ -130,22 +130,22 @@ BEGIN
   EXECUTE format(
     'CREATE POLICY %I ON %I FOR SELECT USING (client_id = public.nelvyon_current_tenant_id())',
     p_table || '_select_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
     'CREATE POLICY %I ON %I FOR INSERT WITH CHECK (client_id = public.nelvyon_current_tenant_id())',
     p_table || '_insert_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
     'CREATE POLICY %I ON %I FOR UPDATE USING (client_id = public.nelvyon_current_tenant_id()) WITH CHECK (client_id = public.nelvyon_current_tenant_id())',
     p_table || '_update_own',
-    p_table,
+    p_table
   );
   EXECUTE format(
     'CREATE POLICY %I ON %I FOR DELETE USING (client_id = public.nelvyon_current_tenant_id())',
     p_table || '_delete_own',
-    p_table,
+    p_table
   );
 END;
 $$;

@@ -24,9 +24,9 @@ ALTER TABLE oauth_connections FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS oauth_connections_select_own ON oauth_connections;
 CREATE POLICY oauth_connections_select_own ON oauth_connections
   FOR SELECT
-  USING (user_id = auth.uid()::text);
+  USING (user_id = auth.uid());
 
 DROP POLICY IF EXISTS oauth_connections_delete_own ON oauth_connections;
 CREATE POLICY oauth_connections_delete_own ON oauth_connections
   FOR DELETE
-  USING (user_id = auth.uid()::text);
+  USING (user_id = auth.uid());

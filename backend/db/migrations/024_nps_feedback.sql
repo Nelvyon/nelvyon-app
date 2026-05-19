@@ -39,12 +39,12 @@ ALTER TABLE nps_responses FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS nps_responses_select_own ON nps_responses;
 CREATE POLICY nps_responses_select_own ON nps_responses
   FOR SELECT
-  USING (user_id = auth.uid()::text);
+  USING (user_id = auth.uid());
 
 DROP POLICY IF EXISTS nps_responses_insert_own ON nps_responses;
 CREATE POLICY nps_responses_insert_own ON nps_responses
   FOR INSERT
-  WITH CHECK (user_id = auth.uid()::text);
+  WITH CHECK (user_id = auth.uid());
 
 ALTER TABLE feedback_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE feedback_items FORCE ROW LEVEL SECURITY;
@@ -57,4 +57,4 @@ CREATE POLICY feedback_items_select_public ON feedback_items
 DROP POLICY IF EXISTS feedback_items_insert_own ON feedback_items;
 CREATE POLICY feedback_items_insert_own ON feedback_items
   FOR INSERT
-  WITH CHECK (user_id = auth.uid()::text);
+  WITH CHECK (user_id = auth.uid());

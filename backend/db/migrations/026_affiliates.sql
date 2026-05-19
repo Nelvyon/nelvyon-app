@@ -45,13 +45,13 @@ ALTER TABLE affiliate_profiles FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS affiliate_profiles_select_own ON affiliate_profiles;
 CREATE POLICY affiliate_profiles_select_own ON affiliate_profiles
   FOR SELECT
-  USING (user_id = auth.uid()::text);
+  USING (user_id = auth.uid());
 
 DROP POLICY IF EXISTS affiliate_profiles_update_own ON affiliate_profiles;
 CREATE POLICY affiliate_profiles_update_own ON affiliate_profiles
   FOR UPDATE
-  USING (user_id = auth.uid()::text)
-  WITH CHECK (user_id = auth.uid()::text);
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
 
 ALTER TABLE affiliate_clicks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE affiliate_clicks FORCE ROW LEVEL SECURITY;
@@ -64,6 +64,6 @@ CREATE POLICY affiliate_conversions_select_own ON affiliate_conversions
   FOR SELECT
   USING (
     code IN (
-      SELECT ap.code FROM affiliate_profiles ap WHERE ap.user_id = auth.uid()::text
+      SELECT ap.code FROM affiliate_profiles ap WHERE ap.user_id = auth.uid()
     )
   );

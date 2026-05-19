@@ -91,15 +91,15 @@ ALTER TABLE support_tickets FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS support_tickets_select_own ON support_tickets;
 CREATE POLICY support_tickets_select_own ON support_tickets
   FOR SELECT
-  USING (user_id = auth.uid()::text);
+  USING (user_id = auth.uid());
 
 DROP POLICY IF EXISTS support_tickets_insert_own ON support_tickets;
 CREATE POLICY support_tickets_insert_own ON support_tickets
   FOR INSERT
-  WITH CHECK (user_id = auth.uid()::text);
+  WITH CHECK (user_id = auth.uid());
 
 DROP POLICY IF EXISTS support_tickets_update_own ON support_tickets;
 CREATE POLICY support_tickets_update_own ON support_tickets
   FOR UPDATE
-  USING (user_id = auth.uid()::text)
-  WITH CHECK (user_id = auth.uid()::text);
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
