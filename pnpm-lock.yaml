@@ -195,6 +195,15 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@24.12.2)(jsdom@27.4.0)(terser@5.46.1)
 
+  backend:
+    dependencies:
+      ioredis:
+        specifier: ^5.8.2
+        version: 5.10.1
+      posthog-node:
+        specifier: ^5.8.4
+        version: 5.34.1
+
   backend/db:
     dependencies:
       '@sentry/node':

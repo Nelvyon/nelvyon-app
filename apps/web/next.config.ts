@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
     "ioredis",
     "pg",
     "tsx",
+    "bcrypt",
     "bcryptjs",
     "jsonwebtoken",
     "stripe",
