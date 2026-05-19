@@ -25,6 +25,14 @@ if (!fs.existsSync(nestedApp)) {
   process.exit(1);
 }
 
+console.log("[copy-standalone-assets] standaloneRoot contents:", fs.readdirSync(standaloneRoot));
+if (fs.existsSync(path.join(standaloneRoot, "node_modules"))) {
+  console.log(
+    "[copy-standalone-assets] standaloneRoot/node_modules:",
+    fs.readdirSync(path.join(standaloneRoot, "node_modules")).slice(0, 20),
+  );
+}
+
 if (fs.existsSync(flatDest)) {
   fs.rmSync(flatDest, { recursive: true, force: true });
 }
@@ -33,14 +41,13 @@ fs.mkdirSync(flatDest, { recursive: true });
 // App entry (server.js, package.json, .next inside app, etc.)
 copyRecursive(nestedApp, flatDest);
 
-// Monorepo standalone ships shared node_modules at standalone root
+// Monorepo standalone ships shared node_modules at standalone root — merge (do not replace)
 const sharedNodeModules = path.join(standaloneRoot, "node_modules");
 if (fs.existsSync(sharedNodeModules)) {
   const destModules = path.join(flatDest, "node_modules");
-  if (fs.existsSync(destModules)) {
-    fs.rmSync(destModules, { recursive: true, force: true });
-  }
+  fs.mkdirSync(destModules, { recursive: true });
   copyRecursive(sharedNodeModules, destModules);
+  console.log("[copy-standalone-assets] merged standaloneRoot/node_modules into flat bundle");
 }
 
 const publicSrc = path.join(webRoot, "public");
@@ -64,10 +71,37 @@ if (!fs.existsSync(serverJs)) {
   process.exit(1);
 }
 
+// Verify next exists in flattened bundle
+const nextInFlat = path.join(flatDest, "node_modules/next");
+if (!fs.existsSync(nextInFlat)) {
+  console.log("[copy-standalone-assets] next not found in flat node_modules, copying from nested standalone...");
+  const nextInNested = path.join(standaloneRoot, "node_modules/next");
+  const nextInWebModules = path.join(webRoot, "node_modules/next");
+
+  if (fs.existsSync(nextInNested)) {
+    fs.mkdirSync(path.join(flatDest, "node_modules"), { recursive: true });
+    copyRecursive(nextInNested, nextInFlat);
+    console.log("[copy-standalone-assets] copied next from nested standalone");
+  } else if (fs.existsSync(nextInWebModules)) {
+    fs.mkdirSync(path.join(flatDest, "node_modules"), { recursive: true });
+    copyRecursive(nextInWebModules, nextInFlat);
+    console.log("[copy-standalone-assets] copied next from apps/web/node_modules");
+  } else {
+    console.error("[copy-standalone-assets] FATAL: cannot find next package anywhere");
+    process.exit(1);
+  }
+}
+
 if (fs.existsSync(standaloneRoot)) {
   fs.rmSync(standaloneRoot, { recursive: true, force: true });
 }
 fs.renameSync(flatDest, standaloneRoot);
 
 console.log("[copy-standalone-assets] flattened →", path.join(standaloneRoot, "server.js"));
+if (fs.existsSync(path.join(standaloneRoot, "node_modules/next"))) {
+  console.log("[copy-standalone-assets] verified node_modules/next in final bundle");
+} else {
+  console.error("[copy-standalone-assets] FATAL: node_modules/next missing after flatten");
+  process.exit(1);
+}
 console.log("[copy-standalone-assets] done");
