@@ -65,8 +65,12 @@ function applyAffiliateRefCookie(request: NextRequest, response: NextResponse): 
 }
 
 export async function middleware(request: NextRequest) {
-  const requestId = resolveRequestId(request);
   const pathname = request.nextUrl.pathname;
+  if (pathname.startsWith("/api/health/")) {
+    return NextResponse.next();
+  }
+
+  const requestId = resolveRequestId(request);
   const startedAt = Date.now();
   const method = request.method;
   const path = pathname;
@@ -130,6 +134,6 @@ export const config = {
     "/api/saas/:path*",
     "/admin/:path*",
     "/api/admin/:path*",
-    "/((?!api|_next|_vercel|.*\\..*).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/health|api|_next|_vercel|.*\\..*).*)",
   ],
 };

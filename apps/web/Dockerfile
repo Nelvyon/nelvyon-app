@@ -31,4 +31,4 @@ COPY --from=builder /app/apps/web/public ./apps/web/public
 COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
 COPY --from=builder /app/apps/web/next.config.ts ./apps/web/next.config.ts
 WORKDIR /app/apps/web
-CMD ["./node_modules/.bin/next", "start", "-p", "3000", "-H", "0.0.0.0"]
+CMD ["sh", "-c", "./node_modules/.bin/next start -p ${PORT:-3000} -H 0.0.0.0"]
