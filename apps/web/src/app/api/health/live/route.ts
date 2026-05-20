@@ -1,8 +1,3 @@
-import { NextResponse } from "next/server";
-
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
 export async function GET() {
-  return NextResponse.json({ status: "ok", ts: Date.now() }, { status: 200 });
+  return Response.json({ ok: true }, { status: 200 })
 }
