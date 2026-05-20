@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React from "react";
 
 import { Button } from "@/core/ui/button";
@@ -113,7 +114,7 @@ export function BillingUpgradeCta({
       {canUpgrade && (nearLimit || eligible || alertPressure) ? (
         <div className="mt-3 flex flex-wrap gap-2">
           <Button asChild>
-            <a href="/billing/upgrade">Review upgrade options</a>
+            <Link href="/billing/upgrade">Review upgrade options</Link>
           </Button>
           <p className="w-full text-xs text-muted-foreground">
             Opens the workspace checkout journey (Stripe Checkout on Billing → Upgrade).

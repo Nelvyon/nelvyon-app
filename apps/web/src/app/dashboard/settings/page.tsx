@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -147,7 +148,7 @@ export default function DashboardSettingsPage() {
               ) : null}
               {plan === "free" ? (
                 <NelvyonDsButton asChild>
-                  <a href="/pricing">Ver planes</a>
+                  <Link href="/pricing">Ver planes</Link>
                 </NelvyonDsButton>
               ) : null}
             </div>

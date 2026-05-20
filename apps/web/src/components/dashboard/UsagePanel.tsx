@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useUsage } from "@/hooks/useUsage";
 
 export function UsagePanel() {
@@ -35,9 +37,9 @@ export function UsagePanel() {
       {usage.percentUsed >= 90 ? (
         <p className="mt-3 text-xs text-red-400">
           Estás cerca del límite.{" "}
-          <a href="/pricing" className="inline-flex min-h-[44px] items-center text-indigo-400 underline">
+          <Link href="/pricing" className="inline-flex min-h-[44px] items-center text-indigo-400 underline">
             Actualiza tu plan →
-          </a>
+          </Link>
         </p>
       ) : null}
     </div>

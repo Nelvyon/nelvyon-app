@@ -1,11 +1,12 @@
-/* eslint-disable @next/next/no-html-link-for-pages -- static 404 must not depend on Next runtime */
+import Link from "next/link";
+
 export default function NotFound() {
   return (
-    <html>
-      <body>
-        <h1>404 - Página no encontrada</h1>
-        <a href="/">Volver al inicio</a>
-      </body>
-    </html>
+    <main className="mx-auto flex min-h-[50vh] max-w-2xl flex-col justify-center px-4 py-10">
+      <h1 className="text-2xl font-semibold">404 - Página no encontrada</h1>
+      <Link href="/" className="mt-4 text-indigo-400 underline">
+        Volver al inicio
+      </Link>
+    </main>
   );
 }
