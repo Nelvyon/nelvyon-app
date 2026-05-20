@@ -21,14 +21,16 @@ RUN pnpm -C apps/web build:prod
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+# Do not set HOSTNAME — Docker injects the container ID and breaks HTTP binding.
 ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
 EXPOSE 3000
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=builder /app/backend/db ./backend/db
 COPY --from=builder /app/apps/web/.next ./apps/web/.next
 COPY --from=builder /app/apps/web/public ./apps/web/public
 COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
 COPY --from=builder /app/apps/web/next.config.ts ./apps/web/next.config.ts
+COPY --from=builder /app/apps/web/server.js ./apps/web/server.js
 WORKDIR /app/apps/web
-CMD ["sh", "-c", "./node_modules/.bin/next start -p ${PORT:-3000} -H 0.0.0.0"]
+CMD ["node", "server.js"]
