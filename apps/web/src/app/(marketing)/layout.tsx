@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://nelvyon.com";
-const canonicalBase = BASE_URL.replace(/\/$/, "");
+import { getAppBaseUrl } from "@/lib/appUrl";
+
+const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/og-image.png`;
 
 export const metadata: Metadata = {

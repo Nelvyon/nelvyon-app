@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://nelvyon.com";
-const base = BASE_URL.replace(/\/$/, "");
+import { getAppBaseUrl } from "@/lib/appUrl";
+
+const base = getAppBaseUrl();
 
 const desc =
   "Planes desde 47€/mes. Starter, Pro y Agency con IA para marketing automatizado. Precios early adopter disponibles hasta el lanzamiento.";

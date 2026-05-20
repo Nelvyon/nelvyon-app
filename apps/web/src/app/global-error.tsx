@@ -5,11 +5,16 @@ import Link from "next/link";
 import { NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
 
 export default function GlobalError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  if (typeof window !== "undefined") {
+    console.error("[nelvyon] global-error", error.message, error.digest);
+  }
+
   return (
     <html lang="es">
       <body className="bg-background text-foreground">
@@ -17,6 +22,9 @@ export default function GlobalError({
           <NelvyonDsCard title="Error crítico">
             <p className="mb-6 text-sm text-muted-foreground">
               Se produjo un error global inesperado.
+              {error.digest ? (
+                <span className="mt-2 block font-mono text-xs text-zinc-500">Ref: {error.digest}</span>
+              ) : null}
             </p>
             <div className="flex flex-wrap gap-3">
               <NelvyonDsButton type="button" onClick={() => reset()}>

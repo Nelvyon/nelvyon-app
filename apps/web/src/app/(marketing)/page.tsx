@@ -4,9 +4,9 @@ import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 import { EarlyAdopterBadge } from "@/components/marketing/EarlyAdopterBadge";
 import { EarlyAdopterHeroCountdown } from "@/components/marketing/EarlyAdopterHeroCountdown";
 import { LandingEarlyAdopterPricing } from "@/components/marketing/LandingEarlyAdopterPricing";
+import { getAppBaseUrl } from "@/lib/appUrl";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://nelvyon.com";
-const canonicalBase = BASE_URL.replace(/\/$/, "");
+const canonicalBase = getAppBaseUrl();
 
 const nelvyonMarketingDescription =
   "Plataforma de marketing con inteligencia artificial. Automatiza SEO, ads, contenido y más.";

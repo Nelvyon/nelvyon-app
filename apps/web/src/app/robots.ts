@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 
+import { getAppBaseUrl } from "@/lib/appUrl";
+
 function baseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  return raw && raw.length > 0 ? raw.replace(/\/$/, "") : "https://nelvyon.com";
+  return getAppBaseUrl();
 }
 
 export default function robots(): MetadataRoute.Robots {

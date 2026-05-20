@@ -8,6 +8,7 @@ import { PostHogProvider } from "@/components/PostHogProvider";
 import { getBrandAppName, getBrandMode } from "@/core/platform/brand";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/core/theme/themeBootstrapScript";
+import { getAppBaseUrl, getAppOrigin } from "@/lib/appUrl";
 import "./globals.css";
 
 const brandMode = getBrandMode();
@@ -15,14 +16,13 @@ const appName = getBrandAppName(brandMode);
 
 // TODO: añadir /public/og-image.png (1200×630px) — asset manual diseño web.
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://nelvyon.com";
-const canonicalBase = BASE_URL.replace(/\/$/, "");
+const canonicalBase = getAppBaseUrl();
 
 const nelvyonMarketingDescription =
   "Plataforma de marketing con inteligencia artificial. Automatiza SEO, ads, contenido y más.";
 
 const nelvyonMetadata: Metadata = {
-  metadataBase: new URL(`${canonicalBase}/`),
+  metadataBase: getAppOrigin(),
   title: {
     default: "NELVYON — Marketing IA Automatizado",
     template: "%s | NELVYON",
