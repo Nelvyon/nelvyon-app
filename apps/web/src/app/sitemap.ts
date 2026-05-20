@@ -16,6 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: abs("/"), lastModified, changeFrequency: "weekly", priority: 1.0 },
     { url: abs("/pricing"), lastModified, changeFrequency: "monthly", priority: 0.9 },
+    { url: abs("/seo"), lastModified, changeFrequency: "monthly", priority: 0.85 },
+    { url: abs("/ads"), lastModified, changeFrequency: "monthly", priority: 0.85 },
+    { url: abs("/contenido"), lastModified, changeFrequency: "monthly", priority: 0.85 },
+    { url: abs("/email-marketing"), lastModified, changeFrequency: "monthly", priority: 0.85 },
+    { url: abs("/branding"), lastModified, changeFrequency: "monthly", priority: 0.85 },
+    { url: abs("/contacto"), lastModified, changeFrequency: "monthly", priority: 0.7 },
     { url: abs("/legal"), lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: abs("/legal/privacy"), lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: abs("/legal/terms"), lastModified, changeFrequency: "yearly", priority: 0.3 },

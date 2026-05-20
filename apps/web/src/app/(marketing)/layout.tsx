@@ -9,11 +9,11 @@ const ogImageAbs = `${canonicalBase}/og-image.png`;
 export const metadata: Metadata = {
   title: "NELVYON — Marketing IA Autónomo",
   description:
-    "80+ servicios de marketing IA ejecutados automáticamente. SEO, Ads, Email, Branding, Video y más. Sin equipo. Desde 47€/mes.",
+    "Marketing autónomo con IA: SEO, publicidad, contenido, email y branding. Planes desde 95€/mes. Sin equipo.",
   openGraph: {
     title: "NELVYON — Marketing IA Autónomo",
     description:
-      "80+ servicios de marketing IA ejecutados automáticamente. Sin equipo. Desde 47€/mes.",
+      "SEO, ads, contenido, email y branding con agentes IA. Planes desde 95€/mes.",
     url: canonicalBase,
     siteName: "NELVYON",
     images: [
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "NELVYON — Marketing IA Autónomo",
-    description: "80+ servicios de marketing IA. Sin equipo. Desde 47€/mes.",
+    description: "Marketing IA autónomo. Planes desde 95€/mes.",
     images: [ogImageAbs],
     creator: "@nelvyon",
   },
@@ -41,5 +41,5 @@ export const metadata: Metadata = {
 };
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
-  return <div className="min-h-screen bg-[#080808] text-zinc-100 antialiased">{children}</div>;
+  return <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased">{children}</div>;
 }
