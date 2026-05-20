@@ -1,5 +1,8 @@
 import path from "node:path";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /** HTTP security headers (MIG 281). CSP tuned for PostHog, Stripe Checkout, Sentry. */
 const CONTENT_SECURITY_POLICY = [
@@ -108,4 +111,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);
