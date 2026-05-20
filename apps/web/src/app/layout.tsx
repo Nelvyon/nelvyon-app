@@ -9,6 +9,8 @@ import { getBrandAppName, getBrandMode } from "@/core/platform/brand";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/core/theme/themeBootstrapScript";
 import { getAppBaseUrl, getAppOrigin } from "@/lib/appUrl";
+import enMessages from "../../messages/en.json";
+import esMessages from "../../messages/es.json";
 import "./globals.css";
 
 const brandMode = getBrandMode();
@@ -70,18 +72,43 @@ export const metadata: Metadata =
     : nelvyonMetadata;
 
 async function resolveLocale(): Promise<"es" | "en"> {
-  const cookieStore = await cookies();
-  const cookieLocale = cookieStore.get("NELVYON_LOCALE")?.value;
-  if (cookieLocale === "es" || cookieLocale === "en") return cookieLocale;
-  const headerStore = await headers();
-  const acceptLang = headerStore.get("accept-language")?.toLowerCase() ?? "";
-  if (acceptLang.startsWith("en")) return "en";
+  try {
+    const cookieStore = await cookies();
+    const cookieLocale = cookieStore.get("NELVYON_LOCALE")?.value;
+    if (cookieLocale === "es" || cookieLocale === "en") return cookieLocale;
+  } catch {
+    /* cookies() unavailable — use Accept-Language or default */
+  }
+
+  try {
+    const headerStore = await headers();
+    const acceptLang = headerStore.get("accept-language")?.toLowerCase() ?? "";
+    if (acceptLang.startsWith("en")) return "en";
+  } catch {
+    /* headers() unavailable */
+  }
+
   return "es";
 }
 
+function loadMessages(locale: "es" | "en"): Record<string, unknown> {
+  try {
+    return (locale === "en" ? enMessages : esMessages) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const locale = await resolveLocale();
-  const messages = locale === "en" ? (await import("../../messages/en.json")).default : (await import("../../messages/es.json")).default;
+  let locale: "es" | "en" = "es";
+  let messages: Record<string, unknown> = esMessages as Record<string, unknown>;
+
+  try {
+    locale = await resolveLocale();
+    messages = loadMessages(locale);
+  } catch (err) {
+    console.error("[nelvyon] RootLayout bootstrap failed, using defaults", err);
+  }
 
   return (
     <html lang={locale} suppressHydrationWarning>

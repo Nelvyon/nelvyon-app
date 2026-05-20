@@ -13,5 +13,9 @@ export function getAppBaseUrl(): string {
 }
 
 export function getAppOrigin(): URL {
-  return new URL(`${getAppBaseUrl()}/`);
+  try {
+    return new URL(`${getAppBaseUrl()}/`);
+  } catch {
+    return new URL(`${DEFAULT_APP_URL}/`);
+  }
 }
