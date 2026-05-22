@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.sentry_utils import capture_exception
 from services.ses_service import BULK_BATCH_SIZE, get_ses_service
+from services.webhook_service import schedule_webhook_event
 from services.whatsapp_service import get_whatsapp_service
 
 logger = logging.getLogger(__name__)
@@ -282,13 +283,15 @@ class CampaignService:
         )
         await self.session.commit()
 
-        return {
+        result_payload = {
             "campaign_id": campaign_id,
             "status": final_status,
             "recipients_count": len(recipients),
             "sent_count": sent_total,
             "failed_count": failed_total,
         }
+        schedule_webhook_event(self.workspace_id, "campaign.sent", result_payload)
+        return result_payload
 
     async def process_scheduled_campaigns(self) -> dict[str, Any]:
         now = datetime.now(timezone.utc)

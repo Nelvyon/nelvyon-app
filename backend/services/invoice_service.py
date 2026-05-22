@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.ses_service import get_ses_service
 from services.supabase_service import get_supabase_service
+from services.webhook_service import schedule_webhook_event
 
 logger = logging.getLogger(__name__)
 
@@ -630,7 +631,9 @@ class InvoiceService:
         if not row:
             raise ValueError("Invoice not found or cannot be marked as paid")
         await self.session.commit()
-        return _row_to_dict(row)
+        invoice = _row_to_dict(row)
+        schedule_webhook_event(self.workspace_id, "invoice.paid", invoice)
+        return invoice
 
     async def get_invoice_stats(self) -> dict[str, Any]:
         result = await self.session.execute(

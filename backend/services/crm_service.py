@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import db_manager
 from core.sentry_utils import capture_exception
+from services.webhook_service import schedule_webhook_event
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +137,9 @@ class CRMService:
         )
         row = _row_to_dict(result.mappings().first())
         await self.recalculate_contact_score(row["id"])
-        return await self.get_contact_by_id(row["id"])
+        contact = await self.get_contact_by_id(row["id"])
+        schedule_webhook_event(self.workspace_id, "contact.created", contact)
+        return contact
 
     async def update_contact(self, contact_id: str, **fields: Any) -> dict[str, Any]:
         await self._assert_contact(contact_id)
@@ -162,7 +165,9 @@ class CRMService:
             text(f"UPDATE crm_contacts SET {', '.join(sets)} WHERE id = CAST(:id AS uuid) AND workspace_id = :workspace_id"),
             params,
         )
-        return await self.get_contact_by_id(contact_id)
+        updated = await self.get_contact_by_id(contact_id)
+        schedule_webhook_event(self.workspace_id, "contact.updated", updated)
+        return updated
 
     async def delete_contact(self, contact_id: str) -> bool:
         await self._assert_contact(contact_id)
@@ -311,10 +316,12 @@ class CRMService:
         )
         deal = _row_to_dict(result.mappings().first())
         await self.recalculate_contact_score(contact_id)
+        schedule_webhook_event(self.workspace_id, "deal.created", deal)
         return deal
 
     async def update_deal(self, deal_id: str, **fields: Any) -> dict[str, Any]:
         deal = await self.get_deal_by_id(deal_id)
+        previous_stage = deal.get("stage")
         allowed = {"title", "value", "currency", "stage", "probability", "close_date", "notes", "contact_id"}
         sets: list[str] = []
         params: dict[str, Any] = {"id": deal_id, "workspace_id": self.workspace_id}
@@ -345,6 +352,16 @@ class CRMService:
         )
         updated = await self.get_deal_by_id(deal_id)
         await self.recalculate_contact_score(updated["contact_id"])
+        if "stage" in fields and updated.get("stage") != previous_stage:
+            schedule_webhook_event(
+                self.workspace_id,
+                "deal.stage_changed",
+                {
+                    "deal": updated,
+                    "previous_stage": previous_stage,
+                    "new_stage": updated.get("stage"),
+                },
+            )
         return updated
 
     async def move_stage(self, deal_id: str, stage: str) -> dict[str, Any]:

@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.calendar_service import get_calendar_service
 from services.ses_service import get_ses_service
+from services.webhook_service import schedule_webhook_event
 from services.zoom_service import get_zoom_service
 
 logger = logging.getLogger(__name__)
@@ -151,6 +152,7 @@ class BookingService:
                 self._confirmation_html(booking),
             )
 
+        schedule_webhook_event(self.workspace_id, "booking.created", booking)
         return booking
 
     async def confirm_booking(self, booking_id: int) -> dict[str, Any]:

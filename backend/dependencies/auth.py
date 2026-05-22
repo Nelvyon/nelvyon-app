@@ -3,7 +3,10 @@ import logging
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from core.auth import AccessTokenError, decode_access_token
+from core.database import get_db
 from core.i18n import request_language, t
 from core.observability import set_user_id_for_log
 from fastapi import Cookie, Depends, HTTPException, Request, status
@@ -37,8 +40,31 @@ async def get_access_token(
 async def get_current_user(
     request: Request,
     token: str = Depends(get_access_token),
+    db: AsyncSession = Depends(get_db),
 ) -> UserResponse:
-    """Dependency to get current authenticated user via JWT token."""
+    """Dependency to get current authenticated user via JWT or API key (nlv_)."""
+    if token.startswith("nlv_"):
+        from services.api_keys_service import get_api_keys_service
+
+        record = await get_api_keys_service(db).validate_api_key(token)
+        if not record:
+            lang = request_language(request)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=t("auth_required", lang),
+            )
+        request.state.api_key_id = record["id"]
+        request.state.api_key_workspace_id = record["workspace_id"]
+        request.state.api_key_scopes = record.get("scopes") or []
+        set_user_id_for_log(f"apikey:{record['id']}")
+        request.state.obs_user_id = f"apikey:{record['id']}"
+        return UserResponse(
+            id=f"apikey:{record['id']}",
+            email=f"api-key@workspace-{record['workspace_id']}.nelvyon.local",
+            name=record.get("name") or "API Key",
+            role="api_key",
+        )
+
     try:
         payload = decode_access_token(token)
     except AccessTokenError as exc:
