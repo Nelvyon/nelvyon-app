@@ -13,6 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import db_manager
+from core.sentry_utils import capture_exception
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +75,31 @@ class CRMService:
     # ─── Contacts ───────────────────────────────────────────────────────────
 
     async def create_contact(
+        self,
+        *,
+        name: str,
+        email: str | None = None,
+        phone: str | None = None,
+        company: str | None = None,
+        status: str = "active",
+        tags: list | None = None,
+        metadata: dict | None = None,
+    ) -> dict[str, Any]:
+        try:
+            return await self._create_contact_impl(
+                name=name,
+                email=email,
+                phone=phone,
+                company=company,
+                status=status,
+                tags=tags,
+                metadata=metadata,
+            )
+        except Exception as exc:
+            capture_exception(exc, service="crm", method="create_contact")
+            raise
+
+    async def _create_contact_impl(
         self,
         *,
         name: str,
@@ -215,6 +241,33 @@ class CRMService:
     # ─── Deals ──────────────────────────────────────────────────────────────
 
     async def create_deal(
+        self,
+        *,
+        contact_id: str,
+        title: str,
+        value: float = 0,
+        currency: str = "EUR",
+        stage: str = "lead",
+        probability: int | None = None,
+        close_date: date | None = None,
+        notes: str | None = None,
+    ) -> dict[str, Any]:
+        try:
+            return await self._create_deal_impl(
+                contact_id=contact_id,
+                title=title,
+                value=value,
+                currency=currency,
+                stage=stage,
+                probability=probability,
+                close_date=close_date,
+                notes=notes,
+            )
+        except Exception as exc:
+            capture_exception(exc, service="crm", method="create_deal")
+            raise
+
+    async def _create_deal_impl(
         self,
         *,
         contact_id: str,

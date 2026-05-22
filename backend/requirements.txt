@@ -62,3 +62,6 @@ google-analytics-data>=0.18.0
 
 # Web Push (PWA) — VAPID notifications
 pywebpush>=2.0.0
+
+# Error monitoring
+sentry-sdk>=1.40.0

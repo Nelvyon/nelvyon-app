@@ -12,6 +12,7 @@ from urllib.parse import quote
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.sentry_utils import capture_exception
 from services.ses_service import BULK_BATCH_SIZE, get_ses_service
 from services.whatsapp_service import get_whatsapp_service
 
@@ -314,6 +315,7 @@ class CampaignService:
                 outcome = await svc.send_campaign(cid)
                 processed.append({"campaign_id": cid, "ok": True, **outcome})
             except Exception as exc:
+                capture_exception(exc, service="campaign", method="process_scheduled_campaigns")
                 logger.exception("Scheduled campaign %s failed: %s", cid, exc)
                 processed.append({"campaign_id": cid, "ok": False, "error": str(exc)})
         return {"processed": len(processed), "results": processed}
@@ -603,6 +605,7 @@ class CampaignService:
                 else:
                     failed += 1
             except Exception as exc:
+                capture_exception(exc, service="campaign", method="_send_email_batch", to=to)
                 logger.warning("Campaign email to %s failed: %s", to, exc)
                 await self._mark_recipient(rid, "failed", now)
                 failed += 1
@@ -634,6 +637,7 @@ class CampaignService:
                 else:
                     failed += 1
             except Exception as exc:
+                capture_exception(exc, service="campaign", method="_send_whatsapp_batch", phone=phone)
                 logger.warning("Campaign WhatsApp to %s failed: %s", phone, exc)
                 await self._mark_recipient(rid, "failed", now)
                 failed += 1

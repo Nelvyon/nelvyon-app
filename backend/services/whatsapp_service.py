@@ -9,6 +9,8 @@ from typing import Any
 
 import httpx
 
+from core.sentry_utils import capture_exception
+
 logger = logging.getLogger(__name__)
 
 GRAPH_API_VERSION = "v19.0"
@@ -263,6 +265,12 @@ class WhatsAppService:
                     "WhatsApp API error status=%s body=%s",
                     response.status_code,
                     body,
+                )
+                capture_exception(
+                    RuntimeError(f"WhatsApp API HTTP {response.status_code}"),
+                    service="whatsapp",
+                    status_code=response.status_code,
+                    body=str(body)[:500],
                 )
                 return {
                     "mock": False,

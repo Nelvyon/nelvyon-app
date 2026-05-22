@@ -106,6 +106,22 @@ async def startup_event():
     logger.info("=== Application startup initiated ===")
     logger.info("Environment: %s | Version: 2.0.0", ENVIRONMENT)
 
+    dsn = os.environ.get("SENTRY_DSN", "").strip()
+    if dsn:
+        try:
+            import sentry_sdk
+
+            sentry_sdk.init(
+                dsn=dsn,
+                environment=ENVIRONMENT,
+                traces_sample_rate=0.1,
+            )
+            logger.info("Sentry initialized (environment=%s)", ENVIRONMENT)
+        except Exception as e:
+            logger.warning("Sentry init skipped: %s", sanitize_text(str(e)))
+    else:
+        logger.info("SENTRY_DSN not set — Sentry disabled")
+
     # MODULE_STARTUP_START
     try:
         await initialize_database()
@@ -304,6 +320,18 @@ async def general_exception_handler(request: Request, exc: Exception):
         exc_info=exc,
     )
 
+    try:
+        from core.sentry_utils import capture_exception
+
+        capture_exception(
+            exc,
+            path=str(request.url.path),
+            method=request.method,
+            request_id=request_id,
+        )
+    except Exception:
+        pass
+
     if IS_DEV:
         error_detail = {
             "detail": f"{error_type}: {exc!s}",
@@ -408,6 +436,19 @@ def run_in_debug_mode(app: FastAPI):
     )
     server = uvicorn.Server(config)
     asyncio.run(server.serve())
+
+
+# Sentry ASGI middleware (wraps app when DSN is configured)
+if os.environ.get("SENTRY_DSN", "").strip():
+    try:
+        from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+
+        app = SentryAsgiMiddleware(app)
+    except Exception as _sentry_mw_exc:
+        logging.getLogger(__name__).warning(
+            "SentryAsgiMiddleware not applied: %s",
+            sanitize_text(str(_sentry_mw_exc)),
+        )
 
 
 if __name__ == "__main__":
