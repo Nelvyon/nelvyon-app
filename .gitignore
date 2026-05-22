@@ -51,6 +51,7 @@ coverage.xml
 !.env.example
 !.env*.example
 secrets.*
+!backend/core/secrets.py
 *.pem
 *.key
 *.p12
