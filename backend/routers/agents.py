@@ -5,7 +5,9 @@ Agent streaming — real-time SSE output from OpenAI-compatible chat completions
 import json
 import logging
 import os
+import re
 from typing import Any, AsyncGenerator, Dict, List, Optional
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
@@ -15,6 +17,7 @@ from core.config import settings
 from dependencies.workspace import WorkspaceContext, require_workspace
 from schemas.agents import AgentStreamRequest
 from services import memory_service
+from services.seo_apis import build_seo_premium_context
 
 logger = logging.getLogger(__name__)
 
@@ -72,15 +75,94 @@ def _extract_user_query(messages: List[Dict[str, Any]]) -> str:
     return ""
 
 
+def _normalize_domain(value: str) -> Optional[str]:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    if "://" not in raw:
+        raw = f"https://{raw}"
+    try:
+        host = urlparse(raw).hostname
+    except Exception:
+        return None
+    if not host:
+        return None
+    return host.lower().removeprefix("www.")
+
+
+def _extract_domain(request: AgentStreamRequest, user_query: str) -> Optional[str]:
+    ctx = request.client_context or {}
+    for key in ("domain", "website", "url", "site", "target_domain", "targetDomain"):
+        val = ctx.get(key)
+        if val:
+            normalized = _normalize_domain(str(val))
+            if normalized:
+                return normalized
+    match = re.search(
+        r"(?:https?://)?(?:www\.)?([a-z0-9][-a-z0-9]*(?:\.[a-z0-9][-a-z0-9]*)+)",
+        user_query,
+        re.IGNORECASE,
+    )
+    if match:
+        return match.group(1).lower()
+    return None
+
+
+def _extract_keywords(request: AgentStreamRequest, user_query: str) -> List[str]:
+    ctx = request.client_context or {}
+    found: List[str] = []
+
+    for key in ("keywords", "main_keywords", "mainKeywords", "target_keywords"):
+        val = ctx.get(key)
+        if isinstance(val, list):
+            found.extend(str(item).strip() for item in val if str(item).strip())
+        elif isinstance(val, str) and val.strip():
+            found.extend(part.strip() for part in re.split(r"[,;\n]", val) if part.strip())
+
+    for key in ("keyword", "main_keyword", "mainKeyword", "seed_keyword"):
+        val = ctx.get(key)
+        if val and str(val).strip():
+            found.append(str(val).strip())
+
+    if user_query.strip():
+        found.append(user_query.strip()[:120])
+
+    deduped: List[str] = []
+    seen = set()
+    for kw in found:
+        key = kw.lower()
+        if key not in seen:
+            seen.add(key)
+            deduped.append(kw)
+    return deduped[:5] if deduped else ["seo"]
+
+
+async def _seo_real_data_prompt(request: AgentStreamRequest, user_query: str) -> Optional[str]:
+    if (request.service_id or "").strip() != "seo_premium":
+        return None
+    domain = _extract_domain(request, user_query)
+    keywords = _extract_keywords(request, user_query)
+    seo_data = await build_seo_premium_context(domain=domain, keywords=keywords)
+    return (
+        "Datos SEO reales (Semrush + DataForSEO). Usa SOLO estos datos para métricas; "
+        "no inventes cifras si aparece error de API:\n"
+        f"{json.dumps(seo_data, ensure_ascii=False, default=str)}"
+    )
+
+
 def _build_messages(
     request: AgentStreamRequest,
     memory_context: Optional[str] = None,
+    seo_context: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     messages: List[Dict[str, Any]] = list(request.messages)
 
     system_parts: List[str] = []
     if memory_context and memory_context.strip():
         system_parts.append(f"Contexto del cliente: {memory_context.strip()}")
+
+    if seo_context and seo_context.strip():
+        system_parts.append(seo_context.strip())
 
     if request.client_context:
         context_line = json.dumps(request.client_context, ensure_ascii=False, default=str)
@@ -112,7 +194,12 @@ async def stream_agent(
         limit=5,
     )
     memory_prompt = memory_service.format_relevant_memories(relevant_memories)
-    messages = _build_messages(request, memory_context=memory_prompt)
+    seo_prompt = await _seo_real_data_prompt(request, user_query)
+    messages = _build_messages(
+        request,
+        memory_context=memory_prompt,
+        seo_context=seo_prompt,
+    )
 
     async def generate() -> AsyncGenerator[str, None]:
         assistant_parts: List[str] = []
