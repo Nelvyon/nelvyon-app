@@ -59,3 +59,6 @@ google-api-python-client>=2.100.0
 
 # Google Analytics 4 Data API
 google-analytics-data>=0.18.0
+
+# Web Push (PWA) — VAPID notifications
+pywebpush>=2.0.0
