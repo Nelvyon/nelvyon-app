@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { streamAgentChat } from "@/lib/agentStream";
 import type { ChatMessage } from "@/types/saas-client";
 
 export type ChatbotWidgetProps = {
@@ -71,39 +72,85 @@ export default function ChatbotWidget({
   const postMessage = useCallback(
     async (text: string) => {
       if (!text.trim() || !sessionId) return;
-      const base = apiBase.replace(/\/$/, "");
-      const url = `${base}/api/saas/chatbot/chat`;
       const userMsg: ChatMessage = { role: "user", content: text.trim() };
       setHistory((h) => [...h, userMsg]);
       setLoading(true);
+
+      const assistantIndex = history.length + 1;
+      setHistory((h) => [...h, { role: "assistant", content: "" }]);
+
+      const messages = [
+        {
+          role: "system",
+          content: `Eres ${botName}, asistente del chatbot ${chatbotId}. Responde en español, breve y útil.`,
+        },
+        ...history.map((m) => ({
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: m.content,
+        })),
+        { role: "user", content: text.trim() },
+      ];
+
       try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chatbotId,
-            sessionId,
-            message: text.trim(),
-            history,
-          }),
+        let streamed = "";
+        await streamAgentChat({
+          serviceId: chatbotId,
+          clientContext: { sessionId, apiBase: apiBase || "same-origin" },
+          messages,
+          onChunk: (delta) => {
+            streamed += delta;
+            setHistory((h) => {
+              const next = [...h];
+              if (next[assistantIndex]) {
+                next[assistantIndex] = { role: "assistant", content: streamed };
+              }
+              return next;
+            });
+          },
         });
-        if (!res.ok) throw new Error("chat_failed");
-        const data = (await res.json()) as ChatApiResponse;
-        setHistory((h) => [...h, { role: "assistant", content: data.response }]);
-        if (data.shouldEscalate) setEscalate(true);
-        if (data.capturedLead?.email || data.capturedLead?.name) {
-          setLeadDraft({
-            name: data.capturedLead.name ?? "",
-            email: data.capturedLead.email ?? "",
+      } catch {
+        const base = apiBase.replace(/\/$/, "");
+        const url = `${base}/api/saas/chatbot/chat`;
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chatbotId,
+              sessionId,
+              message: text.trim(),
+              history,
+            }),
+          });
+          if (!res.ok) throw new Error("chat_failed");
+          const data = (await res.json()) as ChatApiResponse;
+          setHistory((h) => {
+            const next = [...h];
+            next[assistantIndex] = { role: "assistant", content: data.response };
+            return next;
+          });
+          if (data.shouldEscalate) setEscalate(true);
+          if (data.capturedLead?.email || data.capturedLead?.name) {
+            setLeadDraft({
+              name: data.capturedLead.name ?? "",
+              email: data.capturedLead.email ?? "",
+            });
+          }
+        } catch {
+          setHistory((h) => {
+            const next = [...h];
+            next[assistantIndex] = {
+              role: "assistant",
+              content: "No se pudo conectar. Inténtalo de nuevo.",
+            };
+            return next;
           });
         }
-      } catch {
-        setHistory((h) => [...h, { role: "assistant", content: "No se pudo conectar. Inténtalo de nuevo." }]);
       } finally {
         setLoading(false);
       }
     },
-    [apiBase, chatbotId, history, sessionId],
+    [apiBase, botName, chatbotId, history, sessionId],
   );
 
   function send(): void {

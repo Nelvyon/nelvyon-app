@@ -41,6 +41,33 @@ export class ApiClient {
     return this.request<TResponse>("DELETE", path, options);
   }
 
+  /** POST that returns the raw Response for SSE / streaming consumers. */
+  async postStream<TBody = unknown>(
+    path: string,
+    body: TBody,
+    options: Pick<RequestOptions<TBody>, "tenantScoped" | "signal" | "headers"> = {},
+  ): Promise<Response> {
+    const headers = this.buildHeaders({
+      tenantScoped: options.tenantScoped ?? true,
+      headers: { Accept: "text/event-stream", ...(options.headers ?? {}) },
+    });
+    const response = await fetch(`${this.config.baseUrl}${path}`, {
+      method: "POST",
+      signal: options.signal,
+      headers,
+      credentials: "include",
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      const payload = await this.tryParsePayload(response);
+      const message = this.resolveErrorMessage(response.status, payload);
+      if (response.status === 401 && this.config.onUnauthorized) this.config.onUnauthorized();
+      if (response.status === 403 && this.config.onForbidden) this.config.onForbidden();
+      throw new ApiError({ status: response.status, message, payload });
+    }
+    return response;
+  }
+
   /** Multipart upload — do not set Content-Type manually (boundary is set by the runtime). */
   async postMultipart<TResponse>(path: string, formData: FormData, options: Pick<RequestOptions, "tenantScoped" | "signal" | "retries"> = {}): Promise<TResponse> {
     const headers: Record<string, string> = {};

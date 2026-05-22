@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+
+import { streamAgentChat } from "@/lib/agentStream";
 
 type AgentId =
   | "fashion-brand-story"
@@ -41,26 +43,53 @@ export default function FashionDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ agentId: string; result: string; generatedAt: string } | null>(null);
+  const streamAbortRef = useRef<AbortController | null>(null);
   const active = useMemo(() => AGENTS.find((a) => a.id === agentId) ?? AGENTS[0], [agentId]);
 
   async function runAgent(): Promise<void> {
+    streamAbortRef.current?.abort();
+    const controller = new AbortController();
+    streamAbortRef.current = controller;
+
     setLoading(true);
     setError("");
-    setResult(null);
+    const generatedAt = new Date().toISOString();
+    setResult({ agentId, result: "", generatedAt });
+
+    const input = { brandName, category, targetAudience, priceRange, tone, season: season || undefined };
+
     try {
-      const response = await fetch("/api/os/agents/fashion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ agentId, input: { brandName, category, targetAudience, priceRange, tone, season: season || undefined } }),
+      let streamed = "";
+      await streamAgentChat({
+        serviceId: agentId,
+        clientContext: input,
+        messages: [
+          {
+            role: "system",
+            content: `Eres ${active.name}, agente NELVYON de moda. ${active.description}. Responde en español con markdown claro.`,
+          },
+          {
+            role: "user",
+            content: `Genera el deliverable para este brief:\n${JSON.stringify(input, null, 2)}`,
+          },
+        ],
+        signal: controller.signal,
+        onChunk: (delta) => {
+          streamed += delta;
+          setResult({ agentId, result: streamed, generatedAt });
+        },
       });
-      const data = (await response.json()) as { success?: boolean; result?: { agentId: string; result: string; generatedAt: string }; error?: string };
-      if (!response.ok || !data.success || !data.result) throw new Error(data.error ?? "Error procesando solicitud");
-      setResult(data.result);
     } catch (err: unknown) {
+      if (controller.signal.aborted) {
+        return;
+      }
       setError(err instanceof Error ? err.message : "Error inesperado");
+      setResult(null);
     } finally {
       setLoading(false);
+      if (streamAbortRef.current === controller) {
+        streamAbortRef.current = null;
+      }
     }
   }
 
@@ -100,14 +129,16 @@ export default function FashionDashboard() {
               </select>
               <input className="rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm" placeholder="Season (SS25/AW25/atemporal)" value={season} onChange={(e) => setSeason(e.target.value)} />
             </div>
-            <button type="button" disabled={loading} onClick={() => runAgent().catch(() => setError("Error"))} className="mt-4 rounded bg-sky-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{loading ? "Generando..." : "Ejecutar agente"}</button>
+            <button type="button" disabled={loading} onClick={() => runAgent().catch(() => setError("Error"))} className="mt-4 rounded bg-sky-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{loading ? "Generando en vivo…" : "Ejecutar agente (stream)"}</button>
           </div>
           <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-sm font-medium text-slate-200">Resultado</p>
               <button type="button" onClick={() => copyResult().catch(() => {})} className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-200" disabled={!result?.result}>Copiar</button>
             </div>
-            <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap rounded border border-slate-800 bg-slate-950 p-3 text-xs text-slate-300">{result?.result ? result.result : "Sin resultado todavia."}</pre>
+            <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap rounded border border-slate-800 bg-slate-950 p-3 text-xs text-slate-300">
+              {loading && !result?.result ? "Escribiendo…" : result?.result ? result.result : "Sin resultado todavia."}
+            </pre>
           </div>
         </div>
       </div>
