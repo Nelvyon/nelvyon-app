@@ -17,6 +17,7 @@ from core.config import settings
 from dependencies.workspace import WorkspaceContext, require_workspace
 from schemas.agents import AgentStreamRequest
 from services import memory_service
+from services.klaviyo_service import build_email_marketing_premium_context
 from services.seo_apis import build_seo_premium_context
 
 logger = logging.getLogger(__name__)
@@ -150,10 +151,22 @@ async def _seo_real_data_prompt(request: AgentStreamRequest, user_query: str) ->
     )
 
 
+async def _email_marketing_real_data_prompt(request: AgentStreamRequest) -> Optional[str]:
+    if (request.service_id or "").strip() != "email_marketing_premium":
+        return None
+    email_data = await build_email_marketing_premium_context()
+    return (
+        "Datos email marketing reales (Klaviyo). Usa SOLO estos datos para listas, "
+        "métricas y campañas; no inventes cifras si aparece error de API:\n"
+        f"{json.dumps(email_data, ensure_ascii=False, default=str)}"
+    )
+
+
 def _build_messages(
     request: AgentStreamRequest,
     memory_context: Optional[str] = None,
     seo_context: Optional[str] = None,
+    email_context: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     messages: List[Dict[str, Any]] = list(request.messages)
 
@@ -163,6 +176,9 @@ def _build_messages(
 
     if seo_context and seo_context.strip():
         system_parts.append(seo_context.strip())
+
+    if email_context and email_context.strip():
+        system_parts.append(email_context.strip())
 
     if request.client_context:
         context_line = json.dumps(request.client_context, ensure_ascii=False, default=str)
@@ -195,10 +211,12 @@ async def stream_agent(
     )
     memory_prompt = memory_service.format_relevant_memories(relevant_memories)
     seo_prompt = await _seo_real_data_prompt(request, user_query)
+    email_prompt = await _email_marketing_real_data_prompt(request)
     messages = _build_messages(
         request,
         memory_context=memory_prompt,
         seo_context=seo_prompt,
+        email_context=email_prompt,
     )
 
     async def generate() -> AsyncGenerator[str, None]:
