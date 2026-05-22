@@ -15,11 +15,7 @@ async def test_health_returns_200_with_expected_shape(client: AsyncClient):
     r = await client.get("/health")
     assert r.status_code == 200, r.text
     data = r.json()
-    assert data["status"] == "healthy"
-    assert data.get("process") == "up"
-    assert data.get("database") == "ok"
-    assert data.get("version") == "2.0.0"
-    assert "environment" in data
+    assert data == {"status": "healthy"}
 
 
 def test_structured_log_emits_json_line(caplog):

@@ -37,7 +37,7 @@ RATE_LIMIT_RULES = [
 ]
 
 # Paths excluded from rate limiting
-EXCLUDED_PATHS = {"/", "/health", "/docs", "/openapi.json", "/redoc"}
+EXCLUDED_PATHS = {"/", "/health", "/health/ready", "/docs", "/openapi.json", "/redoc"}
 
 
 class RateLimiterMiddleware(BaseHTTPMiddleware):

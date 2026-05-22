@@ -43,6 +43,9 @@ SCAN_EXCLUDED_PATHS = {
     "/api/v1/payment/verify_payment",
 }
 
+# Liveness/readiness — Railway healthcheck and probes (no auth, no body scan)
+PUBLIC_LIVENESS_PATHS = {"/health", "/health/ready"}
+
 # Security headers base (always-on for API responses)
 SECURITY_HEADERS_BASE = {
     "X-Content-Type-Options": "nosniff",
@@ -143,6 +146,9 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         self.scan_bodies = scan_bodies
 
     async def dispatch(self, request: Request, call_next) -> Response:
+        if request.url.path in PUBLIC_LIVENESS_PATHS:
+            return await call_next(request)
+
         # 1. Check request size via Content-Length header
         content_length = request.headers.get("content-length")
         if content_length and int(content_length) > MAX_BODY_SIZE:

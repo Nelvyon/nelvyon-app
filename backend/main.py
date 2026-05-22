@@ -143,6 +143,12 @@ app = FastAPI(
 )
 
 
+# Liveness probe for Railway — no auth, DB, or Redis (see backend/railway.json healthcheckPath)
+@app.get("/health", status_code=200)
+async def health():
+    return {"status": "healthy"}
+
+
 # MODULE_MIDDLEWARE_START
 
 # Error handler middleware (innermost — catches unhandled exceptions from route handlers)
@@ -296,11 +302,6 @@ def root():
         "status": "operational",
         "environment": ENVIRONMENT,
     }
-
-
-@app.get("/health")
-async def health():
-    return {"status": "healthy"}
 
 
 @app.get("/health/ready")
