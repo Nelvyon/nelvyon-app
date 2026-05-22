@@ -39,6 +39,7 @@ DANGEROUS_PATTERNS = [
 SCAN_EXCLUDED_PATHS = {
     "/api/v1/storage/upload",
     "/api/v1/stripe/webhook",
+    "/api/whatsapp/webhook",
     "/api/v1/payment/create_payment_session",
     "/api/v1/payment/verify_payment",
 }
