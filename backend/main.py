@@ -265,7 +265,7 @@ def include_routers_from_package(app: FastAPI, package_name: str = "routers") ->
         logger.info("Total routers discovered: %d", discovered)
 
 
-# Setup logging before router discovery
+# Setup logging before router discovery (includes routers/ses.py — Amazon SES cold email)
 setup_logging()
 include_routers_from_package(app, "routers")
 
