@@ -88,47 +88,74 @@ def setup_logging():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Single application lifespan — do not register lifespan on routers or sub-apps."""
     logger = logging.getLogger(__name__)
     logger.info("=== Application startup initiated ===")
-    logger.info(f"Environment: {ENVIRONMENT} | Version: 2.0.0")
+    logger.info("Environment: %s | Version: 2.0.0", ENVIRONMENT)
 
     # MODULE_STARTUP_START
-    await initialize_database()
-    # Mock JSON fixtures: no-op in production/staging unless ALLOW_MOCK_SEED=true (see services.mock_data)
-    await initialize_mock_data()
-    await initialize_admin_user()
-
-    # Initialize Redis adapter (falls back to in-memory if REDIS_URL not set)
-    await redis_client.initialize()
-    logger.info(f"Cache backend: {'Redis' if redis_client.is_redis else 'in-memory'}")
-
-    # Start async job queue workers (handlers registered before start — ARQ + in-process)
-    register_nelvyon_job_handlers()
     try:
-        await job_queue.start()
+        await initialize_database()
     except Exception as e:
-        logger.warning("Job queue unavailable: %s", e)
-    qstats = job_queue.get_stats()
-    logger.info(
-        "Job queue started backend=%s max_workers=%s handlers=%s",
-        qstats.get("backend"),
-        qstats.get("max_workers"),
-        qstats.get("registered_handlers"),
-    )
+        logger.warning("DB init failed: %s", e)
 
-    # Apply staging overrides if applicable
-    apply_staging_overrides()
+    try:
+        await initialize_mock_data()
+    except Exception as e:
+        logger.warning("Mock data init failed: %s", e)
+
+    try:
+        await initialize_admin_user()
+    except Exception as e:
+        logger.warning("Admin user init failed: %s", e)
+
+    try:
+        await redis_client.initialize()
+        logger.info(
+            "Cache backend: %s",
+            "Redis" if redis_client.is_redis else "in-memory",
+        )
+    except Exception as e:
+        logger.warning("Redis init failed: %s", e)
+
+    try:
+        register_nelvyon_job_handlers()
+        await job_queue.start()
+        qstats = job_queue.get_stats()
+        logger.info(
+            "Job queue started backend=%s max_workers=%s handlers=%s",
+            qstats.get("backend"),
+            qstats.get("max_workers"),
+            qstats.get("registered_handlers"),
+        )
+    except Exception as e:
+        logger.warning("Job queue init failed: %s", e)
+
+    try:
+        apply_staging_overrides()
+    except Exception as e:
+        logger.warning("Staging overrides failed: %s", e)
     # MODULE_STARTUP_END
 
-    logger.info("=== Application startup completed successfully ===")
+    logger.info("=== Application startup completed ===")
     yield
 
-    # Graceful shutdown
     logger.info("=== Application shutdown initiated ===")
     # MODULE_SHUTDOWN_START
-    await job_queue.stop()
-    await redis_client.close()
-    await close_database()
+    try:
+        await job_queue.stop()
+    except Exception as e:
+        logger.warning("Job queue shutdown failed: %s", e)
+
+    try:
+        await redis_client.close()
+    except Exception as e:
+        logger.warning("Redis shutdown failed: %s", e)
+
+    try:
+        await close_database()
+    except Exception as e:
+        logger.warning("DB shutdown failed: %s", e)
     # MODULE_SHUTDOWN_END
     logger.info("=== Application shutdown completed ===")
 
@@ -138,9 +165,12 @@ app = FastAPI(
     description="NELVYON OS + SaaS Platform — Enterprise-grade API for CRM, contracts, billing, helpdesk, campaigns, and AI agents.",
     version="2.0.0",
     lifespan=lifespan,
-    docs_url="/docs" if not IS_PRODUCTION else None,  # Disable Swagger in production
-    redoc_url="/redoc" if not IS_PRODUCTION else None,  # Disable ReDoc in production
+    docs_url="/docs" if not IS_PRODUCTION else None,
+    redoc_url="/redoc" if not IS_PRODUCTION else None,
 )
+
+# Preserve only main.py lifespan — include_router merges each router's default lifespan otherwise.
+_main_lifespan_context = app.router.lifespan_context
 
 
 # Liveness probe for Railway — no auth, DB, or Redis (see backend/railway.json healthcheckPath)
@@ -239,6 +269,8 @@ def include_routers_from_package(app: FastAPI, package_name: str = "routers") ->
 # Setup logging before router discovery
 setup_logging()
 include_routers_from_package(app, "routers")
+# Undo per-router merged_lifespan nesting (fixes recursive merged_lifespan on Railway).
+app.router.lifespan_context = _main_lifespan_context
 
 
 # Add exception handler for all exceptions except HTTPException
