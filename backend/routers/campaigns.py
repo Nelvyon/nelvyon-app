@@ -29,7 +29,7 @@ def _mark_official_campaign_domain(response: Response):
     response.headers["X-Campaign-Official-Domain"] = "campaigns"
 
 
-router = APIRouter(
+entities_router = APIRouter(
     prefix="/api/v1/entities/campaigns",
     tags=["campaigns"],
     dependencies=[Depends(_mark_official_campaign_domain)],
@@ -128,7 +128,7 @@ class CampaignsBatchDeleteRequest(BaseModel):
 
 
 # ---------- Routes (workspace-aware — Sprint 2.5) ----------
-@router.get("", response_model=CampaignsListResponse)
+@entities_router.get("", response_model=CampaignsListResponse)
 async def query_campaigns(
     query: str = Query(None),
     sort: str = Query(None),
@@ -159,7 +159,7 @@ async def query_campaigns(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/all", response_model=CampaignsListResponse)
+@entities_router.get("/all", response_model=CampaignsListResponse)
 async def query_campaigns_all(
     query: str = Query(None),
     sort: str = Query(None),
@@ -190,7 +190,7 @@ async def query_campaigns_all(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/{id}", response_model=CampaignsResponse)
+@entities_router.get("/{id}", response_model=CampaignsResponse)
 async def get_campaigns(
     id: int,
     fields: str = Query(None),
@@ -210,7 +210,7 @@ async def get_campaigns(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.post("", response_model=CampaignsResponse, status_code=201)
+@entities_router.post("", response_model=CampaignsResponse, status_code=201)
 async def create_campaigns(
     data: CampaignsData,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -230,7 +230,7 @@ async def create_campaigns(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.post("/batch", response_model=List[CampaignsResponse], status_code=201)
+@entities_router.post("/batch", response_model=List[CampaignsResponse], status_code=201)
 async def create_campaigns_batch(
     request: CampaignsBatchCreateRequest,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -253,7 +253,7 @@ async def create_campaigns_batch(
         raise HTTPException(status_code=500, detail="Batch create failed")
 
 
-@router.put("/batch", response_model=List[CampaignsResponse])
+@entities_router.put("/batch", response_model=List[CampaignsResponse])
 async def update_campaigns_batch(
     request: CampaignsBatchUpdateRequest,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -283,7 +283,7 @@ async def update_campaigns_batch(
         raise HTTPException(status_code=500, detail="Batch update failed")
 
 
-@router.put("/{id}", response_model=CampaignsResponse)
+@entities_router.put("/{id}", response_model=CampaignsResponse)
 async def update_campaigns(
     id: int,
     data: CampaignsUpdateData,
@@ -311,7 +311,7 @@ async def update_campaigns(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.delete("/batch")
+@entities_router.delete("/batch")
 async def delete_campaigns_batch(
     request: CampaignsBatchDeleteRequest,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -331,7 +331,7 @@ async def delete_campaigns_batch(
         raise HTTPException(status_code=500, detail="Batch delete failed")
 
 
-@router.delete("/{id}")
+@entities_router.delete("/{id}")
 async def delete_campaigns(
     id: int,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -348,3 +348,223 @@ async def delete_campaigns(
     except Exception as e:
         logger.error("Error deleting campaign %s: %s", id, sanitize_text(str(e)), exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+# ─── Scheduler + deliverability API (/api/campaigns) ───────────────────────────
+
+from urllib.parse import unquote
+
+from fastapi.responses import RedirectResponse, Response as FastAPIResponse
+
+from services.campaign_service import TRACKING_PIXEL_GIF, CampaignService
+
+
+class CampaignCreateBody(BaseModel):
+    name: str
+    type: str = "email"
+    status: str = "draft"
+    subject: Optional[str] = None
+    content: Optional[str] = None
+    from_name: Optional[str] = None
+    from_email: Optional[str] = None
+    scheduled_at: Optional[datetime] = None
+    contact_ids: Optional[List[int]] = None
+
+
+class CampaignUpdateBody(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    status: Optional[str] = None
+    subject: Optional[str] = None
+    content: Optional[str] = None
+    from_name: Optional[str] = None
+    from_email: Optional[str] = None
+    scheduled_at: Optional[datetime] = None
+
+
+class ScheduleCampaignBody(BaseModel):
+    scheduled_at: datetime
+
+
+scheduler_router = APIRouter(prefix="/api/campaigns", tags=["campaigns-scheduler"])
+
+
+def _scheduler_service(db: AsyncSession, ws_ctx: WorkspaceContext) -> CampaignService:
+    return CampaignService(db, ws_ctx.workspace_id, user_id=ws_ctx.user_id)
+
+
+@scheduler_router.get("")
+async def list_scheduler_campaigns(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=200),
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        return await service.list_campaigns(skip=skip, limit=limit)
+    except Exception as e:
+        logger.error("list campaigns: %s", sanitize_text(str(e)), exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@scheduler_router.get("/track/open/{campaign_id}/{recipient_id}")
+async def track_campaign_open(
+    campaign_id: int,
+    recipient_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """1×1 tracking pixel (no auth)."""
+    from sqlalchemy import text as sql_text
+
+    try:
+        ws_row = await db.execute(
+            sql_text("SELECT workspace_id FROM campaigns WHERE id = :id"),
+            {"id": campaign_id},
+        )
+        fetched = ws_row.fetchone()
+        if fetched:
+            svc = CampaignService(db, int(fetched._mapping["workspace_id"]))
+            await svc.track_open(campaign_id, recipient_id)
+    except Exception as exc:
+        logger.debug("track_open %s/%s: %s", campaign_id, recipient_id, exc)
+    return FastAPIResponse(content=TRACKING_PIXEL_GIF, media_type="image/gif")
+
+
+@scheduler_router.get("/track/click/{campaign_id}/{recipient_id}")
+async def track_campaign_click(
+    campaign_id: int,
+    recipient_id: int,
+    url: str = Query("https://nelvyon.com"),
+    db: AsyncSession = Depends(get_db),
+):
+    """Redirect tracking (no auth)."""
+    from sqlalchemy import text as sql_text
+
+    target = unquote(url)
+    try:
+        ws_row = await db.execute(
+            sql_text("SELECT workspace_id FROM campaigns WHERE id = :id"),
+            {"id": campaign_id},
+        )
+        fetched = ws_row.fetchone()
+        if fetched:
+            svc = CampaignService(db, int(fetched._mapping["workspace_id"]))
+            await svc.track_click(campaign_id, recipient_id)
+    except Exception as exc:
+        logger.debug("track_click %s/%s: %s", campaign_id, recipient_id, exc)
+    return RedirectResponse(url=target, status_code=302)
+
+
+@scheduler_router.get("/{campaign_id}")
+async def get_scheduler_campaign(
+    campaign_id: int,
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        return await service.get_campaign(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+
+@scheduler_router.post("", status_code=201)
+async def create_scheduler_campaign(
+    body: CampaignCreateBody,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    await enforce_campaign_create_quota(db, ws_ctx.workspace_id)
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        return await service.create_campaign(body.model_dump())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@scheduler_router.put("/{campaign_id}")
+async def update_scheduler_campaign(
+    campaign_id: int,
+    body: CampaignUpdateBody,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        payload = {k: v for k, v in body.model_dump().items() if v is not None}
+        return await service.update_campaign(campaign_id, payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@scheduler_router.delete("/{campaign_id}")
+async def delete_scheduler_campaign(
+    campaign_id: int,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        ok = await service.delete_campaign(campaign_id)
+        if not ok:
+            raise HTTPException(status_code=404, detail="Campaign not found")
+        return {"message": "Campaign deleted", "id": campaign_id}
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+
+@scheduler_router.post("/{campaign_id}/schedule")
+async def schedule_scheduler_campaign(
+    campaign_id: int,
+    body: ScheduleCampaignBody,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        return await service.schedule_campaign(campaign_id, body.scheduled_at)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@scheduler_router.post("/{campaign_id}/send")
+async def send_scheduler_campaign(
+    campaign_id: int,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        return await service.send_campaign(campaign_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@scheduler_router.post("/{campaign_id}/pause")
+async def pause_scheduler_campaign(
+    campaign_id: int,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        return await service.pause_campaign(campaign_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@scheduler_router.get("/{campaign_id}/stats")
+async def scheduler_campaign_stats(
+    campaign_id: int,
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    service = _scheduler_service(db, ws_ctx)
+    try:
+        return await service.get_stats(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+
+router = (entities_router, scheduler_router)
