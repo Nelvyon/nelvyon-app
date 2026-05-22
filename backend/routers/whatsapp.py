@@ -6,8 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
+from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace
+from services.helpdesk_service import default_helpdesk_workspace_id, get_helpdesk_service
 from services.whatsapp_service import get_whatsapp_service
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/api/whatsapp", tags=["whatsapp"])
 
@@ -130,7 +133,10 @@ async def verify_webhook(
 
 
 @router.post("/webhook")
-async def receive_webhook(request: Request) -> Dict[str, Any]:
+async def receive_webhook(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> Dict[str, Any]:
     """Receive inbound messages and delivery status updates from Meta."""
     try:
         payload = await request.json()
@@ -141,4 +147,15 @@ async def receive_webhook(request: Request) -> Dict[str, Any]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Expected JSON object")
 
     service = get_whatsapp_service()
-    return await service.process_incoming_webhook(payload)
+    result = await service.process_incoming_webhook(payload)
+
+    ws_id = default_helpdesk_workspace_id()
+    if ws_id is not None:
+        try:
+            hd = get_helpdesk_service(db, ws_id)
+            helpdesk_out = await hd.process_whatsapp_webhook_payload(payload)
+            result["helpdesk"] = helpdesk_out
+        except Exception as exc:
+            result["helpdesk_error"] = str(exc)
+
+    return result
