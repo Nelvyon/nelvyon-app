@@ -4,7 +4,6 @@ import os
 import pkgutil
 import sys
 import traceback
-from contextlib import asynccontextmanager
 from datetime import datetime
 
 from core.config import settings
@@ -86,9 +85,23 @@ def setup_logging():
     logger.info("Log level: %s", logging.getLevelName(log_level))
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Single application lifespan — do not register lifespan on routers or sub-apps."""
+app = FastAPI(
+    title="NELVYON OS API",
+    description="NELVYON OS + SaaS Platform — Enterprise-grade API for CRM, contracts, billing, helpdesk, campaigns, and AI agents.",
+    version="2.0.0",
+    docs_url="/docs" if not IS_PRODUCTION else None,
+    redoc_url="/redoc" if not IS_PRODUCTION else None,
+)
+
+
+# Liveness probe for Railway — no auth, DB, or Redis (see backend/railway.json healthcheckPath)
+@app.get("/health", status_code=200)
+async def health():
+    return {"status": "healthy"}
+
+
+@app.on_event("startup")
+async def startup_event():
     logger = logging.getLogger(__name__)
     logger.info("=== Application startup initiated ===")
     logger.info("Environment: %s | Version: 2.0.0", ENVIRONMENT)
@@ -138,9 +151,13 @@ async def lifespan(app: FastAPI):
     # MODULE_STARTUP_END
 
     logger.info("=== Application startup completed ===")
-    yield
 
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger = logging.getLogger(__name__)
     logger.info("=== Application shutdown initiated ===")
+
     # MODULE_SHUTDOWN_START
     try:
         await job_queue.stop()
@@ -157,26 +174,8 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("DB shutdown failed: %s", e)
     # MODULE_SHUTDOWN_END
+
     logger.info("=== Application shutdown completed ===")
-
-
-app = FastAPI(
-    title="NELVYON OS API",
-    description="NELVYON OS + SaaS Platform — Enterprise-grade API for CRM, contracts, billing, helpdesk, campaigns, and AI agents.",
-    version="2.0.0",
-    lifespan=lifespan,
-    docs_url="/docs" if not IS_PRODUCTION else None,
-    redoc_url="/redoc" if not IS_PRODUCTION else None,
-)
-
-# Preserve only main.py lifespan — include_router merges each router's default lifespan otherwise.
-_main_lifespan_context = app.router.lifespan_context
-
-
-# Liveness probe for Railway — no auth, DB, or Redis (see backend/railway.json healthcheckPath)
-@app.get("/health", status_code=200)
-async def health():
-    return {"status": "healthy"}
 
 
 # MODULE_MIDDLEWARE_START
@@ -269,8 +268,6 @@ def include_routers_from_package(app: FastAPI, package_name: str = "routers") ->
 # Setup logging before router discovery
 setup_logging()
 include_routers_from_package(app, "routers")
-# Undo per-router merged_lifespan nesting (fixes recursive merged_lifespan on Railway).
-app.router.lifespan_context = _main_lifespan_context
 
 
 # Add exception handler for all exceptions except HTTPException
