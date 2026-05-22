@@ -40,6 +40,7 @@ from typing import Any, Callable, Coroutine, Dict, List, Optional
 
 from core.job_observability import record_job_outcome
 from core.job_contracts import CONTRACT_JOB_TYPES, validate_job_payload
+from core.structured_log import log_structured
 
 logger = logging.getLogger(__name__)
 
@@ -118,6 +119,7 @@ class ARQJobQueue:
         self._redis_pool = None
         self._worker_task: Optional[asyncio.Task] = None
         self._running = False
+        self._available = False
         self._jobs: Dict[str, Job] = {}  # Local cache for status queries
         self._stats = {
             "total_enqueued": 0,
@@ -135,9 +137,20 @@ class ARQJobQueue:
         if self._running:
             return
 
-        redis_url = os.environ.get("REDIS_URL", "")
+        redis_url = (os.environ.get("REDIS_URL") or "").strip()
+        if not redis_url:
+            self._available = False
+            log_structured(
+                logger,
+                logging.WARNING,
+                "job_queue.redis_url_missing",
+                "REDIS_URL not set; running without Redis-backed queue",
+            )
+            return
+
         try:
             from redis.asyncio import Redis
+
             self._redis_pool = Redis.from_url(
                 redis_url,
                 decode_responses=True,
@@ -145,12 +158,26 @@ class ARQJobQueue:
                 socket_timeout=5,
             )
             await self._redis_pool.ping()
+            self._available = True
             self._running = True
             self._worker_task = asyncio.create_task(self._worker_loop())
+            log_structured(
+                logger,
+                logging.INFO,
+                "job_queue.redis_connected",
+                "Redis connected",
+            )
             logger.info("✅ ARQ job queue started with Redis broker")
         except Exception as e:
-            logger.error(f"ARQ: Failed to connect to Redis: {e}")
-            raise
+            self._available = False
+            self._running = False
+            self._redis_pool = None
+            log_structured(
+                logger,
+                logging.WARNING,
+                "job_queue.redis_unavailable",
+                f"Redis not available, running without queue: {e}",
+            )
 
     async def stop(self):
         """Gracefully stop the worker."""
@@ -175,6 +202,15 @@ class ARQJobQueue:
     ) -> str:
         """Enqueue a job to Redis."""
         import json
+
+        if not self._available or not self._redis_pool:
+            logger.warning("ARQ: Redis unavailable, job not enqueued type=%s", job_type)
+            job = Job(job_type=job_type, payload=payload, priority=priority,
+                      max_retries=max_retries, retry_delay=retry_delay)
+            job.status = JobStatus.FAILED
+            job.error = "Redis unavailable"
+            self._jobs[job.id] = job
+            return job.id
 
         validate_job_payload(job_type, payload)
         job = Job(job_type=job_type, payload=payload, priority=priority,
@@ -320,7 +356,7 @@ class ARQJobQueue:
             "registered_handlers": list(self._handlers.keys()),
             "contracted_job_types": sorted(CONTRACT_JOB_TYPES),
             "backend": "arq-redis",
-            "redis_connected": self._running,
+            "redis_connected": self._available,
         }
 
     async def cleanup_old_jobs(self, max_age_hours: int = 24):

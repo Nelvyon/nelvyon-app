@@ -104,7 +104,10 @@ async def lifespan(app: FastAPI):
 
     # Start async job queue workers (handlers registered before start — ARQ + in-process)
     register_nelvyon_job_handlers()
-    await job_queue.start()
+    try:
+        await job_queue.start()
+    except Exception as e:
+        logger.warning("Job queue unavailable: %s", e)
     qstats = job_queue.get_stats()
     logger.info(
         "Job queue started backend=%s max_workers=%s handlers=%s",

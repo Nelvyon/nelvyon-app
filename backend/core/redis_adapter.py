@@ -24,6 +24,8 @@ import os
 import time
 from typing import Any, Dict, Optional
 
+from core.structured_log import log_structured
+
 logger = logging.getLogger(__name__)
 
 
@@ -127,7 +129,7 @@ class RedisAdapter:
         if self._initialized:
             return
 
-        redis_url = os.environ.get("REDIS_URL")
+        redis_url = (os.environ.get("REDIS_URL") or "").strip()
         if redis_url:
             try:
                 import redis.asyncio as aioredis
@@ -138,18 +140,42 @@ class RedisAdapter:
                     socket_timeout=5,
                     retry_on_timeout=True,
                 )
-                # Test connection
                 await self._client.ping()
                 self._using_redis = True
+                log_structured(
+                    logger,
+                    logging.INFO,
+                    "redis.connected",
+                    "Redis connected",
+                )
                 logger.info("✅ Connected to Redis at %s", redis_url.split("@")[-1] if "@" in redis_url else "***")
             except ImportError:
-                logger.warning("⚠️  redis package not installed. Using in-memory fallback. Install with: pip install redis")
-                self._client = None
-            except Exception as e:
-                logger.warning("⚠️  Redis connection failed: %s. Using in-memory fallback.", str(e))
                 self._client = None
                 self._using_redis = False
+                log_structured(
+                    logger,
+                    logging.WARNING,
+                    "redis.unavailable",
+                    "redis package not installed; using in-memory fallback",
+                )
+                logger.warning("⚠️  redis package not installed. Using in-memory fallback. Install with: pip install redis")
+            except Exception as e:
+                self._client = None
+                self._using_redis = False
+                log_structured(
+                    logger,
+                    logging.WARNING,
+                    "redis.unavailable",
+                    f"Redis not available, using in-memory fallback: {e}",
+                )
+                logger.warning("⚠️  Redis connection failed: %s. Using in-memory fallback.", str(e))
         else:
+            log_structured(
+                logger,
+                logging.INFO,
+                "redis.in_memory",
+                "REDIS_URL not configured; using in-memory store",
+            )
             logger.info("ℹ️  REDIS_URL not configured. Using in-memory store (suitable for single-instance deployment).")
 
         self._initialized = True
