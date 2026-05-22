@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace
 from services.analytics_service import default_date_range, get_analytics_service
+from services.cache_service import cached
 from services.google_ads_service import get_google_ads_service
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 
 
 @router.get("/overview")
+@cached(ttl=300, prefix="analytics:overview")
 async def analytics_overview(
     start_date: date | None = Query(None),
     end_date: date | None = Query(None),

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
 from dependencies.workspace import WorkspaceContext, require_workspace
+from services.cache_service import cached
 from services.gsc_service import get_gsc_service
 
 router = APIRouter(prefix="/api/gsc", tags=["gsc"])
@@ -17,6 +18,7 @@ class SubmitSitemapRequest(BaseModel):
 
 
 @router.get("/analytics")
+@cached(ttl=600, prefix="gsc:analytics")
 async def search_analytics(
     site_url: str = Query(..., description="Property URL, e.g. https://example.com/ or sc-domain:example.com"),
     start_date: str = Query(..., description="YYYY-MM-DD"),

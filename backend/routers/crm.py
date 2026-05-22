@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
+from services.cache_service import cached
 from services.crm_service import CRMService, PIPELINE_STAGES
 
 router = APIRouter(prefix="/api/crm", tags=["crm"])
@@ -416,6 +417,7 @@ async def pipeline_view(
 
 
 @router.get("/stats")
+@cached(ttl=120, prefix="crm:stats")
 async def crm_stats(
     ctx: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),

@@ -17,6 +17,7 @@ from dependencies.quota_guards import (
     enforce_campaign_headroom,
     enforce_campaign_reopen_transition,
 )
+from services.cache_service import cached
 from services.plan_quota import enforce_campaign_create_quota
 from schemas.auth import UserResponse
 
@@ -555,6 +556,7 @@ async def pause_scheduler_campaign(
 
 
 @scheduler_router.get("/{campaign_id}/stats")
+@cached(ttl=60, prefix="campaigns:stats")
 async def scheduler_campaign_stats(
     campaign_id: int,
     ws_ctx: WorkspaceContext = Depends(require_workspace),
