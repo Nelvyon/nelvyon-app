@@ -2,9 +2,10 @@
 
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field, HttpUrl
 
+from core.rate_limiter import endpoint_rate_limit
 from dependencies.workspace import WorkspaceContext, require_workspace
 from services.runway_service import get_runway_service
 from services.suno_service import get_suno_service
@@ -26,9 +27,13 @@ class MusicGenerateRequest(BaseModel):
     instrumental: bool = True
 
 
-@router.post("/video/generate")
+@router.post(
+    "/video/generate",
+    dependencies=[Depends(endpoint_rate_limit(10, 3600, "media_video_generate"))],
+)
 async def generate_video(
     body: VideoGenerateRequest,
+    response: Response,
     wait: bool = Query(False, description="Poll Runway until SUCCEEDED/FAILED (max 300s)"),
     _ctx: WorkspaceContext = Depends(require_workspace),
 ) -> Dict[str, Any]:

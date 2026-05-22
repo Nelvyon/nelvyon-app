@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from datetime import date
 
+from core.rate_limiter import endpoint_rate_limit
 from core.secrets import sanitize_text
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -114,9 +114,13 @@ async def report_crm(
         raise HTTPException(status_code=502, detail="CRM report generation failed") from e
 
 
-@router.get("/full")
+@router.get(
+    "/full",
+    dependencies=[Depends(endpoint_rate_limit(5, 3600, "reports_full"))],
+)
 @cached(ttl=REPORT_CACHE_TTL, prefix="reports:full")
 async def report_full(
+    response: Response,
     start_date: date | None = Query(None),
     end_date: date | None = Query(None),
     site_url: str | None = Query(None),

@@ -5,8 +5,10 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
+from core.health_monitor import get_effective_openai_model
+from core.rate_limiter import endpoint_rate_limit
 from core.secrets import sanitize_text
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -78,32 +80,39 @@ async def clear_ai_context(
     return await _svc(ws).clear_context()
 
 
-@router.post("/chat")
+@router.post("/chat", dependencies=[Depends(endpoint_rate_limit(50, 3600, "ai_chat"))])
 async def ai_chat_stream(
     body: ChatRequest,
+    response: Response,
     ws: WorkspaceContext = Depends(require_workspace),
 ):
     """Chat with GPT-4o + client context (SSE stream)."""
     svc = _svc(ws)
     history = [m.model_dump() for m in body.history]
+    model = get_effective_openai_model(body.model or "gpt-4o")
 
     async def generate():
         async for chunk in svc.stream_chat_with_context(
             body.message,
             body.agent_type,
-            model=body.model or "gpt-4o",
+            model=model,
             history=history,
         ):
             yield chunk
 
+    stream_headers = {
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "X-Accel-Buffering": "no",
+    }
+    for key in ("X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset", "X-RateLimit-Backend"):
+        if key in response.headers:
+            stream_headers[key] = response.headers[key]
+
     return StreamingResponse(
         generate(),
         media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",
-        },
+        headers=stream_headers,
     )
 
 

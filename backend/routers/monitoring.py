@@ -1,4 +1,4 @@
-"""Operations monitoring — SES quota, suppressions, health."""
+"""Operations monitoring — SES quota, suppressions, health, regions, rate limits."""
 
 from __future__ import annotations
 
@@ -6,14 +6,18 @@ import logging
 import os
 from typing import Any, Dict
 
+from core.health_monitor import health_monitor
+from core.rate_limiter import get_workspace_rate_limit_status
+from core.regions import CURRENT_REGION, get_optimal_region, list_regions
 from core.secrets import sanitize_text
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import db_manager
+from core.database import db_manager, get_db
 from core.redis_adapter import redis_client
-from dependencies.workspace import WorkspaceContext, require_workspace_admin
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin
 from services.ses_service import get_ses_service
 
 logger = logging.getLogger(__name__)
@@ -77,9 +81,56 @@ async def ses_bounce_webhook(request: Request) -> Dict[str, Any]:
         raise HTTPException(status_code=502, detail="Bounce handler failed") from e
 
 
+@router.get("/health")
+async def health_global():
+    """Global health check with circuit breakers and service latencies."""
+    result = await health_monitor.get_system_health()
+    status_code = 200 if result["status"] == "healthy" else 503
+    return JSONResponse(status_code=status_code, content=result)
+
+
+@router.get("/regions")
+async def regions_status(request: Request):
+    """Regional latency estimates and availability."""
+    client_ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+    if not client_ip and request.client:
+        client_ip = request.client.host
+    optimal = get_optimal_region(client_ip)
+    regions = list_regions()
+    for r in regions:
+        r["latency_estimate_ms"] = r["expected_latency_ms"]
+        if r["id"] != CURRENT_REGION:
+            r["latency_estimate_ms"] = r["expected_latency_ms"] + 80
+    return {
+        "current_region": CURRENT_REGION,
+        "optimal_region": optimal,
+        "client_ip": client_ip or "unknown",
+        "regions": regions,
+    }
+
+
+@router.get("/rate-limits")
+async def rate_limits_usage(
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Current rate limit usage for the workspace."""
+    if ws.workspace_id is None:
+        raise HTTPException(status_code=400, detail="X-Workspace-Id required")
+    return await get_workspace_rate_limit_status(db, int(ws.workspace_id))
+
+
 @router.get("/health/detailed")
 async def health_detailed():
-    """Detailed health: database, Redis, SES, Sentry."""
+    """Detailed health: database, Redis, SES, Sentry (legacy)."""
+    legacy = await _legacy_health_detailed()
+    global_health = await health_monitor.get_system_health(use_cache=False)
+    legacy["global"] = global_health
+    legacy["circuit_breakers"] = global_health.get("circuit_breakers", {})
+    return legacy
+
+
+async def _legacy_health_detailed() -> dict[str, Any]:
     from sqlalchemy import text
 
     result: dict[str, Any] = {
@@ -143,6 +194,4 @@ async def health_detailed():
     if db_status != "ok":
         result["status"] = "degraded"
 
-    if result["status"] != "healthy":
-        return JSONResponse(status_code=503, content=result)
     return result

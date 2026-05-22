@@ -2,9 +2,10 @@
 
 from typing import Any, Dict, Literal, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field, HttpUrl
 
+from core.rate_limiter import endpoint_rate_limit
 from dependencies.workspace import WorkspaceContext, require_workspace
 from services.dalle_service import get_dalle_service
 
@@ -29,9 +30,10 @@ class EditImageRequest(BaseModel):
     prompt: str = Field(..., min_length=1, max_length=4000)
 
 
-@router.post("/generate")
+@router.post("/generate", dependencies=[Depends(endpoint_rate_limit(20, 3600, "dalle_generate"))])
 async def generate_image(
     body: GenerateImageRequest,
+    response: Response,
     _ctx: WorkspaceContext = Depends(require_workspace),
 ) -> Dict[str, Any]:
     """Generate an image with DALL·E 3 and persist to Supabase agent-results."""
