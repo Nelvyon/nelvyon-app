@@ -26,6 +26,10 @@ greenlet
 
 # auth module dependencies
 python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# optional sync Postgres driver (primary async driver is asyncpg)
+psycopg2-binary>=2.9.9
 
 # aihub module dependencies
 openai==2.16.0

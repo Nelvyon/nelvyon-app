@@ -296,12 +296,13 @@ def root():
 
 
 @app.get("/health")
-async def health_check():
-    """Liveness + comprobación ligera de BD (sin secretos).
+async def health():
+    return {"status": "healthy"}
 
-    Inicialización perezosa si el session maker aún no existe (p. ej. tests con
-    ASGITransport sin lifespan); mismo patrón que ``get_db``.
-    """
+
+@app.get("/health/ready")
+async def health_ready():
+    """Readiness — includes database check (503 if DB unavailable)."""
     from sqlalchemy import text
 
     from core.database import db_manager
