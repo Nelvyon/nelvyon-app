@@ -1,12 +1,15 @@
 import json
 import logging
-from typing import List, Optional
+import tempfile
+from pathlib import Path
+from typing import Any, List, Optional
 
 from datetime import datetime
 
 from core.secrets import sanitize_text
-from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, ConfigDict
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import Response
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -16,7 +19,7 @@ from dependencies.workspace import WorkspaceContext, require_workspace, require_
 # Set up logging
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/entities/contracts", tags=["contracts"])
+entities_router = APIRouter(prefix="/api/v1/entities/contracts", tags=["contracts"])
 
 
 # ---------- Pydantic Schemas ----------
@@ -123,7 +126,7 @@ class ContractsBatchDeleteRequest(BaseModel):
 
 
 # ---------- Routes ----------
-@router.get("", response_model=ContractsListResponse)
+@entities_router.get("", response_model=ContractsListResponse)
 async def query_contractss(
     query: str = Query(None, description="Query conditions (JSON string)"),
     sort: str = Query(None, description="Sort field (prefix with '-' for descending)"),
@@ -162,7 +165,7 @@ async def query_contractss(
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
-@router.get("/{id}", response_model=ContractsResponse)
+@entities_router.get("/{id}", response_model=ContractsResponse)
 async def get_contracts(
     id: int,
     fields: str = Query(None, description="Comma-separated list of fields to return"),
@@ -189,7 +192,7 @@ async def get_contracts(
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
-@router.post("", response_model=ContractsResponse, status_code=201)
+@entities_router.post("", response_model=ContractsResponse, status_code=201)
 async def create_contracts(
     data: ContractsData,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -218,7 +221,7 @@ async def create_contracts(
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
-@router.post("/batch", response_model=List[ContractsResponse], status_code=201)
+@entities_router.post("/batch", response_model=List[ContractsResponse], status_code=201)
 async def create_contractss_batch(
     request: ContractsBatchCreateRequest,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -249,7 +252,7 @@ async def create_contractss_batch(
         raise HTTPException(status_code=500, detail=f"Batch create failed: {str(e)}")
 
 
-@router.put("/batch", response_model=List[ContractsResponse])
+@entities_router.put("/batch", response_model=List[ContractsResponse])
 async def update_contractss_batch(
     request: ContractsBatchUpdateRequest,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -281,7 +284,7 @@ async def update_contractss_batch(
         raise HTTPException(status_code=500, detail=f"Batch update failed: {str(e)}")
 
 
-@router.put("/{id}", response_model=ContractsResponse)
+@entities_router.put("/{id}", response_model=ContractsResponse)
 async def update_contracts(
     id: int,
     data: ContractsUpdateData,
@@ -313,7 +316,7 @@ async def update_contracts(
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
-@router.delete("/batch")
+@entities_router.delete("/batch")
 async def delete_contractss_batch(
     request: ContractsBatchDeleteRequest,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -344,7 +347,7 @@ async def delete_contractss_batch(
         raise HTTPException(status_code=500, detail=f"Batch delete failed: {str(e)}")
 
 
-@router.delete("/{id}")
+@entities_router.delete("/{id}")
 async def delete_contracts(
     id: int,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -369,3 +372,172 @@ async def delete_contracts(
     except Exception as e:
         logger.error("Error deleting contracts %s: %s", id, sanitize_text(str(e)), exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+# ─── Signaturit eIDAS signing API (/api/contracts) ───────────────────────────
+
+from services.signaturit_service import get_signaturit_service
+
+
+class SignerInput(BaseModel):
+    name: str = Field(..., min_length=1)
+    email: EmailStr
+    phone: Optional[str] = None
+
+
+class SendContractJsonBody(BaseModel):
+    document_path: str = Field(..., min_length=1)
+    signers: List[SignerInput] = Field(..., min_length=1)
+    subject: str = Field(..., min_length=1)
+    message: str = Field(..., min_length=1)
+
+
+signaturit_router = APIRouter(prefix="/api/contracts", tags=["contracts-signaturit"])
+
+
+@signaturit_router.post("/webhook")
+async def signaturit_webhook(request: Request):
+    """Receive Signaturit webhook events (no auth — configure URL in Signaturit dashboard)."""
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = {}
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="JSON body required")
+    service = get_signaturit_service()
+    return service.handle_webhook_event(payload)
+
+
+@signaturit_router.get("")
+async def list_contract_signatures(
+    status: str | None = Query(None),
+    limit: int = Query(20, ge=1, le=100),
+    _ws_ctx: WorkspaceContext = Depends(require_workspace),
+):
+    service = get_signaturit_service()
+    try:
+        return await service.list_signatures(status=status, limit=limit)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@signaturit_router.post("/send")
+async def send_contract_for_signature(
+    request: Request,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+):
+    """Send a PDF to Signaturit (JSON body or multipart with file)."""
+    service = get_signaturit_service()
+    content_type = (request.headers.get("content-type") or "").lower()
+
+    resolved_path: str | None = None
+    resolved_subject = ""
+    resolved_message = ""
+    resolved_signers: list[dict[str, Any]] = []
+
+    if "application/json" in content_type:
+        try:
+            raw = await request.json()
+        except json.JSONDecodeError as exc:
+            raise HTTPException(status_code=400, detail="Invalid JSON body") from exc
+        body = SendContractJsonBody.model_validate(raw)
+        resolved_path = body.document_path.strip()
+        resolved_subject = body.subject.strip()
+        resolved_message = body.message.strip()
+        resolved_signers = [s.model_dump() for s in body.signers]
+    elif "multipart/form-data" in content_type:
+        form = await request.form()
+        upload = form.get("file")
+        if upload is not None and hasattr(upload, "read"):
+            suffix = Path(getattr(upload, "filename", None) or "contract.pdf").suffix or ".pdf"
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                tmp.write(await upload.read())
+                resolved_path = tmp.name
+        doc_path = form.get("document_path")
+        if not resolved_path and doc_path:
+            resolved_path = str(doc_path).strip()
+        resolved_subject = str(form.get("subject") or "").strip()
+        resolved_message = str(form.get("message") or "").strip()
+        signers_raw = form.get("signers_json") or form.get("signers")
+        if signers_raw:
+            try:
+                parsed = json.loads(str(signers_raw))
+            except json.JSONDecodeError as exc:
+                raise HTTPException(status_code=400, detail="Invalid signers JSON") from exc
+            if not isinstance(parsed, list):
+                raise HTTPException(status_code=400, detail="signers must be a JSON array")
+            resolved_signers = parsed
+    else:
+        raise HTTPException(
+            status_code=415,
+            detail="Use application/json or multipart/form-data",
+        )
+
+    if not resolved_path:
+        raise HTTPException(status_code=400, detail="file or document_path is required")
+    if not resolved_subject or not resolved_message or not resolved_signers:
+        raise HTTPException(status_code=400, detail="subject, message, and signers are required")
+
+    try:
+        result = await service.create_signature_request(
+            document_path=resolved_path,
+            signers=resolved_signers,
+            subject=resolved_subject,
+            message=resolved_message,
+        )
+        return {
+            "workspace_id": ws_ctx.workspace_id,
+            "signature_id": result.get("id"),
+            "status": result.get("status"),
+            "mock": result.get("mock", service.is_mock),
+            "signaturit": result,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error("send_contract_for_signature: %s", sanitize_text(str(e)), exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@signaturit_router.get("/{signature_id}/status")
+async def get_contract_signature_status(
+    signature_id: str,
+    _ws_ctx: WorkspaceContext = Depends(require_workspace),
+):
+    service = get_signaturit_service()
+    try:
+        return await service.get_signature_status(signature_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@signaturit_router.get("/{signature_id}/download")
+async def download_signed_contract(
+    signature_id: str,
+    _ws_ctx: WorkspaceContext = Depends(require_workspace),
+):
+    service = get_signaturit_service()
+    try:
+        content, filename = await service.download_signed_document(signature_id)
+        return Response(
+            content=content,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@signaturit_router.delete("/{signature_id}")
+async def cancel_contract_signature(
+    signature_id: str,
+    _ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+):
+    service = get_signaturit_service()
+    try:
+        return await service.cancel_signature(signature_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+router = (entities_router, signaturit_router)
