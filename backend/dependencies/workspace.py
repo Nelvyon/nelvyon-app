@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.i18n import apply_workspace_language, request_language, t
 from core.observability import set_workspace_id_for_log
 from core.rbac import workspace_can_mutate
 from dependencies.auth import get_current_user
@@ -70,13 +71,16 @@ async def get_workspace_context(
     try:
         ws_id = int(x_workspace_id)
     except (ValueError, TypeError):
+        lang = request_language(request)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="X-Workspace-Id must be a valid integer",
+            detail=t("workspace_id_invalid", lang),
         )
 
     # Super admin bypasses membership check
     if current_user.role == "super_admin":
+        ws_lang_result = await db.execute(select(Workspaces).where(Workspaces.id == ws_id))
+        apply_workspace_language(request, ws_lang_result.scalar_one_or_none())
         set_workspace_id_for_log(ws_id, x_workspace_id)
         request.state.obs_workspace_id = str(ws_id)
         return WorkspaceContext(
@@ -93,6 +97,7 @@ async def get_workspace_context(
     workspace = ws_result.scalar_one_or_none()
 
     if workspace:
+        apply_workspace_language(request, workspace)
         set_workspace_id_for_log(ws_id, x_workspace_id)
         request.state.obs_workspace_id = str(ws_id)
         return WorkspaceContext(
@@ -116,6 +121,8 @@ async def get_workspace_context(
     member = member_result.scalars().first()
 
     if member:
+        ws_lang_result = await db.execute(select(Workspaces).where(Workspaces.id == ws_id))
+        apply_workspace_language(request, ws_lang_result.scalar_one_or_none())
         set_workspace_id_for_log(ws_id, x_workspace_id)
         request.state.obs_workspace_id = str(ws_id)
         return WorkspaceContext(
@@ -125,13 +132,15 @@ async def get_workspace_context(
             role_in_workspace=member.role,
         )
 
+    lang = request_language(request)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="You do not have access to this workspace",
+        detail=t("workspace_access_denied", lang),
     )
 
 
 async def require_workspace(
+    request: Request,
     ctx: WorkspaceContext = Depends(get_workspace_context),
 ) -> WorkspaceContext:
     """
@@ -139,21 +148,24 @@ async def require_workspace(
     Use this for endpoints that MUST be workspace-scoped.
     """
     if not ctx.is_workspace_scoped:
+        lang = request_language(request)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="X-Workspace-Id header is required for this endpoint",
+            detail=t("workspace_id_required", lang),
         )
     return ctx
 
 
 async def require_workspace_admin(
+    request: Request,
     ctx: WorkspaceContext = Depends(require_workspace),
 ) -> WorkspaceContext:
     """Requires workspace owner or admin role."""
     if ctx.role_in_workspace not in ("owner", "admin"):
+        lang = request_language(request)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Workspace admin access required",
+            detail=t("workspace_admin_required", lang),
         )
     return ctx
 
@@ -181,7 +193,8 @@ async def require_workspace_operator(
         event_type="saas.rbac.denied",
         commit=True,
     )
+    lang = request_language(request)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="Workspace operator role required for this action",
+        detail=t("workspace_operator_required", lang),
     )

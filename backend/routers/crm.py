@@ -10,6 +10,7 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.i18n import request_language, t
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.cache_service import cached
 from services.crm_service import CRMService, PIPELINE_STAGES
@@ -90,9 +91,10 @@ class ActivityComplete(BaseModel):
 
 async def _service(db: AsyncSession, ctx: WorkspaceContext) -> CRMService:
     if ctx.workspace_id is None:
+        lang = request_language(None)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="X-Workspace-Id header is required for CRM operations",
+            detail=t("crm_workspace_required", lang),
         )
     await CRMService.ensure_db()
     return CRMService(db, ctx.workspace_id)
@@ -100,8 +102,10 @@ async def _service(db: AsyncSession, ctx: WorkspaceContext) -> CRMService:
 
 def _handle_value_error(exc: ValueError) -> HTTPException:
     msg = str(exc)
-    code = status.HTTP_404_NOT_FOUND if "not found" in msg.lower() else status.HTTP_400_BAD_REQUEST
-    return HTTPException(status_code=code, detail=msg)
+    lang = request_language(None)
+    if "not found" in msg.lower():
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=t("not_found", lang))
+    return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
 
 
 # ─── Contacts ─────────────────────────────────────────────────────────────────

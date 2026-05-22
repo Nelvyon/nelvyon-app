@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from core.auth import AccessTokenError, decode_access_token
+from core.i18n import request_language, t
 from core.observability import set_user_id_for_log
 from fastapi import Cookie, Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -26,7 +27,11 @@ async def get_access_token(
         return nelvyon_session
 
     logger.debug("Authentication required for request %s %s", request.method, request.url.path)
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication credentials were not provided")
+    lang = request_language(request)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=t("auth_required", lang),
+    )
 
 
 async def get_current_user(
@@ -66,10 +71,17 @@ async def get_current_user(
     )
 
 
-async def get_admin_user(current_user: UserResponse = Depends(get_current_user)) -> UserResponse:
+async def get_admin_user(
+    request: Request,
+    current_user: UserResponse = Depends(get_current_user),
+) -> UserResponse:
     """Dependency: user must be admin or super_admin (platform operators)."""
     if current_user.role not in ("admin", "super_admin"):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+        lang = request_language(request)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=t("admin_required", lang),
+        )
     return current_user
 
 

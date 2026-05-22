@@ -11,6 +11,7 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.i18n import request_language, t
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.helpdesk_service import default_helpdesk_workspace_id, get_helpdesk_service
 
@@ -62,17 +63,21 @@ def _svc(db: AsyncSession, ws: WorkspaceContext) -> Any:
 
 def _resolve_inbound_workspace(request: Request) -> int:
     q = request.query_params.get("workspace_id")
+    lang = request_language(request)
     if q:
         try:
             return int(q)
         except ValueError as exc:
-            raise HTTPException(status_code=400, detail="Invalid workspace_id") from exc
+            raise HTTPException(
+                status_code=400,
+                detail=t("invalid_workspace_id_param", lang),
+            ) from exc
     ws = default_helpdesk_workspace_id()
     if ws is not None:
         return ws
     raise HTTPException(
         status_code=400,
-        detail="workspace_id query param or HELPDESK_DEFAULT_WORKSPACE_ID required",
+        detail=t("helpdesk_workspace_required", lang),
     )
 
 

@@ -30,6 +30,7 @@ from core.observability import (
     user_id_ctx,
 )
 from core.http_observability import record_http_request
+from core.i18n import bind_language_to_request
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,7 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
 
         request.state.request_id = rid
         request.state.obs_workspace_hint = ws_hint
+        bind_language_to_request(request)
         rid_tok = request_id_ctx.set(rid)
 
         workspace_id_ctx.set(ws_hint)
