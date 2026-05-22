@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { AgentListenButton } from "@/components/agents/AgentListenButton";
 import { streamAgentChat } from "@/lib/agentStream";
 import type { ChatMessage } from "@/types/saas-client";
 
@@ -195,7 +196,16 @@ export default function ChatbotWidget({
                 key={i}
                 className={`max-w-[92%] rounded-lg px-3 py-2 text-sm ${m.role === "user" ? `ml-auto ${palette.bubbleUser}` : palette.bubbleBot}`}
               >
-                {m.content}
+                <div className={m.role === "assistant" ? "flex flex-col gap-2" : ""}>
+                  <span>{m.content}</span>
+                  {m.role === "assistant" && m.content ? (
+                    <AgentListenButton
+                      text={m.content}
+                      className="items-start"
+                      disabled={loading}
+                    />
+                  ) : null}
+                </div>
               </div>
             ))}
             {loading && <p className="text-xs opacity-60">Escribiendo…</p>}

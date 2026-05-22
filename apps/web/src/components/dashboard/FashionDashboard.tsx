@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 
+import { AgentListenButton } from "@/components/agents/AgentListenButton";
 import { streamAgentChat } from "@/lib/agentStream";
 
 type AgentId =
@@ -133,9 +134,12 @@ export default function FashionDashboard() {
             <button type="button" disabled={loading} onClick={() => runAgent().catch(() => setError("Error"))} className="mt-4 rounded bg-sky-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{loading ? "Generando en vivo…" : "Ejecutar agente (stream)"}</button>
           </div>
           <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between gap-2">
               <p className="text-sm font-medium text-slate-200">Resultado</p>
-              <button type="button" onClick={() => copyResult().catch(() => {})} className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-200" disabled={!result?.result}>Copiar</button>
+              <div className="flex items-center gap-2">
+                <AgentListenButton text={result?.result ?? ""} disabled={loading || !result?.result} />
+                <button type="button" onClick={() => copyResult().catch(() => {})} className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-200" disabled={!result?.result}>Copiar</button>
+              </div>
             </div>
             <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap rounded border border-slate-800 bg-slate-950 p-3 text-xs text-slate-300">
               {loading && !result?.result ? "Escribiendo…" : result?.result ? result.result : "Sin resultado todavia."}
