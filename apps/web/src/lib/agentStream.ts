@@ -8,6 +8,7 @@ export type AgentStreamMessage = {
 export type StreamAgentChatParams = {
   messages: AgentStreamMessage[];
   serviceId?: string;
+  clientId?: string;
   clientContext?: Record<string, unknown>;
   model?: string;
   onChunk: (delta: string) => void;
@@ -39,6 +40,7 @@ export async function streamAgentChat(params: StreamAgentChatParams): Promise<vo
       {
         messages: params.messages,
         service_id: params.serviceId ?? null,
+        client_id: params.clientId ?? null,
         client_context: params.clientContext ?? null,
         model: params.model ?? null,
       },

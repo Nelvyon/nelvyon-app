@@ -62,6 +62,7 @@ export default function FashionDashboard() {
       let streamed = "";
       await streamAgentChat({
         serviceId: agentId,
+        clientId: brandName.trim() || "fashion-client",
         clientContext: input,
         messages: [
           {
