@@ -6,8 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { toastSuccess } from "@/core/ui/toastFeedback";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
 import { dashboardLoyaltyApi } from "@/features/dashboard/api";
 
 type Row = Record<string, unknown>;
@@ -25,6 +24,7 @@ const DEFAULT_RULES = [
 ];
 
 export default function LoyaltyDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<Record<string, unknown>>({});
   const [leaderboard, setLeaderboard] = useState<Row[]>([]);
   const [transactions, setTransactions] = useState<Row[]>([]);
@@ -34,6 +34,8 @@ export default function LoyaltyDashboardPage() {
   const [config, setConfig] = useState({ points_per_euro: 1, reward_rules: DEFAULT_RULES });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const data = await dashboardLoyaltyApi.summary();
     setSummary(data);
     const prog = (data.program as Record<string, unknown>) ?? null;
@@ -54,6 +56,11 @@ export default function LoyaltyDashboardPage() {
     } else {
       setLeaderboard([]);
       setTransactions([]);
+    }
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -91,7 +98,7 @@ export default function LoyaltyDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold">
@@ -107,7 +114,7 @@ export default function LoyaltyDashboardPage() {
           ) : null}
         </div>
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
         {program ? (
           <>
@@ -210,12 +217,20 @@ export default function LoyaltyDashboardPage() {
             </div>
           </>
         ) : (
-          <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Crea un programa de fidelización para empezar a otorgar puntos a tus clientes.
-          </p>
+          <DashboardListShell
+            empty
+            emptyActionLabel="Crear programa"
+            emptyDescription="Crea un programa de fidelización para empezar a otorgar puntos a tus clientes."
+            emptyTitle="Sin programa de loyalty"
+            loading={loading}
+            onEmptyAction={() => setModal(true)}
+            skeleton={<SkeletonList />}
+          >
+            <span className="sr-only">placeholder</span>
+          </DashboardListShell>
         )}
 
-        <SimpleModal open={modal} onClose={() => setModal(false)} title="Nuevo programa loyalty">
+        <EliteModal open={modal} onClose={() => setModal(false)} title="Nuevo programa loyalty">
           <div className="space-y-3">
             <label className="block text-sm">
               Nombre
@@ -238,8 +253,8 @@ export default function LoyaltyDashboardPage() {
             </label>
             <Button onClick={createProgram}>Crear programa</Button>
           </div>
-        </SimpleModal>
-      </div>
+        </EliteModal>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

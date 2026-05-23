@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { BlockRenderer } from "@/features/builders/components/BlockRenderer";
 import type { LandingBlock } from "@/features/builders/types";
@@ -19,6 +21,7 @@ function str(v: unknown, fallback = ""): string {
 }
 
 export default function CampanaEditorPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ id: string }>();
   const id = Number(params?.id);
   const [campaign, setCampaign] = useState<Record<string, unknown> | null>(null);

@@ -1,13 +1,13 @@
 "use client";
 
 import { GraduationCap, Plus, Settings, Trash2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
 import { dashboardLmsApi } from "@/features/dashboard/api";
 
 type Row = Record<string, unknown>;
@@ -24,6 +24,7 @@ function formatPrice(cents: unknown, currency = "eur"): string {
 }
 
 export default function CursosDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<Row[]>([]);
   const [stats, setStats] = useState<Record<string, unknown>>({});
   const [modal, setModal] = useState(false);
@@ -38,9 +39,16 @@ export default function CursosDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardLmsApi.list();
     setCourses(res.items ?? []);
     setStats(res.workspace_stats ?? {});
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -79,7 +87,7 @@ export default function CursosDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold">
@@ -93,19 +101,23 @@ export default function CursosDashboardPage() {
           </Button>
         </div>
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
-        {courses.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Aún no tienes cursos. Crea el primero para publicarlo en el catálogo.
-          </p>
-        ) : (
+        <DashboardListShell
+          empty={!loading && courses.length === 0}
+          emptyActionLabel="Nuevo curso"
+          emptyDescription="Crea el primero para publicarlo en el catálogo."
+          emptyTitle="Sin cursos"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {courses.map((c) => (
               <article key={str(c.id)} className="overflow-hidden rounded-xl border bg-card shadow-sm">
                 {c.thumbnail_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" className="h-36 w-full object-cover" src={str(c.thumbnail_url)} />
+                  <Image alt="" className="h-36 w-full object-cover" height={160} src={str(c.thumbnail_url)} unoptimized width={160} />
                 ) : (
                   <div className="flex h-36 items-center justify-center bg-muted text-muted-foreground">
                     <GraduationCap className="h-10 w-10 opacity-40" />
@@ -135,10 +147,10 @@ export default function CursosDashboardPage() {
               </article>
             ))}
           </div>
-        )}
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal open={modal} onClose={() => setModal(false)} title="Nuevo curso" wide>
+      <EliteModal open={modal} onClose={() => setModal(false)} title="Nuevo curso" wide>
         <div className="space-y-4">
           <label className="block space-y-1 text-sm">
             <span className="font-medium">Título</span>
@@ -174,7 +186,7 @@ export default function CursosDashboardPage() {
             <Button disabled={!form.title.trim()} onClick={createCourse}>Crear</Button>
           </div>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

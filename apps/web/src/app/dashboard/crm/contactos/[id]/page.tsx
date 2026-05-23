@@ -6,9 +6,11 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardCrmApi } from "@/features/dashboard/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 type Row = Record<string, unknown>;
 
@@ -23,6 +25,7 @@ function num(v: unknown, fallback = 0): number {
 }
 
 export default function ContactDetailPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ id: string }>();
   const id = params?.id ?? "";
   const [contact, setContact] = useState<Row | null>(null);
@@ -32,6 +35,8 @@ export default function ContactDetailPage() {
   const [activityForm, setActivityForm] = useState({ type: "call", description: "" });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     if (!id) return;
     const [c, d, a] = await Promise.all([
       dashboardCrmApi.contact(id),
@@ -41,6 +46,11 @@ export default function ContactDetailPage() {
     setContact(c);
     setDeals((d.items ?? []).filter((row) => String(row.contact_id) === id));
     setActivities((a.items ?? []).filter((row) => String(row.contact_id) === id));
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -74,7 +84,7 @@ export default function ContactDetailPage() {
 
   return (
     <ProtectedLayout module="crm">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center gap-3">
           <Button asChild size="sm" variant="outline">
             <Link href="/dashboard/crm">← CRM</Link>
@@ -156,9 +166,9 @@ export default function ContactDetailPage() {
             </section>
           </div>
         </div>
-      </div>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setActivityModal(false)} open={activityModal} title="Nueva actividad">
+      <EliteModal onClose={() => setActivityModal(false)} open={activityModal} title="Nueva actividad">
         <div className="grid gap-3">
           <select
             className="rounded-lg border px-3 py-2"
@@ -181,7 +191,7 @@ export default function ContactDetailPage() {
             Guardar actividad
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

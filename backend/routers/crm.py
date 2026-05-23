@@ -11,8 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from core.i18n import request_language, t
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
-from services.cache_service import cached
 from services.crm_service import CRMService, PIPELINE_STAGES
 
 router = APIRouter(prefix="/api/crm", tags=["crm"])
@@ -135,6 +135,7 @@ async def create_contact(
 
 
 @router.get("/contacts")
+@list_cached("crm:contacts")
 async def list_contacts(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
@@ -235,6 +236,7 @@ async def create_deal(
 
 
 @router.get("/deals")
+@list_cached("crm:deals")
 async def list_deals(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
@@ -333,6 +335,7 @@ async def create_activity(
 
 
 @router.get("/activities")
+@list_cached("crm:activities")
 async def list_activities(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),

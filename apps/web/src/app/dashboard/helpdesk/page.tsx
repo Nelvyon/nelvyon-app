@@ -7,8 +7,8 @@ import { useCallback, useEffect, useState } from "react";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { dashboardHelpdeskApi } from "@/features/dashboard/api";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 type Row = Record<string, unknown>;
 
@@ -18,6 +18,7 @@ function str(v: unknown, fallback = "—"): string {
 }
 
 export default function HelpdeskDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Row[]>([]);
   const [openCount, setOpenCount] = useState(0);
   const [filters, setFilters] = useState({ status: "", priority: "", channel: "" });
@@ -32,6 +33,8 @@ export default function HelpdeskDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const params = new URLSearchParams();
     if (filters.status) params.set("status", filters.status);
     if (filters.priority) params.set("priority", filters.priority);
@@ -43,6 +46,11 @@ export default function HelpdeskDashboardPage() {
     ]);
     setItems(tickets.items ?? []);
     setOpenCount(Number(stats.open_count ?? 0));
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [filters]);
 
   useEffect(() => {
@@ -77,7 +85,7 @@ export default function HelpdeskDashboardPage() {
 
   return (
     <ProtectedLayout module="inbox">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Helpdesk</h1>
@@ -88,7 +96,7 @@ export default function HelpdeskDashboardPage() {
           </Button>
         </div>
 
-        <MetricGrid items={[{ label: "Tickets abiertos", value: openCount }]} />
+        <MetricGrid items={[{ label: "Tickets abiertos", value: openCount }]} loading={loading} />
 
         <div className="flex flex-wrap gap-2">
           <select
@@ -124,55 +132,58 @@ export default function HelpdeskDashboardPage() {
           </select>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-muted/40 text-left">
-              <tr>
-                <th className="px-4 py-3 font-medium">#</th>
-                <th className="px-4 py-3 font-medium">Asunto</th>
-                <th className="px-4 py-3 font-medium">Canal</th>
-                <th className="px-4 py-3 font-medium">Prioridad</th>
-                <th className="px-4 py-3 font-medium">Estado</th>
-                <th className="px-4 py-3 font-medium" />
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((t) => (
-                <tr className="border-b last:border-0" key={str(t.id)}>
-                  <td className="px-4 py-3 text-muted-foreground">{str(t.id)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Inbox className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{str(t.subject)}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 capitalize">{str(t.channel)}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={str(t.priority, "medium")} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={str(t.status, "open")} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/dashboard/helpdesk/${t.id}`}>Abrir</Link>
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-              {items.length === 0 ? (
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nuevo ticket"
+          emptyDescription="Crea un ticket o espera nuevas conversaciones de soporte."
+          emptyTitle="Sin tickets"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonTable />}
+        >
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-muted/40 text-left">
                 <tr>
-                  <td className="px-4 py-8 text-center text-muted-foreground" colSpan={6}>
-                    No hay tickets
-                  </td>
+                  <th className="px-4 py-3 font-medium">#</th>
+                  <th className="px-4 py-3 font-medium">Asunto</th>
+                  <th className="px-4 py-3 font-medium">Canal</th>
+                  <th className="px-4 py-3 font-medium">Prioridad</th>
+                  <th className="px-4 py-3 font-medium">Estado</th>
+                  <th className="px-4 py-3 font-medium" />
                 </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </thead>
+              <tbody>
+                {items.map((t) => (
+                  <tr className="border-b last:border-0 transition-colors hover:bg-muted/50" key={str(t.id)}>
+                    <td className="px-4 py-3 text-muted-foreground">{str(t.id)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Inbox className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">{str(t.subject)}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 capitalize">{str(t.channel)}</td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={str(t.priority, "medium")} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={str(t.status, "open")} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <Button asChild size="sm" variant="outline">
+                        <Link href={`/dashboard/helpdesk/${t.id}`}>Abrir</Link>
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nuevo ticket">
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nuevo ticket">
         <div className="grid gap-3">
           <select
             className="rounded-lg border px-3 py-2"
@@ -226,7 +237,7 @@ export default function HelpdeskDashboardPage() {
             Crear ticket
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

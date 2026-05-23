@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardHelpdeskApi } from "@/features/dashboard/api";
 import { StatusBadge } from "@/features/builders/components/DashboardUi";
@@ -17,6 +19,7 @@ function str(v: unknown, fallback = "—"): string {
 }
 
 export default function HelpdeskTicketPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ id: string }>();
   const id = Number(params?.id);
   const [ticket, setTicket] = useState<Row | null>(null);
@@ -25,9 +28,16 @@ export default function HelpdeskTicketPage() {
   const [resolving, setResolving] = useState(false);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     if (!Number.isFinite(id) || id <= 0) return;
     const t = await dashboardHelpdeskApi.ticket(id);
     setTicket(t);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -69,7 +79,7 @@ export default function HelpdeskTicketPage() {
 
   return (
     <ProtectedLayout module="inbox">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center gap-3">
           <Button asChild size="sm" variant="outline">
             <Link href="/dashboard/helpdesk">← Helpdesk</Link>
@@ -142,7 +152,7 @@ export default function HelpdeskTicketPage() {
         ) : (
           <p className="text-sm text-muted-foreground">Este ticket está resuelto.</p>
         )}
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

@@ -2,6 +2,22 @@
 
 import { cn } from "@/core/ui/utils";
 
+export {
+  DashboardListShell,
+  DashboardPageTransition,
+  EliteAreaChart,
+  EliteModal,
+  EmptyState,
+  MetricCard,
+  MetricGrid,
+  Skeleton,
+  SkeletonList,
+  SkeletonMetricGrid,
+  SkeletonTable,
+  space,
+  type MetricItem,
+} from "./EliteUi";
+
 interface Tab {
   id: string;
   label: string;
@@ -17,12 +33,14 @@ export function DashboardTabs({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-1 border-b">
+    <div className="flex flex-wrap gap-1 border-b border-border">
       {tabs.map((t) => (
         <button
           className={cn(
-            "px-4 py-2 text-sm transition-colors",
-            active === t.id ? "border-b-2 border-primary font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
+            "min-h-[44px] px-4 py-2 text-sm transition-all duration-200",
+            active === t.id
+              ? "border-b-2 border-primary font-semibold text-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
           )}
           key={t.id}
           onClick={() => onChange(t.id)}
@@ -30,19 +48,6 @@ export function DashboardTabs({
         >
           {t.label}
         </button>
-      ))}
-    </div>
-  );
-}
-
-export function MetricGrid({ items }: { items: { label: string; value: string | number }[] }) {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {items.map((m) => (
-        <div className="rounded-xl border bg-card p-4 shadow-card" key={m.label}>
-          <p className="text-xs text-muted-foreground">{m.label}</p>
-          <p className="mt-1 text-2xl font-bold">{m.value}</p>
-        </div>
       ))}
     </div>
   );

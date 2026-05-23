@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { landingApi, osWebApi } from "@/features/builders/api";
 import { BlockRenderer } from "@/features/builders/components/BlockRenderer";
@@ -12,6 +14,7 @@ import { StatusBadge } from "@/features/builders/components/DashboardUi";
 import type { LandingBlock, WebProject } from "@/features/builders/types";
 
 export default function WebsiteEditorPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ project_id: string }>();
   const id = params?.project_id ?? "";
   const [project, setProject] = useState<WebProject | null>(null);
@@ -30,7 +33,7 @@ export default function WebsiteEditorPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <Link className="text-sm text-muted-foreground" href="/dashboard/websites">
@@ -77,7 +80,7 @@ export default function WebsiteEditorPage() {
             <BlockRenderer blocks={previewBlocks} />
           </div>
         </div>
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

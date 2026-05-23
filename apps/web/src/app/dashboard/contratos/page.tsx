@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardContractsApi } from "@/features/dashboard/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 interface ContractRow {
   id: number;
@@ -29,6 +31,7 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export default function ContratosDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<ContractRow[]>([]);
   const [modal, setModal] = useState(false);
   const [sendModal, setSendModal] = useState<ContractRow | null>(null);
@@ -41,8 +44,15 @@ export default function ContratosDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardContractsApi.list();
     setItems((res.items as unknown as ContractRow[]) ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -71,7 +81,7 @@ export default function ContratosDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Contratos</h1>
@@ -82,6 +92,15 @@ export default function ContratosDashboardPage() {
           </Button>
         </div>
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nuevo contrato"
+          emptyDescription="Genera y envía contratos para firma digital."
+          emptyTitle="Sin contratos"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((c) => (
             <article className="rounded-xl border bg-card p-5 shadow-card" key={c.id}>
@@ -108,9 +127,10 @@ export default function ContratosDashboardPage() {
             </article>
           ))}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nuevo contrato" wide>
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nuevo contrato" wide>
         <div className="grid gap-3">
           <input
             className="rounded-lg border px-3 py-2"
@@ -143,9 +163,9 @@ export default function ContratosDashboardPage() {
           />
           <Button onClick={create}>Crear contrato</Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
 
-      <SimpleModal onClose={() => setSendModal(null)} open={Boolean(sendModal)} title="Enviar para firma">
+      <EliteModal onClose={() => setSendModal(null)} open={Boolean(sendModal)} title="Enviar para firma">
         <div className="grid gap-3">
           <p className="text-sm text-muted-foreground">
             Enviar <strong>{sendModal?.title ?? "contrato"}</strong> al firmante por email.
@@ -161,7 +181,7 @@ export default function ContratosDashboardPage() {
             Enviar solicitud de firma
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

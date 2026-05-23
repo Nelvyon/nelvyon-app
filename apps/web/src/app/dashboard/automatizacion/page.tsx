@@ -5,9 +5,11 @@ import { Plus, Workflow } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardWorkflowsApi } from "@/features/dashboard/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 type Row = Record<string, unknown>;
 
@@ -22,6 +24,7 @@ function num(v: unknown, fallback = 0): number {
 }
 
 export default function AutomatizacionDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Row[]>([]);
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState({
@@ -31,8 +34,15 @@ export default function AutomatizacionDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardWorkflowsApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -55,7 +65,7 @@ export default function AutomatizacionDashboardPage() {
 
   return (
     <ProtectedLayout module="automations">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Automatización</h1>
@@ -66,6 +76,15 @@ export default function AutomatizacionDashboardPage() {
           </Button>
         </div>
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nuevo workflow"
+          emptyDescription="Automatiza tareas repetitivas con flujos visuales."
+          emptyTitle="Sin workflows"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((w) => (
             <article className="rounded-xl border bg-card p-5 shadow-card" key={str(w.id)}>
@@ -89,15 +108,11 @@ export default function AutomatizacionDashboardPage() {
               </div>
             </article>
           ))}
-          {items.length === 0 ? (
-            <p className="col-span-full rounded-xl border p-8 text-center text-sm text-muted-foreground">
-              No hay workflows. Crea el primero.
-            </p>
-          ) : null}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nuevo workflow">
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nuevo workflow">
         <div className="grid gap-3">
           <input
             className="rounded-lg border px-3 py-2"
@@ -126,7 +141,7 @@ export default function AutomatizacionDashboardPage() {
             Crear workflow
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

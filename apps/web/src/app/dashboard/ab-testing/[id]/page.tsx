@@ -6,10 +6,11 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
 import { toastSuccess } from "@/core/ui/toastFeedback";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
 import { dashboardAbTestingApi } from "@/features/dashboard/api";
 
 type Tab = "results" | "variants" | "config";
@@ -20,6 +21,7 @@ function str(v: unknown, fb = ""): string {
 }
 
 export default function AbExperimentDetailPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams();
   const id = str(params?.id);
   const [tab, setTab] = useState<Tab>("results");
@@ -30,11 +32,18 @@ export default function AbExperimentDetailPage() {
   const [aiRec, setAiRec] = useState("");
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     if (!id) return;
     const [exp, res] = await Promise.all([dashboardAbTestingApi.get(id), dashboardAbTestingApi.results(id)]);
     setExperiment(exp);
     setResults(res);
     if (res.ai_recommendation) setAiRec(str(res.ai_recommendation));
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -89,7 +98,7 @@ export default function AbExperimentDetailPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center gap-3">
           <Button asChild size="sm" variant="outline">
             <Link href="/dashboard/ab-testing">
@@ -264,7 +273,7 @@ export default function AbExperimentDetailPage() {
           </div>
         )}
 
-        <SimpleModal open={winnerModal} onClose={() => setWinnerModal(false)} title="Declarar ganador">
+        <EliteModal open={winnerModal} onClose={() => setWinnerModal(false)} title="Declarar ganador">
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">Selecciona la variante ganadora. Se generará una recomendación con IA.</p>
             <select
@@ -286,8 +295,8 @@ export default function AbExperimentDetailPage() {
               Confirmar ganador
             </Button>
           </div>
-        </SimpleModal>
-      </div>
+        </EliteModal>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useCallback, useEffect, useState } from "react";
@@ -97,6 +97,7 @@ function SidebarChrome({
   isClientMode,
   liveChatUnread,
   helpdeskOpen,
+  onNavigate,
 }: {
   collapsed: boolean;
   onToggleCollapsed: () => void;
@@ -106,6 +107,7 @@ function SidebarChrome({
   isClientMode: boolean;
   liveChatUnread: number;
   helpdeskOpen: number;
+  onNavigate?: () => void;
 }) {
   return (
     <>
@@ -131,7 +133,14 @@ function SidebarChrome({
         </div>
         {!collapsed ? <p className="mt-1 text-xs text-muted-foreground">{isClientMode ? "Client portal" : "Workspace app"}</p> : null}
       </div>
-      <NavList collapsed={collapsed} helpdeskOpen={helpdeskOpen} items={items} liveChatUnread={liveChatUnread} pathname={pathname} />
+      <NavList
+        collapsed={collapsed}
+        helpdeskOpen={helpdeskOpen}
+        items={items}
+        liveChatUnread={liveChatUnread}
+        onNavigate={onNavigate}
+        pathname={pathname}
+      />
       {!collapsed && !isClientMode ? (
         <p className="px-3 pb-3 text-xs text-muted-foreground">
           Missing a module? Ask a workspace admin to update your role access.
@@ -149,6 +158,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const appName = getBrandAppName(brandMode);
   useWorkspaceRoleSync();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [liveChatUnread, setLiveChatUnread] = useState(0);
   const [helpdeskOpen, setHelpdeskOpen] = useState(0);
 
@@ -199,18 +209,53 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SidebarChrome
           appName={appName}
           collapsed={collapsed}
-          items={items}
-          isClientMode={isClientMode}
-          onToggleCollapsed={() => persistCollapsed(!collapsed)}
-          liveChatUnread={liveChatUnread}
           helpdeskOpen={helpdeskOpen}
+          isClientMode={isClientMode}
+          items={items}
+          liveChatUnread={liveChatUnread}
+          onToggleCollapsed={() => persistCollapsed(!collapsed)}
           pathname={pathname}
         />
       </aside>
 
+      {mobileNavOpen ? (
+        <>
+          <button
+            aria-label="Cerrar menú"
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+            onClick={() => setMobileNavOpen(false)}
+            type="button"
+          />
+          <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card shadow-elevated lg:hidden">
+            <SidebarChrome
+              appName={appName}
+              collapsed={false}
+              helpdeskOpen={helpdeskOpen}
+              isClientMode={isClientMode}
+              items={items}
+              liveChatUnread={liveChatUnread}
+              onNavigate={() => setMobileNavOpen(false)}
+              onToggleCollapsed={() => setMobileNavOpen(false)}
+              pathname={pathname}
+            />
+          </aside>
+        </>
+      ) : null}
+
       <div className="flex min-w-0 flex-1 flex-col bg-background">
         <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b border-border bg-card/95 px-4 py-2 backdrop-blur-sm md:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-2">
+            <Button
+              aria-expanded={mobileNavOpen}
+              aria-label={mobileNavOpen ? "Cerrar menú" : "Abrir menú"}
+              className="lg:hidden"
+              onClick={() => setMobileNavOpen((v) => !v)}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              {mobileNavOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </Button>
             <p className="truncate text-sm text-muted-foreground">
               {user ? (
                 <>

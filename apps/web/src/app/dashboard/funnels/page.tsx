@@ -3,20 +3,30 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { funnelApi } from "@/features/builders/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 import type { Funnel } from "@/features/builders/types";
 
 export default function FunnelsDashboard() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Funnel[]>([]);
   const [modal, setModal] = useState(false);
   const [name, setName] = useState("");
   const [steps, setSteps] = useState([{ name: "Landing", type: "landing" }]);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await funnelApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -37,7 +47,7 @@ export default function FunnelsDashboard() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Funnels</h1>
@@ -46,6 +56,15 @@ export default function FunnelsDashboard() {
           <Button onClick={() => setModal(true)}>Nuevo funnel</Button>
         </div>
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nuevo funnel"
+          emptyDescription="Diseña embudos de conversión paso a paso."
+          emptyTitle="Sin funnels"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((f) => (
             <article className="rounded-xl border p-4" key={f.id}>
@@ -57,9 +76,10 @@ export default function FunnelsDashboard() {
             </article>
           ))}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nuevo funnel">
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nuevo funnel">
         <input
           className="mb-4 w-full rounded-lg border px-3 py-2"
           onChange={(e) => setName(e.target.value)}
@@ -88,7 +108,7 @@ export default function FunnelsDashboard() {
         <Button className="w-full" onClick={create}>
           Crear funnel
         </Button>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

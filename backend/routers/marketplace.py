@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin
 from services.marketplace_service import get_marketplace_service
 
@@ -49,6 +50,7 @@ def _svc(db: AsyncSession, ws: WorkspaceContext | None = None):
 
 
 @router.get("/agencies")
+@list_cached("marketplace:agencies")
 async def list_marketplace_agencies(
     country: Optional[str] = Query(None),
     service: Optional[str] = Query(None),
@@ -140,6 +142,7 @@ class ItemReviewBody(BaseModel):
 
 
 @router.get("/items")
+@list_cached("marketplace:items")
 async def list_marketplace_items(
     category: Optional[str] = Query(None),
     limit: int = Query(50, ge=1, le=100),
@@ -163,6 +166,7 @@ async def purchase_marketplace_item(
 
 
 @router.get("/purchases")
+@list_cached("marketplace:purchases")
 async def list_my_marketplace_purchases(
     limit: int = Query(50, ge=1, le=100),
     ws: WorkspaceContext = Depends(require_workspace),

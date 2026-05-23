@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardCalendarApi } from "@/features/dashboard/api";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
 
 interface CalendarEvent {
   id?: string | number;
@@ -17,6 +18,7 @@ interface CalendarEvent {
 }
 
 export default function CalendarioDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -31,10 +33,17 @@ export default function CalendarioDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const start = new Date(year, month - 1, 1).toISOString();
     const end = new Date(year, month, 0, 23, 59, 59).toISOString();
     const res = await dashboardCalendarApi.events(start, end);
     setEvents((res.items as CalendarEvent[]) ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [year, month]);
 
   useEffect(() => {
@@ -105,7 +114,7 @@ export default function CalendarioDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Calendario</h1>
@@ -153,9 +162,9 @@ export default function CalendarioDashboardPage() {
             })}
           </div>
         </div>
-      </div>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nuevo evento">
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nuevo evento">
         <div className="grid gap-3">
           <input
             className="rounded-lg border px-3 py-2"
@@ -186,7 +195,7 @@ export default function CalendarioDashboardPage() {
             Crear evento
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

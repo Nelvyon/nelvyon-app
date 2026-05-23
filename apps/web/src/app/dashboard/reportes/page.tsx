@@ -4,6 +4,8 @@ import { Download } from "lucide-react";
 import { useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { downloadCsvFile, rowsToCsv } from "@/core/utils/csv";
 import { dashboardReportsApi } from "@/features/dashboard/api";
@@ -63,7 +65,7 @@ export default function ReportesDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div>
           <h1 className="text-2xl font-bold">Reportes</h1>
           <p className="text-sm text-muted-foreground">Informes por módulo con exportación CSV</p>
@@ -124,7 +126,7 @@ export default function ReportesDashboardPage() {
             Selecciona módulo y rango de fechas, luego genera el informe.
           </div>
         )}
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

@@ -5,12 +5,15 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { osWebApi } from "@/features/builders/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 import type { WebProject } from "@/features/builders/types";
 
 export default function WebsitesDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<WebProject[]>([]);
   const [modal, setModal] = useState(false);
   const [generating, setGenerating] = useState<string | null>(null);
@@ -24,8 +27,15 @@ export default function WebsitesDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await osWebApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -54,7 +64,7 @@ export default function WebsitesDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Webs</h1>
@@ -74,6 +84,15 @@ export default function WebsitesDashboardPage() {
           </div>
         ) : null}
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Crear nueva web"
+          emptyDescription="Crea tu primera web multipágina generada con IA."
+          emptyTitle="Aún no tienes webs"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((p) => (
             <article className="rounded-xl border bg-card p-5 shadow-card" key={p.id}>
@@ -103,9 +122,10 @@ export default function WebsitesDashboardPage() {
             </article>
           ))}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nueva web" wide>
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nueva web" wide>
         <div className="grid gap-3">
           <input className="rounded-lg border px-3 py-2" onChange={(e) => setForm({ ...form, business_name: e.target.value })} placeholder="Nombre del negocio" />
           <input className="rounded-lg border px-3 py-2" onChange={(e) => setForm({ ...form, sector: e.target.value })} placeholder="Sector" />
@@ -118,7 +138,7 @@ export default function WebsitesDashboardPage() {
           </select>
           <Button onClick={createAndGenerate}>Crear y generar con IA</Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

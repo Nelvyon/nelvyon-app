@@ -10,7 +10,7 @@ import { PaymentMethodCard } from "@/components/dashboard/PaymentMethodCard";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { dashboardSettingsApi } from "@/features/dashboard/api";
-import { DashboardTabs } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
 
 const DELETE_CONFIRM_PHRASE = "ELIMINAR MI CUENTA";
 

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { dashboardSeoApi } from "@/features/dashboard/api";
-import { DashboardTabs } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
 
 const TABS = [
   { id: "keywords", label: "Keywords" },
@@ -47,7 +47,7 @@ export default function SeoDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div>
           <h1 className="text-2xl font-bold">SEO</h1>
           <p className="text-sm text-muted-foreground">Keywords, posiciones, auditoría y contenido</p>
@@ -101,7 +101,7 @@ export default function SeoDashboardPage() {
             {tab === "content" && "Ideas de contenido basadas en keywords relacionadas."}
           </div>
         )}
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

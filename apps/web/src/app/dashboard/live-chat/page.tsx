@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { livechatApi } from "@/features/builders/api";
 import type { ChatConversation } from "@/features/builders/types";
@@ -13,6 +15,7 @@ function formatTime(iso?: string) {
 }
 
 export default function LiveChatDashboard() {
+  const [loading, setLoading] = useState(true);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [messages, setMessages] = useState<{ id: string; content: string; sender_type: string; created_at: string }[]>([]);
@@ -20,8 +23,15 @@ export default function LiveChatDashboard() {
   const [snippet, setSnippet] = useState("");
 
   const loadConversations = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await livechatApi.conversations();
     setConversations(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -68,7 +78,7 @@ export default function LiveChatDashboard() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div>
           <h1 className="text-2xl font-bold">Live Chat</h1>
           <p className="text-sm text-muted-foreground">Conversaciones en tiempo real con visitantes</p>
@@ -136,7 +146,7 @@ export default function LiveChatDashboard() {
             )}
           </section>
         </div>
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

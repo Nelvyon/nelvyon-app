@@ -7,8 +7,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { dashboardCrmApi } from "@/features/dashboard/api";
-import { DashboardTabs, MetricGrid } from "@/features/dashboard/components/DashboardTabs";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 type Row = Record<string, unknown>;
 
@@ -31,6 +31,7 @@ const TABS = [
 ];
 
 export default function CrmDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("contactos");
   const [search, setSearch] = useState("");
   const [contacts, setContacts] = useState<Row[]>([]);
@@ -68,11 +69,14 @@ export default function CrmDashboardPage() {
   }, []);
 
   useEffect(() => {
-    loadContacts().catch(() => setContacts([]));
-    loadDeals().catch(() => setDeals([]));
-    loadActivities().catch(() => setActivities([]));
-    loadPipeline().catch(() => setPipeline(null));
-    loadStats().catch(() => setStats(null));
+    setLoading(true);
+    Promise.all([
+      loadContacts().catch(() => setContacts([])),
+      loadDeals().catch(() => setDeals([])),
+      loadActivities().catch(() => setActivities([])),
+      loadPipeline().catch(() => setPipeline(null)),
+      loadStats().catch(() => setStats(null)),
+    ]).finally(() => setLoading(false));
   }, [loadContacts, loadDeals, loadActivities, loadPipeline, loadStats]);
 
   useEffect(() => {
@@ -121,7 +125,7 @@ export default function CrmDashboardPage() {
 
   return (
     <ProtectedLayout module="crm">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">CRM</h1>
@@ -132,7 +136,7 @@ export default function CrmDashboardPage() {
           </Button>
         </div>
 
-        {stats ? <MetricGrid items={metricItems} /> : null}
+        <MetricGrid items={metricItems} loading={loading} />
 
         <DashboardTabs active={tab} onChange={setTab} tabs={TABS} />
 
@@ -147,7 +151,16 @@ export default function CrmDashboardPage() {
                 value={search}
               />
             </div>
-            <div className="overflow-x-auto rounded-xl border">
+            <DashboardListShell
+          empty={!loading && contacts.length === 0}
+          emptyDescription="Añade tu primer contacto al CRM."
+          emptyTitle="Sin contactos"
+          emptyActionLabel="Nuevo contacto"
+          onEmptyAction={() => setContactModal(true)}
+          loading={loading}
+          skeleton={<SkeletonTable />}
+        >
+        <div className="overflow-x-auto rounded-xl border">
               <table className="w-full text-sm">
                 <thead className="border-b bg-muted/40 text-left">
                   <tr>
@@ -161,7 +174,7 @@ export default function CrmDashboardPage() {
                 </thead>
                 <tbody>
                   {contacts.map((c) => (
-                    <tr className="border-b last:border-0" key={str(c.id)}>
+                    <tr className="border-b last:border-0 transition-colors hover:bg-muted/50" key={str(c.id)}>
                       <td className="px-4 py-3 font-medium">{str(c.name)}</td>
                       <td className="px-4 py-3 text-muted-foreground">{str(c.email)}</td>
                       <td className="px-4 py-3">{str(c.company)}</td>
@@ -176,16 +189,10 @@ export default function CrmDashboardPage() {
                       </td>
                     </tr>
                   ))}
-                  {contacts.length === 0 ? (
-                    <tr>
-                      <td className="px-4 py-8 text-center text-muted-foreground" colSpan={6}>
-                        No hay contactos
-                      </td>
-                    </tr>
-                  ) : null}
                 </tbody>
               </table>
             </div>
+        </DashboardListShell>
           </div>
         ) : null}
 
@@ -202,7 +209,7 @@ export default function CrmDashboardPage() {
               </thead>
               <tbody>
                 {deals.map((d) => (
-                  <tr className="border-b last:border-0" key={str(d.id)}>
+                  <tr className="border-b last:border-0 transition-colors hover:bg-muted/50" key={str(d.id)}>
                     <td className="px-4 py-3 font-medium">{str(d.title)}</td>
                     <td className="px-4 py-3">
                       {num(d.value).toLocaleString("es-ES")} {str(d.currency, "EUR")}
@@ -296,9 +303,9 @@ export default function CrmDashboardPage() {
             />
           </div>
         ) : null}
-      </div>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setContactModal(false)} open={contactModal} title="Nuevo contacto">
+      <EliteModal onClose={() => setContactModal(false)} open={contactModal} title="Nuevo contacto">
         <div className="grid gap-3">
           <input
             className="rounded-lg border px-3 py-2"
@@ -323,7 +330,7 @@ export default function CrmDashboardPage() {
             Crear contacto
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

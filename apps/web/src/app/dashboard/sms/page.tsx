@@ -7,8 +7,8 @@ import { useCallback, useEffect, useState } from "react";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { dashboardCrmApi, dashboardSmsApi } from "@/features/dashboard/api";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 interface SmsCampaign {
   id: string;
@@ -22,6 +22,7 @@ interface SmsCampaign {
 }
 
 export default function SmsDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [campaigns, setCampaigns] = useState<SmsCampaign[]>([]);
   const [stats, setStats] = useState<Record<string, unknown>>({});
   const [contacts, setContacts] = useState<{ id: string; name?: string; phone?: string }[]>([]);
@@ -29,6 +30,8 @@ export default function SmsDashboardPage() {
   const [form, setForm] = useState({ name: "", message: "", scheduled_at: "", contact_ids: [] as string[] });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const [cRes, sRes, crmRes] = await Promise.all([
       dashboardSmsApi.listCampaigns(),
       dashboardSmsApi.stats(),
@@ -42,6 +45,11 @@ export default function SmsDashboardPage() {
         .filter((c) => c.phone)
         .map((c) => ({ id: String(c.id), name: String(c.name ?? ""), phone: String(c.phone ?? "") })),
     );
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -81,7 +89,7 @@ export default function SmsDashboardPage() {
 
   return (
     <ProtectedLayout module="campaigns">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">SMS Marketing</h1>
@@ -108,7 +116,7 @@ export default function SmsDashboardPage() {
           </div>
         ) : null}
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {campaigns.map((c) => (
@@ -140,9 +148,9 @@ export default function SmsDashboardPage() {
             </article>
           ))}
         </div>
-      </div>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nueva campaña SMS" wide>
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nueva campaña SMS" wide>
         <div className="grid gap-3">
           <input
             className="rounded-lg border px-3 py-2"
@@ -199,7 +207,7 @@ export default function SmsDashboardPage() {
             Crear campaña
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

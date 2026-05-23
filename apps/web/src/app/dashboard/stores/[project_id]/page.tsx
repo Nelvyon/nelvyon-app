@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { osStoreApi } from "@/features/builders/api";
 import { StatusBadge } from "@/features/builders/components/DashboardUi";
@@ -13,6 +15,7 @@ import type { StoreProduct, StoreProject } from "@/features/builders/types";
 type Tab = "products" | "orders" | "analytics" | "config";
 
 export default function StoreManagerPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ project_id: string }>();
   const id = params?.project_id ?? "";
   const [project, setProject] = useState<StoreProject | null>(null);
@@ -37,7 +40,7 @@ export default function StoreManagerPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div>
           <Link className="text-sm text-muted-foreground" href="/dashboard/stores">← Tiendas</Link>
           <h1 className="text-2xl font-bold">{project?.name}</h1>
@@ -119,7 +122,7 @@ export default function StoreManagerPage() {
         {tab === "config" ? (
           <p className="text-sm text-muted-foreground">Dominio personalizado, colores y logo — próximamente en el editor visual.</p>
         ) : null}
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

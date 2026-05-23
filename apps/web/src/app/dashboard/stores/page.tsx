@@ -5,12 +5,15 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { osStoreApi } from "@/features/builders/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 import type { StoreProject } from "@/features/builders/types";
 
 export default function StoresDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<StoreProject[]>([]);
   const [modal, setModal] = useState(false);
   const [generating, setGenerating] = useState<string | null>(null);
@@ -20,8 +23,15 @@ export default function StoresDashboardPage() {
   const [form, setForm] = useState({ store_name: "", sector: "", currency: "EUR", country_code: "ES" });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await osStoreApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -53,7 +63,7 @@ export default function StoresDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Tiendas</h1>
@@ -68,6 +78,15 @@ export default function StoresDashboardPage() {
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm">Generando tu tienda con IA…</div>
         ) : null}
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Crear tienda"
+          emptyDescription="Lanza tu primera tienda online con Stripe integrado."
+          emptyTitle="Sin tiendas todavía"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((p) => (
             <article className="rounded-xl border bg-card p-5 shadow-card" key={p.id}>
@@ -96,9 +115,10 @@ export default function StoresDashboardPage() {
             </article>
           ))}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nueva tienda" wide>
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nueva tienda" wide>
         <div className="grid gap-3">
           <input className="rounded-lg border px-3 py-2" onChange={(e) => setForm({ ...form, store_name: e.target.value })} placeholder="Nombre tienda" />
           <input className="rounded-lg border px-3 py-2" onChange={(e) => setForm({ ...form, sector: e.target.value })} placeholder="Sector (moda, electrónica…)" />
@@ -119,7 +139,7 @@ export default function StoresDashboardPage() {
           </Button>
           <Button onClick={createStore}>Crear y generar</Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

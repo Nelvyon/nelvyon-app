@@ -129,6 +129,13 @@ async def startup_event():
         logger.warning("DB init failed: %s", e)
 
     try:
+        from core.performance_indexes import ensure_performance_indexes
+
+        await ensure_performance_indexes()
+    except Exception as e:
+        logger.warning("Performance indexes failed: %s", e)
+
+    try:
         await initialize_mock_data()
     except Exception as e:
         logger.warning("Mock data init failed: %s", e)

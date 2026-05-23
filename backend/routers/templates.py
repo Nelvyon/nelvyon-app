@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin
 from services.template_service import TEMPLATE_TYPES, get_template_service
 
@@ -56,6 +57,7 @@ async def list_template_types(
 
 
 @router.get("")
+@list_cached("templates")
 async def list_templates(
     type: Optional[str] = Query(None, alias="type"),
     ws: WorkspaceContext = Depends(require_workspace),

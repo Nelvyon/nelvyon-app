@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from dependencies.workspace import WorkspaceContext, require_workspace
+from core.list_cache import list_cached
 from services import memory_service
 
 router = APIRouter(prefix="/api/memory", tags=["memory"])
@@ -40,6 +41,7 @@ class MemorySearchRequest(BaseModel):
 
 
 @router.get("")
+@list_cached("memory")
 async def list_workspace_memories(
     limit: int = 50,
     ctx: WorkspaceContext = Depends(require_workspace),

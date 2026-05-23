@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { socialApi } from "@/features/builders/api";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
 
 const PLATFORM_COLORS: Record<string, string> = {
   instagram: "bg-pink-500",
@@ -25,6 +26,7 @@ interface SocialPostRow {
 }
 
 export default function SocialSchedulerPage() {
+  const [loading, setLoading] = useState(true);
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -39,13 +41,27 @@ export default function SocialSchedulerPage() {
   const [file, setFile] = useState<File | null>(null);
 
   const loadCalendar = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await socialApi.calendar(year, month);
     setDays((res.days as Record<string, SocialPostRow[]>) ?? {});
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [year, month]);
 
   const loadPosts = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await socialApi.posts();
     setPosts((res.items as SocialPostRow[]) ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -119,7 +135,7 @@ export default function SocialSchedulerPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Social Scheduler</h1>
@@ -206,9 +222,9 @@ export default function SocialSchedulerPage() {
             </table>
           </div>
         )}
-      </div>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nuevo post">
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nuevo post">
         <textarea className="mb-3 w-full rounded-lg border px-3 py-2" onChange={(e) => setContent(e.target.value)} placeholder="Texto del post" rows={4} value={content} />
         <input className="mb-3 w-full rounded-lg border px-3 py-2" onChange={(e) => setScheduledAt(e.target.value)} type="datetime-local" />
         <input accept="image/*" className="mb-3 w-full text-sm" onChange={(e) => setFile(e.target.files?.[0] ?? null)} type="file" />
@@ -223,7 +239,7 @@ export default function SocialSchedulerPage() {
         <Button className="w-full" onClick={createPost}>
           Programar
         </Button>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

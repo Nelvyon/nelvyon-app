@@ -5,9 +5,11 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardContractsApi } from "@/features/dashboard/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -21,6 +23,7 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export default function ContratoDetailPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ id: string }>();
   const id = Number(params?.id ?? 0);
   const [contract, setContract] = useState<Record<string, unknown> | null>(null);
@@ -35,6 +38,8 @@ export default function ContratoDetailPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     if (!id) return;
     const data = await dashboardContractsApi.get(id);
     setContract(data);
@@ -44,6 +49,11 @@ export default function ContratoDetailPage() {
       content: String(data.content ?? ""),
       status: String(data.status ?? "draft"),
     });
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -74,7 +84,7 @@ export default function ContratoDetailPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <Link className="text-sm text-muted-foreground" href="/dashboard/contratos">
@@ -128,9 +138,9 @@ export default function ContratoDetailPage() {
             value={form.content}
           />
         </div>
-      </div>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setSendModal(false)} open={sendModal} title="Enviar para firma">
+      <EliteModal onClose={() => setSendModal(false)} open={sendModal} title="Enviar para firma">
         <div className="grid gap-3">
           <input
             className="rounded-lg border px-3 py-2"
@@ -143,7 +153,7 @@ export default function ContratoDetailPage() {
             Enviar
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

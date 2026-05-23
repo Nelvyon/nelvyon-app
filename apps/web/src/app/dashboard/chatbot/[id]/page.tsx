@@ -9,7 +9,7 @@ import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
 import { toastSuccess } from "@/core/ui/toastFeedback";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
 import { chatbotEmbedSnippet, dashboardChatbotApi } from "@/features/dashboard/api";
 
 type Tab = "config" | "conversations" | "stats" | "install";
@@ -27,6 +27,7 @@ function str(v: unknown, fb = ""): string {
 }
 
 export default function ChatbotDetailPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams();
   const id = str(params?.id);
   const [tab, setTab] = useState<Tab>("config");
@@ -38,6 +39,8 @@ export default function ChatbotDetailPage() {
   const [thread, setThread] = useState<Record<string, unknown> | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     if (!id) return;
     const [b, s, c] = await Promise.all([
       dashboardChatbotApi.get(id),
@@ -59,6 +62,11 @@ export default function ChatbotDetailPage() {
     });
     setStats(s);
     setConversations(c.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -84,7 +92,7 @@ export default function ChatbotDetailPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center gap-3">
           <Button asChild size="sm" variant="outline">
             <Link href="/dashboard/chatbot">
@@ -253,7 +261,7 @@ export default function ChatbotDetailPage() {
             </p>
           </div>
         )}
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

@@ -57,7 +57,7 @@ describe("SEO (MIG 287)", () => {
     vi.resetModules();
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://seo-meta.test");
     vi.stubEnv("NEXT_PUBLIC_BRAND_MODE", "internal");
-    const { metadata } = await import("@/app/layout");
+    const { metadata } = await import("@/app/site-metadata");
     expect(metadata).toBeDefined();
     expect(metadata && "title" in metadata && metadata.title).toBeTruthy();
     const title = metadata?.title;

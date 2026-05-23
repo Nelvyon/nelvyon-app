@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { dashboardAffiliatesApi } from "@/features/dashboard/api";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
 
 export default function AfiliadosDashboardPage() {
   const [stats, setStats] = useState<Record<string, unknown> | null>(null);
@@ -66,7 +66,7 @@ export default function AfiliadosDashboardPage() {
   if (!stats && !loading) {
     return (
       <ProtectedLayout module="os">
-        <div className="space-y-6">
+      <DashboardPageTransition>
           <div>
             <h1 className="text-2xl font-bold">Afiliados</h1>
             <p className="text-sm text-muted-foreground">Programa de referidos — gana comisiones por cada cliente</p>
@@ -78,14 +78,14 @@ export default function AfiliadosDashboardPage() {
               {registering ? "Registrando…" : "Registrarme como afiliado"}
             </Button>
           </div>
-        </div>
+        </DashboardPageTransition>
       </ProtectedLayout>
     );
   }
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div>
           <h1 className="text-2xl font-bold">Afiliados</h1>
           <p className="text-sm text-muted-foreground">Comparte tu enlace y gana comisiones</p>
@@ -106,40 +106,41 @@ export default function AfiliadosDashboardPage() {
           </p>
         </div>
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
-        <div className="overflow-x-auto rounded-xl border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/30 text-left">
-                <th className="p-3">ID</th>
-                <th className="p-3">Importe</th>
-                <th className="p-3">Estado</th>
-                <th className="p-3">Fecha</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payouts.map((p, i) => (
-                <tr className="border-b" key={String(p.id ?? i)}>
-                  <td className="p-3">{String(p.id ?? "—")}</td>
-                  <td className="p-3">{String(p.amount ?? p.total ?? "—")} €</td>
-                  <td className="p-3">{String(p.status ?? "—")}</td>
-                  <td className="p-3">
-                    {p.created_at ? new Date(String(p.created_at)).toLocaleDateString("es-ES") : "—"}
-                  </td>
+        <DashboardListShell
+          empty={!loading && payouts.length === 0}
+          emptyDescription="Los pagos por referidos aparecerán cuando generes comisiones."
+          emptyTitle="Sin pagos registrados"
+          loading={loading}
+          skeleton={<SkeletonTable />}
+        >
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/30 text-left">
+                  <th className="p-3">ID</th>
+                  <th className="p-3">Importe</th>
+                  <th className="p-3">Estado</th>
+                  <th className="p-3">Fecha</th>
                 </tr>
-              ))}
-              {!payouts.length ? (
-                <tr>
-                  <td className="p-6 text-center text-muted-foreground" colSpan={4}>
-                    Sin referidos o pagos registrados todavía
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </thead>
+              <tbody>
+                {payouts.map((p, i) => (
+                  <tr className="border-b transition-colors hover:bg-muted/50" key={String(p.id ?? i)}>
+                    <td className="p-3">{String(p.id ?? "—")}</td>
+                    <td className="p-3">{String(p.amount ?? p.total ?? "—")} €</td>
+                    <td className="p-3">{String(p.status ?? "—")}</td>
+                    <td className="p-3">
+                      {p.created_at ? new Date(String(p.created_at)).toLocaleDateString("es-ES") : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

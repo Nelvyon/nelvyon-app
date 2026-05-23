@@ -7,8 +7,8 @@ import { useCallback, useEffect, useState } from "react";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { dashboardInvoicesApi } from "@/features/dashboard/api";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 interface InvoiceRow {
   id: number;
@@ -20,6 +20,7 @@ interface InvoiceRow {
 }
 
 export default function FacturacionDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<InvoiceRow[]>([]);
   const [stats, setStats] = useState<Record<string, unknown>>({});
   const [modal, setModal] = useState(false);
@@ -32,12 +33,19 @@ export default function FacturacionDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const [listRes, statsRes] = await Promise.all([
       dashboardInvoicesApi.list(),
       dashboardInvoicesApi.stats(),
     ]);
     setItems((listRes.items as unknown as InvoiceRow[]) ?? []);
     setStats(statsRes);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -69,7 +77,7 @@ export default function FacturacionDashboardPage() {
 
   return (
     <ProtectedLayout module="billing">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Facturación</h1>
@@ -80,8 +88,17 @@ export default function FacturacionDashboardPage() {
           </Button>
         </div>
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nueva factura"
+          emptyDescription="Crea tu primera factura o presupuesto."
+          emptyTitle="Sin facturas"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((inv) => (
             <article className="rounded-xl border bg-card p-5 shadow-card" key={inv.id}>
@@ -104,9 +121,10 @@ export default function FacturacionDashboardPage() {
             </article>
           ))}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nueva factura" wide>
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nueva factura" wide>
         <div className="grid gap-3">
           <input
             className="rounded-lg border px-3 py-2"
@@ -150,7 +168,7 @@ export default function FacturacionDashboardPage() {
             Crear factura
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

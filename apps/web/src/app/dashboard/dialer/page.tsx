@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
 import { dashboardDialerApi } from "@/features/dashboard/api";
 
 type Row = Record<string, unknown>;
@@ -16,6 +16,7 @@ function str(v: unknown, fb = "—"): string {
 }
 
 export default function DialerPage() {
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Record<string, unknown>>({});
   const [history, setHistory] = useState<Row[]>([]);
   const [number, setNumber] = useState("");
@@ -24,9 +25,16 @@ export default function DialerPage() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const [s, h] = await Promise.all([dashboardDialerApi.stats(), dashboardDialerApi.history()]);
     setStats(s);
     setHistory(h.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -77,7 +85,7 @@ export default function DialerPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold">
             <Phone className="h-7 w-7 text-primary" aria-hidden />
@@ -92,7 +100,7 @@ export default function DialerPage() {
           </p>
         ) : null}
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
         <div className="rounded-lg border p-4">
           <h2 className="mb-3 font-semibold">Panel de marcación</h2>
@@ -122,23 +130,30 @@ export default function DialerPage() {
           ) : null}
         </div>
 
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="px-4 py-3 text-left">Contacto</th>
-                <th className="px-4 py-3 text-left">Número</th>
-                <th className="px-4 py-3 text-left">Duración</th>
-                <th className="px-4 py-3 text-left">Resultado</th>
-                <th className="px-4 py-3 text-left">Transcripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.map((c) => {
-                const id = str(c.id);
-                const open = expanded[id];
-                return (
-                  <tr key={id} className="border-t">
+        <DashboardListShell
+          empty={!loading && history.length === 0}
+          emptyDescription="Realiza tu primera llamada desde el panel de marcación."
+          emptyTitle="Sin historial de llamadas"
+          loading={loading}
+          skeleton={<SkeletonTable />}
+        >
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-4 py-3 text-left">Contacto</th>
+                  <th className="px-4 py-3 text-left">Número</th>
+                  <th className="px-4 py-3 text-left">Duración</th>
+                  <th className="px-4 py-3 text-left">Resultado</th>
+                  <th className="px-4 py-3 text-left">Transcripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((c) => {
+                  const id = str(c.id);
+                  const open = expanded[id];
+                  return (
+                    <tr key={id} className="border-t transition-colors hover:bg-muted/50">
                     <td className="px-4 py-3">{str(c.contact_name || c.contact_email, "—")}</td>
                     <td className="px-4 py-3">{str(c.to_number)}</td>
                     <td className="px-4 py-3">{str(c.duration_seconds, "0")}s</td>
@@ -160,10 +175,11 @@ export default function DialerPage() {
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </tbody>
+            </table>
+          </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

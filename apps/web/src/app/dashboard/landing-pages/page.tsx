@@ -4,20 +4,30 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { landingApi } from "@/features/builders/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 import type { LandingPage } from "@/features/builders/types";
 
 export default function LandingPagesDashboard() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<LandingPage[]>([]);
   const [modal, setModal] = useState(false);
   const [templates, setTemplates] = useState<{ id: string; name: string; thumbnail_url?: string }[]>([]);
   const [name, setName] = useState("");
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await landingApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -39,7 +49,7 @@ export default function LandingPagesDashboard() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Landing Pages</h1>
@@ -48,6 +58,15 @@ export default function LandingPagesDashboard() {
           <Button onClick={() => setModal(true)}>Nueva landing</Button>
         </div>
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nueva landing"
+          emptyDescription="Crea landings con el editor visual o desde plantilla."
+          emptyTitle="Sin landing pages"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((p) => (
             <article className="rounded-xl border p-4" key={p.id}>
@@ -62,9 +81,10 @@ export default function LandingPagesDashboard() {
             </article>
           ))}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nueva landing" wide>
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nueva landing" wide>
         <input className="mb-4 w-full rounded-lg border px-3 py-2" onChange={(e) => setName(e.target.value)} placeholder="Nombre" />
         <Button className="mb-6 w-full" onClick={createBlank} variant="outline">
           En blanco
@@ -77,7 +97,7 @@ export default function LandingPagesDashboard() {
             </button>
           ))}
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

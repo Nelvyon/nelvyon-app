@@ -7,8 +7,7 @@ import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
 import { toastSuccess } from "@/core/ui/toastFeedback";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
 import { dashboardCdpApi } from "@/features/dashboard/api";
 
 type Tab = "profiles" | "segments" | "events";
@@ -22,6 +21,7 @@ function str(v: unknown, fb = "—"): string {
 type Condition = { field: string; operator: string; value: string };
 
 export default function CdpDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("profiles");
   const [stats, setStats] = useState<Record<string, unknown>>({});
   const [profiles, setProfiles] = useState<Row[]>([]);
@@ -35,6 +35,8 @@ export default function CdpDashboardPage() {
   ]);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const [st, prof, seg, ev] = await Promise.all([
       dashboardCdpApi.stats(),
       dashboardCdpApi.profiles(),
@@ -45,6 +47,11 @@ export default function CdpDashboardPage() {
     setProfiles(prof.items ?? []);
     setSegments(seg.items ?? []);
     setEvents(ev.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -89,7 +96,7 @@ export default function CdpDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold">
             <Database className="h-7 w-7 text-primary" aria-hidden />
@@ -98,7 +105,7 @@ export default function CdpDashboardPage() {
           <p className="text-sm text-muted-foreground">Perfiles unificados, segmentos dinámicos y sync CRM</p>
         </div>
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
         <div className="flex flex-wrap gap-2 border-b pb-2">
           {(["profiles", "segments", "events"] as Tab[]).map((t) => (
@@ -212,8 +219,15 @@ export default function CdpDashboardPage() {
           </div>
         )}
 
-        <SimpleModal open={modal} onClose={() => setModal(false)} title="Nuevo segmento">
-          <div className="space-y-3">
+        <EliteModal open={modal} onClose={() => setModal(false)} title="Nuevo segmento">
+          <DashboardListShell
+          empty={!loading && segments.length === 0}
+          emptyDescription="Define audiencias para campañas."
+          emptyTitle="Sin segmentos"
+          loading={loading}
+          skeleton={<SkeletonList />}
+        >
+        <div className="space-y-3">
             <input
               className="w-full rounded border px-3 py-2 text-sm"
               placeholder="Nombre del segmento"
@@ -264,8 +278,9 @@ export default function CdpDashboardPage() {
               Crear segmento
             </Button>
           </div>
-        </SimpleModal>
-      </div>
+        </DashboardListShell>
+        </EliteModal>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

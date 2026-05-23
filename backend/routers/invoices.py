@@ -13,6 +13,8 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.auth import get_current_user
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from schemas.auth import UserResponse
@@ -75,6 +77,7 @@ async def invoice_stats(
 
 
 @router.get("")
+@list_cached("invoices")
 async def list_invoices(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=200),

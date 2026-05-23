@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from services.form_items import Form_itemsService
 from dependencies.auth import get_current_user
 from schemas.auth import UserResponse
@@ -100,6 +101,7 @@ class Form_itemsBatchDeleteRequest(BaseModel):
 
 # ---------- Routes ----------
 @router.get("", response_model=Form_itemsListResponse)
+@list_cached("form_items")
 async def query_form_itemss(
     query: str = Query(None, description="Query conditions (JSON string)"),
     sort: str = Query(None, description="Sort field (prefix with '-' for descending)"),

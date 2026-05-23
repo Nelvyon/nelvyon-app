@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { landingApi } from "@/features/builders/api";
 import { BlockRenderer } from "@/features/builders/components/BlockRenderer";
@@ -14,6 +16,7 @@ import type { LandingBlock, LandingPage } from "@/features/builders/types";
 const BLOCK_TYPES = ["hero", "text", "cta", "form", "testimonials", "pricing", "faq", "social_proof"] as const;
 
 export default function LandingEditorPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ page_id: string }>();
   const id = params?.page_id ?? "";
   const [page, setPage] = useState<LandingPage | null>(null);

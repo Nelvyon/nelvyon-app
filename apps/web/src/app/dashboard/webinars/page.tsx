@@ -6,8 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { toastSuccess } from "@/core/ui/toastFeedback";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
 import { dashboardWebinarsApi } from "@/features/dashboard/api";
 
 type Row = Record<string, unknown>;
@@ -24,6 +23,7 @@ function formatPrice(cents: unknown): string {
 }
 
 export default function WebinarsDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Row[]>([]);
   const [summary, setSummary] = useState<Record<string, unknown>>({});
   const [modal, setModal] = useState(false);
@@ -41,9 +41,16 @@ export default function WebinarsDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardWebinarsApi.list();
     setItems(res.items ?? []);
     setSummary(res.summary ?? {});
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -104,7 +111,7 @@ export default function WebinarsDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold">
@@ -118,13 +125,17 @@ export default function WebinarsDashboardPage() {
           </Button>
         </div>
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
-        {items.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Crea tu primer webinar para empezar a captar registrados.
-          </p>
-        ) : (
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nuevo webinar"
+          emptyDescription="Crea tu primer webinar para empezar a captar registrados."
+          emptyTitle="Sin webinars"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonTable />}
+        >
           <div className="overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
               <thead className="bg-muted/50">
@@ -141,7 +152,7 @@ export default function WebinarsDashboardPage() {
                   const id = str(w.id);
                   const status = str(w.status, "draft");
                   return (
-                    <tr key={id} className="border-t">
+                    <tr key={id} className="border-t transition-colors hover:bg-muted/50">
                       <td className="px-4 py-3 font-medium">{str(w.title)}</td>
                       <td className="px-4 py-3">{str(w.scheduled_at, "—").slice(0, 16)}</td>
                       <td className="px-4 py-3">{str(w.registrations_count, "0")}</td>
@@ -172,9 +183,10 @@ export default function WebinarsDashboardPage() {
               </tbody>
             </table>
           </div>
-        )}
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-        <SimpleModal open={modal} onClose={() => setModal(false)} title="Nuevo webinar">
+      <EliteModal open={modal} onClose={() => setModal(false)} title="Nuevo webinar">
           <div className="space-y-3">
             <label className="block text-sm">
               Título
@@ -210,8 +222,7 @@ export default function WebinarsDashboardPage() {
               Crear webinar
             </Button>
           </div>
-        </SimpleModal>
-      </div>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

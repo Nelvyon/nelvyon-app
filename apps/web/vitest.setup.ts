@@ -23,4 +23,21 @@ class MockIntersectionObserver implements IntersectionObserver {
 
 vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
 
+vi.mock("next/font/google", () => {
+  const mockFont = () => ({
+    className: "mock-font",
+    variable: "--mock-font",
+    style: { fontFamily: "mock" },
+  });
+  return new Proxy(
+    {},
+    {
+      get(_target, prop) {
+        if (prop === "__esModule") return true;
+        return mockFont;
+      },
+    },
+  );
+});
+
 process.env.JWT_SECRET ??= "super-secret-key-min-32-chars-change-in-production";

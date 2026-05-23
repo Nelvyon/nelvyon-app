@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field, HttpUrl
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin
 from services.webhook_service import SUPPORTED_EVENTS, get_webhook_service
 
@@ -48,6 +49,7 @@ async def list_supported_events(
 
 
 @router.get("/endpoints")
+@list_cached("webhooks:endpoints")
 async def list_webhook_endpoints(
     ws: WorkspaceContext = Depends(require_workspace_admin),
     db: AsyncSession = Depends(get_db),

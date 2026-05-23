@@ -12,6 +12,7 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.booking_service import get_booking_service
 
@@ -82,6 +83,7 @@ async def booking_slots(
 
 
 @router.get("")
+@list_cached("bookings")
 async def list_bookings(
     status: str | None = Query(None),
     start_date: datetime | None = Query(None),

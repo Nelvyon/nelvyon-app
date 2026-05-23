@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardInvoicesApi } from "@/features/dashboard/api";
 import { StatusBadge } from "@/features/builders/components/DashboardUi";
@@ -27,6 +29,7 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export default function FacturaDetailPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ id: string }>();
   const id = Number(params?.id ?? 0);
   const [invoice, setInvoice] = useState<Record<string, unknown> | null>(null);
@@ -37,6 +40,8 @@ export default function FacturaDetailPage() {
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     if (!id) return;
     const data = await dashboardInvoicesApi.get(id);
     setInvoice(data);
@@ -45,6 +50,11 @@ export default function FacturaDetailPage() {
     setNotes(String(data.notes ?? ""));
     const rawItems = (data.items as LineItem[] | undefined) ?? [];
     setItems(rawItems.length ? rawItems : [{ description: "", quantity: 1, unit_price: 0 }]);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -101,7 +111,7 @@ export default function FacturaDetailPage() {
 
   return (
     <ProtectedLayout module="billing">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <Link className="text-sm text-muted-foreground" href="/dashboard/facturacion">
@@ -220,7 +230,7 @@ export default function FacturaDetailPage() {
           <p>IVA ({ivaRate}%): {iva.toFixed(2)} €</p>
           <p className="text-lg font-bold">Total: {total.toFixed(2)} €</p>
         </div>
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

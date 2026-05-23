@@ -7,6 +7,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from dependencies.workspace import WorkspaceContext, require_workspace
+from core.list_cache import list_cached
 from services.voice_service import ElevenLabsService, get_voice_dashboard_service
 from core.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -99,6 +100,7 @@ async def stream_text_to_speech(
 
 
 @router.get("/calls")
+@list_cached("voice:calls")
 async def list_voice_calls(
     limit: int = 50,
     ctx: WorkspaceContext = Depends(require_workspace),

@@ -1,11 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { dashboardAiApi } from "@/features/dashboard/api";
-import { DashboardTabs } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
 
 const TABS = [
   { id: "texto", label: "Texto" },
@@ -75,7 +76,7 @@ export default function IaDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div>
           <h1 className="text-2xl font-bold">IA Creativa</h1>
           <p className="text-sm text-muted-foreground">Texto, imágenes, voz, video y música</p>
@@ -116,15 +117,25 @@ export default function IaDashboardPage() {
             {imageUrl ? (
               <div className="rounded-xl border p-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img alt="Generada" className="max-h-96 rounded-lg" src={imageUrl} />
+                <Image alt="Generada" className="max-h-96 rounded-lg" height={160} src={imageUrl} unoptimized width={160} />
               </div>
             ) : null}
-            {history.length ? (
-              <div className="rounded-xl border p-4">
-                <h3 className="mb-2 font-semibold">Historial</h3>
-                <pre className="max-h-48 overflow-auto text-xs">{JSON.stringify(history, null, 2)}</pre>
-              </div>
-            ) : null}
+            <DashboardListShell
+              empty={!loading && history.length === 0}
+              emptyDescription="Las imágenes generadas aparecerán en tu historial."
+              emptyTitle="Sin imágenes generadas"
+              loading={loading}
+              skeleton={<SkeletonList />}
+            >
+              {history.length ? (
+                <div className="rounded-xl border p-4">
+                  <h3 className="mb-2 font-semibold">Historial</h3>
+                  <pre className="max-h-48 overflow-auto text-xs">{JSON.stringify(history, null, 2)}</pre>
+                </div>
+              ) : (
+                <div className="rounded-xl border p-4 text-sm text-muted-foreground">Sin entradas en el historial.</div>
+              )}
+            </DashboardListShell>
           </div>
         ) : null}
 
@@ -155,7 +166,7 @@ export default function IaDashboardPage() {
             Generación de música próximamente. Integración con proveedores de audio en desarrollo.
           </div>
         ) : null}
-      </div>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

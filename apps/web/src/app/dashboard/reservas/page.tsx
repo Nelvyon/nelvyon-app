@@ -4,10 +4,12 @@ import { CalendarCheck, Copy, Link2, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { useWorkspace } from "@/core/workspace/WorkspaceContext";
 import { dashboardBookingsApi } from "@/features/dashboard/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 interface BookingRow {
   id: number;
@@ -19,6 +21,7 @@ interface BookingRow {
 }
 
 export default function ReservasDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const { workspaceId } = useWorkspace();
   const [items, setItems] = useState<BookingRow[]>([]);
   const [modal, setModal] = useState(false);
@@ -37,8 +40,15 @@ export default function ReservasDashboardPage() {
   }, [workspaceId]);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardBookingsApi.list();
     setItems((res.items as unknown as BookingRow[]) ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -66,7 +76,7 @@ export default function ReservasDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Reservas</h1>
@@ -92,6 +102,15 @@ export default function ReservasDashboardPage() {
           </div>
         </div>
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyDescription="Las reservas aparecerán aquí."
+          emptyTitle="Sin reservas"
+          emptyActionLabel="Nueva reserva"
+          onEmptyAction={() => setModal(true)}
+          loading={loading}
+          skeleton={<SkeletonTable />}
+        >
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
             <thead>
@@ -144,9 +163,10 @@ export default function ReservasDashboardPage() {
             </tbody>
           </table>
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nueva reserva" wide>
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nueva reserva" wide>
         <div className="grid gap-3">
           <input
             className="rounded-lg border px-3 py-2"
@@ -187,7 +207,7 @@ export default function ReservasDashboardPage() {
             Crear reserva
           </Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

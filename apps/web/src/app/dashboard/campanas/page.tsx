@@ -5,9 +5,11 @@ import { Megaphone, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardCampaignsApi } from "@/features/dashboard/api";
-import { SimpleModal, StatusBadge } from "@/features/builders/components/DashboardUi";
+import { StatusBadge } from "@/features/builders/components/DashboardUi";
 
 type Row = Record<string, unknown>;
 
@@ -17,6 +19,7 @@ function str(v: unknown, fallback = "—"): string {
 }
 
 export default function CampanasDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Row[]>([]);
   const [modal, setModal] = useState(false);
   const [step, setStep] = useState(0);
@@ -30,8 +33,15 @@ export default function CampanasDashboardPage() {
   });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardCampaignsApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -63,7 +73,7 @@ export default function CampanasDashboardPage() {
 
   return (
     <ProtectedLayout module="campaigns">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Campañas</h1>
@@ -79,6 +89,15 @@ export default function CampanasDashboardPage() {
           </Button>
         </div>
 
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nueva campaña"
+          emptyDescription="Lanza tu primera campaña de email o multicanal."
+          emptyTitle="Sin campañas"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.map((c) => (
             <article className="rounded-xl border bg-card p-5 shadow-card" key={str(c.id)}>
@@ -108,9 +127,10 @@ export default function CampanasDashboardPage() {
             </p>
           ) : null}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal
+      <EliteModal
         onClose={() => {
           setModal(false);
           resetWizard();
@@ -197,7 +217,7 @@ export default function CampanasDashboardPage() {
             </div>
           </div>
         ) : null}
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

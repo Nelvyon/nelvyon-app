@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardWorkflowsApi } from "@/features/dashboard/api";
 import { StatusBadge } from "@/features/builders/components/DashboardUi";
@@ -41,6 +43,7 @@ const NODE_COLORS: Record<WorkflowNode["type"], string> = {
 };
 
 export default function WorkflowEditorPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams<{ id: string }>();
   const id = Number(params?.id);
   const [workflow, setWorkflow] = useState<Record<string, unknown> | null>(null);

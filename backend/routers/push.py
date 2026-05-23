@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.workspace import (
     WorkspaceContext,
     require_workspace,
@@ -146,6 +147,7 @@ async def broadcast_push(
 
 
 @router.get("/subscribers")
+@list_cached("push:subscribers")
 async def list_subscribers(
     limit: int = 200,
     ws_ctx: WorkspaceContext = Depends(require_workspace),

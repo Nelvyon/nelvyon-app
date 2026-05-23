@@ -4,10 +4,11 @@ import { ClipboardList, Plus, Rocket, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
 import { toastSuccess } from "@/core/ui/toastFeedback";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
 import { dashboardFormsApi } from "@/features/dashboard/api";
 
 type Tab = "builder" | "responses" | "stats";
@@ -33,6 +34,7 @@ function newField(type: string): Field {
 }
 
 export default function FormulariosPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Row[]>([]);
   const [selected, setSelected] = useState<Row | null>(null);
   const [tab, setTab] = useState<Tab>("builder");
@@ -49,8 +51,15 @@ export default function FormulariosPage() {
   const [formStats, setFormStats] = useState<Record<string, unknown>>({});
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardFormsApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -102,7 +111,7 @@ export default function FormulariosPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold">
@@ -117,7 +126,16 @@ export default function FormulariosPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-2 rounded-lg border p-3 lg:col-span-1">
+          <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyDescription="Crea tu primer formulario o encuesta."
+          emptyTitle="Sin formularios"
+          emptyActionLabel="Nuevo formulario"
+          onEmptyAction={() => setModal(true)}
+          loading={loading}
+          skeleton={<SkeletonList />}
+        >
+        <div className="space-y-2 rounded-lg border p-3 lg:col-span-1">
             {items.map((f) => (
               <button
                 key={str(f.id)}
@@ -135,6 +153,7 @@ export default function FormulariosPage() {
               </button>
             ))}
           </div>
+        </DashboardListShell>
 
           {selected ? (
             <div className="space-y-4 lg:col-span-2">
@@ -229,14 +248,14 @@ export default function FormulariosPage() {
             <p className="text-sm text-muted-foreground lg:col-span-2">Selecciona o crea un formulario.</p>
           )}
         </div>
+      </DashboardPageTransition>
 
-        <SimpleModal open={modal} onClose={() => setModal(false)} title="Nuevo formulario">
-          <div className="space-y-3">
-            <input className="w-full rounded border px-3 py-2 text-sm" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
-            <Button onClick={createForm} disabled={!title.trim()}>Crear</Button>
-          </div>
-        </SimpleModal>
-      </div>
+      <EliteModal open={modal} onClose={() => setModal(false)} title="Nuevo formulario">
+        <div className="space-y-3">
+          <input className="w-full rounded border px-3 py-2 text-sm" placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Button onClick={createForm} disabled={!title.trim()}>Crear</Button>
+        </div>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

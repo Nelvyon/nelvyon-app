@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
 import { dashboardAbTestingApi } from "@/features/dashboard/api";
 
 type Row = Record<string, unknown>;
@@ -34,6 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
 type VariantForm = { name: string; description: string; changes: string; is_control: boolean };
 
 export default function AbTestingPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Row[]>([]);
   const [modal, setModal] = useState(false);
   const [step, setStep] = useState(1);
@@ -49,8 +51,15 @@ export default function AbTestingPage() {
   ]);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardAbTestingApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -114,7 +123,7 @@ export default function AbTestingPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold">
@@ -133,11 +142,18 @@ export default function AbTestingPage() {
           </Button>
         </div>
 
-        {items.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Crea tu primer experimento para optimizar conversiones en landing pages y funnels.
-          </p>
-        ) : (
+        <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyActionLabel="Nuevo experimento"
+          emptyDescription="Crea tu primer experimento para optimizar conversiones."
+          emptyTitle="Sin experimentos A/B"
+          loading={loading}
+          onEmptyAction={() => {
+            setStep(1);
+            setModal(true);
+          }}
+          skeleton={<SkeletonTable />}
+        >
           <div className="overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
               <thead className="bg-muted/50">
@@ -155,7 +171,7 @@ export default function AbTestingPage() {
                   const id = str(exp.id);
                   const status = str(exp.status, "draft");
                   return (
-                    <tr key={id} className="border-t">
+                    <tr key={id} className="border-t transition-colors hover:bg-muted/50">
                       <td className="px-4 py-3">
                         <Link href={`/dashboard/ab-testing/${id}`} className="font-medium hover:underline">
                           {str(exp.name)}
@@ -186,9 +202,10 @@ export default function AbTestingPage() {
               </tbody>
             </table>
           </div>
-        )}
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-        <SimpleModal open={modal} onClose={() => setModal(false)} title="Nuevo experimento A/B">
+      <EliteModal open={modal} onClose={() => setModal(false)} title="Nuevo experimento A/B">
           <div className="space-y-4">
             <div className="flex gap-2 text-xs">
               {[1, 2, 3].map((s) => (
@@ -309,8 +326,7 @@ export default function AbTestingPage() {
               )}
             </div>
           </div>
-        </SimpleModal>
-      </div>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

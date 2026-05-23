@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.webinar_service import WebinarService, get_webinar_service
 
@@ -73,6 +74,7 @@ def _svc(db: AsyncSession, ws: WorkspaceContext | None = None) -> WebinarService
 
 
 @webinar_router.get("/public/list")
+@list_cached("webinars:public")
 async def public_list(db: AsyncSession = Depends(get_db)):
     await WebinarService.ensure_schema()
     items = await get_webinar_service(db).list_public_webinars()
@@ -153,6 +155,7 @@ async def create_webinar(
 
 
 @webinar_router.get("")
+@list_cached("webinars")
 async def list_webinars(ws: WorkspaceContext = Depends(require_workspace), db: AsyncSession = Depends(get_db)):
     await WebinarService.ensure_schema()
     items = await _svc(db, ws).list_webinars(ws.workspace_id)

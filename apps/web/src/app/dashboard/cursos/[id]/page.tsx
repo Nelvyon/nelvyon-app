@@ -9,8 +9,7 @@ import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
 import { toastSuccess } from "@/core/ui/toastFeedback";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
 import { dashboardLmsApi } from "@/features/dashboard/api";
 
 type Tab = "content" | "students" | "stats" | "config";
@@ -27,6 +26,7 @@ function formatPrice(cents: unknown, currency = "eur"): string {
 }
 
 export default function CursoEditorPage() {
+  const [loading, setLoading] = useState(true);
   const params = useParams();
   const id = str(params?.id);
   const [tab, setTab] = useState<Tab>("content");
@@ -46,6 +46,8 @@ export default function CursoEditorPage() {
   const [configForm, setConfigForm] = useState<Record<string, unknown>>({});
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     if (!id) return;
     const [c, s, e] = await Promise.all([
       dashboardLmsApi.get(id),
@@ -63,6 +65,11 @@ export default function CursoEditorPage() {
       idioma: c.idioma,
       thumbnail_url: c.thumbnail_url,
     });
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -109,7 +116,7 @@ export default function CursoEditorPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center gap-3">
           <Button asChild size="sm" variant="outline">
             <Link href="/dashboard/cursos">
@@ -233,16 +240,16 @@ export default function CursoEditorPage() {
             </p>
           </div>
         )}
-      </div>
+      </DashboardPageTransition>
 
-      <SimpleModal open={moduleModal} onClose={() => setModuleModal(false)} title="Nuevo módulo">
+      <EliteModal open={moduleModal} onClose={() => setModuleModal(false)} title="Nuevo módulo">
         <div className="space-y-4">
           <input className="w-full rounded-lg border px-3 py-2" placeholder="Título del módulo" value={moduleTitle} onChange={(e) => setModuleTitle(e.target.value)} />
           <Button disabled={!moduleTitle.trim()} onClick={addModule}>Crear módulo</Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
 
-      <SimpleModal open={!!lessonModal} onClose={() => setLessonModal(null)} title="Nueva lección">
+      <EliteModal open={!!lessonModal} onClose={() => setLessonModal(null)} title="Nueva lección">
         <div className="space-y-3">
           <input className="w-full rounded-lg border px-3 py-2" placeholder="Título" value={lessonForm.title} onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })} />
           <select className="w-full rounded-lg border px-3 py-2" value={lessonForm.content_type} onChange={(e) => setLessonForm({ ...lessonForm, content_type: e.target.value })}>
@@ -255,7 +262,7 @@ export default function CursoEditorPage() {
           <input type="number" className="w-full rounded-lg border px-3 py-2" placeholder="Duración (min)" value={lessonForm.duration_minutes} onChange={(e) => setLessonForm({ ...lessonForm, duration_minutes: Number(e.target.value) })} />
           <Button disabled={!lessonForm.title.trim() || !lessonModal} onClick={() => lessonModal && addLesson(lessonModal)}>Añadir lección</Button>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

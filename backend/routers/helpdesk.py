@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from core.i18n import request_language, t
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.helpdesk_service import default_helpdesk_workspace_id, get_helpdesk_service
 
@@ -162,6 +163,7 @@ async def helpdesk_stats(
 
 
 @router.get("/tickets")
+@list_cached("helpdesk:tickets")
 async def list_tickets(
     status: str | None = Query(None),
     priority: str | None = Query(None),
@@ -271,6 +273,7 @@ async def close_ticket(
 
 
 @router.get("/agents")
+@list_cached("helpdesk:agents")
 async def list_agents(
     ws_ctx: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
@@ -279,6 +282,7 @@ async def list_agents(
 
 
 @router.get("/categories")
+@list_cached("helpdesk:categories")
 async def list_categories(
     ws_ctx: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),

@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.dialer_service import DialerService, get_dialer_service
 
@@ -114,6 +115,7 @@ async def log_call(
 
 
 @dialer_router.get("/calls")
+@list_cached("dialer:calls")
 async def call_history(ws: WorkspaceContext = Depends(require_workspace), db: AsyncSession = Depends(get_db)):
     await DialerService.ensure_schema()
     items = await _svc(db, ws).get_call_history()

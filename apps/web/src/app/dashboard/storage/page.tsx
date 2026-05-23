@@ -4,6 +4,8 @@ import { File, Trash2, Upload } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { dashboardStorageApi } from "@/features/dashboard/api";
 
@@ -17,14 +19,22 @@ interface StorageObject {
 }
 
 export default function StorageDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [objects, setObjects] = useState<StorageObject[]>([]);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardStorageApi.listObjects(BUCKET);
     setObjects((res.objects as StorageObject[]) ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -58,7 +68,7 @@ export default function StorageDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Storage</h1>
@@ -91,6 +101,13 @@ export default function StorageDashboardPage() {
           <p className="text-sm text-muted-foreground">Arrastra archivos aquí o usa el botón de subir</p>
         </div>
 
+        <DashboardListShell
+          empty={!loading && objects.length === 0}
+          emptyDescription="Sube archivos para compartirlos con tu equipo."
+          emptyTitle="Almacenamiento vacío"
+          loading={loading}
+          skeleton={<SkeletonList />}
+        >
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {objects.map((obj) => {
             const key = String(obj.key ?? obj.name ?? "");
@@ -128,7 +145,8 @@ export default function StorageDashboardPage() {
             </div>
           ) : null}
         </div>
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
     </ProtectedLayout>
   );
 }

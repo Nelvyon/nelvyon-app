@@ -1,12 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { Download, Plus, QrCode } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
+
 import { Button } from "@/core/ui/button";
 import { toastSuccess } from "@/core/ui/toastFeedback";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
 import { dashboardQrApi } from "@/features/dashboard/api";
 
 type Row = Record<string, unknown>;
@@ -19,6 +21,7 @@ function str(v: unknown, fb = "—"): string {
 const QR_TYPES = ["url", "texto", "email", "telefono", "whatsapp", "instagram", "wifi", "vcard", "menu"];
 
 export default function QrDashboardPage() {
+  const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<Row[]>([]);
   const [preview, setPreview] = useState("");
   const [selectedId, setSelectedId] = useState("");
@@ -37,8 +40,15 @@ export default function QrDashboardPage() {
   const [editUrl, setEditUrl] = useState("");
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardQrApi.list();
     setItems(res.items ?? []);
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -90,7 +100,7 @@ export default function QrDashboardPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold">
@@ -146,7 +156,16 @@ export default function QrDashboardPage() {
             ) : null}
           </div>
 
-          <div className="rounded-lg border p-4">
+          <DashboardListShell
+          empty={!loading && items.length === 0}
+          emptyDescription="Genera QR estáticos o dinámicos."
+          emptyTitle="Sin códigos QR"
+          emptyActionLabel="QR dinámico"
+          onEmptyAction={() => setDynamicModal(true)}
+          loading={loading}
+          skeleton={<SkeletonList />}
+        >
+        <div className="rounded-lg border p-4">
             <h2 className="mb-3 font-semibold">QRs dinámicos</h2>
             {items.filter((i) => i.is_dynamic).length === 0 ? (
               <p className="text-sm text-muted-foreground">Sin QRs dinámicos aún.</p>
@@ -191,23 +210,24 @@ export default function QrDashboardPage() {
               </div>
             ) : null}
           </div>
+        </DashboardListShell>
         </div>
+      </DashboardPageTransition>
 
-        <SimpleModal open={dynamicModal} onClose={() => setDynamicModal(false)} title="Nuevo QR dinámico">
+      <EliteModal open={dynamicModal} onClose={() => setDynamicModal(false)} title="Nuevo QR dinámico">
           <div className="space-y-3">
             <input className="w-full rounded border px-3 py-2 text-sm" placeholder="Nombre" value={dynamicForm.name} onChange={(e) => setDynamicForm({ ...dynamicForm, name: e.target.value })} />
             <input className="w-full rounded border px-3 py-2 text-sm" placeholder="URL destino" value={dynamicForm.destination_url} onChange={(e) => setDynamicForm({ ...dynamicForm, destination_url: e.target.value })} />
             <Button onClick={createDynamic}>Crear</Button>
           </div>
-        </SimpleModal>
+        </EliteModal>
 
-        <SimpleModal open={Boolean(editModal)} onClose={() => setEditModal(null)} title="Editar destino">
+        <EliteModal open={Boolean(editModal)} onClose={() => setEditModal(null)} title="Editar destino">
           <div className="space-y-3">
             <input className="w-full rounded border px-3 py-2 text-sm" value={editUrl} onChange={(e) => setEditUrl(e.target.value)} />
             <Button onClick={saveEdit}>Guardar</Button>
           </div>
-        </SimpleModal>
-      </div>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

@@ -1,4 +1,3 @@
-import type { Metadata, Viewport } from "next";
 import { cookies, headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { ReactNode } from "react";
@@ -6,74 +5,14 @@ import { ReactNode } from "react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
-import { getBrandAppName, getBrandMode } from "@/core/platform/brand";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/core/theme/themeBootstrapScript";
-import { getAppBaseUrl, getAppOrigin } from "@/lib/appUrl";
 import enMessages from "../../messages/en.json";
 import esMessages from "../../messages/es.json";
+import { inter, dmSans } from "./fonts";
 import "./globals.css";
 
-const brandMode = getBrandMode();
-const appName = getBrandAppName(brandMode);
-
-// TODO: añadir /public/og-image.png (1200×630px) — asset manual diseño web.
-
-const canonicalBase = getAppBaseUrl();
-
-const nelvyonMarketingDescription =
-  "Plataforma de marketing con inteligencia artificial. Automatiza SEO, ads, contenido y más.";
-
-const nelvyonMetadata: Metadata = {
-  metadataBase: getAppOrigin(),
-  title: {
-    default: "NELVYON — Marketing IA Automatizado",
-    template: "%s | NELVYON",
-  },
-  description: nelvyonMarketingDescription,
-  keywords: ["marketing IA", "automatización marketing", "SaaS marketing", "agentes IA"],
-  authors: [{ name: "NELVYON" }],
-  creator: "NELVYON",
-  openGraph: {
-    type: "website",
-    locale: "es_ES",
-    url: canonicalBase,
-    siteName: "NELVYON",
-    title: "NELVYON — Marketing IA Automatizado",
-    description: nelvyonMarketingDescription,
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "NELVYON" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "NELVYON — Marketing IA Automatizado",
-    description: nelvyonMarketingDescription,
-    images: ["/og-image.png"],
-  },
-  robots: { index: true, follow: true },
-  manifest: "/manifest.json",
-  appleWebApp: { capable: true, title: "NELVYON" },
-  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim()
-    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION.trim() } }
-    : {}),
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#0a0a0a",
-};
-
-export const metadata: Metadata =
-  brandMode === "client"
-    ? {
-        title: {
-          default: `${appName} — Workspace`,
-          template: `%s · ${appName}`,
-        },
-        description: `${appName} client portal.`,
-      }
-    : nelvyonMetadata;
+export { metadata, viewport } from "./site-metadata";
 
 async function resolveLocale(): Promise<"es" | "en"> {
   try {
@@ -121,7 +60,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <meta content="#0a0a0a" name="theme-color" />
         <meta content="yes" name="apple-mobile-web-app-capable" />
       </head>
-      <body>
+      <body className={`${inter.variable} ${dmSans.variable} font-sans antialiased`}>
         {/* Runs before React paint to avoid light/dark flash; keep in sync with ThemeProvider. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} suppressHydrationWarning>
         </script>

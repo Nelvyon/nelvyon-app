@@ -7,8 +7,7 @@ import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
 import { dashboardSocialMonitoringApi } from "@/features/dashboard/api";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
 
 type Row = Record<string, unknown>;
 
@@ -149,7 +148,7 @@ export default function SocialMonitoringPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold">
@@ -171,7 +170,7 @@ export default function SocialMonitoringPage() {
           </div>
         </div>
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
         <section className="rounded-xl border border-border bg-card p-4">
           <h2 className="mb-4 text-sm font-semibold">Sentimiento por día (7 días)</h2>
@@ -322,9 +321,9 @@ export default function SocialMonitoringPage() {
             )}
           </section>
         </div>
-      </div>
+      </DashboardPageTransition>
 
-      <SimpleModal onClose={() => setModal(false)} open={modal} title="Nueva alerta de monitoreo">
+      <EliteModal onClose={() => setModal(false)} open={modal} title="Nueva alerta de monitoreo">
         <div className="space-y-4">
           <label className="block space-y-1 text-sm">
             <span className="font-medium">Keyword</span>
@@ -370,7 +369,7 @@ export default function SocialMonitoringPage() {
             <Button onClick={createAlert}>Crear alerta</Button>
           </div>
         </div>
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

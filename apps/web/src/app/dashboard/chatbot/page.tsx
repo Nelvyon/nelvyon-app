@@ -1,14 +1,14 @@
 "use client";
 
 import { Bot, MessageSquare, Plus, Settings, Trash2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
-import { SimpleModal } from "@/features/builders/components/DashboardUi";
-import { MetricGrid } from "@/features/dashboard/components/DashboardTabs";
+import { DashboardTabs, MetricGrid, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable, EliteModal } from "@/features/dashboard/components/DashboardTabs";
 import { dashboardChatbotApi } from "@/features/dashboard/api";
 
 type BotRow = Record<string, unknown>;
@@ -36,7 +36,7 @@ function WidgetPreview({ config }: { config: typeof DEFAULT_FORM }) {
         <div className="flex items-center gap-2 px-3 py-2 text-sm text-white" style={{ background: config.color_primario }}>
           {config.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img alt="" className="h-8 w-8 rounded-full object-cover" src={config.avatar_url} />
+            <Image alt="" className="h-8 w-8 rounded-full object-cover" height={160} src={config.avatar_url} unoptimized width={160} />
           ) : (
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
               {config.nombre.charAt(0) || "C"}
@@ -56,6 +56,7 @@ function WidgetPreview({ config }: { config: typeof DEFAULT_FORM }) {
 }
 
 export default function ChatbotListPage() {
+  const [loading, setLoading] = useState(true);
   const [bots, setBots] = useState<BotRow[]>([]);
   const [globalStats, setGlobalStats] = useState<Record<string, unknown>>({});
   const [modal, setModal] = useState(false);
@@ -65,9 +66,16 @@ export default function ChatbotListPage() {
   const [thread, setThread] = useState<Record<string, unknown> | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    try {
     const res = await dashboardChatbotApi.list();
     setBots(res.items ?? []);
     setGlobalStats(res.global_stats ?? {});
+    } catch {
+      /* preserved */
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -110,7 +118,7 @@ export default function ChatbotListPage() {
 
   return (
     <ProtectedLayout module="os">
-      <div className="space-y-6">
+      <DashboardPageTransition>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold">
@@ -124,13 +132,17 @@ export default function ChatbotListPage() {
           </Button>
         </div>
 
-        <MetricGrid items={metrics} />
+        <MetricGrid items={metrics} loading={loading} />
 
-        {bots.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Aún no tienes chatbots. Crea uno para obtener el snippet de instalación.
-          </p>
-        ) : (
+        <DashboardListShell
+          empty={!loading && bots.length === 0}
+          emptyActionLabel="Nuevo chatbot"
+          emptyDescription="Crea uno para obtener el snippet de instalación en tu web."
+          emptyTitle="Sin chatbots"
+          loading={loading}
+          onEmptyAction={() => setModal(true)}
+          skeleton={<SkeletonList />}
+        >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {bots.map((b) => {
               const cfg = (b.config as Record<string, unknown>) ?? {};
@@ -140,7 +152,7 @@ export default function ChatbotListPage() {
                     <div className="flex items-center gap-3">
                       {cfg.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img alt="" className="h-10 w-10 rounded-full object-cover" src={str(cfg.avatar_url)} />
+                        <Image alt="" className="h-10 w-10 rounded-full object-cover" height={160} src={str(cfg.avatar_url)} unoptimized width={160} />
                       ) : (
                         <span
                           className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
@@ -178,10 +190,10 @@ export default function ChatbotListPage() {
               );
             })}
           </div>
-        )}
-      </div>
+        </DashboardListShell>
+      </DashboardPageTransition>
 
-      <SimpleModal open={modal} onClose={() => setModal(false)} title={`Nuevo chatbot — paso ${step}/3`} wide>
+      <EliteModal open={modal} onClose={() => setModal(false)} title={`Nuevo chatbot — paso ${step}/3`} wide>
         {step === 1 ? (
           <div className="space-y-4">
             <label className="block space-y-1 text-sm">
@@ -249,11 +261,20 @@ export default function ChatbotListPage() {
             </div>
           </div>
         ) : null}
-      </SimpleModal>
+      </EliteModal>
 
-      <SimpleModal open={!!convModal} onClose={() => setConvModal(null)} title="Conversaciones" wide>
+      <EliteModal open={!!convModal} onClose={() => setConvModal(null)} title="Conversaciones" wide>
         {convModal ? (
-          <div className="grid gap-4 md:grid-cols-2">
+          <DashboardListShell
+          empty={!loading && bots.length === 0}
+          emptyDescription="Crea un asistente IA para tu web."
+          emptyTitle="Sin chatbots"
+          emptyActionLabel="Crear chatbot"
+          onEmptyAction={() => setModal(true)}
+          loading={loading}
+          skeleton={<SkeletonList />}
+        >
+        <div className="grid gap-4 md:grid-cols-2">
             <ul className="max-h-80 space-y-2 overflow-y-auto text-sm">
               {convModal.sessions.length === 0 ? (
                 <li className="text-muted-foreground">Sin conversaciones</li>
@@ -284,8 +305,9 @@ export default function ChatbotListPage() {
               )}
             </div>
           </div>
+        </DashboardListShell>
         ) : null}
-      </SimpleModal>
+      </EliteModal>
     </ProtectedLayout>
   );
 }

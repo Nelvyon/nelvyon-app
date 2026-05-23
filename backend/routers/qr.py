@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.qr_service import QrService, get_qr_service
 
@@ -98,6 +99,7 @@ async def update_dynamic(
 
 
 @qr_router.get("/list")
+@list_cached("qr:list")
 async def list_qrs(ws: WorkspaceContext = Depends(require_workspace), db: AsyncSession = Depends(get_db)):
     await QrService.ensure_schema()
     items = await _svc(db, ws).list_qrs(ws.workspace_id)
