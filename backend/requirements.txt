@@ -63,5 +63,9 @@ google-analytics-data>=0.18.0
 # Web Push (PWA) — VAPID notifications
 pywebpush>=2.0.0
 
+# White-label templates & domain verification
+jinja2>=3.1.0
+dnspython>=2.6.0
+
 # Error monitoring
 sentry-sdk>=1.40.0
