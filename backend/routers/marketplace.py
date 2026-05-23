@@ -132,3 +132,56 @@ async def match_client_to_agency(
     except Exception as exc:
         logger.error("marketplace match: %s", sanitize_text(str(exc)), exc_info=True)
         raise HTTPException(status_code=503, detail="Matching service unavailable") from exc
+
+
+class ItemReviewBody(BaseModel):
+    rating: int = Field(..., ge=1, le=5)
+    review: Optional[str] = Field(None, max_length=2000)
+
+
+@router.get("/items")
+async def list_marketplace_items(
+    category: Optional[str] = Query(None),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+):
+    items = await _svc(db).list_items(category=category, limit=limit, offset=offset)
+    return {"items": items, "count": len(items)}
+
+
+@router.post("/items/{item_id}/purchase", status_code=201)
+async def purchase_marketplace_item(
+    item_id: str,
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await _svc(db, ws).purchase_item(item_id, int(ws.workspace_id))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/purchases")
+async def list_my_marketplace_purchases(
+    limit: int = Query(50, ge=1, le=100),
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    purchases = await _svc(db, ws).list_my_purchases(int(ws.workspace_id), limit=limit)
+    return {"purchases": purchases, "count": len(purchases)}
+
+
+@router.post("/items/{item_id}/review", status_code=201)
+async def review_marketplace_item(
+    item_id: str,
+    body: ItemReviewBody,
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await _svc(db, ws).rate_item(
+            item_id, int(ws.workspace_id), body.rating, review=body.review
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc

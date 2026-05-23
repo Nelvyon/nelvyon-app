@@ -112,3 +112,28 @@ async def verify_domain(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"SES domain verification failed: {e}",
         ) from e
+
+
+@router.get("/suppressions")
+async def list_suppressions(
+    limit: int = 200,
+    _ctx: WorkspaceContext = Depends(require_workspace),
+) -> Dict[str, Any]:
+    """List suppressed email addresses (bounces/complaints)."""
+    service = get_ses_service()
+    return {"suppressions": await service.list_suppressions(limit=limit)}
+
+
+@router.get("/reputation")
+async def get_reputation(
+    _ctx: WorkspaceContext = Depends(require_workspace),
+) -> Dict[str, Any]:
+    """SES sending reputation and bounce rate."""
+    service = get_ses_service()
+    try:
+        return await service.get_reputation()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"SES reputation failed: {e}",
+        ) from e

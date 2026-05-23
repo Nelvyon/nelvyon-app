@@ -215,6 +215,18 @@ async def callback(
         # Issue application JWT and store in HttpOnly cookie (no token in URL)
         app_token, _expires_at, _ = await auth_service.issue_app_token(user=user)
 
+        from services.audit_service import log_critical_audit
+
+        await log_critical_audit(
+            db,
+            tenant_id=0,
+            user_id=str(user.id),
+            action="login",
+            resource_type="auth",
+            resource_id=str(user.id),
+            ip_address=request.client.host if request.client else None,
+        )
+
         spa_base = get_spa_callback_base(request)
         redirect_url = f"{spa_base}/auth/callback"
         logger.info("[callback] OIDC callback successful, redirecting to %s (session cookie set)", redirect_url)

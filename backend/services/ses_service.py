@@ -431,6 +431,41 @@ class SESService:
             capture_exception(exc, service="ses", method="get_sending_stats")
             raise
 
+    async def get_reputation(self) -> dict[str, Any]:
+        """SES reputation: bounce/complaint rates from stats + local suppressions."""
+        stats = await self.get_sending_stats()
+        suppression_count = 0
+        try:
+            session_maker = await self._db_session()
+            async with session_maker() as session:
+                r = await session.execute(text("SELECT COUNT(*) AS cnt FROM ses_suppressions"))
+                row = r.fetchone()
+                suppression_count = int(row._mapping["cnt"]) if row else 0
+        except Exception:
+            suppression_count = 0
+
+        if self._mock or stats.get("mock"):
+            return {
+                "mock": True,
+                "suppression_count": suppression_count,
+                "bounce_rate_pct": 0.0,
+                "complaint_rate_pct": 0.0,
+                "reputation_status": "pending_auth",
+            }
+
+        points = stats.get("statistics", {}).get("SendDataPoints", [])
+        bounces = sum(p.get("Bounces", 0) for p in points)
+        complaints = sum(p.get("Complaints", 0) for p in points)
+        deliveries = sum(p.get("DeliveryAttempts", 0) for p in points) or 1
+        return {
+            "mock": False,
+            "suppression_count": suppression_count,
+            "bounce_rate_pct": round(bounces / deliveries * 100, 3),
+            "complaint_rate_pct": round(complaints / deliveries * 100, 3),
+            "reputation_status": "healthy" if complaints / deliveries < 0.001 else "review",
+            "period_points": len(points),
+        }
+
 
 _ses_service: SESService | None = None
 

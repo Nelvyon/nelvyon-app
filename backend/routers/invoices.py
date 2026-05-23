@@ -7,13 +7,15 @@ from datetime import date, datetime
 from typing import Any, List, Optional
 
 from core.secrets import sanitize_text
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from dependencies.auth import get_current_user
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
+from schemas.auth import UserResponse
 from services.invoice_service import InvoiceService
 
 logger = logging.getLogger(__name__)
@@ -191,14 +193,29 @@ async def download_invoice_pdf(
 @router.post("/{invoice_id}/paid")
 async def mark_invoice_paid(
     invoice_id: int,
+    request: Request,
     body: MarkPaidBody | None = None,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     svc = _service(db, ws_ctx)
     payment_date = body.payment_date if body else None
     try:
-        return await svc.mark_as_paid(invoice_id, payment_date)
+        result = await svc.mark_as_paid(invoice_id, payment_date)
+        from services.audit_service import log_critical_audit
+
+        await log_critical_audit(
+            db,
+            tenant_id=int(ws_ctx.workspace_id),
+            user_id=str(current_user.id),
+            action="paid",
+            resource_type="invoice",
+            resource_id=str(invoice_id),
+            ip_address=request.client.host if request.client else None,
+            new_value={"invoice_id": invoice_id},
+        )
+        return result
     except ValueError as e:
         status = 404 if "not found" in str(e).lower() else 400
         raise HTTPException(status_code=status, detail=str(e))

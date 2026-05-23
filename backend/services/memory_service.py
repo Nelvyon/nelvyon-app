@@ -263,6 +263,34 @@ async def list_client_memories(
         return []
 
 
+async def list_workspace_memories(workspace_id: WorkspaceId, limit: int = 50) -> List[Dict[str, Any]]:
+    """List recent memories across all clients in a workspace."""
+    if not db_manager.async_session_maker:
+        await db_manager.ensure_initialized()
+    if not db_manager.async_session_maker:
+        return []
+
+    try:
+        ws_uuid = _normalize_workspace_id(workspace_id)
+        async with db_manager.async_session_maker() as session:
+            result = await session.execute(
+                text(
+                    """
+                    SELECT id::text AS id, client_id, content, metadata, created_at, updated_at
+                    FROM client_memory
+                    WHERE workspace_id = CAST(:workspace_id AS uuid)
+                    ORDER BY updated_at DESC
+                    LIMIT :limit
+                    """
+                ),
+                {"workspace_id": ws_uuid, "limit": int(limit)},
+            )
+            return [dict(row) for row in result.mappings().all()]
+    except Exception as e:
+        logger.warning("list_workspace_memories failed: %s", e)
+        return []
+
+
 async def delete_client_memories(workspace_id: WorkspaceId, client_id: str) -> int:
     """Delete all memories for a client in a workspace. Returns rows deleted."""
     if not db_manager.async_session_maker:

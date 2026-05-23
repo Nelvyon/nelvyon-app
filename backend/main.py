@@ -164,6 +164,13 @@ async def startup_event():
         apply_staging_overrides()
     except Exception as e:
         logger.warning("Staging overrides failed: %s", e)
+
+    try:
+        from services.social_scheduler_worker import start_social_scheduler_worker
+
+        await start_social_scheduler_worker()
+    except Exception as e:
+        logger.warning("Social scheduler worker failed to start: %s", e)
     # MODULE_STARTUP_END
 
     logger.info("=== Application startup completed ===")
@@ -175,6 +182,27 @@ async def shutdown_event():
     logger.info("=== Application shutdown initiated ===")
 
     # MODULE_SHUTDOWN_START
+    try:
+        from services.social_scheduler_worker import stop_social_scheduler_worker
+
+        await stop_social_scheduler_worker()
+    except Exception as e:
+        logger.warning("Social scheduler worker shutdown failed: %s", e)
+
+    try:
+        from services.os_web_builder_worker import stop_website_generation_workers
+
+        await stop_website_generation_workers()
+    except Exception as e:
+        logger.warning("OS web builder worker shutdown failed: %s", e)
+
+    try:
+        from services.os_store_builder_worker import stop_store_generation_workers
+
+        await stop_store_generation_workers()
+    except Exception as e:
+        logger.warning("OS store builder worker shutdown failed: %s", e)
+
     try:
         await job_queue.stop()
     except Exception as e:
@@ -211,6 +239,10 @@ app.add_middleware(RateLimiterMiddleware, enabled=True)
 # Request ID middleware (outermost custom — assigns X-Request-ID for traceability)
 from middlewares.request_id import RequestIDMiddleware
 app.add_middleware(RequestIDMiddleware)
+
+# Multi-tenant isolation — JWT / X-Workspace-Id → ContextVar + RLS session
+from middleware.tenant import TenantMiddleware
+app.add_middleware(TenantMiddleware)
 
 # CORS middleware (must be outermost to handle preflight OPTIONS correctly)
 # Environment-aware CORS configuration
@@ -284,6 +316,89 @@ def include_routers_from_package(app: FastAPI, package_name: str = "routers") ->
 # Setup logging before router discovery (includes routers/ses.py — Amazon SES cold email)
 setup_logging()
 include_routers_from_package(app, "routers")
+
+# Explicit audit router (FRENTE 32); GDPR at /api/gdpr via auto-discovery
+from routers.audit import router as audit_compliance_router
+from routers.chat import livechat_router
+from routers.social import social_router
+from routers.landing_builder import landing_router, public_page_router
+from routers.funnel_builder import funnel_router
+from routers.os_web_builder import os_web_router, site_router
+from routers.os_store_builder import os_store_router, store_public_router
+from routers.sms import sms_router
+from routers.voice_commands import voice_commands_router
+from routers.social_monitoring import social_monitoring_router
+from routers.chatbot import chatbot_router
+from routers.lms import lms_router
+from routers.ab_testing import ab_router
+from routers.loyalty import loyalty_router
+from routers.webinars import webinar_router
+from routers.cdp import cdp_router
+from routers.dialer import dialer_router
+from routers.qr import qr_router, qr_public_router
+from routers.forms import forms_router
+
+app.include_router(audit_compliance_router)
+app.include_router(livechat_router)
+app.include_router(social_router)
+app.include_router(landing_router)
+app.include_router(public_page_router)
+app.include_router(funnel_router)
+app.include_router(os_web_router)
+app.include_router(site_router)
+app.include_router(os_store_router)
+app.include_router(store_public_router)
+app.include_router(sms_router)
+app.include_router(voice_commands_router)
+app.include_router(social_monitoring_router)
+app.include_router(chatbot_router)
+app.include_router(lms_router)
+app.include_router(ab_router)
+app.include_router(loyalty_router)
+app.include_router(webinar_router)
+app.include_router(cdp_router)
+app.include_router(dialer_router)
+app.include_router(qr_router)
+app.include_router(qr_public_router)
+app.include_router(forms_router)
+
+# Static embeddable chatbot widget
+from pathlib import Path as _Path
+
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse, Response
+
+_static_dir = _Path(__file__).resolve().parent / "static"
+if _static_dir.is_dir():
+    app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
+
+
+@app.get("/widget.js", include_in_schema=False)
+async def serve_widget_js_root():
+    widget_path = _static_dir / "widget.js"
+    if not widget_path.is_file():
+        raise HTTPException(status_code=404, detail="widget.js not found")
+    return FileResponse(widget_path, media_type="application/javascript")
+
+
+@app.middleware("http")
+async def chatbot_embed_cors(request: Request, call_next):
+    """Allow any origin for embeddable chatbot public API."""
+    path = request.url.path
+    if path == "/api/chatbot/chat" or path.startswith("/api/chatbot/widget/"):
+        if request.method == "OPTIONS":
+            return Response(
+                status_code=204,
+                headers={
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "*",
+                },
+            )
+        response = await call_next(request)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    return await call_next(request)
 
 
 # Add exception handler for all exceptions except HTTPException

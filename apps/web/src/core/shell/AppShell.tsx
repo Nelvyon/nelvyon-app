@@ -13,6 +13,10 @@ import { getNavItemsForRole, isNavActive, ProductNavItem } from "@/core/shell/na
 import { RoutePageHeader } from "@/core/shell/RoutePageHeader";
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
+import { livechatApi } from "@/features/builders/api";
+import { dashboardHelpdeskApi } from "@/features/dashboard/api";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
+import { VoiceCommand } from "@/components/VoiceCommand";
 import { HelpBotPanel } from "@/features/helpbot/components/HelpBotPanel";
 import { ThemeToggle } from "@/core/theme/ThemeToggle";
 import { useWorkspaceRoleSync } from "@/core/workspace/useWorkspaceRoleSync";
@@ -25,17 +29,27 @@ function NavList({
   pathname,
   collapsed,
   onNavigate,
+  liveChatUnread = 0,
+  helpdeskOpen = 0,
 }: {
   items: ProductNavItem[];
   pathname: string;
   collapsed: boolean;
   onNavigate?: () => void;
+  liveChatUnread?: number;
+  helpdeskOpen?: number;
 }) {
   return (
     <nav aria-label="Product" className={cn("space-y-1", collapsed ? "p-2" : "p-3")}>
       {items.map((item) => {
         const active = isNavActive(pathname, item);
         const Icon = item.icon;
+        const badge =
+          item.badgeKey === "liveChat" && liveChatUnread > 0
+            ? liveChatUnread
+            : item.badgeKey === "helpdesk" && helpdeskOpen > 0
+              ? helpdeskOpen
+              : 0;
         return (
           <Link
             aria-label={item.label}
@@ -45,12 +59,28 @@ function NavList({
               active ? "bg-primary text-primary-foreground" : "text-foreground/95 hover:bg-muted",
             )}
             href={item.href}
-            key={item.module}
+            key={item.href}
             onClick={onNavigate}
             title={item.label}
           >
-            <Icon aria-hidden className="h-5 w-5 shrink-0 opacity-90" />
-            {!collapsed ? <span>{item.label}</span> : null}
+            <span className="relative shrink-0">
+              <Icon aria-hidden className="h-5 w-5 opacity-90" />
+              {badge > 0 && collapsed ? (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                  {badge > 9 ? "9+" : badge}
+                </span>
+              ) : null}
+            </span>
+            {!collapsed ? (
+              <span className="flex flex-1 items-center justify-between gap-2">
+                <span>{item.label}</span>
+                {badge > 0 ? (
+                  <span className="rounded-full bg-destructive px-2 py-0.5 text-xs font-semibold text-destructive-foreground">
+                    {badge > 99 ? "99+" : badge}
+                  </span>
+                ) : null}
+              </span>
+            ) : null}
           </Link>
         );
       })}
@@ -65,6 +95,8 @@ function SidebarChrome({
   pathname,
   appName,
   isClientMode,
+  liveChatUnread,
+  helpdeskOpen,
 }: {
   collapsed: boolean;
   onToggleCollapsed: () => void;
@@ -72,6 +104,8 @@ function SidebarChrome({
   pathname: string;
   appName: string;
   isClientMode: boolean;
+  liveChatUnread: number;
+  helpdeskOpen: number;
 }) {
   return (
     <>
@@ -97,7 +131,7 @@ function SidebarChrome({
         </div>
         {!collapsed ? <p className="mt-1 text-xs text-muted-foreground">{isClientMode ? "Client portal" : "Workspace app"}</p> : null}
       </div>
-      <NavList collapsed={collapsed} items={items} pathname={pathname} />
+      <NavList collapsed={collapsed} helpdeskOpen={helpdeskOpen} items={items} liveChatUnread={liveChatUnread} pathname={pathname} />
       {!collapsed && !isClientMode ? (
         <p className="px-3 pb-3 text-xs text-muted-foreground">
           Missing a module? Ask a workspace admin to update your role access.
@@ -115,6 +149,25 @@ export function AppShell({ children }: { children: ReactNode }) {
   const appName = getBrandAppName(brandMode);
   useWorkspaceRoleSync();
   const [collapsed, setCollapsed] = useState(false);
+  const [liveChatUnread, setLiveChatUnread] = useState(0);
+  const [helpdeskOpen, setHelpdeskOpen] = useState(0);
+
+  useEffect(() => {
+    if (!user || isClientMode) return;
+    const load = () => {
+      livechatApi
+        .stats()
+        .then((s) => setLiveChatUnread(s.unread ?? 0))
+        .catch(() => undefined);
+      dashboardHelpdeskApi
+        .stats()
+        .then((s) => setHelpdeskOpen(Number(s.open_count ?? 0)))
+        .catch(() => undefined);
+    };
+    load();
+    const t = setInterval(load, 15000);
+    return () => clearInterval(t);
+  }, [user, isClientMode]);
 
   useEffect(() => {
     try {
@@ -149,6 +202,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           items={items}
           isClientMode={isClientMode}
           onToggleCollapsed={() => persistCollapsed(!collapsed)}
+          liveChatUnread={liveChatUnread}
+          helpdeskOpen={helpdeskOpen}
           pathname={pathname}
         />
       </aside>
@@ -182,10 +237,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="mx-auto max-w-6xl">
             <RoutePageHeader />
             {!isClientMode ? <HelpBotPanel /> : null}
+            {pathname.startsWith("/dashboard") ? <PwaInstallPrompt /> : null}
             {children}
           </div>
         </main>
         <BottomNav items={items} />
+        {pathname.startsWith("/dashboard") ? <VoiceCommand /> : null}
       </div>
     </div>
   );

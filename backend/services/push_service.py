@@ -7,15 +7,19 @@ import json
 import logging
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.database import db_manager
+
 logger = logging.getLogger(__name__)
 
 _DEFAULT_VAPID_EMAIL = "mailto:dev@nelvyon.com"
 _generated_vapid: dict[str, str] | None = None
+_SCHEMA_READY = False
 
 
 def _row_to_dict(row: Any) -> dict[str, Any]:
@@ -42,6 +46,26 @@ class PushService:
         self._mock = False
         self._vapid_ready = False
         self._init_attempted = False
+
+    @staticmethod
+    async def ensure_schema() -> None:
+        global _SCHEMA_READY
+        if _SCHEMA_READY:
+            return
+        if not db_manager.async_session_maker:
+            await db_manager.ensure_initialized()
+        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "push_subscriptions.sql"
+        if sql_path.exists() and db_manager.async_session_maker:
+            raw = sql_path.read_text(encoding="utf-8")
+            async with db_manager.async_session_maker() as session:
+                for stmt in [s.strip() for s in raw.split(";") if s.strip()]:
+                    try:
+                        await session.execute(text(stmt))
+                    except Exception as exc:
+                        if "already exists" not in str(exc).lower():
+                            logger.debug("push schema stmt skipped: %s", exc)
+                await session.commit()
+        _SCHEMA_READY = True
 
     @staticmethod
     def generate_vapid_keys() -> dict[str, str]:
@@ -371,6 +395,23 @@ class PushService:
             "failed": failed,
             "results": results,
         }
+
+    async def list_subscribers(self, *, limit: int = 200) -> list[dict[str, Any]]:
+        """List push subscribers for the workspace."""
+        await self.ensure_schema()
+        r = await self.session.execute(
+            text(
+                """
+                SELECT user_id, endpoint, user_agent, created_at, updated_at
+                FROM push_subscriptions
+                WHERE workspace_id = :ws
+                ORDER BY created_at DESC
+                LIMIT :limit
+                """
+            ),
+            {"ws": self.workspace_id, "limit": limit},
+        )
+        return [_row_to_dict(row) for row in r.fetchall()]
 
 
 def get_push_service(session: AsyncSession, workspace_id: int) -> PushService:

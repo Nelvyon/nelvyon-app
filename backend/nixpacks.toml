@@ -1,0 +1,12 @@
+# Alternativa a Dockerfile (Railway Nixpacks). Preferir backend/Dockerfile + railway.json en prod.
+[phases.setup]
+nixPkgs = ["python311"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"
+
+[variables]
+PORT = "8000"

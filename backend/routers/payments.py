@@ -319,3 +319,88 @@ async def get_active_subscription(
 async def get_plans():
     """Get all available plans with display pricing (Stripe Prices are configured via env)."""
     return build_plans_payload()
+
+
+class PaymentIntentRequest(BaseModel):
+    amount_cents: int = Field(..., gt=0)
+    currency: str = Field("eur", min_length=3, max_length=3)
+
+
+class RefundRequest(BaseModel):
+    charge_id: Optional[str] = None
+    payment_intent_id: Optional[str] = None
+    amount_cents: Optional[int] = Field(None, gt=0)
+
+
+@router.post("/intent")
+async def create_payment_intent(
+    body: PaymentIntentRequest,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_admin),
+    current_user: UserResponse = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a Stripe PaymentIntent for one-off workspace charges."""
+    assert ws_ctx.workspace_id is not None
+    customer_id = await _get_or_create_stripe_customer(db, ws_ctx.workspace_id, current_user.email)
+    payment_service = PaymentService()
+    try:
+        return await payment_service.create_payment_intent(
+            amount_cents=body.amount_cents,
+            currency=body.currency,
+            customer=customer_id,
+            metadata={"workspace_id": str(ws_ctx.workspace_id), "user_id": str(current_user.id)},
+        )
+    except CheckoutError as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e
+
+
+@router.get("/charges")
+async def list_charges(
+    limit: int = 25,
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    current_user: UserResponse = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List Stripe charges for the workspace customer."""
+    assert ws_ctx.workspace_id is not None
+    customer_id = await _get_or_create_stripe_customer(db, ws_ctx.workspace_id, current_user.email)
+    payment_service = PaymentService()
+    try:
+        return await payment_service.list_charges(customer=customer_id, limit=limit)
+    except CheckoutError as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e
+
+
+@router.post("/refund")
+async def refund_payment(
+    body: RefundRequest,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_admin),
+    _db: AsyncSession = Depends(get_db),
+):
+    """Refund a charge or payment intent."""
+    payment_service = PaymentService()
+    try:
+        return await payment_service.refund_payment(
+            charge_id=body.charge_id,
+            payment_intent_id=body.payment_intent_id,
+            amount_cents=body.amount_cents,
+        )
+    except CheckoutError as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e
+
+
+@router.get("/history")
+async def payment_history(
+    limit: int = 50,
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    current_user: UserResponse = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Payment history for the workspace Stripe customer."""
+    assert ws_ctx.workspace_id is not None
+    customer_id = await _get_or_create_stripe_customer(db, ws_ctx.workspace_id, current_user.email)
+    payment_service = PaymentService()
+    try:
+        return await payment_service.get_payment_history(customer=customer_id, limit=limit)
+    except CheckoutError as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e

@@ -12,11 +12,13 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.database import db_manager
 from services.ses_service import get_ses_service
 from services.supabase_service import get_supabase_service
 from services.webhook_service import schedule_webhook_event
@@ -28,6 +30,7 @@ INVOICE_STATUSES = frozenset({"draft", "sent", "paid", "cancelled"})
 DEFAULT_SERIES = "FAC"
 DEFAULT_IVA_RATE = Decimal("21.00")
 TWOPLACES = Decimal("0.01")
+_SCHEMA_READY = False
 
 
 def _json_dumps(value: Any) -> str:
@@ -81,6 +84,26 @@ class InvoiceService:
             raise ValueError("workspace_id is required")
         self.session = session
         self.workspace_id = int(workspace_id)
+
+    @staticmethod
+    async def ensure_schema() -> None:
+        global _SCHEMA_READY
+        if _SCHEMA_READY:
+            return
+        if not db_manager.async_session_maker:
+            await db_manager.ensure_initialized()
+        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "invoices.sql"
+        if sql_path.exists() and db_manager.async_session_maker:
+            raw = sql_path.read_text(encoding="utf-8")
+            async with db_manager.async_session_maker() as session:
+                for stmt in [s.strip() for s in raw.split(";") if s.strip()]:
+                    try:
+                        await session.execute(text(stmt))
+                    except Exception as exc:
+                        if "already exists" not in str(exc).lower():
+                            logger.debug("invoices schema stmt skipped: %s", exc)
+                await session.commit()
+        _SCHEMA_READY = True
 
     @staticmethod
     def _normalize_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:

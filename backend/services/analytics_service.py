@@ -440,3 +440,123 @@ def default_date_range(days: int = 30) -> tuple[str, str]:
     end = date.today()
     start = end - timedelta(days=max(1, days) - 1)
     return start.isoformat(), end.isoformat()
+
+
+async def get_workspace_metrics(session: Any, workspace_id: int) -> dict[str, Any]:
+    """Workspace-level KPIs from internal DB (DAU, MAU, revenue, churn, module usage)."""
+    from sqlalchemy import text
+
+    ws = int(workspace_id)
+    metrics: dict[str, Any] = {
+        "workspace_id": ws,
+        "dau": 0,
+        "mau": 0,
+        "revenue_eur": 0.0,
+        "churn_rate_pct": 0.0,
+        "modules_used": [],
+    }
+
+    async def _scalar(sql: str, params: dict[str, Any], default: Any = 0) -> Any:
+        try:
+            r = await session.execute(text(sql), params)
+            row = r.fetchone()
+            if row is None:
+                return default
+            val = row._mapping.get("v", row[0])
+            return val if val is not None else default
+        except Exception:
+            return default
+
+    metrics["dau"] = int(
+        await _scalar(
+            """
+            SELECT COUNT(DISTINCT user_id)::int AS v FROM audit_logs
+            WHERE tenant_id = :ws AND created_at >= NOW() - INTERVAL '1 day'
+            """,
+            {"ws": ws},
+        )
+    )
+    metrics["mau"] = int(
+        await _scalar(
+            """
+            SELECT COUNT(DISTINCT user_id)::int AS v FROM audit_logs
+            WHERE tenant_id = :ws AND created_at >= NOW() - INTERVAL '30 days'
+            """,
+            {"ws": ws},
+        )
+    )
+    if metrics["dau"] == 0:
+        metrics["dau"] = int(
+            await _scalar(
+                """
+                SELECT COUNT(DISTINCT created_by)::int AS v FROM crm_activities
+                WHERE workspace_id = :ws AND created_at >= NOW() - INTERVAL '1 day'
+                """,
+                {"ws": ws},
+            )
+        )
+    if metrics["mau"] == 0:
+        metrics["mau"] = int(
+            await _scalar(
+                """
+                SELECT COUNT(DISTINCT created_by)::int AS v FROM crm_activities
+                WHERE workspace_id = :ws AND created_at >= NOW() - INTERVAL '30 days'
+                """,
+                {"ws": ws},
+            )
+        )
+
+    metrics["revenue_eur"] = float(
+        await _scalar(
+            """
+            SELECT COALESCE(SUM(total_amount), 0)::float AS v FROM invoices
+            WHERE workspace_id = :ws AND status = 'paid'
+            """,
+            {"ws": ws},
+            default=0.0,
+        )
+    )
+
+    active_subs = int(
+        await _scalar(
+            "SELECT COUNT(*)::int AS v FROM subscriptions WHERE workspace_id = :ws AND status = 'active'",
+            {"ws": ws},
+        )
+    )
+    cancelled_subs = int(
+        await _scalar(
+            """
+            SELECT COUNT(*)::int AS v FROM subscriptions
+            WHERE workspace_id = :ws AND status IN ('cancelled', 'canceled', 'expired')
+            """,
+            {"ws": ws},
+        )
+    )
+    total_subs = active_subs + cancelled_subs
+    metrics["churn_rate_pct"] = round((cancelled_subs / total_subs * 100), 2) if total_subs > 0 else 0.0
+    metrics["active_subscriptions"] = active_subs
+
+    module_tables = [
+        ("crm", "crm_contacts"),
+        ("bookings", "bookings"),
+        ("campaigns", "campaigns"),
+        ("helpdesk", "tickets"),
+        ("forms", "forms"),
+        ("dialer", "dialer_calls"),
+        ("invoices", "invoices"),
+        ("webinars", "webinars"),
+        ("social", "social_posts"),
+    ]
+    modules: list[dict[str, Any]] = []
+    for mod, table in module_tables:
+        cnt = int(
+            await _scalar(
+                f"SELECT COUNT(*)::int AS v FROM {table} WHERE workspace_id = :ws",
+                {"ws": ws},
+            )
+        )
+        if cnt > 0:
+            modules.append({"module": mod, "records": cnt})
+    modules.sort(key=lambda x: x["records"], reverse=True)
+    metrics["modules_used"] = modules
+    return metrics

@@ -12,6 +12,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import db_manager
+from services.tenant_service import TenantService
 
 logger = logging.getLogger(__name__)
 
@@ -38,11 +39,16 @@ class GDPRService:
         self.session = session
         self.workspace_id = int(workspace_id)
 
+    @property
+    def tenant_id(self) -> int:
+        return self.workspace_id
+
     @staticmethod
     async def ensure_schema() -> None:
         global _GDPR_SCHEMA_READY
         if _GDPR_SCHEMA_READY:
             return
+        await TenantService.ensure_schema()
         if not db_manager.async_session_maker:
             await db_manager.ensure_initialized()
         sql_path = Path(__file__).resolve().parent.parent / "migrations" / "gdpr.sql"
@@ -571,6 +577,216 @@ class GDPRService:
                 await self.session.execute(text(stmt), params)
             except Exception as exc:
                 logger.debug("purge stmt skipped: %s", exc)
+
+    async def consent_record(
+        self,
+        tenant_id: int,
+        user_id: str,
+        consent_type: str,
+        granted: bool,
+        *,
+        ip_address: str | None = None,
+    ) -> dict[str, Any]:
+        """Immutable consent log (append-only gdpr_user_consents)."""
+        await self.ensure_schema()
+        await TenantService(self.session).set_tenant_context(tenant_id)
+        r = await self.session.execute(
+            text(
+                """
+                INSERT INTO gdpr_user_consents (
+                    tenant_id, user_id, consent_type, granted, ip_address
+                )
+                VALUES (:tid, :uid, :ctype, :granted, :ip)
+                RETURNING id, tenant_id, user_id, consent_type, granted, granted_at, ip_address
+                """
+            ),
+            {
+                "tid": int(tenant_id),
+                "uid": user_id,
+                "ctype": consent_type,
+                "granted": granted,
+                "ip": ip_address,
+            },
+        )
+        await self.session.commit()
+        row = r.fetchone()
+        return dict(row._mapping) if row else {}
+
+    async def get_active_consents(
+        self,
+        tenant_id: int,
+        user_id: str,
+    ) -> dict[str, Any]:
+        """Latest consent state per consent_type for a user."""
+        await self.ensure_schema()
+        await TenantService(self.session).set_tenant_context(tenant_id)
+        r = await self.session.execute(
+            text(
+                """
+                SELECT DISTINCT ON (consent_type)
+                    consent_type, granted, granted_at, ip_address
+                FROM gdpr_user_consents
+                WHERE tenant_id = :tid AND user_id = :uid
+                ORDER BY consent_type, granted_at DESC
+                """
+            ),
+            {"tid": int(tenant_id), "uid": user_id},
+        )
+        consents = {
+            row._mapping["consent_type"]: {
+                "granted": row._mapping["granted"],
+                "granted_at": row._mapping["granted_at"],
+                "ip_address": row._mapping.get("ip_address"),
+            }
+            for row in r.fetchall()
+        }
+        return {"tenant_id": tenant_id, "user_id": user_id, "consents": consents}
+
+    def get_data_map(self, tenant_id: int) -> dict[str, Any]:
+        """Map of stored data categories and legal bases."""
+        return {
+            "tenant_id": tenant_id,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "categories": [
+                {
+                    "name": "identity",
+                    "tables": ["users", "workspace_members"],
+                    "fields": ["email", "name", "role"],
+                    "legal_basis": "contract",
+                    "retention": "account lifetime + 30 days",
+                },
+                {
+                    "name": "crm",
+                    "tables": ["crm_contacts", "crm_deals", "crm_activities"],
+                    "fields": ["name", "email", "phone", "company", "notes"],
+                    "legal_basis": "legitimate_interest",
+                    "retention": "until deletion request",
+                },
+                {
+                    "name": "marketing",
+                    "tables": ["campaigns", "campaign_recipients"],
+                    "fields": ["email", "engagement metrics"],
+                    "legal_basis": "consent",
+                    "retention": "24 months",
+                },
+                {
+                    "name": "billing",
+                    "tables": ["invoices"],
+                    "fields": ["client_name", "client_email", "client_nif", "totals"],
+                    "legal_basis": "legal_obligation",
+                    "retention": "7 years (tax)",
+                },
+                {
+                    "name": "support",
+                    "tables": ["tickets", "ticket_messages"],
+                    "fields": ["email", "message content"],
+                    "legal_basis": "contract",
+                    "retention": "36 months",
+                },
+                {
+                    "name": "bookings",
+                    "tables": ["bookings"],
+                    "fields": ["client_name", "client_email", "client_phone"],
+                    "legal_basis": "contract",
+                    "retention": "24 months",
+                },
+                {
+                    "name": "consent",
+                    "tables": ["gdpr_user_consents", "consent_records"],
+                    "fields": ["consent_type", "granted", "ip_address", "timestamp"],
+                    "legal_basis": "legal_obligation",
+                    "retention": "5 years",
+                },
+                {
+                    "name": "audit",
+                    "tables": ["audit_logs"],
+                    "fields": ["action", "resource_type", "ip_address"],
+                    "legal_basis": "legal_obligation",
+                    "retention": "7 years",
+                },
+            ],
+        }
+
+    async def generate_dpa(
+        self,
+        tenant_id: int,
+        *,
+        accepted_by: str | None = None,
+        workspace_name: str | None = None,
+    ) -> tuple[bytes, dict[str, Any]]:
+        """Generate Data Processing Agreement PDF for the tenant."""
+        await self.ensure_schema()
+        from io import BytesIO
+
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.lib.units import cm
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+        tenant_label = workspace_name or f"Workspace {tenant_id}"
+        version = "1.0"
+        content_text = (
+            f"Data Processing Agreement between NELVYON (Processor) and {tenant_label} (Controller). "
+            f"Tenant ID: {tenant_id}. Processing covers CRM, campaigns, billing, support and analytics "
+            f"data stored in EU-region infrastructure. Sub-processors include Supabase (PostgreSQL), "
+            f"Upstash (Redis), Stripe (payments), and OpenAI (optional AI features). "
+            f"Security measures: encryption in transit, tenant isolation via RLS, immutable audit logs."
+        )
+
+        dpa_id = str(uuid.uuid4())
+        await TenantService(self.session).set_tenant_context(tenant_id)
+        await self.session.execute(
+            text(
+                """
+                INSERT INTO data_processing_agreements (
+                    id, tenant_id, version, content, accepted_at, accepted_by
+                )
+                VALUES (
+                    :id, :tid, :version, :content,
+                    CASE WHEN :accepted_by IS NOT NULL THEN NOW() ELSE NULL END,
+                    :accepted_by
+                )
+                """
+            ),
+            {
+                "id": dpa_id,
+                "tid": tenant_id,
+                "version": version,
+                "content": content_text,
+                "accepted_by": accepted_by,
+            },
+        )
+        await self.session.commit()
+
+        buffer = BytesIO()
+        styles = getSampleStyleSheet()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2 * cm, leftMargin=2 * cm)
+        story = [
+            Paragraph("NELVYON — Data Processing Agreement", styles["Title"]),
+            Spacer(1, 12),
+            Paragraph(f"<b>Controller:</b> {tenant_label}", styles["Normal"]),
+            Paragraph(f"<b>Tenant ID:</b> {tenant_id}", styles["Normal"]),
+            Paragraph(f"<b>Version:</b> {version}", styles["Normal"]),
+            Spacer(1, 12),
+            Paragraph(content_text.replace("\n", "<br/>"), styles["Normal"]),
+        ]
+        if accepted_by:
+            story.append(Spacer(1, 24))
+            story.append(Paragraph(f"<b>Accepted by:</b> {accepted_by}", styles["Normal"]))
+            story.append(
+                Paragraph(
+                    f"<b>Date:</b> {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
+                    styles["Normal"],
+                )
+            )
+        doc.build(story)
+        meta = {
+            "dpa_id": dpa_id,
+            "tenant_id": tenant_id,
+            "version": version,
+            "accepted_by": accepted_by,
+        }
+        return buffer.getvalue(), meta
 
 
 def get_gdpr_service(session: AsyncSession, workspace_id: int) -> GDPRService:

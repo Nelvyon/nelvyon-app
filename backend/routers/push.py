@@ -143,3 +143,14 @@ async def broadcast_push(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Failed to broadcast push notifications",
         ) from e
+
+
+@router.get("/subscribers")
+async def list_subscribers(
+    limit: int = 200,
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """List Web Push subscribers in the workspace."""
+    svc = _svc(db, ws_ctx)
+    return {"subscribers": await svc.list_subscribers(limit=min(limit, 500))}

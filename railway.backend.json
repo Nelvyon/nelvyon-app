@@ -1,0 +1,18 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "$comment": "Monorepo API service: Config file path /backend/railway.json OR use this file with Root Directory backend",
+  "rootDirectory": "backend",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile",
+    "buildCommand": null,
+    "watchPatterns": ["backend/**"]
+  },
+  "deploy": {
+    "startCommand": "uvicorn main:app --host 0.0.0.0 --port 8000",
+    "restartPolicyType": "ON_FAILURE",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 120,
+    "port": 8000
+  }
+}

@@ -7,15 +7,19 @@ import logging
 import os
 import re
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.database import db_manager
 from services.ses_service import get_ses_service
 from services.whatsapp_service import get_whatsapp_service
 
 logger = logging.getLogger(__name__)
+
+_SCHEMA_READY = False
 
 TICKET_STATUSES = frozenset({"open", "pending", "resolved", "closed"})
 TICKET_PRIORITIES = frozenset({"low", "medium", "high", "urgent"})
@@ -69,6 +73,26 @@ class HelpdeskService:
             raise ValueError("workspace_id is required")
         self.session = session
         self.workspace_id = int(workspace_id)
+
+    @staticmethod
+    async def ensure_schema() -> None:
+        global _SCHEMA_READY
+        if _SCHEMA_READY:
+            return
+        if not db_manager.async_session_maker:
+            await db_manager.ensure_initialized()
+        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "helpdesk.sql"
+        if sql_path.exists() and db_manager.async_session_maker:
+            raw = sql_path.read_text(encoding="utf-8")
+            async with db_manager.async_session_maker() as session:
+                for stmt in [s.strip() for s in raw.split(";") if s.strip()]:
+                    try:
+                        await session.execute(text(stmt))
+                    except Exception as exc:
+                        if "already exists" not in str(exc).lower():
+                            logger.debug("helpdesk schema stmt skipped: %s", exc)
+                await session.commit()
+        _SCHEMA_READY = True
 
     async def _resolve_contact_id(
         self, contact_data: dict[str, Any] | None, *, email: str | None = None, phone: str | None = None
@@ -573,6 +597,26 @@ class HelpdeskService:
         resolved = int(m.get("resolved_count") or 0) + int(m.get("closed_count") or 0)
         resolved_rate = round((resolved / total * 100), 2) if total > 0 else 0.0
 
+        sla = await self.session.execute(
+            text(
+                """
+                SELECT
+                    COUNT(*) FILTER (
+                        WHERE EXTRACT(EPOCH FROM (resolved_at - created_at)) / 3600.0 <= 24
+                    ) AS within_sla,
+                    COUNT(*) FILTER (WHERE resolved_at IS NOT NULL) AS resolved_with_time
+                FROM tickets
+                WHERE workspace_id = :workspace_id AND status IN ('resolved', 'closed')
+                """
+            ),
+            {"workspace_id": self.workspace_id},
+        )
+        sla_row = sla.fetchone()
+        sla_m = sla_row._mapping if sla_row else {}
+        resolved_with_time = int(sla_m.get("resolved_with_time") or 0)
+        within_sla = int(sla_m.get("within_sla") or 0)
+        sla_pct = round(within_sla / resolved_with_time * 100, 2) if resolved_with_time else 0.0
+
         return {
             "workspace_id": self.workspace_id,
             "open_count": int(m.get("open_count") or 0),
@@ -582,7 +626,53 @@ class HelpdeskService:
             "total_count": total,
             "avg_first_response_minutes": round(avg_minutes, 2),
             "resolved_rate": resolved_rate,
+            "sla_compliance_pct": sla_pct,
+            "sla_target_hours": 24,
         }
+
+    async def get_agents(self) -> list[dict[str, Any]]:
+        """Agents with assigned ticket counts."""
+        r = await self.session.execute(
+            text(
+                """
+                SELECT assigned_to AS user_id,
+                       COUNT(*) AS ticket_count,
+                       COUNT(*) FILTER (WHERE status = 'open') AS open_count
+                FROM tickets
+                WHERE workspace_id = :workspace_id AND assigned_to IS NOT NULL
+                GROUP BY assigned_to
+                ORDER BY ticket_count DESC
+                """
+            ),
+            {"workspace_id": self.workspace_id},
+        )
+        return [
+            {
+                "user_id": row._mapping["user_id"],
+                "ticket_count": int(row._mapping["ticket_count"]),
+                "open_count": int(row._mapping["open_count"]),
+            }
+            for row in r.fetchall()
+        ]
+
+    async def get_categories(self) -> list[dict[str, Any]]:
+        """Ticket counts grouped by channel (category proxy)."""
+        r = await self.session.execute(
+            text(
+                """
+                SELECT channel, COUNT(*) AS count
+                FROM tickets
+                WHERE workspace_id = :workspace_id
+                GROUP BY channel
+                ORDER BY count DESC
+                """
+            ),
+            {"workspace_id": self.workspace_id},
+        )
+        return [
+            {"category": row._mapping["channel"], "count": int(row._mapping["count"])}
+            for row in r.fetchall()
+        ]
 
 
 def get_helpdesk_service(session: AsyncSession, workspace_id: int) -> HelpdeskService:

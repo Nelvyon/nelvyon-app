@@ -4,13 +4,25 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { CancelSubscriptionFlow } from "@/components/dashboard/CancelSubscriptionFlow";
 import { ChangePlanFlow } from "@/components/dashboard/ChangePlanFlow";
 import { PaymentMethodCard } from "@/components/dashboard/PaymentMethodCard";
-import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
+import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { Button } from "@/core/ui/button";
+import { dashboardSettingsApi } from "@/features/dashboard/api";
+import { DashboardTabs } from "@/features/dashboard/components/DashboardTabs";
 
 const DELETE_CONFIRM_PHRASE = "ELIMINAR MI CUENTA";
+
+const TABS = [
+  { id: "general", label: "General" },
+  { id: "whitelabel", label: "White-label" },
+  { id: "apikeys", label: "API Keys" },
+  { id: "equipo", label: "Equipo" },
+  { id: "facturacion", label: "Facturación" },
+  { id: "gdpr", label: "GDPR" },
+  { id: "push", label: "Notificaciones Push" },
+];
 
 type CancellationStatus = {
   isCancelling: boolean;
@@ -22,10 +34,18 @@ type CancellationStatus = {
 
 export default function DashboardSettingsPage() {
   const router = useRouter();
+  const [tab, setTab] = useState("general");
+  const [workspaceName, setWorkspaceName] = useState("");
+  const [language, setLanguage] = useState("es");
+  const [brandDomain, setBrandDomain] = useState("");
+  const [brandColor, setBrandColor] = useState("#6366f1");
+  const [apiKeys, setApiKeys] = useState<Record<string, unknown>[]>([]);
+  const [newKeyName, setNewKeyName] = useState("");
+  const [gdprItems, setGdprItems] = useState<unknown[]>([]);
+  const [pushEnabled, setPushEnabled] = useState(true);
   const [status, setStatus] = useState<CancellationStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
-
   const [exportBusy, setExportBusy] = useState(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -35,13 +55,8 @@ export default function DashboardSettingsPage() {
 
   const loadStatus = useCallback(async () => {
     try {
-      const res = await fetch("/api/user/cancellation-status", {
-        credentials: "same-origin",
-        cache: "no-store",
-      });
-      if (!res.ok) return;
-      const body = (await res.json()) as CancellationStatus;
-      setStatus(body);
+      const res = await fetch("/api/user/cancellation-status", { credentials: "same-origin", cache: "no-store" });
+      if (res.ok) setStatus((await res.json()) as CancellationStatus);
     } finally {
       setLoading(false);
     }
@@ -51,51 +66,49 @@ export default function DashboardSettingsPage() {
     void loadStatus();
   }, [loadStatus]);
 
-  const plan = status?.plan ?? "free";
-  const showCancelButton = !loading && plan !== "free" && !status?.isCancelling;
-  const showChangePlan = Boolean(status?.canChangePlan) && plan !== "free";
+  useEffect(() => {
+    if (tab === "apikeys") {
+      dashboardSettingsApi.apiKeys().then((r) => setApiKeys(r.api_keys ?? [])).catch(() => setApiKeys([]));
+    }
+    if (tab === "gdpr") {
+      dashboardSettingsApi.gdprRequests().then((r) => setGdprItems(r.items ?? [])).catch(() => setGdprItems([]));
+    }
+  }, [tab]);
 
-  const handleExport = async () => {
+  const plan = status?.plan ?? "free";
+
+  async function createApiKey() {
+    if (!newKeyName.trim()) return;
+    await dashboardSettingsApi.createApiKey(newKeyName, ["read", "write"]);
+    setNewKeyName("");
+    const r = await dashboardSettingsApi.apiKeys();
+    setApiKeys(r.api_keys ?? []);
+  }
+
+  async function handleExport() {
     setExportBusy(true);
     setExportMessage(null);
     try {
-      const res = await fetch("/api/user/export-data", {
-        method: "POST",
-        credentials: "same-origin",
-      });
-      if (res.status === 429) {
-        const j = (await res.json()) as { message?: string };
-        setExportMessage(j.message ?? "Espera 24 h entre exportaciones.");
-        return;
-      }
+      const res = await fetch("/api/user/export-data", { method: "POST", credentials: "same-origin" });
       if (!res.ok) {
-        setExportMessage("No se pudo generar la exportación. Inténtalo más tarde.");
+        setExportMessage("No se pudo generar la exportación.");
         return;
       }
       const blob = await res.blob();
-      const disposition = res.headers.get("Content-Disposition");
-      let filename = "nelvyon-datos.json";
-      const m = disposition?.match(/filename="([^"]+)"/);
-      if (m?.[1]) filename = m[1];
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
+      a.download = "nelvyon-datos.json";
       a.click();
-      a.remove();
       URL.revokeObjectURL(url);
-      setExportMessage("Descarga iniciada. Revisa también tu email de confirmación.");
-    } catch {
-      setExportMessage("Error de red al exportar.");
+      setExportMessage("Descarga iniciada.");
     } finally {
       setExportBusy(false);
     }
-  };
+  }
 
-  const handleDeleteAccount = async () => {
+  async function handleDeleteAccount() {
     setDeleteBusy(true);
-    setDeleteMessage(null);
     try {
       const res = await fetch("/api/user/delete-account", {
         method: "POST",
@@ -103,165 +116,157 @@ export default function DashboardSettingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ confirmation: deleteConfirmText.trim() }),
       });
-      const body = (await res.json()) as { error?: string; message?: string };
       if (!res.ok) {
-        setDeleteMessage(body.message ?? body.error ?? "No se pudo eliminar la cuenta.");
+        setDeleteMessage("No se pudo eliminar la cuenta.");
         return;
       }
       router.push("/goodbye");
-    } catch {
-      setDeleteMessage("Error de red. Inténtalo de nuevo.");
     } finally {
       setDeleteBusy(false);
     }
-  };
+  }
 
   return (
-    <DashboardLayout>
-      <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
-        <NelvyonDsSectionHeader
-          eyebrow="Cuenta"
-          title="Suscripción y facturación"
-          subtitle="Gestiona tu plan, cancelación y acceso a NELVYON."
-        />
+    <ProtectedLayout module="settings">
+      <div className="mx-auto max-w-3xl space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Configuración</h1>
+          <p className="text-sm text-muted-foreground">Workspace, equipo, facturación y privacidad</p>
+        </div>
 
-        <NelvyonDsCard title="Tu plan actual">
-          {loading ? (
-            <p className="text-sm text-muted-foreground">Cargando…</p>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Plan actual:{" "}
-                <span className="font-semibold capitalize text-foreground">{plan}</span>
-              </p>
-              {status?.isCancelling && status.periodEnd ? (
-                <p className="text-sm text-amber-700 dark:text-amber-200">
-                  Cancelación programada para el{" "}
-                  {new Date(status.periodEnd).toLocaleDateString("es-ES", { dateStyle: "long" })}.
-                  Quedan {status.daysLeft} días de acceso completo.
-                </p>
-              ) : null}
-              {showCancelButton ? (
-                <NelvyonDsButton variant="secondary" onClick={() => setCancelModalOpen(true)}>
-                  Cancelar suscripción
-                </NelvyonDsButton>
-              ) : null}
-              {plan === "free" ? (
-                <NelvyonDsButton asChild>
-                  <Link href="/pricing">Ver planes</Link>
-                </NelvyonDsButton>
-              ) : null}
-            </div>
-          )}
-        </NelvyonDsCard>
+        <DashboardTabs active={tab} onChange={setTab} tabs={TABS} />
 
-        {showChangePlan ? (
-          <>
-            <NelvyonDsSectionHeader
-              eyebrow="Plan"
-              title="Tu plan"
-              subtitle="Cambia de plan cuando lo necesites; Paddle aplica la prorrata automáticamente."
-            />
-            <ChangePlanFlow currentPlan={plan} onChanged={() => void loadStatus()} />
-          </>
-        ) : null}
-
-        <NelvyonDsSectionHeader
-          eyebrow="Facturación"
-          title="Método de pago"
-          subtitle="Actualiza tu tarjeta de forma segura en el portal de Paddle."
-        />
-        <PaymentMethodCard />
-
-        <NelvyonDsSectionHeader
-          eyebrow="Privacidad"
-          title="Mis datos"
-          subtitle="Ejercita tus derechos de acceso, portabilidad y supresión (RGPD)."
-        />
-
-        <NelvyonDsCard title="Copia portátil">
-          <p className="text-sm text-muted-foreground">
-            Descarga todos los datos asociados a tu cuenta en JSON. Máximo una exportación cada 24 horas.
-          </p>
-          {exportMessage ? <p className="mt-3 text-sm text-foreground">{exportMessage}</p> : null}
-          <NelvyonDsButton className="mt-4" onClick={() => void handleExport()} disabled={exportBusy}>
-            {exportBusy ? "Generando archivo…" : "Exportar mis datos"}
-          </NelvyonDsButton>
-        </NelvyonDsCard>
-
-        <NelvyonDsCard title="Eliminar cuenta">
-          <p className="text-sm text-muted-foreground">
-            Tu perfil se anonimizará de inmediato. Los registros relativos a facturación pueden conservarse el plazo
-            legal. Los resultados de agentes pueden permanecer retenidos hasta 30 días antes de borrado definitivo de
-            copias procesables.
-          </p>
-          <NelvyonDsButton variant="secondary" className="mt-4 border-rose-500/40 text-rose-600 hover:bg-rose-500/10 dark:text-rose-400" onClick={() => { setDeleteModalOpen(true); setDeleteConfirmText(""); setDeleteMessage(null); }}>
-            Eliminar mi cuenta
-          </NelvyonDsButton>
-        </NelvyonDsCard>
-
-        {cancelModalOpen ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-            <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-xl">
-              <CancelSubscriptionFlow
-                plan={plan}
-                onClose={() => {
-                  setCancelModalOpen(false);
-                  void loadStatus();
-                }}
-                onCompleted={() => void loadStatus()}
-              />
-            </div>
+        {tab === "general" ? (
+          <div className="space-y-4 rounded-xl border p-4">
+            <label className="block text-sm">
+              Nombre del workspace
+              <input className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(e) => setWorkspaceName(e.target.value)} value={workspaceName} />
+            </label>
+            <label className="block text-sm">
+              Idioma
+              <select className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(e) => setLanguage(e.target.value)} value={language}>
+                <option value="es">Español</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+            <Button>Guardar cambios</Button>
           </div>
         ) : null}
 
-        {deleteModalOpen ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-xl border border-zinc-800 bg-card p-6 shadow-xl">
-              <h2 className="text-lg font-semibold text-foreground">Eliminar cuenta permanentemente</h2>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Perderás el acceso al dashboard y a tus proyectos guardados como usuario activo.{" "}
-                <strong>No podremos eliminar de inmediato</strong> los datos necesarios por obligaciones fiscales u
-                otras obligaciones legales (historial de suscripción y pagos relacionados pueden conservarse en bloque).
-              </p>
-              <label className="mt-4 flex flex-col gap-2">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Escribe exactamente{" "}
-                  <span className="font-mono text-foreground">{DELETE_CONFIRM_PHRASE}</span> para confirmar:
-                </span>
-                <input
-                  type="text"
-                  className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  value={deleteConfirmText}
-                  onChange={(e) => setDeleteConfirmText(e.target.value)}
-                  autoComplete="off"
-                />
-              </label>
-              {deleteMessage ? <p className="mt-3 text-sm text-rose-500">{deleteMessage}</p> : null}
-              <div className="mt-6 flex flex-wrap justify-end gap-2">
-                <NelvyonDsButton
-                  variant="secondary"
-                  onClick={() => {
-                    setDeleteModalOpen(false);
-                    setDeleteConfirmText("");
-                    setDeleteMessage(null);
-                  }}
-                >
-                  Cancelar
-                </NelvyonDsButton>
-                <button
-                  type="button"
-                  disabled={deleteBusy || deleteConfirmText.trim() !== DELETE_CONFIRM_PHRASE}
-                  className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-rose-500 disabled:opacity-60"
-                  onClick={() => void handleDeleteAccount()}
-                >
-                  {deleteBusy ? "Eliminando…" : "Eliminar cuenta permanentemente"}
-                </button>
-              </div>
+        {tab === "whitelabel" ? (
+          <div className="space-y-4 rounded-xl border p-4">
+            <label className="block text-sm">
+              Dominio personalizado
+              <input className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(e) => setBrandDomain(e.target.value)} placeholder="app.tuempresa.com" value={brandDomain} />
+            </label>
+            <label className="block text-sm">
+              Color principal
+              <input className="mt-1 h-10 w-full rounded-lg border" onChange={(e) => setBrandColor(e.target.value)} type="color" value={brandColor} />
+            </label>
+            <Button>Guardar white-label</Button>
+          </div>
+        ) : null}
+
+        {tab === "apikeys" ? (
+          <div className="space-y-4 rounded-xl border p-4">
+            <div className="flex gap-2">
+              <input className="flex-1 rounded-lg border px-3 py-2" onChange={(e) => setNewKeyName(e.target.value)} placeholder="Nombre de la key" value={newKeyName} />
+              <Button onClick={createApiKey}>Crear</Button>
             </div>
+            <ul className="space-y-2 text-sm">
+              {apiKeys.map((k) => (
+                <li className="flex items-center justify-between rounded border px-3 py-2" key={String(k.id)}>
+                  <span>{String(k.name ?? k.id)}</span>
+                  <Button onClick={() => dashboardSettingsApi.revokeApiKey(String(k.id)).then(() => dashboardSettingsApi.apiKeys().then((r) => setApiKeys(r.api_keys ?? [])))} size="sm" variant="outline">
+                    Revocar
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {tab === "equipo" ? (
+          <div className="rounded-xl border p-4 text-sm text-muted-foreground">
+            Invitaciones de equipo disponibles para administradores. Por ahora solo el admin del workspace tiene acceso completo.
+          </div>
+        ) : null}
+
+        {tab === "facturacion" ? (
+          <div className="space-y-6">
+            <div className="rounded-xl border p-4">
+              <p className="text-sm">
+                Plan actual: <span className="font-semibold capitalize">{loading ? "…" : plan}</span>
+              </p>
+              {status?.isCancelling && status.periodEnd ? (
+                <p className="mt-2 text-sm text-amber-700">Cancelación programada — {status.daysLeft} días restantes.</p>
+              ) : null}
+              {plan !== "free" && !status?.isCancelling ? (
+                <Button className="mt-4" onClick={() => setCancelModalOpen(true)} variant="outline">
+                  Cancelar suscripción
+                </Button>
+              ) : null}
+              {plan === "free" ? (
+                <Button asChild className="mt-4">
+                  <Link href="/pricing">Ver planes</Link>
+                </Button>
+              ) : null}
+            </div>
+            {status?.canChangePlan && plan !== "free" ? <ChangePlanFlow currentPlan={plan} onChanged={() => void loadStatus()} /> : null}
+            <PaymentMethodCard />
+          </div>
+        ) : null}
+
+        {tab === "gdpr" ? (
+          <div className="space-y-4 rounded-xl border p-4">
+            <p className="text-sm text-muted-foreground">Exporta o elimina datos según RGPD.</p>
+            <Button disabled={exportBusy} onClick={handleExport}>
+              {exportBusy ? "Generando…" : "Exportar mis datos"}
+            </Button>
+            {exportMessage ? <p className="text-sm">{exportMessage}</p> : null}
+            <Button onClick={() => setDeleteModalOpen(true)} variant="outline">
+              Eliminar cuenta
+            </Button>
+            {gdprItems.length ? (
+              <pre className="max-h-40 overflow-auto text-xs">{JSON.stringify(gdprItems, null, 2)}</pre>
+            ) : null}
+          </div>
+        ) : null}
+
+        {tab === "push" ? (
+          <div className="rounded-xl border p-4">
+            <label className="flex items-center gap-2 text-sm">
+              <input checked={pushEnabled} onChange={(e) => setPushEnabled(e.target.checked)} type="checkbox" />
+              Activar notificaciones push del workspace
+            </label>
           </div>
         ) : null}
       </div>
-    </DashboardLayout>
+
+      {cancelModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border bg-card p-6">
+            <CancelSubscriptionFlow onClose={() => { setCancelModalOpen(false); void loadStatus(); }} onCompleted={() => void loadStatus()} plan={plan} />
+          </div>
+        </div>
+      ) : null}
+
+      {deleteModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-xl border bg-card p-6">
+            <h2 className="text-lg font-semibold">Eliminar cuenta</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Escribe {DELETE_CONFIRM_PHRASE} para confirmar.</p>
+            <input className="mt-4 w-full rounded-lg border px-3 py-2" onChange={(e) => setDeleteConfirmText(e.target.value)} value={deleteConfirmText} />
+            {deleteMessage ? <p className="mt-2 text-sm text-destructive">{deleteMessage}</p> : null}
+            <div className="mt-4 flex justify-end gap-2">
+              <Button onClick={() => setDeleteModalOpen(false)} variant="outline">Cancelar</Button>
+              <Button disabled={deleteBusy || deleteConfirmText.trim() !== DELETE_CONFIRM_PHRASE} onClick={handleDeleteAccount}>
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </ProtectedLayout>
   );
 }

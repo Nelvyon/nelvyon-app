@@ -475,7 +475,12 @@ def schedule_webhook_event(
         loop = asyncio.get_running_loop()
         loop.create_task(emit_webhook_event(workspace_id, event, payload))
     except RuntimeError:
-        pass
+        import threading
+
+        def _run() -> None:
+            asyncio.run(emit_webhook_event(workspace_id, event, payload))
+
+        threading.Thread(target=_run, daemon=True).start()
 
 
 def get_webhook_service(session: AsyncSession, workspace_id: int) -> WebhookService:

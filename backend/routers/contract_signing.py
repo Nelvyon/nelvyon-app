@@ -14,7 +14,7 @@ Provides:
 import logging
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -113,6 +113,7 @@ async def prepare_for_signing(
 @router.post("/sign", response_model=SigningResponse)
 async def sign_contract(
     data: SignRequest,
+    request: Request,
     current_user: UserResponse = Depends(get_current_user),
     ctx: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
@@ -124,6 +125,17 @@ async def sign_contract(
             data.contract_id, str(current_user.id),
             data.signer_name, data.signer_email,
             workspace_id=ctx.workspace_id,
+        )
+        from services.audit_service import log_critical_audit
+
+        await log_critical_audit(
+            db,
+            tenant_id=int(ctx.workspace_id),
+            user_id=str(current_user.id),
+            action="signed",
+            resource_type="contract",
+            resource_id=str(data.contract_id),
+            ip_address=request.client.host if request.client else None,
         )
         return SigningResponse(**result)
     except ValueError as e:

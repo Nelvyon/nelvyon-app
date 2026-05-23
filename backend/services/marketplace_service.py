@@ -343,6 +343,130 @@ class MarketplaceService:
             "candidates_evaluated": len(catalog),
         }
 
+    async def list_items(
+        self,
+        *,
+        category: str | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        await self.ensure_schema()
+        q = """
+            SELECT id::text AS id, seller_workspace_id, title, description, price, currency,
+                   category, active, rating, reviews_count, created_at
+            FROM marketplace_items
+            WHERE active = TRUE
+        """
+        params: dict[str, Any] = {"limit": limit, "offset": offset}
+        if category:
+            q += " AND category = :category"
+            params["category"] = category
+        q += " ORDER BY rating DESC, created_at DESC LIMIT :limit OFFSET :offset"
+        r = await self.session.execute(text(q), params)
+        return [_row(x) for x in r.fetchall()]
+
+    async def purchase_item(self, item_id: str, buyer_workspace_id: int) -> dict[str, Any]:
+        await self.ensure_schema()
+        r = await self.session.execute(
+            text("SELECT * FROM marketplace_items WHERE id = :id::uuid AND active = TRUE"),
+            {"id": item_id},
+        )
+        item = _row(r.fetchone())
+        if not item:
+            raise ValueError("Item not found")
+        if int(item.get("seller_workspace_id") or 0) == int(buyer_workspace_id):
+            raise ValueError("Cannot purchase your own item")
+        purchase_id = str(uuid.uuid4())
+        amount = Decimal(str(item.get("price") or 0)).quantize(Decimal("0.01"))
+        await self.session.execute(
+            text(
+                """
+                INSERT INTO marketplace_purchases (id, item_id, buyer_workspace_id, amount, currency, status)
+                VALUES (:id, :item_id::uuid, :buyer, :amount, :currency, 'completed')
+                """
+            ),
+            {
+                "id": purchase_id,
+                "item_id": item_id,
+                "buyer": buyer_workspace_id,
+                "amount": amount,
+                "currency": item.get("currency") or "eur",
+            },
+        )
+        await self.session.commit()
+        return {
+            "purchase_id": purchase_id,
+            "item_id": item_id,
+            "amount": float(amount),
+            "currency": item.get("currency") or "eur",
+            "status": "completed",
+        }
+
+    async def list_my_purchases(self, buyer_workspace_id: int, *, limit: int = 50) -> list[dict[str, Any]]:
+        await self.ensure_schema()
+        r = await self.session.execute(
+            text(
+                """
+                SELECT p.id::text AS purchase_id, p.item_id::text AS item_id, p.amount, p.currency,
+                       p.status, p.created_at, i.title, i.description
+                FROM marketplace_purchases p
+                JOIN marketplace_items i ON i.id = p.item_id
+                WHERE p.buyer_workspace_id = :buyer
+                ORDER BY p.created_at DESC
+                LIMIT :limit
+                """
+            ),
+            {"buyer": buyer_workspace_id, "limit": limit},
+        )
+        return [_row(x) for x in r.fetchall()]
+
+    async def rate_item(
+        self,
+        item_id: str,
+        reviewer_workspace_id: int,
+        rating: int,
+        review: str | None = None,
+    ) -> dict[str, Any]:
+        await self.ensure_schema()
+        if rating < 1 or rating > 5:
+            raise ValueError("Rating must be 1-5")
+        review_id = str(uuid.uuid4())
+        await self.session.execute(
+            text(
+                """
+                INSERT INTO marketplace_item_reviews (id, item_id, reviewer_workspace_id, rating, review)
+                VALUES (:id, :item_id::uuid, :reviewer, :rating, :review)
+                ON CONFLICT (item_id, reviewer_workspace_id) DO UPDATE
+                SET rating = EXCLUDED.rating, review = EXCLUDED.review
+                """
+            ),
+            {
+                "id": review_id,
+                "item_id": item_id,
+                "reviewer": reviewer_workspace_id,
+                "rating": rating,
+                "review": review,
+            },
+        )
+        await self.session.execute(
+            text(
+                """
+                UPDATE marketplace_items
+                SET rating = (
+                    SELECT ROUND(AVG(rating)::numeric, 2) FROM marketplace_item_reviews WHERE item_id = :item_id::uuid
+                ),
+                reviews_count = (
+                    SELECT COUNT(*) FROM marketplace_item_reviews WHERE item_id = :item_id::uuid
+                ),
+                updated_at = NOW()
+                WHERE id = :item_id::uuid
+                """
+            ),
+            {"item_id": item_id},
+        )
+        await self.session.commit()
+        return {"item_id": item_id, "rating": rating, "review": review}
+
     @staticmethod
     def _public_agency_summary(
         row: dict[str, Any],

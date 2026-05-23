@@ -615,21 +615,33 @@ async def get_tenant_data_stats(
     """Get data isolation statistics for the current tenant."""
     # Tables that have user_id column (tenant-scoped data)
     tenant_tables = [
-        "contacts", "deals", "campaigns", "social_posts", "helpdesk_tickets",
+        "contacts", "deals", "campaigns", "social_posts", "tickets",
         "contracts", "activities", "conversations", "calendar_events",
         "workflow_rules", "form_items", "funnel_items", "blog_posts",
         "nelvyon_clients", "nelvyon_projects", "nelvyon_outputs", "nelvyon_assets",
     ]
 
+    ws_id = ctx.workspace_id
     tables_with_data: Dict[str, int] = {}
     total = 0
 
     for table in tenant_tables:
         try:
-            result = await db.execute(
-                text(f"SELECT COUNT(*) as cnt FROM {table} WHERE user_id = :uid"),
-                {"uid": ctx.user_id},
-            )
+            if table == "tickets":
+                result = await db.execute(
+                    text("SELECT COUNT(*) as cnt FROM tickets WHERE workspace_id = :ws"),
+                    {"ws": ws_id},
+                )
+            elif table in ("contacts", "deals", "activities"):
+                result = await db.execute(
+                    text(f"SELECT COUNT(*) as cnt FROM crm_{table} WHERE workspace_id = :ws"),
+                    {"ws": ws_id},
+                )
+            else:
+                result = await db.execute(
+                    text(f"SELECT COUNT(*) as cnt FROM {table} WHERE user_id = :uid"),
+                    {"uid": ctx.user_id},
+                )
             count = (result.mappings().first() or {}).get("cnt", 0)
             if count > 0:
                 tables_with_data[table] = count

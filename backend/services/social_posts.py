@@ -263,3 +263,31 @@ class Social_postsService:
             .order_by(Social_posts.id.desc())
         )
         return result.scalars().all()
+
+    async def get_aggregated_stats(
+        self, workspace_id: int, user_id: str
+    ) -> Dict[str, Any]:
+        """Stats across legacy social_posts for the workspace."""
+        data = await self.get_list(
+            skip=0, limit=500, user_id=user_id, workspace_id=workspace_id
+        )
+        items = data.get("items") or []
+        platforms: Dict[str, int] = {}
+        for item in items:
+            platform = getattr(item, "platform", None) or getattr(item, "channel", None) or "unknown"
+            platforms[str(platform)] = platforms.get(str(platform), 0) + 1
+        return {
+            "total_posts": int(data.get("total") or 0),
+            "by_platform": platforms,
+        }
+
+    @staticmethod
+    def serialize_post(obj: Social_posts) -> Dict[str, Any]:
+        return {
+            "id": obj.id,
+            "source": "legacy",
+            "platform": getattr(obj, "platform", None),
+            "content": getattr(obj, "content", None) or getattr(obj, "body", None),
+            "status": getattr(obj, "status", None),
+            "created_at": obj.created_at.isoformat() if getattr(obj, "created_at", None) else None,
+        }

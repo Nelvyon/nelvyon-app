@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 
 import { CookieBanner } from "@/components/CookieBanner";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { getBrandAppName, getBrandMode } from "@/core/platform/brand";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/core/theme/themeBootstrapScript";
@@ -49,6 +50,8 @@ const nelvyonMetadata: Metadata = {
     images: ["/og-image.png"],
   },
   robots: { index: true, follow: true },
+  manifest: "/manifest.json",
+  appleWebApp: { capable: true, title: "NELVYON" },
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim()
     ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION.trim() } }
     : {}),
@@ -58,6 +61,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#0a0a0a",
 };
 
 export const metadata: Metadata =
@@ -112,6 +116,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <link href="/manifest.json" rel="manifest" />
+        <meta content="#0a0a0a" name="theme-color" />
+        <meta content="yes" name="apple-mobile-web-app-capable" />
+      </head>
       <body>
         {/* Runs before React paint to avoid light/dark flash; keep in sync with ThemeProvider. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} suppressHydrationWarning>
@@ -121,6 +130,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <AppProviders>{children}</AppProviders>
           </NextIntlClientProvider>
           <CookieBanner />
+          <ServiceWorkerRegister />
         </PostHogProvider>
       </body>
     </html>

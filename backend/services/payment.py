@@ -382,6 +382,140 @@ class PaymentService:
         # Settings are automatically read from environment variables
         await initialize_stripe()
 
+    async def create_payment_intent(
+        self,
+        *,
+        amount_cents: int,
+        currency: str = "eur",
+        customer: str | None = None,
+        metadata: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
+        """Create a Stripe PaymentIntent for one-off charges."""
+        if not settings.stripe_secret_key:
+            return {"status": "pending_auth", "message": "Stripe not configured"}
+        await self._auto_reload_stripe_config()
+        try:
+            params: dict[str, Any] = {
+                "amount": amount_cents,
+                "currency": currency.lower(),
+                "metadata": metadata or {},
+                "automatic_payment_methods": {"enabled": True},
+            }
+            if customer:
+                params["customer"] = customer
+            intent = await stripe.PaymentIntent.create_async(**params)
+            return {
+                "status": "created",
+                "payment_intent_id": intent.id,
+                "client_secret": intent.client_secret,
+                "amount": intent.amount,
+                "currency": intent.currency,
+            }
+        except stripe.StripeError as e:
+            error_type, is_retryable, fixable, fix_suggestion = _classify_stripe_error(e)
+            raise CheckoutError(
+                f"Failed to create PaymentIntent: {e}",
+                error_type=error_type,
+                is_retryable=is_retryable,
+                fixable=fixable,
+                fix_suggestion=fix_suggestion,
+                original_error=e,
+            ) from e
+
+    async def list_charges(self, *, customer: str | None = None, limit: int = 25) -> dict[str, Any]:
+        """List recent Stripe charges for a customer."""
+        if not settings.stripe_secret_key:
+            return {"status": "pending_auth", "charges": [], "message": "Stripe not configured"}
+        await self._auto_reload_stripe_config()
+        try:
+            params: dict[str, Any] = {"limit": min(limit, 100)}
+            if customer:
+                params["customer"] = customer
+            result = await stripe.Charge.list_async(**params)
+            charges = [
+                {
+                    "id": c.id,
+                    "amount": c.amount,
+                    "currency": c.currency,
+                    "status": c.status,
+                    "paid": c.paid,
+                    "created": c.created,
+                    "customer": c.customer,
+                    "receipt_url": c.receipt_url,
+                }
+                for c in result.data
+            ]
+            return {"status": "ok", "charges": charges, "count": len(charges)}
+        except stripe.StripeError as e:
+            raise CheckoutError(f"Failed to list charges: {e}", original_error=e) from e
+
+    async def refund_payment(
+        self,
+        *,
+        charge_id: str | None = None,
+        payment_intent_id: str | None = None,
+        amount_cents: int | None = None,
+    ) -> dict[str, Any]:
+        """Refund a charge or payment intent."""
+        if not settings.stripe_secret_key:
+            return {"status": "pending_auth", "message": "Stripe not configured"}
+        if not charge_id and not payment_intent_id:
+            raise CheckoutError("charge_id or payment_intent_id required")
+        await self._auto_reload_stripe_config()
+        try:
+            params: dict[str, Any] = {}
+            if charge_id:
+                params["charge"] = charge_id
+            elif payment_intent_id:
+                params["payment_intent"] = payment_intent_id
+            if amount_cents is not None:
+                params["amount"] = amount_cents
+            refund = await stripe.Refund.create_async(**params)
+            return {
+                "status": "refunded",
+                "refund_id": refund.id,
+                "amount": refund.amount,
+                "currency": refund.currency,
+            }
+        except stripe.StripeError as e:
+            raise CheckoutError(f"Refund failed: {e}", original_error=e) from e
+
+    async def get_payment_history(self, *, customer: str, limit: int = 50) -> dict[str, Any]:
+        """Combined payment history: charges + payment intents."""
+        if not settings.stripe_secret_key:
+            return {"status": "pending_auth", "items": [], "message": "Stripe not configured"}
+        await self._auto_reload_stripe_config()
+        try:
+            charges = await stripe.Charge.list_async(customer=customer, limit=min(limit, 100))
+            intents = await stripe.PaymentIntent.list_async(customer=customer, limit=min(limit, 100))
+            items: list[dict[str, Any]] = []
+            for c in charges.data:
+                items.append(
+                    {
+                        "type": "charge",
+                        "id": c.id,
+                        "amount": c.amount,
+                        "currency": c.currency,
+                        "status": c.status,
+                        "created": c.created,
+                    }
+                )
+            for pi in intents.data:
+                items.append(
+                    {
+                        "type": "payment_intent",
+                        "id": pi.id,
+                        "amount": pi.amount,
+                        "currency": pi.currency,
+                        "status": pi.status,
+                        "created": pi.created,
+                    }
+                )
+            items.sort(key=lambda x: x.get("created") or 0, reverse=True)
+            return {"status": "ok", "customer": customer, "items": items[:limit]}
+        except stripe.StripeError as e:
+            raise CheckoutError(f"Payment history failed: {e}", original_error=e) from e
+
 
 class CheckoutError(Exception):
     """Exception raised for errors in the Stripe checkout process.

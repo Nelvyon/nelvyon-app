@@ -7,7 +7,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from dependencies.workspace import WorkspaceContext, require_workspace
-from services.voice_service import ElevenLabsService
+from services.voice_service import ElevenLabsService, get_voice_dashboard_service
+from core.database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/api/voice", tags=["voice"])
 
@@ -94,3 +96,33 @@ async def stream_text_to_speech(
             yield chunk
 
     return StreamingResponse(audio_generator(), media_type="audio/mpeg")
+
+
+@router.get("/calls")
+async def list_voice_calls(
+    limit: int = 50,
+    ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """List recent dialer calls for the workspace."""
+    svc = get_voice_dashboard_service(db, ctx.workspace_id)
+    return {"calls": await svc.list_calls(limit=min(limit, 100))}
+
+
+@router.get("/stats")
+async def voice_stats(
+    ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Voice/dialer statistics for the workspace."""
+    svc = get_voice_dashboard_service(db, ctx.workspace_id)
+    return await svc.get_stats()
+
+
+@router.get("/config")
+async def voice_config(
+    ctx: WorkspaceContext = Depends(require_workspace),
+):
+    """Voice provider configuration status."""
+    svc = get_voice_dashboard_service(None, ctx.workspace_id)
+    return svc.get_config()

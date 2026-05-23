@@ -11,13 +11,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace
-from services.analytics_service import default_date_range, get_analytics_service
+from services.analytics_service import default_date_range, get_analytics_service, get_workspace_metrics
 from services.cache_service import cached
 from services.google_ads_service import get_google_ads_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
+
+
+@router.get("/workspace")
+async def analytics_workspace(
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Workspace KPIs: DAU, MAU, revenue, churn, most-used modules."""
+    return await get_workspace_metrics(db, ws_ctx.workspace_id)
 
 
 @router.get("/overview")

@@ -256,3 +256,31 @@ async def resolve_ticket(
         return await _svc(db, ws_ctx).resolve_ticket(ticket_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Ticket not found")
+
+
+@router.patch("/tickets/{ticket_id}/close")
+async def close_ticket(
+    ticket_id: int,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await _svc(db, ws_ctx).close_ticket(ticket_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+
+@router.get("/agents")
+async def list_agents(
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    return {"agents": await _svc(db, ws_ctx).get_agents()}
+
+
+@router.get("/categories")
+async def list_categories(
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    return {"categories": await _svc(db, ws_ctx).get_categories()}

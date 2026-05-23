@@ -63,9 +63,15 @@ google-analytics-data>=0.18.0
 # Web Push (PWA) — VAPID notifications
 pywebpush>=2.0.0
 
+# Social scheduler — image compression before upload
+Pillow>=10.0.0
+
 # White-label templates & domain verification
 jinja2>=3.1.0
 dnspython>=2.6.0
+
+# QR code generation
+qrcode[pil]>=7.4.2
 
 # Error monitoring
 sentry-sdk>=1.40.0

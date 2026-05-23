@@ -385,11 +385,23 @@ class AffiliateService:
                 status = "failed"
                 error_message = str(exc)[:500]
         elif not connect_id:
-            status = "failed"
-            error_message = "Affiliate has no Stripe Connect account configured"
+            return {
+                "payout_id": None,
+                "affiliate_id": affiliate_id,
+                "amount": float(payout_amount),
+                "status": "pending_auth",
+                "stripe_transfer_id": None,
+                "error_message": "Affiliate has no Stripe Connect account configured",
+            }
         else:
-            status = "failed"
-            error_message = "STRIPE_SECRET_KEY not configured"
+            return {
+                "payout_id": None,
+                "affiliate_id": affiliate_id,
+                "amount": float(payout_amount),
+                "status": "pending_auth",
+                "stripe_transfer_id": None,
+                "error_message": "STRIPE_SECRET_KEY not configured",
+            }
 
         await self.session.execute(
             text(

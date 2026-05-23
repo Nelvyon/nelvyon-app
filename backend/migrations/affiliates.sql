@@ -105,3 +105,45 @@ CREATE TABLE IF NOT EXISTS agency_reviews (
 
 CREATE UNIQUE INDEX IF NOT EXISTS agency_reviews_unique_idx
     ON agency_reviews (agency_id, reviewer_workspace_id);
+
+CREATE TABLE IF NOT EXISTS marketplace_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seller_workspace_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    price NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    currency TEXT NOT NULL DEFAULT 'eur',
+    category TEXT,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    rating NUMERIC(3, 2) NOT NULL DEFAULT 0,
+    reviews_count INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS marketplace_items_seller_idx
+    ON marketplace_items (seller_workspace_id, active);
+
+CREATE TABLE IF NOT EXISTS marketplace_purchases (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    item_id UUID NOT NULL REFERENCES marketplace_items (id) ON DELETE CASCADE,
+    buyer_workspace_id INTEGER NOT NULL,
+    amount NUMERIC(12, 2) NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'eur',
+    status TEXT NOT NULL DEFAULT 'completed'
+        CHECK (status IN ('pending', 'completed', 'refunded', 'cancelled')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS marketplace_purchases_buyer_idx
+    ON marketplace_purchases (buyer_workspace_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS marketplace_item_reviews (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    item_id UUID NOT NULL REFERENCES marketplace_items (id) ON DELETE CASCADE,
+    reviewer_workspace_id INTEGER NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    review TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (item_id, reviewer_workspace_id)
+);
