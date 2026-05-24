@@ -23,9 +23,12 @@
   "dependencies": {
     "@nelvyon/os-db": "workspace:*",
     "@radix-ui/react-slot": "^1.2.3",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "@sentry/nextjs": "^10.51.0",
     "@sentry/node": "^10.51.0",
     "@tanstack/react-query": "^5.90.2",
+    "@xyflow/react": "^12.6.0",
     "@upstash/redis": "^1.36.2",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
@@ -46,6 +49,7 @@
     "resend": "^4.8.0",
     "stripe": "17.7.0",
     "tailwind-merge": "^3.3.1",
+    "three": "^0.184.0",
     "ws": "^8.20.0",
     "zod": "^3.25.76"
   },
@@ -60,6 +64,7 @@
     "@types/node": "^24.7.2",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
+    "@types/three": "^0.184.1",
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
