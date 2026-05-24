@@ -19,47 +19,45 @@ function renderWithIntl(ui: React.ReactElement) {
 describe("marketing pricing and landing", () => {
   it("Página /pricing renderiza los 3 planes", () => {
     renderWithIntl(<PricingPage />);
-    expect(screen.getByRole("heading", { name: "Starter", level: 2 })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Pro", level: 2 })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Agency", level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Plan 1", level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Plan 2", level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Plan 3", level: 2 })).toBeInTheDocument();
   });
 
-  it("Plan Pro tiene badge 'Más popular'", () => {
+  it("Plan 2 tiene badge 'Recomendado'", () => {
     renderWithIntl(<PricingPage />);
-    expect(screen.getByText("Más popular")).toBeInTheDocument();
+    expect(screen.getByText("Recomendado")).toBeInTheDocument();
   });
 
-  it("Precios correctos: 95€, 270€, 470€ mensuales", () => {
+  it("Precios en blanco (placeholder) en vista mensual", () => {
     renderWithIntl(<PricingPage />);
     const main = screen.getByRole("main");
-    expect(main.textContent).toMatch(/95€/);
-    expect(main.textContent).toMatch(/270€/);
-    expect(main.textContent).toMatch(/470€/);
+    expect(main.textContent).toMatch(/—/);
   });
 
   it("CTA de planes enlazan a /register", () => {
     renderWithIntl(<PricingPage />);
-    const ctas = screen.getAllByRole("link", { name: /Empieza gratis/i });
+    const ctas = screen.getAllByRole("link", { name: /Solicitar acceso/i });
     expect(ctas.length).toBeGreaterThanOrEqual(3);
     expect(ctas.every((el) => el.getAttribute("href") === "/register")).toBe(true);
   });
 
   it("Nav incluye CTA a /register", () => {
     renderWithIntl(<PricingPage />);
-    const navCta = screen.getAllByRole("link", { name: /Empieza gratis/i })[0];
+    const navCta = screen.getByRole("link", { name: /^Empezar$/i });
     expect(navCta).toHaveAttribute("href", "/register");
   });
 
   it("Página / (home) renderiza headline correctamente", () => {
     renderWithIntl(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.textContent).toMatch(/Tu equipo de marketing/i);
-    expect(h1.textContent).toMatch(/Sin contratar a nadie/i);
+    expect(h1.textContent).toMatch(/Donde nace tu imperio/i);
+    expect(h1.textContent).toMatch(/se impone tu legado/i);
   });
 
-  it("Home tiene CTA de registro (Empieza gratis)", () => {
+  it("Home tiene CTA de registro", () => {
     renderWithIntl(<HomePage />);
-    const links = screen.getAllByRole("link", { name: /Empieza gratis/i });
+    const links = screen.getAllByRole("link", { name: /Crear mi imperio|Empezar gratis/i });
     expect(links.length).toBeGreaterThan(0);
     expect(links.some((el) => el.getAttribute("href") === "/register")).toBe(true);
   });
@@ -67,9 +65,9 @@ describe("marketing pricing and landing", () => {
   it("Home enlaza a páginas de servicio", () => {
     renderWithIntl(<HomePage />);
     const hrefs = screen.getAllByRole("link").map((el) => el.getAttribute("href"));
-    expect(hrefs).toContain("/seo");
-    expect(hrefs).toContain("/ads");
-    expect(hrefs).toContain("/contenido");
+    expect(hrefs).toContain("/servicios/seo-ia");
+    expect(hrefs).toContain("/servicios/publicidad-ia");
+    expect(hrefs).toContain("/servicios/contenido-ia");
   });
 
   it("Página /partners renderiza calculadora", () => {

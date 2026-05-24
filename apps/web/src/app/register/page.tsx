@@ -4,18 +4,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { AuthLayout } from "@/components/nelvyon-site/AuthLayout";
 import { identifyUser, trackEvent } from "@/lib/analytics";
+
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition focus:border-[#0066FF] focus:outline-none";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", company: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-
     if (form.name.trim().length < 2) {
       setError("El nombre debe tener al menos 2 caracteres");
       return;
@@ -28,22 +31,18 @@ export default function RegisterPage() {
       setError("La contraseña debe tener al menos 8 caracteres");
       return;
     }
-
     setLoading(true);
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify(form),
+        body: JSON.stringify({ name: form.name, email: form.email, password: form.password }),
       });
       const data: unknown = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg =
-          typeof data === "object" &&
-          data !== null &&
-          "message" in data &&
-          typeof (data as { message: unknown }).message === "string"
+          typeof data === "object" && data !== null && "message" in data && typeof (data as { message: unknown }).message === "string"
             ? (data as { message: string }).message
             : "Error al crear la cuenta";
         setError(msg);
@@ -64,84 +63,43 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#080808] px-4 text-zinc-100">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <Link href="/" className="text-2xl font-black tracking-tight text-indigo-500">
-            NELVYON
+    <AuthLayout subtitle="Crea tu workspace y empieza a imponer tu legado" title="Registro">
+      <form className="space-y-4" onSubmit={(ev) => void handleSubmit(ev)}>
+        <button
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+          onClick={() => setError("Registro con Google disponible para cuentas empresariales — usa el formulario o contacta ventas.")}
+          type="button"
+        >
+          <span className="text-lg">G</span>
+          Registrarse con Google
+        </button>
+        <p className="text-center text-xs text-zinc-600">o completa el formulario</p>
+        <input className={inputClass} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nombre completo" required type="text" value={form.name} />
+        <input className={inputClass} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Email profesional" required type="email" value={form.email} />
+        <input className={inputClass} onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))} placeholder="Empresa (opcional)" type="text" value={form.company} />
+        <input className={inputClass} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} placeholder="Contraseña (mín. 8 caracteres)" required type="password" value={form.password} />
+        <p className="text-xs text-zinc-600">
+          Al registrarte aceptas los{" "}
+          <Link className="text-[#0066FF] hover:underline" href="/terminos">
+            términos
+          </Link>{" "}
+          y la{" "}
+          <Link className="text-[#0066FF] hover:underline" href="/privacidad">
+            privacidad
           </Link>
-          <p className="mt-2 text-sm text-zinc-400">Crea tu cuenta gratis</p>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
-          <form onSubmit={(ev) => void handleSubmit(ev)} className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">Nombre</label>
-              <input
-                type="text"
-                required
-                placeholder="Tu nombre"
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition-colors focus:border-indigo-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">Email</label>
-              <input
-                type="email"
-                required
-                placeholder="tu@empresa.com"
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition-colors focus:border-indigo-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">Contraseña</label>
-              <input
-                type="password"
-                required
-                placeholder="Mínimo 8 caracteres"
-                value={form.password}
-                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition-colors focus:border-indigo-500 focus:outline-none"
-              />
-            </div>
-
-            {error ? (
-              <div className="rounded-xl border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-300">
-                {error}
-              </div>
-            ) : null}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
-            >
-              {loading ? "Creando cuenta…" : "Crear cuenta gratis →"}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-xs text-zinc-500">
-            ¿Ya tienes cuenta?{" "}
-            <Link href="/login" className="text-indigo-400 hover:text-indigo-300">
-              Inicia sesión
-            </Link>
-          </p>
-          <p className="mt-3 text-center text-xs text-zinc-600">
-            Al registrarte aceptas los{" "}
-            <Link href="/terms" className="underline hover:text-zinc-400">
-              Términos
-            </Link>{" "}
-            y la{" "}
-            <Link href="/privacy" className="underline hover:text-zinc-400">
-              Política de privacidad
-            </Link>
-          </p>
-        </div>
-      </div>
-    </main>
+          .
+        </p>
+        {error ? <div className="rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div> : null}
+        <button className="w-full rounded-full bg-[#0066FF] py-3 text-sm font-semibold text-white hover:bg-[#0052cc] disabled:opacity-50" disabled={loading} type="submit">
+          {loading ? "Creando cuenta…" : "Crear cuenta"}
+        </button>
+      </form>
+      <p className="mt-6 text-center text-xs text-zinc-500">
+        ¿Ya tienes cuenta?{" "}
+        <Link className="text-[#0066FF] hover:underline" href="/login">
+          Iniciar sesión
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

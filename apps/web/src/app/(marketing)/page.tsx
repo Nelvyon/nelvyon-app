@@ -1,5 +1,5 @@
-import { HomePageContent } from "@/components/marketing/premium/HomePageContent";
+import { NelvyonHomePage } from "@/components/nelvyon-site/NelvyonHomePage";
 
 export default function HomePage() {
-  return <HomePageContent />;
+  return <NelvyonHomePage />;
 }

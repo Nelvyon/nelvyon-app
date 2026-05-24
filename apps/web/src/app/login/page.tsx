@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
+import { AuthLayout } from "@/components/nelvyon-site/AuthLayout";
 import { identifyUser, trackEvent } from "@/lib/analytics";
+
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition focus:border-[#0066FF] focus:outline-none";
 
 function LoginForm() {
   const router = useRouter();
@@ -21,7 +25,6 @@ function LoginForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-
     if (!email.includes("@")) {
       setError("Introduce un email válido");
       return;
@@ -30,7 +33,6 @@ function LoginForm() {
       setError("La contraseña debe tener al menos 8 caracteres");
       return;
     }
-
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
@@ -70,69 +72,36 @@ function LoginForm() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#080808] px-4 text-zinc-100">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <Link href="/" className="text-2xl font-black tracking-tight text-indigo-500">
-            NELVYON
+    <AuthLayout subtitle="Accede a tu panel NELVYON" title="Iniciar sesión">
+      <form className="space-y-4" onSubmit={(ev) => void handleSubmit(ev)}>
+        <button
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
+          onClick={() => setError("OAuth Google: crea tu cuenta con email o contacta a soporte para SSO empresarial.")}
+          type="button"
+        >
+          <span className="text-lg">G</span>
+          Continuar con Google
+        </button>
+        <p className="text-center text-xs text-zinc-600">o con email</p>
+        <input autoComplete="email" className={inputClass} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required type="email" value={email} />
+        <input autoComplete="current-password" className={inputClass} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" required type="password" value={password} />
+        <div className="text-right">
+          <Link className="text-xs text-[#0066FF] hover:underline" href="/auth/forgot-password">
+            ¿Olvidaste tu contraseña?
           </Link>
-          <p className="mt-2 text-sm text-zinc-400">Inicia sesión en tu cuenta</p>
         </div>
-
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
-          <form onSubmit={(ev) => void handleSubmit(ev)} className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">Email</label>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                placeholder="tu@empresa.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition-colors focus:border-indigo-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <label className="text-sm font-medium text-zinc-300">Contraseña</label>
-                <Link href="/auth/forgot-password" className="text-xs text-indigo-400 hover:text-indigo-300">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <input
-                type="password"
-                required
-                autoComplete="current-password"
-                placeholder="Tu contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition-colors focus:border-indigo-500 focus:outline-none"
-              />
-            </div>
-
-            {error ? (
-              <div className="rounded-xl border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-300">{error}</div>
-            ) : null}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
-            >
-              {loading ? "Entrando…" : "Iniciar sesión →"}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-xs text-zinc-500">
-            ¿No tienes cuenta?{" "}
-            <Link href="/register" className="text-indigo-400 hover:text-indigo-300">
-              Crear cuenta gratis
-            </Link>
-          </p>
-        </div>
-      </div>
-    </main>
+        {error ? <div className="rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div> : null}
+        <button className="w-full rounded-full bg-[#0066FF] py-3 text-sm font-semibold text-white hover:bg-[#0052cc] disabled:opacity-50" disabled={loading} type="submit">
+          {loading ? "Entrando…" : "Entrar"}
+        </button>
+      </form>
+      <p className="mt-6 text-center text-xs text-zinc-500">
+        ¿No tienes cuenta?{" "}
+        <Link className="text-[#0066FF] hover:underline" href="/register">
+          Regístrate gratis
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }
 

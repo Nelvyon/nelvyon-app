@@ -7,13 +7,13 @@ const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/og-image.png`;
 
 export const metadata: Metadata = {
-  title: "NELVYON — Marketing IA Autónomo",
+  title: "NELVYON — Donde nace tu imperio",
   description:
-    "Marketing autónomo con IA: SEO, publicidad, contenido, email y branding. Planes desde 95€/mes. Sin equipo.",
+    "Donde nace tu imperio, crece tu marca y se impone tu legado. Sistema autónomo de marketing con IA: SEO, publicidad, contenido, email, branding y social media.",
   openGraph: {
-    title: "NELVYON — Marketing IA Autónomo",
+    title: "NELVYON — Marketing autónomo con IA",
     description:
-      "SEO, ads, contenido, email y branding con agentes IA. Planes desde 95€/mes.",
+      "Donde nace tu imperio, crece tu marca y se impone tu legado. Plataforma SaaS premium de marketing con agentes IA.",
     url: canonicalBase,
     siteName: "NELVYON",
     images: [
