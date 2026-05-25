@@ -4,54 +4,65 @@ import { useCallback, useState } from "react";
 import { MessageCircle, Send, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const FAQ: { q: RegExp; a: string }[] = [
-  {
-    q: /qu[eé] es|nelvyon/i,
-    a: "NELVYON es un sistema autónomo de marketing con IA: SEO, publicidad, contenido, email, branding y social media ejecutados por agentes especializados.",
-  },
-  {
-    q: /precio|plan|coste|cu[aá]nto/i,
-    a: "Ofrecemos tres planes escalables. Consulta /precios para comparar funcionalidades y solicitar tu propuesta personalizada.",
-  },
-  {
-    q: /demo|prueba|registr/i,
-    a: "Puedes crear tu cuenta en /register y acceder al panel en minutos. El equipo también puede guiarte en una demo personalizada.",
-  },
-  {
-    q: /agencia|diferencia|vs/i,
-    a: "A diferencia de una agencia tradicional, NELVYON opera 24/7 con agentes IA, sin cuellos de botella humanos y con métricas en tiempo real.",
-  },
-  {
-    q: /contact|hablar|soporte/i,
-    a: "Escríbenos en /contacto o deja tu email aquí y te responderemos en menos de 24 horas laborables.",
-  },
-];
+import type { ChatStage } from "@/lib/nelvyon-site-chat";
 
-function answer(text: string): string {
-  const hit = FAQ.find((f) => f.q.test(text));
-  return (
-    hit?.a ??
-    "Gracias por tu interés en NELVYON. Para una respuesta detallada visita /contacto o explora /servicios para ver cada módulo."
-  );
-}
+type Msg = { role: "user" | "bot"; text: string };
 
 export function NelvyonChatbot() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<{ role: "user" | "bot"; text: string }[]>([
-    { role: "bot", text: "Hola, soy el asistente de NELVYON. ¿En qué puedo ayudarte?" },
+  const [busy, setBusy] = useState(false);
+  const [stage, setStage] = useState<ChatStage>("detect_sector");
+  const [sectorId, setSectorId] = useState("");
+  const [messages, setMessages] = useState<Msg[]>([
+    {
+      role: "bot",
+      text: "Hola — soy el asistente de NELVYON. Cuéntame qué tipo de negocio tienes (restaurante, clínica, ecommerce…) y te digo resultados reales para tu sector.",
+    },
   ]);
-  const busy = false;
 
-  const send = useCallback((text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    setMessages((m) => [...m, { role: "user", text: trimmed }]);
-    setInput("");
-    window.setTimeout(() => {
-      setMessages((m) => [...m, { role: "bot", text: answer(trimmed) }]);
-    }, 400);
-  }, []);
+  const send = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed || busy) return;
+      setBusy(true);
+      setMessages((m) => [...m, { role: "user", text: trimmed }]);
+      setInput("");
+
+      const history = messages
+        .filter((m) => m.role === "user" || m.role === "bot")
+        .map((m) => ({
+          role: m.role === "user" ? ("user" as const) : ("assistant" as const),
+          content: m.text,
+        }));
+
+      try {
+        const res = await fetch("/api/nelvyon-site/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: trimmed, history, stage, sectorId }),
+        });
+        const data = (await res.json()) as { reply?: string; stage?: ChatStage; sectorId?: string };
+        if (data.sectorId) setSectorId(data.sectorId);
+        if (data.stage) setStage(data.stage);
+        const reply =
+          data.reply ||
+          "NELVYON ejecuta marketing con IA 24/7. **Empieza tu prueba gratuita de 14 días →** https://nelvyon.com/register";
+        setMessages((m) => [...m, { role: "bot", text: reply }]);
+      } catch {
+        setMessages((m) => [
+          ...m,
+          {
+            role: "bot",
+            text: "NELVYON ayuda a negocios como el tuyo a conseguir más clientes con IA. **Empieza tu prueba gratuita de 14 días →** https://nelvyon.com/register",
+          },
+        ]);
+      } finally {
+        setBusy(false);
+      }
+    },
+    [busy, messages, stage, sectorId],
+  );
 
   return (
     <>
@@ -66,7 +77,7 @@ export function NelvyonChatbot() {
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <div>
                 <p className="text-sm font-semibold text-white">Asistente NELVYON</p>
-                <p className="text-xs text-zinc-500">Respuestas instantáneas</p>
+                <p className="text-xs text-zinc-500">Ventas · resultados por sector</p>
               </div>
               <button aria-label="Cerrar" className="text-zinc-400 hover:text-white" onClick={() => setOpen(false)} type="button">
                 <X className="h-5 w-5" />
@@ -76,11 +87,19 @@ export function NelvyonChatbot() {
               {messages.map((m, i) => (
                 <div
                   key={i}
-                  className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm ${
+                  className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap ${
                     m.role === "user" ? "ml-auto bg-[#0066FF] text-white" : "bg-white/5 text-zinc-200"
                   }`}
                 >
-                  {m.text}
+                  {m.text.split(/(https:\/\/[^\s]+)/g).map((part, j) =>
+                    part.startsWith("https://") ? (
+                      <a className="underline text-[#7eb6ff]" href={part} key={j}>
+                        {part.includes("/register") ? "Empieza tu prueba gratuita →" : part}
+                      </a>
+                    ) : (
+                      <span key={j}>{part}</span>
+                    ),
+                  )}
                 </div>
               ))}
             </div>
@@ -88,19 +107,19 @@ export function NelvyonChatbot() {
               className="flex gap-2 border-t border-white/10 p-3"
               onSubmit={(e) => {
                 e.preventDefault();
-                send(input);
+                void send(input);
               }}
             >
               <input
                 className="flex-1 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#0066FF]"
                 disabled={busy}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Pregunta sobre NELVYON…"
+                placeholder="Ej: tengo una clínica dental en Madrid…"
                 value={input}
               />
               <button
                 aria-label="Enviar"
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0066FF] text-white"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0066FF] text-white disabled:opacity-50"
                 disabled={busy}
                 type="submit"
               >

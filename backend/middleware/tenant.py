@@ -127,6 +127,13 @@ def _is_sms_webhook(path: str, method: str) -> bool:
     return method == "POST" and path == "/api/sms/webhook/twilio"
 
 
+def _is_dm_webhook_public(path: str, method: str) -> bool:
+    """F63 — Meta Instagram/Messenger + TikTok DM webhooks (no JWT)."""
+    if path in ("/api/instagram-dm/webhook", "/api/fb-messenger/webhook") and method in ("GET", "POST"):
+        return True
+    return method == "POST" and path == "/api/tiktok-dm/webhook"
+
+
 def _is_conversation_stream_public(path: str, method: str) -> bool:
     return method == "GET" and re.match(r"^/api/v1/conversations/[^/]+/stream$", path) is not None
 
@@ -145,6 +152,8 @@ def _is_public(path: str, method: str = "GET") -> bool:
     if _is_public_api(path):
         return True
     if _is_sms_webhook(path, method):
+        return True
+    if _is_dm_webhook_public(path, method):
         return True
     if path.startswith("/api/marketplace/agencies") and path.count("/") <= 4:
         return True
