@@ -14,7 +14,7 @@ from core.database import get_db
 from core.i18n import request_language, t
 from core.tenant_context import get_tenant_context
 from dependencies.auth import get_admin_user, get_current_user
-from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin, require_workspace_operator
 from schemas.auth import UserResponse
 from services.audit_service import log_critical_audit
 from services.gdpr_service import get_gdpr_service

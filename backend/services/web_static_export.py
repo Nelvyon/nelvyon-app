@@ -93,11 +93,13 @@ def _render_block(block: dict[str, Any], *, is_home: bool, block_index: int) -> 
         if is_home and (img or (variants and variants.get("desktop"))):
             href = (variants or {}).get("desktop") or img
             preload = f'<link rel="preload" as="image" href="{_esc(href)}">'
+        sub_html = f"<p>{_esc(sub)}</p>" if sub else ""
+        cta_html = f'<a class="btn" href="{_esc(cta_url)}">{_esc(cta)}</a>' if cta else ""
         return (
             f"{preload}<section class=\"hero\">{hero_img}<div class=\"hero__overlay\"></div>"
             f"<h1>{_esc(headline)}</h1>"
-            f"{f'<p>{_esc(sub)}</p>' if sub else ''}"
-            f"{f'<a class=\"btn\" href=\"{_esc(cta_url)}\">{_esc(cta)}</a>' if cta else ''}"
+            f"{sub_html}"
+            f"{cta_html}"
             "</section>"
         )
 
