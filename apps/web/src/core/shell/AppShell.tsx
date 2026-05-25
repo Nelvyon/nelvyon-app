@@ -18,7 +18,7 @@ import { cn } from "@/core/ui/utils";
 import { livechatApi } from "@/features/builders/api";
 import { omnichannelApi } from "@/features/omnichannel/api";
 import { dashboardHelpdeskApi } from "@/features/dashboard/api";
-import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { VoiceCommand } from "@/components/VoiceCommand";
 import { HelpBotPanel } from "@/features/helpbot/components/HelpBotPanel";
 import { ThemeToggle } from "@/core/theme/ThemeToggle";
@@ -319,7 +319,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="mx-auto max-w-6xl">
             <RoutePageHeader />
             {!isClientMode ? <HelpBotPanel /> : null}
-            {pathname.startsWith("/dashboard") ? <PwaInstallPrompt /> : null}
+            {pathname.startsWith("/dashboard") ? <PWAInstallButton /> : null}
             {children}
           </div>
         </main>

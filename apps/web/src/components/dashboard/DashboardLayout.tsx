@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { CancellationBanner } from "./CancellationBanner";
 import { DunningBanner, type DunningBannerStatus } from "./DunningBanner";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { SupportWidget } from "@/components/support";
 
 type DunningApiStatus = "active" | "grace" | "warning" | "suspended";
@@ -70,6 +71,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <DunningBanner status={bannerStatus} daysLeft={dunning.daysLeft} updateUrl={dunning.updateUrl} />
       ) : null}
       {children}
+      <PWAInstallButton />
       <SupportWidget />
     </div>
   );

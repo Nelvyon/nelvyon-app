@@ -3,7 +3,6 @@ import { ReactNode } from "react";
 
 import { CookieBanner } from "@/components/CookieBanner";
 import { PostHogProvider } from "@/components/PostHogProvider";
-import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { LocaleProvider } from "@/core/i18n/LocaleProvider";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/core/theme/themeBootstrapScript";
@@ -79,15 +78,29 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   }
 
   const faviconHref = whitelabelInitial?.favicon_url?.trim() || "/favicon.ico";
-  const themeColor = whitelabelInitial?.primary_color || "#0a0a0a";
 
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
         <link href={faviconHref} rel="icon" />
         <link href="/manifest.json" rel="manifest" />
-        <meta content={themeColor} name="theme-color" />
+        <meta content="#0066FF" name="theme-color" />
         <meta content="yes" name="apple-mobile-web-app-capable" />
+        <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style" />
+        <meta content="NELVYON" name="apple-mobile-web-app-title" />
+        <link href="/icons/icon-192x192.png" rel="apple-touch-icon" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+`,
+          }}
+          suppressHydrationWarning
+        />
       </head>
       <body className={`${inter.variable} ${dmSans.variable} font-sans antialiased`}>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} suppressHydrationWarning />
@@ -96,7 +109,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <AppProviders whitelabelInitial={whitelabelInitial}>{children}</AppProviders>
           </LocaleProvider>
           <CookieBanner />
-          <ServiceWorkerRegister />
         </PostHogProvider>
       </body>
     </html>
