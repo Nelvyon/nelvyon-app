@@ -78,3 +78,7 @@ blob-report/
 # --- Misc ---
 *.local
 .turbo/cache
+
+# --- Artefactos locales (no subir al repo) ---
+nelvyon_backend.zip
+tools/
