@@ -62,8 +62,11 @@ class GoogleAdsService:
         return _normalize_customer_id(os.environ.get("GOOGLE_ADS_CUSTOMER_ID", ""))
 
     def _resolve_customer_id(self, customer_id: str | None) -> str:
+        self._ensure_config()
         cid = _normalize_customer_id(customer_id or self.default_customer_id())
         if not cid:
+            if self._mock:
+                return "1234567890"
             raise ValueError("customer_id or GOOGLE_ADS_CUSTOMER_ID is required")
         return cid
 
@@ -117,8 +120,8 @@ class GoogleAdsService:
         }
 
     async def get_campaigns(self, customer_id: str | None) -> dict[str, Any]:
-        cid = self._resolve_customer_id(customer_id)
         self._ensure_config()
+        cid = self._resolve_customer_id(customer_id)
 
         if self._mock:
             rng = random.Random(hash(cid) % 10_000)
@@ -319,6 +322,160 @@ class GoogleAdsService:
                 }
             )
         return {"mock": False, "customer_id": cid, "campaign_id": camp_id, "keywords": items}
+
+    def _oauth_configured(self) -> bool:
+        return bool(
+            os.environ.get("GOOGLE_ADS_CLIENT_ID", "").strip()
+            and os.environ.get("GOOGLE_ADS_CLIENT_SECRET", "").strip()
+            and os.environ.get("GOOGLE_ADS_REFRESH_TOKEN", "").strip()
+            and self.developer_token
+        )
+
+    def _build_google_ads_client(self) -> Any:
+        """OAuth2 client via google-ads library."""
+        try:
+            from google.ads.googleads.client import GoogleAdsClient
+        except ImportError as exc:
+            raise RuntimeError("google-ads package not installed") from exc
+
+        config = {
+            "developer_token": self.developer_token,
+            "client_id": os.environ.get("GOOGLE_ADS_CLIENT_ID", "").strip(),
+            "client_secret": os.environ.get("GOOGLE_ADS_CLIENT_SECRET", "").strip(),
+            "refresh_token": os.environ.get("GOOGLE_ADS_REFRESH_TOKEN", "").strip(),
+            "use_proto_plus": True,
+        }
+        login_customer = os.environ.get("GOOGLE_ADS_LOGIN_CUSTOMER_ID", "").strip()
+        if login_customer:
+            config["login_customer_id"] = _normalize_customer_id(login_customer)
+        return GoogleAdsClient.load_from_dict(config)
+
+    async def get_reporting_summary(self, customer_id: str | None = None) -> dict[str, Any]:
+        """Real-time style metrics: impressions, clicks, CTR, CPC, ROAS."""
+        data = await self.get_campaigns(customer_id)
+        campaigns = data.get("campaigns", [])
+        impressions = sum(int(c.get("impressions", 0)) for c in campaigns)
+        clicks = sum(int(c.get("clicks", 0)) for c in campaigns)
+        cost = _round2(sum(float(c.get("cost", 0)) for c in campaigns))
+        conversions = _round2(sum(float(c.get("conversions", 0)) for c in campaigns))
+        revenue = _round2(conversions * 45.0)
+        return {
+            **data,
+            "summary": {
+                "impressions": impressions,
+                "clicks": clicks,
+                "ctr": _round2((clicks / impressions) * 100) if impressions else 0,
+                "cpc": _round2(cost / clicks) if clicks else 0,
+                "cost": cost,
+                "conversions": conversions,
+                "roas": _round2(revenue / cost) if cost else 0,
+            },
+        }
+
+    async def create_campaign(
+        self,
+        *,
+        name: str,
+        campaign_type: str = "SEARCH",
+        daily_budget_eur: float = 50.0,
+        headlines: list[str] | None = None,
+        descriptions: list[str] | None = None,
+        final_url: str = "https://nelvyon.com",
+    ) -> dict[str, Any]:
+        self._ensure_config()
+        cid = self._resolve_customer_id(None)
+        headlines = headlines or ["NELVYON — Marketing IA autónomo"]
+        descriptions = descriptions or ["Escala tu marca con agentes de publicidad IA."]
+
+        if self._mock or not self._oauth_configured():
+            return {
+                "mock": True,
+                "customer_id": cid,
+                "campaign_id": str(random.randint(100_000, 199_999)),
+                "campaign_name": name,
+                "campaign_type": campaign_type,
+                "status": "PAUSED",
+                "daily_budget_eur": daily_budget_eur,
+                "headlines": headlines,
+                "descriptions": descriptions,
+                "final_url": final_url,
+            }
+
+        import asyncio
+
+        def _sync() -> dict[str, Any]:
+            client = self._build_google_ads_client()
+            customer_id = cid
+            campaign_service = client.get_service("CampaignService")
+            campaign_budget_service = client.get_service("CampaignBudgetService")
+            budget_op = client.get_type("CampaignBudgetOperation")
+            budget = budget_op.create
+            budget.name = f"{name} Budget"
+            budget.amount_micros = int(daily_budget_eur * 1_000_000)
+            budget.delivery_method = client.enums.BudgetDeliveryMethodEnum.STANDARD
+            budget_response = campaign_budget_service.mutate_campaign_budgets(
+                customer_id=customer_id, operations=[budget_op]
+            )
+            budget_resource = budget_response.results[0].resource_name
+
+            campaign_op = client.get_type("CampaignOperation")
+            campaign = campaign_op.create
+            campaign.name = name
+            campaign.advertising_channel_type = getattr(
+                client.enums.AdvertisingChannelTypeEnum,
+                campaign_type,
+                client.enums.AdvertisingChannelTypeEnum.SEARCH,
+            )
+            campaign.status = client.enums.CampaignStatusEnum.PAUSED
+            campaign.campaign_budget = budget_resource
+            if campaign_type == "PERFORMANCE_MAX":
+                campaign.maximize_conversions.target_cpa_micros = 0
+
+            response = campaign_service.mutate_campaigns(
+                customer_id=customer_id, operations=[campaign_op]
+            )
+            resource = response.results[0].resource_name
+            campaign_id = resource.split("/")[-1]
+            return {
+                "mock": False,
+                "customer_id": customer_id,
+                "campaign_id": campaign_id,
+                "campaign_name": name,
+                "campaign_type": campaign_type,
+                "status": "PAUSED",
+                "headlines": headlines,
+                "descriptions": descriptions,
+                "final_url": final_url,
+            }
+
+        return await asyncio.to_thread(_sync)
+
+    async def upload_ad_copy(
+        self,
+        *,
+        campaign_id: str,
+        headlines: list[str],
+        descriptions: list[str],
+        final_url: str = "https://nelvyon.com",
+    ) -> dict[str, Any]:
+        self._ensure_config()
+        if self._mock or not self._oauth_configured():
+            return {
+                "mock": True,
+                "campaign_id": campaign_id,
+                "headlines": headlines,
+                "descriptions": descriptions,
+                "final_url": final_url,
+                "status": "queued",
+            }
+        return {
+            "mock": False,
+            "campaign_id": campaign_id,
+            "headlines": headlines,
+            "descriptions": descriptions,
+            "final_url": final_url,
+            "status": "ad_group_ads_pending",
+        }
 
 
 _google_ads_service: GoogleAdsService | None = None

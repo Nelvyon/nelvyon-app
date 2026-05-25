@@ -62,6 +62,10 @@ google-api-python-client>=2.100.0
 # Google Analytics 4 Data API
 google-analytics-data>=0.18.0
 
+# F60 — Google Ads + Meta Marketing API
+google-ads>=24.1.0
+facebook-business>=19.0.0
+
 # Web Push (PWA) — VAPID notifications
 pywebpush>=2.0.0
 
