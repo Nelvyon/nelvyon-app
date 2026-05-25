@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import re
+import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -31,6 +32,7 @@ DEFAULT_COLORS = {
     "accent_color": "#06b6d4",
 }
 
+ALLOWED_FONTS = frozenset({"Inter", "Poppins", "Montserrat", "Playfair Display"})
 EMAIL_TEMPLATE_TYPES = frozenset(
     {
         "welcome",
@@ -79,6 +81,7 @@ class WhitelabelService:
         if not db_manager.async_session_maker:
             await db_manager.ensure_initialized()
         sql_path = Path(__file__).resolve().parent.parent / "migrations" / "whitelabel.sql"
+        ext_path = Path(__file__).resolve().parent.parent / "migrations" / "whitelabel_config.sql"
         if sql_path.exists():
             raw = sql_path.read_text(encoding="utf-8")
             async with db_manager.async_session_maker() as session:
@@ -88,6 +91,16 @@ class WhitelabelService:
                     except Exception as exc:
                         if "already exists" not in str(exc).lower():
                             logger.debug("whitelabel schema stmt skipped: %s", exc)
+                await session.commit()
+        if ext_path.exists():
+            raw_ext = ext_path.read_text(encoding="utf-8")
+            async with db_manager.async_session_maker() as session:
+                for stmt in [s.strip() for s in raw_ext.split(";") if s.strip()]:
+                    try:
+                        await session.execute(text(stmt))
+                    except Exception as exc:
+                        if "already exists" not in str(exc).lower() and "duplicate column" not in str(exc).lower():
+                            logger.debug("whitelabel ext stmt skipped: %s", exc)
                 await session.commit()
         _SCHEMA_READY = True
 
@@ -110,21 +123,29 @@ class WhitelabelService:
             raise ValueError("Invalid custom domain format")
 
         verified_domain = False
+        dns_txt_token = None
         if domain_norm:
+            dns_txt_token = secrets.token_hex(16)
             check = await self.validate_custom_domain(domain_norm)
             verified_domain = bool(check.get("verified"))
+
+        font = (config.get("font") or "Inter").strip()
+        if font not in ALLOWED_FONTS:
+            font = "Inter"
 
         r = await self.session.execute(
             text(
                 """
                 INSERT INTO whitelabel_configs (
                     workspace_id, custom_domain, brand_name, logo_url, favicon_url,
-                    colors, email_config, hide_branding, custom_css, verified_domain, updated_at
+                    colors, email_config, hide_branding, custom_css, verified_domain,
+                    font, support_email, dns_txt_token, updated_at
                 )
                 VALUES (
                     :ws, :custom_domain, :brand_name, :logo_url, :favicon_url,
                     CAST(:colors AS jsonb), CAST(:email_config AS jsonb),
-                    :hide_branding, :custom_css, :verified_domain, NOW()
+                    :hide_branding, :custom_css, :verified_domain,
+                    :font, :support_email, :dns_txt_token, NOW()
                 )
                 ON CONFLICT (workspace_id) DO UPDATE SET
                     custom_domain = EXCLUDED.custom_domain,
@@ -136,6 +157,9 @@ class WhitelabelService:
                     hide_branding = EXCLUDED.hide_branding,
                     custom_css = EXCLUDED.custom_css,
                     verified_domain = EXCLUDED.verified_domain,
+                    font = EXCLUDED.font,
+                    support_email = EXCLUDED.support_email,
+                    dns_txt_token = COALESCE(EXCLUDED.dns_txt_token, whitelabel_configs.dns_txt_token),
                     updated_at = NOW()
                 RETURNING *
                 """
@@ -143,7 +167,7 @@ class WhitelabelService:
             {
                 "ws": self.workspace_id,
                 "custom_domain": domain_norm,
-                "brand_name": (config.get("brand_name") or "").strip() or None,
+                "brand_name": (config.get("brand_name") or config.get("company_name") or "").strip() or None,
                 "logo_url": config.get("logo_url"),
                 "favicon_url": config.get("favicon_url"),
                 "colors": _json_dumps(colors),
@@ -151,6 +175,9 @@ class WhitelabelService:
                 "hide_branding": bool(config.get("hide_nelvyon_branding")),
                 "custom_css": config.get("custom_css"),
                 "verified_domain": verified_domain,
+                "font": font,
+                "support_email": config.get("support_email"),
+                "dns_txt_token": dns_txt_token,
             },
         )
         await self.session.commit()
@@ -208,6 +235,244 @@ class WhitelabelService:
             "verified": verified,
         }
 
+    async def verify_domain(self, workspace_id: int | None = None) -> dict[str, Any]:
+        """Verify DNS TXT record (and optionally CNAME) for custom domain."""
+        await self.ensure_schema()
+        ws = int(workspace_id or self.workspace_id)
+        cfg = await self.get_whitelabel_config(ws)
+        domain = cfg.get("custom_domain")
+        if not domain:
+            raise ValueError("No custom domain configured")
+
+        token = cfg.get("dns_txt_token")
+        if not token:
+            token = secrets.token_hex(16)
+            await self.session.execute(
+                text(
+                    "UPDATE whitelabel_configs SET dns_txt_token = :t, updated_at = NOW() WHERE workspace_id = :ws"
+                ),
+                {"t": token, "ws": ws},
+            )
+            await self.session.commit()
+
+        expected_txt = f"nelvyon-verification={token}"
+        txt_records = await asyncio.to_thread(_resolve_txt, domain)
+        txt_verified = any(expected_txt in rec for rec in txt_records)
+
+        cname_check = await self.validate_custom_domain(domain)
+        verified = txt_verified or bool(cname_check.get("verified"))
+
+        if verified:
+            await self.session.execute(
+                text(
+                    "UPDATE whitelabel_configs SET verified_domain = TRUE, updated_at = NOW() WHERE workspace_id = :ws"
+                ),
+                {"ws": ws},
+            )
+            await self.session.commit()
+            await self.verify_ses_domain(domain)
+
+        return {
+            "domain": domain,
+            "verified": verified,
+            "txt_record_name": f"_nelvyon.{domain}",
+            "txt_record_value": expected_txt,
+            "txt_found": txt_records,
+            "cname": cname_check,
+            "instructions": (
+                f"Añade un registro TXT en _nelvyon.{domain} con valor: {expected_txt}\n"
+                f"Opcional: CNAME {domain} → {DEFAULT_CNAME_TARGET}"
+            ),
+        }
+
+    async def get_dns_instructions(self) -> dict[str, Any]:
+        cfg = await self.get_whitelabel_config()
+        domain = cfg.get("custom_domain")
+        if not domain:
+            raise ValueError("Configure a custom domain first")
+        token = cfg.get("dns_txt_token") or secrets.token_hex(16)
+        if not cfg.get("dns_txt_token"):
+            await self.session.execute(
+                text("UPDATE whitelabel_configs SET dns_txt_token = :t WHERE workspace_id = :ws"),
+                {"t": token, "ws": self.workspace_id},
+            )
+            await self.session.commit()
+        return {
+            "domain": domain,
+            "txt_host": f"_nelvyon.{domain}",
+            "txt_value": f"nelvyon-verification={token}",
+            "cname_target": DEFAULT_CNAME_TARGET,
+        }
+
+    async def apply_whitelabel(self, workspace_id: int | None = None) -> dict[str, Any]:
+        """Full frontend theming payload with CSS variables."""
+        cfg = await self.get_whitelabel_config(workspace_id)
+        font = cfg.get("font") or "Inter"
+        primary = cfg.get("primary_color") or DEFAULT_COLORS["primary_color"]
+        secondary = cfg.get("secondary_color") or DEFAULT_COLORS["secondary_color"]
+        brand = cfg.get("brand_name") or "Portal"
+        hide = bool(cfg.get("hide_nelvyon_branding"))
+        return {
+            "workspace_id": cfg.get("workspace_id"),
+            "company_name": brand,
+            "brand_name": brand,
+            "logo_url": cfg.get("logo_url"),
+            "favicon_url": cfg.get("favicon_url"),
+            "primary_color": primary,
+            "secondary_color": secondary,
+            "font": font,
+            "support_email": cfg.get("support_email"),
+            "hide_nelvyon_branding": hide,
+            "custom_css": cfg.get("custom_css") or "",
+            "custom_domain": cfg.get("custom_domain"),
+            "verified_domain": cfg.get("verified_domain"),
+            "smtp_from_name": cfg.get("custom_email_from_name") or brand,
+            "smtp_from_email": cfg.get("custom_email_from_address"),
+            "css_variables": {
+                "--primary-color": primary,
+                "--secondary-color": secondary,
+                "--font-family": f'"{font}", system-ui, -apple-system, sans-serif',
+                "--brand-name": f'"{brand}"',
+            },
+        }
+
+    async def verify_ses_domain(self, domain: str) -> dict[str, Any]:
+        """Request SES domain identity verification for client sending."""
+        domain_norm = _normalize_domain(domain)
+        if not domain_norm:
+            return {"verified": False, "skipped": True}
+        if os.environ.get("SES_MOCK", "").lower() in ("1", "true", "yes"):
+            return {"domain": domain_norm, "verified": True, "mock": True}
+
+        def _verify() -> dict[str, Any]:
+            import boto3
+
+            client = boto3.client("ses", region_name=os.environ.get("AWS_REGION", "eu-west-1"))
+            resp = client.verify_domain_identity(Domain=domain_norm)
+            client.verify_domain_dkim(Domain=domain_norm)
+            return {"verification_token": resp.get("VerificationToken"), "domain": domain_norm}
+
+        try:
+            result = await asyncio.to_thread(_verify)
+            await self.session.execute(
+                text(
+                    """
+                    UPDATE whitelabel_configs
+                    SET ses_domain_verified = TRUE, updated_at = NOW()
+                    WHERE workspace_id = :ws AND custom_domain = :domain
+                    """
+                ),
+                {"ws": self.workspace_id, "domain": domain_norm},
+            )
+            await self.session.commit()
+            result["verified"] = True
+            return result
+        except Exception as exc:
+            logger.warning("SES domain verify failed for %s: %s", domain_norm, exc)
+            return {"domain": domain_norm, "verified": False, "error": str(exc)}
+
+    async def get_email_sender(self, workspace_id: int | None = None) -> dict[str, str | None]:
+        """Resolved from-name / from-email for campaigns and reports."""
+        cfg = await self.get_whitelabel_config(workspace_id)
+        brand = cfg.get("brand_name") or "Portal"
+        from_name = cfg.get("custom_email_from_name") or brand
+        from_email = cfg.get("custom_email_from_address")
+        if from_email and cfg.get("verified_domain"):
+            return {"from_name": from_name, "from_email": from_email}
+        return {
+            "from_name": from_name,
+            "from_email": from_email or os.environ.get("SES_FROM_EMAIL", "").strip() or None,
+        }
+
+    async def partner_can_resell(self) -> bool:
+        r = await self.session.execute(
+            text("SELECT plan, features_json FROM workspaces WHERE id = :ws"),
+            {"ws": self.workspace_id},
+        )
+        row = r.mappings().first()
+        if not row:
+            return False
+        plan = (row.get("plan") or "").lower()
+        if plan in ("enterprise", "partner", "whitelabel", "agency"):
+            return True
+        features = row.get("features_json") or ""
+        return "whitelabel" in features.lower() or "partner" in features.lower()
+
+    async def create_subworkspace(self, name: str, admin_email: str) -> dict[str, Any]:
+        """Partner creates a child workspace inheriting partner branding."""
+        if not await self.partner_can_resell():
+            raise ValueError("White-label partner plan required to create sub-workspaces")
+
+        partner_cfg = await self.get_whitelabel_config()
+        slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:40] or "client"
+        ins = await self.session.execute(
+            text(
+                """
+                INSERT INTO workspaces (user_id, name, slug, plan, status, parent_workspace_id, created_at)
+                VALUES (:uid, :name, :slug, 'starter', 'active', :parent, NOW())
+                RETURNING id
+                """
+            ),
+            {
+                "uid": f"partner-{self.workspace_id}",
+                "name": name.strip(),
+                "slug": f"{slug}-{secrets.token_hex(3)}",
+                "parent": self.workspace_id,
+            },
+        )
+        child_id = int(ins.scalar_one())
+        await self.session.execute(
+            text(
+                """
+                INSERT INTO whitelabel_configs (
+                    workspace_id, brand_name, logo_url, favicon_url, colors, email_config,
+                    hide_branding, custom_css, verified_domain, font, support_email, updated_at
+                )
+                SELECT
+                    :child, brand_name, logo_url, favicon_url, colors, email_config,
+                    TRUE, custom_css, FALSE, font, support_email, NOW()
+                FROM whitelabel_configs WHERE workspace_id = :parent
+                """
+            ),
+            {"child": child_id, "parent": self.workspace_id},
+        )
+        await self.session.execute(
+            text(
+                """
+                INSERT INTO whitelabel_partner_clients (partner_workspace_id, client_workspace_id, client_name, admin_email)
+                VALUES (:partner, :child, :name, :email)
+                """
+            ),
+            {
+                "partner": self.workspace_id,
+                "child": child_id,
+                "name": name.strip(),
+                "email": admin_email.strip(),
+            },
+        )
+        await self.session.commit()
+        return {
+            "client_workspace_id": child_id,
+            "client_name": name,
+            "admin_email": admin_email,
+            "branding": await self.apply_whitelabel(child_id),
+        }
+
+    async def list_partner_clients(self) -> list[dict[str, Any]]:
+        r = await self.session.execute(
+            text(
+                """
+                SELECT c.*, w.name AS workspace_name, w.status
+                FROM whitelabel_partner_clients c
+                JOIN workspaces w ON w.id = c.client_workspace_id
+                WHERE c.partner_workspace_id = :ws
+                ORDER BY c.created_at DESC
+                """
+            ),
+            {"ws": self.workspace_id},
+        )
+        return [_row(x) for x in r.mappings().all()]
+
     async def mark_domain_verified(self, domain: str) -> dict[str, Any]:
         check = await self.validate_custom_domain(domain)
         if not check["verified"]:
@@ -244,8 +509,14 @@ class WhitelabelService:
         subject = vars_map.get("subject") or _default_subject(template_type, brand)
 
         footer = ""
-        if not hide:
-            footer = f'<p style="color:#94a3b8;font-size:12px;">Powered by NELVYON</p>'
+        if hide:
+            support = cfg.get("support_email")
+            footer = f'<p style="color:#64748b;font-size:12px;">{brand}'
+            if support:
+                footer += f' · <a href="mailto:{support}">{support}</a>'
+            footer += "</p>"
+        else:
+            footer = '<p style="color:#94a3b8;font-size:12px;">Powered by NELVYON</p>'
 
         html = f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
@@ -331,9 +602,30 @@ class WhitelabelService:
             "hide_nelvyon_branding": bool(row.get("hide_branding")),
             "custom_css": row.get("custom_css"),
             "verified_domain": bool(row.get("verified_domain")),
+            "font": row.get("font") or "Inter",
+            "support_email": row.get("support_email"),
+            "dns_txt_token": row.get("dns_txt_token"),
+            "ses_domain_verified": bool(row.get("ses_domain_verified")),
             "created_at": row.get("created_at"),
             "updated_at": row.get("updated_at"),
         }
+
+
+def _resolve_txt(domain: str) -> list[str]:
+    try:
+        import dns.resolver
+    except ImportError:
+        return []
+    records: list[str] = []
+    for host in (f"_nelvyon.{domain}", domain):
+        try:
+            answers = dns.resolver.resolve(host, "TXT")
+            for r in answers:
+                txt = b"".join(r.strings).decode("utf-8", errors="ignore")
+                records.append(txt)
+        except Exception:
+            continue
+    return records
 
 
 def _resolve_cname_chain(domain: str) -> list[str]:

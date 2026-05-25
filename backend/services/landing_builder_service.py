@@ -114,6 +114,27 @@ DEFAULT_BLOCK_PROPS: dict[str, dict[str, Any]] = {
         "logos": [],
         "padding": "32px 24px",
     },
+    "hero_3d": {
+        "headline": "Experience the future",
+        "subheadline": "Premium 3D hero section",
+        "ctaText": "Get started",
+        "ctaUrl": "#",
+        "imageUrl": "",
+        "padding": "0",
+        "backgroundColor": "#030712",
+    },
+    "product_3d": {
+        "title": "Our product",
+        "headline": "Our product",
+        "subheadline": "Designed for excellence",
+        "padding": "64px 24px",
+        "backgroundColor": "#0f172a",
+    },
+    "stats_3d": {
+        "stats": [{"label": "Users", "value": "50k+"}, {"label": "Uptime", "value": "99.9%"}],
+        "padding": "48px 24px",
+        "backgroundColor": "#020617",
+    },
 }
 
 

@@ -21,6 +21,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.config import settings
 from core.database import db_manager
 from services.landing_builder_service import LandingBuilderService, _make_block
+from services.os_design_pipeline import (
+    generate_hero_image_dalle,
+    inject_store_hero_url,
+    run_design_score_and_improve,
+)
 from services.tenant_service import TenantService
 from services.whitelabel_service import DEFAULT_CNAME_TARGET, _resolve_cname_chain
 
@@ -307,6 +312,23 @@ class OsStoreBuilderService:
                 await self._create_product_impl(
                     project_id, workspace_id, prod, currency, store_info, ai=True
                 )
+
+            sector = store_info.get("sector") or store_info.get("category") or "ecommerce"
+            hero_url = await generate_hero_image_dalle(
+                str(sector),
+                str(store_info.get("store_name") or project.get("name") or ""),
+            )
+            store_json = await self.build_store_json(project_id, workspace_id)
+            if hero_url:
+                store_json = inject_store_hero_url(store_json, hero_url)
+            store_json, design_eval = await run_design_score_and_improve(store_json)
+            await self.apply_store_json(project_id, workspace_id, store_json)
+            logger.info(
+                "OS Store design pipeline project=%s avg=%s passed=%s",
+                project_id,
+                design_eval.get("average"),
+                design_eval.get("passed"),
+            )
 
             products = await self._list_products(project_id)
             seo = self._build_seo_artifacts(project, products, subdomain)
@@ -1304,6 +1326,77 @@ class OsStoreBuilderService:
         if not subdomain:
             return None
         return f"{STORE_BASE}/store/{subdomain}"
+
+    async def build_store_json(
+        self, project_id: str, workspace_id: int
+    ) -> dict[str, Any]:
+        project = await self.get_project(project_id, workspace_id)
+        if not project:
+            raise ValueError("Project not found")
+        store_info = _parse_jsonb(project.get("store_info")) or {}
+        pages_out: list[dict[str, Any]] = []
+        for page in project.get("pages") or []:
+            lp_id = page.get("landing_page_id")
+            blocks: list[Any] = []
+            meta: dict[str, Any] = {}
+            if lp_id:
+                r = await self.session.execute(
+                    text("SELECT blocks, meta FROM landing_pages WHERE id = :id::uuid"),
+                    {"id": lp_id},
+                )
+                lp = _row(r.fetchone())
+                blocks = _parse_jsonb(lp.get("blocks")) or []
+                meta = _parse_jsonb(lp.get("meta")) or {}
+            pages_out.append(
+                {
+                    "id": page.get("id"),
+                    "page_type": page.get("page_type"),
+                    "page_slug": page.get("page_slug"),
+                    "landing_page_id": lp_id,
+                    "blocks": blocks,
+                    "meta": meta,
+                }
+            )
+        return {
+            "project_id": project_id,
+            "name": project.get("name"),
+            "subdomain": project.get("subdomain"),
+            "hero_image_url": store_info.get("hero_image_url"),
+            "store_info": store_info,
+            "pages": pages_out,
+        }
+
+    async def apply_store_json(
+        self, project_id: str, workspace_id: int, store_json: dict[str, Any]
+    ) -> None:
+        landing_svc = LandingBuilderService(self.session, workspace_id)
+        store_info = dict(store_json.get("store_info") or {})
+        hero_url = store_json.get("hero_image_url") or store_info.get("hero_image_url")
+        if hero_url:
+            store_info["hero_image_url"] = hero_url
+            await self.session.execute(
+                text(
+                    """
+                    UPDATE os_store_projects
+                    SET store_info = CAST(:info AS jsonb), updated_at = NOW()
+                    WHERE id = :id::uuid
+                    """
+                ),
+                {"info": _json_dumps(store_info), "id": project_id},
+            )
+        for page in store_json.get("pages") or []:
+            lp_id = page.get("landing_page_id")
+            if not lp_id:
+                continue
+            await landing_svc.update_page(
+                lp_id,
+                workspace_id,
+                {
+                    "blocks": page.get("blocks") or [],
+                    "meta": page.get("meta") or {},
+                },
+            )
+        await self.session.commit()
 
 
 def get_os_store_builder_service(

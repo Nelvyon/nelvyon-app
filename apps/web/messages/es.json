@@ -127,5 +127,77 @@
       "completed": "Completado",
       "failed": "Fallido"
     }
+  },
+  "shell": {
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "language": "Idioma",
+    "selectLanguage": "Seleccionar idioma"
+  },
+  "sidebar": {
+    "revenue": "Revenue",
+    "crm": "CRM",
+    "campaigns": "Campañas",
+    "sms": "SMS",
+    "workflows": "Workflows",
+    "automation": "Automatización",
+    "inbox": "Inbox",
+    "helpdesk": "Helpdesk",
+    "contracts": "Contratos",
+    "billing": "Facturación",
+    "calendar": "Calendario",
+    "bookings": "Reservas",
+    "seo": "SEO",
+    "aiHub": "IA Hub",
+    "aiModel": "Mi Modelo IA",
+    "affiliates": "Afiliados",
+    "storage": "Storage",
+    "reports": "Reportes",
+    "analytics": "Analytics",
+    "executiveReports": "Reportes Ejecutivos",
+    "settings": "Configuración",
+    "whiteLabel": "White-label",
+    "apiWebhooks": "API & Webhooks",
+    "os": "OS",
+    "websites": "Webs",
+    "stores": "Tiendas",
+    "landingPages": "Landing Pages",
+    "funnels": "Funnels",
+    "liveChat": "Live Chat",
+    "chatbot": "Chatbot",
+    "courses": "Cursos",
+    "abTesting": "A/B Testing",
+    "loyalty": "Loyalty",
+    "webinars": "Webinars",
+    "cdp": "CDP",
+    "dialer": "Dialer",
+    "qr": "QR Codes",
+    "forms": "Formularios",
+    "social": "Social",
+    "socialMonitoring": "Social Monitoring",
+    "history": "Historial",
+    "help": "Ayuda"
+  },
+  "settingsPage": {
+    "title": "Configuración",
+    "subtitle": "Workspace, equipo, facturación y privacidad",
+    "languageRegion": "Idioma y Región",
+    "language": "Idioma",
+    "timezone": "Zona horaria",
+    "dateFormat": "Formato de fecha",
+    "save": "Guardar cambios",
+    "saved": "Configuración guardada",
+    "saveError": "No se pudo guardar"
+  },
+  "errors": {
+    "generic": "Ha ocurrido un error",
+    "network": "Error de conexión",
+    "unauthorized": "No autorizado",
+    "notFound": "No encontrado"
+  },
+  "notifications": {
+    "saved": "Guardado correctamente",
+    "sent": "Enviado correctamente",
+    "error": "Operación fallida"
   }
 }

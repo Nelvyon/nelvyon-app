@@ -1,4 +1,10 @@
 export { BaseOsAgent } from "./BaseOsAgent";
+export {
+  detectLanguageFromText,
+  localizedPrompt,
+  resolveAgentLocale,
+  type AgentLocale,
+} from "./agentLanguage";
 export { SectorAgentBase, SECTOR_ARTIFACT_PUBLISH_STEP } from "./SectorAgentBase";
 export { SectorAgentWrapper, SECTOR_EXECUTE_STEP, type SectorCoreExecutor } from "./SectorAgentWrapper";
 export {

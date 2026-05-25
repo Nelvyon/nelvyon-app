@@ -17,11 +17,14 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 # Ensure backend is in path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _backend_dir)
+
+_test_db_path = os.path.join(_backend_dir, "test.db").replace("\\", "/")
 
 # Set test environment BEFORE importing app
 os.environ["ENVIRONMENT"] = "test"
-os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test.db"
+os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{_test_db_path}"
 # Job queue: tests must use in-process AsyncJobQueue (ARQ+Redis would leave jobs pending without a broker worker).
 os.environ.pop("REDIS_URL", None)
 os.environ["JWT_SECRET_KEY"] = "test-secret-key-not-for-production"
@@ -37,6 +40,10 @@ os.environ.setdefault("NELVYON_TEST_MAX_WORKSPACES_PER_USER", "64")
 # OAuth oleada 3: authorize URL tests (sin secret real en CI)
 os.environ.setdefault("META_CLIENT_ID", "test_meta_client_id")
 os.environ.setdefault("META_CLIENT_SECRET", "test_meta_client_secret")
+os.environ.setdefault("OIDC_ISSUER_URL", "https://test-issuer.nelvyon.example.com")
+os.environ.setdefault("OIDC_CLIENT_ID", "test_oidc_client_id")
+os.environ.setdefault("OIDC_CLIENT_SECRET", "test_oidc_client_secret")
+os.environ.setdefault("VOICE_V1_PLAN_IDS", "starter")
 
 
 @pytest.fixture(scope="session")
@@ -51,16 +58,16 @@ def event_loop():
 async def test_engine():
     """Create test database engine with SQLite."""
     engine = create_async_engine(
-        "sqlite+aiosqlite:///test.db",
+        f"sqlite+aiosqlite:///{_test_db_path}",
         echo=False,
     )
     yield engine
     await engine.dispose()
     # Cleanup test database (Windows puede retener el handle un instante)
-    if os.path.exists("test.db"):
+    if os.path.exists(_test_db_path):
         for _ in range(5):
             try:
-                os.remove("test.db")
+                os.remove(_test_db_path)
                 break
             except PermissionError:
                 gc.collect()
@@ -140,6 +147,16 @@ async def setup_database(test_engine):
                 ('member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'Member User', 'user'),
                 ('admin-user-00000000-0000-0000-0000-000000000001', 'admin@nelvyon-test.com', 'Admin User', 'admin'),
                 ('super-admin-00000000-0000-0000-0000-000000000001', 'superadmin@nelvyon-test.com', 'Super Admin', 'super_admin')
+                """
+            )
+        )
+        await conn.execute(
+            text(
+                """
+                INSERT OR IGNORE INTO subscriptions (user_id, workspace_id, plan_id, billing_cycle, status)
+                VALUES
+                ('test-user-00000000-0000-0000-0000-000000000001', 1, 'starter', 'monthly', 'active'),
+                ('admin-user-00000000-0000-0000-0000-000000000001', 2, 'starter', 'monthly', 'active')
                 """
             )
         )
@@ -260,6 +277,44 @@ async def admin_headers(client: AsyncClient) -> dict:
         "Authorization": f"Bearer {token}",
         "X-Workspace-Id": "2",
     }
+
+
+@pytest.fixture
+def auth_only_headers() -> dict:
+    """Bearer JWT without workspace header (for 401/400 contract tests)."""
+    from core.auth import create_access_token
+
+    token = create_access_token(
+        {
+            "sub": "test-user-00000000-0000-0000-0000-000000000001",
+            "email": "testuser@nelvyon-test.com",
+            "name": "Test User",
+            "role": "user",
+        }
+    )
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest_asyncio.fixture
+async def workspace_headers(auth_headers: dict) -> dict:
+    """Authenticated user with active workspace (alias for auth_headers)."""
+    return auth_headers
+
+
+@pytest.fixture(autouse=True)
+def _restore_voice_plan_env():
+    """Governance tests may delenv VOICE_V1_PLAN_IDS; restore for downstream tests."""
+    yield
+    os.environ["VOICE_V1_PLAN_IDS"] = "starter"
+    os.environ.pop("NEXT_PUBLIC_VOICE_V1_PLAN_IDS", None)
+
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def integration_sqlite_schemas(test_engine, setup_database):
+    """Bootstrap SQLite-friendly module tables for Frente 48 HTTP tests."""
+    from tests.integration_bootstrap import bootstrap_integration_schemas
+
+    await bootstrap_integration_schemas(test_engine)
 
 
 def pytest_configure(config):

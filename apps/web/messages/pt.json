@@ -1,0 +1,203 @@
+{
+  "hero": {
+    "title": "O primeiro OS de marketing digital com IA",
+    "subtitle": "22 serviços premium executados automaticamente. Sem equipa. Sem esperas. Qualidade de agência global.",
+    "cta_primary": "Começar grátis",
+    "cta_secondary": "Ver serviços"
+  },
+  "pricing": {
+    "title": "Planes NELVYON",
+    "starter": "STARTER",
+    "pro": "PRO",
+    "enterprise": "ENTERPRISE",
+    "monthly": "Mensual",
+    "annual": "Anual (2 meses gratis)",
+    "most_popular": "Más popular"
+  },
+  "partners": {
+    "title": "Gana vendiendo NELVYON",
+    "subtitle": "30% de comisión mensual por cada cliente que traigas. Sin límite de ganancias. Sin coste de entrada.",
+    "how_it_works": "Cómo funciona"
+  },
+  "nav": {
+    "services": "Serviços",
+    "pricing": "Preços",
+    "partners": "Parceiros",
+    "login": "Entrar"
+  },
+  "footer": {
+    "rights": "© 2026 NELVYON"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar a NELVYON OS",
+      "email": "Email",
+      "password": "Contraseña",
+      "submit": "Entrar",
+      "no_account": "¿Sin cuenta?"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "name": "Nombre completo",
+      "email": "Email",
+      "password": "Contraseña",
+      "submit": "Crear cuenta",
+      "has_account": "¿Ya tienes cuenta?"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bem-vindo, {company}",
+    "active_jobs": "Serviços ativos",
+    "completed_jobs": "Serviços concluídos",
+    "total_spend": "Gasto total",
+    "current_plan": "Plano atual",
+    "recent_activity": "Atividade recente",
+    "empty_state": "Ainda não há serviços executados. Comece em Serviços.",
+    "quick_actions": "Ações rápidas"
+  },
+  "crm": {
+    "title": "CRM integrado",
+    "contacts": "Contactos",
+    "pipeline": "Pipeline",
+    "new_contact": "Nuevo contacto",
+    "search": "Buscar nombre o email",
+    "filter": "Filtro",
+    "no_contacts": "No hay contactos todavía."
+  },
+  "workflows": {
+    "title": "Workflows",
+    "new_workflow": "Nuevo workflow",
+    "no_workflows": "No hay workflows",
+    "status": {
+      "draft": "Borrador",
+      "active": "Activo",
+      "paused": "Pausado"
+    }
+  },
+  "campanias": {
+    "title": "Campañas",
+    "new": "Nueva campaña",
+    "no_campanias": "No hay campañas",
+    "status": {
+      "draft": "Borrador",
+      "running": "En ejecución",
+      "completed": "Completada"
+    }
+  },
+  "admin": {
+    "title": "Admin",
+    "tenants": "Tenants",
+    "jobs": "Jobs",
+    "activity": "Actividad",
+    "stats": {
+      "total_tenants": "Tenants totales",
+      "active_tenants": "Tenants activos",
+      "total_jobs": "Jobs totales",
+      "running_jobs": "Jobs en ejecución"
+    }
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "loading": "A carregar",
+    "error": "Erro",
+    "success": "Sucesso",
+    "retry": "Tentar novamente",
+    "back": "Voltar",
+    "next": "Seguinte",
+    "finish": "Concluir",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "empty_state": "Sem resultados",
+    "view_all": "Ver tudo"
+  },
+  "os": {
+    "execution": {
+      "title": "Ejecución OS",
+      "no_jobs": "No hay jobs"
+    },
+    "intake": {
+      "title": "Intake de servicio"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "running": "En ejecución",
+      "completed": "Completado",
+      "failed": "Fallido"
+    }
+  },
+  "shell": {
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "language": "Idioma",
+    "selectLanguage": "Selecionar idioma"
+  },
+  "sidebar": {
+    "revenue": "Revenue",
+    "crm": "CRM",
+    "campaigns": "Campanhas",
+    "sms": "SMS",
+    "workflows": "Workflows",
+    "automation": "Automação",
+    "inbox": "Inbox",
+    "helpdesk": "Helpdesk",
+    "contracts": "Contratos",
+    "billing": "Faturação",
+    "calendar": "Calendário",
+    "bookings": "Reservas",
+    "seo": "SEO",
+    "aiHub": "IA Hub",
+    "aiModel": "O meu modelo IA",
+    "affiliates": "Afiliados",
+    "storage": "Storage",
+    "reports": "Relatórios",
+    "analytics": "Analytics",
+    "executiveReports": "Relatórios executivos",
+    "settings": "Definições",
+    "whiteLabel": "White-label",
+    "apiWebhooks": "API & Webhooks",
+    "os": "OS",
+    "websites": "Websites",
+    "stores": "Lojas",
+    "landingPages": "Landing pages",
+    "funnels": "Funnels",
+    "liveChat": "Live Chat",
+    "chatbot": "Chatbot",
+    "courses": "Cursos",
+    "abTesting": "A/B Testing",
+    "loyalty": "Loyalty",
+    "webinars": "Webinars",
+    "cdp": "CDP",
+    "dialer": "Dialer",
+    "qr": "QR Codes",
+    "forms": "Formulários",
+    "social": "Social",
+    "socialMonitoring": "Social Monitoring",
+    "history": "Histórico",
+    "help": "Ajuda"
+  },
+  "settingsPage": {
+    "title": "Definições",
+    "subtitle": "Workspace, equipa, faturação e privacidade",
+    "languageRegion": "Idioma e região",
+    "language": "Idioma",
+    "timezone": "Fuso horário",
+    "dateFormat": "Formato de data",
+    "save": "Guardar alterações",
+    "saved": "Definições guardadas",
+    "saveError": "Não foi possível guardar"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro",
+    "network": "Erro de ligação",
+    "unauthorized": "Não autorizado",
+    "notFound": "Não encontrado"
+  },
+  "notifications": {
+    "saved": "Guardado com sucesso",
+    "sent": "Enviado com sucesso",
+    "error": "Operação falhou"
+  }
+}

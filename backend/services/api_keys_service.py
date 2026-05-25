@@ -18,7 +18,19 @@ logger = logging.getLogger(__name__)
 
 KEY_PREFIX = "nlv_"
 VALID_SCOPES = frozenset(
-    {"read", "write", "admin", "webhooks", "campaigns", "crm", "analytics"}
+    {
+        "read",
+        "write",
+        "admin",
+        "webhooks",
+        "campaigns",
+        "crm",
+        "analytics",
+        "contacts",
+        "chatbot",
+        "forms",
+        "workflows",
+    }
 )
 
 
@@ -113,6 +125,7 @@ class APIKeysService:
                 SELECT id, workspace_id, name, scopes, expires_at, revoked_at
                 FROM api_keys
                 WHERE key_hash = :hash
+                  AND revoked_at IS NULL
                 LIMIT 1
                 """
             ),

@@ -9,6 +9,32 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
+@pytest.fixture(autouse=True)
+def _voice_plan_allowlist(monkeypatch: pytest.MonkeyPatch):
+    """Isolate voice tests from env/subscription pollution across the full suite."""
+    monkeypatch.setenv("VOICE_V1_PLAN_IDS", "starter")
+    monkeypatch.delenv("NEXT_PUBLIC_VOICE_V1_PLAN_IDS", raising=False)
+
+
+@pytest.fixture(autouse=True)
+async def _voice_workspace_starter_plan(db_session: AsyncSession):
+    for ws_id, user_id in (
+        (1, "test-user-00000000-0000-0000-0000-000000000001"),
+        (2, "admin-user-00000000-0000-0000-0000-000000000001"),
+    ):
+        await db_session.execute(text("DELETE FROM subscriptions WHERE workspace_id = :ws"), {"ws": ws_id})
+        await db_session.execute(
+            text(
+                """
+                INSERT INTO subscriptions (user_id, workspace_id, plan_id, billing_cycle, status)
+                VALUES (:uid, :ws, 'starter', 'monthly', 'active')
+                """
+            ),
+            {"uid": user_id, "ws": ws_id},
+        )
+    await db_session.commit()
+
+
 def _minimal_wav() -> bytes:
     """Tiny valid WAV (silence) for multipart upload tests."""
     data = b""

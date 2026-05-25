@@ -216,6 +216,23 @@ class LiveChatService:
             {"type": "message", "message": message},
         )
 
+        if sender_type == "visitor":
+            try:
+                from services.omnichannel_service import ingest_omnichannel_inbound
+
+                await ingest_omnichannel_inbound(
+                    self.session,
+                    tid,
+                    "chat",
+                    content,
+                    participant_name=conv.get("visitor_name"),
+                    participant_email=conv.get("visitor_email"),
+                    external_id=conversation_id,
+                    metadata={"sender_type": sender_type},
+                )
+            except Exception as exc:
+                logger.debug("omnichannel chat ingest skipped: %s", exc)
+
         if (
             sender_type == "visitor"
             and not skip_auto_reply_schedule

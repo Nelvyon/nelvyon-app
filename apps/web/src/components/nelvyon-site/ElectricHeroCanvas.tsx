@@ -27,22 +27,29 @@ function ParticleField() {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial color="#0066FF" size={0.045} sizeAttenuation transparent opacity={0.85} depthWrite={false} />
+      <pointsMaterial color="#0066FF" size={0.055} sizeAttenuation transparent opacity={0.9} depthWrite={false} />
     </points>
   );
 }
 
 export function ElectricHeroCanvas() {
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10 opacity-80">
-      <Canvas camera={{ position: [0, 0, 8], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}>
-        <ambientLight intensity={0.15} />
-        <pointLight color="#0066FF" intensity={2.5} position={[4, 2, 6]} />
+    <div className="pointer-events-none absolute inset-0 z-0 min-h-[480px] w-full">
+      <Canvas
+        camera={{ position: [0, 0, 8], fov: 55 }}
+        className="!absolute inset-0 h-full w-full"
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        style={{ width: "100%", height: "100%" }}
+      >
+        <ambientLight intensity={0.2} />
+        <pointLight color="#0066FF" intensity={2.8} position={[4, 2, 6]} />
+        <pointLight color="#3388ff" intensity={1.2} position={[-3, -1, 4]} />
         <ParticleField />
       </Canvas>
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,102,255,0.18),transparent_55%)]"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,102,255,0.22),transparent_60%)]"
       />
     </div>
   );

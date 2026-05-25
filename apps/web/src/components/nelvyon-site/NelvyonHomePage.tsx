@@ -4,13 +4,21 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
-import { NELVYON, SERVICES } from "./brand";
+import { HOME_STATS, NELVYON, SERVICES } from "./brand";
 import { FadeUp } from "./FadeUp";
 import { NelvyonShell } from "./NelvyonShell";
 
 const ElectricHeroCanvas = dynamic(
   () => import("./ElectricHeroCanvas").then((m) => ({ default: m.ElectricHeroCanvas })),
-  { ssr: false },
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 min-h-[480px] w-full bg-[radial-gradient(ellipse_at_center,rgba(0,102,255,0.15),transparent_70%)]"
+      />
+    ),
+  },
 );
 
 const TESTIMONIALS = [
@@ -41,11 +49,11 @@ const VS_AGENCY = [
 export function NelvyonHomePage() {
   return (
     <NelvyonShell>
-      <section className="relative overflow-hidden px-4 pb-24 pt-16 md:px-6 md:pb-32 md:pt-28">
+      <section className="relative min-h-[72vh] overflow-hidden px-4 pb-24 pt-16 md:min-h-[80vh] md:px-6 md:pb-32 md:pt-28">
         <ElectricHeroCanvas />
         <motion.div
           animate={{ opacity: 1, y: 0 }}
-          className="relative mx-auto max-w-5xl text-center"
+          className="relative z-10 mx-auto max-w-5xl text-center"
           initial={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
         >
@@ -71,14 +79,30 @@ export function NelvyonHomePage() {
         </motion.div>
       </section>
 
-      <section className="border-y border-white/[0.06] px-4 py-20 md:px-6 md:py-28">
+      <section className="border-y border-white/[0.06] bg-[#080808] px-4 py-16 md:px-6 md:py-20">
+        <div className="mx-auto grid max-w-6xl gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {HOME_STATS.map((stat, i) => (
+            <FadeUp delay={i * 0.05} key={stat.label}>
+              <div className="text-center">
+                <p className="text-4xl font-bold text-white md:text-5xl">
+                  {stat.value}
+                  {stat.suffix ? <span className="text-[#0066FF]">{stat.suffix}</span> : null}
+                </p>
+                <p className="mt-2 text-sm font-medium uppercase tracking-wider text-zinc-500">{stat.label}</p>
+              </div>
+            </FadeUp>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-b border-white/[0.06] px-4 py-20 md:px-6 md:py-28">
         <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
           <FadeUp>
             <p className="text-sm font-semibold uppercase tracking-widest text-[#0066FF]">¿Qué es NELVYON?</p>
             <h2 className="mt-4 text-3xl font-bold text-white md:text-4xl">Tu marca, operada por un sistema autónomo</h2>
             <p className="mt-6 text-zinc-400 leading-relaxed">
               NELVYON conecta agentes de IA especializados en un solo ecosistema: posicionamiento, paid media, contenido,
-              email, branding y social. Sin silos. Sin esperas. Con métricas que importan.
+              email, branding, social, CRM, automatización y más. Sin silos. Sin esperas. Con métricas que importan.
             </p>
           </FadeUp>
           <FadeUp delay={0.1}>
@@ -105,11 +129,11 @@ export function NelvyonHomePage() {
       <section className="px-4 py-20 md:px-6 md:py-28">
         <FadeUp className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-bold text-white md:text-4xl">Servicios con precisión de boutique</h2>
-          <p className="mt-4 text-zinc-500">Seis disciplinas. Un solo comando. Iconografía 3D y ejecución real.</p>
+          <p className="mt-4 text-zinc-500">Doce disciplinas. Un solo comando. Iconografía 3D y ejecución real.</p>
         </FadeUp>
         <div className="mx-auto mt-14 grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((s, i) => (
-            <FadeUp delay={i * 0.06} key={s.slug}>
+            <FadeUp delay={i * 0.04} key={s.slug}>
               <Link
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 transition hover:border-[#0066FF]/40 hover:bg-white/[0.04]"
                 href={s.href}

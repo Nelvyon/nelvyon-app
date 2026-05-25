@@ -234,7 +234,7 @@ class SignaturitService:
                 record["documents"][0]["status"] = "completed"
             content = (
                 b"%PDF-1.4\n% mock signed document\n"
-                f"%% Signature: {signature_id}\n".encode("utf-8")
+                + f"%% Signature: {signature_id}\n".encode("utf-8")
             )
             filename = f"signed-{signature_id}.pdf"
             logger.info("[SIGNATURIT MOCK] download_signed_document id=%s", signature_id)

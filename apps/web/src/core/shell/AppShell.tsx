@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useCallback, useEffect, useState } from "react";
@@ -8,12 +9,14 @@ import { ReactNode, useCallback, useEffect, useState } from "react";
 import { BottomNav } from "@/components/dashboard/BottomNav";
 import { AuthDebugPanel } from "@/core/auth/AuthDebugPanel";
 import { useAuth } from "@/core/auth/AuthContext";
-import { getBrandAppName, getBrandMode } from "@/core/platform/brand";
+import { getBrandMode } from "@/core/platform/brand";
 import { getNavItemsForRole, isNavActive, ProductNavItem } from "@/core/shell/navConfig";
+import { useWhitelabel } from "@/core/whitelabel/WhitelabelProvider";
 import { RoutePageHeader } from "@/core/shell/RoutePageHeader";
 import { Button } from "@/core/ui/button";
 import { cn } from "@/core/ui/utils";
 import { livechatApi } from "@/features/builders/api";
+import { omnichannelApi } from "@/features/omnichannel/api";
 import { dashboardHelpdeskApi } from "@/features/dashboard/api";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import { VoiceCommand } from "@/components/VoiceCommand";
@@ -21,6 +24,8 @@ import { HelpBotPanel } from "@/features/helpbot/components/HelpBotPanel";
 import { ThemeToggle } from "@/core/theme/ThemeToggle";
 import { useWorkspaceRoleSync } from "@/core/workspace/useWorkspaceRoleSync";
 import { WorkspaceSelector } from "@/core/workspace/WorkspaceSelector";
+import { DashboardLanguageSelector } from "@/components/DashboardLanguageSelector";
+import { navLabelKey } from "@/core/i18n/navKeys";
 
 const SIDEBAR_LS_KEY = "nelvyon.sidebarCollapsed";
 
@@ -31,6 +36,7 @@ function NavList({
   onNavigate,
   liveChatUnread = 0,
   helpdeskOpen = 0,
+  omnichannelUnread = 0,
 }: {
   items: ProductNavItem[];
   pathname: string;
@@ -38,21 +44,27 @@ function NavList({
   onNavigate?: () => void;
   liveChatUnread?: number;
   helpdeskOpen?: number;
+  omnichannelUnread?: number;
 }) {
+  const tNav = useTranslations("sidebar");
   return (
     <nav aria-label="Product" className={cn("space-y-1", collapsed ? "p-2" : "p-3")}>
       {items.map((item) => {
         const active = isNavActive(pathname, item);
         const Icon = item.icon;
+        const key = navLabelKey(item.href);
+        const label = key ? tNav(key) : item.label;
         const badge =
           item.badgeKey === "liveChat" && liveChatUnread > 0
             ? liveChatUnread
             : item.badgeKey === "helpdesk" && helpdeskOpen > 0
               ? helpdeskOpen
-              : 0;
+              : item.badgeKey === "omnichannel" && omnichannelUnread > 0
+                ? omnichannelUnread
+                : 0;
         return (
           <Link
-            aria-label={item.label}
+            aria-label={label}
             className={cn(
               "flex min-h-[44px] items-center rounded-md text-sm transition-colors",
               collapsed ? "justify-center px-2 py-2.5" : "gap-2 px-3 py-2",
@@ -61,7 +73,7 @@ function NavList({
             href={item.href}
             key={item.href}
             onClick={onNavigate}
-            title={item.label}
+            title={label}
           >
             <span className="relative shrink-0">
               <Icon aria-hidden className="h-5 w-5 opacity-90" />
@@ -73,7 +85,7 @@ function NavList({
             </span>
             {!collapsed ? (
               <span className="flex flex-1 items-center justify-between gap-2">
-                <span>{item.label}</span>
+                <span>{label}</span>
                 {badge > 0 ? (
                   <span className="rounded-full bg-destructive px-2 py-0.5 text-xs font-semibold text-destructive-foreground">
                     {badge > 99 ? "99+" : badge}
@@ -94,9 +106,11 @@ function SidebarChrome({
   items,
   pathname,
   appName,
+  logoUrl,
   isClientMode,
   liveChatUnread,
   helpdeskOpen,
+  omnichannelUnread,
   onNavigate,
 }: {
   collapsed: boolean;
@@ -104,9 +118,11 @@ function SidebarChrome({
   items: ProductNavItem[];
   pathname: string;
   appName: string;
+  logoUrl: string | null;
   isClientMode: boolean;
   liveChatUnread: number;
   helpdeskOpen: number;
+  omnichannelUnread: number;
   onNavigate?: () => void;
 }) {
   return (
@@ -117,7 +133,17 @@ function SidebarChrome({
             className={cn("font-semibold text-foreground", collapsed ? "text-center text-xs" : "text-base")}
             href="/"
           >
-            {collapsed ? appName.charAt(0).toUpperCase() : appName}
+            {logoUrl && !collapsed ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img alt={appName} className="max-h-8 max-w-[140px] object-contain" src={logoUrl} />
+            ) : logoUrl && collapsed ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img alt={appName} className="mx-auto h-8 w-8 object-contain" src={logoUrl} />
+            ) : collapsed ? (
+              appName.charAt(0).toUpperCase()
+            ) : (
+              appName
+            )}
           </Link>
           <Button
             aria-expanded={!collapsed}
@@ -138,6 +164,7 @@ function SidebarChrome({
         helpdeskOpen={helpdeskOpen}
         items={items}
         liveChatUnread={liveChatUnread}
+        omnichannelUnread={omnichannelUnread}
         onNavigate={onNavigate}
         pathname={pathname}
       />
@@ -155,12 +182,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const brandMode = getBrandMode();
   const isClientMode = brandMode === "client";
-  const appName = getBrandAppName(brandMode);
+  const { appName, logoUrl } = useWhitelabel();
   useWorkspaceRoleSync();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [liveChatUnread, setLiveChatUnread] = useState(0);
   const [helpdeskOpen, setHelpdeskOpen] = useState(0);
+  const [omnichannelUnread, setOmnichannelUnread] = useState(0);
 
   useEffect(() => {
     if (!user || isClientMode) return;
@@ -172,6 +200,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       dashboardHelpdeskApi
         .stats()
         .then((s) => setHelpdeskOpen(Number(s.open_count ?? 0)))
+        .catch(() => undefined);
+      omnichannelApi
+        .stats()
+        .then((s) => setOmnichannelUnread(Number(s.unread_count ?? 0)))
         .catch(() => undefined);
     };
     load();
@@ -213,6 +245,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           isClientMode={isClientMode}
           items={items}
           liveChatUnread={liveChatUnread}
+          logoUrl={logoUrl}
+          omnichannelUnread={omnichannelUnread}
           onToggleCollapsed={() => persistCollapsed(!collapsed)}
           pathname={pathname}
         />
@@ -234,6 +268,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               isClientMode={isClientMode}
               items={items}
               liveChatUnread={liveChatUnread}
+              logoUrl={logoUrl}
+              omnichannelUnread={omnichannelUnread}
               onNavigate={() => setMobileNavOpen(false)}
               onToggleCollapsed={() => setMobileNavOpen(false)}
               pathname={pathname}
@@ -273,6 +309,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2 md:gap-3">
+            <DashboardLanguageSelector />
             <ThemeToggle />
             {!isClientMode ? <WorkspaceSelector /> : null}
             {!isClientMode ? <AuthDebugPanel /> : null}

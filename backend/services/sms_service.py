@@ -431,6 +431,21 @@ class SmsService:
                 {"id": campaign_id, "ws": ws},
             )
         await self.session.commit()
+
+        try:
+            from services.omnichannel_service import ingest_omnichannel_inbound
+
+            await ingest_omnichannel_inbound(
+                self.session,
+                ws,
+                "sms",
+                body,
+                participant_phone=normalized,
+                metadata={"twilio_sid": twilio_sid, "campaign_id": campaign_id},
+            )
+        except Exception as exc:
+            logger.debug("omnichannel sms ingest skipped: %s", exc)
+
         return {"handled": True, "from_number": normalized, "campaign_id": campaign_id}
 
     async def get_global_stats(self) -> dict[str, Any]:

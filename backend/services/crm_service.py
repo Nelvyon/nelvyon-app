@@ -18,6 +18,16 @@ from services.webhook_service import schedule_webhook_event
 
 logger = logging.getLogger(__name__)
 
+
+async def _trigger_ai_lead_score(session: AsyncSession, workspace_id: int, contact_id: str) -> None:
+    try:
+        from services.lead_scoring_service import get_lead_scoring_service
+
+        await get_lead_scoring_service(session, workspace_id).auto_score_contact(contact_id)
+    except Exception as exc:
+        logger.debug("AI lead score hook skipped: %s", exc)
+
+
 PIPELINE_STAGES = (
     "lead",
     "qualified",
@@ -139,6 +149,22 @@ class CRMService:
         await self.recalculate_contact_score(row["id"])
         contact = await self.get_contact_by_id(row["id"])
         schedule_webhook_event(self.workspace_id, "contact.created", contact)
+        try:
+            from services.workflow_service import dispatch_workflow_trigger
+
+            await dispatch_workflow_trigger(
+                self.session,
+                self.workspace_id,
+                "contact_created",
+                {
+                    "contact_id": row["id"],
+                    "email": contact.get("email"),
+                    "name": contact.get("name"),
+                    "tags": contact.get("tags") or [],
+                },
+            )
+        except Exception as exc:
+            logger.debug("contact_created workflow trigger skipped: %s", exc)
         return contact
 
     async def update_contact(self, contact_id: str, **fields: Any) -> dict[str, Any]:
@@ -167,6 +193,7 @@ class CRMService:
         )
         updated = await self.get_contact_by_id(contact_id)
         schedule_webhook_event(self.workspace_id, "contact.updated", updated)
+        await _trigger_ai_lead_score(self.session, self.workspace_id, contact_id)
         return updated
 
     async def delete_contact(self, contact_id: str) -> bool:
@@ -545,6 +572,7 @@ class CRMService:
         )
         activity = _row_to_dict(result.mappings().first())
         await self.recalculate_contact_score(contact_id)
+        await _trigger_ai_lead_score(self.session, self.workspace_id, contact_id)
         return activity
 
     async def complete_activity(self, activity_id: str, outcome: str | None = None) -> dict[str, Any]:

@@ -296,6 +296,40 @@ class DialerService:
             {"t": transcript, "sid": call_sid, "ws": self.workspace_id},
         )
         await self.session.commit()
+
+        if transcript:
+            try:
+                from services.omnichannel_service import ingest_omnichannel_inbound
+
+                call = await self._get_by_sid(call_sid)
+                to_n = (call.get("to_number") or "").strip()
+                from_n = (call.get("from_number") or "").strip()
+                default_from_digits = re.sub(r"\D", "", self.default_from or "")
+                # Outbound dialer: customer usually in `to_number`. If callee is our Twilio line, caller is in `from_number`.
+                participant_phone = to_n or from_n
+                if default_from_digits and re.sub(r"\D", "", to_n) == default_from_digits and from_n:
+                    participant_phone = from_n
+
+                cid = call.get("contact_id")
+                contact_id_str = str(cid) if cid else None
+                await ingest_omnichannel_inbound(
+                    self.session,
+                    self.workspace_id,
+                    "voice",
+                    transcript,
+                    participant_phone=participant_phone or None,
+                    contact_id=contact_id_str,
+                    external_id=call_sid,
+                    subject=f"Llamada de voz ({(call_sid or '')[:10]}…)",
+                    metadata={
+                        "source": "dialer_whisper",
+                        "call_sid": call_sid,
+                        "recording_url": rec,
+                    },
+                )
+            except Exception as exc:
+                logger.debug("omnichannel voice ingest skipped: %s", exc)
+
         return {"call_sid": call_sid, "transcript": transcript}
 
     async def log_call(

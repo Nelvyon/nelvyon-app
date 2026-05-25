@@ -1,11 +1,16 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 
 import { routing } from "../i18n";
 import { checkIpRateLimit, getClientIp, getRateLimitRule } from "./lib/security/rateLimit";
 import { resolveRequestId, withRequestId } from "./lib/security/requestId";
 import { createRequestLogger } from "@/lib/serverLogger";
+import {
+  encodeWhitelabelHeader,
+  fetchWhitelabelByHost,
+  isDefaultWhitelabelHost,
+  normalizeHost,
+} from "@/core/whitelabel/resolveWhitelabel";
 
 const handleI18n = createMiddleware(routing);
 
@@ -121,7 +126,24 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return end(handleI18n(request));
+  const host = normalizeHost(request.headers.get("host") ?? request.nextUrl.host);
+  let whitelabelHeader: string | undefined;
+  if (!isDefaultWhitelabelHost(host)) {
+    const wl = await fetchWhitelabelByHost(host);
+    if (wl) {
+      whitelabelHeader = encodeWhitelabelHeader(wl);
+    }
+  }
+
+  const requestHeaders = new Headers(request.headers);
+  if (whitelabelHeader) {
+    requestHeaders.set("x-nelvyon-whitelabel", whitelabelHeader);
+  }
+  const augmentedRequest = new NextRequest(request.url, {
+    headers: requestHeaders,
+    method: request.method,
+  });
+  return end(handleI18n(augmentedRequest));
 }
 
 export const config = {

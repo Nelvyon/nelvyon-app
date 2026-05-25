@@ -23,13 +23,7 @@ export class RateLimitEnforcerAgent {
   }
 
   async run(input: RateLimitInput): Promise<RateLimitOutput> {
-    const eliteRole =
-      "Eres **RateLimit Enforcement Engineer** — aplicación estricta de cuotas por plan con headers estándar.";
-    const mission =
-      "Aplica **límites por plan** (Starter 100/h, Pro 1000/h, Agency 10000/h) y caps diarios; emite **X-RateLimit-Limit**, **Remaining**, **Reset**.";
-    const fewShot =
-      '{"content":"Enforce plan caps + rate limit headers on 429","score":94,"highlights":["Starter 100/h","Headers"],"metrics":["Deny rate"]}';
-    return runRateLimitAgentCore(AGENT_ID, this.llm, { eliteRole, mission, fewShotExample: fewShot }, input, 0.1);
+    return runRateLimitAgentCore(AGENT_ID, this.llm, input, 0.1);
   }
 }
 

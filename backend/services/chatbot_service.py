@@ -403,9 +403,21 @@ class ChatbotService:
             role = "assistant" if m.get("role") == "assistant" else "user"
             chat_messages.append({"role": role, "content": m.get("content", "")})
 
+        last_user = next((m.get("content", "") for m in reversed(messages) if m.get("role") == "user"), "")
         try:
+            from agents.base_agent import detect_language, localized_system_prompt
+
+            lang = await detect_language(last_user or "")
+            chat_messages[0]["content"] = localized_system_prompt(system, lang, role="chatbot")
+        except Exception as exc:
+            logger.debug("chatbot language detect skipped: %s", exc)
+
+        try:
+            from services.finetuning_service import get_model_for_workspace
+
+            model = await get_model_for_workspace(self.session, int(bot["workspace_id"]))
             resp = await client.chat.completions.create(
-                model=CHAT_MODEL,
+                model=model,
                 messages=chat_messages,
                 temperature=0.5,
                 max_tokens=500,

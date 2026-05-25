@@ -25,6 +25,34 @@ export const osWebApi = {
       tenantScoped: true,
       body: { new_content },
     }),
+  staticUrls: (id: string) =>
+    apiClient.get<{
+      website_id: string;
+      version: number;
+      pages: Record<string, string>;
+      cdn_base?: string;
+      index_url?: string;
+      cache_control?: string;
+    }>(`/api/os/web/projects/${id}/static`, { tenantScoped: true }),
+  performance: (id: string) =>
+    apiClient.get<{
+      website_id: string;
+      metrics: {
+        lcp_ms?: number;
+        cls?: number;
+        fid_ms?: number;
+        performance_score?: number;
+        measured_at?: string;
+      } | null;
+      traffic_light: "green" | "yellow" | "red" | "unknown";
+    }>(`/api/os/web/projects/${id}/performance`, { tenantScoped: true }),
+  measurePerformance: (id: string) =>
+    apiClient.post<{
+      website_id: string;
+      measured_url: string;
+      metrics: Record<string, unknown>;
+      traffic_light: "green" | "yellow" | "red" | "unknown";
+    }>(`/api/os/web/projects/${id}/performance/measure`, { tenantScoped: true }),
   addPage: (projectId: string, page_type: string) =>
     apiClient.post<WebProject>(`/api/os/web/projects/${projectId}/pages`, {
       tenantScoped: true,

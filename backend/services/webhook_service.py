@@ -22,7 +22,7 @@ from core.database import db_manager
 logger = logging.getLogger(__name__)
 
 _SCHEMA_READY = False
-MAX_ATTEMPTS = 5
+MAX_ATTEMPTS = 3
 SIGNATURE_HEADER = "X-Nelvyon-Signature"
 EVENT_HEADER = "X-Nelvyon-Event"
 DELIVERY_HEADER = "X-Nelvyon-Delivery-Id"
@@ -34,6 +34,10 @@ SUPPORTED_EVENTS = frozenset(
         "deal.created",
         "deal.stage_changed",
         "campaign.sent",
+        "form.submitted",
+        "chatbot.message",
+        "workflow.triggered",
+        "payment.received",
         "invoice.paid",
         "booking.created",
         "ticket.created",
@@ -485,3 +489,18 @@ def schedule_webhook_event(
 
 def get_webhook_service(session: AsyncSession, workspace_id: int) -> WebhookService:
     return WebhookService(session, workspace_id)
+
+
+async def dispatch_webhook(
+    workspace_id: int,
+    event: str,
+    data: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Universal webhook dispatch — HMAC-signed POST with exponential retry."""
+    if not db_manager.async_session_maker:
+        await db_manager.ensure_initialized()
+    if not db_manager.async_session_maker:
+        return []
+    async with db_manager.async_session_maker() as session:
+        svc = WebhookService(session, workspace_id)
+        return await svc.trigger_webhook(event, data, workspace_id=workspace_id)

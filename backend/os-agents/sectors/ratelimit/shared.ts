@@ -4,6 +4,7 @@ import { ModelRouter } from "../../llm/ModelRouter";
 import { LearningService } from "../../learning/LearningService";
 
 import { ELITE_V300_STANDARDS } from "../../prompts/elitePromptLibrary";
+import { resolveAgentPrompts } from "../../AgentPromptVault";
 export type RateLimitPlan = "starter" | "pro" | "agency";
 
 export interface RateLimitInput {
@@ -115,18 +116,37 @@ OUTPUT: Responde **solo** JSON válido UTF-8 (sin markdown):
 export async function runRateLimitAgentCore(
   agentId: string,
   llm: ILlmClient,
-  params: {
-    eliteRole: string;
-    mission: string;
-    fewShotExample: string;
-  },
-  input: RateLimitInput,
-  temperature: number,
+  arg3: RateLimitInput | { eliteRole: string; mission: string; fewShotExample: string },
+  arg4: RateLimitInput | number,
+  arg5?: number | { eliteRole: string; mission: string; fewShotExample: string },
 ): Promise<RateLimitOutput> {
+  let input: RateLimitInput;
+  let temperature: number;
+  let promptParams: { eliteRole: string; mission: string; fewShotExample: string } | undefined;
+
+  if (typeof arg4 === "number") {
+    input = arg3 as RateLimitInput;
+    temperature = arg4;
+    if (arg5 && typeof arg5 === "object" && "eliteRole" in arg5) {
+      promptParams = arg5;
+    }
+  } else {
+    promptParams = arg3 as { eliteRole: string; mission: string; fewShotExample: string };
+    input = arg4 as RateLimitInput;
+    temperature = (arg5 as number) ?? 0.2;
+  }
+
+  const vault = promptParams
+    ? {
+        elite_role: promptParams.eliteRole,
+        mission: promptParams.mission,
+        few_shot: promptParams.fewShotExample,
+      }
+    : await resolveAgentPrompts(agentId);
   const prompt = buildRateLimitPrompt({
-    eliteRole: params.eliteRole,
-    mission: params.mission,
-    fewShotExample: params.fewShotExample,
+    eliteRole: vault.elite_role,
+    mission: vault.mission,
+    fewShotExample: vault.few_shot,
     input,
   });
   const raw = await llm.complete(prompt, llmOpts(agentId, temperature));

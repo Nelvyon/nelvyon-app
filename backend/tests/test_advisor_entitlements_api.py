@@ -22,7 +22,12 @@ async def _set_active_subscription(db_session, *, workspace_id: int, plan_id: st
 
 
 @pytest.mark.asyncio
-async def test_advisor_entitlements_reports_usage_defaults(client, auth_headers):
+async def test_advisor_entitlements_reports_usage_defaults(client, auth_headers, db_session):
+    try:
+        await db_session.execute(text("DELETE FROM advisor_session_usage WHERE workspace_id = 1"))
+        await db_session.commit()
+    except Exception:
+        await db_session.rollback()
     response = await client.get("/api/v1/advisor/entitlements", headers=auth_headers)
     assert response.status_code == 200
     payload = response.json()
@@ -34,6 +39,11 @@ async def test_advisor_entitlements_reports_usage_defaults(client, auth_headers)
 
 @pytest.mark.asyncio
 async def test_advisor_session_consume_enforces_monthly_limit(client, auth_headers, db_session):
+    try:
+        await db_session.execute(text("DELETE FROM advisor_session_usage WHERE workspace_id = 1"))
+        await db_session.commit()
+    except Exception:
+        await db_session.rollback()
     await _set_active_subscription(db_session, workspace_id=1, plan_id="starter")
 
     ent = await client.get("/api/v1/advisor/entitlements", headers=auth_headers)

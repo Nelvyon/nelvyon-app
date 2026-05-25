@@ -148,7 +148,11 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next) -> Response:
         if request.url.path in PUBLIC_LIVENESS_PATHS:
-            return await call_next(request)
+            response = await call_next(request)
+            if request.method != "OPTIONS":
+                for header, value in _build_security_headers(request).items():
+                    response.headers[header] = value
+            return response
 
         # 1. Check request size via Content-Length header
         content_length = request.headers.get("content-length")

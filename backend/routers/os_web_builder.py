@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import PlainTextResponse, Response
+from fastapi.responses import PlainTextResponse, RedirectResponse, Response
+
+from services.web_cache_service import CACHE_HEADERS_ASSET, CACHE_HEADERS_WEBSITE
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -47,6 +50,10 @@ class UpdatePageBody(BaseModel):
 
 class AddPageBody(BaseModel):
     page_type: str = Field(..., pattern="^(home|about|services|pricing|contact|blog|faq|custom)$")
+
+
+class WebsiteIdBody(BaseModel):
+    website_id: str = Field(..., min_length=1, description="OS website project UUID")
 
 
 @os_web_router.post("/projects", status_code=201)
@@ -184,13 +191,121 @@ async def create_from_template(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
+@os_web_router.post("/score")
+async def score_website(
+    body: WebsiteIdBody,
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Score website design quality (typography, colors, hierarchy, CTA, mobile)."""
+    svc = get_os_web_builder_service(db, ws.workspace_id)
+    project = await svc.get_project(body.website_id, ws.workspace_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Website not found")
+    try:
+        return await svc.score_website_design(body.website_id, ws.workspace_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@os_web_router.get("/projects/{website_id}/static")
+async def get_static_cdn(
+    website_id: str,
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    svc = get_os_web_builder_service(db, ws.workspace_id)
+    try:
+        data = await svc.get_static_urls(website_id, ws.workspace_id)
+        return Response(
+            content=json.dumps(data),
+            media_type="application/json",
+            headers={"Cache-Control": CACHE_HEADERS_WEBSITE},
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@os_web_router.get("/{website_id}/static")
+async def get_static_cdn_alias(
+    website_id: str,
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    return await get_static_cdn(website_id, ws, db)
+
+
+@os_web_router.get("/projects/{website_id}/performance")
+async def get_website_performance(
+    website_id: str,
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    svc = get_os_web_builder_service(db, ws.workspace_id)
+    try:
+        return await svc.get_website_performance(website_id, ws.workspace_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@os_web_router.post("/projects/{website_id}/performance/measure")
+async def measure_website_performance(
+    website_id: str,
+    ws: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    svc = get_os_web_builder_service(db, ws.workspace_id)
+    try:
+        return await svc.measure_website_performance(website_id, ws.workspace_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@os_web_router.get("/{website_id}/performance")
+async def get_website_performance_alias(
+    website_id: str,
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    return await get_website_performance(website_id, ws, db)
+
+
+@os_web_router.post("/improve")
+async def improve_website(
+    body: WebsiteIdBody,
+    ws: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    """Run design scorer agent (up to 3 iterations) and persist improvements."""
+    svc = get_os_web_builder_service(db, ws.workspace_id)
+    project = await svc.get_project(body.website_id, ws.workspace_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Website not found")
+    try:
+        return await svc.improve_website_design(body.website_id, ws.workspace_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
 @site_router.get("/site/{subdomain}")
 async def public_site_home(subdomain: str, db: AsyncSession = Depends(get_db)):
     svc = get_os_web_builder_service(db)
-    page = await svc.get_public_site_page(subdomain.lower(), None)
+    sub = subdomain.lower()
+    static_url = await svc.get_static_page_url(sub, None)
+    if static_url:
+        return RedirectResponse(
+            static_url,
+            status_code=302,
+            headers={"Cache-Control": CACHE_HEADERS_WEBSITE},
+        )
+    page = await svc.get_public_site_page(sub, None)
     if not page:
         raise HTTPException(status_code=404, detail="Site not found")
-    return page
+    return Response(
+        content=json.dumps(page),
+        media_type="application/json",
+        headers={"Cache-Control": CACHE_HEADERS_WEBSITE},
+    )
 
 
 @site_router.get("/site/{subdomain}/{page_slug}")
@@ -214,7 +329,19 @@ async def public_site_page(
             raise HTTPException(status_code=404, detail="Site not found")
         return PlainTextResponse(robots)
 
+    static_url = await svc.get_static_page_url(sub, page_slug)
+    if static_url:
+        return RedirectResponse(
+            static_url,
+            status_code=302,
+            headers={"Cache-Control": CACHE_HEADERS_WEBSITE},
+        )
+
     page = await svc.get_public_site_page(sub, page_slug)
     if not page:
         raise HTTPException(status_code=404, detail="Page not found")
-    return page
+    return Response(
+        content=json.dumps(page),
+        media_type="application/json",
+        headers={"Cache-Control": CACHE_HEADERS_ASSET},
+    )

@@ -362,6 +362,24 @@ class FormsService:
                 logger.warning("Form notify email failed: %s", exc)
 
         await self.session.commit()
+
+        try:
+            from services.workflow_service import dispatch_workflow_trigger
+
+            await dispatch_workflow_trigger(
+                self.session,
+                ws,
+                "form_submit",
+                {
+                    "form_id": form_id,
+                    "response_id": response_row["id"],
+                    "responses": responses,
+                    "visitor_info": visitor_info or {},
+                },
+            )
+        except Exception as exc:
+            logger.debug("form_submit workflow trigger skipped: %s", exc)
+
         return {
             "id": response_row["id"],
             "success_message": settings.get("success_message", "¡Gracias!"),

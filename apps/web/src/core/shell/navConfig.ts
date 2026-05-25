@@ -11,6 +11,7 @@ import {
   CreditCard,
   Database,
   FileText,
+  FileBarChart,
   Gift,
   GitMerge,
   GitBranch,
@@ -23,6 +24,7 @@ import {
   LifeBuoy,
   Mail,
   Megaphone,
+  Palette,
   MessageCircle,
   MessageSquare,
   Phone,
@@ -31,7 +33,9 @@ import {
   Settings,
   Share2,
   ShoppingBag,
+  Sparkles,
   Star,
+  Key,
   TrendingUp,
   Users,
   Video,
@@ -50,7 +54,7 @@ export interface ProductNavItem {
   prefix: string;
   module: ModuleKey;
   icon: LucideIcon;
-  badgeKey?: "liveChat" | "helpdesk";
+  badgeKey?: "liveChat" | "helpdesk" | "omnichannel";
 }
 
 export const PRODUCT_NAV: readonly ProductNavItem[] = [
@@ -58,7 +62,9 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "CRM", href: "/dashboard/crm", prefix: "/dashboard/crm", module: "crm", icon: Users },
   { label: "Campañas", href: "/dashboard/campanas", prefix: "/dashboard/campanas", module: "campaigns", icon: Mail },
   { label: "SMS", href: "/dashboard/sms", prefix: "/dashboard/sms", module: "campaigns", icon: MessageSquare },
+  { label: "Workflows", href: "/dashboard/workflows", prefix: "/dashboard/workflows", module: "automations", icon: GitBranch },
   { label: "Automatización", href: "/dashboard/automatizacion", prefix: "/dashboard/automatizacion", module: "automations", icon: Zap },
+  { label: "Inbox", href: "/dashboard/inbox", prefix: "/dashboard/inbox", module: "inbox", icon: Inbox, badgeKey: "omnichannel" },
   { label: "Helpdesk", href: "/dashboard/helpdesk", prefix: "/dashboard/helpdesk", module: "inbox", icon: LifeBuoy, badgeKey: "helpdesk" },
   { label: "Inbox", href: "/inbox/tickets", prefix: "/inbox", module: "inbox", icon: Inbox },
   { label: "Campaigns", href: "/campaigns", prefix: "/campaigns", module: "campaigns", icon: Megaphone },
@@ -76,10 +82,27 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "Reservas", href: "/dashboard/reservas", prefix: "/dashboard/reservas", module: "os", icon: Clock },
   { label: "SEO", href: "/dashboard/seo", prefix: "/dashboard/seo", module: "os", icon: TrendingUp },
   { label: "IA Hub", href: "/dashboard/ia", prefix: "/dashboard/ia", module: "os", icon: Cpu },
+  { label: "Mi Modelo IA", href: "/dashboard/ai-model", prefix: "/dashboard/ai-model", module: "os", icon: Sparkles },
   { label: "Afiliados", href: "/dashboard/afiliados", prefix: "/dashboard/afiliados", module: "os", icon: Gift },
   { label: "Storage", href: "/dashboard/storage", prefix: "/dashboard/storage", module: "os", icon: HardDrive },
   { label: "Reportes", href: "/dashboard/reportes", prefix: "/dashboard/reportes", module: "os", icon: BarChart2 },
+  {
+    label: "Analytics",
+    href: "/dashboard/analytics/benchmarks",
+    prefix: "/dashboard/analytics",
+    module: "os",
+    icon: TrendingUp,
+  },
+  {
+    label: "Reportes Ejecutivos",
+    href: "/dashboard/executive-reports",
+    prefix: "/dashboard/executive-reports",
+    module: "os",
+    icon: FileBarChart,
+  },
   { label: "Settings", href: "/dashboard/settings", prefix: "/dashboard/settings", module: "settings", icon: Settings },
+  { label: "White-label", href: "/dashboard/white-label", prefix: "/dashboard/white-label", module: "settings", icon: Palette },
+  { label: "API & Webhooks", href: "/dashboard/api-keys", prefix: "/dashboard/api-keys", module: "settings", icon: Key },
   { label: "OS", href: "/os", prefix: "/os", module: "os", icon: Activity },
   { label: "Webs", href: "/dashboard/websites", prefix: "/dashboard/websites", module: "os", icon: Globe },
   { label: "Tiendas", href: "/dashboard/stores", prefix: "/dashboard/stores", module: "os", icon: ShoppingBag },

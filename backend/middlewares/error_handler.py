@@ -55,7 +55,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 }
             else:
                 detail = {
-                    "error": "Internal Server Error",
+                    "detail": "An error occurred",
                     "request_id": request_id,
                 }
 

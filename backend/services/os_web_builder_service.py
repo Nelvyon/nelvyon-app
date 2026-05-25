@@ -22,7 +22,25 @@ from services.landing_builder_service import (
     LandingBuilderService,
     _make_block,
 )
+from services.os_design_pipeline import (
+    generate_hero_image_dalle,
+    inject_hero_image_url,
+    run_design_score_and_improve,
+)
 from services.tenant_service import TenantService
+from services.web_cache_service import (
+    CACHE_HEADERS_WEBSITE,
+    get_website_json,
+    invalidate_website,
+    set_website_json,
+)
+from services.web_performance_service import (
+    get_latest_metrics,
+    maybe_alert_low_score,
+    run_pagespeed,
+    save_metrics,
+)
+from services.web_static_export import export_website_static
 from services.whitelabel_service import DEFAULT_CNAME_TARGET, _resolve_cname_chain
 
 logger = logging.getLogger(__name__)
@@ -146,6 +164,17 @@ class OsWebBuilderService:
                             logger.debug("os_web_builder schema skipped: %s", exc)
                 await session.commit()
         await OsWebBuilderService._seed_templates()
+        perf_path = Path(__file__).resolve().parent.parent / "migrations" / "web_performance.sql"
+        if perf_path.exists():
+            raw_perf = perf_path.read_text(encoding="utf-8")
+            async with db_manager.async_session_maker() as session:
+                for stmt in [s.strip() for s in raw_perf.split(";") if s.strip()]:
+                    try:
+                        await session.execute(text(stmt))
+                    except Exception as exc:
+                        if "already exists" not in str(exc).lower():
+                            logger.debug("web_performance schema skipped: %s", exc)
+                await session.commit()
         _SCHEMA_READY = True
 
     @staticmethod
@@ -322,6 +351,7 @@ class OsWebBuilderService:
         if not project:
             raise ValueError("Project not found")
         workspace_id = int(project["workspace_id"])
+        self.workspace_id = workspace_id
         await self._set_workspace(workspace_id)
         await self._set_project_status(project_id, "generating")
 
@@ -392,6 +422,28 @@ class OsWebBuilderService:
                         },
                     )
 
+            business = _parse_jsonb(project.get("business_info")) or {}
+            sector = (
+                business.get("sector")
+                or business.get("template_category")
+                or "business"
+            )
+            hero_url = await generate_hero_image_dalle(
+                str(sector),
+                str(business.get("business_name") or project.get("name") or ""),
+            )
+            website_json = await self.build_website_json(project_id, workspace_id)
+            if hero_url:
+                website_json = inject_hero_image_url(website_json, hero_url)
+            website_json, design_eval = await run_design_score_and_improve(website_json)
+            await self.apply_website_json(project_id, workspace_id, website_json)
+            logger.info(
+                "OS Web design pipeline project=%s avg=%s passed=%s",
+                project_id,
+                design_eval.get("average"),
+                design_eval.get("passed"),
+            )
+
             seo = self._build_seo_artifacts(project, pages_to_build, subdomain)
             await self.session.execute(
                 text(
@@ -408,7 +460,12 @@ class OsWebBuilderService:
                 {"id": project_id, "seo": _json_dumps(seo), "cnt": len(pages_to_build)},
             )
             await self.session.commit()
-            return await self.get_project(project_id, workspace_id) or {}
+            project_row = await self.get_project(project_id, workspace_id) or {}
+            try:
+                await self.regenerate_static_export(project_id, workspace_id)
+            except Exception as exc:
+                logger.warning("static export after generate failed: %s", exc)
+            return project_row
         except Exception as exc:
             await self._set_project_status(project_id, "error", str(exc)[:2000])
             raise
@@ -457,6 +514,10 @@ class OsWebBuilderService:
             },
         )
         await self.session.commit()
+        try:
+            await self.regenerate_static_export(project_id, workspace_id)
+        except Exception as exc:
+            logger.warning("static export after publish failed: %s", exc)
         updated = await self.get_project(project_id, workspace_id) or {}
         updated["public_url"] = self._site_url(project.get("subdomain"))
         return updated
@@ -509,6 +570,10 @@ class OsWebBuilderService:
                 {"lp": lp_id, "id": page_id},
             )
             await self.session.commit()
+        try:
+            await self.regenerate_static_export(project_id, workspace_id)
+        except Exception as exc:
+            logger.warning("static export after page edit failed: %s", exc)
         return await self.get_project(project_id, workspace_id) or {}
 
     async def add_page(
@@ -859,8 +924,14 @@ class OsWebBuilderService:
             "content, backgroundColor, textColor, padding, ctaText, ctaUrl, items (testimonials/faq)."
         )
         try:
+            from services.finetuning_service import get_model_for_workspace
+
+            ws = self.workspace_id
+            model = WEB_MODEL
+            if ws is not None:
+                model = await get_model_for_workspace(self.session, ws)
             resp = await client.chat.completions.create(
-                model=WEB_MODEL,
+                model=model,
                 messages=[
                     {
                         "role": "system",
@@ -992,6 +1063,246 @@ class OsWebBuilderService:
             "robots_txt": robots_txt,
             "schema_org": schema_org,
         }
+
+    async def build_website_json(
+        self, project_id: str, workspace_id: int
+    ) -> dict[str, Any]:
+        project = await self.get_project(project_id, workspace_id)
+        if not project:
+            raise ValueError("Project not found")
+        business = _parse_jsonb(project.get("business_info")) or {}
+        pages_out: list[dict[str, Any]] = []
+        for page in project.get("pages") or []:
+            lp_id = page.get("landing_page_id")
+            blocks: list[Any] = []
+            meta: dict[str, Any] = {}
+            if lp_id:
+                r = await self.session.execute(
+                    text("SELECT blocks, meta FROM landing_pages WHERE id = :id::uuid"),
+                    {"id": lp_id},
+                )
+                lp = _row(r.fetchone())
+                blocks = _parse_jsonb(lp.get("blocks")) or []
+                meta = _parse_jsonb(lp.get("meta")) or {}
+            pages_out.append(
+                {
+                    "id": page.get("id"),
+                    "page_type": page.get("page_type"),
+                    "page_slug": page.get("page_slug"),
+                    "landing_page_id": lp_id,
+                    "blocks": blocks,
+                    "meta": meta,
+                }
+            )
+        return {
+            "project_id": project_id,
+            "name": project.get("name"),
+            "subdomain": project.get("subdomain"),
+            "hero_image_url": business.get("hero_image_url"),
+            "business_info": business,
+            "pages": pages_out,
+        }
+
+    async def apply_website_json(
+        self, project_id: str, workspace_id: int, website_json: dict[str, Any]
+    ) -> None:
+        landing_svc = LandingBuilderService(self.session, workspace_id)
+        business = dict(website_json.get("business_info") or {})
+        hero_url = website_json.get("hero_image_url") or business.get("hero_image_url")
+        if hero_url:
+            business["hero_image_url"] = hero_url
+            await self.session.execute(
+                text(
+                    """
+                    UPDATE os_website_projects
+                    SET business_info = CAST(:info AS jsonb), updated_at = NOW()
+                    WHERE id = :id::uuid
+                    """
+                ),
+                {"info": _json_dumps(business), "id": project_id},
+            )
+        for page in website_json.get("pages") or []:
+            lp_id = page.get("landing_page_id")
+            if not lp_id:
+                continue
+            await landing_svc.update_page(
+                lp_id,
+                workspace_id,
+                {
+                    "blocks": page.get("blocks") or [],
+                    "meta": page.get("meta") or {},
+                },
+            )
+        await self.session.commit()
+        try:
+            await self.regenerate_static_export(project_id, workspace_id)
+        except Exception as exc:
+            logger.warning("static export after apply json failed: %s", exc)
+
+    async def regenerate_static_export(
+        self, project_id: str, workspace_id: int
+    ) -> dict[str, Any]:
+        project = await self.get_project(project_id, workspace_id)
+        if not project:
+            raise ValueError("Project not found")
+        old_version = int(project.get("static_version") or 0)
+        await invalidate_website(project_id, old_version)
+        website_json = await self.build_website_json(project_id, workspace_id)
+        subdomain = str(project.get("subdomain") or "site")
+        export_result = await export_website_static(
+            workspace_id=workspace_id,
+            website_id=project_id,
+            website_json=website_json,
+            subdomain=subdomain,
+            site_base=SITE_BASE,
+        )
+        new_version = old_version + 1
+        await self.session.execute(
+            text(
+                """
+                UPDATE os_website_projects
+                SET static_version = :ver,
+                    static_cdn_base = :cdn,
+                    updated_at = NOW()
+                WHERE id = :id::uuid AND workspace_id = :ws
+                """
+            ),
+            {
+                "ver": new_version,
+                "cdn": export_result.get("cdn_base"),
+                "id": project_id,
+                "ws": workspace_id,
+            },
+        )
+        await self.session.commit()
+        payload = {**website_json, "static": export_result}
+        await set_website_json(project_id, new_version, payload)
+        return {"version": new_version, **export_result}
+
+    async def get_static_urls(
+        self, project_id: str, workspace_id: int
+    ) -> dict[str, Any]:
+        project = await self.get_project(project_id, workspace_id)
+        if not project:
+            raise ValueError("Project not found")
+        version = int(project.get("static_version") or 0)
+        cached = await get_website_json(project_id, version)
+        if cached and cached.get("static"):
+            static = cached["static"]
+            return {
+                "website_id": project_id,
+                "version": version,
+                "pages": static.get("pages", {}),
+                "cdn_base": static.get("cdn_base") or project.get("static_cdn_base"),
+                "index_url": static.get("index_url"),
+                "cache_control": CACHE_HEADERS_WEBSITE,
+            }
+        cdn = project.get("static_cdn_base")
+        if cdn:
+            return {
+                "website_id": project_id,
+                "version": version,
+                "cdn_base": cdn,
+                "index_url": f"{cdn.rstrip('/')}/index.html",
+                "pages": {"home": f"{cdn.rstrip('/')}/index.html"},
+                "cache_control": CACHE_HEADERS_WEBSITE,
+            }
+        raise ValueError("Static HTML not exported yet")
+
+    async def get_static_page_url(self, subdomain: str, page_slug: str | None) -> str | None:
+        project = await self.get_project_by_subdomain(subdomain)
+        if not project or not project.get("static_cdn_base"):
+            return None
+        slug = page_slug or "home"
+        cdn = str(project["static_cdn_base"]).rstrip("/")
+        if slug in ("home", "", "/"):
+            return f"{cdn}/index.html"
+        safe = re.sub(r"[^a-z0-9_-]+", "-", slug.lower())
+        return f"{cdn}/{safe}.html"
+
+    async def measure_website_performance(
+        self, project_id: str, workspace_id: int
+    ) -> dict[str, Any]:
+        project = await self.get_project(project_id, workspace_id)
+        if not project:
+            raise ValueError("Project not found")
+        try:
+            static = await self.get_static_urls(project_id, workspace_id)
+            url = static.get("index_url") or self._site_url(project.get("subdomain"))
+        except ValueError:
+            url = self._site_url(project.get("subdomain"))
+        metrics = await run_pagespeed(url)
+        await save_metrics(
+            self.session,
+            website_id=project_id,
+            workspace_id=workspace_id,
+            metrics=metrics,
+        )
+        score = metrics.get("performance_score")
+        await maybe_alert_low_score(
+            self.session,
+            workspace_id=workspace_id,
+            website_id=project_id,
+            score=score,
+            project_name=str(project.get("name") or project_id),
+        )
+        latest = await get_latest_metrics(self.session, project_id, workspace_id)
+        return {
+            "website_id": project_id,
+            "measured_url": url,
+            "metrics": latest or metrics,
+            "traffic_light": _performance_traffic_light(score),
+        }
+
+    async def get_website_performance(
+        self, project_id: str, workspace_id: int
+    ) -> dict[str, Any]:
+        project = await self.get_project(project_id, workspace_id)
+        if not project:
+            raise ValueError("Project not found")
+        latest = await get_latest_metrics(self.session, project_id, workspace_id)
+        score = (latest or {}).get("performance_score")
+        return {
+            "website_id": project_id,
+            "metrics": latest,
+            "traffic_light": _performance_traffic_light(score),
+        }
+
+    async def score_website_design(
+        self, project_id: str, workspace_id: int
+    ) -> dict[str, Any]:
+        from agents.design_scorer_agent import get_design_scorer_agent
+
+        website_json = await self.build_website_json(project_id, workspace_id)
+        result = await get_design_scorer_agent().score_website(website_json)
+        result["website_id"] = project_id
+        return result
+
+    async def improve_website_design(
+        self, project_id: str, workspace_id: int
+    ) -> dict[str, Any]:
+        website_json = await self.build_website_json(project_id, workspace_id)
+        improved, design_eval = await run_design_score_and_improve(website_json)
+        await self.apply_website_json(project_id, workspace_id, improved)
+        try:
+            await self.regenerate_static_export(project_id, workspace_id)
+        except Exception as exc:
+            logger.warning("static export after improve failed: %s", exc)
+        return {
+            "website_id": project_id,
+            "design_evaluation": design_eval,
+            "project": await self.get_project(project_id, workspace_id),
+        }
+
+
+def _performance_traffic_light(score: int | None) -> str:
+    if score is None:
+        return "unknown"
+    if score >= 80:
+        return "green"
+    if score >= 50:
+        return "yellow"
+    return "red"
 
 
 def get_os_web_builder_service(

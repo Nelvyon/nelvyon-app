@@ -2,15 +2,19 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 
 import { CancelSubscriptionFlow } from "@/components/dashboard/CancelSubscriptionFlow";
 import { ChangePlanFlow } from "@/components/dashboard/ChangePlanFlow";
 import { PaymentMethodCard } from "@/components/dashboard/PaymentMethodCard";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
+import { useLocaleContext } from "@/core/i18n/LocaleProvider";
 import { Button } from "@/core/ui/button";
 import { dashboardSettingsApi } from "@/features/dashboard/api";
+import { localeSettingsApi } from "@/features/settings/localeApi";
 import { DashboardTabs, DashboardListShell, DashboardPageTransition, SkeletonList, SkeletonTable } from "@/features/dashboard/components/DashboardTabs";
+import { APP_LOCALES, LOCALE_LABELS, type AppLocale, isAppLocale } from "../../../../i18n";
 
 const DELETE_CONFIRM_PHRASE = "ELIMINAR MI CUENTA";
 
@@ -34,9 +38,15 @@ type CancellationStatus = {
 
 export default function DashboardSettingsPage() {
   const router = useRouter();
+  const t = useTranslations("settingsPage");
+  const { locale, setLocale, timezone, setTimezone, dateFormat, setDateFormat } = useLocaleContext();
   const [tab, setTab] = useState("general");
   const [workspaceName, setWorkspaceName] = useState("");
-  const [language, setLanguage] = useState("es");
+  const [language, setLanguage] = useState<AppLocale>(locale);
+  const [tz, setTz] = useState(timezone);
+  const [df, setDf] = useState(dateFormat);
+  const [timezones, setTimezones] = useState<string[]>([]);
+  const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [brandDomain, setBrandDomain] = useState("");
   const [brandColor, setBrandColor] = useState("#6366f1");
   const [apiKeys, setApiKeys] = useState<Record<string, unknown>[]>([]);
@@ -64,7 +74,26 @@ export default function DashboardSettingsPage() {
 
   useEffect(() => {
     void loadStatus();
+    localeSettingsApi.listTimezones().then((r) => setTimezones(r.timezones ?? [])).catch(() => undefined);
+    localeSettingsApi.getRegion().then((r) => {
+      if (isAppLocale(r.language)) setLanguage(r.language);
+      if (r.timezone) setTz(r.timezone);
+      if (r.date_format) setDf(r.date_format);
+    }).catch(() => undefined);
   }, [loadStatus]);
+
+  async function saveRegion() {
+    setSaveMsg(null);
+    try {
+      if (language !== locale) await setLocale(language);
+      await localeSettingsApi.setTimezone(tz, df);
+      setTimezone(tz);
+      setDateFormat(df);
+      setSaveMsg(t("saved"));
+    } catch {
+      setSaveMsg(t("saveError"));
+    }
+  }
 
   useEffect(() => {
     if (tab === "apikeys") {
@@ -130,40 +159,68 @@ export default function DashboardSettingsPage() {
     <ProtectedLayout module="settings">
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Configuración</h1>
-          <p className="text-sm text-muted-foreground">Workspace, equipo, facturación y privacidad</p>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
 
         <DashboardTabs active={tab} onChange={setTab} tabs={TABS} />
 
         {tab === "general" ? (
-          <div className="space-y-4 rounded-xl border p-4">
-            <label className="block text-sm">
-              Nombre del workspace
-              <input className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(e) => setWorkspaceName(e.target.value)} value={workspaceName} />
-            </label>
-            <label className="block text-sm">
-              Idioma
-              <select className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(e) => setLanguage(e.target.value)} value={language}>
-                <option value="es">Español</option>
-                <option value="en">English</option>
-              </select>
-            </label>
-            <Button>Guardar cambios</Button>
+          <div className="space-y-6">
+            <div className="space-y-4 rounded-xl border p-4">
+              <h2 className="font-semibold">{t("languageRegion")}</h2>
+              <label className="block text-sm">
+                {t("language")}
+                <select
+                  className="mt-1 w-full rounded-lg border px-3 py-2"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as AppLocale)}
+                >
+                  {APP_LOCALES.map((code) => (
+                    <option key={code} value={code}>
+                      {LOCALE_LABELS[code]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-sm">
+                {t("timezone")}
+                <select className="mt-1 w-full rounded-lg border px-3 py-2" value={tz} onChange={(e) => setTz(e.target.value)}>
+                  {(timezones.length ? timezones : [tz]).map((z) => (
+                    <option key={z} value={z}>
+                      {z}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-sm">
+                {t("dateFormat")}
+                <select className="mt-1 w-full rounded-lg border px-3 py-2" value={df} onChange={(e) => setDf(e.target.value)}>
+                  <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                  <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                  <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                </select>
+              </label>
+              {saveMsg ? <p className="text-sm text-muted-foreground">{saveMsg}</p> : null}
+              <Button onClick={saveRegion}>{t("save")}</Button>
+            </div>
+            <div className="space-y-4 rounded-xl border p-4">
+              <label className="block text-sm">
+                Nombre del workspace
+                <input className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(e) => setWorkspaceName(e.target.value)} value={workspaceName} />
+              </label>
+            </div>
           </div>
         ) : null}
 
         {tab === "whitelabel" ? (
           <div className="space-y-4 rounded-xl border p-4">
-            <label className="block text-sm">
-              Dominio personalizado
-              <input className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(e) => setBrandDomain(e.target.value)} placeholder="app.tuempresa.com" value={brandDomain} />
-            </label>
-            <label className="block text-sm">
-              Color principal
-              <input className="mt-1 h-10 w-full rounded-lg border" onChange={(e) => setBrandColor(e.target.value)} type="color" value={brandColor} />
-            </label>
-            <Button>Guardar white-label</Button>
+            <p className="text-sm text-muted-foreground">
+              La configuración white-label completa está en el panel dedicado: dominio, DNS, emails y preview en vivo.
+            </p>
+            <Button asChild>
+              <Link href="/dashboard/white-label">Abrir White-label</Link>
+            </Button>
           </div>
         ) : null}
 

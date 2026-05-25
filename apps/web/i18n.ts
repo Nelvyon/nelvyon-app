@@ -1,13 +1,37 @@
 import { defineRouting } from "next-intl/routing";
 
+export const APP_LOCALES = ["es", "en", "fr", "pt", "de", "it"] as const;
+export type AppLocale = (typeof APP_LOCALES)[number];
+
+export const LOCALE_LABELS: Record<AppLocale, string> = {
+  es: "Español",
+  en: "English",
+  fr: "Français",
+  pt: "Português",
+  de: "Deutsch",
+  it: "Italiano",
+};
+
+export const LOCALE_FLAGS: Record<AppLocale, string> = {
+  es: "🇪🇸",
+  en: "🇬🇧",
+  fr: "🇫🇷",
+  pt: "🇵🇹",
+  de: "🇩🇪",
+  it: "🇮🇹",
+};
+
+export function isAppLocale(value: string | null | undefined): value is AppLocale {
+  return APP_LOCALES.includes(value as AppLocale);
+}
+
 export const routing = defineRouting({
-  locales: ["es", "en"],
+  locales: [...APP_LOCALES],
   defaultLocale: "es",
-  /** Default locale (es) at `/`; `/en` for English. `/es` also resolves via `[locale]/page`. */
-  localePrefix: "as-needed",
+  /** Cookie-based locale via LocaleProvider; marketing routes stay unprefixed. */
+  localePrefix: "never",
+  localeDetection: false,
   localeCookie: {
     name: "NELVYON_LOCALE",
   },
 });
-
-export type AppLocale = (typeof routing.locales)[number];

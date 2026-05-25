@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin
-from services.whitelabel_service import EMAIL_TEMPLATE_TYPES, get_whitelabel_service
+from services.whitelabel_service import EMAIL_TEMPLATE_TYPES, WhitelabelService, get_whitelabel_service
 
 logger = logging.getLogger(__name__)
 
@@ -22,15 +22,23 @@ router = APIRouter(prefix="/api/whitelabel", tags=["whitelabel"])
 class WhitelabelConfigBody(BaseModel):
     custom_domain: Optional[str] = None
     brand_name: Optional[str] = Field(None, max_length=120)
+    company_name: Optional[str] = Field(None, max_length=120)
     logo_url: Optional[HttpUrl] = None
     favicon_url: Optional[HttpUrl] = None
     primary_color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$")
     secondary_color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$")
     accent_color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$")
+    font: Optional[str] = Field(None, max_length=40)
+    support_email: Optional[str] = Field(None, max_length=254)
     custom_email_from_name: Optional[str] = Field(None, max_length=120)
     custom_email_from_address: Optional[str] = Field(None, max_length=254)
     hide_nelvyon_branding: bool = False
     custom_css: Optional[str] = Field(None, max_length=50000)
+
+
+class SubworkspaceBody(BaseModel):
+    name: str = Field(..., min_length=2, max_length=120)
+    admin_email: str = Field(..., min_length=3, max_length=254)
 
 
 class VerifyDomainBody(BaseModel):
@@ -44,6 +52,58 @@ class EmailTemplateBody(BaseModel):
 
 def _svc(db: AsyncSession, ws: WorkspaceContext):
     return get_whitelabel_service(db, int(ws.workspace_id))
+
+
+@router.get("/resolve")
+async def resolve_whitelabel_by_host(host: str, db: AsyncSession = Depends(get_db)):
+    """Public — resolve white-label config by request Host header."""
+    await WhitelabelService.ensure_schema()
+    svc = get_whitelabel_service(db, 0)
+    cfg = await svc.get_config_by_domain(host)
+    if not cfg:
+        return {"found": False}
+    apply = await get_whitelabel_service(db, int(cfg["workspace_id"])).apply_whitelabel()
+    return {"found": True, **apply}
+
+
+@router.get("/apply")
+async def apply_whitelabel_config(
+    ws: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    return await _svc(db, ws).apply_whitelabel()
+
+
+@router.get("/dns-instructions")
+async def dns_instructions(
+    ws: WorkspaceContext = Depends(require_workspace_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await _svc(db, ws).get_dns_instructions()
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/subworkspace")
+async def create_subworkspace(
+    body: SubworkspaceBody,
+    ws: WorkspaceContext = Depends(require_workspace_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await _svc(db, ws).create_subworkspace(body.name, body.admin_email)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/clients")
+async def list_partner_clients(
+    ws: WorkspaceContext = Depends(require_workspace_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    clients = await _svc(db, ws).list_partner_clients()
+    return {"clients": clients, "count": len(clients)}
 
 
 @router.get("/config")
@@ -76,16 +136,15 @@ async def configure_whitelabel(
 
 @router.post("/verify-domain")
 async def verify_custom_domain(
-    body: VerifyDomainBody,
+    body: VerifyDomainBody | None = None,
     ws: WorkspaceContext = Depends(require_workspace_admin),
     db: AsyncSession = Depends(get_db),
 ):
     svc = _svc(db, ws)
     try:
-        check = await svc.validate_custom_domain(body.domain)
-        if check.get("verified"):
-            await svc.mark_domain_verified(body.domain)
-        return check
+        if body and body.domain:
+            await svc.configure_whitelabel({"custom_domain": body.domain})
+        return await svc.verify_domain()
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

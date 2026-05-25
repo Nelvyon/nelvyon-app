@@ -131,4 +131,124 @@ export const SERVICE_DETAILS: Record<ServiceSlug, ServiceDetail> = {
     ],
     results: ["Comunidad activa", "Marca visible", "Sin equipo dedicado 24/7"],
   },
+  "chatbot-ia": {
+    slug: "chatbot-ia",
+    title: "Chatbot IA",
+    subtitle: "Conversaciones que venden y resuelven",
+    intro:
+      "Chatbots entrenados con tu marca para web, panel y WhatsApp. Cualifican leads, responden FAQs y escalan a humano cuando hace falta.",
+    features: [
+      "Entrenamiento con base de conocimiento",
+      "Handoff a agentes humanos",
+      "Integración CRM automática",
+      "Métricas de conversión por sesión",
+      "Multicanal unificado",
+    ],
+    steps: [
+      { title: "Configura", body: "Tono, objetivos y fuentes de verdad." },
+      { title: "Despliega", body: "Widget web y canales conectados." },
+      { title: "Optimiza", body: "Iteración según conversaciones reales." },
+    ],
+    results: ["Leads 24/7", "Menor carga de soporte", "Respuesta instantánea"],
+  },
+  "automatizacion-ia": {
+    slug: "automatizacion-ia",
+    title: "Automatización IA",
+    subtitle: "Workflows que no duermen",
+    intro:
+      "Conecta disparadores, condiciones y acciones entre módulos NELVYON y herramientas externas. Tu operación marketing corre sola con supervisión clara.",
+    features: [
+      "Editor visual de flujos",
+      "Triggers por evento CRM",
+      "Acciones multicanal",
+      "Logs y reintentos",
+      "Plantillas por sector",
+    ],
+    steps: [
+      { title: "Mapea", body: "Journey desde lead a cliente." },
+      { title: "Automatiza", body: "Agentes ejecutan pasos sin fricción." },
+      { title: "Mide", body: "KPIs por workflow y optimización." },
+    ],
+    results: ["Menos trabajo manual", "Menos errores", "Velocidad operativa"],
+  },
+  "crm-ia": {
+    slug: "crm-ia",
+    title: "CRM IA",
+    subtitle: "Pipeline inteligente de punta a punta",
+    intro:
+      "Contactos, deals, actividades y scoring predictivo en un solo lugar. Los agentes priorizan quién contactar y qué decir.",
+    features: [
+      "Pipeline personalizable",
+      "Lead scoring automático",
+      "Actividades y recordatorios",
+      "Segmentación dinámica",
+      "Informes de conversión",
+    ],
+    steps: [
+      { title: "Importa", body: "Contactos y deals existentes." },
+      { title: "Prioriza", body: "IA ordena oportunidades por probabilidad." },
+      { title: "Cierra", body: "Seguimiento asistido hasta firma." },
+    ],
+    results: ["Más cierres", "Pipeline limpio", "Visibilidad comercial"],
+  },
+  "landing-pages-ia": {
+    slug: "landing-pages-ia",
+    title: "Landing Pages IA",
+    subtitle: "Páginas que convierten en horas",
+    intro:
+      "Landings generadas con copy, diseño y formularios optimizados. Publica, mide y itera sin depender de desarrollo externo.",
+    features: [
+      "Generación por brief",
+      "A/B de hero y CTA",
+      "Formularios conectados al CRM",
+      "Core Web Vitals optimizados",
+      "Dominio y SSL incluidos",
+    ],
+    steps: [
+      { title: "Brief", body: "Oferta, audiencia y objetivo de conversión." },
+      { title: "Publica", body: "Página live con tracking." },
+      { title: "Optimiza", body: "Variantes ganadoras escaladas." },
+    ],
+    results: ["Más leads", "Lanzamientos rápidos", "Menor CAC"],
+  },
+  "tiendas-online-ia": {
+    slug: "tiendas-online-ia",
+    title: "Tiendas Online IA",
+    subtitle: "Ecommerce con motor autónomo",
+    intro:
+      "Catálogo, checkout, emails post-compra y campañas de retención. Tu tienda opera con la misma inteligencia que el resto del stack NELVYON.",
+    features: [
+      "Catálogo y variantes",
+      "Checkout optimizado",
+      "Upsell y cross-sell IA",
+      "Emails transaccionales",
+      "Informes de revenue",
+    ],
+    steps: [
+      { title: "Lanza", body: "Tienda configurada con branding." },
+      { title: "Vende", body: "Tráfico paid y orgánico conectado." },
+      { title: "Retén", body: "Automatizaciones post-compra." },
+    ],
+    results: ["Más ticket medio", "Recurrencia", "Operación unificada"],
+  },
+  "diseno-ia": {
+    slug: "diseno-ia",
+    title: "Diseño IA",
+    subtitle: "Creatividades premium a escala",
+    intro:
+      "Banners, social assets, thumbnails y UI coherente con tu marca. Producción visual sin cuellos de botella de diseño tradicional.",
+    features: [
+      "Dirección de arte por marca",
+      "Variantes para ads y social",
+      "Export multiformato",
+      "Consistencia cross-campaña",
+      "Revisión humana opcional",
+    ],
+    steps: [
+      { title: "Guía", body: "Paleta, tipografía y restricciones." },
+      { title: "Produce", body: "Lotes de creatividades listas." },
+      { title: "Despliega", body: "En ads, web y email al instante." },
+    ],
+    results: ["Más tests creativos", "Marca impecable", "Menor time-to-creative"],
+  },
 };

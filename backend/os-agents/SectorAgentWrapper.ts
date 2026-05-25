@@ -1,4 +1,5 @@
 import { SectorAgentBase } from "./SectorAgentBase";
+import { resolveAgentLocale } from "./agentLanguage";
 import type { OsAgentStep, OsJobContext, OsJobPayload } from "./types";
 
 export const SECTOR_EXECUTE_STEP = "sector_execute";
@@ -32,6 +33,8 @@ export class SectorAgentWrapper extends SectorAgentBase {
           options.description ??
           `Ejecuta el agente de sector (${options.serviceId}) y serializa la salida para el informe.`,
         run: async (payload, ctx) => {
+          const locale = resolveAgentLocale(payload as Record<string, unknown>);
+          (ctx as OsJobContext & { agentLocale?: string }).agentLocale = locale;
           const result = await options.executor(payload, ctx);
           return typeof result === "string" ? result : JSON.stringify(result);
         },

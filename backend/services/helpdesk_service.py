@@ -398,6 +398,21 @@ class HelpdeskService:
                     {"id": ticket_id},
                 )
                 await self.session.commit()
+                try:
+                    from services.omnichannel_service import ingest_omnichannel_inbound
+
+                    await ingest_omnichannel_inbound(
+                        self.session,
+                        self.workspace_id,
+                        "email",
+                        body or subject,
+                        participant_email=from_email,
+                        participant_name=sender_name,
+                        subject=subject,
+                        metadata={"ticket_id": ticket_id},
+                    )
+                except Exception as exc:
+                    logger.debug("omnichannel email ingest skipped: %s", exc)
                 return {"action": "reply", "ticket": await self.get_ticket(ticket_id)}
 
         ticket = await self.create_ticket(
@@ -406,6 +421,21 @@ class HelpdeskService:
             subject or "Email entrante",
             body or subject,
         )
+        try:
+            from services.omnichannel_service import ingest_omnichannel_inbound
+
+            await ingest_omnichannel_inbound(
+                self.session,
+                self.workspace_id,
+                "email",
+                body or subject,
+                participant_email=from_email,
+                participant_name=sender_name or from_email,
+                subject=subject or "Email entrante",
+                metadata={"ticket_id": ticket.get("id")},
+            )
+        except Exception as exc:
+            logger.debug("omnichannel email ingest skipped: %s", exc)
         return {"action": "created", "ticket": ticket}
 
     async def process_inbound_whatsapp(
@@ -451,6 +481,20 @@ class HelpdeskService:
                 {"id": ticket_id},
             )
             await self.session.commit()
+            try:
+                from services.omnichannel_service import ingest_omnichannel_inbound
+
+                await ingest_omnichannel_inbound(
+                    self.session,
+                    self.workspace_id,
+                    "whatsapp",
+                    message,
+                    participant_phone=from_phone,
+                    participant_name=sender_name,
+                    metadata={"ticket_id": ticket_id},
+                )
+            except Exception as exc:
+                logger.debug("omnichannel whatsapp ingest skipped: %s", exc)
             return {"action": "reply", "ticket": await self.get_ticket(ticket_id)}
 
         ticket = await self.create_ticket(
@@ -459,6 +503,20 @@ class HelpdeskService:
             f"WhatsApp {from_phone}",
             message,
         )
+        try:
+            from services.omnichannel_service import ingest_omnichannel_inbound
+
+            await ingest_omnichannel_inbound(
+                self.session,
+                self.workspace_id,
+                "whatsapp",
+                message,
+                participant_phone=from_phone,
+                participant_name=sender_name or from_phone,
+                metadata={"ticket_id": ticket.get("id")},
+            )
+        except Exception as exc:
+            logger.debug("omnichannel whatsapp ingest skipped: %s", exc)
         return {"action": "created", "ticket": ticket}
 
     async def process_whatsapp_webhook_payload(self, payload: dict[str, Any]) -> dict[str, Any]:

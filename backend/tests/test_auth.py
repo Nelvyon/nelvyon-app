@@ -67,3 +67,57 @@ class TestJWTTokens:
         token1 = create_access_token(claims={"sub": "user-1", "email": "a@a.com"}, expires_minutes=60)
         token2 = create_access_token(claims={"sub": "user-2", "email": "b@b.com"}, expires_minutes=60)
         assert token1 != token2
+
+
+# ─── Frente 48: HTTP integration ─────────────────────────────────────────────
+
+from httpx import AsyncClient
+
+
+class TestAuthHTTPIntegration:
+    """HTTP contract tests for /api/v1/auth."""
+
+    async def test_token_exchange_register_returns_token(self, client: AsyncClient):
+        from tests.integration_helpers import mock_platform_token_verify
+
+        with mock_platform_token_verify(
+            user_id="reg-user-00000000-0000-0000-0000-000000000010",
+            email="register@nelvyon-test.com",
+            name="Register User",
+        ):
+            r = await client.post(
+                "/api/v1/auth/token/exchange",
+                json={"platform_token": "mock-platform-token-register"},
+            )
+        assert r.status_code == 200, r.text
+        body = r.json()
+        assert "token" in body and isinstance(body["token"], str) and len(body["token"]) > 10
+
+    async def test_token_exchange_login_returns_valid_token(self, client: AsyncClient):
+        from tests.integration_helpers import mock_platform_token_verify
+
+        with mock_platform_token_verify(
+            user_id="test-user-00000000-0000-0000-0000-000000000001",
+            email="testuser@nelvyon-test.com",
+            name="Test User",
+        ):
+            r = await client.post(
+                "/api/v1/auth/token/exchange",
+                json={"platform_token": "mock-platform-token-login"},
+            )
+        assert r.status_code == 200, r.text
+        token = r.json()["token"]
+        me = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+        assert me.status_code == 200, me.text
+        assert me.json()["email"] == "testuser@nelvyon-test.com"
+
+    async def test_me_with_token_returns_user(self, client: AsyncClient, auth_only_headers: dict):
+        r = await client.get("/api/v1/auth/me", headers=auth_only_headers)
+        assert r.status_code == 200, r.text
+        body = r.json()
+        assert body["email"] == "testuser@nelvyon-test.com"
+        assert body["id"] == "test-user-00000000-0000-0000-0000-000000000001"
+
+    async def test_me_without_token_returns_401(self, client: AsyncClient):
+        r = await client.get("/api/v1/auth/me")
+        assert r.status_code == 401

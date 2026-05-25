@@ -306,3 +306,82 @@ async def test_crm_analytics_integrity(db_session: AsyncSession):
     assert isinstance(result["issues"], list)
     assert result["health_score"] >= 0
     assert result["health_score"] <= 100
+
+
+# ─── Frente 48: HTTP integration (/api/crm/contacts) ─────────────────────────
+
+from uuid import uuid4
+
+from httpx import AsyncClient
+
+from tests.fakes import FakeCRMService
+from tests.integration_helpers import skip_pg_schema_migrations
+
+
+@pytest.fixture
+def crm_http_fake(monkeypatch):
+    skip_pg_schema_migrations()
+    FakeCRMService.reset()
+    import routers.crm as crm_router
+
+    monkeypatch.setattr(crm_router, "CRMService", FakeCRMService)
+    return FakeCRMService(workspace_id=TEST_WORKSPACE_ID)
+
+
+@pytest.mark.asyncio
+async def test_http_crm_create_contact(client: AsyncClient, auth_headers: dict, crm_http_fake: FakeCRMService):
+    suffix = uuid4().hex[:6]
+    r = await client.post(
+        "/api/crm/contacts",
+        json={"name": f"Lead {suffix}", "email": f"lead-{suffix}@example.com", "company": "Acme"},
+        headers=auth_headers,
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["name"] == f"Lead {suffix}"
+    assert body["id"] in crm_http_fake.contacts
+
+
+@pytest.mark.asyncio
+async def test_http_crm_list_contacts_cached(client: AsyncClient, auth_headers: dict, crm_http_fake: FakeCRMService):
+    suffix = uuid4().hex[:6]
+    await client.post(
+        "/api/crm/contacts",
+        json={"name": f"Cache {suffix}", "email": f"cache-{suffix}@example.com"},
+        headers=auth_headers,
+    )
+    first = await client.get("/api/crm/contacts", headers=auth_headers)
+    second = await client.get("/api/crm/contacts", headers=auth_headers)
+    assert first.status_code == 200 and second.status_code == 200
+    assert first.json()["total"] >= 1
+    assert second.json()["total"] == first.json()["total"]
+
+
+@pytest.mark.asyncio
+async def test_http_crm_update_contact(client: AsyncClient, auth_headers: dict, crm_http_fake: FakeCRMService):
+    created = await client.post(
+        "/api/crm/contacts",
+        json={"name": "Before Update", "email": "before@example.com"},
+        headers=auth_headers,
+    )
+    cid = created.json()["id"]
+    updated = await client.patch(
+        f"/api/crm/contacts/{cid}",
+        json={"name": "After Update", "company": "Updated Co"},
+        headers=auth_headers,
+    )
+    assert updated.status_code == 200, updated.text
+    assert updated.json()["name"] == "After Update"
+
+
+@pytest.mark.asyncio
+async def test_http_crm_delete_contact(client: AsyncClient, auth_headers: dict, crm_http_fake: FakeCRMService):
+    created = await client.post(
+        "/api/crm/contacts",
+        json={"name": "To Delete", "email": "delete@example.com"},
+        headers=auth_headers,
+    )
+    cid = created.json()["id"]
+    deleted = await client.delete(f"/api/crm/contacts/{cid}", headers=auth_headers)
+    assert deleted.status_code == 204
+    assert cid not in crm_http_fake.contacts

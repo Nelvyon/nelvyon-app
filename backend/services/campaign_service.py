@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import re
@@ -9,11 +10,13 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 from urllib.parse import quote
 
+from openai import AsyncOpenAI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.sentry_utils import capture_exception
 from services.ses_service import BULK_BATCH_SIZE, get_ses_service
+from services.whitelabel_service import get_whitelabel_service
 from services.webhook_service import schedule_webhook_event
 from services.whatsapp_service import get_whatsapp_service
 
@@ -44,6 +47,14 @@ def _backend_base_url() -> str:
     if not base:
         base = "http://127.0.0.1:8000"
     return base
+
+
+def _openai_client() -> AsyncOpenAI | None:
+    key = os.environ.get("OPENAI_API_KEY", "").strip() or os.environ.get("APP_AI_KEY", "").strip()
+    if not key:
+        return None
+    base = os.environ.get("OPENAI_BASE_URL", "").strip() or None
+    return AsyncOpenAI(api_key=key, base_url=base)
 
 
 class CampaignService:
@@ -358,6 +369,35 @@ class CampaignService:
                 {"campaign_id": campaign_id},
             )
         await self.session.commit()
+        try:
+            from services.workflow_service import dispatch_workflow_trigger
+
+            rec = await self.session.execute(
+                text(
+                    """
+                    SELECT cr.email, cr.contact_id, c.workspace_id
+                    FROM campaign_recipients cr
+                    JOIN campaigns c ON c.id = cr.campaign_id
+                    WHERE cr.id = :rid AND cr.campaign_id = :cid
+                    """
+                ),
+                {"rid": recipient_id, "cid": campaign_id},
+            )
+            row = rec.mappings().first()
+            if row:
+                await dispatch_workflow_trigger(
+                    self.session,
+                    int(row["workspace_id"]),
+                    "email_open",
+                    {
+                        "campaign_id": campaign_id,
+                        "recipient_id": recipient_id,
+                        "email": row.get("email"),
+                        "contact_id": row.get("contact_id"),
+                    },
+                )
+        except Exception as exc:
+            logger.debug("email_open workflow trigger skipped: %s", exc)
 
     async def track_click(self, campaign_id: int, recipient_id: int) -> None:
         now = datetime.now(timezone.utc)
@@ -404,6 +444,35 @@ class CampaignService:
                 {"campaign_id": campaign_id},
             )
         await self.session.commit()
+        try:
+            from services.workflow_service import dispatch_workflow_trigger
+
+            rec = await self.session.execute(
+                text(
+                    """
+                    SELECT cr.email, cr.contact_id, c.workspace_id
+                    FROM campaign_recipients cr
+                    JOIN campaigns c ON c.id = cr.campaign_id
+                    WHERE cr.id = :rid AND cr.campaign_id = :cid
+                    """
+                ),
+                {"rid": recipient_id, "cid": campaign_id},
+            )
+            row = rec.mappings().first()
+            if row:
+                await dispatch_workflow_trigger(
+                    self.session,
+                    int(row["workspace_id"]),
+                    "link_click",
+                    {
+                        "campaign_id": campaign_id,
+                        "recipient_id": recipient_id,
+                        "email": row.get("email"),
+                        "contact_id": row.get("contact_id"),
+                    },
+                )
+        except Exception as exc:
+            logger.debug("link_click workflow trigger skipped: %s", exc)
 
     async def get_stats(self, campaign_id: int) -> dict[str, Any]:
         campaign = await self._get_campaign_row(campaign_id)
@@ -445,6 +514,58 @@ class CampaignService:
             "bounce_rate": round((bounced / sent * 100), 2) if sent > 0 else 0.0,
             "failed_count": int(c.failed or 0) if c else 0,
         }
+
+    async def generate_campaign_copy(
+        self,
+        brief: str,
+        *,
+        campaign_type: str = "email",
+        language: str | None = None,
+    ) -> dict[str, Any]:
+        """Generate subject + body in the client's language."""
+        client = _openai_client()
+        from agents.base_agent import detect_language, LANG_LABELS
+
+        lang = language or await detect_language(brief)
+        lang_label = LANG_LABELS.get(lang, lang)
+        if not client:
+            return {
+                "subject": "Tu campaña NELVYON",
+                "content": f"<p>{brief}</p>",
+                "mock": True,
+                "language": lang,
+            }
+        from services.finetuning_service import get_model_for_workspace
+
+        model = await get_model_for_workspace(self.session, self.workspace_id)
+        prompt = (
+            f"Generate {campaign_type} campaign copy in {lang_label}.\n"
+            f"Brief: {brief.strip()}\n"
+            'Reply ONLY JSON: {"subject":"...","content":"..."} '
+            "content as brief HTML for email."
+        )
+        try:
+            resp = await client.chat.completions.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": f"You are a B2B/B2C marketing copywriter. Write in {lang_label} only.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.6,
+                response_format={"type": "json_object"},
+            )
+            data = json.loads(resp.choices[0].message.content or "{}")
+            return {
+                "subject": data.get("subject") or "Campaña",
+                "content": data.get("content") or f"<p>{brief}</p>",
+                "language": lang,
+            }
+        except Exception as exc:
+            logger.warning("generate_campaign_copy failed: %s", exc)
+            return {"subject": "Campaña", "content": f"<p>{brief}</p>", "error": str(exc)}
 
     # ─── internal ───────────────────────────────────────────────────────────
 
@@ -582,8 +703,10 @@ class CampaignService:
     async def _send_email_batch(self, campaign: Any, batch: list[dict[str, Any]]) -> tuple[int, int]:
         ses = get_ses_service()
         subject = (campaign.get("subject") or campaign.get("name") or "Campaign").strip()
-        body_base = campaign.get("content") or "<p>Hola desde NELVYON</p>"
-        from_email = campaign.get("from_email")
+        body_base = campaign.get("content") or "<p>Hola</p>"
+        wl = get_whitelabel_service(self.session, self.workspace_id)
+        sender = await wl.get_email_sender()
+        from_email = campaign.get("from_email") or sender.get("from_email")
         sent = 0
         failed = 0
         now = datetime.now(timezone.utc)
@@ -596,9 +719,14 @@ class CampaignService:
                 await self._mark_recipient(rid, "failed", now)
                 failed += 1
                 continue
-            html = self._inject_tracking(
+            tracked = self._inject_tracking(
                 self._wrap_links_for_tracking(body_base, cid, rid), cid, rid
             )
+            branded = await wl.generate_whitelabel_email_template(
+                "campaign",
+                variables={"body": tracked, "subject": subject},
+            )
+            html = branded.get("html") or tracked
             try:
                 result = await ses.send_email(to, subject, html, from_email=from_email)
                 status = "sent" if result.get("message_id") else "failed"

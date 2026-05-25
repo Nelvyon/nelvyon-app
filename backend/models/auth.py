@@ -10,6 +10,7 @@ class User(Base):
     email = Column(String(255), nullable=False)
     name = Column(String(255), nullable=True)
     role = Column(String(50), default="user", nullable=False)  # user/admin
+    language = Column(String(8), default="es", nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     last_login = Column(DateTime(timezone=True), nullable=True)
 

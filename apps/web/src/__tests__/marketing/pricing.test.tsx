@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, it } from "vitest";
 
-import HomePage from "@/app/(marketing)/page";
+import HomePage from "@/app/page";
 import PartnersPage from "@/app/(marketing)/partners/page";
 import PricingPage from "@/app/(marketing)/pricing/page";
 import esMessages from "../../../messages/es.json";

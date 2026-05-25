@@ -171,6 +171,26 @@ class SocialSchedulerService:
         )
         return [self._public_account(_row(x)) for x in r.fetchall()]
 
+    async def _get_workspace_timezone(self, tenant_id: int) -> str:
+        r = await self.session.execute(
+            text("SELECT timezone FROM workspaces WHERE id = :id"),
+            {"id": tenant_id},
+        )
+        tz = r.scalar_one_or_none()
+        return tz or "Europe/Madrid"
+
+    async def _local_scheduled_to_utc(self, tenant_id: int, local_dt: datetime) -> datetime:
+        from zoneinfo import ZoneInfo
+
+        tz_name = await self._get_workspace_timezone(tenant_id)
+        try:
+            tz = ZoneInfo(tz_name)
+        except Exception:
+            tz = ZoneInfo("UTC")
+        if local_dt.tzinfo is None:
+            local_dt = local_dt.replace(tzinfo=tz)
+        return local_dt.astimezone(timezone.utc)
+
     async def create_post(
         self,
         tenant_id: int,
@@ -186,6 +206,9 @@ class SocialSchedulerService:
         await self._set_tenant(tenant_id)
         if not account_ids:
             raise ValueError("At least one account_id is required")
+
+        if scheduled_at is not None and scheduled_at.tzinfo is None:
+            scheduled_at = await self._local_scheduled_to_utc(tenant_id, scheduled_at)
 
         st = status or ("scheduled" if scheduled_at else "draft")
         post_id = str(uuid.uuid4())

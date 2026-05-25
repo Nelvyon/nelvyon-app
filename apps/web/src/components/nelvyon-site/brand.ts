@@ -83,9 +83,64 @@ export const SERVICES = [
     icon: "◉",
     gradient: "from-[#0066FF] to-[#00CCFF]",
   },
+  {
+    slug: "chatbot-ia",
+    href: "/servicios/chatbot-ia",
+    title: "Chatbot IA",
+    short: "Atención, cualificación y ventas 24/7 en web y WhatsApp.",
+    icon: "💬",
+    gradient: "from-[#0055EE] to-[#00AAFF]",
+  },
+  {
+    slug: "automatizacion-ia",
+    href: "/servicios/automatizacion-ia",
+    title: "Automatización IA",
+    short: "Workflows que conectan CRM, email, ads y operaciones.",
+    icon: "⚡",
+    gradient: "from-[#0066FF] to-[#8844FF]",
+  },
+  {
+    slug: "crm-ia",
+    href: "/servicios/crm-ia",
+    title: "CRM IA",
+    short: "Pipeline, scoring y seguimiento inteligente de leads.",
+    icon: "◐",
+    gradient: "from-[#0044CC] to-[#0066FF]",
+  },
+  {
+    slug: "landing-pages-ia",
+    href: "/servicios/landing-pages-ia",
+    title: "Landing Pages IA",
+    short: "Landings de conversión generadas y optimizadas con IA.",
+    icon: "▤",
+    gradient: "from-[#0066FF] to-[#00BBFF]",
+  },
+  {
+    slug: "tiendas-online-ia",
+    href: "/servicios/tiendas-online-ia",
+    title: "Tiendas Online IA",
+    short: "Ecommerce con catálogo, checkout y growth automatizado.",
+    icon: "🛒",
+    gradient: "from-[#0055DD] to-[#3388FF]",
+  },
+  {
+    slug: "diseno-ia",
+    href: "/servicios/diseno-ia",
+    title: "Diseño IA",
+    short: "Creatividades, UI y assets visuales con calidad premium.",
+    icon: "✦",
+    gradient: "from-[#0066FF] to-[#AA44FF]",
+  },
 ] as const;
 
 export type ServiceSlug = (typeof SERVICES)[number]["slug"];
+
+export const HOME_STATS = [
+  { value: "12", label: "Servicios IA", suffix: "+" },
+  { value: "24/7", label: "Ejecución autónoma", suffix: "" },
+  { value: "95€", label: "Desde / mes", suffix: "" },
+  { value: "6", label: "Idiomas soportados", suffix: "" },
+] as const;
 
 export const PLANS = [
   {

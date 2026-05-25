@@ -13,6 +13,7 @@ from core.database import get_db
 from core.i18n import request_language, t
 from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
+from services.cache_service import cached
 from services.crm_service import CRMService, PIPELINE_STAGES
 
 router = APIRouter(prefix="/api/crm", tags=["crm"])

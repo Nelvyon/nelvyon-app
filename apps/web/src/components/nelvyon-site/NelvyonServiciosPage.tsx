@@ -13,7 +13,7 @@ export function NelvyonServiciosPage() {
         <FadeUp className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold text-white md:text-6xl">Servicios IA</h1>
           <p className="mt-6 text-lg text-zinc-400">
-            Seis disciplinas de marketing ejecutadas por agentes autónomos. Cada una con página dedicada y resultados medibles.
+            Doce disciplinas de marketing ejecutadas por agentes autónomos. Cada una con página dedicada y resultados medibles.
           </p>
         </FadeUp>
         <div className="mx-auto mt-16 grid max-w-6xl gap-8 md:grid-cols-2">

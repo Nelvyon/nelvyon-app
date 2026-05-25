@@ -28,11 +28,15 @@ _PUBLIC_PREFIXES = (
     "/api/v1/auth/login",
     "/api/v1/auth/callback",
     "/api/v1/auth/register",
+    "/api/v1/system/",
+    "/api/v1/email/health",
     "/api/affiliates/track/",
     "/api/marketplace/agencies",
     "/api/chat/widget.js",
     "/api/chat/widget-config",
     "/api/chat/ws/",
+    "/api/whitelabel/resolve",
+    "/api/internal/agent-prompts/",
 )
 
 _OPTIONAL_TENANT_PREFIXES = (
@@ -123,8 +127,22 @@ def _is_sms_webhook(path: str, method: str) -> bool:
     return method == "POST" and path == "/api/sms/webhook/twilio"
 
 
+def _is_conversation_stream_public(path: str, method: str) -> bool:
+    return method == "GET" and re.match(r"^/api/v1/conversations/[^/]+/stream$", path) is not None
+
+
+def _is_automation_webhook_public(path: str, method: str) -> bool:
+    return method == "POST" and path.startswith("/api/v1/automation/webhook/trigger/")
+
+
+def _is_public_api(path: str) -> bool:
+    return path.startswith("/api/public/v1/")
+
+
 def _is_public(path: str, method: str = "GET") -> bool:
     if path in _PUBLIC_PATHS:
+        return True
+    if _is_public_api(path):
         return True
     if _is_sms_webhook(path, method):
         return True
@@ -151,6 +169,10 @@ def _is_public(path: str, method: str = "GET") -> bool:
     if _is_chat_public(path, method):
         return True
     if _is_social_oauth_callback(path, method):
+        return True
+    if _is_automation_webhook_public(path, method):
+        return True
+    if _is_conversation_stream_public(path, method):
         return True
     if path.startswith("/p/") and method == "GET":
         return True
@@ -238,11 +260,14 @@ class TenantMiddleware(BaseHTTPMiddleware):
 
         if tenant_id is None and not _optional_tenant(path) and not _is_public(path, request.method):
             if re.match(r"^/api/", path):
-                return JSONResponse(
-                    status_code=401,
-                    content={
-                        "detail": "tenant_id required (JWT claim or X-Workspace-Id / X-Tenant-Id header)",
-                    },
-                )
+                # Unauthenticated API calls are rejected here; authenticated requests
+                # without X-Workspace-Id pass through so require_workspace can return 400.
+                if not user_id:
+                    return JSONResponse(
+                        status_code=401,
+                        content={
+                            "detail": "tenant_id required (JWT claim or X-Workspace-Id / X-Tenant-Id header)",
+                        },
+                    )
 
         return await call_next(request)

@@ -178,6 +178,20 @@ async def startup_event():
         await start_social_scheduler_worker()
     except Exception as e:
         logger.warning("Social scheduler worker failed to start: %s", e)
+
+    try:
+        from services.finetuning_worker import start_finetuning_worker
+
+        await start_finetuning_worker()
+    except Exception as e:
+        logger.warning("Fine-tuning worker failed to start: %s", e)
+
+    try:
+        from services.reporting_worker import start_reporting_worker
+
+        await start_reporting_worker()
+    except Exception as e:
+        logger.warning("Executive reporting worker failed to start: %s", e)
     # MODULE_STARTUP_END
 
     logger.info("=== Application startup completed ===")
@@ -195,6 +209,20 @@ async def shutdown_event():
         await stop_social_scheduler_worker()
     except Exception as e:
         logger.warning("Social scheduler worker shutdown failed: %s", e)
+
+    try:
+        from services.finetuning_worker import stop_finetuning_worker
+
+        await stop_finetuning_worker()
+    except Exception as e:
+        logger.warning("Fine-tuning worker shutdown failed: %s", e)
+
+    try:
+        from services.reporting_worker import stop_reporting_worker
+
+        await stop_reporting_worker()
+    except Exception as e:
+        logger.warning("Executive reporting worker shutdown failed: %s", e)
 
     try:
         from services.os_web_builder_worker import stop_website_generation_workers
@@ -239,9 +267,17 @@ app.add_middleware(ErrorHandlerMiddleware)
 from middlewares.security import SecurityMiddleware
 app.add_middleware(SecurityMiddleware, scan_bodies=True)
 
-# Rate limiting middleware
+# Rate limiting middleware (phase-1 sensitive routes)
 from middlewares.rate_limiter import RateLimiterMiddleware
 app.add_middleware(RateLimiterMiddleware, enabled=True)
+
+# Frente 58 — intelligent tiered rate limits
+from middleware.rate_limit import IntelligentRateLimitMiddleware
+app.add_middleware(IntelligentRateLimitMiddleware, enabled=True)
+
+# Frente 58 — anti-scraping & fingerprinting
+from middleware.anti_scraping import AntiScrapingMiddleware
+app.add_middleware(AntiScrapingMiddleware)
 
 # Request ID middleware (outermost custom — assigns X-Request-ID for traceability)
 from middlewares.request_id import RequestIDMiddleware
@@ -252,19 +288,17 @@ from middleware.tenant import TenantMiddleware
 app.add_middleware(TenantMiddleware)
 
 # CORS middleware (must be outermost to handle preflight OPTIONS correctly)
-# Environment-aware CORS configuration
-_allowed_origin_regex = r".*"  # Default: allow all (dev/staging)
-if IS_PRODUCTION:
-    # In production, restrict to known domains
-    _allowed_origin_regex = r"https?://(.*\.)?nelvyon\.(com|dev|app)(:\d+)?$"
+from core.cors_policy import cors_origin_regex
+
+_allowed_origin_regex = cors_origin_regex(ENVIRONMENT)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origin_regex=_allowed_origin_regex,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
-    expose_headers=["X-Request-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset", "Retry-After"],
+    allow_headers=["Authorization", "Content-Type", "X-Workspace-Id", "X-API-Key", "X-Request-ID"],
+    expose_headers=["X-Request-ID", "Retry-After"],
 )
 # MODULE_MIDDLEWARE_END
 
@@ -368,6 +402,17 @@ app.include_router(dialer_router)
 app.include_router(qr_router)
 app.include_router(qr_public_router)
 app.include_router(forms_router)
+from routers.workflows_visual import workflows_visual_router
+from routers.omnichannel import omnichannel_router
+
+app.include_router(workflows_visual_router)
+app.include_router(omnichannel_router)
+from routers.finetuning import finetuning_router
+
+app.include_router(finetuning_router)
+from routers.public_api import public_api_router
+
+app.include_router(public_api_router)
 
 # Static embeddable chatbot widget
 from pathlib import Path as _Path
@@ -406,6 +451,23 @@ async def chatbot_embed_cors(request: Request, call_next):
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
     return await call_next(request)
+
+
+# Sanitize HTTP errors in production (no internal module/stack leakage)
+@app.exception_handler(HTTPException)
+async def sanitized_http_exception_handler(request: Request, exc: HTTPException):
+    request_id = getattr(request.state, "request_id", "unknown")
+    if IS_PRODUCTION and exc.status_code >= 500:
+        detail = "An error occurred"
+    elif IS_PRODUCTION and isinstance(exc.detail, str) and any(
+        token in exc.detail.lower() for token in ("traceback", "sqlalchemy", "module", "file ", "line ")
+    ):
+        detail = "An error occurred"
+    else:
+        detail = exc.detail
+    headers = dict(exc.headers or {})
+    headers.setdefault("X-Request-ID", request_id)
+    return JSONResponse(status_code=exc.status_code, content={"detail": detail}, headers=headers)
 
 
 # Add exception handler for all exceptions except HTTPException
@@ -462,7 +524,7 @@ async def general_exception_handler(request: Request, exc: Exception):
         }
     else:
         error_detail = {
-            "detail": "Internal Server Error",
+            "detail": "An error occurred",
             "request_id": request_id,
         }
 

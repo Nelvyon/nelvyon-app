@@ -13,6 +13,7 @@ from typing import Any
 import httpx
 from openai import AsyncOpenAI
 
+from services.image_optimizer import optimize_image_bytes
 from services.supabase_service import get_supabase_service
 
 logger = logging.getLogger(__name__)
@@ -118,13 +119,34 @@ class DalleService:
             content_type="image/png",
         )
 
+        optimized: dict[str, Any] = {}
+        try:
+            optimized = await optimize_image_bytes(
+                image_bytes,
+                base_id=record_id,
+                bucket=AGENT_RESULTS_BUCKET,
+                prefix=DALLE_PREFIX,
+            )
+        except Exception as exc:
+            logger.warning("WebP optimization failed, keeping PNG only: %s", exc)
+
+        variants = optimized.get("variants") or {}
+        public_url = (
+            variants.get("desktop")
+            or upload.get("public_url")
+            or self.supabase.public_url(AGENT_RESULTS_BUCKET, image_path)
+        )
+
         metadata: dict[str, Any] = {
             "id": record_id,
             "operation": operation,
             "prompt": prompt,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "image_path": image_path,
-            "public_url": upload.get("public_url"),
+            "public_url": public_url,
+            "imageVariants": variants,
+            "image_width": optimized.get("width"),
+            "image_height": optimized.get("height"),
             "mock_storage": upload.get("mock", False),
             "source_url": source_url,
             **(extra or {}),

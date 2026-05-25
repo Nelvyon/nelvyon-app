@@ -1,0 +1,4 @@
+-- Frente 56 — User language preference
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS language VARCHAR(8) NOT NULL DEFAULT 'es';
+ALTER TABLE workspaces ADD COLUMN IF NOT EXISTS date_format VARCHAR(32) NOT NULL DEFAULT 'DD/MM/YYYY';

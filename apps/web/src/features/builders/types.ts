@@ -1,5 +1,8 @@
 export type BlockType =
   | "hero"
+  | "hero_3d"
+  | "product_3d"
+  | "stats_3d"
   | "text"
   | "image"
   | "video"
