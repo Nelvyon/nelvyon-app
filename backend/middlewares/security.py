@@ -43,6 +43,7 @@ SCAN_EXCLUDED_PATHS = {
     "/api/instagram-dm/webhook",
     "/api/fb-messenger/webhook",
     "/api/tiktok-dm/webhook",
+    "/api/text2pay/webhook",
     "/api/v1/payment/create_payment_session",
     "/api/v1/payment/verify_payment",
 }
