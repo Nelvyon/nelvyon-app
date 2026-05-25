@@ -20,7 +20,7 @@ export function NelvyonShell({
   hero3d?: boolean;
 }) {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#050505] text-zinc-100 antialiased">
+    <div className="relative min-h-screen overflow-x-hidden bg-black text-white antialiased" style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-20 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(0,102,255,0.12),transparent)]"

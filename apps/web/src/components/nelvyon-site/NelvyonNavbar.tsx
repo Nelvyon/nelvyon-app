@@ -6,23 +6,19 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { NAV, NELVYON } from "./brand";
+import { NAV } from "./brand";
 
 export function NelvyonNavbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#050505]/75 backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:h-[4.5rem] md:px-6">
-        <Link href="/" className="group flex items-center gap-2">
-          <span
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#0066FF]/40 bg-[#0066FF]/10 text-sm font-black text-[#0066FF] shadow-[0_0_24px_rgba(0,102,255,0.25)]"
-            style={{ fontFamily: "var(--font-geist-sans, system-ui)" }}
-          >
-            N
+        <Link href="/" className="group flex items-center">
+          <span className="text-xl font-bold tracking-tight text-white transition group-hover:text-[#66a3ff]">
+            NELVYON
           </span>
-          <span className="text-lg font-semibold tracking-tight text-white group-hover:text-[#66a3ff]">{NELVYON.name}</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -45,7 +41,7 @@ export function NelvyonNavbar() {
             href="/register"
             className="rounded-full bg-[#0066FF] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_32px_rgba(0,102,255,0.35)] transition hover:bg-[#0052cc]"
           >
-            Empezar
+            Empieza gratis
           </Link>
         </div>
 
@@ -63,7 +59,7 @@ export function NelvyonNavbar() {
         {open ? (
           <motion.div
             animate={{ opacity: 1, height: "auto" }}
-            className="border-t border-white/[0.06] bg-[#050505] px-4 py-4 md:hidden"
+            className="border-t border-white/10 bg-black px-4 py-4 md:hidden"
             exit={{ opacity: 0, height: 0 }}
             initial={{ opacity: 0, height: 0 }}
           >
@@ -81,7 +77,7 @@ export function NelvyonNavbar() {
                 className="rounded-full bg-[#0066FF] py-3 text-center text-sm font-semibold text-white"
                 onClick={() => setOpen(false)}
               >
-                Empezar
+                Empieza gratis
               </Link>
             </div>
           </motion.div>

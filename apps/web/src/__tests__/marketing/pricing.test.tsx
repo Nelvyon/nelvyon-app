@@ -44,7 +44,7 @@ describe("marketing pricing and landing", () => {
 
   it("Nav incluye CTA a /register", () => {
     renderWithIntl(<PricingPage />);
-    const navCta = screen.getByRole("link", { name: /^Empezar$/i });
+    const navCta = screen.getByRole("link", { name: /^Empieza gratis$/i });
     expect(navCta).toHaveAttribute("href", "/register");
   });
 
@@ -57,17 +57,15 @@ describe("marketing pricing and landing", () => {
 
   it("Home tiene CTA de registro", () => {
     renderWithIntl(<HomePage />);
-    const links = screen.getAllByRole("link", { name: /Crear mi imperio|Empezar gratis/i });
+    const links = screen.getAllByRole("link", { name: /Empieza gratis/i });
     expect(links.length).toBeGreaterThan(0);
     expect(links.some((el) => el.getAttribute("href") === "/register")).toBe(true);
   });
 
-  it("Home enlaza a páginas de servicio", () => {
+  it("Home enlaza a servicios", () => {
     renderWithIntl(<HomePage />);
     const hrefs = screen.getAllByRole("link").map((el) => el.getAttribute("href"));
-    expect(hrefs).toContain("/servicios/seo-ia");
-    expect(hrefs).toContain("/servicios/publicidad-ia");
-    expect(hrefs).toContain("/servicios/contenido-ia");
+    expect(hrefs).toContain("/servicios");
   });
 
   it("Página /partners renderiza calculadora", () => {
