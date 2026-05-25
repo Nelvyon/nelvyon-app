@@ -191,6 +191,45 @@ INTEGRATION_TABLES: tuple[str, ...] = (
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
     """,
+    """
+    CREATE TABLE IF NOT EXISTS dialer_calls (
+        id TEXT PRIMARY KEY,
+        workspace_id INTEGER NOT NULL,
+        contact_id TEXT,
+        client_id TEXT,
+        session_id TEXT,
+        to_number TEXT NOT NULL,
+        from_number TEXT NOT NULL DEFAULT '',
+        local_from_number TEXT,
+        call_sid TEXT,
+        status TEXT NOT NULL DEFAULT 'queued',
+        duration_seconds INTEGER NOT NULL DEFAULT 0,
+        outcome TEXT,
+        amd_result TEXT,
+        call_score INTEGER,
+        recording_url TEXT,
+        recording_storage_path TEXT,
+        transcript TEXT,
+        notes TEXT,
+        agent_id TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS dialer_advanced_sessions (
+        id TEXT PRIMARY KEY,
+        workspace_id INTEGER NOT NULL,
+        client_id TEXT NOT NULL DEFAULT 'default',
+        mode TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'active',
+        queue_json TEXT NOT NULL DEFAULT '[]',
+        parallel_limit INTEGER NOT NULL DEFAULT 3,
+        voicemail_url TEXT,
+        stats_json TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
 )
 
 

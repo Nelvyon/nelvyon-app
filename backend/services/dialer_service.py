@@ -69,17 +69,64 @@ class DialerService:
         return self._configured
 
     @classmethod
-    async def ensure_schema(cls) -> None:
+    async def ensure_schema(cls, session: AsyncSession | None = None) -> None:
         global _SCHEMA_READY
         if _SCHEMA_READY:
             return
         from core.database import db_manager
 
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "dialer.sql"
-        if sql_path.is_file():
-            async with db_manager.get_session() as session:
-                await session.execute(text(sql_path.read_text(encoding="utf-8")))
-                await session.commit()
+        async def _apply(sess: AsyncSession) -> None:
+            bind = sess.get_bind()
+            dialect = bind.dialect.name if bind is not None else "postgresql"
+            if dialect == "sqlite":
+                await sess.execute(
+                    text(
+                        """
+                        CREATE TABLE IF NOT EXISTS dialer_calls (
+                            id TEXT PRIMARY KEY,
+                            workspace_id INTEGER NOT NULL,
+                            contact_id TEXT,
+                            client_id TEXT,
+                            session_id TEXT,
+                            to_number TEXT NOT NULL,
+                            from_number TEXT NOT NULL DEFAULT '',
+                            local_from_number TEXT,
+                            call_sid TEXT,
+                            status TEXT NOT NULL DEFAULT 'queued',
+                            duration_seconds INTEGER NOT NULL DEFAULT 0,
+                            outcome TEXT,
+                            amd_result TEXT,
+                            call_score INTEGER,
+                            recording_url TEXT,
+                            recording_storage_path TEXT,
+                            transcript TEXT,
+                            notes TEXT,
+                            agent_id TEXT,
+                            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                        )
+                        """
+                    )
+                )
+            else:
+                sql_path = Path(__file__).resolve().parent.parent / "migrations" / "dialer.sql"
+                if sql_path.is_file():
+                    for stmt in [
+                        s.strip()
+                        for s in sql_path.read_text(encoding="utf-8").split(";")
+                        if s.strip() and not s.strip().startswith("--")
+                    ]:
+                        try:
+                            await sess.execute(text(stmt))
+                        except Exception as exc:
+                            logger.debug("dialer schema stmt skipped: %s", exc)
+
+        if session is not None:
+            await _apply(session)
+        else:
+            await db_manager.ensure_initialized()
+            async with db_manager.async_session_maker() as sess:
+                await _apply(sess)
+                await sess.commit()
         _SCHEMA_READY = True
 
     async def _set_tenant(self) -> None:

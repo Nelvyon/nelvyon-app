@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import uuid as uuid_mod
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Any, Optional
@@ -13,6 +14,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import db_manager
+from core.sql_compat import json_bind, uuid_bind
 from core.sentry_utils import capture_exception
 from services.webhook_service import schedule_webhook_event
 
@@ -56,7 +58,12 @@ def _json_dumps(value: Any) -> str:
 def _row_to_dict(row: Any) -> dict[str, Any]:
     if row is None:
         return {}
-    data = dict(row._mapping)
+    if isinstance(row, dict):
+        data = dict(row)
+    elif hasattr(row, "_mapping"):
+        data = dict(row._mapping)
+    else:
+        data = dict(row)
     for key, val in list(data.items()):
         if isinstance(val, UUID):
             data[key] = str(val)
@@ -65,6 +72,15 @@ def _row_to_dict(row: Any) -> dict[str, Any]:
         elif isinstance(val, (datetime, date)):
             data[key] = val.isoformat()
     return data
+
+
+def _is_sqlite(session: AsyncSession) -> bool:
+    bind = session.get_bind()
+    return bind is not None and bind.dialect.name == "sqlite"
+
+
+def _updated_at_sql(session: AsyncSession) -> str:
+    return "CURRENT_TIMESTAMP" if _is_sqlite(session) else "now()"
 
 
 class CRMService:
@@ -121,31 +137,51 @@ class CRMService:
         tags: list | None = None,
         metadata: dict | None = None,
     ) -> dict[str, Any]:
-        result = await self.session.execute(
-            text(
-                """
-                INSERT INTO crm_contacts (
-                    workspace_id, name, email, phone, company, status, tags, metadata
-                )
-                VALUES (
-                    :workspace_id, :name, :email, :phone, :company, :status,
-                    CAST(:tags AS jsonb), CAST(:metadata AS jsonb)
-                )
-                RETURNING *
-                """
-            ),
-            {
-                "workspace_id": self.workspace_id,
-                "name": name.strip(),
-                "email": (email or "").strip() or None,
-                "phone": (phone or "").strip() or None,
-                "company": (company or "").strip() or None,
-                "status": (status or "active").strip(),
-                "tags": _json_dumps(tags or []),
-                "metadata": _json_dumps(metadata or {}),
-            },
-        )
-        row = _row_to_dict(result.mappings().first())
+        params = {
+            "workspace_id": self.workspace_id,
+            "name": name.strip(),
+            "email": (email or "").strip() or None,
+            "phone": (phone or "").strip() or None,
+            "company": (company or "").strip() or None,
+            "status": (status or "active").strip(),
+            "tags": _json_dumps(tags or []),
+            "metadata": _json_dumps(metadata or {}),
+        }
+        if _is_sqlite(self.session):
+            contact_id = str(uuid_mod.uuid4())
+            params["id"] = contact_id
+            await self.session.execute(
+                text(
+                    f"""
+                    INSERT INTO crm_contacts (
+                        id, workspace_id, name, email, phone, company, status, tags, metadata
+                    )
+                    VALUES (
+                        :id, :workspace_id, :name, :email, :phone, :company, :status,
+                        {json_bind(self.session, "tags")}, {json_bind(self.session, "metadata")}
+                    )
+                    """
+                ),
+                params,
+            )
+            row = {"id": contact_id}
+        else:
+            result = await self.session.execute(
+                text(
+                    f"""
+                    INSERT INTO crm_contacts (
+                        workspace_id, name, email, phone, company, status, tags, metadata
+                    )
+                    VALUES (
+                        :workspace_id, :name, :email, :phone, :company, :status,
+                        {json_bind(self.session, "tags")}, {json_bind(self.session, "metadata")}
+                    )
+                    RETURNING *
+                    """
+                ),
+                params,
+            )
+            row = _row_to_dict(result.mappings().first())
         await self.recalculate_contact_score(row["id"])
         contact = await self.get_contact_by_id(row["id"])
         schedule_webhook_event(self.workspace_id, "contact.created", contact)
@@ -177,7 +213,7 @@ class CRMService:
             if key not in allowed or val is None:
                 continue
             if key in ("tags", "metadata"):
-                sets.append(f"{key} = CAST(:{key} AS jsonb)")
+                sets.append(f"{key} = {json_bind(self.session, key)}")
                 params[key] = _json_dumps(val)
             else:
                 sets.append(f"{key} = :{key}")
@@ -186,9 +222,12 @@ class CRMService:
         if not sets:
             return await self.get_contact_by_id(contact_id)
 
-        sets.append("updated_at = now()")
+        sets.append(f"updated_at = {_updated_at_sql(self.session)}")
         await self.session.execute(
-            text(f"UPDATE crm_contacts SET {', '.join(sets)} WHERE id = CAST(:id AS uuid) AND workspace_id = :workspace_id"),
+            text(
+                f"UPDATE crm_contacts SET {', '.join(sets)} "
+                f"WHERE id = {uuid_bind(self.session, 'id')} AND workspace_id = :workspace_id"
+            ),
             params,
         )
         updated = await self.get_contact_by_id(contact_id)
@@ -199,14 +238,20 @@ class CRMService:
     async def delete_contact(self, contact_id: str) -> bool:
         await self._assert_contact(contact_id)
         result = await self.session.execute(
-            text("DELETE FROM crm_contacts WHERE id = CAST(:id AS uuid) AND workspace_id = :workspace_id"),
+            text(
+                f"DELETE FROM crm_contacts WHERE id = {uuid_bind(self.session, 'id')} "
+                "AND workspace_id = :workspace_id"
+            ),
             {"id": contact_id, "workspace_id": self.workspace_id},
         )
         return (result.rowcount or 0) > 0
 
     async def get_contact_by_id(self, contact_id: str) -> dict[str, Any]:
         result = await self.session.execute(
-            text("SELECT * FROM crm_contacts WHERE id = CAST(:id AS uuid) AND workspace_id = :workspace_id"),
+            text(
+                f"SELECT * FROM crm_contacts WHERE id = {uuid_bind(self.session, 'id')} "
+                "AND workspace_id = :workspace_id"
+            ),
             {"id": contact_id, "workspace_id": self.workspace_id},
         )
         row = result.mappings().first()
@@ -771,22 +816,32 @@ class CRMService:
         week_ago = now - timedelta(days=7)
         month_ago = now - timedelta(days=30)
 
-        act = await self.session.execute(
-            text(
-                """
+        cid_bind = uuid_bind(self.session, "contact_id")
+        if _is_sqlite(self.session):
+            act_sql = f"""
+                SELECT
+                    SUM(CASE WHEN completed_at >= :week_ago THEN 1 ELSE 0 END) AS completed_7d,
+                    SUM(CASE WHEN created_at >= :month_ago THEN 1 ELSE 0 END) AS activity_30d,
+                    MAX(completed_at) AS last_completed
+                FROM crm_activities
+                WHERE contact_id = {cid_bind} AND workspace_id = :workspace_id
+            """
+        else:
+            act_sql = f"""
                 SELECT
                     COUNT(*) FILTER (WHERE completed_at >= :week_ago) AS completed_7d,
                     COUNT(*) FILTER (WHERE created_at >= :month_ago) AS activity_30d,
                     MAX(completed_at) AS last_completed
                 FROM crm_activities
-                WHERE contact_id = CAST(:contact_id AS uuid) AND workspace_id = :workspace_id
-                """
-            ),
+                WHERE contact_id = {cid_bind} AND workspace_id = :workspace_id
+            """
+        act = await self.session.execute(
+            text(act_sql),
             {
                 "contact_id": contact_id,
                 "workspace_id": self.workspace_id,
-                "week_ago": week_ago,
-                "month_ago": month_ago,
+                "week_ago": week_ago.isoformat() if _is_sqlite(self.session) else week_ago,
+                "month_ago": month_ago.isoformat() if _is_sqlite(self.session) else month_ago,
             },
         )
         act_row = act.mappings().first()
@@ -795,10 +850,10 @@ class CRMService:
 
         deals = await self.session.execute(
             text(
-                """
+                f"""
                 SELECT stage, value, probability, updated_at
                 FROM crm_deals
-                WHERE contact_id = CAST(:contact_id AS uuid) AND workspace_id = :workspace_id
+                WHERE contact_id = {cid_bind} AND workspace_id = :workspace_id
                 """
             ),
             {"contact_id": contact_id, "workspace_id": self.workspace_id},
@@ -836,10 +891,10 @@ class CRMService:
 
         await self.session.execute(
             text(
-                """
+                f"""
                 UPDATE crm_contacts
-                SET score = :score, updated_at = now()
-                WHERE id = CAST(:id AS uuid) AND workspace_id = :workspace_id
+                SET score = :score, updated_at = {_updated_at_sql(self.session)}
+                WHERE id = {uuid_bind(self.session, "id")} AND workspace_id = :workspace_id
                 """
             ),
             {"score": score, "id": contact_id, "workspace_id": self.workspace_id},
