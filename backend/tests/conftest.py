@@ -44,6 +44,7 @@ os.environ.setdefault("OIDC_ISSUER_URL", "https://test-issuer.nelvyon.example.co
 os.environ.setdefault("OIDC_CLIENT_ID", "test_oidc_client_id")
 os.environ.setdefault("OIDC_CLIENT_SECRET", "test_oidc_client_secret")
 os.environ.setdefault("VOICE_V1_PLAN_IDS", "starter")
+os.environ.setdefault("SES_FROM_EMAIL", "noreply@nelvyon-test.com")
 
 
 @pytest.fixture(scope="session")

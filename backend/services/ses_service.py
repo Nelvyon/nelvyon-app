@@ -104,19 +104,23 @@ class SESService:
         await db_manager.ensure_initialized()
         if not db_manager.async_session_maker:
             raise RuntimeError("Database not initialized")
-        return db_manager.async_session_maker()
+        return db_manager.async_session_maker
 
     async def is_suppressed(self, email: str) -> bool:
         addr = _normalize_email(email)
-        if not addr:
+        if not addr or self._mock:
             return False
         session_maker = await self._db_session()
-        async with session_maker() as session:
-            result = await session.execute(
-                text("SELECT 1 FROM ses_suppressions WHERE lower(email) = :email LIMIT 1"),
-                {"email": addr},
-            )
-            return result.fetchone() is not None
+        try:
+            async with session_maker() as session:
+                result = await session.execute(
+                    text("SELECT 1 FROM ses_suppressions WHERE lower(email) = :email LIMIT 1"),
+                    {"email": addr},
+                )
+                return result.fetchone() is not None
+        except Exception as exc:
+            logger.debug("SES suppression lookup skipped: %s", exc)
+            return False
 
     async def add_suppression(self, email: str, reason: str) -> dict[str, Any]:
         addr = _normalize_email(email)

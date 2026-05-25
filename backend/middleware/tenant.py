@@ -134,6 +134,11 @@ def _is_dm_webhook_public(path: str, method: str) -> bool:
     return method == "POST" and path == "/api/tiktok-dm/webhook"
 
 
+def _is_cpq_pixel_public(path: str, method: str) -> bool:
+    """F64 — CPQ email open tracking pixel."""
+    return method == "GET" and path.startswith("/api/cpq/quotes/") and path.endswith("/viewed")
+
+
 def _is_conversation_stream_public(path: str, method: str) -> bool:
     return method == "GET" and re.match(r"^/api/v1/conversations/[^/]+/stream$", path) is not None
 
@@ -154,6 +159,8 @@ def _is_public(path: str, method: str = "GET") -> bool:
     if _is_sms_webhook(path, method):
         return True
     if _is_dm_webhook_public(path, method):
+        return True
+    if _is_cpq_pixel_public(path, method):
         return True
     if path.startswith("/api/marketplace/agencies") and path.count("/") <= 4:
         return True
