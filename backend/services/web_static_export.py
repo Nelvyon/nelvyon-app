@@ -191,11 +191,13 @@ def build_page_html(
     site_base: str,
     subdomain: str,
 ) -> str:
-    nav_links = "".join(
-        f'<a href="{_esc(n.get("href") or f"/site/{subdomain}/{n.get("slug", "")}")}">{_esc(n.get("label"))}</a>'
-        for n in navigation
-        if isinstance(n, dict)
-    )
+    nav_parts: list[str] = []
+    for n in navigation:
+        if not isinstance(n, dict):
+            continue
+        href = n.get("href") or f"/site/{subdomain}/{n.get('slug', '')}"
+        nav_parts.append(f'<a href="{_esc(href)}">{_esc(n.get("label"))}</a>')
+    nav_links = "".join(nav_parts)
     body_blocks = []
     for i, block in enumerate(blocks):
         if isinstance(block, dict):
