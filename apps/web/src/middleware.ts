@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import createMiddleware from "next-intl/middleware";
 
-import { routing } from "../i18n";
 import { checkIpRateLimit, getClientIp, getRateLimitRule } from "./lib/security/rateLimit";
 import { resolveRequestId, withRequestId } from "./lib/security/requestId";
 import { createRequestLogger } from "@/lib/serverLogger";
@@ -11,8 +9,6 @@ import {
   isDefaultWhitelabelHost,
   normalizeHost,
 } from "@/core/whitelabel/resolveWhitelabel";
-
-const handleI18n = createMiddleware(routing);
 
 function isProtectedPath(pathname: string): boolean {
   return (
@@ -139,11 +135,13 @@ export async function middleware(request: NextRequest) {
   if (whitelabelHeader) {
     requestHeaders.set("x-nelvyon-whitelabel", whitelabelHeader);
   }
-  const augmentedRequest = new NextRequest(request.url, {
-    headers: requestHeaders,
-    method: request.method,
-  });
-  return end(handleI18n(augmentedRequest));
+
+  // Locale is handled via LocaleProvider + next-intl plugin (no [locale] segment). Skip next-intl middleware rewrites.
+  return end(
+    NextResponse.next({
+      request: { headers: requestHeaders },
+    }),
+  );
 }
 
 export const config = {
