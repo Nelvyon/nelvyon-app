@@ -28,6 +28,15 @@ const config: Config = {
         elevated: "var(--shadow-elevated)",
       },
       colors: {
+        nelvyon: {
+          blue: "#0066FF",
+          cyan: "#00CFFF",
+          black: "#000000",
+          soft: "#0A0A0A",
+          alt: "#050510",
+          card: "#0A0F1E",
+          muted: "#E0E0E0",
+        },
         border: "hsl(var(--border) / <alpha-value>)",
         input: "hsl(var(--input) / <alpha-value>)",
         ring: "hsl(var(--ring) / <alpha-value>)",

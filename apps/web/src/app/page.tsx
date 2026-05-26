@@ -7,37 +7,26 @@ const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/og-image.png`;
 
 export const metadata: Metadata = {
-  title: "NELVYON — Donde nace tu imperio",
+  title: "NELVYON — Agencia de marketing digital",
   description:
-    "Donde nace tu imperio, crece tu marca y se impone tu legado. Plataforma de marketing con tecnología IA: SEO, publicidad, contenido, email, CRM y social media.",
+    "Agencia de marketing digital: SEO, Google Ads, Meta, email y automatización. Resultados medibles sin contratar múltiples proveedores.",
   openGraph: {
-    title: "NELVYON — Marketing con tecnología IA",
+    title: "NELVYON — Agencia de marketing digital",
     description:
-      "Donde nace tu imperio, crece tu marca y se impone tu legado. Plataforma SaaS premium de marketing todo en uno.",
+      "Donde nace tu imperio, crece tu marca y se impone tu legado. SEO, publicidad, email y webs.",
     url: canonicalBase,
     siteName: "NELVYON",
-    images: [
-      {
-        url: ogImageAbs,
-        width: 1200,
-        height: 630,
-        alt: "NELVYON — Plataforma de marketing IA",
-      },
-    ],
+    images: [{ url: ogImageAbs, width: 1200, height: 630, alt: "NELVYON Marketing Digital" }],
     type: "website",
     locale: "es_ES",
   },
   twitter: {
     card: "summary_large_image",
-    title: "NELVYON — Marketing con tecnología IA",
-    description: "Plataforma de marketing todo en uno. Planes desde 97€/mes.",
+    title: "NELVYON — Agencia de marketing digital",
+    description: "SEO, ads, email y automatización. Solicita tu propuesta.",
     images: [ogImageAbs],
-    creator: "@nelvyon",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 export default function HomePage() {

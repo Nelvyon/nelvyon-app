@@ -1,66 +1,55 @@
 "use client";
 
-import { COLORS } from "./constants";
-import { DashboardMockup } from "./DashboardMockup";
+import { BRAND } from "./shared";
+import { HeroVideo } from "./HeroVideo";
 import { FadeIn } from "./FadeIn";
 import { GhostButton, PrimaryButton } from "./ui";
 
 export function LandingHero() {
   return (
     <section
-      className="relative min-h-[90vh] overflow-hidden pt-8 pb-16 md:pt-12 md:pb-24"
+      className="relative overflow-hidden pt-8 pb-12 md:pt-14 md:pb-20"
       style={{
-        background: `linear-gradient(180deg, ${COLORS.bg} 0%, ${COLORS.heroGradEnd} 100%)`,
+        background: `linear-gradient(180deg, ${BRAND.bg} 0%, ${BRAND.heroGradEnd} 100%)`,
       }}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-40"
+        className="pointer-events-none absolute inset-0 opacity-50"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 20% 30%, rgba(0,102,255,0.25) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(0,207,255,0.15) 0%, transparent 45%)",
+            "radial-gradient(circle at 15% 20%, rgba(0,102,255,0.2), transparent 45%), radial-gradient(circle at 85% 80%, rgba(0,207,255,0.12), transparent 40%)",
         }}
       />
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(0,102,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,102,255,0.08) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-      />
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 md:grid-cols-2 md:px-6 lg:gap-16">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2 md:gap-14 md:px-6">
         <FadeIn>
           <span
-            className="inline-flex rounded-full border px-4 py-1.5 text-xs font-medium text-zinc-300"
-            style={{ borderColor: COLORS.cardBorder, backgroundColor: COLORS.card }}
+            className="inline-flex rounded-full border px-4 py-1.5 text-xs font-medium"
+            style={{ borderColor: BRAND.cardBorder, backgroundColor: BRAND.card, color: BRAND.cyan }}
           >
-            ⚡ La plataforma de marketing más completa
+            Agencia de marketing digital · Resultados medibles
           </span>
-          <h1 className="mt-6 text-4xl font-bold leading-[1.1] tracking-tight text-white md:text-5xl lg:text-6xl">
+          <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-white md:text-5xl lg:text-[3.25rem]">
             Donde nace tu imperio,
             <br />
-            crece tu marca
-            <br />
-            <span style={{ color: COLORS.primary }}>y se impone tu legado</span>
+            <span style={{ color: BRAND.blue }}>crece tu marca</span> y se impone tu legado
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-zinc-400">
-            Todo lo que necesita tu negocio para captar clientes, automatizar marketing y crecer —
-            en una sola plataforma.
+          <p className="mt-6 max-w-lg text-lg leading-relaxed" style={{ color: BRAND.textMuted }}>
+            SEO, publicidad, email y automatización ejecutados por expertos — sin contratar cinco
+            proveedores distintos.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <PrimaryButton>Empieza gratis →</PrimaryButton>
-            <GhostButton href="#plataforma">Ver demostración</GhostButton>
+            <PrimaryButton href="/contacto">Solicitar propuesta →</PrimaryButton>
+            <GhostButton href="/servicios">Ver servicios</GhostButton>
           </div>
-          <p className="mt-6 text-sm text-zinc-500">
-            <span style={{ color: COLORS.primary }}>✓</span> Sin permanencia ·{" "}
-            <span style={{ color: COLORS.primary }}>✓</span> Configuración en minutos ·{" "}
-            <span style={{ color: COLORS.primary }}>✓</span> Soporte incluido
+          <p className="mt-6 text-sm" style={{ color: BRAND.textDim }}>
+            <span style={{ color: BRAND.blue }}>✓</span> Sin permanencia rígida ·{" "}
+            <span style={{ color: BRAND.blue }}>✓</span> Respuesta en 48h ·{" "}
+            <span style={{ color: BRAND.blue }}>✓</span> +193 sectores
           </p>
         </FadeIn>
-        <FadeIn delay={0.15}>
-          <DashboardMockup className="w-full" />
+        <FadeIn delay={0.12}>
+          <HeroVideo />
         </FadeIn>
       </div>
     </section>

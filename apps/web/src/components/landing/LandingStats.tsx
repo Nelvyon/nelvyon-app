@@ -1,18 +1,30 @@
-import { STATS } from "./constants";
+import { AGENCY_STATS } from "./agencyContent";
+import { GrowthCharts } from "./GrowthCharts";
+import { BRAND } from "./shared";
 import { FadeIn } from "./FadeIn";
 
 export function LandingStats() {
   return (
-    <section className="border-y border-zinc-200 bg-zinc-50 py-12 md:py-16">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 md:grid-cols-4 md:px-6">
-        {STATS.map((s, i) => (
-          <FadeIn delay={i * 0.05} key={s.label}>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-zinc-900 md:text-4xl">{s.value}</p>
-              <p className="mt-1 text-sm uppercase tracking-wide text-zinc-500">{s.label}</p>
-            </div>
-          </FadeIn>
-        ))}
+    <section className="py-16 md:py-24" style={{ backgroundColor: BRAND.bgLight }}>
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <FadeIn>
+          <p className="text-center text-sm font-semibold uppercase tracking-widest text-zinc-500">
+            Resultados impulsados por tecnología IA
+          </p>
+        </FadeIn>
+        <div className="mt-10 grid grid-cols-2 gap-8 md:grid-cols-4">
+          {AGENCY_STATS.map((s, i) => (
+            <FadeIn delay={i * 0.05} key={s.label}>
+              <div className="text-center">
+                <p className="text-3xl font-bold text-zinc-900 md:text-4xl">{s.value}</p>
+                <p className="mt-1 text-sm text-zinc-600">{s.label}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+        <div className="mt-14">
+          <GrowthCharts />
+        </div>
       </div>
     </section>
   );

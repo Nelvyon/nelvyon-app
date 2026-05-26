@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { COLORS, LINKS } from "./constants";
+import { LINKS } from "./constants";
+import { BRAND } from "./shared";
 
 export function SectionHeading({
   title,
@@ -41,7 +42,7 @@ export function CheckList({ items }: { items: readonly string[] }) {
     <ul className="space-y-3">
       {items.map((item) => (
         <li className="flex items-start gap-3 text-sm text-zinc-300 md:text-base" key={item}>
-          <span className="mt-0.5 shrink-0 font-bold" style={{ color: COLORS.primary }}>
+          <span className="mt-0.5 shrink-0 font-bold" style={{ color: BRAND.blue }}>
             ✓
           </span>
           <span>{item}</span>
@@ -64,7 +65,7 @@ export function PrimaryButton({
     <Link
       className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 ${className}`}
       href={href}
-      style={{ backgroundColor: COLORS.primary }}
+      style={{ backgroundColor: BRAND.blue }}
     >
       {children}
     </Link>
@@ -101,8 +102,8 @@ export function NelvyonCard({
     <div
       className={`rounded-2xl border p-6 md:p-8 ${className}`}
       style={{
-        backgroundColor: COLORS.card,
-        borderColor: COLORS.cardBorder,
+        backgroundColor: BRAND.card,
+        borderColor: BRAND.cardBorder,
       }}
     >
       {children}

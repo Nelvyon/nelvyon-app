@@ -1,43 +1,41 @@
 "use client";
 
-import { LandingComparison } from "./LandingComparison";
+import { AGENCY_FAQ } from "./agencyContent";
+import { FaqSection } from "./FaqSection";
+import { LandingAgencyServices } from "./LandingAgencyServices";
 import { LandingFinalCta } from "./LandingFinalCta";
 import { LandingFooter } from "./LandingFooter";
 import { LandingHero } from "./LandingHero";
 import { LandingHowItWorks } from "./LandingHowItWorks";
-import { LandingIntegrations } from "./LandingIntegrations";
+import { LandingLogosMarquee } from "./LandingLogosMarquee";
 import { LandingMission } from "./LandingMission";
-import { LandingNavbar } from "./LandingNavbar";
 import { LandingNotificationBar } from "./LandingNotificationBar";
-import { LandingPricing } from "./LandingPricing";
-import { LandingServices } from "./LandingServices";
 import { LandingStats } from "./LandingStats";
-import { LandingTabsSection } from "./LandingTabsSection";
 import { LandingTestimonials } from "./LandingTestimonials";
-import { COLORS } from "./constants";
+import { MarketingNavbar } from "./MarketingNavbar";
+import { BRAND } from "./shared";
 
 export function LandingPage() {
   return (
     <div
-      className="min-h-screen overflow-x-hidden text-white antialiased"
+      className="min-h-screen overflow-x-hidden antialiased"
       style={{
-        backgroundColor: COLORS.bg,
+        backgroundColor: BRAND.bg,
+        color: BRAND.textMuted,
         fontFamily: "var(--font-inter), system-ui, sans-serif",
       }}
     >
       <LandingNotificationBar />
-      <LandingNavbar />
+      <MarketingNavbar active="/" />
       <main>
         <LandingHero />
+        <LandingLogosMarquee />
         <LandingStats />
-        <LandingTabsSection />
+        <LandingAgencyServices />
         <LandingMission />
-        <LandingComparison />
-        <LandingServices />
         <LandingHowItWorks />
         <LandingTestimonials />
-        <LandingPricing />
-        <LandingIntegrations />
+        <FaqSection items={AGENCY_FAQ} />
         <LandingFinalCta />
       </main>
       <LandingFooter />

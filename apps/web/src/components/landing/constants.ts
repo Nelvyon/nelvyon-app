@@ -1,11 +1,14 @@
+import { BRAND } from "./shared";
+
+/** @deprecated Use BRAND from ./shared */
 export const COLORS = {
-  bg: "#000000",
-  bgAlt: "#050510",
-  card: "#0A0F1E",
-  cardBorder: "rgba(0, 102, 255, 0.125)",
-  primary: "#0066FF",
-  cyan: "#00CFFF",
-  heroGradEnd: "#001533",
+  bg: BRAND.bg,
+  bgAlt: BRAND.bgAlt,
+  card: BRAND.card,
+  cardBorder: BRAND.cardBorder,
+  primary: BRAND.blue,
+  cyan: BRAND.cyan,
+  heroGradEnd: BRAND.heroGradEnd,
 } as const;
 
 export const LINKS = {

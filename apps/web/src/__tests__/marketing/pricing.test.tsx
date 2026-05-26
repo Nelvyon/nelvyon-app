@@ -55,11 +55,11 @@ describe("marketing pricing and landing", () => {
     expect(h1.textContent).toMatch(/se impone tu legado/i);
   });
 
-  it("Home tiene CTA de registro", () => {
+  it("Home tiene CTA de contacto", () => {
     renderWithIntl(<HomePage />);
-    const links = screen.getAllByRole("link", { name: /Empieza gratis/i });
+    const links = screen.getAllByRole("link", { name: /Solicitar propuesta/i });
     expect(links.length).toBeGreaterThan(0);
-    expect(links.some((el) => el.getAttribute("href") === "/register")).toBe(true);
+    expect(links.some((el) => el.getAttribute("href") === "/contacto")).toBe(true);
   });
 
   it("Home enlaza a servicios", () => {

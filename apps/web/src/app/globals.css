@@ -7,6 +7,15 @@
  * Tailwind maps semantic names to hsl(var(--token) / <alpha-value>).
  */
 :root {
+  /* NELVYON brand — electric blue #0066FF, cyan #00CFFF (not GHL blue) */
+  --nelvyon-blue: #0066ff;
+  --nelvyon-cyan: #00cfff;
+  --nelvyon-bg: #000000;
+  --nelvyon-bg-soft: #0a0a0a;
+  --nelvyon-bg-alt: #050510;
+  --nelvyon-text-muted: #e0e0e0;
+  --nelvyon-card: #0a0f1e;
+
   --font-sans: var(--font-inter), var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --radius-sm: 0.375rem;
@@ -32,9 +41,9 @@
 
   --border: 214 24% 82%;
   --input: 214 24% 82%;
-  --ring: 221 83% 53%;
+  --ring: 211 100% 50%;
 
-  --primary: 221 83% 45%;
+  --primary: 211 100% 50%;
   --primary-foreground: 210 40% 98%;
 
   --secondary: 214 32% 92%;
@@ -77,9 +86,9 @@
 
   --border: 217 22% 24%;
   --input: 217 22% 24%;
-  --ring: 217 91% 60%;
+  --ring: 211 100% 50%;
 
-  --primary: 217 91% 60%;
+  --primary: 211 100% 50%;
   --primary-foreground: 222 47% 11%;
 
   --secondary: 217 33% 16%;
