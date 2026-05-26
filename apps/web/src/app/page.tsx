@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { NelvyonHomePage } from "@/components/nelvyon-site/NelvyonHomePage";
+import { LandingPage } from "@/components/landing";
 import { getAppBaseUrl } from "@/lib/appUrl";
 
 const canonicalBase = getAppBaseUrl();
@@ -9,11 +9,11 @@ const ogImageAbs = `${canonicalBase}/og-image.png`;
 export const metadata: Metadata = {
   title: "NELVYON — Donde nace tu imperio",
   description:
-    "Donde nace tu imperio, crece tu marca y se impone tu legado. Sistema autónomo de marketing con IA: SEO, publicidad, contenido, email, branding y social media.",
+    "Donde nace tu imperio, crece tu marca y se impone tu legado. Plataforma de marketing con tecnología IA: SEO, publicidad, contenido, email, CRM y social media.",
   openGraph: {
-    title: "NELVYON — Marketing autónomo con IA",
+    title: "NELVYON — Marketing con tecnología IA",
     description:
-      "Donde nace tu imperio, crece tu marca y se impone tu legado. Plataforma SaaS premium de marketing con agentes IA.",
+      "Donde nace tu imperio, crece tu marca y se impone tu legado. Plataforma SaaS premium de marketing todo en uno.",
     url: canonicalBase,
     siteName: "NELVYON",
     images: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         url: ogImageAbs,
         width: 1200,
         height: 630,
-        alt: "NELVYON — Marketing IA Autónomo",
+        alt: "NELVYON — Plataforma de marketing IA",
       },
     ],
     type: "website",
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NELVYON — Marketing IA Autónomo",
-    description: "Marketing IA autónomo. Planes desde 95€/mes.",
+    title: "NELVYON — Marketing con tecnología IA",
+    description: "Plataforma de marketing todo en uno. Planes desde 97€/mes.",
     images: [ogImageAbs],
     creator: "@nelvyon",
   },
@@ -41,5 +41,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <NelvyonHomePage />;
+  return <LandingPage />;
 }

@@ -114,3 +114,16 @@
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }
+
+@keyframes nelvyon-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.nelvyon-marquee {
+  animation: nelvyon-marquee 40s linear infinite;
+}

@@ -39,6 +39,15 @@ const SECURITY_HEADERS_WITH_CSP = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+    ],
+  },
   env: {
     SENTRY_SUPPRESS_INSTRUMENTATION_FILE_WARNING: "1",
   },
