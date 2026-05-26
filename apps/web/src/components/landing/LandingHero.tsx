@@ -1,22 +1,26 @@
 "use client";
 
+import { NeuralNetwork } from "@/components/ui/NeuralNetwork";
+
 import { BRAND } from "./shared";
 import { HeroVideo } from "./HeroVideo";
-import { HeroBackground } from "./effects/HeroBackground";
 import { FadeIn } from "./FadeIn";
 import { GhostButton, PrimaryButton } from "./ui";
 
 export function LandingHero() {
   return (
-    <section className="relative overflow-hidden pt-8 pb-12 md:pt-14 md:pb-20">
-      <HeroBackground />
-      <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2 md:gap-14 md:px-6">
+    <section
+      className="relative overflow-hidden bg-black pt-8 pb-12 md:pt-14 md:pb-20"
+      style={{ backgroundColor: BRAND.bg }}
+    >
+      <NeuralNetwork />
+      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2 md:gap-14 md:px-6">
         <FadeIn>
           <span
             className="inline-flex rounded-full border px-4 py-1.5 text-xs font-medium"
             style={{ borderColor: BRAND.cardBorder, backgroundColor: BRAND.card, color: BRAND.cyan }}
           >
-            Agencia de marketing digital · Resultados medibles
+            Agencia de marketing digital
           </span>
           <h1 className="nelvyon-title-glow mt-6 w-full">
             <span className="nelvyon-slogan-line text-[clamp(1.75rem,5vw,3.25rem)] text-white">
@@ -47,7 +51,7 @@ export function LandingHero() {
           <p className="mt-6 text-sm" style={{ color: BRAND.textDim }}>
             <span style={{ color: BRAND.blue }}>✓</span> Sin permanencia rígida ·{" "}
             <span style={{ color: BRAND.blue }}>✓</span> Respuesta en 48h ·{" "}
-            <span style={{ color: BRAND.blue }}>✓</span> +193 sectores
+            <span style={{ color: BRAND.blue }}>✓</span> 193 sectores atendidos
           </p>
         </FadeIn>
         <FadeIn delay={0.12}>

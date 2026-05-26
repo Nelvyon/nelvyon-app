@@ -2,17 +2,16 @@
 
 import { AGENCY_FAQ } from "./agencyContent";
 import { FaqSection } from "./FaqSection";
-import { LandingAgencyServices } from "./LandingAgencyServices";
 import { LandingFinalCta } from "./LandingFinalCta";
 import { LandingFooter } from "./LandingFooter";
 import { LandingHero } from "./LandingHero";
 import { LandingHowItWorks } from "./LandingHowItWorks";
 import { LandingLogosMarquee } from "./LandingLogosMarquee";
-import { LandingMission } from "./LandingMission";
 import { LandingNotificationBar } from "./LandingNotificationBar";
 import { LandingStats } from "./LandingStats";
 import { LandingComingSoonCases } from "./LandingComingSoonCases";
 import { MarketingNavbar } from "./MarketingNavbar";
+import { ServicesGrid } from "./ServicesGrid";
 import { BRAND } from "./shared";
 
 export function LandingPage() {
@@ -20,8 +19,8 @@ export function LandingPage() {
     <div
       className="min-h-screen overflow-x-hidden antialiased"
       style={{
-        backgroundColor: BRAND.bg,
-        color: BRAND.textMuted,
+        backgroundColor: BRAND.white,
+        color: BRAND.textOnWhite,
         fontFamily: "var(--font-inter), system-ui, sans-serif",
       }}
     >
@@ -30,12 +29,11 @@ export function LandingPage() {
       <main>
         <LandingHero />
         <LandingLogosMarquee />
+        <ServicesGrid />
         <LandingStats />
-        <LandingAgencyServices />
-        <LandingMission />
         <LandingHowItWorks />
         <LandingComingSoonCases />
-        <FaqSection items={AGENCY_FAQ} />
+        <FaqSection dark={false} items={AGENCY_FAQ} />
         <LandingFinalCta />
       </main>
       <LandingFooter />

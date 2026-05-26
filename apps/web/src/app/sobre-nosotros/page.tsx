@@ -1,5 +1,5 @@
-import { NelvyonSobrePage } from "@/components/nelvyon-site/NelvyonSobrePage";
+import { redirect } from "next/navigation";
 
-export default function SobreNosotrosPage() {
-  return <NelvyonSobrePage />;
+export default function SobreNosotrosRedirect() {
+  redirect("/nosotros");
 }

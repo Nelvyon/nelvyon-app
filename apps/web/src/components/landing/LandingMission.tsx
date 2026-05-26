@@ -17,8 +17,8 @@ export function LandingMission() {
             style={{ backgroundColor: BRAND.bgSoft, borderColor: BRAND.cardBorder }}
           >
             <p className="mx-auto max-w-4xl text-2xl font-semibold leading-snug text-white md:text-3xl lg:text-4xl">
-              Existimos para eliminar las agencias caras y darle a cualquier negocio las herramientas que
-              usan las grandes empresas
+              Existimos para dar a cualquier negocio acceso a herramientas de marketing de alto nivel, como
+              las que usan las grandes empresas
             </p>
             <div className="mt-14 grid gap-8 md:grid-cols-3">
               {PILLARS.map((p) => (

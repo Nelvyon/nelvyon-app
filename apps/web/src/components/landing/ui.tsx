@@ -9,27 +9,26 @@ export function SectionHeading({
   subtitle,
   light = false,
   center = true,
+  variant,
 }: {
   title: string;
   subtitle?: string;
   light?: boolean;
   center?: boolean;
+  variant?: "light" | "dark";
 }) {
+  const isDark = variant === "dark" || (variant !== "light" && light);
   return (
     <div className={center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
       <h2
-        className={`nelvyon-title-glow text-3xl font-extrabold tracking-tight md:text-4xl lg:text-5xl ${
-          light ? "text-white" : "text-zinc-900"
+        className={`text-3xl font-extrabold tracking-tight md:text-4xl lg:text-5xl ${
+          isDark ? "nelvyon-title-glow text-white" : "text-zinc-900"
         }`}
       >
         {title}
       </h2>
       {subtitle ? (
-        <p
-          className={`mt-4 text-lg md:text-xl ${
-            light ? "text-zinc-400" : "text-zinc-600"
-          }`}
-        >
+        <p className={`mt-4 text-lg md:text-xl ${isDark ? "text-zinc-400" : "text-[#6B7280]"}`}>
           {subtitle}
         </p>
       ) : null}

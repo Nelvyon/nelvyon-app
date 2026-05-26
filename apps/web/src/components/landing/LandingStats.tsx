@@ -3,15 +3,14 @@
 import { AGENCY_STATS } from "./agencyContent";
 import { AnimatedCounter } from "./effects/AnimatedCounter";
 import { GrowthCharts } from "./GrowthCharts";
-import { BRAND } from "./shared";
 import { FadeIn } from "./FadeIn";
 
 export function LandingStats() {
   return (
-    <section className="py-16 md:py-24" style={{ backgroundColor: BRAND.bgLight }}>
+    <section className="nelvyon-section-white bg-white py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <FadeIn>
-          <p className="text-center text-sm font-semibold uppercase tracking-widest text-zinc-500">
+          <p className="text-center text-sm font-semibold uppercase tracking-widest text-[#6B7280]">
             Tecnología IA al servicio de tu crecimiento
           </p>
         </FadeIn>
@@ -26,7 +25,7 @@ export function LandingStats() {
                     s.value
                   )}
                 </p>
-                <p className="mt-1 text-sm text-zinc-600">{s.label}</p>
+                <p className="mt-1 text-sm text-[#6B7280]">{s.label}</p>
               </div>
             </FadeIn>
           ))}

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { BRAND } from "./shared";
 import { FadeIn } from "./FadeIn";
 import { SectionHeading } from "./ui";
@@ -10,28 +12,44 @@ const STEPS = [
 
 export function LandingHowItWorks() {
   return (
-    <section className="py-20 md:py-28" style={{ backgroundColor: BRAND.bg }}>
+    <section className="bg-[#F9FAFB] py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <FadeIn>
-          <SectionHeading light title="Empieza en minutos" subtitle="De la primera llamada a campañas activas en días, no meses." />
-        </FadeIn>
-        <div className="mt-12 grid gap-8 md:grid-cols-3">
-          {STEPS.map((step, i) => (
-            <FadeIn delay={i * 0.08} key={step.n}>
-              <div
-                className="rounded-2xl border p-8 transition hover:-translate-y-1 hover:border-[#0066FF]/40 hover:shadow-[0_12px_40px_rgba(0,102,255,0.12)]"
-                style={{ backgroundColor: BRAND.card, borderColor: BRAND.cardBorder }}
-              >
-                <p className="text-5xl font-bold opacity-40" style={{ color: BRAND.blue }}>
-                  {step.n}
-                </p>
-                <h3 className="mt-4 text-xl font-bold text-white">{step.title}</h3>
-                <p className="mt-3 text-sm" style={{ color: BRAND.textMuted }}>
-                  {step.desc}
-                </p>
-              </div>
-            </FadeIn>
-          ))}
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <FadeIn>
+            <SectionHeading
+              center={false}
+              subtitle="De la primera llamada a campañas activas en días, no meses."
+              title="Empieza en minutos"
+              variant="light"
+            />
+            <div className="mt-10 space-y-6">
+              {STEPS.map((step) => (
+                <div className="flex gap-4" key={step.n}>
+                  <span
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg font-bold text-white"
+                    style={{ backgroundColor: BRAND.blue }}
+                  >
+                    {step.n}
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-bold text-zinc-900">{step.title}</h3>
+                    <p className="mt-1 text-sm text-[#6B7280]">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.1}>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[#E5E7EB] shadow-lg">
+              <Image
+                alt="Dashboard de marketing en pantalla"
+                className="object-cover"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=900&fit=crop"
+              />
+            </div>
+          </FadeIn>
         </div>
       </div>
     </section>

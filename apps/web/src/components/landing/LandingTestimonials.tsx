@@ -11,6 +11,8 @@ const AVATARS = [
 ];
 
 export function LandingTestimonials() {
+  if (TESTIMONIALS.length === 0) return null;
+
   return (
     <section className="py-20 md:py-28" style={{ backgroundColor: COLORS.bg }}>
       <div className="mx-auto max-w-7xl px-4 md:px-6">

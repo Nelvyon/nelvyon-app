@@ -1,60 +1,78 @@
+import {
+  BarChart3,
+  Bot,
+  ClipboardCheck,
+  FileText,
+  Ghost,
+  Globe,
+  Image,
+  Linkedin,
+  Mail,
+  MessageCircle,
+  Newspaper,
+  Palette,
+  PenLine,
+  Search,
+  Share2,
+  ShoppingCart,
+  Sparkles,
+  Star,
+  Target,
+  UserPlus,
+  Users,
+  Video,
+  Workflow,
+  type LucideIcon,
+} from "lucide-react";
+
 import { BRAND } from "./shared";
 
 export { BRAND };
+
+export type ServiceItem = {
+  slug: string;
+  name: string;
+  desc: string;
+  from: string;
+  icon: LucideIcon;
+};
+
+export const ALL_SERVICES: ServiceItem[] = [
+  { slug: "seo", name: "SEO Premium", desc: "Posicionamiento orgánico con auditorías, contenido y enlaces", from: "497", icon: Search },
+  { slug: "google-ads", name: "Google Ads", desc: "Campañas de búsqueda y display con IA", from: "397", icon: Target },
+  { slug: "meta-ads", name: "Meta Ads", desc: "Facebook e Instagram con creatividades que convierten", from: "397", icon: Share2 },
+  { slug: "tiktok-ads", name: "TikTok Ads", desc: "Alcance Gen Z y millennials con vídeo corto", from: "297", icon: Video },
+  { slug: "email", name: "Email Marketing", desc: "Newsletters, automatizaciones y secuencias de nurturing", from: "197", icon: Mail },
+  { slug: "automatizacion", name: "Automatización de marketing", desc: "Flujos multicanal sin intervención manual", from: "297", icon: Workflow },
+  { slug: "webs", name: "Creación de webs", desc: "Webs corporativas y tiendas online a medida", from: "697", icon: Globe },
+  { slug: "ecommerce", name: "Creación de tiendas online", desc: "E-commerce completo con pasarela de pago", from: "897", icon: ShoppingCart },
+  { slug: "branding", name: "Diseño de logos e identidad visual", desc: "Logotipos, paleta de colores, brand guidelines", from: "297", icon: Palette },
+  { slug: "social", name: "Gestión de redes sociales", desc: "Publicación, respuesta y crecimiento orgánico", from: "297", icon: Share2 },
+  { slug: "contenido-ia", name: "Creación de contenido con IA", desc: "Artículos, posts, guiones y creatividades", from: "197", icon: Sparkles },
+  { slug: "chatbot", name: "Chatbot IA para clientes", desc: "Atención automática 24/7 por web, WhatsApp o email", from: "197", icon: Bot },
+  { slug: "sms-whatsapp", name: "SMS y WhatsApp marketing", desc: "Campañas de mensajería directa", from: "197", icon: MessageCircle },
+  { slug: "crm", name: "CRM y gestión de contactos", desc: "Base de datos de clientes centralizada", from: "297", icon: Users },
+  { slug: "video-ia", name: "Generación de vídeos con IA", desc: "Vídeos promocionales y contenido audiovisual", from: "397", icon: Video },
+  { slug: "imagen-ia", name: "Generación de imágenes con IA", desc: "Creatividades, banners y visuales de marca", from: "197", icon: Image },
+  { slug: "copy-ia", name: "Copywriting con IA", desc: "Textos de venta, landing pages y anuncios", from: "197", icon: PenLine },
+  { slug: "analytics", name: "Análisis y reporting", desc: "Informes de rendimiento en tiempo real", from: "197", icon: BarChart3 },
+  { slug: "reputacion", name: "Reputación online", desc: "Gestión de reseñas y presencia en Google Maps", from: "297", icon: Star },
+  { slug: "influencer", name: "Influencer marketing", desc: "Identificación y gestión de colaboraciones", from: "497", icon: UserPlus },
+  { slug: "pr", name: "PR digital", desc: "Apariciones en medios y notas de prensa digitales", from: "397", icon: Newspaper },
+  { slug: "presupuestos", name: "Presupuestos automáticos", desc: "Generación de propuestas comerciales con IA", from: "197", icon: FileText },
+  { slug: "snapchat", name: "Snapchat Ads", desc: "Campañas en Snapchat para audiencias jóvenes", from: "297", icon: Ghost },
+  { slug: "linkedin", name: "LinkedIn Ads", desc: "Campañas B2B y generación de leads profesionales", from: "397", icon: Linkedin },
+  { slug: "auditoria", name: "Auditoría digital completa", desc: "Análisis 360º de la presencia digital", from: "497", icon: ClipboardCheck },
+];
+
+/** @deprecated Use ALL_SERVICES */
+export const AGENCY_SERVICES = ALL_SERVICES;
 
 export const AGENCY_STATS = [
   { value: "10.000+", label: "proyectos gestionados", numeric: 10000 },
   { value: "193", label: "sectores", numeric: 193 },
   { value: "8+", label: "años de experiencia", numeric: 8 },
   { value: "24/7", label: "soporte disponible", numeric: null },
-] as const;
-
-export const AGENCY_SERVICES = [
-  {
-    name: "SEO Premium",
-    desc: "Posicionamiento orgánico con auditorías, contenido y enlaces de calidad.",
-    from: "497",
-  },
-  {
-    name: "Google Ads",
-    desc: "Campañas de búsqueda y display optimizadas con tecnología IA.",
-    from: "397",
-  },
-  {
-    name: "Meta Ads",
-    desc: "Facebook e Instagram con creatividades que convierten.",
-    from: "397",
-  },
-  {
-    name: "TikTok Ads",
-    desc: "Alcance Gen Z y millennials con vídeo corto de alto impacto.",
-    from: "297",
-  },
-  {
-    name: "Email Marketing",
-    desc: "Newsletters, automatizaciones y secuencias de nurturing.",
-    from: "197",
-  },
-  {
-    name: "Automatización",
-    desc: "Flujos multicanal que trabajan mientras duermes.",
-    from: "297",
-  },
-  {
-    name: "Webs y landings",
-    desc: "Diseño, desarrollo y optimización para conversión.",
-    from: "697",
-  },
-  {
-    name: "Contenido IA",
-    desc: "Copy, imágenes y vídeos para redes y campañas.",
-    from: "197",
-  },
-  {
-    name: "Redes sociales",
-    desc: "Calendario editorial, publicación y community management.",
-    from: "297",
-  },
 ] as const;
 
 export const AGENCY_FAQ = [
@@ -64,7 +82,7 @@ export const AGENCY_FAQ = [
   },
   {
     q: "¿Cuánto tiempo hasta ver resultados?",
-    a: "En publicidad digital, los primeros leads suelen llegar en 2-4 semanas. En SEO, los resultados sólidos se consolidan entre 3 y 6 meses según competencia.",
+    a: "Depende del canal y del sector. En publicidad suele haber actividad en las primeras semanas; en SEO los cambios orgánicos suelen consolidarse en varios meses. Resultados variables según sector y campaña.",
   },
   {
     q: "¿Trabajáis con mi sector?",

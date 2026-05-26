@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 import { FadeIn } from "../FadeIn";
@@ -64,7 +65,7 @@ export function NosotrosPage() {
             </FadeIn>
             <FadeIn delay={0.1}>
               <p style={{ color: BRAND.cyan }}>
-                Existimos para eliminar las agencias caras y democratizar el marketing de alto rendimiento.
+                Existimos para dar a cualquier negocio acceso a herramientas de marketing de alto nivel.
               </p>
             </FadeIn>
           </div>

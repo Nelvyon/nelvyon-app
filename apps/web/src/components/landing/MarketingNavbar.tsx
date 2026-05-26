@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
-import { NavbarLogo } from "./NavbarLogo";
+import { BrandLogo } from "./BrandLogo";
 import { BRAND, NAV_LINKS, type NavActive } from "./shared";
 import { PrimaryButton } from "./ui";
 
@@ -17,9 +17,7 @@ export function MarketingNavbar({ active }: { active?: NavActive }) {
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6">
-        <Link className="text-xl font-bold tracking-tight" href="/" style={{ color: BRAND.blue }}>
-          NELVYON
-        </Link>
+        <BrandLogo />
         <nav className="hidden items-center gap-7 md:flex">
           {NAV_LINKS.map((item) => {
             const isActive =

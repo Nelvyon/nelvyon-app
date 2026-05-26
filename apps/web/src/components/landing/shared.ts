@@ -5,11 +5,16 @@ export const BRAND = {
   bg: "#000000",
   bgSoft: "#0A0A0A",
   bgAlt: "#050510",
-  bgLight: "#F5F7FA",
+  bgLight: "#F9FAFB",
+  white: "#FFFFFF",
+  footer: "#0A0A0A",
   card: "#0A0F1E",
   cardBorder: "rgba(0, 102, 255, 0.125)",
+  borderLight: "#E5E7EB",
   textMuted: "#E0E0E0",
   textDim: "#9CA3AF",
+  textOnWhite: "#111827",
+  textGray: "#6B7280",
   heroGradEnd: "#001533",
 } as const;
 

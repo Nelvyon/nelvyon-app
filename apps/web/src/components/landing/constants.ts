@@ -21,7 +21,7 @@ export const LINKS = {
 
 export const STATS = [
   { value: "+10.000", label: "clientes" },
-  { value: "+340%", label: "leads medios" },
+  { value: "25+", label: "servicios" },
   { value: "193", label: "sectores" },
   { value: "24/7", label: "automatizado" },
 ] as const;
@@ -159,23 +159,7 @@ export const STEPS = [
   },
 ] as const;
 
-export const TESTIMONIALS = [
-  {
-    name: "María González",
-    company: "Clínica Estética Luna",
-    text: "En tres semanas duplicamos las solicitudes de cita. Todo desde un solo panel, sin agencia externa.",
-  },
-  {
-    name: "Carlos Ruiz",
-    company: "Ruiz Inmobiliaria",
-    text: "La automatización de seguimiento nos ahorra 15 horas semanales. El ROI se notó desde el primer mes.",
-  },
-  {
-    name: "Laura Méndez",
-    company: "Méndez Legal",
-    text: "Presupuestos y email marketing integrados. Por fin una plataforma pensada para profesionales.",
-  },
-] as const;
+export const TESTIMONIALS: { name: string; company: string; text: string }[] = [];
 
 export const PLANS = [
   {

@@ -10,7 +10,7 @@ import { FadeIn } from "./FadeIn";
 export function FaqSection({
   title = "Preguntas frecuentes",
   items,
-  dark = true,
+  dark = false,
 }: {
   title?: string;
   items: readonly { q: string; a: string }[];
@@ -19,7 +19,10 @@ export function FaqSection({
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="py-20 md:py-28" style={{ backgroundColor: dark ? BRAND.bgSoft : BRAND.bgLight }}>
+    <section
+      className="py-20 md:py-28"
+      style={{ backgroundColor: dark ? BRAND.bgSoft : BRAND.white }}
+    >
       <div className="mx-auto max-w-3xl px-4 md:px-6">
         <FadeIn>
           <h2
