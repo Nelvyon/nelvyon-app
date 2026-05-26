@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -21,7 +23,8 @@
   --nelvyon-border-light: #e5e7eb;
   --nelvyon-section-gray: #f9fafb;
 
-  --font-sans: var(--font-inter), var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Inter", var(--font-inter), var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -127,7 +130,12 @@
   body {
     @apply min-h-screen font-sans text-foreground;
     background-color: #050816;
-    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-family: "Inter", var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  h1,
+  h2 {
+    font-weight: 800;
   }
 }
 

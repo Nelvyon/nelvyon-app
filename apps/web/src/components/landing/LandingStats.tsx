@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { FadeIn } from "./FadeIn";
-import { BRAND } from "./shared";
 
 const STATS = [
   { value: 193, suffix: "+", label: "Sectores atendidos" },
@@ -70,17 +69,23 @@ export function LandingStats() {
     <section
       ref={sectionRef}
       className="relative z-10 py-16 md:py-20"
-      style={{ backgroundColor: "#0a0f1e" }}
+      style={{ backgroundColor: "#f0f7ff" }}
     >
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
           {STATS.map((s, i) => (
             <FadeIn delay={i * 0.05} key={s.label}>
               <div
-                className="rounded-2xl border p-6 text-center transition duration-200 hover:scale-[1.02] hover:border-[#0066FF]"
-                style={{ backgroundColor: BRAND.bg, borderColor: BRAND.cardBorder }}
+                className="rounded-2xl bg-white p-6 text-center transition duration-200 hover:scale-[1.02]"
+                style={{
+                  borderRadius: 16,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                }}
               >
-                <p className="text-[48px] font-extrabold leading-none tabular-nums text-[#00CFFF]">
+                <p
+                  className="leading-none tabular-nums"
+                  style={{ fontSize: 48, fontWeight: 900, color: "#0a1628" }}
+                >
                   {"noCount" in s && s.noCount ? (
                     <>
                       {s.value}
@@ -100,7 +105,12 @@ export function LandingStats() {
                     </>
                   )}
                 </p>
-                <p className="mt-2 text-sm text-[#94A3B8]">{s.label}</p>
+                <p
+                  className="mt-3 font-semibold uppercase"
+                  style={{ fontSize: 12, letterSpacing: "2px", color: "#64748b" }}
+                >
+                  {s.label}
+                </p>
               </div>
             </FadeIn>
           ))}

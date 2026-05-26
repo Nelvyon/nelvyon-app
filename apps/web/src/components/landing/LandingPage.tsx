@@ -13,31 +13,20 @@ import { LandingTabsSection } from "./LandingTabsSection";
 import { LandingTestimonials } from "./LandingTestimonials";
 import { MarketingNavbar } from "./MarketingNavbar";
 import { ServicesMindMap } from "./ServicesMindMap";
-import { BRAND } from "./shared";
+import { StickyCtaBar } from "./StickyCtaBar";
+import { WhyNelvyon } from "./WhyNelvyon";
 
 export function LandingPage() {
   return (
-    <div
-      className="min-h-screen overflow-x-hidden antialiased"
-      style={{
-        backgroundColor: "#050816",
-        color: BRAND.textPrimary,
-        fontFamily: "var(--font-inter), system-ui, sans-serif",
-      }}
-    >
+    <div className="min-h-screen overflow-x-hidden antialiased" style={{ backgroundColor: "#ffffff" }}>
+      <StickyCtaBar />
       <LandingNotificationBar />
       <MarketingNavbar active="/" />
-      <main className="relative z-0" style={{ backgroundColor: "#050816" }}>
-        <div className="relative z-10">
-          <LandingHero />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-[120px]"
-            style={{ background: "linear-gradient(to bottom, transparent 0%, #050816 100%)" }}
-          />
-        </div>
+      <main className="relative z-0">
+        <LandingHero />
         <LandingLogosMarquee />
         <LandingStats />
+        <WhyNelvyon />
         <LandingTabsSection />
         <AgencyComparisonTable />
         <LandingTestimonials />

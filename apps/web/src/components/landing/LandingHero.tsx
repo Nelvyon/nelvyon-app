@@ -1,83 +1,102 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
-import { NeuralNetwork } from "@/components/ui/NeuralNetwork";
-
-import { BRAND } from "./shared";
-import { HeroVideo } from "./HeroVideo";
 import { FadeIn } from "./FadeIn";
-import { GhostButton, PrimaryButton } from "./ui";
+import { HeroVideo } from "./HeroVideo";
 
 export function LandingHero() {
   return (
     <section
-      className="relative -mt-20 overflow-hidden pt-28 pb-12 md:pt-32 md:pb-20"
+      className="relative -mt-20 overflow-hidden pt-28 pb-16 md:pt-32 md:pb-24"
       style={{
-        background: `radial-gradient(ellipse 80% 70% at 50% 45%, #020818 0%, ${BRAND.bg} 72%)`,
+        background: "linear-gradient(180deg, #07122a 0%, #1a4a7a 50%, #87CEEB 90%, #ffffff 100%)",
       }}
     >
-      <NeuralNetwork />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center"
-      >
-        <div className="relative h-[min(90vw,520px)] w-[min(90vw,520px)]">
-          <Image
-            alt=""
-            className="object-contain opacity-[0.04]"
-            fill
-            priority
-            src="/logo.png.png"
-            style={{
-              filter: "drop-shadow(0 0 80px rgba(0,102,255,0.35))",
-            }}
-          />
-        </div>
-      </div>
       <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2 md:gap-14 md:px-6">
         <FadeIn>
           <span
-            className="inline-flex rounded-full border px-4 py-1.5 text-xs font-medium"
-            style={{ borderColor: BRAND.cardBorder, backgroundColor: BRAND.card, color: BRAND.cyan }}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium text-white"
+            style={{
+              backgroundColor: "rgba(255,255,255,0.1)",
+              borderColor: "rgba(255,255,255,0.3)",
+              borderRadius: 50,
+            }}
           >
+            <span aria-hidden style={{ color: "#fbbf24" }}>
+              ⚡
+            </span>
             Agencia de marketing digital
           </span>
-          <h1 className="nelvyon-title-glow mt-6 w-full">
-            <span className="nelvyon-slogan-line text-[clamp(1.75rem,5vw,3.25rem)] text-white">
-              Donde nace tu imperio,
-            </span>
-            <span
-              className="nelvyon-slogan-line text-[clamp(1.5rem,4.2vw,2.75rem)]"
-              style={{ color: BRAND.blue }}
-            >
+          <h1
+            className="nelvyon-slogan-line mt-6 w-full text-white"
+            style={{
+              fontWeight: 900,
+              fontSize: "clamp(52px, 7vw, 80px)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            <span className="block">Donde nace tu imperio,</span>
+            <span className="block" style={{ color: "#b8e4ff" }}>
               crece tu marca
             </span>
-            <span className="nelvyon-slogan-line text-[clamp(1.25rem,3.5vw,2.25rem)] text-white">
-              y se impone tu legado
-            </span>
+            <span className="block">y se impone tu legado</span>
           </h1>
-          <p className="mt-6 max-w-lg text-lg leading-relaxed" style={{ color: BRAND.textMuted }}>
+          <p className="mt-6 max-w-lg text-lg leading-relaxed text-white/85">
             SEO, publicidad, email y automatización ejecutados por IA — resultados en semanas, sin
             contratar cinco agencias distintas.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <PrimaryButton className="nelvyon-glow-btn hover:scale-[1.03]" href="/contacto">
+            <Link
+              className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm transition hover:scale-[1.02] hover:brightness-95"
+              href="/contacto"
+              style={{
+                backgroundColor: "#ffffff",
+                color: "#0a1628",
+                fontWeight: 700,
+                borderRadius: 50,
+              }}
+            >
               Solicitar propuesta →
-            </PrimaryButton>
-            <GhostButton className="hover:scale-[1.03]" href="/servicios">
+            </Link>
+            <Link
+              className="inline-flex items-center justify-center rounded-full border px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+              href="/servicios"
+              style={{
+                borderColor: "rgba(255,255,255,0.4)",
+                backgroundColor: "transparent",
+                borderRadius: 50,
+              }}
+            >
               Ver servicios
-            </GhostButton>
+            </Link>
           </div>
-          <p className="mt-6 text-sm" style={{ color: BRAND.textDim }}>
-            <span style={{ color: BRAND.blue }}>✓</span> Sin permanencia rígida ·{" "}
-            <span style={{ color: BRAND.blue }}>✓</span> Respuesta en 48h ·{" "}
-            <span style={{ color: BRAND.blue }}>✓</span> 193 sectores atendidos
+          <p className="mt-6 text-sm text-white/75">
+            <span className="text-white">✓</span> Sin permanencia rígida ·{" "}
+            <span className="text-white">✓</span> Respuesta en 48h ·{" "}
+            <span className="text-white">✓</span> 193 sectores atendidos
           </p>
         </FadeIn>
         <FadeIn delay={0.12}>
-          <HeroVideo />
+          <div className="relative">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -inset-8 rounded-full opacity-40"
+              style={{
+                background: "radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 70%)",
+              }}
+            />
+            <HeroVideo />
+          </div>
         </FadeIn>
+      </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-8 left-1/2 z-[1] -translate-x-1/2 opacity-[0.06]"
+      >
+        <Image alt="" height={120} src="/logo.png.png" width={120} />
       </div>
     </section>
   );
