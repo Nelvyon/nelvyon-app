@@ -9,7 +9,7 @@ function LogoItem({ name, icon }: { name: string; icon: ReactNode }) {
       <span className="flex h-10 w-10 shrink-0 items-center justify-center [&_svg]:h-9 [&_svg]:w-9">
         {icon}
       </span>
-      <span className="text-lg font-semibold text-[#1a1a1a]" style={{ fontFamily: "var(--font-inter)" }}>
+      <span className="text-lg font-semibold text-[#111827]" style={{ fontFamily: "var(--font-inter)" }}>
         {name}
       </span>
     </span>
@@ -31,7 +31,7 @@ export function LandingLogosMarquee() {
           </p>
         </FadeIn>
       </div>
-      <div className="relative overflow-hidden py-2">
+      <div className="relative overflow-hidden py-2" style={{ backgroundColor: "#ffffff" }}>
         <div className="nelvyon-marquee flex items-center gap-4 whitespace-nowrap">
           {row.map((logo, i) => (
             <LogoItem icon={logo.icon} key={`${logo.name}-${i}`} name={logo.name} />
