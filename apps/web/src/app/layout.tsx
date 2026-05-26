@@ -1,6 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { ReactNode } from "react";
 
+import { ChatbotWidget } from "@/components/ChatbotWidget";
 import { CookieBanner } from "@/components/CookieBanner";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { LocaleProvider } from "@/core/i18n/LocaleProvider";
@@ -109,6 +110,7 @@ if ('serviceWorker' in navigator) {
             <AppProviders whitelabelInitial={whitelabelInitial}>{children}</AppProviders>
           </LocaleProvider>
           <CookieBanner />
+          <ChatbotWidget />
         </PostHogProvider>
       </body>
     </html>

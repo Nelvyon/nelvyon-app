@@ -1,37 +1,26 @@
+import type { ReactNode } from "react";
+
 import { BRAND } from "./shared";
 import { FadeIn } from "./FadeIn";
+import { INTEGRATION_LOGOS } from "./marketingLogos";
 
-const LOGOS = [
-  { name: "Google", color: "#4285F4" },
-  { name: "Meta", color: "#0668E1" },
-  { name: "OpenAI", color: "#10A37F" },
-  { name: "Stripe", color: "#635BFF" },
-  { name: "TikTok", color: "#EE1D52" },
-  { name: "LinkedIn", color: "#0A66C2" },
-  { name: "Klaviyo", color: "#2DD881" },
-  { name: "Twilio", color: "#F22F46" },
-  { name: "Shopify", color: "#96BF48" },
-  { name: "HubSpot", color: "#FF7A59" },
-] as const;
-
-function LogoPill({ name, color }: { name: string; color: string }) {
+function LogoPill({ name, icon }: { name: string; color: string; icon: ReactNode }) {
   return (
     <span
-      className="inline-flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold"
+      className="inline-flex shrink-0 items-center gap-3 rounded-full border px-5 py-2.5 text-sm font-semibold text-white"
       style={{
         borderColor: "rgba(255,255,255,0.1)",
-        backgroundColor: "rgba(255,255,255,0.04)",
-        color: BRAND.textMuted,
+        backgroundColor: "#0A0A0A",
       }}
     >
-      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
+      {icon}
       {name}
     </span>
   );
 }
 
 export function LandingLogosMarquee() {
-  const row = [...LOGOS, ...LOGOS];
+  const row = [...INTEGRATION_LOGOS, ...INTEGRATION_LOGOS];
 
   return (
     <section
@@ -43,15 +32,18 @@ export function LandingLogosMarquee() {
     >
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <FadeIn>
-          <p className="mb-8 text-center text-sm font-medium uppercase tracking-widest" style={{ color: BRAND.textDim }}>
-            Integrado con las mejores plataformas del mundo
+          <p
+            className="mb-8 text-center text-sm font-medium uppercase tracking-widest"
+            style={{ color: BRAND.textDim }}
+          >
+            Conectado con las herramientas que ya usas
           </p>
         </FadeIn>
       </div>
       <div className="relative overflow-hidden">
         <div className="nelvyon-marquee flex gap-6 whitespace-nowrap px-4">
           {row.map((logo, i) => (
-            <LogoPill color={logo.color} key={`${logo.name}-${i}`} name={logo.name} />
+            <LogoPill color={logo.color} icon={logo.icon} key={`${logo.name}-${i}`} name={logo.name} />
           ))}
         </div>
       </div>

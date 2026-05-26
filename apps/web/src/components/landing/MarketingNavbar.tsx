@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
+import { NavbarLogo } from "./NavbarLogo";
 import { BRAND, NAV_LINKS, type NavActive } from "./shared";
 import { PrimaryButton } from "./ui";
 
@@ -28,7 +29,7 @@ export function MarketingNavbar({ active }: { active?: NavActive }) {
                   (pathname?.startsWith(item.href + "/") ?? false);
             return (
               <Link
-                className="text-sm transition"
+                className="nelvyon-nav-link text-sm transition"
                 href={item.href}
                 key={item.href}
                 style={{

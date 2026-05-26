@@ -18,7 +18,7 @@ export function SectionHeading({
   return (
     <div className={center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
       <h2
-        className={`text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl ${
+        className={`nelvyon-title-glow text-3xl font-extrabold tracking-tight md:text-4xl lg:text-5xl ${
           light ? "text-white" : "text-zinc-900"
         }`}
       >
@@ -63,7 +63,7 @@ export function PrimaryButton({
 }) {
   return (
     <Link
-      className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 ${className}`}
+      className={`nelvyon-glow-btn inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:scale-[1.03] ${className}`}
       href={href}
       style={{ backgroundColor: BRAND.blue }}
     >
@@ -100,11 +100,7 @@ export function NelvyonCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border p-6 md:p-8 ${className}`}
-      style={{
-        backgroundColor: BRAND.card,
-        borderColor: BRAND.cardBorder,
-      }}
+      className={`nelvyon-glass nelvyon-card-hover rounded-2xl p-6 md:p-8 ${className}`}
     >
       {children}
     </div>

@@ -3,10 +3,10 @@ import { BRAND } from "./shared";
 export { BRAND };
 
 export const AGENCY_STATS = [
-  { value: "+10.000", label: "clientes atendidos" },
-  { value: "+340%", label: "leads medios" },
-  { value: "193", label: "sectores" },
-  { value: "8+", label: "años de experiencia" },
+  { value: "10.000+", label: "proyectos gestionados", numeric: 10000 },
+  { value: "193", label: "sectores", numeric: 193 },
+  { value: "8+", label: "años de experiencia", numeric: 8 },
+  { value: "24/7", label: "soporte disponible", numeric: null },
 ] as const;
 
 export const AGENCY_SERVICES = [
@@ -94,35 +94,43 @@ export const AGENCY_FAQ = [
 
 export const SAAS_FAQ = [
   {
-    q: "¿Qué es NELVYON SaaS?",
-    a: "Un software todo-en-uno que reemplaza herramientas como HubSpot, Mailchimp, Hootsuite y más. Marketing, ventas y automatización en un panel.",
+    q: "¿Necesito conocimientos técnicos?",
+    a: "No. La plataforma está diseñada para usarse sin programar ni configurar servidores. Todo es automático desde el panel.",
   },
   {
-    q: "¿Puedo probar antes de pagar?",
-    a: "Sí. 14 días de prueba gratuita en el plan Growth sin tarjeta de crédito.",
+    q: "¿Puedo cancelar cuando quiera?",
+    a: "Sí, sin permanencia. Cancelas desde tu cuenta cuando lo decidas.",
   },
   {
-    q: "¿Qué plan me conviene?",
-    a: "Starter para equipos pequeños (hasta 3 usuarios). Growth para la mayoría de PYMEs. Elite para agencias y empresas con necesidades avanzadas.",
+    q: "¿Nelvyon reemplaza a mi agencia?",
+    a: "Sí. Incluye las funciones que suele cubrir una agencia: marketing, ventas, comunicación y reporting en un solo software.",
   },
   {
-    q: "¿Incluye soporte?",
-    a: "Email en Starter, prioritario en Growth y account manager dedicado en Elite.",
+    q: "¿Cuánto tarda en funcionar?",
+    a: "Menos de 24 horas tras elegir plan y conectar tus canales.",
   },
   {
-    q: "¿Puedo migrar desde HubSpot o GoHighLevel?",
-    a: "Sí. Te ayudamos a importar contactos, pipelines y plantillas en el onboarding.",
+    q: "¿Hay contrato de permanencia?",
+    a: "No. Facturación mensual sin compromiso a largo plazo.",
   },
   {
-    q: "¿Hay API y white-label?",
-    a: "Disponible en plan Elite para integraciones y revendedores.",
+    q: "¿Atiende a mis clientes el chatbot?",
+    a: "Sí. El chatbot con IA puede responder consultas frecuentes las 24 horas del día.",
   },
   {
-    q: "¿Los datos son míos?",
-    a: "100%. Exportación en cualquier momento. Cumplimos RGPD.",
+    q: "¿Puedo tener varias webs?",
+    a: "Según el plan: 1 en Starter, 3 en Growth e ilimitadas en Elite.",
   },
   {
-    q: "¿Diferencia con contratar la agencia?",
-    a: "SaaS es software para que tu equipo ejecute. La agencia ejecuta por ti. Muchos clientes combinan ambos.",
+    q: "¿Los informes son en tiempo real?",
+    a: "Sí. Los dashboards se actualizan de forma continua con los datos de tus campañas y contactos.",
+  },
+  {
+    q: "¿Está disponible en español?",
+    a: "Sí. Interfaz, soporte y documentación en español.",
+  },
+  {
+    q: "¿Qué pasa si necesito ayuda?",
+    a: "Soporte por email en Starter, prioritario en Growth y atención dedicada en Elite.",
   },
 ] as const;

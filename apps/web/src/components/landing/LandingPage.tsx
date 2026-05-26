@@ -11,7 +11,7 @@ import { LandingLogosMarquee } from "./LandingLogosMarquee";
 import { LandingMission } from "./LandingMission";
 import { LandingNotificationBar } from "./LandingNotificationBar";
 import { LandingStats } from "./LandingStats";
-import { LandingTestimonials } from "./LandingTestimonials";
+import { LandingComingSoonCases } from "./LandingComingSoonCases";
 import { MarketingNavbar } from "./MarketingNavbar";
 import { BRAND } from "./shared";
 
@@ -34,7 +34,7 @@ export function LandingPage() {
         <LandingAgencyServices />
         <LandingMission />
         <LandingHowItWorks />
-        <LandingTestimonials />
+        <LandingComingSoonCases />
         <FaqSection items={AGENCY_FAQ} />
         <LandingFinalCta />
       </main>
