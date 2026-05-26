@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
+import { NeuralNetwork } from "@/components/ui/NeuralNetwork";
 import { ALL_SERVICES } from "../agencyContent";
 import { FadeIn } from "../FadeIn";
 import { LandingFooter } from "../LandingFooter";
@@ -63,19 +63,19 @@ function ServiceCard({ service }: { service: (typeof ALL_SERVICES)[number] }) {
     >
       <div>
         <Icon
-          className="mb-4 h-12 w-12 text-white"
+          className="mb-4 h-[52px] w-[52px] text-white"
           style={grad.accent ? { filter: `drop-shadow(0 0 8px ${grad.accent})` } : undefined}
         />
         <h3 className="text-xl font-extrabold text-white">{service.name}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-white/75">{service.desc}</p>
+        <p className="mt-2 text-sm leading-relaxed text-white/80">{service.desc}</p>
       </div>
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-6 flex items-center justify-between gap-3">
         <span className="text-base font-bold text-white">Desde €{service.from}/mes</span>
         <Link
-          className="rounded-lg bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25"
+          className="shrink-0 rounded-lg bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25"
           href="/contacto"
         >
-          Solicitar →
+          Solicitar este servicio →
         </Link>
       </div>
     </div>
@@ -94,36 +94,31 @@ export function ServiciosPage() {
     >
       <MarketingNavbar active="/servicios" />
       <main>
-        {/* Hero */}
-        <section className="bg-white py-16 md:py-24">
-          <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2 md:px-6">
+        {/* Hero oscuro con red neuronal */}
+        <section
+          className="relative -mt-20 overflow-hidden pt-28 pb-16 md:pt-32 md:pb-24"
+          style={{
+            background: `radial-gradient(ellipse 80% 70% at 50% 45%, #020818 0%, #000000 72%)`,
+          }}
+        >
+          <NeuralNetwork />
+          <div className="relative z-10 mx-auto max-w-4xl px-4 text-center md:px-6">
             <FadeIn>
-              <h1 className="text-4xl font-extrabold tracking-tight text-[#111827] md:text-5xl">
-                25 servicios de marketing digital
+              <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-6xl">
+                25 Servicios de Marketing Digital
               </h1>
-              <p className="mt-4 text-lg text-[#374151]">
-                Todo lo que tu negocio necesita para crecer online, con precios claros y un solo equipo.
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
+                Todo lo que tu negocio necesita para crecer online — ejecutado por IA, con calidad de agencia
+                top mundial.
               </p>
-              <div className="mt-8">
+              <div className="mt-10">
                 <PrimaryButton href="/contacto">Solicitar propuesta</PrimaryButton>
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <div className="relative mx-auto aspect-[4/5] max-w-sm overflow-hidden rounded-2xl border border-[#E5E7EB] shadow-lg">
-                <Image
-                  alt="Aplicación de marketing en móvil"
-                  className="object-cover"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 400px"
-                  src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=1000&fit=crop"
-                />
               </div>
             </FadeIn>
           </div>
         </section>
 
-        {/* 2-column colorful grid */}
+        {/* Grid 2 columnas */}
         <section className="bg-[#F9FAFB] py-12 md:py-16">
           <div className="mx-auto max-w-7xl px-4 md:px-6">
             <FadeIn>
@@ -136,7 +131,6 @@ export function ServiciosPage() {
           </div>
         </section>
 
-        {/* Legal note */}
         <section className="bg-white py-12 text-center md:py-16">
           <div className="mx-auto max-w-2xl px-4">
             <p className="text-sm text-[#6B7280]">

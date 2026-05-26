@@ -1,82 +1,114 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { FadeIn } from "./FadeIn";
 import { BRAND } from "./shared";
 
 const BRANCHES = [
   {
-    id: "marketing",
-    label: "Marketing Digital",
-    color: "#6366F1",
-    subs: ["SEO", "Google Ads", "Meta Ads", "TikTok Ads"],
+    id: "seo",
+    label: "SEO & Posicionamiento",
+    subs: ["SEO On-Page", "SEO Técnico", "Link Building", "SEO Local", "Auditoría SEO"],
   },
   {
-    id: "comunicacion",
-    label: "Comunicación",
-    color: "#0EA5E9",
-    subs: ["Email", "SMS", "WhatsApp", "Chatbot IA"],
+    id: "ads",
+    label: "Publicidad Digital",
+    subs: ["Google Ads", "Meta Ads", "TikTok Ads", "LinkedIn Ads", "YouTube Ads"],
   },
   {
-    id: "contenido",
-    label: "Contenido",
-    color: "#10B981",
-    subs: ["Textos IA", "Imágenes IA", "Vídeos IA", "Redes Sociales"],
+    id: "content",
+    label: "Contenido & Social",
+    subs: ["Copywriting", "Artículos Blog", "Posts Redes", "Guiones Vídeo", "Email Marketing"],
   },
   {
-    id: "webs",
-    label: "Webs y Tiendas",
-    color: "#F59E0B",
-    subs: ["Web corporativa", "Tienda online", "Landing pages"],
+    id: "web",
+    label: "Web & Diseño",
+    subs: ["Webs a Medida", "Tiendas Online", "Landings", "Rediseño Web", "UX/UI"],
   },
   {
-    id: "analisis",
-    label: "Análisis",
-    color: "#EF4444",
-    subs: ["Reporting", "CRM", "Reputación", "Presupuestos IA"],
+    id: "ia",
+    label: "Automatización IA",
+    subs: ["Chatbots IA", "Email Automático", "CRM Inteligente", "Reporting Auto", "Flujos IA"],
   },
 ] as const;
 
-// SVG layout constants
-const SVG_W = 860;
-const SVG_H = 540;
+const SVG_W = 920;
+const SVG_H = 640;
+const C_X = 24;
+const C_R = 52;
+const C_CY = SVG_H / 2;
+const B_X = 185;
+const B_W = 168;
+const B_H = 40;
+const S_X = 400;
+const S_W = 130;
+const S_H = 28;
+const S_GAP = 34;
 
-// Central node
-const C_X = 30;
-const C_W = 130;
-const C_H = 52;
-const C_Y = SVG_H / 2 - C_H / 2;
+const BRANCH_YS = [48, 178, 308, 438, 568];
 
-// Branch nodes
-const B_X = 210;
-const B_W = 158;
-const B_H = 36;
+function AnimatedPath({
+  d,
+  inView,
+  delay,
+}: {
+  d: string;
+  inView: boolean;
+  delay: number;
+}) {
+  return (
+    <motion.path
+      animate={{ pathLength: inView ? 1 : 0, opacity: inView ? 1 : 0.2 }}
+      d={d}
+      fill="none"
+      initial={{ pathLength: 0, opacity: 0.2 }}
+      stroke="url(#mindmap-gradient)"
+      strokeLinecap="round"
+      strokeWidth={2.5}
+      transition={{ duration: 0.7, delay, ease: "easeOut" }}
+    />
+  );
+}
 
-// Sub nodes
-const S_X = 420;
-const S_W = 148;
-const S_H = 26;
-const S_GAP = 32;
-
-// Vertical positions for each branch (evenly spaced)
-const BRANCH_YS = [54, 162, 270, 378, 480];
-
-export function ServicesMindMap() {
+export function ServicesMindMap({
+  className = "bg-white",
+  dark = false,
+}: {
+  className?: string;
+  dark?: boolean;
+}) {
   const [openId, setOpenId] = useState<string | null>(BRANCHES[0].id);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) setInView(true);
+      },
+      { threshold: 0.2 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   return (
-    <section className="bg-white py-16 md:py-24">
+    <section className={`py-16 md:py-24 ${className}`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <FadeIn>
-          <h2 className="text-center text-3xl font-extrabold tracking-tight text-[#111827] md:text-4xl">
+          <h2
+            className={`text-center text-3xl font-extrabold tracking-tight md:text-4xl ${dark ? "text-white" : "text-[#111827]"}`}
+          >
             Todo lo que Nelvyon hace por tu negocio
           </h2>
         </FadeIn>
 
-        {/* Desktop: horizontal SVG mind map */}
-        <div className="mt-10 hidden md:block">
+        <div className="mt-10 hidden md:block" ref={containerRef}>
           <FadeIn delay={0.08}>
             <svg
               className="mx-auto w-full"
@@ -84,80 +116,69 @@ export function ServicesMindMap() {
               viewBox={`0 0 ${SVG_W} ${SVG_H}`}
               xmlns="http://www.w3.org/2000/svg"
             >
+              <defs>
+                <linearGradient id="mindmap-gradient" x1="0%" x2="100%" y1="0%" y2="0%">
+                  <stop offset="0%" stopColor="#0066FF" />
+                  <stop offset="100%" stopColor="#00CFFF" />
+                </linearGradient>
+              </defs>
+
               {BRANCHES.map((b, i) => {
                 const bY = BRANCH_YS[i];
                 const bMidY = bY + B_H / 2;
-
-                // Connection from central node right-edge to branch left-edge
-                const cRightX = C_X + C_W;
-                const cMidY = C_Y + C_H / 2;
-                const cp1x = cRightX + 40;
-                const cp2x = B_X - 30;
-
-                // Sub nodes vertical start
+                const startX = C_X + C_R;
+                const endX = B_X;
                 const totalSubH = b.subs.length * S_GAP - (S_GAP - S_H);
                 const subStartY = bMidY - totalSubH / 2;
 
+                const pathToBranch = `M ${startX} ${C_CY} C ${startX + 60} ${C_CY}, ${endX - 40} ${bMidY}, ${B_X} ${bMidY}`;
+
                 return (
                   <g key={b.id}>
-                    {/* Line: central → branch */}
-                    <path
-                      d={`M ${cRightX} ${cMidY} C ${cp1x} ${cMidY}, ${cp2x} ${bMidY}, ${B_X} ${bMidY}`}
-                      fill="none"
-                      stroke={b.color}
-                      strokeOpacity={0.5}
-                      strokeWidth={2}
-                    />
+                    <AnimatedPath d={pathToBranch} delay={i * 0.12} inView={inView} />
 
-                    {/* Branch node */}
                     <rect
-                      fill={b.color}
+                      fill={BRAND.blue}
                       height={B_H}
-                      opacity={0.18}
-                      rx={8}
+                      opacity={inView ? 1 : 0.4}
+                      rx={B_H / 2}
                       width={B_W}
                       x={B_X}
                       y={bY}
                     />
                     <text
                       dominantBaseline="middle"
-                      fill={b.color}
-                      fontSize={12.5}
+                      fill="white"
+                      fontSize={11}
                       fontWeight="700"
-                      x={B_X + 12}
+                      textAnchor="middle"
+                      x={B_X + B_W / 2}
                       y={bMidY}
                     >
                       {b.label}
                     </text>
 
-                    {/* Lines: branch → sub nodes */}
                     {b.subs.map((sub, j) => {
                       const sY = subStartY + j * S_GAP;
                       const sMidY = sY + S_H / 2;
+                      const pathToSub = `M ${B_X + B_W} ${bMidY} L ${S_X} ${sMidY}`;
                       return (
                         <g key={sub}>
-                          <line
-                            stroke={b.color}
-                            strokeOpacity={0.3}
-                            strokeWidth={1.5}
-                            x1={B_X + B_W}
-                            x2={S_X}
-                            y1={bMidY}
-                            y2={sMidY}
-                          />
+                          <AnimatedPath d={pathToSub} delay={i * 0.12 + 0.25 + j * 0.05} inView={inView} />
                           <rect
-                            fill={b.color}
+                            fill="#111111"
                             height={S_H}
-                            opacity={0.12}
-                            rx={6}
+                            rx={S_H / 2}
+                            stroke="rgba(0,102,255,0.4)"
+                            strokeWidth={1}
                             width={S_W}
                             x={S_X}
                             y={sY}
                           />
                           <text
                             dominantBaseline="middle"
-                            fill={b.color}
-                            fontSize={11}
+                            fill="#E5E7EB"
+                            fontSize={10.5}
                             fontWeight="600"
                             x={S_X + 10}
                             y={sMidY}
@@ -171,16 +192,21 @@ export function ServicesMindMap() {
                 );
               })}
 
-              {/* Central NELVYON node */}
-              <rect fill={BRAND.blue} height={C_H} rx={12} width={C_W} x={C_X} y={C_Y} />
+              {/* Central NELVYON circle */}
+              <circle
+                cx={C_X + C_R}
+                cy={C_CY}
+                fill={BRAND.blue}
+                opacity={inView ? 1 : 0.5}
+                r={C_R}
+              />
               <text
-                dominantBaseline="middle"
                 fill="white"
-                fontSize={16}
+                fontSize={15}
                 fontWeight="800"
                 textAnchor="middle"
-                x={C_X + C_W / 2}
-                y={C_Y + C_H / 2}
+                x={C_X + C_R}
+                y={C_CY + 5}
               >
                 NELVYON
               </text>
@@ -188,10 +214,10 @@ export function ServicesMindMap() {
           </FadeIn>
         </div>
 
-        {/* Mobile: accordion */}
+        {/* Mobile accordion */}
         <div className="mt-8 space-y-3 md:hidden">
           <div
-            className="mb-6 flex h-16 w-full items-center justify-center rounded-2xl font-bold text-white"
+            className="mb-6 flex h-16 w-full items-center justify-center rounded-full font-bold text-white"
             style={{ backgroundColor: BRAND.blue }}
           >
             NELVYON
@@ -201,9 +227,8 @@ export function ServicesMindMap() {
             return (
               <div className="overflow-hidden rounded-xl border border-[#E5E7EB]" key={b.id}>
                 <button
-                  className="flex w-full items-center justify-between px-4 py-4 text-left font-semibold"
+                  className="flex w-full items-center justify-between px-4 py-4 text-left font-semibold text-[#0066FF]"
                   onClick={() => setOpenId(isOpen ? null : b.id)}
-                  style={{ color: b.color }}
                   type="button"
                 >
                   {b.label}
@@ -213,9 +238,8 @@ export function ServicesMindMap() {
                   <div className="space-y-2 border-t border-[#E5E7EB] px-4 py-3">
                     {b.subs.map((sub) => (
                       <span
-                        className="block rounded-lg px-3 py-2 text-sm font-medium"
+                        className="block rounded-full border border-[#0066FF]/40 bg-[#111] px-4 py-2 text-sm font-medium text-[#E5E7EB]"
                         key={sub}
-                        style={{ backgroundColor: `${b.color}18`, color: b.color }}
                       >
                         {sub}
                       </span>

@@ -44,6 +44,11 @@ const nelvyonMetadata: Metadata = {
   },
   robots: { index: true, follow: true },
   manifest: "/manifest.json",
+  icons: {
+    icon: [{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" }],
+    shortcut: "/favicon.ico",
+    apple: "/logo.png.png",
+  },
   appleWebApp: { capable: true, title: "NELVYON" },
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim()
     ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION.trim() } }

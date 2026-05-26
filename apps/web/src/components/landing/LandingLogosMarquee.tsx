@@ -5,7 +5,7 @@ import { INTEGRATION_LOGOS } from "./marketingLogos";
 
 function LogoPill({ name, icon }: { name: string; icon: ReactNode }) {
   return (
-    <span className="inline-flex shrink-0 items-center gap-4 rounded-full bg-white px-6 py-3 font-semibold text-zinc-900">
+    <span className="inline-flex shrink-0 items-center gap-4 rounded-full border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white">
       <span className="flex h-10 w-10 shrink-0 items-center justify-center [&_svg]:h-10 [&_svg]:w-10">
         {icon}
       </span>
@@ -24,7 +24,7 @@ export function LandingLogosMarquee() {
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <FadeIn>
           <p
-            className="mb-8 text-center text-sm font-medium uppercase tracking-widest text-[#374151]"
+            className="mb-8 text-center text-sm font-medium uppercase tracking-widest text-white/60"
             style={{ fontFamily: "var(--font-inter)" }}
           >
             Conectado con las herramientas que ya usas

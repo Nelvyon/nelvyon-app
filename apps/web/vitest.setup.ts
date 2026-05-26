@@ -23,6 +23,14 @@ class MockIntersectionObserver implements IntersectionObserver {
 
 vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
 
+class MockResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+vi.stubGlobal("ResizeObserver", MockResizeObserver);
+
 vi.mock("next/font/google", () => {
   const mockFont = () => ({
     className: "mock-font",

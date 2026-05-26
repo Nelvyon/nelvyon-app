@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-import { ComparisonTable } from "./ComparisonTable";
-import { HOME_COMPARE_ROWS } from "./comparisonData";
+import { AgencyComparisonTable } from "./AgencyComparisonTable";
 import { ServicesMindMap } from "./ServicesMindMap";
 import { FadeIn } from "./FadeIn";
 
@@ -35,7 +34,7 @@ export function LandingServicesSection() {
         </FadeIn>
       </section>
 
-      <ComparisonTable rows={HOME_COMPARE_ROWS} title="¿Qué incluye trabajar con NELVYON?" />
+      <AgencyComparisonTable />
 
       <ServicesMindMap />
 
