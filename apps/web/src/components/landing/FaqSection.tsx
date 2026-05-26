@@ -11,22 +11,24 @@ export function FaqSection({
   title = "Preguntas frecuentes",
   items,
   dark = false,
+  background,
 }: {
   title?: string;
   items: readonly { q: string; a: string }[];
   dark?: boolean;
+  background?: string;
 }) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
     <section
       className="py-20 md:py-28"
-      style={{ backgroundColor: dark ? BRAND.bgSoft : BRAND.white }}
+      style={{ backgroundColor: background ?? (dark ? BRAND.bgSoft : BRAND.white) }}
     >
       <div className="mx-auto max-w-3xl px-4 md:px-6">
         <FadeIn>
           <h2
-            className={`text-center text-3xl font-bold md:text-4xl ${dark ? "text-white" : "text-zinc-900"}`}
+            className={`text-center text-3xl font-bold md:text-4xl ${dark ? "text-white" : "text-[#111827]"}`}
           >
             {title}
           </h2>
@@ -41,7 +43,7 @@ export function FaqSection({
                   onClick={() => setOpen(isOpen ? null : i)}
                   type="button"
                 >
-                  <span className={`font-medium ${dark ? "text-white" : "text-zinc-900"}`}>{item.q}</span>
+                  <span className={`font-medium ${dark ? "text-white" : "text-[#111827]"}`}>{item.q}</span>
                   <ChevronDown
                     className={`h-5 w-5 shrink-0 transition ${isOpen ? "rotate-180" : ""}`}
                     style={{ color: BRAND.blue }}
@@ -56,7 +58,10 @@ export function FaqSection({
                       initial={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.25 }}
                     >
-                      <p className={`pb-5 text-sm leading-relaxed ${dark ? "" : "text-zinc-600"}`} style={{ color: dark ? BRAND.textMuted : undefined }}>
+                      <p
+                        className="pb-5 text-sm leading-relaxed"
+                        style={{ color: dark ? BRAND.textMuted : "#374151" }}
+                      >
                         {item.a}
                       </p>
                     </motion.div>

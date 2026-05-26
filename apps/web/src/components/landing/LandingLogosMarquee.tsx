@@ -24,7 +24,7 @@ export function LandingLogosMarquee() {
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <FadeIn>
           <p
-            className="mb-8 text-center text-sm font-medium uppercase tracking-widest text-[#6B7280]"
+            className="mb-8 text-center text-sm font-medium uppercase tracking-widest text-[#374151]"
             style={{ fontFamily: "var(--font-inter)" }}
           >
             Conectado con las herramientas que ya usas

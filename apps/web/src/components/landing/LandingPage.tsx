@@ -8,7 +8,6 @@ import { LandingHero } from "./LandingHero";
 import { LandingHowItWorks } from "./LandingHowItWorks";
 import { LandingLogosMarquee } from "./LandingLogosMarquee";
 import { LandingNotificationBar } from "./LandingNotificationBar";
-import { LandingPartners } from "./LandingPartners";
 import { LandingServicesSection } from "./LandingServicesSection";
 import { LandingStats } from "./LandingStats";
 import { LandingSuccessCases } from "./LandingSuccessCases";
@@ -30,7 +29,6 @@ export function LandingPage() {
       <main className="bg-white">
         <LandingHero />
         <LandingLogosMarquee />
-        <LandingPartners />
         <LandingServicesSection />
         <LandingStats />
         <LandingHowItWorks />

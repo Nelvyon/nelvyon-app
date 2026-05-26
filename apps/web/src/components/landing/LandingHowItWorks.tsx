@@ -32,8 +32,8 @@ export function LandingHowItWorks() {
                     {step.n}
                   </span>
                   <div>
-                    <h3 className="text-lg font-bold text-zinc-900">{step.title}</h3>
-                    <p className="mt-1 text-sm text-[#6B7280]">{step.desc}</p>
+                    <h3 className="text-lg font-bold text-[#111827]">{step.title}</h3>
+                    <p className="mt-1 text-sm text-[#374151]">{step.desc}</p>
                   </div>
                 </div>
               ))}

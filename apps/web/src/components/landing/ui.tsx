@@ -22,13 +22,13 @@ export function SectionHeading({
     <div className={center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
       <h2
         className={`text-3xl font-extrabold tracking-tight md:text-4xl lg:text-5xl ${
-          isDark ? "nelvyon-title-glow text-white" : "text-zinc-900"
+          isDark ? "nelvyon-title-glow text-white" : "text-[#111827]"
         }`}
       >
         {title}
       </h2>
       {subtitle ? (
-        <p className={`mt-4 text-lg md:text-xl ${isDark ? "text-zinc-400" : "text-[#6B7280]"}`}>
+        <p className={`mt-4 text-lg md:text-xl ${isDark ? "text-zinc-400" : "text-[#374151]"}`}>
           {subtitle}
         </p>
       ) : null}

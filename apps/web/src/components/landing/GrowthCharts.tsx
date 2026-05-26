@@ -45,7 +45,7 @@ export function GrowthCharts() {
         <p className="mb-1 text-xs font-medium uppercase tracking-wider" style={{ color: BRAND.cyan }}>
           Tecnología IA · Evolución de actividad
         </p>
-        <p className="mb-4 text-sm text-[#6B7280]">Indicadores agregados por mes (ilustrativo)</p>
+        <p className="mb-4 text-sm text-[#374151]">Indicadores agregados por mes (ilustrativo)</p>
         <div className="h-52">
           <ResponsiveContainer height="100%" width="100%">
             <AreaChart data={LINE_DATA}>
@@ -86,7 +86,7 @@ export function GrowthCharts() {
         <p className="mb-1 text-xs font-medium uppercase tracking-wider" style={{ color: BRAND.cyan }}>
           Rendimiento por canal
         </p>
-        <p className="mb-4 text-sm text-[#6B7280]">Comparativa relativa entre canales</p>
+        <p className="mb-4 text-sm text-[#374151]">Comparativa relativa entre canales</p>
         <div className="h-52">
           <ResponsiveContainer height="100%" width="100%">
             <BarChart data={BAR_DATA}>
