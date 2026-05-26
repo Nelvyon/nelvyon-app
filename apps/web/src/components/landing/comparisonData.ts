@@ -1,28 +1,28 @@
 export type StatusCell = "yes" | "warn" | "no";
 
-export type AgencyCompareRow = {
+export type CompetitorLogo = { name: string; domain: string };
+
+export type MarketCompareRow = {
   service: string;
-  large: StatusCell;
-  medium: StatusCell;
-  small: StatusCell;
-  nelvyon: StatusCell;
+  logos: CompetitorLogo[];
+  marketPrice: string;
 };
 
-export const HOME_AGENCY_COMPARE_ROWS: AgencyCompareRow[] = [
-  { service: "SEO", large: "yes", medium: "yes", small: "warn", nelvyon: "yes" },
-  { service: "SEM / Google Ads", large: "yes", medium: "yes", small: "warn", nelvyon: "yes" },
-  { service: "Meta Ads", large: "yes", medium: "yes", small: "warn", nelvyon: "yes" },
-  { service: "Email Marketing", large: "yes", medium: "yes", small: "yes", nelvyon: "yes" },
-  { service: "Content Marketing", large: "yes", medium: "yes", small: "warn", nelvyon: "yes" },
-  { service: "Social Media", large: "yes", medium: "yes", small: "yes", nelvyon: "yes" },
-  { service: "Web & Landing", large: "yes", medium: "warn", small: "warn", nelvyon: "yes" },
-  { service: "Video Marketing", large: "yes", medium: "warn", small: "no", nelvyon: "yes" },
-  { service: "CRO", large: "yes", medium: "warn", small: "no", nelvyon: "yes" },
-  { service: "Automatización IA", large: "warn", medium: "warn", small: "no", nelvyon: "yes" },
-  { service: "Reputación / PR", large: "yes", medium: "warn", small: "no", nelvyon: "yes" },
-  { service: "WhatsApp Marketing", large: "warn", medium: "warn", small: "no", nelvyon: "yes" },
-  { service: "TikTok Ads", large: "yes", medium: "warn", small: "no", nelvyon: "yes" },
-  { service: "Análisis & Reporting", large: "yes", medium: "yes", small: "warn", nelvyon: "yes" },
+export const HOME_MARKET_COMPARE_ROWS: MarketCompareRow[] = [
+  { service: "SEO & Posicionamiento", logos: [{ name: "Semrush", domain: "semrush.com" }, { name: "Moz", domain: "moz.com" }], marketPrice: "€500-2000/mes" },
+  { service: "Google Ads / SEM", logos: [{ name: "Google Ads", domain: "ads.google.com" }], marketPrice: "€300-1500/mes" },
+  { service: "Meta Ads (FB+IG)", logos: [{ name: "Meta", domain: "meta.com" }], marketPrice: "€400-2000/mes" },
+  { service: "TikTok Ads", logos: [{ name: "TikTok", domain: "tiktok.com" }], marketPrice: "€500-3000/mes" },
+  { service: "Email Marketing", logos: [{ name: "Mailchimp", domain: "mailchimp.com" }, { name: "Klaviyo", domain: "klaviyo.com" }], marketPrice: "€200-800/mes" },
+  { service: "Content Marketing", logos: [], marketPrice: "€300-1500/mes" },
+  { service: "Social Media", logos: [{ name: "Hootsuite", domain: "hootsuite.com" }], marketPrice: "€400-1500/mes" },
+  { service: "Web & Landings", logos: [{ name: "WordPress", domain: "wordpress.com" }, { name: "Wix", domain: "wix.com" }], marketPrice: "€1000-5000 único" },
+  { service: "Video Marketing", logos: [], marketPrice: "€500-3000/pieza" },
+  { service: "Automatización IA", logos: [], marketPrice: "€800-4000/mes" },
+  { service: "WhatsApp Marketing", logos: [{ name: "WhatsApp", domain: "business.whatsapp.com" }], marketPrice: "€200-600/mes" },
+  { service: "CRO & Optimización", logos: [], marketPrice: "€500-2000/mes" },
+  { service: "Reputación & PR", logos: [], marketPrice: "€400-1500/mes" },
+  { service: "Análisis & Reporting", logos: [{ name: "Analytics", domain: "analytics.google.com" }], marketPrice: "€200-800/mes" },
 ];
 
 export type SaasPlatformRow = {
@@ -50,4 +50,12 @@ export const SAAS_PLATFORM_COMPARE_ROWS: SaasPlatformRow[] = [
   { feature: "Soporte en español", hubspot: "no", ghl: "no", activecampaign: "no", hootsuite: "no", nelvyon: "yes" },
   { feature: "Precio inicial (€/mes)", hubspot: "€890+/mes", ghl: "€97/mes", activecampaign: "€29/mes", hootsuite: "€99/mes", nelvyon: "€97/mes" },
   { feature: "IA integrada nativa", hubspot: "warn", ghl: "warn", activecampaign: "warn", hootsuite: "warn", nelvyon: "yes" },
+];
+
+export const SAAS_COMPETITOR_COLUMNS = [
+  { key: "hubspot" as const, label: "HubSpot", domain: "hubspot.com" },
+  { key: "ghl" as const, label: "GoHighLevel", domain: "gohighlevel.com" },
+  { key: "activecampaign" as const, label: "ActiveCampaign", domain: "activecampaign.com" },
+  { key: "hootsuite" as const, label: "Hootsuite", domain: "hootsuite.com" },
+  { key: "nelvyon" as const, label: "NELVYON", domain: "nelvyon.com", highlight: true },
 ];

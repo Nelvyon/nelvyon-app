@@ -16,8 +16,6 @@ const VALUES = [
   { title: "Cercanía", desc: "Hablas con personas que conocen tu cuenta, no con un ticket anónimo." },
 ] as const;
 
-const TECH = ["OpenAI", "Google Cloud", "Meta API", "Stripe", "Twilio", "Vercel", "PostgreSQL", "Redis"] as const;
-
 const TIMELINE = [
   { year: "2026", title: "Expansión EU", desc: "Presencia en 5 países europeos con soporte local." },
   { year: "2028", title: "IA predictiva", desc: "Modelos propios de atribución y forecasting de ventas." },
@@ -48,7 +46,7 @@ export function NosotrosPage() {
           </div>
         </section>
 
-        <section className="py-16 md:py-24" style={{ backgroundColor: BRAND.bgSoft }}>
+        <section className="py-16 md:py-24" style={{ backgroundColor: BRAND.bgSection }}>
           <div className="mx-auto max-w-3xl space-y-6 px-4 text-lg leading-relaxed md:px-6">
             <FadeIn>
               <p>
@@ -95,25 +93,6 @@ export function NosotrosPage() {
           </div>
         </section>
 
-        <section className="py-20 md:py-28" style={{ backgroundColor: BRAND.bgAlt }}>
-          <div className="mx-auto max-w-7xl px-4 md:px-6">
-            <FadeIn>
-              <SectionHeading light center title="Tecnología que usamos" />
-            </FadeIn>
-            <div className="mt-10 flex flex-wrap justify-center gap-4">
-              {TECH.map((t) => (
-                <span
-                  className="rounded-full border px-5 py-2 text-sm font-medium text-white"
-                  key={t}
-                  style={{ borderColor: BRAND.cardBorder, backgroundColor: BRAND.card }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section className="py-20 md:py-28" style={{ backgroundColor: BRAND.bg }}>
           <div className="mx-auto max-w-3xl px-4 md:px-6">
             <FadeIn>
@@ -141,13 +120,13 @@ export function NosotrosPage() {
           </div>
         </section>
 
-        <section className="py-16 md:py-20" style={{ backgroundColor: BRAND.bgLight }}>
+        <section className="py-16 md:py-20" style={{ backgroundColor: BRAND.bgSection }}>
           <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 px-4 md:grid-cols-4 md:px-6">
             {STATS.map((s, i) => (
               <FadeIn delay={i * 0.05} key={s.l}>
                 <motion.div className="text-center" initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}>
-                  <p className="text-3xl font-bold text-zinc-900 md:text-4xl">{s.v}</p>
-                  <p className="mt-1 text-sm text-zinc-600">{s.l}</p>
+                  <p className="text-3xl font-bold text-[#00CFFF] md:text-4xl">{s.v}</p>
+                  <p className="mt-1 text-sm text-[#94A3B8]">{s.l}</p>
                 </motion.div>
               </FadeIn>
             ))}

@@ -1,81 +1,96 @@
 "use client";
 
+import Image from "next/image";
+
 import { FadeIn } from "./FadeIn";
 import { ComparisonStatusCell } from "./ComparisonStatusCell";
-import { SAAS_PLATFORM_COMPARE_ROWS } from "./comparisonData";
-
-const COLUMNS = [
-  { key: "feature" as const, label: "FUNCIONALIDAD", sticky: true },
-  { key: "hubspot" as const, label: "HubSpot" },
-  { key: "ghl" as const, label: "GoHighLevel" },
-  { key: "activecampaign" as const, label: "ActiveCampaign" },
-  { key: "hootsuite" as const, label: "Hootsuite" },
-  { key: "nelvyon" as const, label: "NELVYON", highlight: true },
-];
+import { SAAS_COMPETITOR_COLUMNS, SAAS_PLATFORM_COMPARE_ROWS } from "./comparisonData";
+import { BRAND, faviconUrl } from "./shared";
+import { SectionBadge } from "./ui";
 
 export function SaasPlatformComparisonTable() {
   return (
-    <section className="bg-[#0a0a0a] px-4 py-16 md:px-6 md:py-24">
+    <section className="px-4 py-16 md:px-6 md:py-24" style={{ backgroundColor: BRAND.bg }}>
       <div className="mx-auto max-w-6xl">
         <FadeIn>
-          <h2 className="text-center text-2xl font-extrabold text-white md:text-3xl">
-            NELVYON vs plataformas SaaS del mercado
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-white/70">
-            Compara funcionalidades reales — no solo el precio de entrada.
-          </p>
+          <div className="text-center">
+            <SectionBadge>COMPARATIVA SAAS</SectionBadge>
+            <h2 className="mt-4 text-2xl font-extrabold text-white md:text-4xl">
+              NELVYON vs plataformas del mercado
+            </h2>
+          </div>
         </FadeIn>
 
         <FadeIn delay={0.08}>
-          <div className="mt-10 overflow-x-auto rounded-2xl border border-white/10 bg-black">
-            <table className="w-full min-w-[800px] border-collapse text-left text-sm">
-              <thead className="sticky top-0 z-20">
-                <tr className="border-b border-white/10 bg-black">
-                  {COLUMNS.map((col) => (
-                    <th
-                      className={`px-4 py-4 text-xs font-bold uppercase tracking-wide ${
-                        col.highlight
-                          ? "border-l-2 border-[#0066FF] bg-[#0066FF]/15 text-[#00CFFF]"
-                          : col.sticky
-                            ? "sticky left-0 z-30 bg-[#0066FF] text-white"
-                            : "bg-[#0066FF] text-white"
-                      }`}
-                      key={col.key}
-                    >
-                      {col.label}
+          <div
+            className="mt-10 overflow-hidden rounded-3xl border p-6 md:p-8"
+            style={{
+              background: "linear-gradient(145deg, #0d1b3e 0%, #050816 100%)",
+              borderColor: "#1e3a8a",
+            }}
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[800px] border-collapse text-left text-sm">
+                <thead className="sticky top-0 z-20">
+                  <tr className="border-b border-white/10">
+                    <th className="sticky left-0 z-30 bg-[#0d1b3e] px-4 py-4 text-xs font-bold uppercase text-[#00CFFF]">
+                      FUNCIONALIDAD
                     </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {SAAS_PLATFORM_COMPARE_ROWS.map((row) => (
-                  <tr className="border-b border-white/5 hover:bg-white/[0.02]" key={row.feature}>
-                    <td className="sticky left-0 z-10 border-r border-white/10 bg-black px-4 py-3 font-semibold text-white">
-                      {row.feature}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <ComparisonStatusCell value={row.hubspot} />
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <ComparisonStatusCell value={row.ghl} />
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <ComparisonStatusCell value={row.activecampaign} />
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <ComparisonStatusCell value={row.hootsuite} />
-                    </td>
-                    <td className="border-l-2 border-[#0066FF] bg-[#0066FF]/10 px-4 py-3 text-center font-semibold">
-                      <ComparisonStatusCell value={row.nelvyon} />
-                    </td>
+                    {SAAS_COMPETITOR_COLUMNS.map((col) => (
+                      <th
+                        className={`px-3 py-4 text-center ${col.highlight ? "border-l-2" : ""}`}
+                        key={col.key}
+                        style={
+                          col.highlight
+                            ? { borderColor: BRAND.blue, backgroundColor: "rgba(0,102,255,0.15)" }
+                            : { backgroundColor: "#0d1b3e" }
+                        }
+                      >
+                        <Image
+                          alt={col.label}
+                          className="mx-auto rounded-full bg-white"
+                          height={32}
+                          src={faviconUrl(col.domain)}
+                          unoptimized
+                          width={32}
+                        />
+                        <span
+                          className={`mt-2 block text-[10px] font-bold uppercase ${col.highlight ? "text-[#00CFFF]" : "text-white"}`}
+                        >
+                          {col.label}
+                        </span>
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {SAAS_PLATFORM_COMPARE_ROWS.map((row) => (
+                    <tr className="border-b border-white/5" key={row.feature}>
+                      <td className="sticky left-0 z-10 bg-[#0a1020] px-4 py-3 font-semibold text-white">
+                        {row.feature}
+                      </td>
+                      {SAAS_COMPETITOR_COLUMNS.map((col) => (
+                        <td
+                          className={`px-3 py-3 text-center ${col.highlight ? "border-l-2" : ""}`}
+                          key={col.key}
+                          style={
+                            col.highlight
+                              ? { borderColor: BRAND.blue, backgroundColor: "rgba(0,102,255,0.08)" }
+                              : undefined
+                          }
+                        >
+                          <ComparisonStatusCell value={row[col.key]} />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-6 text-center text-xs text-[#94A3B8]">
+              ✅ Incluido · ⚠️ Limitado · ❌ No incluido
+            </p>
           </div>
-          <p className="mt-6 text-center text-xs text-white/60 md:text-sm">
-            ✅ Incluido y top calidad · ⚠️ Limitado o subcontratado · ❌ No incluido
-          </p>
         </FadeIn>
       </div>
     </section>

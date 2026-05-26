@@ -23,7 +23,7 @@ export function FaqSection({
   return (
     <section
       className="py-20 md:py-28"
-      style={{ backgroundColor: background ?? (dark ? BRAND.bgSoft : BRAND.white) }}
+      style={{ backgroundColor: background ?? (dark ? BRAND.bgSection : BRAND.bg) }}
     >
       <div className="mx-auto max-w-3xl px-4 md:px-6">
         <FadeIn>
@@ -33,7 +33,7 @@ export function FaqSection({
             {title}
           </h2>
         </FadeIn>
-        <div className="mt-10 divide-y divide-[#E5E7EB]">
+        <div className={`mt-10 divide-y ${dark ? "divide-[#1e293b]" : "divide-[#1e293b]"}`}>
           {items.map((item, i) => {
             const isOpen = open === i;
             return (

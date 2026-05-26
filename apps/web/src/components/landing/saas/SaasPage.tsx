@@ -36,19 +36,19 @@ const PLANS = [
   {
     name: "Starter",
     price: "€97",
-    features: ["1 web", "Email marketing", "Chatbot básico", "SEO básico", "1 canal ads"],
+    features: ["CRM", "Email", "Social scheduler", "1 workspace", "Soporte email"],
     highlight: false,
   },
   {
     name: "Growth",
     price: "€297",
     features: [
-      "3 webs",
       "Todo Starter",
-      "Meta / Google / TikTok Ads",
-      "CRM completo",
+      "SMS",
       "WhatsApp",
-      "Informes avanzados",
+      "Funnel builder",
+      "Chatbot IA",
+      "3 workspaces",
     ],
     highlight: true,
   },
@@ -56,12 +56,11 @@ const PLANS = [
     name: "Elite",
     price: "€797",
     features: [
-      "Webs ilimitadas",
       "Todo Growth",
-      "IA generativa",
-      "Automatizaciones avanzadas",
-      "Manager dedicado IA",
-      "Prioridad absoluta",
+      "White label",
+      "Workspaces ilimitados",
+      "Gestor dedicado",
+      "IA avanzada",
     ],
     highlight: false,
   },
@@ -109,11 +108,14 @@ function SaasFeatureCard({
 export function SaasPage() {
   return (
     <div
-      className="min-h-screen overflow-x-hidden bg-[#0a0a0a] text-white"
-      style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
+      className="min-h-screen overflow-x-hidden text-white"
+      style={{
+        backgroundColor: BRAND.bg,
+        fontFamily: "var(--font-inter), system-ui, sans-serif",
+      }}
     >
       <MarketingNavbar active="/saas" />
-      <main className="bg-[#0a0a0a]">
+      <main style={{ backgroundColor: BRAND.bg }}>
         {/* A — Hero */}
         <section
           className="relative -mt-20 overflow-hidden pt-28 pb-16 md:pt-32 md:pb-24"
@@ -155,7 +157,7 @@ export function SaasPage() {
         <SaasPlatformComparisonTable />
 
         {/* C — 12 features */}
-        <section className="bg-[#0a0a0a] py-20 md:py-28">
+        <section className="py-20 md:py-28" style={{ backgroundColor: BRAND.bgSection }}>
           <div className="mx-auto max-w-7xl px-4 md:px-6">
             <FadeIn>
               <h2 className="text-center text-3xl font-extrabold text-white md:text-4xl">Funcionalidades del panel</h2>
@@ -172,24 +174,25 @@ export function SaasPage() {
         </section>
 
         {/* D — Mind map (dark wrapper) */}
-        <ServicesMindMap className="bg-[#111827]" dark />
+        <ServicesMindMap />
 
         {/* E — Planes */}
-        <section className="bg-[#0a0a0a] py-20 md:py-28" id="planes">
+        <section className="py-20 md:py-28" id="planes" style={{ backgroundColor: BRAND.bg }}>
           <div className="mx-auto max-w-7xl px-4 md:px-6">
             <FadeIn>
               <h2 className="text-center text-3xl font-extrabold text-white md:text-4xl">Planes y precios</h2>
               <p className="mt-3 text-center text-white/60">Escala cuando tu negocio crezca.</p>
             </FadeIn>
-            <div className="mt-12 grid gap-8 lg:grid-cols-3">
+            <div className="mt-12 grid items-center gap-8 lg:grid-cols-3">
               {PLANS.map((plan, i) => (
                 <FadeIn delay={i * 0.08} key={plan.name}>
                   <motion.div
-                    className={`relative flex h-full flex-col rounded-2xl border p-8 backdrop-blur-md ${
+                    className={`relative flex h-full flex-col rounded-2xl border p-8 ${
                       plan.highlight
-                        ? "border-[#0066FF] bg-[#0066FF]/10 shadow-[0_16px_48px_rgba(0,102,255,0.25)]"
-                        : "border-white/10 bg-white/5"
+                        ? "border-[#0066FF] shadow-[0_16px_48px_rgba(0,102,255,0.25)] lg:scale-105"
+                        : "border-[#1e293b]"
                     }`}
+                    style={{ backgroundColor: BRAND.bgSection }}
                     whileHover={{ y: -4 }}
                   >
                     {plan.highlight ? (
@@ -202,8 +205,8 @@ export function SaasPage() {
                     ) : null}
                     <h3 className="text-xl font-bold text-white">{plan.name}</h3>
                     <p className="mt-4 tabular-nums">
-                      <span className="text-4xl font-extrabold text-white">{plan.price}</span>
-                      <span className="text-white/60">/mes</span>
+                      <span className="text-[48px] font-extrabold leading-none text-white">{plan.price}</span>
+                      <span className="text-[#94A3B8]">/mes</span>
                     </p>
                     <ul className="mt-8 flex-1 space-y-3">
                       {plan.features.map((f) => (
@@ -214,9 +217,8 @@ export function SaasPage() {
                       ))}
                     </ul>
                     <Link
-                      className="nelvyon-glow-btn nelvyon-btn-shimmer mt-8 block rounded-full py-3 text-center text-sm font-semibold text-white transition hover:scale-[1.03]"
+                      className="nelvyon-cta-btn nelvyon-btn-shimmer mt-8 block rounded-xl py-3 text-center text-sm font-semibold text-white transition hover:scale-[1.02]"
                       href="/register"
-                      style={{ backgroundColor: plan.highlight ? BRAND.blue : "rgba(0,102,255,0.85)" }}
                     >
                       Empezar
                     </Link>
@@ -249,7 +251,7 @@ export function SaasPage() {
         </section>
 
         {/* G — Pasos */}
-        <section className="bg-[#0a0a0a] py-20 md:py-28">
+        <section className="py-20 md:py-28" style={{ backgroundColor: BRAND.bgSection }}>
           <div className="mx-auto max-w-5xl px-4 md:px-6">
             <FadeIn>
               <h2 className="text-center text-3xl font-extrabold text-white md:text-4xl">Cómo funciona</h2>

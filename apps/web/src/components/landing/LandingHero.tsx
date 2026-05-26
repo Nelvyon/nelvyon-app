@@ -58,8 +58,8 @@ export function LandingHero() {
             </span>
           </h1>
           <p className="mt-6 max-w-lg text-lg leading-relaxed" style={{ color: BRAND.textMuted }}>
-            SEO, publicidad, email y automatización ejecutados por expertos — sin contratar cinco
-            proveedores distintos.
+            SEO, publicidad, email y automatización ejecutados por IA — resultados en semanas, sin
+            contratar cinco agencias distintas.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <PrimaryButton className="nelvyon-glow-btn hover:scale-[1.03]" href="/contacto">

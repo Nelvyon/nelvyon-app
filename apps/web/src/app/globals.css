@@ -253,6 +253,18 @@
   border-color: var(--nelvyon-border-light);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+.nelvyon-cta-btn {
+  background: linear-gradient(135deg, #0066FF 0%, #00CFFF 100%);
+  box-shadow: 0 4px 24px rgba(0, 102, 255, 0.35);
+}
+.nelvyon-cta-btn:hover {
+  box-shadow: 0 0 40px rgba(0, 102, 255, 0.5);
+}
+
 .nelvyon-slogan-line {
   display: block;
   text-align: center;
