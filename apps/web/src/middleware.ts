@@ -11,12 +11,22 @@ import {
 } from "@/core/whitelabel/resolveWhitelabel";
 
 function isProtectedPath(pathname: string): boolean {
+  // /saas is the public marketing page — NOT protected
+  // /saas/dashboard and deeper routes remain protected
   return (
     pathname.startsWith("/os/") ||
     pathname === "/os" ||
     pathname.startsWith("/api/os/") ||
-    pathname.startsWith("/saas/") ||
-    pathname === "/saas" ||
+    pathname.startsWith("/saas/dashboard") ||
+    pathname.startsWith("/saas/crm") ||
+    pathname.startsWith("/saas/campanas") ||
+    pathname.startsWith("/saas/chatbot") ||
+    pathname.startsWith("/saas/seo") ||
+    pathname.startsWith("/saas/social") ||
+    pathname.startsWith("/saas/settings") ||
+    pathname.startsWith("/saas/leads") ||
+    pathname.startsWith("/saas/dialer") ||
+    pathname.startsWith("/saas/linkedin") ||
     pathname.startsWith("/api/saas/") ||
     pathname.startsWith("/admin/") ||
     pathname === "/admin" ||

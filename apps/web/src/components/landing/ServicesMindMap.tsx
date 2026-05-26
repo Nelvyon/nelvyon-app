@@ -39,17 +39,29 @@ const BRANCHES = [
   },
 ] as const;
 
-const H = 520;
-const CX = 100;
-const CY = H / 2;
-const NW = 140;
-const NH = 80;
+// SVG layout constants
+const SVG_W = 860;
+const SVG_H = 540;
 
-function branchY(i: number) {
-  const start = 70;
-  const gap = (H - 140) / (BRANCHES.length - 1);
-  return start + i * gap;
-}
+// Central node
+const C_X = 30;
+const C_W = 130;
+const C_H = 52;
+const C_Y = SVG_H / 2 - C_H / 2;
+
+// Branch nodes
+const B_X = 210;
+const B_W = 158;
+const B_H = 36;
+
+// Sub nodes
+const S_X = 420;
+const S_W = 148;
+const S_H = 26;
+const S_GAP = 32;
+
+// Vertical positions for each branch (evenly spaced)
+const BRANCH_YS = [54, 162, 270, 378, 480];
 
 export function ServicesMindMap() {
   const [openId, setOpenId] = useState<string | null>(BRANCHES[0].id);
@@ -63,54 +75,93 @@ export function ServicesMindMap() {
           </h2>
         </FadeIn>
 
+        {/* Desktop: horizontal SVG mind map */}
         <div className="mt-10 hidden md:block">
           <FadeIn delay={0.08}>
-            <svg className="mx-auto w-full max-w-[900px]" viewBox={`0 0 900 ${H}`}>
+            <svg
+              className="mx-auto w-full"
+              style={{ maxWidth: SVG_W }}
+              viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+              xmlns="http://www.w3.org/2000/svg"
+            >
               {BRANCHES.map((b, i) => {
-                const y = branchY(i);
-                const bx = 280;
-                const by = y;
-                const startX = CX + NW;
-                const startY = CY + NH / 2 - 40 + (i - 2) * 12;
-                const cpx1 = startX + 80;
-                const cpx2 = bx - 60;
+                const bY = BRANCH_YS[i];
+                const bMidY = bY + B_H / 2;
+
+                // Connection from central node right-edge to branch left-edge
+                const cRightX = C_X + C_W;
+                const cMidY = C_Y + C_H / 2;
+                const cp1x = cRightX + 40;
+                const cp2x = B_X - 30;
+
+                // Sub nodes vertical start
+                const totalSubH = b.subs.length * S_GAP - (S_GAP - S_H);
+                const subStartY = bMidY - totalSubH / 2;
+
                 return (
                   <g key={b.id}>
+                    {/* Line: central → branch */}
                     <path
-                      d={`M ${startX} ${startY} C ${cpx1} ${startY}, ${cpx2} ${by}, ${bx} ${by}`}
+                      d={`M ${cRightX} ${cMidY} C ${cp1x} ${cMidY}, ${cp2x} ${bMidY}, ${B_X} ${bMidY}`}
                       fill="none"
                       stroke={b.color}
-                      strokeOpacity={0.55}
+                      strokeOpacity={0.5}
                       strokeWidth={2}
                     />
-                    <rect fill={b.color} height={36} opacity={0.2} rx={8} width={160} x={bx} y={by - 18} />
-                    <text fill={b.color} fontSize={13} fontWeight="700" x={bx + 12} y={by + 5}>
+
+                    {/* Branch node */}
+                    <rect
+                      fill={b.color}
+                      height={B_H}
+                      opacity={0.18}
+                      rx={8}
+                      width={B_W}
+                      x={B_X}
+                      y={bY}
+                    />
+                    <text
+                      dominantBaseline="middle"
+                      fill={b.color}
+                      fontSize={12.5}
+                      fontWeight="700"
+                      x={B_X + 12}
+                      y={bMidY}
+                    >
                       {b.label}
                     </text>
+
+                    {/* Lines: branch → sub nodes */}
                     {b.subs.map((sub, j) => {
-                      const sx = 460;
-                      const sy = by - 36 + j * 26;
+                      const sY = subStartY + j * S_GAP;
+                      const sMidY = sY + S_H / 2;
                       return (
                         <g key={sub}>
                           <line
                             stroke={b.color}
-                            strokeOpacity={0.35}
-                            strokeWidth={1}
-                            x1={bx + 160}
-                            x2={sx}
-                            y1={by}
-                            y2={sy + 10}
+                            strokeOpacity={0.3}
+                            strokeWidth={1.5}
+                            x1={B_X + B_W}
+                            x2={S_X}
+                            y1={bMidY}
+                            y2={sMidY}
                           />
                           <rect
                             fill={b.color}
-                            height={22}
+                            height={S_H}
                             opacity={0.12}
                             rx={6}
-                            width={140}
-                            x={sx}
-                            y={sy}
+                            width={S_W}
+                            x={S_X}
+                            y={sY}
                           />
-                          <text fill={b.color} fontSize={11} fontWeight="600" x={sx + 10} y={sy + 15}>
+                          <text
+                            dominantBaseline="middle"
+                            fill={b.color}
+                            fontSize={11}
+                            fontWeight="600"
+                            x={S_X + 10}
+                            y={sMidY}
+                          >
                             {sub}
                           </text>
                         </g>
@@ -119,21 +170,17 @@ export function ServicesMindMap() {
                   </g>
                 );
               })}
-              <rect
-                fill={BRAND.blue}
-                height={NH}
-                rx={16}
-                width={NW}
-                x={CX}
-                y={CY - NH / 2}
-              />
+
+              {/* Central NELVYON node */}
+              <rect fill={BRAND.blue} height={C_H} rx={12} width={C_W} x={C_X} y={C_Y} />
               <text
+                dominantBaseline="middle"
                 fill="white"
-                fontSize={18}
+                fontSize={16}
                 fontWeight="800"
                 textAnchor="middle"
-                x={CX + NW / 2}
-                y={CY + 6}
+                x={C_X + C_W / 2}
+                y={C_Y + C_H / 2}
               >
                 NELVYON
               </text>
@@ -141,9 +188,10 @@ export function ServicesMindMap() {
           </FadeIn>
         </div>
 
+        {/* Mobile: accordion */}
         <div className="mt-8 space-y-3 md:hidden">
           <div
-            className="mb-6 flex h-20 w-full items-center justify-center rounded-2xl font-bold text-white"
+            className="mb-6 flex h-16 w-full items-center justify-center rounded-2xl font-bold text-white"
             style={{ backgroundColor: BRAND.blue }}
           >
             NELVYON
@@ -159,7 +207,7 @@ export function ServicesMindMap() {
                   type="button"
                 >
                   {b.label}
-                  <ChevronDown className={`h-5 w-5 transition ${isOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-5 w-5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                 </button>
                 {isOpen ? (
                   <div className="space-y-2 border-t border-[#E5E7EB] px-4 py-3">

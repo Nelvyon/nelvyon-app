@@ -27,7 +27,14 @@ export function LandingPage() {
       <LandingNotificationBar />
       <MarketingNavbar active="/" />
       <main className="bg-white">
-        <LandingHero />
+        <div className="relative">
+          <LandingHero />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-28"
+            style={{ background: "linear-gradient(to bottom, transparent 0%, #ffffff 100%)" }}
+          />
+        </div>
         <LandingLogosMarquee />
         <LandingServicesSection />
         <LandingStats />

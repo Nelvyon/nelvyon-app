@@ -188,11 +188,7 @@ export function SaasPage() {
           }}
           rows={SAAS_COMPARE_ROWS}
           title="¿Qué incluye NELVYON SaaS?"
-          totalRow={{
-            replaces: "—",
-            cost: "€10.000+/mes",
-            nelvyon: "Nelvyon desde €97/mes",
-          }}
+          totalCost="€10.000+/mes"
         />
 
         {/* C — 12 features */}

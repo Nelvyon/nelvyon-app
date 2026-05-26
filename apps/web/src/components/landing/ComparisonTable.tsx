@@ -9,7 +9,7 @@ type Props = {
   title: string;
   subtitle?: string;
   rows: CompareRow[];
-  totalRow?: { replaces: string; cost: string; nelvyon: string };
+  totalCost?: string;
   footerNote?: string;
   className?: string;
   headers?: { service: string; replaces: string; cost: string; nelvyon: string };
@@ -19,12 +19,8 @@ export function ComparisonTable({
   title,
   subtitle,
   rows,
-  totalRow = {
-    replaces: "—",
-    cost: "€7.600+/mes",
-    nelvyon: "Nelvyon desde €97/mes",
-  },
-  footerNote = "Todo incluido en tu plan. Sin sorpresas.",
+  totalCost = "€7.600+/mes",
+  footerNote = "Los planes incluyen los servicios según el nivel contratado. Consulta los planes para ver qué incluye cada uno.",
   className = "",
   headers = {
     service: "Servicio",
@@ -67,11 +63,17 @@ export function ComparisonTable({
                       </td>
                     </tr>
                   ))}
-                  <tr className="bg-[#0066FF]/15">
-                    <td className="py-4 pr-4 font-bold text-white">TOTAL SIN NELVYON</td>
-                    <td className="py-4 pr-4 text-white/70">{totalRow.replaces}</td>
-                    <td className="py-4 pr-4 font-semibold text-white">{totalRow.cost}</td>
-                    <td className="py-4 text-center font-bold text-[#00CFFF]">{totalRow.nelvyon}</td>
+                  <tr className="border-b border-white/10 bg-white/5">
+                    <td className="py-4 pr-4 font-bold text-white">TOTAL sin Nelvyon</td>
+                    <td className="py-4 pr-4 text-white/60">—</td>
+                    <td className="py-4 pr-4 font-semibold text-red-300">{totalCost}</td>
+                    <td className="py-4 text-center text-white/40">—</td>
+                  </tr>
+                  <tr className="bg-[#0066FF]/20">
+                    <td className="py-4 pr-4 font-extrabold text-white">TODO CON NELVYON</td>
+                    <td className="py-4 pr-4 text-blue-200/80">{rows.length >= 25 ? "25" : rows.length} servicios incluidos</td>
+                    <td className="py-4 pr-4 text-blue-200/60">—</td>
+                    <td className="py-4 text-center font-extrabold text-[#00CFFF]">Desde €97/mes</td>
                   </tr>
                 </tbody>
               </table>

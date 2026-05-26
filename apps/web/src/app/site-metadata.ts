@@ -8,32 +8,39 @@ const appName = getBrandAppName(brandMode);
 const canonicalBase = getAppBaseUrl();
 
 const nelvyonMarketingDescription =
-  "Plataforma de marketing con inteligencia artificial. Automatiza SEO, ads, contenido y más.";
+  "Agencia de marketing digital con inteligencia artificial. SEO, publicidad, email, webs y automatización desde un solo panel.";
 
 const nelvyonMetadata: Metadata = {
   metadataBase: getAppOrigin(),
   title: {
-    default: "NELVYON — Marketing IA Automatizado",
+    default: "NELVYON — Agencia de Marketing Digital con IA",
     template: "%s | NELVYON",
   },
   description: nelvyonMarketingDescription,
-  keywords: ["marketing IA", "automatización marketing", "SaaS marketing", "agentes IA"],
+  keywords: [
+    "agencia marketing digital",
+    "marketing con IA",
+    "SEO",
+    "Google Ads",
+    "automatización marketing",
+    "SaaS marketing",
+  ],
   authors: [{ name: "NELVYON" }],
   creator: "NELVYON",
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: canonicalBase,
+    url: "https://nelvyon.com",
     siteName: "NELVYON",
-    title: "NELVYON — Marketing IA Automatizado",
+    title: "NELVYON — Agencia de Marketing Digital con IA",
     description: nelvyonMarketingDescription,
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "NELVYON" }],
+    images: [{ url: "/logo.png.png", width: 512, height: 512, alt: "NELVYON" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NELVYON — Marketing IA Automatizado",
+    title: "NELVYON — Agencia de Marketing Digital con IA",
     description: nelvyonMarketingDescription,
-    images: ["/og-image.png"],
+    images: ["/logo.png.png"],
   },
   robots: { index: true, follow: true },
   manifest: "/manifest.json",

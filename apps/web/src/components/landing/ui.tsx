@@ -62,7 +62,7 @@ export function PrimaryButton({
 }) {
   return (
     <Link
-      className={`nelvyon-glow-btn inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:scale-[1.03] ${className}`}
+      className={`nelvyon-glow-btn nelvyon-btn-shimmer inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:scale-[1.03] ${className}`}
       href={href}
       style={{ backgroundColor: BRAND.blue }}
     >
