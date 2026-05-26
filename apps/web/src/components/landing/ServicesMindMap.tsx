@@ -91,8 +91,8 @@ export function ServicesMindMap({
 
   return (
     <section
-      className={`py-16 md:py-24 ${className ?? ""}`}
-      style={{ backgroundColor: className ? undefined : BRAND.bg }}
+      className={`relative z-10 py-16 md:py-24 ${className ?? ""}`}
+      style={{ backgroundColor: "#050816" }}
     >
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <FadeIn>

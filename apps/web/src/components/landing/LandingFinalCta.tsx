@@ -1,10 +1,9 @@
-import { BRAND } from "./shared";
 import { FadeIn } from "./FadeIn";
 import Link from "next/link";
 
 export function LandingFinalCta() {
   return (
-    <section className="py-24 md:py-[100px]" style={{ backgroundColor: BRAND.bgSection }}>
+    <section className="relative z-10 py-24 md:py-[100px]" style={{ backgroundColor: "#0a0f1e" }}>
       <div className="mx-auto max-w-3xl px-4 text-center md:px-6">
         <FadeIn>
           <h2 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">

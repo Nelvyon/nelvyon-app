@@ -22,7 +22,7 @@ const SOCIAL = [
 
 export function LandingFooter() {
   return (
-    <footer className="border-t py-16" style={{ backgroundColor: BRAND.footer, borderColor: BRAND.cardBorder }}>
+    <footer className="relative z-10 border-t py-16" style={{ backgroundColor: "#0a0f1e", borderColor: BRAND.cardBorder }}>
       <div className="mx-auto grid max-w-7xl gap-10 px-4 md:grid-cols-4 md:px-6">
         <div>
           <BrandLogo />

@@ -23,7 +23,7 @@ function CompetitorLogos({ logos }: { logos: { name: string; domain: string }[] 
 
 export function AgencyComparisonTable() {
   return (
-    <section className="px-4 py-16 md:px-6 md:py-24" style={{ backgroundColor: BRAND.bg }}>
+    <section className="relative z-10 px-4 py-16 md:px-6 md:py-24" style={{ backgroundColor: "#050816" }}>
       <div className="mx-auto max-w-6xl">
         <FadeIn>
           <div className="text-center">

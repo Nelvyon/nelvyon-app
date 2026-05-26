@@ -121,10 +121,12 @@
 @layer base {
   html {
     @apply antialiased;
+    background-color: #050816;
   }
 
   body {
-    @apply min-h-screen bg-background font-sans text-foreground;
+    @apply min-h-screen font-sans text-foreground;
+    background-color: #050816;
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }

@@ -20,15 +20,15 @@ export function LandingPage() {
     <div
       className="min-h-screen overflow-x-hidden antialiased"
       style={{
-        backgroundColor: BRAND.bg,
+        backgroundColor: "#050816",
         color: BRAND.textPrimary,
         fontFamily: "var(--font-inter), system-ui, sans-serif",
       }}
     >
       <LandingNotificationBar />
       <MarketingNavbar active="/" />
-      <main style={{ backgroundColor: BRAND.bg }}>
-        <div className="relative">
+      <main className="relative z-0" style={{ backgroundColor: "#050816" }}>
+        <div className="relative z-10">
           <LandingHero />
           <div
             aria-hidden

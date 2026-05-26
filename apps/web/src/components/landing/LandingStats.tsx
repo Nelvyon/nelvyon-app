@@ -13,7 +13,7 @@ const STATS = [
 
 export function LandingStats() {
   return (
-    <section className="py-16 md:py-20" style={{ backgroundColor: BRAND.bgSection }}>
+    <section className="relative z-10 py-16 md:py-20" style={{ backgroundColor: "#0a0f1e" }}>
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
           {STATS.map((s, i) => (

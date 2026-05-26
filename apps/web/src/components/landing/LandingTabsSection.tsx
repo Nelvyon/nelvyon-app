@@ -13,7 +13,7 @@ export function LandingTabsSection() {
   const tab = TABS[active];
 
   return (
-    <section className="py-20 md:py-28" id="plataforma" style={{ backgroundColor: BRAND.bgSection }}>
+    <section className="relative z-10 py-20 md:py-28" id="plataforma" style={{ backgroundColor: "#050816" }}>
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <FadeIn>
           <div className="text-center">

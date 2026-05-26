@@ -20,7 +20,7 @@ export function LandingLogosMarquee() {
   const row = [...GHL_MARQUEE_LOGOS, ...GHL_MARQUEE_LOGOS];
 
   return (
-    <section className="bg-[#FFFFFF] py-10">
+    <section className="relative z-10 py-10" style={{ backgroundColor: "#ffffff" }}>
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <FadeIn>
           <p

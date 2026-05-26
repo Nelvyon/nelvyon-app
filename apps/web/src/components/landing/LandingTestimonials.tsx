@@ -33,7 +33,7 @@ const TESTIMONIALS = [
 
 export function LandingTestimonials() {
   return (
-    <section className="py-16 md:py-24" style={{ backgroundColor: BRAND.bg }}>
+    <section className="relative z-10 py-16 md:py-24" style={{ backgroundColor: "#0a0f1e" }}>
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <FadeIn>
           <div className="text-center">
