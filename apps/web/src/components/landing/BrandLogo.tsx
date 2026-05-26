@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 export function BrandLogo({ href = "/", className = "" }: { href?: string; className?: string }) {
-  const [src, setSrc] = useState("/logo.png");
+  const [src, setSrc] = useState("/logo.png.png");
 
   return (
     <Link className={`relative flex shrink-0 items-center ${className}`} href={href}>

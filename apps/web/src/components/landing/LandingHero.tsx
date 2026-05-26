@@ -28,7 +28,7 @@ export function LandingHero() {
             className="object-contain opacity-[0.04]"
             fill
             priority
-            src="/logo.png"
+            src="/logo.png.png"
             style={{
               filter: "drop-shadow(0 0 80px rgba(0,102,255,0.35))",
             }}

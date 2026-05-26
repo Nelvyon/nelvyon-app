@@ -18,7 +18,7 @@ export function NavbarLogo() {
           height={40}
           onError={() => setImgError(true)}
           priority
-          src="/logo.png"
+          src="/logo.png.png"
           width={140}
         />
       ) : (
