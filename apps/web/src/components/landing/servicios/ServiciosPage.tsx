@@ -62,17 +62,32 @@ function ServiceCard({
 }) {
   const Icon = service.icon;
   return (
-    <button
-      className={`flex min-h-[180px] w-full flex-col rounded-2xl border p-6 text-left transition duration-200 hover:scale-[1.02] hover:border-[#0066FF] hover:shadow-[0_8px_32px_rgba(0,102,255,0.2)] ${centered ? "max-w-md" : ""}`}
-      onClick={onSelect}
+    <div
+      className={`flex min-h-[220px] w-full flex-col rounded-2xl border p-6 transition duration-200 hover:scale-[1.02] hover:border-[#0066FF] hover:shadow-[0_8px_32px_rgba(0,102,255,0.2)] ${centered ? "max-w-md" : ""}`}
       style={{ backgroundColor: BRAND.bgSection, borderColor: BRAND.cardBorder }}
-      type="button"
     >
-      <Icon className="h-10 w-10 text-[#00CFFF]" />
-      <h3 className="mt-4 text-lg font-extrabold text-white">{service.name}</h3>
-      <p className="mt-2 flex-1 text-sm text-[#94A3B8]">{service.desc}</p>
-      <p className="mt-4 text-sm font-bold text-white">Desde €{service.from}/mes</p>
-    </button>
+      <button className="flex flex-1 flex-col text-left" onClick={onSelect} type="button">
+        <Icon className="h-10 w-10 text-[#00CFFF]" />
+        <h3 className="mt-4 text-lg font-extrabold text-white">{service.name}</h3>
+        <p className="mt-2 flex-1 text-sm text-[#94A3B8]">{service.desc}</p>
+        <p className="mt-4 text-sm font-bold text-white">Desde €{service.from}/mes</p>
+      </button>
+      <Link
+        className="mt-auto block w-full rounded-full py-2 text-center font-semibold text-white transition hover:brightness-110"
+        href="/contacto"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          backgroundColor: "#0066ff",
+          borderRadius: 50,
+          padding: "8px 20px",
+          fontSize: 13,
+          fontWeight: 600,
+          marginTop: "auto",
+        }}
+      >
+        Solicitar →
+      </Link>
+    </div>
   );
 }
 
@@ -102,7 +117,19 @@ export function ServiciosPage() {
           <NeuralNetwork />
           <div className="relative z-10 mx-auto max-w-4xl px-4 text-center md:px-6">
             <FadeIn>
-              <h1 className="text-4xl font-extrabold text-white md:text-5xl">25 Servicios de Marketing Digital</h1>
+              <p
+                className="leading-none"
+                style={{
+                  color: "#0066ff",
+                  fontSize: "clamp(80px, 12vw, 140px)",
+                  fontWeight: 900,
+                }}
+              >
+                25
+              </p>
+              <h1 className="mt-2 text-4xl font-extrabold text-white md:text-5xl">
+                Servicios de Marketing Digital
+              </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg text-[#94A3B8]">
                 Cada servicio ejecutado por IA entrenada específicamente. Sin subcontratas. Sin excusas.
               </p>

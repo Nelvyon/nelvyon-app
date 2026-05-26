@@ -27,8 +27,9 @@ export function MarketingNavbar({ active }: { active?: NavActive }) {
       <div
         className="transition-[background,backdrop-filter] duration-300"
         style={{
-          backgroundColor: scrolled ? "rgba(0, 0, 0, 0.92)" : "#000000",
-          backdropFilter: scrolled ? "blur(16px)" : "blur(8px)",
+          backgroundColor: scrolled ? "rgba(5, 8, 22, 0.85)" : "#000000",
+          backdropFilter: scrolled ? "blur(12px)" : "blur(8px)",
+          WebkitBackdropFilter: scrolled ? "blur(12px)" : "blur(8px)",
         }}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6">

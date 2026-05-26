@@ -4,7 +4,90 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { FadeIn } from "./FadeIn";
-import { HeroVideo } from "./HeroVideo";
+
+const DASHBOARD_CARDS = [
+  { value: "127", label: "LEADS HOY", delta: "+18%" },
+  { value: "4.2x", label: "ROAS", delta: "+12%" },
+  { value: "8.4%", label: "CONVERSIÓN", delta: "+3%" },
+  { value: "€24.8k", label: "INGRESOS", delta: "+22%" },
+] as const;
+
+const CHART_HEIGHTS = ["40%", "65%", "45%", "80%", "55%", "90%", "70%"] as const;
+
+function HeroDashboardMock() {
+  return (
+    <div
+      className="w-full"
+      style={{
+        borderRadius: 16,
+        background: "rgba(255,255,255,0.07)",
+        border: "1px solid rgba(255,255,255,0.15)",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        padding: 20,
+        boxShadow: "0 25px 50px rgba(0,0,0,0.4)",
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: "#ff5f57" }} />
+        <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: "#febc2e" }} />
+        <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: "#28c840" }} />
+        <span
+          className="flex-1 text-center"
+          style={{ color: "rgba(255,255,255,0.7)", fontSize: 13 }}
+        >
+          NELVYON Dashboard
+        </span>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-2.5">
+        {DASHBOARD_CARDS.map((card) => (
+          <div
+            key={card.label}
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              borderRadius: 10,
+              padding: 14,
+            }}
+          >
+            <p className="font-bold text-white" style={{ fontSize: 22 }}>
+              {card.value}
+            </p>
+            <p
+              className="mt-1 uppercase"
+              style={{ color: "rgba(255,255,255,0.5)", fontSize: 10 }}
+            >
+              {card.label}
+            </p>
+            <p className="mt-1" style={{ color: "#4ade80", fontSize: 11 }}>
+              {card.delta}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4">
+        <p className="uppercase text-white" style={{ fontSize: 11 }}>
+          Rendimiento semanal
+        </p>
+        <div className="mt-2 flex items-end gap-1.5" style={{ height: 60 }}>
+          {CHART_HEIGHTS.map((h, i) => (
+            <div
+              className="flex-1"
+              key={i}
+              style={{
+                height: h,
+                maxHeight: 60,
+                background: "linear-gradient(to top, #0066ff, #00cfff)",
+                borderRadius: "4px 4px 0 0",
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function LandingHero() {
   return (
@@ -80,16 +163,7 @@ export function LandingHero() {
           </p>
         </FadeIn>
         <FadeIn delay={0.12}>
-          <div className="relative">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-8 rounded-full opacity-40"
-              style={{
-                background: "radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 70%)",
-              }}
-            />
-            <HeroVideo />
-          </div>
+          <HeroDashboardMock />
         </FadeIn>
       </div>
       <div

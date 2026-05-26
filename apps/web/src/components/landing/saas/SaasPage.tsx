@@ -25,7 +25,6 @@ import { SAAS_FAQ } from "../agencyContent";
 import { SaasPlatformComparisonTable } from "../SaasPlatformComparisonTable";
 import { FaqSection } from "../FaqSection";
 import { FadeIn } from "../FadeIn";
-import { HeroVideo } from "../HeroVideo";
 import { LandingFooter } from "../LandingFooter";
 import { MarketingNavbar } from "../MarketingNavbar";
 import { ServicesMindMap } from "../ServicesMindMap";
@@ -86,6 +85,68 @@ const STEPS = [
   { icon: Plug, title: "Conectamos tu negocio", desc: "Integramos canales, datos y herramientas en menos de 24 horas." },
   { icon: Bot, title: "Nelvyon trabaja solo", desc: "Automatizaciones, campañas e informes funcionan en segundo plano." },
 ] as const;
+
+const PANEL_ROWS = [
+  { name: "Meta Ads — Q2", roas: "4.2x", budget: "€2.400" },
+  { name: "Google Search Brand", roas: "3.8x", budget: "€1.800" },
+  { name: "TikTok Awareness", roas: "5.1x", budget: "€950" },
+] as const;
+
+function SaasPanelMock() {
+  return (
+    <div
+      className="w-full"
+      style={{
+        borderRadius: 12,
+        background: "rgba(255,255,255,0.07)",
+        border: "1px solid rgba(255,255,255,0.15)",
+        padding: 16,
+      }}
+    >
+      <div className="flex gap-2">
+        {(["Campañas", "CRM", "Analytics"] as const).map((tab) => {
+          const active = tab === "Campañas";
+          return (
+            <span
+              className="rounded-lg px-4 py-2 text-sm font-semibold"
+              key={tab}
+              style={{
+                backgroundColor: active ? "#0066ff" : "rgba(255,255,255,0.08)",
+                color: "#ffffff",
+              }}
+            >
+              {tab}
+            </span>
+          );
+        })}
+      </div>
+      <div className="mt-4 overflow-hidden rounded-lg border border-white/10">
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-white/10 text-white/50">
+              <th className="px-3 py-2 font-medium">Campaña</th>
+              <th className="px-3 py-2 font-medium">Estado</th>
+              <th className="px-3 py-2 font-medium">ROAS</th>
+              <th className="px-3 py-2 font-medium">Presupuesto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {PANEL_ROWS.map((row) => (
+              <tr className="border-b border-white/5 last:border-0" key={row.name}>
+                <td className="px-3 py-2.5 text-white">{row.name}</td>
+                <td className="px-3 py-2.5 font-medium" style={{ color: "#4ade80" }}>
+                  Activa
+                </td>
+                <td className="px-3 py-2.5 text-white">{row.roas}</td>
+                <td className="px-3 py-2.5 text-white/80">{row.budget}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 function SaasFeatureCard({
   icon: Icon,
@@ -148,7 +209,7 @@ export function SaasPage() {
               </div>
             </FadeIn>
             <FadeIn delay={0.12}>
-              <HeroVideo />
+              <SaasPanelMock />
             </FadeIn>
           </div>
         </section>
@@ -187,12 +248,19 @@ export function SaasPage() {
               {PLANS.map((plan, i) => (
                 <FadeIn delay={i * 0.08} key={plan.name}>
                   <motion.div
-                    className={`relative flex h-full flex-col rounded-2xl border p-8 ${
-                      plan.highlight
-                        ? "border-[#0066FF] shadow-[0_16px_48px_rgba(0,102,255,0.25)] lg:scale-105"
-                        : "border-[#1e293b]"
+                    className={`relative flex h-full flex-col rounded-2xl p-8 ${
+                      plan.highlight ? "" : "border border-[#1e293b]"
                     }`}
-                    style={{ backgroundColor: BRAND.bgSection }}
+                    style={
+                      plan.highlight
+                        ? {
+                            backgroundColor: BRAND.bgSection,
+                            transform: "scale(1.05)",
+                            boxShadow: "0 0 40px rgba(0,102,255,0.4)",
+                            border: "2px solid #0066ff",
+                          }
+                        : { backgroundColor: BRAND.bgSection }
+                    }
                     whileHover={{ y: -4 }}
                   >
                     {plan.highlight ? (
@@ -227,26 +295,6 @@ export function SaasPage() {
               ))}
             </div>
             <p className="mt-8 text-center text-sm text-white/50">Sin permanencia. Cancela cuando quieras.</p>
-          </div>
-        </section>
-
-        {/* F — Video */}
-        <section
-          className="py-20 md:py-28"
-          style={{
-            background: `linear-gradient(180deg, ${BRAND.heroGradEnd} 0%, ${BRAND.bg} 100%)`,
-          }}
-        >
-          <div className="mx-auto max-w-3xl px-4 text-center md:px-6">
-            <FadeIn>
-              <h2 className="text-3xl font-extrabold text-white md:text-4xl">Mira cómo funciona en 2 minutos</h2>
-              <p className="mt-4 text-white/70">Un recorrido por el panel y las automatizaciones principales.</p>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <div className="mx-auto mt-10 max-w-2xl">
-                <HeroVideo />
-              </div>
-            </FadeIn>
           </div>
         </section>
 
