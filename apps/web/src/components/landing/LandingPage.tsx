@@ -8,10 +8,11 @@ import { LandingHero } from "./LandingHero";
 import { LandingHowItWorks } from "./LandingHowItWorks";
 import { LandingLogosMarquee } from "./LandingLogosMarquee";
 import { LandingNotificationBar } from "./LandingNotificationBar";
+import { LandingPartners } from "./LandingPartners";
+import { LandingServicesSection } from "./LandingServicesSection";
 import { LandingStats } from "./LandingStats";
-import { LandingComingSoonCases } from "./LandingComingSoonCases";
+import { LandingSuccessCases } from "./LandingSuccessCases";
 import { MarketingNavbar } from "./MarketingNavbar";
-import { ServicesGrid } from "./ServicesGrid";
 import { BRAND } from "./shared";
 
 export function LandingPage() {
@@ -26,13 +27,14 @@ export function LandingPage() {
     >
       <LandingNotificationBar />
       <MarketingNavbar active="/" />
-      <main>
+      <main className="bg-white">
         <LandingHero />
         <LandingLogosMarquee />
-        <ServicesGrid />
+        <LandingPartners />
+        <LandingServicesSection />
         <LandingStats />
         <LandingHowItWorks />
-        <LandingComingSoonCases />
+        <LandingSuccessCases />
         <FaqSection dark={false} items={AGENCY_FAQ} />
         <LandingFinalCta />
       </main>

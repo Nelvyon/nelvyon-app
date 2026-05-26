@@ -7,7 +7,7 @@ import { FadeIn } from "./FadeIn";
 
 export function LandingStats() {
   return (
-    <section className="nelvyon-section-white bg-white py-16 md:py-24">
+    <section className="bg-white py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <FadeIn>
           <p className="text-center text-sm font-semibold uppercase tracking-widest text-[#6B7280]">

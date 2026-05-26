@@ -15,6 +15,7 @@ import {
   Sparkles,
   Target,
   Workflow,
+  X,
   Zap,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -22,7 +23,8 @@ import { motion } from "framer-motion";
 import { SAAS_FAQ } from "../agencyContent";
 import { FaqSection } from "../FaqSection";
 import { FadeIn } from "../FadeIn";
-import { HeroBackground } from "../effects/HeroBackground";
+import { HeroVideo } from "../HeroVideo";
+import { NeuralNetwork } from "@/components/ui/NeuralNetwork";
 import { TiltCard } from "../effects/TiltCard";
 import { LandingFooter } from "../LandingFooter";
 import { MarketingNavbar } from "../MarketingNavbar";
@@ -82,12 +84,12 @@ const FEATURES = [
 
 const COMPARE_ROWS = [
   { feature: "Precio/mes", nelvyon: "Desde €97", hubspot: "€800+", ghl: "€97+", ac: "€29+", hoot: "€99+" },
-  { feature: "Todo en uno", nelvyon: "✓", hubspot: "Parcial", ghl: "✓", ac: "Email", hoot: "Social" },
-  { feature: "IA integrada", nelvyon: "✓", hubspot: "Add-on", ghl: "—", ac: "—", hoot: "—" },
-  { feature: "Sin equipo necesario", nelvyon: "✓", hubspot: "—", ghl: "Parcial", ac: "—", hoot: "—" },
-  { feature: "Webs incluidas", nelvyon: "✓", hubspot: "—", ghl: "✓", ac: "—", hoot: "—" },
-  { feature: "Chatbot 24/7", nelvyon: "✓", hubspot: "Add-on", ghl: "✓", ac: "—", hoot: "—" },
-  { feature: "Soporte español", nelvyon: "✓", hubspot: "✓", ghl: "EN", ac: "EN", hoot: "EN" },
+  { feature: "Todo en uno", nelvyon: true, hubspot: false, ghl: true, ac: false, hoot: false },
+  { feature: "IA integrada", nelvyon: true, hubspot: false, ghl: false, ac: false, hoot: false },
+  { feature: "Sin equipo necesario", nelvyon: true, hubspot: false, ghl: false, ac: false, hoot: false },
+  { feature: "Webs incluidas", nelvyon: true, hubspot: false, ghl: true, ac: false, hoot: false },
+  { feature: "Chatbot 24/7", nelvyon: true, hubspot: false, ghl: true, ac: false, hoot: false },
+  { feature: "Soporte español", nelvyon: true, hubspot: true, ghl: false, ac: false, hoot: false },
 ] as const;
 
 const STEPS = [
@@ -95,6 +97,15 @@ const STEPS = [
   { icon: Plug, title: "Conectamos tu negocio", desc: "Integramos canales, datos y herramientas en menos de 24 horas." },
   { icon: Bot, title: "Nelvyon trabaja solo", desc: "Automatizaciones, campañas e informes funcionan en segundo plano." },
 ] as const;
+
+function CompareCell({ value }: { value: boolean | string }) {
+  if (typeof value === "string") return <span>{value}</span>;
+  return value ? (
+    <Check className="inline h-5 w-5 text-emerald-400" />
+  ) : (
+    <X className="inline h-5 w-5 text-red-400/80" />
+  );
+}
 
 const container = {
   hidden: { opacity: 0 },
@@ -114,42 +125,46 @@ export function SaasPage() {
     >
       <MarketingNavbar active="/saas" />
       <main>
-        {/* A — Hero */}
-        <section className="relative overflow-hidden py-20 md:py-28">
-          <HeroBackground />
-          <div className="relative mx-auto max-w-4xl px-4 text-center md:px-6">
+        <section
+          className="relative -mt-20 overflow-hidden pt-28 pb-16 md:pt-32 md:pb-24"
+          style={{
+            background: `radial-gradient(ellipse 80% 70% at 50% 45%, #020818 0%, ${BRAND.bg} 72%)`,
+          }}
+        >
+          <NeuralNetwork />
+          <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-4 md:grid-cols-2 md:px-6">
             <FadeIn>
               <span
                 className="inline-flex rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-wider"
                 style={{ borderColor: BRAND.cardBorder, color: BRAND.cyan }}
               >
-                Más de 25 herramientas en una sola plataforma
+                SaaS — Plataforma todo en uno
               </span>
-              <h1 className="nelvyon-title-glow mt-6 text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-6xl">
-                Una plataforma.{" "}
-                <span className="nelvyon-gradient-text">Todo lo que necesita tu negocio.</span>
+              <h1 className="nelvyon-title-glow mt-6 text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-[3.25rem]">
+                La plataforma que gestiona todo tu marketing. Sola.
               </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed" style={{ color: BRAND.textMuted }}>
-                Automatiza marketing, ventas, comunicación y atención al cliente desde un solo panel — sin
-                contratar ni gestionar nada.
+              <p className="mt-6 text-lg leading-relaxed" style={{ color: BRAND.textMuted }}>
+                Un panel. 25 herramientas. Cero gestión manual.
               </p>
-              <div className="mt-10 flex flex-wrap justify-center gap-4">
-                <PrimaryButton className="nelvyon-glow-btn hover:scale-[1.03]" href="/register">
-                  Empezar ahora →
+              <div className="mt-10 flex flex-wrap gap-4">
+                <PrimaryButton className="nelvyon-glow-btn hover:scale-[1.03]" href="#planes">
+                  Ver planes
                 </PrimaryButton>
-                <GhostButton className="hover:scale-[1.03]" href="#planes">
-                  Ver demo
+                <GhostButton className="hover:scale-[1.03]" href="/contacto">
+                  Solicitar demo
                 </GhostButton>
               </div>
+            </FadeIn>
+            <FadeIn delay={0.12}>
+              <HeroVideo />
             </FadeIn>
           </div>
         </section>
 
-        {/* B — Features */}
         <section className="py-20 md:py-28" style={{ backgroundColor: BRAND.bgSoft }}>
           <div className="mx-auto max-w-7xl px-4 md:px-6">
             <FadeIn>
-              <SectionHeading light center title="Qué incluye NELVYON" subtitle="Todo lo que necesitas, sin suscripciones extra." />
+              <SectionHeading light center title="Qué incluye el SaaS" subtitle="12 módulos clave en una sola suscripción." />
             </FadeIn>
             <motion.div
               className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
@@ -161,10 +176,7 @@ export function SaasPage() {
               {FEATURES.map((f) => (
                 <motion.div key={f.title} variants={item}>
                   <TiltCard className="h-full p-6">
-                    <f.icon
-                      className="mb-4 h-10 w-10 transition group-hover:scale-110"
-                      style={{ color: BRAND.blue }}
-                    />
+                    <f.icon className="mb-4 h-10 w-10" style={{ color: BRAND.blue }} />
                     <h3 className="text-lg font-bold text-white">{f.title}</h3>
                     <p className="mt-2 text-sm leading-relaxed" style={{ color: BRAND.textDim }}>
                       {f.desc}
@@ -176,10 +188,8 @@ export function SaasPage() {
           </div>
         </section>
 
-        {/* C — Tree */}
         <NelvyonConnectionTree />
 
-        {/* D — Plans */}
         <section className="py-20 md:py-28" id="planes" style={{ backgroundColor: BRAND.bgAlt }}>
           <div className="mx-auto max-w-7xl px-4 md:px-6">
             <FadeIn>
@@ -189,9 +199,10 @@ export function SaasPage() {
               {PLANS.map((plan, i) => (
                 <FadeIn delay={i * 0.08} key={plan.name}>
                   <motion.div
-                    className={`nelvyon-glass nelvyon-card-hover relative flex h-full flex-col rounded-2xl p-8 ${
+                    className={`nelvyon-glass nelvyon-card-hover relative flex h-full flex-col rounded-2xl p-8 backdrop-blur-md ${
                       plan.highlight ? "ring-2 ring-[#0066FF]" : ""
                     }`}
+                    style={{ backgroundColor: "rgba(10, 15, 30, 0.85)" }}
                     whileHover={{ y: -4 }}
                   >
                     {plan.highlight ? (
@@ -218,7 +229,7 @@ export function SaasPage() {
                     <Link
                       className="nelvyon-glow-btn mt-8 block rounded-full py-3 text-center text-sm font-semibold text-white transition hover:scale-[1.03]"
                       href="/register"
-                      style={{ backgroundColor: plan.highlight ? BRAND.blue : "rgba(0,102,255,0.2)" }}
+                      style={{ backgroundColor: plan.highlight ? BRAND.blue : "rgba(0,102,255,0.25)" }}
                     >
                       Empezar
                     </Link>
@@ -232,7 +243,6 @@ export function SaasPage() {
           </div>
         </section>
 
-        {/* E — Compare */}
         <section className="py-20 md:py-28" style={{ backgroundColor: BRAND.bg }}>
           <div className="mx-auto max-w-6xl px-4 md:px-6">
             <FadeIn>
@@ -244,9 +254,7 @@ export function SaasPage() {
                   <thead>
                     <tr className="border-b border-white/10">
                       <th className="px-4 py-4 text-zinc-500">—</th>
-                      <th className="px-4 py-4 font-bold" style={{ color: BRAND.blue }}>
-                        NELVYON
-                      </th>
+                      <th className="bg-[#0066FF]/10 px-4 py-4 font-bold text-[#00CFFF]">NELVYON</th>
                       <th className="px-4 py-4 text-zinc-500">HubSpot</th>
                       <th className="px-4 py-4 text-zinc-500">GoHighLevel</th>
                       <th className="px-4 py-4 text-zinc-500">ActiveCampaign</th>
@@ -257,13 +265,21 @@ export function SaasPage() {
                     {COMPARE_ROWS.map((row) => (
                       <tr className="border-b border-white/5" key={row.feature}>
                         <td className="px-4 py-3 font-medium text-white">{row.feature}</td>
-                        <td className="px-4 py-3 font-semibold" style={{ color: BRAND.cyan }}>
-                          {row.nelvyon}
+                        <td className="bg-[#0066FF]/5 px-4 py-3 font-semibold text-white">
+                          <CompareCell value={row.nelvyon} />
                         </td>
-                        <td className="px-4 py-3 text-zinc-500">{row.hubspot}</td>
-                        <td className="px-4 py-3 text-zinc-500">{row.ghl}</td>
-                        <td className="px-4 py-3 text-zinc-500">{row.ac}</td>
-                        <td className="px-4 py-3 text-zinc-500">{row.hoot}</td>
+                        <td className="px-4 py-3 text-zinc-500">
+                          <CompareCell value={row.hubspot} />
+                        </td>
+                        <td className="px-4 py-3 text-zinc-500">
+                          <CompareCell value={row.ghl} />
+                        </td>
+                        <td className="px-4 py-3 text-zinc-500">
+                          <CompareCell value={row.ac} />
+                        </td>
+                        <td className="px-4 py-3 text-zinc-500">
+                          <CompareCell value={row.hoot} />
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -273,7 +289,6 @@ export function SaasPage() {
           </div>
         </section>
 
-        {/* F — How it works */}
         <section className="py-20 md:py-28" style={{ backgroundColor: BRAND.bgSoft }}>
           <div className="mx-auto max-w-5xl px-4 md:px-6">
             <FadeIn>
@@ -287,7 +302,7 @@ export function SaasPage() {
             <div className="mt-12 grid gap-8 md:grid-cols-3">
               {STEPS.map((step, i) => (
                 <FadeIn delay={i * 0.1} key={step.title}>
-                  <TiltCard className="text-center p-8">
+                  <TiltCard className="p-8 text-center">
                     <div
                       className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
                       style={{ backgroundColor: "rgba(0,102,255,0.15)" }}
@@ -308,10 +323,8 @@ export function SaasPage() {
           </div>
         </section>
 
-        {/* G — FAQ */}
-        <FaqSection items={SAAS_FAQ} />
+        <FaqSection dark items={SAAS_FAQ} />
 
-        {/* H — CTA */}
         <section
           className="relative overflow-hidden py-20 md:py-28"
           style={{

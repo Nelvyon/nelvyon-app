@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { NeuralNetwork } from "@/components/ui/NeuralNetwork";
 
 import { BRAND } from "./shared";
@@ -10,10 +12,29 @@ import { GhostButton, PrimaryButton } from "./ui";
 export function LandingHero() {
   return (
     <section
-      className="relative overflow-hidden bg-black pt-8 pb-12 md:pt-14 md:pb-20"
-      style={{ backgroundColor: BRAND.bg }}
+      className="relative -mt-20 overflow-hidden pt-28 pb-12 md:pt-32 md:pb-20"
+      style={{
+        background: `radial-gradient(ellipse 80% 70% at 50% 45%, #020818 0%, ${BRAND.bg} 72%)`,
+      }}
     >
       <NeuralNetwork />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center"
+      >
+        <div className="relative h-[min(90vw,520px)] w-[min(90vw,520px)]">
+          <Image
+            alt=""
+            className="object-contain opacity-[0.04]"
+            fill
+            priority
+            src="/logo.png"
+            style={{
+              filter: "drop-shadow(0 0 80px rgba(0,102,255,0.35))",
+            }}
+          />
+        </div>
+      </div>
       <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2 md:gap-14 md:px-6">
         <FadeIn>
           <span

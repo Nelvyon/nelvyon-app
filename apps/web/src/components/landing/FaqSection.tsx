@@ -31,7 +31,7 @@ export function FaqSection({
             {title}
           </h2>
         </FadeIn>
-        <div className="mt-10 divide-y" style={{ borderColor: dark ? "rgba(255,255,255,0.08)" : "#e5e7eb" }}>
+        <div className="mt-10 divide-y divide-[#E5E7EB]">
           {items.map((item, i) => {
             const isOpen = open === i;
             return (

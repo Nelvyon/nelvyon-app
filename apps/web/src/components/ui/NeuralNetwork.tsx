@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 
 type Node = { x: number; y: number; vx: number; vy: number };
 
-const NODE_COUNT = 48;
-const MAX_DIST = 140;
+const NODE_COUNT = 56;
+const MAX_DIST = 160;
 
 export function NeuralNetwork() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -26,8 +26,8 @@ export function NeuralNetwork() {
       nodes = Array.from({ length: NODE_COUNT }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.35,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
       }));
     };
 
@@ -46,7 +46,7 @@ export function NeuralNetwork() {
     };
 
     const draw = () => {
-      pulse += 0.02;
+      pulse += 0.025;
       ctx.clearRect(0, 0, w, h);
 
       for (const n of nodes) {
@@ -60,13 +60,11 @@ export function NeuralNetwork() {
         for (let j = i + 1; j < nodes.length; j++) {
           const a = nodes[i];
           const b = nodes[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const dist = Math.hypot(dx, dy);
+          const dist = Math.hypot(a.x - b.x, a.y - b.y);
           if (dist < MAX_DIST) {
-            const alpha = (1 - dist / MAX_DIST) * (0.2 + 0.2 * Math.sin(pulse + i * 0.3));
+            const alpha = (1 - dist / MAX_DIST) * (0.35 + 0.25 * Math.sin(pulse + i * 0.3));
             ctx.strokeStyle = `rgba(0, 102, 255, ${alpha})`;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1.25;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
@@ -77,10 +75,14 @@ export function NeuralNetwork() {
 
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
-        const glow = 0.6 + 0.2 * Math.sin(pulse + i * 0.5);
+        const glow = 0.75 + 0.2 * Math.sin(pulse + i * 0.5);
         ctx.beginPath();
-        ctx.arc(n.x, n.y, 2.5, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, 3.5, 0, Math.PI * 2);
         ctx.fillStyle = i % 2 === 0 ? `rgba(0, 102, 255, ${glow})` : `rgba(0, 207, 255, ${glow})`;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 102, 255, ${glow * 0.15})`;
         ctx.fill();
       }
 
@@ -99,9 +101,8 @@ export function NeuralNetwork() {
   return (
     <canvas
       aria-hidden
-      className="pointer-events-none absolute inset-0 -z-10 h-full w-full"
+      className="pointer-events-none absolute inset-0 z-0 h-full w-full"
       ref={canvasRef}
-      style={{ background: "transparent" }}
     />
   );
 }

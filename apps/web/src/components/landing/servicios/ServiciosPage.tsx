@@ -17,7 +17,7 @@ export function ServiciosPage() {
     >
       <MarketingNavbar active="/servicios" />
       <main>
-        <section className="border-b border-[#E5E7EB] bg-white py-16 md:py-24">
+        <section className="bg-white py-16 md:py-24">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2 md:px-6">
             <FadeIn>
               <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 md:text-5xl">
