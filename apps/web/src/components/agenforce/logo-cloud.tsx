@@ -1,51 +1,37 @@
 "use client";
-import Image from "next/image";
 import React from "react";
 import { motion } from "motion/react";
-
+import { Container } from "./container";
+const logos = [
+  "Meta Ads", "Google Ads", "WhatsApp Business", "Stripe", "Twilio",
+  "Zapier", "Mailchimp", "TikTok Ads", "Shopify", "HubSpot",
+  "Meta Ads", "Google Ads", "WhatsApp Business", "Stripe", "Twilio",
+  "Zapier", "Mailchimp", "TikTok Ads", "Shopify", "HubSpot",
+];
 export const LogoCloud = () => {
-  const logos = [
-    { title: "Meta Ads", src: "https://assets.aceternity.com/logos/openai.png" },
-    { title: "Google Ads", src: "https://assets.aceternity.com/logos/oracle.png" },
-    { title: "WhatsApp", src: "https://assets.aceternity.com/logos/granola.png" },
-    { title: "Stripe", src: "https://assets.aceternity.com/logos/characterai.png" },
-    { title: "Twilio", src: "https://assets.aceternity.com/logos/portola.png" },
-    { title: "Zapier", src: "https://assets.aceternity.com/logos/hello-patient.png" },
-  ];
   return (
-    <section className="pb-10 md:pb-10">
-      <h2 className="text-neutral-600 font-medium dark:text-neutral-400 text-lg text-center max-w-xl mx-auto">
-        Conectado con las herramientas que ya usas.
-      </h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 max-w-3xl mx-auto mt-10">
-        {logos.map((logo, index) => (
-          <motion.div
-            initial={{
-              y: -10,
-              opacity: 0,
-              filter: "blur(10px)",
-            }}
-            whileInView={{
-              y: 0,
-              opacity: 1,
-              filter: "blur(0px)",
-            }}
-            transition={{
-              duration: 0.5,
-              ease: "easeOut",
-              delay: index * 0.1,
-            }}
-            key={logo.title}
-          >
-            <Image
-              src={logo.src}
-              width={100}
-              height={100}
-              alt={logo.title}
-              className="size-20 object-contain mx-auto dark:filter dark:invert"
-            />
-          </motion.div>
-        ))}
+    <section className="py-16 bg-[#f8faff] overflow-hidden">
+      <Container>
+        <p style={{ textAlign: "center", fontSize: "13px", fontWeight: 600, color: "#6b7a99", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "32px" }}>
+          Conectado con las herramientas que ya usas
+        </p>
+      </Container>
+      <div style={{ display: "flex", overflow: "hidden", position: "relative" }}>
+        <motion.div
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          style={{ display: "flex", gap: "48px", alignItems: "center", whiteSpace: "nowrap" }}
+        >
+          {logos.map((logo, i) => (
+            <div key={i} style={{
+              padding: "10px 24px", background: "#ffffff", border: "1px solid #e8eef8",
+              borderRadius: "8px", fontSize: "13px", fontWeight: 600, color: "#07122a",
+              boxShadow: "0 2px 8px rgba(7,18,42,0.06)", flexShrink: 0
+            }}>
+              {logo}
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

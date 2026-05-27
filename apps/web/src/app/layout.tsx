@@ -81,7 +81,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const faviconHref = whitelabelInitial?.favicon_url?.trim() || "/favicon.ico";
 
   return (
-    <html lang={locale} suppressHydrationWarning className="dark scroll-smooth">
+    <html lang={locale} suppressHydrationWarning className="scroll-smooth">
       <head>
         <link href={faviconHref} rel="icon" />
         <link href="/manifest.json" rel="manifest" />
@@ -104,11 +104,11 @@ if ('serviceWorker' in navigator) {
         />
       </head>
       <body className={`${inter.variable} ${manrope.variable} ${dmSans.variable} font-sans antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <PostHogProvider>
             <LocaleProvider initialLocale={locale} initialMessages={messages}>
               <AppProviders whitelabelInitial={whitelabelInitial}>
-                <main className="bg-background text-foreground min-h-screen">{children}</main>
+                <main className="min-h-screen bg-white text-[#07122a]">{children}</main>
               </AppProviders>
             </LocaleProvider>
             <CookieBanner />

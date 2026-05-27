@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 
-import { SaasPage } from "@/components/landing/saas/SaasPage";
+import { NelvyonSaasPage } from "@/components/nelvyon-marketing/pages/saas-page";
 
 export const metadata: Metadata = {
-  title: "NELVYON SaaS — La plataforma que gestiona todo tu marketing",
-  description:
-    "Un panel. 25 herramientas. Cero gestión manual. Planes desde €97/mes.",
+  title: "NELVYON SaaS — La plataforma para agencias de marketing",
+  description: "Un panel. 25 herramientas. Agentes expertos. Planes desde €97/mes con 14 días gratis.",
 };
 
 export default function SaasRoutePage() {
-  return <SaasPage />;
+  return <NelvyonSaasPage />;
 }

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import { NosotrosPage } from "@/components/landing/nosotros/NosotrosPage";
+import { NelvyonNosotrosPage } from "@/components/nelvyon-marketing/pages/nosotros-page";
 
 export const metadata: Metadata = {
   title: "Nosotros — NELVYON",
-  description: "Historia, valores y visión de NELVYON. Agencia de marketing digital con tecnología IA.",
+  description: "Misión, visión y valores de NELVYON. Plataforma para agencias de marketing digital.",
 };
 
 export default function NosotrosRoutePage() {
-  return <NosotrosPage />;
+  return <NelvyonNosotrosPage />;
 }

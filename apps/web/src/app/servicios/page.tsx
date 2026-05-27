@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { ServiciosPage } from "@/components/landing/servicios/ServiciosPage";
+import { NelvyonServiciosPage } from "@/components/nelvyon-marketing/pages/servicios-page";
 
 export const metadata: Metadata = {
-  title: "Servicios — Agencia marketing digital NELVYON",
+  title: "Servicios — NELVYON",
   description:
-    "SEO, Google Ads, Meta Ads, email marketing, automatización y webs. Precios desde €197/mes. Resultados medibles.",
+    "CRM, email marketing, automatizaciones, pagos, funnels, analíticas, WhatsApp y gestión de anuncios para agencias.",
 };
 
 export default function ServiciosRoutePage() {
-  return <ServiciosPage />;
+  return <NelvyonServiciosPage />;
 }

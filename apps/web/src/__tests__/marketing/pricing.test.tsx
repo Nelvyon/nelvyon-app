@@ -12,7 +12,7 @@ import esMessages from "../../../messages/es.json";
 function renderWithProviders(ui: React.ReactElement) {
   return render(
     <NextIntlClientProvider locale="es" messages={esMessages}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
         {ui}
       </ThemeProvider>
     </NextIntlClientProvider>,
@@ -29,13 +29,13 @@ describe("marketing pricing and landing", () => {
 
   it("Plan 2 muestra precio Growth 297€", () => {
     renderWithProviders(<PricingPage />);
-    expect(screen.getByText(/297€/)).toBeInTheDocument();
+    expect(screen.getByText(/€297/)).toBeInTheDocument();
   });
 
   it("Precios en euros en vista mensual", () => {
     const { container } = renderWithProviders(<PricingPage />);
-    expect(container.textContent).toMatch(/97€/);
-    expect(container.textContent).toMatch(/797€/);
+    expect(container.textContent).toMatch(/€97/);
+    expect(container.textContent).toMatch(/€797/);
   });
 
   it("CTA de planes enlazan a registro o contacto", () => {
