@@ -1,165 +1,57 @@
-"use client";
-
-import Image from "next/image";
-
-import { FadeIn } from "./FadeIn";
-import { ComparisonStatusCell } from "./ComparisonStatusCell";
-import type { StatusCell } from "./comparisonData";
-import { SectionBadge } from "./ui";
-
-type AgencyRow = {
-  service: string;
-  large: StatusCell;
-  medium: StatusCell;
-  freelance: StatusCell;
-};
-
-const AGENCY_ROWS: AgencyRow[] = [
-  { service: "SEO", large: "yes", medium: "yes", freelance: "warn" },
-  { service: "SEM / Google Ads", large: "yes", medium: "yes", freelance: "warn" },
-  { service: "Meta Ads", large: "yes", medium: "yes", freelance: "warn" },
-  { service: "Email Marketing", large: "yes", medium: "yes", freelance: "yes" },
-  { service: "Content Marketing", large: "yes", medium: "yes", freelance: "warn" },
-  { service: "Social Media", large: "yes", medium: "yes", freelance: "yes" },
-  { service: "Web & Landing", large: "yes", medium: "warn", freelance: "warn" },
-  { service: "Video Marketing", large: "yes", medium: "warn", freelance: "no" },
-  { service: "CRO", large: "yes", medium: "warn", freelance: "no" },
-  { service: "Automatización IA", large: "warn", medium: "warn", freelance: "no" },
-  { service: "Reputación / PR", large: "yes", medium: "warn", freelance: "no" },
-  { service: "WhatsApp Marketing", large: "warn", medium: "warn", freelance: "no" },
-  { service: "TikTok Ads", large: "yes", medium: "warn", freelance: "no" },
-  { service: "Análisis & Reporting", large: "yes", medium: "yes", freelance: "warn" },
-];
-
-const COLUMNS = [
-  { key: "service" as const, label: "SERVICIO", sticky: true },
-  { key: "large" as const, label: "Agencia grande" },
-  { key: "medium" as const, label: "Agencia mediana" },
-  { key: "freelance" as const, label: "Freelance" },
-  { key: "nelvyon" as const, label: "NELVYON", highlight: true },
-];
-
-const thStyle = {
-  fontSize: 12,
-  letterSpacing: "1px",
-  textTransform: "uppercase" as const,
-};
-
+"use client"
+const rows:[string,string,string,string,string][] = [
+  ["SEO & Posicionamiento","✅","⚠️","❌","✅"],
+  ["Google Ads / SEM","✅","⚠️","⚠️","✅"],
+  ["Meta Ads","✅","✅","⚠️","✅"],
+  ["TikTok Ads","✅","⚠️","❌","✅"],
+  ["Email Marketing","✅","⚠️","⚠️","✅"],
+  ["Content Marketing","✅","⚠️","✅","✅"],
+  ["Social Media","✅","✅","⚠️","✅"],
+  ["Web & Landings","✅","⚠️","⚠️","✅"],
+  ["Video Marketing","✅","❌","❌","✅"],
+  ["Automatización IA","❌","❌","❌","✅"],
+  ["WhatsApp Marketing","⚠️","❌","❌","✅"],
+  ["CRO & Optimización","✅","⚠️","❌","✅"],
+  ["Reputación & PR","✅","⚠️","❌","✅"],
+  ["Analytics & Reporting","✅","⚠️","⚠️","✅"],
+]
 export function AgencyComparisonTable() {
   return (
-    <section className="relative z-10 px-4 py-16 md:px-6 md:py-24" style={{ backgroundColor: "#071020" }}>
-      <div className="mx-auto max-w-6xl">
-        <FadeIn>
-          <div className="text-center">
-            <SectionBadge>COMPARATIVA</SectionBadge>
-            <h2 className="mt-4 text-2xl font-extrabold text-white md:text-4xl">
-              ¿Por qué Nelvyon supera a cualquier agencia?
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-base text-[#94A3B8]">
-              Calidad de agencia global. Velocidad de startup. Precio de freelancer.
-            </p>
-          </div>
-        </FadeIn>
-
-        <FadeIn delay={0.08}>
-          <div className="mt-10 overflow-x-auto rounded-2xl border border-white/10">
-            <table className="w-full min-w-[720px] border-collapse text-left">
-              <thead className="sticky top-0 z-20">
-                <tr className="border-b border-white/10">
-                  {COLUMNS.map((col) => (
-                    <th
-                      className={`px-4 py-4 font-bold text-white ${
-                        col.sticky ? "sticky left-0 z-30 text-left" : "text-center"
-                      } ${col.highlight ? "border-l-2 border-[#0066ff]" : ""}`}
-                      key={col.key}
-                      style={{
-                        ...thStyle,
-                        ...(col.highlight
-                          ? { backgroundColor: "#0066ff" }
-                          : col.sticky
-                            ? { backgroundColor: "#0a1628" }
-                            : { backgroundColor: "#0a1628" }),
-                      }}
-                    >
-                      {col.highlight ? (
-                        <>
-                          <Image alt="NELVYON" className="mx-auto mb-1" height={28} src="/logo.png.png" width={84} />
-                          {col.label}
-                        </>
-                      ) : (
-                        col.label
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {AGENCY_ROWS.map((row) => (
-                  <tr className="border-b border-white/5" key={row.service}>
-                    <td
-                      className="sticky left-0 z-10 px-4 py-3 font-semibold text-white"
-                      style={{ backgroundColor: "#071020", fontSize: 13, letterSpacing: "1px" }}
-                    >
-                      {row.service}
-                    </td>
-                    <td className="px-4 py-3 text-center" style={{ fontSize: 13 }}>
-                      <ComparisonStatusCell value={row.large} />
-                    </td>
-                    <td className="px-4 py-3 text-center" style={{ fontSize: 13 }}>
-                      <ComparisonStatusCell value={row.medium} />
-                    </td>
-                    <td className="px-4 py-3 text-center" style={{ fontSize: 13 }}>
-                      <ComparisonStatusCell value={row.freelance} />
-                    </td>
-                    <td
-                      className="border-l-2 border-[#0066ff] px-4 py-3 text-center"
-                      style={{ backgroundColor: "rgba(0,102,255,0.1)", fontSize: 13 }}
-                    >
-                      <ComparisonStatusCell value="yes" />
-                    </td>
-                  </tr>
+    <section style={{ background:"#071020", padding:"80px 24px", boxSizing:"border-box" }}>
+      <style>{`@media(max-width:700px){.cmp-table{font-size:12px !important;}.cmp-table th,.cmp-table td{padding:10px 8px !important;}.price-nv{font-size:32px !important;}}`}</style>
+      <div style={{ maxWidth:"960px", margin:"0 auto", textAlign:"center" }}>
+        <span style={{ display:"inline-block", background:"rgba(0,102,255,0.2)", color:"#60a5fa", border:"1px solid rgba(0,102,255,0.4)", borderRadius:"50px", padding:"6px 16px", fontSize:"12px", fontWeight:600, letterSpacing:"1px", fontFamily:"Inter,sans-serif", textTransform:"uppercase", marginBottom:"16px" }}>COMPARATIVA</span>
+        <h2 style={{ color:"#ffffff", fontSize:"clamp(28px,4vw,44px)", fontWeight:800, margin:"16px 0 12px", fontFamily:"Inter,sans-serif", lineHeight:1.15 }}>¿Por qué NELVYON supera a cualquier agencia?</h2>
+        <p style={{ color:"#94a3b8", fontSize:"18px", margin:"12px 0 48px", fontFamily:"Inter,sans-serif", lineHeight:1.6 }}>Calidad de agencia global. Velocidad de startup. Precio de freelancer.</p>
+        <div style={{ overflowX:"auto" }}>
+          <table className="cmp-table" style={{ width:"100%", borderCollapse:"collapse", fontFamily:"Inter,sans-serif" }}>
+            <thead>
+              <tr>
+                {["SERVICIO","Agencia grande","Agencia mediana","Freelance","NELVYON"].map((h,i)=>(
+                  <th key={h} style={{ padding:"16px", fontSize:"12px", fontWeight:700, letterSpacing:"1.5px", textTransform:"uppercase", color:i===4?"#ffffff":"#94a3b8", textAlign:i===0?"left":"center", background:i===4?"#0066ff":"transparent", borderRadius:i===4?"12px 12px 0 0":undefined }}>{h}</th>
                 ))}
-                <tr className="border-t border-white/15">
-                  <td
-                    className="sticky left-0 z-10 px-4 py-5 font-bold text-white"
-                    style={{
-                      backgroundColor: "#071020",
-                      fontSize: 12,
-                      letterSpacing: "1px",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    PRECIO TOTAL ESTIMADO
-                  </td>
-                  <td className="px-4 py-5 text-center font-semibold text-[#EF4444]" style={{ fontSize: 13 }}>
-                    €2.000-15.000/mes
-                  </td>
-                  <td className="px-4 py-5 text-center font-semibold text-[#EF4444]" style={{ fontSize: 13 }}>
-                    €2.000-15.000/mes
-                  </td>
-                  <td className="px-4 py-5 text-center font-semibold text-[#EF4444]" style={{ fontSize: 13 }}>
-                    €2.000-15.000/mes
-                  </td>
-                  <td
-                    className="border-l-2 border-[#0066ff] px-4 py-5 text-center"
-                    style={{ backgroundColor: "rgba(0,102,255,0.1)" }}
-                  >
-                    <span
-                      className="block font-black text-white"
-                      style={{ fontSize: 48, fontWeight: 900, lineHeight: 1 }}
-                    >
-                      €97/mes
-                    </span>
-                  </td>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(([svc,c1,c2,c3,c4],ri)=>(
+                <tr key={svc} style={{ background:ri%2!==0?"rgba(255,255,255,0.03)":"transparent" }}>
+                  <td style={{ padding:"14px 16px", fontSize:"14px", borderBottom:"1px solid rgba(255,255,255,0.05)", textAlign:"left", color:"#e2e8f0", fontWeight:500 }}>{svc}</td>
+                  {[c1,c2,c3].map((v,ci)=><td key={ci} style={{ padding:"14px 16px", fontSize:"16px", borderBottom:"1px solid rgba(255,255,255,0.05)", textAlign:"center", color:"#e2e8f0" }}>{v}</td>)}
+                  <td style={{ padding:"14px 16px", fontSize:"16px", borderBottom:"1px solid rgba(255,255,255,0.05)", textAlign:"center", color:"#e2e8f0", background:"rgba(0,102,255,0.08)" }}>{c4}</td>
                 </tr>
-              </tbody>
-            </table>
-            <p className="px-4 py-6 text-center text-xs text-[#94A3B8]">
-              ✅ Incluido · ⚠️ Limitado · ❌ No incluido
-            </p>
-          </div>
-        </FadeIn>
+              ))}
+              <tr style={{ background:"rgba(255,255,255,0.05)", borderTop:"2px solid rgba(255,255,255,0.1)" }}>
+                <td style={{ padding:"14px 16px", fontSize:"14px", color:"#ffffff", fontWeight:700, textTransform:"uppercase", textAlign:"left" }}>PRECIO TOTAL ESTIMADO</td>
+                {["€2.000–15.000/mes","€800–4.000/mes","€300–2.000/mes"].map(p=><td key={p} style={{ padding:"14px 16px", fontSize:"14px", color:"#f87171", textAlign:"center", fontWeight:600 }}>{p}</td>)}
+                <td style={{ padding:"14px 16px", textAlign:"center", background:"rgba(0,102,255,0.08)" }}>
+                  <span className="price-nv" style={{ fontSize:"48px", fontWeight:900, color:"#ffffff", lineHeight:1, fontFamily:"Inter,sans-serif", display:"block" }}>€97/mes</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style={{ color:"#64748b", fontSize:"14px", textAlign:"center", marginTop:"24px", fontFamily:"Inter,sans-serif" }}>Sin permanencia · Cancela cuando quieras · Respuesta en 48h</p>
       </div>
     </section>
-  );
+  )
 }
