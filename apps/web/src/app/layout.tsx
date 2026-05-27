@@ -103,11 +103,18 @@ if ('serviceWorker' in navigator) {
           suppressHydrationWarning
         />
       </head>
-      <body className={`${inter.variable} ${dmSans.variable} font-sans antialiased`}>
+      <body
+        className={`${inter.variable} ${dmSans.variable} font-sans antialiased`}
+        style={{ background: '#ffffff' }}
+      >
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} suppressHydrationWarning />
         <PostHogProvider>
           <LocaleProvider initialLocale={locale} initialMessages={messages}>
-            <AppProviders whitelabelInitial={whitelabelInitial}>{children}</AppProviders>
+            <AppProviders whitelabelInitial={whitelabelInitial}>
+              <div style={{ maxWidth: '1440px', margin: '0 auto', background: '#ffffff' }}>
+                {children}
+              </div>
+            </AppProviders>
           </LocaleProvider>
           <CookieBanner />
           <ChatbotWidget />
