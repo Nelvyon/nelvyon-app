@@ -8,9 +8,11 @@ import { Button } from "@/components/agenforce/ui/button";
 import Link from "next/link";
 import { IconBrandGoogle, IconBrandGithub } from "@tabler/icons-react";
 
-export default function LoginPage() {
+export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,9 +24,11 @@ export default function LoginPage() {
         <Container className="max-w-md w-full">
           <div className="flex flex-col items-center">
             <Heading as="h1" className="text-center text-2xl md:text-3xl lg:text-4xl">
-              Bienvenido de nuevo
+              Crea tu cuenta
             </Heading>
-            <Subheading className="text-center mt-2">Inicia sesión para continuar en NELVYON</Subheading>
+            <Subheading className="text-center mt-2">
+              Empieza tu prueba gratis de 14 días en NELVYON
+            </Subheading>
           </div>
 
           <div className="mt-8 space-y-4">
@@ -55,10 +59,24 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
-              >
+              <label htmlFor="name" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                Nombre completo
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm"
+                placeholder="Tu nombre"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                 Email
               </label>
               <input
@@ -75,45 +93,68 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                >
-                  Contraseña
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
-                >
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+              >
+                Contraseña
+              </label>
               <input
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm"
-                placeholder="Tu contraseña"
+                placeholder="Crea una contraseña"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+              >
+                Confirmar contraseña
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm"
+                placeholder="Repite tu contraseña"
               />
             </div>
 
             <Button type="submit" className="w-full py-3 h-auto">
-              Iniciar sesión
+              Crear cuenta
             </Button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-neutral-500">
-            ¿No tienes cuenta?{" "}
+          <p className="mt-6 text-center text-xs text-neutral-500">
+            Al registrarte aceptas nuestros{" "}
+            <Link href="/terms" className="underline hover:text-neutral-700 dark:hover:text-neutral-300">
+              Términos
+            </Link>{" "}
+            y{" "}
+            <Link href="/privacy" className="underline hover:text-neutral-700 dark:hover:text-neutral-300">
+              Privacidad
+            </Link>
+          </p>
+
+          <p className="mt-6 text-center text-sm text-neutral-500">
+            ¿Ya tienes cuenta?{" "}
             <Link
-              href="/registro"
+              href="/login"
               className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
             >
-              Regístrate gratis
+              Iniciar sesión
             </Link>
           </p>
         </Container>

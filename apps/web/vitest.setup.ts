@@ -31,6 +31,22 @@ class MockResizeObserver {
 
 vi.stubGlobal("ResizeObserver", MockResizeObserver);
 
+if (typeof window !== "undefined") {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes("dark"),
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
 vi.mock("next/font/google", () => {
   const mockFont = () => ({
     className: "mock-font",

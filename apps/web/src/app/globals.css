@@ -1,331 +1,93 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/**
- * NELVYON design tokens — single source for light / dark.
- * Tailwind maps semantic names to hsl(var(--token) / <alpha-value>).
- */
+@import "tailwindcss";
+@import "tw-animate-css";
+@custom-variant dark (&:where(.dark, .dark *));
 :root {
-  /* NELVYON brand — electric blue #0066FF, cyan #00CFFF (not GHL blue) */
-  --nelvyon-blue: #0066ff;
-  --nelvyon-cyan: #00cfff;
-  --nelvyon-bg: #000000;
-  --nelvyon-bg-soft: #0a0a0a;
-  --nelvyon-bg-alt: #050510;
-  --nelvyon-text-muted: #e0e0e0;
-  --nelvyon-card: #0a0f1e;
-  --nelvyon-white: #ffffff;
-  --nelvyon-text-on-white: #111827;
-  --nelvyon-text-gray: #6b7280;
-  --nelvyon-border-light: #e5e7eb;
-  --nelvyon-section-gray: #f9fafb;
-
-  --font-sans: "Inter", var(--font-inter), var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.625rem;
-  --radius-xl: 0.75rem;
-
-  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.05);
-  --shadow-elevated: 0 4px 6px -1px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.06);
-
-  --background: 210 20% 98%;
-  --foreground: 222 47% 11%;
-
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-
-  --muted: 214 32% 94%;
-  /* ~4.6:1 on white for secondary copy */
-  --muted-foreground: 215 18% 36%;
-
-  --border: 214 24% 82%;
-  --input: 214 24% 82%;
-  --ring: 211 100% 50%;
-
-  --primary: 211 100% 50%;
-  --primary-foreground: 210 40% 98%;
-
-  --secondary: 214 32% 92%;
-  --secondary-foreground: 222 47% 11%;
-
-  --accent: 214 32% 93%;
-  --accent-foreground: 222 47% 11%;
-
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 100%;
-
-  --warning: 38 92% 50%;
-  --warning-foreground: 26 88% 12%;
-
-  --success: 142 76% 32%;
-  --success-foreground: 144 65% 12%;
-
-  --link: 221 83% 40%;
-  --link-hover: 224 76% 38%;
-
-  --overlay: 222 47% 11%;
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.08 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.08 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.08 0.02 250);
+  --primary: oklch(0.35 0.12 250);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.08 0.02 250);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.50 0.04 250);
+  --accent: oklch(0.55 0.18 240);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.91 0.02 240);
+  --input: oklch(0.91 0.02 240);
+  --ring: oklch(0.55 0.18 240);
+  --nelvyon-navy: #07122a;
+  --nelvyon-blue: #1a7fc4;
+  --nelvyon-sky: #4db8e8;
+  --nelvyon-light: #a8dff5;
+  --shadow-brand-var:
+    -82px 54px 27px 0px rgba(7,18,42,0.01),
+    -52px 35px 25px 0px rgba(7,18,42,0.04),
+    -29px 19px 21px 0px rgba(7,18,42,0.15),
+    -13px 9px 16px 0px rgba(7,18,42,0.25),
+    -3px 2px 9px 0px rgba(7,18,42,0.29);
 }
-
 .dark {
-  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.35);
-  --shadow-elevated: 0 10px 15px -3px rgb(0 0 0 / 0.45), 0 4px 6px -4px rgb(0 0 0 / 0.35);
-
-  --background: 224 71% 4%;
-  --foreground: 213 31% 91%;
-
-  --card: 222 42% 10%;
-  --card-foreground: 213 31% 91%;
-
-  --popover: 222 47% 8%;
-  --popover-foreground: 213 31% 91%;
-
-  --muted: 217 33% 14%;
-  /* Brighter secondary on dark canvas */
-  --muted-foreground: 215 18% 72%;
-
-  --border: 217 22% 24%;
-  --input: 217 22% 24%;
-  --ring: 211 100% 50%;
-
-  --primary: 211 100% 50%;
-  --primary-foreground: 222 47% 11%;
-
-  --secondary: 217 33% 16%;
-  --secondary-foreground: 213 31% 91%;
-
-  --accent: 217 33% 17%;
-  --accent-foreground: 213 31% 91%;
-
-  --destructive: 0 62% 45%;
-  --destructive-foreground: 0 0% 98%;
-
-  --warning: 38 92% 50%;
-  /* Light copy on low-opacity amber over dark canvas */
-  --warning-foreground: 43 96% 93%;
-
-  --success: 142 70% 45%;
-  --success-foreground: 144 55% 94%;
-
-  --link: 213 94% 68%;
-  --link-hover: 217 91% 75%;
-
-  --overlay: 0 0% 0%;
+  --background: oklch(0.08 0.02 250);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.12 0.03 250);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.12 0.03 250);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.65 0.18 220);
+  --primary-foreground: oklch(0.08 0.02 250);
+  --secondary: oklch(0.18 0.04 250);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.18 0.04 250);
+  --muted-foreground: oklch(0.60 0.06 240);
+  --accent: oklch(0.65 0.18 220);
+  --accent-foreground: oklch(0.08 0.02 250);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.65 0.18 220);
+  --shadow-brand-var:
+    -82px 54px 27px 0px rgba(77,184,232,0.01),
+    -52px 35px 25px 0px rgba(77,184,232,0.04),
+    -29px 19px 21px 0px rgba(77,184,232,0.08),
+    -13px 9px 16px 0px rgba(77,184,232,0.12),
+    -3px 2px 9px 0px rgba(77,184,232,0.15);
 }
-
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --shadow-brand: var(--shadow-brand-var);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-inter: var(--font-inter);
+  --font-display: var(--font-manrope);
+  --animate-orbit: orbit var(--orbit-duration) linear infinite;
+  @keyframes orbit {
+    0% { transform: rotate(var(--initial-position, 0deg)) translate(var(--translate-position)) rotate(calc(-1 * var(--initial-position, 0deg))); }
+    100% { transform: rotate(calc(var(--initial-position, 0deg) + 360deg)) translate(var(--translate-position)) rotate(calc(-1 * (var(--initial-position, 0deg) + 360deg))); }
+  }
+}
 @layer base {
-  html {
-    @apply antialiased;
-    background-color: #050816;
-  }
-
-  body {
-    @apply min-h-screen font-sans text-foreground;
-    background-color: #050816;
-    font-family: "Inter", var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  }
-
-  h1,
-  h2 {
-    font-weight: 800;
-  }
-}
-
-@keyframes nelvyon-marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.nelvyon-marquee {
-  animation: nelvyon-marquee 40s linear infinite;
-}
-
-/* NELVYON marketing v3 — glass, glow, particles, grid */
-.nelvyon-glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.nelvyon-glow-btn {
-  box-shadow: 0 0 20px rgba(0, 102, 255, 0.45), 0 0 40px rgba(0, 102, 255, 0.15);
-  animation: nelvyon-glow-pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes nelvyon-glow-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 16px rgba(0, 102, 255, 0.4), 0 0 32px rgba(0, 102, 255, 0.12);
-  }
-  50% {
-    box-shadow: 0 0 28px rgba(0, 102, 255, 0.65), 0 0 48px rgba(0, 207, 255, 0.2);
-  }
-}
-
-.nelvyon-card-hover {
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-
-.nelvyon-card-hover:hover {
-  border-color: rgba(0, 102, 255, 0.4) !important;
-  box-shadow: 0 0 24px rgba(0, 102, 255, 0.25);
-}
-
-.nelvyon-title-glow {
-  text-shadow: 0 0 40px rgba(0, 102, 255, 0.35), 0 0 80px rgba(0, 207, 255, 0.12);
-}
-
-.nelvyon-gradient-text {
-  background: linear-gradient(90deg, #0066ff, #00cfff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.nelvyon-grid-bg {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-
-.nelvyon-particles {
-  background-image:
-    radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1px 1px at 80% 40%, rgba(0, 102, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 40% 80%, rgba(0, 207, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.25), transparent);
-  background-size: 200% 200%;
-  animation: nelvyon-particles-drift 25s ease-in-out infinite;
-}
-
-@keyframes nelvyon-particles-drift {
-  0%,
-  100% {
-    background-position: 0% 0%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-}
-
-.nelvyon-hero-sphere {
-  width: min(420px, 80vw);
-  height: min(420px, 80vw);
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(0, 207, 255, 0.15), transparent 50%),
-    radial-gradient(circle at 70% 70%, rgba(0, 102, 255, 0.2), transparent 55%);
-  filter: blur(40px);
-  animation: nelvyon-sphere-float 12s ease-in-out infinite;
-}
-
-@keyframes nelvyon-sphere-float {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -48%) scale(1.05);
-  }
-}
-
-.nelvyon-navbar {
-  background: #000000;
-}
-
-.nelvyon-nav-link-white {
-  transition: color 0.2s ease;
-}
-
-.nelvyon-chat-panel {
-  background: rgba(10, 15, 30, 0.92);
-  backdrop-filter: blur(24px);
-}
-
-.nelvyon-section-white {
-  color: var(--nelvyon-text-on-white);
-}
-
-.nelvyon-service-card {
-  background: var(--nelvyon-white);
-  border-color: var(--nelvyon-border-light);
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-.nelvyon-cta-btn {
-  background: linear-gradient(135deg, #0066FF 0%, #00CFFF 100%);
-  box-shadow: 0 4px 24px rgba(0, 102, 255, 0.35);
-}
-.nelvyon-cta-btn:hover {
-  box-shadow: 0 0 40px rgba(0, 102, 255, 0.5);
-}
-
-.nelvyon-slogan-line {
-  display: block;
-  text-align: center;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-
-/* ── Shimmer animation for CTA buttons ── */
-@keyframes nelvyon-shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-.nelvyon-btn-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.nelvyon-btn-shimmer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.25) 50%,
-    transparent 70%
-  );
-  background-size: 200% 100%;
-  animation: nelvyon-shimmer 2.2s linear infinite;
-  pointer-events: none;
-}
-
-/* ── Gradient text utility ── */
-.nelvyon-gradient-text {
-  background: linear-gradient(90deg, #0066FF 0%, #00CFFF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── Subtle noise texture on white sections ── */
-.nelvyon-section-noise {
-  position: relative;
-}
-.nelvyon-section-noise::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  z-index: 0;
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground; }
 }

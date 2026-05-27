@@ -6,8 +6,8 @@ import { CookieBanner } from "@/components/CookieBanner";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { LocaleProvider } from "@/core/i18n/LocaleProvider";
 import { AppProviders } from "@/core/providers/AppProviders";
-import { THEME_BOOTSTRAP_SCRIPT } from "@/core/theme/themeBootstrapScript";
-import { inter, dmSans } from "./fonts";
+import { ThemeProvider } from "@/providers/theme-provider";
+import { inter, dmSans, manrope } from "./fonts";
 import "./globals.css";
 import { APP_LOCALES, isAppLocale, type AppLocale } from "../../i18n";
 import { decodeWhitelabelHeader } from "@/core/whitelabel/resolveWhitelabel";
@@ -81,11 +81,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const faviconHref = whitelabelInitial?.favicon_url?.trim() || "/favicon.ico";
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning className="dark scroll-smooth">
       <head>
         <link href={faviconHref} rel="icon" />
         <link href="/manifest.json" rel="manifest" />
-        <meta content="#0066FF" name="theme-color" />
+        <meta content="#07122a" name="theme-color" />
         <meta content="yes" name="apple-mobile-web-app-capable" />
         <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style" />
         <meta content="NELVYON" name="apple-mobile-web-app-title" />
@@ -103,22 +103,18 @@ if ('serviceWorker' in navigator) {
           suppressHydrationWarning
         />
       </head>
-      <body
-        className={`${inter.variable} ${dmSans.variable} font-sans antialiased`}
-        style={{ background: '#ffffff' }}
-      >
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} suppressHydrationWarning />
-        <PostHogProvider>
-          <LocaleProvider initialLocale={locale} initialMessages={messages}>
-            <AppProviders whitelabelInitial={whitelabelInitial}>
-              <div style={{ maxWidth: '1440px', margin: '0 auto', background: '#ffffff' }}>
-                {children}
-              </div>
-            </AppProviders>
-          </LocaleProvider>
-          <CookieBanner />
-          <ChatbotWidget />
-        </PostHogProvider>
+      <body className={`${inter.variable} ${manrope.variable} ${dmSans.variable} font-sans antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+          <PostHogProvider>
+            <LocaleProvider initialLocale={locale} initialMessages={messages}>
+              <AppProviders whitelabelInitial={whitelabelInitial}>
+                <main className="bg-background text-foreground min-h-screen">{children}</main>
+              </AppProviders>
+            </LocaleProvider>
+            <CookieBanner />
+            <ChatbotWidget />
+          </PostHogProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

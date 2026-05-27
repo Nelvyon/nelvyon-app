@@ -1,34 +1,28 @@
-import type { Metadata } from "next";
-
-import { LandingPage } from "@/components/landing";
-import { getAppBaseUrl } from "@/lib/appUrl";
-
-const canonicalBase = getAppBaseUrl();
-const ogImageAbs = `${canonicalBase}/og-image.png`;
-
-export const metadata: Metadata = {
-  title: "NELVYON — Agencia de marketing digital",
-  description:
-    "Agencia de marketing digital: SEO, Google Ads, Meta, email y automatización. Resultados medibles sin contratar múltiples proveedores.",
-  openGraph: {
-    title: "NELVYON — Agencia de marketing digital",
-    description:
-      "Donde nace tu imperio, crece tu marca y se impone tu legado. SEO, publicidad, email y webs.",
-    url: canonicalBase,
-    siteName: "NELVYON",
-    images: [{ url: ogImageAbs, width: 1200, height: 630, alt: "NELVYON Marketing Digital" }],
-    type: "website",
-    locale: "es_ES",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "NELVYON — Agencia de marketing digital",
-    description: "SEO, ads, email y automatización. Solicita tu propuesta.",
-    images: [ogImageAbs],
-  },
-  robots: { index: true, follow: true },
-};
+import { FAQs } from "@/components/agenforce/faqs";
+import { Features } from "@/components/agenforce/features";
+import { FeaturesSecondary } from "@/components/agenforce/features-secondary";
+import { FeaturesTertiary } from "@/components/agenforce/features-tertiary";
+import { Hero } from "@/components/agenforce/hero";
+import { LogoCloud } from "@/components/agenforce/logo-cloud";
+import { MarketingLayout } from "@/components/agenforce/marketing-layout";
+import { Outcomes } from "@/components/agenforce/outcomes";
+import { Pricing } from "@/components/agenforce/pricing";
+import { Speed } from "@/components/agenforce/speed";
 
 export default function HomePage() {
-  return <LandingPage />;
+  return (
+    <MarketingLayout>
+      <div className="min-h-screen">
+        <Hero />
+        <LogoCloud />
+        <Features />
+        <Speed />
+        <FeaturesSecondary />
+        <Outcomes />
+        <FeaturesTertiary />
+        <Pricing />
+        <FAQs />
+      </div>
+    </MarketingLayout>
+  );
 }
