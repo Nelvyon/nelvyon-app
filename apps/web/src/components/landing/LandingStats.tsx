@@ -1,53 +1,68 @@
-"use client"
-import { useState, useEffect, useRef } from "react"
-const stats = [
-  {value:193,suffix:"+",label:"Sectores atendidos"},
-  {value:25,suffix:"",label:"Servicios incluidos"},
-  {value:48,suffix:"h",label:"Tiempo de respuesta",fixed:true},
-  {value:100,suffix:"%",label:"IA en cada servicio"},
+'use client'
+import { useEffect, useRef, useState } from 'react'
+function useCountUp(target: number, active: boolean, duration = 1800) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    if (!active) return
+    let start = 0
+    const step = target / (duration / 16)
+    const timer = setInterval(() => {
+      start += step
+      if (start >= target) { setCount(target); clearInterval(timer) }
+      else setCount(Math.floor(start))
+    }, 16)
+    return () => clearInterval(timer)
+  }, [active, target, duration])
+  return count
+}
+const STATS = [
+  { value: 132, suffix: '+', label: 'SECTORES ATENDIDOS' },
+  { value: 25,  suffix: '',  label: 'SERVICIOS INCLUIDOS' },
+  { value: 48,  suffix: 'h', label: 'TIEMPO DE RESPUESTA' },
+  { value: 100, suffix: '%', label: 'IA EN CADA SERVICIO' },
 ]
-function StatCard({stat,triggered}:{stat:typeof stats[0],triggered:boolean}) {
-  const [current,setCurrent] = useState(0)
-  const done = useRef(false)
-  useEffect(()=>{
-    if(!triggered||stat.fixed||done.current) return
-    const steps = Math.ceil(1200/20)
-    const inc = Math.ceil(stat.value/steps)
-    let count = 0
-    const id = setInterval(()=>{
-      count += inc
-      if(count>=stat.value){count=stat.value;clearInterval(id);done.current=true}
-      setCurrent(count)
-    },20)
-    return ()=>clearInterval(id)
-  },[triggered,stat.value,stat.fixed])
+function StatItem({ stat, active }: { stat: (typeof STATS)[0]; active: boolean }) {
+  const count = useCountUp(stat.value, active)
   return (
-    <div style={{ background:"#ffffff", borderRadius:"16px", padding:"32px 24px", textAlign:"center", boxShadow:"0 4px 20px rgba(0,0,0,0.08)", border:"1px solid #e2e8f0" }}>
-      <div style={{ fontSize:"48px", fontWeight:900, color:"#0a1628", lineHeight:1, fontFamily:"Inter,sans-serif" }}>
-        {stat.fixed?stat.value:current}<span>{stat.suffix}</span>
+    <div style={{
+      background: '#ffffff', border: '1.5px solid #e8eef8',
+      borderRadius: '20px', padding: '36px 28px', textAlign: 'center',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+      minHeight: '140px', display: 'flex', flexDirection: 'column',
+      justifyContent: 'center', alignItems: 'center',
+    }}>
+      <div style={{
+        fontSize: '56px', fontWeight: 900, lineHeight: 1,
+        color: '#0d1b3e', letterSpacing: '-0.03em', marginBottom: '10px',
+      }}>
+        {count}{stat.suffix}
       </div>
-      <div style={{ fontSize:"13px", fontWeight:600, color:"#64748b", letterSpacing:"2px", textTransform:"uppercase", marginTop:"8px", fontFamily:"Inter,sans-serif" }}>{stat.label}</div>
+      <div style={{
+        fontSize: '12px', fontWeight: 700, color: '#9aa0b0',
+        letterSpacing: '0.1em', textTransform: 'uppercase',
+      }}>
+        {stat.label}
+      </div>
     </div>
   )
 }
 export function LandingStats() {
-  const [triggered,setTriggered] = useState(false)
-  const ref = useRef<HTMLElement>(null)
-  useEffect(()=>{
-    const observer = new IntersectionObserver(entries=>{
-      if(entries[0].isIntersecting&&!triggered) setTriggered(true)
-    },{threshold:0.2})
-    const el = ref.current
-    if(el) observer.observe(el)
-    return ()=>{ if(el) observer.unobserve(el) }
-  },[triggered])
+  const ref = useRef<HTMLDivElement>(null)
+  const [active, setActive] = useState(false)
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setActive(true) }, { threshold: 0.2 })
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
   return (
-    <section ref={ref} style={{ background:"#f0f7ff", padding:"60px 24px", boxSizing:"border-box" }}>
-      <style>{`@media(max-width:640px){.stats-grid{grid-template-columns:1fr 1fr !important;}}`}</style>
-      <div style={{ maxWidth:"1100px", margin:"0 auto" }}>
-        <div className="stats-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"24px" }}>
-          {stats.map(s=><StatCard key={s.label} stat={s} triggered={triggered}/>)}
-        </div>
+    <section style={{ background: '#ffffff', paddingTop: '72px', paddingBottom: '72px' }}>
+      <div ref={ref} style={{
+        maxWidth: '1200px', margin: '0 auto', padding: '0 48px',
+        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px',
+      }}>
+        {STATS.map((s) => (
+          <StatItem key={s.label} stat={s} active={active} />
+        ))}
       </div>
     </section>
   )

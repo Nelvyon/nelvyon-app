@@ -7,12 +7,12 @@ import { LandingFinalCta } from "./LandingFinalCta";
 import { LandingFooter } from "./LandingFooter";
 import { LandingHero } from "./LandingHero";
 import { LandingLogosMarquee } from "./LandingLogosMarquee";
+import { LandingServicesGrid } from "./LandingServicesGrid";
 import { LandingNotificationBar } from "./LandingNotificationBar";
 import { LandingStats } from "./LandingStats";
 import { LandingTabsSection } from "./LandingTabsSection";
 import { LandingTestimonials } from "./LandingTestimonials";
 import { MarketingNavbar } from "./MarketingNavbar";
-import { ServicesMindMap } from "./ServicesMindMap";
 import { StickyCtaBar } from "./StickyCtaBar";
 import { WhyNelvyon } from "./WhyNelvyon";
 
@@ -30,7 +30,7 @@ export function LandingPage() {
         <LandingTabsSection />
         <AgencyComparisonTable />
         <LandingTestimonials />
-        <ServicesMindMap />
+        <LandingServicesGrid />
         <FaqSection dark items={AGENCY_FAQ} />
         <LandingFinalCta />
       </main>

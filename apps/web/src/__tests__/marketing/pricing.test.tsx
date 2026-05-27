@@ -51,8 +51,8 @@ describe("marketing pricing and landing", () => {
   it("Página / (home) renderiza headline correctamente", () => {
     renderWithIntl(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.textContent).toMatch(/Donde nace tu imperio/i);
-    expect(h1.textContent).toMatch(/se impone tu legado/i);
+    expect(h1.textContent).toMatch(/El sistema operativo/i);
+    expect(h1.textContent).toMatch(/de tu marketing/i);
   });
 
   it("Home tiene CTA de contacto", () => {
