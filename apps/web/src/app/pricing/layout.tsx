@@ -6,7 +6,7 @@ import { getAppBaseUrl } from "@/lib/appUrl";
 const base = getAppBaseUrl();
 
 const desc =
-  "Planes desde 95€/mes. Starter, Pro y Agency con SEO, ads, contenido, email y branding IA.";
+  "Planes desde 97€/mes. Starter, Growth y Agency con CRM, agentes expertos, funnels y automatización.";
 
 export const metadata: Metadata = {
   title: "Precios — NELVYON",

@@ -16,7 +16,7 @@ COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/backend/node_modules ./backend/node_modules
 COPY --from=deps /app/backend/db/node_modules ./backend/db/node_modules
 COPY . .
-RUN pnpm -C apps/web build:prod
+RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm -C apps/web build:prod
 
 FROM base AS runner
 WORKDIR /app
