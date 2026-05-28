@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/agenforce/footer";
 import { Navbar } from "@/components/agenforce/navbar";
+import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
 export const metadata: Metadata = {
   title: "Política de Cookies | NELVYON",
   description: "Política de cookies de NELVYON. Qué cookies usamos y cómo puedes gestionarlas.",
@@ -10,11 +11,12 @@ export default function CookiesPage() {
     <>
       <Navbar />
       <main style={{ paddingTop: "68px" }}>
-        <section style={{ background: "linear-gradient(135deg, #07122a 0%, #0b1e44 100%)", padding: "64px 0 48px" }}>
-          <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
+        <section style={{ backgroundColor: "#07122a", padding: "64px 0 0" }}>
+          <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 48px", textAlign: "center" }}>
             <h1 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 900, color: "#ffffff", margin: 0 }}>Política de Cookies</h1>
             <p style={{ fontSize: "16px", color: "#a8c8e8", marginTop: "12px" }}>Última actualización: Mayo 2026</p>
           </div>
+          <NavyToWhiteTransition />
         </section>
         <section style={{ backgroundColor: "#ffffff", padding: "80px 0" }}>
           <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>

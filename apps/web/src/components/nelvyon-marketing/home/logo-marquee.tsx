@@ -14,7 +14,7 @@ const logos = [
 function LogoPill({ name }: { name: string }) {
   return (
     <span className="mx-3 inline-flex items-center gap-2 rounded-full border border-[#e8eef8] bg-white px-5 py-2.5 text-sm font-semibold text-[#07122a] shadow-sm">
-      <svg className="size-4 text-[#1a7fc4]" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <svg className="size-4 text-[#0084fc]" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
         <circle cx="12" cy="12" r="8" />
       </svg>
       {name}

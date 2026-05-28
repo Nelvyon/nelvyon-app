@@ -2,12 +2,12 @@ function MiniMock({ variant }: { variant: string }) {
   return (
     <div className="mb-4 h-28 overflow-hidden rounded-xl border border-[#e8eef8] bg-[#f8faff] p-2">
       <div className="flex h-full flex-col gap-1">
-        <div className="h-2 w-1/2 rounded bg-[#1a7fc4]/30" />
+        <div className="h-2 w-1/2 rounded bg-[#0084fc]/30" />
         <div className="flex-1 rounded bg-white p-1">
           {variant === "chart" && (
             <div className="flex h-full items-end gap-0.5">
               {[30, 50, 40, 70, 55].map((h, i) => (
-                <div key={i} className="flex-1 rounded-t bg-[#1a7fc4]" style={{ height: `${h}%` }} />
+                <div key={i} className="flex-1 rounded-t bg-[#0084fc]" style={{ height: `${h}%` }} />
               ))}
             </div>
           )}
@@ -80,7 +80,7 @@ export function HomeFeaturesBento() {
             >
               <MiniMock variant={f.variant} />
               <div className="flex items-start gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#1a7fc4]/10 text-[#1a7fc4]">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#0084fc]/10 text-[#0084fc]">
                   <svg className="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z" />
                   </svg>

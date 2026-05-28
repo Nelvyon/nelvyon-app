@@ -8,7 +8,7 @@ export const Hero = () => {
     <section
       className="relative overflow-hidden"
       style={{
-        background: "linear-gradient(175deg, #07122a 0%, #0b1e44 30%, #0e3a7a 58%, #1a7fc4 80%, #4db8e8 94%, #ffffff 100%)",
+        background: "linear-gradient(175deg, #07122a 0%, #0b1e44 30%, #053d7a 58%, #0084fc 80%, #00d6fe 94%, #ffffff 100%)",
         paddingTop: "80px",
         paddingBottom: "0",
       }}
@@ -22,7 +22,7 @@ export const Hero = () => {
             borderRadius: "50px", padding: "8px 20px", fontSize: "13px", fontWeight: 600,
             color: "#a8dff5", letterSpacing: "0.02em"
           }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#4db8e8", display: "inline-block" }} />
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#00d6fe", display: "inline-block" }} />
             La plataforma todo-en-uno para agencias y negocios
           </span>
         </div>
@@ -84,16 +84,16 @@ export const Hero = () => {
             {/* Sidebar */}
             <div style={{ width: "200px", flexShrink: 0, background: "#071020", borderRight: "1px solid rgba(255,255,255,0.06)", padding: "20px 0" }}>
               <div style={{ padding: "0 16px 20px 16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "28px", height: "28px", borderRadius: "6px", background: "linear-gradient(135deg, #1a7fc4, #4db8e8)" }} />
+                <div style={{ width: "28px", height: "28px", borderRadius: "6px", background: "linear-gradient(135deg, #0084fc, #00d6fe)" }} />
                 <span style={{ color: "#ffffff", fontWeight: 700, fontSize: "13px" }}>NELVYON</span>
               </div>
               {["Dashboard", "CRM", "Campañas", "Automatizaciones", "Email", "Pagos", "Analíticas", "Webs"].map((item, i) => (
                 <div key={item} style={{
                   padding: "9px 16px", display: "flex", alignItems: "center", gap: "10px",
                   background: i === 0 ? "rgba(26,127,196,0.18)" : "transparent",
-                  borderLeft: i === 0 ? "2px solid #1a7fc4" : "2px solid transparent"
+                  borderLeft: i === 0 ? "2px solid #0084fc" : "2px solid transparent"
                 }}>
-                  <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: i === 0 ? "#4db8e8" : "rgba(255,255,255,0.20)", flexShrink: 0 }} />
+                  <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: i === 0 ? "#00d6fe" : "rgba(255,255,255,0.20)", flexShrink: 0 }} />
                   <span style={{ color: i === 0 ? "#ffffff" : "rgba(255,255,255,0.45)", fontSize: "12px", fontWeight: i === 0 ? 600 : 400 }}>{item}</span>
                 </div>
               ))}
@@ -125,7 +125,7 @@ export const Hero = () => {
                   <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "11px", marginBottom: "12px" }}>Ingresos — últimos 6 meses</div>
                   <div style={{ display: "flex", alignItems: "flex-end", gap: "6px", height: "80px" }}>
                     {[40, 55, 48, 70, 65, 90].map((h, i) => (
-                      <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px 4px 0 0", background: i === 5 ? "linear-gradient(180deg, #4db8e8, #1a7fc4)" : "rgba(26,127,196,0.25)" }} />
+                      <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px 4px 0 0", background: i === 5 ? "linear-gradient(180deg, #00d6fe, #0084fc)" : "rgba(0,132,252,0.25)" }} />
                     ))}
                   </div>
                 </div>
@@ -137,7 +137,7 @@ export const Hero = () => {
                         <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "10px" }}>{s}</span>
                       </div>
                       <div style={{ height: "4px", background: "rgba(255,255,255,0.08)", borderRadius: "2px" }}>
-                        <div style={{ width: `${p}%`, height: "100%", background: "#1a7fc4", borderRadius: "2px" }} />
+                        <div style={{ width: `${p}%`, height: "100%", background: "#0084fc", borderRadius: "2px" }} />
                       </div>
                     </div>
                   ))}

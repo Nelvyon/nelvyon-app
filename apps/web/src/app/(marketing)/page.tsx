@@ -1,4 +1,5 @@
 import { Hero } from "@/components/agenforce/hero";
+import { ComoFunciona } from "@/components/agenforce/como-funciona";
 import { LogoCloud } from "@/components/agenforce/logo-cloud";
 import { Features } from "@/components/agenforce/features";
 import { Stats } from "@/components/agenforce/stats";
@@ -11,6 +12,7 @@ export default function HomePage() {
   return (
     <main>
       <Hero />
+      <ComoFunciona />
       <Stats />
       <LogoCloud />
       <Features />

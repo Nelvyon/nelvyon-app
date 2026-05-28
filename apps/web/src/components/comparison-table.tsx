@@ -28,7 +28,7 @@ export function ComparisonTable() {
               {rows.map((row) => (
                 <tr key={row.feature} style={{ borderTop: "1px solid #e6efff" }}>
                   <td style={{ padding: "14px 16px", fontWeight: 700, color: "#07122a" }}>{row.feature}</td>
-                  <td style={{ padding: "14px 16px", textAlign: "center", color: "#1a7fc4", fontWeight: 700 }}>{row.nelvyon}</td>
+                  <td style={{ padding: "14px 16px", textAlign: "center", color: "#0084fc", fontWeight: 700 }}>{row.nelvyon}</td>
                   <td style={{ padding: "14px 16px", textAlign: "center", color: "#3f4e6b" }}>{row.agencia}</td>
                   <td style={{ padding: "14px 16px", textAlign: "center", color: "#3f4e6b" }}>{row.plataformas}</td>
                 </tr>

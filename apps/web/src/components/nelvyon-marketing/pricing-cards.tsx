@@ -38,11 +38,11 @@ export function NelvyonPricingCards() {
         <article
           key={plan.name}
           className={`relative rounded-2xl border bg-white p-6 shadow-sm ${
-            plan.popular ? "border-[#1a7fc4] shadow-lg ring-2 ring-[#1a7fc4]/20" : "border-[#e8eef8]"
+            plan.popular ? "border-[#0084fc] shadow-lg ring-2 ring-[#0084fc]/20" : "border-[#e8eef8]"
           }`}
         >
           {plan.popular && (
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#1a7fc4] px-3 py-1 text-xs font-semibold text-white">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#0084fc] px-3 py-1 text-xs font-semibold text-white">
               Más popular
             </span>
           )}
@@ -54,7 +54,7 @@ export function NelvyonPricingCards() {
           <ul className="mt-6 space-y-2 text-sm text-[#07122a]/75">
             {plan.features.map((f) => (
               <li key={f} className="flex gap-2">
-                <span className="text-[#1a7fc4]">✓</span>
+                <span className="text-[#0084fc]">✓</span>
                 {f}
               </li>
             ))}
@@ -63,8 +63,8 @@ export function NelvyonPricingCards() {
             href="/registro"
             className={`mt-8 block rounded-lg py-3 text-center text-sm font-semibold transition ${
               plan.popular
-                ? "bg-[#1a7fc4] text-white hover:bg-[#1569a8]"
-                : "border border-[#1a7fc4] text-[#1a7fc4] hover:bg-[#f8faff]"
+                ? "bg-[#0084fc] text-white hover:bg-[#0066cc]"
+                : "border border-[#0084fc] text-[#0084fc] hover:bg-[#f8faff]"
             }`}
           >
             Empieza gratis 14 días

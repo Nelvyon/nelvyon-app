@@ -28,7 +28,7 @@ export function NelvyonNavbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-[#07122a]/80 transition hover:text-[#1a7fc4]"
+              className="text-sm font-medium text-[#07122a]/80 transition hover:text-[#0084fc]"
             >
               {link.label}
             </Link>
@@ -44,7 +44,7 @@ export function NelvyonNavbar() {
           </Link>
           <Link
             href="/registro"
-            className="rounded-lg bg-[#1a7fc4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1569a8]"
+            className="rounded-lg bg-[#0084fc] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0066cc]"
           >
             Empieza gratis
           </Link>
@@ -78,7 +78,7 @@ export function NelvyonNavbar() {
             </Link>
             <Link
               href="/registro"
-              className="rounded-lg bg-[#1a7fc4] px-4 py-2 text-center text-sm font-semibold text-white"
+              className="rounded-lg bg-[#0084fc] px-4 py-2 text-center text-sm font-semibold text-white"
               onClick={() => setOpen(false)}
             >
               Empieza gratis

@@ -21,7 +21,7 @@ export function HomeComparison() {
                 <th className="pb-4 pr-4 font-medium">Funcionalidad</th>
                 <th className="pb-4 pr-4 font-medium">Agencias tradicionales</th>
                 <th className="pb-4 pr-4 font-medium">Precio aprox.</th>
-                <th className="pb-4 font-medium text-[#4db8e8]">NELVYON ✓</th>
+                <th className="pb-4 font-medium text-[#00d6fe]">NELVYON ✓</th>
               </tr>
             </thead>
             <tbody>
@@ -30,7 +30,7 @@ export function HomeComparison() {
                   <td className="py-3 pr-4 font-medium text-white">{row.feature}</td>
                   <td className="py-3 pr-4 text-white/50">{row.trad}</td>
                   <td className="py-3 pr-4 text-white/40">{row.price}</td>
-                  <td className="py-3 text-[#4db8e8]">
+                  <td className="py-3 text-[#00d6fe]">
                     <span className="text-green-400">✓</span>{" "}
                     {row.feature === "CRM integrado" && (
                       <span className="text-xs text-green-400">desde €97/mes</span>

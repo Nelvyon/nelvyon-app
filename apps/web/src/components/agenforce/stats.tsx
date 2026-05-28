@@ -6,10 +6,10 @@ export function Stats() {
     { value: "3x", label: "ROI medio", sub: "frente a agencias tradicionales" },
   ];
   return (
-    <section style={{ backgroundColor: "#f8faff", padding: "64px 0" }}>
+    <section style={{ backgroundColor: "#f8faff", padding: "0 0 64px" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "12px" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
             Resultados reales
           </p>
           <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
@@ -29,7 +29,7 @@ export function Stats() {
                 boxShadow: "0 4px 20px rgba(7,18,42,0.06)",
               }}
             >
-              <div style={{ fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 900, color: "#1a7fc4", lineHeight: 1, marginBottom: "8px" }}>
+              <div style={{ fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 900, color: "#0084fc", lineHeight: 1, marginBottom: "8px" }}>
                 {s.value}
               </div>
               <div style={{ fontSize: "16px", fontWeight: 700, color: "#07122a", marginBottom: "4px" }}>

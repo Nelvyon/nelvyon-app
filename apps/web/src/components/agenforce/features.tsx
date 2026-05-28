@@ -42,7 +42,7 @@ export function Features() {
     <section style={{ backgroundColor: "#ffffff", padding: "64px 0" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "12px" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
             Todo en una plataforma
           </p>
           <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>
@@ -65,8 +65,8 @@ export function Features() {
               minHeight: "280px",
             }}
           >
-            <div style={{ position: "absolute", top: "-40px", right: "-40px", width: "200px", height: "200px", borderRadius: "50%", background: "radial-gradient(circle, #1a7fc4 0%, transparent 70%)", opacity: 0.3 }} />
-            <span style={{ display: "inline-block", background: "#1a7fc4", color: "#fff", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "20px", padding: "4px 12px", marginBottom: "20px" }}>
+            <div style={{ position: "absolute", top: "-40px", right: "-40px", width: "200px", height: "200px", borderRadius: "50%", background: "radial-gradient(circle, #0084fc 0%, transparent 70%)", opacity: 0.3 }} />
+            <span style={{ display: "inline-block", background: "#0084fc", color: "#fff", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "20px", padding: "4px 12px", marginBottom: "20px" }}>
               {features[0].badge}
             </span>
             <div style={{ fontSize: "36px", marginBottom: "16px" }}>{features[0].icon}</div>
@@ -76,7 +76,7 @@ export function Features() {
           <div style={{ gridColumn: "span 5", display: "flex", flexDirection: "column", gap: "20px" }}>
             {features.slice(1, 3).map((f, i) => (
               <div key={i} style={{ backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "20px", padding: "28px", flex: 1 }}>
-                <span style={{ display: "inline-block", background: "#e8f0fb", color: "#1a7fc4", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "20px", padding: "4px 10px", marginBottom: "14px" }}>
+                <span style={{ display: "inline-block", background: "#e8f0fb", color: "#0084fc", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "20px", padding: "4px 10px", marginBottom: "14px" }}>
                   {f.badge}
                 </span>
                 <div style={{ fontSize: "28px", marginBottom: "10px" }}>{f.icon}</div>
@@ -87,7 +87,7 @@ export function Features() {
           </div>
           {features.slice(3).map((f, i) => (
             <div key={i} style={{ gridColumn: "span 4", backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "20px", padding: "28px" }}>
-              <span style={{ display: "inline-block", background: "#e8f0fb", color: "#1a7fc4", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "20px", padding: "4px 10px", marginBottom: "14px" }}>
+              <span style={{ display: "inline-block", background: "#e8f0fb", color: "#0084fc", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "20px", padding: "4px 10px", marginBottom: "14px" }}>
                 {f.badge}
               </span>
               <div style={{ fontSize: "28px", marginBottom: "10px" }}>{f.icon}</div>

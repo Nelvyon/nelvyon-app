@@ -13,12 +13,12 @@ function DashboardMock() {
     <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-white/20 bg-[#07122a] shadow-2xl">
       <div className="flex">
         <aside className="hidden w-36 shrink-0 border-r border-white/10 bg-[#050d1f] p-3 sm:block">
-          <div className="mb-4 h-2 w-16 rounded bg-[#1a7fc4]" />
+          <div className="mb-4 h-2 w-16 rounded bg-[#0084fc]" />
           <ul className="space-y-2">
             {navItems.map((item, i) => (
               <li
                 key={item}
-                className={`rounded px-2 py-1.5 text-[10px] ${i === 0 ? "bg-[#1a7fc4]/30 text-[#4db8e8]" : "text-white/50"}`}
+                className={`rounded px-2 py-1.5 text-[10px] ${i === 0 ? "bg-[#0084fc]/30 text-[#00d6fe]" : "text-white/50"}`}
               >
                 {item}
               </li>
@@ -43,7 +43,7 @@ function DashboardMock() {
             {[40, 65, 45, 80, 55, 90, 70, 95, 60, 85].map((h, i) => (
               <div
                 key={i}
-                className="flex-1 rounded-t bg-gradient-to-t from-[#1a7fc4] to-[#4db8e8]"
+                className="flex-1 rounded-t bg-gradient-to-t from-[#0084fc] to-[#00d6fe]"
                 style={{ height: `${h}%` }}
               />
             ))}
@@ -60,7 +60,7 @@ export function HomeHero() {
       className="relative overflow-hidden px-4 pb-20 pt-16 lg:px-6 lg:pt-24"
       style={{
         background:
-          "linear-gradient(175deg, #07122a 0%, #0b1e44 35%, #0e3a7a 60%, #1a7fc4 80%, #4db8e8 95%, #ffffff 100%)",
+          "linear-gradient(175deg, #07122a 0%, #0b1e44 35%, #0e3a7a 60%, #0084fc 80%, #00d6fe 95%, #ffffff 100%)",
       }}
     >
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">

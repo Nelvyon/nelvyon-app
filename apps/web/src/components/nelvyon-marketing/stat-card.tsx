@@ -51,7 +51,7 @@ export function StatCard({ end, suffix = "", label }: StatCardProps) {
       ref={ref}
       className="rounded-2xl border border-[#e8eef8] bg-white p-6 text-center shadow-sm transition hover:shadow-md"
     >
-      <p className="text-4xl font-extrabold text-[#1a7fc4] lg:text-5xl">
+      <p className="text-4xl font-extrabold text-[#0084fc] lg:text-5xl">
         {value}
         {suffix}
       </p>

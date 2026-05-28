@@ -39,15 +39,14 @@ export function Navbar() {
         <Link
           href="/"
           style={{
-            color: "#ffffff",
-            fontWeight: 800,
-            fontSize: "20px",
+            display: "flex",
+            alignItems: "center",
             textDecoration: "none",
-            letterSpacing: "-0.02em",
             flexShrink: 0,
           }}
         >
-          NELVYON
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png.png" alt="NELVYON" style={{ height: "36px", width: "auto" }} />
         </Link>
 
         <nav
@@ -82,7 +81,7 @@ export function Navbar() {
           className="nelvyon-nav-cta"
           style={{
             display: "inline-block",
-            backgroundColor: "#1a7fc4",
+            backgroundColor: "#0084fc",
             color: "#ffffff",
             fontWeight: 700,
             fontSize: "14px",
@@ -158,7 +157,7 @@ export function Navbar() {
               marginTop: "8px",
               display: "inline-block",
               textAlign: "center",
-              backgroundColor: "#1a7fc4",
+              backgroundColor: "#0084fc",
               color: "#ffffff",
               fontWeight: 700,
               fontSize: "14px",

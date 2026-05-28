@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { CtaFinal } from "@/components/agenforce/cta-final";
+import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
 
 export const metadata: Metadata = {
   title: "Contacto | NELVYON — Habla con un experto",
@@ -8,9 +10,9 @@ export const metadata: Metadata = {
 export default function ContactoPage() {
   return (
     <main>
-      <section style={{ background: "linear-gradient(175deg, #07122a 0%, #0b1e44 50%, #1a7fc4 85%, #ffffff 100%)", padding: "120px 0 80px" }}>
-        <div style={{ maxWidth: "700px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#4db8e8", marginBottom: "16px" }}>
+      <section style={{ backgroundColor: "#07122a", padding: "120px 0 0" }}>
+        <div style={{ maxWidth: "700px", margin: "0 auto", padding: "0 24px 80px", textAlign: "center" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#00d6fe", marginBottom: "16px" }}>
             Contacto
           </p>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
@@ -20,6 +22,7 @@ export default function ContactoPage() {
             Cuéntanos tu negocio. Te respondemos en menos de 24h con un plan personalizado.
           </p>
         </div>
+        <NavyToWhiteTransition />
       </section>
       <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
@@ -50,7 +53,7 @@ export default function ContactoPage() {
               </div>
               <div style={{ marginTop: "40px", padding: "24px", backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "16px" }}>
                 <p style={{ fontSize: "14px", fontWeight: 600, color: "#07122a", margin: "0 0 8px" }}>¿Prefieres escribirnos directamente?</p>
-                <a href="mailto:hola@nelvyon.com" style={{ fontSize: "15px", color: "#1a7fc4", fontWeight: 700, textDecoration: "none" }}>
+                <a href="mailto:hola@nelvyon.com" style={{ fontSize: "15px", color: "#0084fc", fontWeight: 700, textDecoration: "none" }}>
                   hola@nelvyon.com
                 </a>
               </div>
@@ -100,7 +103,7 @@ export default function ContactoPage() {
                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Mensaje</label>
                   <textarea name="mensaje" rows={4} placeholder="Cuéntanos tu situación, objetivos o dudas..." style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit" }} />
                 </div>
-                <button type="submit" style={{ backgroundColor: "#1a7fc4", color: "#ffffff", fontWeight: 700, fontSize: "15px", padding: "14px 24px", borderRadius: "12px", border: "none", cursor: "pointer", width: "100%" }}>
+                <button type="submit" style={{ backgroundColor: "#0084fc", color: "#ffffff", fontWeight: 700, fontSize: "15px", padding: "14px 24px", borderRadius: "12px", border: "none", cursor: "pointer", width: "100%" }}>
                   Enviar solicitud →
                 </button>
                 <p style={{ fontSize: "12px", color: "#9aabbf", textAlign: "center", margin: 0 }}>
@@ -111,6 +114,7 @@ export default function ContactoPage() {
           </div>
         </div>
       </section>
+      <CtaFinal />
     </main>
   );
 }

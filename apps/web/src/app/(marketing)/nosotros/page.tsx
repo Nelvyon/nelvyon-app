@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { CtaFinal } from "@/components/agenforce/cta-final";
+import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
 
 export const metadata: Metadata = {
   title: "Nosotros | NELVYON — La empresa detrás de la automatización",
@@ -22,9 +24,9 @@ const milestones = [
 export default function NosotrosPage() {
   return (
     <main>
-      <section style={{ background: "linear-gradient(175deg, #07122a 0%, #0b1e44 40%, #1a7fc4 80%, #ffffff 100%)", padding: "120px 0 80px" }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#4db8e8", marginBottom: "16px" }}>
+      <section style={{ backgroundColor: "#07122a", padding: "120px 0 0" }}>
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 80px", textAlign: "center" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#00d6fe", marginBottom: "16px" }}>
             Sobre NELVYON
           </p>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
@@ -34,12 +36,13 @@ export default function NosotrosPage() {
             NELVYON es la plataforma de marketing automatizado que está redefiniendo cómo las empresas crecen en la era digital.
           </p>
         </div>
+        <NavyToWhiteTransition />
       </section>
       <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
             <div>
-              <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "16px" }}>
+              <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "16px" }}>
                 Nuestra misión
               </p>
               <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 20px", lineHeight: 1.2 }}>
@@ -60,7 +63,7 @@ export default function NosotrosPage() {
                 { v: "24/7", l: "Automatización activa" },
               ].map((s, i) => (
                 <div key={i} style={{ backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "20px", padding: "28px", textAlign: "center" }}>
-                  <div style={{ fontSize: "36px", fontWeight: 900, color: "#1a7fc4", marginBottom: "8px" }}>{s.v}</div>
+                  <div style={{ fontSize: "36px", fontWeight: 900, color: "#0084fc", marginBottom: "8px" }}>{s.v}</div>
                   <div style={{ fontSize: "13px", color: "#6b7a99", fontWeight: 600 }}>{s.l}</div>
                 </div>
               ))}
@@ -71,7 +74,7 @@ export default function NosotrosPage() {
       <section style={{ backgroundColor: "#f8faff", padding: "96px 0" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
-            <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "12px" }}>
+            <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
               Lo que nos define
             </p>
             <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
@@ -92,7 +95,7 @@ export default function NosotrosPage() {
       <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
-            <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "12px" }}>
+            <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
               Nuestra historia
             </p>
             <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
@@ -103,7 +106,7 @@ export default function NosotrosPage() {
             {milestones.map((m, i) => (
               <div key={i} style={{ display: "flex", gap: "24px", paddingBottom: i < milestones.length - 1 ? "40px" : "0" }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg, #07122a, #1a7fc4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "12px", fontWeight: 800, flexShrink: 0 }}>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg, #07122a, #0084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "12px", fontWeight: 800, flexShrink: 0 }}>
                     {m.year}
                   </div>
                   {i < milestones.length - 1 && (
@@ -119,19 +122,7 @@ export default function NosotrosPage() {
           </div>
         </div>
       </section>
-      <section style={{ background: "linear-gradient(135deg, #07122a 0%, #1a7fc4 100%)", padding: "80px 0", textAlign: "center" }}>
-        <div style={{ maxWidth: "600px", margin: "0 auto", padding: "0 24px" }}>
-          <h2 style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 800, color: "#ffffff", margin: "0 0 16px" }}>
-            Únete a la revolución
-          </h2>
-          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: "0 0 32px" }}>
-            Forma parte de la empresa que está cambiando cómo crece el marketing en el mundo.
-          </p>
-          <a href="/contacto" style={{ display: "inline-block", backgroundColor: "#ffffff", color: "#07122a", fontWeight: 700, fontSize: "16px", padding: "16px 40px", borderRadius: "12px", textDecoration: "none" }}>
-            Contactar →
-          </a>
-        </div>
-      </section>
+      <CtaFinal />
     </main>
   );
 }

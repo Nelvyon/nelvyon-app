@@ -12,7 +12,7 @@ export function LandingHero() {
     <section
       style={{
         width: '100%',
-        background: 'linear-gradient(175deg, #07122a 0%, #0b1e44 30%, #0e3a7a 58%, #1a7fc4 78%, #4db8e8 92%, #a8dff5 100%)',
+        background: 'linear-gradient(175deg, #07122a 0%, #0b1e44 30%, #0e3a7a 58%, #0084fc 78%, #00d6fe 92%, #a8dff5 100%)',
         paddingTop: '0',
         paddingBottom: '0',
         position: 'relative',
@@ -60,7 +60,7 @@ export function LandingHero() {
               letterSpacing: '0.02em',
             }}
           >
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4db8e8', display: 'inline-block' }} />
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00d6fe', display: 'inline-block' }} />
             La plataforma todo-en-uno para agencias y negocios
           </span>
         </div>
@@ -204,7 +204,7 @@ export function LandingHero() {
                     gap: '8px',
                   }}
                 >
-                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'linear-gradient(135deg, #1a7fc4, #4db8e8)' }} />
+                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'linear-gradient(135deg, #0084fc, #00d6fe)' }} />
                   <span style={{ color: '#ffffff', fontWeight: 700, fontSize: '13px' }}>NELVYON</span>
                 </div>
               </div>
@@ -226,11 +226,11 @@ export function LandingHero() {
                     alignItems: 'center',
                     gap: '10px',
                     background: item.active ? 'rgba(29,127,196,0.18)' : 'transparent',
-                    borderLeft: item.active ? '2px solid #1a7fc4' : '2px solid transparent',
+                    borderLeft: item.active ? '2px solid #0084fc' : '2px solid transparent',
                     cursor: 'default',
                   }}
                 >
-                  <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: item.active ? '#4db8e8' : 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+                  <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: item.active ? '#00d6fe' : 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
                   <span style={{ color: item.active ? '#ffffff' : 'rgba(255,255,255,0.45)', fontSize: '12px', fontWeight: item.active ? 600 : 400 }}>
                     {item.label}
                   </span>
@@ -294,7 +294,7 @@ export function LandingHero() {
                           height: `${h}%`,
                           borderRadius: '4px 4px 0 0',
                           background: i === 5
-                            ? 'linear-gradient(180deg, #4db8e8 0%, #1a7fc4 100%)'
+                            ? 'linear-gradient(180deg, #00d6fe 0%, #0084fc 100%)'
                             : 'rgba(29,127,196,0.25)',
                         }}
                       />
@@ -324,7 +324,7 @@ export function LandingHero() {
                         <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: '10px' }}>{s.count}</span>
                       </div>
                       <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ width: `${s.pct}%`, height: '100%', background: '#1a7fc4', borderRadius: '2px' }} />
+                        <div style={{ width: `${s.pct}%`, height: '100%', background: '#0084fc', borderRadius: '2px' }} />
                       </div>
                     </div>
                   ))}

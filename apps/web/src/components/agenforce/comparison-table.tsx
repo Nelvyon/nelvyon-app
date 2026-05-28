@@ -12,7 +12,7 @@ export function ComparisonTable() {
     <section style={{ backgroundColor: "#f8faff", padding: "64px 0" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "12px" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
             Comparativa honesta
           </p>
           <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>
@@ -33,7 +33,7 @@ export function ComparisonTable() {
               {rows.map((row, index) => (
                 <tr key={row.feature} style={{ borderTop: "1px solid #e6efff", backgroundColor: index % 2 === 0 ? "#ffffff" : "#f0f7ff" }}>
                   <td style={{ padding: "14px 16px", fontWeight: 700, color: "#07122a" }}>{row.feature}</td>
-                  <td style={{ padding: "14px 16px", textAlign: "center", color: "#1a7fc4", fontWeight: 700 }}>{row.nelvyon}</td>
+                  <td style={{ padding: "14px 16px", textAlign: "center", color: "#0084fc", fontWeight: 700 }}>{row.nelvyon}</td>
                   <td style={{ padding: "14px 16px", textAlign: "center", color: "#3f4e6b" }}>{row.agencia}</td>
                   <td style={{ padding: "14px 16px", textAlign: "center", color: "#3f4e6b" }}>{row.plataformas}</td>
                 </tr>

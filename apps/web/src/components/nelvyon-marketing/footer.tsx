@@ -17,7 +17,7 @@ export function NelvyonFooter() {
 
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#4db8e8]">Producto</h3>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#00d6fe]">Producto</h3>
             <ul className="space-y-2 text-sm text-white/80">
               <li>
                 <Link href="/" className="hover:text-white">
@@ -42,7 +42,7 @@ export function NelvyonFooter() {
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#4db8e8]">Empresa</h3>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#00d6fe]">Empresa</h3>
             <ul className="space-y-2 text-sm text-white/80">
               <li>
                 <Link href="/nosotros" className="hover:text-white">
@@ -62,7 +62,7 @@ export function NelvyonFooter() {
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#4db8e8]">Legal</h3>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#00d6fe]">Legal</h3>
             <ul className="space-y-2 text-sm text-white/80">
               <li>
                 <Link href="/privacy" className="hover:text-white">
@@ -82,7 +82,7 @@ export function NelvyonFooter() {
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#4db8e8]">Contacto</h3>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#00d6fe]">Contacto</h3>
             <ul className="space-y-2 text-sm text-white/80">
               <li>
                 <a href="mailto:soporte@nelvyon.com" className="hover:text-white">

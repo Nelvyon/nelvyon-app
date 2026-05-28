@@ -47,7 +47,7 @@ export function NelvyonSaasPage() {
     <NelvyonMarketingShell>
       <section
         className="px-4 py-20 text-center lg:px-6"
-        style={{ background: "linear-gradient(175deg, #07122a 0%, #1a7fc4 70%, #4db8e8 100%)" }}
+        style={{ background: "linear-gradient(175deg, #07122a 0%, #0084fc 70%, #00d6fe 100%)" }}
       >
         <h1 className="text-4xl font-bold text-white md:text-5xl">La plataforma SaaS para agencias de marketing</h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-white/70">
@@ -96,7 +96,7 @@ export function NelvyonSaasPage() {
                   onClick={() => setOpen(open === i ? null : i)}
                 >
                   {faq.q}
-                  <span className="text-[#1a7fc4]">{open === i ? "−" : "+"}</span>
+                  <span className="text-[#0084fc]">{open === i ? "−" : "+"}</span>
                 </button>
                 {open === i && <p className="border-t border-[#e8eef8] px-5 py-4 text-sm text-[#07122a]/75">{faq.a}</p>}
               </div>

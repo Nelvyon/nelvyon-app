@@ -66,7 +66,7 @@ export function NelvyonServiciosPage() {
     <NelvyonMarketingShell>
       <section
         className="px-4 py-16 text-center lg:px-6"
-        style={{ background: "linear-gradient(180deg, #07122a 0%, #1a7fc4 100%)" }}
+        style={{ background: "linear-gradient(180deg, #07122a 0%, #0084fc 100%)" }}
       >
         <h1 className="text-4xl font-bold text-white md:text-5xl">Servicios NELVYON</h1>
         <p className="mx-auto mt-4 max-w-2xl text-white/70">
@@ -89,22 +89,22 @@ export function NelvyonServiciosPage() {
               <ul className="mt-4 space-y-2 text-sm text-[#07122a]/80">
                 {s.features.map((f) => (
                   <li key={f} className="flex gap-2">
-                    <span className="text-[#1a7fc4]">✓</span>
+                    <span className="text-[#0084fc]">✓</span>
                     {f}
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-sm font-semibold text-[#1a7fc4]">{s.plan}</p>
+              <p className="mt-4 text-sm font-semibold text-[#0084fc]">{s.plan}</p>
               <Link
                 href="/registro"
-                className="mt-6 inline-block rounded-lg bg-[#1a7fc4] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1569a8]"
+                className="mt-6 inline-block rounded-lg bg-[#0084fc] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0066cc]"
               >
                 Empezar gratis
               </Link>
             </div>
             <div className="flex min-h-[180px] items-center justify-center rounded-xl bg-[#f8faff] border border-[#e8eef8]">
-              <div className="h-24 w-full max-w-xs rounded-lg bg-gradient-to-r from-[#1a7fc4]/20 to-[#4db8e8]/20 p-4">
-                <div className="h-3 w-2/3 rounded bg-[#1a7fc4]/40" />
+              <div className="h-24 w-full max-w-xs rounded-lg bg-gradient-to-r from-[#0084fc]/20 to-[#00d6fe]/20 p-4">
+                <div className="h-3 w-2/3 rounded bg-[#0084fc]/40" />
                 <div className="mt-3 space-y-2">
                   <div className="h-2 rounded bg-[#e8eef8]" />
                   <div className="h-2 w-4/5 rounded bg-[#e8eef8]" />

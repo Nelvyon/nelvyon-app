@@ -48,19 +48,19 @@ export function NelvyonNosotrosPage() {
       <section className="bg-[#f8faff] px-4 py-16 lg:px-6">
         <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-[#e8eef8] bg-white p-6 text-center">
-            <p className="text-3xl font-bold text-[#1a7fc4]">2024</p>
+            <p className="text-3xl font-bold text-[#0084fc]">2024</p>
             <p className="mt-1 text-sm text-[#07122a]/70">Fundada</p>
           </div>
           <div className="rounded-2xl border border-[#e8eef8] bg-white p-6 text-center">
-            <p className="text-3xl font-bold text-[#1a7fc4]">Madrid</p>
+            <p className="text-3xl font-bold text-[#0084fc]">Madrid</p>
             <p className="mt-1 text-sm text-[#07122a]/70">España</p>
           </div>
           <div className="rounded-2xl border border-[#e8eef8] bg-white p-6 text-center">
-            <p className="text-3xl font-bold text-[#1a7fc4]">132+</p>
+            <p className="text-3xl font-bold text-[#0084fc]">132+</p>
             <p className="mt-1 text-sm text-[#07122a]/70">Clientes</p>
           </div>
           <div className="rounded-2xl border border-[#e8eef8] bg-white p-6 text-center">
-            <p className="text-3xl font-bold text-[#1a7fc4]">25</p>
+            <p className="text-3xl font-bold text-[#0084fc]">25</p>
             <p className="mt-1 text-sm text-[#07122a]/70">Integraciones</p>
           </div>
         </div>
