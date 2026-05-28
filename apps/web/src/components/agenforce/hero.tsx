@@ -48,7 +48,7 @@ export const Hero = () => {
           Capta leads, cierra ventas y escala tu agencia — todo ejecutado por agentes expertos dentro de una sola plataforma.
         </p>
         {/* CTAs */}
-        <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginBottom: "64px" }}>
+        <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px" }}>
           <a href="/registro" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             height: "52px", padding: "0 32px", borderRadius: "50px",
@@ -80,7 +80,7 @@ export const Hero = () => {
             <div style={{ flex: 1, height: "22px", background: "rgba(255,255,255,0.06)", borderRadius: "6px", margin: "0 16px" }} />
           </div>
           {/* Dashboard interior */}
-          <div style={{ display: "flex", background: "#0a1628", minHeight: "420px" }}>
+          <div style={{ display: "flex", background: "#0a1628", minHeight: "300px" }}>
             {/* Sidebar */}
             <div style={{ width: "200px", flexShrink: 0, background: "#071020", borderRight: "1px solid rgba(255,255,255,0.06)", padding: "20px 0" }}>
               <div style={{ padding: "0 16px 20px 16px", display: "flex", alignItems: "center", gap: "8px" }}>

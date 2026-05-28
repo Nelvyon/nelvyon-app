@@ -44,9 +44,9 @@ export function Testimonials() {
     },
   ];
   return (
-    <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+    <section style={{ backgroundColor: "#ffffff", padding: "64px 0" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: "64px" }}>
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "12px" }}>
             Lo que dicen nuestros clientes
           </p>

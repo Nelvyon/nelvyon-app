@@ -6,9 +6,9 @@ export function Stats() {
     { value: "3x", label: "ROI medio", sub: "frente a agencias tradicionales" },
   ];
   return (
-    <section style={{ backgroundColor: "#f8faff", padding: "80px 0" }}>
+    <section style={{ backgroundColor: "#f8faff", padding: "64px 0" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: "56px" }}>
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "12px" }}>
             Resultados reales
           </p>

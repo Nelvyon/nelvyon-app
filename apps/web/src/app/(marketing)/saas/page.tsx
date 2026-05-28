@@ -4,6 +4,12 @@ export const metadata: Metadata = {
   title: "SaaS | NELVYON — Plataforma de Marketing Automatizado",
   description: "NELVYON SaaS: la plataforma todo-en-uno con agentes expertos para automatizar tu marketing digital. Planes desde €97/mes. Sin permanencia.",
 };
+const heroStats = [
+  { label: "leads generados", value: "+2.847" },
+  { label: "ingresos mes", value: "€38.420" },
+  { label: "tasa de cierre", value: "34.2%" },
+  { label: "clientes activos", value: "142" },
+];
 const plans = [
   {
     name: "Starter",
@@ -46,7 +52,7 @@ export default function SaasPage() {
   return (
     <main style={{ paddingTop: "68px" }}>
       {/* Hero */}
-      <section style={{ background: "linear-gradient(175deg, #07122a 0%, #0b1e44 40%, #1a7fc4 80%, #ffffff 100%)", padding: "80px 0 64px" }}>
+      <section style={{ background: "linear-gradient(175deg, #07122a 0%, #0b1e44 40%, #1a7fc4 80%, #ffffff 100%)", padding: "64px 0 48px" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#4db8e8", marginBottom: "16px" }}>NELVYON SaaS Platform</p>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
@@ -65,14 +71,22 @@ export default function SaasPage() {
           </div>
         </div>
       </section>
-      {/* Imagen */}
-      <section style={{ backgroundColor: "#f8faff", padding: "0" }}>
-        <div style={{ background: "linear-gradient(135deg, #07122a 0%, #1a7fc4 100%)", borderRadius: "12px", width: "100%", height: "320px", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "white", fontSize: "48px", opacity: 0.3 }}>◆</span></div>
+      <section style={{ backgroundColor: "#f8faff", padding: "24px 0" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ background: "linear-gradient(135deg, #07122a 0%, #1a7fc4 100%)", borderRadius: "16px", padding: "48px", display: "flex", gap: "32px", justifyContent: "center", flexWrap: "wrap" }}>
+            {heroStats.map((stat) => (
+              <div key={stat.label} style={{ textAlign: "center", minWidth: "160px" }}>
+                <p style={{ color: "white", fontSize: "13px", opacity: 0.7, margin: "0 0 8px" }}>{stat.label}</p>
+                <p style={{ color: "white", fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, margin: 0 }}>{stat.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
       {/* Features */}
-      <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+      <section style={{ backgroundColor: "#ffffff", padding: "64px 0" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center", marginBottom: "64px" }}>
+          <div style={{ textAlign: "center", marginBottom: "40px" }}>
             <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>Por qué NELVYON SaaS es diferente</h2>
             <p style={{ fontSize: "18px", color: "#5a6a8a", maxWidth: "540px", margin: "0 auto" }}>No es otra herramienta más. Es tu equipo de marketing completo en una plataforma.</p>
           </div>
@@ -90,9 +104,9 @@ export default function SaasPage() {
         </div>
       </section>
       {/* Precios */}
-      <section id="precios" style={{ backgroundColor: "#f8faff", padding: "96px 0" }}>
+      <section id="precios" style={{ backgroundColor: "#f8faff", padding: "64px 0" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center", marginBottom: "64px" }}>
+          <div style={{ textAlign: "center", marginBottom: "40px" }}>
             <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a7fc4", marginBottom: "12px" }}>Precios transparentes</p>
             <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>Elige tu plan</h2>
             <p style={{ fontSize: "18px", color: "#5a6a8a" }}>Sin permanencia. Sin sorpresas. Cancela cuando quieras.</p>

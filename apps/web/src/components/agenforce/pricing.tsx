@@ -33,9 +33,9 @@ const plans = [
 ];
 export const Pricing = () => {
   return (
-    <section id="precios" className="py-20 lg:py-32 bg-white">
+    <section id="precios" className="py-12 lg:py-16 bg-white">
       <Container>
-        <div style={{ textAlign: "center", marginBottom: "64px" }}>
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, color: "#1a7fc4", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "12px" }}>Precios</p>
           <h2 style={{ fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 800, color: "#07122a", letterSpacing: "-0.03em", margin: "0 0 16px 0" }}>
             Precios claros. Sin sorpresas.

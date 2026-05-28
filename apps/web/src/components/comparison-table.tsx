@@ -1,15 +1,15 @@
 export function ComparisonTable() {
   const rows = [
-    { feature: "Precio mensual", nelvyon: "Desde €97", agencia: "€2.000–€10.000", plataformas: "€200–€500" },
-    { feature: "Agentes expertos 24/7", nelvyon: "✅ Incluido", agencia: "❌ No", plataformas: "⚠️ Limitado" },
+    { feature: "Precio", nelvyon: "Desde €97/mes", agencia: "€2.000–€10.000", plataformas: "€200–€500" },
+    { feature: "Agentes expertos 24/7", nelvyon: "✅", agencia: "❌", plataformas: "⚠️" },
     { feature: "Automatización completa", nelvyon: "✅", agencia: "❌", plataformas: "⚠️" },
-    { feature: "Sin contrato largo", nelvyon: "✅", agencia: "❌ 6–12 meses", plataformas: "✅" },
-    { feature: "Resultados en 48h", nelvyon: "✅", agencia: "❌ Semanas", plataformas: "⚠️" },
+    { feature: "Sin contrato", nelvyon: "✅", agencia: "❌", plataformas: "✅" },
+    { feature: "Resultados en 48h", nelvyon: "✅", agencia: "❌", plataformas: "⚠️" },
     { feature: "Escalable al instante", nelvyon: "✅", agencia: "❌", plataformas: "⚠️" },
   ];
 
   return (
-    <section style={{ backgroundColor: "#ffffff", padding: "64px 0" }}>
+    <section style={{ backgroundColor: "#f8faff", padding: "64px 0" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
         <h2 style={{ color: "#07122a", fontSize: "clamp(24px, 3.5vw, 40px)", margin: "0 0 24px", fontWeight: 800, textAlign: "center" }}>
           NELVYON vs Agencias Tradicionales vs Otras Plataformas
