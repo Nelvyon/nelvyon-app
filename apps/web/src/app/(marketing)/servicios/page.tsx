@@ -80,11 +80,7 @@ export default function ServiciosPage() {
       </section>
       {/* Imagen hero */}
       <section style={{ backgroundColor: "#f8faff", padding: "0" }}>
-        <img
-          src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&q=85&fm=webp"
-          alt="Dashboard de marketing digital NELVYON"
-          style={{ width: "100%", height: "360px", objectFit: "cover", display: "block" }}
-        />
+        <div style={{ background: "linear-gradient(135deg, #07122a 0%, #1a7fc4 100%)", borderRadius: "12px", width: "100%", height: "320px", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "white", fontSize: "48px", opacity: 0.3 }}>◆</span></div>
       </section>
       {/* Servicios grid */}
       <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>

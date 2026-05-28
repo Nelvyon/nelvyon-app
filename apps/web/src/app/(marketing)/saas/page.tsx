@@ -67,11 +67,7 @@ export default function SaasPage() {
       </section>
       {/* Imagen */}
       <section style={{ backgroundColor: "#f8faff", padding: "0" }}>
-        <img
-          src="https://images.unsplash.com/photo-1543286386-713bdd548da4?w=1400&q=85&fm=webp"
-          alt="Plataforma SaaS NELVYON"
-          style={{ width: "100%", height: "360px", objectFit: "cover", display: "block" }}
-        />
+        <div style={{ background: "linear-gradient(135deg, #07122a 0%, #1a7fc4 100%)", borderRadius: "12px", width: "100%", height: "320px", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "white", fontSize: "48px", opacity: 0.3 }}>◆</span></div>
       </section>
       {/* Features */}
       <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
