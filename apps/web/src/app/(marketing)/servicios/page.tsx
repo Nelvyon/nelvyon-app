@@ -4,12 +4,6 @@ export const metadata: Metadata = {
   title: "Servicios | NELVYON — Marketing Digital con Agentes Expertos",
   description: "Meta Ads, Google Ads, TikTok Ads, WhatsApp Marketing, Email Marketing y webs automáticas. Todo gestionado por agentes expertos de NELVYON.",
 };
-const heroStats = [
-  { label: "leads generados", value: "+2.847" },
-  { label: "ingresos mes", value: "€38.420" },
-  { label: "tasa de cierre", value: "34.2%" },
-  { label: "clientes activos", value: "142" },
-];
 const services = [
   {
     title: "Meta Ads (Facebook & Instagram)",
@@ -70,18 +64,6 @@ export default function ServiciosPage() {
           <Link href="/contacto" style={{ display: "inline-block", backgroundColor: "#1a7fc4", color: "#ffffff", fontWeight: 700, fontSize: "16px", padding: "16px 40px", borderRadius: "12px", textDecoration: "none" }}>
             Solicitar demo gratuita →
           </Link>
-        </div>
-      </section>
-      <section style={{ backgroundColor: "#f8faff", padding: "24px 0" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ background: "linear-gradient(135deg, #07122a 0%, #1a7fc4 100%)", borderRadius: "16px", padding: "48px", display: "flex", gap: "32px", justifyContent: "center", flexWrap: "wrap" }}>
-            {heroStats.map((stat) => (
-              <div key={stat.label} style={{ textAlign: "center", minWidth: "160px" }}>
-                <p style={{ color: "white", fontSize: "13px", opacity: 0.7, margin: "0 0 8px" }}>{stat.label}</p>
-                <p style={{ color: "white", fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, margin: 0 }}>{stat.value}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
       {/* Servicios grid */}

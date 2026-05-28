@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ComparisonTable } from "@/components/agenforce/comparison-table";
 export const metadata: Metadata = {
   title: "SaaS | NELVYON — Plataforma de Marketing Automatizado",
   description: "NELVYON SaaS: la plataforma todo-en-uno con agentes expertos para automatizar tu marketing digital. Planes desde €97/mes. Sin permanencia.",
@@ -140,6 +141,7 @@ export default function SaasPage() {
           </div>
         </div>
       </section>
+      <ComparisonTable />
     </main>
   );
 }
