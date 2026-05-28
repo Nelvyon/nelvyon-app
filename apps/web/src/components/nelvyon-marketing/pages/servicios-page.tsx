@@ -97,7 +97,7 @@ export function NelvyonServiciosPage() {
               <p className="mt-4 text-sm font-semibold text-[#0084fc]">{s.plan}</p>
               <Link
                 href="/registro"
-                className="mt-6 inline-block rounded-lg bg-[#0084fc] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0066cc]"
+                className="mt-6 inline-block rounded-lg bg-[#0084fc] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0084fc]/90"
               >
                 Empezar gratis
               </Link>

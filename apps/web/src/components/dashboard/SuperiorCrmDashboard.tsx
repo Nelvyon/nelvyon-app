@@ -22,7 +22,7 @@ type SuperiorCrmOutput = {
   metrics: string[];
 };
 
-const accent = "#3b82f6";
+const accent = "#0084fc";
 
 const AGENTS: Row[] = [
   { id: "superiorcrm-leadscoring", title: "Scoring", subtitle: ">90% accuracy" },

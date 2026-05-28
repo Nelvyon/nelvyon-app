@@ -41,7 +41,7 @@ export default function WorkspaceBrandingV1Page() {
     setLogoUrlError(null);
     const trimmedAccent = accent.trim();
     if (trimmedAccent && !parseHexColor(trimmedAccent)) {
-      setAccentError("Use a 6-digit hex color (for example #2563eb or 2563eb).");
+      setAccentError("Use a 6-digit hex color (for example #0084fc or 2563eb).");
       return;
     }
     const logoCheck = validateHttpsLogoUrl(logoUrl);
@@ -155,7 +155,7 @@ export default function WorkspaceBrandingV1Page() {
                       setAccent(e.target.value);
                       setAccentError(null);
                     }}
-                    placeholder="#2563eb"
+                    placeholder="#0084fc"
                     value={accent}
                   />
                 </label>

@@ -63,7 +63,7 @@ export function NelvyonPricingCards() {
             href="/registro"
             className={`mt-8 block rounded-lg py-3 text-center text-sm font-semibold transition ${
               plan.popular
-                ? "bg-[#0084fc] text-white hover:bg-[#0066cc]"
+                ? "bg-[#0084fc] text-white hover:bg-[#0084fc]/90"
                 : "border border-[#0084fc] text-[#0084fc] hover:bg-[#f8faff]"
             }`}
           >

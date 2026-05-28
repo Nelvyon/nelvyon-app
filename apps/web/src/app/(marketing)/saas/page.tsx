@@ -58,7 +58,7 @@ export default function SaasPage() {
       <section style={{ backgroundColor: "#07122a", padding: "64px 0 0" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto", padding: "0 24px 48px", textAlign: "center" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#00d6fe", marginBottom: "16px" }}>NELVYON SaaS Platform</p>
-          <h1 style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
+          <h1 className="fade-in" style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
             La plataforma que trabaja<br />mientras tú descansas
           </h1>
           <p style={{ fontSize: "18px", color: "#a8c8e8", margin: "0 0 36px", lineHeight: 1.6 }}>
@@ -91,7 +91,7 @@ export default function SaasPage() {
       <section style={{ backgroundColor: "#ffffff", padding: "64px 0" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "40px" }}>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>Por qué NELVYON SaaS es diferente</h2>
+            <h2 className="fade-in" style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>Por qué NELVYON SaaS es diferente</h2>
             <p style={{ fontSize: "18px", color: "#5a6a8a", maxWidth: "540px", margin: "0 auto" }}>No es otra herramienta más. Es tu equipo de marketing completo en una plataforma.</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px" }}>
@@ -112,7 +112,7 @@ export default function SaasPage() {
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "40px" }}>
             <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>Precios transparentes</p>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>Elige tu plan</h2>
+            <h2 className="fade-in" style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>Elige tu plan</h2>
             <p style={{ fontSize: "18px", color: "#5a6a8a" }}>Sin permanencia. Sin sorpresas. Cancela cuando quieras.</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px", alignItems: "start" }}>

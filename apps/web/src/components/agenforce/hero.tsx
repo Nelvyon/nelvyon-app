@@ -8,7 +8,7 @@ export const Hero = () => {
     <section
       className="relative overflow-hidden"
       style={{
-        background: "linear-gradient(175deg, #07122a 0%, #0b1e44 30%, #053d7a 58%, #0084fc 80%, #00d6fe 94%, #ffffff 100%)",
+        background: "linear-gradient(175deg, #07122a 0%, #0b1e44 30%, #0084fc 45%, #0084fc 80%, #00d6fe 94%, #ffffff 100%)",
         paddingTop: "80px",
         paddingBottom: "0",
       }}
@@ -27,10 +27,13 @@ export const Hero = () => {
           </span>
         </div>
         {/* H1 */}
-        <h1 style={{
+        <h1
+          className="fade-in"
+          style={{
           textAlign: "center", fontSize: "clamp(36px, 5.5vw, 68px)", fontWeight: 800,
           color: "#ffffff", lineHeight: 1.08, letterSpacing: "-0.03em", margin: "0 0 16px 0"
-        }}>
+        }}
+        >
           El sistema operativo<br />de tu negocio
         </h1>
         {/* Eslogan */}
@@ -49,13 +52,25 @@ export const Hero = () => {
         </p>
         {/* CTAs */}
         <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px" }}>
-          <a href="/registro" style={{
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            height: "52px", padding: "0 32px", borderRadius: "50px",
-            background: "#ffffff", color: "#07122a", fontSize: "15px", fontWeight: 700,
-            textDecoration: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.25)"
-          }}>
-            Empieza gratis 14 días
+          <a
+            href="/contacto"
+            style={{
+              background: "#0084fc",
+              color: "white",
+              fontWeight: 700,
+              fontSize: "18px",
+              padding: "16px 40px",
+              borderRadius: "8px",
+              border: "none",
+              boxShadow: "0 0 30px rgba(0,132,252,0.5)",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textDecoration: "none",
+            }}
+          >
+            Empezar gratis
           </a>
           <a href="/demo" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",

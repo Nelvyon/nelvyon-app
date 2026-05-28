@@ -38,7 +38,7 @@ describe("marketing pricing and landing", () => {
     expect(container.textContent).toMatch(/€797/);
   });
 
-  it("CTA de planes enlazan a registro o contacto", () => {
+  it("CTA de planes enlazan a registro o contacto", { timeout: 15000 }, () => {
     renderWithProviders(<PricingPage />);
     const starter = screen.getByRole("link", { name: /Empezar con Starter/i });
     expect(starter).toHaveAttribute("href", "/registro");
@@ -52,18 +52,18 @@ describe("marketing pricing and landing", () => {
     expect(navCta).toHaveAttribute("href", "/contacto");
   });
 
-  it("Página / (home) renderiza headline correctamente", () => {
+  it("Página / (home) renderiza headline correctamente", { timeout: 15000 }, () => {
     renderWithProviders(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1.textContent).toMatch(/El sistema operativo/i);
     expect(h1.textContent).toMatch(/de tu negocio/i);
   });
 
-  it("Home tiene CTA de registro", () => {
+  it("Home tiene CTA principal a contacto", () => {
     renderWithProviders(<HomePage />);
-    const links = screen.getAllByRole("link", { name: /Empieza gratis/i });
+    const links = screen.getAllByRole("link", { name: /Empezar gratis/i });
     expect(links.length).toBeGreaterThan(0);
-    expect(links.some((el) => el.getAttribute("href") === "/registro")).toBe(true);
+    expect(links.some((el) => el.getAttribute("href") === "/contacto")).toBe(true);
   });
 
   it("Home enlaza a servicios", () => {

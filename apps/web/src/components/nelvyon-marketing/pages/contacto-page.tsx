@@ -112,7 +112,7 @@ export function NelvyonContactoPage() {
                 </div>
                 <button
                   type="submit"
-                  className="mt-6 w-full rounded-lg bg-[#0084fc] py-3 text-sm font-semibold text-white hover:bg-[#1569a8]"
+                  className="mt-6 w-full rounded-lg bg-[#0084fc] py-3 text-sm font-semibold text-white hover:bg-[#0084fc]/90"
                 >
                   Enviar mensaje
                 </button>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { Footer } from "@/components/agenforce/footer";
-import { Navbar } from "@/components/agenforce/navbar";
+import { Navbar } from "@/components/navbar";
 import { getAppBaseUrl } from "@/lib/appUrl";
 
 const canonicalBase = getAppBaseUrl();
@@ -48,6 +48,12 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <Navbar />
       {children}
       <Footer />
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "document.addEventListener('DOMContentLoaded',function(){const els=document.querySelectorAll('.fade-in');const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.1});els.forEach(el=>obs.observe(el))});",
+        }}
+      />
     </>
   );
 }

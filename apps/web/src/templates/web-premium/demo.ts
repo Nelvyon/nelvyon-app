@@ -12,7 +12,7 @@ export const webPremiumNelvyonDemoConfig: WebPremiumSiteConfig = {
     locale: "en_US",
   },
   theme: {
-    accentHex: "#2563eb",
+    accentHex: "#0084fc",
   },
   hero: {
     eyebrow: "OS-delivered web · v2 (Design System)",

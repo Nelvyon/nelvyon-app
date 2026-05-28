@@ -22,7 +22,7 @@ export function LogoCloud() {
         <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
           Integrado con las herramientas que ya usas
         </p>
-        <h2 style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
+        <h2 className="fade-in" style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
           Conectado con todo tu ecosistema
         </h2>
       </div>

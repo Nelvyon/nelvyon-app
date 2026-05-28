@@ -98,7 +98,7 @@ export default function BrandingPreviewV2Page() {
             <input
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               onChange={(e) => setAccent(e.target.value)}
-              placeholder={tenant?.primary_color || "#2563eb"}
+              placeholder={tenant?.primary_color || "#0084fc"}
               value={accent}
             />
           </label>

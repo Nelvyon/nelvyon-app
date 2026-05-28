@@ -81,7 +81,7 @@ function priorityTone(priority: FormacionAuditItem["priority"]): "danger" | "war
   }
 }
 
-export function FormacionCapacitacionPremiumProjectTemplate({ config, accentHex = "#1d4ed8", showDeliveryPanel = false }: Props) {
+export function FormacionCapacitacionPremiumProjectTemplate({ config, accentHex = "#0084fc", showDeliveryPanel = false }: Props) {
   const surfaceStyle = { "--formacion-accent": accentHex } as CSSProperties;
 
   return (

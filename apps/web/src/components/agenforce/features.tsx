@@ -45,7 +45,7 @@ export function Features() {
           <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
             Todo en una plataforma
           </p>
-          <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>
+          <h2 className="fade-in" style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>
             Cada herramienta que necesitas,<br />ninguna que no necesitas
           </h2>
           <p style={{ fontSize: "18px", color: "#5a6a8a", maxWidth: "600px", margin: "0 auto", lineHeight: 1.6 }}>

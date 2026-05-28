@@ -60,7 +60,7 @@ export function HomeHero() {
       className="relative overflow-hidden px-4 pb-20 pt-16 lg:px-6 lg:pt-24"
       style={{
         background:
-          "linear-gradient(175deg, #07122a 0%, #0b1e44 35%, #0e3a7a 60%, #0084fc 80%, #00d6fe 95%, #ffffff 100%)",
+          "linear-gradient(175deg, #07122a 0%, #0b1e44 35%, #0084fc 60%, #0084fc 80%, #00d6fe 95%, #ffffff 100%)",
       }}
     >
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">

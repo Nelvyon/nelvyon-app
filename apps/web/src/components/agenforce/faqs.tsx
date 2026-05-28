@@ -24,7 +24,7 @@ export const FAQs = () => {
       <Container>
         <div style={{ textAlign: "center", marginBottom: "64px" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, color: "#0084fc", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "12px" }}>FAQ</p>
-          <h2 style={{ fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 800, color: "#07122a", letterSpacing: "-0.03em" }}>
+          <h2 className="fade-in" style={{ fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 800, color: "#07122a", letterSpacing: "-0.03em" }}>
             Preguntas frecuentes
           </h2>
         </div>

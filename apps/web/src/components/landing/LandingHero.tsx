@@ -12,7 +12,7 @@ export function LandingHero() {
     <section
       style={{
         width: '100%',
-        background: 'linear-gradient(175deg, #07122a 0%, #0b1e44 30%, #0e3a7a 58%, #0084fc 78%, #00d6fe 92%, #a8dff5 100%)',
+        background: 'linear-gradient(175deg, #07122a 0%, #0b1e44 30%, #0084fc 58%, #0084fc 78%, #00d6fe 92%, #a8dff5 100%)',
         paddingTop: '0',
         paddingBottom: '0',
         position: 'relative',

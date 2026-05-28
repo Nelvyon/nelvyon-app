@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/agenforce/footer";
-import { Navbar } from "@/components/agenforce/navbar";
+import { Navbar } from "@/components/navbar";
 import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
 export const metadata: Metadata = {
   title: "Política de Privacidad | NELVYON",

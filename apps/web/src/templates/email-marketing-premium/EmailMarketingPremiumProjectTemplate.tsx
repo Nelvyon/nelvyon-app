@@ -81,7 +81,7 @@ function priorityTone(priority: EmailMarketingAuditItem["priority"]): "danger" |
   }
 }
 
-export function EmailMarketingPremiumProjectTemplate({ config, accentHex = "#1d4ed8", showDeliveryPanel = false }: Props) {
+export function EmailMarketingPremiumProjectTemplate({ config, accentHex = "#0084fc", showDeliveryPanel = false }: Props) {
   const surfaceStyle = { "--em-accent": accentHex } as CSSProperties;
 
   return (

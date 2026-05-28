@@ -170,6 +170,7 @@ export default function ServiciosPage() {
             Servicios NELVYON
           </p>
           <h1
+            className="fade-in"
             style={{
               fontSize: "clamp(36px, 6vw, 60px)",
               fontWeight: 900,
@@ -209,6 +210,7 @@ export default function ServiciosPage() {
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "48px 24px 0" }}>
           <div style={{ textAlign: "center", marginBottom: "48px" }}>
             <h2
+              className="fade-in"
               style={{
                 fontSize: "clamp(28px, 4vw, 44px)",
                 fontWeight: 800,

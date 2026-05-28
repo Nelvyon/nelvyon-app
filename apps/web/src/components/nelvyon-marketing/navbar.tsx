@@ -44,7 +44,7 @@ export function NelvyonNavbar() {
           </Link>
           <Link
             href="/registro"
-            className="rounded-lg bg-[#0084fc] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0066cc]"
+            className="rounded-lg bg-[#0084fc] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0084fc]/90"
           >
             Empieza gratis
           </Link>
