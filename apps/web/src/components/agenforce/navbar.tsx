@@ -1,85 +1,184 @@
 "use client";
-import React, { useState } from "react";
-import { Logo } from "./logo";
-import { Container } from "./container";
+
 import Link from "next/link";
-import { Button } from "./ui/button";
-import { IconLayoutSidebar, IconX } from "@tabler/icons-react";
-import { AnimatePresence, motion } from "motion/react";
-const navlinks = [
+import { useState } from "react";
+
+const navLinks = [
   { title: "Inicio", href: "/" },
   { title: "Servicios", href: "/servicios" },
   { title: "SaaS", href: "/saas" },
   { title: "Nosotros", href: "/nosotros" },
-  { title: "Precios", href: "/pricing" },
+  { title: "Precios", href: "/#precios" },
   { title: "Contacto", href: "/contacto" },
 ];
-export const Navbar = () => {
+
+export function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <div className="border-b border-neutral-200 bg-white sticky top-0 z-50">
-      <DesktopNavbar />
-      <MobileNavbar />
-    </div>
-  );
-};
-export const MobileNavbar = () => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="flex md:hidden px-4 py-3 justify-between relative bg-white">
-      <Logo />
-      <button onClick={() => setOpen(!open)}>
-        <IconLayoutSidebar className="size-5 text-neutral-700" />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 h-full w-full z-50 px-4 py-4 bg-white flex flex-col justify-between"
+    <header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        backgroundColor: "#07122a",
+        padding: "16px 24px",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "24px",
+        }}
+      >
+        <Link
+          href="/"
+          style={{
+            color: "#ffffff",
+            fontWeight: 800,
+            fontSize: "20px",
+            textDecoration: "none",
+            letterSpacing: "-0.02em",
+            flexShrink: 0,
+          }}
+        >
+          NELVYON
+        </Link>
+
+        <nav
+          aria-label="Principal"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "28px",
+            flex: 1,
+          }}
+          className="nelvyon-nav-desktop"
+        >
+          {navLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                color: "rgba(255,255,255,0.85)",
+                fontSize: "14px",
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
+            >
+              {item.title}
+            </Link>
+          ))}
+        </nav>
+
+        <Link
+          href="/contacto"
+          className="nelvyon-nav-cta"
+          style={{
+            display: "inline-block",
+            backgroundColor: "#1a7fc4",
+            color: "#ffffff",
+            fontWeight: 700,
+            fontSize: "14px",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            textDecoration: "none",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
+        >
+          Empezar gratis →
+        </Link>
+
+        <button
+          type="button"
+          aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen((open) => !open)}
+          className="nelvyon-nav-mobile-toggle"
+          style={{
+            display: "none",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "transparent",
+            border: "1px solid rgba(255,255,255,0.25)",
+            borderRadius: "8px",
+            color: "#ffffff",
+            fontSize: "18px",
+            width: "40px",
+            height: "40px",
+            cursor: "pointer",
+            flexShrink: 0,
+          }}
+        >
+          {mobileOpen ? "✕" : "☰"}
+        </button>
+      </div>
+
+      {mobileOpen ? (
+        <nav
+          aria-label="Principal móvil"
+          style={{
+            maxWidth: "1200px",
+            margin: "16px auto 0",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            paddingTop: "16px",
+            borderTop: "1px solid rgba(255,255,255,0.1)",
+          }}
+          className="nelvyon-nav-mobile-panel"
+        >
+          {navLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                color: "#ffffff",
+                fontSize: "15px",
+                fontWeight: 600,
+                textDecoration: "none",
+                padding: "8px 0",
+              }}
+            >
+              {item.title}
+            </Link>
+          ))}
+          <Link
+            href="/contacto"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              marginTop: "8px",
+              display: "inline-block",
+              textAlign: "center",
+              backgroundColor: "#1a7fc4",
+              color: "#ffffff",
+              fontWeight: 700,
+              fontSize: "14px",
+              padding: "12px 20px",
+              borderRadius: "10px",
+              textDecoration: "none",
+            }}
           >
-            <div>
-              <div className="flex justify-between items-center mb-8">
-                <Logo />
-                <button onClick={() => setOpen(false)}><IconX className="size-5" /></button>
-              </div>
-              <div className="flex flex-col gap-6">
-                {navlinks.map((item, index) => (
-                  <Link key={index} href={item.href} onClick={() => setOpen(false)}
-                    className="text-xl text-neutral-700 font-medium hover:text-[#1a7fc4] transition-colors">
-                    {item.title}
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center gap-4 pb-4">
-              <Link href="/login" className="text-sm px-4 py-2 text-neutral-600 font-medium">Acceder</Link>
-              <Button asChild><Link href="/registro">Empieza gratis</Link></Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-export const DesktopNavbar = () => {
-  return (
-    <Container className="py-4 items-center justify-between hidden lg:flex">
-      <Logo />
-      <div className="flex items-center gap-8">
-        {navlinks.map((item, index) => (
-          <Link key={index} href={item.href}
-            className="text-sm text-neutral-600 font-medium hover:text-[#1a7fc4] transition-colors">
-            {item.title}
+            Empezar gratis →
           </Link>
-        ))}
-      </div>
-      <div className="flex items-center gap-4">
-        <Link href="/login" className="text-sm px-4 py-2 text-neutral-600 font-medium hover:text-[#1a7fc4] transition-colors">Acceder</Link>
-        <Button asChild style={{ background: "#1a7fc4" }}>
-          <Link href="/registro">Empieza gratis</Link>
-        </Button>
-      </div>
-    </Container>
+        </nav>
+      ) : null}
+
+      <style>{`
+        @media (max-width: 899px) {
+          .nelvyon-nav-desktop { display: none !important; }
+          .nelvyon-nav-cta { display: none !important; }
+          .nelvyon-nav-mobile-toggle { display: flex !important; }
+        }
+      `}</style>
+    </header>
   );
-};
+}

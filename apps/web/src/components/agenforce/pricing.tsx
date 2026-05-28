@@ -33,7 +33,7 @@ const plans = [
 ];
 export const Pricing = () => {
   return (
-    <section className="py-20 lg:py-32 bg-white">
+    <section id="precios" className="py-20 lg:py-32 bg-white">
       <Container>
         <div style={{ textAlign: "center", marginBottom: "64px" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, color: "#1a7fc4", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "12px" }}>Precios</p>

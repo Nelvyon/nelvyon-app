@@ -6,7 +6,7 @@ export function LogoCloud() {
     { name: "Google Ads", slug: "googleads", color: "#4285F4" },
     { name: "WhatsApp", slug: "whatsapp", color: "#25D366" },
     { name: "Stripe", slug: "stripe", color: "#635BFF" },
-    { name: "Twilio", slug: "twilio", color: "#F22F46" },
+    { name: "LinkedIn", slug: "linkedin", color: "#0A66C2" },
     { name: "Zapier", slug: "zapier", color: "#FF4A00" },
     { name: "Mailchimp", slug: "mailchimp", color: "#FFE01B" },
     { name: "TikTok", slug: "tiktok", color: "#000000" },

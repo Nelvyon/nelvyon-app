@@ -46,10 +46,10 @@ describe("marketing pricing and landing", () => {
     expect(sales).toHaveAttribute("href", "/contacto");
   });
 
-  it("Nav incluye CTA a /registro", () => {
+  it("Nav incluye CTA a contacto", () => {
     renderWithProviders(<PricingPage />);
-    const navCta = screen.getAllByRole("link", { name: /^Empieza gratis$/i })[0];
-    expect(navCta).toHaveAttribute("href", "/registro");
+    const navCta = screen.getAllByRole("link", { name: /Empezar gratis/i })[0];
+    expect(navCta).toHaveAttribute("href", "/contacto");
   });
 
   it("Página / (home) renderiza headline correctamente", () => {

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { Footer } from "@/components/agenforce/footer";
+import { Navbar } from "@/components/agenforce/navbar";
 import { getAppBaseUrl } from "@/lib/appUrl";
 
 const canonicalBase = getAppBaseUrl();
@@ -41,5 +43,11 @@ export const metadata: Metadata = {
 };
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
-  return <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased">{children}</div>;
+  return (
+    <>
+      <Navbar />
+      {children}
+      <Footer />
+    </>
+  );
 }
