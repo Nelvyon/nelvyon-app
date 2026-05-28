@@ -19,7 +19,7 @@ export default function BlogPage() {
     <main style={{ paddingTop: "68px" }}>
       <section style={{ backgroundColor: "#07122a", padding: "80px 0 0" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 64px", textAlign: "center" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#00d6fe", marginBottom: "16px" }}>Blog NELVYON</p>
+          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "16px" }}>Blog NELVYON</p>
           <h1 className="fade-in" style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>Ideas para operar mejor el marketing</h1>
           <p style={{ fontSize: "18px", color: "#a8c8e8", margin: 0, lineHeight: 1.6 }}>Análisis, guías y reflexiones sobre automatización, campañas, CRM, contenido, reporting y sistemas de crecimiento empresarial.</p>
         </div>

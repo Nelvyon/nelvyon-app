@@ -12,7 +12,7 @@ export default function ContactoPage() {
     <main>
       <section style={{ backgroundColor: "#07122a", padding: "120px 0 0" }}>
         <div style={{ maxWidth: "700px", margin: "0 auto", padding: "0 24px 80px", textAlign: "center" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#00d6fe", marginBottom: "16px" }}>
+          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "16px" }}>
             Contacto
           </p>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
@@ -26,10 +26,10 @@ export default function ContactoPage() {
       </section>
       <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "start" }}>
+          <div className="nelvyon-contacto-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "start" }}>
             <div>
               <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 32px" }}>
-                Este formulario no es para recibir una propuesta genérica. Es para entender tu situación actual, tus herramientas, tus procesos, tus canales y el tipo de estructura que necesitas construir. Cuanta más claridad tengamos desde el inicio, mejor podremos orientarte.
+                Este formulario no es para recibir una propuesta genérica. Es para entender tu situación actual y valorar qué estructura puede tener sentido para tu empresa.
               </p>
               <div style={{ marginBottom: "32px" }}>
                 <p style={{ fontSize: "14px", fontWeight: 600, color: "#07122a", margin: "0 0 12px" }}>Información de contacto</p>
@@ -57,7 +57,7 @@ export default function ContactoPage() {
                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Nombre completo *</label>
                   <input type="text" name="nombre" required placeholder="Tu nombre completo" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div className="nelvyon-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Empresa</label>
                     <input type="text" name="empresa" placeholder="Tu empresa" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
@@ -71,7 +71,7 @@ export default function ContactoPage() {
                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Email corporativo *</label>
                   <input type="email" name="email" required placeholder="tu@empresa.com" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div className="nelvyon-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Teléfono</label>
                     <input type="tel" name="telefono" placeholder="+34 600 000 000" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
@@ -81,7 +81,7 @@ export default function ContactoPage() {
                     <input type="url" name="web" placeholder="https://tuempresa.com" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
                   </div>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div className="nelvyon-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Sector</label>
                     <input type="text" name="sector" placeholder="Tu sector" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
@@ -117,7 +117,7 @@ export default function ContactoPage() {
                   <textarea name="mensaje" rows={4} placeholder="Cuéntanos tu situación, objetivos o contexto..." style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit" }} />
                 </div>
                 <button type="submit" style={{ backgroundColor: "#0084fc", color: "#ffffff", fontWeight: 700, fontSize: "15px", padding: "14px 24px", borderRadius: "12px", border: "none", cursor: "pointer", width: "100%" }}>
-                  Enviar solicitud →
+                  Enviar solicitud
                 </button>
                 <p style={{ fontSize: "12px", color: "#9aabbf", textAlign: "center", margin: 0 }}>
                   Al enviar aceptas nuestra política de privacidad.
@@ -133,6 +133,12 @@ export default function ContactoPage() {
         primaryLabel="Contactar con NELVYON"
         showSecondary={false}
       />
+      <style>{`
+        @media (max-width: 768px) {
+          .nelvyon-contacto-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .nelvyon-form-row { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </main>
   );
 }

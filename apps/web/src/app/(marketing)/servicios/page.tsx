@@ -126,7 +126,20 @@ function ServiceCard({ service }: { service: Service }) {
       <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#07122a", margin: 0, lineHeight: 1.3 }}>
         {service.title}
       </h3>
-      <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6, margin: 0, flex: 1 }}>
+      <p
+        className="nelvyon-service-desc"
+        style={{
+          fontSize: "14px",
+          color: "#5a6a8a",
+          lineHeight: 1.6,
+          margin: 0,
+          flex: 1,
+          display: "-webkit-box",
+          WebkitLineClamp: 4,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
         {service.description}
       </p>
     </div>
@@ -144,7 +157,7 @@ export default function ServiciosPage() {
               fontWeight: 600,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
-              color: "#00d6fe",
+              color: "rgba(255,255,255,0.45)",
               marginBottom: "16px",
             }}
           >
@@ -160,13 +173,10 @@ export default function ServiciosPage() {
               lineHeight: 1.1,
             }}
           >
-            Servicios de marketing para operar con criterio
+            Servicios de marketing conectados a una operación real
           </h1>
-          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: "0 0 16px", lineHeight: 1.6 }}>
-            NELVYON diseña, ejecuta y coordina servicios de marketing digital dentro de una estructura profesional, medible y conectada.
-          </p>
-          <p style={{ fontSize: "16px", color: "#a8c8e8", margin: "0 0 36px", lineHeight: 1.6 }}>
-            Cada servicio se integra dentro de un sistema mayor: campañas, contenidos, automatización, CRM, analítica y seguimiento. El objetivo no es hacer acciones aisladas, sino construir una operación coherente.
+          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: "0 0 36px", lineHeight: 1.6, maxWidth: "640px", marginLeft: "auto", marginRight: "auto" }}>
+            Campañas, contenido, automatización, CRM y analítica trabajados dentro de un sistema profesional, medible y centralizado.
           </p>
           <Link
             href="/contacto"
@@ -187,27 +197,11 @@ export default function ServiciosPage() {
         <NavyToWhiteTransition />
       </section>
 
-      <section style={{ backgroundColor: "#ffffff", padding: "0 0 64px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "48px 24px 0" }}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }}>
-            <h2
-              className="fade-in"
-              style={{
-                fontSize: "clamp(28px, 4vw, 44px)",
-                fontWeight: 800,
-                color: "#07122a",
-                margin: "0 0 16px",
-              }}
-            >
-              Metodología profesional
-            </h2>
-            <p style={{ fontSize: "17px", color: "#5a6a8a", maxWidth: "800px", margin: "0 auto 16px", lineHeight: 1.7 }}>
-              Una empresa no necesita más ruido. Necesita claridad. NELVYON trabaja con una metodología basada en diagnóstico, ejecución, medición y optimización responsable. Cada canal se configura según la situación real del negocio, sus activos, su mercado, su capacidad comercial y su estructura interna.
-            </p>
-            <p style={{ fontSize: "16px", color: "#5a6a8a", maxWidth: "800px", margin: "0 auto", lineHeight: 1.7 }}>
-              No utilizamos mensajes vacíos ni promesas irreales. Creamos sistemas de marketing profesionales preparados para funcionar de forma ordenada.
-            </p>
-          </div>
+      <section style={{ backgroundColor: "#ffffff", padding: "64px 0" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+          <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, maxWidth: "720px", margin: "0 auto 48px", textAlign: "center" }}>
+            Una empresa no necesita más ruido. Necesita claridad. Cada servicio se integra en un sistema mayor: campañas, contenidos, automatización, CRM y seguimiento, configurados según la situación real del negocio.
+          </p>
           <div
             style={{
               display: "grid",
@@ -246,8 +240,34 @@ export default function ServiciosPage() {
         `}</style>
       </section>
 
+      <section style={{ backgroundColor: "#f8faff", padding: "80px 0" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+          <h2 className="fade-in" style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "#07122a", textAlign: "center", margin: "0 0 40px" }}>
+            Metodología
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }} className="nelvyon-metodologia-grid">
+            {[
+              { title: "Diagnóstico", desc: "Análisis de canales, procesos, herramientas y capacidad comercial." },
+              { title: "Planificación", desc: "Definición de estructura, prioridades y conexión entre servicios." },
+              { title: "Implementación", desc: "Configuración, ejecución y centralización de la operación." },
+              { title: "Revisión continua", desc: "Medición, ajustes y optimización con criterio profesional." },
+            ].map((m) => (
+              <div key={m.title} style={{ backgroundColor: "#ffffff", border: "1px solid #e8eef8", borderRadius: "12px", padding: "24px" }}>
+                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#07122a", margin: "0 0 8px" }}>{m.title}</h3>
+                <p style={{ fontSize: "14px", color: "#5a6a8a", margin: 0, lineHeight: 1.55 }}>{m.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`
+          @media (max-width: 768px) {
+            .nelvyon-metodologia-grid { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
+      </section>
+
       <CtaFinal
-        title="Servicios conectados dentro de un sistema"
+        title="Ordena tu marketing dentro de un sistema profesional"
         subtitle="Marketing, automatización, CRM y reporting trabajando bajo una misma estructura operativa."
         primaryLabel="Solicitar análisis"
         showSecondary={false}

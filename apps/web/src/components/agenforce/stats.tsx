@@ -1,60 +1,56 @@
 export function Stats() {
   const principios = [
-    {
-      title: "Sin promesas infladas",
-      desc: "No prometemos cifras que no dependen únicamente de una plataforma o una campaña. Trabajamos con metodología, medición y criterio profesional.",
-    },
-    {
-      title: "Visibilidad completa",
-      desc: "Cada acción debe poder revisarse, analizarse y entenderse. La empresa debe saber qué se está haciendo y por qué.",
-    },
-    {
-      title: "Procesos antes que improvisación",
-      desc: "El marketing serio no depende de golpes de suerte. Depende de sistemas, consistencia, datos y ejecución ordenada.",
-    },
-    {
-      title: "Agentes expertos operativos",
-      desc: "NELVYON utiliza agentes expertos para ejecutar tareas específicas de marketing, ventas, contenido, automatización y análisis sin intervención humana constante.",
-    },
-    {
-      title: "Tecnología con soporte humano",
-      desc: "La automatización aporta velocidad y continuidad. El criterio estratégico aporta dirección, control y coherencia.",
-    },
+    { title: "Operación 24/7", desc: "Los agentes expertos mantienen tareas y flujos activos según la configuración definida." },
+    { title: "Procesos centralizados", desc: "Campañas, CRM, contenidos y reporting en un entorno único, no en herramientas aisladas." },
+    { title: "Dashboards claros", desc: "Visibilidad operativa para revisar qué ocurre y tomar decisiones con criterio." },
+    { title: "Agentes expertos", desc: "Coordinación de tareas de marketing, ventas, contenido y análisis sin intervención constante." },
+    { title: "Sin permanencia forzada", desc: "Relación profesional mes a mes, centrada en utilidad y claridad operativa." },
+    { title: "Servicios + plataforma", desc: "Ejecución profesional y tecnología operativa en el mismo ecosistema." },
   ];
+
   return (
-    <section style={{ backgroundColor: "#f8faff", padding: "0 0 64px" }}>
+    <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
-            Principios de trabajo
+        <div style={{ textAlign: "center", marginBottom: "48px" }}>
+          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
+            Principios operativos
           </p>
-          <h2 className="fade-in" style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
-            Cómo trabajamos en NELVYON
+          <h2 className="fade-in" style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
+            Diseñado para operar con control
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "24px" }}>
-          {principios.map((p, i) => (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "16px",
+          }}
+          className="nelvyon-principios-grid"
+        >
+          {principios.map((p) => (
             <div
-              key={i}
+              key={p.title}
               style={{
-                backgroundColor: "#ffffff",
+                backgroundColor: "#f8faff",
                 border: "1px solid #e8eef8",
-                borderRadius: "20px",
-                padding: "32px 28px",
-                textAlign: "left",
-                boxShadow: "0 4px 20px rgba(7,18,42,0.06)",
+                borderRadius: "12px",
+                padding: "24px",
               }}
             >
-              <div style={{ fontSize: "17px", fontWeight: 800, color: "#07122a", marginBottom: "12px", lineHeight: 1.3 }}>
-                {p.title}
-              </div>
-              <div style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6 }}>
-                {p.desc}
-              </div>
+              <div style={{ fontSize: "15px", fontWeight: 700, color: "#07122a", marginBottom: "8px" }}>{p.title}</div>
+              <div style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.55 }}>{p.desc}</div>
             </div>
           ))}
         </div>
       </div>
+      <style>{`
+        @media (max-width: 900px) {
+          .nelvyon-principios-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 520px) {
+          .nelvyon-principios-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }

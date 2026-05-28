@@ -1,94 +1,91 @@
 export function ComoFunciona() {
   const steps = [
     {
-      num: 1,
+      num: "01",
       title: "Diagnóstico operativo",
-      desc: "Analizamos tu situación actual: canales, procesos, herramientas, equipo, flujo comercial y necesidades reales de automatización.",
+      desc: "Analizamos canales, procesos, herramientas, equipo comercial y necesidades reales de automatización.",
     },
     {
-      num: 2,
+      num: "02",
       title: "Diseño del sistema",
-      desc: "Definimos la estructura de trabajo: campañas, CRM, contenidos, automatizaciones, agentes expertos, reporting y prioridades operativas.",
+      desc: "Definimos la estructura de campañas, CRM, contenidos, agentes expertos, reporting y flujos de trabajo.",
     },
     {
-      num: 3,
+      num: "03",
       title: "Implementación controlada",
-      desc: "Configuramos el ecosistema NELVYON con los módulos y servicios necesarios para que tu operación quede centralizada y ordenada.",
+      desc: "Configuramos la plataforma, conectamos herramientas y dejamos cada módulo preparado para operar.",
     },
     {
-      num: 4,
+      num: "04",
       title: "Operación continua",
-      desc: "Los agentes expertos trabajan 24/7 ejecutando tareas, coordinando procesos, generando activos y manteniendo el sistema en funcionamiento.",
+      desc: "Los agentes expertos mantienen tareas, flujos y procesos activos 24/7 según la configuración definida.",
     },
   ];
 
   return (
-    <section style={{ backgroundColor: "#07122a" }}>
-      <div
-        aria-hidden
-        style={{ background: "linear-gradient(to bottom, #ffffff, #07122a)", height: "80px" }}
-      />
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "64px 24px" }}>
-        <h2
-          className="fade-in"
-          style={{
-            fontSize: "clamp(28px, 4vw, 44px)",
-            fontWeight: 800,
-            color: "#ffffff",
-            textAlign: "center",
-            margin: "0 0 48px",
-          }}
-        >
-          Cómo funciona
-        </h2>
+    <section style={{ backgroundColor: "#07122a", padding: "96px 0" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: "56px" }}>
+          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
+            Proceso
+          </p>
+          <h2 className="fade-in" style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 800, color: "#ffffff", margin: 0 }}>
+            Cómo funciona
+          </h2>
+        </div>
         <div
+          className="nelvyon-como-funciona-timeline"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "32px",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "24px",
+            position: "relative",
           }}
         >
+          <div
+            aria-hidden
+            className="nelvyon-timeline-line"
+            style={{
+              position: "absolute",
+              top: "28px",
+              left: "12%",
+              right: "12%",
+              height: "1px",
+              background: "rgba(255,255,255,0.1)",
+            }}
+          />
           {steps.map((step) => (
-            <div key={step.num} style={{ textAlign: "center" }}>
+            <div key={step.num} style={{ position: "relative", zIndex: 1 }}>
               <div
                 style={{
-                  fontSize: "clamp(48px, 6vw, 72px)",
-                  fontWeight: 900,
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "12px",
+                  background: "rgba(0,132,252,0.12)",
+                  border: "1px solid rgba(0,132,252,0.3)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "13px",
+                  fontWeight: 700,
                   color: "#0084fc",
-                  lineHeight: 1,
-                  marginBottom: "16px",
+                  marginBottom: "20px",
                 }}
               >
                 {step.num}
               </div>
-              <h3
-                style={{
-                  fontSize: "18px",
-                  fontWeight: 800,
-                  color: "#ffffff",
-                  margin: "0 0 12px",
-                }}
-              >
-                {step.title}
-              </h3>
-              <p
-                style={{
-                  fontSize: "15px",
-                  color: "#a8c8e8",
-                  lineHeight: 1.6,
-                  margin: 0,
-                }}
-              >
-                {step.desc}
-              </p>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#ffffff", margin: "0 0 10px", lineHeight: 1.3 }}>{step.title}</h3>
+              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6, margin: 0 }}>{step.desc}</p>
             </div>
           ))}
         </div>
       </div>
-      <div
-        aria-hidden
-        style={{ background: "linear-gradient(to bottom, #07122a, #ffffff)", height: "80px" }}
-      />
+      <style>{`
+        @media (max-width: 900px) {
+          .nelvyon-como-funciona-timeline { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .nelvyon-timeline-line { display: none !important; }
+        }
+      `}</style>
     </section>
   );
 }

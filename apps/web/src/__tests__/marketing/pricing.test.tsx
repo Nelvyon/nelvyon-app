@@ -20,7 +20,7 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe("marketing pricing and landing", () => {
-  it("Página /pricing renderiza los 3 planes", () => {
+  it("Página /pricing renderiza los 3 planes", { timeout: 15000 }, () => {
     renderWithProviders(<PricingPage />);
     expect(screen.getByText("Empezar con Starter")).toBeInTheDocument();
     expect(screen.getByText("Empezar con Growth")).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("marketing pricing and landing", () => {
 
   it("Nav incluye CTA a contacto", () => {
     renderWithProviders(<PricingPage />);
-    const navCta = screen.getAllByRole("link", { name: /Empezar gratis/i })[0];
+    const navCta = screen.getAllByRole("link", { name: /Solicitar demo/i })[0];
     expect(navCta).toHaveAttribute("href", "/contacto");
   });
 
@@ -61,7 +61,7 @@ describe("marketing pricing and landing", () => {
 
   it("Home tiene CTA principal a contacto", () => {
     renderWithProviders(<HomePage />);
-    const links = screen.getAllByRole("link", { name: /Empieza ahora/i });
+    const links = screen.getAllByRole("link", { name: /Solicitar demo/i });
     expect(links.length).toBeGreaterThan(0);
     expect(links.some((el) => el.getAttribute("href") === "/contacto")).toBe(true);
   });

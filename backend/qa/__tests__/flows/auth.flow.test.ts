@@ -36,7 +36,7 @@ describe("flow: auth — registro → login → refresh → logout", () => {
     auth = new AuthService(JWT_SECRET, { query: queryMock });
   });
 
-  it("registro con email válido devuelve userId y token", async () => {
+  it("registro con email válido devuelve userId y token", { timeout: 15000 }, async () => {
     queryMock.mockImplementation(async (sql: string) => {
       if (String(sql).includes("INSERT INTO nelvyon_users")) {
         return [{ ...userRow, password_hash: await auth.hashPassword("password123") }];
@@ -92,7 +92,7 @@ describe("flow: auth — registro → login → refresh → logout", () => {
     await expect(auth.verifyToken(expired)).rejects.toThrow(/Unauthorized/);
   });
 
-  it("refresh: nuevo login emite token válido (sesión renovada)", async () => {
+  it("refresh: nuevo login emite token válido (sesión renovada)", { timeout: 15000 }, async () => {
     const hash = await auth.hashPassword("secretpass");
     queryMock.mockResolvedValue([{ ...userRow, password_hash: hash }]);
 

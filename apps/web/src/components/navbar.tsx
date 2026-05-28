@@ -6,9 +6,9 @@ import { useState } from "react";
 const navLinks = [
   { title: "Inicio", href: "/" },
   { title: "Servicios", href: "/servicios" },
-  { title: "SaaS", href: "/saas" },
+  { title: "Plataforma", href: "/saas" },
   { title: "Nosotros", href: "/nosotros" },
-  { title: "Precios", href: "/#precios" },
+  { title: "Blog", href: "/blog" },
   { title: "Contacto", href: "/contacto" },
 ];
 
@@ -22,14 +22,15 @@ export function Navbar() {
         top: 0,
         zIndex: 50,
         backgroundColor: "#07122a",
-        padding: "16px 24px",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}
     >
       <div
         style={{
           maxWidth: "1200px",
           margin: "0 auto",
+          padding: "0 24px",
+          height: "64px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -43,32 +44,40 @@ export function Navbar() {
             alignItems: "center",
             textDecoration: "none",
             flexShrink: 0,
+            gap: "1px",
           }}
         >
-          <span style={{ color: "#0084fc", fontWeight: 900, fontSize: "22px", letterSpacing: "-0.5px" }}>N</span>
-          <span style={{ color: "white", fontWeight: 700, fontSize: "22px", letterSpacing: "-0.5px" }}>ELVYON</span>
+          <span style={{ color: "#0084fc", fontWeight: 800, fontSize: "18px", letterSpacing: "-0.03em" }}>N</span>
+          <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600, fontSize: "18px", letterSpacing: "-0.03em" }}>ELVYON</span>
         </Link>
 
         <nav
           aria-label="Principal"
+          className="nelvyon-nav-desktop"
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "28px",
+            gap: "32px",
             flex: 1,
           }}
-          className="nelvyon-nav-desktop"
         >
           {navLinks.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               style={{
-                color: "rgba(255,255,255,0.85)",
+                color: "rgba(255,255,255,0.65)",
                 fontSize: "14px",
-                fontWeight: 600,
+                fontWeight: 500,
                 textDecoration: "none",
+                transition: "color 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#ffffff";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "rgba(255,255,255,0.65)";
               }}
             >
               {item.title}
@@ -80,19 +89,21 @@ export function Navbar() {
           href="/contacto"
           className="nelvyon-nav-cta"
           style={{
-            display: "inline-block",
+            display: "inline-flex",
+            alignItems: "center",
             backgroundColor: "#0084fc",
             color: "#ffffff",
-            fontWeight: 700,
-            fontSize: "14px",
-            padding: "10px 20px",
-            borderRadius: "10px",
+            fontWeight: 600,
+            fontSize: "13px",
+            padding: "9px 18px",
+            borderRadius: "8px",
             textDecoration: "none",
             whiteSpace: "nowrap",
             flexShrink: 0,
+            boxShadow: "none",
           }}
         >
-          Empezar gratis →
+          Solicitar demo
         </Link>
 
         <button
@@ -106,10 +117,10 @@ export function Navbar() {
             alignItems: "center",
             justifyContent: "center",
             background: "transparent",
-            border: "1px solid rgba(255,255,255,0.25)",
+            border: "1px solid rgba(255,255,255,0.15)",
             borderRadius: "8px",
             color: "#ffffff",
-            fontSize: "18px",
+            fontSize: "16px",
             width: "40px",
             height: "40px",
             cursor: "pointer",
@@ -123,16 +134,16 @@ export function Navbar() {
       {mobileOpen ? (
         <nav
           aria-label="Principal móvil"
+          className="nelvyon-nav-mobile-panel"
           style={{
             maxWidth: "1200px",
-            margin: "16px auto 0",
+            margin: "0 auto",
+            padding: "0 24px 20px",
             display: "flex",
             flexDirection: "column",
-            gap: "12px",
-            paddingTop: "16px",
-            borderTop: "1px solid rgba(255,255,255,0.1)",
+            gap: "4px",
+            borderTop: "1px solid rgba(255,255,255,0.06)",
           }}
-          className="nelvyon-nav-mobile-panel"
         >
           {navLinks.map((item) => (
             <Link
@@ -140,11 +151,11 @@ export function Navbar() {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               style={{
-                color: "#ffffff",
+                color: "rgba(255,255,255,0.85)",
                 fontSize: "15px",
-                fontWeight: 600,
+                fontWeight: 500,
                 textDecoration: "none",
-                padding: "8px 0",
+                padding: "12px 0",
               }}
             >
               {item.title}
@@ -154,19 +165,19 @@ export function Navbar() {
             href="/contacto"
             onClick={() => setMobileOpen(false)}
             style={{
-              marginTop: "8px",
-              display: "inline-block",
+              marginTop: "12px",
+              display: "block",
               textAlign: "center",
               backgroundColor: "#0084fc",
               color: "#ffffff",
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: "14px",
-              padding: "12px 20px",
-              borderRadius: "10px",
+              padding: "14px 20px",
+              borderRadius: "8px",
               textDecoration: "none",
             }}
           >
-            Empezar gratis →
+            Solicitar demo
           </Link>
         </nav>
       ) : null}

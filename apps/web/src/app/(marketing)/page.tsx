@@ -1,10 +1,13 @@
 import { Hero } from "@/components/agenforce/hero";
+import { QueEsNelvyon } from "@/components/agenforce/que-es-nelvyon";
+import { Problema } from "@/components/agenforce/problema";
 import { ComoFunciona } from "@/components/agenforce/como-funciona";
-import { LogoCloud } from "@/components/agenforce/logo-cloud";
+import { PlataformaOs } from "@/components/agenforce/plataforma-os";
+import { ModulosHome } from "@/components/agenforce/modulos-home";
 import { Features } from "@/components/agenforce/features";
-import { Stats } from "@/components/agenforce/stats";
+import { Diferenciadores } from "@/components/agenforce/diferenciadores";
 import { Testimonials } from "@/components/agenforce/testimonials";
-import { Pricing } from "@/components/agenforce/pricing";
+import { Stats } from "@/components/agenforce/stats";
 import { Faqs } from "@/components/agenforce/faqs";
 import { CtaFinal } from "@/components/agenforce/cta-final";
 
@@ -12,12 +15,15 @@ export default function HomePage() {
   return (
     <main>
       <Hero />
+      <QueEsNelvyon />
+      <Problema />
       <ComoFunciona />
-      <Stats />
-      <LogoCloud />
+      <PlataformaOs />
+      <ModulosHome />
       <Features />
+      <Diferenciadores />
       <Testimonials />
-      <Pricing />
+      <Stats />
       <Faqs />
       <CtaFinal />
     </main>

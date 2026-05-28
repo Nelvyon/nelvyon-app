@@ -5,14 +5,14 @@ import { IconMinus, IconPlus } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 const questions = [
-  { question: "¿NELVYON es una agencia o un software?", answer: "Es ambas cosas. NELVYON combina servicios profesionales de marketing con una plataforma SaaS operada por agentes expertos." },
-  { question: "¿Prometéis resultados concretos?", answer: "No. Trabajamos con metodología, medición y optimización, pero no publicamos promesas de rendimiento que no puedan demostrarse." },
-  { question: "¿Qué significa que opera 24/7?", answer: "Significa que los agentes expertos pueden ejecutar tareas, activar flujos, generar activos y coordinar procesos de forma continua según la configuración definida." },
-  { question: "¿Necesito equipo técnico para usar NELVYON?", answer: "No necesariamente. La plataforma está pensada para simplificar la operación, aunque los proyectos avanzados pueden requerir configuración específica." },
-  { question: "¿Puedo contratar solo servicios?", answer: "Sí. Una empresa puede trabajar con servicios profesionales, con el SaaS o con ambos." },
-  { question: "¿Puedo usar NELVYON si ya tengo CRM?", answer: "Sí. Se puede evaluar integración, migración o convivencia con herramientas existentes." },
-  { question: "¿Trabajáis con agencias?", answer: "Sí. NELVYON puede servir como infraestructura para agencias que necesitan operar clientes, automatizaciones y reporting con mayor orden." },
-  { question: "¿Qué tipo de empresas encajan mejor?", answer: "Empresas que valoran procesos serios, visibilidad, automatización y ejecución profesional." },
+  { question: "¿NELVYON es una agencia o una plataforma?", answer: "Es ambas cosas integradas: servicios profesionales de marketing y un SaaS operativo con agentes expertos." },
+  { question: "¿Qué son los agentes expertos?", answer: "Sistemas configurados para ejecutar tareas, coordinar procesos y mantener flujos activos de forma continua según las reglas definidas." },
+  { question: "¿Usáis promesas de resultados?", answer: "No. Trabajamos con metodología, medición y optimización responsable, sin publicar promesas que no puedan demostrarse." },
+  { question: "¿Puedo contratar solo servicios?", answer: "Sí. Puedes trabajar con servicios profesionales, con la plataforma o con ambos según la estructura que necesite tu empresa." },
+  { question: "¿Puedo contratar solo la plataforma?", answer: "Sí. El SaaS puede centralizar operaciones sin contratar todos los servicios, según el nivel de autonomía que busques." },
+  { question: "¿Trabajáis con agencias?", answer: "Sí. NELVYON puede servir como infraestructura multi-cliente para agencias que necesitan más orden en procesos y reporting." },
+  { question: "¿Qué se puede automatizar?", answer: "Seguimiento comercial, emails, WhatsApp, tareas repetitivas, reporting y coordinación entre módulos, siempre con configuración y criterio previos." },
+  { question: "¿Cómo empieza un proyecto?", answer: "Con un diagnóstico operativo: entendemos canales, herramientas, procesos y necesidades antes de configurar campañas o automatizaciones." },
 ];
 export function Faqs() {
   return <FAQs />;

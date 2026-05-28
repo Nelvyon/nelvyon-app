@@ -1,79 +1,54 @@
 export function Testimonials() {
-  const perfiles = [
-    {
-      name: "Empresas en crecimiento",
-      role: "",
-      avatar: "EC",
-      text: "Para equipos que ya tienen actividad comercial y necesitan una estructura más sólida para gestionar campañas, leads, contenidos y seguimiento.",
-      stars: 0,
-    },
-    {
-      name: "Agencias de marketing",
-      role: "",
-      avatar: "AM",
-      text: "Para agencias que quieren apoyarse en una infraestructura más completa para gestionar clientes, procesos y entregas.",
-      stars: 0,
-    },
-    {
-      name: "Equipos comerciales",
-      role: "",
-      avatar: "EQ",
-      text: "Para departamentos que necesitan organizar oportunidades, automatizar seguimiento y mantener visibilidad sobre cada fase del pipeline.",
-      stars: 0,
-    },
-    {
-      name: "Negocios digitales y ecommerce",
-      role: "",
-      avatar: "NE",
-      text: "Para empresas que necesitan conectar campañas, catálogo, audiencias, automatizaciones, email, WhatsApp y reporting en un único sistema.",
-      stars: 0,
-    },
+  const casos = [
+    { title: "Empresa con equipo comercial", desc: "Centralización de leads, seguimiento y pipeline en un único entorno." },
+    { title: "Ecommerce", desc: "Conexión entre campañas, catálogo, email, WhatsApp y reporting." },
+    { title: "Agencia", desc: "Gestión multi-cliente con procesos, entregas y paneles centralizados." },
+    { title: "Empresa B2B", desc: "Automatización de seguimiento comercial y contenido profesional." },
   ];
+
   return (
-    <section style={{ backgroundColor: "#ffffff", padding: "64px 0" }}>
+    <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
-            Para quién es
+        <div style={{ marginBottom: "48px" }}>
+          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
+            Casos de uso
           </p>
-          <h2 className="fade-in" style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
-            Perfiles que encajan con NELVYON
+          <h2 className="fade-in" style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 800, color: "#07122a", margin: "0 0 12px" }}>
+            Escenarios de aplicación
           </h2>
+          <p style={{ fontSize: "15px", color: "#5a6a8a", margin: 0, maxWidth: "560px", lineHeight: 1.6 }}>
+            Perfiles operativos ilustrativos. No son testimonios de clientes ni resultados publicados.
+          </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px" }}>
-          {perfiles.map((t, i) => (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "16px",
+          }}
+          className="nelvyon-casos-grid"
+        >
+          {casos.map((c) => (
             <div
-              key={i}
+              key={c.title}
               style={{
                 backgroundColor: "#f8faff",
                 border: "1px solid #e8eef8",
-                borderRadius: "20px",
-                padding: "32px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
+                borderRadius: "12px",
+                padding: "28px",
               }}
             >
-              <p style={{ fontSize: "15px", color: "#374151", lineHeight: 1.6, margin: 0 }}>
-                {t.text}
-              </p>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "auto" }}>
-                <div style={{
-                  width: "42px", height: "42px", borderRadius: "50%",
-                  background: "linear-gradient(135deg, #07122a, #0084fc)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#fff", fontSize: "13px", fontWeight: 700, flexShrink: 0,
-                }}>
-                  {t.avatar}
-                </div>
-                <div>
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "#07122a" }}>{t.name}</div>
-                </div>
-              </div>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#07122a", margin: "0 0 10px" }}>{c.title}</h3>
+              <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{c.desc}</p>
             </div>
           ))}
         </div>
       </div>
+      <style>{`
+        @media (max-width: 640px) {
+          .nelvyon-casos-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }

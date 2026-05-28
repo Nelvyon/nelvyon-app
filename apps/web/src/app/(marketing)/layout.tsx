@@ -9,13 +9,13 @@ const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/og-image.png`;
 
 export const metadata: Metadata = {
-  title: "NELVYON — Donde nace tu imperio",
+  title: "NELVYON — Marketing operativo para empresas exigentes",
   description:
-    "Donde nace tu imperio, crece tu marca y se impone tu legado. Sistema autónomo de marketing con IA: SEO, publicidad, contenido, email, branding y social media.",
+    "Plataforma operativa de marketing, ventas y automatización con servicios profesionales y agentes expertos. Centraliza campañas, CRM, contenidos y reporting.",
   openGraph: {
-    title: "NELVYON — Marketing autónomo con IA",
+    title: "NELVYON — Plataforma operativa de marketing",
     description:
-      "Donde nace tu imperio, crece tu marca y se impone tu legado. Plataforma SaaS premium de marketing con agentes IA.",
+      "Donde nace tu imperio, crece tu marca y se impone tu legado. Servicios profesionales, SaaS y agentes expertos para operar con orden y continuidad.",
     url: canonicalBase,
     siteName: "NELVYON",
     images: [
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
         url: ogImageAbs,
         width: 1200,
         height: 630,
-        alt: "NELVYON — Marketing IA Autónomo",
+        alt: "NELVYON — Plataforma operativa de marketing",
       },
     ],
     type: "website",
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NELVYON — Marketing IA Autónomo",
-    description: "Marketing IA autónomo. Planes desde 95€/mes.",
+    title: "NELVYON — Plataforma operativa de marketing",
+    description: "Marketing operativo con agentes expertos. Servicios y plataforma SaaS.",
     images: [ogImageAbs],
     creator: "@nelvyon",
   },

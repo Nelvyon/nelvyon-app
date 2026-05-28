@@ -8,12 +8,12 @@ export const metadata: Metadata = {
 };
 
 const values = [
-  { icon: "🎯", title: "Seriedad", desc: "Trabajamos con mensajes claros, procesos documentados y expectativas responsables." },
-  { icon: "🔍", title: "Transparencia", desc: "La empresa debe saber qué se hace, cómo se hace y qué información se está utilizando." },
-  { icon: "📐", title: "Orden", desc: "Un sistema bien diseñado reduce confusión, duplicidades y pérdida de información." },
-  { icon: "🔄", title: "Continuidad", desc: "Los agentes expertos permiten mantener tareas activas sin depender siempre de intervención humana." },
-  { icon: "⚖️", title: "Criterio", desc: "Automatizar no significa improvisar más rápido. Significa ejecutar mejor lo que ha sido pensado con rigor." },
-  { icon: "📈", title: "Escalabilidad", desc: "La infraestructura debe poder crecer con la empresa sin romper su operación." },
+  { title: "Seriedad", desc: "Trabajamos con mensajes claros, procesos documentados y expectativas responsables." },
+  { title: "Transparencia", desc: "La empresa debe saber qué se hace, cómo se hace y qué información se está utilizando." },
+  { title: "Orden", desc: "Un sistema bien diseñado reduce confusión, duplicidades y pérdida de información." },
+  { title: "Continuidad", desc: "Los agentes expertos permiten mantener tareas activas sin depender siempre de intervención humana." },
+  { title: "Criterio", desc: "Automatizar no significa improvisar más rápido. Significa ejecutar mejor lo que ha sido pensado con rigor." },
+  { title: "Escalabilidad", desc: "La infraestructura debe poder crecer con la empresa sin romper su operación." },
 ];
 
 const formaTrabajar = [
@@ -23,18 +23,12 @@ const formaTrabajar = [
   { step: "4", title: "Finalmente operamos", desc: "El sistema se mantiene activo, se revisa y se ajusta con criterios claros." },
 ];
 
-const milestones = [
-  { year: "01", title: "Origen", desc: "NELVYON nace de observar un problema repetido: empresas con buenas ofertas, pero operaciones de marketing fragmentadas." },
-  { year: "02", title: "Construcción", desc: "La plataforma se desarrolla para unir servicios profesionales, automatización, agentes expertos y reporting en un mismo ecosistema." },
-  { year: "03", title: "Evolución", desc: "NELVYON avanza hacia un modelo donde las empresas puedan operar su crecimiento con más orden, continuidad y control." },
-];
-
 export default function NosotrosPage() {
   return (
     <main>
       <section style={{ backgroundColor: "#07122a", padding: "120px 0 0" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 80px", textAlign: "center" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#00d6fe", marginBottom: "16px" }}>
+          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "16px" }}>
             Sobre NELVYON
           </p>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
@@ -48,7 +42,7 @@ export default function NosotrosPage() {
       </section>
       <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "start" }}>
+          <div className="nelvyon-nosotros-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "start" }}>
             <div>
               <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "16px" }}>
                 Quiénes somos
@@ -80,7 +74,7 @@ export default function NosotrosPage() {
                 Equipo
               </p>
               <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
-                NELVYON combina fundadores, especialistas, perfiles estratégicos y agentes expertos. Los fundadores definen visión, criterio, dirección y estándares de calidad. Los especialistas aportan ejecución profesional. Los agentes expertos mantienen tareas operativas activas de forma continua. Esta combinación permite trabajar con una mentalidad más cercana a una infraestructura empresarial que a una agencia tradicional.
+                NELVYON combina fundadores, especialistas estratégicos y agentes expertos operativos. Los fundadores definen visión, criterio y estándares de calidad. Los especialistas aportan ejecución profesional. Los agentes expertos mantienen tareas operativas activas de forma continua.
               </p>
             </div>
           </div>
@@ -98,9 +92,8 @@ export default function NosotrosPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "24px" }}>
             {values.map((v, i) => (
-              <div key={i} style={{ backgroundColor: "#ffffff", border: "1px solid #e8eef8", borderRadius: "20px", padding: "32px", textAlign: "center" }}>
-                <div style={{ fontSize: "40px", marginBottom: "16px" }}>{v.icon}</div>
-                <h3 style={{ fontSize: "17px", fontWeight: 800, color: "#07122a", margin: "0 0 10px" }}>{v.title}</h3>
+              <div key={i} style={{ backgroundColor: "#ffffff", border: "1px solid #e8eef8", borderRadius: "12px", padding: "28px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#07122a", margin: "0 0 10px" }}>{v.title}</h3>
                 <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{v.desc}</p>
               </div>
             ))}
@@ -135,34 +128,13 @@ export default function NosotrosPage() {
               </div>
             ))}
           </div>
-          <div style={{ textAlign: "center", marginBottom: "56px" }}>
-            <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
-              Nuestra historia
-            </p>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
-              El camino de NELVYON
-            </h2>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-            {milestones.map((m, i) => (
-              <div key={i} style={{ display: "flex", gap: "24px", paddingBottom: i < milestones.length - 1 ? "40px" : "0" }}>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg, #07122a, #0084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "12px", fontWeight: 800, flexShrink: 0 }}>
-                    {m.year}
-                  </div>
-                  {i < milestones.length - 1 && (
-                    <div style={{ width: "2px", flex: 1, backgroundColor: "#e8eef8", marginTop: "8px" }} />
-                  )}
-                </div>
-                <div style={{ paddingTop: "10px" }}>
-                  <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#07122a", margin: "0 0 8px" }}>{m.title}</h3>
-                  <p style={{ fontSize: "15px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{m.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
+      <style>{`
+        @media (max-width: 768px) {
+          .nelvyon-nosotros-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
+        }
+      `}</style>
       <CtaFinal
         title="Una empresa seria necesita un sistema serio"
         subtitle="NELVYON está diseñado para compañías que quieren dejar de improvisar y empezar a operar con estructura."

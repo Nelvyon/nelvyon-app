@@ -16,7 +16,7 @@ export function CtaFinal({
   showSecondary = true,
 }: CtaFinalProps) {
   return (
-    <section style={{ padding: "64px 0", background: "linear-gradient(135deg, #07122a 0%, #0084fc 50%, #00d6fe 100%)" }}>
+    <section style={{ padding: "96px 0", background: "linear-gradient(180deg, #07122a 0%, #0d2048 70%, #0a1835 100%)" }}>
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
         <h2 style={{ fontSize: "clamp(32px, 5vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.15 }}>
           {title}
@@ -39,7 +39,7 @@ export function CtaFinal({
               border: "2px solid #ffffff",
             }}
           >
-            {primaryLabel} →
+            {primaryLabel}
           </a>
           {showSecondary ? (
             <Link
