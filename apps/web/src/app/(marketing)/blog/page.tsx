@@ -4,15 +4,15 @@ import { NavyToWhiteTransition } from "@/components/agenforce/section-transition
 
 export const metadata: Metadata = {
   title: "Blog | NELVYON — Marketing Digital y Automatización",
-  description: "Artículos, guías y casos de éxito sobre marketing digital automatizado, Meta Ads, Google Ads, TikTok Ads y crecimiento empresarial.",
+  description: "Análisis, guías y reflexiones sobre automatización, campañas, CRM, contenido, reporting y sistemas de crecimiento empresarial.",
 };
 const posts = [
-  { tag: "Meta Ads", title: "Cómo triplicar el ROAS en Meta Ads con agentes expertos", excerpt: "La estrategia que usamos para que nuestros clientes multipliquen por 3 su retorno en Meta Ads en menos de 30 días.", date: "15 Mayo 2026", readTime: "5 min" },
-  { tag: "Google Ads", title: "Smart Bidding vs agentes NELVYON: quién gana", excerpt: "Comparamos el Smart Bidding de Google con los agentes de optimización de NELVYON. Los resultados son sorprendentes.", date: "8 Mayo 2026", readTime: "7 min" },
-  { tag: "WhatsApp", title: "WhatsApp Marketing: la guía definitiva para 2026", excerpt: "Todo lo que necesitas para implementar secuencias de WhatsApp que convierten leads en clientes automáticamente.", date: "1 Mayo 2026", readTime: "10 min" },
-  { tag: "TikTok Ads", title: "TikTok Ads para negocios B2C: estrategia completa", excerpt: "Cómo usar TikTok Ads para generar leads cualificados en 2026. Formatos, presupuestos y optimización con agentes.", date: "22 Abril 2026", readTime: "8 min" },
-  { tag: "Automatización", title: "Email Marketing automatizado: de 0 a 10.000 suscriptores", excerpt: "La arquitectura de automatización de email que usan nuestros clientes para crecer sin tocar nada manualmente.", date: "15 Abril 2026", readTime: "6 min" },
-  { tag: "Casos de éxito", title: "Cómo una clínica dental duplicó reservas en 45 días", excerpt: "Caso real: de 40 a 80 reservas mensuales con Google Ads + WhatsApp automatizado gestionado por NELVYON.", date: "8 Abril 2026", readTime: "4 min" },
+  { tag: "Operaciones", title: "Cómo ordenar el marketing de una empresa sin depender de herramientas dispersas", excerpt: "Una guía sobre los problemas más comunes que aparecen cuando campañas, CRM, contenidos y reporting funcionan por separado.", date: "Mayo 2026", readTime: "8 min" },
+  { tag: "CRM", title: "Qué debe tener un CRM útil para equipos comerciales modernos", excerpt: "Un análisis práctico sobre pipeline, seguimiento, tareas, automatizaciones y visibilidad comercial.", date: "Mayo 2026", readTime: "7 min" },
+  { tag: "Automatización", title: "Automatización de marketing: qué procesos conviene automatizar y cuáles no", excerpt: "Una visión responsable sobre cómo automatizar sin perder control, contexto ni calidad en la relación con el cliente.", date: "Abril 2026", readTime: "10 min" },
+  { tag: "Reporting", title: "Por qué el reporting es una pieza estratégica, no una tarea administrativa", excerpt: "Cómo transformar datos dispersos en información útil para dirección, marketing y ventas.", date: "Abril 2026", readTime: "6 min" },
+  { tag: "Publicidad", title: "Publicidad digital con criterio: más allá de lanzar campañas", excerpt: "Una explicación sobre estructura, medición, mensajes, audiencias y revisión continua en campañas profesionales.", date: "Marzo 2026", readTime: "9 min" },
+  { tag: "Agentes expertos", title: "Agentes expertos en marketing: cómo pueden cambiar la operación empresarial", excerpt: "Una introducción al papel de los agentes expertos en tareas de contenido, seguimiento, análisis y coordinación operativa.", date: "Marzo 2026", readTime: "7 min" },
 ];
 export default function BlogPage() {
   return (
@@ -20,8 +20,8 @@ export default function BlogPage() {
       <section style={{ backgroundColor: "#07122a", padding: "80px 0 0" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 64px", textAlign: "center" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#00d6fe", marginBottom: "16px" }}>Blog NELVYON</p>
-          <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>Ideas que hacen crecer tu negocio</h1>
-          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: 0, lineHeight: 1.6 }}>Estrategias, casos de éxito y guías de marketing automatizado.</p>
+          <h1 className="fade-in" style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>Ideas para operar mejor el marketing</h1>
+          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: 0, lineHeight: 1.6 }}>Análisis, guías y reflexiones sobre automatización, campañas, CRM, contenido, reporting y sistemas de crecimiento empresarial.</p>
         </div>
         <NavyToWhiteTransition />
       </section>
@@ -35,7 +35,7 @@ export default function BlogPage() {
                 <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{post.excerpt}</p>
                 <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "16px", borderTop: "1px solid #e8eef8" }}>
                   <span style={{ fontSize: "12px", color: "#9aabbf" }}>{post.date}</span>
-                  <span style={{ fontSize: "12px", color: "#9aabbf" }}>📖 {post.readTime} lectura</span>
+                  <span style={{ fontSize: "12px", color: "#9aabbf" }}>{post.readTime} lectura</span>
                 </div>
               </div>
             ))}

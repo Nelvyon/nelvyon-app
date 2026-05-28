@@ -4,21 +4,29 @@ import { NavyToWhiteTransition } from "@/components/agenforce/section-transition
 
 export const metadata: Metadata = {
   title: "Nosotros | NELVYON — La empresa detrás de la automatización",
-  description: "NELVYON nació para democratizar el marketing de precisión. Conoce nuestra misión, visión y el equipo de agentes expertos que lo hacen posible.",
+  description: "NELVYON nace para ordenar el crecimiento. Conoce nuestra misión, visión, valores y forma de trabajar con agentes expertos.",
 };
 
 const values = [
-  { icon: "🚀", title: "Automatización total", desc: "Creemos que el marketing eficiente no debería requerir un ejército de personas. Los agentes lo hacen todo." },
-  { icon: "🎯", title: "Resultados, no promesas", desc: "Cada euro de nuestros clientes tiene que tener un retorno medible. Sin excusas, sin humo." },
-  { icon: "🌍", title: "Escala global", desc: "Nuestras herramientas están pensadas para empresas que quieren crecer sin fronteras." },
-  { icon: "🔒", title: "Confianza y transparencia", desc: "Datos seguros, precios claros y sin letra pequeña. Así construimos relaciones duraderas." },
+  { icon: "🎯", title: "Seriedad", desc: "Trabajamos con mensajes claros, procesos documentados y expectativas responsables." },
+  { icon: "🔍", title: "Transparencia", desc: "La empresa debe saber qué se hace, cómo se hace y qué información se está utilizando." },
+  { icon: "📐", title: "Orden", desc: "Un sistema bien diseñado reduce confusión, duplicidades y pérdida de información." },
+  { icon: "🔄", title: "Continuidad", desc: "Los agentes expertos permiten mantener tareas activas sin depender siempre de intervención humana." },
+  { icon: "⚖️", title: "Criterio", desc: "Automatizar no significa improvisar más rápido. Significa ejecutar mejor lo que ha sido pensado con rigor." },
+  { icon: "📈", title: "Escalabilidad", desc: "La infraestructura debe poder crecer con la empresa sin romper su operación." },
+];
+
+const formaTrabajar = [
+  { step: "1", title: "Primero entendemos", desc: "Antes de configurar campañas o automatizaciones, analizamos cómo funciona la empresa." },
+  { step: "2", title: "Después estructuramos", desc: "Definimos qué procesos deben centralizarse, qué tareas pueden automatizarse y qué módulos son necesarios." },
+  { step: "3", title: "Luego implementamos", desc: "Configuramos la plataforma, los flujos, los agentes expertos y los elementos operativos." },
+  { step: "4", title: "Finalmente operamos", desc: "El sistema se mantiene activo, se revisa y se ajusta con criterios claros." },
 ];
 
 const milestones = [
-  { year: "2024", title: "Nace NELVYON", desc: "Fundada con la misión de democratizar el marketing automatizado para empresas de todos los tamaños." },
-  { year: "2025", title: "Primeros 100 clientes", desc: "Validación del modelo: ROAS medio x3 frente a agencias tradicionales. Primeros €500K ARR." },
-  { year: "2026", title: "Lanzamiento SaaS global", desc: "Apertura de la plataforma SaaS con agentes expertos. Expansión a Europa y LATAM." },
-  { year: "2030", title: "10M clientes objetivo", desc: "Visión de convertirnos en la plataforma de marketing automatizado líder a nivel mundial." },
+  { year: "01", title: "Origen", desc: "NELVYON nace de observar un problema repetido: empresas con buenas ofertas, pero operaciones de marketing fragmentadas." },
+  { year: "02", title: "Construcción", desc: "La plataforma se desarrolla para unir servicios profesionales, automatización, agentes expertos y reporting en un mismo ecosistema." },
+  { year: "03", title: "Evolución", desc: "NELVYON avanza hacia un modelo donde las empresas puedan operar su crecimiento con más orden, continuidad y control." },
 ];
 
 export default function NosotrosPage() {
@@ -30,43 +38,50 @@ export default function NosotrosPage() {
             Sobre NELVYON
           </p>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
-            Donde nace tu imperio,<br />crece tu marca y<br />se impone tu legado
+            NELVYON nace para ordenar el crecimiento
           </h1>
           <p style={{ fontSize: "20px", color: "#a8c8e8", margin: 0, lineHeight: 1.6 }}>
-            NELVYON es la plataforma de marketing automatizado que está redefiniendo cómo las empresas crecen en la era digital.
+            Creamos una nueva forma de operar marketing, ventas y automatización: más centralizada, más continua y más profesional.
           </p>
         </div>
         <NavyToWhiteTransition />
       </section>
       <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "start" }}>
             <div>
               <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "16px" }}>
-                Nuestra misión
+                Quiénes somos
               </p>
-              <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 20px", lineHeight: 1.2 }}>
-                Democratizar el marketing de precisión
-              </h2>
-              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 16px" }}>
-                Antes, acceder a campañas de marketing de alto rendimiento requería grandes agencias, equipos caros y meses de trabajo. NELVYON lo cambia todo.
+              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 24px" }}>
+                NELVYON es una empresa construida sobre una idea simple: las empresas modernas no pueden depender de procesos dispersos, herramientas aisladas y ejecución improvisada. El marketing necesita estrategia. Las ventas necesitan seguimiento. La automatización necesita lógica. La dirección necesita visibilidad. NELVYON une estos elementos en una plataforma operativa con servicios profesionales y agentes expertos.
+              </p>
+              <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
+                Misión
+              </p>
+              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 24px" }}>
+                Ayudar a empresas a construir sistemas de marketing y ventas más claros, automatizados y medibles. Nuestra misión no es prometer resultados imposibles. Es aportar estructura, ejecución y tecnología para que cada empresa pueda operar con mayor control.
+              </p>
+              <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
+                Visión
               </p>
               <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
-                Nuestros agentes expertos dan a cualquier empresa — desde startups hasta grandes corporaciones — la capacidad de competir con los mejores, sin el coste y la complejidad de hacerlo de forma tradicional.
+                Convertir NELVYON en una infraestructura de referencia para empresas que quieren trabajar su marketing, ventas y operaciones desde un entorno centralizado. Una plataforma capaz de combinar criterio humano, agentes expertos y automatización continua.
               </p>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-              {[
-                { v: "10M+", l: "Clientes objetivo 2030" },
-                { v: "€2.4B", l: "ARR proyectado" },
-                { v: "3x", l: "ROI medio clientes" },
-                { v: "24/7", l: "Automatización activa" },
-              ].map((s, i) => (
-                <div key={i} style={{ backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "20px", padding: "28px", textAlign: "center" }}>
-                  <div style={{ fontSize: "36px", fontWeight: 900, color: "#0084fc", marginBottom: "8px" }}>{s.v}</div>
-                  <div style={{ fontSize: "13px", color: "#6b7a99", fontWeight: 600 }}>{s.l}</div>
-                </div>
-              ))}
+            <div>
+              <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "16px" }}>
+                NELVYON OS
+              </p>
+              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 24px" }}>
+                NELVYON OS es el sistema operativo interno que coordina agentes expertos, automatizaciones, módulos y procesos. Su función es conectar piezas que normalmente trabajan separadas: campañas, CRM, email, WhatsApp, contenido, reporting, ecommerce e integraciones externas. NELVYON OS no es una promesa comercial. Es la forma en la que estructuramos la operación.
+              </p>
+              <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "16px" }}>
+                Equipo
+              </p>
+              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
+                NELVYON combina fundadores, especialistas, perfiles estratégicos y agentes expertos. Los fundadores definen visión, criterio, dirección y estándares de calidad. Los especialistas aportan ejecución profesional. Los agentes expertos mantienen tareas operativas activas de forma continua. Esta combinación permite trabajar con una mentalidad más cercana a una infraestructura empresarial que a una agencia tradicional.
+              </p>
             </div>
           </div>
         </div>
@@ -96,10 +111,36 @@ export default function NosotrosPage() {
         <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
             <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
+              Forma de trabajar
+            </p>
+            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>
+              Cómo implementamos cada proyecto
+            </h2>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0", marginBottom: "64px" }}>
+            {formaTrabajar.map((m, i) => (
+              <div key={i} style={{ display: "flex", gap: "24px", paddingBottom: i < formaTrabajar.length - 1 ? "40px" : "0" }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg, #07122a, #0084fc)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "12px", fontWeight: 800, flexShrink: 0 }}>
+                    {m.step}
+                  </div>
+                  {i < formaTrabajar.length - 1 && (
+                    <div style={{ width: "2px", flex: 1, backgroundColor: "#e8eef8", marginTop: "8px" }} />
+                  )}
+                </div>
+                <div style={{ paddingTop: "10px" }}>
+                  <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#07122a", margin: "0 0 8px" }}>{m.title}</h3>
+                  <p style={{ fontSize: "15px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{m.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: "center", marginBottom: "56px" }}>
+            <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
               Nuestra historia
             </p>
             <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
-              El camino al liderazgo mundial
+              El camino de NELVYON
             </h2>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
@@ -122,7 +163,12 @@ export default function NosotrosPage() {
           </div>
         </div>
       </section>
-      <CtaFinal />
+      <CtaFinal
+        title="Una empresa seria necesita un sistema serio"
+        subtitle="NELVYON está diseñado para compañías que quieren dejar de improvisar y empezar a operar con estructura."
+        primaryLabel="Conocer NELVYON"
+        showSecondary={false}
+      />
     </main>
   );
 }

@@ -1,41 +1,41 @@
 export function Features() {
   const features = [
     {
-      icon: "🤖",
-      title: "Agentes Expertos de Marketing",
-      description: "Agentes especializados gestionan tus campañas de Meta Ads, Google Ads y TikTok Ads de forma autónoma, optimizando en tiempo real sin que toques nada.",
-      badge: "Núcleo",
+      icon: "📣",
+      title: "Publicidad digital",
+      description: "Gestión profesional de campañas en Meta, Google, TikTok, YouTube, LinkedIn y Pinterest con estructura, seguimiento y optimización responsable.",
+      badge: "Campañas",
       large: true,
     },
     {
-      icon: "📱",
-      title: "WhatsApp & Email Automático",
-      description: "Secuencias de nurturing multicanal que convierten leads en clientes mientras duermes.",
-      badge: "Automatización",
+      icon: "⚙️",
+      title: "Automatización de marketing",
+      description: "Diseño de flujos que conectan campañas, formularios, CRM, email, WhatsApp y seguimiento comercial.",
+      badge: "Flujos",
     },
     {
       icon: "📊",
-      title: "Dashboard Unificado",
-      description: "Todas tus métricas: ROAS, CAC, LTV, conversiones — en un solo panel en tiempo real.",
-      badge: "Analytics",
+      title: "CRM y pipeline",
+      description: "Organización visual de oportunidades, clientes, tareas y fases comerciales para mejorar el control interno.",
+      badge: "CRM",
+    },
+    {
+      icon: "✍️",
+      title: "Contenido y copywriting",
+      description: "Creación de textos, publicaciones, anuncios, emails, guiones y piezas orientadas a comunicación clara y conversión responsable.",
+      badge: "Contenido",
     },
     {
       icon: "🌐",
-      title: "NELVYON OS — Web Autopilot",
-      description: "Genera webs completas para tus clientes automáticamente con agentes expertos. Sin plantillas, sin equipo.",
-      badge: "OS",
+      title: "Diseño web y ecommerce",
+      description: "Desarrollo de páginas, landings y tiendas online con enfoque profesional, estructura clara y experiencia de usuario cuidada.",
+      badge: "Web",
     },
     {
-      icon: "⚡",
-      title: "Deploy Instantáneo",
-      description: "Infraestructura Railway + Vercel. Tus proyectos en producción en minutos, no en días.",
-      badge: "Infra",
-    },
-    {
-      icon: "🔒",
-      title: "Enterprise-grade Seguridad",
-      description: "Autenticación OAuth, JWT, cifrado end-to-end y cumplimiento GDPR de serie.",
-      badge: "Seguridad",
+      icon: "📈",
+      title: "Analítica y reporting",
+      description: "Implementación de medición, eventos, paneles e informes para interpretar la actividad de marketing con mayor precisión.",
+      badge: "Datos",
     },
   ];
   return (
@@ -43,13 +43,16 @@ export function Features() {
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
-            Todo en una plataforma
+            Qué es NELVYON
           </p>
           <h2 className="fade-in" style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>
-            Cada herramienta que necesitas,<br />ninguna que no necesitas
+            Servicios destacados
           </h2>
-          <p style={{ fontSize: "18px", color: "#5a6a8a", maxWidth: "600px", margin: "0 auto", lineHeight: 1.6 }}>
-            NELVYON reemplaza 12+ herramientas en una sola plataforma impulsada por agentes expertos.
+          <p style={{ fontSize: "17px", color: "#5a6a8a", maxWidth: "800px", margin: "0 auto 16px", lineHeight: 1.7 }}>
+            NELVYON es una plataforma dual para empresas que necesitan una estructura de marketing más seria, más ordenada y más operativa. Por un lado, ofrece servicios profesionales de marketing digital ejecutados con criterio estratégico. Por otro, integra un entorno SaaS con agentes expertos capaces de coordinar tareas, procesos y flujos de trabajo de forma continua.
+          </p>
+          <p style={{ fontSize: "16px", color: "#5a6a8a", maxWidth: "800px", margin: "0 auto", lineHeight: 1.7 }}>
+            No sustituimos la estrategia. No vendemos fórmulas mágicas. Construimos sistemas de trabajo claros, medibles y preparados para operar con consistencia.
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: "20px" }}>

@@ -5,14 +5,14 @@ import { IconMinus, IconPlus } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 const questions = [
-  { question: "¿Qué es NELVYON?", answer: "NELVYON es la plataforma todo-en-uno para agencias de marketing digital. CRM, email, automatizaciones, pagos, funnels y analíticas en un solo lugar — ejecutado por agentes expertos." },
-  { question: "¿Necesito conocimientos técnicos?", answer: "No. NELVYON está diseñado para que cualquier agencia pueda usarlo desde el primer día. La configuración inicial tarda menos de 30 minutos." },
-  { question: "¿Hay contrato de permanencia?", answer: "No. Puedes cancelar en cualquier momento sin penalizaciones. Creemos en que te quedas porque NELVYON te genera resultados, no porque estés atrapado." },
-  { question: "¿Puedo probar NELVYON gratis?", answer: "Sí. Tienes 14 días de prueba gratuita con acceso completo a todas las funciones de tu plan. Sin tarjeta de crédito requerida." },
-  { question: "¿Qué integraciones tiene NELVYON?", answer: "NELVYON se conecta con Meta Ads, Google Ads, TikTok Ads, WhatsApp Business, Stripe, Twilio, Zapier, Mailchimp, Shopify, HubSpot y más de 25 herramientas." },
-  { question: "¿Qué soporte ofrece NELVYON?", answer: "Starter incluye soporte por email. Growth y Elite tienen soporte prioritario 24h. Elite además incluye un manager de cuenta dedicado." },
-  { question: "¿Puedo tener el plan White-label?", answer: "Sí, el plan Elite incluye white-label completo para que ofrezcas NELVYON bajo tu propia marca a tus clientes." },
-  { question: "¿Qué son los agentes expertos?", answer: "Los agentes expertos son sistemas automatizados especializados en cada proceso de marketing — captación, nutrición, cierre, facturación — que trabajan solos sin intervención humana." },
+  { question: "¿NELVYON es una agencia o un software?", answer: "Es ambas cosas. NELVYON combina servicios profesionales de marketing con una plataforma SaaS operada por agentes expertos." },
+  { question: "¿Prometéis resultados concretos?", answer: "No. Trabajamos con metodología, medición y optimización, pero no publicamos promesas de rendimiento que no puedan demostrarse." },
+  { question: "¿Qué significa que opera 24/7?", answer: "Significa que los agentes expertos pueden ejecutar tareas, activar flujos, generar activos y coordinar procesos de forma continua según la configuración definida." },
+  { question: "¿Necesito equipo técnico para usar NELVYON?", answer: "No necesariamente. La plataforma está pensada para simplificar la operación, aunque los proyectos avanzados pueden requerir configuración específica." },
+  { question: "¿Puedo contratar solo servicios?", answer: "Sí. Una empresa puede trabajar con servicios profesionales, con el SaaS o con ambos." },
+  { question: "¿Puedo usar NELVYON si ya tengo CRM?", answer: "Sí. Se puede evaluar integración, migración o convivencia con herramientas existentes." },
+  { question: "¿Trabajáis con agencias?", answer: "Sí. NELVYON puede servir como infraestructura para agencias que necesitan operar clientes, automatizaciones y reporting con mayor orden." },
+  { question: "¿Qué tipo de empresas encajan mejor?", answer: "Empresas que valoran procesos serios, visibilidad, automatización y ejecución profesional." },
 ];
 export function Faqs() {
   return <FAQs />;

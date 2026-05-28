@@ -23,7 +23,7 @@ export const Hero = () => {
             color: "#a8dff5", letterSpacing: "0.02em"
           }}>
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#00d6fe", display: "inline-block" }} />
-            La plataforma todo-en-uno para agencias y negocios
+            Marketing operativo para empresas exigentes
           </span>
         </div>
         {/* H1 */}
@@ -34,7 +34,7 @@ export const Hero = () => {
           color: "#ffffff", lineHeight: 1.08, letterSpacing: "-0.03em", margin: "0 0 16px 0"
         }}
         >
-          El sistema operativo<br />de tu negocio
+          Marketing operativo<br />para empresas exigentes
         </h1>
         {/* Eslogan */}
         <p style={{
@@ -43,12 +43,17 @@ export const Hero = () => {
         }}>
           Donde nace tu imperio, crece tu marca y se impone tu legado
         </p>
-        {/* Subtítulo */}
         <p style={{
-          textAlign: "center", fontSize: "clamp(14px, 1.5vw, 17px)", color: "rgba(255,255,255,0.72)",
-          maxWidth: "600px", margin: "0 auto 44px auto", lineHeight: 1.6
+          textAlign: "center", fontSize: "clamp(15px, 1.6vw, 18px)", color: "rgba(255,255,255,0.85)",
+          maxWidth: "720px", margin: "0 auto 16px auto", lineHeight: 1.6
         }}>
-          Capta leads, cierra ventas y escala tu agencia — todo ejecutado por agentes expertos dentro de una sola plataforma.
+          NELVYON combina servicios profesionales de marketing, automatización y agentes expertos en una plataforma diseñada para operar de forma continua.
+        </p>
+        <p style={{
+          textAlign: "center", fontSize: "clamp(14px, 1.4vw, 16px)", color: "rgba(255,255,255,0.72)",
+          maxWidth: "720px", margin: "0 auto 44px auto", lineHeight: 1.6
+        }}>
+          Un ecosistema para centralizar campañas, contenidos, CRM, procesos comerciales, analítica y automatización sin depender de herramientas desconectadas ni tareas manuales constantes.
         </p>
         {/* CTAs */}
         <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px" }}>
@@ -70,7 +75,7 @@ export const Hero = () => {
               textDecoration: "none",
             }}
           >
-            Empezar gratis
+            Empieza ahora
           </a>
           <a href="/demo" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
@@ -78,7 +83,7 @@ export const Hero = () => {
             background: "transparent", border: "2px solid rgba(255,255,255,0.40)",
             color: "#ffffff", fontSize: "15px", fontWeight: 700, textDecoration: "none"
           }}>
-            Ver demo →
+            Ver demo
           </a>
         </div>
         {/* Dashboard mock */}

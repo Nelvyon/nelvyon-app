@@ -2,23 +2,23 @@ export function ComoFunciona() {
   const steps = [
     {
       num: 1,
-      title: "Auditoría gratuita",
-      desc: "Analizamos tu negocio, competencia y oportunidades en 24h.",
+      title: "Diagnóstico operativo",
+      desc: "Analizamos tu situación actual: canales, procesos, herramientas, equipo, flujo comercial y necesidades reales de automatización.",
     },
     {
       num: 2,
-      title: "Estrategia personalizada",
-      desc: "Agentes expertos diseñan tu plan de crecimiento a medida.",
+      title: "Diseño del sistema",
+      desc: "Definimos la estructura de trabajo: campañas, CRM, contenidos, automatizaciones, agentes expertos, reporting y prioridades operativas.",
     },
     {
       num: 3,
-      title: "Ejecución automática",
-      desc: "Lanzamos y optimizamos campañas sin que toques nada.",
+      title: "Implementación controlada",
+      desc: "Configuramos el ecosistema NELVYON con los módulos y servicios necesarios para que tu operación quede centralizada y ordenada.",
     },
     {
       num: 4,
-      title: "Resultados medibles",
-      desc: "Ves el ROI real en tu dashboard en tiempo real.",
+      title: "Operación continua",
+      desc: "Los agentes expertos trabajan 24/7 ejecutando tareas, coordinando procesos, generando activos y manteniendo el sistema en funcionamiento.",
     },
   ];
 
@@ -39,7 +39,7 @@ export function ComoFunciona() {
             margin: "0 0 48px",
           }}
         >
-          Resultados en 4 pasos
+          Cómo funciona
         </h2>
         <div
           style={{

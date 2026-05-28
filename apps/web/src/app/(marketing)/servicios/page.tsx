@@ -6,50 +6,44 @@ import { NavyToWhiteTransition } from "@/components/agenforce/section-transition
 export const metadata: Metadata = {
   title: "Servicios | NELVYON — Marketing Digital con Agentes Expertos",
   description:
-    "Meta Ads, Google Ads, TikTok Ads, SEO, email, WhatsApp, CRM y más. Todo gestionado por agentes expertos de NELVYON.",
+    "Servicios profesionales de marketing digital: publicidad, SEO, contenido, CRM, automatización y analítica dentro de una estructura operativa coherente.",
 };
 
-type Service = { title: string; description: string; price: string };
+type Service = { title: string; description: string };
 
 const columns: { heading: string; services: Service[] }[] = [
   {
     heading: "PUBLICIDAD DE PAGO",
     services: [
       {
-        title: "Meta Ads (Facebook & Instagram)",
+        title: "Meta Ads",
         description:
-          "Campañas que escalan ROAS con creatividades y audiencias optimizadas cada día. Resultado medio: +180% leads cualificados en 60 días.",
-        price: "Desde €297/mes",
+          "Gestión profesional de campañas en Facebook e Instagram orientadas a visibilidad, captación, tráfico, remarketing o conversión según el objetivo del proyecto. El trabajo incluye estructura de campañas, segmentación, revisión de audiencias, coordinación de creatividades, configuración de eventos y seguimiento de rendimiento. NELVYON puede integrar Meta Ads con CRM, formularios, WhatsApp, email y dashboards para que la actividad publicitaria no quede aislada.",
       },
       {
-        title: "Google Ads (Search & Display)",
+        title: "Google Ads",
         description:
-          "Captura intención de compra en búsqueda y display con pujas inteligentes. Reduce CPA un 35% frente a gestión manual típica.",
-        price: "Desde €297/mes",
+          "Configuración y gestión de campañas en Google Ads para búsquedas, display, shopping, Performance Max y formatos relacionados con intención de búsqueda. El servicio contempla análisis de palabras clave, estructura de grupos, anuncios, extensiones, configuración de conversiones y revisión periódica de términos. La prioridad es construir campañas ordenadas, comprensibles y conectadas con medición fiable.",
       },
       {
         title: "TikTok Ads",
         description:
-          "Formatos nativos y hooks que convierten en público joven. Escala alcance sin disparar CPM gracias a tests continuos.",
-        price: "Desde €297/mes",
+          "Planificación y ejecución de campañas en TikTok Ads adaptadas al lenguaje, formato y velocidad de consumo de la plataforma. NELVYON trabaja la estructura publicitaria, los ángulos creativos, la adaptación de mensajes y la revisión de activos para mantener coherencia con la marca.",
       },
       {
         title: "YouTube Ads",
         description:
-          "Vídeo que educa y vende con segmentación por intereses y remarketing. Aumenta reconocimiento de marca y tráfico cualificado.",
-        price: "Desde €347/mes",
+          "Diseño y gestión de campañas publicitarias en YouTube orientadas a presencia de marca, tráfico cualificado, educación de mercado o apoyo a embudos comerciales. Se trabaja la estructura de campañas, segmentación, formatos de anuncio, mensajes de vídeo y conexión con medición.",
       },
       {
         title: "LinkedIn Ads",
         description:
-          "B2B con targeting por cargo, sector y empresa. Genera reuniones comerciales con CPL optimizado para ventas consultivas.",
-        price: "Desde €397/mes",
+          "Publicidad profesional para entornos B2B, venta consultiva, servicios especializados, formación, tecnología y consultoría. Segmentación por cargo, empresa, sector, ubicación e intereses profesionales. NELVYON diseña campañas con mensajes adecuados al contexto profesional y conexión con CRM.",
       },
       {
         title: "Pinterest Ads",
         description:
-          "Ideal para ecommerce, decoración y lifestyle. Impulsa descubrimiento visual y compras con catálogos dinámicos.",
-        price: "Desde €247/mes",
+          "Gestión de campañas en Pinterest para marcas visuales, ecommerce, decoración, moda, belleza, diseño y sectores con fuerte componente inspiracional. El servicio contempla estructura de campañas, selección de formatos y adaptación visual.",
       },
     ],
   },
@@ -57,28 +51,24 @@ const columns: { heading: string; services: Service[] }[] = [
     heading: "SEO Y CONTENIDO",
     services: [
       {
-        title: "SEO técnico y posicionamiento",
+        title: "SEO Técnico",
         description:
-          "Auditoría, arquitectura y contenido orientado a keywords con intención. Posiciones estables en 90-120 días en nichos competitivos.",
-        price: "Desde €397/mes",
+          "Auditoría y optimización de aspectos técnicos que afectan a la visibilidad orgánica de una web. Se revisan indexación, arquitectura, rendimiento, Core Web Vitals, enlazado interno, estructura de URLs, metadatos, schema y errores técnicos.",
       },
       {
-        title: "Marketing de contenidos",
+        title: "Marketing de Contenidos",
         description:
-          "Calendario editorial, artículos y piezas que atraen tráfico orgánico. Más visitas cualificadas sin depender solo de paid media.",
-        price: "Desde €297/mes",
+          "Planificación y creación de contenidos orientados a educar, posicionar y comunicar con claridad la propuesta de valor de la empresa. Incluye artículos, páginas informativas, recursos descargables, guías, emails y publicaciones. NELVYON trabaja el contenido como un activo estratégico, no como producción genérica.",
       },
       {
-        title: "Email marketing automatizado",
+        title: "Email Marketing",
         description:
-          "Flujos de bienvenida, nurturing y reactivación con A/B testing. Incrementa ingresos recurrentes desde la base de datos actual.",
-        price: "Desde €197/mes",
+          "Diseño de comunicaciones por email para bienvenida, seguimiento, nutrición comercial, recuperación, fidelización y comunicación recurrente. El servicio puede incluir segmentación, estructura de secuencias, redacción, configuración técnica y automatización.",
       },
       {
-        title: "WhatsApp Business automatizado",
+        title: "WhatsApp Automatizado",
         description:
-          "Secuencias, recordatorios y recuperación de carritos 24/7. Convierte conversaciones en citas y ventas sin equipo manual.",
-        price: "Desde €197/mes",
+          "Implementación de flujos de WhatsApp para atención, cualificación, seguimiento y comunicación comercial. NELVYON puede configurar respuestas automáticas, rutas de conversación, integración con CRM y recuperación de contactos pendientes.",
       },
     ],
   },
@@ -86,40 +76,34 @@ const columns: { heading: string; services: Service[] }[] = [
     heading: "GESTIÓN Y AUTOMATIZACIÓN",
     services: [
       {
-        title: "Gestión redes sociales",
+        title: "Gestión de Redes Sociales",
         description:
-          "Publicación, community y reporting unificado en todas tus redes. Crece engagement y tráfico a web o tienda sin contratar community managers.",
-        price: "Desde €247/mes",
+          "Planificación, creación, programación y revisión de contenido para redes sociales con enfoque profesional. Incluye calendario editorial, adaptación por canal, tono de marca y análisis de actividad.",
       },
       {
-        title: "CRM y pipeline de ventas",
+        title: "CRM y Pipeline",
         description:
-          "Leads, etapas y seguimiento automatizado en un solo panel. Cierra más oportunidades con menos leads perdidos por olvido.",
-        price: "Incluido en plan",
+          "Diseño e implementación de un sistema visual para gestionar leads, oportunidades, clientes, tareas y fases comerciales. El CRM permite ordenar el seguimiento, registrar interacciones y automatizar tareas repetitivas.",
       },
       {
-        title: "Diseño web y landing pages",
+        title: "Diseño Web",
         description:
-          "Landings de conversión listas en 24-48h, alineadas a tus campañas. Tasas de conversión superiores a plantillas genéricas.",
-        price: "Desde €497 única vez",
+          "Diseño y desarrollo de páginas corporativas, landing pages y estructuras web orientadas a claridad, credibilidad y conversión responsable. El servicio contempla arquitectura de información, copy, experiencia móvil y estructura visual.",
       },
       {
-        title: "Ecommerce y tiendas online",
+        title: "Ecommerce",
         description:
-          "Catálogo, checkout y campañas de retargeting integrados. Escala ventas online con funnels medidos de punta a punta.",
-        price: "Desde €397/mes",
+          "Diseño, optimización y soporte para tiendas online en Shopify, WooCommerce o PrestaShop. NELVYON trabaja estructura de catálogo, experiencia de compra, automatizaciones, recuperación de carrito y conexión con campañas.",
       },
       {
-        title: "Automatización de procesos",
+        title: "Automatización de Procesos",
         description:
-          "Zapier, webhooks y flujos entre herramientas sin código manual. Ahorra horas semanales en tareas repetitivas del equipo.",
-        price: "Incluido en plan",
+          "Diseño de flujos automatizados para reducir tareas manuales en marketing, ventas, atención, reporting y gestión interna. Se pueden conectar formularios, CRM, email, WhatsApp, calendarios, pagos y herramientas externas.",
       },
       {
-        title: "Analítica y reporting avanzado",
+        title: "Analítica y Reporting",
         description:
-          "Dashboards en tiempo real: ROAS, CAC, LTV y atribución multicanal. Decisiones basadas en datos, no en intuición.",
-        price: "Incluido en plan",
+          "Configuración de medición, eventos, conversiones, paneles e informes para interpretar la actividad digital de la empresa. NELVYON trabaja con herramientas de analítica, píxeles, etiquetas y dashboards según las necesidades del proyecto.",
       },
     ],
   },
@@ -144,9 +128,6 @@ function ServiceCard({ service }: { service: Service }) {
       </h3>
       <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6, margin: 0, flex: 1 }}>
         {service.description}
-      </p>
-      <p style={{ fontSize: "15px", fontWeight: 700, color: "#0084fc", margin: 0 }}>
-        {service.price}
       </p>
     </div>
   );
@@ -179,13 +160,13 @@ export default function ServiciosPage() {
               lineHeight: 1.1,
             }}
           >
-            Marketing digital
-            <br />
-            sin límites
+            Servicios de marketing para operar con criterio
           </h1>
-          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: "0 0 36px", lineHeight: 1.6 }}>
-            Agentes expertos gestionan tus canales de captación mientras tú te centras en crecer. Sin agencias, sin
-            equipos, sin límites.
+          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: "0 0 16px", lineHeight: 1.6 }}>
+            NELVYON diseña, ejecuta y coordina servicios de marketing digital dentro de una estructura profesional, medible y conectada.
+          </p>
+          <p style={{ fontSize: "16px", color: "#a8c8e8", margin: "0 0 36px", lineHeight: 1.6 }}>
+            Cada servicio se integra dentro de un sistema mayor: campañas, contenidos, automatización, CRM, analítica y seguimiento. El objetivo no es hacer acciones aisladas, sino construir una operación coherente.
           </p>
           <Link
             href="/contacto"
@@ -200,7 +181,7 @@ export default function ServiciosPage() {
               textDecoration: "none",
             }}
           >
-            Solicitar demo gratuita →
+            Solicitar análisis →
           </Link>
         </div>
         <NavyToWhiteTransition />
@@ -218,10 +199,13 @@ export default function ServiciosPage() {
                 margin: "0 0 16px",
               }}
             >
-              Todo lo que necesitas para dominar tu mercado
+              Metodología profesional
             </h2>
-            <p style={{ fontSize: "18px", color: "#5a6a8a", maxWidth: "560px", margin: "0 auto" }}>
-              Cada servicio gestionado por agentes expertos especializados. Sin contrato de permanencia.
+            <p style={{ fontSize: "17px", color: "#5a6a8a", maxWidth: "800px", margin: "0 auto 16px", lineHeight: 1.7 }}>
+              Una empresa no necesita más ruido. Necesita claridad. NELVYON trabaja con una metodología basada en diagnóstico, ejecución, medición y optimización responsable. Cada canal se configura según la situación real del negocio, sus activos, su mercado, su capacidad comercial y su estructura interna.
+            </p>
+            <p style={{ fontSize: "16px", color: "#5a6a8a", maxWidth: "800px", margin: "0 auto", lineHeight: 1.7 }}>
+              No utilizamos mensajes vacíos ni promesas irreales. Creamos sistemas de marketing profesionales preparados para funcionar de forma ordenada.
             </p>
           </div>
           <div
@@ -262,7 +246,12 @@ export default function ServiciosPage() {
         `}</style>
       </section>
 
-      <CtaFinal />
+      <CtaFinal
+        title="Servicios conectados dentro de un sistema"
+        subtitle="Marketing, automatización, CRM y reporting trabajando bajo una misma estructura operativa."
+        primaryLabel="Solicitar análisis"
+        showSecondary={false}
+      />
     </main>
   );
 }

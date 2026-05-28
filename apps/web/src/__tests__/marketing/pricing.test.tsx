@@ -55,13 +55,13 @@ describe("marketing pricing and landing", () => {
   it("Página / (home) renderiza headline correctamente", { timeout: 15000 }, () => {
     renderWithProviders(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.textContent).toMatch(/El sistema operativo/i);
-    expect(h1.textContent).toMatch(/de tu negocio/i);
+    expect(h1.textContent).toMatch(/Marketing operativo/i);
+    expect(h1.textContent).toMatch(/empresas exigentes/i);
   });
 
   it("Home tiene CTA principal a contacto", () => {
     renderWithProviders(<HomePage />);
-    const links = screen.getAllByRole("link", { name: /Empezar gratis/i });
+    const links = screen.getAllByRole("link", { name: /Empieza ahora/i });
     expect(links.length).toBeGreaterThan(0);
     expect(links.some((el) => el.getAttribute("href") === "/contacto")).toBe(true);
   });

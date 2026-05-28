@@ -4,7 +4,7 @@ import { NavyToWhiteTransition } from "@/components/agenforce/section-transition
 
 export const metadata: Metadata = {
   title: "Contacto | NELVYON — Habla con un experto",
-  description: "Contacta con NELVYON. Te respondemos en menos de 24h para analizar tu negocio y diseñar tu estrategia de marketing automatizado.",
+  description: "Contacta con NELVYON para estructurar marketing, ventas, automatización y reporting con criterio profesional.",
 };
 
 export default function ContactoPage() {
@@ -16,10 +16,10 @@ export default function ContactoPage() {
             Contacto
           </p>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
-            Hablemos de tu crecimiento
+            Hablemos de tu operación digital
           </h1>
           <p style={{ fontSize: "20px", color: "#a8c8e8", margin: 0, lineHeight: 1.6 }}>
-            Cuéntanos tu negocio. Te respondemos en menos de 24h con un plan personalizado.
+            Cuéntanos qué necesita tu empresa y estudiaremos cómo NELVYON puede ayudarte a estructurar marketing, ventas, automatización y reporting.
           </p>
         </div>
         <NavyToWhiteTransition />
@@ -28,93 +28,111 @@ export default function ContactoPage() {
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "start" }}>
             <div>
-              <h2 style={{ fontSize: "28px", fontWeight: 800, color: "#07122a", margin: "0 0 20px" }}>
-                ¿Por qué contactar con nosotros?
-              </h2>
               <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 32px" }}>
-                No somos una agencia más. Analizamos tu negocio, identificamos las oportunidades de crecimiento y te proponemos un plan de automatización específico para ti.
+                Este formulario no es para recibir una propuesta genérica. Es para entender tu situación actual, tus herramientas, tus procesos, tus canales y el tipo de estructura que necesitas construir. Cuanta más claridad tengamos desde el inicio, mejor podremos orientarte.
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                {[
-                  { icon: "⚡", title: "Respuesta en 24h", desc: "Revisamos tu caso y te contactamos con un plan concreto." },
-                  { icon: "🎯", title: "Análisis gratuito", desc: "Auditamos tus campañas actuales sin coste y sin compromiso." },
-                  { icon: "🤝", title: "Sin permanencia", desc: "Empieza cuando quieras, cancela cuando quieras." },
-                ].map((item, i) => (
-                  <div key={i} style={{ display: "flex", gap: "16px" }}>
-                    <div style={{ width: "44px", height: "44px", borderRadius: "12px", backgroundColor: "#e8f0fb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", flexShrink: 0 }}>
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#07122a", margin: "0 0 4px" }}>{item.title}</h3>
-                      <p style={{ fontSize: "14px", color: "#6b7a99", margin: 0 }}>{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginTop: "40px", padding: "24px", backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "16px" }}>
-                <p style={{ fontSize: "14px", fontWeight: 600, color: "#07122a", margin: "0 0 8px" }}>¿Prefieres escribirnos directamente?</p>
-                <a href="mailto:hola@nelvyon.com" style={{ fontSize: "15px", color: "#0084fc", fontWeight: 700, textDecoration: "none" }}>
-                  hola@nelvyon.com
+              <div style={{ marginBottom: "32px" }}>
+                <p style={{ fontSize: "14px", fontWeight: 600, color: "#07122a", margin: "0 0 12px" }}>Información de contacto</p>
+                <p style={{ fontSize: "14px", color: "#5a6a8a", margin: "0 0 8px" }}>Web: nelvyon.com</p>
+                <a href="mailto:contacto@nelvyon.com" style={{ fontSize: "15px", color: "#0084fc", fontWeight: 700, textDecoration: "none", display: "block", marginBottom: "8px" }}>
+                  contacto@nelvyon.com
                 </a>
+                <p style={{ fontSize: "14px", color: "#5a6a8a", margin: "0 0 4px" }}>Horario: Lunes a viernes</p>
+                <p style={{ fontSize: "14px", color: "#5a6a8a", margin: 0 }}>Idioma: Español</p>
               </div>
+              <p style={{ fontSize: "15px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
+                NELVYON trabaja con empresas que buscan claridad, estructura y operación seria. No prometemos resultados irreales. No vendemos soluciones genéricas. No construimos sistemas sin entender primero el negocio. Si tu empresa necesita ordenar su marketing, automatizar procesos y trabajar con una plataforma preparada para operar de forma continua, podemos hablar.
+              </p>
             </div>
             <div style={{ backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "24px", padding: "40px" }}>
               <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#07122a", margin: "0 0 28px" }}>
-                Solicita tu análisis gratuito
+                Cuéntanos tu situación
               </h3>
               <form
                 action="https://formspree.io/f/xpwzgvbq"
                 method="POST"
                 style={{ display: "flex", flexDirection: "column", gap: "20px" }}
               >
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Nombre completo *</label>
+                  <input type="text" name="nombre" required placeholder="Tu nombre completo" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Nombre *</label>
-                    <input type="text" name="nombre" required placeholder="Tu nombre" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
-                  </div>
                   <div>
                     <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Empresa</label>
                     <input type="text" name="empresa" placeholder="Tu empresa" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
                   </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Cargo</label>
+                    <input type="text" name="cargo" placeholder="Tu cargo" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                  </div>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Email *</label>
-                  <input type="email" name="email" required placeholder="tu@email.com" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Email corporativo *</label>
+                  <input type="email" name="email" required placeholder="tu@empresa.com" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Teléfono</label>
+                    <input type="tel" name="telefono" placeholder="+34 600 000 000" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Página web</label>
+                    <input type="url" name="web" placeholder="https://tuempresa.com" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Sector</label>
+                    <input type="text" name="sector" placeholder="Tu sector" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Tamaño del equipo</label>
+                    <input type="text" name="tamano_equipo" placeholder="Ej. 5-20 personas" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                  </div>
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Teléfono (WhatsApp)</label>
-                  <input type="tel" name="telefono" placeholder="+34 600 000 000" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>¿Qué necesitas?</label>
-                  <select name="servicio" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}>
-                    <option value="">Selecciona un servicio</option>
-                    <option value="meta-ads">Meta Ads (Facebook & Instagram)</option>
-                    <option value="google-ads">Google Ads</option>
-                    <option value="tiktok-ads">TikTok Ads</option>
-                    <option value="whatsapp">WhatsApp Marketing</option>
-                    <option value="email">Email Marketing</option>
-                    <option value="web-autopilot">Web Autopilot (NELVYON OS)</option>
-                    <option value="saas">Plataforma SaaS completa</option>
-                    <option value="todo">Todo — plan completo</option>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Servicios de interés</label>
+                  <select name="servicios_interes" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}>
+                    <option value="">Selecciona una opción</option>
+                    <option value="servicios">Servicios profesionales</option>
+                    <option value="saas">Plataforma SaaS</option>
+                    <option value="ambos">Servicios + SaaS</option>
+                    <option value="publicidad">Publicidad digital</option>
+                    <option value="automatizacion">Automatización</option>
+                    <option value="crm">CRM y pipeline</option>
+                    <option value="otro">Otro</option>
                   </select>
                 </div>
                 <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Herramientas actuales</label>
+                  <input type="text" name="herramientas" placeholder="CRM, ads, email, etc." style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Principal necesidad</label>
+                  <input type="text" name="principal_necesidad" placeholder="Qué necesitas resolver" style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#07122a", marginBottom: "6px" }}>Mensaje</label>
-                  <textarea name="mensaje" rows={4} placeholder="Cuéntanos tu situación, objetivos o dudas..." style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit" }} />
+                  <textarea name="mensaje" rows={4} placeholder="Cuéntanos tu situación, objetivos o contexto..." style={{ width: "100%", padding: "12px 16px", border: "1px solid #d1dce8", borderRadius: "10px", fontSize: "14px", color: "#07122a", backgroundColor: "#ffffff", outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit" }} />
                 </div>
                 <button type="submit" style={{ backgroundColor: "#0084fc", color: "#ffffff", fontWeight: 700, fontSize: "15px", padding: "14px 24px", borderRadius: "12px", border: "none", cursor: "pointer", width: "100%" }}>
                   Enviar solicitud →
                 </button>
                 <p style={{ fontSize: "12px", color: "#9aabbf", textAlign: "center", margin: 0 }}>
-                  Al enviar aceptas nuestra política de privacidad. Sin spam, garantizado.
+                  Al enviar aceptas nuestra política de privacidad.
                 </p>
               </form>
             </div>
           </div>
         </div>
       </section>
-      <CtaFinal />
+      <CtaFinal
+        title="Empieza por ordenar el sistema"
+        subtitle="El crecimiento serio necesita procesos claros, tecnología fiable y ejecución constante."
+        primaryLabel="Contactar con NELVYON"
+        showSecondary={false}
+      />
     </main>
   );
 }
