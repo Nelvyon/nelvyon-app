@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import { describe, it, expect } from "vitest";
 
-import HomePage from "@/app/page";
+import HomePage from "@/app/(marketing)/page";
 import PartnersPage from "@/app/(marketing)/partners/page";
 import PricingPage from "@/app/pricing/page";
 import esMessages from "../../../messages/es.json";

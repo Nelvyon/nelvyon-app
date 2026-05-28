@@ -14,6 +14,10 @@ const questions = [
   { question: "¿Puedo tener el plan White-label?", answer: "Sí, el plan Elite incluye white-label completo para que ofrezcas NELVYON bajo tu propia marca a tus clientes." },
   { question: "¿Qué son los agentes expertos?", answer: "Los agentes expertos son sistemas automatizados especializados en cada proceso de marketing — captación, nutrición, cierre, facturación — que trabajan solos sin intervención humana." },
 ];
+export function Faqs() {
+  return <FAQs />;
+}
+
 export const FAQs = () => {
   return (
     <section id="faqs" className="py-20 lg:py-32 bg-[#f8faff]">
