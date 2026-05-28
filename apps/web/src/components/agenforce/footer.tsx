@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer style={{ background: "#07122a", paddingTop: "72px", paddingBottom: "40px" }}>
+    <footer className="nelvyon-footer" style={{ background: "#07122a" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div
           className="nelvyon-footer-grid"
@@ -13,7 +13,7 @@ export function Footer() {
             display: "grid",
             gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
             gap: "48px",
-            marginBottom: "48px",
+            marginBottom: "32px",
           }}
         >
           <div>
@@ -109,10 +109,10 @@ export function Footer() {
       </div>
       <style>{`
         @media (max-width: 768px) {
-          .nelvyon-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+          .nelvyon-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; margin-bottom: 24px !important; }
         }
         @media (max-width: 480px) {
-          .nelvyon-footer-grid { grid-template-columns: 1fr !important; }
+          .nelvyon-footer-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
         }
       `}</style>
     </footer>

@@ -12,7 +12,7 @@ export function PlataformaOs() {
   ];
 
   return (
-    <section style={{ backgroundColor: "#07122a", padding: "96px 0" }}>
+    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#07122a" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", maxWidth: "640px", margin: "0 auto 56px" }}>
           <p

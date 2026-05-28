@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ComparisonTable } from "@/components/agenforce/comparison-table";
 import { CtaFinal } from "@/components/agenforce/cta-final";
-import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
+import { MarketingPageHero } from "@/components/agenforce/marketing-page-hero";
 export const metadata: Metadata = {
   title: "SaaS | NELVYON — Plataforma de Marketing Automatizado",
   description: "NELVYON SaaS: plataforma operativa con agentes expertos para centralizar marketing, ventas, contenidos, automatización y reporting.",
@@ -59,41 +59,15 @@ const saasFeatures = [
 const integraciones = ["Meta", "Google Ads", "WhatsApp", "Stripe", "Shopify", "HubSpot", "LinkedIn", "Zapier"];
 export default function SaasPage() {
   return (
-    <main style={{ paddingTop: "68px" }}>
-      <section style={{ backgroundColor: "#07122a", padding: "64px 0 0" }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto", padding: "0 24px 48px", textAlign: "center" }}>
-          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "16px" }}>Plataforma NELVYON</p>
-          <h1 className="fade-in" style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
-            La plataforma operativa de NELVYON
-          </h1>
-          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: "0 0 16px", lineHeight: 1.6 }}>
-            Un SaaS diseñado para centralizar marketing, ventas, contenidos, automatización y reporting mediante agentes expertos.
-          </p>
-          <p style={{ fontSize: "16px", color: "#a8c8e8", margin: "0 0 36px", lineHeight: 1.6 }}>
-            NELVYON SaaS permite a las empresas trabajar con un entorno más ordenado, automatizado y preparado para operaciones continuas.
-          </p>
-          <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="#precios" style={{ display: "inline-block", backgroundColor: "#0084fc", color: "#ffffff", fontWeight: 700, fontSize: "16px", padding: "16px 40px", borderRadius: "12px", textDecoration: "none" }}>
-              Ver planes →
-            </Link>
-            <Link href="/contacto" style={{ display: "inline-block", backgroundColor: "transparent", color: "#ffffff", fontWeight: 700, fontSize: "16px", padding: "16px 40px", borderRadius: "12px", textDecoration: "none", border: "2px solid rgba(255,255,255,0.3)" }}>
-              Solicitar demo
-            </Link>
-          </div>
-        </div>
-        <NavyToWhiteTransition />
-      </section>
-      <section style={{ backgroundColor: "#f8faff", padding: "48px 0" }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
-          <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 16px" }}>
-            La mayoría de equipos utilizan demasiadas herramientas desconectadas: una para campañas, otra para contactos, otra para emails, otra para informes, otra para tareas y otra para publicar contenido.
-          </p>
-          <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
-            NELVYON SaaS busca reducir esa fragmentación mediante una plataforma central que conecta módulos, datos, flujos y agentes expertos. El sistema no elimina la necesidad de criterio. La organiza, la ejecuta y la mantiene operativa.
-          </p>
-        </div>
-      </section>
-      <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+    <main>
+      <MarketingPageHero
+        eyebrow="Plataforma NELVYON"
+        title="La plataforma operativa de NELVYON"
+        subtitle="Centraliza marketing, ventas, contenidos, automatización y reporting mediante agentes expertos, en un entorno ordenado y preparado para operaciones continuas."
+        ctaLabel="Ver planes"
+        ctaHref="#precios"
+      />
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ marginBottom: "48px" }}>
             <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>Módulos</p>
@@ -110,7 +84,7 @@ export default function SaasPage() {
           </div>
         </div>
       </section>
-      <section style={{ backgroundColor: "#f8faff", padding: "64px 0", borderTop: "1px solid #e8eef8" }}>
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff", borderTop: "1px solid #e8eef8" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>Integraciones</p>
           <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, color: "#07122a", margin: "0 0 24px" }}>Conectado con tu ecosistema</h2>
@@ -123,7 +97,7 @@ export default function SaasPage() {
           </div>
         </div>
       </section>
-      <section id="precios" style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+      <section id="precios" className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "48px" }}>
             <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>Planes</p>
@@ -132,14 +106,14 @@ export default function SaasPage() {
           </div>
           <div className="nelvyon-pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", alignItems: "stretch" }}>
             {plans.map((plan, i) => (
-              <div key={i} style={{ backgroundColor: plan.highlight ? "#07122a" : "#f8faff", border: plan.highlight ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e8eef8", borderRadius: "12px", padding: "32px", position: "relative", display: "flex", flexDirection: "column" }}>
+              <div key={i} style={{ backgroundColor: plan.highlight ? "#07122a" : "#f8faff", border: plan.highlight ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e8eef8", borderRadius: "12px", padding: "28px 24px", position: "relative", display: "flex", flexDirection: "column" }}>
                 {plan.badge && (
                   <span style={{ position: "absolute", top: "16px", right: "16px", background: "rgba(0,132,252,0.15)", color: "#0084fc", fontSize: "11px", fontWeight: 600, borderRadius: "6px", padding: "4px 10px", whiteSpace: "nowrap", ...(plan.highlight ? { background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.85)" } : {}) }}>
                     {plan.badge}
                   </span>
                 )}
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: plan.highlight ? "#ffffff" : "#07122a", margin: "0 0 8px" }}>{plan.name}</h3>
-                <p style={{ fontSize: "14px", color: plan.highlight ? "rgba(255,255,255,0.55)" : "#5a6a8a", margin: "0 0 20px", lineHeight: 1.5, minHeight: "42px" }}>{plan.description}</p>
+                <p style={{ fontSize: "14px", color: plan.highlight ? "rgba(255,255,255,0.55)" : "#5a6a8a", margin: "0 0 20px", lineHeight: 1.5 }}>{plan.description}</p>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "24px" }}>
                   <span style={{ fontSize: "40px", fontWeight: 800, color: plan.highlight ? "#ffffff" : "#07122a", lineHeight: 1, letterSpacing: "-0.02em" }}>{plan.price}</span>
                   <span style={{ fontSize: "14px", color: plan.highlight ? "rgba(255,255,255,0.5)" : "#5a6a8a" }}>{plan.period}</span>

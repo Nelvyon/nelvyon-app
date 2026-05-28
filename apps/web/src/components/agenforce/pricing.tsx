@@ -62,7 +62,7 @@ export const Pricing = () => {
                 </div>
               )}
               <div style={{ marginBottom: "24px" }}>
-                <p style={{ fontSize: "13px", fontWeight: 600, color: plan.popular ? "#00d6fe" : "#0084fc", marginBottom: "8px" }}>{plan.name}</p>
+                <p style={{ fontSize: "13px", fontWeight: 600, color: "#0084fc", marginBottom: "8px" }}>{plan.name}</p>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "8px" }}>
                   <span style={{ fontSize: "48px", fontWeight: 800, color: plan.popular ? "#ffffff" : "#07122a", letterSpacing: "-0.03em" }}>€{plan.price}</span>
                   <span style={{ fontSize: "16px", color: plan.popular ? "rgba(255,255,255,0.5)" : "#6b7a99" }}>/mes</span>
@@ -72,7 +72,7 @@ export const Pricing = () => {
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px 0", display: "flex", flexDirection: "column", gap: "12px" }}>
                 {plan.steps.map((step) => (
                   <li key={step} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <IconCircleCheckFilled style={{ width: "18px", height: "18px", color: plan.popular ? "#00d6fe" : "#0084fc", flexShrink: 0 }} />
+                    <IconCircleCheckFilled style={{ width: "18px", height: "18px", color: "#0084fc", flexShrink: 0 }} />
                     <span style={{ fontSize: "14px", color: plan.popular ? "rgba(255,255,255,0.85)" : "#07122a" }}>{step}</span>
                   </li>
                 ))}

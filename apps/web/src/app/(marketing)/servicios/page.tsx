@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { CtaFinal } from "@/components/agenforce/cta-final";
-import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
+import { MarketingPageHero } from "@/components/agenforce/marketing-page-hero";
 
 export const metadata: Metadata = {
   title: "Servicios | NELVYON — Marketing Digital con Agentes Expertos",
@@ -115,8 +114,8 @@ function ServiceCard({ service }: { service: Service }) {
       style={{
         backgroundColor: "#ffffff",
         border: "1px solid rgba(7, 18, 42, 0.12)",
-        borderRadius: "16px",
-        padding: "24px",
+        borderRadius: "12px",
+        padding: "20px",
         display: "flex",
         flexDirection: "column",
         gap: "12px",
@@ -148,56 +147,16 @@ function ServiceCard({ service }: { service: Service }) {
 
 export default function ServiciosPage() {
   return (
-    <main style={{ paddingTop: "68px" }}>
-      <section style={{ backgroundColor: "#07122a", padding: "64px 0 0" }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 48px", textAlign: "center" }}>
-          <p
-            style={{
-              fontSize: "13px",
-              fontWeight: 600,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.45)",
-              marginBottom: "16px",
-            }}
-          >
-            Servicios NELVYON
-          </p>
-          <h1
-            className="fade-in"
-            style={{
-              fontSize: "clamp(36px, 6vw, 60px)",
-              fontWeight: 900,
-              color: "#ffffff",
-              margin: "0 0 20px",
-              lineHeight: 1.1,
-            }}
-          >
-            Servicios de marketing conectados a una operación real
-          </h1>
-          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: "0 0 36px", lineHeight: 1.6, maxWidth: "640px", marginLeft: "auto", marginRight: "auto" }}>
-            Campañas, contenido, automatización, CRM y analítica trabajados dentro de un sistema profesional, medible y centralizado.
-          </p>
-          <Link
-            href="/contacto"
-            style={{
-              display: "inline-block",
-              backgroundColor: "#0084fc",
-              color: "#ffffff",
-              fontWeight: 700,
-              fontSize: "16px",
-              padding: "16px 40px",
-              borderRadius: "12px",
-              textDecoration: "none",
-            }}
-          >
-            Solicitar análisis →
-          </Link>
-        </div>
-        <NavyToWhiteTransition />
-      </section>
+    <main>
+      <MarketingPageHero
+        eyebrow="Servicios NELVYON"
+        title="Servicios de marketing conectados a una operación real"
+        subtitle="Campañas, contenido, automatización, CRM y analítica trabajados dentro de un sistema profesional, medible y centralizado."
+        ctaLabel="Solicitar análisis"
+        ctaHref="/contacto"
+      />
 
-      <section style={{ backgroundColor: "#ffffff", padding: "64px 0" }}>
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, maxWidth: "720px", margin: "0 auto 48px", textAlign: "center" }}>
             Una empresa no necesita más ruido. Necesita claridad. Cada servicio se integra en un sistema mayor: campañas, contenidos, automatización, CRM y seguimiento, configurados según la situación real del negocio.
@@ -240,7 +199,7 @@ export default function ServiciosPage() {
         `}</style>
       </section>
 
-      <section style={{ backgroundColor: "#f8faff", padding: "80px 0" }}>
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 className="fade-in" style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "#07122a", textAlign: "center", margin: "0 0 40px" }}>
             Metodología

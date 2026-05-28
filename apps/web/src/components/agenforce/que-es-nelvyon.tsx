@@ -6,7 +6,7 @@ export function QueEsNelvyon() {
   ];
 
   return (
-    <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div
           className="nelvyon-que-es-grid"

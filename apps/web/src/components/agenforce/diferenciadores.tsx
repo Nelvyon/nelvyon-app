@@ -8,7 +8,7 @@ export function Diferenciadores() {
   ];
 
   return (
-    <section style={{ backgroundColor: "#f8faff", padding: "96px 0" }}>
+    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ textAlign: "center", marginBottom: "48px" }}>
           <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>

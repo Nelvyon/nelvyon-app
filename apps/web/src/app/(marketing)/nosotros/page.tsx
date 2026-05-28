@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CtaFinal } from "@/components/agenforce/cta-final";
-import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
+import { MarketingPageHero } from "@/components/agenforce/marketing-page-hero";
 
 export const metadata: Metadata = {
   title: "Nosotros | NELVYON — La empresa detrás de la automatización",
@@ -26,21 +26,12 @@ const formaTrabajar = [
 export default function NosotrosPage() {
   return (
     <main>
-      <section style={{ backgroundColor: "#07122a", padding: "120px 0 0" }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 80px", textAlign: "center" }}>
-          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "16px" }}>
-            Sobre NELVYON
-          </p>
-          <h1 style={{ fontSize: "clamp(36px, 6vw, 60px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
-            NELVYON nace para ordenar el crecimiento
-          </h1>
-          <p style={{ fontSize: "20px", color: "#a8c8e8", margin: 0, lineHeight: 1.6 }}>
-            Creamos una nueva forma de operar marketing, ventas y automatización: más centralizada, más continua y más profesional.
-          </p>
-        </div>
-        <NavyToWhiteTransition />
-      </section>
-      <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+      <MarketingPageHero
+        eyebrow="Sobre NELVYON"
+        title="NELVYON nace para ordenar el crecimiento"
+        subtitle="Creamos una nueva forma de operar marketing, ventas y automatización: más centralizada, más continua y más profesional."
+      />
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <div className="nelvyon-nosotros-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "start" }}>
             <div>
@@ -80,7 +71,7 @@ export default function NosotrosPage() {
           </div>
         </div>
       </section>
-      <section style={{ backgroundColor: "#f8faff", padding: "96px 0" }}>
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
             <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
@@ -100,7 +91,7 @@ export default function NosotrosPage() {
           </div>
         </div>
       </section>
-      <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
             <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>

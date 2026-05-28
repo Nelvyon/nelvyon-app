@@ -13,7 +13,7 @@ export function ModulosHome() {
   ];
 
   return (
-    <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "24px", marginBottom: "48px" }}>
           <div>
@@ -46,7 +46,7 @@ export function ModulosHome() {
                 backgroundColor: "#f8faff",
                 border: "1px solid #e8eef8",
                 borderRadius: "12px",
-                padding: "28px",
+                padding: "22px",
                 transition: "border-color 0.2s, box-shadow 0.2s",
               }}
               onMouseEnter={(e) => {

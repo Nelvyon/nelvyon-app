@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CtaFinal } from "@/components/agenforce/cta-final";
-import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
+import { MarketingPageHero } from "@/components/agenforce/marketing-page-hero";
 
 export const metadata: Metadata = {
   title: "Contacto | NELVYON — Habla con un experto",
@@ -10,21 +10,12 @@ export const metadata: Metadata = {
 export default function ContactoPage() {
   return (
     <main>
-      <section style={{ backgroundColor: "#07122a", padding: "120px 0 0" }}>
-        <div style={{ maxWidth: "700px", margin: "0 auto", padding: "0 24px 80px", textAlign: "center" }}>
-          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "16px" }}>
-            Contacto
-          </p>
-          <h1 style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>
-            Hablemos de tu operación digital
-          </h1>
-          <p style={{ fontSize: "20px", color: "#a8c8e8", margin: 0, lineHeight: 1.6 }}>
-            Cuéntanos qué necesita tu empresa y estudiaremos cómo NELVYON puede ayudarte a estructurar marketing, ventas, automatización y reporting.
-          </p>
-        </div>
-        <NavyToWhiteTransition />
-      </section>
-      <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+      <MarketingPageHero
+        eyebrow="Contacto"
+        title="Hablemos de tu operación digital"
+        subtitle="Cuéntanos qué necesita tu empresa y estudiaremos cómo NELVYON puede ayudarte a estructurar marketing, ventas, automatización y reporting."
+      />
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
           <div className="nelvyon-contacto-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "start" }}>
             <div>

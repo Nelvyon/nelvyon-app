@@ -17,16 +17,16 @@
   --secondary-foreground: #07122a;
   --muted: #f8faff;
   --muted-foreground: #4a5568;
-  --accent: #00d6fe;
-  --accent-foreground: #07122a;
+  --accent: #0084fc;
+  --accent-foreground: #ffffff;
   --destructive: oklch(0.577 0.245 27.325);
   --border: #e8eef8;
   --input: #e8eef8;
   --ring: #0084fc;
   --nelvyon-navy: #07122a;
   --nelvyon-blue: #0084fc;
-  --nelvyon-sky: #00d6fe;
-  --nelvyon-light: #a8dff5;
+  --nelvyon-sky: #0084fc;
+  --nelvyon-light: rgba(0, 132, 252, 0.12);
   --nelvyon-section-alt: #f8faff;
   --shadow-brand-var:
     0 4px 24px rgba(7, 18, 42, 0.06),
@@ -44,6 +44,26 @@
 .fade-in.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.nelvyon-mkt-section {
+  padding: 64px 0;
+}
+
+@media (min-width: 1024px) {
+  .nelvyon-mkt-section {
+    padding: 80px 0;
+  }
+}
+
+.nelvyon-footer {
+  padding: 48px 0 28px;
+}
+
+@media (min-width: 768px) {
+  .nelvyon-footer {
+    padding: 56px 0 36px;
+  }
 }
 
 @theme inline {

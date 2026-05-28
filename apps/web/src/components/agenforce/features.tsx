@@ -11,7 +11,7 @@ export function Features() {
   ];
 
   return (
-    <section style={{ backgroundColor: "#f8faff", padding: "96px 0" }}>
+    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "24px", marginBottom: "48px" }}>
           <div>
@@ -41,7 +41,7 @@ export function Features() {
                 backgroundColor: "#ffffff",
                 border: "1px solid #e8eef8",
                 borderRadius: "12px",
-                padding: "28px",
+                padding: "22px",
               }}
             >
               <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#07122a", margin: "0 0 8px" }}>{s.title}</h3>

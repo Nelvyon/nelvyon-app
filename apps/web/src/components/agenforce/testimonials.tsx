@@ -7,7 +7,7 @@ export function Testimonials() {
   ];
 
   return (
-    <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ marginBottom: "48px" }}>
           <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
@@ -35,7 +35,7 @@ export function Testimonials() {
                 backgroundColor: "#f8faff",
                 border: "1px solid #e8eef8",
                 borderRadius: "12px",
-                padding: "28px",
+                padding: "22px",
               }}
             >
               <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#07122a", margin: "0 0 10px" }}>{c.title}</h3>

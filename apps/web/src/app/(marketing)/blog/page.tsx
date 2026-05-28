@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CtaFinal } from "@/components/agenforce/cta-final";
-import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
+import { MarketingPageHero } from "@/components/agenforce/marketing-page-hero";
 
 export const metadata: Metadata = {
   title: "Blog | NELVYON — Marketing Digital y Automatización",
@@ -16,20 +16,17 @@ const posts = [
 ];
 export default function BlogPage() {
   return (
-    <main style={{ paddingTop: "68px" }}>
-      <section style={{ backgroundColor: "#07122a", padding: "80px 0 0" }}>
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 64px", textAlign: "center" }}>
-          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "16px" }}>Blog NELVYON</p>
-          <h1 className="fade-in" style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.1 }}>Ideas para operar mejor el marketing</h1>
-          <p style={{ fontSize: "18px", color: "#a8c8e8", margin: 0, lineHeight: 1.6 }}>Análisis, guías y reflexiones sobre automatización, campañas, CRM, contenido, reporting y sistemas de crecimiento empresarial.</p>
-        </div>
-        <NavyToWhiteTransition />
-      </section>
-      <section style={{ backgroundColor: "#ffffff", padding: "96px 0" }}>
+    <main>
+      <MarketingPageHero
+        eyebrow="Blog NELVYON"
+        title="Ideas para operar mejor el marketing"
+        subtitle="Análisis, guías y reflexiones sobre automatización, campañas, CRM, contenido, reporting y sistemas de crecimiento empresarial."
+      />
+      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "28px" }}>
+          <div className="nelvyon-blog-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
             {posts.map((post, i) => (
-              <div key={i} style={{ backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "20px", padding: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div key={i} style={{ backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "12px", padding: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
                 <span style={{ display: "inline-block", backgroundColor: "#e8f0fb", color: "#0084fc", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "20px", padding: "4px 12px", width: "fit-content" }}>{post.tag}</span>
                 <h2 style={{ fontSize: "18px", fontWeight: 800, color: "#07122a", margin: 0, lineHeight: 1.3 }}>{post.title}</h2>
                 <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{post.excerpt}</p>
@@ -43,6 +40,11 @@ export default function BlogPage() {
         </div>
       </section>
       <CtaFinal />
+      <style>{`
+        @media (max-width: 640px) {
+          .nelvyon-blog-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </main>
   );
 }

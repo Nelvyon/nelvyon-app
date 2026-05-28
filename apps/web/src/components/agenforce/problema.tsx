@@ -6,7 +6,7 @@ export function Problema() {
   ];
 
   return (
-    <section style={{ backgroundColor: "#f8faff", padding: "96px 0" }}>
+    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <div style={{ maxWidth: "640px", marginBottom: "48px" }}>
           <p
