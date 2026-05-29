@@ -25,12 +25,9 @@ export function CtaFinal({
           {title}
         </h2>
         <p
+          className="mkt-lead--light"
           style={{
-            fontSize: 16,
-            color: "rgba(255,255,255,0.52)",
             margin: "0 0 36px",
-            lineHeight: 1.5,
-            letterSpacing: "-0.012em",
           }}
         >
           {subtitle}

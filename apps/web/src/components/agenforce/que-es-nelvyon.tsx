@@ -1,7 +1,7 @@
 import { NELVYON_NAVY } from "./marketing-brand";
 
 const CAPAS = [
-  { key: "01", title: "NELVYON OS", desc: "Núcleo SaaS: CRM, campañas, automatización y reporting." },
+  { key: "01", title: "NELVYON", desc: "Marca y plataforma. NELVYON OS como núcleo SaaS: CRM, campañas, automatización y reporting." },
   { key: "02", title: "Agentes expertos", desc: "Coordinación operativa continua según reglas definidas." },
   { key: "03", title: "Capa de ejecución", desc: "Servicios profesionales cuando el sistema necesita manos." },
 ];

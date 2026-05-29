@@ -1,6 +1,6 @@
 "use client";
 
-import { NELVYON_BLUE, NELVYON_NAVY } from "./marketing-brand";
+import { NELVYON_BLUE } from "./marketing-brand";
 
 const NODES = [
   { label: "Ads", angle: -90 },
@@ -14,10 +14,11 @@ const NODES = [
   { label: "Contenido", angle: 326 },
 ];
 
-const CX = 300;
-const CY = 300;
-const RADIUS = 210;
-const NODE_R = 52;
+const CX = 360;
+const CY = 360;
+const RADIUS = 248;
+const NODE_W = 120;
+const NODE_H = 48;
 
 function polar(angleDeg: number) {
   const rad = (angleDeg * Math.PI) / 180;
@@ -29,90 +30,104 @@ function polar(angleDeg: number) {
 
 export function PlataformaOs() {
   return (
-    <section className="nelvyon-mkt-section--airy nelvyon-os-section" style={{ backgroundColor: NELVYON_NAVY }}>
+    <section className="nelvyon-mkt-section--airy" style={{ backgroundColor: "#ffffff" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", maxWidth: 480, margin: "0 auto 48px" }}>
-          <p className="mkt-eyebrow" style={{ color: "rgba(0,132,252,0.85)" }}>
-            NELVYON OS
+        <div style={{ textAlign: "center", maxWidth: 520, margin: "0 auto 56px" }}>
+          <p className="mkt-eyebrow">Plataforma</p>
+          <h2 className="mkt-h2 fade-in">Infraestructura operativa central</h2>
+          <p className="mkt-lead" style={{ marginTop: 16 }}>
+            NELVYON conecta marketing, ventas y automatización desde un núcleo único.
           </p>
-          <h2 className="mkt-h2 mkt-h2--light fade-in">Infraestructura operativa central</h2>
         </div>
 
-        <div className="nelvyon-os-diagram-wrap">
-          <svg
-            viewBox="0 0 600 600"
-            className="nelvyon-os-diagram"
-            role="img"
-            aria-label="Diagrama: NELVYON OS conectado con Ads, CRM, WhatsApp, Email, SEO, Ecommerce, Reporting, Automatización y Contenido"
-          >
-            <defs>
-              <radialGradient id="nelvyon-os-glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor={NELVYON_BLUE} stopOpacity="0.12" />
-                <stop offset="100%" stopColor={NELVYON_BLUE} stopOpacity="0" />
-              </radialGradient>
-            </defs>
-            <circle cx={CX} cy={CY} r={RADIUS + 40} fill="url(#nelvyon-os-glow)" />
-            {NODES.map((node) => {
-              const { x, y } = polar(node.angle);
-              return (
-                <line
-                  key={`line-${node.label}`}
-                  x1={CX}
-                  y1={CY}
-                  x2={x}
-                  y2={y}
-                  stroke={NELVYON_BLUE}
-                  strokeOpacity={0.28}
-                  strokeWidth={1}
-                  className="nelvyon-os-line"
-                />
-              );
-            })}
-            <rect
-              x={CX - 72}
-              y={CY - 40}
-              width={144}
-              height={80}
-              rx={10}
-              fill="rgba(255,255,255,0.04)"
-              stroke={NELVYON_BLUE}
-              strokeOpacity={0.45}
-              strokeWidth={1.5}
-            />
-            <text x={CX} y={CY - 8} textAnchor="middle" fill="rgba(255,255,255,0.45)" fontSize={9} fontWeight={500} letterSpacing="0.14em">
-              NÚCLEO
-            </text>
-            <text x={CX} y={CY + 16} textAnchor="middle" fill="#ffffff" fontSize={17} fontWeight={600}>
-              NELVYON OS
-            </text>
-            {NODES.map((node) => {
-              const { x, y } = polar(node.angle);
-              return (
-                <g key={node.label} className="nelvyon-os-node" transform={`translate(${x - NODE_R}, ${y - 22})`}>
-                  <rect
-                    width={NODE_R * 2}
-                    height={44}
-                    rx={8}
-                    fill="rgba(255,255,255,0.04)"
-                    stroke="rgba(255,255,255,0.1)"
-                    strokeWidth={1}
-                    className="nelvyon-os-node__box"
+        <div className="nelvyon-os-diagram-stage">
+          <div className="nelvyon-os-diagram-wrap">
+            <svg
+              viewBox="0 0 720 720"
+              className="nelvyon-os-diagram"
+              role="img"
+              aria-label="Diagrama: NELVYON en el centro conectado con Ads, CRM, WhatsApp, Email, SEO, Ecommerce, Reporting, Automatización y Contenido"
+            >
+              <defs>
+                <radialGradient id="nelvyon-os-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor={NELVYON_BLUE} stopOpacity="0.18" />
+                  <stop offset="100%" stopColor={NELVYON_BLUE} stopOpacity="0" />
+                </radialGradient>
+                <filter id="nelvyon-line-glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <circle cx={CX} cy={CY} r={RADIUS + 52} fill="url(#nelvyon-os-glow)" />
+              {NODES.map((node) => {
+                const { x, y } = polar(node.angle);
+                return (
+                  <line
+                    key={`line-${node.label}`}
+                    x1={CX}
+                    y1={CY}
+                    x2={x}
+                    y2={y}
+                    stroke={NELVYON_BLUE}
+                    strokeOpacity={0.38}
+                    strokeWidth={1.5}
+                    className="nelvyon-os-line"
+                    filter="url(#nelvyon-line-glow)"
                   />
-                  <text
-                    x={NODE_R}
-                    y={27}
-                    textAnchor="middle"
-                    fill="rgba(255,255,255,0.82)"
-                    fontSize={11}
-                    fontWeight={600}
-                    letterSpacing="-0.02em"
-                  >
-                    {node.label}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
+                );
+              })}
+              <rect
+                x={CX - 88}
+                y={CY - 52}
+                width={176}
+                height={104}
+                rx={14}
+                fill="rgba(255,255,255,0.05)"
+                stroke={NELVYON_BLUE}
+                strokeOpacity={0.55}
+                strokeWidth={1.5}
+              />
+              <text x={CX} y={CY - 14} textAnchor="middle" fill="#ffffff" fontSize={26} fontWeight={700} letterSpacing="-0.03em">
+                NELVYON
+              </text>
+              <text x={CX} y={CY + 12} textAnchor="middle" fill="rgba(255,255,255,0.42)" fontSize={10} fontWeight={500} letterSpacing="0.16em">
+                NELVYON OS
+              </text>
+              <text x={CX} y={CY + 30} textAnchor="middle" fill="rgba(0,132,252,0.75)" fontSize={9} fontWeight={500} letterSpacing="0.1em">
+                NÚCLEO OPERATIVO
+              </text>
+              {NODES.map((node) => {
+                const { x, y } = polar(node.angle);
+                return (
+                  <g key={node.label} className="nelvyon-os-node" transform={`translate(${x - NODE_W / 2}, ${y - NODE_H / 2})`}>
+                    <rect
+                      width={NODE_W}
+                      height={NODE_H}
+                      rx={10}
+                      fill="rgba(255,255,255,0.05)"
+                      stroke="rgba(255,255,255,0.12)"
+                      strokeWidth={1}
+                      className="nelvyon-os-node__box"
+                    />
+                    <text
+                      x={NODE_W / 2}
+                      y={NODE_H / 2 + 4}
+                      textAnchor="middle"
+                      fill="rgba(255,255,255,0.88)"
+                      fontSize={12}
+                      fontWeight={600}
+                      letterSpacing="-0.02em"
+                    >
+                      {node.label}
+                    </text>
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
         </div>
       </div>
     </section>

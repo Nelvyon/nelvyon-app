@@ -59,7 +59,7 @@ const Question = ({ question, answer }: { question: string; answer: string }) =>
         </div>
       </div>
       <motion.div animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} initial={false} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }} style={{ overflow: "hidden" }}>
-        <p style={{ marginTop: 12, fontSize: 14, color: "#5a6a8a", lineHeight: 1.5, marginBottom: 0, maxWidth: 560 }}>{answer}</p>
+        <p className="mkt-body" style={{ marginTop: 12, marginBottom: 0, maxWidth: 560 }}>{answer}</p>
       </motion.div>
     </button>
   );

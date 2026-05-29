@@ -19,23 +19,23 @@ export default function ContactoPage() {
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
           <div className="nelvyon-contacto-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "start" }}>
             <div>
-              <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 32px" }}>
+              <p className="mkt-body" style={{ fontSize: "16px", margin: "0 0 32px" }}>
                 Este formulario no es para recibir una propuesta genérica. Es para entender tu situación actual y valorar qué estructura puede tener sentido para tu empresa.
               </p>
               <div style={{ marginBottom: "32px" }}>
                 <p style={{ fontSize: "14px", fontWeight: 600, color: "#07122a", margin: "0 0 12px" }}>Información de contacto</p>
-                <p style={{ fontSize: "14px", color: "#5a6a8a", margin: "0 0 8px" }}>Web: nelvyon.com</p>
+                <p className="mkt-body" style={{ fontSize: "14px", margin: "0 0 8px" }}>Web: nelvyon.com</p>
                 <a href="mailto:contacto@nelvyon.com" style={{ fontSize: "15px", color: "#0084fc", fontWeight: 700, textDecoration: "none", display: "block", marginBottom: "8px" }}>
                   contacto@nelvyon.com
                 </a>
-                <p style={{ fontSize: "14px", color: "#5a6a8a", margin: "0 0 4px" }}>Horario: Lunes a viernes</p>
-                <p style={{ fontSize: "14px", color: "#5a6a8a", margin: 0 }}>Idioma: Español</p>
+                <p className="mkt-body" style={{ fontSize: "14px", margin: "0 0 4px" }}>Horario: Lunes a viernes</p>
+                <p className="mkt-body" style={{ fontSize: "14px", margin: 0 }}>Idioma: Español</p>
               </div>
-              <p style={{ fontSize: "15px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
+              <p className="mkt-body" style={{ margin: 0 }}>
                 NELVYON trabaja con empresas que buscan claridad, estructura y operación seria. No prometemos resultados irreales. No vendemos soluciones genéricas. No construimos sistemas sin entender primero el negocio. Si tu empresa necesita ordenar su marketing, automatizar procesos y trabajar con una plataforma preparada para operar de forma continua, podemos hablar.
               </p>
             </div>
-            <div style={{ backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "24px", padding: "40px" }}>
+            <div className="mkt-card" style={{ borderRadius: "20px", padding: "40px" }}>
               <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#07122a", margin: "0 0 28px" }}>
                 Cuéntanos tu situación
               </h3>

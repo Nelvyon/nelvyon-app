@@ -1,7 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+
+import { NELVYON_BLUE } from "@/components/agenforce/marketing-brand";
 
 const navLinks = [
   { title: "Inicio", href: "/" },
@@ -44,11 +47,13 @@ export function Navbar() {
             alignItems: "center",
             textDecoration: "none",
             flexShrink: 0,
-            gap: "1px",
+            gap: "10px",
           }}
         >
-          <span style={{ color: "#0084fc", fontWeight: 800, fontSize: "18px", letterSpacing: "-0.03em" }}>N</span>
-          <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600, fontSize: "18px", letterSpacing: "-0.03em" }}>ELVYON</span>
+          <Image src="/logo.png" alt="NELVYON" width={32} height={32} className="object-contain" priority />
+          <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 650, fontSize: "17px", letterSpacing: "-0.03em" }}>
+            NELVYON
+          </span>
         </Link>
 
         <nav
@@ -67,7 +72,7 @@ export function Navbar() {
               key={item.href}
               href={item.href}
               style={{
-                color: "rgba(255,255,255,0.65)",
+                color: "rgba(255,255,255,0.7)",
                 fontSize: "14px",
                 fontWeight: 500,
                 textDecoration: "none",
@@ -77,7 +82,7 @@ export function Navbar() {
                 e.currentTarget.style.color = "#ffffff";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = "rgba(255,255,255,0.65)";
+                e.currentTarget.style.color = "rgba(255,255,255,0.7)";
               }}
             >
               {item.title}
@@ -87,11 +92,11 @@ export function Navbar() {
 
         <Link
           href="/contacto"
-          className="nelvyon-nav-cta"
+          className="nelvyon-nav-cta mkt-btn"
           style={{
             display: "inline-flex",
             alignItems: "center",
-            backgroundColor: "#0084fc",
+            backgroundColor: NELVYON_BLUE,
             color: "#ffffff",
             fontWeight: 600,
             fontSize: "13px",
@@ -100,7 +105,6 @@ export function Navbar() {
             textDecoration: "none",
             whiteSpace: "nowrap",
             flexShrink: 0,
-            boxShadow: "none",
           }}
         >
           Solicitar demo
@@ -151,7 +155,7 @@ export function Navbar() {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               style={{
-                color: "rgba(255,255,255,0.85)",
+                color: "rgba(255,255,255,0.88)",
                 fontSize: "15px",
                 fontWeight: 500,
                 textDecoration: "none",
@@ -168,7 +172,7 @@ export function Navbar() {
               marginTop: "12px",
               display: "block",
               textAlign: "center",
-              backgroundColor: "#0084fc",
+              backgroundColor: NELVYON_BLUE,
               color: "#ffffff",
               fontWeight: 600,
               fontSize: "14px",

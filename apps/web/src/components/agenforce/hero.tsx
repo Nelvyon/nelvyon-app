@@ -28,21 +28,20 @@ export const Hero = () => {
     <section
       className="relative overflow-hidden nelvyon-hero"
       style={{
-        background: `linear-gradient(180deg, ${NELVYON_NAVY} 0%, #0a1835 55%, #0c1d42 100%)`,
         paddingTop: "52px",
         paddingBottom: 0,
       }}
     >
       <Container>
         <div className="nelvyon-hero-copy" style={{ maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
-          <p className="nelvyon-hero-eyebrow mkt-eyebrow" style={{ color: "rgba(255,255,255,0.42)", marginBottom: 18 }}>
+          <p className="nelvyon-hero-eyebrow mkt-eyebrow" style={{ color: "rgba(255,255,255,0.55)", marginBottom: 18 }}>
             Plataforma operativa
           </p>
           <h1
             className="fade-in"
             style={{
               fontSize: "clamp(32px, 4.5vw, 54px)",
-              fontWeight: 650,
+              fontWeight: 700,
               color: "#ffffff",
               lineHeight: 1.06,
               letterSpacing: "-0.04em",
@@ -55,7 +54,7 @@ export const Hero = () => {
             className="nelvyon-hero-subtitle"
             style={{
               fontSize: "clamp(15px, 1.4vw, 17px)",
-              color: "rgba(255,255,255,0.58)",
+              color: "rgba(255,255,255,0.72)",
               margin: "0 auto 28px",
               lineHeight: 1.5,
               letterSpacing: "-0.012em",

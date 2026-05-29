@@ -38,19 +38,19 @@ export default function NosotrosPage() {
               <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "16px" }}>
                 Quiénes somos
               </p>
-              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 24px" }}>
+              <p className="mkt-body" style={{ fontSize: "17px", margin: "0 0 24px" }}>
                 NELVYON es una empresa construida sobre una idea simple: las empresas modernas no pueden depender de procesos dispersos, herramientas aisladas y ejecución improvisada. El marketing necesita estrategia. Las ventas necesitan seguimiento. La automatización necesita lógica. La dirección necesita visibilidad. NELVYON une estos elementos en una plataforma operativa con servicios profesionales y agentes expertos.
               </p>
               <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
                 Misión
               </p>
-              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 24px" }}>
+              <p className="mkt-body" style={{ fontSize: "17px", margin: "0 0 24px" }}>
                 Ayudar a empresas a construir sistemas de marketing y ventas más claros, automatizados y medibles. Nuestra misión no es prometer resultados imposibles. Es aportar estructura, ejecución y tecnología para que cada empresa pueda operar con mayor control.
               </p>
               <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
                 Visión
               </p>
-              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
+              <p className="mkt-body" style={{ fontSize: "17px", margin: 0 }}>
                 Convertir NELVYON en una infraestructura de referencia para empresas que quieren trabajar su marketing, ventas y operaciones desde un entorno centralizado. Una plataforma capaz de combinar criterio humano, agentes expertos y automatización continua.
               </p>
             </div>
@@ -58,13 +58,13 @@ export default function NosotrosPage() {
               <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "16px" }}>
                 NELVYON OS
               </p>
-              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: "0 0 24px" }}>
+              <p className="mkt-body" style={{ fontSize: "17px", margin: "0 0 24px" }}>
                 NELVYON OS es el sistema operativo interno que coordina agentes expertos, automatizaciones, módulos y procesos. Su función es conectar piezas que normalmente trabajan separadas: campañas, CRM, email, WhatsApp, contenido, reporting, ecommerce e integraciones externas. NELVYON OS no es una promesa comercial. Es la forma en la que estructuramos la operación.
               </p>
               <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "16px" }}>
                 Equipo
               </p>
-              <p style={{ fontSize: "17px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
+              <p className="mkt-body" style={{ fontSize: "17px", margin: 0 }}>
                 NELVYON combina fundadores, especialistas estratégicos y agentes expertos operativos. Los fundadores definen visión, criterio y estándares de calidad. Los especialistas aportan ejecución profesional. Los agentes expertos mantienen tareas operativas activas de forma continua.
               </p>
             </div>
@@ -77,15 +77,15 @@ export default function NosotrosPage() {
             <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
               Lo que nos define
             </p>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: 0 }}>
+            <h2 className="mkt-h2 fade-in">
               Nuestros valores
             </h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "24px" }}>
             {values.map((v, i) => (
-              <div key={i} style={{ backgroundColor: "#ffffff", border: "1px solid #e8eef8", borderRadius: "12px", padding: "28px" }}>
-                <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#07122a", margin: "0 0 10px" }}>{v.title}</h3>
-                <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{v.desc}</p>
+              <div key={i} className="mkt-card">
+                <h3 className="mkt-card__title">{v.title}</h3>
+                <p className="mkt-card__desc">{v.desc}</p>
               </div>
             ))}
           </div>
@@ -97,7 +97,7 @@ export default function NosotrosPage() {
             <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
               Forma de trabajar
             </p>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#07122a", margin: "0 0 16px" }}>
+            <h2 className="mkt-h2 fade-in" style={{ margin: "0 0 16px" }}>
               Cómo implementamos cada proyecto
             </h2>
           </div>
@@ -114,7 +114,7 @@ export default function NosotrosPage() {
                 </div>
                 <div style={{ paddingTop: "10px" }}>
                   <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#07122a", margin: "0 0 8px" }}>{m.title}</h3>
-                  <p style={{ fontSize: "15px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{m.desc}</p>
+                  <p className="mkt-body">{m.desc}</p>
                 </div>
               </div>
             ))}

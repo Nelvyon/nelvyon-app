@@ -19,6 +19,8 @@ import {
   IconWebhook,
 } from "@tabler/icons-react";
 
+import { NELVYON_BLUE } from "./marketing-brand";
+
 const ECOSYSTEM: { label: string; Icon: TablerIcon }[] = [
   { label: "CRM", Icon: IconUsers },
   { label: "Meta Ads", Icon: IconBrandMeta },
@@ -42,7 +44,7 @@ export function EcosistemaNelvyon() {
 
   return (
     <section className="nelvyon-ecosystem-section nelvyon-mkt-section--airy" style={{ backgroundColor: "#f8faff" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 48px" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 56px" }}>
         <div style={{ maxWidth: 560 }}>
           <p className="mkt-eyebrow">Ecosistema</p>
           <h2 className="mkt-h2 fade-in">Todo conectado dentro de NELVYON</h2>
@@ -56,7 +58,7 @@ export function EcosistemaNelvyon() {
           {track.map((item, i) => (
             <div key={`${item.label}-${i}`} className="nelvyon-ecosystem-card">
               <div className="nelvyon-ecosystem-card__icon">
-                <item.Icon size={26} stroke={1.5} color="#0084fc" aria-hidden />
+                <item.Icon size={30} stroke={1.5} color={NELVYON_BLUE} aria-hidden />
               </div>
               <span className="nelvyon-ecosystem-card__label">{item.label}</span>
             </div>

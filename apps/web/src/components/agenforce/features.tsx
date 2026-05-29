@@ -21,8 +21,11 @@ function CapasHubVisual() {
         <line x1="100" y1="100" x2="100" y2="172" stroke={NELVYON_BLUE} strokeOpacity={0.35} strokeWidth={1} />
         <line x1="100" y1="100" x2="38" y2="144" stroke={NELVYON_BLUE} strokeOpacity={0.35} strokeWidth={1} />
         <rect x="68" y="78" width="64" height="44" rx="8" fill={NELVYON_NAVY} stroke={NELVYON_BLUE} strokeOpacity={0.5} />
-        <text x="100" y="106" textAnchor="middle" fill="#fff" fontSize={10} fontWeight={600}>
-          NELVYON OS
+        <text x="100" y="102" textAnchor="middle" fill="#fff" fontSize={9} fontWeight={700}>
+          NELVYON
+        </text>
+        <text x="100" y="114" textAnchor="middle" fill="rgba(255,255,255,0.45)" fontSize={6} fontWeight={500}>
+          OS
         </text>
       </svg>
     </div>

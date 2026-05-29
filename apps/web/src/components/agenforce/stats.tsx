@@ -32,9 +32,9 @@ export function Stats() {
               key={p}
               style={{
                 fontSize: 15,
-                fontWeight: 500,
+                fontWeight: 550,
                 letterSpacing: "-0.02em",
-                color: "#5a6a8a",
+                color: "#475569",
               }}
             >
               {p}

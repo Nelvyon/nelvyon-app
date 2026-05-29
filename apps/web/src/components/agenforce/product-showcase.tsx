@@ -101,7 +101,7 @@ function AutomationMock() {
 
 export function ProductShowcase() {
   return (
-    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
+    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
         <div style={{ marginBottom: 40, maxWidth: 420 }}>
           <p className="mkt-eyebrow">Producto</p>

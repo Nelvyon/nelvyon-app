@@ -61,7 +61,7 @@ export default function SaasPage() {
   return (
     <main>
       <MarketingPageHero
-        eyebrow="NELVYON OS"
+        eyebrow="NELVYON"
         title="El núcleo de tu operación"
         subtitle="Marketing, ventas y automatización en un sistema operativo con agentes expertos."
         ctaLabel="Ver planes"
@@ -107,14 +107,15 @@ export default function SaasPage() {
               <span
                 key={name}
                 style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: "#5a6a8a",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#475569",
                   letterSpacing: "-0.01em",
-                  padding: "8px 14px",
-                  borderRadius: 5,
+                  padding: "10px 16px",
+                  borderRadius: 10,
                   border: "1px solid #e8eef8",
                   background: "#fff",
+                  boxShadow: "0 1px 2px rgba(7,18,42,0.04), 0 4px 16px rgba(7,18,42,0.04)",
                 }}
               >
                 {name}
@@ -132,14 +133,18 @@ export default function SaasPage() {
           </div>
           <div className="nelvyon-pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", alignItems: "stretch" }}>
             {plans.map((plan, i) => (
-              <div key={i} style={{ backgroundColor: plan.highlight ? "#07122a" : "#f8faff", border: plan.highlight ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e8eef8", borderRadius: "12px", padding: "28px 24px", position: "relative", display: "flex", flexDirection: "column" }}>
+              <div
+                key={i}
+                className={plan.highlight ? "mkt-card--dark" : "mkt-card"}
+                style={{ position: "relative", display: "flex", flexDirection: "column", padding: "28px 24px" }}
+              >
                 {plan.badge && (
                   <span style={{ position: "absolute", top: "16px", right: "16px", background: "rgba(0,132,252,0.15)", color: "#0084fc", fontSize: "11px", fontWeight: 600, borderRadius: "6px", padding: "4px 10px", whiteSpace: "nowrap", ...(plan.highlight ? { background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.85)" } : {}) }}>
                     {plan.badge}
                   </span>
                 )}
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: plan.highlight ? "#ffffff" : "#07122a", margin: "0 0 8px" }}>{plan.name}</h3>
-                <p style={{ fontSize: "14px", color: plan.highlight ? "rgba(255,255,255,0.55)" : "#5a6a8a", margin: "0 0 20px", lineHeight: 1.5 }}>{plan.description}</p>
+                <p style={{ fontSize: "14px", color: plan.highlight ? "rgba(255,255,255,0.62)" : "#64748b", margin: "0 0 20px", lineHeight: 1.55 }}>{plan.description}</p>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "24px" }}>
                   <span style={{ fontSize: "40px", fontWeight: 800, color: plan.highlight ? "#ffffff" : "#07122a", lineHeight: 1, letterSpacing: "-0.02em" }}>{plan.price}</span>
                   <span style={{ fontSize: "14px", color: plan.highlight ? "rgba(255,255,255,0.5)" : "#5a6a8a" }}>{plan.period}</span>

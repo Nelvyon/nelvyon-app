@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 export function Footer() {
@@ -17,14 +17,14 @@ export function Footer() {
           }}
         >
           <div>
-            <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "1px", marginBottom: "16px" }}>
-              <span style={{ color: "#0084fc", fontWeight: 800, fontSize: "18px" }}>N</span>
-              <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600, fontSize: "18px" }}>ELVYON</span>
+            <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+              <Image src="/logo.png" alt="NELVYON" width={28} height={28} className="object-contain" />
+              <span style={{ color: "rgba(255,255,255,0.95)", fontWeight: 650, fontSize: "17px", letterSpacing: "-0.03em" }}>NELVYON</span>
             </Link>
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", lineHeight: 1.6, maxWidth: "280px", margin: "0 0 8px" }}>
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6, maxWidth: "280px", margin: "0 0 8px" }}>
               Donde nace tu imperio, crece tu marca y se impone tu legado.
             </p>
-            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.35)", margin: 0 }}>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.42)", margin: 0 }}>
               Plataforma operativa de marketing y automatización.
             </p>
           </div>

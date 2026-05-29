@@ -1,5 +1,9 @@
 export const NELVYON_NAVY = "#07122a";
 export const NELVYON_BLUE = "#0084fc";
-export const NELVYON_MUTED = "#5a6a8a";
+export const NELVYON_MUTED = "#475569";
+export const NELVYON_MUTED_SOFT = "#64748b";
 export const NELVYON_BORDER = "#e8eef8";
 export const NELVYON_SURFACE = "#f8faff";
+export const NELVYON_SURFACE_ALT = "#f1f5f9";
+export const NELVYON_CARD_DARK = "#0a1628";
+export const NELVYON_CARD_DARK_BORDER = "rgba(255,255,255,0.08)";

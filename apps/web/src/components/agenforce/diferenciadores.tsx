@@ -8,7 +8,7 @@ const ITEMS = [
 
 export function Diferenciadores() {
   return (
-    <section className="nelvyon-mkt-section--airy" style={{ backgroundColor: "#ffffff" }}>
+    <section className="nelvyon-mkt-section--airy" style={{ backgroundColor: "#f8faff" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
         <div style={{ maxWidth: 400, marginBottom: 48 }}>
           <p className="mkt-eyebrow">Por qué NELVYON</p>
@@ -17,33 +17,19 @@ export function Diferenciadores() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "0 48px",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: 20,
           }}
           className="nelvyon-dif-grid"
         >
-          {ITEMS.map((d, i) => (
-            <div
-              key={d.title}
-              style={{
-                padding: "20px 0",
-                borderBottom: "1px solid #e8eef8",
-                borderTop: i < 2 ? "1px solid #e8eef8" : "none",
-              }}
-            >
-              <p style={{ fontSize: 15, fontWeight: 600, letterSpacing: "-0.02em", color: "#07122a", margin: "0 0 6px" }}>
-                {d.title}
-              </p>
-              <p style={{ fontSize: 13, color: "#5a6a8a", margin: 0, lineHeight: 1.45 }}>{d.desc}</p>
+          {ITEMS.map((d) => (
+            <div key={d.title} className="mkt-card">
+              <p className="mkt-card__title">{d.title}</p>
+              <p className="mkt-card__desc">{d.desc}</p>
             </div>
           ))}
         </div>
       </div>
-      <style>{`
-        @media (max-width: 640px) {
-          .nelvyon-dif-grid { grid-template-columns: 1fr !important; gap: 0 !important; }
-        }
-      `}</style>
     </section>
   );
 }
