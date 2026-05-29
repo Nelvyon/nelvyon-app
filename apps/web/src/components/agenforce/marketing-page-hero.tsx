@@ -17,17 +17,7 @@ export function MarketingPageHero({ eyebrow, title, subtitle, ctaLabel, ctaHref 
         <p className="mkt-eyebrow nelvyon-page-hero-eyebrow" style={{ color: "rgba(255,255,255,0.55)" }}>
           {eyebrow}
         </p>
-        <h1
-          className="fade-in"
-          style={{
-            fontSize: "clamp(28px, 4.5vw, 44px)",
-            fontWeight: 700,
-            color: "#ffffff",
-            margin: "0 0 14px",
-            lineHeight: 1.06,
-            letterSpacing: "-0.04em",
-          }}
-        >
+        <h1 className="mkt-h1 mkt-h1--page fade-in" style={{ color: "#ffffff", marginBottom: 14 }}>
           {title}
         </h1>
         <p

@@ -3,14 +3,16 @@ import { NELVYON_BLUE } from "./marketing-brand";
 
 function PanelChrome({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="nelvyon-product-panel">
-      <div className="nelvyon-product-panel__chrome">
-        <span className="nelvyon-product-panel__dot" style={{ background: "#ff5f57" }} />
-        <span className="nelvyon-product-panel__dot" style={{ background: "#febc2e" }} />
-        <span className="nelvyon-product-panel__dot" style={{ background: "#28c840" }} />
-        <span className="nelvyon-product-panel__title">{title}</span>
+    <div className="nelvyon-product-showcase-item">
+      <div className="nelvyon-product-panel">
+        <div className="nelvyon-product-panel__chrome">
+          <span className="nelvyon-product-panel__dot" style={{ background: "#ff5f57" }} />
+          <span className="nelvyon-product-panel__dot" style={{ background: "#febc2e" }} />
+          <span className="nelvyon-product-panel__dot" style={{ background: "#28c840" }} />
+          <span className="nelvyon-product-panel__title">{title}</span>
+        </div>
+        <div className="nelvyon-product-panel__body">{children}</div>
       </div>
-      <div className="nelvyon-product-panel__body">{children}</div>
     </div>
   );
 }
@@ -22,7 +24,7 @@ function CrmMock() {
     { name: "Propuesta", items: ["Deal X"] },
   ];
   return (
-    <div style={{ display: "flex", gap: 8, minHeight: 140 }}>
+    <div style={{ display: "flex", gap: 8, minHeight: 148 }}>
       {cols.map((col) => (
         <div key={col.name} style={{ flex: 1, background: "rgba(255,255,255,0.03)", borderRadius: 6, padding: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
           <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", marginBottom: 8, fontWeight: 600 }}>{col.name}</div>
@@ -55,7 +57,7 @@ function ReportingMock() {
         <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>Actividad por canal</span>
         <span style={{ fontSize: 9, color: NELVYON_BLUE, fontWeight: 600 }}>Sincronizado</span>
       </div>
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 5, height: 100 }}>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 5, height: 108 }}>
         {[35, 52, 41, 58, 45, 62].map((h, i) => (
           <div
             key={i}
@@ -101,11 +103,11 @@ function AutomationMock() {
 
 export function ProductShowcase() {
   return (
-    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ marginBottom: 40, maxWidth: 420 }}>
+    <section className="nelvyon-mkt-section nelvyon-section--alt nelvyon-product-showcase-section">
+      <div className="nelvyon-section-inner">
+        <div className="nelvyon-section-head nelvyon-section-head--stack">
           <p className="mkt-eyebrow">Producto</p>
-          <h2 className="mkt-h2 fade-in">Software en acción</h2>
+          <h2 className="mkt-h2 mkt-h2--display fade-in">Software en acción</h2>
         </div>
         <div className="nelvyon-product-grid">
           <PanelChrome title="app.nelvyon.com · CRM">

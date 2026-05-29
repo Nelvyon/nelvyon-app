@@ -76,7 +76,7 @@ export function Footer() {
                   <li key={label}>
                     <Link
                       href={href}
-                      style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", textDecoration: "none" }}
+                      style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", textDecoration: "none" }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.color = "#0084fc";
                       }}
@@ -103,8 +103,8 @@ export function Footer() {
             gap: "12px",
           }}
         >
-          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.35)", margin: 0 }}>© 2026 NELVYON. Todos los derechos reservados.</p>
-          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.35)", margin: 0 }}>nelvyon.com · España</p>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", margin: 0 }}>© 2026 NELVYON. Todos los derechos reservados.</p>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", margin: 0 }}>nelvyon.com · España</p>
         </div>
       </div>
       <style>{`

@@ -21,48 +21,63 @@ import {
 
 import { NELVYON_BLUE } from "./marketing-brand";
 
-const ECOSYSTEM: { label: string; Icon: TablerIcon }[] = [
-  { label: "CRM", Icon: IconUsers },
-  { label: "Meta Ads", Icon: IconBrandMeta },
-  { label: "Google Ads", Icon: IconBrandGoogle },
-  { label: "TikTok Ads", Icon: IconBrandTiktok },
-  { label: "WhatsApp", Icon: IconBrandWhatsapp },
-  { label: "Email", Icon: IconMail },
-  { label: "SEO", Icon: IconSearch },
-  { label: "Ecommerce", Icon: IconShoppingCart },
-  { label: "Reporting", Icon: IconChartBar },
-  { label: "Automatización", Icon: IconWebhook },
-  { label: "Pipeline", Icon: IconLayoutKanban },
-  { label: "Social Media", Icon: IconShare2 },
-  { label: "Contenido", Icon: IconFileText },
-  { label: "Analytics", Icon: IconChartLine },
-  { label: "Integraciones", Icon: IconPlugConnected },
+type EcosystemItem = {
+  label: string;
+  Icon: TablerIcon;
+  tint: string;
+  iconColor: string;
+};
+
+const ECOSYSTEM: EcosystemItem[] = [
+  { label: "CRM", Icon: IconUsers, tint: "rgba(0,132,252,0.1)", iconColor: NELVYON_BLUE },
+  { label: "Meta Ads", Icon: IconBrandMeta, tint: "rgba(24,119,242,0.12)", iconColor: "#1877f2" },
+  { label: "Google Ads", Icon: IconBrandGoogle, tint: "rgba(234,67,53,0.1)", iconColor: "#ea4335" },
+  { label: "TikTok Ads", Icon: IconBrandTiktok, tint: "rgba(0,0,0,0.06)", iconColor: "#111827" },
+  { label: "WhatsApp", Icon: IconBrandWhatsapp, tint: "rgba(37,211,102,0.12)", iconColor: "#25d366" },
+  { label: "Email", Icon: IconMail, tint: "rgba(0,132,252,0.1)", iconColor: NELVYON_BLUE },
+  { label: "SEO", Icon: IconSearch, tint: "rgba(99,102,241,0.1)", iconColor: "#6366f1" },
+  { label: "Ecommerce", Icon: IconShoppingCart, tint: "rgba(245,158,11,0.12)", iconColor: "#f59e0b" },
+  { label: "Reporting", Icon: IconChartBar, tint: "rgba(0,132,252,0.1)", iconColor: NELVYON_BLUE },
+  { label: "Automatización", Icon: IconWebhook, tint: "rgba(139,92,246,0.1)", iconColor: "#8b5cf6" },
+  { label: "Pipeline", Icon: IconLayoutKanban, tint: "rgba(14,165,233,0.1)", iconColor: "#0ea5e9" },
+  { label: "Social Media", Icon: IconShare2, tint: "rgba(236,72,153,0.1)", iconColor: "#ec4899" },
+  { label: "Contenido", Icon: IconFileText, tint: "rgba(100,116,139,0.1)", iconColor: "#64748b" },
+  { label: "Analytics", Icon: IconChartLine, tint: "rgba(0,132,252,0.1)", iconColor: NELVYON_BLUE },
+  { label: "Integraciones", Icon: IconPlugConnected, tint: "rgba(0,132,252,0.1)", iconColor: NELVYON_BLUE },
 ];
 
 export function EcosistemaNelvyon() {
   const track = [...ECOSYSTEM, ...ECOSYSTEM];
 
   return (
-    <section className="nelvyon-ecosystem-section nelvyon-mkt-section--airy" style={{ backgroundColor: "#f8faff" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px 56px" }}>
-        <div style={{ maxWidth: 560 }}>
-          <p className="mkt-eyebrow">Ecosistema</p>
-          <h2 className="mkt-h2 fade-in">Todo conectado dentro de NELVYON</h2>
-          <p className="mkt-lead" style={{ marginTop: 16 }}>
-            Marketing, ventas, automatización y operaciones trabajando dentro de un mismo ecosistema.
-          </p>
-        </div>
+    <section className="nelvyon-ecosystem-section nelvyon-mkt-section--airy">
+      <div className="nelvyon-ecosystem-section__header">
+        <p className="mkt-eyebrow">Ecosistema</p>
+        <h2 className="mkt-h2 mkt-h2--display fade-in">Todo conectado dentro de NELVYON</h2>
+        <p className="mkt-lead" style={{ marginTop: 16, maxWidth: 560 }}>
+          Marketing, ventas, automatización y operaciones trabajando dentro de un mismo ecosistema.
+        </p>
       </div>
-      <div className="nelvyon-ecosystem-viewport" aria-hidden>
-        <div className="nelvyon-ecosystem-track">
-          {track.map((item, i) => (
-            <div key={`${item.label}-${i}`} className="nelvyon-ecosystem-card">
-              <div className="nelvyon-ecosystem-card__icon">
-                <item.Icon size={30} stroke={1.5} color={NELVYON_BLUE} aria-hidden />
+
+      <div className="nelvyon-ecosystem-stage">
+        <div className="nelvyon-ecosystem-hub" aria-hidden>
+          <div className="nelvyon-ecosystem-hub__ring nelvyon-ecosystem-hub__ring--outer" />
+          <div className="nelvyon-ecosystem-hub__ring nelvyon-ecosystem-hub__ring--inner" />
+          <div className="nelvyon-ecosystem-hub__core">
+            <img src="/logo.png" alt="" width={40} height={40} className="nelvyon-ecosystem-hub__logo" />
+          </div>
+        </div>
+        <div className="nelvyon-ecosystem-viewport">
+          <div className="nelvyon-ecosystem-track">
+            {track.map((item, i) => (
+              <div key={`${item.label}-${i}`} className="nelvyon-ecosystem-card">
+                <div className="nelvyon-ecosystem-card__icon" style={{ background: item.tint }}>
+                  <item.Icon size={32} stroke={1.5} color={item.iconColor} aria-hidden />
+                </div>
+                <span className="nelvyon-ecosystem-card__label">{item.label}</span>
               </div>
-              <span className="nelvyon-ecosystem-card__label">{item.label}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

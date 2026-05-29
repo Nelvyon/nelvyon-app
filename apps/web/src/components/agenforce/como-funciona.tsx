@@ -9,8 +9,8 @@ const STEPS = [
 
 export function ComoFunciona() {
   return (
-    <section className="nelvyon-mkt-section--airy" style={{ backgroundColor: "#ffffff" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
+    <section className="nelvyon-mkt-section--airy nelvyon-section--white">
+      <div className="nelvyon-section-inner">
         <div style={{ maxWidth: 480, marginBottom: 56 }}>
           <p className="mkt-eyebrow">Proceso</p>
           <h2 className="mkt-h2 fade-in">Cómo funciona</h2>

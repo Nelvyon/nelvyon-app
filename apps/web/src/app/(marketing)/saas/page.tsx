@@ -98,26 +98,13 @@ export default function SaasPage() {
           }
         `}</style>
       </section>
-      <section className="nelvyon-mkt-section--compact" style={{ backgroundColor: "#f8faff" }}>
-        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
+      <section className="nelvyon-integrations-bar">
+        <div className="nelvyon-integrations-bar__inner">
           <p className="mkt-eyebrow">Integraciones</p>
-          <h2 className="mkt-h2" style={{ marginBottom: 28 }}>Tu ecosistema conectado</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8 }}>
+          <h2 className="mkt-h2 mkt-h2--light">Tu ecosistema conectado</h2>
+          <div className="nelvyon-integrations-bar__pills">
             {integraciones.map((name) => (
-              <span
-                key={name}
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#475569",
-                  letterSpacing: "-0.01em",
-                  padding: "10px 16px",
-                  borderRadius: 10,
-                  border: "1px solid #e8eef8",
-                  background: "#fff",
-                  boxShadow: "0 1px 2px rgba(7,18,42,0.04), 0 4px 16px rgba(7,18,42,0.04)",
-                }}
-              >
+              <span key={name} className="nelvyon-integrations-bar__pill">
                 {name}
               </span>
             ))}

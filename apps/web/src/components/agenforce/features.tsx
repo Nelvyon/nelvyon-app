@@ -34,8 +34,8 @@ function CapasHubVisual() {
 
 export function Features() {
   return (
-    <section className="nelvyon-mkt-section--compact" style={{ backgroundColor: "#f8faff" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
+    <section className="nelvyon-mkt-section--compact nelvyon-section--alt">
+      <div className="nelvyon-section-inner">
         <div
           style={{
             display: "grid",

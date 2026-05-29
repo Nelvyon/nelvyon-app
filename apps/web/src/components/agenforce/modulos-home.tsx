@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 
 const MODULOS = [
@@ -13,18 +11,9 @@ const MODULOS = [
 
 export function ModulosHome() {
   return (
-    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            flexWrap: "wrap",
-            gap: 20,
-            marginBottom: 40,
-          }}
-        >
+    <section className="nelvyon-mkt-section nelvyon-section--white">
+      <div className="nelvyon-section-inner">
+        <div className="nelvyon-section-head">
           <div>
             <p className="mkt-eyebrow">Plataforma</p>
             <h2 className="mkt-h2 fade-in">Módulos del sistema</h2>
@@ -33,14 +22,11 @@ export function ModulosHome() {
             Ver SaaS →
           </Link>
         </div>
-        <div style={{ maxWidth: 720 }}>
+        <div className="nelvyon-modulos-grid">
           {MODULOS.map((m) => (
-            <div key={m.title} className="mkt-row">
-              <div>
-                <p className="mkt-row__title">{m.title}</p>
-                <p className="mkt-row__desc">{m.desc}</p>
-              </div>
-              <span className="mkt-row__meta">Módulo</span>
+            <div key={m.title} className="mkt-card nelvyon-modulo-card">
+              <p className="mkt-card__title">{m.title}</p>
+              <p className="mkt-card__desc">{m.desc}</p>
             </div>
           ))}
         </div>

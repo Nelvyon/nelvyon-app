@@ -8,8 +8,8 @@ const ITEMS = [
 
 export function Diferenciadores() {
   return (
-    <section className="nelvyon-mkt-section--airy" style={{ backgroundColor: "#f8faff" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
+    <section className="nelvyon-mkt-section--airy nelvyon-section--alt">
+      <div className="nelvyon-section-inner">
         <div style={{ maxWidth: 400, marginBottom: 48 }}>
           <p className="mkt-eyebrow">Por qué NELVYON</p>
           <h2 className="mkt-h2 fade-in">Diseñado para operar</h2>
