@@ -1,12 +1,14 @@
-import { NelvyonFooter } from "./footer";
-import { NelvyonNavbar } from "./navbar";
+import { NvFooter } from "./footer";
+import { NvNavbar } from "./navbar";
 
 export function NelvyonMarketingShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white">
-      <NelvyonNavbar />
+    <div className="nv-mkt min-h-screen">
+      <NvNavbar />
       {children}
-      <NelvyonFooter />
+      <NvFooter />
     </div>
   );
 }
+
+export { NvNavbar as NelvyonNavbar, NvFooter as NelvyonFooter };

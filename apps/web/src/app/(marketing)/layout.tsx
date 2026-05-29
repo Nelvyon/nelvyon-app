@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { Footer } from "@/components/agenforce/footer";
-import { Navbar } from "@/components/navbar";
+import { NvFooter } from "@/components/nelvyon-marketing/footer";
+import { NvNavbar } from "@/components/nelvyon-marketing/navbar";
 import { getAppBaseUrl } from "@/lib/appUrl";
+
+import "@/styles/nelvyon-marketing.css";
 
 const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/og-image.png`;
 
 export const metadata: Metadata = {
-  title: "NELVYON — Marketing operativo para empresas exigentes",
+  title: "NELVYON — Plataforma operativa de marketing y automatización",
   description:
-    "Plataforma operativa de marketing, ventas y automatización con servicios profesionales y agentes expertos. Centraliza campañas, CRM, contenidos y reporting.",
+    "Centraliza marketing, ventas, automatización y operación digital con NELVYON. Plataforma SaaS y servicios profesionales.",
   openGraph: {
     title: "NELVYON — Plataforma operativa de marketing",
     description:
-      "Donde nace tu imperio, crece tu marca y se impone tu legado. Servicios profesionales, SaaS y agentes expertos para operar con orden y continuidad.",
+      "Centraliza marketing, ventas, automatización y operación digital con NELVYON.",
     url: canonicalBase,
     siteName: "NELVYON",
     images: [
@@ -23,7 +25,7 @@ export const metadata: Metadata = {
         url: ogImageAbs,
         width: 1200,
         height: 630,
-        alt: "NELVYON — Plataforma operativa de marketing",
+        alt: "NELVYON",
       },
     ],
     type: "website",
@@ -32,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "NELVYON — Plataforma operativa de marketing",
-    description: "Marketing operativo con agentes expertos. Servicios y plataforma SaaS.",
+    description: "Marketing, ventas y automatización en un entorno centralizado.",
     images: [ogImageAbs],
     creator: "@nelvyon",
   },
@@ -44,16 +46,16 @@ export const metadata: Metadata = {
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
-    <>
-      <Navbar />
+    <div className="nv-mkt">
+      <NvNavbar />
       {children}
-      <Footer />
+      <NvFooter />
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "document.addEventListener('DOMContentLoaded',function(){const els=document.querySelectorAll('.fade-in');const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.1});els.forEach(el=>obs.observe(el))});",
+            "document.addEventListener('DOMContentLoaded',function(){const sel='.nv-fade,.fade-in';const els=document.querySelectorAll(sel);const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.08});els.forEach(el=>obs.observe(el))});",
         }}
       />
-    </>
+    </div>
   );
 }

@@ -1,126 +1,90 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
+import { NvPageHero } from "../page-hero";
 
-import { NelvyonMarketingShell } from "../marketing-shell";
-
-export function NelvyonContactoPage() {
-  const [sent, setSent] = useState(false);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setSent(true);
-  }
-
+export function NvContactoPage() {
   return (
-    <NelvyonMarketingShell>
-      <section className="bg-[#f8faff] px-4 py-16 lg:px-6">
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2">
-          <div>
-            <h1 className="text-4xl font-bold text-[#07122a]">Contacto</h1>
-            <p className="mt-4 text-[#07122a]/70">Cuéntanos tu proyecto. Respondemos en menos de 24 horas.</p>
+    <main>
+      <NvPageHero
+        eyebrow="Contacto"
+        title="Hablemos de tu operación digital"
+        subtitle="Cuéntanos qué necesita tu empresa y valoraremos cómo NELVYON puede ayudarte."
+      />
 
-            <ul className="mt-8 space-y-4 text-sm text-[#07122a]/80">
-              <li>
-                <strong className="text-[#07122a]">Email:</strong>{" "}
-                <a href="mailto:soporte@nelvyon.com" className="text-[#0084fc] hover:underline">
-                  soporte@nelvyon.com
-                </a>
-              </li>
-              <li>
-                <strong className="text-[#07122a]">Ubicación:</strong> Madrid, España
-              </li>
-              <li>
-                <strong className="text-[#07122a]">Respuesta:</strong> Menos de 24h laborables
-              </li>
-            </ul>
-
-            <div className="mt-8 rounded-2xl border border-[#e8eef8] bg-white p-6">
-              <h2 className="font-semibold text-[#07122a]">Horario de atención</h2>
-              <p className="mt-2 text-sm text-[#07122a]/70">Lunes – Viernes: 9:00 – 18:00 (CET)</p>
-              <div className="mt-4 h-32 rounded-xl bg-gradient-to-br from-[#07122a] to-[#0084fc] flex items-center justify-center text-white/80 text-sm">
-                Madrid, España
-              </div>
-            </div>
+      <section className="nv-section nv-section--white">
+        <div className="nv-container nv-contact-grid">
+          <div className="nv-prose">
+            <p>
+              Este formulario sirve para entender tu situación actual y valorar qué estructura puede tener sentido para tu empresa.
+            </p>
+            <h3 style={{ fontSize: 17, fontWeight: 650, margin: "24px 0 12px", color: "var(--nv-text)" }}>Información de contacto</h3>
+            <p style={{ margin: "0 0 8px" }}>Web: nelvyon.com</p>
+            <p style={{ margin: "0 0 8px" }}>
+              Email:{" "}
+              <Link href="mailto:contacto@nelvyon.com" className="nv-link">
+                contacto@nelvyon.com
+              </Link>
+            </p>
+            <p style={{ margin: "0 0 8px" }}>Horario: Lunes a viernes</p>
+            <p style={{ margin: 0 }}>Idioma: Español</p>
+            <p style={{ marginTop: 24 }}>
+              NELVYON trabaja con empresas que buscan claridad y operación seria. No prometemos resultados irreales ni soluciones genéricas.
+            </p>
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="rounded-2xl border border-[#e8eef8] bg-white p-8 shadow-sm"
-          >
-            {sent ? (
-              <p className="text-center text-[#0084fc] font-medium">Mensaje enviado. Te contactaremos pronto.</p>
-            ) : (
-              <>
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="nombre" className="block text-sm font-medium text-[#07122a]">
-                      Nombre
-                    </label>
-                    <input
-                      id="nombre"
-                      name="nombre"
-                      required
-                      className="mt-1 w-full rounded-lg border border-[#e8eef8] px-4 py-2.5 text-sm focus:border-[#0084fc] focus:outline-none focus:ring-1 focus:ring-[#0084fc]"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-[#07122a]">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      className="mt-1 w-full rounded-lg border border-[#e8eef8] px-4 py-2.5 text-sm focus:border-[#0084fc] focus:outline-none focus:ring-1 focus:ring-[#0084fc]"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="empresa" className="block text-sm font-medium text-[#07122a]">
-                      Empresa
-                    </label>
-                    <input
-                      id="empresa"
-                      name="empresa"
-                      className="mt-1 w-full rounded-lg border border-[#e8eef8] px-4 py-2.5 text-sm focus:border-[#0084fc] focus:outline-none focus:ring-1 focus:ring-[#0084fc]"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="telefono" className="block text-sm font-medium text-[#07122a]">
-                      Teléfono
-                    </label>
-                    <input
-                      id="telefono"
-                      name="telefono"
-                      type="tel"
-                      className="mt-1 w-full rounded-lg border border-[#e8eef8] px-4 py-2.5 text-sm focus:border-[#0084fc] focus:outline-none focus:ring-1 focus:ring-[#0084fc]"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="mensaje" className="block text-sm font-medium text-[#07122a]">
-                      Mensaje
-                    </label>
-                    <textarea
-                      id="mensaje"
-                      name="mensaje"
-                      required
-                      rows={4}
-                      className="mt-1 w-full rounded-lg border border-[#e8eef8] px-4 py-2.5 text-sm focus:border-[#0084fc] focus:outline-none focus:ring-1 focus:ring-[#0084fc]"
-                    />
-                  </div>
+          <div className="nv-form-card">
+            <h3>Cuéntanos tu situación</h3>
+            <form action="https://formspree.io/f/xpwzgvbq" method="POST">
+              <div className="nv-field">
+                <label htmlFor="nombre">Nombre completo *</label>
+                <input id="nombre" name="nombre" type="text" required placeholder="Tu nombre" />
+              </div>
+              <div className="nv-form-row">
+                <div className="nv-field">
+                  <label htmlFor="empresa">Empresa</label>
+                  <input id="empresa" name="empresa" type="text" placeholder="Tu empresa" />
                 </div>
-                <button
-                  type="submit"
-                  className="mt-6 w-full rounded-lg bg-[#0084fc] py-3 text-sm font-semibold text-white hover:bg-[#0084fc]/90"
-                >
-                  Enviar mensaje
-                </button>
-              </>
-            )}
-          </form>
+                <div className="nv-field">
+                  <label htmlFor="cargo">Cargo</label>
+                  <input id="cargo" name="cargo" type="text" placeholder="Tu cargo" />
+                </div>
+              </div>
+              <div className="nv-field">
+                <label htmlFor="email">Email corporativo *</label>
+                <input id="email" name="email" type="email" required placeholder="tu@empresa.com" />
+              </div>
+              <div className="nv-form-row">
+                <div className="nv-field">
+                  <label htmlFor="telefono">Teléfono</label>
+                  <input id="telefono" name="telefono" type="tel" placeholder="+34 600 000 000" />
+                </div>
+                <div className="nv-field">
+                  <label htmlFor="sector">Sector</label>
+                  <input id="sector" name="sector" type="text" placeholder="Tu sector" />
+                </div>
+              </div>
+              <div className="nv-field">
+                <label htmlFor="servicios_interes">Servicios de interés</label>
+                <select id="servicios_interes" name="servicios_interes" defaultValue="">
+                  <option value="">Selecciona una opción</option>
+                  <option value="servicios">Servicios profesionales</option>
+                  <option value="saas">Plataforma SaaS</option>
+                  <option value="ambos">Servicios + SaaS</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
+              <div className="nv-field">
+                <label htmlFor="mensaje">Mensaje</label>
+                <textarea id="mensaje" name="mensaje" rows={4} placeholder="Cuéntanos tu situación..." />
+              </div>
+              <button type="submit" className="nv-btn nv-btn--primary" style={{ width: "100%" }}>
+                Enviar solicitud
+              </button>
+              <p className="nv-form-privacy">Al enviar aceptas nuestra política de privacidad.</p>
+            </form>
+          </div>
         </div>
       </section>
-    </NelvyonMarketingShell>
+    </main>
   );
 }

@@ -1,91 +1,51 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-const links = [
-  { href: "/", label: "Inicio" },
-  { href: "/servicios", label: "Servicios" },
+import { NvLogo } from "./logo";
+
+const LINKS = [
   { href: "/saas", label: "SaaS" },
+  { href: "/servicios", label: "Servicios" },
   { href: "/nosotros", label: "Nosotros" },
+  { href: "/blog", label: "Blog" },
   { href: "/contacto", label: "Contacto" },
 ];
 
-export function NelvyonNavbar() {
+export function NvNavbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#e8eef8] bg-white">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 lg:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png.png" alt="NELVYON" width={32} height={32} className="object-contain" />
-          <span className="text-base font-bold tracking-tight text-[#07122a]">NELVYON</span>
-        </Link>
-
-        <nav className="hidden items-center gap-8 md:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-[#07122a]/80 transition hover:text-[#0084fc]"
-            >
-              {link.label}
+    <header className="nv-navbar">
+      <div className="nv-navbar__inner">
+        <NvLogo size={32} priority />
+        <nav className="nv-navbar__nav" aria-label="Principal">
+          {LINKS.map((l) => (
+            <Link key={l.href} href={l.href} className="nv-navbar__link">
+              {l.label}
             </Link>
           ))}
         </nav>
-
-        <div className="hidden items-center gap-3 md:flex">
-          <Link
-            href="/login"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-[#07122a] transition hover:bg-[#f8faff]"
-          >
-            Acceder
-          </Link>
-          <Link
-            href="/registro"
-            className="rounded-lg bg-[#0084fc] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0084fc]/90"
-          >
-            Empieza gratis
-          </Link>
-        </div>
-
-        <button
-          type="button"
-          className="rounded-lg border border-[#e8eef8] px-3 py-2 text-sm md:hidden"
-          onClick={() => setOpen(!open)}
-          aria-label="Menú"
-        >
-          Menú
+        <Link href="/contacto" className="nv-btn nv-btn--primary nv-navbar__cta">
+          Solicitar demo
+        </Link>
+        <button type="button" className="nv-navbar__toggle" aria-expanded={open} aria-label="Menú" onClick={() => setOpen((v) => !v)}>
+          {open ? "✕" : "☰"}
         </button>
       </div>
-
-      {open && (
-        <div className="border-t border-[#e8eef8] bg-white px-4 py-4 md:hidden">
-          <nav className="flex flex-col gap-3">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-[#07122a]"
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Link href="/login" className="text-sm font-medium text-[#07122a]" onClick={() => setOpen(false)}>
-              Acceder
+      {open ? (
+        <nav className="nv-navbar__mobile" aria-label="Menú móvil">
+          {LINKS.map((l) => (
+            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
+              {l.label}
             </Link>
-            <Link
-              href="/registro"
-              className="rounded-lg bg-[#0084fc] px-4 py-2 text-center text-sm font-semibold text-white"
-              onClick={() => setOpen(false)}
-            >
-              Empieza gratis
-            </Link>
-          </nav>
-        </div>
-      )}
+          ))}
+          <Link href="/contacto" className="nv-btn nv-btn--primary" style={{ marginTop: 12, textAlign: "center" }} onClick={() => setOpen(false)}>
+            Solicitar demo
+          </Link>
+        </nav>
+      ) : null}
     </header>
   );
 }

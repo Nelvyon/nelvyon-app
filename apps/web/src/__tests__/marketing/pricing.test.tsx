@@ -55,8 +55,8 @@ describe("marketing pricing and landing", () => {
   it("Página / (home) renderiza headline correctamente", { timeout: 15000 }, () => {
     renderWithProviders(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.textContent).toMatch(/Marketing operativo/i);
-    expect(h1.textContent).toMatch(/empresas exigentes/i);
+    expect(h1.textContent).toMatch(/sistema operativo/i);
+    expect(h1.textContent).toMatch(/automatización inteligente/i);
   });
 
   it("Home tiene CTA principal a contacto", () => {

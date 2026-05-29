@@ -1,120 +1,115 @@
-import Link from "next/link";
+import Image from "next/image";
 
-import { NelvyonMarketingShell } from "../marketing-shell";
+import { NvCtaBand } from "../cta-band";
+import { NvPageHero } from "../page-hero";
 
-const services = [
+const GROUPS = [
   {
-    id: "crm",
-    title: "CRM & Pipeline",
-    desc: "Centraliza contactos, oportunidades y seguimiento comercial en un solo panel.",
-    features: ["Pipeline visual", "Etiquetas y segmentos", "Historial de actividad", "Importación masiva"],
-    plan: "Incluido desde Starter €97/mes",
+    title: "Publicidad y captación",
+    items: [
+      { name: "Meta Ads", desc: "Campañas conectadas a CRM y medición." },
+      { name: "Google Ads", desc: "Search, display y conversiones estructuradas." },
+      { name: "TikTok Ads", desc: "Formato nativo con seguimiento operativo." },
+      { name: "LinkedIn Ads", desc: "Segmentación B2B y pipeline." },
+    ],
   },
   {
-    id: "email",
-    title: "Email Marketing",
-    desc: "Campañas, secuencias y automatizaciones que convierten leads en clientes.",
-    features: ["Editor visual", "A/B testing", "Plantillas", "Métricas de apertura"],
-    plan: "Incluido desde Starter €97/mes",
+    title: "Contenido y comunicación",
+    items: [
+      { name: "SEO técnico", desc: "Indexación, rendimiento y arquitectura." },
+      { name: "Contenidos", desc: "Estrategia editorial conectada a la operación." },
+      { name: "Email marketing", desc: "Secuencias y segmentación." },
+      { name: "Redes sociales", desc: "Calendario y publicación centralizada." },
+    ],
   },
   {
-    id: "automation",
-    title: "Automatizaciones",
-    desc: "Flujos sin código que conectan CRM, email, pagos y notificaciones.",
-    features: ["Triggers personalizados", "Acciones múltiples", "Condiciones", "Logs de ejecución"],
-    plan: "Growth €297/mes",
-  },
-  {
-    id: "pagos",
-    title: "Pagos & Facturación",
-    desc: "Cobra a tus clientes, emite facturas y controla ingresos recurrentes.",
-    features: ["Stripe integrado", "Facturas PDF", "Suscripciones", "Recordatorios de pago"],
-    plan: "Growth €297/mes",
-  },
-  {
-    id: "funnels",
-    title: "Funnels & Webs",
-    desc: "Landing pages, embudos de venta y sitios web listos para captar leads.",
-    features: ["Editor drag & drop", "Formularios", "Dominios propios", "SSL incluido"],
-    plan: "Growth €297/mes",
-  },
-  {
-    id: "analytics",
-    title: "Analíticas",
-    desc: "Dashboards en tiempo real de leads, ingresos, campañas y rendimiento.",
-    features: ["KPIs personalizados", "Exportación", "Informes automáticos", "Multi-workspace"],
-    plan: "Todos los planes",
-  },
-  {
-    id: "whatsapp",
-    title: "WhatsApp Business",
-    desc: "Mensajería automatizada y atención al cliente desde la plataforma.",
-    features: ["Plantillas aprobadas", "Respuestas automáticas", "Historial unificado", "Asignación a agentes"],
-    plan: "Growth €297/mes",
-  },
-  {
-    id: "ads",
-    title: "Gestión de Anuncios",
-    desc: "Conecta Meta, Google y TikTok Ads para gestionar campañas y métricas.",
-    features: ["Sincronización de leads", "Reportes unificados", "Presupuestos", "Alertas de rendimiento"],
-    plan: "Growth €297/mes",
+    title: "Operación comercial",
+    items: [
+      { name: "CRM y pipeline", desc: "Leads, fases y seguimiento visual." },
+      { name: "WhatsApp", desc: "Flujos comerciales integrados." },
+      { name: "Automatización", desc: "Procesos entre CRM, email y reporting." },
+      { name: "Analítica", desc: "Paneles e informes operativos." },
+    ],
   },
 ];
 
-export function NelvyonServiciosPage() {
+const METHODOLOGY = [
+  { num: "01", title: "Diagnóstico", desc: "Canales, procesos y herramientas actuales." },
+  { num: "02", title: "Planificación", desc: "Prioridades y estructura del sistema." },
+  { num: "03", title: "Implementación", desc: "Configuración y centralización." },
+  { num: "04", title: "Operación", desc: "Revisión y mejora continua." },
+];
+
+function ServiciosVisual() {
   return (
-    <NelvyonMarketingShell>
-      <section
-        className="px-4 py-16 text-center lg:px-6"
-        style={{ background: "linear-gradient(180deg, #07122a 0%, #0084fc 100%)" }}
-      >
-        <h1 className="text-4xl font-bold text-white md:text-5xl">Servicios NELVYON</h1>
-        <p className="mx-auto mt-4 max-w-2xl text-white/70">
-          Todo lo que tu agencia necesita para captar, convertir y retener clientes — en una sola plataforma.
-        </p>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 280,
+        borderRadius: 20,
+        background: "linear-gradient(165deg, var(--nv-panel) 0%, var(--nv-navy) 100%)",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      <Image src="/logo.png" alt="" width={100} height={100} className="object-contain" style={{ opacity: 0.95 }} />
+    </div>
+  );
+}
+
+export function NvServiciosPage() {
+  return (
+    <main>
+      <NvPageHero
+        eyebrow="Servicios"
+        title="Capas de ejecución sobre la plataforma"
+        subtitle="Publicidad, contenido y automatización como extensiones de NELVYON — no como paquetes aislados."
+        visual={<ServiciosVisual />}
+        split
+      />
+
+      {GROUPS.map((group, gi) => (
+        <section key={group.title} className={`nv-section ${gi % 2 === 0 ? "nv-section--white" : "nv-section--light"}`}>
+          <div className="nv-container">
+            <header className="nv-section-head" style={{ textAlign: "left", marginLeft: 0, maxWidth: "none" }}>
+              <h2>{group.title}</h2>
+            </header>
+            <div className="nv-grid-3">
+              {group.items.map((item) => (
+                <article key={item.name} className="nv-card">
+                  <h3>{item.name}</h3>
+                  <p>{item.desc}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      <section className="nv-section nv-section--dark">
+        <div className="nv-container">
+          <header className="nv-section-head nv-section-head--light">
+            <span className="nv-eyebrow">Metodología</span>
+            <h2>De diagnóstico a operación</h2>
+          </header>
+          <div className="nv-grid-4">
+            {METHODOLOGY.map((m) => (
+              <article key={m.num} className="nv-card nv-card--dark">
+                <span className="nv-card__num">{m.num}</span>
+                <h3>{m.title}</h3>
+                <p>{m.desc}</p>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 lg:px-6">
-        {services.map((s, i) => (
-          <article
-            key={s.id}
-            id={s.id}
-            className={`grid gap-8 rounded-2xl border border-[#e8eef8] bg-white p-8 shadow-sm lg:grid-cols-2 ${
-              i % 2 === 1 ? "lg:flex-row-reverse" : ""
-            }`}
-          >
-            <div>
-              <h2 className="text-2xl font-bold text-[#07122a]">{s.title}</h2>
-              <p className="mt-3 text-[#07122a]/70">{s.desc}</p>
-              <ul className="mt-4 space-y-2 text-sm text-[#07122a]/80">
-                {s.features.map((f) => (
-                  <li key={f} className="flex gap-2">
-                    <span className="text-[#0084fc]">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 text-sm font-semibold text-[#0084fc]">{s.plan}</p>
-              <Link
-                href="/registro"
-                className="mt-6 inline-block rounded-lg bg-[#0084fc] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0084fc]/90"
-              >
-                Empezar gratis
-              </Link>
-            </div>
-            <div className="flex min-h-[180px] items-center justify-center rounded-xl bg-[#f8faff] border border-[#e8eef8]">
-              <div className="h-24 w-full max-w-xs rounded-lg bg-gradient-to-r from-[#0084fc]/20 to-[#00d6fe]/20 p-4">
-                <div className="h-3 w-2/3 rounded bg-[#0084fc]/40" />
-                <div className="mt-3 space-y-2">
-                  <div className="h-2 rounded bg-[#e8eef8]" />
-                  <div className="h-2 w-4/5 rounded bg-[#e8eef8]" />
-                  <div className="h-2 w-3/5 rounded bg-[#e8eef8]" />
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </NelvyonMarketingShell>
+      <NvCtaBand
+        title="Activa capas sobre tu operación"
+        subtitle="Marketing y automatización dentro de un mismo entorno NELVYON."
+        primaryLabel="Solicitar análisis"
+      />
+    </main>
   );
 }
