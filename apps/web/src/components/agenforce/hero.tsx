@@ -41,7 +41,7 @@ export const Hero = () => {
           <h1
             className="fade-in"
             style={{
-              fontSize: "clamp(30px, 4.2vw, 50px)",
+              fontSize: "clamp(32px, 4.5vw, 54px)",
               fontWeight: 650,
               color: "#ffffff",
               lineHeight: 1.06,
@@ -115,7 +115,7 @@ export const Hero = () => {
         <div
           className="nelvyon-dashboard-shell"
           style={{
-            maxWidth: 1080,
+            maxWidth: 1240,
             margin: "0 auto",
             borderRadius: "8px 8px 0 0",
             overflow: "hidden",
@@ -155,7 +155,7 @@ export const Hero = () => {
             <span style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", fontWeight: 500 }}>app.nelvyon.com</span>
           </div>
 
-          <div style={{ display: "flex", background: "#07122a", minHeight: 340 }} className="nelvyon-dashboard-mock">
+          <div style={{ display: "flex", background: "#07122a", minHeight: 380 }} className="nelvyon-dashboard-mock">
             <aside
               className="nelvyon-dashboard-sidebar"
               style={{

@@ -2,7 +2,9 @@ import { Hero } from "@/components/agenforce/hero";
 import { QueEsNelvyon } from "@/components/agenforce/que-es-nelvyon";
 import { Problema } from "@/components/agenforce/problema";
 import { ComoFunciona } from "@/components/agenforce/como-funciona";
+import { EcosistemaNelvyon } from "@/components/agenforce/ecosistema-nelvyon";
 import { PlataformaOs } from "@/components/agenforce/plataforma-os";
+import { ProductShowcase } from "@/components/agenforce/product-showcase";
 import { ModulosHome } from "@/components/agenforce/modulos-home";
 import { Features } from "@/components/agenforce/features";
 import { Diferenciadores } from "@/components/agenforce/diferenciadores";
@@ -16,9 +18,11 @@ export default function HomePage() {
     <main>
       <Hero />
       <QueEsNelvyon />
+      <PlataformaOs />
+      <EcosistemaNelvyon />
       <Problema />
       <ComoFunciona />
-      <PlataformaOs />
+      <ProductShowcase />
       <ModulosHome />
       <Features />
       <Diferenciadores />
