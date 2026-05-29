@@ -44,7 +44,9 @@ export function NvFooter() {
         <div className="nv-footer__grid">
           <div>
             <NvLogo size={28} />
-            <p className="nv-footer__tagline">Donde nace tu imperio, crece tu marca y se impone tu legado.</p>
+            <p className="nv-footer__tagline">
+              Plataforma operativa para centralizar marketing, ventas y automatización con continuidad.
+            </p>
             <p className="nv-footer__meta">Plataforma operativa de marketing y automatización.</p>
           </div>
           {COLS.map((col) => (

@@ -1,8 +1,19 @@
 import Image from "next/image";
 
-const NAV = ["Vista general", "Pipeline", "Campañas", "Reporting"];
-const KPIS = ["Pipeline", "CRM", "Reporting", "Automatización"];
-const BARS = [42, 68, 48, 82, 56, 90, 64, 88];
+const NAV = ["Vista general", "Pipeline", "Campañas", "Automatización", "Reporting"];
+const MODULES = [
+  { label: "Pipeline comercial", status: "Activo" },
+  { label: "Campañas", status: "En curso" },
+  { label: "Automatización", status: "Configurado" },
+  { label: "Reporting", status: "Centralizado" },
+];
+
+const PIPELINE = [
+  { stage: "Nuevo", items: 2 },
+  { stage: "Seguimiento", items: 3 },
+  { stage: "Propuesta", items: 2 },
+  { stage: "Cierre", items: 1 },
+];
 
 export function NvDashboardMock() {
   return (
@@ -11,7 +22,7 @@ export function NvDashboardMock() {
         <span className="nv-mock__dot" style={{ background: "#ff5f57" }} />
         <span className="nv-mock__dot" style={{ background: "#febc2e" }} />
         <span className="nv-mock__dot" style={{ background: "#28c840" }} />
-        <span style={{ flex: 1, marginLeft: 8, fontSize: 10, color: "rgba(255,255,255,0.28)" }}>app.nelvyon.com</span>
+        <span className="nv-mock__url">app.nelvyon.com</span>
       </div>
       <div className="nv-mock__body">
         <aside className="nv-mock__sidebar">
@@ -26,18 +37,28 @@ export function NvDashboardMock() {
           ))}
         </aside>
         <div className="nv-mock__main">
-          <div className="nv-mock__title">Operación comercial</div>
+          <div className="nv-mock__header">
+            <div className="nv-mock__title">Operación comercial</div>
+            <span className="nv-mock__pill">Vista unificada</span>
+          </div>
           <div className="nv-mock__kpis">
-            {KPIS.map((label) => (
-              <div key={label} className="nv-mock__kpi">
-                <label>{label}</label>
-                <span>Activo</span>
+            {MODULES.map((mod) => (
+              <div key={mod.label} className="nv-mock__kpi">
+                <label>{mod.label}</label>
+                <span>{mod.status}</span>
               </div>
             ))}
           </div>
-          <div className="nv-mock__chart">
-            {BARS.map((h, i) => (
-              <div key={i} className="nv-mock__bar-col" style={{ height: `${h}%` }} />
+          <div className="nv-mock__pipeline">
+            {PIPELINE.map((col) => (
+              <div key={col.stage} className="nv-mock__col">
+                <div className="nv-mock__col-head">{col.stage}</div>
+                <div className="nv-mock__col-cards">
+                  {Array.from({ length: col.items }).map((_, i) => (
+                    <div key={i} className="nv-mock__deal" />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>

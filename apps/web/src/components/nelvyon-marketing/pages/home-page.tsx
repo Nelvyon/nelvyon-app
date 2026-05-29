@@ -4,7 +4,9 @@ import {
   IconBuildingStore,
   IconChartBar,
   IconChartLine,
+  IconHeadset,
   IconLayoutDashboard,
+  IconMail,
   IconRocket,
   IconSchool,
   IconSearch,
@@ -17,8 +19,6 @@ import {
   IconUsers,
   IconUsersGroup,
   IconWebhook,
-  IconHeadset,
-  IconMail,
 } from "@tabler/icons-react";
 
 import { NvCtaBand } from "../cta-band";
@@ -28,7 +28,7 @@ import { NvPlatformStrip } from "../platform-strip";
 
 function IconCard({ title, desc, Icon }: { title: string; desc: string; Icon: TablerIcon }) {
   return (
-    <article className="nv-card">
+    <article className="nv-card nv-fade">
       <div className="nv-card__icon">
         <Icon size={26} stroke={1.5} aria-hidden />
       </div>
@@ -39,36 +39,36 @@ function IconCard({ title, desc, Icon }: { title: string; desc: string; Icon: Ta
 }
 
 const CAPACITIES = [
-  { title: "Centraliza tu negocio", desc: "Campañas, CRM y reporting en un mismo entorno.", Icon: IconLayoutDashboard },
-  { title: "Automatiza procesos", desc: "Email, WhatsApp y flujos conectados al CRM.", Icon: IconWebhook },
-  { title: "Toma mejores decisiones", desc: "Paneles operativos sin hojas dispersas.", Icon: IconChartBar },
-  { title: "Gestiona oportunidades", desc: "Pipeline y seguimiento comercial claro.", Icon: IconTarget },
-  { title: "Escala con orden", desc: "Operación continua con procesos definidos.", Icon: IconTrendingUp },
+  { title: "Centraliza tu negocio", desc: "Campañas, CRM y reporting en un mismo entorno operativo.", Icon: IconLayoutDashboard },
+  { title: "Automatiza procesos", desc: "Email, WhatsApp y flujos conectados al CRM sin dispersión.", Icon: IconWebhook },
+  { title: "Toma mejores decisiones", desc: "Paneles operativos claros, sin hojas ni herramientas sueltas.", Icon: IconChartBar },
+  { title: "Gestiona oportunidades", desc: "Pipeline y seguimiento comercial con visibilidad continua.", Icon: IconTarget },
+  { title: "Escala con orden", desc: "Operación continua con procesos definidos y equipos alineados.", Icon: IconTrendingUp },
 ];
 
 const SOLUTIONS = [
-  { title: "CRM y ventas", desc: "Pipeline, leads y seguimiento comercial.", Icon: IconUsers },
-  { title: "Marketing y contenidos", desc: "Campañas y comunicación coordinada.", Icon: IconSpeakerphone },
-  { title: "Automatización", desc: "Flujos, email y WhatsApp conectados.", Icon: IconMail },
-  { title: "E-commerce", desc: "Catálogo y ventas integrados.", Icon: IconShoppingCart },
-  { title: "Reporting", desc: "Paneles operativos centralizados.", Icon: IconChartBar },
-  { title: "Soporte operativo", desc: "Continuidad con agentes expertos.", Icon: IconHeadset },
+  { title: "CRM y ventas", desc: "Pipeline, leads y seguimiento comercial en un solo flujo.", Icon: IconUsers },
+  { title: "Marketing y contenidos", desc: "Campañas, comunicación y coordinación de canales.", Icon: IconSpeakerphone },
+  { title: "Automatización", desc: "Flujos, email y WhatsApp conectados a tu operación.", Icon: IconMail },
+  { title: "E-commerce", desc: "Catálogo, ventas y seguimiento integrados.", Icon: IconShoppingCart },
+  { title: "Reporting", desc: "Paneles operativos centralizados para revisión periódica.", Icon: IconChartBar },
+  { title: "Soporte operativo", desc: "Continuidad con acompañamiento experto cuando lo necesitas.", Icon: IconHeadset },
 ];
 
 const STEPS = [
-  { num: "01", title: "Entendemos tu negocio", desc: "Canales, procesos y necesidades reales.", Icon: IconSearch },
-  { num: "02", title: "Diseñamos el sistema", desc: "Estructura de CRM, campañas y flujos.", Icon: IconSettings },
-  { num: "03", title: "Implementamos", desc: "Plataforma configurada y conectada.", Icon: IconRocket },
-  { num: "04", title: "Optimizamos y escalamos", desc: "Mejora progresiva de la operación.", Icon: IconChartLine },
+  { num: "01", title: "Entendemos tu negocio", desc: "Canales, procesos y necesidades reales de tu operación.", Icon: IconSearch },
+  { num: "02", title: "Diseñamos el sistema", desc: "Estructura de CRM, campañas y flujos adaptada a tu contexto.", Icon: IconSettings },
+  { num: "03", title: "Implementamos", desc: "Plataforma configurada, conectada y lista para operar.", Icon: IconRocket },
+  { num: "04", title: "Optimizamos y escalamos", desc: "Mejora progresiva de la operación con revisiones periódicas.", Icon: IconChartLine },
 ];
 
 const CASES = [
-  { title: "Agencias de marketing", desc: "Multi-cliente con procesos centralizados.", Icon: IconSpeakerphone },
-  { title: "Negocios locales", desc: "Captación y seguimiento con continuidad.", Icon: IconBuildingStore },
-  { title: "E-commerce", desc: "Campañas, catálogo y reporting conectados.", Icon: IconShoppingCart },
-  { title: "Educación y formación", desc: "Comunicación y seguimiento de oportunidades.", Icon: IconSchool },
-  { title: "Consultoras", desc: "Operación comercial unificada.", Icon: IconUsersGroup },
-  { title: "Profesionales", desc: "CRM y automatización sin dispersión.", Icon: IconUser },
+  { title: "Agencias de marketing", desc: "Multi-cliente con procesos centralizados y seguimiento unificado.", Icon: IconSpeakerphone },
+  { title: "Negocios locales", desc: "Captación y seguimiento comercial con continuidad operativa.", Icon: IconBuildingStore },
+  { title: "E-commerce", desc: "Campañas, catálogo y reporting conectados en un entorno.", Icon: IconShoppingCart },
+  { title: "Educación y formación", desc: "Comunicación y seguimiento de oportunidades comerciales.", Icon: IconSchool },
+  { title: "Consultoras", desc: "Operación comercial unificada para equipos y clientes.", Icon: IconUsersGroup },
+  { title: "Profesionales", desc: "CRM y automatización sin dispersión de herramientas.", Icon: IconUser },
 ];
 
 export function NvHomePage() {
@@ -78,12 +78,14 @@ export function NvHomePage() {
         <div className="nv-container">
           <div className="nv-hero__grid">
             <div className="nv-hero__copy">
+              <span className="nv-hero__eyebrow nv-fade">Plataforma operativa · NELVYON</span>
               <h1 className="nv-fade">
                 El sistema operativo para escalar tu negocio con{" "}
-                <span className="nv-accent">automatización inteligente</span>
+                <span className="nv-accent">marketing, ventas y automatización</span>
               </h1>
               <p className="nv-hero__lead nv-fade">
-                Centraliza marketing, ventas, automatización y operación digital con NELVYON.
+                Centraliza campañas, CRM, comunicación y operación digital en un entorno diseñado para equipos que
+                necesitan orden, visibilidad y continuidad.
               </p>
               <div className="nv-hero__actions nv-fade">
                 <Link href="/contacto" className="nv-btn nv-btn--primary">
@@ -107,7 +109,11 @@ export function NvHomePage() {
       <section className="nv-section nv-section--light">
         <div className="nv-container">
           <header className="nv-section-head">
+            <span className="nv-eyebrow nv-fade">Capacidades</span>
             <h2 className="nv-fade">Todo lo que necesitas. En un solo lugar.</h2>
+            <p className="nv-fade">
+              Un entorno operativo para coordinar marketing, ventas y automatización sin saltar entre herramientas.
+            </p>
           </header>
           <div className="nv-grid-5">
             {CAPACITIES.map((c) => (
@@ -120,8 +126,11 @@ export function NvHomePage() {
       <section className="nv-section nv-section--white">
         <div className="nv-container">
           <header className="nv-section-head">
+            <span className="nv-eyebrow nv-fade">Ecosistema</span>
             <h2 className="nv-fade">Ecosistema NELVYON</h2>
-            <p className="nv-fade">Un ecosistema conectado para operar marketing, ventas y automatización con continuidad.</p>
+            <p className="nv-fade">
+              Marketing, ventas, automatización y reporting conectados alrededor de una operación central.
+            </p>
           </header>
           <NvEcosystem />
         </div>
@@ -130,14 +139,16 @@ export function NvHomePage() {
       <section className="nv-section nv-section--light">
         <div className="nv-container">
           <header className="nv-section-head">
+            <span className="nv-eyebrow nv-fade">Soluciones</span>
             <h2 className="nv-fade">Soluciones para cada área de tu negocio</h2>
+            <p className="nv-fade">Módulos operativos para cubrir las áreas clave de tu negocio digital.</p>
           </header>
           <div className="nv-grid-3">
             {SOLUTIONS.map((s) => (
               <IconCard key={s.title} {...s} />
             ))}
           </div>
-          <p style={{ textAlign: "center", marginTop: 32 }}>
+          <p className="nv-section-foot nv-fade">
             <Link href="/servicios" className="nv-link">
               Ver servicios →
             </Link>
@@ -145,14 +156,16 @@ export function NvHomePage() {
         </div>
       </section>
 
-      <section className="nv-section nv-section--white">
+      <section className="nv-section nv-section--white nv-section--steps">
         <div className="nv-container">
           <header className="nv-section-head">
+            <span className="nv-eyebrow nv-fade">Metodología</span>
             <h2 className="nv-fade">Así es como trabajamos</h2>
+            <p className="nv-fade">Un proceso claro, de principio a fin, para implementar y operar con NELVYON.</p>
           </header>
           <div className="nv-grid-4">
             {STEPS.map((s) => (
-              <article key={s.num} className="nv-card nv-card--dark">
+              <article key={s.num} className="nv-card nv-card--dark nv-fade">
                 <span className="nv-card__num">{s.num}</span>
                 <h3>{s.title}</h3>
                 <p>{s.desc}</p>
@@ -166,8 +179,11 @@ export function NvHomePage() {
       <section className="nv-section nv-section--light">
         <div className="nv-container">
           <header className="nv-section-head">
-            <h2 className="nv-fade">Casos de uso</h2>
-            <p className="nv-fade">Escenarios operativos habituales. No son testimonios ni resultados publicados.</p>
+            <span className="nv-eyebrow nv-fade">Casos de uso</span>
+            <h2 className="nv-fade">Escenarios donde encaja NELVYON</h2>
+            <p className="nv-fade">
+              Perfiles operativos habituales. No son testimonios, métricas publicadas ni resultados garantizados.
+            </p>
           </header>
           <div className="nv-grid-3">
             {CASES.map((c) => (
@@ -180,6 +196,8 @@ export function NvHomePage() {
       <NvCtaBand
         title="Empieza hoy. Construye una operación más seria."
         subtitle="Solicita una demo y revisa cómo NELVYON encaja en tu operación de marketing y ventas."
+        secondaryLabel="Ver SaaS"
+        secondaryHref="/saas"
       />
     </main>
   );

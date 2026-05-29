@@ -56,7 +56,7 @@ describe("marketing pricing and landing", () => {
     renderWithProviders(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1.textContent).toMatch(/sistema operativo/i);
-    expect(h1.textContent).toMatch(/automatización inteligente/i);
+    expect(h1.textContent).toMatch(/marketing, ventas y automatización/i);
   });
 
   it("Home tiene CTA principal a contacto", () => {
