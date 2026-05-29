@@ -1,89 +1,64 @@
-export function ComoFunciona() {
-  const steps = [
-    {
-      num: "01",
-      title: "Diagnóstico operativo",
-      desc: "Analizamos canales, procesos, herramientas, equipo comercial y necesidades reales de automatización.",
-    },
-    {
-      num: "02",
-      title: "Diseño del sistema",
-      desc: "Definimos la estructura de campañas, CRM, contenidos, agentes expertos, reporting y flujos de trabajo.",
-    },
-    {
-      num: "03",
-      title: "Implementación controlada",
-      desc: "Configuramos la plataforma, conectamos herramientas y dejamos cada módulo preparado para operar.",
-    },
-    {
-      num: "04",
-      title: "Operación continua",
-      desc: "Los agentes expertos mantienen tareas, flujos y procesos activos 24/7 según la configuración definida.",
-    },
-  ];
+const STEPS = [
+  { num: "01", title: "Diagnóstico", desc: "Canales, procesos y necesidades reales." },
+  { num: "02", title: "Diseño", desc: "Estructura de CRM, campañas y flujos." },
+  { num: "03", title: "Implementación", desc: "Plataforma configurada y conectada." },
+  { num: "04", title: "Operación", desc: "Agentes expertos en continuidad 24/7." },
+];
 
+export function ComoFunciona() {
   return (
-    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#07122a" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: "56px" }}>
-          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>
+    <section className="nelvyon-mkt-section--airy" style={{ backgroundColor: "#07122a" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ maxWidth: 480, marginBottom: 56 }}>
+          <p className="mkt-eyebrow" style={{ color: "rgba(0,132,252,0.9)" }}>
             Proceso
           </p>
-          <h2 className="fade-in" style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 800, color: "#ffffff", margin: 0 }}>
-            Cómo funciona
-          </h2>
+          <h2 className="mkt-h2 mkt-h2--light fade-in">Cómo funciona</h2>
         </div>
         <div
           className="nelvyon-como-funciona-timeline"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "24px",
-            position: "relative",
+            gap: "clamp(20px, 3vw, 40px)",
           }}
         >
-          <div
-            aria-hidden
-            className="nelvyon-timeline-line"
-            style={{
-              position: "absolute",
-              top: "28px",
-              left: "12%",
-              right: "12%",
-              height: "1px",
-              background: "rgba(255,255,255,0.1)",
-            }}
-          />
-          {steps.map((step) => (
-            <div key={step.num} style={{ position: "relative", zIndex: 1 }}>
+          {STEPS.map((step) => (
+            <div key={step.num}>
               <div
                 style={{
-                  width: "56px",
-                  height: "56px",
-                  borderRadius: "12px",
-                  background: "rgba(0,132,252,0.12)",
-                  border: "1px solid rgba(0,132,252,0.3)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  color: "#0084fc",
-                  marginBottom: "20px",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: "rgba(255,255,255,0.28)",
+                  letterSpacing: "0.08em",
+                  marginBottom: 14,
                 }}
               >
                 {step.num}
               </div>
-              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#ffffff", margin: "0 0 10px", lineHeight: 1.3 }}>{step.title}</h3>
-              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6, margin: 0 }}>{step.desc}</p>
+              <h3
+                style={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: "#ffffff",
+                  margin: "0 0 8px",
+                  lineHeight: 1.25,
+                  letterSpacing: "-0.025em",
+                }}
+              >
+                {step.title}
+              </h3>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.48)", lineHeight: 1.45, margin: 0 }}>{step.desc}</p>
             </div>
           ))}
         </div>
       </div>
       <style>{`
         @media (max-width: 900px) {
-          .nelvyon-como-funciona-timeline { grid-template-columns: 1fr !important; gap: 32px !important; }
-          .nelvyon-timeline-line { display: none !important; }
+          .nelvyon-como-funciona-timeline { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 520px) {
+          .nelvyon-como-funciona-timeline { grid-template-columns: 1fr !important; gap: 28px !important; }
         }
       `}</style>
     </section>

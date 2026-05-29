@@ -1,144 +1,91 @@
-export function PlataformaOs() {
-  const orbit = [
-    "Ads",
-    "CRM",
-    "Email",
-    "WhatsApp",
-    "SEO",
-    "Contenido",
-    "Reporting",
-    "Ecommerce",
-    "Automatización",
-  ];
+const MODULOS = [
+  "Ads",
+  "CRM",
+  "Email",
+  "WhatsApp",
+  "SEO",
+  "Contenido",
+  "Reporting",
+  "Automatización",
+];
 
+export function PlataformaOs() {
   return (
-    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#07122a" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ textAlign: "center", maxWidth: "640px", margin: "0 auto 56px" }}>
-          <p
-            style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "#0084fc",
-              marginBottom: "16px",
-            }}
-          >
-            Infraestructura
-          </p>
-          <h2
-            className="fade-in"
-            style={{
-              fontSize: "clamp(26px, 3.5vw, 40px)",
-              fontWeight: 800,
-              color: "#ffffff",
-              margin: "0 0 16px",
-              lineHeight: 1.15,
-            }}
-          >
-            Una plataforma. Un equipo. Un sistema operativo.
-          </h2>
-          <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.65)", lineHeight: 1.7, margin: 0 }}>
-            NELVYON une lo que normalmente trabaja separado: estrategia, campañas, contenidos, CRM, automatización, reporting y agentes expertos.
-          </p>
-        </div>
+    <section className="nelvyon-mkt-section--compact" style={{ backgroundColor: "#07122a" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
         <div
-          className="nelvyon-os-diagram"
           style={{
-            position: "relative",
-            maxWidth: "720px",
-            margin: "0 auto",
-            minHeight: "420px",
-            display: "flex",
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+            gap: "clamp(40px, 6vw, 72px)",
             alignItems: "center",
-            justifyContent: "center",
           }}
+          className="nelvyon-os-layout"
         >
-          <div
-            style={{
-              position: "absolute",
-              inset: "8%",
-              border: "1px dashed rgba(255,255,255,0.12)",
-              borderRadius: "50%",
-            }}
-          />
-          <div
-            style={{
-              width: "200px",
-              height: "200px",
-              borderRadius: "16px",
-              background: "linear-gradient(145deg, rgba(0,132,252,0.15) 0%, rgba(7,18,42,0.9) 100%)",
-              border: "1px solid rgba(0,132,252,0.35)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-              padding: "24px",
-              zIndex: 2,
-            }}
-          >
-            <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0084fc", marginBottom: "8px" }}>
-              Núcleo
-            </div>
-            <div style={{ fontSize: "22px", fontWeight: 800, color: "#ffffff", letterSpacing: "-0.02em" }}>NELVYON OS</div>
-            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", marginTop: "8px", lineHeight: 1.4 }}>
-              Coordinación operativa central
-            </div>
+          <div>
+            <p className="mkt-eyebrow" style={{ color: "rgba(0,132,252,0.9)" }}>
+              Infraestructura
+            </p>
+            <h2 className="mkt-h2 mkt-h2--light fade-in" style={{ marginBottom: 14 }}>
+              Un sistema operativo para marketing
+            </h2>
+            <p className="mkt-lead mkt-lead--light" style={{ maxWidth: 400 }}>
+              Estrategia, campañas, CRM y reporting — coordinados desde un núcleo, no desde herramientas aisladas.
+            </p>
           </div>
           <div
-            className="nelvyon-os-orbit"
             style={{
-              position: "absolute",
-              inset: 0,
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "12px",
-              padding: "0",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              justifyContent: "flex-end",
             }}
           >
-            {orbit.map((label) => (
-              <div
+            <div
+              style={{
+                width: "100%",
+                marginBottom: 12,
+                padding: "16px 18px",
+                borderRadius: 6,
+                border: "1px solid rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.03)",
+              }}
+            >
+              <div style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", marginBottom: 6 }}>
+                NÚCLEO
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 650, color: "#fff", letterSpacing: "-0.03em" }}>NELVYON OS</div>
+            </div>
+            {MODULOS.map((label) => (
+              <span
                 key={label}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: "rgba(255,255,255,0.65)",
+                  letterSpacing: "-0.01em",
+                  padding: "8px 12px",
+                  borderRadius: 5,
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  background: "rgba(255,255,255,0.02)",
+                  transition: "border-color 0.2s ease, background 0.2s ease",
                 }}
+                className="nelvyon-os-chip"
               >
-                <span
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    color: "rgba(255,255,255,0.75)",
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "8px",
-                    padding: "8px 14px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {label}
-                </span>
-              </div>
+                {label}
+              </span>
             ))}
           </div>
         </div>
       </div>
       <style>{`
-        .nelvyon-os-orbit > div:nth-child(5) { grid-column: 2; }
-        @media (max-width: 640px) {
-          .nelvyon-os-orbit {
-            position: static !important;
-            display: flex !important;
-            flex-wrap: wrap !important;
-            justify-content: center !important;
-            gap: 8px !important;
-            margin-top: 240px !important;
-          }
-          .nelvyon-os-diagram { min-height: auto !important; flex-direction: column !important; padding-bottom: 24px !important; }
-          .nelvyon-os-diagram > div:first-of-type { display: none !important; }
+        .nelvyon-os-chip:hover {
+          border-color: rgba(0, 132, 252, 0.35);
+          background: rgba(0, 132, 252, 0.06);
+        }
+        @media (max-width: 768px) {
+          .nelvyon-os-layout { grid-template-columns: 1fr !important; }
+          .nelvyon-os-layout > div:last-child { justify-content: flex-start !important; }
         }
       `}</style>
     </section>

@@ -1,83 +1,59 @@
-export function Problema() {
-  const problemas = [
-    { title: "Herramientas desconectadas", desc: "Campañas, leads y reporting repartidos en plataformas que no se comunican entre sí." },
-    { title: "Procesos manuales", desc: "Seguimiento comercial, emails y tareas repetitivas que consumen tiempo sin aportar control." },
-    { title: "Falta de visibilidad", desc: "La dirección no tiene una vista clara de qué ocurre en marketing, ventas y automatización." },
-  ];
+const PUNTOS = [
+  { title: "Herramientas desconectadas", desc: "Campañas, leads y reporting en silos." },
+  { title: "Procesos manuales", desc: "Seguimiento y tareas sin control central." },
+  { title: "Sin visibilidad", desc: "La dirección no ve la operación completa." },
+];
 
+export function Problema() {
   return (
-    <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ maxWidth: "640px", marginBottom: "48px" }}>
-          <p
-            style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "#0084fc",
-              marginBottom: "16px",
-            }}
-          >
-            El problema
-          </p>
-          <h2
-            className="fade-in"
-            style={{
-              fontSize: "clamp(26px, 3.5vw, 40px)",
-              fontWeight: 800,
-              color: "#07122a",
-              margin: "0 0 20px",
-              lineHeight: 1.15,
-            }}
-          >
-            Muchas empresas no fallan por falta de herramientas
-          </h2>
-          <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>
-            Fallan porque sus herramientas no trabajan juntas. Campañas en una plataforma. Leads en otra. Emails en otra. WhatsApp sin control. Informes manuales. Seguimiento comercial disperso.
-          </p>
-        </div>
+    <section className="nelvyon-mkt-section--compact" style={{ backgroundColor: "#f8faff" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "20px",
-            marginBottom: "40px",
+            gridTemplateColumns: "minmax(0, 0.95fr) minmax(0, 1.05fr)",
+            gap: "clamp(40px, 6vw, 80px)",
+            alignItems: "start",
           }}
-          className="nelvyon-problema-grid"
+          className="nelvyon-problema-layout"
         >
-          {problemas.map((p) => (
-            <div
-              key={p.title}
+          <div>
+            <p className="mkt-eyebrow">El problema</p>
+            <h2 className="mkt-h2 fade-in" style={{ marginBottom: 16 }}>
+              No es falta de herramientas
+            </h2>
+            <p className="mkt-lead">
+              Es que no trabajan juntas. Campañas, CRM, email y reporting dispersos — sin una operación unificada.
+            </p>
+          </div>
+          <div>
+            {PUNTOS.map((p) => (
+              <div key={p.title} className="mkt-row">
+                <div>
+                  <p className="mkt-row__title">{p.title}</p>
+                  <p className="mkt-row__desc">{p.desc}</p>
+                </div>
+              </div>
+            ))}
+            <p
               style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #e8eef8",
-                borderRadius: "12px",
-                padding: "28px",
+                fontSize: 15,
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: "#07122a",
+                margin: "28px 0 0",
+                paddingTop: 24,
+                borderTop: "1px solid #e8eef8",
               }}
             >
-              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#07122a", margin: "0 0 10px" }}>{p.title}</h3>
-              <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
-            </div>
-          ))}
+              NELVYON unifica la operación.
+            </p>
+          </div>
         </div>
-        <p
-          style={{
-            fontSize: "17px",
-            fontWeight: 600,
-            color: "#07122a",
-            textAlign: "center",
-            margin: 0,
-            padding: "24px",
-            borderTop: "1px solid #e8eef8",
-          }}
-        >
-          NELVYON conecta la operación completa.
-        </p>
       </div>
       <style>{`
         @media (max-width: 768px) {
-          .nelvyon-problema-grid { grid-template-columns: 1fr !important; }
+          .nelvyon-problema-layout { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>

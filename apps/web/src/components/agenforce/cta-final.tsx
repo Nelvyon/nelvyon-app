@@ -9,54 +9,66 @@ type CtaFinalProps = {
 };
 
 export function CtaFinal({
-  title = "Construye una operación de marketing más seria",
-  subtitle = "Centraliza campañas, contenidos, CRM, automatización y reporting en un sistema diseñado para trabajar con orden, criterio y continuidad.",
+  title = "Opera marketing con más control",
+  subtitle = "Centraliza campañas, CRM y automatización en un sistema diseñado para continuidad.",
   primaryLabel = "Solicitar demo",
   primaryHref = "/contacto",
   showSecondary = true,
 }: CtaFinalProps) {
   return (
-    <section className="nelvyon-mkt-section" style={{ background: "linear-gradient(180deg, #07122a 0%, #0d2048 70%, #0a1835 100%)" }}>
-      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-        <h2 style={{ fontSize: "clamp(32px, 5vw, 56px)", fontWeight: 900, color: "#ffffff", margin: "0 0 20px", lineHeight: 1.15 }}>
+    <section className="nelvyon-mkt-section--airy" style={{ background: "#07122a" }}>
+      <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
+        <h2
+          className="mkt-h2 mkt-h2--light fade-in"
+          style={{ fontSize: "clamp(28px, 4vw, 40px)", marginBottom: 14 }}
+        >
           {title}
         </h2>
-        <p style={{ fontSize: "20px", color: "rgba(255,255,255,0.9)", margin: "0 0 48px", lineHeight: 1.6 }}>
+        <p
+          style={{
+            fontSize: 16,
+            color: "rgba(255,255,255,0.52)",
+            margin: "0 0 36px",
+            lineHeight: 1.5,
+            letterSpacing: "-0.012em",
+          }}
+        >
           {subtitle}
         </p>
-        <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
           <a
             href={primaryHref}
+            className="mkt-btn"
             style={{
               display: "inline-block",
               backgroundColor: "#ffffff",
               color: "#07122a",
-              fontWeight: 700,
-              fontSize: "16px",
-              padding: "16px 40px",
-              borderRadius: "12px",
+              fontWeight: 600,
+              fontSize: 14,
+              padding: "11px 24px",
+              borderRadius: 7,
               textDecoration: "none",
-              border: "2px solid #ffffff",
             }}
           >
             {primaryLabel}
           </a>
           {showSecondary ? (
             <Link
-              href="/servicios"
+              href="/saas"
+              className="mkt-btn"
               style={{
                 display: "inline-block",
                 backgroundColor: "transparent",
-                color: "#ffffff",
-                fontWeight: 700,
-                fontSize: "16px",
-                padding: "16px 40px",
-                borderRadius: "12px",
+                color: "rgba(255,255,255,0.88)",
+                fontWeight: 500,
+                fontSize: 14,
+                padding: "11px 24px",
+                borderRadius: 7,
                 textDecoration: "none",
-                border: "2px solid rgba(255,255,255,0.4)",
+                border: "1px solid rgba(255,255,255,0.18)",
               }}
             >
-              Ver servicios
+              Ver SaaS
             </Link>
           ) : null}
         </div>

@@ -12,7 +12,7 @@ const plans = [
     name: "Starter",
     price: "€97",
     period: "/mes",
-    description: "Para empresas que quieren empezar a centralizar procesos básicos de marketing, CRM, publicaciones y reporting con mayor orden y visibilidad.",
+    description: "Centraliza marketing, CRM y reporting con orden.",
     features: ["1 canal publicitario gestionado", "Dashboard unificado", "WhatsApp automático (500 msg/mes)", "Email Marketing básico", "Soporte por chat", "1 usuario"],
     cta: "Solicitar demo",
     highlight: false,
@@ -21,7 +21,7 @@ const plans = [
     name: "Growth",
     price: "€297",
     period: "/mes",
-    description: "Para empresas que necesitan una operación más completa con agentes expertos, automatizaciones, campañas, contenido y seguimiento comercial.",
+    description: "Operación completa con agentes expertos y automatización.",
     features: ["Meta + Google + TikTok Ads", "Dashboard avanzado + Analytics", "WhatsApp automático (5.000 msg/mes)", "Email Marketing con A/B testing", "CRM integrado", "Soporte prioritario 24/7", "5 usuarios", "1 web NELVYON OS/mes"],
     cta: "Solicitar demo",
     highlight: true,
@@ -31,29 +31,29 @@ const plans = [
     name: "Elite",
     price: "€797",
     period: "/mes",
-    description: "Para empresas, agencias o estructuras complejas que necesitan módulos avanzados, integraciones, reporting amplio y soporte estratégico.",
+    description: "Módulos avanzados, integraciones y soporte estratégico.",
     features: ["Canales ilimitados", "Dashboard enterprise", "WhatsApp ilimitado", "Email Marketing enterprise", "CRM avanzado + Kanban", "Account Manager dedicado", "Usuarios ilimitados", "NELVYON OS ilimitado", "Integraciones API"],
     cta: "Solicitar demo",
     highlight: false,
   },
 ];
 const saasFeatures = [
-  { title: "Dashboard Central", desc: "Vista unificada para consultar campañas, contactos, tareas, oportunidades, automatizaciones, contenidos y métricas principales sin saltar entre herramientas." },
-  { title: "Agente de Ads", desc: "Apoyo en creación, revisión y coordinación de campañas: estructura, mensajes, audiencias y seguimiento operativo." },
-  { title: "Agente de Email", desc: "Secuencias, newsletters, segmentación, calendarios y flujos automatizados de email." },
-  { title: "Agente de Contenidos", desc: "Artículos, publicaciones, copies y piezas adaptadas a la voz de marca de forma organizada." },
-  { title: "Agente de SEO", desc: "Oportunidades orgánicas, palabras clave, estructuras de contenido y tareas SEO." },
-  { title: "CRM Visual Kanban", desc: "Pipeline visual para oportunidades, contactos, fases comerciales y seguimiento." },
-  { title: "Social Publishing", desc: "Planificación y programación de publicaciones desde un entorno centralizado." },
-  { title: "Agente de WhatsApp", desc: "Automatización de conversaciones, cualificación y seguimiento integrado con CRM." },
-  { title: "Creative Studio", desc: "Piezas y variantes de anuncios alineados con la identidad de marca." },
-  { title: "Attribution Engine", desc: "Recorrido de contactos y relación entre canales, campañas e interacciones." },
-  { title: "Landing Page Builder", desc: "Páginas de captación con formularios y conexión directa con CRM." },
-  { title: "NELVYON Academy", desc: "Recursos para entender la plataforma y adoptar módulos con autonomía." },
-  { title: "Agency Partner Portal", desc: "Gestión multi-cliente, reporting y módulos operativos para agencias." },
-  { title: "E-commerce Connectors", desc: "Sincronización de tiendas online, automatizaciones y flujos de recuperación." },
-  { title: "Reportes y Dashboards", desc: "Paneles e informes sin depender de hojas de cálculo dispersas." },
-  { title: "Integraciones API", desc: "Conexión con herramientas externas mediante integraciones y webhooks." },
+  { title: "Dashboard Central", desc: "Vista unificada de operación." },
+  { title: "Agente de Ads", desc: "Campañas y seguimiento." },
+  { title: "Agente de Email", desc: "Secuencias y flujos." },
+  { title: "Agente de Contenidos", desc: "Piezas y calendario editorial." },
+  { title: "Agente de SEO", desc: "Oportunidades y tareas orgánicas." },
+  { title: "CRM Visual Kanban", desc: "Pipeline y fases comerciales." },
+  { title: "Social Publishing", desc: "Publicación centralizada." },
+  { title: "Agente de WhatsApp", desc: "Conversaciones + CRM." },
+  { title: "Creative Studio", desc: "Variantes de anuncios." },
+  { title: "Attribution Engine", desc: "Recorrido entre canales." },
+  { title: "Landing Page Builder", desc: "Captación conectada al CRM." },
+  { title: "NELVYON Academy", desc: "Onboarding y autonomía." },
+  { title: "Agency Partner Portal", desc: "Multi-cliente para agencias." },
+  { title: "E-commerce Connectors", desc: "Tiendas y recuperación." },
+  { title: "Reportes y Dashboards", desc: "Paneles operativos." },
+  { title: "Integraciones API", desc: "Webhooks y herramientas externas." },
 ];
 
 const integraciones = ["Meta", "Google Ads", "WhatsApp", "Stripe", "Shopify", "HubSpot", "LinkedIn", "Zapier"];
@@ -61,36 +61,62 @@ export default function SaasPage() {
   return (
     <main>
       <MarketingPageHero
-        eyebrow="Plataforma NELVYON"
-        title="La plataforma operativa de NELVYON"
-        subtitle="Centraliza marketing, ventas, contenidos, automatización y reporting mediante agentes expertos, en un entorno ordenado y preparado para operaciones continuas."
+        eyebrow="NELVYON OS"
+        title="El núcleo de tu operación"
+        subtitle="Marketing, ventas y automatización en un sistema operativo con agentes expertos."
         ctaLabel="Ver planes"
         ctaHref="#precios"
       />
       <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ marginBottom: "48px" }}>
-            <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>Módulos</p>
-            <h2 className="fade-in" style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 800, color: "#07122a", margin: "0 0 12px" }}>Módulos de la plataforma</h2>
-            <p style={{ fontSize: "16px", color: "#5a6a8a", maxWidth: "540px", margin: 0 }}>16 módulos para ejecutar tareas, coordinar procesos y mantener flujos activos desde un entorno central.</p>
+        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ maxWidth: 400, marginBottom: 40 }}>
+            <p className="mkt-eyebrow">Módulos</p>
+            <h2 className="mkt-h2 fade-in">16 módulos operativos</h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: "0 48px",
+              maxWidth: 900,
+            }}
+            className="nelvyon-saas-modules"
+          >
             {saasFeatures.map((f) => (
-              <div key={f.title} style={{ backgroundColor: "#f8faff", border: "1px solid #e8eef8", borderRadius: "12px", padding: "24px" }}>
-                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#07122a", margin: "0 0 8px" }}>{f.title}</h3>
-                <p style={{ fontSize: "14px", color: "#5a6a8a", lineHeight: 1.55, margin: 0 }}>{f.desc}</p>
+              <div key={f.title} className="mkt-row">
+                <div>
+                  <p className="mkt-row__title">{f.title}</p>
+                  <p className="mkt-row__desc">{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
+        <style>{`
+          @media (max-width: 640px) {
+            .nelvyon-saas-modules { grid-template-columns: 1fr !important; gap: 0 !important; }
+          }
+        `}</style>
       </section>
-      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff", borderTop: "1px solid #e8eef8" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-          <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>Integraciones</p>
-          <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, color: "#07122a", margin: "0 0 24px" }}>Conectado con tu ecosistema</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px" }}>
+      <section className="nelvyon-mkt-section--compact" style={{ backgroundColor: "#f8faff" }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
+          <p className="mkt-eyebrow">Integraciones</p>
+          <h2 className="mkt-h2" style={{ marginBottom: 28 }}>Tu ecosistema conectado</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8 }}>
             {integraciones.map((name) => (
-              <span key={name} style={{ fontSize: "13px", fontWeight: 600, color: "#5a6a8a", backgroundColor: "#ffffff", border: "1px solid #e8eef8", borderRadius: "8px", padding: "10px 18px" }}>
+              <span
+                key={name}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: "#5a6a8a",
+                  letterSpacing: "-0.01em",
+                  padding: "8px 14px",
+                  borderRadius: 5,
+                  border: "1px solid #e8eef8",
+                  background: "#fff",
+                }}
+              >
                 {name}
               </span>
             ))}
@@ -99,10 +125,10 @@ export default function SaasPage() {
       </section>
       <section id="precios" className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }}>
-            <p style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0084fc", marginBottom: "12px" }}>Planes</p>
-            <h2 className="fade-in" style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 800, color: "#07122a", margin: "0 0 12px" }}>Starter, Growth y Elite</h2>
-            <p style={{ fontSize: "16px", color: "#5a6a8a" }}>Sin permanencia forzada. Estructura según la complejidad de tu operación.</p>
+          <div style={{ textAlign: "center", marginBottom: 48, maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
+            <p className="mkt-eyebrow">Planes</p>
+            <h2 className="mkt-h2 fade-in" style={{ marginBottom: 10 }}>Starter, Growth y Elite</h2>
+            <p className="mkt-lead">Sin permanencia. Escala según tu operación.</p>
           </div>
           <div className="nelvyon-pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", alignItems: "stretch" }}>
             {plans.map((plan, i) => (
@@ -140,10 +166,10 @@ export default function SaasPage() {
       </section>
       <ComparisonTable />
       <CtaFinal
-        title="Una plataforma para operar con continuidad"
-        subtitle="Centraliza procesos, activa agentes expertos y trabaja con una estructura digital preparada para crecer con tu empresa."
-        primaryLabel="Ver plataforma"
-        primaryHref="/saas#precios"
+        title="Opera con continuidad"
+        subtitle="Activa agentes expertos sobre NELVYON OS."
+        primaryLabel="Solicitar demo"
+        primaryHref="/contacto"
         showSecondary={false}
       />
     </main>

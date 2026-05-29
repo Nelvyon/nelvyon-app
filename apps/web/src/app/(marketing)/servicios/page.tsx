@@ -5,189 +5,79 @@ import { MarketingPageHero } from "@/components/agenforce/marketing-page-hero";
 export const metadata: Metadata = {
   title: "Servicios | NELVYON — Marketing Digital con Agentes Expertos",
   description:
-    "Servicios profesionales de marketing digital: publicidad, SEO, contenido, CRM, automatización y analítica dentro de una estructura operativa coherente.",
+    "Capas de ejecución profesional sobre NELVYON OS: publicidad, SEO, contenido, CRM, automatización y analítica.",
 };
 
 type Service = { title: string; description: string };
 
 const columns: { heading: string; services: Service[] }[] = [
   {
-    heading: "PUBLICIDAD DE PAGO",
+    heading: "Publicidad",
     services: [
-      {
-        title: "Meta Ads",
-        description:
-          "Gestión profesional de campañas en Facebook e Instagram orientadas a visibilidad, captación, tráfico, remarketing o conversión según el objetivo del proyecto. El trabajo incluye estructura de campañas, segmentación, revisión de audiencias, coordinación de creatividades, configuración de eventos y seguimiento de rendimiento. NELVYON puede integrar Meta Ads con CRM, formularios, WhatsApp, email y dashboards para que la actividad publicitaria no quede aislada.",
-      },
-      {
-        title: "Google Ads",
-        description:
-          "Configuración y gestión de campañas en Google Ads para búsquedas, display, shopping, Performance Max y formatos relacionados con intención de búsqueda. El servicio contempla análisis de palabras clave, estructura de grupos, anuncios, extensiones, configuración de conversiones y revisión periódica de términos. La prioridad es construir campañas ordenadas, comprensibles y conectadas con medición fiable.",
-      },
-      {
-        title: "TikTok Ads",
-        description:
-          "Planificación y ejecución de campañas en TikTok Ads adaptadas al lenguaje, formato y velocidad de consumo de la plataforma. NELVYON trabaja la estructura publicitaria, los ángulos creativos, la adaptación de mensajes y la revisión de activos para mantener coherencia con la marca.",
-      },
-      {
-        title: "YouTube Ads",
-        description:
-          "Diseño y gestión de campañas publicitarias en YouTube orientadas a presencia de marca, tráfico cualificado, educación de mercado o apoyo a embudos comerciales. Se trabaja la estructura de campañas, segmentación, formatos de anuncio, mensajes de vídeo y conexión con medición.",
-      },
-      {
-        title: "LinkedIn Ads",
-        description:
-          "Publicidad profesional para entornos B2B, venta consultiva, servicios especializados, formación, tecnología y consultoría. Segmentación por cargo, empresa, sector, ubicación e intereses profesionales. NELVYON diseña campañas con mensajes adecuados al contexto profesional y conexión con CRM.",
-      },
-      {
-        title: "Pinterest Ads",
-        description:
-          "Gestión de campañas en Pinterest para marcas visuales, ecommerce, decoración, moda, belleza, diseño y sectores con fuerte componente inspiracional. El servicio contempla estructura de campañas, selección de formatos y adaptación visual.",
-      },
+      { title: "Meta Ads", description: "Campañas Meta conectadas a CRM y medición." },
+      { title: "Google Ads", description: "Search, display y conversiones con estructura clara." },
+      { title: "TikTok Ads", description: "Formato nativo y seguimiento operativo." },
+      { title: "YouTube Ads", description: "Vídeo, tráfico y embudos B2B/B2C." },
+      { title: "LinkedIn Ads", description: "Segmentación profesional y CRM." },
+      { title: "Pinterest Ads", description: "Ecommerce y marcas visuales." },
     ],
   },
   {
-    heading: "SEO Y CONTENIDO",
+    heading: "SEO y contenido",
     services: [
-      {
-        title: "SEO Técnico",
-        description:
-          "Auditoría y optimización de aspectos técnicos que afectan a la visibilidad orgánica de una web. Se revisan indexación, arquitectura, rendimiento, Core Web Vitals, enlazado interno, estructura de URLs, metadatos, schema y errores técnicos.",
-      },
-      {
-        title: "Marketing de Contenidos",
-        description:
-          "Planificación y creación de contenidos orientados a educar, posicionar y comunicar con claridad la propuesta de valor de la empresa. Incluye artículos, páginas informativas, recursos descargables, guías, emails y publicaciones. NELVYON trabaja el contenido como un activo estratégico, no como producción genérica.",
-      },
-      {
-        title: "Email Marketing",
-        description:
-          "Diseño de comunicaciones por email para bienvenida, seguimiento, nutrición comercial, recuperación, fidelización y comunicación recurrente. El servicio puede incluir segmentación, estructura de secuencias, redacción, configuración técnica y automatización.",
-      },
-      {
-        title: "WhatsApp Automatizado",
-        description:
-          "Implementación de flujos de WhatsApp para atención, cualificación, seguimiento y comunicación comercial. NELVYON puede configurar respuestas automáticas, rutas de conversación, integración con CRM y recuperación de contactos pendientes.",
-      },
+      { title: "SEO Técnico", description: "Indexación, rendimiento y arquitectura." },
+      { title: "Marketing de Contenidos", description: "Contenido estratégico, no genérico." },
+      { title: "Email Marketing", description: "Secuencias, segmentación y automatización." },
+      { title: "WhatsApp Automatizado", description: "Flujos comerciales integrados con CRM." },
     ],
   },
   {
-    heading: "GESTIÓN Y AUTOMATIZACIÓN",
+    heading: "Operación",
     services: [
-      {
-        title: "Gestión de Redes Sociales",
-        description:
-          "Planificación, creación, programación y revisión de contenido para redes sociales con enfoque profesional. Incluye calendario editorial, adaptación por canal, tono de marca y análisis de actividad.",
-      },
-      {
-        title: "CRM y Pipeline",
-        description:
-          "Diseño e implementación de un sistema visual para gestionar leads, oportunidades, clientes, tareas y fases comerciales. El CRM permite ordenar el seguimiento, registrar interacciones y automatizar tareas repetitivas.",
-      },
-      {
-        title: "Diseño Web",
-        description:
-          "Diseño y desarrollo de páginas corporativas, landing pages y estructuras web orientadas a claridad, credibilidad y conversión responsable. El servicio contempla arquitectura de información, copy, experiencia móvil y estructura visual.",
-      },
-      {
-        title: "Ecommerce",
-        description:
-          "Diseño, optimización y soporte para tiendas online en Shopify, WooCommerce o PrestaShop. NELVYON trabaja estructura de catálogo, experiencia de compra, automatizaciones, recuperación de carrito y conexión con campañas.",
-      },
-      {
-        title: "Automatización de Procesos",
-        description:
-          "Diseño de flujos automatizados para reducir tareas manuales en marketing, ventas, atención, reporting y gestión interna. Se pueden conectar formularios, CRM, email, WhatsApp, calendarios, pagos y herramientas externas.",
-      },
-      {
-        title: "Analítica y Reporting",
-        description:
-          "Configuración de medición, eventos, conversiones, paneles e informes para interpretar la actividad digital de la empresa. NELVYON trabaja con herramientas de analítica, píxeles, etiquetas y dashboards según las necesidades del proyecto.",
-      },
+      { title: "Redes Sociales", description: "Calendario editorial y publicación centralizada." },
+      { title: "CRM y Pipeline", description: "Leads, fases y seguimiento visual." },
+      { title: "Diseño Web", description: "Landings y webs conectadas al OS." },
+      { title: "Ecommerce", description: "Tiendas, catálogo y recuperación." },
+      { title: "Automatización", description: "Flujos entre CRM, email y reporting." },
+      { title: "Analítica", description: "Eventos, paneles e informes operativos." },
     ],
   },
 ];
-
-function ServiceCard({ service }: { service: Service }) {
-  return (
-    <div
-      style={{
-        backgroundColor: "#ffffff",
-        border: "1px solid rgba(7, 18, 42, 0.12)",
-        borderRadius: "12px",
-        padding: "20px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-        height: "100%",
-      }}
-    >
-      <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#07122a", margin: 0, lineHeight: 1.3 }}>
-        {service.title}
-      </h3>
-      <p
-        className="nelvyon-service-desc"
-        style={{
-          fontSize: "14px",
-          color: "#5a6a8a",
-          lineHeight: 1.6,
-          margin: 0,
-          flex: 1,
-          display: "-webkit-box",
-          WebkitLineClamp: 4,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-        }}
-      >
-        {service.description}
-      </p>
-    </div>
-  );
-}
 
 export default function ServiciosPage() {
   return (
     <main>
       <MarketingPageHero
-        eyebrow="Servicios NELVYON"
-        title="Servicios de marketing conectados a una operación real"
-        subtitle="Campañas, contenido, automatización, CRM y analítica trabajados dentro de un sistema profesional, medible y centralizado."
+        eyebrow="Capas de ejecución"
+        title="Servicios sobre el sistema operativo"
+        subtitle="Publicidad, contenido y automatización como extensiones de NELVYON OS — no como paquetes aislados."
         ctaLabel="Solicitar análisis"
         ctaHref="/contacto"
       />
 
       <section className="nelvyon-mkt-section" style={{ backgroundColor: "#ffffff" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, maxWidth: "720px", margin: "0 auto 48px", textAlign: "center" }}>
-            Una empresa no necesita más ruido. Necesita claridad. Cada servicio se integra en un sistema mayor: campañas, contenidos, automatización, CRM y seguimiento, configurados según la situación real del negocio.
-          </p>
+        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "40px",
+              gap: "clamp(32px, 5vw, 56px)",
             }}
             className="servicios-columns"
           >
             {columns.map((col) => (
               <div key={col.heading}>
-                <h3
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 800,
-                    letterSpacing: "0.1em",
-                    color: "#0084fc",
-                    margin: "0 0 20px",
-                    textTransform: "uppercase",
-                  }}
-                >
+                <h3 className="mkt-eyebrow" style={{ marginBottom: 20 }}>
                   {col.heading}
                 </h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                  {col.services.map((svc) => (
-                    <ServiceCard key={svc.title} service={svc} />
-                  ))}
-                </div>
+                {col.services.map((svc) => (
+                  <div key={svc.title} className="mkt-row">
+                    <div>
+                      <p className="mkt-row__title">{svc.title}</p>
+                      <p className="mkt-row__desc">{svc.description}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
@@ -199,35 +89,31 @@ export default function ServiciosPage() {
         `}</style>
       </section>
 
-      <section className="nelvyon-mkt-section" style={{ backgroundColor: "#f8faff" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <h2 className="fade-in" style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "#07122a", textAlign: "center", margin: "0 0 40px" }}>
-            Metodología
+      <section className="nelvyon-mkt-section--compact" style={{ backgroundColor: "#f8faff" }}>
+        <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 24px" }}>
+          <p className="mkt-eyebrow">Metodología</p>
+          <h2 className="mkt-h2 fade-in" style={{ marginBottom: 32 }}>
+            De diagnóstico a operación
           </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }} className="nelvyon-metodologia-grid">
-            {[
-              { title: "Diagnóstico", desc: "Análisis de canales, procesos, herramientas y capacidad comercial." },
-              { title: "Planificación", desc: "Definición de estructura, prioridades y conexión entre servicios." },
-              { title: "Implementación", desc: "Configuración, ejecución y centralización de la operación." },
-              { title: "Revisión continua", desc: "Medición, ajustes y optimización con criterio profesional." },
-            ].map((m) => (
-              <div key={m.title} style={{ backgroundColor: "#ffffff", border: "1px solid #e8eef8", borderRadius: "12px", padding: "24px" }}>
-                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#07122a", margin: "0 0 8px" }}>{m.title}</h3>
-                <p style={{ fontSize: "14px", color: "#5a6a8a", margin: 0, lineHeight: 1.55 }}>{m.desc}</p>
+          {[
+            { title: "Diagnóstico", desc: "Canales, procesos y herramientas." },
+            { title: "Planificación", desc: "Estructura y prioridades del sistema." },
+            { title: "Implementación", desc: "Configuración y centralización." },
+            { title: "Revisión", desc: "Medición y ajuste continuo." },
+          ].map((m) => (
+            <div key={m.title} className="mkt-row">
+              <div>
+                <p className="mkt-row__title">{m.title}</p>
+                <p className="mkt-row__desc">{m.desc}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-        <style>{`
-          @media (max-width: 768px) {
-            .nelvyon-metodologia-grid { grid-template-columns: 1fr !important; }
-          }
-        `}</style>
       </section>
 
       <CtaFinal
-        title="Ordena tu marketing dentro de un sistema profesional"
-        subtitle="Marketing, automatización, CRM y reporting trabajando bajo una misma estructura operativa."
+        title="Activa capas sobre tu operación"
+        subtitle="Marketing y automatización dentro de NELVYON OS."
         primaryLabel="Solicitar análisis"
         showSecondary={false}
       />

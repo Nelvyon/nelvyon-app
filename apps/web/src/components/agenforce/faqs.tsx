@@ -20,15 +20,13 @@ export function Faqs() {
 
 export const FAQs = () => {
   return (
-    <section id="faqs" className="py-12 lg:py-16 bg-[#f8faff]">
+    <section id="faqs" className="nelvyon-mkt-section--compact bg-[#f8faff]">
       <Container>
-        <div style={{ textAlign: "center", marginBottom: "64px" }}>
-          <p style={{ fontSize: "13px", fontWeight: 600, color: "#0084fc", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "12px" }}>FAQ</p>
-          <h2 className="fade-in" style={{ fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 800, color: "#07122a", letterSpacing: "-0.03em" }}>
-            Preguntas frecuentes
-          </h2>
+        <div style={{ maxWidth: 480, marginBottom: 40 }}>
+          <p className="mkt-eyebrow">FAQ</p>
+          <h2 className="mkt-h2 fade-in">Preguntas frecuentes</h2>
         </div>
-        <div style={{ maxWidth: "800px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", flexDirection: "column", borderTop: "1px solid #e8eef8" }}>
           {questions.map((q, index) => (
             <Question key={index} question={q.question} answer={q.answer} />
           ))}
@@ -40,19 +38,28 @@ export const FAQs = () => {
 const Question = ({ question, answer }: { question: string; answer: string }) => {
   const [open, setOpen] = useState(false);
   return (
-    <button onClick={() => setOpen(!open)} style={{
-      width: "100%", background: "#ffffff", border: "1px solid #e8eef8",
-      borderRadius: "16px", padding: "24px", textAlign: "left",
-      cursor: "pointer", transition: "box-shadow 0.2s",
-    }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#07122a", margin: 0 }}>{question}</h3>
-        <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "#07122a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginLeft: "16px" }}>
-          {open ? <IconMinus style={{ width: "14px", height: "14px", color: "#ffffff" }} /> : <IconPlus style={{ width: "14px", height: "14px", color: "#ffffff" }} />}
+    <button
+      onClick={() => setOpen(!open)}
+      style={{
+        width: "100%",
+        background: "transparent",
+        border: "none",
+        borderBottom: "1px solid #e8eef8",
+        padding: "18px 0",
+        textAlign: "left",
+        cursor: "pointer",
+        transition: "opacity 0.2s ease",
+      }}
+      className="nelvyon-faq-item"
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 600, letterSpacing: "-0.02em", color: "#07122a", margin: 0 }}>{question}</h3>
+        <div style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "rgba(7,18,42,0.35)" }}>
+          {open ? <IconMinus style={{ width: 14, height: 14 }} /> : <IconPlus style={{ width: 14, height: 14 }} />}
         </div>
       </div>
-      <motion.div animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} initial={false} transition={{ duration: 0.2 }} style={{ overflow: "hidden" }}>
-        <p style={{ marginTop: "16px", fontSize: "14px", color: "#6b7a99", lineHeight: 1.6, marginBottom: 0 }}>{answer}</p>
+      <motion.div animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} initial={false} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }} style={{ overflow: "hidden" }}>
+        <p style={{ marginTop: 12, fontSize: 14, color: "#5a6a8a", lineHeight: 1.5, marginBottom: 0, maxWidth: 560 }}>{answer}</p>
       </motion.div>
     </button>
   );

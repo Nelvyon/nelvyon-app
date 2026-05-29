@@ -12,47 +12,47 @@ type MarketingPageHeroProps = {
 
 export function MarketingPageHero({ eyebrow, title, subtitle, ctaLabel, ctaHref }: MarketingPageHeroProps) {
   return (
-    <section style={{ backgroundColor: NELVYON_NAVY, paddingTop: "64px" }}>
-      <div style={{ maxWidth: "720px", margin: "0 auto", padding: "48px 24px 56px", textAlign: "center" }}>
-        <p
-          style={{
-            fontSize: "12px",
-            fontWeight: 600,
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "rgba(255,255,255,0.45)",
-            marginBottom: "14px",
-          }}
-        >
+    <section style={{ backgroundColor: NELVYON_NAVY, paddingTop: 56 }}>
+      <div style={{ maxWidth: 640, margin: "0 auto", padding: "44px 24px 52px", textAlign: "center" }}>
+        <p className="mkt-eyebrow nelvyon-page-hero-eyebrow" style={{ color: "rgba(255,255,255,0.4)" }}>
           {eyebrow}
         </p>
         <h1
           className="fade-in"
           style={{
-            fontSize: "clamp(28px, 5vw, 48px)",
-            fontWeight: 800,
+            fontSize: "clamp(28px, 4.5vw, 44px)",
+            fontWeight: 650,
             color: "#ffffff",
-            margin: "0 0 16px",
-            lineHeight: 1.12,
-            letterSpacing: "-0.02em",
+            margin: "0 0 14px",
+            lineHeight: 1.06,
+            letterSpacing: "-0.04em",
           }}
         >
           {title}
         </h1>
-        <p style={{ fontSize: "clamp(16px, 1.8vw, 18px)", color: "rgba(255,255,255,0.65)", margin: ctaLabel ? "0 0 28px" : 0, lineHeight: 1.6 }}>
+        <p
+          style={{
+            fontSize: "clamp(15px, 1.5vw, 17px)",
+            color: "rgba(255,255,255,0.52)",
+            margin: ctaLabel ? "0 0 24px" : 0,
+            lineHeight: 1.5,
+            letterSpacing: "-0.012em",
+          }}
+        >
           {subtitle}
         </p>
         {ctaLabel && ctaHref ? (
           <Link
             href={ctaHref}
+            className="mkt-btn"
             style={{
               display: "inline-block",
               backgroundColor: NELVYON_BLUE,
               color: "#ffffff",
               fontWeight: 600,
-              fontSize: "14px",
-              padding: "12px 24px",
-              borderRadius: "8px",
+              fontSize: 14,
+              padding: "11px 22px",
+              borderRadius: 7,
               textDecoration: "none",
             }}
           >
@@ -63,11 +63,11 @@ export function MarketingPageHero({ eyebrow, title, subtitle, ctaLabel, ctaHref 
       <NavyToWhiteTransition />
       <style>{`
         @media (max-width: 768px) {
-          section { padding-top: 52px !important; }
+          section { padding-top: 48px !important; }
           section > div { padding: 32px 20px 40px !important; }
         }
         @media (max-width: 480px) {
-          section > div p:first-of-type { display: none; }
+          .nelvyon-page-hero-eyebrow { display: none; }
         }
       `}</style>
     </section>

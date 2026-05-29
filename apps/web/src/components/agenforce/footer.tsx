@@ -34,7 +34,7 @@ export function Footer() {
               links: [
                 ["Inicio", "/"],
                 ["Servicios", "/servicios"],
-                ["Plataforma", "/saas"],
+                ["SaaS", "/saas"],
                 ["Nosotros", "/nosotros"],
                 ["Blog", "/blog"],
                 ["Contacto", "/contacto"],
