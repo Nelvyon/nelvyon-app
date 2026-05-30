@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { NvFooter } from "@/components/nelvyon-marketing/footer";
-import { NvNavbar } from "@/components/nelvyon-marketing/navbar";
+import { MarketingLayout } from "@/components/agenforce/marketing-layout";
 import { getAppBaseUrl } from "@/lib/appUrl";
 
 import "@/styles/nelvyon-marketing.css";
@@ -44,18 +43,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function MarketingLayout({ children }: { children: ReactNode }) {
+export default function MarketingRouteLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="nv-mkt">
-      <NvNavbar />
-      {children}
-      <NvFooter />
+    <>
+      <MarketingLayout>{children}</MarketingLayout>
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "document.addEventListener('DOMContentLoaded',function(){const sel='.nv-fade,.fade-in';const els=document.querySelectorAll(sel);const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.08});els.forEach(el=>obs.observe(el))});",
+            "document.addEventListener('DOMContentLoaded',function(){const sel='.fade-in,.nv-fade';const els=document.querySelectorAll(sel);const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.08});els.forEach(el=>obs.observe(el))});",
         }}
       />
-    </div>
+    </>
   );
 }

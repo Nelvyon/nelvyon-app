@@ -48,28 +48,28 @@ describe("marketing pricing and landing", () => {
 
   it("Nav incluye CTA a contacto", () => {
     renderWithProviders(<PricingPage />);
-    const navCta = screen.getAllByRole("link", { name: /Solicitar demo/i })[0];
+    const navCta = screen.getAllByRole("link", { name: /Solicitar información/i })[0];
     expect(navCta).toHaveAttribute("href", "/contacto");
   });
 
   it("Página / (home) renderiza headline correctamente", { timeout: 15000 }, () => {
     renderWithProviders(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.textContent).toMatch(/sistema operativo/i);
-    expect(h1.textContent).toMatch(/marketing, ventas y automatización/i);
+    expect(h1.textContent).toMatch(/marketing digital/i);
+    expect(h1.textContent).toMatch(/escalar con orden/i);
   });
 
   it("Home tiene CTA principal a contacto", () => {
     renderWithProviders(<HomePage />);
-    const links = screen.getAllByRole("link", { name: /Solicitar demo/i });
+    const links = screen.getAllByRole("link", { name: /Solicitar información/i });
     expect(links.length).toBeGreaterThan(0);
     expect(links.some((el) => el.getAttribute("href") === "/contacto")).toBe(true);
   });
 
-  it("Home enlaza a servicios", () => {
+  it("Home enlaza a SaaS", () => {
     renderWithProviders(<HomePage />);
     const hrefs = screen.getAllByRole("link").map((el) => el.getAttribute("href"));
-    expect(hrefs).toContain("/servicios");
+    expect(hrefs).toContain("/saas");
   });
 
   it("Página /partners renderiza calculadora", () => {

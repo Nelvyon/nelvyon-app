@@ -1,58 +1,42 @@
+import {
+  IconChartLine,
+  IconRocket,
+  IconSearch,
+  IconSettings,
+} from "@tabler/icons-react";
+import type { TablerIcon } from "@tabler/icons-react";
+
 import { NELVYON_BLUE } from "./marketing-brand";
 
-const STEPS = [
-  { num: "01", title: "Diagnóstico", desc: "Canales, procesos y necesidades reales." },
-  { num: "02", title: "Diseño", desc: "Estructura de CRM, campañas y flujos." },
-  { num: "03", title: "Implementación", desc: "Plataforma configurada y conectada." },
-  { num: "04", title: "Operación", desc: "Agentes expertos en continuidad 24/7." },
+type Step = { num: string; title: string; desc: string; Icon: TablerIcon };
+
+const STEPS: Step[] = [
+  { num: "01", title: "Entendemos tu negocio", desc: "Canales, procesos y necesidades reales.", Icon: IconSearch },
+  { num: "02", title: "Diseñamos el sistema", desc: "Estructura de CRM, campañas y flujos.", Icon: IconSettings },
+  { num: "03", title: "Implementamos", desc: "Plataforma configurada y conectada.", Icon: IconRocket },
+  { num: "04", title: "Optimizamos y escalamos", desc: "Operación continua con mejora progresiva.", Icon: IconChartLine },
 ];
 
 export function ComoFunciona() {
   return (
-    <section className="nelvyon-mkt-section--airy nelvyon-section--white">
+    <section className="nelvyon-home-section nelvyon-section--alt nelvyon-como-trabajamos">
       <div className="nelvyon-section-inner">
-        <div style={{ maxWidth: 480, marginBottom: 56 }}>
-          <p className="mkt-eyebrow">Proceso</p>
-          <h2 className="mkt-h2 fade-in">Cómo funciona</h2>
-          <p className="mkt-lead" style={{ marginTop: 14 }}>
-            De diagnóstico a operación continua, con estructura clara en cada fase.
-          </p>
-        </div>
-        <div
-          className="nelvyon-como-funciona-timeline"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "clamp(16px, 2.5vw, 24px)",
-          }}
-        >
+        <header className="nelvyon-home-section__head nelvyon-home-section__head--center">
+          <h2 className="mkt-h2 mkt-h2--display fade-in">Así es como trabajamos</h2>
+        </header>
+        <div className="nelvyon-como-funciona-timeline">
           {STEPS.map((step) => (
-            <div key={step.num} className="mkt-card--dark">
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: NELVYON_BLUE,
-                  letterSpacing: "0.1em",
-                  marginBottom: 16,
-                }}
-              >
+            <article key={step.num} className="nelvyon-step-card nelvyon-step-card--dark">
+              <span className="nelvyon-step-card__num" style={{ color: NELVYON_BLUE }}>
                 {step.num}
-              </div>
-              <h3 className="mkt-card__title">{step.title}</h3>
-              <p className="mkt-card__desc">{step.desc}</p>
-            </div>
+              </span>
+              <h3 className="nelvyon-step-card__title">{step.title}</h3>
+              <p className="nelvyon-step-card__desc">{step.desc}</p>
+              <step.Icon className="nelvyon-step-card__glyph" size={28} stroke={1.25} color={NELVYON_BLUE} aria-hidden />
+            </article>
           ))}
         </div>
       </div>
-      <style>{`
-        @media (max-width: 900px) {
-          .nelvyon-como-funciona-timeline { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-        @media (max-width: 520px) {
-          .nelvyon-como-funciona-timeline { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </section>
   );
 }
