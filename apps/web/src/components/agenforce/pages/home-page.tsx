@@ -2,8 +2,10 @@ import { CasosDeUso } from "../casos-de-uso";
 import { CtaFinal } from "../cta-final";
 import { Hero } from "../hero";
 import { HomePricingTeaser } from "../home-pricing-teaser";
+import { HomeServiciosPremium } from "../home-servicios-premium";
 import { HomeTrustStrip } from "../home-trust-strip";
 import { IntegrationsHub } from "../integrations-hub";
+import { ProductScroll } from "../product-scroll";
 import { ProductShowcase } from "../product-showcase";
 import { QueEsNelvyon } from "../que-es-nelvyon";
 
@@ -13,7 +15,9 @@ export function AgenforceHomePage() {
       <Hero />
       <IntegrationsHub />
       <QueEsNelvyon />
+      <ProductScroll />
       <ProductShowcase />
+      <HomeServiciosPremium />
       <HomeTrustStrip />
       <HomePricingTeaser />
       <CasosDeUso />
