@@ -2150,6 +2150,10 @@
   .nelvyon-integrations-hub__mobile-groups {
     display: block;
   }
+
+  .nelvyon-integrations-hub__mobile-groups .nelvyon-integrations-hub__pills {
+    display: flex;
+  }
 }
 
 @media (min-width: 768px) {
