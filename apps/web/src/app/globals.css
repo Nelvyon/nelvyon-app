@@ -445,6 +445,349 @@
   z-index: 0;
 }
 
+/* Hero V3 — Proactiv scroll + MacBook chrome */
+.nelvyon-hero--v3 {
+  padding-bottom: 0;
+  min-height: auto;
+  overflow: clip;
+}
+
+.nelvyon-hero-v3__copy-wrap {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 820px;
+  padding-top: clamp(32px, 5vw, 56px);
+  padding-bottom: 32px;
+}
+
+.nelvyon-hero-v3__eyebrow {
+  color: rgba(255, 255, 255, 0.55) !important;
+  margin-bottom: 16px;
+}
+
+.nelvyon-hero-v3__title {
+  max-width: 780px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nelvyon-hero-v3__subtitle {
+  max-width: 620px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.nelvyon-hero-v3__ctas {
+  justify-content: center !important;
+}
+
+.nelvyon-hero-v3__stage {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px 48px;
+}
+
+.nelvyon-hero-v3__card {
+  position: relative;
+  border-radius: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.08);
+  background: #060f1e;
+  box-shadow:
+    0 0 #0000004d,
+    0 12px 28px #0000004a,
+    0 40px 48px #00000038,
+    0 80px 60px #0000001a;
+  overflow: hidden;
+  transform-origin: center top;
+}
+
+.nelvyon-hero-v3__beam {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 70%);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 132, 252, 0.85), transparent);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.nelvyon-hero-v3__card-inner {
+  position: relative;
+  z-index: 1;
+  padding: 10px;
+}
+
+.nelvyon-hero-v3__card-fade {
+  position: absolute;
+  inset: auto 0 0;
+  height: 120px;
+  background: linear-gradient(to top, #060f1e 20%, transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
+@media (min-width: 768px) {
+  .nelvyon-hero--v3 {
+    min-height: 88vh;
+    padding-bottom: 24px;
+  }
+
+  .nelvyon-hero-v3__stage {
+    padding-bottom: 72px;
+  }
+}
+
+/* Product Tour — StickyScroll */
+.nelvyon-product-tour {
+  padding: clamp(56px, 8vw, 96px) 0 clamp(48px, 6vw, 80px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nelvyon-product-tour__head {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.nelvyon-product-tour__eyebrow {
+  color: rgba(0, 132, 252, 0.9) !important;
+}
+
+.nelvyon-product-tour__lead {
+  max-width: 620px;
+  margin: 12px auto 0;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.nelvyon-product-tour__screen {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  background: #07122a;
+}
+
+.nelvyon-sticky-scroll {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.nelvyon-sticky-scroll__desktop {
+  display: none;
+}
+
+.nelvyon-sticky-scroll__mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 24px 0;
+}
+
+.nelvyon-sticky-scroll__mobile-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nelvyon-sticky-scroll__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
+  gap: 40px;
+  align-items: start;
+  margin: clamp(80px, 12vh, 140px) 0;
+}
+
+.nelvyon-sticky-scroll__icon {
+  margin-bottom: 12px;
+}
+
+.nelvyon-sticky-scroll__title {
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  color: #fff;
+  margin: 0 0 12px;
+}
+
+.nelvyon-sticky-scroll__desc {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 360px;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .nelvyon-sticky-scroll__desktop {
+    display: block;
+  }
+
+  .nelvyon-sticky-scroll__mobile {
+    display: none;
+  }
+}
+
+/* Home Servicios */
+.nelvyon-home-servicios {
+  position: relative;
+  overflow: hidden;
+}
+
+.nelvyon-home-servicios__pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(0, 132, 252, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 132, 252, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 90%);
+  pointer-events: none;
+}
+
+.nelvyon-home-servicios__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.nelvyon-home-servicios__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.nelvyon-home-servicios__card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 132, 252, 0.2);
+  box-shadow: 0 16px 40px rgba(7, 18, 42, 0.08);
+}
+
+.nelvyon-home-servicios__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 132, 252, 0.08);
+  border: 1px solid rgba(0, 132, 252, 0.12);
+  margin-bottom: 4px;
+}
+
+.nelvyon-home-servicios__link {
+  margin-top: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nelvyon-blue);
+}
+
+@media (max-width: 1024px) {
+  .nelvyon-home-servicios__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .nelvyon-home-servicios__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Home FAQs */
+.nelvyon-home-faqs__inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.nelvyon-home-faqs__list {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.nelvyon-home-faqs__group-title {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(7, 18, 42, 0.45);
+  margin: 0 0 12px;
+}
+
+.nelvyon-home-faqs__items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nelvyon-home-faqs__item {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nelvyon-home-faqs__item--active {
+  border-color: rgba(0, 132, 252, 0.22);
+  box-shadow: 0 8px 28px rgba(7, 18, 42, 0.06);
+}
+
+.nelvyon-home-faqs__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--nelvyon-navy);
+}
+
+.nelvyon-home-faqs__trigger span:first-child {
+  flex: 1;
+}
+
+.nelvyon-home-faqs__panel {
+  overflow: hidden;
+}
+
+.nelvyon-home-faqs__panel p {
+  margin: 0;
+  padding: 0 18px 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--nelvyon-muted);
+}
+
+.nelvyon-capas-stack--two {
+  gap: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nelvyon-hero-v3__card {
+    transform: none !important;
+  }
+}
+
 .nelvyon-dashboard-shell {
   position: relative;
   z-index: 1;

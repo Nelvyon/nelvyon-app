@@ -2,50 +2,43 @@ import Link from "next/link";
 
 import { NELVYON_BLUE, NELVYON_NAVY } from "./marketing-brand";
 
-const CAPAS = [
+const PILARES = [
   {
     key: "01",
     title: "NELVYON SaaS",
-    desc: "CRM, campañas, automatización, reporting, comunicación y operación.",
+    desc: "CRM, campañas, workflows, inbox, facturación, calendario, funnels y reporting en un solo entorno.",
     href: "/saas",
     cta: "Ver plataforma SaaS",
   },
   {
     key: "02",
-    title: "NELVYON OS",
-    desc: "Motor que impulsa la ejecución y los servicios premium.",
+    title: "Servicios",
+    desc: "SEO, Ads, Branding, Desarrollo Web, Ecommerce y Automatización con entregables definidos.",
     href: "/servicios",
     cta: "Ver servicios",
-  },
-  {
-    key: "03",
-    title: "Servicios Premium",
-    desc: "SEO, Ads, Branding, Ecommerce, Automatización y crecimiento.",
-    href: "/servicios",
-    cta: "Explorar servicios",
   },
 ];
 
 export function QueEsNelvyon() {
   return (
-    <section className="nelvyon-home-section nelvyon-section--white nelvyon-que-es-section">
+    <section className="nelvyon-home-section nelvyon-section--white nelvyon-que-es-section" aria-labelledby="que-es-nelvyon-title">
       <div className="nelvyon-section-inner">
         <div className="nelvyon-que-es-grid">
           <div>
             <p className="mkt-eyebrow">Qué es NELVYON</p>
-            <h2 className="mkt-h2 mkt-h2--display fade-in" style={{ marginBottom: 20 }}>
-              Una plataforma con tres capas claras
+            <h2 id="que-es-nelvyon-title" className="mkt-h2 mkt-h2--display fade-in" style={{ marginBottom: 20 }}>
+              Software y servicios, con roles claros
             </h2>
             <p className="mkt-lead" style={{ marginBottom: 12 }}>
-              Software operativo para centralizar marketing, ventas, automatización y operación. Sin capas ocultas ni
-              promesas vacías.
+              Plataforma operativa para centralizar marketing, ventas y operación. Servicios profesionales cuando la
+              ejecución requiere acompañamiento especializado.
             </p>
             <p style={{ fontSize: 15, fontWeight: 650, color: NELVYON_NAVY, letterSpacing: "-0.02em", margin: 0 }}>
-              SaaS para operar. OS para ejecutar. Servicios cuando hace falta acompañamiento.
+              SaaS para operar. Servicios para ejecutar cuando hace falta.
             </p>
           </div>
-          <div className="nelvyon-capas-stack">
-            {CAPAS.map((c) => (
+          <div className="nelvyon-capas-stack nelvyon-capas-stack--two">
+            {PILARES.map((c) => (
               <article key={c.key} className="mkt-card nelvyon-capa-card nelvyon-capa-card--layer">
                 <span className="nelvyon-capa-card__key">{c.key}</span>
                 <div>
