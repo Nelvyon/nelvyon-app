@@ -3653,6 +3653,478 @@
   font-size: 9px;
 }
 
+/* ─── Home V4 — Servicios first, sobrio ─── */
+.nelvyon-home--v4 {
+  background: #fff;
+}
+
+.nelvyon-hero-v4 {
+  background: var(--nelvyon-dark);
+  padding: clamp(56px, 8vw, 88px) 0 clamp(48px, 6vw, 72px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nelvyon-hero-v4__inner {
+  max-width: 1180px;
+}
+
+.nelvyon-hero-v4__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .nelvyon-hero-v4__grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 56px;
+  }
+}
+
+.nelvyon-hero-v4__eyebrow {
+  color: rgba(255, 255, 255, 0.5) !important;
+  margin-bottom: 16px;
+}
+
+.nelvyon-hero-v4__title {
+  max-width: 640px;
+  margin-bottom: 16px;
+}
+
+.nelvyon-hero-v4__subtitle {
+  max-width: 540px;
+  margin-bottom: 28px !important;
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+.nelvyon-hero-v4__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.nelvyon-hero-v4__saas-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+}
+
+.nelvyon-hero-v4__saas-link:hover {
+  color: var(--nelvyon-blue);
+}
+
+.nelvyon-hero-v4__aside {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+
+.nelvyon-hero-v4__service-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nelvyon-hero-v4__service-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+  font-weight: 550;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.15s ease;
+}
+
+.nelvyon-hero-v4__service-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+.nelvyon-hero-v4__service-arrow {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+}
+
+.nelvyon-hero-v4__saas-panel {
+  padding: 18px;
+  background: rgba(0, 132, 252, 0.06);
+  border-top: 1px solid rgba(0, 132, 252, 0.12);
+}
+
+.nelvyon-hero-v4__saas-panel-label {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(0, 132, 252, 0.9);
+  margin: 0 0 8px;
+}
+
+.nelvyon-hero-v4__saas-panel-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 10px;
+}
+
+.nelvyon-hero-v4__saas-panel-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nelvyon-blue);
+  text-decoration: none;
+}
+
+.nelvyon-service-placeholder {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--nelvyon-surface-alt);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.nelvyon-service-placeholder--compact {
+  aspect-ratio: 3 / 1;
+}
+
+.nelvyon-service-placeholder__accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.nelvyon-service-placeholder__label {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(7, 18, 42, 0.28);
+}
+
+.nelvyon-home-servicios__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.nelvyon-home-servicios__card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  transition: border-color 0.15s ease;
+}
+
+.nelvyon-home-servicios__card:hover {
+  border-color: rgba(0, 132, 252, 0.28);
+}
+
+.nelvyon-home-servicios__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.nelvyon-home-servicios__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 132, 252, 0.08);
+  margin-bottom: 4px;
+}
+
+.nelvyon-home-servicios__title {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--nelvyon-navy);
+  margin: 0;
+}
+
+.nelvyon-home-servicios__desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--nelvyon-muted);
+  margin: 0;
+  flex: 1;
+}
+
+.nelvyon-home-servicios__link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nelvyon-blue);
+  margin-top: 8px;
+}
+
+@media (max-width: 1024px) {
+  .nelvyon-home-servicios__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .nelvyon-home-servicios__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nelvyon-home-metodologia__steps {
+  list-style: none;
+  margin: 40px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .nelvyon-home-metodologia__steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .nelvyon-home-metodologia__steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nelvyon-home-metodologia__step {
+  position: relative;
+  padding-top: 8px;
+}
+
+.nelvyon-home-metodologia__num {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--nelvyon-blue);
+  margin-bottom: 12px;
+}
+
+.nelvyon-home-metodologia__title {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--nelvyon-navy);
+  margin: 0 0 6px;
+}
+
+.nelvyon-home-metodologia__desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--nelvyon-muted);
+  margin: 0;
+}
+
+.nelvyon-home-saas-compact {
+  background: var(--nelvyon-navy);
+  padding: clamp(56px, 8vw, 88px) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nelvyon-home-saas-compact__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .nelvyon-home-saas-compact__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 56px;
+  }
+}
+
+.nelvyon-home-saas-compact__eyebrow {
+  color: rgba(0, 132, 252, 0.9) !important;
+}
+
+.nelvyon-home-saas-compact__lead {
+  color: rgba(255, 255, 255, 0.55) !important;
+  margin: 12px 0 24px;
+  max-width: 480px;
+}
+
+.nelvyon-home-saas-compact__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nelvyon-home-saas-compact__item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.nelvyon-home-saas-compact__item-title {
+  font-size: 14px;
+  font-weight: 650;
+  color: #fff;
+  margin: 0 0 4px;
+}
+
+.nelvyon-home-saas-compact__item-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.nelvyon-home-integrations__inner {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.nelvyon-home-integrations__group {
+  margin-top: 28px;
+}
+
+.nelvyon-home-integrations__group-label {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+
+.nelvyon-home-integrations__group-label--available {
+  color: rgba(7, 18, 42, 0.45);
+}
+
+.nelvyon-home-integrations__group-label--coming {
+  color: rgba(7, 18, 42, 0.35);
+}
+
+.nelvyon-home-integrations__pills {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nelvyon-home-integrations__pill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--nelvyon-navy);
+}
+
+.nelvyon-home-integrations__pill--available {
+  border-color: rgba(0, 132, 252, 0.18);
+  background: rgba(0, 132, 252, 0.04);
+}
+
+.nelvyon-home-integrations__pill--coming {
+  opacity: 0.65;
+  border-style: dashed;
+  color: var(--nelvyon-muted);
+}
+
+.nelvyon-home-pricing-dual {
+  padding: clamp(56px, 8vw, 80px) 0;
+  background: #fff;
+  border-top: 4px solid var(--nelvyon-blue);
+}
+
+.nelvyon-home-pricing-dual__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+@media (max-width: 640px) {
+  .nelvyon-home-pricing-dual__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nelvyon-home-pricing-dual__card {
+  padding: 28px 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.nelvyon-home-pricing-dual__eyebrow {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nelvyon-muted);
+  margin: 0 0 8px;
+}
+
+.nelvyon-home-pricing-dual__price {
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--nelvyon-navy);
+  margin: 0 0 10px;
+}
+
+.nelvyon-home-pricing-dual__desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--nelvyon-muted);
+  margin: 0 0 16px;
+}
+
+.nelvyon-home-pricing-dual__link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nelvyon-blue);
+  text-decoration: none;
+}
+
+.nelvyon-home-pricing-dual__link:hover {
+  text-decoration: underline;
+}
+
+.nelvyon-cta-final--v4 {
+  background: var(--nelvyon-dark);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nelvyon-cta-final--v4 .nelvyon-btn-primary {
+  box-shadow: none;
+}
+
 @theme inline {
   --color-blue-400: #0084fc;
   --color-blue-500: #0084fc;

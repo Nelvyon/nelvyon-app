@@ -5,17 +5,17 @@ import { NELVYON_BLUE, NELVYON_NAVY } from "./marketing-brand";
 const PILARES = [
   {
     key: "01",
-    title: "NELVYON SaaS",
-    desc: "CRM, campañas, workflows, inbox, facturación, calendario, funnels y reporting en un solo entorno.",
-    href: "/saas",
-    cta: "Ver plataforma SaaS",
-  },
-  {
-    key: "02",
     title: "Servicios",
     desc: "SEO, Ads, Branding, Desarrollo Web, Ecommerce y Automatización con entregables definidos.",
     href: "/servicios",
     cta: "Ver servicios",
+  },
+  {
+    key: "02",
+    title: "NELVYON SaaS",
+    desc: "CRM, campañas, automatizaciones y reporting en un entorno operativo centralizado.",
+    href: "/saas",
+    cta: "Ver plataforma SaaS",
   },
 ];
 
@@ -26,15 +26,15 @@ export function QueEsNelvyon() {
         <div className="nelvyon-que-es-grid">
           <div>
             <p className="mkt-eyebrow">Qué es NELVYON</p>
-            <h2 id="que-es-nelvyon-title" className="mkt-h2 mkt-h2--display fade-in" style={{ marginBottom: 20 }}>
-              Software y servicios, con roles claros
+            <h2 id="que-es-nelvyon-title" className="mkt-h2 mkt-h2--display" style={{ marginBottom: 20 }}>
+              Dos formas de trabajar con NELVYON
             </h2>
             <p className="mkt-lead" style={{ marginBottom: 12 }}>
-              Plataforma operativa para centralizar marketing, ventas y operación. Servicios profesionales cuando la
-              ejecución requiere acompañamiento especializado.
+              Ejecutamos con servicios profesionales. Operamos con SaaS cuando conviene centralizar campañas, CRM y
+              reporting.
             </p>
             <p style={{ fontSize: 15, fontWeight: 650, color: NELVYON_NAVY, letterSpacing: "-0.02em", margin: 0 }}>
-              SaaS para operar. Servicios para ejecutar cuando hace falta.
+              Servicios para ejecutar. SaaS para centralizar.
             </p>
           </div>
           <div className="nelvyon-capas-stack nelvyon-capas-stack--two">

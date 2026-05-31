@@ -1,89 +1,62 @@
-"use client";
-
-import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
+import Link from "next/link";
 
 import { Container } from "./container";
-import { ModuleScreen } from "./module-screens";
-import { DottedGlowBackground } from "./ui/dotted-glow-background";
+import { HOME_SERVICES } from "./home-services-config";
 
-function HeroScrollCard({
-  rotate,
-  translate,
-  children,
-}: {
-  rotate: MotionValue<number>;
-  translate: MotionValue<number>;
-  children: ReactNode;
-}) {
-  return (
-    <motion.div
-      className="nelvyon-hero-v3__card"
-      style={{ rotateX: rotate, translateY: translate }}
-    >
-      <div className="nelvyon-hero-v3__beam" aria-hidden />
-      <div className="nelvyon-hero-v3__card-inner">{children}</div>
-      <div className="nelvyon-hero-v3__card-fade" aria-hidden />
-    </motion.div>
-  );
-}
-
+/** Hero V4 — Opción 1: dual columna, Servicios primero, SaaS como soporte. */
 export const Hero = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  const rotate = useTransform(scrollYProgress, [0, 0.45], [isMobile ? 8 : 18, 0]);
-  const translate = useTransform(scrollYProgress, [0, 0.5], [0, isMobile ? 24 : 48]);
-
   return (
-    <section ref={containerRef} className="nelvyon-hero nelvyon-hero--v3" aria-labelledby="home-hero-title">
-      <DottedGlowBackground
-        className="nelvyon-hero-dots"
-        gap={14}
-        radius={1.2}
-        color="rgba(255,255,255,0.04)"
-        glowColor="rgba(0,132,252,0.45)"
-        darkColor="rgba(255,255,255,0.04)"
-        darkGlowColor="rgba(0,132,252,0.45)"
-        opacity={0.85}
-        speedMin={0.15}
-        speedMax={0.45}
-        speedScale={0.6}
-      />
-      <Container className="nelvyon-hero-v3__copy-wrap">
-        <p className="mkt-eyebrow fade-in nelvyon-hero-v3__eyebrow">NELVYON</p>
-        <h1 id="home-hero-title" className="mkt-h1 fade-in nelvyon-hero-v3__title">
-          Plataforma empresarial para{" "}
-          <span className="nelvyon-text-accent">centralizar marketing, ventas y operación</span>
-        </h1>
-        <p className="nelvyon-hero-subtitle mkt-lead--light fade-in nelvyon-hero-v3__subtitle">
-          CRM, campañas, workflows, comunicación y reporting en un entorno operativo diseñado para equipos que
-          necesitan control, trazabilidad y ejecución sin herramientas dispersas.
-        </p>
-        <div className="nelvyon-hero-ctas nelvyon-hero-v3__ctas fade-in">
-          <a href="/contacto" className="mkt-btn nelvyon-btn-primary">
-            Solicitar información
-          </a>
-          <a href="/saas" className="mkt-btn nelvyon-btn-ghost">
-            Ver SaaS
-          </a>
+    <section className="nelvyon-hero-v4" aria-labelledby="home-hero-title">
+      <Container className="nelvyon-hero-v4__inner">
+        <div className="nelvyon-hero-v4__grid">
+          <div className="nelvyon-hero-v4__main">
+            <p className="mkt-eyebrow nelvyon-hero-v4__eyebrow">Servicios + Plataforma</p>
+            <h1 id="home-hero-title" className="mkt-h1 nelvyon-hero-v4__title">
+              Ejecutamos tu operación de marketing con{" "}
+              <span className="nelvyon-text-accent">entregables reales</span>
+            </h1>
+            <p className="mkt-lead--light nelvyon-hero-v4__subtitle">
+              SEO, publicidad, identidad, desarrollo web, ecommerce y automatización. Cuando hace falta escalar,
+              centralizamos la operación en NELVYON SaaS.
+            </p>
+            <div className="nelvyon-hero-v4__ctas">
+              <a href="/contacto" className="mkt-btn nelvyon-btn-primary">
+                Solicitar información
+              </a>
+              <Link href="/servicios" className="mkt-btn nelvyon-btn-ghost">
+                Ver servicios
+              </Link>
+            </div>
+            <Link href="/saas" className="nelvyon-hero-v4__saas-link">
+              Ver plataforma SaaS →
+            </Link>
+          </div>
+
+          <aside className="nelvyon-hero-v4__aside" aria-label="Áreas de servicio">
+            <ul className="nelvyon-hero-v4__service-list">
+              {HOME_SERVICES.map((item) => (
+                <li key={item.title}>
+                  <Link href={item.href} className="nelvyon-hero-v4__service-item">
+                    <span className="nelvyon-hero-v4__service-name">{item.title}</span>
+                    <span className="nelvyon-hero-v4__service-arrow" aria-hidden>
+                      →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="nelvyon-hero-v4__saas-panel">
+              <p className="nelvyon-hero-v4__saas-panel-label">Plataforma SaaS</p>
+              <p className="nelvyon-hero-v4__saas-panel-text">
+                Software propio para operar campañas, CRM, workflows y reporting cuando el volumen lo requiere.
+              </p>
+              <Link href="/saas" className="nelvyon-hero-v4__saas-panel-link">
+                Conocer SaaS →
+              </Link>
+            </div>
+          </aside>
         </div>
       </Container>
-
-      <div className="nelvyon-hero-v3__stage" style={{ perspective: "1200px" }}>
-        <HeroScrollCard rotate={rotate} translate={translate}>
-          <ModuleScreen module="CRM" flat />
-        </HeroScrollCard>
-      </div>
     </section>
   );
 };

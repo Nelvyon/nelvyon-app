@@ -5,6 +5,8 @@ type CtaFinalProps = {
   subtitle?: string;
   primaryLabel?: string;
   primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
   showSecondary?: boolean;
 };
 
@@ -13,21 +15,22 @@ export function CtaFinal({
   subtitle = "Centraliza campañas, CRM y automatización en un sistema diseñado para continuidad.",
   primaryLabel = "Solicitar información",
   primaryHref = "/contacto",
+  secondaryLabel = "Ver SaaS",
+  secondaryHref = "/saas",
   showSecondary = true,
 }: CtaFinalProps) {
   return (
-    <section className="nelvyon-cta-final">
-      <div className="nelvyon-cta-final__glow" aria-hidden />
+    <section className="nelvyon-cta-final nelvyon-cta-final--v4">
       <div className="nelvyon-cta-final__inner">
-        <h2 className="mkt-h2 mkt-h2--light fade-in nelvyon-cta-final__title">{title}</h2>
+        <h2 className="mkt-h2 mkt-h2--light nelvyon-cta-final__title">{title}</h2>
         <p className="mkt-lead--light nelvyon-cta-final__subtitle">{subtitle}</p>
         <div className="nelvyon-cta-final__actions">
           <a href={primaryHref} className="mkt-btn nelvyon-btn-primary">
             {primaryLabel}
           </a>
           {showSecondary ? (
-            <Link href="/saas" className="mkt-btn nelvyon-btn-ghost">
-              Ver SaaS
+            <Link href={secondaryHref} className="mkt-btn nelvyon-btn-ghost">
+              {secondaryLabel}
             </Link>
           ) : null}
         </div>

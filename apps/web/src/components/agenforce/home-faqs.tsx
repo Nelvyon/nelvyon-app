@@ -9,21 +9,6 @@ type FAQSection = { title: string; items: FAQItem[] };
 
 const FAQ_DATA: FAQSection[] = [
   {
-    title: "Plataforma SaaS",
-    items: [
-      {
-        question: "¿Qué incluye NELVYON SaaS?",
-        answer:
-          "CRM, campañas, workflows, inbox, facturación, calendario, funnels y reporting en un entorno operativo centralizado. La interfaz mostrada en la web es representativa del producto.",
-      },
-      {
-        question: "¿Puedo usar solo el software sin contratar servicios?",
-        answer:
-          "Sí. NELVYON SaaS funciona de forma autónoma. Los servicios son opcionales cuando necesitas ejecución especializada.",
-      },
-    ],
-  },
-  {
     title: "Servicios",
     items: [
       {
@@ -35,6 +20,25 @@ const FAQ_DATA: FAQSection[] = [
         question: "¿Garantizáis resultados en campañas o SEO?",
         answer:
           "No. Documentamos procesos y entregables. No publicamos métricas inventadas ni prometemos resultados garantizados.",
+      },
+      {
+        question: "¿Puedo contratar solo servicios?",
+        answer:
+          "Sí. Los servicios son independientes del SaaS. Muchos clientes empiezan con ejecución profesional y adoptan la plataforma cuando la operación crece.",
+      },
+    ],
+  },
+  {
+    title: "Plataforma SaaS",
+    items: [
+      {
+        question: "¿Qué incluye NELVYON SaaS?",
+        answer:
+          "CRM, campañas, automatizaciones, inbox, facturación, calendario, funnels y reporting en un entorno operativo centralizado.",
+      },
+      {
+        question: "¿Puedo usar solo el software sin contratar servicios?",
+        answer: "Sí. NELVYON SaaS funciona de forma autónoma. Los servicios son opcionales.",
       },
     ],
   },
@@ -59,7 +63,7 @@ const FAQ_DATA: FAQSection[] = [
       {
         question: "¿Qué integraciones están disponibles hoy?",
         answer:
-          "Meta, Google, TikTok, Instagram, LinkedIn, WhatsApp, email, CRM, Stripe, Shopify, calendario y reporting, entre otras. Algunas integraciones figuran como próximamente en el hub de la home.",
+          "Meta, Google, TikTok, Instagram, LinkedIn, WhatsApp, email, Stripe, Shopify, calendario y reporting, entre otras. WooCommerce figura como próximamente.",
       },
     ],
   },
