@@ -4125,6 +4125,257 @@
   box-shadow: none;
 }
 
+/* Home V5 — Hero, Para quién, Qué hace NELVYON */
+.nelvyon-home--v5 {
+  background: #fff;
+}
+
+.nelvyon-hero-v5 {
+  background: #fff;
+  padding: clamp(80px, 10vw, 120px) 0 clamp(64px, 8vw, 96px);
+  border-bottom: 1px solid var(--nelvyon-border);
+}
+
+.nelvyon-hero-v5__inner {
+  max-width: 720px;
+}
+
+.nelvyon-hero-v5__eyebrow {
+  margin-bottom: 18px;
+}
+
+.nelvyon-hero-v5__title {
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 750;
+  color: var(--nelvyon-navy);
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+  margin: 0 0 20px;
+}
+
+.nelvyon-hero-v5__lead {
+  font-size: clamp(17px, 1.6vw, 19px);
+  line-height: 1.65;
+  letter-spacing: -0.016em;
+  color: var(--nelvyon-muted);
+  font-weight: 450;
+  margin: 0 0 20px;
+  max-width: 620px;
+}
+
+.nelvyon-hero-v5__audience {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(7, 18, 42, 0.52);
+  margin: 0 0 32px;
+}
+
+.nelvyon-hero-v5__audience-sep {
+  color: rgba(7, 18, 42, 0.24);
+  margin: 0 2px;
+}
+
+.nelvyon-hero-v5__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.nelvyon-hero-v5__saas-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nelvyon-muted-soft);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+}
+
+.nelvyon-hero-v5__saas-link:hover {
+  color: var(--nelvyon-blue);
+}
+
+.nelvyon-btn-primary--solid {
+  box-shadow: none;
+}
+
+.nelvyon-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--nelvyon-border);
+  color: var(--nelvyon-navy);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.nelvyon-btn-outline:hover {
+  border-color: rgba(0, 132, 252, 0.35);
+  background: rgba(248, 250, 255, 0.9);
+  color: var(--nelvyon-navy);
+}
+
+.nelvyon-para-quien__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--nelvyon-border);
+  border: 1px solid var(--nelvyon-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .nelvyon-para-quien__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .nelvyon-para-quien__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.nelvyon-para-quien__card {
+  background: #fff;
+  padding: 28px 24px;
+  min-height: 100%;
+}
+
+.nelvyon-para-quien__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(0, 132, 252, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.nelvyon-para-quien__title {
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--nelvyon-navy);
+  margin: 0 0 8px;
+}
+
+.nelvyon-para-quien__desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--nelvyon-muted-soft);
+  margin: 0;
+}
+
+.nelvyon-que-hace__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+
+@media (min-width: 900px) {
+  .nelvyon-que-hace__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    border: 1px solid var(--nelvyon-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .nelvyon-que-hace__col:first-child {
+    border-right: 1px solid var(--nelvyon-border);
+  }
+}
+
+.nelvyon-que-hace__col {
+  padding: clamp(28px, 4vw, 40px);
+}
+
+@media (min-width: 900px) {
+  .nelvyon-que-hace__col {
+    padding: clamp(32px, 4vw, 44px);
+  }
+}
+
+.nelvyon-que-hace__label {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--nelvyon-blue);
+  margin: 0 0 12px;
+}
+
+.nelvyon-que-hace__intro {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--nelvyon-muted);
+  margin: 0 0 24px;
+  max-width: 460px;
+}
+
+.nelvyon-que-hace__list {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  border-top: 1px solid var(--nelvyon-border);
+}
+
+.nelvyon-que-hace__list li {
+  border-bottom: 1px solid var(--nelvyon-border);
+}
+
+.nelvyon-que-hace__list-link,
+.nelvyon-que-hace__list-item {
+  display: block;
+  padding: 16px 0;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.nelvyon-que-hace__list-link:hover {
+  background: rgba(248, 250, 255, 0.85);
+  margin: 0 -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.nelvyon-que-hace__list-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--nelvyon-navy);
+  margin-bottom: 4px;
+}
+
+.nelvyon-que-hace__list-desc {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--nelvyon-muted-soft);
+}
+
+.nelvyon-que-hace__cta {
+  display: inline-block;
+}
+
 @theme inline {
   --color-blue-400: #0084fc;
   --color-blue-500: #0084fc;
