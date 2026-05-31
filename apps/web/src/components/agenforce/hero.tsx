@@ -27,12 +27,12 @@ export const Hero = () => {
               NELVYON
             </p>
             <h1 className="mkt-h1 fade-in">
-              Marketing digital, ventas y automatización para{" "}
-              <span className="nelvyon-text-accent">escalar con orden</span>
+              Plataforma empresarial para{" "}
+              <span className="nelvyon-text-accent">centralizar marketing, ventas y operación</span>
             </h1>
             <p className="nelvyon-hero-subtitle mkt-lead--light fade-in">
-              Donde nace tu imperio, crece tu marca y se impone tu legado. Centraliza CRM, campañas,
-              comunicación y reporting en un entorno operativo diseñado para crecer.
+              Donde nace tu imperio, crece tu marca y se impone tu legado. CRM, campañas, automatización,
+              comunicación y reporting en un entorno diseñado para equipos que escalan con orden.
             </p>
             <div className="nelvyon-hero-ctas">
               <a href="/contacto" className="mkt-btn nelvyon-btn-primary">

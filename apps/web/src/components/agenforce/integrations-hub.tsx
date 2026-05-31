@@ -3,45 +3,42 @@
 import Image from "next/image";
 import type { TablerIcon } from "@tabler/icons-react";
 import {
-  IconBrandGoogle,
-  IconBrandInstagram,
-  IconBrandLinkedin,
-  IconBrandMeta,
-  IconBrandTiktok,
-  IconBrandWhatsapp,
   IconBrandWordpress,
   IconCalendar,
   IconChartBar,
-  IconCreditCard,
   IconMail,
-  IconShoppingCart,
   IconUsers,
 } from "@tabler/icons-react";
 
 import { NELVYON_BLUE } from "./marketing-brand";
 
+type IntegrationStatus = "available" | "coming";
+
 type IntegrationNode = {
   name: string;
-  Icon: TablerIcon;
-  color: string;
-  bg: string;
+  status: IntegrationStatus;
   angle: number;
+  slug?: string;
+  brandColor?: string;
+  Icon?: TablerIcon;
+  iconColor?: string;
+  bg?: string;
 };
 
 const INTEGRATIONS: IntegrationNode[] = [
-  { name: "Meta", Icon: IconBrandMeta, color: "#1877f2", bg: "rgba(24,119,242,0.14)", angle: 0 },
-  { name: "Google", Icon: IconBrandGoogle, color: "#ea4335", bg: "rgba(234,67,53,0.12)", angle: 28 },
-  { name: "TikTok", Icon: IconBrandTiktok, color: "#ffffff", bg: "rgba(255,255,255,0.08)", angle: 56 },
-  { name: "Instagram", Icon: IconBrandInstagram, color: "#e4405f", bg: "rgba(228,64,95,0.12)", angle: 84 },
-  { name: "LinkedIn", Icon: IconBrandLinkedin, color: "#0a66c2", bg: "rgba(10,102,194,0.12)", angle: 112 },
-  { name: "WhatsApp", Icon: IconBrandWhatsapp, color: "#25d366", bg: "rgba(37,211,102,0.12)", angle: 140 },
-  { name: "Email", Icon: IconMail, color: NELVYON_BLUE, bg: "rgba(0,132,252,0.12)", angle: 168 },
-  { name: "CRM", Icon: IconUsers, color: NELVYON_BLUE, bg: "rgba(0,132,252,0.12)", angle: 196 },
-  { name: "Stripe", Icon: IconCreditCard, color: "#635bff", bg: "rgba(99,91,255,0.12)", angle: 224 },
-  { name: "Shopify", Icon: IconShoppingCart, color: "#96bf48", bg: "rgba(150,191,72,0.12)", angle: 252 },
-  { name: "WooCommerce", Icon: IconBrandWordpress, color: "#96588a", bg: "rgba(150,88,138,0.12)", angle: 280 },
-  { name: "Calendario", Icon: IconCalendar, color: NELVYON_BLUE, bg: "rgba(0,132,252,0.12)", angle: 308 },
-  { name: "Reporting", Icon: IconChartBar, color: NELVYON_BLUE, bg: "rgba(0,132,252,0.12)", angle: 336 },
+  { name: "Meta", status: "available", slug: "meta", brandColor: "1877f2", angle: 0 },
+  { name: "Google", status: "available", slug: "google", brandColor: "ea4335", angle: 28 },
+  { name: "TikTok", status: "available", slug: "tiktok", brandColor: "000000", angle: 56 },
+  { name: "Instagram", status: "available", slug: "instagram", brandColor: "e4405f", angle: 84 },
+  { name: "LinkedIn", status: "available", slug: "linkedin", brandColor: "0a66c2", angle: 112 },
+  { name: "WhatsApp", status: "available", slug: "whatsapp", brandColor: "25d366", angle: 140 },
+  { name: "Email", status: "available", Icon: IconMail, iconColor: NELVYON_BLUE, bg: "rgba(0,132,252,0.12)", angle: 168 },
+  { name: "CRM", status: "available", Icon: IconUsers, iconColor: NELVYON_BLUE, bg: "rgba(0,132,252,0.12)", angle: 196 },
+  { name: "Stripe", status: "available", slug: "stripe", brandColor: "635bff", angle: 224 },
+  { name: "Shopify", status: "available", slug: "shopify", brandColor: "96bf48", angle: 252 },
+  { name: "WooCommerce", status: "coming", Icon: IconBrandWordpress, iconColor: "#96588a", bg: "rgba(150,88,138,0.12)", angle: 280 },
+  { name: "Calendario", status: "available", Icon: IconCalendar, iconColor: NELVYON_BLUE, bg: "rgba(0,132,252,0.12)", angle: 308 },
+  { name: "Reporting", status: "available", Icon: IconChartBar, iconColor: NELVYON_BLUE, bg: "rgba(0,132,252,0.12)", angle: 336 },
 ];
 
 const HUB_RADIUS = 42;
@@ -53,6 +50,24 @@ function polarToPercent(angleDeg: number, radiusPercent: number) {
     x: 50 + radiusPercent * Math.cos(rad),
     y: 50 + radiusPercent * Math.sin(rad),
   };
+}
+
+function IntegrationIcon({ item }: { item: IntegrationNode }) {
+  if (item.slug && item.brandColor) {
+    return (
+      <img
+        src={`https://cdn.simpleicons.org/${item.slug}/${item.brandColor}`}
+        alt=""
+        width={22}
+        height={22}
+        className="nelvyon-integrations-hub__brand-logo"
+      />
+    );
+  }
+  if (item.Icon) {
+    return <item.Icon size={20} stroke={1.5} color={item.iconColor ?? NELVYON_BLUE} aria-hidden />;
+  }
+  return null;
 }
 
 export function IntegrationsHub() {
@@ -68,6 +83,16 @@ export function IntegrationsHub() {
           <p className="mkt-lead--light nelvyon-integrations-hub__lead fade-in">
             Canales, pagos, CRM y reporting conectados hacia un entorno operativo único.
           </p>
+          <div className="nelvyon-integrations-hub__legend fade-in">
+            <span className="nelvyon-integrations-hub__legend-item">
+              <span className="nelvyon-integrations-hub__legend-dot nelvyon-integrations-hub__legend-dot--available" />
+              Disponible
+            </span>
+            <span className="nelvyon-integrations-hub__legend-item">
+              <span className="nelvyon-integrations-hub__legend-dot nelvyon-integrations-hub__legend-dot--coming" />
+              Próximamente
+            </span>
+          </div>
         </header>
 
         <div className="nelvyon-integrations-hub__stage" role="img" aria-label="Integraciones conectadas a NELVYON">
@@ -84,8 +109,9 @@ export function IntegrationsHub() {
                   x2={node.x}
                   y2={node.y}
                   stroke={NELVYON_BLUE}
-                  strokeOpacity={0.28}
+                  strokeOpacity={item.status === "coming" ? 0.12 : 0.28}
                   strokeWidth="0.35"
+                  strokeDasharray={item.status === "coming" ? "1 1" : undefined}
                 />
               );
             })}
@@ -102,13 +128,21 @@ export function IntegrationsHub() {
             return (
               <div
                 key={item.name}
-                className="nelvyon-integrations-hub__node"
+                className={`nelvyon-integrations-hub__node${item.status === "coming" ? " nelvyon-integrations-hub__node--coming" : ""}`}
                 style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
               >
-                <div className="nelvyon-integrations-hub__node-icon" style={{ background: item.bg }}>
-                  <item.Icon size={20} stroke={1.5} color={item.color} aria-hidden />
+                <div
+                  className="nelvyon-integrations-hub__node-icon"
+                  style={{ background: item.bg ?? "rgba(255,255,255,0.06)" }}
+                >
+                  <IntegrationIcon item={item} />
                 </div>
                 <span className="nelvyon-integrations-hub__node-label">{item.name}</span>
+                <span
+                  className={`nelvyon-integrations-hub__node-badge nelvyon-integrations-hub__node-badge--${item.status}`}
+                >
+                  {item.status === "available" ? "Disponible" : "Próximamente"}
+                </span>
               </div>
             );
           })}
@@ -116,7 +150,10 @@ export function IntegrationsHub() {
 
         <div className="nelvyon-integrations-hub__pills" aria-hidden>
           {INTEGRATIONS.map((item) => (
-            <span key={`pill-${item.name}`} className="nelvyon-integrations-hub__pill">
+            <span
+              key={`pill-${item.name}`}
+              className={`nelvyon-integrations-hub__pill nelvyon-integrations-hub__pill--${item.status}`}
+            >
               {item.name}
             </span>
           ))}

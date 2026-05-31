@@ -26,7 +26,10 @@ export function HomeSoluciones() {
     <section className="nelvyon-home-section nelvyon-section--white">
       <div className="nelvyon-section-inner">
         <header className="nelvyon-home-section__head nelvyon-home-section__head--center">
-          <h2 className="mkt-h2 mkt-h2--display fade-in">Soluciones para cada área de tu negocio</h2>
+          <h2 className="mkt-h2 mkt-h2--display fade-in">Áreas operativas cubiertas</h2>
+          <p className="mkt-lead nelvyon-home-section__lead fade-in">
+            Módulos conectados dentro de la plataforma, no paquetes aislados de agencia.
+          </p>
         </header>
         <div className="nelvyon-home-soluciones-grid">
           {SOLUCIONES.map((item) => (

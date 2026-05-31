@@ -1,21 +1,21 @@
 import { CasosDeUso } from "../casos-de-uso";
-import { ComoFunciona } from "../como-funciona";
 import { CtaFinal } from "../cta-final";
 import { Hero } from "../hero";
-import { HomeSoluciones } from "../home-soluciones";
-import { HomeTodoNecesitas } from "../home-todo-necesitas";
+import { HomePricingTeaser } from "../home-pricing-teaser";
+import { HomeTrustStrip } from "../home-trust-strip";
 import { IntegrationsHub } from "../integrations-hub";
-import { PlataformaOs } from "../plataforma-os";
+import { ProductShowcase } from "../product-showcase";
+import { QueEsNelvyon } from "../que-es-nelvyon";
 
 export function AgenforceHomePage() {
   return (
     <main className="nelvyon-home">
       <Hero />
       <IntegrationsHub />
-      <HomeTodoNecesitas />
-      <PlataformaOs />
-      <HomeSoluciones />
-      <ComoFunciona />
+      <QueEsNelvyon />
+      <ProductShowcase />
+      <HomeTrustStrip />
+      <HomePricingTeaser />
       <CasosDeUso />
       <CtaFinal
         title="Construye una operación digital con más control"
