@@ -35,7 +35,7 @@ export function Footer() {
       <div className="nelvyon-footer__inner">
         <div className="nelvyon-footer-grid">
           <div className="nelvyon-footer__brand">
-            <NelvyonLogo size={28} wordmarkClassName="nelvyon-footer__wordmark" />
+            <NelvyonLogo height={36} wordmarkClassName="nelvyon-footer__wordmark" />
             <p className="nelvyon-footer__tagline">
               Donde nace tu imperio, crece tu marca y se impone tu legado.
             </p>

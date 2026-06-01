@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const LOGO = "/logo.png";
+const LOGO = "/logo.png.png";
 
 type NvLogoProps = {
   size?: number;

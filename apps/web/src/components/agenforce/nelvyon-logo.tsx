@@ -1,10 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
-const LOGO_SRC = "/logo.png";
+import { LogoIcon } from "./logo";
+
+const LOGO_FULL = "/logo.png.png";
+const LOGO_FALLBACK = "/logo.svg";
 
 type NelvyonLogoProps = {
-  size?: number;
+  height?: number;
   showWordmark?: boolean;
   wordmarkClassName?: string;
   href?: string;
@@ -13,27 +19,33 @@ type NelvyonLogoProps = {
 };
 
 export function NelvyonLogo({
-  size = 32,
-  showWordmark = true,
+  height = 40,
+  showWordmark = false,
   wordmarkClassName = "",
   href = "/",
   priority = false,
   className = "",
 }: NelvyonLogoProps) {
-  const content = (
+  const [useFallback, setUseFallback] = useState(false);
+
+  const content = useFallback ? (
     <>
-      <Image
-        src={LOGO_SRC}
-        alt="NELVYON"
-        width={size}
-        height={size}
-        className="object-contain shrink-0"
-        priority={priority}
-      />
+      <LogoIcon className="nelvyon-logo__icon" style={{ height, width: "auto" }} />
       {showWordmark ? (
         <span className={`nelvyon-logo-wordmark ${wordmarkClassName}`.trim()}>NELVYON</span>
       ) : null}
     </>
+  ) : (
+    <Image
+      src={LOGO_FULL}
+      alt="NELVYON"
+      width={Math.round(height * 3.4)}
+      height={height}
+      className="nelvyon-logo__image"
+      style={{ height, width: "auto" }}
+      priority={priority}
+      onError={() => setUseFallback(true)}
+    />
   );
 
   const wrapClass = `nelvyon-logo ${className}`.trim();

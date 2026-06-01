@@ -1,9 +1,13 @@
 import type { TablerIcon } from "@tabler/icons-react";
 import {
   IconBrandGoogle,
+  IconChartBar,
+  IconMail,
   IconPalette,
+  IconShare2,
   IconShoppingCart,
   IconSpeakerphone,
+  IconUsers,
   IconWebhook,
   IconWorld,
 } from "@tabler/icons-react";
@@ -58,6 +62,34 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/servicios",
     Icon: IconWebhook,
     placeholderLabel: "Automatización",
+  },
+  {
+    title: "Email Marketing",
+    desc: "Secuencias, newsletters y nurturing con operación conectada al CRM.",
+    href: "/os/email-marketing-premium/preview",
+    Icon: IconMail,
+    placeholderLabel: "Email",
+  },
+  {
+    title: "Redes Sociales",
+    desc: "Contenido, calendario editorial y operación social centralizada.",
+    href: "/os/social-media-premium/preview",
+    Icon: IconShare2,
+    placeholderLabel: "Social",
+  },
+  {
+    title: "Analítica y Reporting",
+    desc: "Informes, paneles y seguimiento de actividad por canal y campaña.",
+    href: "/saas",
+    Icon: IconChartBar,
+    placeholderLabel: "Reporting",
+  },
+  {
+    title: "CRM / Operación comercial",
+    desc: "Pipeline, contactos, fases comerciales y seguimiento unificado.",
+    href: "/saas",
+    Icon: IconUsers,
+    placeholderLabel: "CRM",
   },
 ];
 

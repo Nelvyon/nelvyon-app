@@ -20,7 +20,7 @@ export function Navbar() {
   return (
     <header className="nelvyon-navbar">
       <div className="nelvyon-navbar__inner">
-        <NelvyonLogo size={32} priority wordmarkClassName="nelvyon-navbar__wordmark" />
+        <NelvyonLogo height={38} priority />
 
         <nav aria-label="Principal" className="nelvyon-nav-desktop">
           {navLinks.map((item) => (

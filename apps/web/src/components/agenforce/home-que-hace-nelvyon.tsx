@@ -12,19 +12,19 @@ export function HomeQueHaceNelvyon() {
         <header className="nelvyon-home-section__head nelvyon-home-section__head--center">
           <p className="mkt-eyebrow">Qué hace NELVYON</p>
           <h2 id="que-hace-nelvyon-title" className="mkt-h2 mkt-h2--display">
-            Ejecutamos con servicios. Centralizamos con SaaS.
+            A qué se dedica NELVYON
           </h2>
           <p className="mkt-lead nelvyon-home-section__lead">
-            Dos capas complementarias: entregables profesionales cuando hace falta ejecutar, plataforma propia cuando
-            hace falta operar con continuidad.
+            Ejecutamos marketing y operación digital con servicios profesionales. Cuando el volumen lo
+            requiere, centralizamos campañas, CRM y reporting en plataforma SaaS propia.
           </p>
         </header>
         <div className="nelvyon-que-hace__grid">
           <div className="nelvyon-que-hace__col">
             <p className="nelvyon-que-hace__label">Servicios profesionales</p>
             <p className="nelvyon-que-hace__intro">
-              Ejecutamos campañas, identidad, web, ecommerce y automatización con entregables definidos y seguimiento
-              operativo.
+              Ejecutamos captación, identidad, web, ecommerce, email, social, analítica y operación
+              comercial con entregables definidos y seguimiento operativo.
             </p>
             <ul className="nelvyon-que-hace__list">
               {HOME_SERVICES.map((service) => (
@@ -40,11 +40,11 @@ export function HomeQueHaceNelvyon() {
               Ver servicios →
             </Link>
           </div>
-          <div className="nelvyon-que-hace__col">
-            <p className="nelvyon-que-hace__label">Plataforma SaaS</p>
+          <div className="nelvyon-que-hace__col nelvyon-que-hace__col--saas">
+            <p className="nelvyon-que-hace__label">Plataforma SaaS · apoyo operativo</p>
             <p className="nelvyon-que-hace__intro">
-              Centralizamos campañas, CRM, automatizaciones y reporting en un entorno operativo conectado a la
-              operación diaria.
+              La plataforma no sustituye la ejecución: la sostiene. Centraliza campañas, CRM,
+              automatizaciones e integraciones cuando conviene operar con continuidad.
             </p>
             <ul className="nelvyon-que-hace__list">
               {SAAS_CAPABILITIES.map((cap) => (

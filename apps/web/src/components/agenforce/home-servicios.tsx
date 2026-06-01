@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { HOME_SERVICES } from "./home-services-config";
 import { NELVYON_BLUE } from "./marketing-brand";
-import { ServicePlaceholder } from "./service-placeholder";
 
 export function HomeServicios() {
   return (
@@ -11,16 +10,16 @@ export function HomeServicios() {
         <header className="nelvyon-home-section__head nelvyon-home-section__head--center">
           <p className="mkt-eyebrow">Servicios</p>
           <h2 id="home-servicios-title" className="mkt-h2 mkt-h2--display">
-            Ejecución profesional en seis áreas
+            Ejecución profesional en diez áreas
           </h2>
           <p className="mkt-lead nelvyon-home-section__lead">
-            Entregables definidos. Sin resultados garantizados ni promesas vacías.
+            Entregables definidos en captación, marca, web, ecommerce, operación comercial y reporting.
+            Sin resultados garantizados ni promesas vacías.
           </p>
         </header>
         <div className="nelvyon-home-servicios__grid">
           {HOME_SERVICES.map((item) => (
             <Link key={item.title} href={item.href} className="nelvyon-home-servicios__card">
-              <ServicePlaceholder label={item.placeholderLabel} />
               <div className="nelvyon-home-servicios__body">
                 <div className="nelvyon-home-servicios__icon" aria-hidden>
                   <item.Icon size={22} stroke={1.5} color={NELVYON_BLUE} />
