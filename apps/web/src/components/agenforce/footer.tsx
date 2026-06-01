@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { NelvyonLogo } from "./nelvyon-logo";
+import { NELVYON_SLOGAN } from "./marketing-brand";
 
 const FOOTER_COLUMNS = [
   {
@@ -31,18 +32,22 @@ const FOOTER_COLUMNS = [
 
 export function Footer() {
   return (
-    <footer className="nelvyon-footer">
+    <footer className="nelvyon-footer nelvyon-footer--launch">
+      <div className="nelvyon-footer__accent" aria-hidden />
       <div className="nelvyon-footer__inner">
         <div className="nelvyon-footer-grid">
           <div className="nelvyon-footer__brand">
-            <NelvyonLogo height={36} wordmarkClassName="nelvyon-footer__wordmark" />
-            <p className="nelvyon-footer__tagline">
-              Donde nace tu imperio, crece tu marca y se impone tu legado.
+            <NelvyonLogo height={44} />
+            <p className="nelvyon-footer__tagline">{NELVYON_SLOGAN}</p>
+            <p className="nelvyon-footer__meta">
+              Servicios profesionales y plataforma SaaS para marketing y operación digital.
             </p>
-            <p className="nelvyon-footer__meta">Plataforma operativa de marketing y automatización.</p>
+            <Link href="/contacto" className="nelvyon-footer__cta">
+              Solicitar información →
+            </Link>
           </div>
           {FOOTER_COLUMNS.map((col) => (
-            <div key={col.title}>
+            <div key={col.title} className="nelvyon-footer__col">
               <h4 className="nelvyon-footer__col-title">{col.title}</h4>
               <ul className="nelvyon-footer__links">
                 {col.links.map(([label, href]) => (

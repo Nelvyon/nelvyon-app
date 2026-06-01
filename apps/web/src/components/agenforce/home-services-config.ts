@@ -18,6 +18,7 @@ export type HomeService = {
   href: string;
   Icon: TablerIcon;
   placeholderLabel: string;
+  group: "captacion" | "marca" | "operacion";
 };
 
 export const HOME_SERVICES: HomeService[] = [
@@ -27,6 +28,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/seo",
     Icon: IconBrandGoogle,
     placeholderLabel: "SEO",
+    group: "captacion",
   },
   {
     title: "Ads",
@@ -34,6 +36,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/ads",
     Icon: IconSpeakerphone,
     placeholderLabel: "Ads",
+    group: "captacion",
   },
   {
     title: "Branding",
@@ -41,6 +44,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/branding",
     Icon: IconPalette,
     placeholderLabel: "Branding",
+    group: "marca",
   },
   {
     title: "Desarrollo Web",
@@ -48,6 +52,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/os/web-premium/preview",
     Icon: IconWorld,
     placeholderLabel: "Web",
+    group: "marca",
   },
   {
     title: "Ecommerce",
@@ -55,6 +60,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/os/ecommerce-premium/preview",
     Icon: IconShoppingCart,
     placeholderLabel: "Ecommerce",
+    group: "marca",
   },
   {
     title: "Automatización",
@@ -62,6 +68,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/servicios",
     Icon: IconWebhook,
     placeholderLabel: "Automatización",
+    group: "operacion",
   },
   {
     title: "Email Marketing",
@@ -69,6 +76,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/os/email-marketing-premium/preview",
     Icon: IconMail,
     placeholderLabel: "Email",
+    group: "captacion",
   },
   {
     title: "Redes Sociales",
@@ -76,6 +84,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/os/social-media-premium/preview",
     Icon: IconShare2,
     placeholderLabel: "Social",
+    group: "captacion",
   },
   {
     title: "Analítica y Reporting",
@@ -83,6 +92,7 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/saas",
     Icon: IconChartBar,
     placeholderLabel: "Reporting",
+    group: "operacion",
   },
   {
     title: "CRM / Operación comercial",
@@ -90,7 +100,14 @@ export const HOME_SERVICES: HomeService[] = [
     href: "/saas",
     Icon: IconUsers,
     placeholderLabel: "CRM",
+    group: "operacion",
   },
+];
+
+export const HOME_SERVICE_GROUPS = [
+  { id: "captacion" as const, title: "Captación y demanda", desc: "Atraer tráfico, leads y oportunidades con criterio operativo." },
+  { id: "marca" as const, title: "Marca y presencia", desc: "Construir confianza visual y digital antes de convertir." },
+  { id: "operacion" as const, title: "Operación comercial", desc: "Automatizar, medir y operar el negocio con continuidad." },
 ];
 
 export const SAAS_CAPABILITIES = [

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { NelvyonLogo } from "@/components/agenforce/nelvyon-logo";
-import { NELVYON_BLUE } from "@/components/agenforce/marketing-brand";
 
 const navLinks = [
   { title: "Inicio", href: "/" },
@@ -19,8 +18,11 @@ export function Navbar() {
 
   return (
     <header className="nelvyon-navbar">
+      <div className="nelvyon-navbar__accent" aria-hidden />
       <div className="nelvyon-navbar__inner">
-        <NelvyonLogo height={38} priority />
+        <div className="nelvyon-navbar__brand">
+          <NelvyonLogo height={42} priority />
+        </div>
 
         <nav aria-label="Principal" className="nelvyon-nav-desktop">
           {navLinks.map((item) => (
@@ -30,29 +32,35 @@ export function Navbar() {
           ))}
         </nav>
 
-        <Link href="/contacto" className="nelvyon-nav-cta nelvyon-btn-primary nelvyon-navbar__cta">
-          Solicitar información
-        </Link>
-
-        <button
-          type="button"
-          aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
-          aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((open) => !open)}
-          className="nelvyon-nav-mobile-toggle"
-        >
-          {mobileOpen ? "✕" : "☰"}
-        </button>
+        <div className="nelvyon-navbar__actions">
+          <Link href="/contacto" className="nelvyon-nav-cta nelvyon-btn-primary nelvyon-navbar__cta">
+            Solicitar información
+          </Link>
+          <button
+            type="button"
+            aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((open) => !open)}
+            className="nelvyon-nav-mobile-toggle"
+          >
+            {mobileOpen ? "✕" : "☰"}
+          </button>
+        </div>
       </div>
 
       {mobileOpen ? (
         <nav aria-label="Principal móvil" className="nelvyon-nav-mobile-panel">
           {navLinks.map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className="nelvyon-nav-mobile-panel__link">
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setMobileOpen(false)}
+              className="nelvyon-nav-mobile-panel__link"
+            >
               {item.title}
             </Link>
           ))}
-          <Link href="/contacto" onClick={() => setMobileOpen(false)} className="nelvyon-nav-mobile-panel__cta" style={{ backgroundColor: NELVYON_BLUE }}>
+          <Link href="/contacto" onClick={() => setMobileOpen(false)} className="nelvyon-nav-mobile-panel__cta">
             Solicitar información
           </Link>
         </nav>

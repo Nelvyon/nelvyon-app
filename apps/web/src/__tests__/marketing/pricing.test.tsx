@@ -55,8 +55,9 @@ describe("marketing pricing and landing", () => {
   it("Página / (home) renderiza headline correctamente", { timeout: 15000 }, () => {
     renderWithProviders(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.textContent).toMatch(/Donde nace tu imperio/i);
-    expect(h1.textContent).toMatch(/tu legado/i);
+    expect(h1.textContent).toMatch(/operación digital/i);
+    expect(h1.textContent).toMatch(/ejecutar con orden/i);
+    expect(screen.getByText(/Donde nace tu imperio/i)).toBeInTheDocument();
   });
 
   it("Home muestra pricing dual SaaS y servicios", () => {
