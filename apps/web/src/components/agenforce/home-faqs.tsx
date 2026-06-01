@@ -94,7 +94,7 @@ export function HomeFaqs() {
   }, []);
 
   return (
-    <section className="nelvyon-home-section nelvyon-section--white nelvyon-home-faqs" aria-labelledby="home-faqs-title">
+    <section className="nelvyon-home-section nelvyon-section--dark nelvyon-home-faqs" aria-labelledby="home-faqs-title">
       <div className="nelvyon-section-inner nelvyon-home-faqs__inner">
         <header className="nelvyon-home-section__head nelvyon-home-section__head--center">
           <p className="mkt-eyebrow">Preguntas frecuentes</p>

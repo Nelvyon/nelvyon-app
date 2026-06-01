@@ -1,34 +1,29 @@
 # Biblioteca premium NELVYON
 
-Componentes adaptados (estilo Aceternity / enterprise) para NELVYON y webs de clientes.
+Estilo FTMO / GoHighLevel. Paleta: `#020817`, `#0084FF`, `#0047AB`, blanco.
 
-## Aprobados
+## Aprobados (Aceternity adaptados)
 
-| Componente | Archivo | Uso previsto |
-|------------|---------|--------------|
-| Logo Cloud Marquee | `logo-cloud-marquee.tsx` | Home, integraciones, clientes SaaS |
-| Macbook Scroll | `macbook-scroll.tsx` | `/saas` — capturas reales del producto |
+| Componente | Archivo | Uso |
+|------------|---------|-----|
+| Spotlight New | `spotlight-new.tsx` | Hero, fondos premium, glow azul |
+| Lamp Effect | `lamp-effect.tsx` | CTA final o cabecera `/saas` (sin abusar) |
+| Glowing Effect | `glowing-effect.tsx` | Cards premium servicios / SaaS / rutas |
+| World Map | `world-map.tsx` | Conexión operativa (sin claims globales) |
+| Logo Cloud Marquee | `logo-cloud-marquee.tsx` | Integraciones |
+| Macbook Scroll | `macbook-scroll.tsx` | `/saas` con captura real |
 | Bento Grid | `bento-grid.tsx` | `/saas`, `/servicios`, sectores |
-| Card Hover Effect | `card-hover-effect.tsx` | Servicios, SaaS, sectores |
+| Card Hover Effect | `card-hover-effect.tsx` | Servicios, sectores, clientes |
 
 ## No aprobados
 
-Text Hover Effect, Orbit, Meteors, Sparkles, Lamp, Floating Logos, Vortex, Background Beams excesivos, efectos demo.
+Text Hover Effect, Text Animations, Meteors, Sparkles, Orbit, Vortex, efectos excesivos.
 
 ## Reglas
 
-- Sin textos demo, logos de clientes falsos, testimonios ni métricas inventadas.
-- Sin imágenes IA ni dashboards ficticios.
-- Paleta: `#020817`, `#0084FF`, blanco.
+- Sin textos demo, clientes falsos, testimonios, métricas ni dashboards inventados.
+- Home: marca + para quién + problema → `/saas` y `/servicios`.
 
-## Ejemplo
+## Integración Aceternity
 
-```tsx
-import { LogoCloudMarquee, NELVYON_INTEGRATION_LOGOS } from "@/components/premium";
-
-<LogoCloudMarquee
-  title="Conecta tus herramientas en un solo sistema"
-  subtitle="..."
-  logos={NELVYON_INTEGRATION_LOGOS}
-/>
-```
+`spotlight-new`, `lamp-effect`, `glowing-effect` y `world-map` envuelven los componentes en `components/ui/` con la paleta NELVYON.

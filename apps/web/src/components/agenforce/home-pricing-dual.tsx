@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function HomePricingDual() {
   return (
-    <section className="nelvyon-home-pricing-dual" aria-labelledby="home-pricing-title">
+    <section className="nelvyon-home-section nelvyon-section--dark nelvyon-home-pricing-dual" aria-labelledby="home-pricing-title">
       <div className="nelvyon-section-inner">
         <header className="nelvyon-home-section__head nelvyon-home-section__head--center">
           <p className="mkt-eyebrow">Precios</p>

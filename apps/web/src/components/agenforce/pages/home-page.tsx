@@ -1,5 +1,8 @@
+import { LampEffect } from "@/components/premium/lamp-effect";
+
 import { CtaFinal } from "../cta-final";
 import { Hero } from "../hero";
+import { HomeConnectedOperation } from "../home-connected-operation";
 import { HomeFaqs } from "../home-faqs";
 import { HomeIntegrationsMarquee } from "../home-integrations-marquee";
 import { HomeMetodologia } from "../home-metodologia";
@@ -17,17 +20,20 @@ export function AgenforceHomePage() {
       <HomeParaQuien />
       <HomeProblemasResuelve />
       <HomeOfferSplit />
+      <HomeConnectedOperation />
       <HomeMetodologia />
       <HomeTrustStrip />
       <HomePricingDual />
       <HomeFaqs />
-      <CtaFinal
-        title="¿Hablamos de tu operación?"
-        subtitle="Servicios profesionales y plataforma SaaS. Sin promesas vacías."
-        primaryLabel="Solicitar información"
-        secondaryLabel="Ver servicios"
-        secondaryHref="/servicios"
-      />
+      <LampEffect>
+        <CtaFinal
+          title="¿Hablamos de tu operación?"
+          subtitle="Servicios profesionales y plataforma SaaS. Sin promesas vacías."
+          primaryLabel="Solicitar información"
+          secondaryLabel="Ver servicios"
+          secondaryHref="/servicios"
+        />
+      </LampEffect>
     </main>
   );
 }

@@ -92,6 +92,11 @@ describe("marketing pricing and landing", () => {
     expect(screen.getByRole("link", { name: /Ver plataforma SaaS/i })).toHaveAttribute("href", "/saas");
   });
 
+  it("Home muestra sección de operación conectada", () => {
+    renderWithProviders(<HomePage />);
+    expect(screen.getByRole("heading", { name: /Operación digital conectada/i })).toBeInTheDocument();
+  });
+
   it("Página /partners renderiza calculadora", () => {
     renderWithProviders(<PartnersPage />);
     expect(screen.getByText("Calculadora simple")).toBeInTheDocument();

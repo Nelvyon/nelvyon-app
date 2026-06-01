@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { IconArrowRight, IconCloud, IconTools } from "@tabler/icons-react";
 
+import { GlowingEffect } from "@/components/premium/glowing-effect";
+
 const OFFERS = [
   {
     id: "servicios",
@@ -37,18 +39,20 @@ export function HomeOfferSplit() {
         </header>
         <div className="nelvyon-home-offer__grid">
           {OFFERS.map((offer) => (
-            <Link key={offer.id} href={offer.href} className="nelvyon-home-offer__card">
-              <div className="nelvyon-home-offer__icon" aria-hidden>
-                <offer.Icon size={28} stroke={1.5} />
-              </div>
-              <p className="nelvyon-home-offer__card-eyebrow">{offer.eyebrow}</p>
-              <h3 className="nelvyon-home-offer__card-title">{offer.title}</h3>
-              <p className="nelvyon-home-offer__card-desc">{offer.desc}</p>
-              <span className="nelvyon-home-offer__card-cta">
-                {offer.cta}
-                <IconArrowRight size={18} stroke={2} aria-hidden />
-              </span>
-            </Link>
+            <GlowingEffect key={offer.id} className="nelvyon-home-offer__glow-wrap">
+              <Link href={offer.href} className="nelvyon-home-offer__card nelvyon-home-offer__card--glow">
+                <div className="nelvyon-home-offer__icon" aria-hidden>
+                  <offer.Icon size={28} stroke={1.5} />
+                </div>
+                <p className="nelvyon-home-offer__card-eyebrow">{offer.eyebrow}</p>
+                <h3 className="nelvyon-home-offer__card-title">{offer.title}</h3>
+                <p className="nelvyon-home-offer__card-desc">{offer.desc}</p>
+                <span className="nelvyon-home-offer__card-cta">
+                  {offer.cta}
+                  <IconArrowRight size={18} stroke={2} aria-hidden />
+                </span>
+              </Link>
+            </GlowingEffect>
           ))}
         </div>
       </div>
