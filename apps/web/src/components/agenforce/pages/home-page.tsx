@@ -2,36 +2,29 @@ import { LampEffect } from "@/components/premium/lamp-effect";
 
 import { CtaFinal } from "../cta-final";
 import { Hero } from "../hero";
-import { HomeConnectedOperation } from "../home-connected-operation";
-import { HomeFaqs } from "../home-faqs";
+import { HOME_COPY } from "../home-copy";
 import { HomeIntegrationsMarquee } from "../home-integrations-marquee";
-import { HomeMetodologia } from "../home-metodologia";
-import { HomeOfferSplit } from "../home-offer-split";
-import { HomeParaQuien } from "../home-para-quien";
-import { HomePricingDual } from "../home-pricing-dual";
-import { HomeProblemasResuelve } from "../home-problemas-resuelve";
-import { HomeTrustStrip } from "../home-trust-strip";
+import { HomeMisionVision } from "../home-mision-vision";
+import { HomeQueEs } from "../home-que-es";
+import { HomeSaasTeaser } from "../home-saas-teaser";
+import { HomeServicios } from "../home-servicios";
+import { HomeWorldMap } from "../home-world-map";
 
 export function AgenforceHomePage() {
   return (
-    <main className="nelvyon-home nelvyon-home--v5 nelvyon-home--launch nelvyon-home--enterprise">
+    <main className="nelvyon-home nelvyon-home--definitive">
       <Hero />
+      <HomeQueEs />
+      <HomeMisionVision />
+      <HomeWorldMap />
+      <HomeServicios />
+      <HomeSaasTeaser />
       <HomeIntegrationsMarquee />
-      <HomeParaQuien />
-      <HomeProblemasResuelve />
-      <HomeOfferSplit />
-      <HomeConnectedOperation />
-      <HomeMetodologia />
-      <HomeTrustStrip />
-      <HomePricingDual />
-      <HomeFaqs />
       <LampEffect>
         <CtaFinal
-          title="¿Hablamos de tu operación?"
-          subtitle="Servicios profesionales y plataforma SaaS. Sin promesas vacías."
-          primaryLabel="Solicitar información"
-          secondaryLabel="Ver servicios"
-          secondaryHref="/servicios"
+          title={HOME_COPY.ctaFinal.title}
+          primaryLabel={HOME_COPY.ctaFinal.cta}
+          showSecondary={false}
         />
       </LampEffect>
     </main>

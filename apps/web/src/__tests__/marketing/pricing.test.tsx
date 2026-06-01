@@ -55,16 +55,18 @@ describe("marketing pricing and landing", () => {
   it("Página / (home) renderiza headline correctamente", { timeout: 15000 }, () => {
     renderWithProviders(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1.textContent).toMatch(/operación digital/i);
-    expect(h1.textContent).toMatch(/ejecutar con orden/i);
-    expect(screen.getByText(/Donde nace tu imperio/i)).toBeInTheDocument();
-    expect(screen.getByText(/Servicios profesionales y plataforma SaaS para operar/i)).toBeInTheDocument();
+    expect(h1.textContent).toMatch(/Donde nace tu imperio/i);
+    expect(
+      screen.getByText(
+        /NELVYON combina estrategia, marketing, automatización y tecnología/i,
+      ),
+    ).toBeInTheDocument();
   });
 
-  it("Home muestra pricing dual SaaS y servicios", () => {
+  it("Home no muestra pricing ni FAQs de plantilla", () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByText(/Desde €47\/mes/i)).toBeInTheDocument();
-    expect(screen.getByText(/A medida/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Desde €47\/mes/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/A medida/i)).not.toBeInTheDocument();
   });
 
   it("Home tiene CTA principal a contacto", () => {
@@ -82,19 +84,21 @@ describe("marketing pricing and landing", () => {
 
   it("Home muestra marquee de integraciones", () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByRole("heading", { name: /Conecta tus herramientas en un solo sistema/i })).toBeInTheDocument();
+    expect(screen.getByText(/Integraciones/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Google Calendar/i).length).toBeGreaterThan(0);
   });
 
-  it("Home dirige a SaaS y servicios sin listar todo el catálogo", () => {
+  it("Home dirige a SaaS con teaser", () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByRole("heading", { name: /El detalle está en cada área/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Ver plataforma SaaS/i })).toHaveAttribute("href", "/saas");
+    expect(
+      screen.getByRole("heading", { name: /Una plataforma para centralizar tu operación/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Descubrir la plataforma/i })).toHaveAttribute("href", "/saas");
   });
 
-  it("Home muestra sección de operación conectada", () => {
+  it("Home muestra operación conectada en world map", () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByRole("heading", { name: /Operación digital conectada/i })).toBeInTheDocument();
+    expect(screen.getByText(/Operación conectada\. Un ecosistema, una ejecución/i)).toBeInTheDocument();
   });
 
   it("Página /partners renderiza calculadora", () => {

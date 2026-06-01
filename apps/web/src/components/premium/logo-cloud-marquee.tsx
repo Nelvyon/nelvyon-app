@@ -5,12 +5,14 @@ import { cn } from "@/lib/utils";
 import type { IntegrationLogo } from "./integration-logos";
 
 export type LogoCloudMarqueeProps = {
-  title: string;
+  title?: string;
   subtitle?: string;
   logos: readonly IntegrationLogo[];
   className?: string;
   /** Duración de un ciclo completo en segundos (más alto = más lento). */
   durationSeconds?: number;
+  /** Si false, solo se muestra el eyebrow (p. ej. Home integraciones). */
+  showTitle?: boolean;
 };
 
 function LogoTile({ logo }: { logo: IntegrationLogo }) {
@@ -40,20 +42,26 @@ export function LogoCloudMarquee({
   logos,
   className,
   durationSeconds = 55,
+  showTitle = true,
 }: LogoCloudMarqueeProps) {
   const track = [...logos, ...logos];
+  const headingId = "nelvyon-logo-marquee-title";
 
   return (
     <section
       className={cn("nelvyon-logo-marquee", className)}
-      aria-labelledby="nelvyon-logo-marquee-title"
+      aria-labelledby={showTitle && title ? headingId : "nelvyon-logo-marquee-eyebrow"}
     >
       <div className="nelvyon-logo-marquee__inner">
         <header className="nelvyon-logo-marquee__head">
-          <p className="mkt-eyebrow nelvyon-logo-marquee__eyebrow">Integraciones</p>
-          <h2 id="nelvyon-logo-marquee-title" className="nelvyon-logo-marquee__title">
-            {title}
-          </h2>
+          <p id="nelvyon-logo-marquee-eyebrow" className="mkt-eyebrow nelvyon-logo-marquee__eyebrow">
+            Integraciones
+          </p>
+          {showTitle && title ? (
+            <h2 id={headingId} className="nelvyon-logo-marquee__title">
+              {title}
+            </h2>
+          ) : null}
           {subtitle ? <p className="nelvyon-logo-marquee__subtitle">{subtitle}</p> : null}
         </header>
 

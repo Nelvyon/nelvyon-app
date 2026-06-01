@@ -50,7 +50,7 @@ export function WorldMap({
             {subtitle ? <p className="nelvyon-world-map__subtitle">{subtitle}</p> : null}
           </header>
         ) : null}
-        <div className="nelvyon-world-map__canvas">
+        <div className={cn("nelvyon-world-map__canvas", !title && "nelvyon-world-map__canvas--bare")}>
           <WorldMapCanvas dots={dots} />
         </div>
         {children}

@@ -23,7 +23,7 @@ export function CtaFinal({
     <section className="nelvyon-cta-final nelvyon-cta-final--v4">
       <div className="nelvyon-cta-final__inner">
         <h2 className="mkt-h2 mkt-h2--light nelvyon-cta-final__title">{title}</h2>
-        <p className="mkt-lead--light nelvyon-cta-final__subtitle">{subtitle}</p>
+        {subtitle ? <p className="mkt-lead--light nelvyon-cta-final__subtitle">{subtitle}</p> : null}
         <div className="nelvyon-cta-final__actions">
           <a href={primaryHref} className="mkt-btn nelvyon-btn-primary">
             {primaryLabel}
