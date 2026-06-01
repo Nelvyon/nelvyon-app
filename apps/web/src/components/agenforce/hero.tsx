@@ -1,8 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "./container";
-import { HeroLaptopVisual } from "./hero-laptop-visual";
 import { NELVYON_SLOGAN } from "./marketing-brand";
+
+const HERO_VISUAL_SRC = "/images/nelvyon-hero-visual.png";
 
 const HERO_FACTS = [
   "Servicios + plataforma",
@@ -40,7 +42,17 @@ export const Hero = () => {
           </div>
         </div>
         <div className="nelvyon-hero-v5__visual">
-          <HeroLaptopVisual />
+          <div className="nelvyon-hero-v5__visual-glow" aria-hidden />
+          <div className="nelvyon-hero-v5__visual-glow nelvyon-hero-v5__visual-glow--ring" aria-hidden />
+          <Image
+            src={HERO_VISUAL_SRC}
+            alt="Composición visual de la plataforma y operación digital NELVYON"
+            width={1400}
+            height={1050}
+            priority
+            className="nelvyon-hero-v5__visual-img"
+            sizes="(max-width: 899px) 92vw, min(58vw, 720px)"
+          />
         </div>
       </Container>
 
