@@ -86,6 +86,12 @@ describe("marketing pricing and landing", () => {
     expect(screen.getAllByText(/Google Calendar/i).length).toBeGreaterThan(0);
   });
 
+  it("Home dirige a SaaS y servicios sin listar todo el catálogo", () => {
+    renderWithProviders(<HomePage />);
+    expect(screen.getByRole("heading", { name: /El detalle está en cada área/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Ver plataforma SaaS/i })).toHaveAttribute("href", "/saas");
+  });
+
   it("Página /partners renderiza calculadora", () => {
     renderWithProviders(<PartnersPage />);
     expect(screen.getByText("Calculadora simple")).toBeInTheDocument();

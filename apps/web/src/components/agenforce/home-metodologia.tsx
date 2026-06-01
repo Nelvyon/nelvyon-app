@@ -7,7 +7,7 @@ const STEPS = [
 
 export function HomeMetodologia() {
   return (
-    <section className="nelvyon-home-section nelvyon-section--alt nelvyon-home-metodologia" aria-labelledby="metodologia-title">
+    <section className="nelvyon-home-section nelvyon-section--white nelvyon-home-metodologia" aria-labelledby="metodologia-title">
       <div className="nelvyon-section-inner">
         <header className="nelvyon-home-section__head nelvyon-home-section__head--center">
           <p className="mkt-eyebrow">Cómo trabajamos</p>

@@ -20,7 +20,7 @@ const PROBLEMAS = [
 export function HomeProblemasResuelve() {
   return (
     <section
-      className="nelvyon-home-section nelvyon-section--alt nelvyon-problemas"
+      className="nelvyon-home-section nelvyon-section--dark nelvyon-problemas"
       aria-labelledby="problemas-title"
     >
       <div className="nelvyon-section-inner">

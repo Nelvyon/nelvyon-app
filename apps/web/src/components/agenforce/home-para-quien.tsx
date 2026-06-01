@@ -22,7 +22,7 @@ const PERFILES: Perfil[] = [
 
 export function HomeParaQuien() {
   return (
-    <section className="nelvyon-home-section nelvyon-section--alt nelvyon-para-quien" aria-labelledby="para-quien-title">
+    <section className="nelvyon-home-section nelvyon-section--dark nelvyon-para-quien" aria-labelledby="para-quien-title">
       <div className="nelvyon-section-inner">
         <header className="nelvyon-home-section__head nelvyon-home-section__head--center">
           <p className="mkt-eyebrow">Para quién</p>
