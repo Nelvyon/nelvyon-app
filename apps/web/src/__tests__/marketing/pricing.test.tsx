@@ -84,7 +84,7 @@ describe("marketing pricing and landing", () => {
 
   it("Home muestra marquee de integraciones", () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByText(/Integraciones/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Integraciones$/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Google Calendar/i).length).toBeGreaterThan(0);
   });
 
@@ -96,9 +96,19 @@ describe("marketing pricing and landing", () => {
     expect(screen.getByRole("link", { name: /Descubrir la plataforma/i })).toHaveAttribute("href", "/saas");
   });
 
-  it("Home muestra operación conectada en world map", () => {
+  it("Home muestra operación conectada y bloques editoriales", () => {
     renderWithProviders(<HomePage />);
     expect(screen.getByText(/Operación conectada\. Un ecosistema, una ejecución/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /Estrategia, ejecución y tecnología en un solo partner/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Equipos que necesitan orden/i })).toBeInTheDocument();
+  });
+
+  it("Home hero destaca palabras en azul", () => {
+    renderWithProviders(<HomePage />);
+    const accents = document.querySelectorAll(".nelvyon-hero-def__accent");
+    expect(accents.length).toBeGreaterThanOrEqual(3);
   });
 
   it("Página /partners renderiza calculadora", () => {

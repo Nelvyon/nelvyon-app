@@ -9,7 +9,18 @@ import { HOME_COPY } from "./home-copy";
 const HERO_VISUAL_SRC = "/images/nelvyon-hero-visual.png";
 
 export const Hero = () => {
-  const { title, subtitle, ctaPrimary, ctaSecondary } = HOME_COPY.hero;
+  const {
+    titleBefore,
+    titleAccent1,
+    titleMid,
+    titleAccent2,
+    titleMid2,
+    titleAccent3,
+    titleEnd,
+    subtitle,
+    ctaPrimary,
+    ctaSecondary,
+  } = HOME_COPY.hero;
 
   return (
     <section className="nelvyon-hero-def" aria-labelledby="home-hero-title">
@@ -18,7 +29,13 @@ export const Hero = () => {
           <div className="nelvyon-hero-def__grid">
             <div className="nelvyon-hero-def__copy">
               <h1 id="home-hero-title" className="nelvyon-hero-def__title">
-                {title}
+                {titleBefore}
+                <span className="nelvyon-hero-def__accent">{titleAccent1}</span>
+                {titleMid}
+                <span className="nelvyon-hero-def__accent">{titleAccent2}</span>
+                {titleMid2}
+                <span className="nelvyon-hero-def__accent">{titleAccent3}</span>
+                {titleEnd}
               </h1>
               <p className="nelvyon-hero-def__subtitle">{subtitle}</p>
               <div className="nelvyon-hero-def__ctas">

@@ -50,7 +50,8 @@ export function LogoCloudMarquee({
   return (
     <section
       className={cn("nelvyon-logo-marquee", className)}
-      aria-labelledby={showTitle && title ? headingId : "nelvyon-logo-marquee-eyebrow"}
+      aria-label="Integraciones"
+      aria-labelledby={showTitle && title ? headingId : undefined}
     >
       <div className="nelvyon-logo-marquee__inner">
         <header className="nelvyon-logo-marquee__head">
