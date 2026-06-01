@@ -5,7 +5,10 @@ export function HomeQueHace() {
   const { eyebrow, title, body, body2 } = HOME_COPY.queHace;
 
   return (
-    <section className="nelvyon-home-block nelvyon-home-story" aria-labelledby="home-que-hace-title">
+    <section
+      className="nelvyon-home-block nelvyon-home-block--compact nelvyon-home-story"
+      aria-labelledby="home-que-hace-title"
+    >
       <Container>
         <article className="nelvyon-home-story__article nelvyon-home-story__article--wide">
           <p className="nelvyon-home-story__eyebrow">{eyebrow}</p>
@@ -24,7 +27,10 @@ export function HomeParaQuien() {
   const { eyebrow, title, intro, audiences } = HOME_COPY.paraQuien;
 
   return (
-    <section className="nelvyon-home-block nelvyon-home-story" aria-labelledby="home-para-quien-title">
+    <section
+      className="nelvyon-home-block nelvyon-home-block--alt nelvyon-home-story"
+      aria-labelledby="home-para-quien-title"
+    >
       <Container>
         <article className="nelvyon-home-story__article">
           <p className="nelvyon-home-story__eyebrow">{eyebrow}</p>
@@ -50,7 +56,10 @@ export function HomeComoTrabaja() {
   const { eyebrow, title, steps } = HOME_COPY.comoTrabaja;
 
   return (
-    <section className="nelvyon-home-block nelvyon-home-story" aria-labelledby="home-como-trabaja-title">
+    <section
+      className="nelvyon-home-block nelvyon-home-block--compact nelvyon-home-story"
+      aria-labelledby="home-como-trabaja-title"
+    >
       <Container>
         <article className="nelvyon-home-story__article nelvyon-home-story__article--wide">
           <p className="nelvyon-home-story__eyebrow">{eyebrow}</p>
@@ -80,7 +89,10 @@ export function HomePorQue() {
   const { eyebrow, title, paragraphs } = HOME_COPY.porQue;
 
   return (
-    <section className="nelvyon-home-block nelvyon-home-story" aria-labelledby="home-por-que-title">
+    <section
+      className="nelvyon-home-block nelvyon-home-block--grand nelvyon-home-story"
+      aria-labelledby="home-por-que-title"
+    >
       <Container>
         <article className="nelvyon-home-story__article nelvyon-home-story__article--wide">
           <p className="nelvyon-home-story__eyebrow">{eyebrow}</p>

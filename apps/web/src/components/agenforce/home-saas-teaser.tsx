@@ -7,7 +7,10 @@ export function HomeSaasTeaser() {
   const { title, body, cta } = HOME_COPY.saas;
 
   return (
-    <section className="nelvyon-home-block nelvyon-home-saas" aria-labelledby="home-saas-title">
+    <section
+      className="nelvyon-home-block nelvyon-home-block--compact nelvyon-home-block--alt nelvyon-home-saas"
+      aria-labelledby="home-saas-title"
+    >
       <Container>
         <div className="nelvyon-home-saas__inner">
           <h2 id="home-saas-title" className="nelvyon-home-saas__title">

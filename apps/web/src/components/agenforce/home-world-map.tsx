@@ -22,7 +22,11 @@ export function HomeWorldMap() {
   const { title, subtitle } = HOME_COPY.worldMap;
 
   return (
-    <section className="nelvyon-home-block nelvyon-home-world nelvyon-home-world--v3" aria-labelledby="home-world-map-title">
+    <section
+      className="nelvyon-home-block nelvyon-home-block--scene nelvyon-home-world nelvyon-home-world--v3"
+      aria-labelledby="home-world-map-title"
+    >
+      <div className="nelvyon-home-world__scene-bg" aria-hidden />
       <Container className="nelvyon-home-world__container">
         <header className="nelvyon-home-world__head">
           <h2 id="home-world-map-title" className="nelvyon-home-world__title">
@@ -30,8 +34,11 @@ export function HomeWorldMap() {
           </h2>
           <p className="nelvyon-home-world__subtitle">{subtitle}</p>
         </header>
-        <div className="nelvyon-home-world__canvas-wrap">
-          <WorldMapCanvas dots={OPERATION_DOTS} className="nelvyon-home-world__map" />
+        <div className="nelvyon-home-world__scene">
+          <div className="nelvyon-home-world__scene-glow" aria-hidden />
+          <div className="nelvyon-home-world__canvas-wrap">
+            <WorldMapCanvas dots={OPERATION_DOTS} className="nelvyon-home-world__map" />
+          </div>
         </div>
       </Container>
     </section>

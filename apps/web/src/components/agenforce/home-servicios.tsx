@@ -5,7 +5,10 @@ import { HOME_COPY } from "./home-copy";
 
 export function HomeServicios() {
   return (
-    <section className="nelvyon-home-block nelvyon-home-servicios nelvyon-home-servicios--v3" aria-label="Servicios">
+    <section
+      className="nelvyon-home-block nelvyon-home-block--grand nelvyon-home-servicios nelvyon-home-servicios--v3"
+      aria-label="Servicios"
+    >
       <Container>
         <ul className="nelvyon-home-servicios__grid">
           {HOME_COPY.servicios.items.map((item) => (

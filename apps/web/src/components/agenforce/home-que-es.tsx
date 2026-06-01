@@ -6,7 +6,7 @@ export function HomeQueEs() {
 
   return (
     <section
-      className="nelvyon-home-block nelvyon-home-block--manifesto nelvyon-home-que-es"
+      className="nelvyon-home-block nelvyon-home-block--grand nelvyon-home-block--manifesto nelvyon-home-que-es"
       aria-labelledby="home-que-es-title"
     >
       <Container>

@@ -8,10 +8,12 @@ import { cn } from "@/lib/utils";
 type SpotlightProps = {
   className?: string;
   fill?: string;
+  /** Menos saturación — Hero negro premium */
+  subtle?: boolean;
 };
 
 /** Spotlight New (Aceternity) — atmósfera + seguimiento suave del cursor. */
-export function Spotlight({ className, fill = "#0084FF" }: SpotlightProps) {
+export function Spotlight({ className, fill = "#0084FF", subtle = false }: SpotlightProps) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -25,7 +27,7 @@ export function Spotlight({ className, fill = "#0084FF" }: SpotlightProps) {
     return () => window.removeEventListener("mousemove", onMove);
   }, [mouseX, mouseY]);
 
-  const cursorGlow = useMotionTemplate`radial-gradient(720px circle at ${mouseX}px ${mouseY}px, rgba(0, 132, 255, 0.14), transparent 72%)`;
+  const cursorGlow = useMotionTemplate`radial-gradient(720px circle at ${mouseX}px ${mouseY}px, rgba(0, 71, 171, ${subtle ? 0.06 : 0.14}), transparent 72%)`;
 
   return (
     <>
@@ -51,8 +53,8 @@ export function Spotlight({ className, fill = "#0084FF" }: SpotlightProps) {
             rx="1924.71"
             ry="273.501"
             transform="matrix(-0.822377 -0.568943 -0.568943 0.822377 3631.88 2291.09)"
-            fill={fill}
-            fillOpacity="0.18"
+            fill={subtle ? "#0047AB" : fill}
+            fillOpacity={subtle ? "0.08" : "0.18"}
           />
         </g>
         <defs>

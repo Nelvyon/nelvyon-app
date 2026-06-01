@@ -108,7 +108,7 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
       >
         <defs>
           <radialGradient id="nelvyon_map_glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#0084FF" stopOpacity="0.35" />
+            <stop offset="0%" stopColor="#0084FF" stopOpacity="0.2" />
             <stop offset="100%" stopColor="#0084FF" stopOpacity="0" />
           </radialGradient>
         </defs>
@@ -120,7 +120,7 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
             cy={point.y}
             r={1.2}
             fill="#0084FF"
-            opacity={0.22}
+            opacity={0.14}
           />
         ))}
 
@@ -131,9 +131,9 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
               fill="none"
               stroke="#0047AB"
               strokeWidth={1}
-              strokeOpacity={0.35}
+              strokeOpacity={0.25}
               initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 0.5 }}
+              whileInView={{ pathLength: 1, opacity: 0.35 }}
               viewport={{ once: true }}
               transition={{ duration: 1.4, delay: index * 0.15, ease: "easeInOut" }}
             />
@@ -143,7 +143,7 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
               stroke="#0084FF"
               strokeWidth={1.5}
               initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 0.85 }}
+              whileInView={{ pathLength: 1, opacity: 0.65 }}
               viewport={{ once: true }}
               transition={{ duration: 1.6, delay: index * 0.15 + 0.1, ease: "easeInOut" }}
             />

@@ -28,7 +28,7 @@ export function AgenforceHomePage() {
       <HomeServicios />
       <HomeSaasTeaser />
       <HomeIntegrationsMarquee />
-      <LampEffect>
+      <LampEffect className="nelvyon-home-cta-scene">
         <CtaFinal
           title={HOME_COPY.ctaFinal.title}
           primaryLabel={HOME_COPY.ctaFinal.cta}

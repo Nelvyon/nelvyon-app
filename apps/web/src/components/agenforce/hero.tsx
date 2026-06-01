@@ -21,10 +21,12 @@ export const Hero = () => {
 
   return (
     <section className="nelvyon-hero-v3" aria-labelledby="home-hero-title">
-      <SpotlightNew className="nelvyon-hero-v3__spotlight">
+      <SpotlightNew className="nelvyon-hero-v3__spotlight" subtle>
         <div className="nelvyon-hero-v3__atmosphere" aria-hidden>
+          <div className="nelvyon-hero-v3__vignette" />
           <div className="nelvyon-hero-v3__glow nelvyon-hero-v3__glow--primary" />
           <div className="nelvyon-hero-v3__glow nelvyon-hero-v3__glow--secondary" />
+          <div className="nelvyon-hero-v3__horizon" />
         </div>
         <Container className="nelvyon-hero-v3__container">
           <div className="nelvyon-hero-v3__copy">
