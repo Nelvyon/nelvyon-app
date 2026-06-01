@@ -1,4 +1,4 @@
-/** Textos Home NELVYON */
+/** Textos Home NELVYON v3 */
 export const HOME_COPY = {
   hero: {
     titleBefore: "Donde nace tu ",
@@ -14,6 +14,7 @@ export const HOME_COPY = {
     ctaSecondary: "Explorar servicios",
   },
   queEs: {
+    eyebrow: "Qué es NELVYON",
     title: "Marketing, tecnología y operación en un mismo ecosistema.",
     body: "NELVYON ayuda a empresas a atraer clientes, optimizar procesos y construir sistemas escalables mediante servicios profesionales y tecnología propia.",
   },
@@ -22,7 +23,7 @@ export const HOME_COPY = {
     title: "Estrategia, ejecución y tecnología en un solo partner.",
     body: "Diseñamos y operamos el sistema completo: captación, conversión, automatización y reporting. No entregamos piezas sueltas — construimos continuidad entre marketing, ventas y operación para que tu equipo ejecute con criterio y sin fricción entre herramientas.",
     body2:
-      "Combinamos servicios profesionales (SEO, publicidad, branding, web, ecommerce, automatización) con plataforma SaaS cuando el volumen y la complejidad lo exigen. El objetivo es simple: menos dispersión, más control y ejecución sostenida.",
+      "Combinamos servicios profesionales con plataforma SaaS cuando el volumen y la complejidad lo exigen. Menos dispersión, más control y ejecución sostenida.",
   },
   paraQuien: {
     eyebrow: "Para quién es",
@@ -36,36 +37,16 @@ export const HOME_COPY = {
       },
       {
         label: "Marcas con operación activa",
-        text: "Que necesitan reporting unificado, procesos claros y alguien que ejecute con método, no solo con entregables puntuales.",
+        text: "Que necesitan reporting unificado, procesos claros y ejecución con método.",
       },
       {
         label: "Equipos internos de marketing",
-        text: "Que buscan un partner técnico y estratégico para reforzar ejecución, automatización e integraciones.",
+        text: "Que buscan un partner técnico y estratégico para reforzar ejecución y automatización.",
       },
       {
         label: "Proyectos SaaS y ecommerce",
-        text: "Que requieren funnels, campañas y operación comercial conectada a un entorno centralizado.",
+        text: "Que requieren funnels, campañas y operación comercial en un entorno centralizado.",
       },
-    ],
-  },
-  problemas: {
-    eyebrow: "Qué problemas resuelve",
-    title: "Menos caos operativo. Más claridad para decidir.",
-    items: [
-      "Herramientas y proveedores dispersos que impiden ver el negocio con contexto completo.",
-      "Campañas y proyectos sin continuidad: mucho arranque, poco sistema que sostenga la operación.",
-      "Procesos manuales que consumen tiempo del equipo en tareas repetitivas en lugar de estrategia.",
-      "Reporting fragmentado que retrasa decisiones y dificulta alinear marketing con ventas.",
-      "Falta de un partner que entienda tanto la ejecución diaria como la arquitectura tecnológica del negocio.",
-    ],
-  },
-  porQue: {
-    eyebrow: "Por qué elegir NELVYON",
-    title: "Un ecosistema. Una dirección. Ejecución real.",
-    paragraphs: [
-      "No somos una agencia genérica ni un software aislado: unimos consultoría, producción y plataforma para que marketing y operación avancen en la misma línea.",
-      "Trabajamos con procesos documentados, entregables definidos y comunicación directa. Sin promesas vacías ni métricas inventadas: priorizamos lo que tu negocio puede medir y sostener.",
-      "Cuando tu operación crece, la plataforma NELVYON centraliza clientes, automatizaciones e integraciones sin obligarte a migrar a otro proveedor.",
     ],
   },
   comoTrabaja: {
@@ -94,25 +75,29 @@ export const HOME_COPY = {
       },
     ],
   },
-  connected: {
-    caption: "Operación conectada. Un ecosistema, una ejecución.",
+  porQue: {
+    eyebrow: "Por qué elegir NELVYON",
+    title: "Un ecosistema. Una dirección. Ejecución real.",
+    paragraphs: [
+      "No somos una agencia genérica ni un software aislado: unimos consultoría, producción y plataforma para que marketing y operación avancen en la misma línea.",
+      "Trabajamos con procesos documentados, entregables definidos y comunicación directa. Sin promesas vacías ni métricas inventadas.",
+      "Resolvemos el caos de herramientas dispersas, la falta de continuidad entre proyectos y el reporting fragmentado que frena decisiones.",
+      "Cuando tu operación crece, la plataforma NELVYON centraliza clientes, automatizaciones e integraciones sin obligarte a cambiar de partner.",
+    ],
   },
-  misionVision: {
-    misionLabel: "Nuestra misión",
-    mision:
-      "Crear empresas más eficientes, organizadas y preparadas para crecer en un entorno digital cada vez más competitivo.",
-    visionLabel: "Nuestra visión",
-    vision:
-      "Convertirnos en el ecosistema de referencia para empresas que buscan centralizar marketing, ventas, automatización y operación en un único entorno.",
+  worldMap: {
+    title: "Operación digital conectada.",
+    subtitle:
+      "NELVYON conecta marketing, ventas, automatización y operación en un único ecosistema.",
   },
   servicios: {
     items: [
-      { name: "SEO" },
-      { name: "Publicidad" },
-      { name: "Branding" },
-      { name: "Desarrollo Web" },
-      { name: "Ecommerce" },
-      { name: "Automatización" },
+      { name: "SEO", phrase: "Posicionamiento para aumentar visibilidad y captar demanda." },
+      { name: "Publicidad", phrase: "Campañas orientadas a crecimiento y adquisición." },
+      { name: "Branding", phrase: "Identidad, diferenciación y percepción de marca." },
+      { name: "Desarrollo Web", phrase: "Experiencias rápidas, modernas y orientadas a conversión." },
+      { name: "Ecommerce", phrase: "Tiendas optimizadas para vender más." },
+      { name: "Automatización", phrase: "Procesos que reducen trabajo manual y aumentan eficiencia." },
     ] as const,
   },
   saas: {

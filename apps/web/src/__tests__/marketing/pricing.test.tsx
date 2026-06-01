@@ -96,19 +96,28 @@ describe("marketing pricing and landing", () => {
     expect(screen.getByRole("link", { name: /Descubrir la plataforma/i })).toHaveAttribute("href", "/saas");
   });
 
-  it("Home muestra operación conectada y bloques editoriales", () => {
+  it("Home muestra World Map y bloques editoriales", () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByText(/Operación conectada\. Un ecosistema, una ejecución/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Operación digital conectada/i })).toBeInTheDocument();
+    expect(
+      screen.getByText(/NELVYON conecta marketing, ventas, automatización y operación/i),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: /Estrategia, ejecución y tecnología en un solo partner/i }),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Equipos que necesitan orden/i })).toBeInTheDocument();
   });
 
-  it("Home hero destaca palabras en azul", () => {
+  it("Home hero sin imagen y con acentos azules", () => {
     renderWithProviders(<HomePage />);
-    const accents = document.querySelectorAll(".nelvyon-hero-def__accent");
-    expect(accents.length).toBeGreaterThanOrEqual(3);
+    expect(document.querySelector(".nelvyon-hero-v3__visual")).toBeNull();
+    expect(document.querySelectorAll(".nelvyon-hero-v3__accent").length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("Home servicios muestra frases exactas", () => {
+    renderWithProviders(<HomePage />);
+    expect(screen.getByText(/Posicionamiento para aumentar visibilidad/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tiendas optimizadas para vender más/i)).toBeInTheDocument();
   });
 
   it("Página /partners renderiza calculadora", () => {

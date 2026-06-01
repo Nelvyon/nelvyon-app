@@ -12,7 +12,7 @@ export function HomeQueHace() {
           <h2 id="home-que-hace-title" className="nelvyon-home-story__title">
             {title}
           </h2>
-          <p className="nelvyon-home-story__body">{body}</p>
+          <p className="nelvyon-home-story__body nelvyon-home-story__body--lead">{body}</p>
           <p className="nelvyon-home-story__body">{body2}</p>
         </article>
       </Container>
@@ -32,58 +32,14 @@ export function HomeParaQuien() {
             {title}
           </h2>
           <p className="nelvyon-home-story__body nelvyon-home-story__body--lead">{intro}</p>
-          <ul className="nelvyon-home-story__list">
+          <ul className="nelvyon-home-story__audiences">
             {audiences.map((item) => (
-              <li key={item.label} className="nelvyon-home-story__list-item">
-                <strong className="nelvyon-home-story__list-label">{item.label}</strong>
-                <span className="nelvyon-home-story__list-text">{item.text}</span>
+              <li key={item.label} className="nelvyon-home-story__audience">
+                <strong className="nelvyon-home-story__audience-label">{item.label}</strong>
+                <p className="nelvyon-home-story__audience-text">{item.text}</p>
               </li>
             ))}
           </ul>
-        </article>
-      </Container>
-    </section>
-  );
-}
-
-export function HomeProblemas() {
-  const { eyebrow, title, items } = HOME_COPY.problemas;
-
-  return (
-    <section className="nelvyon-home-block nelvyon-home-story" aria-labelledby="home-problemas-title">
-      <Container>
-        <article className="nelvyon-home-story__article">
-          <p className="nelvyon-home-story__eyebrow">{eyebrow}</p>
-          <h2 id="home-problemas-title" className="nelvyon-home-story__title">
-            {title}
-          </h2>
-          <ul className="nelvyon-home-story__bullets">
-            {items.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </article>
-      </Container>
-    </section>
-  );
-}
-
-export function HomePorQue() {
-  const { eyebrow, title, paragraphs } = HOME_COPY.porQue;
-
-  return (
-    <section className="nelvyon-home-block nelvyon-home-story" aria-labelledby="home-por-que-title">
-      <Container>
-        <article className="nelvyon-home-story__article nelvyon-home-story__article--wide">
-          <p className="nelvyon-home-story__eyebrow">{eyebrow}</p>
-          <h2 id="home-por-que-title" className="nelvyon-home-story__title">
-            {title}
-          </h2>
-          {paragraphs.map((p) => (
-            <p key={p.slice(0, 32)} className="nelvyon-home-story__body">
-              {p}
-            </p>
-          ))}
         </article>
       </Container>
     </section>
@@ -114,6 +70,28 @@ export function HomeComoTrabaja() {
               </li>
             ))}
           </ol>
+        </article>
+      </Container>
+    </section>
+  );
+}
+
+export function HomePorQue() {
+  const { eyebrow, title, paragraphs } = HOME_COPY.porQue;
+
+  return (
+    <section className="nelvyon-home-block nelvyon-home-story" aria-labelledby="home-por-que-title">
+      <Container>
+        <article className="nelvyon-home-story__article nelvyon-home-story__article--wide">
+          <p className="nelvyon-home-story__eyebrow">{eyebrow}</p>
+          <h2 id="home-por-que-title" className="nelvyon-home-story__title">
+            {title}
+          </h2>
+          {paragraphs.map((p) => (
+            <p key={p.slice(0, 36)} className="nelvyon-home-story__body">
+              {p}
+            </p>
+          ))}
         </article>
       </Container>
     </section>

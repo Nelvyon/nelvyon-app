@@ -6223,6 +6223,383 @@ body:has(.nelvyon-home--definitive) .nelvyon-nav-mobile-toggle {
   box-shadow: 0 12px 40px rgba(0, 132, 255, 0.28);
 }
 
+/* ========== Home v3 — premium FTMO / Linear ========== */
+.nelvyon-home--v3 {
+  background: #020817;
+  color: #ffffff;
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar {
+  background: #020817;
+  backdrop-filter: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.45);
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar__inner {
+  height: 80px;
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar__accent {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #0084ff 22%,
+    #0047ab 50%,
+    #0084ff 78%,
+    transparent 100%
+  );
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar__brand {
+  border-right-color: rgba(255, 255, 255, 0.12);
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar__brand img {
+  filter: brightness(1.15) contrast(1.08);
+  max-height: 46px;
+  width: auto;
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar__link {
+  color: #ffffff;
+  opacity: 0.92;
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar__link:hover {
+  color: #ffffff;
+  opacity: 1;
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar__cta {
+  background: #0084ff !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 13px 26px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 6px 28px rgba(0, 132, 255, 0.45);
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-navbar__cta:hover {
+  background: #0074e0 !important;
+  box-shadow: 0 8px 36px rgba(0, 132, 255, 0.55);
+}
+
+body:has(.nelvyon-home--v3) .nelvyon-nav-mobile-panel,
+body:has(.nelvyon-home--v3) .nelvyon-nav-mobile-toggle {
+  background: #020817;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.nelvyon-home--v3 .nelvyon-home-block {
+  padding: clamp(120px, 14vw, 168px) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.nelvyon-home--v3 .nelvyon-home-block--manifesto {
+  border-top: none;
+}
+
+/* Hero v3 — tipografía, sin imagen */
+.nelvyon-hero-v3 {
+  position: relative;
+  background: #020817;
+  overflow: hidden;
+}
+
+.nelvyon-hero-v3__spotlight {
+  position: relative;
+  min-height: min(94vh, 960px);
+  display: flex;
+  flex-direction: column;
+}
+
+.nelvyon-hero-v3__atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.nelvyon-hero-v3__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.nelvyon-hero-v3__glow--primary {
+  width: min(70vw, 720px);
+  height: min(50vw, 480px);
+  top: -8%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(0, 71, 171, 0.55) 0%, transparent 68%);
+}
+
+.nelvyon-hero-v3__glow--secondary {
+  width: min(55vw, 560px);
+  height: min(40vw, 400px);
+  bottom: 5%;
+  right: -8%;
+  background: radial-gradient(circle, rgba(0, 132, 255, 0.22) 0%, transparent 70%);
+}
+
+.nelvyon-hero-v3__container {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding-top: clamp(100px, 12vh, 140px);
+  padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+.nelvyon-hero-v3__copy {
+  max-width: 46rem;
+  text-align: left;
+}
+
+.nelvyon-hero-v3__title {
+  font-size: clamp(42px, 6.2vw, 90px);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  color: #ffffff;
+  margin: 0 0 36px;
+  max-width: 14ch;
+}
+
+@media (min-width: 1024px) {
+  .nelvyon-hero-v3__title {
+    font-size: clamp(72px, 5.8vw, 90px);
+  }
+}
+
+.nelvyon-hero-v3__accent {
+  color: #0084ff;
+}
+
+.nelvyon-hero-v3__subtitle {
+  font-size: clamp(17px, 1.55vw, 21px);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0 0 48px;
+  max-width: 46ch;
+  font-weight: 450;
+}
+
+.nelvyon-hero-v3__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* Manifiesto */
+.nelvyon-home-manifesto {
+  max-width: 56rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.nelvyon-home-manifesto__title {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: #ffffff;
+  margin: 0 0 36px;
+}
+
+.nelvyon-home-manifesto__body {
+  font-size: clamp(18px, 1.75vw, 22px);
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0;
+}
+
+.nelvyon-home--v3 .nelvyon-home-story__title {
+  font-size: clamp(30px, 3.6vw, 48px);
+  margin-bottom: 32px;
+}
+
+.nelvyon-home--v3 .nelvyon-home-story__article {
+  max-width: 44rem;
+}
+
+.nelvyon-home--v3 .nelvyon-home-story__article--wide {
+  max-width: 52rem;
+}
+
+.nelvyon-home-story__audiences {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 3.5vw, 40px);
+}
+
+.nelvyon-home-story__audience-label {
+  display: block;
+  font-size: clamp(17px, 1.6vw, 20px);
+  font-weight: 650;
+  color: #ffffff;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.nelvyon-home-story__audience-text {
+  font-size: clamp(16px, 1.5vw, 18px);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+}
+
+/* World Map v3 */
+.nelvyon-home-world--v3 {
+  padding-top: clamp(140px, 15vw, 180px);
+  padding-bottom: clamp(140px, 15vw, 180px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nelvyon-home-world__head {
+  text-align: center;
+  max-width: 40rem;
+  margin: 0 auto clamp(56px, 6vw, 72px);
+}
+
+.nelvyon-home-world__title {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: #ffffff;
+  margin: 0 0 24px;
+}
+
+.nelvyon-home-world__subtitle {
+  font-size: clamp(17px, 1.6vw, 20px);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+}
+
+.nelvyon-home-world__canvas-wrap {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.nelvyon-home-world__map {
+  max-width: none;
+  border-radius: 0;
+}
+
+.nelvyon-home-world__skeleton {
+  aspect-ratio: 2 / 1;
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(0, 132, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  border-radius: 12px;
+}
+
+/* Servicios v3 — monolitos */
+.nelvyon-home-servicios--v3 {
+  padding-bottom: clamp(140px, 15vw, 180px);
+}
+
+.nelvyon-home-servicios--v3 .nelvyon-home-servicios__grid {
+  max-width: 72rem;
+  gap: clamp(24px, 3vw, 32px);
+}
+
+@media (min-width: 768px) {
+  .nelvyon-home-servicios--v3 .nelvyon-home-servicios__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.nelvyon-home-servicios--v3 .nelvyon-home-servicios__glow {
+  border-radius: 16px !important;
+}
+
+.nelvyon-home-servicios--v3 .nelvyon-home-servicios__cell {
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 16px;
+  min-height: clamp(160px, 18vw, 200px);
+  padding: clamp(32px, 4vw, 44px) clamp(28px, 3.5vw, 40px);
+  border-radius: 14px;
+}
+
+.nelvyon-home-servicios--v3 .nelvyon-home-servicios__name {
+  font-size: clamp(24px, 2.4vw, 32px);
+  font-weight: 700;
+  text-align: left;
+  color: #ffffff;
+}
+
+.nelvyon-home-servicios__phrase {
+  font-size: clamp(15px, 1.45vw, 17px);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.68);
+  margin: 0;
+  text-align: left;
+  max-width: 36ch;
+}
+
+.nelvyon-home--v3 .nelvyon-home-saas__title {
+  font-size: clamp(32px, 3.8vw, 48px);
+}
+
+.nelvyon-home--v3 .nelvyon-logo-marquee {
+  background: #020817;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nelvyon-home--v3 .nelvyon-lamp-effect {
+  background: #020817;
+}
+
+.nelvyon-home--v3 .nelvyon-lamp-effect .nelvyon-cta-final {
+  background: transparent;
+  padding: clamp(96px, 12vw, 140px) 24px clamp(120px, 14vw, 160px);
+}
+
+.nelvyon-home--v3 .nelvyon-lamp-effect .nelvyon-cta-final__title {
+  font-size: clamp(32px, 4vw, 56px);
+  max-width: 16ch;
+}
+
+@media (max-width: 899px) {
+  .nelvyon-hero-v3__copy {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .nelvyon-hero-v3__title {
+    max-width: none;
+    font-size: clamp(40px, 9vw, 56px);
+  }
+
+  .nelvyon-hero-v3__subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .nelvyon-hero-v3__ctas {
+    justify-content: center;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
