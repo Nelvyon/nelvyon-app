@@ -58,6 +58,7 @@ describe("marketing pricing and landing", () => {
     expect(h1.textContent).toMatch(/operación digital/i);
     expect(h1.textContent).toMatch(/ejecutar con orden/i);
     expect(screen.getByText(/Donde nace tu imperio/i)).toBeInTheDocument();
+    expect(screen.getByText(/Servicios profesionales y plataforma SaaS para operar/i)).toBeInTheDocument();
   });
 
   it("Home muestra pricing dual SaaS y servicios", () => {

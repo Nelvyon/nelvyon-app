@@ -87,7 +87,7 @@ export const HOME_SERVICES: HomeService[] = [
     group: "captacion",
   },
   {
-    title: "Analítica y Reporting",
+    title: "Reporting",
     desc: "Informes, paneles y seguimiento de actividad por canal y campaña.",
     href: "/saas",
     Icon: IconChartBar,
@@ -95,7 +95,7 @@ export const HOME_SERVICES: HomeService[] = [
     group: "operacion",
   },
   {
-    title: "CRM / Operación comercial",
+    title: "CRM",
     desc: "Pipeline, contactos, fases comerciales y seguimiento unificado.",
     href: "/saas",
     Icon: IconUsers,
@@ -105,9 +105,21 @@ export const HOME_SERVICES: HomeService[] = [
 ];
 
 export const HOME_SERVICE_GROUPS = [
-  { id: "captacion" as const, title: "Captación y demanda", desc: "Atraer tráfico, leads y oportunidades con criterio operativo." },
-  { id: "marca" as const, title: "Marca y presencia", desc: "Construir confianza visual y digital antes de convertir." },
-  { id: "operacion" as const, title: "Operación comercial", desc: "Automatizar, medir y operar el negocio con continuidad." },
+  {
+    id: "captacion" as const,
+    title: "Captación",
+    desc: "SEO, Ads, Redes Sociales y Email Marketing para generar demanda con criterio operativo.",
+  },
+  {
+    id: "marca" as const,
+    title: "Marca y presencia",
+    desc: "Branding, Desarrollo Web y Ecommerce para construir confianza antes de convertir.",
+  },
+  {
+    id: "operacion" as const,
+    title: "Operación",
+    desc: "Automatización, CRM y Reporting para operar el negocio con continuidad.",
+  },
 ];
 
 export const SAAS_CAPABILITIES = [

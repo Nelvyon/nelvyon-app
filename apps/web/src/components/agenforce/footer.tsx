@@ -37,7 +37,7 @@ export function Footer() {
       <div className="nelvyon-footer__inner">
         <div className="nelvyon-footer-grid">
           <div className="nelvyon-footer__brand">
-            <NelvyonLogo height={44} />
+            <NelvyonLogo height={48} />
             <p className="nelvyon-footer__tagline">{NELVYON_SLOGAN}</p>
             <p className="nelvyon-footer__meta">
               Servicios profesionales y plataforma SaaS para marketing y operación digital.

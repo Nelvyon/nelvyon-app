@@ -1,6 +1,6 @@
-import { CasosDeUso } from "../casos-de-uso";
 import { CtaFinal } from "../cta-final";
 import { Hero } from "../hero";
+import { HomeBrandBand } from "../home-brand-band";
 import { HomeFaqs } from "../home-faqs";
 import { HomeIntegrationsCompact } from "../home-integrations-compact";
 import { HomeMetodologia } from "../home-metodologia";
@@ -14,8 +14,9 @@ import { HomeTrustStrip } from "../home-trust-strip";
 
 export function AgenforceHomePage() {
   return (
-    <main className="nelvyon-home nelvyon-home--v5">
+    <main className="nelvyon-home nelvyon-home--v5 nelvyon-home--launch">
       <Hero />
+      <HomeBrandBand />
       <HomeParaQuien />
       <HomeProblemasResuelve />
       <HomeQueHaceNelvyon />

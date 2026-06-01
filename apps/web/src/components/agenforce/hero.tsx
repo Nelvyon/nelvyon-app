@@ -1,65 +1,71 @@
 import Link from "next/link";
 
 import { Container } from "./container";
+import { SAAS_CAPABILITIES } from "./home-services-config";
 import { NELVYON_SLOGAN } from "./marketing-brand";
 
-const AUDIENCE = ["Agencias", "Pymes", "Ecommerce", "Consultoras"] as const;
-
-const HIGHLIGHTS = [
-  {
-    label: "Qué es",
-    text: "Firma de marketing y operación digital con servicios profesionales y plataforma SaaS propia.",
-  },
-  {
-    label: "Para quién",
-    text: "Equipos y negocios que necesitan ejecutar con orden, continuidad y entregables reales.",
-  },
-  {
-    label: "Qué hace",
-    text: "Ejecuta campañas, web, ecommerce y operación comercial. Centraliza CRM, reporting e integraciones.",
-  },
+const PLATFORM_SERVICES = [
+  "SEO, Ads, Email y Social",
+  "Branding, Web y Ecommerce",
+  "Automatización y CRM",
+  "Reporting e integraciones",
 ] as const;
 
 export const Hero = () => {
   return (
-    <section className="nelvyon-hero-v5" aria-labelledby="home-hero-title">
+    <section className="nelvyon-hero-v5 nelvyon-hero-v5--dark" aria-labelledby="home-hero-title">
+      <div className="nelvyon-hero-v5__glow" aria-hidden />
       <Container className="nelvyon-hero-v5__inner">
-        <p className="mkt-eyebrow nelvyon-hero-v5__eyebrow">NELVYON · Servicios + Plataforma</p>
+        <p className="nelvyon-hero-v5__eyebrow">NELVYON · Servicios + Plataforma</p>
         <h1 id="home-hero-title" className="nelvyon-hero-v5__title">
           Marketing y operación digital para equipos que necesitan{" "}
-          <span className="nelvyon-text-accent">ejecutar con orden</span>
+          <span className="nelvyon-hero-v5__title-accent">ejecutar con orden</span>
         </h1>
         <p className="nelvyon-hero-v5__slogan">{NELVYON_SLOGAN}</p>
         <p className="nelvyon-hero-v5__subtitle">
-          NELVYON combina ejecución profesional y plataforma propia para coordinar captación, marca, web,
-          ecommerce y operación comercial sin fragmentar herramientas.
+          Firma de marketing y operación digital. Ejecutamos con servicios profesionales y
+          centralizamos con plataforma SaaS propia cuando el volumen lo requiere.
         </p>
-        <div className="nelvyon-hero-v5__highlights" aria-label="Resumen NELVYON">
-          {HIGHLIGHTS.map((item) => (
-            <article key={item.label} className="nelvyon-hero-v5__highlight">
-              <p className="nelvyon-hero-v5__highlight-label">{item.label}</p>
-              <p className="nelvyon-hero-v5__highlight-text">{item.text}</p>
-            </article>
-          ))}
-        </div>
-        <div className="nelvyon-hero-v5__audience" aria-label="Perfiles habituales">
-          {AUDIENCE.map((item) => (
-            <span key={item} className="nelvyon-hero-v5__audience-pill">
-              {item}
-            </span>
-          ))}
-        </div>
         <div className="nelvyon-hero-v5__ctas">
-          <a href="/contacto" className="mkt-btn nelvyon-btn-primary nelvyon-btn-primary--solid">
+          <a href="/contacto" className="mkt-btn nelvyon-btn-primary">
             Solicitar información
           </a>
-          <Link href="/servicios" className="mkt-btn nelvyon-btn-outline">
+          <Link href="/servicios" className="mkt-btn nelvyon-btn-outline nelvyon-btn-outline--light">
             Ver servicios
           </Link>
         </div>
-        <Link href="/saas" className="nelvyon-hero-v5__saas-link">
-          Ver plataforma SaaS →
-        </Link>
+      </Container>
+
+      <Container className="nelvyon-hero-v5__platform-wrap">
+        <div className="nelvyon-hero-v5__platform" aria-label="Servicios y plataforma NELVYON">
+          <article className="nelvyon-hero-v5__platform-col">
+            <p className="nelvyon-hero-v5__platform-label">Servicios profesionales</p>
+            <h2 className="nelvyon-hero-v5__platform-title">Ejecución con entregables definidos</h2>
+            <ul className="nelvyon-hero-v5__platform-list">
+              {PLATFORM_SERVICES.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <Link href="/servicios" className="nelvyon-hero-v5__platform-link">
+              Ver servicios →
+            </Link>
+          </article>
+          <div className="nelvyon-hero-v5__platform-divider" aria-hidden />
+          <article className="nelvyon-hero-v5__platform-col nelvyon-hero-v5__platform-col--saas">
+            <p className="nelvyon-hero-v5__platform-label">Plataforma SaaS</p>
+            <h2 className="nelvyon-hero-v5__platform-title">Centralización operativa</h2>
+            <ul className="nelvyon-hero-v5__platform-list">
+              {SAAS_CAPABILITIES.map((cap) => (
+                <li key={cap.title}>
+                  <strong>{cap.title}</strong> — {cap.desc}
+                </li>
+              ))}
+            </ul>
+            <Link href="/saas" className="nelvyon-hero-v5__platform-link">
+              Ver plataforma SaaS →
+            </Link>
+          </article>
+        </div>
       </Container>
     </section>
   );
