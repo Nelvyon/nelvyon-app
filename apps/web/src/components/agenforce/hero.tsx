@@ -20,7 +20,11 @@ export const Hero = () => {
   } = HOME_COPY.hero;
 
   return (
-    <section className="nelvyon-hero-v3" aria-labelledby="home-hero-title">
+    <section
+      className="nelvyon-hero-v3"
+      aria-labelledby="home-hero-title"
+      style={{ scrollMarginTop: "var(--nelvyon-nav-h, 80px)" }}
+    >
       <SpotlightNew className="nelvyon-hero-v3__spotlight" subtle>
         <div className="nelvyon-hero-v3__atmosphere" aria-hidden>
           <div className="nelvyon-hero-v3__vignette" />

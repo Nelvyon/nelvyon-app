@@ -108,9 +108,16 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
       >
         <defs>
           <radialGradient id="nelvyon_map_glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#0084FF" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#0084FF" stopOpacity="0" />
+            <stop offset="0%" stopColor="#0084FF" stopOpacity="0.16" />
+            <stop offset="100%" stopColor="#0047AB" stopOpacity="0" />
           </radialGradient>
+          <filter id="nelvyon_map_line_glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
         {landPoints.map((point, index) => (
@@ -118,9 +125,9 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
             key={`land-${index}`}
             cx={point.x}
             cy={point.y}
-            r={1.2}
+            r={1.4}
             fill="#0084FF"
-            opacity={0.14}
+            opacity={0.22}
           />
         ))}
 
@@ -130,10 +137,11 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
               d={arc.d}
               fill="none"
               stroke="#0047AB"
-              strokeWidth={1}
-              strokeOpacity={0.25}
+              strokeWidth={2}
+              strokeOpacity={0.35}
+              filter="url(#nelvyon_map_line_glow)"
               initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 0.35 }}
+              whileInView={{ pathLength: 1, opacity: 0.45 }}
               viewport={{ once: true }}
               transition={{ duration: 1.4, delay: index * 0.15, ease: "easeInOut" }}
             />
@@ -141,16 +149,17 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
               d={arc.d}
               fill="none"
               stroke="#0084FF"
-              strokeWidth={1.5}
+              strokeWidth={1.75}
+              filter="url(#nelvyon_map_line_glow)"
               initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 0.65 }}
+              whileInView={{ pathLength: 1, opacity: 0.8 }}
               viewport={{ once: true }}
               transition={{ duration: 1.6, delay: index * 0.15 + 0.1, ease: "easeInOut" }}
             />
             <motion.circle
               cx={arc.start.x}
               cy={arc.start.y}
-              r={3}
+              r={4}
               fill="#0084FF"
               initial={{ scale: 0, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
@@ -160,7 +169,7 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
             <motion.circle
               cx={arc.end.x}
               cy={arc.end.y}
-              r={3}
+              r={4}
               fill="#0084FF"
               initial={{ scale: 0, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
@@ -173,10 +182,10 @@ export default function WorldMap({ dots = [], className }: WorldMapProps) {
         <ellipse
           cx={MAP_WIDTH / 2}
           cy={MAP_HEIGHT / 2}
-          rx={MAP_WIDTH * 0.45}
-          ry={MAP_HEIGHT * 0.35}
+          rx={MAP_WIDTH * 0.48}
+          ry={MAP_HEIGHT * 0.38}
           fill="url(#nelvyon_map_glow)"
-          opacity={0.4}
+          opacity={0.55}
         />
       </svg>
     </div>
