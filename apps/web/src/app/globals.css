@@ -3925,15 +3925,15 @@
 .nelvyon-home-servicios__group {
   background: var(--nelvyon-primary-white);
   border: 1px solid var(--nelvyon-border);
-  border-radius: 24px;
-  padding: clamp(40px, 5vw, 56px);
-  box-shadow: 0 12px 48px rgba(2, 8, 23, 0.08);
+  border-radius: 20px;
+  padding: clamp(36px, 4.5vw, 52px);
+  box-shadow: 0 4px 24px rgba(2, 8, 23, 0.04);
 }
 
 .nelvyon-home-servicios__group--alt {
   background: #020817;
   border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .nelvyon-home-servicios__group-head {
@@ -3955,11 +3955,11 @@
   font-weight: 800;
   letter-spacing: -0.06em;
   line-height: 1;
-  color: rgba(var(--nelvyon-primary-blue-rgb), 0.18);
+  color: rgba(2, 8, 23, 0.08);
 }
 
 .nelvyon-home-servicios__group--alt .nelvyon-home-servicios__group-index {
-  color: rgba(var(--nelvyon-primary-blue-rgb), 0.45);
+  color: rgba(255, 255, 255, 0.12);
 }
 
 .nelvyon-home-servicios__group-eyebrow {
@@ -3988,50 +3988,46 @@
 .nelvyon-home-servicios__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
+  gap: 20px;
+  justify-items: stretch;
+  align-items: stretch;
 }
 
 .nelvyon-home-servicios__card {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  min-height: 240px;
-  padding: 32px 28px 28px;
+  gap: 12px;
+  min-height: 200px;
+  padding: 28px 26px 24px;
   border: 1px solid var(--nelvyon-border);
-  border-radius: 18px;
+  border-radius: 16px;
   background: var(--nelvyon-primary-white);
   text-decoration: none;
   color: inherit;
-  overflow: hidden;
   transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .nelvyon-home-servicios__group--alt .nelvyon-home-servicios__card {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.nelvyon-home-servicios__card-accent {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--nelvyon-primary-blue) 0%, rgba(var(--nelvyon-primary-blue-rgb), 0.35) 100%);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .nelvyon-home-servicios__card:hover {
-  border-color: rgba(var(--nelvyon-primary-blue-rgb), 0.55);
-  box-shadow: 0 20px 48px rgba(2, 8, 23, 0.14);
-  transform: translateY(-4px);
+  border-color: rgba(2, 8, 23, 0.14);
+  box-shadow: 0 12px 32px rgba(2, 8, 23, 0.08);
+  transform: translateY(-2px);
 }
 
 .nelvyon-home-servicios__group--alt .nelvyon-home-servicios__card:hover {
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+}
+
+.nelvyon-home-servicios__card:hover .nelvyon-home-servicios__link {
+  color: var(--nelvyon-primary-blue);
 }
 
 .nelvyon-home-servicios__card-top {
@@ -4041,15 +4037,31 @@
 }
 
 .nelvyon-home-servicios__icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(var(--nelvyon-primary-blue-rgb), 0.12);
-  color: var(--nelvyon-primary-blue);
+  background: rgba(2, 8, 23, 0.04);
+  color: var(--nelvyon-navy);
   flex-shrink: 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nelvyon-home-servicios__card:hover .nelvyon-home-servicios__icon {
+  background: rgba(var(--nelvyon-primary-blue-rgb), 0.1);
+  color: var(--nelvyon-primary-blue);
+}
+
+.nelvyon-home-servicios__group--alt .nelvyon-home-servicios__icon {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--nelvyon-primary-white);
+}
+
+.nelvyon-home-servicios__group--alt .nelvyon-home-servicios__card:hover .nelvyon-home-servicios__icon {
+  background: rgba(var(--nelvyon-primary-blue-rgb), 0.14);
+  color: var(--nelvyon-primary-blue);
 }
 
 .nelvyon-home-servicios__title {
@@ -4082,9 +4094,14 @@
 
 .nelvyon-home-servicios__link {
   font-size: 14px;
-  font-weight: 700;
-  color: var(--nelvyon-primary-blue);
+  font-weight: 650;
+  color: #1e293b;
   margin-top: auto;
+  transition: color 0.2s ease;
+}
+
+.nelvyon-home-servicios__group--alt .nelvyon-home-servicios__link {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 @media (min-width: 1024px) {
@@ -4164,8 +4181,8 @@
 .nelvyon-home-saas-compact__glow {
   position: absolute;
   inset: auto 0 0;
-  height: 55%;
-  background: radial-gradient(ellipse 70% 80% at 50% 100%, rgba(var(--nelvyon-primary-blue-rgb), 0.22) 0%, transparent 70%);
+  height: 50%;
+  background: radial-gradient(ellipse 70% 80% at 50% 100%, rgba(var(--nelvyon-primary-blue-rgb), 0.12) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -4217,19 +4234,25 @@
 }
 
 .nelvyon-home-saas-compact__card:hover {
-  border-color: rgba(var(--nelvyon-primary-blue-rgb), 0.55);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
-  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
+  transform: translateY(-2px);
 }
 
 .nelvyon-home-saas-compact__card-icon {
   width: 52px;
   height: 52px;
-  border-radius: 14px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(var(--nelvyon-primary-blue-rgb), 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--nelvyon-primary-white);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nelvyon-home-saas-compact__card:hover .nelvyon-home-saas-compact__card-icon {
+  background: rgba(var(--nelvyon-primary-blue-rgb), 0.12);
   color: var(--nelvyon-primary-blue);
 }
 
@@ -4774,23 +4797,21 @@
   display: flex;
   flex-direction: column;
   gap: clamp(28px, 4vw, 36px);
-  min-height: 420px;
+  min-height: 360px;
   padding: clamp(36px, 4.5vw, 48px);
-  border-radius: 24px;
+  border-radius: 20px;
 }
 
 .nelvyon-que-hace__pillar--services {
   background: #020817;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 64px rgba(2, 8, 23, 0.35);
+  box-shadow: 0 8px 32px rgba(2, 8, 23, 0.2);
 }
 
 .nelvyon-que-hace__pillar--saas {
-  background:
-    radial-gradient(ellipse 80% 60% at 100% 0%, rgba(var(--nelvyon-primary-blue-rgb), 0.2) 0%, transparent 55%),
-    linear-gradient(165deg, #020817 0%, #07122a 100%);
-  border: 1px solid rgba(var(--nelvyon-primary-blue-rgb), 0.35);
-  box-shadow: 0 24px 64px rgba(var(--nelvyon-primary-blue-rgb), 0.12);
+  background: #020817;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(2, 8, 23, 0.2);
 }
 
 .nelvyon-que-hace__pillar-eyebrow {
@@ -4841,8 +4862,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(var(--nelvyon-primary-blue-rgb), 0.15);
-  color: var(--nelvyon-primary-blue);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--nelvyon-primary-white);
 }
 
 .nelvyon-que-hace__tile-title {
@@ -4862,14 +4883,14 @@
 
 .nelvyon-que-hace__tag {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(var(--nelvyon-primary-blue-rgb), 0.35);
-  color: rgba(255, 255, 255, 0.85);
-  background: rgba(var(--nelvyon-primary-blue-rgb), 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .nelvyon-que-hace__saas-grid {
@@ -4901,8 +4922,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: rgba(var(--nelvyon-primary-blue-rgb), 0.15);
-  color: var(--nelvyon-primary-blue);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--nelvyon-primary-white);
 }
 
 .nelvyon-que-hace__saas-title {
@@ -4963,6 +4984,230 @@
   .nelvyon-problemas__grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Logo Cloud Marquee — biblioteca premium NELVYON */
+@keyframes nelvyon-logo-marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.nelvyon-logo-marquee {
+  background: #020817;
+  padding: clamp(64px, 8vw, 88px) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nelvyon-logo-marquee__inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.nelvyon-logo-marquee__head {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto clamp(40px, 5vw, 52px);
+}
+
+.nelvyon-logo-marquee__eyebrow {
+  color: var(--nelvyon-primary-blue) !important;
+  margin-bottom: 12px;
+}
+
+.nelvyon-logo-marquee__title {
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+  color: var(--nelvyon-primary-white);
+  margin: 0 0 14px;
+}
+
+.nelvyon-logo-marquee__subtitle {
+  font-size: clamp(16px, 2vw, 18px);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.68);
+  margin: 0;
+}
+
+.nelvyon-logo-marquee__viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+
+.nelvyon-logo-marquee__track {
+  display: flex;
+  align-items: center;
+  gap: clamp(32px, 4vw, 56px);
+  width: max-content;
+  animation: nelvyon-logo-marquee-scroll linear infinite;
+}
+
+.nelvyon-logo-marquee__viewport:hover .nelvyon-logo-marquee__track {
+  animation-play-state: paused;
+}
+
+.nelvyon-logo-marquee__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  min-width: 100px;
+}
+
+.nelvyon-logo-marquee__logo-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.nelvyon-logo-marquee__tile:hover .nelvyon-logo-marquee__logo-wrap {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.nelvyon-logo-marquee__logo-img {
+  object-fit: contain;
+  display: block;
+}
+
+.nelvyon-logo-marquee__name {
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+/* Bento Grid — biblioteca premium */
+.nelvyon-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.nelvyon-bento-grid__item {
+  border: 1px solid var(--nelvyon-border);
+  border-radius: 16px;
+  background: var(--nelvyon-primary-white);
+  padding: 28px 24px;
+}
+
+.nelvyon-bento-grid__item--wide {
+  grid-column: span 2;
+}
+
+.nelvyon-bento-grid__item--tall {
+  grid-row: span 2;
+}
+
+.nelvyon-bento-grid__item--hero {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+/* Card Hover Effect — biblioteca premium */
+.nelvyon-card-hover {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.nelvyon-card-hover__card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--nelvyon-border);
+  border-radius: 16px;
+  background: var(--nelvyon-primary-white);
+  padding: 28px 24px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.nelvyon-card-hover__card:hover {
+  border-color: rgba(2, 8, 23, 0.12);
+  box-shadow: 0 12px 32px rgba(2, 8, 23, 0.08);
+  transform: translateY(-2px);
+}
+
+.nelvyon-card-hover__title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--nelvyon-navy);
+  margin: 0 0 8px;
+}
+
+.nelvyon-card-hover__desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Macbook Scroll — biblioteca premium */
+.nelvyon-macbook-scroll {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.nelvyon-macbook-scroll__lid {
+  border-radius: 16px 16px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0a0a0c;
+  padding: 10px 10px 0;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+.nelvyon-macbook-scroll__screen {
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: #020817;
+}
+
+.nelvyon-macbook-scroll__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nelvyon-macbook-scroll__base {
+  height: 14px;
+  margin: 0 8%;
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(180deg, #2a2a2e 0%, #1a1a1e 100%);
+}
+
+.nelvyon-macbook-scroll__trackpad {
+  width: 28%;
+  height: 4px;
+  margin: 4px auto 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nelvyon-macbook-scroll__badge {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
 }
 
 @theme inline {

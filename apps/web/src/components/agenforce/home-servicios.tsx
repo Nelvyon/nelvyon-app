@@ -40,7 +40,6 @@ export function HomeServicios() {
                 <div className="nelvyon-home-servicios__grid">
                   {services.map((item) => (
                     <Link key={item.title} href={item.href} className="nelvyon-home-servicios__card">
-                      <span className="nelvyon-home-servicios__card-accent" aria-hidden />
                       <div className="nelvyon-home-servicios__card-top">
                         <div className="nelvyon-home-servicios__icon" aria-hidden>
                           <item.Icon size={28} stroke={1.5} />

@@ -2,7 +2,7 @@ import { CtaFinal } from "../cta-final";
 import { Hero } from "../hero";
 import { HomeBrandBand } from "../home-brand-band";
 import { HomeFaqs } from "../home-faqs";
-import { HomeIntegrationsCompact } from "../home-integrations-compact";
+import { HomeIntegrationsMarquee } from "../home-integrations-marquee";
 import { HomeMetodologia } from "../home-metodologia";
 import { HomeParaQuien } from "../home-para-quien";
 import { HomePricingDual } from "../home-pricing-dual";
@@ -17,13 +17,13 @@ export function AgenforceHomePage() {
     <main className="nelvyon-home nelvyon-home--v5 nelvyon-home--launch">
       <Hero />
       <HomeBrandBand />
+      <HomeIntegrationsMarquee />
       <HomeParaQuien />
       <HomeProblemasResuelve />
       <HomeQueHaceNelvyon />
       <HomeServicios />
       <HomeMetodologia />
       <HomeSaasCompact />
-      <HomeIntegrationsCompact />
       <HomeTrustStrip />
       <HomePricingDual />
       <HomeFaqs />

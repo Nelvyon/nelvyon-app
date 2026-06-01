@@ -80,6 +80,12 @@ describe("marketing pricing and landing", () => {
     expect(hrefs).toContain("/saas");
   });
 
+  it("Home muestra marquee de integraciones", () => {
+    renderWithProviders(<HomePage />);
+    expect(screen.getByRole("heading", { name: /Conecta tus herramientas en un solo sistema/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Google Calendar/i).length).toBeGreaterThan(0);
+  });
+
   it("Página /partners renderiza calculadora", () => {
     renderWithProviders(<PartnersPage />);
     expect(screen.getByText("Calculadora simple")).toBeInTheDocument();
