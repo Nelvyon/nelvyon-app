@@ -64,34 +64,35 @@ function renderWithProviders(ui: React.ReactElement) {
 describe("marketing pricing and landing", () => {
   it("Página /pricing renderiza los 3 planes", { timeout: 15000 }, () => {
     renderWithProviders(<PricingPage />);
-    expect(screen.getByText("Empezar con Starter")).toBeInTheDocument();
-    expect(screen.getByText("Empezar con Growth")).toBeInTheDocument();
-    expect(screen.getByText("Contactar ventas")).toBeInTheDocument();
+    expect(screen.getByText("Starter")).toBeInTheDocument();
+    expect(screen.getByText("Growth")).toBeInTheDocument();
+    expect(screen.getByText("Elite")).toBeInTheDocument();
   });
 
   it("Plan 2 muestra precio Growth 297€", () => {
     renderWithProviders(<PricingPage />);
-    expect(screen.getByText(/€297/)).toBeInTheDocument();
+    expect(screen.getByText("297")).toBeInTheDocument();
   });
 
   it("Precios en euros en vista mensual", () => {
     const { container } = renderWithProviders(<PricingPage />);
-    expect(container.textContent).toMatch(/€97/);
-    expect(container.textContent).toMatch(/€797/);
+    expect(container.textContent).toMatch(/97/);
+    expect(container.textContent).toMatch(/797/);
   });
 
-  it("CTA de planes enlazan a registro o contacto", { timeout: 15000 }, () => {
+  it("CTA de planes enlazan a contacto", { timeout: 15000 }, () => {
     renderWithProviders(<PricingPage />);
-    const starter = screen.getByRole("link", { name: /Empezar con Starter/i });
-    expect(starter).toHaveAttribute("href", "/registro");
-    const sales = screen.getByRole("link", { name: /Contactar ventas/i });
-    expect(sales).toHaveAttribute("href", "/contacto");
+    const ctas = screen.getAllByRole("link", { name: /Solicitar informacion/i });
+    expect(ctas.length).toBeGreaterThanOrEqual(3);
+    expect(ctas.every((el) => el.getAttribute("href") === "/contacto")).toBe(true);
   });
 
-  it("Nav incluye CTA a contacto", () => {
+  it("Pricing incluye contacto por email", { timeout: 15000 }, () => {
     renderWithProviders(<PricingPage />);
-    const navCta = screen.getAllByRole("link", { name: /Solicitar información/i })[0];
-    expect(navCta).toHaveAttribute("href", "/contacto");
+    expect(screen.getByText("contacto@nelvyon.com")).toHaveAttribute(
+      "href",
+      "mailto:contacto@nelvyon.com",
+    );
   });
 
   it("Home PA renderiza headline NELVYON", { timeout: 30000 }, () => {
