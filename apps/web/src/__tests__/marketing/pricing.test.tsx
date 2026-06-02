@@ -48,7 +48,7 @@ vi.mock("@/components/pa/icons/logo", () => ({
 
 import HomePage from "@/app/(marketing)/page";
 import PartnersPage from "@/app/(marketing)/partners/page";
-import PricingPage from "@/app/pricing/page";
+import PricingPage from "@/app/(marketing)/pricing/page";
 import esMessages from "../../../messages/es.json";
 
 function renderWithProviders(ui: React.ReactElement) {
