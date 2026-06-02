@@ -1,1 +1,5 @@
-export { default } from "../pricing/page";
+import { redirect } from "next/navigation";
+
+export default function PreciosRedirect() {
+  redirect("/pricing");
+}
