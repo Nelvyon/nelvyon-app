@@ -5,6 +5,7 @@ FROM base AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
+COPY apps/web/source.config.ts ./apps/web/
 COPY backend/package.json ./backend/
 COPY backend/db/package.json ./backend/db/
 RUN pnpm install --frozen-lockfile
