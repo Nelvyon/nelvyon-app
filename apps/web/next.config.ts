@@ -102,6 +102,9 @@ const nextConfig: NextConfig = {
         ...config.resolve.alias,
         ioredis: false,
         [path.resolve(__dirname, "../../backend/db/RedisClient.ts")]: false,
+        // fumadocs-ui imports client hooks (useEffectEvent) from react; avoid react-server entry.
+        react: path.dirname(require.resolve("react/package.json")),
+        "react-dom": path.dirname(require.resolve("react-dom/package.json")),
       };
     }
     return config;
