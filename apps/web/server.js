@@ -5,6 +5,9 @@
  * - Uses process.env.PORT (Railway injects this)
  * - Clears Docker-injected HOSTNAME (container id) so Next does not mis-bind
  */
+// Skip fumadocs-mdx init on next.config load (recompiling source.config.ts breaks production boot).
+process.env._FUMADOCS_MDX = "1";
+
 const http = require("http");
 const { parse } = require("url");
 const next = require("next");
