@@ -17,7 +17,7 @@ const a11yCriticalScreens = [
 
 const eslintConfig = [
   {
-    ignores: [".next/**", "node_modules/**", "out/**", "dist/**", "coverage/**", "next-env.d.ts"],
+    ignores: [".next/**", ".source/**", "node_modules/**", "out/**", "dist/**", "coverage/**", "next-env.d.ts"],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {

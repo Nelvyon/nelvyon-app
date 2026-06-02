@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { DM_Mono, Geist_Mono, Inter } from "next/font/google";
 
-import { MarketingLayout } from "@/components/agenforce/marketing-layout";
+import { Footer } from "@/components/pa/footer";
+import { Navbar } from "@/components/pa/navbar";
 import { getAppBaseUrl } from "@/lib/appUrl";
 
-import "@/styles/nelvyon-marketing.css";
+import "@/styles/productized-agency.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+const dmMono = DM_Mono({ subsets: ["latin"], variable: "--font-dm-mono", weight: ["300", "400", "500"] });
 
 const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/og-image.png`;
@@ -45,14 +51,16 @@ export const metadata: Metadata = {
 
 export default function MarketingRouteLayout({ children }: { children: ReactNode }) {
   return (
-    <>
-      <MarketingLayout>{children}</MarketingLayout>
+    <section lang="es" className={`${inter.variable} ${geistMono.variable} ${dmMono.variable} pa-theme`}>
+      <Navbar />
+      <main>{children}</main>
+      <Footer />
       <script
         dangerouslySetInnerHTML={{
           __html:
             "document.addEventListener('DOMContentLoaded',function(){const sel='.fade-in,.nv-fade';const els=document.querySelectorAll(sel);const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.08});els.forEach(el=>obs.observe(el))});",
         }}
       />
-    </>
+    </section>
   );
 }

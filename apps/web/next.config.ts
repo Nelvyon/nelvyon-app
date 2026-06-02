@@ -1,8 +1,10 @@
 import path from "node:path";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { createMDX } from "fumadocs-mdx/next";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const withMDX = createMDX();
 
 /** HTTP security headers (MIG 281). CSP tuned for PostHog, Stripe Checkout, Sentry. */
 const CONTENT_SECURITY_POLICY = [
@@ -15,7 +17,7 @@ const CONTENT_SECURITY_POLICY = [
   "frame-src https://js.stripe.com https://hooks.stripe.com",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://formspree.io",
   "upgrade-insecure-requests",
 ].join("; ");
 
@@ -39,6 +41,7 @@ const SECURITY_HEADERS_WITH_CSP = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  pageExtensions: ["ts", "tsx", "md", "mdx"],
   images: {
     remotePatterns: [
       {
@@ -107,6 +110,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/legal/privacy", destination: "/privacy", permanent: true },
       { source: "/legal/terms", destination: "/terms", permanent: true },
+      { source: "/work", destination: "/servicios", permanent: true },
+      { source: "/products", destination: "/servicios", permanent: true },
     ];
   },
   async headers() {
@@ -125,4 +130,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withMDX(withNextIntl(nextConfig));

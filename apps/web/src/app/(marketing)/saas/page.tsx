@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
-import { NvSaasPage } from "@/components/nelvyon-marketing/pages/saas-page";
+import { BentoTwo } from "@/components/pa/bento-two";
+import { Pricing } from "@/components/pa/pricing";
+import { Products } from "@/components/pa/products";
 
 export const metadata: Metadata = {
   title: "SaaS | NELVYON — Plataforma de marketing y automatización",
@@ -9,5 +11,11 @@ export const metadata: Metadata = {
 };
 
 export default function SaasPage() {
-  return <NvSaasPage />;
+  return (
+    <>
+      <Products />
+      <BentoTwo disabelHeader />
+      <Pricing />
+    </>
+  );
 }

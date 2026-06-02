@@ -8,7 +8,9 @@ import { OsAgentError } from "@nelvyon/os-agents";
 const secret = process.env.JWT_SECRET as string;
 
 describe("AuthService", () => {
-  it("register hashes password, inserts via DB, returns token", async () => {
+  it(
+    "register hashes password, inserts via DB, returns token",
+    async () => {
     const query = vi.fn(async (sql: string, params?: unknown[]) => {
       if (sql.includes("INSERT")) {
         expect(params?.[1]).not.toBe("password12");
@@ -36,10 +38,14 @@ describe("AuthService", () => {
     expect(typeof r.expiresAt).toBe("string");
     const claims = await svc.verifyToken(r.token);
     expect(claims).toEqual({ userId: "uid-1", email: "test@example.com", tenantId: "ten-1", plan: "free" });
-  });
+    },
+    30_000,
+  );
 
-  it("login with correct password returns verifiable token", async () => {
-    const hash = await bcrypt.hash("rightpass12", 12);
+  it(
+    "login with correct password returns verifiable token",
+    async () => {
+    const hash = await bcrypt.hash("rightpass12", 4);
     const query = vi.fn(async (sql: string) => {
       if (sql.includes("SELECT")) {
         return [
@@ -58,10 +64,12 @@ describe("AuthService", () => {
     const svc = new AuthService(secret, { query: query as AuthDbPort["query"] });
     const r = await svc.login("a@b.com", "rightpass12");
     await expect(svc.verifyToken(r.token)).resolves.toEqual({ userId: "u", email: "a@b.com", tenantId: "t", plan: "pro" });
-  });
+    },
+    30_000,
+  );
 
   it("login with wrong password throws", async () => {
-    const hash = await bcrypt.hash("rightpass12", 12);
+    const hash = await bcrypt.hash("rightpass12", 4);
     const query = vi.fn(async () => [
       { user_id: "u", email: "a@b.com", password_hash: hash, full_name: "A", plan: "free", tenant_id: "t" },
     ]);

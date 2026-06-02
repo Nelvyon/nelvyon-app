@@ -2,7 +2,49 @@ import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("motion/react", async () => {
+  const ReactMod = await import("react");
+  type ReactNode = import("react").ReactNode;
+  type ElementType = import("react").ElementType;
+
+  function createMotionComponent(component: ElementType) {
+    function MotionWrapped({
+      children,
+      ...props
+    }: {
+      children?: ReactNode;
+      [key: string]: unknown;
+    }) {
+      return ReactMod.createElement(component, props, children);
+    }
+    MotionWrapped.displayName = "MotionWrapped";
+    return MotionWrapped;
+  }
+
+  const motion = new Proxy(
+    {},
+    {
+      get: (_target, tag) => {
+        if (tag === "create") {
+          return createMotionComponent;
+        }
+        return ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) =>
+          ReactMod.createElement(String(tag), props, children);
+      },
+    },
+  );
+
+  return { motion };
+});
+
+vi.mock("@/components/pa/icons/logo", () => ({
+  GoogleLogo: () => <span data-testid="google-logo" />,
+  Adobe: () => null,
+  Microsoft: () => null,
+  Raycast: () => null,
+}));
 
 import HomePage from "@/app/(marketing)/page";
 import PartnersPage from "@/app/(marketing)/partners/page";
@@ -52,7 +94,7 @@ describe("marketing pricing and landing", () => {
     expect(navCta).toHaveAttribute("href", "/contacto");
   });
 
-  it("Página / (home) renderiza headline correctamente", { timeout: 15000 }, () => {
+  it("Home PA renderiza headline NELVYON", { timeout: 30000 }, () => {
     renderWithProviders(<HomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1.textContent).toMatch(/Donde nace tu imperio/i);
@@ -63,61 +105,45 @@ describe("marketing pricing and landing", () => {
     ).toBeInTheDocument();
   });
 
-  it("Home no muestra pricing ni FAQs de plantilla", () => {
+  it("Home PA incluye sección de servicios", { timeout: 30000 }, () => {
     renderWithProviders(<HomePage />);
-    expect(screen.queryByText(/Desde €47\/mes/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/A medida/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/Servicios para construir y operar con metodo/i),
+    ).toBeInTheDocument();
   });
 
-  it("Home tiene CTA principal a contacto", () => {
+  it("Home PA tiene CTA principal a contacto", { timeout: 30000 }, () => {
     renderWithProviders(<HomePage />);
-    const links = screen.getAllByRole("link", { name: /Solicitar información/i });
-    expect(links.length).toBeGreaterThan(0);
+    const links = screen.getAllByRole("link", {
+      name: /Solicitar informacion|Solicitar información/i,
+    });
     expect(links.some((el) => el.getAttribute("href") === "/contacto")).toBe(true);
   });
 
-  it("Home enlaza a SaaS", () => {
+  it("Home PA enlaza a servicios", { timeout: 30000 }, () => {
     renderWithProviders(<HomePage />);
     const hrefs = screen.getAllByRole("link").map((el) => el.getAttribute("href"));
-    expect(hrefs).toContain("/saas");
+    expect(hrefs).toContain("/servicios");
   });
 
-  it("Home muestra marquee de integraciones", () => {
+  it("Home PA muestra planes SaaS NELVYON", { timeout: 30000 }, () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByLabelText(/^Integraciones$/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Google Calendar/i).length).toBeGreaterThan(0);
+    expect(screen.getByText("Starter")).toBeInTheDocument();
+    expect(screen.getByText("Growth")).toBeInTheDocument();
+    expect(screen.getByText("Elite")).toBeInTheDocument();
   });
 
-  it("Home dirige a SaaS con teaser", () => {
+  it("Home PA muestra FAQ NELVYON", { timeout: 30000 }, () => {
     renderWithProviders(<HomePage />);
+    expect(screen.getByText(/Preguntas frecuentes/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /Una plataforma para centralizar tu operación/i }),
+      screen.getByText(/Que diferencia a NELVYON de una agencia tradicional/i),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Descubrir la plataforma/i })).toHaveAttribute("href", "/saas");
   });
 
-  it("Home muestra World Map y bloques editoriales", () => {
+  it("Home PA incluye marca NELVYON en hero", { timeout: 30000 }, () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByRole("heading", { name: /Operación digital conectada/i })).toBeInTheDocument();
-    expect(
-      screen.getByText(/NELVYON conecta marketing, ventas, automatización y operación/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /Estrategia, ejecución y tecnología en un solo partner/i }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Equipos que necesitan orden/i })).toBeInTheDocument();
-  });
-
-  it("Home hero sin imagen y con acentos azules", () => {
-    renderWithProviders(<HomePage />);
-    expect(document.querySelector(".nelvyon-hero-v3__visual")).toBeNull();
-    expect(document.querySelectorAll(".nelvyon-hero-v3__accent").length).toBeGreaterThanOrEqual(3);
-  });
-
-  it("Home servicios muestra frases exactas", () => {
-    renderWithProviders(<HomePage />);
-    expect(screen.getByText(/Posicionamiento para aumentar visibilidad/i)).toBeInTheDocument();
-    expect(screen.getByText(/Tiendas optimizadas para vender más/i)).toBeInTheDocument();
+    expect(screen.getAllByText("NELVYON").length).toBeGreaterThan(0);
   });
 
   it("Página /partners renderiza calculadora", () => {

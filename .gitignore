@@ -26,6 +26,7 @@ dist/
 build/
 out/
 .next/
+.source/
 .nuxt/
 .turbo/
 .nx/

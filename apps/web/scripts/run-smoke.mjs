@@ -8,7 +8,7 @@ const appWebRoot = join(__dirname, "..");
 const files = JSON.parse(readFileSync(join(__dirname, "smoke-test-files.json"), "utf8"));
 const vitestEntry = join(appWebRoot, "node_modules", "vitest", "vitest.mjs");
 
-const r = spawnSync(process.execPath, [vitestEntry, "run", ...files], {
+const r = spawnSync(process.execPath, [vitestEntry, "run", "--pool=forks", "--maxWorkers=1", ...files], {
   cwd: appWebRoot,
   stdio: "inherit",
   shell: false,

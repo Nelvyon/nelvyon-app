@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { AboutSection } from "@/components/pa/about";
+import { Container } from "@/components/pa/container";
+import { PageHeader } from "@/components/pa/page-header";
 
-import { NvNosotrosPage } from "@/components/nelvyon-marketing/pages/nosotros-page";
 
 export const metadata: Metadata = {
   title: "Nosotros | NELVYON",
@@ -8,5 +10,12 @@ export const metadata: Metadata = {
 };
 
 export default function NosotrosPage() {
-  return <NvNosotrosPage />;
+  return (
+    <>
+      <Container className="relative pt-28 md:pt-40">
+        <PageHeader>Nosotros</PageHeader>
+      </Container>
+      <AboutSection />
+    </>
+  );
 }

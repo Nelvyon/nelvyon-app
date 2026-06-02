@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-import { NvServiciosPage } from "@/components/nelvyon-marketing/pages/servicios-page";
+import { Acebuilder } from "@/components/pa/acebuilder";
+import { Products } from "@/components/pa/products";
 
 export const metadata: Metadata = {
   title: "Servicios | NELVYON — Marketing y automatización",
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function ServiciosPage() {
-  return <NvServiciosPage />;
+  return (
+    <>
+      <Acebuilder />
+      <Products />
+    </>
+  );
 }
