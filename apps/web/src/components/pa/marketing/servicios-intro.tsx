@@ -7,7 +7,7 @@ import { nelvyonPageCtas } from "@/config/nelvyon-pa-content";
 export function ServiciosIntro() {
   return (
     <section className="w-full pt-28 md:pt-36">
-      <Container className="flex flex-col gap-20 pb-8">
+      <Container className="flex flex-col gap-24 pb-12 md:gap-28 md:pb-16">
         <div className="flex max-w-3xl flex-col gap-6">
           <Header>{nelvyonServiciosIntro.title}</Header>
           <p className="-tracking-xs text-lg leading-7 font-medium text-white/75">

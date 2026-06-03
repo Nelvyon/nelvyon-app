@@ -345,6 +345,42 @@ export const nelvyonSaasVision = {
   body: "NELVYON SaaS está diseñado para reunir las piezas principales del crecimiento digital en una sola plataforma. El objetivo no es añadir más herramientas, sino reducir complejidad y crear una operación más clara.",
 };
 
+export const nelvyonSaasPanel = {
+  title: "Todo tu sistema comercial en un solo panel",
+  subtitle:
+    "Cuatro capas operativas conectadas en el mismo workspace. Sin prometer funciones que no existen: cada bloque refleja módulos reales del dashboard NELVYON.",
+  blocks: [
+    {
+      id: "crm-leads",
+      title: "CRM y leads",
+      description:
+        "Contactos, oportunidades, pipeline y captación en un registro compartido. Cada lead entra con origen, etapa y contexto para el equipo comercial.",
+      items: ["Contactos y empresas", "Pipeline por etapas", "Captación y scoring", "Actividades de seguimiento"],
+    },
+    {
+      id: "automatizaciones",
+      title: "Automatizaciones",
+      description:
+        "Workflows que ejecutan tareas repetitivas: asignaciones, alertas, actualizaciones de CRM y comunicaciones según reglas del negocio.",
+      items: ["Flujos por evento", "Tareas automáticas", "Reglas comerciales", "Menos seguimiento manual"],
+    },
+    {
+      id: "comunicacion",
+      title: "Comunicación",
+      description:
+        "Canales conectados al contexto del cliente: campañas de email, mensajería e integraciones según tu configuración activa.",
+      items: ["Email marketing", "Secuencias y nurturing", "WhatsApp (según integración)", "Historial por contacto"],
+    },
+    {
+      id: "ia-analitica",
+      title: "IA y analítica",
+      description:
+        "Paneles operativos para leer captación y conversión, con asistentes del ecosistema NELVYON según módulos contratados.",
+      items: ["Dashboard operativo", "Señales de campañas", "Reporting según plan", "Asistentes IA por módulo"],
+    },
+  ],
+} as const;
+
 export const nelvyonSaasPage = {
   modulesTitle: "Qué puede gestionar",
   modulesIntro:
@@ -545,13 +581,13 @@ export const nelvyonSaasModules = [
 export const nelvyonServiciosCapacidades = {
   title: "Capacidades NELVYON",
   intro:
-    "Áreas de ejecución que cubren el ciclo completo de crecimiento digital: desde la visibilidad hasta la operación interna.",
+    "Seis áreas de ejecución que cubren visibilidad, conversión, automatización, datos, operación e IA. Cada categoría responde a una parte concreta del sistema de crecimiento.",
   categories: [
     {
       id: "marketing",
       title: "Marketing",
       intro:
-        "Canales de adquisición y posicionamiento con método, medición y continuidad entre campañas y seguimiento comercial.",
+        "Todo lo que atrae demanda: posicionamiento orgánico, campañas de pago, redes, email y contenido. Trabajamos cada canal con método y medición, no como acciones sueltas.",
       items: [
         { title: "SEO", description: "Visibilidad orgánica con auditoría, arquitectura editorial y priorización por demanda real." },
         { title: "Publicidad", description: "Paid media estructurado con seguimiento de coste, volumen y calidad de lead." },
@@ -564,7 +600,7 @@ export const nelvyonServiciosCapacidades = {
       id: "desarrollo",
       title: "Desarrollo",
       intro:
-        "Activos digitales orientados a conversión, rendimiento e integración con captación y operación comercial.",
+        "Activos digitales que convierten: webs, tiendas, landings y funnels. Cada pieza se diseña para captar, medir y conectar con el seguimiento comercial.",
       items: [
         { title: "Web Corporativa", description: "Sitios profesionales con mensaje claro, velocidad y eventos de conversión medibles." },
         { title: "Ecommerce", description: "Tiendas online con funnel de compra, tracking y coordinación con campañas y post-venta." },
@@ -576,7 +612,7 @@ export const nelvyonServiciosCapacidades = {
       id: "automatizacion",
       title: "Automatización",
       intro:
-        "Procesos repetibles entre marketing, ventas y operación para reducir trabajo manual y mejorar el seguimiento.",
+        "Procesos que conectan marketing y ventas: CRM, leads, alertas y workflows. El objetivo es continuidad operativa, no bots decorativos.",
       items: [
         { title: "Automatización IA", description: "Flujos asistidos por IA para tareas repetitivas de clasificación, respuesta y priorización." },
         { title: "CRM", description: "Implementación y configuración de CRM para estructurar contactos, pipeline y actividades comerciales." },
@@ -589,7 +625,7 @@ export const nelvyonServiciosCapacidades = {
       id: "datos",
       title: "Datos",
       intro:
-        "Lectura operativa del negocio: qué funciona, dónde hay fricción y qué decisiones tomar con información consolidada.",
+        "Información que sirve para decidir: dashboards, analítica y reportes con lectura clara de qué funciona y qué hay que ajustar.",
       items: [
         { title: "Dashboards", description: "Cuadros de mando con KPIs comerciales y de marketing en una vista accionable." },
         { title: "Analítica", description: "Seguimiento de tráfico, campañas y conversiones con criterio de atribución acordado." },
@@ -600,7 +636,7 @@ export const nelvyonServiciosCapacidades = {
       id: "operacion",
       title: "Operación Digital",
       intro:
-        "Organización interna del crecimiento: procesos, roles y sistemas que sostienen la ejecución día a día.",
+        "La capa interna que sostiene el crecimiento: equipos, procesos, optimización y arquitectura de sistemas conectados.",
       items: [
         { title: "Organización comercial", description: "Estructura de equipos, etapas y responsables para que ventas y marketing operen con claridad." },
         { title: "Procesos internos", description: "Mapeo y diseño de flujos internos entre departamentos, herramientas y puntos de contacto." },
@@ -612,7 +648,7 @@ export const nelvyonServiciosCapacidades = {
       id: "ia",
       title: "IA",
       intro:
-        "Inteligencia artificial aplicada a tareas concretas de marketing y operación, con criterio y supervisión humana.",
+        "IA aplicada a tareas reales de marketing y operación: asistentes, documentación, contenido y optimización de procesos, siempre con supervisión humana.",
       items: [
         { title: "Asistentes IA", description: "Agentes configurados para apoyar tareas de respuesta, clasificación y preparación de contenido." },
         { title: "Automatización documental", description: "Generación y estructuración de documentos operativos a partir de datos y plantillas del negocio." },

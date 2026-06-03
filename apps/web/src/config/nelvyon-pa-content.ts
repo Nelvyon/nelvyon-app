@@ -2,7 +2,6 @@ export const nelvyonNavLinks = [
   { label: "Inicio", href: "/" },
   { label: "Servicios", href: "/servicios" },
   { label: "SaaS", href: "/saas" },
-  { label: "Precios", href: "/pricing" },
   { label: "Nosotros", href: "/nosotros" },
 ] as const;
 
@@ -169,7 +168,6 @@ export const nelvyonFooter = {
     { label: "Home", href: "/" },
     { label: "Servicios", href: "/servicios" },
     { label: "SaaS", href: "/saas" },
-    { label: "Pricing", href: "/pricing" },
     { label: "Contacto", href: "/contacto" },
   ],
   legalLinks: [

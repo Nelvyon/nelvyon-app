@@ -30,7 +30,7 @@ const gridLayerVariants: Variants = {
 
 const lightAboveVariants: Variants = {
   hidden: { opacity: 0 },
-  show: { opacity: 0.4, transition: { duration: 0.8, ease: "easeInOut" } },
+  show: { opacity: 0.55, transition: { duration: 0.8, ease: "easeInOut" } },
 };
 
 export const Hero = () => {

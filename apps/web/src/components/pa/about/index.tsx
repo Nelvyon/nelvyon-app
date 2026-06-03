@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Container } from "@/components/pa/container";
 import Link from "next/link";
 import {
@@ -8,13 +7,14 @@ import {
 } from "@/components/pa/icons/general";
 import { cn } from "@/lib/pa/utils";
 import { nelvyonAbout } from "@/config/nelvyon-pa-content";
+import { PaDashboardMock } from "@/components/pa/marketing/pa-dashboard-mock";
 
 export const AboutSection = () => {
   return (
     <section className="bg-natural-black text-natural-white relative w-full overflow-hidden">
       <div className="absolute inset-0">
         <div className="relative h-full w-full">
-          <div className="absolute top-71 -left-140 h-125.5 w-122 rounded-full bg-white blur-[214px]" />
+          <div className="absolute top-71 -left-140 h-125.5 w-122 rounded-full bg-[#0084FF]/20 blur-[214px]" />
           <div className="absolute top-0 -left-40 h-293 w-180 rounded-full bg-[#27251F] blur-[287px]" />
           <div className="absolute top-0 -right-100 h-293.75 w-180 rounded-full bg-[#27251F] blur-[287px]" />
           <div
@@ -33,13 +33,7 @@ export const AboutSection = () => {
         </div>
         <div className="grid w-full grid-cols-1 justify-between gap-30 lg:grid-cols-5">
           <div className="relative lg:col-span-2">
-            <Image
-              src={"/pa/assets/project-1.webp"}
-              alt="Operación digital NELVYON"
-              width={1200}
-              height={800}
-              className="w-full rounded-lg object-cover"
-            />
+            <PaDashboardMock title="Ecosistema NELVYON" />
           </div>
           <div className="flex h-full w-full flex-col justify-between gap-15 lg:col-span-3">
             <div className="flex flex-col gap-6">

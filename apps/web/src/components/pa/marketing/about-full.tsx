@@ -1,10 +1,9 @@
-import Image from "next/image";
-
 import { nelvyonAboutFull } from "@/config/nelvyon-marketing-pages";
 import { nelvyonPageCtas } from "@/config/nelvyon-pa-content";
 import { Container } from "@/components/pa/container";
 import { Header } from "@/components/pa/header";
 import { Button } from "@/components/pa/button";
+import { PaDashboardMock } from "@/components/pa/marketing/pa-dashboard-mock";
 
 export function AboutFull() {
   return (
@@ -40,15 +39,7 @@ export function AboutFull() {
         </div>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10">
-            <Image
-              src="/pa/assets/project-3.webp"
-              alt="Panel y operación digital NELVYON"
-              width={1200}
-              height={800}
-              className="h-auto w-full object-cover"
-            />
-          </div>
+          <PaDashboardMock title="Panel operativo" />
           <div className="flex flex-col gap-6">
             <Header>Historia</Header>
             <p className="text-lg leading-7 text-white/75">{nelvyonAboutFull.historia}</p>

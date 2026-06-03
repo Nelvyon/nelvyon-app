@@ -157,8 +157,8 @@ export const GlobeLight = () => {
           y2="334"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#CDA63C" />
-          <stop offset="1" stopColor="#CDA63C" stopOpacity="0" />
+          <stop stopColor="#0084FF" />
+          <stop offset="1" stopColor="#0084FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_2693_2731"
@@ -168,8 +168,8 @@ export const GlobeLight = () => {
           y2="361"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#CDA63C" />
-          <stop offset="1" stopColor="#CDA63C" stopOpacity="0" />
+          <stop stopColor="#0047AB" />
+          <stop offset="1" stopColor="#0047AB" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_2693_2731"
@@ -179,8 +179,8 @@ export const GlobeLight = () => {
           y2="336.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#CDA63C" />
-          <stop offset="1" stopColor="#CDA63C" stopOpacity="0" />
+          <stop stopColor="#0084FF" />
+          <stop offset="1" stopColor="#0084FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_2693_2731"
@@ -190,8 +190,8 @@ export const GlobeLight = () => {
           y2="780.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="white" />
-          <stop offset="1" stopColor="white" stopOpacity="0" />
+          <stop stopColor="#66B3FF" />
+          <stop offset="1" stopColor="#66B3FF" stopOpacity="0" />
         </linearGradient>
       </defs>
     </motion.svg>
