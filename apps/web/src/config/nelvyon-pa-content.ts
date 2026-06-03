@@ -8,55 +8,55 @@ export const nelvyonNavLinks = [
 
 export const nelvyonHero = {
   title:
-    "NELVYON une SaaS, marketing, automatización e IA para hacer crecer negocios con orden.",
+    "NELVYON une SaaS, marketing, automatización e IA para construir sistemas digitales que ayudan a captar, vender y operar con más orden.",
   subtitle:
-    "Servicios profesionales y plataforma en un mismo sistema operativo: captación, CRM, automatizaciones y reporting sin saltar entre herramientas.",
+    "Diseñamos y conectamos web, CRM, campañas, automatizaciones y datos para que tu negocio dependa menos de procesos sueltos y tenga una operación más clara.",
   ctaPrimary: "Solicitar información",
   ctaSecondary: "Ver SaaS",
 };
 
 export const nelvyonServices = [
   {
+    title: "Desarrollo Web",
+    href: "/desarrollo-web",
+    problem: "Tu web no transmite confianza ni convierte visitas en oportunidades.",
+    solution: "Sitios y landings profesionales, rápidos y conectados a captación y CRM.",
+    microcopy: "Presencia digital profesional y conversión.",
+  },
+  {
     title: "SEO",
     href: "/seo",
-    problem: "Tu marca no aparece donde tu cliente busca.",
-    solution: "Visibilidad orgánica, contenido y técnica alineados a demanda real.",
-    microcopy: "Para negocios que necesitan captar mejor.",
+    problem: "Tu marca no aparece de forma constante cuando el cliente busca.",
+    solution: "Estrategia orgánica, contenido y técnica para captación a largo plazo.",
+    microcopy: "Visibilidad orgánica y demanda sostenida.",
   },
   {
     title: "Publicidad",
     href: "/ads",
-    problem: "Inviertes en ads sin un sistema claro de seguimiento.",
-    solution: "Campañas estructuradas con optimización y reporting conectado.",
-    microcopy: "Para empresas que quieren escalar captación con control.",
+    problem: "Inviertes en anuncios sin medir bien qué genera negocio.",
+    solution: "Campañas estructuradas con seguimiento de coste, lead y calidad.",
+    microcopy: "Captación inmediata con medición clara.",
   },
   {
     title: "Branding",
     href: "/branding",
-    problem: "Tu mensaje cambia en cada canal y pierde coherencia.",
-    solution: "Identidad y narrativa aplicables a web, campañas y ventas.",
-    microcopy: "Para marcas que necesitan presencia profesional.",
-  },
-  {
-    title: "Desarrollo Web",
-    href: "/desarrollo-web",
-    problem: "Tu web no convierte o no está conectada al CRM.",
-    solution: "Sitios y landings orientados a conversión, rendimiento e integración.",
-    microcopy: "Para negocios que lanzan oferta o campaña.",
-  },
-  {
-    title: "Ecommerce",
-    href: "/ecommerce",
-    problem: "El funnel de compra tiene fricción y datos dispersos.",
-    solution: "Tienda y post-venta conectados a campañas y operación.",
-    microcopy: "Para marcas que venden online y quieren orden.",
+    problem: "Tu marca se percibe genérica o inconsistente entre canales.",
+    solution: "Identidad, mensaje y piezas que transmiten confianza y claridad.",
+    microcopy: "Identidad, confianza y percepción premium.",
   },
   {
     title: "Automatización",
     href: "/automatizacion",
-    problem: "El seguimiento depende de tareas manuales repetitivas.",
-    solution: "Flujos entre marketing, ventas y operación con reglas claras.",
-    microcopy: "Para empresas que quieren automatizar seguimiento.",
+    problem: "El equipo pierde tiempo en tareas repetitivas de seguimiento.",
+    solution: "Flujos que asignan, avisan y actualizan el CRM según reglas del negocio.",
+    microcopy: "Ahorro de tiempo y seguimiento fiable.",
+  },
+  {
+    title: "Ecommerce",
+    href: "/ecommerce",
+    problem: "La tienda vende pero el proceso post-compra y los datos están dispersos.",
+    solution: "Funnel de compra, tracking y coordinación con campañas y operación.",
+    microcopy: "Venta online con proceso claro.",
   },
 ] as const;
 
@@ -64,7 +64,7 @@ export const nelvyonSaasPlans = [
   {
     name: "Starter",
     forWho:
-      "Equipos pequeños o fundadores que necesitan ordenar leads, clientes y tareas repetitivas.",
+      "Equipos pequeños o fundadores que necesitan estructurar leads, clientes y tareas repetitivas.",
     subtitle: "Base operativa para empezar sin complejidad innecesaria.",
     price: 97,
     currency: "EUR",
@@ -120,7 +120,7 @@ export const nelvyonFaq = [
   {
     question: "¿Trabajan con empresas pequeñas o solo con equipos grandes?",
     answer:
-      "Con equipos en crecimiento y operaciones ya activas. El alcance se adapta al volumen de canales, integraciones y procesos que haya que ordenar.",
+      "Con equipos en crecimiento y operaciones ya activas. El alcance se adapta al volumen de canales, integraciones y procesos a estructurar.",
   },
   {
     question: "¿Cuánto tarda la puesta en marcha?",
@@ -161,11 +161,10 @@ export const nelvyonPageCtas = {
 
 export const nelvyonFooter = {
   tagline:
-    "NELVYON centraliza marketing, ventas, automatización e IA en un sistema operativo para negocios modernos.",
+    "SaaS, marketing, automatización e IA en un mismo partner para negocios que quieren operar con método.",
   ctaTitle: nelvyonPageCtas.global,
   ctaHref: "/contacto",
-  description:
-    "Servicios profesionales y plataforma SaaS para ejecutar marketing, ventas y automatización con método.",
+  description: "",
   mainLinks: [
     { label: "Home", href: "/" },
     { label: "Servicios", href: "/servicios" },

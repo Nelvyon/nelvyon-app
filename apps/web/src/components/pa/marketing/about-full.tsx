@@ -21,6 +21,24 @@ export function AboutFull() {
           </p>
         </div>
 
+        <div>
+          <Header>{nelvyonAboutFull.loQueNoHacemos.title}</Header>
+          <ul className="mt-8 flex flex-col gap-3">
+            {nelvyonAboutFull.loQueNoHacemos.items.map((item) => (
+              <li
+                key={item}
+                className="flex gap-3 rounded-2xl border border-white/10 bg-[#07111F] px-5 py-4 text-base leading-6 text-white/85"
+              >
+                <span className="shrink-0 text-[#0084FF]">×</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-lg leading-7 text-white/75">
+            {nelvyonAboutFull.loQueNoHacemos.cierre}
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
           <div className="relative overflow-hidden rounded-3xl border border-white/10">
             <Image

@@ -18,7 +18,7 @@ const ogImageAbs = `${canonicalBase}/og-image.png`;
 export const metadata: Metadata = {
   title: "NELVYON — SaaS, marketing, automatización e IA",
   description:
-    "NELVYON une SaaS, marketing, automatización e IA para hacer crecer negocios con orden. Servicios profesionales y plataforma operativa.",
+    "NELVYON une SaaS, marketing, automatización e IA para construir sistemas digitales que ayudan a captar, vender y operar con más claridad.",
   openGraph: {
     title: "NELVYON — SaaS, marketing, automatización e IA",
     description:

@@ -43,7 +43,7 @@ export function GradientGrid({ className }: { className?: string }) {
       className={className}
     >
       <defs>
-        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="nelvyonGridGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.5" />
           <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0" />
         </linearGradient>
@@ -65,7 +65,7 @@ export function GradientGrid({ className }: { className?: string }) {
             y={y}
             width={cellSize}
             height={cellSize}
-            fill={isFilled ? "url(#goldGradient)" : "transparent"}
+            fill={isFilled ? "url(#nelvyonGridGradient)" : "transparent"}
             stroke="rgba(255,255,255,0.08)"
           />
         );

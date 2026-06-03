@@ -7,8 +7,8 @@ export function HomeSystemSection() {
       <Container className="flex flex-col gap-6">
         <Header>Un sistema para ordenar, automatizar y hacer crecer tu negocio</Header>
         <p className="-tracking-xs max-w-3xl text-lg leading-7 font-medium text-white/75">
-          NELVYON combina SaaS, servicios de marketing, automatización e IA para que una empresa
-          pueda centralizar captación, ventas, comunicación y operación digital en un solo entorno.
+          NELVYON conecta estrategia, tecnología y ejecución para que marketing, ventas y operación
+          trabajen dentro de una misma estructura.
         </p>
       </Container>
     </section>

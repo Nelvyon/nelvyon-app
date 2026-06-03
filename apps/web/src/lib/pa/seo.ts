@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const siteConfig = {
   name: "NELVYON",
   description:
-    "NELVYON une SaaS, marketing, automatización e IA para hacer crecer negocios con orden.",
+    "NELVYON une SaaS, marketing, automatización e IA para construir sistemas digitales con más claridad.",
   // Override in production via NEXT_PUBLIC_SITE_URL.
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://nelvyon.com",
   ogImage: "/logo.png",

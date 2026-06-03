@@ -65,9 +65,9 @@ export const Stars = () => {
           cx={star.cx}
           cy={star.cy}
           r={star.r}
-          fill="white"
+          fill={i % 7 === 0 ? "#0084FF" : "white"}
           initial={{ opacity: 0.2 }}
-          animate={{ opacity: [0.2, 1, 0.2] }}
+          animate={{ opacity: [0.2, i % 7 === 0 ? 0.85 : 1, 0.2] }}
           transition={{
             duration: 2 + seeded(i) * 3,
             delay: 1.2 + seeded(i + 100) * 2.5,

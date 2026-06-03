@@ -316,9 +316,9 @@ export const RoundedGridPattern = () => {
           gradientUnits="userSpaceOnUse"
         >
           <stop offset="0.0819437" stopColor="#F7F7F7" />
-          <stop offset="0.208333" stopColor="#EDDD9D" />
-          <stop offset="0.526042" stopColor="#C471ED" />
-          <stop offset="0.9375" stopColor="#F64F59" />
+          <stop offset="0.35" stopColor="#0084FF" stopOpacity="0.6" />
+          <stop offset="0.65" stopColor="#0047AB" stopOpacity="0.5" />
+          <stop offset="0.9375" stopColor="#0084FF" stopOpacity="0.25" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_2620_9398"

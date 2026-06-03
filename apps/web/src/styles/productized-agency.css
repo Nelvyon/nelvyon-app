@@ -148,3 +148,15 @@ body:has(.pa-theme) {
 .pa-theme [class*="border-purple"] {
   border-color: rgba(0, 132, 255, 0.35) !important;
 }
+
+.pa-theme [stroke="#FF6200"],
+.pa-theme [fill="#FF6200"] {
+  stroke: #0084ff !important;
+  fill: #0084ff !important;
+}
+
+.pa-theme [fill="#FFBC00"],
+.pa-theme [fill="#FFBD2E"],
+.pa-theme [fill="#FF5F57"] {
+  fill: rgba(255, 255, 255, 0.35) !important;
+}

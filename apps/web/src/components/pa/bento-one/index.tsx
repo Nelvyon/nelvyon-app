@@ -14,7 +14,13 @@ import { ComponentsDashboardsAndEverything } from "@/components/pa/bento-one/car
 export const BentoOne = () => {
   return (
     <Container className="flex flex-col gap-15 py-4">
-      <Header>Servicios NELVYON</Header>
+      <div className="flex flex-col gap-3">
+        <Header>Servicios NELVYON</Header>
+        <p className="max-w-2xl text-base leading-6 text-white/70">
+          Cada servicio cubre un ángulo distinto del crecimiento: visibilidad, captación, marca,
+          tecnología, venta y seguimiento.
+        </p>
+      </div>
 
       <div className="grid grid-cols-19 gap-3">
         <div className="bg-natural-black relative col-span-19 grid overflow-hidden rounded-2xl p-4 lg:col-span-6">

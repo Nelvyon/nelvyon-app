@@ -70,7 +70,7 @@ export const GridPattenDepth = () => {
             y="28.7969"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -83,7 +83,7 @@ export const GridPattenDepth = () => {
               y="28.7969"
               width="72"
               height="72"
-              fill="#F0C17B"
+              fill="#0084FF"
               fillOpacity="0.5"
               shapeRendering="crispEdges"
               initial={{ opacity: 0 }}
@@ -98,7 +98,7 @@ export const GridPattenDepth = () => {
               y="100.797"
               width="72"
               height="72"
-              fill="#F0C17B"
+              fill="#0084FF"
               fillOpacity="0.5"
               shapeRendering="crispEdges"
               initial={{ opacity: 0 }}
@@ -112,7 +112,7 @@ export const GridPattenDepth = () => {
             y="100.797"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.45 }}
@@ -124,7 +124,7 @@ export const GridPattenDepth = () => {
             y="100.797"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.3 }}
@@ -136,7 +136,7 @@ export const GridPattenDepth = () => {
             y="172.797"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.6 }}
@@ -148,7 +148,7 @@ export const GridPattenDepth = () => {
             y="172.797"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.45 }}
@@ -161,7 +161,7 @@ export const GridPattenDepth = () => {
               y="172.797"
               width="72"
               height="72"
-              fill="#F0C17B"
+              fill="#0084FF"
               fillOpacity="0.5"
               shapeRendering="crispEdges"
               initial={{ opacity: 0 }}
@@ -175,7 +175,7 @@ export const GridPattenDepth = () => {
             y="100.797"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.3 }}
@@ -187,7 +187,7 @@ export const GridPattenDepth = () => {
             y="28.7969"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.3 }}
@@ -199,7 +199,7 @@ export const GridPattenDepth = () => {
             y="172.797"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.15 }}
@@ -211,7 +211,7 @@ export const GridPattenDepth = () => {
             y="244.797"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.3 }}
@@ -223,7 +223,7 @@ export const GridPattenDepth = () => {
             y="244.797"
             width="72"
             height="72"
-            fill="#F0C17B"
+            fill="#0084FF"
             fillOpacity="0.5"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.15 }}

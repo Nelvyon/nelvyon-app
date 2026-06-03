@@ -41,7 +41,7 @@ export function SaasPageContent() {
       <section className="w-full border-t border-white/8 py-12 md:py-20">
         <Container className="flex flex-col gap-8">
           <Header>{nelvyonSaasPage.replacesTitle}</Header>
-          <p className="max-w-3xl text-base leading-6 text-white/70">
+          <p className="max-w-3xl text-base leading-6 text-white/75">
             {nelvyonSaasPage.replacesIntro}
           </p>
           <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">

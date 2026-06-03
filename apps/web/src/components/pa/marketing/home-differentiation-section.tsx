@@ -4,24 +4,24 @@ import { Header } from "@/components/pa/header";
 const blocks = [
   {
     title: "Agencia tradicional",
-    body: "Ejecuta acciones aisladas: campañas, diseño o contenido, pero muchas veces sin conectar todo el sistema comercial.",
+    body: "Ejecuta acciones aisladas, pero muchas veces no conecta todo el proceso comercial.",
     highlight: false,
   },
   {
     title: "Herramientas separadas",
-    body: "CRM, formularios, calendarios, email, WhatsApp y analítica en plataformas distintas que generan fricción y pérdida de control.",
+    body: "CRM, formularios, calendarios, email, WhatsApp y analítica en plataformas distintas generan fricción y pérdida de control.",
     highlight: false,
   },
   {
     title: "NELVYON",
-    body: "Une estrategia, tecnología, automatización e IA para construir una operación digital más clara, conectada y escalable.",
+    body: "Une SaaS, servicios, automatización e IA para construir una operación digital más clara, conectada y escalable.",
     highlight: true,
   },
 ] as const;
 
 export function HomeDifferentiationSection() {
   return (
-    <section className="w-full bg-[#020817]/50 py-16 md:py-24">
+    <section className="w-full py-16 md:py-24">
       <Container className="flex flex-col gap-10 md:gap-12">
         <Header>Más que una agencia. Más que un software.</Header>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

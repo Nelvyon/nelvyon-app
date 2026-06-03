@@ -23,7 +23,7 @@ export const LightAbove = () => {
         filter="url(#filter1_f_2693_2600)"
         style={{ mixBlendMode: "plus-lighter" }}
       >
-        <path d="M611.5 219L495 -188H959L849.5 219H611.5Z" fill="#FFD99F" />
+        <path d="M611.5 219L495 -188H959L849.5 219H611.5Z" fill="#0047AB" fillOpacity="0.35" />
       </g>
       <g
         filter="url(#filter2_f_2693_2600)"
@@ -31,8 +31,8 @@ export const LightAbove = () => {
       >
         <path
           d="M656.49 43L568 -219H829L768.219 43H656.49Z"
-          fill="#F6B253"
-          fillOpacity="0.8"
+          fill="#0084FF"
+          fillOpacity="0.45"
         />
       </g>
       <defs>

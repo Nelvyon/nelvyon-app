@@ -19,9 +19,9 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
     title: "SEO",
     eyebrow: "Servicio NELVYON",
     summary:
-      "Posicionamiento orgánico, contenido y técnica alineados a la demanda de tu mercado, con reporting conectado a la operación.",
+      "Visibilidad orgánica y captación a largo plazo: técnica, contenido y prioridades según demanda real de tu mercado.",
     whatIs:
-      "El servicio SEO de NELVYON cubre auditoría, arquitectura de contenido, optimización on-page y seguimiento de rendimiento. Trabajamos con datos reales de tu web y competencia, sin promesas de posiciones garantizadas.",
+      "NELVYON trabaja SEO como canal de adquisición sostenible: auditoría, arquitectura editorial, on-page y seguimiento. Sin promesas de posiciones; con criterio técnico y datos de tu web y competencia.",
     forWho: [
       "Marcas que dependen de captación orgánica y necesitan priorizar esfuerzos.",
       "Equipos con web activa que quieren orden técnico y editorial.",
@@ -62,9 +62,9 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
     title: "Publicidad",
     eyebrow: "Servicio NELVYON",
     summary:
-      "Campañas en buscadores y redes sociales con estructura, creatividades y optimización orientadas a adquisición medible.",
+      "Captación inmediata con campañas estructuradas, creatividades y optimización basada en datos de plataforma.",
     whatIs:
-      "Diseñamos y operamos campañas de paid media (Google, Meta y otros canales según alcance) con foco en estructura, mensajes y revisión de rendimiento. Sin prometer ROAS fijo: optimizamos con datos de plataforma.",
+      "NELVYON diseña y opera paid media (Google, Meta y otros según alcance) con foco en volumen, coste y calidad de lead. Medimos y ajustamos; no prometemos ROAS fijo.",
     forWho: [
       "Empresas que necesitan volumen de leads o ventas con presupuesto controlado.",
       "Equipos que ya invierten en ads pero carecen de método y reporting unificado.",
@@ -105,9 +105,9 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
     title: "Branding",
     eyebrow: "Servicio NELVYON",
     summary:
-      "Identidad, mensaje y coherencia visual para que marketing y ventas hablen el mismo idioma.",
+      "Identidad, confianza y percepción premium: mensaje y sistema visual coherentes en cada punto de contacto.",
     whatIs:
-      "Trabajamos posicionamiento, narrativa y sistema visual aplicable a web, campañas y piezas comerciales. El objetivo es claridad y consistencia, no solo un logo aislado.",
+      "NELVYON define posicionamiento, narrativa y guías visuales aplicables a web, campañas y ventas. Buscamos claridad y consistencia de marca, no solo un logo suelto.",
     forWho: [
       "Marcas en reposicionamiento o lanzamiento.",
       "Equipos con múltiples proveedores que generan mensajes dispares.",
@@ -143,9 +143,9 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
     title: "Contenido",
     eyebrow: "Servicio NELVYON",
     summary:
-      "Calendarios editoriales, copy y piezas para blog y redes, alineados a SEO y campañas.",
+      "Autoridad, redes y comunicación: contenido alineado a marca, SEO y campañas activas.",
     whatIs:
-      "Producción y planificación de contenido con criterio de marca y objetivo comercial. Combinamos redacción, repurposing y coordinación con canales de distribución.",
+      "NELVYON planifica y produce contenido con criterio comercial: pilares editoriales, copy y piezas para blog y redes. Coordinamos con SEO y paid cuando aplica.",
     forWho: [
       "Equipos sin capacidad interna de contenido constante.",
       "Marcas que alimentan SEO y redes desde un mismo plan.",
@@ -181,9 +181,9 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
     title: "Email Marketing",
     eyebrow: "Servicio NELVYON",
     summary:
-      "Secuencias, newsletters y automatizaciones de email conectadas al CRM y al journey comercial.",
+      "Relación, nutrición y conversión: email conectado al CRM y al recorrido comercial.",
     whatIs:
-      "Diseñamos flujos de email (bienvenida, nurturing, reactivación) integrados con tu base de contactos y etapas de venta. Medimos aperturas y clics con las herramientas que uses o con NELVYON.",
+      "NELVYON diseña secuencias, newsletters y reglas de envío (bienvenida, nurturing, reactivación) integradas con tu base y etapas de venta. Medimos aperturas y clics en tu ESP o en NELVYON.",
     forWho: [
       "Negocios con base de leads que no nutren de forma sistemática.",
       "Equipos que quieren unir CRM y comunicación por email.",
@@ -219,9 +219,9 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
     title: "Desarrollo Web",
     eyebrow: "Servicio NELVYON",
     summary:
-      "Sitios y landings rápidos, orientados a conversión y conectados a captación y CRM.",
+      "Presencia digital profesional: webs y landings orientadas a conversión, rendimiento e integración con captación.",
     whatIs:
-      "Diseño y desarrollo de webs corporativas, landings de campaña y páginas de producto. Priorizamos rendimiento, claridad del mensaje e integración con formularios y analítica.",
+      "NELVYON diseña y desarrolla webs corporativas, landings de campaña y páginas de producto. Priorizamos mensaje claro, velocidad, formularios y eventos de conversión enlazados al CRM.",
     forWho: [
       "Empresas que lanzan oferta o campaña y necesitan landing operativa.",
       "Marcas con web desactualizada que frena conversión.",
@@ -257,9 +257,9 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
     title: "Ecommerce",
     eyebrow: "Servicio NELVYON",
     summary:
-      "Tiendas y funnels de venta con operación conectada a inventario, campañas y post-venta.",
+      "Venta online ordenada: funnel, checkout, tracking y coordinación con campañas y post-venta.",
     whatIs:
-      "Implementación y optimización de ecommerce: catálogo, checkout, tracking y coordinación con publicidad y automatizaciones. Trabajamos con plataformas acordadas en proyecto.",
+      "NELVYON implementa y optimiza tiendas online: catálogo, checkout, eventos de conversión y coordinación con ads, email y operación. Plataforma según proyecto acordado.",
     forWho: [
       "Marcas D2C que escalan tráfico y pedidos.",
       "Retailers que unifican campañas y operación.",
@@ -295,9 +295,9 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
     title: "Automatización",
     eyebrow: "Servicio NELVYON",
     summary:
-      "Flujos entre marketing, ventas y operación para eliminar tareas repetitivas y errores manuales.",
+      "Ahorro de tiempo y seguimiento fiable: flujos entre marketing, ventas y operación con reglas claras.",
     whatIs:
-      "Diseñamos automatizaciones (email, tareas, asignaciones, alertas) sobre la plataforma NELVYON y herramientas conectadas. El foco es continuidad operativa, no bots decorativos.",
+      "NELVYON diseña automatizaciones (email, tareas, asignaciones, alertas) en NELVYON y herramientas conectadas. El foco es continuidad operativa y menos trabajo manual, no bots decorativos.",
     forWho: [
       "Equipos que pierden leads por falta de seguimiento automático.",
       "Negocios con procesos repetitivos entre herramientas.",
@@ -332,15 +332,17 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
 export const nelvyonSaasHero = {
   title: "NELVYON SaaS: una plataforma para gestionar crecimiento, clientes y automatización",
   subtitle:
-    "Centraliza CRM, leads, pipeline, calendarios, formularios, automatizaciones, WhatsApp, email marketing, landing pages, analítica e IA en un solo entorno.",
+    "Plataforma orientada a conectar CRM, leads, pipeline, formularios, comunicación, automatizaciones, landings, analítica e IA en un mismo entorno operativo.",
 };
 
 export const nelvyonSaasPage = {
-  replacesTitle: "NELVYON SaaS reduce la dependencia de múltiples herramientas desconectadas",
+  replacesTitle: "Qué sustituye NELVYON SaaS",
   replacesIntro:
-    "En lugar de saltar entre CRM, formularios, mensajería y reporting en silos, NELVYON concentra las capas operativas que tu negocio usa a diario.",
+    "NELVYON SaaS está diseñado para reducir la dependencia de herramientas separadas y permite conectar las piezas principales del crecimiento digital en un mismo entorno.",
   replacesItems: [
     "CRM",
+    "Leads",
+    "Pipeline",
     "Formularios",
     "Calendarios",
     "WhatsApp",
@@ -348,14 +350,15 @@ export const nelvyonSaasPage = {
     "Automatizaciones",
     "Landing pages",
     "Analítica",
+    "IA",
   ],
   audienceTitle: "Para quién es NELVYON SaaS",
   audiences: [
-    "Negocios locales que necesitan ordenar clientes y seguimiento",
+    "Negocios locales que necesitan estructurar clientes y seguimiento",
     "Agencias que gestionan varias marcas o cuentas",
     "Clínicas y servicios con citas, leads y comunicación recurrente",
     "Ecommerce que conectan campañas, pedidos y post-venta",
-    "Profesionales que centralizan captación y venta",
+    "Profesionales que unifican captación y venta",
     "Empresas que quieren unificar marketing y operación comercial",
   ],
   differenceTitle: "Diseñado para operar, no solo para almacenar datos",
@@ -530,6 +533,18 @@ export const nelvyonSaasModules = [
 export const nelvyonAboutFull = {
   fraseFuerte:
     "NELVYON no nace para vender acciones sueltas, sino para construir sistemas digitales completos.",
+  loQueNoHacemos: {
+    title: "Lo que no hacemos",
+    items: [
+      "No prometemos resultados garantizados.",
+      "No vendemos soluciones genéricas.",
+      "No aplicamos la misma estructura a todos los negocios.",
+      "No añadimos tecnología sin sentido.",
+      "No trabajamos acciones sueltas sin estrategia.",
+    ],
+    cierre:
+      "NELVYON busca construir sistemas útiles, medibles y sostenibles, no promesas vacías.",
+  },
   porQueExiste: {
     title: "Por qué existe NELVYON",
     body: "NELVYON nace para ayudar a negocios que necesitan crecer con más orden, más tecnología y menos dependencia de procesos manuales. Muchas empresas tienen herramientas, campañas y canales activos, pero no un sistema conectado. NELVYON busca unir estrategia, software, automatización e IA en una operación digital más simple y potente.",
@@ -539,7 +554,7 @@ export const nelvyonAboutFull = {
   mision:
     "Construir sistemas digitales que ayuden a empresas a captar, vender, automatizar y operar con más claridad.",
   vision:
-    "Convertir NELVYON en una plataforma de referencia para negocios que quieren centralizar marketing, ventas, automatización e inteligencia artificial.",
+    "Convertir NELVYON en una plataforma de referencia para negocios que quieren unificar marketing, ventas, automatización e inteligencia artificial.",
   valores: [
     { title: "Claridad", body: "Alcances, responsables y entregables definidos desde el inicio." },
     { title: "Tecnología útil", body: "Software y automatización que resuelven fricción real." },
@@ -567,6 +582,18 @@ export const nelvyonAboutFull = {
 export const nelvyonContactChannels = {
   intro:
     "Cuéntanos qué necesita tu negocio y analizaremos si NELVYON puede ayudarte con SaaS, servicios de marketing, automatización o una combinación de ambos.",
+  antesDeContactar: {
+    title: "Antes de contactarnos",
+    intro:
+      "NELVYON trabaja mejor con negocios que quieren mejorar su presencia digital, su captación y los sistemas de venta, automatización y seguimiento.",
+    bullets: [
+      "Quieres mejorar tu web o presencia digital.",
+      "Quieres captar clientes con más método.",
+      "Quieres automatizar procesos.",
+      "Quieres entender si NELVYON SaaS encaja con tu negocio.",
+      "Quieres combinar SaaS + servicios.",
+    ],
+  },
   email: "contacto@nelvyon.com",
   whatsappLabel: "WhatsApp",
   whatsappNote:

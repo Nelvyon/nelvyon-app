@@ -21,6 +21,23 @@ export function ContactFull() {
           {nelvyonContactChannels.intro}
         </p>
 
+        <div className="rounded-3xl border border-white/10 bg-[#07111F] p-8 md:p-10">
+          <h2 className="text-xl font-medium text-white md:text-2xl">
+            {nelvyonContactChannels.antesDeContactar.title}
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-white/75">
+            {nelvyonContactChannels.antesDeContactar.intro}
+          </p>
+          <ul className="mt-6 flex flex-col gap-3">
+            {nelvyonContactChannels.antesDeContactar.bullets.map((bullet) => (
+              <li key={bullet} className="flex gap-3 text-base leading-6 text-white/80">
+                <span className="text-[#0084FF]">•</span>
+                {bullet}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-[#020817] p-6">
             <h2 className="text-lg font-medium text-white">Email</h2>
