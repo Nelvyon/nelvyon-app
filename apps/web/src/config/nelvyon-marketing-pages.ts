@@ -330,67 +330,103 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
 };
 
 export const nelvyonSaasHero = {
-  title: "NELVYON SaaS: una plataforma para gestionar crecimiento, clientes y automatización",
+  title: "NELVYON SaaS",
   subtitle:
-    "Plataforma orientada a conectar CRM, leads, pipeline, formularios, comunicación, automatizaciones, landings, analítica e IA en un mismo entorno operativo.",
+    "Una plataforma diseñada para conectar CRM, automatización, comunicación, captación y análisis dentro de un mismo entorno.",
+  cta: "Solicitar acceso",
+};
+
+export const nelvyonSaasProblem = {
+  title: "Demasiadas herramientas. Demasiada complejidad.",
+  body: "Muchas empresas gestionan clientes, formularios, calendarios, campañas, automatizaciones y seguimiento comercial en plataformas separadas. Esto genera fricción, pérdida de información y procesos difíciles de mantener.",
+};
+
+export const nelvyonSaasVision = {
+  body: "NELVYON SaaS está diseñado para reunir las piezas principales del crecimiento digital en una sola plataforma. El objetivo no es añadir más herramientas, sino reducir complejidad y crear una operación más clara.",
 };
 
 export const nelvyonSaasPage = {
-  replacesTitle: "Qué sustituye NELVYON SaaS",
+  modulesTitle: "Qué puede gestionar",
+  modulesIntro:
+    "Módulos del workspace NELVYON. La disponibilidad concreta depende de tu plan, configuración e integraciones activas.",
+  replacesTitle: "Qué sustituye",
   replacesIntro:
-    "NELVYON SaaS está diseñado para reducir la dependencia de herramientas separadas y permite conectar las piezas principales del crecimiento digital en un mismo entorno.",
+    "El objetivo es reducir la dependencia de múltiples herramientas cuando tenga sentido hacerlo.",
   replacesItems: [
-    "CRM",
-    "Leads",
-    "Pipeline",
-    "Formularios",
-    "Calendarios",
-    "WhatsApp",
-    "Email marketing",
-    "Automatizaciones",
-    "Landing pages",
-    "Analítica",
-    "IA",
+    "CRM aislados",
+    "Formularios independientes",
+    "Calendarios separados",
+    "Herramientas de seguimiento",
+    "Automatizaciones dispersas",
+    "Sistemas desconectados",
   ],
-  audienceTitle: "Para quién es NELVYON SaaS",
+  audienceTitle: "Para quién es",
   audiences: [
-    "Negocios locales que necesitan estructurar clientes y seguimiento",
-    "Agencias que gestionan varias marcas o cuentas",
-    "Clínicas y servicios con citas, leads y comunicación recurrente",
-    "Ecommerce que conectan campañas, pedidos y post-venta",
-    "Profesionales que unifican captación y venta",
-    "Empresas que quieren unificar marketing y operación comercial",
+    "Negocios locales",
+    "Agencias",
+    "Ecommerce",
+    "Clínicas",
+    "Consultores",
+    "Empresas en crecimiento",
   ],
-  differenceTitle: "Diseñado para operar, no solo para almacenar datos",
-  differenceBody:
-    "NELVYON SaaS no busca ser solo un CRM. Su objetivo es conectar captación, seguimiento, automatización y análisis para que cada lead tenga un proceso claro desde el primer contacto.",
+  roadmapTitle: "Roadmap",
+  finalCta: "Solicitar acceso a NELVYON SaaS",
 };
+
+export const nelvyonSaasRoadmap = {
+  disponible: [
+    "CRM, contactos y pipeline comercial",
+    "Captación y gestión de leads",
+    "Automatizaciones y workflows",
+    "Campañas de email",
+    "Constructor de landing pages",
+    "Panel de analítica operativa",
+    "Catálogo de integraciones",
+  ],
+  enDesarrollo: [
+    "Calendarios y reservas integradas",
+    "WhatsApp y mensajería conectada al CRM",
+    "Formularios avanzados con lógica condicional",
+    "Reporting ejecutivo ampliado",
+  ],
+  planificado: [
+    "Inbox unificado multicanal",
+    "Agentes IA nativos por módulo",
+    "Marketplace de plantillas operativas",
+    "White-label para agencias",
+  ],
+} as const;
 
 export const nelvyonSaasFaq = [
   {
-    question: "¿NELVYON SaaS sustituye a un CRM?",
+    question: "¿Qué es NELVYON SaaS?",
     answer:
-      "Incluye CRM y pipeline, pero el enfoque es operativo: conectar captación, seguimiento y automatización en un mismo entorno, no solo guardar contactos.",
+      "Es la plataforma operativa de NELVYON: un entorno donde conectar CRM, captación, comunicación, automatizaciones y analítica. No es un conjunto de herramientas sueltas, sino una base para operar el crecimiento digital con más orden.",
+  },
+  {
+    question: "¿Incluye CRM?",
+    answer:
+      "Sí. Incluye contactos, pipeline, actividades y seguimiento comercial. El CRM es una pieza central, no el único módulo de la plataforma.",
   },
   {
     question: "¿Incluye automatizaciones?",
     answer:
-      "Sí. Los workflows y reglas dependen de tu plan y de los módulos activos en tu workspace.",
+      "Sí. Puedes configurar workflows que asignen tareas, envíen comunicaciones y actualicen registros según reglas del negocio. El alcance depende de tu plan y módulos activos.",
   },
   {
-    question: "¿Puede conectarse con herramientas externas?",
+    question: "¿Puede integrarse con otras herramientas?",
     answer:
-      "Sí, según el catálogo de integraciones disponible (ads, mensajería, pagos, etc.). Lo revisamos en el diagnóstico inicial.",
+      "Sí, mediante el catálogo de integraciones del dashboard (publicidad, mensajería, pagos y otras según disponibilidad). Revisamos compatibilidad en el diagnóstico inicial.",
   },
   {
     question: "¿Es para empresas pequeñas o grandes?",
     answer:
-      "Para equipos en crecimiento y operaciones consolidadas. Los planes Starter, Growth y Elite escalan alcance y soporte.",
+      "Para equipos en crecimiento que necesitan estructurar captación y operación comercial, y para operaciones consolidadas que buscan unificar procesos. El alcance se adapta al volumen y madurez de cada negocio.",
   },
   {
-    question: "¿Se puede usar junto a los servicios de NELVYON?",
+    question: "¿Se puede combinar con los servicios de NELVYON?",
     answer:
-      "Sí. Muchos clientes combinan plataforma SaaS con servicios de marketing, automatización o implementación.",
+      "Sí. Es el modelo más habitual: la plataforma para operar y los servicios de NELVYON para estrategia, implementación y optimización continua.",
   },
 ] as const;
 
@@ -419,116 +455,173 @@ export const nelvyonServiciosIntro = {
   ],
 } as const;
 
-export type SaasModuleCategory =
-  | "CRM"
-  | "Ventas"
-  | "Comunicación"
-  | "Automatización"
-  | "IA"
-  | "Analítica";
-
-export const nelvyonSaasModuleCategories: SaasModuleCategory[] = [
-  "CRM",
-  "Ventas",
-  "Comunicación",
-  "Automatización",
-  "IA",
-  "Analítica",
-];
-
 export const nelvyonSaasModules = [
   {
     id: "crm",
     title: "CRM",
-    category: "CRM" as SaasModuleCategory,
     description:
-      "Registro único de contactos, empresas y actividades. Listas, historial y seguimiento comercial enlazado a campañas y automatizaciones del mismo workspace. Evita duplicados y pérdida de contexto entre equipos.",
+      "Base comercial del workspace: empresas, oportunidades, actividades y contexto compartido entre equipos.",
   },
   {
     id: "leads",
     title: "Leads",
-    category: "Ventas" as SaasModuleCategory,
     description:
-      "Captura desde formularios y campañas, scoring y paso a CRM para que ninguna oportunidad quede fuera del pipeline comercial. Cada lead entra con origen, etapa y siguiente acción definida.",
+      "Entrada de oportunidades desde campañas y formularios, con origen, etapa y siguiente acción definida.",
   },
   {
     id: "pipeline",
     title: "Pipeline",
-    category: "Ventas" as SaasModuleCategory,
     description:
-      "Etapas de venta configurables, totales por fase y movimiento de oportunidades con visibilidad para dirección y equipo comercial. El pipeline refleja el proceso real, no solo una lista de deals.",
+      "Etapas de venta configurables con visibilidad por fase para dirección y equipo comercial.",
+  },
+  {
+    id: "contactos",
+    title: "Contactos",
+    description:
+      "Ficha unificada por persona: datos, historial, etiquetas y comunicaciones en un solo registro.",
   },
   {
     id: "calendarios",
     title: "Calendarios",
-    category: "Comunicación" as SaasModuleCategory,
     description:
-      "Coordinación de citas y seguimientos dentro del flujo operativo, según integraciones activas en tu workspace.",
-  },
-  {
-    id: "whatsapp",
-    title: "WhatsApp",
-    category: "Comunicación" as SaasModuleCategory,
-    description:
-      "Mensajería y cobros vinculados al CRM donde la integración esté configurada (Text2Pay, conectores aprobados).",
-  },
-  {
-    id: "email-marketing",
-    title: "Email Marketing",
-    category: "Comunicación" as SaasModuleCategory,
-    description:
-      "Campañas, secuencias y warmup de dominio para nurturing y outbound alineados con etapas del pipeline.",
-  },
-  {
-    id: "automatizaciones",
-    title: "Automatizaciones",
-    category: "Automatización" as SaasModuleCategory,
-    description:
-      "Workflows que asignan tareas, envían comunicaciones y actualizan el CRM según reglas y eventos del negocio. Reduce seguimiento manual y errores entre marketing y ventas.",
-  },
-  {
-    id: "ia",
-    title: "IA",
-    category: "IA" as SaasModuleCategory,
-    description:
-      "Agentes y asistentes del OS NELVYON para apoyar tareas de marketing y operación dentro de cada módulo contratado.",
+      "Coordinación de citas y seguimientos vinculados al flujo comercial, según integraciones activas.",
   },
   {
     id: "formularios",
     title: "Formularios",
-    category: "Automatización" as SaasModuleCategory,
     description:
-      "Captación estructurada conectada a leads y CRM; base para landings, campañas y funnels de adquisición.",
+      "Captación estructurada conectada a leads y CRM como punto de entrada a funnels y campañas.",
+  },
+  {
+    id: "whatsapp",
+    title: "WhatsApp",
+    description:
+      "Mensajería y cobros vinculados al CRM donde la integración esté configurada en tu workspace.",
+  },
+  {
+    id: "email-marketing",
+    title: "Email Marketing",
+    description:
+      "Campañas, secuencias y warmup de dominio alineados con etapas del pipeline comercial.",
+  },
+  {
+    id: "automatizaciones",
+    title: "Automatizaciones",
+    description:
+      "Workflows que ejecutan tareas, envían comunicaciones y actualizan registros según reglas del negocio.",
   },
   {
     id: "landing-pages",
     title: "Landing Pages",
-    category: "Automatización" as SaasModuleCategory,
     description:
-      "Constructor web (web-builder) para páginas de conversión enlazadas a campañas, formularios y seguimiento.",
+      "Constructor de páginas de conversión enlazadas a formularios, campañas y seguimiento comercial.",
   },
   {
     id: "analitica",
     title: "Analítica",
-    category: "Analítica" as SaasModuleCategory,
     description:
-      "Paneles de campañas, uso y señales operativas en el dashboard; reporting ejecutivo según plan y alcance acordado. Conecta inversión, captación y conversión en una misma lectura.",
+      "Paneles de campañas, uso y señales operativas para leer captación, conversión e inversión.",
+  },
+  {
+    id: "ia",
+    title: "IA",
+    description:
+      "Asistentes del ecosistema NELVYON para apoyar tareas de marketing y operación dentro de cada módulo.",
+  },
+  {
+    id: "roles",
+    title: "Roles y permisos",
+    description:
+      "Accesos por workspace para separar configuración, ventas y operación diaria en equipos multidisciplinares.",
   },
   {
     id: "integraciones",
     title: "Integraciones",
-    category: "Automatización" as SaasModuleCategory,
     description:
-      "Conexión con publicidad, mensajería, pagos y herramientas del stack desde el catálogo del dashboard de integraciones.",
-  },
-  {
-    id: "roles",
-    title: "Roles de usuario",
-    category: "CRM" as SaasModuleCategory,
-    description:
-      "Permisos por workspace para separar configuración, ventas y operación diaria en equipos multidisciplinares.",
+      "Conexión con publicidad, mensajería, pagos y herramientas del stack desde el catálogo del dashboard.",
   },
 ] as const;
+
+export const nelvyonServiciosCapacidades = {
+  title: "Capacidades NELVYON",
+  intro:
+    "Áreas de ejecución que cubren el ciclo completo de crecimiento digital: desde la visibilidad hasta la operación interna.",
+  categories: [
+    {
+      id: "marketing",
+      title: "Marketing",
+      intro:
+        "Canales de adquisición y posicionamiento con método, medición y continuidad entre campañas y seguimiento comercial.",
+      items: [
+        { title: "SEO", description: "Visibilidad orgánica con auditoría, arquitectura editorial y priorización por demanda real." },
+        { title: "Publicidad", description: "Paid media estructurado con seguimiento de coste, volumen y calidad de lead." },
+        { title: "Redes Sociales", description: "Presencia, contenido y coordinación de canales sociales alineados a objetivos comerciales." },
+        { title: "Email Marketing", description: "Secuencias, newsletters y nurturing conectados al recorrido comercial." },
+        { title: "Contenido", description: "Producción editorial y piezas para blog, redes y campañas con cadencia sostenible." },
+      ],
+    },
+    {
+      id: "desarrollo",
+      title: "Desarrollo",
+      intro:
+        "Activos digitales orientados a conversión, rendimiento e integración con captación y operación comercial.",
+      items: [
+        { title: "Web Corporativa", description: "Sitios profesionales con mensaje claro, velocidad y eventos de conversión medibles." },
+        { title: "Ecommerce", description: "Tiendas online con funnel de compra, tracking y coordinación con campañas y post-venta." },
+        { title: "Landing Pages", description: "Páginas de campaña optimizadas para captación y conexión directa con CRM y automatizaciones." },
+        { title: "Funnels", description: "Recorridos de conversión diseñados para mover al usuario entre etapas con seguimiento en cada paso." },
+      ],
+    },
+    {
+      id: "automatizacion",
+      title: "Automatización",
+      intro:
+        "Procesos repetibles entre marketing, ventas y operación para reducir trabajo manual y mejorar el seguimiento.",
+      items: [
+        { title: "Automatización IA", description: "Flujos asistidos por IA para tareas repetitivas de clasificación, respuesta y priorización." },
+        { title: "CRM", description: "Implementación y configuración de CRM para estructurar contactos, pipeline y actividades comerciales." },
+        { title: "Seguimiento Comercial", description: "Reglas de alerta, tareas y recordatorios para que ninguna oportunidad quede sin respuesta." },
+        { title: "Lead Management", description: "Captura, scoring, asignación y paso de leads entre marketing y ventas con criterio definido." },
+        { title: "Flujos de trabajo", description: "Workflows documentados que conectan herramientas, equipos y acciones según eventos del negocio." },
+      ],
+    },
+    {
+      id: "datos",
+      title: "Datos",
+      intro:
+        "Lectura operativa del negocio: qué funciona, dónde hay fricción y qué decisiones tomar con información consolidada.",
+      items: [
+        { title: "Dashboards", description: "Cuadros de mando con KPIs comerciales y de marketing en una vista accionable." },
+        { title: "Analítica", description: "Seguimiento de tráfico, campañas y conversiones con criterio de atribución acordado." },
+        { title: "Reportes", description: "Informes periódicos con hallazgos claros y siguientes pasos, no solo exportaciones de datos." },
+      ],
+    },
+    {
+      id: "operacion",
+      title: "Operación Digital",
+      intro:
+        "Organización interna del crecimiento: procesos, roles y sistemas que sostienen la ejecución día a día.",
+      items: [
+        { title: "Organización comercial", description: "Estructura de equipos, etapas y responsables para que ventas y marketing operen con claridad." },
+        { title: "Procesos internos", description: "Mapeo y diseño de flujos internos entre departamentos, herramientas y puntos de contacto." },
+        { title: "Optimización operativa", description: "Identificación de cuellos de botella y mejoras concretas en tiempos, costes y calidad de servicio." },
+        { title: "Sistemas digitales", description: "Arquitectura de herramientas conectadas para que datos, campañas y seguimiento no vivan aislados." },
+      ],
+    },
+    {
+      id: "ia",
+      title: "IA",
+      intro:
+        "Inteligencia artificial aplicada a tareas concretas de marketing y operación, con criterio y supervisión humana.",
+      items: [
+        { title: "Asistentes IA", description: "Agentes configurados para apoyar tareas de respuesta, clasificación y preparación de contenido." },
+        { title: "Automatización documental", description: "Generación y estructuración de documentos operativos a partir de datos y plantillas del negocio." },
+        { title: "Generación de contenido", description: "Borradores, variantes y adaptaciones de copy alineados a voz de marca y objetivo de canal." },
+        { title: "Optimización de procesos", description: "Análisis de flujos existentes para detectar pasos automatizables o eliminables con IA." },
+      ],
+    },
+  ],
+} as const;
 
 export const nelvyonAboutFull = {
   fraseFuerte:
