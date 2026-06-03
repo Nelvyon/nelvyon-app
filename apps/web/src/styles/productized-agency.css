@@ -13,7 +13,7 @@
   --color-charcoal: #020817;
   --color-offwhite: #05070d;
 
-  --color-dusty-red: #ff6464;
+  --color-dusty-red: #0047ab;
   --color-dusty-green: #0084ff;
 
   --shadow-card-md: 0 16px 48px rgba(0, 0, 0, 0.35);
@@ -100,4 +100,15 @@ body:has(.pa-theme) {
 
 .pa-theme .bg-secondary {
   background-color: rgba(2, 8, 23, 0.7);
+}
+
+/* NELVYON: sin acentos naranja/morado de plantilla en home PA */
+.pa-theme .bg-orange-200,
+.pa-theme .bg-orange-200\/60 {
+  background-color: rgba(0, 132, 255, 0.35) !important;
+}
+
+.pa-theme [class*="bg-[#FA9A63]"],
+.pa-theme [class*="bg-[#E37400]"] {
+  background-color: #0084ff !important;
 }

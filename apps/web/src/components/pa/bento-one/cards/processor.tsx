@@ -57,11 +57,11 @@ export const Processor = () => {
             <div className="h-3 w-1.5 self-stretch bg-[#EEEEEE]" />
           </div>
         </div>
-        <div className="relative size-28 overflow-hidden rounded-3xl bg-[#FA9A63] shadow-[0px_3.200000047683716px_9.600000381469727px_0px_rgba(0,0,0,0.12)]">
-          <div className="absolute top-[-25.60px] left-[26.80px] size-16 rounded-full bg-orange-200 blur-[48px]" />
-          <div className="absolute top-[82.38px] left-[-47.20px] h-32 w-5 origin-top-left rotate-[-59.09deg] rounded-full bg-orange-200 blur-[48px]" />
+        <div className="relative size-28 overflow-hidden rounded-3xl bg-[#0084FF] shadow-[0px_3.200000047683716px_9.600000381469727px_0px_rgba(0,0,0,0.12)]">
+          <div className="absolute top-[-25.60px] left-[26.80px] size-16 rounded-full bg-[#0084FF]/40 blur-[48px]" />
+          <div className="absolute top-[82.38px] left-[-47.20px] h-32 w-5 origin-top-left rotate-[-59.09deg] rounded-full bg-[#0047AB]/50 blur-[48px]" />
           <div className="absolute top-[-35.30px] left-[113.80px] h-16 w-14 rounded-full bg-white blur-[48px]" />
-          <div className="absolute top-[45.60px] left-[63.20px] h-44 w-36 rounded-full bg-orange-200/60 blur-[160px]" />
+          <div className="absolute top-[45.60px] left-[63.20px] h-44 w-36 rounded-full bg-[#0084FF]/35 blur-[160px]" />
         </div>
       </div>
     </div>

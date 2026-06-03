@@ -18,26 +18,32 @@ export const nelvyonHero = {
 export const nelvyonServices = [
   {
     title: "SEO",
+    href: "/seo",
     description: "Visibilidad orgánica, contenido y técnica alineados a demanda real.",
   },
   {
     title: "Publicidad",
+    href: "/ads",
     description: "Campañas de adquisición con seguimiento y optimización continua.",
   },
   {
     title: "Branding",
+    href: "/branding",
     description: "Identidad y mensaje coherentes en cada punto de contacto.",
   },
   {
     title: "Desarrollo Web",
+    href: "/desarrollo-web",
     description: "Sitios y landings orientados a conversión y rendimiento.",
   },
   {
     title: "Ecommerce",
+    href: "/ecommerce",
     description: "Tiendas y funnels de venta con operación conectada al CRM.",
   },
   {
     title: "Automatización",
+    href: "/automatizacion",
     description: "Flujos entre marketing, ventas y operación para reducir trabajo manual.",
   },
 ] as const;

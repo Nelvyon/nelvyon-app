@@ -15,7 +15,7 @@ export const LightAbove = () => {
       >
         <path
           d="M611.5 51L495 -188H959L849.5 51H611.5Z"
-          fill="#FA9A63"
+          fill="#0084FF"
           fillOpacity="0.1"
         />
       </g>

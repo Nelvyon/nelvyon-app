@@ -128,9 +128,9 @@ export function AnimatedSVG3() {
       })}
       <defs>
         <linearGradient id="tailGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#FA9A63" stopOpacity="0" />
-          <stop offset="50%" stopColor="#FA9A63" stopOpacity="1" />
-          <stop offset="100%" stopColor="#FA9A63" stopOpacity="0" />
+          <stop offset="0%" stopColor="#0084FF" stopOpacity="0" />
+          <stop offset="50%" stopColor="#0084FF" stopOpacity="1" />
+          <stop offset="100%" stopColor="#0084FF" stopOpacity="0" />
         </linearGradient>
       </defs>
     </svg>

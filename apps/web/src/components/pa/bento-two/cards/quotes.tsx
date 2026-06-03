@@ -19,8 +19,8 @@ export const Quotes = () => {
         />
       </div>
       <div className="-tracking-xs text-muted-foreground z-10 text-base leading-6 font-medium">
-        &ldquo;No vendemos promesas vacias: diseniamos procesos, ejecutamos con
-        disciplina y optimizamos segun datos reales.&rdquo;
+        &ldquo;No vendemos promesas vacías: diseñamos procesos, ejecutamos con
+        disciplina y optimizamos según datos reales.&rdquo;
       </div>
       <div className="flex items-center gap-2 z-10">
         <span className="-tracking-xs text-base leading-6 font-medium">

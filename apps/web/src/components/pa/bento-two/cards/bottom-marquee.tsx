@@ -24,11 +24,11 @@ const data = [
   },
   {
     name: "Ejecucion",
-    shadow: "#FFC36A",
+    shadow: "#0084FF",
   },
   {
     name: "Escalado",
-    shadow: "#E37400",
+    shadow: "#0047AB",
   },
 ];
 

@@ -6,12 +6,13 @@ import { nelvyonServices } from "@/config/nelvyon-pa-content";
 const data: CardItem[] = nelvyonServices.map((service, index) => ({
   logo: "/logo.png",
   name: service.title,
+  href: service.href,
   description: service.description,
   badge: index === 0 ? "Servicios" : undefined,
   image: `/pa/assets/project-${(index % 6) + 1}.webp`,
   feature: [
-    "Diagnostico y roadmap",
-    "Implementacion con metodo",
+    "Diagnóstico y roadmap",
+    "Implementación con método",
     "Seguimiento operativo",
     "Mejora continua",
   ],

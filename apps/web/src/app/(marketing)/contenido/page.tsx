@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
 
-import { SERVICE_PAGES } from "@/components/marketing/premium/constants";
-import { ServicePageContent } from "@/components/marketing/premium/ServicePageContent";
+import { ServiceDetailPage } from "@/components/pa/marketing/service-detail-page";
+import { nelvyonServicePages } from "@/config/nelvyon-marketing-pages";
 import { getAppBaseUrl } from "@/lib/appUrl";
 
-const service = SERVICE_PAGES.contenido;
+const content = nelvyonServicePages.contenido;
 const base = getAppBaseUrl();
 
 export const metadata: Metadata = {
-  title: `${service.title} — NELVYON`,
-  description: service.subtitle,
+  title: `${content.title} | NELVYON`,
+  description: content.summary,
   openGraph: {
-    url: `${base}${service.path}`,
-    title: `${service.title} — NELVYON`,
-    description: service.subtitle,
+    url: `${base}${content.path}`,
+    title: `${content.title} | NELVYON`,
+    description: content.summary,
   },
 };
 
 export default function ContenidoPage() {
-  return <ServicePageContent service={service} />;
+  return <ServiceDetailPage content={content} />;
 }

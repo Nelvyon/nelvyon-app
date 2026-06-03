@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "motion/react";
 
 export interface CardItem {
   logo: string;
   name: string;
+  href: string;
   description: string;
   badge?: string;
   image: string;
@@ -63,6 +65,7 @@ export interface CardItem {
 
 export const HoverCard = ({ item }: { item: CardItem }) => {
   return (
+    <Link href={item.href} className="block h-full">
     <motion.div
       initial="rest"
       whileHover="hover"
@@ -140,6 +143,7 @@ export const HoverCard = ({ item }: { item: CardItem }) => {
         </motion.div>
       </motion.div>
     </motion.div>
+    </Link>
   );
 };
 

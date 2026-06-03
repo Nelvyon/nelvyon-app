@@ -4,20 +4,14 @@ import Link from "next/link";
 
 export const Logo = ({ className }: { className?: string }) => {
   return (
-    <Link href="/" className={cn("", className)}>
+    <Link href="/" className={cn("inline-flex items-center gap-2", className)} aria-label="NELVYON">
       <Image
         src="/logo.png"
-        height="56"
-        width="56"
-        alt="NELVYON"
-        className={cn("block dark:hidden", className)}
-      />
-      <Image
-        src="/logo.png"
-        height="56"
-        width="56"
-        alt="NELVYON"
-        className={cn("hidden dark:block", className)}
+        height={56}
+        width={56}
+        alt=""
+        className={cn("size-full max-h-14 max-w-14 object-contain", className)}
+        priority
       />
     </Link>
   );

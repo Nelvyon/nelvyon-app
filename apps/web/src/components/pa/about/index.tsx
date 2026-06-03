@@ -34,11 +34,11 @@ export const AboutSection = () => {
         <div className="grid w-full grid-cols-1 justify-between gap-30 lg:grid-cols-5">
           <div className="relative lg:col-span-2">
             <Image
-              src={"/pa/assets/workers.webp"}
-              alt="Equipo NELVYON"
+              src={"/pa/assets/project-1.webp"}
+              alt="Operación digital NELVYON"
               width={1200}
-              height={1200}
-              className="w-full rounded-lg"
+              height={800}
+              className="w-full rounded-lg object-cover"
             />
           </div>
           <div className="flex h-full w-full flex-col justify-between gap-15 lg:col-span-3">

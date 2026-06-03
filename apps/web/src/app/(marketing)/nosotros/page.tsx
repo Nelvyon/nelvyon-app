@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+
+import { AboutFull } from "@/components/pa/marketing/about-full";
 import { AboutSection } from "@/components/pa/about";
 import { Container } from "@/components/pa/container";
 import { PageHeader } from "@/components/pa/page-header";
 
-
 export const metadata: Metadata = {
   title: "Nosotros | NELVYON",
-  description: "Misión, visión, valores y metodología de NELVYON. Plataforma operativa con red de especialistas.",
+  description:
+    "Historia, misión, visión, valores y metodología de NELVYON. Plataforma operativa con ejecución real.",
 };
 
 export default function NosotrosPage() {
@@ -16,6 +18,7 @@ export default function NosotrosPage() {
         <PageHeader>Nosotros</PageHeader>
       </Container>
       <AboutSection />
+      <AboutFull />
     </>
   );
 }

@@ -4,7 +4,7 @@ import { ServiceDetailPage } from "@/components/pa/marketing/service-detail-page
 import { nelvyonServicePages } from "@/config/nelvyon-marketing-pages";
 import { getAppBaseUrl } from "@/lib/appUrl";
 
-const content = nelvyonServicePages.branding;
+const content = nelvyonServicePages.ecommerce;
 const base = getAppBaseUrl();
 
 export const metadata: Metadata = {
@@ -17,6 +17,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BrandingPage() {
+export default function EcommercePage() {
   return <ServiceDetailPage content={content} />;
 }

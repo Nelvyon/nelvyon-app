@@ -102,8 +102,8 @@ export const GlobeLight = () => {
           y2="313.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FA9A63" />
-          <stop offset="1" stopColor="#FA9A63" stopOpacity="0" />
+          <stop stopColor="#0084FF" />
+          <stop offset="1" stopColor="#0084FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_2693_2731"
@@ -113,8 +113,8 @@ export const GlobeLight = () => {
           y2="582"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FA9A63" />
-          <stop offset="1" stopColor="#FA9A63" stopOpacity="0" />
+          <stop stopColor="#0084FF" />
+          <stop offset="1" stopColor="#0084FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_2693_2731"
@@ -124,8 +124,8 @@ export const GlobeLight = () => {
           y2="392"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FA9A63" />
-          <stop offset="1" stopColor="#FA9A63" stopOpacity="0" />
+          <stop stopColor="#0084FF" />
+          <stop offset="1" stopColor="#0084FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_2693_2731"
@@ -135,8 +135,8 @@ export const GlobeLight = () => {
           y2="468.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FA9A63" />
-          <stop offset="1" stopColor="#FA9A63" stopOpacity="0" />
+          <stop stopColor="#0084FF" />
+          <stop offset="1" stopColor="#0084FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_2693_2731"
@@ -146,8 +146,8 @@ export const GlobeLight = () => {
           y2="328.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FA9A63" />
-          <stop offset="1" stopColor="#FA9A63" stopOpacity="0" />
+          <stop stopColor="#0084FF" />
+          <stop offset="1" stopColor="#0084FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_2693_2731"

@@ -39,8 +39,8 @@ export const Acebuilder = () => {
           <div className="bg-natural-black relative mx-auto flex w-full max-w-225 flex-col gap-2.5 overflow-hidden rounded-3xl p-3">
             <div className="absolute inset-0">
               <div className="relative h-full w-full">
-                <div className="absolute top-90 left-0 h-7 w-248.5 origin-top-left -translate-y-1/2 rotate-[-23deg] rounded-full bg-indigo-200/60 blur-[20px]" />
-                <div className="absolute top-90 -left-20 h-7 w-248.5 origin-top-left -translate-y-1/2 rotate-[-23deg] rounded-full bg-indigo-200/60 blur-2xl" />
+                <div className="absolute top-90 left-0 h-7 w-248.5 origin-top-left -translate-y-1/2 rotate-[-23deg] rounded-full bg-[#0084FF]/30 blur-[20px]" />
+                <div className="absolute top-90 -left-20 h-7 w-248.5 origin-top-left -translate-y-1/2 rotate-[-23deg] rounded-full bg-[#0047AB]/25 blur-2xl" />
               </div>
             </div>
             <div className="flex items-center gap-2 px-3">

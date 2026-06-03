@@ -1,82 +1,9 @@
 import { Button } from "@/components/pa/button";
 import { cn } from "@/lib/pa/utils";
-import Image from "next/image";
 
-interface CtaCardPatten {
-  type: "tile" | "depth" | "image";
-  image?: string;
-}
-
-const patten: CtaCardPatten[] = [
-  // 1st row
-  {
-    type: "tile",
-  },
-  {
-    type: "tile",
-  },
-  {
-    type: "tile",
-  },
-  {
-    type: "tile",
-  },
-  {
-    type: "tile",
-  },
-  // 2nd row
-  {
-    type: "tile",
-  },
-  {
-    type: "tile",
-  },
-  {
-    type: "image",
-    image: "/pa/avatar/avatar-1.webp",
-  },
-  {
-    type: "depth",
-  },
-  {
-    type: "tile",
-  },
-  // 3rd row
-  {
-    type: "tile",
-  },
-  {
-    type: "image",
-    image: "/pa/avatar/avatar-2.webp",
-  },
-  {
-    type: "tile",
-  },
-  {
-    type: "image",
-    image: "/pa/avatar/avatar-3.webp",
-  },
-  {
-    type: "depth",
-  },
-  // 4rd row
-  {
-    type: "tile",
-  },
-  {
-    type: "depth",
-  },
-  {
-    type: "image",
-    image: "/pa/avatar/avatar-4.webp",
-  },
-  {
-    type: "tile",
-  },
-  {
-    type: "tile",
-  },
-];
+const patten = Array.from({ length: 20 }, (_, index) => ({
+  type: index % 5 === 0 ? ("depth" as const) : ("tile" as const),
+}));
 
 export const CtaCard = () => {
   return (
@@ -96,47 +23,29 @@ export const CtaCard = () => {
                 data-slot="tile-body"
                 className={cn(
                   "border-natural-black/10 border transition-all",
-                  "group-hover:border-transparent group-hover:bg-secondary group-hover:shadow-[inset_var(--shadow-card-md)]",
+                  "group-hover:border-transparent group-hover:bg-[#0084FF]/10 group-hover:shadow-[inset_var(--shadow-card-md)]",
                 )}
-              />
-            );
-          }
-          if (item.type === "depth") {
-            return (
-              <div
-                key={`depth-${index}`}
-                data-slot="tile-body"
-                className="bg-secondary shadow-[inset_var(--shadow-card-md)]"
               />
             );
           }
           return (
             <div
-              key={`image-${index}`}
+              key={`depth-${index}`}
               data-slot="tile-body"
-              className="shadow-card-md p-1 transition-all will-change-contents group-hover:p-0"
-            >
-              <Image
-                src={item.image as string}
-                alt="avatar"
-                className="h-full w-full rounded-lg object-cover will-change-contents"
-                width={80}
-                height={90}
-              />
-            </div>
+              className="bg-[#0084FF]/15 shadow-[inset_var(--shadow-card-md)]"
+            />
           );
         })}
       </div>
 
       <div className="flex flex-col gap-5">
         <span className="-tracking-xs text-lg leading-6 font-medium">
-          Hablemos de tu operacion digital
+          Hablemos de tu operación digital
         </span>
         <div>
-          <Button text="Solicitar informacion" />
+          <Button text="Solicitar información" />
         </div>
       </div>
     </div>
   );
 };
-
