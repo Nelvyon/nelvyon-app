@@ -10,10 +10,10 @@ export function ServiciosIntro() {
       <Container className="flex flex-col gap-20 pb-8">
         <div className="flex max-w-3xl flex-col gap-6">
           <Header>{nelvyonServiciosIntro.title}</Header>
-          <p className="text-muted-foreground -tracking-xs text-lg leading-7 font-medium">
+          <p className="-tracking-xs text-lg leading-7 font-medium text-white/75">
             {nelvyonServiciosIntro.intro}
           </p>
-          <Button text={nelvyonPageCtas.servicios} href="/contacto" />
+          <Button variant="primary" text={nelvyonPageCtas.servicios} href="/contacto" />
         </div>
         <div>
           <h2 className="-tracking-sm mb-8 text-2xl font-medium text-white">
@@ -29,7 +29,7 @@ export function ServiciosIntro() {
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-2 font-medium text-white">{step.title}</h3>
-                <p className="text-muted-foreground mt-3 text-sm leading-6">{step.body}</p>
+                <p className="mt-3 text-sm leading-6 text-white/70">{step.body}</p>
               </div>
             ))}
           </div>

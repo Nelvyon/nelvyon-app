@@ -20,11 +20,11 @@ export const FAQ = () => {
         <div className="flex flex-col gap-15 pt-8">
           <div className="flex flex-col gap-4">
             <Header>Preguntas frecuentes</Header>
-            <div className="-tracking-xs text-base leading-6 font-medium md:text-nowrap">
+            <div className="-tracking-xs text-base leading-6 font-medium text-white/75 md:text-nowrap">
               Tienes mas preguntas? Escribenos a{" "}
               <Link
                 href={`mailto:${nelvyonContact.email}`}
-                className="text-dusty-green underline underline-offset-3"
+                className="text-[#0084FF] underline underline-offset-3"
               >
                 {nelvyonContact.email}
               </Link>

@@ -1,23 +1,15 @@
 import { cn } from "@/lib/pa/utils";
 
 interface PricingBadgeProps {
-  variant?: "danger" | "success";
   className?: string;
   children: React.ReactNode;
 }
 
-export const PricingBadge = ({
-  variant = "danger",
-  className,
-  children,
-}: PricingBadgeProps) => {
+export const PricingBadge = ({ className, children }: PricingBadgeProps) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-2 rounded-full px-4 py-1.5",
-        variant === "danger"
-          ? "bg-[#0084FF]/10 text-[#0084FF]"
-          : "text-dusty-green bg-[color-mix(in_oklab,var(--color-dusty-green)_30%,#fff)]",
+        "flex items-center gap-2 rounded-full border border-[#0084FF]/35 bg-[#0084FF]/15 px-3 py-1 text-xs font-medium text-[#0084FF]",
         className,
       )}
     >
@@ -25,4 +17,3 @@ export const PricingBadge = ({
     </div>
   );
 };
-

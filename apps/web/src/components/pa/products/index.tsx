@@ -7,7 +7,8 @@ const data: CardItem[] = nelvyonServices.map((service, index) => ({
   logo: "",
   name: service.title,
   href: service.href,
-  description: service.description,
+  description: `${service.problem} → ${service.solution}`,
+  microcopy: service.microcopy,
   badge: index === 0 ? "Servicios" : undefined,
   image: `/pa/assets/project-${(index % 6) + 1}.webp`,
   feature: [
@@ -23,7 +24,7 @@ export const Products = () => {
     <section className="w-full">
       <Container className="flex w-full flex-col gap-20 py-20 md:py-30">
         <Header>Capas de ejecución</Header>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {data.map((item, index) => (
             <HoverCard key={`${item.name}-${index}`} item={item} />
           ))}
@@ -32,4 +33,3 @@ export const Products = () => {
     </section>
   );
 };
-

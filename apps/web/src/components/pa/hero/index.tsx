@@ -81,7 +81,7 @@ export const Hero = () => {
                 {nelvyonHero.title}
               </h1>
               <div className="lg:max-w-md">
-                <h2 className="text-sm font-medium text-balance text-neutral-300 sm:text-base lg:text-lg">
+                <h2 className="text-sm font-medium text-balance text-white/80 sm:text-base lg:text-lg">
                   {nelvyonHero.subtitle}
                 </h2>
                 <div className="mt-6 flex flex-wrap gap-3 md:mt-8">

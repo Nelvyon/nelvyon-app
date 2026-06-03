@@ -9,6 +9,7 @@ export interface CardItem {
   name: string;
   href: string;
   description: string;
+  microcopy?: string;
   badge?: string;
   image: string;
   feature: string[];
@@ -87,7 +88,7 @@ export const HoverCard = ({ item }: { item: CardItem }) => {
 
       <motion.div
         layout
-        className="shadow-card-md z-10 flex w-full flex-col rounded-2xl bg-white px-6 py-4"
+        className="shadow-card-md z-10 flex w-full flex-col rounded-2xl border border-white/10 bg-[#07111F] px-5 py-5 sm:px-6 sm:py-5"
       >
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center gap-2.5">
@@ -101,20 +102,19 @@ export const HoverCard = ({ item }: { item: CardItem }) => {
               />
             ) : (
               <span
-                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0084FF]/15 text-xs font-bold text-[#0084FF]"
+                className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#0084FF]/30 bg-[#0084FF]/15 text-xs font-bold text-[#0084FF]"
                 aria-hidden
               >
                 N
               </span>
             )}
-            <div className="text-natural-black text-lg font-semibold">
-              {item.name}
-            </div>
+            <div className="text-lg font-semibold text-white">{item.name}</div>
           </div>
 
-          <div className="text-muted-foreground text-base font-medium">
-            {item.description}
-          </div>
+          <div className="text-base font-medium leading-6 text-white/75">{item.description}</div>
+          {item.microcopy ? (
+            <p className="text-sm font-medium text-[#0084FF]">{item.microcopy}</p>
+          ) : null}
         </div>
 
         {/* Animated features */}
@@ -142,9 +142,9 @@ export const HoverCard = ({ item }: { item: CardItem }) => {
                   hover: { opacity: 1, y: 0 },
                 }}
                 transition={{ duration: 0.2, delay: index * 0.05 }}
-                className="text-muted-foreground flex items-center gap-2 text-sm font-medium"
+                className="flex items-center gap-2 text-sm font-medium text-white/65"
               >
-                <div className="bg-muted-foreground/50 size-2.5 rounded-full" />
+                <div className="size-2.5 rounded-full bg-[#0084FF]/60" />
                 {feature}
               </motion.div>
             ))}

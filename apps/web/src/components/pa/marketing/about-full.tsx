@@ -8,17 +8,21 @@ import { Button } from "@/components/pa/button";
 
 export function AboutFull() {
   return (
-    <section className="bg-natural-black text-natural-white w-full py-12 md:py-20">
+    <section className="bg-natural-black text-natural-white w-full border-t border-white/8 py-12 md:py-20">
       <Container className="flex flex-col gap-20">
         <div className="max-w-3xl">
           <Header>{nelvyonAboutFull.porQueExiste.title}</Header>
-          <p className="text-muted-foreground mt-6 text-lg leading-7">
-            {nelvyonAboutFull.porQueExiste.body}
+          <p className="mt-6 text-lg leading-7 text-white/75">{nelvyonAboutFull.porQueExiste.body}</p>
+        </div>
+
+        <div className="rounded-3xl border border-[#0084FF]/30 bg-gradient-to-r from-[#0047AB]/20 to-[#07111F] px-8 py-10 md:px-12">
+          <p className="text-xl font-medium leading-8 text-white md:text-2xl md:leading-9">
+            {nelvyonAboutFull.fraseFuerte}
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
-          <div className="relative overflow-hidden rounded-3xl">
+          <div className="relative overflow-hidden rounded-3xl border border-white/10">
             <Image
               src="/pa/assets/project-3.webp"
               alt="Panel y operación digital NELVYON"
@@ -29,18 +33,22 @@ export function AboutFull() {
           </div>
           <div className="flex flex-col gap-6">
             <Header>Historia</Header>
-            <p className="text-muted-foreground text-lg leading-7">{nelvyonAboutFull.historia}</p>
+            <p className="text-lg leading-7 text-white/75">{nelvyonAboutFull.historia}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          <div className="rounded-3xl border border-[#0084FF]/25 bg-[#0084FF]/5 p-8">
-            <h3 className="-tracking-sm text-xl font-medium">Misión</h3>
-            <p className="text-muted-foreground mt-4 text-base leading-6">{nelvyonAboutFull.mision}</p>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="rounded-3xl border border-[#0084FF]/35 bg-gradient-to-br from-[#0084FF]/10 to-[#07111F] p-8 md:p-10">
+            <span className="text-xs font-medium uppercase tracking-wider text-[#0084FF]">
+              Misión
+            </span>
+            <p className="mt-4 text-base leading-7 text-white/80 md:text-lg">{nelvyonAboutFull.mision}</p>
           </div>
-          <div className="rounded-3xl border border-white/10 p-8">
-            <h3 className="-tracking-sm text-xl font-medium">Visión</h3>
-            <p className="text-muted-foreground mt-4 text-base leading-6">{nelvyonAboutFull.vision}</p>
+          <div className="rounded-3xl border border-white/10 bg-[#07111F] p-8 md:p-10">
+            <span className="text-xs font-medium uppercase tracking-wider text-white/55">
+              Visión
+            </span>
+            <p className="mt-4 text-base leading-7 text-white/80 md:text-lg">{nelvyonAboutFull.vision}</p>
           </div>
         </div>
 
@@ -48,29 +56,32 @@ export function AboutFull() {
           <Header>Valores</Header>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {nelvyonAboutFull.valores.map((v) => (
-              <div key={v.title} className="bg-natural-white rounded-2xl p-6 text-natural-black">
-                <h4 className="font-medium">{v.title}</h4>
-                <p className="text-muted-foreground mt-2 text-sm leading-6">{v.body}</p>
+              <div
+                key={v.title}
+                className="rounded-2xl border border-white/10 bg-[#07111F] p-6"
+              >
+                <h4 className="font-medium text-white">{v.title}</h4>
+                <p className="mt-2 text-sm leading-6 text-white/70">{v.body}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 p-8 md:p-12">
-          <h3 className="-tracking-sm text-2xl font-medium">Filosofía</h3>
-          <p className="text-muted-foreground mt-4 max-w-3xl text-lg leading-7">
+        <div className="rounded-3xl border border-white/10 bg-[#07111F] p-8 md:p-12">
+          <h3 className="-tracking-sm text-2xl font-medium text-white">Filosofía</h3>
+          <p className="mt-4 max-w-3xl text-lg leading-7 text-white/75">
             {nelvyonAboutFull.filosofia}
           </p>
         </div>
 
         <div>
           <Header>Cómo trabajamos</Header>
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {nelvyonAboutFull.comoTrabajamos.map((s) => (
-              <div key={s.step} className="rounded-2xl bg-[#020817] border border-white/10 p-6">
-                <span className="text-[#0084FF] text-sm font-medium">{s.step}</span>
-                <h4 className="mt-2 font-medium">{s.title}</h4>
-                <p className="text-muted-foreground mt-2 text-sm leading-6">{s.body}</p>
+              <div key={s.step} className="rounded-2xl border border-white/10 bg-[#020817] p-6">
+                <span className="text-sm font-medium text-[#0084FF]">{s.step}</span>
+                <h4 className="mt-2 font-medium text-white">{s.title}</h4>
+                <p className="mt-2 text-sm leading-6 text-white/70">{s.body}</p>
               </div>
             ))}
           </div>
@@ -82,17 +93,17 @@ export function AboutFull() {
             {nelvyonAboutFull.diferencia.map((d) => (
               <li
                 key={d}
-                className="flex gap-3 rounded-2xl border border-[#0084FF]/20 px-6 py-4 text-base leading-6"
+                className="flex gap-3 rounded-2xl border border-[#0084FF]/20 bg-[#07111F] px-6 py-4 text-base leading-6 text-white/85"
               >
-                <span className="text-[#0084FF] shrink-0">→</span>
+                <span className="shrink-0 text-[#0084FF]">→</span>
                 {d}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="rounded-3xl border border-[#0084FF]/30 bg-[#0084FF]/5 p-8 md:p-10">
-          <Button text={nelvyonPageCtas.nosotros} href="/contacto" />
+        <div className="rounded-3xl border border-[#0084FF]/30 bg-[#0084FF]/10 p-8 md:p-10">
+          <Button variant="primary" text={nelvyonPageCtas.nosotros} href="/contacto" />
         </div>
       </Container>
     </section>

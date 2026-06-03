@@ -56,16 +56,19 @@ export const AboutSection = () => {
                   </Link>
                 </div>
               </div>
-              <span className="-tracking-xs text-lg leading-6.5 font-medium">
+              <span className="-tracking-xs text-lg leading-6.5 font-medium text-white/80">
                 {nelvyonAbout.intro}
               </span>
               {nelvyonAbout.paragraphs.map((paragraph) => (
-                <span key={paragraph} className="-tracking-xs text-lg leading-6.5 font-medium">
+                <span
+                  key={paragraph}
+                  className="-tracking-xs text-lg leading-6.5 font-medium text-white/75"
+                >
                   {paragraph}
                 </span>
               ))}
             </div>
-            <div className={cn("rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-neutral-300")}>
+            <div className={cn("rounded-2xl border border-white/10 bg-[#07111F] p-6 text-sm text-white/70")}>
               Estrategia, ejecución y plataforma con el mismo criterio operativo.
             </div>
           </div>

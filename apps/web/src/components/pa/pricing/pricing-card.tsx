@@ -52,9 +52,7 @@ export const PricingCard = ({ card }: { card: PricingCardType }) => {
             <span className="-tracking-sm text-lg leading-5">
               {card.category}
             </span>
-            <PricingBadge variant={card.badge.variant}>
-              {card.badge.text}
-            </PricingBadge>
+            <PricingBadge>{card.badge.text}</PricingBadge>
           </div>
           <div className="-tracking-xl text-2xl leading-8 font-medium">
             <span>{card.title}</span>

@@ -7,11 +7,27 @@ export const Button = ({
   text = "Solicitar informacion",
   href = "/contacto",
   containerClassName,
+  variant = "default",
 }: {
   text?: string;
   href?: string;
   containerClassName?: string;
+  variant?: "default" | "primary";
 }) => {
+  if (variant === "primary") {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "inline-flex w-fit items-center justify-center rounded-xl bg-[#0084FF] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0071db]",
+          containerClassName,
+        )}
+      >
+        {text}
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={href}

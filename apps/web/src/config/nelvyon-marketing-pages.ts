@@ -416,88 +416,120 @@ export const nelvyonServiciosIntro = {
   ],
 } as const;
 
+export type SaasModuleCategory =
+  | "CRM"
+  | "Ventas"
+  | "Comunicación"
+  | "Automatización"
+  | "IA"
+  | "Analítica";
+
+export const nelvyonSaasModuleCategories: SaasModuleCategory[] = [
+  "CRM",
+  "Ventas",
+  "Comunicación",
+  "Automatización",
+  "IA",
+  "Analítica",
+];
+
 export const nelvyonSaasModules = [
   {
     id: "crm",
     title: "CRM",
+    category: "CRM" as SaasModuleCategory,
     description:
       "Registro único de contactos, empresas y actividades. Listas, historial y seguimiento comercial enlazado a campañas y automatizaciones del mismo workspace. Evita duplicados y pérdida de contexto entre equipos.",
   },
   {
     id: "leads",
     title: "Leads",
+    category: "Ventas" as SaasModuleCategory,
     description:
       "Captura desde formularios y campañas, scoring y paso a CRM para que ninguna oportunidad quede fuera del pipeline comercial. Cada lead entra con origen, etapa y siguiente acción definida.",
   },
   {
     id: "pipeline",
     title: "Pipeline",
+    category: "Ventas" as SaasModuleCategory,
     description:
       "Etapas de venta configurables, totales por fase y movimiento de oportunidades con visibilidad para dirección y equipo comercial. El pipeline refleja el proceso real, no solo una lista de deals.",
   },
   {
     id: "calendarios",
     title: "Calendarios",
+    category: "Comunicación" as SaasModuleCategory,
     description:
       "Coordinación de citas y seguimientos dentro del flujo operativo, según integraciones activas en tu workspace.",
   },
   {
     id: "whatsapp",
     title: "WhatsApp",
+    category: "Comunicación" as SaasModuleCategory,
     description:
       "Mensajería y cobros vinculados al CRM donde la integración esté configurada (Text2Pay, conectores aprobados).",
   },
   {
     id: "email-marketing",
     title: "Email Marketing",
+    category: "Comunicación" as SaasModuleCategory,
     description:
       "Campañas, secuencias y warmup de dominio para nurturing y outbound alineados con etapas del pipeline.",
   },
   {
     id: "automatizaciones",
     title: "Automatizaciones",
+    category: "Automatización" as SaasModuleCategory,
     description:
       "Workflows que asignan tareas, envían comunicaciones y actualizan el CRM según reglas y eventos del negocio. Reduce seguimiento manual y errores entre marketing y ventas.",
   },
   {
     id: "ia",
     title: "IA",
+    category: "IA" as SaasModuleCategory,
     description:
       "Agentes y asistentes del OS NELVYON para apoyar tareas de marketing y operación dentro de cada módulo contratado.",
   },
   {
     id: "formularios",
     title: "Formularios",
+    category: "Automatización" as SaasModuleCategory,
     description:
       "Captación estructurada conectada a leads y CRM; base para landings, campañas y funnels de adquisición.",
   },
   {
     id: "landing-pages",
     title: "Landing Pages",
+    category: "Automatización" as SaasModuleCategory,
     description:
       "Constructor web (web-builder) para páginas de conversión enlazadas a campañas, formularios y seguimiento.",
   },
   {
     id: "analitica",
     title: "Analítica",
+    category: "Analítica" as SaasModuleCategory,
     description:
       "Paneles de campañas, uso y señales operativas en el dashboard; reporting ejecutivo según plan y alcance acordado. Conecta inversión, captación y conversión en una misma lectura.",
   },
   {
     id: "integraciones",
     title: "Integraciones",
+    category: "Automatización" as SaasModuleCategory,
     description:
       "Conexión con publicidad, mensajería, pagos y herramientas del stack desde el catálogo del dashboard de integraciones.",
   },
   {
     id: "roles",
     title: "Roles de usuario",
+    category: "CRM" as SaasModuleCategory,
     description:
       "Permisos por workspace para separar configuración, ventas y operación diaria en equipos multidisciplinares.",
   },
 ] as const;
 
 export const nelvyonAboutFull = {
+  fraseFuerte:
+    "NELVYON no nace para vender acciones sueltas, sino para construir sistemas digitales completos.",
   porQueExiste: {
     title: "Por qué existe NELVYON",
     body: "NELVYON nace para ayudar a negocios que necesitan crecer con más orden, más tecnología y menos dependencia de procesos manuales. Muchas empresas tienen herramientas, campañas y canales activos, pero no un sistema conectado. NELVYON busca unir estrategia, software, automatización e IA en una operación digital más simple y potente.",

@@ -38,7 +38,7 @@ export default function BlogPage() {
     <section className="w-full py-28 md:py-36">
       <Container className="flex flex-col gap-12">
         <Header>Blog NELVYON</Header>
-        <p className="text-muted-foreground -tracking-xs max-w-2xl text-base leading-6">
+        <p className="-tracking-xs max-w-2xl text-base leading-6 text-white/75">
           Recursos por área de operación digital. Publicamos cuando hay contenido útil; las
           categorías sin artículos muestran estado «Próximamente».
         </p>
@@ -70,7 +70,7 @@ export default function BlogPage() {
                 className="rounded-2xl border border-white/10 bg-[#020817] p-6"
               >
                 <h3 className="text-lg font-medium text-[#0084FF]">{cat.label}</h3>
-                <p className="text-muted-foreground mt-2 text-sm leading-6">{cat.description}</p>
+                <p className="mt-2 text-sm leading-6 text-white/70">{cat.description}</p>
                 {catPosts.length > 0 ? (
                   <ul className="mt-4 flex flex-col gap-2">
                     {catPosts.map((post) => (
@@ -82,7 +82,7 @@ export default function BlogPage() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-muted-foreground mt-4 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm">
+                  <p className="mt-4 rounded-lg border border-white/10 bg-[#07111F] px-3 py-2 text-sm text-white/55">
                     Próximamente — estamos preparando contenido en esta categoría.
                   </p>
                 )}

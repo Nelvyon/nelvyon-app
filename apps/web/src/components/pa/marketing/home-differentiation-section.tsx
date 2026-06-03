@@ -21,8 +21,8 @@ const blocks = [
 
 export function HomeDifferentiationSection() {
   return (
-    <section className="w-full py-16 md:py-24">
-      <Container className="flex flex-col gap-12">
+    <section className="w-full bg-[#020817]/50 py-16 md:py-24">
+      <Container className="flex flex-col gap-10 md:gap-12">
         <Header>Más que una agencia. Más que un software.</Header>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {blocks.map((block) => (
@@ -30,28 +30,12 @@ export function HomeDifferentiationSection() {
               key={block.title}
               className={
                 block.highlight
-                  ? "rounded-3xl border border-[#0084FF]/40 bg-[#0084FF]/10 p-8"
-                  : "bg-natural-white rounded-3xl p-8 text-natural-black"
+                  ? "rounded-3xl border border-[#0084FF]/45 bg-gradient-to-b from-[#0084FF]/15 to-[#07111F] p-8 shadow-[0_0_40px_rgba(0,132,255,0.12)]"
+                  : "rounded-3xl border border-white/10 bg-[#07111F] p-8"
               }
             >
-              <h3
-                className={
-                  block.highlight
-                    ? "-tracking-sm text-xl font-medium text-white"
-                    : "-tracking-sm text-xl font-medium"
-                }
-              >
-                {block.title}
-              </h3>
-              <p
-                className={
-                  block.highlight
-                    ? "text-muted-foreground mt-4 text-base leading-6"
-                    : "text-muted-foreground mt-4 text-base leading-6"
-                }
-              >
-                {block.body}
-              </p>
+              <h3 className="-tracking-sm text-xl font-medium text-white">{block.title}</h3>
+              <p className="mt-4 text-base leading-6 text-white/70">{block.body}</p>
             </div>
           ))}
         </div>

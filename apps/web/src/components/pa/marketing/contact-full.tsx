@@ -17,14 +17,14 @@ export function ContactFull() {
     <section className="w-full py-28 md:py-36">
       <Container className="relative flex flex-col gap-12">
         <PageHeader>Contacto</PageHeader>
-        <p className="text-muted-foreground -tracking-xs max-w-3xl text-lg leading-7 font-medium">
+        <p className="-tracking-xs max-w-3xl text-lg leading-7 font-medium text-white/75">
           {nelvyonContactChannels.intro}
         </p>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-[#020817] p-6">
             <h2 className="text-lg font-medium text-white">Email</h2>
-            <p className="text-muted-foreground text-sm leading-6">
+            <p className="text-sm leading-6 text-white/70">
               Canal principal para propuestas y soporte comercial.
             </p>
             <a
@@ -36,7 +36,7 @@ export function ContactFull() {
           </div>
           <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-[#020817] p-6">
             <h2 className="text-lg font-medium text-white">{nelvyonContactChannels.whatsappLabel}</h2>
-            <p className="text-muted-foreground text-sm leading-6">
+            <p className="text-sm leading-6 text-white/70">
               {nelvyonContactChannels.whatsappNote}
             </p>
             <a
@@ -48,7 +48,7 @@ export function ContactFull() {
           </div>
           <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-[#020817] p-6">
             <h2 className="text-lg font-medium text-white">{nelvyonContactChannels.calendarLabel}</h2>
-            <p className="text-muted-foreground text-sm leading-6">
+            <p className="text-sm leading-6 text-white/70">
               {nelvyonContactChannels.calendarNote}
             </p>
             <Link href="#formulario" className="text-[#0084FF] text-sm font-medium hover:underline">
@@ -72,32 +72,32 @@ export function ContactFull() {
               name="nombre"
               required
               placeholder="Nombre *"
-              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-base text-white outline-none focus:border-[#0084FF]/50"
             />
             <input
               type="text"
               name="empresa"
               required
               placeholder="Empresa *"
-              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-base text-white outline-none focus:border-[#0084FF]/50"
             />
             <input
               type="email"
               name="email"
               required
               placeholder="Email *"
-              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-base text-white outline-none focus:border-[#0084FF]/50"
             />
             <input
               type="tel"
               name="telefono"
               placeholder="Teléfono (opcional)"
-              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-base text-white outline-none focus:border-[#0084FF]/50"
             />
             <select
               name="necesidad"
               required
-              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-base text-white outline-none focus:border-[#0084FF]/50"
               defaultValue=""
             >
               <option value="" disabled>
@@ -111,7 +111,7 @@ export function ContactFull() {
             </select>
             <select
               name="presupuesto"
-              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-base text-white outline-none focus:border-[#0084FF]/50"
               defaultValue=""
             >
               <option value="">Presupuesto aproximado (opcional)</option>
@@ -126,7 +126,7 @@ export function ContactFull() {
               required
               placeholder="Mensaje *"
               rows={6}
-              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-base text-white outline-none focus:border-[#0084FF]/50"
             />
             <button
               type="submit"
@@ -143,7 +143,7 @@ export function ContactFull() {
             {nelvyonContactChannels.faq.map((item, i) => (
               <AccordionItem key={item.question} value={`c-${i}`} className="border-white/10 py-3">
                 <AccordionTrigger className="text-white">{item.question}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
+                <AccordionContent className="text-white/70">{item.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
