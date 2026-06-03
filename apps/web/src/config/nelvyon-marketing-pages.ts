@@ -376,7 +376,7 @@ export const nelvyonSaasPanel = {
       title: "IA y analítica",
       description:
         "Paneles operativos para leer captación y conversión, con asistentes del ecosistema NELVYON según módulos contratados.",
-      items: ["Dashboard operativo", "Señales de campañas", "Reporting según plan", "Asistentes IA por módulo"],
+      items: ["Dashboard operativo", "Señales de campañas", "Reporting según alcance", "Asistentes IA por módulo"],
     },
   ],
 } as const;
@@ -581,7 +581,7 @@ export const nelvyonSaasModules = [
 export const nelvyonServiciosCapacidades = {
   title: "Capacidades NELVYON",
   intro:
-    "Seis áreas de ejecución que cubren visibilidad, conversión, automatización, datos, operación e IA. Cada categoría responde a una parte concreta del sistema de crecimiento.",
+    "Soluciones empresariales para construir sistemas completos de crecimiento. Cada capacidad responde a un problema operativo concreto.",
   categories: [
     {
       id: "marketing",
@@ -589,11 +589,11 @@ export const nelvyonServiciosCapacidades = {
       intro:
         "Todo lo que atrae demanda: posicionamiento orgánico, campañas de pago, redes, email y contenido. Trabajamos cada canal con método y medición, no como acciones sueltas.",
       items: [
-        { title: "SEO", description: "Visibilidad orgánica con auditoría, arquitectura editorial y priorización por demanda real." },
-        { title: "Publicidad", description: "Paid media estructurado con seguimiento de coste, volumen y calidad de lead." },
-        { title: "Redes Sociales", description: "Presencia, contenido y coordinación de canales sociales alineados a objetivos comerciales." },
-        { title: "Email Marketing", description: "Secuencias, newsletters y nurturing conectados al recorrido comercial." },
-        { title: "Contenido", description: "Producción editorial y piezas para blog, redes y campañas con cadencia sostenible." },
+        { title: "SEO", problem: "Tu marca no aparece de forma constante cuando el cliente busca.", solution: "Auditoría técnica, arquitectura editorial y priorización por demanda real.", result: "Visibilidad orgánica estructurada con métricas que puedes revisar." },
+        { title: "Publicidad", problem: "Inviertes en anuncios sin claridad sobre qué genera oportunidades.", solution: "Campañas estructuradas con seguimiento de coste, volumen y calidad de lead.", result: "Captación medible con criterio para optimizar inversión." },
+        { title: "Redes Sociales", problem: "Presencia dispersa sin conexión con objetivos comerciales.", solution: "Contenido y coordinación de canales alineados a captación y marca.", result: "Redes sociales como canal operativo, no solo publicación aislada." },
+        { title: "Email Marketing", problem: "Base de contactos sin nutrición sistemática ni continuidad.", solution: "Secuencias, newsletters y reglas de envío conectadas al recorrido comercial.", result: "Más valor desde leads existentes con comunicación por etapas." },
+        { title: "Contenido", problem: "Falta de cadencia editorial y mensaje inconsistente entre canales.", solution: "Pilares, calendario y producción alineados a SEO, campañas y ventas.", result: "Autoridad y contenido sostenible sin depender de esfuerzos puntuales." },
       ],
     },
     {
@@ -602,10 +602,10 @@ export const nelvyonServiciosCapacidades = {
       intro:
         "Activos digitales que convierten: webs, tiendas, landings y funnels. Cada pieza se diseña para captar, medir y conectar con el seguimiento comercial.",
       items: [
-        { title: "Web Corporativa", description: "Sitios profesionales con mensaje claro, velocidad y eventos de conversión medibles." },
-        { title: "Ecommerce", description: "Tiendas online con funnel de compra, tracking y coordinación con campañas y post-venta." },
-        { title: "Landing Pages", description: "Páginas de campaña optimizadas para captación y conexión directa con CRM y automatizaciones." },
-        { title: "Funnels", description: "Recorridos de conversión diseñados para mover al usuario entre etapas con seguimiento en cada paso." },
+        { title: "Web Corporativa", problem: "Tu web no transmite confianza ni convierte visitas en oportunidades.", solution: "Sitios con mensaje claro, rendimiento y eventos de conversión medibles.", result: "Presencia digital profesional conectada a captación y CRM." },
+        { title: "Ecommerce", problem: "Ventas online con datos y post-venta dispersos entre herramientas.", solution: "Funnel de compra, tracking e integración con campañas y operación.", result: "Tienda ordenada con visibilidad de conversión e ingresos." },
+        { title: "Landing Pages", problem: "Campañas sin páginas de destino optimizadas para captar y medir.", solution: "Landings orientadas a conversión con formularios y seguimiento comercial.", result: "Cada campaña con punto de entrada medible al pipeline." },
+        { title: "Funnels", problem: "Recorridos de conversión rotos entre etapas sin seguimiento.", solution: "Diseño de funnels con eventos, mensajes y pasos conectados al CRM.", result: "Usuario guiado entre etapas con contexto comercial en cada paso." },
       ],
     },
     {
@@ -614,11 +614,11 @@ export const nelvyonServiciosCapacidades = {
       intro:
         "Procesos que conectan marketing y ventas: CRM, leads, alertas y workflows. El objetivo es continuidad operativa, no bots decorativos.",
       items: [
-        { title: "Automatización IA", description: "Flujos asistidos por IA para tareas repetitivas de clasificación, respuesta y priorización." },
-        { title: "CRM", description: "Implementación y configuración de CRM para estructurar contactos, pipeline y actividades comerciales." },
-        { title: "Seguimiento Comercial", description: "Reglas de alerta, tareas y recordatorios para que ninguna oportunidad quede sin respuesta." },
-        { title: "Lead Management", description: "Captura, scoring, asignación y paso de leads entre marketing y ventas con criterio definido." },
-        { title: "Flujos de trabajo", description: "Workflows documentados que conectan herramientas, equipos y acciones según eventos del negocio." },
+        { title: "Automatización IA", problem: "Tareas repetitivas que consumen tiempo del equipo comercial.", solution: "Flujos asistidos por IA para clasificación, respuesta y priorización.", result: "Menos trabajo manual en operaciones de alto volumen." },
+        { title: "CRM", problem: "Contactos y oportunidades repartidos sin pipeline claro.", solution: "Implementación de CRM con contactos, etapas, actividades y roles.", result: "Operación comercial estructurada en un registro compartido." },
+        { title: "Seguimiento Comercial", problem: "Leads que se enfrían por falta de respuesta o continuidad.", solution: "Alertas, tareas y recordatorios según reglas del negocio.", result: "Seguimiento más fiable sin depender de memoria del equipo." },
+        { title: "Lead Management", problem: "Captación sin criterio de asignación ni paso a ventas.", solution: "Scoring, asignación y traspaso entre marketing y comercial.", result: "Cada lead con origen, responsable y siguiente acción." },
+        { title: "Flujos de trabajo", problem: "Procesos manuales entre herramientas y departamentos.", solution: "Workflows documentados con triggers, acciones e integraciones.", result: "Operación repetible y auditable entre equipos y sistemas." },
       ],
     },
     {
@@ -627,9 +627,9 @@ export const nelvyonServiciosCapacidades = {
       intro:
         "Información que sirve para decidir: dashboards, analítica y reportes con lectura clara de qué funciona y qué hay que ajustar.",
       items: [
-        { title: "Dashboards", description: "Cuadros de mando con KPIs comerciales y de marketing en una vista accionable." },
-        { title: "Analítica", description: "Seguimiento de tráfico, campañas y conversiones con criterio de atribución acordado." },
-        { title: "Reportes", description: "Informes periódicos con hallazgos claros y siguientes pasos, no solo exportaciones de datos." },
+        { title: "Dashboards", problem: "KPIs repartidos entre herramientas sin vista unificada.", solution: "Cuadros de mando con indicadores comerciales y de marketing accionables.", result: "Lectura operativa clara para decidir prioridades." },
+        { title: "Analítica", problem: "Datos de tráfico y campañas difíciles de interpretar.", solution: "Seguimiento de conversiones con criterio de atribución acordado.", result: "Visibilidad sobre qué canales y acciones mueven el negocio." },
+        { title: "Reportes", problem: "Informes que llegan tarde o sin conclusiones útiles.", solution: "Reporting periódico con hallazgos y siguientes pasos concretos.", result: "Revisiones productivas, no solo exportaciones de datos." },
       ],
     },
     {
@@ -638,10 +638,10 @@ export const nelvyonServiciosCapacidades = {
       intro:
         "La capa interna que sostiene el crecimiento: equipos, procesos, optimización y arquitectura de sistemas conectados.",
       items: [
-        { title: "Organización comercial", description: "Estructura de equipos, etapas y responsables para que ventas y marketing operen con claridad." },
-        { title: "Procesos internos", description: "Mapeo y diseño de flujos internos entre departamentos, herramientas y puntos de contacto." },
-        { title: "Optimización operativa", description: "Identificación de cuellos de botella y mejoras concretas en tiempos, costes y calidad de servicio." },
-        { title: "Sistemas digitales", description: "Arquitectura de herramientas conectadas para que datos, campañas y seguimiento no vivan aislados." },
+        { title: "Organización comercial", problem: "Equipos comerciales sin etapas, roles ni responsables claros.", solution: "Estructura de pipeline, asignaciones y criterios de seguimiento.", result: "Marketing y ventas operan con el mismo mapa de proceso." },
+        { title: "Procesos internos", problem: "Fricción entre departamentos y herramientas desconectadas.", solution: "Mapeo y diseño de flujos internos con puntos de contacto definidos.", result: "Menos retrabajo y handoffs más predecibles." },
+        { title: "Optimización operativa", problem: "Cuellos de botella que frenan tiempos, costes o calidad.", solution: "Diagnóstico operativo con mejoras concretas priorizadas.", result: "Operación más eficiente sin multiplicar complejidad." },
+        { title: "Sistemas digitales", problem: "Stack tecnológico fragmentado sin arquitectura común.", solution: "Diseño de sistemas conectados entre captación, venta y operación.", result: "Datos, campañas y seguimiento en capas integradas." },
       ],
     },
     {
@@ -650,10 +650,10 @@ export const nelvyonServiciosCapacidades = {
       intro:
         "IA aplicada a tareas reales de marketing y operación: asistentes, documentación, contenido y optimización de procesos, siempre con supervisión humana.",
       items: [
-        { title: "Asistentes IA", description: "Agentes configurados para apoyar tareas de respuesta, clasificación y preparación de contenido." },
-        { title: "Automatización documental", description: "Generación y estructuración de documentos operativos a partir de datos y plantillas del negocio." },
-        { title: "Generación de contenido", description: "Borradores, variantes y adaptaciones de copy alineados a voz de marca y objetivo de canal." },
-        { title: "Optimización de procesos", description: "Análisis de flujos existentes para detectar pasos automatizables o eliminables con IA." },
+        { title: "Asistentes IA", problem: "Equipos saturados en tareas de respuesta y clasificación.", solution: "Agentes configurados para apoyar operaciones repetitivas con supervisión.", result: "Capacidad operativa ampliada sin perder control humano." },
+        { title: "Automatización documental", problem: "Documentos operativos que consumen tiempo en preparación manual.", solution: "Generación y estructuración a partir de datos y plantillas del negocio.", result: "Menos tiempo en papeleo y más en ejecución comercial." },
+        { title: "Generación de contenido", problem: "Producción lenta de copy para campañas y canales.", solution: "Borradores y variantes alineados a voz de marca y objetivo.", result: "Cadencia de contenido más ágil con revisión humana." },
+        { title: "Optimización de procesos", problem: "Flujos con pasos redundantes o difíciles de escalar.", solution: "Análisis de procesos para detectar automatización útil con IA.", result: "Operación más ligera sin añadir tecnología innecesaria." },
       ],
     },
   ],
@@ -661,50 +661,50 @@ export const nelvyonServiciosCapacidades = {
 
 export const nelvyonAboutFull = {
   fraseFuerte:
-    "NELVYON no nace para vender acciones sueltas, sino para construir sistemas digitales completos.",
+    "NELVYON existe para construir sistemas digitales completos — no para vender acciones sueltas ni promesas vacías.",
   loQueNoHacemos: {
     title: "Lo que no hacemos",
     items: [
       "No prometemos resultados garantizados.",
       "No vendemos soluciones genéricas.",
       "No aplicamos la misma estructura a todos los negocios.",
-      "No añadimos tecnología sin sentido.",
-      "No trabajamos acciones sueltas sin estrategia.",
+      "No añadimos tecnología sin fricción real que resolver.",
+      "No ejecutamos acciones sueltas sin arquitectura de sistema.",
     ],
     cierre:
-      "NELVYON busca construir sistemas útiles, medibles y sostenibles, no promesas vacías.",
+      "Preferimos sistemas útiles, medibles y sostenibles a narrativas de marketing sin soporte operativo.",
   },
   porQueExiste: {
     title: "Por qué existe NELVYON",
-    body: "NELVYON nace para ayudar a negocios que necesitan crecer con más orden, más tecnología y menos dependencia de procesos manuales. Muchas empresas tienen herramientas, campañas y canales activos, pero no un sistema conectado. NELVYON busca unir estrategia, software, automatización e IA en una operación digital más simple y potente.",
+    body: "Muchas empresas crecen más rápido que su operación: buenas campañas, CRM desordenado, automatizaciones a medias y datos que llegan tarde. NELVYON nace para unir estrategia, software, automatización e IA en una operación digital más clara y conectada.",
   },
   historia:
-    "NELVYON surge de la necesidad de unificar marketing, ventas y tecnología en empresas que crecían más rápido que su operación. Vimos equipos con buenas campañas pero CRM desordenado, automatizaciones a medias y reporting que llegaba tarde.",
+    "Empezamos viendo el mismo patrón en negocios en crecimiento: herramientas que no conversan entre sí, equipos comerciales sin continuidad y reporting que no ayuda a decidir. NELVYON se construyó para cerrar esa brecha con tecnología aplicada y ejecución real.",
   mision:
-    "Construir sistemas digitales que ayuden a empresas a captar, vender, automatizar y operar con más claridad.",
+    "Ayudar a empresas a captar, vender, automatizar y operar con sistemas digitales conectados y criterio de largo plazo.",
   vision:
-    "Convertir NELVYON en una plataforma de referencia para negocios que quieren unificar marketing, ventas, automatización e inteligencia artificial.",
+    "Ser la referencia en operación digital para negocios que quieren unificar marketing, ventas, automatización e inteligencia artificial en un mismo entorno.",
   valores: [
-    { title: "Claridad", body: "Alcances, responsables y entregables definidos desde el inicio." },
-    { title: "Tecnología útil", body: "Software y automatización que resuelven fricción real." },
-    { title: "Ejecución profesional", body: "Implementación con método, no solo consultoría." },
-    { title: "Automatización con sentido", body: "Flujos que ahorran trabajo y mejoran seguimiento." },
-    { title: "Crecimiento sostenible", body: "Sistemas que escalan sin multiplicar el caos." },
-    { title: "Transparencia", body: "Sin promesas vacías ni métricas que no puedas revisar." },
+    { title: "Claridad", body: "Alcances, responsables y entregables definidos desde el inicio de cada fase." },
+    { title: "Tecnología útil", body: "Software y automatización solo donde reducen fricción operativa real." },
+    { title: "Ejecución profesional", body: "Implementación con método, hitos y panel compartido — no solo consultoría." },
+    { title: "Automatización con sentido", body: "Flujos que ahorran trabajo y mejoran continuidad comercial." },
+    { title: "Crecimiento sostenible", body: "Sistemas que escalan sin multiplicar caos ni dependencia de heroísmos manuales." },
+    { title: "Transparencia", body: "Métricas y decisiones que el cliente puede revisar y cuestionar." },
   ],
   filosofia:
-    "Creemos que el marketing moderno es operaciones: datos, procesos, personas y tecnología en la misma capa. Por eso NELVYON no separa agencia de software.",
+    "El marketing moderno es operaciones: datos, procesos, personas y tecnología en la misma capa. NELVYON no separa agencia de software porque el crecimiento exige ambos con el mismo criterio.",
   comoTrabajamos: [
-    { step: "01", title: "Diagnóstico", body: "Canales, herramientas, procesos y prioridades." },
-    { step: "02", title: "Plan", body: "Roadmap con servicios, SaaS e integraciones." },
-    { step: "03", title: "Implementación", body: "Ejecución con hitos y panel compartido." },
-    { step: "04", title: "Operación", body: "Revisión, optimización y escalado." },
+    { step: "01", title: "Diagnóstico", body: "Canales, herramientas, procesos comerciales y cuellos de botella reales." },
+    { step: "02", title: "Arquitectura", body: "Diseño del sistema: servicios, SaaS, integraciones y prioridades." },
+    { step: "03", title: "Implementación", body: "Ejecución con hitos, responsables y panel operativo compartido." },
+    { step: "04", title: "Operación", body: "Revisión continua, optimización y escalado según datos." },
   ],
   diferencia: [
-    "Servicios y plataforma en el mismo partner, no proveedores desconectados.",
-    "Foco en procesos y continuidad, no en entregables sueltos.",
-    "IA y automatización como soporte operativo, no como claim vacío.",
-    "Comunicación directa y reporting que ya puedes auditar.",
+    "Servicios y plataforma en el mismo partner — no proveedores desconectados.",
+    "Foco en sistemas y continuidad, no en entregables sueltos.",
+    "IA y automatización como capa operativa, no como claim decorativo.",
+    "Comunicación directa y reporting auditable desde el primer día.",
   ],
 };
 

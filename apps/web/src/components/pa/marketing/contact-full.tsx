@@ -165,7 +165,7 @@ export function ContactFull() {
             ))}
           </Accordion>
           <div className="mt-8">
-            <Button text="Ver planes SaaS" href="/pricing" />
+            <Button text="Solicitar acceso a SaaS" href="/contacto" />
           </div>
         </div>
       </Container>

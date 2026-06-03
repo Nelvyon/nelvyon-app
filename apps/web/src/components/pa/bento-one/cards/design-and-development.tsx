@@ -20,8 +20,8 @@ export const DesignAndDevelopment = () => {
         <div>
           <Button
             containerClassName="my-4"
-            text="Ver precios"
-            href="/pricing"
+            text="Solicitar información"
+            href="/contacto"
           />
         </div>
       </div>

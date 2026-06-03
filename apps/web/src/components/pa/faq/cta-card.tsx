@@ -8,8 +8,7 @@ export const CTACard = () => {
           ¿Necesitas definir el siguiente paso?
         </span>
         <span className="-tracking-xs text-base font-medium leading-6 text-white/75">
-          Cuéntanos tu contexto y te proponemos alcance, plan y forma de trabajo
-          sin compromiso inicial.
+          Cuéntanos tu contexto y te proponemos alcance y forma de trabajo sin compromiso inicial.
         </span>
       </div>
       <p className="text-sm leading-6 text-white/55">

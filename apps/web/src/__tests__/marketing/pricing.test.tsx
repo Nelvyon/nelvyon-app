@@ -46,6 +46,12 @@ vi.mock("@/components/pa/icons/logo", () => ({
   Raycast: () => null,
 }));
 
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn((url: string) => {
+    throw new Error(`NEXT_REDIRECT:${url}`);
+  }),
+}));
+
 import HomePage from "@/app/(marketing)/page";
 import PartnersPage from "@/app/(marketing)/partners/page";
 import PricingPage from "@/app/(marketing)/pricing/page";
@@ -62,37 +68,8 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe("marketing pricing and landing", () => {
-  it("Página /pricing renderiza los 3 planes", { timeout: 15000 }, () => {
-    renderWithProviders(<PricingPage />);
-    expect(screen.getByText("Starter")).toBeInTheDocument();
-    expect(screen.getByText("Growth")).toBeInTheDocument();
-    expect(screen.getByText("Elite")).toBeInTheDocument();
-  });
-
-  it("Plan 2 muestra precio Growth 297€", () => {
-    renderWithProviders(<PricingPage />);
-    expect(screen.getByText("297")).toBeInTheDocument();
-  });
-
-  it("Precios en euros en vista mensual", () => {
-    const { container } = renderWithProviders(<PricingPage />);
-    expect(container.textContent).toMatch(/97/);
-    expect(container.textContent).toMatch(/797/);
-  });
-
-  it("CTA de planes enlazan a contacto", { timeout: 15000 }, () => {
-    renderWithProviders(<PricingPage />);
-    const ctas = screen.getAllByRole("link", { name: /Solicitar informacion/i });
-    expect(ctas.length).toBeGreaterThanOrEqual(3);
-    expect(ctas.every((el) => el.getAttribute("href") === "/contacto")).toBe(true);
-  });
-
-  it("Pricing incluye contacto por email", { timeout: 15000 }, () => {
-    renderWithProviders(<PricingPage />);
-    expect(screen.getByText("contacto@nelvyon.com")).toHaveAttribute(
-      "href",
-      "mailto:contacto@nelvyon.com",
-    );
+  it("Página /pricing redirige a contacto", () => {
+    expect(() => PricingPage()).toThrow("NEXT_REDIRECT:/contacto");
   });
 
   it("Home PA renderiza headline NELVYON", { timeout: 30000 }, () => {
@@ -125,13 +102,6 @@ describe("marketing pricing and landing", () => {
     renderWithProviders(<HomePage />);
     const hrefs = screen.getAllByRole("link").map((el) => el.getAttribute("href"));
     expect(hrefs).toContain("/servicios");
-  });
-
-  it("Home PA muestra planes SaaS NELVYON", { timeout: 30000 }, () => {
-    renderWithProviders(<HomePage />);
-    expect(screen.getByText("Starter")).toBeInTheDocument();
-    expect(screen.getByText("Growth")).toBeInTheDocument();
-    expect(screen.getByText("Elite")).toBeInTheDocument();
   });
 
   it("Home PA muestra FAQ NELVYON", { timeout: 30000 }, () => {

@@ -33,7 +33,7 @@ export const AboutSection = () => {
         </div>
         <div className="grid w-full grid-cols-1 justify-between gap-30 lg:grid-cols-5">
           <div className="relative lg:col-span-2">
-            <PaDashboardMock title="Ecosistema NELVYON" />
+            <PaDashboardMock featured title="Ecosistema NELVYON" badge="Sistema conectado" />
           </div>
           <div className="flex h-full w-full flex-col justify-between gap-15 lg:col-span-3">
             <div className="flex flex-col gap-6">

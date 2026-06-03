@@ -7,14 +7,14 @@ import { PaDashboardMock } from "@/components/pa/marketing/pa-dashboard-mock";
 
 export function AboutFull() {
   return (
-    <section className="bg-natural-black text-natural-white w-full border-t border-white/8 py-12 md:py-20">
-      <Container className="flex flex-col gap-20">
+    <section className="bg-natural-black text-natural-white w-full border-t border-white/10 py-20 md:py-32">
+      <Container className="flex flex-col gap-24 md:gap-28">
         <div className="max-w-3xl">
           <Header>{nelvyonAboutFull.porQueExiste.title}</Header>
           <p className="mt-6 text-lg leading-7 text-white/75">{nelvyonAboutFull.porQueExiste.body}</p>
         </div>
 
-        <div className="rounded-3xl border border-[#0084FF]/30 bg-gradient-to-r from-[#0047AB]/20 to-[#07111F] px-8 py-10 md:px-12">
+        <div className="rounded-3xl border border-[#0084FF]/35 bg-gradient-to-r from-[#0047AB]/25 to-[#07111F] px-8 py-10 md:px-12 md:py-14">
           <p className="text-xl font-medium leading-8 text-white md:text-2xl md:leading-9">
             {nelvyonAboutFull.fraseFuerte}
           </p>
@@ -39,7 +39,7 @@ export function AboutFull() {
         </div>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
-          <PaDashboardMock title="Panel operativo" />
+          <PaDashboardMock featured title="Panel operativo NELVYON" badge="Operación conectada" />
           <div className="flex flex-col gap-6">
             <Header>Historia</Header>
             <p className="text-lg leading-7 text-white/75">{nelvyonAboutFull.historia}</p>

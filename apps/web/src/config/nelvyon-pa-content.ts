@@ -7,9 +7,9 @@ export const nelvyonNavLinks = [
 
 export const nelvyonHero = {
   title:
-    "NELVYON une SaaS, marketing, automatización e IA para construir sistemas digitales que ayudan a captar, vender y operar con más orden.",
+    "NELVYON une SaaS, marketing, automatización e IA para construir sistemas que captan, venden y operan con orden.",
   subtitle:
-    "Diseñamos y conectamos web, CRM, campañas, automatizaciones y datos para que tu negocio dependa menos de procesos sueltos y tenga una operación más clara.",
+    "Diseñamos y conectamos web, CRM, campañas, automatizaciones y datos para reducir procesos sueltos y ganar claridad operativa.",
   ctaPrimary: "Solicitar información",
   ctaSecondary: "Ver SaaS",
 };
@@ -141,11 +141,11 @@ export const nelvyonFaq = [
 export const nelvyonAbout = {
   title: "Nosotros",
   intro:
-    "NELVYON es un ecosistema de estrategia, marketing, automatización y tecnología orientado a ejecución real.",
+    "NELVYON es una operación digital: estrategia, software, automatización e implementación en un mismo criterio.",
   paragraphs: [
-    "Unimos talento multidisciplinar y sistemas de trabajo claros para que las empresas crezcan sin dispersar su operación.",
-    "Trabajamos con diagnóstico, planificación, implementación y optimización continua, con objetivos acordados en cada fase.",
-    "Sin humo ni promesas vacías: foco en procesos, continuidad operativa y decisiones con datos que ya tengas o puedas medir.",
+    "Construimos sistemas para empresas que necesitan crecer con método — no más herramientas sueltas, sino una arquitectura conectada entre captación, venta y operación.",
+    "Trabajamos con diagnóstico, diseño, implementación y mejora continua. Cada fase tiene responsables, entregables y métricas que puedes revisar.",
+    "No vendemos humo: priorizamos procesos útiles, continuidad operativa y tecnología aplicada al negocio real.",
   ],
 };
 

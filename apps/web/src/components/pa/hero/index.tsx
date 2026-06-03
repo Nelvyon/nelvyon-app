@@ -30,13 +30,21 @@ const gridLayerVariants: Variants = {
 
 const lightAboveVariants: Variants = {
   hidden: { opacity: 0 },
-  show: { opacity: 0.55, transition: { duration: 0.8, ease: "easeInOut" } },
+  show: { opacity: 0.85, transition: { duration: 0.8, ease: "easeInOut" } },
 };
 
 export const Hero = () => {
   return (
     <div className="h-[60vh] w-full p-2 md:h-screen">
       <div className="text-natural-white relative m-0 h-full w-full overflow-hidden rounded-3xl bg-black">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[62%] bg-[radial-gradient(ellipse_95%_85%_at_50%_0%,rgba(0,132,255,0.42),transparent_72%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[40%] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(0,71,171,0.28),transparent_68%)]"
+          aria-hidden
+        />
         <motion.div
           className="absolute inset-0 h-full w-full"
           variants={layersContainerVariants}
@@ -76,11 +84,11 @@ export const Hero = () => {
         </motion.div>
         <Container className="relative z-10 flex h-full flex-col justify-between">
           <div className="pt-32 md:pt-42 lg:pt-75">
-            <div className="mt-6 flex flex-col items-start gap-6 md:mt-10 lg:flex-row lg:gap-10">
-              <h1 className="text-natural-white -tracking-xl text-3xl font-semibold text-balance sm:text-4xl md:text-5xl lg:text-7xl">
+            <div className="mt-6 flex flex-col items-start gap-6 md:mt-10 lg:flex-row lg:items-start lg:gap-12">
+              <h1 className="text-natural-white -tracking-xl max-w-[38rem] text-[1.65rem] font-semibold text-pretty sm:max-w-[42rem] sm:text-[1.85rem] md:text-[2.15rem] md:leading-[1.2] lg:max-w-[44rem] lg:text-[2.65rem] lg:leading-[1.15] xl:text-[2.85rem]">
                 {nelvyonHero.title}
               </h1>
-              <div className="lg:max-w-md">
+              <div className="w-full max-w-md shrink-0 lg:pt-1">
                 <h2 className="text-sm font-medium text-balance text-white/80 sm:text-base lg:text-lg">
                   {nelvyonHero.subtitle}
                 </h2>
