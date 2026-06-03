@@ -10,9 +10,9 @@ export const Metrics = () => {
         <RoundedGridPattern />
       </div>
       <div className="z-10 flex flex-col gap-3">
-        <span className="-tracking-xl flex text-4xl leading-12 font-medium">Operacion centralizada</span>
+        <span className="-tracking-xl flex text-4xl leading-12 font-medium">Un solo sistema</span>
         <span className="text-muted-foreground -tracking-xs text-lg leading-6.5 font-medium">
-          Marketing, ventas y automatizacion en una sola capa operativa
+          Estrategia, ejecución y plataforma comparten el mismo entorno
         </span>
       </div>
       <div className="z-10">

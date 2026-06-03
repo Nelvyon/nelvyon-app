@@ -14,7 +14,7 @@ import { ComponentsDashboardsAndEverything } from "@/components/pa/bento-one/car
 export const BentoOne = () => {
   return (
     <Container className="flex flex-col gap-15 py-4">
-      <Header>Servicios para construir y operar con metodo</Header>
+      <Header>Servicios NELVYON</Header>
 
       <div className="grid grid-cols-19 gap-3">
         <div className="bg-natural-black relative col-span-19 grid overflow-hidden rounded-2xl p-4 lg:col-span-6">

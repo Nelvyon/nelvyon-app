@@ -46,7 +46,7 @@ export const Acebuilder = () => {
             <div className="flex items-center gap-2 px-3">
               <ThunderIcon />
               <span className="text-sm leading-7 text-[#999999]">
-                Unlock more features with Pro
+                Automatizaciones, CRM y paneles en NELVYON Core
               </span>
             </div>
             <div className="bg-natural-white text-natural-black z-10 flex min-h-50 flex-col justify-between rounded-2xl p-6">

@@ -1,131 +1,156 @@
-import { HOME_COPY } from "@/components/agenforce/home-copy";
-
 export const nelvyonNavLinks = [
   { label: "Inicio", href: "/" },
   { label: "Servicios", href: "/servicios" },
   { label: "SaaS", href: "/saas" },
   { label: "Precios", href: "/pricing" },
-  { label: "Blog", href: "/blog" },
   { label: "Nosotros", href: "/nosotros" },
 ] as const;
 
 export const nelvyonHero = {
-  title: `${HOME_COPY.hero.titleBefore}${HOME_COPY.hero.titleAccent1}${HOME_COPY.hero.titleMid}${HOME_COPY.hero.titleAccent2}${HOME_COPY.hero.titleMid2}${HOME_COPY.hero.titleAccent3}${HOME_COPY.hero.titleEnd}`,
-  subtitle: HOME_COPY.hero.subtitle,
-  ctaPrimary: HOME_COPY.hero.ctaPrimary,
-  ctaSecondary: HOME_COPY.hero.ctaSecondary,
+  title:
+    "NELVYON une SaaS, marketing, automatización e IA para hacer crecer negocios con orden.",
+  subtitle:
+    "Servicios profesionales y plataforma en un mismo sistema operativo: captación, CRM, automatizaciones y reporting sin saltar entre herramientas.",
+  ctaPrimary: "Solicitar información",
+  ctaSecondary: "Ver SaaS",
 };
 
-export const nelvyonServices = HOME_COPY.servicios.items.map((service) => ({
-  title: service.name,
-  description: service.phrase,
-}));
+export const nelvyonServices = [
+  {
+    title: "SEO",
+    description: "Visibilidad orgánica, contenido y técnica alineados a demanda real.",
+  },
+  {
+    title: "Publicidad",
+    description: "Campañas de adquisición con seguimiento y optimización continua.",
+  },
+  {
+    title: "Branding",
+    description: "Identidad y mensaje coherentes en cada punto de contacto.",
+  },
+  {
+    title: "Desarrollo Web",
+    description: "Sitios y landings orientados a conversión y rendimiento.",
+  },
+  {
+    title: "Ecommerce",
+    description: "Tiendas y funnels de venta con operación conectada al CRM.",
+  },
+  {
+    title: "Automatización",
+    description: "Flujos entre marketing, ventas y operación para reducir trabajo manual.",
+  },
+] as const;
 
 export const nelvyonSaasPlans = [
   {
     name: "Starter",
-    subtitle: "Para equipos que comienzan a ordenar su operacion digital.",
+    forWho:
+      "Equipos pequeños o fundadores que necesitan ordenar leads, clientes y tareas repetitivas.",
+    subtitle: "Base operativa para empezar sin complejidad innecesaria.",
     price: 97,
     currency: "EUR",
     billing: "/mes",
-    cta: "Solicitar informacion",
+    cta: "Solicitar información",
     features: [
-      "CRM base para leads y clientes",
-      "Automatizaciones esenciales",
-      "Panel operativo inicial",
-      "Soporte por email",
+      "CRM base: contactos, leads y seguimiento simple",
+      "Automatizaciones esenciales (email y tareas)",
+      "Panel operativo con vistas iniciales",
+      "Soporte por email en horario laboral",
     ],
   },
   {
     name: "Growth",
-    subtitle: "Para empresas que escalan captacion y procesos internos.",
+    forWho:
+      "Empresas en crecimiento que coordinan varios canales y necesitan pipelines claros.",
+    subtitle: "Más capacidad de integración y seguimiento comercial.",
     price: 297,
     currency: "EUR",
     billing: "/mes",
-    cta: "Solicitar informacion",
+    cta: "Solicitar información",
     features: [
-      "CRM avanzado con pipelines",
-      "Automatizaciones multi-canal",
-      "Integraciones clave",
-      "Revision estrategica mensual",
+      "CRM con pipelines y etapas personalizables",
+      "Automatizaciones multi-canal (email, SMS, tareas)",
+      "Integraciones con herramientas clave del stack",
+      "Revisión operativa mensual con el equipo NELVYON",
     ],
   },
   {
     name: "Elite",
-    subtitle: "Operacion unificada para equipos con alta complejidad.",
+    forWho:
+      "Operaciones con alta complejidad que requieren arquitectura a medida y acompañamiento cercano.",
+    subtitle: "Capa completa para unificar marketing, ventas y automatización.",
     price: 797,
     currency: "EUR",
     billing: "/mes",
-    cta: "Solicitar informacion",
+    cta: "Solicitar información",
     features: [
-      "Arquitectura operativa completa",
-      "Integraciones y flujos a medida",
-      "Analitica y reporting ejecutivo",
-      "Acompanamiento prioritario",
+      "Arquitectura operativa y flujos a medida",
+      "Integraciones avanzadas y APIs según alcance",
+      "Reporting ejecutivo y cuadros de mando",
+      "Acompañamiento prioritario y canal directo",
     ],
   },
 ] as const;
 
 export const nelvyonFaq = [
   {
-    question: "Que diferencia a NELVYON de una agencia tradicional?",
+    question: "¿Qué diferencia a NELVYON de una agencia tradicional?",
     answer:
-      "NELVYON combina servicios profesionales con plataforma SaaS para que la estrategia y la ejecucion vivan en el mismo sistema operativo.",
+      "Combinamos ejecución de servicios con plataforma SaaS propia. La estrategia y la operación comparten el mismo entorno, no entregables desconectados.",
   },
   {
-    question: "Trabajan con empresas pequenas o solo con equipos grandes?",
+    question: "¿Trabajan con empresas pequeñas o solo con equipos grandes?",
     answer:
-      "Trabajamos con empresas en crecimiento y operaciones consolidadas. Ajustamos alcance, roadmap y stack al momento operativo de cada negocio.",
+      "Con equipos en crecimiento y operaciones ya activas. El alcance se adapta al volumen de canales, integraciones y procesos que haya que ordenar.",
   },
   {
-    question: "Cuanto tarda la puesta en marcha?",
+    question: "¿Cuánto tarda la puesta en marcha?",
     answer:
-      "La fase inicial suele completarse en 2 a 4 semanas, dependiendo del volumen de activos, integraciones y procesos actuales.",
+      "Depende del alcance acordado, las integraciones existentes y el estado de tus activos. Lo definimos en el diagnóstico inicial, sin plazos genéricos.",
   },
   {
-    question: "Puedo contratar solo servicios sin plan SaaS?",
+    question: "¿Puedo contratar solo servicios sin plan SaaS?",
     answer:
-      "Si. Puedes iniciar por servicios puntuales y evolucionar a una operacion integrada con nuestra plataforma cuando tenga sentido.",
+      "Sí. Puedes empezar por servicios puntuales y pasar a la plataforma cuando el volumen y la complejidad lo justifiquen.",
   },
   {
-    question: "Como gestionan soporte y seguimiento?",
+    question: "¿Cómo gestionan soporte y seguimiento?",
     answer:
-      "Definimos responsables, cadencia de revision y un panel compartido para seguimiento de acciones, resultados y prioridades.",
+      "Asignamos responsables, cadencia de revisión y un panel compartido para prioridades, entregables y siguientes pasos.",
   },
 ] as const;
 
 export const nelvyonAbout = {
   title: "Nosotros",
   intro:
-    "NELVYON es un ecosistema de estrategia, marketing, automatizacion y tecnologia orientado a ejecucion real.",
+    "NELVYON es un ecosistema de estrategia, marketing, automatización y tecnología orientado a ejecución real.",
   paragraphs: [
-    "Unimos talento multidisciplinar y sistemas de trabajo claros para ayudar a empresas a crecer sin dispersar su operacion.",
-    "Nuestra metodologia prioriza diagnostico, planificacion, implementacion y optimizacion continua con objetivos medibles.",
-    "Sin humo, sin metricas infladas y sin promesas vacias: foco en impacto operativo y crecimiento sostenible.",
+    "Unimos talento multidisciplinar y sistemas de trabajo claros para que las empresas crezcan sin dispersar su operación.",
+    "Trabajamos con diagnóstico, planificación, implementación y optimización continua, con objetivos acordados en cada fase.",
+    "Sin humo ni promesas vacías: foco en procesos, continuidad operativa y decisiones con datos que ya tengas o puedas medir.",
   ],
 };
 
 export const nelvyonFooter = {
-  ctaTitle: "Centraliza marketing, ventas y operacion en NELVYON.",
+  tagline:
+    "NELVYON centraliza marketing, ventas, automatización e IA en un sistema operativo para negocios modernos.",
+  ctaTitle: "¿Quieres ordenar tu operación digital?",
   ctaHref: "/contacto",
   description:
-    "Servicios profesionales y plataforma SaaS para ejecutar con metodo y escalar con control.",
-  columns: {
-    Producto: [
-      { label: "SaaS", href: "/saas" },
-      { label: "Precios", href: "/pricing" },
-      { label: "Contacto", href: "/contacto" },
-    ],
-    Empresa: [
-      { label: "Blog", href: "/blog" },
-      { label: "Nosotros", href: "/nosotros" },
-      { label: "Servicios", href: "/servicios" },
-    ],
-    Legal: [
-      { label: "Privacidad", href: "/privacidad" },
-      { label: "Terminos", href: "/terminos" },
-    ],
-  },
+    "Servicios profesionales y plataforma SaaS para ejecutar marketing, ventas y automatización con método.",
+  mainLinks: [
+    { label: "Home", href: "/" },
+    { label: "Servicios", href: "/servicios" },
+    { label: "SaaS", href: "/saas" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "Contacto", href: "/contacto" },
+  ],
+  legalLinks: [
+    { label: "Privacidad", href: "/privacidad" },
+    { label: "Términos", href: "/terminos" },
+    { label: "Legal", href: "/legal" },
+  ],
   copyright: `© ${new Date().getFullYear()} NELVYON. Todos los derechos reservados.`,
 };
 

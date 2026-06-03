@@ -3,7 +3,8 @@ import { Pricing } from "@/components/pa/pricing";
 
 export const metadata: Metadata = {
   title: "Precios | NELVYON",
-  description: "Planes SaaS de NELVYON para centralizar marketing, ventas y operacion.",
+  description:
+    "Planes SaaS NELVYON: Starter, Growth y Elite. Para quién es cada plan y qué incluye.",
 };
 
 export default function PricingPage() {

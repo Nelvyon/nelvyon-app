@@ -21,7 +21,7 @@ export const Products = () => {
   return (
     <section className="w-full">
       <Container className="flex w-full flex-col gap-20 py-20 md:py-30">
-        <Header>Servicios y producto en un mismo ecosistema</Header>
+        <Header>Capas de ejecución</Header>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
           {data.map((item, index) => (
             <HoverCard key={`${item.name}-${index}`} item={item} />

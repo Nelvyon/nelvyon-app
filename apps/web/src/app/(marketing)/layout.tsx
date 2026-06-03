@@ -16,13 +16,13 @@ const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/og-image.png`;
 
 export const metadata: Metadata = {
-  title: "NELVYON — Plataforma operativa de marketing y automatización",
+  title: "NELVYON — SaaS, marketing, automatización e IA",
   description:
-    "Centraliza marketing, ventas, automatización y operación digital con NELVYON. Plataforma SaaS y servicios profesionales.",
+    "NELVYON une SaaS, marketing, automatización e IA para hacer crecer negocios con orden. Servicios profesionales y plataforma operativa.",
   openGraph: {
-    title: "NELVYON — Plataforma operativa de marketing",
+    title: "NELVYON — SaaS, marketing, automatización e IA",
     description:
-      "Centraliza marketing, ventas, automatización y operación digital con NELVYON.",
+      "SaaS, marketing, automatización e IA en un sistema operativo para negocios modernos.",
     url: canonicalBase,
     siteName: "NELVYON",
     images: [
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "NELVYON — Plataforma operativa de marketing",
-    description: "Marketing, ventas y automatización en un entorno centralizado.",
+    description: "SaaS, marketing, automatización e IA para crecer con orden.",
     images: [ogImageAbs],
     creator: "@nelvyon",
   },

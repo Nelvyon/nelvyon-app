@@ -21,6 +21,7 @@ export const DesignAndDevelopment = () => {
           <Button
             containerClassName="my-4"
             text="Ver precios"
+            href="/pricing"
           />
         </div>
       </div>

@@ -14,7 +14,7 @@ export const Pricing = ({ disabelHeader = false }: { disabelHeader?: boolean }) 
       <Container className="flex flex-col gap-20 py-20 md:py-30">
         {!disabelHeader && (
           <div className="flex w-full flex-col justify-between gap-4 lg:flex-row">
-            <Header>Planes SaaS de NELVYON</Header>
+            <Header>Planes SaaS</Header>
             <div className="-tracking-xs text-base leading-6 font-medium md:text-nowrap">
               Dudas? Escribenos a{" "}
               <Link
@@ -42,6 +42,9 @@ export const Pricing = ({ disabelHeader = false }: { disabelHeader?: boolean }) 
                   <PricingBadge variant={index === 1 ? "success" : "danger"}>
                     {index === 1 ? "Recomendado" : "Disponible"}
                   </PricingBadge>
+                </div>
+                <div className="-tracking-xs text-sm leading-5 font-medium text-[#0084FF]">
+                  {plan.forWho}
                 </div>
                 <div className="-tracking-xs text-base leading-6 font-medium text-muted-foreground">
                   {plan.subtitle}

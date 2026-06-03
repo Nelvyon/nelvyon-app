@@ -66,7 +66,7 @@ export const AboutSection = () => {
               ))}
             </div>
             <div className={cn("rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-neutral-300")}>
-              Equipo multidisciplinar, procesos claros y foco en resultados medibles.
+              Estrategia, ejecución y plataforma con el mismo criterio operativo.
             </div>
           </div>
         </div>

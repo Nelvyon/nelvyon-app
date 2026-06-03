@@ -5,11 +5,11 @@ export const CTACard = () => {
     <div className="bg-natural-white flex flex-col gap-8 rounded-3xl px-6 py-8 shadow-card-md w-full lg:max-w-lg">
       <div className="flex flex-col gap-3">
         <span className="font-medium text-2xl leading-8 -tracking-sm">
-          Necesitas ayuda para estructurar tu operacion?
+          ¿Necesitas definir el siguiente paso?
         </span>
         <span className="font-medium text-muted-foreground text-base -tracking-xs leading-6">
-          Te ayudamos a alinear marketing, ventas y automatizacion con una hoja
-          de ruta clara.
+          Cuéntanos tu contexto y te proponemos alcance, plan y forma de trabajo
+          sin compromiso inicial.
         </span>
       </div>
       <div>

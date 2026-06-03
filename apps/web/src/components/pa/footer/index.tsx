@@ -13,8 +13,6 @@ import { Button } from "@/components/pa/button";
 import { Logo } from "@/components/pa/logo";
 import { nelvyonFooter } from "@/config/nelvyon-pa-content";
 
-const data = nelvyonFooter.columns;
-
 export const Footer = () => {
   return (
     <footer className="bg-natural-black relative overflow-hidden">
@@ -50,33 +48,51 @@ export const Footer = () => {
           <div className="grid w-full grid-cols-1 gap-15 lg:grid-cols-2 lg:gap-0">
             <div className="flex flex-col gap-4">
               <Logo className="size-8" />
+              <p className="text-natural-white -tracking-sm max-w-md text-sm leading-6 font-medium">
+                {nelvyonFooter.tagline}
+              </p>
               <span className="text-muted-foreground text-sm leading-5">
                 {nelvyonFooter.description}
               </span>
               <div>
-                <Button text="Solicitar informacion" />
+                <Button text="Contacto" href="/contacto" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-0">
-              {Object.entries(data).map(([key, value]) => (
-                <div key={key} className="flex flex-col gap-4">
-                  <h3 className="text-muted-foreground -tracking-sm text-xs leading-5 font-medium">
-                    {key}
-                  </h3>
-                  <ul className="flex flex-col gap-4">
-                    {value.map((item, index) => (
-                      <li key={index}>
-                        <Link
-                          href={item.href}
-                          className="text-natural-white -tracking-sm text-sm leading-5 font-medium hover:underline"
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+            <div className="grid grid-cols-2 gap-10 md:gap-16">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-muted-foreground -tracking-sm text-xs leading-5 font-medium">
+                  Navegación
+                </h3>
+                <ul className="flex flex-col gap-4">
+                  {nelvyonFooter.mainLinks.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className="text-natural-white -tracking-sm text-sm leading-5 font-medium hover:underline"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex flex-col gap-4">
+                <h3 className="text-muted-foreground -tracking-sm text-xs leading-5 font-medium">
+                  Legal
+                </h3>
+                <ul className="flex flex-col gap-4">
+                  {nelvyonFooter.legalLinks.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className="text-natural-white -tracking-sm text-sm leading-5 font-medium hover:underline"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
           <div className="flex w-full flex-col justify-between gap-6 md:flex-row md:items-center md:gap-0">
@@ -105,4 +121,3 @@ export const Footer = () => {
     </footer>
   );
 };
-

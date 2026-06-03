@@ -11,7 +11,7 @@ export const BentoTwo = ({ disabelHeader = false }: { disabelHeader?: boolean })
   return (
     <section className="w-full">
       <Container className="flex flex-col gap-15 py-20 md:py-30">
-        {!disabelHeader && <Header>Metodo NELVYON para escalar</Header>}
+        {!disabelHeader && <Header>Cómo trabajamos</Header>}
         <div
           className={cn(
             "flex min-h-140 w-full flex-col-reverse gap-3 lg:grid lg:grid-cols-3",

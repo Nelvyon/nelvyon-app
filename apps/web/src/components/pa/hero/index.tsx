@@ -86,7 +86,11 @@ export const Hero = () => {
                 </h2>
                 <div className="mt-6 flex flex-wrap gap-3 md:mt-8">
                   <Button containerClassName="!bg-[#0084ff]" text={nelvyonHero.ctaPrimary} />
-                  <Button href="/servicios" containerClassName="!bg-transparent" text={nelvyonHero.ctaSecondary} />
+                  <Button
+                    href="/saas"
+                    containerClassName="!bg-transparent"
+                    text={nelvyonHero.ctaSecondary}
+                  />
                 </div>
               </div>
             </div>

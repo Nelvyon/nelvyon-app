@@ -7,7 +7,7 @@ export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Contacto | NELVYON",
-  description: "Contacta con NELVYON para estructurar marketing, ventas, automatización y reporting.",
+  description: "Contacta con NELVYON para definir alcance, plan SaaS o servicios profesionales.",
 };
 
 export default function ContactoPage() {
