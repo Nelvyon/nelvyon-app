@@ -138,10 +138,19 @@ export const nelvyonAbout = {
   ],
 };
 
+export const nelvyonPageCtas = {
+  home: "Solicitar información",
+  servicios: "Hablemos de tu estrategia digital",
+  saas: "Solicitar acceso a NELVYON SaaS",
+  nosotros: "Construyamos tu sistema de crecimiento",
+  contacto: "Enviar solicitud",
+  global: "¿Quieres ordenar tu operación digital?",
+} as const;
+
 export const nelvyonFooter = {
   tagline:
     "NELVYON centraliza marketing, ventas, automatización e IA en un sistema operativo para negocios modernos.",
-  ctaTitle: "¿Quieres ordenar tu operación digital?",
+  ctaTitle: nelvyonPageCtas.global,
   ctaHref: "/contacto",
   description:
     "Servicios profesionales y plataforma SaaS para ejecutar marketing, ventas y automatización con método.",
@@ -164,3 +173,13 @@ export const nelvyonContact = {
   email: "contacto@nelvyon.com",
   formAction: "https://formspree.io/f/xpwzgvbq",
 };
+
+export function getNavbarCta(pathname: string): string {
+  if (pathname === "/servicios" || pathname.startsWith("/seo") || pathname.startsWith("/ads") || pathname.startsWith("/branding") || pathname.startsWith("/contenido") || pathname.startsWith("/email-marketing") || pathname.startsWith("/desarrollo-web") || pathname.startsWith("/ecommerce") || pathname.startsWith("/automatizacion")) {
+    return nelvyonPageCtas.servicios;
+  }
+  if (pathname === "/saas" || pathname === "/pricing") return nelvyonPageCtas.saas;
+  if (pathname === "/nosotros") return nelvyonPageCtas.nosotros;
+  if (pathname === "/contacto") return nelvyonPageCtas.contacto;
+  return nelvyonPageCtas.home;
+}

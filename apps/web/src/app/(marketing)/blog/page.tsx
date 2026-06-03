@@ -20,6 +20,8 @@ const CATEGORY_LABEL_MAP: Record<string, string[]> = {
   saas: ["SaaS", "Plataforma"],
 };
 
+const MIN_POSTS_FOR_LISTING = 2;
+
 export default function BlogPage() {
   const posts = [...blog.getPages()].sort(
     (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -37,11 +39,11 @@ export default function BlogPage() {
       <Container className="flex flex-col gap-12">
         <Header>Blog NELVYON</Header>
         <p className="text-muted-foreground -tracking-xs max-w-2xl text-base leading-6">
-          Guías y reflexiones por área. Solo publicamos artículos con contenido útil; las secciones
-          vacías se marcan como próximas.
+          Recursos por área de operación digital. Publicamos cuando hay contenido útil; las
+          categorías sin artículos muestran estado «Próximamente».
         </p>
 
-        {posts.length > 0 ? (
+        {posts.length >= MIN_POSTS_FOR_LISTING ? (
           <div className="mb-8">
             <h2 className="mb-4 text-lg font-medium text-white">Últimas publicaciones</h2>
             <div className="grid grid-cols-1 gap-4">
@@ -80,7 +82,9 @@ export default function BlogPage() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-muted-foreground mt-4 text-sm italic">Próximamente</p>
+                  <p className="text-muted-foreground mt-4 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm">
+                    Próximamente — estamos preparando contenido en esta categoría.
+                  </p>
                 )}
               </div>
             );

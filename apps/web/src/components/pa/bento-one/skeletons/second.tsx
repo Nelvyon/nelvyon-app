@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { IconBrandGithubFilled } from "@tabler/icons-react";
-import Image from "next/image";
 import { SlackIcon } from "@/icons";
 
 export const SkeletonTwo = () => {
@@ -22,13 +21,9 @@ export const SkeletonTwo = () => {
       title: "Design Finalized",
       badge: "notification",
       icon: (
-        <Image
-          src="/pa/manu.webp"
-          alt="Design Finalized"
-          width={20}
-          height={20}
-          className="rounded-full"
-        />
+        <span className="flex size-5 items-center justify-center rounded-full bg-[#0084FF]/20 text-[10px] font-bold text-[#0084FF]">
+          N
+        </span>
       ),
     },
   ];

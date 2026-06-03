@@ -20,47 +20,11 @@ interface SkeletonThreeProps {
 }
 
 const defaultPins: Pin[] = [
-  // Avatars
-  {
-    top: "32%",
-    left: "68%",
-    label: "India",
-    type: "avatar",
-    image: "/pa/manu.webp",
-  },
-  {
-    top: "72%",
-    left: "82%",
-    label: "Australia",
-    type: "avatar",
-    image:
-      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    top: "28%",
-    left: "15%",
-    label: "California",
-    type: "avatar",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    top: "40%",
-    left: "52%",
-    label: "Dubai",
-    type: "avatar",
-    image:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    top: "65%",
-    left: "35%",
-    label: "Brazil",
-    type: "avatar",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1361&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  // Data Centers
+  { top: "32%", left: "68%", label: "India", type: "datacenter" },
+  { top: "72%", left: "82%", label: "Australia", type: "datacenter" },
+  { top: "28%", left: "15%", label: "California", type: "datacenter" },
+  { top: "40%", left: "52%", label: "Dubai", type: "datacenter" },
+  { top: "65%", left: "35%", label: "Brazil", type: "datacenter" },
   { top: "35%", left: "22%", label: "USA East", type: "datacenter" },
   { top: "22%", left: "47%", label: "UK", type: "datacenter" },
   { top: "26%", left: "53%", label: "Germany", type: "datacenter" },
@@ -70,7 +34,7 @@ const defaultPins: Pin[] = [
 
 export const SkeletonThree = ({
   pins = defaultPins,
-  defaultAvatarImage = "/pa/manu.webp",
+  defaultAvatarImage = "/pa/assets/project-3.webp",
 }: SkeletonThreeProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 

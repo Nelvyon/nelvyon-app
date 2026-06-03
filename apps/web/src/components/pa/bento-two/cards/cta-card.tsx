@@ -1,4 +1,5 @@
 import { Button } from "@/components/pa/button";
+import { nelvyonPageCtas } from "@/config/nelvyon-pa-content";
 import { cn } from "@/lib/pa/utils";
 
 const patten = Array.from({ length: 20 }, (_, index) => ({
@@ -40,10 +41,10 @@ export const CtaCard = () => {
 
       <div className="flex flex-col gap-5">
         <span className="-tracking-xs text-lg leading-6 font-medium">
-          Hablemos de tu operación digital
+          Conecta estrategia, tecnología y ejecución en un solo sistema
         </span>
         <div>
-          <Button text="Solicitar información" />
+          <Button text={nelvyonPageCtas.home} href="/contacto" />
         </div>
       </div>
     </div>

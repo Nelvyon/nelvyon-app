@@ -112,3 +112,19 @@ body:has(.pa-theme) {
 .pa-theme [class*="bg-[#E37400]"] {
   background-color: #0084ff !important;
 }
+
+.pa-theme .bg-purple-500,
+.pa-theme .bg-purple-100,
+.pa-theme [class*="bg-purple"] {
+  background-color: rgba(0, 132, 255, 0.15) !important;
+}
+
+.pa-theme .text-purple-500,
+.pa-theme [class*="text-purple"] {
+  color: #0084ff !important;
+}
+
+.pa-theme .border-purple-200,
+.pa-theme [class*="border-purple"] {
+  border-color: rgba(0, 132, 255, 0.35) !important;
+}

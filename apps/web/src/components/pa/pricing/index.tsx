@@ -8,7 +8,13 @@ import { Button } from "@/components/pa/button";
 import Link from "next/link";
 import { nelvyonContact, nelvyonSaasPlans } from "@/config/nelvyon-pa-content";
 
-export const Pricing = ({ disabelHeader = false }: { disabelHeader?: boolean }) => {
+export const Pricing = ({
+  disabelHeader = false,
+  ctaText,
+}: {
+  disabelHeader?: boolean;
+  ctaText?: string;
+}) => {
   return (
     <section className="w-full">
       <Container className="flex flex-col gap-20 py-20 md:py-30">
@@ -55,7 +61,7 @@ export const Pricing = ({ disabelHeader = false }: { disabelHeader?: boolean }) 
                   <span className="text-2xl">{plan.billing}</span>
                 </div>
                 <div>
-                  <Button text={plan.cta} />
+                  <Button text={ctaText ?? plan.cta} />
                 </div>
                 <div className="grid grid-cols-1 gap-3 pt-2">
                   {plan.features.map((feature) => (

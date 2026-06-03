@@ -11,7 +11,7 @@ import {
 } from "@/components/pa/icons/general";
 import { Button } from "@/components/pa/button";
 import { Logo } from "@/components/pa/logo";
-import { nelvyonFooter } from "@/config/nelvyon-pa-content";
+import { nelvyonFooter, nelvyonPageCtas } from "@/config/nelvyon-pa-content";
 
 export const Footer = () => {
   return (
@@ -55,7 +55,7 @@ export const Footer = () => {
                 {nelvyonFooter.description}
               </span>
               <div>
-                <Button text="Contacto" href="/contacto" />
+                <Button text={nelvyonPageCtas.home} href="/contacto" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-10 md:gap-16">

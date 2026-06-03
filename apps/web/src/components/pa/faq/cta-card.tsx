@@ -1,4 +1,4 @@
-import { Button } from "@/components/pa/button";
+import Link from "next/link";
 
 export const CTACard = () => {
   return (
@@ -12,9 +12,13 @@ export const CTACard = () => {
           sin compromiso inicial.
         </span>
       </div>
-      <div>
-        <Button text="Solicitar informacion" />
-      </div>
+      <p className="text-muted-foreground text-sm leading-6">
+        Escríbenos desde la sección de{" "}
+        <Link href="/contacto" className="text-[#0084FF] font-medium hover:underline">
+          contacto
+        </Link>{" "}
+        o usa el formulario al final de la página.
+      </p>
     </div>
   );
 };

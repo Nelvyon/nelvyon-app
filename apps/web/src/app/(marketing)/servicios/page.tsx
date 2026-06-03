@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-
 import Link from "next/link";
 
 import { Acebuilder } from "@/components/pa/acebuilder";
 import { Container } from "@/components/pa/container";
 import { Products } from "@/components/pa/products";
+import { ServiciosIntro } from "@/components/pa/marketing/servicios-intro";
 
 export const metadata: Metadata = {
   title: "Servicios | NELVYON — Marketing y automatización",
@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 export default function ServiciosPage() {
   return (
     <>
+      <ServiciosIntro />
       <Acebuilder />
       <Products />
       <Container className="pb-20">

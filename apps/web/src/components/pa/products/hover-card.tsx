@@ -91,13 +91,22 @@ export const HoverCard = ({ item }: { item: CardItem }) => {
       >
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center gap-2.5">
-            <Image
-              src={`${item.logo}`}
-              alt={item.name}
-              height={32}
-              width={32}
-              className="size-8"
-            />
+            {item.logo ? (
+              <Image
+                src={item.logo}
+                alt={item.name}
+                height={32}
+                width={32}
+                className="size-8"
+              />
+            ) : (
+              <span
+                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0084FF]/15 text-xs font-bold text-[#0084FF]"
+                aria-hidden
+              >
+                N
+              </span>
+            )}
             <div className="text-natural-black text-lg font-semibold">
               {item.name}
             </div>

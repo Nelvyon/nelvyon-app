@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Pricing } from "@/components/pa/pricing";
+import { nelvyonPageCtas } from "@/config/nelvyon-pa-content";
 
 export const metadata: Metadata = {
   title: "Precios | NELVYON",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function PricingPage() {
-  return <Pricing />;
+  return <Pricing ctaText={nelvyonPageCtas.saas} />;
 }

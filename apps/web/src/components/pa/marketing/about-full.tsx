@@ -1,13 +1,22 @@
 import Image from "next/image";
 
 import { nelvyonAboutFull } from "@/config/nelvyon-marketing-pages";
+import { nelvyonPageCtas } from "@/config/nelvyon-pa-content";
 import { Container } from "@/components/pa/container";
 import { Header } from "@/components/pa/header";
+import { Button } from "@/components/pa/button";
 
 export function AboutFull() {
   return (
     <section className="bg-natural-black text-natural-white w-full py-12 md:py-20">
       <Container className="flex flex-col gap-20">
+        <div className="max-w-3xl">
+          <Header>{nelvyonAboutFull.porQueExiste.title}</Header>
+          <p className="text-muted-foreground mt-6 text-lg leading-7">
+            {nelvyonAboutFull.porQueExiste.body}
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
           <div className="relative overflow-hidden rounded-3xl">
             <Image
@@ -37,7 +46,7 @@ export function AboutFull() {
 
         <div>
           <Header>Valores</Header>
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {nelvyonAboutFull.valores.map((v) => (
               <div key={v.title} className="bg-natural-white rounded-2xl p-6 text-natural-black">
                 <h4 className="font-medium">{v.title}</h4>
@@ -80,6 +89,10 @@ export function AboutFull() {
               </li>
             ))}
           </ul>
+        </div>
+
+        <div className="rounded-3xl border border-[#0084FF]/30 bg-[#0084FF]/5 p-8 md:p-10">
+          <Button text={nelvyonPageCtas.nosotros} href="/contacto" />
         </div>
       </Container>
     </section>

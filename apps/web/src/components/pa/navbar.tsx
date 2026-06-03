@@ -8,7 +8,7 @@ import { IconMenu2, IconX } from "@tabler/icons-react";
 import { Logo } from "@/components/pa/logo";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { nelvyonNavLinks } from "@/config/nelvyon-pa-content";
+import { getNavbarCta, nelvyonNavLinks } from "@/config/nelvyon-pa-content";
 
 const navItems = [...nelvyonNavLinks];
 
@@ -17,6 +17,7 @@ export const Navbar = ({ className }: { className?: string | undefined }) => {
   const pathname = usePathname();
 
   const isDarkMode = pathname === "/";
+  const navCta = getNavbarCta(pathname ?? "/");
 
   return (
     <nav
@@ -56,7 +57,7 @@ export const Navbar = ({ className }: { className?: string | undefined }) => {
 
           {/* Desktop CTA Button */}
           <div className="hidden md:block">
-            <Button />
+            <Button text={navCta} />
           </div>
 
           {/* Mobile menu button */}
@@ -93,7 +94,7 @@ export const Navbar = ({ className }: { className?: string | undefined }) => {
               </Link>
             ))}
             <div className="px-2 pt-4">
-              <Button />
+              <Button text={navCta} />
             </div>
           </div>
         </div>

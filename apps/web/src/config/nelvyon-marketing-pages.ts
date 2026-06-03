@@ -329,99 +329,192 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
   },
 };
 
+export const nelvyonSaasHero = {
+  title: "NELVYON SaaS: una plataforma para gestionar crecimiento, clientes y automatización",
+  subtitle:
+    "Centraliza CRM, leads, pipeline, calendarios, formularios, automatizaciones, WhatsApp, email marketing, landing pages, analítica e IA en un solo entorno.",
+};
+
+export const nelvyonSaasPage = {
+  replacesTitle: "NELVYON SaaS reduce la dependencia de múltiples herramientas desconectadas",
+  replacesIntro:
+    "En lugar de saltar entre CRM, formularios, mensajería y reporting en silos, NELVYON concentra las capas operativas que tu negocio usa a diario.",
+  replacesItems: [
+    "CRM",
+    "Formularios",
+    "Calendarios",
+    "WhatsApp",
+    "Email marketing",
+    "Automatizaciones",
+    "Landing pages",
+    "Analítica",
+  ],
+  audienceTitle: "Para quién es NELVYON SaaS",
+  audiences: [
+    "Negocios locales que necesitan ordenar clientes y seguimiento",
+    "Agencias que gestionan varias marcas o cuentas",
+    "Clínicas y servicios con citas, leads y comunicación recurrente",
+    "Ecommerce que conectan campañas, pedidos y post-venta",
+    "Profesionales que centralizan captación y venta",
+    "Empresas que quieren unificar marketing y operación comercial",
+  ],
+  differenceTitle: "Diseñado para operar, no solo para almacenar datos",
+  differenceBody:
+    "NELVYON SaaS no busca ser solo un CRM. Su objetivo es conectar captación, seguimiento, automatización y análisis para que cada lead tenga un proceso claro desde el primer contacto.",
+};
+
+export const nelvyonSaasFaq = [
+  {
+    question: "¿NELVYON SaaS sustituye a un CRM?",
+    answer:
+      "Incluye CRM y pipeline, pero el enfoque es operativo: conectar captación, seguimiento y automatización en un mismo entorno, no solo guardar contactos.",
+  },
+  {
+    question: "¿Incluye automatizaciones?",
+    answer:
+      "Sí. Los workflows y reglas dependen de tu plan y de los módulos activos en tu workspace.",
+  },
+  {
+    question: "¿Puede conectarse con herramientas externas?",
+    answer:
+      "Sí, según el catálogo de integraciones disponible (ads, mensajería, pagos, etc.). Lo revisamos en el diagnóstico inicial.",
+  },
+  {
+    question: "¿Es para empresas pequeñas o grandes?",
+    answer:
+      "Para equipos en crecimiento y operaciones consolidadas. Los planes Starter, Growth y Elite escalan alcance y soporte.",
+  },
+  {
+    question: "¿Se puede usar junto a los servicios de NELVYON?",
+    answer:
+      "Sí. Muchos clientes combinan plataforma SaaS con servicios de marketing, automatización o implementación.",
+  },
+] as const;
+
+export const nelvyonServiciosIntro = {
+  title: "Servicios diseñados para conectar estrategia, ejecución y tecnología",
+  intro:
+    "No trabajamos servicios aislados. Cada área de NELVYON está pensada para mejorar una parte del sistema de crecimiento: visibilidad, conversión, automatización, marca, seguimiento y venta.",
+  processTitle: "Cómo trabajamos los servicios",
+  steps: [
+    {
+      title: "Diagnóstico",
+      body: "Analizamos la situación actual del negocio, sus canales, puntos de fricción y oportunidades.",
+    },
+    {
+      title: "Estrategia",
+      body: "Definimos qué acciones tienen más sentido según el objetivo: captación, conversión, automatización o posicionamiento.",
+    },
+    {
+      title: "Implementación",
+      body: "Construimos los activos necesarios: web, campañas, automatizaciones, contenidos, CRM o flujos.",
+    },
+    {
+      title: "Optimización",
+      body: "Medimos, ajustamos y mejoramos para que el sistema sea más claro y eficiente.",
+    },
+  ],
+} as const;
+
 export const nelvyonSaasModules = [
   {
     id: "crm",
     title: "CRM",
     description:
-      "Contactos, empresas y actividades en un registro único. Vista de lista y seguimiento comercial integrado con el resto de la operación.",
+      "Registro único de contactos, empresas y actividades. Listas, historial y seguimiento comercial enlazado a campañas y automatizaciones del mismo workspace. Evita duplicados y pérdida de contexto entre equipos.",
   },
   {
     id: "leads",
     title: "Leads",
     description:
-      "Captación y scoring de leads con sincronización hacia el CRM para no perder oportunidades entre formularios y campañas.",
+      "Captura desde formularios y campañas, scoring y paso a CRM para que ninguna oportunidad quede fuera del pipeline comercial. Cada lead entra con origen, etapa y siguiente acción definida.",
   },
   {
     id: "pipeline",
     title: "Pipeline",
     description:
-      "Etapas de venta configurables, resumen por fase y movimiento de oportunidades con visibilidad para dirección comercial.",
+      "Etapas de venta configurables, totales por fase y movimiento de oportunidades con visibilidad para dirección y equipo comercial. El pipeline refleja el proceso real, no solo una lista de deals.",
   },
   {
     id: "calendarios",
     title: "Calendarios",
     description:
-      "Coordinación de citas y seguimientos en el flujo operativo (según integraciones activas en tu workspace).",
+      "Coordinación de citas y seguimientos dentro del flujo operativo, según integraciones activas en tu workspace.",
   },
   {
     id: "whatsapp",
     title: "WhatsApp",
     description:
-      "Canales de mensajería y cobros por WhatsApp donde la integración esté configurada (p. ej. Text2Pay y conectores aprobados).",
+      "Mensajería y cobros vinculados al CRM donde la integración esté configurada (Text2Pay, conectores aprobados).",
   },
   {
     id: "email-marketing",
     title: "Email Marketing",
     description:
-      "Campañas, secuencias y warmup de dominio para comunicación outbound alineada con CRM y automatizaciones.",
+      "Campañas, secuencias y warmup de dominio para nurturing y outbound alineados con etapas del pipeline.",
   },
   {
     id: "automatizaciones",
     title: "Automatizaciones",
     description:
-      "Workflows que disparan tareas, emails y actualizaciones de CRM según reglas de negocio definidas.",
+      "Workflows que asignan tareas, envían comunicaciones y actualizan el CRM según reglas y eventos del negocio. Reduce seguimiento manual y errores entre marketing y ventas.",
   },
   {
     id: "ia",
     title: "IA",
     description:
-      "Asistentes y agentes OS para apoyar tareas de marketing y operación dentro de los límites de cada módulo activo.",
+      "Agentes y asistentes del OS NELVYON para apoyar tareas de marketing y operación dentro de cada módulo contratado.",
   },
   {
     id: "formularios",
     title: "Formularios",
     description:
-      "Captación de datos conectada a leads y CRM; base para landings y campañas de adquisición.",
+      "Captación estructurada conectada a leads y CRM; base para landings, campañas y funnels de adquisición.",
   },
   {
     id: "landing-pages",
     title: "Landing Pages",
     description:
-      "Constructor web para páginas de conversión enlazadas a campañas y seguimiento (módulo web-builder del dashboard).",
+      "Constructor web (web-builder) para páginas de conversión enlazadas a campañas, formularios y seguimiento.",
   },
   {
     id: "analitica",
     title: "Analítica",
     description:
-      "Paneles de uso, campañas y señales operativas en el dashboard SaaS; reporting acordado en planes superiores.",
+      "Paneles de campañas, uso y señales operativas en el dashboard; reporting ejecutivo según plan y alcance acordado. Conecta inversión, captación y conversión en una misma lectura.",
   },
   {
     id: "integraciones",
     title: "Integraciones",
     description:
-      "Conexión con ads, mensajería, pagos y herramientas externas según catálogo disponible en /saas/dashboard/integrations.",
+      "Conexión con publicidad, mensajería, pagos y herramientas del stack desde el catálogo del dashboard de integraciones.",
   },
   {
     id: "roles",
     title: "Roles de usuario",
     description:
-      "Acceso por workspace y permisos para separar operación, ventas y configuración en equipos.",
+      "Permisos por workspace para separar configuración, ventas y operación diaria en equipos multidisciplinares.",
   },
 ] as const;
 
 export const nelvyonAboutFull = {
+  porQueExiste: {
+    title: "Por qué existe NELVYON",
+    body: "NELVYON nace para ayudar a negocios que necesitan crecer con más orden, más tecnología y menos dependencia de procesos manuales. Muchas empresas tienen herramientas, campañas y canales activos, pero no un sistema conectado. NELVYON busca unir estrategia, software, automatización e IA en una operación digital más simple y potente.",
+  },
   historia:
     "NELVYON surge de la necesidad de unificar marketing, ventas y tecnología en empresas que crecían más rápido que su operación. Vimos equipos con buenas campañas pero CRM desordenado, automatizaciones a medias y reporting que llegaba tarde.",
   mision:
-    "Ayudar a negocios a crecer con orden mediante servicios profesionales y una plataforma SaaS que comparten el mismo sistema operativo.",
+    "Construir sistemas digitales que ayuden a empresas a captar, vender, automatizar y operar con más claridad.",
   vision:
-    "Ser el partner de referencia para operaciones digitales integradas en mercados hispanohablantes, con ejecución real y transparencia.",
+    "Convertir NELVYON en una plataforma de referencia para negocios que quieren centralizar marketing, ventas, automatización e inteligencia artificial.",
   valores: [
     { title: "Claridad", body: "Alcances, responsables y entregables definidos desde el inicio." },
-    { title: "Ejecución", body: "Menos presentaciones, más implementación medible." },
-    { title: "Honestidad", body: "Sin métricas infladas ni promesas que no podemos sostener." },
-    { title: "Continuidad", body: "El sistema evoluciona con tu negocio, no se reinicia cada trimestre." },
+    { title: "Tecnología útil", body: "Software y automatización que resuelven fricción real." },
+    { title: "Ejecución profesional", body: "Implementación con método, no solo consultoría." },
+    { title: "Automatización con sentido", body: "Flujos que ahorran trabajo y mejoran seguimiento." },
+    { title: "Crecimiento sostenible", body: "Sistemas que escalan sin multiplicar el caos." },
+    { title: "Transparencia", body: "Sin promesas vacías ni métricas que no puedas revisar." },
   ],
   filosofia:
     "Creemos que el marketing moderno es operaciones: datos, procesos, personas y tecnología en la misma capa. Por eso NELVYON no separa agencia de software.",
@@ -440,6 +533,8 @@ export const nelvyonAboutFull = {
 };
 
 export const nelvyonContactChannels = {
+  intro:
+    "Cuéntanos qué necesita tu negocio y analizaremos si NELVYON puede ayudarte con SaaS, servicios de marketing, automatización o una combinación de ambos.",
   email: "contacto@nelvyon.com",
   whatsappLabel: "WhatsApp",
   whatsappNote:
@@ -448,18 +543,36 @@ export const nelvyonContactChannels = {
   calendarNote:
     "Solicita una reunión desde el formulario y te proponemos horarios según disponibilidad del equipo.",
   formAction: "https://formspree.io/f/xpwzgvbq",
+  budgetOptions: [
+    "Menos de 500 €/mes",
+    "500 – 1.500 €/mes",
+    "1.500 – 5.000 €/mes",
+    "Más de 5.000 €/mes",
+    "Aún no lo sé",
+  ],
+  needOptions: [
+    "Solo SaaS",
+    "Solo servicios de marketing",
+    "SaaS + servicios",
+    "Automatización / IA",
+    "No estoy seguro",
+  ],
   faq: [
     {
-      question: "¿Cuánto tardáis en responder?",
-      answer: "Respondemos solicitudes en días laborables; urgencias se indican en el mensaje.",
+      question: "¿Puedo contratar solo servicios?",
+      answer: "Sí. Puedes empezar por servicios puntuales sin contratar la plataforma SaaS.",
     },
     {
-      question: "¿Atendéis fuera de España?",
-      answer: "Sí, trabajamos en remoto con equipos en distintos husos horarios.",
+      question: "¿Puedo usar solo el SaaS?",
+      answer: "Sí. La plataforma está disponible por planes; el alcance depende del módulo y tu configuración.",
     },
     {
-      question: "¿Puedo pedir solo información de precios?",
-      answer: "Sí. Indica tu contexto y te orientamos sobre plan SaaS o servicios sin compromiso.",
+      question: "¿NELVYON trabaja con negocios pequeños?",
+      answer: "Sí, con equipos en crecimiento. Ajustamos alcance al volumen y madurez de tu operación.",
+    },
+    {
+      question: "¿Se puede combinar SaaS + marketing?",
+      answer: "Sí. Es el modelo más habitual: plataforma para operar y servicios para estrategia e implementación.",
     },
   ],
 };

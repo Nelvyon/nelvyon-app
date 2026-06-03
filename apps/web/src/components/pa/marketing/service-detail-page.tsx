@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { ServicePageContent } from "@/config/nelvyon-marketing-pages";
+import { nelvyonPageCtas } from "@/config/nelvyon-pa-content";
 import { Container } from "@/components/pa/container";
 import { Header } from "@/components/pa/header";
 import { Button } from "@/components/pa/button";
@@ -109,7 +110,7 @@ export function ServiceDetailPage({ content }: { content: ServicePageContent }) 
                 Cuéntanos tu situación y definimos alcance, plazos y siguiente paso.
               </p>
             </div>
-            <Button text="Solicitar información" href="/contacto" />
+            <Button text={nelvyonPageCtas.servicios} href="/contacto" />
           </div>
         </section>
       </Container>

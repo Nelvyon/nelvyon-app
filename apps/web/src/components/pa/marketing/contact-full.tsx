@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { nelvyonContactChannels } from "@/config/nelvyon-marketing-pages";
+import { nelvyonPageCtas } from "@/config/nelvyon-pa-content";
 import { Container } from "@/components/pa/container";
 import { PageHeader } from "@/components/pa/page-header";
 import { Button } from "@/components/pa/button";
@@ -16,6 +17,9 @@ export function ContactFull() {
     <section className="w-full py-28 md:py-36">
       <Container className="relative flex flex-col gap-12">
         <PageHeader>Contacto</PageHeader>
+        <p className="text-muted-foreground -tracking-xs max-w-3xl text-lg leading-7 font-medium">
+          {nelvyonContactChannels.intro}
+        </p>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-[#020817] p-6">
@@ -57,10 +61,7 @@ export function ContactFull() {
           id="formulario"
           className="relative z-10 mx-auto w-full max-w-3xl rounded-3xl border border-white/10 bg-[#020817] p-6 md:p-10"
         >
-          <h2 className="text-3xl font-semibold text-white md:text-4xl">Solicitar información</h2>
-          <p className="mt-4 text-base text-slate-300">
-            Nombre, empresa y objetivo. Te respondemos para alinear servicios, plan SaaS o ambos.
-          </p>
+          <h2 className="text-3xl font-semibold text-white md:text-4xl">Formulario de contacto</h2>
           <form
             action={nelvyonContactChannels.formAction}
             method="POST"
@@ -70,32 +71,60 @@ export function ContactFull() {
               type="text"
               name="nombre"
               required
-              placeholder="Nombre"
+              placeholder="Nombre *"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+            />
+            <input
+              type="text"
+              name="empresa"
+              required
+              placeholder="Empresa *"
               className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
             />
             <input
               type="email"
               name="email"
               required
-              placeholder="Email"
-              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
-            />
-            <input
-              type="text"
-              name="empresa"
-              placeholder="Empresa"
+              placeholder="Email *"
               className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
             />
             <input
               type="tel"
               name="telefono"
-              placeholder="Teléfono (opcional, para WhatsApp)"
+              placeholder="Teléfono (opcional)"
               className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
             />
+            <select
+              name="necesidad"
+              required
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Qué necesitas *
+              </option>
+              {nelvyonContactChannels.needOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+            <select
+              name="presupuesto"
+              className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
+              defaultValue=""
+            >
+              <option value="">Presupuesto aproximado (opcional)</option>
+              {nelvyonContactChannels.budgetOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
             <textarea
               name="mensaje"
               required
-              placeholder="Objetivo principal y contexto"
+              placeholder="Mensaje *"
               rows={6}
               className="rounded-xl border border-white/10 bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[#0084FF]/50"
             />
@@ -103,7 +132,7 @@ export function ContactFull() {
               type="submit"
               className="mt-2 inline-flex w-fit rounded-xl bg-[#0084FF] px-6 py-3 font-medium text-white hover:bg-[#0071db]"
             >
-              Enviar solicitud
+              {nelvyonPageCtas.contacto}
             </button>
           </form>
         </div>

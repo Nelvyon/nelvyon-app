@@ -4,7 +4,7 @@ import { HoverCard, CardItem } from "@/components/pa/products/hover-card";
 import { nelvyonServices } from "@/config/nelvyon-pa-content";
 
 const data: CardItem[] = nelvyonServices.map((service, index) => ({
-  logo: "/logo.png",
+  logo: "",
   name: service.title,
   href: service.href,
   description: service.description,

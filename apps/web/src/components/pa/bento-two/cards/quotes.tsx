@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { GridPattenDepth } from "@/components/pa/bento-two/cards/grid-patten-depth";
 
 export const Quotes = () => {
@@ -10,13 +9,7 @@ export const Quotes = () => {
         </div>
       </div>
       <div className="z-10">
-        <Image
-          src={"/logo.png"}
-          alt="NELVYON"
-          width={140}
-          height={52}
-          className="w-28 object-contain"
-        />
+        <span className="text-2xl font-semibold tracking-tight text-white">NELVYON</span>
       </div>
       <div className="-tracking-xs text-muted-foreground z-10 text-base leading-6 font-medium">
         &ldquo;No vendemos promesas vacías: diseñamos procesos, ejecutamos con
