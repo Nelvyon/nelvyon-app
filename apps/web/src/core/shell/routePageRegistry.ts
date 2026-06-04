@@ -294,10 +294,22 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       description: "KPIs internos nelvyon_* y automatización (sin datos simulados).",
     };
   }
-  if (path === "/os/clientes") {
+  if (path === "/os/clientes" || path.startsWith("/os/clientes/")) {
+    if (path.endsWith("/nuevo")) {
+      return { documentTitle: "Nuevo cliente · NELVYON OS", heading: "Nuevo cliente", description: "nelvyon_clients" };
+    }
+    if (/\/clientes\/\d+/.test(path)) {
+      return { documentTitle: "Cliente · NELVYON OS", heading: "Detalle cliente", description: "nelvyon_clients" };
+    }
     return { documentTitle: "Clientes · NELVYON OS", heading: "Clientes internos", description: "nelvyon_clients" };
   }
-  if (path === "/os/proyectos") {
+  if (path === "/os/proyectos" || path.startsWith("/os/proyectos/")) {
+    if (path.endsWith("/nuevo")) {
+      return { documentTitle: "Nuevo proyecto · NELVYON OS", heading: "Nuevo proyecto", description: "nelvyon_projects" };
+    }
+    if (/\/proyectos\/\d+/.test(path)) {
+      return { documentTitle: "Proyecto · NELVYON OS", heading: "Detalle proyecto", description: "nelvyon_projects" };
+    }
     return { documentTitle: "Proyectos · NELVYON OS", heading: "Proyectos", description: "nelvyon_projects" };
   }
   if (path === "/os/pipeline" || path === "/os/tareas" || path === "/os/documentos") {

@@ -62,9 +62,12 @@ cd apps/web && pnpm typecheck && pnpm build
 pnpm exec vitest run src/features/os-shell/__tests__/osShellNav.test.ts
 ```
 
-## Siguiente fase (2B sugerida)
+## Fase 2B (completada)
 
-1. CRUD `nelvyon_clients` / `nelvyon_projects` en shell OS
-2. Listado `nelvyon_outputs` en documentos
+CRUD clientes y proyectos: ver `PHASE_2B_OS_CLIENTS_PROJECTS.md`.
+
+## Siguiente fase (2C sugerida)
+
+1. Listado `nelvyon_outputs` en documentos
 3. Redirect opcional Vite → Next para super-admin
 4. `os_tasks` + pipeline cuando exista esquema
