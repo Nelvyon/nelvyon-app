@@ -11,5 +11,6 @@
 | **Integraciones** | `apps/web/saas/dashboard/integrations`, OAuth en `apps/web/src/app/api/oauth/*` | `backend/routers/oauth_integrations.py` | Tokens duplicados sin estrategia UUID |
 
 Actualizado: Fase 1B — ETL dry-run/apply, cuotas híbridas, guardrails legacy.
+Fase 1C — métricas/dashboards contactos hybrid, cuotas unificadas, plan `saas_deals`.
 
-Ver también: `PHASE_1B_CRM_ETL.md`, `PHASE_1B_QUOTAS.md`.
+Ver también: `PHASE_1B_CRM_ETL.md`, `PHASE_1B_QUOTAS.md`, `PHASE_1C_QUOTAS.md`, `PHASE_1C_LEGACY_DASHBOARDS.md`, `PHASE_1C_SAAS_DEALS_PLAN.md`, `PHASE_1C_SUMMARY.md`.

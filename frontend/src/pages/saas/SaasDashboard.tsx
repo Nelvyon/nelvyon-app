@@ -1,3 +1,8 @@
+/**
+ * Vite SaaS hub — KPIs desde GET /api/v1/dashboard/metrics (Fase 1C: contactos hybrid).
+ * Deals/pipeline siguen legacy. CRM oficial: /saas/crm.
+ * @see docs/PHASE_1C_LEGACY_DASHBOARDS.md
+ */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";

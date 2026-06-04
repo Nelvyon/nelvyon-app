@@ -2,6 +2,10 @@
 Dashboard Metrics Router — Aggregates real data from all NELVYON tables.
 Provides unified endpoints for Dashboard, Analytics, and Sales pages.
 Now supports workspace-scoped queries via X-Workspace-Id header.
+
+Fase 1C — KPI contactos: saas_contacts vía saas_tenants.workspace_id (saas-first),
+con fallback legacy (contacts + crm_contacts). Deals/campaigns siguen en tablas legacy.
+Consumido por Vite /saas/dashboard (SaasDashboard.tsx) — ver docs/PHASE_1C_LEGACY_DASHBOARDS.md.
 """
 import logging
 from datetime import datetime, timedelta, timezone
@@ -146,9 +150,23 @@ async def get_dashboard_metrics(
     mrr = 0.0
     orphan_sales_records_count = 0
 
+    contacts_source = "empty"
     try:
-        contacts_total = await _count(Contacts)
-        contacts_period = await _count(Contacts, Contacts.created_at >= since)
+        from services.saas_contact_quota import (
+            count_contacts_breakdown,
+            count_contacts_for_workspace,
+            count_contacts_period_hybrid,
+            contacts_count_source_label,
+        )
+
+        breakdown = await count_contacts_breakdown(db, ws_id)
+        contacts_total = await count_contacts_for_workspace(db, ws_id, mode="hybrid")
+        contacts_period = await count_contacts_period_hybrid(
+            db, ws_id, since, user_id=user_id
+        )
+        contacts_source = contacts_count_source_label(
+            breakdown["saas"], breakdown["legacy"]
+        )
     except Exception as e:
         _record_partial("contacts", e)
 
@@ -257,6 +275,8 @@ async def get_dashboard_metrics(
         "partial_errors": partial_errors,
         "sales_scope_policy": sales_scope_policy,
         "orphan_sales_records_count": orphan_sales_records_count,
+        "contacts_count_mode": "hybrid",
+        "contacts_source": contacts_source,
         "kpis": {
             "contacts": {"total": contacts_total, "period": contacts_period},
             "deals": {

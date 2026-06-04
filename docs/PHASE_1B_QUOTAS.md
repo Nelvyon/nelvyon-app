@@ -15,14 +15,17 @@ Evita bajar cuotas de golpe mientras coexisten datos legacy y SaaS.
 
 ## Código que aún cuenta legacy directamente
 
-| Ubicación | Qué cuenta | Acción 1B |
-|-----------|------------|-----------|
-| `workspace_service.py` | contacts (híbrido) | Actualizado |
-| `dashboard_metrics.py` | ORM `Contacts` | Legacy — documentado |
-| `global_dashboard.py` | SQL `contacts` | Legacy — documentado |
-| `module_analytics.py` | ORM `Contacts` | Legacy — documentado |
-| `reporting_service.py` | `crm_contacts` | Legacy — fase 1C |
+| Ubicación | Qué cuenta | Acción |
+|-----------|------------|--------|
+| `workspace_service.py` | contacts (híbrido) | 1B/1C ✅ |
+| `plan_quota.py` / `billing_usage` | hybrid vía adapter | 1C ✅ |
+| `dashboard_metrics.py` | hybrid contactos | 1C ✅ |
+| `global_dashboard.py` | hybrid contactos | 1C ✅ |
+| `module_analytics.py` | hybrid totales; charts legacy | 1C ✅ |
+| `reporting_service.py` | `crm_contacts` | Pendiente |
 | `admin/*` | `saas_contacts` | OK |
+
+Ver `PHASE_1C_QUOTAS.md` para modo saas-only.
 
 ## Adapter SQL reutilizable
 

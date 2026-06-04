@@ -2,6 +2,8 @@
 PRODUCT-ONBOARD-1 FASE 1 — Resumen ligero del workspace para el dashboard inicial.
 
 Solo conteos y metadatos; mismo aislamiento que el resto de la API (require_workspace).
+
+Fase 1C — contactos: saas_contacts (bridge) + fallback legacy; checklist apunta a /saas/crm.
 """
 from __future__ import annotations
 
@@ -33,7 +35,6 @@ async def get_workspace_home_summary(
 ) -> dict[str, Any]:
     """KPIs mínimos + checklist sugerida (derivada de datos reales, sin persistencia extra)."""
     from models.campaigns import Campaigns
-    from models.contacts import Contacts
     from models.deals import Deals
     from models.helpdesk_tickets import Helpdesk_tickets
     from models.workflows import Workflows
@@ -48,10 +49,6 @@ async def get_workspace_home_summary(
     stage_lower = func.lower(func.coalesce(Deals.stage, ""))
     ticket_status = func.lower(func.coalesce(Helpdesk_tickets.status, "open"))
 
-    q_contacts = (
-        select(func.count(Contacts.id))
-        .where(Contacts.user_id == user_id, Contacts.workspace_id == ws_id)
-    )
     q_campaigns = (
         select(func.count(Campaigns.id))
         .where(Campaigns.user_id == user_id, Campaigns.workspace_id == ws_id)
@@ -86,7 +83,9 @@ async def get_workspace_home_summary(
     )
 
     try:
-        contacts_n = int((await db.execute(q_contacts)).scalar_one() or 0)
+        from services.saas_contact_quota import count_contacts_for_workspace
+
+        contacts_n = await count_contacts_for_workspace(db, ws_id, mode="hybrid")
         campaigns_n = int((await db.execute(q_campaigns)).scalar_one() or 0)
         deals_open_n = int((await db.execute(q_deals_open)).scalar_one() or 0)
         tickets_open_n = int((await db.execute(q_tickets_open)).scalar_one() or 0)

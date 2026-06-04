@@ -1,3 +1,7 @@
+/**
+ * Vite global dashboard — GET /api/v1/global-dashboard/* (Fase 1C: contactos hybrid).
+ * @see docs/PHASE_1C_LEGACY_DASHBOARDS.md
+ */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";

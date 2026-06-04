@@ -110,17 +110,14 @@ class WorkspaceService:
         return (plan or "free").strip().lower()
 
     async def _count_resource(self, resource: str) -> int:
+        if resource == "contacts":
+            from services.saas_contact_quota import count_contacts_for_workspace
+
+            return await count_contacts_for_workspace(
+                self.session, self.workspace_id, mode="hybrid"
+            )
+
         queries = {
-            "contacts": """
-                SELECT GREATEST(
-                    COALESCE((
-                        SELECT COUNT(*) FROM saas_contacts sc
-                        INNER JOIN saas_tenants st ON st.id = sc.tenant_id AND st.workspace_id = :ws
-                    ), 0),
-                    COALESCE((SELECT COUNT(*) FROM crm_contacts WHERE workspace_id = :ws), 0)
-                    + COALESCE((SELECT COUNT(*) FROM contacts WHERE workspace_id = :ws), 0)
-                ) AS c
-            """,
             "campaigns": """
                 SELECT COUNT(*) AS c FROM campaigns WHERE workspace_id = :ws
             """,

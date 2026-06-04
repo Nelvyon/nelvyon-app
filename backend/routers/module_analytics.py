@@ -2,6 +2,9 @@
 Module Analytics Router — Per-module KPIs from real PostgreSQL data.
 Endpoints for CRM, Contracts, Social, Helpdesk, and Agents.
 Each returns aggregated metrics with current vs previous period comparison.
+
+Fase 1C — totales de contactos: hybrid saas_contacts + legacy; desgloses source/status
+siguen en tabla `contacts` hasta migración analítica. Vite: /saas/analytics.
 """
 import logging
 from datetime import datetime, timedelta, timezone
@@ -90,9 +93,18 @@ async def crm_analytics(
                 q = q.where(f)
             return float((await db.execute(q)).scalar() or 0)
 
-        contacts_total = await _cnt(Contacts)
-        contacts_cur = await _cnt(Contacts, Contacts.created_at >= cur_start)
-        contacts_prev = await _cnt(Contacts, Contacts.created_at >= prev_start, Contacts.created_at < prev_end)
+        from services.saas_contact_quota import (
+            count_contacts_for_workspace,
+            count_contacts_period_hybrid,
+        )
+
+        contacts_total = await count_contacts_for_workspace(db, wid, mode="hybrid")
+        contacts_cur = await count_contacts_period_hybrid(
+            db, wid, cur_start, user_id=uid
+        )
+        contacts_prev = await count_contacts_period_hybrid(
+            db, wid, prev_start, until=prev_end, user_id=uid
+        )
         avg_score = await _avg_col(Contacts, Contacts.score)
 
         # Contacts by source
@@ -142,6 +154,8 @@ async def crm_analytics(
             "period": period,
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "source": "postgresql_live",
+            "contacts_count_mode": "hybrid",
+            "contacts_charts_legacy_only": True,
             "kpis": {
                 "contacts_total": contacts_total,
                 "contacts_new": _delta(contacts_cur, contacts_prev),

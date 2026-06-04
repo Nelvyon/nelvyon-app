@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * LEGACY CRM dashboard (Fase 1C) — datos vía /api/crm/* → crm_contacts / contacts.
+ * Fuente oficial SaaS: /saas/crm + /api/saas/crm/*. No eliminar hasta redirect documentado.
+ * @see docs/PHASE_1C_LEGACY_DASHBOARDS.md
+ */
+
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";

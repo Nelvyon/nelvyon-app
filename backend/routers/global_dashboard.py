@@ -4,6 +4,9 @@ Global Business Dashboard Router — Resumen ejecutivo del workspace activo.
 Misma unidad de negocio que /api/v1/dashboard/metrics (workspace-first).
 Requiere X-Workspace-Id (require_workspace).
 
+Fase 1C — señal CRM (contactos/leads): saas_contacts + bridge tenant; fallback legacy.
+Deals/pipeline siguen en tabla `deals` (legacy). Vite: /saas/global-dashboard.
+
 Criterios de stage: core.deal_stages (SQL_WON / SQL_LOST / abiertos).
 """
 import logging
@@ -331,13 +334,9 @@ async def get_global_dashboard(
 
     contacts_count = 0
     try:
-        rc = await db.execute(
-            text(
-                "SELECT COUNT(*) AS c FROM contacts WHERE user_id = :uid AND workspace_id = :ws_id"
-            ),
-            {"uid": user_id, "ws_id": ws_id},
-        )
-        contacts_count = int((rc.mappings().first() or {}).get("c", 0) or 0)
+        from services.saas_contact_quota import count_contacts_for_workspace
+
+        contacts_count = await count_contacts_for_workspace(db, ws_id, mode="hybrid")
     except Exception as e:
         _record_partial("contacts_signal", e)
 
@@ -555,8 +554,19 @@ async def get_modules_summary(
             _log_summary_error(f"{table}.count", e)
             return 0
 
-    contacts_total = await _count("contacts")
-    contacts_leads = await _count("contacts", "status = 'lead'")
+    contacts_total = 0
+    contacts_leads = 0
+    try:
+        from services.saas_contact_quota import (
+            count_contacts_for_workspace,
+            count_contacts_leads_hybrid,
+        )
+
+        contacts_total = await count_contacts_for_workspace(db, ws_id, mode="hybrid")
+        contacts_leads = await count_contacts_leads_hybrid(db, ws_id)
+    except Exception as e:
+        _log_summary_error("crm.contacts_hybrid", e)
+
     summaries.append(
         ModuleSummary(
             module="crm",
@@ -567,6 +577,8 @@ async def get_modules_summary(
             secondary_metric="Leads",
             secondary_value=contacts_leads,
             status="healthy" if contacts_total > 0 else "warning",
+            scope="workspace_hybrid_contacts",
+            scope_note="saas_contacts + fallback legacy (Fase 1C)",
         )
     )
 

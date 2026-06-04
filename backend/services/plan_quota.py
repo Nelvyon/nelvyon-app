@@ -14,7 +14,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.pricing_plans import get_limit, get_plan_definition
 from models.campaigns import Campaigns
-from models.contacts import Contacts
 from models.workflows import Workflows
 
 logger = logging.getLogger(__name__)
@@ -44,9 +43,10 @@ async def get_active_plan_id_for_workspace(db: AsyncSession, workspace_id: int) 
 
 
 async def count_contacts_in_workspace(db: AsyncSession, workspace_id: int) -> int:
-    q = select(func.count()).select_from(Contacts).where(Contacts.workspace_id == workspace_id)
-    r = await db.execute(q)
-    return int(r.scalar() or 0)
+    """Fase 1C: saas_contacts vía bridge; fallback legacy (max, no GREATEST abrupto)."""
+    from services.saas_contact_quota import count_contacts_for_workspace
+
+    return await count_contacts_for_workspace(db, workspace_id, mode="hybrid")
 
 
 async def count_non_terminal_campaigns_in_workspace(db: AsyncSession, workspace_id: int) -> int:

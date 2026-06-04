@@ -91,6 +91,7 @@ async def test_billing_usage_contacts_count_workspace_scoped(
     now = datetime.now(timezone.utc)
     await db_session.execute(text("DELETE FROM subscriptions WHERE workspace_id IN (1, 2)"))
     await db_session.execute(text("DELETE FROM contacts WHERE workspace_id IN (1, 2)"))
+    await db_session.execute(text("DELETE FROM crm_contacts WHERE workspace_id IN (1, 2)"))
     await db_session.commit()
     await db_session.execute(
         text(
