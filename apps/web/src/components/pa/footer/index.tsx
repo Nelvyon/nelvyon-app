@@ -11,7 +11,7 @@ import {
 } from "@/components/pa/icons/general";
 import { Button } from "@/components/pa/button";
 import { Logo } from "@/components/pa/logo";
-import { nelvyonFooter, nelvyonPageCtas } from "@/config/nelvyon-pa-content";
+import { nelvyonFooter } from "@/config/nelvyon-pa-content";
 
 export const Footer = () => {
   return (
@@ -52,18 +52,18 @@ export const Footer = () => {
                 {nelvyonFooter.tagline}
               </p>
               <div>
-                <Button variant="primary" text={nelvyonPageCtas.home} href="/contacto" />
+                <Button variant="primary" text="Explorar servicios" href="/servicios" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-10 md:gap-16">
               <div className="flex flex-col gap-4">
-                <h3 className="text-xs leading-5 font-medium text-white/55">Navegación</h3>
+                <h3 className="text-xs leading-5 font-medium text-white/65">Navegación</h3>
                 <ul className="flex flex-col gap-4">
                   {nelvyonFooter.mainLinks.map((item) => (
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className="text-natural-white -tracking-sm text-sm leading-5 font-medium text-white/80 transition hover:text-white hover:underline"
+                        className="text-natural-white -tracking-sm text-sm leading-5 font-medium text-white/90 transition hover:text-white hover:underline"
                       >
                         {item.label}
                       </Link>
@@ -72,13 +72,13 @@ export const Footer = () => {
                 </ul>
               </div>
               <div className="flex flex-col gap-4">
-                <h3 className="text-xs leading-5 font-medium text-white/55">Legal</h3>
+                <h3 className="text-xs leading-5 font-medium text-white/65">Legal</h3>
                 <ul className="flex flex-col gap-4">
                   {nelvyonFooter.legalLinks.map((item) => (
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className="text-natural-white -tracking-sm text-sm leading-5 font-medium text-white/80 transition hover:text-white hover:underline"
+                        className="text-natural-white -tracking-sm text-sm leading-5 font-medium text-white/90 transition hover:text-white hover:underline"
                       >
                         {item.label}
                       </Link>
@@ -92,20 +92,20 @@ export const Footer = () => {
             <div>
               <span className="flex items-center gap-1">
                 <CopyRightIcon />
-                <span className="text-xs leading-5 font-medium text-white/55">
+                <span className="text-xs leading-5 font-medium text-white/65">
                   {nelvyonFooter.copyright}
                 </span>
               </span>
             </div>
             <div className="flex items-center gap-5">
               <Link href={"https://x.com/nelvyon"} target="_blank">
-                <XformerlyTwitter className="size-4 text-white/55 transition-colors hover:text-white" />
+                <XformerlyTwitter className="size-4 text-white/65 transition-colors hover:text-white" />
               </Link>
               <Link href={"https://www.linkedin.com/company/nelvyon"} target="_blank">
-                <LinkedIn className="size-4 text-white/55 transition-colors hover:text-white" />
+                <LinkedIn className="size-4 text-white/65 transition-colors hover:text-white" />
               </Link>
               <Link href={"https://www.instagram.com/nelvyon/"} target="_blank">
-                <Instagram className="size-4 text-white/55 transition-colors hover:text-white" />
+                <Instagram className="size-4 text-white/65 transition-colors hover:text-white" />
               </Link>
             </div>
           </div>

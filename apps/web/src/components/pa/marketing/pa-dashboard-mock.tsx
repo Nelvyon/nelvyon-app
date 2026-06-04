@@ -29,7 +29,7 @@ export function PaDashboardMock({
     <div
       className={
         featured
-          ? "relative overflow-hidden rounded-3xl border border-[#0084FF]/35 bg-[#020817] p-1 shadow-[0_0_120px_rgba(0,132,255,0.22),0_24px_80px_rgba(0,0,0,0.55)]"
+          ? "relative overflow-hidden rounded-3xl border border-[#0084FF]/35 bg-[#020817] p-1 shadow-[0_0_80px_rgba(0,132,255,0.16),0_24px_64px_rgba(0,0,0,0.5)]"
           : "overflow-hidden rounded-2xl border border-white/10 bg-[#020817] shadow-[0_0_80px_rgba(0,132,255,0.12)]"
       }
       aria-hidden
@@ -57,7 +57,7 @@ export function PaDashboardMock({
           ) : null}
         </div>
         <div
-          className={`flex flex-col md:flex-row ${featured ? "min-h-[360px] md:min-h-[420px]" : "min-h-[280px] md:min-h-[320px]"}`}
+          className={`flex flex-col md:flex-row ${featured ? "min-h-[400px] md:min-h-[460px]" : "min-h-[280px] md:min-h-[320px]"}`}
         >
           <aside className="hidden w-48 shrink-0 border-r border-white/8 bg-[#07111F]/90 p-4 md:block md:p-5">
             <div className="mb-5 flex items-center gap-2 text-xs font-semibold text-white/90">

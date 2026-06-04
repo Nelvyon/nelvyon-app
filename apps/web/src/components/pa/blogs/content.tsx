@@ -36,12 +36,12 @@ export const Content = ({ page }: { page: BlogPage }) => {
             <div className="flex flex-col items-start justify-start gap-3 self-stretch">
               <div className="flex flex-col items-start justify-start gap-6 self-stretch">
                 <div className="-tracking-xs text-2xl leading-8 font-medium">
-                  Necesitas ejecutar marketing y operacion sin caos?
+                  ¿Necesitas ejecutar marketing y operación sin caos?
                 </div>
               </div>
               <div className="text-muted-foreground -tracking-xs text-base leading-6 font-medium">
                 NELVYON integra estrategia, servicios y plataforma para pasar de
-                ideas a ejecucion sostenible.
+                ideas a ejecución sostenible.
               </div>
             </div>
             <div>

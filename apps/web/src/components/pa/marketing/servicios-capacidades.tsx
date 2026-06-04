@@ -14,22 +14,22 @@ function SolutionCard({
   result: string;
 }) {
   return (
-    <article className="flex flex-col rounded-3xl border border-white/12 bg-[#07111F] p-7 md:p-9">
+    <article className="flex flex-col rounded-3xl border border-white/12 bg-[#07111F] p-8 md:p-10">
       <h4 className="text-lg font-medium text-white md:text-xl">{title}</h4>
-      <div className="mt-7 grid grid-cols-1 gap-6 border-t border-white/8 pt-7 md:grid-cols-3 md:gap-8">
+      <div className="mt-8 grid grid-cols-1 gap-8 border-t border-white/8 pt-8 md:grid-cols-3 md:gap-10">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-white/45">Problema habitual</p>
-          <p className="mt-2 text-sm leading-7 text-white/68 md:text-[15px]">{problem}</p>
+          <p className="mt-3 text-sm leading-7 text-white/72 md:text-[15px] md:leading-8">{problem}</p>
         </div>
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-[#0084FF]/80">
             Solución NELVYON
           </p>
-          <p className="mt-2 text-sm leading-7 text-white/78 md:text-[15px]">{solution}</p>
+          <p className="mt-3 text-sm leading-7 text-white/82 md:text-[15px] md:leading-8">{solution}</p>
         </div>
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-white/45">Resultado esperado</p>
-          <p className="mt-2 text-sm leading-7 text-white/68 md:text-[15px]">{result}</p>
+          <p className="mt-3 text-sm leading-7 text-white/72 md:text-[15px] md:leading-8">{result}</p>
         </div>
       </div>
     </article>

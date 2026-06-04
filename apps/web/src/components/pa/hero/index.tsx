@@ -22,10 +22,9 @@ const layerVariants: Variants = {
   show: { opacity: 1, transition: { duration: 0.8, ease: "easeInOut" } },
 };
 
-// Grid stays dimmed, so it fades to 0.2 instead of full opacity.
 const gridLayerVariants: Variants = {
   hidden: { opacity: 0 },
-  show: { opacity: 0.2, transition: { duration: 0.8, ease: "easeInOut" } },
+  show: { opacity: 0.05, transition: { duration: 0.8, ease: "easeInOut" } },
 };
 
 const lightAboveVariants: Variants = {
@@ -85,7 +84,7 @@ export const Hero = () => {
         <Container className="relative z-10 flex h-full flex-col justify-between">
           <div className="pt-32 md:pt-42 lg:pt-75">
             <div className="mt-6 flex flex-col items-start gap-6 md:mt-10 lg:flex-row lg:items-start lg:gap-12">
-              <h1 className="text-natural-white -tracking-xl max-w-[38rem] text-[1.65rem] font-semibold text-pretty sm:max-w-[42rem] sm:text-[1.85rem] md:text-[2.15rem] md:leading-[1.2] lg:max-w-[44rem] lg:text-[2.65rem] lg:leading-[1.15] xl:text-[2.85rem]">
+              <h1 className="text-natural-white -tracking-xl max-w-[36rem] text-balance text-[1.55rem] font-semibold leading-[1.28] sm:max-w-[40rem] sm:text-[1.7rem] md:max-w-[42rem] md:text-[1.95rem] md:leading-[1.24] lg:max-w-[44rem] lg:text-[2.25rem] lg:leading-[1.2] xl:text-[2.4rem]">
                 {nelvyonHero.title}
               </h1>
               <div className="w-full max-w-md shrink-0 lg:pt-1">
@@ -107,7 +106,7 @@ export const Hero = () => {
             <p
               className={cn(
                 "from-natural-white/10 -tracking-xl to-heading/0 bg-linear-to-r bg-clip-text text-transparent",
-                "absolute -top-10 left-1/2 -translate-x-1/2 text-center text-[100px] font-semibold sm:text-[6rem] md:-top-6 md:mt-10 md:text-[160px] lg:-top-18 lg:text-[300px]",
+                "absolute -top-10 left-1/2 -translate-x-1/2 text-center text-[72px] font-semibold sm:text-[5rem] md:-top-6 md:mt-10 md:text-[120px] lg:-top-18 lg:text-[220px] xl:text-[260px]",
               )}
             >
               NELVYON

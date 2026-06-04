@@ -21,7 +21,7 @@ import {
 } from "@/components/pa/ui/accordion";
 
 const ROADMAP_COLUMNS = [
-  { key: "disponible" as const, label: "Disponible", accent: "text-emerald-400 border-emerald-400/30 bg-emerald-400/5" },
+  { key: "disponible" as const, label: "Disponible", accent: "text-[#66B3FF] border-[#0084FF]/35 bg-[#0084FF]/8" },
   { key: "enDesarrollo" as const, label: "En desarrollo", accent: "text-[#0084FF] border-[#0084FF]/30 bg-[#0084FF]/5" },
   { key: "planificado" as const, label: "Planificado", accent: "text-white/70 border-white/15 bg-white/[0.03]" },
 ];
@@ -37,29 +37,31 @@ export function SaasPageContent() {
   return (
     <>
       {/* Hero + Dashboard protagonista */}
-      <section className="relative w-full overflow-hidden pb-4 md:pb-8">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_-20%,rgba(0,132,255,0.28),transparent_68%)]" />
-        <Container className="relative flex flex-col gap-10 pt-28 md:gap-14 md:pt-40">
-          <div className="max-w-3xl">
-            <span className="text-xs font-medium uppercase tracking-wider text-[#0084FF]">
-              Plataforma NELVYON
-            </span>
-            <Header className="mt-3">{nelvyonSaasHero.title}</Header>
-            <p className="-tracking-xs mt-4 max-w-2xl text-lg leading-7 font-medium text-white/75">
-              {nelvyonSaasHero.subtitle}
-            </p>
-            <div className="mt-8">
-              <Button variant="primary" text={nelvyonSaasHero.cta} href="/contacto" />
+      <section className="relative w-full overflow-hidden pb-8 md:pb-12">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_-20%,rgba(0,132,255,0.22),transparent_68%)]" />
+        <Container className="relative flex flex-col gap-12 pt-28 md:gap-16 md:pt-40">
+          <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12 lg:gap-12">
+            <div className="max-w-xl lg:col-span-4">
+              <span className="text-xs font-medium uppercase tracking-wider text-[#0084FF]">
+                Plataforma NELVYON
+              </span>
+              <Header className="mt-3">{nelvyonSaasHero.title}</Header>
+              <p className="-tracking-xs mt-4 text-lg leading-7 font-medium text-white/75">
+                {nelvyonSaasHero.subtitle}
+              </p>
+              <div className="mt-8">
+                <Button variant="primary" text={nelvyonSaasHero.cta} href="/contacto" />
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-4">
-            <NarrativeStep label="02" title="Centralización" />
-            <PaDashboardMock
-              featured
-              title="Centro de control empresarial"
-              badge="Panel NELVYON SaaS"
-            />
+            <div className="flex flex-col gap-4 lg:col-span-8">
+              <NarrativeStep label="02" title="Centralización" />
+              <PaDashboardMock
+                featured
+                title="Centro de control empresarial"
+                badge="Panel NELVYON SaaS"
+              />
+            </div>
           </div>
         </Container>
       </section>
@@ -152,19 +154,25 @@ export function SaasPageContent() {
 
       {/* IA + escalabilidad */}
       <section className="w-full border-t border-white/10 bg-[#020817]/50 py-20 md:py-32">
-        <Container className="flex flex-col gap-14">
+        <Container className="flex flex-col gap-12">
           <NarrativeStep label="04" title="IA" />
-          <Header>{nelvyonSaasPage.audienceTitle}</Header>
-          <ul className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <div className="max-w-3xl">
+            <Header>{nelvyonSaasPage.audienceTitle}</Header>
+            <p className="-tracking-xs mt-4 text-base leading-7 text-white/70">
+              Perfiles habituales en los que la plataforma encaja cuando hay captación activa y procesos que unificar.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {nelvyonSaasPage.audiences.map((a) => (
-              <li
-                key={a}
-                className="rounded-2xl border border-white/12 bg-[#07111F] px-5 py-6 text-center text-sm font-medium text-white/88 md:text-base"
+              <div
+                key={a.label}
+                className="rounded-2xl border border-white/12 bg-[#07111F] px-6 py-6"
               >
-                {a}
-              </li>
+                <h3 className="text-base font-medium text-white">{a.label}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/68">{a.description}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </Container>
       </section>
 
@@ -192,29 +200,37 @@ export function SaasPageContent() {
 
       <section className="w-full border-t border-white/10 bg-[#020817]/40 py-20 md:py-28">
         <Container className="flex flex-col gap-10">
-          <Header>{nelvyonSaasPage.replacesTitle}</Header>
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="max-w-3xl">
+            <Header>{nelvyonSaasPage.replacesTitle}</Header>
+            <p className="-tracking-xs mt-5 text-base leading-8 text-white/72">{nelvyonSaasPage.replacesIntro}</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {nelvyonSaasPage.replacesItems.map((item) => (
-              <li
-                key={item}
-                className="rounded-2xl border border-white/12 bg-[#07111F] px-6 py-5 text-sm font-medium text-white/88 md:text-base"
+              <div
+                key={item.title}
+                className="rounded-2xl border border-white/12 bg-[#07111F] px-6 py-5"
               >
-                {item}
-              </li>
+                <p className="text-sm font-medium text-white/92">{item.title}</p>
+                <p className="mt-2 text-sm leading-6 text-white/65">{item.description}</p>
+              </div>
             ))}
-          </ul>
-          <p className="max-w-3xl text-base leading-8 text-white/72">{nelvyonSaasPage.replacesIntro}</p>
+          </div>
         </Container>
       </section>
 
-      <section className="w-full border-t border-white/10 py-20 md:py-28">
-        <Container className="max-w-3xl">
-          <Header>FAQ SaaS</Header>
-          <Accordion className="mt-10">
+      <section className="w-full border-t border-white/10 py-16 md:py-24">
+        <Container className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
+          <div className="flex flex-col gap-4 lg:pt-2">
+            <Header>FAQ SaaS</Header>
+            <p className="text-base leading-7 text-white/70">
+              Respuestas directas sobre alcance, módulos e integraciones. Si tu caso es más específico, lo revisamos en contacto.
+            </p>
+          </div>
+          <Accordion className="w-full">
             {nelvyonSaasFaq.map((item, i) => (
-              <AccordionItem key={item.question} value={`saas-faq-${i}`} className="border-white/10 py-4">
-                <AccordionTrigger className="text-white/92">{item.question}</AccordionTrigger>
-                <AccordionContent className="text-white/72">{item.answer}</AccordionContent>
+              <AccordionItem key={item.question} value={`saas-faq-${i}`} className="border-white/10 py-3">
+                <AccordionTrigger className="text-left text-white/92">{item.question}</AccordionTrigger>
+                <AccordionContent className="pb-4 text-white/72">{item.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
@@ -223,10 +239,13 @@ export function SaasPageContent() {
 
       <section className="w-full border-t border-white/10 py-20 md:py-28">
         <Container className="flex flex-col items-center gap-7 rounded-3xl border border-[#0084FF]/35 bg-gradient-to-br from-[#0047AB]/30 to-[#020817] p-10 text-center shadow-[0_0_80px_rgba(0,132,255,0.12)] md:p-16">
-          <h2 className="-tracking-sm text-2xl font-medium text-white md:text-3xl">
+          <h2 className="-tracking-sm mb-2 text-2xl font-medium text-white md:mb-3">
             {nelvyonSaasPage.finalCta}
           </h2>
-          <Button variant="primary" text={nelvyonSaasPage.finalCta} href="/contacto" />
+          <p className="max-w-xl text-base leading-7 text-white/72">
+            Te explicamos alcance, módulos disponibles e integraciones según tu operación. Sin compromiso inicial.
+          </p>
+          <Button variant="primary" text="Ir a contacto" href="/contacto" />
         </Container>
       </section>
     </>

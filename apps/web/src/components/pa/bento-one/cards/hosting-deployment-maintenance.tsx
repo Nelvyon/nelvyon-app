@@ -11,7 +11,7 @@ export const HostingDeploymentMaintenance = () => {
         <ellipse cx="50%" cy="50%" rx="100" ry="60" />
       </svg>
       <h2 className="relative z-50 p-4 text-base font-medium text-white">
-        Integraciones, automatizacion y mantenimiento
+        Integraciones, automatización y mantenimiento
       </h2>
       <SkeletonThree />
     </div>

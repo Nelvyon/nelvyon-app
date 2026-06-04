@@ -155,7 +155,7 @@ export const nelvyonPageCtas = {
   saas: "Solicitar acceso a NELVYON SaaS",
   nosotros: "Construyamos tu sistema de crecimiento",
   contacto: "Enviar solicitud",
-  global: "¿Quieres ordenar tu operación digital?",
+  global: "¿Hablamos de tu operación digital?",
 } as const;
 
 export const nelvyonFooter = {
@@ -165,7 +165,7 @@ export const nelvyonFooter = {
   ctaHref: "/contacto",
   description: "",
   mainLinks: [
-    { label: "Home", href: "/" },
+    { label: "Inicio", href: "/" },
     { label: "Servicios", href: "/servicios" },
     { label: "SaaS", href: "/saas" },
     { label: "Contacto", href: "/contacto" },

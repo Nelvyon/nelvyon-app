@@ -11,7 +11,7 @@ import { GoogleLogo } from "@/components/pa/icons/logo";
 import { RoundedGridPattern } from "@/components/pa/bento-one/cards/rounded-grid-pattern";
 import { motion } from "motion/react";
 
-const searchQuery = "servicios marketing automatizacion nelvyon";
+const searchQuery = "servicios marketing automatización nelvyon";
 const typingFrames = Array.from(
   { length: searchQuery.length + 1 },
   (_, index) => `${index*0.8}ch`,
@@ -45,7 +45,7 @@ export const GetFoundOnGoogle = () => {
 
   return (
     <div className="relative flex h-full flex-col gap-10">
-      <div className="absolute inset-0 translate-x-5">
+      <div className="absolute inset-0 translate-x-5 opacity-40">
         <RoundedGridPattern />
       </div>
       <div className="z-10 justify-start text-lg leading-6 font-medium">
@@ -173,7 +173,7 @@ export const GetFoundOnGoogle = () => {
                 </div>
               </div>
               <div className="justify-start text-center text-sm leading-4 font-normal text-zinc-800">
-                Ecosistema de marketing y operacion digital
+                Ecosistema de marketing y operación digital
               </div>
               <div className="flex flex-col items-start justify-start gap-1.5">
                 <motion.div

@@ -21,7 +21,7 @@ export const FAQ = () => {
           <div className="flex flex-col gap-4">
             <Header>Preguntas frecuentes</Header>
             <div className="-tracking-xs text-base leading-6 font-medium text-white/75 md:text-nowrap">
-              Tienes mas preguntas? Escribenos a{" "}
+              ¿Tienes más preguntas? Escríbenos a{" "}
               <Link
                 href={`mailto:${nelvyonContact.email}`}
                 className="text-[#0084FF] underline underline-offset-3"

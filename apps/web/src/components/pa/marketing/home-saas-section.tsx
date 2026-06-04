@@ -20,10 +20,10 @@ export function HomeSaasSection() {
           <span className="text-xs font-medium uppercase tracking-wider text-[#0084FF]">
             Plataforma NELVYON
           </span>
-          <Header>NELVYON SaaS: lo que obtienes con la plataforma</Header>
+          <Header>NELVYON SaaS: plataforma operativa conectada</Header>
           <p className="-tracking-xs max-w-xl text-lg leading-7 text-white/75">
-            Un entorno diseñado para conectar clientes, leads, comunicación y reporting sin depender
-            de varias herramientas que no hablan entre sí.
+            Un entorno para gestionar clientes, leads, comunicación y reporting sin depender de
+            varias herramientas que no comparten contexto.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button variant="primary" text={nelvyonPageCtas.saas} href="/contacto" />

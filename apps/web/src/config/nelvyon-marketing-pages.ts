@@ -332,7 +332,7 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
 export const nelvyonSaasHero = {
   title: "NELVYON SaaS",
   subtitle:
-    "Una plataforma diseñada para conectar CRM, automatización, comunicación, captación y análisis dentro de un mismo entorno.",
+    "Plataforma para conectar CRM, automatización, comunicación, captación y analítica en un mismo entorno operativo.",
   cta: "Solicitar acceso",
 };
 
@@ -387,23 +387,59 @@ export const nelvyonSaasPage = {
     "Módulos del workspace NELVYON. La disponibilidad concreta depende de tu plan, configuración e integraciones activas.",
   replacesTitle: "Qué sustituye",
   replacesIntro:
-    "El objetivo es reducir la dependencia de múltiples herramientas cuando tenga sentido hacerlo.",
+    "Cuando encaja con tu operación, la plataforma puede concentrar funciones que hoy viven en herramientas separadas. No implica sustituir todo de golpe: priorizamos según tu stack y madurez.",
   replacesItems: [
-    "CRM aislados",
-    "Formularios independientes",
-    "Calendarios separados",
-    "Herramientas de seguimiento",
-    "Automatizaciones dispersas",
-    "Sistemas desconectados",
+    {
+      title: "CRM aislados",
+      description: "Contactos, pipeline y actividades en un registro compartido con el resto del workspace.",
+    },
+    {
+      title: "Formularios independientes",
+      description: "Captación conectada a leads y seguimiento comercial desde el primer envío.",
+    },
+    {
+      title: "Calendarios separados",
+      description: "Citas y recordatorios vinculados al contexto del cliente, según integraciones activas.",
+    },
+    {
+      title: "Herramientas de seguimiento",
+      description: "Tareas, alertas y actividades comerciales con reglas claras para el equipo.",
+    },
+    {
+      title: "Automatizaciones dispersas",
+      description: "Workflows centralizados con triggers, acciones e historial en un mismo entorno.",
+    },
+    {
+      title: "Sistemas desconectados",
+      description: "Menos saltos entre plataformas cuando captación, venta y operación comparten datos.",
+    },
   ],
-  audienceTitle: "Para quién es",
+  audienceTitle: "Para quién encaja",
   audiences: [
-    "Negocios locales",
-    "Agencias",
-    "Ecommerce",
-    "Clínicas",
-    "Consultores",
-    "Empresas en crecimiento",
+    {
+      label: "Negocios locales",
+      description: "Captación y seguimiento con pocos recursos internos y necesidad de orden comercial.",
+    },
+    {
+      label: "Agencias",
+      description: "Operación multi-cliente con procesos repetibles y visibilidad por cuenta.",
+    },
+    {
+      label: "Ecommerce",
+      description: "Datos de campañas, leads y post-venta en capas que se pueden revisar juntas.",
+    },
+    {
+      label: "Clínicas y servicios",
+      description: "Citas, recordatorios y comunicación con continuidad entre equipos.",
+    },
+    {
+      label: "Consultores",
+      description: "Pipeline claro, propuestas y nurturing sin depender de hojas sueltas.",
+    },
+    {
+      label: "Empresas en crecimiento",
+      description: "Operaciones que escalan y necesitan unificar canales sin multiplicar herramientas.",
+    },
   ],
   roadmapTitle: "Roadmap",
   finalCta: "Solicitar acceso a NELVYON SaaS",
@@ -467,9 +503,9 @@ export const nelvyonSaasFaq = [
 ] as const;
 
 export const nelvyonServiciosIntro = {
-  title: "Servicios diseñados para conectar estrategia, ejecución y tecnología",
+  title: "Servicios para conectar estrategia, ejecución y tecnología",
   intro:
-    "No trabajamos servicios aislados. Cada área de NELVYON está pensada para mejorar una parte del sistema de crecimiento: visibilidad, conversión, automatización, marca, seguimiento y venta.",
+    "Cada área de NELVYON resuelve una parte concreta del crecimiento — visibilidad, conversión, automatización, marca y seguimiento — con entregables medibles y conexión al resto del sistema.",
   processTitle: "Cómo trabajamos los servicios",
   steps: [
     {
@@ -591,7 +627,7 @@ export const nelvyonServiciosCapacidades = {
       items: [
         { title: "SEO", problem: "Tu marca no aparece de forma constante cuando el cliente busca.", solution: "Auditoría técnica, arquitectura editorial y priorización por demanda real.", result: "Visibilidad orgánica estructurada con métricas que puedes revisar." },
         { title: "Publicidad", problem: "Inviertes en anuncios sin claridad sobre qué genera oportunidades.", solution: "Campañas estructuradas con seguimiento de coste, volumen y calidad de lead.", result: "Captación medible con criterio para optimizar inversión." },
-        { title: "Redes Sociales", problem: "Presencia dispersa sin conexión con objetivos comerciales.", solution: "Contenido y coordinación de canales alineados a captación y marca.", result: "Redes sociales como canal operativo, no solo publicación aislada." },
+        { title: "Redes Sociales", problem: "Presencia dispersa sin conexión con objetivos comerciales.", solution: "Calendario editorial y coordinación de canales alineados a captación y marca.", result: "Redes como canal operativo, no como publicación aislada." },
         { title: "Email Marketing", problem: "Base de contactos sin nutrición sistemática ni continuidad.", solution: "Secuencias, newsletters y reglas de envío conectadas al recorrido comercial.", result: "Más valor desde leads existentes con comunicación por etapas." },
         { title: "Contenido", problem: "Falta de cadencia editorial y mensaje inconsistente entre canales.", solution: "Pilares, calendario y producción alineados a SEO, campañas y ventas.", result: "Autoridad y contenido sostenible sin depender de esfuerzos puntuales." },
       ],
@@ -614,7 +650,7 @@ export const nelvyonServiciosCapacidades = {
       intro:
         "Procesos que conectan marketing y ventas: CRM, leads, alertas y workflows. El objetivo es continuidad operativa, no bots decorativos.",
       items: [
-        { title: "Automatización IA", problem: "Tareas repetitivas que consumen tiempo del equipo comercial.", solution: "Flujos asistidos por IA para clasificación, respuesta y priorización.", result: "Menos trabajo manual en operaciones de alto volumen." },
+        { title: "Automatización IA", problem: "Tareas repetitivas que consumen tiempo del equipo comercial.", solution: "Flujos asistidos por IA para clasificar, responder y priorizar con supervisión humana.", result: "Menos carga manual en operaciones de alto volumen." },
         { title: "CRM", problem: "Contactos y oportunidades repartidos sin pipeline claro.", solution: "Implementación de CRM con contactos, etapas, actividades y roles.", result: "Operación comercial estructurada en un registro compartido." },
         { title: "Seguimiento Comercial", problem: "Leads que se enfrían por falta de respuesta o continuidad.", solution: "Alertas, tareas y recordatorios según reglas del negocio.", result: "Seguimiento más fiable sin depender de memoria del equipo." },
         { title: "Lead Management", problem: "Captación sin criterio de asignación ni paso a ventas.", solution: "Scoring, asignación y traspaso entre marketing y comercial.", result: "Cada lead con origen, responsable y siguiente acción." },
@@ -710,7 +746,7 @@ export const nelvyonAboutFull = {
 
 export const nelvyonContactChannels = {
   intro:
-    "Cuéntanos qué necesita tu negocio y analizaremos si NELVYON puede ayudarte con SaaS, servicios de marketing, automatización o una combinación de ambos.",
+    "Cuéntanos qué necesita tu negocio y revisaremos si NELVYON puede ayudarte con SaaS, servicios de marketing, automatización o una combinación de ambos.",
   antesDeContactar: {
     title: "Antes de contactarnos",
     intro:

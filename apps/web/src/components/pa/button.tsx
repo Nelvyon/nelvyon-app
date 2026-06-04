@@ -4,7 +4,7 @@ import { cn } from "@/lib/pa/utils";
 import Link from "next/link";
 
 export const Button = ({
-  text = "Solicitar informacion",
+  text = "Solicitar información",
   href = "/contacto",
   containerClassName,
   variant = "default",
