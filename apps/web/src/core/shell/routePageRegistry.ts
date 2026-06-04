@@ -371,8 +371,8 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
   if (path === "/os/finanzas") {
     return {
       documentTitle: "Finanzas · NELVYON OS",
-      heading: "Finanzas",
-      description: "Billing workspace cuando hay permiso.",
+      heading: "Finanzas operativas",
+      description: "invoices · contracts · os_deals · billing",
     };
   }
   if (path === "/os/ia" || path === "/os/configuracion") {

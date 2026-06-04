@@ -5,6 +5,7 @@ import {
   AlertCircle,
   CircleDollarSign,
   ClipboardList,
+  FileText,
   FolderKanban,
   GitBranch,
   Hammer,
@@ -111,21 +112,37 @@ export function OsPlatformDashboard() {
             icon={AlertCircle}
           />
           <OsMetricCard
-            label={canBilling ? "Pagado YTD" : "Finanzas"}
+            label="Ingresos del mes"
+            value={
+              data.incomeMonth !== null
+                ? `${data.incomeMonth.toLocaleString("es-ES")} EUR`
+                : null
+            }
+            sub="Facturas cobradas (invoices)"
+            icon={CircleDollarSign}
+            emptyLabel="Sin datos todavía"
+          />
+          <OsMetricCard
+            label="Facturas pendientes"
+            value={data.invoicesPendingCount}
+            sub={
+              data.contractsActiveCount !== null
+                ? `${data.contractsActiveCount} contratos activos`
+                : null
+            }
+            icon={FileText}
+            emptyLabel="Sin datos todavía"
+          />
+          <OsMetricCard
+            label={canBilling ? "Suscripción YTD" : "Plataforma"}
             value={
               canBilling && data.billingPaidYtd !== null
                 ? `${data.billingPaidYtd.toLocaleString()} ${data.billingCurrency ?? "EUR"}`
                 : canBilling
                   ? null
-                  : "Sin permiso billing"
+                  : "Sin permiso"
             }
-            sub={
-              canBilling && data.invoiceCount !== null
-                ? `${data.invoiceCount} facturas listadas`
-                : !canBilling
-                  ? "Rol sin acceso a facturación"
-                  : null
-            }
+            sub={canBilling ? "Pagos billing (no ingresos cliente)" : "Ver /os/finanzas"}
             icon={CircleDollarSign}
             emptyLabel={canBilling ? "Sin datos todavía" : "Sin permiso billing"}
           />
@@ -211,6 +228,12 @@ export function OsPlatformDashboard() {
             className="rounded-lg border border-white/10 px-4 py-2 text-white/80 hover:border-[#0084FF]/40"
           >
             Tareas
+          </Link>
+          <Link
+            href="/os/finanzas"
+            className="rounded-lg border border-white/10 px-4 py-2 text-white/80 hover:border-[#0084FF]/40"
+          >
+            Finanzas
           </Link>
           <Link
             href="/os/agents"

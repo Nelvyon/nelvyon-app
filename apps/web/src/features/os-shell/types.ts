@@ -45,6 +45,10 @@ export interface OsPlatformDashboardData {
   billingPaidYtd: number | null;
   billingCurrency: string | null;
   invoiceCount: number | null;
+  incomeMonth: number | null;
+  incomeYear: number | null;
+  invoicesPendingCount: number | null;
+  contractsActiveCount: number | null;
   recentJobs: { id: number; job_type: string; status: string; created_at?: string }[];
   recentOutputs: { id: number; title: string; output_type: string; qa_status?: string; created_at?: string }[];
   errors: string[];

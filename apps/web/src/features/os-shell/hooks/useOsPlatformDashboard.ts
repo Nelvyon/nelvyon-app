@@ -6,6 +6,13 @@ import { ApiError } from "@/core/api/types";
 import { useAuth } from "@/core/auth/AuthContext";
 import { can } from "@/core/routing/roleMatrix";
 import { osPlatformApi } from "@/features/os-shell/api";
+import { osFinanzasApi } from "@/features/os-shell/finanzas/api";
+import {
+  countActiveContracts,
+  countPendingInvoices,
+  sumPaidInvoicesInPeriod,
+} from "@/features/os-shell/finanzas/compute";
+import type { SpanishInvoiceRow } from "@/features/os-shell/finanzas/types";
 import { OS_DEAL_OPEN_STATUSES, OS_TASK_ACTIVE_STATUSES } from "@/features/os-shell/constants";
 import type { OsPlatformDashboardData } from "@/features/os-shell/types";
 import { isTaskOverdue } from "@/features/os-shell/tareas/taskStatus";
@@ -31,6 +38,10 @@ function emptyDashboard(): OsPlatformDashboardData {
     billingPaidYtd: null,
     billingCurrency: null,
     invoiceCount: null,
+    incomeMonth: null,
+    incomeYear: null,
+    invoicesPendingCount: null,
+    contractsActiveCount: null,
     recentJobs: [],
     recentOutputs: [],
     errors: [],
@@ -155,6 +166,37 @@ export function useOsPlatformDashboard() {
       capture("Jobs recientes", jobsRes.reason);
     }
 
+    const [invStatsRes, invListRes, contractFinRes] = await Promise.allSettled([
+      osFinanzasApi.invoiceStats(),
+      osFinanzasApi.invoicesList(200),
+      osFinanzasApi.contracts(200),
+    ]);
+
+    let spanishInvoices: SpanishInvoiceRow[] = [];
+    if (invListRes.status === "fulfilled") {
+      spanishInvoices = invListRes.value.items ?? [];
+    } else {
+      capture("Facturas españolas", invListRes.reason);
+    }
+
+    if (invStatsRes.status === "fulfilled") {
+      next.incomeYear = invStatsRes.value.pagado ?? null;
+    }
+
+    next.incomeMonth = sumPaidInvoicesInPeriod(spanishInvoices, "month");
+    if (next.incomeYear === null) {
+      next.incomeYear = sumPaidInvoicesInPeriod(spanishInvoices, "year");
+    }
+    const pend = countPendingInvoices(spanishInvoices);
+    next.invoicesPendingCount = pend.count;
+    next.invoiceCount = spanishInvoices.length > 0 ? spanishInvoices.length : null;
+
+    if (contractFinRes.status === "fulfilled") {
+      next.contractsActiveCount = countActiveContracts(contractFinRes.value.items ?? []);
+    } else {
+      capture("Contratos (finanzas)", contractFinRes.reason);
+    }
+
     if (canBilling) {
       const [sumRes, invRes] = await Promise.allSettled([
         osPlatformApi.billingSummary(),
@@ -167,9 +209,10 @@ export function useOsPlatformDashboard() {
         capture("Facturación (resumen)", sumRes.reason);
       }
       if (invRes.status === "fulfilled") {
-        next.invoiceCount = invRes.value.invoices?.length ?? 0;
+        const billN = invRes.value.invoices?.length ?? 0;
+        if (next.invoiceCount === null && billN > 0) next.invoiceCount = billN;
       } else {
-        capture("Facturas", invRes.reason);
+        capture("Facturas billing", invRes.reason);
       }
     }
 
