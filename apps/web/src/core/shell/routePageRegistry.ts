@@ -287,6 +287,40 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/os/dashboard") {
+    return {
+      documentTitle: "NELVYON OS — Dashboard",
+      heading: "Dashboard operativo",
+      description: "KPIs internos nelvyon_* y automatización (sin datos simulados).",
+    };
+  }
+  if (path === "/os/clientes") {
+    return { documentTitle: "Clientes · NELVYON OS", heading: "Clientes internos", description: "nelvyon_clients" };
+  }
+  if (path === "/os/proyectos") {
+    return { documentTitle: "Proyectos · NELVYON OS", heading: "Proyectos", description: "nelvyon_projects" };
+  }
+  if (path === "/os/pipeline" || path === "/os/tareas" || path === "/os/documentos") {
+    return {
+      documentTitle: "NELVYON OS",
+      heading: path.split("/").pop() ?? "Módulo",
+      description: "Módulo preparado — sin mocks.",
+    };
+  }
+  if (path === "/os/finanzas") {
+    return {
+      documentTitle: "Finanzas · NELVYON OS",
+      heading: "Finanzas",
+      description: "Billing workspace cuando hay permiso.",
+    };
+  }
+  if (path === "/os/ia" || path === "/os/configuracion") {
+    return {
+      documentTitle: "NELVYON OS",
+      heading: path === "/os/ia" ? "IA" : "Configuración",
+      description: "Enlaces a rutas operativas existentes.",
+    };
+  }
   if (path === "/os") {
     return {
       documentTitle: "Operations · NELVYON",

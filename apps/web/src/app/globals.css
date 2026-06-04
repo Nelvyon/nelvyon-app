@@ -6807,3 +6807,15 @@ body:has(.nelvyon-home--v3) .nelvyon-nav-mobile-toggle {
     @apply bg-white text-[#07122a] antialiased;
   }
 }
+
+/* NELVYON OS shell (Fase 2A) — operación interna, no marketing */
+.nelvyon-os-shell {
+  color-scheme: dark;
+  --background: #020817;
+  --foreground: #f8fafc;
+  --primary: #0084ff;
+  --primary-foreground: #ffffff;
+  --muted: #0b1428;
+  --muted-foreground: rgba(248, 250, 252, 0.55);
+  --border: rgba(255, 255, 255, 0.1);
+}

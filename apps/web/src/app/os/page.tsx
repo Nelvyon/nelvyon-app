@@ -65,6 +65,14 @@ export default function OsOverviewPage() {
   return (
     <ProtectedLayout module="os">
       <div className="space-y-8">
+        <div className="rounded-lg border border-[#0084FF]/25 bg-[#0b1428]/80 px-4 py-3 text-sm text-foreground">
+          <span className="font-medium text-[#0084FF]">NELVYON OS (shell oficial)</span>
+          {" — "}
+          <Link className="underline hover:text-[#0084FF]" href="/os/dashboard">
+            Ir al dashboard operativo
+          </Link>
+          . Esta ruta sigue siendo el hub de automatización (jobs/webhooks); no se elimina en Fase 2A.
+        </div>
         <HelpContextLink href="/help/os" label="Operations troubleshooting guide" />
         {showInitialSkeleton && <OsOverviewSkeleton />}
 

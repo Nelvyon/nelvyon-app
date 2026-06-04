@@ -1,3 +1,7 @@
+/**
+ * LEGACY — Shell NELVYON OS en Vite (interino). Oficial: Next apps/web /os/* (Fase 2A).
+ * @see docs/PHASE_2A_OS_SHELL.md
+ */
 import { ReactNode, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";

@@ -3,7 +3,8 @@
 | Sistema | Oficial | Legacy | Deprecado |
 |---------|---------|--------|-----------|
 | **CRM** | `saas_contacts`, `SaasCrmService`, `/api/saas/crm/*`, `/saas/crm` | `crm_contacts` (workspace + OS), `/api/crm/*`, OS `CrmService` | Escrituras en tablas legacy (congeladas, sin delete) |
-| **Dashboard** | `/saas/dashboard`, `SaasDashboardService`, `/api/saas/dashboard` | `/dashboard/*` (apps/web OS), Vite `SaasDashboard` + `global-dashboard` | Componentes `Superior*Dashboard` (roadmap) |
+| **Dashboard** | `/saas/dashboard`, `SaasDashboardService`, `/api/saas/dashboard` | `/dashboard/*` (apps/web producto), Vite `SaasDashboard` + `global-dashboard` | Componentes `Superior*Dashboard` (roadmap) |
+| **OS interno** | `/os/dashboard` shell Next (`features/os-shell`) | `/os` hub jobs, Vite `DashboardLayout` (`frontend/`) | Ver `PHASE_2A_OS_SHELL.md` |
 | **Auth** | `nelvyon_users`, `AuthService.ts`, `authenticate()` en `/api/saas/*` | FastAPI JWT + `X-Workspace-Id`, cookie `nelvyon_session` | Doble claim sin unificar `tenantId` TEXT vs `saas_tenants.id` |
 | **Contacts** | `saas_contacts` | `contacts` (integer ID), `crm_contacts` | Tabla `contacts` post-ETL |
 | **Deals** | (pendiente `saas_deals`) | `deals`, `crm_deals`, `pipeline_deals` | Unificación fase 2 |
