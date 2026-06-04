@@ -354,11 +354,18 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       description: "os_tasks",
     };
   }
-  if (path === "/os/documentos") {
+  if (path === "/os/documentos" || path.startsWith("/os/documentos/")) {
+    if (/\/documentos\/(entrega|archivo|contrato|factura)\/\d+/.test(path)) {
+      return {
+        documentTitle: "Documento · NELVYON OS",
+        heading: "Detalle documento",
+        description: "nelvyon_outputs · nelvyon_assets · contracts",
+      };
+    }
     return {
-      documentTitle: "NELVYON OS",
-      heading: "Documentos",
-      description: "Módulo preparado — sin mocks.",
+      documentTitle: "Documentos · NELVYON OS",
+      heading: "Documentos y entregas",
+      description: "Vista unificada OS",
     };
   }
   if (path === "/os/finanzas") {

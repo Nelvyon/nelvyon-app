@@ -73,7 +73,7 @@ Frontend: `apps/web/src/features/os-shell/pipeline/api.ts`, `tareas/api.ts`.
 
 ## Pendiente
 
-- Migración automática en todos los entornos (ejecutar `pnpm migrate` / `281_os_deals_tasks.sql`)
+- Migración **no** corre sola en el deploy de Railway (ver `docs/PHASE_2D_OS_DOCUMENTS_LIBRARY.md` § Migración 281)
 - FK opcionales + `ON DELETE` si se quiere cascada estricta
 - Drag-and-drop kanban (hoy: select de estado en tarjeta)
 - Notificaciones / asignación a `user_id` real del workspace (hoy `assignee` texto libre)

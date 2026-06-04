@@ -19,6 +19,7 @@ import { useOsPermissions } from "@/features/os-shell/hooks/useOsPermissions";
 import { osProjectsApi } from "@/features/os-shell/projects/api";
 import type { OsProject } from "@/features/os-shell/projects/types";
 
+import { OsDeliveriesSection } from "@/features/os-shell/components/OsDeliveriesSection";
 import { OsRelatedOpsSection } from "@/features/os-shell/components/OsRelatedOpsSection";
 
 import { osClientsApi } from "./api";
@@ -219,6 +220,10 @@ export function OsClientDetailView({ clientId }: { clientId: number }) {
 
       <div className="mb-10">
         <OsRelatedOpsSection clientId={clientId} />
+      </div>
+
+      <div className="mb-10">
+        <OsDeliveriesSection clientId={clientId} />
       </div>
 
       <h2 className="mb-3 text-lg font-semibold text-white">Proyectos vinculados</h2>

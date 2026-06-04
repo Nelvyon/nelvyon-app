@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ApiError } from "@/core/api/types";
 import { osClientsApi } from "@/features/os-shell/clients/api";
 import type { OsClient } from "@/features/os-shell/clients/types";
+import { OsDeliveriesSection } from "@/features/os-shell/components/OsDeliveriesSection";
 import { OsRelatedOpsSection } from "@/features/os-shell/components/OsRelatedOpsSection";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
 import {
@@ -22,7 +23,7 @@ import { useOsPermissions } from "@/features/os-shell/hooks/useOsPermissions";
 
 import { osProjectsApi } from "./api";
 import { emptyOsProjectForm, OsProjectForm } from "./OsProjectForm";
-import type { OsCampaign, OsOutput, OsProject, OsProjectWriteInput } from "./types";
+import type { OsCampaign, OsProject, OsProjectWriteInput } from "./types";
 
 export function OsProjectDetailView({ projectId }: { projectId: number }) {
   const router = useRouter();
@@ -30,7 +31,6 @@ export function OsProjectDetailView({ projectId }: { projectId: number }) {
   const [project, setProject] = useState<OsProject | null>(null);
   const [client, setClient] = useState<OsClient | null>(null);
   const [clients, setClients] = useState<OsClient[]>([]);
-  const [outputs, setOutputs] = useState<OsOutput[]>([]);
   const [campaigns, setCampaigns] = useState<OsCampaign[]>([]);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<OsProjectWriteInput | null>(null);
@@ -54,15 +54,13 @@ export function OsProjectDetailView({ projectId }: { projectId: number }) {
         deadline: p.deadline ?? "",
         priority: p.priority ?? "",
       });
-      const [cList, cOne, out, camp] = await Promise.all([
+      const [cList, cOne, camp] = await Promise.all([
         osClientsApi.list({ limit: 500 }),
         osClientsApi.getById(p.client_id).catch(() => null),
-        osProjectsApi.listOutputsForProject(projectId),
         osProjectsApi.listCampaignsForProject(projectId),
       ]);
       setClients(cList.items ?? []);
       setClient(cOne);
-      setOutputs(out.items ?? []);
       setCampaigns(camp.items ?? []);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Proyecto no encontrado");
@@ -177,31 +175,9 @@ export function OsProjectDetailView({ projectId }: { projectId: number }) {
         <OsRelatedOpsSection clientId={project.client_id} projectId={projectId} />
       </div>
 
-      <h2 className="mb-3 text-lg font-semibold text-white">Entregas (nelvyon_outputs)</h2>
-      {outputs.length === 0 ? (
-        <p className="mb-8 text-sm text-white/40">Sin datos todavía</p>
-      ) : (
-        <OsTable>
-          <thead>
-            <tr className="border-b border-white/10 text-xs text-white/45">
-              <th className="px-4 py-2">Título</th>
-              <th className="px-4 py-2">Tipo</th>
-              <th className="px-4 py-2">QA</th>
-            </tr>
-          </thead>
-          <tbody>
-            {outputs.map((o) => (
-              <tr key={o.id} className="border-b border-white/5">
-                <td className="px-4 py-2 text-white">{o.title || o.output_type}</td>
-                <td className="px-4 py-2 text-white/55">{o.output_type}</td>
-                <td className="px-4 py-2">
-                  <OsStatusBadge label={o.qa_status || "—"} tone="neutral" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </OsTable>
-      )}
+      <div className="mb-8">
+        <OsDeliveriesSection clientId={project.client_id} projectId={projectId} />
+      </div>
 
       <h2 className="mb-3 mt-8 text-lg font-semibold text-white">Campañas (nelvyon_campaigns)</h2>
       {campaigns.length === 0 ? (
