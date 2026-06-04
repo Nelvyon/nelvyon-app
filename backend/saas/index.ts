@@ -2,15 +2,30 @@ export {
   SaasOnboardingService,
   SaasOnboardingError,
   assertSaasPlan,
+  SaasPlanValidationError,
   getSaasOnboardingService,
   resetSaasOnboardingServiceForTests,
   type SaasPostgresPort,
   type SaasTenant,
+  type SaasTenantRow,
   type SaasPlan,
   type CreateSaasTenantInput,
   type UpdateSaasTenantPatch,
   type SaasOnboardingErrorCode,
 } from "./SaasOnboardingService";
+export {
+  SaasTenantBridgeService,
+  SaasTenantBridgeError,
+  getSaasTenantBridgeService,
+  resetSaasTenantBridgeServiceForTests,
+} from "./SaasTenantBridgeService";
+export {
+  SAAS_CRM_SOURCE_OF_TRUTH,
+  LEGACY_CONTACT_STORES,
+  FROZEN_LEGACY_CRM_WRITE_PATHS,
+  isFrozenLegacyCrmWritePath,
+  type LegacyCrmWritePath,
+} from "./crmConsolidation";
 export {
   SaasDashboardService,
   SaasDashboardError,

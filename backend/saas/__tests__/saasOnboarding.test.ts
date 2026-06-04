@@ -8,6 +8,7 @@ import { POST as POST_COMPLETE } from "../../../apps/web/src/app/api/saas/onboar
 import {
   SaasOnboardingError,
   SaasOnboardingService,
+  SaasPlanValidationError,
   assertSaasPlan,
   resetSaasOnboardingServiceForTests,
 } from "../index";
@@ -17,6 +18,7 @@ const secret = process.env.JWT_SECRET as string;
 type MemRow = {
   id: string;
   user_id: string;
+  workspace_id: number | null;
   company_name: string;
   industry: string;
   plan: string;
@@ -50,6 +52,7 @@ function makeMemoryDb(opts?: { failInsertCheck?: boolean }) {
       const row: MemRow = {
         id: crypto.randomUUID(),
         user_id: userId,
+        workspace_id: null,
         company_name: params[1] as string,
         industry: params[2] as string,
         plan: params[3] as string,
@@ -204,7 +207,7 @@ describe("SaasOnboardingService", () => {
 
   it("assertSaasPlan valida planes", () => {
     expect(assertSaasPlan("pro")).toBe("pro");
-    expect(() => assertSaasPlan("invalid")).toThrow(SaasOnboardingError);
+    expect(() => assertSaasPlan("invalid")).toThrow(SaasPlanValidationError);
   });
 });
 

@@ -275,12 +275,6 @@ export class SaasCrmService {
   async updateContact(tenantId: string, contactId: string, data: UpdateContactInput): Promise<SaasContact> {
     const existing = await this.getContact(tenantId, contactId);
     if (!existing) {
-      const anyTenant = await this.db.query<ContactRow>(
-        `SELECT id, tenant_id, name, email, phone, company, position, status, pipeline_stage, value, notes, tags, created_at, updated_at
-         FROM saas_contacts WHERE id = $1 LIMIT 1`,
-        [contactId],
-      );
-      if (anyTenant[0]) throw new SaasCrmError("Contact belongs to another tenant", "FORBIDDEN");
       throw new SaasCrmError("Contact not found", "NOT_FOUND");
     }
     const status = data.status !== undefined ? assertStatus(data.status) : undefined;

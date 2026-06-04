@@ -1,4 +1,8 @@
-"""NELVYON CRM — contacts, deals pipeline, activities, scoring (Postgres/asyncpg)."""
+"""NELVYON CRM — contacts, deals pipeline, activities, scoring (Postgres/asyncpg).
+
+LEGACY (Fase 1A): escribe en `crm_contacts` por workspace_id.
+Fuente oficial SaaS: saas_contacts — ver docs/PHASE_1A_CRM_TRANSITION.md
+"""
 
 from __future__ import annotations
 

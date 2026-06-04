@@ -1,3 +1,5 @@
+# LEGACY (Fase 1A): tabla `contacts` — no usar para CRM SaaS nuevo.
+# Fuente oficial: saas_contacts + SaasCrmService. Ver docs/PHASE_1A_CRM_TRANSITION.md
 import logging
 from typing import Optional, Dict, Any, List
 

@@ -5,6 +5,7 @@ import {
   assertSaasPlan,
   getSaasOnboardingService,
   SaasOnboardingError,
+  SaasPlanValidationError,
   type CreateSaasTenantInput,
   type SaasPlan,
   type UpdateSaasTenantPatch,
@@ -99,8 +100,11 @@ export async function POST(req: Request) {
       try {
         plan = assertSaasPlan(body.plan);
       } catch (err) {
-        if (err instanceof SaasOnboardingError) {
-          const m = mapSaasError(err);
+        if (err instanceof SaasOnboardingError || err instanceof SaasPlanValidationError) {
+          const m =
+            err instanceof SaasOnboardingError
+              ? mapSaasError(err)
+              : { status: 400 as const, body: { error: err.message, code: "VALIDATION" } };
           return NextResponse.json(m.body, { status: m.status });
         }
         throw err;

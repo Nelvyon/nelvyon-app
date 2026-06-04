@@ -74,10 +74,6 @@ function makeDb() {
       const row = contacts.find((c) => c.tenant_id === String(p[0]) && c.id === String(p[1]));
       return (row ? [row] : []) as T[];
     }
-    if (s.includes("FROM saas_contacts WHERE id = $1 LIMIT 1")) {
-      const row = contacts.find((c) => c.id === String(p[0]));
-      return (row ? [row] : []) as T[];
-    }
     if (s.startsWith("SELECT id, tenant_id, name, email, phone, company, position, status, pipeline_stage")) {
       const tenantId = String(p[0]);
       let out = contacts.filter((c) => c.tenant_id === tenantId);
@@ -225,11 +221,11 @@ describe("SaasCrmService", () => {
     expect(up.pipelineStage).toBe("proposal");
   });
 
-  it("updateContact no permite acceso cross-tenant", async () => {
+  it("updateContact no permite acceso cross-tenant (404 sin filtrar por id)", async () => {
     const db = makeDb();
     const svc = new SaasCrmService(db);
     const c = await svc.createContact("t1", { name: "Ana" });
-    await expect(svc.updateContact("t2", c.id, { name: "X" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(svc.updateContact("t2", c.id, { name: "X" })).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 
   it("deleteContact elimina correctamente", async () => {

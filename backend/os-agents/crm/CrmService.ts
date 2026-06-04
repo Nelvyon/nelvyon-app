@@ -1,3 +1,8 @@
+/**
+ * LEGACY (Fase 1A): CRM OS por user_id en `crm_contacts` (esquema OS).
+ * No usar para producto SaaS — fuente oficial: SaasCrmService / saas_contacts.
+ * Ver docs/PHASE_1A_CRM_TRANSITION.md
+ */
 import { DbClient } from "../../db/DbClient";
 import type { CrmActivity, CrmContact, CrmContactFilters, CrmContactUpsert } from "./types";
 

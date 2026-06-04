@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort, SaasTenant } from "./SaasOnboardingService";
+import { saasTenantFromRow } from "./saasTenantMapper";
 
 export interface ActivityLog {
   id: string;
@@ -21,6 +22,7 @@ export interface DashboardSummary {
 type TenantRow = {
   id: string;
   user_id: string;
+  workspace_id: number | null;
   company_name: string;
   industry: string;
   plan: "starter" | "pro" | "enterprise";
@@ -71,24 +73,6 @@ function toNum(v: string | number | null | undefined): number {
   return 0;
 }
 
-function rowToTenant(r: TenantRow): SaasTenant {
-  return {
-    id: r.id,
-    userId: r.user_id,
-    companyName: r.company_name,
-    industry: r.industry,
-    plan: r.plan,
-    website: r.website,
-    phone: r.phone,
-    employees: r.employees,
-    goals: r.goals ?? [],
-    onboardingCompleted: r.onboarding_completed,
-    onboardingStep: r.onboarding_step,
-    createdAt: toIso(r.created_at),
-    updatedAt: toIso(r.updated_at),
-  };
-}
-
 function rowToActivity(r: ActivityRow): ActivityLog {
   return {
     id: r.id,
@@ -105,7 +89,7 @@ export class SaasDashboardService {
 
   private async fetchTenantWithAuthTenant(tenantId: string): Promise<{ tenant: SaasTenant; authTenantId: string }> {
     const rows = await this.db.query<TenantRow>(
-      `SELECT st.id, st.user_id, st.company_name, st.industry, st.plan, st.website, st.phone, st.employees, st.goals,
+      `SELECT st.id, st.user_id, st.workspace_id, st.company_name, st.industry, st.plan, st.website, st.phone, st.employees, st.goals,
               st.onboarding_completed, st.onboarding_step, st.created_at, st.updated_at, nu.tenant_id AS auth_tenant_id
        FROM saas_tenants st
        JOIN nelvyon_users nu ON nu.user_id = st.user_id
@@ -117,7 +101,7 @@ export class SaasDashboardService {
     if (!row) {
       throw new SaasDashboardError("Tenant not found", "NOT_FOUND");
     }
-    return { tenant: rowToTenant(row), authTenantId: row.auth_tenant_id };
+    return { tenant: saasTenantFromRow(row), authTenantId: row.auth_tenant_id };
   }
 
   async getRecentActivity(tenantId: string, limit = 10): Promise<ActivityLog[]> {

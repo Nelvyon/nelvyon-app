@@ -10,6 +10,7 @@ import { SaasDashboardService } from "../SaasDashboardService";
 type TenantRow = {
   id: string;
   user_id: string;
+  workspace_id: number | null;
   company_name: string;
   industry: string;
   plan: "starter" | "pro" | "enterprise";
@@ -42,6 +43,7 @@ function makeMemoryDb() {
   const t1: TenantRow = {
     id: "tenant-uuid-1",
     user_id: "u1",
+    workspace_id: null,
     company_name: "Acme",
     industry: "Retail",
     plan: "pro",
