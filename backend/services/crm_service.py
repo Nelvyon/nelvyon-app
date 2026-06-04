@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import db_manager
 from core.sql_compat import json_bind, uuid_bind
 from core.sentry_utils import capture_exception
+from services.legacy_crm_guard import warn_legacy_crm_write
 from services.webhook_service import schedule_webhook_event
 
 logger = logging.getLogger(__name__)
@@ -116,6 +117,7 @@ class CRMService:
         tags: list | None = None,
         metadata: dict | None = None,
     ) -> dict[str, Any]:
+        warn_legacy_crm_write("CRMService.create_contact", "crm_contacts")
         try:
             return await self._create_contact_impl(
                 name=name,

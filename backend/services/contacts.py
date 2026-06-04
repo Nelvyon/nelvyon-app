@@ -7,6 +7,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.contacts import Contacts
+from services.legacy_crm_guard import warn_legacy_crm_write
 from services.workspace_mixin import WorkspaceAwareMixin
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,7 @@ class ContactsService(WorkspaceAwareMixin):
 
     async def create(self, data: Dict[str, Any], user_id: Optional[str] = None, workspace_id: Optional[int] = None) -> Optional[Contacts]:
         """Create a new contact with workspace isolation."""
+        warn_legacy_crm_write("ContactsService.create", "contacts")
         return await self.ws_create(data, user_id=user_id, workspace_id=workspace_id)
 
     async def check_ownership(self, obj_id: int, user_id: str, workspace_id: Optional[int] = None) -> bool:

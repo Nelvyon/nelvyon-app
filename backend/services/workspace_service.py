@@ -112,7 +112,11 @@ class WorkspaceService:
     async def _count_resource(self, resource: str) -> int:
         queries = {
             "contacts": """
-                SELECT (
+                SELECT GREATEST(
+                    COALESCE((
+                        SELECT COUNT(*) FROM saas_contacts sc
+                        INNER JOIN saas_tenants st ON st.id = sc.tenant_id AND st.workspace_id = :ws
+                    ), 0),
                     COALESCE((SELECT COUNT(*) FROM crm_contacts WHERE workspace_id = :ws), 0)
                     + COALESCE((SELECT COUNT(*) FROM contacts WHERE workspace_id = :ws), 0)
                 ) AS c

@@ -3,6 +3,7 @@
  * No usar para producto SaaS — fuente oficial: SaasCrmService / saas_contacts.
  * Ver docs/PHASE_1A_CRM_TRANSITION.md
  */
+import { warnLegacyCrmWrite } from "../../saas/legacyCrmGuard";
 import { DbClient } from "../../db/DbClient";
 import type { CrmActivity, CrmContact, CrmContactFilters, CrmContactUpsert } from "./types";
 
@@ -70,6 +71,7 @@ const STAGES = new Set(["lead", "prospect", "proposal", "won", "lost"]);
 
 export class CrmService {
   static async upsertContact(userId: string, data: CrmContactUpsert): Promise<CrmContact> {
+    warnLegacyCrmWrite("CrmService.upsertContact", "crm_contacts");
     const db = DbClient.getInstance();
     if (data.id?.trim()) {
       const nextStage = data.stage && STAGES.has(data.stage) ? data.stage : undefined;

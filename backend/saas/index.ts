@@ -27,6 +27,29 @@ export {
   type LegacyCrmWritePath,
 } from "./crmConsolidation";
 export {
+  SaasTenantBridgeValidationService,
+  getSaasTenantBridgeValidationService,
+  resetSaasTenantBridgeValidationServiceForTests,
+  type TenantBridgeValidationReport,
+} from "./SaasTenantBridgeValidation";
+export {
+  SaasCrmEtlService,
+  getSaasCrmEtlService,
+  resetSaasCrmEtlServiceForTests,
+  type SaasCrmEtlReport,
+  type EtlMode,
+  type EtlConflict,
+} from "./SaasCrmEtlService";
+export {
+  buildDedupeKey,
+  etlLegacyIdTag,
+  etlSourceTag,
+  mapLegacyStatusToSaas,
+  mapLegacyStageToSaas,
+  type EtlSource,
+} from "./saasCrmDedupe";
+export { warnLegacyCrmWrite, resetLegacyCrmWriteWarningsForTests } from "./legacyCrmGuard";
+export {
   SaasDashboardService,
   SaasDashboardError,
   getSaasDashboardService,
