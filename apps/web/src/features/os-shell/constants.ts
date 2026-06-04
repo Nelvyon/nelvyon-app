@@ -23,3 +23,32 @@ export const OS_PROJECT_TYPE_OPTIONS = [
 export const TERMINAL_PROJECT_STATUSES = new Set(["completed", "cancelled", "delivered", "archived"]);
 
 export type OsClientOperationalStatus = "con_proyectos" | "sin_proyectos" | "todos";
+
+/** Pipeline interno OS (os_deals) — separado de crm_deals / saas_deals */
+export const OS_DEAL_STATUS_OPTIONS = [
+  { value: "nuevo", label: "Nuevo" },
+  { value: "contactado", label: "Contactado" },
+  { value: "propuesta", label: "Propuesta" },
+  { value: "ganado", label: "Ganado" },
+  { value: "perdido", label: "Perdido" },
+] as const;
+
+export const OS_DEAL_OPEN_STATUSES = new Set(["nuevo", "contactado", "propuesta"]);
+
+/** Tareas internas OS (os_tasks) */
+export const OS_TASK_STATUS_OPTIONS = [
+  { value: "", label: "Todos" },
+  { value: "pendiente", label: "Pendiente" },
+  { value: "en_progreso", label: "En progreso" },
+  { value: "bloqueada", label: "Bloqueada" },
+  { value: "completada", label: "Completada" },
+] as const;
+
+export const OS_TASK_PRIORITY_OPTIONS = [
+  { value: "", label: "Todas" },
+  { value: "baja", label: "Baja" },
+  { value: "media", label: "Media" },
+  { value: "alta", label: "Alta" },
+] as const;
+
+export const OS_TASK_ACTIVE_STATUSES = new Set(["pendiente", "en_progreso", "bloqueada"]);

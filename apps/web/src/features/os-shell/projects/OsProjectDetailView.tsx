@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ApiError } from "@/core/api/types";
 import { osClientsApi } from "@/features/os-shell/clients/api";
 import type { OsClient } from "@/features/os-shell/clients/types";
+import { OsRelatedOpsSection } from "@/features/os-shell/components/OsRelatedOpsSection";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
 import {
   OsErrorBanner,
@@ -124,7 +125,27 @@ export function OsProjectDetailView({ projectId }: { projectId: number }) {
             ? `${client.business_name} · ${project.project_type}`
             : `Cliente #${project.client_id}`
         }
-        actions={perms.canEdit && !editing ? <OsGhostButton onClick={() => setEditing(true)}>Editar</OsGhostButton> : null}
+        actions={
+          <>
+            {perms.canCreate ? (
+              <>
+                <OsGhostButton
+                  href={`/os/pipeline/nuevo?project_id=${projectId}&client_id=${project.client_id}`}
+                >
+                  Nueva oportunidad
+                </OsGhostButton>
+                <OsGhostButton
+                  href={`/os/tareas/nuevo?project_id=${projectId}&client_id=${project.client_id}`}
+                >
+                  Nueva tarea
+                </OsGhostButton>
+              </>
+            ) : null}
+            {perms.canEdit && !editing ? (
+              <OsGhostButton onClick={() => setEditing(true)}>Editar</OsGhostButton>
+            ) : null}
+          </>
+        }
       />
       {error ? <OsErrorBanner message={error} /> : null}
       <div className="mb-4 flex flex-wrap gap-2">
@@ -151,6 +172,10 @@ export function OsProjectDetailView({ projectId }: { projectId: number }) {
       {!editing ? (
         <p className="mb-6 text-sm text-white/60">{project.brief || "Sin brief"}</p>
       ) : null}
+
+      <div className="mb-10">
+        <OsRelatedOpsSection clientId={project.client_id} projectId={projectId} />
+      </div>
 
       <h2 className="mb-3 text-lg font-semibold text-white">Entregas (nelvyon_outputs)</h2>
       {outputs.length === 0 ? (

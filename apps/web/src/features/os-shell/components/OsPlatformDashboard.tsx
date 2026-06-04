@@ -4,9 +4,12 @@ import Link from "next/link";
 import {
   AlertCircle,
   CircleDollarSign,
+  ClipboardList,
   FolderKanban,
+  GitBranch,
   Hammer,
   Loader2,
+  Trophy,
   Users,
   Workflow,
 } from "lucide-react";
@@ -57,6 +60,32 @@ export function OsPlatformDashboard() {
               data.projectsTotal !== null ? `${data.projectsTotal} totales` : null
             }
             icon={FolderKanban}
+          />
+          <OsMetricCard
+            label="Oportunidades abiertas"
+            value={data.dealsOpen}
+            sub={data.dealsWon !== null ? `${data.dealsWon} ganadas` : null}
+            icon={GitBranch}
+            emptyLabel="Sin datos todavía"
+          />
+          <OsMetricCard
+            label="Tareas pendientes"
+            value={data.tasksPending}
+            sub={
+              data.tasksOverdue !== null && data.tasksOverdue > 0
+                ? `${data.tasksOverdue} vencidas`
+                : data.tasksOverdue === 0
+                  ? "Ninguna vencida"
+                  : null
+            }
+            icon={ClipboardList}
+            emptyLabel="Sin datos todavía"
+          />
+          <OsMetricCard
+            label="Oportunidades ganadas"
+            value={data.dealsWon}
+            icon={Trophy}
+            emptyLabel="Sin datos todavía"
           />
           <OsMetricCard
             label="Entregas pendientes"
@@ -170,6 +199,18 @@ export function OsPlatformDashboard() {
             className="rounded-lg border border-white/10 px-4 py-2 text-white/80 hover:border-[#0084FF]/40"
           >
             Proyectos
+          </Link>
+          <Link
+            href="/os/pipeline"
+            className="rounded-lg border border-white/10 px-4 py-2 text-white/80 hover:border-[#0084FF]/40"
+          >
+            Pipeline
+          </Link>
+          <Link
+            href="/os/tareas"
+            className="rounded-lg border border-white/10 px-4 py-2 text-white/80 hover:border-[#0084FF]/40"
+          >
+            Tareas
           </Link>
           <Link
             href="/os/agents"

@@ -9,12 +9,22 @@ import type { EntityListResponse, NelvyonOutputRow, QaDashboardStats } from "./t
 const CLIENTS = "/api/v1/entities/nelvyon_clients";
 const PROJECTS = "/api/v1/entities/nelvyon_projects";
 const OUTPUTS = "/api/v1/entities/nelvyon_outputs";
+const DEALS = "/api/v1/entities/os_deals";
+const TASKS = "/api/v1/entities/os_tasks";
 
 export const osPlatformApi = {
   clients: (limit = 50) =>
     apiClient.get<ClientListResponse>(`${CLIENTS}?skip=0&limit=${limit}`, { tenantScoped: true }),
   projects: (limit = 50) =>
     apiClient.get<ProjectListResponse>(`${PROJECTS}?skip=0&limit=${limit}`, { tenantScoped: true }),
+  deals: (limit = 200) =>
+    apiClient.get<EntityListResponse<Record<string, unknown>>>(`${DEALS}?skip=0&limit=${limit}`, {
+      tenantScoped: true,
+    }),
+  tasks: (limit = 200) =>
+    apiClient.get<EntityListResponse<Record<string, unknown>>>(`${TASKS}?skip=0&limit=${limit}`, {
+      tenantScoped: true,
+    }),
   outputs: (limit = 50) =>
     apiClient.get<EntityListResponse<NelvyonOutputRow>>(`${OUTPUTS}?skip=0&limit=${limit}`, {
       tenantScoped: true,

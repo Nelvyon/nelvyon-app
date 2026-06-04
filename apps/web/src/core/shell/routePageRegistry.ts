@@ -312,10 +312,52 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     }
     return { documentTitle: "Proyectos · NELVYON OS", heading: "Proyectos", description: "nelvyon_projects" };
   }
-  if (path === "/os/pipeline" || path === "/os/tareas" || path === "/os/documentos") {
+  if (path === "/os/pipeline" || path.startsWith("/os/pipeline/")) {
+    if (path.endsWith("/nuevo")) {
+      return {
+        documentTitle: "Nueva oportunidad · NELVYON OS",
+        heading: "Nueva oportunidad",
+        description: "os_deals",
+      };
+    }
+    if (/\/pipeline\/\d+/.test(path)) {
+      return {
+        documentTitle: "Oportunidad · NELVYON OS",
+        heading: "Detalle oportunidad",
+        description: "os_deals",
+      };
+    }
+    return {
+      documentTitle: "Pipeline · NELVYON OS",
+      heading: "Pipeline interno",
+      description: "os_deals",
+    };
+  }
+  if (path === "/os/tareas" || path.startsWith("/os/tareas/")) {
+    if (path.endsWith("/nuevo")) {
+      return {
+        documentTitle: "Nueva tarea · NELVYON OS",
+        heading: "Nueva tarea",
+        description: "os_tasks",
+      };
+    }
+    if (/\/tareas\/\d+/.test(path)) {
+      return {
+        documentTitle: "Tarea · NELVYON OS",
+        heading: "Detalle tarea",
+        description: "os_tasks",
+      };
+    }
+    return {
+      documentTitle: "Tareas · NELVYON OS",
+      heading: "Tareas operativas",
+      description: "os_tasks",
+    };
+  }
+  if (path === "/os/documentos") {
     return {
       documentTitle: "NELVYON OS",
-      heading: path.split("/").pop() ?? "Módulo",
+      heading: "Documentos",
       description: "Módulo preparado — sin mocks.",
     };
   }

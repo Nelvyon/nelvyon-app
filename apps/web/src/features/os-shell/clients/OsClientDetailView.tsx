@@ -19,6 +19,8 @@ import { useOsPermissions } from "@/features/os-shell/hooks/useOsPermissions";
 import { osProjectsApi } from "@/features/os-shell/projects/api";
 import type { OsProject } from "@/features/os-shell/projects/types";
 
+import { OsRelatedOpsSection } from "@/features/os-shell/components/OsRelatedOpsSection";
+
 import { osClientsApi } from "./api";
 import { computeClientMetrics, deriveClientOperationalLabel } from "./metrics";
 import { OsClientForm } from "./OsClientForm";
@@ -138,9 +140,17 @@ export function OsClientDetailView({ clientId }: { clientId: number }) {
               <OsGhostButton onClick={() => setEditing(true)}>Editar</OsGhostButton>
             ) : null}
             {perms.canCreate ? (
-              <OsPrimaryButton href={`/os/proyectos/nuevo?client_id=${client.id}`}>
-                Nuevo proyecto
-              </OsPrimaryButton>
+              <>
+                <OsGhostButton href={`/os/pipeline/nuevo?client_id=${client.id}`}>
+                  Nueva oportunidad
+                </OsGhostButton>
+                <OsGhostButton href={`/os/tareas/nuevo?client_id=${client.id}`}>
+                  Nueva tarea
+                </OsGhostButton>
+                <OsPrimaryButton href={`/os/proyectos/nuevo?client_id=${client.id}`}>
+                  Nuevo proyecto
+                </OsPrimaryButton>
+              </>
             ) : null}
           </>
         }
@@ -206,6 +216,10 @@ export function OsClientDetailView({ clientId }: { clientId: number }) {
           </div>
         </dl>
       ) : null}
+
+      <div className="mb-10">
+        <OsRelatedOpsSection clientId={clientId} />
+      </div>
 
       <h2 className="mb-3 text-lg font-semibold text-white">Proyectos vinculados</h2>
       {projects.length === 0 ? (

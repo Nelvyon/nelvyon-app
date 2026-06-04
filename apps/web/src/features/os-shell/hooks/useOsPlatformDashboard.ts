@@ -6,7 +6,9 @@ import { ApiError } from "@/core/api/types";
 import { useAuth } from "@/core/auth/AuthContext";
 import { can } from "@/core/routing/roleMatrix";
 import { osPlatformApi } from "@/features/os-shell/api";
+import { OS_DEAL_OPEN_STATUSES, OS_TASK_ACTIVE_STATUSES } from "@/features/os-shell/constants";
 import type { OsPlatformDashboardData } from "@/features/os-shell/types";
+import { isTaskOverdue } from "@/features/os-shell/tareas/taskStatus";
 
 const PENDING_QA = new Set(["pending", "qa_review", "generating", "draft", "failed"]);
 
@@ -14,6 +16,10 @@ function emptyDashboard(): OsPlatformDashboardData {
   return {
     clientsTotal: null,
     clientsActive: null,
+    dealsOpen: null,
+    dealsWon: null,
+    tasksPending: null,
+    tasksOverdue: null,
     projectsTotal: null,
     projectsActive: null,
     outputsTotal: null,
@@ -51,10 +57,12 @@ export function useOsPlatformDashboard() {
       errors.push(`${label}: ${msg.slice(0, 120)}`);
     };
 
-    const [clientsRes, projectsRes, outputsRes, qaRes, statsRes, jobsRes] =
+    const [clientsRes, projectsRes, dealsRes, tasksRes, outputsRes, qaRes, statsRes, jobsRes] =
       await Promise.allSettled([
         osPlatformApi.clients(),
         osPlatformApi.projects(),
+        osPlatformApi.deals(),
+        osPlatformApi.tasks(),
         osPlatformApi.outputs(),
         osPlatformApi.qaDashboard(),
         osPlatformApi.automationStats(),
@@ -69,6 +77,30 @@ export function useOsPlatformDashboard() {
       ).length;
     } else {
       capture("Clientes internos", clientsRes.reason);
+    }
+
+    if (dealsRes.status === "fulfilled") {
+      const items = (dealsRes.value.items ?? []) as { status?: string }[];
+      next.dealsOpen = items.filter((d) => OS_DEAL_OPEN_STATUSES.has(d.status ?? "nuevo")).length;
+      next.dealsWon = items.filter((d) => d.status === "ganado").length;
+    } else {
+      capture("Pipeline (os_deals)", dealsRes.reason);
+    }
+
+    if (tasksRes.status === "fulfilled") {
+      const items = (tasksRes.value.items ?? []) as {
+        status?: string;
+        due_date?: string | null;
+      }[];
+      next.tasksPending = items.filter((t) =>
+        OS_TASK_ACTIVE_STATUSES.has(t.status ?? "pendiente"),
+      ).length;
+      next.tasksOverdue = items.filter(
+        (t) =>
+          t.status !== "completada" && isTaskOverdue(t.due_date ?? undefined),
+      ).length;
+    } else {
+      capture("Tareas (os_tasks)", tasksRes.reason);
     }
 
     if (projectsRes.status === "fulfilled") {

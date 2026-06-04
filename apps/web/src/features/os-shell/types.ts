@@ -30,6 +30,10 @@ export type OsPlatformLoadState = "loading" | "ready" | "error" | "empty";
 export interface OsPlatformDashboardData {
   clientsTotal: number | null;
   clientsActive: number | null;
+  dealsOpen: number | null;
+  dealsWon: number | null;
+  tasksPending: number | null;
+  tasksOverdue: number | null;
   projectsTotal: number | null;
   projectsActive: number | null;
   outputsTotal: number | null;
