@@ -1,5 +1,7 @@
 import type { InvoiceRow } from "@/features/billing/types";
 
+import type { OsCashflowRow, OsExpense } from "./expenseTypes";
+
 export interface SpanishInvoiceRow {
   id: number;
   invoice_number?: string;
@@ -59,6 +61,13 @@ export interface OsFinanzasData {
   invoicesPendingAmount: number | null;
   contractsActiveCount: number | null;
   platformPaidYtd: number | null;
+  expenses: OsExpense[];
+  expensesMonth: number | null;
+  expensesYear: number | null;
+  expensesPendingCount: number | null;
+  expensesPendingAmount: number | null;
+  cashflowMonth: number | null;
+  cashflowLedger: OsCashflowRow[];
   currency: string;
   errors: string[];
 }

@@ -11,6 +11,7 @@ const PROJECTS = "/api/v1/entities/nelvyon_projects";
 const OUTPUTS = "/api/v1/entities/nelvyon_outputs";
 const DEALS = "/api/v1/entities/os_deals";
 const TASKS = "/api/v1/entities/os_tasks";
+const EXPENSES = "/api/v1/entities/os_expenses";
 
 export const osPlatformApi = {
   clients: (limit = 50) =>
@@ -25,6 +26,11 @@ export const osPlatformApi = {
     apiClient.get<EntityListResponse<Record<string, unknown>>>(`${TASKS}?skip=0&limit=${limit}`, {
       tenantScoped: true,
     }),
+  expenses: (limit = 200) =>
+    apiClient.get<EntityListResponse<Record<string, unknown>>>(
+      `${EXPENSES}?skip=0&limit=${limit}`,
+      { tenantScoped: true },
+    ),
   outputs: (limit = 50) =>
     apiClient.get<EntityListResponse<NelvyonOutputRow>>(`${OUTPUTS}?skip=0&limit=${limit}`, {
       tenantScoped: true,

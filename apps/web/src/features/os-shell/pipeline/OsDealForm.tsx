@@ -1,6 +1,7 @@
 "use client";
 
 import { OS_DEAL_STATUS_OPTIONS } from "@/features/os-shell/constants";
+import { OsAssigneeInput } from "@/features/os-shell/components/OsAssigneeInput";
 import { OsField, OsInput, OsSelect, OsTextarea } from "@/features/os-shell/components/ui/OsUi";
 import type { OsClient } from "@/features/os-shell/clients/types";
 import type { OsProject } from "@/features/os-shell/projects/types";
@@ -100,14 +101,11 @@ export function OsDealForm({
           ))}
         </OsSelect>
       </OsField>
-      <OsField label="Responsable">
-        <OsInput
-          value={value.assignee ?? ""}
-          onChange={(e) => onChange({ ...value, assignee: e.target.value || null })}
-          disabled={disabled}
-          placeholder="Nombre o email"
-        />
-      </OsField>
+      <OsAssigneeInput
+        value={value.assignee ?? ""}
+        onChange={(v) => onChange({ ...value, assignee: v || null })}
+        className={disabled ? "pointer-events-none opacity-60" : ""}
+      />
       <div className="md:col-span-2">
         <OsField label="Notas">
         <OsTextarea

@@ -8,9 +8,13 @@ import { TERMINAL_PROJECT_STATUSES } from "@/features/os-shell/constants";
 import { osFinanzasApi } from "./api";
 import {
   countActiveContracts,
+  countPendingExpenses,
   countPendingInvoices,
+  netCashflowMonth,
+  sumPaidExpensesInPeriod,
   sumPaidInvoicesInPeriod,
 } from "./compute";
+import { osExpensesApi } from "./expensesApi";
 import type { OsFinanzasData } from "./types";
 
 function empty(): OsFinanzasData {
@@ -30,6 +34,13 @@ function empty(): OsFinanzasData {
     invoicesPendingAmount: null,
     contractsActiveCount: null,
     platformPaidYtd: null,
+    expenses: [],
+    expensesMonth: null,
+    expensesYear: null,
+    expensesPendingCount: null,
+    expensesPendingAmount: null,
+    cashflowMonth: null,
+    cashflowLedger: [],
     currency: "EUR",
     errors: [],
   };
@@ -53,7 +64,7 @@ export function useOsFinanzas(canBilling: boolean) {
       errors.push(`${label}: ${msg.slice(0, 100)}`);
     };
 
-    const [statsRes, invRes, contractRes, clientsRes, projectsRes, dealsRes] =
+    const [statsRes, invRes, contractRes, clientsRes, projectsRes, dealsRes, expRes, cfRes] =
       await Promise.allSettled([
         osFinanzasApi.invoiceStats(),
         osFinanzasApi.invoicesList(300),
@@ -61,6 +72,8 @@ export function useOsFinanzas(canBilling: boolean) {
         osFinanzasApi.clients(),
         osFinanzasApi.projects(),
         osFinanzasApi.dealsWon(),
+        osExpensesApi.list({ limit: 500 }),
+        osFinanzasApi.cashflow(300),
       ]);
 
     if (statsRes.status === "fulfilled") {
@@ -137,12 +150,31 @@ export function useOsFinanzas(canBilling: boolean) {
       }
     }
 
+    if (expRes.status === "fulfilled") {
+      next.expenses = expRes.value.items ?? [];
+    } else {
+      capture("Gastos (os_expenses)", expRes.reason);
+    }
+
+    if (cfRes.status === "fulfilled") {
+      next.cashflowLedger = cfRes.value.items ?? [];
+    } else {
+      capture("Flujo de caja (os_cashflow)", cfRes.reason);
+    }
+
     next.incomeMonth = sumPaidInvoicesInPeriod(next.invoices, "month");
     next.incomeYear = sumPaidInvoicesInPeriod(next.invoices, "year");
     const pend = countPendingInvoices(next.invoices);
     next.invoicesPendingCount = pend.count;
     next.invoicesPendingAmount = pend.amount;
     next.contractsActiveCount = countActiveContracts(next.contracts);
+
+    next.expensesMonth = sumPaidExpensesInPeriod(next.expenses, "month");
+    next.expensesYear = sumPaidExpensesInPeriod(next.expenses, "year");
+    const expPend = countPendingExpenses(next.expenses);
+    next.expensesPendingCount = expPend.count;
+    next.expensesPendingAmount = expPend.amount;
+    next.cashflowMonth = netCashflowMonth(next.incomeMonth, next.expensesMonth);
 
     next.errors = errors;
     setData(next);

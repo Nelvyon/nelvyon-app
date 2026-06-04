@@ -5,7 +5,10 @@ import { osDealsApi } from "@/features/os-shell/pipeline/api";
 import { osPlatformApi } from "@/features/os-shell/api";
 import { TERMINAL_PROJECT_STATUSES } from "@/features/os-shell/constants";
 
+import type { OsCashflowRow } from "./expenseTypes";
 import type { InvoiceStatsRow, OsContractFinanceRow, SpanishInvoiceRow } from "./types";
+
+const CASHFLOW = "/api/v1/entities/os_cashflow";
 
 const CONTRACTS = "/api/v1/entities/contracts";
 
@@ -31,6 +34,14 @@ export const osFinanzasApi = {
   projects: () => osPlatformApi.projects(),
   dealsWon: () => osDealsApi.list({ limit: 500, query: { status: "ganado" } }),
 
+  cashflow: (limit = 200) =>
+    apiClient.get<{ items?: OsCashflowRow[]; total?: number }>(
+      entityListUrl(CASHFLOW, { limit, sort: "-id" }),
+      { tenantScoped: true },
+    ),
+
   /** Re-export for PDF links */
   invoicePdf: (id: number) => dashboardInvoicesApi.pdf(id),
 };
+
+export { osExpensesApi } from "./expensesApi";

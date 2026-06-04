@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, HandCoins, Loader2, Receipt, ScrollText } from "lucide-react";
+import { ArrowLeftRight, FileText, HandCoins, Loader2, Receipt, ScrollText, Wallet } from "lucide-react";
 
 import { useAuth } from "@/core/auth/AuthContext";
 import { can } from "@/core/routing/roleMatrix";
@@ -16,6 +16,7 @@ import {
 } from "@/features/os-shell/components/ui/OsUi";
 
 import { parseAmount } from "./compute";
+import { OsExpensesSection } from "./OsExpensesSection";
 import { useOsFinanzas } from "./useOsFinanzas";
 
 function fmtMoney(n: number | null, currency: string) {
@@ -46,6 +47,8 @@ export function OsFinanzasView() {
   const hasAnyData =
     data.invoices.length > 0 ||
     data.contracts.length > 0 ||
+    data.expenses.length > 0 ||
+    data.cashflowLedger.length > 0 ||
     (data.dealsWonCount ?? 0) > 0 ||
     data.invoiceStats !== null ||
     data.billingSummary !== null;
@@ -120,6 +123,24 @@ export function OsFinanzasView() {
                 icon={ScrollText}
                 emptyLabel="Sin datos todavía"
               />
+              <OsMetricCard
+                label="Gastos del mes"
+                value={fmtMoney(data.expensesMonth, data.currency)}
+                sub={
+                  data.expensesPendingCount !== null
+                    ? `${data.expensesPendingCount} pendientes`
+                    : undefined
+                }
+                icon={Wallet}
+                emptyLabel="Sin datos todavía"
+              />
+              <OsMetricCard
+                label="Flujo de caja (mes)"
+                value={fmtMoney(data.cashflowMonth, data.currency)}
+                sub="Ingresos cobrados − gastos pagados"
+                icon={ArrowLeftRight}
+                emptyLabel="Sin datos todavía"
+              />
             </div>
           </section>
 
@@ -177,11 +198,44 @@ export function OsFinanzasView() {
                   </dd>
                 </div>
               </dl>
-              <p className="mt-3 text-xs text-white/40">
-                Gastos operativos: no hay módulo de gastos en DB — sección no inventada.
-              </p>
             </section>
           ) : null}
+
+          <OsExpensesSection expenses={data.expenses} onReload={() => void reload()} />
+
+          <section className="mb-8">
+            <h2 className="mb-3 text-lg font-semibold text-white">Flujo de caja (ledger)</h2>
+            {data.cashflowLedger.length === 0 ? (
+              <p className="text-sm text-white/40">Sin datos todavía</p>
+            ) : (
+              <OsTable>
+                <thead>
+                  <tr className="border-b border-white/10 text-xs text-white/45">
+                    <th className="px-4 py-2">Dirección</th>
+                    <th className="px-4 py-2">Importe</th>
+                    <th className="px-4 py-2">Origen</th>
+                    <th className="px-4 py-2">Fecha</th>
+                    <th className="px-4 py-2">Descripción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.cashflowLedger.slice(0, 40).map((cf) => (
+                    <tr key={cf.id} className="border-b border-white/5">
+                      <td className="px-4 py-2 text-white">
+                        {cf.direction === "in" ? "Entrada" : "Salida"}
+                      </td>
+                      <td className="px-4 py-2 text-white/80">
+                        {fmtMoney(cf.amount, cf.currency ?? data.currency)}
+                      </td>
+                      <td className="px-4 py-2 text-white/50">{cf.source_type}</td>
+                      <td className="px-4 py-2 text-white/50">{cf.flow_date ?? "—"}</td>
+                      <td className="px-4 py-2 text-white/60">{cf.description ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </OsTable>
+            )}
+          </section>
 
           {canBilling && data.billingSummary ? (
             <section className="mb-8 rounded-xl border border-[#0084FF]/20 bg-[#07122a] p-5">

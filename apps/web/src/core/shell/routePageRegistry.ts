@@ -378,7 +378,7 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
   if (path === "/os/ia" || path === "/os/configuracion") {
     return {
       documentTitle: "NELVYON OS",
-      heading: path === "/os/ia" ? "IA" : "Configuración",
+      heading: path === "/os/ia" ? "IA operativa" : "Configuración",
       description: "Enlaces a rutas operativas existentes.",
     };
   }

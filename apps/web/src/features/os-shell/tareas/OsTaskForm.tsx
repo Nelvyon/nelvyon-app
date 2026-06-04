@@ -1,6 +1,7 @@
 "use client";
 
 import { OS_TASK_PRIORITY_OPTIONS, OS_TASK_STATUS_OPTIONS } from "@/features/os-shell/constants";
+import { OsAssigneeInput } from "@/features/os-shell/components/OsAssigneeInput";
 import { OsField, OsInput, OsSelect, OsTextarea } from "@/features/os-shell/components/ui/OsUi";
 import type { OsClient } from "@/features/os-shell/clients/types";
 import type { OsProject } from "@/features/os-shell/projects/types";
@@ -73,13 +74,11 @@ export function OsTaskForm({
           disabled={disabled}
         />
       </OsField>
-      <OsField label="Responsable">
-        <OsInput
-          value={value.assignee ?? ""}
-          onChange={(e) => onChange({ ...value, assignee: e.target.value || null })}
-          disabled={disabled}
-        />
-      </OsField>
+      <OsAssigneeInput
+        value={value.assignee ?? ""}
+        onChange={(v) => onChange({ ...value, assignee: v || null })}
+        className={disabled ? "pointer-events-none opacity-60" : ""}
+      />
       <OsField label="Cliente">
         <OsSelect
           value={value.client_id ?? ""}

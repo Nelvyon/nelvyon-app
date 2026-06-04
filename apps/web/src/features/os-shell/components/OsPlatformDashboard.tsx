@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   AlertCircle,
+  ArrowLeftRight,
   CircleDollarSign,
   ClipboardList,
   FileText,
@@ -10,8 +11,10 @@ import {
   GitBranch,
   Hammer,
   Loader2,
+  Sparkles,
   Trophy,
   Users,
+  Wallet,
   Workflow,
 } from "lucide-react";
 
@@ -26,9 +29,9 @@ export function OsPlatformDashboard() {
     <OsShellLayout onRefresh={() => void reload()} refreshing={loading}>
       <div className="mx-auto max-w-6xl space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Dashboard operativo</h1>
+          <h1 className="text-2xl font-semibold text-white">Dashboard ejecutivo</h1>
           <p className="mt-1 max-w-2xl text-sm text-white/55">
-            Datos de operación interna NELVYON (
+            Vista unificada de operación interna NELVYON (
             <code className="text-[#0084FF]">nelvyon_*</code>
             ). No usa contactos SaaS del cliente (
             <code className="text-white/40">saas_contacts</code>
@@ -134,6 +137,32 @@ export function OsPlatformDashboard() {
             emptyLabel="Sin datos todavía"
           />
           <OsMetricCard
+            label="Gastos del mes"
+            value={
+              data.expensesMonth !== null
+                ? `${data.expensesMonth.toLocaleString("es-ES")} EUR`
+                : null
+            }
+            sub={
+              data.expensesPendingCount !== null
+                ? `${data.expensesPendingCount} pendientes`
+                : null
+            }
+            icon={Wallet}
+            emptyLabel="Sin datos todavía"
+          />
+          <OsMetricCard
+            label="Flujo de caja (mes)"
+            value={
+              data.cashflowMonth !== null
+                ? `${data.cashflowMonth.toLocaleString("es-ES")} EUR`
+                : null
+            }
+            sub="Ingresos cobrados − gastos pagados"
+            icon={ArrowLeftRight}
+            emptyLabel="Sin datos todavía"
+          />
+          <OsMetricCard
             label={canBilling ? "Suscripción YTD" : "Plataforma"}
             value={
               canBilling && data.billingPaidYtd !== null
@@ -158,6 +187,34 @@ export function OsPlatformDashboard() {
             </ul>
           </div>
         ) : null}
+
+        <section className="rounded-xl border border-white/10 bg-[#0b1428] p-5">
+          <h2 className="text-sm font-semibold text-white">Actividad reciente</h2>
+          {data.recentActivity.length === 0 ? (
+            <p className="mt-4 text-sm text-white/40">Sin datos todavía</p>
+          ) : (
+            <ul className="mt-4 space-y-2">
+              {data.recentActivity.map((a, i) => (
+                <li
+                  key={`${a.kind}-${a.label}-${i}`}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white/5 px-3 py-2 text-sm"
+                >
+                  <span className="text-white/80">
+                    <span className="text-white/40">{a.kind} · </span>
+                    {a.href ? (
+                      <Link href={a.href} className="hover:text-[#0084FF]">
+                        {a.label}
+                      </Link>
+                    ) : (
+                      a.label
+                    )}
+                  </span>
+                  <span className="text-white/45">{a.detail}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         <div className="grid gap-6 lg:grid-cols-2">
           <section className="rounded-xl border border-white/10 bg-[#0b1428] p-5">
@@ -236,10 +293,19 @@ export function OsPlatformDashboard() {
             Finanzas
           </Link>
           <Link
+            href="/os/ia"
+            className="rounded-lg border border-white/10 px-4 py-2 text-white/80 hover:border-[#0084FF]/40"
+          >
+            <span className="inline-flex items-center gap-1">
+              <Sparkles className="h-3.5 w-3.5" />
+              IA operativa
+            </span>
+          </Link>
+          <Link
             href="/os/agents"
             className="rounded-lg border border-white/10 px-4 py-2 text-white/80 hover:border-[#0084FF]/40"
           >
-            Agentes IA
+            Catálogo agentes
           </Link>
         </div>
       </div>

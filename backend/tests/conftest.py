@@ -96,6 +96,8 @@ async def setup_database(test_engine):
     import models.nelvyon_outputs  # noqa: F401
     import models.os_deals  # noqa: F401 — Fase 2C OS pipeline
     import models.os_tasks  # noqa: F401
+    import models.os_expenses  # noqa: F401 — Fase 2F finanzas OS
+    import models.os_cashflow  # noqa: F401
     import models.contacts  # noqa: F401 — e2e_orchestrator / CRM chain tests
     import models.contracts  # noqa: F401
     import models.deals  # noqa: F401

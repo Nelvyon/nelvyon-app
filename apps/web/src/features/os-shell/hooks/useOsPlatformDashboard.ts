@@ -9,9 +9,14 @@ import { osPlatformApi } from "@/features/os-shell/api";
 import { osFinanzasApi } from "@/features/os-shell/finanzas/api";
 import {
   countActiveContracts,
+  countPendingExpenses,
   countPendingInvoices,
+  netCashflowMonth,
+  sumPaidExpensesInPeriod,
   sumPaidInvoicesInPeriod,
 } from "@/features/os-shell/finanzas/compute";
+import type { OsExpense } from "@/features/os-shell/finanzas/expenseTypes";
+import { mergeRecentActivity, type ActivityItem } from "@/features/os-shell/lib/recentActivity";
 import type { SpanishInvoiceRow } from "@/features/os-shell/finanzas/types";
 import { OS_DEAL_OPEN_STATUSES, OS_TASK_ACTIVE_STATUSES } from "@/features/os-shell/constants";
 import type { OsPlatformDashboardData } from "@/features/os-shell/types";
@@ -42,8 +47,12 @@ function emptyDashboard(): OsPlatformDashboardData {
     incomeYear: null,
     invoicesPendingCount: null,
     contractsActiveCount: null,
+    expensesMonth: null,
+    expensesPendingCount: null,
+    cashflowMonth: null,
     recentJobs: [],
     recentOutputs: [],
+    recentActivity: [],
     errors: [],
   };
 }
@@ -68,7 +77,7 @@ export function useOsPlatformDashboard() {
       errors.push(`${label}: ${msg.slice(0, 120)}`);
     };
 
-    const [clientsRes, projectsRes, dealsRes, tasksRes, outputsRes, qaRes, statsRes, jobsRes] =
+    const [clientsRes, projectsRes, dealsRes, tasksRes, outputsRes, qaRes, statsRes, jobsRes, expRes] =
       await Promise.allSettled([
         osPlatformApi.clients(),
         osPlatformApi.projects(),
@@ -78,6 +87,7 @@ export function useOsPlatformDashboard() {
         osPlatformApi.qaDashboard(),
         osPlatformApi.automationStats(),
         osPlatformApi.recentJobs(),
+        osPlatformApi.expenses(),
       ]);
 
     if (clientsRes.status === "fulfilled") {
@@ -179,6 +189,13 @@ export function useOsPlatformDashboard() {
       capture("Facturas españolas", invListRes.reason);
     }
 
+    let expenses: OsExpense[] = [];
+    if (expRes.status === "fulfilled") {
+      expenses = (expRes.value.items ?? []) as unknown as OsExpense[];
+    } else {
+      capture("Gastos (os_expenses)", expRes.reason);
+    }
+
     if (invStatsRes.status === "fulfilled") {
       next.incomeYear = invStatsRes.value.pagado ?? null;
     }
@@ -191,11 +208,62 @@ export function useOsPlatformDashboard() {
     next.invoicesPendingCount = pend.count;
     next.invoiceCount = spanishInvoices.length > 0 ? spanishInvoices.length : null;
 
+    next.expensesMonth = sumPaidExpensesInPeriod(expenses, "month");
+    next.expensesPendingCount = countPendingExpenses(expenses).count;
+    next.cashflowMonth = netCashflowMonth(next.incomeMonth, next.expensesMonth);
+
     if (contractFinRes.status === "fulfilled") {
       next.contractsActiveCount = countActiveContracts(contractFinRes.value.items ?? []);
     } else {
       capture("Contratos (finanzas)", contractFinRes.reason);
     }
+
+    const activity: ActivityItem[] = [];
+    for (const j of next.recentJobs) {
+      activity.push({
+        kind: "job",
+        label: j.job_type,
+        detail: j.status,
+        at: j.created_at,
+        href: "/os",
+      });
+    }
+    for (const o of next.recentOutputs) {
+      activity.push({
+        kind: "entrega",
+        label: o.title,
+        detail: o.qa_status ?? "—",
+        at: o.created_at,
+        href: `/os/documentos/output/${o.id}`,
+      });
+    }
+    if (tasksRes.status === "fulfilled") {
+      for (const t of (tasksRes.value.items ?? []).slice(0, 8) as {
+        id?: number;
+        title?: string;
+        status?: string;
+        updated_at?: string;
+        created_at?: string;
+      }[]) {
+        activity.push({
+          kind: "tarea",
+          label: t.title ?? `Tarea #${t.id}`,
+          detail: t.status ?? "—",
+          at: t.updated_at ?? t.created_at,
+          href: t.id != null ? `/os/tareas/${t.id}` : "/os/tareas",
+        });
+      }
+    }
+    for (const ex of expenses.slice(0, 6)) {
+      activity.push({
+        kind: "gasto",
+        label: ex.title,
+        detail: `${ex.amount} ${ex.currency} · ${ex.status}`,
+        at: ex.updated_at ?? ex.created_at ?? ex.expense_date ?? undefined,
+        href: "/os/finanzas",
+      });
+    }
+    next.recentActivity = mergeRecentActivity(activity);
 
     if (canBilling) {
       const [sumRes, invRes] = await Promise.allSettled([

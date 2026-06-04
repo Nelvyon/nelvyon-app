@@ -49,7 +49,17 @@ export interface OsPlatformDashboardData {
   incomeYear: number | null;
   invoicesPendingCount: number | null;
   contractsActiveCount: number | null;
+  expensesMonth: number | null;
+  expensesPendingCount: number | null;
+  cashflowMonth: number | null;
   recentJobs: { id: number; job_type: string; status: string; created_at?: string }[];
   recentOutputs: { id: number; title: string; output_type: string; qa_status?: string; created_at?: string }[];
+  recentActivity: {
+    kind: string;
+    label: string;
+    detail: string;
+    at?: string;
+    href?: string;
+  }[];
   errors: string[];
 }

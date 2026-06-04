@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   countActiveContracts,
+  countPendingExpenses,
   countPendingInvoices,
+  netCashflowMonth,
   parseAmount,
+  sumPaidExpensesInPeriod,
   sumPaidInvoicesInPeriod,
 } from "../compute";
 
@@ -35,5 +38,32 @@ describe("os finanzas compute", () => {
     expect(
       countActiveContracts([{ status: "active" }, { status: "draft" }]),
     ).toBe(1);
+  });
+
+  it("sumPaidExpensesInPeriod", () => {
+    const now = new Date();
+    const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    expect(
+      sumPaidExpensesInPeriod(
+        [{ amount: 80, status: "pagado", paid_at: `${ym}-15` }],
+        "month",
+      ),
+    ).toBe(80);
+  });
+
+  it("countPendingExpenses", () => {
+    expect(
+      countPendingExpenses([
+        { amount: 10, status: "pendiente" },
+        { amount: 20, status: "pagado" },
+      ]),
+    ).toEqual({ count: 1, amount: 10 });
+  });
+
+  it("netCashflowMonth", () => {
+    expect(netCashflowMonth(1000, 300)).toBe(700);
+    expect(netCashflowMonth(null, 300)).toBe(-300);
+    expect(netCashflowMonth(500, null)).toBe(500);
+    expect(netCashflowMonth(null, null)).toBe(null);
   });
 });

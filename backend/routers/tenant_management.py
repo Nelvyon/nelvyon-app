@@ -619,7 +619,7 @@ async def get_tenant_data_stats(
         "contracts", "activities", "conversations", "calendar_events",
         "workflow_rules", "form_items", "funnel_items", "blog_posts",
         "nelvyon_clients", "nelvyon_projects", "nelvyon_outputs", "nelvyon_assets",
-        "os_deals", "os_tasks",
+        "os_deals", "os_tasks", "os_expenses", "os_cashflow",
     ]
 
     ws_id = ctx.workspace_id
