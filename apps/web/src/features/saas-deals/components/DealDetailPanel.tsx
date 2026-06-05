@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
+import { SaasCan } from "@/features/saas-shell/components/SaasCan";
 
 import { useDeleteSaasDeal } from "../hooks";
 import { dealStageLabel, formatDealValue } from "../stages";
@@ -103,26 +104,30 @@ export function DealDetailPanel({
         </dl>
 
         <div className="flex flex-wrap gap-2 border-t border-border pt-3">
-          <NelvyonDsButton size="sm" onClick={() => onEdit(deal)}>
-            Editar
-          </NelvyonDsButton>
-          <NelvyonDsButton
-            size="sm"
-            variant={confirmDelete ? "danger" : "secondary"}
-            disabled={deleteMutation.isPending}
-            onClick={() => void handleDelete()}
-          >
-            {deleteMutation.isPending
-              ? "Eliminando…"
-              : confirmDelete
-                ? "Confirmar eliminar"
-                : "Eliminar"}
-          </NelvyonDsButton>
-          {confirmDelete ? (
-            <NelvyonDsButton size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>
-              Cancelar
+          <SaasCan action="deals.write">
+            <NelvyonDsButton size="sm" onClick={() => onEdit(deal)}>
+              Editar
             </NelvyonDsButton>
-          ) : null}
+          </SaasCan>
+          <SaasCan action="deals.delete">
+            <NelvyonDsButton
+              size="sm"
+              variant={confirmDelete ? "danger" : "secondary"}
+              disabled={deleteMutation.isPending}
+              onClick={() => void handleDelete()}
+            >
+              {deleteMutation.isPending
+                ? "Eliminando…"
+                : confirmDelete
+                  ? "Confirmar eliminar"
+                  : "Eliminar"}
+            </NelvyonDsButton>
+            {confirmDelete ? (
+              <NelvyonDsButton size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>
+                Cancelar
+              </NelvyonDsButton>
+            ) : null}
+          </SaasCan>
           <NelvyonDsButton size="sm" variant="ghost" onClick={onClose}>
             Cerrar
           </NelvyonDsButton>

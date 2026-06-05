@@ -13,7 +13,10 @@ import { DealFormModal } from "@/features/saas-deals/components/DealFormModal";
 import { DealsKanban } from "@/features/saas-deals/components/DealsKanban";
 import { DealsKpiRow } from "@/features/saas-deals/components/DealsKpiRow";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
+import { SaasCan } from "@/features/saas-shell/components/SaasCan";
+import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 import {
   useChangeDealStage,
   useSaasContactDetail,
@@ -80,6 +83,9 @@ export default function SaasCrmPage() {
   const metricsQuery = useSaasDealMetrics();
   const changeStageMutation = useChangeDealStage();
   const contactDetailQuery = useSaasContactDetail(selectedId);
+  const { can, isViewer, forbidden } = useSaasPermissions();
+  const canWriteContacts = can("contacts.write");
+  const canWriteDeals = can("deals.write");
 
   const selected = useMemo((): SaasContact | null => {
     const fromList = contacts.find((c) => c.id === selectedId);
@@ -213,6 +219,10 @@ export default function SaasCrmPage() {
         value: Number(newValue || "0"),
       }),
     });
+    if (res.status === 403) {
+      setError(forbidden("contacts.write"));
+      return;
+    }
     if (res.ok) {
       setNewName("");
       setNewCompany("");
@@ -283,6 +293,10 @@ export default function SaasCrmPage() {
           ) : null}
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
+          {isViewer ? (
+            <SaasPermissionDenied message="Tu rol es solo lectura. Puedes consultar contactos y deals, pero no crear ni editar." />
+          ) : null}
+
           {!loading && tab === "contacts" ? (
             <section className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
               <NelvyonDsCard title="Contactos">
@@ -301,21 +315,27 @@ export default function SaasCrmPage() {
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
-                  <NelvyonDsButton onClick={() => void createContact()}>Nuevo contacto</NelvyonDsButton>
+                  <NelvyonDsButton onClick={() => void createContact()} disabled={!canWriteContacts}>Nuevo contacto</NelvyonDsButton>
                 </div>
 
+                {canWriteContacts ? (
                 <div className="mb-3 grid gap-2 sm:grid-cols-4">
                   <input className="rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Nombre *" value={newName} onChange={(e) => setNewName(e.target.value)} />
                   <input className="rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Empresa" value={newCompany} onChange={(e) => setNewCompany(e.target.value)} />
                   <input className="rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
                   <input className="rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Valor" value={newValue} onChange={(e) => setNewValue(e.target.value)} />
                 </div>
+                ) : null}
 
                 {contacts.length === 0 ? (
                   <SaasEmptyState
                     title={SAAS_EMPTY_TITLE}
                     description={SAAS_EMPTY_DESCRIPTION}
-                    action={<NelvyonDsButton onClick={() => void createContact()}>Crear primer contacto</NelvyonDsButton>}
+                    action={
+                      canWriteContacts ? (
+                        <NelvyonDsButton onClick={() => void createContact()}>Crear primer contacto</NelvyonDsButton>
+                      ) : undefined
+                    }
                   />
                 ) : (
                   <div className="overflow-x-auto">
@@ -357,7 +377,7 @@ export default function SaasCrmPage() {
                       dealsContext={contactDetailQuery.data?.dealsContext}
                       isLoading={contactDetailQuery.isLoading}
                       error={contactDetailQuery.error}
-                      onNewDeal={() => openCreateDeal(selected.id)}
+                      onNewDeal={canWriteDeals ? () => openCreateDeal(selected.id) : undefined}
                       onSelectDeal={openDealFromContact}
                     />
 
@@ -378,6 +398,7 @@ export default function SaasCrmPage() {
                         ))}
                       </ul>
                     </div>
+                    {canWriteContacts ? (
                     <div className="grid gap-2">
                       <select className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={activityType} onChange={(e) => setActivityType(e.target.value as ActivityType)}>
                         <option value="note">note</option>
@@ -389,6 +410,7 @@ export default function SaasCrmPage() {
                       <input className="rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Nueva actividad" value={activityDesc} onChange={(e) => setActivityDesc(e.target.value)} />
                       <NelvyonDsButton onClick={() => void addActivity()}>Agregar actividad</NelvyonDsButton>
                     </div>
+                    ) : null}
                   </div>
                 )}
               </NelvyonDsCard>
@@ -401,7 +423,9 @@ export default function SaasCrmPage() {
                 <p className="text-sm text-muted-foreground">
                   Pipeline oficial basado en <strong className="text-foreground">saas_deals</strong>
                 </p>
-                <NelvyonDsButton onClick={() => openCreateDeal()}>Nuevo deal</NelvyonDsButton>
+                <SaasCan action="deals.write">
+                  <NelvyonDsButton onClick={() => openCreateDeal()}>Nuevo deal</NelvyonDsButton>
+                </SaasCan>
               </div>
               <DealsKpiRow
                 metrics={metricsQuery.data?.metrics}
@@ -419,6 +443,7 @@ export default function SaasCrmPage() {
                   selectedDealId={selectedDealId}
                   onSelectDeal={(deal) => setSelectedDealId(deal.id)}
                   onMoveStage={(deal, stage) => void handleMoveDealStage(deal, stage)}
+                  readOnly={!canWriteDeals}
                 />
                 <DealDetailPanel
                   deal={selectedDeal}

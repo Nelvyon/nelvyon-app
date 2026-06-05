@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 
 import { NelvyonDsBadge, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { saasRoleLabel } from "@/features/saas-shell/saasPermissions";
+import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 
 type SettingsSummary = {
   tenant: {
@@ -21,6 +23,7 @@ type SettingsSummary = {
 
 export default function SaasSettingsPage() {
   const router = useRouter();
+  const { role: hookRole } = useSaasPermissions();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<SettingsSummary | null>(null);
@@ -43,6 +46,8 @@ export default function SaasSettingsPage() {
     })();
   }, [router]);
 
+  const displayRole = data?.role ?? hookRole;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -62,9 +67,20 @@ export default function SaasSettingsPage() {
                   <div><dt className="text-muted-foreground">Teléfono</dt><dd>{data.tenant.phone ?? "—"}</dd></div>
                 </dl>
               </NelvyonDsCard>
-              <NelvyonDsCard title="Acceso">
-                <p className="text-sm">Rol: <strong>{data.role}</strong></p>
-                <p className="mt-2 text-xs text-muted-foreground">
+              <NelvyonDsCard title="Tu rol en este tenant">
+                {displayRole ? (
+                  <div className="space-y-2">
+                    <NelvyonDsBadge tone="primary">{saasRoleLabel(displayRole)}</NelvyonDsBadge>
+                    <p className="text-sm text-muted-foreground">
+                      {displayRole === "viewer"
+                        ? "Solo lectura: puedes consultar datos, pero no crear, editar ni eliminar recursos."
+                        : displayRole === "member"
+                          ? "Miembro: puedes crear y editar contactos y deals. No puedes eliminar recursos críticos ni ver facturación."
+                          : "Administración completa del tenant, incluida facturación y eliminación de recursos."}
+                    </p>
+                  </div>
+                ) : null}
+                <p className="mt-3 text-xs text-muted-foreground">
                   Permisos: {data.permissions.join(", ")}
                 </p>
               </NelvyonDsCard>

@@ -21,6 +21,7 @@ export function DealsKanban({
   selectedDealId,
   onSelectDeal,
   onMoveStage,
+  readOnly = false,
 }: {
   deals: SaasDeal[];
   metrics?: SaasDealsMetrics;
@@ -31,6 +32,7 @@ export function DealsKanban({
   selectedDealId?: string | null;
   onSelectDeal?: (deal: SaasDeal) => void;
   onMoveStage: (deal: SaasDeal, stage: DealStage) => void;
+  readOnly?: boolean;
 }) {
   const [draggingDealId, setDraggingDealId] = useState<string | null>(null);
   const [dragOverStage, setDragOverStage] = useState<DealStage | null>(null);
@@ -127,6 +129,7 @@ export function DealsKanban({
               isDropTarget && "bg-primary/5 ring-2 ring-primary/50 ring-offset-2 ring-offset-background",
             )}
             onDragOver={(e) => {
+              if (readOnly) return;
               e.preventDefault();
               if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
               setDragOverStage(stage);
@@ -140,6 +143,7 @@ export function DealsKanban({
               setDragOverStage((prev) => (prev === stage ? null : prev));
             }}
             onDrop={(e) => {
+              if (readOnly) return;
               e.preventDefault();
               handleDrop(stage);
             }}
@@ -162,20 +166,20 @@ export function DealsKanban({
                       key={deal.id}
                       data-testid={`kanban-deal-${deal.id}`}
                       data-deal-id={deal.id}
-                      draggable={!busy}
+                      draggable={!busy && !readOnly}
                       aria-grabbed={dragging}
                       role="button"
                       tabIndex={0}
                       className={cn(
                         "rounded-md border bg-card p-2 text-xs transition-all",
                         busy && "pointer-events-none opacity-60",
-                        dragging
+                        readOnly ? "cursor-pointer hover:bg-muted/40" : dragging
                           ? "scale-[0.98] cursor-grabbing opacity-50 ring-2 ring-primary/40"
                           : "cursor-grab hover:bg-muted/40 active:cursor-grabbing",
                         selected && !dragging ? "border-primary ring-1 ring-primary/30" : "border-border",
                       )}
                       onDragStart={(e) => {
-                        if (busy) {
+                        if (readOnly || busy) {
                           e.preventDefault();
                           return;
                         }
@@ -206,32 +210,34 @@ export function DealsKanban({
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-2 flex gap-1">
-                        <NelvyonDsButton
-                          size="sm"
-                          variant="secondary"
-                          disabled={!prev || busy}
-                          aria-label={`Mover ${deal.title} a etapa anterior`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (prev) onMoveStage(deal, prev);
-                          }}
-                        >
-                          ◀
-                        </NelvyonDsButton>
-                        <NelvyonDsButton
-                          size="sm"
-                          variant="secondary"
-                          disabled={!next || busy}
-                          aria-label={`Mover ${deal.title} a etapa siguiente`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (next) onMoveStage(deal, next);
-                          }}
-                        >
-                          ▶
-                        </NelvyonDsButton>
-                      </div>
+                      {!readOnly ? (
+                        <div className="mt-2 flex gap-1">
+                          <NelvyonDsButton
+                            size="sm"
+                            variant="secondary"
+                            disabled={!prev || busy}
+                            aria-label={`Mover ${deal.title} a etapa anterior`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (prev) onMoveStage(deal, prev);
+                            }}
+                          >
+                            ◀
+                          </NelvyonDsButton>
+                          <NelvyonDsButton
+                            size="sm"
+                            variant="secondary"
+                            disabled={!next || busy}
+                            aria-label={`Mover ${deal.title} a etapa siguiente`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (next) onMoveStage(deal, next);
+                            }}
+                          >
+                            ▶
+                          </NelvyonDsButton>
+                        </div>
+                      ) : null}
                     </div>
                   );
                 })}

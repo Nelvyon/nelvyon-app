@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasEmptyState } from "@/features/saas-shell/components/SaasEmptyState";
+import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { saasRoleLabel } from "@/features/saas-shell/saasPermissions";
 import type { SaasNavId } from "@/features/saas-shell/saasNav";
 
 type BillingSummary = {
@@ -35,7 +37,7 @@ export default function SaasBillingPage() {
           return;
         }
         if (res.status === 403) {
-          setError("Tu rol no tiene acceso a facturación.");
+          setError("Tu rol no tiene acceso a facturación. Solo propietarios y administradores pueden ver esta sección.");
           return;
         }
         if (!res.ok) throw new Error("No se pudo cargar la facturación");
@@ -57,13 +59,14 @@ export default function SaasBillingPage() {
         <main className="space-y-6">
           <NelvyonDsSectionHeader title="Facturación y plan" subtitle="Uso real del tenant y límites del plan activo." />
           {loading ? <NelvyonDsCard>Cargando…</NelvyonDsCard> : null}
-          {error ? <NelvyonDsCard className="text-sm text-destructive">{error}</NelvyonDsCard> : null}
+          {error ? <SaasPermissionDenied message={error} /> : null}
           {!loading && !error && data ? (
             <>
               <NelvyonDsCard title="Plan actual">
                 <div className="flex flex-wrap items-center gap-2">
                   <NelvyonDsBadge tone="primary">{data.tenant.plan}</NelvyonDsBadge>
                   <span className="text-sm text-muted-foreground">{data.tenant.companyName}</span>
+                  <NelvyonDsBadge tone="neutral">{saasRoleLabel(data.role)}</NelvyonDsBadge>
                 </div>
               </NelvyonDsCard>
               <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

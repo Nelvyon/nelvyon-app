@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
+import { SaasCan } from "@/features/saas-shell/components/SaasCan";
+import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 
 type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
 type CampaniaChannel = "email" | "sms" | "notification" | "multi";
@@ -30,6 +33,8 @@ const CHANNELS: CampaniaChannel[] = ["email", "sms", "notification", "multi"];
 
 export default function SaasCampaniasPage() {
   const router = useRouter();
+  const { can, isViewer } = useSaasPermissions();
+  const canManage = can("campanias.write");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tenantPlan, setTenantPlan] = useState<"starter" | "pro" | "enterprise">("starter");
@@ -220,13 +225,18 @@ export default function SaasCampaniasPage() {
         <SaasSidebar activeId="campanias" tenantCompany={tenantCompany || undefined} tenantPlan={tenantPlan} />
         <main className="space-y-6">
           <NelvyonDsSectionHeader title="Campanias" subtitle="Motor multicanal email, sms y notificacion" />
+          {isViewer ? (
+            <SaasPermissionDenied message="Tu rol es solo lectura. Puedes ver campañas, pero no crear ni lanzar." />
+          ) : null}
           <div className="flex flex-wrap gap-2">
             {(["all", "active", "completed", "draft"] as const).map((t) => (
               <NelvyonDsButton key={t} onClick={() => setTab(t)}>
                 {t === "all" ? "Todas" : t === "active" ? "Activas" : t === "completed" ? "Completadas" : "Borradores"}
               </NelvyonDsButton>
             ))}
-            <NelvyonDsButton onClick={() => setShowWizard(true)}>Nueva campania</NelvyonDsButton>
+            <SaasCan action="campanias.write">
+              <NelvyonDsButton onClick={() => setShowWizard(true)}>Nueva campania</NelvyonDsButton>
+            </SaasCan>
           </div>
           {error ? <NelvyonDsCard className="text-sm text-destructive">{error}</NelvyonDsCard> : null}
           {loading ? (
@@ -235,7 +245,11 @@ export default function SaasCampaniasPage() {
             <SaasEmptyState
               title={SAAS_EMPTY_TITLE}
               description={SAAS_EMPTY_DESCRIPTION}
-              action={<NelvyonDsButton onClick={() => setShowWizard(true)}>Crear primera campania</NelvyonDsButton>}
+              action={
+                canManage ? (
+                  <NelvyonDsButton onClick={() => setShowWizard(true)}>Crear primera campania</NelvyonDsButton>
+                ) : undefined
+              }
             />
           ) : (
             <div className="space-y-3">
@@ -264,7 +278,7 @@ export default function SaasCampaniasPage() {
             </div>
           )}
 
-          {showWizard ? (
+          {showWizard && canManage ? (
             <NelvyonDsCard className="space-y-4">
               <div className="text-base font-semibold text-foreground">Nueva campania (Paso {step}/5)</div>
               {step === 1 ? (
@@ -349,9 +363,13 @@ export default function SaasCampaniasPage() {
                 <NelvyonDsCard>Click Rate: {stats?.click_rate ?? 0}%</NelvyonDsCard>
               </div>
               <div className="flex flex-wrap gap-2">
-                <NelvyonDsButton onClick={() => void launchSelected()}>Lanzar</NelvyonDsButton>
-                <NelvyonDsButton onClick={() => void pauseSelected()}>Pausar</NelvyonDsButton>
-                <NelvyonDsButton onClick={() => void duplicateSelected()}>Duplicar</NelvyonDsButton>
+                <SaasCan action="campanias.launch">
+                  <NelvyonDsButton onClick={() => void launchSelected()}>Lanzar</NelvyonDsButton>
+                </SaasCan>
+                <SaasCan action="campanias.write">
+                  <NelvyonDsButton onClick={() => void pauseSelected()}>Pausar</NelvyonDsButton>
+                  <NelvyonDsButton onClick={() => void duplicateSelected()}>Duplicar</NelvyonDsButton>
+                </SaasCan>
               </div>
               <div className="space-y-2">
                 <div className="text-sm font-medium text-foreground">Recipients</div>

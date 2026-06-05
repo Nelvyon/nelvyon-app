@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -10,6 +9,7 @@ import { cn } from "@/core/ui/utils";
 import { resetUser } from "@/lib/analytics";
 
 import { SAAS_NAV_ITEMS, filterSaasNavForPermissions, isSaasNavActive, type SaasNavId } from "../saasNav";
+import { useSaasPermissions } from "../useSaasPermissions";
 
 function planTone(plan: "starter" | "pro" | "enterprise"): "primary" | "success" | "warning" {
   if (plan === "enterprise") return "warning";
@@ -29,19 +29,14 @@ export function SaasSidebar({
   showLanguageSelector?: boolean;
 }) {
   const router = useRouter();
-  const [permissions, setPermissions] = useState<string[] | null>(null);
+  const { permissions, loading, tenant } = useSaasPermissions();
 
-  useEffect(() => {
-    void fetch("/api/saas/settings", { credentials: "same-origin" })
-      .then(async (res) => (res.ok ? ((await res.json()) as { permissions?: string[] }) : null))
-      .then((body) => setPermissions(body?.permissions ?? []))
-      .catch(() => setPermissions([]));
-  }, []);
+  const company = tenantCompany ?? tenant?.companyName;
+  const plan = tenant?.plan ?? tenantPlan;
 
-  const visibleItems = useMemo(() => {
-    if (permissions === null) return [...SAAS_NAV_ITEMS];
-    return filterSaasNavForPermissions(permissions);
-  }, [permissions]);
+  const visibleItems = loading
+    ? [...SAAS_NAV_ITEMS]
+    : filterSaasNavForPermissions(permissions);
 
   return (
     <aside className="space-y-4" data-testid="saas-sidebar">
@@ -66,10 +61,10 @@ export function SaasSidebar({
             );
           })}
         </nav>
-        {tenantCompany ? (
+        {company ? (
           <div className="space-y-1 border-t border-border pt-3">
-            <p className="text-sm font-medium text-foreground">{tenantCompany}</p>
-            <NelvyonDsBadge tone={planTone(tenantPlan)}>{tenantPlan}</NelvyonDsBadge>
+            <p className="text-sm font-medium text-foreground">{company}</p>
+            <NelvyonDsBadge tone={planTone(plan)}>{plan}</NelvyonDsBadge>
           </div>
         ) : null}
         <NelvyonDsButton

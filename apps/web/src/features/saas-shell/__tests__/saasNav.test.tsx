@@ -1,15 +1,17 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SaasSidebar } from "../components/SaasSidebar";
 import { SAAS_NAV_ITEMS, SAAS_HIDDEN_ROUTES, isSaasNavActive } from "../saasNav";
+import { resetSaasPermissionsCacheForTests } from "../useSaasPermissions";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
 }));
 
 beforeEach(() => {
+  resetSaasPermissionsCacheForTests();
   vi.stubGlobal(
     "fetch",
     vi.fn().mockResolvedValue({
@@ -17,6 +19,11 @@ beforeEach(() => {
       json: async () => ({ permissions: ["billing.read", "settings.read"] }),
     }),
   );
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  resetSaasPermissionsCacheForTests();
 });
 
 describe("saasNav", () => {

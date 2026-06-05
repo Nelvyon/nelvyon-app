@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
+import { SaasCan } from "@/features/saas-shell/components/SaasCan";
+import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 
 type WorkflowStatus = "draft" | "active" | "paused" | "archived";
 type TriggerType = "contact_created" | "contact_updated" | "stage_changed" | "job_completed" | "manual" | "scheduled";
@@ -27,6 +30,8 @@ const TRIGGERS: TriggerType[] = ["contact_created", "contact_updated", "stage_ch
 
 export default function SaasWorkflowsPage() {
   const router = useRouter();
+  const { can, isViewer } = useSaasPermissions();
+  const canWrite = can("workflows.write");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
@@ -166,8 +171,13 @@ export default function SaasWorkflowsPage() {
         <SaasSidebar activeId="workflows" tenantCompany={tenantCompany || undefined} tenantPlan={tenantPlan} />
         <main className="space-y-6">
           <NelvyonDsSectionHeader title="Workflows" subtitle="Motor automatico trigger -> condicion -> accion" />
+          {isViewer ? (
+            <SaasPermissionDenied message="Tu rol es solo lectura. Puedes ver workflows, pero no crearlos ni ejecutarlos." />
+          ) : null}
           <div className="flex flex-wrap gap-2">
-            <NelvyonDsButton onClick={() => setShowEditor(true)}>Nuevo workflow</NelvyonDsButton>
+            <SaasCan action="workflows.write">
+              <NelvyonDsButton onClick={() => setShowEditor(true)}>Nuevo workflow</NelvyonDsButton>
+            </SaasCan>
           </div>
           {error ? <NelvyonDsCard className="text-sm text-destructive">{error}</NelvyonDsCard> : null}
           {loading ? (
@@ -176,7 +186,11 @@ export default function SaasWorkflowsPage() {
             <SaasEmptyState
               title={SAAS_EMPTY_TITLE}
               description={SAAS_EMPTY_DESCRIPTION}
-              action={<NelvyonDsButton onClick={() => setShowEditor(true)}>Crear primer workflow</NelvyonDsButton>}
+              action={
+                canWrite ? (
+                  <NelvyonDsButton onClick={() => setShowEditor(true)}>Crear primer workflow</NelvyonDsButton>
+                ) : undefined
+              }
             />
           ) : (
             <div className="grid gap-4">
@@ -194,17 +208,27 @@ export default function SaasWorkflowsPage() {
                     <div>Ultima ejecucion: {wf.lastRunAt ? new Date(wf.lastRunAt).toLocaleString() : "Nunca"}</div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {wf.status !== "active" ? <NelvyonDsButton onClick={() => void changeStatus(wf, "active")}>Activar</NelvyonDsButton> : null}
-                    {wf.status === "active" ? <NelvyonDsButton onClick={() => void changeStatus(wf, "paused")}>Pausar</NelvyonDsButton> : null}
-                    <NelvyonDsButton onClick={() => void runWorkflow(wf.id)}>Ejecutar</NelvyonDsButton>
-                    <NelvyonDsButton onClick={() => void deleteWorkflow(wf.id)}>Eliminar</NelvyonDsButton>
+                    <SaasCan action="workflows.write">
+                      {wf.status !== "active" ? (
+                        <NelvyonDsButton onClick={() => void changeStatus(wf, "active")}>Activar</NelvyonDsButton>
+                      ) : null}
+                      {wf.status === "active" ? (
+                        <NelvyonDsButton onClick={() => void changeStatus(wf, "paused")}>Pausar</NelvyonDsButton>
+                      ) : null}
+                    </SaasCan>
+                    <SaasCan action="workflows.execute">
+                      <NelvyonDsButton onClick={() => void runWorkflow(wf.id)}>Ejecutar</NelvyonDsButton>
+                    </SaasCan>
+                    <SaasCan action="workflows.delete">
+                      <NelvyonDsButton onClick={() => void deleteWorkflow(wf.id)}>Eliminar</NelvyonDsButton>
+                    </SaasCan>
                   </div>
                 </NelvyonDsCard>
               ))}
             </div>
           )}
 
-          {showEditor ? (
+          {showEditor && canWrite ? (
             <NelvyonDsCard className="space-y-4">
               <div className="text-base font-semibold text-foreground">Crear workflow (Paso {wizardStep}/5)</div>
               {wizardStep === 1 ? (
