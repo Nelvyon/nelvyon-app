@@ -27,7 +27,15 @@ Convertir `saas_deals` en el pipeline visible y oficial del producto SaaS en `/s
 - Drag-and-drop avanzado
 - `deal_stage_changed` en workflows
 - Billing, RBAC, automatizaciones nuevas
-- Dashboard comercial en `/saas/dashboard` (S6)
+- ~~Dashboard comercial en `/saas/dashboard` (S6)~~ ✅
+
+## S6 — Dashboard comercial
+
+- `CommercialPipelineSection` en `/saas/dashboard`
+- KPIs desde `GET /api/saas/deals/metrics` (6 métricas incl. valor ganado)
+- Distribución `byStage` con barras proporcionales reales
+- Actividad: oportunidades abiertas y ganados recientes (`GET /api/saas/deals`)
+- CTA → `/saas/crm?tab=pipeline`
 
 ## S3 — CRUD UI
 

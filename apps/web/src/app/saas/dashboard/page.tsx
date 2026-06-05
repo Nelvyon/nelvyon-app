@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot, type NelvyonDsStatus } from "@/design-system/components";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { CommercialPipelineSection } from "@/features/saas-deals/components/CommercialPipelineSection";
 import { resetUser, trackEvent } from "@/lib/analytics";
 import { cn } from "@/core/ui/utils";
 import type { SaasPlan, SaasTenantDto } from "../onboarding/components/types";
@@ -161,6 +162,14 @@ export default function SaasDashboardPage() {
         <main className="space-y-6">
           <NelvyonDsSectionHeader eyebrow="SaaS Dashboard" title={t("dashboard.welcome", { company: tenant.companyName })} subtitle={now} />
 
+          <CommercialPipelineSection />
+
+          <NelvyonDsSectionHeader
+            eyebrow="Operaciones"
+            title="Actividad del tenant"
+            subtitle="Jobs, gasto y plan de tu espacio SaaS."
+          />
+
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {kpis.map((k) => (
               <NelvyonDsCard key={k.label} title={k.label}>
@@ -218,10 +227,13 @@ export default function SaasDashboardPage() {
                   <Link href="/os/execution">Ir a Servicios</Link>
                 </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
-                  <Link href="/saas/dashboard">Abrir CRM</Link>
+                  <Link href="/saas/crm">Abrir CRM</Link>
                 </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
-                  <Link href="/saas/dashboard">Ver Campanas</Link>
+                  <Link href="/saas/crm?tab=pipeline">Ver pipeline comercial</Link>
+                </NelvyonDsButton>
+                <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
+                  <Link href="/saas/campanias">Ver Campanas</Link>
                 </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
                   <Link href="/dashboard/settings">Suscripción y facturación</Link>

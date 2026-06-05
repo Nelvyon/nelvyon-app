@@ -11,9 +11,9 @@
 
 | Dimensión | Nota 0–10 | Veredicto |
 |-----------|-----------|-----------|
-| SaaS núcleo (onboarding, CRM, workflows, campañas) | **8.0** | CRM + pipeline deals CRUD en producto; falta RBAC, dashboard comercial y cierre legacy |
-| CRM competitivo vs HubSpot/SF | **5.5** | Contactos + deals CRUD + kanban + dealsContext; sin secuencias ni reporting avanzado |
-| Pipeline / deals SaaS | **8.0** | Backend 3A + UI 3B S1–S3–S5; kanban, KPIs y CRUD sobre `saas_deals`; sin drag-drop ni dashboard comercial |
+| SaaS núcleo (onboarding, CRM, workflows, campañas) | **8.5** | CRM + pipeline CRUD + dashboard comercial; falta RBAC, billing enforcement y cierre legacy |
+| CRM competitivo vs HubSpot/SF | **6.0** | Contactos + deals CRUD + kanban + dashboard ventas; sin secuencias ni reporting avanzado |
+| Pipeline / deals SaaS | **8.5** | Backend 3A + UI 3B completa (kanban, CRUD, KPIs, dashboard); sin drag-drop ni analytics históricos |
 | Automatizaciones | **6.0** | Workflows tenant reales; campañas simulan envío; drag-drop paralelo no integrado |
 | IA en SaaS | **5.0** | Agentes potentes en OS/backend; poca IA integrada en flujo CRM SaaS |
 | Onboarding | **7.0** | Wizard + API + bridge workspace completos |
@@ -35,6 +35,7 @@
 | CRM contactos | `saas_contacts`, `saas_contact_activities` | SaasCrmService | `/api/saas/crm/*` | `/saas/crm` | ✅ |
 | Pipeline (legacy contacto) | `saas_contacts.pipeline_stage` | SaasCrmService | `/api/saas/crm/pipeline` | badge en tabla contactos | ✅ (deprecado UI) |
 | Dashboard tenant | `saas_activity_log`, jobs, billing opcional | SaasDashboardService | `/api/saas/dashboard/*` | `/saas/dashboard` | ✅ |
+| Dashboard comercial | `saas_deals` agregado | SaasDealsService | `/api/saas/deals/metrics` | sección en `/saas/dashboard` | ✅ |
 | Workflows | `saas_workflows`, `saas_workflow_runs` | SaasWorkflowService | `/api/saas/workflows/*` | `/saas/workflows` | ✅ |
 | Campañas | `saas_campanias`, recipients | SaasCampaniasService | `/api/saas/campanias/*` | `/saas/campanias` | ✅ |
 | Deals (Fase 3A+3B) | `saas_deals` (312) | SaasDealsService | `/api/saas/deals/*` | `/saas/crm` pestaña Pipeline | ✅ |

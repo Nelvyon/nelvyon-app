@@ -171,6 +171,13 @@ export default function SaasCrmPage() {
   }
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("tab") === "pipeline") {
+      setTab("pipeline");
+    }
+  }, []);
+
+  useEffect(() => {
     void refreshContacts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
