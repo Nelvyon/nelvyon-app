@@ -3,7 +3,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { saasDealsApi } from "./api";
-import type { CreateDealInput, DealListFilters, DealStage, UpdateDealInput } from "./types";
+import { applyOptimisticStageChange } from "./kanbanDragUtils";
+import type { CreateDealInput, DealListFilters, DealListResponse, DealStage, UpdateDealInput } from "./types";
 
 export const saasDealsQueryKeys = {
   all: ["saas-deals"] as const,
@@ -52,7 +53,24 @@ export function useChangeDealStage() {
   return useMutation({
     mutationFn: ({ dealId, stage, probability }: { dealId: string; stage: DealStage; probability?: number }) =>
       saasDealsApi.changeStage(dealId, stage, probability),
-    onSuccess: async () => {
+    onMutate: async ({ dealId, stage }) => {
+      await queryClient.cancelQueries({ queryKey: saasDealsQueryKeys.all });
+      const snapshots = queryClient.getQueriesData<DealListResponse>({
+        queryKey: saasDealsQueryKeys.all,
+        predicate: (q) => q.queryKey[1] === "list",
+      });
+      queryClient.setQueriesData<DealListResponse>(
+        { queryKey: saasDealsQueryKeys.all, predicate: (q) => q.queryKey[1] === "list" },
+        (old) => (old ? applyOptimisticStageChange(old, dealId, stage) : old),
+      );
+      return { snapshots };
+    },
+    onError: (_err, _vars, context) => {
+      for (const [key, data] of context?.snapshots ?? []) {
+        queryClient.setQueryData(key, data);
+      }
+    },
+    onSettled: async () => {
       await invalidateDealsQueries(queryClient);
     },
   });

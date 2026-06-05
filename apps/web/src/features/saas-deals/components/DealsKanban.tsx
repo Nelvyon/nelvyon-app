@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
+import { cn } from "@/core/ui/utils";
 
+import { resolveKanbanDrop, shouldSuppressKanbanClick } from "../kanbanDragUtils";
 import type { DealStage, SaasDeal, SaasDealsMetrics } from "../types";
 import { SAAS_DEAL_STAGES, dealStageLabel, formatDealValue, nextDealStage, prevDealStage } from "../stages";
 
@@ -30,6 +32,35 @@ export function DealsKanban({
   onSelectDeal?: (deal: SaasDeal) => void;
   onMoveStage: (deal: SaasDeal, stage: DealStage) => void;
 }) {
+  const [draggingDealId, setDraggingDealId] = useState<string | null>(null);
+  const [dragOverStage, setDragOverStage] = useState<DealStage | null>(null);
+  const lastDragEndedAt = useRef(0);
+
+  const finishDrag = useCallback(() => {
+    lastDragEndedAt.current = Date.now();
+    setDraggingDealId(null);
+    setDragOverStage(null);
+  }, []);
+
+  const handleDrop = useCallback(
+    (targetStage: DealStage) => {
+      const resolved = resolveKanbanDrop(deals, draggingDealId, targetStage);
+      if (resolved) {
+        onMoveStage(resolved.deal, resolved.stage);
+      }
+      finishDrag();
+    },
+    [deals, draggingDealId, finishDrag, onMoveStage],
+  );
+
+  const handleCardClick = useCallback(
+    (deal: SaasDeal) => {
+      if (shouldSuppressKanbanClick(lastDragEndedAt.current)) return;
+      onSelectDeal?.(deal);
+    },
+    [onSelectDeal],
+  );
+
   const byStage = useMemo(() => {
     const map = new Map<DealStage, SaasDeal[]>();
     for (const s of SAAS_DEAL_STAGES) map.set(s, []);
@@ -81,75 +112,132 @@ export function DealsKanban({
   }
 
   return (
-    <section className="grid gap-3 lg:grid-cols-3 xl:grid-cols-6">
+    <section className="grid gap-3 lg:grid-cols-3 xl:grid-cols-6" aria-label="Kanban pipeline de deals">
       {SAAS_DEAL_STAGES.map((stage) => {
         const stats = stageStats.get(stage) ?? { count: 0, totalValue: 0 };
         const cards = byStage.get(stage) ?? [];
+        const isDropTarget = dragOverStage === stage && draggingDealId !== null;
         return (
-          <NelvyonDsCard key={stage} title={dealStageLabel(stage)}>
-            <p className="mb-2 text-xs text-muted-foreground">
-              {stats.count} · {formatDealValue(stats.totalValue, currency)}
-            </p>
-            <div className="space-y-2">
-              {cards.length === 0 ? <p className="text-xs text-muted-foreground">Sin deals</p> : null}
-              {cards.map((deal) => {
-                const contact = deal.contactId ? contactsById.get(deal.contactId) : null;
-                const prev = prevDealStage(deal.stage);
-                const next = nextDealStage(deal.stage);
-                const busy = changingDealId === deal.id;
-                const selected = selectedDealId === deal.id;
-                return (
-                  <div
-                    key={deal.id}
-                    role="button"
-                    tabIndex={0}
-                    className={`cursor-pointer rounded-md border bg-card p-2 text-xs transition-colors ${
-                      selected ? "border-primary ring-1 ring-primary/30" : "border-border hover:bg-muted/40"
-                    }`}
-                    onClick={() => onSelectDeal?.(deal)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        onSelectDeal?.(deal);
-                      }
-                    }}
-                  >
-                    <p className="font-medium text-foreground">{deal.title}</p>
-                    <p className="text-muted-foreground">{contact?.name ?? "Sin contacto"}</p>
-                    <p className="text-muted-foreground">{contact?.company ?? "-"}</p>
-                    <p className="text-muted-foreground">{formatDealValue(deal.value, deal.currency || currency)}</p>
-                    <div className="mt-1 flex items-center gap-1">
-                      <NelvyonDsBadge tone="neutral">{deal.probability}%</NelvyonDsBadge>
+          <div
+            key={stage}
+            data-testid={`kanban-column-${stage}`}
+            data-stage={stage}
+            className={cn(
+              "rounded-lg transition-colors",
+              isDropTarget && "bg-primary/5 ring-2 ring-primary/50 ring-offset-2 ring-offset-background",
+            )}
+            onDragOver={(e) => {
+              e.preventDefault();
+              if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+              setDragOverStage(stage);
+            }}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              setDragOverStage(stage);
+            }}
+            onDragLeave={(e) => {
+              if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+              setDragOverStage((prev) => (prev === stage ? null : prev));
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              handleDrop(stage);
+            }}
+          >
+            <NelvyonDsCard title={dealStageLabel(stage)}>
+              <p className="mb-2 text-xs text-muted-foreground">
+                {stats.count} · {formatDealValue(stats.totalValue, currency)}
+              </p>
+              <div className="min-h-[4rem] space-y-2">
+                {cards.length === 0 ? <p className="text-xs text-muted-foreground">Sin deals</p> : null}
+                {cards.map((deal) => {
+                  const contact = deal.contactId ? contactsById.get(deal.contactId) : null;
+                  const prev = prevDealStage(deal.stage);
+                  const next = nextDealStage(deal.stage);
+                  const busy = changingDealId === deal.id;
+                  const selected = selectedDealId === deal.id;
+                  const dragging = draggingDealId === deal.id;
+                  return (
+                    <div
+                      key={deal.id}
+                      data-testid={`kanban-deal-${deal.id}`}
+                      data-deal-id={deal.id}
+                      draggable={!busy}
+                      aria-grabbed={dragging}
+                      role="button"
+                      tabIndex={0}
+                      className={cn(
+                        "rounded-md border bg-card p-2 text-xs transition-all",
+                        busy && "pointer-events-none opacity-60",
+                        dragging
+                          ? "scale-[0.98] cursor-grabbing opacity-50 ring-2 ring-primary/40"
+                          : "cursor-grab hover:bg-muted/40 active:cursor-grabbing",
+                        selected && !dragging ? "border-primary ring-1 ring-primary/30" : "border-border",
+                      )}
+                      onDragStart={(e) => {
+                        if (busy) {
+                          e.preventDefault();
+                          return;
+                        }
+                        if (e.dataTransfer) {
+                          e.dataTransfer.effectAllowed = "move";
+                          e.dataTransfer.setData("text/plain", deal.id);
+                        }
+                        setDraggingDealId(deal.id);
+                      }}
+                      onDragEnd={finishDrag}
+                      onClick={() => handleCardClick(deal)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleCardClick(deal);
+                        }
+                      }}
+                    >
+                      <p className="font-medium text-foreground">{deal.title}</p>
+                      <p className="text-muted-foreground">{contact?.name ?? "Sin contacto"}</p>
+                      <p className="text-muted-foreground">{contact?.company ?? "-"}</p>
+                      <p className="text-muted-foreground">{formatDealValue(deal.value, deal.currency || currency)}</p>
+                      <div className="mt-1 flex items-center gap-1">
+                        <NelvyonDsBadge tone="neutral">{deal.probability}%</NelvyonDsBadge>
+                        {busy ? (
+                          <span className="text-[10px] text-muted-foreground" aria-live="polite">
+                            Moviendo…
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-2 flex gap-1">
+                        <NelvyonDsButton
+                          size="sm"
+                          variant="secondary"
+                          disabled={!prev || busy}
+                          aria-label={`Mover ${deal.title} a etapa anterior`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (prev) onMoveStage(deal, prev);
+                          }}
+                        >
+                          ◀
+                        </NelvyonDsButton>
+                        <NelvyonDsButton
+                          size="sm"
+                          variant="secondary"
+                          disabled={!next || busy}
+                          aria-label={`Mover ${deal.title} a etapa siguiente`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (next) onMoveStage(deal, next);
+                          }}
+                        >
+                          ▶
+                        </NelvyonDsButton>
+                      </div>
                     </div>
-                    <div className="mt-2 flex gap-1">
-                      <NelvyonDsButton
-                        size="sm"
-                        variant="secondary"
-                        disabled={!prev || busy}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (prev) onMoveStage(deal, prev);
-                        }}
-                      >
-                        ◀
-                      </NelvyonDsButton>
-                      <NelvyonDsButton
-                        size="sm"
-                        variant="secondary"
-                        disabled={!next || busy}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (next) onMoveStage(deal, next);
-                        }}
-                      >
-                        ▶
-                      </NelvyonDsButton>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </NelvyonDsCard>
+                  );
+                })}
+              </div>
+            </NelvyonDsCard>
+          </div>
         );
       })}
     </section>
