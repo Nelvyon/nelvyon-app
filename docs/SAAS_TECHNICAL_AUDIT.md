@@ -11,9 +11,9 @@
 
 | Dimensión | Nota 0–10 | Veredicto |
 |-----------|-----------|-----------|
-| SaaS núcleo (onboarding, CRM, workflows, campañas) | **8.5** | CRM + pipeline CRUD + dashboard comercial; falta RBAC, billing enforcement y cierre legacy |
-| CRM competitivo vs HubSpot/SF | **6.0** | Contactos + deals CRUD + kanban + dashboard ventas; sin secuencias ni reporting avanzado |
-| Pipeline / deals SaaS | **8.5** | Backend 3A + UI 3B completa (kanban, CRUD, KPIs, dashboard); sin drag-drop ni analytics históricos |
+| SaaS núcleo (onboarding, CRM, workflows, campañas) | **8.8** | CRM + pipeline CRUD + dashboard + sync pipeline_stage; workflows/campañas coherentes con deals |
+| CRM competitivo vs HubSpot/SF | **6.2** | Loop comercial cerrado; pipeline_stage derivado; sin secuencias ni reporting histórico |
+| Pipeline / deals SaaS | **9.0** | saas_deals fuente oficial + sync contacto + UI 3B; falta drag-drop y deprecación formal del campo |
 | Automatizaciones | **6.0** | Workflows tenant reales; campañas simulan envío; drag-drop paralelo no integrado |
 | IA en SaaS | **5.0** | Agentes potentes en OS/backend; poca IA integrada en flujo CRM SaaS |
 | Onboarding | **7.0** | Wizard + API + bridge workspace completos |

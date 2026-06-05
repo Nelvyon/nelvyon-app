@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { pickPrimaryPipelineStage } from "./pipelineStageSync";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
 import type { ContactActivity } from "./SaasCrmService";
 
@@ -198,6 +199,41 @@ export class SaasDealsService {
     }
   }
 
+  /** Deriva saas_contacts.pipeline_stage desde deals del contacto (campo transitorio para workflows/campañas). */
+  async syncContactPipelineStage(tenantId: string, contactId: string): Promise<void> {
+    const contactRows = await this.db.query<{ id: string }>(
+      `SELECT id FROM saas_contacts WHERE tenant_id = $1 AND id = $2 LIMIT 1`,
+      [tenantId, contactId],
+    );
+    if (!contactRows[0]) return;
+
+    const deals = await this.listDeals(tenantId, { contact_id: contactId });
+    const primary =
+      pickPrimaryPipelineStage(
+        deals.map((d) => ({ stage: d.stage, value: d.value, updatedAt: d.updatedAt })),
+      ) ?? "new";
+
+    await this.db.query(
+      `UPDATE saas_contacts
+       SET pipeline_stage = $3, updated_at = NOW()
+       WHERE tenant_id = $1 AND id = $2`,
+      [tenantId, contactId, primary],
+    );
+  }
+
+  private async syncContactsAfterDealMutation(
+    tenantId: string,
+    previousContactId: string | null,
+    currentContactId: string | null,
+  ): Promise<void> {
+    const ids = new Set<string>();
+    if (currentContactId) ids.add(currentContactId);
+    if (previousContactId && previousContactId !== currentContactId) ids.add(previousContactId);
+    for (const contactId of ids) {
+      await this.syncContactPipelineStage(tenantId, contactId);
+    }
+  }
+
   async listDeals(tenantId: string, filters?: DealFilters): Promise<SaasDeal[]> {
     const clauses: string[] = ["tenant_id = $1"];
     const params: unknown[] = [tenantId];
@@ -277,7 +313,11 @@ export class SaasDealsService {
     );
     const row = rows[0];
     if (!row) throw new SaasDealsError("Failed to create deal", "CONSTRAINT");
-    return rowToDeal(row);
+    const deal = rowToDeal(row);
+    if (deal.contactId) {
+      await this.syncContactPipelineStage(tenantId, deal.contactId);
+    }
+    return deal;
   }
 
   async updateDeal(tenantId: string, dealId: string, data: UpdateDealInput): Promise<SaasDeal> {
@@ -322,7 +362,9 @@ export class SaasDealsService {
     );
     const row = rows[0];
     if (!row) throw new SaasDealsError("Deal not found", "NOT_FOUND");
-    return rowToDeal(row);
+    const deal = rowToDeal(row);
+    await this.syncContactsAfterDealMutation(tenantId, existing.contactId, deal.contactId);
+    return deal;
   }
 
   async changeStage(
@@ -340,7 +382,11 @@ export class SaasDealsService {
   }
 
   async deleteDeal(tenantId: string, dealId: string): Promise<void> {
+    const existing = await this.getDeal(tenantId, dealId);
     await this.db.query(`DELETE FROM saas_deals WHERE tenant_id = $1 AND id = $2`, [tenantId, dealId]);
+    if (existing?.contactId) {
+      await this.syncContactPipelineStage(tenantId, existing.contactId);
+    }
   }
 
   async getMetrics(tenantId: string): Promise<SaasDealsMetrics> {
@@ -425,11 +471,9 @@ export class SaasDealsService {
 
     const deals = await this.listDeals(tenantId, { contact_id: contactId });
     const totalValue = deals.reduce((s, d) => s + d.value, 0);
-    const openDeals = deals.filter((d) => isOpenDealStage(d.stage));
-    const primaryStage =
-      openDeals.sort((a, b) => b.value - a.value)[0]?.stage ??
-      deals[0]?.stage ??
-      null;
+    const primaryStage = pickPrimaryPipelineStage(
+      deals.map((d) => ({ stage: d.stage, value: d.value, updatedAt: d.updatedAt })),
+    );
 
     const actRows = await this.db.query<ActivityRow>(
       `SELECT id, contact_id, tenant_id, activity_type, description, scheduled_at, completed, created_at

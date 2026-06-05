@@ -46,7 +46,8 @@ Convertir `saas_deals` en el pipeline visible y oficial del producto SaaS en `/s
 ## Transición `pipeline_stage`
 
 - Kanban oficial lee **solo** `saas_deals`
-- Tabla contactos mantiene badge `pipeline_stage` (legacy informativo)
+- `saas_contacts.pipeline_stage` se **sincroniza** desde deals (ver `docs/PHASE_3B_PIPELINE_STAGE_SYNC.md`)
+- Tabla contactos muestra badge derivado para workflows/campañas
 - `GET /api/saas/crm/pipeline` deprecado en UI; sin eliminar backend
 
 ## Validación
