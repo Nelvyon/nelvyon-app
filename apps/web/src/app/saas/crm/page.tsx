@@ -9,6 +9,8 @@ import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader,
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { cn } from "@/core/ui/utils";
 import { ContactDealsContextPanel } from "@/features/saas-deals/components/ContactDealsContextPanel";
+import { DealDetailPanel } from "@/features/saas-deals/components/DealDetailPanel";
+import { DealFormModal } from "@/features/saas-deals/components/DealFormModal";
 import { DealsKanban } from "@/features/saas-deals/components/DealsKanban";
 import { DealsKpiRow } from "@/features/saas-deals/components/DealsKpiRow";
 import {
@@ -17,7 +19,7 @@ import {
   useSaasDealMetrics,
   useSaasDeals,
 } from "@/features/saas-deals/hooks";
-import type { DealStage } from "@/features/saas-deals/types";
+import type { DealStage, SaasDeal } from "@/features/saas-deals/types";
 
 type ContactStatus = "lead" | "prospect" | "client" | "churned";
 type PipelineStage = DealStage;
@@ -68,6 +70,11 @@ export default function SaasCrmPage() {
   const [tenantPlan, setTenantPlan] = useState<"starter" | "pro" | "enterprise">("starter");
   const [tenantCompany, setTenantCompany] = useState("");
   const [changingDealId, setChangingDealId] = useState<string | null>(null);
+  const [selectedDealId, setSelectedDealId] = useState<string | null>(null);
+  const [dealFormOpen, setDealFormOpen] = useState(false);
+  const [dealFormMode, setDealFormMode] = useState<"create" | "edit">("create");
+  const [editingDeal, setEditingDeal] = useState<SaasDeal | null>(null);
+  const [presetContactId, setPresetContactId] = useState<string | null>(null);
 
   const dealsQuery = useSaasDeals();
   const metricsQuery = useSaasDealMetrics();
@@ -85,6 +92,40 @@ export default function SaasCrmPage() {
     () => new Map(contacts.map((c) => [c.id, { name: c.name, company: c.company }])),
     [contacts],
   );
+
+  const contactOptions = useMemo(
+    () => contacts.map((c) => ({ id: c.id, name: c.name, company: c.company })),
+    [contacts],
+  );
+
+  const selectedDeal = useMemo(
+    () => (dealsQuery.data?.deals ?? []).find((d) => d.id === selectedDealId) ?? null,
+    [dealsQuery.data?.deals, selectedDealId],
+  );
+
+  function openCreateDeal(contactId?: string | null) {
+    setDealFormMode("create");
+    setEditingDeal(null);
+    setPresetContactId(contactId ?? null);
+    setDealFormOpen(true);
+  }
+
+  function openEditDeal(deal: SaasDeal) {
+    setDealFormMode("edit");
+    setEditingDeal(deal);
+    setPresetContactId(deal.contactId);
+    setDealFormOpen(true);
+  }
+
+  function openDealFromContact(deal: SaasDeal) {
+    setTab("pipeline");
+    setSelectedDealId(deal.id);
+  }
+
+  function handleDealFormSuccess(deal: SaasDeal) {
+    setSelectedDealId(deal.id);
+    void contactDetailQuery.refetch();
+  }
 
   async function loadContacts() {
     const params = new URLSearchParams();
@@ -327,6 +368,8 @@ export default function SaasCrmPage() {
                       dealsContext={contactDetailQuery.data?.dealsContext}
                       isLoading={contactDetailQuery.isLoading}
                       error={contactDetailQuery.error}
+                      onNewDeal={() => openCreateDeal(selected.id)}
+                      onSelectDeal={openDealFromContact}
                     />
 
                     <div className="space-y-2">
@@ -363,22 +406,52 @@ export default function SaasCrmPage() {
 
           {pipelineEnabled ? (
             <section className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm text-muted-foreground">
+                  Pipeline oficial basado en <strong className="text-foreground">saas_deals</strong>
+                </p>
+                <NelvyonDsButton onClick={() => openCreateDeal()}>Nuevo deal</NelvyonDsButton>
+              </div>
               <DealsKpiRow
                 metrics={metricsQuery.data?.metrics}
                 isLoading={metricsQuery.isLoading}
                 error={metricsQuery.error}
               />
-              <DealsKanban
-                deals={dealsQuery.data?.deals ?? []}
-                metrics={metricsQuery.data?.metrics}
-                contactsById={contactsById}
-                isLoading={dealsQuery.isLoading}
-                error={dealsQuery.error}
-                changingDealId={changingDealId}
-                onMoveStage={(deal, stage) => void handleMoveDealStage(deal, stage)}
-              />
+              <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                <DealsKanban
+                  deals={dealsQuery.data?.deals ?? []}
+                  metrics={metricsQuery.data?.metrics}
+                  contactsById={contactsById}
+                  isLoading={dealsQuery.isLoading}
+                  error={dealsQuery.error}
+                  changingDealId={changingDealId}
+                  selectedDealId={selectedDealId}
+                  onSelectDeal={(deal) => setSelectedDealId(deal.id)}
+                  onMoveStage={(deal, stage) => void handleMoveDealStage(deal, stage)}
+                />
+                <DealDetailPanel
+                  deal={selectedDeal}
+                  contactsById={contactsById}
+                  onEdit={openEditDeal}
+                  onDeleted={() => {
+                    setSelectedDealId(null);
+                    void contactDetailQuery.refetch();
+                  }}
+                  onClose={() => setSelectedDealId(null)}
+                />
+              </div>
             </section>
           ) : null}
+
+          <DealFormModal
+            open={dealFormOpen}
+            mode={dealFormMode}
+            deal={editingDeal}
+            presetContactId={presetContactId}
+            contacts={contactOptions}
+            onClose={() => setDealFormOpen(false)}
+            onSuccess={handleDealFormSuccess}
+          />
 
           <div className="flex gap-2">
             <NelvyonDsButton asChild variant="secondary"><Link href="/saas/dashboard">Volver a Dashboard</Link></NelvyonDsButton>

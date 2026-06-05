@@ -68,10 +68,11 @@ export function useCreateSaasDeal() {
   });
 }
 
-export function useUpdateSaasDeal(dealId: string) {
+export function useUpdateSaasDeal() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: UpdateDealInput) => saasDealsApi.update(dealId, input),
+    mutationFn: ({ dealId, input }: { dealId: string; input: UpdateDealInput }) =>
+      saasDealsApi.update(dealId, input),
     onSuccess: async () => {
       await invalidateDealsQueries(queryClient);
     },

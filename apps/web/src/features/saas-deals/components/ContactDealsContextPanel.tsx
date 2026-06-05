@@ -1,18 +1,22 @@
 "use client";
 
-import { NelvyonDsBadge, NelvyonDsStatusDot } from "@/design-system/components";
+import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsStatusDot } from "@/design-system/components";
 
-import type { ContactDealsContext } from "../types";
+import type { ContactDealsContext, SaasDeal } from "../types";
 import { dealStageLabel, formatDealValue } from "../stages";
 
 export function ContactDealsContextPanel({
   dealsContext,
   isLoading,
   error,
+  onNewDeal,
+  onSelectDeal,
 }: {
   dealsContext?: ContactDealsContext | null;
   isLoading?: boolean;
   error?: unknown;
+  onNewDeal?: () => void;
+  onSelectDeal?: (deal: SaasDeal) => void;
 }) {
   if (isLoading) {
     return (
@@ -41,7 +45,14 @@ export function ContactDealsContextPanel({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <h4 className="text-sm font-medium text-foreground">Oportunidades</h4>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h4 className="text-sm font-medium text-foreground">Oportunidades</h4>
+          {onNewDeal ? (
+            <NelvyonDsButton size="sm" variant="secondary" onClick={onNewDeal}>
+              Nuevo deal
+            </NelvyonDsButton>
+          ) : null}
+        </div>
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted-foreground">
             {dealCount} deal{dealCount === 1 ? "" : "s"} · {formatDealValue(totalValue)}
@@ -57,7 +68,19 @@ export function ContactDealsContextPanel({
       ) : (
         <ul className="space-y-2">
           {deals.map((deal) => (
-            <li key={deal.id} className="rounded-md border border-border bg-muted/30 p-2 text-sm">
+            <li
+              key={deal.id}
+              className={`rounded-md border border-border bg-muted/30 p-2 text-sm ${onSelectDeal ? "cursor-pointer hover:bg-muted/50" : ""}`}
+              onClick={() => onSelectDeal?.(deal)}
+              onKeyDown={(e) => {
+                if (onSelectDeal && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  onSelectDeal(deal);
+                }
+              }}
+              role={onSelectDeal ? "button" : undefined}
+              tabIndex={onSelectDeal ? 0 : undefined}
+            >
               <p className="font-medium text-foreground">{deal.title}</p>
               <p className="text-muted-foreground">
                 {dealStageLabel(deal.stage)} · {formatDealValue(deal.value, deal.currency)} · {deal.probability}%

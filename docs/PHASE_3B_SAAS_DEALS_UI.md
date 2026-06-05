@@ -12,6 +12,7 @@ Convertir `saas_deals` en el pipeline visible y oficial del producto SaaS en `/s
 | S2 | Kanban deals en pestaña Pipeline; cambio de etapa vía `PATCH /api/saas/deals/[id]/stage` |
 | S4 | KPIs: openCount, wonCount, lostCount, pipelineValue, forecastValue |
 | S5 | `dealsContext` en detalle contacto (`GET /api/saas/crm/contacts/[id]`) |
+| S3 | CRUD deals: crear, editar, eliminar, detalle lateral, selector contacto |
 
 ## APIs consumidas (solo frontend)
 
@@ -27,6 +28,12 @@ Convertir `saas_deals` en el pipeline visible y oficial del producto SaaS en `/s
 - `deal_stage_changed` en workflows
 - Billing, RBAC, automatizaciones nuevas
 - Dashboard comercial en `/saas/dashboard` (S6)
+
+## S3 — CRUD UI
+
+- `DealFormModal` — POST crear / PATCH editar
+- `DealDetailPanel` — detalle + eliminar con confirmación
+- Botón «Nuevo deal» en Pipeline y en detalle contacto (contacto preseleccionado)
 
 ## Transición `pipeline_stage`
 

@@ -16,6 +16,8 @@ export function DealsKanban({
   isLoading,
   error,
   changingDealId,
+  selectedDealId,
+  onSelectDeal,
   onMoveStage,
 }: {
   deals: SaasDeal[];
@@ -24,6 +26,8 @@ export function DealsKanban({
   isLoading?: boolean;
   error?: unknown;
   changingDealId?: string | null;
+  selectedDealId?: string | null;
+  onSelectDeal?: (deal: SaasDeal) => void;
   onMoveStage: (deal: SaasDeal, stage: DealStage) => void;
 }) {
   const byStage = useMemo(() => {
@@ -66,6 +70,16 @@ export function DealsKanban({
 
   const currency = metrics?.currency ?? "EUR";
 
+  if (deals.length === 0) {
+    return (
+      <NelvyonDsCard title="Pipeline de deals">
+        <p className="text-sm text-muted-foreground">
+          Aún no hay oportunidades en el pipeline. Crea el primer deal con el botón «Nuevo deal».
+        </p>
+      </NelvyonDsCard>
+    );
+  }
+
   return (
     <section className="grid gap-3 lg:grid-cols-3 xl:grid-cols-6">
       {SAAS_DEAL_STAGES.map((stage) => {
@@ -83,8 +97,23 @@ export function DealsKanban({
                 const prev = prevDealStage(deal.stage);
                 const next = nextDealStage(deal.stage);
                 const busy = changingDealId === deal.id;
+                const selected = selectedDealId === deal.id;
                 return (
-                  <div key={deal.id} className="rounded-md border border-border bg-card p-2 text-xs">
+                  <div
+                    key={deal.id}
+                    role="button"
+                    tabIndex={0}
+                    className={`cursor-pointer rounded-md border bg-card p-2 text-xs transition-colors ${
+                      selected ? "border-primary ring-1 ring-primary/30" : "border-border hover:bg-muted/40"
+                    }`}
+                    onClick={() => onSelectDeal?.(deal)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onSelectDeal?.(deal);
+                      }
+                    }}
+                  >
                     <p className="font-medium text-foreground">{deal.title}</p>
                     <p className="text-muted-foreground">{contact?.name ?? "Sin contacto"}</p>
                     <p className="text-muted-foreground">{contact?.company ?? "-"}</p>
@@ -97,7 +126,10 @@ export function DealsKanban({
                         size="sm"
                         variant="secondary"
                         disabled={!prev || busy}
-                        onClick={() => prev && onMoveStage(deal, prev)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (prev) onMoveStage(deal, prev);
+                        }}
                       >
                         ◀
                       </NelvyonDsButton>
@@ -105,7 +137,10 @@ export function DealsKanban({
                         size="sm"
                         variant="secondary"
                         disabled={!next || busy}
-                        onClick={() => next && onMoveStage(deal, next)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (next) onMoveStage(deal, next);
+                        }}
                       >
                         ▶
                       </NelvyonDsButton>
