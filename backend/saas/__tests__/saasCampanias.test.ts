@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import * as Auth from "@nelvyon/auth";
 import * as Saas from "@nelvyon/saas";
+import * as Onboarding from "../SaasOnboardingService";
 import { OsAgentError } from "@nelvyon/os-agents";
 import { GET as GET_CAMPANIAS, POST as POST_CAMPANIAS } from "../../../apps/web/src/app/api/saas/campanias/route";
 import { POST as POST_LAUNCH } from "../../../apps/web/src/app/api/saas/campanias/[campaniaId]/launch/route";
@@ -363,9 +364,9 @@ describe("API SaaS campanias", () => {
   it("API POST /api/saas/campanias → 201 con datos válidos", async () => {
     const db = makeDb();
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "t1" }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasCampaniasService").mockReturnValue(new SaasCampaniasService(db));
     const req = new Request("https://app.test/api/saas/campanias", {
       method: "POST",
@@ -382,9 +383,9 @@ describe("API SaaS campanias", () => {
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "C", body: "B", channel: "email" });
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "t1" }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasCampaniasService").mockReturnValue(svc);
     const req = new Request("https://app.test/api/saas/campanias/x/launch", { method: "POST" });
     const res = await POST_LAUNCH(req, { params: Promise.resolve({ campaniaId: c.id }) });
@@ -396,9 +397,9 @@ describe("API SaaS campanias", () => {
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "C", body: "B", channel: "email" });
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "t1" }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasCampaniasService").mockReturnValue(svc);
     const req = new Request("https://app.test/api/saas/campanias/x/stats");
     const res = await GET_STATS(req, { params: Promise.resolve({ campaniaId: c.id }) });

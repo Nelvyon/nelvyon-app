@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { pickPrimaryPipelineStage } from "./pipelineStageSync";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
 import type { ContactActivity } from "./SaasCrmService";
@@ -279,6 +280,7 @@ export class SaasDealsService {
   }
 
   async createDeal(tenantId: string, data: CreateDealInput): Promise<SaasDeal> {
+    await assertSaasPlanCanCreate(this.db, tenantId, "deals");
     const title = data.title.trim();
     if (title.length === 0) {
       throw new SaasDealsError("title is required", "VALIDATION");

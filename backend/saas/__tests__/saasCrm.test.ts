@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import * as Auth from "@nelvyon/auth";
 import * as Saas from "@nelvyon/saas";
+import * as Onboarding from "../SaasOnboardingService";
 import { OsAgentError } from "@nelvyon/os-agents";
 import { GET as GET_CONTACTS, POST as POST_CONTACTS } from "../../../apps/web/src/app/api/saas/crm/contacts/route";
 import { GET as GET_PIPELINE } from "../../../apps/web/src/app/api/saas/crm/pipeline/route";
@@ -43,6 +44,13 @@ function makeDb() {
   async function query<T>(sql: string, params?: unknown[]): Promise<T[]> {
     const s = sql.replace(/\s+/g, " ").trim();
     const p = params ?? [];
+    if (s.includes("SELECT plan FROM saas_tenants")) {
+      return [{ plan: "enterprise" }] as T[];
+    }
+    if (s.includes("COUNT(*)") && s.includes("FROM saas_contacts") && !s.includes("GROUP BY")) {
+      const tenantId = String(p[0]);
+      return [{ n: contacts.filter((c) => c.tenant_id === tenantId).length }] as T[];
+    }
     if (s.startsWith("INSERT INTO saas_contacts")) {
       const status = String(p[6]);
       const stage = String(p[7]);
@@ -282,6 +290,7 @@ describe("API CRM", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     Saas.resetSaasCrmServiceForTests();
+    Saas.resetSaasOnboardingServiceForTests();
   });
 
   it("API GET /api/saas/crm/contacts → 401 sin auth", async () => {
@@ -294,9 +303,9 @@ describe("API CRM", () => {
     const db = makeDb();
     const svc = new SaasCrmService(db);
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "x", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
-      getTenant: vi.fn().mockResolvedValue({ id: "t1" }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
+      getTenant: vi.fn().mockResolvedValue({ id: "t1", userId: "u1", plan: "starter", onboardingCompleted: true }),
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasCrmService").mockReturnValue(svc);
     const req = new Request("https://app.test/api/saas/crm/contacts", {
       method: "POST",
@@ -311,9 +320,9 @@ describe("API CRM", () => {
     const db = makeDb();
     const svc = new SaasCrmService(db);
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "x", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
-      getTenant: vi.fn().mockResolvedValue({ id: "t1" }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
+      getTenant: vi.fn().mockResolvedValue({ id: "t1", userId: "u1", plan: "starter", onboardingCompleted: true }),
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasCrmService").mockReturnValue(svc);
     const res = await GET_PIPELINE(new Request("https://app.test/api/saas/crm/pipeline"));
     expect(res.status).toBe(200);

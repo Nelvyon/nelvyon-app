@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
 import {
   getSaasDealsService,
-  getSaasOnboardingService,
+  requireSaasContext,
   SaasDealsError,
+  saasErrorBody,
+  saasErrorStatus,
   type DealStage,
 } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -19,19 +19,13 @@ function mapError(e: SaasDealsError): NextResponse {
 
 export async function GET(req: Request) {
   try {
-    const claims = await authenticate(req);
-    const onboarding = getSaasOnboardingService();
-    const tenant = await onboarding.getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-
+    const ctx = await requireSaasContext(req, "deals.read");
     const url = new URL(req.url);
     const stage = url.searchParams.get("stage") ?? undefined;
     const contactId = url.searchParams.get("contact_id") ?? undefined;
     const search = url.searchParams.get("search") ?? undefined;
     const openOnly = url.searchParams.get("open_only") === "true";
-
-    const deals = getSaasDealsService();
-    const items = await deals.listDeals(tenant.id, {
+    const items = await getSaasDealsService().listDeals(ctx.tenant.id, {
       stage: stage as DealStage | undefined,
       contact_id: contactId,
       search,
@@ -39,21 +33,14 @@ export async function GET(req: Request) {
     });
     return NextResponse.json({ deals: items, total: items.length });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasDealsError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function POST(req: Request) {
   try {
-    const claims = await authenticate(req);
-    const onboarding = getSaasOnboardingService();
-    const tenant = await onboarding.getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-
+    const ctx = await requireSaasContext(req, "deals.write");
     let body: unknown;
     try {
       body = await req.json();
@@ -67,9 +54,7 @@ export async function POST(req: Request) {
     if (typeof b.title !== "string" || b.title.trim().length === 0) {
       return NextResponse.json({ error: "title is required" }, { status: 400 });
     }
-
-    const deals = getSaasDealsService();
-    const deal = await deals.createDeal(tenant.id, {
+    const deal = await getSaasDealsService().createDeal(ctx.tenant.id, {
       title: b.title,
       contact_id: typeof b.contact_id === "string" ? b.contact_id : null,
       value: typeof b.value === "number" ? b.value : undefined,
@@ -84,10 +69,7 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ deal }, { status: 201 });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasDealsError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

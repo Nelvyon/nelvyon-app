@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 
 export type ContactStatus = "lead" | "prospect" | "client" | "churned";
 export type PipelineStage = "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
@@ -191,6 +192,7 @@ export class SaasCrmService {
   constructor(private readonly db: SaasPostgresPort) {}
 
   async createContact(tenantId: string, data: CreateContactInput): Promise<SaasContact> {
+    await assertSaasPlanCanCreate(this.db, tenantId, "contacts");
     const name = data.name.trim();
     if (name.length === 0) {
       throw new SaasCrmError("name is required", "VALIDATION");

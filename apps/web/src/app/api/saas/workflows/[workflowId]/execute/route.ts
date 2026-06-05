@@ -1,33 +1,40 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
-import { getSaasOnboardingService, getSaasWorkflowService, SaasWorkflowError } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
+import {
+  getSaasWorkflowService,
+  requireSaasContext,
+  SaasWorkflowError,
+  saasErrorBody,
+  saasErrorStatus,
+} from "@nelvyon/saas";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req: Request, ctx: { params: Promise<{ workflowId: string }> }) {
   try {
-    const claims = await authenticate(req);
+    const saasCtx = await requireSaasContext(req, "workflows.execute");
     const { workflowId } = await ctx.params;
-    const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
     let body: unknown = {};
     try {
       body = await req.json();
     } catch {
-      // noop
+      // optional body
     }
     const triggerData =
-      typeof body === "object" && body !== null && "triggerData" in body && typeof (body as { triggerData: unknown }).triggerData === "object"
+      typeof body === "object" &&
+      body !== null &&
+      "triggerData" in body &&
+      typeof (body as { triggerData: unknown }).triggerData === "object"
         ? ((body as { triggerData: Record<string, unknown> }).triggerData ?? {})
         : {};
-    const run = await getSaasWorkflowService().executeWorkflow(workflowId, tenant.id, triggerData);
+    const run = await getSaasWorkflowService().executeWorkflow(workflowId, saasCtx.tenant.id, triggerData);
     return NextResponse.json({ run });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (e instanceof SaasWorkflowError) return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
-    throw e;
+    if (e instanceof SaasWorkflowError) {
+      const status = e.code === "NOT_FOUND" ? 404 : e.code === "FORBIDDEN" ? 403 : 400;
+      return NextResponse.json({ error: e.message, code: e.code }, { status });
+    }
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

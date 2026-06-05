@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
-import { getSaasOnboardingService, getSaasWorkflowService, SaasWorkflowError } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
+import {
+  getSaasWorkflowService,
+  requireSaasContext,
+  SaasWorkflowError,
+  saasErrorBody,
+  saasErrorStatus,
+} from "@nelvyon/saas";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function mapError(e: SaasWorkflowError): NextResponse {
@@ -14,47 +18,38 @@ function mapError(e: SaasWorkflowError): NextResponse {
 
 export async function GET(req: Request, ctx: { params: Promise<{ workflowId: string }> }) {
   try {
-    const claims = await authenticate(req);
+    const saasCtx = await requireSaasContext(req, "workflows.read");
     const { workflowId } = await ctx.params;
-    const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-    const workflow = await getSaasWorkflowService().getWorkflow(tenant.id, workflowId);
+    const workflow = await getSaasWorkflowService().getWorkflow(saasCtx.tenant.id, workflowId);
     if (!workflow) return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     return NextResponse.json({ workflow });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (e instanceof SaasWorkflowError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ workflowId: string }> }) {
   try {
-    const claims = await authenticate(req);
+    const saasCtx = await requireSaasContext(req, "workflows.write");
     const { workflowId } = await ctx.params;
-    const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
     const body = (await req.json()) as Record<string, unknown>;
-    const workflow = await getSaasWorkflowService().updateWorkflow(tenant.id, workflowId, body);
+    const workflow = await getSaasWorkflowService().updateWorkflow(saasCtx.tenant.id, workflowId, body);
     return NextResponse.json({ workflow });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (e instanceof SaasWorkflowError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function DELETE(req: Request, ctx: { params: Promise<{ workflowId: string }> }) {
   try {
-    const claims = await authenticate(req);
+    const saasCtx = await requireSaasContext(req, "workflows.delete");
     const { workflowId } = await ctx.params;
-    const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-    await getSaasWorkflowService().deleteWorkflow(tenant.id, workflowId);
+    await getSaasWorkflowService().deleteWorkflow(saasCtx.tenant.id, workflowId);
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (e instanceof SaasWorkflowError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

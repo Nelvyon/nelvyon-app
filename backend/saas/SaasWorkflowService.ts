@@ -1,6 +1,7 @@
 import { DbClient } from "../db/DbClient";
 import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 
 export type WorkflowStatus = "draft" | "active" | "paused" | "archived";
 export type TriggerType = "contact_created" | "contact_updated" | "stage_changed" | "job_completed" | "manual" | "scheduled";
@@ -177,6 +178,7 @@ export class SaasWorkflowService {
   ) {}
 
   async createWorkflow(tenantId: string, data: WorkflowInput): Promise<SaasWorkflow> {
+    await assertSaasPlanCanCreate(this.db, tenantId, "workflows");
     const name = data.name.trim();
     if (name.length === 0) throw new SaasWorkflowError("name is required", "VALIDATION");
     const status = data.status ?? "draft";

@@ -1,10 +1,12 @@
 /** Visible SaaS product navigation — only modules with real tenant APIs. */
-export type SaasNavId = "dashboard" | "crm" | "pipeline" | "campanias" | "workflows" | "settings";
+export type SaasNavId = "dashboard" | "crm" | "pipeline" | "campanias" | "workflows" | "billing" | "settings";
 
 export type SaasNavItem = {
   id: SaasNavId;
   label: string;
   href: string;
+  /** Permission required to see this nav item (optional). */
+  permission?: "billing.read" | "settings.read";
 };
 
 export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
@@ -13,7 +15,8 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "pipeline", label: "Pipeline", href: "/saas/crm?tab=pipeline" },
   { id: "campanias", label: "Campanas", href: "/saas/campanias" },
   { id: "workflows", label: "Workflows", href: "/saas/workflows" },
-  { id: "settings", label: "Configuracion", href: "/dashboard/settings" },
+  { id: "billing", label: "Facturacion", href: "/saas/billing", permission: "billing.read" },
+  { id: "settings", label: "Configuracion", href: "/saas/settings", permission: "settings.read" },
 ] as const;
 
 /**
@@ -22,8 +25,9 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
  */
 export const SAAS_HIDDEN_ROUTES = {
   legacyCrm: ["/dashboard/crm", "/crm/deals", "/crm/clients"],
+  legacyBilling: ["/dashboard/settings"],
   os: ["/os/execution"],
-  viteOnly: ["/saas/pipelines", "/saas/billing", "/saas/settings"],
+  viteOnly: ["/saas/pipelines"],
   f62Modules: [
     "/saas/dashboard/affiliates",
     "/saas/dashboard/cpq",
@@ -49,4 +53,11 @@ export const SAAS_HIDDEN_ROUTES = {
 
 export function isSaasNavActive(activeId: SaasNavId, itemId: SaasNavId): boolean {
   return activeId === itemId;
+}
+
+export function filterSaasNavForPermissions(
+  permissions: readonly string[],
+  items: readonly SaasNavItem[] = SAAS_NAV_ITEMS,
+): SaasNavItem[] {
+  return items.filter((item) => !item.permission || permissions.includes(item.permission));
 }

@@ -38,6 +38,7 @@ export {
   resetSaasCrmEtlServiceForTests,
   type SaasCrmEtlReport,
   type EtlMode,
+  type CrmEtlRunOptions,
   type EtlConflict,
 } from "./SaasCrmEtlService";
 export {
@@ -96,10 +97,18 @@ export {
   mapLegacyDealStageToSaas,
   etlDealLegacySourceTag,
   isOpenDealStage,
+  pickDealEtlWinner,
   OPEN_DEAL_STAGES,
   type DealStage,
   type DealEtlSource,
 } from "./saasDealsDedupe";
+export {
+  pickContactEtlWinner,
+} from "./saasCrmDedupe";
+export {
+  BlockBFinalAuditService,
+  type BlockBFinalAuditReport,
+} from "./BlockBFinalAudit";
 export {
   SaasWorkflowService,
   SaasWorkflowError,
@@ -295,3 +304,43 @@ export {
   type InvoiceStats,
   type InvoicingServiceDeps,
 } from "./InvoicingService";
+export {
+  canSaasPerform,
+  assertSaasPermission,
+  mapWorkspaceRoleToSaas,
+  listPermissionsForRole,
+  SaasRbacError,
+  type SaasRole,
+  type SaasAction,
+} from "./saasRbac";
+export {
+  getSaasPlanLimits,
+  getSaasPlanLimit,
+  assertBelowPlanLimit,
+  SaasPlanQuotaError,
+  type SaasPlanResource,
+  type SaasPlanLimits,
+} from "./saasPlanLimits";
+export {
+  assertSaasPlanCanCreate,
+  getSaasResourceUsage,
+  getSaasTenantPlan,
+} from "./saasPlanQuota";
+export {
+  SaasPlanQuotaService,
+  getSaasPlanQuotaService,
+  resetSaasPlanQuotaServiceForTests,
+} from "./SaasPlanQuotaService";
+export {
+  requireSaasContext,
+  saasErrorStatus,
+  saasErrorBody,
+  type SaasRequestContext,
+} from "./saasRequestContext";
+export {
+  buildSaasBillingSummary,
+  buildSaasSettingsSummary,
+  type SaasBillingSummary,
+  type SaasSettingsSummary,
+  type SaasUsageCounts,
+} from "./SaasBillingService";

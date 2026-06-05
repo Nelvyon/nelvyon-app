@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import * as Auth from "@nelvyon/auth";
 import * as Saas from "@nelvyon/saas";
+import * as Onboarding from "../SaasOnboardingService";
 import { OsAgentError } from "@nelvyon/os-agents";
 import { GET as GET_DASHBOARD } from "../../../apps/web/src/app/api/saas/dashboard/route";
 import { GET as GET_ACTIVITY, POST as POST_ACTIVITY } from "../../../apps/web/src/app/api/saas/dashboard/activity/route";
@@ -206,9 +207,9 @@ describe("API SaaS dashboard", () => {
     const db = makeMemoryDb();
     const svc = new SaasDashboardService(db);
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "tenant-uuid-1", onboardingCompleted: true }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasDashboardService").mockReturnValue(svc);
     const res = await GET_DASHBOARD(new Request("https://app.test/api/saas/dashboard"));
     expect(res.status).toBe(200);
@@ -219,9 +220,9 @@ describe("API SaaS dashboard", () => {
     const svc = new SaasDashboardService(db);
     await svc.logActivity("tenant-uuid-1", "evt", "hello");
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "tenant-uuid-1", onboardingCompleted: true }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasDashboardService").mockReturnValue(svc);
     const res = await GET_ACTIVITY(new Request("https://app.test/api/saas/dashboard/activity"));
     expect(res.status).toBe(200);
@@ -233,9 +234,9 @@ describe("API SaaS dashboard", () => {
     const db = makeMemoryDb();
     const svc = new SaasDashboardService(db);
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "tenant-uuid-1", onboardingCompleted: true }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasDashboardService").mockReturnValue(svc);
     const req = new Request("https://app.test/api/saas/dashboard/activity", {
       method: "POST",
@@ -250,9 +251,9 @@ describe("API SaaS dashboard", () => {
     const db = makeMemoryDb();
     const svc = new SaasDashboardService(db);
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "tenant-uuid-1", onboardingCompleted: true }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasDashboardService").mockReturnValue(svc);
     const req = new Request("https://app.test/api/saas/dashboard/activity", {
       method: "POST",

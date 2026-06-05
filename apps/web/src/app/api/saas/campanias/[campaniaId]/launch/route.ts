@@ -1,23 +1,27 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
-import { getSaasCampaniasService, getSaasOnboardingService, SaasCampaniasError } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
+import {
+  getSaasCampaniasService,
+  requireSaasContext,
+  SaasCampaniasError,
+  saasErrorBody,
+  saasErrorStatus,
+} from "@nelvyon/saas";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req: Request, ctx: { params: Promise<{ campaniaId: string }> }) {
   try {
-    const claims = await authenticate(req);
+    const saasCtx = await requireSaasContext(req, "campanias.launch");
     const { campaniaId } = await ctx.params;
-    const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-    const result = await getSaasCampaniasService().launchCampania(tenant.id, campaniaId);
+    const result = await getSaasCampaniasService().launchCampania(saasCtx.tenant.id, campaniaId);
     return NextResponse.json({ result });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (e instanceof SaasCampaniasError) return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
-    throw e;
+    if (e instanceof SaasCampaniasError) {
+      const status = e.code === "NOT_FOUND" ? 404 : e.code === "FORBIDDEN" ? 403 : 400;
+      return NextResponse.json({ error: e.message, code: e.code }, { status });
+    }
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

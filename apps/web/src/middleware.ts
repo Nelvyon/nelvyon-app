@@ -20,6 +20,8 @@ function isProtectedPath(pathname: string): boolean {
     pathname.startsWith("/saas/dashboard") ||
     pathname.startsWith("/saas/crm") ||
     pathname.startsWith("/saas/campanas") ||
+    pathname.startsWith("/saas/workflows") ||
+    pathname.startsWith("/saas/billing") ||
     pathname.startsWith("/saas/chatbot") ||
     pathname.startsWith("/saas/seo") ||
     pathname.startsWith("/saas/social") ||

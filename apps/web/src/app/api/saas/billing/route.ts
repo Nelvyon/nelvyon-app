@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 
 import {
-  getSaasDashboardService,
+  buildSaasBillingSummary,
   requireSaasContext,
-  SaasDashboardError,
   saasErrorBody,
   saasErrorStatus,
 } from "@nelvyon/saas";
@@ -13,13 +12,10 @@ export const runtime = "nodejs";
 
 export async function GET(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
-    const summary = await getSaasDashboardService().getDashboardSummary(ctx.tenant.id);
+    const ctx = await requireSaasContext(req, "billing.read");
+    const summary = await buildSaasBillingSummary(ctx.tenant, ctx.role);
     return NextResponse.json(summary);
   } catch (e: unknown) {
-    if (e instanceof SaasDashboardError && e.code === "NOT_FOUND") {
-      return NextResponse.json({ error: e.message }, { status: 404 });
-    }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

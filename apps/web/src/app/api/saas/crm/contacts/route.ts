@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
-import { getSaasCrmService, getSaasOnboardingService, SaasCrmError, type ContactStatus, type PipelineStage } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
+import {
+  getSaasCrmService,
+  SaasCrmError,
+  saasErrorBody,
+  saasErrorStatus,
+  requireSaasContext,
+  type ContactStatus,
+  type PipelineStage,
+} from "@nelvyon/saas";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function mapError(e: SaasCrmError): NextResponse {
@@ -14,37 +20,27 @@ function mapError(e: SaasCrmError): NextResponse {
 
 export async function GET(req: Request) {
   try {
-    const claims = await authenticate(req);
-    const onboarding = getSaasOnboardingService();
-    const tenant = await onboarding.getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+    const ctx = await requireSaasContext(req, "contacts.read");
     const url = new URL(req.url);
     const status = url.searchParams.get("status") ?? undefined;
     const stage = url.searchParams.get("stage") ?? undefined;
     const search = url.searchParams.get("search") ?? undefined;
     const crm = getSaasCrmService();
-    const contacts = await crm.getContacts(tenant.id, {
+    const contacts = await crm.getContacts(ctx.tenant.id, {
       status: status as ContactStatus | undefined,
       pipeline_stage: stage as PipelineStage | undefined,
       search,
     });
     return NextResponse.json({ contacts });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasCrmError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function POST(req: Request) {
   try {
-    const claims = await authenticate(req);
-    const onboarding = getSaasOnboardingService();
-    const tenant = await onboarding.getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-
+    const ctx = await requireSaasContext(req, "contacts.write");
     let body: unknown;
     try {
       body = await req.json();
@@ -59,7 +55,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "name is required" }, { status: 400 });
     }
     const crm = getSaasCrmService();
-    const contact = await crm.createContact(tenant.id, {
+    const contact = await crm.createContact(ctx.tenant.id, {
       name: b.name,
       email: typeof b.email === "string" ? b.email : null,
       phone: typeof b.phone === "string" ? b.phone : null,
@@ -73,10 +69,7 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ contact }, { status: 201 });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasCrmError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

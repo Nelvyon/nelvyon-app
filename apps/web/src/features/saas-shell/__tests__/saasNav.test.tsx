@@ -1,6 +1,6 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SaasSidebar } from "../components/SaasSidebar";
 import { SAAS_NAV_ITEMS, SAAS_HIDDEN_ROUTES, isSaasNavActive } from "../saasNav";
@@ -9,10 +9,20 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
 }));
 
+beforeEach(() => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ permissions: ["billing.read", "settings.read"] }),
+    }),
+  );
+});
+
 describe("saasNav", () => {
   it("lists only production-ready SaaS modules", () => {
     const labels = SAAS_NAV_ITEMS.map((i) => i.label);
-    expect(labels).toEqual(["Dashboard", "CRM", "Pipeline", "Campanas", "Workflows", "Configuracion"]);
+    expect(labels).toEqual(["Dashboard", "CRM", "Pipeline", "Campanas", "Workflows", "Facturacion", "Configuracion"]);
     expect(labels).not.toContain("Servicios");
   });
 
@@ -33,11 +43,15 @@ describe("saasNav", () => {
 });
 
 describe("SaasSidebar", () => {
-  it("renders clickable nav links for active modules", () => {
+  it("renders clickable nav links for active modules", async () => {
     render(<SaasSidebar activeId="dashboard" tenantCompany="Acme" tenantPlan="pro" />);
     expect(screen.getByTestId("saas-sidebar")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Facturacion" })).toBeInTheDocument();
+    });
     expect(screen.getByRole("link", { name: "CRM" })).toHaveAttribute("href", "/saas/crm");
     expect(screen.getByRole("link", { name: "Pipeline" })).toHaveAttribute("href", "/saas/crm?tab=pipeline");
-    expect(screen.queryByRole("link", { name: "Servicios" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Facturacion" })).toHaveAttribute("href", "/saas/billing");
+    expect(screen.getByRole("link", { name: "Configuracion" })).toHaveAttribute("href", "/saas/settings");
   });
 });

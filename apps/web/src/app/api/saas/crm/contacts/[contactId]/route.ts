@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
 import {
   getSaasCrmService,
   getSaasDealsService,
-  getSaasOnboardingService,
+  requireSaasContext,
   SaasCrmError,
+  saasErrorBody,
+  saasErrorStatus,
   type ContactStatus,
   type PipelineStage,
 } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function mapError(e: SaasCrmError): NextResponse {
@@ -19,38 +19,24 @@ function mapError(e: SaasCrmError): NextResponse {
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }
 
-async function resolveTenantId(req: Request): Promise<string> {
-  const claims = await authenticate(req);
-  const onboarding = getSaasOnboardingService();
-  const tenant = await onboarding.getTenant(claims.userId);
-  if (!tenant) {
-    throw new SaasCrmError("Tenant not found", "NOT_FOUND");
-  }
-  return tenant.id;
-}
-
 export async function GET(req: Request, context: { params: Promise<{ contactId: string }> }) {
   try {
-    const tenantId = await resolveTenantId(req);
+    const ctx = await requireSaasContext(req, "contacts.read");
     const { contactId } = await context.params;
     const crm = getSaasCrmService();
-    const contact = await crm.getContact(tenantId, contactId);
+    const contact = await crm.getContact(ctx.tenant.id, contactId);
     if (!contact) return NextResponse.json({ error: "Contact not found" }, { status: 404 });
-    const dealsSvc = getSaasDealsService();
-    const dealsContext = await dealsSvc.getContactDealsContext(tenantId, contactId);
+    const dealsContext = await getSaasDealsService().getContactDealsContext(ctx.tenant.id, contactId);
     return NextResponse.json({ contact, dealsContext });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasCrmError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function PATCH(req: Request, context: { params: Promise<{ contactId: string }> }) {
   try {
-    const tenantId = await resolveTenantId(req);
+    const ctx = await requireSaasContext(req, "contacts.write");
     const { contactId } = await context.params;
     let body: unknown;
     try {
@@ -62,8 +48,7 @@ export async function PATCH(req: Request, context: { params: Promise<{ contactId
       return NextResponse.json({ error: "Body must be an object" }, { status: 400 });
     }
     const b = body as Record<string, unknown>;
-    const crm = getSaasCrmService();
-    const contact = await crm.updateContact(tenantId, contactId, {
+    const contact = await getSaasCrmService().updateContact(ctx.tenant.id, contactId, {
       name: typeof b.name === "string" ? b.name : undefined,
       email: typeof b.email === "string" ? b.email : undefined,
       phone: typeof b.phone === "string" ? b.phone : undefined,
@@ -77,26 +62,19 @@ export async function PATCH(req: Request, context: { params: Promise<{ contactId
     });
     return NextResponse.json({ contact });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasCrmError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function DELETE(req: Request, context: { params: Promise<{ contactId: string }> }) {
   try {
-    const tenantId = await resolveTenantId(req);
+    const ctx = await requireSaasContext(req, "contacts.delete");
     const { contactId } = await context.params;
-    const crm = getSaasCrmService();
-    await crm.deleteContact(tenantId, contactId);
+    await getSaasCrmService().deleteContact(ctx.tenant.id, contactId);
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasCrmError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

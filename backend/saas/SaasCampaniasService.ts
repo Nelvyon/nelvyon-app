@@ -1,6 +1,7 @@
 import { DbClient } from "../db/DbClient";
 import type { ContactStatus, PipelineStage } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 
 export type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
 export type CampaniaChannel = "email" | "sms" | "notification" | "multi";
@@ -204,6 +205,7 @@ export class SaasCampaniasService {
   constructor(private readonly db: SaasPostgresPort) {}
 
   async createCampania(tenantId: string, data: CreateCampaniaInput): Promise<SaasCampania> {
+    await assertSaasPlanCanCreate(this.db, tenantId, "campanias");
     const name = data.name.trim();
     const body = data.body.trim();
     if (!name) throw new SaasCampaniasError("name is required", "VALIDATION");

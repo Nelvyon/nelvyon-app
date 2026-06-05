@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { cn } from "@/core/ui/utils";
 import { resetUser } from "@/lib/analytics";
 
-import { SAAS_NAV_ITEMS, isSaasNavActive, type SaasNavId } from "../saasNav";
+import { SAAS_NAV_ITEMS, filterSaasNavForPermissions, isSaasNavActive, type SaasNavId } from "../saasNav";
 
 function planTone(plan: "starter" | "pro" | "enterprise"): "primary" | "success" | "warning" {
   if (plan === "enterprise") return "warning";
@@ -28,6 +29,19 @@ export function SaasSidebar({
   showLanguageSelector?: boolean;
 }) {
   const router = useRouter();
+  const [permissions, setPermissions] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    void fetch("/api/saas/settings", { credentials: "same-origin" })
+      .then(async (res) => (res.ok ? ((await res.json()) as { permissions?: string[] }) : null))
+      .then((body) => setPermissions(body?.permissions ?? []))
+      .catch(() => setPermissions([]));
+  }, []);
+
+  const visibleItems = useMemo(() => {
+    if (permissions === null) return [...SAAS_NAV_ITEMS];
+    return filterSaasNavForPermissions(permissions);
+  }, [permissions]);
 
   return (
     <aside className="space-y-4" data-testid="saas-sidebar">
@@ -35,7 +49,7 @@ export function SaasSidebar({
         <div className="text-lg font-semibold text-foreground">NELVYON</div>
         {showLanguageSelector ? <LanguageSelector /> : null}
         <nav className="space-y-1" aria-label="Navegación SaaS">
-          {SAAS_NAV_ITEMS.map((item) => {
+          {visibleItems.map((item) => {
             const active = isSaasNavActive(activeId, item.id);
             return (
               <Link

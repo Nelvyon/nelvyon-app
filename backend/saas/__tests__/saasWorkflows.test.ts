@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import * as Auth from "@nelvyon/auth";
 import * as Saas from "@nelvyon/saas";
+import * as Onboarding from "../SaasOnboardingService";
 import { OsAgentError } from "@nelvyon/os-agents";
 import { GET as GET_WORKFLOWS, POST as POST_WORKFLOWS } from "../../../apps/web/src/app/api/saas/workflows/route";
 import { POST as POST_EXECUTE } from "../../../apps/web/src/app/api/saas/workflows/[workflowId]/execute/route";
@@ -324,9 +325,9 @@ describe("API SaaS workflows", () => {
   it("API POST /api/saas/workflows → 201 con datos válidos", async () => {
     const db = makeDb();
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "t1" }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasWorkflowService").mockReturnValue(new SaasWorkflowService(db, new SaasCrmService(db)));
     const req = new Request("https://app.test/api/saas/workflows", {
       method: "POST",
@@ -342,9 +343,9 @@ describe("API SaaS workflows", () => {
     const svc = new SaasWorkflowService(db, new SaasCrmService(db));
     const wf = await svc.createWorkflow("t1", { name: "WF", triggerType: "manual", actions: [{ type: "notify", config: { message: "ok" } }] as never[] });
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
       getTenant: vi.fn().mockResolvedValue({ id: "t1" }),
-    } as unknown as ReturnType<typeof Saas.getSaasOnboardingService>);
+    } as unknown as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasWorkflowService").mockReturnValue(svc);
     const req = new Request(`https://app.test/api/saas/workflows/${wf.id}/execute`, {
       method: "POST",

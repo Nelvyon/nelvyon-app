@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
-import { getSaasCrmService, getSaasOnboardingService, SaasCrmError, type ActivityType } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
+import {
+  getSaasCrmService,
+  requireSaasContext,
+  SaasCrmError,
+  saasErrorBody,
+  saasErrorStatus,
+  type ActivityType,
+} from "@nelvyon/saas";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function mapError(e: SaasCrmError): NextResponse {
@@ -12,35 +17,21 @@ function mapError(e: SaasCrmError): NextResponse {
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }
 
-async function resolveTenantId(req: Request): Promise<string> {
-  const claims = await authenticate(req);
-  const onboarding = getSaasOnboardingService();
-  const tenant = await onboarding.getTenant(claims.userId);
-  if (!tenant) {
-    throw new SaasCrmError("Tenant not found", "NOT_FOUND");
-  }
-  return tenant.id;
-}
-
 export async function GET(req: Request, context: { params: Promise<{ contactId: string }> }) {
   try {
-    const tenantId = await resolveTenantId(req);
+    const ctx = await requireSaasContext(req, "contacts.read");
     const { contactId } = await context.params;
-    const crm = getSaasCrmService();
-    const activity = await crm.getActivities(contactId, tenantId);
+    const activity = await getSaasCrmService().getActivities(contactId, ctx.tenant.id);
     return NextResponse.json({ activity });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasCrmError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function POST(req: Request, context: { params: Promise<{ contactId: string }> }) {
   try {
-    const tenantId = await resolveTenantId(req);
+    const ctx = await requireSaasContext(req, "contacts.write");
     const { contactId } = await context.params;
     let body: unknown;
     try {
@@ -58,8 +49,7 @@ export async function POST(req: Request, context: { params: Promise<{ contactId:
     if (typeof b.description !== "string" || b.description.trim().length === 0) {
       return NextResponse.json({ error: "description is required" }, { status: 400 });
     }
-    const crm = getSaasCrmService();
-    const activity = await crm.addActivity(contactId, tenantId, {
+    const activity = await getSaasCrmService().addActivity(contactId, ctx.tenant.id, {
       activityType: b.activityType as ActivityType,
       description: b.description,
       scheduledAt: typeof b.scheduledAt === "string" ? b.scheduledAt : null,
@@ -67,10 +57,7 @@ export async function POST(req: Request, context: { params: Promise<{ contactId:
     });
     return NextResponse.json({ activity }, { status: 201 });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (e instanceof SaasCrmError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

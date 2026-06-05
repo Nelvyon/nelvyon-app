@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
-import { getSaasCampaniasService, getSaasOnboardingService, SaasCampaniasError } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
+import {
+  getSaasCampaniasService,
+  requireSaasContext,
+  SaasCampaniasError,
+  saasErrorBody,
+  saasErrorStatus,
+} from "@nelvyon/saas";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function mapError(e: SaasCampaniasError): NextResponse {
@@ -14,47 +18,38 @@ function mapError(e: SaasCampaniasError): NextResponse {
 
 export async function GET(req: Request, ctx: { params: Promise<{ campaniaId: string }> }) {
   try {
-    const claims = await authenticate(req);
+    const saasCtx = await requireSaasContext(req, "campanias.read");
     const { campaniaId } = await ctx.params;
-    const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-    const campania = await getSaasCampaniasService().getCampania(tenant.id, campaniaId);
+    const campania = await getSaasCampaniasService().getCampania(saasCtx.tenant.id, campaniaId);
     if (!campania) return NextResponse.json({ error: "Campania not found" }, { status: 404 });
     return NextResponse.json({ campania });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (e instanceof SaasCampaniasError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ campaniaId: string }> }) {
   try {
-    const claims = await authenticate(req);
+    const saasCtx = await requireSaasContext(req, "campanias.write");
     const { campaniaId } = await ctx.params;
-    const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
     const body = (await req.json()) as Record<string, unknown>;
-    const campania = await getSaasCampaniasService().updateCampania(tenant.id, campaniaId, body);
+    const campania = await getSaasCampaniasService().updateCampania(saasCtx.tenant.id, campaniaId, body);
     return NextResponse.json({ campania });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (e instanceof SaasCampaniasError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
 export async function DELETE(req: Request, ctx: { params: Promise<{ campaniaId: string }> }) {
   try {
-    const claims = await authenticate(req);
+    const saasCtx = await requireSaasContext(req, "campanias.delete");
     const { campaniaId } = await ctx.params;
-    const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-    await getSaasCampaniasService().deleteCampania(tenant.id, campaniaId);
+    await getSaasCampaniasService().deleteCampania(saasCtx.tenant.id, campaniaId);
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (e instanceof SaasCampaniasError) return mapError(e);
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

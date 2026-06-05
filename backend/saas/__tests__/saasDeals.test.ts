@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import * as Auth from "@nelvyon/auth";
 import * as Saas from "@nelvyon/saas";
+import * as Onboarding from "../SaasOnboardingService";
 import { OsAgentError } from "@nelvyon/os-agents";
 import { GET as GET_DEALS, POST as POST_DEALS } from "../../../apps/web/src/app/api/saas/deals/route";
 import { GET as GET_METRICS } from "../../../apps/web/src/app/api/saas/deals/metrics/route";
@@ -32,6 +33,14 @@ function makeDb() {
   async function query<T>(sql: string, params?: unknown[]): Promise<T[]> {
     const s = sql.replace(/\s+/g, " ").trim();
     const p = params ?? [];
+
+    if (s.includes("SELECT plan FROM saas_tenants")) {
+      return [{ plan: "enterprise" }] as T[];
+    }
+    if (s.includes("COUNT(*)") && s.includes("FROM saas_deals")) {
+      const tenantId = String(p[0]);
+      return [{ n: deals.filter((d) => d.tenant_id === tenantId).length }] as T[];
+    }
 
     if (s.startsWith("SELECT id FROM saas_contacts WHERE tenant_id")) {
       const key = `${p[0]}:${p[1]}`;
@@ -171,9 +180,17 @@ describe("API /api/saas/deals", () => {
   it("POST → 201 crea deal", async () => {
     const db = makeDb();
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "a@test.com", role: "admin" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
-      getTenant: async () => ({ id: "tenant-1", userId: "u1", plan: "starter", name: "T", createdAt: "", updatedAt: "" }),
-    } as ReturnType<typeof Saas.getSaasOnboardingService>);
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
+      getTenant: async () => ({
+        id: "tenant-1",
+        userId: "u1",
+        plan: "starter",
+        companyName: "T",
+        onboardingCompleted: true,
+        createdAt: "",
+        updatedAt: "",
+      }),
+    } as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasDealsService").mockReturnValue(new SaasDealsService(db));
 
     const req = new Request("https://app.test/api/saas/deals", {
@@ -190,9 +207,17 @@ describe("API /api/saas/deals", () => {
   it("GET metrics → 200", async () => {
     const db = makeDb();
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "a@test.com", role: "admin" });
-    vi.spyOn(Saas, "getSaasOnboardingService").mockReturnValue({
-      getTenant: async () => ({ id: "tenant-1", userId: "u1", plan: "starter", name: "T", createdAt: "", updatedAt: "" }),
-    } as ReturnType<typeof Saas.getSaasOnboardingService>);
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
+      getTenant: async () => ({
+        id: "tenant-1",
+        userId: "u1",
+        plan: "starter",
+        companyName: "T",
+        onboardingCompleted: true,
+        createdAt: "",
+        updatedAt: "",
+      }),
+    } as ReturnType<typeof Onboarding.getSaasOnboardingService>);
     vi.spyOn(Saas, "getSaasDealsService").mockReturnValue(new SaasDealsService(db));
 
     const res = await GET_METRICS(new Request("https://app.test/api/saas/deals/metrics"));
