@@ -1,9 +1,9 @@
 # NELVYON SaaS — Auditoría técnica completa
 
-**Fecha:** junio 2026  
+**Fecha:** junio 2026 (actualizado tras Fase 3B)  
 **Alcance:** producto SaaS tenant (`/saas/*`, `/api/saas/*`, `backend/saas/*`).  
 **Excluido:** web pública/marketing (congelada), NELVYON OS interno (cerrado salvo lectura).  
-**Método:** revisión de código, migraciones, tests, docs de fases 1A–3A y estado git.
+**Método:** revisión de código, migraciones, tests, docs de fases 1A–3B y estado git.
 
 ---
 
@@ -11,9 +11,9 @@
 
 | Dimensión | Nota 0–10 | Veredicto |
 |-----------|-----------|-----------|
-| SaaS núcleo (onboarding, CRM, workflows, campañas) | **6.5** | Usable en MVP; falta deals UI, RBAC y cierre legacy |
-| CRM competitivo vs HubSpot/SF | **4.0** | Contactos reales; sin deals en producto, sin secuencias, reporting débil |
-| Pipeline / deals SaaS | **3.5** | Backend 3A escrito **sin commit**; UI sigue en `saas_contacts.pipeline_stage` |
+| SaaS núcleo (onboarding, CRM, workflows, campañas) | **7.5** | CRM + pipeline deals en producto; falta RBAC, CRUD deals UI completo y cierre legacy |
+| CRM competitivo vs HubSpot/SF | **5.0** | Contactos + dealsContext + kanban; sin secuencias, scoring UI ni reporting avanzado |
+| Pipeline / deals SaaS | **7.0** | Backend 3A + UI 3B en `/saas/crm`; kanban y KPIs sobre `saas_deals`; sin drag-drop ni dashboard comercial |
 | Automatizaciones | **6.0** | Workflows tenant reales; campañas simulan envío; drag-drop paralelo no integrado |
 | IA en SaaS | **5.0** | Agentes potentes en OS/backend; poca IA integrada en flujo CRM SaaS |
 | Onboarding | **7.0** | Wizard + API + bridge workspace completos |
@@ -33,11 +33,11 @@
 |--------|-----------|----------|---------|------------|-------|
 | Onboarding | `saas_tenants` | SaasOnboardingService | `/api/saas/onboarding/*` | `/saas/onboarding` | ✅ |
 | CRM contactos | `saas_contacts`, `saas_contact_activities` | SaasCrmService | `/api/saas/crm/*` | `/saas/crm` | ✅ |
-| Pipeline (hoy) | agrega `saas_contacts.pipeline_stage` | SaasCrmService | `/api/saas/crm/pipeline` | pestaña en CRM | ✅ |
+| Pipeline (legacy contacto) | `saas_contacts.pipeline_stage` | SaasCrmService | `/api/saas/crm/pipeline` | badge en tabla contactos | ✅ (deprecado UI) |
 | Dashboard tenant | `saas_activity_log`, jobs, billing opcional | SaasDashboardService | `/api/saas/dashboard/*` | `/saas/dashboard` | ✅ |
 | Workflows | `saas_workflows`, `saas_workflow_runs` | SaasWorkflowService | `/api/saas/workflows/*` | `/saas/workflows` | ✅ |
 | Campañas | `saas_campanias`, recipients | SaasCampaniasService | `/api/saas/campanias/*` | `/saas/campanias` | ✅ |
-| Deals (Fase 3A) | `saas_deals` (312) | SaasDealsService | `/api/saas/deals/*` | **❌ ninguna** | ✅ (local) |
+| Deals (Fase 3A+3B) | `saas_deals` (312) | SaasDealsService | `/api/saas/deals/*` | `/saas/crm` pestaña Pipeline | ✅ |
 | Reports | — | saas-reports | `/api/saas/reports/*` | parcial | parcial |
 
 ### 1.2 Infraestructura tenant

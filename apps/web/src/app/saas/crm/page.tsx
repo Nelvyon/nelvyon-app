@@ -8,9 +8,19 @@ import { useRouter } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { cn } from "@/core/ui/utils";
+import { ContactDealsContextPanel } from "@/features/saas-deals/components/ContactDealsContextPanel";
+import { DealsKanban } from "@/features/saas-deals/components/DealsKanban";
+import { DealsKpiRow } from "@/features/saas-deals/components/DealsKpiRow";
+import {
+  useChangeDealStage,
+  useSaasContactDetail,
+  useSaasDealMetrics,
+  useSaasDeals,
+} from "@/features/saas-deals/hooks";
+import type { DealStage } from "@/features/saas-deals/types";
 
 type ContactStatus = "lead" | "prospect" | "client" | "churned";
-type PipelineStage = "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
+type PipelineStage = DealStage;
 type ActivityType = "note" | "call" | "email" | "meeting" | "task";
 
 type SaasContact = {
@@ -34,8 +44,6 @@ type ContactActivity = {
   createdAt: string;
 };
 
-type PipelineSummaryItem = { stage: PipelineStage; count: number; totalValue: number };
-
 const NAV = ["Dashboard", "Servicios", "CRM", "Workflows", "Campanas", "Configuracion"] as const;
 const STAGES: PipelineStage[] = ["new", "contacted", "qualified", "proposal", "won", "lost"];
 
@@ -45,8 +53,7 @@ export default function SaasCrmPage() {
   const [tab, setTab] = useState<"contacts" | "pipeline">("contacts");
   const [loading, setLoading] = useState(true);
   const [contacts, setContacts] = useState<SaasContact[]>([]);
-  const [pipeline, setPipeline] = useState<PipelineSummaryItem[]>([]);
-  const [selected, setSelected] = useState<SaasContact | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activities, setActivities] = useState<ContactActivity[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | ContactStatus>("");
@@ -60,6 +67,24 @@ export default function SaasCrmPage() {
   const [activityDesc, setActivityDesc] = useState("");
   const [tenantPlan, setTenantPlan] = useState<"starter" | "pro" | "enterprise">("starter");
   const [tenantCompany, setTenantCompany] = useState("");
+  const [changingDealId, setChangingDealId] = useState<string | null>(null);
+
+  const dealsQuery = useSaasDeals();
+  const metricsQuery = useSaasDealMetrics();
+  const changeStageMutation = useChangeDealStage();
+  const contactDetailQuery = useSaasContactDetail(selectedId);
+
+  const selected = useMemo((): SaasContact | null => {
+    const fromList = contacts.find((c) => c.id === selectedId);
+    if (fromList) return fromList;
+    const fromDetail = contactDetailQuery.data?.contact;
+    return fromDetail ? { ...fromDetail, tags: fromDetail.tags ?? [] } : null;
+  }, [contacts, selectedId, contactDetailQuery.data?.contact]);
+
+  const contactsById = useMemo(
+    () => new Map(contacts.map((c) => [c.id, { name: c.name, company: c.company }])),
+    [contacts],
+  );
 
   async function loadContacts() {
     const params = new URLSearchParams();
@@ -74,13 +99,6 @@ export default function SaasCrmPage() {
     if (!res.ok) throw new Error(t("common.error"));
     const body = (await res.json()) as { contacts: SaasContact[] };
     setContacts(body.contacts ?? []);
-  }
-
-  async function loadPipeline() {
-    const res = await fetch("/api/saas/crm/pipeline", { credentials: "same-origin" });
-    if (!res.ok) throw new Error(t("common.error"));
-    const body = (await res.json()) as { pipeline: PipelineSummaryItem[] };
-    setPipeline(body.pipeline ?? []);
   }
 
   async function loadTenant() {
@@ -99,11 +117,11 @@ export default function SaasCrmPage() {
     setTenantPlan(body.tenant.plan);
   }
 
-  async function refreshAll() {
+  async function refreshContacts() {
     setLoading(true);
     setError(null);
     try {
-      await Promise.all([loadTenant(), loadContacts(), loadPipeline()]);
+      await Promise.all([loadTenant(), loadContacts()]);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : t("common.error"));
     } finally {
@@ -112,7 +130,7 @@ export default function SaasCrmPage() {
   }
 
   useEffect(() => {
-    void refreshAll();
+    void refreshContacts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -124,9 +142,12 @@ export default function SaasCrmPage() {
   }, [search, statusFilter, stageFilter]);
 
   async function openContact(c: SaasContact) {
-    setSelected(c);
+    setSelectedId(c.id);
     const res = await fetch(`/api/saas/crm/contacts/${c.id}/activities`, { credentials: "same-origin" });
-    if (!res.ok) return;
+    if (!res.ok) {
+      setActivities([]);
+      return;
+    }
     const body = (await res.json()) as { activity: ContactActivity[] };
     setActivities(body.activity ?? []);
   }
@@ -149,7 +170,7 @@ export default function SaasCrmPage() {
       setNewCompany("");
       setNewEmail("");
       setNewValue("");
-      await refreshAll();
+      await refreshContacts();
     }
   }
 
@@ -164,30 +185,22 @@ export default function SaasCrmPage() {
     if (res.ok) {
       setActivityDesc("");
       await openContact(selected);
+      void contactDetailQuery.refetch();
     }
   }
 
-  async function moveStage(c: SaasContact, dir: -1 | 1) {
-    const idx = STAGES.indexOf(c.pipelineStage);
-    const next = STAGES[idx + dir];
-    if (!next) return;
-    const res = await fetch(`/api/saas/crm/contacts/${c.id}`, {
-      method: "PATCH",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pipeline_stage: next }),
-    });
-    if (res.ok) {
-      await refreshAll();
+  async function handleMoveDealStage(deal: { id: string; stage: DealStage }, nextStage: DealStage) {
+    setChangingDealId(deal.id);
+    try {
+      await changeStageMutation.mutateAsync({ dealId: deal.id, stage: nextStage });
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : t("common.error"));
+    } finally {
+      setChangingDealId(null);
     }
   }
 
-  const byStage = useMemo(() => {
-    const m = new Map<PipelineStage, SaasContact[]>();
-    for (const s of STAGES) m.set(s, []);
-    for (const c of contacts) (m.get(c.pipelineStage) as SaasContact[]).push(c);
-    return m;
-  }, [contacts]);
+  const pipelineEnabled = tab === "pipeline";
 
   return (
     <div className="min-h-screen bg-background">
@@ -220,7 +233,11 @@ export default function SaasCrmPage() {
         </aside>
 
         <main className="space-y-6">
-          <NelvyonDsSectionHeader eyebrow="SaaS CRM" title={t("crm.title")} subtitle="Gestiona contactos, pipeline y actividades de venta." />
+          <NelvyonDsSectionHeader
+            eyebrow="SaaS CRM"
+            title={t("crm.title")}
+            subtitle="Gestiona contactos, pipeline de deals y actividades de venta."
+          />
 
           <div className="flex flex-wrap gap-2">
             <NelvyonDsButton variant={tab === "contacts" ? "primary" : "secondary"} onClick={() => setTab("contacts")}>
@@ -231,7 +248,7 @@ export default function SaasCrmPage() {
             </NelvyonDsButton>
           </div>
 
-          {loading ? (
+          {loading && tab === "contacts" ? (
             <NelvyonDsCard title="Cargando">
               <p className="text-sm text-muted-foreground">Obteniendo datos del CRM…</p>
             </NelvyonDsCard>
@@ -251,7 +268,7 @@ export default function SaasCrmPage() {
                     <option value="churned">churned</option>
                   </select>
                   <select className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={stageFilter} onChange={(e) => setStageFilter(e.target.value as "" | PipelineStage)}>
-                    <option value="">Stage</option>
+                    <option value="">Stage (contacto)</option>
                     {STAGES.map((s) => (
                       <option key={s} value={s}>{s}</option>
                     ))}
@@ -305,6 +322,13 @@ export default function SaasCrmPage() {
                       <p className="text-sm"><span className="text-muted-foreground">Email:</span> {selected.email ?? "-"}</p>
                       <p className="text-sm"><span className="text-muted-foreground">Status:</span> {selected.status}</p>
                     </div>
+
+                    <ContactDealsContextPanel
+                      dealsContext={contactDetailQuery.data?.dealsContext}
+                      isLoading={contactDetailQuery.isLoading}
+                      error={contactDetailQuery.error}
+                    />
+
                     <div className="space-y-2">
                       <h4 className="text-sm font-medium text-foreground">Actividad</h4>
                       {activities.length === 0 ? <p className="text-sm text-muted-foreground">Sin actividades.</p> : null}
@@ -337,31 +361,22 @@ export default function SaasCrmPage() {
             </section>
           ) : null}
 
-          {!loading && tab === "pipeline" ? (
-            <section className="grid gap-3 lg:grid-cols-3 xl:grid-cols-6">
-              {STAGES.map((s) => {
-                const stats = pipeline.find((p) => p.stage === s) ?? { stage: s, count: 0, totalValue: 0 };
-                const cards = byStage.get(s) ?? [];
-                return (
-                  <NelvyonDsCard key={s} title={s}>
-                    <p className="mb-2 text-xs text-muted-foreground">{stats.count} · {stats.totalValue.toFixed(2)} EUR</p>
-                    <div className="space-y-2">
-                      {cards.length === 0 ? <p className="text-xs text-muted-foreground">Sin contactos</p> : null}
-                      {cards.map((c) => (
-                        <div key={c.id} className="rounded-md border border-border bg-card p-2 text-xs">
-                          <p className="font-medium text-foreground">{c.name}</p>
-                          <p className="text-muted-foreground">{c.company ?? "-"}</p>
-                          <p className="text-muted-foreground">{c.value.toFixed(2)} EUR</p>
-                          <div className="mt-2 flex gap-1">
-                            <NelvyonDsButton size="sm" variant="secondary" onClick={() => void moveStage(c, -1)}>◀</NelvyonDsButton>
-                            <NelvyonDsButton size="sm" variant="secondary" onClick={() => void moveStage(c, 1)}>▶</NelvyonDsButton>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </NelvyonDsCard>
-                );
-              })}
+          {pipelineEnabled ? (
+            <section className="space-y-4">
+              <DealsKpiRow
+                metrics={metricsQuery.data?.metrics}
+                isLoading={metricsQuery.isLoading}
+                error={metricsQuery.error}
+              />
+              <DealsKanban
+                deals={dealsQuery.data?.deals ?? []}
+                metrics={metricsQuery.data?.metrics}
+                contactsById={contactsById}
+                isLoading={dealsQuery.isLoading}
+                error={dealsQuery.error}
+                changingDealId={changingDealId}
+                onMoveStage={(deal, stage) => void handleMoveDealStage(deal, stage)}
+              />
             </section>
           ) : null}
 
