@@ -10,7 +10,7 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 
 type WorkflowStatus = "draft" | "active" | "paused" | "archived";
-type TriggerType = "contact_created" | "contact_updated" | "stage_changed" | "job_completed" | "manual" | "scheduled";
+type TriggerType = "contact_created" | "contact_updated" | "stage_changed" | "deal_stage_changed" | "job_completed" | "manual" | "scheduled";
 type WorkflowCondition = { field: string; operator: string; value: string | number };
 type WorkflowAction = { type: string; config: Record<string, unknown> };
 type Workflow = {
@@ -26,7 +26,17 @@ type Workflow = {
 };
 type WorkflowRun = { id: string; status: "running" | "completed" | "failed"; stepsExecuted: Array<Record<string, unknown>>; startedAt: string; error: string | null };
 
-const TRIGGERS: TriggerType[] = ["contact_created", "contact_updated", "stage_changed", "job_completed", "manual", "scheduled"];
+const TRIGGERS: TriggerType[] = ["contact_created", "contact_updated", "stage_changed", "deal_stage_changed", "job_completed", "manual", "scheduled"];
+
+const TRIGGER_LABELS: Record<TriggerType, string> = {
+  contact_created: "Contacto creado",
+  contact_updated: "Contacto actualizado",
+  stage_changed: "Cambio etapa contacto",
+  deal_stage_changed: "Cambio etapa oportunidad",
+  job_completed: "Job completado",
+  manual: "Manual",
+  scheduled: "Programado",
+};
 
 export default function SaasWorkflowsPage() {
   const router = useRouter();
@@ -242,7 +252,7 @@ export default function SaasWorkflowsPage() {
                   <select className="rounded-md border bg-background px-3 py-2 text-sm" value={triggerType} onChange={(e) => setTriggerType(e.target.value as TriggerType)}>
                     {TRIGGERS.map((t) => (
                       <option key={t} value={t}>
-                        {t}
+                        {TRIGGER_LABELS[t]}
                       </option>
                     ))}
                   </select>

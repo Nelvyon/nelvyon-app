@@ -54,7 +54,7 @@ export default function SaasCampaniasPage() {
   const [body, setBody] = useState("");
   const [ctaText, setCtaText] = useState("");
   const [ctaUrl, setCtaUrl] = useState("");
-  const [audienceMode, setAudienceMode] = useState<"all" | "status" | "stage" | "tags">("all");
+  const [audienceMode, setAudienceMode] = useState<"all" | "status" | "stage" | "deal_stage" | "deal_open" | "tags">("all");
   const [audienceValue, setAudienceValue] = useState("");
   const [scheduleMode, setScheduleMode] = useState<"now" | "scheduled">("now");
   const [scheduledAt, setScheduledAt] = useState("");
@@ -113,6 +113,8 @@ export default function SaasCampaniasPage() {
   function buildAudienceFilter(): Record<string, unknown> {
     if (audienceMode === "status" && audienceValue) return { status: audienceValue };
     if (audienceMode === "stage" && audienceValue) return { pipeline_stage: audienceValue };
+    if (audienceMode === "deal_stage" && audienceValue) return { deal_stage: audienceValue };
+    if (audienceMode === "deal_open") return { deal_open_only: true };
     if (audienceMode === "tags" && audienceValue) return { tags: audienceValue.split(",").map((x) => x.trim()).filter(Boolean) };
     return {};
   }
@@ -304,13 +306,15 @@ export default function SaasCampaniasPage() {
               ) : null}
               {step === 3 ? (
                 <div className="grid gap-2">
-                  <select className="rounded-md border bg-background px-3 py-2 text-sm" value={audienceMode} onChange={(e) => setAudienceMode(e.target.value as "all" | "status" | "stage" | "tags")}>
+                  <select className="rounded-md border bg-background px-3 py-2 text-sm" value={audienceMode} onChange={(e) => setAudienceMode(e.target.value as "all" | "status" | "stage" | "deal_stage" | "deal_open" | "tags")}>
                     <option value="all">Todos</option>
-                    <option value="status">Por status</option>
-                    <option value="stage">Por stage</option>
+                    <option value="status">Por status contacto</option>
+                    <option value="stage">Por stage contacto (legacy)</option>
+                    <option value="deal_stage">Etapa de oportunidad</option>
+                    <option value="deal_open">Pipeline abierto (deals)</option>
                     <option value="tags">Por tags</option>
                   </select>
-                  {audienceMode !== "all" ? (
+                  {audienceMode !== "all" && audienceMode !== "deal_open" ? (
                     <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="Valor del filtro" value={audienceValue} onChange={(e) => setAudienceValue(e.target.value)} />
                   ) : null}
                 </div>

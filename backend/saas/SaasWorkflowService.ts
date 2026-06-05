@@ -1,13 +1,31 @@
 import { DbClient } from "../db/DbClient";
-import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact } from "./SaasCrmService";
+import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact, type ActivityType } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
+import type { SaasDealsService } from "./SaasDealsService";
+import type { DealStage } from "./saasDealsDedupe";
 
 export type WorkflowStatus = "draft" | "active" | "paused" | "archived";
-export type TriggerType = "contact_created" | "contact_updated" | "stage_changed" | "job_completed" | "manual" | "scheduled";
+export type TriggerType =
+  | "contact_created"
+  | "contact_updated"
+  | "stage_changed"
+  | "deal_stage_changed"
+  | "job_completed"
+  | "manual"
+  | "scheduled";
+
+export type WorkflowConditionField =
+  | "contact.status"
+  | "contact.pipeline_stage"
+  | "contact.value"
+  | "deal.stage"
+  | "deal.value"
+  | "deal.contact_id"
+  | "deal.probability";
 
 export type WorkflowCondition = {
-  field: "contact.status" | "contact.pipeline_stage" | "contact.value";
+  field: WorkflowConditionField;
   operator: "equals" | "greater_than";
   value: string | number;
 };
@@ -16,7 +34,10 @@ export type WorkflowAction =
   | { type: "send_email"; config: { to: string; subject: string; body: string } }
   | { type: "update_contact"; config: { contactId: string; fields: Partial<Pick<SaasContact, "name" | "status" | "pipelineStage" | "value" | "notes">> } }
   | { type: "change_stage"; config: { contactId: string; stage: PipelineStage } }
-  | { type: "create_activity"; config: { contactId: string; type: "note" | "call" | "email" | "meeting" | "task"; description: string } }
+  | { type: "change_deal_stage"; config: { dealId?: string; stage: DealStage } }
+  | { type: "add_deal_note"; config: { dealId?: string; note: string } }
+  | { type: "create_activity"; config: { contactId: string; type: ActivityType; description: string } }
+  | { type: "create_deal_activity"; config: { contactId?: string; dealId?: string; type: ActivityType; description: string } }
   | { type: "notify"; config: { message: string } };
 
 export interface SaasWorkflow {
@@ -86,7 +107,15 @@ type RunRow = {
 };
 
 const STATUSES: readonly WorkflowStatus[] = ["draft", "active", "paused", "archived"] as const;
-const TRIGGERS: readonly TriggerType[] = ["contact_created", "contact_updated", "stage_changed", "job_completed", "manual", "scheduled"] as const;
+const TRIGGERS: readonly TriggerType[] = [
+  "contact_created",
+  "contact_updated",
+  "stage_changed",
+  "deal_stage_changed",
+  "job_completed",
+  "manual",
+  "scheduled",
+] as const;
 const STAGES: readonly PipelineStage[] = ["new", "contacted", "qualified", "proposal", "won", "lost"] as const;
 const CONTACT_STATUSES: readonly ContactStatus[] = ["lead", "prospect", "client", "churned"] as const;
 
@@ -175,6 +204,7 @@ export class SaasWorkflowService {
   constructor(
     private readonly db: SaasPostgresPort,
     private readonly crm: Pick<SaasCrmService, "updateContact" | "addActivity" | "getContact">,
+    private readonly deals?: Pick<SaasDealsService, "changeStage" | "updateDeal" | "getDeal">,
   ) {}
 
   async createWorkflow(tenantId: string, data: WorkflowInput): Promise<SaasWorkflow> {
@@ -265,6 +295,7 @@ export class SaasWorkflowService {
   private evalConditions(conditions: WorkflowCondition[], triggerData: Record<string, unknown>): boolean {
     for (const c of conditions) {
       const contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+      const deal = (triggerData.deal ?? {}) as Record<string, unknown>;
       if (c.field === "contact.status") {
         const actual = typeof contact.status === "string" ? contact.status : "";
         const expected = String(c.value);
@@ -279,9 +310,59 @@ export class SaasWorkflowService {
         const actual = typeof contact.value === "number" ? contact.value : Number(contact.value ?? 0);
         const expected = Number(c.value);
         if (c.operator !== "greater_than" || !(actual > expected)) return false;
+      } else if (c.field === "deal.stage") {
+        const actual = typeof deal.stage === "string" ? deal.stage : "";
+        const expected = String(c.value);
+        assertStage(expected);
+        if (c.operator !== "equals" || actual !== expected) return false;
+      } else if (c.field === "deal.contact_id") {
+        const actual = deal.contactId === null || deal.contactId === undefined ? "" : String(deal.contactId);
+        const expected = String(c.value);
+        if (c.operator !== "equals" || actual !== expected) return false;
+      } else if (c.field === "deal.value") {
+        const actual = typeof deal.value === "number" ? deal.value : Number(deal.value ?? 0);
+        const expected = Number(c.value);
+        if (c.operator !== "greater_than" || !(actual > expected)) return false;
+      } else if (c.field === "deal.probability") {
+        const actual = typeof deal.probability === "number" ? deal.probability : Number(deal.probability ?? 0);
+        const expected = Number(c.value);
+        if (c.operator !== "greater_than" || !(actual > expected)) return false;
       }
     }
     return true;
+  }
+
+  /** Optional trigger_config filters (e.g. stage_to on deal_stage_changed). */
+  matchesTriggerConfig(triggerType: TriggerType, triggerConfig: Record<string, unknown>, triggerData: Record<string, unknown>): boolean {
+    if (triggerType !== "deal_stage_changed") return true;
+    const deal = (triggerData.deal ?? {}) as Record<string, unknown>;
+    if (triggerConfig.stage_to && String(triggerConfig.stage_to) !== String(deal.stage ?? "")) return false;
+    if (triggerConfig.stage_from && String(triggerConfig.stage_from) !== String(deal.previousStage ?? "")) return false;
+    if (triggerConfig.contact_id && String(triggerConfig.contact_id) !== String(deal.contactId ?? "")) return false;
+    return true;
+  }
+
+  async dispatchActiveWorkflows(tenantId: string, triggerType: TriggerType, triggerData: Record<string, unknown>): Promise<void> {
+    const workflows = await this.getWorkflows(tenantId);
+    for (const wf of workflows) {
+      if (wf.status !== "active" || wf.triggerType !== triggerType) continue;
+      if (!this.matchesTriggerConfig(wf.triggerType, wf.triggerConfig, triggerData)) continue;
+      await this.executeWorkflow(wf.id, tenantId, triggerData);
+    }
+  }
+
+  private resolveDealId(triggerData: Record<string, unknown>, configDealId?: string): string | null {
+    if (configDealId) return configDealId;
+    const deal = (triggerData.deal ?? {}) as Record<string, unknown>;
+    return typeof deal.id === "string" ? deal.id : null;
+  }
+
+  private resolveContactIdForDealAction(triggerData: Record<string, unknown>, configContactId?: string): string | null {
+    if (configContactId) return configContactId;
+    const deal = (triggerData.deal ?? {}) as Record<string, unknown>;
+    if (typeof deal.contactId === "string" && deal.contactId.length > 0) return deal.contactId;
+    const contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+    return typeof contact.id === "string" ? contact.id : null;
   }
 
   async executeWorkflow(workflowId: string, tenantId: string, triggerData: Record<string, unknown> = {}): Promise<WorkflowRun> {
@@ -335,6 +416,31 @@ export class SaasWorkflowService {
             description: action.config.description,
           });
           stepsExecuted.push({ action: action.type, ok: true });
+        } else if (action.type === "change_deal_stage") {
+          if (!this.deals) throw new SaasWorkflowError("Deals service unavailable", "FORBIDDEN");
+          const dealId = this.resolveDealId(triggerData, action.config.dealId);
+          if (!dealId) throw new SaasWorkflowError("dealId required for change_deal_stage", "VALIDATION");
+          await this.deals.updateDeal(tenantId, dealId, { stage: action.config.stage });
+          stepsExecuted.push({ action: action.type, ok: true, dealId });
+        } else if (action.type === "add_deal_note") {
+          if (!this.deals) throw new SaasWorkflowError("Deals service unavailable", "FORBIDDEN");
+          const dealId = this.resolveDealId(triggerData, action.config.dealId);
+          if (!dealId) throw new SaasWorkflowError("dealId required for add_deal_note", "VALIDATION");
+          const existing = await this.deals.getDeal(tenantId, dealId);
+          if (!existing) throw new SaasWorkflowError("Deal not found", "NOT_FOUND");
+          const merged = [existing.notes?.trim(), action.config.note.trim()].filter(Boolean).join("\n");
+          await this.deals.updateDeal(tenantId, dealId, { notes: merged });
+          stepsExecuted.push({ action: action.type, ok: true, dealId });
+        } else if (action.type === "create_deal_activity") {
+          const contactId = this.resolveContactIdForDealAction(triggerData, action.config.contactId);
+          if (!contactId) throw new SaasWorkflowError("contactId required for create_deal_activity", "VALIDATION");
+          const dealId = this.resolveDealId(triggerData, action.config.dealId);
+          const prefix = dealId ? `[Deal ${dealId}] ` : "";
+          await this.crm.addActivity(contactId, tenantId, {
+            activityType: action.config.type,
+            description: `${prefix}${action.config.description}`,
+          });
+          stepsExecuted.push({ action: action.type, ok: true, contactId, dealId });
         } else if (action.type === "notify") {
           await this.db.query(
             `INSERT INTO saas_activity_log (tenant_id, event_type, description, metadata)
@@ -388,7 +494,9 @@ export function getSaasWorkflowService(): SaasWorkflowService {
   if (!cached) {
     const db = DbClient.getInstance();
     const crm = new SaasCrmService(db);
-    cached = new SaasWorkflowService(db, crm);
+    const { SaasDealsService } = require("./SaasDealsService") as typeof import("./SaasDealsService");
+    const deals = new SaasDealsService(db);
+    cached = new SaasWorkflowService(db, crm, deals);
   }
   return cached;
 }

@@ -49,7 +49,7 @@ function makeDb() {
     if (s.startsWith("INSERT INTO saas_workflows")) {
       const status = String(p[3]);
       const trigger = String(p[4]);
-      if (!["draft", "active", "paused", "archived"].includes(status) || !["contact_created", "contact_updated", "stage_changed", "job_completed", "manual", "scheduled"].includes(trigger)) {
+      if (!["draft", "active", "paused", "archived"].includes(status) || !["contact_created", "contact_updated", "stage_changed", "deal_stage_changed", "job_completed", "manual", "scheduled"].includes(trigger)) {
         const e = new Error("check");
         (e as { code: string }).code = "23514";
         throw e;

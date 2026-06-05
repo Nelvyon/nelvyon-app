@@ -4,6 +4,7 @@ import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { pickPrimaryPipelineStage } from "./pipelineStageSync";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
 import type { ContactActivity } from "./SaasCrmService";
+import { dispatchDealStageChanged } from "./saasWorkflowDispatch";
 
 export interface SaasDeal {
   id: string;
@@ -375,12 +376,18 @@ export class SaasDealsService {
     stage: string,
     probability?: number,
   ): Promise<SaasDeal> {
+    const existing = await this.getDeal(tenantId, dealId);
+    if (!existing) throw new SaasDealsError("Deal not found", "NOT_FOUND");
     const s = assertStage(stage);
     const patch: UpdateDealInput = { stage: s };
     if (probability !== undefined) patch.probability = probability;
     if (s === "won") patch.probability = 100;
     if (s === "lost") patch.probability = 0;
-    return this.updateDeal(tenantId, dealId, patch);
+    const deal = await this.updateDeal(tenantId, dealId, patch);
+    if (deal.stage !== existing.stage) {
+      await dispatchDealStageChanged(tenantId, deal, existing.stage);
+    }
+    return deal;
   }
 
   async deleteDeal(tenantId: string, dealId: string): Promise<void> {

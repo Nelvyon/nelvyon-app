@@ -121,6 +121,7 @@ export {
   type WorkflowStatus,
   type TriggerType,
 } from "./SaasWorkflowService";
+export { dispatchDealStageChanged } from "./saasWorkflowDispatch";
 export {
   SaasCampaniasService,
   SaasCampaniasError,

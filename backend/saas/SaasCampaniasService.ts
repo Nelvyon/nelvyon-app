@@ -2,6 +2,7 @@ import { DbClient } from "../db/DbClient";
 import type { ContactStatus, PipelineStage } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
+import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
 
 export type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
 export type CampaniaChannel = "email" | "sms" | "notification" | "multi";
@@ -9,8 +10,13 @@ export type RecipientStatus = "pending" | "sent" | "opened" | "clicked" | "bounc
 
 export type AudienceFilter = {
   status?: ContactStatus;
+  /** @deprecated Prefer deal_stage — synced from deals but not authoritative. */
   pipeline_stage?: PipelineStage;
   tags?: string[];
+  /** Contacts linked to at least one deal in this stage (saas_deals). */
+  deal_stage?: DealStage;
+  /** Contacts with any open deal (stage not won/lost). */
+  deal_open_only?: boolean;
 };
 
 export interface SaasCampania {
@@ -146,6 +152,12 @@ function assertAudienceFilter(filter: AudienceFilter): void {
   }
   if (filter.pipeline_stage && !(STAGES as readonly string[]).includes(filter.pipeline_stage)) {
     throw new SaasCampaniasError("Invalid audience pipeline_stage", "VALIDATION");
+  }
+  if (filter.deal_stage && !(STAGES as readonly string[]).includes(filter.deal_stage)) {
+    throw new SaasCampaniasError("Invalid audience deal_stage", "VALIDATION");
+  }
+  if (filter.deal_open_only !== undefined && typeof filter.deal_open_only !== "boolean") {
+    throw new SaasCampaniasError("Invalid audience deal_open_only", "VALIDATION");
   }
 }
 
@@ -327,6 +339,36 @@ export class SaasCampaniasService {
   }
 
   private async resolveAudience(tenantId: string, audienceFilter: AudienceFilter): Promise<string[]> {
+    const usesDealJoin = Boolean(audienceFilter.deal_stage || audienceFilter.deal_open_only);
+    if (usesDealJoin) {
+      const where: string[] = ["c.tenant_id = $1", "d.tenant_id = $1", "d.contact_id = c.id"];
+      const params: unknown[] = [tenantId];
+      let n = 2;
+      if (audienceFilter.status) {
+        where.push(`c.status = $${n++}`);
+        params.push(audienceFilter.status);
+      }
+      if (audienceFilter.tags && audienceFilter.tags.length > 0) {
+        where.push(`c.tags && $${n++}::text[]`);
+        params.push(audienceFilter.tags);
+      }
+      if (audienceFilter.deal_stage) {
+        where.push(`d.stage = $${n++}`);
+        params.push(audienceFilter.deal_stage);
+      }
+      if (audienceFilter.deal_open_only) {
+        where.push(`d.stage NOT IN ('won', 'lost')`);
+      }
+      const rows = await this.db.query<ContactRow>(
+        `SELECT DISTINCT c.id
+         FROM saas_contacts c
+         INNER JOIN saas_deals d ON d.contact_id = c.id AND d.tenant_id = c.tenant_id
+         WHERE ${where.join(" AND ")}`,
+        params,
+      );
+      return rows.map((r) => r.id);
+    }
+
     const where: string[] = ["tenant_id = $1"];
     const params: unknown[] = [tenantId];
     let n = 2;
