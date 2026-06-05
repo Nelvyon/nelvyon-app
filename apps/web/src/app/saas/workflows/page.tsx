@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
-import { cn } from "@/core/ui/utils";
+import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
+import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 type WorkflowStatus = "draft" | "active" | "paused" | "archived";
 type TriggerType = "contact_created" | "contact_updated" | "stage_changed" | "job_completed" | "manual" | "scheduled";
@@ -22,7 +23,6 @@ type Workflow = {
 };
 type WorkflowRun = { id: string; status: "running" | "completed" | "failed"; stepsExecuted: Array<Record<string, unknown>>; startedAt: string; error: string | null };
 
-const NAV = ["Dashboard", "Servicios", "CRM", "Workflows", "Campanas", "Configuracion"] as const;
 const TRIGGERS: TriggerType[] = ["contact_created", "contact_updated", "stage_changed", "job_completed", "manual", "scheduled"];
 
 export default function SaasWorkflowsPage() {
@@ -163,20 +163,7 @@ export default function SaasWorkflowsPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside className="space-y-4">
-          <NelvyonDsCard className="space-y-4">
-            <div className="text-lg font-semibold text-foreground">NELVYON</div>
-            <div className="space-y-2">
-              {NAV.map((item) => (
-                <div key={item} className={cn("rounded-md px-3 py-2 text-sm", item === "Workflows" ? "bg-primary/10 text-primary" : "text-muted-foreground")}>
-                  {item}
-                </div>
-              ))}
-            </div>
-            <NelvyonDsBadge>{tenantPlan.toUpperCase()}</NelvyonDsBadge>
-            <div className="text-sm text-muted-foreground">{tenantCompany || "Cliente SaaS"}</div>
-          </NelvyonDsCard>
-        </aside>
+        <SaasSidebar activeId="workflows" tenantCompany={tenantCompany || undefined} tenantPlan={tenantPlan} />
         <main className="space-y-6">
           <NelvyonDsSectionHeader title="Workflows" subtitle="Motor automatico trigger -> condicion -> accion" />
           <div className="flex flex-wrap gap-2">
@@ -186,10 +173,11 @@ export default function SaasWorkflowsPage() {
           {loading ? (
             <NelvyonDsCard>Cargando workflows...</NelvyonDsCard>
           ) : workflows.length === 0 ? (
-            <NelvyonDsCard className="space-y-2">
-              <div className="text-base font-medium text-foreground">No tienes workflows todavia</div>
-              <div className="text-sm text-muted-foreground">Crea tu primer workflow para automatizar acciones.</div>
-            </NelvyonDsCard>
+            <SaasEmptyState
+              title={SAAS_EMPTY_TITLE}
+              description={SAAS_EMPTY_DESCRIPTION}
+              action={<NelvyonDsButton onClick={() => setShowEditor(true)}>Crear primer workflow</NelvyonDsButton>}
+            />
           ) : (
             <div className="grid gap-4">
               {workflows.map((wf) => (
@@ -298,7 +286,7 @@ export default function SaasWorkflowsPage() {
               <div className="space-y-2">
                 <div className="text-sm font-medium text-foreground">Historial de runs</div>
                 {runs.length === 0 ? (
-                  <div className="text-sm text-muted-foreground">Sin ejecuciones todavia.</div>
+                  <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Ejecuta el workflow para ver el historial aquí." className="p-4" />
                 ) : (
                   <div className="space-y-2">
                     {runs.map((run) => (

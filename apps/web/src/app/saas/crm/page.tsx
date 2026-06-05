@@ -6,13 +6,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { cn } from "@/core/ui/utils";
 import { ContactDealsContextPanel } from "@/features/saas-deals/components/ContactDealsContextPanel";
 import { DealDetailPanel } from "@/features/saas-deals/components/DealDetailPanel";
 import { DealFormModal } from "@/features/saas-deals/components/DealFormModal";
 import { DealsKanban } from "@/features/saas-deals/components/DealsKanban";
 import { DealsKpiRow } from "@/features/saas-deals/components/DealsKpiRow";
+import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
+import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import {
   useChangeDealStage,
   useSaasContactDetail,
@@ -46,7 +47,6 @@ type ContactActivity = {
   createdAt: string;
 };
 
-const NAV = ["Dashboard", "Servicios", "CRM", "Workflows", "Campanas", "Configuracion"] as const;
 const STAGES: PipelineStage[] = ["new", "contacted", "qualified", "proposal", "won", "lost"];
 
 export default function SaasCrmPage() {
@@ -253,32 +253,12 @@ export default function SaasCrmPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside className="space-y-4">
-          <NelvyonDsCard className="space-y-4">
-            <div className="text-lg font-semibold text-foreground">NELVYON</div>
-            <LanguageSelector />
-            <div className="space-y-2">
-              {NAV.map((item) => (
-                <div key={item} className={cn("rounded-md px-3 py-2 text-sm", item === "CRM" ? "bg-primary/10 text-primary" : "text-muted-foreground")}>
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="space-y-1 border-t border-border pt-3">
-              <p className="text-sm font-medium text-foreground">{tenantCompany || "Empresa"}</p>
-              <NelvyonDsBadge tone={tenantPlan === "enterprise" ? "warning" : tenantPlan === "pro" ? "success" : "primary"}>{tenantPlan}</NelvyonDsBadge>
-            </div>
-            <NelvyonDsButton
-              variant="secondary"
-              onClick={async () => {
-                await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).catch(() => null);
-                router.replace("/auth/login");
-              }}
-            >
-              Cerrar sesion
-            </NelvyonDsButton>
-          </NelvyonDsCard>
-        </aside>
+        <SaasSidebar
+          activeId={tab === "pipeline" ? "pipeline" : "crm"}
+          tenantCompany={tenantCompany || undefined}
+          tenantPlan={tenantPlan}
+          showLanguageSelector
+        />
 
         <main className="space-y-6">
           <NelvyonDsSectionHeader
@@ -332,9 +312,11 @@ export default function SaasCrmPage() {
                 </div>
 
                 {contacts.length === 0 ? (
-                  <div className="rounded-md border border-border bg-muted p-4 text-sm text-muted-foreground">
-                    {t("crm.no_contacts")}
-                  </div>
+                  <SaasEmptyState
+                    title={SAAS_EMPTY_TITLE}
+                    description={SAAS_EMPTY_DESCRIPTION}
+                    action={<NelvyonDsButton onClick={() => void createContact()}>Crear primer contacto</NelvyonDsButton>}
+                  />
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
@@ -362,7 +344,7 @@ export default function SaasCrmPage() {
 
               <NelvyonDsCard title={selected ? `Detalle: ${selected.name}` : "Detalle contacto"}>
                 {!selected ? (
-                  <p className="text-sm text-muted-foreground">Selecciona un contacto para ver detalle y actividad.</p>
+                  <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Selecciona un contacto para ver detalle y actividad." />
                 ) : (
                   <div className="space-y-4">
                     <div className="grid gap-2">
@@ -381,7 +363,9 @@ export default function SaasCrmPage() {
 
                     <div className="space-y-2">
                       <h4 className="text-sm font-medium text-foreground">Actividad</h4>
-                      {activities.length === 0 ? <p className="text-sm text-muted-foreground">Sin actividades.</p> : null}
+                      {activities.length === 0 ? (
+                        <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Registra la primera actividad para este contacto." className="p-4" />
+                      ) : null}
                       <ul className="space-y-2">
                         {activities.map((a) => (
                           <li key={a.id} className="flex items-start gap-2 text-sm">

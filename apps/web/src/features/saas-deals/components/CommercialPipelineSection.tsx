@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { NelvyonDsButton, NelvyonDsSectionHeader } from "@/design-system/components";
+import { SaasEmptyState } from "@/features/saas-shell/components/SaasEmptyState";
 
 import { useSaasDealMetrics, useSaasDeals } from "../hooks";
 import { hasCommercialPipelineData } from "../commercialDashboardUtils";
@@ -31,10 +32,15 @@ export function CommercialPipelineSection() {
       </div>
 
       {!metricsQuery.isLoading && !metricsQuery.error && metrics && !hasData ? (
-        <div className="rounded-md border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-          Tu pipeline comercial está vacío. Crea el primer deal desde el CRM para ver KPIs, distribución por etapa y
-          actividad de ventas aquí.
-        </div>
+        <SaasEmptyState
+          title="Sin datos todavía"
+          description="Conecta datos o crea el primer deal en el CRM para ver KPIs, distribución por etapa y actividad de ventas."
+          action={
+            <NelvyonDsButton asChild>
+              <Link href="/saas/crm?tab=pipeline">Crear primer deal</Link>
+            </NelvyonDsButton>
+          }
+        />
       ) : null}
 
       <CommercialKpiRow

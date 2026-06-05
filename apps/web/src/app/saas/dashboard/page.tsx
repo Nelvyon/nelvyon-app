@@ -5,12 +5,12 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot, type NelvyonDsStatus } from "@/design-system/components";
+import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot, type NelvyonDsStatus } from "@/design-system/components";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { CommercialPipelineSection } from "@/features/saas-deals/components/CommercialPipelineSection";
-import { resetUser, trackEvent } from "@/lib/analytics";
-import { cn } from "@/core/ui/utils";
+import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
+import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { trackEvent } from "@/lib/analytics";
 import type { SaasPlan, SaasTenantDto } from "../onboarding/components/types";
 
 type ActivityItem = {
@@ -28,13 +28,7 @@ type DashboardSummary = {
   recentActivity: ActivityItem[];
 };
 
-const NAV = ["Dashboard", "Servicios", "CRM", "Workflows", "Campanas", "Configuracion"] as const;
 
-function planTone(plan: SaasPlan): "primary" | "success" | "warning" {
-  if (plan === "enterprise") return "warning";
-  if (plan === "pro") return "success";
-  return "primary";
-}
 
 function activityStatus(type: string): NelvyonDsStatus {
   const v = type.toLowerCase();
@@ -103,7 +97,11 @@ export default function SaasDashboardPage() {
   }
 
   if (!summary) {
-    return <div className="px-4 py-10 text-sm text-destructive">{error ?? t("common.empty_state")}</div>;
+    return (
+      <div className="px-4 py-10">
+        <SaasEmptyState title={SAAS_EMPTY_TITLE} description={error ?? SAAS_EMPTY_DESCRIPTION} />
+      </div>
+    );
   }
 
   const { tenant } = summary;
@@ -125,39 +123,12 @@ export default function SaasDashboardPage() {
     <DashboardLayout>
     <div className="min-h-screen bg-background">
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside className="space-y-4">
-          <NelvyonDsCard className="space-y-4">
-            <div className="text-lg font-semibold text-foreground">NELVYON</div>
-            <LanguageSelector />
-            <div className="space-y-2">
-              {NAV.map((item) => (
-                <div
-                  key={item}
-                  className={cn(
-                    "rounded-md px-3 py-2 text-sm",
-                    item === "Dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="space-y-1 border-t border-border pt-3">
-              <p className="text-sm font-medium text-foreground">{tenant.companyName}</p>
-              <NelvyonDsBadge tone={planTone(tenant.plan)}>{tenant.plan}</NelvyonDsBadge>
-            </div>
-            <NelvyonDsButton
-              variant="secondary"
-              onClick={async () => {
-                await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).catch(() => null);
-                resetUser();
-                router.replace("/auth/login");
-              }}
-            >
-              Cerrar sesion
-            </NelvyonDsButton>
-          </NelvyonDsCard>
-        </aside>
+        <SaasSidebar
+          activeId="dashboard"
+          tenantCompany={tenant.companyName}
+          tenantPlan={tenant.plan}
+          showLanguageSelector
+        />
 
         <main className="space-y-6">
           <NelvyonDsSectionHeader eyebrow="SaaS Dashboard" title={t("dashboard.welcome", { company: tenant.companyName })} subtitle={now} />
@@ -181,7 +152,10 @@ export default function SaasDashboardPage() {
           <section className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <NelvyonDsCard title={t("dashboard.recent_activity")}>
               {summary.recentActivity.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("common.empty_state")}</p>
+                <SaasEmptyState
+                  title={SAAS_EMPTY_TITLE}
+                  description="Cuando haya jobs o eventos del tenant aparecerán aquí."
+                />
               ) : (
                 <ul className="space-y-3">
                   {summary.recentActivity.slice(0, 10).map((a) => (
@@ -223,9 +197,6 @@ export default function SaasDashboardPage() {
                 >
                   {exportingReport ? `${t("common.loading")}…` : "Exportar informe ejecutivo (ZIP)"}
                 </NelvyonDsButton>
-                <NelvyonDsButton asChild className="w-full justify-start">
-                  <Link href="/os/execution">Ir a Servicios</Link>
-                </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
                   <Link href="/saas/crm">Abrir CRM</Link>
                 </NelvyonDsButton>
@@ -233,15 +204,21 @@ export default function SaasDashboardPage() {
                   <Link href="/saas/crm?tab=pipeline">Ver pipeline comercial</Link>
                 </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
-                  <Link href="/saas/campanias">Ver Campanas</Link>
+                  <Link href="/saas/campanias">Ver campanas</Link>
                 </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
-                  <Link href="/dashboard/settings">Suscripción y facturación</Link>
+                  <Link href="/saas/workflows">Ver workflows</Link>
+                </NelvyonDsButton>
+                <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
+                  <Link href="/dashboard/settings">Configuracion y facturacion</Link>
                 </NelvyonDsButton>
               </div>
               {hasNoJobs ? (
-                <div className="mt-4 rounded-md border border-border bg-muted p-3 text-sm text-muted-foreground">
-                  {t("dashboard.empty_state")}
+                <div className="mt-4">
+                  <SaasEmptyState
+                    title={SAAS_EMPTY_TITLE}
+                    description="Conecta datos o crea el primer registro en CRM, campanas o workflows."
+                  />
                 </div>
               ) : null}
             </NelvyonDsCard>

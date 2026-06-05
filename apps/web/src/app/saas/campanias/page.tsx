@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
-import { cn } from "@/core/ui/utils";
+import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
+import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
 type CampaniaChannel = "email" | "sms" | "notification" | "multi";
@@ -25,7 +26,6 @@ type Campania = {
 type CampaniaStats = { total_recipients: number; sent_count: number; opened_count: number; clicked_count: number; open_rate: number; click_rate: number };
 type Recipient = { id: string; contactId: string; status: "pending" | "sent" | "opened" | "clicked" | "bounced" | "unsubscribed"; sentAt: string | null };
 
-const NAV = ["Dashboard", "Servicios", "CRM", "Workflows", "Campanias", "Configuracion"] as const;
 const CHANNELS: CampaniaChannel[] = ["email", "sms", "notification", "multi"];
 
 export default function SaasCampaniasPage() {
@@ -217,20 +217,7 @@ export default function SaasCampaniasPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside className="space-y-4">
-          <NelvyonDsCard className="space-y-4">
-            <div className="text-lg font-semibold text-foreground">NELVYON</div>
-            <div className="space-y-2">
-              {NAV.map((item) => (
-                <div key={item} className={cn("rounded-md px-3 py-2 text-sm", item === "Campanias" ? "bg-primary/10 text-primary" : "text-muted-foreground")}>
-                  {item}
-                </div>
-              ))}
-            </div>
-            <NelvyonDsBadge>{tenantPlan.toUpperCase()}</NelvyonDsBadge>
-            <div className="text-sm text-muted-foreground">{tenantCompany || "Cliente SaaS"}</div>
-          </NelvyonDsCard>
-        </aside>
+        <SaasSidebar activeId="campanias" tenantCompany={tenantCompany || undefined} tenantPlan={tenantPlan} />
         <main className="space-y-6">
           <NelvyonDsSectionHeader title="Campanias" subtitle="Motor multicanal email, sms y notificacion" />
           <div className="flex flex-wrap gap-2">
@@ -245,7 +232,11 @@ export default function SaasCampaniasPage() {
           {loading ? (
             <NelvyonDsCard>Cargando campanias...</NelvyonDsCard>
           ) : filtered.length === 0 ? (
-            <NelvyonDsCard className="text-sm text-muted-foreground">No hay campanias para esta vista.</NelvyonDsCard>
+            <SaasEmptyState
+              title={SAAS_EMPTY_TITLE}
+              description={SAAS_EMPTY_DESCRIPTION}
+              action={<NelvyonDsButton onClick={() => setShowWizard(true)}>Crear primera campania</NelvyonDsButton>}
+            />
           ) : (
             <div className="space-y-3">
               {filtered.map((c) => {
@@ -365,7 +356,7 @@ export default function SaasCampaniasPage() {
               <div className="space-y-2">
                 <div className="text-sm font-medium text-foreground">Recipients</div>
                 {recipients.length === 0 ? (
-                  <div className="text-sm text-muted-foreground">Sin recipients aun.</div>
+                  <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Lanza la campania para ver destinatarios aquí." className="p-4" />
                 ) : (
                   recipients.map((r) => (
                     <div key={r.id} className="flex items-center justify-between rounded-md border p-2 text-sm">
