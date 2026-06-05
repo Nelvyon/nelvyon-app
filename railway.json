@@ -8,6 +8,7 @@
     "restartPolicyType": "ON_FAILURE",
     "healthcheckPath": "/api/health/live",
     "healthcheckTimeout": 300,
-    "port": 3000
+    "port": 3000,
+    "releaseCommand": "cd apps/web && pnpm exec tsx ../../backend/db/migrate.ts"
   }
 }

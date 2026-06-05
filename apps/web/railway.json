@@ -3,5 +3,8 @@
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "apps/web/Dockerfile"
+  },
+  "deploy": {
+    "releaseCommand": "pnpm exec tsx ../../backend/db/migrate.ts"
   }
 }

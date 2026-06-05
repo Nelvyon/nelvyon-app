@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { authenticate } from "@nelvyon/auth";
-import { getSaasCrmService, getSaasOnboardingService, SaasCrmError, type ContactStatus, type PipelineStage } from "@nelvyon/saas";
+import {
+  getSaasCrmService,
+  getSaasDealsService,
+  getSaasOnboardingService,
+  SaasCrmError,
+  type ContactStatus,
+  type PipelineStage,
+} from "@nelvyon/saas";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 export const dynamic = 'force-dynamic';
@@ -29,7 +36,9 @@ export async function GET(req: Request, context: { params: Promise<{ contactId: 
     const crm = getSaasCrmService();
     const contact = await crm.getContact(tenantId, contactId);
     if (!contact) return NextResponse.json({ error: "Contact not found" }, { status: 404 });
-    return NextResponse.json({ contact });
+    const dealsSvc = getSaasDealsService();
+    const dealsContext = await dealsSvc.getContactDealsContext(tenantId, contactId);
+    return NextResponse.json({ contact, dealsContext });
   } catch (e: unknown) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

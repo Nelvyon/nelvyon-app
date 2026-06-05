@@ -70,6 +70,37 @@ export {
   type ActivityType,
 } from "./SaasCrmService";
 export {
+  SaasDealsService,
+  SaasDealsError,
+  getSaasDealsService,
+  resetSaasDealsServiceForTests,
+  type SaasDeal,
+  type DealFilters,
+  type CreateDealInput,
+  type UpdateDealInput,
+  type SaasDealsMetrics,
+  type ContactDealsContext,
+  type StageMetricsItem,
+} from "./SaasDealsService";
+export {
+  SaasDealsEtlService,
+  getSaasDealsEtlService,
+  resetSaasDealsEtlServiceForTests,
+  type SaasDealsEtlReport,
+  type DealsEtlMode,
+  type DealsEtlRunOptions,
+  type DealsEtlConflict,
+} from "./SaasDealsEtlService";
+export {
+  buildDealDedupeKey,
+  mapLegacyDealStageToSaas,
+  etlDealLegacySourceTag,
+  isOpenDealStage,
+  OPEN_DEAL_STAGES,
+  type DealStage,
+  type DealEtlSource,
+} from "./saasDealsDedupe";
+export {
   SaasWorkflowService,
   SaasWorkflowError,
   getSaasWorkflowService,
