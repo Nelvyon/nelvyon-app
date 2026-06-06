@@ -1,0 +1,13 @@
+{
+  "mode": "dry-run",
+  "executedAt": "2026-06-06T22:50:17.684Z",
+  "legacyTotal": 0,
+  "candidatesNew": 0,
+  "duplicates": 0,
+  "conflicts": [],
+  "errors": [],
+  "skippedNoWorkspace": 0,
+  "skippedAlreadyMigrated": 0,
+  "skippedNoClientMapping": 0,
+  "appliedInserts": 0
+}
