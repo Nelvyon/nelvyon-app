@@ -15,6 +15,8 @@
     "validate:os-core-migrations": "tsx ./scripts/validate-os-core-migrations.ts",
     "validate:os-clients-backfill": "tsx ./scripts/validate-os-clients-backfill.ts",
     "os:clients-backfill": "tsx ../../backend/os-core/scripts/runOsClientsBackfill.ts",
+    "os:projects-backfill": "tsx ../../backend/os-core/scripts/runOsProjectsBackfill.ts",
+    "validate:os-projects-backfill": "tsx ./scripts/validate-os-projects-backfill.ts",
     "saas:validate-bridge": "tsx ../../backend/saas/scripts/validateTenantBridge.ts",
     "saas:crm-etl": "tsx ../../backend/saas/scripts/runCrmEtl.ts",
     "saas:deals-etl": "tsx ../../backend/saas/scripts/runDealsEtl.ts",
