@@ -4,8 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ApiError } from "@/core/api/types";
-import { osClientsApi } from "@/features/os-shell/clients/api";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import { osClientsApi } from "@/features/os-shell/clients/legacyApi";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
 import {
   OsErrorBanner,
@@ -27,7 +27,7 @@ export function OsTaskCreateView() {
   const perms = useOsPermissions();
   const presetClient = Number(searchParams?.get("client_id") || 0);
   const presetProject = Number(searchParams?.get("project_id") || 0);
-  const [clients, setClients] = useState<OsClient[]>([]);
+  const [clients, setClients] = useState<OsClientPickerRow[]>([]);
   const [projects, setProjects] = useState<OsProject[]>([]);
   const [form, setForm] = useState(
     emptyOsTaskForm({

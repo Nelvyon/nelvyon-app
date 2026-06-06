@@ -1,6 +1,6 @@
 import { OS_DEAL_OPEN_STATUSES, OS_TASK_ACTIVE_STATUSES, TERMINAL_PROJECT_STATUSES } from "@/features/os-shell/constants";
 import { isTaskOverdue } from "@/features/os-shell/tareas/taskStatus";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import type { OsProject } from "@/features/os-shell/projects/types";
 import type { NelvyonOutputRow } from "@/features/os-shell/types";
 
@@ -16,7 +16,7 @@ import type {
 const PENDING_QA = new Set(["pending", "qa_review", "generating", "draft", "failed"]);
 
 export interface OsIaSourceData {
-  clients: OsClient[];
+  clients: OsClientPickerRow[];
   projects: OsProject[];
   deals: { id?: number; title?: string; status?: string; client_id?: number | null }[];
   tasks: {

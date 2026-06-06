@@ -1,30 +1,43 @@
 import { apiClient } from "@/core/api";
-import { entityListUrl } from "@/features/os-shell/lib/entityQuery";
+import type {
+  OsClient,
+  OsClientCreateInput,
+  OsClientListResponse,
+  OsClientUpdateInput,
+} from "@/features/os-shell/clients/types";
 
-import type { OsClient, OsClientListResponse, OsClientWriteInput } from "./types";
+const BASE = "/api/v1/os/clients";
 
-const BASE = "/api/v1/entities/nelvyon_clients";
+function qs(params: Record<string, string | number | undefined>): string {
+  const sp = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== "") sp.set(k, String(v));
+  }
+  const s = sp.toString();
+  return s ? `?${s}` : "";
+}
 
-export const osClientsApi = {
+/** Canonical os_clients API — used by Clients UI (OS-1-UI-01). */
+export const osClientsCanonicalApi = {
   list: (params?: {
     skip?: number;
     limit?: number;
-    query?: Record<string, string | number>;
-    sort?: string;
+    q?: string;
+    status?: string;
+    sector?: string;
   }) =>
-    apiClient.get<OsClientListResponse>(
-      entityListUrl(BASE, { skip: params?.skip, limit: params?.limit ?? 200, query: params?.query, sort: params?.sort }),
-      { tenantScoped: true },
-    ),
+    apiClient.get<OsClientListResponse>(`${BASE}${qs(params ?? {})}`, { tenantScoped: true }),
 
-  getById: (id: number) => apiClient.get<OsClient>(`${BASE}/${id}`, { tenantScoped: true }),
+  getById: (id: string) => apiClient.get<OsClient>(`${BASE}/${id}`, { tenantScoped: true }),
 
-  create: (body: OsClientWriteInput) =>
-    apiClient.post<OsClient, OsClientWriteInput>(BASE, { tenantScoped: true, body }),
+  create: (body: OsClientCreateInput) =>
+    apiClient.post<OsClient, OsClientCreateInput>(BASE, { body, tenantScoped: true }),
 
-  update: (id: number, body: Partial<OsClientWriteInput>) =>
-    apiClient.put<OsClient, Partial<OsClientWriteInput>>(`${BASE}/${id}`, { tenantScoped: true, body }),
+  update: (id: string, body: OsClientUpdateInput) =>
+    apiClient.patch<OsClient, OsClientUpdateInput>(`${BASE}/${id}`, { body, tenantScoped: true }),
 
-  delete: (id: number) =>
-    apiClient.delete<{ message: string; id: number }>(`${BASE}/${id}`, { tenantScoped: true }),
+  archive: (id: string) =>
+    apiClient.delete<{ message: string; id: string; status: string }>(`${BASE}/${id}`, {
+      tenantScoped: true,
+    }),
 };

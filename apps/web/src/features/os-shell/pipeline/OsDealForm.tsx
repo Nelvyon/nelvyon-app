@@ -3,7 +3,7 @@
 import { OS_DEAL_STATUS_OPTIONS } from "@/features/os-shell/constants";
 import { OsAssigneeInput } from "@/features/os-shell/components/OsAssigneeInput";
 import { OsField, OsInput, OsSelect, OsTextarea } from "@/features/os-shell/components/ui/OsUi";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import type { OsProject } from "@/features/os-shell/projects/types";
 
 import type { OsDealWriteInput } from "./types";
@@ -17,7 +17,7 @@ export function OsDealForm({
 }: {
   value: OsDealWriteInput;
   onChange: (v: OsDealWriteInput) => void;
-  clients: OsClient[];
+  clients: OsClientPickerRow[];
   projects: OsProject[];
   disabled?: boolean;
 }) {

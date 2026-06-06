@@ -3,7 +3,7 @@
 import { OS_TASK_PRIORITY_OPTIONS, OS_TASK_STATUS_OPTIONS } from "@/features/os-shell/constants";
 import { OsAssigneeInput } from "@/features/os-shell/components/OsAssigneeInput";
 import { OsField, OsInput, OsSelect, OsTextarea } from "@/features/os-shell/components/ui/OsUi";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import type { OsProject } from "@/features/os-shell/projects/types";
 
 import type { OsTaskWriteInput } from "./types";
@@ -20,7 +20,7 @@ export function OsTaskForm({
 }: {
   value: OsTaskWriteInput;
   onChange: (v: OsTaskWriteInput) => void;
-  clients: OsClient[];
+  clients: OsClientPickerRow[];
   projects: OsProject[];
   disabled?: boolean;
 }) {

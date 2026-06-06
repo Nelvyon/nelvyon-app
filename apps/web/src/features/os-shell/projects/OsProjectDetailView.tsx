@@ -5,8 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { ApiError } from "@/core/api/types";
-import { osClientsApi } from "@/features/os-shell/clients/api";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import { osClientsApi } from "@/features/os-shell/clients/legacyApi";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import { OsDeliveriesSection } from "@/features/os-shell/components/OsDeliveriesSection";
 import { OsRelatedOpsSection } from "@/features/os-shell/components/OsRelatedOpsSection";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
@@ -29,8 +29,8 @@ export function OsProjectDetailView({ projectId }: { projectId: number }) {
   const router = useRouter();
   const perms = useOsPermissions();
   const [project, setProject] = useState<OsProject | null>(null);
-  const [client, setClient] = useState<OsClient | null>(null);
-  const [clients, setClients] = useState<OsClient[]>([]);
+  const [client, setClient] = useState<OsClientPickerRow | null>(null);
+  const [clients, setClients] = useState<OsClientPickerRow[]>([]);
   const [campaigns, setCampaigns] = useState<OsCampaign[]>([]);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<OsProjectWriteInput | null>(null);

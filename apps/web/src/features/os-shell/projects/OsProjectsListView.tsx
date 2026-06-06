@@ -6,8 +6,8 @@ import { Plus, Search } from "lucide-react";
 
 import { ApiError } from "@/core/api/types";
 import { OS_PROJECT_STATUS_OPTIONS } from "@/features/os-shell/constants";
-import { osClientsApi } from "@/features/os-shell/clients/api";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import { osClientsApi } from "@/features/os-shell/clients/legacyApi";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
 import {
   OsEmptyState,
@@ -29,7 +29,7 @@ import type { OsProject } from "./types";
 export function OsProjectsListView() {
   const perms = useOsPermissions();
   const [projects, setProjects] = useState<OsProject[]>([]);
-  const [clients, setClients] = useState<OsClient[]>([]);
+  const [clients, setClients] = useState<OsClientPickerRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");

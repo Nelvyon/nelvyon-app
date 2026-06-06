@@ -5,8 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
 import { ApiError } from "@/core/api/types";
-import { osClientsApi } from "@/features/os-shell/clients/api";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import { osClientsApi } from "@/features/os-shell/clients/legacyApi";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
 import {
   OsEmptyState,
@@ -33,7 +33,7 @@ function formatValue(v: number | null | undefined) {
 export function OsPipelineView() {
   const perms = useOsPermissions();
   const [deals, setDeals] = useState<OsDeal[]>([]);
-  const [clients, setClients] = useState<OsClient[]>([]);
+  const [clients, setClients] = useState<OsClientPickerRow[]>([]);
   const [projects, setProjects] = useState<OsProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

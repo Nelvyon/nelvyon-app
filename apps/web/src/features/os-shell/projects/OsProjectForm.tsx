@@ -2,7 +2,7 @@
 
 import { OS_PROJECT_STATUS_OPTIONS, OS_PROJECT_TYPE_OPTIONS } from "@/features/os-shell/constants";
 import { OsField, OsInput, OsSelect, OsTextarea } from "@/features/os-shell/components/ui/OsUi";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 
 import type { OsProjectWriteInput } from "./types";
 
@@ -26,7 +26,7 @@ export function OsProjectForm({
 }: {
   value: OsProjectWriteInput;
   onChange: (next: OsProjectWriteInput) => void;
-  clients: OsClient[];
+  clients: OsClientPickerRow[];
   disabled?: boolean;
 }) {
   const set = <K extends keyof OsProjectWriteInput>(key: K, v: OsProjectWriteInput[K]) =>

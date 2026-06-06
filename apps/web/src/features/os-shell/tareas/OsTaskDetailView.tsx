@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { ApiError } from "@/core/api/types";
-import { osClientsApi } from "@/features/os-shell/clients/api";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import { osClientsApi } from "@/features/os-shell/clients/legacyApi";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
 import {
   OsErrorBanner,
@@ -28,7 +28,7 @@ export function OsTaskDetailView({ taskId }: { taskId: number }) {
   const router = useRouter();
   const perms = useOsPermissions();
   const [task, setTask] = useState<OsTask | null>(null);
-  const [clients, setClients] = useState<OsClient[]>([]);
+  const [clients, setClients] = useState<OsClientPickerRow[]>([]);
   const [projects, setProjects] = useState<OsProject[]>([]);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<OsTaskWriteInput | null>(null);

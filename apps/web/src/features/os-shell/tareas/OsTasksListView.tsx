@@ -5,8 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Check, Plus } from "lucide-react";
 
 import { ApiError } from "@/core/api/types";
-import { osClientsApi } from "@/features/os-shell/clients/api";
-import type { OsClient } from "@/features/os-shell/clients/types";
+import { osClientsApi } from "@/features/os-shell/clients/legacyApi";
+import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
 import {
   OsEmptyState,
@@ -31,7 +31,7 @@ import type { OsTask } from "./types";
 export function OsTasksListView() {
   const perms = useOsPermissions();
   const [tasks, setTasks] = useState<OsTask[]>([]);
-  const [clients, setClients] = useState<OsClient[]>([]);
+  const [clients, setClients] = useState<OsClientPickerRow[]>([]);
   const [projects, setProjects] = useState<OsProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
