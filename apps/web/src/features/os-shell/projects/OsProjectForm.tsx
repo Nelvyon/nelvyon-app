@@ -2,11 +2,11 @@
 
 import { OS_PROJECT_STATUS_OPTIONS, OS_PROJECT_TYPE_OPTIONS } from "@/features/os-shell/constants";
 import { OsField, OsInput, OsSelect, OsTextarea } from "@/features/os-shell/components/ui/OsUi";
-import type { OsClientPickerRow } from "@/features/os-shell/clients/types";
+import type { OsLegacyClient } from "@/features/os-shell/clients/types";
 
-import type { OsProjectWriteInput } from "./types";
+import type { OsLegacyProjectWriteInput } from "./types";
 
-export function emptyOsProjectForm(clientId = 0): OsProjectWriteInput {
+export function emptyOsProjectForm(clientId = 0): OsLegacyProjectWriteInput {
   return {
     client_id: clientId,
     name: "",
@@ -24,12 +24,12 @@ export function OsProjectForm({
   clients,
   disabled,
 }: {
-  value: OsProjectWriteInput;
-  onChange: (next: OsProjectWriteInput) => void;
-  clients: OsClientPickerRow[];
+  value: OsLegacyProjectWriteInput;
+  onChange: (next: OsLegacyProjectWriteInput) => void;
+  clients: OsLegacyClient[];
   disabled?: boolean;
 }) {
-  const set = <K extends keyof OsProjectWriteInput>(key: K, v: OsProjectWriteInput[K]) =>
+  const set = <K extends keyof OsLegacyProjectWriteInput>(key: K, v: OsLegacyProjectWriteInput[K]) =>
     onChange({ ...value, [key]: v });
 
   return (

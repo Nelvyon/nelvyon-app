@@ -22,6 +22,7 @@ import {
   deliverableStatusTone,
 } from "@/features/os-shell/deliverables/deliverableStatus";
 import { useOsPermissions } from "@/features/os-shell/hooks/useOsPermissions";
+import { isOsProjectsCanonicalUiEnabled } from "@/features/os-shell/projects/featureFlag";
 
 import { osClientsCanonicalApi } from "./api";
 import { fetchLinkedProjects, fetchRecentDeliverables } from "./clientEnrichment";
@@ -146,8 +147,18 @@ export function OsClientDetailCanonicalView({ clientId }: { clientId: string }) 
                   <>
                     <OsGhostButton href={`/os/pipeline/nuevo?client_id=${legacyId}`}>Nueva oportunidad</OsGhostButton>
                     <OsGhostButton href={`/os/tareas/nuevo?client_id=${legacyId}`}>Nueva tarea</OsGhostButton>
-                    <OsPrimaryButton href={`/os/proyectos/nuevo?client_id=${legacyId}`}>Nuevo proyecto</OsPrimaryButton>
+                    <OsPrimaryButton
+                      href={
+                        isOsProjectsCanonicalUiEnabled()
+                          ? `/os/proyectos/nuevo?client_id=${client.id}`
+                          : `/os/proyectos/nuevo?client_id=${legacyId}`
+                      }
+                    >
+                      Nuevo proyecto
+                    </OsPrimaryButton>
                   </>
+                ) : isOsProjectsCanonicalUiEnabled() ? (
+                  <OsPrimaryButton href={`/os/proyectos/nuevo?client_id=${client.id}`}>Nuevo proyecto</OsPrimaryButton>
                 ) : (
                   <OsGhostButton href={`/os/entregables/nuevo?client_id=${client.id}`}>Nuevo entregable</OsGhostButton>
                 )}
@@ -286,7 +297,11 @@ export function OsClientDetailCanonicalView({ clientId }: { clientId: string }) 
                 <td className="px-4 py-2">
                   <OsStatusBadge label={p.status || "—"} tone="neutral" />
                 </td>
-                <td className="px-4 py-2 text-right text-white/40 text-xs">{p.id.slice(0, 8)}…</td>
+                <td className="px-4 py-2 text-right">
+                  <Link href={`/os/proyectos/${p.id}`} className="text-[#0084FF] hover:underline">
+                    Ver
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>

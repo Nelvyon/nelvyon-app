@@ -10,9 +10,5 @@ export default async function OsProyectoDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const projectId = Number(id);
-  if (!Number.isFinite(projectId) || projectId <= 0) {
-    return <p className="p-8 text-white">ID de proyecto inválido</p>;
-  }
-  return <OsProjectDetailView projectId={projectId} />;
+  return <OsProjectDetailView projectId={id} />;
 }

@@ -305,12 +305,12 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
   }
   if (path === "/os/proyectos" || path.startsWith("/os/proyectos/")) {
     if (path.endsWith("/nuevo")) {
-      return { documentTitle: "Nuevo proyecto · NELVYON OS", heading: "Nuevo proyecto", description: "nelvyon_projects" };
+      return { documentTitle: "Nuevo proyecto · NELVYON OS", heading: "Nuevo proyecto", description: "os_projects" };
     }
-    if (/\/proyectos\/\d+/.test(path)) {
-      return { documentTitle: "Proyecto · NELVYON OS", heading: "Detalle proyecto", description: "nelvyon_projects" };
+    if (/\/proyectos\/[^/]+/.test(path) && !path.endsWith("/nuevo")) {
+      return { documentTitle: "Proyecto · NELVYON OS", heading: "Detalle proyecto", description: "os_projects" };
     }
-    return { documentTitle: "Proyectos · NELVYON OS", heading: "Proyectos", description: "nelvyon_projects" };
+    return { documentTitle: "Proyectos · NELVYON OS", heading: "Proyectos", description: "os_projects" };
   }
   if (path === "/os/pipeline" || path.startsWith("/os/pipeline/")) {
     if (path.endsWith("/nuevo")) {
