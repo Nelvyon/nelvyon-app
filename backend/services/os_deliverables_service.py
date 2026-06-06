@@ -17,7 +17,17 @@ from models.os_tasks import Os_tasks
 logger = logging.getLogger(__name__)
 
 VALID_STATUSES = frozenset(
-    {"draft", "in_review", "delivered", "approved", "published", "rejected", "archived"}
+    {
+        "draft",
+        "in_review",
+        "delivered",
+        "approved",
+        "published",
+        "approved_by_client",
+        "changes_requested",
+        "rejected",
+        "archived",
+    }
 )
 VALID_VISIBILITY = frozenset({"internal", "client_visible"})
 

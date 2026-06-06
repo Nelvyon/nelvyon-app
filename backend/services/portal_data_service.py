@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.os_deliverables import Os_deliverables
 from models.os_projects import Os_projects
+from services.portal_deliverable_review_service import PORTAL_VISIBLE_STATUSES
 
 logger = logging.getLogger(__name__)
 
@@ -100,13 +101,13 @@ class PortalDataService:
             Os_deliverables.workspace_id == workspace_id,
             Os_deliverables.client_id == client_id,
             Os_deliverables.visibility == "client_visible",
-            Os_deliverables.status == "published",
+            Os_deliverables.status.in_(tuple(PORTAL_VISIBLE_STATUSES)),
         )
         count_q = select(func.count(Os_deliverables.id)).where(
             Os_deliverables.workspace_id == workspace_id,
             Os_deliverables.client_id == client_id,
             Os_deliverables.visibility == "client_visible",
-            Os_deliverables.status == "published",
+            Os_deliverables.status.in_(tuple(PORTAL_VISIBLE_STATUSES)),
         )
 
         if project_id:
@@ -146,7 +147,7 @@ class PortalDataService:
             Os_deliverables.workspace_id == workspace_id,
             Os_deliverables.client_id == client_id,
             Os_deliverables.visibility == "client_visible",
-            Os_deliverables.status == "published",
+            Os_deliverables.status.in_(tuple(PORTAL_VISIBLE_STATUSES)),
         )
         result = await self.db.execute(q)
         row = result.scalar_one_or_none()
@@ -166,14 +167,21 @@ class PortalDataService:
 
     @staticmethod
     def _deliverable_dict(row: Os_deliverables) -> Dict[str, Any]:
+        meta = row.deliverable_metadata if isinstance(row.deliverable_metadata, dict) else {}
         return {
             "id": row.id,
             "project_id": row.project_id,
             "title": row.title,
             "description": row.description,
             "type": row.type,
+            "status": row.status,
             "file_url": row.file_url,
             "version": row.version,
             "published_at": row.published_at.isoformat() if row.published_at else None,
+            "client_reviewed_at": row.client_reviewed_at.isoformat()
+            if row.client_reviewed_at
+            else None,
+            "client_feedback": meta.get("client_feedback"),
+            "client_review_decision": meta.get("client_review_decision"),
             "updated_at": row.updated_at.isoformat() if row.updated_at else None,
         }

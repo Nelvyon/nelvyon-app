@@ -102,6 +102,7 @@ async def setup_database(test_engine):
     import models.os_deliverables  # noqa: F401 — OS-1-08 canonical deliverables
     import models.os_portal_invites  # noqa: F401 — OS-1-09 portal invites
     import models.os_portal_users  # noqa: F401 — OS-1-09 portal users
+    import models.os_deliverable_reviews  # noqa: F401 — OS-1-10 client reviews
     import models.os_expenses  # noqa: F401 — Fase 2F finanzas OS
     import models.os_cashflow  # noqa: F401
     import models.contacts  # noqa: F401 — e2e_orchestrator / CRM chain tests

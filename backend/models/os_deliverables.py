@@ -29,6 +29,8 @@ class Os_deliverables(Base):
     delivered_at = Column(DateTime(timezone=True), nullable=True)
     approved_at = Column(DateTime(timezone=True), nullable=True)
     published_at = Column(DateTime(timezone=True), nullable=True)
+    client_reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    approved_by_portal_user_id = Column(String(36), nullable=True)
     deliverable_metadata = Column("metadata", JSON, nullable=False, default=dict)
     archived_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=True)

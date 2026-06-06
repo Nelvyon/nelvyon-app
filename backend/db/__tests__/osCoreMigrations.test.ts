@@ -162,3 +162,29 @@ describe("319_os_portal migration", () => {
     }
   });
 });
+
+describe("320_os_deliverable_reviews migration", () => {
+  const sql = fs.readFileSync(
+    path.resolve(__dirname, "../../db/migrations/320_os_deliverable_reviews.sql"),
+    "utf8",
+  );
+
+  it("crea os_deliverable_reviews y extiende status", () => {
+    expect(sql).toMatch(/CREATE TABLE IF NOT EXISTS os_deliverable_reviews/i);
+    expect(sql).toMatch(/approved_by_client/);
+    expect(sql).toMatch(/changes_requested/);
+    expect(sql).toMatch(/client_reviewed_at/);
+  });
+
+  it("define FKs e índices de reviews", () => {
+    expect(sql).toMatch(/REFERENCES os_deliverables/i);
+    expect(sql).toMatch(/REFERENCES os_portal_users/i);
+    for (const idx of [
+      "idx_os_deliverable_reviews_deliverable",
+      "idx_os_deliverable_reviews_workspace",
+      "idx_os_deliverable_reviews_portal_user",
+    ]) {
+      expect(sql).toContain(idx);
+    }
+  });
+});

@@ -46,6 +46,7 @@ const REQUIRED_MIGRATIONS = [
   "317_os_tasks.sql",
   "318_os_deliverables.sql",
   "319_os_portal.sql",
+  "320_os_deliverable_reviews.sql",
 ] as const;
 
 const OS_CLIENTS_COLUMNS = [
@@ -131,6 +132,8 @@ const OS_DELIVERABLES_COLUMNS = [
   "delivered_at",
   "approved_at",
   "published_at",
+  "client_reviewed_at",
+  "approved_by_portal_user_id",
   "metadata",
   "created_at",
   "updated_at",
@@ -145,6 +148,22 @@ const OS_DELIVERABLES_INDEXES = [
   "idx_os_deliverables_status",
   "idx_os_deliverables_visibility",
   "idx_os_deliverables_updated_at",
+] as const;
+
+const OS_DELIVERABLE_REVIEWS_COLUMNS = [
+  "id",
+  "workspace_id",
+  "deliverable_id",
+  "portal_user_id",
+  "decision",
+  "feedback",
+  "created_at",
+] as const;
+
+const OS_DELIVERABLE_REVIEWS_INDEXES = [
+  "idx_os_deliverable_reviews_deliverable",
+  "idx_os_deliverable_reviews_workspace",
+  "idx_os_deliverable_reviews_portal_user",
 ] as const;
 
 const OS_PORTAL_INVITES_COLUMNS = [
@@ -409,9 +428,9 @@ async function main(): Promise<void> {
 
     ok =
       (await checkCheckConstraint(db, "os_deliverables", "status", [
-        "'draft'",
         "'published'",
-        "'archived'",
+        "'approved_by_client'",
+        "'changes_requested'",
       ])) && ok;
     ok =
       (await checkCheckConstraint(db, "os_deliverables", "visibility", [
@@ -530,13 +549,57 @@ async function main(): Promise<void> {
     }
   }
 
+  const hasReviews = await tableExists(db, "os_deliverable_reviews");
+  if (!hasReviews) {
+    console.error("[validate-os-core] FALTA tabla: os_deliverable_reviews");
+    ok = false;
+  } else {
+    ok = (await checkColumns(db, "os_deliverable_reviews", OS_DELIVERABLE_REVIEWS_COLUMNS)) && ok;
+    ok =
+      (await checkCheckConstraint(db, "os_deliverable_reviews", "decision", [
+        "'approve'",
+        "'reject'",
+      ])) && ok;
+    const revFk = await db.query<{ def: string }>(
+      `SELECT pg_get_constraintdef(c.oid) AS def
+       FROM pg_constraint c
+       JOIN pg_class t ON t.oid = c.conrelid
+       JOIN pg_namespace n ON n.oid = t.relnamespace
+       WHERE n.nspname = 'public' AND t.relname = 'os_deliverable_reviews' AND c.contype = 'f'`,
+    );
+    if (!revFk.some((r) => r.def?.includes("os_deliverables") && r.def?.includes("deliverable_id"))) {
+      console.error("[validate-os-core] FALTA FK os_deliverable_reviews.deliverable_id → os_deliverables");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK deliverable_id → os_deliverables");
+    }
+    if (!revFk.some((r) => r.def?.includes("os_portal_users") && r.def?.includes("portal_user_id"))) {
+      console.error("[validate-os-core] FALTA FK os_deliverable_reviews.portal_user_id → os_portal_users");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK portal_user_id → os_portal_users");
+    }
+    for (const idx of OS_DELIVERABLE_REVIEWS_INDEXES) {
+      const idxRows = await db.query<{ reg: string | null }>(
+        "SELECT to_regclass($1)::text AS reg",
+        [`public.${idx}`],
+      );
+      if (!idxRows[0]?.reg) {
+        console.error(`[validate-os-core] FALTA índice: ${idx}`);
+        ok = false;
+      } else {
+        console.log(`[validate-os-core] OK índice ${idx}`);
+      }
+    }
+  }
+
   await db.end();
   if (!ok) {
     console.error("[validate-os-core] Validación fallida.");
     process.exit(1);
   }
   console.log(
-    "[validate-os-core] Validación OK (315–319: clients, projects, tasks, deliverables, portal).",
+    "[validate-os-core] Validación OK (315–320: clients, projects, tasks, deliverables, portal, reviews).",
   );
 }
 

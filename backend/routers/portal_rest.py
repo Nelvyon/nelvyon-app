@@ -14,6 +14,7 @@ from dependencies.portal import PortalContext, require_portal_user
 from dependencies.workspace import WorkspaceContext, require_workspace_operator
 from services.portal_auth_service import PortalAuthService
 from services.portal_data_service import PortalDataService
+from services.portal_deliverable_review_service import PortalDeliverableReviewService
 
 logger = logging.getLogger(__name__)
 
@@ -77,10 +78,32 @@ class PortalDeliverableResponse(BaseModel):
     title: str
     description: Optional[str] = None
     type: Optional[str] = None
+    status: str
     file_url: Optional[str] = None
     version: int
     published_at: Optional[str] = None
+    client_reviewed_at: Optional[str] = None
+    client_feedback: Optional[str] = None
+    client_review_decision: Optional[str] = None
     updated_at: Optional[str] = None
+
+
+class PortalDeliverableRejectBody(BaseModel):
+    feedback: str = Field(..., min_length=1)
+
+
+class PortalDeliverableApproveBody(BaseModel):
+    feedback: Optional[str] = None
+
+
+class PortalDeliverableReviewResponse(BaseModel):
+    id: str
+    project_id: str
+    title: str
+    status: str
+    client_reviewed_at: Optional[str] = None
+    client_feedback: Optional[str] = None
+    client_review_decision: Optional[str] = None
 
 
 class PortalListResponse(BaseModel):
@@ -250,3 +273,51 @@ async def portal_get_deliverable(
     if not row:
         raise HTTPException(status_code=404, detail="Deliverable not found")
     return PortalDeliverableResponse(**row)
+
+
+@router.post("/deliverables/{deliverable_id}/approve", response_model=PortalDeliverableReviewResponse)
+async def portal_approve_deliverable(
+    deliverable_id: str,
+    body: PortalDeliverableApproveBody = PortalDeliverableApproveBody(),
+    portal: PortalContext = Depends(require_portal_user),
+    db: AsyncSession = Depends(get_db),
+):
+    service = PortalDeliverableReviewService(db)
+    try:
+        result = await service.approve(
+            deliverable_id,
+            workspace_id=portal.workspace_id,
+            client_id=portal.client_id,
+            portal_user_id=portal.portal_user_id,
+            feedback=body.feedback,
+        )
+        return PortalDeliverableReviewResponse(**result)
+    except ValueError as e:
+        msg = str(e)
+        code = 404 if "not found" in msg.lower() else 400
+        raise HTTPException(status_code=code, detail=msg) from e
+
+
+@router.post("/deliverables/{deliverable_id}/reject", response_model=PortalDeliverableReviewResponse)
+async def portal_reject_deliverable(
+    deliverable_id: str,
+    body: PortalDeliverableRejectBody,
+    portal: PortalContext = Depends(require_portal_user),
+    db: AsyncSession = Depends(get_db),
+):
+    service = PortalDeliverableReviewService(db)
+    try:
+        result = await service.reject(
+            deliverable_id,
+            workspace_id=portal.workspace_id,
+            client_id=portal.client_id,
+            portal_user_id=portal.portal_user_id,
+            feedback=body.feedback,
+        )
+        return PortalDeliverableReviewResponse(**result)
+    except ValueError as e:
+        msg = str(e)
+        if "feedback is required" in msg:
+            raise HTTPException(status_code=400, detail=msg) from e
+        code = 404 if "not found" in msg.lower() else 400
+        raise HTTPException(status_code=code, detail=msg) from e

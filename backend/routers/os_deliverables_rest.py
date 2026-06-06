@@ -77,6 +77,8 @@ class OsDeliverableResponse(BaseModel):
     delivered_at: Optional[datetime] = None
     approved_at: Optional[datetime] = None
     published_at: Optional[datetime] = None
+    client_reviewed_at: Optional[datetime] = None
+    approved_by_portal_user_id: Optional[str] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
     archived_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
@@ -111,6 +113,8 @@ def _to_response(row: Os_deliverables) -> OsDeliverableResponse:
         delivered_at=row.delivered_at,
         approved_at=row.approved_at,
         published_at=row.published_at,
+        client_reviewed_at=row.client_reviewed_at,
+        approved_by_portal_user_id=row.approved_by_portal_user_id,
         metadata=row.deliverable_metadata if isinstance(row.deliverable_metadata, dict) else {},
         archived_at=row.archived_at,
         created_at=row.created_at,
@@ -174,6 +178,26 @@ async def get_os_deliverable(
     if not row:
         raise HTTPException(status_code=404, detail="Deliverable not found")
     return _to_response(row)
+
+
+@router.get("/{deliverable_id}/client-reviews")
+async def list_os_deliverable_client_reviews(
+    deliverable_id: str,
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Historial de revisiones cliente portal (solo lectura, equipo interno)."""
+    from services.portal_deliverable_review_service import PortalDeliverableReviewService
+
+    deliverable_service = OsDeliverablesService(db)
+    row = await deliverable_service.get_by_id(deliverable_id, workspace_id=ws_ctx.workspace_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Deliverable not found")
+    review_service = PortalDeliverableReviewService(db)
+    items = await review_service.list_reviews_for_deliverable(
+        deliverable_id, workspace_id=ws_ctx.workspace_id
+    )
+    return {"items": items, "total": len(items)}
 
 
 @router.post("", response_model=OsDeliverableResponse, status_code=201)
