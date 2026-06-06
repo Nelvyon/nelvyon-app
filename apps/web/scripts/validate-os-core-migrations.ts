@@ -45,6 +45,7 @@ const REQUIRED_MIGRATIONS = [
   "316_os_projects.sql",
   "317_os_tasks.sql",
   "318_os_deliverables.sql",
+  "319_os_portal.sql",
 ] as const;
 
 const OS_CLIENTS_COLUMNS = [
@@ -144,6 +145,40 @@ const OS_DELIVERABLES_INDEXES = [
   "idx_os_deliverables_status",
   "idx_os_deliverables_visibility",
   "idx_os_deliverables_updated_at",
+] as const;
+
+const OS_PORTAL_INVITES_COLUMNS = [
+  "id",
+  "workspace_id",
+  "client_id",
+  "email",
+  "token_hash",
+  "role",
+  "expires_at",
+  "accepted_at",
+  "created_by_user_id",
+  "created_at",
+] as const;
+
+const OS_PORTAL_USERS_COLUMNS = [
+  "id",
+  "workspace_id",
+  "client_id",
+  "email",
+  "password_hash",
+  "name",
+  "status",
+  "invite_id",
+  "last_login_at",
+  "created_at",
+  "updated_at",
+] as const;
+
+const OS_PORTAL_INDEXES = [
+  "idx_os_portal_invites_token_hash",
+  "idx_os_portal_invites_workspace_client",
+  "idx_os_portal_users_workspace_email",
+  "idx_os_portal_users_client",
 ] as const;
 
 async function tableExists(db: ReturnType<typeof DbClient.getInstance>, table: string): Promise<boolean> {
@@ -434,13 +469,74 @@ async function main(): Promise<void> {
     }
   }
 
+  const hasPortalInvites = await tableExists(db, "os_portal_invites");
+  const hasPortalUsers = await tableExists(db, "os_portal_users");
+  if (!hasPortalInvites) {
+    console.error("[validate-os-core] FALTA tabla: os_portal_invites");
+    ok = false;
+  } else {
+    ok = (await checkColumns(db, "os_portal_invites", OS_PORTAL_INVITES_COLUMNS)) && ok;
+    const invFk = await db.query<{ def: string }>(
+      `SELECT pg_get_constraintdef(c.oid) AS def
+       FROM pg_constraint c
+       JOIN pg_class t ON t.oid = c.conrelid
+       JOIN pg_namespace n ON n.oid = t.relnamespace
+       WHERE n.nspname = 'public' AND t.relname = 'os_portal_invites' AND c.contype = 'f'`,
+    );
+    if (!invFk.some((r) => r.def?.includes("os_clients") && r.def?.includes("client_id"))) {
+      console.error("[validate-os-core] FALTA FK os_portal_invites.client_id → os_clients(id)");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK os_portal_invites.client_id → os_clients");
+    }
+  }
+  if (!hasPortalUsers) {
+    console.error("[validate-os-core] FALTA tabla: os_portal_users");
+    ok = false;
+  } else {
+    ok = (await checkColumns(db, "os_portal_users", OS_PORTAL_USERS_COLUMNS)) && ok;
+    ok =
+      (await checkCheckConstraint(db, "os_portal_users", "status", [
+        "'active'",
+        "'disabled'",
+      ])) && ok;
+    const usrFk = await db.query<{ def: string }>(
+      `SELECT pg_get_constraintdef(c.oid) AS def
+       FROM pg_constraint c
+       JOIN pg_class t ON t.oid = c.conrelid
+       JOIN pg_namespace n ON n.oid = t.relnamespace
+       WHERE n.nspname = 'public' AND t.relname = 'os_portal_users' AND c.contype = 'f'`,
+    );
+    if (!usrFk.some((r) => r.def?.includes("os_clients") && r.def?.includes("client_id"))) {
+      console.error("[validate-os-core] FALTA FK os_portal_users.client_id → os_clients(id)");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK os_portal_users.client_id → os_clients");
+    }
+  }
+  if (hasPortalInvites && hasPortalUsers) {
+    console.log("[validate-os-core] OK tablas portal (os_portal_invites + os_portal_users)");
+    for (const idx of OS_PORTAL_INDEXES) {
+      const idxRows = await db.query<{ reg: string | null }>(
+        "SELECT to_regclass($1)::text AS reg",
+        [`public.${idx}`],
+      );
+      if (!idxRows[0]?.reg) {
+        console.error(`[validate-os-core] FALTA índice: ${idx}`);
+        ok = false;
+      } else {
+        console.log(`[validate-os-core] OK índice ${idx}`);
+      }
+    }
+  }
+
   await db.end();
   if (!ok) {
     console.error("[validate-os-core] Validación fallida.");
     process.exit(1);
   }
   console.log(
-    "[validate-os-core] Validación OK (315 os_clients + 316 os_projects + 317 os_tasks + 318 os_deliverables).",
+    "[validate-os-core] Validación OK (315–319: clients, projects, tasks, deliverables, portal).",
   );
 }
 

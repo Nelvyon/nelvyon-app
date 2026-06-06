@@ -28,6 +28,7 @@ _PUBLIC_PREFIXES = (
     "/api/v1/auth/login",
     "/api/v1/auth/callback",
     "/api/v1/auth/register",
+    "/api/v1/portal/auth/",
     "/api/v1/system/",
     "/api/v1/email/health",
     "/api/affiliates/track/",
@@ -41,6 +42,7 @@ _PUBLIC_PREFIXES = (
 
 _OPTIONAL_TENANT_PREFIXES = (
     "/api/v1/auth/",
+    "/api/v1/portal/",
     "/api/marketplace/agencies",
     "/api/developer/docs",
     "/api/workspace/",

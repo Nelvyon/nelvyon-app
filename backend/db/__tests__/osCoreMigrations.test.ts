@@ -134,3 +134,31 @@ describe("318_os_deliverables migration", () => {
     }
   });
 });
+
+describe("319_os_portal migration", () => {
+  const sql = fs.readFileSync(
+    path.resolve(__dirname, "../../db/migrations/319_os_portal.sql"),
+    "utf8",
+  );
+
+  it("crea tablas os_portal_invites y os_portal_users", () => {
+    expect(sql).toMatch(/CREATE TABLE IF NOT EXISTS os_portal_invites/i);
+    expect(sql).toMatch(/CREATE TABLE IF NOT EXISTS os_portal_users/i);
+  });
+
+  it("define FKs hacia os_clients", () => {
+    expect(sql).toMatch(/client_id\s+UUID NOT NULL REFERENCES os_clients/i);
+  });
+
+  it("incluye token_hash e índices portal", () => {
+    expect(sql).toContain("token_hash");
+    for (const idx of [
+      "idx_os_portal_invites_token_hash",
+      "idx_os_portal_invites_workspace_client",
+      "idx_os_portal_users_workspace_email",
+      "idx_os_portal_users_client",
+    ]) {
+      expect(sql).toContain(idx);
+    }
+  });
+});
