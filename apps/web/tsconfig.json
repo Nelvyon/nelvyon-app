@@ -162,6 +162,7 @@
   "exclude": [
     "node_modules",
     "../../backend/os-agents/__tests__/**/*",
+    "../../backend/db/__tests__/**/*",
     "../../backend/saas/__tests__/**/*",
     "../../backend/admin/__tests__/**/*",
     "../../backend/email/__tests__/**/*",
