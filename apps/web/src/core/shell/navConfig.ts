@@ -124,6 +124,18 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "Help", href: "/help", prefix: "/help", module: "help", icon: CircleHelp },
 ] as const;
 
+const CLIENT_PORTAL_NAV: readonly ProductNavItem[] = [
+  { label: "Dashboard", href: "/portal", prefix: "/portal-home", module: "campaigns", icon: Layout },
+  { label: "Projects", href: "/portal/projects", prefix: "/portal/projects", module: "campaigns", icon: Megaphone },
+  {
+    label: "Deliverables",
+    href: "/portal/deliverables",
+    prefix: "/portal/deliverables",
+    module: "campaigns",
+    icon: FileText,
+  },
+];
+
 function labelForMode(item: ProductNavItem, mode: BrandMode): string {
   if (mode === "internal") return item.label;
   if (item.module === "inbox") return "Requests";
@@ -134,10 +146,16 @@ function labelForMode(item: ProductNavItem, mode: BrandMode): string {
 }
 
 export function getNavItemsForRole(role: UserRole, mode: BrandMode = "internal"): ProductNavItem[] {
-  return PRODUCT_NAV.filter((item) => (mode === "client" ? isModuleAllowed(item.module, mode) : can(role, item.module, "view") && isModuleAllowed(item.module, mode))).map((item) => ({
-    ...item,
-    label: labelForMode(item, mode),
-  }));
+  if (mode === "client") {
+    const supportNav = PRODUCT_NAV.filter(
+      (item) => isModuleAllowed(item.module, mode) && item.module !== "campaigns",
+    ).map((item) => ({ ...item, label: labelForMode(item, mode) }));
+    return [...CLIENT_PORTAL_NAV, ...supportNav];
+  }
+
+  return PRODUCT_NAV.filter(
+    (item) => can(role, item.module, "view") && isModuleAllowed(item.module, mode),
+  ).map((item) => ({ ...item, label: labelForMode(item, mode) }));
 }
 
 export function isNavActive(pathname: string, item: ProductNavItem) {

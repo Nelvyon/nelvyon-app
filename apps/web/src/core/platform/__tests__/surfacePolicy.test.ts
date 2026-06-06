@@ -17,6 +17,10 @@ describe("surface policy", () => {
   it("allows explicit client portal routes", () => {
     expect(isPathAllowed("/", "client")).toBe(true);
     expect(isPathAllowed("/account", "client")).toBe(true);
+    expect(isPathAllowed("/portal", "client")).toBe(true);
+    expect(isPathAllowed("/portal/projects/abc", "client")).toBe(true);
+    expect(isPathAllowed("/portal/deliverables/abc", "client")).toBe(true);
+    expect(isPathAllowed("/client/accept-invite", "client")).toBe(true);
     expect(isPathAllowed("/inbox/tickets/11", "client")).toBe(true);
     expect(isPathAllowed("/campaigns/4", "client")).toBe(true);
     expect(isPathAllowed("/help", "client")).toBe(true);

@@ -16,6 +16,8 @@ export const CLIENT_PORTAL_ALLOWED: readonly string[] = [
   "/",
   "/auth/signup",
   "/client/sign-in",
+  "/client/accept-invite",
+  "/portal",
   "/account",
   "/app/assistant",
   "/app/advisor",
@@ -30,7 +32,7 @@ export const CLIENT_PORTAL_ALLOWED: readonly string[] = [
   "/billing",
 ];
 
-const CLIENT_ALLOWED_MODULES = new Set<ModuleKey>(["inbox", "campaigns", "help", "billing", "branding", "os"]);
+const CLIENT_ALLOWED_MODULES = new Set<ModuleKey>(["inbox", "campaigns", "help", "billing", "branding"]);
 
 function pathMatches(pathname: string, prefix: string) {
   if (prefix === "/") return pathname === "/";

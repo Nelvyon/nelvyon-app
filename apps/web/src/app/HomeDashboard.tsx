@@ -5,22 +5,35 @@ import Link from "next/link";
 import { useAuth } from "@/core/auth/AuthContext";
 import { getBrandMode } from "@/core/platform/brand";
 import { isClientTicketCreateEnabled } from "@/core/platform/surfacePolicy";
+import { usePortalAuth } from "@/features/client_portal_v1/PortalAuthContext";
 import { ActivationChecklist } from "@/features/onboarding/components/ActivationChecklist";
 
 export function HomeDashboard() {
-  const { isAuthenticated } = useAuth();
   const isClientMode = getBrandMode() === "client";
+  const portalAuth = usePortalAuth();
+  const { isAuthenticated: platformAuthenticated } = useAuth();
   const ticketCreateEnabled = isClientTicketCreateEnabled();
 
   if (isClientMode) {
-    if (!isAuthenticated) {
+    if (portalAuth.isLoading) {
+      return (
+        <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground shadow-card">
+          Loading your portal session…
+        </div>
+      );
+    }
+
+    if (!portalAuth.isAuthenticated) {
       return (
         <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground shadow-card">
           <p>
-            Sign in to open your request and project portal.
-            {" "}
+            Sign in to review projects and deliverables.{" "}
             <Link className="text-link underline" href="/client/sign-in">
-              Open client sign-in
+              Client sign-in
+            </Link>{" "}
+            or{" "}
+            <Link className="text-link underline" href="/client/accept-invite">
+              activate an invite
             </Link>
             .
           </p>
@@ -33,13 +46,34 @@ export function HomeDashboard() {
         <div>
           <h2 className="text-base font-semibold text-foreground">Start here</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Track requests, review project status, and contact support from one place.
+            Review deliverables, track project status, and contact support from one place.
           </p>
         </div>
         <ul className="grid gap-3 sm:grid-cols-3">
           <li className="rounded-md border border-border p-3">
+            <p className="text-sm font-medium text-foreground">Dashboard</p>
+            <p className="mt-1 text-xs text-muted-foreground">Overview of pending reviews and activity.</p>
+            <Link className="mt-2 inline-block text-sm text-link underline" href="/portal">
+              Open dashboard
+            </Link>
+          </li>
+          <li className="rounded-md border border-border p-3">
+            <p className="text-sm font-medium text-foreground">Projects</p>
+            <p className="mt-1 text-xs text-muted-foreground">View delivery progress and project details.</p>
+            <Link className="mt-2 inline-block text-sm text-link underline" href="/portal/projects">
+              Open projects
+            </Link>
+          </li>
+          <li className="rounded-md border border-border p-3">
+            <p className="text-sm font-medium text-foreground">Deliverables</p>
+            <p className="mt-1 text-xs text-muted-foreground">Approve or request changes on published work.</p>
+            <Link className="mt-2 inline-block text-sm text-link underline" href="/portal/deliverables">
+              Open deliverables
+            </Link>
+          </li>
+          <li className="rounded-md border border-border p-3">
             <p className="text-sm font-medium text-foreground">Requests</p>
-            <p className="mt-1 text-xs text-muted-foreground">Review open items and updates from your account team.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Review open items from your account team.</p>
             <Link className="mt-2 inline-block text-sm text-link underline" href="/inbox/tickets">
               Open requests
             </Link>
@@ -50,13 +84,6 @@ export function HomeDashboard() {
             )}
           </li>
           <li className="rounded-md border border-border p-3">
-            <p className="text-sm font-medium text-foreground">Projects</p>
-            <p className="mt-1 text-xs text-muted-foreground">View delivery progress and current execution status.</p>
-            <Link className="mt-2 inline-block text-sm text-link underline" href="/campaigns">
-              Open projects
-            </Link>
-          </li>
-          <li className="rounded-md border border-border p-3">
             <p className="text-sm font-medium text-foreground">Support</p>
             <p className="mt-1 text-xs text-muted-foreground">Find guidance and next steps for common tasks.</p>
             <Link className="mt-2 inline-block text-sm text-link underline" href="/help">
@@ -65,16 +92,9 @@ export function HomeDashboard() {
           </li>
           <li className="rounded-md border border-border p-3">
             <p className="text-sm font-medium text-foreground">Billing</p>
-            <p className="mt-1 text-xs text-muted-foreground">Review plan snapshot, usage, and invoices in read-only mode.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Review plan snapshot and invoices (read-only).</p>
             <Link className="mt-2 inline-block text-sm text-link underline" href="/billing">
               Open billing
-            </Link>
-          </li>
-          <li className="rounded-md border border-border p-3">
-            <p className="text-sm font-medium text-foreground">Account</p>
-            <p className="mt-1 text-xs text-muted-foreground">Check profile details, access count, and recent account activity.</p>
-            <Link className="mt-2 inline-block text-sm text-link underline" href="/account">
-              Open account
             </Link>
           </li>
         </ul>
@@ -82,7 +102,7 @@ export function HomeDashboard() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!platformAuthenticated) {
     return (
       <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground shadow-card">
         <p>
