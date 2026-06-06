@@ -59,6 +59,22 @@ class OsDeliverableRejectBody(BaseModel):
     review_notes: Optional[str] = None
 
 
+class OsDeliverableVersionResponse(BaseModel):
+    id: str
+    deliverable_id: str
+    version: int
+    status: str
+    file_url: Optional[str] = None
+    review_notes: Optional[str] = None
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    created_at: Optional[str] = None
+
+
+class OsDeliverableVersionListResponse(BaseModel):
+    items: List[OsDeliverableVersionResponse]
+    total: int
+
+
 class OsDeliverableResponse(BaseModel):
     id: str
     workspace_id: int
@@ -198,6 +214,23 @@ async def list_os_deliverable_client_reviews(
         deliverable_id, workspace_id=ws_ctx.workspace_id
     )
     return {"items": items, "total": len(items)}
+
+
+@router.get("/{deliverable_id}/versions", response_model=OsDeliverableVersionListResponse)
+async def list_os_deliverable_versions(
+    deliverable_id: str,
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Historial de snapshots de versiones anteriores (OS-1-11)."""
+    service = OsDeliverablesService(db)
+    items = await service.list_versions(deliverable_id, workspace_id=ws_ctx.workspace_id)
+    if items is None:
+        raise HTTPException(status_code=404, detail="Deliverable not found")
+    return OsDeliverableVersionListResponse(
+        items=[OsDeliverableVersionResponse(**row) for row in items],
+        total=len(items),
+    )
 
 
 @router.post("", response_model=OsDeliverableResponse, status_code=201)
@@ -340,4 +373,28 @@ async def reject_os_deliverable(
         raise _handle_value_error(e) from e
     except Exception as e:
         logger.error("Reject on %s failed: %s", deliverable_id, e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
+@router.post("/{deliverable_id}/create-revision", response_model=OsDeliverableResponse)
+async def create_revision_os_deliverable(
+    deliverable_id: str,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    """Crea nueva revisión tras changes_requested: snapshot vN → draft vN+1."""
+    service = OsDeliverablesService(db)
+    try:
+        row = await service.create_revision(
+            deliverable_id, workspace_id=ws_ctx.workspace_id
+        )
+        if not row:
+            raise HTTPException(status_code=404, detail="Deliverable not found")
+        return _to_response(row)
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise _handle_value_error(e) from e
+    except Exception as e:
+        logger.error("Create revision on %s failed: %s", deliverable_id, e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error") from e

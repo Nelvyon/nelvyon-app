@@ -188,3 +188,25 @@ describe("320_os_deliverable_reviews migration", () => {
     }
   });
 });
+
+describe("321_os_deliverable_versions migration", () => {
+  const sql = fs.readFileSync(
+    path.resolve(__dirname, "../../db/migrations/321_os_deliverable_versions.sql"),
+    "utf8",
+  );
+
+  it("crea os_deliverable_versions con UNIQUE deliverable+version", () => {
+    expect(sql).toMatch(/CREATE TABLE IF NOT EXISTS os_deliverable_versions/i);
+    expect(sql).toMatch(/UNIQUE \(deliverable_id, version\)/i);
+    expect(sql).toMatch(/REFERENCES os_deliverables/i);
+  });
+
+  it("define índices de versiones", () => {
+    for (const idx of [
+      "idx_os_deliverable_versions_deliverable",
+      "idx_os_deliverable_versions_workspace",
+    ]) {
+      expect(sql).toContain(idx);
+    }
+  });
+});

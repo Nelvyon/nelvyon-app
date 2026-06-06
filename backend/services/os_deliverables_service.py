@@ -10,6 +10,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.os_clients import Os_clients
+from models.os_deliverable_versions import Os_deliverable_versions
 from models.os_deliverables import Os_deliverables
 from models.os_projects import Os_projects
 from models.os_tasks import Os_tasks
@@ -458,3 +459,88 @@ class OsDeliverablesService:
         await self.db.commit()
         await self.db.refresh(obj)
         return obj
+
+    async def create_revision(
+        self, deliverable_id: str, *, workspace_id: int
+    ) -> Optional[Os_deliverables]:
+        """Snapshot current version and reset deliverable to draft for re-work."""
+        obj = await self.get_by_id(deliverable_id, workspace_id=workspace_id)
+        if not obj:
+            return None
+        if obj.status != "changes_requested":
+            raise ValueError(
+                "deliverable must be changes_requested to create a revision "
+                f"(current: {obj.status})"
+            )
+
+        now = _utcnow()
+        meta = dict(obj.deliverable_metadata) if isinstance(obj.deliverable_metadata, dict) else {}
+
+        snapshot = Os_deliverable_versions(
+            id=str(uuid.uuid4()),
+            workspace_id=workspace_id,
+            deliverable_id=obj.id,
+            version=obj.version,
+            status=obj.status,
+            file_url=obj.file_url,
+            review_notes=obj.review_notes,
+            version_metadata=meta.copy(),
+            created_at=now,
+        )
+        self.db.add(snapshot)
+
+        old_version = obj.version
+        obj.version = old_version + 1
+        obj.status = "draft"
+        obj.visibility = "internal"
+        obj.delivered_at = None
+        obj.approved_at = None
+        obj.published_at = None
+        obj.client_reviewed_at = None
+        obj.approved_by_portal_user_id = None
+        meta["previous_version"] = old_version
+        meta["revision_created_at"] = now.isoformat()
+        obj.deliverable_metadata = meta
+        obj.updated_at = now
+
+        await self.db.commit()
+        await self.db.refresh(obj)
+        logger.info(
+            "Created revision v%s for os_deliverables id=%s workspace=%s",
+            obj.version,
+            obj.id,
+            workspace_id,
+        )
+        return obj
+
+    async def list_versions(
+        self, deliverable_id: str, *, workspace_id: int
+    ) -> Optional[List[Dict[str, Any]]]:
+        obj = await self.get_by_id(deliverable_id, workspace_id=workspace_id)
+        if not obj:
+            return None
+        q = (
+            select(Os_deliverable_versions)
+            .where(
+                Os_deliverable_versions.deliverable_id == str(deliverable_id),
+                Os_deliverable_versions.workspace_id == workspace_id,
+            )
+            .order_by(Os_deliverable_versions.version.desc())
+        )
+        result = await self.db.execute(q)
+        rows = list(result.scalars().all())
+        return [
+            {
+                "id": r.id,
+                "deliverable_id": r.deliverable_id,
+                "version": r.version,
+                "status": r.status,
+                "file_url": r.file_url,
+                "review_notes": r.review_notes,
+                "metadata": r.version_metadata
+                if isinstance(r.version_metadata, dict)
+                else {},
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+            }
+            for r in rows
+        ]

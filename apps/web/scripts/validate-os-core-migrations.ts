@@ -47,6 +47,7 @@ const REQUIRED_MIGRATIONS = [
   "318_os_deliverables.sql",
   "319_os_portal.sql",
   "320_os_deliverable_reviews.sql",
+  "321_os_deliverable_versions.sql",
 ] as const;
 
 const OS_CLIENTS_COLUMNS = [
@@ -164,6 +165,23 @@ const OS_DELIVERABLE_REVIEWS_INDEXES = [
   "idx_os_deliverable_reviews_deliverable",
   "idx_os_deliverable_reviews_workspace",
   "idx_os_deliverable_reviews_portal_user",
+] as const;
+
+const OS_DELIVERABLE_VERSIONS_COLUMNS = [
+  "id",
+  "workspace_id",
+  "deliverable_id",
+  "version",
+  "status",
+  "file_url",
+  "review_notes",
+  "metadata",
+  "created_at",
+] as const;
+
+const OS_DELIVERABLE_VERSIONS_INDEXES = [
+  "idx_os_deliverable_versions_deliverable",
+  "idx_os_deliverable_versions_workspace",
 ] as const;
 
 const OS_PORTAL_INVITES_COLUMNS = [
@@ -593,13 +611,46 @@ async function main(): Promise<void> {
     }
   }
 
+  const hasVersions = await tableExists(db, "os_deliverable_versions");
+  if (!hasVersions) {
+    console.error("[validate-os-core] FALTA tabla: os_deliverable_versions");
+    ok = false;
+  } else {
+    ok = (await checkColumns(db, "os_deliverable_versions", OS_DELIVERABLE_VERSIONS_COLUMNS)) && ok;
+    const verFk = await db.query<{ def: string }>(
+      `SELECT pg_get_constraintdef(c.oid) AS def
+       FROM pg_constraint c
+       JOIN pg_class t ON t.oid = c.conrelid
+       JOIN pg_namespace n ON n.oid = t.relnamespace
+       WHERE n.nspname = 'public' AND t.relname = 'os_deliverable_versions' AND c.contype = 'f'`,
+    );
+    if (!verFk.some((r) => r.def?.includes("os_deliverables") && r.def?.includes("deliverable_id"))) {
+      console.error("[validate-os-core] FALTA FK os_deliverable_versions.deliverable_id → os_deliverables");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK deliverable_id → os_deliverables (versions)");
+    }
+    for (const idx of OS_DELIVERABLE_VERSIONS_INDEXES) {
+      const idxRows = await db.query<{ reg: string | null }>(
+        "SELECT to_regclass($1)::text AS reg",
+        [`public.${idx}`],
+      );
+      if (!idxRows[0]?.reg) {
+        console.error(`[validate-os-core] FALTA índice: ${idx}`);
+        ok = false;
+      } else {
+        console.log(`[validate-os-core] OK índice ${idx}`);
+      }
+    }
+  }
+
   await db.end();
   if (!ok) {
     console.error("[validate-os-core] Validación fallida.");
     process.exit(1);
   }
   console.log(
-    "[validate-os-core] Validación OK (315–320: clients, projects, tasks, deliverables, portal, reviews).",
+    "[validate-os-core] Validación OK (315–321: clients, projects, tasks, deliverables, portal, reviews, versions).",
   );
 }
 
