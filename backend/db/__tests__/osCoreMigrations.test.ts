@@ -62,3 +62,39 @@ describe("315_os_clients migration (prereq)", () => {
     expect(sql).toMatch(/CREATE TABLE IF NOT EXISTS os_clients/i);
   });
 });
+
+describe("317_os_tasks migration", () => {
+  const sql = fs.readFileSync(
+    path.resolve(__dirname, "../../db/migrations/317_os_tasks.sql"),
+    "utf8",
+  );
+
+  it("renombra legacy 281 si aplica y crea tabla canónica", () => {
+    expect(sql).toMatch(/RENAME TO os_tasks_legacy_281/i);
+    expect(sql).toMatch(/CREATE TABLE IF NOT EXISTS os_tasks/i);
+  });
+
+  it("define FKs hacia os_projects y os_clients", () => {
+    expect(sql).toMatch(/project_id\s+UUID REFERENCES os_projects/i);
+    expect(sql).toMatch(/client_id\s+UUID REFERENCES os_clients/i);
+  });
+
+  it("define CHECK status y priority", () => {
+    expect(sql).toMatch(/'pending', 'in_progress', 'blocked', 'completed', 'archived'/);
+    expect(sql).toMatch(/'low', 'medium', 'high', 'urgent'/);
+  });
+
+  it("incluye índices principales", () => {
+    for (const idx of [
+      "idx_os_tasks_workspace",
+      "idx_os_tasks_project",
+      "idx_os_tasks_client",
+      "idx_os_tasks_status",
+      "idx_os_tasks_priority",
+      "idx_os_tasks_due_date",
+      "idx_os_tasks_updated_at",
+    ]) {
+      expect(sql).toContain(idx);
+    }
+  });
+});

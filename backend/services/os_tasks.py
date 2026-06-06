@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.os_tasks import Os_tasks
+from models.os_tasks_legacy_281 import Os_tasks
 from services.workspace_mixin import WorkspaceAwareMixin
 
 logger = logging.getLogger(__name__)

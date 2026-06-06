@@ -40,7 +40,11 @@ function loadEnvFiles(): void {
   }
 }
 
-const REQUIRED_MIGRATIONS = ["315_os_clients.sql", "316_os_projects.sql"] as const;
+const REQUIRED_MIGRATIONS = [
+  "315_os_clients.sql",
+  "316_os_projects.sql",
+  "317_os_tasks.sql",
+] as const;
 
 const OS_CLIENTS_COLUMNS = [
   "id",
@@ -77,6 +81,34 @@ const OS_PROJECTS_INDEXES = [
   "idx_os_projects_status",
   "idx_os_projects_due_date",
   "idx_os_projects_updated_at",
+] as const;
+
+const OS_TASKS_COLUMNS = [
+  "id",
+  "workspace_id",
+  "project_id",
+  "client_id",
+  "title",
+  "description",
+  "status",
+  "priority",
+  "assignee",
+  "due_date",
+  "completed_at",
+  "metadata",
+  "created_at",
+  "updated_at",
+  "archived_at",
+] as const;
+
+const OS_TASKS_INDEXES = [
+  "idx_os_tasks_workspace",
+  "idx_os_tasks_project",
+  "idx_os_tasks_client",
+  "idx_os_tasks_status",
+  "idx_os_tasks_priority",
+  "idx_os_tasks_due_date",
+  "idx_os_tasks_updated_at",
 ] as const;
 
 async function tableExists(db: ReturnType<typeof DbClient.getInstance>, table: string): Promise<boolean> {
@@ -229,12 +261,75 @@ async function main(): Promise<void> {
     }
   }
 
+  const hasTasks = await tableExists(db, "os_tasks");
+  if (!hasTasks) {
+    console.error("[validate-os-core] FALTA tabla: os_tasks");
+    ok = false;
+  } else {
+    const countRows = await db.query<{ n: string }>("SELECT COUNT(*)::text AS n FROM os_tasks");
+    console.log(`[validate-os-core] OK tabla os_tasks (filas: ${countRows[0]?.n ?? "0"})`);
+    ok = (await checkColumns(db, "os_tasks", OS_TASKS_COLUMNS)) && ok;
+
+    ok =
+      (await checkCheckConstraint(db, "os_tasks", "status", [
+        "'pending'",
+        "'completed'",
+        "'archived'",
+      ])) && ok;
+    ok =
+      (await checkCheckConstraint(db, "os_tasks", "priority", [
+        "'low'",
+        "'medium'",
+        "'urgent'",
+      ])) && ok;
+
+    const taskFkRows = await db.query<{ def: string }>(
+      `SELECT pg_get_constraintdef(c.oid) AS def
+       FROM pg_constraint c
+       JOIN pg_class t ON t.oid = c.conrelid
+       JOIN pg_namespace n ON n.oid = t.relnamespace
+       WHERE n.nspname = 'public' AND t.relname = 'os_tasks'
+         AND c.contype = 'f'`,
+    );
+    const fkProject = taskFkRows.some(
+      (r) => r.def?.includes("os_projects") && r.def?.includes("project_id"),
+    );
+    const fkClient = taskFkRows.some(
+      (r) => r.def?.includes("os_clients") && r.def?.includes("client_id"),
+    );
+    if (!fkProject) {
+      console.error("[validate-os-core] FALTA FK os_tasks.project_id → os_projects(id)");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK project_id → os_projects");
+    }
+    if (!fkClient) {
+      console.error("[validate-os-core] FALTA FK os_tasks.client_id → os_clients(id)");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK client_id → os_clients");
+    }
+
+    for (const idx of OS_TASKS_INDEXES) {
+      const idxRows = await db.query<{ reg: string | null }>(
+        "SELECT to_regclass($1)::text AS reg",
+        [`public.${idx}`],
+      );
+      if (!idxRows[0]?.reg) {
+        console.error(`[validate-os-core] FALTA índice: ${idx}`);
+        ok = false;
+      } else {
+        console.log(`[validate-os-core] OK índice ${idx}`);
+      }
+    }
+  }
+
   await db.end();
   if (!ok) {
     console.error("[validate-os-core] Validación fallida.");
     process.exit(1);
   }
-  console.log("[validate-os-core] Validación OK (315 os_clients + 316 os_projects).");
+  console.log("[validate-os-core] Validación OK (315 os_clients + 316 os_projects + 317 os_tasks).");
 }
 
 main().catch((err: unknown) => {
