@@ -98,3 +98,39 @@ describe("317_os_tasks migration", () => {
     }
   });
 });
+
+describe("318_os_deliverables migration", () => {
+  const sql = fs.readFileSync(
+    path.resolve(__dirname, "../../db/migrations/318_os_deliverables.sql"),
+    "utf8",
+  );
+
+  it("crea tabla canónica idempotente", () => {
+    expect(sql).toMatch(/CREATE TABLE IF NOT EXISTS os_deliverables/i);
+  });
+
+  it("define FKs hacia os_clients, os_projects y os_tasks", () => {
+    expect(sql).toMatch(/client_id\s+UUID NOT NULL REFERENCES os_clients/i);
+    expect(sql).toMatch(/project_id\s+UUID NOT NULL REFERENCES os_projects/i);
+    expect(sql).toMatch(/task_id\s+UUID REFERENCES os_tasks/i);
+  });
+
+  it("define CHECK status y visibility", () => {
+    expect(sql).toMatch(/'draft', 'in_review', 'delivered', 'approved', 'published', 'rejected', 'archived'/);
+    expect(sql).toMatch(/'internal', 'client_visible'/);
+  });
+
+  it("incluye índices principales", () => {
+    for (const idx of [
+      "idx_os_deliverables_workspace",
+      "idx_os_deliverables_client",
+      "idx_os_deliverables_project",
+      "idx_os_deliverables_task",
+      "idx_os_deliverables_status",
+      "idx_os_deliverables_visibility",
+      "idx_os_deliverables_updated_at",
+    ]) {
+      expect(sql).toContain(idx);
+    }
+  });
+});

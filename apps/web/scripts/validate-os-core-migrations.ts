@@ -44,6 +44,7 @@ const REQUIRED_MIGRATIONS = [
   "315_os_clients.sql",
   "316_os_projects.sql",
   "317_os_tasks.sql",
+  "318_os_deliverables.sql",
 ] as const;
 
 const OS_CLIENTS_COLUMNS = [
@@ -109,6 +110,40 @@ const OS_TASKS_INDEXES = [
   "idx_os_tasks_priority",
   "idx_os_tasks_due_date",
   "idx_os_tasks_updated_at",
+] as const;
+
+const OS_DELIVERABLES_COLUMNS = [
+  "id",
+  "workspace_id",
+  "client_id",
+  "project_id",
+  "task_id",
+  "title",
+  "description",
+  "type",
+  "status",
+  "visibility",
+  "file_url",
+  "storage_key",
+  "version",
+  "review_notes",
+  "delivered_at",
+  "approved_at",
+  "published_at",
+  "metadata",
+  "created_at",
+  "updated_at",
+  "archived_at",
+] as const;
+
+const OS_DELIVERABLES_INDEXES = [
+  "idx_os_deliverables_workspace",
+  "idx_os_deliverables_client",
+  "idx_os_deliverables_project",
+  "idx_os_deliverables_task",
+  "idx_os_deliverables_status",
+  "idx_os_deliverables_visibility",
+  "idx_os_deliverables_updated_at",
 ] as const;
 
 async function tableExists(db: ReturnType<typeof DbClient.getInstance>, table: string): Promise<boolean> {
@@ -324,12 +359,89 @@ async function main(): Promise<void> {
     }
   }
 
+  const hasDeliverables = await tableExists(db, "os_deliverables");
+  if (!hasDeliverables) {
+    console.error("[validate-os-core] FALTA tabla: os_deliverables");
+    ok = false;
+  } else {
+    const countRows = await db.query<{ n: string }>(
+      "SELECT COUNT(*)::text AS n FROM os_deliverables",
+    );
+    console.log(
+      `[validate-os-core] OK tabla os_deliverables (filas: ${countRows[0]?.n ?? "0"})`,
+    );
+    ok = (await checkColumns(db, "os_deliverables", OS_DELIVERABLES_COLUMNS)) && ok;
+
+    ok =
+      (await checkCheckConstraint(db, "os_deliverables", "status", [
+        "'draft'",
+        "'published'",
+        "'archived'",
+      ])) && ok;
+    ok =
+      (await checkCheckConstraint(db, "os_deliverables", "visibility", [
+        "'internal'",
+        "'client_visible'",
+      ])) && ok;
+
+    const delFkRows = await db.query<{ def: string }>(
+      `SELECT pg_get_constraintdef(c.oid) AS def
+       FROM pg_constraint c
+       JOIN pg_class t ON t.oid = c.conrelid
+       JOIN pg_namespace n ON n.oid = t.relnamespace
+       WHERE n.nspname = 'public' AND t.relname = 'os_deliverables'
+         AND c.contype = 'f'`,
+    );
+    const fkClient = delFkRows.some(
+      (r) => r.def?.includes("os_clients") && r.def?.includes("client_id"),
+    );
+    const fkProject = delFkRows.some(
+      (r) => r.def?.includes("os_projects") && r.def?.includes("project_id"),
+    );
+    const fkTask = delFkRows.some(
+      (r) => r.def?.includes("os_tasks") && r.def?.includes("task_id"),
+    );
+    if (!fkClient) {
+      console.error("[validate-os-core] FALTA FK os_deliverables.client_id → os_clients(id)");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK client_id → os_clients");
+    }
+    if (!fkProject) {
+      console.error("[validate-os-core] FALTA FK os_deliverables.project_id → os_projects(id)");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK project_id → os_projects");
+    }
+    if (!fkTask) {
+      console.error("[validate-os-core] FALTA FK os_deliverables.task_id → os_tasks(id)");
+      ok = false;
+    } else {
+      console.log("[validate-os-core] OK FK task_id → os_tasks");
+    }
+
+    for (const idx of OS_DELIVERABLES_INDEXES) {
+      const idxRows = await db.query<{ reg: string | null }>(
+        "SELECT to_regclass($1)::text AS reg",
+        [`public.${idx}`],
+      );
+      if (!idxRows[0]?.reg) {
+        console.error(`[validate-os-core] FALTA índice: ${idx}`);
+        ok = false;
+      } else {
+        console.log(`[validate-os-core] OK índice ${idx}`);
+      }
+    }
+  }
+
   await db.end();
   if (!ok) {
     console.error("[validate-os-core] Validación fallida.");
     process.exit(1);
   }
-  console.log("[validate-os-core] Validación OK (315 os_clients + 316 os_projects + 317 os_tasks).");
+  console.log(
+    "[validate-os-core] Validación OK (315 os_clients + 316 os_projects + 317 os_tasks + 318 os_deliverables).",
+  );
 }
 
 main().catch((err: unknown) => {

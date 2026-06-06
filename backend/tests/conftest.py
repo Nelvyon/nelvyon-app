@@ -99,6 +99,7 @@ async def setup_database(test_engine):
     import models.os_projects  # noqa: F401 — OS-1-06 canonical projects API
     import models.os_tasks_legacy_281  # noqa: F401 — pipeline 281 preserved
     import models.os_tasks  # noqa: F401 — OS-1-07 canonical tasks
+    import models.os_deliverables  # noqa: F401 — OS-1-08 canonical deliverables
     import models.os_expenses  # noqa: F401 — Fase 2F finanzas OS
     import models.os_cashflow  # noqa: F401
     import models.contacts  # noqa: F401 — e2e_orchestrator / CRM chain tests
