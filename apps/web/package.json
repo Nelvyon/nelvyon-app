@@ -12,6 +12,7 @@
     "migrate": "tsx ../../backend/db/migrate.ts",
     "migrate:prod": "tsx ./scripts/migrate-prod.ts",
     "validate:saas-deals-migrations": "tsx ./scripts/validate-saas-deals-migrations.ts",
+    "validate:os-core-migrations": "tsx ./scripts/validate-os-core-migrations.ts",
     "saas:validate-bridge": "tsx ../../backend/saas/scripts/validateTenantBridge.ts",
     "saas:crm-etl": "tsx ../../backend/saas/scripts/runCrmEtl.ts",
     "saas:deals-etl": "tsx ../../backend/saas/scripts/runDealsEtl.ts",
