@@ -10,5 +10,5 @@ export default async function OsTareaDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <OsTaskDetailView taskId={Number(id)} />;
+  return <OsTaskDetailView taskId={id} />;
 }

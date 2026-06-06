@@ -341,7 +341,7 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
         description: "os_tasks",
       };
     }
-    if (/\/tareas\/\d+/.test(path)) {
+    if (/\/tareas\/[^/]+/.test(path) && !path.endsWith("/nuevo")) {
       return {
         documentTitle: "Tarea · NELVYON OS",
         heading: "Detalle tarea",

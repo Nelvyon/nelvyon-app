@@ -22,6 +22,7 @@ import {
   OsTable,
 } from "@/features/os-shell/components/ui/OsUi";
 import { useOsPermissions } from "@/features/os-shell/hooks/useOsPermissions";
+import { isOsTasksCanonicalUiEnabled } from "@/features/os-shell/tareas/featureFlag";
 
 import { osProjectsCanonicalApi } from "./api";
 import { fetchLinkedDeliverables, fetchLinkedTasks, legacyProjectIdFromMetadata } from "./projectEnrichment";
@@ -144,7 +145,7 @@ export function OsProjectDetailCanonicalView({ projectId }: { projectId: string 
           <>
             {perms.canCreate ? (
               <>
-                {legacyProjectId && legacyClientId ? (
+                {legacyProjectId && legacyClientId && !isOsTasksCanonicalUiEnabled() ? (
                   <>
                     <OsGhostButton
                       href={`/os/pipeline/nuevo?project_id=${legacyProjectId}&client_id=${legacyClientId}`}
@@ -158,9 +159,16 @@ export function OsProjectDetailCanonicalView({ projectId }: { projectId: string 
                     </OsGhostButton>
                   </>
                 ) : (
-                  <OsPrimaryButton href={`/os/entregables/nuevo?project_id=${project.id}&client_id=${project.client_id}`}>
-                    Nuevo entregable
-                  </OsPrimaryButton>
+                  <>
+                    <OsGhostButton
+                      href={`/os/tareas/nuevo?project_id=${project.id}&client_id=${project.client_id}`}
+                    >
+                      Nueva tarea
+                    </OsGhostButton>
+                    <OsPrimaryButton href={`/os/entregables/nuevo?project_id=${project.id}&client_id=${project.client_id}`}>
+                      Nuevo entregable
+                    </OsPrimaryButton>
+                  </>
                 )}
               </>
             ) : null}
@@ -240,16 +248,26 @@ export function OsProjectDetailCanonicalView({ projectId }: { projectId: string 
               <th className="px-4 py-2">Título</th>
               <th className="px-4 py-2">Estado</th>
               <th className="px-4 py-2">Prioridad</th>
+              <th className="px-4 py-2" />
             </tr>
           </thead>
           <tbody>
             {tasks.map((t) => (
               <tr key={t.id} className="border-b border-white/5">
-                <td className="px-4 py-2 text-white">{t.title}</td>
+                <td className="px-4 py-2 text-white">
+                  <Link href={`/os/tareas/${t.id}`} className="hover:text-[#0084FF]">
+                    {t.title}
+                  </Link>
+                </td>
                 <td className="px-4 py-2">
                   <OsStatusBadge label={t.status} tone="neutral" />
                 </td>
                 <td className="px-4 py-2 text-white/55">{t.priority ?? "—"}</td>
+                <td className="px-4 py-2 text-right">
+                  <Link href={`/os/tareas/${t.id}`} className="text-[#0084FF] hover:underline">
+                    Ver
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>

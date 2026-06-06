@@ -1,27 +1,42 @@
 "use client";
 
-import { OS_TASK_PRIORITY_OPTIONS, OS_TASK_STATUS_OPTIONS } from "@/features/os-shell/constants";
 import { OsAssigneeInput } from "@/features/os-shell/components/OsAssigneeInput";
 import { OsField, OsInput, OsSelect, OsTextarea } from "@/features/os-shell/components/ui/OsUi";
-import type { OsLegacyClient } from "@/features/os-shell/clients/types";
-import type { OsLegacyProject } from "@/features/os-shell/projects/types";
+import type { OsClient } from "@/features/os-shell/clients/types";
+import type { OsCanonicalProject } from "@/features/os-shell/projects/types";
+import {
+  OS_CANONICAL_TASK_PRIORITY_FORM_OPTIONS,
+  OS_CANONICAL_TASK_STATUS_FORM_OPTIONS,
+} from "@/features/os-shell/tareas/taskStatus";
+import type { OsTaskCreateInput } from "@/features/os-shell/tareas/types";
 
-import type { OsLegacyTaskWriteInput } from "./types";
+export function emptyOsTaskCanonicalForm(preset?: {
+  client_id?: string;
+  project_id?: string;
+}): OsTaskCreateInput {
+  return {
+    title: "",
+    description: "",
+    status: "pending",
+    priority: "medium",
+    due_date: "",
+    client_id: preset?.client_id,
+    project_id: preset?.project_id,
+    assignee: "",
+  };
+}
 
-const STATUS_WRITE = OS_TASK_STATUS_OPTIONS.filter((o) => o.value !== "");
-const PRIORITY_WRITE = OS_TASK_PRIORITY_OPTIONS.filter((o) => o.value !== "");
-
-export function OsTaskForm({
+export function OsTaskCanonicalForm({
   value,
   onChange,
   clients,
   projects,
   disabled,
 }: {
-  value: OsLegacyTaskWriteInput;
-  onChange: (v: OsLegacyTaskWriteInput) => void;
-  clients: OsLegacyClient[];
-  projects: OsLegacyProject[];
+  value: OsTaskCreateInput;
+  onChange: (v: OsTaskCreateInput) => void;
+  clients: OsClient[];
+  projects: OsCanonicalProject[];
   disabled?: boolean;
 }) {
   const clientProjects = value.client_id
@@ -31,22 +46,22 @@ export function OsTaskForm({
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="md:col-span-2">
-        <OsField label="Título">
-        <OsInput
-          value={value.title}
-          onChange={(e) => onChange({ ...value, title: e.target.value })}
-          disabled={disabled}
-          required
-        />
-      </OsField>
+        <OsField label="Título *">
+          <OsInput
+            value={value.title}
+            onChange={(e) => onChange({ ...value, title: e.target.value })}
+            disabled={disabled}
+            required
+          />
+        </OsField>
       </div>
       <OsField label="Estado">
         <OsSelect
-          value={value.status}
-          onChange={(e) => onChange({ ...value, status: e.target.value })}
+          value={value.status ?? "pending"}
+          onChange={(e) => onChange({ ...value, status: e.target.value as OsTaskCreateInput["status"] })}
           disabled={disabled}
         >
-          {STATUS_WRITE.map((o) => (
+          {OS_CANONICAL_TASK_STATUS_FORM_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
             </option>
@@ -55,11 +70,13 @@ export function OsTaskForm({
       </OsField>
       <OsField label="Prioridad">
         <OsSelect
-          value={value.priority ?? "media"}
-          onChange={(e) => onChange({ ...value, priority: e.target.value })}
+          value={value.priority ?? "medium"}
+          onChange={(e) =>
+            onChange({ ...value, priority: e.target.value as OsTaskCreateInput["priority"] })
+          }
           disabled={disabled}
         >
-          {PRIORITY_WRITE.map((o) => (
+          {OS_CANONICAL_TASK_PRIORITY_FORM_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
             </option>
@@ -70,13 +87,13 @@ export function OsTaskForm({
         <OsInput
           type="date"
           value={value.due_date?.slice(0, 10) ?? ""}
-          onChange={(e) => onChange({ ...value, due_date: e.target.value || null })}
+          onChange={(e) => onChange({ ...value, due_date: e.target.value || undefined })}
           disabled={disabled}
         />
       </OsField>
       <OsAssigneeInput
         value={value.assignee ?? ""}
-        onChange={(v) => onChange({ ...value, assignee: v || null })}
+        onChange={(v) => onChange({ ...value, assignee: v || undefined })}
         className={disabled ? "pointer-events-none opacity-60" : ""}
       />
       <OsField label="Cliente">
@@ -85,8 +102,8 @@ export function OsTaskForm({
           onChange={(e) =>
             onChange({
               ...value,
-              client_id: e.target.value ? Number(e.target.value) : null,
-              project_id: null,
+              client_id: e.target.value || undefined,
+              project_id: undefined,
             })
           }
           disabled={disabled}
@@ -102,9 +119,7 @@ export function OsTaskForm({
       <OsField label="Proyecto">
         <OsSelect
           value={value.project_id ?? ""}
-          onChange={(e) =>
-            onChange({ ...value, project_id: e.target.value ? Number(e.target.value) : null })
-          }
+          onChange={(e) => onChange({ ...value, project_id: e.target.value || undefined })}
           disabled={disabled}
         >
           <option value="">—</option>
@@ -117,30 +132,14 @@ export function OsTaskForm({
       </OsField>
       <div className="md:col-span-2">
         <OsField label="Descripción">
-        <OsTextarea
-          value={value.description ?? ""}
-          onChange={(e) => onChange({ ...value, description: e.target.value || null })}
-          disabled={disabled}
-          rows={3}
-        />
-      </OsField>
+          <OsTextarea
+            value={value.description ?? ""}
+            onChange={(e) => onChange({ ...value, description: e.target.value || undefined })}
+            disabled={disabled}
+            rows={3}
+          />
+        </OsField>
       </div>
     </div>
   );
-}
-
-export function emptyOsTaskForm(preset?: {
-  client_id?: number;
-  project_id?: number;
-}): OsLegacyTaskWriteInput {
-  return {
-    title: "",
-    status: "pendiente",
-    priority: "media",
-    due_date: null,
-    client_id: preset?.client_id ?? null,
-    project_id: preset?.project_id ?? null,
-    assignee: null,
-    description: null,
-  };
 }

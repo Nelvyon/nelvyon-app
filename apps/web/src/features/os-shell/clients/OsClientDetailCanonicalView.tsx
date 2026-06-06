@@ -23,6 +23,7 @@ import {
 } from "@/features/os-shell/deliverables/deliverableStatus";
 import { useOsPermissions } from "@/features/os-shell/hooks/useOsPermissions";
 import { isOsProjectsCanonicalUiEnabled } from "@/features/os-shell/projects/featureFlag";
+import { isOsTasksCanonicalUiEnabled } from "@/features/os-shell/tareas/featureFlag";
 
 import { osClientsCanonicalApi } from "./api";
 import { fetchLinkedProjects, fetchRecentDeliverables } from "./clientEnrichment";
@@ -146,7 +147,15 @@ export function OsClientDetailCanonicalView({ clientId }: { clientId: string }) 
                 {legacyId ? (
                   <>
                     <OsGhostButton href={`/os/pipeline/nuevo?client_id=${legacyId}`}>Nueva oportunidad</OsGhostButton>
-                    <OsGhostButton href={`/os/tareas/nuevo?client_id=${legacyId}`}>Nueva tarea</OsGhostButton>
+                    <OsGhostButton
+                      href={
+                        isOsTasksCanonicalUiEnabled()
+                          ? `/os/tareas/nuevo?client_id=${client.id}`
+                          : `/os/tareas/nuevo?client_id=${legacyId}`
+                      }
+                    >
+                      Nueva tarea
+                    </OsGhostButton>
                     <OsPrimaryButton
                       href={
                         isOsProjectsCanonicalUiEnabled()
@@ -157,8 +166,11 @@ export function OsClientDetailCanonicalView({ clientId }: { clientId: string }) 
                       Nuevo proyecto
                     </OsPrimaryButton>
                   </>
-                ) : isOsProjectsCanonicalUiEnabled() ? (
-                  <OsPrimaryButton href={`/os/proyectos/nuevo?client_id=${client.id}`}>Nuevo proyecto</OsPrimaryButton>
+                ) : isOsTasksCanonicalUiEnabled() ? (
+                  <>
+                    <OsPrimaryButton href={`/os/proyectos/nuevo?client_id=${client.id}`}>Nuevo proyecto</OsPrimaryButton>
+                    <OsGhostButton href={`/os/tareas/nuevo?client_id=${client.id}`}>Nueva tarea</OsGhostButton>
+                  </>
                 ) : (
                   <OsGhostButton href={`/os/entregables/nuevo?client_id=${client.id}`}>Nuevo entregable</OsGhostButton>
                 )}

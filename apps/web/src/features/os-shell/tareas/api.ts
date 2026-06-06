@@ -1,35 +1,48 @@
 import { apiClient } from "@/core/api";
-import { entityListUrl } from "@/features/os-shell/lib/entityQuery";
+import type {
+  OsCanonicalTask,
+  OsTaskCreateInput,
+  OsTaskListResponse,
+  OsTaskUpdateInput,
+} from "@/features/os-shell/tareas/types";
 
-import type { OsTask, OsTaskListResponse, OsTaskWriteInput } from "./types";
+const BASE = "/api/v1/os/tasks";
 
-const BASE = "/api/v1/entities/os_tasks";
+function qs(params: Record<string, string | number | undefined>): string {
+  const sp = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== "") sp.set(k, String(v));
+  }
+  const s = sp.toString();
+  return s ? `?${s}` : "";
+}
 
-export const osTasksApi = {
+/** Canonical os_tasks API — used by Tasks UI (OS-1-UI-05). */
+export const osTasksCanonicalApi = {
   list: (params?: {
-    skip?: number;
-    limit?: number;
-    query?: Record<string, string | number>;
-    sort?: string;
+    page?: number;
+    page_size?: number;
+    q?: string;
+    status?: string;
+    priority?: string;
+    project_id?: string;
+    client_id?: string;
+    assignee?: string;
   }) =>
-    apiClient.get<OsTaskListResponse>(
-      entityListUrl(BASE, {
-        skip: params?.skip,
-        limit: params?.limit ?? 500,
-        query: params?.query,
-        sort: params?.sort,
-      }),
-      { tenantScoped: true },
-    ),
+    apiClient.get<OsTaskListResponse>(`${BASE}${qs(params ?? {})}`, { tenantScoped: true }),
 
-  getById: (id: number) => apiClient.get<OsTask>(`${BASE}/${id}`, { tenantScoped: true }),
+  getById: (id: string) => apiClient.get<OsCanonicalTask>(`${BASE}/${id}`, { tenantScoped: true }),
 
-  create: (body: OsTaskWriteInput) =>
-    apiClient.post<OsTask, OsTaskWriteInput>(BASE, { tenantScoped: true, body }),
+  create: (body: OsTaskCreateInput) =>
+    apiClient.post<OsCanonicalTask, OsTaskCreateInput>(BASE, { body, tenantScoped: true }),
 
-  update: (id: number, body: Partial<OsTaskWriteInput>) =>
-    apiClient.put<OsTask, Partial<OsTaskWriteInput>>(`${BASE}/${id}`, { tenantScoped: true, body }),
+  update: (id: string, body: OsTaskUpdateInput) =>
+    apiClient.patch<OsCanonicalTask, OsTaskUpdateInput>(`${BASE}/${id}`, { body, tenantScoped: true }),
 
-  delete: (id: number) =>
-    apiClient.delete<{ message: string; id: number }>(`${BASE}/${id}`, { tenantScoped: true }),
+  archive: (id: string) =>
+    apiClient.delete<{ message: string; id: string; status: string }>(`${BASE}/${id}`, {
+      tenantScoped: true,
+    }),
 };
+
+export { osTasksApi, osTasksLegacyApi } from "./legacyApi";
