@@ -354,6 +354,27 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       description: "os_tasks",
     };
   }
+  if (path === "/os/entregables" || path.startsWith("/os/entregables/")) {
+    if (path.endsWith("/nuevo")) {
+      return {
+        documentTitle: "Nuevo entregable · NELVYON OS",
+        heading: "Nuevo entregable",
+        description: "os_deliverables",
+      };
+    }
+    if (/\/entregables\/[^/]+/.test(path) && !path.endsWith("/nuevo")) {
+      return {
+        documentTitle: "Entregable · NELVYON OS",
+        heading: "Detalle entregable",
+        description: "os_deliverables",
+      };
+    }
+    return {
+      documentTitle: "Entregables · NELVYON OS",
+      heading: "Entregables",
+      description: "os_deliverables",
+    };
+  }
   if (path === "/os/documentos" || path.startsWith("/os/documentos/")) {
     if (/\/documentos\/(entrega|archivo|contrato|factura)\/\d+/.test(path)) {
       return {

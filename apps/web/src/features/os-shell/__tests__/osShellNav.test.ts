@@ -17,6 +17,7 @@ describe("osShellNav", () => {
   it("includes core platform modules", () => {
     const hrefs = OS_SHELL_NAV.map((n) => n.href);
     expect(hrefs).toContain("/os/dashboard");
+    expect(hrefs).toContain("/os/entregables");
     expect(hrefs).toContain("/os/configuracion");
   });
 });

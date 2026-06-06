@@ -37,6 +37,10 @@ export class ApiClient {
     return this.request<TResponse, TBody>("PUT", path, options);
   }
 
+  patch<TResponse, TBody = unknown>(path: string, options?: RequestOptions<TBody>): Promise<TResponse> {
+    return this.request<TResponse, TBody>("PATCH", path, options);
+  }
+
   delete<TResponse>(path: string, options?: RequestOptions): Promise<TResponse> {
     return this.request<TResponse>("DELETE", path, options);
   }
