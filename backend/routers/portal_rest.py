@@ -119,7 +119,48 @@ class PortalListResponse(BaseModel):
 # --- Auth (public + operator invite) ---
 
 
-@router.post("/invites", status_code=201)
+class PortalInviteListItem(BaseModel):
+    id: str
+    email: str
+    client_id: str
+    status: str
+    expires_at: Optional[str] = None
+    accepted_at: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+class PortalInviteListResponse(BaseModel):
+    items: List[PortalInviteListItem]
+    total: int
+
+
+class PortalInviteCreateResponse(BaseModel):
+    invite_id: str
+    email: str
+    client_id: str
+    expires_at: Any
+    token: str
+
+
+@router.get("/invites", response_model=PortalInviteListResponse)
+async def list_portal_invites(
+    client_id: str = Query(..., min_length=1),
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    """Lista invitaciones portal de un cliente OS (operator+). Sin token raw."""
+    service = PortalAuthService(db)
+    items = await service.list_invites_for_client(
+        workspace_id=ws_ctx.workspace_id,
+        client_id=client_id,
+    )
+    return PortalInviteListResponse(
+        items=[PortalInviteListItem(**row) for row in items],
+        total=len(items),
+    )
+
+
+@router.post("/invites", status_code=201, response_model=PortalInviteCreateResponse)
 async def create_portal_invite(
     body: PortalInviteCreateBody,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
@@ -134,13 +175,13 @@ async def create_portal_invite(
             email=body.email,
             created_by_user_id=ws_ctx.user_id,
         )
-        return {
-            "invite_id": result["invite_id"],
-            "email": result["email"],
-            "client_id": result["client_id"],
-            "expires_at": result["expires_at"],
-            "token": result["token"],
-        }
+        return PortalInviteCreateResponse(
+            invite_id=result["invite_id"],
+            email=result["email"],
+            client_id=result["client_id"],
+            expires_at=result["expires_at"],
+            token=result["token"],
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 

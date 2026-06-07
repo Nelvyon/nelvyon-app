@@ -199,6 +199,18 @@ class PortalDeliverableReviewService:
             obj.id,
             portal_user_id,
         )
+        try:
+            from services.os_notification_service import notify_deliverable_revision_requested
+
+            await notify_deliverable_revision_requested(
+                self.db,
+                workspace_id=workspace_id,
+                client_id=client_id,
+                deliverable_title=obj.title,
+                feedback=text,
+            )
+        except Exception as exc:
+            logger.warning("Revision requested notification failed: %s", exc)
         return self._result_dict(obj)
 
     @staticmethod

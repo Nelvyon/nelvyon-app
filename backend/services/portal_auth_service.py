@@ -127,6 +127,20 @@ class PortalAuthService:
             client_id,
             workspace_id,
         )
+        try:
+            from services.os_notification_service import notify_portal_invite_created
+
+            await notify_portal_invite_created(
+                self.db,
+                workspace_id=workspace_id,
+                email=normalized,
+                token=raw_token,
+                client_name=client.business_name or "Cliente",
+                created_by_user_id=created_by_user_id,
+            )
+        except Exception as exc:
+            logger.warning("Portal invite email failed: %s", exc)
+
         return {
             "invite_id": invite.id,
             "email": normalized,
@@ -221,6 +235,45 @@ class PortalAuthService:
             "token_type": "bearer",
             "user": self._user_dict(user),
         }
+
+    async def list_invites_for_client(
+        self, *, workspace_id: int, client_id: str
+    ) -> list[Dict[str, Any]]:
+        client = await self._get_client(client_id, workspace_id=workspace_id)
+        if not client:
+            return []
+        q = (
+            select(Os_portal_invites)
+            .where(
+                Os_portal_invites.workspace_id == workspace_id,
+                Os_portal_invites.client_id == client_id,
+            )
+            .order_by(Os_portal_invites.created_at.desc())
+        )
+        result = await self.db.execute(q)
+        rows = list(result.scalars().all())
+        now = _utcnow()
+        items: list[Dict[str, Any]] = []
+        for row in rows:
+            expires = _as_utc(row.expires_at)
+            if row.accepted_at is not None:
+                status = "accepted"
+            elif expires and expires < now:
+                status = "expired"
+            else:
+                status = "pending"
+            items.append(
+                {
+                    "id": row.id,
+                    "email": row.email,
+                    "client_id": row.client_id,
+                    "expires_at": expires.isoformat() if expires else None,
+                    "accepted_at": row.accepted_at.isoformat() if row.accepted_at else None,
+                    "created_at": row.created_at.isoformat() if row.created_at else None,
+                    "status": status,
+                }
+            )
+        return items
 
     async def get_portal_user(
         self, portal_user_id: str, *, workspace_id: int, client_id: str

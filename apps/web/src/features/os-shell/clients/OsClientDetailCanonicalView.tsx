@@ -25,6 +25,7 @@ import { useOsPermissions } from "@/features/os-shell/hooks/useOsPermissions";
 import { isOsProjectsCanonicalUiEnabled } from "@/features/os-shell/projects/featureFlag";
 import { isOsTasksCanonicalUiEnabled } from "@/features/os-shell/tareas/featureFlag";
 
+import { OsPortalInvitePanel } from "@/features/os-shell/portal/OsPortalInvitePanel";
 import { osClientsCanonicalApi } from "./api";
 import { fetchLinkedProjects, fetchRecentDeliverables } from "./clientEnrichment";
 import { clientStatusLabel, clientStatusTone } from "./clientStatus";
@@ -223,6 +224,10 @@ export function OsClientDetailCanonicalView({ clientId }: { clientId: string }) 
           </div>
         </dl>
       )}
+
+      {perms.canEdit && client.status === "active" ? (
+        <OsPortalInvitePanel clientId={client.id} defaultEmail={client.contact_email} />
+      ) : null}
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-white/10 bg-[#0b1428] p-4">

@@ -428,13 +428,26 @@ class OsDeliverablesService:
             obj.published_at = now
             obj.visibility = "client_visible"
 
-        return await self._transition(
+        row = await self._transition(
             deliverable_id,
             workspace_id=workspace_id,
             allowed_from=frozenset({"approved"}),
             to_status="published",
             on_apply=_apply,
         )
+        if row:
+            try:
+                from services.os_notification_service import notify_deliverable_published
+
+                await notify_deliverable_published(
+                    self.db,
+                    workspace_id=workspace_id,
+                    client_id=row.client_id,
+                    deliverable_title=row.title,
+                )
+            except Exception as exc:
+                logger.warning("Publish notification failed: %s", exc)
+        return row
 
     async def reject(
         self,
@@ -511,6 +524,18 @@ class OsDeliverablesService:
             obj.id,
             workspace_id,
         )
+        try:
+            from services.os_notification_service import notify_deliverable_revision_started
+
+            await notify_deliverable_revision_started(
+                self.db,
+                workspace_id=workspace_id,
+                client_id=obj.client_id,
+                deliverable_title=obj.title,
+                version=obj.version,
+            )
+        except Exception as exc:
+            logger.warning("Revision started notification failed: %s", exc)
         return obj
 
     async def list_versions(
