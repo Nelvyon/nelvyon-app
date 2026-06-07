@@ -168,7 +168,7 @@ export function runSeoLandingPatch(copy: Record<string, unknown>, brief: Record<
   const host = (brief.domain as { host: string }).host;
   const patch = {
     canonical: `https://${host}/`,
-    schema: { "@type": "WebPage", name: (copy.meta as { title: string }).title },
+    schema: { "@type": "WebPage", name: (copy.meta as { title?: string })?.title ?? "Landing" },
   };
   const merged = { ...copy, seo_patch: patch, version: (copy.version as number) ?? 1 };
   return { copy: merged, log: log("agent-seo", "copy", merged.version as number, { copy: 1 }) };

@@ -29,6 +29,7 @@
     "test:regression": "vitest run",
     "test:bot-evals": "vitest run src/features/helpbot/__tests__/engine.test.ts",
     "autonomous:simulate": "tsx ../../backend/autonomous/scripts/run-simulation.ts",
+    "autonomous:phase-c": "tsx ../../backend/autonomous/scripts/run-phase-c.ts",
     "gate": "pnpm typecheck && pnpm lint && pnpm test:smoke && pnpm test:bot-evals",
     "pwa:icons": "node ./scripts/generate-pwa-icons.mjs"
   },

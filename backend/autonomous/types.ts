@@ -27,8 +27,9 @@ export interface AgentLogEntry {
   input_artifact_versions: Record<string, number>;
   output_artifact: string;
   output_version: number;
-  model: "mock-rules-v1";
-  tokens: 0;
+  model: string;
+  tokens: number;
+  llm_mode?: "mock" | "real";
   status: "success" | "failed";
 }
 
@@ -58,6 +59,14 @@ export interface QaResult {
   evaluated_at: string;
   artifact_versions: Record<string, number>;
   checks: QaCheckResult[];
+  offline_dimensions?: {
+    structure: number;
+    completeness: number;
+    consistency: number;
+    copy_quality: number;
+    seo_basic: number;
+    brief_compliance: number;
+  };
 }
 
 export interface RetryDirective {
@@ -107,11 +116,37 @@ export interface AutonomousProject {
   artifacts: Record<string, unknown>;
   qa: QaResult | null;
   agent_log: AgentLogEntry[];
-  simulation_mode: "phase-b-offline";
+  simulation_mode: "phase-b-offline" | "phase-c-llm-qa";
+  llm_mode?: "mock" | "real";
+  retry_history?: RetryHistoryEntry[];
+}
+
+export interface RetryHistoryEntry {
+  attempt: number;
+  score: number;
+  passed: boolean;
+  failed_agents: string[];
+  target_agent: string | null;
+  reason: string | null;
+  at: string;
 }
 
 export interface SimulationResult {
   project: AutonomousProject;
   os_publish: OsPublishPayload | null;
   escalated: boolean;
+}
+
+export interface PhaseCOutputBundle {
+  artifacts: Record<string, unknown>;
+  qaResult: QaResult;
+  retryHistory: RetryHistoryEntry[];
+  osPublishPayload: OsPublishPayload | null;
+  llm_mode: "mock" | "real";
+  phase: "C";
+}
+
+export interface PhaseCResult extends SimulationResult {
+  output_bundle: PhaseCOutputBundle;
+  llm_mode: "mock" | "real";
 }
