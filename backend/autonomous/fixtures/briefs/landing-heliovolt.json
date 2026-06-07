@@ -1,0 +1,36 @@
+{
+  "company_name": "HelioVolt Energía",
+  "sector": "solar",
+  "value_proposition": "Instalación solar llave en mano en Valencia con financiación y estudio gratuito.",
+  "primary_cta": "Solicitar estudio gratuito",
+  "cta_type": "form",
+  "traffic_source": "google_ads",
+  "target_geo": "ES-VC",
+  "locale": "es-ES",
+  "brand": {
+    "logo_url": "https://cdn.example.com/heliovolt/logo.svg",
+    "primary_color": "#0F766E",
+    "secondary_color": "#F59E0B"
+  },
+  "social_proof": [
+    {
+      "type": "testimonial",
+      "text": "Redujimos la factura un 65% en el primer año.",
+      "author": "María G."
+    }
+  ],
+  "domain": {
+    "type": "subdomain",
+    "host": "solar.heliovolt.example.com"
+  },
+  "tracking": {
+    "google_ads_id": "AW-123456",
+    "meta_pixel_id": null,
+    "ga4_id": "G-XXXXXXXX"
+  },
+  "references": ["https://competidor-solar.example.com"],
+  "compliance_flags": {
+    "regulated_sector": false,
+    "requires_legal_review": false
+  }
+}

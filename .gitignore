@@ -83,3 +83,4 @@ blob-report/
 # --- Artefactos locales (no subir al repo) ---
 nelvyon_backend.zip
 tools/
+backend/autonomous/output/

@@ -1,0 +1,29 @@
+{
+  "company_name": "Clínica Sonrisa Norte",
+  "sector": "dental",
+  "website_url": "https://sonrisanorte.example.com",
+  "locale": "es-ES",
+  "bot_name": "Asistente Sonrisa",
+  "tone": "cercano_profesional",
+  "channels": ["web_widget"],
+  "business_hours": "L-V 9:00-20:00",
+  "handoff": {
+    "type": "email",
+    "destination": "recepcion@sonrisanorte.example.com"
+  },
+  "lead_capture": {
+    "enabled": true,
+    "fields": ["name", "phone", "email"]
+  },
+  "faqs_source": {
+    "urls": ["https://sonrisanorte.example.com/tratamientos"],
+    "uploaded_docs": []
+  },
+  "faqs_minimum": 15,
+  "forbidden_topics": ["diagnostico", "prescripcion", "precio_exacto_sin_cita"],
+  "compliance_flags": {
+    "regulated_sector": true,
+    "disclaimer_required": true
+  },
+  "openai_cost_bearer": "client"
+}

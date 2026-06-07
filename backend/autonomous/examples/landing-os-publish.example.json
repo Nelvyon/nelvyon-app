@@ -1,0 +1,47 @@
+{
+  "dry_run": true,
+  "project_id": "sim-landing-1700000000000",
+  "os_refs": {
+    "client_id": "os_client_sim_0001",
+    "project_slug": "LANDING-HELIOVOLT-SIM",
+    "workspace_id": "ws_sim_0001"
+  },
+  "deliverables": [
+    {
+      "type": "url",
+      "label": "Landing staging/live",
+      "value": "https://solar.heliovolt.example.com",
+      "visibility": "client"
+    },
+    {
+      "type": "json",
+      "label": "Copy map",
+      "value": "mock://artifacts/copy.json",
+      "visibility": "client"
+    },
+    {
+      "type": "file",
+      "label": "QA Report",
+      "value": "mock://artifacts/qa-report.pdf",
+      "visibility": "internal"
+    },
+    {
+      "type": "file",
+      "label": "Handoff 1-pager",
+      "value": "mock://artifacts/handoff.md",
+      "visibility": "client"
+    }
+  ],
+  "qa_score": 100,
+  "autonomous_job_id": "autonomous_job_sim-land",
+  "handoff_email_draft": {
+    "subject": "Tu landing NELVYON está lista — HelioVolt Energía",
+    "body_markdown": "Proyecto: LANDING-HELIOVOLT-SIM\nSKU: NELVYON-LANDING\nQA score: 100"
+  },
+  "os_actions": [
+    { "entity": "deliverable", "action": "create", "status": "published" },
+    { "entity": "project", "action": "update_status", "status": "CLIENTE_REVISION" },
+    { "entity": "task", "action": "complete", "task_key": "QA_AUTONOMOUS" }
+  ],
+  "note": "PHASE-B SIMULATION: payload NOT sent to OS. Would create os_deliverables records when Phase D is enabled."
+}

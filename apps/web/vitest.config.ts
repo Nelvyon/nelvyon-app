@@ -31,6 +31,7 @@ export default defineConfig({
       "../../backend/oauth/__tests__/**/*.test.ts",
       "../../backend/qa/__tests__/flows/**/*.test.ts",
       "../../backend/stripe/__tests__/**/*.test.ts",
+      "../../backend/autonomous/__tests__/**/*.test.ts",
     ],
   },
   resolve: {

@@ -1,0 +1,10 @@
+{
+  "sector": "dental",
+  "description": "Gold set mock para QA chatbot — evaluación offline",
+  "pass_threshold": 0.8,
+  "questions": [
+    { "id": "G-01", "input": "¿Cuál es el horario?", "expected_intent": "hours" },
+    { "id": "G-02", "input": "¿Hacéis blanqueamiento?", "expected_intent": "treatments_info" },
+    { "id": "G-03", "input": "Quiero hablar con una persona", "expected_intent": "handoff_human" }
+  ]
+}

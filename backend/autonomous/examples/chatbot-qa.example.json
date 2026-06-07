@@ -1,0 +1,21 @@
+{
+  "score": 100,
+  "passed": true,
+  "threshold": 85,
+  "sku": "NELVYON-CHATBOT",
+  "dimensions": {
+    "sop_compliance": 25,
+    "technical": 25,
+    "content": 25,
+    "conversion_or_intent": 15,
+    "seo_or_tracking": 10
+  },
+  "blocking_failures": [],
+  "warnings": [],
+  "failed_agents": [],
+  "retry_recommendation": null,
+  "artifact_versions": {
+    "knowledge_base": 1,
+    "config": 1
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "company_name": "Alonso & Vega Abogados",
+  "primary_domain": "https://alonsovega.example.com",
+  "locale": "es-ES",
+  "market": "ES-AN",
+  "seed_keywords": [
+    "abogado laboral sevilla",
+    "despacho mercantil sevilla",
+    "abogado familia sevilla",
+    "asesoría legal pymes",
+    "consulta abogado online"
+  ],
+  "competitors": [
+    "https://competidor-legal-1.example.com",
+    "https://competidor-legal-2.example.com"
+  ],
+  "gsc_oauth": {
+    "connected": true,
+    "property": "sc-domain:alonsovega.example.com"
+  },
+  "ga4_property_id": "123456789",
+  "pages_to_optimize": 5,
+  "tier_scope": "starter",
+  "compliance_flags": {
+    "regulated_sector": true,
+    "no_ranking_guarantee_ack": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "sku": "NELVYON-SEO",
+  "client_visible": [
+    { "label": "SEO Report PDF", "type": "file" },
+    { "label": "Issues CSV", "type": "json" },
+    { "label": "On-page fixes", "type": "json" },
+    { "label": "Keyword map", "type": "json" },
+    { "label": "Plan 90d", "type": "file" }
+  ],
+  "internal_only": [
+    { "label": "QA Report", "type": "file" }
+  ],
+  "os_project_status_after_publish": "CLIENTE_REVISION"
+}
