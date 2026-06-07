@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.os_deliverables import Os_deliverables
+from services.os_audit_service import record_os_event
 from services.os_deliverable_storage import (
     deliverable_has_file,
     resolve_deliverable_download_url,
@@ -52,6 +53,7 @@ class PortalDeliverableDownloadService:
         *,
         workspace_id: int,
         client_id: str,
+        portal_user_id: str = "portal-anonymous",
     ) -> Optional[str]:
         obj = await self._get_downloadable(
             deliverable_id,
@@ -59,8 +61,28 @@ class PortalDeliverableDownloadService:
             client_id=client_id,
         )
         if not obj:
+            await record_os_event(
+                self.db,
+                category="download",
+                action="resolve_url",
+                resource_type="os_deliverable",
+                resource_id=deliverable_id,
+                result="error",
+                workspace_id=workspace_id,
+                actor_user_id=portal_user_id,
+            )
             return None
         if not deliverable_has_file(storage_key=obj.storage_key, file_url=obj.file_url):
+            await record_os_event(
+                self.db,
+                category="download",
+                action="no_file",
+                resource_type="os_deliverable",
+                resource_id=obj.id,
+                result="error",
+                workspace_id=workspace_id,
+                actor_user_id=portal_user_id,
+            )
             return None
 
         url = await resolve_deliverable_download_url(
@@ -73,5 +95,26 @@ class PortalDeliverableDownloadService:
                 obj.id,
                 workspace_id,
                 client_id,
+            )
+            await record_os_event(
+                self.db,
+                category="download",
+                action="resolve_url",
+                resource_type="os_deliverable",
+                resource_id=obj.id,
+                result="success",
+                workspace_id=workspace_id,
+                actor_user_id=portal_user_id,
+            )
+        else:
+            await record_os_event(
+                self.db,
+                category="download",
+                action="signed_url_failed",
+                resource_type="os_deliverable",
+                resource_id=obj.id,
+                result="error",
+                workspace_id=workspace_id,
+                actor_user_id=portal_user_id,
             )
         return url

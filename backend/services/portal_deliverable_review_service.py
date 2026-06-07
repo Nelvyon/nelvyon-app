@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.os_deliverable_reviews import Os_deliverable_reviews
 from models.os_deliverables import Os_deliverables
+from services.os_audit_service import record_os_event
 
 logger = logging.getLogger(__name__)
 
@@ -151,6 +152,16 @@ class PortalDeliverableReviewService:
             obj.id,
             portal_user_id,
         )
+        await record_os_event(
+            self.db,
+            category="portal",
+            action="approve_deliverable",
+            resource_type="os_deliverable",
+            resource_id=obj.id,
+            result="success",
+            workspace_id=workspace_id,
+            actor_user_id=portal_user_id,
+        )
         return self._result_dict(obj)
 
     async def reject(
@@ -211,6 +222,16 @@ class PortalDeliverableReviewService:
             )
         except Exception as exc:
             logger.warning("Revision requested notification failed: %s", exc)
+        await record_os_event(
+            self.db,
+            category="portal",
+            action="reject_deliverable",
+            resource_type="os_deliverable",
+            resource_id=obj.id,
+            result="success",
+            workspace_id=workspace_id,
+            actor_user_id=portal_user_id,
+        )
         return self._result_dict(obj)
 
     @staticmethod

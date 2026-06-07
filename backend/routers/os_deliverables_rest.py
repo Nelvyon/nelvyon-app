@@ -289,6 +289,7 @@ async def upload_os_deliverable_file(
             filename=file.filename or "",
             content_type=file.content_type,
             data=raw,
+            actor_user_id=ws_ctx.user_id,
         )
         return _to_response(row)
     except LookupError:

@@ -189,6 +189,38 @@ describe("320_os_deliverable_reviews migration", () => {
   });
 });
 
+describe("322_os_rls migration", () => {
+  const sql = fs.readFileSync(
+    path.resolve(__dirname, "../../db/migrations/322_os_rls.sql"),
+    "utf8",
+  );
+
+  it("aplica RLS workspace a tablas OS canónicas", () => {
+    for (const tbl of [
+      "os_clients",
+      "os_projects",
+      "os_tasks",
+      "os_deliverables",
+      "os_portal_invites",
+      "os_portal_users",
+      "os_deliverable_reviews",
+      "os_deliverable_versions",
+    ]) {
+      expect(sql).toContain(tbl);
+    }
+    expect(sql).toMatch(/nelvyon_apply_os_workspace_rls/i);
+    expect(sql).toMatch(/nelvyon_os_workspace_select/i);
+    expect(sql).toMatch(/nelvyon_os_workspace_mutate/i);
+    expect(sql).toMatch(/FORCE ROW LEVEL SECURITY/i);
+  });
+
+  it("no toca tablas SaaS ni legacy nelvyon_*", () => {
+    expect(sql).not.toMatch(/saas_contacts/i);
+    expect(sql).not.toMatch(/nelvyon_clients/i);
+    expect(sql).not.toMatch(/nelvyon_projects/i);
+  });
+});
+
 describe("321_os_deliverable_versions migration", () => {
   const sql = fs.readFileSync(
     path.resolve(__dirname, "../../db/migrations/321_os_deliverable_versions.sql"),

@@ -16,6 +16,7 @@ from dependencies.workspace import WorkspaceContext, require_workspace_operator
 from services.portal_auth_service import PortalAuthService
 from services.portal_data_service import PortalDataService
 from services.portal_deliverable_download_service import PortalDeliverableDownloadService
+from services.os_audit_service import record_os_event
 from services.portal_deliverable_review_service import PortalDeliverableReviewService
 
 logger = logging.getLogger(__name__)
@@ -175,6 +176,16 @@ async def create_portal_invite(
             email=body.email,
             created_by_user_id=ws_ctx.user_id,
         )
+        await record_os_event(
+            db,
+            category="portal",
+            action="create_invite",
+            resource_type="os_portal_invite",
+            resource_id=result["invite_id"],
+            result="success",
+            workspace_id=ws_ctx.workspace_id,
+            actor_user_id=ws_ctx.user_id,
+        )
         return PortalInviteCreateResponse(
             invite_id=result["invite_id"],
             email=result["email"],
@@ -183,6 +194,16 @@ async def create_portal_invite(
             token=result["token"],
         )
     except ValueError as e:
+        await record_os_event(
+            db,
+            category="portal",
+            action="create_invite",
+            resource_type="os_portal_invite",
+            resource_id=body.client_id,
+            result="error",
+            workspace_id=ws_ctx.workspace_id,
+            actor_user_id=ws_ctx.user_id,
+        )
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
@@ -211,6 +232,15 @@ async def portal_login(
     try:
         return await service.login(email=body.email, password=body.password)
     except ValueError as e:
+        await record_os_event(
+            db,
+            category="portal",
+            action="login",
+            resource_type="os_portal_user",
+            resource_id=body.email,
+            result="error",
+            actor_user_id="portal-anonymous",
+        )
         raise HTTPException(status_code=401, detail=str(e)) from e
 
 
@@ -331,6 +361,7 @@ async def portal_download_deliverable(
         deliverable_id,
         workspace_id=portal.workspace_id,
         client_id=portal.client_id,
+        portal_user_id=portal.portal_user_id,
     )
     if not url:
         raise HTTPException(status_code=404, detail="No file attached to this deliverable")

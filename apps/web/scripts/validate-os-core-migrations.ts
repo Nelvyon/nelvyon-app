@@ -48,6 +48,18 @@ const REQUIRED_MIGRATIONS = [
   "319_os_portal.sql",
   "320_os_deliverable_reviews.sql",
   "321_os_deliverable_versions.sql",
+  "322_os_rls.sql",
+] as const;
+
+const OS_RLS_TABLES = [
+  "os_clients",
+  "os_projects",
+  "os_tasks",
+  "os_deliverables",
+  "os_portal_invites",
+  "os_portal_users",
+  "os_deliverable_reviews",
+  "os_deliverable_versions",
 ] as const;
 
 const OS_CLIENTS_COLUMNS = [
@@ -644,13 +656,59 @@ async function main(): Promise<void> {
     }
   }
 
+  console.log("[validate-os-core] Comprobando RLS OS (322)…");
+  for (const tbl of OS_RLS_TABLES) {
+    if (!(await tableExists(db, tbl))) {
+      continue;
+    }
+    const rlsRows = await db.query<{ relrowsecurity: boolean }>(
+      `SELECT c.relrowsecurity
+       FROM pg_class c
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+       WHERE n.nspname = 'public' AND c.relname = $1`,
+      [tbl],
+    );
+    if (!rlsRows[0]?.relrowsecurity) {
+      console.error(`[validate-os-core] FALTA RLS habilitado en ${tbl}`);
+      ok = false;
+    } else {
+      console.log(`[validate-os-core] OK RLS ${tbl}`);
+    }
+    const polRows = await db.query<{ n: string }>(
+      `SELECT COUNT(*)::text AS n
+       FROM pg_policies
+       WHERE schemaname = 'public' AND tablename = $1
+         AND policyname LIKE $2`,
+      [tbl, `${tbl}_os_%`],
+    );
+    const polCount = Number(polRows[0]?.n ?? "0");
+    if (polCount < 4) {
+      console.error(
+        `[validate-os-core] FALTA políticas OS en ${tbl} (esperado ≥4, tiene ${polCount})`,
+      );
+      ok = false;
+    } else {
+      console.log(`[validate-os-core] OK políticas ${tbl} (${polCount})`);
+    }
+  }
+
+  const fnRows = await db.query<{ reg: string | null }>(
+    "SELECT to_regprocedure('public.nelvyon_apply_os_workspace_rls(text)')::text AS reg",
+  );
+  if (!fnRows[0]?.reg) {
+    console.error("[validate-os-core] FALTA función nelvyon_apply_os_workspace_rls");
+    ok = false;
+  } else {
+    console.log("[validate-os-core] OK función nelvyon_apply_os_workspace_rls");
+  }
+
   await db.end();
   if (!ok) {
     console.error("[validate-os-core] Validación fallida.");
     process.exit(1);
   }
   console.log(
-    "[validate-os-core] Validación OK (315–321: clients, projects, tasks, deliverables, portal, reviews, versions).",
+    "[validate-os-core] Validación OK (315–322: clients, projects, tasks, deliverables, portal, reviews, versions, RLS).",
   );
 }
 

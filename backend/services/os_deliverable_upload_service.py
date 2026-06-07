@@ -13,6 +13,7 @@ from services.os_deliverable_storage import (
     build_storage_path,
     validate_upload_payload,
 )
+from services.os_audit_service import record_os_event
 from services.os_deliverables_service import OsDeliverablesService
 from services.supabase_service import get_supabase_service
 
@@ -36,6 +37,7 @@ class OsDeliverableUploadService:
         filename: str,
         content_type: str | None,
         data: bytes,
+        actor_user_id: str = "os-system",
     ) -> Os_deliverables:
         safe_name, resolved_ct = validate_upload_payload(
             filename=filename,
@@ -71,6 +73,16 @@ class OsDeliverableUploadService:
             )
         elif not result.get("ok"):
             error = result.get("error") or "storage upload failed"
+            await record_os_event(
+                self.db,
+                category="upload",
+                action="storage_upload",
+                resource_type="os_deliverable",
+                resource_id=obj.id,
+                result="error",
+                workspace_id=workspace_id,
+                actor_user_id=actor_user_id,
+            )
             raise RuntimeError(str(error))
 
         obj.storage_key = storage_key
@@ -84,5 +96,15 @@ class OsDeliverableUploadService:
             workspace_id,
             storage_key,
             len(data),
+        )
+        await record_os_event(
+            self.db,
+            category="upload",
+            action="file_uploaded",
+            resource_type="os_deliverable",
+            resource_id=obj.id,
+            result="success",
+            workspace_id=workspace_id,
+            actor_user_id=actor_user_id,
         )
         return obj

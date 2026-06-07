@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.os_clients import Os_clients
 from models.os_portal_users import Os_portal_users
 from services.email_service import EmailService
+from services.os_audit_service import record_os_event
 
 logger = logging.getLogger(__name__)
 
@@ -84,15 +85,36 @@ async def _send_many(
                 email_type=email_type,
                 workspace_id=workspace_id,
             )
+            status = str(result.get("status") or "unknown")
             logger.info(
                 "OS notification %s to=%s status=%s provider=%s",
                 email_type,
                 to,
-                result.get("status"),
+                status,
                 _provider_name(),
+            )
+            await record_os_event(
+                db,
+                category="email",
+                action=email_type,
+                resource_type="email",
+                resource_id=to,
+                result="success" if status not in ("failed", "error") else "error",
+                workspace_id=workspace_id,
+                actor_user_id=actor_user_id or OS_SYSTEM_USER_ID,
             )
         except Exception as exc:
             logger.warning("OS notification %s failed for %s: %s", email_type, to, exc)
+            await record_os_event(
+                db,
+                category="email",
+                action=email_type,
+                resource_type="email",
+                resource_id=to,
+                result="error",
+                workspace_id=workspace_id,
+                actor_user_id=actor_user_id or OS_SYSTEM_USER_ID,
+            )
 
 
 async def notify_portal_invite_created(
