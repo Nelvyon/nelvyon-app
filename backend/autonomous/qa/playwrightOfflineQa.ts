@@ -7,6 +7,8 @@ export interface PlaywrightQaCheck {
   id: string;
   passed: boolean;
   message: string;
+  /** When true, failure blocks Phase H staging handoff */
+  blocking?: boolean;
 }
 
 export interface PlaywrightQaResult {

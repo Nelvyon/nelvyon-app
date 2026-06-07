@@ -32,6 +32,7 @@
     "autonomous:phase-c": "tsx ../../backend/autonomous/scripts/run-phase-c.ts",
     "autonomous:phase-f": "tsx ../../backend/autonomous/scripts/run-phase-f-pilot.ts",
     "autonomous:phase-g": "tsx ../../backend/autonomous/scripts/run-phase-g-staging.ts",
+    "autonomous:phase-h": "tsx ../../backend/autonomous/scripts/run-phase-h-preview.ts",
     "gate": "pnpm typecheck && pnpm lint && pnpm test:smoke && pnpm test:bot-evals",
     "pwa:icons": "node ./scripts/generate-pwa-icons.mjs"
   },
