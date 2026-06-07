@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +15,7 @@ from dependencies.portal import PortalContext, require_portal_user
 from dependencies.workspace import WorkspaceContext, require_workspace_operator
 from services.portal_auth_service import PortalAuthService
 from services.portal_data_service import PortalDataService
+from services.portal_deliverable_download_service import PortalDeliverableDownloadService
 from services.portal_deliverable_review_service import PortalDeliverableReviewService
 
 logger = logging.getLogger(__name__)
@@ -80,6 +82,7 @@ class PortalDeliverableResponse(BaseModel):
     type: Optional[str] = None
     status: str
     file_url: Optional[str] = None
+    has_file: bool = False
     version: int
     published_at: Optional[str] = None
     client_reviewed_at: Optional[str] = None
@@ -273,6 +276,24 @@ async def portal_get_deliverable(
     if not row:
         raise HTTPException(status_code=404, detail="Deliverable not found")
     return PortalDeliverableResponse(**row)
+
+
+@router.get("/deliverables/{deliverable_id}/download")
+async def portal_download_deliverable(
+    deliverable_id: str,
+    portal: PortalContext = Depends(require_portal_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Secure download: portal JWT, same client/workspace, client_visible + published/approved."""
+    service = PortalDeliverableDownloadService(db)
+    url = await service.resolve_download_url(
+        deliverable_id,
+        workspace_id=portal.workspace_id,
+        client_id=portal.client_id,
+    )
+    if not url:
+        raise HTTPException(status_code=404, detail="No file attached to this deliverable")
+    return RedirectResponse(url=url, status_code=302)
 
 
 @router.post("/deliverables/{deliverable_id}/approve", response_model=PortalDeliverableReviewResponse)

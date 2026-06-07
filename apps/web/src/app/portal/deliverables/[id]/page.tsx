@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { use } from "react";
 
+import { PortalDeliverableDownloadButton } from "@/features/client_portal_v1/components/PortalDeliverableDownloadButton";
 import { PortalDeliverableReviewPanel } from "@/features/client_portal_v1/components/PortalDeliverableReviewPanel";
 import { PortalPageShell } from "@/features/client_portal_v1/components/PortalPageShell";
 import {
@@ -47,17 +48,11 @@ export default function PortalDeliverableDetailPage({
             ) : null}
           </div>
 
-          {query.data.file_url ? (
-            <p className="text-sm">
-              <a
-                className="text-link underline"
-                href={query.data.file_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Open file
-              </a>
-            </p>
+          {query.data.has_file ?? Boolean(query.data.file_url) ? (
+            <PortalDeliverableDownloadButton
+              deliverableId={query.data.id}
+              title={query.data.title}
+            />
           ) : null}
 
           <p className="text-sm text-muted-foreground">

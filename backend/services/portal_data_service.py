@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.os_deliverables import Os_deliverables
 from models.os_projects import Os_projects
+from services.os_deliverable_storage import deliverable_has_file
 from services.portal_deliverable_review_service import PORTAL_VISIBLE_STATUSES
 
 logger = logging.getLogger(__name__)
@@ -176,6 +177,7 @@ class PortalDataService:
             "type": row.type,
             "status": row.status,
             "file_url": row.file_url,
+            "has_file": deliverable_has_file(storage_key=row.storage_key, file_url=row.file_url),
             "version": row.version,
             "published_at": row.published_at.isoformat() if row.published_at else None,
             "client_reviewed_at": row.client_reviewed_at.isoformat()

@@ -138,6 +138,65 @@ class SupabaseService:
             data = response.json()
             return data if isinstance(data, list) else []
 
+    async def create_signed_url(
+        self,
+        bucket: str,
+        path: str,
+        *,
+        expires_in: int = 600,
+    ) -> dict[str, Any]:
+        """Create a time-limited signed URL for a private storage object."""
+        self._ensure_config()
+        clean_path = path.lstrip("/")
+        if self._mock:
+            return {
+                "mock": True,
+                "bucket": bucket,
+                "path": clean_path,
+                "signed_url": f"https://mock.supabase.local/{bucket}/{clean_path}?expires={expires_in}",
+            }
+
+        url = f"{self.base_url}/storage/v1/object/sign/{bucket}/{clean_path}"
+        headers = {
+            "Authorization": f"Bearer {self.service_key}",
+            "apikey": self.service_key,
+            "Content-Type": "application/json",
+        }
+        body = {"expiresIn": max(60, min(int(expires_in), 3600))}
+
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(url, headers=headers, json=body)
+            if response.status_code >= 400:
+                logger.warning(
+                    "Supabase signed URL failed: %s %s",
+                    response.status_code,
+                    response.text,
+                )
+                return {
+                    "mock": False,
+                    "ok": False,
+                    "status_code": response.status_code,
+                    "error": response.text,
+                }
+
+            data = response.json()
+            signed_path = data.get("signedURL") or data.get("signedUrl") or ""
+            if not signed_path:
+                return {"mock": False, "ok": False, "error": "missing signedURL in response"}
+
+            if str(signed_path).startswith("http"):
+                signed_url = str(signed_path)
+            else:
+                signed_url = f"{self.base_url}{signed_path}"
+
+        return {
+            "mock": False,
+            "ok": True,
+            "bucket": bucket,
+            "path": clean_path,
+            "signed_url": signed_url,
+        }
+
     async def download_bytes(self, bucket: str, path: str) -> bytes | None:
         self._ensure_config()
         if self._mock:

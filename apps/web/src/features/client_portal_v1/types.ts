@@ -68,6 +68,7 @@ export interface PortalDeliverable {
   type?: string | null;
   status: PortalDeliverableStatus | string;
   file_url?: string | null;
+  has_file?: boolean;
   version: number;
   published_at?: string | null;
   client_reviewed_at?: string | null;
