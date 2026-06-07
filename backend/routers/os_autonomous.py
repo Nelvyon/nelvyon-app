@@ -46,6 +46,7 @@ class OsActionBody(BaseModel):
 class OsPublishPayloadBody(BaseModel):
     dry_run: bool = True
     sector: Optional[str] = None
+    sku: Optional[str] = None
     project_id: str = Field(..., min_length=1)
     os_refs: OsRefsBody
     deliverables: List[OsDeliverableDraftBody] = Field(..., min_length=1)

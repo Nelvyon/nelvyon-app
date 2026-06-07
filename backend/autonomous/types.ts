@@ -98,6 +98,8 @@ export interface OsPublishPayload {
   dry_run: boolean;
   /** Phase E sector agent (optional) */
   sector?: AutonomousSector | null;
+  /** Phase G SKU slug for metadata (e.g. landing, chatbot, seo) */
+  sku?: string | null;
   /** Autonomous simulation/job id (traceability) */
   project_id: string;
   os_refs: OsRefs;

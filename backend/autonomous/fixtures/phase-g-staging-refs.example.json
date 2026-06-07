@@ -1,0 +1,12 @@
+{
+  "client_name": "La Brasa del Raval",
+  "project_name": "Landing Reserva Directa",
+  "project_slug": "LANDING-RESERVA-DIRECTA",
+  "sector": "restaurant",
+  "sku": "landing",
+  "os_refs": {
+    "client_id": "<uuid-from-POST-/api/v1/os/clients>",
+    "project_id": "<uuid-from-POST-/api/v1/os/projects>",
+    "workspace_id": 1
+  }
+}

@@ -16,6 +16,13 @@ logger = logging.getLogger(__name__)
 
 QA_THRESHOLD = 85.0
 AUTONOMOUS_PHASE = "D"
+AUTONOMOUS_PHASE_G = "G"
+
+_SKU_ALIASES = {
+    "NELVYON-LANDING": "landing",
+    "NELVYON-CHATBOT": "chatbot",
+    "NELVYON-SEO": "seo",
+}
 
 
 def is_autonomous_production_enabled() -> bool:
@@ -40,15 +47,32 @@ def _map_deliverable_type(dtype: str) -> str:
     return "file"
 
 
+def _normalize_sku(raw: Optional[str]) -> Optional[str]:
+    if not raw:
+        return None
+    key = raw.strip()
+    if not key:
+        return None
+    return _SKU_ALIASES.get(key, key.lower())
+
+
+def _resolve_autonomous_phase(payload: Dict[str, Any]) -> str:
+    """Phase G pilot payloads carry sku — legacy Phase D payloads do not."""
+    if payload.get("sku"):
+        return AUTONOMOUS_PHASE_G
+    return AUTONOMOUS_PHASE
+
+
 def _build_metadata(
     *,
     payload: Dict[str, Any],
     deliverable: Dict[str, Any],
     actor_user_id: str,
 ) -> Dict[str, Any]:
+    sku = _normalize_sku(payload.get("sku"))
     meta: Dict[str, Any] = {
         "autonomous_provenance": True,
-        "autonomous_phase": AUTONOMOUS_PHASE,
+        "autonomous_phase": _resolve_autonomous_phase(payload),
         "autonomous_job_id": payload.get("autonomous_job_id"),
         "autonomous_project_id": payload.get("project_id"),
         "qa_score": payload.get("qa_score"),
@@ -67,6 +91,8 @@ def _build_metadata(
     if payload.get("sector"):
         meta["sector"] = payload["sector"]
         meta["sector_phase"] = "E"
+    if sku:
+        meta["sku"] = sku
     if payload.get("os_actions"):
         meta["os_actions_planned"] = payload["os_actions"]
     os_refs = payload.get("os_refs") or {}
