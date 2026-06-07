@@ -42,11 +42,18 @@ function loadBrief(file: string): Record<string, unknown> {
   return JSON.parse(readFileSync(join(FIXTURES, file), "utf-8")) as Record<string, unknown>;
 }
 
-async function runSku(sku: AutonomousSku): Promise<void> {
+function parseSectorArg(): string | undefined {
+  const idx = process.argv.indexOf("--sector");
+  if (idx >= 0 && process.argv[idx + 1]) return process.argv[idx + 1];
+  return undefined;
+}
+
+async function runSku(sku: AutonomousSku, sector?: string): Promise<void> {
   const result = await simulatePhaseC({
     sku,
     tier: "professional",
     brief: loadBrief(SKU_FIXTURE[sku]),
+    sector,
     os_refs: {
       client_id: "os_client_phase_c",
       project_slug: SKU_SLUG[sku],
@@ -58,6 +65,7 @@ async function runSku(sku: AutonomousSku): Promise<void> {
   const { project, escalated, llm_mode, output_bundle } = result;
   console.log("\n--- NELVYON Phase C ---");
   console.log(`SKU:       ${project.sku}`);
+  console.log(`Sector:    ${project.sector ?? "(none)"}`);
   console.log(`LLM mode:  ${llm_mode}`);
   console.log(`Status:    ${project.status}`);
   console.log(`QA Score:  ${project.qa?.score} (>= 85)`);
@@ -73,22 +81,25 @@ async function runSku(sku: AutonomousSku): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const arg = process.argv[2] ?? "all";
+  const args = process.argv.slice(2).filter((a) => a !== "--sector" && !a.startsWith("--"));
+  const sector = parseSectorArg();
+  const arg = args[0] ?? "all";
   console.log(`[phase-c] LLM resolved mode: ${resolveLlmMode()}`);
+  if (sector) console.log(`[phase-c] Sector: ${sector}`);
 
   if (arg === "all") {
     for (const sku of ["NELVYON-LANDING", "NELVYON-CHATBOT", "NELVYON-SEO"] as AutonomousSku[]) {
-      await runSku(sku);
+      await runSku(sku, sector);
     }
     return;
   }
 
   const sku = skuFromCliArg(arg);
   if (!sku) {
-    console.error("Usage: landing | chatbot | seo | all");
+    console.error("Usage: landing | chatbot | seo | all [--sector dental|legal|...]");
     process.exit(1);
   }
-  await runSku(sku);
+  await runSku(sku, sector);
 }
 
 main().catch((e) => {

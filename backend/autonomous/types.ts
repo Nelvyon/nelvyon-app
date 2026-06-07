@@ -1,5 +1,9 @@
 /** NELVYON Autonomous — types (Phase B simulation, offline only) */
 
+import type { AutonomousSector, SectorProfile } from "./sectors/types";
+
+export type { AutonomousSector } from "./sectors/types";
+
 export type AutonomousSku = "NELVYON-LANDING" | "NELVYON-CHATBOT" | "NELVYON-SEO";
 export type AutonomousTier = "starter" | "professional" | "premium";
 export type ProjectStatus =
@@ -92,6 +96,8 @@ export interface OsDeliverableDraft {
 export interface OsPublishPayload {
   /** Default true — Phase D endpoint rejects DB writes unless false + AUTONOMOUS_PRODUCTION */
   dry_run: boolean;
+  /** Phase E sector agent (optional) */
+  sector?: AutonomousSector | null;
   /** Autonomous simulation/job id (traceability) */
   project_id: string;
   os_refs: OsRefs;
@@ -125,6 +131,10 @@ export interface AutonomousProject {
   simulation_mode: "phase-b-offline" | "phase-c-llm-qa";
   llm_mode?: "mock" | "real";
   retry_history?: RetryHistoryEntry[];
+  /** Phase E — resolved sector */
+  sector?: AutonomousSector | null;
+  sector_profile?: Pick<SectorProfile, "id" | "label" | "autonomy_score" | "regulated" | "sensitivity"> | null;
+  sector_escalation?: boolean;
 }
 
 export interface RetryHistoryEntry {

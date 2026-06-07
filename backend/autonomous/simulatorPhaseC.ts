@@ -6,7 +6,9 @@ import { join } from "node:path";
 import { resolveLlmMode } from "./llm/llmAdapter";
 import { executePipelinePhaseC, initPhaseCProject } from "./pipelines/runPipelinePhaseC";
 import { buildOsPublishPayload } from "./publish/osPublishPayload";
+import { requiresOperatorEscalation } from "./sectors/sectorQa";
 import type {
+  AutonomousSector,
   AutonomousSku,
   AutonomousTier,
   PhaseCOutputBundle,
@@ -19,6 +21,8 @@ export interface PhaseCOptions {
   sku: AutonomousSku;
   tier?: AutonomousTier;
   brief: Record<string, unknown>;
+  /** Phase E — explicit sector or inferred from brief.sector */
+  sector?: AutonomousSector | string | null;
   os_refs?: {
     client_id: string;
     project_slug: string;
@@ -38,7 +42,14 @@ export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResu
   const llmMode = resolveLlmMode();
   const osRefs = { ...DEFAULT_OS_REFS, ...options.os_refs };
 
-  const project = initPhaseCProject(options.sku, tier, options.brief, osRefs, llmMode);
+  const project = initPhaseCProject(
+    options.sku,
+    tier,
+    options.brief,
+    osRefs,
+    llmMode,
+    options.sector,
+  );
   project.status = "PLANNING";
 
   const retryHistory: RetryHistoryEntry[] = [];
@@ -61,8 +72,17 @@ export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResu
   let escalated = false;
 
   if (qa.passed) {
-    project.status = "OS_PUBLISH_READY";
-    os_publish = buildOsPublishPayload(project);
+    const sectorEscalate =
+      project.sector != null && requiresOperatorEscalation(project.sector);
+    project.sector_escalation = sectorEscalate ?? false;
+    if (sectorEscalate) {
+      project.status = "ESCALATE_OPERATOR";
+      escalated = true;
+      os_publish = buildOsPublishPayload(project, { dry_run: true });
+    } else {
+      project.status = "OS_PUBLISH_READY";
+      os_publish = buildOsPublishPayload(project);
+    }
   } else {
     project.status = "ESCALATE_OPERATOR";
     escalated = true;

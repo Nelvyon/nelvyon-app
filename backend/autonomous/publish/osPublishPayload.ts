@@ -11,8 +11,13 @@ export function buildOsPublishPayload(
 
   const deliverables = deliverablesForSku(project.sku, project.artifacts, project.brief);
 
+  const sectorNote = project.sector_escalation
+    ? " | SECTOR_ESCALATE_OPERATOR: legal/operator review required before client delivery"
+    : "";
+
   return {
     dry_run: options?.dry_run ?? true,
+    sector: project.sector ?? null,
     project_id: project.project_id,
     os_refs: {
       ...project.os_refs,
@@ -32,9 +37,11 @@ export function buildOsPublishPayload(
       { entity: "task", action: "complete", task_key: "QA_AUTONOMOUS" },
     ],
     note:
-      options?.dry_run === false
+      (options?.dry_run === false
         ? "PHASE-D STAGING: POST /api/v1/os/autonomous/publish with AUTONOMOUS_PRODUCTION=true"
-        : "PHASE-D DRY-RUN: POST /api/v1/os/autonomous/publish validates payload without DB writes",
+        : "PHASE-D DRY-RUN: POST /api/v1/os/autonomous/publish validates payload without DB writes") +
+      (project.sector ? ` | Phase E sector=${project.sector}` : "") +
+      sectorNote,
   };
 }
 

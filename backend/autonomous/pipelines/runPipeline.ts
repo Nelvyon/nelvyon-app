@@ -18,15 +18,20 @@ import {
   runStrategistLanding,
   runStrategistSeo,
 } from "../agents/mockAgents";
+import { applySectorContext, injectSectorArtifacts } from "../sectors/applySectorContext";
 import { scoreProject } from "../qa/scorer";
-import type { AutonomousProject, AutonomousSku, AutonomousTier, QaResult } from "../types";
+import type { AutonomousProject, AutonomousSector, AutonomousSku, AutonomousTier, QaResult } from "../types";
 
 export function createProject(
   sku: AutonomousSku,
   tier: AutonomousTier,
   brief: Record<string, unknown>,
   osRefs: { client_id: string; project_slug: string; workspace_id: string },
+  sectorInput?: AutonomousSector | string | null,
 ): AutonomousProject {
+  const { sector, profile, brief: enrichedBrief } = applySectorContext(brief, sectorInput);
+  const artifacts = injectSectorArtifacts({ _tier: tier }, sector, profile);
+
   return {
     project_id: `sim-${sku.toLowerCase().replace("nelvyon-", "")}-${Date.now()}`,
     sku,
@@ -35,11 +40,22 @@ export function createProject(
     retry_count: 0,
     max_retries: 3,
     os_refs: osRefs,
-    brief,
-    artifacts: { _tier: tier },
+    brief: enrichedBrief,
+    artifacts,
     qa: null,
     agent_log: [],
     simulation_mode: "phase-b-offline",
+    sector,
+    sector_profile: profile
+      ? {
+          id: profile.id,
+          label: profile.label,
+          autonomy_score: profile.autonomy_score,
+          regulated: profile.regulated,
+          sensitivity: profile.sensitivity,
+        }
+      : null,
+    sector_escalation: false,
   };
 }
 

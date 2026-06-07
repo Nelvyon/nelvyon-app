@@ -79,13 +79,22 @@ export function getSystemPrompt(role: AgentRole): string {
   return SYSTEM_PROMPTS[role];
 }
 
+function sectorBlock(payload: Record<string, unknown>): string {
+  const ctx = payload._sector_context ?? payload.sector_context;
+  if (!ctx || typeof ctx !== "object") return "";
+  return `\nSector context (Phase E):\n${JSON.stringify(ctx)}\n`;
+}
+
 export function buildUserPrompt(role: AgentRole, payload: Record<string, unknown>): string {
   const json = JSON.stringify(payload, null, 0);
+  const sector = sectorBlock(payload);
   switch (role) {
     case "agent-pm-landing":
-      return renderTemplate(
-        "Valida brief y genera PMPlan:\n{{brief_json}}\nTier: {{tier}}\nOS: {{project_slug}}",
-        { brief_json: json, tier: String(payload.tier ?? ""), project_slug: String(payload.project_slug ?? "") },
+      return (
+        renderTemplate(
+          "Valida brief y genera PMPlan:\n{{brief_json}}\nTier: {{tier}}\nOS: {{project_slug}}",
+          { brief_json: json, tier: String(payload.tier ?? ""), project_slug: String(payload.project_slug ?? "") },
+        ) + sector
       );
     case "agent-strategist-landing":
       return `Brief:\n${json}\nPlantilla: ${String(payload.template_id ?? "")}`;
@@ -112,6 +121,6 @@ export function buildUserPrompt(role: AgentRole, payload: Record<string, unknown
     case "agent-seo-report":
       return `Brief:\n${JSON.stringify(payload.brief ?? {})}\nOn-page:\n${JSON.stringify(payload.on_page ?? {})}`;
     default:
-      return json;
+      return json + sector;
   }
 }

@@ -3,6 +3,8 @@
  * Merges with rubric scorer (AUTONOMOUS_QA_RUBRICS.md)
  */
 
+import { applySectorQaToScore, runSectorQaChecks } from "../sectors/sectorQa";
+import { resolveSector } from "../sectors/resolveSector";
 import type { AutonomousSku, QaCheckResult, QaResult } from "../types";
 import {
   scoreCopyQuality,
@@ -138,6 +140,33 @@ export function scoreOffline(
   const blocking = allChecks.filter((c) => c.blocking && !c.passed);
   let score = Math.min(100, total);
   if (blocking.length > 0 && score >= THRESHOLD) score = 84;
+
+  const sector = resolveSector(null, brief);
+  if (sector) {
+    const sectorChecks = runSectorQaChecks(sector, sku, brief, artifacts);
+    const sectorApplied = applySectorQaToScore(score, sectorChecks);
+    score = sectorApplied.score;
+    for (const sc of sectorChecks) {
+      allChecks.push({
+        id: sc.id,
+        passed: sc.passed,
+        points: sc.passed ? 2 : 0,
+        max_points: 2,
+        blocking: sc.blocking,
+        message: sc.message,
+      });
+      if (sc.blocking && !sc.passed) {
+        blocking.push({
+          id: sc.id,
+          passed: false,
+          points: 0,
+          max_points: 2,
+          blocking: true,
+          message: sc.message,
+        });
+      }
+    }
+  }
 
   const rubric = scoreProject(sku, brief, artifacts, attempt);
   if (!rubric.passed && rubric.blocking_failures.length > 0) {

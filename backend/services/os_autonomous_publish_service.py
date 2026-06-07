@@ -64,6 +64,9 @@ def _build_metadata(
         meta["handoff_email_draft"] = payload["handoff_email_draft"]
     if payload.get("note"):
         meta["note"] = payload["note"]
+    if payload.get("sector"):
+        meta["sector"] = payload["sector"]
+        meta["sector_phase"] = "E"
     if payload.get("os_actions"):
         meta["os_actions_planned"] = payload["os_actions"]
     os_refs = payload.get("os_refs") or {}

@@ -193,8 +193,9 @@ export function initPhaseCProject(
   brief: Record<string, unknown>,
   osRefs: { client_id: string; project_slug: string; workspace_id: string },
   llmMode: "mock" | "real",
+  sectorInput?: import("../types").AutonomousSector | string | null,
 ): AutonomousProject {
-  const p = createProject(sku, tier, brief, osRefs);
+  const p = createProject(sku, tier, brief, osRefs, sectorInput);
   p.simulation_mode = "phase-c-llm-qa";
   p.llm_mode = llmMode;
   p.retry_history = [];
