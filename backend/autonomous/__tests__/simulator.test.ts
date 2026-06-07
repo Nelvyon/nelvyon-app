@@ -59,7 +59,7 @@ describe("autonomous phase-b simulator", () => {
     });
     const payload = buildOsPublishPayload(result.project);
     expect(payload.dry_run).toBe(true);
-    expect(payload.note).toContain("NOT sent to OS");
+    expect(payload.note).toContain("DRY-RUN");
     expect(payload.os_actions.some((a) => a.entity === "deliverable")).toBe(true);
   });
 

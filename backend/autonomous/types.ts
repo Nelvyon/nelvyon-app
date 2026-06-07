@@ -16,6 +16,8 @@ export type ProjectStatus =
 
 export interface OsRefs {
   client_id: string;
+  /** OS project UUID — required for Phase D staging publish */
+  project_id?: string;
   project_slug: string;
   workspace_id: string;
 }
@@ -88,12 +90,16 @@ export interface OsDeliverableDraft {
 }
 
 export interface OsPublishPayload {
-  dry_run: true;
+  /** Default true — Phase D endpoint rejects DB writes unless false + AUTONOMOUS_PRODUCTION */
+  dry_run: boolean;
+  /** Autonomous simulation/job id (traceability) */
   project_id: string;
   os_refs: OsRefs;
   deliverables: OsDeliverableDraft[];
   qa_score: number;
   autonomous_job_id: string;
+  /** Artifact bundle attached to deliverable metadata in staging */
+  artifacts?: Record<string, unknown>;
   handoff_email_draft: { subject: string; body_markdown: string };
   os_actions: Array<{
     entity: string;

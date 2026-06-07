@@ -1,31 +1,40 @@
-/** Build OsPublishPayload — DRY RUN only, never writes to OS/DB */
+/** Build OsPublishPayload — dry_run by default; Phase D endpoint for controlled staging */
 
 import type { AutonomousProject, AutonomousSku, OsPublishPayload } from "../types";
 
-export function buildOsPublishPayload(project: AutonomousProject): OsPublishPayload {
+export function buildOsPublishPayload(
+  project: AutonomousProject,
+  options?: { dry_run?: boolean; os_project_id?: string },
+): OsPublishPayload {
   const score = project.qa?.score ?? 0;
   const jobId = `autonomous_job_${project.project_id.slice(0, 8)}`;
 
   const deliverables = deliverablesForSku(project.sku, project.artifacts, project.brief);
 
   return {
-    dry_run: true,
+    dry_run: options?.dry_run ?? true,
     project_id: project.project_id,
-    os_refs: project.os_refs,
+    os_refs: {
+      ...project.os_refs,
+      ...(options?.os_project_id ? { project_id: options.os_project_id } : {}),
+    },
     deliverables,
     qa_score: score,
     autonomous_job_id: jobId,
+    artifacts: project.artifacts,
     handoff_email_draft: {
       subject: handoffSubject(project.sku, project.brief),
       body_markdown: handoffBody(project),
     },
     os_actions: [
-      { entity: "deliverable", action: "create", status: "published" },
-      { entity: "project", action: "update_status", status: "CLIENTE_REVISION" },
+      { entity: "deliverable", action: "create", status: "in_review" },
+      { entity: "project", action: "update_status", status: "INTERNAL_REVIEW" },
       { entity: "task", action: "complete", task_key: "QA_AUTONOMOUS" },
     ],
     note:
-      "PHASE-B SIMULATION: payload NOT sent to OS. Would create os_deliverables records when Phase D is enabled.",
+      options?.dry_run === false
+        ? "PHASE-D STAGING: POST /api/v1/os/autonomous/publish with AUTONOMOUS_PRODUCTION=true"
+        : "PHASE-D DRY-RUN: POST /api/v1/os/autonomous/publish validates payload without DB writes",
   };
 }
 
