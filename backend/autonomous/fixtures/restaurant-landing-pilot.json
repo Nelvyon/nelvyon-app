@@ -1,0 +1,86 @@
+{
+  "pilot_id": "phase-f-restaurant-landing-v1",
+  "company_name": "La Brasa del Raval",
+  "sector": "restaurant",
+  "value_proposition": "Cocina de brasas mediterránea en el Raval con reserva directa web y -10% vs apps de delivery.",
+  "primary_cta": "Reservar mesa",
+  "cta_type": "reservation",
+  "traffic_source": "google_ads_local",
+  "target_geo": "ES-CT-Barcelona-Raval",
+  "locale": "es-ES",
+  "target_audience": {
+    "description": "Parejas y grupos 25-45 años, residentes y turismo urbano, ticket medio 35-55€",
+    "pain_points": [
+      "Mesas vacías entre semana",
+      "Comisión alta de apps delivery",
+      "Poca visibilidad cocina de autor en zona turística"
+    ]
+  },
+  "location": {
+    "address": "Carrer de Joaquín Costa, 42",
+    "city": "Barcelona",
+    "district": "Raval",
+    "postal_code": "08001",
+    "country": "ES",
+    "coordinates": { "lat": 41.3825, "lng": 2.1652 },
+    "parking_note": "Parking público Paral·lel a 3 min"
+  },
+  "brand_tone": {
+    "voice": "cálido_gastronómico",
+    "keywords": ["brasas", "producto local", "temporada", "maridaje"],
+    "avoid": ["fast food", "menú industrial", "claims superlativos sin prueba"]
+  },
+  "offer": {
+    "headline": "Menú degustación brasas de temporada",
+    "promotion": "Reserva directa en web: -10% vs apps de delivery",
+    "valid_until": "2026-09-30",
+    "includes": ["Entrante", "Principal brasas", "Postre", "Copa bienvenida"]
+  },
+  "local_competition": [
+    { "name": "Brasa Raval Bistro", "weakness": "Sin reserva online clara" },
+    { "name": "Tapas Tour Barcelona", "weakness": "Menú genérico turístico" },
+    { "name": "Delivery Apps agregadores", "weakness": "Comisión 25-30%" }
+  ],
+  "photos_placeholder": [
+    { "id": "hero-dish", "url": "https://cdn.example.com/labrasa/hero-brasas.webp", "alt": "Brasas de temporada en La Brasa del Raval" },
+    { "id": "interior", "url": "https://cdn.example.com/labrasa/sala.webp", "alt": "Sala del restaurante con iluminación cálida" },
+    { "id": "chef", "url": "https://cdn.example.com/labrasa/cocina.webp", "alt": "Cocina de brasas a la vista" }
+  ],
+  "legal_constraints": {
+    "allergen_notice_required": true,
+    "alcohol_service_18_plus": true,
+    "no_health_claims": true,
+    "no_guaranteed_awards": true,
+    "privacy_policy_required": true,
+    "prohibited_claims": [
+      "el mejor restaurante del mundo",
+      "100% garantizado",
+      "michelin seguro",
+      "sin gluten certificado sin documento"
+    ]
+  },
+  "brand": {
+    "logo_url": "https://cdn.example.com/labrasa/logo.svg",
+    "primary_color": "#B45309",
+    "secondary_color": "#1C1917"
+  },
+  "social_proof": [
+    { "type": "review", "text": "Producto excelente y trato cercano.", "author": "Laura M.", "rating": 5 },
+    { "type": "review", "text": "Reservamos online y todo perfecto.", "author": "Marc T.", "rating": 5 }
+  ],
+  "domain": {
+    "type": "subdomain",
+    "host": "reservas.labrasadelraval.example.com"
+  },
+  "tracking": {
+    "google_ads_id": "AW-PILOT-REST",
+    "meta_pixel_id": "PIXEL-PILOT-REST",
+    "ga4_id": "G-PILOTREST"
+  },
+  "references": ["https://brasa-raval-bistro.example.com"],
+  "compliance_flags": {
+    "regulated_sector": false,
+    "disclaimer_required": false,
+    "requires_legal_review": false
+  }
+}
