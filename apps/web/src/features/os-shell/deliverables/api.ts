@@ -70,4 +70,12 @@ export const osDeliverablesApi = {
     apiClient.get<{ items: unknown[]; total: number }>(`${BASE}/${id}/client-reviews`, {
       tenantScoped: true,
     }),
+
+  uploadFile: (id: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiClient.postMultipart<OsDeliverable>(`${BASE}/${id}/upload`, formData, {
+      tenantScoped: true,
+    });
+  },
 };

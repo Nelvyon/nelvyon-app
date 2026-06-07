@@ -4,6 +4,7 @@ const getMock = vi.fn();
 const postMock = vi.fn();
 const patchMock = vi.fn();
 const deleteMock = vi.fn();
+const postMultipartMock = vi.fn();
 
 vi.mock("@/core/api", () => ({
   apiClient: {
@@ -11,6 +12,7 @@ vi.mock("@/core/api", () => ({
     post: (...args: unknown[]) => postMock(...args),
     patch: (...args: unknown[]) => patchMock(...args),
     delete: (...args: unknown[]) => deleteMock(...args),
+    postMultipart: (...args: unknown[]) => postMultipartMock(...args),
   },
 }));
 
@@ -69,6 +71,17 @@ describe("osDeliverablesApi", () => {
       body: { review_notes: "incompleto" },
       tenantScoped: true,
     });
+  });
+
+  it("uploads file via multipart", async () => {
+    postMultipartMock.mockResolvedValue({ id: "d1", storage_key: "1/d1/1/report.pdf" });
+    const file = new File(["pdf"], "report.pdf", { type: "application/pdf" });
+    await osDeliverablesApi.uploadFile("d1", file);
+    expect(postMultipartMock).toHaveBeenCalledWith(
+      "/api/v1/os/deliverables/d1/upload",
+      expect.any(FormData),
+      { tenantScoped: true },
+    );
   });
 
   it("lists versions and client reviews", async () => {

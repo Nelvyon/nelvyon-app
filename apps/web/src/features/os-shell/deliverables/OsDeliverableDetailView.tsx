@@ -23,7 +23,9 @@ import {
   deliverableStatusLabel,
   deliverableStatusTone,
 } from "@/features/os-shell/deliverables/deliverableStatus";
+import { deliverableAttachmentLabel } from "@/features/os-shell/deliverables/attachment";
 import { OsDeliverableForm } from "@/features/os-shell/deliverables/OsDeliverableForm";
+import { OsDeliverableUploadPanel } from "@/features/os-shell/deliverables/OsDeliverableUploadPanel";
 import { OsDeliverableWorkflowActions } from "@/features/os-shell/deliverables/OsDeliverableWorkflowActions";
 import type {
   OsCanonicalClient,
@@ -102,6 +104,11 @@ export function OsDeliverableDetailView({ deliverableId }: { deliverableId: stri
     void load();
   };
 
+  const onFileUploaded = (updated: OsDeliverable) => {
+    setRow(updated);
+    setError(null);
+  };
+
   if (loading) {
     return (
       <OsShellLayout>
@@ -148,6 +155,12 @@ export function OsDeliverableDetailView({ deliverableId }: { deliverableId: stri
         ) : null}
       </div>
 
+      {perms.canEdit ? (
+        <div className="mb-6">
+          <OsDeliverableUploadPanel deliverable={row} onUploaded={onFileUploaded} />
+        </div>
+      ) : null}
+
       {editing && form ? (
         <div className="mb-8 space-y-4">
           <OsDeliverableForm value={form} onChange={setForm} clients={clients} projects={projects} />
@@ -163,15 +176,7 @@ export function OsDeliverableDetailView({ deliverableId }: { deliverableId: stri
           </div>
           <div>
             <dt className="text-white/45">Archivo</dt>
-            <dd>
-              {row.file_url ? (
-                <a href={row.file_url} className="text-[#0084FF] hover:underline" target="_blank" rel="noreferrer">
-                  Abrir
-                </a>
-              ) : (
-                "—"
-              )}
-            </dd>
+            <dd className="text-white/80">{deliverableAttachmentLabel(row)}</dd>
           </div>
           {row.review_notes ? (
             <div className="md:col-span-2">

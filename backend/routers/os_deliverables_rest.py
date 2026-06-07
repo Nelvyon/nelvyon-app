@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,6 +16,8 @@ from dependencies.workspace import (
     require_workspace_operator,
 )
 from models.os_deliverables import Os_deliverables
+from services.os_deliverable_storage import MAX_UPLOAD_BYTES
+from services.os_deliverable_upload_service import OsDeliverableUploadService
 from services.os_deliverables_service import OsDeliverablesService
 
 logger = logging.getLogger(__name__)
@@ -142,6 +144,23 @@ def _handle_value_error(e: ValueError) -> HTTPException:
     return HTTPException(status_code=400, detail=str(e))
 
 
+async def _read_upload_limited(upload: UploadFile, limit: int) -> bytes:
+    chunks: list[bytes] = []
+    total = 0
+    while True:
+        block = await upload.read(65536)
+        if not block:
+            break
+        total += len(block)
+        if total > limit:
+            raise HTTPException(
+                status_code=400,
+                detail=f"file exceeds maximum size ({limit} bytes)",
+            )
+        chunks.append(block)
+    return b"".join(chunks)
+
+
 @router.get("", response_model=OsDeliverableListResponse)
 async def list_os_deliverables(
     page: int = Query(1, ge=1),
@@ -247,6 +266,40 @@ async def create_os_deliverable(
         raise _handle_value_error(e) from e
     except Exception as e:
         logger.error("Error creating os_deliverable: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
+@router.post("/{deliverable_id}/upload", response_model=OsDeliverableResponse)
+async def upload_os_deliverable_file(
+    deliverable_id: str,
+    file: UploadFile = File(..., description="Deliverable attachment"),
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload file to private storage; sets storage_key (keeps manual file_url if present)."""
+    raw = await _read_upload_limited(file, MAX_UPLOAD_BYTES)
+    if not raw:
+        raise HTTPException(status_code=400, detail="empty file")
+
+    service = OsDeliverableUploadService(db)
+    try:
+        row = await service.upload_file(
+            deliverable_id,
+            workspace_id=ws_ctx.workspace_id,
+            filename=file.filename or "",
+            content_type=file.content_type,
+            data=raw,
+        )
+        return _to_response(row)
+    except LookupError:
+        raise HTTPException(status_code=404, detail="Deliverable not found") from None
+    except ValueError as e:
+        raise _handle_value_error(e) from e
+    except RuntimeError as e:
+        logger.error("Storage upload failed for %s: %s", deliverable_id, e)
+        raise HTTPException(status_code=502, detail="File storage upload failed") from e
+    except Exception as e:
+        logger.error("Upload on %s failed: %s", deliverable_id, e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
