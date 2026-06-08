@@ -37,6 +37,7 @@
     "autonomous:learning": "tsx ../../backend/autonomous/scripts/run-learning.ts",
     "autonomous:rank-templates": "tsx ../../backend/autonomous/scripts/run-rank-templates.ts",
     "autonomous:enrich-outcomes": "tsx ../../backend/autonomous/scripts/run-enrich-outcomes.ts",
+    "autonomous:learning-refresh": "tsx ../../backend/autonomous/scripts/run-learning-refresh.ts",
     "gate": "pnpm typecheck && pnpm lint && pnpm test:smoke && pnpm test:bot-evals",
     "pwa:icons": "node ./scripts/generate-pwa-icons.mjs"
   },

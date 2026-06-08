@@ -18,6 +18,9 @@ _LEARNING_OUTPUT = _AUTONOMOUS_ROOT / "output" / "learning"
 _RANKINGS_PATH = _LEARNING_OUTPUT / "rankings.json"
 _ENRICHED_PATH = _LEARNING_OUTPUT / "enrichedOutcomes.json"
 _REPORT_PATH = _LEARNING_OUTPUT / "learningReport.json"
+_ALERTS_PATH = _LEARNING_OUTPUT / "learningAlerts.json"
+_REFRESH_STATUS_PATH = _LEARNING_OUTPUT / "refreshStatus.json"
+_EXPORTS_DIR = _LEARNING_OUTPUT / "exports"
 _LOCAL_OUTCOMES_PATH = _LEARNING_OUTPUT / "local-outcomes.json"
 
 
@@ -294,11 +297,32 @@ class OsAutonomousLearningService:
             if isinstance(ap, dict):
                 autonomy_pct = ap.get("current")
         if autonomy_pct is None:
-            autonomy_pct = 86
+            autonomy_pct = 90
 
         enriched_count = 0
         if isinstance(enriched_raw, dict) and isinstance(enriched_raw.get("enriched"), list):
             enriched_count = len(enriched_raw["enriched"])
+
+        alerts_raw = _read_json(_ALERTS_PATH)
+        alerts: List[Dict[str, Any]] = []
+        if isinstance(alerts_raw, dict) and isinstance(alerts_raw.get("alerts"), list):
+            alerts = [a for a in alerts_raw["alerts"] if isinstance(a, dict)]
+
+        refresh_status = _read_json(_REFRESH_STATUS_PATH)
+        if not isinstance(refresh_status, dict):
+            refresh_status = None
+
+        export_files = {
+            "rankings": _EXPORTS_DIR / "rankings.csv",
+            "outcomes": _EXPORTS_DIR / "outcomes.csv",
+            "sector_summary": _EXPORTS_DIR / "sector_summary.csv",
+        }
+        exports_available = {k: v.exists() for k, v in export_files.items()}
+
+        if isinstance(report_raw, dict) and report_raw.get("phase") == "P":
+            ap = report_raw.get("autonomy_pct")
+            if isinstance(ap, dict) and ap.get("current") is not None:
+                autonomy_pct = ap.get("current")
 
         return {
             "computed_at": computed_at,
@@ -312,4 +336,19 @@ class OsAutonomousLearningService:
             "by_service": _group_rankings(top_templates, "service"),
             "trend_30d": _build_trend_30d(outcome_rows),
             "has_rankings_file": _RANKINGS_PATH.exists(),
+            "alerts": alerts[:50],
+            "alerts_count": len(alerts),
+            "refresh_status": refresh_status,
+            "exports_available": exports_available,
         }
+
+    def get_export_path(self, export_key: str) -> Optional[Path]:
+        mapping = {
+            "rankings": _EXPORTS_DIR / "rankings.csv",
+            "outcomes": _EXPORTS_DIR / "outcomes.csv",
+            "sector_summary": _EXPORTS_DIR / "sector_summary.csv",
+        }
+        path = mapping.get(export_key)
+        if not path or not path.exists():
+            return None
+        return path

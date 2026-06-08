@@ -1,5 +1,3 @@
-import { apiClient } from "@/core/api";
-
 export interface LearningTemplateItem {
   template_id: string;
   sector: string;
@@ -45,6 +43,30 @@ export interface Ga4DashboardStatus {
   message: string;
 }
 
+export interface LearningAlertItem {
+  id: string;
+  type: string;
+  severity: "warn" | "crit";
+  template_id?: string | null;
+  sector?: string | null;
+  service?: string | null;
+  message: string;
+  value?: number | null;
+  threshold?: number | null;
+  previous_value?: number | null;
+  at: string;
+}
+
+export interface LearningRefreshStatus {
+  computed_at?: string | null;
+  source?: "manual" | "cron" | null;
+  steps_completed?: string[];
+  success?: boolean | null;
+  storage_mode?: string | null;
+  alerts_count?: number | null;
+  exports?: string[];
+}
+
 export interface OsAutonomousLearningDashboard {
   computed_at: string | null;
   storage_mode: string;
@@ -57,10 +79,10 @@ export interface OsAutonomousLearningDashboard {
   by_service: LearningGroupItem[];
   trend_30d: LearningTrendPoint[];
   has_rankings_file: boolean;
+  alerts: LearningAlertItem[];
+  alerts_count: number;
+  refresh_status: LearningRefreshStatus | null;
+  exports_available: Record<string, boolean>;
 }
 
-const BASE = "/api/v1/os/autonomous/learning";
-
-export const osAutonomousLearningApi = {
-  dashboard: () => apiClient.get<OsAutonomousLearningDashboard>(BASE, { tenantScoped: true }),
-};
+export type LearningExportKey = "rankings" | "outcomes" | "sector_summary";

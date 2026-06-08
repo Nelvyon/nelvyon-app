@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
+
 import { useAuth } from "@/core/auth/AuthContext";
 import { can } from "@/core/routing/roleMatrix";
 import { Badge } from "@/core/ui/Badge";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
+import { triggerLearningExportDownload } from "@/features/osAutonomous/api";
 import { useOsAutonomousLearningDashboard } from "@/features/osAutonomous/hooks";
-import type { LearningTemplateItem } from "@/features/osAutonomous/types";
+import type { LearningAlertItem, LearningExportKey, LearningTemplateItem } from "@/features/osAutonomous/types";
 
 function fmtPct(v: number | null | undefined): string {
   if (v === null || v === undefined) return "—";
@@ -67,7 +70,84 @@ function TemplateTable({ rows, title }: { rows: LearningTemplateItem[]; title: s
   );
 }
 
-/** Phase O — internal Learning Engine dashboard (operator+ only). */
+function AlertsPanel({ alerts }: { alerts: LearningAlertItem[] }) {
+  if (!alerts.length) {
+    return (
+      <section className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground shadow-card">
+        <p className="font-medium text-foreground">Alertas internas</p>
+        <p className="mt-1">Sin alertas activas.</p>
+      </section>
+    );
+  }
+  return (
+    <section className="space-y-3 rounded-lg border border-border bg-card p-4 shadow-card">
+      <h3 className="text-sm font-semibold text-foreground">Alertas internas ({alerts.length})</h3>
+      <ul className="space-y-2 text-sm">
+        {alerts.map((a) => (
+          <li
+            key={a.id}
+            className={`rounded-md border px-3 py-2 ${
+              a.severity === "crit" ? "border-destructive/40 bg-destructive/5" : "border-warning/40 bg-warning/5"
+            }`}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone={a.severity === "crit" ? "destructive" : "warning"}>{a.severity}</Badge>
+              <span className="font-medium text-foreground">{a.type}</span>
+              {a.template_id ? <span className="text-muted-foreground">{a.template_id}</span> : null}
+            </div>
+            <p className="mt-1 text-muted-foreground">{a.message}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function ExportButtons({ available }: { available: Record<string, boolean> }) {
+  const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const keys: LearningExportKey[] = ["rankings", "outcomes", "sector_summary"];
+
+  async function onExport(key: LearningExportKey) {
+    setLoading(key);
+    setError(null);
+    try {
+      await triggerLearningExportDownload(key);
+    } catch {
+      setError("No se pudo descargar el CSV. Ejecuta autonomous:learning-refresh en staging.");
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  return (
+    <section className="space-y-2 rounded-lg border border-border bg-card p-4 shadow-card">
+      <h3 className="text-sm font-semibold text-foreground">Export CSV</h3>
+      <div className="flex flex-wrap gap-2">
+        {keys.map((k) => (
+          <button
+            key={k}
+            type="button"
+            disabled={!available[k] || loading === k}
+            onClick={() => onExport(k)}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50"
+          >
+            {loading === k ? "…" : `${k}.csv`}
+          </button>
+        ))}
+      </div>
+      {!available.rankings && !available.outcomes ? (
+        <p className="text-xs text-muted-foreground">
+          Sin exports — ejecuta <code className="rounded bg-muted px-1">pnpm -C apps/web autonomous:learning-refresh</code>
+        </p>
+      ) : null}
+      {error ? <p className="text-xs text-destructive">{error}</p> : null}
+    </section>
+  );
+}
+
+/** Phase O/P — internal Learning Engine dashboard (operator+ only). */
 export function OsAutonomousLearningView() {
   const { user } = useAuth();
   const operatorPlus = user ? can(user.role, "os", "create") : false;
@@ -87,7 +167,7 @@ export function OsAutonomousLearningView() {
       <header className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-xl font-semibold text-foreground">Learning Engine</h2>
-          <Badge tone="neutral">AUTONOMOUS Phase O</Badge>
+          <Badge tone="neutral">AUTONOMOUS Phase P</Badge>
           {d?.autonomy_pct != null ? <Badge tone="success">Autonomía {d.autonomy_pct}%</Badge> : null}
         </div>
         <p className="max-w-3xl text-sm text-muted-foreground">
@@ -106,7 +186,7 @@ export function OsAutonomousLearningView() {
 
       {d ? (
         <>
-          <section className="grid gap-3 rounded-lg border border-border bg-card p-4 text-sm shadow-card sm:grid-cols-2 lg:grid-cols-4">
+          <section className="grid gap-3 rounded-lg border border-border bg-card p-4 text-sm shadow-card sm:grid-cols-2 lg:grid-cols-5">
             <div>
               <p className="text-muted-foreground">Almacenamiento</p>
               <p className="font-medium text-foreground">{d.storage_mode}</p>
@@ -116,14 +196,23 @@ export function OsAutonomousLearningView() {
               <p className="font-medium text-foreground">{d.outcomes_count}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Rankings file</p>
-              <p className="font-medium text-foreground">{d.has_rankings_file ? "Sí" : "No"}</p>
+              <p className="text-muted-foreground">Alertas</p>
+              <p className="font-medium text-foreground">{d.alerts_count}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Actualizado</p>
+              <p className="text-muted-foreground">Última actualización</p>
               <p className="font-medium text-foreground">{d.computed_at ?? "—"}</p>
             </div>
+            <div>
+              <p className="text-muted-foreground">Refresh</p>
+              <p className="font-medium text-foreground">
+                {d.refresh_status?.source ?? "manual"} · {d.refresh_status?.computed_at ?? "—"}
+              </p>
+            </div>
           </section>
+
+          <AlertsPanel alerts={d.alerts ?? []} />
+          <ExportButtons available={d.exports_available ?? {}} />
 
           <section className="rounded-lg border border-border bg-muted/30 p-4 text-sm">
             <p className="font-medium text-foreground">GA4 — {d.ga4.mode}</p>
@@ -135,9 +224,8 @@ export function OsAutonomousLearningView() {
               <p className="font-medium text-foreground">Sin datos de learning</p>
               <p className="mt-2">
                 Ejecuta{" "}
-                <code className="rounded bg-muted px-1">pnpm -C apps/web autonomous:rank-templates</code> o{" "}
-                <code className="rounded bg-muted px-1">autonomous:enrich-outcomes</code> en staging para poblar
-                rankings.
+                <code className="rounded bg-muted px-1">pnpm -C apps/web autonomous:learning-refresh</code> en staging
+                para poblar rankings, alertas y exports.
               </p>
             </div>
           ) : (

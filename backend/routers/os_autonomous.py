@@ -5,6 +5,7 @@ import logging
 from typing import Any, Dict, List, Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -122,6 +123,30 @@ class Ga4DashboardStatus(BaseModel):
     message: str
 
 
+class LearningAlertItem(BaseModel):
+    id: str
+    type: str
+    severity: str
+    template_id: Optional[str] = None
+    sector: Optional[str] = None
+    service: Optional[str] = None
+    message: str
+    value: Optional[float] = None
+    threshold: Optional[float] = None
+    previous_value: Optional[float] = None
+    at: str
+
+
+class LearningRefreshStatus(BaseModel):
+    computed_at: Optional[str] = None
+    source: Optional[str] = None
+    steps_completed: List[str] = Field(default_factory=list)
+    success: Optional[bool] = None
+    storage_mode: Optional[str] = None
+    alerts_count: Optional[int] = None
+    exports: List[str] = Field(default_factory=list)
+
+
 class OsAutonomousLearningResponse(BaseModel):
     computed_at: Optional[str] = None
     storage_mode: str
@@ -134,6 +159,10 @@ class OsAutonomousLearningResponse(BaseModel):
     by_service: List[LearningGroupItem] = Field(default_factory=list)
     trend_30d: List[LearningTrendPoint] = Field(default_factory=list)
     has_rankings_file: bool = False
+    alerts: List[LearningAlertItem] = Field(default_factory=list)
+    alerts_count: int = 0
+    refresh_status: Optional[LearningRefreshStatus] = None
+    exports_available: Dict[str, bool] = Field(default_factory=dict)
 
 
 @router.get(
@@ -159,6 +188,38 @@ async def autonomous_learning_dashboard(
     service = OsAutonomousLearningService(db)
     payload = await service.get_dashboard(ws_ctx.workspace_id)
     return OsAutonomousLearningResponse(**payload)
+
+
+@router.get(
+    "/learning/export/{export_key}",
+    summary="Download learning CSV export (operator+ only)",
+)
+async def autonomous_learning_export(
+    export_key: str,
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+):
+    if ws_ctx.workspace_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="X-Workspace-Id header required",
+        )
+    allowed = {"rankings", "outcomes", "sector_summary"}
+    if export_key not in allowed:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="export not found")
+
+    service = OsAutonomousLearningService(db)
+    path = service.get_export_path(export_key)
+    if not path:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="export file not generated — run autonomous:learning-refresh",
+        )
+    return FileResponse(
+        path,
+        media_type="text/csv",
+        filename=f"{export_key}.csv",
+    )
 
 
 @router.post(

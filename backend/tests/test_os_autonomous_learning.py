@@ -233,3 +233,66 @@ async def test_learning_empty_local_fallback(
     assert data["storage_mode"] == "none"
     assert data["outcomes_count"] == 0
     assert data["top_templates"] == []
+
+
+@pytest.mark.asyncio
+async def test_learning_export_operator(
+    client: AsyncClient,
+    seed_learning_rbac,
+    operator_headers,
+    local_outcomes_fixture,
+    tmp_path,
+    monkeypatch,
+):
+    export_dir = tmp_path / "exports"
+    export_dir.mkdir()
+    (export_dir / "rankings.csv").write_text("template_id,sector\nlanding-cro-v3,restaurant\n", encoding="utf-8")
+    monkeypatch.setattr(
+        "services.os_autonomous_learning_service._EXPORTS_DIR",
+        export_dir,
+    )
+    r = await client.get(f"{LEARNING_BASE}/export/rankings", headers=operator_headers)
+    assert r.status_code == 200, r.text
+    assert "text/csv" in r.headers.get("content-type", "")
+    assert b"landing-cro-v3" in r.content
+
+
+@pytest.mark.asyncio
+async def test_learning_export_viewer_forbidden(
+    client: AsyncClient, seed_learning_rbac, viewer_headers
+):
+    r = await client.get(f"{LEARNING_BASE}/export/rankings", headers=viewer_headers)
+    assert r.status_code == 403, r.text
+
+
+@pytest.mark.asyncio
+async def test_learning_includes_alerts(
+    client: AsyncClient,
+    seed_learning_rbac,
+    operator_headers,
+    local_outcomes_fixture,
+    tmp_path,
+    monkeypatch,
+):
+    learning_dir = tmp_path / "learning"
+    learning_dir.mkdir(parents=True, exist_ok=True)
+    alerts = {
+        "computed_at": "2026-06-08T00:00:00Z",
+        "alerts": [
+            {
+                "id": "qa:1",
+                "type": "qa_score_low",
+                "severity": "warn",
+                "message": "QA bajo",
+                "at": "2026-06-08T00:00:00Z",
+            }
+        ],
+    }
+    (learning_dir / "learningAlerts.json").write_text(json.dumps(alerts), encoding="utf-8")
+    monkeypatch.setattr("services.os_autonomous_learning_service._ALERTS_PATH", learning_dir / "learningAlerts.json")
+
+    r = await client.get(LEARNING_BASE, headers=operator_headers)
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert data["alerts_count"] >= 1
+    assert data["alerts"][0]["type"] == "qa_score_low"

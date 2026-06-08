@@ -77,7 +77,10 @@ const sampleDashboard = {
     },
   ],
   trend_30d: [],
-  has_rankings_file: true,
+  alerts: [],
+  alerts_count: 0,
+  refresh_status: null,
+  exports_available: { rankings: true, outcomes: false, sector_summary: false },
 };
 
 describe("OsAutonomousLearningView", () => {
@@ -122,6 +125,29 @@ describe("OsAutonomousLearningView", () => {
     });
     render(<OsAutonomousLearningView />);
     await waitFor(() => expect(screen.getByText(/No se pudo cargar/i)).toBeTruthy());
+  });
+
+  it("shows alerts panel", async () => {
+    useDashboardMock.mockReturnValue({
+      isLoading: false,
+      error: null,
+      data: {
+        ...sampleDashboard,
+        alerts_count: 1,
+        alerts: [
+          {
+            id: "a1",
+            type: "qa_score_low",
+            severity: "warn",
+            message: "QA score 72 < 85",
+            at: "2026-06-08T00:00:00Z",
+          },
+        ],
+      },
+    });
+    render(<OsAutonomousLearningView />);
+    await waitFor(() => expect(screen.getByText(/Alertas internas/i)).toBeTruthy());
+    expect(screen.getByText(/qa_score_low/i)).toBeTruthy();
   });
 
   it("blocks viewer role", () => {
