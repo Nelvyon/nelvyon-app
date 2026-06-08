@@ -44,16 +44,17 @@ describe("Phase M — conversion metrics placeholder", () => {
     delete process.env.GA4_PROPERTY_ID;
     const m = resolveConversionMetrics({ deliverable_id: "d-1", sector: "restaurant" });
     expect(m.conversion_rate).toBeNull();
-    expect(m.lead_count).toBeNull();
+    expect(m.lead_count).toBe(0);
     expect(m.source).toBe("none");
   });
 
-  it("returns null metrics with GA4_PROPERTY_ID (no API yet)", () => {
+  it("returns null metrics with GA4_PROPERTY_ID only (real flags not set)", () => {
     process.env.GA4_PROPERTY_ID = "123456";
+    delete process.env.ENABLE_AUTONOMOUS_GA4;
     const m = resolveConversionMetrics();
     expect(m.conversion_rate).toBeNull();
-    expect(m.lead_count).toBeNull();
-    expect(m.source).toBe("ga4");
+    expect(m.lead_count).toBe(0);
+    expect(m.source).toBe("none");
   });
 });
 

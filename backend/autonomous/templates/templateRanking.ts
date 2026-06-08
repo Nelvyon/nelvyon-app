@@ -12,6 +12,11 @@ import type {
 const COLD_START_MIN_SAMPLES = 3;
 const COLD_START_PENALTY = 5;
 
+/** Map GA4-style conversion % (e.g. 8.2) to 0–100 score (25% ≈ 100). */
+function conversionPercentToScore(crPercent: number): number {
+  return clampScore(Math.min(100, crPercent * 4));
+}
+
 /** Sector conversion benchmarks when no measured CR (0–100). */
 const SECTOR_BENCHMARK: Record<string, number> = {
   restaurant: 78,
@@ -57,17 +62,27 @@ export function computeConversionScore(
   coldBlend: number,
 ): number {
   let fromData: number;
+  const benchmark = SECTOR_BENCHMARK[sector] ?? SECTOR_BENCHMARK.general;
+  const hasConversionRate = agg.conversion_measured >= 1 && agg.conversion_avg !== null;
+  const hasLeadSignal = agg.sample_size > 0 && agg.lead_total > 0;
 
-  if (agg.conversion_measured >= 1 && agg.conversion_avg !== null) {
+  if (hasConversionRate) {
     const revisionPenalty = Math.min(15, agg.revisions_avg * 4);
+    const leadsPerOutcome = agg.lead_total / agg.sample_size;
+    const leadBoost = hasLeadSignal ? Math.min(6, Math.log1p(leadsPerOutcome) * 2.5) : 0;
+    const crScore = conversionPercentToScore(agg.conversion_avg as number);
     fromData = clampScore(
-      0.5 * agg.conversion_avg +
+      0.5 * crScore +
         0.2 * (agg.qa_avg * 0.5) +
         0.15 * (agg.first_pass_rate * 100) +
-        0.15 * Math.max(0, 100 - revisionPenalty),
+        0.15 * Math.max(0, 100 - revisionPenalty) +
+        leadBoost,
     );
+  } else if (hasLeadSignal) {
+    const leadsPerOutcome = agg.lead_total / agg.sample_size;
+    const leadScore = clampScore(42 + Math.log1p(leadsPerOutcome) * 14);
+    fromData = clampScore(0.55 * leadScore + 0.45 * benchmark);
   } else {
-    const benchmark = SECTOR_BENCHMARK[sector] ?? SECTOR_BENCHMARK.general;
     fromData = clampScore(0.4 * (agg.qa_avg * 0.55) + 0.35 * (agg.first_pass_rate * 100) + 0.25 * benchmark);
   }
 
