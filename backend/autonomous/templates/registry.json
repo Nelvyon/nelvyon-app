@@ -1,0 +1,203 @@
+{
+  "version": "1.0.0",
+  "templates": [
+    {
+      "id": "landing-cro-v3",
+      "category": "landing",
+      "sectors": ["restaurant", "general"],
+      "services": ["landing"],
+      "objectives": ["lead_gen", "booking"],
+      "channels": ["web", "google_search", "meta_feed"],
+      "languages": ["es"],
+      "levels": ["starter", "professional"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 88,
+        "conversion_score": 72,
+        "usage_score": 50,
+        "reliability_score": 70
+      }
+    },
+    {
+      "id": "landing-hero-split",
+      "category": "landing",
+      "sectors": ["dental", "legal"],
+      "services": ["landing"],
+      "objectives": ["lead_gen", "trust"],
+      "channels": ["web", "google_search"],
+      "languages": ["es"],
+      "levels": ["professional", "premium"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 82,
+        "conversion_score": 68,
+        "usage_score": 45,
+        "reliability_score": 65
+      }
+    },
+    {
+      "id": "landing-video-cta",
+      "category": "landing",
+      "sectors": ["fitness", "coaching"],
+      "services": ["landing"],
+      "objectives": ["lead_gen", "trial"],
+      "channels": ["web", "meta_stories"],
+      "languages": ["es"],
+      "levels": ["professional"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 80,
+        "conversion_score": 70,
+        "usage_score": 40,
+        "reliability_score": 62
+      }
+    },
+    {
+      "id": "landing-form-long",
+      "category": "landing",
+      "sectors": ["solar", "real_estate"],
+      "services": ["landing"],
+      "objectives": ["lead_gen"],
+      "channels": ["web", "google_search"],
+      "languages": ["es"],
+      "levels": ["professional", "premium"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 79,
+        "conversion_score": 66,
+        "usage_score": 42,
+        "reliability_score": 60
+      }
+    },
+    {
+      "id": "landing-saas-trial",
+      "category": "landing",
+      "sectors": ["saas_b2b"],
+      "services": ["landing"],
+      "objectives": ["trial", "lead_gen"],
+      "channels": ["web", "google_search", "meta_feed"],
+      "languages": ["es", "en"],
+      "levels": ["professional", "premium"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 85,
+        "conversion_score": 75,
+        "usage_score": 48,
+        "reliability_score": 68
+      }
+    },
+    {
+      "id": "landing-catalog-bridge",
+      "category": "landing",
+      "sectors": ["ecommerce"],
+      "services": ["landing"],
+      "objectives": ["sales", "lead_gen"],
+      "channels": ["web", "meta_feed"],
+      "languages": ["es"],
+      "levels": ["professional"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 81,
+        "conversion_score": 74,
+        "usage_score": 44,
+        "reliability_score": 63
+      }
+    },
+    {
+      "id": "web-proactiv",
+      "category": "website",
+      "sectors": ["general", "saas_b2b"],
+      "services": ["website"],
+      "objectives": ["trust", "awareness"],
+      "channels": ["web"],
+      "languages": ["es", "en"],
+      "levels": ["professional", "premium"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 84,
+        "conversion_score": 60,
+        "usage_score": 55,
+        "reliability_score": 72
+      }
+    },
+    {
+      "id": "chatbot-faq-restaurant-v1",
+      "category": "chatbot",
+      "sectors": ["restaurant"],
+      "services": ["chatbot"],
+      "objectives": ["booking"],
+      "channels": ["chat_widget", "whatsapp"],
+      "languages": ["es"],
+      "levels": ["starter", "professional"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 86,
+        "conversion_score": 65,
+        "usage_score": 52,
+        "reliability_score": 74
+      }
+    },
+    {
+      "id": "ads-google-search-solar-v1",
+      "category": "ads",
+      "sectors": ["solar"],
+      "services": ["google_ads"],
+      "objectives": ["lead_gen"],
+      "channels": ["google_search"],
+      "languages": ["es"],
+      "levels": ["professional"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 78,
+        "conversion_score": 70,
+        "usage_score": 38,
+        "reliability_score": 58
+      }
+    },
+    {
+      "id": "ads-meta-advantage-ecom-v1",
+      "category": "ads",
+      "sectors": ["ecommerce"],
+      "services": ["meta_ads"],
+      "objectives": ["sales"],
+      "channels": ["meta_feed", "meta_stories"],
+      "languages": ["es"],
+      "levels": ["professional", "premium"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 80,
+        "conversion_score": 72,
+        "usage_score": 41,
+        "reliability_score": 61
+      }
+    },
+    {
+      "id": "branding-kit-minimal-v1",
+      "category": "branding",
+      "sectors": ["beauty", "fitness"],
+      "services": ["branding"],
+      "objectives": ["awareness"],
+      "channels": ["organic_social"],
+      "languages": ["es"],
+      "levels": ["professional"],
+      "status": "active",
+      "factory_version": "1.0.0",
+      "baseline_scores": {
+        "quality_score": 83,
+        "conversion_score": 55,
+        "usage_score": 46,
+        "reliability_score": 67
+      }
+    }
+  ]
+}
