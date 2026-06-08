@@ -150,8 +150,8 @@ describe("OsAutonomousLearningView", () => {
     expect(screen.getByText(/qa_score_low/i)).toBeTruthy();
   });
 
-  it("blocks viewer role", () => {
-    mockRole = "viewer";
+  it("blocks member role (no operator access)", () => {
+    mockRole = "member";
     render(<OsAutonomousLearningView />);
     expect(screen.getByText(/Acceso restringido/i)).toBeTruthy();
     expect(screen.queryByText(/Top plantillas/i)).toBeNull();
