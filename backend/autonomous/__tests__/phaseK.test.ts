@@ -190,7 +190,7 @@ describe("Phase K — learning engine CLI output", () => {
     expect(result.report.phase).toBe("K");
     expect(result.report.outcomes_count).toBeGreaterThan(10);
     expect(result.report.selections.length).toBeGreaterThan(0);
-    expect(result.report.autonomy_pct.current).toBe(69);
+    expect(result.report.autonomy_pct.current).toBe(74);
 
     const rankings = JSON.parse(readFileSync(result.rankings_path, "utf-8")) as {
       slices: Array<{ ranked: Array<{ final_template_score: number }> }>;

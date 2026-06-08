@@ -22,8 +22,8 @@ export const DEFAULT_PHASE_H_DIR = join(AUTONOMOUS_ROOT, "output", "phase-h", "r
 export const DEFAULT_PHASE_I_DIR = join(AUTONOMOUS_ROOT, "output", "phase-i", "restaurant-landing");
 export const DEFAULT_LEARNING_OUTPUT = join(AUTONOMOUS_ROOT, "output", "learning");
 
-const AUTONOMY_PREVIOUS_PCT = 62;
-const AUTONOMY_LEARNING_DELTA = 7;
+const AUTONOMY_PREVIOUS_PCT = 69;
+const AUTONOMY_LEARNING_DELTA = 5;
 
 export interface RunLearningEngineOptions {
   mock_fixture_path?: string;
@@ -105,7 +105,7 @@ export function runLearningEngine(options: RunLearningEngineOptions = {}): Learn
       current: AUTONOMY_PREVIOUS_PCT + AUTONOMY_LEARNING_DELTA,
       delta: AUTONOMY_LEARNING_DELTA,
       rationale:
-        "Learning Engine Phase K operativo: ranking + selector por sector/servicio sin DB. +7% sobre base post Phase I (62%).",
+        "Learning Engine Phase L: persistencia template_outcomes + selector en pipeline C/H. +5% sobre Phase K (69%).",
     },
   };
 

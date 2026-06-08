@@ -30,6 +30,12 @@ async function runLandingPhaseC(project: AutonomousProject, attempt: number): Pr
 
   const pm = await llmPmLanding(brief, tier, os_refs.project_slug);
   artifacts.plan = pm.data;
+  const selectedTemplate =
+    project.template_pipeline?.selected_template_id ??
+    (typeof brief._selected_template_id === "string" ? brief._selected_template_id : null);
+  if (selectedTemplate) {
+    (artifacts.plan as { template_id: string }).template_id = selectedTemplate;
+  }
   agent_log.push({ ...pm.log, llm_mode: pm.llm_mode as "mock" | "real" });
   if ((pm.data as { blockers?: string[] }).blockers?.length) {
     project.status = "INTAKE_VALIDATING";

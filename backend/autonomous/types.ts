@@ -137,6 +137,8 @@ export interface AutonomousProject {
   sector?: AutonomousSector | null;
   sector_profile?: Pick<SectorProfile, "id" | "label" | "autonomy_score" | "regulated" | "sensitivity"> | null;
   sector_escalation?: boolean;
+  /** Phase L — selector de plantillas en pipeline */
+  template_pipeline?: TemplatePipelineState | null;
 }
 
 export interface RetryHistoryEntry {
@@ -147,6 +149,18 @@ export interface RetryHistoryEntry {
   target_agent: string | null;
   reason: string | null;
   at: string;
+  /** Phase L — plantilla usada en este intento */
+  template_id?: string | null;
+  final_template_score?: number | null;
+  template_source?: "rankings" | "registry" | "default" | null;
+}
+
+export interface TemplatePipelineState {
+  selected_template_id: string;
+  final_template_score: number;
+  source: "rankings" | "registry" | "default";
+  used_template_ids: string[];
+  skipped_low_score?: string[];
 }
 
 export interface SimulationResult {

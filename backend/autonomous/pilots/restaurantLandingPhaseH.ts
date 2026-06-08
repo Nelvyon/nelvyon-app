@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 import { buildPhaseHPublishPayload, buildQaReport } from "../publish/buildPhaseHPublishPayload";
 import { runPlaywrightStagingQa, stagingQaBlocksPublish } from "../qa/playwrightStagingQa";
+import { recordPostQaOutcome } from "../templates/recordPostQaOutcome";
 import { simulatePhaseC } from "../simulatorPhaseC";
 import { buildLandingStagingIsolated } from "../wrappers/landingBuilderStaging";
 import type { OsPublishPayload } from "../types";
@@ -71,12 +72,25 @@ export async function runRestaurantLandingPhaseH(options?: {
   const qaPassed =
     offlineScore >= 85 && stagingQa.passed && !stagingQaBlocksPublish(stagingQa);
 
+  const combinedQaScore = Math.min(100, Math.round((offlineScore + stagingQa.score) / 2));
   const qaReport = buildQaReport({
     offline_score: offlineScore,
     staging_qa: stagingQa,
     passed: qaPassed,
   });
   phaseC.project.artifacts.qa_report = qaReport;
+
+  const templateId =
+    phaseC.project.template_pipeline?.selected_template_id ??
+    String((phaseC.project.artifacts.plan as { template_id?: string })?.template_id ?? "landing-cro-v3");
+  if (phaseC.project.qa) {
+    await recordPostQaOutcome({
+      project: phaseC.project,
+      qa: { ...phaseC.project.qa, score: combinedQaScore, passed: qaPassed },
+      templateId,
+      extra: { phase: "H", combined_qa_score: combinedQaScore },
+    });
+  }
 
   const osPublish = buildPhaseHPublishPayload(phaseC.project, {
     preview_metadata: staging.preview_metadata,

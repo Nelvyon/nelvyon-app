@@ -1,4 +1,4 @@
-/** Phase C simulator — LLM + offline QA + output bundle */
+/** Phase C simulator — LLM + offline QA + output bundle + Phase L template learning */
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -7,6 +7,8 @@ import { resolveLlmMode } from "./llm/llmAdapter";
 import { executePipelinePhaseC, initPhaseCProject } from "./pipelines/runPipelinePhaseC";
 import { buildOsPublishPayload } from "./publish/osPublishPayload";
 import { requiresOperatorEscalation } from "./sectors/sectorQa";
+import { pickPipelineTemplate, skuToTemplateContext } from "./templates/pipelineTemplateSelector";
+import { recordPostQaOutcome } from "./templates/recordPostQaOutcome";
 import type {
   AutonomousSector,
   AutonomousSku,
@@ -29,6 +31,8 @@ export interface PhaseCOptions {
     workspace_id: string;
   };
   output_dir?: string;
+  /** Phase L — path to rankings.json override */
+  rankings_path?: string;
 }
 
 const DEFAULT_OS_REFS = {
@@ -36,6 +40,8 @@ const DEFAULT_OS_REFS = {
   project_slug: "PHASE-C-AUTONOMOUS",
   workspace_id: "ws_sim_0001",
 };
+
+const QA_PASS_THRESHOLD = 85;
 
 export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResult> {
   const tier = options.tier ?? "professional";
@@ -53,17 +59,52 @@ export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResu
   project.status = "PLANNING";
 
   const retryHistory: RetryHistoryEntry[] = [];
+  const usedTemplateIds: string[] = [];
+  const ctx = skuToTemplateContext(project.sku);
+  const sector = project.sector ?? String(project.brief.sector ?? "general");
 
-  let qa = await executePipelinePhaseC(project);
+  async function runAttempt(): Promise<QaResult> {
+    const pick = await pickPipelineTemplate({
+      sector,
+      service: ctx.service,
+      category: ctx.category,
+      level: tier,
+      usedTemplateIds,
+      rankingsPath: options.rankings_path,
+    });
+
+    usedTemplateIds.push(pick.template_id);
+    project.template_pipeline = {
+      selected_template_id: pick.template_id,
+      final_template_score: pick.final_template_score,
+      source: pick.source,
+      used_template_ids: [...usedTemplateIds],
+      skipped_low_score: pick.skipped_low_score,
+    };
+    project.brief = { ...project.brief, _selected_template_id: pick.template_id };
+
+    const qa = await executePipelinePhaseC(project);
+
+    await recordPostQaOutcome({
+      project,
+      qa,
+      templateId: pick.template_id,
+      extra: { phase: "C" },
+    });
+
+    return qa;
+  }
+
+  let qa = await runAttempt();
   project.qa = qa;
-  retryHistory.push(historyEntry(1, qa));
+  retryHistory.push(historyEntry(1, qa, project));
 
-  while (!qa.passed && project.retry_count < project.max_retries) {
+  while (!qa.passed && qa.score < QA_PASS_THRESHOLD && project.retry_count < project.max_retries) {
     project.retry_count += 1;
     project.status = "RETRYING";
-    qa = await executePipelinePhaseC(project);
+    qa = await runAttempt();
     project.qa = qa;
-    retryHistory.push(historyEntry(project.retry_count + 1, qa));
+    retryHistory.push(historyEntry(project.retry_count + 1, qa, project));
   }
 
   project.retry_history = retryHistory;
@@ -104,7 +145,11 @@ export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResu
   return { project, os_publish, escalated, output_bundle, llm_mode: llmMode };
 }
 
-function historyEntry(attempt: number, qa: QaResult): RetryHistoryEntry {
+function historyEntry(
+  attempt: number,
+  qa: QaResult,
+  project: PhaseCResult["project"],
+): RetryHistoryEntry {
   return {
     attempt,
     score: qa.score,
@@ -113,6 +158,9 @@ function historyEntry(attempt: number, qa: QaResult): RetryHistoryEntry {
     target_agent: qa.retry_recommendation?.target_agent ?? null,
     reason: qa.retry_recommendation?.reason ?? null,
     at: qa.evaluated_at,
+    template_id: project.template_pipeline?.selected_template_id ?? null,
+    final_template_score: project.template_pipeline?.final_template_score ?? null,
+    template_source: project.template_pipeline?.source ?? null,
   };
 }
 

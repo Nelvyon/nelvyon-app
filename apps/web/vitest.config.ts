@@ -60,6 +60,7 @@ export default defineConfig({
       "@upstash/redis": path.resolve(__dirname, "node_modules/@upstash/redis"),
       "@sentry/nextjs": path.resolve(__dirname, "node_modules/@sentry/nextjs"),
       stripe: path.resolve(__dirname, "node_modules/stripe"),
+      pg: path.resolve(__dirname, "../../backend/db/node_modules/pg"),
     },
   },
 });
