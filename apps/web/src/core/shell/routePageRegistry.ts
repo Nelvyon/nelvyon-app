@@ -431,6 +431,14 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       description: "Read-only alert simulation for 5xx ratio, job failures, and queue backlog without external pager wiring.",
     };
   }
+  if (path === "/os/autonomous/learning") {
+    return {
+      documentTitle: "Learning Engine · NELVYON OS",
+      heading: "Learning Engine",
+      description:
+        "Internal template rankings, conversion metrics, and portal feedback — operator+ only, no client PII.",
+    };
+  }
   if (path === "/os/global") {
     return {
       documentTitle: "Cross-workspace operations snapshot · NELVYON",

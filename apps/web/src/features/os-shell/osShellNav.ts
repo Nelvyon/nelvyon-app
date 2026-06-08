@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Bot,
   Briefcase,
+  Brain,
   CircleDollarSign,
   ClipboardList,
   FileStack,
@@ -40,6 +41,7 @@ export const OS_SHELL_NAV: readonly OsShellNavItem[] = [
 export const OS_SHELL_QUICK_LINKS: readonly OsShellNavItem[] = [
   { label: "Hub operaciones", href: "/os", icon: Workflow },
   { label: "Agentes", href: "/os/agents", icon: Bot },
+  { label: "Learning", href: "/os/autonomous/learning", icon: Brain },
   { label: "Ejecución", href: "/os/execution", icon: Briefcase },
 ] as const;
 

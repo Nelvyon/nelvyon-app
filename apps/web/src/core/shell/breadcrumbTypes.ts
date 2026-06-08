@@ -291,6 +291,10 @@ export function getBreadcrumbs(pathname: string, mode: BrandMode = getBrandMode(
       items.push({ key: "os-observability-alerts", label: "Alerts" });
       return items;
     }
+    if (path === "/os/autonomous/learning") {
+      items.push({ key: "os-autonomous-learning", label: "Learning Engine" });
+      return items;
+    }
     if (path === "/os/workspaces/select") {
       items.push({ key: "workspace-select", label: "Workspace selection" });
       return items;

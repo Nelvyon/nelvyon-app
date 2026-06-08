@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace_operator
 from services.os_autonomous_publish_service import OsAutonomousPublishService
+from services.os_autonomous_learning_service import OsAutonomousLearningService
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +75,90 @@ class OsAutonomousPublishResponse(BaseModel):
     created: List[CreatedDeliverableResponse] = Field(default_factory=list)
     deliverables_preview: List[Dict[str, Any]] = Field(default_factory=list)
     message: str
+
+
+class LearningTemplateItem(BaseModel):
+    template_id: str
+    sector: str
+    service: str
+    category: str
+    rank_position: int
+    final_template_score: float
+    conversion_score: float
+    quality_score: float
+    sample_size: int
+    qa_score: float
+    conversion_rate: Optional[float] = None
+    lead_count: int = 0
+    approved_by_client: bool = False
+    approved_by_client_rate: float = 0
+    revisions_count: float = 0
+    cold_start: bool = False
+
+
+class LearningGroupItem(BaseModel):
+    sector: Optional[str] = None
+    service: Optional[str] = None
+    templates_count: int
+    top_template_id: str
+    top_final_score: float
+    avg_conversion_score: float
+    templates: List[LearningTemplateItem] = Field(default_factory=list)
+
+
+class LearningTrendPoint(BaseModel):
+    date: str
+    outcomes_count: int
+    conversion_rate_avg: Optional[float] = None
+    lead_count_total: int = 0
+
+
+class Ga4DashboardStatus(BaseModel):
+    mode: str
+    real_enabled: bool
+    mock_realistic: bool
+    property_configured: bool
+    credentials_configured: bool
+    message: str
+
+
+class OsAutonomousLearningResponse(BaseModel):
+    computed_at: Optional[str] = None
+    storage_mode: str
+    ga4: Ga4DashboardStatus
+    outcomes_count: int
+    enriched_count: int = 0
+    autonomy_pct: Optional[int] = None
+    top_templates: List[LearningTemplateItem] = Field(default_factory=list)
+    by_sector: List[LearningGroupItem] = Field(default_factory=list)
+    by_service: List[LearningGroupItem] = Field(default_factory=list)
+    trend_30d: List[LearningTrendPoint] = Field(default_factory=list)
+    has_rankings_file: bool = False
+
+
+@router.get(
+    "/learning",
+    response_model=OsAutonomousLearningResponse,
+    summary="Internal Learning Engine dashboard (operator+ only)",
+)
+async def autonomous_learning_dashboard(
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    db: AsyncSession = Depends(get_db),
+) -> OsAutonomousLearningResponse:
+    """
+    Read-only learning rankings for internal OS operators.
+
+    Data sources: template_outcomes (DB when flagged) or local-outcomes.json + rankings.json.
+    No client PII, no GA4 secrets.
+    """
+    if ws_ctx.workspace_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="X-Workspace-Id header required",
+        )
+    service = OsAutonomousLearningService(db)
+    payload = await service.get_dashboard(ws_ctx.workspace_id)
+    return OsAutonomousLearningResponse(**payload)
 
 
 @router.post(
