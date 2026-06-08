@@ -35,6 +35,7 @@
     "autonomous:phase-h": "tsx ../../backend/autonomous/scripts/run-phase-h-preview.ts",
     "autonomous:phase-i": "tsx ../../backend/autonomous/scripts/run-phase-i-deploy.ts",
     "autonomous:learning": "tsx ../../backend/autonomous/scripts/run-learning.ts",
+    "autonomous:rank-templates": "tsx ../../backend/autonomous/scripts/run-rank-templates.ts",
     "gate": "pnpm typecheck && pnpm lint && pnpm test:smoke && pnpm test:bot-evals",
     "pwa:icons": "node ./scripts/generate-pwa-icons.mjs"
   },

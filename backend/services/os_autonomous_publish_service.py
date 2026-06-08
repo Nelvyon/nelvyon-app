@@ -93,6 +93,19 @@ def _build_metadata(
         meta["sector_phase"] = "E"
     if sku:
         meta["sku"] = sku
+    template_id = payload.get("template_id")
+    if not template_id and isinstance(artifacts, dict):
+        plan = artifacts.get("plan") if isinstance(artifacts.get("plan"), dict) else {}
+        template_id = plan.get("template_id")
+        pipeline = (
+            artifacts.get("template_pipeline")
+            if isinstance(artifacts.get("template_pipeline"), dict)
+            else {}
+        )
+        if not template_id:
+            template_id = pipeline.get("selected_template_id")
+    if template_id:
+        meta["template_id"] = template_id
     if payload.get("os_actions"):
         meta["os_actions_planned"] = payload["os_actions"]
     os_refs = payload.get("os_refs") or {}

@@ -162,6 +162,18 @@ class PortalDeliverableReviewService:
             workspace_id=workspace_id,
             actor_user_id=portal_user_id,
         )
+        try:
+            from services.autonomous_portal_learning_service import maybe_record_portal_outcome
+
+            await maybe_record_portal_outcome(
+                self.db,
+                deliverable_id=obj.id,
+                workspace_id=workspace_id,
+                deliverable_metadata=obj.deliverable_metadata,
+                decision="approve",
+            )
+        except Exception as exc:
+            logger.warning("Autonomous portal learning hook failed (approve): %s", exc)
         return self._result_dict(obj)
 
     async def reject(
@@ -232,6 +244,18 @@ class PortalDeliverableReviewService:
             workspace_id=workspace_id,
             actor_user_id=portal_user_id,
         )
+        try:
+            from services.autonomous_portal_learning_service import maybe_record_portal_outcome
+
+            await maybe_record_portal_outcome(
+                self.db,
+                deliverable_id=obj.id,
+                workspace_id=workspace_id,
+                deliverable_metadata=obj.deliverable_metadata,
+                decision="reject",
+            )
+        except Exception as exc:
+            logger.warning("Autonomous portal learning hook failed (reject): %s", exc)
         return self._result_dict(obj)
 
     @staticmethod
