@@ -82,9 +82,9 @@ TENANTS_WITH_BRIDGE_SQL = text(
 UPDATE_TENANT_PLAN_SQL = text(
     """
     UPDATE saas_tenants
-    SET plan = :plan, updated_at = NOW()
-    WHERE id = CAST(:tenant_id AS uuid)
-      AND plan IS DISTINCT FROM :plan
+    SET plan = :plan, updated_at = CURRENT_TIMESTAMP
+    WHERE id = :tenant_id
+      AND COALESCE(plan, '') != COALESCE(:plan, '')
     RETURNING id, plan
     """
 )

@@ -7,6 +7,7 @@ Idempotency: INSERT row (stripe_event_id UNIQUE) → atomic claim received→pro
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional, Tuple
 
@@ -22,12 +23,55 @@ from services.billing_sync import (
     period_fields_from_stripe_subscription,
 )
 from services.billing_plan_validation import is_known_commercial_plan, normalize_plan_id
+from services.saas_billing_sync import sync_from_subscription_hint
 from services.subscriptions import SubscriptionsService
 
 logger = logging.getLogger(__name__)
 
 
 BILLING_MONTHS_LOCAL = BILLING_MONTHS
+
+
+def _saas_billing_sync_enabled() -> bool:
+    return os.getenv("SAAS_BILLING_SYNC_ENABLED", "").lower() in ("1", "true", "yes")
+
+
+async def _maybe_sync_saas_tenant_plan(
+    db: AsyncSession,
+    *,
+    workspace_id: Optional[int],
+    plan_id: str,
+    status: str,
+) -> None:
+    """
+    Best-effort sync subscriptions → saas_tenants.plan (gated by SAAS_BILLING_SYNC_ENABLED).
+    Never raises: webhook subscription writes must succeed even if tenant sync fails.
+    """
+    if not _saas_billing_sync_enabled():
+        return
+    if workspace_id is None or not isinstance(workspace_id, int) or workspace_id <= 0:
+        return
+    try:
+        result = await sync_from_subscription_hint(
+            db,
+            workspace_id=workspace_id,
+            plan_id=plan_id,
+            status=status,
+            mode="apply",
+        )
+        logger.info(
+            "saas_billing_sync webhook",
+            extra={
+                "workspace_id": workspace_id,
+                "plan_id": plan_id,
+                "status": status,
+                "synced": result.synced,
+                "skipped": result.skipped,
+                "skip_reason": result.skip_reason,
+            },
+        )
+    except Exception:
+        logger.exception("saas_billing_sync failed workspace_id=%s", workspace_id)
 
 
 async def _get_event_row(db: AsyncSession, event_id: str) -> Optional[StripeWebhookEvent]:
@@ -138,15 +182,15 @@ async def process_stripe_event(db: AsyncSession, event: Dict[str, Any]) -> Tuple
     try:
         checkout_effect: Optional[bool] = None
         if event_type == "checkout.session.completed":
-            checkout_effect = await _handle_checkout_completed(sub_service, data_object)
+            checkout_effect = await _handle_checkout_completed(db, sub_service, data_object)
         elif event_type == "invoice.payment_succeeded":
-            await _handle_payment_succeeded(sub_service, data_object)
+            await _handle_payment_succeeded(db, sub_service, data_object)
         elif event_type == "invoice.payment_failed":
-            await _handle_payment_failed(sub_service, data_object)
+            await _handle_payment_failed(db, sub_service, data_object)
         elif event_type in ("customer.subscription.deleted", "customer.subscription.canceled"):
             await _handle_subscription_cancelled(sub_service, data_object)
         elif event_type == "customer.subscription.updated":
-            await _handle_subscription_updated(sub_service, data_object)
+            await _handle_subscription_updated(db, sub_service, data_object)
         else:
             logger.info(
                 "stripe.webhook unhandled event type",
@@ -179,7 +223,11 @@ async def process_stripe_event(db: AsyncSession, event: Dict[str, Any]) -> Tuple
         raise
 
 
-async def _handle_checkout_completed(sub_service: SubscriptionsService, session: dict) -> bool:
+async def _handle_checkout_completed(
+    db: AsyncSession,
+    sub_service: SubscriptionsService,
+    session: dict,
+) -> bool:
     session_id = session.get("id", "")
     metadata = session.get("metadata", {}) or {}
     user_id = metadata.get("user_id", "")
@@ -223,6 +271,14 @@ async def _handle_checkout_completed(sub_service: SubscriptionsService, session:
             workspace_id=sub.workspace_id,
         )
         logger.info("Subscription %s activated for user %s plan %s", sub.id, user_id, plan_id)
+        sync_ws = sub.workspace_id if sub.workspace_id is not None else workspace_id
+        sync_plan = normalize_plan_id(plan_id) if plan_id else (sub.plan_id or "starter")
+        await _maybe_sync_saas_tenant_plan(
+            db,
+            workspace_id=sync_ws,
+            plan_id=sync_plan,
+            status="active",
+        )
         return True
 
     if workspace_id is None:
@@ -251,10 +307,20 @@ async def _handle_checkout_completed(sub_service: SubscriptionsService, session:
 
     await sub_service.create(create_row, user_id=user_id)
     logger.info("New subscription created from webhook for user %s workspace %s", user_id, workspace_id)
+    await _maybe_sync_saas_tenant_plan(
+        db,
+        workspace_id=workspace_id,
+        plan_id=pid,
+        status="active",
+    )
     return True
 
 
-async def _handle_payment_succeeded(sub_service: SubscriptionsService, invoice: dict) -> None:
+async def _handle_payment_succeeded(
+    db: AsyncSession,
+    sub_service: SubscriptionsService,
+    invoice: dict,
+) -> None:
     stripe_sub_id = invoice.get("subscription", "")
     if not stripe_sub_id:
         return
@@ -290,9 +356,19 @@ async def _handle_payment_succeeded(sub_service: SubscriptionsService, invoice: 
         workspace_id=sub.workspace_id,
     )
     logger.info("Subscription %s renewed; period_end=%s", sub.id, inv_pf.get("current_period_end"))
+    await _maybe_sync_saas_tenant_plan(
+        db,
+        workspace_id=sub.workspace_id,
+        plan_id=sub.plan_id or "starter",
+        status="active",
+    )
 
 
-async def _handle_payment_failed(sub_service: SubscriptionsService, invoice: dict) -> None:
+async def _handle_payment_failed(
+    db: AsyncSession,
+    sub_service: SubscriptionsService,
+    invoice: dict,
+) -> None:
     stripe_sub_id = invoice.get("subscription", "")
     if not stripe_sub_id:
         return
@@ -313,6 +389,12 @@ async def _handle_payment_failed(sub_service: SubscriptionsService, invoice: dic
         workspace_id=sub.workspace_id,
     )
     logger.info("Subscription %s marked as past_due (payment failed)", sub.id)
+    await _maybe_sync_saas_tenant_plan(
+        db,
+        workspace_id=sub.workspace_id,
+        plan_id=sub.plan_id or "starter",
+        status="past_due",
+    )
 
 
 async def _handle_subscription_cancelled(sub_service: SubscriptionsService, subscription: dict) -> None:
@@ -338,7 +420,11 @@ async def _handle_subscription_cancelled(sub_service: SubscriptionsService, subs
     logger.info("Subscription %s cancelled", sub.id)
 
 
-async def _handle_subscription_updated(sub_service: SubscriptionsService, subscription: dict) -> None:
+async def _handle_subscription_updated(
+    db: AsyncSession,
+    sub_service: SubscriptionsService,
+    subscription: dict,
+) -> None:
     stripe_sub_id = subscription.get("id", "")
     stripe_status = subscription.get("status", "")
     if not stripe_sub_id:
@@ -373,3 +459,9 @@ async def _handle_subscription_updated(sub_service: SubscriptionsService, subscr
         workspace_id=sub.workspace_id,
     )
     logger.info("Subscription %s updated to status: %s", sub.id, new_status)
+    await _maybe_sync_saas_tenant_plan(
+        db,
+        workspace_id=sub.workspace_id,
+        plan_id=sub.plan_id or "starter",
+        status=new_status,
+    )
