@@ -14,6 +14,46 @@ export function assertSaasPlan(value: string): SaasPlan {
   throw new SaasPlanValidationError();
 }
 
+/** plan_id from Python subscriptions / Stripe metadata (not yet a saas_tenants.plan). */
+export type BillablePlanId = string;
+
+const SYNCABLE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing", "past_due"]);
+
+export function normalizeBillablePlanId(raw: string | null | undefined): string {
+  return String(raw ?? "").trim().toLowerCase();
+}
+
+/**
+ * Maps billing plan_id (Python SSOT / Stripe) to saas_tenants.plan CHECK constraint.
+ * agency → enterprise; partner → starter; unknown → starter.
+ */
+export function mapBillablePlanToSaasPlan(billablePlanId: string): SaasPlan {
+  switch (normalizeBillablePlanId(billablePlanId)) {
+    case "starter":
+      return "starter";
+    case "pro":
+      return "pro";
+    case "enterprise":
+      return "enterprise";
+    case "agency":
+      return "enterprise";
+    case "partner":
+      return "starter";
+    default:
+      return "starter";
+  }
+}
+
+/** Subscription statuses that warrant syncing plan into saas_tenants (pre-gate). */
+export function isSaasPlanSyncStatus(status: string): boolean {
+  return SYNCABLE_SUBSCRIPTION_STATUSES.has(normalizeBillablePlanId(status));
+}
+
+/** Whether a subscription row should drive an UPDATE to saas_tenants.plan. */
+export function shouldSyncSaasTenantPlan(status: string): boolean {
+  return isSaasPlanSyncStatus(status);
+}
+
 export type SaasTenantRow = {
   id: string;
   user_id: string;

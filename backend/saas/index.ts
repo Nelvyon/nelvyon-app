@@ -20,6 +20,23 @@ export {
   resetSaasTenantBridgeServiceForTests,
 } from "./SaasTenantBridgeService";
 export {
+  mapBillablePlanToSaasPlan,
+  normalizeBillablePlanId,
+  shouldSyncSaasTenantPlan,
+  isSaasPlanSyncStatus,
+  type BillablePlanId,
+} from "./saasTenantMapper";
+export {
+  SaasBillingSyncService,
+  getSaasBillingSyncService,
+  resetSaasBillingSyncServiceForTests,
+  type SaasBillingSyncMode,
+  type SaasBillingSyncResult,
+  type SaasBillingSyncBatchReport,
+  type SaasBillingSyncHint,
+  type SaasBillingSyncSkipReason,
+} from "./SaasBillingSyncService";
+export {
   SAAS_CRM_SOURCE_OF_TRUTH,
   LEGACY_CONTACT_STORES,
   FROZEN_LEGACY_CRM_WRITE_PATHS,
