@@ -20,6 +20,7 @@
     "saas:validate-bridge": "tsx ../../backend/saas/scripts/validateTenantBridge.ts",
     "saas:crm-etl": "tsx ../../backend/saas/scripts/runCrmEtl.ts",
     "saas:deals-etl": "tsx ../../backend/saas/scripts/runDealsEtl.ts",
+    "saas:billing-backfill": "tsx ../../backend/saas/scripts/runBillingSync.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
