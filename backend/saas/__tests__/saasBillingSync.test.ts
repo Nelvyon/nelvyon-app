@@ -207,4 +207,38 @@ describe("SaasBillingSyncService", () => {
     expect(result.mode).toBe("dry-run");
     expect(db.updateCalls).toHaveLength(0);
   });
+
+  it("runBackfill scoped dry-run defaults without UPDATE", async () => {
+    const db = makeBillingSyncDb({
+      subscription: { plan_id: "pro", status: "active", workspace_id: 10 },
+    });
+    const svc = new SaasBillingSyncService(db);
+    const report = await svc.runBackfill("dry-run", { workspaceId: 10 });
+    expect(report.scanned).toBe(1);
+    expect(report.synced).toBe(1);
+    expect(report.bySkipReason?.PLAN_UNCHANGED).toBe(0);
+    expect(db.updateCalls).toHaveLength(0);
+  });
+
+  it("runBackfill global includes bySkipReason", async () => {
+    const db = makeBillingSyncDb({
+      tenant: tenantRow({ id: "t-1", user_id: "u-1", workspace_id: 10, plan: "pro" }),
+      subscription: { plan_id: "pro", status: "active", workspace_id: 10 },
+    });
+    const svc = new SaasBillingSyncService(db);
+    const report = await svc.runBackfill();
+    expect(report.scanned).toBe(1);
+    expect(report.skipped).toBe(1);
+    expect(report.bySkipReason?.PLAN_UNCHANGED).toBe(1);
+  });
+
+  it("runBackfill defaults to dry-run mode", async () => {
+    const db = makeBillingSyncDb({
+      subscription: { plan_id: "pro", status: "active", workspace_id: 10 },
+    });
+    const svc = new SaasBillingSyncService(db);
+    const report = await svc.runBackfill(undefined, { workspaceId: 10 });
+    expect(report.mode).toBe("dry-run");
+    expect(db.updateCalls).toHaveLength(0);
+  });
 });

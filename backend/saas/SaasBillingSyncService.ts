@@ -41,6 +41,12 @@ export type SaasBillingSyncBatchReport = {
   skipped: number;
   errors: { workspaceId?: number; userId?: string; message: string }[];
   results: SaasBillingSyncResult[];
+  /** Populated by runBackfill (Commit 3.5). */
+  bySkipReason?: Record<SaasBillingSyncSkipReason, number>;
+};
+
+export type SaasBillingBackfillRunOptions = {
+  workspaceId?: number;
 };
 
 export type SaasBillingSyncHint = {
@@ -215,6 +221,61 @@ export class SaasBillingSyncService {
     }
 
     return report;
+  }
+
+  async runBackfill(
+    mode: SaasBillingSyncMode = "dry-run",
+    options?: SaasBillingBackfillRunOptions,
+  ): Promise<SaasBillingSyncBatchReport> {
+    const workspaceId = options?.workspaceId;
+    let report: SaasBillingSyncBatchReport;
+
+    if (workspaceId !== undefined) {
+      const executedAt = new Date().toISOString();
+      report = {
+        mode,
+        executedAt,
+        scanned: 1,
+        synced: 0,
+        skipped: 0,
+        errors: [],
+        results: [],
+      };
+      try {
+        const result = await this.syncFromWorkspaceId(workspaceId, mode);
+        report.results.push(result);
+        if (result.synced) report.synced += 1;
+        else if (result.skipped) report.skipped += 1;
+      } catch (e: unknown) {
+        report.errors.push({
+          workspaceId,
+          message: e instanceof Error ? e.message : String(e),
+        });
+      }
+    } else {
+      report = await this.runBatch(mode);
+    }
+
+    report.bySkipReason = this.summarizeSkipReasons(report.results);
+    return report;
+  }
+
+  private summarizeSkipReasons(
+    results: SaasBillingSyncResult[],
+  ): Record<SaasBillingSyncSkipReason, number> {
+    const counts: Record<SaasBillingSyncSkipReason, number> = {
+      NO_TENANT: 0,
+      NO_SUBSCRIPTION: 0,
+      STATUS_NOT_SYNCABLE: 0,
+      PLAN_UNCHANGED: 0,
+      VALIDATION: 0,
+    };
+    for (const r of results) {
+      if (r.skipReason) {
+        counts[r.skipReason] += 1;
+      }
+    }
+    return counts;
   }
 
   private async applySync(
