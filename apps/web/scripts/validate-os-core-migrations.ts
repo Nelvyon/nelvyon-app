@@ -7,38 +7,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { DbClient } from "../../../backend/db/DbClient";
+import { loadEnvFiles } from "../../../backend/db/loadEnvFiles";
 
 const scriptsDir = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(scriptsDir, "..");
 const repoRoot = path.resolve(webRoot, "../..");
-
-function loadEnvFiles(): void {
-  const files = [
-    path.join(webRoot, ".env.production.local"),
-    path.join(webRoot, ".env.production.local.txt"),
-    path.join(webRoot, ".env.local"),
-    path.join(repoRoot, ".env.production"),
-    path.join(repoRoot, ".env"),
-  ];
-  for (const file of files) {
-    if (!fs.existsSync(file)) continue;
-    for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith("#")) continue;
-      const eq = trimmed.indexOf("=");
-      if (eq <= 0) continue;
-      const key = trimmed.slice(0, eq).trim();
-      let val = trimmed.slice(eq + 1).trim();
-      if (
-        (val.startsWith('"') && val.endsWith('"')) ||
-        (val.startsWith("'") && val.endsWith("'"))
-      ) {
-        val = val.slice(1, -1);
-      }
-      if (!process.env[key]) process.env[key] = val;
-    }
-  }
-}
 
 const REQUIRED_MIGRATIONS = [
   "315_os_clients.sql",

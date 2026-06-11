@@ -3,10 +3,12 @@
  * Uso: DATABASE_URL=... pnpm -C apps/web validate:saas-deals-migrations
  */
 import { DbClient } from "../../../backend/db/DbClient";
+import { loadEnvFiles } from "../../../backend/db/loadEnvFiles";
 
 const REQUIRED_MIGRATIONS = ["312_saas_deals.sql", "313_saas_deals_rls.sql"] as const;
 
 async function main(): Promise<void> {
+  loadEnvFiles();
   const dbUrl = process.env.DATABASE_URL?.trim();
   if (!dbUrl) {
     console.error("[validate-saas-deals] DATABASE_URL is required.");

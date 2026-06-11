@@ -3,9 +3,11 @@
  * Uso: pnpm saas:validate-bridge (desde apps/web)
  */
 import { DbClient } from "../../db/DbClient";
+import { loadEnvFiles } from "../../db/loadEnvFiles";
 import { getSaasTenantBridgeValidationService } from "../SaasTenantBridgeValidation";
 
 async function main(): Promise<void> {
+  loadEnvFiles();
   const svc = getSaasTenantBridgeValidationService();
   const report = await svc.run();
   console.log(JSON.stringify(report, null, 2));

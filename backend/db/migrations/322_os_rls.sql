@@ -1,5 +1,6 @@
 -- OS-1-12: Row Level Security defensivo en tablas canónicas OS (workspace_id).
 -- Complementa aislamiento en FastAPI; service_role bypass (backend) sigue operativo.
+-- Helpers de membership condicionales si `workspaces` / `workspace_members` (Alembic) no existen aún.
 
 -- ── Helpers workspace (JWT sub = users.id texto) ─────────────────────────────
 
@@ -27,13 +28,18 @@ AS $$
   );
 $$;
 
+DO $nelvyon_os_rls_workspace_helpers$
+BEGIN
+  IF to_regclass('public.workspaces') IS NOT NULL
+     AND to_regclass('public.workspace_members') IS NOT NULL THEN
+    EXECUTE $fn$
 CREATE OR REPLACE FUNCTION public.nelvyon_user_in_workspace(p_workspace_id integer)
 RETURNS boolean
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $body$
   SELECT CASE
     WHEN p_workspace_id IS NULL THEN false
     ELSE EXISTS (
@@ -50,15 +56,17 @@ AS $$
         AND w.user_id = public.nelvyon_jwt_sub_text()
     )
   END;
-$$;
+$body$;
+$fn$;
 
+    EXECUTE $fn$
 CREATE OR REPLACE FUNCTION public.nelvyon_workspace_can_mutate(p_workspace_id integer)
 RETURNS boolean
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $body$
   SELECT CASE
     WHEN p_workspace_id IS NULL THEN false
     ELSE EXISTS (
@@ -76,7 +84,37 @@ AS $$
         AND w.user_id = public.nelvyon_jwt_sub_text()
     )
   END;
-$$;
+$body$;
+$fn$;
+  ELSE
+    RAISE NOTICE '322: workspaces/workspace_members not present — installing deny-all workspace membership helpers';
+
+    EXECUTE $fn$
+CREATE OR REPLACE FUNCTION public.nelvyon_user_in_workspace(p_workspace_id integer)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $body$
+  SELECT false;
+$body$;
+$fn$;
+
+    EXECUTE $fn$
+CREATE OR REPLACE FUNCTION public.nelvyon_workspace_can_mutate(p_workspace_id integer)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $body$
+  SELECT false;
+$body$;
+$fn$;
+  END IF;
+END;
+$nelvyon_os_rls_workspace_helpers$;
 
 CREATE OR REPLACE FUNCTION public.nelvyon_os_workspace_select(p_workspace_id integer)
 RETURNS boolean
