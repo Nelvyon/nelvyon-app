@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ApiError } from "@/core/api/types";
-import { osClientsApi } from "@/features/os-shell/clients/api";
+import { osClientsApi } from "@/features/os-shell/clients/legacyApi";
 import { osProjectsApi } from "@/features/os-shell/projects/api";
 import { osPlatformApi } from "@/features/os-shell/api";
 

@@ -12,6 +12,10 @@ function parseMode(argv: string[]): EtlMode {
   return "dry-run";
 }
 
+function parseResolveConflicts(argv: string[]): boolean {
+  return argv.includes("--resolve-conflicts");
+}
+
 async function main(): Promise<void> {
   const mode = parseMode(process.argv.slice(2));
   if (mode === "apply" && !process.argv.includes("--i-understand-apply")) {
@@ -19,7 +23,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
   const svc = getSaasCrmEtlService();
-  const report = await svc.run(mode);
+  const report = await svc.run(mode, { resolveConflicts: parseResolveConflicts(process.argv.slice(2)) });
   console.log(JSON.stringify(report, null, 2));
   await DbClient.getInstance().end();
   if (report.errors.length > 0) {

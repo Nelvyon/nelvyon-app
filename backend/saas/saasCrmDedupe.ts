@@ -74,3 +74,14 @@ export function mergeEtlTags(existing: string[] | null | undefined, extra: strin
   for (const t of extra) set.add(t);
   return [...set];
 }
+
+const CONTACT_SOURCE_RANK: Record<EtlSource, number> = { crm_contacts: 2, contacts: 1 };
+
+/** Resuelve conflicto dedupe: prioriza crm_contacts sobre contacts. */
+export function pickContactEtlWinner<T extends { source: EtlSource; legacyId: string }>(group: T[]): T {
+  return [...group].sort((a, b) => {
+    const rank = CONTACT_SOURCE_RANK[b.source] - CONTACT_SOURCE_RANK[a.source];
+    if (rank !== 0) return rank;
+    return b.legacyId.localeCompare(a.legacyId);
+  })[0];
+}

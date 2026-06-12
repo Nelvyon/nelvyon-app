@@ -66,3 +66,18 @@ export const OPEN_DEAL_STAGES: readonly DealStage[] = [
 export function isOpenDealStage(stage: DealStage): boolean {
   return (OPEN_DEAL_STAGES as readonly string[]).includes(stage);
 }
+
+const DEAL_SOURCE_RANK: Record<DealEtlSource, number> = {
+  crm_deals: 3,
+  deals: 2,
+  pipeline_deals: 1,
+};
+
+/** Resuelve conflicto dedupe: crm_deals > deals > pipeline_deals. */
+export function pickDealEtlWinner<T extends { source: DealEtlSource; legacyId: string }>(group: T[]): T {
+  return [...group].sort((a, b) => {
+    const rank = DEAL_SOURCE_RANK[b.source] - DEAL_SOURCE_RANK[a.source];
+    if (rank !== 0) return rank;
+    return b.legacyId.localeCompare(a.legacyId);
+  })[0];
+}

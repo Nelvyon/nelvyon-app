@@ -5,6 +5,7 @@ import {
   buildDealDedupeKey,
   etlDealLegacySourceTag,
   mapLegacyDealStageToSaas,
+  pickDealEtlWinner,
   type DealEtlSource,
 } from "./saasDealsDedupe";
 import { etlLegacyIdTag, type EtlSource as ContactEtlSource } from "./saasCrmDedupe";
@@ -14,6 +15,7 @@ export type DealsEtlMode = "dry-run" | "apply";
 /** `tenantId` acota el ETL al tenant autenticado (API). Sin valor = global (CLI ops). */
 export type DealsEtlRunOptions = {
   tenantId?: string;
+  resolveConflicts?: boolean;
 };
 
 export type DealsEtlConflict = {
@@ -42,6 +44,7 @@ export type SaasDealsEtlReport = {
   skippedNoTenant: number;
   skippedNoContact: number;
   skippedAlreadyMigrated: number;
+  resolvedConflicts: number;
   bySource: Record<DealEtlSource, number>;
   appliedInserts: number;
 };
@@ -69,6 +72,7 @@ export class SaasDealsEtlService {
   constructor(private readonly db: SaasPostgresPort) {}
 
   async run(mode: DealsEtlMode, options?: DealsEtlRunOptions): Promise<SaasDealsEtlReport> {
+    const resolveConflicts = options?.resolveConflicts === true;
     const scopeTenantId = options?.tenantId?.trim() || null;
     const scopeWorkspaceId = scopeTenantId
       ? await this.resolveWorkspaceForTenant(scopeTenantId)
@@ -85,6 +89,7 @@ export class SaasDealsEtlService {
       skippedNoTenant: 0,
       skippedNoContact: 0,
       skippedAlreadyMigrated: 0,
+      resolvedConflicts: 0,
       bySource: { deals: 0, crm_deals: 0, pipeline_deals: 0 },
       appliedInserts: 0,
     };
@@ -114,17 +119,29 @@ export class SaasDealsEtlService {
     const toInsert: DealCandidate[] = [];
 
     for (const [key, group] of byDedupe) {
+      let pick = group[0];
       if (group.length > 1) {
-        report.conflicts.push({
-          dedupeKey: key,
-          tenantId: group[0].tenantId,
-          sources: [...new Set(group.map((g) => g.source))],
-          legacyIds: group.map((g) => `${g.source}:${g.legacyId}`),
-          reason: "multiple_legacy_rows_same_dedupe_key",
-        });
-        continue;
+        if (resolveConflicts) {
+          pick = pickDealEtlWinner(group);
+          report.resolvedConflicts += 1;
+          report.conflicts.push({
+            dedupeKey: key,
+            tenantId: pick.tenantId,
+            sources: [...new Set(group.map((g) => g.source))],
+            legacyIds: group.map((g) => `${g.source}:${g.legacyId}`),
+            reason: "resolved_pick_winner",
+          });
+        } else {
+          report.conflicts.push({
+            dedupeKey: key,
+            tenantId: group[0].tenantId,
+            sources: [...new Set(group.map((g) => g.source))],
+            legacyIds: group.map((g) => `${g.source}:${g.legacyId}`),
+            reason: "multiple_legacy_rows_same_dedupe_key",
+          });
+          continue;
+        }
       }
-      const pick = group[0];
       if (existingKeys.has(key)) {
         report.duplicates += 1;
         continue;

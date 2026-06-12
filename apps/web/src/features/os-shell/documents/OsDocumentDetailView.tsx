@@ -7,7 +7,7 @@ import { ExternalLink } from "lucide-react";
 import { ApiError } from "@/core/api/types";
 import { useAuth } from "@/core/auth/AuthContext";
 import { can } from "@/core/routing/roleMatrix";
-import { osClientsApi } from "@/features/os-shell/clients/api";
+import { osClientsApi } from "@/features/os-shell/clients/legacyApi";
 import { OsShellLayout } from "@/features/os-shell/components/OsShellLayout";
 import {
   OsErrorBanner,

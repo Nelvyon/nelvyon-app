@@ -10,9 +10,15 @@ import {
   mapLegacyStatusToSaas,
   mergeEtlTags,
   normalizeEmail,
+  pickContactEtlWinner,
 } from "./saasCrmDedupe";
 
 export type EtlMode = "dry-run" | "apply";
+
+export type CrmEtlRunOptions = {
+  /** Si true, elige un ganador por clave dedupe en lugar de omitir el grupo. */
+  resolveConflicts?: boolean;
+};
 
 export type EtlConflict = {
   dedupeKey: string;
@@ -39,6 +45,7 @@ export type SaasCrmEtlReport = {
   errors: EtlError[];
   skippedNoTenant: number;
   skippedAlreadyMigrated: number;
+  resolvedConflicts: number;
   bySource: Record<EtlSource, number>;
   appliedInserts: number;
 };
@@ -72,7 +79,8 @@ type Candidate = {
 export class SaasCrmEtlService {
   constructor(private readonly db: SaasPostgresPort) {}
 
-  async run(mode: EtlMode): Promise<SaasCrmEtlReport> {
+  async run(mode: EtlMode, options?: CrmEtlRunOptions): Promise<SaasCrmEtlReport> {
+    const resolveConflicts = options?.resolveConflicts === true;
     const report: SaasCrmEtlReport = {
       mode,
       executedAt: new Date().toISOString(),
@@ -83,6 +91,7 @@ export class SaasCrmEtlService {
       errors: [],
       skippedNoTenant: 0,
       skippedAlreadyMigrated: 0,
+      resolvedConflicts: 0,
       bySource: { contacts: 0, crm_contacts: 0 },
       appliedInserts: 0,
     };
@@ -107,17 +116,29 @@ export class SaasCrmEtlService {
     const toInsert: Candidate[] = [];
 
     for (const [key, group] of byDedupe) {
+      let pick = group[0];
       if (group.length > 1) {
-        report.conflicts.push({
-          dedupeKey: key,
-          tenantId: group[0].tenantId,
-          sources: [...new Set(group.map((g) => g.source))],
-          legacyIds: group.map((g) => `${g.source}:${g.legacyId}`),
-          reason: "multiple_legacy_rows_same_dedupe_key",
-        });
-        continue;
+        if (resolveConflicts) {
+          pick = pickContactEtlWinner(group);
+          report.resolvedConflicts += 1;
+          report.conflicts.push({
+            dedupeKey: key,
+            tenantId: pick.tenantId,
+            sources: [...new Set(group.map((g) => g.source))],
+            legacyIds: group.map((g) => `${g.source}:${g.legacyId}`),
+            reason: "resolved_pick_winner",
+          });
+        } else {
+          report.conflicts.push({
+            dedupeKey: key,
+            tenantId: group[0].tenantId,
+            sources: [...new Set(group.map((g) => g.source))],
+            legacyIds: group.map((g) => `${g.source}:${g.legacyId}`),
+            reason: "multiple_legacy_rows_same_dedupe_key",
+          });
+          continue;
+        }
       }
-      const pick = group[0];
       if (existingIndex.has(key)) {
         report.duplicates += 1;
         continue;
