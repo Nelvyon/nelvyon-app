@@ -6,7 +6,7 @@ import {
   ClientUpdateInput,
 } from "@/features/crm/types";
 
-const BASE = "/api/v1/entities/nelvyon_clients";
+const BASE = "/api/platform/crm/clients";
 
 export const crmApi = {
   list: () => apiClient.get<ClientListResponse>(BASE, { tenantScoped: true }),

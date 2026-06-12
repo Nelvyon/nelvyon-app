@@ -54,11 +54,13 @@ export async function fetchAuthMe(accessToken: string): Promise<AuthMeResponse> 
 }
 
 export async function fetchWorkspaceList(accessToken: string): Promise<WorkspaceRow[]> {
-  const res = await fetch(`${apiBase()}/api/v1/workspace/list`, {
+  const res = await fetch("/api/platform/workspaces/list", {
+    credentials: "same-origin",
     headers: {
       Authorization: `Bearer ${accessToken}`,
       Accept: "application/json",
     },
+    cache: "no-store",
   });
   if (!res.ok) {
     const text = await res.text();

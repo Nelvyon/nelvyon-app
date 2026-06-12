@@ -4,13 +4,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { toastError, toastSuccess } from "@/core/ui/toastFeedback";
 import { trackProductEvent } from "@/core/telemetry/productEvents";
+import { useWorkspace } from "@/core/workspace/WorkspaceContext";
 import { crmApi } from "@/features/crm/api";
 import { ClientCreateInput, ClientUpdateInput } from "@/features/crm/types";
 
 export function useClients() {
+  const { workspaceId } = useWorkspace();
   return useQuery({
-    queryKey: ["crm", "clients"],
+    queryKey: ["crm", "clients", workspaceId],
     queryFn: crmApi.list,
+    enabled: Boolean(workspaceId),
   });
 }
 

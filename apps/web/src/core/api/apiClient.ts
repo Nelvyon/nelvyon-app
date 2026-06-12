@@ -131,10 +131,12 @@ export class ApiClient {
 
     while (attempt <= retries) {
       try {
-        const response = await fetch(`${this.config.baseUrl}${path}`, {
+        const sameOrigin = path.startsWith("/api/");
+        const response = await fetch(sameOrigin ? path : `${this.config.baseUrl}${path}`, {
           method,
           signal: options.signal,
           headers: this.buildHeaders(options),
+          credentials: sameOrigin ? "include" : undefined,
           body: options.body === undefined ? undefined : JSON.stringify(options.body),
         });
 

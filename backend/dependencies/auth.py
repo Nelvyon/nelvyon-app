@@ -3,10 +3,7 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from core.auth import AccessTokenError, decode_access_token
-from core.database import get_db
 from core.i18n import request_language, t
 from core.observability import set_user_id_for_log
 from fastapi import Cookie, Depends, HTTPException, Request, status
@@ -40,13 +37,20 @@ async def get_access_token(
 async def get_current_user(
     request: Request,
     token: str = Depends(get_access_token),
-    db: AsyncSession = Depends(get_db),
 ) -> UserResponse:
     """Dependency to get current authenticated user via JWT or API key (nlv_)."""
     if token.startswith("nlv_"):
+        from core.database import db_manager
         from services.api_keys_service import get_api_keys_service
 
-        record = await get_api_keys_service(db).validate_api_key(token)
+        await db_manager.ensure_initialized()
+        if not db_manager.async_session_maker:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Database unavailable",
+            )
+        async with db_manager.async_session_maker() as db:
+            record = await get_api_keys_service(db).validate_api_key(token)
         if not record:
             lang = request_language(request)
             raise HTTPException(
@@ -69,8 +73,14 @@ async def get_current_user(
     try:
         payload = decode_access_token(token)
     except AccessTokenError:
-        from core.nelvyon_jwt import try_decode_nelvyon_app_token
-
+        try:
+            from core.nelvyon_jwt import try_decode_nelvyon_app_token
+        except Exception:
+            logger.exception("Nelvyon JWT bridge unavailable")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication token",
+            ) from None
         payload = try_decode_nelvyon_app_token(token)
         if payload is None:
             logger.warning("Token validation failed: invalid app or nelvyon token")

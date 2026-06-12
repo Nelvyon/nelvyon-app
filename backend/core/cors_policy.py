@@ -9,6 +9,7 @@ _NELVYON_ORIGIN = re.compile(
     r"^https://([a-z0-9-]+\.)*nelvyon\.(com|dev|app)(:\d+)?$",
     re.I,
 )
+_RAILWAY_ORIGIN = re.compile(r"^https://([a-z0-9-]+\.)*up\.railway\.app(:\d+)?$", re.I)
 _LOCALHOST = re.compile(r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$", re.I)
 
 
@@ -23,7 +24,7 @@ def is_allowed_origin(origin: str | None) -> bool:
     if not origin:
         return False
     o = origin.strip()
-    if _NELVYON_ORIGIN.match(o) or _LOCALHOST.match(o):
+    if _NELVYON_ORIGIN.match(o) or _LOCALHOST.match(o) or _RAILWAY_ORIGIN.match(o):
         return True
     return o in _extra_origins()
 
@@ -33,7 +34,9 @@ def cors_origin_regex(environment: str) -> str:
     if env in ("dev", "development", "test"):
         return r"https?://.*"
     extras = _extra_origins()
+    railway = r"https://([a-z0-9-]+\.)*up\.railway\.app(:\d+)?$"
+    nelvyon = r"https://(.*\.)?nelvyon\.(com|dev|app)(:\d+)?$"
     if extras:
         escaped = "|".join(re.escape(x) for x in extras)
-        return rf"https://(.*\.)?nelvyon\.(com|dev|app)(:\d+)?$|{escaped}"
-    return r"https://(.*\.)?nelvyon\.(com|dev|app)(:\d+)?$"
+        return rf"{nelvyon}|{railway}|{escaped}"
+    return rf"{nelvyon}|{railway}"

@@ -261,8 +261,14 @@ class TenantMiddleware(BaseHTTPMiddleware):
             try:
                 payload = decode_access_token(token)
             except AccessTokenError:
-                from core.nelvyon_jwt import try_decode_nelvyon_app_token
-
+                try:
+                    from core.nelvyon_jwt import try_decode_nelvyon_app_token
+                except Exception:
+                    logger.exception("Nelvyon JWT bridge unavailable")
+                    return JSONResponse(
+                        status_code=401,
+                        content={"detail": "Invalid or expired authentication token"},
+                    )
                 payload = try_decode_nelvyon_app_token(token)
                 if payload is None:
                     return JSONResponse(
