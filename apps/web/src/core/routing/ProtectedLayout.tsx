@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { ReactNode, useEffect } from "react";
 
 import { AuthDebugPanel } from "@/core/auth/AuthDebugPanel";
 import { useAuth } from "@/core/auth/AuthContext";
@@ -17,12 +17,32 @@ interface ProtectedLayoutProps {
   children: ReactNode;
 }
 
+function AuthLoadingShell() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center p-6">
+      <p className="text-sm text-muted-foreground">Cargando sesión…</p>
+    </div>
+  );
+}
+
 export function ProtectedLayout({ module, children }: ProtectedLayoutProps) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isBootstrapping, user } = useAuth();
   const pathname = usePathname() ?? "";
+  const router = useRouter();
   const brandMode = getBrandMode();
   const isClientMode = brandMode === "client";
   const appName = getBrandAppName(brandMode);
+
+  useEffect(() => {
+    if (isBootstrapping || isAuthenticated) return;
+    if (isClientMode) return;
+    const next = encodeURIComponent(pathname || "/dashboard");
+    router.replace(`/login?next=${next}`);
+  }, [isAuthenticated, isBootstrapping, isClientMode, pathname, router]);
+
+  if (isBootstrapping) {
+    return <AuthLoadingShell />;
+  }
 
   if (!isAuthenticated || !user) {
     if (isClientMode) {
@@ -30,8 +50,7 @@ export function ProtectedLayout({ module, children }: ProtectedLayoutProps) {
         <div className="space-y-4 p-6">
           <p className="text-sm text-destructive">Sign-in required</p>
           <p className="text-sm text-muted-foreground">
-            Open the client access page to continue.
-            {" "}
+            Open the client access page to continue.{" "}
             <Link className="text-link underline" href="/client/sign-in">
               Client sign-in
             </Link>
@@ -41,13 +60,13 @@ export function ProtectedLayout({ module, children }: ProtectedLayoutProps) {
     }
     return (
       <div className="space-y-4 p-6">
-        <p className="text-sm text-destructive">Unauthorized (session required)</p>
+        <p className="text-sm text-muted-foreground">Redirigiendo al inicio de sesión…</p>
         <p className="text-sm text-muted-foreground">
-          Use a real API JWT on the{" "}
-          <Link className="text-link underline" href="/sign-in">
-            sign-in (staging)
-          </Link>{" "}
-          page — demo tokens are not accepted by the backend.
+          Si no ocurre automáticamente, abre{" "}
+          <Link className="text-link underline" href={`/login?next=${encodeURIComponent(pathname || "/dashboard")}`}>
+            iniciar sesión
+          </Link>
+          .
         </p>
         {!isClientMode ? <AuthDebugPanel /> : null}
       </div>

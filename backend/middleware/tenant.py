@@ -257,15 +257,20 @@ class TenantMiddleware(BaseHTTPMiddleware):
         tenant_id: Optional[int] = None
 
         if token and not token.startswith("nlv_"):
+            payload = None
             try:
                 payload = decode_access_token(token)
-                user_id = str(payload.get("sub") or "")
-                tenant_id = _resolve_tenant_id(request, payload)
             except AccessTokenError:
-                return JSONResponse(
-                    status_code=401,
-                    content={"detail": "Invalid or expired authentication token"},
-                )
+                from core.nelvyon_jwt import try_decode_nelvyon_app_token
+
+                payload = try_decode_nelvyon_app_token(token)
+                if payload is None:
+                    return JSONResponse(
+                        status_code=401,
+                        content={"detail": "Invalid or expired authentication token"},
+                    )
+            user_id = str(payload.get("sub") or "")
+            tenant_id = _resolve_tenant_id(request, payload)
         elif token and token.startswith("nlv_"):
             header_ws = request.headers.get("x-workspace-id") or request.headers.get("x-tenant-id")
             if header_ws:

@@ -65,12 +65,16 @@ async def get_current_user(
             role="api_key",
         )
 
+    payload = None
     try:
         payload = decode_access_token(token)
-    except AccessTokenError as exc:
-        # Log error type only, not the full exception which may contain sensitive token data
-        logger.warning("Token validation failed: %s", type(exc).__name__)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=exc.message)
+    except AccessTokenError:
+        from core.nelvyon_jwt import try_decode_nelvyon_app_token
+
+        payload = try_decode_nelvyon_app_token(token)
+        if payload is None:
+            logger.warning("Token validation failed: invalid app or nelvyon token")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication token")
 
     user_id = payload.get("sub")
     if not user_id:

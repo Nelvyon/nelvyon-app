@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { AuthLayout } from "@/components/nelvyon-site/AuthLayout";
+import { useAuth } from "@/core/auth/AuthContext";
+import { nelvyonPlanToUiRole } from "@/core/auth/nelvyonPlanRole";
 import { identifyUser, trackEvent } from "@/lib/analytics";
 
 const inputClass =
@@ -12,6 +14,7 @@ const inputClass =
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { signIn } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", company: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,10 +51,31 @@ export default function RegisterPage() {
         setError(msg);
         return;
       }
-      const registered = data as { userId?: string };
-      if (typeof registered.userId === "string") {
-        identifyUser(registered.userId, { plan: "free" });
+      const registered = data as {
+        userId?: string;
+        email?: string;
+        tenantId?: string;
+        token?: string;
+        plan?: string;
+      };
+      if (
+        typeof registered.userId !== "string" ||
+        typeof registered.email !== "string" ||
+        typeof registered.token !== "string"
+      ) {
+        setError("Respuesta de registro inválida. Inténtalo de nuevo.");
+        return;
       }
+      signIn(
+        {
+          id: registered.userId,
+          email: registered.email,
+          role: nelvyonPlanToUiRole(typeof registered.plan === "string" ? registered.plan : "free"),
+          tenantId: typeof registered.tenantId === "string" ? registered.tenantId : undefined,
+        },
+        registered.token,
+      );
+      identifyUser(registered.userId, { plan: "free" });
       trackEvent("signup_completed", { plan: "free" });
       router.push("/dashboard");
       router.refresh();

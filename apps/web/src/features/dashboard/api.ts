@@ -53,7 +53,7 @@ export const dashboardHelpdeskApi = {
     apiClient.post("/api/helpdesk/tickets", { tenantScoped: true, body }),
   reply: (id: number, content: string) =>
     apiClient.post(`/api/helpdesk/tickets/${id}/reply`, { tenantScoped: true, body: { content } }),
-  resolve: (id: number) => apiClient.put(`/api/helpdesk/tickets/${id}/resolve`, { tenantScoped: true, body: {} }),
+  resolve: (id: number) => apiClient.patch(`/api/helpdesk/tickets/${id}/resolve`, { tenantScoped: true, body: {} }),
 };
 
 export const dashboardContractsApi = {
