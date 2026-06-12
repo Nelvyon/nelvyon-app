@@ -61,10 +61,10 @@ export default function DashboardHomePage() {
               lanza tus primeras acciones en menos de 5 minutos.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button asChild size="lg">
+              <Button asChild>
                 <Link href="/crm/clients/new">Añadir primer cliente</Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
+              <Button asChild variant="outline">
                 <Link href="/campaigns/new">Crear campaña</Link>
               </Button>
             </div>

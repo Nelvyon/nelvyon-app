@@ -8,7 +8,7 @@ const STOPWORDS = new Set([
 ]);
 
 type Playbook = {
-  patterns: RegExp[];
+  pattern: RegExp;
   answer: string;
   actionHref: string;
   actionLabel: string;
@@ -17,7 +17,7 @@ type Playbook = {
 
 const OUTCOME_PLAYBOOKS: Playbook[] = [
   {
-    patterns: /(lead|cliente|client|revenue|crm|venta|pipeline|deal)/i,
+    pattern: /(lead|cliente|client|revenue|crm|venta|pipeline|deal)/i,
     answer:
       "Para generar más oportunidades, empieza registrando cuentas en Revenue y vinculando deals. Un cliente bien definido desbloquea campañas y reportes coherentes.",
     actionHref: "/crm/clients/new",
@@ -25,7 +25,7 @@ const OUTCOME_PLAYBOOKS: Playbook[] = [
     confidence: "high",
   },
   {
-    patterns: /(campaña|campaign|email|sms|marketing|demanda|nurturing)/i,
+    pattern: /(campaña|campaign|email|sms|marketing|demanda|nurturing)/i,
     answer:
       "Las campañas funcionan mejor con un cliente o segmento claro. Crea una campaña piloto, define objetivo y canal, y mide respuestas desde Analytics.",
     actionHref: "/campaigns/new",
@@ -33,7 +33,7 @@ const OUTCOME_PLAYBOOKS: Playbook[] = [
     confidence: "high",
   },
   {
-    patterns: /(ticket|soporte|helpdesk|incidencia|support|petición)/i,
+    pattern: /(ticket|soporte|helpdesk|incidencia|support|petición)/i,
     answer:
       "Helpdesk centraliza solicitudes del equipo y clientes. Abre un ticket con contexto claro y así evitas perder demanda comercial escondida en soporte.",
     actionHref: "/inbox/tickets/new",
@@ -41,7 +41,7 @@ const OUTCOME_PLAYBOOKS: Playbook[] = [
     confidence: "high",
   },
   {
-    patterns: /(automat|workflow|webhook|job)/i,
+    pattern: /(automat|workflow|webhook|job)/i,
     answer:
       "Automatiza tareas repetitivas con jobs y webhooks. Revisa la cola de automatización y conecta eventos (nuevo cliente, ticket cerrado) a acciones externas.",
     actionHref: "/automations/jobs",
@@ -49,7 +49,7 @@ const OUTCOME_PLAYBOOKS: Playbook[] = [
     confidence: "high",
   },
   {
-    patterns: /(empezar|start|primeros pasos|onboarding|activar|setup|configur)/i,
+    pattern: /(empezar|start|primeros pasos|onboarding|activar|setup|configur)/i,
     answer:
       "Tu checklist de activación en Inicio te guía en 5 minutos: workspace, cliente, ticket y campaña. Es la forma más rápida de validar que todo funciona.",
     actionHref: "/dashboard",
@@ -79,7 +79,7 @@ function scoreArticle(questionTokens: string[], article: HelpArticle, routeModul
 
 function matchPlaybook(question: string): Playbook | null {
   for (const playbook of OUTCOME_PLAYBOOKS) {
-    if (playbook.patterns.test(question)) return playbook;
+    if (playbook.pattern.test(question)) return playbook;
   }
   return null;
 }

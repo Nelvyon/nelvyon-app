@@ -14,7 +14,7 @@ export interface ProductEventPayload {
   module?: string;
   step_key?: string;
   form_kind?: "bug" | "help" | "feedback";
-  result?: "article" | "handoff";
+  result?: "article" | "handoff" | "playbook";
   confidence?: "high" | "low";
   route?: string;
   workspace_id?: string | number;
