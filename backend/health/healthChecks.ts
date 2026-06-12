@@ -1,4 +1,5 @@
 import { DbClient } from "../db/DbClient";
+import { sanitizeEnvValue } from "../db/envSanitize";
 
 export type HealthCheckResult = {
   status: "ok" | "degraded" | "down";
@@ -41,6 +42,18 @@ async function withGlobalCap(run: () => Promise<HealthCheckResult>): Promise<Hea
  * SELECT 1 against Postgres (Supabase). Timeout default 3s.
  * Exported `timeoutMs` for tests (fake timers).
  */
+/** JWT_SECRET required for /api/auth/login (not exposed in response). */
+export function checkAuthConfig(): HealthCheckResult {
+  const secret = sanitizeEnvValue(process.env.JWT_SECRET);
+  if (secret.length === 0) {
+    return { status: "down", latencyMs: 0, error: "JWT_SECRET missing" };
+  }
+  if (secret.length < 32) {
+    return { status: "down", latencyMs: 0, error: "JWT_SECRET too short" };
+  }
+  return { status: "ok", latencyMs: 0 };
+}
+
 export async function checkDatabase(timeoutMs = 3000): Promise<HealthCheckResult> {
   return withGlobalCap(async () => {
     const started = Date.now();

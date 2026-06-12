@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import { DbClient } from "../db/DbClient";
+import { sanitizeEnvValue } from "../db/envSanitize";
 import { NelvyonMonitor } from "../monitoring";
 import { OsAgentError } from "../os-agents/OsAgentError";
 import type { AuthResult, JwtPayload, NelvyonUserRow } from "./types";
@@ -14,13 +15,12 @@ export interface AuthDbPort {
 }
 
 function assertJwtSecret(): string {
-  const raw = process.env.JWT_SECRET;
-  if (typeof raw !== "string" || raw.trim().length === 0) {
+  const secret = sanitizeEnvValue(process.env.JWT_SECRET);
+  if (secret.length === 0) {
     throw new Error(
       "AuthService: JWT_SECRET is not defined or empty. Set JWT_SECRET in the environment to a secret string of at least 32 characters.",
     );
   }
-  const secret = raw.trim();
   if (secret.length < 32) {
     throw new Error(
       `AuthService: JWT_SECRET must be at least 32 characters (got ${secret.length}). Use a long random secret in production.`,
