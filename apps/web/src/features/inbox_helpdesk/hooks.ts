@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/core/auth/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { LOCAL_ACTIVATION_FIRST_TICKET } from "@/core/auth/sessionStorageKeys";
@@ -10,9 +11,11 @@ import { inboxApi } from "@/features/inbox_helpdesk/api";
 import { TicketCreateInput, TicketUpdateInput } from "@/features/inbox_helpdesk/types";
 
 export function useTickets() {
+  const { isAuthenticated, isBootstrapping } = useAuth();
   return useQuery({
     queryKey: ["inbox", "tickets"],
     queryFn: inboxApi.list,
+    enabled: isAuthenticated && !isBootstrapping,
   });
 }
 
@@ -37,10 +40,10 @@ export function useCreateTicket() {
         /* ignore */
       }
       trackProductEvent("inbox_ticket_created", { module: "inbox" });
-      toastSuccess("Ticket created.");
+      toastSuccess("Ticket creado.");
     },
     onError: () => {
-      toastError("Could not create ticket.");
+      toastError("No se pudo crear el ticket.");
     },
   });
 }

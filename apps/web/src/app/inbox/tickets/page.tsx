@@ -48,11 +48,7 @@ export default function TicketsListPage() {
         )}
         {query.error && !(query.error instanceof ApiError && query.error.status === 403) && (
           <ErrorNotice>
-            <p>
-              {isClientMode
-                ? "We could not load requests for this account. Check your connection and retry."
-                : "Cause: ticket list request failed for this workspace (network/session/backend). Next: refresh once and confirm workspace header; if it persists, sign in again."}
-            </p>
+            <p>No pudimos cargar los tickets. Comprueba tu conexión e inténtalo de nuevo.</p>
           </ErrorNotice>
         )}
         {query.data && <TicketList items={query.data.items} showCreateCta={canCreate} />}

@@ -3,12 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { FormEvent, useState } from "react";
+import { Sparkles } from "lucide-react";
 
 import { Button } from "@/core/ui/button";
 import { trackProductEvent } from "@/core/telemetry/productEvents";
 import { inferHelpModuleFromPath } from "@/features/help/context";
 import { answerHelpQuestion } from "@/features/helpbot/engine";
 import { BotReply } from "@/features/helpbot/types";
+
+const SUGGESTIONS = [
+  "¿Cómo consigo más leads?",
+  "¿Cómo lanzo mi primera campaña?",
+  "¿Dónde abro un ticket de soporte?",
+];
 
 export function HelpBotPanel() {
   const pathname = usePathname() ?? "";
@@ -23,7 +30,7 @@ export function HelpBotPanel() {
     setError(null);
     const nextQuestion = question.trim();
     if (!nextQuestion) {
-      setError("Enter a question first. Next: ask about a concrete workflow, then submit again.");
+      setError("Escribe una pregunta concreta (por ejemplo: “¿Cómo creo un cliente?”).");
       return;
     }
     setBusy(true);
@@ -32,38 +39,58 @@ export function HelpBotPanel() {
       setReply(nextReply);
       trackProductEvent("bot_result", {
         module: inferHelpModuleFromPath(pathname) ?? "unknown",
-        result: nextReply.article ? "article" : "handoff",
+        result: nextReply.article ? "article" : nextReply.actionHref ? "playbook" : "handoff",
         confidence: nextReply.confidence,
       });
     } catch {
-      setError("The bot could not process this question right now. Next: retry or open Help center.");
+      setError("No pude procesar la pregunta. Prueba de nuevo o abre el centro de ayuda.");
     } finally {
       setBusy(false);
     }
   };
 
+  const askSuggestion = (text: string) => {
+    setQuestion(text);
+    setReply(answerHelpQuestion(text, pathname));
+  };
+
   return (
-    <section className="my-4 rounded-lg border border-border bg-card p-3 shadow-card">
+    <section className="my-4 rounded-xl border border-border bg-gradient-to-br from-primary/5 to-card p-4 shadow-card">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-medium text-foreground">Help bot v1</p>
+        <div className="flex items-center gap-2">
+          <Sparkles className="size-4 text-primary" aria-hidden />
+          <p className="text-sm font-semibold text-foreground">Asistente NELVYON</p>
+        </div>
         <Button onClick={() => setOpen((v) => !v)} size="sm" type="button" variant="outline">
-          {open ? "Hide" : "Ask"}
+          {open ? "Cerrar" : "Preguntar"}
         </Button>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        Short answers from Help content + current module context. Bot v1 does not execute actions or edit data.
+        Respuestas orientadas a resultados: más clientes, mejores campañas y soporte más rápido. No modifica datos por ti.
       </p>
       {open ? (
         <form className="mt-3 space-y-3" onSubmit={onAsk}>
           <input
-            className="w-full rounded-md border border-input bg-background px-2 py-1 text-sm"
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask a product usage question"
+            placeholder="Ej.: ¿Cómo registro mi primer cliente?"
             value={question}
           />
+          <div className="flex flex-wrap gap-2">
+            {SUGGESTIONS.map((s) => (
+              <button
+                className="rounded-full border border-border bg-muted/50 px-3 py-1 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+                key={s}
+                onClick={() => askSuggestion(s)}
+                type="button"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button disabled={busy} type="submit">
-              {busy ? "Answering…" : "Get answer"}
+              {busy ? "Buscando…" : "Obtener respuesta"}
             </Button>
             <Button
               onClick={() => {
@@ -74,54 +101,70 @@ export function HelpBotPanel() {
               type="button"
               variant="outline"
             >
-              Clear
+              Limpiar
             </Button>
           </div>
         </form>
       ) : null}
 
-      {open && !reply && !busy && !error ? (
-        <div className="mt-3 rounded-md border border-border p-3 text-xs text-muted-foreground">
-          <p>Try: “How do I launch my first campaign?” or “App crashes with 500 on save”.</p>
-        </div>
-      ) : null}
-      {busy ? <p className="mt-3 text-xs text-muted-foreground">Checking Help content and module context…</p> : null}
+      {busy ? <p className="mt-3 text-xs text-muted-foreground">Analizando tu pregunta y el módulo actual…</p> : null}
       {error ? (
         <p className="mt-3 text-xs text-destructive">
           {error}{" "}
           <Link className="text-link underline" href="/help">
-            Open Help
+            Centro de ayuda
           </Link>
         </p>
       ) : null}
 
       {reply ? (
-        <div className="mt-3 space-y-2 rounded-md border border-border p-3">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Confidence: {reply.confidence}</p>
-          <p className="text-sm text-foreground">{reply.answer}</p>
+        <div className="mt-3 space-y-3 rounded-lg border border-border bg-background/80 p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Confianza: {reply.confidence === "high" ? "Alta" : "Media"}
+          </p>
+          <p className="text-sm leading-relaxed text-foreground">{reply.answer}</p>
+          {reply.actionHref && reply.actionLabel ? (
+            <Button asChild size="sm">
+              <Link href={reply.actionHref}>{reply.actionLabel}</Link>
+            </Button>
+          ) : null}
           {reply.article ? (
             <p className="text-xs">
               <Link
                 className="text-link underline"
                 href={`/help/${reply.article.module}`}
-                onClick={() => trackProductEvent("help_article_opened", { module: reply.article?.module, route: `/help/${reply.article?.module}` })}
+                onClick={() =>
+                  trackProductEvent("help_article_opened", {
+                    module: reply.article?.module,
+                    route: `/help/${reply.article?.module}`,
+                  })
+                }
               >
-                Article: {reply.article.title}
+                Guía: {reply.article.title}
               </Link>
               {" · "}
               <Link
                 className="text-link underline"
                 href={reply.article.href}
-                onClick={() => trackProductEvent("help_article_opened", { module: reply.article?.module, route: reply.article?.href })}
+                onClick={() =>
+                  trackProductEvent("help_article_opened", {
+                    module: reply.article?.module,
+                    route: reply.article?.href,
+                  })
+                }
               >
-                Open action
+                Ir a la acción
               </Link>
             </p>
           ) : null}
           {reply.handoffHref ? (
             <p className="text-xs">
               <Link className="text-link underline" href={reply.handoffHref}>
-                Open {reply.handoffKind} form in Help
+                {reply.handoffKind === "bug"
+                  ? "Reportar error"
+                  : reply.handoffKind === "feedback"
+                    ? "Enviar feedback"
+                    : "Pedir ayuda humana"}
               </Link>
             </p>
           ) : null}

@@ -35,10 +35,10 @@ export function useCreateClient() {
       queryClient.invalidateQueries({ queryKey: ["crm", "clients"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding", "progress"] });
       trackProductEvent("crm_client_created", { module: "crm" });
-      toastSuccess("Client created.");
+      toastSuccess("Cliente creado.");
     },
     onError: () => {
-      toastError("Could not create client.");
+      toastError("No se pudo crear el cliente.");
     },
   });
 }

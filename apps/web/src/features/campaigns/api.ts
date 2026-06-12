@@ -6,7 +6,7 @@ import {
   CampaignUpdateInput,
 } from "@/features/campaigns/types";
 
-const BASE = "/api/v1/entities/nelvyon_campaigns";
+const BASE = "/api/platform/campaigns";
 
 export const campaignsApi = {
   list: () => apiClient.get<CampaignListResponse>(BASE, { tenantScoped: true }),

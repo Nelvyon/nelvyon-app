@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/core/auth/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { toastError, toastSuccess } from "@/core/ui/toastFeedback";
@@ -8,9 +9,11 @@ import { campaignsApi } from "@/features/campaigns/api";
 import { CampaignCreateInput, CampaignUpdateInput } from "@/features/campaigns/types";
 
 export function useCampaigns() {
+  const { isAuthenticated, isBootstrapping } = useAuth();
   return useQuery({
     queryKey: ["campaigns", "list"],
     queryFn: campaignsApi.list,
+    enabled: isAuthenticated && !isBootstrapping,
   });
 }
 
@@ -30,10 +33,10 @@ export function useCreateCampaign() {
       queryClient.invalidateQueries({ queryKey: ["campaigns", "list"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding", "progress"] });
       trackProductEvent("campaign_bootstrap_completed", { module: "campaigns" });
-      toastSuccess("Campaign created.");
+      toastSuccess("Campaña creada.");
     },
     onError: () => {
-      toastError("Could not create campaign.");
+      toastError("No se pudo crear la campaña.");
     },
   });
 }

@@ -8,4 +8,6 @@ export interface BotReply {
   article?: HelpArticle;
   handoffKind?: BotHandoffKind;
   handoffHref?: string;
+  actionHref?: string;
+  actionLabel?: string;
 }

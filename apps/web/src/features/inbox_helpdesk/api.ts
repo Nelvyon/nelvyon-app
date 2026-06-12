@@ -6,7 +6,7 @@ import {
   TicketUpdateInput,
 } from "@/features/inbox_helpdesk/types";
 
-const BASE = "/api/v1/entities/helpdesk_tickets";
+const BASE = "/api/platform/inbox/tickets";
 
 export const inboxApi = {
   list: () => apiClient.get<TicketListResponse>(BASE, { tenantScoped: true }),

@@ -14,12 +14,12 @@ export function ClientList({ items, showCreateCta }: { items: Client[]; showCrea
         action={
           showCreateCta ? (
             <Button asChild>
-              <Link href="/crm/clients/new">Add your first client</Link>
+              <Link href="/crm/clients/new">Añadir primer cliente</Link>
             </Button>
           ) : undefined
         }
-        description="NELVYON keeps CRM ready—add accounts so your team can track outreach and delivery in one place."
-        title="No clients in this workspace yet"
+        description="Añade tu primera cuenta para conectar deals, campañas y seguimiento comercial en un solo lugar."
+        title="Aún no hay clientes en este workspace"
       />
     );
   }

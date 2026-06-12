@@ -100,7 +100,9 @@ export function LoginForm() {
             <Heading as="h1" className="text-center text-2xl md:text-3xl lg:text-4xl">
               Bienvenido de nuevo
             </Heading>
-            <Subheading className="mt-2 text-center">Inicia sesión para continuar en NELVYON</Subheading>
+            <Subheading className="mt-2 text-center">
+              Inicia sesión para gestionar clientes, campañas y soporte desde un solo panel.
+            </Subheading>
           </div>
 
           <div className="mt-8 space-y-4">

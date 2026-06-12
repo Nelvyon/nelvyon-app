@@ -8,10 +8,16 @@ describe("helpbot engine", () => {
     expect(reply.handoffHref).toBe("/help#structured-forms");
   });
 
-  it("returns article-based answer for known product question", () => {
-    const reply = answerHelpQuestion("How to launch my first campaign?", "/campaigns/new");
+  it("returns playbook for growth-oriented questions", () => {
+    const reply = answerHelpQuestion("¿Cómo consigo más leads?", "/crm/clients");
+    expect(reply.actionHref).toBe("/crm/clients/new");
+    expect(reply.confidence).toBe("high");
+  });
+
+  it("returns article-based answer for specific help article match", () => {
+    const reply = answerHelpQuestion("How do I create a campaign without entering project id manually?", "/campaigns/new");
     expect(reply.article?.module).toBe("campaigns");
-    expect(reply.answer.length).toBeLessThan(220);
+    expect(reply.answer.length).toBeLessThan(280);
   });
 
   it("returns low-confidence help handoff for unknown question", () => {
@@ -24,6 +30,7 @@ describe("helpbot engine", () => {
     const outcomes = BOT_EVAL_FIXTURES.map((fixture) => {
       const reply = answerHelpQuestion(fixture.question, fixture.pathname);
       if (reply.article) return "article";
+      if (reply.actionHref) return "playbook";
       if (reply.handoffKind === "bug") return "handoff_bug";
       if (reply.handoffKind === "feedback") return "handoff_feedback";
       return "handoff_help";

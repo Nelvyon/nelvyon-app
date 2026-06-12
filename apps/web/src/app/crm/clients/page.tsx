@@ -47,10 +47,7 @@ export default function ClientsListPage() {
         )}
         {query.error && !(query.error instanceof ApiError && query.error.status === 403) && (
           <ErrorNotice>
-            <p>Cause: the clients list request failed before any rows could render.</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Next: confirm network and workspace header, then refresh; sign in again if needed.
-            </p>
+            <p>No pudimos cargar la lista de clientes. Comprueba tu conexión e inténtalo de nuevo.</p>
           </ErrorNotice>
         )}
         {query.data && <ClientList items={query.data.items} showCreateCta={canCreate} />}

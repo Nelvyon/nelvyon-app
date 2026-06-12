@@ -23,45 +23,47 @@ type ActivationRow = {
   description: string;
   href?: string;
   ctaLabel?: string;
-  /** Backend `step_key` when this row syncs to `/api/v1/onboarding/complete-step`. */
   backendStepKey?: string;
-  /** Purely client-side completion (not in server onboarding). */
   localStorageKey?: typeof LOCAL_ACTIVATION_FIRST_TICKET;
 };
 
 export const ACTIVATION_ROWS: ActivationRow[] = [
   {
     id: "ws",
-    title: "Workspace active",
-    description: "Confirms all next module actions are scoped to the right workspace from the first click.",
-    ctaLabel: "Use workspace selector in header",
+    title: "Workspace activo",
+    description: "Confirma que trabajas en el workspace correcto antes de crear clientes o campañas.",
+    ctaLabel: "Selector de workspace en la cabecera",
   },
   {
     id: "tenant",
-    title: "Workspace profile",
-    description: "Makes outputs client-ready (brand/timezone) so demos and deliveries look consistent.",
+    title: "Perfil del workspace",
+    description: "Marca, zona horaria e idioma para que entregables y reportes se vean profesionales.",
     href: "/settings",
+    ctaLabel: "Configurar workspace",
     backendStepKey: "workspace",
   },
   {
     id: "client",
-    title: "First CRM client",
-    description: "Creates a real account anchor so revenue, campaigns, and billing references stay coherent.",
+    title: "Primer cliente en Revenue",
+    description: "Añade una cuenta real para conectar deals, campañas y facturación.",
     href: "/crm/clients/new",
+    ctaLabel: "Crear cliente",
     backendStepKey: "first_contact",
   },
   {
     id: "ticket",
-    title: "First helpdesk ticket",
-    description: "Proves support intake is live in this workspace (activation-only until backend adds a matching step_key).",
+    title: "Primer ticket de soporte",
+    description: "Comprueba que Helpdesk recibe solicitudes de tu equipo o clientes.",
     href: "/inbox/tickets/new",
+    ctaLabel: "Abrir ticket",
     localStorageKey: LOCAL_ACTIVATION_FIRST_TICKET,
   },
   {
     id: "campaign",
-    title: "First campaign",
-    description: "Shows execution flow is operational end-to-end from project bootstrap to campaign record.",
+    title: "Primera campaña",
+    description: "Lanza una campaña piloto para validar el flujo comercial de punta a punta.",
     href: "/campaigns/new",
+    ctaLabel: "Nueva campaña",
     backendStepKey: "first_campaign",
   },
 ];
@@ -75,7 +77,7 @@ function readLocalDone(key: string): boolean {
   }
 }
 
-function setLocalDone(key: string, done: boolean) {
+export function setActivationLocalDone(key: string, done = true) {
   try {
     if (done) localStorage.setItem(key, "1");
     else localStorage.removeItem(key);
@@ -121,6 +123,7 @@ export function ActivationChecklist() {
   };
 
   const doneCount = ACTIVATION_ROWS.filter((r) => isRowDone(r)).length;
+  const allDone = doneCount === ACTIVATION_ROWS.length;
 
   const onMarkServer = async (key: string) => {
     await completeMutation.mutateAsync({ stepKey: key });
@@ -128,62 +131,60 @@ export function ActivationChecklist() {
   };
 
   const onMarkTicketLocal = () => {
-    setLocalDone(LOCAL_ACTIVATION_FIRST_TICKET, true);
+    setActivationLocalDone(LOCAL_ACTIVATION_FIRST_TICKET, true);
     trackProductEvent("onboarding_step_completed", { step_key: "first_ticket_local", module: "onboarding" });
     void queryClient.invalidateQueries({ queryKey: [...ACTIVATION_LOCAL_QUERY_KEY] });
   };
 
   return (
-    <section aria-label="Activation checklist" className="rounded-lg border border-border bg-card p-4 shadow-card">
-      <SectionTitle>Activation checklist</SectionTitle>
-      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-        Up to five actionable steps. Rows with a server badge call{" "}
-        <code className="rounded bg-muted px-1">POST /api/v1/onboarding/complete-step</code> when you mark them done
-        (operator/admin in workspace). The ticket row is <strong>client-only</strong> until the backend exposes a
-        matching <code className="rounded bg-muted px-1">step_key</code>.
+    <section aria-label="Checklist de activación" className="rounded-xl border border-border bg-card p-5 shadow-card">
+      <SectionTitle>Tus primeros 5 minutos</SectionTitle>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {allDone
+          ? "¡Workspace listo! Explora los módulos o lanza una automatización rápida abajo."
+          : "Completa estos pasos para dejar NELVYON operativo. Cada uno te acerca a leads, campañas y soporte real."}
       </p>
-      <p className="mt-2 text-xs font-medium text-foreground">
-        Progress: {doneCount}/{ACTIVATION_ROWS.length}
-      </p>
-      {progress.isLoading ? (
-        <p className="mt-1 text-xs text-muted-foreground">Loading activation progress for current workspace…</p>
-      ) : null}
-      {progress.isFetching && progress.data ? (
-        <p className="mt-1 text-xs text-muted-foreground">Refreshing activation progress from workspace data…</p>
-      ) : null}
-      <div className="pt-1">
-        <HelpContextLink href="/help" label="Need setup help? Open Help center" />
+      <div className="mt-3 flex items-center gap-3">
+        <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-500"
+            style={{ width: `${(doneCount / ACTIVATION_ROWS.length) * 100}%` }}
+          />
+        </div>
+        <span className="text-sm font-medium tabular-nums text-foreground">
+          {doneCount}/{ACTIVATION_ROWS.length}
+        </span>
       </div>
-      <ul className="mt-3 divide-y divide-border rounded-md border border-border">
+      {progress.isLoading ? (
+        <p className="mt-2 text-xs text-muted-foreground">Cargando progreso del workspace…</p>
+      ) : null}
+      <div className="pt-2">
+        <HelpContextLink href="/help" label="¿Necesitas ayuda? Centro de ayuda" />
+      </div>
+      <ul className="mt-4 divide-y divide-border rounded-lg border border-border">
         {ACTIVATION_ROWS.map((row) => {
           const done = isRowDone(row);
           return (
-            <li className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between" key={row.id}>
+            <li className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between" key={row.id}>
               <div className="min-w-0">
                 <p className="font-medium text-foreground">
-                  {row.title}{" "}
-                  {row.backendStepKey ? (
-                    <span className="ml-1 rounded bg-muted px-1 text-[10px] font-normal text-muted-foreground">
-                      server:{row.backendStepKey}
-                    </span>
-                  ) : row.localStorageKey ? (
-                    <span className="ml-1 rounded bg-warning/15 px-1 text-[10px] font-normal text-warning-foreground">
-                      client-only
-                    </span>
-                  ) : null}
+                  {done ? "✓ " : ""}
+                  {row.title}
                 </p>
-                <p className="text-xs text-muted-foreground">{row.description}</p>
-                {row.href ? (
-                  <Link className="mt-1 inline-block text-sm text-link underline" href={row.href}>
-                    {row.ctaLabel ?? "Open →"}
+                <p className="text-sm text-muted-foreground">{row.description}</p>
+                {row.href && !done ? (
+                  <Link className="mt-1 inline-block text-sm font-medium text-link underline-offset-2 hover:underline" href={row.href}>
+                    {row.ctaLabel ?? "Abrir →"}
                   </Link>
-                ) : (
-                  <p className="mt-1 text-xs text-muted-foreground">{row.ctaLabel ?? "No direct route for this step."}</p>
-                )}
+                ) : row.ctaLabel && !row.href ? (
+                  <p className="mt-1 text-xs text-muted-foreground">{row.ctaLabel}</p>
+                ) : null}
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
                 {done ? (
-                  <span className="text-xs font-medium text-success">Done</span>
+                  <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success-foreground">
+                    Hecho
+                  </span>
                 ) : row.backendStepKey ? (
                   <>
                     <Button
@@ -193,48 +194,26 @@ export function ActivationChecklist() {
                       type="button"
                       variant="secondary"
                     >
-                      Mark done (server)
+                      Marcar hecho
                     </Button>
-                    {!canMarkServer ? <span className="text-xs text-warning-foreground">Requires operator/admin.</span> : null}
+                    {!canMarkServer ? (
+                      <span className="text-xs text-muted-foreground">Requiere rol admin u operator.</span>
+                    ) : null}
                   </>
                 ) : row.localStorageKey ? (
                   <Button onClick={onMarkTicketLocal} size="sm" type="button" variant="secondary">
-                    Mark done (this browser)
+                    Marcar hecho
                   </Button>
-                ) : (
-                  <span className="text-xs text-muted-foreground">Complete in header</span>
-                )}
+                ) : null}
               </div>
             </li>
           );
         })}
       </ul>
-      {progress.error ? (
-        progress.error instanceof ApiError && progress.error.status === 403 ? (
-          <p className="mt-2 text-xs text-destructive">
-            Activation progress is blocked for this role/workspace. Next: switch workspace or ask an admin for settings
-            edit scope.
-          </p>
-        ) : (
-          <p className="mt-2 text-xs text-destructive">
-            Could not load onboarding progress due to request/network failure. Next: refresh and confirm active session +
-            workspace header.
-          </p>
-        )
-      ) : null}
-      {completeMutation.isSuccess ? (
-        <p className="mt-2 text-xs text-success-foreground">Step saved and activation progress synced.</p>
-      ) : null}
-      {completeMutation.error ? (
-        completeMutation.error instanceof ApiError && completeMutation.error.status === 403 ? (
-          <p className="mt-2 text-xs text-destructive">
-            Save blocked by role/workspace policy. Requires operator/admin scope for server-backed checklist updates.
-          </p>
-        ) : (
-          <p className="mt-2 text-xs text-destructive">
-            Could not save checklist step. Next: retry once; if it persists, refresh and submit again.
-          </p>
-        )
+      {progress.error && !(progress.error instanceof ApiError && progress.error.status === 403) ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          No pudimos sincronizar el progreso con el servidor. Puedes seguir con los enlaces de arriba.
+        </p>
       ) : null}
     </section>
   );
