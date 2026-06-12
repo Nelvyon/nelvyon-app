@@ -15,14 +15,8 @@ const next = require("next");
 // Docker sets HOSTNAME to the container hostname; must not affect listen address.
 delete process.env.HOSTNAME;
 
-// Dockerfile ENV PORT=3000; Railway injects PORT at runtime (often 8080). Healthcheck uses :3000.
-let port = Number.parseInt(process.env.PORT || "3000", 10);
-if (port === 8080) {
-  console.warn(
-    "[nelvyon] PORT=8080 from Railway does not match service/healthcheck port 3000 — binding to 3000",
-  );
-  port = 3000;
-}
+// Railway injects PORT at runtime (often 8080); Docker may set PORT=3000.
+let port = Number(process.env.PORT || 8080);
 const hostname = "0.0.0.0";
 
 if (!Number.isFinite(port) || port <= 0) {
@@ -64,7 +58,7 @@ app
 
     server.listen(port, hostname, () => {
       console.log(
-        `[nelvyon] Ready on http://${hostname}:${port} (PORT env=${process.env.PORT ?? "(unset)"}, NODE_ENV=${process.env.NODE_ENV})`,
+        `[nelvyon] Ready on http://${hostname}:${port} (PORT env=${process.env.PORT}, NODE_ENV=${process.env.NODE_ENV})`,
       );
     });
   })
