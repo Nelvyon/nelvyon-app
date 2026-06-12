@@ -10,9 +10,10 @@ export function platformApiBase(): string {
 }
 
 export function stableWorkspaceIdFromTenant(tenantId: string): number {
+  const src = (tenantId ?? "").trim() || "default-tenant";
   let hash = 0;
-  for (let i = 0; i < tenantId.length; i += 1) {
-    hash = (hash * 31 + tenantId.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < src.length; i += 1) {
+    hash = (hash * 31 + src.charCodeAt(i)) >>> 0;
   }
   return (hash % 900_000) + 1_000;
 }

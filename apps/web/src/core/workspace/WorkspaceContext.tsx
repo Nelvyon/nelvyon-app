@@ -15,7 +15,7 @@ interface WorkspaceContextValue {
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, accessToken } = useAuth();
   const [workspaceId, setWorkspaceIdState] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, accessToken]);
 
   const value = useMemo<WorkspaceContextValue>(
     () => ({
