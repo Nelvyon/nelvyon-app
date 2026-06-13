@@ -3,66 +3,53 @@
 import React from "react";
 
 import { getBrandMode } from "@/core/platform/brand";
+import { PanelCard } from "@/core/ui/PanelCard";
 import { Campaign } from "@/features/campaigns/types";
 
 export function CampaignDetailCard({ campaign }: { campaign: Campaign }) {
   const isClientMode = getBrandMode() === "client";
+  const title = campaign.name?.trim() || `${isClientMode ? "Proyecto" : "Campaña"} #${campaign.id}`;
+
   return (
-    <section className="space-y-2 rounded border p-4">
-      <h2 className="text-lg font-semibold">{campaign.name?.trim() || `${isClientMode ? "Project" : "Campaign"} #${campaign.id}`}</h2>
-      <dl className="grid gap-2 text-sm sm:grid-cols-2">
-        <div>
-          <dt className="text-muted-foreground">Status</dt>
-          <dd>{campaign.status ?? "—"}</dd>
+    <PanelCard accent="from-primary/5 via-card to-card">
+      <div className="space-y-1">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {isClientMode ? "Proyecto" : "Campaña"}
+        </p>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h2>
+      </div>
+      <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-lg border border-border/80 bg-background/60 px-4 py-3">
+          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estado</dt>
+          <dd className="mt-1 text-sm font-medium capitalize text-foreground">{campaign.status ?? "—"}</dd>
         </div>
-        <div>
-          <dt className="text-muted-foreground">QA score</dt>
-          <dd>{campaign.qa_score ?? "—"}</dd>
+        <div className="rounded-lg border border-border/80 bg-background/60 px-4 py-3">
+          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Canal</dt>
+          <dd className="mt-1 text-sm font-medium capitalize text-foreground">{campaign.platform}</dd>
         </div>
-        <div>
-          <dt className="text-muted-foreground">Platform</dt>
-          <dd>{campaign.platform}</dd>
+        <div className="rounded-lg border border-border/80 bg-background/60 px-4 py-3">
+          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Objetivo</dt>
+          <dd className="mt-1 text-sm font-medium capitalize text-foreground">{campaign.campaign_type}</dd>
         </div>
-        <div>
-          <dt className="text-muted-foreground">Type</dt>
-          <dd>{campaign.campaign_type}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Project</dt>
-          <dd>{campaign.project_id}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Client</dt>
-          <dd>{campaign.client_id ?? "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Variants</dt>
-          <dd>{campaign.variants_count ?? "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Budget (suggested)</dt>
-          <dd>{campaign.budget_suggested ?? "—"}</dd>
+        <div className="rounded-lg border border-border/80 bg-background/60 px-4 py-3">
+          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Cliente</dt>
+          <dd className="mt-1 text-sm font-medium text-foreground">{campaign.client_id ?? "—"}</dd>
         </div>
       </dl>
-      {campaign.target_audience && (
-        <div className="text-sm">
-          <p className="text-muted-foreground">Audience</p>
-          <p>{campaign.target_audience}</p>
+      {campaign.target_audience ? (
+        <div className="mt-4 rounded-lg border border-border/80 bg-background/60 px-4 py-3 text-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Audiencia</p>
+          <p className="mt-1 text-foreground">{campaign.target_audience}</p>
         </div>
-      )}
-      {campaign.content && (
-        <div className="text-sm">
-          <p className="text-muted-foreground">Content</p>
-          <pre className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-muted p-2 text-xs">
+      ) : null}
+      {campaign.content ? (
+        <div className="mt-4 rounded-lg border border-border/80 bg-background/60 px-4 py-3 text-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Contenido</p>
+          <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap text-xs text-foreground">
             {campaign.content}
           </pre>
         </div>
-      )}
-      <p className="text-xs text-muted-foreground">
-        {isClientMode
-          ? "Account-scoped view: only projects shared with your portal access appear here."
-          : "Execution view is limited to stored status and metrics on this record (no separate runner UI yet)."}
-      </p>
-    </section>
+      ) : null}
+    </PanelCard>
   );
 }

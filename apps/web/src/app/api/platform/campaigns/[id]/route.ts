@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { authenticatePlatformRequest, readJsonBody } from "@/lib/platformBffRoute";
+import type { JwtPayload } from "@nelvyon/auth";
 import {
   dbGetCampaign,
   dbResolveWorkspaceId,
@@ -13,6 +14,23 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const entityPath = (id: string) => `/api/v1/entities/nelvyon_campaigns/${id}`;
+
+async function getCampaignViaDb(
+  req: Request,
+  claims: JwtPayload,
+  campaignId: number,
+): Promise<NextResponse | null> {
+  if (!platformDbFallbackEnabled()) return null;
+  try {
+    const workspaceId = await dbResolveWorkspaceId(req, claims);
+    if (workspaceId <= 0 || !Number.isFinite(campaignId)) return null;
+    const row = await dbGetCampaign(campaignId, workspaceId, claims.userId);
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(row);
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
@@ -27,45 +45,47 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   }
   if (claims instanceof NextResponse) return claims;
 
-  const upstream = await proxyPlatformFetch(req, "GET", entityPath(id));
-  const text = await upstream.text();
-
-  if (upstream.ok) {
-    return NextResponse.json(text ? JSON.parse(text) : {});
-  }
-
-  if (upstream.status === 401) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  if (upstream.status === 403) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-  if (upstream.status === 404) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
-  if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
-    try {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      const campaignId = Number(id);
-      if (workspaceId > 0 && Number.isFinite(campaignId)) {
-        const row = await dbGetCampaign(campaignId, workspaceId, claims.userId);
-        if (row) {
-          return NextResponse.json(row);
-        }
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
-      }
-    } catch {
-      /* fall through */
-    }
-  }
+  const campaignId = Number(id);
 
   try {
-    return NextResponse.json(JSON.parse(text), { status: upstream.status });
+    const upstream = await proxyPlatformFetch(req, "GET", entityPath(id));
+    const text = await upstream.text();
+
+    if (upstream.ok) {
+      return NextResponse.json(text ? JSON.parse(text) : {});
+    }
+
+    if (upstream.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (upstream.status === 404) {
+      const dbRes = await getCampaignViaDb(req, claims, campaignId);
+      if (dbRes) return dbRes;
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    if (upstreamFailed(upstream.status)) {
+      const dbRes = await getCampaignViaDb(req, claims, campaignId);
+      if (dbRes) return dbRes;
+    }
+
+    try {
+      return NextResponse.json(JSON.parse(text), { status: upstream.status });
+    } catch {
+      return NextResponse.json(
+        { error: "Servicio temporalmente no disponible. Inténtalo de nuevo en unos minutos." },
+        { status: upstream.status >= 500 ? 503 : upstream.status },
+      );
+    }
   } catch {
+    const dbRes = await getCampaignViaDb(req, claims, campaignId);
+    if (dbRes) return dbRes;
     return NextResponse.json(
       { error: "Servicio temporalmente no disponible. Inténtalo de nuevo en unos minutos." },
-      { status: upstream.status >= 500 ? 503 : upstream.status },
+      { status: 503 },
     );
   }
 }

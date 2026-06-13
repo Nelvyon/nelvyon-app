@@ -18,40 +18,50 @@ async function probe() {
   const health = await fetch(`${base}/api/health/live`, { cache: "no-store" });
   const token = await loginToken();
   const headers = token
-    ? { Authorization: `Bearer ${token}`, Accept: "application/json" }
+    ? {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      }
     : {};
   const wsRes = await fetch(`${base}/api/platform/workspaces/list`, { headers, cache: "no-store" });
   let workspaceOk = false;
+  let workspaceId = null;
   if (wsRes.ok) {
     try {
       const rows = await wsRes.json();
       workspaceOk = Array.isArray(rows) && rows.length > 0;
+      workspaceId = rows?.[0]?.id ?? null;
     } catch {
       workspaceOk = false;
     }
   }
-  const routes = ["crm/clients", "campaigns"];
-  const statuses = {};
-  for (const r of routes) {
-    try {
-      const res = await fetch(`${base}/api/platform/${r}`, { headers, cache: "no-store" });
-      statuses[r] = res.status;
-    } catch {
-      statuses[r] = 0;
-    }
+  let clientPostOk = false;
+  if (workspaceId) {
+    const post = await fetch(`${base}/api/platform/crm/clients`, {
+      method: "POST",
+      headers: { ...headers, "X-Workspace-Id": String(workspaceId) },
+      body: JSON.stringify({
+        business_name: `Deploy probe ${Date.now()}`,
+        sector: "Tech",
+      }),
+    });
+    clientPostOk = post.status === 201;
   }
-  return { health: health.status, workspace: wsRes.status, workspaceOk, statuses, ts: new Date().toISOString() };
+  return {
+    health: health.status,
+    workspace: wsRes.status,
+    workspaceOk,
+    clientPostOk,
+    ts: new Date().toISOString(),
+  };
 }
 
 for (let i = 0; i < 45; i += 1) {
   const r = await probe();
   console.log(JSON.stringify({ attempt: i + 1, ...r }));
-  const bffReady =
-    r.health === 200 &&
-    r.workspaceOk &&
-    r.statuses["crm/clients"] === 200 &&
-    r.statuses.campaigns === 200;
-  if (bffReady) {
+  const ready = r.health === 200 && r.workspaceOk && r.clientPostOk;
+  if (ready) {
     console.log("DEPLOY_READY");
     process.exit(0);
   }

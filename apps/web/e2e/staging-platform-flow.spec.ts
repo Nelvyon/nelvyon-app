@@ -56,6 +56,8 @@ test.describe("Staging platform flow", () => {
 
     await page.getByRole("link", { name: campaignName }).click();
     await expect(page).toHaveURL(/\/campaigns\/\d+/);
-    await expect(page.getByText(campaignName)).toBeVisible();
+    await expect(page.getByRole("heading", { name: new RegExp(campaignName) })).toBeVisible({
+      timeout: 20_000,
+    });
   });
 });

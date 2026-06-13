@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
+import type { JwtPayload } from "@nelvyon/auth";
 import {
   dbGetClient,
   dbResolveWorkspaceId,
@@ -13,6 +14,23 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const entityPath = (id: string) => `/api/v1/entities/nelvyon_clients/${id}`;
+
+async function getClientViaDb(
+  req: Request,
+  claims: JwtPayload,
+  clientId: number,
+): Promise<NextResponse | null> {
+  if (!platformDbFallbackEnabled()) return null;
+  try {
+    const workspaceId = await dbResolveWorkspaceId(req, claims);
+    if (workspaceId <= 0 || !Number.isFinite(clientId)) return null;
+    const row = await dbGetClient(clientId, workspaceId, claims.userId);
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(row);
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
@@ -27,32 +45,30 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   }
   if (claims instanceof NextResponse) return claims;
 
-  const upstream = await proxyPlatformFetch(req, "GET", entityPath(id));
-  const text = await upstream.text();
-
-  if (upstream.ok) {
-    return NextResponse.json(text ? JSON.parse(text) : {});
-  }
-
-  if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
-    try {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      const clientId = Number(id);
-      if (workspaceId > 0 && Number.isFinite(clientId)) {
-        const row = await dbGetClient(clientId, workspaceId, claims.userId);
-        if (row) {
-          return NextResponse.json(row);
-        }
-      }
-    } catch {
-      /* fall through */
-    }
-  }
+  const clientId = Number(id);
 
   try {
-    return NextResponse.json(JSON.parse(text), { status: upstream.status });
+    const upstream = await proxyPlatformFetch(req, "GET", entityPath(id));
+    const text = await upstream.text();
+
+    if (upstream.ok) {
+      return NextResponse.json(text ? JSON.parse(text) : {});
+    }
+
+    if (upstreamFailed(upstream.status)) {
+      const dbRes = await getClientViaDb(req, claims, clientId);
+      if (dbRes) return dbRes;
+    }
+
+    try {
+      return NextResponse.json(JSON.parse(text), { status: upstream.status });
+    } catch {
+      return NextResponse.json({ error: "Not found" }, { status: upstream.status });
+    }
   } catch {
-    return NextResponse.json({ error: "Not found" }, { status: upstream.status });
+    const dbRes = await getClientViaDb(req, claims, clientId);
+    if (dbRes) return dbRes;
+    return NextResponse.json({ error: "Not found" }, { status: 503 });
   }
 }
 
