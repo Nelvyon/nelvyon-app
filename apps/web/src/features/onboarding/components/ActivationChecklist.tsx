@@ -155,9 +155,6 @@ export function ActivationChecklist() {
           {doneCount}/{ACTIVATION_ROWS.length}
         </span>
       </div>
-      {progress.isLoading ? (
-        <p className="mt-2 text-xs text-muted-foreground">Cargando progreso del workspace…</p>
-      ) : null}
       <div className="pt-2">
         <HelpContextLink href="/help" label="¿Necesitas ayuda? Centro de ayuda" />
       </div>

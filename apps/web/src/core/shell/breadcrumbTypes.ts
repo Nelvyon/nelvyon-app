@@ -36,30 +36,35 @@ export function getBreadcrumbs(pathname: string, mode: BrandMode = getBrandMode(
     }
   }
 
+  if (path === "/dashboard") {
+    items.push({ key: "home", label: "Inicio" });
+    return items;
+  }
+
   if (path.startsWith("/crm")) {
     items.push({ key: "revenue", label: "Revenue", href: "/crm/clients" });
     if (path === "/crm/deals") {
-      items.push({ key: "deals", label: "Deals" });
+      items.push({ key: "deals", label: "Pipeline comercial" });
       return items;
     }
     const dm = path.match(/^\/crm\/deals\/(\d+)$/);
     if (dm) {
-      items.push({ key: "deals", label: "Deals", href: "/crm/deals" });
+      items.push({ key: "deals", label: "Pipeline comercial", href: "/crm/deals" });
       items.push({ key: "deal-detail", label: `Deal #${dm[1]}` });
       return items;
     }
     if (path === "/crm/clients") {
-      items.push({ key: "clients", label: "Clients" });
+      items.push({ key: "clients", label: "Clientes" });
       return items;
     }
-    items.push({ key: "clients", label: "Clients", href: "/crm/clients" });
+    items.push({ key: "clients", label: "Clientes", href: "/crm/clients" });
     if (path === "/crm/clients/new") {
-      items.push({ key: "new", label: "New" });
+      items.push({ key: "new", label: "Nuevo" });
       return items;
     }
     const m = path.match(/^\/crm\/clients\/(\d+)$/);
     if (m) {
-      items.push({ key: "detail", label: `Client #${m[1]}` });
+      items.push({ key: "detail", label: `Cliente #${m[1]}` });
     }
     return items;
   }
@@ -83,15 +88,15 @@ export function getBreadcrumbs(pathname: string, mode: BrandMode = getBrandMode(
   }
 
   if (path.startsWith("/campaigns")) {
-    items.push({ key: "campaigns", label: "Campaigns", href: "/campaigns" });
+    items.push({ key: "campaigns", label: "Campañas", href: "/campaigns" });
     if (path === "/campaigns") return items;
     if (path === "/campaigns/new") {
-      items.push({ key: "new", label: "New" });
+      items.push({ key: "new", label: "Nueva" });
       return items;
     }
     const m = path.match(/^\/campaigns\/(\d+)$/);
     if (m) {
-      items.push({ key: "detail", label: `Campaign #${m[1]}` });
+      items.push({ key: "detail", label: `Campaña #${m[1]}` });
     }
     return items;
   }
