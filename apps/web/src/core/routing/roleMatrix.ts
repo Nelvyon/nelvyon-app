@@ -18,9 +18,9 @@ type ModulePolicy = Record<Capability, UserRole>;
 type RoleMatrix = Record<ModuleKey, ModulePolicy>;
 
 export const ROLE_MATRIX: RoleMatrix = {
-  crm: { view: "member", create: "operator", edit: "operator", delete: "admin" },
-  inbox: { view: "member", create: "operator", edit: "operator", delete: "admin" },
-  campaigns: { view: "member", create: "operator", edit: "operator", delete: "admin" },
+  crm: { view: "member", create: "member", edit: "operator", delete: "admin" },
+  inbox: { view: "member", create: "member", edit: "operator", delete: "admin" },
+  campaigns: { view: "member", create: "member", edit: "operator", delete: "admin" },
   automations: { view: "member", create: "operator", edit: "operator", delete: "admin" },
   os: { view: "member", create: "operator", edit: "operator", delete: "admin" },
   /** Operator can read billing; only admin can act (upgrade / checkout flows). */

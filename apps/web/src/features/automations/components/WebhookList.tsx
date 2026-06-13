@@ -10,8 +10,8 @@ export function WebhookList({ items }: { items: AutomationWebhook[] }) {
   if (items.length === 0) {
     return (
       <EmptyState
-        description="Webhooks let external systems trigger NELVYON automations securely. When your workspace has hooks configured, they will list here with keys and activity."
-        title="No webhooks yet"
+        description="Los webhooks permiten que sistemas externos disparen automatizaciones de NELVYON. Cuando los configures, aparecerán aquí con sus claves y actividad."
+        title="Aún no hay webhooks"
       />
     );
   }

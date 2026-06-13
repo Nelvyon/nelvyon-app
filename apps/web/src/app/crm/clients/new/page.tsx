@@ -28,12 +28,12 @@ export default function CreateClientPage() {
       <div className="space-y-5">
         {mutation.error instanceof ApiError && mutation.error.status === 403 && (
           <ForbiddenNotice>
-            <p>Your role cannot create clients in this NELVYON workspace. Ask an operator or admin.</p>
+            <p>Tu rol no puede crear clientes en este workspace. Pide ayuda a un administrador.</p>
           </ForbiddenNotice>
         )}
         {mutation.error && !(mutation.error instanceof ApiError && mutation.error.status === 403) && (
           <ErrorNotice>
-            <p>We could not create the client. Check required fields and try again.</p>
+            <p>No pudimos crear el cliente. Revisa los campos obligatorios e inténtalo de nuevo.</p>
           </ErrorNotice>
         )}
         <ClientForm canSubmit={canCreate} isSubmitting={mutation.isPending} onSubmit={onSubmit} />

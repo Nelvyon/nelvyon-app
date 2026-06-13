@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
 
 import { EMPTY_CLIENT_LIST, proxyPlatformFetch } from "@/lib/platformFastApiProxy";
+import { authenticatePlatformRequest, forwardPlatformJson, readJsonBody } from "@/lib/platformBffRoute";
 import { authenticate } from "@nelvyon/auth";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-/** Same-origin CRM clients list — avoids browser CORS to FastAPI; empty list if upstream fails. */
+const UPSTREAM = "/api/v1/entities/nelvyon_clients";
+
+/** Same-origin CRM clients — avoids browser CORS to FastAPI. */
 export async function GET(req: Request) {
   try {
     await authenticate(req);
-    const upstream = await proxyPlatformFetch(req, "GET", "/api/v1/entities/nelvyon_clients");
+    const upstream = await proxyPlatformFetch(req, "GET", UPSTREAM);
 
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
@@ -31,4 +34,14 @@ export async function GET(req: Request) {
     }
     return NextResponse.json(EMPTY_CLIENT_LIST);
   }
+}
+
+export async function POST(req: Request) {
+  const authError = await authenticatePlatformRequest(req);
+  if (authError) return authError;
+  const body = await readJsonBody(req);
+  return forwardPlatformJson(req, "POST", UPSTREAM, {
+    body: JSON.stringify(body),
+    headers: { "Content-Type": "application/json" },
+  });
 }

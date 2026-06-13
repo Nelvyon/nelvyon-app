@@ -51,7 +51,7 @@ export function useUpdateCampaign(id: number) {
       toastSuccess("Campaign updated.");
     },
     onError: () => {
-      toastError("Could not save campaign.");
+      toastError("No se pudo guardar la campaña.");
     },
   });
 }

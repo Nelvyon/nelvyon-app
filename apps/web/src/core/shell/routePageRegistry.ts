@@ -128,32 +128,32 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
 
   if (path === "/crm/clients") {
     return {
-      documentTitle: "Clients · Revenue · NELVYON",
-      heading: "Clients",
-      description: "Revenue accounts for this workspace — link to each client’s deals and pipeline from the list or detail.",
+      documentTitle: "Clientes · Revenue · NELVYON",
+      heading: "Clientes",
+      description: "Cuentas de revenue de este workspace: enlaza deals y pipeline desde la lista o el detalle.",
     };
   }
   if (path === "/crm/clients/new") {
     return {
-      documentTitle: "New client · Revenue · NELVYON",
-      heading: "New client",
-      description: "Create a Revenue client profile your team can attach to deals and delivery workflows.",
+      documentTitle: "Nuevo cliente · Revenue · NELVYON",
+      heading: "Nuevo cliente",
+      description: "Crea un perfil de cliente para conectar deals, campañas y entregables.",
     };
   }
   const clientDetail = path.match(/^\/crm\/clients\/(\d+)$/);
   if (clientDetail) {
     const id = clientDetail[1];
     return {
-      documentTitle: `Client #${id} · Revenue · NELVYON`,
-      heading: `Client #${id}`,
-      description: "Review the account, jump to this client’s deals, and update fields your role allows.",
+      documentTitle: `Cliente #${id} · Revenue · NELVYON`,
+      heading: `Cliente #${id}`,
+      description: "Revisa la cuenta, accede a sus deals y actualiza los campos permitidos por tu rol.",
     };
   }
   if (path === "/crm/deals") {
     return {
       documentTitle: "Deals · Revenue · NELVYON",
-      heading: "Deals",
-      description: "Revenue pipeline: stages, owners, client links, follow-ups, and workspace conversion signals.",
+      heading: "Pipeline comercial",
+      description: "Etapas, responsables, clientes vinculados y seguimiento comercial del workspace.",
     };
   }
   const dealDetail = path.match(/^\/crm\/deals\/(\d+)$/);
@@ -168,16 +168,16 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
 
   if (path === "/inbox/tickets") {
     return {
-      documentTitle: "Tickets · Inbox · NELVYON",
-      heading: "Helpdesk tickets",
-      description: "Workspace conversations and requests in one queue.",
+      documentTitle: "Tickets · Helpdesk · NELVYON",
+      heading: "Tickets de soporte",
+      description: "Cola unificada de solicitudes y conversaciones del workspace.",
     };
   }
   if (path === "/inbox/tickets/new") {
     return {
-      documentTitle: "New ticket · Inbox · NELVYON",
-      heading: "New ticket",
-      description: "Capture a new request for your operators to triage.",
+      documentTitle: "Nuevo ticket · Helpdesk · NELVYON",
+      heading: "Nuevo ticket",
+      description: "Registra una solicitud para que tu equipo la gestione.",
     };
   }
   const ticketDetail = path.match(/^\/inbox\/tickets\/(\d+)$/);
@@ -192,16 +192,16 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
 
   if (path === "/campaigns") {
     return {
-      documentTitle: "Campaigns · NELVYON",
-      heading: "Campaigns",
-      description: "Workspace campaigns with delivery context and lifecycle status.",
+      documentTitle: "Campañas · NELVYON",
+      heading: "Campañas",
+      description: "Campañas del workspace con contexto de entrega y estado del ciclo de vida.",
     };
   }
   if (path === "/campaigns/new") {
     return {
-      documentTitle: "New campaign · NELVYON",
-      heading: "New campaign",
-      description: "Start a campaign tied to a project and optional client context.",
+      documentTitle: "Nueva campaña · NELVYON",
+      heading: "Nueva campaña",
+      description: "Inicia una campaña vinculada a un proyecto y, opcionalmente, a un cliente.",
     };
   }
   const campaignDetail = path.match(/^\/campaigns\/(\d+)$/);
@@ -216,9 +216,9 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
 
   if (path === "/automations/jobs") {
     return {
-      documentTitle: "Automation jobs · NELVYON",
-      heading: "Automation jobs",
-      description: "Background work generated for this workspace.",
+      documentTitle: "Jobs de automatización · NELVYON",
+      heading: "Jobs de automatización",
+      description: "Trabajos en segundo plano generados para este workspace.",
     };
   }
   const jobDetail = path.match(/^\/automations\/jobs\/(\d+)$/);

@@ -50,10 +50,10 @@ export function useUpdateClient(id: number) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["crm", "clients"] });
       await queryClient.refetchQueries({ queryKey: ["crm", "clients", id] });
-      toastSuccess("Client updated.");
+      toastSuccess("Cliente actualizado.");
     },
     onError: () => {
-      toastError("Could not save client.");
+      toastError("No se pudo guardar el cliente.");
     },
   });
 }

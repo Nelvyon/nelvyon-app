@@ -58,7 +58,7 @@ export function useUpdateTicketStatus(id: number) {
       toastSuccess("Ticket status updated.");
     },
     onError: () => {
-      toastError("Could not update ticket status.");
+      toastError("No se pudo actualizar el ticket.");
     },
   });
 }

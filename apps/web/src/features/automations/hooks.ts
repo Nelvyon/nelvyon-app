@@ -50,7 +50,7 @@ export function useRetryAutomationJob(jobId: number) {
       toastSuccess("Retry requested.");
     },
     onError: () => {
-      toastError("Could not retry job.");
+      toastError("No se pudo reintentar el job.");
     },
   });
 }

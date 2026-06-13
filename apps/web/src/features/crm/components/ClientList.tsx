@@ -34,7 +34,7 @@ export function ClientList({ items, showCreateCta }: { items: Client[]; showCrea
           <p className="text-xs text-muted-foreground">{client.sector}</p>
           <p className="mt-1 text-xs">
             <Link className="text-link underline-offset-2 hover:underline" href={`/crm/deals?client_id=${client.id}`}>
-              Deals and pipeline for this client →
+              Deals y pipeline de este cliente →
             </Link>
           </p>
         </li>

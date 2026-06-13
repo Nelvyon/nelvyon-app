@@ -12,14 +12,14 @@ export function JobList({ items }: { items: AutomationJob[] }) {
       <EmptyState
         description={
           <>
-            Jobs appear when NELVYON runs automations (manual runs, retries, or webhooks). Open{" "}
+            Los jobs aparecen cuando NELVYON ejecuta automatizaciones (manual, reintentos o webhooks). Abre{" "}
             <Link className="text-link hover:text-link-hover hover:underline" href="/os">
-              Operations
+              Operaciones
             </Link>{" "}
-            for a workspace pulse, or start work from CRM and delivery flows.
+            para ver el pulso del workspace, o inicia flujos desde Revenue y entregas.
           </>
         }
-        title="No automation jobs yet"
+        title="Aún no hay jobs de automatización"
       />
     );
   }

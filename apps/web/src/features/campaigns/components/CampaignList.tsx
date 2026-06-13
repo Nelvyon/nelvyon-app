@@ -16,18 +16,18 @@ export function CampaignList({ items, showCreateCta }: { items: Campaign[]; show
         action={
           showCreateCta ? (
             <Button asChild>
-              <Link href="/campaigns/new">Create a campaign</Link>
+              <Link href="/campaigns/new">Crear campaña</Link>
             </Button>
           ) : undefined
         }
         description={
           isClientMode
-            ? "No projects are currently published to your portal."
+            ? "Aún no hay proyectos publicados en tu portal."
             : showCreateCta
-              ? "Launch your first campaign to align creative, delivery, and status in this workspace."
-              : "No campaigns are visible yet. Why: your role can view this list but cannot create campaigns. Next: ask an admin/operator to create the first campaign."
+              ? "Lanza tu primera campaña para alinear creatividad, entrega y estado en un solo lugar."
+              : "Aún no hay campañas visibles. Tu rol puede ver la lista pero no crearlas: pide a un admin que cree la primera."
         }
-        title={isClientMode ? "No projects yet" : "No campaigns yet"}
+        title={isClientMode ? "Sin proyectos aún" : "Aún no hay campañas"}
       />
     );
   }

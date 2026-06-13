@@ -27,7 +27,7 @@ export function TicketForm({ canSubmit, isSubmitting = false, onSubmit }: Ticket
     setError(null);
     const parsed = ticketCreateSchema.safeParse(values);
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Invalid form");
+      setError(parsed.error.issues[0]?.message ?? "Revisa los campos del formulario.");
       return;
     }
     await onSubmit(parsed.data);
@@ -37,7 +37,7 @@ export function TicketForm({ canSubmit, isSubmitting = false, onSubmit }: Ticket
     <form className="space-y-3 rounded border p-4" onSubmit={handleSubmit}>
       <div>
         <label className="mb-1 block text-sm" htmlFor={`${id}-subject`}>
-          Subject
+          Asunto
         </label>
         <input
           className="w-full rounded border px-2 py-1"
@@ -48,7 +48,7 @@ export function TicketForm({ canSubmit, isSubmitting = false, onSubmit }: Ticket
       </div>
       <div>
         <label className="mb-1 block text-sm" htmlFor={`${id}-description`}>
-          Description
+          Descripción
         </label>
         <textarea
           className="w-full rounded border px-2 py-1"
@@ -59,9 +59,11 @@ export function TicketForm({ canSubmit, isSubmitting = false, onSubmit }: Ticket
         />
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      {!canSubmit && <p className="text-sm text-warning-foreground">You do not have permission for this action.</p>}
+      {!canSubmit && (
+        <p className="text-sm text-warning-foreground">No tienes permiso para esta acción.</p>
+      )}
       <Button disabled={!canSubmit || isSubmitting} type="submit">
-        {isSubmitting ? "Saving..." : "Create ticket"}
+        {isSubmitting ? "Guardando…" : "Crear ticket"}
       </Button>
     </form>
   );

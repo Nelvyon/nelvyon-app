@@ -16,16 +16,16 @@ export function TicketList({ items, showCreateCta }: { items: Ticket[]; showCrea
         action={
           showCreateCta ? (
             <Button asChild>
-              <Link href="/inbox/tickets/new">{isClientMode ? "Create request" : "Create a ticket"}</Link>
+              <Link href="/inbox/tickets/new">{isClientMode ? "Crear solicitud" : "Crear ticket"}</Link>
             </Button>
           ) : undefined
         }
         description={
           isClientMode
-            ? "No requests are currently open for your account."
-            : "There are no helpdesk tickets in this workspace. When requests arrive, they will queue here for your team."
+            ? "No hay solicitudes abiertas para tu cuenta."
+            : "No hay tickets de soporte en este workspace. Cuando lleguen solicitudes, aparecerán aquí."
         }
-        title={isClientMode ? "No requests yet" : "Inbox is clear"}
+        title={isClientMode ? "Sin solicitudes aún" : "Bandeja vacía"}
       />
     );
   }

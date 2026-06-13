@@ -18,7 +18,7 @@ export function ClientForm({
   canSubmit,
   isSubmitting = false,
   initialValues,
-  submitLabel = "Save client",
+  submitLabel = "Guardar cliente",
   onSubmit,
 }: ClientFormProps) {
   const id = useId();
@@ -36,7 +36,7 @@ export function ClientForm({
     setError(null);
     const parsed = clientFormSchema.safeParse(values);
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Invalid form");
+      setError(parsed.error.issues[0]?.message ?? "Revisa los campos del formulario.");
       return;
     }
     await onSubmit(parsed.data);
@@ -46,7 +46,7 @@ export function ClientForm({
     <form className="space-y-3 rounded-lg border border-border bg-card p-4 shadow-card" onSubmit={handleSubmit}>
       <div>
         <label className="mb-1 block text-sm" htmlFor={`${id}-business_name`}>
-          Business name
+          Nombre comercial
         </label>
         <input
           className="w-full rounded border px-2 py-1"
@@ -69,7 +69,7 @@ export function ClientForm({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="mb-1 block text-sm" htmlFor={`${id}-country`}>
-            Country
+            País
           </label>
           <input
             className="w-full rounded border px-2 py-1"
@@ -80,7 +80,7 @@ export function ClientForm({
         </div>
         <div>
           <label className="mb-1 block text-sm" htmlFor={`${id}-city`}>
-            City
+            Ciudad
           </label>
           <input
             className="w-full rounded border px-2 py-1"
@@ -91,9 +91,11 @@ export function ClientForm({
         </div>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      {!canSubmit && <p className="text-sm text-warning-foreground">You do not have permission for this action.</p>}
+      {!canSubmit && (
+        <p className="text-sm text-warning-foreground">No tienes permiso para esta acción.</p>
+      )}
       <Button disabled={!canSubmit || isSubmitting} type="submit">
-        {isSubmitting ? "Saving..." : submitLabel}
+        {isSubmitting ? "Guardando…" : submitLabel}
       </Button>
     </form>
   );
