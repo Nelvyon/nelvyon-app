@@ -43,6 +43,7 @@ _PUBLIC_PREFIXES = (
 _OPTIONAL_TENANT_PREFIXES = (
     "/api/v1/auth/",
     "/api/v1/portal/",
+    "/api/v1/workspace/",
     "/api/marketplace/agencies",
     "/api/developer/docs",
     "/api/workspace/",

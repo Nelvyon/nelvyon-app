@@ -199,10 +199,10 @@ async def get_nelvyon_clients(
 @router.post("", response_model=Nelvyon_clientsResponse, status_code=201)
 async def create_nelvyon_clients(
     data: Nelvyon_clientsData,
-    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    """Create a new nelvyon_clients"""
+    """Create a new nelvyon_clients (any workspace member)."""
     logger.debug(f"Creating new nelvyon_clients with data: {data}")
     
     service = Nelvyon_clientsService(db)

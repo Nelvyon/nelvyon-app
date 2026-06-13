@@ -1,36 +1,37 @@
 import { NextResponse } from "next/server";
 
-import {
-  fallbackWorkspaceList,
-  platformApiBase,
-  readSessionToken,
-} from "@/lib/platformFastApiProxy";
+import { platformApiBase, readSessionToken } from "@/lib/platformFastApiProxy";
 import { authenticate } from "@nelvyon/auth";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function workspaceFallbackResponse(claims: { userId: string; tenantId: string; plan: string }) {
-  return NextResponse.json(
-    fallbackWorkspaceList({
-      userId: claims.userId,
-      tenantId: claims.tenantId || claims.userId,
-      plan: claims.plan,
-    }),
-  );
+const UNAVAILABLE = {
+  error: "No se pudo cargar el workspace. Inténtalo de nuevo en unos minutos.",
+};
+
+async function upstreamFetch(token: string, path: string, init: RequestInit = {}) {
+  return fetch(`${platformApiBase()}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+      ...(init.headers ?? {}),
+    },
+    cache: "no-store",
+  });
 }
 
-/** Same-origin workspace list — proxies FastAPI; falls back for staging when API is down. */
+/** Same-origin workspace list — real FastAPI workspaces only (no synthetic fallback). */
 export async function GET(req: Request) {
-  let claims: { userId: string; tenantId: string; plan: string };
   try {
-    claims = await authenticate(req);
+    await authenticate(req);
   } catch (e: unknown) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(UNAVAILABLE, { status: 503 });
   }
 
   const token = await readSessionToken(req);
@@ -39,28 +40,45 @@ export async function GET(req: Request) {
   }
 
   try {
-    const upstream = await fetch(`${platformApiBase()}/api/v1/workspace/list`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-      cache: "no-store",
-    });
-
+    let upstream = await upstreamFetch(token, "/api/v1/workspace/list");
     if (upstream.status === 401) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (upstream.ok) {
-      try {
-        return NextResponse.json(await upstream.json());
-      } catch {
-        return workspaceFallbackResponse(claims);
+      const rows = await upstream.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        return NextResponse.json(rows);
       }
     }
-  } catch {
-    /* FastAPI unreachable — use fallback workspace */
-  }
 
-  return workspaceFallbackResponse(claims);
+    const create = await upstreamFetch(token, "/api/v1/workspace/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "Mi Workspace", slug: "default" }),
+    });
+
+    if (create.ok) {
+      const created = await create.json();
+      return NextResponse.json([
+        {
+          ...created,
+          role: created.role ?? "owner",
+          members_count: created.members_count ?? 1,
+        },
+      ]);
+    }
+
+    upstream = await upstreamFetch(token, "/api/v1/workspace/list");
+    if (upstream.ok) {
+      const rows = await upstream.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        return NextResponse.json(rows);
+      }
+    }
+
+    return NextResponse.json(UNAVAILABLE, { status: 503 });
+  } catch {
+    return NextResponse.json(UNAVAILABLE, { status: 503 });
+  }
 }

@@ -197,10 +197,10 @@ async def get_nelvyon_campaigns(
 @router.post("", response_model=Nelvyon_campaignsResponse, status_code=201)
 async def create_nelvyon_campaigns(
     data: Nelvyon_campaignsData,
-    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
+    ws_ctx: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    """Create a new nelvyon_campaigns"""
+    """Create a new nelvyon_campaigns (any workspace member)."""
     logger.debug(f"Creating new nelvyon_campaigns with data: {data}")
     
     service = Nelvyon_campaignsService(db)

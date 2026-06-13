@@ -341,13 +341,33 @@ class FormsService:
                     if isinstance(v, str) and "@" in v:
                         email = v
                         break
+            name = str(
+                responses.get("name")
+                or (visitor_info.get("name") if visitor_info else None)
+                or (email.split("@")[0] if email else "Lead formulario")
+            )
             if email:
                 try:
                     crm = CRMService(self.session, ws)
-                    name = str(responses.get("name") or visitor_info.get("name") if visitor_info else email.split("@")[0])
                     await crm.create_contact(name=name, email=str(email).lower(), tags=["form-submission"])
                 except Exception as exc:
                     logger.warning("CRM save from form failed: %s", exc)
+            try:
+                from services.nelvyon_clients import Nelvyon_clientsService
+
+                owner_id = str(form.get("user_id") or "")
+                if owner_id:
+                    client_svc = Nelvyon_clientsService(self.session)
+                    await client_svc.create(
+                        {
+                            "business_name": name[:255],
+                            "sector": "Lead web",
+                        },
+                        user_id=owner_id,
+                        workspace_id=ws,
+                    )
+            except Exception as exc:
+                logger.warning("nelvyon_clients save from form failed: %s", exc)
 
         notify = settings.get("notify_email")
         if notify:

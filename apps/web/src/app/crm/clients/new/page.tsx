@@ -36,7 +36,12 @@ export default function CreateClientPage() {
             <p>No pudimos crear el cliente. Revisa los campos obligatorios e inténtalo de nuevo.</p>
           </ErrorNotice>
         )}
-        <ClientForm canSubmit={canCreate} isSubmitting={mutation.isPending} onSubmit={onSubmit} />
+        <ClientForm
+          canSubmit={canCreate}
+          isSubmitting={mutation.isPending}
+          onSubmit={onSubmit}
+          submitLabel="Crear cliente"
+        />
       </div>
     </ProtectedLayout>
   );

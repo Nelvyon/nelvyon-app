@@ -81,13 +81,13 @@ export function DealsPageClient() {
               onChange={(e) => setStageFilter(e.target.value)}
               value={stageFilter}
             >
-              <option value="all">All stages</option>
-              <option value="lead">lead</option>
-              <option value="qualified">qualified</option>
-              <option value="proposal">proposal</option>
-              <option value="negotiation">negotiation</option>
-              <option value="won">won</option>
-              <option value="lost">lost</option>
+              <option value="all">Todas las etapas</option>
+              <option value="lead">Lead</option>
+              <option value="qualified">Cualificado</option>
+              <option value="proposal">Propuesta</option>
+              <option value="negotiation">Negociación</option>
+              <option value="won">Ganado</option>
+              <option value="lost">Perdido</option>
             </select>
             <select
               aria-label="Filter deals by owner"
@@ -95,7 +95,7 @@ export function DealsPageClient() {
               onChange={(e) => setOwnerFilter(e.target.value)}
               value={ownerFilter}
             >
-              <option value="all">All owners</option>
+              <option value="all">Todos los responsables</option>
               {owners.map((owner) => (
                 <option key={owner} value={owner}>
                   {owner}

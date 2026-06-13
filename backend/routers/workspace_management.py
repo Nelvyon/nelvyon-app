@@ -83,6 +83,59 @@ class MemberRoleUpdateRequest(BaseModel):
     role: str  # admin, operator, member, viewer
 
 
+def _format_created_at(value) -> Optional[str]:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    return str(value)
+
+
+async def _count_workspace_members(db: AsyncSession, workspace_id: int) -> int:
+    try:
+        mc = (
+            await db.execute(
+                select(func.count(Workspace_members.id)).where(
+                    Workspace_members.workspace_id == workspace_id
+                )
+            )
+        ).scalar()
+        return int(mc or 0)
+    except Exception as exc:
+        logger.debug("workspace member count skipped for ws=%s: %s", workspace_id, exc)
+        return 0
+
+
+async def _ensure_default_workspace(db: AsyncSession, user_id: str) -> WorkspaceResponse:
+    default_ws = Workspaces(
+        user_id=user_id,
+        name="Mi Workspace",
+        slug="default",
+        status="active",
+        plan="starter",
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(default_ws)
+    await db.commit()
+    await db.refresh(default_ws)
+    logger.info("Auto-created default workspace %s for user %s", default_ws.id, user_id)
+    return WorkspaceResponse(
+        id=default_ws.id,
+        name=default_ws.name,
+        slug=default_ws.slug,
+        logo_url=None,
+        primary_color=None,
+        domain=None,
+        plan=default_ws.plan,
+        status=default_ws.status,
+        role="owner",
+        members_count=1,
+        created_at=_format_created_at(default_ws.created_at),
+    )
+
+
 # ── List user's workspaces ──────────────────────────────────────────────────
 
 @router.get("/list", response_model=List[WorkspaceResponse])
@@ -95,106 +148,87 @@ async def list_my_workspaces(
     This is used by the workspace selector in the UI.
     """
     user_id = str(current_user.id)
-    workspaces = []
+    workspaces: list[WorkspaceResponse] = []
 
-    # 1. Workspaces the user owns
-    owned_result = await db.execute(
-        select(Workspaces).where(
-            Workspaces.user_id == user_id,
-            or_(Workspaces.status == "active", Workspaces.status.is_(None)),
-        ).order_by(Workspaces.id.asc())
-    )
-    for ws in owned_result.scalars().all():
-        # Count members
-        mc = (await db.execute(
-            select(func.count(Workspace_members.id)).where(
-                Workspace_members.workspace_id == ws.id
+    try:
+        owned_result = await db.execute(
+            select(Workspaces).where(
+                Workspaces.user_id == user_id,
+                or_(Workspaces.status == "active", Workspaces.status.is_(None)),
+            ).order_by(Workspaces.id.asc())
+        )
+        for ws in owned_result.scalars().all():
+            mc = await _count_workspace_members(db, ws.id)
+            workspaces.append(
+                WorkspaceResponse(
+                    id=ws.id,
+                    name=ws.name,
+                    slug=ws.slug,
+                    logo_url=ws.logo_url,
+                    primary_color=ws.primary_color,
+                    domain=ws.domain,
+                    plan=ws.plan,
+                    status=ws.status,
+                    role="owner",
+                    members_count=mc + 1,
+                    created_at=_format_created_at(ws.created_at),
+                )
             )
-        )).scalar() or 0
 
-        workspaces.append(WorkspaceResponse(
-            id=ws.id,
-            name=ws.name,
-            slug=ws.slug,
-            logo_url=ws.logo_url,
-            primary_color=ws.primary_color,
-            domain=ws.domain,
-            plan=ws.plan,
-            status=ws.status,
-            role="owner",
-            members_count=mc + 1,  # +1 for owner
-            created_at=ws.created_at.isoformat() if ws.created_at else None,
-        ))
-
-    # 2. Workspaces the user is a member of (not owner)
-    member_result = await db.execute(
-        select(Workspace_members).where(
-            Workspace_members.user_id == user_id,
-            Workspace_members.status == "active",
-        )
-    )
-    owned_ids = {ws.id for ws in workspaces}
-
-    for member in member_result.scalars().all():
-        if member.workspace_id in owned_ids:
-            continue
-
-        ws_result = await db.execute(
-            select(Workspaces).where(Workspaces.id == member.workspace_id)
-        )
-        ws = ws_result.scalar_one_or_none()
-        if not ws:
-            continue
-
-        mc = (await db.execute(
-            select(func.count(Workspace_members.id)).where(
-                Workspace_members.workspace_id == ws.id
+        try:
+            member_result = await db.execute(
+                select(Workspace_members).where(
+                    Workspace_members.user_id == user_id,
+                    Workspace_members.status == "active",
+                )
             )
-        )).scalar() or 0
+            owned_ids = {ws.id for ws in workspaces}
 
-        workspaces.append(WorkspaceResponse(
-            id=ws.id,
-            name=ws.name,
-            slug=ws.slug,
-            logo_url=ws.logo_url,
-            primary_color=ws.primary_color,
-            domain=ws.domain,
-            plan=ws.plan,
-            status=ws.status,
-            role=member.role,
-            members_count=mc + 1,
-            created_at=ws.created_at.isoformat() if ws.created_at else None,
-        ))
+            for member in member_result.scalars().all():
+                if member.workspace_id in owned_ids:
+                    continue
 
-    # If user has no workspaces, auto-create a default one
-    if not workspaces:
-        default_ws = Workspaces(
-            user_id=user_id,
-            name="Mi Workspace",
-            slug="default",
-            status="active",
-            plan="starter",
-            created_at=datetime.now(timezone.utc),
-        )
-        db.add(default_ws)
-        await db.commit()
-        await db.refresh(default_ws)
+                ws_result = await db.execute(
+                    select(Workspaces).where(Workspaces.id == member.workspace_id)
+                )
+                ws = ws_result.scalar_one_or_none()
+                if not ws:
+                    continue
 
-        workspaces.append(WorkspaceResponse(
-            id=default_ws.id,
-            name=default_ws.name,
-            slug=default_ws.slug,
-            logo_url=None,
-            primary_color=None,
-            domain=None,
-            plan=default_ws.plan,
-            status=default_ws.status,
-            role="owner",
-            members_count=1,
-            created_at=default_ws.created_at.isoformat() if default_ws.created_at else None,
-        ))
+                mc = await _count_workspace_members(db, ws.id)
+                workspaces.append(
+                    WorkspaceResponse(
+                        id=ws.id,
+                        name=ws.name,
+                        slug=ws.slug,
+                        logo_url=ws.logo_url,
+                        primary_color=ws.primary_color,
+                        domain=ws.domain,
+                        plan=ws.plan,
+                        status=ws.status,
+                        role=member.role or "member",
+                        members_count=mc + 1,
+                        created_at=_format_created_at(ws.created_at),
+                    )
+                )
+        except Exception as exc:
+            logger.warning("workspace member listing skipped for user %s: %s", user_id, exc)
 
-    return workspaces
+        if not workspaces:
+            workspaces.append(await _ensure_default_workspace(db, user_id))
+
+        return workspaces
+    except Exception as exc:
+        logger.error("list_my_workspaces failed for user %s: %s", user_id, exc, exc_info=True)
+        try:
+            await db.rollback()
+        except Exception:
+            pass
+        try:
+            return [await _ensure_default_workspace(db, user_id)]
+        except Exception as inner:
+            logger.error("default workspace bootstrap failed: %s", inner, exc_info=True)
+            raise HTTPException(status_code=500, detail="Could not load workspaces") from inner
 
 
 # ── Create workspace ─────────────────────────────────────────────────────────

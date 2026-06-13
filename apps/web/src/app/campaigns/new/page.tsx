@@ -7,11 +7,10 @@ import { ApiError } from "@/core/api/types";
 import { useAuth } from "@/core/auth/AuthContext";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { canPerformAction } from "@/core/routing/guards";
-import { HelpContextLink } from "@/features/help/components/HelpContextLink";
-import { CampaignBootstrapWizard } from "@/features/campaigns/components/CampaignBootstrapWizard";
-import { useCreateCampaign } from "@/features/campaigns/hooks";
-import { CampaignCreateInput } from "@/features/campaigns/types";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
+import { SimpleCampaignForm } from "@/features/campaigns/components/SimpleCampaignForm";
+import { useCreateCampaign } from "@/features/campaigns/hooks";
+import type { CampaignCreateInput } from "@/features/campaigns/types";
 
 export default function CreateCampaignPage() {
   const { user } = useAuth();
@@ -27,18 +26,17 @@ export default function CreateCampaignPage() {
   return (
     <ProtectedLayout module="campaigns">
       <div className="space-y-5">
-        <HelpContextLink href="/help/campaigns" label="Campaign setup guide" />
         {mutation.error instanceof ApiError && mutation.error.status === 403 && (
           <ForbiddenNotice>
-            <p>Your role cannot create campaigns in this NELVYON workspace. Ask an operator or admin.</p>
+            <p>Tu rol no puede crear campañas. Pide ayuda a un administrador.</p>
           </ForbiddenNotice>
         )}
         {mutation.error && !(mutation.error instanceof ApiError && mutation.error.status === 403) && (
           <ErrorNotice>
-            <p>We could not create the campaign. Review required fields and try again.</p>
+            <p>No pudimos crear la campaña. Revisa los campos e inténtalo de nuevo.</p>
           </ErrorNotice>
         )}
-        <CampaignBootstrapWizard canSubmit={canCreate} isCreatingCampaign={mutation.isPending} onCreateCampaign={onSubmit} />
+        <SimpleCampaignForm canSubmit={canCreate} isSubmitting={mutation.isPending} onSubmit={onSubmit} />
       </div>
     </ProtectedLayout>
   );
