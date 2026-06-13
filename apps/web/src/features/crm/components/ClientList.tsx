@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 
 import { Button } from "@/core/ui/button";
+import { DataTable, DataTableCell, DataTableHeader, DataTableRow } from "@/core/ui/DataTable";
 import { EmptyState } from "@/core/ui/EmptyState";
 import { Client } from "@/features/crm/types";
 
@@ -25,20 +26,38 @@ export function ClientList({ items, showCreateCta }: { items: Client[]; showCrea
   }
 
   return (
-    <ul aria-label="Clients in this workspace" className="divide-y rounded-lg border border-border bg-card shadow-card">
+    <DataTable>
+      <DataTableHeader>
+        <span>Cuenta</span>
+        <span>Sector</span>
+        <span>Ubicación</span>
+        <span className="text-right">Acciones</span>
+      </DataTableHeader>
       {items.map((client) => (
-        <li className="p-3" key={client.id}>
-          <Link className="font-medium text-link transition-colors hover:text-link-hover hover:underline" href={`/crm/clients/${client.id}`}>
-            {client.business_name}
-          </Link>
-          <p className="text-xs text-muted-foreground">{client.sector}</p>
-          <p className="mt-1 text-xs">
-            <Link className="text-link underline-offset-2 hover:underline" href={`/crm/deals?client_id=${client.id}`}>
-              Deals y pipeline de este cliente →
+        <DataTableRow key={client.id}>
+          <DataTableCell>
+            <Link
+              className="font-medium text-foreground transition-colors hover:text-primary"
+              href={`/crm/clients/${client.id}`}
+            >
+              {client.business_name}
             </Link>
-          </p>
-        </li>
+            <p className="mt-0.5 text-xs text-muted-foreground">ID {client.id}</p>
+          </DataTableCell>
+          <DataTableCell className="text-muted-foreground">{client.sector}</DataTableCell>
+          <DataTableCell className="text-muted-foreground">
+            {[client.city, client.country].filter(Boolean).join(", ") || "—"}
+          </DataTableCell>
+          <DataTableCell className="flex justify-end gap-2">
+            <Button asChild size="sm" variant="outline">
+              <Link href={`/crm/clients/${client.id}`}>Ver ficha</Link>
+            </Button>
+            <Button asChild size="sm" variant="ghost">
+              <Link href={`/crm/deals?client_id=${client.id}`}>Deals</Link>
+            </Button>
+          </DataTableCell>
+        </DataTableRow>
       ))}
-    </ul>
+    </DataTable>
   );
 }

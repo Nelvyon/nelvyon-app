@@ -92,6 +92,7 @@ async def setup_database(test_engine):
     import models.oauth_tokens  # noqa: F401 — oauth_integrations HTTP tests
     import models.onboarding_progress  # noqa: F401 — onboarding router tests
     import models.nelvyon_clients  # noqa: F401 — orchestrator / OS entity tests
+    import models.nelvyon_campaigns  # noqa: F401 — staging platform smoke
     import models.nelvyon_projects  # noqa: F401
     import models.nelvyon_outputs  # noqa: F401
     import models.os_deals  # noqa: F401 — Fase 2C OS pipeline

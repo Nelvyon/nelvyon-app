@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { platformApiBase, readSessionToken } from "@/lib/platformFastApiProxy";
-import { authenticate } from "@nelvyon/auth";
+import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
+import {
+  dbCreateWorkspace,
+  dbListWorkspaces,
+  platformDbFallbackEnabled,
+} from "@/lib/platformDbFallback";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 export const dynamic = "force-dynamic";
@@ -23,16 +28,18 @@ async function upstreamFetch(token: string, path: string, init: RequestInit = {}
   });
 }
 
-/** Same-origin workspace list — real FastAPI workspaces only (no synthetic fallback). */
+/** Same-origin workspace list — FastAPI first, Postgres fallback when API staging is down. */
 export async function GET(req: Request) {
+  let claims;
   try {
-    await authenticate(req);
+    claims = await requirePlatformClaims(req);
   } catch (e: unknown) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.json(UNAVAILABLE, { status: 503 });
   }
+  if (claims instanceof NextResponse) return claims;
 
   const token = await readSessionToken(req);
   if (!token) {
@@ -77,8 +84,25 @@ export async function GET(req: Request) {
       }
     }
 
+    if (platformDbFallbackEnabled() && (upstreamFailed(upstream.status) || upstreamFailed(create.status))) {
+      const rows = await dbListWorkspaces(claims);
+      if (rows.length > 0) {
+        return NextResponse.json(rows);
+      }
+    }
+
     return NextResponse.json(UNAVAILABLE, { status: 503 });
   } catch {
+    if (platformDbFallbackEnabled()) {
+      try {
+        const rows = await dbListWorkspaces(claims);
+        if (rows.length > 0) {
+          return NextResponse.json(rows);
+        }
+      } catch {
+        /* fall through */
+      }
+    }
     return NextResponse.json(UNAVAILABLE, { status: 503 });
   }
 }

@@ -71,8 +71,13 @@ async def get_current_user(
 
     payload = None
     try:
-        payload = decode_access_token(token)
+        candidate = decode_access_token(token)
+        if candidate.get("sub"):
+            payload = candidate
     except AccessTokenError:
+        pass
+
+    if payload is None:
         try:
             from core.nelvyon_jwt import try_decode_nelvyon_app_token
         except Exception:

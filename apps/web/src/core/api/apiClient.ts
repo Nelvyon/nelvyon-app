@@ -7,6 +7,18 @@ const RETRYABLE_STATUS = new Set([502, 503, 504]);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** Next.js BFF/auth routes — same-origin. FastAPI `/api/v1/*` uses `baseUrl` + CORS. */
+export function isNextBffPath(path: string): boolean {
+  return (
+    path.startsWith("/api/platform/") ||
+    path.startsWith("/api/auth/") ||
+    path.startsWith("/api/saas/") ||
+    path.startsWith("/api/admin/") ||
+    path.startsWith("/api/health/") ||
+    path.startsWith("/api/waitlist")
+  );
+}
+
 export class ApiClient {
   private readonly config: Required<
     Pick<ApiClientConfig, "baseUrl" | "maxRetries" | "retryDelayMs">
@@ -131,7 +143,7 @@ export class ApiClient {
 
     while (attempt <= retries) {
       try {
-        const sameOrigin = path.startsWith("/api/");
+        const sameOrigin = isNextBffPath(path);
         const response = await fetch(sameOrigin ? path : `${this.config.baseUrl}${path}`, {
           method,
           signal: options.signal,

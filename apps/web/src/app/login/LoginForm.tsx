@@ -11,6 +11,7 @@ import { MarketingLayout } from "@/components/agenforce/marketing-layout";
 import { Subheading } from "@/components/agenforce/subheading";
 import { useAuth } from "@/core/auth/AuthContext";
 import { nelvyonPlanToUiRole } from "@/core/auth/nelvyonPlanRole";
+import { PanelCard } from "@/core/ui/PanelCard";
 
 type LoginSuccess = {
   userId: string;
@@ -94,18 +95,19 @@ export function LoginForm() {
 
   return (
     <MarketingLayout>
-      <div className="w-full min-h-[70vh] px-4 py-8">
+      <div className="w-full min-h-[70vh] bg-gradient-to-b from-primary/5 via-background to-background px-4 py-10">
         <Container className="w-full max-w-md">
-          <div className="flex flex-col items-center">
-            <Heading as="h1" className="text-center text-2xl md:text-3xl lg:text-4xl">
-              Bienvenido de nuevo
-            </Heading>
-            <Subheading className="mt-2 text-center">
-              Inicia sesión para gestionar clientes, campañas y soporte desde un solo panel.
-            </Subheading>
-          </div>
+          <PanelCard accent="from-primary/5 via-card to-card">
+            <div className="flex flex-col items-center text-center">
+              <Heading as="h1" className="text-2xl md:text-3xl">
+                Bienvenido de nuevo
+              </Heading>
+              <Subheading className="mt-2">
+                Inicia sesión para gestionar clientes, campañas y soporte desde un solo panel.
+              </Subheading>
+            </div>
 
-          <div className="mt-8 space-y-4">
+            <div className="mt-8 space-y-3">
             <button
               type="button"
               disabled
@@ -215,6 +217,7 @@ export function LoginForm() {
               Regístrate gratis
             </Link>
           </p>
+          </PanelCard>
         </Container>
       </div>
     </MarketingLayout>

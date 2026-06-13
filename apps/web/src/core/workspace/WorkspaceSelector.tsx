@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/core/auth/AuthContext";
 import { trackProductEvent } from "@/core/telemetry/productEvents";
 import { Button } from "@/core/ui/button";
+import { PanelCard } from "@/core/ui/PanelCard";
 import { useWorkspace } from "@/core/workspace/WorkspaceContext";
 import { useCreateWorkspace, useWorkspaceList } from "@/features/workspace/hooks";
 
@@ -37,22 +38,22 @@ export function WorkspaceSelector() {
   }
 
   if (list.isLoading) {
-    return <span className="text-xs text-muted-foreground">Loading workspaces…</span>;
+    return <span className="text-xs text-muted-foreground">Cargando workspaces…</span>;
   }
 
   if (list.error) {
-    return <span className="text-xs text-destructive">Workspaces unavailable</span>;
+    return <span className="text-xs text-destructive">Workspaces no disponibles</span>;
   }
 
   const items = list.data ?? [];
 
   return (
-    <div className="flex flex-wrap items-center gap-2 text-sm text-foreground">
-      <label className="flex items-center gap-2">
-        <span className="text-muted-foreground">Workspace</span>
+    <PanelCard className="flex flex-wrap items-center gap-3 p-3 shadow-none sm:p-3">
+      <label className="flex min-w-[12rem] flex-1 items-center gap-2 text-sm text-foreground">
+        <span className="shrink-0 text-muted-foreground">Workspace</span>
         <select
           aria-label="workspace-selector"
-          className="rounded-md border border-input bg-card px-2 py-1 text-sm text-foreground shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-w-0 flex-1 rounded-md border border-input bg-background px-2 py-1.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           disabled={!items.length}
           onChange={(event) => {
             const next = event.target.value || null;
@@ -63,7 +64,7 @@ export function WorkspaceSelector() {
           }}
           value={workspaceId ?? ""}
         >
-          {!items.length ? <option value="">No workspaces</option> : null}
+          {!items.length ? <option value="">Sin workspaces</option> : null}
           {items.map((ws) => (
             <option key={ws.id} value={String(ws.id)}>
               {ws.name}
@@ -73,19 +74,19 @@ export function WorkspaceSelector() {
       </label>
       {!showCreate ? (
         <Button onClick={() => setShowCreate(true)} size="sm" type="button" variant="outline">
-          New workspace
+          Nuevo workspace
         </Button>
       ) : (
         <form className="flex flex-wrap items-center gap-1" onSubmit={onCreate}>
           <input
             aria-label="New workspace name"
-            className="w-40 rounded-md border border-input bg-background px-2 py-1 text-xs"
+            className="w-40 rounded-md border border-input bg-background px-2 py-1.5 text-xs"
             onChange={(e) => setNewName(e.target.value)}
-            placeholder="Name"
+            placeholder="Nombre"
             value={newName}
           />
           <Button disabled={createMutation.isPending} size="sm" type="submit" variant="secondary">
-            Create
+            Crear
           </Button>
           <Button
             onClick={() => {
@@ -96,10 +97,10 @@ export function WorkspaceSelector() {
             type="button"
             variant="ghost"
           >
-            Cancel
+            Cancelar
           </Button>
         </form>
       )}
-    </div>
+    </PanelCard>
   );
 }

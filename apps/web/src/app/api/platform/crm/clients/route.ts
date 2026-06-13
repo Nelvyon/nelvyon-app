@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { EMPTY_CLIENT_LIST, proxyPlatformFetch } from "@/lib/platformFastApiProxy";
-import { authenticatePlatformRequest, forwardPlatformJson, readJsonBody } from "@/lib/platformBffRoute";
-import { authenticate } from "@nelvyon/auth";
+import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
+import { authenticatePlatformRequest, readJsonBody } from "@/lib/platformBffRoute";
+import {
+  dbCreateClient,
+  dbListClients,
+  dbResolveWorkspaceId,
+  platformDbFallbackEnabled,
+} from "@/lib/platformDbFallback";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 export const dynamic = "force-dynamic";
@@ -10,10 +16,20 @@ export const runtime = "nodejs";
 
 const UPSTREAM = "/api/v1/entities/nelvyon_clients";
 
-/** Same-origin CRM clients — avoids browser CORS to FastAPI. */
+/** Same-origin CRM clients — FastAPI first, Postgres fallback when API staging is down. */
 export async function GET(req: Request) {
+  let claims;
   try {
-    await authenticate(req);
+    claims = await requirePlatformClaims(req);
+  } catch (e: unknown) {
+    if (e instanceof OsAgentError && e.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    return NextResponse.json(EMPTY_CLIENT_LIST);
+  }
+  if (claims instanceof NextResponse) return claims;
+
+  try {
     const upstream = await proxyPlatformFetch(req, "GET", UPSTREAM);
 
     if (upstream.ok) {
@@ -27,10 +43,27 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
+      const workspaceId = await dbResolveWorkspaceId(req, claims);
+      if (workspaceId > 0) {
+        return NextResponse.json(await dbListClients(workspaceId, claims.userId));
+      }
+    }
+
     return NextResponse.json(EMPTY_CLIENT_LIST);
   } catch (e: unknown) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (platformDbFallbackEnabled()) {
+      try {
+        const workspaceId = await dbResolveWorkspaceId(req, claims);
+        if (workspaceId > 0) {
+          return NextResponse.json(await dbListClients(workspaceId, claims.userId));
+        }
+      } catch {
+        /* fall through */
+      }
     }
     return NextResponse.json(EMPTY_CLIENT_LIST);
   }
@@ -39,9 +72,51 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const authError = await authenticatePlatformRequest(req);
   if (authError) return authError;
-  const body = await readJsonBody(req);
-  return forwardPlatformJson(req, "POST", UPSTREAM, {
+
+  let claims;
+  try {
+    claims = await requirePlatformClaims(req);
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (claims instanceof NextResponse) return claims;
+
+  const body = (await readJsonBody(req)) as Record<string, unknown>;
+  const upstream = await proxyPlatformFetch(req, "POST", UPSTREAM, {
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
   });
+  const text = await upstream.text();
+
+  if (upstream.ok) {
+    return NextResponse.json(text ? JSON.parse(text) : {}, { status: upstream.status });
+  }
+
+  if (upstream.status === 401) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (upstream.status === 403) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
+    try {
+      const workspaceId = await dbResolveWorkspaceId(req, claims);
+      if (workspaceId > 0) {
+        const created = await dbCreateClient(workspaceId, claims.userId, body);
+        return NextResponse.json(created, { status: 201 });
+      }
+    } catch {
+      /* fall through */
+    }
+  }
+
+  try {
+    return NextResponse.json(JSON.parse(text), { status: upstream.status });
+  } catch {
+    return NextResponse.json(
+      { error: "Servicio temporalmente no disponible. Inténtalo de nuevo en unos minutos." },
+      { status: upstream.status >= 500 ? 503 : upstream.status },
+    );
+  }
 }

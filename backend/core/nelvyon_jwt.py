@@ -13,6 +13,8 @@ from core.auth import AccessTokenError
 def _nelvyon_jwt_secret() -> Optional[str]:
     raw = os.environ.get("JWT_SECRET", "").strip()
     if len(raw) < 32:
+        raw = os.environ.get("JWT_SECRET_KEY", "").strip()
+    if len(raw) < 32:
         return None
     return raw
 

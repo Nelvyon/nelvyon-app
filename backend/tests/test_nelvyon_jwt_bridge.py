@@ -35,6 +35,7 @@ def test_try_decode_returns_none_for_foreign_token():
 
 def test_decode_raises_when_secret_missing(monkeypatch):
     monkeypatch.delenv("JWT_SECRET", raising=False)
+    monkeypatch.delenv("JWT_SECRET_KEY", raising=False)
     token = jwt.encode({"userId": "u", "email": "e@t.com"}, SECRET, algorithm="HS256")
     with pytest.raises(AccessTokenError):
         decode_nelvyon_app_token(token)

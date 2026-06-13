@@ -9,6 +9,8 @@ import { useAuth } from "@/core/auth/AuthContext";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { canPerformAction } from "@/core/routing/guards";
 import { Button } from "@/core/ui/button";
+import { PageHeader } from "@/core/ui/PageHeader";
+import { PanelCard } from "@/core/ui/PanelCard";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonDetailCard } from "@/core/ui/Skeleton";
 import { ClientDetailCard } from "@/features/crm/components/ClientDetailCard";
@@ -31,63 +33,59 @@ export default function ClientDetailPage() {
 
   return (
     <ProtectedLayout module="crm">
-      <div className="space-y-5">
-        <Button asChild size="sm" variant="outline">
-          <Link href="/crm/clients">Back to clients</Link>
-        </Button>
+      <div className="space-y-6">
+        <PageHeader
+          title={query.data?.business_name ?? `Cliente #${id}`}
+          description="Ficha de cuenta, pipeline vinculado y edición rápida de campos permitidos."
+          actions={
+            <Button asChild size="sm" variant="outline">
+              <Link href="/crm/clients">← Volver a clientes</Link>
+            </Button>
+          }
+        />
 
         {invalidId ? (
-          <ErrorNotice title="Invalid client id">
-            <p>Cause: this route does not contain a valid numeric client identifier.</p>
-            <p className="mt-2 text-sm text-muted-foreground">Next: return to Revenue → Clients and open a valid account row.</p>
+          <ErrorNotice title="Identificador no válido">
+            <p>Esta URL no contiene un identificador numérico de cliente válido.</p>
           </ErrorNotice>
         ) : null}
-        {query.isLoading && (
+        {query.isLoading ? (
           <>
-            <p className="text-sm text-muted-foreground">Loading client profile, linked deals path, and editable fields…</p>
+            <p className="text-sm text-muted-foreground">Cargando ficha del cliente…</p>
             <SkeletonDetailCard />
           </>
-        )}
-        {query.error instanceof ApiError && query.error.status === 403 && (
+        ) : null}
+        {query.error instanceof ApiError && query.error.status === 403 ? (
           <ForbiddenNotice>
-            <p>Cause: your role or current workspace cannot read this Revenue client.</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Next: switch workspace in the header or ask an admin for CRM view access.
-            </p>
+            <p>Tu rol o workspace actual no puede leer este cliente.</p>
           </ForbiddenNotice>
-        )}
-        {query.error instanceof ApiError && query.error.status === 404 && (
-          <ErrorNotice title="Client not found">
-            <p>Cause: this client id is not present in the current workspace scope (deleted/moved/wrong tenant).</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Next: open Revenue → Clients and navigate from the list to avoid stale links.
-            </p>
+        ) : null}
+        {query.error instanceof ApiError && query.error.status === 404 ? (
+          <ErrorNotice title="Cliente no encontrado">
+            <p>Este cliente no existe en el workspace activo o fue eliminado.</p>
           </ErrorNotice>
-        )}
+        ) : null}
         {query.error &&
-          !(query.error instanceof ApiError && (query.error.status === 403 || query.error.status === 404)) && (
+          !(query.error instanceof ApiError && (query.error.status === 403 || query.error.status === 404)) ? (
           <ErrorNotice>
-            <p>Cause: the client request failed or the id is not in this tenant.</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Next: return to Revenue → Clients and open the row again; refresh if the problem persists.
-            </p>
+            <p>No pudimos cargar el cliente. Vuelve a la lista e inténtalo de nuevo.</p>
           </ErrorNotice>
-        )}
+        ) : null}
 
-        {query.data && (
+        {query.data ? (
           <>
             <ClientDetailCard client={query.data} />
-            <section className="space-y-2 rounded-lg border border-border bg-card p-4 shadow-card">
-              <h2 className="text-base font-medium text-foreground">Deals and pipeline for this client</h2>
-              <p className="text-sm text-muted-foreground">
-                Open Revenue → Deals filtered to this account to review stage, owner, value, and risk in one list.
+            <PanelCard>
+              <h2 className="text-base font-semibold text-foreground">Pipeline y deals</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Revisa etapa, responsable, valor y riesgo de las oportunidades vinculadas a esta cuenta.
               </p>
-              <Button asChild variant="outline">
-                <Link href={`/crm/deals?client_id=${id}`}>View deals for this client</Link>
+              <Button asChild className="mt-4" variant="outline">
+                <Link href={`/crm/deals?client_id=${id}`}>Ver deals de este cliente</Link>
               </Button>
-            </section>
-            <section className="space-y-2">
-              <h2 className="text-base font-medium text-foreground">Quick edit</h2>
+            </PanelCard>
+            <section className="space-y-3">
+              <h2 className="text-base font-semibold text-foreground">Edición rápida</h2>
               <ClientForm
                 canSubmit={canEdit}
                 initialValues={{
@@ -99,23 +97,21 @@ export default function ClientDetailPage() {
                 }}
                 isSubmitting={updateMutation.isPending}
                 onSubmit={onUpdate}
-                submitLabel="Update client"
+                submitLabel="Guardar cambios"
               />
             </section>
-            {updateMutation.error instanceof ApiError && updateMutation.error.status === 403 && (
-              <p className="text-sm text-warning-foreground">You cannot update this client with your current NELVYON role.</p>
-            )}
+            {updateMutation.error instanceof ApiError && updateMutation.error.status === 403 ? (
+              <p className="text-sm text-warning-foreground">No puedes editar este cliente con tu rol actual.</p>
+            ) : null}
             {updateMutation.isSuccess ? (
-              <p className="text-xs text-success-foreground">Saved and synced from persisted client detail.</p>
+              <p className="text-sm text-success-foreground">Cambios guardados correctamente.</p>
             ) : null}
             {updateMutation.error &&
-              !(updateMutation.error instanceof ApiError && updateMutation.error.status === 403) && (
-                <p className="text-sm text-destructive">
-                  Update failed. Next: retry save once; if it fails again, refresh this client record and submit again.
-                </p>
-              )}
+              !(updateMutation.error instanceof ApiError && updateMutation.error.status === 403) ? (
+                <p className="text-sm text-destructive">No se pudo guardar. Inténtalo de nuevo.</p>
+              ) : null}
           </>
-        )}
+        ) : null}
       </div>
     </ProtectedLayout>
   );

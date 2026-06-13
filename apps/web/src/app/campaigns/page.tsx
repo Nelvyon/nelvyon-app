@@ -9,6 +9,7 @@ import { getBrandAppName, getBrandMode } from "@/core/platform/brand";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { canPerformAction } from "@/core/routing/guards";
 import { Button } from "@/core/ui/button";
+import { PageHeader } from "@/core/ui/PageHeader";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { CampaignList } from "@/features/campaigns/components/CampaignList";
@@ -25,13 +26,17 @@ export default function CampaignsListPage() {
   return (
     <ProtectedLayout module="campaigns">
       <div className="space-y-5">
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          {canCreate && (
-            <Button asChild>
-              <Link href="/campaigns/new">Create campaign</Link>
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Campañas"
+          description="Email y multicanal para generar demanda en tu workspace activo."
+          actions={
+            canCreate ? (
+              <Button asChild>
+                <Link href="/campaigns/new">Nueva campaña</Link>
+              </Button>
+            ) : undefined
+          }
+        />
 
         {query.isLoading && <SkeletonListRows aria-label="Loading campaigns" rows={7} />}
         {query.isFetching && query.data ? (

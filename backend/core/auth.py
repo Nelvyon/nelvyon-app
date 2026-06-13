@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import logging
+import os
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
@@ -73,16 +74,34 @@ class AccessTokenError(Exception):
         super().__init__(self.message)
 
 
+def _fastapi_jwt_secret_key() -> Optional[str]:
+    """FastAPI-native JWT secret (JWT_SECRET_KEY). Missing env → None, not AttributeError."""
+    return os.environ.get("JWT_SECRET_KEY", "").strip() or None
+
+
+def _fastapi_jwt_algorithm() -> str:
+    return os.environ.get("JWT_ALGORITHM", "HS256").strip() or "HS256"
+
+
+def _fastapi_jwt_expire_minutes() -> int:
+    raw = os.environ.get("JWT_EXPIRATION_MINUTES", "60").strip() or "60"
+    try:
+        return int(raw)
+    except ValueError:
+        return 60
+
+
 def create_access_token(claims: Dict[str, Any], expires_minutes: Optional[int] = None) -> str:
     """Create signed JWT access token from provided claims."""
-    if not settings.jwt_secret_key:
+    secret = _fastapi_jwt_secret_key()
+    if not secret:
         logger.error("JWT secret key is not configured")
         raise ValueError("JWT secret key is not configured")
 
     now = datetime.now(timezone.utc)
     token_claims = claims.copy()
 
-    expiry_minutes = expires_minutes if expires_minutes is not None else int(settings.jwt_expire_minutes)
+    expiry_minutes = expires_minutes if expires_minutes is not None else _fastapi_jwt_expire_minutes()
     expire_at = now + timedelta(minutes=expiry_minutes)
 
     token_claims.update(
@@ -93,7 +112,7 @@ def create_access_token(claims: Dict[str, Any], expires_minutes: Optional[int] =
         }
     )
 
-    token = jwt.encode(token_claims, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
+    token = jwt.encode(token_claims, secret, algorithm=_fastapi_jwt_algorithm())
     # Log user hash instead of actual user ID to avoid exposing sensitive information
     user_id = token_claims.get("sub", "unknown")
     user_hash = hashlib.sha256(str(user_id).encode()).hexdigest()[:8] if user_id != "unknown" else "unknown"
@@ -103,12 +122,12 @@ def create_access_token(claims: Dict[str, Any], expires_minutes: Optional[int] =
 
 def decode_access_token(token: str) -> Dict[str, Any]:
     """Decode and validate JWT access token."""
-    if not settings.jwt_secret_key:
-        logger.error("JWT secret key is not configured")
+    secret = _fastapi_jwt_secret_key()
+    if not secret:
         raise AccessTokenError("Authentication service is misconfigured")
 
     try:
-        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+        payload = jwt.decode(token, secret, algorithms=[_fastapi_jwt_algorithm()])
         # Log user hash instead of actual user ID to avoid exposing sensitive information
         user_id = payload.get("sub", "unknown")
         user_hash = hashlib.sha256(str(user_id).encode()).hexdigest()[:8] if user_id != "unknown" else "unknown"
