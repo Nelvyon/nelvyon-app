@@ -53,9 +53,9 @@ export default function DashboardHomePage() {
         <section className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 shadow-card sm:p-8">
           <div className="relative z-[1] max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">Tu workspace</p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <p className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               Empieza a generar resultados hoy
-            </h1>
+            </p>
             <p className="mt-3 text-base leading-relaxed text-muted-foreground">
               NELVYON conecta clientes, campañas y soporte en un solo panel. Sigue la checklist de activación y
               lanza tus primeras acciones en menos de 5 minutos.

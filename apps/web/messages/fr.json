@@ -135,6 +135,7 @@
     "selectLanguage": "Choisir la langue"
   },
   "sidebar": {
+    "home": "Accueil",
     "revenue": "Revenus",
     "crm": "CRM",
     "campaigns": "Campagnes",

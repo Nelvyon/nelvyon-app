@@ -10,7 +10,6 @@ import { getBrandMode } from "@/core/platform/brand";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { canPerformAction } from "@/core/routing/guards";
 import { Button } from "@/core/ui/button";
-import { PageHeader } from "@/core/ui/PageHeader";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonDetailCard } from "@/core/ui/Skeleton";
 import { CampaignDetailCard } from "@/features/campaigns/components/CampaignDetailCard";
@@ -43,26 +42,12 @@ export default function CampaignDetailPage() {
     await updateMutation.mutateAsync(payload);
   };
 
-  const title =
-    query.data?.name?.trim() ||
-    (isClientMode ? `Proyecto #${id}` : `Campaña #${id}`);
-
   return (
     <ProtectedLayout module="campaigns">
       <div className="space-y-6">
-        <PageHeader
-          title={title}
-          description={
-            isClientMode
-              ? "Detalle del proyecto compartido con tu cuenta."
-              : "Estado, canal, cliente vinculado y edición según tu rol."
-          }
-          actions={
-            <Button asChild size="sm" variant="outline">
-              <Link href="/campaigns">{isClientMode ? "← Volver a proyectos" : "← Volver a campañas"}</Link>
-            </Button>
-          }
-        />
+        <Button asChild className="w-fit" size="sm" variant="outline">
+          <Link href="/campaigns">{isClientMode ? "← Volver a proyectos" : "← Volver a campañas"}</Link>
+        </Button>
 
         {invalidId ? (
           <ErrorNotice title="Identificador no válido">

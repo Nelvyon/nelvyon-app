@@ -11,7 +11,10 @@ export function CampaignDetailCard({ campaign }: { campaign: Campaign }) {
 
   return (
     <PanelCard accent="from-primary/5 via-card to-card">
-      <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <p className="text-2xl font-semibold tracking-tight text-foreground">
+        {campaign.name?.trim() || `${isClientMode ? "Proyecto" : "Campaña"} #${campaign.id}`}
+      </p>
+      <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border border-border/80 bg-background/60 px-4 py-3">
           <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estado</dt>
           <dd className="mt-1 text-sm font-medium capitalize text-foreground">{campaign.status ?? "—"}</dd>

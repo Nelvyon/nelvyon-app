@@ -53,7 +53,8 @@ function NavList({
         const active = isNavActive(pathname, item);
         const Icon = item.icon;
         const key = navLabelKey(item.href);
-        const label = key ? tNav(key) : item.label;
+        const translated = key ? tNav(key) : item.label;
+        const label = key && translated.startsWith("sidebar.") ? item.label : translated;
         const badge =
           item.badgeKey === "liveChat" && liveChatUnread > 0
             ? liveChatUnread

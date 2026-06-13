@@ -8,7 +8,6 @@ import { useAuth } from "@/core/auth/AuthContext";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { canPerformAction } from "@/core/routing/guards";
 import { Button } from "@/core/ui/button";
-import { PageHeader } from "@/core/ui/PageHeader";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { ClientList } from "@/features/crm/components/ClientList";
@@ -23,22 +22,16 @@ export default function ClientsListPage() {
   return (
     <ProtectedLayout module="crm">
       <div className="space-y-6">
-        <PageHeader
-          title="Clientes"
-          description="Cuentas de revenue del workspace activo. Conecta deals, campañas y seguimiento comercial desde un solo panel."
-          actions={
-            <>
-              <Button asChild variant="outline">
-                <Link href="/crm/deals">Pipeline comercial</Link>
-              </Button>
-              {canCreate ? (
-                <Button asChild>
-                  <Link href="/crm/clients/new">Nuevo cliente</Link>
-                </Button>
-              ) : null}
-            </>
-          }
-        />
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button asChild variant="outline">
+            <Link href="/crm/deals">Pipeline comercial</Link>
+          </Button>
+          {canCreate ? (
+            <Button asChild>
+              <Link href="/crm/clients/new">Nuevo cliente</Link>
+            </Button>
+          ) : null}
+        </div>
 
         {query.isLoading ? (
           <SkeletonListRows aria-label="Cargando clientes del workspace" rows={7} />

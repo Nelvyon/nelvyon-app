@@ -9,7 +9,6 @@ import { useAuth } from "@/core/auth/AuthContext";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { canPerformAction } from "@/core/routing/guards";
 import { Button } from "@/core/ui/button";
-import { PageHeader } from "@/core/ui/PageHeader";
 import { PanelCard } from "@/core/ui/PanelCard";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonDetailCard } from "@/core/ui/Skeleton";
@@ -34,15 +33,9 @@ export default function ClientDetailPage() {
   return (
     <ProtectedLayout module="crm">
       <div className="space-y-6">
-        <PageHeader
-          title={query.data?.business_name ?? `Cliente #${id}`}
-          description="Ficha de cuenta, pipeline vinculado y edición rápida de campos permitidos."
-          actions={
-            <Button asChild size="sm" variant="outline">
-              <Link href="/crm/clients">← Volver a clientes</Link>
-            </Button>
-          }
-        />
+        <Button asChild className="w-fit" size="sm" variant="outline">
+          <Link href="/crm/clients">← Volver a clientes</Link>
+        </Button>
 
         {invalidId ? (
           <ErrorNotice title="Identificador no válido">

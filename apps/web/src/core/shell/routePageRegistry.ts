@@ -41,6 +41,14 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/dashboard") {
+    return {
+      documentTitle: "Inicio · NELVYON",
+      heading: "Inicio",
+      description: "Checklist de activación, KPIs y accesos rápidos a clientes, campañas y soporte.",
+    };
+  }
+
   if (path === "/sign-in") {
     return {
       documentTitle: `Sign in (staging) · ${appName}`,
@@ -208,9 +216,9 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
   if (campaignDetail) {
     const id = campaignDetail[1];
     return {
-      documentTitle: `Campaign #${id} · NELVYON`,
-      heading: `Campaign #${id}`,
-      description: "Review performance signals and adjust fields your role can edit.",
+      documentTitle: `Campaña #${id} · NELVYON`,
+      heading: `Campaña #${id}`,
+      description: "Estado, canal, cliente vinculado y edición según tu rol.",
     };
   }
 
