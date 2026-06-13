@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 import { EMPTY_CLIENT_LIST, proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { authenticatePlatformRequest, readJsonBody } from "@/lib/platformBffRoute";
+import type { JwtPayload } from "@nelvyon/auth";
 import {
   dbCreateCampaign,
-  dbGetCampaign,
   dbListCampaigns,
   dbResolveWorkspaceId,
   platformDbFallbackEnabled,
@@ -17,6 +17,22 @@ export const runtime = "nodejs";
 
 const EMPTY_CAMPAIGNS = { ...EMPTY_CLIENT_LIST };
 const UPSTREAM = "/api/v1/entities/nelvyon_campaigns";
+
+async function createCampaignViaDb(
+  req: Request,
+  claims: JwtPayload,
+  body: Record<string, unknown>,
+): Promise<NextResponse | null> {
+  if (!platformDbFallbackEnabled()) return null;
+  try {
+    const workspaceId = await dbResolveWorkspaceId(req, claims);
+    if (workspaceId <= 0) return null;
+    const created = await dbCreateCampaign(workspaceId, claims.userId, body);
+    return NextResponse.json(created, { status: 201 });
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(req: Request) {
   let claims;
@@ -81,42 +97,50 @@ export async function POST(req: Request) {
   }
   if (claims instanceof NextResponse) return claims;
 
-  const body = (await readJsonBody(req)) as Record<string, unknown>;
-  const upstream = await proxyPlatformFetch(req, "POST", UPSTREAM, {
-    body: JSON.stringify(body),
-    headers: { "Content-Type": "application/json" },
-  });
-  const text = await upstream.text();
-
-  if (upstream.ok) {
-    return NextResponse.json(text ? JSON.parse(text) : {}, { status: upstream.status });
-  }
-
-  if (upstream.status === 401) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  if (upstream.status === 403) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
-    try {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      if (workspaceId > 0) {
-        const created = await dbCreateCampaign(workspaceId, claims.userId, body);
-        return NextResponse.json(created, { status: 201 });
-      }
-    } catch {
-      /* fall through */
-    }
+  let body: Record<string, unknown> = {};
+  try {
+    body = (await readJsonBody(req)) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   try {
-    return NextResponse.json(JSON.parse(text), { status: upstream.status });
+    const upstream = await proxyPlatformFetch(req, "POST", UPSTREAM, {
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+    });
+    const text = await upstream.text();
+
+    if (upstream.ok) {
+      return NextResponse.json(text ? JSON.parse(text) : {}, { status: upstream.status });
+    }
+
+    if (upstream.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    if (upstreamFailed(upstream.status)) {
+      const dbRes = await createCampaignViaDb(req, claims, body);
+      if (dbRes) return dbRes;
+    }
+
+    try {
+      return NextResponse.json(JSON.parse(text), { status: upstream.status });
+    } catch {
+      return NextResponse.json(
+        { error: "Servicio temporalmente no disponible. Inténtalo de nuevo en unos minutos." },
+        { status: upstream.status >= 500 ? 503 : upstream.status },
+      );
+    }
   } catch {
+    const dbRes = await createCampaignViaDb(req, claims, body);
+    if (dbRes) return dbRes;
     return NextResponse.json(
       { error: "Servicio temporalmente no disponible. Inténtalo de nuevo en unos minutos." },
-      { status: upstream.status >= 500 ? 503 : upstream.status },
+      { status: 503 },
     );
   }
 }
