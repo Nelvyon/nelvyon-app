@@ -8,17 +8,10 @@ import { Campaign } from "@/features/campaigns/types";
 
 export function CampaignDetailCard({ campaign }: { campaign: Campaign }) {
   const isClientMode = getBrandMode() === "client";
-  const title = campaign.name?.trim() || `${isClientMode ? "Proyecto" : "Campaña"} #${campaign.id}`;
 
   return (
     <PanelCard accent="from-primary/5 via-card to-card">
-      <div className="space-y-1">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          {isClientMode ? "Proyecto" : "Campaña"}
-        </p>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h2>
-      </div>
-      <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border border-border/80 bg-background/60 px-4 py-3">
           <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estado</dt>
           <dd className="mt-1 text-sm font-medium capitalize text-foreground">{campaign.status ?? "—"}</dd>
