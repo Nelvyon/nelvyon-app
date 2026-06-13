@@ -10,6 +10,7 @@ import { getBrandMode } from "@/core/platform/brand";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { canPerformAction } from "@/core/routing/guards";
 import { Button } from "@/core/ui/button";
+import { PageHeader } from "@/core/ui/PageHeader";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonDetailCard } from "@/core/ui/Skeleton";
 import { CampaignDetailCard } from "@/features/campaigns/components/CampaignDetailCard";
@@ -42,79 +43,64 @@ export default function CampaignDetailPage() {
     await updateMutation.mutateAsync(payload);
   };
 
+  const title =
+    query.data?.name?.trim() ||
+    (isClientMode ? `Proyecto #${id}` : `Campaña #${id}`);
+
   return (
     <ProtectedLayout module="campaigns">
-      <div className="space-y-5">
-        <Button asChild size="sm" variant="outline">
-          <Link href="/campaigns">{isClientMode ? "Back to projects" : "Back to campaigns"}</Link>
-        </Button>
+      <div className="space-y-6">
+        <PageHeader
+          title={title}
+          description={
+            isClientMode
+              ? "Detalle del proyecto compartido con tu cuenta."
+              : "Estado, canal, cliente vinculado y edición según tu rol."
+          }
+          actions={
+            <Button asChild size="sm" variant="outline">
+              <Link href="/campaigns">{isClientMode ? "← Volver a proyectos" : "← Volver a campañas"}</Link>
+            </Button>
+          }
+        />
 
         {invalidId ? (
-          <ErrorNotice title="Invalid project id">
-            <p>Cause: this route does not contain a valid numeric project identifier.</p>
-            <p className="mt-2 text-sm text-muted-foreground">Next: return to Projects and open a valid row.</p>
+          <ErrorNotice title="Identificador no válido">
+            <p>Esta URL no contiene un identificador numérico válido.</p>
           </ErrorNotice>
         ) : null}
-        {query.isLoading && (
+        {query.isLoading ? (
           <>
-            <p className="text-sm text-muted-foreground">{isClientMode ? "Loading project details…" : "Loading campaign details…"}</p>
+            <p className="text-sm text-muted-foreground">
+              {isClientMode ? "Cargando proyecto…" : "Cargando campaña…"}
+            </p>
             <SkeletonDetailCard />
           </>
-        )}
-        {query.isFetching && query.data ? (
-          <p className="text-xs text-muted-foreground">
-            {isClientMode ? "Refreshing project detail for this account…" : "Refreshing campaign detail for current workspace…"}
-          </p>
         ) : null}
-        {query.error instanceof ApiError && query.error.status === 403 && (
+        {query.error instanceof ApiError && query.error.status === 403 ? (
           <ForbiddenNotice>
-            <p>
-              {isClientMode
-                ? "Cause: this project is not available for your account access."
-                : "Cause: this campaign is outside your current role/workspace visibility scope."}
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {isClientMode
-                ? "Next: ask your account owner to share this project in portal scope."
-                : "Next: switch workspace in the header or ask an admin for campaigns view permissions."}
-            </p>
+            <p>No tienes acceso a {isClientMode ? "este proyecto" : "esta campaña"} con tu rol actual.</p>
           </ForbiddenNotice>
-        )}
-        {query.error instanceof ApiError && query.error.status === 404 && (
-          <ErrorNotice title={isClientMode ? "Project not found" : "Campaign not found"}>
-            <p>
-              {isClientMode
-                ? "Cause: this project is not available for your account, or no longer exists."
-                : "Cause: this campaign id is not available in the current workspace scope."}
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Next: return to {isClientMode ? "Projects" : "Campaigns"} and open it again from the list.
-            </p>
+        ) : null}
+        {query.error instanceof ApiError && query.error.status === 404 ? (
+          <ErrorNotice title={isClientMode ? "Proyecto no encontrado" : "Campaña no encontrada"}>
+            <p>El registro no existe en el workspace activo o fue eliminado.</p>
           </ErrorNotice>
-        )}
+        ) : null}
         {query.error &&
-          !(query.error instanceof ApiError && (query.error.status === 403 || query.error.status === 404)) && (
+          !(query.error instanceof ApiError && (query.error.status === 403 || query.error.status === 404)) ? (
           <ErrorNotice>
-            <p>
-              {isClientMode
-                ? "Cause: this project could not be loaded due to a temporary connection or service issue."
-                : "Cause: campaign detail request failed unexpectedly."}
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {isClientMode
-                ? "Next: refresh this page and verify account session access."
-                : "Next: refresh once; if it persists, confirm workspace header and API/session health."}
-            </p>
+            <p>No pudimos cargar el detalle. Vuelve a la lista e inténtalo de nuevo.</p>
           </ErrorNotice>
-        )}
+        ) : null}
 
-        {query.data && (
+        {query.data ? (
           <>
             <CampaignDetailCard campaign={query.data} />
             {!isClientMode ? (
               <>
-                <section className="space-y-2">
-                  <h2 className="text-base font-medium text-foreground">Status / launch</h2>
+                <section className="space-y-3">
+                  <h2 className="text-base font-semibold text-foreground">Estado y lanzamiento</h2>
                   <CampaignStatusForm
                     canSubmit={canEdit}
                     currentStatus={query.data.status}
@@ -124,8 +110,8 @@ export default function CampaignDetailPage() {
                     }}
                   />
                 </section>
-                <section className="space-y-2">
-                  <h2 className="text-base font-medium text-foreground">Edit fields</h2>
+                <section className="space-y-3">
+                  <h2 className="text-base font-semibold text-foreground">Editar campos</h2>
                   <CampaignForm
                     canSubmit={canEdit}
                     initialValues={{
@@ -140,27 +126,16 @@ export default function CampaignDetailPage() {
                     }}
                     isSubmitting={updateMutation.isPending}
                     onSubmit={onUpdate}
-                    submitLabel="Update campaign"
+                    submitLabel="Guardar cambios"
                   />
                 </section>
               </>
             ) : null}
             {updateMutation.isSuccess && !isClientMode ? (
-              <p className="text-xs text-success-foreground">Saved and synced from persisted campaign detail.</p>
+              <p className="text-sm text-success-foreground">Cambios guardados correctamente.</p>
             ) : null}
-            {updateMutation.error instanceof ApiError && updateMutation.error.status === 403 && (
-              <p className="text-sm text-warning-foreground">
-                Save blocked: your role cannot update this campaign in the current workspace. Next: ask an admin/operator to apply edits.
-              </p>
-            )}
-            {updateMutation.error &&
-              !(updateMutation.error instanceof ApiError && updateMutation.error.status === 403) && (
-                <p className="text-sm text-destructive">
-                  Save failed. Next: retry once; if it fails again, refresh detail and submit changes again.
-                </p>
-              )}
           </>
-        )}
+        ) : null}
       </div>
     </ProtectedLayout>
   );
