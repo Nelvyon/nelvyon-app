@@ -188,6 +188,35 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/publicidad") {
+    return {
+      documentTitle: "Publicidad · NELVYON",
+      heading: "Publicidad",
+      description: "Google Ads y Meta Ads unificados: métricas, briefing IA y alertas ROAS.",
+    };
+  }
+  if (path === "/publicidad/google") {
+    return {
+      documentTitle: "Google Ads · Publicidad · NELVYON",
+      heading: "Google Ads",
+      description: "Reporting y campañas de búsqueda, display y Performance Max.",
+    };
+  }
+  if (path === "/publicidad/meta") {
+    return {
+      documentTitle: "Meta Ads · Publicidad · NELVYON",
+      heading: "Meta Ads",
+      description: "Campañas de Facebook e Instagram con ROAS por anuncio.",
+    };
+  }
+  if (path === "/publicidad/briefing") {
+    return {
+      documentTitle: "Briefing IA · Publicidad · NELVYON",
+      heading: "Briefing de campaña",
+      description: "Genera estrategia cross-platform y lanza en Google y Meta.",
+    };
+  }
+
   if (path === "/inbox/tickets") {
     return {
       documentTitle: "Tickets · Helpdesk · NELVYON",
@@ -944,6 +973,13 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       documentTitle: "Reportes · Analytics · NELVYON",
       heading: "Reportes del workspace",
       description: "Informes visuales por módulo con exportación CSV.",
+    };
+  }
+  if (path === "/analytics/publicidad") {
+    return {
+      documentTitle: "Analytics Publicidad · NELVYON",
+      heading: "Analytics de publicidad",
+      description: "Inversión consolidada, ROAS y alertas de rendimiento por plataforma.",
     };
   }
   if (path === "/analytics/campaigns") {

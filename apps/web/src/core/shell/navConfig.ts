@@ -61,6 +61,7 @@ export interface ProductNavItem {
 export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "Inicio", href: "/dashboard", prefix: "/dashboard", module: "os", icon: LayoutDashboard },
   { label: "Revenue", href: "/crm", prefix: "/crm", module: "crm", icon: Users },
+  { label: "Publicidad", href: "/publicidad", prefix: "/publicidad", module: "ads", icon: Megaphone },
   { label: "Campañas", href: "/campaigns", prefix: "/campaigns", module: "campaigns", icon: Megaphone },
   { label: "SMS", href: "/dashboard/sms", prefix: "/dashboard/sms", module: "campaigns", icon: MessageSquare },
   { label: "Bandeja", href: "/dashboard/inbox", prefix: "/dashboard/inbox", module: "inbox", icon: Inbox, badgeKey: "omnichannel" },

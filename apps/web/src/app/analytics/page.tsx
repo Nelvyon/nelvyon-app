@@ -13,6 +13,11 @@ const ANALYTICS_LINKS = [
     description: "Deals, conversión por etapa y valor ponderado del pipeline.",
   },
   {
+    href: "/analytics/publicidad",
+    title: "Publicidad",
+    description: "Inversión, ROAS y alertas de Google Ads y Meta Ads.",
+  },
+  {
     href: "/analytics/campaigns",
     title: "Campañas",
     description: "Rendimiento email y multicanal por workspace.",

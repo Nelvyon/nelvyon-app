@@ -8,6 +8,7 @@ import { cn } from "@/core/ui/utils";
 const LINKS = [
   { href: "/analytics", label: "Centro", exact: true },
   { href: "/analytics/revenue", label: "Revenue", exact: false },
+  { href: "/analytics/publicidad", label: "Publicidad", exact: false },
   { href: "/analytics/tickets", label: "Helpdesk", exact: false },
   { href: "/analytics/campaigns", label: "Campañas", exact: false },
   { href: "/analytics/reportes", label: "Reportes", exact: false },
