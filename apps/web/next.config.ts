@@ -115,6 +115,9 @@ const nextConfig: NextConfig = {
       { source: "/legal/terms", destination: "/terms", permanent: true },
       { source: "/work", destination: "/servicios", permanent: true },
       { source: "/products", destination: "/servicios", permanent: true },
+      { source: "/dashboard/social-scheduler", destination: "/social/scheduler", permanent: false },
+      { source: "/dashboard/social-monitoring", destination: "/social/monitoring", permanent: false },
+      { source: "/saas/dashboard/social", destination: "/social/auto-publish", permanent: false },
     ];
   },
   async headers() {
