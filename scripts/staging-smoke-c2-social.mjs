@@ -133,6 +133,11 @@ async function probePage(module, name, path, token, workspaceId, checks = {}) {
     return;
   }
 
+  if (checks.redirectTo) {
+    fail(module, name, `expected redirect to ${checks.redirectTo}, got HTTP ${res.status}`);
+    return;
+  }
+
   if (res.status !== 200) {
     fail(module, name, `HTTP ${res.status}${location ? ` → ${location}` : ""}`);
     return;
