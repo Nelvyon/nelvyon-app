@@ -118,6 +118,9 @@ const nextConfig: NextConfig = {
       { source: "/dashboard/social-scheduler", destination: "/social/scheduler", permanent: false },
       { source: "/dashboard/social-monitoring", destination: "/social/monitoring", permanent: false },
       { source: "/saas/dashboard/social", destination: "/social/auto-publish", permanent: false },
+      { source: "/dashboard/funnels", destination: "/funnels", permanent: false },
+      { source: "/saas/funnels", destination: "/funnels", permanent: false },
+      { source: "/saas/dashboard/funnels", destination: "/funnels", permanent: false },
     ];
   },
   async headers() {

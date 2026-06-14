@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/analytics/revenue", label: "Revenue", exact: false },
   { href: "/analytics/publicidad", label: "Publicidad", exact: false },
   { href: "/analytics/social", label: "Social", exact: false },
+  { href: "/analytics/funnels", label: "Embudos", exact: false },
   { href: "/analytics/tickets", label: "Helpdesk", exact: false },
   { href: "/analytics/campaigns", label: "Campañas", exact: false },
   { href: "/analytics/reportes", label: "Reportes", exact: false },

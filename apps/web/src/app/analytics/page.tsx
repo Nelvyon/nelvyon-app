@@ -23,6 +23,11 @@ const ANALYTICS_LINKS = [
     description: "Inversión, ROAS y alertas de Google Ads y Meta Ads.",
   },
   {
+    href: "/analytics/funnels",
+    title: "Embudos",
+    description: "Conversión por paso y campaña, integrado con CRM y ads.",
+  },
+  {
     href: "/analytics/campaigns",
     title: "Campañas",
     description: "Rendimiento email y multicanal por workspace.",

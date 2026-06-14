@@ -60,7 +60,7 @@ export const MODULE_SCREEN_META = {
   Inbox: { active: "Inbox" as const, route: "/dashboard/inbox", label: "Inbox" },
   Facturación: { active: "Facturación" as const, route: "/dashboard/facturacion", label: "Facturación" },
   Calendario: { active: "Calendario" as const, route: "/dashboard/calendario", label: "Calendario" },
-  Funnels: { active: "Funnels" as const, route: "/dashboard/funnels", label: "Funnels" },
+  Funnels: { active: "Funnels" as const, route: "/funnels", label: "Embudos" },
   Reporting: { active: "Reporting" as const, route: "/dashboard/reportes", label: "Reporting" },
 } as const;
 

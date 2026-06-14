@@ -246,6 +246,28 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/funnels") {
+    return {
+      documentTitle: "Embudos · NELVYON",
+      heading: "Embudos",
+      description: "Builder de conversión Anuncio → Landing → Formulario → CRM con métricas por paso.",
+    };
+  }
+  if (path === "/funnels/builder") {
+    return {
+      documentTitle: "Builder · Embudos · NELVYON",
+      heading: "Builder de embudos",
+      description: "Diseña pasos claros y conecta publicidad, landings y CRM.",
+    };
+  }
+  if (path.startsWith("/funnels/") && path !== "/funnels/builder") {
+    return {
+      documentTitle: "Detalle embudo · NELVYON",
+      heading: "Detalle del embudo",
+      description: "Conversión por paso, abandono y atribución a campaña.",
+    };
+  }
+
   if (path === "/inbox/tickets") {
     return {
       documentTitle: "Tickets · Helpdesk · NELVYON",
@@ -1016,6 +1038,13 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       documentTitle: "Analytics Publicidad · NELVYON",
       heading: "Analytics de publicidad",
       description: "Inversión consolidada, ROAS y alertas de rendimiento por plataforma.",
+    };
+  }
+  if (path === "/analytics/funnels") {
+    return {
+      documentTitle: "Analytics Embudos · NELVYON",
+      heading: "Analytics de embudos",
+      description: "Conversión por paso y campaña integrada con CRM y publicidad.",
     };
   }
   if (path === "/analytics/campaigns") {

@@ -32,6 +32,7 @@ export const NAV_HREF_KEYS: Record<string, string> = {
   "/dashboard/websites": "websites",
   "/dashboard/stores": "stores",
   "/dashboard/landing-pages": "landingPages",
+  "/funnels": "funnels",
   "/dashboard/funnels": "funnels",
   "/dashboard/live-chat": "liveChat",
   "/dashboard/chatbot": "chatbot",
