@@ -253,7 +253,7 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
   },
   ecommerce: {
     slug: "ecommerce",
-    path: "/ecommerce",
+    path: "/servicios/ecommerce",
     title: "Ecommerce",
     eyebrow: "Servicio NELVYON",
     summary:

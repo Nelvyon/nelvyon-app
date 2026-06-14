@@ -8,6 +8,7 @@ export type ModuleKey =
   | "ads"
   | "social"
   | "funnels"
+  | "ecommerce"
   | "automations"
   | "os"
   | "billing"
@@ -27,6 +28,7 @@ export const ROLE_MATRIX: RoleMatrix = {
   ads: { view: "member", create: "member", edit: "operator", delete: "admin" },
   social: { view: "member", create: "member", edit: "operator", delete: "admin" },
   funnels: { view: "member", create: "member", edit: "operator", delete: "admin" },
+  ecommerce: { view: "member", create: "member", edit: "operator", delete: "admin" },
   automations: { view: "member", create: "operator", edit: "operator", delete: "admin" },
   os: { view: "member", create: "operator", edit: "operator", delete: "admin" },
   /** Operator can read billing; only admin can act (upgrade / checkout flows). */

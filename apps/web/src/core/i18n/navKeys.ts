@@ -30,6 +30,7 @@ export const NAV_HREF_KEYS: Record<string, string> = {
   "/dashboard/api-keys": "apiWebhooks",
   "/os": "os",
   "/dashboard/websites": "websites",
+  "/ecommerce": "stores",
   "/dashboard/stores": "stores",
   "/dashboard/landing-pages": "landingPages",
   "/funnels": "funnels",

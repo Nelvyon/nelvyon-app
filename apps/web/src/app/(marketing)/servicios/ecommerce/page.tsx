@@ -17,6 +17,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function EcommercePage() {
+export default function EcommerceMarketingPage() {
   return <ServiceDetailPage content={content} />;
 }

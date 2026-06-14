@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/analytics/publicidad", label: "Publicidad", exact: false },
   { href: "/analytics/social", label: "Social", exact: false },
   { href: "/analytics/funnels", label: "Embudos", exact: false },
+  { href: "/analytics/ecommerce", label: "Ecommerce", exact: false },
   { href: "/analytics/tickets", label: "Helpdesk", exact: false },
   { href: "/analytics/campaigns", label: "Campañas", exact: false },
   { href: "/analytics/reportes", label: "Reportes", exact: false },

@@ -268,6 +268,28 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/ecommerce") {
+    return {
+      documentTitle: "Ecommerce · NELVYON",
+      heading: "Ecommerce",
+      description: "Editor de tienda, carrito, checkout e integración con Publicidad y Email.",
+    };
+  }
+  if (path === "/ecommerce/editor") {
+    return {
+      documentTitle: "Editor · Ecommerce · NELVYON",
+      heading: "Editor de tienda",
+      description: "Catálogo, landing ecommerce y checkout Stripe.",
+    };
+  }
+  if (path.startsWith("/ecommerce/") && path !== "/ecommerce/editor") {
+    return {
+      documentTitle: "Detalle tienda · NELVYON",
+      heading: "Detalle de tienda",
+      description: "Productos, carrito, checkout y analytics de conversión.",
+    };
+  }
+
   if (path === "/inbox/tickets") {
     return {
       documentTitle: "Tickets · Helpdesk · NELVYON",
@@ -1045,6 +1067,13 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       documentTitle: "Analytics Embudos · NELVYON",
       heading: "Analytics de embudos",
       description: "Conversión por paso y campaña integrada con CRM y publicidad.",
+    };
+  }
+  if (path === "/analytics/ecommerce") {
+    return {
+      documentTitle: "Analytics Ecommerce · NELVYON",
+      heading: "Analytics de ecommerce",
+      description: "Carrito, checkout, ingresos e integración con Publicidad y Email.",
     };
   }
   if (path === "/analytics/campaigns") {

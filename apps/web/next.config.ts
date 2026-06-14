@@ -121,6 +121,8 @@ const nextConfig: NextConfig = {
       { source: "/dashboard/funnels", destination: "/funnels", permanent: false },
       { source: "/saas/funnels", destination: "/funnels", permanent: false },
       { source: "/saas/dashboard/funnels", destination: "/funnels", permanent: false },
+      { source: "/dashboard/stores", destination: "/ecommerce", permanent: false },
+      { source: "/saas/stores", destination: "/ecommerce", permanent: false },
     ];
   },
   async headers() {

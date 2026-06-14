@@ -28,6 +28,11 @@ const ANALYTICS_LINKS = [
     description: "Conversión por paso y campaña, integrado con CRM y ads.",
   },
   {
+    href: "/analytics/ecommerce",
+    title: "Ecommerce",
+    description: "Carrito, checkout, ingresos e integración con Publicidad y Email.",
+  },
+  {
     href: "/analytics/campaigns",
     title: "Campañas",
     description: "Rendimiento email y multicanal por workspace.",

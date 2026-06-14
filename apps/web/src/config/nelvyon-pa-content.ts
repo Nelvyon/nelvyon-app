@@ -52,7 +52,7 @@ export const nelvyonServices = [
   },
   {
     title: "Ecommerce",
-    href: "/ecommerce",
+    href: "/servicios/ecommerce",
     problem: "La tienda vende pero el proceso post-compra y los datos están dispersos.",
     solution: "Funnel de compra, tracking y coordinación con campañas y operación.",
     microcopy: "Venta online con proceso claro.",
