@@ -6,6 +6,7 @@ export const INTERNAL_ONLY: readonly string[] = [
   "/analytics",
   "/crm",
   "/publicidad",
+  "/social",
   "/automations",
   "/os",
   "/billing/upgrade",

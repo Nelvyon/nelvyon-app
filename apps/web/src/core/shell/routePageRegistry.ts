@@ -217,6 +217,35 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/social") {
+    return {
+      documentTitle: "Social · NELVYON",
+      heading: "Social",
+      description: "Programación, auto-publicación IA y monitoring de marca unificados.",
+    };
+  }
+  if (path === "/social/scheduler") {
+    return {
+      documentTitle: "Programación · Social · NELVYON",
+      heading: "Programación social",
+      description: "Calendario editorial y cuentas conectadas del workspace.",
+    };
+  }
+  if (path === "/social/monitoring") {
+    return {
+      documentTitle: "Monitoring · Social · NELVYON",
+      heading: "Monitoring de marca",
+      description: "Menciones, alertas y sentimiento en tiempo casi real.",
+    };
+  }
+  if (path === "/social/auto-publish") {
+    return {
+      documentTitle: "Auto-publicación · Social · NELVYON",
+      heading: "Auto-publicación IA",
+      description: "Copys, creatividades y calendario automático por red.",
+    };
+  }
+
   if (path === "/inbox/tickets") {
     return {
       documentTitle: "Tickets · Helpdesk · NELVYON",
@@ -973,6 +1002,13 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       documentTitle: "Reportes · Analytics · NELVYON",
       heading: "Reportes del workspace",
       description: "Informes visuales por módulo con exportación CSV.",
+    };
+  }
+  if (path === "/analytics/social") {
+    return {
+      documentTitle: "Analytics Social · NELVYON",
+      heading: "Analytics de Social",
+      description: "Alcance, engagement, sentimiento y publicaciones del workspace.",
     };
   }
   if (path === "/analytics/publicidad") {

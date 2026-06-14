@@ -62,6 +62,7 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "Inicio", href: "/dashboard", prefix: "/dashboard", module: "os", icon: LayoutDashboard },
   { label: "Revenue", href: "/crm", prefix: "/crm", module: "crm", icon: Users },
   { label: "Publicidad", href: "/publicidad", prefix: "/publicidad", module: "ads", icon: Megaphone },
+  { label: "Social", href: "/social", prefix: "/social", module: "social", icon: Share2 },
   { label: "Campañas", href: "/campaigns", prefix: "/campaigns", module: "campaigns", icon: Megaphone },
   { label: "SMS", href: "/dashboard/sms", prefix: "/dashboard/sms", module: "campaigns", icon: MessageSquare },
   { label: "Bandeja", href: "/dashboard/inbox", prefix: "/dashboard/inbox", module: "inbox", icon: Inbox, badgeKey: "omnichannel" },
@@ -110,8 +111,6 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "Dialer", href: "/dashboard/dialer", prefix: "/dashboard/dialer", module: "os", icon: Phone },
   { label: "QR Codes", href: "/dashboard/qr", prefix: "/dashboard/qr", module: "os", icon: QrCode },
   { label: "Formularios", href: "/dashboard/formularios", prefix: "/dashboard/formularios", module: "os", icon: ClipboardList },
-  { label: "Social", href: "/dashboard/social-scheduler", prefix: "/dashboard/social-scheduler", module: "os", icon: Share2 },
-  { label: "Social Monitoring", href: "/dashboard/social-monitoring", prefix: "/dashboard/social-monitoring", module: "os", icon: Radio },
   { label: "Historial", href: "/dashboard/history", prefix: "/dashboard", module: "os", icon: History },
   { label: "Help", href: "/help", prefix: "/help", module: "help", icon: CircleHelp },
 ] as const;
