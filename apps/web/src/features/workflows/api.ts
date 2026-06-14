@@ -49,7 +49,7 @@ export type WorkflowExecution = {
   completed_at?: string;
 };
 
-const BASE = "/api/workflows";
+const BASE = "/api/platform/automations/workflows";
 
 export const workflowsApi = {
   list: (skip = 0, limit = 50) =>

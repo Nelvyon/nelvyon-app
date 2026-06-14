@@ -290,6 +290,42 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/automatizacion") {
+    return {
+      documentTitle: "Automatización · NELVYON",
+      heading: "Automatización",
+      description: "Workflows si pasa X haz Y con conectores CRM, Helpdesk, Publicidad, Email y Ecommerce.",
+    };
+  }
+  if (path === "/automatizacion/flujos") {
+    return {
+      documentTitle: "Flujos · Automatización · NELVYON",
+      heading: "Flujos visuales",
+      description: "Editor drag-and-drop de automatizaciones.",
+    };
+  }
+  if (path === "/automatizacion/recetas") {
+    return {
+      documentTitle: "Recetas · Automatización · NELVYON",
+      heading: "Recetas predefinidas",
+      description: "Onboarding, carrito, ROAS, tickets urgentes y email de bienvenida.",
+    };
+  }
+  if (path === "/automatizacion/reglas") {
+    return {
+      documentTitle: "Reglas CRM · Automatización · NELVYON",
+      heading: "Reglas del motor CRM",
+      description: "Triggers automáticos en deals y contactos.",
+    };
+  }
+  if (path === "/automatizacion/editor") {
+    return {
+      documentTitle: "Editor · Automatización · NELVYON",
+      heading: "Editor de flujos",
+      description: "Diseña triggers, acciones y lógica visual.",
+    };
+  }
+
   if (path === "/inbox/tickets") {
     return {
       documentTitle: "Tickets · Helpdesk · NELVYON",
@@ -1074,6 +1110,13 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       documentTitle: "Analytics Ecommerce · NELVYON",
       heading: "Analytics de ecommerce",
       description: "Carrito, checkout, ingresos e integración con Publicidad y Email.",
+    };
+  }
+  if (path === "/analytics/automatizacion") {
+    return {
+      documentTitle: "Analytics Automatización · NELVYON",
+      heading: "Analytics de automatización",
+      description: "Eventos por flujo, reglas CRM y jobs del workspace.",
     };
   }
   if (path === "/analytics/campaigns") {

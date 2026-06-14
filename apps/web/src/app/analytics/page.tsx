@@ -33,6 +33,11 @@ const ANALYTICS_LINKS = [
     description: "Carrito, checkout, ingresos e integración con Publicidad y Email.",
   },
   {
+    href: "/analytics/automatizacion",
+    title: "Automatización",
+    description: "Eventos por flujo, reglas CRM y tasa de éxito de jobs.",
+  },
+  {
     href: "/analytics/campaigns",
     title: "Campañas",
     description: "Rendimiento email y multicanal por workspace.",

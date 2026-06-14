@@ -123,6 +123,10 @@ const nextConfig: NextConfig = {
       { source: "/saas/dashboard/funnels", destination: "/funnels", permanent: false },
       { source: "/dashboard/stores", destination: "/ecommerce", permanent: false },
       { source: "/saas/stores", destination: "/ecommerce", permanent: false },
+      { source: "/dashboard/workflows", destination: "/automatizacion/flujos", permanent: false },
+      { source: "/dashboard/workflows/editor", destination: "/automatizacion/editor", permanent: false },
+      { source: "/dashboard/automatizacion", destination: "/automatizacion/flujos", permanent: false },
+      { source: "/automations/jobs", destination: "/automatizacion/flujos", permanent: false },
     ];
   },
   async headers() {

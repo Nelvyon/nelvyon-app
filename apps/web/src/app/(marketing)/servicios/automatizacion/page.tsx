@@ -17,6 +17,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AutomatizacionPage() {
+export default function AutomatizacionMarketingPage() {
   return <ServiceDetailPage content={content} />;
 }

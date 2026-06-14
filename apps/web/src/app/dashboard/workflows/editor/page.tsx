@@ -147,7 +147,7 @@ function EditorInner() {
 
   useEffect(() => {
     if (!workflowId) {
-      router.replace("/dashboard/workflows");
+      router.replace("/automatizacion/flujos");
       return;
     }
     workflowsApi
@@ -259,7 +259,7 @@ function EditorInner() {
     <div className="flex h-[calc(100vh-4rem)] flex-col">
       <header className="flex flex-wrap items-center gap-3 border-b bg-card px-4 py-3">
         <Button asChild size="sm" variant="ghost">
-          <Link href="/dashboard/workflows">
+          <Link href="/automatizacion/flujos">
             <ArrowLeft className="mr-1 h-4 w-4" /> Volver
           </Link>
         </Button>

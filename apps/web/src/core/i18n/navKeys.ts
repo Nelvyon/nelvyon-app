@@ -4,6 +4,7 @@ export const NAV_HREF_KEYS: Record<string, string> = {
   "/dashboard/crm": "crm",
   "/dashboard/campanas": "campaigns",
   "/dashboard/sms": "sms",
+  "/automatizacion": "automation",
   "/dashboard/workflows": "workflows",
   "/dashboard/automatizacion": "automation",
   "/dashboard/inbox": "inbox",

@@ -291,7 +291,7 @@ export const nelvyonServicePages: Record<string, ServicePageContent> = {
   },
   automatizacion: {
     slug: "automatizacion",
-    path: "/automatizacion",
+    path: "/servicios/automatizacion",
     title: "Automatización",
     eyebrow: "Servicio NELVYON",
     summary:

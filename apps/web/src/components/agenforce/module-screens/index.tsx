@@ -55,7 +55,7 @@ export function ModuleScreenShell({ active, route, children, flat = false }: Mod
 
 export const MODULE_SCREEN_META = {
   CRM: { active: "CRM" as const, route: "/dashboard/crm", label: "CRM" },
-  Workflows: { active: "Workflows" as const, route: "/dashboard/workflows", label: "Workflows" },
+  Workflows: { active: "Workflows" as const, route: "/automatizacion", label: "Automatización" },
   Campañas: { active: "Campañas" as const, route: "/dashboard/campanas", label: "Campañas" },
   Inbox: { active: "Inbox" as const, route: "/dashboard/inbox", label: "Inbox" },
   Facturación: { active: "Facturación" as const, route: "/dashboard/facturacion", label: "Facturación" },

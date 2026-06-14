@@ -45,7 +45,7 @@ export const nelvyonServices = [
   },
   {
     title: "Automatización",
-    href: "/automatizacion",
+    href: "/servicios/automatizacion",
     problem: "El equipo pierde tiempo en tareas repetitivas de seguimiento.",
     solution: "Flujos que asignan, avisan y actualizan el CRM según reglas del negocio.",
     microcopy: "Ahorro de tiempo y seguimiento fiable.",
