@@ -66,6 +66,7 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "Embudos", href: "/funnels", prefix: "/funnels", module: "funnels", icon: GitMerge },
   { label: "Ecommerce", href: "/ecommerce", prefix: "/ecommerce", module: "ecommerce", icon: ShoppingBag },
   { label: "Automatización", href: "/automatizacion", prefix: "/automatizacion", module: "automations", icon: Workflow },
+  { label: "Reputación", href: "/reputacion", prefix: "/reputacion", module: "reputacion", icon: Star },
   { label: "Campañas", href: "/campaigns", prefix: "/campaigns", module: "campaigns", icon: Megaphone },
   { label: "SMS", href: "/dashboard/sms", prefix: "/dashboard/sms", module: "campaigns", icon: MessageSquare },
   { label: "Bandeja", href: "/dashboard/inbox", prefix: "/dashboard/inbox", module: "inbox", icon: Inbox, badgeKey: "omnichannel" },

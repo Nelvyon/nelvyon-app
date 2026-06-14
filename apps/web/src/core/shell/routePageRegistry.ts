@@ -326,6 +326,35 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/reputacion") {
+    return {
+      documentTitle: "Reputación · NELVYON",
+      heading: "Reputación online",
+      description: "Google Business, sentimiento, alertas negativas y widgets para tu web.",
+    };
+  }
+  if (path === "/reputacion/resenas") {
+    return {
+      documentTitle: "Reseñas · Reputación · NELVYON",
+      heading: "Listado de reseñas",
+      description: "Filtros por sentimiento y valoración en Google Business.",
+    };
+  }
+  if (path === "/reputacion/alertas") {
+    return {
+      documentTitle: "Alertas · Reputación · NELVYON",
+      heading: "Alertas de reputación",
+      description: "Avisos inmediatos ante nuevas reseñas negativas.",
+    };
+  }
+  if (path === "/reputacion/widgets") {
+    return {
+      documentTitle: "Widgets · Reputación · NELVYON",
+      heading: "Widgets y embeds",
+      description: "Incrusta reseñas verificadas en landings y tiendas.",
+    };
+  }
+
   if (path === "/inbox/tickets") {
     return {
       documentTitle: "Tickets · Helpdesk · NELVYON",
@@ -1117,6 +1146,13 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       documentTitle: "Analytics Automatización · NELVYON",
       heading: "Analytics de automatización",
       description: "Eventos por flujo, reglas CRM y jobs del workspace.",
+    };
+  }
+  if (path === "/analytics/reputacion") {
+    return {
+      documentTitle: "Analytics Reputación · NELVYON",
+      heading: "Analytics de reputación",
+      description: "Sentimiento, alertas y evolución de reseñas Google Business.",
     };
   }
   if (path === "/analytics/campaigns") {

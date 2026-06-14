@@ -38,6 +38,11 @@ const ANALYTICS_LINKS = [
     description: "Eventos por flujo, reglas CRM y tasa de éxito de jobs.",
   },
   {
+    href: "/analytics/reputacion",
+    title: "Reputación",
+    description: "Sentimiento, alertas de reseñas negativas y evolución Google Business.",
+  },
+  {
     href: "/analytics/campaigns",
     title: "Campañas",
     description: "Rendimiento email y multicanal por workspace.",

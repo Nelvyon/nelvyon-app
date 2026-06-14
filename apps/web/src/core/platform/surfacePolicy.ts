@@ -10,6 +10,7 @@ export const INTERNAL_ONLY: readonly string[] = [
   "/funnels",
   "/ecommerce",
   "/automatizacion",
+  "/reputacion",
   "/automations",
   "/os",
   "/billing/upgrade",

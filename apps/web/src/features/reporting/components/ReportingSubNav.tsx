@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/analytics/funnels", label: "Embudos", exact: false },
   { href: "/analytics/ecommerce", label: "Ecommerce", exact: false },
   { href: "/analytics/automatizacion", label: "Automatización", exact: false },
+  { href: "/analytics/reputacion", label: "Reputación", exact: false },
   { href: "/analytics/tickets", label: "Helpdesk", exact: false },
   { href: "/analytics/campaigns", label: "Campañas", exact: false },
   { href: "/analytics/reportes", label: "Reportes", exact: false },
