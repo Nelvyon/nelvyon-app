@@ -65,6 +65,9 @@ export default function AnalyticsHubPage() {
     <ProtectedLayout module="os">
       <div className="space-y-6">
         <ReportingSubNav />
+        <p className="sr-only">
+          Analytics centro: Instantáneas de Publicidad, Social, Embudos y Ecommerce con rendimiento cruzado.
+        </p>
         <AnalyticsHubSnapshots />
         <p className="text-sm text-muted-foreground">
           Centro de analítica unificado del workspace. Elige un módulo para profundizar en métricas operativas.

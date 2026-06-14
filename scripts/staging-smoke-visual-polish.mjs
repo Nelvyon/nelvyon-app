@@ -23,17 +23,21 @@ async function sleep(ms) {
 
 async function waitForDeploy() {
   if (SKIP_WAIT) return;
-  for (let i = 1; i <= 30; i += 1) {
+  for (let i = 1; i <= 40; i += 1) {
     try {
       const h = await fetch(`${BASE}/api/health/live`, { cache: "no-store" });
-      const bff = await fetch(`${BASE}/api/platform/ads/reporting/unified`, { cache: "no-store" });
-      if (h.status === 200 && bff.status !== 404) {
+      const dash = await fetch(`${BASE}/dashboard`, { cache: "no-store" });
+      const html = dash.status === 200 ? await dash.text() : "";
+      const uiReady = html.toLowerCase().includes("pulso del workspace");
+      console.log(JSON.stringify({ attempt: i, health: h.status, dashboard: dash.status, uiReady }));
+      if (h.status === 200 && uiReady) {
         console.log("DEPLOY_READY");
         return;
       }
     } catch {}
-    await sleep(20000);
+    await sleep(30000);
   }
+  fail("deploy", "wait", "timeout — continuing");
 }
 
 async function login() {
