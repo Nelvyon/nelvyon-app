@@ -190,6 +190,37 @@ export async function dbGetClient(id: number, workspaceId: number, userId: strin
   return rows[0] ? mapClientRow(rows[0]) : null;
 }
 
+export async function dbUpdateClient(
+  id: number,
+  workspaceId: number,
+  userId: string,
+  data: Record<string, unknown>,
+) {
+  const allowed = ["business_name", "sector", "country", "city", "website_url", "value_proposition"] as const;
+  const sets: string[] = [];
+  const values: unknown[] = [id, workspaceId, userId];
+  let i = 4;
+
+  for (const key of allowed) {
+    if (data[key] !== undefined) {
+      sets.push(`${key} = $${i++}`);
+      values.push(data[key]);
+    }
+  }
+
+  if (sets.length === 0) {
+    return dbGetClient(id, workspaceId, userId);
+  }
+
+  const rows = await db().query<Record<string, unknown>>(
+    `UPDATE nelvyon_clients SET ${sets.join(", ")}
+     WHERE id = $1 AND workspace_id = $2 AND user_id = $3
+     RETURNING *`,
+    values,
+  );
+  return rows[0] ? mapClientRow(rows[0]) : null;
+}
+
 function mapCampaignRow(row: Record<string, unknown>) {
   return {
     id: Number(row.id),
@@ -264,4 +295,316 @@ export async function dbGetCampaign(id: number, workspaceId: number, userId: str
     [id, workspaceId, userId],
   );
   return rows[0] ? mapCampaignRow(rows[0]) : null;
+}
+
+export async function dbUpdateCampaign(
+  id: number,
+  workspaceId: number,
+  userId: string,
+  data: Record<string, unknown>,
+) {
+  const allowed = ["name", "content", "target_audience", "status", "campaign_type", "platform"] as const;
+  const sets: string[] = ["updated_at = NOW()"];
+  const values: unknown[] = [id, workspaceId, userId];
+  let i = 4;
+
+  for (const key of allowed) {
+    if (data[key] !== undefined) {
+      sets.push(`${key} = $${i++}`);
+      values.push(data[key]);
+    }
+  }
+
+  if (sets.length === 1) {
+    return dbGetCampaign(id, workspaceId, userId);
+  }
+
+  const rows = await db().query<Record<string, unknown>>(
+    `UPDATE nelvyon_campaigns SET ${sets.join(", ")}
+     WHERE id = $1 AND workspace_id = $2 AND user_id = $3
+     RETURNING *`,
+    values,
+  );
+  return rows[0] ? mapCampaignRow(rows[0]) : null;
+}
+
+function mapDealRow(row: Record<string, unknown>) {
+  return {
+    id: Number(row.id),
+    user_id: String(row.user_id),
+    workspace_id: row.workspace_id != null ? Number(row.workspace_id) : null,
+    title: String(row.title),
+    value: row.value != null ? Number(row.value) : null,
+    currency: (row.currency as string | null) ?? null,
+    stage: (row.stage as string | null) ?? null,
+    pipeline: (row.pipeline as string | null) ?? null,
+    probability: row.probability != null ? Number(row.probability) : null,
+    expected_close: row.expected_close ? String(row.expected_close) : null,
+    assigned_to: (row.assigned_to as string | null) ?? null,
+    notes: (row.notes as string | null) ?? null,
+    days_in_stage: row.days_in_stage != null ? Number(row.days_in_stage) : null,
+    client_id: row.client_id != null ? Number(row.client_id) : null,
+    created_at: row.created_at ? String(row.created_at) : null,
+    updated_at: row.updated_at ? String(row.updated_at) : null,
+  };
+}
+
+export async function dbListDeals(workspaceId: number, userId: string, clientId?: number) {
+  const items = clientId
+    ? await db().query<Record<string, unknown>>(
+        `SELECT * FROM deals
+         WHERE workspace_id = $1 AND user_id = $2 AND client_id = $3
+         ORDER BY id DESC LIMIT 100`,
+        [workspaceId, userId, clientId],
+      )
+    : await db().query<Record<string, unknown>>(
+        `SELECT * FROM deals
+         WHERE workspace_id = $1 AND user_id = $2
+         ORDER BY id DESC LIMIT 100`,
+        [workspaceId, userId],
+      );
+  const totalRows = clientId
+    ? await db().query<{ count: string }>(
+        `SELECT COUNT(*)::text AS count FROM deals
+         WHERE workspace_id = $1 AND user_id = $2 AND client_id = $3`,
+        [workspaceId, userId, clientId],
+      )
+    : await db().query<{ count: string }>(
+        `SELECT COUNT(*)::text AS count FROM deals
+         WHERE workspace_id = $1 AND user_id = $2`,
+        [workspaceId, userId],
+      );
+  return {
+    items: items.map(mapDealRow),
+    total: Number(totalRows[0]?.count ?? items.length),
+    skip: 0,
+    limit: 100,
+  };
+}
+
+export async function dbCreateDeal(
+  workspaceId: number,
+  userId: string,
+  data: Record<string, unknown>,
+) {
+  const rows = await db().query<Record<string, unknown>>(
+    `INSERT INTO deals
+       (user_id, workspace_id, title, value, currency, stage, pipeline, probability, assigned_to, notes, client_id, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())
+     RETURNING *`,
+    [
+      userId,
+      workspaceId,
+      String(data.title ?? "Nuevo deal"),
+      data.value != null ? Number(data.value) : null,
+      (data.currency as string | undefined) ?? "EUR",
+      (data.stage as string | undefined) ?? "lead",
+      (data.pipeline as string | undefined) ?? "default",
+      data.probability != null ? Number(data.probability) : 10,
+      (data.assigned_to as string | undefined) ?? userId,
+      (data.notes as string | undefined) ?? null,
+      data.client_id != null ? Number(data.client_id) : null,
+    ],
+  );
+  return mapDealRow(rows[0]);
+}
+
+export async function dbGetDeal(id: number, workspaceId: number, userId: string) {
+  const rows = await db().query<Record<string, unknown>>(
+    `SELECT * FROM deals WHERE id = $1 AND workspace_id = $2 AND user_id = $3 LIMIT 1`,
+    [id, workspaceId, userId],
+  );
+  return rows[0] ? mapDealRow(rows[0]) : null;
+}
+
+export async function dbUpdateDeal(
+  id: number,
+  workspaceId: number,
+  userId: string,
+  data: Record<string, unknown>,
+) {
+  const allowed = [
+    "title",
+    "value",
+    "currency",
+    "stage",
+    "pipeline",
+    "probability",
+    "assigned_to",
+    "notes",
+    "client_id",
+  ] as const;
+  const sets: string[] = ["updated_at = NOW()"];
+  const values: unknown[] = [id, workspaceId, userId];
+  let i = 4;
+
+  for (const key of allowed) {
+    if (data[key] !== undefined) {
+      sets.push(`${key} = $${i++}`);
+      values.push(data[key]);
+    }
+  }
+
+  const rows = await db().query<Record<string, unknown>>(
+    `UPDATE deals SET ${sets.join(", ")}
+     WHERE id = $1 AND workspace_id = $2 AND user_id = $3
+     RETURNING *`,
+    values,
+  );
+  return rows[0] ? mapDealRow(rows[0]) : null;
+}
+
+export async function dbPipelineSummary(workspaceId: number, userId: string) {
+  const rows = await db().query<Record<string, unknown>>(
+    `SELECT stage, COUNT(*)::int AS count, COALESCE(SUM(value), 0)::float AS value
+     FROM deals
+     WHERE workspace_id = $1 AND user_id = $2 AND stage IS NOT NULL
+     GROUP BY stage
+     ORDER BY count DESC`,
+    [workspaceId, userId],
+  );
+  const stages = rows.map((r) => ({
+    stage: String(r.stage),
+    count: Number(r.count),
+    value: Number(r.value),
+  }));
+  const total_count = stages.reduce((a, s) => a + s.count, 0);
+  const total_value = stages.reduce((a, s) => a + s.value, 0);
+  return {
+    by_stage: stages,
+    items: stages,
+    stages,
+    total_count,
+    total_value,
+  };
+}
+
+function mapTicketRow(row: Record<string, unknown>) {
+  return {
+    id: Number(row.id),
+    user_id: String(row.user_id),
+    workspace_id: Number(row.workspace_id),
+    subject: String(row.subject),
+    description: (row.description as string | null) ?? null,
+    status: (row.status as string | null) ?? "open",
+    priority: (row.priority as string | null) ?? "medium",
+    category: (row.category as string | null) ?? null,
+    assigned_to: (row.assigned_to as string | null) ?? null,
+    client_name: (row.client_name as string | null) ?? null,
+    client_email: (row.client_email as string | null) ?? null,
+    channel: (row.channel as string | null) ?? null,
+    client_id: row.client_id != null ? Number(row.client_id) : null,
+    first_response_minutes: row.first_response_minutes != null ? Number(row.first_response_minutes) : null,
+    satisfaction_score: row.satisfaction_score != null ? Number(row.satisfaction_score) : null,
+    created_at: row.created_at ? String(row.created_at) : null,
+    resolved_at: row.resolved_at ? String(row.resolved_at) : null,
+  };
+}
+
+export async function dbGetTicket(id: number, workspaceId: number, userId: string) {
+  const rows = await db().query<Record<string, unknown>>(
+    `SELECT * FROM helpdesk_tickets
+     WHERE id = $1 AND workspace_id = $2 AND user_id = $3 LIMIT 1`,
+    [id, workspaceId, userId],
+  );
+  return rows[0] ? mapTicketRow(rows[0]) : null;
+}
+
+export async function dbUpdateTicket(
+  id: number,
+  workspaceId: number,
+  userId: string,
+  data: Record<string, unknown>,
+) {
+  const existing = await dbGetTicket(id, workspaceId, userId);
+  if (!existing) return null;
+
+  const newStatus = data.status != null ? String(data.status) : existing.status;
+  const sets: string[] = [];
+  const values: unknown[] = [id, workspaceId, userId];
+  let i = 4;
+
+  if (data.status !== undefined) {
+    sets.push(`status = $${i++}`);
+    values.push(newStatus);
+  }
+  if (data.priority !== undefined) {
+    sets.push(`priority = $${i++}`);
+    values.push(data.priority);
+  }
+  if (data.assigned_to !== undefined) {
+    sets.push(`assigned_to = $${i++}`);
+    values.push(data.assigned_to);
+  }
+
+  const movingToActive = ["in_progress", "pending", "waiting"].includes(String(newStatus).toLowerCase());
+  const movingToClosed = ["closed", "resolved"].includes(String(newStatus).toLowerCase());
+
+  if (movingToActive && existing.first_response_minutes == null && existing.created_at) {
+    const created = new Date(existing.created_at);
+    const minutes = Math.max(0, Math.floor((Date.now() - created.getTime()) / 60000));
+    sets.push(`first_response_minutes = $${i++}`);
+    values.push(minutes);
+  }
+
+  if (movingToClosed && !existing.resolved_at) {
+    sets.push(`resolved_at = NOW()`);
+  }
+
+  if (sets.length === 0) return existing;
+
+  const rows = await db().query<Record<string, unknown>>(
+    `UPDATE helpdesk_tickets SET ${sets.join(", ")}
+     WHERE id = $1 AND workspace_id = $2 AND user_id = $3
+     RETURNING *`,
+    values,
+  );
+  return rows[0] ? mapTicketRow(rows[0]) : null;
+}
+
+export async function dbListTickets(workspaceId: number, userId: string) {
+  const items = await db().query<Record<string, unknown>>(
+    `SELECT * FROM helpdesk_tickets
+     WHERE workspace_id = $1 AND user_id = $2
+     ORDER BY id DESC LIMIT 50`,
+    [workspaceId, userId],
+  );
+  const totalRows = await db().query<{ count: string }>(
+    `SELECT COUNT(*)::text AS count FROM helpdesk_tickets
+     WHERE workspace_id = $1 AND user_id = $2`,
+    [workspaceId, userId],
+  );
+  return {
+    items: items.map(mapTicketRow),
+    total: Number(totalRows[0]?.count ?? items.length),
+    skip: 0,
+    limit: 50,
+  };
+}
+
+export async function dbCreateTicket(
+  workspaceId: number,
+  userId: string,
+  data: Record<string, unknown>,
+) {
+  const rows = await db().query<Record<string, unknown>>(
+    `INSERT INTO helpdesk_tickets
+       (user_id, workspace_id, subject, description, status, priority, category, client_name, client_email, channel, client_id, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+     RETURNING *`,
+    [
+      userId,
+      workspaceId,
+      String(data.subject ?? "Nuevo ticket"),
+      (data.description as string | undefined) ?? null,
+      (data.status as string | undefined) ?? "open",
+      (data.priority as string | undefined) ?? "medium",
+      (data.category as string | undefined) ?? null,
+      (data.client_name as string | undefined) ?? null,
+      (data.client_email as string | undefined) ?? null,
+      (data.channel as string | undefined) ?? "web",
+      data.client_id != null ? Number(data.client_id) : null,
+    ],
+  );
+  return mapTicketRow(rows[0]);
 }

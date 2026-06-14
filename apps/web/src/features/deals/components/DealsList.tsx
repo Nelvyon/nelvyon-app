@@ -8,8 +8,17 @@ import { EmptyState } from "@/core/ui/EmptyState";
 import { isDealAtRisk } from "@/features/deals/risk";
 import { Deal } from "@/features/deals/types";
 
+const STAGE_LABELS: Record<string, string> = {
+  lead: "Lead",
+  qualified: "Calificado",
+  proposal: "Propuesta",
+  negotiation: "Negociación",
+  won: "Ganado",
+  lost: "Perdido",
+};
+
 function riskLabel(deal: Deal) {
-  return isDealAtRisk(deal) ? "at risk" : "healthy";
+  return isDealAtRisk(deal) ? "En riesgo" : "Saludable";
 }
 
 export function DealsList({
@@ -17,27 +26,24 @@ export function DealsList({
   emptyContext = "default",
 }: {
   deals: Deal[];
-  /** Why the list is empty — avoids a “broken” generic empty. */
   emptyContext?: "default" | "client-filter" | "filters";
 }) {
   if (deals.length === 0) {
     const copy =
       emptyContext === "client-filter"
         ? {
-            title: "No deals for this client in the current view",
+            title: "Sin deals para este cliente",
             description:
-              "Why: either this account has no linked opportunities yet, or stage/owner filters exclude them. Next: clear filters above, open Revenue → Clients to confirm the account, or add a deal tied to this client.",
+              "No hay oportunidades vinculadas o los filtros las excluyen. Limpia filtros o crea un deal desde la ficha del cliente.",
           }
         : emptyContext === "filters"
           ? {
-              title: "No deals match these filters",
-              description:
-                "Why: stage or owner filters returned zero rows; the workspace may still have other deals. Next: set stage and owner to “All”, then narrow again.",
+              title: "Ningún deal coincide con los filtros",
+              description: "Prueba con etapa y responsable en “Todos” para ver el pipeline completo.",
             }
           : {
-              title: "No deals in this workspace yet",
-              description:
-                "Why: no opportunities were returned for this tenant. Next: create deals from Revenue → Clients or your import flow, then revisit this pipeline view.",
+              title: "Pipeline vacío",
+              description: "Crea tu primera oportunidad desde Nuevo deal o vincúlala a un cliente existente.",
             };
     return <EmptyState title={copy.title} description={copy.description} />;
   }
@@ -53,17 +59,18 @@ export function DealsList({
             <Badge tone={toneFromMeterStatus(isDealAtRisk(deal) ? "critical" : "normal")}>{riskLabel(deal)}</Badge>
           </div>
           <p className="text-xs text-muted-foreground">
-            Stage: {deal.stage ?? "—"} · Owner: {deal.assigned_to ?? "unassigned"}
+            Etapa: {STAGE_LABELS[(deal.stage ?? "").toLowerCase()] ?? deal.stage ?? "—"} · Responsable:{" "}
+            {deal.assigned_to ?? "sin asignar"}
             {deal.client_id != null && deal.client_id > 0 ? (
               <>
                 {" "}
-                · Client:{" "}
-                <Link className="text-link hover:text-link-hover hover:underline" href={`/crm/clients/${deal.client_id}`}>
+                · Cliente:{" "}
+                <Link className="text-link hover:underline" href={`/crm/clients/${deal.client_id}`}>
                   #{deal.client_id}
                 </Link>
               </>
             ) : null}{" "}
-            · Value: {deal.value != null ? `${deal.value} ${deal.currency ?? ""}`.trim() : "—"}
+            · Valor: {deal.value != null ? `${deal.value} ${deal.currency ?? "EUR"}`.trim() : "—"}
           </p>
         </li>
       ))}

@@ -14,11 +14,11 @@ export default function PortalDeliverablesPage() {
 
   return (
     <PortalPageShell
-      title="Deliverables"
-      description="Review, approve, or request changes on published deliverables."
+      title="Entregables"
+      description="Revisa, aprueba o solicita cambios en los entregables publicados por tu equipo."
       backHref="/portal"
     >
-      {query.isLoading ? <PortalLoadingState message="Loading deliverables…" /> : null}
+      {query.isLoading ? <PortalLoadingState message="Cargando entregables…" /> : null}
       {query.isError ? (
         <PortalErrorState
           message={query.error instanceof Error ? query.error.message : undefined}
@@ -27,8 +27,8 @@ export default function PortalDeliverablesPage() {
       ) : null}
       {query.data && query.data.items.length === 0 ? (
         <PortalEmptyState
-          title="No deliverables to review"
-          description="When your team publishes a deliverable, it will appear here for your approval."
+          title="Sin entregables pendientes"
+          description="Cuando tu equipo publique un entregable (landing, SEO, chatbot o informe), aparecerá aquí para tu revisión."
         />
       ) : null}
       {query.data && query.data.items.length > 0 ? (

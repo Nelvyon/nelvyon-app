@@ -6,7 +6,7 @@ import { toastError, toastSuccess } from "@/core/ui/toastFeedback";
 import { dealsApi } from "@/features/deals/api";
 import { CreateFollowUpInput, DealUpdateInput } from "@/features/deals/types";
 
-export function useDeals(filters: { stage?: string; owner?: string; clientId?: number }) {
+export function useDeals(filters: { stage?: string; owner?: string; clientId?: number; limit?: number } = {}) {
   return useQuery({
     queryKey: ["deals", "list", filters],
     queryFn: () => dealsApi.list(filters),
@@ -43,10 +43,10 @@ export function useUpdateDeal(id: number) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["deals"] });
       await queryClient.refetchQueries({ queryKey: ["deals", "detail", id] });
-      toastSuccess("Deal updated.");
+      toastSuccess("Deal actualizado.");
     },
     onError: () => {
-      toastError("Could not update deal.");
+      toastError("No se pudo actualizar el deal.");
     },
   });
 }
@@ -59,10 +59,24 @@ export function useCreateFollowUp(dealId: number) {
       await queryClient.invalidateQueries({ queryKey: ["deals"] });
       await queryClient.refetchQueries({ queryKey: ["deals", "follow-ups", dealId] });
       await queryClient.refetchQueries({ queryKey: ["deals", "detail", dealId] });
-      toastSuccess("Follow-up activity created.");
+      toastSuccess("Seguimiento creado.");
     },
     onError: () => {
-      toastError("Could not create follow-up activity.");
+      toastError("No se pudo crear el seguimiento.");
+    },
+  });
+}
+
+export function useCreateDeal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: dealsApi.create,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["deals"] });
+      toastSuccess("Deal creado.");
+    },
+    onError: () => {
+      toastError("No se pudo crear el deal.");
     },
   });
 }

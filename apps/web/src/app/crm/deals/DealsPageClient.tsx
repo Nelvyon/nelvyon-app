@@ -11,6 +11,7 @@ import { canPerformAction } from "@/core/routing/guards";
 import { Button } from "@/core/ui/button";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
+import { CrmSubNav } from "@/features/crm/components/CrmSubNav";
 import { useClient } from "@/features/crm/hooks";
 import { DealsAtRiskPanel } from "@/features/deals/components/DealsAtRiskPanel";
 import { DealsList } from "@/features/deals/components/DealsList";
@@ -49,25 +50,27 @@ export function DealsPageClient() {
   return (
     <ProtectedLayout module="crm">
       <div className="space-y-5">
+        <CrmSubNav />
+
         {clientId != null ? (
           <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm shadow-card">
-            <p className="font-medium text-foreground">Revenue · deals for one client</p>
+            <p className="font-medium text-foreground">Pipeline filtrado por cliente</p>
             <p className="mt-1 text-muted-foreground">
-              Filtered to client{" "}
+              Cliente{" "}
               {clientQuery.data?.business_name ? (
                 <strong>{clientQuery.data.business_name}</strong>
               ) : clientQuery.isLoading ? (
-                <span>loading…</span>
+                <span>cargando…</span>
               ) : (
                 <strong>#{clientId}</strong>
               )}
               .{" "}
               <Link className="text-link underline-offset-2 hover:underline" href={`/crm/clients/${clientId}`}>
-                Open client record
+                Ver ficha
               </Link>
               {" · "}
               <Link className="text-link underline-offset-2 hover:underline" href="/crm/deals">
-                Clear filter (all deals)
+                Quitar filtro
               </Link>
             </p>
           </div>
@@ -76,21 +79,21 @@ export function DealsPageClient() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <select
-              aria-label="Filter deals by stage"
+              aria-label="Filtrar por etapa"
               className="rounded-md border border-input bg-background px-2 py-1 text-sm"
               onChange={(e) => setStageFilter(e.target.value)}
               value={stageFilter}
             >
               <option value="all">Todas las etapas</option>
               <option value="lead">Lead</option>
-              <option value="qualified">Cualificado</option>
+              <option value="qualified">Calificado</option>
               <option value="proposal">Propuesta</option>
               <option value="negotiation">Negociación</option>
               <option value="won">Ganado</option>
               <option value="lost">Perdido</option>
             </select>
             <select
-              aria-label="Filter deals by owner"
+              aria-label="Filtrar por responsable"
               className="rounded-md border border-input bg-background px-2 py-1 text-sm"
               onChange={(e) => setOwnerFilter(e.target.value)}
               value={ownerFilter}
@@ -103,37 +106,40 @@ export function DealsPageClient() {
               ))}
             </select>
           </div>
-          <Button asChild variant="outline">
-            <Link href="/crm/clients">Revenue · clients</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {canEdit ? (
+              <Button asChild>
+                <Link href={clientId ? `/crm/deals/new?client_id=${clientId}` : "/crm/deals/new"}>
+                  Nuevo deal
+                </Link>
+              </Button>
+            ) : null}
+          </div>
         </div>
 
-        {!canEdit && (
+        {!canEdit ? (
           <p className="text-sm text-warning-foreground">
-            Your role can review Revenue deals, risk, and conversion signals. Stage and owner updates require operator access.
+            Tu rol puede consultar el pipeline; editar etapa y responsable requiere permisos de operador.
           </p>
-        )}
-
-        {dealsQuery.isLoading && <SkeletonListRows aria-label="Loading deals" rows={7} />}
-        {dealsQuery.isFetching && dealsQuery.data ? (
-          <p className="text-xs text-muted-foreground">Refreshing deals for current filters…</p>
         ) : null}
-        {dealsQuery.error instanceof ApiError && dealsQuery.error.status === 403 && (
+
+        {dealsQuery.isLoading ? <SkeletonListRows aria-label="Cargando deals" rows={7} /> : null}
+        {dealsQuery.isFetching && dealsQuery.data ? (
+          <p className="text-xs text-muted-foreground">Actualizando pipeline…</p>
+        ) : null}
+        {dealsQuery.error instanceof ApiError && dealsQuery.error.status === 403 ? (
           <ForbiddenNotice>
-            <p>Cause: NELVYON cannot load deals for the workspace in your header with this role.</p>
+            <p>No tienes acceso a deals en este workspace.</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Next: switch to a workspace where you have CRM view, or ask an admin to grant CRM access. Revenue → Clients uses the same gate.
+              Cambia de workspace o pide permisos CRM a un administrador.
             </p>
           </ForbiddenNotice>
-        )}
-        {dealsQuery.error && !(dealsQuery.error instanceof ApiError && dealsQuery.error.status === 403) && (
+        ) : null}
+        {dealsQuery.error && !(dealsQuery.error instanceof ApiError && dealsQuery.error.status === 403) ? (
           <ErrorNotice>
-            <p>Cause: the deals list request failed (network, 5xx, or invalid session).</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Next: refresh, re-check the workspace selector, then sign in again if the error repeats.
-            </p>
+            <p>No pudimos cargar el pipeline. Revisa tu conexión e inténtalo de nuevo.</p>
           </ErrorNotice>
-        )}
+        ) : null}
 
         <PipelineConversionPanel
           error={analyticsQuery.error ?? undefined}

@@ -9,6 +9,24 @@ import { QuickWinAutomations } from "@/features/onboarding/components/QuickWinAu
 
 const QUICK_LINKS = [
   {
+    href: "/os/packs",
+    title: "Growth Packs",
+    desc: "Local, Ecommerce y SaaS B2B — un clic tras el brief",
+    accent: "from-teal-500/15 to-teal-500/5",
+  },
+  {
+    href: "/dashboard/local-growth",
+    title: "Local Growth Pack",
+    desc: "Informe del pack autónomo para negocios locales",
+    accent: "from-emerald-500/15 to-emerald-500/5",
+  },
+  {
+    href: "/dashboard/ecommerce-growth",
+    title: "Ecommerce Growth Pack",
+    desc: "Meta Ads kit, carrito abandonado y QA tienda",
+    accent: "from-violet-500/15 to-violet-500/5",
+  },
+  {
     href: "/crm/clients",
     title: "Clientes",
     desc: "Cuentas de revenue y pipeline de ventas",

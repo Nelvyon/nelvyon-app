@@ -13,6 +13,7 @@ import { PanelCard } from "@/core/ui/PanelCard";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonDetailCard } from "@/core/ui/Skeleton";
 import { ClientDetailCard } from "@/features/crm/components/ClientDetailCard";
+import { CrmSubNav } from "@/features/crm/components/CrmSubNav";
 import { ClientForm } from "@/features/crm/components/ClientForm";
 import { useClient, useUpdateClient } from "@/features/crm/hooks";
 import { ClientCreateInput } from "@/features/crm/types";
@@ -33,6 +34,7 @@ export default function ClientDetailPage() {
   return (
     <ProtectedLayout module="crm">
       <div className="space-y-6">
+        <CrmSubNav />
         <Button asChild className="w-fit" size="sm" variant="outline">
           <Link href="/crm/clients">← Volver a clientes</Link>
         </Button>

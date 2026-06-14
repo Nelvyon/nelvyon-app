@@ -12,6 +12,7 @@ import { canPerformAction } from "@/core/routing/guards";
 import { Button } from "@/core/ui/button";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonDetailCard } from "@/core/ui/Skeleton";
+import { HelpdeskSubNav } from "@/features/inbox_helpdesk/components/HelpdeskSubNav";
 import { TicketDetailCard } from "@/features/inbox_helpdesk/components/TicketDetailCard";
 import { TicketStatusForm } from "@/features/inbox_helpdesk/components/TicketStatusForm";
 import { useTicket, useUpdateTicketStatus } from "@/features/inbox_helpdesk/hooks";
@@ -29,20 +30,23 @@ export default function TicketDetailPage() {
   return (
     <ProtectedLayout module="inbox">
       <div className="space-y-5">
+        {!isClientMode ? <HelpdeskSubNav /> : null}
         <Button asChild size="sm" variant="outline">
-          <Link href="/inbox/tickets">{isClientMode ? "Back to requests" : "Back to tickets"}</Link>
+          <Link href="/inbox/tickets">{isClientMode ? "Volver a solicitudes" : "Volver a bandeja"}</Link>
         </Button>
 
         {invalidId ? (
-          <ErrorNotice title="Invalid request id">
-            <p>Cause: this route does not contain a valid numeric request identifier.</p>
-            <p className="mt-2 text-sm text-muted-foreground">Next: return to Requests and open a valid row.</p>
+          <ErrorNotice title="ID de ticket no válido">
+            <p>Esta ruta no contiene un identificador numérico válido.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Vuelve a la bandeja y abre un ticket de la lista.</p>
           </ErrorNotice>
         ) : null}
 
         {query.isLoading && (
           <>
-            <p className="text-sm text-muted-foreground">{isClientMode ? "Loading request details…" : "Loading ticket details…"}</p>
+            <p className="text-sm text-muted-foreground">
+              {isClientMode ? "Cargando solicitud…" : "Cargando ticket…"}
+            </p>
             <SkeletonDetailCard />
           </>
         )}
@@ -50,20 +54,20 @@ export default function TicketDetailPage() {
           <ForbiddenNotice>
             <p>
               {isClientMode
-                ? "This request is not available for your account access."
-                : "This ticket is not available for your account access."}
+                ? "Esta solicitud no está disponible para tu cuenta."
+                : "Este ticket no está disponible para tu acceso en el workspace."}
             </p>
           </ForbiddenNotice>
         )}
         {query.error instanceof ApiError && query.error.status === 404 && (
-          <ErrorNotice title={isClientMode ? "Request not found" : "Ticket not found"}>
+          <ErrorNotice title={isClientMode ? "Solicitud no encontrada" : "Ticket no encontrado"}>
             <p>
               {isClientMode
-                ? "Cause: this request is not available for your account, or no longer exists."
-                : "Cause: this ticket id is not available in the current workspace scope."}
+                ? "La solicitud no existe o ya no está disponible para tu cuenta."
+                : "El ticket no existe en el workspace activo o fue eliminado."}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Next: return to {isClientMode ? "Requests" : "Tickets"} and open it again from the list.
+              Vuelve a {isClientMode ? "Solicitudes" : "Bandeja"} y ábrelo de nuevo desde la lista.
             </p>
           </ErrorNotice>
         )}
@@ -72,12 +76,12 @@ export default function TicketDetailPage() {
           <ErrorNotice>
             <p>
               {isClientMode
-                ? "We could not load this request due to a temporary connection or service issue."
-                : "Cause: ticket detail request failed before rendering current data."}
+                ? "No pudimos cargar esta solicitud por un problema temporal de conexión."
+                : "No se pudo cargar el detalle del ticket. Revisa la conexión o el scope del workspace."}
             </p>
             {!isClientMode ? (
               <p className="mt-2 text-sm text-muted-foreground">
-                Next: return to Tickets list and re-open the row. If the error persists, refresh and verify workspace scope.
+                Vuelve a la bandeja y reabre el ticket. Si persiste, recarga la página.
               </p>
             ) : null}
           </ErrorNotice>
@@ -88,14 +92,14 @@ export default function TicketDetailPage() {
             <TicketDetailCard ticket={query.data} />
             {isClientMode ? (
               <section className="space-y-2 rounded-lg border border-border bg-card p-4 shadow-card">
-                <h2 className="text-base font-medium text-foreground">Request status</h2>
+                <h2 className="text-base font-medium text-foreground">Estado de la solicitud</h2>
                 <p className="text-sm text-muted-foreground">
-                  Status updates are managed by your account team and will appear here automatically.
+                  Tu equipo gestiona las actualizaciones; aparecerán aquí automáticamente.
                 </p>
               </section>
             ) : (
               <section className="space-y-2">
-                <h2 className="text-base font-medium text-foreground">Status</h2>
+                <h2 className="text-base font-medium text-foreground">Estado</h2>
                 <TicketStatusForm
                   canSubmit={canEdit}
                   currentStatus={query.data.status}
@@ -105,12 +109,12 @@ export default function TicketDetailPage() {
                   }}
                 />
                 {statusMutation.error instanceof ApiError && statusMutation.error.status === 403 && (
-                  <p className="text-sm text-warning-foreground">Your role cannot change this ticket&apos;s status.</p>
+                  <p className="text-sm text-warning-foreground">Tu rol no puede cambiar el estado de este ticket.</p>
                 )}
                 {statusMutation.error &&
                   !(statusMutation.error instanceof ApiError && statusMutation.error.status === 403) && (
                     <p className="text-sm text-destructive">
-                      Status update failed. Next: retry once; if it fails again, reload this ticket and submit from fresh state.
+                      No se pudo actualizar el estado. Reintenta o recarga el ticket.
                     </p>
                   )}
               </section>

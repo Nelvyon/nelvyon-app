@@ -24,10 +24,10 @@ export default function PortalDashboardPage() {
 
   return (
     <PortalPageShell
-      title="Client dashboard"
-      description="Overview of your projects and deliverables awaiting review."
+      title="Panel del cliente"
+      description="Resumen de proyectos y entregables pendientes de tu revisión."
     >
-      {me.isLoading ? <PortalLoadingState message="Loading profile…" /> : null}
+      {me.isLoading ? <PortalLoadingState message="Cargando perfil…" /> : null}
       {me.isError ? (
         <PortalErrorState message={me.error instanceof Error ? me.error.message : undefined} onRetry={() => void me.refetch()} />
       ) : null}
@@ -35,15 +35,15 @@ export default function PortalDashboardPage() {
       {user ? (
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-            <p className="text-xs uppercase text-muted-foreground">Projects</p>
+            <p className="text-xs uppercase text-muted-foreground">Proyectos</p>
             <p className="mt-1 text-2xl font-semibold">{projects.data?.total ?? "—"}</p>
           </div>
           <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-            <p className="text-xs uppercase text-muted-foreground">Deliverables</p>
+            <p className="text-xs uppercase text-muted-foreground">Entregables</p>
             <p className="mt-1 text-2xl font-semibold">{deliverables.data?.total ?? "—"}</p>
           </div>
           <div className="rounded-lg border border-border bg-card p-4 shadow-card">
-            <p className="text-xs uppercase text-muted-foreground">Pending review</p>
+            <p className="text-xs uppercase text-muted-foreground">Pendientes de revisión</p>
             <p className="mt-1 text-2xl font-semibold text-amber-700">{pendingReview}</p>
           </div>
         </div>
@@ -51,12 +51,12 @@ export default function PortalDashboardPage() {
 
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">Recent deliverables</h2>
+          <h2 className="text-lg font-semibold">Entregables recientes</h2>
           <Button variant="link" size="sm" asChild>
-            <Link href="/portal/deliverables">View all</Link>
+            <Link href="/portal/deliverables">Ver todos</Link>
           </Button>
         </div>
-        {deliverables.isLoading ? <PortalLoadingState message="Loading deliverables…" /> : null}
+        {deliverables.isLoading ? <PortalLoadingState message="Cargando entregables…" /> : null}
         {deliverables.isError ? (
           <PortalErrorState
             message={deliverables.error instanceof Error ? deliverables.error.message : undefined}
@@ -65,11 +65,11 @@ export default function PortalDashboardPage() {
         ) : null}
         {deliverables.data?.items.length === 0 ? (
           <PortalEmptyState
-            title="No deliverables yet"
-            description="When your team publishes deliverables for your review, they will appear here."
+            title="Aún no hay entregables"
+            description="Cuando tu equipo publique entregables para revisión, aparecerán aquí."
             action={
               <Button variant="outline" size="sm" asChild>
-                <Link href="/portal/projects">Browse projects</Link>
+                <Link href="/portal/projects">Ver proyectos</Link>
               </Button>
             }
           />

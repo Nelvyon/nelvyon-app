@@ -30,6 +30,18 @@ export interface DealUpdateInput {
   notes?: string;
 }
 
+export interface CreateDealInput {
+  title: string;
+  client_id?: number;
+  value?: number;
+  currency?: string;
+  stage?: string;
+  pipeline?: string;
+  probability?: number;
+  assigned_to?: string;
+  notes?: string;
+}
+
 export interface Activity {
   id: number;
   deal_id?: number | null;

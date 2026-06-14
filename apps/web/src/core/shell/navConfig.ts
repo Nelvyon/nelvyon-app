@@ -60,7 +60,7 @@ export interface ProductNavItem {
 
 export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "Inicio", href: "/dashboard", prefix: "/dashboard", module: "os", icon: LayoutDashboard },
-  { label: "Revenue", href: "/crm/clients", prefix: "/crm", module: "crm", icon: Users },
+  { label: "Revenue", href: "/crm", prefix: "/crm", module: "crm", icon: Users },
   { label: "Campañas", href: "/campaigns", prefix: "/campaigns", module: "campaigns", icon: Megaphone },
   { label: "SMS", href: "/dashboard/sms", prefix: "/dashboard/sms", module: "campaigns", icon: MessageSquare },
   { label: "Bandeja", href: "/dashboard/inbox", prefix: "/dashboard/inbox", module: "inbox", icon: Inbox, badgeKey: "omnichannel" },
@@ -116,10 +116,10 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
 ] as const;
 
 const CLIENT_PORTAL_NAV: readonly ProductNavItem[] = [
-  { label: "Dashboard", href: "/portal", prefix: "/portal-home", module: "campaigns", icon: Layout },
-  { label: "Projects", href: "/portal/projects", prefix: "/portal/projects", module: "campaigns", icon: Megaphone },
+  { label: "Inicio", href: "/portal", prefix: "/portal-home", module: "campaigns", icon: Layout },
+  { label: "Proyectos", href: "/portal/projects", prefix: "/portal/projects", module: "campaigns", icon: Megaphone },
   {
-    label: "Deliverables",
+    label: "Entregables",
     href: "/portal/deliverables",
     prefix: "/portal/deliverables",
     module: "campaigns",

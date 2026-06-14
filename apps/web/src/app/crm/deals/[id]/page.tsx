@@ -12,6 +12,7 @@ import { Button } from "@/core/ui/button";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonDetailCard } from "@/core/ui/Skeleton";
 import { useCreateFollowUp, useDeal, useDealFollowUps, useUpdateDeal } from "@/features/deals/hooks";
+import { CrmSubNav } from "@/features/crm/components/CrmSubNav";
 
 function toInputDate(value?: string | null) {
   if (!value) return "";
@@ -56,6 +57,7 @@ export default function DealDetailPage() {
   return (
     <ProtectedLayout module="crm">
       <div className="space-y-5">
+        <CrmSubNav />
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm" variant="outline">
             <Link
@@ -65,12 +67,12 @@ export default function DealDetailPage() {
                   : "/crm/deals"
               }
             >
-              Back to deals
+              Volver al pipeline
             </Link>
           </Button>
           {dealQuery.data?.client_id != null && dealQuery.data.client_id > 0 ? (
             <Button asChild size="sm" variant="outline">
-              <Link href={`/crm/clients/${dealQuery.data.client_id}`}>Open client record</Link>
+              <Link href={`/crm/clients/${dealQuery.data.client_id}`}>Ver cliente</Link>
             </Button>
           ) : null}
         </div>

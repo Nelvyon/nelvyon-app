@@ -14,11 +14,11 @@ export default function PortalProjectsPage() {
 
   return (
     <PortalPageShell
-      title="Projects"
-      description="Active projects shared with your organization."
+      title="Proyectos"
+      description="Proyectos activos compartidos con tu organización."
       backHref="/portal"
     >
-      {query.isLoading ? <PortalLoadingState message="Loading projects…" /> : null}
+      {query.isLoading ? <PortalLoadingState message="Cargando proyectos…" /> : null}
       {query.isError ? (
         <PortalErrorState
           message={query.error instanceof Error ? query.error.message : undefined}
@@ -27,8 +27,8 @@ export default function PortalProjectsPage() {
       ) : null}
       {query.data && query.data.items.length === 0 ? (
         <PortalEmptyState
-          title="No projects published"
-          description="Your account team has not shared any projects with this portal yet."
+          title="Sin proyectos publicados"
+          description="Tu equipo aún no ha compartido proyectos en este portal."
         />
       ) : null}
       {query.data && query.data.items.length > 0 ? (

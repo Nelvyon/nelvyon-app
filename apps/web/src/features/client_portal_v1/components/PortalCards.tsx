@@ -2,10 +2,17 @@
 
 import Link from "next/link";
 
+import {
+  portalDeliverableStatusLabel,
+  portalDeliverableTypeLabel,
+  portalProjectStatusLabel,
+} from "@/features/client_portal_v1/constants";
 import { PortalStatusBadge } from "@/features/client_portal_v1/components/PortalUiStates";
 import type { PortalDeliverable } from "@/features/client_portal_v1/types";
 
 export function PortalDeliverableCard({ item }: { item: PortalDeliverable }) {
+  const typeLabel = portalDeliverableTypeLabel(item.type);
+
   return (
     <Link
       href={`/portal/deliverables/${item.id}`}
@@ -13,6 +20,7 @@ export function PortalDeliverableCard({ item }: { item: PortalDeliverable }) {
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
+          <p className="text-xs font-medium uppercase text-muted-foreground">{typeLabel}</p>
           <p className="font-medium text-foreground">{item.title}</p>
           {item.description ? (
             <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.description}</p>
@@ -21,8 +29,10 @@ export function PortalDeliverableCard({ item }: { item: PortalDeliverable }) {
         <PortalStatusBadge status={item.status} />
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Version {item.version}
-        {item.published_at ? ` · Published ${new Date(item.published_at).toLocaleDateString()}` : ""}
+        Versión {item.version}
+        {item.published_at
+          ? ` · Publicado ${new Date(item.published_at).toLocaleDateString("es-ES")}`
+          : ""}
       </p>
     </Link>
   );
@@ -46,8 +56,8 @@ export function PortalProjectCard({
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <p className="font-medium text-foreground">{name}</p>
-        <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs capitalize text-muted-foreground">
-          {status}
+        <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+          {portalProjectStatusLabel(status)}
         </span>
       </div>
       {description ? (

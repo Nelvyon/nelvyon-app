@@ -134,6 +134,13 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     }
   }
 
+  if (path === "/crm") {
+    return {
+      documentTitle: "Revenue · NELVYON",
+      heading: "Revenue",
+      description: "Resumen de clientes, pipeline comercial y analytics del workspace.",
+    };
+  }
   if (path === "/crm/clients") {
     return {
       documentTitle: "Clientes · Revenue · NELVYON",
@@ -159,9 +166,16 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
   }
   if (path === "/crm/deals") {
     return {
-      documentTitle: "Deals · Revenue · NELVYON",
+      documentTitle: "Pipeline · Revenue · NELVYON",
       heading: "Pipeline comercial",
       description: "Etapas, responsables, clientes vinculados y seguimiento comercial del workspace.",
+    };
+  }
+  if (path === "/crm/deals/new") {
+    return {
+      documentTitle: "Nuevo deal · Revenue · NELVYON",
+      heading: "Nuevo deal",
+      description: "Crea una oportunidad comercial y vincúlala a un cliente.",
     };
   }
   const dealDetail = path.match(/^\/crm\/deals\/(\d+)$/);
@@ -192,9 +206,9 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
   if (ticketDetail) {
     const id = ticketDetail[1];
     return {
-      documentTitle: `Ticket #${id} · Inbox · NELVYON`,
+      documentTitle: `Ticket #${id} · Helpdesk · NELVYON`,
       heading: `Ticket #${id}`,
-      description: "Track status and keep stakeholders aligned.",
+      description: "Estado, SLA y seguimiento del ticket en el workspace activo.",
     };
   }
 
@@ -736,6 +750,72 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
       description: "Read-only audit trail with attempted action, result, timestamp, and workspace scope.",
     };
   }
+  if (path === "/dashboard/local-growth") {
+    return {
+      documentTitle: "Local Growth Pack · NELVYON",
+      heading: "Local Growth Pack",
+      description:
+        "Informe del pack autónomo: landing, SEO y chatbot para negocios locales. Métricas QA y entregables en portal.",
+    };
+  }
+
+  if (path === "/os/packs/local-growth") {
+    return {
+      documentTitle: "Local Growth Pack · NELVYON OS",
+      heading: "Local Growth Pack",
+      description:
+        "Lanza el pack autónomo para negocios locales: intake, jobs OS, entrega en portal y cliente en SaaS.",
+    };
+  }
+
+  if (path === "/os/packs") {
+    return {
+      documentTitle: "Growth Packs · NELVYON OS",
+      heading: "Growth Packs",
+      description: "Catálogo de packs autónomos: Local, Ecommerce y SaaS B2B.",
+    };
+  }
+
+  if (path === "/os/packs/ecommerce-growth") {
+    return {
+      documentTitle: "Ecommerce Growth Pack · NELVYON OS",
+      heading: "Ecommerce Growth Pack",
+      description: "Landing tienda, SEO catálogo, chatbot ventas, Meta Ads y carrito abandonado.",
+    };
+  }
+
+  if (path === "/os/packs/saas-b2b-growth") {
+    return {
+      documentTitle: "SaaS B2B Growth Pack · NELVYON OS",
+      heading: "SaaS B2B Growth Pack",
+      description: "Landing SaaS, SEO demand gen, demo bot, nurture B2B y playbook outbound.",
+    };
+  }
+
+  if (path === "/dashboard/ecommerce-growth") {
+    return {
+      documentTitle: "Ecommerce Growth Pack · NELVYON",
+      heading: "Ecommerce Growth Pack",
+      description: "Informe QA, entregables y KPIs del pack ecommerce.",
+    };
+  }
+
+  if (path === "/dashboard/saas-b2b-growth") {
+    return {
+      documentTitle: "SaaS B2B Growth Pack · NELVYON",
+      heading: "SaaS B2B Growth Pack",
+      description: "Informe QA, nurture B2B y playbook outbound ABM.",
+    };
+  }
+
+  if (path === "/analytics") {
+    return {
+      documentTitle: "Analytics · NELVYON",
+      heading: "Analytics",
+      description: "Hub unificado: revenue, campañas, helpdesk y growth packs.",
+    };
+  }
+
   if (path === "/os/workspaces/select") {
     return {
       documentTitle: "Workspace selection · NELVYON",
@@ -854,9 +934,16 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
   }
   if (path === "/analytics/tickets") {
     return {
-      documentTitle: "Tickets analytics v2 · NELVYON",
-      heading: "Tickets analytics v2",
-      description: "Read-only support queue signals and SLA heuristics from existing helpdesk rows.",
+      documentTitle: "Analytics Helpdesk · NELVYON",
+      heading: "Analytics de tickets",
+      description: "SLA real, incumplimientos y distribución de tickets del workspace activo.",
+    };
+  }
+  if (path === "/analytics/reportes") {
+    return {
+      documentTitle: "Reportes · Analytics · NELVYON",
+      heading: "Reportes del workspace",
+      description: "Informes visuales por módulo con exportación CSV.",
     };
   }
   if (path === "/analytics/campaigns") {

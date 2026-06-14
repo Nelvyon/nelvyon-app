@@ -33,6 +33,7 @@ export function useCreateTicket() {
     mutationFn: (payload: TicketCreateInput) => inboxApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inbox", "tickets"] });
+      queryClient.invalidateQueries({ queryKey: ["inbox", "stats"] });
       queryClient.invalidateQueries({ queryKey: ACTIVATION_LOCAL_QUERY_KEY });
       try {
         localStorage.setItem(LOCAL_ACTIVATION_FIRST_TICKET, "1");
@@ -48,14 +49,24 @@ export function useCreateTicket() {
   });
 }
 
+export function useHelpdeskStats() {
+  const { isAuthenticated, isBootstrapping } = useAuth();
+  return useQuery({
+    queryKey: ["inbox", "stats"],
+    queryFn: inboxApi.stats,
+    enabled: isAuthenticated && !isBootstrapping,
+  });
+}
+
 export function useUpdateTicketStatus(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: TicketUpdateInput) => inboxApi.updateStatus(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inbox", "tickets"] });
+      queryClient.invalidateQueries({ queryKey: ["inbox", "stats"] });
       queryClient.invalidateQueries({ queryKey: ["inbox", "tickets", id] });
-      toastSuccess("Ticket status updated.");
+      toastSuccess("Estado del ticket actualizado.");
     },
     onError: () => {
       toastError("No se pudo actualizar el ticket.");

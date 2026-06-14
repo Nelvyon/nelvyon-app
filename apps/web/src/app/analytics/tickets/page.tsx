@@ -7,176 +7,179 @@ import { ApiError } from "@/core/api/types";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
-import { useTickets } from "@/features/inbox_helpdesk/hooks";
-import { Ticket } from "@/features/inbox_helpdesk/types";
-
-function ticketAgeHours(ticket: Ticket) {
-  if (!ticket.created_at) return 0;
-  const created = new Date(ticket.created_at);
-  if (Number.isNaN(created.getTime())) return 0;
-  return (Date.now() - created.getTime()) / (1000 * 60 * 60);
-}
+import { HelpdeskSubNav } from "@/features/inbox_helpdesk/components/HelpdeskSubNav";
+import {
+  priorityLabel,
+  statusLabel,
+  TicketSlaBadges,
+} from "@/features/inbox_helpdesk/components/TicketSlaBadges";
+import { useHelpdeskStats, useTickets } from "@/features/inbox_helpdesk/hooks";
+import { SLA_TARGETS } from "@/lib/helpdeskSla";
 
 export default function TicketsAnalyticsPage() {
   const query = useTickets();
+  const statsQuery = useHelpdeskStats();
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
-  const [queueFilter, setQueueFilter] = useState("all");
 
   const rows = useMemo(() => query.data?.items ?? [], [query.data]);
-  const queueValues = useMemo(() => [...new Set(rows.map((t) => t.category).filter(Boolean))] as string[], [rows]);
 
   const filtered = useMemo(() => {
     return rows.filter((row) => {
-      if (statusFilter !== "all") {
-        const status = (row.status ?? "").toLowerCase();
-        if (statusFilter === "open" && status !== "open") return false;
-        if (statusFilter === "pending" && !["in_progress", "pending"].includes(status)) return false;
-        if (statusFilter === "closed" && !["closed", "resolved"].includes(status)) return false;
-      }
-      if (priorityFilter !== "all" && (row.priority ?? "").toLowerCase() !== priorityFilter) return false;
-      if (queueFilter !== "all" && (row.category ?? "") !== queueFilter) return false;
+      const status = (row.status ?? "open").toLowerCase();
+      if (statusFilter === "open" && status !== "open") return false;
+      if (statusFilter === "active" && !["in_progress", "pending", "waiting"].includes(status)) return false;
+      if (statusFilter === "closed" && !["closed", "resolved"].includes(status)) return false;
+      if (priorityFilter !== "all" && (row.priority ?? "medium").toLowerCase() !== priorityFilter) return false;
       return true;
     });
-  }, [priorityFilter, queueFilter, rows, statusFilter]);
+  }, [priorityFilter, rows, statusFilter]);
 
-  const metrics = useMemo(() => {
-    const open = rows.filter((r) => (r.status ?? "").toLowerCase() === "open").length;
-    const pending = rows.filter((r) => ["in_progress", "pending"].includes((r.status ?? "").toLowerCase())).length;
-    const closed = rows.filter((r) => ["closed", "resolved"].includes((r.status ?? "").toLowerCase())).length;
-    const atRisk = rows.filter((r) => {
-      const status = (r.status ?? "").toLowerCase();
-      return ["open", "in_progress", "pending"].includes(status) && ticketAgeHours(r) >= 48;
-    }).length;
-    const oldestOpenHours = Math.max(
-      0,
-      ...rows
-        .filter((r) => ["open", "in_progress", "pending"].includes((r.status ?? "").toLowerCase()))
-        .map((r) => ticketAgeHours(r)),
-    );
-    return { open, pending, closed, atRisk, oldestOpenHours };
-  }, [rows]);
+  const stats = statsQuery.data;
 
   return (
     <ProtectedLayout module="inbox">
       <div className="space-y-5">
+        <HelpdeskSubNav />
+
         <p className="text-sm text-muted-foreground">
-          Tickets analytics v2 is a read-only support snapshot from existing helpdesk rows. SLA/at-risk are heuristic
-          signals based on ticket age and status, not routing AI or automated triage.
+          Analytics de soporte con SLA real por prioridad (urgente 15 min / alta 1 h / media 4 h / baja 8 h para
+          primera respuesta). Datos del workspace activo.
         </p>
 
-        <div className="flex flex-wrap gap-3 text-sm">
-          <Link className="text-link underline" href="/analytics">
-            Back to reporting
-          </Link>
-          <Link className="text-link underline" href="/inbox/tickets">
-            Open ticket operations list
-          </Link>
-        </div>
+        {stats ? (
+          <>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Metric label="Tickets totales" value={String(stats.total_count)} />
+              <Metric label="Cumplimiento SLA" value={`${stats.sla_compliance_rate}%`} highlight />
+              <Metric
+                label="Media 1ª respuesta"
+                value={
+                  stats.avg_first_response_minutes != null
+                    ? `${stats.avg_first_response_minutes} min`
+                    : "—"
+                }
+              />
+              <Metric label="Ticket abierto más antiguo" value={`${stats.oldest_open_hours} h`} />
+            </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="rounded-lg border border-border bg-card p-3 text-sm shadow-card">
-            <p className="text-muted-foreground">Open</p>
-            <p className="text-lg font-semibold text-foreground">{metrics.open}</p>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-3 text-sm shadow-card">
-            <p className="text-muted-foreground">Pending</p>
-            <p className="text-lg font-semibold text-foreground">{metrics.pending}</p>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-3 text-sm shadow-card">
-            <p className="text-muted-foreground">Closed</p>
-            <p className="text-lg font-semibold text-foreground">{metrics.closed}</p>
-          </div>
-          <div className="rounded-lg border border-warning/35 bg-warning/10 p-3 text-sm shadow-card">
-            <p className="text-warning-foreground">At-risk (48h+ open/pending)</p>
-            <p className="text-lg font-semibold text-warning-foreground">{metrics.atRisk}</p>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-3 text-sm shadow-card">
-            <p className="text-muted-foreground">Oldest open age</p>
-            <p className="text-lg font-semibold text-foreground">{Math.round(metrics.oldestOpenHours)}h</p>
-          </div>
-        </div>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <section className="rounded-xl border border-border bg-card p-4 shadow-card">
+                <h2 className="text-base font-semibold">Incumplimientos SLA</h2>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+                    <p className="text-muted-foreground">1ª respuesta</p>
+                    <p className="text-xl font-semibold text-destructive">{stats.sla_first_response_breaches}</p>
+                  </div>
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+                    <p className="text-muted-foreground">Resolución</p>
+                    <p className="text-xl font-semibold text-destructive">{stats.sla_resolution_breaches}</p>
+                  </div>
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-border bg-card p-4 shadow-card">
+                <h2 className="text-base font-semibold">Objetivos SLA por prioridad</h2>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {(Object.entries(SLA_TARGETS) as [string, { first_response: number; resolution: number }][]).map(
+                    ([pri, t]) => (
+                      <li className="flex justify-between gap-2" key={pri}>
+                        <span className="font-medium">{priorityLabel(pri)}</span>
+                        <span className="text-muted-foreground">
+                          1ª resp. {t.first_response} min · resol. {Math.round(t.resolution / 60)} h
+                        </span>
+                      </li>
+                    ),
+                  )}
+                </ul>
+              </section>
+            </div>
+
+            {stats.by_status.length > 0 ? (
+              <section className="rounded-xl border border-border bg-card p-4 shadow-card">
+                <h2 className="text-base font-semibold">Distribución por estado</h2>
+                <ul className="mt-4 space-y-3">
+                  {stats.by_status.map((row) => {
+                    const pct = stats.total_count > 0 ? (row.count / stats.total_count) * 100 : 0;
+                    return (
+                      <li key={row.status}>
+                        <div className="mb-1 flex justify-between text-sm">
+                          <span>{statusLabel(row.status)}</span>
+                          <span className="text-muted-foreground">
+                            {row.count} ({pct.toFixed(0)}%)
+                          </span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-muted">
+                          <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            ) : null}
+          </>
+        ) : null}
 
         <div className="flex flex-wrap gap-2">
           <select
-            aria-label="Filter tickets analytics by status"
+            aria-label="Filtrar por estado"
             className="rounded-md border border-input bg-background px-2 py-1 text-sm"
             onChange={(e) => setStatusFilter(e.target.value)}
             value={statusFilter}
           >
-            <option value="all">All statuses</option>
-            <option value="open">open</option>
-            <option value="pending">pending</option>
-            <option value="closed">closed</option>
+            <option value="all">Todos los estados</option>
+            <option value="open">Abiertos</option>
+            <option value="active">En curso</option>
+            <option value="closed">Cerrados</option>
           </select>
           <select
-            aria-label="Filter tickets analytics by priority"
+            aria-label="Filtrar por prioridad"
             className="rounded-md border border-input bg-background px-2 py-1 text-sm"
             onChange={(e) => setPriorityFilter(e.target.value)}
             value={priorityFilter}
           >
-            <option value="all">All priorities</option>
-            <option value="low">low</option>
-            <option value="normal">normal</option>
-            <option value="high">high</option>
-            <option value="urgent">urgent</option>
+            <option value="all">Todas las prioridades</option>
+            <option value="urgent">Urgente</option>
+            <option value="high">Alta</option>
+            <option value="medium">Media</option>
+            <option value="low">Baja</option>
           </select>
-          <select
-            aria-label="Filter tickets analytics by queue"
-            className="rounded-md border border-input bg-background px-2 py-1 text-sm"
-            onChange={(e) => setQueueFilter(e.target.value)}
-            value={queueFilter}
-          >
-            <option value="all">All queues</option>
-            {queueValues.map((queue) => (
-              <option key={queue} value={queue}>
-                {queue}
-              </option>
-            ))}
-          </select>
+          <Link className="text-sm text-link hover:underline" href="/inbox/tickets">
+            Ir a bandeja operativa →
+          </Link>
         </div>
 
-        {query.isLoading ? <SkeletonListRows aria-label="Loading tickets analytics" rows={7} /> : null}
-        {query.isFetching && query.data ? (
-          <p className="text-xs text-muted-foreground">Refreshing tickets analytics for current filters…</p>
-        ) : null}
-
+        {query.isLoading ? <SkeletonListRows rows={5} /> : null}
         {query.error instanceof ApiError && query.error.status === 403 ? (
           <ForbiddenNotice>
-            <p>Cause: ticket analytics is limited to roles/workspaces with inbox visibility.</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Next: switch workspace in header or ask an admin for inbox view access.
-            </p>
+            <p>No tienes acceso a analytics de helpdesk en este workspace.</p>
           </ForbiddenNotice>
         ) : null}
         {query.error && !(query.error instanceof ApiError && query.error.status === 403) ? (
           <ErrorNotice>
-            <p>Cause: support analytics request failed before rows could load.</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Next: refresh once; if it persists, verify session/network and reopen from reporting.
-            </p>
+            <p>No pudimos cargar los datos de tickets.</p>
           </ErrorNotice>
         ) : null}
 
         {query.data ? (
-          <section className="rounded-lg border border-border bg-card p-4 shadow-card">
-            <h2 className="text-base font-medium text-foreground">Tickets in current analytics slice</h2>
+          <section className="rounded-xl border border-border bg-card p-4 shadow-card">
+            <h2 className="text-base font-semibold">Tickets en esta vista ({filtered.length})</h2>
             {filtered.length === 0 ? (
-              <p className="mt-2 text-sm text-muted-foreground">
-                No tickets match this filter combination. Next: reset filters to “All” or open Inbox tickets list for
-                raw queue operations.
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">Ningún ticket coincide con los filtros.</p>
             ) : (
-              <ul className="mt-3 space-y-1 text-sm">
+              <ul className="mt-3 space-y-3">
                 {filtered.map((ticket) => (
-                  <li key={ticket.id}>
-                    <Link className="text-link underline" href={`/inbox/tickets/${ticket.id}`}>
+                  <li className="rounded-lg border border-border/80 p-3" key={ticket.id}>
+                    <Link className="font-medium text-link hover:underline" href={`/inbox/tickets/${ticket.id}`}>
                       #{ticket.id} {ticket.subject}
-                    </Link>{" "}
-                    <span className="text-muted-foreground">
-                      · {(ticket.status ?? "—").toLowerCase()} · {(ticket.priority ?? "—").toLowerCase()} ·{" "}
-                      {ticket.category ?? "uncategorized"}
-                    </span>
+                    </Link>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {statusLabel(ticket.status)} · {priorityLabel(ticket.priority)}
+                    </p>
+                    <div className="mt-2">
+                      <TicketSlaBadges ticket={ticket} />
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -185,5 +188,24 @@ export default function TicketsAnalyticsPage() {
         ) : null}
       </div>
     </ProtectedLayout>
+  );
+}
+
+function Metric({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-xl border p-4 shadow-card ${highlight ? "border-primary/30 bg-primary/5" : "border-border bg-card"}`}
+    >
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
+    </div>
   );
 }

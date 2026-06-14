@@ -48,7 +48,7 @@ export function PortalEmptyState({
   );
 }
 
-export function PortalLoadingState({ message = "Loading…" }: { message?: string }) {
+export function PortalLoadingState({ message = "Cargando…" }: { message?: string }) {
   return (
     <div className="flex items-center gap-3 py-10 text-sm text-muted-foreground" role="status">
       <span
@@ -61,7 +61,7 @@ export function PortalLoadingState({ message = "Loading…" }: { message?: strin
 }
 
 export function PortalErrorState({
-  title = "Could not load data",
+  title = "No se pudieron cargar los datos",
   message,
   onRetry,
 }: {
@@ -79,7 +79,7 @@ export function PortalErrorState({
           className="mt-3 text-sm font-medium text-link underline"
           onClick={onRetry}
         >
-          Try again
+          Reintentar
         </button>
       ) : null}
     </div>

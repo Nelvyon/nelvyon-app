@@ -21,6 +21,7 @@ function AcceptInviteForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const hasTokenFromLink = Boolean(tokenFromUrl.trim());
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -35,7 +36,7 @@ function AcceptInviteForm() {
       signIn(response);
       router.push("/portal");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not activate account");
+      setError(err instanceof Error ? err.message : "No se pudo activar la cuenta");
     } finally {
       setLoading(false);
     }
@@ -43,24 +44,30 @@ function AcceptInviteForm() {
 
   return (
     <div className="rounded-lg border border-border bg-card p-6 shadow-card">
-      <h1 className="text-xl font-semibold text-foreground">Activate {appName} access</h1>
+      <h1 className="text-xl font-semibold text-foreground">Activar acceso a {appName}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Paste your invitation token and choose a password (minimum 8 characters).
+        {hasTokenFromLink
+          ? "Tu invitación está lista. Elige una contraseña (mínimo 8 caracteres) para acceder al portal."
+          : "Pega el token de invitación y elige una contraseña (mínimo 8 caracteres)."}
       </p>
 
       <form className="mt-6 space-y-4" onSubmit={(e) => void onSubmit(e)}>
+        {!hasTokenFromLink ? (
+          <label className="block space-y-1 text-sm">
+            <span className="font-medium">Token de invitación</span>
+            <input
+              type="text"
+              required
+              className="h-9 w-full rounded-md border border-input bg-background px-3 font-mono text-xs"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+            />
+          </label>
+        ) : (
+          <input type="hidden" value={token} readOnly />
+        )}
         <label className="block space-y-1 text-sm">
-          <span className="font-medium">Invitation token</span>
-          <input
-            type="text"
-            required
-            className="h-9 w-full rounded-md border border-input bg-background px-3 font-mono text-xs"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-          />
-        </label>
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium">Your name (optional)</span>
+          <span className="font-medium">Tu nombre (opcional)</span>
           <input
             type="text"
             className="h-9 w-full rounded-md border border-input bg-background px-3"
@@ -69,7 +76,7 @@ function AcceptInviteForm() {
           />
         </label>
         <label className="block space-y-1 text-sm">
-          <span className="font-medium">Password</span>
+          <span className="font-medium">Contraseña</span>
           <input
             type="password"
             required
@@ -80,16 +87,16 @@ function AcceptInviteForm() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </label>
-        {error ? <PortalErrorState title="Activation failed" message={error} /> : null}
+        {error ? <PortalErrorState title="Error de activación" message={error} /> : null}
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Activating…" : "Activate account"}
+          {loading ? "Activando…" : "Activar cuenta"}
         </Button>
       </form>
 
       <p className="mt-4 text-sm">
-        Already activated?{" "}
+        ¿Ya tienes cuenta?{" "}
         <Link className="text-link underline" href="/client/sign-in">
-          Sign in
+          Iniciar sesión
         </Link>
       </p>
     </div>
@@ -99,7 +106,7 @@ function AcceptInviteForm() {
 export default function ClientAcceptInvitePage() {
   return (
     <main className="mx-auto flex min-h-[60vh] max-w-md flex-col justify-center p-6">
-      <Suspense fallback={<PortalLoadingState message="Loading invitation…" />}>
+      <Suspense fallback={<PortalLoadingState message="Cargando invitación…" />}>
         <AcceptInviteForm />
       </Suspense>
     </main>

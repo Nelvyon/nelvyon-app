@@ -1,6 +1,7 @@
 import { apiClient } from "@/core/api";
 import {
   ActivityListResponse,
+  CreateDealInput,
   CreateFollowUpInput,
   Deal,
   DealListResponse,
@@ -20,6 +21,8 @@ function encodeQuery(query: Record<string, unknown>) {
   return encodeURIComponent(JSON.stringify(query));
 }
 
+const BASE = "/api/platform/crm/deals";
+
 export const dealsApi = {
   list: (query: ListDealsQuery = {}) => {
     const params = new URLSearchParams();
@@ -30,11 +33,13 @@ export const dealsApi = {
     if (query.owner && query.owner !== "all") q.assigned_to = query.owner;
     if (query.clientId != null && query.clientId > 0) q.client_id = query.clientId;
     if (Object.keys(q).length > 0) params.set("query", encodeQuery(q));
-    return apiClient.get<DealListResponse>(`/api/v1/entities/deals?${params.toString()}`, { tenantScoped: true });
+    return apiClient.get<DealListResponse>(`${BASE}?${params.toString()}`, { tenantScoped: true });
   },
-  getById: (id: number) => apiClient.get<Deal>(`/api/v1/entities/deals/${id}`, { tenantScoped: true }),
+  getById: (id: number) => apiClient.get<Deal>(`${BASE}/${id}`, { tenantScoped: true }),
+  create: (body: CreateDealInput) =>
+    apiClient.post<Deal, CreateDealInput>(BASE, { body, tenantScoped: true }),
   update: (id: number, body: DealUpdateInput) =>
-    apiClient.put<Deal, DealUpdateInput>(`/api/v1/entities/deals/${id}`, { tenantScoped: true, body }),
+    apiClient.put<Deal, DealUpdateInput>(`${BASE}/${id}`, { tenantScoped: true, body }),
   listFollowUps: (dealId: number) => {
     const query = encodeQuery({ deal_id: dealId });
     return apiClient.get<ActivityListResponse>(`/api/v1/entities/activities?query=${query}&sort=-created_at&limit=50`, {
@@ -53,5 +58,5 @@ export const dealsApi = {
         is_completed: false,
       },
     }),
-  pipelineSummary: () => apiClient.get<PipelineSummary>("/api/v1/crm/analytics/pipeline", { tenantScoped: true }),
+  pipelineSummary: () => apiClient.get<PipelineSummary>("/api/platform/crm/pipeline", { tenantScoped: true }),
 };

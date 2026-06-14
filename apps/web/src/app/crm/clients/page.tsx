@@ -11,6 +11,7 @@ import { Button } from "@/core/ui/button";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { ClientList } from "@/features/crm/components/ClientList";
+import { CrmSubNav } from "@/features/crm/components/CrmSubNav";
 import { useClients } from "@/features/crm/hooks";
 
 export default function ClientsListPage() {
@@ -22,6 +23,7 @@ export default function ClientsListPage() {
   return (
     <ProtectedLayout module="crm">
       <div className="space-y-6">
+        <CrmSubNav />
         <div className="flex flex-wrap items-center justify-end gap-2">
           <Button asChild variant="outline">
             <Link href="/crm/deals">Pipeline comercial</Link>

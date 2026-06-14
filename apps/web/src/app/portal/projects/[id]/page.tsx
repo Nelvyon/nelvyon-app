@@ -4,6 +4,7 @@ import Link from "next/link";
 import { use } from "react";
 
 import { Button } from "@/core/ui/button";
+import { portalProjectStatusLabel } from "@/features/client_portal_v1/constants";
 import { PortalDeliverableCard } from "@/features/client_portal_v1/components/PortalCards";
 import { PortalPageShell } from "@/features/client_portal_v1/components/PortalPageShell";
 import {
@@ -24,14 +25,14 @@ export default function PortalProjectDetailPage({
 
   return (
     <PortalPageShell
-      title={project.data?.name ?? "Project"}
+      title={project.data?.name ?? "Proyecto"}
       description={project.data?.description ?? undefined}
       backHref="/portal/projects"
     >
-      {project.isLoading ? <PortalLoadingState message="Loading project…" /> : null}
+      {project.isLoading ? <PortalLoadingState message="Cargando proyecto…" /> : null}
       {project.isError ? (
         <PortalErrorState
-          title="Project not found"
+          title="Proyecto no encontrado"
           message={project.error instanceof Error ? project.error.message : undefined}
           onRetry={() => void project.refetch()}
         />
@@ -40,21 +41,21 @@ export default function PortalProjectDetailPage({
       {project.data ? (
         <dl className="grid gap-2 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-muted-foreground">Status</dt>
-            <dd className="font-medium capitalize">{project.data.status}</dd>
+            <dt className="text-muted-foreground">Estado</dt>
+            <dd className="font-medium">{portalProjectStatusLabel(project.data.status)}</dd>
           </div>
           {project.data.due_date ? (
             <div>
-              <dt className="text-muted-foreground">Due date</dt>
-              <dd className="font-medium">{new Date(project.data.due_date).toLocaleDateString()}</dd>
+              <dt className="text-muted-foreground">Fecha límite</dt>
+              <dd className="font-medium">{new Date(project.data.due_date).toLocaleDateString("es-ES")}</dd>
             </div>
           ) : null}
         </dl>
       ) : null}
 
       <section className="space-y-3 pt-4">
-        <h2 className="text-lg font-semibold">Deliverables</h2>
-        {deliverables.isLoading ? <PortalLoadingState message="Loading deliverables…" /> : null}
+        <h2 className="text-lg font-semibold">Entregables</h2>
+        {deliverables.isLoading ? <PortalLoadingState message="Cargando entregables…" /> : null}
         {deliverables.isError ? (
           <PortalErrorState
             message={deliverables.error instanceof Error ? deliverables.error.message : undefined}
@@ -63,11 +64,11 @@ export default function PortalProjectDetailPage({
         ) : null}
         {deliverables.data && deliverables.data.items.length === 0 ? (
           <PortalEmptyState
-            title="No deliverables for this project"
-            description="Published deliverables for this project will show up here."
+            title="Sin entregables en este proyecto"
+            description="Los entregables publicados para este proyecto aparecerán aquí."
             action={
               <Button variant="outline" size="sm" asChild>
-                <Link href="/portal/deliverables">All deliverables</Link>
+                <Link href="/portal/deliverables">Todos los entregables</Link>
               </Button>
             }
           />

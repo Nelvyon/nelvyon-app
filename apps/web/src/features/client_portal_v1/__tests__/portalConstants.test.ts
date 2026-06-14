@@ -3,13 +3,19 @@ import { describe, expect, it } from "vitest";
 import {
   canReviewDeliverable,
   portalDeliverableStatusLabel,
+  portalDeliverableTypeLabel,
 } from "@/features/client_portal_v1/constants";
 
 describe("portal deliverable status helpers", () => {
   it("labels known statuses", () => {
-    expect(portalDeliverableStatusLabel("published")).toBe("Pending your review");
-    expect(portalDeliverableStatusLabel("approved_by_client")).toBe("Approved");
-    expect(portalDeliverableStatusLabel("changes_requested")).toBe("Changes requested");
+    expect(portalDeliverableStatusLabel("published")).toBe("Pendiente de revisión");
+    expect(portalDeliverableStatusLabel("approved_by_client")).toBe("Aprobado");
+    expect(portalDeliverableStatusLabel("changes_requested")).toBe("Cambios solicitados");
+  });
+
+  it("labels known types", () => {
+    expect(portalDeliverableTypeLabel("landing")).toBe("Landing page");
+    expect(portalDeliverableTypeLabel("seo")).toBe("Informe SEO");
   });
 
   it("only published deliverables are reviewable", () => {

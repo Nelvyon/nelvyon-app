@@ -32,7 +32,7 @@ export default function ClientSignInPage() {
       signIn(response);
       router.push("/portal");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign-in failed");
+      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -41,9 +41,9 @@ export default function ClientSignInPage() {
   return (
     <main className="mx-auto flex min-h-[60vh] max-w-md flex-col justify-center p-6">
       <div className="rounded-lg border border-border bg-card p-6 shadow-card">
-        <h1 className="text-xl font-semibold text-foreground">{appName} client access</h1>
+        <h1 className="text-xl font-semibold text-foreground">Acceso cliente · {appName}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Sign in with the email and password you set when accepting your invitation.
+          Inicia sesión con el email y la contraseña que definiste al aceptar la invitación.
         </p>
 
         <form className="mt-6 space-y-4" onSubmit={(e) => void onSubmit(e)}>
@@ -69,21 +69,21 @@ export default function ClientSignInPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </label>
-          {error ? <PortalErrorState title="Sign-in failed" message={error} /> : null}
+          {error ? <PortalErrorState title="Error al iniciar sesión" message={error} /> : null}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? "Entrando…" : "Iniciar sesión"}
           </Button>
         </form>
 
         <p className="mt-4 text-sm text-muted-foreground">
-          Received an invite link?{" "}
+          ¿Recibiste un enlace de invitación?{" "}
           <Link className="text-link underline" href="/client/accept-invite">
-            Activate your account
+            Activar cuenta
           </Link>
         </p>
         <p className="mt-2 text-sm">
           <Link className="text-link underline" href="/">
-            Back to portal home
+            Volver al inicio
           </Link>
         </p>
       </div>

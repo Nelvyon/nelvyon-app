@@ -21,7 +21,7 @@ export function PortalDeliverableDownloadButton({
     try {
       await downloadPortalDeliverable(deliverableId, title);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Download failed");
+      setError(e instanceof Error ? e.message : "Error al descargar");
     } finally {
       setLoading(false);
     }
@@ -30,7 +30,7 @@ export function PortalDeliverableDownloadButton({
   return (
     <div className="space-y-2">
       <Button type="button" variant="outline" size="sm" disabled={loading} onClick={() => void handleDownload()}>
-        {loading ? "Preparing download…" : "Download file"}
+        {loading ? "Preparando descarga…" : "Descargar archivo"}
       </Button>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
     </div>

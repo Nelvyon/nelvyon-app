@@ -6,6 +6,11 @@ import Link from "next/link";
 import { getBrandMode } from "@/core/platform/brand";
 import { Button } from "@/core/ui/button";
 import { EmptyState } from "@/core/ui/EmptyState";
+import {
+  priorityLabel,
+  statusLabel,
+  TicketSlaBadges,
+} from "@/features/inbox_helpdesk/components/TicketSlaBadges";
 import { Ticket } from "@/features/inbox_helpdesk/types";
 
 export function TicketList({ items, showCreateCta }: { items: Ticket[]; showCreateCta?: boolean }) {
@@ -23,7 +28,7 @@ export function TicketList({ items, showCreateCta }: { items: Ticket[]; showCrea
         description={
           isClientMode
             ? "No hay solicitudes abiertas para tu cuenta."
-            : "No hay tickets de soporte en este workspace. Cuando lleguen solicitudes, aparecerán aquí."
+            : "No hay tickets que coincidan con los filtros. Crea uno nuevo o ajusta los filtros."
         }
         title={isClientMode ? "Sin solicitudes aún" : "Bandeja vacía"}
       />
@@ -31,15 +36,24 @@ export function TicketList({ items, showCreateCta }: { items: Ticket[]; showCrea
   }
 
   return (
-    <ul className="divide-y rounded-lg border border-border bg-card shadow-card">
+    <ul className="divide-y rounded-xl border border-border bg-card shadow-card">
       {items.map((ticket) => (
-        <li className="p-3" key={ticket.id}>
-          <Link className="font-medium text-link transition-colors hover:text-link-hover hover:underline" href={`/inbox/tickets/${ticket.id}`}>
-            {ticket.subject}
-          </Link>
+        <li className="space-y-2 p-4" key={ticket.id}>
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <Link
+              className="font-medium text-link transition-colors hover:text-link-hover hover:underline"
+              href={`/inbox/tickets/${ticket.id}`}
+            >
+              {ticket.subject}
+            </Link>
+            <span className="text-xs text-muted-foreground">#{ticket.id}</span>
+          </div>
           <p className="text-xs text-muted-foreground">
-            {ticket.status ?? "open"} · {ticket.priority ?? "normal"}
+            {statusLabel(ticket.status)} · {priorityLabel(ticket.priority)}
+            {ticket.category ? ` · ${ticket.category}` : ""}
+            {ticket.assigned_to ? ` · ${ticket.assigned_to}` : ""}
           </p>
+          {!isClientMode ? <TicketSlaBadges ticket={ticket} /> : null}
         </li>
       ))}
     </ul>

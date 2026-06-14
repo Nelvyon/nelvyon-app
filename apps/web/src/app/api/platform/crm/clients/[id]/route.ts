@@ -6,6 +6,7 @@ import type { JwtPayload } from "@nelvyon/auth";
 import {
   dbGetClient,
   dbResolveWorkspaceId,
+  dbUpdateClient,
   platformDbFallbackEnabled,
 } from "@/lib/platformDbFallback";
 import { authenticatePlatformRequest, readJsonBody } from "@/lib/platformBffRoute";
@@ -78,19 +79,44 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
   const authError = await authenticatePlatformRequest(req);
   if (authError) return authError;
 
-  const upstream = await proxyPlatformFetch(req, "PUT", entityPath(id), {
-    body: JSON.stringify(body),
-    headers: { "Content-Type": "application/json" },
-  });
-  const text = await upstream.text();
-
-  if (upstream.ok) {
-    return NextResponse.json(text ? JSON.parse(text) : {});
+  let claims;
+  try {
+    claims = await requirePlatformClaims(req);
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (claims instanceof NextResponse) return claims;
+
+  const clientId = Number(id);
 
   try {
-    return NextResponse.json(JSON.parse(text), { status: upstream.status });
+    const upstream = await proxyPlatformFetch(req, "PUT", entityPath(id), {
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+    });
+    const text = await upstream.text();
+
+    if (upstream.ok) {
+      return NextResponse.json(text ? JSON.parse(text) : {});
+    }
+
+    if (upstreamFailed(upstream.status) && platformDbFallbackEnabled()) {
+      const workspaceId = await dbResolveWorkspaceId(req, claims);
+      const updated = await dbUpdateClient(clientId, workspaceId, claims.userId, body as Record<string, unknown>);
+      if (updated) return NextResponse.json(updated);
+    }
+
+    try {
+      return NextResponse.json(JSON.parse(text), { status: upstream.status });
+    } catch {
+      return NextResponse.json({ error: "Update failed" }, { status: upstream.status >= 500 ? 503 : upstream.status });
+    }
   } catch {
-    return NextResponse.json({ error: "Update failed" }, { status: upstream.status });
+    if (platformDbFallbackEnabled()) {
+      const workspaceId = await dbResolveWorkspaceId(req, claims);
+      const updated = await dbUpdateClient(clientId, workspaceId, claims.userId, body as Record<string, unknown>);
+      if (updated) return NextResponse.json(updated);
+    }
+    return NextResponse.json({ error: "Update failed" }, { status: 503 });
   }
 }

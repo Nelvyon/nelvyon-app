@@ -3,6 +3,7 @@
 import React, { FormEvent, useState } from "react";
 
 import { Button } from "@/core/ui/button";
+import { PanelCard } from "@/core/ui/PanelCard";
 
 interface TicketStatusFormProps {
   currentStatus?: string | null;
@@ -10,6 +11,14 @@ interface TicketStatusFormProps {
   isSubmitting?: boolean;
   onSubmit: (status: string) => Promise<void> | void;
 }
+
+const STATUSES = [
+  { id: "open", label: "Abierto" },
+  { id: "in_progress", label: "En curso" },
+  { id: "waiting", label: "En espera" },
+  { id: "resolved", label: "Resuelto" },
+  { id: "closed", label: "Cerrado" },
+];
 
 export function TicketStatusForm({
   currentStatus,
@@ -25,24 +34,29 @@ export function TicketStatusForm({
   };
 
   return (
-    <form className="space-y-3 rounded border p-4" onSubmit={handleSubmit}>
-      <label className="block text-sm">
-        Status
-        <select
-          className="mt-1 w-full rounded border px-2 py-1"
-          onChange={(e) => setStatus(e.target.value)}
-          value={status}
-        >
-          <option value="open">open</option>
-          <option value="in_progress">in_progress</option>
-          <option value="resolved">resolved</option>
-          <option value="closed">closed</option>
-        </select>
-      </label>
-      {!canSubmit && <p className="text-sm text-warning-foreground">Only operator/admin can update status.</p>}
-      <Button disabled={!canSubmit || isSubmitting} type="submit">
-        {isSubmitting ? "Updating..." : "Update status"}
-      </Button>
-    </form>
+    <PanelCard>
+      <form className="space-y-3" onSubmit={handleSubmit}>
+        <label className="block space-y-1 text-sm">
+          <span className="font-medium">Estado del ticket</span>
+          <select
+            className="w-full rounded-md border border-input bg-background px-2 py-2"
+            onChange={(e) => setStatus(e.target.value)}
+            value={status}
+          >
+            {STATUSES.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        {!canSubmit ? (
+          <p className="text-sm text-warning-foreground">Solo operadores pueden cambiar el estado.</p>
+        ) : null}
+        <Button disabled={!canSubmit || isSubmitting} type="submit">
+          {isSubmitting ? "Guardando…" : "Guardar estado"}
+        </Button>
+      </form>
+    </PanelCard>
   );
 }

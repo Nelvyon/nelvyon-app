@@ -20,7 +20,7 @@ export function PortalPageHeader({
     <header className="space-y-2">
       {backHref ? (
         <Link className="text-sm text-link underline" href={backHref}>
-          ← Back
+          ← Volver
         </Link>
       ) : null}
       <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
@@ -50,23 +50,23 @@ export function PortalPageShell({
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{appName}</p>
           {user ? (
             <p className="text-sm text-muted-foreground">
-              Signed in as <span className="font-medium text-foreground">{user.email}</span>
+              Sesión: <span className="font-medium text-foreground">{user.email}</span>
             </p>
           ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link href="/portal">Dashboard</Link>
+            <Link href="/portal">Inicio</Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/portal/projects">Projects</Link>
+            <Link href="/portal/projects">Proyectos</Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/portal/deliverables">Deliverables</Link>
+            <Link href="/portal/deliverables">Entregables</Link>
           </Button>
           {user ? (
             <Button variant="ghost" size="sm" type="button" onClick={() => signOut()}>
-              Sign out
+              Cerrar sesión
             </Button>
           ) : null}
         </div>
