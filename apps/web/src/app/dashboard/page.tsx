@@ -28,6 +28,12 @@ const QUICK_LINKS = [
     accent: "from-violet-500/15 to-violet-500/5",
   },
   {
+    href: "/dashboard/saas-b2b-growth",
+    title: "SaaS B2B Growth Pack",
+    desc: "Landing PLG, nurture y playbook outbound",
+    accent: "from-sky-500/15 to-sky-500/5",
+  },
+  {
     href: "/crm/clients",
     title: "Clientes",
     desc: "Cuentas de revenue y pipeline de ventas",

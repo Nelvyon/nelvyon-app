@@ -100,7 +100,7 @@ export function scoreLanding(
   const checks: QaCheckResult[] = [
     check("L-SOP-01", !(plan?.blockers?.length), 5, true, "Brief incompleto"),
     check("L-SOP-02", copy?.primary_cta_count === 1, 5, true, "CTA múltiple"),
-    check("L-SOP-03", Boolean((copy?.thank_you as object)?.headline), 3),
+    check("L-SOP-03", Boolean((copy?.thank_you as { headline?: string })?.headline), 3),
     check("L-SOP-04", Boolean(build?.deliverable_pack_ready), 4),
     check("L-SOP-05", tier === "starter" || tier === "professional" || tier === "premium", 4),
     check("L-SOP-06", true, 4),
@@ -110,8 +110,8 @@ export function scoreLanding(
     check("L-TEC-04", Number(build?.lcp_seconds) < 2.5, 4),
     check("L-TEC-05", Number(build?.console_errors) === 0, 3),
     check("L-TEC-06", Array.isArray(build?.responsive_breakpoints), 3),
-    check("L-CNT-01", Boolean((copy?.hero as object)?.headline), 5),
-    check("L-CNT-02", Boolean((copy?.hero as object)?.subheadline), 4),
+    check("L-CNT-01", Boolean((copy?.hero as { headline?: string })?.headline), 5),
+    check("L-CNT-02", Boolean((copy?.hero as { subheadline?: string })?.subheadline), 4),
     check(
       "L-CNT-03",
       !(brief.compliance_flags as { regulated_sector?: boolean })?.regulated_sector ||
@@ -128,7 +128,7 @@ export function scoreLanding(
     check("L-SEO-01", String((copy?.meta as { title?: string })?.title ?? "").length <= 60, 4),
     check("L-SEO-02", String((copy?.meta as { description?: string })?.description ?? "").length <= 155, 4),
     check("L-SEO-03", build?.pixel_fires_pageview === true, 4, true),
-    check("L-SEO-04", Boolean((copy?.seo_patch as object)?.canonical), 3),
+    check("L-SEO-04", Boolean((copy?.seo_patch as { canonical?: string })?.canonical), 3),
   ];
 
   // Retry boost: mock repair fixes technical on attempt 2+
@@ -232,7 +232,7 @@ export function scoreSeo(
     check("S-CNT-03", true, 5, true),
     check("S-CNT-04", true, 4),
     check("S-CNT-05", true, 5),
-    check("S-KW-01", (artifacts.keywords as { keywords?: unknown[] })?.keywords?.length >= 10, 5),
+    check("S-KW-01", ((artifacts.keywords as { keywords?: unknown[] })?.keywords?.length ?? 0) >= 10, 5),
     check("S-KW-02", true, 5),
     check("S-KW-03", true, 5),
     check("S-SCH-01", true, 5),

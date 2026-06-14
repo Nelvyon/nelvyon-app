@@ -135,7 +135,7 @@ function runSeoPipeline(project: AutonomousProject, onPageVersion = 1): QaResult
   }
 
   project.status = "PRODUCING";
-  const st = runStrategistSeo(brief, pm.plan.pages_target);
+  const st = runStrategistSeo(brief, Number(pm.plan.pages_target) || 1);
   artifacts.priority = st.priority;
   agent_log.push(st.log);
 
