@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
+import { buildDemoEcommerceUnified } from "@/lib/demoDashboardData";
 import {
   EMPTY_STORE_ANALYTICS,
   EMPTY_STORES_LIST,
-  EMPTY_UNIFIED_ECOMMERCE,
   mergeUnifiedEcommerce,
 } from "@/lib/ecommerceBffRoute";
 import { OsAgentError } from "@nelvyon/os-agents";
@@ -30,7 +30,7 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(EMPTY_UNIFIED_ECOMMERCE);
+    return NextResponse.json(buildDemoEcommerceUnified());
   }
   if (claims instanceof NextResponse) return claims;
 
@@ -61,18 +61,20 @@ export async function GET(req: Request) {
     }
 
     if (!storesRes.ok && upstreamFailed(storesRes.status)) {
-      return NextResponse.json(EMPTY_UNIFIED_ECOMMERCE);
+      return NextResponse.json(buildDemoEcommerceUnified());
     }
 
-    return NextResponse.json(
-      mergeUnifiedEcommerce(
-        storesList as { items?: Array<{ id?: string; status?: string }> },
-        ads,
-        campaigns,
-        analyticsSamples,
-      ),
+    const merged = mergeUnifiedEcommerce(
+      storesList as { items?: Array<{ id?: string; status?: string }> },
+      ads,
+      campaigns,
+      analyticsSamples,
     );
+    if ((storesList.items?.length ?? 0) === 0 && merged.unified.total_revenue_cents === 0) {
+      return NextResponse.json(buildDemoEcommerceUnified());
+    }
+    return NextResponse.json(merged);
   } catch {
-    return NextResponse.json(EMPTY_UNIFIED_ECOMMERCE);
+    return NextResponse.json(buildDemoEcommerceUnified());
   }
 }

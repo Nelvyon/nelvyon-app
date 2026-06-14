@@ -11,6 +11,7 @@ import { SkeletonListRows } from "@/core/ui/Skeleton";
 import {
   SentimentBar,
   SocialMetricCard,
+  SocialMiniChart,
   SocialMockBadge,
 } from "@/features/social/components/SocialPanels";
 import { SocialSubNav } from "@/features/social/components/SocialSubNav";
@@ -74,7 +75,7 @@ export default function SocialHubPage() {
           />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <PanelCard>
             <h2 className="text-base font-semibold">Sentimiento de marca</h2>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -108,6 +109,13 @@ export default function SocialHubPage() {
             ) : (
               <p className="mt-3 text-sm text-muted-foreground">Sin datos de publicación aún.</p>
             )}
+          </PanelCard>
+
+          <PanelCard>
+            <h2 className="text-base font-semibold">Evolución sentimiento (7d)</h2>
+            <div className="mt-4">
+              <SocialMiniChart values={(monitoring?.sentiment_by_day as number[]) ?? []} />
+            </div>
           </PanelCard>
         </div>
 

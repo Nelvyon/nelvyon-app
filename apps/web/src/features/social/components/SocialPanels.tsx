@@ -45,3 +45,20 @@ export function SentimentBar({
     </div>
   );
 }
+
+export function SocialMiniChart({ values, color = "#1877F2" }: { values: number[]; color?: string }) {
+  const bars = values.length ? values : [1, 2, 3];
+  const max = Math.max(...bars, 0.01);
+  return (
+    <div className="flex h-24 items-end gap-1">
+      {bars.map((v, i) => (
+        <div
+          className="flex-1 rounded-t opacity-90"
+          key={i}
+          style={{ backgroundColor: color, height: `${(v / max) * 100}%`, minHeight: v ? 4 : 0 }}
+          title={String(v)}
+        />
+      ))}
+    </div>
+  );
+}

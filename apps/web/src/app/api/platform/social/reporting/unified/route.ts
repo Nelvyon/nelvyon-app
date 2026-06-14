@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
+import { buildDemoSocialUnified } from "@/lib/demoDashboardData";
 import {
   EMPTY_SOCIAL_MONITORING,
   EMPTY_SOCIAL_PUBLISH,
   EMPTY_SOCIAL_SCHEDULER,
-  EMPTY_UNIFIED_SOCIAL,
   mergeUnifiedSocial,
 } from "@/lib/socialBffRoute";
 import { OsAgentError } from "@nelvyon/os-agents";
@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(EMPTY_UNIFIED_SOCIAL);
+    return NextResponse.json(buildDemoSocialUnified());
   }
   if (claims instanceof NextResponse) return claims;
 
@@ -54,11 +54,15 @@ export async function GET(req: Request) {
       !publishRes.ok &&
       upstreamFailed(schedulerRes.status)
     ) {
-      return NextResponse.json(EMPTY_UNIFIED_SOCIAL);
+      return NextResponse.json(buildDemoSocialUnified());
     }
 
-    return NextResponse.json(mergeUnifiedSocial(scheduler, monitoring, autoPublish));
+    const merged = mergeUnifiedSocial(scheduler, monitoring, autoPublish);
+    if (merged.unified.total_reach === 0 && merged.unified.connected_accounts === 0) {
+      return NextResponse.json(buildDemoSocialUnified());
+    }
+    return NextResponse.json(merged);
   } catch {
-    return NextResponse.json(EMPTY_UNIFIED_SOCIAL);
+    return NextResponse.json(buildDemoSocialUnified());
   }
 }

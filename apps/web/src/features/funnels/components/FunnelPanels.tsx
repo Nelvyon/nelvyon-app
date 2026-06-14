@@ -3,6 +3,15 @@
 import type { FunnelAnalytics } from "@/features/funnels/types";
 import { STEP_TYPE_LABELS } from "@/features/funnels/constants";
 
+export function FunnelMockBadge({ mock }: { mock?: boolean }) {
+  if (!mock) return null;
+  return (
+    <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
+      Datos demo
+    </span>
+  );
+}
+
 export function FunnelMetricCard({
   label,
   value,

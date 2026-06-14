@@ -31,9 +31,10 @@ export type StoreAnalytics = {
 };
 
 export type UnifiedEcommerceReporting = {
-  stores: { items: StoreProject[] };
+  stores: { items: StoreProject[]; mock?: boolean };
   ads: { total_spend: number; blended_roas: number };
   email: { campaigns_total: number; active_campaigns: number };
+  demo_analytics?: StoreAnalytics;
   unified: {
     total_stores: number;
     published_stores: number;
@@ -46,5 +47,6 @@ export type UnifiedEcommerceReporting = {
     ads_spend: number;
     ads_roas: number;
     email_campaigns: number;
+    mock?: boolean;
   };
 };

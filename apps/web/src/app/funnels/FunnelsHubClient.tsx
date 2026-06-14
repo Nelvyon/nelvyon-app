@@ -9,7 +9,9 @@ import { PanelCard } from "@/core/ui/PanelCard";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import {
+  FunnelConversionChart,
   FunnelMetricCard,
+  FunnelMockBadge,
   FunnelStepPipeline,
 } from "@/features/funnels/components/FunnelPanels";
 import { FunnelsSubNav } from "@/features/funnels/components/FunnelsSubNav";
@@ -20,12 +22,21 @@ export function FunnelsHubClient() {
   const unifiedQuery = useFunnelsUnifiedReporting();
   const listQuery = useFunnelsList();
   const unified = unifiedQuery.data?.unified;
-  const items = listQuery.data?.items ?? [];
+  const isMock = Boolean(unified?.mock ?? unifiedQuery.data?.funnels?.mock);
+  const items = isMock ? (unifiedQuery.data?.funnels?.items ?? []) : (listQuery.data?.items ?? []);
+  const demoAnalytics = unifiedQuery.data?.demo_analytics;
 
   return (
     <ProtectedLayout module="funnels">
       <div className="space-y-6">
         <FunnelsSubNav />
+
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-muted-foreground">
+            Embudos de conversión integrados con CRM, publicidad y analytics.
+          </p>
+          <FunnelMockBadge mock={isMock} />
+        </div>
 
         {unifiedQuery.error instanceof ApiError && unifiedQuery.error.status === 403 ? (
           <ForbiddenNotice>
@@ -102,29 +113,45 @@ export function FunnelsHubClient() {
         </div>
 
         <PanelCard>
+          <h2 className="text-base font-semibold">Conversión por paso</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {demoAnalytics?.name ?? "Embudo principal"} · visitas y conversiones
+          </p>
+          <div className="mt-4">
+            <FunnelConversionChart analytics={demoAnalytics} />
+          </div>
+        </PanelCard>
+
+        <PanelCard>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-base font-semibold">Tus embudos</h2>
             <Button asChild size="sm">
               <Link href="/funnels/builder">Abrir builder</Link>
             </Button>
           </div>
-          {listQuery.isLoading ? (
+          {listQuery.isLoading && !isMock ? (
             <SkeletonListRows rows={3} />
           ) : items.length ? (
             <ul className="mt-3 divide-y divide-border">
               {items.slice(0, 6).map((f) => (
                 <li className="flex flex-wrap items-center justify-between gap-2 py-3" key={f.id}>
                   <div>
-                    <Link className="font-medium text-link hover:underline" href={`/funnels/${f.id}`}>
-                      {f.name}
-                    </Link>
+                    {isMock ? (
+                      <span className="font-medium">{f.name}</span>
+                    ) : (
+                      <Link className="font-medium text-link hover:underline" href={`/funnels/${f.id}`}>
+                        {f.name}
+                      </Link>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       {f.step_count ?? f.steps?.length ?? 0} pasos · {f.status}
                     </p>
                   </div>
-                  <Button asChild size="sm" variant="ghost">
-                    <Link href={`/funnels/${f.id}`}>Ver métricas</Link>
-                  </Button>
+                  {!isMock ? (
+                    <Button asChild size="sm" variant="ghost">
+                      <Link href={`/funnels/${f.id}`}>Ver métricas</Link>
+                    </Button>
+                  ) : null}
                 </li>
               ))}
             </ul>

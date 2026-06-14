@@ -9,7 +9,9 @@ import { PanelCard } from "@/core/ui/PanelCard";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import {
+  CartCheckoutChart,
   EcommerceMetricCard,
+  EcommerceMockBadge,
   StoreFunnelSteps,
 } from "@/features/ecommerce/components/EcommercePanels";
 import { EcommerceSubNav } from "@/features/ecommerce/components/EcommerceSubNav";
@@ -23,12 +25,21 @@ export function EcommerceHubClient() {
   const unifiedQuery = useEcommerceUnifiedReporting();
   const listQuery = useStoresList();
   const unified = unifiedQuery.data?.unified;
-  const items = listQuery.data?.items ?? [];
+  const isMock = Boolean(unified?.mock ?? unifiedQuery.data?.stores?.mock);
+  const items = isMock ? (unifiedQuery.data?.stores?.items ?? []) : (listQuery.data?.items ?? []);
+  const demoAnalytics = unifiedQuery.data?.demo_analytics;
 
   return (
     <ProtectedLayout module="ecommerce">
       <div className="space-y-6">
         <EcommerceSubNav />
+
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-muted-foreground">
+            Tiendas online con catálogo, carrito, checkout Stripe e integración con Publicidad y Email.
+          </p>
+          <EcommerceMockBadge mock={isMock} />
+        </div>
 
         {unifiedQuery.error instanceof ApiError && unifiedQuery.error.status === 403 ? (
           <ForbiddenNotice>
@@ -115,6 +126,27 @@ export function EcommerceHubClient() {
         </div>
 
         <PanelCard>
+          <h2 className="text-base font-semibold">Carrito y checkout</h2>
+          <div className="mt-4">
+            <CartCheckoutChart analytics={demoAnalytics} />
+          </div>
+        </PanelCard>
+
+        {demoAnalytics?.top_products?.length ? (
+          <PanelCard>
+            <h2 className="text-base font-semibold">Top productos</h2>
+            <ul className="mt-3 divide-y divide-border text-sm">
+              {demoAnalytics.top_products.map((p) => (
+                <li className="flex justify-between py-2" key={p.name}>
+                  <span>{p.name}</span>
+                  <span className="tabular-nums text-muted-foreground">{p.qty} uds.</span>
+                </li>
+              ))}
+            </ul>
+          </PanelCard>
+        ) : null}
+
+        <PanelCard>
           <h2 className="text-base font-semibold">Funnel de compra</h2>
           <div className="mt-4">
             <StoreFunnelSteps />
@@ -128,21 +160,27 @@ export function EcommerceHubClient() {
               <Link href="/ecommerce/editor">Abrir editor</Link>
             </Button>
           </div>
-          {listQuery.isLoading ? (
+          {listQuery.isLoading && !isMock ? (
             <SkeletonListRows rows={3} />
           ) : items.length ? (
             <ul className="mt-3 divide-y divide-border">
               {items.slice(0, 6).map((s) => (
                 <li className="flex flex-wrap items-center justify-between gap-2 py-3" key={s.id}>
                   <div>
-                    <Link className="font-medium text-link hover:underline" href={`/ecommerce/${s.id}`}>
-                      {s.name}
-                    </Link>
+                    {isMock ? (
+                      <span className="font-medium">{s.name}</span>
+                    ) : (
+                      <Link className="font-medium text-link hover:underline" href={`/ecommerce/${s.id}`}>
+                        {s.name}
+                      </Link>
+                    )}
                     <p className="text-xs text-muted-foreground">{s.status}</p>
                   </div>
-                  <Button asChild size="sm" variant="ghost">
-                    <Link href={`/ecommerce/${s.id}`}>Ver analytics</Link>
-                  </Button>
+                  {!isMock ? (
+                    <Button asChild size="sm" variant="ghost">
+                      <Link href={`/ecommerce/${s.id}`}>Ver analytics</Link>
+                    </Button>
+                  ) : null}
                 </li>
               ))}
             </ul>

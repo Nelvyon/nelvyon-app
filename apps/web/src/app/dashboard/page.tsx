@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HomeDashboard } from "@/app/HomeDashboard";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
+import { WorkspacePulse } from "@/features/dashboard/components/WorkspacePulse";
 import { QuickWinAutomations } from "@/features/onboarding/components/QuickWinAutomations";
 
 const QUICK_LINKS = [
@@ -51,9 +52,9 @@ const QUICK_LINKS = [
     accent: "from-amber-500/15 to-amber-500/5",
   },
   {
-    href: "/automations/jobs",
+    href: "/automatizacion",
     title: "Automatización",
-    desc: "Jobs y webhooks en segundo plano",
+    desc: "Workflows si pasa X haz Y con conectores",
     accent: "from-rose-500/15 to-rose-500/5",
   },
   {
@@ -88,6 +89,8 @@ export default function DashboardHomePage() {
             </div>
           </div>
         </section>
+
+        <WorkspacePulse />
 
         <HomeDashboard />
 

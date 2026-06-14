@@ -2,6 +2,15 @@
 
 import type { StoreAnalytics } from "@/features/ecommerce/types";
 
+export function EcommerceMockBadge({ mock }: { mock?: boolean }) {
+  if (!mock) return null;
+  return (
+    <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
+      Datos demo
+    </span>
+  );
+}
+
 export function EcommerceMetricCard({
   label,
   value,

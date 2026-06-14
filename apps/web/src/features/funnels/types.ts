@@ -38,9 +38,10 @@ export type FunnelAnalytics = {
 };
 
 export type UnifiedFunnelsReporting = {
-  funnels: { items: Funnel[] };
+  funnels: { items: Funnel[]; mock?: boolean };
   crm: { deals_total: number; pipeline_value: number };
   ads: { total_spend: number; blended_roas: number };
+  demo_analytics?: FunnelAnalytics;
   unified: {
     active_funnels: number;
     total_funnels: number;
@@ -51,5 +52,6 @@ export type UnifiedFunnelsReporting = {
     deals_total: number;
     ads_spend: number;
     ads_roas: number;
+    mock?: boolean;
   };
 };

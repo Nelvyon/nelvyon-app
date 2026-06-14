@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { PanelCard } from "@/core/ui/PanelCard";
 import { ReportingSubNav } from "@/features/reporting/components/ReportingSubNav";
+import { AnalyticsHubSnapshots } from "@/features/reporting/components/AnalyticsHubSnapshots";
 
 const ANALYTICS_LINKS = [
   {
@@ -64,6 +65,7 @@ export default function AnalyticsHubPage() {
     <ProtectedLayout module="os">
       <div className="space-y-6">
         <ReportingSubNav />
+        <AnalyticsHubSnapshots />
         <p className="text-sm text-muted-foreground">
           Centro de analítica unificado del workspace. Elige un módulo para profundizar en métricas operativas.
         </p>
