@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
-import { PanelCard } from "@/core/ui/PanelCard";
 import { GrowthPackKickoffForm, PackRunProgress } from "@/features/packs/GrowthPackComponents";
 import { useKickoffGrowthPack } from "@/features/packs/hooks";
 import { getPackMeta } from "@/lib/packs/packRegistry";

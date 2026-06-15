@@ -26,8 +26,8 @@ export type PackMeta = {
 export const PACK_REGISTRY: Record<PackId, PackMeta> = {
   [LOCAL_GROWTH_PACK_ID]: {
     id: LOCAL_GROWTH_PACK_ID,
-    name: "Nelvyon Local Growth Pack",
-    tagline: "Landing + SEO + chatbot para negocios locales",
+    name: "Pack Crecimiento Local",
+    tagline: "Landing, SEO local y chatbot de citas para negocios de barrio",
     accent: "from-emerald-500/10 via-card to-card",
     kickoffPath: "/os/packs/local-growth",
     reportPath: "/dashboard/local-growth",
@@ -45,8 +45,8 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
   },
   [ECOMMERCE_GROWTH_PACK_ID]: {
     id: ECOMMERCE_GROWTH_PACK_ID,
-    name: "Nelvyon Ecommerce Growth Pack",
-    tagline: "Tienda online, SEO catálogo, chatbot ventas y kit Meta Ads",
+    name: "Pack Crecimiento Ecommerce",
+    tagline: "Tienda online, SEO de catálogo, chatbot ventas y kit Meta Ads",
     accent: "from-violet-500/10 via-card to-card",
     kickoffPath: "/os/packs/ecommerce-growth",
     reportPath: "/dashboard/ecommerce-growth",
@@ -61,8 +61,8 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
   },
   [SAAS_B2B_GROWTH_PACK_ID]: {
     id: SAAS_B2B_GROWTH_PACK_ID,
-    name: "Nelvyon SaaS B2B Growth Pack",
-    tagline: "Landing product-led, SEO demand gen, demo bot y playbook outbound",
+    name: "Pack Crecimiento SaaS B2B",
+    tagline: "Landing PLG, SEO demand gen, bot de demo y playbook outbound",
     accent: "from-sky-500/10 via-card to-card",
     kickoffPath: "/os/packs/saas-b2b-growth",
     reportPath: "/dashboard/saas-b2b-growth",

@@ -47,6 +47,7 @@ export async function dbCreateOsProject(params: {
   name: string;
   description?: string;
   packRunId: string;
+  packId: string;
 }): Promise<string> {
   const id = randomUUID();
   await db().query(
@@ -59,7 +60,7 @@ export async function dbCreateOsProject(params: {
       params.clientId,
       params.name,
       params.description ?? null,
-      JSON.stringify({ pack_id: "local-business-growth", pack_run_id: params.packRunId }),
+      JSON.stringify({ pack_id: params.packId, pack_run_id: params.packRunId }),
     ],
   );
   return id;

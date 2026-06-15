@@ -13,6 +13,7 @@ import { PanelCard } from "@/core/ui/PanelCard";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonDetailCard } from "@/core/ui/Skeleton";
 import { ClientDetailCard } from "@/features/crm/components/ClientDetailCard";
+import { CrmClientPackPanel } from "@/features/crm/components/CrmClientPackPanel";
 import { CrmSubNav } from "@/features/crm/components/CrmSubNav";
 import { ClientForm } from "@/features/crm/components/ClientForm";
 import { useClient, useUpdateClient } from "@/features/crm/hooks";
@@ -70,6 +71,7 @@ export default function ClientDetailPage() {
         {query.data ? (
           <>
             <ClientDetailCard client={query.data} />
+            <CrmClientPackPanel saasClientId={id} />
             <PanelCard>
               <h2 className="text-base font-semibold text-foreground">Pipeline y deals</h2>
               <p className="mt-1 text-sm text-muted-foreground">

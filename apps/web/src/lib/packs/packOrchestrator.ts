@@ -254,6 +254,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       name: `${meta.name} — ${intake.business_name}`,
       description: config.projectDescription(intake),
       packRunId: run.id,
+      packId: meta.id,
     });
     steps = markStep(steps, "os_project", "done", osProjectId);
     run = (await updatePackRun(run.id, { steps, os_project_id: osProjectId }))!;

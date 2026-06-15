@@ -65,12 +65,12 @@ export default function OsSaasB2bGrowthPackPage() {
                   value={extra.pricing_model}
                 >
                   <option value="subscription">Suscripción</option>
-                  <option value="usage">Usage-based</option>
+                  <option value="usage">Por uso</option>
                   <option value="hybrid">Híbrido</option>
                 </select>
               </label>
               <label className="block space-y-1">
-                <span className="text-sm font-medium">Motion comercial</span>
+                <span className="text-sm font-medium">Modelo de ventas</span>
                 <select
                   className={inputClass}
                   onChange={(e) =>

@@ -9,12 +9,14 @@ import { PanelCard } from "@/core/ui/PanelCard";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { usePackReportLatest } from "@/features/packs/hooks";
 import { PackEliteSnapshots } from "@/features/packs/PackEliteSnapshots";
+import { getPackCeoKpis, getPackDeliverablesCatalog } from "@/lib/packs/packDeliverablesCatalog";
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import type { PackId } from "@/lib/packs/types";
 
 export function PackReportDashboard({ packId }: { packId: PackId }) {
   const meta = getPackMeta(packId)!;
   const query = usePackReportLatest(packId);
+  const deliverables = getPackDeliverablesCatalog(packId);
 
   const latest = query.data?.latest;
   const report = latest?.report;
@@ -39,6 +41,16 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
             <p className="mt-1 text-sm text-muted-foreground">
               Lanza {meta.name} desde Nelvyon OS para ver métricas aquí.
             </p>
+            <PanelCard className="mt-4 border-dashed">
+              <p className="text-sm font-medium">Qué recibirá el cliente en el portal</p>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                {deliverables.map((d) => (
+                  <li key={d.title}>
+                    <strong className="text-foreground">{d.title}</strong> — {d.description}
+                  </li>
+                ))}
+              </ul>
+            </PanelCard>
             <Button asChild className="mt-4">
               <Link href={meta.kickoffPath}>Lanzar pack</Link>
             </Button>
@@ -53,15 +65,40 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
               </p>
               <h2 className="mt-1 text-2xl font-semibold">{report.business_name}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{report.summary}</p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-4">
-                <Metric label="QA medio" value={`${report.kpis.avg_qa_score}%`} />
-                <Metric label="Servicios OK" value={`${report.kpis.skus_passed}/${report.kpis.skus_total}`} />
-                <Metric label="Entregables" value={String(report.kpis.deliverables_published)} />
-                <Metric label="Campañas extra" value={String(report.kpis.extra_campaigns ?? 0)} />
+              <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                KPIs para dirección
+              </p>
+              <div className="mt-3 grid gap-4 sm:grid-cols-4">
+                {getPackCeoKpis(packId, report.kpis).map((kpi) => (
+                  <Metric hint={kpi.hint} key={kpi.label} label={kpi.label} value={kpi.value} />
+                ))}
               </div>
             </PanelCard>
 
             <PackEliteSnapshots packId={packId} />
+
+            <PanelCard>
+              <h3 className="text-base font-semibold">Entregables en portal del cliente</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                El cliente accede con invitación desde CRM y revisa cada activo publicado.
+              </p>
+              <ul className="mt-4 divide-y divide-border">
+                {deliverables.map((d) => (
+                  <li className="flex flex-wrap items-start justify-between gap-2 py-3 text-sm" key={d.title}>
+                    <div>
+                      <p className="font-medium text-foreground">{d.title}</p>
+                      <p className="text-muted-foreground">{d.description}</p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success-foreground">
+                      Publicado
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Button asChild className="mt-4" size="sm" variant="outline">
+                <Link href="/portal">Vista previa portal</Link>
+              </Button>
+            </PanelCard>
 
             <PanelCard>
               <h3 className="text-base font-semibold">Acciones post-entrega</h3>
@@ -72,7 +109,7 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
                 {report.kpis.saas_client_id ? (
                   <Button asChild size="sm" variant="outline">
                     <Link href={`/crm/clients/${report.kpis.saas_client_id}`}>
-                      Ficha cliente Revenue
+                      Ficha cliente e invitación portal
                     </Link>
                   </Button>
                 ) : null}
@@ -83,9 +120,6 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
                     </Link>
                   </Button>
                 ) : null}
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/portal">Vista portal (preview)</Link>
-                </Button>
                 {latest.os_project_id ? (
                   <Button asChild size="sm" variant="outline">
                     <Link href={`/os/proyectos/${latest.os_project_id}`}>Proyecto OS</Link>
@@ -101,7 +135,7 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
                   <li className="flex items-center justify-between py-3 text-sm" key={sku.sku}>
                     <span>{skuLabel(sku.sku)}</span>
                     <span className={sku.passed ? "text-success-foreground" : "text-destructive"}>
-                      QA {sku.qa_score} {sku.passed ? "✓" : "✗"}
+                      Calidad {sku.qa_score}% {sku.passed ? "✓" : "✗"}
                     </span>
                   </li>
                 ))}
@@ -141,11 +175,12 @@ function skuLabel(sku: string): string {
   return map[sku] ?? sku.replace("NELVYON-", "");
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-lg border border-border/80 bg-background/60 px-4 py-3">
       <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
       <p className="mt-1 text-xl font-semibold tabular-nums">{value}</p>
+      {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }

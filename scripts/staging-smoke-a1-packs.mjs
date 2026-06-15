@@ -2,8 +2,7 @@
  * Staging smoke — FASE A Growth Packs (fast: target ≤12 min total).
  * Usage: node scripts/staging-smoke-a1-packs.mjs [--skip-wait]
  *
- * Critical: auth, catalog, 1 kickoff, 1 report dashboard, pack-report BFF.
- * Non-critical (logged only): extra kickoff/report pages and HTML keyword checks.
+ * Critical: auth, catalog, 3 kickoffs, 3 report dashboards, pack-report BFF per pack.
  */
 const BASE = "https://ideal-victory-staging.up.railway.app";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
@@ -178,21 +177,30 @@ async function probeApi(module, name, path, token, workspaceId) {
 }
 
 async function runSmoke(token, workspaceId) {
-  console.log("\n=== A1 Packs — critical ===");
-  await probePageCritical("A1", "catalog /os/packs", "/os/packs", token, workspaceId);
-  await probePageCritical("A1", "kickoff local-growth", "/os/packs/local-growth", token, workspaceId);
-  await probePageCritical("A1", "report local-growth", "/dashboard/local-growth", token, workspaceId);
-  await probeApi("A1", "pack-report BFF", "/api/platform/pack-report", token, workspaceId);
+  const packs = [
+    { slug: "local-growth", label: "Local" },
+    { slug: "ecommerce-growth", label: "Ecommerce" },
+    { slug: "saas-b2b-growth", label: "SaaS B2B" },
+  ];
 
-  console.log("\n=== A1 Packs — optional (soft) ===");
-  await probePageSoft("A1", "kickoff ecommerce-growth", "/os/packs/ecommerce-growth", token, workspaceId, [
-    "Ecommerce",
-  ]);
-  await probePageSoft("A1", "kickoff saas-b2b-growth", "/os/packs/saas-b2b-growth", token, workspaceId, ["SaaS"]);
-  await probePageSoft("A1", "report ecommerce-growth", "/dashboard/ecommerce-growth", token, workspaceId, [
-    "Ecommerce",
-  ]);
-  await probePageSoft("A1", "report saas-b2b-growth", "/dashboard/saas-b2b-growth", token, workspaceId, ["SaaS"]);
+  console.log("\n=== FASE A Packs — critical ===");
+  await probePageCritical("packs", "catalog /os/packs", "/os/packs", token, workspaceId);
+
+  for (const p of packs) {
+    await probePageCritical("packs", `kickoff ${p.slug}`, `/os/packs/${p.slug}`, token, workspaceId);
+    await probePageCritical("packs", `report ${p.slug}`, `/dashboard/${p.slug}`, token, workspaceId);
+  }
+
+  await probeApi("packs", "pack-report BFF (latest)", "/api/platform/pack-report", token, workspaceId);
+
+  const packIds = [
+    "local-business-growth",
+    "ecommerce-growth",
+    "saas-b2b-growth",
+  ];
+  for (const id of packIds) {
+    await probeApi("packs", `pack-report BFF (${id})`, `/api/platform/pack-report?pack_id=${id}`, token, workspaceId);
+  }
 }
 
 async function main() {

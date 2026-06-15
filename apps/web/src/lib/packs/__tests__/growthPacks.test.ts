@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildBriefFromIntake,
+  validateLocalGrowthIntake,
+} from "@/lib/packs/localBusinessGrowthPack";
+import {
   buildEcommerceBrief,
   validateEcommerceGrowthIntake,
 } from "@/lib/packs/ecommerceGrowthPack";
@@ -8,6 +12,31 @@ import {
   buildSaasB2bBrief,
   validateSaasB2bGrowthIntake,
 } from "@/lib/packs/saasB2bGrowthPack";
+
+describe("Local Growth Pack", () => {
+  it("validates intake with local sector", () => {
+    const intake = validateLocalGrowthIntake({
+      business_name: "Clínica Norte",
+      sector: "dental",
+      city: "Valencia",
+      value_proposition: "Ortodoncia invisible",
+      primary_cta: "Reservar cita",
+    });
+    expect(intake?.sector).toBe("dental");
+  });
+
+  it("builds local brief", () => {
+    const brief = buildBriefFromIntake({
+      business_name: "Clínica Norte",
+      sector: "dental",
+      city: "Valencia",
+      value_proposition: "Ortodoncia",
+      primary_cta: "Reservar",
+    });
+    expect(brief.locale).toBe("es-ES");
+    expect(brief.sector).toBe("dental");
+  });
+});
 
 describe("Ecommerce Growth Pack", () => {
   it("validates intake with product category", () => {

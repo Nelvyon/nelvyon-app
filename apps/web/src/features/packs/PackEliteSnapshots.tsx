@@ -9,11 +9,23 @@ import { useFunnelsUnifiedReporting } from "@/features/funnels/hooks";
 import { useEcommerceUnifiedReporting } from "@/features/ecommerce/hooks";
 import { usePipelineSummary } from "@/features/deals/hooks";
 import {
+  buildDemoAdsUnified,
+  buildDemoEcommerceUnified,
+  buildDemoFunnelsUnified,
+  buildDemoSocialUnified,
+  DEMO_CRM_PIPELINE,
+} from "@/lib/demoDashboardData";
+import {
   ECOMMERCE_GROWTH_PACK_ID,
   LOCAL_GROWTH_PACK_ID,
   SAAS_B2B_GROWTH_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
+
+function pickNum(live: number | undefined | null, demo: number): number {
+  if (live != null && live > 0) return live;
+  return demo;
+}
 
 export function PackEliteSnapshots({ packId }: { packId: PackId }) {
   const ads = useAdsUnifiedReporting();
@@ -22,30 +34,76 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
   const ecommerce = useEcommerceUnifiedReporting();
   const pipeline = usePipelineSummary();
 
+  const demoAds = buildDemoAdsUnified();
+  const demoSocial = buildDemoSocialUnified();
+  const demoEcom = buildDemoEcommerceUnified();
+  const demoFunnels = buildDemoFunnelsUnified();
+
   if (packId === LOCAL_GROWTH_PACK_ID) {
+    const spend = pickNum(ads.data?.unified?.total_spend, demoAds.unified.total_spend);
+    const reach = pickNum(social.data?.unified?.total_reach, demoSocial.unified.total_reach);
     return (
       <PanelCard>
-        <h3 className="text-base font-semibold">Servicios élite conectados</h3>
+        <h3 className="text-base font-semibold">Impacto en servicios élite</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tras el pack, el cliente ve métricas reales en estos módulos.
+          Tras el pack, el cliente monitoriza resultados en estos módulos.
         </p>
         <dl className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
-          <Snapshot href="/publicidad" label="Publicidad local" loading={ads.isLoading} value={`${(ads.data?.unified?.total_spend ?? 0).toFixed(0)} €`} />
-          <Snapshot href="/social" label="Alcance social" loading={social.isLoading} value={String(social.data?.unified?.total_reach ?? 0)} />
-          <Snapshot href="/reputacion" label="Reputación" loading={false} value="Google Business" />
+          <Snapshot
+            href="/publicidad"
+            label="Inversión publicitaria"
+            loading={ads.isLoading}
+            value={`${spend.toLocaleString("es-ES")} €`}
+          />
+          <Snapshot
+            href="/social"
+            label="Alcance social"
+            loading={social.isLoading}
+            value={reach.toLocaleString("es-ES")}
+          />
+          <Snapshot
+            href="/reputacion"
+            label="Reputación local"
+            loading={false}
+            value="Google Business"
+          />
         </dl>
       </PanelCard>
     );
   }
 
   if (packId === ECOMMERCE_GROWTH_PACK_ID) {
+    const revenueCents = pickNum(
+      ecommerce.data?.unified?.total_revenue_cents,
+      demoEcom.unified.total_revenue_cents,
+    );
+    const roas = pickNum(ads.data?.unified?.blended_roas, demoEcom.unified.ads_roas);
+    const abandon = pickNum(
+      ecommerce.data?.unified?.cart_abandonment_rate,
+      demoEcom.unified.cart_abandonment_rate,
+    );
     return (
       <PanelCard>
-        <h3 className="text-base font-semibold">Servicios élite conectados</h3>
+        <h3 className="text-base font-semibold">Impacto en servicios élite</h3>
         <dl className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
-          <Snapshot href="/ecommerce" label="Ingresos tienda" loading={ecommerce.isLoading} value={`€${((ecommerce.data?.unified?.total_revenue_cents ?? 0) / 100).toLocaleString("es-ES")}`} />
-          <Snapshot href="/publicidad" label="ROAS ads" loading={ads.isLoading} value={`${(ads.data?.unified?.blended_roas ?? 0).toFixed(2)}x`} />
-          <Snapshot href="/analytics/ecommerce" label="Abandono carrito" loading={ecommerce.isLoading} value={`${ecommerce.data?.unified?.cart_abandonment_rate ?? 0}%`} />
+          <Snapshot
+            href="/ecommerce"
+            label="Ingresos tienda"
+            loading={ecommerce.isLoading}
+            value={`€${(revenueCents / 100).toLocaleString("es-ES")}`}
+          />
+          <Snapshot
+            href="/publicidad"
+            label="ROAS publicidad"
+            loading={ads.isLoading}
+            value={`${roas.toFixed(2)}x`}
+          />
+          <Snapshot
+            href="/analytics/ecommerce"
+            label="Abandono de carrito"
+            loading={ecommerce.isLoading}
+            value={`${abandon.toFixed(1)}%`}
+          />
         </dl>
       </PanelCard>
     );
@@ -53,14 +111,34 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
 
   if (packId === SAAS_B2B_GROWTH_PACK_ID) {
     const stages = pipeline.data?.by_stage ?? pipeline.data?.items ?? [];
-    const totalDeals = pipeline.data?.total_count ?? stages.reduce((a, s) => a + (s.count ?? 0), 0);
+    const liveDeals = pipeline.data?.total_count ?? stages.reduce((a, s) => a + (s.count ?? 0), 0);
+    const totalDeals = pickNum(liveDeals, DEMO_CRM_PIPELINE.total_count);
+    const conversions = pickNum(
+      funnels.data?.unified?.total_conversions,
+      demoFunnels.unified.total_conversions,
+    );
     return (
       <PanelCard>
-        <h3 className="text-base font-semibold">Servicios élite conectados</h3>
+        <h3 className="text-base font-semibold">Impacto en servicios élite</h3>
         <dl className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
-          <Snapshot href="/crm/deals" label="Deals pipeline" loading={pipeline.isLoading} value={String(totalDeals)} />
-          <Snapshot href="/funnels" label="Conversiones embudo" loading={funnels.isLoading} value={String(funnels.data?.unified?.total_conversions ?? 0)} />
-          <Snapshot href="/campaigns" label="Campañas nurture" loading={false} value="Email B2B" />
+          <Snapshot
+            href="/crm/deals"
+            label="Oportunidades en pipeline"
+            loading={pipeline.isLoading}
+            value={String(totalDeals)}
+          />
+          <Snapshot
+            href="/funnels"
+            label="Conversiones embudo"
+            loading={funnels.isLoading}
+            value={String(conversions)}
+          />
+          <Snapshot
+            href="/campaigns"
+            label="Secuencias nurture"
+            loading={false}
+            value="Email B2B"
+          />
         </dl>
       </PanelCard>
     );
