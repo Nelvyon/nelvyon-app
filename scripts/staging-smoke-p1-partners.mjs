@@ -185,7 +185,7 @@ async function main() {
 
   console.log("\n=== Partner HQ UI ===");
   await probePage("partners", "/dashboard/partners shell", "/dashboard/partners", token, workspaceId, {
-    contains: ["partner hq", "stripe connect"],
+    contains: ["partner hq", "cómo funciona tu comisión", "stripe connect", "tu margen este mes"],
   });
 
   console.log("\n=== Partner HQ BFF ===");

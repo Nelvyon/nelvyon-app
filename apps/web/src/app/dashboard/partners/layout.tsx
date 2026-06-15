@@ -3,7 +3,7 @@ export default function PartnersLayout({ children }: { children: React.ReactNode
     <section aria-label="Partner HQ">
       {/* SSR anchor for staging smoke — matches client Stripe Connect banner region */}
       <p className="sr-only" id="partner-hq-connect-region">
-        Partner HQ — Stripe Connect cobros partner
+        Partner HQ — Cómo funciona tu comisión — Stripe Connect cobros partner
       </p>
       {children}
     </section>

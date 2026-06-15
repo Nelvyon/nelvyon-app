@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Building2, CreditCard, Loader2, Package, Plus, TrendingUp, Users } from "lucide-react";
+import { ArrowRight, Building2, CreditCard, Loader2, Package, Plus, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -15,6 +15,7 @@ import {
   SkeletonTable,
 } from "@/features/dashboard/components/DashboardTabs";
 import { partnersApi, type PartnerHqResponse } from "@/features/partners/api";
+import { PartnerCommissionFlow } from "@/features/partners/components/PartnerCommissionFlow";
 
 export default function PartnerHqPage() {
   const searchParams = useSearchParams();
@@ -106,6 +107,15 @@ export default function PartnerHqPage() {
         </div>
 
         <MetricGrid items={metrics} loading={loading} />
+
+        {data && connect ? (
+          <PartnerCommissionFlow
+            connect={connect}
+            data={data}
+            onboarding={onboarding}
+            onStartConnect={() => void startStripeOnboarding()}
+          />
+        ) : null}
 
         {connect ? (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
@@ -355,17 +365,6 @@ export default function PartnerHqPage() {
             </Button>
           </div>
         ) : null}
-
-        <div className="flex flex-wrap gap-3 rounded-xl border border-dashed p-4 text-sm">
-          <Users className="h-5 w-5 shrink-0 text-muted-foreground" />
-          <div>
-            <p className="font-medium">Flujo recomendado (3 clics)</p>
-            <p className="text-muted-foreground">
-              1) Crear cliente · 2) Kickoff pack en /os/packs · 3) Invite portal — el cliente ve progreso sin
-              pantallas vacías.
-            </p>
-          </div>
-        </div>
       </DashboardPageTransition>
     </ProtectedLayout>
   );
