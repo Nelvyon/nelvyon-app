@@ -51,11 +51,15 @@ async function workspace(token) {
   const res = await fetch(`${BASE}/api/platform/workspaces/list`, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
   });
+  if (!res.ok) {
+    fail("auth", "workspaces", `status ${res.status}`);
+    return "";
+  }
   const data = await res.json();
-  const items = data.items ?? data.workspaces ?? [];
+  const items = data.items ?? data.workspaces ?? (Array.isArray(data) ? data : []);
   const id = items[0]?.id ?? items[0]?.workspace_id;
   if (!id) {
-    fail("auth", "workspace", "missing");
+    fail("auth", "workspaces", "missing");
     return "";
   }
   pass("auth", "workspace", `id=${id}`);
