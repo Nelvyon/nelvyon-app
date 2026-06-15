@@ -6,6 +6,7 @@ import { use } from "react";
 import { Button } from "@/core/ui/button";
 import { portalProjectStatusLabel } from "@/features/client_portal_v1/constants";
 import { PortalDeliverableCard } from "@/features/client_portal_v1/components/PortalCards";
+import { PortalPackProgressPanel } from "@/features/client_portal_v1/components/PortalPackProgressPanel";
 import { PortalPageShell } from "@/features/client_portal_v1/components/PortalPageShell";
 import {
   PortalEmptyState,
@@ -51,6 +52,10 @@ export default function PortalProjectDetailPage({
             </div>
           ) : null}
         </dl>
+      ) : null}
+
+      {project.data?.pack_id && deliverables.data ? (
+        <PortalPackProgressPanel packId={project.data.pack_id} deliverables={deliverables.data.items} />
       ) : null}
 
       <section className="space-y-3 pt-4">

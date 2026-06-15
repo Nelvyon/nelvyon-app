@@ -155,7 +155,46 @@ class PortalDataService:
         return self._deliverable_dict(row) if row else None
 
     @staticmethod
+    def _sanitize_pack_summary(meta: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        report = meta.get("pack_report")
+        if not isinstance(report, dict):
+            return None
+        kpis = report.get("kpis") if isinstance(report.get("kpis"), dict) else {}
+        sku_results = report.get("sku_results") if isinstance(report.get("sku_results"), list) else []
+        safe_skus: List[Dict[str, Any]] = []
+        for item in sku_results:
+            if not isinstance(item, dict):
+                continue
+            safe_skus.append(
+                {
+                    "sku": item.get("sku"),
+                    "qa_score": item.get("qa_score"),
+                    "passed": item.get("passed"),
+                }
+            )
+        next_steps = report.get("next_steps")
+        if not isinstance(next_steps, list):
+            next_steps = []
+        return {
+            "pack_name": report.get("pack_name"),
+            "pack_id": report.get("pack_id"),
+            "business_name": report.get("business_name"),
+            "sector": report.get("sector"),
+            "completed_at": report.get("completed_at"),
+            "summary": report.get("summary"),
+            "kpis": {
+                "deliverables_published": kpis.get("deliverables_published"),
+                "avg_qa_score": kpis.get("avg_qa_score"),
+                "skus_passed": kpis.get("skus_passed"),
+                "skus_total": kpis.get("skus_total"),
+            },
+            "sku_results": safe_skus,
+            "next_steps": [str(s) for s in next_steps[:6]],
+        }
+
+    @staticmethod
     def _project_dict(row: Os_projects) -> Dict[str, Any]:
+        meta = row.project_metadata if isinstance(row.project_metadata, dict) else {}
         return {
             "id": row.id,
             "name": row.name,
@@ -164,11 +203,14 @@ class PortalDataService:
             "start_date": row.start_date.isoformat() if row.start_date else None,
             "due_date": row.due_date.isoformat() if row.due_date else None,
             "updated_at": row.updated_at.isoformat() if row.updated_at else None,
+            "pack_id": meta.get("pack_id"),
+            "pack_run_id": meta.get("pack_run_id"),
         }
 
     @staticmethod
     def _deliverable_dict(row: Os_deliverables) -> Dict[str, Any]:
         meta = row.deliverable_metadata if isinstance(row.deliverable_metadata, dict) else {}
+        pack_summary = PortalDataService._sanitize_pack_summary(meta)
         return {
             "id": row.id,
             "project_id": row.project_id,
@@ -186,4 +228,9 @@ class PortalDataService:
             "client_feedback": meta.get("client_feedback"),
             "client_review_decision": meta.get("client_review_decision"),
             "updated_at": row.updated_at.isoformat() if row.updated_at else None,
+            "pack_id": meta.get("pack_id"),
+            "pack_run_id": meta.get("pack_run_id"),
+            "sku": meta.get("sku"),
+            "qa_score": meta.get("qa_score"),
+            "pack_summary": pack_summary,
         }

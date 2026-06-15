@@ -10,6 +10,7 @@ import {
   PortalErrorState,
   PortalLoadingState,
 } from "@/features/client_portal_v1/components/PortalUiStates";
+import { portalPackLabel } from "@/features/client_portal_v1/portalPackProgress";
 import { usePortalAuth } from "@/features/client_portal_v1/PortalAuthContext";
 import { usePortalDeliverables, usePortalMe, usePortalProjects } from "@/features/client_portal_v1/hooks";
 
@@ -22,6 +23,9 @@ export default function PortalDashboardPage() {
   const pendingReview =
     deliverables.data?.items.filter((d) => d.status === "published").length ?? 0;
 
+  const packProjects =
+    projects.data?.items.filter((p) => p.pack_id).length ?? 0;
+
   return (
     <PortalPageShell
       title="Panel del cliente"
@@ -33,7 +37,7 @@ export default function PortalDashboardPage() {
       ) : null}
 
       {user ? (
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-lg border border-border bg-card p-4 shadow-card">
             <p className="text-xs uppercase text-muted-foreground">Proyectos</p>
             <p className="mt-1 text-2xl font-semibold">{projects.data?.total ?? "—"}</p>
@@ -46,7 +50,35 @@ export default function PortalDashboardPage() {
             <p className="text-xs uppercase text-muted-foreground">Pendientes de revisión</p>
             <p className="mt-1 text-2xl font-semibold text-amber-700">{pendingReview}</p>
           </div>
+          <div className="rounded-lg border border-border bg-card p-4 shadow-card">
+            <p className="text-xs uppercase text-muted-foreground">Growth Packs</p>
+            <p className="mt-1 text-2xl font-semibold">{packProjects}</p>
+          </div>
         </div>
+      ) : null}
+
+      {projects.data && projects.data.items.some((p) => p.pack_id) ? (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">Proyectos Growth Pack</h2>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {projects.data.items
+              .filter((p) => p.pack_id)
+              .map((p) => (
+                <li key={p.id}>
+                  <Link
+                    className="block rounded-xl border border-border bg-card p-4 shadow-card transition hover:border-primary/40"
+                    href={`/portal/projects/${p.id}`}
+                  >
+                    <p className="text-xs font-medium uppercase text-primary">
+                      {portalPackLabel(p.pack_id)}
+                    </p>
+                    <p className="mt-1 font-semibold">{p.name}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Ver tareas y resultados →</p>
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </section>
       ) : null}
 
       <section className="space-y-3">

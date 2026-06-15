@@ -36,6 +36,49 @@ export function PortalDeliverablePreview({ deliverable }: { deliverable: PortalD
         </p>
       )}
 
+      {deliverable.pack_summary ? (
+        <div className="space-y-4 rounded-lg border border-border bg-muted/20 p-4">
+          <h3 className="text-sm font-semibold text-foreground">Resultados del Growth Pack</h3>
+          {deliverable.pack_summary.summary ? (
+            <p className="text-sm text-muted-foreground">{deliverable.pack_summary.summary}</p>
+          ) : null}
+          {deliverable.pack_summary.kpis ? (
+            <dl className="grid gap-2 text-sm sm:grid-cols-3">
+              {deliverable.pack_summary.kpis.avg_qa_score != null ? (
+                <div>
+                  <dt className="text-muted-foreground">Calidad QA</dt>
+                  <dd className="font-semibold">{deliverable.pack_summary.kpis.avg_qa_score}%</dd>
+                </div>
+              ) : null}
+              {deliverable.pack_summary.kpis.skus_passed != null ? (
+                <div>
+                  <dt className="text-muted-foreground">Servicios OK</dt>
+                  <dd className="font-semibold">
+                    {deliverable.pack_summary.kpis.skus_passed}/{deliverable.pack_summary.kpis.skus_total}
+                  </dd>
+                </div>
+              ) : null}
+              {deliverable.pack_summary.kpis.deliverables_published != null ? (
+                <div>
+                  <dt className="text-muted-foreground">Entregables</dt>
+                  <dd className="font-semibold">{deliverable.pack_summary.kpis.deliverables_published}</dd>
+                </div>
+              ) : null}
+            </dl>
+          ) : null}
+          {deliverable.pack_summary.next_steps && deliverable.pack_summary.next_steps.length > 0 ? (
+            <div>
+              <p className="text-xs font-medium uppercase text-muted-foreground">Próximos pasos</p>
+              <ul className="mt-1 list-inside list-disc text-sm text-muted-foreground">
+                {deliverable.pack_summary.next_steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
       {fileUrl && isHttpUrl(fileUrl) ? (
         <div className="rounded-lg border border-border bg-muted/20 p-4">
           <p className="text-sm font-medium text-foreground">Vista previa / enlace de entrega</p>
