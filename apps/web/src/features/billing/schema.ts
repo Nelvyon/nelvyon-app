@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /** Plans where we show a self-serve upgrade CTA in billing. */
-export const selfServeEligiblePlanSchema = z.enum(["starter", "pro", "partner"]);
+export const selfServeEligiblePlanSchema = z.enum(["starter", "pro", "partner", "agency_partner"]);
 
 export type SelfServeEligiblePlan = z.infer<typeof selfServeEligiblePlanSchema>;
 

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const plan = typeof body.planId === "string" ? normalizeBillablePlan(body.planId) : null;
     if (!plan) {
-      return NextResponse.json({ error: "planId debe ser starter, pro o agency" }, { status: 400 });
+      return NextResponse.json({ error: "planId debe ser starter, pro, agency o agency_partner" }, { status: 400 });
     }
 
     const userRows = await DbClient.getInstance().query<{ email: string; stripe_customer_id: string | null }>(

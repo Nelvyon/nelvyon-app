@@ -11,6 +11,7 @@ import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { SectionTitle, SubsectionTitle } from "@/core/ui/typography";
 import { HelpContextLink } from "@/features/help/components/HelpContextLink";
+import { BillingWholesalePanel } from "@/features/billing/components/BillingWholesalePanel";
 import { BillingOverviewSkeleton, BillingUsageSectionSkeleton } from "@/features/billing/components/BillingOverviewSkeleton";
 import { InvoiceList } from "@/features/billing/components/InvoiceList";
 import { BillingMeterBars } from "@/features/billing/components/BillingMeterBars";
@@ -108,6 +109,7 @@ export default function BillingPage() {
         {summary && (
           <>
             <BillingSummaryCard summary={summary} />
+            <BillingWholesalePanel planId={summary.plan_id} />
             {activeSubscriptionQuery.isLoading ? (
               <p className="text-xs text-muted-foreground">Checking active subscription record…</p>
             ) : null}

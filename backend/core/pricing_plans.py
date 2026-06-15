@@ -80,6 +80,24 @@ PRICING_PLANS: Dict[str, dict] = {
             "workspace_users": 1,
         },
     },
+    "agency_partner": {
+        "label": "Agency Partner",
+        "modules": {
+            "contacts": True,
+            "helpdesk": True,
+            "campaigns": True,
+            "workflows": True,
+            "analytics": True,
+            "integrations": True,
+        },
+        "limits": {
+            "contacts": None,
+            "active_campaigns": None,
+            "active_workflows": None,
+            "workspace_users": 50,
+            "partner_client_slots": 50,
+        },
+    },
 }
 
 

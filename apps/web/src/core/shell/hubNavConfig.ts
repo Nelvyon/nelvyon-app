@@ -141,7 +141,7 @@ const AGENCY_HUB_BLUEPRINTS: readonly HubBlueprint[] = [
     id: "saas",
     label: "SaaS & Partners",
     icon: Sparkles,
-    hrefs: ["/dashboard/white-label", "/billing", "/dashboard/afiliados", "/dashboard/executive-reports"],
+    hrefs: ["/dashboard/white-label", "/dashboard/partners", "/billing", "/dashboard/afiliados", "/dashboard/executive-reports"],
   },
   {
     id: "inicio",
@@ -225,6 +225,6 @@ export const HUB_MODULE_COVERAGE: Record<NavHubId, string[]> = {
   automation: ["Workflows", "IA Hub", "Modelo IA", "Chatbot"],
   growth: ["Growth Packs", "Plantillas élite", "Analytics ejecutivos", "OS ops"],
   agency: ["Panel agencia", "Clientes OS", "Packs"],
-  saas: ["White-label", "Billing", "Afiliados", "Reportes CEO"],
+  saas: ["White-label", "Partner HQ", "Billing", "Afiliados", "Reportes CEO"],
   more: ["Settings", "Integraciones", "Storage", "Help"],
 };

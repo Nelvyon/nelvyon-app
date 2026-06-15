@@ -192,6 +192,22 @@ export async function listPackRunsForWorkspace(
   return rows.map(mapRow);
 }
 
+export async function listPackRunsForWorkspaces(
+  workspaceIds: number[],
+  limit = 50,
+): Promise<PackRunRecord[]> {
+  if (workspaceIds.length === 0) return [];
+  await ensurePackRunsTable();
+  const rows = await db().query<Record<string, unknown>>(
+    `SELECT * FROM nelvyon_pack_runs
+     WHERE workspace_id = ANY($1::int[])
+     ORDER BY created_at DESC
+     LIMIT $2`,
+    [workspaceIds, limit],
+  );
+  return rows.map(mapRow);
+}
+
 export async function findLatestPackRunBySaasClient(
   workspaceId: number,
   saasClientId: number,

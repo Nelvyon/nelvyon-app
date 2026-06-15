@@ -3,6 +3,7 @@ import {
   Activity,
   BarChart2,
   Bot,
+  Building2,
   ClipboardList,
   Calendar,
   CircleHelp,
@@ -79,6 +80,7 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "IA Hub", href: "/dashboard/ia", prefix: "/dashboard/ia", module: "os", icon: Cpu },
   { label: "Mi Modelo IA", href: "/dashboard/ai-model", prefix: "/dashboard/ai-model", module: "os", icon: Sparkles },
   { label: "Afiliados", href: "/dashboard/afiliados", prefix: "/dashboard/afiliados", module: "os", icon: Gift },
+  { label: "Partner HQ", href: "/dashboard/partners", prefix: "/dashboard/partners", module: "os", icon: Building2 },
   { label: "Storage", href: "/dashboard/storage", prefix: "/dashboard/storage", module: "os", icon: HardDrive },
   { label: "Reportes", href: "/dashboard/reportes", prefix: "/dashboard/reportes", module: "os", icon: BarChart2 },
   {

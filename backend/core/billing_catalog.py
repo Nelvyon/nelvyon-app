@@ -10,6 +10,7 @@ import os
 from typing import Any, Dict, List, Optional
 
 from core.pricing_plans import PRICING_PLANS
+from core.agency_wholesale import build_wholesale_payload
 
 # Display-only EUR / month (UI); Stripe collects real amounts via Price IDs.
 DISPLAY_BASE_PRICE_EUR: Dict[str, float] = {
@@ -17,6 +18,7 @@ DISPLAY_BASE_PRICE_EUR: Dict[str, float] = {
     "pro": 249.0,
     "enterprise": 449.0,
     "partner": 50.0,
+    "agency_partner": 197.0,
 }
 
 # Must match PRICING_PLANS (single source for plan ids / gating).
@@ -104,4 +106,4 @@ def build_plans_payload() -> Dict[str, Any]:
                 "cycles": cycles,
             }
         )
-    return {"plans": plans}
+    return {"plans": plans, "wholesale": build_wholesale_payload()}

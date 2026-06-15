@@ -23,6 +23,7 @@ export const NAV_HREF_KEYS: Record<string, string> = {
   "/dashboard/ia": "aiHub",
   "/dashboard/ai-model": "aiModel",
   "/dashboard/afiliados": "affiliates",
+  "/dashboard/partners": "partners",
   "/dashboard/storage": "storage",
   "/dashboard/reportes": "reports",
   "/dashboard/analytics/benchmarks": "analytics",
