@@ -93,7 +93,7 @@ export async function startPartnerConnectOnboarding(params: {
     throw new Error("Stripe Connect no está configurado en este entorno");
   }
 
-  let row = await getPartnerStripeAccount(params.workspaceId);
+  const row = await getPartnerStripeAccount(params.workspaceId);
   let accountId = row?.stripe_account_id;
 
   if (!accountId) {
