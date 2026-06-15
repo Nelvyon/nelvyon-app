@@ -26,41 +26,54 @@ async function fetchJsonUpstream(req: Request, path: string): Promise<Record<str
 }
 
 export async function GET(req: Request) {
-  const claims = await requirePlatformClaims(req);
-  if (claims instanceof NextResponse) return claims;
+  try {
+    const claims = await requirePlatformClaims(req);
+    if (claims instanceof NextResponse) return claims;
 
-  const workspaceId = parseWorkspaceId(req);
-  if (!workspaceId) {
-    return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+    const workspaceId = parseWorkspaceId(req);
+    if (!workspaceId) {
+      return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+    }
+
+    const [clientsPayload, affiliatePayload] = await Promise.all([
+      fetchJsonUpstream(req, "/api/whitelabel/clients"),
+      fetchJsonUpstream(req, "/api/affiliates/stats"),
+    ]);
+
+    const rawClients = (clientsPayload?.clients as Record<string, unknown>[] | undefined) ?? [];
+    const clients: PartnerClientRow[] = rawClients
+      .map((c) => ({
+        client_workspace_id: Number(c.client_workspace_id),
+        client_name: String(c.client_name ?? c.workspace_name ?? "Cliente"),
+        admin_email: c.admin_email != null ? String(c.admin_email) : undefined,
+        status: c.status != null ? String(c.status) : "active",
+        plan_id: "starter",
+      }))
+      .filter((c) => Number.isFinite(c.client_workspace_id));
+
+    const childIds = clients.map((c) => c.client_workspace_id);
+    const workspaceIds = [workspaceId, ...childIds];
+
+    let packRuns: Awaited<ReturnType<typeof listPackRunsForWorkspaces>> = [];
+    try {
+      packRuns = await listPackRunsForWorkspaces(workspaceIds, 80);
+    } catch {
+      packRuns = [];
+    }
+
+    const summary = buildPartnerHqSummary({
+      clients,
+      packRuns,
+      affiliateStats: affiliatePayload,
+    });
+
+    return NextResponse.json({
+      ...summary,
+      partner_user_id: claims.userId,
+      workspace_id: workspaceId,
+    });
+  } catch (e) {
+    console.error("[partners/hq]", e);
+    return NextResponse.json({ error: "Partner HQ unavailable" }, { status: 503 });
   }
-
-  const [clientsPayload, affiliatePayload] = await Promise.all([
-    fetchJsonUpstream(req, "/api/whitelabel/clients"),
-    fetchJsonUpstream(req, "/api/affiliates/stats"),
-  ]);
-
-  const rawClients = (clientsPayload?.clients as Record<string, unknown>[] | undefined) ?? [];
-  const clients: PartnerClientRow[] = rawClients.map((c) => ({
-    client_workspace_id: Number(c.client_workspace_id),
-    client_name: String(c.client_name ?? c.workspace_name ?? "Cliente"),
-    admin_email: c.admin_email != null ? String(c.admin_email) : undefined,
-    status: c.status != null ? String(c.status) : "active",
-    plan_id: "starter",
-  }));
-
-  const childIds = clients.map((c) => c.client_workspace_id).filter((id) => Number.isFinite(id));
-  const workspaceIds = [workspaceId, ...childIds];
-  const packRuns = await listPackRunsForWorkspaces(workspaceIds, 80);
-
-  const summary = buildPartnerHqSummary({
-    clients,
-    packRuns,
-    affiliateStats: affiliatePayload,
-  });
-
-  return NextResponse.json({
-    ...summary,
-    partner_user_id: claims.userId,
-    workspace_id: workspaceId,
-  });
 }
