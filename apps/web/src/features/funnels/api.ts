@@ -6,8 +6,12 @@ const BFF = "/api/platform/funnels";
 
 export const funnelsApi = {
   list: () => apiClient.get<{ items: Funnel[] }>(BFF, { tenantScoped: true }),
-  create: (body: { name: string; steps?: FunnelStep[]; status?: string }) =>
-    apiClient.post<Funnel>(BFF, { tenantScoped: true, body }),
+  create: (body: {
+    name: string;
+    steps?: FunnelStep[];
+    status?: string;
+    metadata?: Record<string, unknown>;
+  }) => apiClient.post<Funnel>(BFF, { tenantScoped: true, body }),
   get: (id: string) => apiClient.get<Funnel>(`${BFF}/${id}`, { tenantScoped: true }),
   update: (id: string, body: Record<string, unknown>) =>
     apiClient.put<Funnel>(`${BFF}/${id}`, { tenantScoped: true, body }),

@@ -15,6 +15,7 @@ import {
   AdsMiniChart,
   AdsMockBadge,
 } from "@/features/publicidad/components/AdsPanels";
+import { AdsTemplateQuickLaunch } from "@/features/publicidad/components/AdsTemplateQuickLaunch";
 import { PublicidadSubNav } from "@/features/publicidad/components/PublicidadSubNav";
 import { useAdsRoasAlerts, useAdsUnifiedReporting } from "@/features/publicidad/hooks";
 import type { AdsCampaignRow } from "@/features/publicidad/types";
@@ -88,9 +89,11 @@ export default function PublicidadHubPage() {
           />
         </div>
 
+        <AdsTemplateQuickLaunch />
+
         <div className="flex flex-wrap gap-2">
           <Button asChild>
-            <Link href="/publicidad/briefing">Crear campaña con IA</Link>
+            <Link href="/publicidad/briefing">Briefing personalizado con IA</Link>
           </Button>
           <Button asChild variant="outline">
             <Link href="/publicidad/google">Ver Google Ads</Link>

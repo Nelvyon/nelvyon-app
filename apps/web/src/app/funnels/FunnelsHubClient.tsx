@@ -12,10 +12,9 @@ import {
   FunnelConversionChart,
   FunnelMetricCard,
   FunnelMockBadge,
-  FunnelStepPipeline,
 } from "@/features/funnels/components/FunnelPanels";
+import { FunnelTemplateQuickLaunch } from "@/features/funnels/components/FunnelTemplateQuickLaunch";
 import { FunnelsSubNav } from "@/features/funnels/components/FunnelsSubNav";
-import { DEFAULT_FUNNEL_STEPS } from "@/features/funnels/constants";
 import { useFunnelsList, useFunnelsUnifiedReporting } from "@/features/funnels/hooks";
 
 export function FunnelsHubClient() {
@@ -48,6 +47,8 @@ export function FunnelsHubClient() {
             <p>No pudimos cargar el resumen de embudos.</p>
           </ErrorNotice>
         ) : null}
+
+        <FunnelTemplateQuickLaunch />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <FunnelMetricCard
@@ -102,13 +103,13 @@ export function FunnelsHubClient() {
           </PanelCard>
 
           <PanelCard>
-            <h2 className="text-base font-semibold">Plantilla recomendada</h2>
+            <h2 className="text-base font-semibold">Publicidad conectada</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Anuncio → Landing → Formulario → CRM
+              Lanza campañas desde plantillas élite y enlázalas al primer paso del embudo.
             </p>
-            <div className="mt-4">
-              <FunnelStepPipeline steps={[...DEFAULT_FUNNEL_STEPS]} />
-            </div>
+            <Button asChild className="mt-4" size="sm" variant="outline">
+              <Link href="/publicidad">Plantillas Ads →</Link>
+            </Button>
           </PanelCard>
         </div>
 
@@ -156,9 +157,12 @@ export function FunnelsHubClient() {
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-muted-foreground">
-              Crea tu primer embudo con la plantilla Anuncio → Landing → Formulario → CRM.
-            </p>
+            <div className="mt-3">
+              <p className="text-sm text-muted-foreground">
+                Sin embudos propios todavía — usa la plantilla élite superior en 1 clic.
+              </p>
+              <FunnelTemplateQuickLaunch compact />
+            </div>
           )}
         </PanelCard>
 

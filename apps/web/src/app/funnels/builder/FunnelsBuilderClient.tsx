@@ -10,23 +10,33 @@ import { PanelCard } from "@/core/ui/PanelCard";
 import { ErrorNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { FunnelStepPipeline } from "@/features/funnels/components/FunnelPanels";
+import { FunnelTemplateQuickLaunch } from "@/features/funnels/components/FunnelTemplateQuickLaunch";
 import { FunnelsSubNav } from "@/features/funnels/components/FunnelsSubNav";
-import { DEFAULT_FUNNEL_STEPS } from "@/features/funnels/constants";
+import {
+  buildFunnelCreatePayload,
+  listFunnelElitePresets,
+  type FunnelElitePreset,
+} from "@/lib/eliteTemplates/funnelTemplates";
+import { ELITE_SECTOR_GROUP_LABELS, type EliteSectorGroup } from "@/lib/eliteTemplates/types";
 import { useCreateFunnel, useFunnelsList } from "@/features/funnels/hooks";
+
+const GROUPS: EliteSectorGroup[] = ["local", "ecommerce", "saas_b2b"];
 
 export function FunnelsBuilderClient() {
   const router = useRouter();
   const listQuery = useFunnelsList();
   const createMutation = useCreateFunnel();
-  const [name, setName] = useState("Embudo principal");
+  const [activeGroup, setActiveGroup] = useState<EliteSectorGroup>("ecommerce");
+  const [selected, setSelected] = useState<FunnelElitePreset | null>(null);
 
-  async function createFromTemplate() {
-    const funnel = await createMutation.mutateAsync({
-      name: name.trim() || "Nuevo embudo",
-      steps: DEFAULT_FUNNEL_STEPS.map((s) => ({ name: s.name, exit_url: s.exit_url })),
-      status: "draft",
-    });
-    if (funnel?.id) router.push(`/funnels/${funnel.id}`);
+  const presets = listFunnelElitePresets(activeGroup);
+
+  async function launch(preset: FunnelElitePreset) {
+    const payload = buildFunnelCreatePayload(preset);
+    const funnel = await createMutation.mutateAsync(payload);
+    if (funnel?.id && funnel.id !== "mock-funnel") {
+      router.push(`/funnels/${funnel.id}`);
+    }
   }
 
   const items = listQuery.data?.items ?? [];
@@ -42,25 +52,58 @@ export function FunnelsBuilderClient() {
           </ErrorNotice>
         ) : null}
 
+        <FunnelTemplateQuickLaunch />
+
         <PanelCard>
-          <h2 className="text-base font-semibold">Builder de embudos</h2>
+          <h2 className="text-base font-semibold">Builder por sector</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Define el recorrido Anuncio → Landing → Formulario → CRM. Cada paso enlaza con Publicidad, landings y deals.
+            Elige variante, revisa pasos y crea en un clic — sin pantalla vacía.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <input
-              className="min-w-[220px] flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm"
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nombre del embudo"
-              value={name}
-            />
-            <Button disabled={createMutation.isPending} onClick={() => void createFromTemplate()} type="button">
-              {createMutation.isPending ? "Creando…" : "Crear con plantilla élite"}
-            </Button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {GROUPS.map((g) => (
+              <Button
+                key={g}
+                onClick={() => {
+                  setActiveGroup(g);
+                  setSelected(null);
+                }}
+                size="sm"
+                type="button"
+                variant={activeGroup === g ? "default" : "outline"}
+              >
+                {ELITE_SECTOR_GROUP_LABELS[g]}
+              </Button>
+            ))}
           </div>
-          <div className="mt-6">
-            <FunnelStepPipeline steps={[...DEFAULT_FUNNEL_STEPS]} />
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {presets.map((preset) => (
+              <button
+                className={`rounded-lg border px-4 py-3 text-left transition ${
+                  selected?.id === preset.id
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-muted/20 hover:border-primary/40"
+                }`}
+                key={preset.id}
+                onClick={() => setSelected(preset)}
+                type="button"
+              >
+                <p className="font-medium">{preset.label}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{preset.tagline}</p>
+              </button>
+            ))}
           </div>
+          {selected ? (
+            <div className="mt-4 space-y-3">
+              <FunnelStepPipeline steps={selected.steps} />
+              <Button
+                disabled={createMutation.isPending}
+                onClick={() => void launch(selected)}
+                type="button"
+              >
+                {createMutation.isPending ? "Creando…" : `Crear · ${selected.label}`}
+              </Button>
+            </div>
+          ) : null}
         </PanelCard>
 
         <PanelCard>
@@ -85,7 +128,7 @@ export function FunnelsBuilderClient() {
             </ul>
           ) : (
             <p className="mt-3 text-sm text-muted-foreground">
-              Aún no hay embudos. Usa la plantilla superior para empezar.
+              Usa la plantilla élite superior para crear tu primer embudo.
             </p>
           )}
         </PanelCard>

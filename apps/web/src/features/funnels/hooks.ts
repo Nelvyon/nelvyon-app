@@ -40,7 +40,12 @@ export function useFunnelAnalytics(id: string) {
 export function useCreateFunnel() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { name: string; steps?: FunnelStep[]; status?: string }) => funnelsApi.create(payload),
+    mutationFn: (payload: {
+      name: string;
+      steps?: FunnelStep[];
+      status?: string;
+      metadata?: Record<string, unknown>;
+    }) => funnelsApi.create(payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["funnels"] });
       toastSuccess("Embudo creado.");
