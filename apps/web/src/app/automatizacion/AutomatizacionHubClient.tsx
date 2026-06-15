@@ -7,7 +7,7 @@ import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
 import { PanelCard } from "@/core/ui/PanelCard";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
-import { AutomatizacionMetricCard } from "@/features/automatizacion/components/AutomatizacionPanels";
+import { AutomationCeoSummaryPanel } from "@/features/automatizacion/components/AutomationCeoSummaryPanel";
 import { AutomatizacionSubNav } from "@/features/automatizacion/components/AutomatizacionSubNav";
 import { CONNECTOR_LINKS, CONNECTOR_LABELS } from "@/features/automatizacion/constants";
 import { useAutomatizacionUnifiedReporting } from "@/features/automatizacion/hooks";
@@ -16,7 +16,6 @@ const CONNECTORS = ["crm", "helpdesk", "publicidad", "email", "ecommerce"] as co
 
 export function AutomatizacionHubClient() {
   const query = useAutomatizacionUnifiedReporting();
-  const unified = query.data?.unified;
 
   return (
     <ProtectedLayout module="automations">
@@ -34,31 +33,7 @@ export function AutomatizacionHubClient() {
           </ErrorNotice>
         ) : null}
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <AutomatizacionMetricCard
-            label="Flujos totales"
-            loading={query.isLoading}
-            sub={`${unified?.active_flows ?? 0} activos`}
-            value={String(unified?.total_flows ?? 0)}
-          />
-          <AutomatizacionMetricCard
-            label="Ejecuciones"
-            loading={query.isLoading}
-            sub={`${unified?.workflow_runs ?? 0} visuales · ${unified?.rule_executions ?? 0} reglas`}
-            value={String(unified?.total_runs ?? 0)}
-          />
-          <AutomatizacionMetricCard
-            label="Jobs completados"
-            loading={query.isLoading}
-            sub={`${unified?.jobs_failed ?? 0} fallidos`}
-            value={String(unified?.jobs_completed ?? 0)}
-          />
-          <AutomatizacionMetricCard
-            label="Tasa éxito"
-            loading={query.isLoading}
-            value={`${(unified?.success_rate ?? 0).toFixed(0)}%`}
-          />
-        </div>
+        <AutomationCeoSummaryPanel data={query.data} loading={query.isLoading} />
 
         <PanelCard>
           <h2 className="text-base font-semibold">Conectores del workspace</h2>

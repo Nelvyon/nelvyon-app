@@ -35,6 +35,7 @@ export type AutomationExecution = {
   trigger_type: string;
   action_type: string;
   status: string;
+  error_message?: string | null;
   executed_at?: string;
 };
 

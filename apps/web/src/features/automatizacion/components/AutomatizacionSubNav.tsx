@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/automatizacion", label: "Resumen", exact: true },
+  { href: "/automatizacion", label: "Resumen CEO", exact: true },
   { href: "/automatizacion/flujos", label: "Flujos", exact: false },
   { href: "/automatizacion/recetas", label: "Recetas", exact: false },
   { href: "/automatizacion/reglas", label: "Reglas CRM", exact: false },
