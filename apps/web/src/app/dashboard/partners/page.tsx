@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowRight, Building2, Package, Plus, TrendingUp, Users } from "lucide-react";
+import { ArrowRight, Building2, CreditCard, Loader2, Package, Plus, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
@@ -16,13 +17,18 @@ import {
 import { partnersApi, type PartnerHqResponse } from "@/features/partners/api";
 
 export default function PartnerHqPage() {
+  const searchParams = useSearchParams();
   const [data, setData] = useState<PartnerHqResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [onboarding, setOnboarding] = useState(false);
   const [tab, setTab] = useState("clients");
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (refreshConnect = false) => {
     setLoading(true);
     try {
+      if (refreshConnect) {
+        await partnersApi.connectStatus(true);
+      }
       const res = await partnersApi.hq();
       setData(res);
     } catch {
@@ -33,15 +39,40 @@ export default function PartnerHqPage() {
   }, []);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    const connectReturn = searchParams?.get("connect");
+    void load(connectReturn === "return" || connectReturn === "refresh");
+  }, [load, searchParams]);
+
+  async function startStripeOnboarding() {
+    setOnboarding(true);
+    try {
+      const res = await partnersApi.connectOnboard();
+      if (res.url) window.location.href = res.url;
+    } finally {
+      setOnboarding(false);
+    }
+  }
+
+  const connect = data?.connect;
+  const connectBadgeClass =
+    connect?.onboarding_complete
+      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+      : connect?.onboarding_status === "restricted"
+        ? "bg-destructive/15 text-destructive"
+        : "bg-amber-500/15 text-amber-800 dark:text-amber-300";
 
   const metrics = data
     ? [
         { label: "Clientes", value: String(data.metrics.total_clients) },
         { label: "Packs activos", value: String(data.metrics.active_packs) },
-        { label: "MRR estimado", value: `€${data.metrics.estimated_mrr_eur.toFixed(0)}` },
-        { label: "Margen packs (mes)", value: `€${data.metrics.pack_margin_mtd_eur.toFixed(0)}` },
+        {
+          label: "Margen real (mes)",
+          value: `€${(data.metrics.ledger_margin_mtd_eur || data.metrics.pack_margin_mtd_eur).toFixed(0)}`,
+        },
+        {
+          label: "Stripe Connect",
+          value: connect?.label ?? "—",
+        },
       ]
     : [];
 
@@ -75,6 +106,49 @@ export default function PartnerHqPage() {
         </div>
 
         <MetricGrid items={metrics} loading={loading} />
+
+        {connect ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
+            <div className="flex items-start gap-3">
+              <CreditCard className="mt-0.5 h-5 w-5 text-primary" />
+              <div>
+                <p className="font-medium">Stripe Connect — cobros partner</p>
+                <p className="text-sm text-muted-foreground">
+                  Estado:{" "}
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${connectBadgeClass}`}>
+                    {connect.label}
+                  </span>
+                  {connect.stripe_account_id ? (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      {connect.stripe_account_id.slice(0, 12)}…
+                    </span>
+                  ) : null}
+                </p>
+                {connect.onboarding_complete ? (
+                  <p className="mt-1 text-xs text-emerald-600">
+                    Cuenta lista para recibir transferencias (P2b activará cobros a clientes).
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Completa el onboarding para habilitar rebilling en fases siguientes.
+                  </p>
+                )}
+              </div>
+            </div>
+            {!connect.onboarding_complete && connect.configured ? (
+              <Button disabled={onboarding} onClick={() => void startStripeOnboarding()} size="sm">
+                {onboarding ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Redirigiendo…
+                  </>
+                ) : (
+                  "Completar onboarding Stripe"
+                )}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
 
         {data && data.metrics.affiliate_earnings_eur > 0 ? (
           <div className="rounded-xl border bg-muted/30 px-4 py-3 text-sm">
@@ -184,16 +258,47 @@ export default function PartnerHqPage() {
         {tab === "commissions" ? (
           <div className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">
-              {(data?.commissions ?? []).map((c) => (
-                <div className="rounded-xl border bg-card p-4" key={c.source}>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{c.period}</p>
+              {(data?.commissions ?? []).map((c, i) => (
+                <div className="rounded-xl border bg-card p-4" key={`${c.source}-${i}`}>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {c.period}
+                    {c.real ? " · real" : " · est."}
+                  </p>
                   <p className="mt-1 font-semibold">{c.label}</p>
                   <p className="mt-2 text-2xl font-bold text-emerald-600">€{c.amount_eur.toFixed(2)}</p>
                 </div>
               ))}
             </div>
+            {(data?.ledger_entries.length ?? 0) > 0 ? (
+              <div className="overflow-x-auto rounded-xl border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/30 text-left">
+                      <th className="p-3">Fecha</th>
+                      <th className="p-3">Tipo</th>
+                      <th className="p-3">Descripción</th>
+                      <th className="p-3">Bruto</th>
+                      <th className="p-3">Margen</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data?.ledger_entries.map((e) => (
+                      <tr className="border-b" key={e.id}>
+                        <td className="p-3 text-muted-foreground">
+                          {new Date(e.created_at).toLocaleDateString("es-ES")}
+                        </td>
+                        <td className="p-3">{e.event_type}</td>
+                        <td className="p-3">{e.description ?? "—"}</td>
+                        <td className="p-3">€{e.gross_eur.toFixed(2)}</td>
+                        <td className="p-3 font-medium text-emerald-600">€{e.partner_margin_eur.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
             <p className="text-xs text-muted-foreground">
-              P1: márgenes calculados sobre precios wholesale sugeridos. Rebilling Stripe Connect en fase P2.
+              P2a: ledger real vía Stripe Connect. Entradas demo en staging hasta activar cobros (P2b).
             </p>
           </div>
         ) : null}

@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 
 import { buildPartnerHqSummary, type PartnerClientRow } from "@/lib/partners/partnerHqSummary";
 import { listPackRunsForWorkspaces } from "@/lib/packs/packRunStore";
+import {
+  getLedgerTotals,
+  listLedgerEntries,
+} from "@/lib/partners/partnerConnectStore";
+import {
+  getPartnerConnectStatus,
+  maybeSeedDemoLedger,
+  buildConnectStatus,
+} from "@/lib/partners/partnerConnectService";
+import { isStripeConnectConfigured } from "@/lib/partners/partnerStripeConnect";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 
@@ -47,10 +57,30 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
   }
 
+  try {
+    await maybeSeedDemoLedger(workspaceId);
+  } catch {
+    /* non-blocking */
+  }
+
   const [clientsPayload, affiliatePayload] = await Promise.all([
     fetchJsonUpstream(req, "/api/whitelabel/clients"),
     fetchJsonUpstream(req, "/api/affiliates/stats"),
   ]);
+
+  let connect = buildConnectStatus(null, isStripeConnectConfigured());
+  let ledger: Awaited<ReturnType<typeof listLedgerEntries>> = [];
+  let ledgerTotals = { total_margin_eur: 0, margin_mtd_eur: 0, entry_count: 0 };
+
+  try {
+    connect = await getPartnerConnectStatus(workspaceId, true);
+    [ledger, ledgerTotals] = await Promise.all([
+      listLedgerEntries(workspaceId, 20),
+      getLedgerTotals(workspaceId),
+    ]);
+  } catch {
+    /* partner connect tables may be unavailable */
+  }
 
   const clients = mapClients(clientsPayload);
   const workspaceIds = [workspaceId, ...clients.map((c) => c.client_workspace_id)];
@@ -66,6 +96,9 @@ export async function GET(req: Request) {
     clients,
     packRuns,
     affiliateStats: affiliatePayload,
+    connect,
+    ledger,
+    ledgerTotals,
   });
 
   return NextResponse.json({

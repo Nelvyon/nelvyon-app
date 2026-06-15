@@ -1,5 +1,6 @@
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import type { PackRunRecord } from "@/lib/packs/types";
+import type { PartnerConnectStatus, PartnerLedgerRow, PartnerLedgerTotals } from "@/lib/partners/partnerConnectTypes";
 import {
   AGENCY_PARTNER_SUBSCRIPTION,
   buildWholesaleCatalogPayload,
@@ -28,10 +29,11 @@ export type PartnerPackRow = {
 };
 
 export type PartnerCommissionRow = {
-  source: "affiliate" | "pack_margin" | "client_slot";
+  source: "affiliate" | "pack_margin" | "client_slot" | "ledger";
   label: string;
   amount_eur: number;
   period: string;
+  real?: boolean;
 };
 
 export type PartnerHqSummary = {
@@ -44,7 +46,11 @@ export type PartnerHqSummary = {
     pack_margin_mtd_eur: number;
     affiliate_earnings_eur: number;
     affiliate_pending_eur: number;
+    ledger_margin_mtd_eur: number;
+    ledger_margin_total_eur: number;
   };
+  connect: PartnerConnectStatus;
+  ledger_entries: PartnerLedgerRow[];
   clients: PartnerClientRow[];
   packs: PartnerPackRow[];
   commissions: PartnerCommissionRow[];
@@ -75,8 +81,11 @@ export function buildPartnerHqSummary(params: {
   clients: PartnerClientRow[];
   packRuns: PackRunRecord[];
   affiliateStats?: Record<string, unknown> | null;
+  connect: PartnerConnectStatus;
+  ledger?: PartnerLedgerRow[];
+  ledgerTotals?: PartnerLedgerTotals;
 }): PartnerHqSummary {
-  const { clients, packRuns, affiliateStats } = params;
+  const { clients, packRuns, affiliateStats, connect, ledger = [], ledgerTotals } = params;
   const latestByWs = latestPackByWorkspace(packRuns);
 
   const enrichedClients = clients.map((c) => {
@@ -118,20 +127,46 @@ export function buildPartnerHqSummary(params: {
     margin_eur: packMarginEur(r.pack_id),
   }));
 
-  const commissions: PartnerCommissionRow[] = [
-    {
-      source: "pack_margin",
-      label: "Margen packs completados (est.)",
-      amount_eur: packMarginMtd,
+  const commissions: PartnerCommissionRow[] = [];
+
+  const ledgerMtd = ledgerTotals?.margin_mtd_eur ?? 0;
+  const ledgerTotal = ledgerTotals?.total_margin_eur ?? 0;
+
+  if (ledgerMtd > 0 || ledger.length > 0) {
+    commissions.push({
+      source: "ledger",
+      label: "Comisiones reales (ledger)",
+      amount_eur: ledgerMtd,
       period: "mes actual",
-    },
-    {
-      source: "client_slot",
-      label: "Slots cliente extra (wholesale)",
-      amount_eur: slotRevenue,
-      period: "mes actual",
-    },
-  ];
+      real: true,
+    });
+    if (ledgerTotal > ledgerMtd) {
+      commissions.push({
+        source: "ledger",
+        label: "Comisiones acumuladas (ledger)",
+        amount_eur: ledgerTotal,
+        period: "total",
+        real: true,
+      });
+    }
+  } else {
+    commissions.push(
+      {
+        source: "pack_margin",
+        label: "Margen packs completados (est.)",
+        amount_eur: packMarginMtd,
+        period: "mes actual",
+        real: false,
+      },
+      {
+        source: "client_slot",
+        label: "Slots cliente extra (wholesale)",
+        amount_eur: slotRevenue,
+        period: "mes actual",
+        real: false,
+      },
+    );
+  }
 
   const affiliateEarnings = Number(affiliateStats?.total_earnings ?? 0);
   const affiliatePending = Number(affiliateStats?.pending_payout ?? 0);
@@ -154,7 +189,11 @@ export function buildPartnerHqSummary(params: {
       pack_margin_mtd_eur: Math.round(packMarginMtd * 100) / 100,
       affiliate_earnings_eur: affiliateEarnings,
       affiliate_pending_eur: affiliatePending,
+      ledger_margin_mtd_eur: Math.round(ledgerMtd * 100) / 100,
+      ledger_margin_total_eur: Math.round(ledgerTotal * 100) / 100,
     },
+    connect,
+    ledger_entries: ledger.slice(0, 20),
     clients: enrichedClients,
     packs,
     commissions,

@@ -1,5 +1,5 @@
 /**
- * Staging smoke — P1 Partner HQ + wholesale billing.
+ * Staging smoke — Partner HQ (P1 wholesale + P2a Stripe Connect).
  * Usage: node scripts/staging-smoke-p1-partners.mjs [--skip-wait]
  */
 const BASE = "https://ideal-victory-staging.up.railway.app";
@@ -7,6 +7,8 @@ const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
 const COOKIE = "nelvyon_token";
 const SKIP_WAIT = process.argv.includes("--skip-wait");
+
+const VALID_CONNECT_STATUSES = ["not_started", "pending", "active", "restricted"];
 
 const CRITICAL = [];
 const WARN = [];
@@ -31,21 +33,21 @@ async function waitForDeploy() {
     console.log("SKIP deploy wait");
     return;
   }
-  console.log("Waiting for staging deploy (Partner HQ BFF)…");
+  console.log("Waiting for staging deploy (Partner HQ + Connect BFF)…");
   for (let i = 1; i <= 24; i += 1) {
     try {
       const health = await fetch(`${BASE}/api/health/live`, { cache: "no-store" });
+      const connect = await fetch(`${BASE}/api/platform/partners/connect/status`, { cache: "no-store" });
       const wholesale = await fetch(`${BASE}/api/platform/partners/wholesale`, { cache: "no-store" });
-      const partnersPage = await fetch(`${BASE}/dashboard/partners`, { cache: "no-store", redirect: "manual" });
       console.log(
         JSON.stringify({
           attempt: i,
           health: health.status,
+          connect: connect.status,
           wholesale: wholesale.status,
-          partnersPage: partnersPage.status,
         }),
       );
-      if (health.status === 200 && wholesale.status !== 404 && wholesale.status !== 0) {
+      if (health.status === 200 && connect.status !== 404 && wholesale.status !== 404) {
         console.log("DEPLOY_READY");
         return;
       }
@@ -100,8 +102,9 @@ async function probePage(module, check, path, token, workspaceId, opts = {}) {
     fail(module, check, `HTTP ${res.status}`);
     return null;
   }
+  let body = "";
   if (opts.contains?.length) {
-    const body = (await res.text()).toLowerCase();
+    body = (await res.text()).toLowerCase();
     for (const needle of opts.contains) {
       if (!body.includes(needle.toLowerCase())) {
         fail(module, check, `missing "${needle}"`);
@@ -109,8 +112,8 @@ async function probePage(module, check, path, token, workspaceId, opts = {}) {
       }
     }
   }
-  pass(module, check, `HTTP ${res.status}`);
-  return res;
+  pass(module, check, `HTTP ${res.status}${opts.contains ? ` (${opts.contains.join(",")})` : ""}`);
+  return body;
 }
 
 async function probeApi(module, check, path, token, workspaceId) {
@@ -141,8 +144,25 @@ async function probeApi(module, check, path, token, workspaceId) {
   return data;
 }
 
+function assertConnectShape(module, connect, checkLabel) {
+  if (!connect || typeof connect !== "object") {
+    fail(module, checkLabel, "missing connect object");
+    return false;
+  }
+  if (!VALID_CONNECT_STATUSES.includes(connect.onboarding_status)) {
+    fail(module, checkLabel, `invalid status ${connect.onboarding_status}`);
+    return false;
+  }
+  if (!connect.label || typeof connect.label !== "string") {
+    fail(module, checkLabel, "missing connect.label");
+    return false;
+  }
+  pass(module, checkLabel, `status=${connect.onboarding_status} label=${connect.label}`);
+  return true;
+}
+
 async function main() {
-  console.log(`P1 Partner HQ smoke → ${BASE}\n`);
+  console.log(`Partner HQ smoke (P1+P2a) → ${BASE}\n`);
   await waitForDeploy();
   const token = await login();
   const workspaceId = await getWorkspaceId(token);
@@ -151,9 +171,21 @@ async function main() {
     process.exit(1);
   }
 
+  console.log("\n=== P2a Stripe Connect ===");
+  const connectStatus = await probeApi(
+    "connect",
+    "/connect/status",
+    "/api/platform/partners/connect/status",
+    token,
+    workspaceId,
+  );
+  if (connectStatus) {
+    assertConnectShape("connect", connectStatus.connect, "connect status shape");
+  }
+
   console.log("\n=== Partner HQ UI ===");
-  await probePage("partners", "/dashboard/partners", "/dashboard/partners", token, workspaceId, {
-    contains: ["partner"],
+  await probePage("partners", "/dashboard/partners shell", "/dashboard/partners", token, workspaceId, {
+    contains: ["partner hq", "stripe connect"],
   });
 
   console.log("\n=== Partner HQ BFF ===");
@@ -178,10 +210,25 @@ async function main() {
   }
 
   const hq = await probeApi("partners", "hq summary", "/api/platform/partners/hq", token, workspaceId);
-  if (hq && typeof hq.metrics !== "object") {
-    fail("partners", "hq shape", "missing metrics");
-  } else if (hq) {
-    pass("partners", "hq shape", `clients=${hq.metrics?.total_clients ?? 0}`);
+  if (hq) {
+    if (typeof hq.metrics !== "object") {
+      fail("partners", "hq shape", "missing metrics");
+    } else {
+      pass("partners", "hq metrics", `clients=${hq.metrics?.total_clients ?? 0}`);
+    }
+    if (hq.connect) {
+      assertConnectShape("partners", hq.connect, "hq connect banner state");
+      if (connectStatus?.connect?.label && hq.connect.label !== connectStatus.connect.label) {
+        warn("partners", "connect label sync", `hq=${hq.connect.label} status=${connectStatus.connect.label}`);
+      }
+    } else {
+      fail("partners", "hq connect", "missing connect in hq payload");
+    }
+  }
+
+  const ledger = await probeApi("partners", "ledger", "/api/platform/partners/ledger", token, workspaceId);
+  if (ledger?.totals) {
+    pass("partners", "ledger totals", `entries=${ledger.totals.entry_count ?? 0}`);
   }
 
   console.log("\n=== Billing ===");
