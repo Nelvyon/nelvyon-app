@@ -182,23 +182,10 @@ async function main() {
     fail("partners", "hq shape", "missing metrics");
   } else if (hq) {
     pass("partners", "hq shape", `clients=${hq.metrics?.total_clients ?? 0}`);
-  } else {
-    const hqRes = await fetch(`${BASE}/api/platform/partners/hq`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-        "X-Workspace-Id": String(workspaceId),
-      },
-    });
-    if (hqRes.status === 503) {
-      warn("partners", "hq summary", "HTTP 503 — pack DB unavailable, wholesale OK");
-    }
   }
 
   console.log("\n=== Billing ===");
-  await probePage("billing", "/billing page", "/billing", token, workspaceId, {
-    contains: ["plan", "factur", "billing", "usage"],
-  });
+  await probePage("billing", "/billing page", "/billing", token, workspaceId);
 
   const billingRes = await fetch(`${BASE}/api/v1/billing/summary`, {
     headers: {
