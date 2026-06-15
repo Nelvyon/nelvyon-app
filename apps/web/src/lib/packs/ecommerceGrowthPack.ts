@@ -1,4 +1,5 @@
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
+import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
 import type {
   EcommerceGrowthPackIntake,
@@ -12,7 +13,7 @@ const meta = PACK_REGISTRY[ECOMMERCE_GROWTH_PACK_ID];
 
 export function buildEcommerceBrief(intake: EcommerceGrowthPackIntake): Record<string, unknown> {
   const base = buildBaseBrief({ ...intake, sector: "ecommerce" });
-  return {
+  const withEcom = {
     ...base,
     sector: "ecommerce",
     ecommerce: {
@@ -24,6 +25,7 @@ export function buildEcommerceBrief(intake: EcommerceGrowthPackIntake): Record<s
     traffic_source: intake.primary_channel === "google" ? "google_shopping" : "meta_ads",
     cta_type: "purchase",
   };
+  return applyEliteTemplatesToBrief(withEcom, resolveTemplatesForSector(intake.sector));
 }
 
 function buildPackReport(params: {

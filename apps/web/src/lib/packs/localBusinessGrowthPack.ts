@@ -1,4 +1,5 @@
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
+import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
 import type {
   LocalGrowthPackIntake,
@@ -11,7 +12,8 @@ import { LOCAL_GROWTH_PACK_ID } from "@/lib/packs/types";
 const meta = PACK_REGISTRY[LOCAL_GROWTH_PACK_ID];
 
 export function buildBriefFromIntake(intake: LocalGrowthPackIntake): Record<string, unknown> {
-  return buildBaseBrief({ ...intake, sector: intake.sector });
+  const base = buildBaseBrief({ ...intake, sector: intake.sector });
+  return applyEliteTemplatesToBrief(base, resolveTemplatesForSector(intake.sector));
 }
 
 function buildPackReport(params: {

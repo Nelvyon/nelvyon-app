@@ -1,4 +1,5 @@
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
+import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
 import type {
   PackReport,
@@ -12,7 +13,7 @@ const meta = PACK_REGISTRY[SAAS_B2B_GROWTH_PACK_ID];
 
 export function buildSaasB2bBrief(intake: SaasB2bGrowthPackIntake): Record<string, unknown> {
   const base = buildBaseBrief({ ...intake, sector: "saas_b2b" });
-  return {
+  const withB2b = {
     ...base,
     sector: "saas_b2b",
     b2b: {
@@ -23,6 +24,7 @@ export function buildSaasB2bBrief(intake: SaasB2bGrowthPackIntake): Record<strin
     traffic_source: "linkedin_ads",
     cta_type: "demo_request",
   };
+  return applyEliteTemplatesToBrief(withB2b, resolveTemplatesForSector(intake.sector));
 }
 
 function buildPackReport(params: {

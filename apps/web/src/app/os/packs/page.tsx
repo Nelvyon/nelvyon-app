@@ -11,8 +11,8 @@ export default function OsPacksHubPage() {
     <ProtectedLayout module="os">
       <div className="space-y-6">
         <p className="text-sm text-muted-foreground">
-          Cierra al cliente, rellena el brief y lanza el pack. Nelvyon provisiona SaaS, OS, SKUs autónomos
-          e informe en portal en un solo flujo.
+          Cierra al cliente y lanza el pack en 1–2 clics con plantillas élite. Nelvyon provisiona SaaS,
+          OS, SKUs autónomos e informe en portal en un solo flujo.
         </p>
         <div className="grid gap-4 md:grid-cols-3">
           {ALL_PACKS.map((pack) => (

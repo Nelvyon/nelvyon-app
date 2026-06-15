@@ -10,6 +10,7 @@ import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { usePackReportLatest } from "@/features/packs/hooks";
 import { PackEliteSnapshots } from "@/features/packs/PackEliteSnapshots";
 import { getPackCeoKpis, getPackDeliverablesCatalog } from "@/lib/packs/packDeliverablesCatalog";
+import { getPackTemplateGallery } from "@/lib/packs/packEliteTemplates";
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import type { PackId } from "@/lib/packs/types";
 
@@ -17,6 +18,7 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
   const meta = getPackMeta(packId)!;
   const query = usePackReportLatest(packId);
   const deliverables = getPackDeliverablesCatalog(packId);
+  const templateGallery = getPackTemplateGallery(packId);
 
   const latest = query.data?.latest;
   const report = latest?.report;
@@ -42,11 +44,17 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
               Lanza {meta.name} desde Nelvyon OS para ver métricas aquí.
             </p>
             <PanelCard className="mt-4 border-dashed">
-              <p className="text-sm font-medium">Qué recibirá el cliente en el portal</p>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                {deliverables.map((d) => (
-                  <li key={d.title}>
-                    <strong className="text-foreground">{d.title}</strong> — {d.description}
+              <p className="text-sm font-medium">Plantillas élite incluidas en este pack</p>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                {templateGallery.map((t) => (
+                  <li key={t.key}>
+                    <Link
+                      className="block rounded-md border border-border px-3 py-2 text-sm hover:border-primary/40"
+                      href={t.previewPath}
+                    >
+                      <span className="font-medium">{t.title}</span>
+                      <span className="mt-0.5 block text-xs text-muted-foreground">{t.description}</span>
+                    </Link>
                   </li>
                 ))}
               </ul>

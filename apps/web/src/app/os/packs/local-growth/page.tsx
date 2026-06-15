@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
-import { GrowthPackKickoffForm, PackRunProgress } from "@/features/packs/GrowthPackComponents";
+import { PackQuickLaunch } from "@/features/packs/PackQuickLaunch";
 import { useKickoffGrowthPack } from "@/features/packs/hooks";
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import { LOCAL_GROWTH_PACK_ID } from "@/lib/packs/types";
@@ -13,7 +12,6 @@ import { LOCAL_GROWTH_PACK_ID } from "@/lib/packs/types";
 const meta = getPackMeta(LOCAL_GROWTH_PACK_ID)!;
 
 export default function OsLocalGrowthPackPage() {
-  const [runId, setRunId] = useState<string | null>(null);
   const mutation = useKickoffGrowthPack(LOCAL_GROWTH_PACK_ID);
 
   return (
@@ -28,14 +26,11 @@ export default function OsLocalGrowthPackPage() {
           </Button>
         </div>
 
-        <GrowthPackKickoffForm
-          defaultValues={{ primary_cta: "Reservar cita", sector: meta.sectors[0]?.id }}
+        <PackQuickLaunch
           meta={meta}
           onKickoff={(body) => mutation.mutateAsync(body)}
-          onSuccess={setRunId}
+          packId={LOCAL_GROWTH_PACK_ID}
         />
-
-        {runId ? <PackRunProgress packId={LOCAL_GROWTH_PACK_ID} runId={runId} /> : null}
       </div>
     </ProtectedLayout>
   );

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
-import { GrowthPackKickoffForm, PackRunProgress } from "@/features/packs/GrowthPackComponents";
+import { PackQuickLaunch } from "@/features/packs/PackQuickLaunch";
 import { useKickoffGrowthPack } from "@/features/packs/hooks";
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import { SAAS_B2B_GROWTH_PACK_ID } from "@/lib/packs/types";
@@ -15,10 +15,9 @@ const inputClass =
   "w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export default function OsSaasB2bGrowthPackPage() {
-  const [runId, setRunId] = useState<string | null>(null);
   const mutation = useKickoffGrowthPack(SAAS_B2B_GROWTH_PACK_ID);
   const [extra, setExtra] = useState({
-    icp_title: "",
+    icp_title: "VP Product en SaaS B2B (50–200 empleados)",
     pricing_model: "subscription" as "subscription" | "usage" | "hybrid",
     sales_motion: "hybrid" as "plg" | "sales_led" | "hybrid",
   });
@@ -35,11 +34,7 @@ export default function OsSaasB2bGrowthPackPage() {
           </Button>
         </div>
 
-        <GrowthPackKickoffForm
-          defaultValues={{
-            primary_cta: "Solicitar demo",
-            sector: "saas_b2b",
-          }}
+        <PackQuickLaunch
           extraFields={
             <>
               <label className="block space-y-1 sm:col-span-2">
@@ -88,19 +83,16 @@ export default function OsSaasB2bGrowthPackPage() {
               </label>
             </>
           }
+          mergeKickoffBody={(body) => ({
+            ...body,
+            icp_title: extra.icp_title,
+            pricing_model: extra.pricing_model,
+            sales_motion: extra.sales_motion,
+          })}
           meta={meta}
-          onKickoff={(body) =>
-            mutation.mutateAsync({
-              ...body,
-              icp_title: extra.icp_title,
-              pricing_model: extra.pricing_model,
-              sales_motion: extra.sales_motion,
-            })
-          }
-          onSuccess={setRunId}
+          onKickoff={(body) => mutation.mutateAsync(body)}
+          packId={SAAS_B2B_GROWTH_PACK_ID}
         />
-
-        {runId ? <PackRunProgress packId={SAAS_B2B_GROWTH_PACK_ID} runId={runId} /> : null}
       </div>
     </ProtectedLayout>
   );

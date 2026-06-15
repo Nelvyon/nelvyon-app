@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
-import { GrowthPackKickoffForm, PackRunProgress } from "@/features/packs/GrowthPackComponents";
+import { PackQuickLaunch } from "@/features/packs/PackQuickLaunch";
 import { useKickoffGrowthPack } from "@/features/packs/hooks";
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import { ECOMMERCE_GROWTH_PACK_ID } from "@/lib/packs/types";
@@ -15,11 +15,10 @@ const inputClass =
   "w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export default function OsEcommerceGrowthPackPage() {
-  const [runId, setRunId] = useState<string | null>(null);
   const mutation = useKickoffGrowthPack(ECOMMERCE_GROWTH_PACK_ID);
   const [extra, setExtra] = useState({
-    product_category: "",
-    avg_order_value: "",
+    product_category: "Moda femenina",
+    avg_order_value: "89",
     primary_channel: "meta" as "meta" | "google" | "organic",
   });
 
@@ -35,11 +34,7 @@ export default function OsEcommerceGrowthPackPage() {
           </Button>
         </div>
 
-        <GrowthPackKickoffForm
-          defaultValues={{
-            primary_cta: "Comprar ahora",
-            sector: "ecommerce",
-          }}
+        <PackQuickLaunch
           extraFields={
             <>
               <label className="block space-y-1 sm:col-span-2">
@@ -52,7 +47,7 @@ export default function OsEcommerceGrowthPackPage() {
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-sm font-medium">AOV medio (EUR)</span>
+                <span className="text-sm font-medium">Ticket medio (EUR)</span>
                 <input
                   className={inputClass}
                   onChange={(e) => setExtra({ ...extra, avg_order_value: e.target.value })}
@@ -79,19 +74,16 @@ export default function OsEcommerceGrowthPackPage() {
               </label>
             </>
           }
+          mergeKickoffBody={(body) => ({
+            ...body,
+            product_category: extra.product_category,
+            avg_order_value: extra.avg_order_value || undefined,
+            primary_channel: extra.primary_channel,
+          })}
           meta={meta}
-          onKickoff={(body) =>
-            mutation.mutateAsync({
-              ...body,
-              product_category: extra.product_category,
-              avg_order_value: extra.avg_order_value || undefined,
-              primary_channel: extra.primary_channel,
-            })
-          }
-          onSuccess={setRunId}
+          onKickoff={(body) => mutation.mutateAsync(body)}
+          packId={ECOMMERCE_GROWTH_PACK_ID}
         />
-
-        {runId ? <PackRunProgress packId={ECOMMERCE_GROWTH_PACK_ID} runId={runId} /> : null}
       </div>
     </ProtectedLayout>
   );
