@@ -6,6 +6,11 @@ import {
   listAdsElitePresets,
 } from "@/lib/eliteTemplates/adsTemplates";
 import {
+  buildEmailCampaignFromPreset,
+  EMAIL_FEATURED_PRESET,
+  listEmailElitePresets,
+} from "@/lib/eliteTemplates/emailTemplates";
+import {
   buildFunnelCreatePayload,
   FUNNEL_FEATURED_PRESET,
   listFunnelElitePresets,
@@ -23,6 +28,22 @@ describe("adsEliteTemplates", () => {
     expect(briefing.launch).toBe(true);
     expect(briefing.product).toBe("Moda Nova");
     expect(briefing.notes).toContain("ads-meta-advantage-ecom-v1");
+  });
+});
+
+describe("emailEliteTemplates", () => {
+  it("lists presets for each sector group", () => {
+    expect(listEmailElitePresets("local").length).toBeGreaterThanOrEqual(3);
+    expect(listEmailElitePresets("ecommerce").length).toBeGreaterThanOrEqual(2);
+    expect(listEmailElitePresets("saas_b2b").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("builds campaign payload with sequence content", () => {
+    const payload = buildEmailCampaignFromPreset(EMAIL_FEATURED_PRESET, 42);
+    expect(payload.platform).toBe("email");
+    expect(payload.project_id).toBe(42);
+    expect(payload.content).toContain("email-cart-abandon-v1");
+    expect(payload.content).toContain("D+0");
   });
 });
 

@@ -98,6 +98,8 @@ export const PRODUCT_NAV: readonly ProductNavItem[] = [
   { label: "Settings", href: "/dashboard/settings", prefix: "/dashboard/settings", module: "settings", icon: Settings },
   { label: "White-label", href: "/dashboard/white-label", prefix: "/dashboard/white-label", module: "settings", icon: Palette },
   { label: "API & Webhooks", href: "/dashboard/api-keys", prefix: "/dashboard/api-keys", module: "settings", icon: Key },
+  { label: "Growth Packs", href: "/os/packs", prefix: "/os/packs", module: "os", icon: Zap },
+  { label: "Clientes OS", href: "/os/clientes", prefix: "/os/clientes", module: "os", icon: Users },
   { label: "OS", href: "/os/dashboard", prefix: "/os", module: "os", icon: Activity },
   { label: "Webs", href: "/dashboard/websites", prefix: "/dashboard/websites", module: "os", icon: Globe },
   { label: "Landing Pages", href: "/dashboard/landing-pages", prefix: "/dashboard/landing-pages", module: "os", icon: Layout },

@@ -31,6 +31,8 @@ export const NAV_HREF_KEYS: Record<string, string> = {
   "/dashboard/white-label": "whiteLabel",
   "/dashboard/api-keys": "apiWebhooks",
   "/os": "os",
+  "/os/packs": "os",
+  "/os/clientes": "os",
   "/dashboard/websites": "websites",
   "/ecommerce": "stores",
   "/dashboard/stores": "stores",

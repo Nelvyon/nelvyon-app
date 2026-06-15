@@ -12,6 +12,7 @@ import { Button } from "@/core/ui/button";
 import { ErrorNotice, ForbiddenNotice } from "@/core/ui/pageStatus";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { CampaignList } from "@/features/campaigns/components/CampaignList";
+import { EmailTemplateQuickLaunch } from "@/features/campaigns/components/EmailTemplateQuickLaunch";
 import { useCampaigns } from "@/features/campaigns/hooks";
 
 export default function CampaignsListPage() {
@@ -24,6 +25,8 @@ export default function CampaignsListPage() {
   return (
     <ProtectedLayout module="campaigns">
       <div className="space-y-6">
+        {!isClientMode ? <EmailTemplateQuickLaunch /> : null}
+
         <div className="flex flex-wrap items-center justify-end gap-2">
           {canCreate ? (
             <Button asChild>
