@@ -14,6 +14,8 @@ export async function proxyPortalFetch(
   const contentType = req.headers.get("content-type");
   if (contentType) headers.set("Content-Type", contentType);
   headers.set("Accept", req.headers.get("accept") ?? "application/json");
+  const workspaceId = req.headers.get("x-workspace-id");
+  if (workspaceId) headers.set("X-Workspace-Id", workspaceId);
 
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
   const body = hasBody ? await req.arrayBuffer() : undefined;

@@ -187,20 +187,12 @@ async function createPortalInvite(token, workspaceId, clientId, email) {
     "Content-Type": "application/json",
     "X-Workspace-Id": String(workspaceId),
   };
-  let res = await fetch(`${BASE}/api/v1/portal/invites`, {
+  const res = await fetch(`${BASE}/api/platform/portal/invites`, {
     method: "POST",
     headers,
     body: JSON.stringify({ client_id: clientId, email }),
   });
-  let base = BASE;
-  if (res.status === 404) {
-    res = await fetch(`${BACKEND_API}/api/v1/portal/invites`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ client_id: clientId, email }),
-    });
-    base = BACKEND_API;
-  }
+  const base = BASE;
   if (!res.ok) {
     const err = await res.text();
     fail("portal", "create invite", `HTTP ${res.status} ${err.slice(0, 200)}`);
