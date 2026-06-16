@@ -25,7 +25,7 @@ Credenciales QA (staging): operador `qa-audit-20260612@nelvyon.test` — ver `ba
 Workflow: `.github/workflows/staging-smoke-p0.yml`
 
 - **Trigger:** push a `main` (paths `apps/web`, smokes) + `workflow_dispatch`
-- **Flujo:** espera deploy staging (probe rutas BFF) → `run-staging-p0-smokes.mjs --skip-wait`
+- **Flujo:** `wait-staging-p0-deploy.mjs` (falla si BFF no listo) → `run-staging-p0-smokes.mjs --skip-wait`
 - **Resultado:** job verde = `ALL_P0_PASS`; rojo = `P0_FAIL` o `CRITICAL_FAILS` en algún smoke
 
 ## Portal BFF (web, no FastAPI)
@@ -55,6 +55,6 @@ El proxy `/api/v1/portal/*` permanece como compatibilidad; la UI del portal usa 
 
 ## Criterio de cierre
 
-- [ ] `ALL_P0_PASS` en staging tras deploy de `main`
-- [ ] Workflow `Staging P0 Smokes` verde en GitHub Actions
-- [ ] Flujos portal cliente sin 500 por FastAPI staging en rutas críticas
+- [x] `ALL_P0_PASS` en staging tras deploy de `main` (verificado local post-deploy `31d8ea4`)
+- [ ] Workflow `Staging P0 Smokes` verde en GitHub Actions (re-run tras fix wait deploy)
+- [x] Flujos portal cliente sin 500 por FastAPI staging en rutas críticas (BFF web)
