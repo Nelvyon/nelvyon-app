@@ -1,6 +1,20 @@
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
+import { dbCreatePackDeliverable } from "@/lib/packs/packOsDb";
+import {
+  buildLocalPackReport,
+  buildWelcomeEmailSequence,
+  enrichLocalIntake,
+  mapLocalSkuDeliverable,
+  resolveLandingLiveUrl,
+  resolvePackAppOrigin,
+} from "@/lib/packs/localPackProduction";
+import {
+  dispatchLocalWelcomeSequence,
+  type WelcomeDispatchResult,
+} from "@/lib/packs/localPackWelcomeEmail";
+import { updatePackRun } from "@/lib/packs/packRunStore";
 import type {
   LocalGrowthPackIntake,
   PackReport,
@@ -12,11 +26,154 @@ import { LOCAL_GROWTH_PACK_ID } from "@/lib/packs/types";
 const meta = PACK_REGISTRY[LOCAL_GROWTH_PACK_ID];
 
 export function buildBriefFromIntake(intake: LocalGrowthPackIntake): Record<string, unknown> {
-  const base = buildBaseBrief({ ...intake, sector: intake.sector });
-  return applyEliteTemplatesToBrief(base, resolveTemplatesForSector(intake.sector));
+  const enriched = enrichLocalIntake(intake);
+  const base = buildBaseBrief({ ...enriched, sector: enriched.sector });
+  const origin = resolvePackAppOrigin();
+  const landingUrl = resolveLandingLiveUrl(enriched, enriched.landing_slug, origin);
+
+  const withDomain = {
+    ...base,
+    primary_domain: landingUrl,
+    website_url: landingUrl,
+    domain: {
+      type: intake.website_url ? "custom" : "hosted",
+      host: (() => {
+        try {
+          return new URL(landingUrl).host;
+        } catch {
+          return `${enriched.landing_slug}.nelvyon-client.test`;
+        }
+      })(),
+    },
+    bot_name: `Asistente ${intake.business_name}`,
+    openai_cost_bearer: "client",
+    landing_slug: enriched.landing_slug,
+  };
+
+  return applyEliteTemplatesToBrief(withDomain, resolveTemplatesForSector(intake.sector));
 }
 
-function buildPackReport(params: {
+export async function runLocalBusinessGrowthPack(params: {
+  workspaceId: number;
+  userId: string;
+  intake: LocalGrowthPackIntake;
+}): Promise<PackRunRecord> {
+  const enriched = enrichLocalIntake(params.intake);
+  let welcomeDispatch: WelcomeDispatchResult = {
+    status: "skipped",
+    touches: 0,
+    email_ids: [],
+  };
+
+  return runGrowthPack({
+    workspaceId: params.workspaceId,
+    userId: params.userId,
+    config: {
+      meta,
+      intake: enriched,
+      buildBrief: buildBriefFromIntake,
+      reportDeliverableTitle: "Informe ejecutivo",
+      primaryCampaign: (i) => ({
+        platform: "email",
+        campaign_type: "welcome_sequence",
+        name: `Bienvenida 3-touch — ${i.business_name}`,
+        content: JSON.stringify(buildWelcomeEmailSequence(i)),
+        target_audience: `${i.sector} — ${i.city}`,
+        status: "ready",
+      }),
+      mapSkuDeliverable: (p) =>
+        mapLocalSkuDeliverable({
+          sku: p.sku,
+          simulation: p.simulation,
+          intake: p.intake as LocalGrowthPackIntake & { landing_slug: string },
+          packRunId: p.packRunId,
+          osClientId: p.osClientId,
+          osProjectId: p.osProjectId,
+          workspaceId: p.workspaceId,
+        }),
+      onPackStepsComplete: async (ctx) => {
+        welcomeDispatch = await dispatchLocalWelcomeSequence({
+          workspaceId: ctx.workspaceId,
+          userId: ctx.userId,
+          intake: ctx.intake as LocalGrowthPackIntake,
+          campaignId: ctx.saasCampaignId,
+        });
+
+        await dbCreatePackDeliverable({
+          workspaceId: ctx.workspaceId,
+          clientId: ctx.osClientId,
+          projectId: ctx.osProjectId,
+          title: "Campaña email de bienvenida",
+          type: "json",
+          visibility: "client_visible",
+          metadata: {
+            pack_id: LOCAL_GROWTH_PACK_ID,
+            pack_run_id: ctx.packRunId,
+            production: true,
+            sequence_touch_count: welcomeDispatch.touches,
+            dispatch_status: welcomeDispatch.status,
+            emails: buildWelcomeEmailSequence(ctx.intake as LocalGrowthPackIntake),
+            email_queue_ids: welcomeDispatch.email_ids,
+          },
+        });
+
+        await updatePackRun(ctx.packRunId, {
+          intake: { ...ctx.intake, landing_slug: enriched.landing_slug },
+        });
+      },
+      buildReport: (p): PackReport => {
+        const origin = resolvePackAppOrigin();
+        const landingUrl = resolveLandingLiveUrl(
+          p.intake as LocalGrowthPackIntake,
+          enriched.landing_slug,
+          origin,
+        );
+        return buildLocalPackReport({
+          intake: p.intake as LocalGrowthPackIntake,
+          skuResults: p.skuResults.map((r) => ({
+            sku: r.sku,
+            qa_score: r.qa_score,
+            passed: r.passed,
+          })),
+          saasClientId: p.saasClientId,
+          saasCampaignId: p.saasCampaignId,
+          landingUrl,
+          welcomeDispatch,
+        });
+      },
+      projectDescription: (i) =>
+        `Pack local: landing + SEO + chatbot para ${i.sector} en ${i.city}`,
+    },
+  });
+}
+
+export function validateLocalGrowthIntake(body: unknown): LocalGrowthPackIntake | null {
+  if (typeof body !== "object" || body === null) return null;
+  const o = body as Record<string, unknown>;
+  const sectors = new Set(meta.sectors.map((s) => s.id));
+  const sector = String(o.sector ?? "").trim();
+  if (!sectors.has(sector)) return null;
+  const business_name = String(o.business_name ?? "").trim();
+  const city = String(o.city ?? "").trim();
+  const value_proposition = String(o.value_proposition ?? "").trim();
+  const primary_cta = String(o.primary_cta ?? "").trim();
+  if (!business_name || !city || !value_proposition || !primary_cta) return null;
+  return {
+    business_name,
+    sector: sector as LocalGrowthPackIntake["sector"],
+    city,
+    country: o.country ? String(o.country) : "ES",
+    contact_email: o.contact_email ? String(o.contact_email) : undefined,
+    contact_name: o.contact_name ? String(o.contact_name) : undefined,
+    website_url: o.website_url ? String(o.website_url) : undefined,
+    value_proposition,
+    primary_cta,
+    tier: o.tier === "premium" ? "premium" : "professional",
+  };
+}
+
+/** @deprecated use buildReport via runLocalBusinessGrowthPack */
+export function buildPackReport(params: {
   intake: LocalGrowthPackIntake;
   skuResults: SkuRunResult[];
   saasClientId: number;
@@ -60,58 +217,5 @@ function buildPackReport(params: {
       "Programar revisión SEO a 30 días",
     ],
     portal_path: "/portal",
-  };
-}
-
-export async function runLocalBusinessGrowthPack(params: {
-  workspaceId: number;
-  userId: string;
-  intake: LocalGrowthPackIntake;
-}): Promise<PackRunRecord> {
-  const { intake } = params;
-  return runGrowthPack({
-    workspaceId: params.workspaceId,
-    userId: params.userId,
-    config: {
-      meta,
-      intake,
-      buildBrief: buildBriefFromIntake,
-      primaryCampaign: (i) => ({
-        platform: "email",
-        campaign_type: "welcome",
-        name: `Bienvenida — ${i.business_name}`,
-        content: `Secuencia de bienvenida para ${i.business_name}. CTA: ${i.primary_cta}`,
-        target_audience: `${i.sector} — ${i.city}`,
-        status: "ready",
-      }),
-      buildReport: buildPackReport,
-      projectDescription: (i) =>
-        `Pack local: landing + SEO + chatbot para ${i.sector} en ${i.city}`,
-    },
-  });
-}
-
-export function validateLocalGrowthIntake(body: unknown): LocalGrowthPackIntake | null {
-  if (typeof body !== "object" || body === null) return null;
-  const o = body as Record<string, unknown>;
-  const sectors = new Set(meta.sectors.map((s) => s.id));
-  const sector = String(o.sector ?? "").trim();
-  if (!sectors.has(sector)) return null;
-  const business_name = String(o.business_name ?? "").trim();
-  const city = String(o.city ?? "").trim();
-  const value_proposition = String(o.value_proposition ?? "").trim();
-  const primary_cta = String(o.primary_cta ?? "").trim();
-  if (!business_name || !city || !value_proposition || !primary_cta) return null;
-  return {
-    business_name,
-    sector: sector as LocalGrowthPackIntake["sector"],
-    city,
-    country: o.country ? String(o.country) : "ES",
-    contact_email: o.contact_email ? String(o.contact_email) : undefined,
-    contact_name: o.contact_name ? String(o.contact_name) : undefined,
-    website_url: o.website_url ? String(o.website_url) : undefined,
-    value_proposition,
-    primary_cta,
-    tier: o.tier === "premium" ? "premium" : "professional",
   };
 }

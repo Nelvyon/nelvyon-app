@@ -81,6 +81,9 @@ export type PackReport = {
     saas_client_id: number | null;
     saas_campaign_id: number | null;
     extra_campaigns?: number;
+    landing_live_url?: string;
+    welcome_email_status?: string;
+    welcome_touches?: number;
   };
   sku_results: SkuRunResult[];
   next_steps: string[];

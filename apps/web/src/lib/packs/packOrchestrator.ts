@@ -1,11 +1,14 @@
 import { simulateAutonomousJob } from "../../../../../backend/autonomous/simulator";
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
 
+import type { SimulationResult } from "../../../../../backend/autonomous/types";
+
 import type { PackMeta } from "@/lib/packs/packRegistry";
 import {
   dbCreateOsClient,
   dbCreateOsProject,
   dbCreatePackDeliverable,
+  type PackDeliverableInput,
 } from "@/lib/packs/packOsDb";
 import {
   createPackRun,
@@ -112,19 +115,47 @@ export type GrowthPackRunConfig<T extends GrowthPackIntakeBase & { sector: strin
     saasCampaignId: number;
     extraCampaignCount: number;
     extraDeliverableCount: number;
+    packRunId: string;
+    osClientId: string;
+    osProjectId: string;
   }) => PackReport;
   projectDescription: (intake: T) => string;
+  mapSkuDeliverable?: (params: {
+    sku: AutonomousSku;
+    simulation: SimulationResult;
+    intake: T;
+    brief: Record<string, unknown>;
+    packRunId: string;
+    osClientId: string;
+    osProjectId: string;
+    workspaceId: number;
+    projectSlug: string;
+  }) => PackDeliverableInput | null;
+  reportDeliverableTitle?: string;
+  onPackStepsComplete?: (params: {
+    intake: T;
+    packRunId: string;
+    workspaceId: number;
+    userId: string;
+    saasClientId: number;
+    saasCampaignId: number;
+    osClientId: string;
+    osProjectId: string;
+    skuResults: SkuRunResult[];
+  }) => Promise<void>;
 };
 
 async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string }>(params: {
   sku: AutonomousSku;
   packId: string;
+  packRunId: string;
   intake: T;
   buildBrief: (intake: T) => Record<string, unknown>;
   osClientId: string;
   osProjectId: string;
   workspaceId: number;
   projectSlug: string;
+  mapSkuDeliverable?: GrowthPackRunConfig<T>["mapSkuDeliverable"];
 }): Promise<{ result: SkuRunResult; deliverableIds: string[] }> {
   const brief = params.buildBrief(params.intake);
   const simulation = simulateAutonomousJob({
@@ -142,26 +173,43 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   const qaScore = simulation.project.qa?.score ?? 0;
   const passed = Boolean(simulation.project.qa?.passed && !simulation.escalated);
 
-  if (passed && simulation.os_publish) {
-    for (const d of simulation.os_publish.deliverables) {
-      if (d.visibility !== "client") continue;
-      const id = await dbCreatePackDeliverable({
-        workspaceId: params.workspaceId,
-        clientId: params.osClientId,
-        projectId: params.osProjectId,
-        title: d.label,
-        type: d.type,
-        file_url: d.type === "url" ? d.value : null,
-        visibility: "client_visible",
-        metadata: {
-          pack_id: params.packId,
-          sku: params.sku,
-          qa_score: qaScore,
-          artifact_value: d.value,
-          autonomous_job_id: simulation.os_publish.autonomous_job_id,
-        },
-      });
+  if (passed) {
+    const mapped = params.mapSkuDeliverable?.({
+      sku: params.sku,
+      simulation,
+      intake: params.intake,
+      brief,
+      packRunId: params.packRunId,
+      osClientId: params.osClientId,
+      osProjectId: params.osProjectId,
+      workspaceId: params.workspaceId,
+      projectSlug: params.projectSlug,
+    });
+
+    if (mapped) {
+      const id = await dbCreatePackDeliverable(mapped);
       deliverableIds.push(id);
+    } else if (simulation.os_publish) {
+      for (const d of simulation.os_publish.deliverables) {
+        if (d.visibility !== "client") continue;
+        const id = await dbCreatePackDeliverable({
+          workspaceId: params.workspaceId,
+          clientId: params.osClientId,
+          projectId: params.osProjectId,
+          title: d.label,
+          type: d.type,
+          file_url: d.type === "url" ? d.value : null,
+          visibility: "client_visible",
+          metadata: {
+            pack_id: params.packId,
+            sku: params.sku,
+            qa_score: qaScore,
+            artifact_value: d.value,
+            autonomous_job_id: simulation.os_publish.autonomous_job_id,
+          },
+        });
+        deliverableIds.push(id);
+      }
     }
   }
 
@@ -268,12 +316,14 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       const { result } = await runSkuPipeline({
         sku,
         packId: meta.id,
+        packRunId: run.id,
         intake,
         buildBrief: config.buildBrief,
         osClientId,
         osProjectId,
         workspaceId: params.workspaceId,
         projectSlug,
+        mapSkuDeliverable: config.mapSkuDeliverable,
       });
       skuResults.push(result);
       steps = markStep(
@@ -310,6 +360,20 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       run = (await updatePackRun(run.id, { steps }))!;
     }
 
+    if (config.onPackStepsComplete) {
+      await config.onPackStepsComplete({
+        intake,
+        packRunId: run.id,
+        workspaceId: params.workspaceId,
+        userId: params.userId,
+        saasClientId: Number(saasClient.id),
+        saasCampaignId: Number(campaign.id),
+        osClientId,
+        osProjectId,
+        skuResults,
+      });
+    }
+
     const report = config.buildReport({
       intake,
       skuResults,
@@ -317,16 +381,19 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       saasCampaignId: Number(campaign.id),
       extraCampaignCount,
       extraDeliverableCount,
+      packRunId: run.id,
+      osClientId,
+      osProjectId,
     });
 
     await dbCreatePackDeliverable({
       workspaceId: params.workspaceId,
       clientId: osClientId,
       projectId: osProjectId,
-      title: `Informe ${meta.name}`,
+      title: config.reportDeliverableTitle ?? `Informe ${meta.name}`,
       type: "json",
       visibility: "client_visible",
-      metadata: { pack_report: report, pack_run_id: run.id },
+      metadata: { pack_report: report, pack_run_id: run.id, pack_id: meta.id },
     });
     steps = markStep(steps, "report", "done");
 

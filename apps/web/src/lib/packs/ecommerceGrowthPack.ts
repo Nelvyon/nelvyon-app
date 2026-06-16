@@ -35,6 +35,9 @@ function buildPackReport(params: {
   saasCampaignId: number;
   extraCampaignCount: number;
   extraDeliverableCount: number;
+  packRunId: string;
+  osClientId: string;
+  osProjectId: string;
 }): PackReport {
   const passed = params.skuResults.filter((r) => r.passed);
   const avgQa =

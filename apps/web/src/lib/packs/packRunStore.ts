@@ -101,6 +101,7 @@ export async function updatePackRun(
   patch: Partial<{
     status: PackRunStatus;
     steps: PackStep[];
+    intake: GrowthPackIntakeBase & { sector: string };
     saas_client_id: number;
     saas_campaign_id: number;
     os_client_id: string;
@@ -122,6 +123,10 @@ export async function updatePackRun(
   if (patch.steps !== undefined) {
     sets.push(`steps = $${i++}::jsonb`);
     values.push(JSON.stringify(patch.steps));
+  }
+  if (patch.intake !== undefined) {
+    sets.push(`intake = $${i++}::jsonb`);
+    values.push(JSON.stringify(patch.intake));
   }
   if (patch.saas_client_id !== undefined) {
     sets.push(`saas_client_id = $${i++}`);
