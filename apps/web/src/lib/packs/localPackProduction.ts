@@ -202,8 +202,6 @@ export function mapLocalSkuDeliverable(params: {
   osProjectId: string;
   workspaceId: number;
 }): PackDeliverableInput | null {
-  if (!params.simulation.project.qa?.passed || params.simulation.escalated) return null;
-
   const origin = resolvePackAppOrigin();
   const slug = params.intake.landing_slug;
   const qaScore = params.simulation.project.qa?.score ?? 88;

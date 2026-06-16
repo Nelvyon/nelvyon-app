@@ -83,6 +83,7 @@ export async function runLocalBusinessGrowthPack(params: {
       intake: enriched,
       buildBrief: buildBriefFromIntake,
       reportDeliverableTitle: "Informe ejecutivo",
+      publishProductionDeliverables: true,
       primaryCampaign: (i) => ({
         platform: "email",
         campaign_type: "welcome_sequence",

@@ -132,6 +132,8 @@ export type GrowthPackRunConfig<T extends GrowthPackIntakeBase & { sector: strin
     projectSlug: string;
   }) => PackDeliverableInput | null;
   reportDeliverableTitle?: string;
+  /** Publish mapSkuDeliverable outputs even when simulator QA did not pass (production packs). */
+  publishProductionDeliverables?: boolean;
   onPackStepsComplete?: (params: {
     intake: T;
     packRunId: string;
@@ -156,6 +158,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   workspaceId: number;
   projectSlug: string;
   mapSkuDeliverable?: GrowthPackRunConfig<T>["mapSkuDeliverable"];
+  publishProductionDeliverables?: boolean;
 }): Promise<{ result: SkuRunResult; deliverableIds: string[] }> {
   const brief = params.buildBrief(params.intake);
   const simulation = simulateAutonomousJob({
@@ -173,7 +176,10 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   const qaScore = simulation.project.qa?.score ?? 0;
   const passed = Boolean(simulation.project.qa?.passed && !simulation.escalated);
 
-  if (passed) {
+  const shouldPublish =
+    passed || Boolean(params.publishProductionDeliverables && params.mapSkuDeliverable);
+
+  if (shouldPublish) {
     const mapped = params.mapSkuDeliverable?.({
       sku: params.sku,
       simulation,
@@ -324,6 +330,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         workspaceId: params.workspaceId,
         projectSlug,
         mapSkuDeliverable: config.mapSkuDeliverable,
+        publishProductionDeliverables: config.publishProductionDeliverables,
       });
       skuResults.push(result);
       steps = markStep(
