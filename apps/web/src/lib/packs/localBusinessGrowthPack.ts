@@ -118,7 +118,7 @@ export async function runLocalBusinessGrowthPack(params: {
         });
 
         await updatePackRun(ctx.packRunId, {
-          intake: { ...ctx.intake, landing_slug: enriched.landing_slug },
+          intake: { ...ctx.intake, landing_slug: enriched.landing_slug } as typeof ctx.intake,
         });
       },
       buildReport: (p): PackReport => {
