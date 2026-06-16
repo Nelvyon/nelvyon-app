@@ -244,7 +244,7 @@ async function portalLogin() {
 
 async function verifyPortalDeliverables(portalToken, portalBase, projectId) {
   const res = await fetch(
-    `${portalBase}/api/v1/portal/deliverables?project_id=${projectId}&page_size=50`,
+    `${portalBase}/api/platform/portal/deliverables?project_id=${projectId}&page_size=50`,
     { headers: { Authorization: `Bearer ${portalToken}`, Accept: "application/json" } },
   );
   if (!res.ok) {
