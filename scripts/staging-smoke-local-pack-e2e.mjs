@@ -208,48 +208,38 @@ async function createPortalInvite(token, workspaceId, clientId, email) {
 }
 
 async function acceptPortalInvite(inviteToken) {
-  for (const base of [BASE, BACKEND_API]) {
-    const res = await fetch(`${base}/api/v1/portal/auth/accept-invite`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: inviteToken,
-        password: PORTAL_PASSWORD,
-        name: "Cliente Portal QA",
-      }),
-    });
-    if (res.status === 404) continue;
-    if (!res.ok) {
-      const err = await res.text();
-      fail("portal", "accept invite", `HTTP ${res.status} ${err.slice(0, 200)}`);
-      return null;
-    }
-    const auth = await res.json();
-    pass("portal", "accept invite", `via ${base}`);
-    return { token: auth.access_token, base };
+  const res = await fetch(`${BASE}/api/platform/portal/auth/accept-invite`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: inviteToken,
+      password: PORTAL_PASSWORD,
+      name: "Cliente Portal QA",
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    fail("portal", "accept invite", `HTTP ${res.status} ${err.slice(0, 200)}`);
+    return null;
   }
-  fail("portal", "accept invite", "HTTP 404 on web and backend");
-  return null;
+  const auth = await res.json();
+  pass("portal", "accept invite", "via platform BFF");
+  return { token: auth.access_token, base: BASE };
 }
 
 async function portalLogin() {
-  for (const base of [BASE, BACKEND_API]) {
-    const res = await fetch(`${base}/api/v1/portal/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: PORTAL_EMAIL, password: PORTAL_PASSWORD }),
-    });
-    if (res.status === 404) continue;
-    if (!res.ok) {
-      fail("portal", "login", `HTTP ${res.status}`);
-      return null;
-    }
-    const auth = await res.json();
-    pass("portal", "login", `via ${base}`);
-    return { token: auth.access_token, base };
+  const res = await fetch(`${BASE}/api/platform/portal/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: PORTAL_EMAIL, password: PORTAL_PASSWORD }),
+  });
+  if (!res.ok) {
+    fail("portal", "login", `HTTP ${res.status}`);
+    return null;
   }
-  fail("portal", "login", "HTTP 404");
-  return null;
+  const auth = await res.json();
+  pass("portal", "login", "via platform BFF");
+  return { token: auth.access_token, base: BASE };
 }
 
 async function verifyPortalDeliverables(portalToken, portalBase, projectId) {
