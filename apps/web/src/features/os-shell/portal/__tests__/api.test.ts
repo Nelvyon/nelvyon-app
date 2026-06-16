@@ -16,7 +16,7 @@ describe("osPortalApi", () => {
   it("creates invite with tenant scope", async () => {
     postMock.mockResolvedValue({ invite_id: "i1", token: "tok", email: "a@b.com" });
     await osPortalApi.createInvite({ client_id: "c1", email: "a@b.com" });
-    expect(postMock).toHaveBeenCalledWith("/api/v1/portal/invites", {
+    expect(postMock).toHaveBeenCalledWith("/api/platform/portal/invites", {
       body: { client_id: "c1", email: "a@b.com" },
       tenantScoped: true,
     });
@@ -25,7 +25,7 @@ describe("osPortalApi", () => {
   it("lists invites by client", async () => {
     getMock.mockResolvedValue({ items: [], total: 0 });
     await osPortalApi.listInvites("c1");
-    expect(getMock).toHaveBeenCalledWith("/api/v1/portal/invites?client_id=c1", {
+    expect(getMock).toHaveBeenCalledWith("/api/platform/portal/invites?client_id=c1", {
       tenantScoped: true,
     });
   });

@@ -60,3 +60,42 @@ export async function createPortalInviteBff(params: {
     token: rawToken,
   };
 }
+
+export async function listPortalInvitesBff(params: {
+  workspaceId: number;
+  clientId: string;
+}): Promise<{ items: Record<string, unknown>[]; total: number }> {
+  const rows = await db().query<{
+    id: string;
+    email: string;
+    client_id: string;
+    expires_at: string;
+    accepted_at: string | null;
+    created_at: string;
+  }>(
+    `SELECT id, email, client_id, expires_at, accepted_at, created_at
+     FROM os_portal_invites
+     WHERE workspace_id = $1 AND client_id = $2
+     ORDER BY created_at DESC
+     LIMIT 50`,
+    [params.workspaceId, params.clientId],
+  );
+
+  const now = Date.now();
+  const items = rows.map((row) => {
+    let status = "pending";
+    if (row.accepted_at) status = "accepted";
+    else if (new Date(row.expires_at).getTime() < now) status = "expired";
+    return {
+      id: row.id,
+      email: row.email,
+      client_id: row.client_id,
+      status,
+      expires_at: row.expires_at,
+      accepted_at: row.accepted_at,
+      created_at: row.created_at,
+    };
+  });
+
+  return { items, total: items.length };
+}

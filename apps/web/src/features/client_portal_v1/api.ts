@@ -10,7 +10,8 @@ import type {
   PortalUser,
 } from "@/features/client_portal_v1/types";
 
-const BASE = "/api/v1/portal";
+const AUTH_BASE = "/api/platform/portal/auth";
+const BASE = "/api/platform/portal";
 
 const portalOpts = { tenantScoped: false as const };
 
@@ -25,13 +26,13 @@ function qs(params: Record<string, string | number | undefined>): string {
 
 export const portalApi = {
   login: (body: PortalLoginInput) =>
-    apiClient.post<PortalAuthResponse, PortalLoginInput>(`${BASE}/auth/login`, {
+    apiClient.post<PortalAuthResponse, PortalLoginInput>(`${AUTH_BASE}/login`, {
       body,
       tenantScoped: false,
     }),
 
   acceptInvite: (body: PortalAcceptInviteInput) =>
-    apiClient.post<PortalAuthResponse, PortalAcceptInviteInput>(`${BASE}/auth/accept-invite`, {
+    apiClient.post<PortalAuthResponse, PortalAcceptInviteInput>(`${AUTH_BASE}/accept-invite`, {
       body,
       tenantScoped: false,
     }),

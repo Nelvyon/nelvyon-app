@@ -1,0 +1,80 @@
+name: Staging P0 Smokes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/web/**"
+      - "scripts/staging-smoke*.mjs"
+      - "scripts/run-staging-p0-smokes.mjs"
+      - ".github/workflows/staging-smoke-p0.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: staging-p0-smokes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p0-smokes:
+    name: P0 smokes (staging)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Wait for staging deploy
+        env:
+          STAGING_WEB_URL: https://ideal-victory-staging.up.railway.app
+        run: |
+          node --input-type=module -e "
+          const base = process.env.STAGING_WEB_URL;
+          const routes = [
+            '/api/health/live',
+            '/api/platform/portal/auth/login',
+            '/api/platform/portal/me',
+            '/api/platform/portal/deliverables',
+          ];
+          let ready = false;
+          for (let i = 1; i <= 24; i++) {
+            const probes = await Promise.all(
+              routes.map(async (path) => {
+                const init = { cache: 'no-store' };
+                if (path.includes('/auth/login')) {
+                  return fetch(base + path, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'probe@test.com', password: 'short' }),
+                  });
+                }
+                return fetch(base + path, init);
+              }),
+            );
+            const statuses = probes.map((r) => r.status);
+            const html = await probes[1].text();
+            const isHtml = html.trimStart().startsWith('<!');
+            console.log(JSON.stringify({ attempt: i, statuses, loginIsHtml: isHtml }));
+            if (statuses[0] === 200 && statuses[1] !== 404 && !isHtml && statuses[2] === 401) {
+              ready = true;
+              break;
+            }
+            await new Promise((r) => setTimeout(r, 15000));
+          }
+          if (!ready) {
+            console.log('DEPLOY_WAIT_TIMEOUT — running smokes anyway');
+          } else {
+            console.log('DEPLOY_READY');
+          }
+          "
+
+      - name: Run P0 staging smokes
+        env:
+          STAGING_WEB_URL: https://ideal-victory-staging.up.railway.app
+        run: node scripts/run-staging-p0-smokes.mjs --skip-wait

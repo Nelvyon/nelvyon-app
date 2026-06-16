@@ -1,6 +1,6 @@
 import { apiClient } from "@/core/api";
 
-const BASE = "/api/v1/portal";
+const BASE = "/api/platform/portal";
 
 export interface PortalInviteCreateResult {
   invite_id: string;

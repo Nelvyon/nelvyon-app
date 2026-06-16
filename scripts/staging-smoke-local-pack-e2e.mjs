@@ -249,7 +249,7 @@ async function verifyPortalDeliverables(portalToken, portalBase, projectId) {
   );
   if (!res.ok) {
     fail("portal", "deliverables", `HTTP ${res.status}`);
-    return;
+    return [];
   }
   const data = await res.json();
   const items = data.items ?? [];
@@ -275,6 +275,79 @@ async function verifyPortalDeliverables(portalToken, portalBase, projectId) {
     pass("portal", "pack_summary", report.pack_summary?.summary?.slice(0, 40) ?? report.pack_id);
   } else {
     warn("portal", "pack_summary", "informe sin pack_summary en payload");
+  }
+  return items;
+}
+
+async function verifyPortalBffFlows(portalToken, portalBase, projectId, items) {
+  const headers = {
+    Authorization: `Bearer ${portalToken}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+  const api = (path) => `${portalBase}/api/platform/portal${path}`;
+
+  const me = await fetch(api("/me"), { headers });
+  if (me.ok) pass("portal-bff", "GET /me", "ok");
+  else fail("portal-bff", "GET /me", `HTTP ${me.status}`);
+
+  const projects = await fetch(api("/projects"), { headers });
+  if (projects.ok) {
+    const pdata = await projects.json();
+    pass("portal-bff", "GET /projects", `total=${pdata.total ?? pdata.items?.length ?? 0}`);
+  } else {
+    fail("portal-bff", "GET /projects", `HTTP ${projects.status}`);
+  }
+
+  const project = await fetch(api(`/projects/${projectId}`), { headers });
+  if (project.ok) pass("portal-bff", "GET /projects/:id", "ok");
+  else fail("portal-bff", "GET /projects/:id", `HTTP ${project.status}`);
+
+  const published = items.filter((d) => d.status === "published");
+  const sample = published[0] ?? items[0];
+  if (!sample?.id) {
+    fail("portal-bff", "deliverable sample", "no deliverables to exercise BFF");
+    return;
+  }
+
+  const detail = await fetch(api(`/deliverables/${sample.id}`), { headers });
+  if (detail.ok) pass("portal-bff", "GET /deliverables/:id", sample.title ?? sample.id);
+  else fail("portal-bff", "GET /deliverables/:id", `HTTP ${detail.status}`);
+
+  const download = await fetch(api(`/deliverables/${sample.id}/download`), {
+    headers: { Authorization: `Bearer ${portalToken}` },
+    redirect: "manual",
+  });
+  if (download.status === 302 || download.status === 200) {
+    pass("portal-bff", "GET /deliverables/:id/download", `HTTP ${download.status}`);
+  } else if (download.status === 404) {
+    warn("portal-bff", "GET /deliverables/:id/download", "HTTP 404 — no file on sample");
+  } else {
+    fail("portal-bff", "GET /deliverables/:id/download", `HTTP ${download.status}`);
+  }
+
+  const toApprove = published.find((d) => d.title?.includes("Informe")) ?? published[0];
+  if (toApprove) {
+    const approve = await fetch(api(`/deliverables/${toApprove.id}/approve`), {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ feedback: "Smoke QA approve" }),
+    });
+    if (approve.ok) pass("portal-bff", "POST /deliverables/:id/approve", toApprove.title ?? toApprove.id);
+    else fail("portal-bff", "POST /deliverables/:id/approve", `HTTP ${approve.status}`);
+  }
+
+  const toReject = published.find((d) => d.id !== toApprove?.id && d.title?.includes("SEO"));
+  if (toReject) {
+    const reject = await fetch(api(`/deliverables/${toReject.id}/reject`), {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ feedback: "Smoke QA — solicitar ajuste menor" }),
+    });
+    if (reject.ok) pass("portal-bff", "POST /deliverables/:id/reject", toReject.title ?? toReject.id);
+    else fail("portal-bff", "POST /deliverables/:id/reject", `HTTP ${reject.status}`);
+  } else {
+    warn("portal-bff", "POST /deliverables/:id/reject", "no second published deliverable for reject");
   }
 }
 
@@ -358,7 +431,10 @@ async function main() {
   if (!portalAuth) process.exit(1);
 
   console.log("\n=== Portal deliverables ===");
-  await verifyPortalDeliverables(portalAuth.token, portalAuth.base, osProjectId);
+  const deliverables = await verifyPortalDeliverables(portalAuth.token, portalAuth.base, osProjectId);
+
+  console.log("\n=== Portal BFF (me/projects/approve/reject/download) ===");
+  await verifyPortalBffFlows(portalAuth.token, portalAuth.base, osProjectId, deliverables);
 
   console.log("\n=== SUMMARY ===");
   if (WARN.length) console.log(`WARNINGS: ${WARN.length}`);

@@ -17,7 +17,7 @@ describe("portalApi", () => {
     postMock.mockResolvedValue({ access_token: "t", user: {} });
     await portalApi.login({ email: "a@b.com", password: "secret" });
     expect(postMock).toHaveBeenCalledWith(
-      "/api/v1/portal/auth/login",
+      "/api/platform/portal/auth/login",
       expect.objectContaining({ tenantScoped: false, body: { email: "a@b.com", password: "secret" } }),
     );
   });
@@ -26,7 +26,7 @@ describe("portalApi", () => {
     getMock.mockResolvedValue({ items: [], total: 0, page: 1, page_size: 50 });
     await portalApi.listDeliverables({ project_id: "uuid-1" });
     expect(getMock).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/portal/deliverables?"),
+      expect.stringContaining("/api/platform/portal/deliverables?"),
       expect.objectContaining({ tenantScoped: false }),
     );
     const url = String(getMock.mock.calls[0]?.[0] ?? "");
@@ -37,7 +37,7 @@ describe("portalApi", () => {
     postMock.mockResolvedValue({ id: "d1", status: "changes_requested" });
     await portalApi.rejectDeliverable("d1", "Please revise");
     expect(postMock).toHaveBeenCalledWith(
-      "/api/v1/portal/deliverables/d1/reject",
+      "/api/platform/portal/deliverables/d1/reject",
       expect.objectContaining({
         tenantScoped: false,
         body: { feedback: "Please revise" },

@@ -5,8 +5,6 @@
  * Critical: health, A1 packs, C5 automation CEO, portal shell, hub/agency pages.
  */
 const BASE = "https://ideal-victory-staging.up.railway.app";
-const BACKEND_API =
-  process.env.STAGING_BACKEND_API?.trim() || "https://nelvyon-app-production.up.railway.app";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
 const COOKIE = "nelvyon_token";
@@ -187,37 +185,28 @@ async function runSmoke(token, workspaceId) {
     contains: ["contraseña", "password", "sesión"],
   });
 
-  async function probePortalLogin(url) {
-    return fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: QA_EMAIL, password: QA_PASSWORD }),
-    });
-  }
-
-  let portalLogin = await probePortalLogin(`${BASE}/api/v1/portal/auth/login`);
-  let portalApiBase = BASE;
-  if (portalLogin.status === 404) {
-    portalLogin = await probePortalLogin(`${BACKEND_API}/api/v1/portal/auth/login`);
-    if (portalLogin.status !== 404) portalApiBase = BACKEND_API;
-  }
+  const portalLogin = await fetch(`${BASE}/api/platform/portal/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: QA_EMAIL, password: QA_PASSWORD }),
+  });
 
   if (portalLogin.status === 200) {
     const portalAuth = await portalLogin.json();
     const portalToken = portalAuth.access_token;
-    pass("portal", "portal login", portalApiBase === BASE ? "QA user has portal access" : `via backend ${BACKEND_API}`);
-    const projects = await fetch(`${portalApiBase}/api/v1/portal/projects`, {
+    pass("portal", "portal login BFF", "QA user has portal access");
+    const projects = await fetch(`${BASE}/api/platform/portal/projects`, {
       headers: { Authorization: `Bearer ${portalToken}`, Accept: "application/json" },
     });
     if (projects.status === 200) {
       const pdata = await projects.json();
-      pass("portal", "portal projects API", `total=${pdata.total ?? pdata.items?.length ?? 0}`);
+      pass("portal", "portal projects BFF", `total=${pdata.total ?? pdata.items?.length ?? 0}`);
       const withPack = (pdata.items ?? []).filter((p) => p.pack_id);
       if (withPack.length > 0) {
         pass("portal", "pack_id on project", `${withPack.length} project(s)`);
         const sample = withPack[0];
         const dels = await fetch(
-          `${portalApiBase}/api/v1/portal/deliverables?project_id=${sample.id}&page_size=50`,
+          `${BASE}/api/platform/portal/deliverables?project_id=${sample.id}&page_size=50`,
           { headers: { Authorization: `Bearer ${portalToken}`, Accept: "application/json" } },
         );
         if (dels.status === 200) {
@@ -225,38 +214,36 @@ async function runSmoke(token, workspaceId) {
           const hasSummary = (ddata.items ?? []).some((d) => d.pack_summary || d.pack_id);
           if (hasSummary) pass("portal", "pack fields on deliverables", "pack_id or pack_summary present");
           else warn("portal", "pack fields", "no pack metadata on deliverables yet (run a pack first)");
+        } else {
+          fail("portal", "portal deliverables BFF", `HTTP ${dels.status}`);
         }
       } else {
         warn("portal", "pack_id on project", "no pack projects yet — UI smoke only");
       }
     } else {
-      fail("portal", "portal projects API", `HTTP ${projects.status}`);
+      fail("portal", "portal projects BFF", `HTTP ${projects.status}`);
     }
   } else if (portalLogin.status === 401 || portalLogin.status === 403) {
     warn(
       "portal",
-      "portal login",
+      "portal login BFF",
       `HTTP ${portalLogin.status} — QA operator sin cuenta portal; shell UI OK`,
     );
   } else if (portalLogin.status === 404) {
-    fail("portal", "portal login", "HTTP 404 on web and backend — route missing");
+    fail("portal", "portal login BFF", "HTTP 404 — route missing");
   } else {
-    fail("portal", "portal login", `HTTP ${portalLogin.status}`);
+    fail("portal", "portal login BFF", `HTTP ${portalLogin.status}`);
   }
 
-  async function probePortalMe(url) {
-    return fetch(`${url}/api/v1/portal/me`, { cache: "no-store" });
-  }
-  let portalMe = await probePortalMe(BASE);
-  if (portalMe.status === 404) portalMe = await probePortalMe(portalApiBase);
+  const portalMe = await fetch(`${BASE}/api/platform/portal/me`, { cache: "no-store" });
   if (portalMe.status === 401 || portalMe.status === 403) {
-    pass("portal", "API auth gate", `HTTP ${portalMe.status}`);
+    pass("portal", "BFF auth gate /me", `HTTP ${portalMe.status}`);
   } else if (portalMe.status === 404) {
-    warn("portal", "API auth gate", "HTTP 404 — deploy portal BFF proxy (/api/v1/portal/*)");
+    fail("portal", "BFF auth gate /me", "HTTP 404 — deploy portal BFF");
   } else if (portalMe.status >= 500) {
-    fail("portal", "API auth gate", `HTTP ${portalMe.status}`);
+    fail("portal", "BFF auth gate /me", `HTTP ${portalMe.status}`);
   } else {
-    pass("portal", "API auth gate", `HTTP ${portalMe.status}`);
+    pass("portal", "BFF auth gate /me", `HTTP ${portalMe.status}`);
   }
 
   console.log("\n=== Hubs & agency layer ===");

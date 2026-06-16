@@ -128,6 +128,35 @@ export async function acceptPortalInviteBff(params: {
   };
 }
 
+export async function getPortalUserBff(params: {
+  portalUserId: string;
+  workspaceId: number;
+  clientId: string;
+}): Promise<Record<string, unknown> | null> {
+  const rows = await db().query<{
+    id: string;
+    email: string;
+    name: string | null;
+    client_id: string;
+    workspace_id: number;
+  }>(
+    `SELECT id, email, name, client_id, workspace_id
+     FROM os_portal_users
+     WHERE id = $1 AND workspace_id = $2 AND client_id = $3 AND status = 'active'
+     LIMIT 1`,
+    [params.portalUserId, params.workspaceId, params.clientId],
+  );
+  const user = rows[0];
+  if (!user) return null;
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    client_id: user.client_id,
+    workspace_id: user.workspace_id,
+  };
+}
+
 export async function loginPortalUserBff(params: {
   email: string;
   password: string;
