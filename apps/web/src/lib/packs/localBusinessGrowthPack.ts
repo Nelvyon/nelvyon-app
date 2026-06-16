@@ -48,6 +48,16 @@ export function buildBriefFromIntake(intake: LocalGrowthPackIntake): Record<stri
     bot_name: `Asistente ${intake.business_name}`,
     openai_cost_bearer: "client",
     landing_slug: enriched.landing_slug,
+    handoff: {
+      destination: intake.contact_email?.trim() || `hola@${enriched.landing_slug}.nelvyon-client.test`,
+    },
+    seed_keywords: [
+      `${intake.sector} ${intake.city}`,
+      intake.primary_cta,
+      intake.business_name,
+      `mejor ${intake.sector}`,
+      `${intake.city} ${intake.sector}`,
+    ],
   };
 
   return applyEliteTemplatesToBrief(withDomain, resolveTemplatesForSector(intake.sector));

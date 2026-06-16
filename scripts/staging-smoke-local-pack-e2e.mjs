@@ -24,6 +24,8 @@ const EXPECTED_TITLES = [
   "Informe ejecutivo",
 ];
 
+const COOKIE = "nelvyon_token";
+
 const CRITICAL = [];
 const WARN = [];
 
@@ -113,6 +115,7 @@ async function getWorkspaceId(token) {
 async function resolveApiBase(path, token, workspaceId, method = "GET", body) {
   const headers = {
     Authorization: `Bearer ${token}`,
+    Cookie: `${COOKIE}=${token}`,
     Accept: "application/json",
     "X-Workspace-Id": String(workspaceId),
   };
@@ -177,13 +180,27 @@ async function pollPackRun(token, workspaceId, runId) {
 }
 
 async function createPortalInvite(token, workspaceId, clientId, email) {
-  const { res, base } = await resolveApiBase(
-    "/api/v1/portal/invites",
-    token,
-    workspaceId,
-    "POST",
-    { client_id: clientId, email },
-  );
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    Cookie: `${COOKIE}=${token}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    "X-Workspace-Id": String(workspaceId),
+  };
+  let res = await fetch(`${BASE}/api/v1/portal/invites`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ client_id: clientId, email }),
+  });
+  let base = BASE;
+  if (res.status === 404) {
+    res = await fetch(`${BACKEND_API}/api/v1/portal/invites`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ client_id: clientId, email }),
+    });
+    base = BACKEND_API;
+  }
   if (!res.ok) {
     const err = await res.text();
     fail("portal", "create invite", `HTTP ${res.status} ${err.slice(0, 200)}`);
