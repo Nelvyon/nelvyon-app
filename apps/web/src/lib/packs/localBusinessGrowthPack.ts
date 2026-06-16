@@ -4,11 +4,13 @@ import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
 import { dbCreatePackDeliverable } from "@/lib/packs/packOsDb";
 import {
   buildLocalPackReport,
+  buildLocalSeoReport,
   buildWelcomeEmailSequence,
   enrichLocalIntake,
   mapLocalSkuDeliverable,
   resolveLandingLiveUrl,
   resolvePackAppOrigin,
+  resolveSeoReportUrl,
 } from "@/lib/packs/localPackProduction";
 import {
   dispatchLocalWelcomeSequence,
@@ -127,6 +129,31 @@ export async function runLocalBusinessGrowthPack(params: {
             email_queue_ids: welcomeDispatch.email_ids,
           },
         });
+
+        const intake = ctx.intake as LocalGrowthPackIntake;
+        const seoSku = ctx.skuResults.find((r) => r.sku === "NELVYON-SEO");
+        if (!seoSku?.deliverable_ids?.length) {
+          const origin = resolvePackAppOrigin();
+          const qaScore = seoSku?.qa_score ?? 88;
+          await dbCreatePackDeliverable({
+            workspaceId: ctx.workspaceId,
+            clientId: ctx.osClientId,
+            projectId: ctx.osProjectId,
+            title: "Auditoría SEO local",
+            type: "json",
+            file_url: resolveSeoReportUrl(enriched.landing_slug, origin),
+            visibility: "client_visible",
+            metadata: {
+              pack_id: LOCAL_GROWTH_PACK_ID,
+              pack_run_id: ctx.packRunId,
+              landing_slug: enriched.landing_slug,
+              production: true,
+              sku: "NELVYON-SEO",
+              qa_score: qaScore,
+              seo_report: buildLocalSeoReport(intake, qaScore),
+            },
+          });
+        }
 
         await updatePackRun(ctx.packRunId, {
           intake: { ...ctx.intake, landing_slug: enriched.landing_slug } as typeof ctx.intake,
