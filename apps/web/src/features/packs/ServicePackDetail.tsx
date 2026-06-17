@@ -84,16 +84,16 @@ export function ServicePackDetail({ slug }: { slug: string }) {
 
         <div className="flex flex-wrap gap-3">
           {canLaunch ? (
-            <Button asChild size="lg">
+            <Button asChild>
               <Link href={pack.kickoffPath!}>{SAAS_PACK_DETAIL.launchCta}</Link>
             </Button>
           ) : (
-            <Button disabled size="lg" variant="outline">
+            <Button disabled variant="outline">
               {SAAS_PACKS_HUB.ctaComingSoon}
             </Button>
           )}
           {pack.reportPath ? (
-            <Button asChild size="lg" variant="outline">
+            <Button asChild variant="outline">
               <Link href={pack.reportPath}>{SAAS_PACKS_HUB.ctaViewResults}</Link>
             </Button>
           ) : null}
