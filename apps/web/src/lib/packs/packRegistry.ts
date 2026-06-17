@@ -1,5 +1,6 @@
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
 
+import { getPackOsBinding } from "@/lib/os-core/packOsBridge";
 import {
   ECOMMERCE_GROWTH_PACK_ID,
   ECOMMERCE_PACK_STEP_DEFINITIONS,
@@ -21,8 +22,11 @@ export type PackMeta = {
   stepDefinitions: { key: string; label: string }[];
   skuSequence: AutonomousSku[];
   sectors: { id: string; label: string }[];
+  /** Internal OS wiring (not shown to end users in SaaS UI). */
+  osAgentIds: string[];
+  osProcessTemplateIds: string[];
+  osConnectorIds: string[];
 };
-
 export const PACK_REGISTRY: Record<PackId, PackMeta> = {
   [LOCAL_GROWTH_PACK_ID]: {
     id: LOCAL_GROWTH_PACK_ID,
@@ -42,6 +46,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
       { id: "real_estate", label: "Inmobiliaria" },
       { id: "coaching", label: "Coaching / formación" },
     ],
+    ...pickOsFields(LOCAL_GROWTH_PACK_ID),
   },
   [ECOMMERCE_GROWTH_PACK_ID]: {
     id: ECOMMERCE_GROWTH_PACK_ID,
@@ -58,6 +63,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
       { id: "marketplace", label: "Marketplace / multimarca" },
       { id: "dtc_brand", label: "Marca DTC" },
     ],
+    ...pickOsFields(ECOMMERCE_GROWTH_PACK_ID),
   },
   [SAAS_B2B_GROWTH_PACK_ID]: {
     id: SAAS_B2B_GROWTH_PACK_ID,
@@ -74,9 +80,18 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
       { id: "devtools", label: "DevTools / infra" },
       { id: "fintech_b2b", label: "Fintech B2B" },
     ],
+    ...pickOsFields(SAAS_B2B_GROWTH_PACK_ID),
   },
 };
 
+function pickOsFields(packId: PackId) {
+  const b = getPackOsBinding(packId);
+  return {
+    osAgentIds: b?.agentIds ?? [],
+    osProcessTemplateIds: b?.processTemplateIds ?? [],
+    osConnectorIds: b?.connectorIds ?? [],
+  };
+}
 export function getPackMeta(packId: string): PackMeta | null {
   return PACK_REGISTRY[packId as PackId] ?? null;
 }

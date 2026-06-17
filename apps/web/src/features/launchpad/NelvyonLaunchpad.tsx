@@ -28,7 +28,7 @@ const LAUNCHPAD_STEPS: LaunchpadStep[] = [
     phase: "day1",
     title: "Activar Growth Pack",
     description: "Local, Ecommerce o SaaS B2B — landing, SEO y chatbot en un clic.",
-    href: "/os/packs",
+    href: "/packs",
     cta: "Elegir pack",
   },
   {

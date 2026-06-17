@@ -12,6 +12,7 @@ import { PackEliteSnapshots } from "@/features/packs/PackEliteSnapshots";
 import { getPackCeoKpis, getPackDeliverablesCatalog } from "@/lib/packs/packDeliverablesCatalog";
 import { getPackTemplateGallery } from "@/lib/packs/packEliteTemplates";
 import { getPackMeta } from "@/lib/packs/packRegistry";
+import { SAAS_DASHBOARD, SAAS_EMPTY_STATES } from "@/lib/saas/copy";
 import type { PackId } from "@/lib/packs/types";
 
 export function PackReportDashboard({ packId }: { packId: PackId }) {
@@ -31,7 +32,7 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
             <Link href={meta.kickoffPath}>Lanzar nuevo pack</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/os/packs">Todos los packs</Link>
+            <Link href="/packs">Catálogo de packs</Link>
           </Button>
         </div>
 
@@ -39,10 +40,8 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
 
         {!query.isLoading && !latest ? (
           <PanelCard>
-            <p className="font-medium text-foreground">Aún no hay packs ejecutados</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Lanza {meta.name} desde Nelvyon OS para ver métricas aquí.
-            </p>
+            <p className="font-medium text-foreground">{SAAS_EMPTY_STATES.noDeliverables.title}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{SAAS_DASHBOARD.noPacksYetHint}</p>
             <PanelCard className="mt-4 border-dashed">
               <p className="text-sm font-medium">Plantillas élite incluidas en este pack</p>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">

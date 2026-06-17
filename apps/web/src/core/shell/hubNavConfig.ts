@@ -135,7 +135,7 @@ const AGENCY_HUB_BLUEPRINTS: readonly HubBlueprint[] = [
     id: "growth",
     label: "Growth Packs",
     icon: Zap,
-    hrefs: ["/os/packs"],
+    hrefs: ["/packs", "/os/packs"],
   },
   {
     id: "saas",
