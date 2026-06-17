@@ -935,6 +935,22 @@ export function getRoutePageMeta(pathname: string, mode: BrandMode = getBrandMod
     };
   }
 
+  if (path === "/packs") {
+    return {
+      documentTitle: "Packs de marketing digital · NELVYON",
+      heading: "Packs",
+      description: "Catálogo de servicios: SEO, ads, redes, email y funnels listos para ejecutar.",
+    };
+  }
+
+  if (path.startsWith("/packs/")) {
+    return {
+      documentTitle: "Detalle del pack · NELVYON",
+      heading: "Detalle del pack",
+      description: "Qué incluye, qué necesitas y qué recibes al lanzarlo.",
+    };
+  }
+
   if (path === "/os/packs") {
     return {
       documentTitle: "Growth Packs · NELVYON OS",
