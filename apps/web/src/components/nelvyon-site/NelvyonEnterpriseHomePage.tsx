@@ -17,6 +17,11 @@ import { NELVYON } from "./brand";
 import { FadeUp } from "./FadeUp";
 import { NelvyonHomePage } from "./NelvyonHomePage";
 import { NelvyonShell } from "./NelvyonShell";
+import {
+  NelvyonEnterpriseBadge,
+  NelvyonEnterpriseHeading,
+  NelvyonProductFrame,
+} from "@/components/nelvyon-enterprise";
 
 const ElectricHeroCanvas = dynamic(
   () => import("./ElectricHeroCanvas").then((m) => ({ default: m.ElectricHeroCanvas })),
@@ -58,20 +63,18 @@ function EnterpriseHero() {
         initial={{ opacity: 0, y: 28 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       >
-        <span className="nv-enterprise-badge mb-8 inline-flex">
+        <NelvyonEnterpriseBadge className="mb-8">
           <Sparkles className="h-3.5 w-3.5" aria-hidden />
           Plataforma enterprise
-        </span>
-        <h1 className="text-4xl font-bold leading-[1.06] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+        </NelvyonEnterpriseBadge>
+        <NelvyonEnterpriseHeading as="h1" variant="display" className="text-white">
           El sistema operativo de marketing
-          <span className="mt-2 block bg-gradient-to-r from-[#66a3ff] via-white to-[#0066FF] bg-clip-text text-transparent">
-            que ejecuta por ti
-          </span>
-        </h1>
-        <p className="mx-auto mt-8 max-w-2xl text-lg text-zinc-400 md:text-xl">
+          <span className="nv-enterprise-gradient-text mt-2 block">que ejecuta por ti</span>
+        </NelvyonEnterpriseHeading>
+        <NelvyonEnterpriseHeading as="p" variant="subtitle" className="mx-auto mt-8 max-w-2xl text-zinc-400">
           {NELVYON.tagline}. Packs autónomos para el cliente final y un OS interno que orquesta SEO, paid media,
           funnels y entregables — una sola marca, nivel empresa.
-        </p>
+        </NelvyonEnterpriseHeading>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
             className="inline-flex w-full max-w-xs items-center justify-center rounded-full bg-[#0066FF] px-10 py-4 text-base font-semibold text-white shadow-[0_0_48px_rgba(0,102,255,0.4)] transition hover:bg-[#0052cc] sm:w-auto"
@@ -87,6 +90,7 @@ function EnterpriseHero() {
           </Link>
         </div>
       </motion.div>
+      <NelvyonProductFrame />
     </section>
   );
 }
@@ -96,7 +100,9 @@ function PlatformLayersSection() {
     <section className="border-t border-white/10 px-4 py-20 md:px-6 md:py-28">
       <FadeUp className="mx-auto max-w-3xl text-center">
         <p className="nv-enterprise-eyebrow mb-4">Arquitectura dual</p>
-        <h2 className="text-3xl font-bold text-white md:text-4xl">SaaS para el cliente. OS para escalar.</h2>
+        <NelvyonEnterpriseHeading as="h2" variant="title" className="text-white">
+          SaaS para el cliente. OS para escalar.
+        </NelvyonEnterpriseHeading>
         <p className="mt-4 text-zinc-500">
           Dos capas separadas, una experiencia premium: lo que ve tu cliente no se mezcla con los motores internos que
           Nelvyon opera.

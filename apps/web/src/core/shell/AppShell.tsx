@@ -33,6 +33,7 @@ import { useWorkspaceRoleSync } from "@/core/workspace/useWorkspaceRoleSync";
 import { WorkspaceSelector } from "@/core/workspace/WorkspaceSelector";
 import { DashboardLanguageSelector } from "@/components/DashboardLanguageSelector";
 import { navLabelKey } from "@/core/i18n/navKeys";
+import { NELVYON_PLATFORM_UI_SEED } from "@/lib/template-library/platform-ui-seed";
 
 const SIDEBAR_LS_KEY = "nelvyon.sidebarCollapsed";
 const HUB_COLLAPSE_LS_KEY = "nelvyon.hubCollapse";
@@ -457,7 +458,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const mobileNavItems = isClientMode ? flatItems : getMobileHubNavItems(hubSections);
 
   return (
-    <div className="nelvyon-enterprise-app flex min-h-screen flex-col bg-muted lg:flex-row">
+    <div
+      className="nelvyon-enterprise-app flex min-h-screen flex-col bg-muted lg:flex-row"
+      data-platform-ui-seed={NELVYON_PLATFORM_UI_SEED.seed_id}
+    >
       <aside
         className={cn(
           "nelvyon-enterprise-sidebar hidden shrink-0 flex-col border-r transition-[width] duration-200 ease-out lg:flex",

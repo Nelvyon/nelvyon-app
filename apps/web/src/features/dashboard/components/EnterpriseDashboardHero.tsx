@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { Layers, Package, Sparkles } from "lucide-react";
 
+import { NelvyonEnterpriseBadge, NelvyonEnterpriseHeading } from "@/components/nelvyon-enterprise";
 import { useAuth } from "@/core/auth/AuthContext";
+
+const HERO_STATS = [
+  { label: "Packs activos", value: "3 motores" },
+  { label: "SLA Elite", value: "99.9%" },
+  { label: "Automatización", value: "24/7" },
+] as const;
 
 export function EnterpriseDashboardHero() {
   const { user } = useAuth();
@@ -26,17 +33,25 @@ export function EnterpriseDashboardHero() {
       />
       <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-2xl">
-          <span className="nv-enterprise-badge mb-4 inline-flex border-[#0084ff]/40 bg-[#0084ff]/15 text-[#66a3ff]">
+          <NelvyonEnterpriseBadge className="mb-4 border-[#0084ff]/40 bg-[#0084ff]/15 text-[#66a3ff]">
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             Centro de operaciones
-          </span>
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+          </NelvyonEnterpriseBadge>
+          <NelvyonEnterpriseHeading as="h1" variant="title" className="text-white">
             Bienvenido, {name}
-          </h1>
-          <p className="mt-2 text-sm leading-relaxed text-slate-300 md:text-base">
+          </NelvyonEnterpriseHeading>
+          <NelvyonEnterpriseHeading as="p" variant="subtitle" className="mt-2 text-slate-300">
             Tu workspace ejecuta packs autónomos y el OS interno de Nelvyon en una sola consola — la misma
             infraestructura que usan equipos de crecimiento a escala.
-          </p>
+          </NelvyonEnterpriseHeading>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {HERO_STATS.map((stat) => (
+              <span className="nv-enterprise-stat-pill" key={stat.label}>
+                <span className="text-zinc-500">{stat.label} · </span>
+                {stat.value}
+              </span>
+            ))}
+          </div>
         </div>
         <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
           <Link

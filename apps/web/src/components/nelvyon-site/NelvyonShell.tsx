@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { NelvyonChatbot } from "./NelvyonChatbot";
 import { NelvyonFooter } from "./NelvyonFooter";
 import { NelvyonNavbar } from "./NelvyonNavbar";
+import { NELVYON_PLATFORM_UI_SEED } from "@/lib/template-library/platform-ui-seed";
 
 const ElectricHeroCanvas = dynamic(
   () => import("./ElectricHeroCanvas").then((m) => ({ default: m.ElectricHeroCanvas })),
@@ -20,7 +21,11 @@ export function NelvyonShell({
   hero3d?: boolean;
 }) {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-black text-white antialiased" style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
+    <div
+      className="nelvyon-enterprise-theme relative min-h-screen overflow-x-hidden bg-black text-white antialiased"
+      data-platform-ui-seed={NELVYON_PLATFORM_UI_SEED.seed_id}
+      style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
+    >
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-20 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(0,102,255,0.12),transparent)]"

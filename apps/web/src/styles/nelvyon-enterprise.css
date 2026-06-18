@@ -106,3 +106,76 @@
   text-transform: uppercase;
   color: #66a3ff;
 }
+
+/* Typography — ported from Simplistic SaaS display hierarchy */
+.nv-enterprise-display {
+  font-feature-settings: "ss01" on, "cv01" on;
+  letter-spacing: -0.03em;
+}
+
+.nv-enterprise-title {
+  letter-spacing: -0.02em;
+}
+
+.nv-enterprise-subtitle {
+  color: var(--nv-enterprise-muted);
+}
+
+.dark .nv-enterprise-subtitle,
+.nelvyon-enterprise-theme .nv-enterprise-subtitle {
+  color: #a1a1aa;
+}
+
+.nv-enterprise-gradient-text {
+  background: linear-gradient(135deg, #66a3ff 0%, #ffffff 45%, #0066ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nv-enterprise-product-frame {
+  animation: nv-enterprise-float 8s ease-in-out infinite;
+}
+
+@keyframes nv-enterprise-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.nv-enterprise-stat-pill {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 12px;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+
+.nelvyon-enterprise-sidebar a.bg-primary,
+.nelvyon-enterprise-sidebar a[class*="bg-primary"] {
+  animation: nv-enterprise-glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes nv-enterprise-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px var(--enterprise-accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(0, 132, 255, 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nv-enterprise-product-frame,
+  .nelvyon-enterprise-sidebar a.bg-primary,
+  .nelvyon-enterprise-sidebar a[class*="bg-primary"] {
+    animation: none;
+  }
+}
