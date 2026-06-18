@@ -3,15 +3,13 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 
-import { Container } from "@/components/agenforce/container";
-import { Heading } from "@/components/agenforce/heading";
-import { MarketingLayout } from "@/components/agenforce/marketing-layout";
-import { Subheading } from "@/components/agenforce/subheading";
+import { AuthLayout } from "@/components/nelvyon-site/AuthLayout";
 import { useAuth } from "@/core/auth/AuthContext";
 import { nelvyonPlanToUiRole } from "@/core/auth/nelvyonPlanRole";
-import { PanelCard } from "@/core/ui/PanelCard";
+
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition focus:border-[#0066FF] focus:outline-none";
 
 type LoginSuccess = {
   userId: string;
@@ -94,132 +92,73 @@ export function LoginForm() {
   }
 
   return (
-    <MarketingLayout>
-      <div className="w-full min-h-[70vh] bg-gradient-to-b from-primary/5 via-background to-background px-4 py-10">
-        <Container className="w-full max-w-md">
-          <PanelCard accent="from-primary/5 via-card to-card">
-            <div className="flex flex-col items-center text-center">
-              <Heading as="h1" className="text-2xl md:text-3xl">
-                Bienvenido de nuevo
-              </Heading>
-              <Subheading className="mt-2">
-                Inicia sesión para gestionar clientes, campañas y soporte desde un solo panel.
-              </Subheading>
-            </div>
+    <AuthLayout
+      subtitle="Accede al centro de operaciones de Nelvyon — packs autónomos y OS de marketing en un solo panel."
+      title="Bienvenido de nuevo"
+    >
+      <form className="space-y-5" noValidate onSubmit={(ev) => void handleSubmit(ev)}>
+        <div>
+          <label className="mb-2 block text-sm font-medium text-zinc-400" htmlFor="email">
+            Email
+          </label>
+          <input
+            autoComplete="email"
+            className={inputClass}
+            disabled={loading}
+            id="email"
+            name="email"
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="tu@empresa.com"
+            required
+            type="email"
+            value={email}
+          />
+        </div>
 
-            <div className="mt-8 space-y-3">
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Próximamente"
-              className="flex w-full items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-medium opacity-60 transition-colors dark:border-neutral-700 dark:bg-neutral-800"
-            >
-              <IconBrandGoogle className="size-5" />
-              Continuar con Google
-            </button>
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Próximamente"
-              className="flex w-full items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-medium opacity-60 transition-colors dark:border-neutral-700 dark:bg-neutral-800"
-            >
-              <IconBrandGithub className="size-5" />
-              Continuar con GitHub
-            </button>
-          </div>
-
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-200 dark:border-neutral-700" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-background px-4 text-neutral-500">O continúa con email</span>
-            </div>
-          </div>
-
-          <form className="space-y-6" noValidate onSubmit={(ev) => void handleSubmit(ev)}>
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                disabled={loading}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-neutral-700 dark:bg-neutral-800"
-                placeholder="tu@empresa.com"
-              />
-            </div>
-
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                >
-                  Contraseña
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:hover:text-neutral-300"
-                >
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                disabled={loading}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-neutral-700 dark:bg-neutral-800"
-                placeholder="Tu contraseña"
-              />
-            </div>
-
-            {error ? (
-              <div
-                role="alert"
-                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"
-              >
-                {error}
-              </div>
-            ) : null}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-sm bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
-            >
-              {loading ? "Iniciando sesión…" : "Iniciar sesión"}
-            </button>
-          </form>
-
-          <p className="mt-8 text-center text-sm text-neutral-500">
-            ¿No tienes cuenta?{" "}
-            <Link
-              href="/register"
-              className="font-medium text-neutral-700 transition-colors hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white"
-            >
-              Regístrate gratis
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <label className="block text-sm font-medium text-zinc-400" htmlFor="password">
+              Contraseña
+            </label>
+            <Link className="text-sm text-[#66a3ff] hover:text-white" href="/forgot-password">
+              ¿Olvidaste tu contraseña?
             </Link>
-          </p>
-          </PanelCard>
-        </Container>
-      </div>
-    </MarketingLayout>
+          </div>
+          <input
+            autoComplete="current-password"
+            className={inputClass}
+            disabled={loading}
+            id="password"
+            name="password"
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Tu contraseña"
+            required
+            type="password"
+            value={password}
+          />
+        </div>
+
+        {error ? (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300" role="alert">
+            {error}
+          </div>
+        ) : null}
+
+        <button
+          className="w-full rounded-xl bg-[#0066FF] px-4 py-3 text-sm font-semibold text-white shadow-[0_0_32px_rgba(0,102,255,0.35)] transition hover:bg-[#0052cc] disabled:opacity-50"
+          disabled={loading}
+          type="submit"
+        >
+          {loading ? "Iniciando sesión…" : "Acceder al panel"}
+        </button>
+      </form>
+
+      <p className="mt-8 text-center text-sm text-zinc-500">
+        ¿No tienes cuenta?{" "}
+        <Link className="font-semibold text-[#66a3ff] hover:text-white" href="/register">
+          Empieza gratis
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

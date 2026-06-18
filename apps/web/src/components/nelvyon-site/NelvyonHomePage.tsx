@@ -113,32 +113,38 @@ function GlassCard({ children, className = "" }: { children: React.ReactNode; cl
   );
 }
 
-export function NelvyonHomePage() {
+function DefaultHero() {
+  return (
+    <section className="relative min-h-[72vh] overflow-hidden px-4 pb-24 pt-16 md:min-h-[80vh] md:px-6 md:pb-32 md:pt-28">
+      <ElectricHeroCanvas />
+      <motion.div
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-10 mx-auto max-w-5xl text-center"
+        initial={{ opacity: 0, y: 32 }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <p className="mb-6 text-xs font-semibold uppercase tracking-[0.35em] text-[#0066FF]">Marketing autónomo</p>
+        <h1 className="text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-7xl">
+          {NELVYON.slogan}
+        </h1>
+        <p className="mx-auto mt-8 max-w-2xl text-lg text-zinc-400 md:text-xl">{NELVYON.tagline}</p>
+        <Link
+          className="mt-12 inline-flex w-full max-w-xs items-center justify-center rounded-full bg-[#0066FF] px-10 py-4 text-base font-semibold text-white shadow-[0_0_48px_rgba(0,102,255,0.4)] transition hover:bg-[#0052cc] sm:w-auto"
+          href="/register"
+        >
+          Empieza gratis
+        </Link>
+      </motion.div>
+    </section>
+  );
+}
+
+export function NelvyonHomePage({ embedded = false }: { embedded?: boolean }) {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  return (
-    <NelvyonShell>
-      <section className="relative min-h-[72vh] overflow-hidden px-4 pb-24 pt-16 md:min-h-[80vh] md:px-6 md:pb-32 md:pt-28">
-        <ElectricHeroCanvas />
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="relative z-10 mx-auto max-w-5xl text-center"
-          initial={{ opacity: 0, y: 32 }}
-          transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.35em] text-[#0066FF]">Marketing autónomo</p>
-          <h1 className="text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-7xl">
-            {NELVYON.slogan}
-          </h1>
-          <p className="mx-auto mt-8 max-w-2xl text-lg text-zinc-400 md:text-xl">{NELVYON.tagline}</p>
-          <Link
-            className="mt-12 inline-flex w-full max-w-xs items-center justify-center rounded-full bg-[#0066FF] px-10 py-4 text-base font-semibold text-white shadow-[0_0_48px_rgba(0,102,255,0.4)] transition hover:bg-[#0052cc] sm:w-auto"
-            href="/register"
-          >
-            Empieza gratis
-          </Link>
-        </motion.div>
-      </section>
+  const body = (
+    <>
+      {!embedded ? <DefaultHero /> : null}
 
       <section className="border-t border-white/10 px-4 py-20 md:px-6 md:py-28" id="servicios">
         <FadeUp className="mx-auto max-w-3xl text-center">
@@ -285,6 +291,9 @@ export function NelvyonHomePage() {
           </div>
         </FadeUp>
       </section>
-    </NelvyonShell>
+    </>
   );
+
+  if (embedded) return body;
+  return <NelvyonShell>{body}</NelvyonShell>;
 }

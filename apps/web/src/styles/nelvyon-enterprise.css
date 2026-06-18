@@ -1,0 +1,108 @@
+/**
+ * Nelvyon Enterprise — unified visual system (marketing + authenticated app).
+ * Native React/Tailwind; no third-party template assets served to clients.
+ */
+.nelvyon-enterprise-theme {
+  --nv-enterprise-navy: #07122a;
+  --nv-enterprise-panel: #0b1428;
+  --nv-enterprise-electric: #0066ff;
+  --nv-enterprise-electric-soft: rgba(0, 102, 255, 0.12);
+  --nv-enterprise-glow: rgba(0, 102, 255, 0.35);
+  --nv-enterprise-border: rgba(255, 255, 255, 0.08);
+  --nv-enterprise-muted: #94a3b8;
+}
+
+.nelvyon-enterprise-app {
+  --enterprise-sidebar: #07122a;
+  --enterprise-sidebar-elevated: #0b1428;
+  --enterprise-sidebar-border: rgba(255, 255, 255, 0.08);
+  --enterprise-sidebar-text: #e2e8f0;
+  --enterprise-sidebar-muted: #94a3b8;
+  --enterprise-accent: #0084ff;
+  --enterprise-accent-glow: rgba(0, 132, 255, 0.25);
+  --enterprise-surface: #f8faff;
+  --enterprise-header: rgba(255, 255, 255, 0.92);
+}
+
+.dark .nelvyon-enterprise-app {
+  --enterprise-surface: #020817;
+  --enterprise-header: rgba(7, 18, 42, 0.92);
+}
+
+.nv-enterprise-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--nv-enterprise-electric);
+}
+
+.nv-enterprise-glass {
+  border: 1px solid var(--nv-enterprise-border);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 24px 64px rgba(0, 0, 0, 0.35);
+}
+
+.nv-enterprise-grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.nelvyon-enterprise-sidebar {
+  background: linear-gradient(180deg, var(--enterprise-sidebar) 0%, var(--enterprise-sidebar-elevated) 100%);
+  border-color: var(--enterprise-sidebar-border);
+  color: var(--enterprise-sidebar-text);
+}
+
+.nelvyon-enterprise-sidebar .text-muted-foreground {
+  color: var(--enterprise-sidebar-muted) !important;
+}
+
+.nelvyon-enterprise-sidebar .text-foreground {
+  color: var(--enterprise-sidebar-text) !important;
+}
+
+.nelvyon-enterprise-sidebar .border-border {
+  border-color: var(--enterprise-sidebar-border) !important;
+}
+
+.nelvyon-enterprise-sidebar a.bg-primary {
+  background: linear-gradient(135deg, #0084ff, #0066ff) !important;
+  box-shadow: 0 0 24px var(--enterprise-accent-glow);
+}
+
+.nelvyon-enterprise-sidebar a:hover:not(.bg-primary) {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.nelvyon-enterprise-topbar {
+  background: var(--enterprise-header);
+  border-color: var(--enterprise-sidebar-border);
+  backdrop-filter: blur(12px);
+}
+
+.nelvyon-enterprise-main {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 132, 255, 0.06), transparent),
+    var(--enterprise-surface);
+}
+
+.nv-enterprise-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 102, 255, 0.35);
+  background: rgba(0, 102, 255, 0.1);
+  padding: 0.35rem 0.85rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #66a3ff;
+}

@@ -323,8 +323,8 @@ function SidebarChrome({
       <div className={cn("border-b border-border", collapsed ? "p-2" : "p-4")}>
         <div className={cn("flex items-center", collapsed ? "flex-col gap-2" : "justify-between gap-2")}>
           <Link
-            className={cn("font-semibold text-foreground", collapsed ? "text-center text-xs" : "text-base")}
-            href="/"
+            className={cn("font-semibold text-foreground tracking-tight", collapsed ? "text-center text-xs" : "text-base")}
+            href="/dashboard"
           >
             {logoUrl && !collapsed ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -333,9 +333,11 @@ function SidebarChrome({
               // eslint-disable-next-line @next/next/no-img-element
               <img alt={appName} className="mx-auto h-8 w-8 object-contain" src={logoUrl} />
             ) : collapsed ? (
-              appName.charAt(0).toUpperCase()
+              <span className="text-[#66a3ff]">N</span>
             ) : (
-              appName
+              <span className="bg-gradient-to-r from-white to-[#66a3ff] bg-clip-text text-transparent">
+                {appName.toUpperCase()}
+              </span>
             )}
           </Link>
           <Button
@@ -455,10 +457,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const mobileNavItems = isClientMode ? flatItems : getMobileHubNavItems(hubSections);
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted lg:flex-row">
+    <div className="nelvyon-enterprise-app flex min-h-screen flex-col bg-muted lg:flex-row">
       <aside
         className={cn(
-          "hidden shrink-0 flex-col border-r border-border bg-card transition-[width] duration-200 ease-out lg:flex",
+          "nelvyon-enterprise-sidebar hidden shrink-0 flex-col border-r transition-[width] duration-200 ease-out lg:flex",
           collapsed ? "w-[4.25rem]" : "w-56",
         )}
       >
@@ -487,7 +489,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             onClick={() => setMobileNavOpen(false)}
             type="button"
           />
-          <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border bg-card shadow-elevated lg:hidden">
+          <aside className="nelvyon-enterprise-sidebar fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r shadow-elevated lg:hidden">
             <SidebarChrome
               appName={appName}
               collapsed={false}
@@ -509,12 +511,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col bg-background">
-        <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b border-border bg-card/95 px-4 py-2 backdrop-blur-sm md:px-6 lg:px-8">
+        <header className="nelvyon-enterprise-topbar sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2 md:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-2">
             <Button
               aria-expanded={mobileNavOpen}
               aria-label={mobileNavOpen ? "Cerrar menú" : "Abrir menú"}
-              className="lg:hidden"
+              className="border-white/10 lg:hidden"
               onClick={() => setMobileNavOpen((v) => !v)}
               size="sm"
               type="button"
@@ -529,7 +531,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                   {!isClientMode ? (
                     <>
                       <span className="text-muted-foreground/70"> · </span>
-                      {user.role}
+                      <span className="rounded-full border border-[#0084ff]/30 bg-[#0084ff]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#0084ff]">
+                        Enterprise
+                      </span>
                     </>
                   ) : null}
                 </>
@@ -545,7 +549,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {!isClientMode ? <AuthDebugPanel /> : null}
           </div>
         </header>
-        <main className="min-h-0 flex-1 px-4 py-5 pb-20 md:px-6 lg:px-8 lg:pb-5">
+        <main className="nelvyon-enterprise-main min-h-0 flex-1 px-4 py-5 pb-20 md:px-6 lg:px-8 lg:pb-5">
           <div className="mx-auto max-w-6xl">
             <RoutePageHeader />
             {!isClientMode ? <HelpBotPanel /> : null}

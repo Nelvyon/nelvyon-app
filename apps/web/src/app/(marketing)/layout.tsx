@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { DM_Mono, Geist_Mono, Inter } from "next/font/google";
 
-import { Footer } from "@/components/pa/footer";
-import { Navbar } from "@/components/pa/navbar";
+import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { getAppBaseUrl } from "@/lib/appUrl";
 
+import "@/styles/nelvyon-enterprise.css";
 import "@/styles/productized-agency.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -16,9 +16,9 @@ const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/og-image.png`;
 
 export const metadata: Metadata = {
-  title: "NELVYON — SaaS, marketing, automatización e IA",
+  title: "NELVYON — OS de marketing + packs autónomos",
   description:
-    "NELVYON une SaaS, marketing, automatización e IA para construir sistemas digitales que ayudan a captar, vender y operar con más claridad.",
+    "Plataforma enterprise de marketing autónomo: packs listos para el cliente y un sistema operativo interno que ejecuta SEO, ads, funnels y entregables a escala.",
   openGraph: {
     title: "NELVYON — SaaS, marketing, automatización e IA",
     description:
@@ -51,10 +51,8 @@ export const metadata: Metadata = {
 
 export default function MarketingRouteLayout({ children }: { children: ReactNode }) {
   return (
-    <section lang="es" className={`${inter.variable} ${geistMono.variable} ${dmMono.variable} pa-theme`}>
-      <Navbar />
-      <main>{children}</main>
-      <Footer />
+    <section lang="es" className={`${inter.variable} ${geistMono.variable} ${dmMono.variable} nelvyon-enterprise-theme`}>
+      <MarketingChrome>{children}</MarketingChrome>
       <script
         dangerouslySetInnerHTML={{
           __html:

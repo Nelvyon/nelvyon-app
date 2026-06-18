@@ -13,7 +13,7 @@ export function NelvyonNavbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
+    <header className="nelvyon-enterprise-topbar fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:h-[4.5rem] md:px-6">
         <Link href="/" className="group flex items-center">
           <span className="text-xl font-bold tracking-tight text-white transition group-hover:text-[#66a3ff]">
