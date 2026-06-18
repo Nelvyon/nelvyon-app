@@ -7,6 +7,7 @@ import { Button } from "@/core/ui/button";
 import { PanelCard } from "@/core/ui/PanelCard";
 import { usePackRun } from "@/features/packs/hooks";
 import { getPackMeta } from "@/lib/packs/packRegistry";
+import { SAAS_ERRORS, SAAS_KICKOFF } from "@/lib/saas/copy";
 import type { PackMeta } from "@/lib/packs/packRegistry";
 import type { PackId, PackRunRecord } from "@/lib/packs/types";
 
@@ -54,7 +55,7 @@ export function GrowthPackKickoffForm({
       });
       onSuccess?.(run.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al lanzar el pack");
+      setError(err instanceof Error ? err.message : SAAS_ERRORS.packLaunch);
     } finally {
       setPending(false);
     }
@@ -132,7 +133,7 @@ export function GrowthPackKickoffForm({
           </p>
         ) : null}
         <Button disabled={pending} type="submit">
-          {pending ? "Ejecutando pack autónomo…" : `Lanzar ${meta.name}`}
+          {pending ? SAAS_KICKOFF.formRunning : SAAS_KICKOFF.formSubmit}
         </Button>
       </form>
     </PanelCard>
@@ -143,14 +144,14 @@ export function PackRunProgress({ runId, packId }: { runId: string; packId: Pack
   const query = usePackRun(packId, runId);
 
   if (query.isLoading) {
-    return <p className="text-sm text-muted-foreground">Cargando progreso del pack…</p>;
+    return <p className="text-sm text-muted-foreground">{SAAS_KICKOFF.progressLoading}</p>;
   }
   if (!query.data) return null;
 
   const run = query.data;
   return (
     <PanelCard>
-      <p className="font-semibold text-foreground">Estado: {run.status}</p>
+      <p className="font-semibold text-foreground">{SAAS_KICKOFF.progressTitle}: {run.status}</p>
       <ul className="mt-4 space-y-2">
         {run.steps.map((step) => (
           <li className="flex items-start gap-2 text-sm" key={step.key}>
@@ -198,17 +199,17 @@ export function PackRunSuccessLinks({ run }: { run: PackRunRecord }) {
     <div className="flex flex-wrap gap-2">
       {run.report?.kpis.saas_client_id ? (
         <Button asChild size="sm" variant="outline">
-          <Link href={`/crm/clients/${run.report.kpis.saas_client_id}`}>Invitar cliente al portal</Link>
+          <Link href={`/crm/clients/${run.report.kpis.saas_client_id}`}>{SAAS_KICKOFF.invitePortal}</Link>
         </Button>
       ) : null}
       {meta ? (
         <Button asChild size="sm" variant="outline">
-          <Link href={meta.reportPath}>Ver informe completo</Link>
+          <Link href={meta.reportPath}>{SAAS_KICKOFF.viewFullReport}</Link>
         </Button>
       ) : null}
       {run.report?.kpis.saas_campaign_id ? (
         <Button asChild size="sm" variant="outline">
-          <Link href={`/campaigns/${run.report.kpis.saas_campaign_id}`}>Activar campaña</Link>
+          <Link href={`/campaigns/${run.report.kpis.saas_campaign_id}`}>{SAAS_KICKOFF.activateCampaign}</Link>
         </Button>
       ) : null}
     </div>

@@ -12,7 +12,7 @@ import { PackEliteSnapshots } from "@/features/packs/PackEliteSnapshots";
 import { getPackCeoKpis, getPackDeliverablesCatalog } from "@/lib/packs/packDeliverablesCatalog";
 import { getPackTemplateGallery } from "@/lib/packs/packEliteTemplates";
 import { getPackMeta } from "@/lib/packs/packRegistry";
-import { SAAS_DASHBOARD, SAAS_EMPTY_STATES } from "@/lib/saas/copy";
+import { SAAS_DASHBOARD, SAAS_EMPTY_STATES, SAAS_REPORT } from "@/lib/saas/copy";
 import type { PackId } from "@/lib/packs/types";
 
 export function PackReportDashboard({ packId }: { packId: PackId }) {
@@ -73,7 +73,7 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
               <h2 className="mt-1 text-2xl font-semibold">{report.business_name}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{report.summary}</p>
               <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                KPIs para dirección
+                {SAAS_REPORT.ceoTitle}
               </p>
               <div className="mt-3 grid gap-4 sm:grid-cols-4">
                 {getPackCeoKpis(packId, report.kpis).map((kpi) => (
@@ -85,10 +85,8 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
             <PackEliteSnapshots packId={packId} />
 
             <PanelCard>
-              <h3 className="text-base font-semibold">Entregables en portal del cliente</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                El cliente accede con invitación desde CRM y revisa cada activo publicado.
-              </p>
+              <h3 className="text-base font-semibold">{SAAS_REPORT.deliverablesTitle}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{SAAS_REPORT.deliverablesHint}</p>
               <ul className="mt-4 divide-y divide-border">
                 {deliverables.map((d) => (
                   <li className="flex flex-wrap items-start justify-between gap-2 py-3 text-sm" key={d.title}>
@@ -97,13 +95,13 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
                       <p className="text-muted-foreground">{d.description}</p>
                     </div>
                     <span className="shrink-0 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success-foreground">
-                      Publicado
+                      {SAAS_REPORT.publishedBadge}
                     </span>
                   </li>
                 ))}
               </ul>
               <Button asChild className="mt-4" size="sm" variant="outline">
-                <Link href="/portal">Vista previa portal</Link>
+                <Link href="/portal">{SAAS_REPORT.portalPreview}</Link>
               </Button>
             </PanelCard>
 
@@ -150,7 +148,7 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
             </PanelCard>
 
             <PanelCard>
-              <h3 className="text-base font-semibold">Próximos pasos</h3>
+              <h3 className="text-base font-semibold">{SAAS_REPORT.nextStepsTitle}</h3>
               <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
                 {report.next_steps.map((step) => (
                   <li key={step}>{step}</li>

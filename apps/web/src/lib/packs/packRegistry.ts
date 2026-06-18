@@ -30,8 +30,8 @@ export type PackMeta = {
 export const PACK_REGISTRY: Record<PackId, PackMeta> = {
   [LOCAL_GROWTH_PACK_ID]: {
     id: LOCAL_GROWTH_PACK_ID,
-    name: "Pack Crecimiento Local",
-    tagline: "Landing, SEO local y chatbot de citas para negocios de barrio",
+    name: "Crecimiento Local",
+    tagline: "Aparece en Google en tu ciudad y convierte visitas en citas o reservas",
     accent: "from-emerald-500/10 via-card to-card",
     kickoffPath: "/os/packs/local-growth",
     reportPath: "/dashboard/local-growth",
@@ -50,8 +50,8 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
   },
   [ECOMMERCE_GROWTH_PACK_ID]: {
     id: ECOMMERCE_GROWTH_PACK_ID,
-    name: "Pack Crecimiento Ecommerce",
-    tagline: "Tienda online, SEO de catálogo, chatbot ventas y kit Meta Ads",
+    name: "Crecimiento Ecommerce",
+    tagline: "Tienda que vende, catálogo en Google y retargeting en Meta",
     accent: "from-violet-500/10 via-card to-card",
     kickoffPath: "/os/packs/ecommerce-growth",
     reportPath: "/dashboard/ecommerce-growth",
@@ -67,8 +67,8 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
   },
   [SAAS_B2B_GROWTH_PACK_ID]: {
     id: SAAS_B2B_GROWTH_PACK_ID,
-    name: "Pack Crecimiento SaaS B2B",
-    tagline: "Landing PLG, SEO demand gen, bot de demo y playbook outbound",
+    name: "Crecimiento SaaS B2B",
+    tagline: "Pipeline de demos con landing PLG, SEO y nurture automático",
     accent: "from-sky-500/10 via-card to-card",
     kickoffPath: "/os/packs/saas-b2b-growth",
     reportPath: "/dashboard/saas-b2b-growth",

@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Button } from "@/core/ui/button";
+import { PackKickoffBanner } from "@/features/packs/PackKickoffBanner";
 import { PackQuickLaunch } from "@/features/packs/PackQuickLaunch";
 import { useKickoffGrowthPack } from "@/features/packs/hooks";
 import { getPackMeta } from "@/lib/packs/packRegistry";
@@ -33,6 +34,8 @@ export default function OsEcommerceGrowthPackPage() {
             <Link href={meta.reportPath}>Ver informe en panel SaaS →</Link>
           </Button>
         </div>
+
+        <PackKickoffBanner />
 
         <PackQuickLaunch
           extraFields={

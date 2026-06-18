@@ -81,13 +81,19 @@ export function ServicePackCatalog({ showCategoryFilter = true, compact = false 
               </div>
               <p className="mt-2 text-lg font-semibold">{pack.name}</p>
               <p className="mt-2 flex-1 text-sm text-muted-foreground">{pack.tagline}</p>
-              <p className="mt-3 text-xs text-muted-foreground">~{pack.estimatedMinutes} min · brief corto</p>
+              {pack.benefits[0] ? (
+                <p className="mt-2 text-xs text-foreground/80">
+                  <span className="font-medium">{SAAS_PACKS_HUB.benefitLabel}: </span>
+                  {pack.benefits[0]}
+                </p>
+              ) : null}
+              <p className="mt-3 text-xs text-muted-foreground">
+                ~{pack.estimatedMinutes} min · demo en 1 clic
+              </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button asChild size="sm" variant={pack.availability === "coming_soon" ? "outline" : "default"}>
                   <Link href={`/packs/${pack.slug}`}>
-                    {pack.availability === "coming_soon"
-                      ? "Ver detalle"
-                      : SAAS_PACKS_HUB.ctaLaunch.replace("pack", "detalle")}
+                    {pack.availability === "coming_soon" ? "Ver detalle" : SAAS_PACKS_HUB.ctaLaunch}
                   </Link>
                 </Button>
                 {pack.reportPath && pack.availability !== "coming_soon" ? (

@@ -53,6 +53,23 @@ export function ServicePackDetail({ slug }: { slug: string }) {
         </PanelCard>
 
         <PanelCard>
+          <h2 className="text-base font-semibold">{SAAS_PACK_DETAIL.benefitsTitle}</h2>
+          <ul className="mt-3 space-y-2">
+            {pack.benefits.map((b) => (
+              <li className="flex gap-2 text-sm text-muted-foreground" key={b}>
+                <span className="text-success-foreground">✓</span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+          {pack.demoExample ? (
+            <p className="mt-4 text-xs text-muted-foreground">
+              Ejemplo demo: <strong className="text-foreground">{pack.demoExample}</strong>
+            </p>
+          ) : null}
+        </PanelCard>
+
+        <PanelCard>
           <h2 className="text-base font-semibold">{SAAS_PACK_DETAIL.inputsTitle}</h2>
           <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-muted-foreground">
             {pack.inputs.map((i) => (

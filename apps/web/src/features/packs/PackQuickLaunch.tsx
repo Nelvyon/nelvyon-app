@@ -13,6 +13,7 @@ import {
   listPackSectorPresets,
   type PackElitePreset,
 } from "@/lib/packs/packEliteTemplates";
+import { SAAS_ERRORS, SAAS_KICKOFF } from "@/lib/saas/copy";
 import type { PackId, PackRunRecord } from "@/lib/packs/types";
 
 type PackQuickLaunchProps = {
@@ -53,7 +54,7 @@ export function PackQuickLaunch({
       const run = await onKickoff(body);
       setRunId(run.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al lanzar el pack");
+      setError(err instanceof Error ? err.message : SAAS_ERRORS.packLaunch);
     } finally {
       setPending(false);
     }
@@ -66,11 +67,9 @@ export function PackQuickLaunch({
     <div className="space-y-6">
       <PanelCard accent={meta.accent}>
         <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-          Plantillas élite incluidas
+          {SAAS_KICKOFF.eliteTemplates}
         </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Cada pack usa plantillas premium con preview en OS — sin pantallas vacías.
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{SAAS_KICKOFF.eliteHint}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {gallery.map((item) => (
             <Link
@@ -89,7 +88,7 @@ export function PackQuickLaunch({
 
       <PanelCard accent={meta.accent}>
         <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-          Lanzamiento rápido
+          {SAAS_KICKOFF.quickLaunch}
         </p>
         <h2 className="mt-1 text-lg font-semibold">{featured.label}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{featured.tagline}</p>
@@ -99,7 +98,7 @@ export function PackQuickLaunch({
           onClick={() => void launchPreset(featured)}
           type="button"
         >
-          {pending ? "Ejecutando pack…" : "Lanzar con plantilla demo (1 clic)"}
+          {pending ? SAAS_KICKOFF.demoRunning : SAAS_KICKOFF.demoButton}
         </Button>
         {error ? (
           <p className="mt-3 text-sm text-destructive" role="alert">
@@ -109,7 +108,7 @@ export function PackQuickLaunch({
       </PanelCard>
 
       <PanelCard>
-        <p className="text-sm font-medium text-foreground">O elige sector (2 clics)</p>
+        <p className="text-sm font-medium text-foreground">{SAAS_KICKOFF.sectorPick}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {meta.sectors.map((s) => (
             <Button
