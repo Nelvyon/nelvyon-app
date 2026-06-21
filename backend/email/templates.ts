@@ -1,6 +1,7 @@
 export type EmailTemplate =
   | "welcome"
   | "email_verify"
+  | "password_reset"
   | "plan_activated"
   | "invoice"
   | "payment_failed"
@@ -31,6 +32,13 @@ export function buildEmail(template: EmailTemplate, params: Record<string, strin
         subject: "Confirma tu email — NELVYON",
         html: emailVerifyHtml(params),
         text: `Hola ${params.name}, confirma tu email en NELVYON: ${params.verifyUrl}`,
+      };
+    case "password_reset":
+      return {
+        to: params.email,
+        subject: "Restablece tu contraseña — NELVYON",
+        html: passwordResetHtml(params),
+        text: `Hola ${params.name}, restablece tu contraseña en NELVYON: ${params.resetUrl}`,
       };
     case "plan_activated":
       return {
@@ -137,6 +145,23 @@ function emailVerifyHtml(p: Record<string, string>): string {
 </a>
 <p style="color:#71717a;font-size:13px;margin:24px 0 0;line-height:1.5;">
   Si no creaste esta cuenta, ignora este mensaje.
+</p>`);
+}
+
+function passwordResetHtml(p: Record<string, string>): string {
+  return baseHtml("Restablece tu contraseña", `
+<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">Restablece tu contraseña, ${p.name}</h1>
+<p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 24px;">
+  Hemos recibido una solicitud para cambiar la contraseña de tu cuenta NELVYON.
+  El enlace caduca en 1 hora.
+</p>
+<a href="${p.resetUrl}"
+   style="display:inline-block;background:#6366f1;color:#fff;padding:14px 28px;
+   border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
+  Restablecer contraseña →
+</a>
+<p style="color:#71717a;font-size:13px;margin:24px 0 0;line-height:1.5;">
+  Si no solicitaste este cambio, ignora este mensaje. Tu contraseña actual seguirá siendo válida.
 </p>`);
 }
 

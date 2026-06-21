@@ -1,5 +1,6 @@
 import path from "node:path";
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
 import { createMDX } from "fumadocs-mdx/next";
 
@@ -57,7 +58,7 @@ const nextConfig: NextConfig = {
     ],
   },
   env: {
-    SENTRY_SUPPRESS_INSTRUMENTATION_FILE_WARNING: "1",
+    SENTRY_ENVIRONMENT: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
   },
   experimental: {
     externalDir: true,
@@ -113,6 +114,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/legal/privacy", destination: "/privacy", permanent: true },
       { source: "/legal/terms", destination: "/terms", permanent: true },
+      { source: "/forgot-password", destination: "/auth/forgot-password", permanent: false },
       { source: "/work", destination: "/servicios", permanent: true },
       { source: "/products", destination: "/servicios", permanent: true },
       { source: "/dashboard/social-scheduler", destination: "/social/scheduler", permanent: false },
@@ -145,4 +147,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withMDX(withNextIntl(nextConfig));
+const sentryWebpackPluginOptions = {
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+};
+
+export default withSentryConfig(withMDX(withNextIntl(nextConfig)), sentryWebpackPluginOptions);

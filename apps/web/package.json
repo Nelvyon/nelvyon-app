@@ -33,6 +33,7 @@
     "test:bot-evals": "vitest run src/features/helpbot/__tests__/engine.test.ts",
     "autonomous:simulate": "tsx ../../backend/autonomous/scripts/run-simulation.ts",
     "autonomous:phase-c": "tsx ../../backend/autonomous/scripts/run-phase-c.ts",
+    "e2e:phase0": "node ../../scripts/e2e-phase0-prod.mjs",
     "autonomous:phase-f": "tsx ../../backend/autonomous/scripts/run-phase-f-pilot.ts",
     "autonomous:phase-g": "tsx ../../backend/autonomous/scripts/run-phase-g-staging.ts",
     "autonomous:phase-h": "tsx ../../backend/autonomous/scripts/run-phase-h-preview.ts",
