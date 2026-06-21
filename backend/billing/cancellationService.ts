@@ -199,8 +199,8 @@ export class CancellationService {
               u.cancel_at_period_end,
               u.period_end_date::text AS period_end_date
        FROM nelvyon_users u
-       LEFT JOIN subscriptions s ON s.user_id::text = u.user_id
-       WHERE u.user_id = $1
+       LEFT JOIN subscriptions s ON s.user_id = u.user_id
+       WHERE u.user_id = $1::uuid
        LIMIT 1`,
       [userId],
     );

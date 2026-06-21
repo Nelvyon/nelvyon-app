@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
       `SELECT u.email,
               COALESCE(s.stripe_customer_id, s.paddle_customer_id) AS stripe_customer_id
        FROM nelvyon_users u
-       LEFT JOIN subscriptions s ON s.user_id::text = u.user_id
-       WHERE u.user_id = $1
+       LEFT JOIN subscriptions s ON s.user_id = u.user_id
+       WHERE u.user_id = $1::uuid
        LIMIT 1`,
       [claims.userId],
     );

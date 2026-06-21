@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
               COALESCE(s.plan, u.plan) AS plan,
               s.status AS subscription_status
        FROM nelvyon_users u
-       INNER JOIN subscriptions s ON s.user_id::text = u.user_id
-       WHERE u.user_id = $1
+       INNER JOIN subscriptions s ON s.user_id = u.user_id
+       WHERE u.user_id = $1::uuid
          AND COALESCE(s.stripe_subscription_id, s.paddle_subscription_id) IS NOT NULL
        LIMIT 1`,
       [claims.userId],
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       claims.userId,
       planStr,
     ]);
-    await DbClient.getInstance().query(`UPDATE subscriptions SET plan = $2, updated_at = now() WHERE user_id::text = $1`, [
+    await DbClient.getInstance().query(`UPDATE subscriptions SET plan = $2, updated_at = now() WHERE user_id = $1::uuid`, [
       claims.userId,
       planStr,
     ]);
