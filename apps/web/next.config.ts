@@ -1,6 +1,5 @@
 import path from "node:path";
 import type { NextConfig } from "next";
-import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
 import { createMDX } from "fumadocs-mdx/next";
 
@@ -58,7 +57,7 @@ const nextConfig: NextConfig = {
     ],
   },
   env: {
-    SENTRY_ENVIRONMENT: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
+    SENTRY_SUPPRESS_INSTRUMENTATION_FILE_WARNING: "1",
   },
   experimental: {
     externalDir: true,
@@ -71,7 +70,6 @@ const nextConfig: NextConfig = {
     "bcryptjs",
     "jsonwebtoken",
     "stripe",
-    "@sentry/node",
     "@opentelemetry/core",
     "@opentelemetry/api",
     "node:http",
@@ -147,11 +145,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-const sentryWebpackPluginOptions = {
-  silent: true,
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-};
-
-export default withSentryConfig(withMDX(withNextIntl(nextConfig)), sentryWebpackPluginOptions);
+export default withMDX(withNextIntl(nextConfig));
