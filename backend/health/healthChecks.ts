@@ -137,11 +137,19 @@ export async function checkOpenAI(timeoutMs = 3000): Promise<HealthCheckResult> 
 }
 
 /**
- * HEAD https://api.stripe.com — connectivity only.
+ * Stripe billing readiness: secret key, starter price ID, and API connectivity.
  */
 export async function checkStripe(timeoutMs = 3000): Promise<HealthCheckResult> {
   return withGlobalCap(async () => {
     const started = Date.now();
+    const secret = process.env.STRIPE_SECRET_KEY?.trim() ?? process.env.STRIPE_API_KEY?.trim();
+    const priceStarter = process.env.STRIPE_PRICE_ID_STARTER?.trim() ?? process.env.STRIPE_PRICE_STARTER_MONTHLY?.trim();
+    if (!secret) {
+      return { status: "degraded", latencyMs: Date.now() - started, error: "STRIPE_SECRET_KEY missing" };
+    }
+    if (!priceStarter) {
+      return { status: "degraded", latencyMs: Date.now() - started, error: "STRIPE_PRICE_ID_STARTER missing" };
+    }
     try {
       const ac = new AbortController();
       const tid = setTimeout(() => ac.abort(), timeoutMs);
