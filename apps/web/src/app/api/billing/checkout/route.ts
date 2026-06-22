@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { authenticate } from "@nelvyon/auth";
 import { getStripePriceEnvVarName, getStripePriceId, normalizeBillablePlan, type BillablePlan } from "@nelvyon/billing";
+import { readStripePriceEnvDiagnostic, logStripePriceEnvDiagnostic } from "@nelvyon/billing";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 import { DbClient } from "../../../../../../../backend/db/DbClient";
@@ -102,6 +103,14 @@ export async function POST(req: NextRequest) {
       );
     }
     ctx.planId = plan;
+
+    const envDiagnostic = readStripePriceEnvDiagnostic(plan);
+    logStripePriceEnvDiagnostic("checkout POST env", envDiagnostic, {
+      planIdReceived: ctx.planIdReceived,
+      userId: ctx.userId,
+    });
+    ctx.stripePriceEnvRaw = envDiagnostic.raw ?? null;
+    ctx.stripePriceEnvTrimmed = envDiagnostic.trimmed ?? null;
 
     if (!stripeSecretKeyConfigured()) {
       return checkoutError(

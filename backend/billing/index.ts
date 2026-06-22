@@ -14,6 +14,12 @@ export {
   getPaddlePriceId,
   STRIPE_PRICE_ENV_BY_PLAN,
 } from "./planConfig";
+export {
+  logStripePriceEnvDiagnostic,
+  readAllCheckoutStripePriceDiagnostics,
+  readStripePriceEnvDiagnostic,
+  type StripePriceEnvDiagnostic,
+} from "./stripePriceEnvAudit";
 export type { BillablePlan } from "./planConfig";
 export { CancellationService } from "./cancellationService";
 export { DunningService, resolveTenantIdFromUserId } from "./dunningService";

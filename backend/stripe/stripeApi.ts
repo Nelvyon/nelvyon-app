@@ -1,5 +1,9 @@
 import type { BillablePlan } from "../billing/planConfig";
 import { getStripePriceEnvVarName, getStripePriceId } from "../billing/planConfig";
+import {
+  logStripePriceEnvDiagnostic,
+  readStripePriceEnvDiagnostic,
+} from "../billing/stripePriceEnvAudit";
 
 export const STRIPE_API_BASE = "https://api.stripe.com/v1";
 
@@ -119,11 +123,27 @@ export async function retrieveStripePrice(priceId: string): Promise<{ id: string
  * @throws StripePriceNotFoundError si el price no existe (404 / resource_missing)
  */
 export async function validateStripePriceForPlan(plan: BillablePlan): Promise<string> {
+  const envDiagnostic = readStripePriceEnvDiagnostic(plan);
+  logStripePriceEnvDiagnostic("process.env read", envDiagnostic);
+
   const priceId = getStripePriceId(plan);
   const envVar = getStripePriceEnvVarName(plan);
 
+  if (envDiagnostic.trimmed !== priceId) {
+    logStripePriceEnvDiagnostic("trim mismatch after getStripePriceId", envDiagnostic, { resolved: priceId });
+  }
+
   try {
+    logStripePriceEnvDiagnostic("stripe.prices.retrieve attempt", envDiagnostic, {
+      retrievePriceId: priceId,
+    });
     const price = await retrieveStripePrice(priceId);
+    logStripePriceEnvDiagnostic("stripe.prices.retrieve ok", envDiagnostic, {
+      retrievePriceId: priceId,
+      stripePriceId: price.id,
+      stripeActive: price.active,
+      envMatchesStripe: price.id === priceId,
+    });
     if (!price.active) {
       throw new StripePriceNotFoundError(
         plan,
@@ -145,6 +165,11 @@ export async function validateStripePriceForPlan(plan: BillablePlan): Promise<st
         failure.stripeCode === "resource_missing" ||
         failure.stripeMessage.toLowerCase().includes("no such price"))
     ) {
+      logStripePriceEnvDiagnostic("stripe.prices.retrieve NOT FOUND", envDiagnostic, {
+        retrievePriceId: priceId,
+        stripeMessage: failure.stripeMessage,
+        stripeHttpStatus: failure.httpStatus,
+      });
       throw new StripePriceNotFoundError(plan, priceId, envVar, failure.stripeMessage);
     }
     throw e;
@@ -173,6 +198,7 @@ export async function createSubscriptionCheckoutSession(opts: {
   customerId?: string | null;
 }): Promise<{ url: string | null; sessionId: string }> {
   const priceId = await validateStripePriceForPlan(opts.plan);
+  const envDiagnostic = readStripePriceEnvDiagnostic(opts.plan);
   const body: Record<string, string | number | boolean | undefined> = {
     mode: "subscription",
     "line_items[0][price]": priceId,
@@ -188,6 +214,24 @@ export async function createSubscriptionCheckoutSession(opts: {
   if (opts.couponId) {
     body["discounts[0][coupon]"] = opts.couponId;
   }
+
+  const checkoutLineItemPrice = body["line_items[0][price]"];
+  console.error(
+    "[billing/checkout-session] stripe.checkout.sessions.create",
+    JSON.stringify({
+      plan: opts.plan,
+      envVar: envDiagnostic.envVar,
+      processEnv_STRIPE_PRICE_ID: envDiagnostic.trimmed ?? null,
+      processEnvRaw: envDiagnostic.raw ?? null,
+      line_items_0_price_sent_to_stripe: checkoutLineItemPrice,
+      priceIdFromValidate: priceId,
+      valuesMatch: checkoutLineItemPrice === priceId && priceId === envDiagnostic.trimmed,
+      mode: body.mode,
+      hasCustomer: Boolean(body.customer),
+      hasCustomerEmail: Boolean(body.customer_email),
+    }),
+  );
+
   const session = await stripeRequest<{ id: string; url: string | null }>("POST", "/checkout/sessions", body);
   return { url: session.url, sessionId: session.id };
 }

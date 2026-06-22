@@ -1,8 +1,11 @@
 """
 Single source of truth for billing: Stripe Price IDs (env) + display amounts for GET /payment/plans.
 
-Env naming: STRIPE_PRICE_<PLAN_ID_UPPER>_<BILLING_CYCLE_UPPER>
-Example: STRIPE_PRICE_STARTER_MONTHLY=price_xxx
+Nelvyon Web checkout (@nelvyon/web) uses:
+  STRIPE_PRICE_ID_STARTER, STRIPE_PRICE_ID_PRO, STRIPE_PRICE_ID_AGENCY
+
+This Python API uses the same STRIPE_PRICE_ID_* for monthly cycles (no legacy fallback).
+Non-monthly cycles use STRIPE_PRICE_<PLAN>_<CYCLE> if configured.
 """
 from __future__ import annotations
 
@@ -11,6 +14,14 @@ from typing import Any, Dict, List, Optional
 
 from core.pricing_plans import PRICING_PLANS
 from core.agency_wholesale import build_wholesale_payload
+
+# Canonical monthly Price ID env vars — must match backend/billing/planConfig.ts (Web service).
+STRIPE_PRICE_ID_ENV_MONTHLY: Dict[str, str] = {
+    "starter": "STRIPE_PRICE_ID_STARTER",
+    "pro": "STRIPE_PRICE_ID_PRO",
+    "enterprise": "STRIPE_PRICE_ID_AGENCY",
+    "agency_partner": "STRIPE_PRICE_ID_AGENCY_PARTNER",
+}
 
 # Display-only EUR / month (UI); Stripe collects real amounts via Price IDs.
 DISPLAY_BASE_PRICE_EUR: Dict[str, float] = {
@@ -56,6 +67,17 @@ def resolve_stripe_price_id(plan_id: str, billing_cycle: str) -> str:
         raise ValueError(f"Plan no configurado: {plan_id}")
     if billing_cycle not in VALID_BILLING_CYCLES:
         raise ValueError(f"Ciclo inválido: {billing_cycle}")
+
+    if billing_cycle == "monthly":
+        id_env = STRIPE_PRICE_ID_ENV_MONTHLY.get(plan_id)
+        if id_env:
+            val = os.environ.get(id_env, "").strip()
+            if val:
+                return val
+            raise ValueError(
+                f"Falta variable de entorno {id_env} con el Price ID Live de Stripe para {plan_id}/monthly"
+            )
+
     key = _price_env_key(plan_id, billing_cycle)
     val = os.environ.get(key, "").strip()
     if not val:
