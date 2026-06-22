@@ -2,14 +2,17 @@ export { getPremiumProduct, PREMIUM_PRODUCTS } from "./premiumProducts";
 export type { PremiumProduct } from "./types";
 export {
   BILLABLE_PLANS,
+  CHECKOUT_STRIPE_PLANS,
   comparePlans,
+  getStripePriceEnvVarName,
+  getStripePriceId,
   normalizeBillablePlan,
   PLAN_LIMITS,
   PLAN_NAMES,
   PLAN_PRICES,
   planTier,
-  getStripePriceId,
   getPaddlePriceId,
+  STRIPE_PRICE_ENV_BY_PLAN,
 } from "./planConfig";
 export type { BillablePlan } from "./planConfig";
 export { CancellationService } from "./cancellationService";

@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { authenticate } from "@nelvyon/auth";
-import { getStripePriceId, normalizeBillablePlan, type BillablePlan } from "@nelvyon/billing";
+import { getStripePriceEnvVarName, getStripePriceId, normalizeBillablePlan, type BillablePlan } from "@nelvyon/billing";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 import { EarlyAdopterService } from "../../../../../../../backend/billing/earlyAdopterService";
-import { createSubscriptionCheckoutSession } from "../../../../../../../backend/stripe/stripeApi";
+import {
+  createSubscriptionCheckoutSession,
+  StripePriceNotFoundError,
+} from "../../../../../../../backend/stripe/stripeApi";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -24,13 +27,7 @@ function stripeSecretKeyConfigured(): boolean {
 }
 
 function stripePriceEnvVar(plan: BillablePlan): string {
-  const map: Record<BillablePlan, string> = {
-    starter: "STRIPE_PRICE_ID_STARTER",
-    pro: "STRIPE_PRICE_ID_PRO",
-    agency: "STRIPE_PRICE_ID_AGENCY",
-    agency_partner: "STRIPE_PRICE_ID_AGENCY_PARTNER",
-  };
-  return map[plan];
+  return getStripePriceEnvVarName(plan);
 }
 
 function parseStripeApiError(message: string): {
@@ -204,6 +201,25 @@ export async function POST(req: NextRequest) {
         customerId: user.stripe_customer_id,
       });
     } catch (stripeErr) {
+      if (stripeErr instanceof StripePriceNotFoundError) {
+        return checkoutError(
+          502,
+          stripeErr.message,
+          "stripe_price_not_found",
+          {
+            ...ctx,
+            planId: plan,
+            stripePriceId: stripeErr.priceId,
+            envVar: stripeErr.envVar,
+            stripeMessage: stripeErr.stripeMessage,
+          },
+          {
+            priceId: stripeErr.priceId,
+            envVar: stripeErr.envVar,
+            stripeMessage: stripeErr.stripeMessage,
+          },
+        );
+      }
       const exception = stripeErr instanceof Error ? stripeErr.message : String(stripeErr);
       const parsed = parseStripeApiError(exception);
       const stripeHttpStatus = parsed.httpStatus ?? 502;

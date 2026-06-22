@@ -1,6 +1,17 @@
 export const BILLABLE_PLANS = ["starter", "pro", "agency", "agency_partner"] as const;
 export type BillablePlan = (typeof BILLABLE_PLANS)[number];
 
+/** Planes SaaS con checkout directo vía STRIPE_PRICE_ID_* */
+export const CHECKOUT_STRIPE_PLANS = ["starter", "pro", "agency"] as const;
+export type CheckoutStripePlan = (typeof CHECKOUT_STRIPE_PLANS)[number];
+
+export const STRIPE_PRICE_ENV_BY_PLAN: Record<BillablePlan, string> = {
+  starter: "STRIPE_PRICE_ID_STARTER",
+  pro: "STRIPE_PRICE_ID_PRO",
+  agency: "STRIPE_PRICE_ID_AGENCY",
+  agency_partner: "STRIPE_PRICE_ID_AGENCY_PARTNER",
+};
+
 export const PLAN_NAMES: Record<BillablePlan, string> = {
   starter: "Starter",
   pro: "Pro",
@@ -49,32 +60,19 @@ export function normalizeBillablePlan(raw: string): BillablePlan | null {
   return BILLABLE_PLANS.includes(p as BillablePlan) ? (p as BillablePlan) : null;
 }
 
+export function getStripePriceEnvVarName(plan: BillablePlan): string {
+  return STRIPE_PRICE_ENV_BY_PLAN[plan];
+}
+
 /**
- * Stripe Price ID (mensual) para checkout y cambio de plan.
- * Preferencia: STRIPE_PRICE_ID_*; compatibilidad STRIPE_PRICE_{PLAN}_MONTHLY.
+ * Stripe Price ID (mensual) — únicamente desde STRIPE_PRICE_ID_* en Railway.
+ * No hay fallbacks ni IDs hardcodeados.
  */
-export function getStripePriceId(plan: BillablePlan, billingCycle = "monthly"): string {
-  const cycleKey = billingCycle.toUpperCase();
-  const planKey = plan.toUpperCase();
-  const fromEnv =
-    plan === "starter"
-      ? process.env.STRIPE_PRICE_ID_STARTER ??
-        process.env[`STRIPE_PRICE_${planKey}_${cycleKey}`] ??
-        process.env.STRIPE_PRICE_STARTER_MONTHLY
-      : plan === "pro"
-        ? process.env.STRIPE_PRICE_ID_PRO ??
-          process.env[`STRIPE_PRICE_${planKey}_${cycleKey}`] ??
-          process.env.STRIPE_PRICE_PRO_MONTHLY
-        : plan === "agency_partner"
-          ? process.env.STRIPE_PRICE_ID_AGENCY_PARTNER ??
-            process.env[`STRIPE_PRICE_${planKey}_${cycleKey}`] ??
-            process.env.STRIPE_PRICE_AGENCY_PARTNER_MONTHLY
-          : process.env.STRIPE_PRICE_ID_AGENCY ??
-            process.env[`STRIPE_PRICE_${planKey}_${cycleKey}`] ??
-            process.env.STRIPE_PRICE_AGENCY_MONTHLY;
-  const id = fromEnv?.trim();
+export function getStripePriceId(plan: BillablePlan): string {
+  const envVar = getStripePriceEnvVarName(plan);
+  const id = process.env[envVar]?.trim();
   if (!id) {
-    throw new Error(`Stripe price ID no configurado para el plan: ${plan}`);
+    throw new Error(`Falta variable de entorno: ${envVar}`);
   }
   return id;
 }

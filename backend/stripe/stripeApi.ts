@@ -1,7 +1,23 @@
 import type { BillablePlan } from "../billing/planConfig";
-import { getStripePriceId } from "../billing/planConfig";
+import { getStripePriceEnvVarName, getStripePriceId } from "../billing/planConfig";
 
 export const STRIPE_API_BASE = "https://api.stripe.com/v1";
+
+/** Price ID from env does not exist in the connected Stripe account (Live/Test mismatch or typo). */
+export class StripePriceNotFoundError extends Error {
+  readonly name = "StripePriceNotFoundError";
+
+  constructor(
+    readonly plan: BillablePlan,
+    readonly priceId: string,
+    readonly envVar: string,
+    readonly stripeMessage: string,
+  ) {
+    super(
+      `Price ID inexistente en Stripe: ${priceId} (${envVar}). ${stripeMessage}`,
+    );
+  }
+}
 
 /** Fallback billing portal when API is unavailable. */
 export const STRIPE_BILLING_PORTAL_FALLBACK =
@@ -59,6 +75,82 @@ async function stripeRequest<T>(
   return (await res.json()) as T;
 }
 
+type StripeApiFailure = {
+  httpStatus: number;
+  stripeMessage: string;
+  stripeType?: string;
+  stripeCode?: string;
+  raw: string;
+};
+
+function parseStripeApiFailure(message: string): StripeApiFailure | null {
+  const match = message.match(/Stripe API \w+ .+ failed \((\d+)\):([\s\S]*)$/);
+  if (!match) return null;
+
+  const httpStatus = Number(match[1]);
+  const raw = match[2]?.trim() ?? "";
+  try {
+    const parsed = JSON.parse(raw) as {
+      error?: { message?: string; type?: string; code?: string };
+    };
+    const stripeErr = parsed.error;
+    return {
+      httpStatus,
+      stripeMessage: stripeErr?.message ?? raw,
+      stripeType: stripeErr?.type,
+      stripeCode: stripeErr?.code,
+      raw,
+    };
+  } catch {
+    return { httpStatus, stripeMessage: raw || message, raw };
+  }
+}
+
+/** stripe.prices.retrieve — valida que el Price ID existe en la cuenta Stripe conectada. */
+export async function retrieveStripePrice(priceId: string): Promise<{ id: string; active: boolean }> {
+  return stripeRequest<{ id: string; active: boolean }>(
+    "GET",
+    `/prices/${encodeURIComponent(priceId)}`,
+  );
+}
+
+/**
+ * Resuelve STRIPE_PRICE_ID_* y verifica en Stripe antes de crear checkout.
+ * @throws StripePriceNotFoundError si el price no existe (404 / resource_missing)
+ */
+export async function validateStripePriceForPlan(plan: BillablePlan): Promise<string> {
+  const priceId = getStripePriceId(plan);
+  const envVar = getStripePriceEnvVarName(plan);
+
+  try {
+    const price = await retrieveStripePrice(priceId);
+    if (!price.active) {
+      throw new StripePriceNotFoundError(
+        plan,
+        priceId,
+        envVar,
+        `El price existe pero está inactivo en Stripe Dashboard`,
+      );
+    }
+    return priceId;
+  } catch (e: unknown) {
+    if (e instanceof StripePriceNotFoundError) {
+      throw e;
+    }
+    const message = e instanceof Error ? e.message : String(e);
+    const failure = parseStripeApiFailure(message);
+    if (
+      failure &&
+      (failure.httpStatus === 404 ||
+        failure.stripeCode === "resource_missing" ||
+        failure.stripeMessage.toLowerCase().includes("no such price"))
+    ) {
+      throw new StripePriceNotFoundError(plan, priceId, envVar, failure.stripeMessage);
+    }
+    throw e;
+  }
+}
+
 export function mapStripePriceToNelvyon(priceId: string): string {
   const map: Record<string, string> = {};
   for (const plan of ["starter", "pro", "agency"] as BillablePlan[]) {
@@ -67,17 +159,6 @@ export function mapStripePriceToNelvyon(priceId: string): string {
     } catch {
       /* env may be partial in tests */
     }
-  }
-  const legacy = {
-    [process.env.STRIPE_PRICE_ID_STARTER ?? ""]: "starter",
-    [process.env.STRIPE_PRICE_ID_PRO ?? ""]: "pro",
-    [process.env.STRIPE_PRICE_ID_AGENCY ?? ""]: "agency",
-    [process.env.STRIPE_PRICE_STARTER_MONTHLY ?? ""]: "starter",
-    [process.env.STRIPE_PRICE_PRO_MONTHLY ?? ""]: "pro",
-    [process.env.STRIPE_PRICE_AGENCY_MONTHLY ?? ""]: "agency",
-  };
-  for (const [id, plan] of Object.entries(legacy)) {
-    if (id) map[id] = plan;
   }
   return map[priceId] ?? "starter";
 }
@@ -91,7 +172,7 @@ export async function createSubscriptionCheckoutSession(opts: {
   couponId?: string | null;
   customerId?: string | null;
 }): Promise<{ url: string | null; sessionId: string }> {
-  const priceId = getStripePriceId(opts.plan);
+  const priceId = await validateStripePriceForPlan(opts.plan);
   const body: Record<string, string | number | boolean | undefined> = {
     mode: "subscription",
     "line_items[0][price]": priceId,
