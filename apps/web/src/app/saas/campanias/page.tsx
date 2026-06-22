@@ -8,6 +8,7 @@ import { SaasCan } from "@/features/saas-shell/components/SaasCan";
 import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
+import { EmailEditor } from "@/features/email-editor/EmailEditor";
 
 type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
 type CampaniaChannel = "email" | "sms" | "notification" | "multi";
@@ -299,7 +300,7 @@ export default function SaasCampaniasPage() {
               {step === 2 ? (
                 <div className="grid gap-2">
                   {channel === "email" ? <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} /> : null}
-                  <textarea className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="Body" value={body} onChange={(e) => setBody(e.target.value)} />
+                  <EmailEditor value={body} onChange={setBody} />
                   <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="CTA text" value={ctaText} onChange={(e) => setCtaText(e.target.value)} />
                   <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="CTA url" value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} />
                 </div>
