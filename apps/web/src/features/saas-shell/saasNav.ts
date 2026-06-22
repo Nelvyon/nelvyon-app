@@ -20,6 +20,9 @@ export type SaasNavId =
   | "helpdesk"
   | "afiliados"
   | "reportes"
+  | "integraciones"
+  | "dialer"
+  | "loyalty"
   | "billing"
   | "settings";
 
@@ -52,12 +55,15 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "formularios", label: "Formularios", href: "/saas/formularios", group: "gestion" },
   { id: "citas", label: "Agenda / Citas", href: "/saas/citas", group: "gestion" },
   { id: "helpdesk", label: "Helpdesk", href: "/saas/helpdesk", group: "gestion" },
+  { id: "dialer", label: "Dialer (Llamadas)", href: "/saas/dialer", group: "gestion" },
+  { id: "loyalty", label: "Fidelización", href: "/saas/loyalty", group: "gestion" },
   // IA & Formación
   { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes", group: "ia" },
   { id: "chat", label: "💬 Asistente IA", href: "/saas/chat", group: "ia" },
   { id: "lms", label: "Cursos / LMS", href: "/saas/lms", group: "ia" },
   // Cuenta
   { id: "reportes", label: "Reportes", href: "/saas/reportes", group: "cuenta" },
+  { id: "integraciones", label: "Integraciones", href: "/saas/integraciones", group: "cuenta" },
   { id: "afiliados", label: "Afiliados", href: "/saas/afiliados", group: "cuenta" },
   { id: "billing", label: "Facturación", href: "/saas/billing", group: "cuenta", permission: "billing.read" },
   { id: "settings", label: "Configuración", href: "/saas/settings", group: "cuenta", permission: "settings.read" },
