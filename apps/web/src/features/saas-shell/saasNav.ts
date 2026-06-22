@@ -10,9 +10,16 @@ export type SaasNavId =
   | "publicidad"
   | "seo"
   | "workflows"
+  | "funnels"
   | "formularios"
   | "citas"
+  | "web-builder"
   | "agentes"
+  | "chat"
+  | "lms"
+  | "helpdesk"
+  | "afiliados"
+  | "reportes"
   | "billing"
   | "settings";
 
@@ -20,27 +27,40 @@ export type SaasNavItem = {
   id: SaasNavId;
   label: string;
   href: string;
+  group?: string;
   /** Permission required to see this nav item (optional). */
   permission?: "billing.read" | "settings.read";
 };
 
 export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
-  { id: "dashboard", label: "Dashboard", href: "/saas/dashboard" },
-  { id: "crm", label: "CRM", href: "/saas/crm" },
-  { id: "pipeline", label: "Pipeline", href: "/saas/crm?tab=pipeline" },
-  { id: "campanias", label: "Email Campañas", href: "/saas/campanias" },
-  { id: "sms", label: "SMS Marketing", href: "/saas/sms" },
-  { id: "whatsapp", label: "WhatsApp", href: "/saas/whatsapp" },
-  { id: "social", label: "Redes Sociales", href: "/saas/social" },
-  { id: "publicidad", label: "Publicidad", href: "/saas/publicidad" },
-  { id: "seo", label: "SEO", href: "/saas/seo" },
-  { id: "workflows", label: "Workflows", href: "/saas/workflows" },
-  { id: "formularios", label: "Formularios", href: "/saas/formularios" },
-  { id: "citas", label: "Agenda / Citas", href: "/saas/citas" },
-  { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes" },
-  { id: "citas", label: "💬 Asistente IA", href: "/saas/chat" },
-  { id: "billing", label: "Facturación", href: "/saas/billing", permission: "billing.read" },
-  { id: "settings", label: "Configuración", href: "/saas/settings", permission: "settings.read" },
+  // Core
+  { id: "dashboard", label: "Dashboard", href: "/saas/dashboard", group: "principal" },
+  { id: "crm", label: "CRM", href: "/saas/crm", group: "principal" },
+  { id: "pipeline", label: "Pipeline", href: "/saas/crm?tab=pipeline", group: "principal" },
+  // Comunicación
+  { id: "campanias", label: "Email Campañas", href: "/saas/campanias", group: "comunicacion" },
+  { id: "sms", label: "SMS Marketing", href: "/saas/sms", group: "comunicacion" },
+  { id: "whatsapp", label: "WhatsApp", href: "/saas/whatsapp", group: "comunicacion" },
+  { id: "social", label: "Redes Sociales", href: "/saas/social", group: "comunicacion" },
+  // Captación
+  { id: "publicidad", label: "Publicidad", href: "/saas/publicidad", group: "captacion" },
+  { id: "seo", label: "SEO", href: "/saas/seo", group: "captacion" },
+  { id: "funnels", label: "Funnel Builder", href: "/saas/funnels", group: "captacion" },
+  { id: "web-builder", label: "Web Builder", href: "/saas/web-builder", group: "captacion" },
+  // Gestión
+  { id: "workflows", label: "Workflows", href: "/saas/workflows", group: "gestion" },
+  { id: "formularios", label: "Formularios", href: "/saas/formularios", group: "gestion" },
+  { id: "citas", label: "Agenda / Citas", href: "/saas/citas", group: "gestion" },
+  { id: "helpdesk", label: "Helpdesk", href: "/saas/helpdesk", group: "gestion" },
+  // IA & Formación
+  { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes", group: "ia" },
+  { id: "chat", label: "💬 Asistente IA", href: "/saas/chat", group: "ia" },
+  { id: "lms", label: "Cursos / LMS", href: "/saas/lms", group: "ia" },
+  // Cuenta
+  { id: "reportes", label: "Reportes", href: "/saas/reportes", group: "cuenta" },
+  { id: "afiliados", label: "Afiliados", href: "/saas/afiliados", group: "cuenta" },
+  { id: "billing", label: "Facturación", href: "/saas/billing", group: "cuenta", permission: "billing.read" },
+  { id: "settings", label: "Configuración", href: "/saas/settings", group: "cuenta", permission: "settings.read" },
 ] as const;
 
 /**
