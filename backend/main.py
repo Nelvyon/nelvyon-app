@@ -194,6 +194,19 @@ async def startup_event():
         logger.warning("Executive reporting worker failed to start: %s", e)
     # MODULE_STARTUP_END
 
+    # Critical configuration warnings (non-fatal — allow graceful degradation)
+    _stripe_key = os.environ.get("STRIPE_SECRET_KEY", "").strip()
+    _stripe_wh = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+    _frontend_url = os.environ.get("FRONTEND_APP_URL", "").strip() or os.environ.get("NEXT_PUBLIC_APP_URL", "").strip()
+    if not _stripe_key:
+        logger.error("STARTUP: STRIPE_SECRET_KEY is not set — payment endpoints will fail")
+    elif not _stripe_key.startswith("sk_live_") and ENVIRONMENT.lower() in ("production", "prod"):
+        logger.warning("STARTUP: STRIPE_SECRET_KEY appears to be a test key in production environment")
+    if not _stripe_wh and ENVIRONMENT.lower() in ("production", "prod"):
+        logger.error("STARTUP: STRIPE_WEBHOOK_SECRET is not set — webhook endpoint will return 503")
+    if not _frontend_url:
+        logger.warning("STARTUP: FRONTEND_APP_URL not set — Stripe checkout success/cancel URLs may be relative")
+
     logger.info("=== Application startup completed ===")
 
 

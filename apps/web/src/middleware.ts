@@ -160,6 +160,8 @@ export const config = {
   matcher: [
     "/api/auth/:path*",
     "/api/public/:path*",
+    "/api/webhooks/:path*",
+    "/api/early-adopter/:path*",
     "/os/:path*",
     "/api/os/:path*",
     "/saas/:path*",

@@ -31,6 +31,18 @@ const RULES: RateLimitRule[] = [
     limit: 30,
     windowSec: 60,
   },
+  {
+    id: "webhooks",
+    match: (p) => p.startsWith("/api/webhooks/"),
+    limit: 200,
+    windowSec: 60,
+  },
+  {
+    id: "early-adopter",
+    match: (p) => p.startsWith("/api/early-adopter/"),
+    limit: 20,
+    windowSec: 60,
+  },
 ];
 
 export function getRateLimitRule(pathname: string): RateLimitRule | null {
@@ -91,6 +103,10 @@ export async function checkIpRateLimit(params: {
 }): Promise<RateLimitResult> {
   const config = getUpstashConfig();
   if (!config) {
+    // Fail-open: rate limiting disabled when Redis is not configured.
+    if (process.env.NODE_ENV === "production") {
+      console.warn("[rate-limit] Upstash Redis not configured — rate limiting disabled");
+    }
     return { allowed: true, retryAfter: params.rule.windowSec };
   }
 
