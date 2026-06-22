@@ -2,14 +2,27 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Suspense } from "react";
 
-import { CTA_REGISTER, PLANS } from "./constants";
+import { PlanCheckoutButton } from "@/features/billing/PlanCheckoutButton";
+import type { BillablePlanId } from "@/features/billing/planCheckout";
+import { useAutoPlanCheckout } from "@/features/billing/useAutoPlanCheckout";
+
+import { PLANS } from "./constants";
 import { FadeIn } from "./FadeIn";
 import { MarketingShell } from "./MarketingShell";
+
+function PricingAutoCheckout() {
+  useAutoPlanCheckout("/pricing");
+  return null;
+}
 
 export function PricingPageContent() {
   return (
     <MarketingShell>
+      <Suspense fallback={null}>
+        <PricingAutoCheckout />
+      </Suspense>
       <section className="px-4 pb-8 pt-12 md:px-6 md:pt-20">
         <motion.div
           initial={{ opacity: 0, y: 28 }}
@@ -54,16 +67,17 @@ export function PricingPageContent() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href={CTA_REGISTER}
-                  className={`mt-8 block rounded-full py-3.5 text-center text-sm font-semibold transition ${
+                <PlanCheckoutButton
+                  className={`mt-8 block w-full rounded-full py-3.5 text-center text-sm font-semibold transition ${
                     plan.featured
                       ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:brightness-110"
                       : "border border-white/15 text-white hover:bg-white/5"
                   }`}
+                  planId={plan.id as BillablePlanId}
+                  returnPath="/pricing"
                 >
-                  Empieza gratis →
-                </Link>
+                  Elegir {plan.name}
+                </PlanCheckoutButton>
               </div>
             </FadeIn>
           ))}

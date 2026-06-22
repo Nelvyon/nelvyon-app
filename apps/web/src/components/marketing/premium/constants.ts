@@ -26,8 +26,15 @@ export const FOOTER_GROUPS = [
     links: [
       { href: "/pricing", label: "Precios" },
       { href: "/contacto", label: "Contacto" },
-      { href: "/legal", label: "Legal" },
       { href: "/auth/login", label: "Acceder" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { href: "/legal/terms", label: "Términos" },
+      { href: "/legal/privacy", label: "Privacidad" },
+      { href: "/legal", label: "Centro legal" },
     ],
   },
 ] as const;
@@ -36,7 +43,7 @@ export const PLANS = [
   {
     id: "starter",
     name: "Starter",
-    price: 95,
+    price: 47,
     description: "Ideal para founders y equipos que arrancan con marketing IA.",
     highlights: ["SEO IA", "Contenido IA", "Informes mensuales", "Soporte email"],
     featured: false,
@@ -44,7 +51,7 @@ export const PLANS = [
   {
     id: "pro",
     name: "Pro",
-    price: 270,
+    price: 197,
     description: "Para negocios que escalan adquisición y conversión cada mes.",
     highlights: ["Todo Starter", "Publicidad IA", "Email Marketing IA", "Prioridad en cola", "Integraciones"],
     featured: true,
@@ -52,7 +59,7 @@ export const PLANS = [
   {
     id: "agency",
     name: "Agency",
-    price: 470,
+    price: 497,
     description: "Agencias y equipos que gestionan múltiples marcas con IA.",
     highlights: ["Todo Pro", "Branding IA", "Multi-workspace", "API & white-label", "Account manager"],
     featured: false,

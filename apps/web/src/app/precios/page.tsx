@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { NelvyonPreciosPage } from "@/components/nelvyon-site/NelvyonPreciosPage";
 
-export default function PreciosRedirect() {
-  redirect("/contacto");
+export default function PreciosPage() {
+  return <NelvyonPreciosPage />;
 }

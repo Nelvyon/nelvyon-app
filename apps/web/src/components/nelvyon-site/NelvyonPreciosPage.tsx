@@ -1,7 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+
+import { PlanCheckoutButton } from "@/features/billing/PlanCheckoutButton";
+import type { BillablePlanId } from "@/features/billing/planCheckout";
+import { useAutoPlanCheckout } from "@/features/billing/useAutoPlanCheckout";
 
 import { COMPARE_ROWS, PLANS } from "./brand";
 import { FadeUp } from "./FadeUp";
@@ -11,11 +14,19 @@ function priceLabel(value: number | null) {
   return value == null ? "—" : `${value}€`;
 }
 
+function PreciosAutoCheckout() {
+  useAutoPlanCheckout("/precios");
+  return null;
+}
+
 export function NelvyonPreciosPage() {
   const [annual, setAnnual] = useState(false);
 
   return (
     <NelvyonShell>
+      <Suspense fallback={null}>
+        <PreciosAutoCheckout />
+      </Suspense>
       <section className="px-4 pb-8 pt-16 text-center md:px-6 md:pt-24">
         <FadeUp>
           <h1 className="text-4xl font-bold text-white md:text-6xl">Planes NELVYON</h1>
@@ -71,14 +82,15 @@ export function NelvyonPreciosPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  className={`mt-8 block rounded-full py-3.5 text-center text-sm font-semibold ${
+                <PlanCheckoutButton
+                  className={`mt-8 block w-full rounded-full py-3.5 text-center text-sm font-semibold ${
                     plan.featured ? "bg-[#0066FF] text-white hover:bg-[#0052cc]" : "border border-white/15 text-white hover:bg-white/5"
                   }`}
-                  href="/register"
+                  planId={plan.id as BillablePlanId}
+                  returnPath="/precios"
                 >
-                  Solicitar acceso
-                </Link>
+                  Elegir {plan.name}
+                </PlanCheckoutButton>
               </div>
             </FadeUp>
           ))}
@@ -93,9 +105,9 @@ export function NelvyonPreciosPage() {
               <thead className="bg-white/[0.03] text-zinc-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Funcionalidad</th>
-                  <th className="px-4 py-3 text-center">Plan 1</th>
-                  <th className="px-4 py-3 text-center">Plan 2</th>
-                  <th className="px-4 py-3 text-center">Plan 3</th>
+                  <th className="px-4 py-3 text-center">Starter</th>
+                  <th className="px-4 py-3 text-center">Pro</th>
+                  <th className="px-4 py-3 text-center">Agency</th>
                 </tr>
               </thead>
               <tbody>

@@ -20,6 +20,8 @@ import {
 import { NELVYON } from "./brand";
 import { FadeUp } from "./FadeUp";
 import { NelvyonShell } from "./NelvyonShell";
+import { PlanCheckoutButton } from "@/features/billing/PlanCheckoutButton";
+import type { BillablePlanId } from "@/features/billing/planCheckout";
 
 const ElectricHeroCanvas = dynamic(
   () => import("./ElectricHeroCanvas").then((m) => ({ default: m.ElectricHeroCanvas })),
@@ -60,21 +62,24 @@ const RESULTS = [
 
 const PLANS = [
   {
+    id: "starter" as BillablePlanId,
     name: "Starter",
-    price: "€97",
+    price: "€47",
     period: "/mes",
     features: ["3 agentes IA", "Web Builder básico", "Email + CRM", "Soporte email"],
   },
   {
-    name: "Growth",
-    price: "€297",
+    id: "pro" as BillablePlanId,
+    name: "Pro",
+    price: "€197",
     period: "/mes",
     highlight: true,
     features: ["12 agentes", "Publicidad IA", "Social auto-publish", "Analytics avanzado"],
   },
   {
-    name: "Elite",
-    price: "€797",
+    id: "agency" as BillablePlanId,
+    name: "Agency",
+    price: "€497",
     period: "/mes",
     features: ["Todo ilimitado", "Voz IA + leads", "Account manager", "SLA prioritario"],
   },
@@ -99,7 +104,7 @@ const FAQ = [
   },
   {
     q: "¿Hay periodo de prueba?",
-    a: "Puedes empezar gratis y escalar a Starter, Growth o Elite cuando quieras activar más agentes.",
+    a: "Puedes empezar gratis y escalar a Starter, Pro o Agency cuando quieras activar más agentes.",
   },
 ];
 
@@ -217,7 +222,7 @@ export function NelvyonHomePage({ embedded = false }: { embedded?: boolean }) {
         </FadeUp>
         <div className="mx-auto mt-14 grid max-w-5xl gap-6 lg:grid-cols-3">
           {PLANS.map((plan, i) => (
-            <FadeUp delay={i * 0.06} key={plan.name}>
+            <FadeUp delay={i * 0.06} key={plan.id}>
               <GlassCard
                 className={`flex h-full flex-col ${plan.highlight ? "border-[#0066FF]/50 ring-1 ring-[#0066FF]/30" : ""}`}
               >
@@ -236,16 +241,17 @@ export function NelvyonHomePage({ embedded = false }: { embedded?: boolean }) {
                     <li key={f}>✓ {f}</li>
                   ))}
                 </ul>
-                <Link
-                  className={`mt-8 block rounded-full py-3 text-center text-sm font-semibold transition ${
+                <PlanCheckoutButton
+                  className={`mt-8 block w-full rounded-full py-3 text-center text-sm font-semibold transition ${
                     plan.highlight
                       ? "bg-[#0066FF] text-white hover:bg-[#0052cc]"
                       : "border border-white/15 text-white hover:border-[#0066FF]/50"
                   }`}
-                  href="/register"
+                  planId={plan.id}
+                  returnPath="/precios"
                 >
                   Elegir {plan.name}
-                </Link>
+                </PlanCheckoutButton>
               </GlassCard>
             </FadeUp>
           ))}

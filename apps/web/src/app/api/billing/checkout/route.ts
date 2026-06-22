@@ -44,13 +44,17 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? req.nextUrl.origin;
     const successUrl = `${appUrl}/billing/upgrade?checkout=success&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${appUrl}/pricing?checkout=cancelled`;
+    const cancelUrl = `${appUrl}/precios?checkout=cancelled`;
 
     let couponId: string | null = null;
-    const ea = EarlyAdopterService.getInstance();
-    if (await ea.isEarlyAdopterActive()) {
-      const claim = await ea.claimEarlyAdopterSlot(claims.userId);
-      couponId = claim.discountCode;
+    try {
+      const ea = EarlyAdopterService.getInstance();
+      if (await ea.isEarlyAdopterActive()) {
+        const claim = await ea.claimEarlyAdopterSlot(claims.userId);
+        couponId = claim.discountCode;
+      }
+    } catch (eaErr) {
+      console.error("[billing/checkout] early adopter skipped:", eaErr);
     }
 
     const session = await createSubscriptionCheckoutSession({
@@ -72,7 +76,20 @@ export async function POST(req: NextRequest) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.error("[billing/checkout]", e);
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("[billing/checkout]", message, e);
+    if (message.includes("Stripe price ID no configurado")) {
+      return NextResponse.json(
+        { error: "Stripe price ID no configurado para este plan", code: "STRIPE_PRICE_MISSING" },
+        { status: 503 },
+      );
+    }
+    if (message.includes("STRIPE_SECRET_KEY")) {
+      return NextResponse.json(
+        { error: "Stripe no está configurado en el servidor", code: "STRIPE_SECRET_MISSING" },
+        { status: 503 },
+      );
+    }
     return NextResponse.json({ error: "No se pudo iniciar el checkout" }, { status: 500 });
   }
 }

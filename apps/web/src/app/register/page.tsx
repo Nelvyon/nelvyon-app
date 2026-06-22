@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AuthLayout } from "@/components/nelvyon-site/AuthLayout";
 import { useAuth } from "@/core/auth/AuthContext";
@@ -14,10 +14,16 @@ const inputClass =
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn, isAuthenticated, isBootstrapping } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", company: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isBootstrapping && isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, isBootstrapping, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
