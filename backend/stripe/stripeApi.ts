@@ -223,6 +223,39 @@ export async function validateStripePriceForPlan(plan: BillablePlan): Promise<st
         hint:
           "Si el Price existe en Stripe Dashboard pero falla aquí, STRIPE_SECRET_KEY (sk_live/sk_test) no pertenece a la misma cuenta/modo que el Price ID en STRIPE_PRICE_ID_*.",
       });
+
+      // Auto-reparación: crea/reutiliza price en la cuenta API y actualiza env en caliente (+ Railway si hay token).
+      try {
+        console.error(
+          "[billing/stripe-api] auto-repair triggered for missing price",
+          JSON.stringify({ plan, priceId, envVar }),
+        );
+        const { fixStripePrices } = await import("./stripeRepair");
+        const repair = await fixStripePrices([plan]);
+        const repaired = repair.configuredPrices.find((p) => p.plan === plan);
+        if (repaired?.resolvedPriceId) {
+          const retried = await retrieveStripePrice(repaired.resolvedPriceId);
+          if (retried.active) {
+            console.error(
+              "[billing/stripe-api] auto-repair ok",
+              JSON.stringify({
+                plan,
+                oldPriceId: priceId,
+                newPriceId: repaired.resolvedPriceId,
+                action: repaired.action,
+                railwayUpdated: repair.railwayUpdate?.ok ?? false,
+              }),
+            );
+            return repaired.resolvedPriceId;
+          }
+        }
+      } catch (repairErr) {
+        console.error(
+          "[billing/stripe-api] auto-repair failed",
+          repairErr instanceof Error ? repairErr.message : String(repairErr),
+        );
+      }
+
       throw new StripePriceNotFoundError(
         plan,
         priceId,
