@@ -20,6 +20,7 @@ STRIPE_PRICE_ID_ENV_MONTHLY: Dict[str, str] = {
     "starter": "STRIPE_PRICE_ID_STARTER",
     "pro": "STRIPE_PRICE_ID_PRO",
     "enterprise": "STRIPE_PRICE_ID_AGENCY",
+    "agency": "STRIPE_PRICE_ID_AGENCY",          # TS/webhook canonical name for the same tier
     "agency_partner": "STRIPE_PRICE_ID_AGENCY_PARTNER",
 }
 
@@ -28,6 +29,7 @@ DISPLAY_BASE_PRICE_EUR: Dict[str, float] = {
     "starter": 79.0,
     "pro": 249.0,
     "enterprise": 449.0,
+    "agency": 449.0,              # alias for enterprise (TS/webhook canonical name)
     "partner": 50.0,
     "agency_partner": 197.0,
 }

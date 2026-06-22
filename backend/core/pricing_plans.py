@@ -62,6 +62,25 @@ PRICING_PLANS: Dict[str, dict] = {
             "workspace_users": None,
         },
     },
+    # "agency" is the canonical TS/webhook name for the enterprise tier.
+    # Both IDs are valid in the DB; they resolve to identical limits.
+    "agency": {
+        "label": "Agency",
+        "modules": {
+            "contacts": True,
+            "helpdesk": True,
+            "campaigns": True,
+            "workflows": True,
+            "analytics": True,
+            "integrations": True,
+        },
+        "limits": {
+            "contacts": None,
+            "active_campaigns": None,
+            "active_workflows": None,
+            "workspace_users": None,
+        },
+    },
     # Legacy/support plan kept for compatibility (not part of 3 core public plans).
     "partner": {
         "label": "Partner",

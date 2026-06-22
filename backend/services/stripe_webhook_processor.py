@@ -33,7 +33,9 @@ BILLING_MONTHS_LOCAL = BILLING_MONTHS
 
 
 def _saas_billing_sync_enabled() -> bool:
-    return os.getenv("SAAS_BILLING_SYNC_ENABLED", "").lower() in ("1", "true", "yes")
+    # Default ON in production. Set SAAS_BILLING_SYNC_ENABLED=false to disable.
+    val = os.getenv("SAAS_BILLING_SYNC_ENABLED", "true").lower()
+    return val not in ("0", "false", "no", "off")
 
 
 async def _maybe_sync_saas_tenant_plan(
