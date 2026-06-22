@@ -118,11 +118,12 @@ export function BillingUpgradePageClient() {
     if (!selectedPlan || !selectedCycle) return;
     try {
       setUiState({ status: "redirecting", message: "Redirigiendo a Stripe Checkout…" });
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
       const result = await createPaymentSession.mutateAsync({
         plan_id: selectedPlan.plan_id,
         billing_cycle: selectedCycle.cycle,
-        success_url: "/billing/upgrade?checkout=success&session_id={CHECKOUT_SESSION_ID}",
-        cancel_url: "/billing/upgrade?checkout=cancelled",
+        success_url: `${origin}/billing/upgrade?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/billing/upgrade?checkout=cancelled`,
       });
       if (result.url) {
         window.location.assign(result.url);

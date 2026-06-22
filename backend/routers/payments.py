@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime
 from typing import Optional
 
@@ -123,7 +124,15 @@ async def create_payment_session(
             data.plan_id, data.billing_cycle, data.promo_code
         )
 
-        frontend_host = request.headers.get("App-Host")
+        # Resolve absolute base URL for success/cancel redirects.
+        # Priority: App-Host header > FRONTEND_APP_URL env > NEXT_PUBLIC_APP_URL env.
+        # Without an absolute base, Stripe rejects relative success_url/cancel_url.
+        _header_host = request.headers.get("App-Host", "").strip()
+        frontend_host = (
+            _header_host
+            or os.getenv("FRONTEND_APP_URL", "").strip()
+            or os.getenv("NEXT_PUBLIC_APP_URL", "").strip()
+        )
         if frontend_host and not frontend_host.startswith(("http://", "https://")):
             frontend_host = f"https://{frontend_host}"
 

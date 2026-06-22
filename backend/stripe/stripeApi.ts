@@ -28,9 +28,9 @@ export class StripePriceNotFoundError extends Error {
   }
 }
 
-/** Fallback billing portal when API is unavailable. */
+/** Fallback billing portal URL when API is unavailable. Set STRIPE_BILLING_PORTAL_FALLBACK in Railway. */
 export const STRIPE_BILLING_PORTAL_FALLBACK =
-  process.env.STRIPE_BILLING_PORTAL_FALLBACK ?? "https://billing.stripe.com/p/login/test";
+  process.env.STRIPE_BILLING_PORTAL_FALLBACK?.trim() ?? "";
 
 export type StripeCardSummary = {
   lastFour?: string;
