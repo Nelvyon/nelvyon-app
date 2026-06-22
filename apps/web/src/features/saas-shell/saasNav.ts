@@ -18,6 +18,7 @@ export type SaasNavId =
   | "chat"
   | "lms"
   | "copywriter"
+  | "reputacion"
   | "helpdesk"
   | "afiliados"
   | "reportes"
@@ -49,6 +50,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   // Captación
   { id: "publicidad", label: "Publicidad", href: "/saas/publicidad", group: "captacion" },
   { id: "seo", label: "SEO", href: "/saas/seo", group: "captacion" },
+  { id: "reputacion", label: "Reputación", href: "/saas/reputacion", group: "captacion" },
   { id: "funnels", label: "Funnel Builder", href: "/saas/funnels", group: "captacion" },
   { id: "web-builder", label: "Web Builder", href: "/saas/web-builder", group: "captacion" },
   // Gestión
