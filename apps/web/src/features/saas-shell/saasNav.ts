@@ -1,5 +1,16 @@
 /** Visible SaaS product navigation — only modules with real tenant APIs. */
-export type SaasNavId = "dashboard" | "crm" | "pipeline" | "campanias" | "workflows" | "billing" | "settings";
+export type SaasNavId =
+  | "dashboard"
+  | "crm"
+  | "pipeline"
+  | "campanias"
+  | "workflows"
+  | "sms"
+  | "whatsapp"
+  | "formularios"
+  | "citas"
+  | "billing"
+  | "settings";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -13,10 +24,14 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "dashboard", label: "Dashboard", href: "/saas/dashboard" },
   { id: "crm", label: "CRM", href: "/saas/crm" },
   { id: "pipeline", label: "Pipeline", href: "/saas/crm?tab=pipeline" },
-  { id: "campanias", label: "Campanas", href: "/saas/campanias" },
+  { id: "campanias", label: "Email Campañas", href: "/saas/campanias" },
+  { id: "sms", label: "SMS Marketing", href: "/saas/sms" },
+  { id: "whatsapp", label: "WhatsApp", href: "/saas/whatsapp" },
   { id: "workflows", label: "Workflows", href: "/saas/workflows" },
-  { id: "billing", label: "Facturacion", href: "/saas/billing", permission: "billing.read" },
-  { id: "settings", label: "Configuracion", href: "/saas/settings", permission: "settings.read" },
+  { id: "formularios", label: "Formularios", href: "/saas/formularios" },
+  { id: "citas", label: "Agenda / Citas", href: "/saas/citas" },
+  { id: "billing", label: "Facturación", href: "/saas/billing", permission: "billing.read" },
+  { id: "settings", label: "Configuración", href: "/saas/settings", permission: "settings.read" },
 ] as const;
 
 /**
