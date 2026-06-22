@@ -166,21 +166,49 @@ function passwordResetHtml(p: Record<string, string>): string {
 }
 
 function planActivatedHtml(p: Record<string, string>): string {
-  return baseHtml(`Plan ${p.plan} activado`, `
-<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">
-  Plan <span style="color:#6366f1;">${p.plan}</span> activado
+  const planLabel = p.plan.charAt(0).toUpperCase() + p.plan.slice(1);
+  const steps = [
+    { n: "1", title: "Completa tu perfil", desc: "Añade el nombre de tu empresa y logotipo.", href: `${p.appUrl}/saas/settings` },
+    { n: "2", title: "Importa tus contactos", desc: "Sube tu CSV o conéctalos desde tu CRM anterior.", href: `${p.appUrl}/saas/crm` },
+    { n: "3", title: "Crea tu primera campaña", desc: "Email, SMS o WhatsApp — en 2 minutos.", href: `${p.appUrl}/saas/campanias` },
+    { n: "4", title: "Activa tus redes sociales", desc: "Conecta Instagram, Facebook, LinkedIn y TikTok.", href: `${p.appUrl}/saas/social` },
+    { n: "5", title: "Configura tu primera automatización", desc: "Workflows que trabajan mientras duermes.", href: `${p.appUrl}/saas/workflows` },
+  ];
+  const stepsHtml = steps.map(s => `
+<tr>
+  <td style="padding:12px 16px;vertical-align:top;">
+    <table cellpadding="0" cellspacing="0"><tr>
+      <td style="width:32px;height:32px;background:#6366f1;border-radius:50%;text-align:center;vertical-align:middle;color:#fff;font-weight:700;font-size:13px;padding:0;">${s.n}</td>
+      <td style="padding-left:12px;">
+        <a href="${s.href}" style="color:#f4f4f5;font-weight:600;font-size:14px;text-decoration:none;">${s.title}</a>
+        <p style="margin:2px 0 0;color:#71717a;font-size:13px;">${s.desc}</p>
+      </td>
+    </tr></table>
+  </td>
+</tr>`).join("");
+
+  return baseHtml(`¡Bienvenido a NELVYON ${planLabel}!`, `
+<h1 style="color:#f4f4f5;font-size:26px;margin:0 0 8px;">
+  🎉 Tu plan <span style="color:#6366f1;">${planLabel}</span> está activo
 </h1>
-<p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 8px;">
-  Tu plan está activo y todos los agentes están disponibles.
+<p style="color:#a1a1aa;font-size:15px;line-height:1.6;margin:0 0 24px;">
+  Tienes acceso completo a todos los módulos de NELVYON. Sigue estos 5 pasos para arrancar hoy mismo:
 </p>
-<p style="color:#71717a;font-size:14px;margin:0 0 24px;">
+<table width="100%" cellpadding="0" cellspacing="0"
+  style="border:1px solid #27272a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
+  ${stepsHtml}
+</table>
+<p style="color:#71717a;font-size:13px;margin:0 0 24px;">
   Próxima renovación: <strong style="color:#f4f4f5;">${p.periodEnd}</strong>
 </p>
-<a href="${p.appUrl}/dashboard"
-   style="display:inline-block;background:#6366f1;color:#fff;padding:14px 28px;
-   border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
-  Abrir dashboard →
-</a>`);
+<a href="${p.appUrl}/saas/dashboard"
+   style="display:inline-block;background:#6366f1;color:#fff;padding:14px 32px;
+   border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.3px;">
+  Ir al dashboard →
+</a>
+<p style="color:#71717a;font-size:12px;margin:20px 0 0;">
+  ¿Necesitas ayuda? Escríbenos a <a href="mailto:danicaste2004@gmail.com" style="color:#6366f1;">danicaste2004@gmail.com</a>
+</p>`);
 }
 
 function invoiceHtml(p: Record<string, string>): string {

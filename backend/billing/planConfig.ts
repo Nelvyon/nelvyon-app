@@ -21,10 +21,10 @@ export const PLAN_NAMES: Record<BillablePlan, string> = {
 
 /** Precios públicos (EUR/mes). agency_partner = wholesale que paga el partner a Nelvyon. */
 export const PLAN_PRICES: Record<BillablePlan, number> = {
-  starter: 47,
-  pro: 197,
-  agency: 497,
-  agency_partner: 197,
+  starter: 97,
+  pro: 297,
+  agency: 797,
+  agency_partner: 297,
 };
 
 export const PLAN_LIMITS: Record<

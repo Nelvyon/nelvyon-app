@@ -25,13 +25,14 @@ STRIPE_PRICE_ID_ENV_MONTHLY: Dict[str, str] = {
 }
 
 # Display-only EUR / month (UI); Stripe collects real amounts via Price IDs.
+# Must match backend/billing/planConfig.ts PLAN_PRICES.
 DISPLAY_BASE_PRICE_EUR: Dict[str, float] = {
-    "starter": 79.0,
-    "pro": 249.0,
-    "enterprise": 449.0,
-    "agency": 449.0,              # alias for enterprise (TS/webhook canonical name)
+    "starter": 97.0,
+    "pro": 297.0,
+    "enterprise": 797.0,
+    "agency": 797.0,              # alias for enterprise (TS/webhook canonical name)
     "partner": 50.0,
-    "agency_partner": 197.0,
+    "agency_partner": 297.0,
 }
 
 # Must match PRICING_PLANS (single source for plan ids / gating).
