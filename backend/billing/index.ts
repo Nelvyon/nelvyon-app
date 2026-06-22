@@ -20,6 +20,14 @@ export {
   readStripePriceEnvDiagnostic,
   type StripePriceEnvDiagnostic,
 } from "./stripePriceEnvAudit";
+export {
+  buildPricePipelineTrace,
+  logPricePipelineTrace,
+  readRailwayDeployDiagnostic,
+  readStripeKeyDiagnostic,
+  type StripeKeyDiagnostic,
+  type StripePricePipelineTrace,
+} from "./stripePricePipelineTrace";
 export type { BillablePlan } from "./planConfig";
 export { CancellationService } from "./cancellationService";
 export { DunningService, resolveTenantIdFromUserId } from "./dunningService";

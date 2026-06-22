@@ -3,6 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticate } from "@nelvyon/auth";
 import { getStripePriceEnvVarName, getStripePriceId, normalizeBillablePlan, type BillablePlan } from "@nelvyon/billing";
 import { readStripePriceEnvDiagnostic, logStripePriceEnvDiagnostic } from "@nelvyon/billing";
+import {
+  buildPricePipelineTrace,
+  logPricePipelineTrace,
+  readRailwayDeployDiagnostic,
+  readStripeKeyDiagnostic,
+} from "../../../../../../../backend/billing/stripePricePipelineTrace";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 import { DbClient } from "../../../../../../../backend/db/DbClient";
@@ -76,6 +82,9 @@ function checkoutError(
 export async function POST(req: NextRequest) {
   const ctx: CheckoutLogContext = {
     stripeSecretKeyConfigured: stripeSecretKeyConfigured(),
+    stripeKey: readStripeKeyDiagnostic(),
+    railway: readRailwayDeployDiagnostic(),
+    legacyFallbackUsed: false,
   };
 
   try {
@@ -137,6 +146,18 @@ export async function POST(req: NextRequest) {
       );
     }
     ctx.stripePriceId = stripePriceId;
+
+    logPricePipelineTrace(
+      "checkout route resolved price",
+      buildPricePipelineTrace({
+        plan,
+        planIdReceived: String(ctx.planIdReceived ?? ""),
+        envVar: envDiagnostic.envVar,
+        raw: envDiagnostic.raw,
+        trimmed: envDiagnostic.trimmed,
+        resolvedPriceId: stripePriceId,
+      }),
+    );
 
     logCheckout("pre_checkout", {
       ...ctx,

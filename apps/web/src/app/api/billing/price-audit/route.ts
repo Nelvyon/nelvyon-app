@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 import {
   CHECKOUT_STRIPE_PLANS,
+  getStripePriceEnvVarName,
   readStripePriceEnvDiagnostic,
-  type BillablePlan,
 } from "@nelvyon/billing";
 
 import {
+  buildPricePipelineTrace,
+  readRailwayDeployDiagnostic,
+  readStripeKeyDiagnostic,
+} from "../../../../../../../backend/billing/stripePricePipelineTrace";
+import {
+  retrieveStripeAccount,
   retrieveStripePrice,
   StripePriceNotFoundError,
 } from "../../../../../../../backend/stripe/stripeApi";
@@ -17,91 +23,93 @@ export const runtime = "nodejs";
 function authorize(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET?.trim();
   if (!secret) return false;
-  const header = req.headers.get("x-cron-secret")?.trim();
-  return header === secret;
-}
-
-type PlanAuditRow = {
-  plan: BillablePlan;
-  envVar: string;
-  processEnvRaw: string | null;
-  processEnvTrimmed: string | null;
-  charCodes: number[];
-  stripeRetrieveOk: boolean;
-  stripePriceId: string | null;
-  stripeActive: boolean | null;
-  envMatchesStripe: boolean | null;
-  error: string | null;
-};
-
-async function auditPlan(plan: BillablePlan): Promise<PlanAuditRow> {
-  const d = readStripePriceEnvDiagnostic(plan);
-  const row: PlanAuditRow = {
-    plan,
-    envVar: d.envVar,
-    processEnvRaw: d.raw ?? null,
-    processEnvTrimmed: d.trimmed ?? null,
-    charCodes: d.charCodes,
-    stripeRetrieveOk: false,
-    stripePriceId: null,
-    stripeActive: null,
-    envMatchesStripe: null,
-    error: null,
-  };
-
-  if (!d.trimmed) {
-    row.error = `Falta variable de entorno: ${d.envVar}`;
-    return row;
-  }
-
-  try {
-    const price = await retrieveStripePrice(d.trimmed);
-    row.stripeRetrieveOk = true;
-    row.stripePriceId = price.id;
-    row.stripeActive = price.active;
-    row.envMatchesStripe = price.id === d.trimmed;
-    if (!price.active) {
-      row.error = "Price existe en Stripe pero está inactivo";
-    }
-  } catch (e: unknown) {
-    if (e instanceof StripePriceNotFoundError) {
-      row.error = e.message;
-    } else {
-      row.error = e instanceof Error ? e.message : String(e);
-    }
-  }
-
-  return row;
+  return req.headers.get("x-cron-secret")?.trim() === secret;
 }
 
 /**
  * GET /api/billing/price-audit
- * Header: x-cron-secret = CRON_SECRET
- * Compara process.env STRIPE_PRICE_ID_* vs stripe.prices.retrieve en la cuenta Live/Test del secret key.
+ * Evidencia: process.env exacto, sin fallback legacy, retrieve vs checkout, cuenta/modo Stripe, deploy Railway.
  */
 export async function GET(req: NextRequest) {
   if (!authorize(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const stripeSecretConfigured = Boolean(
-    (process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_API_KEY ?? "").trim(),
-  );
-  const stripeKeyMode = (process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_API_KEY ?? "").startsWith("sk_live")
-    ? "live"
-    : (process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_API_KEY ?? "").startsWith("sk_test")
-      ? "test"
-      : "unknown";
+  const stripeKey = readStripeKeyDiagnostic();
+  const railway = readRailwayDeployDiagnostic();
 
-  const plans = await Promise.all(CHECKOUT_STRIPE_PLANS.map((plan) => auditPlan(plan)));
+  let stripeAccount: { id: string; email: string | null } | null = null;
+  let stripeAccountError: string | null = null;
+  if (stripeKey.isConfigured) {
+    try {
+      stripeAccount = await retrieveStripeAccount();
+    } catch (e) {
+      stripeAccountError = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  const plans = await Promise.all(
+    CHECKOUT_STRIPE_PLANS.map(async (plan) => {
+      const d = readStripePriceEnvDiagnostic(plan);
+      const envVar = getStripePriceEnvVarName(plan);
+      const trace = buildPricePipelineTrace({
+        plan,
+        planIdReceived: plan,
+        envVar,
+        raw: d.raw,
+        trimmed: d.trimmed,
+        resolvedPriceId: d.trimmed ?? null,
+        checkoutLineItemPrice: d.trimmed ?? null,
+      });
+
+      const row: Record<string, unknown> = {
+        ...trace,
+        charCodes: d.charCodes,
+        stripeRetrieveOk: false,
+        stripePriceIdFromApi: null as string | null,
+        stripeActive: null as boolean | null,
+        error: null as string | null,
+      };
+
+      if (!d.trimmed) {
+        row.error = `Falta ${envVar}`;
+        return row;
+      }
+
+      try {
+        const price = await retrieveStripePrice(d.trimmed);
+        row.stripeRetrieveOk = true;
+        row.stripePriceIdFromApi = price.id;
+        row.stripeActive = price.active;
+        row.envMatchesStripeApi = price.id === d.trimmed;
+        if (!price.active) row.error = "Price inactivo en Stripe";
+      } catch (e) {
+        if (e instanceof StripePriceNotFoundError) {
+          row.error = e.message;
+        } else {
+          row.error = e instanceof Error ? e.message : String(e);
+        }
+      }
+
+      return row;
+    }),
+  );
 
   return NextResponse.json({
     timestamp: new Date().toISOString(),
     service: "@nelvyon/web",
-    stripeSecretConfigured,
-    stripeKeyMode,
-    note: "Checkout SaaS usa solo STRIPE_PRICE_ID_STARTER|PRO|AGENCY en este servicio. Python API (:8000) usa las mismas vars para monthly.",
+    legacyFallbackUsed: false,
+    envVarsUsed: {
+      starter: "STRIPE_PRICE_ID_STARTER",
+      pro: "STRIPE_PRICE_ID_PRO",
+      agency: "STRIPE_PRICE_ID_AGENCY",
+    },
+    frontendPlanId: "starter → POST { planId: \"starter\" } → normalizeBillablePlan → STRIPE_PRICE_ID_STARTER",
+    stripeKey,
+    stripeAccount,
+    stripeAccountError,
+    railway,
     plans,
-    allValid: plans.every((p) => p.stripeRetrieveOk && p.stripeActive && !p.error),
+    allValid: plans.every((p) => p.stripeRetrieveOk === true && !p.error),
   });
 }

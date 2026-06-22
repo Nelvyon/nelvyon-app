@@ -4,6 +4,11 @@ import {
   logStripePriceEnvDiagnostic,
   readStripePriceEnvDiagnostic,
 } from "../billing/stripePriceEnvAudit";
+import {
+  buildPricePipelineTrace,
+  logPricePipelineTrace,
+  readStripeKeyDiagnostic,
+} from "../billing/stripePricePipelineTrace";
 
 export const STRIPE_API_BASE = "https://api.stripe.com/v1";
 
@@ -112,10 +117,22 @@ function parseStripeApiFailure(message: string): StripeApiFailure | null {
 
 /** stripe.prices.retrieve — valida que el Price ID existe en la cuenta Stripe conectada. */
 export async function retrieveStripePrice(priceId: string): Promise<{ id: string; active: boolean }> {
-  return stripeRequest<{ id: string; active: boolean }>(
-    "GET",
-    `/prices/${encodeURIComponent(priceId)}`,
+  const retrievePath = `/prices/${encodeURIComponent(priceId)}`;
+  console.error(
+    "[billing/stripe-api] stripe.prices.retrieve",
+    JSON.stringify({
+      retrievePath,
+      priceIdArgument: priceId,
+      priceIdLength: priceId.length,
+      stripeKey: readStripeKeyDiagnostic(),
+    }),
   );
+  return stripeRequest<{ id: string; active: boolean }>("GET", retrievePath);
+}
+
+/** Cuenta Stripe asociada al STRIPE_SECRET_KEY activo (detecta Live/Test y cuenta). */
+export async function retrieveStripeAccount(): Promise<{ id: string; email: string | null }> {
+  return stripeRequest<{ id: string; email: string | null }>("GET", "/account");
 }
 
 /**
@@ -129,13 +146,45 @@ export async function validateStripePriceForPlan(plan: BillablePlan): Promise<st
   const priceId = getStripePriceId(plan);
   const envVar = getStripePriceEnvVarName(plan);
 
+  logPricePipelineTrace(
+    "before retrieve",
+    buildPricePipelineTrace({
+      plan,
+      planIdReceived: plan,
+      envVar,
+      raw: envDiagnostic.raw,
+      trimmed: envDiagnostic.trimmed,
+      resolvedPriceId: priceId,
+    }),
+  );
+
   if (envDiagnostic.trimmed !== priceId) {
     logStripePriceEnvDiagnostic("trim mismatch after getStripePriceId", envDiagnostic, { resolved: priceId });
+  }
+
+  let stripeAccountId: string | null = null;
+  try {
+    const account = await retrieveStripeAccount();
+    stripeAccountId = account.id;
+    console.error(
+      "[billing/stripe-api] stripe account for active secret key",
+      JSON.stringify({
+        stripeAccountId: account.id,
+        stripeAccountEmail: account.email,
+        stripeKey: readStripeKeyDiagnostic(),
+      }),
+    );
+  } catch (accountErr) {
+    console.error(
+      "[billing/stripe-api] stripe account retrieve failed",
+      accountErr instanceof Error ? accountErr.message : String(accountErr),
+    );
   }
 
   try {
     logStripePriceEnvDiagnostic("stripe.prices.retrieve attempt", envDiagnostic, {
       retrievePriceId: priceId,
+      stripeAccountId,
     });
     const price = await retrieveStripePrice(priceId);
     logStripePriceEnvDiagnostic("stripe.prices.retrieve ok", envDiagnostic, {
@@ -169,8 +218,17 @@ export async function validateStripePriceForPlan(plan: BillablePlan): Promise<st
         retrievePriceId: priceId,
         stripeMessage: failure.stripeMessage,
         stripeHttpStatus: failure.httpStatus,
+        stripeAccountId,
+        stripeKey: readStripeKeyDiagnostic(),
+        hint:
+          "Si el Price existe en Stripe Dashboard pero falla aquí, STRIPE_SECRET_KEY (sk_live/sk_test) no pertenece a la misma cuenta/modo que el Price ID en STRIPE_PRICE_ID_*.",
       });
-      throw new StripePriceNotFoundError(plan, priceId, envVar, failure.stripeMessage);
+      throw new StripePriceNotFoundError(
+        plan,
+        priceId,
+        envVar,
+        `${failure.stripeMessage} — Cuenta API: ${stripeAccountId ?? "unknown"}, modo clave: ${readStripeKeyDiagnostic().prefix}`,
+      );
     }
     throw e;
   }
@@ -216,19 +274,27 @@ export async function createSubscriptionCheckoutSession(opts: {
   }
 
   const checkoutLineItemPrice = body["line_items[0][price]"];
+  logPricePipelineTrace(
+    "checkout.sessions.create",
+    buildPricePipelineTrace({
+      plan: opts.plan,
+      planIdReceived: opts.plan,
+      envVar: envDiagnostic.envVar,
+      raw: envDiagnostic.raw,
+      trimmed: envDiagnostic.trimmed,
+      resolvedPriceId: priceId,
+      checkoutLineItemPrice: String(checkoutLineItemPrice ?? ""),
+    }),
+  );
   console.error(
-    "[billing/checkout-session] stripe.checkout.sessions.create",
+    "[billing/checkout-session] stripe.checkout.sessions.create body",
     JSON.stringify({
       plan: opts.plan,
-      envVar: envDiagnostic.envVar,
-      processEnv_STRIPE_PRICE_ID: envDiagnostic.trimmed ?? null,
+      line_items_0_price: checkoutLineItemPrice,
       processEnvRaw: envDiagnostic.raw ?? null,
-      line_items_0_price_sent_to_stripe: checkoutLineItemPrice,
-      priceIdFromValidate: priceId,
-      valuesMatch: checkoutLineItemPrice === priceId && priceId === envDiagnostic.trimmed,
-      mode: body.mode,
-      hasCustomer: Boolean(body.customer),
-      hasCustomerEmail: Boolean(body.customer_email),
+      processEnvTrimmed: envDiagnostic.trimmed ?? null,
+      legacyFallbackUsed: false,
+      stripeKey: readStripeKeyDiagnostic(),
     }),
   );
 

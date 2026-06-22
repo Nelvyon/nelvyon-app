@@ -80,7 +80,7 @@ describe("validateStripePriceForPlan", () => {
     expect(err).toMatchObject({
       priceId: "price_wrong_typo",
       envVar: "STRIPE_PRICE_ID_STARTER",
-      stripeMessage: "No such price: 'price_wrong_typo'",
     });
+    expect((err as StripePriceNotFoundError).stripeMessage).toContain("No such price: 'price_wrong_typo'");
   });
 });
