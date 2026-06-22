@@ -80,7 +80,8 @@ async def _read_tenant_plan(db_session, workspace_id: int = 1) -> str | None:
 
 @pytest.fixture
 def sync_flag_off(monkeypatch):
-    monkeypatch.delenv("SAAS_BILLING_SYNC_ENABLED", raising=False)
+    # Explicitly disable (default is now ON — set to "false" to opt out).
+    monkeypatch.setenv("SAAS_BILLING_SYNC_ENABLED", "false")
 
 
 @pytest.fixture
