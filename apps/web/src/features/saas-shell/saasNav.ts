@@ -4,9 +4,12 @@ export type SaasNavId =
   | "crm"
   | "pipeline"
   | "campanias"
-  | "workflows"
   | "sms"
   | "whatsapp"
+  | "social"
+  | "publicidad"
+  | "seo"
+  | "workflows"
   | "formularios"
   | "citas"
   | "billing"
@@ -27,6 +30,9 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "campanias", label: "Email Campañas", href: "/saas/campanias" },
   { id: "sms", label: "SMS Marketing", href: "/saas/sms" },
   { id: "whatsapp", label: "WhatsApp", href: "/saas/whatsapp" },
+  { id: "social", label: "Redes Sociales", href: "/saas/social" },
+  { id: "publicidad", label: "Publicidad", href: "/saas/publicidad" },
+  { id: "seo", label: "SEO", href: "/saas/seo" },
   { id: "workflows", label: "Workflows", href: "/saas/workflows" },
   { id: "formularios", label: "Formularios", href: "/saas/formularios" },
   { id: "citas", label: "Agenda / Citas", href: "/saas/citas" },
