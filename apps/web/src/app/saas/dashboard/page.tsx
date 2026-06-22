@@ -10,6 +10,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { CommercialPipelineSection } from "@/features/saas-deals/components/CommercialPipelineSection";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { ActivationChecklist } from "@/features/saas-shell/components/ActivationChecklist";
 import { trackEvent } from "@/lib/analytics";
 import type { SaasPlan, SaasTenantDto } from "../onboarding/components/types";
 
@@ -141,6 +142,8 @@ export default function SaasDashboardPage() {
 
         <main className="space-y-6">
           <NelvyonDsSectionHeader eyebrow="SaaS Dashboard" title={t("dashboard.welcome", { company: tenant.companyName })} subtitle={now} />
+
+          <ActivationChecklist />
 
           <CommercialPipelineSection />
 
