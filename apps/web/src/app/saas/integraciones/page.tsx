@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -109,6 +110,9 @@ function IntegrationCard({ integration, onConnect }: { integration: Integration;
 export default function SaasIntegracionesPage() {
   const [integrations, setIntegrations] = useState<Integration[]>(STATIC_PROVIDERS);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const oauthSuccess = searchParams.get("oauth_success");
+  const oauthError = searchParams.get("oauth_error");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -161,6 +165,17 @@ export default function SaasIntegracionesPage() {
           title="Integraciones"
           subtitle="Conecta Nelvyon con las herramientas que ya usas"
         />
+
+        {oauthSuccess && (
+          <div className="rounded-xl bg-green-500/10 border border-green-500/30 px-4 py-3 text-sm text-green-400">
+            ✅ {oauthSuccess} conectado correctamente.
+          </div>
+        )}
+        {oauthError && (
+          <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
+            ❌ Error al conectar: {oauthError}. Asegúrate de haber añadido las variables de entorno en Railway.
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {[
