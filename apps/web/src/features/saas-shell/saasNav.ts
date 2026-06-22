@@ -17,6 +17,7 @@ export type SaasNavId =
   | "agentes"
   | "chat"
   | "lms"
+  | "copywriter"
   | "helpdesk"
   | "afiliados"
   | "reportes"
@@ -61,6 +62,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes", group: "ia" },
   { id: "chat", label: "💬 Asistente IA", href: "/saas/chat", group: "ia" },
   { id: "lms", label: "Cursos / LMS", href: "/saas/lms", group: "ia" },
+  { id: "copywriter", label: "✍️ Copywriter IA", href: "/saas/copywriter", group: "ia" },
   // Cuenta
   { id: "reportes", label: "Reportes", href: "/saas/reportes", group: "cuenta" },
   { id: "integraciones", label: "Integraciones", href: "/saas/integraciones", group: "cuenta" },
