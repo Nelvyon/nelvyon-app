@@ -20,8 +20,17 @@ type ActivityItem = {
   createdAt: string;
 };
 
+type ModuleStats = {
+  contacts: number;
+  campaigns: number;
+  activeWorkflows: number;
+  forms: number;
+  upcomingAppointments: number;
+};
+
 type DashboardSummary = {
   tenant: SaasTenantDto;
+  moduleStats?: ModuleStats;
   activeJobs: number;
   completedJobs: number;
   totalSpend: number;
@@ -135,6 +144,33 @@ export default function SaasDashboardPage() {
 
           <CommercialPipelineSection />
 
+          {/* Module stats */}
+          {summary.moduleStats && (
+            <>
+              <NelvyonDsSectionHeader
+                eyebrow="Marketing"
+                title="Estado de tus módulos"
+                subtitle="Métricas reales de CRM, campañas, workflows y más."
+              />
+              <section className="grid gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                {[
+                  { label: "Contactos CRM", value: summary.moduleStats.contacts, href: "/saas/crm" },
+                  { label: "Campañas", value: summary.moduleStats.campaigns, href: "/saas/campanias" },
+                  { label: "Workflows activos", value: summary.moduleStats.activeWorkflows, href: "/saas/workflows" },
+                  { label: "Formularios", value: summary.moduleStats.forms, href: "/saas/formularios" },
+                  { label: "Citas próximas", value: summary.moduleStats.upcomingAppointments, href: "/saas/citas" },
+                ].map((s) => (
+                  <Link key={s.label} href={s.href}>
+                    <NelvyonDsCard className="transition-colors hover:border-primary/50 hover:bg-primary/5">
+                      <p className="text-xs text-muted-foreground">{s.label}</p>
+                      <p className="mt-1 text-3xl font-bold text-foreground">{s.value}</p>
+                    </NelvyonDsCard>
+                  </Link>
+                ))}
+              </section>
+            </>
+          )}
+
           <NelvyonDsSectionHeader
             eyebrow="Operaciones"
             title="Actividad del tenant"
@@ -204,13 +240,25 @@ export default function SaasDashboardPage() {
                   <Link href="/saas/crm?tab=pipeline">Ver pipeline comercial</Link>
                 </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
-                  <Link href="/saas/campanias">Ver campanas</Link>
+                  <Link href="/saas/campanias">Campañas de email</Link>
                 </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
-                  <Link href="/saas/workflows">Ver workflows</Link>
+                  <Link href="/saas/sms">SMS Marketing</Link>
                 </NelvyonDsButton>
                 <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
-                  <Link href="/dashboard/settings">Configuracion y facturacion</Link>
+                  <Link href="/saas/whatsapp">WhatsApp Business</Link>
+                </NelvyonDsButton>
+                <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
+                  <Link href="/saas/workflows">Workflows</Link>
+                </NelvyonDsButton>
+                <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
+                  <Link href="/saas/formularios">Formularios</Link>
+                </NelvyonDsButton>
+                <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
+                  <Link href="/saas/citas">Agenda y citas</Link>
+                </NelvyonDsButton>
+                <NelvyonDsButton asChild variant="secondary" className="w-full justify-start">
+                  <Link href="/saas/billing">Facturación</Link>
                 </NelvyonDsButton>
               </div>
               {hasNoJobs ? (
