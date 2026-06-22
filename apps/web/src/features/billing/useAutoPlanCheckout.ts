@@ -23,7 +23,7 @@ export function useAutoPlanCheckout(returnPath = "/precios") {
   const started = useRef(false);
 
   useEffect(() => {
-    if (isBootstrapping || started.current) return;
+    if (isBootstrapping || started.current || !searchParams) return;
     const plan = parsePlan(searchParams.get("plan"));
     if (!plan) return;
 
