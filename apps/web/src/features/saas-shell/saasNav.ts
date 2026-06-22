@@ -38,6 +38,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "formularios", label: "Formularios", href: "/saas/formularios" },
   { id: "citas", label: "Agenda / Citas", href: "/saas/citas" },
   { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes" },
+  { id: "citas", label: "💬 Asistente IA", href: "/saas/chat" },
   { id: "billing", label: "Facturación", href: "/saas/billing", permission: "billing.read" },
   { id: "settings", label: "Configuración", href: "/saas/settings", permission: "settings.read" },
 ] as const;
