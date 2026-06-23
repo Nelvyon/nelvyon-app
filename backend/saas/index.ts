@@ -362,3 +362,60 @@ export {
   type SaasSettingsSummary,
   type SaasUsageCounts,
 } from "./SaasBillingService";
+export {
+  SaasSnippetsService,
+  SaasSnippetsError,
+  getSaasSnippetsService,
+  resetSaasSnippetsServiceForTests,
+  type SaasSnippet,
+  type CreateSnippetInput,
+} from "./SaasSnippetsService";
+export {
+  SaasWebhooksService,
+  SaasWebhooksError,
+  getSaasWebhooksService,
+  resetSaasWebhooksServiceForTests,
+  type SaasWebhook,
+  type SaasWebhookDelivery,
+  type CreateWebhookInput,
+} from "./SaasWebhooksService";
+export {
+  SaasApiKeysService,
+  SaasApiKeysError,
+  getSaasApiKeysService,
+  resetSaasApiKeysServiceForTests,
+  type SaasApiKey,
+  type CreateApiKeyInput,
+  type CreateApiKeyResult,
+} from "./SaasApiKeysService";
+export {
+  SaasCalendarService,
+  SaasCalendarError,
+  getSaasCalendarService,
+  resetSaasCalendarServiceForTests,
+  type SaasCalendarEvent,
+  type CreateCalendarEventInput,
+  type CalendarEventType,
+} from "./SaasCalendarService";
+export {
+  SaasTeamService,
+  SaasTeamError,
+  getSaasTeamService,
+  resetSaasTeamServiceForTests,
+  type SaasTeamMember,
+  type InviteTeamMemberInput,
+  type TeamMemberRole,
+  type TeamMemberStatus,
+} from "./SaasTeamService";
+export {
+  SaasInboxService,
+  SaasInboxError,
+  getSaasInboxService,
+  resetSaasInboxServiceForTests,
+  type SaasConversation,
+  type SaasMessage,
+  type CreateConversationInput,
+  type SendMessageInput,
+  type InboxChannel,
+  type ConversationStatus,
+} from "./SaasInboxService";

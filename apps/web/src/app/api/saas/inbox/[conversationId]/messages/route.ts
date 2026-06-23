@@ -5,46 +5,38 @@ import {
   saasErrorBody,
   saasErrorStatus,
   requireSaasContext,
-  type InboxChannel,
 } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function mapError(e: SaasInboxError): NextResponse {
-  const status = e.code === "NOT_FOUND" ? 404 : e.code === "FORBIDDEN" ? 403 : 400;
+  const status = e.code === "NOT_FOUND" ? 404 : 400;
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }
 
-export async function GET(req: Request) {
+export async function GET(req: Request, { params }: { params: { conversationId: string } }) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const url = new URL(req.url);
-    const conversations = await getSaasInboxService().listConversations(ctx.tenant.id, {
-      status: url.searchParams.get("status") ?? undefined,
-      channel: url.searchParams.get("channel") ?? undefined,
-      assignedTo: url.searchParams.get("assigned_to") ?? undefined,
-    });
-    return NextResponse.json({ conversations });
+    const messages = await getSaasInboxService().listMessages(ctx.tenant.id, params.conversationId);
+    return NextResponse.json({ messages });
   } catch (e: unknown) {
     if (e instanceof SaasInboxError) return mapError(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: Request, { params }: { params: { conversationId: string } }) {
   try {
     const ctx = await requireSaasContext(req, "contacts.write");
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const b = body as Record<string, unknown>;
-    const conversation = await getSaasInboxService().createConversation(ctx.tenant.id, {
-      contactId: typeof b.contact_id === "string" ? b.contact_id : null,
-      channel: typeof b.channel === "string" ? (b.channel as InboxChannel) : "chat",
-      assignedTo: typeof b.assigned_to === "string" ? b.assigned_to : null,
-      firstMessage: typeof b.first_message === "string" ? b.first_message : undefined,
+    const message = await getSaasInboxService().sendMessage(ctx.tenant.id, params.conversationId, {
+      body: typeof b.body === "string" ? b.body : "",
+      direction: b.direction === "inbound" ? "inbound" : "outbound",
     });
-    return NextResponse.json({ conversation }, { status: 201 });
+    return NextResponse.json({ message }, { status: 201 });
   } catch (e: unknown) {
     if (e instanceof SaasInboxError) return mapError(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
