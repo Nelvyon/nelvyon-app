@@ -22,7 +22,8 @@ export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "workflows.read");
     const workflows = await getSaasWorkflowService().getWorkflows(ctx.tenant.id);
-    return NextResponse.json({ workflows });
+    const ses_configured = Boolean(process.env.SES_FROM_EMAIL && process.env.SES_ACCESS_KEY_ID);
+    return NextResponse.json({ workflows, ses_configured });
   } catch (e: unknown) {
     if (e instanceof SaasWorkflowError) return mapError(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

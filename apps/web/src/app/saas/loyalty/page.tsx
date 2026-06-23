@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 interface LoyaltyMember {
@@ -56,11 +56,7 @@ export default function SaasLoyaltyPage() {
   members.forEach(m => { tierCounts[m.tier] = (tierCounts[m.tier] ?? 0) + 1; });
 
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <SaasSidebar activeId="crm" />
-          <main className="space-y-6">
+    <SaasShellLayout sidebar={<SaasSidebar activeId="crm" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Programa de Fidelización" subtitle="Recompensa a tus mejores clientes con puntos, niveles y descuentos" />
@@ -156,9 +152,6 @@ export default function SaasLoyaltyPage() {
           )
         )}
       </div>
-          </main>
-        </div>
-      </div>
-    </DashboardLayout>
+    </SaasShellLayout>
   );
 }

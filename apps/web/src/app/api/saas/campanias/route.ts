@@ -22,7 +22,8 @@ export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "campanias.read");
     const campanias = await getSaasCampaniasService().getCampanias(ctx.tenant.id);
-    return NextResponse.json({ campanias });
+    const ses_configured = Boolean(process.env.SES_FROM_EMAIL && process.env.SES_ACCESS_KEY_ID);
+    return NextResponse.json({ campanias, ses_configured });
   } catch (e: unknown) {
     if (e instanceof SaasCampaniasError) return mapError(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

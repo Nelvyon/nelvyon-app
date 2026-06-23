@@ -492,7 +492,16 @@ ${ctaBlock}
 
       for (const contactId of contactIds) {
         const email = emailByContactId.get(contactId);
-        if (!email) continue;
+        if (!email) {
+          // Contact has no email address — mark bounced instead of silently skipping
+          await this.db.query(
+            `UPDATE saas_campania_recipients
+             SET status = 'bounced', sent_at = NOW()
+             WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+            [tenantId, campaniaId, contactId],
+          );
+          continue;
+        }
 
         const html = buildHtml(contactId);
         const status = await sendCampaniaEmail(email, subject, html, { campaniaId, contactId, tenantId });

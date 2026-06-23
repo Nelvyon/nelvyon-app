@@ -43,6 +43,15 @@ export type ServicePackDefinition = {
   demoExample?: string;
 };
 
+/**
+ * SKU → Pack mapping (autonomous agents only):
+ *   local-business-growth   → NELVYON-LANDING + NELVYON-SEO + NELVYON-CHATBOT
+ *   ecommerce-growth        → NELVYON-LANDING + NELVYON-SEO + NELVYON-CHATBOT
+ *   saas-b2b-growth         → NELVYON-LANDING + NELVYON-SEO + NELVYON-CHATBOT
+ *
+ * coming_soon packs have no backend SKUs — do NOT change availability without kickoff route.
+ * analytics-insights (beta) uses the same SKU sequence but filtered; see packRegistry.ts.
+ */
 export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
   {
     id: LOCAL_GROWTH_PACK_ID,

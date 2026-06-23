@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 type Sentiment = "positive" | "neutral" | "negative";
@@ -126,11 +126,7 @@ export default function SaasReputacionPage() {
   const score = mentions.length > 0 ? Math.round((positive / mentions.length) * 100) : 0;
 
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <SaasSidebar activeId="seo" />
-          <main className="space-y-6">
+    <SaasShellLayout sidebar={<SaasSidebar activeId="seo" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Reputación & Menciones" subtitle="Monitorea lo que dicen de tu marca en internet y redes sociales" />
@@ -225,9 +221,6 @@ export default function SaasReputacionPage() {
         )}
       </div>
       {showNew && <NewAlertModal onClose={() => setShowNew(false)} onSaved={load} />}
-          </main>
-        </div>
-      </div>
-    </DashboardLayout>
+    </SaasShellLayout>
   );
 }

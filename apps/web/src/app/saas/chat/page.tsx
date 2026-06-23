@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 interface Message {
@@ -70,11 +70,7 @@ export default function SaasChatPage() {
   }
 
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <SaasSidebar activeId="agentes" />
-          <main className="space-y-6">
+    <SaasShellLayout sidebar={<SaasSidebar activeId="agentes" />}>
       <div className="flex h-[calc(100vh-80px)] flex-col gap-4">
         <NelvyonDsSectionHeader
           title="Asistente IA"
@@ -146,9 +142,6 @@ export default function SaasChatPage() {
           </div>
         </NelvyonDsCard>
       </div>
-          </main>
-        </div>
-      </div>
-    </DashboardLayout>
+    </SaasShellLayout>
   );
 }

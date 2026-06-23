@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 interface Report {
@@ -64,11 +64,7 @@ export default function SaasReportesPage() {
   }
 
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <SaasSidebar activeId="dashboard" />
-          <main className="space-y-6">
+    <SaasShellLayout sidebar={<SaasSidebar activeId="dashboard" />}>
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader title="Reportes" subtitle="Genera y descarga informes ejecutivos de todos tus módulos en PDF" />
 
@@ -132,9 +128,6 @@ export default function SaasReportesPage() {
           )}
         </div>
       </div>
-          </main>
-        </div>
-      </div>
-    </DashboardLayout>
+    </SaasShellLayout>
   );
 }

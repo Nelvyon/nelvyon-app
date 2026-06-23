@@ -8,7 +8,7 @@ import {
   NelvyonDsSectionHeader,
   NelvyonDsBadge,
 } from "@/design-system/components";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 // ─── Sección 1: Descargas ────────────────────────────────────────────────────
@@ -172,11 +172,7 @@ function ApiKeyCard() {
 
 export default function HerramientasPage() {
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <SaasSidebar activeId="herramientas" />
-          <main className="space-y-10">
+    <SaasShellLayout sidebar={<SaasSidebar activeId="herramientas" />}>
             {/* ── Encabezado ── */}
             <NelvyonDsSectionHeader
               title="Herramientas & Descargas"
@@ -302,9 +298,6 @@ export default function HerramientasPage() {
                 ))}
               </div>
             </section>
-          </main>
-        </div>
-      </div>
-    </DashboardLayout>
+    </SaasShellLayout>
   );
 }

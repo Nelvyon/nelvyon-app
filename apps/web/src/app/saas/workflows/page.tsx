@@ -46,6 +46,7 @@ export default function SaasWorkflowsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const [sesConfigured, setSesConfigured] = useState<boolean | null>(null);
   const [selected, setSelected] = useState<Workflow | null>(null);
   const [runs, setRuns] = useState<WorkflowRun[]>([]);
   const [showEditor, setShowEditor] = useState(false);
@@ -82,8 +83,9 @@ export default function SaasWorkflowsPage() {
       return;
     }
     if (!res.ok) throw new Error("No se pudieron cargar workflows");
-    const body = (await res.json()) as { workflows: Workflow[] };
+    const body = (await res.json()) as { workflows: Workflow[]; ses_configured?: boolean };
     setWorkflows(body.workflows ?? []);
+    setSesConfigured(body.ses_configured ?? false);
   }
 
   async function refreshAll() {
@@ -188,6 +190,12 @@ export default function SaasWorkflowsPage() {
 
       {isViewer ? (
         <SaasPermissionDenied message="Tu rol es solo lectura. Puedes ver workflows, pero no crearlos ni ejecutarlos." />
+      ) : null}
+
+      {sesConfigured === false ? (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+          <strong>Email no configurado:</strong> las acciones de tipo "Enviar email" fallarán hasta que definas <code className="text-amber-200">SES_FROM_EMAIL</code> y <code className="text-amber-200">SES_ACCESS_KEY_ID</code> en Railway.
+        </div>
       ) : null}
 
       <div className="flex flex-wrap gap-2">

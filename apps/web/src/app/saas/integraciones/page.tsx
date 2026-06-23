@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 interface Integration {
@@ -158,11 +158,7 @@ function IntegracionesContent() {
   const connected = integrations.filter(i => i.status === "connected").length;
 
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <SaasSidebar activeId="settings" />
-          <main className="space-y-6">
+    <SaasShellLayout sidebar={<SaasSidebar activeId="settings" />}>
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader
           title="Integraciones"
@@ -216,10 +212,7 @@ function IntegracionesContent() {
           </div>
         )}
       </div>
-          </main>
-        </div>
-      </div>
-    </DashboardLayout>
+    </SaasShellLayout>
   );
 }
 

@@ -375,6 +375,14 @@ export class SaasWorkflowService {
     for (const wf of workflows) {
       if (wf.status !== "active" || wf.triggerType !== triggerType) continue;
       if (!this.matchesTriggerConfig(wf.triggerType, wf.triggerConfig, triggerData)) continue;
+
+      // Idempotency for scheduled workflows: skip if already ran in the last 4 minutes
+      // (cron runs every 5 min — prevents double execution on retries or overlapping calls)
+      if (triggerType === "scheduled" && wf.lastRunAt) {
+        const msSinceLast = Date.now() - new Date(wf.lastRunAt).getTime();
+        if (msSinceLast < 4 * 60 * 1000) continue;
+      }
+
       await this.executeWorkflow(wf.id, tenantId, triggerData);
     }
   }

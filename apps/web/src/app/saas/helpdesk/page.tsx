@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 type Priority = "low" | "medium" | "high" | "urgent";
@@ -126,11 +126,7 @@ export default function SaasHelpdeskPage() {
   const urgent = tickets.filter(t => t.priority === "urgent" && t.status !== "resolved" && t.status !== "closed").length;
 
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <SaasSidebar activeId="crm" />
-          <main className="space-y-6">
+    <SaasShellLayout sidebar={<SaasSidebar activeId="crm" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Helpdesk / Soporte" subtitle="Gestiona tickets de soporte de tus clientes desde un solo lugar" />
@@ -189,9 +185,6 @@ export default function SaasHelpdeskPage() {
         )}
       </div>
       {showNew && <NewTicketModal onClose={() => setShowNew(false)} onSaved={load} />}
-          </main>
-        </div>
-      </div>
-    </DashboardLayout>
+    </SaasShellLayout>
   );
 }

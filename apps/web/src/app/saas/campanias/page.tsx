@@ -42,6 +42,7 @@ export default function SaasCampaniasPage() {
   const [tenantPlan, setTenantPlan] = useState<"starter" | "pro" | "enterprise">("starter");
   const [tenantCompany, setTenantCompany] = useState("");
   const [campanias, setCampanias] = useState<Campania[]>([]);
+  const [sesConfigured, setSesConfigured] = useState<boolean | null>(null);
   const [tab, setTab] = useState<"all" | "active" | "completed" | "draft">("all");
   const [showWizard, setShowWizard] = useState(false);
   const [step, setStep] = useState(1);
@@ -84,8 +85,9 @@ export default function SaasCampaniasPage() {
       return;
     }
     if (!res.ok) throw new Error("No se pudieron cargar campanias");
-    const bodyRes = (await res.json()) as { campanias: Campania[] };
+    const bodyRes = (await res.json()) as { campanias: Campania[]; ses_configured?: boolean };
     setCampanias(bodyRes.campanias ?? []);
+    setSesConfigured(bodyRes.ses_configured ?? false);
   }
 
   async function refresh() {
@@ -232,6 +234,11 @@ export default function SaasCampaniasPage() {
       </div>
           {isViewer ? (
             <SaasPermissionDenied message="Tu rol es solo lectura. Puedes ver campañas, pero no crear ni lanzar." />
+          ) : null}
+          {sesConfigured === false ? (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+              <strong>Email no configurado:</strong> las variables <code className="text-amber-200">SES_FROM_EMAIL</code> y <code className="text-amber-200">SES_ACCESS_KEY_ID</code> no están definidas en el servidor. Los envíos de email fallarán hasta que las configures en Railway.
+            </div>
           ) : null}
           <div className="flex flex-wrap gap-2">
             {(["all", "active", "completed", "draft"] as const).map((t) => (
