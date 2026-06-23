@@ -1,6 +1,7 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
+import { dispatchContactCreated } from "./saasWorkflowDispatch";
 
 export type ContactStatus = "lead" | "prospect" | "client" | "churned";
 export type PipelineStage = "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
@@ -224,7 +225,9 @@ export class SaasCrmService {
       );
       const row = rows[0];
       if (!row) throw new SaasCrmError("Failed to create contact", "CONSTRAINT");
-      return rowToContact(row);
+      const contact = rowToContact(row);
+      void dispatchContactCreated(tenantId, contact);
+      return contact;
     } catch (e: unknown) {
       if (isCheckViolation(e)) {
         throw new SaasCrmError("Invalid status or pipeline_stage", "CONSTRAINT");

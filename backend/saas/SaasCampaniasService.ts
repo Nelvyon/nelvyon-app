@@ -9,7 +9,12 @@ import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
 
 const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
 
-async function sendCampaniaEmail(to: string, subject: string, html: string): Promise<"sent" | "bounced"> {
+async function sendCampaniaEmail(
+  to: string,
+  subject: string,
+  html: string,
+  meta?: { campaniaId: string; contactId: string; tenantId: string },
+): Promise<"sent" | "bounced"> {
   try {
     const client = getSesClient();
     await client.send(
@@ -20,6 +25,13 @@ async function sendCampaniaEmail(to: string, subject: string, html: string): Pro
           Subject: { Data: subject, Charset: "UTF-8" },
           Body: { Html: { Data: html, Charset: "UTF-8" } },
         },
+        ...(meta && {
+          Tags: [
+            { Name: "campania_id", Value: meta.campaniaId },
+            { Name: "contact_id", Value: meta.contactId },
+            { Name: "tenant_id", Value: meta.tenantId },
+          ],
+        }),
       }),
     );
     return "sent";
@@ -475,7 +487,7 @@ ${ctaBlock}
         if (!email) continue;
 
         const html = buildHtml(contactId);
-        const status = await sendCampaniaEmail(email, subject, html);
+        const status = await sendCampaniaEmail(email, subject, html, { campaniaId, contactId, tenantId });
         await this.db.query(
           `UPDATE saas_campania_recipients
            SET status = $4, sent_at = NOW()
