@@ -419,3 +419,36 @@ export {
   type InboxChannel,
   type ConversationStatus,
 } from "./SaasInboxService";
+export {
+  SaasSequencesService,
+  SaasSequencesError,
+  getSaasSequencesService,
+  resetSaasSequencesServiceForTests,
+  type SaasSequence,
+  type SaasSequenceStep,
+  type SaasSequenceEnrollment,
+  type CreateSequenceInput,
+  type CreateStepInput,
+  type SequenceStatus,
+  type SequenceTrigger,
+} from "./SaasSequencesService";
+export {
+  SaasAbTestingService,
+  SaasAbTestingError,
+  getSaasAbTestingService,
+  resetSaasAbTestingServiceForTests,
+  type SaasAbTest,
+  type AbVariant,
+  type CreateAbTestInput,
+  type AbTestStatus,
+  type AbTestType,
+} from "./SaasAbTestingService";
+export {
+  SaasSmsService,
+  SaasSmsError,
+  getSaasSmsService,
+  resetSaasSmsServiceForTests,
+  type SmsSendResult,
+  type SaasSmsConfigured,
+} from "./SaasSmsService";
+export { dispatchFormSubmitted, dispatchTagAdded } from "./saasWorkflowDispatch";

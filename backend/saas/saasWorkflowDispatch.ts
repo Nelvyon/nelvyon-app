@@ -45,6 +45,42 @@ export async function dispatchContactStageChanged(
   }
 }
 
+/** Fire active workflows on form submission (non-blocking). */
+export async function dispatchFormSubmitted(
+  tenantId: string,
+  formId: string,
+  contactId: string | null,
+  data: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const { getSaasWorkflowService } = await import("./SaasWorkflowService");
+    await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "form_submitted", {
+      form: { id: formId },
+      contact: contactId ? { id: contactId } : {},
+      submission: data,
+    });
+  } catch {
+    // Must not roll back form submission.
+  }
+}
+
+/** Fire active workflows on tag added (non-blocking). */
+export async function dispatchTagAdded(
+  tenantId: string,
+  contactId: string,
+  tag: string,
+): Promise<void> {
+  try {
+    const { getSaasWorkflowService } = await import("./SaasWorkflowService");
+    await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "tag_added", {
+      contact: { id: contactId },
+      tag,
+    });
+  } catch {
+    // Must not roll back tag mutation.
+  }
+}
+
 /** Fire active workflows listening for deal stage changes (non-blocking for deal mutation). */
 export async function dispatchDealStageChanged(
   tenantId: string,

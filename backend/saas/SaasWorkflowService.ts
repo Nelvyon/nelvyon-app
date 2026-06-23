@@ -38,7 +38,9 @@ export type TriggerType =
   | "deal_stage_changed"
   | "job_completed"
   | "manual"
-  | "scheduled";
+  | "scheduled"
+  | "form_submitted"
+  | "tag_added";
 
 export type WorkflowConditionField =
   | "contact.status"
@@ -142,6 +144,8 @@ const TRIGGERS: readonly TriggerType[] = [
   "deal_stage_changed",
   "job_completed",
   "manual",
+  "form_submitted",
+  "tag_added",
   "scheduled",
 ] as const;
 const STAGES: readonly PipelineStage[] = ["new", "contacted", "qualified", "proposal", "won", "lost"] as const;
