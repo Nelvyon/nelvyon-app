@@ -134,6 +134,8 @@ export type GrowthPackRunConfig<T extends GrowthPackIntakeBase & { sector: strin
   reportDeliverableTitle?: string;
   /** Publish mapSkuDeliverable outputs even when simulator QA did not pass (production packs). */
   publishProductionDeliverables?: boolean;
+  /** Minimum QA score to auto-publish without human review (default: 85). */
+  autoPublishQaThreshold?: number;
   onPackStepsComplete?: (params: {
     intake: T;
     packRunId: string;
@@ -159,6 +161,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   projectSlug: string;
   mapSkuDeliverable?: GrowthPackRunConfig<T>["mapSkuDeliverable"];
   publishProductionDeliverables?: boolean;
+  autoPublishQaThreshold?: number;
 }): Promise<{ result: SkuRunResult; deliverableIds: string[] }> {
   const brief = params.buildBrief(params.intake);
   const simulation = simulateAutonomousJob({
@@ -175,9 +178,13 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   const deliverableIds: string[] = [];
   const qaScore = simulation.project.qa?.score ?? 0;
   const passed = Boolean(simulation.project.qa?.passed && !simulation.escalated);
+  const autoPublishThreshold = params.autoPublishQaThreshold ?? 85;
+  const meetsThreshold = qaScore >= autoPublishThreshold;
 
   const shouldPublish =
-    passed || Boolean(params.publishProductionDeliverables && params.mapSkuDeliverable);
+    passed ||
+    meetsThreshold ||
+    Boolean(params.publishProductionDeliverables && params.mapSkuDeliverable);
 
   if (shouldPublish) {
     const mapped = params.mapSkuDeliverable?.({
@@ -331,6 +338,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         projectSlug,
         mapSkuDeliverable: config.mapSkuDeliverable,
         publishProductionDeliverables: config.publishProductionDeliverables,
+        autoPublishQaThreshold: config.autoPublishQaThreshold,
       });
       skuResults.push(result);
       steps = markStep(
@@ -404,7 +412,8 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     });
     steps = markStep(steps, "report", "done");
 
-    const needsReview = skuResults.some((r) => r.escalated || !r.passed);
+    const autoPublishThreshold = config.autoPublishQaThreshold ?? 85;
+    const needsReview = skuResults.some((r) => r.qa_score < autoPublishThreshold);
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
 

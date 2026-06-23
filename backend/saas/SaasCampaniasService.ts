@@ -1,8 +1,32 @@
+import { SendEmailCommand } from "@aws-sdk/client-ses";
+
 import { DbClient } from "../db/DbClient";
+import { getSesClient } from "../email/sesClient";
 import type { ContactStatus, PipelineStage } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
+
+const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
+
+async function sendCampaniaEmail(to: string, subject: string, html: string): Promise<"sent" | "bounced"> {
+  try {
+    const client = getSesClient();
+    await client.send(
+      new SendEmailCommand({
+        Source: `NELVYON <${FROM_EMAIL}>`,
+        Destination: { ToAddresses: [to] },
+        Message: {
+          Subject: { Data: subject, Charset: "UTF-8" },
+          Body: { Html: { Data: html, Charset: "UTF-8" } },
+        },
+      }),
+    );
+    return "sent";
+  } catch {
+    return "bounced";
+  }
+}
 
 export type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
 export type CampaniaChannel = "email" | "sms" | "notification" | "multi";
@@ -410,17 +434,61 @@ export class SaasCampaniasService {
     for (const contactId of contactIds) {
       await this.db.query(
         `INSERT INTO saas_campania_recipients (campania_id, contact_id, tenant_id, status)
-         VALUES ($1,$2,$3,'pending')`,
+         VALUES ($1,$2,$3,'pending')
+         ON CONFLICT (campania_id, contact_id) DO NOTHING`,
         [campaniaId, contactId, tenantId],
       );
     }
 
-    await this.db.query(
-      `UPDATE saas_campania_recipients
-       SET status = 'sent', sent_at = NOW()
-       WHERE tenant_id = $1 AND campania_id = $2`,
-      [tenantId, campaniaId],
-    );
+    let sentCount = 0;
+
+    if (campania.channel === "email") {
+      const subject = campania.subject ?? campania.name;
+      const ctaBlock =
+        campania.ctaText && campania.ctaUrl
+          ? `<p style="text-align:center;margin:24px 0;">
+               <a href="${campania.ctaUrl}" style="background:#1d4ed8;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;">${campania.ctaText}</a>
+             </p>`
+          : "";
+      const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a;">
+${campania.body}
+${ctaBlock}
+<hr style="margin-top:32px;border:none;border-top:1px solid #e2e8f0;" />
+<p style="font-size:11px;color:#94a3b8;text-align:center;margin-top:8px;">
+  Enviado por NELVYON · <a href="{{unsubscribe_url}}" style="color:#94a3b8;">Darse de baja</a>
+</p>
+</div>`;
+
+      type ContactEmailRow = { id: string; email: string | null };
+      const contacts = await this.db.query<ContactEmailRow>(
+        `SELECT id, email FROM saas_contacts WHERE tenant_id = $1 AND id = ANY($2::uuid[])`,
+        [tenantId, contactIds],
+      );
+      const emailByContactId = new Map(contacts.map((c) => [c.id, c.email]));
+
+      for (const contactId of contactIds) {
+        const email = emailByContactId.get(contactId);
+        if (!email) continue;
+
+        const status = await sendCampaniaEmail(email, subject, html);
+        await this.db.query(
+          `UPDATE saas_campania_recipients
+           SET status = $4, sent_at = NOW()
+           WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+          [tenantId, campaniaId, contactId, status],
+        );
+        if (status === "sent") sentCount++;
+      }
+    } else {
+      // SMS / notification / multi: mark as sent (real dispatch per channel TBD in Fase 1.2)
+      await this.db.query(
+        `UPDATE saas_campania_recipients
+         SET status = 'sent', sent_at = NOW()
+         WHERE tenant_id = $1 AND campania_id = $2`,
+        [tenantId, campaniaId],
+      );
+      sentCount = contactIds.length;
+    }
 
     await this.db.query(
       `UPDATE saas_campanias SET
@@ -429,10 +497,10 @@ export class SaasCampaniasService {
         completed_at = NOW(),
         updated_at = NOW()
        WHERE tenant_id = $1 AND id = $2`,
-      [tenantId, campaniaId, contactIds.length],
+      [tenantId, campaniaId, sentCount],
     );
 
-    return { campaniaId, totalSent: contactIds.length, status: "completed" };
+    return { campaniaId, totalSent: sentCount, status: "completed" };
   }
 
   async pauseCampania(tenantId: string, campaniaId: string): Promise<SaasCampania> {

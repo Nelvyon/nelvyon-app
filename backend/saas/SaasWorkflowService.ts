@@ -1,9 +1,34 @@
+import { SendEmailCommand } from "@aws-sdk/client-ses";
+
 import { DbClient } from "../db/DbClient";
+import { getSesClient } from "../email/sesClient";
 import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact, type ActivityType } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import type { SaasDealsService } from "./SaasDealsService";
 import type { DealStage } from "./saasDealsDedupe";
+
+const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
+
+async function dispatchEmail(to: string, subject: string, body: string): Promise<void> {
+  const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a;">${body}</div>`;
+  try {
+    const client = getSesClient();
+    await client.send(
+      new SendEmailCommand({
+        Source: `NELVYON <${FROM_EMAIL}>`,
+        Destination: { ToAddresses: [to] },
+        Message: {
+          Subject: { Data: subject, Charset: "UTF-8" },
+          Body: { Html: { Data: html, Charset: "UTF-8" } },
+        },
+      }),
+    );
+  } catch (e) {
+    console.error("[WorkflowEmail] SES error", e instanceof Error ? e.message : e);
+    throw e;
+  }
+}
 
 export type WorkflowStatus = "draft" | "active" | "paused" | "archived";
 export type TriggerType =
@@ -392,12 +417,28 @@ export class SaasWorkflowService {
       for (const action of wf.actions) {
         if (action.type === "send_email") {
           const cfg = action.config;
+          // Resolve {{contact.email}} / {{contact.name}} placeholders from triggerData
+          let contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+          // If contact only has id (e.g. deal_stage_changed), fetch full record from DB
+          if (typeof contact.id === "string" && (!contact.email || !contact.name)) {
+            type ContactRow = { id: string; email: string | null; name: string };
+            const rows = await this.db.query<ContactRow>(
+              `SELECT id, email, name FROM saas_contacts WHERE tenant_id = $1 AND id = $2 LIMIT 1`,
+              [tenantId, contact.id],
+            );
+            if (rows[0]) contact = { ...contact, email: rows[0].email, name: rows[0].name };
+          }
+          const toResolved = cfg.to === "{{contact.email}}"
+            ? (typeof contact.email === "string" ? contact.email : cfg.to)
+            : cfg.to;
+          const bodyResolved = cfg.body.replace(/\{\{contact\.name\}\}/g, String(contact.name ?? ""));
+          await dispatchEmail(toResolved, cfg.subject, bodyResolved);
           await this.db.query(
             `INSERT INTO saas_activity_log (tenant_id, event_type, description, metadata)
              VALUES ($1,$2,$3,$4)`,
-            [tenantId, "workflow_email", `Email to ${cfg.to}: ${cfg.subject}`, cfg],
+            [tenantId, "workflow_email_sent", `Email sent to ${toResolved}: ${cfg.subject}`, { ...cfg, to: toResolved }],
           );
-          stepsExecuted.push({ action: action.type, ok: true });
+          stepsExecuted.push({ action: action.type, ok: true, to: toResolved });
         } else if (action.type === "update_contact") {
           await this.crm.updateContact(tenantId, action.config.contactId, {
             name: (action.config.fields.name as string | undefined) ?? undefined,
