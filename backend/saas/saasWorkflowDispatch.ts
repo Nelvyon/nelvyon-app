@@ -21,6 +21,30 @@ export async function dispatchContactCreated(tenantId: string, contact: SaasCont
   }
 }
 
+/** Fire active workflows on contact pipeline_stage change (non-blocking). */
+export async function dispatchContactStageChanged(
+  tenantId: string,
+  contact: SaasContact,
+  previousStage: SaasContact["pipelineStage"],
+): Promise<void> {
+  try {
+    const { getSaasWorkflowService } = await import("./SaasWorkflowService");
+    await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "stage_changed", {
+      contact: {
+        id: contact.id,
+        name: contact.name,
+        email: contact.email,
+        status: contact.status,
+        pipeline_stage: contact.pipelineStage,
+        previousStage,
+        value: contact.value,
+      },
+    });
+  } catch {
+    // Must not roll back contact update.
+  }
+}
+
 /** Fire active workflows listening for deal stage changes (non-blocking for deal mutation). */
 export async function dispatchDealStageChanged(
   tenantId: string,

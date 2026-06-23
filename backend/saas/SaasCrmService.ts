@@ -1,7 +1,7 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
-import { dispatchContactCreated } from "./saasWorkflowDispatch";
+import { dispatchContactCreated, dispatchContactStageChanged } from "./saasWorkflowDispatch";
 
 export type ContactStatus = "lead" | "prospect" | "client" | "churned";
 export type PipelineStage = "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
@@ -320,7 +320,11 @@ export class SaasCrmService {
     );
     const row = rows[0];
     if (!row) throw new SaasCrmError("Contact not found", "NOT_FOUND");
-    return rowToContact(row);
+    const updated = rowToContact(row);
+    if (stage !== undefined && stage !== existing.pipelineStage) {
+      void dispatchContactStageChanged(tenantId, updated, existing.pipelineStage);
+    }
+    return updated;
   }
 
   async deleteContact(tenantId: string, contactId: string): Promise<void> {

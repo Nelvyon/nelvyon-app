@@ -63,7 +63,10 @@ export type WorkflowAction =
   | { type: "add_deal_note"; config: { dealId?: string; note: string } }
   | { type: "create_activity"; config: { contactId: string; type: ActivityType; description: string } }
   | { type: "create_deal_activity"; config: { contactId?: string; dealId?: string; type: ActivityType; description: string } }
-  | { type: "notify"; config: { message: string } };
+  | { type: "notify"; config: { message: string } }
+  | { type: "delay_minutes"; config: { minutes: number } }
+  | { type: "webhook_out"; config: { url: string; method?: "GET" | "POST" | "PUT"; body?: Record<string, unknown> } }
+  | { type: "add_tag"; config: { contactId?: string; tag: string } };
 
 export interface SaasWorkflow {
   id: string;
@@ -489,6 +492,40 @@ export class SaasWorkflowService {
             [tenantId, "workflow_notify", action.config.message, action.config],
           );
           stepsExecuted.push({ action: action.type, ok: true });
+        } else if (action.type === "delay_minutes") {
+          const ms = Math.min(action.config.minutes * 60 * 1000, 10 * 60 * 1000); // cap at 10min
+          await new Promise((r) => setTimeout(r, ms));
+          stepsExecuted.push({ action: action.type, ok: true, minutes: action.config.minutes });
+        } else if (action.type === "webhook_out") {
+          const method = action.config.method ?? "POST";
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 10_000);
+          try {
+            const res = await fetch(action.config.url, {
+              method,
+              headers: { "Content-Type": "application/json" },
+              body: method !== "GET" ? JSON.stringify({ ...action.config.body, triggerData }) : undefined,
+              signal: controller.signal,
+            });
+            stepsExecuted.push({ action: action.type, ok: res.ok, status: res.status, url: action.config.url });
+          } catch (err) {
+            stepsExecuted.push({ action: action.type, ok: false, error: err instanceof Error ? err.message : String(err) });
+          } finally {
+            clearTimeout(timeout);
+          }
+        } else if (action.type === "add_tag") {
+          const contactId = action.config.contactId ?? this.resolveContactIdForDealAction(triggerData);
+          if (contactId) {
+            await this.db.query(
+              `UPDATE saas_contacts
+               SET tags = array(SELECT DISTINCT unnest(tags || $3::text[])), updated_at = NOW()
+               WHERE tenant_id = $1 AND id = $2`,
+              [tenantId, contactId, [action.config.tag]],
+            );
+            stepsExecuted.push({ action: action.type, ok: true, contactId, tag: action.config.tag });
+          } else {
+            stepsExecuted.push({ action: action.type, ok: false, error: "contactId not resolvable" });
+          }
         }
       }
 
