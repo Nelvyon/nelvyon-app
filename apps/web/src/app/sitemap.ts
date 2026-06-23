@@ -29,6 +29,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: abs("/contacto"), lastModified, changeFrequency: "monthly", priority: 0.7 },
     { url: abs("/login"), lastModified, changeFrequency: "yearly", priority: 0.5 },
     { url: abs("/register"), lastModified, changeFrequency: "yearly", priority: 0.6 },
+    { url: abs("/demo"), lastModified, changeFrequency: "monthly", priority: 0.8 },
+    { url: abs("/blog"), lastModified, changeFrequency: "weekly", priority: 0.7 },
     { url: abs("/privacidad"), lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: abs("/cookies"), lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: abs("/terminos"), lastModified, changeFrequency: "yearly", priority: 0.3 },

@@ -26,7 +26,8 @@ export type SaasNavId =
   | "dialer"
   | "loyalty"
   | "billing"
-  | "settings";
+  | "settings"
+  | "herramientas";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -69,6 +70,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "reportes", label: "Reportes", href: "/saas/reportes", group: "cuenta" },
   { id: "integraciones", label: "Integraciones", href: "/saas/integraciones", group: "cuenta" },
   { id: "afiliados", label: "Afiliados", href: "/saas/afiliados", group: "cuenta" },
+  { id: "herramientas", label: "🛠️ Herramientas", href: "/saas/herramientas", group: "cuenta" },
   { id: "billing", label: "Facturación", href: "/saas/billing", group: "cuenta", permission: "billing.read" },
   { id: "settings", label: "Configuración", href: "/saas/settings", group: "cuenta", permission: "settings.read" },
 ] as const;
