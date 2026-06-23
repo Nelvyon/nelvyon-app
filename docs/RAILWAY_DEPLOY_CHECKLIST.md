@@ -21,13 +21,16 @@
 | `DATABASE_URL` | `postgresql://user:pass@host:5432/nelvyon` | Railway Postgres → Variables → DATABASE_URL |
 
 ### AWS SES (email real)
+> Nombres exactos que usa el código en `backend/email/sesClient.ts` y `emailService.ts`
+
 | Variable | Ejemplo | Notas |
 |---|---|---|
-| `AWS_REGION` | `eu-west-1` | Región donde SES está verificado |
-| `AWS_ACCESS_KEY_ID` | `AKIA...` | IAM user con permiso `ses:SendEmail` |
-| `AWS_SECRET_ACCESS_KEY` | `...` | Secreto del IAM user |
-| `SES_FROM_EMAIL` | `hola@nelvyon.com` | Email verificado en SES (o dominio) |
-| `SES_FROM_NAME` | `Nelvyon` | Nombre del remitente |
+| `SES_REGION` | `eu-west-1` | Región donde SES está verificado (`sesClient.ts` → `process.env.SES_REGION`) |
+| `SES_ACCESS_KEY_ID` | `AKIA...` | IAM user con permiso `ses:SendEmail` (fallback: `AWS_SES_ACCESS_KEY`) |
+| `SES_SECRET_ACCESS_KEY` | `...` | Secreto del IAM user (fallback: `AWS_SES_SECRET_KEY`) |
+| `SES_FROM_EMAIL` | `hola@nelvyon.com` | Email verificado en SES — `emailService.ts` → `process.env.SES_FROM_EMAIL` |
+
+> **Nota:** `AWS_ACCESS_KEY_ID` / `AWS_REGION` son los nombres estándar del SDK de AWS pero el código los ignora — usa los `SES_*` prefijados arriba. No confundir.
 
 ### Email tracking
 | Variable | Ejemplo | Notas |
