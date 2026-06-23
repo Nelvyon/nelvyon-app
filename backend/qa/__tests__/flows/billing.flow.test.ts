@@ -94,10 +94,11 @@ describe("flow: billing — suscripción → webhook Stripe → dunning → canc
     });
 
     queryMock
-      .mockResolvedValueOnce([{ plan: "free" }])
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([{ email: "a@test.com" }]);
+      .mockResolvedValueOnce([{ plan: "free" }])   // isTenantSuspended
+      .mockResolvedValueOnce([])                    // INSERT INTO subscriptions
+      .mockResolvedValueOnce([])                    // UPDATE nelvyon_users SET plan
+      .mockResolvedValueOnce([])                    // UPDATE saas_tenants SET plan
+      .mockResolvedValueOnce([{ email: "a@test.com" }]); // getUserEmail → notifyPlanActivated
 
     await handleStripeWebhook("{}", "sig", { query: queryMock } as never);
 

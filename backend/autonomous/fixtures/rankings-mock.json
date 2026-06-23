@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-06-23T00:00:00.000Z",
+  "slices": [
+    {
+      "slice": {
+        "category": "landing",
+        "sector": "restaurant",
+        "service": "landing",
+        "objective": "*",
+        "channel": "web",
+        "language": "es",
+        "level": "professional"
+      },
+      "ranked": [
+        {
+          "template_id": "landing-cro-v3",
+          "final_template_score": 88,
+          "base_score": 80,
+          "recency_bonus": 5,
+          "diversity_bonus": 3,
+          "usage_count": 12,
+          "last_used_at": "2026-06-20T00:00:00.000Z"
+        }
+      ]
+    }
+  ]
+}

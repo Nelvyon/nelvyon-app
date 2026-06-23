@@ -106,7 +106,7 @@ describe("Phase L — pipeline template selector", () => {
       sector: "restaurant",
       service: "landing",
       category: "landing",
-      rankingsPath: DEFAULT_RANKINGS_PATH,
+      rankingsPath: join(__dirname, "..", "fixtures", "rankings-mock.json"),
     });
     expect(pick.source).toBe("rankings");
     expect(pick.template_id).toBe("landing-cro-v3");
