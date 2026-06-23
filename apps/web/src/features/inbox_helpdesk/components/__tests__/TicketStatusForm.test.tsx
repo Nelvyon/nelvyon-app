@@ -14,7 +14,7 @@ describe("TicketStatusForm", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: /update status/i })).toBeDisabled();
-    expect(screen.getByText(/only operator\/admin/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /guardar estado/i })).toBeDisabled();
+    expect(screen.getByText(/solo operadores/i)).toBeInTheDocument();
   });
 });

@@ -436,7 +436,7 @@ export class SaasWorkflowService {
           await this.db.query(
             `INSERT INTO saas_activity_log (tenant_id, event_type, description, metadata)
              VALUES ($1,$2,$3,$4)`,
-            [tenantId, "workflow_email_sent", `Email sent to ${toResolved}: ${cfg.subject}`, { ...cfg, to: toResolved }],
+            [tenantId, "workflow_email", `Email sent to ${toResolved}: ${cfg.subject}`, { ...cfg, to: toResolved }],
           );
           stepsExecuted.push({ action: action.type, ok: true, to: toResolved });
         } else if (action.type === "update_contact") {

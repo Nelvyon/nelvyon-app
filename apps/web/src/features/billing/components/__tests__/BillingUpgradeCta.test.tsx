@@ -9,7 +9,7 @@ describe("BillingUpgradeCta", () => {
       <BillingUpgradeCta canUpgrade={false} metersAtRisk={["contacts"]} planId="starter" />,
     );
 
-    expect(screen.getByText(/only a workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/managed by your account owner/i)).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /review upgrade options/i })).not.toBeInTheDocument();
   });
 });

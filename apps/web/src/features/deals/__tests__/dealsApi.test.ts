@@ -19,7 +19,7 @@ describe("dealsApi", () => {
     getMock.mockResolvedValue({ items: [], total: 0, skip: 0, limit: 100 });
     await dealsApi.list({ stage: "lead" });
     expect(getMock).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/entities/deals?"),
+      expect.stringContaining("/api/platform/crm/deals?"),
       expect.objectContaining({ tenantScoped: true }),
     );
   });

@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("../../email/sesClient", () => ({
+  getSesClient: () => ({ send: vi.fn().mockResolvedValue({}) }),
+}));
+vi.mock("@aws-sdk/client-ses", () => ({
+  SendEmailCommand: vi.fn().mockImplementation((input: unknown) => input),
+}));
+
 import * as Auth from "@nelvyon/auth";
 import * as Saas from "@nelvyon/saas";
 import * as Onboarding from "../SaasOnboardingService";

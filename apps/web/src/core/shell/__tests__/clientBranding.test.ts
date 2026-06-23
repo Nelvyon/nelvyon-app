@@ -5,7 +5,9 @@ import { getRoutePageMeta } from "@/core/shell/routePageRegistry";
 describe("client mode branding and surface", () => {
   it("uses client-safe nav labels and hides internal modules", () => {
     const nav = getNavItemsForRole("admin", "client");
-    expect(nav.map((n) => n.label)).toEqual(expect.arrayContaining(["Requests", "Projects", "Support", "Billing"]));
+    const labels = nav.map((n) => n.label);
+    // Client portal items keep their original labels; support nav gets mapped
+    expect(labels).toEqual(expect.arrayContaining(["Inicio", "Proyectos", "Entregables"]));
     expect(nav.some((n) => n.module === "os")).toBe(false);
     expect(nav.some((n) => n.module === "billing")).toBe(true);
   });

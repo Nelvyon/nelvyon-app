@@ -116,6 +116,11 @@ describe("/api/health/deep GET", () => {
     process.env.UPSTASH_REDIS_REST_URL = "https://redis-hc.test";
     process.env.UPSTASH_REDIS_REST_TOKEN = "token";
     process.env.SES_FROM_EMAIL = "noreply@test.com";
+    process.env.STRIPE_SECRET_KEY = "sk_test_hc";
+    process.env.STRIPE_PRICE_ID_STARTER = "price_starter_hc";
+    process.env.STRIPE_PRICE_ID_PRO = "price_pro_hc";
+    process.env.STRIPE_PRICE_ID_AGENCY = "price_agency_hc";
+    process.env.OPENAI_API_KEY = "sk-test-hc";
     global.fetch = vi.fn(async (input: RequestInfo | URL) => {
       const u = String(input);
       if (u.includes("/ping")) {

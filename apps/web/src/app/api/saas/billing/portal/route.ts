@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const rows = await DbClient.getInstance().query<{ stripe_customer_id: string | null }>(
       `SELECT stripe_customer_id FROM subscriptions WHERE user_id = $1 LIMIT 1`,
-      [ctx.userId],
+      [ctx.claims.userId],
     );
     const customerId = rows[0]?.stripe_customer_id ?? null;
     if (!customerId) {

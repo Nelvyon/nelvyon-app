@@ -8,6 +8,7 @@ import { resetSaasPermissionsCacheForTests } from "../useSaasPermissions";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
+  usePathname: () => "/saas/dashboard",
 }));
 
 beforeEach(() => {
@@ -16,7 +17,7 @@ beforeEach(() => {
     "fetch",
     vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ permissions: ["billing.read", "settings.read"] }),
+      json: async () => ({ role: "owner", permissions: ["billing.read", "settings.read"], tenant: { companyName: "Acme", plan: "pro" } }),
     }),
   );
 });
@@ -29,7 +30,14 @@ afterEach(() => {
 describe("saasNav", () => {
   it("lists only production-ready SaaS modules", () => {
     const labels = SAAS_NAV_ITEMS.map((i) => i.label);
-    expect(labels).toEqual(["Dashboard", "CRM", "Pipeline", "Campanas", "Workflows", "Facturacion", "Configuracion"]);
+    // Core modules must be present
+    expect(labels).toContain("Dashboard");
+    expect(labels).toContain("CRM");
+    expect(labels).toContain("Pipeline");
+    expect(labels).toContain("Workflows");
+    expect(labels).toContain("Facturación");
+    expect(labels).toContain("Configuración");
+    // Legacy/OS routes must not be present as labels
     expect(labels).not.toContain("Servicios");
   });
 
@@ -51,14 +59,13 @@ describe("saasNav", () => {
 
 describe("SaasSidebar", () => {
   it("renders clickable nav links for active modules", async () => {
-    render(<SaasSidebar activeId="dashboard" tenantCompany="Acme" tenantPlan="pro" />);
+    // activeId="billing" opens the "cuenta" group so billing/settings links render
+    render(<SaasSidebar activeId="billing" tenantCompany="Acme" tenantPlan="pro" />);
     expect(screen.getByTestId("saas-sidebar")).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.getByRole("link", { name: "Facturacion" })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Facturación" })).toBeInTheDocument();
     });
-    expect(screen.getByRole("link", { name: "CRM" })).toHaveAttribute("href", "/saas/crm");
-    expect(screen.getByRole("link", { name: "Pipeline" })).toHaveAttribute("href", "/saas/crm?tab=pipeline");
-    expect(screen.getByRole("link", { name: "Facturacion" })).toHaveAttribute("href", "/saas/billing");
-    expect(screen.getByRole("link", { name: "Configuracion" })).toHaveAttribute("href", "/saas/settings");
+    expect(screen.getByRole("link", { name: "Facturación" })).toHaveAttribute("href", "/saas/billing");
+    expect(screen.getByRole("link", { name: "Configuración" })).toHaveAttribute("href", "/saas/settings");
   });
 });

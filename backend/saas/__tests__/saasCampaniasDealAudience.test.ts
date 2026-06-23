@@ -1,15 +1,22 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("../../email/sesClient", () => ({
+  getSesClient: () => ({ send: vi.fn().mockResolvedValue({}) }),
+}));
+vi.mock("@aws-sdk/client-ses", () => ({
+  SendEmailCommand: vi.fn().mockImplementation((input: unknown) => input),
+}));
 
 import { SaasCampaniasService } from "../SaasCampaniasService";
 
-type ContactRow = { id: string; tenant_id: string; status: string; pipeline_stage: string; tags: string[] };
+type ContactRow = { id: string; tenant_id: string; email: string; status: string; pipeline_stage: string; tags: string[] };
 type DealRow = { id: string; tenant_id: string; contact_id: string; stage: string };
 
 function makeDb() {
   const contacts: ContactRow[] = [
-    { id: "c1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] },
-    { id: "c2", tenant_id: "t1", status: "lead", pipeline_stage: "won", tags: [] },
-    { id: "c3", tenant_id: "t2", status: "lead", pipeline_stage: "new", tags: [] },
+    { id: "c1", tenant_id: "t1", email: "c1@test.com", status: "lead", pipeline_stage: "new", tags: [] },
+    { id: "c2", tenant_id: "t1", email: "c2@test.com", status: "lead", pipeline_stage: "won", tags: [] },
+    { id: "c3", tenant_id: "t2", email: "c3@test.com", status: "lead", pipeline_stage: "new", tags: [] },
   ];
   const deals: DealRow[] = [
     { id: "d1", tenant_id: "t1", contact_id: "c1", stage: "proposal" },
@@ -100,10 +107,17 @@ function makeDb() {
       }] as T[];
     }
 
+    if (s.startsWith("SELECT id, email FROM saas_contacts")) {
+      const tenantId = String(p[0]);
+      const ids = (p[1] as string[]) ?? [];
+      return contacts
+        .filter((x) => x.tenant_id === tenantId && ids.includes(x.id))
+        .map((x) => ({ id: x.id, email: x.email })) as unknown as T[];
+    }
     if (s.startsWith("UPDATE saas_campanias SET status = 'running'")) return [] as T[];
     if (s.startsWith("INSERT INTO saas_campania_recipients")) return [] as T[];
     if (s.startsWith("UPDATE saas_campania_recipients")) return [] as T[];
-    if (s.startsWith("UPDATE saas_campanias SET status = 'completed'")) return [] as T[];
+    if (s.startsWith("UPDATE saas_campanias SET") && s.includes("status = 'completed'")) return [] as T[];
     if (s.includes("SELECT plan FROM saas_tenants")) return [{ plan: "enterprise" }] as T[];
     if (s.includes("COUNT(*)") && s.includes("FROM saas_campanias")) return [{ n: campanias.length }] as T[];
 

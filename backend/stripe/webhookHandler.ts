@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { CancellationService } from "../billing/cancellationService";
 import { DunningService, resolveTenantIdFromUserId } from "../billing/dunningService";
 import { mapStripePriceToNelvyon } from "./stripeApi";
+import { mapBillablePlanToSaasPlan } from "../saas/saasTenantMapper";
 import type { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
 import { completeStep } from "../onboarding";
@@ -211,6 +212,12 @@ async function upsertSubscription(
     opts.userId,
     opts.plan,
   ]);
+  // Sync plan to saas_tenants so quota checks (saasPlanQuota.ts) see the new plan immediately
+  const saasPlan = mapBillablePlanToSaasPlan(opts.plan);
+  await db.query(
+    `UPDATE saas_tenants SET plan = $2, updated_at = now() WHERE user_id = $1`,
+    [opts.userId, saasPlan],
+  );
 }
 
 async function notifyPlanActivated(

@@ -28,7 +28,7 @@ describe("auth bridge api", () => {
     vi.stubGlobal("fetch", mockFetch);
     await fetchWorkspaceList("xyz.jwt");
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining("/api/v1/workspace/list"),
+      expect.stringContaining("/api/platform/workspaces/list"),
       expect.objectContaining({
         headers: expect.objectContaining({ Authorization: "Bearer xyz.jwt" }),
       }),

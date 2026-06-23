@@ -14,7 +14,7 @@ describe("ClientForm", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: /save client/i })).toBeDisabled();
-    expect(screen.getByText(/do not have permission/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /guardar cliente/i })).toBeDisabled();
+    expect(screen.getByText(/no tienes permiso/i)).toBeInTheDocument();
   });
 });

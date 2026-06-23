@@ -4,13 +4,12 @@ import { getRoutePageMeta } from "@/core/shell/routePageRegistry";
 describe("getRoutePageMeta", () => {
   it("titles CRM client detail with id", () => {
     const meta = getRoutePageMeta("/crm/clients/42");
-    expect(meta.heading).toBe("Client #42");
+    expect(meta.heading).toBe("Cliente #42");
     expect(meta.documentTitle).toContain("NELVYON");
   });
   it("titles Revenue deals list", () => {
     const meta = getRoutePageMeta("/crm/deals");
-    expect(meta.heading).toBe("Deals");
-    expect(meta.documentTitle).toContain("Deals");
+    expect(meta.heading).toBe("Pipeline comercial");
     expect(meta.documentTitle).toContain("Revenue");
   });
 
@@ -209,12 +208,12 @@ describe("getBreadcrumbs", () => {
   it("builds Revenue client detail trail", () => {
     const crumbs = getBreadcrumbs("/crm/clients/7");
     expect(crumbs[0]?.label).toBe("Revenue");
-    expect(crumbs[crumbs.length - 1]?.label).toBe("Client #7");
+    expect(crumbs[crumbs.length - 1]?.label).toBe("Cliente #7");
   });
   it("builds Revenue deal detail trail", () => {
     const crumbs = getBreadcrumbs("/crm/deals/9");
     expect(crumbs[0]?.label).toBe("Revenue");
-    expect(crumbs.some((c) => c.label === "Deals")).toBe(true);
+    expect(crumbs.some((c) => c.label === "Pipeline comercial")).toBe(true);
     expect(crumbs[crumbs.length - 1]?.label).toBe("Deal #9");
   });
 

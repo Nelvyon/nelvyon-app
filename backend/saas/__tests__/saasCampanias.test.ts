@@ -1,5 +1,14 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("../../email/sesClient", () => ({
+  getSesClient: () => ({
+    send: vi.fn().mockResolvedValue({}),
+  }),
+}));
+vi.mock("@aws-sdk/client-ses", () => ({
+  SendEmailCommand: vi.fn().mockImplementation((input: unknown) => input),
+}));
+
 import * as Auth from "@nelvyon/auth";
 import * as Saas from "@nelvyon/saas";
 import * as Onboarding from "../SaasOnboardingService";
@@ -46,6 +55,7 @@ type RecipientRow = {
 type ContactRow = {
   id: string;
   tenant_id: string;
+  email: string;
   status: "lead" | "prospect" | "client" | "churned";
   pipeline_stage: "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
   tags: string[];
@@ -128,6 +138,13 @@ function makeDb() {
       row.scheduled_at = new Date(String(p[2]));
       return [row as unknown as T];
     }
+    if (s.startsWith("SELECT id, email FROM saas_contacts")) {
+      const tenantId = String(p[0]);
+      const ids = (p[1] as string[]) ?? [];
+      return contacts
+        .filter((x) => x.tenant_id === tenantId && ids.includes(x.id))
+        .map((x) => ({ id: x.id, email: x.email })) as unknown as T[];
+    }
     if (s.startsWith("SELECT id FROM saas_contacts")) {
       const tenantId = String(p[0]);
       let out = contacts.filter((x) => x.tenant_id === tenantId);
@@ -165,6 +182,14 @@ function makeDb() {
       });
       return [] as T[];
     }
+    if (s.startsWith("UPDATE saas_campania_recipients SET status = $4")) {
+      // Per-contact update: (tenantId, campaniaId, contactId, status)
+      const r = recipients.find(
+        (x) => x.tenant_id === String(p[0]) && x.campania_id === String(p[1]) && x.contact_id === String(p[2]),
+      );
+      if (r) { r.status = String(p[3]) as RecipientRow["status"]; r.sent_at = new Date(Date.now() + ++tick); }
+      return [] as T[];
+    }
     if (s.startsWith("UPDATE saas_campania_recipients")) {
       for (const r of recipients.filter((x) => x.tenant_id === String(p[0]) && x.campania_id === String(p[1]))) {
         r.status = "sent";
@@ -172,7 +197,8 @@ function makeDb() {
       }
       return [] as T[];
     }
-    if (s.startsWith("UPDATE saas_campanias SET status = 'completed'")) {
+    if (s.startsWith("UPDATE saas_campanias SET") && s.includes("status = 'completed'")) {
+      // Matches both: SET status = 'completed' ... sent_count = $3
       const row = campanias.find((x) => x.tenant_id === String(p[0]) && x.id === String(p[1]));
       if (row) {
         row.status = "completed";
@@ -263,7 +289,7 @@ describe("SaasCampaniasService", () => {
 
   it("launchCampania cambia status a 'completed'", async () => {
     const db = makeDb();
-    db.contacts.push({ id: "ct-1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] });
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "ct1@test.com", status: "lead", pipeline_stage: "new", tags: [] });
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
     const out = await svc.launchCampania("t1", c.id);
@@ -272,7 +298,7 @@ describe("SaasCampaniasService", () => {
 
   it("launchCampania con audience_filter {} incluye todos los contactos", async () => {
     const db = makeDb();
-    db.contacts.push({ id: "ct-1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] }, { id: "ct-2", tenant_id: "t1", status: "client", pipeline_stage: "won", tags: [] });
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "ct1@test.com", status: "lead", pipeline_stage: "new", tags: [] }, { id: "ct-2", tenant_id: "t1", email: "ct2@test.com", status: "client", pipeline_stage: "won", tags: [] });
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email", audienceFilter: {} });
     const out = await svc.launchCampania("t1", c.id);
@@ -281,7 +307,7 @@ describe("SaasCampaniasService", () => {
 
   it("launchCampania con audience_filter status filtra correctamente", async () => {
     const db = makeDb();
-    db.contacts.push({ id: "ct-1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] }, { id: "ct-2", tenant_id: "t1", status: "client", pipeline_stage: "won", tags: [] });
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "ct1@test.com", status: "lead", pipeline_stage: "new", tags: [] }, { id: "ct-2", tenant_id: "t1", email: "ct2@test.com", status: "client", pipeline_stage: "won", tags: [] });
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email", audienceFilter: { status: "lead" } });
     const out = await svc.launchCampania("t1", c.id);
@@ -290,7 +316,7 @@ describe("SaasCampaniasService", () => {
 
   it("launchCampania actualiza total_recipients y sent_count", async () => {
     const db = makeDb();
-    db.contacts.push({ id: "ct-1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] });
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "ct1@test.com", status: "lead", pipeline_stage: "new", tags: [] });
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
     await svc.launchCampania("t1", c.id);
@@ -301,7 +327,7 @@ describe("SaasCampaniasService", () => {
 
   it("launchCampania inserta recipients en saas_campania_recipients", async () => {
     const db = makeDb();
-    db.contacts.push({ id: "ct-1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] });
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "ct1@test.com", status: "lead", pipeline_stage: "new", tags: [] });
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
     await svc.launchCampania("t1", c.id);
@@ -331,7 +357,7 @@ describe("SaasCampaniasService", () => {
 
   it("getRecipients retorna recipients de la campaña", async () => {
     const db = makeDb();
-    db.contacts.push({ id: "ct-1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] });
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "ct1@test.com", status: "lead", pipeline_stage: "new", tags: [] });
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
     await svc.launchCampania("t1", c.id);
@@ -341,7 +367,7 @@ describe("SaasCampaniasService", () => {
 
   it("No se puede lanzar campaña ya completada", async () => {
     const db = makeDb();
-    db.contacts.push({ id: "ct-1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] });
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "ct1@test.com", status: "lead", pipeline_stage: "new", tags: [] });
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
     await svc.launchCampania("t1", c.id);
@@ -379,7 +405,7 @@ describe("API SaaS campanias", () => {
 
   it("API POST /api/saas/campanias/[id]/launch → 200 con CampaniaLaunchResult", async () => {
     const db = makeDb();
-    db.contacts.push({ id: "ct-1", tenant_id: "t1", status: "lead", pipeline_stage: "new", tags: [] });
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "ct1@test.com", status: "lead", pipeline_stage: "new", tags: [] });
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "C", body: "B", channel: "email" });
     vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "e@test.com", tenantId: "auth-tenant-1", plan: "free" });

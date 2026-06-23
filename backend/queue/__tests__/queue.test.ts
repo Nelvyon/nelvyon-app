@@ -21,6 +21,7 @@ vi.mock("../../os-agents/OsOrchestrator", () => ({
     enqueueAndDispatch: (...args: unknown[]) => enqueueAndDispatchMock(...args),
     processQueuedJob: (...args: unknown[]) => processQueuedJobMock(...args),
   },
+  sectorFromServiceId: (serviceId: string) => serviceId.split("_")[0] ?? "web",
 }));
 
 import { QueueClient } from "../queueClient";
