@@ -1,14 +1,16 @@
 # Staging P0 smokes — quality gate
 
-Gate de calidad para **portal BFF** y **pack Local** en staging. No sustituye los unit tests de `apps/web` (`pnpm gate`).
+Gate de calidad para **portal BFF** y los **3 packs autónomos** en staging. No sustituye los unit tests de `apps/web` (`pnpm gate`).
 
 ## Scripts P0
 
 | Script | Qué valida |
 |--------|------------|
 | `scripts/staging-smoke-portal-packs.mjs` | Hubs packs, automatización CEO, shell portal, **login/projects/deliverables vía BFF** |
-| `scripts/staging-smoke-local-pack-e2e.mjs` | Kickoff Local → assets live → invite → accept → login → 5 entregables → **me/projects/approve/reject/download BFF** |
-| `scripts/run-staging-p0-smokes.mjs` | Orquestador: ejecuta ambos y emite `ALL_P0_PASS` o `P0_FAIL` |
+| `scripts/staging-smoke-local-pack-e2e.mjs` | Kickoff `local-business-growth` → 5 entregables sin mock:// → portal sin operador |
+| `scripts/staging-smoke-ecommerce-pack-e2e.mjs` | Kickoff `ecommerce-growth` → 5 entregables sin mock:// → portal sin operador |
+| `scripts/staging-smoke-saas-b2b-pack-e2e.mjs` | Kickoff `saas-b2b-growth` → 5 entregables sin mock:// → portal sin operador |
+| `scripts/run-staging-p0-smokes.mjs` | Orquestador: ejecuta los 4 smokes y emite `ALL_P0_PASS` o `P0_FAIL` |
 
 ## Ejecución local
 

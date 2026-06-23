@@ -113,7 +113,7 @@ export default function DemoPage() {
           <div className="grid gap-6 sm:grid-cols-3">
             {TESTIMONIALS.map((t) => (
               <div key={t.name} className="rounded-2xl border border-white/10 bg-white/5 p-6">
-                <p className="text-sm leading-relaxed text-white/80">"{t.text}"</p>
+                <p className="text-sm leading-relaxed text-white/80">&ldquo;{t.text}&rdquo;</p>
                 <div className="mt-4 border-t border-white/10 pt-4">
                   <p className="text-sm font-semibold text-white">{t.name}</p>
                   <p className="text-xs text-white/50">{t.role}</p>

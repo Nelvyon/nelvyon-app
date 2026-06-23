@@ -42,9 +42,10 @@
 |---|---|---|
 | `STRIPE_SECRET_KEY` | `sk_live_...` | Clave secreta Stripe producción |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` | Secret del webhook Stripe (billing events) |
-| `STRIPE_STARTER_PRICE_ID` | `price_...` | Price ID plan Starter en Stripe |
-| `STRIPE_PRO_PRICE_ID` | `price_...` | Price ID plan Pro |
-| `STRIPE_AGENCY_PRICE_ID` | `price_...` | Price ID plan Agency |
+| `STRIPE_PRICE_ID_STARTER` | `price_...` | Price ID plan Starter en Stripe |
+| `STRIPE_PRICE_ID_PRO` | `price_...` | Price ID plan Pro |
+| `STRIPE_PRICE_ID_AGENCY` | `price_...` | Price ID plan Agency |
+| `STRIPE_PRICE_ID_AGENCY_PARTNER` | `price_...` | Price ID plan Agency Partner (wholesale para partners) |
 
 ### Cron jobs
 | Variable | Ejemplo | Notas |

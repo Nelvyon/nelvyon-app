@@ -76,9 +76,9 @@ En Railway → proyecto → tu servicio → **Variables**, añadir todas estas:
 |---|---|
 | `STRIPE_SECRET_KEY` | `sk_live_...` |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` (del endpoint de prod en Stripe Dashboard) |
-| `STRIPE_STARTER_PRICE_ID` | `price_...` |
-| `STRIPE_PRO_PRICE_ID` | `price_...` |
-| `STRIPE_AGENCY_PRICE_ID` | `price_...` |
+| `STRIPE_PRICE_ID_STARTER` | `price_...` |
+| `STRIPE_PRICE_ID_PRO` | `price_...` |
+| `STRIPE_PRICE_ID_AGENCY` | `price_...` |
 
 #### Opcionales (AI/Voice)
 
@@ -187,6 +187,67 @@ Verificar en browser:
 - `/saas/dashboard` → fondo `#020817` oscuro (dark glass)
 - `/saas/campanias` → si SES_FROM_EMAIL no está: banner amber visible
 - `/saas/billing` → badge del plan correcto tras simular webhook Stripe
+
+---
+
+---
+
+## Post-perfección — Script de prueba producción (10 pasos)
+
+Ejecutar estos 10 pasos **después del deploy** para confirmar que todo funciona en prod real.
+
+```bash
+PROD="https://app.nelvyon.com"
+
+# 1. Health check
+curl -sf "$PROD/api/health" | grep '"ok":true' && echo "✅ 1/10 health" || echo "❌ 1/10 health"
+
+# 2. Auth protegida (401 sin cookie)
+CODE=$(curl -s -o /dev/null -w "%{http_code}" "$PROD/api/saas/analytics")
+[ "$CODE" = "401" ] && echo "✅ 2/10 auth gate" || echo "❌ 2/10 auth gate (got $CODE)"
+
+# 3. Stripe price env configuradas (price-audit)
+curl -sf "$PROD/api/billing/price-audit" | grep '"allValid":true' && echo "✅ 3/10 stripe prices" || echo "⚠️  3/10 stripe prices (revisar STRIPE_PRICE_ID_*)"
+
+# 4. SES configurado (campanias API)
+SES=$(curl -sf -H "Cookie: " "$PROD/api/saas/campanias" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('ses_configured','?'))" 2>/dev/null || echo "?")
+[ "$SES" = "True" ] || [ "$SES" = "true" ] && echo "✅ 4/10 SES configured" || echo "⚠️  4/10 SES not configured (banner visible en UI)"
+
+# 5. CRM redirige legacy /crm → /saas/crm
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -L "$PROD/crm")
+[ "$CODE" = "200" ] && echo "✅ 5/10 /crm redirect" || echo "⚠️  5/10 /crm redirect (got $CODE)"
+
+# 6. Pack kickoff responde (sin auth → 401)
+for PACK in local-business-growth ecommerce-growth saas-b2b-growth; do
+  CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$PROD/api/os/packs/$PACK/kickoff")
+  [ "$CODE" = "401" ] && echo "✅ 6/10 kickoff $PACK" || echo "❌ 6/10 kickoff $PACK (got $CODE, expected 401)"
+done
+
+# 7. Portal deliverables sin auth → 401
+CODE=$(curl -s -o /dev/null -w "%{http_code}" "$PROD/api/platform/portal/deliverables")
+[ "$CODE" = "401" ] || [ "$CODE" = "403" ] && echo "✅ 7/10 portal auth" || echo "❌ 7/10 portal auth (got $CODE)"
+
+# 8. Cron endpoint protegido (sin secret → 401/403)
+CODE=$(curl -s -o /dev/null -w "%{http_code}" "$PROD/api/cron/saas-workflows")
+[ "$CODE" = "401" ] || [ "$CODE" = "403" ] && echo "✅ 8/10 cron protected" || echo "⚠️  8/10 cron not protected (got $CODE)"
+
+# 9. Stripe webhook endpoint existe
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$PROD/api/webhooks/stripe")
+[ "$CODE" != "404" ] && echo "✅ 9/10 stripe webhook" || echo "❌ 9/10 stripe webhook 404"
+
+# 10. SES webhook endpoint existe
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$PROD/api/webhooks/ses")
+[ "$CODE" != "404" ] && echo "✅ 10/10 ses webhook" || echo "❌ 10/10 ses webhook 404"
+
+echo ""
+echo "Manual browser checks:"
+echo "  /saas/dashboard     → fondo #020817 oscuro"
+echo "  /saas/campanias     → sin SES: banner amber visible"
+echo "  /saas/billing       → plan badge correcto"
+echo "  /portal             → panel cliente carga"
+```
+
+> Credenciales QA para smokes E2E completos: ver `docs/STAGING_P0_SMOKES.md`
 
 ---
 

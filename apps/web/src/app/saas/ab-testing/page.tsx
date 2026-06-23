@@ -87,7 +87,7 @@ function VariantBar({ variant, metric, total, isWinner }: { variant: ABVariant; 
             </span>
             {isWinner && <span className="text-xs text-primary font-medium">🏆 Ganador</span>}
           </div>
-          <p className="mt-1.5 text-xs text-muted-foreground max-w-72 italic">"{variant.label}"</p>
+          <p className="mt-1.5 text-xs text-muted-foreground max-w-72 italic">&ldquo;{variant.label}&rdquo;</p>
         </div>
         <p className={`text-2xl font-bold ${isWinner ? "text-primary" : "text-foreground"}`}>{display}</p>
       </div>

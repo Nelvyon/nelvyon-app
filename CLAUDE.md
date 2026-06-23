@@ -90,9 +90,10 @@ SES_SECRET_ACCESS_KEY
 SES_FROM_EMAIL          # dirección verificada en SES
 STRIPE_SECRET_KEY
 STRIPE_WEBHOOK_SECRET
-STRIPE_STARTER_PRICE_ID
-STRIPE_PRO_PRICE_ID
-STRIPE_AGENCY_PRICE_ID
+STRIPE_PRICE_ID_STARTER
+STRIPE_PRICE_ID_PRO
+STRIPE_PRICE_ID_AGENCY
+STRIPE_PRICE_ID_AGENCY_PARTNER  # wholesale para partners (opcional si no hay programa partner)
 ```
 
 Sin `SES_FROM_EMAIL` + `SES_ACCESS_KEY_ID`, la UI muestra un banner de advertencia (no crash).
