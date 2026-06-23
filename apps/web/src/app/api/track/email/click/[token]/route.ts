@@ -3,8 +3,8 @@
  * Increments clicked_count and redirects to the original URL.
  */
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyTrackingToken } from "../../../../../../../../backend/email/trackingToken";
-import { DbClient } from "../../../../../../../../backend/db/DbClient";
+import { verifyTrackingToken } from "../../../../../../../../../backend/email/trackingToken";
+import { DbClient } from "../../../../../../../../../backend/db/DbClient";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
