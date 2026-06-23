@@ -77,6 +77,32 @@ export type PackDeliverableInput = {
   metadata: Record<string, unknown>;
 };
 
+/**
+ * Bulk-approve all client_visible deliverables for a project when QA ≥ threshold.
+ * Sets status → approved_by_client without human portal interaction.
+ * Returns count of rows updated.
+ */
+export async function dbAutoApprovePackDeliverables(params: {
+  workspaceId: number;
+  projectId: string;
+}): Promise<number> {
+  const rows = await db().query<{ id: string }>(
+    `UPDATE os_deliverables
+     SET status = 'approved_by_client',
+         approved_at = NOW(),
+         client_reviewed_at = NOW(),
+         metadata = metadata || '{"auto_approved":true,"auto_approve_reason":"qa_score_gte_85"}'::jsonb,
+         updated_at = NOW()
+     WHERE workspace_id = $1
+       AND project_id = $2
+       AND visibility = 'client_visible'
+       AND status = 'published'
+     RETURNING id`,
+    [params.workspaceId, params.projectId],
+  );
+  return rows.length;
+}
+
 /** Pack mode: deliverables go straight to portal (published + client_visible). */
 export async function dbCreatePackDeliverable(input: PackDeliverableInput): Promise<string> {
   const id = randomUUID();

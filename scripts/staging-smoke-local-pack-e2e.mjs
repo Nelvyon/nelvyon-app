@@ -270,6 +270,17 @@ async function verifyPortalDeliverables(portalToken, portalBase, projectId) {
     }
   }
 
+  // Verify auto-approve: all deliverables should be approved_by_client (QA≥85 path)
+  const autoApproved = items.filter((d) => d.status === "approved_by_client");
+  const stillPublished = items.filter((d) => d.status === "published");
+  if (autoApproved.length > 0) {
+    pass("portal", "auto-approved", `${autoApproved.length} entregables auto-aprobados (QA≥85)`);
+  } else if (stillPublished.length > 0) {
+    warn("portal", "auto-approved", `0 auto-aprobados — ${stillPublished.length} siguen en published (revisar QA score)`);
+  } else {
+    warn("portal", "auto-approved", "sin entregables published ni approved_by_client");
+  }
+
   const report = items.find((d) => d.title?.includes("Informe"));
   if (report?.pack_summary || report?.pack_id) {
     pass("portal", "pack_summary", report.pack_summary?.summary?.slice(0, 40) ?? report.pack_id);
@@ -303,8 +314,7 @@ async function verifyPortalBffFlows(portalToken, portalBase, projectId, items) {
   if (project.ok) pass("portal-bff", "GET /projects/:id", "ok");
   else fail("portal-bff", "GET /projects/:id", `HTTP ${project.status}`);
 
-  const published = items.filter((d) => d.status === "published");
-  const sample = published[0] ?? items[0];
+  const sample = items[0];
   if (!sample?.id) {
     fail("portal-bff", "deliverable sample", "no deliverables to exercise BFF");
     return;
@@ -326,6 +336,9 @@ async function verifyPortalBffFlows(portalToken, portalBase, projectId, items) {
     fail("portal-bff", "GET /deliverables/:id/download", `HTTP ${download.status}`);
   }
 
+  // approve/reject only apply to deliverables still in 'published' status
+  // (auto-approve path sets them to 'approved_by_client' — those skip manual review)
+  const published = items.filter((d) => d.status === "published");
   const toApprove = published.find((d) => d.title?.includes("Informe")) ?? published[0];
   if (toApprove) {
     const approve = await fetch(api(`/deliverables/${toApprove.id}/approve`), {
@@ -335,6 +348,8 @@ async function verifyPortalBffFlows(portalToken, portalBase, projectId, items) {
     });
     if (approve.ok) pass("portal-bff", "POST /deliverables/:id/approve", toApprove.title ?? toApprove.id);
     else fail("portal-bff", "POST /deliverables/:id/approve", `HTTP ${approve.status}`);
+  } else {
+    pass("portal-bff", "POST /deliverables/:id/approve", "skip — todos auto-aprobados por QA≥85");
   }
 
   const toReject = published.find((d) => d.id !== toApprove?.id && d.title?.includes("SEO"));
@@ -398,7 +413,7 @@ async function main() {
     process.exit(1);
   }
   if (finalRun.status === "needs_review") {
-    warn("kickoff", "status", "needs_review — continuing portal checks");
+    fail("kickoff", "auto-approve", "status=needs_review — expected completed (auto-approve QA≥85)");
   } else {
     pass("kickoff", "status", finalRun.status);
   }

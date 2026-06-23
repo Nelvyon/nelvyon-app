@@ -5,6 +5,7 @@ import type { SimulationResult } from "../../../../../backend/autonomous/types";
 
 import type { PackMeta } from "@/lib/packs/packRegistry";
 import {
+  dbAutoApprovePackDeliverables,
   dbCreateOsClient,
   dbCreateOsProject,
   dbCreatePackDeliverable,
@@ -416,6 +417,25 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     const needsReview = skuResults.some((r) => r.qa_score < autoPublishThreshold);
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
+
+    // Auto-approve deliverables when all SKUs pass QA threshold — no human needed
+    let autoApprovedCount = 0;
+    if (finalStatus === "completed") {
+      autoApprovedCount = await dbAutoApprovePackDeliverables({
+        workspaceId: params.workspaceId,
+        projectId: osProjectId,
+      }).catch(() => 0);
+
+      // Welcome email via SES (best-effort — never blocks pack completion)
+      if (intake.contact_email && process.env.SES_FROM_EMAIL) {
+        const { sendEmail } = await import("../../../../../backend/email/emailService");
+        await sendEmail("welcome", {
+          email: intake.contact_email,
+          name: intake.contact_name ?? intake.business_name,
+          appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
+        }).catch(() => null);
+      }
+    }
 
     run = (await updatePackRun(run.id, {
       steps,
