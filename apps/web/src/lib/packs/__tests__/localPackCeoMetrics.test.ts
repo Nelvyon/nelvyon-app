@@ -53,7 +53,7 @@ describe("localPackCeoMetrics", () => {
 
   it("formats welcome status labels", () => {
     expect(formatWelcomeStatus("queued", 3)).toBe("En cola (3-touch)");
-    expect(formatWelcomeStatus("no_api_key", 3)).toBe("Pendiente (falta SendGrid)");
+    expect(formatWelcomeStatus("no_api_key", 3)).toBe("Pendiente (falta SES)");
     expect(formatWelcomeStatus("skipped", 0)).toBe("Omitida (sin email)");
   });
 

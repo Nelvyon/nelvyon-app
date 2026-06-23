@@ -1,0 +1,31 @@
+{
+  "item_name": "Nodus Agent Template",
+  "provider": "Aceternity",
+  "license_id": "lic-aceternity-ui-pro-2026",
+  "slug": "nodus-agent-template",
+  "seed_id": "ace-nodus-agent-template",
+  "quality_score": 95,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "landing",
+    "funnel"
+  ],
+  "services": [
+    "Landing",
+    "SaaS B2B",
+    "Chatbot"
+  ],
+  "sector_groups": [
+    "saas_tech",
+    "other"
+  ],
+  "converted_to": [],
+  "notes": "AI agents/chatbots landing | Descargar desde pro.aceternity.com por nombre exacto."
+}

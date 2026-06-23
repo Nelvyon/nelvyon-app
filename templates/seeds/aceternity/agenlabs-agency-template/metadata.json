@@ -1,0 +1,28 @@
+{
+  "item_name": "Agenlabs Agency Template",
+  "provider": "Aceternity",
+  "license_id": "lic-aceternity-ui-pro-2026",
+  "slug": "agenlabs-agency-template",
+  "seed_id": "ace-agenlabs-agency-template",
+  "quality_score": 95,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "landing"
+  ],
+  "services": [
+    "Agency",
+    "Landing"
+  ],
+  "sector_groups": [
+    "agency_creator"
+  ],
+  "converted_to": [],
+  "notes": "Agency corporate | Descargar desde pro.aceternity.com por nombre exacto."
+}

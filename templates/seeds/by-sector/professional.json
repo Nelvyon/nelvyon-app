@@ -1,0 +1,872 @@
+{
+  "sector_group": "professional",
+  "count": 48,
+  "seeds": [
+    {
+      "slug": "schedule-marketing-template",
+      "item_name": "Schedule Marketing Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "cleanpro-cleaning-service-html-template",
+      "item_name": "Cleanpro - Cleaning Service HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "estatepro-real-estate-html-template",
+      "item_name": "EstatePro - Real Estate HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "handyman-home-repair-html-template",
+      "item_name": "Handyman - Home Repair HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "homelengo-real-estate-html-template",
+      "item_name": "Homelengo - Real Estate HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "hously-real-estate-html5-template",
+      "item_name": "Hously - Real Estate HTML5 Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "hvac-pro-air-conditioning-html-template",
+      "item_name": "HVAC Pro - Air Conditioning HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "plumber-home-services-html-template",
+      "item_name": "Plumber - Home Services HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "property-real-estate-html-template",
+      "item_name": "Property - Real Estate HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "realest-real-estate-html-template",
+      "item_name": "Realest - Real Estate HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "roofing-construction-html-template",
+      "item_name": "Roofing - Construction HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "atorn-law-firm-attorney-website-html-template",
+      "item_name": "Atorn - Law Firm & Attorney Website HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "ensaf-attorney-lawyer-html-template",
+      "item_name": "Ensaf - Attorney Lawyer HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fresh-mail-responsive-e-mail-template",
+      "item_name": "Fresh Mail - Responsive E-mail Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "grand-lead-generating-html-landing-pages",
+      "item_name": "Grand - Lead Generating HTML Landing Pages",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "indexly-seo-agency-html-template",
+      "item_name": "Indexly - SEO Agency HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "seo-local-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "lawfinity-law-and-attorney-html-template",
+      "item_name": "Lawfinity | Law and Attorney HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "seo_page"
+      ],
+      "services": [
+        "Landing",
+        "SEO",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "lyzo-law-firm-attorney-html-template",
+      "item_name": "Lyzo - Law Firm & Attorney HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "optima-seo-services-html-template",
+      "item_name": "Optima - SEO Services HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "seo-local-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "rankup-seo-landing-html-template",
+      "item_name": "RankUp - SEO Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "seo-local-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "searchpro-seo-html-template",
+      "item_name": "SearchPro - SEO HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "seo-local-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "seo-agency-seo-html-template",
+      "item_name": "SEO Agency - SEO HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "seo-local-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "architect-architecture-html-template",
+      "item_name": "Architect - Architecture HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "consultpro-consulting-html-template",
+      "item_name": "ConsultPro - Consulting HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "engineerpro-engineering-html-template",
+      "item_name": "EngineerPro - Engineering HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "financehub-financial-advisor-html-template",
+      "item_name": "FinanceHub - Financial Advisor HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "insurepro-insurance-html-template",
+      "item_name": "InsurePro - Insurance HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "legalpro-law-firm-html-template",
+      "item_name": "LegalPro - Law Firm HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "notary-notary-html-template",
+      "item_name": "Notary - Notary HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "taxadvisor-accounting-html-template",
+      "item_name": "TaxAdvisor - Accounting HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-1-premium-html-landing-template",
+      "item_name": "Pro Elite 1 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-10-premium-html-landing-template",
+      "item_name": "Pro Elite 10 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-11-premium-html-landing-template",
+      "item_name": "Pro Elite 11 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-12-premium-html-landing-template",
+      "item_name": "Pro Elite 12 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-13-premium-html-landing-template",
+      "item_name": "Pro Elite 13 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-14-premium-html-landing-template",
+      "item_name": "Pro Elite 14 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-15-premium-html-landing-template",
+      "item_name": "Pro Elite 15 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-16-premium-html-landing-template",
+      "item_name": "Pro Elite 16 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-17-premium-html-landing-template",
+      "item_name": "Pro Elite 17 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-18-premium-html-landing-template",
+      "item_name": "Pro Elite 18 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-2-premium-html-landing-template",
+      "item_name": "Pro Elite 2 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-3-premium-html-landing-template",
+      "item_name": "Pro Elite 3 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-4-premium-html-landing-template",
+      "item_name": "Pro Elite 4 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-5-premium-html-landing-template",
+      "item_name": "Pro Elite 5 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-6-premium-html-landing-template",
+      "item_name": "Pro Elite 6 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-7-premium-html-landing-template",
+      "item_name": "Pro Elite 7 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-8-premium-html-landing-template",
+      "item_name": "Pro Elite 8 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pro-elite-9-premium-html-landing-template",
+      "item_name": "Pro Elite 9 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

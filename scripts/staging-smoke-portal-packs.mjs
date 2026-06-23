@@ -46,16 +46,17 @@ async function waitForDeploy() {
   for (let i = 1; i <= MAX_DEPLOY_ATTEMPTS; i += 1) {
     try {
       const health = await fetch(`${BASE}/api/health/live`, { cache: "no-store" });
-      const [portal, automatizacion, packsHub, packReport] = await Promise.all([
+      const [portal, automatizacion, packsHub, packReport, ceoMetrics] = await Promise.all([
         routeExists("/portal"),
         routeExists("/automatizacion"),
         routeExists("/os/packs"),
         routeExists("/api/platform/pack-report"),
+        routeExists("/api/platform/packs/local-growth/ceo-metrics"),
       ]);
       console.log(
-        JSON.stringify({ attempt: i, health: health.status, portal, automatizacion, packsHub, packReport }),
+        JSON.stringify({ attempt: i, health: health.status, portal, automatizacion, packsHub, packReport, ceoMetrics }),
       );
-      if (health.status === 200 && portal && automatizacion && packsHub && packReport) {
+      if (health.status === 200 && portal && automatizacion && packsHub && packReport && ceoMetrics) {
         console.log("DEPLOY_READY");
         return;
       }
@@ -149,6 +150,33 @@ async function probeApi(module, check, path, token, workspaceId, okStatuses = [2
   return data;
 }
 
+async function probeApiNo404(module, check, path, token, workspaceId) {
+  const res = await fetch(`${BASE}${path}`, {
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+      ...(workspaceId ? { "X-Workspace-Id": String(workspaceId) } : {}),
+    },
+  });
+  if (res.status === 404 || res.status === 0) {
+    fail(module, check, `HTTP ${res.status}`);
+    return null;
+  }
+  if (res.status >= 500) {
+    fail(module, check, `HTTP ${res.status}`);
+    return null;
+  }
+  pass(module, check, `HTTP ${res.status}`);
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    return null;
+  }
+  return data;
+}
+
 async function runSmoke(token, workspaceId) {
   console.log("\n=== A1 Growth Packs ===");
   const packs = [
@@ -161,6 +189,24 @@ async function runSmoke(token, workspaceId) {
     await probePage("packs", `kickoff ${p.slug}`, `/os/packs/${p.slug}`, token, workspaceId);
     await probePage("packs", `report ${p.slug}`, `/dashboard/${p.slug}`, token, workspaceId);
     await probeApi("packs", `pack-report BFF (${p.id})`, `/api/platform/pack-report?pack_id=${p.id}`, token, workspaceId);
+    if (p.slug === "local-growth") {
+      await probeApiNo404(
+        "packs",
+        "local CEO metrics BFF",
+        "/api/platform/packs/local-growth/ceo-metrics",
+        token,
+        workspaceId,
+      );
+    }
+    if (p.slug === "saas-b2b-growth") {
+      await probeApiNo404(
+        "packs",
+        "saas B2B CEO metrics BFF",
+        "/api/platform/packs/saas-b2b-growth/ceo-metrics",
+        token,
+        workspaceId,
+      );
+    }
   }
 
   console.log("\n=== C5 Automation CEO ===");

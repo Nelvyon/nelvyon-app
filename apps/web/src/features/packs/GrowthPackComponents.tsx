@@ -6,10 +6,12 @@ import Link from "next/link";
 import { Button } from "@/core/ui/button";
 import { PanelCard } from "@/core/ui/PanelCard";
 import { usePackRun } from "@/features/packs/hooks";
+import { ANALYTICS_INSIGHTS_META } from "@/lib/packs/analyticsInsightsPack";
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import { SAAS_ERRORS, SAAS_KICKOFF } from "@/lib/saas/copy";
 import type { PackMeta } from "@/lib/packs/packRegistry";
-import type { PackId, PackRunRecord } from "@/lib/packs/types";
+import type { PackId, PackRunRecord, ReportPackId } from "@/lib/packs/types";
+import { ANALYTICS_INSIGHTS_PACK_ID } from "@/lib/packs/types";
 
 const inputClass =
   "w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -140,7 +142,7 @@ export function GrowthPackKickoffForm({
   );
 }
 
-export function PackRunProgress({ runId, packId }: { runId: string; packId: PackId }) {
+export function PackRunProgress({ runId, packId }: { runId: string; packId: ReportPackId }) {
   const query = usePackRun(packId, runId);
 
   if (query.isLoading) {
@@ -192,7 +194,10 @@ export function PackRunProgress({ runId, packId }: { runId: string; packId: Pack
 }
 
 export function PackRunSuccessLinks({ run }: { run: PackRunRecord }) {
-  const meta = getPackMeta(run.pack_id as PackId);
+  const meta =
+    run.pack_id === ANALYTICS_INSIGHTS_PACK_ID
+      ? ANALYTICS_INSIGHTS_META
+      : getPackMeta(run.pack_id as PackId);
   if (run.status !== "completed" && run.status !== "needs_review") return null;
 
   return (

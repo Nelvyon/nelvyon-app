@@ -80,7 +80,13 @@ blob-report/
 *.local
 .turbo/cache
 
-# --- Artefactos locales (no subir al repo) ---
-nelvyon_backend.zip
+# --- Template seeds (licensed — storage privado, no repo público) ---
+templates/seeds/**/source.zip
+templates/seeds/**/assets/**
+!templates/seeds/by-sector/
+templates/seeds/verify-report.json
+templates/monsterone/**/source.zip
+templates/**/source.zip
+templates/_extracted/**/node_modules/
 tools/
 backend/autonomous/output/

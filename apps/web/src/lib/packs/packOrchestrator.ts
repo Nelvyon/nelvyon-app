@@ -93,6 +93,7 @@ export type ExtraDeliverableSpec = {
   title: string;
   type: string;
   metadata: Record<string, unknown>;
+  file_url?: string | null;
 };
 
 export type GrowthPackRunConfig<T extends GrowthPackIntakeBase & { sector: string }> = {
@@ -359,6 +360,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         projectId: osProjectId,
         title: spec.title,
         type: spec.type,
+        file_url: spec.file_url ?? null,
         visibility: "client_visible",
         metadata: spec.metadata,
       });

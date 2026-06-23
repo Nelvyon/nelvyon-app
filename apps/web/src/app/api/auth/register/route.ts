@@ -59,8 +59,10 @@ export async function POST(req: Request) {
     } catch (err) {
       console.error("[register] onboarding init failed:", err);
     }
+    let emailVerificationSent = false;
     try {
       await issueEmailVerification(result.userId, result.email, displayName);
+      emailVerificationSent = true;
     } catch (err) {
       console.error("[register] verification email failed:", err);
     }
@@ -70,7 +72,7 @@ export async function POST(req: Request) {
       tenantId: result.tenantId,
       token: result.token,
       expiresAt: result.expiresAt,
-      emailVerificationSent: true,
+      emailVerificationSent,
     });
     applyNelvyonAuthCookie(res, result.token);
     return res;

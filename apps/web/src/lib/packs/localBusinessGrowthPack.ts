@@ -1,3 +1,5 @@
+import { enrichBriefWithPackLibrary } from "@/lib/packs/packTemplateLibrary";
+import { parseCatalogFocus } from "@/lib/packs/parseCatalogFocus";
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
@@ -62,7 +64,10 @@ export function buildBriefFromIntake(intake: LocalGrowthPackIntake): Record<stri
     ],
   };
 
-  return applyEliteTemplatesToBrief(withDomain, resolveTemplatesForSector(intake.sector));
+  return enrichBriefWithPackLibrary(
+    applyEliteTemplatesToBrief(withDomain, resolveTemplatesForSector(intake.sector)),
+    { pack_id: LOCAL_GROWTH_PACK_ID, sector: intake.sector },
+  );
 }
 
 export async function runLocalBusinessGrowthPack(params: {
@@ -207,6 +212,7 @@ export function validateLocalGrowthIntake(body: unknown): LocalGrowthPackIntake 
     value_proposition,
     primary_cta,
     tier: o.tier === "premium" ? "premium" : "professional",
+    catalog_focus: parseCatalogFocus(o.catalog_focus),
   };
 }
 

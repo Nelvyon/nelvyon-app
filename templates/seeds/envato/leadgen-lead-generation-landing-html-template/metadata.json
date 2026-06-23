@@ -1,0 +1,32 @@
+{
+  "item_name": "LeadGen - Lead Generation Landing HTML Template",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "leadgen-lead-generation-landing-html-template",
+  "seed_id": "env-leadgen-lead-generation-landing-html-template",
+  "quality_score": 91,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "landing-funnel-pack"
+  ],
+  "kinds": [
+    "landing",
+    "funnel"
+  ],
+  "services": [
+    "Landing",
+    "Funnel",
+    "CRO"
+  ],
+  "sector_groups": [
+    "saas_tech",
+    "agency_creator",
+    "ecommerce"
+  ],
+  "converted_to": [],
+  "notes": "Curated landing P1 — high conversion layout | Descargar desde elements.envato.com por nombre exacto."
+}

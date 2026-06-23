@@ -1,0 +1,43 @@
+{
+  "sector_group": "other",
+  "count": 2,
+  "seeds": [
+    {
+      "slug": "nodus-agent-template",
+      "item_name": "Nodus Agent Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Chatbot"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "nature-blog-article-website-template",
+      "item_name": "Nature Blog Article Website Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "SEO",
+        "Content"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

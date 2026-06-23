@@ -139,12 +139,12 @@ export default function SignupPage() {
 
           <p className="mt-6 text-center text-xs text-neutral-500">
             Al registrarte aceptas nuestros{" "}
-            <Link href="/terms" className="underline hover:text-neutral-700 dark:hover:text-neutral-300">
-              Términos
+            <Link href="/legal/terms" className="underline hover:text-neutral-700 dark:hover:text-neutral-300">
+              Términos de servicio
             </Link>{" "}
             y{" "}
-            <Link href="/privacy" className="underline hover:text-neutral-700 dark:hover:text-neutral-300">
-              Privacidad
+            <Link href="/legal/privacy" className="underline hover:text-neutral-700 dark:hover:text-neutral-300">
+              Política de privacidad
             </Link>
           </p>
 

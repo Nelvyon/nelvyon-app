@@ -5,6 +5,7 @@
  * Smokes:
  *  1. staging-smoke-portal-packs.mjs
  *  2. staging-smoke-local-pack-e2e.mjs
+ *  3. staging-smoke-saas-b2b-pack-e2e.mjs
  */
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -18,6 +19,7 @@ const extraArgs = skipWait ? ["--skip-wait"] : [];
 const SMOKES = [
   { name: "portal-packs", script: "staging-smoke-portal-packs.mjs" },
   { name: "local-pack-e2e", script: "staging-smoke-local-pack-e2e.mjs" },
+  { name: "saas-b2b-pack-e2e", script: "staging-smoke-saas-b2b-pack-e2e.mjs" },
 ];
 
 const results = [];

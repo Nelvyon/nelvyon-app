@@ -1,65 +1,36 @@
 import type { LocalGrowthPackIntake } from "@/lib/packs/types";
+import {
+  buildSeedProvenanceMeta,
+  personalizeSeedLanding,
+} from "@/lib/template-library/seed-personalizer";
+import { LOCAL_GROWTH_PACK_ID } from "@/lib/packs/types";
 
 export function buildLocalLandingHtml(intake: LocalGrowthPackIntake): string {
-  const cta = intake.primary_cta;
-  const city = intake.city;
-  return `<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(intake.business_name)} — ${escapeHtml(city)}</title>
-  <meta name="description" content="${escapeHtml(intake.value_proposition)}" />
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; }
-    .wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-    .badge { display: inline-block; background: #0f766e; color: #fff; padding: .35rem .75rem; border-radius: 999px; font-size: .8rem; }
-    h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 1rem 0 .5rem; line-height: 1.1; }
-    p.lead { font-size: 1.15rem; color: #cbd5e1; max-width: 52ch; }
-    .cta { display: inline-block; margin-top: 1.5rem; background: #f59e0b; color: #111; font-weight: 700; padding: .9rem 1.4rem; border-radius: .75rem; text-decoration: none; }
-    .grid { display: grid; gap: 1rem; margin-top: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 1rem; padding: 1.25rem; }
-    .map { margin-top: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid #334155; }
-    iframe { width: 100%; height: 280px; border: 0; }
-    form { margin-top: 1.5rem; display: grid; gap: .75rem; max-width: 420px; }
-    input, textarea { padding: .75rem; border-radius: .5rem; border: 1px solid #475569; background: #0f172a; color: #fff; }
-    button { background: #0f766e; color: #fff; border: 0; padding: .85rem; border-radius: .5rem; font-weight: 600; cursor: pointer; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <span class="badge">${escapeHtml(intake.sector)} · ${escapeHtml(city)}</span>
-    <h1>${escapeHtml(intake.business_name)}</h1>
-    <p class="lead">${escapeHtml(intake.value_proposition)}</p>
-    <a class="cta" href="#reserva">${escapeHtml(cta)}</a>
-    <div class="grid">
-      <div class="card"><strong>Horario</strong><br/>Lun–Sáb 9:00–20:00</div>
-      <div class="card"><strong>Ubicación</strong><br/>${escapeHtml(city)}, España</div>
-      <div class="card"><strong>Contacto</strong><br/>${escapeHtml(intake.contact_email ?? "info@" + slugify(intake.business_name) + ".es")}</div>
-    </div>
-    <div class="map">
-      <iframe title="Mapa" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-        src="https://www.google.com/maps?q=${encodeURIComponent(city + " España")}&output=embed"></iframe>
-    </div>
-    <form id="reserva">
-      <h2 id="reserva">${escapeHtml(cta)}</h2>
-      <input required name="name" placeholder="Tu nombre" />
-      <input required type="email" name="email" placeholder="Email" />
-      <input required type="tel" name="phone" placeholder="Teléfono" />
-      <textarea name="message" rows="3" placeholder="¿En qué podemos ayudarte?"></textarea>
-      <button type="submit">Enviar solicitud</button>
-    </form>
-  </div>
-  <script>
-    document.getElementById('reserva').addEventListener('submit', function (e) {
-      e.preventDefault();
-      alert('¡Gracias! Te contactaremos en breve para confirmar tu cita.');
-      e.target.reset();
-    });
-  </script>
-</body>
-</html>`;
+  const result = personalizeSeedLanding({
+    pack_id: LOCAL_GROWTH_PACK_ID,
+    sector: intake.sector,
+    business_name: intake.business_name,
+    city: intake.city,
+    value_proposition: intake.value_proposition,
+    primary_cta: intake.primary_cta,
+    contact_email: intake.contact_email,
+    varietyKey: intake.business_name,
+  });
+  return result.html;
+}
+
+export function buildLocalLandingProvenance(intake: LocalGrowthPackIntake): Record<string, unknown> {
+  const result = personalizeSeedLanding({
+    pack_id: LOCAL_GROWTH_PACK_ID,
+    sector: intake.sector,
+    business_name: intake.business_name,
+    city: intake.city,
+    value_proposition: intake.value_proposition,
+    primary_cta: intake.primary_cta,
+    contact_email: intake.contact_email,
+    varietyKey: intake.business_name,
+  });
+  return buildSeedProvenanceMeta(result);
 }
 
 export function buildLocalBotHtml(intake: LocalGrowthPackIntake): string {
@@ -131,8 +102,4 @@ function escapeHtml(value: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-}
-
-function slugify(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }

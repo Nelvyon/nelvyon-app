@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 };
 
 const LEGAL_LINKS = [
-  { href: "/privacy", label: "Política de privacidad" },
-  { href: "/terms", label: "Términos de servicio" },
+  { href: "/legal/privacy", label: "Política de privacidad" },
+  { href: "/legal/terms", label: "Términos de servicio" },
   { href: "/legal/refund-policy", label: "Política de reembolso" },
   { href: "/legal/acceptable-use", label: "Política de uso aceptable (AUP)" },
   { href: "/legal/dpa", label: "Acuerdo de tratamiento de datos (DPA)" },

@@ -1,0 +1,28 @@
+{
+  "item_name": "DineMail - Restaurant Newsletter Template",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "dinemail-restaurant-newsletter-template",
+  "seed_id": "env-dinemail-restaurant-newsletter-template",
+  "quality_score": 89,
+  "primary_kind": "email_sequence",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "email-welcome-nurture"
+  ],
+  "kinds": [
+    "email_sequence",
+    "email"
+  ],
+  "services": [
+    "Email"
+  ],
+  "sector_groups": [
+    "food_hospitality"
+  ],
+  "converted_to": [],
+  "notes": "Curated email sequence — newsletter quality | Descargar desde elements.envato.com por nombre exacto."
+}

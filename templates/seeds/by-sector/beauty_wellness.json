@@ -1,0 +1,218 @@
+{
+  "sector_group": "beauty_wellness",
+  "count": 12,
+  "seeds": [
+    {
+      "slug": "schedule-marketing-template",
+      "item_name": "Schedule Marketing Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "beautica-beauty-salon-html-template",
+      "item_name": "Beautica - Beauty Salon HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "caremail-healthcare-newsletter-template",
+      "item_name": "CareMail - Healthcare Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dentalmail-dentist-email-template",
+      "item_name": "DentalMail - Dentist Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "glamour-beauty-salon-html-template",
+      "item_name": "Glamour - Beauty Salon HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "healthmail-medical-email-template",
+      "item_name": "HealthMail - Medical Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "medical-spa-yoga-fitness-landing-page-template",
+      "item_name": "Medical, Spa, Yoga & Fitness Landing Page Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "nailart-nail-salon-html-template",
+      "item_name": "NailArt - Nail Salon HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "salonify-hair-salon-html-template",
+      "item_name": "Salonify - Hair Salon HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "skincare-spa-html-template",
+      "item_name": "SkinCare - Spa HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "sparelax-spa-beauty-html-template",
+      "item_name": "Sparelax - Spa & Beauty HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "wellnessmail-spa-email-template",
+      "item_name": "WellnessMail - Spa Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

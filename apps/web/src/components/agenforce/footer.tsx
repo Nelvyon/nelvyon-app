@@ -24,8 +24,9 @@ const FOOTER_COLUMNS = [
     title: "Empresa",
     links: [
       ["Nosotros", "/nosotros"],
-      ["Privacidad", "/privacidad"],
-      ["Términos", "/terminos"],
+      ["Privacidad", "/legal/privacy"],
+      ["Términos", "/legal/terms"],
+      ["Legal", "/legal"],
     ],
   },
 ];

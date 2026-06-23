@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{business_name}} — {{city}}</title>
+  <meta name="description" content="{{value_proposition}}" />
+  <style>
+    :root {
+      --primary: {{primary_color}};
+      --accent: {{accent_color}};
+      --dark: #1a1208;
+      --cream: #faf6f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, "Times New Roman", serif; background: var(--dark); color: var(--cream); }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .logo { font-size: 1.35rem; font-weight: 700; letter-spacing: .04em; color: var(--accent); }
+    .nav-cta { background: var(--accent); color: var(--dark); padding: .55rem 1.1rem; border-radius: 2rem; text-decoration: none; font-family: system-ui, sans-serif; font-weight: 600; font-size: .9rem; }
+    .hero { min-height: 72vh; display: grid; place-items: center; text-align: center; padding: 3rem 1.5rem; background: linear-gradient(160deg, rgba(0,0,0,.55), rgba(0,0,0,.75)), url('{{hero_image}}') center/cover; }
+    .hero-inner { max-width: 720px; }
+    .badge { display: inline-block; font-family: system-ui, sans-serif; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+    h1 { font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1.05; margin-bottom: 1rem; }
+    .lead { font-family: system-ui, sans-serif; font-size: 1.15rem; color: rgba(250,246,240,.85); max-width: 52ch; margin: 0 auto 2rem; line-height: 1.6; }
+    .cta-main { display: inline-block; background: var(--accent); color: var(--dark); font-family: system-ui, sans-serif; font-weight: 700; padding: 1rem 2rem; border-radius: .5rem; text-decoration: none; font-size: 1.05rem; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .feature { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 1rem; padding: 1.75rem; }
+    .feature h3 { color: var(--accent); font-family: system-ui, sans-serif; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .75rem; }
+    .feature p { font-family: system-ui, sans-serif; font-size: .95rem; color: rgba(250,246,240,.75); line-height: 1.5; }
+    .booking { background: var(--cream); color: var(--dark); padding: 4rem 2rem; }
+    .booking-inner { max-width: 520px; margin: 0 auto; }
+    .booking h2 { font-size: 2rem; margin-bottom: .5rem; }
+    .booking p { font-family: system-ui, sans-serif; color: #555; margin-bottom: 1.5rem; }
+    form { display: grid; gap: .75rem; }
+    input, textarea { padding: .85rem 1rem; border: 1px solid #ddd; border-radius: .5rem; font-family: system-ui, sans-serif; font-size: 1rem; }
+    button { background: var(--primary); color: #fff; border: 0; padding: 1rem; border-radius: .5rem; font-weight: 700; font-size: 1rem; cursor: pointer; }
+    footer { text-align: center; padding: 2rem; font-family: system-ui, sans-serif; font-size: .85rem; color: rgba(250,246,240,.45); border-top: 1px solid rgba(255,255,255,.06); }
+    .seed-meta { display: none; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">{{business_name}}</div>
+    <a class="nav-cta" href="#reserva">{{primary_cta}}</a>
+  </nav>
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="badge">{{sector_label}} · {{city}}</span>
+      <h1>{{business_name}}</h1>
+      <p class="lead">{{value_proposition}}</p>
+      <a class="cta-main" href="#reserva">{{primary_cta}}</a>
+    </div>
+  </section>
+  <section class="features">
+    <div class="feature"><h3>Ubicación</h3><p>{{city}}, España — fácil acceso y aparcamiento cercano.</p></div>
+    <div class="feature"><h3>Horario</h3><p>Lunes a sábado · servicio de calidad en cada visita.</p></div>
+    <div class="feature"><h3>Contacto</h3><p>{{contact_email}}</p></div>
+  </section>
+  <section class="booking" id="reserva">
+    <div class="booking-inner">
+      <h2>{{primary_cta}}</h2>
+      <p>Completa el formulario y te confirmamos en breve.</p>
+      <form id="booking-form">
+        <input required name="name" placeholder="Tu nombre" />
+        <input required type="email" name="email" placeholder="Email" />
+        <input required type="tel" name="phone" placeholder="Teléfono" />
+        <textarea name="message" rows="3" placeholder="¿Algo que debamos saber?"></textarea>
+        <button type="submit">{{primary_cta}}</button>
+      </form>
+    </div>
+  </section>
+  <footer>
+    {{business_name}} · {{city}} · Plantilla base: {{seed_template_name}}
+    <span class="seed-meta" data-seed-slug="{{seed_slug}}" data-seed-provider="{{seed_provider}}"></span>
+  </footer>
+  <script>
+    document.getElementById('booking-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('¡Gracias! Te contactaremos en breve.');
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

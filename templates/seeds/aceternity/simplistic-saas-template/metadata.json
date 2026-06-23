@@ -1,0 +1,36 @@
+{
+  "item_name": "Simplistic SaaS Template",
+  "provider": "Aceternity",
+  "license_id": "lic-aceternity-ui-pro-2026",
+  "slug": "simplistic-saas-template",
+  "seed_id": "ace-simplistic-saas-template",
+  "quality_score": 95,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "on_disk",
+  "storage": {
+    "source_zip": "source.zip"
+  },
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "landing",
+    "funnel"
+  ],
+  "services": [
+    "Landing",
+    "SaaS B2B",
+    "Funnel"
+  ],
+  "sector_groups": [
+    "saas_tech"
+  ],
+  "converted_to": [
+    "landing-saas-demo-v1",
+    "landing-saas-trial-v1"
+  ],
+  "notes": "Seed → bloques hero_3d/bento; pack SaaS B2B demo/trial | seed_id=aceternity-simplistic-saas"
+}

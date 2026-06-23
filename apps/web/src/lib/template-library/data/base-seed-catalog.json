@@ -1,0 +1,1192 @@
+[
+  {
+    "provider": "Aceternity",
+    "item_name": "Simplistic SaaS Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Seed → bloques hero_3d/bento; pack SaaS B2B demo/trial"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "AI SaaS Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B",
+      "Funnel"
+    ],
+    "match": {
+      "sectors": [
+        "ai_startup",
+        "martech",
+        "devtools"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Multi-page AI SaaS; seed multipágina"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Startup Landing Page Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Microinteractions; startup general"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Nodus Agent Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B",
+      "Chatbot"
+    ],
+    "match": {
+      "sectors": [
+        "ai_startup",
+        "chatbot"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "AI agents/chatbots landing"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Agenforce Marketing Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Agency",
+      "SaaS B2B"
+    ],
+    "match": {
+      "groups": [
+        "agency_creator",
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Agency + SaaS marketing"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Foxtrot Marketing Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Brand"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech",
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Single-page SaaS marketing (ya en repo _extracted)"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Proactiv Marketing Template",
+    "kinds": [
+      "landing",
+      "social"
+    ],
+    "services": [
+      "Landing",
+      "Social",
+      "Brand"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech",
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Social media tools SaaS"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Productized Agency Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Agency",
+      "Landing",
+      "SaaS B2B"
+    ],
+    "match": {
+      "groups": [
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Agency packages/pricing; parcial en components/pa"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Agenlabs Agency Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Agency",
+      "Landing"
+    ],
+    "match": {
+      "groups": [
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Agency corporate"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Schedule Marketing Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "health_medical",
+        "beauty_wellness",
+        "professional"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Booking/appointments — clínicas, salones, consultas"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Playful Marketing Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Brand",
+      "Social"
+    ],
+    "match": {
+      "groups": [
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Creator/coach playful brand"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Cryptgen Marketing Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B"
+    ],
+    "match": {
+      "sectors": [
+        "fintech",
+        "ai_startup"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Bento + testimonials fintech/crypto style"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "Minimal Portfolio Template",
+    "kinds": [
+      "landing",
+      "content_page"
+    ],
+    "services": [
+      "Landing",
+      "Content",
+      "Agency"
+    ],
+    "match": {
+      "sectors": [
+        "photographer",
+        "freelancer",
+        "videographer",
+        "author"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Portfolio creators"
+  },
+  {
+    "provider": "Aceternity",
+    "item_name": "DevPro Portfolio Template",
+    "kinds": [
+      "landing",
+      "content_page"
+    ],
+    "services": [
+      "Landing",
+      "Content"
+    ],
+    "match": {
+      "sectors": [
+        "freelancer",
+        "devtools"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Developer portfolio"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Granny - Elegant Restaurant & Cafe HTML Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "food_hospitality"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Restaurante/café; menú + reservas"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Pizzan - Fast Food and Restaurant HTML Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Local"
+    ],
+    "match": {
+      "sectors": [
+        "pizza",
+        "fast_food"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Fast food / pizza"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Savory Haven - Restaurant Landing Page",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Local"
+    ],
+    "match": {
+      "groups": [
+        "food_hospitality"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Figma/XD seed; convertir a bloques"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Restaurant Email Newsletter Template",
+    "kinds": [
+      "email_sequence",
+      "email"
+    ],
+    "services": [
+      "Email",
+      "Local"
+    ],
+    "match": {
+      "groups": [
+        "food_hospitality"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Newsletter promo menú/eventos"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Fast Food Restaurant Email Newsletter Template",
+    "kinds": [
+      "email"
+    ],
+    "services": [
+      "Email"
+    ],
+    "match": {
+      "sectors": [
+        "fast_food",
+        "food_truck",
+        "pizza"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Email promo oferta"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Pearl - Hotel & Restaurant Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "hospitality_travel"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Hotel + restaurante"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Dentist & Dental Clinic Web Template - Dentia",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "Funnel"
+    ],
+    "match": {
+      "sectors": [
+        "dental"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Clínica dental primera cita"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Dentalux",
+    "kinds": [
+      "landing",
+      "seo_page"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "SEO"
+    ],
+    "match": {
+      "groups": [
+        "health_medical"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Dental + clínica general"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Dotus – Health & Medical HTML5 Template",
+    "kinds": [
+      "landing",
+      "seo_page"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "SEO"
+    ],
+    "match": {
+      "groups": [
+        "health_medical"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Hospital, clínica, farmacia"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Medical, Spa, Yoga & Fitness Landing Page Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Local"
+    ],
+    "match": {
+      "groups": [
+        "beauty_wellness",
+        "fitness_sports"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Spa, yoga, wellness"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Gymfito - Tailwind CSS Fitness & Gym HTML Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "fitness_sports"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Gym, trainer, clases"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "GymOn - Gym and Fitness Club HTML Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Local"
+    ],
+    "match": {
+      "groups": [
+        "fitness_sports"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Crossfit, yoga club"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Fitmas - Gym & Fitness Center HTML Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Funnel",
+      "Local"
+    ],
+    "match": {
+      "groups": [
+        "fitness_sports"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "17 inner pages; funnel membership"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Atorn - Law Firm & Attorney Website HTML Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "Funnel"
+    ],
+    "match": {
+      "sectors": [
+        "legal"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Despacho abogados consulta"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Lawfinity | Law and Attorney HTML Template",
+    "kinds": [
+      "landing",
+      "seo_page"
+    ],
+    "services": [
+      "Landing",
+      "SEO",
+      "Local"
+    ],
+    "match": {
+      "sectors": [
+        "legal",
+        "notary"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "SEO legal practice areas"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Lyzo - Law Firm & Attorney HTML Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Local"
+    ],
+    "match": {
+      "sectors": [
+        "legal"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Alternativa legal RTL"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Grand - Lead Generating HTML Landing Pages",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "Local",
+      "Funnel",
+      "CRO"
+    ],
+    "match": {
+      "sectors": [
+        "real_estate",
+        "solar",
+        "construction",
+        "mortgage"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Lead gen valoración/presupuesto"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "GoShop - Premium HTML Ecommerce Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Ecommerce",
+      "Landing",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "ecommerce"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "Tienda multipropósito"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Comercio - Fashion Shop Ecommerce HTML Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Ecommerce",
+      "Landing"
+    ],
+    "match": {
+      "sectors": [
+        "ecommerce_fashion",
+        "ecommerce_beauty"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "Moda DTC"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "ECOSHOP - Multipurpose eCommerce HTML5 Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Ecommerce",
+      "Landing"
+    ],
+    "match": {
+      "groups": [
+        "ecommerce"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "Multicategoría"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Olive - Fashion Ecommerce Email Newsletter",
+    "kinds": [
+      "email_sequence",
+      "email"
+    ],
+    "services": [
+      "Email",
+      "Ecommerce"
+    ],
+    "match": {
+      "groups": [
+        "ecommerce"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "Newsletter moda; carrito welcome"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Fashino - Responsive Shop Email Templates",
+    "kinds": [
+      "email_sequence",
+      "email"
+    ],
+    "services": [
+      "Email",
+      "Ecommerce"
+    ],
+    "match": {
+      "groups": [
+        "ecommerce"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "40+ secciones email ecommerce"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Evolia Email eCommerce Newsletter",
+    "kinds": [
+      "email"
+    ],
+    "services": [
+      "Email",
+      "Ecommerce"
+    ],
+    "match": {
+      "groups": [
+        "ecommerce"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "Campañas promo"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Fashionistas - Responsive Email Template",
+    "kinds": [
+      "email"
+    ],
+    "services": [
+      "Email"
+    ],
+    "match": {
+      "sectors": [
+        "ecommerce_fashion"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "Moda seasonal"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Softing – Software & SaaS Landing Page Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Bootstrap 5 SaaS; pricing CTA"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Anaton - SaaS & AI Startup landing Page",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "35+ páginas; demo funnel"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Cloudly – SaaS, Software & App Landing HTML Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "App landing 3 homes"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Saasten - SaaS & Software HTML Template",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "07+ home layouts"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "WETA - SaaS Landing HTML5 Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Trial signup"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Boostly – SaaS & Tech Startup HTML Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "SaaS B2B"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Tech startup"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Yoso - Digital Marketing Agency HTML Landing Page",
+    "kinds": [
+      "landing",
+      "funnel"
+    ],
+    "services": [
+      "Agency",
+      "Landing",
+      "Funnel"
+    ],
+    "match": {
+      "groups": [
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "9 layouts leadgen; auditoría gratis"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Andeo - Digital Marketing Agency HTML Template",
+    "kinds": [
+      "landing",
+      "seo_page"
+    ],
+    "services": [
+      "Agency",
+      "SEO",
+      "Landing"
+    ],
+    "match": {
+      "groups": [
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "SEO agency inner pages"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Cleo - Agency Landing Page Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Agency",
+      "Landing"
+    ],
+    "match": {
+      "groups": [
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Agency corporate"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Fresh Mail - Responsive E-mail Template",
+    "kinds": [
+      "email_sequence",
+      "email"
+    ],
+    "services": [
+      "Email"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech",
+        "agency_creator",
+        "professional"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Multipropósito B2B"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Black - Notification Email Templates",
+    "kinds": [
+      "email"
+    ],
+    "services": [
+      "Email",
+      "Automation"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Transaccional SaaS"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Minimal Email Newsletter Template",
+    "kinds": [
+      "email_sequence"
+    ],
+    "services": [
+      "Email",
+      "Content"
+    ],
+    "match": {
+      "groups": [
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Coach/infoproduct nurture"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Nature Blog Article Website Template",
+    "kinds": [
+      "content_page",
+      "seo_page"
+    ],
+    "services": [
+      "SEO",
+      "Content"
+    ],
+    "match": {
+      "groups": [
+        "education",
+        "agency_creator",
+        "other"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Blog/article layout SEO"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Gym Google Adwords HTML5 Banner Ads GWD",
+    "kinds": [
+      "ad_creative"
+    ],
+    "services": [
+      "Ads",
+      "Social"
+    ],
+    "match": {
+      "groups": [
+        "fitness_sports"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Display banners gym"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Fashion Email Newsletter Template",
+    "kinds": [
+      "ad_creative",
+      "social"
+    ],
+    "services": [
+      "Social",
+      "Ads"
+    ],
+    "match": {
+      "sectors": [
+        "influencer",
+        "ecommerce_fashion",
+        "coach"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "Visual hooks Instagram/email"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Workout Youtube Thumbnail Template",
+    "kinds": [
+      "ad_creative",
+      "content_page"
+    ],
+    "services": [
+      "Social",
+      "Content",
+      "Ads"
+    ],
+    "match": {
+      "groups": [
+        "fitness_sports",
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "YouTube/social thumbnails"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Kababi - Restaurant HTMLTemplate",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Local"
+    ],
+    "match": {
+      "groups": [
+        "food_hospitality"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Fallback food service"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Ensaf - Attorney Lawyer HTML Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Landing",
+      "Local"
+    ],
+    "match": {
+      "groups": [
+        "professional"
+      ]
+    },
+    "pack_ids": "local-business-growth",
+    "lang": "en",
+    "notes": "Fallback professional services"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "Maxshop - Multipurpose eCommerce HTML Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "Ecommerce",
+      "Landing"
+    ],
+    "match": {
+      "groups": [
+        "ecommerce",
+        "industrial"
+      ]
+    },
+    "pack_ids": "ecommerce-growth",
+    "lang": "en",
+    "notes": "Fallback retail/industrial DTC"
+  },
+  {
+    "provider": "EnvatoElements",
+    "item_name": "OSaaS - SaaS & Startup Agency Template",
+    "kinds": [
+      "landing"
+    ],
+    "services": [
+      "SaaS B2B",
+      "Agency",
+      "Landing"
+    ],
+    "match": {
+      "groups": [
+        "saas_tech",
+        "agency_creator"
+      ]
+    },
+    "pack_ids": "saas-b2b-growth",
+    "lang": "en",
+    "notes": "Fallback SaaS/agency"
+  }
+]

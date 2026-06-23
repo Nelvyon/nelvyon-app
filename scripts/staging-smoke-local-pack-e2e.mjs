@@ -2,7 +2,7 @@
  * Staging E2E — Local Growth Pack production pilot.
  * Usage: node scripts/staging-smoke-local-pack-e2e.mjs [--skip-wait]
  *
- * Flow: operator login → POST kickoff → portal invite → portal login → 5 deliverables sin mock://
+ * Flow: operator login → POST kickoff → CEO metrics BFF → portal invite → portal login → 5 deliverables sin mock://
  */
 const BASE = "https://ideal-victory-staging.up.railway.app";
 const BACKEND_API =
@@ -23,6 +23,31 @@ const EXPECTED_TITLES = [
   "Campaña email de bienvenida",
   "Informe ejecutivo",
 ];
+
+/** Contract for GET /api/platform/packs/local-growth/ceo-metrics */
+const EXPECTED_CEO_METRIC_KEYS = [
+  "leads",
+  "cpl_approx",
+  "appointments",
+  "landing_to_lead_rate",
+  "welcome_sequence_status",
+];
+
+const EXPECTED_CEO_LABELS = {
+  leads: "Leads",
+  cpl_approx: "CPL aprox.",
+  appointments: "Citas",
+  landing_to_lead_rate: "Landing → lead",
+  welcome_sequence_status: "Secuencia bienvenida",
+};
+
+const CEO_LIMITATION_MARKERS = {
+  leads: ["CRM", "crm", "contactos"],
+  cpl_approx: ["simulador", "Aproximado", "Google/Meta", "atribución"],
+  appointments: ["Reservas", "reservas", "citas"],
+  landing_to_lead_rate: ["landing", "Landing", "pixel", "GA4", "tráfico"],
+  welcome_sequence_status: ["bienvenida", "welcome", "campaña", "email", "secuencia"],
+};
 
 const COOKIE = "nelvyon_token";
 
@@ -67,15 +92,19 @@ async function waitForDeploy() {
         cache: "no-store",
       }).catch(() => null);
       const liveRoute = await fetch(`${BASE}/api/packs/local/live/smoke-probe`, { cache: "no-store" });
+      const ceoMetricsRoute = await fetch(`${BASE}/api/platform/packs/local-growth/ceo-metrics`, {
+        cache: "no-store",
+      });
       console.log(
         JSON.stringify({
           attempt: i,
           health: health.status,
           kickoff: kickoff?.status ?? "n/a",
           liveRoute: liveRoute.status,
+          ceoMetricsRoute: ceoMetricsRoute.status,
         }),
       );
-      if (health.status === 200) {
+      if (health.status === 200 && ceoMetricsRoute.status !== 404) {
         console.log("DEPLOY_READY");
         return;
       }
@@ -157,6 +186,117 @@ async function kickoffLocalPack(token, workspaceId) {
   const run = await res.json();
   pass("kickoff", "POST", `run=${run.id} status=${run.status} via ${base}`);
   return run;
+}
+
+function buildCeoMetricsPath(report) {
+  const kpis = report?.kpis ?? {};
+  const qs = new URLSearchParams();
+  if (kpis.saas_campaign_id) qs.set("campaign_id", String(kpis.saas_campaign_id));
+  if (kpis.welcome_email_status) qs.set("welcome_status", String(kpis.welcome_email_status));
+  if (kpis.welcome_touches != null) qs.set("welcome_touches", String(kpis.welcome_touches));
+  const suffix = qs.toString() ? `?${qs.toString()}` : "";
+  return `/api/platform/packs/local-growth/ceo-metrics${suffix}`;
+}
+
+async function verifyLocalCeoMetrics(token, workspaceId, finalRun) {
+  const path = buildCeoMetricsPath(finalRun.report);
+  const { res, base } = await resolveApiBase(path, token, workspaceId);
+
+  if (res.status === 404) {
+    fail("ceo-metrics", "GET route", `HTTP 404 — missing BFF at ${path}`);
+    return;
+  }
+  if (res.status >= 500) {
+    const err = await res.text();
+    fail("ceo-metrics", "GET route", `HTTP ${res.status} ${err.slice(0, 200)}`);
+    return;
+  }
+  if (!res.ok) {
+    const err = await res.text();
+    fail("ceo-metrics", "GET route", `HTTP ${res.status} ${err.slice(0, 200)}`);
+    return;
+  }
+
+  let payload;
+  try {
+    payload = await res.json();
+  } catch (e) {
+    fail("ceo-metrics", "JSON", String(e));
+    return;
+  }
+
+  pass("ceo-metrics", "GET", `HTTP 200 via ${base}`);
+
+  if (!Array.isArray(payload.metrics)) {
+    fail("ceo-metrics", "metrics array", "missing metrics[]");
+    return;
+  }
+  if (payload.metrics.length !== EXPECTED_CEO_METRIC_KEYS.length) {
+    fail(
+      "ceo-metrics",
+      "metrics count",
+      `expected ${EXPECTED_CEO_METRIC_KEYS.length}, got ${payload.metrics.length}`,
+    );
+    return;
+  }
+  pass("ceo-metrics", "metrics count", String(payload.metrics.length));
+
+  if (!payload.fetched_at) {
+    fail("ceo-metrics", "fetched_at", "missing timestamp");
+  } else {
+    pass("ceo-metrics", "fetched_at", payload.fetched_at.slice(0, 19));
+  }
+
+  for (const key of EXPECTED_CEO_METRIC_KEYS) {
+    const metric = payload.metrics.find((m) => m?.key === key);
+    if (!metric) {
+      fail("ceo-metrics", `metric:${key}`, "missing");
+      continue;
+    }
+
+    const expectedLabel = EXPECTED_CEO_LABELS[key];
+    if (metric.label !== expectedLabel) {
+      fail("ceo-metrics", `label:${key}`, `expected "${expectedLabel}", got "${metric.label}"`);
+    } else {
+      pass("ceo-metrics", `label:${key}`, metric.label);
+    }
+
+    if (typeof metric.value !== "string" || !metric.value.trim()) {
+      fail("ceo-metrics", `value:${key}`, "empty or missing");
+    } else {
+      pass("ceo-metrics", `value:${key}`, metric.value);
+    }
+
+    if (typeof metric.hint !== "string" || metric.hint.trim().length < 8) {
+      fail("ceo-metrics", `hint:${key}`, "missing or too short");
+    } else {
+      pass("ceo-metrics", `hint:${key}`, "present");
+    }
+
+    const limitation = typeof metric.limitation === "string" ? metric.limitation.trim() : "";
+    if (limitation.length < 12) {
+      fail("ceo-metrics", `limitation:${key}`, "missing or too short");
+      continue;
+    }
+    const markers = CEO_LIMITATION_MARKERS[key] ?? [];
+    const hasMarker = markers.some((needle) => limitation.toLowerCase().includes(needle.toLowerCase()));
+    if (!hasMarker) {
+      fail("ceo-metrics", `limitation:${key}`, `unexpected text: ${limitation.slice(0, 80)}`);
+    } else {
+      pass("ceo-metrics", `limitation:${key}`, limitation.slice(0, 56));
+    }
+
+    if (typeof metric.available !== "boolean") {
+      fail("ceo-metrics", `available:${key}`, "must be boolean");
+    }
+  }
+
+  const keys = payload.metrics.map((m) => m?.key).filter(Boolean);
+  if (keys.join(",") !== EXPECTED_CEO_METRIC_KEYS.join(",")) {
+    fail("ceo-metrics", "metrics order", `got [${keys.join(", ")}]`);
+  } else {
+    pass("ceo-metrics", "metrics order", "canonical");
+  }
 }
 
 async function pollPackRun(token, workspaceId, runId) {
@@ -409,6 +549,9 @@ async function main() {
     fail("kickoff", "os ids", "missing os_client_id or os_project_id");
     process.exit(1);
   }
+
+  console.log("\n=== CEO metrics (post-kickoff) ===");
+  await verifyLocalCeoMetrics(token, workspaceId, finalRun);
 
   const slug = BUSINESS_NAME.toLowerCase()
     .normalize("NFD")

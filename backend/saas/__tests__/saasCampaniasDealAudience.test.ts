@@ -103,6 +103,14 @@ function makeDb() {
     if (s.startsWith("UPDATE saas_campanias SET status = 'running'")) return [] as T[];
     if (s.startsWith("INSERT INTO saas_campania_recipients")) return [] as T[];
     if (s.startsWith("UPDATE saas_campania_recipients")) return [] as T[];
+    if (s.startsWith("INSERT INTO saas_activity_log")) return [] as T[];
+    if (s.includes("SELECT id, email, name FROM saas_contacts")) {
+      const tenantId = String(p[0]);
+      const ids = (p[1] as string[]) ?? [];
+      return contacts
+        .filter((c) => c.tenant_id === tenantId && ids.includes(c.id))
+        .map((c) => ({ id: c.id, email: "test@example.com", name: "Contact" })) as T[];
+    }
     if (s.startsWith("UPDATE saas_campanias SET status = 'completed'")) return [] as T[];
     if (s.includes("SELECT plan FROM saas_tenants")) return [{ plan: "enterprise" }] as T[];
     if (s.includes("COUNT(*)") && s.includes("FROM saas_campanias")) return [{ n: campanias.length }] as T[];

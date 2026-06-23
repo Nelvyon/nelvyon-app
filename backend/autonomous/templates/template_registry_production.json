@@ -1,0 +1,112 @@
+{
+  "version": "1.0.0",
+  "catalog": "production",
+  "source_default": "MonsterONE",
+  "target_volume": {
+    "min": 500,
+    "max": 700,
+    "notes": "Registro documental. No conectado a loadRegistry.ts ni pipelineTemplateSelector hasta migración explícita."
+  },
+  "allowed_categories": [
+    "Landing",
+    "Corporate",
+    "SaaS",
+    "Ecommerce",
+    "Restaurant",
+    "Dental",
+    "Legal",
+    "Fitness",
+    "RealEstate",
+    "Beauty",
+    "Coaching",
+    "Solar",
+    "Branding",
+    "Logos",
+    "SocialMedia",
+    "Ads",
+    "PitchDecks"
+  ],
+  "allowed_status": ["active", "review", "deprecated", "suspended"],
+  "allowed_stacks": [
+    "html-css-js",
+    "bootstrap",
+    "tailwind",
+    "react",
+    "next",
+    "vue",
+    "wordpress",
+    "webflow-export",
+    "figma",
+    "psd",
+    "ai-eps",
+    "canva",
+    "video-mp4",
+    "pptx",
+    "keynote",
+    "google-slides"
+  ],
+  "schema": {
+    "template_id": "string — único, kebab-case, prefijo categoría (ej. landing-monster-042)",
+    "name": "string — título comercial MonsterONE o nombre normalizado",
+    "category": "string — una de allowed_categories",
+    "sector": "string — sector primario (Restaurant, Dental, general, …)",
+    "source": "string — siempre MonsterONE salvo excepción documentada",
+    "stack": "string — una de allowed_stacks",
+    "quality_score": "number 0–100 — QA visual/técnico manual",
+    "conversion_score": "number 0–100 — CRO estimado (estructura CTA, form, prueba social)",
+    "speed_score": "number 0–100 — rendimiento estimado (peso assets, JS, LCP proxy)",
+    "premium_score": "number 0–100 — percepción premium (diseño, tipografía, spacing)",
+    "tags": "string[] — keywords libres (hero-video, dark-mode, multi-page, …)",
+    "status": "string — active | review | deprecated | suspended"
+  },
+  "scoring_thresholds": {
+    "min_active": {
+      "quality_score": 75,
+      "premium_score": 70,
+      "notes": "Plantillas por debajo → status review hasta re-score o descarte"
+    },
+    "pipeline_ready": {
+      "quality_score": 85,
+      "conversion_score": 70,
+      "speed_score": 65,
+      "premium_score": 80,
+      "notes": "Umbral futuro para pipelines autónomos (no enforced hoy)"
+    }
+  },
+  "storage_convention": {
+    "root": "templates/monsterone/",
+    "pattern": "{category}/{sector}/{template_id}/",
+    "required_files": ["source.zip", "preview.png", "metadata.json"],
+    "optional_files": ["license.txt", "readme-monsterone.txt", "fonts/"]
+  },
+  "templates": [
+    {
+      "template_id": "landing-monster-restaurant-001",
+      "name": "Restaurant Landing — Hero Menu CTA (ejemplo schema)",
+      "category": "Landing",
+      "sector": "Restaurant",
+      "source": "MonsterONE",
+      "stack": "html-css-js",
+      "quality_score": 0,
+      "conversion_score": 0,
+      "speed_score": 0,
+      "premium_score": 0,
+      "tags": ["schema-example", "do-not-use-in-pipeline"],
+      "status": "review"
+    },
+    {
+      "template_id": "corporate-monster-general-001",
+      "name": "Corporate Multi-page — Trust & Services (ejemplo schema)",
+      "category": "Corporate",
+      "sector": "general",
+      "source": "MonsterONE",
+      "stack": "bootstrap",
+      "quality_score": 0,
+      "conversion_score": 0,
+      "speed_score": 0,
+      "premium_score": 0,
+      "tags": ["schema-example", "do-not-use-in-pipeline"],
+      "status": "review"
+    }
+  ]
+}

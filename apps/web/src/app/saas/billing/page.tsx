@@ -1,9 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import {
+  CHECKOUT_STRIPE_PLANS,
+  PLAN_NAMES,
+  PLAN_PRICES,
+  comparePlans,
+  type CheckoutStripePlan,
+} from "@nelvyon/billing/planConfig";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
+import { PlanCheckoutButton } from "@/features/billing/PlanCheckoutButton";
+import type { BillablePlanId } from "@/features/billing/planCheckout";
 import { SaasEmptyState } from "@/features/saas-shell/components/SaasEmptyState";
 import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -22,11 +31,19 @@ function usagePct(used: number, limit: number | null): number | null {
   return Math.min(100, Math.round((used / limit) * 100));
 }
 
+function saasPlanToCheckoutTier(plan: string): CheckoutStripePlan {
+  const p = plan.toLowerCase().trim();
+  if (p === "enterprise") return "agency";
+  if (p === "starter" || p === "pro" || p === "agency") return p;
+  return "starter";
+}
+
 export default function SaasBillingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<BillingSummary | null>(null);
+  const [portalUrl, setPortalUrl] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -42,6 +59,12 @@ export default function SaasBillingPage() {
         }
         if (!res.ok) throw new Error("No se pudo cargar la facturación");
         setData((await res.json()) as BillingSummary);
+
+        const portalRes = await fetch("/api/user/payment-method", { credentials: "same-origin" });
+        if (portalRes.ok) {
+          const portal = (await portalRes.json()) as { updateUrl?: string };
+          if (portal.updateUrl) setPortalUrl(portal.updateUrl);
+        }
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Error");
       } finally {
@@ -50,6 +73,11 @@ export default function SaasBillingPage() {
     })();
   }, [router]);
 
+  const currentCheckoutTier = useMemo(
+    () => (data ? saasPlanToCheckoutTier(data.tenant.plan) : "starter"),
+    [data],
+  );
+
   const activeId: SaasNavId = "billing";
 
   return (
@@ -57,7 +85,7 @@ export default function SaasBillingPage() {
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
         <SaasSidebar activeId={activeId} tenantCompany={data?.tenant.companyName} tenantPlan={data?.tenant.plan as "starter" | "pro" | "enterprise" | undefined} />
         <main className="space-y-6">
-          <NelvyonDsSectionHeader title="Facturación y plan" subtitle="Uso real del tenant y límites del plan activo." />
+          <NelvyonDsSectionHeader title="Facturación y plan" subtitle="Uso del tenant, límites y checkout Stripe self-serve." />
           {loading ? <NelvyonDsCard>Cargando…</NelvyonDsCard> : null}
           {error ? <SaasPermissionDenied message={error} /> : null}
           {!loading && !error && data ? (
@@ -68,6 +96,15 @@ export default function SaasBillingPage() {
                   <span className="text-sm text-muted-foreground">{data.tenant.companyName}</span>
                   <NelvyonDsBadge tone="neutral">{saasRoleLabel(data.role)}</NelvyonDsBadge>
                 </div>
+                {portalUrl ? (
+                  <div className="mt-4">
+                    <NelvyonDsButton asChild variant="secondary" size="sm">
+                      <a href={portalUrl} rel="noopener noreferrer" target="_blank">
+                        Gestionar método de pago en Stripe
+                      </a>
+                    </NelvyonDsButton>
+                  </div>
+                ) : null}
               </NelvyonDsCard>
               <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {(["contacts", "deals", "campanias", "workflows", "users"] as const).map((key) => {
@@ -91,13 +128,52 @@ export default function SaasBillingPage() {
                   );
                 })}
               </section>
+              <section className="space-y-4">
+                <h2 className="text-lg font-semibold">Cambiar de plan</h2>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {CHECKOUT_STRIPE_PLANS.map((planId) => {
+                    const isCurrent = planId === currentCheckoutTier;
+                    const isUpgrade = comparePlans(planId, currentCheckoutTier as BillablePlanId) > 0;
+                    const isDowngrade = comparePlans(planId, currentCheckoutTier as BillablePlanId) < 0;
+                    return (
+                      <NelvyonDsCard key={planId} title={PLAN_NAMES[planId]}>
+                        <p className="text-3xl font-bold tabular-nums">
+                          €{PLAN_PRICES[planId]}
+                          <span className="text-sm font-normal text-muted-foreground">/mes</span>
+                        </p>
+                        <div className="mt-4">
+                          {isCurrent ? (
+                            <NelvyonDsBadge tone="primary">Plan actual</NelvyonDsBadge>
+                          ) : (
+                            <PlanCheckoutButton
+                              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+                              planId={planId}
+                              returnPath="/saas/billing"
+                            >
+                              {isUpgrade ? "Mejorar plan" : isDowngrade ? "Cambiar plan" : "Seleccionar"}
+                            </PlanCheckoutButton>
+                          )}
+                        </div>
+                      </NelvyonDsCard>
+                    );
+                  })}
+                </div>
+              </section>
               <SaasEmptyState
-                title="Gestión de suscripción"
-                description="Para cambiar de plan o métodos de pago, usa el portal de facturación del workspace."
+                title="Facturación del workspace"
+                description="El portal de Stripe gestiona métodos de pago e historial. Los cambios de plan se sincronizan automáticamente con tu tenant SaaS."
                 action={
-                  <NelvyonDsButton asChild variant="secondary">
-                    <a href="/dashboard/settings">Abrir portal de facturación</a>
-                  </NelvyonDsButton>
+                  portalUrl ? (
+                    <NelvyonDsButton asChild variant="secondary">
+                      <a href={portalUrl} rel="noopener noreferrer" target="_blank">
+                        Abrir portal Stripe
+                      </a>
+                    </NelvyonDsButton>
+                  ) : (
+                    <NelvyonDsButton asChild variant="secondary">
+                      <a href="/dashboard/settings">Configuración del workspace</a>
+                    </NelvyonDsButton>
+                  )
                 }
               />
             </>

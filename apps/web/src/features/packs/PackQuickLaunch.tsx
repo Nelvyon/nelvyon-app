@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/core/ui/button";
 import { PanelCard } from "@/core/ui/PanelCard";
@@ -14,6 +15,7 @@ import {
   type PackElitePreset,
 } from "@/lib/packs/packEliteTemplates";
 import { SAAS_ERRORS, SAAS_KICKOFF } from "@/lib/saas/copy";
+import { resolvePackFocus } from "@/lib/saas/packFocusCopy";
 import type { PackId, PackRunRecord } from "@/lib/packs/types";
 
 type PackQuickLaunchProps = {
@@ -24,7 +26,15 @@ type PackQuickLaunchProps = {
   mergeKickoffBody?: (body: Record<string, unknown>) => Record<string, unknown>;
 };
 
-export function PackQuickLaunch({
+export function PackQuickLaunch(props: PackQuickLaunchProps) {
+  return (
+    <Suspense fallback={null}>
+      <PackQuickLaunchInner {...props} />
+    </Suspense>
+  );
+}
+
+function PackQuickLaunchInner({
   packId,
   meta,
   onKickoff,
@@ -36,6 +46,11 @@ export function PackQuickLaunch({
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const catalogFocus = resolvePackFocus(searchParams?.get("focus") ?? null);
+
+  const withCatalogFocus = (body: Record<string, unknown>) =>
+    catalogFocus ? { ...body, catalog_focus: catalogFocus } : body;
 
   const featured = getPackFeaturedPreset(packId);
   const gallery = getPackTemplateGallery(packId);
@@ -49,8 +64,8 @@ export function PackQuickLaunch({
     setError(null);
     try {
       const body = mergeKickoffBody
-        ? mergeKickoffBody({ ...preset.intake, elite_preset_id: preset.id })
-        : { ...preset.intake, elite_preset_id: preset.id };
+        ? mergeKickoffBody(withCatalogFocus({ ...preset.intake, elite_preset_id: preset.id }))
+        : withCatalogFocus({ ...preset.intake, elite_preset_id: preset.id });
       const run = await onKickoff(body);
       setRunId(run.id);
     } catch (err) {
@@ -151,7 +166,7 @@ export function PackQuickLaunch({
               defaultValues={featured.intake}
               extraFields={extraFields}
               meta={meta}
-              onKickoff={onKickoff}
+              onKickoff={(body) => onKickoff(withCatalogFocus(body))}
               onSuccess={setRunId}
             />
           </div>

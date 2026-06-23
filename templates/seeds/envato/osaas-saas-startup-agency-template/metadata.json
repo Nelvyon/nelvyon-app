@@ -1,0 +1,30 @@
+{
+  "item_name": "OSaaS - SaaS & Startup Agency Template",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "osaas-saas-startup-agency-template",
+  "seed_id": "env-osaas-saas-startup-agency-template",
+  "quality_score": 88,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "landing"
+  ],
+  "services": [
+    "SaaS B2B",
+    "Agency",
+    "Landing"
+  ],
+  "sector_groups": [
+    "saas_tech",
+    "agency_creator"
+  ],
+  "converted_to": [],
+  "notes": "Fallback SaaS/agency | Descargar desde elements.envato.com por nombre exacto."
+}

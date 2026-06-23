@@ -1,0 +1,921 @@
+{
+  "sector_group": "health_medical",
+  "count": 51,
+  "seeds": [
+    {
+      "slug": "schedule-marketing-template",
+      "item_name": "Schedule Marketing Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "caremed-medical-health-html-template",
+      "item_name": "Caremed - Medical & Health HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "clinicmaster-medical-health-html-template",
+      "item_name": "ClinicMaster - Medical Health HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dental-dentist-and-medical-clinics-template",
+      "item_name": "Dental - Dentist and Medical Clinics Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dentexa-dental-clinic-html-template",
+      "item_name": "Dentexa - Dental Clinic HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dentist-dental-clinic-tailwind-template",
+      "item_name": "Dentist & Dental Clinic Tailwind Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dentisto-html-template",
+      "item_name": "Dentisto | HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "evencare-medical-landing-page-html-template",
+      "item_name": "Evencare - Medical Landing Page HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "healthcare-medical-html-template",
+      "item_name": "HealthCare - Medical HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "medcity-medical-healthcare-html-template",
+      "item_name": "Medcity - Medical Healthcare HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "mediplus-medical-health-html-template",
+      "item_name": "Mediplus - Medical & Health HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "medisch-health-medical-html5-template",
+      "item_name": "Medisch - Health & Medical HTML5 Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "medizo-healthcare-clinic-doctor-html-template",
+      "item_name": "Medizo - Healthcare Clinic & Doctor HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "nischinto-medical-landing-page-html-template",
+      "item_name": "Nischinto - Medical Landing Page HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "predent-dental-care-html-template",
+      "item_name": "Predent – Dental Care HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "trustlife-medical-and-health-landing-page",
+      "item_name": "Trustlife - Medical and Health Landing Page",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 93,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "caremail-healthcare-newsletter-template",
+      "item_name": "CareMail - Healthcare Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dentalmail-dentist-email-template",
+      "item_name": "DentalMail - Dentist Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dentalux",
+      "item_name": "Dentalux",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "seo_page"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dentist-dental-clinic-web-template-dentia",
+      "item_name": "Dentist & Dental Clinic Web Template - Dentia",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dotus-health-medical-html5-template",
+      "item_name": "Dotus – Health & Medical HTML5 Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "seo_page"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "SEO"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "healthmail-medical-email-template",
+      "item_name": "HealthMail - Medical Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "wellnessmail-spa-email-template",
+      "item_name": "WellnessMail - Spa Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "eyecare-optometry-html-template",
+      "item_name": "EyeCare - Optometry HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "kidsdental-pediatric-dental-html-template",
+      "item_name": "KidsDental - Pediatric Dental HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "mindcare-psychology-html-template",
+      "item_name": "MindCare - Psychology HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "orthopro-orthodontist-html-template",
+      "item_name": "OrthoPro - Orthodontist HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pharmacare-pharmacy-html-template",
+      "item_name": "PharmaCare - Pharmacy HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "physiopro-physiotherapy-html-template",
+      "item_name": "PhysioPro - Physiotherapy HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "seniorcare-elderly-care-html-template",
+      "item_name": "SeniorCare - Elderly Care HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "skinclinic-dermatology-html-template",
+      "item_name": "SkinClinic - Dermatology HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "smilecare-dental-html-template",
+      "item_name": "SmileCare - Dental HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "vitacare-clinic-html-template",
+      "item_name": "VitaCare - Clinic HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-1-premium-html-landing-template",
+      "item_name": "Health Elite 1 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-10-premium-html-landing-template",
+      "item_name": "Health Elite 10 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-11-premium-html-landing-template",
+      "item_name": "Health Elite 11 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-12-premium-html-landing-template",
+      "item_name": "Health Elite 12 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-13-premium-html-landing-template",
+      "item_name": "Health Elite 13 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-14-premium-html-landing-template",
+      "item_name": "Health Elite 14 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-15-premium-html-landing-template",
+      "item_name": "Health Elite 15 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-16-premium-html-landing-template",
+      "item_name": "Health Elite 16 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-17-premium-html-landing-template",
+      "item_name": "Health Elite 17 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-18-premium-html-landing-template",
+      "item_name": "Health Elite 18 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-2-premium-html-landing-template",
+      "item_name": "Health Elite 2 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-3-premium-html-landing-template",
+      "item_name": "Health Elite 3 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-4-premium-html-landing-template",
+      "item_name": "Health Elite 4 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-5-premium-html-landing-template",
+      "item_name": "Health Elite 5 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-6-premium-html-landing-template",
+      "item_name": "Health Elite 6 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-7-premium-html-landing-template",
+      "item_name": "Health Elite 7 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "health-elite-8-premium-html-landing-template",
+      "item_name": "Health Elite 8 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

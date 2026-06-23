@@ -1,0 +1,96 @@
+{
+  "sector_group": "automotive",
+  "count": 5,
+  "seeds": [
+    {
+      "slug": "autodrive-automotive-html-template",
+      "item_name": "Autodrive - Automotive HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "carzone-car-dealer-html-template",
+      "item_name": "Carzone - Car Dealer HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "driveon-car-rental-html-template",
+      "item_name": "DriveON - Car Rental HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "garagepro-auto-repair-html-template",
+      "item_name": "GaragePro - Auto Repair HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "motorx-car-dealer-html-template",
+      "item_name": "Motorx - Car Dealer HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

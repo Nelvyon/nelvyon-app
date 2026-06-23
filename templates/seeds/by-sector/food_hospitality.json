@@ -1,0 +1,900 @@
+{
+  "sector_group": "food_hospitality",
+  "count": 66,
+  "seeds": [
+    {
+      "slug": "akala-mobile-template-for-food-cafe-restaurant",
+      "item_name": "Akala - Mobile Template for Food, Cafe, Restaurant",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "bites-restaurant-cafe-html-template",
+      "item_name": "Bites - Restaurant & Cafe HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "cafert-cafe-restaurant-html-template",
+      "item_name": "Cafert - Cafe & Restaurant HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "delici-restaurant-food-html-template",
+      "item_name": "Delici - Restaurant & Food HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "foodera-restaurant-html5-template",
+      "item_name": "Foodera - Restaurant HTML5 Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "foodily-food-restaurant-html-template",
+      "item_name": "Foodily - Food & Restaurant HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "foodking-restaurant-food-html-template",
+      "item_name": "Foodking - Restaurant & Food HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "foodmart-grocery-food-store-html-template",
+      "item_name": "FoodMart - Grocery & Food Store HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "foodwagon-food-delivery-html-template",
+      "item_name": "Foodwagon - Food Delivery HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "foodz-restaurant-cafe-html5-template",
+      "item_name": "Foodz - Restaurant & Cafe HTML5 Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "hungry-food-and-restaurant-mobile-template",
+      "item_name": "Hungry - Food and Restaurant Mobile Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "restabook-restaurant-booking-html-template",
+      "item_name": "Restabook - Restaurant Booking HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "restano-restaurant-cafe-html-template",
+      "item_name": "Restano - Restaurant & Cafe HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "restoria-restaurant-html-template",
+      "item_name": "Restoria - Restaurant HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "tasteit-restaurant-html-template",
+      "item_name": "Tasteit - Restaurant HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "chefmail-food-email-template",
+      "item_name": "ChefMail - Food Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dinemail-restaurant-newsletter-template",
+      "item_name": "DineMail - Restaurant Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "foodie-restaurant-email-template",
+      "item_name": "Foodie - Restaurant Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "spice-restaurant-email-template",
+      "item_name": "Spice - Restaurant Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "tastemail-food-newsletter-template",
+      "item_name": "TasteMail - Food Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 89,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "agency-services-ads-html5",
+      "item_name": "Agency Services Ads HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "display-ads-html5-gwd-bundle",
+      "item_name": "Display Ads HTML5 GWD Bundle",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "ecommerce-product-ads-html5",
+      "item_name": "Ecommerce Product Ads HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "facebook-ads-html5-banner-template",
+      "item_name": "Facebook Ads HTML5 Banner Template",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fast-food-restaurant-email-newsletter-template",
+      "item_name": "Fast Food Restaurant Email Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-gym-ads-html5-banner",
+      "item_name": "Fitness Gym Ads HTML5 Banner",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "google-ads-html5-banner-bundle",
+      "item_name": "Google Ads HTML5 Banner Bundle",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "granny-elegant-restaurant-cafe-html-template",
+      "item_name": "Granny - Elegant Restaurant & Cafe HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "instagram-story-ads-template",
+      "item_name": "Instagram Story Ads Template",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "kababi-restaurant-htmltemplate",
+      "item_name": "Kababi - Restaurant HTMLTemplate",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "local-business-ads-html5-pack",
+      "item_name": "Local Business Ads HTML5 Pack",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pizzan-fast-food-and-restaurant-html-template",
+      "item_name": "Pizzan - Fast Food and Restaurant HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "real-estate-ads-html5-banner",
+      "item_name": "Real Estate Ads HTML5 Banner",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "restaurant-email-newsletter-template",
+      "item_name": "Restaurant Email Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "restaurant-promo-ads-html5",
+      "item_name": "Restaurant Promo Ads HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "retargeting-banner-pack-html5",
+      "item_name": "Retargeting Banner Pack HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "saas-ads-html5-banner-template",
+      "item_name": "SaaS Ads HTML5 Banner Template",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "savory-haven-restaurant-landing-page",
+      "item_name": "Savory Haven - Restaurant Landing Page",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "bistro-restaurant-html-template",
+      "item_name": "Bistro - Restaurant HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "burgerhub-fast-food-html-template",
+      "item_name": "BurgerHub - Fast Food HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "cafeblend-coffee-shop-html-template",
+      "item_name": "CafeBlend - Coffee Shop HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "cheftable-fine-dining-html-template",
+      "item_name": "ChefTable - Fine Dining HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "mealprep-food-delivery-html-template",
+      "item_name": "MealPrep - Food Delivery HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "organiceats-healthy-food-html-template",
+      "item_name": "OrganicEats - Healthy Food HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "streetfood-food-truck-html-template",
+      "item_name": "StreetFood - Food Truck HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "sushibar-japanese-restaurant-html-template",
+      "item_name": "SushiBar - Japanese Restaurant HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "sweetbake-bakery-html-template",
+      "item_name": "SweetBake - Bakery HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "winedine-winery-restaurant-html-template",
+      "item_name": "WineDine - Winery Restaurant HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "food-elite-1-premium-html-landing-template",
+      "item_name": "Food Elite 1 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "food-elite-10-premium-html-landing-template",
+      "item_name": "Food Elite 10 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

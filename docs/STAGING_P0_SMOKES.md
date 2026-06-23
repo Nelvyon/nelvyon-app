@@ -7,8 +7,9 @@ Gate de calidad para **portal BFF** y **pack Local** en staging. No sustituye lo
 | Script | Qué valida |
 |--------|------------|
 | `scripts/staging-smoke-portal-packs.mjs` | Hubs packs, automatización CEO, shell portal, **login/projects/deliverables vía BFF** |
-| `scripts/staging-smoke-local-pack-e2e.mjs` | Kickoff Local → assets live → invite → accept → login → 5 entregables → **me/projects/approve/reject/download BFF** |
-| `scripts/run-staging-p0-smokes.mjs` | Orquestador: ejecuta ambos y emite `ALL_P0_PASS` o `P0_FAIL` |
+| `scripts/staging-smoke-local-pack-e2e.mjs` | Kickoff Local → **CEO metrics BFF (5 KPIs + limitaciones)** → assets live → invite → accept → login → 5 entregables → **me/projects/approve/reject/download BFF** |
+| `scripts/staging-smoke-saas-b2b-pack-e2e.mjs` | Kickoff SaaS B2B → **CEO metrics BFF (5 KPIs SaaS)** → assets live → invite → portal → 6 entregables sin mock:// |
+| `scripts/run-staging-p0-smokes.mjs` | Orquestador: ejecuta los tres smokes y emite `ALL_P0_PASS` o `P0_FAIL` |
 
 ## Ejecución local
 
@@ -52,6 +53,26 @@ Operador (invite):
 | POST/GET | `/api/platform/portal/invites` |
 
 El proxy `/api/v1/portal/*` permanece como compatibilidad; la UI del portal usa el BFF web.
+
+## CEO metrics (pack Local)
+
+Tras kickoff en `staging-smoke-local-pack-e2e.mjs`:
+
+| Método | Ruta |
+|--------|------|
+| GET | `/api/platform/packs/local-growth/ceo-metrics` |
+
+El smoke exige HTTP 200 (no 404/500), exactamente 5 métricas (`leads`, `cpl_approx`, `appointments`, `landing_to_lead_rate`, `welcome_sequence_status`), cada una con `label`, `value`, `hint`, `limitation` y `available`.
+
+## CEO metrics (pack SaaS B2B)
+
+Tras kickoff en `staging-smoke-saas-b2b-pack-e2e.mjs`:
+
+| Método | Ruta |
+|--------|------|
+| GET | `/api/platform/packs/saas-b2b-growth/ceo-metrics` |
+
+Métricas: `mqls`, `trial_demo_leads`, `demos_booked`, `pipeline_opportunities`, `nurture_sequence_status`.
 
 ## Criterio de cierre
 

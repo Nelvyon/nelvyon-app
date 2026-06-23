@@ -111,6 +111,12 @@ export const PACK_OS_BINDINGS: Record<string, PackOsBinding> = {
     processTemplateIds: ["deliverable-checklist-launch", "deliverable-report-executive"],
     connectorIds: ["google-analytics-4", "google-search-console"],
   },
+  "analytics-insights-pack": {
+    packId: "analytics-insights-pack",
+    agentIds: ["sector-analytics-ga4"],
+    processTemplateIds: ["deliverable-report-executive", "deliverable-checklist-launch"],
+    connectorIds: ["google-analytics-4"],
+  },
   "brand-voice-pack": {
     packId: "brand-voice-pack",
     agentIds: ["branding_premium", "contenido_copywriting_premium"],

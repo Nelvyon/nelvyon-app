@@ -1,0 +1,28 @@
+{
+  "item_name": "Black - Notification Email Templates",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "black-notification-email-templates",
+  "seed_id": "env-black-notification-email-templates",
+  "quality_score": 88,
+  "primary_kind": "email",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "email"
+  ],
+  "services": [
+    "Email",
+    "Automation"
+  ],
+  "sector_groups": [
+    "saas_tech"
+  ],
+  "converted_to": [],
+  "notes": "Transaccional SaaS | Descargar desde elements.envato.com por nombre exacto."
+}

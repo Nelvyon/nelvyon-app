@@ -4,7 +4,6 @@ import Link from "next/link";
 
 import { PanelCard } from "@/core/ui/PanelCard";
 import { useAdsUnifiedReporting } from "@/features/publicidad/hooks";
-import { useSocialUnifiedReporting } from "@/features/social/hooks";
 import { useFunnelsUnifiedReporting } from "@/features/funnels/hooks";
 import { useEcommerceUnifiedReporting } from "@/features/ecommerce/hooks";
 import { usePipelineSummary } from "@/features/deals/hooks";
@@ -12,8 +11,6 @@ import {
   buildDemoAdsUnified,
   buildDemoEcommerceUnified,
   buildDemoFunnelsUnified,
-  buildDemoSocialUnified,
-  DEMO_CRM_PIPELINE,
 } from "@/lib/demoDashboardData";
 import {
   ECOMMERCE_GROWTH_PACK_ID,
@@ -29,24 +26,31 @@ function pickNum(live: number | undefined | null, demo: number): number {
 
 export function PackEliteSnapshots({ packId }: { packId: PackId }) {
   const ads = useAdsUnifiedReporting();
-  const social = useSocialUnifiedReporting();
   const funnels = useFunnelsUnifiedReporting();
   const ecommerce = useEcommerceUnifiedReporting();
   const pipeline = usePipelineSummary();
 
   const demoAds = buildDemoAdsUnified();
-  const demoSocial = buildDemoSocialUnified();
   const demoEcom = buildDemoEcommerceUnified();
-  const demoFunnels = buildDemoFunnelsUnified();
 
   if (packId === LOCAL_GROWTH_PACK_ID) {
+    const demoAds = buildDemoAdsUnified();
+    const demoFunnels = buildDemoFunnelsUnified();
     const spend = pickNum(ads.data?.unified?.total_spend, demoAds.unified.total_spend);
-    const reach = pickNum(social.data?.unified?.total_reach, demoSocial.unified.total_reach);
+    const visits = pickNum(funnels.data?.unified?.total_visits, demoFunnels.unified.total_visits);
+    const conversions = pickNum(
+      funnels.data?.unified?.total_conversions,
+      demoFunnels.unified.total_conversions,
+    );
+    const hasLiveAds = ads.data?.unified?.total_spend != null && ads.data.unified.total_spend > 0;
+    const hasLiveFunnel = funnels.data?.unified?.total_visits != null && funnels.data.unified.total_visits > 0;
     return (
       <PanelCard>
         <h3 className="text-base font-semibold">Impacto en servicios élite</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tras el pack, el cliente monitoriza resultados en estos módulos.
+          {hasLiveAds || hasLiveFunnel
+            ? "Métricas reales de módulos conectados."
+            : "Vista demo con benchmarks de referencia hasta conectar ads y embudo."}
         </p>
         <dl className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
           <Snapshot
@@ -56,16 +60,16 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
             value={`${spend.toLocaleString("es-ES")} €`}
           />
           <Snapshot
-            href="/social"
-            label="Alcance social"
-            loading={social.isLoading}
-            value={reach.toLocaleString("es-ES")}
+            href="/funnels"
+            label="Visitas embudo"
+            loading={funnels.isLoading}
+            value={visits.toLocaleString("es-ES")}
           />
           <Snapshot
-            href="/reputacion"
-            label="Reputación local"
-            loading={false}
-            value="Google Business"
+            href="/crm"
+            label="Conversiones embudo"
+            loading={funnels.isLoading}
+            value={String(conversions)}
           />
         </dl>
       </PanelCard>
@@ -110,22 +114,32 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
   }
 
   if (packId === SAAS_B2B_GROWTH_PACK_ID) {
-    const stages = pipeline.data?.by_stage ?? pipeline.data?.items ?? [];
-    const liveDeals = pipeline.data?.total_count ?? stages.reduce((a, s) => a + (s.count ?? 0), 0);
-    const totalDeals = pickNum(liveDeals, DEMO_CRM_PIPELINE.total_count);
+    const demoFunnels = buildDemoFunnelsUnified();
+    const deals = pickNum(
+      pipeline.data?.total_count ??
+        pipeline.data?.by_stage?.reduce((a, s) => a + (s.count ?? 0), 0),
+      12,
+    );
     const conversions = pickNum(
       funnels.data?.unified?.total_conversions,
       demoFunnels.unified.total_conversions,
     );
+    const hasPipeline =
+      pipeline.data?.total_count != null && pipeline.data.total_count > 0;
     return (
       <PanelCard>
         <h3 className="text-base font-semibold">Impacto en servicios élite</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {hasPipeline
+            ? "Pipeline real desde CRM."
+            : "Vista demo B2B hasta registrar oportunidades en CRM."}
+        </p>
         <dl className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
           <Snapshot
             href="/crm/deals"
-            label="Oportunidades en pipeline"
+            label="Oportunidades pipeline"
             loading={pipeline.isLoading}
-            value={String(totalDeals)}
+            value={String(deals)}
           />
           <Snapshot
             href="/funnels"
@@ -135,9 +149,9 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
           />
           <Snapshot
             href="/campaigns"
-            label="Secuencias nurture"
+            label="Nurture B2B"
             loading={false}
-            value="Email B2B"
+            value="Ver campañas"
           />
         </dl>
       </PanelCard>

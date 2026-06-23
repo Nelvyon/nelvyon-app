@@ -9,6 +9,10 @@ import { PanelCard } from "@/core/ui/PanelCard";
 import { SkeletonListRows } from "@/core/ui/Skeleton";
 import { usePackReportLatest } from "@/features/packs/hooks";
 import { PackEliteSnapshots } from "@/features/packs/PackEliteSnapshots";
+import {
+  PackParentComplementPanel,
+  PackReportSectionsPanel,
+} from "@/features/packs/PackReportSections";
 import { getPackCeoKpis, getPackDeliverablesCatalog } from "@/lib/packs/packDeliverablesCatalog";
 import { getPackTemplateGallery } from "@/lib/packs/packEliteTemplates";
 import { getPackMeta } from "@/lib/packs/packRegistry";
@@ -81,6 +85,25 @@ export function PackReportDashboard({ packId }: { packId: PackId }) {
                 ))}
               </div>
             </PanelCard>
+
+            {report.parent_complement ? (
+              <PackParentComplementPanel complement={report.parent_complement} />
+            ) : null}
+
+            {report.sections && report.sections.length > 0 ? (
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-base font-semibold">Informe detallado (demo)</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Secciones con hallazgos, métricas de ejemplo y recomendaciones listas para enseñar al cliente.
+                  </p>
+                </div>
+                <PackReportSectionsPanel
+                  highlightIds={report.highlight_section_ids}
+                  sections={report.sections}
+                />
+              </div>
+            ) : null}
 
             <PackEliteSnapshots packId={packId} />
 

@@ -1,21 +1,43 @@
+import { enrichBriefWithPackLibrary } from "@/lib/packs/packTemplateLibrary";
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
-import type {
-  PackReport,
-  PackRunRecord,
-  SaasB2bGrowthPackIntake,
-  SkuRunResult,
-} from "@/lib/packs/types";
+import { parseCatalogFocus } from "@/lib/packs/parseCatalogFocus";
+import { dbCreatePackDeliverable } from "@/lib/packs/packOsDb";
+import {
+  buildNurtureEmailSequence,
+  buildOutboundPlaybook,
+  buildSaasB2bPackReport,
+  buildSaasB2bSeoReport,
+  enrichSaasB2bIntake,
+  mapSaasB2bSkuDeliverable,
+  resolvePackAppOrigin,
+  resolveSaasLandingLiveUrl,
+  resolveSaasPlaybookUrl,
+  resolveSaasSeoReportUrl,
+} from "@/lib/packs/saasB2bPackProduction";
+import {
+  dispatchSaasB2bNurtureSequence,
+  type NurtureDispatchResult,
+} from "@/lib/packs/saasB2bPackNurtureEmail";
+import { updatePackRun } from "@/lib/packs/packRunStore";
+import type { PackReport, PackRunRecord, SaasB2bGrowthPackIntake } from "@/lib/packs/types";
 import { SAAS_B2B_GROWTH_PACK_ID } from "@/lib/packs/types";
 
 const meta = PACK_REGISTRY[SAAS_B2B_GROWTH_PACK_ID];
 
 export function buildSaasB2bBrief(intake: SaasB2bGrowthPackIntake): Record<string, unknown> {
-  const base = buildBaseBrief({ ...intake, sector: "saas_b2b" });
+  const enriched = enrichSaasB2bIntake(intake);
+  const base = buildBaseBrief({ ...enriched, sector: enriched.sector });
+  const origin = resolvePackAppOrigin();
+  const landingUrl = resolveSaasLandingLiveUrl(enriched, enriched.landing_slug, origin);
+
   const withB2b = {
     ...base,
-    sector: "saas_b2b",
+    primary_domain: landingUrl,
+    website_url: landingUrl,
+    sector: enriched.sector,
+    landing_slug: enriched.landing_slug,
     b2b: {
       icp_title: intake.icp_title,
       pricing_model: intake.pricing_model ?? "subscription",
@@ -23,59 +45,15 @@ export function buildSaasB2bBrief(intake: SaasB2bGrowthPackIntake): Record<strin
     },
     traffic_source: "linkedin_ads",
     cta_type: "demo_request",
-  };
-  return applyEliteTemplatesToBrief(withB2b, resolveTemplatesForSector(intake.sector));
-}
-
-function buildPackReport(params: {
-  intake: SaasB2bGrowthPackIntake;
-  skuResults: SkuRunResult[];
-  saasClientId: number;
-  saasCampaignId: number;
-  extraCampaignCount: number;
-  extraDeliverableCount: number;
-  packRunId: string;
-  osClientId: string;
-  osProjectId: string;
-}): PackReport {
-  const passed = params.skuResults.filter((r) => r.passed);
-  const avgQa =
-    params.skuResults.length > 0
-      ? Math.round(
-          params.skuResults.reduce((a, r) => a + r.qa_score, 0) / params.skuResults.length,
-        )
-      : 0;
-  const deliverables =
-    params.skuResults.reduce((a, r) => a + r.deliverable_ids.length, 0) +
-    1 +
-    params.extraDeliverableCount;
-
-  return {
-    pack_name: meta.name,
-    pack_id: SAAS_B2B_GROWTH_PACK_ID,
-    business_name: params.intake.business_name,
-    sector: params.intake.sector,
-    completed_at: new Date().toISOString(),
-    summary: `${passed.length}/${params.skuResults.length} SKUs + playbook outbound ABM. Landing SaaS y demo bot listos en portal.`,
-    kpis: {
-      deliverables_published: deliverables,
-      avg_qa_score: avgQa,
-      skus_passed: passed.length,
-      skus_total: params.skuResults.length,
-      saas_client_id: params.saasClientId,
-      saas_campaign_id: params.saasCampaignId,
-      extra_campaigns: params.extraCampaignCount,
+    bot_name: `Demo Bot — ${intake.business_name}`,
+    handoff: {
+      destination: intake.contact_email?.trim() || `hola@${enriched.landing_slug}.nelvyon-client.test`,
     },
-    sku_results: params.skuResults,
-    next_steps: [
-      "Revisar landing y posicionamiento en portal",
-      "Activar secuencia nurture B2B en panel SaaS",
-      "Ejecutar playbook outbound con ICP definido",
-      "Conectar CRM para tracking MQL → SQL",
-      "Medir demo requests y pipeline a 30 días",
-    ],
-    portal_path: "/portal",
   };
+  return enrichBriefWithPackLibrary(
+    applyEliteTemplatesToBrief(withB2b, resolveTemplatesForSector(intake.sector)),
+    { pack_id: SAAS_B2B_GROWTH_PACK_ID, sector: intake.sector },
+  );
 }
 
 export async function runSaasB2bGrowthPack(params: {
@@ -83,62 +61,134 @@ export async function runSaasB2bGrowthPack(params: {
   userId: string;
   intake: SaasB2bGrowthPackIntake;
 }): Promise<PackRunRecord> {
-  const { intake } = params;
+  const enriched = enrichSaasB2bIntake(params.intake);
+  let nurtureDispatch: NurtureDispatchResult = {
+    status: "skipped",
+    touches: 0,
+    email_ids: [],
+  };
+
   return runGrowthPack({
     workspaceId: params.workspaceId,
     userId: params.userId,
     config: {
       meta,
-      intake,
+      intake: enriched,
       buildBrief: buildSaasB2bBrief,
+      reportDeliverableTitle: "Informe ejecutivo",
+      publishProductionDeliverables: true,
       primaryCampaign: (i) => ({
         platform: "email",
         campaign_type: "nurturing",
         name: `Nurture B2B — ${i.business_name}`,
-        content: `Secuencia 5-touch: problema → caso de uso → demo → prueba social → CTA demo. ICP: ${i.icp_title}`,
+        content: JSON.stringify(buildNurtureEmailSequence(i)),
         target_audience: `${i.icp_title} — ${i.city}`,
         status: "ready",
       }),
+      mapSkuDeliverable: (p) =>
+        mapSaasB2bSkuDeliverable({
+          sku: p.sku,
+          simulation: p.simulation,
+          intake: p.intake as SaasB2bGrowthPackIntake & { landing_slug: string },
+          packRunId: p.packRunId,
+          osClientId: p.osClientId,
+          osProjectId: p.osProjectId,
+          workspaceId: p.workspaceId,
+        }),
       extraDeliverables: [
-        ({ intake: i, packRunId }) => ({
-          stepKey: "outbound_playbook",
-          title: "Playbook Outbound / ABM B2B",
+        ({ intake: i, packRunId }) => {
+          const origin = resolvePackAppOrigin();
+          const slug = enrichSaasB2bIntake(i).landing_slug;
+          return {
+            stepKey: "outbound_playbook",
+            title: "Playbook outbound / ABM",
+            type: "json",
+            file_url: resolveSaasPlaybookUrl(slug, origin),
+            metadata: {
+              pack_id: SAAS_B2B_GROWTH_PACK_ID,
+              pack_run_id: packRunId,
+              landing_slug: slug,
+              production: true,
+              playbook: buildOutboundPlaybook(i),
+            },
+          };
+        },
+      ],
+      onPackStepsComplete: async (ctx) => {
+        nurtureDispatch = await dispatchSaasB2bNurtureSequence({
+          workspaceId: ctx.workspaceId,
+          userId: ctx.userId,
+          intake: ctx.intake as SaasB2bGrowthPackIntake,
+          campaignId: ctx.saasCampaignId,
+        });
+
+        await dbCreatePackDeliverable({
+          workspaceId: ctx.workspaceId,
+          clientId: ctx.osClientId,
+          projectId: ctx.osProjectId,
+          title: "Secuencia nurture B2B",
           type: "json",
+          visibility: "client_visible",
           metadata: {
             pack_id: SAAS_B2B_GROWTH_PACK_ID,
-            pack_run_id: packRunId,
-            business_name: i.business_name,
-            icp_title: i.icp_title,
-            sales_motion: i.sales_motion ?? "hybrid",
-            pricing_model: i.pricing_model ?? "subscription",
-            sequences: [
-              {
-                name: "LinkedIn connect + value",
-                touches: 3,
-                channel: "linkedin",
-              },
-              {
-                name: "Email cold — problem agitation",
-                touches: 4,
-                channel: "email",
-              },
-              {
-                name: "ABM account list — tier 1",
-                touches: 5,
-                channel: "multi",
-              },
-            ],
-            kpis_to_track: [
-              "demo_requests",
-              "mql_to_sql_rate",
-              "pipeline_created_eur",
-              "reply_rate",
-              "trial_signups",
-            ],
+            pack_run_id: ctx.packRunId,
+            production: true,
+            sequence_touch_count: nurtureDispatch.touches,
+            dispatch_status: nurtureDispatch.status,
+            emails: buildNurtureEmailSequence(ctx.intake as SaasB2bGrowthPackIntake),
+            email_queue_ids: nurtureDispatch.email_ids,
           },
-        }),
-      ],
-      buildReport: buildPackReport,
+        });
+
+        const intake = ctx.intake as SaasB2bGrowthPackIntake;
+        const seoSku = ctx.skuResults.find((r) => r.sku === "NELVYON-SEO");
+        if (!seoSku?.deliverable_ids?.length) {
+          const origin = resolvePackAppOrigin();
+          const qaScore = seoSku?.qa_score ?? 88;
+          await dbCreatePackDeliverable({
+            workspaceId: ctx.workspaceId,
+            clientId: ctx.osClientId,
+            projectId: ctx.osProjectId,
+            title: "SEO demand gen",
+            type: "json",
+            file_url: resolveSaasSeoReportUrl(enriched.landing_slug, origin),
+            visibility: "client_visible",
+            metadata: {
+              pack_id: SAAS_B2B_GROWTH_PACK_ID,
+              pack_run_id: ctx.packRunId,
+              landing_slug: enriched.landing_slug,
+              production: true,
+              sku: "NELVYON-SEO",
+              qa_score: qaScore,
+              seo_report: buildSaasB2bSeoReport(intake, qaScore),
+            },
+          });
+        }
+
+        await updatePackRun(ctx.packRunId, {
+          intake: { ...ctx.intake, landing_slug: enriched.landing_slug } as typeof ctx.intake,
+        });
+      },
+      buildReport: (p): PackReport => {
+        const origin = resolvePackAppOrigin();
+        const landingUrl = resolveSaasLandingLiveUrl(
+          p.intake as SaasB2bGrowthPackIntake,
+          enriched.landing_slug,
+          origin,
+        );
+        return buildSaasB2bPackReport({
+          intake: p.intake as SaasB2bGrowthPackIntake,
+          skuResults: p.skuResults.map((r) => ({
+            sku: r.sku,
+            qa_score: r.qa_score,
+            passed: r.passed,
+          })),
+          saasClientId: p.saasClientId,
+          saasCampaignId: p.saasCampaignId,
+          landingUrl,
+          nurtureDispatch,
+        });
+      },
       projectDescription: (i) =>
         `SaaS B2B pack: landing + SEO demand gen + demo bot + outbound para ICP ${i.icp_title}`,
     },
@@ -175,5 +225,6 @@ export function validateSaasB2bGrowthIntake(body: unknown): SaasB2bGrowthPackInt
     sales_motion:
       motion === "plg" || motion === "sales_led" ? motion : "hybrid",
     tier: o.tier === "premium" ? "premium" : "professional",
+    catalog_focus: parseCatalogFocus(o.catalog_focus),
   };
 }

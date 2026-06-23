@@ -1,0 +1,33 @@
+{
+  "item_name": "Local Business Ads HTML5 Pack",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "local-business-ads-html5-pack",
+  "seed_id": "env-local-business-ads-html5-pack",
+  "quality_score": 88,
+  "primary_kind": "ad_creative",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "meta-ads-pack"
+  ],
+  "kinds": [
+    "ad_creative"
+  ],
+  "services": [
+    "Ads",
+    "Social"
+  ],
+  "sector_groups": [
+    "saas_tech",
+    "ecommerce",
+    "food_hospitality",
+    "fitness_sports",
+    "home_services",
+    "agency_creator"
+  ],
+  "converted_to": [],
+  "notes": "Curated ad creative — display/social | Descargar desde elements.envato.com por nombre exacto."
+}

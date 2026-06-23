@@ -1,0 +1,30 @@
+{
+  "item_name": "Fresh Mail - Responsive E-mail Template",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "fresh-mail-responsive-e-mail-template",
+  "seed_id": "env-fresh-mail-responsive-e-mail-template",
+  "quality_score": 88,
+  "primary_kind": "email_sequence",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "email_sequence",
+    "email"
+  ],
+  "services": [
+    "Email"
+  ],
+  "sector_groups": [
+    "saas_tech",
+    "agency_creator",
+    "professional"
+  ],
+  "converted_to": [],
+  "notes": "Multipropósito B2B | Descargar desde elements.envato.com por nombre exacto."
+}

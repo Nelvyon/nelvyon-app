@@ -1,0 +1,35 @@
+{
+  "item_name": "Foxtrot Marketing Template",
+  "provider": "Aceternity",
+  "license_id": "lic-aceternity-ui-pro-2026",
+  "slug": "foxtrot-marketing-template",
+  "seed_id": "ace-foxtrot-marketing-template",
+  "quality_score": 95,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "on_disk",
+  "storage": {
+    "source_zip": "source.zip"
+  },
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "landing"
+  ],
+  "services": [
+    "Landing",
+    "Brand"
+  ],
+  "sector_groups": [
+    "saas_tech",
+    "agency_creator"
+  ],
+  "converted_to": [
+    "landing-saas-demo-v1",
+    "landing-agency-audit-v1"
+  ],
+  "notes": "Single-page SaaS marketing (ya en repo _extracted) | seed_id=aceternity-foxtrot"
+}

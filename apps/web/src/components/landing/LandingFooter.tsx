@@ -76,13 +76,13 @@ export function LandingFooter() {
               </Link>
             </li>
             <li>
-              <Link className="transition hover:text-white" href="/privacidad">
+              <Link className="transition hover:text-white" href="/legal/privacy">
                 Política de privacidad
               </Link>
             </li>
             <li>
-              <Link className="transition hover:text-white" href="/terminos">
-                Aviso legal
+              <Link className="transition hover:text-white" href="/legal/terms">
+                Términos de servicio
               </Link>
             </li>
           </ul>

@@ -1,0 +1,81 @@
+@import "tailwindcss";
+@import "./prism.css";
+
+@plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-charcoal: #08090a;
+  --color-secondary: #39c3ef;
+  --color-muted: var(--color-neutral-200);
+  --color-muted-dark: var(--color-neutral-400);
+
+  --shadow-derek: 0px 0px 0px 1px rgb(0 0 0 / 0.06),
+    0px 1px 1px -0.5px rgb(0 0 0 / 0.06),
+    0px 3px 3px -1.5px rgb(0 0 0 / 0.06),
+    0px 6px 6px -3px rgb(0 0 0 / 0.06), 0px 12px 12px -6px rgb(0 0 0 / 0.06),
+    0px 24px 24px -12px rgb(0 0 0 / 0.06);
+  --shadow-aceternity: 0px 2px 3px -1px rgba(0, 0, 0, 0.1),
+    0px 1px 0px 0px rgba(25, 28, 33, 0.02),
+    0px 0px 0px 1px rgba(25, 28, 33, 0.08);
+
+  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --background-image-gradient-conic: conic-gradient(
+    from 180deg at 50% 50%,
+    var(--tw-gradient-stops)
+  );
+
+  --animate-move: move 5s linear infinite;
+}
+
+@keyframes move {
+  0% {
+    transform: translateX(-200px);
+  }
+
+  100% {
+    transform: translateX(200px);
+  }
+}
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --black: var(--color-black);
+  --charcoal: var(--color-charcoal);
+  --secondary: var(--color-secondary);
+  --gray-900: var(--color-gray-900);
+  --blue-400: var(--color-blue-400);
+  --blue-500: var(--color-blue-500);
+  --blue-900: var(--color-blue-900);
+  --cyan-500: var(--color-cyan-500);
+  --emerald-400: var(--color-emerald-400);
+  --emerald-500: var(--color-emerald-500);
+  --indigo-500: var(--color-indigo-500);
+  --neutral-200: var(--color-neutral-200);
+  --neutral-800: var(--color-neutral-800);
+  --neutral-900: var(--color-neutral-900);
+  --orange-500: var(--color-orange-500);
+  --pink-500: var(--color-pink-500);
+  --sky-200: var(--color-sky-200);
+  --slate-300: var(--color-slate-300);
+  --slate-900: var(--color-slate-900);
+  --teal-300: var(--color-teal-300);
+  --yellow-500: var(--color-yellow-500);
+  --zinc-100: var(--color-zinc-100);
+  --zinc-400: var(--color-zinc-400);
+  --zinc-500: var(--color-zinc-500);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}

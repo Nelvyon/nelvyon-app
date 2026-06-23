@@ -49,6 +49,8 @@ type ContactRow = {
   status: "lead" | "prospect" | "client" | "churned";
   pipeline_stage: "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
   tags: string[];
+  email?: string;
+  name?: string;
 };
 
 function makeDb() {
@@ -143,6 +145,17 @@ function makeDb() {
       }
       return out.map((x) => ({ id: x.id })) as unknown as T[];
     }
+    if (s.includes("SELECT id, email, name FROM saas_contacts")) {
+      const tenantId = String(p[0]);
+      const ids = (p[1] as string[]) ?? [];
+      return contacts
+        .filter((x) => x.tenant_id === tenantId && ids.includes(x.id))
+        .map((x) => ({
+          id: x.id,
+          email: x.email ?? "test@example.com",
+          name: x.name ?? "Contact",
+        })) as unknown as T[];
+    }
     if (s.startsWith("UPDATE saas_campanias SET status = 'running'")) {
       const row = campanias.find((x) => x.tenant_id === String(p[0]) && x.id === String(p[1]));
       if (row) {
@@ -166,6 +179,16 @@ function makeDb() {
       return [] as T[];
     }
     if (s.startsWith("UPDATE saas_campania_recipients")) {
+      if (s.includes("contact_id = $3")) {
+        const r = recipients.find(
+          (x) => x.tenant_id === String(p[0]) && x.campania_id === String(p[1]) && x.contact_id === String(p[2]),
+        );
+        if (r) {
+          r.status = String(p[3]) as RecipientRow["status"];
+          if (p[3] === "sent") r.sent_at = new Date(Date.now() + ++tick);
+        }
+        return [] as T[];
+      }
       for (const r of recipients.filter((x) => x.tenant_id === String(p[0]) && x.campania_id === String(p[1]))) {
         r.status = "sent";
         r.sent_at = new Date(Date.now() + ++tick);

@@ -1,0 +1,277 @@
+{
+  "sector_group": "hospitality_travel",
+  "count": 15,
+  "seeds": [
+    {
+      "slug": "flyaway-travel-agency-html-template",
+      "item_name": "Flyaway - Travel Agency HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "hoteler-hotel-resort-html-template",
+      "item_name": "Hoteler - Hotel & Resort HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pearl-hotel-restaurant-template",
+      "item_name": "Pearl - Hotel & Restaurant Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "resortica-resort-hotel-html-template",
+      "item_name": "Resortica - Resort & Hotel HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "tourzi-travel-agency-html-template",
+      "item_name": "Tourzi - Travel Agency HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "travila-travel-tour-html-template",
+      "item_name": "Travila - Travel & Tour HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "tripgo-travel-tourism-html-template",
+      "item_name": "Tripgo - Travel & Tourism HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "vacation-travel-html-template",
+      "item_name": "Vacation - Travel HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "travel-elite-1-premium-html-landing-template",
+      "item_name": "Travel Elite 1 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "travel-elite-2-premium-html-landing-template",
+      "item_name": "Travel Elite 2 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "travel-elite-3-premium-html-landing-template",
+      "item_name": "Travel Elite 3 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "travel-elite-4-premium-html-landing-template",
+      "item_name": "Travel Elite 4 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "travel-elite-5-premium-html-landing-template",
+      "item_name": "Travel Elite 5 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "travel-elite-6-premium-html-landing-template",
+      "item_name": "Travel Elite 6 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "travel-elite-7-premium-html-landing-template",
+      "item_name": "Travel Elite 7 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

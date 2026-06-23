@@ -1,0 +1,893 @@
+{
+  "sector_group": "ecommerce",
+  "count": 89,
+  "seeds": [
+    {
+      "slug": "bagisto-ecommerce-html-template",
+      "item_name": "Bagisto - eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "beautyshop-cosmetics-ecommerce-html-template",
+      "item_name": "BeautyShop - Cosmetics eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "bookstore-book-shop-html-template",
+      "item_name": "BookStore - Book Shop HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "clothify-fashion-store-html-template",
+      "item_name": "Clothify - Fashion Store HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "ecomus-multipurpose-ecommerce-html-template",
+      "item_name": "Ecomus - Multipurpose eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "electro-electronics-ecommerce-html-template",
+      "item_name": "Electro - Electronics eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "emax-ecommerce-html-template",
+      "item_name": "Emax - eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fashi-fashion-ecommerce-html-template",
+      "item_name": "Fashi - Fashion eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "furnhome-furniture-ecommerce-html-template",
+      "item_name": "Furnhome - Furniture eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "martfury-multipurpose-marketplace-html-template",
+      "item_name": "Martfury - Multipurpose Marketplace HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "modaz-fashion-ecommerce-html-template",
+      "item_name": "Modaz - Fashion eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "petshop-pet-store-html-template",
+      "item_name": "PetShop - Pet Store HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "shopingo-ecommerce-html-template",
+      "item_name": "Shopingo - eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "shopwise-multipurpose-ecommerce-html-template",
+      "item_name": "Shopwise - Multipurpose eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "storepro-ecommerce-html-template",
+      "item_name": "StorePro - eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 92,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "clickfunnel-style-landing-html-template",
+      "item_name": "ClickFunnel Style - Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "convertly-high-converting-landing-page-html",
+      "item_name": "Convertly - High Converting Landing Page HTML",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "demo-book-a-demo-landing-html-template",
+      "item_name": "Demo - Book a Demo Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "funnelx-sales-funnel-html-template",
+      "item_name": "FunnelX - Sales Funnel HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "launchpad-product-launch-html-template",
+      "item_name": "LaunchPad - Product Launch HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "leadgen-lead-generation-landing-html-template",
+      "item_name": "LeadGen - Lead Generation Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "optin-lead-capture-landing-html-template",
+      "item_name": "Optin - Lead Capture Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "signup-saas-signup-landing-html-template",
+      "item_name": "Signup - SaaS Signup Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "trial-free-trial-landing-html-template",
+      "item_name": "Trial - Free Trial Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "waitlist-coming-soon-landing-html-template",
+      "item_name": "Waitlist - Coming Soon Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "avalanche-responsive-email-template",
+      "item_name": "Avalanche - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "bento-email-template",
+      "item_name": "Bento - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "blueprint-email-template",
+      "item_name": "Blueprint - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "bulletproof-email-template",
+      "item_name": "Bulletproof - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "campaign-email-newsletter-template",
+      "item_name": "Campaign - Email Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "mailbakery-responsive-email-template",
+      "item_name": "Mailbakery - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "myst-responsive-email-template",
+      "item_name": "Myst - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "notify-responsive-email-template",
+      "item_name": "Notify - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "nuc-email-template",
+      "item_name": "Nuc - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pennyblack-responsive-email-template",
+      "item_name": "PennyBlack - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "salt-responsive-email-template",
+      "item_name": "Salt - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "slate-email-template",
+      "item_name": "Slate - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "sublime-responsive-email-template",
+      "item_name": "Sublime - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "vega-email-template",
+      "item_name": "Vega - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "zen-responsive-email-template",
+      "item_name": "Zen - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "agency-services-ads-html5",
+      "item_name": "Agency Services Ads HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "comercio-fashion-shop-ecommerce-html-template",
+      "item_name": "Comercio - Fashion Shop Ecommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "display-ads-html5-gwd-bundle",
+      "item_name": "Display Ads HTML5 GWD Bundle",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "ecommerce-product-ads-html5",
+      "item_name": "Ecommerce Product Ads HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "ecoshop-multipurpose-ecommerce-html5-template",
+      "item_name": "ECOSHOP - Multipurpose eCommerce HTML5 Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "evolia-email-ecommerce-newsletter",
+      "item_name": "Evolia Email eCommerce Newsletter",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "email"
+      ],
+      "services": [
+        "Email",
+        "Ecommerce"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "facebook-ads-html5-banner-template",
+      "item_name": "Facebook Ads HTML5 Banner Template",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fashino-responsive-shop-email-templates",
+      "item_name": "Fashino - Responsive Shop Email Templates",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email",
+        "Ecommerce"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fashion-email-newsletter-template",
+      "item_name": "Fashion Email Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "ad_creative",
+        "social"
+      ],
+      "services": [
+        "Social",
+        "Ads"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fashionistas-responsive-email-template",
+      "item_name": "Fashionistas - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

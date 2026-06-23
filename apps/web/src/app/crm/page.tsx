@@ -31,7 +31,12 @@ export default function CrmHubPage() {
   const realDeals = pipelineQuery.data?.total_count ?? stages.reduce((a, s) => a + (s.count ?? 0), 0);
   const realValue = pipelineQuery.data?.total_value ?? stages.reduce((a, s) => a + (s.value ?? 0), 0);
   const clientsCount = clientsQuery.data?.total ?? 0;
-  const useDemo = !clientsQuery.isLoading && !pipelineQuery.isLoading && clientsCount === 0 && realDeals === 0;
+  const useDemo =
+    process.env.NODE_ENV !== "production" &&
+    !clientsQuery.isLoading &&
+    !pipelineQuery.isLoading &&
+    clientsCount === 0 &&
+    realDeals === 0;
   const totalDeals = useDemo ? DEMO_CRM_PIPELINE.total_count : realDeals;
   const totalValue = useDemo ? DEMO_CRM_PIPELINE.total_value : realValue;
   const pipelineSummary = useDemo ? DEMO_CRM_PIPELINE : pipelineQuery.data;

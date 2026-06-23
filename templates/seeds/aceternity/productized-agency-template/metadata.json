@@ -1,0 +1,35 @@
+{
+  "item_name": "Productized Agency Template",
+  "provider": "Aceternity",
+  "license_id": "lic-aceternity-ui-pro-2026",
+  "slug": "productized-agency-template",
+  "seed_id": "ace-productized-agency-template",
+  "quality_score": 95,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "on_disk",
+  "storage": {
+    "source_zip": "source.zip"
+  },
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "landing",
+    "funnel"
+  ],
+  "services": [
+    "Agency",
+    "Landing",
+    "SaaS B2B"
+  ],
+  "sector_groups": [
+    "agency_creator"
+  ],
+  "converted_to": [
+    "landing-agency-audit-v1"
+  ],
+  "notes": "Agency packages/pricing; parcial en components/pa | seed_id=aceternity-productized-agency"
+}

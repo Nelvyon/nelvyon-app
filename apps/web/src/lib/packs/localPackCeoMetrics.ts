@@ -222,7 +222,7 @@ export function formatWelcomeStatus(status: string | null, touches: number | nul
   if (s === "ready" || s === "draft") return `Lista${touchLabel}`;
   if (s === "active" || s === "running") return `Activa${touchLabel}`;
   if (s === "skipped") return "Omitida (sin email)";
-  if (s === "no_api_key") return "Pendiente (falta SendGrid)";
+  if (s === "no_api_key") return "Pendiente (falta SES)";
   if (s === "failed" || s === "error") return "Con errores";
   return `${status}${touchLabel}`;
 }

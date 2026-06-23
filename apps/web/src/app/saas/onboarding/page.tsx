@@ -56,6 +56,7 @@ export default function SaasOnboardingPage() {
   const [phone, setPhone] = useState("");
   const [employees, setEmployees] = useState("");
   const [goals, setGoals] = useState<string[]>([]);
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
 
   const loadStatus = useCallback(async () => {
     setLoading(true);
@@ -235,7 +236,15 @@ export default function SaasOnboardingPage() {
         />
       ) : null}
       {uiStep === 4 && tenant ? (
-        <StepConfirm tenant={tenant} busy={busy} error={error} onBack={() => setUiStep(3)} onFinish={() => void handleFinish()} />
+        <StepConfirm
+          acceptedLegal={acceptedLegal}
+          busy={busy}
+          error={error}
+          onAcceptedLegalChange={setAcceptedLegal}
+          onBack={() => setUiStep(3)}
+          onFinish={() => void handleFinish()}
+          tenant={tenant}
+        />
       ) : null}
     </OnboardingLayout>
   );

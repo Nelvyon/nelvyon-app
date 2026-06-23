@@ -1,0 +1,312 @@
+{
+  "sector_group": "education",
+  "count": 17,
+  "seeds": [
+    {
+      "slug": "nature-blog-article-website-template",
+      "item_name": "Nature Blog Article Website Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "SEO",
+        "Content"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "academia-university-html-template",
+      "item_name": "Academia - University HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Content"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "article-blog-html-template",
+      "item_name": "Article - Blog HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "blogar-personal-blog-html-template",
+      "item_name": "Blogar - Personal Blog HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "blogzine-blog-html-template",
+      "item_name": "Blogzine - Blog HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "coursera-lms-education-html-template",
+      "item_name": "Coursera - LMS Education HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Content"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "editor-magazine-html-template",
+      "item_name": "Editor - Magazine HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "eduzone-education-html-template",
+      "item_name": "Eduzone - Education HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Content"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "learny-online-course-html-template",
+      "item_name": "Learny - Online Course HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Content"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "magz-magazine-html-template",
+      "item_name": "Magz - Magazine HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "newspaper-magazine-html-template",
+      "item_name": "Newspaper - Magazine HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "posty-blog-html-template",
+      "item_name": "Posty - Blog HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "press-news-magazine-html-template",
+      "item_name": "Press - News Magazine HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "skillup-online-learning-html-template",
+      "item_name": "SkillUp - Online Learning HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Content"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "story-blog-html-template",
+      "item_name": "Story - Blog HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "studi-education-html-template",
+      "item_name": "Studi - Education HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Content"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "writico-blog-magazine-html-template",
+      "item_name": "Writico - Blog Magazine HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "content-strategy-pack"
+      ],
+      "kinds": [
+        "content_page",
+        "seo_page"
+      ],
+      "services": [
+        "Content",
+        "SEO"
+      ],
+      "quality_score": 87,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

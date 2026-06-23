@@ -1,0 +1,32 @@
+{
+  "item_name": "Schedule Marketing Template",
+  "provider": "Aceternity",
+  "license_id": "lic-aceternity-ui-pro-2026",
+  "slug": "schedule-marketing-template",
+  "seed_id": "ace-schedule-marketing-template",
+  "quality_score": 95,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "local-business-growth"
+  ],
+  "kinds": [
+    "landing",
+    "funnel"
+  ],
+  "services": [
+    "Landing",
+    "Local",
+    "Funnel"
+  ],
+  "sector_groups": [
+    "health_medical",
+    "beauty_wellness",
+    "professional"
+  ],
+  "converted_to": [],
+  "notes": "Booking/appointments — clínicas, salones, consultas | Descargar desde pro.aceternity.com por nombre exacto."
+}

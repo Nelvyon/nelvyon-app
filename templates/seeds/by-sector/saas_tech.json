@@ -1,0 +1,937 @@
+{
+  "sector_group": "saas_tech",
+  "count": 152,
+  "seeds": [
+    {
+      "slug": "agenforce-marketing-template",
+      "item_name": "Agenforce Marketing Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Agency",
+        "SaaS B2B"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "ai-saas-template",
+      "item_name": "AI SaaS Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "cryptgen-marketing-template",
+      "item_name": "Cryptgen Marketing Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "devpro-portfolio-template",
+      "item_name": "DevPro Portfolio Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "content_page"
+      ],
+      "services": [
+        "Landing",
+        "Content"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "foxtrot-marketing-template",
+      "item_name": "Foxtrot Marketing Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Brand"
+      ],
+      "quality_score": 95,
+      "asset_status": "full_assets"
+    },
+    {
+      "slug": "nodus-agent-template",
+      "item_name": "Nodus Agent Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Chatbot"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "proactiv-marketing-template",
+      "item_name": "Proactiv Marketing Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "social"
+      ],
+      "services": [
+        "Landing",
+        "Social",
+        "Brand"
+      ],
+      "quality_score": 95,
+      "asset_status": "full_assets"
+    },
+    {
+      "slug": "simplistic-saas-template",
+      "item_name": "Simplistic SaaS Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 95,
+      "asset_status": "full_assets"
+    },
+    {
+      "slug": "startup-landing-page-template",
+      "item_name": "Startup Landing Page Template",
+      "provider": "aceternity",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B"
+      ],
+      "quality_score": 95,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "alfena-saas-software-webapp-template",
+      "item_name": "Alfena - SaaS, Software & WebApp Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "appway-saas-startup-html-template",
+      "item_name": "Appway - Saas & Startup HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "asaas-saas-landing-page-html-template",
+      "item_name": "Asaas - Saas Landing Page HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "astriol-software-app-saas-landing-html-template",
+      "item_name": "Astriol - Software App, SaaS Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "babil-startup-and-saas-template",
+      "item_name": "Babil - Startup and SaaS template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "binmp-app-and-software-landing-html-template",
+      "item_name": "Binmp - App and Software Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "gosaas-saas-software-startup-template",
+      "item_name": "Gosaas - SaaS & Software Startup Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "landder-lead-generation-html-landing-pages",
+      "item_name": "Landder+ – Lead Generation HTML Landing Pages",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "landpagy-saas-software-landing-page-template",
+      "item_name": "Landpagy - Saas & Software Landing Page Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "miwlo-landing-page-html-template",
+      "item_name": "Miwlo - Landing Page HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "olikit-creative-saas-agency-template",
+      "item_name": "Olikit - Creative SaaS & Agency Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "posas-saas-software-landing-page-template",
+      "item_name": "Posas - Saas Software Landing Page Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "progrisaas-creative-landing-page-html5-templates",
+      "item_name": "ProgriSaaS - Creative Landing Page HTML5 Templates",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "quad-saas-startup-software-landing-page-html5",
+      "item_name": "Quad - SaaS Startup & Software Landing Page HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "saasdesk-saas-startup-html-template",
+      "item_name": "SaasDesk - Saas Startup HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "saasflix-saas-software-landing-page-template",
+      "item_name": "Saasflix SaaS Software Landing Page Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "saasox-saas-software-app-startup-html-template",
+      "item_name": "SaasoX - SaaS & Software App Startup HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "sapro-saas-it-solutions-html-landing-page",
+      "item_name": "Sapro – SaaS & IT Solutions HTML Landing Page",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "smartly-app-landing-page-html-template",
+      "item_name": "Smartly - App Landing Page HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "startix-multipurpose-saas-landing-html-template",
+      "item_name": "Startix - Multipurpose SaaS Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "sware-saas-software-landing-html5-page-template",
+      "item_name": "Sware SaaS & Software Landing HTML5 Page Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "treko-startup-and-software-landing-page-template",
+      "item_name": "Treko - Startup and Software Landing Page template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "xotix-software-saas-landing-page-template",
+      "item_name": "Xotix - Software & Saas Landing Page Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "xprosik-saas-software-app-landing-page-template",
+      "item_name": "Xprosik – Saas Software App Landing Page Template",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "zubaz-startup-saas-html-tempalte",
+      "item_name": "Zubaz - Startup & SaaS Html Tempalte",
+      "provider": "envato",
+      "pack_ids": [
+        "saas-b2b-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "SaaS B2B",
+        "Funnel"
+      ],
+      "quality_score": 94,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "clickfunnel-style-landing-html-template",
+      "item_name": "ClickFunnel Style - Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "convertly-high-converting-landing-page-html",
+      "item_name": "Convertly - High Converting Landing Page HTML",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "demo-book-a-demo-landing-html-template",
+      "item_name": "Demo - Book a Demo Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "funnelx-sales-funnel-html-template",
+      "item_name": "FunnelX - Sales Funnel HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "launchpad-product-launch-html-template",
+      "item_name": "LaunchPad - Product Launch HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "leadgen-lead-generation-landing-html-template",
+      "item_name": "LeadGen - Lead Generation Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "optin-lead-capture-landing-html-template",
+      "item_name": "Optin - Lead Capture Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "signup-saas-signup-landing-html-template",
+      "item_name": "Signup - SaaS Signup Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "trial-free-trial-landing-html-template",
+      "item_name": "Trial - Free Trial Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "waitlist-coming-soon-landing-html-template",
+      "item_name": "Waitlist - Coming Soon Landing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "landing-funnel-pack"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "CRO"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "avalanche-responsive-email-template",
+      "item_name": "Avalanche - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "bento-email-template",
+      "item_name": "Bento - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "blueprint-email-template",
+      "item_name": "Blueprint - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "bulletproof-email-template",
+      "item_name": "Bulletproof - Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "campaign-email-newsletter-template",
+      "item_name": "Campaign - Email Newsletter Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "mailbakery-responsive-email-template",
+      "item_name": "Mailbakery - Responsive Email Template",
+      "provider": "envato",
+      "pack_ids": [
+        "email-welcome-nurture"
+      ],
+      "kinds": [
+        "email_sequence",
+        "email"
+      ],
+      "services": [
+        "Email"
+      ],
+      "quality_score": 90,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

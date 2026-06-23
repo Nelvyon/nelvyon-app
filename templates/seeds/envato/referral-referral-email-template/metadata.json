@@ -1,0 +1,28 @@
+{
+  "item_name": "Referral - Referral Email Template",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "referral-referral-email-template",
+  "seed_id": "env-referral-referral-email-template",
+  "quality_score": 84,
+  "primary_kind": "email_sequence",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "email-welcome-nurture"
+  ],
+  "kinds": [
+    "email_sequence",
+    "email"
+  ],
+  "services": [
+    "Email"
+  ],
+  "sector_groups": [
+    "saas_tech"
+  ],
+  "converted_to": [],
+  "notes": "Curated email sequence — newsletter quality | Descargar desde elements.envato.com por nombre exacto."
+}

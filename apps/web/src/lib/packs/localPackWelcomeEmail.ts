@@ -1,6 +1,11 @@
 import { DbClient } from "../../../../../backend/db/DbClient";
 
 import {
+  isSesCredentialError,
+  isSesPermanentFailure,
+  sendEmailViaSes,
+} from "@/lib/email/sesMailer";
+import {
   buildWelcomeEmailSequence,
   type WelcomeTouch,
 } from "@/lib/packs/localPackProduction";
@@ -31,7 +36,6 @@ type QueueEmailRow = {
   scheduled_at: string | null;
 };
 
-const SENDGRID_API_URL = "https://api.sendgrid.com/v3/mail/send";
 let emailQueueHasScheduledAt: boolean | null = null;
 
 async function hasScheduledAtColumn(): Promise<boolean> {
@@ -158,50 +162,6 @@ function scheduledAtFromDelay(delayHours: number): string {
   return new Date(Date.now() + delayHours * 60 * 60 * 1000).toISOString();
 }
 
-async function sendViaSendGrid(params: {
-  toEmail: string;
-  toName: string;
-  subject: string;
-  bodyText: string;
-  bodyHtml: string;
-}): Promise<{ ok: boolean; error?: string }> {
-  const apiKey = process.env.SENDGRID_API_KEY?.trim();
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL?.trim() || "nelvyon@noreply.com";
-  const fromName = process.env.SENDGRID_FROM_NAME?.trim() || "NELVYON";
-  if (!apiKey) {
-    return { ok: false, error: "SENDGRID_API_KEY missing" };
-  }
-
-  try {
-    const response = await fetch(SENDGRID_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: params.toEmail, name: params.toName }] }],
-        from: { email: fromEmail, name: fromName },
-        subject: params.subject,
-        content: [
-          { type: "text/plain", value: params.bodyText },
-          { type: "text/html", value: params.bodyHtml },
-        ],
-        headers: {
-          "List-Unsubscribe": "<mailto:unsubscribe@nelvyon.com?subject=unsubscribe>",
-          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-        },
-      }),
-    });
-
-    if ([200, 201, 202].includes(response.status)) return { ok: true };
-    const msg = (await response.text()).slice(0, 500);
-    return { ok: false, error: `SendGrid ${response.status}: ${msg}` };
-  } catch (error) {
-    return { ok: false, error: String(error) };
-  }
-}
-
 async function fetchQueueByIds(ids: number[]): Promise<QueueEmailRow[]> {
   if (ids.length === 0) return [];
   return db().query<QueueEmailRow>(
@@ -262,7 +222,7 @@ export async function processPendingLocalWelcomeEmails(params: {
       continue;
     }
 
-    const result = await sendViaSendGrid({
+    const result = await sendEmailViaSes({
       toEmail: row.to_email,
       toName: row.to_name || "",
       subject: row.subject,
@@ -279,19 +239,20 @@ export async function processPendingLocalWelcomeEmails(params: {
       continue;
     }
 
-    if ((result.error || "").toLowerCase().includes("api_key")) {
+    const errorMessage = result.error ?? "ses_send_failed";
+    if (isSesCredentialError(errorMessage)) {
       await db().query(
         `UPDATE email_queue SET status = 'no_api_key', error_message = $2 WHERE id = $1`,
-        [row.id, result.error ?? "SENDGRID_API_KEY missing"],
+        [row.id, errorMessage],
       );
       noApiKey += 1;
       continue;
     }
 
-    if ((result.error || "").includes("400")) {
+    if (isSesPermanentFailure(errorMessage)) {
       await db().query(
         `UPDATE email_queue SET status = 'failed', error_message = $2 WHERE id = $1`,
-        [row.id, result.error ?? "sendgrid_400"],
+        [row.id, errorMessage],
       );
       failed += 1;
       continue;

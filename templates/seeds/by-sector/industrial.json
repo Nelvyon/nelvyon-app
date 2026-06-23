@@ -1,0 +1,113 @@
+{
+  "sector_group": "industrial",
+  "count": 6,
+  "seeds": [
+    {
+      "slug": "maxshop-multipurpose-ecommerce-html-template",
+      "item_name": "Maxshop - Multipurpose eCommerce HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "buildpro-construction-html-template",
+      "item_name": "BuildPro - Construction HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 86,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "factory-industrial-html-template",
+      "item_name": "Factory - Industrial HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 86,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "industri-factory-industrial-html-template",
+      "item_name": "Industri - Factory & Industrial HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 86,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "logistix-logistics-html-template",
+      "item_name": "Logistix - Logistics HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 86,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "manufact-manufacturing-html-template",
+      "item_name": "Manufact - Manufacturing HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "ecommerce-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Ecommerce",
+        "Landing"
+      ],
+      "quality_score": 86,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

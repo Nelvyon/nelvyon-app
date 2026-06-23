@@ -1,0 +1,894 @@
+{
+  "sector_group": "fitness_sports",
+  "count": 54,
+  "seeds": [
+    {
+      "slug": "activitar-gym-fitness-html-template",
+      "item_name": "Activitar - Gym & Fitness HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "crossfit-pro-gym-html-template",
+      "item_name": "CrossFit Pro - Gym HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitlife-gym-fitness-html-template",
+      "item_name": "FitLife - Gym Fitness HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitzone-gym-fitness-html-template",
+      "item_name": "Fitzone - Gym & Fitness HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "gym24-fitness-center-html-template",
+      "item_name": "Gym24 - Fitness Center HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "gymster-fitness-gym-html-template",
+      "item_name": "Gymster - Fitness & Gym HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "irongym-gym-fitness-html5-template",
+      "item_name": "IronGym - Gym & Fitness HTML5 Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "powerlift-gym-fitness-html-template",
+      "item_name": "Powerlift - Gym Fitness HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "stronger-fitness-gym-html-template",
+      "item_name": "Stronger - Fitness Gym HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "yogastic-yoga-fitness-html-template",
+      "item_name": "Yogastic - Yoga & Fitness HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 91,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "agency-services-ads-html5",
+      "item_name": "Agency Services Ads HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "display-ads-html5-gwd-bundle",
+      "item_name": "Display Ads HTML5 GWD Bundle",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "ecommerce-product-ads-html5",
+      "item_name": "Ecommerce Product Ads HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "facebook-ads-html5-banner-template",
+      "item_name": "Facebook Ads HTML5 Banner Template",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitmas-gym-fitness-center-html-template",
+      "item_name": "Fitmas - Gym & Fitness Center HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Funnel",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-gym-ads-html5-banner",
+      "item_name": "Fitness Gym Ads HTML5 Banner",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "google-ads-html5-banner-bundle",
+      "item_name": "Google Ads HTML5 Banner Bundle",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "gym-google-adwords-html5-banner-ads-gwd",
+      "item_name": "Gym Google Adwords HTML5 Banner Ads GWD",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "gymfito-tailwind-css-fitness-gym-html-template",
+      "item_name": "Gymfito - Tailwind CSS Fitness & Gym HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local",
+        "Funnel"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "gymon-gym-and-fitness-club-html-template",
+      "item_name": "GymOn - Gym and Fitness Club HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "instagram-story-ads-template",
+      "item_name": "Instagram Story Ads Template",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "local-business-ads-html5-pack",
+      "item_name": "Local Business Ads HTML5 Pack",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "medical-spa-yoga-fitness-landing-page-template",
+      "item_name": "Medical, Spa, Yoga & Fitness Landing Page Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "real-estate-ads-html5-banner",
+      "item_name": "Real Estate Ads HTML5 Banner",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "restaurant-promo-ads-html5",
+      "item_name": "Restaurant Promo Ads HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "retargeting-banner-pack-html5",
+      "item_name": "Retargeting Banner Pack HTML5",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "saas-ads-html5-banner-template",
+      "item_name": "SaaS Ads HTML5 Banner Template",
+      "provider": "envato",
+      "pack_ids": [
+        "meta-ads-pack"
+      ],
+      "kinds": [
+        "ad_creative"
+      ],
+      "services": [
+        "Ads",
+        "Social"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "workout-youtube-thumbnail-template",
+      "item_name": "Workout Youtube Thumbnail Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "ad_creative",
+        "content_page"
+      ],
+      "services": [
+        "Social",
+        "Content",
+        "Ads"
+      ],
+      "quality_score": 88,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "boxingclub-martial-arts-html-template",
+      "item_name": "BoxingClub - Martial Arts HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "dancestudio-dance-html-template",
+      "item_name": "DanceStudio - Dance HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "pilatespro-pilates-html-template",
+      "item_name": "PilatesPro - Pilates HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "runclub-running-html-template",
+      "item_name": "RunClub - Running HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "spartangym-crossfit-html-template",
+      "item_name": "SpartanGym - CrossFit HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "swimacademy-swimming-html-template",
+      "item_name": "SwimAcademy - Swimming HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "tennisclub-tennis-html-template",
+      "item_name": "TennisClub - Tennis HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "yogaflow-yoga-studio-html-template",
+      "item_name": "YogaFlow - Yoga Studio HTML Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 85,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-1-premium-html-landing-template",
+      "item_name": "Fitness Elite 1 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-10-premium-html-landing-template",
+      "item_name": "Fitness Elite 10 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-11-premium-html-landing-template",
+      "item_name": "Fitness Elite 11 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-12-premium-html-landing-template",
+      "item_name": "Fitness Elite 12 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-13-premium-html-landing-template",
+      "item_name": "Fitness Elite 13 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-14-premium-html-landing-template",
+      "item_name": "Fitness Elite 14 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-15-premium-html-landing-template",
+      "item_name": "Fitness Elite 15 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-16-premium-html-landing-template",
+      "item_name": "Fitness Elite 16 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-17-premium-html-landing-template",
+      "item_name": "Fitness Elite 17 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-18-premium-html-landing-template",
+      "item_name": "Fitness Elite 18 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-2-premium-html-landing-template",
+      "item_name": "Fitness Elite 2 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-3-premium-html-landing-template",
+      "item_name": "Fitness Elite 3 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-4-premium-html-landing-template",
+      "item_name": "Fitness Elite 4 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    },
+    {
+      "slug": "fitness-elite-5-premium-html-landing-template",
+      "item_name": "Fitness Elite 5 - Premium HTML Landing Template",
+      "provider": "envato",
+      "pack_ids": [
+        "local-business-growth"
+      ],
+      "kinds": [
+        "landing",
+        "funnel"
+      ],
+      "services": [
+        "Landing",
+        "Local"
+      ],
+      "quality_score": 82,
+      "asset_status": "pooled_zip"
+    }
+  ]
+}

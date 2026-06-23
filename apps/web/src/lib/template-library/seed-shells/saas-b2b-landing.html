@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{business_name}} — SaaS B2B</title>
+  <meta name="description" content="{{value_proposition}}" />
+  <style>
+    :root {
+      --primary: {{primary_color}};
+      --accent: {{accent_color}};
+      --bg: #030712;
+      --surface: #111827;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: #f9fafb; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid #1f2937; }
+    .logo { font-weight: 800; font-size: 1.2rem; background: linear-gradient(135deg, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: #9ca3af; text-decoration: none; font-size: .9rem; }
+    .nav-cta { background: var(--primary); color: #fff; padding: .55rem 1.2rem; border-radius: .5rem; text-decoration: none; font-weight: 600; font-size: .9rem; }
+    .hero { padding: 5rem 2rem 4rem; max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+    @media (max-width: 768px) { .hero { grid-template-columns: 1fr; } }
+    .badge { display: inline-block; background: rgba(56,189,248,.12); color: var(--accent); padding: .3rem .75rem; border-radius: 999px; font-size: .75rem; font-weight: 600; margin-bottom: 1.25rem; }
+    h1 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.1; font-weight: 800; margin-bottom: 1rem; }
+    .lead { color: #9ca3af; font-size: 1.1rem; line-height: 1.65; margin-bottom: 2rem; }
+    .cta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .cta-primary { background: var(--primary); color: #fff; padding: .9rem 1.6rem; border-radius: .6rem; text-decoration: none; font-weight: 700; }
+    .cta-secondary { border: 1px solid #374151; color: #d1d5db; padding: .9rem 1.6rem; border-radius: .6rem; text-decoration: none; font-weight: 600; }
+    .hero-visual { background: var(--surface); border: 1px solid #1f2937; border-radius: 1rem; padding: 2rem; min-height: 320px; display: grid; place-items: center; }
+    .hero-visual .metric { text-align: center; }
+    .hero-visual .metric strong { display: block; font-size: 3rem; font-weight: 800; color: var(--accent); }
+    .hero-visual .metric span { color: #6b7280; font-size: .9rem; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding: 0 2rem 4rem; max-width: 1100px; margin: 0 auto; }
+    .stat { background: var(--surface); border: 1px solid #1f2937; border-radius: .75rem; padding: 1.25rem; }
+    .stat strong { display: block; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; margin-bottom: .5rem; }
+    .stat span { font-size: .95rem; color: #d1d5db; }
+    .demo-section { background: var(--surface); border-top: 1px solid #1f2937; padding: 4rem 2rem; }
+    .demo-inner { max-width: 480px; margin: 0 auto; }
+    .demo-inner h2 { font-size: 1.75rem; margin-bottom: .5rem; }
+    .demo-inner p { color: #9ca3af; margin-bottom: 1.5rem; }
+    form { display: grid; gap: .75rem; }
+    input, select, textarea { padding: .8rem 1rem; border: 1px solid #374151; border-radius: .5rem; background: var(--bg); color: #f9fafb; font-size: 1rem; }
+    button { background: var(--primary); color: #fff; border: 0; padding: 1rem; border-radius: .5rem; font-weight: 700; cursor: pointer; }
+    footer { text-align: center; padding: 2rem; color: #4b5563; font-size: .85rem; border-top: 1px solid #1f2937; }
+    .seed-meta { display: none; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">{{business_name}}</div>
+    <div class="nav-links">
+      <a href="#features">Producto</a>
+      <a href="#demo">Demo</a>
+      <a class="nav-cta" href="#demo">{{primary_cta}}</a>
+    </div>
+  </nav>
+  <section class="hero">
+    <div>
+      <span class="badge">SaaS B2B · {{icp_title}}</span>
+      <h1>{{value_proposition}}</h1>
+      <p class="lead">{{business_name}} ayuda a equipos como el tuyo a escalar con datos en tiempo real.</p>
+      <div class="cta-row">
+        <a class="cta-primary" href="#demo">{{primary_cta}}</a>
+        <a class="cta-secondary" href="#features">Ver funcionalidades</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="metric">
+        <strong>98%</strong>
+        <span>uptime SLA · demo</span>
+      </div>
+    </div>
+  </section>
+  <section class="stats" id="features">
+    <div class="stat"><strong>ICP</strong><span>{{icp_title}}</span></div>
+    <div class="stat"><strong>Sales motion</strong><span>{{sales_motion}}</span></div>
+    <div class="stat"><strong>Pricing</strong><span>{{pricing_model}}</span></div>
+  </section>
+  <section class="demo-section" id="demo">
+    <div class="demo-inner">
+      <h2>{{primary_cta}}</h2>
+      <p>Agenda una demo personalizada para tu equipo.</p>
+      <form id="demo-form">
+        <input required name="name" placeholder="Nombre" />
+        <input required type="email" name="email" placeholder="Email corporativo" />
+        <input required name="company" placeholder="Empresa" />
+        <select name="role"><option>{{icp_title}}</option><option>Otro rol</option></select>
+        <textarea name="message" rows="3" placeholder="¿Qué problema quieres resolver?"></textarea>
+        <button type="submit">{{primary_cta}}</button>
+      </form>
+    </div>
+  </section>
+  <footer>
+    {{business_name}} · {{contact_email}} · Plantilla base: {{seed_template_name}}
+    <span class="seed-meta" data-seed-slug="{{seed_slug}}" data-seed-provider="{{seed_provider}}"></span>
+  </footer>
+  <script>
+    document.getElementById('demo-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('¡Gracias! Un AE te contactará para agendar la demo.');
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

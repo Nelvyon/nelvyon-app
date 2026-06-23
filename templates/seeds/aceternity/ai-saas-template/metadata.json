@@ -1,0 +1,30 @@
+{
+  "item_name": "AI SaaS Template",
+  "provider": "Aceternity",
+  "license_id": "lic-aceternity-ui-pro-2026",
+  "slug": "ai-saas-template",
+  "seed_id": "ace-ai-saas-template",
+  "quality_score": 95,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "saas-b2b-growth"
+  ],
+  "kinds": [
+    "landing",
+    "funnel"
+  ],
+  "services": [
+    "Landing",
+    "SaaS B2B",
+    "Funnel"
+  ],
+  "sector_groups": [
+    "saas_tech"
+  ],
+  "converted_to": [],
+  "notes": "Multi-page AI SaaS; seed multipágina | Descargar desde pro.aceternity.com por nombre exacto."
+}

@@ -1,0 +1,31 @@
+{
+  "item_name": "SEO Agency - SEO HTML Template",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "seo-agency-seo-html-template",
+  "seed_id": "env-seo-agency-seo-html-template",
+  "quality_score": 88,
+  "primary_kind": "seo_page",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "seo-local-pack"
+  ],
+  "kinds": [
+    "content_page",
+    "seo_page"
+  ],
+  "services": [
+    "Content",
+    "SEO"
+  ],
+  "sector_groups": [
+    "agency_creator",
+    "saas_tech",
+    "professional"
+  ],
+  "converted_to": [],
+  "notes": "Curated content/SEO page | Descargar desde elements.envato.com por nombre exacto."
+}

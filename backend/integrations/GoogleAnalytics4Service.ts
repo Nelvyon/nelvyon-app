@@ -37,6 +37,17 @@ export interface GA4ConversionRow {
   eventCount: number;
 }
 
+export interface GA4LandingPageRow {
+  landingPage: string;
+  sessions: number;
+  conversions: number;
+}
+
+export interface GA4EventRow {
+  eventName: string;
+  eventCount: number;
+}
+
 export interface GA4TrafficSource {
   channel: string;
   sessions: number;
@@ -288,6 +299,49 @@ export class GoogleAnalytics4Service {
       channel: r.dimensions.sessionDefaultChannelGroup ?? "",
       sessions: Math.round(toNum(r.metrics.sessions)),
       conversions: Math.round(toNum(r.metrics.conversions)),
+    }));
+  }
+
+  async getLandingPageStats(
+    userId: string,
+    dateRange: { startDate: string; endDate: string },
+    limit = 25,
+  ): Promise<GA4LandingPageRow[]> {
+    const capped = Math.max(1, Math.min(limit, 100));
+    const rows = await this.runReport(
+      userId,
+      dateRange,
+      ["landingPage"],
+      ["sessions", "conversions"],
+      {
+        orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+        limit: capped,
+      },
+    );
+    return rows.map((r) => ({
+      landingPage: r.dimensions.landingPage ?? "",
+      sessions: Math.round(toNum(r.metrics.sessions)),
+      conversions: Math.round(toNum(r.metrics.conversions)),
+    }));
+  }
+
+  async getKeyEventCounts(
+    userId: string,
+    dateRange: { startDate: string; endDate: string },
+    eventNames: string[],
+  ): Promise<GA4EventRow[]> {
+    if (eventNames.length === 0) return [];
+    const rows = await this.runReport(userId, dateRange, ["eventName"], ["eventCount"], {
+      dimensionFilter: {
+        filter: {
+          fieldName: "eventName",
+          inListFilter: { values: eventNames },
+        },
+      },
+    });
+    return rows.map((r) => ({
+      eventName: r.dimensions.eventName ?? "",
+      eventCount: Math.round(toNum(r.metrics.eventCount)),
     }));
   }
 

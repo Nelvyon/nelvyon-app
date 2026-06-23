@@ -1,6 +1,7 @@
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
 import type { SimulationResult } from "../../../../../backend/autonomous/types";
 
+import { enrichPackReportWithDemoContent } from "@/lib/packs/packDemoReportContent";
 import { getPackDeliverablesCatalog } from "@/lib/packs/packDeliverablesCatalog";
 import type { PackDeliverableInput } from "@/lib/packs/packOsDb";
 import type { LocalGrowthPackIntake, PackReport } from "@/lib/packs/types";
@@ -60,25 +61,42 @@ export function buildLocalSeoReport(intake: LocalGrowthPackIntake, qaScore: numb
     city: intake.city,
     qa_score: qaScore,
     generated_at: new Date().toISOString(),
+    visibility_score_demo: 78,
     keywords_geo: [
-      `${intake.sector} ${intake.city}`,
-      `${intake.primary_cta} ${intake.city}`,
-      `mejor ${intake.sector} cerca de mí`,
+      { term: `${intake.sector} ${intake.city}`, volume_demo: 880, difficulty: "media", intent: "transaccional" },
+      { term: `${intake.primary_cta} ${intake.city}`, volume_demo: 320, difficulty: "baja", intent: "alta" },
+      { term: `mejor ${intake.sector} cerca de mí`, volume_demo: 1200, difficulty: "alta", intent: "móvil" },
+      { term: `${intake.business_name} opiniones`, volume_demo: 90, difficulty: "baja", intent: "marca" },
     ],
     google_business: {
       status: "recomendado",
-      actions: ["Completar ficha Google", "Añadir fotos", "Activar mensajes", "Solicitar reseñas"],
+      completeness_demo: "62%",
+      actions: [
+        "Completar ficha Google con categoría principal",
+        "Subir 8+ fotos de local y equipo",
+        "Activar mensajes y botón de reserva",
+        "Solicitar 5 reseñas en las primeras 2 semanas",
+      ],
     },
     on_page: [
-      { page: "/", issue: "Meta title local", priority: "high" },
-      { page: "/", issue: "Schema LocalBusiness", priority: "medium" },
-      { page: "/contacto", issue: "CTA visible móvil", priority: "high" },
+      { page: "/", issue: "Meta title local con ciudad", priority: "high", fix: `Incluir «${intake.city}» y CTA` },
+      { page: "/", issue: "Schema LocalBusiness", priority: "medium", fix: "JSON-LD con dirección y horario" },
+      { page: "/contacto", issue: "CTA visible móvil sin scroll", priority: "high", fix: "Sticky bar «" + intake.primary_cta + "»" },
+      { page: "/servicios", issue: "Página de servicios ausente", priority: "medium", fix: "Landing por servicio estrella" },
+    ],
+    competitors_demo: [
+      { name: `Competidor A · ${intake.city}`, gap: "Más reseñas Google" },
+      { name: `Competidor B · ${intake.city}`, gap: "Blog local activo" },
     ],
     plan_30d: [
-      "Publicar landing live",
-      "Optimizar ficha Google",
-      "Lanzar campaña local",
-      "Revisión SEO a 30 días",
+      { week: 1, action: "Publicar landing live y enviar sitemap" },
+      { week: 2, action: "Optimizar ficha Google + 2 posts" },
+      { week: 3, action: "Publicar página /servicios + FAQ schema" },
+      { week: 4, action: "Revisión rankings y ajuste on-page" },
+    ],
+    recommendations: [
+      { action: "Crear 2 landings barrio/zona", impact: "Captar long-tail geo de baja competencia" },
+      { action: "Enlazar desde directorios locales", impact: "Señales NAP y autoridad local" },
     ],
   };
 }
@@ -157,40 +175,44 @@ export function buildLocalPackReport(params: {
       ? Math.round(params.skuResults.reduce((a, r) => a + r.qa_score, 0) / params.skuResults.length)
       : 0;
 
-  return {
-    pack_name: "Pack Crecimiento Local",
-    pack_id: LOCAL_GROWTH_PACK_ID,
-    business_name: params.intake.business_name,
-    sector: params.intake.sector,
-    completed_at: new Date().toISOString(),
-    summary: `Pack local completado: landing live (${params.landingUrl}), SEO local, chatbot de citas y secuencia bienvenida ${params.welcomeDispatch.touches}-touch (${params.welcomeDispatch.status}).`,
-    kpis: {
-      deliverables_published: 5,
-      avg_qa_score: avgQa,
-      skus_passed: passed.length,
-      skus_total: params.skuResults.length,
-      saas_client_id: params.saasClientId,
-      saas_campaign_id: params.saasCampaignId,
-      extra_campaigns: 0,
-      landing_live_url: params.landingUrl,
-      welcome_email_status: params.welcomeDispatch.status,
-      welcome_touches: params.welcomeDispatch.touches,
+  return enrichPackReportWithDemoContent(
+    {
+      pack_name: "Pack Crecimiento Local",
+      pack_id: LOCAL_GROWTH_PACK_ID,
+      business_name: params.intake.business_name,
+      sector: params.intake.sector,
+      completed_at: new Date().toISOString(),
+      summary: `Pack local completado: landing live (${params.landingUrl}), SEO local, chatbot de citas y secuencia bienvenida ${params.welcomeDispatch.touches}-touch (${params.welcomeDispatch.status}).`,
+      kpis: {
+        deliverables_published: 5,
+        avg_qa_score: avgQa,
+        skus_passed: passed.length,
+        skus_total: params.skuResults.length,
+        saas_client_id: params.saasClientId,
+        saas_campaign_id: params.saasCampaignId,
+        extra_campaigns: 0,
+        landing_live_url: params.landingUrl,
+        welcome_email_status: params.welcomeDispatch.status,
+        welcome_touches: params.welcomeDispatch.touches,
+      },
+      sku_results: params.skuResults.map((r) => ({
+        sku: r.sku,
+        qa_score: r.qa_score,
+        passed: r.passed,
+        escalated: false,
+        deliverable_ids: [],
+      })),
+      next_steps: [
+        "Revisar landing live y aprobar en portal",
+        "Conectar dominio propio y pixel GA4",
+        "Lanzar campaña Google/Meta local (playbook D1)",
+        "Activar automatización lead → email → CRM",
+      ],
+      portal_path: "/portal",
     },
-    sku_results: params.skuResults.map((r) => ({
-      sku: r.sku,
-      qa_score: r.qa_score,
-      passed: r.passed,
-      escalated: false,
-      deliverable_ids: [],
-    })),
-    next_steps: [
-      "Revisar landing live y aprobar en portal",
-      "Conectar dominio propio y pixel GA4",
-      "Lanzar campaña Google/Meta local (playbook D1)",
-      "Activar automatización lead → email → CRM",
-    ],
-    portal_path: "/portal",
-  };
+    params.intake,
+    params.intake.catalog_focus,
+  );
 }
 
 export function mapLocalSkuDeliverable(params: {

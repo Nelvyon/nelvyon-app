@@ -1,6 +1,9 @@
-import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
+import { enrichPackReportWithDemoContent } from "@/lib/packs/packDemoReportContent";
+import { enrichBriefWithPackLibrary } from "@/lib/packs/packTemplateLibrary";
 import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
+import { parseCatalogFocus } from "@/lib/packs/parseCatalogFocus";
+import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import type {
   EcommerceGrowthPackIntake,
   PackReport,
@@ -25,7 +28,10 @@ export function buildEcommerceBrief(intake: EcommerceGrowthPackIntake): Record<s
     traffic_source: intake.primary_channel === "google" ? "google_shopping" : "meta_ads",
     cta_type: "purchase",
   };
-  return applyEliteTemplatesToBrief(withEcom, resolveTemplatesForSector(intake.sector));
+  return enrichBriefWithPackLibrary(
+    applyEliteTemplatesToBrief(withEcom, resolveTemplatesForSector(intake.sector)),
+    { pack_id: ECOMMERCE_GROWTH_PACK_ID, sector: intake.sector },
+  );
 }
 
 function buildPackReport(params: {
@@ -51,32 +57,36 @@ function buildPackReport(params: {
     1 +
     params.extraDeliverableCount;
 
-  return {
-    pack_name: meta.name,
-    pack_id: ECOMMERCE_GROWTH_PACK_ID,
-    business_name: params.intake.business_name,
-    sector: params.intake.sector,
-    completed_at: new Date().toISOString(),
-    summary: `${passed.length}/${params.skuResults.length} SKUs + kit Meta Ads + campaña carrito abandonado. Tienda lista para revisión en portal.`,
-    kpis: {
-      deliverables_published: deliverables,
-      avg_qa_score: avgQa,
-      skus_passed: passed.length,
-      skus_total: params.skuResults.length,
-      saas_client_id: params.saasClientId,
-      saas_campaign_id: params.saasCampaignId,
-      extra_campaigns: params.extraCampaignCount,
+  return enrichPackReportWithDemoContent(
+    {
+      pack_name: meta.name,
+      pack_id: ECOMMERCE_GROWTH_PACK_ID,
+      business_name: params.intake.business_name,
+      sector: params.intake.sector,
+      completed_at: new Date().toISOString(),
+      summary: `${passed.length}/${params.skuResults.length} SKUs + kit Meta Ads + campaña carrito abandonado. Tienda lista para revisión en portal.`,
+      kpis: {
+        deliverables_published: deliverables,
+        avg_qa_score: avgQa,
+        skus_passed: passed.length,
+        skus_total: params.skuResults.length,
+        saas_client_id: params.saasClientId,
+        saas_campaign_id: params.saasCampaignId,
+        extra_campaigns: params.extraCampaignCount,
+      },
+      sku_results: params.skuResults,
+      next_steps: [
+        "Revisar landing y catálogo SEO en portal",
+        "Importar kit Meta Ads Advantage+ en Business Manager",
+        "Activar secuencia carrito abandonado",
+        "Conectar pixel Meta + GA4 ecommerce",
+        "Medir ROAS a 14 días post-lanzamiento",
+      ],
+      portal_path: "/portal",
     },
-    sku_results: params.skuResults,
-    next_steps: [
-      "Revisar landing y catálogo SEO en portal",
-      "Importar kit Meta Ads Advantage+ en Business Manager",
-      "Activar secuencia carrito abandonado",
-      "Conectar pixel Meta + GA4 ecommerce",
-      "Medir ROAS a 14 días post-lanzamiento",
-    ],
-    portal_path: "/portal",
-  };
+    params.intake,
+    params.intake.catalog_focus,
+  );
 }
 
 export async function runEcommerceGrowthPack(params: {
@@ -173,5 +183,6 @@ export function validateEcommerceGrowthIntake(body: unknown): EcommerceGrowthPac
     primary_channel:
       channel === "google" || channel === "organic" ? channel : "meta",
     tier: o.tier === "premium" ? "premium" : "professional",
+    catalog_focus: parseCatalogFocus(o.catalog_focus),
   };
 }

@@ -3,6 +3,7 @@ import type { ContactStatus, PipelineStage } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
+import { sendCampaniaEmailToContact, type CampaniaEmailContact } from "./saasCampaniaEmail";
 
 export type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
 export type CampaniaChannel = "email" | "sms" | "notification" | "multi";
@@ -396,6 +397,14 @@ export class SaasCampaniasService {
     if (!campania) throw new SaasCampaniasError("Campania not found", "NOT_FOUND");
     if (campania.status === "completed") throw new SaasCampaniasError("Campania already completed", "VALIDATION");
     const contactIds = await this.resolveAudience(tenantId, campania.audienceFilter);
+    const sendsEmail = campania.channel === "email" || campania.channel === "multi";
+    const emailSubject = (campania.subject ?? campania.name).trim();
+    if (sendsEmail && !emailSubject) {
+      throw new SaasCampaniasError("Email campaigns require a subject", "VALIDATION");
+    }
+    if (campania.channel === "sms") {
+      throw new SaasCampaniasError("Canal SMS requiere Twilio (no configurado)", "VALIDATION");
+    }
 
     await this.db.query(
       `UPDATE saas_campanias SET
@@ -407,20 +416,56 @@ export class SaasCampaniasService {
       [tenantId, campaniaId, contactIds.length],
     );
 
+    const contactMap = sendsEmail
+      ? await this.loadContactsForEmail(tenantId, contactIds)
+      : new Map<string, CampaniaEmailContact>();
+
+    let sentCount = 0;
+
     for (const contactId of contactIds) {
       await this.db.query(
         `INSERT INTO saas_campania_recipients (campania_id, contact_id, tenant_id, status)
          VALUES ($1,$2,$3,'pending')`,
         [campaniaId, contactId, tenantId],
       );
-    }
 
-    await this.db.query(
-      `UPDATE saas_campania_recipients
-       SET status = 'sent', sent_at = NOW()
-       WHERE tenant_id = $1 AND campania_id = $2`,
-      [tenantId, campaniaId],
-    );
+      if (sendsEmail) {
+        const contact = contactMap.get(contactId) ?? { id: contactId, email: null, name: "" };
+        const result = await sendCampaniaEmailToContact({
+          contact,
+          subject: emailSubject,
+          body: campania.body,
+          ctaText: campania.ctaText,
+          ctaUrl: campania.ctaUrl,
+        });
+        const status = result.ok ? "sent" : "bounced";
+        if (result.ok) sentCount += 1;
+        await this.db.query(
+          `UPDATE saas_campania_recipients
+           SET status = $4, sent_at = CASE WHEN $4 = 'sent' THEN NOW() ELSE sent_at END
+           WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+          [tenantId, campaniaId, contactId, status],
+        );
+      } else {
+        await this.db.query(
+          `INSERT INTO saas_activity_log (tenant_id, event_type, description, metadata)
+           VALUES ($1,$2,$3,$4)`,
+          [
+            tenantId,
+            "campania_notification",
+            `Notificación: ${campania.name}`,
+            { campaniaId, contactId, channel: campania.channel },
+          ],
+        );
+        sentCount += 1;
+        await this.db.query(
+          `UPDATE saas_campania_recipients
+           SET status = 'sent', sent_at = NOW()
+           WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+          [tenantId, campaniaId, contactId],
+        );
+      }
+    }
 
     await this.db.query(
       `UPDATE saas_campanias SET
@@ -429,10 +474,22 @@ export class SaasCampaniasService {
         completed_at = NOW(),
         updated_at = NOW()
        WHERE tenant_id = $1 AND id = $2`,
-      [tenantId, campaniaId, contactIds.length],
+      [tenantId, campaniaId, sentCount],
     );
 
-    return { campaniaId, totalSent: contactIds.length, status: "completed" };
+    return { campaniaId, totalSent: sentCount, status: "completed" };
+  }
+
+  private async loadContactsForEmail(
+    tenantId: string,
+    contactIds: string[],
+  ): Promise<Map<string, CampaniaEmailContact>> {
+    if (contactIds.length === 0) return new Map();
+    const rows = await this.db.query<CampaniaEmailContact>(
+      `SELECT id, email, name FROM saas_contacts WHERE tenant_id = $1 AND id = ANY($2::uuid[])`,
+      [tenantId, contactIds],
+    );
+    return new Map(rows.map((r) => [r.id, r]));
   }
 
   async pauseCampania(tenantId: string, campaniaId: string): Promise<SaasCampania> {

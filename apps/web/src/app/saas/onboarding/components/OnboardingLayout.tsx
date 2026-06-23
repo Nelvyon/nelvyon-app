@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
@@ -40,6 +41,15 @@ export function OnboardingLayout({ step, children }: OnboardingLayoutProps) {
         </div>
       </div>
       {children}
+      <p className="text-center text-xs text-muted-foreground">
+        <Link className="underline hover:text-foreground" href="/legal/terms">
+          Términos
+        </Link>
+        {" · "}
+        <Link className="underline hover:text-foreground" href="/legal/privacy">
+          Privacidad
+        </Link>
+      </p>
     </div>
   );
 }

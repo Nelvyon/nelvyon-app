@@ -1,0 +1,28 @@
+{
+  "item_name": "Kababi - Restaurant HTMLTemplate",
+  "provider": "EnvatoElements",
+  "license_id": "lic-envato-elements-2026",
+  "slug": "kababi-restaurant-htmltemplate",
+  "seed_id": "env-kababi-restaurant-htmltemplate",
+  "quality_score": 88,
+  "primary_kind": "landing",
+  "downloaded_at": "2026-06-18",
+  "nelvyon_project": "template-library",
+  "redistribution": "none",
+  "status": "catalog_registered",
+  "pack_ids": [
+    "local-business-growth"
+  ],
+  "kinds": [
+    "landing"
+  ],
+  "services": [
+    "Landing",
+    "Local"
+  ],
+  "sector_groups": [
+    "food_hospitality"
+  ],
+  "converted_to": [],
+  "notes": "Fallback food service | Descargar desde elements.envato.com por nombre exacto."
+}

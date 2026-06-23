@@ -1,9 +1,11 @@
 import { DbClient } from "../db/DbClient";
+import { sendRawEmail } from "../email/sendRawEmail";
 import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact, type ActivityType } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import type { SaasDealsService } from "./SaasDealsService";
 import type { DealStage } from "./saasDealsDedupe";
+import { buildCampaniaEmailHtml } from "./saasCampaniaEmail";
 
 export type WorkflowStatus = "draft" | "active" | "paused" | "archived";
 export type TriggerType =
@@ -392,6 +394,12 @@ export class SaasWorkflowService {
       for (const action of wf.actions) {
         if (action.type === "send_email") {
           const cfg = action.config;
+          await sendRawEmail({
+            to: cfg.to,
+            subject: cfg.subject,
+            html: buildCampaniaEmailHtml({ body: cfg.body }),
+            text: cfg.body,
+          });
           await this.db.query(
             `INSERT INTO saas_activity_log (tenant_id, event_type, description, metadata)
              VALUES ($1,$2,$3,$4)`,

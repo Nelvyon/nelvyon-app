@@ -6,6 +6,17 @@ import {
   deliverableHasFile,
   resolveDeliverableDownloadUrl,
 } from "@/lib/portal/portalDeliverableStorage";
+import {
+  fetchLocalPackCeoMetricsFromDb,
+  type LocalPackCeoMetricsPayload,
+} from "@/lib/packs/localPackCeoMetrics";
+import {
+  fetchSaasB2bCeoMetricsFromDb,
+  type SaasB2bCeoMetricsPayload,
+} from "@/lib/packs/saasB2bPackCeoMetrics";
+import { LOCAL_GROWTH_PACK_ID, SAAS_B2B_GROWTH_PACK_ID } from "@/lib/packs/types";
+
+type PortalCeoMetricsPayload = LocalPackCeoMetricsPayload | SaasB2bCeoMetricsPayload;
 
 const PORTAL_VISIBLE_STATUSES = ["published", "approved_by_client", "changes_requested"] as const;
 const DOWNLOADABLE_STATUSES = ["published", "approved_by_client"] as const;
@@ -31,7 +42,10 @@ type DeliverableRow = {
   updated_at: string | null;
 };
 
-function sanitizePackSummary(meta: Record<string, unknown>): Record<string, unknown> | null {
+function sanitizePackSummary(
+  meta: Record<string, unknown>,
+  ceoMetrics?: PortalCeoMetricsPayload | null,
+): Record<string, unknown> | null {
   const report = meta.pack_report;
   if (!report || typeof report !== "object" || Array.isArray(report)) return null;
   const r = report as Record<string, unknown>;
@@ -47,7 +61,7 @@ function sanitizePackSummary(meta: Record<string, unknown>): Record<string, unkn
       passed: item.passed,
     }));
   const nextSteps = Array.isArray(r.next_steps) ? r.next_steps.map(String).slice(0, 6) : [];
-  return {
+  const summary: Record<string, unknown> = {
     pack_name: r.pack_name,
     pack_id: r.pack_id,
     business_name: r.business_name,
@@ -63,13 +77,86 @@ function sanitizePackSummary(meta: Record<string, unknown>): Record<string, unkn
     sku_results: safeSkus,
     next_steps: nextSteps,
   };
+  if (ceoMetrics) {
+    summary.ceo_operational_kpis = ceoMetrics.metrics.map((m) => ({
+      label: m.label,
+      value: m.value,
+      hint: m.hint,
+      limitation: m.limitation,
+      available: m.available,
+    }));
+    summary.ceo_metrics_fetched_at = ceoMetrics.fetched_at;
+  }
+  return summary;
 }
 
-function deliverableDict(row: DeliverableRow): Record<string, unknown> {
+async function resolveWorkspaceOwnerUserId(workspaceId: number): Promise<string | null> {
+  const rows = await db().query<{ user_id: string }>(
+    `SELECT user_id::text AS user_id FROM workspaces WHERE id = $1 LIMIT 1`,
+    [workspaceId],
+  );
+  return rows[0]?.user_id ?? null;
+}
+
+async function maybeFetchPortalCeoMetrics(
+  row: DeliverableRow,
+  meta: Record<string, unknown>,
+  workspaceId: number,
+): Promise<PortalCeoMetricsPayload | null> {
+  if (row.title !== "Informe ejecutivo") return null;
+  const packId = meta.pack_id;
+  if (packId !== LOCAL_GROWTH_PACK_ID && packId !== SAAS_B2B_GROWTH_PACK_ID) return null;
+  const report = meta.pack_report;
+  if (!report || typeof report !== "object" || Array.isArray(report)) return null;
+  const kpis =
+    (report as Record<string, unknown>).kpis &&
+    typeof (report as Record<string, unknown>).kpis === "object"
+      ? ((report as Record<string, unknown>).kpis as Record<string, unknown>)
+      : {};
+  const ownerUserId = await resolveWorkspaceOwnerUserId(workspaceId);
+  if (!ownerUserId) return null;
+
+  if (packId === LOCAL_GROWTH_PACK_ID) {
+    return fetchLocalPackCeoMetricsFromDb({
+      workspaceId,
+      userId: ownerUserId,
+      campaignId:
+        typeof kpis.saas_campaign_id === "number" ? kpis.saas_campaign_id : null,
+      welcomeFallback: {
+        status:
+          typeof kpis.welcome_email_status === "string"
+            ? kpis.welcome_email_status
+            : undefined,
+        touches:
+          typeof kpis.welcome_touches === "number" ? kpis.welcome_touches : undefined,
+      },
+    });
+  }
+
+  return fetchSaasB2bCeoMetricsFromDb({
+    workspaceId,
+    userId: ownerUserId,
+    campaignId:
+      typeof kpis.saas_campaign_id === "number" ? kpis.saas_campaign_id : null,
+    nurtureFallback: {
+      status:
+        typeof kpis.nurture_email_status === "string"
+          ? kpis.nurture_email_status
+          : undefined,
+      touches:
+        typeof kpis.nurture_touches === "number" ? kpis.nurture_touches : undefined,
+    },
+  });
+}
+
+function deliverableDict(
+  row: DeliverableRow,
+  ceoMetrics?: PortalCeoMetricsPayload | null,
+): Record<string, unknown> {
   const meta = row.deliverable_metadata && typeof row.deliverable_metadata === "object"
     ? row.deliverable_metadata
     : {};
-  const packSummary = sanitizePackSummary(meta);
+  const packSummary = sanitizePackSummary(meta, ceoMetrics);
   return {
     id: row.id,
     project_id: row.project_id,
@@ -154,7 +241,7 @@ export async function listPortalDeliverablesBff(params: {
   );
 
   return {
-    items: rows.map(deliverableDict),
+    items: rows.map((row) => deliverableDict(row)),
     total,
     page,
     page_size: pageSize,
@@ -202,7 +289,13 @@ export async function getPortalDeliverableBff(params: {
     clientId: params.clientId,
     statuses: PORTAL_VISIBLE_STATUSES,
   });
-  return row ? deliverableDict(row) : null;
+  if (!row) return null;
+  const meta =
+    row.deliverable_metadata && typeof row.deliverable_metadata === "object"
+      ? row.deliverable_metadata
+      : {};
+  const ceoMetrics = await maybeFetchPortalCeoMetrics(row, meta, params.workspaceId);
+  return deliverableDict(row, ceoMetrics);
 }
 
 function reviewResultDict(row: DeliverableRow): Record<string, unknown> {
