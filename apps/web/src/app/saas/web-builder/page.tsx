@@ -106,7 +106,11 @@ export default function SaasWebBuilderPage() {
   useEffect(() => { void load(); }, [load]);
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="workflows" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="workflows" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Web Builder" subtitle="Crea y publica páginas web sin código, directamente desde Nelvyon" />
@@ -150,16 +154,16 @@ export default function SaasWebBuilderPage() {
                         <p className="text-xs text-muted-foreground">/{p.slug}</p>
                       </div>
                     </div>
-                    <NelvyonDsBadge tone={p.status === "published" ? "success" : "primary"} size="sm">
+                    <NelvyonDsBadge tone={p.status === "published" ? "success" : "primary"}>
                       {p.status === "published" ? "Publicado" : "Borrador"}
                     </NelvyonDsBadge>
                   </div>
                   <p className="text-xs text-muted-foreground">{p.visits.toLocaleString()} visitas</p>
                   <div className="flex gap-2">
-                    <NelvyonDsButton size="sm" variant="ghost" className="flex-1">✏️ Editar</NelvyonDsButton>
+                    <NelvyonDsButton variant="ghost" className="flex-1">✏️ Editar</NelvyonDsButton>
                     {p.status === "published" && p.publishedUrl && (
                       <a href={p.publishedUrl} target="_blank" rel="noopener noreferrer">
-                        <NelvyonDsButton size="sm" variant="ghost">🔗 Ver</NelvyonDsButton>
+                        <NelvyonDsButton variant="ghost">🔗 Ver</NelvyonDsButton>
                       </a>
                     )}
                   </div>
@@ -170,6 +174,9 @@ export default function SaasWebBuilderPage() {
         )}
       </div>
       {showNew && <NewPageModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

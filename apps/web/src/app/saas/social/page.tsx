@@ -244,7 +244,11 @@ export default function SaasSocialPage() {
   };
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="campanias" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="campanias" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
@@ -327,7 +331,7 @@ export default function SaasSocialPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-medium text-foreground">{cfg.label}</span>
-                        <NelvyonDsBadge tone={STATUS_TONE[p.status]} size="sm">{STATUS_LABELS[p.status]}</NelvyonDsBadge>
+                        <NelvyonDsBadge tone={STATUS_TONE[p.status]}>{STATUS_LABELS[p.status]}</NelvyonDsBadge>
                         {p.scheduledAt && (
                           <span className="text-xs text-muted-foreground">
                             📅 {new Date(p.scheduledAt).toLocaleString("es-ES")}
@@ -353,6 +357,9 @@ export default function SaasSocialPage() {
       </div>
 
       {showNew && <NewPostModal accounts={accounts} onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

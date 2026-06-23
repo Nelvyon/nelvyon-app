@@ -126,7 +126,11 @@ export default function SaasHelpdeskPage() {
   const urgent = tickets.filter(t => t.priority === "urgent" && t.status !== "resolved" && t.status !== "closed").length;
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="crm" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="crm" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Helpdesk / Soporte" subtitle="Gestiona tickets de soporte de tus clientes desde un solo lugar" />
@@ -177,7 +181,7 @@ export default function SaasHelpdeskPage() {
                     </div>
                     <p className="mt-0.5 text-xs text-muted-foreground">{t.contactName} · {t.contactEmail} · {t.messageCount} mensaje{t.messageCount !== 1 ? "s" : ""}</p>
                   </div>
-                  <NelvyonDsBadge tone={STATUS_TONE[t.status]} size="sm">{STATUS_LABEL[t.status]}</NelvyonDsBadge>
+                  <NelvyonDsBadge tone={STATUS_TONE[t.status]}>{STATUS_LABEL[t.status]}</NelvyonDsBadge>
                 </div>
               </NelvyonDsCard>
             ))}
@@ -185,6 +189,9 @@ export default function SaasHelpdeskPage() {
         )}
       </div>
       {showNew && <NewTicketModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

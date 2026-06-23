@@ -64,7 +64,11 @@ export default function SaasReportesPage() {
   }
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="dashboard" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="dashboard" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader title="Reportes" subtitle="Genera y descarga informes ejecutivos de todos tus módulos en PDF" />
 
@@ -84,8 +88,7 @@ export default function SaasReportesPage() {
                   </div>
                 </div>
                 <NelvyonDsButton
-                  size="sm"
-                  onClick={() => void generateReport(rt.id)}
+                                   onClick={() => void generateReport(rt.id)}
                   disabled={generating === rt.id}
                   className="w-full"
                 >
@@ -114,7 +117,7 @@ export default function SaasReportesPage() {
                     <p className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString("es-ES")} {fmtSize(r.sizeBytes) && `· ${fmtSize(r.sizeBytes)}`}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <NelvyonDsBadge tone={r.status === "ready" ? "success" : r.status === "failed" ? "danger" : "primary"} size="sm">
+                    <NelvyonDsBadge tone={r.status === "ready" ? "success" : r.status === "failed" ? "danger" : "primary"}>
                       {r.status === "ready" ? "Listo" : r.status === "failed" ? "Error" : "Generando…"}
                     </NelvyonDsBadge>
                     {r.status === "ready" && r.downloadUrl && (
@@ -127,6 +130,9 @@ export default function SaasReportesPage() {
               ))}
             </div>
           )}
+        </div>
+      </div>
+          </main>
         </div>
       </div>
     </DashboardLayout>

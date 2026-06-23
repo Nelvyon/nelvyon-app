@@ -284,7 +284,7 @@ function ContactDetail({ contact, onClose }: { contact: Contact; onClose: () => 
             placeholder="Escribe una nota sobre este contacto…"
             className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
           />
-          <NelvyonDsButton type="submit" size="sm" disabled={saving || !note.trim()}>
+          <NelvyonDsButton type="submit" disabled={saving || !note.trim()}>
             Añadir
           </NelvyonDsButton>
         </div>
@@ -329,7 +329,11 @@ export default function SaasCrmPage() {
   const totalValue = contacts.reduce((s, c) => s + (c.value ?? 0), 0);
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="crm" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="crm" />
+          <main className="space-y-6">
       <div className="flex h-full flex-col gap-6 pb-8">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -434,7 +438,7 @@ export default function SaasCrmPage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="truncate font-medium text-foreground">{c.name}</p>
-                            <NelvyonDsBadge tone={STATUS_TONE[c.status]} size="sm">
+                            <NelvyonDsBadge tone={STATUS_TONE[c.status]}>
                               {STATUS_LABELS[c.status]}
                             </NelvyonDsBadge>
                           </div>
@@ -465,6 +469,9 @@ export default function SaasCrmPage() {
       </div>
 
       {showNew && <NewContactModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

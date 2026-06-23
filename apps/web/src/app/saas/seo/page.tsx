@@ -179,7 +179,11 @@ export default function SaasSeoPage() {
   const errors = issues.filter((i) => i.type === "error").length;
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="campanias" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="campanias" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
@@ -273,7 +277,7 @@ export default function SaasSeoPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-foreground">{issue.title}</p>
-                        <NelvyonDsBadge tone={issue.type === "error" ? "danger" : issue.type === "warning" ? "warning" : "primary"} size="sm">
+                        <NelvyonDsBadge tone={issue.type === "error" ? "danger" : issue.type === "warning" ? "warning" : "primary"}>
                           {issue.count} páginas
                         </NelvyonDsBadge>
                       </div>
@@ -291,6 +295,9 @@ export default function SaasSeoPage() {
       </div>
 
       {showAdd && <AddKeywordModal onClose={() => setShowAdd(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

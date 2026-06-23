@@ -97,7 +97,11 @@ export default function SaasDialerPage() {
   };
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="crm" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="crm" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader title="Dialer — Llamadas" subtitle="Realiza llamadas salientes a tus contactos directamente desde Nelvyon" />
 
@@ -144,13 +148,16 @@ export default function SaasDialerPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-muted-foreground">{fmtDur(c.duration)}</span>
-                      <NelvyonDsBadge tone={STATUS_TONE[c.status] ?? "primary"} size="sm">{STATUS_LABEL[c.status] ?? c.status}</NelvyonDsBadge>
+                      <NelvyonDsBadge tone={STATUS_TONE[c.status] ?? "primary"}>{STATUS_LABEL[c.status] ?? c.status}</NelvyonDsBadge>
                     </div>
                   </NelvyonDsCard>
                 ))}
               </div>
             )}
           </div>
+        </div>
+      </div>
+          </main>
         </div>
       </div>
     </DashboardLayout>

@@ -7,34 +7,33 @@ import {
   saasErrorBody,
   saasErrorStatus,
 } from "@nelvyon/saas";
-import { getDb } from "@nelvyon/db";
-import { sql } from "drizzle-orm";
+import { DbClient } from "../../../../../../../backend/db/DbClient";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 async function getModuleStats(tenantId: string) {
-  const db = getDb();
+  const db = DbClient.getInstance();
 
   const queries = await Promise.allSettled([
-    db.execute(sql`SELECT COUNT(*) AS n FROM saas_crm_contacts WHERE tenant_id = ${tenantId}`),
-    db.execute(sql`SELECT COUNT(*) AS n FROM saas_campaigns WHERE tenant_id = ${tenantId}`),
-    db.execute(sql`SELECT COUNT(*) AS n FROM saas_workflows WHERE tenant_id = ${tenantId} AND status = 'active'`),
-    db.execute(sql`SELECT COUNT(*) AS n FROM saas_forms WHERE tenant_id = ${tenantId}`),
-    db.execute(sql`SELECT COUNT(*) AS n FROM saas_appointments WHERE tenant_id = ${tenantId} AND status NOT IN ('cancelled','completed') AND start_at > NOW()`),
+    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_crm_contacts WHERE tenant_id = $1`, [tenantId]),
+    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_campaigns WHERE tenant_id = $1`, [tenantId]),
+    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_workflows WHERE tenant_id = $1 AND status = 'active'`, [tenantId]),
+    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_forms WHERE tenant_id = $1`, [tenantId]),
+    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_appointments WHERE tenant_id = $1 AND status NOT IN ('cancelled','completed') AND start_at > NOW()`, [tenantId]),
   ]);
 
-  function count(r: PromiseSettledResult<{ rows: Record<string, unknown>[] }>) {
+  function count(r: PromiseSettledResult<{ n: string }[]>) {
     if (r.status !== "fulfilled") return 0;
-    return Number(r.value.rows[0]?.n ?? 0);
+    return Number(r.value[0]?.n ?? 0);
   }
 
   return {
-    contacts: count(queries[0] as PromiseSettledResult<{ rows: Record<string, unknown>[] }>),
-    campaigns: count(queries[1] as PromiseSettledResult<{ rows: Record<string, unknown>[] }>),
-    activeWorkflows: count(queries[2] as PromiseSettledResult<{ rows: Record<string, unknown>[] }>),
-    forms: count(queries[3] as PromiseSettledResult<{ rows: Record<string, unknown>[] }>),
-    upcomingAppointments: count(queries[4] as PromiseSettledResult<{ rows: Record<string, unknown>[] }>),
+    contacts: count(queries[0]),
+    campaigns: count(queries[1]),
+    activeWorkflows: count(queries[2]),
+    forms: count(queries[3]),
+    upcomingAppointments: count(queries[4]),
   };
 }
 

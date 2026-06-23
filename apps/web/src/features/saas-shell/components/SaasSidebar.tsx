@@ -143,14 +143,13 @@ export function SaasSidebar({
         {company ? (
           <div className="space-y-1.5 border-t border-border pt-3 px-1">
             <p className="text-xs font-medium text-foreground truncate">{company}</p>
-            <NelvyonDsBadge tone={planTone(plan)} size="sm">{plan}</NelvyonDsBadge>
+            <NelvyonDsBadge tone={planTone(plan)}>{plan}</NelvyonDsBadge>
           </div>
         ) : null}
 
         <NelvyonDsButton
           variant="secondary"
-          size="sm"
-          onClick={async () => {
+                   onClick={async () => {
             await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).catch(() => null);
             resetUser();
             router.replace("/auth/login");

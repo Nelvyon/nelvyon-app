@@ -182,7 +182,7 @@ function NewCampaignModal({ onClose, onSaved }: { onClose: () => void; onSaved: 
               placeholder="Hola {{nombre}}, tenemos una oferta exclusiva para ti…"
               className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
             />
-            <p className="mt-1 text-xs text-muted-foreground">Usa {{"{{"}}nombre{"}}"}} para personalizar</p>
+            <p className="mt-1 text-xs text-muted-foreground">{"Usa {{nombre}} para personalizar"}</p>
           </div>
           <div className="flex gap-3">
             <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
@@ -223,7 +223,11 @@ export default function SaasSmsPage() {
   const totalSent = campaigns.reduce((s, c) => s + c.sentCount, 0);
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="sms" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="sms" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
@@ -285,7 +289,7 @@ export default function SaasSmsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-foreground">{c.name}</p>
-                      <NelvyonDsBadge tone={STATUS_TONE[c.status]} size="sm">
+                      <NelvyonDsBadge tone={STATUS_TONE[c.status]}>
                         {STATUS_LABELS[c.status]}
                       </NelvyonDsBadge>
                     </div>
@@ -295,7 +299,7 @@ export default function SaasSmsPage() {
                     </p>
                   </div>
                   {c.status === "draft" && (
-                    <NelvyonDsButton size="sm" variant="ghost">Enviar</NelvyonDsButton>
+                    <NelvyonDsButton variant="ghost">Enviar</NelvyonDsButton>
                   )}
                 </div>
               </NelvyonDsCard>
@@ -306,6 +310,9 @@ export default function SaasSmsPage() {
 
       {showSend && <SendSmsModal onClose={() => setShowSend(false)} />}
       {showNew && <NewCampaignModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

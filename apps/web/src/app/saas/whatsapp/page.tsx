@@ -153,7 +153,11 @@ export default function SaasWhatsAppPage() {
   };
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="whatsapp" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="whatsapp" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
@@ -230,7 +234,7 @@ export default function SaasWhatsAppPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-mono text-sm text-foreground">{m.to}</p>
-                      <NelvyonDsBadge tone={STATUS_TONE[m.status]} size="sm">{STATUS_LABELS[m.status]}</NelvyonDsBadge>
+                      <NelvyonDsBadge tone={STATUS_TONE[m.status]}>{STATUS_LABELS[m.status]}</NelvyonDsBadge>
                     </div>
                     <p className="mt-0.5 truncate text-sm text-muted-foreground">{m.content}</p>
                     {m.error && <p className="mt-0.5 text-xs text-red-400">{m.error}</p>}
@@ -246,6 +250,9 @@ export default function SaasWhatsAppPage() {
       </div>
 
       {showSend && <SendWaModal onClose={() => { setShowSend(false); void load(); }} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

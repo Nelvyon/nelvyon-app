@@ -196,7 +196,11 @@ export default function SaasPublicidadPage() {
   };
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="campanias" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="campanias" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
@@ -257,7 +261,7 @@ export default function SaasPublicidadPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-foreground">{c.name}</p>
-                        <NelvyonDsBadge tone={STATUS_TONE[c.status]} size="sm">{STATUS_LABELS[c.status]}</NelvyonDsBadge>
+                        <NelvyonDsBadge tone={STATUS_TONE[c.status]}>{STATUS_LABELS[c.status]}</NelvyonDsBadge>
                         <span className="text-xs text-muted-foreground">{OBJ_LABELS[c.objective]}</span>
                       </div>
                       <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-4 lg:grid-cols-6">
@@ -278,6 +282,9 @@ export default function SaasPublicidadPage() {
       </div>
 
       {showNew && <NewCampaignModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

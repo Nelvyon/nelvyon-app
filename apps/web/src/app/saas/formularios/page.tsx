@@ -363,7 +363,11 @@ export default function SaasFormulariosPage() {
   const totalSubmissions = forms.reduce((s, f) => s + f.submissions, 0);
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="formularios" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="formularios" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
@@ -412,7 +416,7 @@ export default function SaasFormulariosPage() {
                     <p className="font-semibold text-foreground">{f.name}</p>
                     {f.description && <p className="mt-0.5 text-sm text-muted-foreground">{f.description}</p>}
                   </div>
-                  <NelvyonDsBadge tone={f.isActive ? "success" : "primary"} size="sm">
+                  <NelvyonDsBadge tone={f.isActive ? "success" : "primary"}>
                     {f.isActive ? "Activo" : "Inactivo"}
                   </NelvyonDsBadge>
                 </div>
@@ -422,10 +426,10 @@ export default function SaasFormulariosPage() {
                   <span>{f.submissions} respuestas</span>
                 </div>
                 <div className="flex gap-2">
-                  <NelvyonDsButton size="sm" variant="ghost" className="flex-1" onClick={() => setEmbedForm(f)}>
+                  <NelvyonDsButton variant="ghost" className="flex-1" onClick={() => setEmbedForm(f)}>
                     {"</>"} Embed
                   </NelvyonDsButton>
-                  <NelvyonDsButton size="sm" variant="ghost" className="flex-1" onClick={() => { setEditingForm(f); setShowBuilder(true); }}>
+                  <NelvyonDsButton variant="ghost" className="flex-1" onClick={() => { setEditingForm(f); setShowBuilder(true); }}>
                     Editar
                   </NelvyonDsButton>
                 </div>
@@ -443,6 +447,9 @@ export default function SaasFormulariosPage() {
         />
       )}
       {embedForm && <EmbedModal form={embedForm} onClose={() => setEmbedForm(null)} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

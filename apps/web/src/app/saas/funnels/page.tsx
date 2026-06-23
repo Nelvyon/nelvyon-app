@@ -136,7 +136,11 @@ export default function SaasFunnelsPage() {
     : 0;
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="workflows" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="workflows" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Funnel Builder" subtitle="Crea embudos de conversión multipaso que venden solos" />
@@ -174,7 +178,7 @@ export default function SaasFunnelsPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-semibold text-foreground">{f.name}</p>
-                      <NelvyonDsBadge tone={f.status === "active" ? "success" : "primary"} size="sm">
+                      <NelvyonDsBadge tone={f.status === "active" ? "success" : "primary"}>
                         {f.status === "active" ? "Activo" : f.status === "paused" ? "Pausado" : "Borrador"}
                       </NelvyonDsBadge>
                     </div>
@@ -202,6 +206,9 @@ export default function SaasFunnelsPage() {
         )}
       </div>
       {showNew && <NewFunnelModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

@@ -88,7 +88,11 @@ export default function SaasAfiliadosPage() {
   const totalPending = affiliates.reduce((s, a) => s + a.pendingPayout, 0);
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="billing" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="billing" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Programa de Afiliados" subtitle="Gana comisiones recurrentes por cada cliente que refieras a Nelvyon" />
@@ -151,7 +155,7 @@ export default function SaasAfiliadosPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-semibold text-foreground">{a.name}</p>
-                      <NelvyonDsBadge tone={a.status === "active" ? "success" : "primary"} size="sm">
+                      <NelvyonDsBadge tone={a.status === "active" ? "success" : "primary"}>
                         {a.status === "active" ? "Activo" : a.status === "pending" ? "Pendiente" : "Inactivo"}
                       </NelvyonDsBadge>
                     </div>
@@ -170,6 +174,9 @@ export default function SaasAfiliadosPage() {
         )}
       </div>
       {showInvite && <InviteModal onClose={() => setShowInvite(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

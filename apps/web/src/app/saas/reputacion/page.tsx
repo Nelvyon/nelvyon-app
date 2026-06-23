@@ -126,7 +126,11 @@ export default function SaasReputacionPage() {
   const score = mentions.length > 0 ? Math.round((positive / mentions.length) * 100) : 0;
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="seo" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="seo" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Reputación & Menciones" subtitle="Monitorea lo que dicen de tu marca en internet y redes sociales" />
@@ -183,14 +187,14 @@ export default function SaasReputacionPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-foreground text-sm">{m.title}</p>
-                        <NelvyonDsBadge tone={SENTIMENT_TONE[m.sentiment]} size="sm">{SENTIMENT_LABEL[m.sentiment]}</NelvyonDsBadge>
+                        <NelvyonDsBadge tone={SENTIMENT_TONE[m.sentiment]}>{SENTIMENT_LABEL[m.sentiment]}</NelvyonDsBadge>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{m.snippet}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{m.platform} · keyword: <span className="text-primary">{m.keyword}</span></p>
                     </div>
                     {m.url && (
                       <a href={m.url} target="_blank" rel="noopener noreferrer">
-                        <NelvyonDsButton size="sm" variant="ghost">Ver →</NelvyonDsButton>
+                        <NelvyonDsButton variant="ghost">Ver →</NelvyonDsButton>
                       </a>
                     )}
                   </div>
@@ -213,7 +217,7 @@ export default function SaasReputacionPage() {
                     <p className="font-medium text-foreground">{a.keyword}</p>
                     <p className="text-xs text-muted-foreground">{a.platforms.join(", ")} · {a.mentionCount} menciones</p>
                   </div>
-                  <NelvyonDsBadge tone={a.active ? "success" : "primary"} size="sm">{a.active ? "Activa" : "Inactiva"}</NelvyonDsBadge>
+                  <NelvyonDsBadge tone={a.active ? "success" : "primary"}>{a.active ? "Activa" : "Inactiva"}</NelvyonDsBadge>
                 </NelvyonDsCard>
               ))}
             </div>
@@ -221,6 +225,9 @@ export default function SaasReputacionPage() {
         )}
       </div>
       {showNew && <NewAlertModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

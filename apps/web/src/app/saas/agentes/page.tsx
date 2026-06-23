@@ -176,7 +176,11 @@ export default function SaasAgentesPage() {
   });
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="dashboard" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="agentes" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader
           title="Agentes IA por Sector"
@@ -229,12 +233,12 @@ export default function SaasAgentesPage() {
                   <p className="mt-0.5 text-xs text-muted-foreground">{agent.description}</p>
                 </div>
                 {agent.premium && (
-                  <NelvyonDsBadge tone="warning" size="sm">Pro</NelvyonDsBadge>
+                  <NelvyonDsBadge tone="warning">Pro</NelvyonDsBadge>
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <NelvyonDsBadge tone="primary" size="sm">{agent.category}</NelvyonDsBadge>
-                <NelvyonDsButton size="sm" onClick={() => setActiveAgent(agent)}>
+                <NelvyonDsBadge tone="primary">{agent.category}</NelvyonDsBadge>
+                <NelvyonDsButton onClick={() => setActiveAgent(agent)}>
                   Ejecutar →
                 </NelvyonDsButton>
               </div>
@@ -252,6 +256,9 @@ export default function SaasAgentesPage() {
       </div>
 
       {activeAgent && <ExecuteModal agent={activeAgent} onClose={() => setActiveAgent(null)} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

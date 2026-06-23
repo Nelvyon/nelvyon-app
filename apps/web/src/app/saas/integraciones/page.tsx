@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -77,7 +77,7 @@ function IntegrationCard({ integration, onConnect }: { integration: Integration;
             )}
           </div>
         </div>
-        <NelvyonDsBadge tone={isConnected ? "success" : integration.status === "error" ? "danger" : "primary"} size="sm">
+        <NelvyonDsBadge tone={isConnected ? "success" : integration.status === "error" ? "danger" : "primary"}>
           {isConnected ? "Conectado" : integration.status === "error" ? "Error" : "Sin conectar"}
         </NelvyonDsBadge>
       </div>
@@ -96,8 +96,7 @@ function IntegrationCard({ integration, onConnect }: { integration: Integration;
       )}
 
       <NelvyonDsButton
-        size="sm"
-        variant={isConnected ? "ghost" : "primary"}
+               variant={isConnected ? "ghost" : "primary"}
         onClick={() => onConnect(integration.id)}
         className="w-full"
       >
@@ -107,12 +106,12 @@ function IntegrationCard({ integration, onConnect }: { integration: Integration;
   );
 }
 
-export default function SaasIntegracionesPage() {
+function IntegracionesContent() {
   const [integrations, setIntegrations] = useState<Integration[]>(STATIC_PROVIDERS);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
-  const oauthSuccess = searchParams.get("oauth_success");
-  const oauthError = searchParams.get("oauth_error");
+  const oauthSuccess = searchParams?.get("oauth_success") ?? null;
+  const oauthError = searchParams?.get("oauth_error") ?? null;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -159,7 +158,11 @@ export default function SaasIntegracionesPage() {
   const connected = integrations.filter(i => i.status === "connected").length;
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="settings" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="settings" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader
           title="Integraciones"
@@ -213,6 +216,17 @@ export default function SaasIntegracionesPage() {
           </div>
         )}
       </div>
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
+  );
+}
+
+export default function SaasIntegracionesPage() {
+  return (
+    <Suspense fallback={null}>
+      <IntegracionesContent />
+    </Suspense>
   );
 }

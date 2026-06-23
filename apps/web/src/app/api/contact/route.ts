@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { getDb } from "@nelvyon/db";
-import { sql } from "drizzle-orm";
+import { DbClient } from "../../../../../../backend/db/DbClient";
 import { sendEmail } from "../../../../../../backend/email";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 async function ensureSchema() {
-  const db = getDb();
-  await db.execute(sql`
+  const db = DbClient.getInstance();
+  await db.query(`
     CREATE TABLE IF NOT EXISTS marketing_leads (
       id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name       TEXT NOT NULL,
@@ -46,19 +45,20 @@ export async function POST(req: Request) {
     }
 
     await ensureSchema();
-    const db = getDb();
+    const db = DbClient.getInstance();
 
-    await db.execute(sql`
-      INSERT INTO marketing_leads (name, email, company, phone, message, plan)
-      VALUES (
-        ${body.name.trim()},
-        ${body.email.trim().toLowerCase()},
-        ${body.company?.trim() ?? null},
-        ${body.phone?.trim() ?? null},
-        ${body.message.trim()},
-        ${body.plan?.trim() ?? null}
-      )
-    `);
+    await db.query(
+      `INSERT INTO marketing_leads (name, email, company, phone, message, plan)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        body.name.trim(),
+        body.email.trim().toLowerCase(),
+        body.company?.trim() ?? null,
+        body.phone?.trim() ?? null,
+        body.message.trim(),
+        body.plan?.trim() ?? null,
+      ],
+    );
 
     // Notify owner
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com";

@@ -85,7 +85,11 @@ export default function SaasLmsPage() {
   const totalRevenue = courses.reduce((s, c) => s + c.price * c.enrollments, 0);
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="workflows" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="workflows" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="LMS — Cursos y Formación" subtitle="Crea y vende cursos online directamente desde Nelvyon" />
@@ -121,7 +125,7 @@ export default function SaasLmsPage() {
               <NelvyonDsCard key={c.id} className="flex flex-col gap-4 p-5">
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-semibold text-foreground leading-tight">{c.title}</p>
-                  <NelvyonDsBadge tone={c.status === "published" ? "success" : "primary"} size="sm">
+                  <NelvyonDsBadge tone={c.status === "published" ? "success" : "primary"}>
                     {c.status === "published" ? "Publicado" : c.status === "archived" ? "Archivado" : "Borrador"}
                   </NelvyonDsBadge>
                 </div>
@@ -132,8 +136,8 @@ export default function SaasLmsPage() {
                   <div><p className="text-xs text-muted-foreground">Completado</p><p className="font-semibold text-green-400">{c.completionRate.toFixed(0)}%</p></div>
                 </div>
                 <div className="flex gap-2">
-                  <NelvyonDsButton size="sm" variant="ghost" className="flex-1">Módulos</NelvyonDsButton>
-                  <NelvyonDsButton size="sm" variant="ghost" className="flex-1">Alumnos</NelvyonDsButton>
+                  <NelvyonDsButton variant="ghost" className="flex-1">Módulos</NelvyonDsButton>
+                  <NelvyonDsButton variant="ghost" className="flex-1">Alumnos</NelvyonDsButton>
                 </div>
               </NelvyonDsCard>
             ))}
@@ -141,6 +145,9 @@ export default function SaasLmsPage() {
         )}
       </div>
       {showNew && <NewCourseModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

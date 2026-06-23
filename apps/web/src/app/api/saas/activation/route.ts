@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
-import { getDb } from "@nelvyon/db";
-import { sql } from "drizzle-orm";
+import { DbClient } from "../../../../../../../backend/db/DbClient";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 async function ensureSchema() {
-  const db = getDb();
-  await db.execute(sql`
+  const db = DbClient.getInstance();
+  await db.query(`
     CREATE TABLE IF NOT EXISTS saas_activation_checklist (
       id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       tenant_id    TEXT NOT NULL UNIQUE,
@@ -28,34 +27,40 @@ async function ensureSchema() {
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
+    const tenantId = ctx.tenant.id;
     await ensureSchema();
-    const db = getDb();
+    const db = DbClient.getInstance();
 
-    const rows = await db.execute(sql`
-      SELECT step_profile, step_contact, step_campaign, step_workflow, step_social, step_billing
-      FROM saas_activation_checklist
-      WHERE tenant_id = ${ctx.tenantId}
-      LIMIT 1
-    `);
+    const rows = await db.query<{
+      step_profile: boolean; step_contact: boolean; step_campaign: boolean;
+      step_workflow: boolean; step_social: boolean; step_billing: boolean;
+    }>(
+      `SELECT step_profile, step_contact, step_campaign, step_workflow, step_social, step_billing
+       FROM saas_activation_checklist
+       WHERE tenant_id = $1
+       LIMIT 1`,
+      [tenantId],
+    );
 
-    if (rows.rows.length === 0) {
+    if (rows.length === 0) {
       // Auto-detect completed steps from existing data
       const [contactCount, campaignCount, workflowCount] = await Promise.all([
-        db.execute(sql`SELECT COUNT(*) AS n FROM saas_crm_contacts WHERE tenant_id = ${ctx.tenantId}`).catch(() => ({ rows: [{ n: 0 }] })),
-        db.execute(sql`SELECT COUNT(*) AS n FROM saas_campaigns WHERE tenant_id = ${ctx.tenantId}`).catch(() => ({ rows: [{ n: 0 }] })),
-        db.execute(sql`SELECT COUNT(*) AS n FROM saas_workflows WHERE tenant_id = ${ctx.tenantId} AND status = 'active'`).catch(() => ({ rows: [{ n: 0 }] })),
+        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_crm_contacts WHERE tenant_id = $1`, [tenantId]).catch(() => [{ n: "0" }]),
+        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_campaigns WHERE tenant_id = $1`, [tenantId]).catch(() => [{ n: "0" }]),
+        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_workflows WHERE tenant_id = $1 AND status = 'active'`, [tenantId]).catch(() => [{ n: "0" }]),
       ]);
 
-      const hasContacts = parseInt(String((contactCount.rows[0] as { n: unknown })?.n ?? 0)) > 0;
-      const hasCampaigns = parseInt(String((campaignCount.rows[0] as { n: unknown })?.n ?? 0)) > 0;
-      const hasWorkflows = parseInt(String((workflowCount.rows[0] as { n: unknown })?.n ?? 0)) > 0;
+      const hasContacts = parseInt(String(contactCount[0]?.n ?? 0)) > 0;
+      const hasCampaigns = parseInt(String(campaignCount[0]?.n ?? 0)) > 0;
+      const hasWorkflows = parseInt(String(workflowCount[0]?.n ?? 0)) > 0;
       const profileDone = !!(ctx.tenant.companyName && ctx.tenant.industry);
 
-      await db.execute(sql`
-        INSERT INTO saas_activation_checklist (tenant_id, step_profile, step_contact, step_campaign, step_workflow)
-        VALUES (${ctx.tenantId}, ${profileDone}, ${hasContacts}, ${hasCampaigns}, ${hasWorkflows})
-        ON CONFLICT (tenant_id) DO NOTHING
-      `);
+      await db.query(
+        `INSERT INTO saas_activation_checklist (tenant_id, step_profile, step_contact, step_campaign, step_workflow)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (tenant_id) DO NOTHING`,
+        [tenantId, profileDone, hasContacts, hasCampaigns, hasWorkflows],
+      );
 
       return NextResponse.json({
         steps: {
@@ -69,10 +74,7 @@ export async function GET(req: Request) {
       });
     }
 
-    const row = rows.rows[0] as {
-      step_profile: boolean; step_contact: boolean; step_campaign: boolean;
-      step_workflow: boolean; step_social: boolean; step_billing: boolean;
-    };
+    const row = rows[0];
 
     return NextResponse.json({
       steps: {
@@ -92,21 +94,18 @@ export async function GET(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
+    const tenantId = ctx.tenant.id;
     const body = (await req.json()) as Partial<{
       profile: boolean; contact: boolean; campaign: boolean;
       workflow: boolean; social: boolean; billing: boolean;
     }>;
     await ensureSchema();
-    const db = getDb();
+    const db = DbClient.getInstance();
 
-    await db.execute(sql`
-      INSERT INTO saas_activation_checklist (
+    await db.query(
+      `INSERT INTO saas_activation_checklist (
         tenant_id, step_profile, step_contact, step_campaign, step_workflow, step_social, step_billing
-      ) VALUES (
-        ${ctx.tenantId},
-        ${body.profile ?? false}, ${body.contact ?? false}, ${body.campaign ?? false},
-        ${body.workflow ?? false}, ${body.social ?? false}, ${body.billing ?? false}
-      )
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       ON CONFLICT (tenant_id) DO UPDATE SET
         step_profile  = COALESCE(EXCLUDED.step_profile, saas_activation_checklist.step_profile),
         step_contact  = COALESCE(EXCLUDED.step_contact, saas_activation_checklist.step_contact),
@@ -114,8 +113,10 @@ export async function PATCH(req: Request) {
         step_workflow = COALESCE(EXCLUDED.step_workflow, saas_activation_checklist.step_workflow),
         step_social   = COALESCE(EXCLUDED.step_social, saas_activation_checklist.step_social),
         step_billing  = COALESCE(EXCLUDED.step_billing, saas_activation_checklist.step_billing),
-        updated_at    = NOW()
-    `);
+        updated_at    = NOW()`,
+      [tenantId, body.profile ?? false, body.contact ?? false, body.campaign ?? false,
+       body.workflow ?? false, body.social ?? false, body.billing ?? false],
+    );
 
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {

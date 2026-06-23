@@ -70,7 +70,11 @@ export default function SaasChatPage() {
   }
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="agentes" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="agentes" />
+          <main className="space-y-6">
       <div className="flex h-[calc(100vh-80px)] flex-col gap-4">
         <NelvyonDsSectionHeader
           title="Asistente IA"
@@ -141,6 +145,9 @@ export default function SaasChatPage() {
             <p className="mt-1.5 text-xs text-muted-foreground">Shift+Enter para nueva línea</p>
           </div>
         </NelvyonDsCard>
+      </div>
+          </main>
+        </div>
       </div>
     </DashboardLayout>
   );

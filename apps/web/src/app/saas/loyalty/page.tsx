@@ -56,7 +56,11 @@ export default function SaasLoyaltyPage() {
   members.forEach(m => { tierCounts[m.tier] = (tierCounts[m.tier] ?? 0) + 1; });
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="crm" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="crm" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Programa de Fidelización" subtitle="Recompensa a tus mejores clientes con puntos, niveles y descuentos" />
@@ -145,12 +149,15 @@ export default function SaasLoyaltyPage() {
                     <p className="font-medium text-foreground">{r.name}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{r.pointsCost.toLocaleString()} puntos · {r.redemptions} canjes</p>
                   </div>
-                  <NelvyonDsBadge tone={r.active ? "success" : "primary"} size="sm">{r.active ? "Activa" : "Inactiva"}</NelvyonDsBadge>
+                  <NelvyonDsBadge tone={r.active ? "success" : "primary"}>{r.active ? "Activa" : "Inactiva"}</NelvyonDsBadge>
                 </NelvyonDsCard>
               ))}
             </div>
           )
         )}
+      </div>
+          </main>
+        </div>
       </div>
     </DashboardLayout>
   );

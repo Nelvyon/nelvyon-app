@@ -213,7 +213,11 @@ export default function SaasCitasPage() {
   };
 
   return (
-    <DashboardLayout sidebar={<SaasSidebar activeId="formularios" />}>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <SaasSidebar activeId="formularios" />
+          <main className="space-y-6">
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
@@ -279,7 +283,7 @@ export default function SaasCitasPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-semibold text-foreground">{a.title}</p>
-                      <NelvyonDsBadge tone={STATUS_TONE[a.status]} size="sm">
+                      <NelvyonDsBadge tone={STATUS_TONE[a.status]}>
                         {STATUS_LABELS[a.status]}
                       </NelvyonDsBadge>
                     </div>
@@ -310,6 +314,9 @@ export default function SaasCitasPage() {
       </div>
 
       {showNew && <NewApptModal onClose={() => setShowNew(false)} onSaved={load} />}
+          </main>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }
