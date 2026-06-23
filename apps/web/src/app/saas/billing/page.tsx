@@ -42,6 +42,7 @@ export default function SaasBillingPage() {
   const [data, setData] = useState<BillingSummary | null>(null);
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [portaling, setPortaling] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -64,6 +65,7 @@ export default function SaasBillingPage() {
 
   async function handleUpgrade(planId: string) {
     setUpgrading(planId);
+    setActionError(null);
     try {
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
@@ -75,7 +77,7 @@ export default function SaasBillingPage() {
       if (!res.ok || !json.url) throw new Error(json.error ?? "No se pudo iniciar el checkout");
       window.location.href = json.url;
     } catch (e: unknown) {
-      alert(e instanceof Error ? e.message : "Error al iniciar el checkout");
+      setActionError(e instanceof Error ? e.message : "Error al iniciar el checkout");
     } finally {
       setUpgrading(null);
     }
@@ -83,6 +85,7 @@ export default function SaasBillingPage() {
 
   async function handlePortal() {
     setPortaling(true);
+    setActionError(null);
     try {
       const res = await fetch("/api/saas/billing/portal", {
         method: "POST",
@@ -92,7 +95,7 @@ export default function SaasBillingPage() {
       if (!res.ok || !json.url) throw new Error(json.error ?? "No se pudo abrir el portal de facturación");
       window.location.href = json.url;
     } catch (e: unknown) {
-      alert(e instanceof Error ? e.message : "Error al abrir el portal");
+      setActionError(e instanceof Error ? e.message : "Error al abrir el portal");
     } finally {
       setPortaling(false);
     }
@@ -117,6 +120,12 @@ export default function SaasBillingPage() {
 
           {loading && <NelvyonDsCard>Cargando…</NelvyonDsCard>}
           {error && <SaasPermissionDenied message={error} />}
+          {actionError && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive flex items-center justify-between gap-3">
+              <span>{actionError}</span>
+              <button onClick={() => setActionError(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
+            </div>
+          )}
 
           {!loading && !error && data && (
             <>

@@ -444,20 +444,24 @@ export class SaasCampaniasService {
 
     if (campania.channel === "email") {
       const subject = campania.subject ?? campania.name;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "https://nelvyon.com";
       const ctaBlock =
         campania.ctaText && campania.ctaUrl
           ? `<p style="text-align:center;margin:24px 0;">
                <a href="${campania.ctaUrl}" style="background:#1d4ed8;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;">${campania.ctaText}</a>
              </p>`
           : "";
-      const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a;">
+      const buildHtml = (contactId: string) => {
+        const unsubscribeUrl = `${appUrl}/api/saas/campanias/unsubscribe?cid=${encodeURIComponent(campaniaId)}&rid=${encodeURIComponent(contactId)}&tid=${encodeURIComponent(tenantId)}`;
+        return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a;">
 ${campania.body}
 ${ctaBlock}
 <hr style="margin-top:32px;border:none;border-top:1px solid #e2e8f0;" />
 <p style="font-size:11px;color:#94a3b8;text-align:center;margin-top:8px;">
-  Enviado por NELVYON · <a href="{{unsubscribe_url}}" style="color:#94a3b8;">Darse de baja</a>
+  Enviado por NELVYON · <a href="${unsubscribeUrl}" style="color:#94a3b8;">Darse de baja</a>
 </p>
 </div>`;
+      };
 
       type ContactEmailRow = { id: string; email: string | null };
       const contacts = await this.db.query<ContactEmailRow>(
@@ -470,6 +474,7 @@ ${ctaBlock}
         const email = emailByContactId.get(contactId);
         if (!email) continue;
 
+        const html = buildHtml(contactId);
         const status = await sendCampaniaEmail(email, subject, html);
         await this.db.query(
           `UPDATE saas_campania_recipients
