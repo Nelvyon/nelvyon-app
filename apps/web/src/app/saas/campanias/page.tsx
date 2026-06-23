@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
+import { NelvyonDsBadge, NelvyonDsStatusDot } from "@/design-system/components";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
 import { SaasCan } from "@/features/saas-shell/components/SaasCan";
 import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { SaasShellLayout, DarkCard } from "@/features/saas-shell/components/SaasShellLayout";
 import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 import { EmailEditor } from "@/features/email-editor/EmailEditor";
 
@@ -223,34 +224,41 @@ export default function SaasCampaniasPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <SaasSidebar activeId="campanias" tenantCompany={tenantCompany || undefined} tenantPlan={tenantPlan} />
-        <main className="space-y-6">
-          <NelvyonDsSectionHeader title="Campanias" subtitle="Motor multicanal email, sms y notificacion" />
+    <SaasShellLayout sidebar={<SaasSidebar activeId="campanias" tenantCompany={tenantCompany || undefined} tenantPlan={tenantPlan} />}>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">Marketing</p>
+        <h1 className="mt-1 text-2xl font-bold text-white">Campañas</h1>
+        <p className="mt-0.5 text-sm text-white/40">Motor multicanal email, SMS y notificación</p>
+      </div>
           {isViewer ? (
             <SaasPermissionDenied message="Tu rol es solo lectura. Puedes ver campañas, pero no crear ni lanzar." />
           ) : null}
           <div className="flex flex-wrap gap-2">
             {(["all", "active", "completed", "draft"] as const).map((t) => (
-              <NelvyonDsButton key={t} onClick={() => setTab(t)}>
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${tab === t ? "bg-[#0084ff]/15 text-[#0084ff] ring-1 ring-[#0084ff]/30" : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"}`}
+              >
                 {t === "all" ? "Todas" : t === "active" ? "Activas" : t === "completed" ? "Completadas" : "Borradores"}
-              </NelvyonDsButton>
+              </button>
             ))}
             <SaasCan action="campanias.write">
-              <NelvyonDsButton onClick={() => setShowWizard(true)}>Nueva campania</NelvyonDsButton>
+              <button onClick={() => setShowWizard(true)} className="rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-3 py-1.5 text-sm font-medium text-white shadow-[0_0_12px_rgba(0,132,255,0.3)] hover:shadow-[0_0_20px_rgba(0,132,255,0.4)] transition-all">
+                Nueva campania
+              </button>
             </SaasCan>
           </div>
-          {error ? <NelvyonDsCard className="text-sm text-destructive">{error}</NelvyonDsCard> : null}
+          {error ? <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400">{error}</div> : null}
           {loading ? (
-            <NelvyonDsCard>Cargando campanias...</NelvyonDsCard>
+            <DarkCard><p className="text-sm text-white/40">Cargando campañas...</p></DarkCard>
           ) : filtered.length === 0 ? (
             <SaasEmptyState
               title={SAAS_EMPTY_TITLE}
               description={SAAS_EMPTY_DESCRIPTION}
               action={
                 canManage ? (
-                  <NelvyonDsButton onClick={() => setShowWizard(true)}>Crear primera campania</NelvyonDsButton>
+                  <button onClick={() => setShowWizard(true)} className="rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-4 py-2 text-sm font-medium text-white shadow-[0_0_12px_rgba(0,132,255,0.3)]">Crear primera campania</button>
                 ) : undefined
               }
             />
@@ -259,31 +267,31 @@ export default function SaasCampaniasPage() {
               {filtered.map((c) => {
                 const openRate = c.sentCount > 0 ? ((0 / c.sentCount) * 100).toFixed(0) : "0";
                 return (
-                  <NelvyonDsCard key={c.id} className="space-y-2">
+                  <DarkCard key={c.id} className="space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <button className="text-left text-base font-semibold text-foreground hover:text-primary" onClick={() => void openDetail(c)}>
+                      <button className="text-left text-base font-semibold text-white/90 hover:text-[#0084ff] transition-colors" onClick={() => void openDetail(c)}>
                         {c.name}
                       </button>
                       <div className="flex gap-2">
-                        <NelvyonDsBadge>{c.channel}</NelvyonDsBadge>
-                        <NelvyonDsBadge>{c.status}</NelvyonDsBadge>
+                        <span className="rounded-md bg-white/5 px-2 py-0.5 text-xs text-white/50">{c.channel}</span>
+                        <span className="rounded-md bg-[#0084ff]/10 px-2 py-0.5 text-xs text-[#0084ff]">{c.status}</span>
                       </div>
                     </div>
-                    <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-                      <div>Recipients: {c.totalRecipients}</div>
-                      <div>Enviados: {c.sentCount}</div>
-                      <div>Open rate: {openRate}%</div>
-                      <div>Programada: {c.scheduledAt ? new Date(c.scheduledAt).toLocaleString() : "No"}</div>
+                    <div className="grid gap-2 text-sm text-white/40 sm:grid-cols-4">
+                      <div><span className="text-white/25">Recipients</span> <span className="text-white/70">{c.totalRecipients}</span></div>
+                      <div><span className="text-white/25">Enviados</span> <span className="text-white/70">{c.sentCount}</span></div>
+                      <div><span className="text-white/25">Open rate</span> <span className="text-white/70">{openRate}%</span></div>
+                      <div><span className="text-white/25">Prog.</span> <span className="text-white/70">{c.scheduledAt ? new Date(c.scheduledAt).toLocaleString() : "—"}</span></div>
                     </div>
-                  </NelvyonDsCard>
+                  </DarkCard>
                 );
               })}
             </div>
           )}
 
           {showWizard && canManage ? (
-            <NelvyonDsCard className="space-y-4">
-              <div className="text-base font-semibold text-foreground">Nueva campania (Paso {step}/5)</div>
+            <DarkCard className="space-y-4">
+              <div className="text-base font-semibold text-white">Nueva campania (Paso {step}/5)</div>
               {step === 1 ? (
                 <div className="grid gap-2">
                   <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
@@ -340,62 +348,71 @@ export default function SaasCampaniasPage() {
                 </div>
               ) : null}
               <div className="flex flex-wrap gap-2">
-                <NelvyonDsButton onClick={() => setStep((s) => Math.max(1, s - 1))}>Atras</NelvyonDsButton>
-                {step < 5 ? <NelvyonDsButton onClick={() => setStep((s) => Math.min(5, s + 1))}>Siguiente</NelvyonDsButton> : null}
-                {step === 5 ? (
-                  <>
-                    <NelvyonDsButton onClick={() => void createCampania(false)}>Guardar</NelvyonDsButton>
-                    <NelvyonDsButton onClick={() => void createCampania(scheduleMode === "now")}>Guardar y lanzar</NelvyonDsButton>
-                  </>
-                ) : null}
-                <NelvyonDsButton onClick={() => setShowWizard(false)}>Cerrar</NelvyonDsButton>
+                {[
+                  { label: "Atrás", action: () => setStep((s) => Math.max(1, s - 1)) },
+                  ...(step < 5 ? [{ label: "Siguiente", action: () => setStep((s) => Math.min(5, s + 1)) }] : []),
+                  ...(step === 5 ? [
+                    { label: "Guardar", action: () => void createCampania(false) },
+                    { label: "Guardar y lanzar", action: () => void createCampania(scheduleMode === "now") },
+                  ] : []),
+                  { label: "Cerrar", action: () => setShowWizard(false) },
+                ].map((btn) => (
+                  <button key={btn.label} onClick={btn.action} className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/70 hover:bg-white/10 hover:text-white transition-all">
+                    {btn.label}
+                  </button>
+                ))}
               </div>
-            </NelvyonDsCard>
+            </DarkCard>
           ) : null}
 
           {selected ? (
-            <NelvyonDsCard className="space-y-3">
+            <DarkCard glow className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="text-base font-semibold text-foreground">{selected.name}</div>
-                <NelvyonDsBadge>{selected.status}</NelvyonDsBadge>
+                <div className="text-base font-semibold text-white">{selected.name}</div>
+                <span className="rounded-md bg-[#0084ff]/10 px-2 py-0.5 text-xs text-[#0084ff]">{selected.status}</span>
               </div>
-              <div className="text-sm text-muted-foreground">{selected.description || "Sin descripcion"}</div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                <NelvyonDsCard>Enviados: {stats?.sent_count ?? 0}</NelvyonDsCard>
-                <NelvyonDsCard>Abiertos: {stats?.opened_count ?? 0}</NelvyonDsCard>
-                <NelvyonDsCard>Clicks: {stats?.clicked_count ?? 0}</NelvyonDsCard>
-                <NelvyonDsCard>Open Rate: {stats?.open_rate ?? 0}%</NelvyonDsCard>
-                <NelvyonDsCard>Click Rate: {stats?.click_rate ?? 0}%</NelvyonDsCard>
+              <div className="text-sm text-white/40">{selected.description ?? "Sin descripción"}</div>
+              <div className="grid gap-3 sm:grid-cols-5">
+                {[
+                  { label: "Enviados", value: stats?.sent_count ?? 0 },
+                  { label: "Abiertos", value: stats?.opened_count ?? 0 },
+                  { label: "Clicks", value: stats?.clicked_count ?? 0 },
+                  { label: "Open Rate", value: `${stats?.open_rate ?? 0}%` },
+                  { label: "Click Rate", value: `${stats?.click_rate ?? 0}%` },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+                    <p className="text-[10px] uppercase tracking-wider text-white/30">{s.label}</p>
+                    <p className="mt-1 text-xl font-bold text-white">{s.value}</p>
+                  </div>
+                ))}
               </div>
               <div className="flex flex-wrap gap-2">
                 <SaasCan action="campanias.launch">
-                  <NelvyonDsButton onClick={() => void launchSelected()}>Lanzar</NelvyonDsButton>
+                  <button onClick={() => void launchSelected()} className="rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-3 py-1.5 text-sm font-medium text-white shadow-[0_0_12px_rgba(0,132,255,0.3)] hover:shadow-[0_0_20px_rgba(0,132,255,0.4)] transition-all">Lanzar</button>
                 </SaasCan>
                 <SaasCan action="campanias.write">
-                  <NelvyonDsButton onClick={() => void pauseSelected()}>Pausar</NelvyonDsButton>
-                  <NelvyonDsButton onClick={() => void duplicateSelected()}>Duplicar</NelvyonDsButton>
+                  <button onClick={() => void pauseSelected()} className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/60 hover:text-white transition-all">Pausar</button>
+                  <button onClick={() => void duplicateSelected()} className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/60 hover:text-white transition-all">Duplicar</button>
                 </SaasCan>
               </div>
               <div className="space-y-2">
-                <div className="text-sm font-medium text-foreground">Recipients</div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-white/30">Recipients</p>
                 {recipients.length === 0 ? (
-                  <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Lanza la campania para ver destinatarios aquí." className="p-4" />
+                  <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Lanza la campaña para ver destinatarios aquí." className="p-4" />
                 ) : (
                   recipients.map((r) => (
-                    <div key={r.id} className="flex items-center justify-between rounded-md border p-2 text-sm">
-                      <div>{r.contactId}</div>
+                    <div key={r.id} className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm">
+                      <div className="text-white/60">{r.contactId}</div>
                       <div className="flex items-center gap-2">
                         <NelvyonDsStatusDot status={r.status === "sent" || r.status === "opened" || r.status === "clicked" ? "ok" : "pending"} />
-                        <span>{r.status}</span>
+                        <span className="text-white/50">{r.status}</span>
                       </div>
                     </div>
                   ))
                 )}
               </div>
-            </NelvyonDsCard>
+            </DarkCard>
           ) : null}
-        </main>
-      </div>
-    </div>
+    </SaasShellLayout>
   );
 }

@@ -8,8 +8,8 @@ import {
   NelvyonDsCard,
   NelvyonDsSectionHeader,
 } from "@/design-system/components";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { SaasShellLayout, DarkCard, StatCard } from "@/features/saas-shell/components/SaasShellLayout";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -329,38 +329,37 @@ export default function SaasCrmPage() {
   const totalValue = contacts.reduce((s, c) => s + (c.value ?? 0), 0);
 
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <SaasSidebar activeId="crm" />
-          <main className="space-y-6">
+    <SaasShellLayout sidebar={<SaasSidebar activeId="crm" />}>
       <div className="flex h-full flex-col gap-6 pb-8">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader
-            title="CRM"
-            subtitle={`${contacts.length} contactos · ${eur(totalValue)} en pipeline`}
-          />
-          <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo contacto</NelvyonDsButton>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">CRM</p>
+            <h1 className="mt-1 text-2xl font-bold text-white">Contactos</h1>
+            <p className="mt-0.5 text-sm text-white/40">{contacts.length} contactos · {eur(totalValue)} en pipeline</p>
+          </div>
+          <button
+            onClick={() => setShowNew(true)}
+            className="rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-4 py-2 text-sm font-medium text-white shadow-[0_0_16px_rgba(0,132,255,0.3)] hover:shadow-[0_0_24px_rgba(0,132,255,0.4)] transition-all"
+          >
+            + Nuevo contacto
+          </button>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { label: "Total", value: contacts.length },
-            { label: "Clientes", value: contacts.filter((c) => c.status === "client").length },
-            { label: "Leads", value: contacts.filter((c) => c.status === "lead").length },
-            { label: "Pipeline", value: eur(totalValue) },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
+            { label: "Total", value: contacts.length, accent: true },
+            { label: "Clientes", value: contacts.filter((c) => c.status === "client").length, accent: false },
+            { label: "Leads", value: contacts.filter((c) => c.status === "lead").length, accent: false },
+            { label: "Pipeline €", value: eur(totalValue), accent: false },
+          ].map(({ label, value, accent }) => (
+            <StatCard key={label} label={label} value={value} accent={accent} />
           ))}
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-0 border-b border-border">
+        <div className="flex gap-0 border-b border-white/[0.07]">
           {(["contacts", "pipeline"] as const).map((t) => (
             <button
               key={t}
@@ -368,8 +367,8 @@ export default function SaasCrmPage() {
               onClick={() => setTab(t)}
               className={`px-5 py-2.5 text-sm font-medium transition-colors ${
                 tab === t
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "border-b-2 border-[#0084ff] text-[#0084ff]"
+                  : "text-white/40 hover:text-white/70"
               }`}
             >
               {t === "contacts" ? "Contactos" : "Pipeline"}
@@ -469,9 +468,6 @@ export default function SaasCrmPage() {
       </div>
 
       {showNew && <NewContactModal onClose={() => setShowNew(false)} onSaved={load} />}
-          </main>
-        </div>
-      </div>
-    </DashboardLayout>
+    </SaasShellLayout>
   );
 }

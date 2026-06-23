@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
+import { NelvyonDsBadge } from "@/design-system/components";
 import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { SaasShellLayout, DarkCard } from "@/features/saas-shell/components/SaasShellLayout";
 import { saasRoleLabel } from "@/features/saas-shell/saasPermissions";
 import type { SaasNavId } from "@/features/saas-shell/saasNav";
 
@@ -105,135 +106,137 @@ export default function SaasBillingPage() {
   const currentPlan = data?.tenant.plan ?? null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+    <SaasShellLayout
+      sidebar={
         <SaasSidebar
           activeId={activeId}
           tenantCompany={data?.tenant.companyName}
           tenantPlan={currentPlan as "starter" | "pro" | "enterprise" | undefined}
         />
-        <main className="space-y-6">
-          <NelvyonDsSectionHeader
-            title="Facturación y plan"
-            subtitle="Gestiona tu suscripción y consulta el uso en tiempo real."
-          />
-
-          {loading && <NelvyonDsCard>Cargando…</NelvyonDsCard>}
-          {error && <SaasPermissionDenied message={error} />}
-          {actionError && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive flex items-center justify-between gap-3">
-              <span>{actionError}</span>
-              <button onClick={() => setActionError(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
-            </div>
-          )}
-
-          {!loading && !error && data && (
-            <>
-              {/* Plan actual */}
-              <NelvyonDsCard title="Plan actual">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <NelvyonDsBadge tone="primary" className="capitalize">{data.tenant.plan}</NelvyonDsBadge>
-                    <span className="text-sm text-muted-foreground">{data.tenant.companyName}</span>
-                    <NelvyonDsBadge tone="neutral">{saasRoleLabel(data.role)}</NelvyonDsBadge>
-                  </div>
-                  <NelvyonDsButton
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => void handlePortal()}
-                    disabled={portaling}
-                  >
-                    {portaling ? "Abriendo portal…" : "Gestionar facturación"}
-                  </NelvyonDsButton>
-                </div>
-              </NelvyonDsCard>
-
-              {/* Uso */}
-              <NelvyonDsCard title="Uso del plan">
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {(["contacts", "deals", "campanias", "workflows", "users"] as const).map((key) => {
-                    const used = data.usage[key] ?? 0;
-                    const limit = data.limits[key] ?? null;
-                    const pct = usagePct(used, limit);
-                    const isHigh = pct !== null && pct >= 80;
-                    return (
-                      <div key={key} className="rounded-xl border border-border bg-muted/20 p-4">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                          {USAGE_LABELS[key] ?? key}
-                        </p>
-                        <p className="mt-1 text-2xl font-semibold tabular-nums">
-                          {used}
-                          <span className="text-base font-normal text-muted-foreground">
-                            {limit !== null ? ` / ${limit}` : " / ∞"}
-                          </span>
-                        </p>
-                        {pct !== null ? (
-                          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-                            <div
-                              className={`h-full rounded-full transition-all ${isHigh ? "bg-destructive" : "bg-primary"}`}
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                        ) : (
-                          <p className="mt-2 text-xs text-muted-foreground">Sin límite</p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </NelvyonDsCard>
-
-              {/* Planes disponibles */}
-              <NelvyonDsCard title="Cambiar de plan">
-                <div className="grid gap-4 sm:grid-cols-3">
-                  {PLANS.map((plan) => {
-                    const isCurrent = currentPlan === plan.id;
-                    return (
-                      <div
-                        key={plan.id}
-                        className={`rounded-xl border p-5 flex flex-col gap-3 ${
-                          isCurrent
-                            ? "border-primary bg-primary/5"
-                            : "border-border bg-muted/10"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold">{plan.name}</span>
-                          {isCurrent && <NelvyonDsBadge tone="primary">Activo</NelvyonDsBadge>}
-                        </div>
-                        <p className="text-2xl font-bold">
-                          {plan.price}€
-                          <span className="text-sm font-normal text-muted-foreground">/mes</span>
-                        </p>
-                        <ul className="space-y-1.5">
-                          {plan.features.map((f) => (
-                            <li key={f} className="flex items-start gap-1.5 text-sm text-muted-foreground">
-                              <span className="mt-0.5 text-primary">✓</span> {f}
-                            </li>
-                          ))}
-                        </ul>
-                        <NelvyonDsButton
-                          variant={isCurrent ? "secondary" : "primary"}
-                          size="sm"
-                          disabled={isCurrent || upgrading !== null}
-                          onClick={() => void handleUpgrade(plan.id)}
-                          className="mt-auto w-full"
-                        >
-                          {upgrading === plan.id
-                            ? "Redirigiendo…"
-                            : isCurrent
-                              ? "Plan actual"
-                              : "Cambiar a este plan"}
-                        </NelvyonDsButton>
-                      </div>
-                    );
-                  })}
-                </div>
-              </NelvyonDsCard>
-            </>
-          )}
-        </main>
+      }
+    >
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">Cuenta</p>
+        <h1 className="mt-1 text-2xl font-bold text-white">Facturación y plan</h1>
+        <p className="mt-0.5 text-sm text-white/40">Gestiona tu suscripción y consulta el uso en tiempo real.</p>
       </div>
-    </div>
+
+      {loading && <DarkCard><p className="text-sm text-white/40">Cargando…</p></DarkCard>}
+      {error && <SaasPermissionDenied message={error} />}
+      {actionError && (
+        <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400 flex items-center justify-between gap-3">
+          <span>{actionError}</span>
+          <button onClick={() => setActionError(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
+        </div>
+      )}
+
+      {!loading && !error && data && (
+        <>
+          {/* Plan actual */}
+          <DarkCard glow className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${
+                data.tenant.plan === "enterprise" ? "bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/25" :
+                data.tenant.plan === "pro" ? "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/25" :
+                "bg-[#0084ff]/15 text-[#0084ff] ring-1 ring-[#0084ff]/25"
+              }`}>{data.tenant.plan}</span>
+              <span className="text-sm text-white/50">{data.tenant.companyName}</span>
+              <span className="text-xs text-white/30">{saasRoleLabel(data.role)}</span>
+            </div>
+            <button
+              onClick={() => void handlePortal()}
+              disabled={portaling}
+              className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/60 transition-all hover:bg-white/[0.08] hover:text-white disabled:opacity-40"
+            >
+              {portaling ? "Abriendo portal…" : "Gestionar facturación"}
+            </button>
+          </DarkCard>
+
+          {/* Uso */}
+          <DarkCard>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">Uso del plan</p>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {(["contacts", "deals", "campanias", "workflows", "users"] as const).map((key) => {
+                const used = data.usage[key] ?? 0;
+                const limit = data.limits[key] ?? null;
+                const pct = usagePct(used, limit);
+                const isHigh = pct !== null && pct >= 80;
+                return (
+                  <div key={key} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">{USAGE_LABELS[key] ?? key}</p>
+                    <p className="mt-1 text-2xl font-semibold tabular-nums text-white">
+                      {used}
+                      <span className="text-base font-normal text-white/30">{limit !== null ? ` / ${limit}` : " / ∞"}</span>
+                    </p>
+                    {pct !== null ? (
+                      <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/[0.06]">
+                        <div
+                          className={`h-full rounded-full transition-all ${isHigh ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "bg-[#0084ff] shadow-[0_0_8px_rgba(0,132,255,0.4)]"}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-xs text-white/25">Sin límite</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </DarkCard>
+
+          {/* Plan cards */}
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">Cambiar de plan</p>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {PLANS.map((plan) => {
+                const isCurrent = currentPlan === plan.id;
+                return (
+                  <div
+                    key={plan.id}
+                    className={`relative overflow-hidden rounded-xl border p-5 flex flex-col gap-4 transition-all ${
+                      isCurrent
+                        ? "border-[#0084ff]/40 bg-gradient-to-b from-[#0084ff]/10 to-[#0047ab]/5 shadow-[0_0_32px_rgba(0,132,255,0.15)]"
+                        : "border-white/[0.07] bg-white/[0.02] hover:border-white/[0.14] hover:bg-white/[0.04]"
+                    }`}
+                  >
+                    {isCurrent && (
+                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0084ff]/60 to-transparent" />
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-white">{plan.name}</span>
+                      {isCurrent && (
+                        <span className="rounded-md bg-[#0084ff]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0084ff]">Activo</span>
+                      )}
+                    </div>
+                    <p className="text-3xl font-bold text-white">
+                      {plan.price}€
+                      <span className="text-sm font-normal text-white/35">/mes</span>
+                    </p>
+                    <ul className="space-y-2 flex-1">
+                      {plan.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm text-white/50">
+                          <span className="mt-0.5 text-[#0084ff]">✓</span> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      disabled={isCurrent || upgrading !== null}
+                      onClick={() => void handleUpgrade(plan.id)}
+                      className={`w-full rounded-lg py-2 text-sm font-medium transition-all disabled:opacity-40 ${
+                        isCurrent
+                          ? "border border-[#0084ff]/30 bg-[#0084ff]/10 text-[#0084ff] cursor-default"
+                          : "bg-gradient-to-r from-[#0084ff] to-[#0047ab] text-white shadow-[0_0_12px_rgba(0,132,255,0.3)] hover:shadow-[0_0_20px_rgba(0,132,255,0.4)]"
+                      }`}
+                    >
+                      {upgrading === plan.id ? "Redirigiendo…" : isCurrent ? "Plan actual" : "Cambiar a este plan"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+    </SaasShellLayout>
   );
 }
