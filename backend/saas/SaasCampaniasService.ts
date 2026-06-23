@@ -2,6 +2,7 @@ import { SendEmailCommand } from "@aws-sdk/client-ses";
 
 import { DbClient } from "../db/DbClient";
 import { getSesClient } from "../email/sesClient";
+import { signTrackingToken } from "../email/trackingToken";
 import type { ContactStatus, PipelineStage } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
@@ -457,13 +458,19 @@ export class SaasCampaniasService {
     if (campania.channel === "email") {
       const subject = campania.subject ?? campania.name;
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "https://nelvyon.com";
-      const ctaBlock =
-        campania.ctaText && campania.ctaUrl
-          ? `<p style="text-align:center;margin:24px 0;">
-               <a href="${campania.ctaUrl}" style="background:#1d4ed8;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;">${campania.ctaText}</a>
-             </p>`
-          : "";
       const buildHtml = (contactId: string) => {
+        const openToken = signTrackingToken({ tid: tenantId, cid: campaniaId, rid: contactId, t: "o" });
+        const pixelUrl = `${appUrl}/api/track/email/open/${openToken}`;
+
+        let ctaBlock = "";
+        if (campania.ctaText && campania.ctaUrl) {
+          const clickToken = signTrackingToken({ tid: tenantId, cid: campaniaId, rid: contactId, t: "c", url: campania.ctaUrl });
+          const clickUrl = `${appUrl}/api/track/email/click/${clickToken}`;
+          ctaBlock = `<p style="text-align:center;margin:24px 0;">
+               <a href="${clickUrl}" style="background:#1d4ed8;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;">${campania.ctaText}</a>
+             </p>`;
+        }
+
         const unsubscribeUrl = `${appUrl}/api/saas/campanias/unsubscribe?cid=${encodeURIComponent(campaniaId)}&rid=${encodeURIComponent(contactId)}&tid=${encodeURIComponent(tenantId)}`;
         return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a;">
 ${campania.body}
@@ -472,6 +479,7 @@ ${ctaBlock}
 <p style="font-size:11px;color:#94a3b8;text-align:center;margin-top:8px;">
   Enviado por NELVYON · <a href="${unsubscribeUrl}" style="color:#94a3b8;">Darse de baja</a>
 </p>
+<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;" />
 </div>`;
       };
 
