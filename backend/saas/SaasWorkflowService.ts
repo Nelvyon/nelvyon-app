@@ -49,7 +49,8 @@ export type TriggerType =
   | "webhook_in"
   | "date_reached"
   | "sequence_enrolled"
-  | "review_received";
+  | "review_received"
+  | "score_threshold";
 
 export type WorkflowConditionField =
   | "contact.status"

@@ -795,3 +795,30 @@ export {
   type CreateArticleInput,
   type CreateCategoryInput,
 } from "./SaasKnowledgeBaseService";
+
+export {
+  SaasLeadScoringService,
+  getSaasLeadScoringService,
+  resetSaasLeadScoringServiceForTests,
+  SaasLeadScoringError,
+  type ScoringRule,
+  type LeadScore,
+  type LeadGrade,
+  type SaasLeadCategory,
+  type RuleField,
+  type RuleOperator,
+  type RuleCategory,
+  type CreateRuleInput,
+} from "./SaasLeadScoringService";
+
+export {
+  SaasAttributionService,
+  getSaasAttributionService,
+  resetSaasAttributionServiceForTests,
+  SaasAttributionError,
+  type AttributionEvent,
+  type TrackEventInput,
+  type ChannelBreakdown,
+  type CampaignBreakdown,
+  type AttributionEventType,
+} from "./SaasAttributionService";

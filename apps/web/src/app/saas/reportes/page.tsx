@@ -9,14 +9,23 @@ interface Report {
   id: string; name: string; type: string; status: "ready" | "generating" | "failed";
   createdAt: string; downloadUrl: string | null; sizeBytes: number | null;
 }
-
 interface UtmLink {
   id: string; name: string; utmSource: string; utmMedium: string; utmCampaign: string;
   clicks: number; fullUrl: string; createdAt: string;
 }
-
 interface RoasAlert {
   platform: string; roas: number; threshold: number; spend: number; dateStart: string; dateEnd: string;
+}
+interface ChannelBreakdown {
+  utmSource: string; utmMedium: string | null;
+  visits: number; formSubmits: number; conversions: number; contacts: number;
+}
+interface CampaignBreakdown {
+  utmCampaign: string; utmSource: string | null;
+  visits: number; formSubmits: number; conversions: number; contacts: number;
+}
+interface AttributionSummary {
+  totalVisits: number; totalFormSubmits: number; totalConversions: number; totalContacts: number; topSource: string | null;
 }
 
 const REPORT_TYPES = [
@@ -28,13 +37,36 @@ const REPORT_TYPES = [
   { id: "ad_performance", label: "Publicidad Digital", icon: "💰", desc: "ROAS, CPC, impresiones y gasto por plataforma" },
 ];
 
+const DAYS_OPTIONS = [7, 14, 30, 90] as const;
+
 export default function SaasReportesPage() {
-  const [reports, setReports] = useState<Report[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [utmLinks, setUtmLinks] = useState<UtmLink[]>([]);
-  const [roasAlerts, setRoasAlerts] = useState<RoasAlert[]>([]);
+  const [reports, setReports]               = useState<Report[]>([]);
+  const [loading, setLoading]               = useState(true);
+  const [generating, setGenerating]         = useState<string | null>(null);
+  const [error, setError]                   = useState<string | null>(null);
+  const [utmLinks, setUtmLinks]             = useState<UtmLink[]>([]);
+  const [roasAlerts, setRoasAlerts]         = useState<RoasAlert[]>([]);
+  // attribution
+  const [days, setDays]                     = useState<30 | 7 | 14 | 90>(30);
+  const [attrSummary, setAttrSummary]       = useState<AttributionSummary | null>(null);
+  const [channels, setChannels]             = useState<ChannelBreakdown[]>([]);
+  const [campaigns, setCampaigns]           = useState<CampaignBreakdown[]>([]);
+  const [attrTab, setAttrTab]               = useState<"channels" | "campaigns">("channels");
+  const [attrLoading, setAttrLoading]       = useState(false);
+
+  const loadAttribution = useCallback(async (d: number) => {
+    setAttrLoading(true);
+    try {
+      const [sumRes, chRes, camRes] = await Promise.all([
+        fetch(`/api/saas/reportes?resource=summary&days=${d}`),
+        fetch(`/api/saas/reportes?resource=channels&days=${d}`),
+        fetch(`/api/saas/reportes?resource=campaigns&days=${d}`),
+      ]);
+      if (sumRes.ok)  { const s = await sumRes.json() as { summary?: AttributionSummary };  setAttrSummary(s.summary ?? null); }
+      if (chRes.ok)   { const s = await chRes.json()  as { channels?: ChannelBreakdown[] }; setChannels(s.channels ?? []); }
+      if (camRes.ok)  { const s = await camRes.json() as { campaigns?: CampaignBreakdown[] }; setCampaigns(s.campaigns ?? []); }
+    } finally { setAttrLoading(false); }
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,15 +85,13 @@ export default function SaasReportesPage() {
     } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void load(); void loadAttribution(30); }, [load, loadAttribution]);
 
   async function generateReport(type: string) {
-    setGenerating(type);
-    setError(null);
+    setGenerating(type); setError(null);
     try {
       const res = await fetch("/api/saas/reports/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type }),
       });
       const data = (await res.json().catch(() => ({}))) as { downloadUrl?: string; error?: string };
@@ -70,9 +100,7 @@ export default function SaasReportesPage() {
       void load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error generando reporte");
-    } finally {
-      setGenerating(null);
-    }
+    } finally { setGenerating(null); }
   }
 
   function fmtSize(bytes: number | null) {
@@ -82,12 +110,114 @@ export default function SaasReportesPage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
   }
 
+  const maxVisits = Math.max(1, ...channels.map(c => c.visits), ...campaigns.map(c => c.visits));
+
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="dashboard" />}>
       <div className="flex flex-col gap-6 pb-8">
-        <NelvyonDsSectionHeader title="Reportes" subtitle="Genera y descarga informes ejecutivos de todos tus módulos en PDF" />
+        <NelvyonDsSectionHeader title="Reportes" subtitle="Informes ejecutivos y atribución multi-touch por canal y campaña" />
 
         {error && <p className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</p>}
+
+        {/* ── Atribución multi-touch ───────────────────────────── */}
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-foreground">🔗 Atribución multi-touch</p>
+            <div className="flex gap-1">
+              {DAYS_OPTIONS.map(d => (
+                <button key={d} onClick={() => { setDays(d as 7|14|30|90); void loadAttribution(d); }}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${days === d ? "bg-primary text-white" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
+                  {d}d
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* KPIs */}
+          {attrSummary && (
+            <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {([
+                ["Visitas", attrSummary.totalVisits],
+                ["Formularios", attrSummary.totalFormSubmits],
+                ["Conversiones", attrSummary.totalConversions],
+                ["Contactos únicos", attrSummary.totalContacts],
+              ] as [string, number][]).map(([label, val]) => (
+                <div key={label} className="rounded-xl bg-muted/20 p-3">
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                  <p className="mt-0.5 text-xl font-bold text-foreground">{val.toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {attrSummary?.topSource && (
+            <p className="mb-4 text-xs text-muted-foreground">Fuente principal: <span className="font-medium text-foreground">{attrSummary.topSource}</span></p>
+          )}
+
+          {/* Sub-tabs */}
+          <div className="mb-3 flex gap-1 border-b border-border">
+            {(["channels","campaigns"] as const).map(t => (
+              <button key={t} onClick={() => setAttrTab(t)}
+                className={`px-4 py-1.5 text-xs font-medium border-b-2 transition-colors ${attrTab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+                {t === "channels" ? "Por canal" : "Por campaña"}
+              </button>
+            ))}
+          </div>
+
+          {attrLoading ? (
+            <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded-lg bg-muted/20" />)}</div>
+          ) : attrTab === "channels" ? (
+            channels.length === 0 ? (
+              <p className="py-6 text-center text-xs text-muted-foreground">Sin datos de atribución por canal en los últimos {days} días.</p>
+            ) : (
+              <div className="space-y-2">
+                {channels.map((ch, i) => (
+                  <div key={i} className="rounded-xl bg-muted/10 p-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-medium text-foreground">{ch.utmSource}</span>
+                        {ch.utmMedium && <span className="ml-2 text-xs text-muted-foreground">/ {ch.utmMedium}</span>}
+                      </div>
+                      <div className="flex gap-3 text-xs text-muted-foreground">
+                        <span>{ch.visits.toLocaleString()} visitas</span>
+                        <span>{ch.formSubmits.toLocaleString()} forms</span>
+                        <span className="text-primary font-medium">{ch.conversions.toLocaleString()} conv.</span>
+                        <span>{ch.contacts.toLocaleString()} leads</span>
+                      </div>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-muted/30 overflow-hidden">
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (ch.visits / maxVisits) * 100)}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : (
+            campaigns.length === 0 ? (
+              <p className="py-6 text-center text-xs text-muted-foreground">Sin datos de campañas UTM en los últimos {days} días.</p>
+            ) : (
+              <div className="space-y-2">
+                {campaigns.map((cam, i) => (
+                  <div key={i} className="rounded-xl bg-muted/10 p-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-medium text-foreground">{cam.utmCampaign}</span>
+                        {cam.utmSource && <span className="ml-2 text-xs text-muted-foreground">via {cam.utmSource}</span>}
+                      </div>
+                      <div className="flex gap-3 text-xs text-muted-foreground">
+                        <span>{cam.visits.toLocaleString()} visitas</span>
+                        <span>{cam.formSubmits.toLocaleString()} forms</span>
+                        <span className="text-primary font-medium">{cam.conversions.toLocaleString()} conv.</span>
+                      </div>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-muted/30 overflow-hidden">
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (cam.visits / maxVisits) * 100)}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          )}
+        </div>
 
         {/* ROAS alerts */}
         {roasAlerts.length > 0 && (
@@ -125,7 +255,7 @@ export default function SaasReportesPage() {
           </div>
         )}
 
-        {/* Generate new report */}
+        {/* Generate report */}
         <div>
           <p className="mb-3 text-sm font-medium text-muted-foreground">Generar nuevo reporte</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -138,11 +268,7 @@ export default function SaasReportesPage() {
                     <p className="text-xs text-muted-foreground mt-0.5">{rt.desc}</p>
                   </div>
                 </div>
-                <NelvyonDsButton
-                                   onClick={() => void generateReport(rt.id)}
-                  disabled={generating === rt.id}
-                  className="w-full"
-                >
+                <NelvyonDsButton onClick={() => void generateReport(rt.id)} disabled={generating === rt.id} className="w-full">
                   {generating === rt.id ? "Generando…" : "⬇ Generar PDF"}
                 </NelvyonDsButton>
               </NelvyonDsCard>
@@ -165,7 +291,7 @@ export default function SaasReportesPage() {
                 <NelvyonDsCard key={r.id} className="flex items-center justify-between gap-4 px-5 py-3">
                   <div>
                     <p className="text-sm font-medium text-foreground">{r.name}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString("es-ES")} {fmtSize(r.sizeBytes) && `· ${fmtSize(r.sizeBytes)}`}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString("es-ES")}{fmtSize(r.sizeBytes) ? ` · ${fmtSize(r.sizeBytes)}` : ""}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <NelvyonDsBadge tone={r.status === "ready" ? "success" : r.status === "failed" ? "danger" : "primary"}>
