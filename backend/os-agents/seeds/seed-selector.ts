@@ -126,3 +126,41 @@ export function getSeedByIndex(sector: string, index: number, _rootOverride?: st
   if (!seeds.length) return null;
   return seeds[index % seeds.length];
 }
+
+/**
+ * Returns sectors sorted by CVR descending (highest-converting first).
+ * Sectors not in weights map fall to the end, sorted alphabetically.
+ *
+ * @param weights - Record<sector, cvr> from OsLearningService.getSectorWeights()
+ * @param n       - how many top sectors to return (0 = all)
+ */
+export function getTopSectorsByCvr(weights: Record<string, number>, n = 0): string[] {
+  const all = Object.keys(weights).sort((a, b) => (weights[b] ?? 0) - (weights[a] ?? 0));
+  return n > 0 ? all.slice(0, n) : all;
+}
+
+/**
+ * Re-ranks seeds within a sector by boosting those from higher-tier sources
+ * when the sector has an above-average CVR.
+ *
+ * Concretely: if the sector CVR >= avgCvr, envato/metadata seeds are kept first;
+ * if below average, synthetic seeds are surfaced earlier to try new templates.
+ *
+ * @param seeds   - seeds array from getSectorSeeds()
+ * @param sectorCvr - CVR for this sector (0 if unknown)
+ * @param avgCvr    - average CVR across all sectors (0 if unknown)
+ */
+export function rankSeedsByCvr(seeds: SectorSeed[], sectorCvr: number, avgCvr: number): SectorSeed[] {
+  if (sectorCvr >= avgCvr) return seeds; // already sorted envato > metadata > synthetic
+  // Below average: interleave synthetic seeds earlier to explore new templates
+  const envato = seeds.filter((s) => s.source === "envato");
+  const synthetic = seeds.filter((s) => s.source === "synthetic");
+  const other = seeds.filter((s) => s.source !== "envato" && s.source !== "synthetic");
+  const interleaved: SectorSeed[] = [];
+  const max = Math.max(envato.length, synthetic.length);
+  for (let i = 0; i < max; i++) {
+    if (i < synthetic.length) interleaved.push(synthetic[i]);
+    if (i < envato.length) interleaved.push(envato[i]);
+  }
+  return [...interleaved, ...other];
+}

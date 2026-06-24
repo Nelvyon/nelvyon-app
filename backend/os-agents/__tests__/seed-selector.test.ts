@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-import { getSectorSeeds, getSeedByIndex } from "../seeds/seed-selector";
+import { getSectorSeeds, getSeedByIndex, getTopSectorsByCvr, rankSeedsByCvr } from "../seeds/seed-selector";
 
 // Build a temporary fixture directory that mirrors the real seed layout
 let tmpRoot: string;
@@ -144,5 +144,56 @@ describe("getSeedByIndex", () => {
 
   it("returns null for unknown sector", () => {
     expect(getSeedByIndex("unknown-xyz", 0, tmpRoot)).toBeNull();
+  });
+});
+
+// ── getTopSectorsByCvr ────────────────────────────────────────────────────────
+
+describe("getTopSectorsByCvr", () => {
+  it("returns sectors sorted by CVR descending", () => {
+    const weights = { dental: 0.08, ecommerce: 0.03, fitness: 0.12 };
+    const top = getTopSectorsByCvr(weights);
+    expect(top[0]).toBe("fitness");
+    expect(top[1]).toBe("dental");
+    expect(top[2]).toBe("ecommerce");
+  });
+
+  it("limits to n when n > 0", () => {
+    const weights = { a: 0.1, b: 0.2, c: 0.3 };
+    expect(getTopSectorsByCvr(weights, 2)).toHaveLength(2);
+  });
+
+  it("returns all when n = 0", () => {
+    const weights = { a: 0.1, b: 0.2, c: 0.3 };
+    expect(getTopSectorsByCvr(weights, 0)).toHaveLength(3);
+  });
+
+  it("returns empty array for empty weights", () => {
+    expect(getTopSectorsByCvr({})).toHaveLength(0);
+  });
+});
+
+// ── rankSeedsByCvr ────────────────────────────────────────────────────────────
+
+describe("rankSeedsByCvr", () => {
+  const envatoSeed = { id: "e1", headline: "E", meta_title: "", cta_label: "", chatbot_greeting: "", source: "envato" as const };
+  const syntheticSeed = { id: "s1", headline: "S", meta_title: "", cta_label: "", chatbot_greeting: "", source: "synthetic" as const };
+
+  it("returns seeds unchanged when sectorCvr >= avgCvr (exploit mode)", () => {
+    const seeds = [envatoSeed, syntheticSeed];
+    const ranked = rankSeedsByCvr(seeds, 0.1, 0.05);
+    expect(ranked[0].source).toBe("envato");
+  });
+
+  it("interleaves synthetic before envato when sectorCvr < avgCvr (explore mode)", () => {
+    const seeds = [envatoSeed, syntheticSeed];
+    const ranked = rankSeedsByCvr(seeds, 0.01, 0.05);
+    expect(ranked[0].source).toBe("synthetic");
+  });
+
+  it("returns same array reference when above average", () => {
+    const seeds = [envatoSeed];
+    const ranked = rankSeedsByCvr(seeds, 0.2, 0.1);
+    expect(ranked).toBe(seeds);
   });
 });

@@ -286,7 +286,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
 
   // Visual QA — runs offline, no browser needed
   const visualQa = runVisualQa({
-    copyText: personalized?.value_proposition ?? undefined,
+    copyText: (params.intake as Record<string, unknown>).value_proposition as string | undefined,
     brandColor: "#0084ff",
     backgroundColor: "#020817",
   });
