@@ -160,7 +160,7 @@ psql $DATABASE_URL -f backend/db/migrations/001_init.sql
 psql $DATABASE_URL -f backend/db/migrations/400_nelvyon_pack_runs.sql
 ```
 
-La migración máxima del repo es `400_nelvyon_pack_runs.sql`. **No crear 401–416 sin nueva feature.**
+Todas las migraciones 001–424 están en main. Ejecutar `pnpm -C apps/web migrate` aplica el set completo en orden.
 
 Alternativa — script automatizado:
 ```bash

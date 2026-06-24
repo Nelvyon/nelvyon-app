@@ -123,8 +123,12 @@ export async function listPortalDeliverablesBff(params: {
 
   const statusPlaceholders = PORTAL_VISIBLE_STATUSES.map((_, i) => `$${i + 3}`).join(", ");
 
-  // QA gate: only expose deliverables that meet MIN_SCORE or have no score recorded.
-  const qaGate = ` AND (metadata->>'qa_score' IS NULL OR (metadata->>'qa_score')::numeric >= ${PORTAL_MIN_QA_SCORE})`;
+  // QA gate: in production, qa_score must meet MIN_SCORE (NULL = blocked — legacy rows without score).
+  // In non-production environments, NULL is allowed to surface unscored deliverables for testing.
+  const isProd = process.env.NODE_ENV === "production";
+  const qaGate = isProd
+    ? ` AND (metadata->>'qa_score')::numeric >= ${PORTAL_MIN_QA_SCORE}`
+    : ` AND (metadata->>'qa_score' IS NULL OR (metadata->>'qa_score')::numeric >= ${PORTAL_MIN_QA_SCORE})`;
 
   const countRows = await db().query<{ count: string }>(
     `SELECT COUNT(*)::text AS count
