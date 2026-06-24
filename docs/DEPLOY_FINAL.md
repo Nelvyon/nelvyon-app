@@ -28,8 +28,10 @@
 | O11 | Recurring monthly services: OsRecurringServicesService (SEO report, social calendar, ads snapshot), cron /api/cron/os-recurring-services, migration 432 | d05941e |
 | S20 | Social scheduler publish elite: cron /api/cron/social-publish (CRON_SECRET), no-account banner + post actions in /saas/social, 6 processDueScheduled tests | a76032a |
 | O12 | QA visual + legal pre-portal: visualQaEngine (WCAG contrast + structural + legal), packOrchestrator qa_visual_score/qa_legal_passed, portal block if score<70 or legal fail | 418f46e |
-| S21 | Ads create/edit: createCampaign + updateCampaignBudget (Meta + Google), POST /campaigns/create, PATCH /campaigns/[id], CreateCampaignModal + EditBudgetModal in /saas/publicidad | (current) |
-| O13 | Learning loop GA4→seed weights: OsLearningService CVR per sector, os_seed_weights table (migration 433), getTopSectorsByCvr + rankSeedsByCvr in seed-selector, cron /api/cron/os-learning-loop | (current) |
+| S21 | Ads create/edit: createCampaign + updateCampaignBudget (Meta + Google), POST /campaigns/create, PATCH /campaigns/[id], CreateCampaignModal + EditBudgetModal in /saas/publicidad | c715282 |
+| O13 | Learning loop GA4→seed weights: OsLearningService CVR per sector, os_seed_weights table (migration 433), getTopSectorsByCvr + rankSeedsByCvr in seed-selector, cron /api/cron/os-learning-loop | b0d600a |
+| S22 | TikTok + Snapchat ads: _fetchTikTokCampaigns, _createTikTokCampaign, _fetchSnapchatCampaigns, _createSnapchatCampaign in SaasAdsDashboardService; UI /saas/publicidad snapchat tab; 16 tests | (current) |
+| O14 | AUTONOMOUS_PRODUCTION=true guard: isAutonomousProductionEnabled() + guard in runGrowthPack; scripts/run-os-autonomous-gate.mjs; docs/OS_AUTONOMOUS_PROD.md; .github/workflows/os-gate.yml | (current) |
 
 ---
 
@@ -81,6 +83,16 @@ GOOGLE_ADS_ACCESS_TOKEN=
 GOOGLE_ADS_DEVELOPER_TOKEN=
 # LinkedIn Ads: LinkedIn Marketing Solutions access token
 LINKEDIN_ADS_ACCESS_TOKEN=
+# TikTok Ads: TikTok for Business → Marketing API → Access Token
+TIKTOK_ADS_ACCESS_TOKEN=
+TIKTOK_ADS_ADVERTISER_ID=
+# Snapchat Ads: Snap Marketing API → OAuth2 Bearer
+SNAPCHAT_ADS_ACCESS_TOKEN=
+SNAPCHAT_ADS_ACCOUNT_ID=
+
+# OS Autonomous Production (O14)
+# Set to "true" only AFTER node scripts/run-os-autonomous-gate.mjs passes
+AUTONOMOUS_PRODUCTION=false
 
 # Social Publish — OAuth tokens (S20)
 # Meta: generate at developers.facebook.com → Tools → Graph API Explorer

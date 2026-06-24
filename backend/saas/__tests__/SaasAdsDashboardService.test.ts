@@ -27,7 +27,7 @@ describe("SaasAdsDashboardService", () => {
     const db = makeDb([[]]);
     const svc = new SaasAdsDashboardService(db);
     const status = await svc.getStatus(TENANT);
-    expect(status).toHaveLength(4);
+    expect(status).toHaveLength(5);
     expect(status.every((s) => !s.connected)).toBe(true);
   });
 
@@ -44,7 +44,7 @@ describe("SaasAdsDashboardService", () => {
     const db = makeDb();
     const svc = new SaasAdsDashboardService(db);
     await expect(svc.connectAccount(TENANT, {
-      platform: "snapchat" as "meta", accountId: "1", accountName: "x", accessToken: "t",
+      platform: "twitter" as "meta", accountId: "1", accountName: "x", accessToken: "t",
     })).rejects.toMatchObject({ code: "VALIDATION" });
   });
 

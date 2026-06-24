@@ -5,7 +5,7 @@
  */
 import { DbClient } from "../db/DbClient";
 
-export type AdsPlatform = "meta" | "google" | "linkedin" | "tiktok";
+export type AdsPlatform = "meta" | "google" | "linkedin" | "tiktok" | "snapchat";
 
 export type AdsConnection = {
   id: string;
@@ -85,7 +85,7 @@ export class SaasAdsDashboardError extends Error {
   }
 }
 
-const PLATFORMS: AdsPlatform[] = ["meta", "google", "linkedin", "tiktok"];
+const PLATFORMS: AdsPlatform[] = ["meta", "google", "linkedin", "tiktok", "snapchat"];
 const CACHE_TTL_HOURS = 4;
 
 type DbPort = { query: <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]> };
@@ -293,6 +293,8 @@ export class SaasAdsDashboardService {
     const conn = conns[0];
     if (platform === "meta") return this._fetchMetaCampaigns(conn.access_token, conn.account_id);
     if (platform === "google") return this._fetchGoogleCampaigns(conn.access_token, conn.account_id, conn.extra_config);
+    if (platform === "tiktok") return this._fetchTikTokCampaigns(conn.access_token, conn.account_id);
+    if (platform === "snapchat") return this._fetchSnapchatCampaigns(conn.access_token, conn.account_id);
     throw new SaasAdsDashboardError(`Campaign listing for ${platform} not yet implemented`, "API_ERROR");
   }
 
@@ -305,6 +307,8 @@ export class SaasAdsDashboardService {
     const conn = conns[0];
     if (input.platform === "meta") return this._createMetaCampaign(conn.access_token, conn.account_id, input);
     if (input.platform === "google") return this._createGoogleCampaign(conn.access_token, conn.account_id, conn.extra_config, input);
+    if (input.platform === "tiktok") return this._createTikTokCampaign(conn.access_token, conn.account_id, input);
+    if (input.platform === "snapchat") return this._createSnapchatCampaign(conn.access_token, conn.account_id, input);
     throw new SaasAdsDashboardError(`Campaign creation for ${input.platform} not yet implemented`, "API_ERROR");
   }
 
@@ -318,6 +322,8 @@ export class SaasAdsDashboardService {
     const conn = conns[0];
     if (platform === "meta") return this._updateMetaBudget(conn.access_token, campaignId, dailyBudgetUsd);
     if (platform === "google") return this._updateGoogleBudget(conn.access_token, conn.account_id, conn.extra_config, campaignId, dailyBudgetUsd);
+    if (platform === "tiktok") return this._updateTikTokBudget(conn.access_token, conn.account_id, campaignId, dailyBudgetUsd);
+    if (platform === "snapchat") return this._updateSnapchatBudget(conn.access_token, campaignId, dailyBudgetUsd);
     throw new SaasAdsDashboardError(`Budget update for ${platform} not yet implemented`, "API_ERROR");
   }
 
@@ -330,6 +336,8 @@ export class SaasAdsDashboardService {
     const conn = conns[0];
     if (platform === "meta") return this._setMetaCampaignStatus(conn.access_token, campaignId, status);
     if (platform === "google") return this._setGoogleCampaignStatus(conn.access_token, conn.account_id, conn.extra_config, campaignId, status);
+    if (platform === "tiktok") return this._setTikTokCampaignStatus(conn.access_token, conn.account_id, campaignId, status);
+    if (platform === "snapchat") return this._setSnapchatCampaignStatus(conn.access_token, campaignId, status);
     throw new SaasAdsDashboardError(`Campaign management for ${platform} not yet implemented`, "API_ERROR");
   }
 
@@ -477,6 +485,163 @@ export class SaasAdsDashboardService {
     const resourceName = data.results?.[0]?.resourceName ?? "";
     const id = resourceName.split("/").pop() ?? resourceName;
     return { id, name: input.name, status: input.status ?? "PAUSED", platform: "google", dailyBudget: input.dailyBudgetUsd };
+  }
+
+  // ── TikTok API ──────────────────────────────────────────────────────────────
+  // Docs: https://business-api.tiktok.com/portal/docs
+
+  private async _fetchTikTokCampaigns(token: string, advertiserId: string): Promise<AdsCampaign[]> {
+    const res = await this.fetchFn(
+      `https://business-api.tiktok.com/open_api/v1.3/campaign/get/?advertiser_id=${advertiserId}&fields=["campaign_id","campaign_name","operation_status","budget"]`,
+      { headers: { "Access-Token": token, "Content-Type": "application/json" } },
+    );
+    const data = await res.json() as { code?: number; message?: string; data?: { list?: Array<Record<string, unknown>> } };
+    if (!res.ok || (data.code !== undefined && data.code !== 0)) {
+      throw new SaasAdsDashboardError(`TikTok Ads: ${data.message ?? "unknown error"}`, "API_ERROR");
+    }
+    return (data.data?.list ?? []).map((c) => ({
+      id: String(c["campaign_id"] ?? ""),
+      name: String(c["campaign_name"] ?? ""),
+      status: (c["operation_status"] === "ENABLE" ? "ACTIVE" : "PAUSED") as AdsCampaignStatus,
+      platform: "tiktok" as AdsPlatform,
+      dailyBudget: c["budget"] ? Number(c["budget"]) : null,
+    }));
+  }
+
+  private async _setTikTokCampaignStatus(token: string, advertiserId: string, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
+    const operationStatus = status === "ACTIVE" ? "ENABLE" : "DISABLE";
+    const res = await this.fetchFn(
+      "https://business-api.tiktok.com/open_api/v1.3/campaign/status/update/",
+      {
+        method: "POST",
+        headers: { "Access-Token": token, "Content-Type": "application/json" },
+        body: JSON.stringify({ advertiser_id: advertiserId, campaign_ids: [campaignId], operation_status: operationStatus }),
+      },
+    );
+    const data = await res.json() as { code?: number; message?: string };
+    if (!res.ok || (data.code !== undefined && data.code !== 0)) {
+      throw new SaasAdsDashboardError(`TikTok Ads: ${data.message ?? "unknown error"}`, "API_ERROR");
+    }
+  }
+
+  private async _createTikTokCampaign(token: string, advertiserId: string, input: AdsCreateCampaignInput): Promise<AdsCampaign> {
+    const budgetMicro = input.dailyBudgetUsd; // TikTok uses USD directly
+    const res = await this.fetchFn(
+      "https://business-api.tiktok.com/open_api/v1.3/campaign/create/",
+      {
+        method: "POST",
+        headers: { "Access-Token": token, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          advertiser_id: advertiserId,
+          campaign_name: input.name,
+          objective_type: input.objective ?? "TRAFFIC",
+          budget_mode: "BUDGET_MODE_DAY",
+          budget: budgetMicro,
+          operation_status: input.status === "ACTIVE" ? "ENABLE" : "DISABLE",
+        }),
+      },
+    );
+    const data = await res.json() as { code?: number; message?: string; data?: { campaign_id?: string } };
+    if (!res.ok || (data.code !== undefined && data.code !== 0)) {
+      throw new SaasAdsDashboardError(`TikTok Ads: ${data.message ?? "unknown error"}`, "API_ERROR");
+    }
+    return { id: data.data?.campaign_id ?? "", name: input.name, status: input.status ?? "PAUSED", platform: "tiktok", dailyBudget: input.dailyBudgetUsd };
+  }
+
+  private async _updateTikTokBudget(token: string, advertiserId: string, campaignId: string, dailyBudgetUsd: number): Promise<AdsCampaign> {
+    const res = await this.fetchFn(
+      "https://business-api.tiktok.com/open_api/v1.3/campaign/update/",
+      {
+        method: "POST",
+        headers: { "Access-Token": token, "Content-Type": "application/json" },
+        body: JSON.stringify({ advertiser_id: advertiserId, campaign_id: campaignId, budget: dailyBudgetUsd, budget_mode: "BUDGET_MODE_DAY" }),
+      },
+    );
+    const data = await res.json() as { code?: number; message?: string };
+    if (!res.ok || (data.code !== undefined && data.code !== 0)) {
+      throw new SaasAdsDashboardError(`TikTok Ads: ${data.message ?? "unknown error"}`, "API_ERROR");
+    }
+    return { id: campaignId, name: "", status: "UNKNOWN", platform: "tiktok", dailyBudget: dailyBudgetUsd };
+  }
+
+  // ── Snapchat API ─────────────────────────────────────────────────────────────
+  // Docs: https://marketingapi.snapchat.com/docs/
+
+  private async _fetchSnapchatCampaigns(token: string, adAccountId: string): Promise<AdsCampaign[]> {
+    const res = await this.fetchFn(
+      `https://adsapi.snapchat.com/v1/adaccounts/${adAccountId}/campaigns`,
+      { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } },
+    );
+    const data = await res.json() as { campaigns?: Array<{ campaign: Record<string, unknown> }>; request_status?: string; request_id?: string };
+    if (!res.ok) throw new SaasAdsDashboardError(`Snapchat Ads: HTTP ${res.status}`, "API_ERROR");
+    return (data.campaigns ?? []).map((item) => {
+      const c = item.campaign;
+      return {
+        id: String(c["id"] ?? ""),
+        name: String(c["name"] ?? ""),
+        status: (c["status"] === "ACTIVE" ? "ACTIVE" : "PAUSED") as AdsCampaignStatus,
+        platform: "snapchat" as AdsPlatform,
+        dailyBudget: c["daily_budget_micro"] ? Number(c["daily_budget_micro"]) / 1_000_000 : null,
+      };
+    });
+  }
+
+  private async _setSnapchatCampaignStatus(token: string, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
+    const res = await this.fetchFn(
+      `https://adsapi.snapchat.com/v1/campaigns/${campaignId}`,
+      {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ campaigns: [{ id: campaignId, status }] }),
+      },
+    );
+    const data = await res.json() as { request_status?: string };
+    if (!res.ok || data.request_status === "ERROR") {
+      throw new SaasAdsDashboardError(`Snapchat Ads: HTTP ${res.status}`, "API_ERROR");
+    }
+  }
+
+  private async _createSnapchatCampaign(token: string, adAccountId: string, input: AdsCreateCampaignInput): Promise<AdsCampaign> {
+    const dailyBudgetMicro = Math.round(input.dailyBudgetUsd * 1_000_000);
+    const res = await this.fetchFn(
+      `https://adsapi.snapchat.com/v1/adaccounts/${adAccountId}/campaigns`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaigns: [{
+            name: input.name,
+            ad_account_id: adAccountId,
+            status: input.status ?? "PAUSED",
+            objective: input.objective ?? "WEB_CONVERSION",
+            daily_budget_micro: dailyBudgetMicro,
+          }],
+        }),
+      },
+    );
+    const data = await res.json() as { campaigns?: Array<{ campaign: { id?: string } }>; request_status?: string };
+    if (!res.ok || data.request_status === "ERROR") {
+      throw new SaasAdsDashboardError(`Snapchat Ads: HTTP ${res.status}`, "API_ERROR");
+    }
+    const id = data.campaigns?.[0]?.campaign.id ?? "";
+    return { id, name: input.name, status: input.status ?? "PAUSED", platform: "snapchat", dailyBudget: input.dailyBudgetUsd };
+  }
+
+  private async _updateSnapchatBudget(token: string, campaignId: string, dailyBudgetUsd: number): Promise<AdsCampaign> {
+    const dailyBudgetMicro = Math.round(dailyBudgetUsd * 1_000_000);
+    const res = await this.fetchFn(
+      `https://adsapi.snapchat.com/v1/campaigns/${campaignId}`,
+      {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ campaigns: [{ id: campaignId, daily_budget_micro: dailyBudgetMicro }] }),
+      },
+    );
+    const data = await res.json() as { request_status?: string };
+    if (!res.ok || data.request_status === "ERROR") {
+      throw new SaasAdsDashboardError(`Snapchat Ads: HTTP ${res.status}`, "API_ERROR");
+    }
+    return { id: campaignId, name: "", status: "UNKNOWN", platform: "snapchat", dailyBudget: dailyBudgetUsd };
   }
 
   // ── Update budget ───────────────────────────────────────────────────────────

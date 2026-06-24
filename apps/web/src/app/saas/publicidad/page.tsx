@@ -5,7 +5,7 @@ import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader 
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
-type AdsPlatform = "meta" | "google" | "linkedin" | "tiktok";
+type AdsPlatform = "meta" | "google" | "linkedin" | "tiktok" | "snapchat";
 
 interface AdsStatusResult {
   platform: AdsPlatform;
@@ -29,11 +29,12 @@ interface AdsMetrics {
   fetchedAt: string;
 }
 
-const PLATFORM_CFG: Record<AdsPlatform, { label: string; icon: string }> = {
-  google: { label: "Google Ads", icon: "🔍" },
-  meta: { label: "Meta Ads", icon: "📘" },
-  linkedin: { label: "LinkedIn Ads", icon: "💼" },
-  tiktok: { label: "TikTok Ads", icon: "🎵" },
+const PLATFORM_CFG: Record<AdsPlatform, { label: string; icon: string; tokenLabel: string; tokenPlaceholder: string }> = {
+  google: { label: "Google Ads", icon: "🔍", tokenLabel: "OAuth Access Token", tokenPlaceholder: "ya29..." },
+  meta: { label: "Meta Ads", icon: "📘", tokenLabel: "Access Token", tokenPlaceholder: "EAAG..." },
+  linkedin: { label: "LinkedIn Ads", icon: "💼", tokenLabel: "Access Token", tokenPlaceholder: "AQV..." },
+  tiktok: { label: "TikTok Ads", icon: "🎵", tokenLabel: "Access Token", tokenPlaceholder: "d4ff..." },
+  snapchat: { label: "Snapchat Ads", icon: "👻", tokenLabel: "OAuth Access Token", tokenPlaceholder: "Bearer token..." },
 };
 
 function fmt(n: number) { return n.toLocaleString("es-ES", { maximumFractionDigits: 2 }); }
@@ -101,10 +102,20 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Access Token *</label>
-            <input value={accessToken} onChange={e => setAccessToken(e.target.value)} type="password" placeholder="EAAG..."
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+              {PLATFORM_CFG[platform]?.tokenLabel ?? "Access Token"} *
+            </label>
+            <input value={accessToken} onChange={e => setAccessToken(e.target.value)} type="password"
+              placeholder={PLATFORM_CFG[platform]?.tokenPlaceholder ?? "token..."}
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
           </div>
+          {(platform === "tiktok" || platform === "snapchat") && (
+            <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 px-4 py-3 text-xs text-blue-400">
+              {platform === "tiktok"
+                ? "TikTok: genera el Access Token desde TikTok for Business → Marketing API → App → Access Token."
+                : "Snapchat: genera el token OAuth desde Snapchat Business → Snap Marketing API → OAuth."}
+            </div>
+          )}
           <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 px-4 py-3 text-xs text-yellow-400">
             El token se almacena cifrado. Necesitas permisos de lectura de metricas.
           </div>
