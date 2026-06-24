@@ -43,6 +43,26 @@ export type AdsConnectionInput = {
   extraConfig?: Record<string, unknown>;
 };
 
+export type AdsCampaignStatus = "ACTIVE" | "PAUSED" | "DELETED" | "ARCHIVED" | "UNKNOWN";
+
+export type AdsCampaign = {
+  id: string;
+  name: string;
+  status: AdsCampaignStatus;
+  platform: AdsPlatform;
+  dailyBudget: number | null;
+};
+
+export type RoasAlert = {
+  platform: AdsPlatform;
+  roas: number;
+  threshold: number;
+  dateStart: string;
+  dateEnd: string;
+  spend: number;
+  fetchedAt: string;
+};
+
 export type AdsStatusResult = {
   platform: AdsPlatform;
   connected: boolean;
@@ -252,6 +272,124 @@ export class SaasAdsDashboardService {
     const cpc = totals.clicks > 0 ? spend / totals.clicks : null;
     const roas = spend > 0 && totals.revenue > 0 ? totals.revenue / spend : null;
     return { spend, impressions: totals.impressions, clicks: totals.clicks, conversions: totals.conversions, ctr, cpc, roas };
+  }
+
+  // ─── Campaign management ──────────────────────────────────────────────────
+
+  async listCampaigns(tenantId: string, platform: AdsPlatform): Promise<AdsCampaign[]> {
+    const conns = await this.db.query<ConnectionRow>(
+      `SELECT * FROM saas_ads_connections WHERE tenant_id=$1 AND platform=$2 AND is_active=true ORDER BY created_at DESC LIMIT 1`,
+      [tenantId, platform],
+    );
+    if (!conns.length) throw new SaasAdsDashboardError(`No active ${platform} connection`, "NOT_CONNECTED");
+    const conn = conns[0];
+    if (platform === "meta") return this._fetchMetaCampaigns(conn.access_token, conn.account_id);
+    if (platform === "google") return this._fetchGoogleCampaigns(conn.access_token, conn.account_id, conn.extra_config);
+    throw new SaasAdsDashboardError(`Campaign listing for ${platform} not yet implemented`, "API_ERROR");
+  }
+
+  async setCampaignStatus(tenantId: string, platform: AdsPlatform, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
+    const conns = await this.db.query<ConnectionRow>(
+      `SELECT * FROM saas_ads_connections WHERE tenant_id=$1 AND platform=$2 AND is_active=true ORDER BY created_at DESC LIMIT 1`,
+      [tenantId, platform],
+    );
+    if (!conns.length) throw new SaasAdsDashboardError(`No active ${platform} connection`, "NOT_CONNECTED");
+    const conn = conns[0];
+    if (platform === "meta") return this._setMetaCampaignStatus(conn.access_token, campaignId, status);
+    if (platform === "google") return this._setGoogleCampaignStatus(conn.access_token, conn.account_id, conn.extra_config, campaignId, status);
+    throw new SaasAdsDashboardError(`Campaign management for ${platform} not yet implemented`, "API_ERROR");
+  }
+
+  async getRoasAlerts(tenantId: string, roasThreshold = 1.5): Promise<RoasAlert[]> {
+    const dateEnd = new Date().toISOString().slice(0, 10);
+    const dateStart = new Date(Date.now() - 30 * 86400_000).toISOString().slice(0, 10);
+    const cached = await this.db.query<CacheRow & { platform: string }>(
+      `SELECT c.*, a.platform FROM saas_ads_metrics_cache c
+       JOIN saas_ads_connections a ON a.id = c.connection_id
+       WHERE a.tenant_id=$1 AND c.date_start=$2 AND c.date_end=$3`,
+      [tenantId, dateStart, dateEnd],
+    );
+    return cached
+      .filter((r) => r.roas !== null && Number(r.roas) < roasThreshold)
+      .map((r) => ({
+        platform: r.platform as AdsPlatform,
+        roas: Number(r.roas),
+        threshold: roasThreshold,
+        dateStart,
+        dateEnd,
+        spend: Number(r.spend),
+        fetchedAt: new Date(r.fetched_at).toISOString(),
+      }));
+  }
+
+  private async _fetchMetaCampaigns(token: string, accountId: string): Promise<AdsCampaign[]> {
+    const fields = "id,name,status,effective_status,daily_budget,lifetime_budget";
+    const res = await this.fetchFn(
+      `https://graph.facebook.com/v19.0/act_${accountId}/campaigns?fields=${fields}&access_token=${token}`,
+    );
+    const data = await res.json() as { data?: Array<Record<string, string>>; error?: { message: string } };
+    if (!res.ok || data.error) throw new SaasAdsDashboardError(`Meta Ads: ${data.error?.message ?? "unknown error"}`, "API_ERROR");
+    return (data.data ?? []).map((c) => ({
+      id: c["id"] ?? "", name: c["name"] ?? "",
+      status: (c["effective_status"] ?? c["status"] ?? "UNKNOWN") as AdsCampaignStatus,
+      platform: "meta" as AdsPlatform,
+      dailyBudget: c["daily_budget"] ? Number(c["daily_budget"]) / 100 : null,
+    }));
+  }
+
+  private async _fetchGoogleCampaigns(token: string, customerId: string, extra: Record<string, unknown>): Promise<AdsCampaign[]> {
+    const cleanId = customerId.replace(/-/g, "");
+    const query = "SELECT campaign.id,campaign.name,campaign.status,campaign_budget.amount_micros FROM campaign ORDER BY campaign.name";
+    const res = await this.fetchFn(
+      `https://googleads.googleapis.com/v14/customers/${cleanId}/googleAds:search`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "developer-token": String(extra["developerToken"] ?? ""),
+        },
+        body: JSON.stringify({ query }),
+      },
+    );
+    const data = await res.json() as { results?: Array<{ campaign: Record<string, unknown>; campaignBudget?: Record<string, number> }>; error?: { message: string } };
+    if (!res.ok || data.error) throw new SaasAdsDashboardError(`Google Ads: ${data.error?.message ?? "unknown error"}`, "API_ERROR");
+    return (data.results ?? []).map((r) => ({
+      id: String(r.campaign["id"] ?? ""),
+      name: String(r.campaign["name"] ?? ""),
+      status: String(r.campaign["status"] ?? "UNKNOWN") as AdsCampaignStatus,
+      platform: "google" as AdsPlatform,
+      dailyBudget: r.campaignBudget ? Number(r.campaignBudget["amountMicros"] ?? 0) / 1_000_000 : null,
+    }));
+  }
+
+  private async _setMetaCampaignStatus(token: string, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
+    const metaStatus = status === "ACTIVE" ? "ACTIVE" : "PAUSED";
+    const res = await this.fetchFn(
+      `https://graph.facebook.com/v19.0/${campaignId}`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: metaStatus, access_token: token }) },
+    );
+    const data = await res.json() as { success?: boolean; error?: { message: string } };
+    if (!res.ok || data.error) throw new SaasAdsDashboardError(`Meta Ads: ${data.error?.message ?? "unknown error"}`, "API_ERROR");
+  }
+
+  private async _setGoogleCampaignStatus(token: string, customerId: string, extra: Record<string, unknown>, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
+    const cleanId = customerId.replace(/-/g, "");
+    const googleStatus = status === "ACTIVE" ? "ENABLED" : "PAUSED";
+    const res = await this.fetchFn(
+      `https://googleads.googleapis.com/v14/customers/${cleanId}/campaigns:mutate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "developer-token": String(extra["developerToken"] ?? ""),
+        },
+        body: JSON.stringify({ operations: [{ update: { resourceName: `customers/${cleanId}/campaigns/${campaignId}`, status: googleStatus }, updateMask: "status" }] }),
+      },
+    );
+    const data = await res.json() as { error?: { message: string } };
+    if (!res.ok || data.error) throw new SaasAdsDashboardError(`Google Ads: ${data.error?.message ?? "unknown error"}`, "API_ERROR");
   }
 }
 

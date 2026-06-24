@@ -10,6 +10,15 @@ interface Report {
   createdAt: string; downloadUrl: string | null; sizeBytes: number | null;
 }
 
+interface UtmLink {
+  id: string; name: string; utmSource: string; utmMedium: string; utmCampaign: string;
+  clicks: number; fullUrl: string; createdAt: string;
+}
+
+interface RoasAlert {
+  platform: string; roas: number; threshold: number; spend: number; dateStart: string; dateEnd: string;
+}
+
 const REPORT_TYPES = [
   { id: "executive_summary", label: "Resumen ejecutivo", icon: "📊", desc: "KPIs generales del mes: contactos, campañas, workflows" },
   { id: "email_marketing", label: "Email Marketing", icon: "📧", desc: "Tasas de apertura, clics, conversiones por campaña" },
@@ -24,13 +33,23 @@ export default function SaasReportesPage() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [utmLinks, setUtmLinks] = useState<UtmLink[]>([]);
+  const [roasAlerts, setRoasAlerts] = useState<RoasAlert[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/saas/reports");
-      const data = (await res.json().catch(() => ({ reports: [] }))) as { reports: Report[] };
+      const [reportsRes, utmRes, alertsRes] = await Promise.all([
+        fetch("/api/saas/reports"),
+        fetch("/api/saas/utm?limit=5"),
+        fetch("/api/saas/ads/alerts"),
+      ]);
+      const data = (await reportsRes.json().catch(() => ({ reports: [] }))) as { reports: Report[] };
       setReports(data.reports ?? []);
+      const utmData = (await utmRes.json().catch(() => ({ links: [] }))) as { links: UtmLink[] };
+      setUtmLinks(utmData.links ?? []);
+      const alertsData = (await alertsRes.json().catch(() => ({ alerts: [] }))) as { alerts: RoasAlert[] };
+      setRoasAlerts(alertsData.alerts ?? []);
     } finally { setLoading(false); }
   }, []);
 
@@ -69,6 +88,42 @@ export default function SaasReportesPage() {
         <NelvyonDsSectionHeader title="Reportes" subtitle="Genera y descarga informes ejecutivos de todos tus módulos en PDF" />
 
         {error && <p className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</p>}
+
+        {/* ROAS alerts */}
+        {roasAlerts.length > 0 && (
+          <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-5 py-4">
+            <p className="mb-3 text-sm font-semibold text-yellow-400">⚠️ Alertas ROAS ({roasAlerts.length})</p>
+            <div className="flex flex-col gap-2">
+              {roasAlerts.map((a, i) => (
+                <div key={i} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground capitalize">{a.platform}</span>
+                  <span className="text-yellow-400 font-medium">ROAS {a.roas.toFixed(2)}x (umbral: {a.threshold}x) — gasto {a.spend.toFixed(2)} EUR</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* UTM attribution */}
+        {utmLinks.length > 0 && (
+          <div>
+            <p className="mb-3 text-sm font-medium text-muted-foreground">Atribución UTM — top enlaces</p>
+            <div className="flex flex-col gap-2">
+              {utmLinks.map(l => (
+                <NelvyonDsCard key={l.id} className="flex items-center justify-between gap-4 px-5 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground truncate">{l.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{l.utmSource} / {l.utmMedium} / {l.utmCampaign}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold text-foreground">{l.clicks.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">clics</p>
+                  </div>
+                </NelvyonDsCard>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Generate new report */}
         <div>

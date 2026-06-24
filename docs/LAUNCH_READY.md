@@ -152,6 +152,20 @@ En Railway → proyecto → tu servicio → **Variables**, añadir todas estas:
 
 > Sin estas variables, SMS y WhatsApp muestran banner de configuración (no crash).
 
+#### Publicidad Digital (Fase 11 — opcionales)
+
+| Variable | Descripción |
+|---|---|
+| `META_ADS_APP_ID` | App ID de Meta for Developers (para OAuth flow) |
+| `META_ADS_APP_SECRET` | App Secret de Meta (par con META_ADS_APP_ID) |
+| `GOOGLE_ADS_DEVELOPER_TOKEN` | Developer token de Google Ads API — necesario en `extra_config.developerToken` al conectar cuenta |
+| `GOOGLE_ADS_CLIENT_ID` | OAuth 2.0 client ID (Google Cloud Console) |
+| `GOOGLE_ADS_CLIENT_SECRET` | OAuth 2.0 client secret |
+| `LINKEDIN_ADS_CLIENT_ID` | Client ID de LinkedIn Marketing API |
+| `LINKEDIN_ADS_CLIENT_SECRET` | Client secret de LinkedIn Marketing API |
+
+> Las cuentas de ads se conectan con tokens OAuth en `/saas/publicidad`. Sin tokens, la UI muestra "Sin plataformas conectadas" (no crash). Los tokens se almacenan en `saas_ads_connections`.
+
 #### Opcionales (AI/Voice)
 
 | Variable | Cuándo |

@@ -118,6 +118,73 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
   );
 }
 
+type AdsCampaign = { id: string; name: string; status: string; platform: string; dailyBudget: number | null };
+
+function CampaignsSection({ platform }: { platform: AdsPlatform }) {
+  const [campaigns, setCampaigns] = useState<AdsCampaign[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [toggling, setToggling] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    setLoading(true); setError(null);
+    fetch(`/api/saas/ads/campaigns?platform=${platform}`)
+      .then(r => r.json() as Promise<{ campaigns?: AdsCampaign[]; error?: string; code?: string }>)
+      .then(d => {
+        if (d.error && d.code === "NOT_CONNECTED") { setCampaigns([]); setError(null); }
+        else if (d.error) setError(d.error);
+        else setCampaigns(d.campaigns ?? []);
+      })
+      .catch(() => setError("Error de red"))
+      .finally(() => setLoading(false));
+  }, [platform]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function toggle(c: AdsCampaign) {
+    setToggling(c.id);
+    try {
+      const action = c.status === "ACTIVE" ? "pause" : "activate";
+      const res = await fetch("/api/saas/ads/campaigns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform, campaign_id: c.id, action }),
+      });
+      if (!res.ok) { const j = (await res.json().catch(() => ({}))) as { error?: string }; throw new Error(j.error ?? "Error"); }
+      load();
+    } catch (err) { setError(err instanceof Error ? err.message : "Error"); }
+    finally { setToggling(null); }
+  }
+
+  if (loading) return <div className="h-16 animate-pulse rounded-xl bg-muted/30" />;
+  if (error) return <p className="text-sm text-red-400">{error}</p>;
+  if (!campaigns.length) return null;
+
+  return (
+    <div className="mt-4">
+      <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">Campañas activas</p>
+      <div className="flex flex-col gap-2">
+        {campaigns.map(c => (
+          <div key={c.id} className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card/50 px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">{c.name}</p>
+              {c.dailyBudget != null && <p className="text-xs text-muted-foreground">Ppto. diario: {c.dailyBudget.toFixed(2)} EUR</p>}
+            </div>
+            <div className="flex items-center gap-3">
+              <NelvyonDsBadge tone={c.status === "ACTIVE" ? "success" : "neutral"}>
+                {c.status === "ACTIVE" ? "Activa" : "Pausada"}
+              </NelvyonDsBadge>
+              <NelvyonDsButton size="sm" variant="ghost" disabled={toggling === c.id} onClick={() => void toggle(c)}>
+                {toggling === c.id ? "…" : c.status === "ACTIVE" ? "Pausar" : "Activar"}
+              </NelvyonDsButton>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function MetricsCard({ platform, dateStart, dateEnd }: { platform: AdsPlatform; dateStart: string; dateEnd: string }) {
   const [metrics, setMetrics] = useState<AdsMetrics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -210,7 +277,12 @@ export default function SaasPublicidadPage() {
           <>
             <div className="flex flex-col gap-3">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Ultimos 30 dias</p>
-              {connected.map(s => <MetricsCard key={s.platform} platform={s.platform} dateStart={dateStart} dateEnd={dateEnd} />)}
+              {connected.map(s => (
+                <div key={s.platform} className="flex flex-col gap-3">
+                  <MetricsCard platform={s.platform} dateStart={dateStart} dateEnd={dateEnd} />
+                  <CampaignsSection platform={s.platform} />
+                </div>
+              ))}
             </div>
             {disconnected.length > 0 && (
               <div className="flex flex-col gap-2">

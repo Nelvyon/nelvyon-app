@@ -490,6 +490,9 @@ export {
   type AdsMetrics,
   type AdsConnectionInput,
   type AdsStatusResult,
+  type AdsCampaign,
+  type AdsCampaignStatus,
+  type RoasAlert,
 } from "./SaasAdsDashboardService";
 export {
   SaasUtmService,
