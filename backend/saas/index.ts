@@ -663,9 +663,17 @@ export {
   type LmsCourse,
   type LmsEnrollment,
   type LmsCertificate,
+  type LmsModule,
+  type LmsLesson,
+  type LmsProgressSummary,
+  type LessonContentType,
   type CourseStatus,
   type CreateCourseInput,
   type EnrollInput,
+  type CreateModuleInput,
+  type UpdateModuleInput,
+  type CreateLessonInput,
+  type UpdateLessonInput,
 } from "./SaasLmsService";
 export {
   SaasKlaviyoService,

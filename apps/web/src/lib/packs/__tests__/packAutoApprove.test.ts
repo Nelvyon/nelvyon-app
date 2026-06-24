@@ -169,7 +169,7 @@ describe("packOrchestrator — auto-approve", () => {
     mockSimulate.mockReturnValueOnce({
       project: { qa: { score: 70, passed: false }, project_id: "proj-low", sku: "NELVYON-LANDING", artifacts: {}, os_refs: {} },
       escalated: false,
-      os_publish: null,
+      os_publish: { deliverables: [] },
       simulation_mode: "production",
     });
 
