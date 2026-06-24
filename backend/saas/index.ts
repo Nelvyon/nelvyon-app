@@ -418,6 +418,7 @@ export {
   type SendMessageInput,
   type InboxChannel,
   type ConversationStatus,
+  type ReplyResult,
 } from "./SaasInboxService";
 export {
   SaasSequencesService,

@@ -63,3 +63,58 @@ describe("SaasInboxService", () => {
     await expect(svc.sendMessage(TENANT, "cv1", { body: "  " })).rejects.toThrow("body");
   });
 });
+
+const msgRow = {
+  id: "m1", conversation_id: "cv1", tenant_id: TENANT,
+  direction: "outbound", body: "Hello", status: "sent",
+  external_id: null, created_at: now,
+};
+
+describe("SaasInboxService.replyToConversation", () => {
+  it("throws NOT_FOUND for missing conversation", async () => {
+    const db = makeDb([[]]);
+    const svc = new SaasInboxService(db);
+    await expect(svc.replyToConversation(TENANT, "missing", "hi"))
+      .rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  it("throws VALIDATION for empty body", async () => {
+    const db = makeDb([[convRow]]);
+    const svc = new SaasInboxService(db);
+    await expect(svc.replyToConversation(TENANT, "cv1", "  "))
+      .rejects.toMatchObject({ code: "VALIDATION" });
+  });
+
+  it("stores message and returns channelDispatched=false for email channel (no external dispatch)", async () => {
+    // replyToConversation DB calls:
+    // 1: getConversation (SELECT convRow)
+    // 2: sendMessage → getConversation again (SELECT convRow)
+    // 3: sendMessage → INSERT message (msgRow)
+    // 4: sendMessage → UPDATE conversations []
+    const db = makeDb([[convRow], [convRow], [msgRow], []]);
+    const svc = new SaasInboxService(db);
+    const result = await svc.replyToConversation(TENANT, "cv1", "Hello");
+    expect(result.message.id).toBe("m1");
+    expect(result.channelDispatched).toBe(false);
+    expect(result.channelError).toBeUndefined();
+  });
+
+  it("returns channelDispatched=false + channelError when SMS contact has no phone", async () => {
+    const smsConv = { ...convRow, channel: "sms", contact_id: "c1" };
+    // 1: getConversation, 2: getConversation (in sendMessage), 3: INSERT msg, 4: UPDATE conv, 5: phone lookup
+    const db = makeDb([[smsConv], [smsConv], [msgRow], [], [{ phone: null }]]);
+    const svc = new SaasInboxService(db);
+    const result = await svc.replyToConversation(TENANT, "cv1", "Hello");
+    expect(result.channelDispatched).toBe(false);
+    expect(result.channelError).toContain("phone number");
+  });
+
+  it("returns channelDispatched=false + channelError when WhatsApp contact has no phone", async () => {
+    const waConv = { ...convRow, channel: "whatsapp", contact_id: "c1" };
+    const db = makeDb([[waConv], [waConv], [msgRow], [], [{ phone: null }]]);
+    const svc = new SaasInboxService(db);
+    const result = await svc.replyToConversation(TENANT, "cv1", "Hello");
+    expect(result.channelDispatched).toBe(false);
+    expect(result.channelError).toContain("phone number");
+  });
+});

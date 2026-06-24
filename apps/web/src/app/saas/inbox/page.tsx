@@ -85,22 +85,37 @@ export default function SaasInboxPage() {
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [selected]);
 
+  const [replyInfo, setReplyInfo] = useState<{ dispatched: boolean; error?: string } | null>(null);
+
   async function sendReply() {
     if (!reply.trim() || !selected) return;
     const newMsg: Message = { id: Date.now().toString(), direction: "out", content: reply, createdAt: new Date().toISOString(), status: "sent" };
-    // Optimistic update
     setConvs(prev => prev.map(c => c.id === selected.id ? { ...c, messages: [...c.messages, newMsg], lastMessage: reply, lastAt: new Date().toISOString(), unread: 0 } : c));
     setSelected(s => s ? ({ ...s, messages: [...s.messages, newMsg], lastMessage: reply }) : s);
+    const body = reply;
     setReply("");
+    setReplyInfo(null);
     try {
-      await fetch("/api/saas/inbox", {
+      const res = await fetch(`/api/saas/inbox/${selected.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reply", conversationId: selected.id, content: reply }),
+        body: JSON.stringify({ body }),
       });
+      const data = await res.json().catch(() => ({})) as { channel_dispatched?: boolean; channel_error?: string };
+      setReplyInfo({ dispatched: data.channel_dispatched ?? false, error: data.channel_error ?? undefined });
     } catch {
-      // message already shown optimistically; silent fail acceptable for reply
+      // optimistic update already applied
     }
+  }
+
+  async function closeConversation(id: string) {
+    await fetch(`/api/saas/inbox/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "closed" }),
+    });
+    setConvs(prev => prev.map(c => c.id === id ? { ...c, open: false } : c));
+    if (selected?.id === id) setSelected(null);
   }
 
   function markRead(id: string) {
@@ -225,6 +240,13 @@ export default function SaasInboxPage() {
                       <div ref={messagesEndRef} />
                     </div>
 
+                    {/* Channel dispatch feedback */}
+                    {replyInfo && (
+                      <div className={`mx-4 mt-1 rounded-lg px-3 py-1.5 text-xs ${replyInfo.error ? "bg-yellow-500/10 text-yellow-400" : "bg-green-500/10 text-green-400"}`}>
+                        {replyInfo.error ? `⚠ ${replyInfo.error}` : replyInfo.dispatched ? `✓ Enviado vía ${CH[selected.channel].label}` : `✓ Guardado (canal no despachado)`}
+                      </div>
+                    )}
+
                     {/* Reply box */}
                     <div className="border-t border-border p-4">
                       <div className="flex items-end gap-3">
@@ -281,7 +303,7 @@ export default function SaasInboxPage() {
                       <NelvyonDsButton variant="ghost" className="w-full text-xs">📋 Ver en CRM</NelvyonDsButton>
                       <NelvyonDsButton variant="ghost" className="w-full text-xs">📅 Agendar cita</NelvyonDsButton>
                       <NelvyonDsButton variant="ghost" className="w-full text-xs">✉️ Enviar campaña</NelvyonDsButton>
-                      <NelvyonDsButton variant="ghost" className="w-full text-xs">✓ Cerrar conversación</NelvyonDsButton>
+                      <NelvyonDsButton variant="ghost" className="w-full text-xs" onClick={() => selected && closeConversation(selected.id)}>✓ Cerrar conversación</NelvyonDsButton>
                     </div>
                   </div>
                 )}

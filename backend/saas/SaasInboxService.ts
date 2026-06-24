@@ -1,5 +1,7 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { getSaasSmsService, SaasSmsError } from "./SaasSmsService";
+import { getSaasWhatsAppService, SaasWhatsAppError } from "./SaasWhatsAppService";
 
 export type InboxChannel = "email" | "sms" | "whatsapp" | "instagram" | "facebook" | "chat";
 export type ConversationStatus = "open" | "closed" | "spam";
@@ -39,6 +41,12 @@ export interface CreateConversationInput {
 export interface SendMessageInput {
   body: string;
   direction?: "inbound" | "outbound";
+}
+
+export interface ReplyResult {
+  message: SaasMessage;
+  channelDispatched: boolean;
+  channelError?: string;
 }
 
 export class SaasInboxError extends Error {
@@ -188,6 +196,73 @@ export class SaasInboxService {
       [tenantId, conversationId, input.body.trim().slice(0, 200), unreadDelta],
     );
     return rowToMsg(rows[0]);
+  }
+
+  /**
+   * Reply to a conversation — stores the message AND dispatches via the correct channel:
+   * - sms     → SaasSmsService.send (Twilio SMS)
+   * - whatsapp → SaasWhatsAppService.send (Twilio WhatsApp)
+   * - email / instagram / facebook / chat → stored only (no external dispatch yet)
+   *
+   * Always stores the message even if channel dispatch fails.
+   * Returns channelDispatched=false + channelError on soft failure.
+   */
+  async replyToConversation(tenantId: string, conversationId: string, body: string): Promise<ReplyResult> {
+    const conv = await this.getConversation(tenantId, conversationId);
+    if (!conv) throw new SaasInboxError("Conversation not found", "NOT_FOUND");
+    if (!body.trim()) throw new SaasInboxError("body is required", "VALIDATION");
+
+    const message = await this.sendMessage(tenantId, conversationId, { body, direction: "outbound" });
+
+    // Resolve contact phone for SMS / WhatsApp dispatch
+    let contactPhone: string | null = null;
+    if ((conv.channel === "sms" || conv.channel === "whatsapp") && conv.contactId) {
+      type PhoneRow = { phone: string | null };
+      const rows = await this.db.query<PhoneRow>(
+        `SELECT phone FROM saas_contacts WHERE tenant_id=$1 AND id=$2 LIMIT 1`,
+        [tenantId, conv.contactId],
+      ).catch(() => [] as PhoneRow[]);
+      contactPhone = rows[0]?.phone ?? null;
+    }
+
+    let channelDispatched = false;
+    let channelError: string | undefined;
+
+    if (conv.channel === "sms") {
+      if (!contactPhone) {
+        channelError = "Contact has no phone number — message stored but SMS not sent";
+      } else {
+        try {
+          await getSaasSmsService().send(tenantId, contactPhone, body.trim());
+          channelDispatched = true;
+        } catch (e) {
+          channelError = e instanceof SaasSmsError ? e.message : "SMS dispatch failed";
+        }
+      }
+    } else if (conv.channel === "whatsapp") {
+      if (!contactPhone) {
+        channelError = "Contact has no phone number — message stored but WhatsApp not sent";
+      } else {
+        try {
+          await getSaasWhatsAppService().send(tenantId, {
+            to: contactPhone,
+            body: body.trim(),
+            contactId: conv.contactId ?? undefined,
+          });
+          channelDispatched = true;
+        } catch (e) {
+          channelError = e instanceof SaasWhatsAppError ? e.message : "WhatsApp dispatch failed";
+        }
+      }
+    } else {
+      // email / chat / instagram / facebook — message stored; external dispatch not yet implemented
+      channelDispatched = false;
+      channelError = conv.channel === "email"
+        ? undefined  // email replies are handled by SES; message stored for record-keeping
+        : undefined;
+    }
+
+    return { message, channelDispatched, channelError };
   }
 }
 

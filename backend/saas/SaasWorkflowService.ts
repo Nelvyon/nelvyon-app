@@ -2,6 +2,8 @@ import { SendEmailCommand } from "@aws-sdk/client-ses";
 
 import { DbClient } from "../db/DbClient";
 import { getSesClient } from "../email/sesClient";
+import { getSaasSmsService } from "./SaasSmsService";
+import { getSaasWhatsAppService } from "./SaasWhatsAppService";
 import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact, type ActivityType } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
@@ -72,7 +74,9 @@ export type WorkflowAction =
   | { type: "notify"; config: { message: string } }
   | { type: "delay_minutes"; config: { minutes: number } }
   | { type: "webhook_out"; config: { url: string; method?: "GET" | "POST" | "PUT"; body?: Record<string, unknown> } }
-  | { type: "add_tag"; config: { contactId?: string; tag: string } };
+  | { type: "add_tag"; config: { contactId?: string; tag: string } }
+  | { type: "send_sms"; config: { to: string; body: string } }
+  | { type: "send_whatsapp"; config: { to: string; body: string } };
 
 export interface SaasWorkflow {
   id: string;
@@ -577,6 +581,32 @@ export class SaasWorkflowService {
             stepsExecuted.push({ action: action.type, ok: true, contactId, tag: action.config.tag });
           } else {
             stepsExecuted.push({ action: action.type, ok: false, error: "contactId not resolvable" });
+          }
+        } else if (action.type === "send_sms") {
+          const toResolved = action.config.to === "{{contact.phone}}"
+            ? (() => {
+                const contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+                return typeof contact.phone === "string" ? contact.phone : action.config.to;
+              })()
+            : action.config.to;
+          try {
+            const result = await getSaasSmsService().send(tenantId, toResolved, action.config.body);
+            stepsExecuted.push({ action: action.type, ok: result.ok, to: toResolved, sid: result.messageSid });
+          } catch (e) {
+            stepsExecuted.push({ action: action.type, ok: false, error: e instanceof Error ? e.message : String(e) });
+          }
+        } else if (action.type === "send_whatsapp") {
+          const toResolved = action.config.to === "{{contact.phone}}"
+            ? (() => {
+                const contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+                return typeof contact.phone === "string" ? contact.phone : action.config.to;
+              })()
+            : action.config.to;
+          try {
+            const result = await getSaasWhatsAppService().send(tenantId, { to: toResolved, body: action.config.body });
+            stepsExecuted.push({ action: action.type, ok: result.status === "sent", to: toResolved, sid: result.twilioSid });
+          } catch (e) {
+            stepsExecuted.push({ action: action.type, ok: false, error: e instanceof Error ? e.message : String(e) });
           }
         }
       }
