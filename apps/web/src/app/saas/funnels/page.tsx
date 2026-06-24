@@ -8,10 +8,14 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 type FunnelStatus = "draft" | "active" | "paused";
 type StepType = "landing" | "form" | "video" | "checkout" | "upsell" | "thankyou";
 
-interface FunnelStep { id: string; type: StepType; name: string; conversions: number; visitors: number }
+interface FunnelStep { id: string; type: StepType; name: string; conversions: number; visitors: number; cvr?: number; dropOff?: number }
 interface Funnel {
   id: string; name: string; description: string | null; status: FunnelStatus;
   steps: FunnelStep[]; totalVisitors: number; totalConversions: number; revenue: number; createdAt: string;
+}
+interface FunnelAnalytics {
+  funnelId: string; totalVisitors: number; totalConversions: number; overallCvr: number;
+  steps: Array<{ id: string; name: string; type: string; stepOrder: number; visitors: number; conversions: number; cvr: number; dropOff: number }>;
 }
 
 const STEP_TYPES: { type: StepType; label: string; icon: string }[] = [
@@ -122,6 +126,8 @@ export default function SaasFunnelsPage() {
   const [funnels, setFunnels] = useState<Funnel[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
+  const [analyticsById, setAnalyticsById] = useState<Record<string, FunnelAnalytics>>({});
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -133,6 +139,25 @@ export default function SaasFunnelsPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  async function loadAnalytics(funnelId: string) {
+    if (analyticsById[funnelId]) { setExpandedId(prev => prev === funnelId ? null : funnelId); return; }
+    try {
+      const res = await fetch(`/api/saas/funnels/${funnelId}?resource=analytics`);
+      const data = (await res.json().catch(() => ({}))) as { analytics?: FunnelAnalytics };
+      if (data.analytics) setAnalyticsById(prev => ({ ...prev, [funnelId]: data.analytics! }));
+    } catch { /* non-fatal */ }
+    setExpandedId(prev => prev === funnelId ? null : funnelId);
+  }
+
+  async function publishFunnel(funnelId: string) {
+    await fetch(`/api/saas/funnels/${funnelId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "publish" }),
+    });
+    void load();
+  }
 
   const totalRevenue = funnels.reduce((s, f) => s + f.revenue, 0);
   const avgCvr = funnels.length > 0
@@ -172,7 +197,10 @@ export default function SaasFunnelsPage() {
           </NelvyonDsCard>
         ) : (
           <div className="space-y-3">
-            {funnels.map(f => (
+            {funnels.map(f => {
+              const analytics = analyticsById[f.id];
+              const isExpanded = expandedId === f.id;
+              return (
               <NelvyonDsCard key={f.id} className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="flex-1">
@@ -194,14 +222,40 @@ export default function SaasFunnelsPage() {
                       })}
                     </div>
                   </div>
-                  <div className="flex gap-6 text-center text-sm">
-                    <div><p className="text-xs text-muted-foreground">Visitas</p><p className="font-semibold text-foreground">{f.totalVisitors.toLocaleString()}</p></div>
-                    <div><p className="text-xs text-muted-foreground">Conversiones</p><p className="font-semibold text-foreground">{f.totalConversions}</p></div>
-                    <div><p className="text-xs text-muted-foreground">Revenue</p><p className="font-semibold text-green-400">{f.revenue.toFixed(0)}€</p></div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex gap-6 text-center text-sm">
+                      <div><p className="text-xs text-muted-foreground">Visitas</p><p className="font-semibold text-foreground">{f.totalVisitors.toLocaleString()}</p></div>
+                      <div><p className="text-xs text-muted-foreground">Conversiones</p><p className="font-semibold text-foreground">{f.totalConversions}</p></div>
+                    </div>
+                    <div className="flex gap-2">
+                      {f.status === "draft" && (
+                        <NelvyonDsButton variant="ghost" onClick={() => publishFunnel(f.id)} className="text-xs px-2 py-1">Publicar</NelvyonDsButton>
+                      )}
+                      <NelvyonDsButton variant="ghost" onClick={() => loadAnalytics(f.id)} className="text-xs px-2 py-1">
+                        {isExpanded ? "▲ Analytics" : "▼ Analytics"}
+                      </NelvyonDsButton>
+                    </div>
                   </div>
                 </div>
+                {isExpanded && analytics && (
+                  <div className="mt-4 border-t border-border pt-4">
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">CVR global: <span className="text-foreground font-semibold">{analytics.overallCvr}%</span></p>
+                    <div className="space-y-2">
+                      {analytics.steps.map(s => (
+                        <div key={s.id} className="flex items-center gap-3 rounded-lg bg-muted/20 px-3 py-2 text-xs">
+                          <span className="min-w-[140px] text-foreground font-medium">{s.name}</span>
+                          <span className="text-muted-foreground">{s.visitors} visitas</span>
+                          <span className="text-muted-foreground">{s.conversions} conv.</span>
+                          <span className="text-primary font-semibold">CVR {s.cvr}%</span>
+                          {s.dropOff > 0 && <span className="text-red-400">Drop-off {s.dropOff}%</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </NelvyonDsCard>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

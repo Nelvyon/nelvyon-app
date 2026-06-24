@@ -99,6 +99,82 @@ describe("SaasWebBuilderService.delete", () => {
   });
 });
 
+describe("SaasWebBuilderService.renderHtml", () => {
+  function makePage(sections: unknown[]) {
+    const svc = new SaasWebBuilderService(makeDb() as never);
+    return svc.renderHtml({
+      id: "p1", tenantId: "t1", title: "Test Page", slug: "test",
+      type: "landing", status: "published", sections: sections as never,
+      views: 0, publishedAt: null, customDomain: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    });
+  }
+
+  it("renders <!DOCTYPE html> wrapper", () => {
+    const html = makePage([]);
+    expect(html).toContain("<!DOCTYPE html>");
+    expect(html).toContain("<title>Test Page</title>");
+  });
+
+  it("renders hero section with headline and CTA", () => {
+    const html = makePage([{
+      id: "h1", type: "hero",
+      content: { headline: "Bienvenido", subtitle: "Subtitulo", ctaLabel: "Empezar", ctaUrl: "/start" },
+    }]);
+    expect(html).toContain("Bienvenido");
+    expect(html).toContain("Subtitulo");
+    expect(html).toContain("Empezar");
+    expect(html).toContain("/start");
+  });
+
+  it("renders text section", () => {
+    const html = makePage([{
+      id: "t1", type: "text",
+      content: { heading: "¿Quiénes somos?", body: "Somos una agencia." },
+    }]);
+    expect(html).toContain("¿Quiénes somos?");
+    expect(html).toContain("Somos una agencia.");
+  });
+
+  it("renders features section with items", () => {
+    const html = makePage([{
+      id: "f1", type: "features",
+      content: { heading: "Ventajas", items: [{ icon: "✅", title: "Rápido", desc: "Muy rápido" }] },
+    }]);
+    expect(html).toContain("Ventajas");
+    expect(html).toContain("Rápido");
+    expect(html).toContain("Muy rápido");
+  });
+
+  it("escapes HTML special characters", () => {
+    const html = makePage([{
+      id: "x1", type: "text",
+      content: { heading: "<script>alert(1)</script>", body: "" },
+    }]);
+    expect(html).not.toContain("<script>alert(1)</script>");
+    expect(html).toContain("&lt;script&gt;");
+  });
+});
+
+describe("SaasWebBuilderService customDomain", () => {
+  it("stores customDomain on create and returns it", async () => {
+    const rowWithDomain = { ...pageRow, custom_domain: "landing.example.com" };
+    const db = { query: vi.fn().mockResolvedValue([rowWithDomain]) };
+    const svc = new SaasWebBuilderService(db as never);
+    const page = await svc.create("t1", { title: "X", customDomain: "landing.example.com" });
+    expect(page.customDomain).toBe("landing.example.com");
+    const call = db.query.mock.calls[0];
+    expect(call[1]).toContain("landing.example.com");
+  });
+
+  it("returns null customDomain when not set", async () => {
+    const db = { query: vi.fn().mockResolvedValue([{ ...pageRow, custom_domain: null }]) };
+    const svc = new SaasWebBuilderService(db as never);
+    const page = await svc.create("t1", { title: "X" });
+    expect(page.customDomain).toBeNull();
+  });
+});
+
 describe("SaasWebBuilderError", () => {
   it("is instanceof Error with code", () => {
     const e = new SaasWebBuilderError("msg", "TEST");

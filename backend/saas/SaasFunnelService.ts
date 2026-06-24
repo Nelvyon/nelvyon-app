@@ -238,6 +238,47 @@ export class SaasFunnelService {
       [rows[0].funnel_id],
     );
   }
+
+  /** Increment visitor count for a step (called when someone enters the step). */
+  async trackVisitor(tenantId: string, stepId: string): Promise<void> {
+    const rows = await this.db.query<{ id: string }>(
+      `UPDATE saas_funnel_steps SET visitors=visitors+1, updated_at=NOW()
+       WHERE id=$1 AND tenant_id=$2 RETURNING id`,
+      [stepId, tenantId],
+    );
+    if (!rows[0]) throw new SaasFunnelError("Step not found", "NOT_FOUND");
+  }
+
+  /** Increment conversion count for a step (called when someone completes the step CTA). */
+  async trackConversion(tenantId: string, stepId: string): Promise<void> {
+    const rows = await this.db.query<{ id: string }>(
+      `UPDATE saas_funnel_steps SET conversions=conversions+1, updated_at=NOW()
+       WHERE id=$1 AND tenant_id=$2 RETURNING id`,
+      [stepId, tenantId],
+    );
+    if (!rows[0]) throw new SaasFunnelError("Step not found", "NOT_FOUND");
+  }
+
+  /** Get analytics for a specific funnel: steps with CVR and drop-off. */
+  async getAnalytics(tenantId: string, funnelId: string): Promise<{
+    funnelId: string; totalVisitors: number; totalConversions: number; overallCvr: number;
+    steps: Array<{ id: string; name: string; type: string; stepOrder: number; visitors: number; conversions: number; cvr: number; dropOff: number }>;
+  }> {
+    const funnel = await this.get(tenantId, funnelId);
+    if (!funnel) throw new SaasFunnelError("Funnel not found", "NOT_FOUND");
+    const steps = funnel.steps.map((s, i) => {
+      const nextVisitors = funnel.steps[i + 1]?.visitors ?? 0;
+      const cvr = s.visitors > 0 ? Math.round((s.conversions / s.visitors) * 1000) / 10 : 0;
+      const dropOff = s.visitors > 0 && i < funnel.steps.length - 1
+        ? Math.round(((s.visitors - nextVisitors) / s.visitors) * 1000) / 10
+        : 0;
+      return { id: s.id, name: s.name, type: s.type, stepOrder: s.stepOrder, visitors: s.visitors, conversions: s.conversions, cvr, dropOff };
+    });
+    const overallCvr = funnel.totalVisitors > 0
+      ? Math.round((funnel.totalConversions / funnel.totalVisitors) * 1000) / 10
+      : 0;
+    return { funnelId, totalVisitors: funnel.totalVisitors, totalConversions: funnel.totalConversions, overallCvr, steps };
+  }
 }
 
 let _instance: SaasFunnelService | null = null;

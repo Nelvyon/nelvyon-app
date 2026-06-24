@@ -126,6 +126,73 @@ describe("SaasFunnelService.addStep", () => {
   });
 });
 
+describe("SaasFunnelService.trackVisitor + trackConversion", () => {
+  it("calls UPDATE with visitors+1 on trackVisitor", async () => {
+    const db = { query: vi.fn().mockResolvedValue([{ id: "s1" }]) };
+    const svc = new SaasFunnelService(db as never);
+    await svc.trackVisitor("t1", "s1");
+    expect(db.query).toHaveBeenCalledWith(
+      expect.stringContaining("visitors=visitors+1"),
+      ["s1", "t1"],
+    );
+  });
+
+  it("throws NOT_FOUND when step missing on trackVisitor", async () => {
+    const db = { query: vi.fn().mockResolvedValue([]) };
+    const svc = new SaasFunnelService(db as never);
+    await expect(svc.trackVisitor("t1", "missing"))
+      .rejects.toThrow(expect.objectContaining({ code: "NOT_FOUND" }));
+  });
+
+  it("calls UPDATE with conversions+1 on trackConversion", async () => {
+    const db = { query: vi.fn().mockResolvedValue([{ id: "s1" }]) };
+    const svc = new SaasFunnelService(db as never);
+    await svc.trackConversion("t1", "s1");
+    expect(db.query).toHaveBeenCalledWith(
+      expect.stringContaining("conversions=conversions+1"),
+      ["s1", "t1"],
+    );
+  });
+});
+
+describe("SaasFunnelService.getAnalytics", () => {
+  it("throws NOT_FOUND for missing funnel", async () => {
+    const db = makeDb([], []);
+    const svc = new SaasFunnelService(db as never);
+    await expect(svc.getAnalytics("t1", "bad"))
+      .rejects.toThrow(expect.objectContaining({ code: "NOT_FOUND" }));
+  });
+
+  it("returns analytics with CVR and dropOff", async () => {
+    const steps = [
+      { ...stepRow, id: "s1", step_order: 0, visitors: 100, conversions: 60 },
+      { ...stepRow, id: "s2", step_order: 1, visitors: 60, conversions: 20 },
+    ];
+    const db = makeDb([funnelRow], steps);
+    const svc = new SaasFunnelService(db as never);
+    const result = await svc.getAnalytics("t1", "f1");
+    expect(result.funnelId).toBe("f1");
+    expect(result.totalVisitors).toBe(160); // sum of all step visitors
+    expect(result.steps).toHaveLength(2);
+    // step 0: cvr = 60/100*100 = 60%, dropOff = (100-60)/100*100 = 40%
+    expect(result.steps[0].cvr).toBe(60);
+    expect(result.steps[0].dropOff).toBe(40);
+    // step 1: cvr = 20/60*100 ≈ 33.3%, no next step → dropOff 0
+    expect(result.steps[1].cvr).toBeGreaterThan(33);
+    expect(result.steps[1].dropOff).toBe(0);
+  });
+
+  it("handles zero visitors (no division by zero)", async () => {
+    const steps = [{ ...stepRow, id: "s1", step_order: 0, visitors: 0, conversions: 0 }];
+    const db = makeDb([funnelRow], steps);
+    const svc = new SaasFunnelService(db as never);
+    const result = await svc.getAnalytics("t1", "f1");
+    expect(result.overallCvr).toBe(0);
+    expect(result.steps[0].cvr).toBe(0);
+    expect(result.steps[0].dropOff).toBe(0);
+  });
+});
+
 describe("SaasFunnelError", () => {
   it("is instance of Error", () => {
     const e = new SaasFunnelError("test", "TEST");

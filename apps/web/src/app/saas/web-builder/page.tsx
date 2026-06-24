@@ -7,7 +7,7 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 interface WebPage {
   id: string; title: string; slug: string; type: "landing" | "blog" | "product" | "about" | "contact" | "custom";
-  status: "draft" | "published" | "archived"; views: number; updatedAt: string;
+  status: "draft" | "published" | "archived"; views: number; customDomain: string | null; publishedAt: string | null; updatedAt: string;
 }
 
 const PAGE_TYPES = [
@@ -23,6 +23,7 @@ function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [type, setType] = useState<WebPage["type"]>("landing");
+  const [customDomain, setCustomDomain] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +40,12 @@ function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
       const res = await fetch("/api/saas/web-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), slug: slug || title.toLowerCase().replace(/\s+/g, "-"), type }),
+        body: JSON.stringify({
+          title: title.trim(),
+          slug: slug || title.toLowerCase().replace(/\s+/g, "-"),
+          type,
+          custom_domain: customDomain.trim() || null,
+        }),
       });
       if (!res.ok) throw new Error("Error al crear página");
       onSaved(); onClose();
@@ -67,6 +73,11 @@ function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
             </div>
           </div>
           <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Dominio personalizado (opcional)</label>
+            <input value={customDomain} onChange={e => setCustomDomain(e.target.value)} placeholder="landing.miempresa.com"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          </div>
+          <div>
             <label className="mb-2 block text-xs font-medium text-muted-foreground">Tipo de página</label>
             <div className="grid grid-cols-3 gap-2">
               {PAGE_TYPES.map(pt => (
@@ -89,10 +100,51 @@ function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
   );
 }
 
+function DomainModal({ page, onClose, onSaved }: { page: WebPage; onClose: () => void; onSaved: () => void }) {
+  const [domain, setDomain] = useState(page.customDomain ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await fetch("/api/saas/web-builder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", id: page.id, custom_domain: domain.trim() || null }),
+      });
+      if (!res.ok) throw new Error("Error al actualizar dominio");
+      onSaved(); onClose();
+    } catch (err) { setError(err instanceof Error ? err.message : "Error"); }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">Dominio personalizado</h2>
+        <p className="mb-4 text-sm text-muted-foreground">Apunta tu dominio con un CNAME a <code className="text-primary">pages.nelvyon.com</code></p>
+        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        <form onSubmit={save} className="space-y-4">
+          <input value={domain} onChange={e => setDomain(e.target.value)} placeholder="landing.miempresa.com"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          <div className="flex gap-3">
+            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Guardar"}</NelvyonDsButton>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function SaasWebBuilderPage() {
   const [pages, setPages] = useState<WebPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
+  const [domainPage, setDomainPage] = useState<WebPage | null>(null);
+  const [publishing, setPublishing] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -104,6 +156,31 @@ export default function SaasWebBuilderPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  async function publishPage(pageId: string) {
+    setPublishing(pageId);
+    try {
+      await fetch("/api/saas/web-builder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "publish", id: pageId }),
+      });
+      void load();
+    } finally { setPublishing(null); }
+  }
+
+  async function previewHtml(pageId: string) {
+    const res = await fetch("/api/saas/web-builder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "render", id: pageId }),
+    });
+    if (res.ok) {
+      const html = await res.text();
+      const blob = new Blob([html], { type: "text/html" });
+      window.open(URL.createObjectURL(blob), "_blank");
+    }
+  }
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="web-builder" />}>
@@ -148,15 +225,22 @@ export default function SaasWebBuilderPage() {
                       <div>
                         <p className="font-semibold text-foreground">{p.title}</p>
                         <p className="text-xs text-muted-foreground">/{p.slug}</p>
+                        {p.customDomain && <p className="text-xs text-primary">{p.customDomain}</p>}
                       </div>
                     </div>
                     <NelvyonDsBadge tone={p.status === "published" ? "success" : "primary"}>
                       {p.status === "published" ? "Publicado" : "Borrador"}
                     </NelvyonDsBadge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{p.views.toLocaleString()} visitas</p>
-                  <div className="flex gap-2">
-                    <NelvyonDsButton variant="ghost" className="flex-1">✏️ Editar</NelvyonDsButton>
+                  <p className="text-xs text-muted-foreground">{p.views.toLocaleString()} visitas{p.publishedAt ? ` · publicado ${new Date(p.publishedAt).toLocaleDateString("es-ES")}` : ""}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <NelvyonDsButton variant="ghost" onClick={() => previewHtml(p.id)} className="text-xs px-2 py-1">👁 Preview</NelvyonDsButton>
+                    {p.status === "draft" && (
+                      <NelvyonDsButton variant="ghost" onClick={() => publishPage(p.id)} disabled={publishing === p.id} className="text-xs px-2 py-1">
+                        {publishing === p.id ? "Publicando…" : "🚀 Publicar"}
+                      </NelvyonDsButton>
+                    )}
+                    <NelvyonDsButton variant="ghost" onClick={() => setDomainPage(p)} className="text-xs px-2 py-1">🌐 Dominio</NelvyonDsButton>
                   </div>
                 </NelvyonDsCard>
               );
@@ -165,6 +249,7 @@ export default function SaasWebBuilderPage() {
         )}
       </div>
       {showNew && <NewPageModal onClose={() => setShowNew(false)} onSaved={load} />}
+      {domainPage && <DomainModal page={domainPage} onClose={() => setDomainPage(null)} onSaved={load} />}
     </SaasShellLayout>
   );
 }
