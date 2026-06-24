@@ -20,7 +20,9 @@ interface WaMessage {
 
 interface WaStatus {
   whatsapp_configured: boolean;
+  provider: "meta" | "twilio" | null;
   from_number: string | null;
+  phone_number_id: string | null;
   messages: WaMessage[];
 }
 
@@ -131,10 +133,15 @@ export default function SaasWhatsAppPage() {
           <NelvyonDsCard className="border-yellow-500/30 bg-yellow-500/5 p-4">
             <p className="font-medium text-yellow-400">⚠️ WhatsApp no configurado</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Configura{" "}
-              <code className="rounded bg-muted/50 px-1 text-xs">TWILIO_ACCOUNT_SID</code>,{" "}
-              <code className="rounded bg-muted/50 px-1 text-xs">TWILIO_AUTH_TOKEN</code> y{" "}
-              <code className="rounded bg-muted/50 px-1 text-xs">TWILIO_FROM_WHATSAPP</code> para activar WhatsApp Business.
+              Opción A (Meta Cloud API):{" "}
+              <code className="rounded bg-muted/50 px-1 text-xs">META_WA_PHONE_NUMBER_ID</code> +{" "}
+              <code className="rounded bg-muted/50 px-1 text-xs">META_WA_ACCESS_TOKEN</code>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Opción B (Twilio fallback):{" "}
+              <code className="rounded bg-muted/50 px-1 text-xs">TWILIO_ACCOUNT_SID</code> +{" "}
+              <code className="rounded bg-muted/50 px-1 text-xs">TWILIO_AUTH_TOKEN</code> +{" "}
+              <code className="rounded bg-muted/50 px-1 text-xs">TWILIO_FROM_WHATSAPP</code>
             </p>
           </NelvyonDsCard>
         )}
@@ -142,8 +149,18 @@ export default function SaasWhatsAppPage() {
         {!loading && data?.whatsapp_configured && (
           <NelvyonDsCard className="border-green-500/30 bg-green-500/5 p-4">
             <p className="text-sm text-green-400">
-              ✅ WhatsApp activo — enviando desde{" "}
-              <code className="rounded bg-muted/50 px-1 text-xs">{data.from_number}</code>
+              ✅ WhatsApp activo vía{" "}
+              <span className="font-semibold uppercase">{data.provider ?? "?"}</span>
+              {data.provider === "meta" && data.phone_number_id && (
+                <> — Phone Number ID:{" "}
+                  <code className="rounded bg-muted/50 px-1 text-xs">{data.phone_number_id}</code>
+                </>
+              )}
+              {data.provider === "twilio" && data.from_number && (
+                <> — desde{" "}
+                  <code className="rounded bg-muted/50 px-1 text-xs">{data.from_number}</code>
+                </>
+              )}
             </p>
           </NelvyonDsCard>
         )}

@@ -2,6 +2,7 @@ import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { getSaasSmsService, SaasSmsError } from "./SaasSmsService";
 import { getSaasWhatsAppService, SaasWhatsAppError } from "./SaasWhatsAppService";
+import { getSaasWhatsAppCloudService, SaasWhatsAppCloudError, isMetaWaConfigured } from "./SaasWhatsAppCloudService";
 
 export type InboxChannel = "email" | "sms" | "whatsapp" | "instagram" | "facebook" | "chat";
 export type ConversationStatus = "open" | "closed" | "spam";
@@ -244,14 +245,19 @@ export class SaasInboxService {
         channelError = "Contact has no phone number — message stored but WhatsApp not sent";
       } else {
         try {
-          await getSaasWhatsAppService().send(tenantId, {
-            to: contactPhone,
-            body: body.trim(),
-            contactId: conv.contactId ?? undefined,
-          });
+          if (isMetaWaConfigured()) {
+            await getSaasWhatsAppCloudService().send(tenantId, {
+              to: contactPhone, body: body.trim(), contactId: conv.contactId ?? undefined,
+            });
+          } else {
+            await getSaasWhatsAppService().send(tenantId, {
+              to: contactPhone, body: body.trim(), contactId: conv.contactId ?? undefined,
+            });
+          }
           channelDispatched = true;
         } catch (e) {
-          channelError = e instanceof SaasWhatsAppError ? e.message : "WhatsApp dispatch failed";
+          channelError = (e instanceof SaasWhatsAppCloudError || e instanceof SaasWhatsAppError)
+            ? e.message : "WhatsApp dispatch failed";
         }
       }
     } else {

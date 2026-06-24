@@ -4,6 +4,7 @@ import { DbClient } from "../db/DbClient";
 import { getSesClient } from "../email/sesClient";
 import { getSaasSmsService } from "./SaasSmsService";
 import { getSaasWhatsAppService } from "./SaasWhatsAppService";
+import { getSaasWhatsAppCloudService, isMetaWaConfigured } from "./SaasWhatsAppCloudService";
 import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact, type ActivityType } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
@@ -603,8 +604,13 @@ export class SaasWorkflowService {
               })()
             : action.config.to;
           try {
-            const result = await getSaasWhatsAppService().send(tenantId, { to: toResolved, body: action.config.body });
-            stepsExecuted.push({ action: action.type, ok: result.status === "sent", to: toResolved, sid: result.twilioSid });
+            if (isMetaWaConfigured()) {
+              const result = await getSaasWhatsAppCloudService().send(tenantId, { to: toResolved, body: action.config.body });
+              stepsExecuted.push({ action: action.type, ok: result.status === "sent", to: toResolved, sid: result.metaWamid, provider: "meta" });
+            } else {
+              const result = await getSaasWhatsAppService().send(tenantId, { to: toResolved, body: action.config.body });
+              stepsExecuted.push({ action: action.type, ok: result.status === "sent", to: toResolved, sid: result.twilioSid, provider: "twilio" });
+            }
           } catch (e) {
             stepsExecuted.push({ action: action.type, ok: false, error: e instanceof Error ? e.message : String(e) });
           }

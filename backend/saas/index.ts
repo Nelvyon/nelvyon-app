@@ -607,6 +607,18 @@ export {
   type WhatsAppConfig,
 } from "./SaasWhatsAppService";
 export {
+  SaasWhatsAppCloudService,
+  getSaasWhatsAppCloudService,
+  resetSaasWhatsAppCloudServiceForTests,
+  SaasWhatsAppCloudError,
+  isMetaWaConfigured,
+  getMetaVerifyToken,
+  type CloudWaConfig,
+  type CloudWaSendInput,
+  type CloudWaMessage,
+  type InboundWaMessage,
+} from "./SaasWhatsAppCloudService";
+export {
   SaasFunnelService,
   getSaasFunnelService,
   resetSaasFunnelServiceForTests,
