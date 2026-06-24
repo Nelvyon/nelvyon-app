@@ -48,7 +48,7 @@ test("Catálogo de service packs — 5 nuevos packs tienen slugs válidos", asyn
   for (const id of newPacks) {
     const found = packs.find((p) => p.id === id);
     if (found) {
-      expect(["available", "coming_soon"]).toContain(found.availability);
+      expect(["available", "beta", "coming_soon"]).toContain(found.availability);
     }
   }
 });

@@ -1,4 +1,4 @@
-export {
+﻿export {
   SaasOnboardingService,
   SaasOnboardingError,
   assertSaasPlan,
@@ -593,3 +593,38 @@ export {
   type CreateQrInput,
   type SurveyStats,
 } from "./SaasSurveysService";
+export {
+  SaasWhatsAppService,
+  getSaasWhatsAppService,
+  resetSaasWhatsAppServiceForTests,
+  SaasWhatsAppError,
+  type WhatsAppSendInput,
+  type WhatsAppMessage,
+  type WhatsAppConfig,
+} from "./SaasWhatsAppService";
+export {
+  SaasFunnelService,
+  getSaasFunnelService,
+  resetSaasFunnelServiceForTests,
+  SaasFunnelError,
+  type Funnel,
+  type FunnelStep,
+  type FunnelStatus,
+  type FunnelStepType,
+  type CreateFunnelInput,
+  type UpdateFunnelInput,
+  type CreateFunnelStepInput,
+  type UpdateFunnelStepInput,
+} from "./SaasFunnelService";
+export {
+  SaasWebBuilderService,
+  getSaasWebBuilderService,
+  resetSaasWebBuilderServiceForTests,
+  SaasWebBuilderError,
+  type WebPage,
+  type WebPageType,
+  type WebPageStatus,
+  type PageSection,
+  type CreatePageInput,
+  type UpdatePageInput,
+} from "./SaasWebBuilderService";

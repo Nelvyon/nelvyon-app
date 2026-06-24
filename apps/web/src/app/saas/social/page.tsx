@@ -12,39 +12,38 @@ import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayou
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { EmailEditor } from "@/features/email-editor/EmailEditor";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types (shaped to match /api/saas/social/* responses) ─────────────────────
 
-type Platform = "instagram" | "facebook" | "twitter" | "linkedin" | "tiktok";
-type PostStatus = "draft" | "scheduled" | "published" | "failed";
+type SocialPlatform = string;
+
+interface SocialAccount {
+  id: string;
+  platform: SocialPlatform;
+  accountName: string;
+  isActive: boolean;
+}
 
 interface SocialPost {
   id: string;
-  platform: Platform;
+  platform: SocialPlatform;
   content: string;
-  mediaUrl: string | null;
-  status: PostStatus;
+  status: "draft" | "scheduled" | "published" | "failed";
   scheduledAt: string | null;
   publishedAt: string | null;
-  likes: number;
-  comments: number;
-  shares: number;
-  reach: number;
 }
 
-interface SocialAccount {
-  platform: Platform;
-  username: string;
-  connected: boolean;
-  followers: number;
-}
-
-const PLATFORM_CONFIG: Record<Platform, { label: string; color: string; icon: string }> = {
+const PLATFORM_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
   instagram: { label: "Instagram", color: "bg-pink-500/10 text-pink-400 border-pink-500/20", icon: "📸" },
   facebook: { label: "Facebook", color: "bg-blue-600/10 text-blue-400 border-blue-600/20", icon: "👤" },
   twitter: { label: "X (Twitter)", color: "bg-sky-500/10 text-sky-400 border-sky-500/20", icon: "🐦" },
   linkedin: { label: "LinkedIn", color: "bg-blue-700/10 text-blue-300 border-blue-700/20", icon: "💼" },
   tiktok: { label: "TikTok", color: "bg-purple-500/10 text-purple-400 border-purple-500/20", icon: "🎵" },
+  meta: { label: "Meta", color: "bg-blue-600/10 text-blue-400 border-blue-600/20", icon: "🌐" },
 };
+
+function getPlatformCfg(platform: string) {
+  return PLATFORM_CONFIG[platform] ?? { label: platform, color: "border-border text-muted-foreground", icon: "📱" };
+}
 
 const STATUS_TONE = {
   draft: "primary",
@@ -63,7 +62,7 @@ const STATUS_LABELS = {
 // ─── New post modal ───────────────────────────────────────────────────────────
 
 function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[]; onClose: () => void; onSaved: () => void }) {
-  const [platforms, setPlatforms] = useState<Platform[]>([]);
+  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const [content, setContent] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
   const [scheduleAt, setScheduleAt] = useState("");
@@ -71,34 +70,34 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
   const [error, setError] = useState<string | null>(null);
   const [useRichEditor, setUseRichEditor] = useState(false);
 
-  const connectedAccounts = accounts.filter((a) => a.connected);
+  const connectedAccounts = accounts.filter((a) => a.isActive);
 
-  function togglePlatform(p: Platform) {
-    setPlatforms((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
+  function toggleAccount(id: string) {
+    setSelectedAccountIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
   }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (platforms.length === 0) { setError("Selecciona al menos una red social"); return; }
+    if (selectedAccountIds.length === 0) { setError("Selecciona al menos una cuenta"); return; }
     if (!content.trim()) { setError("El contenido es obligatorio"); return; }
     setSaving(true);
     setError(null);
     try {
-      const payload = {
-        platforms,
-        content: content.trim(),
-        mediaUrl: mediaUrl.trim() || null,
-        scheduledAt: scheduleAt ? new Date(scheduleAt).toISOString() : null,
-      };
-      const res = await fetch("/api/v1/social/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const j = (await res.json().catch(() => ({}))) as { detail?: string };
-        throw new Error(j.detail ?? "Error al publicar");
-      }
+      const scheduledAt = scheduleAt ? new Date(scheduleAt).toISOString() : undefined;
+      const mediaUrls = mediaUrl.trim() ? [mediaUrl.trim()] : undefined;
+      // One POST per selected account
+      await Promise.all(selectedAccountIds.map((social_account_id) =>
+        fetch("/api/saas/social/posts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ social_account_id, content: content.trim(), media_urls: mediaUrls, scheduled_at: scheduledAt }),
+        }).then(async (r) => {
+          if (!r.ok) {
+            const j = (await r.json().catch(() => ({}))) as { error?: string };
+            throw new Error(j.error ?? "Error al publicar");
+          }
+        }),
+      ));
       onSaved();
       onClose();
     } catch (err) {
@@ -118,26 +117,26 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
         <form onSubmit={submit} className="space-y-5 p-6">
           {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
 
-          {/* Platform selector */}
+          {/* Account selector */}
           <div>
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">Redes sociales *</label>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Cuentas *</label>
             <div className="flex flex-wrap gap-2">
               {connectedAccounts.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No hay cuentas conectadas. Ve a Configuración → Redes Sociales.</p>
               ) : connectedAccounts.map((a) => {
-                const cfg = PLATFORM_CONFIG[a.platform];
-                const sel = platforms.includes(a.platform);
+                const cfg = getPlatformCfg(a.platform);
+                const sel = selectedAccountIds.includes(a.id);
                 return (
                   <button
-                    key={a.platform}
+                    key={a.id}
                     type="button"
-                    onClick={() => togglePlatform(a.platform)}
+                    onClick={() => toggleAccount(a.id)}
                     className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-all ${
                       sel ? cfg.color + " ring-2 ring-primary/40" : "border-border text-muted-foreground hover:border-primary/40"
                     }`}
                   >
                     {cfg.icon} {cfg.label}
-                    <span className="text-xs opacity-60">@{a.username}</span>
+                    <span className="text-xs opacity-60">{a.accountName}</span>
                   </button>
                 );
               })}
@@ -208,14 +207,14 @@ export default function SaasSocialPage() {
   const [accounts, setAccounts] = useState<SocialAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
-  const [filterPlatform, setFilterPlatform] = useState<Platform | "all">("all");
+  const [filterStatus, setFilterStatus] = useState<SocialPost["status"] | "all">("all");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const [postsRes, accountsRes] = await Promise.allSettled([
-        fetch("/api/v1/social/posts?limit=50"),
-        fetch("/api/v1/social/accounts"),
+        fetch("/api/saas/social/posts?limit=50"),
+        fetch("/api/saas/social/accounts"),
       ]);
 
       if (postsRes.status === "fulfilled" && postsRes.value.ok) {
@@ -233,18 +232,17 @@ export default function SaasSocialPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  const PLATFORMS: Platform[] = ["instagram", "facebook", "twitter", "linkedin", "tiktok"];
-  const filtered = filterPlatform === "all" ? posts : posts.filter((p) => p.platform === filterPlatform);
+  const filtered = filterStatus === "all" ? posts : posts.filter((p) => p.status === filterStatus);
 
   const stats = {
     total: posts.length,
     published: posts.filter((p) => p.status === "published").length,
     scheduled: posts.filter((p) => p.status === "scheduled").length,
-    totalReach: posts.reduce((s, p) => s + p.reach, 0),
+    connected: accounts.filter((a) => a.isActive).length,
   };
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="campanias" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="social" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
@@ -258,12 +256,12 @@ export default function SaasSocialPage() {
         {accounts.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {accounts.map((a) => {
-              const cfg = PLATFORM_CONFIG[a.platform];
+              const cfg = getPlatformCfg(a.platform);
               return (
-                <div key={a.platform} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${a.connected ? cfg.color : "border-border text-muted-foreground"}`}>
+                <div key={a.id} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${a.isActive ? cfg.color : "border-border text-muted-foreground"}`}>
                   {cfg.icon}
-                  <span className="font-medium">@{a.username}</span>
-                  <span className="text-xs opacity-70">{a.connected ? `${a.followers.toLocaleString("es-ES")} seg.` : "Desconectado"}</span>
+                  <span className="font-medium">{a.accountName}</span>
+                  <span className="text-xs opacity-70">{a.isActive ? "Conectado" : "Desconectado"}</span>
                 </div>
               );
             })}
@@ -276,7 +274,7 @@ export default function SaasSocialPage() {
             { label: "Posts totales", value: stats.total },
             { label: "Publicados", value: stats.published },
             { label: "Programados", value: stats.scheduled },
-            { label: "Alcance total", value: stats.totalReach.toLocaleString("es-ES") },
+            { label: "Cuentas activas", value: stats.connected },
           ].map(({ label, value }) => (
             <NelvyonDsCard key={label} className="p-4">
               <p className="text-xs text-muted-foreground">{label}</p>
@@ -285,21 +283,15 @@ export default function SaasSocialPage() {
           ))}
         </div>
 
-        {/* Platform filters */}
+        {/* Status filters */}
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setFilterPlatform("all")}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${filterPlatform === "all" ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"}`}
-          >
-            Todas
-          </button>
-          {PLATFORMS.map((p) => (
+          {(["all", "draft", "scheduled", "published", "failed"] as const).map((s) => (
             <button
-              key={p}
-              onClick={() => setFilterPlatform(p)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${filterPlatform === p ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"}`}
+              key={s}
+              onClick={() => setFilterStatus(s)}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${filterStatus === s ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"}`}
             >
-              {PLATFORM_CONFIG[p].icon} {PLATFORM_CONFIG[p].label}
+              {s === "all" ? "Todos" : STATUS_LABELS[s]}
             </button>
           ))}
         </div>
@@ -319,7 +311,7 @@ export default function SaasSocialPage() {
         ) : (
           <div className="flex flex-col gap-3">
             {filtered.map((p) => {
-              const cfg = PLATFORM_CONFIG[p.platform];
+              const cfg = getPlatformCfg(p.platform);
               return (
                 <NelvyonDsCard key={p.id} className="p-4">
                   <div className="flex items-start gap-4">
@@ -335,14 +327,6 @@ export default function SaasSocialPage() {
                         )}
                       </div>
                       <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.content.replace(/<[^>]+>/g, "")}</p>
-                      {p.status === "published" && (
-                        <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
-                          <span>❤️ {p.likes}</span>
-                          <span>💬 {p.comments}</span>
-                          <span>🔁 {p.shares}</span>
-                          <span>👁 {p.reach.toLocaleString("es-ES")}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </NelvyonDsCard>

@@ -1,4 +1,6 @@
+import { SendEmailCommand } from "@aws-sdk/client-ses";
 import { DbClient } from "../db/DbClient";
+import { getSesClient } from "../email/sesClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type CalendarEventType = "appointment" | "campaign" | "task" | "deadline" | "reminder";
@@ -34,6 +36,10 @@ export interface CreateCalendarEventInput {
   campaignId?: string | null;
   assignedTo?: string | null;
   notes?: string | null;
+  // Optional fields for booking confirm email (only used when type="appointment")
+  contactEmail?: string | null;
+  contactName?: string | null;
+  companyName?: string | null;
 }
 
 export class SaasCalendarError extends Error {
@@ -111,7 +117,48 @@ export class SaasCalendarService {
        input.dealId ?? null, input.campaignId ?? null, input.assignedTo ?? null, input.notes ?? null],
     );
     if (!rows[0]) throw new SaasCalendarError("Failed to create event", "VALIDATION");
-    return rowToEvent(rows[0]);
+    const event = rowToEvent(rows[0]);
+
+    // Fire-and-forget booking confirmation email
+    if (input.type === "appointment" && input.contactEmail) {
+      void this._sendBookingConfirm(input.contactEmail, input.contactName ?? "Cliente", {
+        title: event.title,
+        eventDate: event.eventDate,
+        eventTime: event.eventTime,
+        durationMinutes: event.durationMinutes,
+        companyName: input.companyName,
+      });
+    }
+
+    return event;
+  }
+
+  private async _sendBookingConfirm(
+    to: string,
+    name: string,
+    opts: { title: string; eventDate: string; eventTime: string | null; durationMinutes: number | null; companyName?: string | null },
+  ): Promise<void> {
+    const sesFrom = process.env.SES_FROM_EMAIL?.trim();
+    if (!sesFrom) return;
+    try {
+      const client = getSesClient();
+      if (!client) return;
+      const dateLabel = `${opts.eventDate}${opts.eventTime ? " " + opts.eventTime : ""}`;
+      const durLabel = opts.durationMinutes ? ` (${opts.durationMinutes} min)` : "";
+      const subject = `Confirmación de cita: ${opts.title}`;
+      const html = `<p>Hola ${name},</p>
+<p>Tu cita <strong>${opts.title}</strong> ha sido confirmada para el <strong>${dateLabel}</strong>${durLabel}.</p>
+${opts.companyName ? `<p>Nuestro equipo de <strong>${opts.companyName}</strong> estará contigo puntualmente.</p>` : ""}
+<p>Si necesitas cambiar la cita, responde a este email.</p>`;
+      await client.send(new SendEmailCommand({
+        Source: sesFrom,
+        Destination: { ToAddresses: [to] },
+        Message: {
+          Subject: { Data: subject, Charset: "UTF-8" },
+          Body: { Html: { Data: html, Charset: "UTF-8" } },
+        },
+      }));
+    } catch { /* non-fatal */ }
   }
 
   async update(tenantId: string, id: string, input: Partial<CreateCalendarEventInput & { completed: boolean }>): Promise<SaasCalendarEvent> {

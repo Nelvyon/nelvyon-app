@@ -69,8 +69,10 @@ Ejecutar **en orden numérico** en Railway Postgres antes del primer deploy (o c
 | `422_utm_links.sql` | UTM Links | ✅ en main |
 | `423_dragdrop_tenant.sql` | Drag-drop tenant config | ✅ en main |
 | `424_whitelabel_stripe_subcuentas.sql` | Stripe Connect + Subcuentas | ✅ en main |
+| `425_saas_funnels.sql` | Funnels multi-step | ✅ en main |
+| `426_saas_web_pages.sql` | Web Builder páginas | ✅ en main |
 
-> Todas las migraciones 400–424 están comiteadas en main.  
+> Todas las migraciones 400–426 están comiteadas en main.  
 > Ejecutar: `pnpm -C apps/web migrate` (aplica todas en orden numérico).
 
 ### Cron jobs requeridos en producción
@@ -139,6 +141,17 @@ En Railway → proyecto → tu servicio → **Variables**, añadir todas estas:
 | `STRIPE_PRICE_ID_PRO` | `price_...` |
 | `STRIPE_PRICE_ID_AGENCY` | `price_...` |
 
+#### SMS + WhatsApp (Twilio)
+
+| Variable | Valor |
+|---|---|
+| `TWILIO_ACCOUNT_SID` | `AC...` — cuenta Twilio |
+| `TWILIO_AUTH_TOKEN` | Token secreto de Twilio |
+| `TWILIO_FROM_NUMBER` | Número SMS E.164: `+34911234567` |
+| `TWILIO_FROM_WHATSAPP` | Número WhatsApp E.164: `+14155238886` (sandbox) o tu número aprobado |
+
+> Sin estas variables, SMS y WhatsApp muestran banner de configuración (no crash).
+
 #### Opcionales (AI/Voice)
 
 | Variable | Cuándo |
@@ -160,7 +173,7 @@ psql $DATABASE_URL -f backend/db/migrations/001_init.sql
 psql $DATABASE_URL -f backend/db/migrations/400_nelvyon_pack_runs.sql
 ```
 
-Todas las migraciones 001–424 están en main. Ejecutar `pnpm -C apps/web migrate` aplica el set completo en orden.
+Todas las migraciones 001–426 están en main. Ejecutar `pnpm -C apps/web migrate` aplica el set completo en orden.
 
 Alternativa — script automatizado:
 ```bash

@@ -7,7 +7,7 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 interface WebPage {
   id: string; title: string; slug: string; type: "landing" | "blog" | "product" | "about" | "contact" | "custom";
-  status: "draft" | "published"; visits: number; lastEdited: string; publishedUrl: string | null;
+  status: "draft" | "published" | "archived"; views: number; updatedAt: string;
 }
 
 const PAGE_TYPES = [
@@ -36,7 +36,7 @@ function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
     if (!title.trim()) { setError("El título es obligatorio"); return; }
     setSaving(true);
     try {
-      const res = await fetch("/api/v1/website_pages/pages", {
+      const res = await fetch("/api/saas/web-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: title.trim(), slug: slug || title.toLowerCase().replace(/\s+/g, "-"), type }),
@@ -97,7 +97,7 @@ export default function SaasWebBuilderPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/website_pages/pages");
+      const res = await fetch("/api/saas/web-builder");
       const data = (await res.json().catch(() => ({ pages: [] }))) as { pages: WebPage[] };
       setPages(data.pages ?? []);
     } finally { setLoading(false); }
@@ -106,7 +106,7 @@ export default function SaasWebBuilderPage() {
   useEffect(() => { void load(); }, [load]);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="workflows" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="web-builder" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Web Builder" subtitle="Crea y publica páginas web sin código, directamente desde Nelvyon" />
@@ -118,7 +118,7 @@ export default function SaasWebBuilderPage() {
             { label: "Páginas", value: pages.length },
             { label: "Publicadas", value: pages.filter(p => p.status === "published").length },
             { label: "Borradores", value: pages.filter(p => p.status === "draft").length },
-            { label: "Visitas totales", value: pages.reduce((s, p) => s + p.visits, 0).toLocaleString() },
+            { label: "Visitas totales", value: pages.reduce((s, p) => s + p.views, 0).toLocaleString() },
           ].map(({ label, value }) => (
             <NelvyonDsCard key={label} className="p-4">
               <p className="text-xs text-muted-foreground">{label}</p>
@@ -154,14 +154,9 @@ export default function SaasWebBuilderPage() {
                       {p.status === "published" ? "Publicado" : "Borrador"}
                     </NelvyonDsBadge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{p.visits.toLocaleString()} visitas</p>
+                  <p className="text-xs text-muted-foreground">{p.views.toLocaleString()} visitas</p>
                   <div className="flex gap-2">
                     <NelvyonDsButton variant="ghost" className="flex-1">✏️ Editar</NelvyonDsButton>
-                    {p.status === "published" && p.publishedUrl && (
-                      <a href={p.publishedUrl} target="_blank" rel="noopener noreferrer">
-                        <NelvyonDsButton variant="ghost">🔗 Ver</NelvyonDsButton>
-                      </a>
-                    )}
                   </div>
                 </NelvyonDsCard>
               );

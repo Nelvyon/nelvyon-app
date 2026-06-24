@@ -39,7 +39,10 @@ export type SaasNavId =
   | "team"
   | "white-label"
   | "webhooks"
-  | "api-keys";
+  | "api-keys"
+  | "whatsapp"
+  | "funnels"
+  | "web-builder";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -61,6 +64,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "campanias", label: "Email Campañas", href: "/saas/campanias", group: "comunicacion" },
   { id: "sms", label: "SMS Marketing", href: "/saas/sms", group: "comunicacion" },
   { id: "social", label: "Redes Sociales", href: "/saas/social", group: "comunicacion" },
+  { id: "whatsapp", label: "💬 WhatsApp", href: "/saas/whatsapp", group: "comunicacion" },
   // Captación
   { id: "publicidad", label: "Publicidad Digital", href: "/saas/publicidad", group: "captacion" },
   { id: "seo", label: "SEO", href: "/saas/seo", group: "captacion" },
@@ -80,6 +84,8 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "qr", label: "Códigos QR", href: "/saas/qr", group: "gestion" },
   { id: "ab-testing", label: "A/B Testing", href: "/saas/ab-testing", group: "gestion" },
   // IA & Automatización
+  { id: "funnels", label: "🚀 Funnels", href: "/saas/funnels", group: "captacion" },
+  { id: "web-builder", label: "🌐 Web Builder", href: "/saas/web-builder", group: "captacion" },
   { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes", group: "ia" },
   { id: "chat", label: "💬 Asistente IA", href: "/saas/chat", group: "ia" },
   { id: "copywriter", label: "✍️ Copywriter IA", href: "/saas/copywriter", group: "ia" },

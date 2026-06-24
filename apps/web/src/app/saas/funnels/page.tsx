@@ -46,10 +46,14 @@ function NewFunnelModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
     if (!name.trim()) { setError("El nombre es obligatorio"); return; }
     setSaving(true);
     try {
-      const res = await fetch("/api/v1/funnel_builder/funnels", {
+      const res = await fetch("/api/saas/funnels", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), description: desc.trim() || null, steps }),
+        body: JSON.stringify({
+          name: name.trim(),
+          description: desc.trim() || null,
+          steps: steps.map(s => ({ type: s.type, name: s.name })),
+        }),
       });
       if (!res.ok) throw new Error("Error al crear funnel");
       onSaved(); onClose();
@@ -122,7 +126,7 @@ export default function SaasFunnelsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/funnel_builder/funnels");
+      const res = await fetch("/api/saas/funnels");
       const data = (await res.json().catch(() => ({ funnels: [] }))) as { funnels: Funnel[] };
       setFunnels(data.funnels ?? []);
     } finally { setLoading(false); }
@@ -136,7 +140,7 @@ export default function SaasFunnelsPage() {
     : 0;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="workflows" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="funnels" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Funnel Builder" subtitle="Crea embudos de conversión multipaso que venden solos" />
