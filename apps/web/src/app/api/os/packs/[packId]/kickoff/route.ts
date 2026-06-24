@@ -13,11 +13,23 @@ import {
   runSaasB2bGrowthPack,
   validateSaasB2bGrowthIntake,
 } from "@/lib/packs/saasB2bGrowthPack";
+import {
+  runSocialCalendarPack, validateSocialCalendarIntake,
+  runContentStrategyPack, validateContentStrategyIntake,
+  runCroAuditPack, validateCroAuditIntake,
+  runAnalyticsSetupPack, validateAnalyticsSetupIntake,
+  runBrandVoicePack, validateBrandVoiceIntake,
+} from "@/lib/packs/betaPacksRunners";
 import type { PackRunRecord } from "@/lib/packs/types";
 import {
   ECOMMERCE_GROWTH_PACK_ID,
   LOCAL_GROWTH_PACK_ID,
   SAAS_B2B_GROWTH_PACK_ID,
+  SOCIAL_CALENDAR_PACK_ID,
+  CONTENT_STRATEGY_PACK_ID,
+  CRO_AUDIT_PACK_ID,
+  ANALYTICS_SETUP_PACK_ID,
+  BRAND_VOICE_PACK_ID,
 } from "@/lib/packs/types";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
 import { platformDbFallbackEnabled } from "@/lib/platformDbFallback";
@@ -52,6 +64,26 @@ const RUNNERS: Record<string, { validate: (body: unknown) => unknown; run: PackR
     validate: validateSaasB2bGrowthIntake,
     run: runSaasB2bGrowthPack as PackRunner,
   },
+  [SOCIAL_CALENDAR_PACK_ID]: {
+    validate: validateSocialCalendarIntake,
+    run: runSocialCalendarPack as PackRunner,
+  },
+  [CONTENT_STRATEGY_PACK_ID]: {
+    validate: validateContentStrategyIntake,
+    run: runContentStrategyPack as PackRunner,
+  },
+  [CRO_AUDIT_PACK_ID]: {
+    validate: validateCroAuditIntake,
+    run: runCroAuditPack as PackRunner,
+  },
+  [ANALYTICS_SETUP_PACK_ID]: {
+    validate: validateAnalyticsSetupIntake,
+    run: runAnalyticsSetupPack as PackRunner,
+  },
+  [BRAND_VOICE_PACK_ID]: {
+    validate: validateBrandVoiceIntake,
+    run: runBrandVoicePack as PackRunner,
+  },
 };
 
 export async function POST(
@@ -61,26 +93,6 @@ export async function POST(
   const { packId } = await ctx.params;
   const meta = getPackMeta(packId);
   const runner = RUNNERS[packId];
-
-  // Beta packs are visible but don't have a runner yet — return explicit 422 (not 404)
-  const BETA_PACKS = new Set([
-    "social-calendar-pack",
-    "content-strategy-pack",
-    "cro-audit-pack",
-    "analytics-setup-pack",
-    "brand-voice-pack",
-  ]);
-  if (BETA_PACKS.has(packId)) {
-    return NextResponse.json(
-      {
-        status: "beta",
-        pack_id: packId,
-        message: "Este pack está en beta. Únete a la lista de espera en nelvyon.com/beta para acceso anticipado.",
-        available_at: null,
-      },
-      { status: 422 },
-    );
-  }
 
   if (!meta || !runner) {
     return NextResponse.json({ error: `Pack desconocido: ${packId}` }, { status: 404 });

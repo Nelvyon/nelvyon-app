@@ -2,6 +2,11 @@ import {
   ECOMMERCE_GROWTH_PACK_ID,
   LOCAL_GROWTH_PACK_ID,
   SAAS_B2B_GROWTH_PACK_ID,
+  SOCIAL_CALENDAR_PACK_ID,
+  CONTENT_STRATEGY_PACK_ID,
+  CRO_AUDIT_PACK_ID,
+  ANALYTICS_SETUP_PACK_ID,
+  BRAND_VOICE_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -232,6 +237,46 @@ const FEATURED: Record<PackId, PackElitePreset> = {
       tier: "professional",
     },
     templates: SECTOR_TEMPLATES.saas_b2b,
+  },
+  [SOCIAL_CALENDAR_PACK_ID]: {
+    id: "social-calendar-demo",
+    label: "SocialDemo",
+    sector: "local",
+    tagline: "Social Calendar · 30 días de contenido",
+    intake: { business_name: "SocialDemo", sector: "local", city: "Madrid", country: "ES", value_proposition: "Presencia en redes sin esfuerzo", primary_cta: "Pedir calendario", tier: "professional" },
+    templates: SECTOR_TEMPLATES.restaurant ?? SECTOR_TEMPLATES.saas_b2b,
+  },
+  [CONTENT_STRATEGY_PACK_ID]: {
+    id: "content-strategy-demo",
+    label: "ContentDemo",
+    sector: "local",
+    tagline: "Estrategia de contenido 90 días",
+    intake: { business_name: "ContentDemo", sector: "local", city: "Barcelona", country: "ES", value_proposition: "Contenido que posiciona y convierte", primary_cta: "Empezar estrategia", tier: "professional" },
+    templates: SECTOR_TEMPLATES.restaurant ?? SECTOR_TEMPLATES.saas_b2b,
+  },
+  [CRO_AUDIT_PACK_ID]: {
+    id: "cro-audit-demo",
+    label: "CRODemo",
+    sector: "ecommerce",
+    tagline: "Auditoría CRO + plan A/B",
+    intake: { business_name: "CRODemo", sector: "ecommerce", city: "Valencia", country: "ES", value_proposition: "Más conversiones, misma inversión", primary_cta: "Pedir auditoría", tier: "professional" },
+    templates: SECTOR_TEMPLATES.ecommerce,
+  },
+  [ANALYTICS_SETUP_PACK_ID]: {
+    id: "analytics-setup-demo",
+    label: "AnalyticsDemo",
+    sector: "saas_b2b",
+    tagline: "Setup GA4 + dashboard ejecutivo",
+    intake: { business_name: "AnalyticsDemo", sector: "saas_b2b", city: "Madrid", country: "ES", value_proposition: "Métricas que impactan en decisiones", primary_cta: "Configurar analytics", tier: "professional" },
+    templates: SECTOR_TEMPLATES.saas_b2b,
+  },
+  [BRAND_VOICE_PACK_ID]: {
+    id: "brand-voice-demo",
+    label: "BrandDemo",
+    sector: "local",
+    tagline: "Guía de voz de marca en 48h",
+    intake: { business_name: "BrandDemo", sector: "local", city: "Sevilla", country: "ES", value_proposition: "Una marca que se recuerda y se recomienda", primary_cta: "Definir mi marca", tier: "professional" },
+    templates: SECTOR_TEMPLATES.restaurant ?? SECTOR_TEMPLATES.saas_b2b,
   },
 };
 

@@ -3,11 +3,26 @@
 export const LOCAL_GROWTH_PACK_ID = "local-business-growth" as const;
 export const ECOMMERCE_GROWTH_PACK_ID = "ecommerce-growth" as const;
 export const SAAS_B2B_GROWTH_PACK_ID = "saas-b2b-growth" as const;
+export const SOCIAL_CALENDAR_PACK_ID = "social-calendar-pack" as const;
+export const CONTENT_STRATEGY_PACK_ID = "content-strategy-pack" as const;
+export const CRO_AUDIT_PACK_ID = "cro-audit-pack" as const;
+export const ANALYTICS_SETUP_PACK_ID = "analytics-setup-pack" as const;
+export const BRAND_VOICE_PACK_ID = "brand-voice-pack" as const;
 
 export type PackId =
   | typeof LOCAL_GROWTH_PACK_ID
   | typeof ECOMMERCE_GROWTH_PACK_ID
-  | typeof SAAS_B2B_GROWTH_PACK_ID;
+  | typeof SAAS_B2B_GROWTH_PACK_ID
+  | typeof SOCIAL_CALENDAR_PACK_ID
+  | typeof CONTENT_STRATEGY_PACK_ID
+  | typeof CRO_AUDIT_PACK_ID
+  | typeof ANALYTICS_SETUP_PACK_ID
+  | typeof BRAND_VOICE_PACK_ID;
+
+/** Common intake for the 5 beta packs (minimal fields, sector required) */
+export type BetaPackIntake = GrowthPackIntakeBase & {
+  sector: string;
+};
 
 export type PackRunStatus = "running" | "completed" | "failed" | "needs_review";
 export type PackStepStatus = "pending" | "running" | "done" | "failed" | "skipped";
@@ -138,3 +153,19 @@ export const SAAS_B2B_PACK_STEP_DEFINITIONS = [
 
 /** @deprecated use LOCAL_PACK_STEP_DEFINITIONS */
 export const PACK_STEP_DEFINITIONS = LOCAL_PACK_STEP_DEFINITIONS;
+
+const BETA_BASE_STEPS: { key: string; label: string }[] = [
+  { key: "intake", label: "Brief recibido" },
+  { key: "saas_client", label: "Cliente en panel SaaS" },
+  { key: "saas_campaign", label: "Campaña principal creada" },
+  { key: "os_client", label: "Cliente OS provisionado" },
+  { key: "os_project", label: "Proyecto OS creado" },
+  { key: "sku_landing", label: "Entregable autónomo (NELVYON-LANDING)" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+export const SOCIAL_CALENDAR_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
+export const CONTENT_STRATEGY_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
+export const CRO_AUDIT_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
+export const ANALYTICS_SETUP_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
+export const BRAND_VOICE_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;

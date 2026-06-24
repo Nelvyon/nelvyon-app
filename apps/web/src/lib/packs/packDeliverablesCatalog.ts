@@ -2,6 +2,11 @@ import {
   ECOMMERCE_GROWTH_PACK_ID,
   LOCAL_GROWTH_PACK_ID,
   SAAS_B2B_GROWTH_PACK_ID,
+  SOCIAL_CALENDAR_PACK_ID,
+  CONTENT_STRATEGY_PACK_ID,
+  CRO_AUDIT_PACK_ID,
+  ANALYTICS_SETUP_PACK_ID,
+  BRAND_VOICE_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -102,6 +107,31 @@ const CATALOG: Record<PackId, PackDeliverableItem[]> = {
       description: "Pipeline, demos objetivo y métricas MQL→SQL.",
       portalLabel: "Abrir informe",
     },
+  ],
+  [SOCIAL_CALENDAR_PACK_ID]: [
+    { title: "Calendario 30 días", description: "Publicaciones listas para cada canal social.", portalLabel: "Descargar calendario" },
+    { title: "Informe ejecutivo", description: "Estrategia, KPIs y próximos pasos.", portalLabel: "Abrir informe" },
+  ],
+  [CONTENT_STRATEGY_PACK_ID]: [
+    { title: "Plan editorial 90 días", description: "Temas, keywords y formatos de contenido.", portalLabel: "Descargar plan" },
+    { title: "Guía de mensajes de marca", description: "Value prop, voice y pilares de contenido.", portalLabel: "Ver guía" },
+    { title: "Informe ejecutivo", description: "Roadmap de contenido y métricas objetivo.", portalLabel: "Abrir informe" },
+  ],
+  [CRO_AUDIT_PACK_ID]: [
+    { title: "Auditoría de landing", description: "Análisis de fricción, heat map y quick wins.", portalLabel: "Ver auditoría" },
+    { title: "Plan A/B test 30 días", description: "Hipótesis priorizadas y diseños de variantes.", portalLabel: "Descargar plan" },
+    { title: "Informe ejecutivo", description: "Oportunidades de conversión y ROI estimado.", portalLabel: "Abrir informe" },
+  ],
+  [ANALYTICS_SETUP_PACK_ID]: [
+    { title: "Setup GA4 + Search Console", description: "Configuración completa con eventos clave.", portalLabel: "Ver checklist" },
+    { title: "Dashboard ejecutivo", description: "Plantilla de métricas en Google Looker Studio.", portalLabel: "Abrir dashboard" },
+    { title: "Informe ejecutivo", description: "KPIs actuales y baseline para decisiones.", portalLabel: "Abrir informe" },
+  ],
+  [BRAND_VOICE_PACK_ID]: [
+    { title: "Guía de voz de marca", description: "Tono, estilo y ejemplos correctos vs incorrectos.", portalLabel: "Ver guía" },
+    { title: "3 propuestas de valor", description: "Para segmentos de cliente diferenciados.", portalLabel: "Descargar props" },
+    { title: "3 arquetipos de cliente", description: "Buyer personas con motivaciones y objeciones.", portalLabel: "Descargar arquetipos" },
+    { title: "Informe ejecutivo", description: "Resumen de posicionamiento y aplicación.", portalLabel: "Abrir informe" },
   ],
 };
 
