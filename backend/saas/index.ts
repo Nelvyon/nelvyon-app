@@ -531,3 +531,65 @@ export {
   type SubcuentaUsage,
   type CreateSubcuentaInput,
 } from "./SaasSubcuentasService";
+export {
+  SaasCountdownService,
+  getSaasCountdownService,
+  resetSaasCountdownServiceForTests,
+  type CountdownTimer,
+  type CountdownType,
+  type CountdownAction,
+  type CreateCountdownInput,
+} from "./SaasCountdownService";
+export {
+  SaasCustomObjectsService,
+  getSaasCustomObjectsService,
+  resetSaasCustomObjectsServiceForTests,
+  type CustomObject,
+  type CustomObjectField,
+  type CustomObjectRecord,
+  type CreateCustomObjectInput,
+} from "./SaasCustomObjectsService";
+export {
+  SaasAuditService,
+  getSaasAuditService,
+  resetSaasAuditServiceForTests,
+  type AuditLog,
+  type LogAuditInput,
+  type AuditFilters,
+  type AuditModuleStats,
+} from "./SaasAuditService";
+export {
+  SaasCommunitiesService,
+  getSaasCommunitiesService,
+  resetSaasCommunitiesServiceForTests,
+  type Community,
+  type CommunityPost,
+  type CreateCommunityInput,
+  type CreatePostInput,
+} from "./SaasCommunitiesService";
+export {
+  SaasDocumentsService,
+  getSaasDocumentsService,
+  resetSaasDocumentsServiceForTests,
+  type Document as SaasDocument,
+  type DocumentType,
+  type DocumentStatus,
+  type Product,
+  type ProductType,
+  type CreateDocumentInput,
+  type CreateProductInput,
+} from "./SaasDocumentsService";
+export {
+  SaasSurveysService,
+  getSaasSurveysService,
+  resetSaasSurveysServiceForTests,
+  type Survey,
+  type SurveyType,
+  type SurveyQuestion,
+  type SurveyResponse,
+  type QrCode,
+  type CreateSurveyInput,
+  type SubmitResponseInput,
+  type CreateQrInput,
+  type SurveyStats,
+} from "./SaasSurveysService";
