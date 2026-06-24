@@ -33,7 +33,8 @@
 | S22 | TikTok + Snapchat ads: _fetchTikTokCampaigns, _createTikTokCampaign, _fetchSnapchatCampaigns, _createSnapchatCampaign in SaasAdsDashboardService; UI /saas/publicidad snapchat tab; 16 tests | 747bc16 |
 | O14 | AUTONOMOUS_PRODUCTION=true guard: isAutonomousProductionEnabled() + guard in runGrowthPack; scripts/run-os-autonomous-gate.mjs; docs/OS_AUTONOMOUS_PROD.md; .github/workflows/os-gate.yml | 7cb1d7b |
 | S23 | LMS 100%: módulos/lecciones CRUD, quiz JSONB, progreso %, certificados PDF firmados (HMAC), migration 434, 30 tests | 2443e0e |
-| S24 | Store ecommerce: SaasStoreService (productos+variantes+stock+IVA EU+pedidos), migration 435, /saas/store UI, checkout+VAT+order DB, Stripe webhook, 29 tests | (current) |
+| S24 | Store ecommerce: SaasStoreService (productos+variantes+stock+IVA EU+pedidos), migration 435, /saas/store UI, checkout+VAT+order DB, Stripe webhook, 29 tests | 6f3c3b2 |
+| S25 | Reputation elite: SaasReputationService, GBP sync bidireccional, reply OAuth, workflow trigger review_received, migration 436, /saas/reputacion reescrita, 22 tests | (current) |
 
 ---
 
@@ -106,8 +107,11 @@ LINKEDIN_CLIENT_ID=
 LINKEDIN_CLIENT_SECRET=
 
 # Reputación / Google Business Profile (opcional)
-GOOGLE_PLACES_API_KEY=
-GBP_PLACE_ID=
+GOOGLE_PLACES_API_KEY=             # Google Places API key para sync GBP reviews (read-only)
+GBP_PLACE_ID=                      # Place ID del negocio en Google Maps
+GBP_ACCESS_TOKEN=                  # OAuth token con scope business.manage (para reply)
+GBP_ACCOUNT_ID=                    # GBP account ID (ej: accounts/1234567890)
+GBP_LOCATION_ID=                   # GBP location ID (ej: locations/9876543210)
 ```
 
 ---

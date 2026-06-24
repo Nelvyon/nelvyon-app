@@ -735,3 +735,14 @@ export {
   type CreateOrderInput,
   type CartItemInput,
 } from "./SaasStoreService";
+
+export {
+  SaasReputationService,
+  getSaasReputationService,
+  SaasReputationError,
+  type GbpReview,
+  type GbpConfig,
+  type GbpStats,
+  type SyncResult,
+  type ReviewReplyStatus,
+} from "./SaasReputationService";
