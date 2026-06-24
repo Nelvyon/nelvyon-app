@@ -1,181 +1,113 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
+// ── Types ─────────────────────────────────────────────────────────────────────
+type DealStage = "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
+type QuoteStatus = "draft" | "sent" | "accepted" | "rejected" | "expired";
+type PlaybookActionType = "task" | "email" | "call" | "note" | "wait";
+
 interface Deal {
-  id: string;
-  name: string;
-  contactName: string;
-  value: number;
-  probability: number;
-  stageId: string;
-  assignedTo: string;
-  dueDate: string | null;
-  tags: string[];
-  notes: string;
-  createdAt: string;
+  id: string; tenantId: string; contactId: string | null; title: string; value: number;
+  currency: string; stage: DealStage; probability: number;
+  expectedCloseDate: string | null; source: string | null; ownerUserId: string | null;
+  notes: string | null; createdAt: string; updatedAt: string;
 }
+interface ForecastStage { stage: DealStage; count: number; value: number; weightedValue: number; probability: number }
+interface Forecast { weightedTotal: number; bestCase: number; committed: number; byStage: ForecastStage[] }
+interface PlaybookAction { id: string; actionType: PlaybookActionType; title: string; description: string | null; template: string | null; waitDays: number | null; sortOrder: number }
+interface Playbook { id: string; name: string; stage: DealStage; description: string | null; active: boolean; actions: PlaybookAction[] }
+interface QuoteItem { description: string; quantity: number; unitPrice: number; subtotal: number }
+interface Quote { id: string; quoteNumber: string; title: string; clientName: string; clientEmail: string | null; currency: string; subtotal: number; discountPct: number; taxPct: number; taxAmount: number; total: number; status: QuoteStatus; dealId: string | null; validUntil: string | null; items: QuoteItem[]; createdAt: string }
 
-interface Stage {
-  id: string;
-  name: string;
-  color: string;
-  deals: Deal[];
-}
+const STAGE_LABELS: Record<DealStage, string> = { new: "Nuevo", contacted: "Contactado", qualified: "Calificado", proposal: "Propuesta", won: "Ganado", lost: "Perdido" };
+const STAGE_COLORS: Record<DealStage, string> = { new: "bg-blue-500/10 text-blue-400", contacted: "bg-cyan-500/10 text-cyan-400", qualified: "bg-purple-500/10 text-purple-400", proposal: "bg-amber-500/10 text-amber-400", won: "bg-green-500/10 text-green-400", lost: "bg-red-500/10 text-red-400" };
+const QUOTE_STATUS_LABEL: Record<QuoteStatus, string> = { draft: "Borrador", sent: "Enviado", accepted: "Aceptado", rejected: "Rechazado", expired: "Expirado" };
+const QUOTE_TONE: Record<QuoteStatus, "success" | "warning" | "danger" | "primary"> = { draft: "primary", sent: "warning", accepted: "success", rejected: "danger", expired: "danger" };
+const ACTION_ICON: Record<PlaybookActionType, string> = { task: "✅", email: "📧", call: "📞", note: "📝", wait: "⏳" };
+const fmt = (n: number, currency = "EUR") => new Intl.NumberFormat("es-ES", { style: "currency", currency }).format(n);
 
-const INITIAL_STAGES: Stage[] = [
-  {
-    id: "s1", name: "Prospecto", color: "#6366f1",
-    deals: [
-      { id: "d1", name: "Proyecto Web Corporativa", contactName: "Tech Solutions SL", value: 4500, probability: 20, stageId: "s1", assignedTo: "Admin", dueDate: "2026-07-15", tags: ["web"], notes: "", createdAt: "2026-06-01T10:00:00Z" },
-      { id: "d2", name: "Pack Marketing Digital", contactName: "Startup XYZ", value: 1200, probability: 30, stageId: "s1", assignedTo: "Ventas", dueDate: null, tags: [], notes: "", createdAt: "2026-06-10T10:00:00Z" },
-    ],
-  },
-  {
-    id: "s2", name: "Propuesta enviada", color: "#f59e0b",
-    deals: [
-      { id: "d3", name: "Consultoría SEO Anual", contactName: "Inmobiliaria Norte", value: 6000, probability: 50, stageId: "s2", assignedTo: "Admin", dueDate: "2026-07-01", tags: ["seo", "anual"], notes: "Esperando feedback director", createdAt: "2026-05-20T10:00:00Z" },
-      { id: "d4", name: "Gestión Redes Sociales", contactName: "Restaurante La Plaza", value: 800, probability: 60, stageId: "s2", assignedTo: "Marketing", dueDate: "2026-06-30", tags: ["social"], notes: "", createdAt: "2026-06-05T10:00:00Z" },
-    ],
-  },
-  {
-    id: "s3", name: "Negociación", color: "#ec4899",
-    deals: [
-      { id: "d5", name: "Automatización Marketing", contactName: "Agencia Digital Sur", value: 3200, probability: 70, stageId: "s3", assignedTo: "Admin", dueDate: "2026-07-10", tags: ["automation"], notes: "Ajustar precio final", createdAt: "2026-05-15T10:00:00Z" },
-    ],
-  },
-  {
-    id: "s4", name: "Contrato firmado", color: "#10b981",
-    deals: [
-      { id: "d6", name: "Funnel de Captación", contactName: "Coach Bienestar", value: 2800, probability: 90, stageId: "s4", assignedTo: "Admin", dueDate: "2026-06-25", tags: ["funnel"], notes: "", createdAt: "2026-05-01T10:00:00Z" },
-      { id: "d7", name: "Email Marketing Q3", contactName: "Moda Española SL", value: 1500, probability: 90, stageId: "s4", assignedTo: "Marketing", dueDate: "2026-07-05", tags: ["email"], notes: "", createdAt: "2026-06-08T10:00:00Z" },
-    ],
-  },
-  {
-    id: "s5", name: "Cerrado ganado", color: "#22c55e",
-    deals: [
-      { id: "d8", name: "Estrategia Digital 2026", contactName: "Grupo Empresarial ABC", value: 12000, probability: 100, stageId: "s5", assignedTo: "Admin", dueDate: null, tags: ["estrategia", "anual"], notes: "", createdAt: "2026-04-01T10:00:00Z" },
-    ],
-  },
-];
+type Tab = "forecast" | "deals" | "playbooks" | "quotes";
 
-function DealCard({ deal, onMove, stages }: { deal: Deal; onMove: (dealId: string, stageId: string) => void; stages: Stage[] }) {
-  const [showMenu, setShowMenu] = useState(false);
-  const isOverdue = deal.dueDate && new Date(deal.dueDate) < new Date();
-
-  return (
-    <div className="group relative rounded-xl border border-border bg-card p-3 shadow-sm hover:border-primary/40 hover:shadow-md transition-all cursor-grab active:cursor-grabbing">
-      <div className="mb-2 flex items-start justify-between gap-1">
-        <p className="text-sm font-semibold text-foreground leading-tight">{deal.name}</p>
-        <button onClick={() => setShowMenu(s => !s)} className="shrink-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground text-xs">⋯</button>
-        {showMenu && (
-          <div className="absolute right-2 top-8 z-10 rounded-xl border border-border bg-card shadow-xl p-1 min-w-36">
-            {stages.filter(s => s.id !== deal.stageId).map(s => (
-              <button key={s.id} onClick={() => { onMove(deal.id, s.id); setShowMenu(false); }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs text-foreground hover:bg-muted/20">
-                → {s.name}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-      <p className="text-xs text-muted-foreground mb-2">{deal.contactName}</p>
-      {deal.tags.length > 0 && (
-        <div className="mb-2 flex flex-wrap gap-1">
-          {deal.tags.map(t => <span key={t} className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">{t}</span>)}
-        </div>
-      )}
-      <div className="flex items-center justify-between">
-        <p className="text-base font-bold text-foreground">€{deal.value.toLocaleString("es-ES")}</p>
-        <div className="flex items-center gap-1.5">
-          {deal.dueDate && (
-            <span className={`text-[10px] ${isOverdue ? "text-red-400" : "text-muted-foreground"}`}>
-              {isOverdue ? "⚠️" : "📅"} {new Date(deal.dueDate).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}
-            </span>
-          )}
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[9px] font-bold text-primary">{deal.assignedTo[0]}</div>
-        </div>
-      </div>
-      {/* Probability bar */}
-      <div className="mt-2 h-1 w-full rounded-full bg-muted overflow-hidden">
-        <div className="h-full rounded-full bg-primary" style={{ width: `${deal.probability}%` }} />
-      </div>
-      <p className="mt-0.5 text-[10px] text-muted-foreground">{deal.probability}% prob.</p>
-    </div>
-  );
-}
-
-function AddDealModal({ stageId, stages, onClose, onAdd }: { stageId: string; stages: Stage[]; onClose: () => void; onAdd: (deal: Deal) => void }) {
-  const [name, setName] = useState("");
-  const [contactName, setContactName] = useState("");
-  const [value, setValue] = useState(0);
-  const [probability, setProbability] = useState(50);
-  const [stage, setStage] = useState(stageId);
-  const [dueDate, setDueDate] = useState("");
-  const [assignedTo, setAssignedTo] = useState("Admin");
+// ── Quote Create Modal ────────────────────────────────────────────────────────
+function QuoteModal({ deal, onClose, onCreated }: { deal?: Deal; onClose: () => void; onCreated: () => void }) {
+  const [title, setTitle] = useState(deal ? `Presupuesto — ${deal.title}` : "");
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [taxPct, setTaxPct] = useState(21);
+  const [discountPct, setDiscountPct] = useState(0);
+  const [items, setItems] = useState([{ description: "", quantity: 1, unitPrice: 0 }]);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function addItem() { setItems(p => [...p, { description: "", quantity: 1, unitPrice: 0 }]); }
+  function updateItem(i: number, field: string, val: string | number) {
+    setItems(p => p.map((it, idx) => idx === i ? { ...it, [field]: val } : it));
+  }
+  function removeItem(i: number) { setItems(p => p.filter((_, idx) => idx !== i)); }
+
+  const subtotal = items.reduce((s, it) => s + it.quantity * it.unitPrice, 0);
+  const discountAmt = subtotal * discountPct / 100;
+  const taxAmt = (subtotal - discountAmt) * taxPct / 100;
+  const total = subtotal - discountAmt + taxAmt;
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    setSaving(true);
-    await new Promise(r => setTimeout(r, 400));
-    onAdd({ id: Date.now().toString(), name, contactName, value, probability, stageId: stage, assignedTo, dueDate: dueDate || null, tags: [], notes: "", createdAt: new Date().toISOString() });
-    setSaving(false);
-    onClose();
+    if (!title.trim() || !clientName.trim()) { setError("Título y nombre de cliente son obligatorios"); return; }
+    if (items.some(it => !it.description.trim())) { setError("Todos los ítems necesitan descripción"); return; }
+    setSaving(true); setError(null);
+    try {
+      const res = await fetch("/api/saas/quotes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: title.trim(), clientName: clientName.trim(), clientEmail: clientEmail.trim() || null, dealId: deal?.id ?? null, taxPct, discountPct, items }) });
+      const d = await res.json() as { error?: string };
+      if (!res.ok) { setError(d.error ?? "Error al crear presupuesto"); return; }
+      onCreated(); onClose();
+    } finally { setSaving(false); }
   }
 
+  const inp = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Nuevo deal</h2>
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
+      <div className="my-8 w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="text-lg font-semibold text-foreground">Nuevo presupuesto</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
-        <form onSubmit={save} className="space-y-4 p-5">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre del deal *</label>
-            <input value={name} onChange={e => setName(e.target.value)} autoFocus placeholder="Ej: Proyecto Web Corporativa"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+        <form onSubmit={save} className="space-y-4 p-6">
+          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Título *</label><input value={title} onChange={e => setTitle(e.target.value)} className={inp} /></div>
+            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Cliente *</label><input value={clientName} onChange={e => setClientName(e.target.value)} className={inp} /></div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Email cliente</label><input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} className={inp} /></div>
+            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">IVA %</label><input type="number" value={taxPct} onChange={e => setTaxPct(Number(e.target.value))} min={0} max={100} className={inp} /></div>
+            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Descuento %</label><input type="number" value={discountPct} onChange={e => setDiscountPct(Number(e.target.value))} min={0} max={100} className={inp} /></div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Empresa / Contacto</label>
-            <input value={contactName} onChange={e => setContactName(e.target.value)} placeholder="Tech Solutions SL"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Valor (€)</label>
-              <input type="number" min={0} value={value} onChange={e => setValue(Number(e.target.value))}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Probabilidad</label>
-              <div className="flex items-center gap-2">
-                <input type="range" min={0} max={100} step={5} value={probability} onChange={e => setProbability(Number(e.target.value))} className="flex-1 accent-primary" />
-                <span className="w-8 text-right text-sm text-foreground">{probability}%</span>
-              </div>
+            <div className="mb-2 flex items-center justify-between"><label className="text-xs font-medium text-muted-foreground">Líneas de presupuesto</label><button type="button" onClick={addItem} className="text-xs text-primary hover:underline">+ Añadir línea</button></div>
+            <div className="space-y-2">
+              {items.map((it, i) => (
+                <div key={i} className="grid gap-2 sm:grid-cols-[1fr_80px_100px_28px]">
+                  <input value={it.description} onChange={e => updateItem(i, "description", e.target.value)} placeholder="Descripción" className={inp} />
+                  <input type="number" value={it.quantity} onChange={e => updateItem(i, "quantity", Number(e.target.value))} min={0.01} step={0.01} className={inp} />
+                  <input type="number" value={it.unitPrice} onChange={e => updateItem(i, "unitPrice", Number(e.target.value))} min={0} step={0.01} className={inp} />
+                  <button type="button" onClick={() => removeItem(i)} className="text-muted-foreground hover:text-red-400">✕</button>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Etapa</label>
-              <select value={stage} onChange={e => setStage(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
-                {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Fecha cierre</label>
-              <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
+          <div className="space-y-1 border-t border-border pt-3 text-right text-sm">
+            <p className="text-muted-foreground">Subtotal: <span className="text-foreground">{fmt(subtotal)}</span></p>
+            {discountPct > 0 && <p className="text-muted-foreground">Descuento ({discountPct}%): <span className="text-red-400">-{fmt(discountAmt)}</span></p>}
+            <p className="text-muted-foreground">IVA ({taxPct}%): <span className="text-foreground">{fmt(taxAmt)}</span></p>
+            <p className="text-lg font-bold text-foreground">Total: {fmt(total)}</p>
           </div>
-          <div className="flex gap-3 pt-1">
+          <div className="flex gap-3 pt-2">
             <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving || !name} className="flex-1">{saving ? "Creando…" : "Crear deal"}</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Crear presupuesto"}</NelvyonDsButton>
           </div>
         </form>
       </div>
@@ -183,114 +115,321 @@ function AddDealModal({ stageId, stages, onClose, onAdd }: { stageId: string; st
   );
 }
 
+// ── Playbook Create Modal ─────────────────────────────────────────────────────
+function PlaybookModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [name, setName] = useState("");
+  const [stage, setStage] = useState<DealStage>("new");
+  const [description, setDescription] = useState("");
+  const [actions, setActions] = useState<Array<{ actionType: PlaybookActionType; title: string }>>([]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function addAction() { setActions(p => [...p, { actionType: "task", title: "" }]); }
+  const inp = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) { setError("Nombre obligatorio"); return; }
+    setSaving(true); setError(null);
+    try {
+      const res = await fetch("/api/saas/playbooks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), stage, description: description.trim() || undefined, actions: actions.filter(a => a.title.trim()) }) });
+      const d = await res.json() as { error?: string };
+      if (!res.ok) { setError(d.error ?? "Error"); return; }
+      onCreated(); onClose();
+    } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="text-lg font-semibold text-foreground">Nuevo playbook</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+        </div>
+        <form onSubmit={save} className="space-y-4 p-6">
+          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label><input value={name} onChange={e => setName(e.target.value)} className={inp} /></div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Etapa del pipeline</label>
+            <select value={stage} onChange={e => setStage(e.target.value as DealStage)} className={inp}>
+              {(["new","contacted","qualified","proposal"] as DealStage[]).map(s => <option key={s} value={s}>{STAGE_LABELS[s]}</option>)}
+            </select>
+          </div>
+          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Descripción</label><input value={description} onChange={e => setDescription(e.target.value)} className={inp} /></div>
+          {actions.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Acciones</label>
+              {actions.map((a, i) => (
+                <div key={i} className="flex gap-2">
+                  <select value={a.actionType} onChange={e => setActions(p => p.map((x, j) => j === i ? { ...x, actionType: e.target.value as PlaybookActionType } : x))} className="rounded-lg border border-border bg-background px-2 py-2 text-xs text-foreground">
+                    {(["task","email","call","note","wait"] as PlaybookActionType[]).map(t => <option key={t} value={t}>{ACTION_ICON[t]} {t}</option>)}
+                  </select>
+                  <input value={a.title} onChange={e => setActions(p => p.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} placeholder="Título de la acción" className={`${inp} flex-1`} />
+                  <button type="button" onClick={() => setActions(p => p.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-red-400">✕</button>
+                </div>
+              ))}
+            </div>
+          )}
+          <button type="button" onClick={addAction} className="text-xs text-primary hover:underline">+ Añadir acción</button>
+          <div className="flex gap-3 pt-2">
+            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Crear playbook"}</NelvyonDsButton>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function SaasPipelinePage() {
-  const [stages, setStages] = useState<Stage[]>(INITIAL_STAGES);
-  const [showAddDeal, setShowAddDeal] = useState<string | null>(null);
-  const [view, setView] = useState<"kanban" | "list">("kanban");
+  const [tab, setTab] = useState<Tab>("forecast");
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showPlaybookModal, setShowPlaybookModal] = useState(false);
+  const [quoteDeal, setQuoteDeal] = useState<Deal | undefined>(undefined);
 
-  function moveDeal(dealId: string, toStageId: string) {
-    setStages(prev => {
-      let deal: Deal | undefined;
-      const updated = prev.map(s => ({ ...s, deals: s.deals.filter(d => { if (d.id === dealId) { deal = d; return false; } return true; }) }));
-      if (!deal) return prev;
-      return updated.map(s => s.id === toStageId ? { ...s, deals: [...s.deals, { ...deal!, stageId: toStageId }] } : s);
-    });
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [dealsRes, forecastRes, playbooksRes, quotesRes] = await Promise.all([
+        fetch("/api/saas/deals"),
+        fetch("/api/saas/playbooks?resource=forecast"),
+        fetch("/api/saas/playbooks"),
+        fetch("/api/saas/quotes"),
+      ]);
+      if (dealsRes.ok) { const d = await dealsRes.json() as { deals?: Deal[] }; setDeals(d.deals ?? []); }
+      if (forecastRes.ok) { const d = await forecastRes.json() as { forecast?: Forecast }; setForecast(d.forecast ?? null); }
+      if (playbooksRes.ok) { const d = await playbooksRes.json() as { playbooks?: Playbook[] }; setPlaybooks(d.playbooks ?? []); }
+      if (quotesRes.ok) { const d = await quotesRes.json() as { quotes?: Quote[] }; setQuotes(d.quotes ?? []); }
+    } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function deletePlaybook(id: string) {
+    await fetch("/api/saas/playbooks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "delete", id }) });
+    void load();
   }
 
-  function addDeal(deal: Deal) {
-    setStages(prev => prev.map(s => s.id === deal.stageId ? { ...s, deals: [...s.deals, deal] } : s));
+  async function updateQuoteStatus(id: string, status: QuoteStatus) {
+    await fetch("/api/saas/quotes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "update-status", id, status }) });
+    void load();
   }
 
-  const totalValue = stages.flatMap(s => s.deals).reduce((s, d) => s + d.value, 0);
-  const weightedValue = stages.flatMap(s => s.deals).reduce((s, d) => s + d.value * d.probability / 100, 0);
-  const totalDeals = stages.reduce((s, st) => s + st.deals.length, 0);
+  const openDeals = deals.filter(d => d.stage !== "won" && d.stage !== "lost");
+  const wonDeals = deals.filter(d => d.stage === "won");
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="pipeline" />}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader title="Pipeline de Ventas" subtitle="Gestiona tus deals en un tablero Kanban visual" />
-              <div className="flex items-center gap-2">
-                <div className="flex rounded-lg border border-border overflow-hidden">
-                  {(["kanban", "list"] as const).map(v => (
-                    <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-                      {v === "kanban" ? "⊞ Kanban" : "☰ Lista"}
-                    </button>
+      <div className="flex flex-col gap-6 pb-8">
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <NelvyonDsSectionHeader title="Sales Hub — Pipeline" subtitle="Forecast ponderado, playbooks por etapa y presupuestos CPQ" />
+          <div className="flex gap-2">
+            {tab === "quotes" && <NelvyonDsButton onClick={() => { setQuoteDeal(undefined); setShowQuoteModal(true); }}>+ Presupuesto</NelvyonDsButton>}
+            {tab === "playbooks" && <NelvyonDsButton onClick={() => setShowPlaybookModal(true)}>+ Playbook</NelvyonDsButton>}
+          </div>
+        </div>
+
+        {/* KPIs */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: "Deals activos",    value: String(openDeals.length) },
+            { label: "Pipeline bruto",   value: fmt(openDeals.reduce((s, d) => s + d.value, 0)) },
+            { label: "Forecast weighted",value: fmt(forecast?.weightedTotal ?? 0) },
+            { label: "Won este periodo", value: String(wonDeals.length) },
+          ].map(({ label, value }) => (
+            <NelvyonDsCard key={label} className="p-4">
+              <p className="text-xs text-muted-foreground">{label}</p>
+              <p className="mt-1 text-xl font-bold text-foreground">{value}</p>
+            </NelvyonDsCard>
+          ))}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-1 border-b border-border">
+          {(["forecast", "deals", "playbooks", "quotes"] as Tab[]).map(t => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${tab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              {t === "forecast" ? "📊 Forecast" : t === "deals" ? `💼 Deals (${deals.length})` : t === "playbooks" ? `📋 Playbooks (${playbooks.length})` : `📄 Presupuestos (${quotes.length})`}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}</div>
+        ) : (
+          <>
+            {/* ── FORECAST ── */}
+            {tab === "forecast" && (
+              <div className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {[
+                    { label: "Weighted Forecast", value: fmt(forecast?.weightedTotal ?? 0), sub: "Prob. ponderada", color: "text-primary" },
+                    { label: "Best Case",          value: fmt(forecast?.bestCase ?? 0),      sub: "Si todos cierran", color: "text-green-400" },
+                    { label: "Committed",          value: fmt(forecast?.committed ?? 0),     sub: "Prob. ≥ 75%",     color: "text-amber-400" },
+                  ].map(({ label, value, sub, color }) => (
+                    <NelvyonDsCard key={label} className="p-5">
+                      <p className="text-xs text-muted-foreground">{label}</p>
+                      <p className={`mt-1 text-2xl font-bold ${color}`}>{value}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{sub}</p>
+                    </NelvyonDsCard>
                   ))}
                 </div>
-                <NelvyonDsButton onClick={() => setShowAddDeal(stages[0]!.id)}>+ Nuevo deal</NelvyonDsButton>
-              </div>
-            </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { label: "Deals activos", value: totalDeals },
-                { label: "Valor total pipeline", value: `€${totalValue.toLocaleString("es-ES")}` },
-                { label: "Valor ponderado", value: `€${Math.round(weightedValue).toLocaleString("es-ES")}` },
-                { label: "Ganados este mes", value: `€${stages.find(s => s.id === "s5")!.deals.reduce((s, d) => s + d.value, 0).toLocaleString("es-ES")}` },
-              ].map(({ label, value }) => (
-                <NelvyonDsCard key={label} className="p-4">
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="mt-1 text-xl font-bold text-foreground">{value}</p>
-                </NelvyonDsCard>
-              ))}
-            </div>
-
-            {view === "kanban" ? (
-              /* Kanban board */
-              <div className="overflow-x-auto pb-4">
-                <div className="flex gap-4" style={{ minWidth: `${stages.length * 280}px` }}>
-                  {stages.map(stage => {
-                    const stageValue = stage.deals.reduce((s, d) => s + d.value, 0);
-                    return (
-                      <div key={stage.id} className="flex w-64 shrink-0 flex-col rounded-2xl bg-muted/20 border border-border">
-                        {/* Stage header */}
-                        <div className="flex items-center justify-between px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: stage.color }} />
-                            <p className="text-sm font-semibold text-foreground">{stage.name}</p>
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[11px] font-medium text-muted-foreground">{stage.deals.length}</span>
+                {forecast && forecast.byStage.length > 0 ? (
+                  <NelvyonDsCard className="p-5">
+                    <h3 className="mb-4 text-sm font-semibold text-foreground">Pipeline por etapa (weighted)</h3>
+                    <div className="space-y-3">
+                      {forecast.byStage.map(s => (
+                        <div key={s.stage}>
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[s.stage]}`}>{STAGE_LABELS[s.stage]}</span>
+                              <span className="text-xs text-muted-foreground">{s.count} deal{s.count !== 1 ? "s" : ""} · {s.probability}% prob.</span>
+                            </div>
+                            <div className="text-right text-xs">
+                              <span className="text-muted-foreground">{fmt(s.value)} → </span>
+                              <span className="font-semibold text-foreground">{fmt(s.weightedValue)}</span>
+                            </div>
                           </div>
-                          <button onClick={() => setShowAddDeal(stage.id)} className="text-muted-foreground hover:text-primary text-lg leading-none">+</button>
+                          {forecast.bestCase > 0 && (
+                            <div className="h-1.5 rounded-full bg-muted/30">
+                              <div className="h-1.5 rounded-full bg-primary transition-all" style={{ width: `${Math.min(100, (s.weightedValue / forecast.bestCase) * 100)}%` }} />
+                            </div>
+                          )}
                         </div>
-                        <p className="px-4 pb-2 text-xs text-muted-foreground font-medium">€{stageValue.toLocaleString("es-ES")}</p>
-                        {/* Deals */}
-                        <div className="flex-1 space-y-2.5 overflow-y-auto px-3 pb-3" style={{ maxHeight: "60vh" }}>
-                          {stage.deals.map(d => <DealCard key={d.id} deal={d} onMove={moveDeal} stages={stages} />)}
+                      ))}
+                    </div>
+                  </NelvyonDsCard>
+                ) : (
+                  <NelvyonDsCard className="p-12 text-center">
+                    <p className="text-3xl">📊</p>
+                    <p className="mt-3 text-sm text-muted-foreground">Sin datos de forecast. Crea deals en el pipeline para verlos aquí.</p>
+                  </NelvyonDsCard>
+                )}
+              </div>
+            )}
+
+            {/* ── DEALS ── */}
+            {tab === "deals" && (
+              deals.length === 0 ? (
+                <NelvyonDsCard className="p-12 text-center">
+                  <p className="text-3xl">💼</p>
+                  <p className="mt-3 text-sm text-muted-foreground">Sin deals. Crea deals desde el CRM para verlos aquí.</p>
+                </NelvyonDsCard>
+              ) : (
+                <div className="space-y-2">
+                  {deals.map(deal => (
+                    <NelvyonDsCard key={deal.id} className="flex flex-wrap items-center gap-4 px-4 py-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-foreground text-sm">{deal.title}</p>
+                          <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[deal.stage]}`}>{STAGE_LABELS[deal.stage]}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">Prob: {deal.probability}% · {deal.expectedCloseDate ? `Cierre: ${new Date(deal.expectedCloseDate).toLocaleDateString("es-ES")}` : "Sin fecha"}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="font-bold text-foreground">{fmt(deal.value, deal.currency)}</p>
+                        <p className="text-xs text-muted-foreground">Forecast: {fmt(deal.value * deal.probability / 100, deal.currency)}</p>
+                      </div>
+                      <NelvyonDsButton variant="ghost" className="text-xs shrink-0" onClick={() => { setQuoteDeal(deal); setShowQuoteModal(true); }}>+ Presupuesto</NelvyonDsButton>
+                    </NelvyonDsCard>
+                  ))}
+                </div>
+              )
+            )}
+
+            {/* ── PLAYBOOKS ── */}
+            {tab === "playbooks" && (
+              playbooks.length === 0 ? (
+                <NelvyonDsCard className="p-12 text-center">
+                  <p className="text-3xl">📋</p>
+                  <p className="mt-3 text-lg font-semibold text-foreground">Sin playbooks</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Crea templates de acciones para cada etapa del pipeline</p>
+                  <NelvyonDsButton className="mt-5" onClick={() => setShowPlaybookModal(true)}>+ Crear playbook</NelvyonDsButton>
+                </NelvyonDsCard>
+              ) : (
+                <div className="space-y-3">
+                  {playbooks.map(pb => (
+                    <NelvyonDsCard key={pb.id} className="p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-foreground">{pb.name}</p>
+                            <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[pb.stage]}`}>{STAGE_LABELS[pb.stage]}</span>
+                            {!pb.active && <NelvyonDsBadge tone="warning">Inactivo</NelvyonDsBadge>}
+                          </div>
+                          {pb.description && <p className="text-xs text-muted-foreground mt-1">{pb.description}</p>}
+                          {pb.actions.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {pb.actions.map(a => (
+                                <span key={a.id} className="flex items-center gap-1 rounded-lg bg-muted/20 px-2 py-1 text-xs text-muted-foreground">
+                                  {ACTION_ICON[a.actionType]} {a.title}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <button onClick={() => void deletePlaybook(pb.id)} className="text-xs text-muted-foreground hover:text-red-400 shrink-0">Eliminar</button>
+                      </div>
+                    </NelvyonDsCard>
+                  ))}
+                </div>
+              )
+            )}
+
+            {/* ── QUOTES ── */}
+            {tab === "quotes" && (
+              quotes.length === 0 ? (
+                <NelvyonDsCard className="p-12 text-center">
+                  <p className="text-3xl">📄</p>
+                  <p className="mt-3 text-lg font-semibold text-foreground">Sin presupuestos</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Crea presupuestos profesionales vinculados a tus deals</p>
+                  <NelvyonDsButton className="mt-5" onClick={() => { setQuoteDeal(undefined); setShowQuoteModal(true); }}>+ Crear presupuesto</NelvyonDsButton>
+                </NelvyonDsCard>
+              ) : (
+                <div className="space-y-3">
+                  {quotes.map(q => (
+                    <NelvyonDsCard key={q.id} className="p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-medium text-foreground text-sm">{q.title}</p>
+                            <span className="text-xs text-muted-foreground font-mono">{q.quoteNumber}</span>
+                            <NelvyonDsBadge tone={QUOTE_TONE[q.status]}>{QUOTE_STATUS_LABEL[q.status]}</NelvyonDsBadge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">{q.clientName}{q.clientEmail ? ` · ${q.clientEmail}` : ""}</p>
+                          <p className="text-xs text-muted-foreground">IVA {q.taxPct}%{q.discountPct > 0 ? ` · Dto. ${q.discountPct}%` : ""} · {q.items.length} ítem{q.items.length !== 1 ? "s" : ""}</p>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div className="text-right">
+                            <p className="font-bold text-foreground">{fmt(q.total, q.currency)}</p>
+                            {q.validUntil && <p className="text-xs text-muted-foreground">Válido hasta {new Date(q.validUntil).toLocaleDateString("es-ES")}</p>}
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <a href={`/api/saas/quotes/${q.id}/pdf`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline">Ver PDF →</a>
+                            {q.status === "draft" && <button onClick={() => void updateQuoteStatus(q.id, "sent")} className="text-xs text-muted-foreground hover:text-foreground">Marcar enviado</button>}
+                            {q.status === "sent" && <button onClick={() => void updateQuoteStatus(q.id, "accepted")} className="text-xs text-green-400 hover:text-green-300">Aceptar</button>}
+                          </div>
                         </div>
                       </div>
-                    );
-                  })}
+                    </NelvyonDsCard>
+                  ))}
                 </div>
-              </div>
-            ) : (
-              /* List view */
-              <NelvyonDsCard className="overflow-hidden p-0">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/20">
-                      {["Deal", "Contacto", "Etapa", "Valor", "Prob.", "Cierre", "Asignado"].map(h => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {stages.flatMap(s => s.deals.map(d => (
-                      <tr key={d.id} className="hover:bg-muted/10 transition-colors">
-                        <td className="px-4 py-3 font-medium text-foreground">{d.name}</td>
-                        <td className="px-4 py-3 text-muted-foreground text-xs">{d.contactName}</td>
-                        <td className="px-4 py-3"><span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: `${s.color}20`, color: s.color }}>{s.name}</span></td>
-                        <td className="px-4 py-3 font-bold text-foreground">€{d.value.toLocaleString("es-ES")}</td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">{d.probability}%</td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">{d.dueDate ? new Date(d.dueDate).toLocaleDateString("es-ES") : "—"}</td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">{d.assignedTo}</td>
-                      </tr>
-                    )))}
-                  </tbody>
-                </table>
-              </NelvyonDsCard>
+              )
             )}
-      {showAddDeal && <AddDealModal stageId={showAddDeal} stages={stages} onClose={() => setShowAddDeal(null)} onAdd={addDeal} />}
+          </>
+        )}
+      </div>
+
+      {showQuoteModal && <QuoteModal deal={quoteDeal} onClose={() => { setShowQuoteModal(false); setQuoteDeal(undefined); }} onCreated={() => void load()} />}
+      {showPlaybookModal && <PlaybookModal onClose={() => setShowPlaybookModal(false)} onCreated={() => void load()} />}
     </SaasShellLayout>
   );
 }

@@ -746,3 +746,27 @@ export {
   type SyncResult,
   type ReviewReplyStatus,
 } from "./SaasReputationService";
+
+export {
+  SaasPlaybooksService,
+  getSaasPlaybooksService,
+  resetSaasPlaybooksServiceForTests,
+  SaasPlaybooksError,
+  DEFAULT_STAGE_PROBS,
+  type Playbook,
+  type PlaybookAction,
+  type PlaybookActionType,
+  type CreatePlaybookInput,
+  type StageProbability,
+} from "./SaasPlaybooksService";
+
+export {
+  SaasQuotesService,
+  getSaasQuotesService,
+  resetSaasQuotesServiceForTests,
+  SaasQuotesError,
+  type SaasQuote,
+  type QuoteItem,
+  type QuoteStatus,
+  type CreateQuoteInput,
+} from "./SaasQuotesService";
