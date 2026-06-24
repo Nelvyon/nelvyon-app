@@ -1,6 +1,7 @@
 import type { ILlmClient, LlmOptions } from "../../LlmClient";
 import { LlmClient } from "../../LlmClient";
 import { LearningService } from "../../learning/LearningService";
+import { getSeedByIndex } from "../../seeds/seed-selector";
 
 import { ELITE_V300_STANDARDS } from "../../prompts/elitePromptLibrary";
 export interface EsteticaInput {
@@ -8,6 +9,7 @@ export interface EsteticaInput {
   businessName: string;
   services: string[];
   targets: string[];
+  seedIndex?: number;
 }
 
 export interface EsteticaOutput {
@@ -58,6 +60,8 @@ export function buildEsteticaPrompt(params: {
 }): string {
   const services = params.input.services.length > 0 ? params.input.services.join(", ") : "no indicado";
   const targets = params.input.targets.length > 0 ? params.input.targets.join(", ") : "no indicado";
+  const seed = getSeedByIndex("estetica", params.input.seedIndex ?? 0);
+  const seedCtx = seed ? `\nSEED TEMPLATE (adaptar al cliente):\n- Headline: ${seed.headline}\n- CTA: ${seed.cta_label}\n- Chatbot: ${seed.chatbot_greeting}` : "";
 
   return `${params.eliteRole}
 
@@ -79,7 +83,7 @@ MISIÓN DEL AGENTE:
 ${params.mission}
 
 OUTPUT: Responde **solo** JSON válido UTF-8 (sin markdown):
-{"result":"documento maestro en español salvo brief","score":0-100,"recommendations":["bullets accionables"]}`;
+{"result":"documento maestro en español salvo brief","score":0-100,"recommendations":["bullets accionables"]}${seedCtx}`;
 }
 
 export async function runEsteticaAgentCore(

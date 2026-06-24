@@ -3,6 +3,7 @@ import { LlmClient } from "../../LlmClient";
 import { ModelRouter } from "../../llm/ModelRouter";
 import { LearningService } from "../../learning/LearningService";
 
+import { getSeedByIndex } from "../../seeds/seed-selector";
 import { ELITE_V300_STANDARDS } from "../../prompts/elitePromptLibrary";
 export interface RetailInput {
   userId: string;
@@ -11,6 +12,7 @@ export interface RetailInput {
   retailBrief?: string;
   metricsBrief?: string;
   metadata?: Record<string, unknown>;
+  seedIndex?: number;
 }
 
 export interface RetailOutput {
@@ -73,6 +75,8 @@ export function buildRetailPrompt(params: {
       ? JSON.stringify(params.input.metadata, null, 0)
       : "{}";
   const retailCtx = params.input.retailBrief?.trim() ? params.input.retailBrief.trim() : "inferir desde sector";
+  const seed = getSeedByIndex("retail", params.input.seedIndex ?? 0);
+  const seedCtx = seed ? `\nSEED TEMPLATE (adaptar al cliente):\n- Headline: ${seed.headline}\n- CTA: ${seed.cta_label}\n- Chatbot: ${seed.chatbot_greeting}` : "";
 
   return `${params.eliteRole}
 
@@ -98,7 +102,7 @@ MISIÓN DEL AGENTE:
 ${params.mission}
 
 OUTPUT: Responde **solo** JSON válido UTF-8 (sin markdown):
-{"content":"documento maestro en español salvo brief","score":0-100,"highlights":["bullets"],"metrics":["líneas KPI"]}`;
+{"content":"documento maestro en español salvo brief","score":0-100,"highlights":["bullets"],"metrics":["líneas KPI"]}${seedCtx}`;
 }
 
 export async function runRetailAgentCore(

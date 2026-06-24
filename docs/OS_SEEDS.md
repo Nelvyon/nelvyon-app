@@ -38,13 +38,35 @@ git add backend/data/envato-seeds/**/*.json backend/data/envato-seeds-metadata.j
 git commit -m "chore(seeds): refresh envato seeds metadata"
 ```
 
-## Sector coverage
+## Sector coverage — TOP 10 (O7)
 
-| Sector | Synthetic seeds | Envato seeds (when downloaded) |
-|---|---|---|
-| restaurantes | `seeds/restaurantes.json` (20 items) | `data/envato-seeds/restaurantes/` |
-| clinicas | `seeds/clinicas.json` (20 items) | `data/envato-seeds/clinicas/` |
-| ecommerce | `seeds/ecommerce.json` (20 items) | `data/envato-seeds/ecommerce/` |
+All 10 priority sectors in `sectorPriority.ts` have seed support.
+
+| Sector | Synthetic seeds | Envato seeds | Pack | shared.ts location |
+|---|---|---|---|---|
+| restaurantes | `seeds/restaurantes.json` (20) | `data/envato-seeds/restaurantes/` | local-business-growth | `sectors/restaurantes/` |
+| clinicas | `seeds/clinicas.json` (20) | `data/envato-seeds/clinicas/` | local-business-growth | `sectors/health/` |
+| estetica | `seeds/estetica.json` (20) | — | local-business-growth | `sectors/estetica/` |
+| realestate | `seeds/realestate.json` (20) | — | local-business-growth | `sectors/realestate/` |
+| retail | `seeds/retail.json` (20) | — | local-business-growth | `sectors/retail/` |
+| ecommerce | `seeds/ecommerce.json` (20) | `data/envato-seeds/ecommerce/` | ecommerce-growth | `sectors/ecommerce/` |
+| moda | `seeds/moda.json` (20) | — | ecommerce-growth | `sectors/fashion/` |
+| saasb2b | `seeds/saasb2b.json` (20) | — | saas-b2b-growth | `sectors/saasb2b/` |
+| consultoria | `seeds/consultoria.json` (20) | — | saas-b2b-growth | `sectors/consultoria/` |
+| fintech | `seeds/fintech.json` (20) | — | saas-b2b-growth | `sectors/fintech/` |
+
+> Note: `clinicas` maps to `sectors/health/` and `moda` maps to `sectors/fashion/` — seed file names follow `sectorPriority.ts seedFile` field.
+
+## Deliverable metadata (O7)
+
+Every deliverable created by `packOrchestrator.ts` now includes:
+
+```json
+{
+  "seed_id": "restaurantes_tpl_0",
+  "source": "synthetic"
+}
+```
 
 ## Integration with sector agents
 

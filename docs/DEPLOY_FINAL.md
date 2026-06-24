@@ -1,6 +1,6 @@
 # DEPLOY FINAL — Nelvyon Production Checklist
 
-> Estado: **Código completado** (Fases 1–12, S13, S14, S15). Este documento cubre el deploy final en Railway.
+> Estado: **Código completado** (Fases 1–12, S13, S14, S15, O7). Este documento cubre el deploy final en Railway.
 
 ---
 

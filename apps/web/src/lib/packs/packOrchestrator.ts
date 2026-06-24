@@ -196,6 +196,12 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     primary_cta: (params.intake as Record<string, unknown>).primary_cta as string | undefined,
   });
 
+  // Seed provenance for QA metadata (inline templates are synthetic)
+  const seedMeta = {
+    seed_id: `${params.intake.sector}_tpl_0`,
+    source: "synthetic" as const,
+  };
+
   if (shouldPublish) {
     const mapped = params.mapSkuDeliverable?.({
       sku: params.sku,
@@ -213,7 +219,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       // Enrich mapped deliverable with personalized content
       const enriched: PackDeliverableInput = {
         ...mapped,
-        metadata: { ...mapped.metadata, personalized_content: personalized ?? undefined },
+        metadata: { ...mapped.metadata, personalized_content: personalized ?? undefined, ...seedMeta },
       };
       const id = await dbCreatePackDeliverable(enriched);
       deliverableIds.push(id);
@@ -235,6 +241,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
             artifact_value: d.value,
             autonomous_job_id: simulation.os_publish.autonomous_job_id,
             personalized_content: personalized ?? undefined,
+            ...seedMeta,
           },
         });
         deliverableIds.push(id);
@@ -265,6 +272,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
             value_proposition: (params.intake as Record<string, unknown>).value_proposition ?? null,
           },
           personalized_content: personalized ?? undefined,
+          ...seedMeta,
         },
       });
       deliverableIds.push(id);
