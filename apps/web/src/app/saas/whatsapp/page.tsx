@@ -153,7 +153,7 @@ export default function SaasWhatsAppPage() {
   };
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="whatsapp" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="sms" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader

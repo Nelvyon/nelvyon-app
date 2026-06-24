@@ -92,7 +92,7 @@ export default function SaasCertificadosPage() {
   const pendingCount = certs.filter(c => !c.issued).length;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="certificados" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="herramientas" />}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <NelvyonDsSectionHeader title="Certificados" subtitle="Emite y gestiona certificados de finalización para tus cursos LMS" />
               {pendingCount > 0 && <NelvyonDsButton onClick={issueAll}>↗ Emitir {pendingCount} pendientes</NelvyonDsButton>}

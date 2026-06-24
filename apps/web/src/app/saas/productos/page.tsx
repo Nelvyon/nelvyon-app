@@ -120,7 +120,7 @@ export default function SaasProductosPage() {
   }
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="productos" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="documentos" />}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <NelvyonDsSectionHeader title="Productos & Catálogo" subtitle="Gestiona tus servicios y productos para facturar desde el CRM" />
               <NelvyonDsButton onClick={() => { setEditingProduct(undefined); setShowModal(true); }}>+ Nuevo producto</NelvyonDsButton>

@@ -26,14 +26,6 @@ const TYPE_CONFIG: Record<SnippetType, { label: string; icon: string; color: str
   call: { label: "Llamada", icon: "📞", color: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
 };
 
-const MOCK: Snippet[] = [
-  { id: "s1", name: "Bienvenida nuevo lead", type: "email", content: "Hola {{nombre}}, gracias por tu interés en {{empresa}}. Me gustaría conocer más sobre tus objetivos para ver cómo podemos ayudarte.", variables: ["nombre", "empresa"], usageCount: 47, createdAt: "2026-01-10T10:00:00Z", updatedAt: "2026-06-01T10:00:00Z" },
-  { id: "s2", name: "Seguimiento propuesta", type: "email", content: "Hola {{nombre}}, ¿has tenido oportunidad de revisar la propuesta que te enviamos? Estaré encantado de resolver cualquier duda.", variables: ["nombre"], usageCount: 23, createdAt: "2026-02-05T10:00:00Z", updatedAt: "2026-05-20T10:00:00Z" },
-  { id: "s3", name: "Confirmación cita", type: "sms", content: "Hola {{nombre}}, te recuerdo tu cita con {{agente}} el {{fecha}} a las {{hora}}. Responde CANCELAR si no puedes asistir.", variables: ["nombre", "agente", "fecha", "hora"], usageCount: 134, createdAt: "2026-01-15T10:00:00Z", updatedAt: "2026-06-10T10:00:00Z" },
-  { id: "s4", name: "Oferta flash WhatsApp", type: "whatsapp", content: "🔥 Hola {{nombre}}! Tenemos una oferta especial para ti: {{descuento}}% de descuento solo hasta el {{fecha_fin}}. ¿Te interesa saber más?", variables: ["nombre", "descuento", "fecha_fin"], usageCount: 89, createdAt: "2026-03-01T10:00:00Z", updatedAt: "2026-06-15T10:00:00Z" },
-  { id: "s5", name: "Post nuevo producto", type: "social", content: "🚀 ¡Presentamos {{producto}}! La solución que estabas esperando para {{beneficio}}. Descúbrelo en el enlace de nuestra bio. #{{hashtag}}", variables: ["producto", "beneficio", "hashtag"], usageCount: 12, createdAt: "2026-04-01T10:00:00Z", updatedAt: "2026-06-12T10:00:00Z" },
-  { id: "s6", name: "Script apertura llamada", type: "call", content: "Hola, ¿hablo con {{nombre}}? Soy {{agente}} de {{empresa}}. Te llamo porque {{razon}}. ¿Tienes 2 minutos para comentártelo?", variables: ["nombre", "agente", "empresa", "razon"], usageCount: 67, createdAt: "2026-02-20T10:00:00Z", updatedAt: "2026-06-05T10:00:00Z" },
-];
 
 function SnippetModal({ snippet, onClose }: { snippet?: Snippet; onClose: () => void }) {
   const [name, setName] = useState(snippet?.name ?? "");
@@ -136,9 +128,9 @@ export default function SaasSnippetsPage() {
       const res = await fetch("/api/saas/snippets");
       if (res.ok) {
         const d = (await res.json()) as { snippets?: Snippet[] };
-        setSnippets(d.snippets ?? MOCK);
-      } else setSnippets(MOCK);
-    } catch { setSnippets(MOCK); }
+        setSnippets(d.snippets ?? []);
+      } else setSnippets([]);
+    } catch { setSnippets([]); }
     finally { setLoading(false); }
   }, []);
 

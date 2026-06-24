@@ -113,7 +113,7 @@ export default function SaasKnowledgeBasePage() {
   const avgHelpful = articles.filter(a => a.helpful + a.notHelpful > 0).reduce((s, a) => s + (a.helpful / (a.helpful + a.notHelpful)) * 100, 0) / articles.filter(a => a.helpful + a.notHelpful > 0).length;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="knowledge-base" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="herramientas" />}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <NelvyonDsSectionHeader title="Base de Conocimiento" subtitle="Centro de ayuda público para tus clientes — reduce tickets y mejora la satisfacción" />
               <div className="flex gap-2">
