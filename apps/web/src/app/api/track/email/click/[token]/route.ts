@@ -5,6 +5,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyTrackingToken } from "../../../../../../../../../backend/email/trackingToken";
 import { DbClient } from "../../../../../../../../../backend/db/DbClient";
+import { dispatchEmailClicked } from "../../../../../../../../../backend/saas/saasWorkflowDispatch";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,6 +39,9 @@ export async function GET(
      WHERE tenant_id = $1 AND id = $2`,
     [tid, cid],
   ).catch(() => null);
+
+  // Fire email_clicked workflow trigger (fire-and-forget — must not delay redirect)
+  void dispatchEmailClicked(tid, cid, rid, url);
 
   // Validate the destination URL is http/https before redirecting
   let destination: URL;

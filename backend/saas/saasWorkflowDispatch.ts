@@ -81,6 +81,68 @@ export async function dispatchTagAdded(
   }
 }
 
+/** Fire active workflows on email open (non-blocking). */
+export async function dispatchEmailOpened(
+  tenantId: string,
+  campaniaId: string,
+  contactId: string,
+): Promise<void> {
+  try {
+    const { getSaasWorkflowService } = await import("./SaasWorkflowService");
+    await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "email_opened", {
+      email: { campaniaId, contactId },
+    });
+  } catch {
+    // Must not fail the pixel response.
+  }
+}
+
+/** Fire active workflows on email link click (non-blocking). */
+export async function dispatchEmailClicked(
+  tenantId: string,
+  campaniaId: string,
+  contactId: string,
+  url: string,
+): Promise<void> {
+  try {
+    const { getSaasWorkflowService } = await import("./SaasWorkflowService");
+    await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "email_clicked", {
+      email: { campaniaId, contactId, url },
+    });
+  } catch {
+    // Must not fail the click redirect.
+  }
+}
+
+/** Fire active workflows on incoming webhook (non-blocking). */
+export async function dispatchWebhookIn(
+  tenantId: string,
+  source: string,
+  payload: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const { getSaasWorkflowService } = await import("./SaasWorkflowService");
+    await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "webhook_in", {
+      source,
+      payload,
+    });
+  } catch {
+    // Must not fail the webhook acknowledgment.
+  }
+}
+
+/** Fire date_reached workflows whose configured date is today (called from cron). */
+export async function dispatchDateReached(tenantId: string): Promise<void> {
+  try {
+    const { getSaasWorkflowService } = await import("./SaasWorkflowService");
+    await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "date_reached", {
+      date: new Date().toISOString().slice(0, 10),
+    });
+  } catch {
+    // Cron — log but don't crash.
+  }
+}
+
 /** Fire active workflows listening for deal stage changes (non-blocking for deal mutation). */
 export async function dispatchDealStageChanged(
   tenantId: string,

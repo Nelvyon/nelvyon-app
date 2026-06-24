@@ -40,7 +40,11 @@ export type TriggerType =
   | "manual"
   | "scheduled"
   | "form_submitted"
-  | "tag_added";
+  | "tag_added"
+  | "email_opened"
+  | "email_clicked"
+  | "webhook_in"
+  | "date_reached";
 
 export type WorkflowConditionField =
   | "contact.status"
@@ -147,6 +151,10 @@ const TRIGGERS: readonly TriggerType[] = [
   "form_submitted",
   "tag_added",
   "scheduled",
+  "email_opened",
+  "email_clicked",
+  "webhook_in",
+  "date_reached",
 ] as const;
 const STAGES: readonly PipelineStage[] = ["new", "contacted", "qualified", "proposal", "won", "lost"] as const;
 const CONTACT_STATUSES: readonly ContactStatus[] = ["lead", "prospect", "client", "churned"] as const;
@@ -364,13 +372,45 @@ export class SaasWorkflowService {
     return true;
   }
 
-  /** Optional trigger_config filters (e.g. stage_to on deal_stage_changed). */
+  /** Optional trigger_config filters. Each trigger type can define its own config filters. */
   matchesTriggerConfig(triggerType: TriggerType, triggerConfig: Record<string, unknown>, triggerData: Record<string, unknown>): boolean {
-    if (triggerType !== "deal_stage_changed") return true;
-    const deal = (triggerData.deal ?? {}) as Record<string, unknown>;
-    if (triggerConfig.stage_to && String(triggerConfig.stage_to) !== String(deal.stage ?? "")) return false;
-    if (triggerConfig.stage_from && String(triggerConfig.stage_from) !== String(deal.previousStage ?? "")) return false;
-    if (triggerConfig.contact_id && String(triggerConfig.contact_id) !== String(deal.contactId ?? "")) return false;
+    if (triggerType === "deal_stage_changed") {
+      const deal = (triggerData.deal ?? {}) as Record<string, unknown>;
+      if (triggerConfig.stage_to && String(triggerConfig.stage_to) !== String(deal.stage ?? "")) return false;
+      if (triggerConfig.stage_from && String(triggerConfig.stage_from) !== String(deal.previousStage ?? "")) return false;
+      if (triggerConfig.contact_id && String(triggerConfig.contact_id) !== String(deal.contactId ?? "")) return false;
+    }
+    if (triggerType === "email_opened" || triggerType === "email_clicked") {
+      // Optional: only fire for a specific campania_id
+      if (triggerConfig.campania_id) {
+        const email = (triggerData.email ?? {}) as Record<string, unknown>;
+        if (String(triggerConfig.campania_id) !== String(email.campaniaId ?? "")) return false;
+      }
+    }
+    if (triggerType === "webhook_in") {
+      // Optional: only fire for a specific source name
+      if (triggerConfig.source) {
+        if (String(triggerConfig.source) !== String(triggerData.source ?? "")) return false;
+      }
+    }
+    if (triggerType === "date_reached") {
+      // Fire when today's date matches triggerConfig.date (YYYY-MM-DD)
+      if (triggerConfig.date) {
+        const today = new Date().toISOString().slice(0, 10);
+        if (String(triggerConfig.date) !== today) return false;
+      }
+    }
+    if (triggerType === "tag_added") {
+      // Optional: only fire for a specific tag value
+      if (triggerConfig.tag && String(triggerConfig.tag) !== String(triggerData.tag ?? "")) return false;
+    }
+    if (triggerType === "form_submitted") {
+      // Optional: only fire for a specific form_id
+      if (triggerConfig.form_id) {
+        const form = (triggerData.form ?? {}) as Record<string, unknown>;
+        if (String(triggerConfig.form_id) !== String(form.id ?? "")) return false;
+      }
+    }
     return true;
   }
 

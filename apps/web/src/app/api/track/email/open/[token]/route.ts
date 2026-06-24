@@ -5,6 +5,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyTrackingToken } from "../../../../../../../../../backend/email/trackingToken";
 import { DbClient } from "../../../../../../../../../backend/db/DbClient";
+import { dispatchEmailOpened } from "../../../../../../../../../backend/saas/saasWorkflowDispatch";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,6 +41,9 @@ export async function GET(
        WHERE tenant_id = $1 AND id = $2`,
       [tid, cid],
     ).catch(() => null);
+
+    // Fire email_opened workflow trigger (fire-and-forget — must not delay pixel)
+    void dispatchEmailOpened(tid, cid, rid);
   }
 
   return new NextResponse(PIXEL, {

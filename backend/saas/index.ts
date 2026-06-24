@@ -451,7 +451,22 @@ export {
   type SmsSendResult,
   type SaasSmsConfigured,
 } from "./SaasSmsService";
-export { dispatchFormSubmitted, dispatchTagAdded } from "./saasWorkflowDispatch";
+export {
+  dispatchFormSubmitted,
+  dispatchTagAdded,
+  dispatchEmailOpened,
+  dispatchEmailClicked,
+  dispatchWebhookIn,
+  dispatchDateReached,
+} from "./saasWorkflowDispatch";
+export {
+  SaasWorkflowRecipesService,
+  SaasWorkflowRecipesError,
+  getSaasWorkflowRecipesService,
+  resetSaasWorkflowRecipesServiceForTests,
+  type WorkflowRecipe,
+  type RecipeCategory,
+} from "./SaasWorkflowRecipesService";
 export {
   SaasSocialService,
   SaasSocialError,
