@@ -2,12 +2,12 @@
  * seed-selector.ts — Picks seed items for sector agents.
  *
  * Priority:
- * 1. Envato seeds on-disk at backend/data/envato-seeds/{sector}/*.json (metadata)
- * 2. Synthetic JSON seeds at backend/os-agents/seeds/{sector}.json
+ * 1. Envato seeds on-disk at backend/data/envato-seeds/{sector}/*.json (individual files)
+ * 2. Envato metadata index at backend/data/envato-seeds-metadata.json (500 entries, 10 sectors × 50)
+ * 3. Synthetic JSON seeds at backend/os-agents/seeds/{sector}.json
  *
- * Envato seeds are downloaded with `download-envato-seeds.ts` and stored as
- * individual metadata JSON files (not ZIPs). Re-download when ENVATO_ELEMENTS_TOKEN
- * is available and seeds need refreshing.
+ * Envato on-disk files are downloaded with `download-envato-seeds.ts`.
+ * The metadata index is the committed catalog — usable without ZIPs.
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -21,7 +21,13 @@ export type SectorSeed = {
   source: "envato" | "synthetic";
 };
 
-function resolveRoots(overrideRoot?: string): { envatoDir: string; syntheticDir: string } {
+type MetadataEntry = {
+  id: string; sector: string; source: "envato" | "synthetic";
+  headline: string; meta_title: string; cta_label: string;
+  chatbot_greeting: string; downloaded_at: string | null; envato_id: string | null;
+};
+
+function resolveRoots(overrideRoot?: string): { envatoDir: string; syntheticDir: string; metadataFile: string } {
   const base = overrideRoot ?? path.resolve(
     path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")),
     "../..",
@@ -29,6 +35,7 @@ function resolveRoots(overrideRoot?: string): { envatoDir: string; syntheticDir:
   return {
     envatoDir: path.join(base, "data", "envato-seeds"),
     syntheticDir: path.join(base, "os-agents", "seeds"),
+    metadataFile: path.join(base, "data", "envato-seeds-metadata.json"),
   };
 }
 
@@ -55,6 +62,25 @@ function loadEnvatoSeeds(sector: string, envatoDir: string): SectorSeed[] {
   }
 }
 
+function loadMetadataSeeds(sector: string, metadataFile: string): SectorSeed[] {
+  if (!fs.existsSync(metadataFile)) return [];
+  try {
+    const entries = JSON.parse(fs.readFileSync(metadataFile, "utf-8")) as MetadataEntry[];
+    return entries
+      .filter((e) => e.sector === sector && e.headline)
+      .map((e) => ({
+        id: e.id,
+        headline: e.headline,
+        meta_title: e.meta_title,
+        cta_label: e.cta_label,
+        chatbot_greeting: e.chatbot_greeting,
+        source: e.source,
+      }));
+  } catch {
+    return [];
+  }
+}
+
 function loadSyntheticSeeds(sector: string, syntheticDir: string): SectorSeed[] {
   const file = path.join(syntheticDir, `${sector}.json`);
   if (!fs.existsSync(file)) return [];
@@ -74,15 +100,20 @@ function loadSyntheticSeeds(sector: string, syntheticDir: string): SectorSeed[] 
 }
 
 /**
- * Get seeds for a sector. Prefers Envato on-disk seeds over synthetic JSON.
- * @param sector      - e.g. restaurantes, clinicas, ecommerce
- * @param limit       - max seeds to return (default 20)
+ * Get seeds for a sector. Priority: on-disk envato files > metadata index > synthetic JSON.
+ * @param sector        - e.g. dental, restaurant, ecommerce
+ * @param limit         - max seeds to return (default 50)
  * @param _rootOverride - optional root dir for testing
  */
-export function getSectorSeeds(sector: string, limit = 20, _rootOverride?: string): SectorSeed[] {
-  const { envatoDir, syntheticDir } = resolveRoots(_rootOverride);
-  const envatoSeeds = loadEnvatoSeeds(sector, envatoDir);
-  if (envatoSeeds.length > 0) return envatoSeeds.slice(0, limit);
+export function getSectorSeeds(sector: string, limit = 50, _rootOverride?: string): SectorSeed[] {
+  const { envatoDir, syntheticDir, metadataFile } = resolveRoots(_rootOverride);
+
+  const onDisk = loadEnvatoSeeds(sector, envatoDir);
+  if (onDisk.length > 0) return onDisk.slice(0, limit);
+
+  const metadata = loadMetadataSeeds(sector, metadataFile);
+  if (metadata.length > 0) return metadata.slice(0, limit);
+
   return loadSyntheticSeeds(sector, syntheticDir).slice(0, limit);
 }
 
@@ -91,7 +122,7 @@ export function getSectorSeeds(sector: string, limit = 20, _rootOverride?: strin
  * Used by sector agents to pick a seed template given a job index.
  */
 export function getSeedByIndex(sector: string, index: number, _rootOverride?: string): SectorSeed | null {
-  const seeds = getSectorSeeds(sector, 20, _rootOverride);
+  const seeds = getSectorSeeds(sector, 50, _rootOverride);
   if (!seeds.length) return null;
   return seeds[index % seeds.length];
 }

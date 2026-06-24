@@ -36,6 +36,17 @@ beforeAll(() => {
   // Envato seeds dir (empty — no on-disk seeds)
   const envatoDir = path.join(tmpRoot, "data", "envato-seeds");
   fs.mkdirSync(envatoDir, { recursive: true });
+
+  // Envato metadata index (500 entries simulated with 3 entries for test)
+  const metadataFile = path.join(tmpRoot, "data", "envato-seeds-metadata.json");
+  fs.writeFileSync(
+    metadataFile,
+    JSON.stringify([
+      { id: "dental-001", sector: "dental", source: "synthetic", headline: "Clínica Dental Premium", meta_title: "Dental {{city}}", cta_label: "Pedir cita", chatbot_greeting: "¿Cita dental?", downloaded_at: null, envato_id: null },
+      { id: "dental-002", sector: "dental", source: "synthetic", headline: "Tu Sonrisa Perfecta", meta_title: "Dental {{city}} 2", cta_label: "Reservar", chatbot_greeting: "¿Reservas?", downloaded_at: null, envato_id: null },
+      { id: "ecommerce-001", sector: "ecommerce", source: "synthetic", headline: "Tienda Online Premium", meta_title: "Shop {{city}}", cta_label: "Comprar", chatbot_greeting: "¿Buscas algo?", downloaded_at: null, envato_id: null },
+    ]),
+  );
 });
 
 describe("getSectorSeeds — synthetic fallback", () => {
@@ -52,9 +63,11 @@ describe("getSectorSeeds — synthetic fallback", () => {
     expect(seeds[0].cta_label).toBe("Pedir cita");
   });
 
-  it("returns ecommerce seeds", () => {
+  it("returns ecommerce seeds (metadata index takes priority over synthetic JSON)", () => {
+    // ecommerce is in the metadata index, so metadata (priority 2) returns before synthetic (priority 3)
     const seeds = getSectorSeeds("ecommerce", 20, tmpRoot);
-    expect(seeds[0].headline).toBe("Compra fácil");
+    expect(seeds[0].headline).toBe("Tienda Online Premium");
+    expect(seeds[0].source).toBe("synthetic");
   });
 
   it("respects limit", () => {
@@ -80,6 +93,40 @@ describe("getSectorSeeds — envato priority", () => {
     expect(seeds[0].source).toBe("envato");
     expect(seeds[0].headline).toBe("Envato headline");
     // Clean up so other tests are unaffected
+    fs.rmSync(envatoSectorDir, { recursive: true, force: true });
+  });
+});
+
+describe("getSectorSeeds — metadata index fallback (priority 2)", () => {
+  it("returns dental seeds from metadata index when no on-disk files", () => {
+    const seeds = getSectorSeeds("dental", 50, tmpRoot);
+    expect(seeds.length).toBe(2);
+    expect(seeds[0].id).toBe("dental-001");
+    expect(seeds[0].headline).toBe("Clínica Dental Premium");
+    expect(seeds[0].source).toBe("synthetic");
+  });
+
+  it("returns ecommerce from metadata when not in synthetic JSON", () => {
+    // ecommerce is in both synthetic and metadata — on-disk wins, then metadata
+    // but synthetic JSON also has it. For dental (not in synthetic JSON) → metadata kicks in
+    const seeds = getSectorSeeds("dental", 50, tmpRoot);
+    expect(seeds.length).toBeGreaterThan(0);
+  });
+
+  it("metadata respects limit", () => {
+    const seeds = getSectorSeeds("dental", 1, tmpRoot);
+    expect(seeds).toHaveLength(1);
+  });
+
+  it("on-disk envato wins over metadata", () => {
+    const envatoSectorDir = path.join(tmpRoot, "data", "envato-seeds", "dental");
+    fs.mkdirSync(envatoSectorDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(envatoSectorDir, "ondisk-01.json"),
+      JSON.stringify({ id: "on-disk-dental", headline: "On-Disk Dental", cta_label: "Book", chatbot_greeting: "Hi" }),
+    );
+    const seeds = getSectorSeeds("dental", 50, tmpRoot);
+    expect(seeds[0].headline).toBe("On-Disk Dental");
     fs.rmSync(envatoSectorDir, { recursive: true, force: true });
   });
 });

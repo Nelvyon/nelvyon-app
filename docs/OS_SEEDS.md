@@ -77,6 +77,47 @@ In `runSkuPipeline`, deliverable metadata receives:
 
 ---
 
+## Descarga masiva Envato (500 seeds, 10 sectores)
+
+El índice `backend/data/envato-seeds-metadata.json` contiene **500 entradas sintéticas** (10 sectores × 50) listas para usar sin descargar ZIPs.
+
+### Sectores cubiertos
+
+`dental`, `legal`, `fitness`, `beauty`, `restaurant`, `real_estate`, `ecommerce`, `solar`, `coaching`, `saas_b2b`
+
+### Prioridad en seed-selector
+
+1. **On-disk** — `backend/data/envato-seeds/{sector}/*.json` (descargados con el script)
+2. **Metadata index** — `backend/data/envato-seeds-metadata.json` (500 entradas sintéticas)
+3. **Synthetic JSON** — `backend/os-agents/seeds/{sector}.json` (legacy)
+
+### Descargar ZIPs desde Envato (opcional)
+
+```bash
+# Requiere ENVATO_TOKEN en .env
+pnpm tsx backend/os-agents/seeds/download-envato-seeds.ts
+
+# Regenerar solo el metadata index (sin descarga)
+node scripts/generate-envato-metadata.mjs
+```
+
+El script descarga 50 items × 10 sectores = 500 archivos individuales en `backend/data/envato-seeds/{sector}/`.
+Los ZIPs están en `.gitignore`; solo el JSON de metadata se commitea.
+
+### Usar un seed específico
+
+```typescript
+import { getSectorSeeds, getSeedByIndex } from "@/backend/os-agents/seeds/seed-selector";
+
+// Todos los seeds de un sector (máx 50)
+const seeds = getSectorSeeds("dental", 50);
+
+// Seed determinístico por índice de job (wraps around)
+const seed = getSeedByIndex("dental", jobIndex);
+```
+
+---
+
 ## Tests
 
 ```bash
