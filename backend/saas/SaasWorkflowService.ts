@@ -77,7 +77,8 @@ export type WorkflowAction =
   | { type: "webhook_out"; config: { url: string; method?: "GET" | "POST" | "PUT"; body?: Record<string, unknown> } }
   | { type: "add_tag"; config: { contactId?: string; tag: string } }
   | { type: "send_sms"; config: { to: string; body: string } }
-  | { type: "send_whatsapp"; config: { to: string; body: string } };
+  | { type: "send_whatsapp"; config: { to: string; body: string } }
+  | { type: "log_call_activity"; config: { to: string; message?: string; contactId?: string } };
 
 export interface SaasWorkflow {
   id: string;
@@ -611,6 +612,24 @@ export class SaasWorkflowService {
               const result = await getSaasWhatsAppService().send(tenantId, { to: toResolved, body: action.config.body });
               stepsExecuted.push({ action: action.type, ok: result.status === "sent", to: toResolved, sid: result.twilioSid, provider: "twilio" });
             }
+          } catch (e) {
+            stepsExecuted.push({ action: action.type, ok: false, error: e instanceof Error ? e.message : String(e) });
+          }
+        } else if (action.type === "log_call_activity") {
+          const toResolved = action.config.to === "{{contact.phone}}"
+            ? (() => {
+                const contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+                return typeof contact.phone === "string" ? contact.phone : action.config.to;
+              })()
+            : action.config.to;
+          try {
+            const { getSaasDialerService } = await import("./SaasDialerService");
+            const call = await getSaasDialerService().initiateCall(tenantId, {
+              to: toResolved,
+              message: action.config.message,
+              contactId: action.config.contactId ?? null,
+            });
+            stepsExecuted.push({ action: action.type, ok: call.status === "initiated", to: toResolved, sid: call.callSid });
           } catch (e) {
             stepsExecuted.push({ action: action.type, ok: false, error: e instanceof Error ? e.message : String(e) });
           }

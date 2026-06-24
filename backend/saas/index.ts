@@ -678,3 +678,13 @@ export {
   type CreateTicketInput,
   type UpdateTicketInput,
 } from "./SaasHelpdeskService";
+
+export {
+  SaasDialerService,
+  getSaasDialerService,
+  resetSaasDialerServiceForTests,
+  SaasDialerError,
+  type DialerConfig,
+  type CallRecord,
+  type InitiateCallInput,
+} from "./SaasDialerService";

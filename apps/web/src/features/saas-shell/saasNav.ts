@@ -43,7 +43,8 @@ export type SaasNavId =
   | "whatsapp"
   | "funnels"
   | "web-builder"
-  | "lms";
+  | "lms"
+  | "dialer";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -66,6 +67,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "sms", label: "SMS Marketing", href: "/saas/sms", group: "comunicacion" },
   { id: "social", label: "Redes Sociales", href: "/saas/social", group: "comunicacion" },
   { id: "whatsapp", label: "💬 WhatsApp", href: "/saas/whatsapp", group: "comunicacion" },
+  { id: "dialer", label: "📞 Dialer", href: "/saas/dialer", group: "comunicacion" },
   // Captación
   { id: "publicidad", label: "Publicidad Digital", href: "/saas/publicidad", group: "captacion" },
   { id: "seo", label: "SEO", href: "/saas/seo", group: "captacion" },

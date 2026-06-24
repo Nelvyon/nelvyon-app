@@ -1,6 +1,6 @@
 # DEPLOY FINAL — Nelvyon Production Checklist
 
-> Estado: **Código completado** (Fases 1–12, S13, S14, S15, O7, S16, O8). Este documento cubre el deploy final en Railway.
+> Estado: **Código completado** (Fases 1–12, S13, S14, S15, O7, S16, O8, S17, O9). Este documento cubre el deploy final en Railway.
 
 ---
 
@@ -18,8 +18,10 @@
 | S13 | Helpdesk, Integraciones, SEO, Reputación GBP, Store BFF Stripe, CI anti-v1 gate | d4c760a |
 | S14 | Funnels analytics/publish, Web Builder renderHtml/custom_domain/publish, PDF export, migration 429 | f849570 |
 | S15 | Inbox omnicanal: reply SMS/WA/email, workflow send_sms/send_whatsapp, UI dispatch feedback | 10fae93 |
-| S16 | WhatsApp Business Cloud API (Meta): SaasWhatsAppCloudService, inbound webhook, Cloud API first + Twilio fallback | (current) |
-| O8 | 5 beta packs con runner real: social-calendar, content-strategy, cro-audit, analytics-setup, brand-voice | (current) |
+| S16 | WhatsApp Business Cloud API (Meta): SaasWhatsAppCloudService, inbound webhook, Cloud API first + Twilio fallback | 62ba68e |
+| O8 | 5 beta packs con runner real: social-calendar, content-strategy, cro-audit, analytics-setup, brand-voice | 221fcc4 |
+| S17 | Dialer Twilio: SaasDialerService click-to-call, /api/saas/dialer, UI real, log_call_activity workflow | (current) |
+| O9 | 20 sector agents: +10 sectores (veterinaria…tecnologia), sectorSeeds.ts getSeedByIndex, docs/OS_SEEDS.md | (current) |
 
 ---
 
