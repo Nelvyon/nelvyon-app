@@ -36,7 +36,8 @@
 | S24 | Store ecommerce: SaasStoreService (productos+variantes+stock+IVA EU+pedidos), migration 435, /saas/store UI, checkout+VAT+order DB, Stripe webhook, 29 tests | 6f3c3b2 |
 | S25 | Reputation elite: SaasReputationService, GBP sync bidireccional, reply OAuth, workflow trigger review_received, migration 436, /saas/reputacion reescrita, 22 tests | 3d4104d |
 | S26 | Agency white-label + Stripe Connect E2E: migration 437, subcuentas UI real, white-label UI carga API + tab Connect onboarding, 17 tests Connect mock | 8753582 |
-| S27 | CRM Sales Hub: SaasPlaybooksService (forecast ponderado, playbooks CRUD, stage probs), SaasQuotesService (CPQ quotes PDF HMAC), migration 438, /saas/pipeline reescrita (forecast+deals+playbooks+quotes), 41 tests | (current) |
+| S27 | CRM Sales Hub: SaasPlaybooksService (forecast ponderado, playbooks CRUD, stage probs), SaasQuotesService (CPQ quotes PDF HMAC), migration 438, /saas/pipeline reescrita (forecast+deals+playbooks+quotes), 41 tests | 269bca8 |
+| S28 | Service Hub: SaasHelpdeskServiceV2 (SLA auto-calc 3 políticas, macros CRUD+apply, thread mensajes), SaasKnowledgeBaseService (artículos+categorías CRUD, search, vote, views), migration 439, UIs /saas/helpdesk + /saas/knowledge-base cableadas, 53 tests | (current) |
 
 ---
 

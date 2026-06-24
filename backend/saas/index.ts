@@ -770,3 +770,28 @@ export {
   type QuoteStatus,
   type CreateQuoteInput,
 } from "./SaasQuotesService";
+
+export {
+  SaasHelpdeskServiceV2,
+  getSaasHelpdeskServiceV2,
+  resetSaasHelpdeskServiceV2ForTests,
+  SaasHelpdeskError as SaasHelpdeskErrorV2,
+  type HelpdeskTicket as HelpdeskTicketV2,
+  type HelpdeskMessage as HelpdeskMessageV2,
+  type HelpdeskMacro,
+  type MacroAction,
+  type CreateTicketInput as CreateTicketInputV2,
+  type UpdateTicketInput as UpdateTicketInputV2,
+  type SlaPolicy,
+} from "./SaasHelpdeskServiceV2";
+
+export {
+  SaasKnowledgeBaseService,
+  getSaasKbService,
+  resetSaasKbServiceForTests,
+  SaasKbError,
+  type KbArticle,
+  type KbCategory,
+  type CreateArticleInput,
+  type CreateCategoryInput,
+} from "./SaasKnowledgeBaseService";

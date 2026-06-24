@@ -1,89 +1,120 @@
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import {
-  getSaasHelpdeskService,
-  SaasHelpdeskError,
+  getSaasHelpdeskServiceV2,
+  SaasHelpdeskErrorV2,
   saasErrorBody,
   saasErrorStatus,
   requireSaasContext,
   type TicketStatus,
+  type TicketPriority,
+  type SlaPolicy,
 } from "@nelvyon/saas";
 
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
-function mapError(e: SaasHelpdeskError): NextResponse {
-  const status = e.code === "NOT_FOUND" ? 404 : 400;
-  return NextResponse.json({ error: e.message, code: e.code }, { status });
+function mapErr(e: SaasHelpdeskErrorV2): NextResponse {
+  return NextResponse.json({ error: e.message, code: e.code }, { status: e.code === "NOT_FOUND" ? 404 : 400 });
 }
 
-/** GET /api/saas/helpdesk?status=open|in_progress|resolved|closed */
+/** GET /api/saas/helpdesk?status=open&id=uuid */
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
     const { searchParams } = new URL(req.url);
+    const svc = getSaasHelpdeskServiceV2();
+    const id = searchParams.get("id");
+    if (id) {
+      const { ticket, messages } = await svc.get(ctx.tenant.id, id);
+      return NextResponse.json({ ticket, messages });
+    }
+    if (searchParams.get("resource") === "macros") {
+      const macros = await svc.listMacros(ctx.tenant.id);
+      return NextResponse.json({ macros });
+    }
     const status = searchParams.get("status") as TicketStatus | null;
-    const tickets = await getSaasHelpdeskService().list(ctx.tenant.id, status ?? undefined);
+    const tickets = await svc.list(ctx.tenant.id, status ?? undefined);
     return NextResponse.json({ tickets });
   } catch (e: unknown) {
-    if (e instanceof SaasHelpdeskError) return mapError(e);
+    if (e instanceof SaasHelpdeskErrorV2) return mapErr(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
-/** POST /api/saas/helpdesk
- *  action="message" → add message to ticket
- *  action="update"  → update status/priority/assignedTo
- *  default          → create ticket
- */
+/** POST /api/saas/helpdesk — action = message|update|apply-macro|create-macro|delete-macro|delete */
 export async function POST(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.write");
-    const body = await req.json().catch(() => null);
-    if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-    const b = body as Record<string, unknown>;
+    const b = await req.json() as Record<string, unknown>;
+    const action = String(b.action ?? "");
+    const svc = getSaasHelpdeskServiceV2();
 
-    if (b.action === "message") {
-      const msg = await getSaasHelpdeskService().addMessage(
-        ctx.tenant.id,
-        typeof b.ticket_id === "string" ? b.ticket_id : "",
-        typeof b.body === "string" ? b.body : "",
-        typeof b.author === "string" ? b.author : "agent",
-        b.is_internal === true,
+    if (action === "message") {
+      const msg = await svc.addMessage(
+        ctx.tenant.id, String(b.ticket_id ?? ""), String(b.body ?? ""),
+        String(b.author ?? "agent"), b.is_internal === true,
       );
       return NextResponse.json({ message: msg }, { status: 201 });
     }
 
-    if (b.action === "update") {
-      const ticket = await getSaasHelpdeskService().update(ctx.tenant.id, typeof b.id === "string" ? b.id : "", {
-        status: typeof b.status === "string" ? b.status as TicketStatus : undefined,
-        assignedTo: typeof b.assigned_to === "string" ? b.assigned_to : undefined,
+    if (action === "update") {
+      const ticket = await svc.update(ctx.tenant.id, String(b.id ?? ""), {
+        status:     b.status     ? String(b.status)     as TicketStatus   : undefined,
+        priority:   b.priority   ? String(b.priority)   as TicketPriority : undefined,
+        assignedTo: b.assignedTo ? String(b.assignedTo) : undefined,
+        slaPolicy:  b.slaPolicy  ? String(b.slaPolicy)  as SlaPolicy      : undefined,
       });
       return NextResponse.json({ ticket });
     }
 
-    const ticket = await getSaasHelpdeskService().create(ctx.tenant.id, {
-      subject: typeof b.subject === "string" ? b.subject : "",
-      description: typeof b.description === "string" ? b.description : null,
-      contactName: typeof b.contactName === "string" ? b.contactName : (typeof b.contact_name === "string" ? b.contact_name : ""),
-      contactEmail: typeof b.contactEmail === "string" ? b.contactEmail : (typeof b.contact_email === "string" ? b.contact_email : ""),
-      priority: typeof b.priority === "string" ? b.priority as "low" | "medium" | "high" | "urgent" : undefined,
+    if (action === "apply-macro") {
+      const ticket = await svc.applyMacro(ctx.tenant.id, String(b.ticketId ?? ""), String(b.macroId ?? ""));
+      return NextResponse.json({ ticket });
+    }
+
+    if (action === "create-macro") {
+      const macro = await svc.createMacro(ctx.tenant.id, {
+        name: String(b.name ?? ""),
+        actions: Array.isArray(b.actions) ? b.actions as Parameters<typeof svc.createMacro>[1]["actions"] : [],
+      });
+      return NextResponse.json({ macro }, { status: 201 });
+    }
+
+    if (action === "delete-macro") {
+      await svc.deleteMacro(ctx.tenant.id, String(b.id ?? ""));
+      return NextResponse.json({ ok: true });
+    }
+
+    if (action === "delete") {
+      await svc.delete(ctx.tenant.id, String(b.id ?? ""));
+      return NextResponse.json({ ok: true });
+    }
+
+    // default: create ticket
+    const ticket = await svc.create(ctx.tenant.id, {
+      subject:     String(b.subject     ?? ""),
+      description: b.description ? String(b.description) : null,
+      contactName: b.contactName ? String(b.contactName) : "",
+      contactEmail: String(b.contactEmail ?? ""),
+      priority:   b.priority  ? String(b.priority)  as TicketPriority : undefined,
+      slaPolicy:  b.slaPolicy ? String(b.slaPolicy) as SlaPolicy      : undefined,
+      assignedTo: b.assignedTo ? String(b.assignedTo) : null,
     });
     return NextResponse.json({ ticket }, { status: 201 });
   } catch (e: unknown) {
-    if (e instanceof SaasHelpdeskError) return mapError(e);
+    if (e instanceof SaasHelpdeskErrorV2) return mapErr(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
-/** DELETE /api/saas/helpdesk?id=uuid */
 export async function DELETE(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.write");
     const id = new URL(req.url).searchParams.get("id") ?? "";
-    await getSaasHelpdeskService().delete(ctx.tenant.id, id);
+    await getSaasHelpdeskServiceV2().delete(ctx.tenant.id, id);
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
-    if (e instanceof SaasHelpdeskError) return mapError(e);
+    if (e instanceof SaasHelpdeskErrorV2) return mapErr(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
