@@ -40,7 +40,11 @@ vi.mock("@/lib/packs/packRunStore", () => ({
 const mockSimulate = vi.fn(({ sku }: { sku: string }) => ({
   project: { qa: { score: 90, passed: true }, project_id: "proj-1", sku, artifacts: {}, os_refs: {} },
   escalated: false,
-  os_publish: null,
+  os_publish: {
+    deliverables: [
+      { id: "d-1", type: "landing_page", title: "Landing", visibility: "client", content: "<h1>Test</h1>", metadata: {} },
+    ],
+  },
   simulation_mode: "production",
 }));
 vi.mock("../../../../../../backend/autonomous/simulator", () => ({
@@ -50,6 +54,11 @@ vi.mock("../../../../../../backend/autonomous/simulator", () => ({
 // --- Email mock -------------------------------------------------------------
 vi.mock("../../../../../../backend/email/emailService", () => ({
   sendEmail: vi.fn().mockResolvedValue(undefined),
+}));
+
+// --- Visual QA mock — always passes for orchestrator tests ------------------
+vi.mock("../../../../../../backend/autonomous/qa/visualQaEngine", () => ({
+  runVisualQa: vi.fn(() => ({ score: 95, legal_passed: true, checks: { contrast_passes_aa: true } })),
 }));
 
 // ---------------------------------------------------------------------------

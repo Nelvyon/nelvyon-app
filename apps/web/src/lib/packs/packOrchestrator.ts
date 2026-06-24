@@ -33,6 +33,11 @@ import {
   platformDbFallbackEnabled,
 } from "@/lib/platformDbFallback";
 
+/** Returns true only when AUTONOMOUS_PRODUCTION=true is set in the environment. */
+export function isAutonomousProductionEnabled(): boolean {
+  return process.env.AUTONOMOUS_PRODUCTION === "true";
+}
+
 const SKU_STEP_KEYS: Record<AutonomousSku, string> = {
   "NELVYON-LANDING": "sku_landing",
   "NELVYON-SEO": "sku_seo",
@@ -315,6 +320,15 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
   }
 
   const { config } = params;
+
+  // Guard: publishProductionDeliverables only works when AUTONOMOUS_PRODUCTION=true.
+  // This prevents accidental production publishing in staging or local environments.
+  if (config.publishProductionDeliverables && !isAutonomousProductionEnabled()) {
+    throw new Error(
+      "publishProductionDeliverables requiere AUTONOMOUS_PRODUCTION=true. " +
+      "Activa la bandera solo tras validar el gate de producción.",
+    );
+  }
   const { meta, intake } = config;
   let run = await createPackRun({
     workspaceId: params.workspaceId,
