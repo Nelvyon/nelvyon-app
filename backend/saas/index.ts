@@ -691,3 +691,14 @@ export {
   type CallRecord,
   type InitiateCallInput,
 } from "./SaasDialerService";
+
+
+export {
+  OsRecurringServicesService,
+  getOsRecurringServicesService,
+  resetOsRecurringServicesServiceForTests,
+  type RecurringServiceType,
+  type RecurringDeliverableStatus,
+  type RecurringDeliverable,
+  type OsRecurringServicesDeps,
+} from "./OsRecurringServicesService";
