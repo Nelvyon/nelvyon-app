@@ -1,6 +1,7 @@
 import { simulateAutonomousJob } from "../../../../../backend/autonomous/simulator";
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
 import { personalizeForSector } from "@/lib/packs/packSeedTemplates";
+import { getSeedByIndex } from "@/lib/packs/sectorSeeds";
 
 import type { SimulationResult } from "../../../../../backend/autonomous/types";
 
@@ -196,10 +197,13 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     primary_cta: (params.intake as Record<string, unknown>).primary_cta as string | undefined,
   });
 
-  // Seed provenance for QA metadata (inline templates are synthetic)
+  // Seed provenance for QA metadata — use structured seed registry when available
+  const seed = getSeedByIndex(params.intake.sector, 0);
   const seedMeta = {
-    seed_id: `${params.intake.sector}_tpl_0`,
+    seed_id: seed?.seed_id ?? `${params.intake.sector}_tpl_0`,
     source: "synthetic" as const,
+    sector: params.intake.sector,
+    prompt_preview: seed?.prompt.slice(0, 80) ?? null,
   };
 
   if (shouldPublish) {

@@ -1,91 +1,85 @@
-# OS Seeds — Nelvyon
+# OS Seeds — 20 Sector Agents
 
-Seeds provide headline templates, CTAs, and chatbot greetings for sector agents.
-They enrich AI prompts so generated content is more specific and higher quality.
+Seed registry at `apps/web/src/lib/packs/sectorSeeds.ts`.  
+API: `getSeedByIndex(sectorId, index)` → `SectorSeed | null`
 
-## Seed priority
+Each seed contains: `seed_id`, `prompt` (non-empty), `output_schema`, `landing_headline`, `meta_title`, `meta_desc`, `chatbot_greeting`, `blog_h1_ideas`.
 
-1. **Envato on-disk seeds** — `backend/data/envato-seeds/{sector}/*.json`
-   Downloaded via `download-envato-seeds.ts` when `ENVATO_ELEMENTS_TOKEN` is set.
-2. **Synthetic JSON seeds** — `backend/os-agents/seeds/{sector}.json`
-   Curated templates checked into the repo. Used when Envato seeds are absent.
+---
 
-The `getSectorSeeds(sector, limit?)` function in `seed-selector.ts` handles this fallback automatically.
+## TOP 10 (original sectors)
 
-## Metadata index
+| # | `sector_id` | Label | Sensitivity | Regulated | Seeds |
+|---|---|---|---|---|---|
+| 1 | `dental` | Clínicas dentales | high | ✅ | 1 |
+| 2 | `legal` | Despachos de abogados | high | ✅ | 1 |
+| 3 | `fitness` | Gimnasios / fitness | medium | ❌ | 1 |
+| 4 | `beauty` | Clínicas estéticas | high | ✅ | 1 |
+| 5 | `restaurant` | Restaurantes | low | ❌ | 1 |
+| 6 | `real_estate` | Inmobiliarias | medium | ❌ | 1 |
+| 7 | `ecommerce` | Ecommerce / tiendas online | medium | ❌ | 1 |
+| 8 | `solar` | Instaladores solares | medium | ✅ | 1 |
+| 9 | `coaching` | Coaches y mentores | low | ❌ | 1 |
+| 10 | `saas_b2b` | SaaS B2B | low | ❌ | 1 |
 
-`backend/data/envato-seeds-metadata.json` — 51 items across 3 sectors (restaurantes, clinicas, ecommerce).
+## +10 (new sectors — O9)
 
-When Envato seeds are downloaded, each item is stored as:
-- `backend/data/envato-seeds/{sector}/{item_id}.json` — metadata only
-- ZIPs are **NOT** committed (`.gitignore` entry: `backend/data/envato-seeds/**/*.zip`)
+| # | `sector_id` | Label | Sensitivity | Regulated | Seeds |
+|---|---|---|---|---|---|
+| 11 | `veterinaria` | Clínicas veterinarias | medium | ❌ | 1 |
+| 12 | `educacion` | Academias y centros educativos | low | ❌ | 1 |
+| 13 | `turismo` | Turismo y alojamiento | low | ❌ | 1 |
+| 14 | `construccion` | Construcción y reformas | medium | ❌ | 1 |
+| 15 | `automocion` | Concesionarios y talleres | medium | ❌ | 1 |
+| 16 | `logistica` | Logística y transporte B2B | medium | ❌ | 1 |
+| 17 | `seguros` | Corredurías de seguros | high | ✅ | 1 |
+| 18 | `contabilidad` | Asesorías fiscales y gestorías | medium | ✅ | 1 |
+| 19 | `hosteleria` | Hoteles y hostelería | low | ❌ | 1 |
+| 20 | `tecnologia` | Agencias IT / desarrollo software | low | ❌ | 1 |
 
-## How to re-download Envato seeds
+---
 
-Requires `ENVATO_ELEMENTS_TOKEN` (Envato Elements API Bearer token).
+## Seed structure
 
-```bash
-# One-time download (~50 items across 3 sectors)
-ENVATO_ELEMENTS_TOKEN=your_token_here npx tsx backend/os-agents/seeds/download-envato-seeds.ts
-
-# Output:
-#   backend/data/envato-seeds/restaurantes/*.zip
-#   backend/data/envato-seeds/clinicas/*.zip
-#   backend/data/envato-seeds/ecommerce/*.zip
-
-# Then commit the metadata JSON files only (not ZIPs):
-git add backend/data/envato-seeds/**/*.json backend/data/envato-seeds-metadata.json
-git commit -m "chore(seeds): refresh envato seeds metadata"
+```typescript
+type SectorSeed = {
+  seed_id: string;          // e.g. "dental_tpl_0"
+  sector: string;
+  prompt: string;           // non-empty agent prompt (≥20 chars)
+  output_schema: { fields: string[] };  // includes landing_headline, meta_title, chatbot_greeting
+  landing_headline: string;
+  landing_subheadline: string;
+  meta_title: string;
+  meta_desc: string;
+  chatbot_greeting: string;
+  blog_h1_ideas: string[];
+};
 ```
 
-## Sector coverage — TOP 10 (O7)
+Template variables: `{{business_name}}`, `{{city}}`, `{{value_proposition}}`, `{{primary_cta}}`.
 
-All 10 priority sectors in `sectorPriority.ts` have seed support.
+---
 
-| Sector | Synthetic seeds | Envato seeds | Pack | shared.ts location |
-|---|---|---|---|---|
-| restaurantes | `seeds/restaurantes.json` (20) | `data/envato-seeds/restaurantes/` | local-business-growth | `sectors/restaurantes/` |
-| clinicas | `seeds/clinicas.json` (20) | `data/envato-seeds/clinicas/` | local-business-growth | `sectors/health/` |
-| estetica | `seeds/estetica.json` (20) | — | local-business-growth | `sectors/estetica/` |
-| realestate | `seeds/realestate.json` (20) | — | local-business-growth | `sectors/realestate/` |
-| retail | `seeds/retail.json` (20) | — | local-business-growth | `sectors/retail/` |
-| ecommerce | `seeds/ecommerce.json` (20) | `data/envato-seeds/ecommerce/` | ecommerce-growth | `sectors/ecommerce/` |
-| moda | `seeds/moda.json` (20) | — | ecommerce-growth | `sectors/fashion/` |
-| saasb2b | `seeds/saasb2b.json` (20) | — | saas-b2b-growth | `sectors/saasb2b/` |
-| consultoria | `seeds/consultoria.json` (20) | — | saas-b2b-growth | `sectors/consultoria/` |
-| fintech | `seeds/fintech.json` (20) | — | saas-b2b-growth | `sectors/fintech/` |
+## Integration with packOrchestrator
 
-> Note: `clinicas` maps to `sectors/health/` and `moda` maps to `sectors/fashion/` — seed file names follow `sectorPriority.ts seedFile` field.
+In `runSkuPipeline`, deliverable metadata receives:
 
-## Deliverable metadata (O7)
-
-Every deliverable created by `packOrchestrator.ts` now includes:
-
-```json
+```typescript
 {
-  "seed_id": "restaurantes_tpl_0",
-  "source": "synthetic"
+  seed_id: seed?.seed_id ?? `${sector}_tpl_0`,
+  source: "synthetic",
+  sector: intake.sector,
+  prompt_preview: seed?.prompt.slice(0, 80),
 }
 ```
 
-## Integration with sector agents
+`getSeedByIndex(sector, 0)` is called per-SKU run. When the sector is registered, the real `seed_id` from the registry is used. Unknown sectors fall back to the legacy `${sector}_tpl_0` format.
 
-Each sector's `shared.ts` calls `getSeedByIndex(sector, index)` to inject a seed template into the AI prompt:
+---
 
-```typescript
-// Example from restaurantes/shared.ts
-const seed = getSeedByIndex("restaurantes", params.seedIndex ?? 0);
-const seedCtx = seed
-  ? `\nSEED TEMPLATE:\n- Headline: ${seed.headline}\n- CTA: ${seed.cta_label}`
-  : "";
+## Tests
+
+```bash
+pnpm -C apps/web exec vitest run src/lib/packs/__tests__/sectorSeeds.test.ts
+# 107 tests — all 20 sectors × (seed_id, prompt, output_schema, template fields) + edge cases
 ```
-
-The seed context is appended to the agent's brief before LLM completion.
-Agents use `seedIndex % seeds.length` for deterministic, wrapping selection.
-
-## Envato Elements API
-
-- Base URL: `https://elements.envato.com/api`
-- Auth: `Authorization: Bearer {ENVATO_ELEMENTS_TOKEN}`
-- Rate limit: 300ms between requests (handled in `download-envato-seeds.ts`)
-- Items per sector: ~17 (configurable via `ITEMS_PER_SECTOR` in the script)

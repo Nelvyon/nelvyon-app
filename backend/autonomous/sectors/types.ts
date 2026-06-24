@@ -1,6 +1,7 @@
 /** Phase E — sector agent types (isolated from OS/SaaS core) */
 
 export type AutonomousSector =
+  // TOP 10
   | "dental"
   | "legal"
   | "fitness"
@@ -10,7 +11,18 @@ export type AutonomousSector =
   | "ecommerce"
   | "solar"
   | "coaching"
-  | "saas_b2b";
+  | "saas_b2b"
+  // +10
+  | "veterinaria"
+  | "educacion"
+  | "turismo"
+  | "construccion"
+  | "automocion"
+  | "logistica"
+  | "seguros"
+  | "contabilidad"
+  | "hosteleria"
+  | "tecnologia";
 
 export type SectorSensitivity = "low" | "medium" | "high";
 
