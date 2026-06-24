@@ -15,6 +15,7 @@ type FormRow = {
   name: string;
   fields: Array<{ name: string; type: string; required?: boolean }>;
   is_active: boolean;
+  honeypot_field: string;
 };
 
 type ContactUpsertRow = { id: string };
@@ -27,7 +28,7 @@ export async function POST(
   const formId = params.formId;
 
   const forms = await db.query<FormRow>(
-    `SELECT id, tenant_id, name, fields, is_active FROM saas_forms WHERE id=$1 LIMIT 1`,
+    `SELECT id, tenant_id, name, fields, is_active, honeypot_field FROM saas_forms WHERE id=$1 LIMIT 1`,
     [formId],
   );
   const form = forms[0];
@@ -36,6 +37,7 @@ export async function POST(
 
   let data: Record<string, unknown> = {};
   const ct = req.headers.get("content-type") ?? "";
+  const honeypotField = form.honeypot_field || "_hp";
   if (ct.includes("application/json")) {
     try { data = (await req.json()) as Record<string, unknown>; } catch { /**/ }
   } else if (ct.includes("application/x-www-form-urlencoded") || ct.includes("multipart/form-data")) {
@@ -43,6 +45,11 @@ export async function POST(
     if (fd) fd.forEach((v, k) => { data[k] = v; });
   } else {
     try { data = (await req.json()) as Record<string, unknown>; } catch { /**/ }
+  }
+
+  // Honeypot: silently discard bots that fill the hidden field
+  if (data[honeypotField]) {
+    return NextResponse.json({ ok: true, contactId: null }, { status: 200 });
   }
 
   // Validate required fields

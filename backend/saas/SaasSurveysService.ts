@@ -283,6 +283,40 @@ export class SaasSurveysService {
     );
     return rows[0]?.destinationUrl ?? null;
   }
+
+  // ── Share links ───────────────────────────────────────────────────────────
+
+  async enableShare(tenantId: string, surveyId: string): Promise<string> {
+    const slug = surveyId; // use UUID as slug for simplicity + guaranteed uniqueness
+    const rows = await this.db.query<{ id: string }>(
+      `UPDATE surveys SET share_enabled=TRUE, share_slug=$3
+       WHERE id=$1::uuid AND tenant_id=$2
+       RETURNING id`,
+      [surveyId, tenantId, slug],
+    );
+    if (!rows.length) throw Object.assign(new Error("Survey not found"), { code: "NOT_FOUND" });
+    return slug;
+  }
+
+  async disableShare(tenantId: string, surveyId: string): Promise<void> {
+    await this.db.query(
+      `UPDATE surveys SET share_enabled=FALSE WHERE id=$1::uuid AND tenant_id=$2`,
+      [surveyId, tenantId],
+    );
+  }
+
+  async getPublicSurvey(slugOrId: string): Promise<(Survey & { shareEnabled: boolean }) | null> {
+    const rows = await this.db.query<Record<string, unknown>>(
+      `SELECT ${SURV_SEL}, share_enabled as "shareEnabled"
+       FROM surveys
+       WHERE (share_slug=$1 OR id=$1::uuid) AND share_enabled=TRUE AND active=TRUE
+       LIMIT 1`,
+      [slugOrId],
+    );
+    if (!rows[0]) return null;
+    const s = mapSurv(rows[0]);
+    return { ...s, shareEnabled: true };
+  }
 }
 
 let _svc: SaasSurveysService | undefined;

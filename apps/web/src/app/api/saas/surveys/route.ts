@@ -72,6 +72,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ response }, { status: 201 });
     }
 
+    if (action === "enable_share") {
+      const slug = await svc.enableShare(ctx.tenant.id, String(body.id ?? ""));
+      return NextResponse.json({ slug });
+    }
+
+    if (action === "disable_share") {
+      await svc.disableShare(ctx.tenant.id, String(body.id ?? ""));
+      return NextResponse.json({ ok: true });
+    }
+
     if (action === "update") {
       const survey = await svc.updateSurvey(ctx.tenant.id, String(body.id ?? ""), body as unknown as Parameters<typeof svc.updateSurvey>[2]);
       if (!survey) return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
