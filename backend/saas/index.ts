@@ -501,3 +501,33 @@ export {
   type UtmClickRecord,
   type UtmStats,
 } from "./SaasUtmService";
+export {
+  SaasFacturasService,
+  getSaasFacturasService,
+  resetSaasFacturasServiceForTests,
+  type Factura,
+  type FacturaStatus,
+  type FacturaLineItem,
+  type FacturaStats,
+  type CreateFacturaInput,
+  type UpdateFacturaInput,
+} from "./SaasFacturasService";
+export {
+  SaasWhiteLabelService,
+  getSaasWhiteLabelService,
+  resetSaasWhiteLabelServiceForTests,
+  saasWhiteLabelService,
+  type WhiteLabelConfig,
+  type StripeConnectStatus,
+  type StripeConnectStatusResult,
+} from "./SaasWhiteLabelService";
+export {
+  SaasSubcuentasService,
+  getSaasSubcuentasService,
+  resetSaasSubcuentasServiceForTests,
+  type Subcuenta,
+  type SubcuentaStatus,
+  type SubcuentaPlan,
+  type SubcuentaUsage,
+  type CreateSubcuentaInput,
+} from "./SaasSubcuentasService";
