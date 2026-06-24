@@ -45,16 +45,6 @@ function fmt(iso: string) {
   return new Date(iso).toLocaleString("es-ES", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-const MOCK: AuditEntry[] = [
-  { id: "1", userId: "u1", userEmail: "admin@empresa.com", userName: "Admin", action: "create", module: "CRM", resourceId: "c1", resourceLabel: "Contacto: María García", metadata: {}, ip: "185.22.11.4", createdAt: new Date(Date.now() - 3 * 60000).toISOString() },
-  { id: "2", userId: "u1", userEmail: "admin@empresa.com", userName: "Admin", action: "send", module: "Campañas", resourceId: "camp1", resourceLabel: "Campaña: Black Friday", metadata: { recipients: 1240 }, ip: "185.22.11.4", createdAt: new Date(Date.now() - 12 * 60000).toISOString() },
-  { id: "3", userId: "u2", userEmail: "marketing@empresa.com", userName: "Marketing", action: "update", module: "Workflows", resourceId: "wf1", resourceLabel: "Workflow: Lead nurturing", metadata: {}, ip: "90.10.5.2", createdAt: new Date(Date.now() - 35 * 60000).toISOString() },
-  { id: "4", userId: "u1", userEmail: "admin@empresa.com", userName: "Admin", action: "login", module: "Configuración", resourceId: null, resourceLabel: null, metadata: { device: "Chrome/Windows" }, ip: "185.22.11.4", createdAt: new Date(Date.now() - 2 * 3600000).toISOString() },
-  { id: "5", userId: "u2", userEmail: "marketing@empresa.com", userName: "Marketing", action: "export", module: "CRM", resourceId: null, resourceLabel: "1.432 contactos", metadata: { format: "CSV" }, ip: "90.10.5.2", createdAt: new Date(Date.now() - 5 * 3600000).toISOString() },
-  { id: "6", userId: "u1", userEmail: "admin@empresa.com", userName: "Admin", action: "delete", module: "Pipeline", resourceId: "deal5", resourceLabel: "Deal: Proyecto Web €4.500", metadata: {}, ip: "185.22.11.4", createdAt: new Date(Date.now() - 8 * 3600000).toISOString() },
-  { id: "7", userId: "u3", userEmail: "ventas@empresa.com", userName: "Ventas", action: "create", module: "Pipeline", resourceId: "deal6", resourceLabel: "Deal: Consultoría SEO €2.200", metadata: {}, ip: "77.4.8.9", createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: "8", userId: "u1", userEmail: "admin@empresa.com", userName: "Admin", action: "publish", module: "Agentes", resourceId: "ag1", resourceLabel: "Agente: Email Marketing IA", metadata: {}, ip: "185.22.11.4", createdAt: new Date(Date.now() - 2 * 86400000).toISOString() },
-];
 
 export default function SaasAuditoriaPage() {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
@@ -69,12 +59,12 @@ export default function SaasAuditoriaPage() {
       const res = await fetch("/api/saas/audit?limit=100");
       if (res.ok) {
         const d = (await res.json()) as { entries?: AuditEntry[] };
-        setEntries(d.entries ?? MOCK);
+        setEntries(d.entries ?? []);
       } else {
-        setEntries(MOCK);
+        setEntries([]);
       }
     } catch {
-      setEntries(MOCK);
+      setEntries([]);
     } finally {
       setLoading(false);
     }

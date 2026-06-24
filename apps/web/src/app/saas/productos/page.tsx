@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -30,13 +30,6 @@ const TYPE_CONFIG: Record<ProductType, { label: string; icon: string }> = {
   subscription: { label: "Suscripción", icon: "🔄" },
 };
 
-const MOCK: Product[] = [
-  { id: "p1", name: "Pack Marketing Starter", description: "Gestión básica de redes sociales + email mensual", type: "subscription", price: 299, currency: "EUR", sku: "MKT-STR-M", stock: null, active: true, imageUrl: null, salesCount: 23, revenue: 6877, createdAt: "2026-01-10T10:00:00Z" },
-  { id: "p2", name: "Auditoría SEO Completa", description: "Análisis completo de posicionamiento web + informe detallado", type: "service", price: 450, currency: "EUR", sku: "SEO-AUD", stock: null, active: true, imageUrl: null, salesCount: 11, revenue: 4950, createdAt: "2026-02-15T10:00:00Z" },
-  { id: "p3", name: "Guía Email Marketing 2026", description: "Ebook descargable con 80 templates y estrategias", type: "digital", price: 29, currency: "EUR", sku: "GEM-2026", stock: null, active: true, imageUrl: null, salesCount: 187, revenue: 5423, createdAt: "2026-03-01T10:00:00Z" },
-  { id: "p4", name: "Sesión Estrategia 1h", description: "Consultoría estratégica de marketing personalizada", type: "service", price: 120, currency: "EUR", sku: "CONS-1H", stock: null, active: true, imageUrl: null, salesCount: 34, revenue: 4080, createdAt: "2026-04-10T10:00:00Z" },
-  { id: "p5", name: "Pack Landing + Funnel", description: "Diseño y configuración de landing page + embudo completo", type: "service", price: 1800, currency: "EUR", sku: "LND-FNL", stock: null, active: false, imageUrl: null, salesCount: 5, revenue: 9000, createdAt: "2026-01-20T10:00:00Z" },
-];
 
 function ProductModal({ product, onClose }: { product?: Product; onClose: () => void }) {
   const [name, setName] = useState(product?.name ?? "");
@@ -100,7 +93,7 @@ function ProductModal({ product, onClose }: { product?: Product; onClose: () => 
 }
 
 export default function SaasProductosPage() {
-  const [products, setProducts] = useState<Product[]>(MOCK);
+  const [products, setProducts] = useState<Product[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
   const [filterType, setFilterType] = useState<ProductType | "all">("all");
@@ -114,6 +107,18 @@ export default function SaasProductosPage() {
 
   const totalRevenue = products.reduce((s, p) => s + p.revenue, 0);
   const totalSales = products.reduce((s, p) => s + p.salesCount, 0);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/saas/documents?type=products");
+      if (res.ok) {
+        const d = (await res.json()) as { products?: Product[] };
+        setProducts(d.products ?? []);
+      }
+    } catch { /* silencioso */ }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
 
   function toggleActive(id: string) {
     setProducts(prev => prev.map(p => p.id === id ? { ...p, active: !p.active } : p));
@@ -153,6 +158,13 @@ export default function SaasProductosPage() {
               </div>
             </div>
 
+            {filtered.length === 0 && (
+              <NelvyonDsCard className="p-16 text-center">
+                <p className="text-4xl">🛍️</p>
+                <p className="mt-4 text-lg font-semibold text-foreground">Sin productos</p>
+                <p className="mt-2 text-sm text-muted-foreground">Añade tu primer producto o servicio para empezar a facturar desde el CRM.</p>
+              </NelvyonDsCard>
+            )}
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map(p => (
                 <NelvyonDsCard key={p.id} className={`flex flex-col p-4 transition-colors ${!p.active ? "opacity-60" : "hover:border-primary/30"}`}>

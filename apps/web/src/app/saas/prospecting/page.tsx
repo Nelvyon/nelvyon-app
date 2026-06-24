@@ -39,18 +39,6 @@ interface ProspectingList {
   status: "running" | "done" | "paused";
 }
 
-const MOCK_LISTS: ProspectingList[] = [
-  { id: "l1", name: "CMOs Tech España", filter: { industry: "Tecnología", country: "ES", minEmployees: 20, maxEmployees: 500, jobTitle: "CMO", keywords: "SaaS marketing" }, prospects: 312, enriched: 287, createdAt: "2026-06-15T10:00:00Z", status: "done" },
-  { id: "l2", name: "Directores Marketing LATAM", filter: { industry: "Todos", country: "MX,AR,CO", minEmployees: 50, maxEmployees: 1000, jobTitle: "Director Marketing", keywords: "" }, prospects: 841, enriched: 0, createdAt: "2026-06-20T10:00:00Z", status: "running" },
-  { id: "l3", name: "Agencias Madrid", filter: { industry: "Marketing", country: "ES", minEmployees: 5, maxEmployees: 50, jobTitle: "CEO", keywords: "agencia digital" }, prospects: 167, enriched: 142, createdAt: "2026-06-01T10:00:00Z", status: "done" },
-];
-
-const MOCK_PROSPECTS: Prospect[] = [
-  { id: "p1", name: "Laura Fernández", title: "CMO", company: "TechFlow SL", industry: "Tecnología", country: "ES", employees: 85, email: "l.fernandez@techflow.es", linkedinUrl: "https://linkedin.com/in/laurafernandez", phone: "+34 91 234 5678", enriched: true, addedToCrm: false },
-  { id: "p2", name: "Carlos Méndez", title: "Director de Marketing", company: "Innova Labs", industry: "Tecnología", country: "ES", employees: 210, email: "c.mendez@innovalabs.com", linkedinUrl: "https://linkedin.com/in/carlosmendez", phone: null, enriched: true, addedToCrm: true },
-  { id: "p3", name: "María Soto", title: "CMO", company: "DigitalHub", industry: "Tecnología", country: "ES", employees: 45, email: null, linkedinUrl: "https://linkedin.com/in/mariasoto", phone: null, enriched: false, addedToCrm: false },
-  { id: "p4", name: "Pablo Ruiz", title: "Growth Lead", company: "ScaleUp", industry: "Tecnología", country: "ES", employees: 32, email: "p.ruiz@scaleup.io", linkedinUrl: null, phone: "+34 93 456 7890", enriched: true, addedToCrm: false },
-];
 
 const STATUS_CONFIG: Record<ProspectingList["status"], { label: string; color: string; icon: string }> = {
   running: { label: "Buscando…", color: "text-yellow-400", icon: "⟳" },
@@ -76,10 +64,10 @@ export default function SaasProspectingPage() {
     try {
       const res = await fetch("/api/saas/prospecting");
       if (res.ok) {
-        const d = (await res.json()) as { lists?: ProspectingList[] };
-        setLists(d.lists ?? MOCK_LISTS);
-      } else setLists(MOCK_LISTS);
-    } catch { setLists(MOCK_LISTS); }
+        const d = (await res.json()) as { lists?: ProspectingList[]; results?: ProspectingList[] };
+        setLists(d.lists ?? d.results ?? []);
+      } else setLists([]);
+    } catch { setLists([]); }
     finally { setLoading(false); }
   }, []);
 
@@ -97,9 +85,9 @@ export default function SaasProspectingPage() {
       });
       if (res.ok) {
         const d = (await res.json()) as { prospects?: Prospect[] };
-        setProspects(d.prospects ?? MOCK_PROSPECTS);
-      } else setProspects(MOCK_PROSPECTS);
-    } catch { setProspects(MOCK_PROSPECTS); }
+        setProspects(d.prospects ?? []);
+      } else setProspects([]);
+    } catch { setProspects([]); }
     finally { setSearching(false); }
   }
 
@@ -169,7 +157,7 @@ export default function SaasProspectingPage() {
                           <div className="text-right">
                             <p className="text-xl font-bold text-foreground">{list.prospects.toLocaleString("es-ES")}</p>
                             <p className="text-xs text-muted-foreground">prospectos</p>
-                            <NelvyonDsButton variant="ghost" className="mt-2 text-xs" onClick={() => { setSelectedList(list.id); setProspects(MOCK_PROSPECTS); setTab("lists"); }}>
+                            <NelvyonDsButton variant="ghost" className="mt-2 text-xs" onClick={() => { setSelectedList(list.id); setTab("lists"); }}>
                               Ver prospectos →
                             </NelvyonDsButton>
                           </div>
@@ -178,12 +166,12 @@ export default function SaasProspectingPage() {
                           <div className="mt-4 border-t border-border pt-4">
                             <div className="mb-3 flex items-center justify-between">
                               <p className="text-sm font-medium text-foreground">Prospectos</p>
-                              <NelvyonDsButton className="text-xs" onClick={() => addToCrm(MOCK_PROSPECTS.filter(p => !p.addedToCrm).map(p => p.id))}>
+                              <NelvyonDsButton className="text-xs" onClick={() => addToCrm(prospects.filter(p => !p.addedToCrm).map(p => p.id))}>
                                 Añadir todos al CRM
                               </NelvyonDsButton>
                             </div>
                             <div className="space-y-2">
-                              {MOCK_PROSPECTS.map(p => (
+                              {prospects.map(p => (
                                 <div key={p.id} className="flex items-center gap-3 rounded-lg border border-border p-3 hover:bg-muted/10 transition-colors">
                                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">{p.name[0]}</div>
                                   <div className="flex-1 min-w-0">

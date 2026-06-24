@@ -52,13 +52,6 @@ const DEFAULT_RULES: ScoringRule[] = [
   { id: "r10", name: "Email rebotó", category: "engagement", condition: "email.bounced = true", points: -20, active: false },
 ];
 
-const MOCK_LEADS: ScoredLead[] = [
-  { id: "l1", name: "Carlos Ruiz", email: "carlos@empresa.com", company: "Tech Solutions SL", score: 87, grade: "A", topReasons: ["Reservó demo", "Hizo clic en email", "Cargo directivo"], lastActivity: "Hace 2 horas" },
-  { id: "l2", name: "Ana Martínez", email: "ana@startup.io", company: "StartupIO", score: 65, grade: "B", topReasons: ["Visitó página de precios", "Rellenó formulario"], lastActivity: "Hace 1 día" },
-  { id: "l3", name: "Pedro López", email: "pedro@consulting.es", company: "Consulting Group", score: 42, grade: "C", topReasons: ["Abrió email", "País objetivo"], lastActivity: "Hace 3 días" },
-  { id: "l4", name: "Laura Sánchez", email: "laura@personal.com", company: null, score: 18, grade: "D", topReasons: ["Abrió email"], lastActivity: "Hace 12 días" },
-  { id: "l5", name: "Miguel Torres", email: "miguel@agencia.com", company: "Agencia Digital", score: 78, grade: "A", topReasons: ["Rellenó formulario", "Empresa > 50", "Visitó precios"], lastActivity: "Hace 4 horas" },
-];
 
 function RuleRow({ rule, onToggle }: { rule: ScoringRule; onToggle: (id: string) => void }) {
   return (
@@ -98,13 +91,13 @@ export default function SaasLeadScoringPage() {
     try {
       const res = await fetch("/api/saas/lead-scoring/leads");
       if (res.ok) {
-        const d = (await res.json()) as { leads?: ScoredLead[] };
-        setLeads(d.leads ?? MOCK_LEADS);
+        const d = (await res.json()) as { leads?: ScoredLead[]; contacts?: ScoredLead[] };
+        setLeads(d.leads ?? d.contacts ?? []);
       } else {
-        setLeads(MOCK_LEADS);
+        setLeads([]);
       }
     } catch {
-      setLeads(MOCK_LEADS);
+      setLeads([]);
     } finally {
       setLoading(false);
     }

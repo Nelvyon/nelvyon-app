@@ -24,27 +24,13 @@ interface KBCategory {
   articleCount: number;
 }
 
-const MOCK_CATEGORIES: KBCategory[] = [
-  { id: "c1", name: "Primeros pasos", icon: "🚀", articleCount: 8 },
-  { id: "c2", name: "CRM & Contactos", icon: "👥", articleCount: 12 },
-  { id: "c3", name: "Email Marketing", icon: "📧", articleCount: 15 },
-  { id: "c4", name: "Automatizaciones", icon: "⚡", articleCount: 10 },
-  { id: "c5", name: "Facturación", icon: "💳", articleCount: 6 },
-  { id: "c6", name: "Integraciones", icon: "🔗", articleCount: 9 },
-];
-
-const MOCK_ARTICLES: KBArticle[] = [
-  { id: "a1", title: "Cómo configurar tu primera campaña de email", excerpt: "Guía paso a paso para crear y enviar tu primera campaña de email marketing con Nelvyon.", category: "Email Marketing", published: true, views: 1243, helpful: 98, notHelpful: 4, updatedAt: "2026-06-10T10:00:00Z" },
-  { id: "a2", title: "Importar contactos desde CSV", excerpt: "Aprende a importar tu lista de contactos desde un archivo Excel o CSV en segundos.", category: "CRM & Contactos", published: true, views: 892, helpful: 76, notHelpful: 8, updatedAt: "2026-06-05T10:00:00Z" },
-  { id: "a3", title: "Crear un workflow de lead nurturing", excerpt: "Automatiza el seguimiento de tus leads con workflows basados en comportamiento.", category: "Automatizaciones", published: true, views: 654, helpful: 61, notHelpful: 5, updatedAt: "2026-06-15T10:00:00Z" },
-  { id: "a4", title: "Conectar tu dominio personalizado", excerpt: "Cómo usar tu propio dominio para el portal de clientes y los emails enviados.", category: "Primeros pasos", published: true, views: 432, helpful: 45, notHelpful: 12, updatedAt: "2026-06-01T10:00:00Z" },
-  { id: "a5", title: "Gestionar facturas y pagos", excerpt: "Todo sobre el módulo de facturación: crear, enviar y registrar pagos.", category: "Facturación", published: false, views: 0, helpful: 0, notHelpful: 0, updatedAt: "2026-06-22T10:00:00Z" },
-];
+const EMPTY_CATEGORIES: KBCategory[] = [];
+const EMPTY_ARTICLES: KBArticle[] = [];
 
 function ArticleEditor({ article, onClose }: { article?: KBArticle; onClose: () => void }) {
   const [title, setTitle] = useState(article?.title ?? "");
   const [content, setContent] = useState(article?.excerpt ?? "");
-  const [category, setCategory] = useState(article?.category ?? MOCK_CATEGORIES[0]!.name);
+  const [category, setCategory] = useState(article?.category ?? "");
   const [published, setPublished] = useState(article?.published ?? false);
   const [saving, setSaving] = useState(false);
 
@@ -73,7 +59,7 @@ function ArticleEditor({ article, onClose }: { article?: KBArticle; onClose: () 
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Categoría</label>
             <select value={category} onChange={e => setCategory(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
-              {MOCK_CATEGORIES.map(c => <option key={c.id}>{c.name}</option>)}
+              {EMPTY_CATEGORIES.map(c => <option key={c.id}>{c.name}</option>)}
             </select>
           </div>
           <div>
@@ -97,7 +83,7 @@ function ArticleEditor({ article, onClose }: { article?: KBArticle; onClose: () 
 }
 
 export default function SaasKnowledgeBasePage() {
-  const [articles] = useState<KBArticle[]>(MOCK_ARTICLES);
+  const [articles] = useState<KBArticle[]>(EMPTY_ARTICLES);
   const [showEditor, setShowEditor] = useState(false);
   const [editing, setEditing] = useState<KBArticle | undefined>();
   const [filterCategory, setFilterCategory] = useState("Todas");
@@ -110,7 +96,8 @@ export default function SaasKnowledgeBasePage() {
   });
 
   const totalViews = articles.reduce((s, a) => s + a.views, 0);
-  const avgHelpful = articles.filter(a => a.helpful + a.notHelpful > 0).reduce((s, a) => s + (a.helpful / (a.helpful + a.notHelpful)) * 100, 0) / articles.filter(a => a.helpful + a.notHelpful > 0).length;
+  const helpfulArticles = articles.filter(a => a.helpful + a.notHelpful > 0);
+  const avgHelpful = helpfulArticles.length > 0 ? helpfulArticles.reduce((s, a) => s + (a.helpful / (a.helpful + a.notHelpful)) * 100, 0) / helpfulArticles.length : 0;
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="herramientas" />}>
@@ -127,7 +114,7 @@ export default function SaasKnowledgeBasePage() {
                 { label: "Artículos publicados", value: articles.filter(a => a.published).length },
                 { label: "Total lecturas", value: totalViews.toLocaleString("es-ES") },
                 { label: "% útil", value: `${Math.round(avgHelpful)}%` },
-                { label: "Categorías", value: MOCK_CATEGORIES.length },
+                { label: "Categorías", value: EMPTY_CATEGORIES.length },
               ].map(({ label, value }) => (
                 <NelvyonDsCard key={label} className="p-4">
                   <p className="text-xs text-muted-foreground">{label}</p>
@@ -138,7 +125,7 @@ export default function SaasKnowledgeBasePage() {
 
             {/* Categories */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              {MOCK_CATEGORIES.map(c => (
+              {EMPTY_CATEGORIES.map(c => (
                 <button key={c.id} onClick={() => setFilterCategory(filterCategory === c.name ? "Todas" : c.name)}
                   className={`rounded-xl border p-3 text-center transition-colors ${filterCategory === c.name ? "border-primary bg-primary/10" : "border-border hover:bg-muted/10"}`}>
                   <p className="text-2xl">{c.icon}</p>
@@ -151,6 +138,13 @@ export default function SaasKnowledgeBasePage() {
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar artículo…"
               className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none" />
 
+            {filtered.length === 0 && (
+              <NelvyonDsCard className="p-16 text-center">
+                <p className="text-4xl">📚</p>
+                <p className="mt-4 text-lg font-semibold text-foreground">Base de conocimiento vacía</p>
+                <p className="mt-2 text-sm text-muted-foreground">Crea el primer artículo para ayudar a tus clientes.</p>
+              </NelvyonDsCard>
+            )}
             <div className="space-y-3">
               {filtered.map(a => {
                 const helpfulPct = a.helpful + a.notHelpful > 0 ? Math.round((a.helpful / (a.helpful + a.notHelpful)) * 100) : null;

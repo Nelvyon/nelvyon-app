@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -36,12 +36,6 @@ const STATUS_CONFIG: Record<InvoiceStatus, { label: string; tone: "primary" | "s
   cancelled: { label: "Cancelada", tone: "danger" },
 };
 
-const MOCK: Invoice[] = [
-  { id: "i1", number: "FAC-2026-001", clientName: "Tech Solutions SL", clientEmail: "admin@techsolutions.es", status: "paid", lines: [{ description: "Pack Marketing Mensual", qty: 1, unitPrice: 299 }, { description: "Gestión Ads Google", qty: 1, unitPrice: 150 }], total: 449, tax: 94.29, issueDate: "2026-06-01", dueDate: "2026-06-15", paidAt: "2026-06-10", notes: "" },
-  { id: "i2", number: "FAC-2026-002", clientName: "Inmobiliaria Norte", clientEmail: "dir@inmonorte.com", status: "overdue", lines: [{ description: "Auditoría SEO Completa", qty: 1, unitPrice: 450 }], total: 450, tax: 94.5, issueDate: "2026-05-20", dueDate: "2026-06-04", paidAt: null, notes: "Pendiente confirmar IBAN" },
-  { id: "i3", number: "FAC-2026-003", clientName: "Restaurante La Plaza", clientEmail: "info@laplaza.com", status: "sent", lines: [{ description: "Diseño Landing Page", qty: 1, unitPrice: 800 }, { description: "Configuración Funnel", qty: 1, unitPrice: 400 }, { description: "Integración CRM", qty: 1, unitPrice: 200 }], total: 1400, tax: 294, issueDate: "2026-06-15", dueDate: "2026-06-30", paidAt: null, notes: "" },
-  { id: "i4", number: "FAC-2026-004", clientName: "Startup XYZ", clientEmail: "cto@startupxyz.io", status: "draft", lines: [{ description: "Consultoría Estratégica 4h", qty: 4, unitPrice: 120 }], total: 480, tax: 100.8, issueDate: "2026-06-22", dueDate: "2026-07-07", paidAt: null, notes: "" },
-];
 
 function fmt(s: string) { return new Date(s).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" }); }
 
@@ -63,9 +57,16 @@ function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await new Promise(r => setTimeout(r, 600));
-    setSaving(false);
-    onClose();
+    try {
+      await fetch("/api/saas/facturas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: invoice?.id, clientName, clientEmail, dueDate, lines, notes }),
+      });
+      onClose();
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -155,10 +156,30 @@ function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => 
 }
 
 export default function SaasFacturasPage() {
-  const [invoices] = useState<Invoice[]>(MOCK);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | undefined>();
   const [filterStatus, setFilterStatus] = useState<InvoiceStatus | "all">("all");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/saas/facturas");
+      if (res.ok) {
+        const d = (await res.json()) as { facturas?: Invoice[]; invoices?: Invoice[] };
+        setInvoices(d.facturas ?? d.invoices ?? []);
+      } else {
+        setInvoices([]);
+      }
+    } catch {
+      setInvoices([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
 
   const filtered = invoices.filter(i => filterStatus === "all" || i.status === filterStatus);
 
@@ -199,6 +220,16 @@ export default function SaasFacturasPage() {
               ))}
             </div>
 
+            {loading ? (
+              <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-muted/30" />)}</div>
+            ) : invoices.length === 0 ? (
+              <NelvyonDsCard className="p-16 text-center">
+                <p className="text-5xl">🧾</p>
+                <p className="mt-4 text-lg font-semibold text-foreground">Sin facturas</p>
+                <p className="mt-2 text-sm text-muted-foreground">Crea tu primera factura y envíala directamente desde Nelvyon</p>
+                <NelvyonDsButton className="mt-5" onClick={() => { setEditingInvoice(undefined); setShowModal(true); }}>+ Nueva factura</NelvyonDsButton>
+              </NelvyonDsCard>
+            ) : (
             <NelvyonDsCard className="overflow-hidden p-0">
               <table className="w-full text-sm">
                 <thead>
@@ -235,7 +266,8 @@ export default function SaasFacturasPage() {
                 </tbody>
               </table>
             </NelvyonDsCard>
-      {showModal && <InvoiceModal invoice={editingInvoice} onClose={() => setShowModal(false)} />}
+            )}
+      {showModal && <InvoiceModal invoice={editingInvoice} onClose={() => { setShowModal(false); void load(); }} />}
     </SaasShellLayout>
   );
 }

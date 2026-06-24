@@ -29,19 +29,6 @@ interface Post {
   createdAt: string;
 }
 
-const MOCK_COMMUNITIES: Community[] = [
-  { id: "c1", name: "Clientes Premium", description: "Espacio exclusivo para clientes de plan Pro y Agency", icon: "⭐", color: "#6366f1", memberCount: 47, postCount: 234, private: true, createdAt: "2026-01-10T10:00:00Z" },
-  { id: "c2", name: "Formación & Recursos", description: "Materiales, guías y tutoriales para aprovechar al máximo el servicio", icon: "📚", color: "#10b981", memberCount: 312, postCount: 891, private: false, createdAt: "2026-02-01T10:00:00Z" },
-  { id: "c3", name: "Ideas & Sugerencias", description: "Comparte tu feedback y vota las próximas funcionalidades", icon: "💡", color: "#f59e0b", memberCount: 189, postCount: 456, private: false, createdAt: "2026-03-15T10:00:00Z" },
-];
-
-const MOCK_POSTS: Post[] = [
-  { id: "p1", communityId: "c1", authorName: "María García", authorAvatar: "M", content: "¡Hola a todos! Acabo de implementar el workflow de lead nurturing que compartió el equipo y los resultados son increíbles. CTR del 34% en la primera semana. ¿Alguien más lo ha probado?", likes: 23, replies: 8, pinned: true, createdAt: new Date(Date.now() - 3600000 * 2).toISOString() },
-  { id: "p2", communityId: "c1", authorName: "Carlos Méndez", authorAvatar: "C", content: "Pregunta: ¿cómo configuráis vosotros el lead scoring para el sector inmobiliario? Tengo dudas con el peso de las variables firmográficas.", likes: 11, replies: 5, pinned: false, createdAt: new Date(Date.now() - 3600000 * 8).toISOString() },
-  { id: "p3", communityId: "c2", authorName: "Equipo Nelvyon", authorAvatar: "N", content: "📹 NUEVO VIDEO: Cómo configurar tu primer funnel de captación desde cero en menos de 30 minutos. Enlace en los recursos adjuntos.", likes: 67, replies: 14, pinned: true, createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: "p4", communityId: "c3", authorName: "Ana López", authorAvatar: "A", content: "Votad: ¿qué queréis que implementemos antes? A) Integración nativa con Shopify B) Editor visual de emails C) App móvil", likes: 45, replies: 32, pinned: false, createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
-];
-
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   if (diff < 3600000) return `Hace ${Math.floor(diff / 60000)} min`;
@@ -75,19 +62,32 @@ function PostCard({ post }: { post: Post }) {
   );
 }
 
-function CreateCommunityModal({ onClose }: { onClose: () => void }) {
+function CreateCommunityModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [icon, setIcon] = useState("🌐");
   const [isPrivate, setIsPrivate] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await new Promise(r => setTimeout(r, 600));
-    setSaving(false);
-    onClose();
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/communities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, description, icon, private: isPrivate }),
+      });
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      onCreated();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al crear comunidad");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -98,6 +98,7 @@ function CreateCommunityModal({ onClose }: { onClose: () => void }) {
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={save} className="space-y-4 p-6">
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="grid gap-4 sm:grid-cols-[72px_1fr]">
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Icono</label>
@@ -130,11 +131,49 @@ function CreateCommunityModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function SaasComunidadesPage() {
-  const [communities] = useState<Community[]>(MOCK_COMMUNITIES);
-  const [selectedId, setSelectedId] = useState<string>(MOCK_COMMUNITIES[0]!.id);
-  const [posts] = useState<Post[]>(MOCK_POSTS);
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loadingCommunities, setLoadingCommunities] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [newPost, setNewPost] = useState("");
+
+  const loadCommunities = useCallback(async () => {
+    setLoadingCommunities(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/communities");
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const d = (await res.json()) as { communities?: Community[] };
+      const list = d.communities ?? [];
+      setCommunities(list);
+      if (list.length > 0 && !selectedId) setSelectedId(list[0]!.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al cargar comunidades");
+      setCommunities([]);
+    } finally {
+      setLoadingCommunities(false);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadPosts = useCallback(async (communityId: string) => {
+    setLoadingPosts(true);
+    try {
+      const res = await fetch(`/api/saas/communities?communityId=${communityId}&posts=true`);
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const d = (await res.json()) as { posts?: Post[] };
+      setPosts(d.posts ?? []);
+    } catch {
+      setPosts([]);
+    } finally {
+      setLoadingPosts(false);
+    }
+  }, []);
+
+  useEffect(() => { void loadCommunities(); }, [loadCommunities]);
+  useEffect(() => { if (selectedId) void loadPosts(selectedId); }, [selectedId, loadPosts]);
 
   const selected = communities.find(c => c.id === selectedId);
   const visiblePosts = posts.filter(p => p.communityId === selectedId).sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
@@ -146,55 +185,79 @@ export default function SaasComunidadesPage() {
               <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nueva comunidad</NelvyonDsButton>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-              {/* Sidebar communities */}
-              <div className="space-y-2">
-                {communities.map(c => (
-                  <button key={c.id} onClick={() => setSelectedId(c.id)}
-                    className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${selectedId === c.id ? "border-primary bg-primary/10" : "border-border hover:bg-muted/20"}`}>
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl" style={{ backgroundColor: `${c.color}20` }}>{c.icon}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-sm font-semibold text-foreground truncate">{c.name}</p>
-                        {c.private && <span className="text-xs text-muted-foreground">🔒</span>}
-                      </div>
-                      <p className="text-xs text-muted-foreground">{c.memberCount} miembros · {c.postCount} posts</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+            {error && (
+              <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
+                <p className="text-sm text-red-400">{error}</p>
+                <button onClick={() => void loadCommunities()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
+              </NelvyonDsCard>
+            )}
 
-              {/* Posts feed */}
-              <div className="space-y-4">
-                {selected && (
-                  <NelvyonDsCard className="p-4">
-                    <div className="mb-3 flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl" style={{ backgroundColor: `${selected.color}20` }}>{selected.icon}</div>
-                      <div>
-                        <p className="font-semibold text-foreground">{selected.name}</p>
-                        <p className="text-xs text-muted-foreground">{selected.description}</p>
-                      </div>
-                    </div>
-                    <textarea value={newPost} onChange={e => setNewPost(e.target.value)} rows={3}
-                      placeholder="Escribe algo para la comunidad…"
-                      className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-                    <div className="mt-2 flex justify-end">
-                      <NelvyonDsButton disabled={!newPost.trim()} onClick={() => setNewPost("")} className="text-sm">Publicar</NelvyonDsButton>
-                    </div>
-                  </NelvyonDsCard>
-                )}
-                {visiblePosts.length === 0 ? (
-                  <NelvyonDsCard className="p-16 text-center">
-                    <p className="text-4xl">💬</p>
-                    <p className="mt-4 font-semibold text-foreground">Sin posts aún</p>
-                    <p className="mt-2 text-sm text-muted-foreground">Sé el primero en publicar en esta comunidad</p>
-                  </NelvyonDsCard>
-                ) : (
-                  visiblePosts.map(p => <PostCard key={p.id} post={p} />)
-                )}
+            {loadingCommunities ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-muted/30" />)}
               </div>
-            </div>
-      {showModal && <CreateCommunityModal onClose={() => setShowModal(false)} />}
+            ) : communities.length === 0 && !error ? (
+              <NelvyonDsCard className="p-16 text-center">
+                <p className="text-4xl">🏘️</p>
+                <p className="mt-4 font-semibold text-foreground">Sin comunidades todavía</p>
+                <p className="mt-2 text-sm text-muted-foreground">Crea tu primera comunidad para conectar con tus clientes</p>
+                <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>+ Nueva comunidad</NelvyonDsButton>
+              </NelvyonDsCard>
+            ) : (
+              <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+                {/* Sidebar communities */}
+                <div className="space-y-2">
+                  {communities.map(c => (
+                    <button key={c.id} onClick={() => setSelectedId(c.id)}
+                      className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${selectedId === c.id ? "border-primary bg-primary/10" : "border-border hover:bg-muted/20"}`}>
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl" style={{ backgroundColor: `${c.color}20` }}>{c.icon}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-sm font-semibold text-foreground truncate">{c.name}</p>
+                          {c.private && <span className="text-xs text-muted-foreground">🔒</span>}
+                        </div>
+                        <p className="text-xs text-muted-foreground">{c.memberCount} miembros · {c.postCount} posts</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Posts feed */}
+                <div className="space-y-4">
+                  {selected && (
+                    <NelvyonDsCard className="p-4">
+                      <div className="mb-3 flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl" style={{ backgroundColor: `${selected.color}20` }}>{selected.icon}</div>
+                        <div>
+                          <p className="font-semibold text-foreground">{selected.name}</p>
+                          <p className="text-xs text-muted-foreground">{selected.description}</p>
+                        </div>
+                      </div>
+                      <textarea value={newPost} onChange={e => setNewPost(e.target.value)} rows={3}
+                        placeholder="Escribe algo para la comunidad…"
+                        className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+                      <div className="mt-2 flex justify-end">
+                        <NelvyonDsButton disabled={!newPost.trim()} onClick={() => setNewPost("")} className="text-sm">Publicar</NelvyonDsButton>
+                      </div>
+                    </NelvyonDsCard>
+                  )}
+                  {loadingPosts ? (
+                    <div className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}
+                    </div>
+                  ) : visiblePosts.length === 0 ? (
+                    <NelvyonDsCard className="p-16 text-center">
+                      <p className="text-4xl">💬</p>
+                      <p className="mt-4 font-semibold text-foreground">Sin posts aún</p>
+                      <p className="mt-2 text-sm text-muted-foreground">Sé el primero en publicar en esta comunidad</p>
+                    </NelvyonDsCard>
+                  ) : (
+                    visiblePosts.map(p => <PostCard key={p.id} post={p} />)
+                  )}
+                </div>
+              </div>
+            )}
+      {showModal && <CreateCommunityModal onClose={() => setShowModal(false)} onCreated={() => void loadCommunities()} />}
     </SaasShellLayout>
   );
 }

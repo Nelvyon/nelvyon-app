@@ -30,29 +30,6 @@ const TYPE_LABEL: Record<TimerType, string> = {
 
 const THEMES = ["dark", "light", "minimal"] as const;
 
-const MOCK: CountdownTimer[] = [
-  {
-    id: "t1", name: "Black Friday 2026", type: "datetime",
-    targetDate: "2026-11-27T00:00:00Z", durationMinutes: null, evergreenMinutes: null,
-    redirectUrl: "https://mitienda.com/blackfriday", theme: "dark",
-    embedCode: `<iframe src="https://nelvyon.com/timer/t1" width="400" height="120" frameborder="0"></iframe>`,
-    active: true, views: 2341, createdAt: "2026-06-01T10:00:00Z",
-  },
-  {
-    id: "t2", name: "Oferta 48h webinar", type: "duration",
-    targetDate: null, durationMinutes: 2880, evergreenMinutes: null,
-    redirectUrl: null, theme: "light",
-    embedCode: `<iframe src="https://nelvyon.com/timer/t2" width="400" height="120" frameborder="0"></iframe>`,
-    active: true, views: 891, createdAt: "2026-06-10T10:00:00Z",
-  },
-  {
-    id: "t3", name: "Descuento personal 20min", type: "evergreen",
-    targetDate: null, durationMinutes: null, evergreenMinutes: 20,
-    redirectUrl: "https://mitienda.com/oferta", theme: "minimal",
-    embedCode: `<iframe src="https://nelvyon.com/timer/t3" width="400" height="120" frameborder="0"></iframe>`,
-    active: false, views: 5102, createdAt: "2026-05-20T10:00:00Z",
-  },
-];
 
 function LiveClock({ targetDate }: { targetDate: string }) {
   const [remaining, setRemaining] = useState({ d: 0, h: 0, m: 0, s: 0 });
@@ -186,9 +163,9 @@ export default function SaasCountdownPage() {
       const res = await fetch("/api/saas/countdown");
       if (res.ok) {
         const d = (await res.json()) as { timers?: CountdownTimer[] };
-        setTimers(d.timers ?? MOCK);
-      } else setTimers(MOCK);
-    } catch { setTimers(MOCK); }
+        setTimers(d.timers ?? []);
+      } else setTimers([]);
+    } catch { setTimers([]); }
     finally { setLoading(false); }
   }, []);
 

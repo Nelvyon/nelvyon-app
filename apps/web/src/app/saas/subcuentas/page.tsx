@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -35,12 +35,6 @@ const STATUS_CONFIG: Record<SubAccountStatus, { label: string; tone: "success" |
   trial: { label: "Trial", tone: "warning" },
 };
 
-const MOCK: SubAccount[] = [
-  { id: "a1", name: "Agencia Digital Norte", domain: "norte.nelvyon.com", ownerName: "Carlos Ruiz", ownerEmail: "carlos@agencianorte.com", plan: "agency", status: "active", contacts: 4231, campaigns: 87, monthlyRevenue: 299, createdAt: "2026-01-15T10:00:00Z", lastActive: new Date(Date.now() - 3600000).toISOString() },
-  { id: "a2", name: "Marketing Sur SL", domain: "sur.nelvyon.com", ownerName: "Ana López", ownerEmail: "ana@marketingsur.es", plan: "pro", status: "active", contacts: 1820, campaigns: 34, monthlyRevenue: 149, createdAt: "2026-02-10T10:00:00Z", lastActive: new Date(Date.now() - 86400000).toISOString() },
-  { id: "a3", name: "Consultora ABC", domain: null, ownerName: "Pedro Sánchez", ownerEmail: "pedro@consultoraabc.com", plan: "starter", status: "trial", contacts: 245, campaigns: 3, monthlyRevenue: 0, createdAt: "2026-06-10T10:00:00Z", lastActive: new Date(Date.now() - 3 * 86400000).toISOString() },
-  { id: "a4", name: "RetailMax España", domain: "retailmax.nelvyon.com", ownerName: "María Torres", ownerEmail: "maria@retailmax.es", plan: "pro", status: "suspended", contacts: 890, campaigns: 12, monthlyRevenue: 0, createdAt: "2026-03-20T10:00:00Z", lastActive: new Date(Date.now() - 30 * 86400000).toISOString() },
-];
 
 function timeAgo(iso: string) {
   const d = Date.now() - new Date(iso).getTime();
@@ -59,9 +53,16 @@ function AddSubAccountModal({ onClose }: { onClose: () => void }) {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await new Promise(r => setTimeout(r, 700));
-    setSaving(false);
-    onClose();
+    try {
+      await fetch("/api/saas/subcuentas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, ownerName, ownerEmail, plan }),
+      });
+      onClose();
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -114,9 +115,29 @@ function AddSubAccountModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function SaasSubcuentasPage() {
-  const [accounts] = useState<SubAccount[]>(MOCK);
+  const [accounts, setAccounts] = useState<SubAccount[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState<SubAccountStatus | "all">("all");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/saas/subcuentas");
+      if (res.ok) {
+        const d = (await res.json()) as { subcuentas?: SubAccount[] };
+        setAccounts(d.subcuentas ?? []);
+      } else {
+        setAccounts([]);
+      }
+    } catch {
+      setAccounts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
 
   const filtered = accounts.filter(a => filterStatus === "all" || a.status === filterStatus);
   const totalMRR = accounts.filter(a => a.status === "active").reduce((s, a) => s + a.monthlyRevenue, 0);
@@ -151,6 +172,16 @@ export default function SaasSubcuentasPage() {
               ))}
             </div>
 
+            {loading ? (
+              <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/30" />)}</div>
+            ) : accounts.length === 0 ? (
+              <NelvyonDsCard className="p-16 text-center">
+                <p className="text-5xl">🏢</p>
+                <p className="mt-4 text-lg font-semibold text-foreground">Sin subcuentas</p>
+                <p className="mt-2 text-sm text-muted-foreground">Crea la primera subcuenta para tu cliente y envíale la invitación</p>
+                <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>+ Nueva subcuenta</NelvyonDsButton>
+              </NelvyonDsCard>
+            ) : (
             <div className="space-y-3">
               {filtered.map(acc => {
                 const sc = STATUS_CONFIG[acc.status];
@@ -192,7 +223,8 @@ export default function SaasSubcuentasPage() {
                 );
               })}
             </div>
-      {showModal && <AddSubAccountModal onClose={() => setShowModal(false)} />}
+            )}
+      {showModal && <AddSubAccountModal onClose={() => { setShowModal(false); void load(); }} />}
     </SaasShellLayout>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -38,34 +38,6 @@ const STATUS_CONFIG: Record<SurveyStatus, { label: string; tone: "primary" | "su
 const Q_ICON: Record<QuestionType, string> = {
   rating: "⭐", nps: "📊", text: "T", choice: "☑", boolean: "Y/N",
 };
-
-const MOCK: Survey[] = [
-  {
-    id: "s1", name: "NPS Post-Onboarding", description: "Satisfacción tras el primer mes de uso", status: "active", responses: 47, avgScore: 8.2, npsScore: 62, createdAt: "2026-05-01T10:00:00Z",
-    questions: [
-      { id: "q1", type: "nps", text: "¿Con qué probabilidad recomendarías Nelvyon a un colega? (0-10)", required: true, scale: 10 },
-      { id: "q2", type: "text", text: "¿Qué es lo que más valoras hasta ahora?", required: false },
-      { id: "q3", type: "text", text: "¿Qué mejorarías?", required: false },
-    ],
-  },
-  {
-    id: "s2", name: "Satisfacción Post-Servicio", description: "Feedback tras entrega de proyecto", status: "active", responses: 23, avgScore: 9.1, npsScore: null, createdAt: "2026-06-01T10:00:00Z",
-    questions: [
-      { id: "q4", type: "rating", text: "¿Cómo valorarías la calidad del trabajo entregado?", required: true, scale: 10 },
-      { id: "q5", type: "rating", text: "¿Y la comunicación con el equipo?", required: true, scale: 10 },
-      { id: "q6", type: "choice", text: "¿Volverías a contratarnos?", required: true, options: ["Sí, seguro", "Probablemente sí", "No lo sé", "Probablemente no"] },
-      { id: "q7", type: "text", text: "Comentario libre", required: false },
-    ],
-  },
-  {
-    id: "s3", name: "Encuesta de Producto", description: "Qué funcionalidades priorizar en el roadmap", status: "draft", responses: 0, avgScore: null, npsScore: null, createdAt: "2026-06-20T10:00:00Z",
-    questions: [
-      { id: "q8", type: "choice", text: "¿Qué módulo usas más?", required: true, options: ["CRM", "Campañas", "Workflows", "Reportes"] },
-      { id: "q9", type: "choice", text: "¿Qué echarías más en falta?", required: false, options: ["App móvil", "Integración Shopify", "Editor email visual", "API pública"] },
-      { id: "q10", type: "boolean", text: "¿Recomendarías añadir IA a los reportes?", required: false },
-    ],
-  },
-];
 
 function NpsGauge({ score }: { score: number }) {
   const color = score >= 50 ? "text-green-400" : score >= 0 ? "text-yellow-400" : "text-red-400";
@@ -136,12 +108,35 @@ function SurveyCard({ survey }: { survey: Survey }) {
 }
 
 export default function SaasEncuestasPage() {
-  const [surveys] = useState<Survey[]>(MOCK);
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/surveys");
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const d = (await res.json()) as { surveys?: Survey[] };
+      setSurveys(d.surveys ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al cargar encuestas");
+      setSurveys([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const withNps = surveys.filter(s => s.npsScore !== null);
   const stats = {
     active: surveys.filter(s => s.status === "active").length,
     responses: surveys.reduce((s, sv) => s + sv.responses, 0),
-    avgNps: Math.round(surveys.filter(s => s.npsScore !== null).reduce((s, sv) => s + (sv.npsScore ?? 0), 0) / surveys.filter(s => s.npsScore !== null).length),
+    avgNps: withNps.length > 0
+      ? Math.round(withNps.reduce((s, sv) => s + (sv.npsScore ?? 0), 0) / withNps.length)
+      : 0,
   };
 
   return (
@@ -164,9 +159,31 @@ export default function SaasEncuestasPage() {
               ))}
             </div>
 
-            <div className="space-y-4">
-              {surveys.map(s => <SurveyCard key={s.id} survey={s} />)}
-            </div>
+            {error && (
+              <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
+                <p className="text-sm text-red-400">{error}</p>
+                <button onClick={() => void load()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
+              </NelvyonDsCard>
+            )}
+
+            {loading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/30" />
+                ))}
+              </div>
+            ) : surveys.length === 0 && !error ? (
+              <NelvyonDsCard className="p-16 text-center">
+                <p className="text-4xl">📋</p>
+                <p className="mt-4 font-semibold text-foreground">Sin encuestas todavía</p>
+                <p className="mt-2 text-sm text-muted-foreground">Crea tu primera encuesta de NPS o satisfacción</p>
+                <NelvyonDsButton className="mt-5">+ Nueva encuesta</NelvyonDsButton>
+              </NelvyonDsCard>
+            ) : (
+              <div className="space-y-4">
+                {surveys.map(s => <SurveyCard key={s.id} survey={s} />)}
+              </div>
+            )}
     </SaasShellLayout>
   );
 }

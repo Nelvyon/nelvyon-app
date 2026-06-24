@@ -37,40 +37,6 @@ const FIELD_TYPE_LABEL: Record<FieldType, string> = {
 
 const OBJECT_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#ef4444"];
 
-const MOCK_OBJECTS: CustomObject[] = [
-  {
-    id: "o1", name: "Proyecto", pluralName: "Proyectos", icon: "🏗️", color: "#6366f1", recordCount: 24,
-    createdAt: "2026-03-01T10:00:00Z",
-    fields: [
-      { id: "f1", name: "Nombre", type: "text", required: true },
-      { id: "f2", name: "Presupuesto", type: "number", required: false },
-      { id: "f3", name: "Fecha inicio", type: "date", required: false },
-      { id: "f4", name: "Estado", type: "select", required: true, options: ["Propuesta", "En curso", "Entregado", "Cancelado"] },
-      { id: "f5", name: "Cliente", type: "relation", required: false, relationTo: "CRM" },
-    ],
-  },
-  {
-    id: "o2", name: "Vehículo", pluralName: "Vehículos", icon: "🚗", color: "#ec4899", recordCount: 87,
-    createdAt: "2026-04-10T10:00:00Z",
-    fields: [
-      { id: "g1", name: "Matrícula", type: "text", required: true },
-      { id: "g2", name: "Marca", type: "text", required: true },
-      { id: "g3", name: "Año", type: "number", required: false },
-      { id: "g4", name: "En servicio", type: "boolean", required: false },
-    ],
-  },
-  {
-    id: "o3", name: "Propiedad", pluralName: "Propiedades", icon: "🏠", color: "#10b981", recordCount: 142,
-    createdAt: "2026-02-15T10:00:00Z",
-    fields: [
-      { id: "h1", name: "Dirección", type: "text", required: true },
-      { id: "h2", name: "Precio", type: "number", required: true },
-      { id: "h3", name: "Tipo", type: "select", required: true, options: ["Piso", "Casa", "Local", "Solar"] },
-      { id: "h4", name: "Disponible", type: "boolean", required: false },
-      { id: "h5", name: "Fotos", type: "file", required: false },
-    ],
-  },
-];
 
 function FieldBadge({ field }: { field: ObjectField }) {
   return (
@@ -196,16 +162,20 @@ export default function SaasObjetosPage() {
   const [showModal, setShowModal] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  const [error, setError] = useState<string | null>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/saas/objects");
-      if (res.ok) {
-        const d = (await res.json()) as { objects?: CustomObject[] };
-        setObjects(d.objects ?? MOCK_OBJECTS);
-      } else setObjects(MOCK_OBJECTS);
-    } catch { setObjects(MOCK_OBJECTS); }
-    finally { setLoading(false); }
+      const res = await fetch("/api/saas/custom-objects");
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const d = (await res.json()) as { objects?: CustomObject[] };
+      setObjects(d.objects ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al cargar objetos");
+      setObjects([]);
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
@@ -230,6 +200,13 @@ export default function SaasObjetosPage() {
                 </div>
               </div>
             </NelvyonDsCard>
+
+            {error && (
+              <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
+                <p className="text-sm text-red-400">{error}</p>
+                <button onClick={() => void load()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
+              </NelvyonDsCard>
+            )}
 
             {loading ? (
               <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/30" />)}</div>

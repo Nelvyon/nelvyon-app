@@ -124,11 +124,11 @@ const TOOLS = [
 function ApiKeyCard() {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
-  const MOCK_KEY = "nv_sk_1a2b3c4d5e6f7g8h9i0j";
-  const displayKey = revealed ? MOCK_KEY : "nv_••••••••••••••••";
+  const EXAMPLE_KEY = "nv_sk_1a2b3c4d5e6f7g8h9i0j";
+  const displayKey = revealed ? EXAMPLE_KEY : "nv_••••••••••••••••";
 
   function handleCopy() {
-    void navigator.clipboard.writeText(MOCK_KEY);
+    void navigator.clipboard.writeText(EXAMPLE_KEY);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }

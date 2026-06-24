@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -43,32 +43,6 @@ const TYPE_LABEL: Record<ABType, string> = {
   email_subject: "Asunto de email", email_content: "Contenido email", landing: "Landing page", cta: "Botón CTA",
 };
 
-const MOCK: ABTest[] = [
-  {
-    id: "t1", name: "Asunto campaña reactivación", type: "email_subject", status: "winner",
-    winnerMetric: "open_rate", confidence: 97, splitPercent: 50, startedAt: "2026-06-10T10:00:00Z", endedAt: "2026-06-13T10:00:00Z",
-    variants: [
-      { id: "v1", name: "A", label: "¡Te echamos de menos! Vuelve con 20% dto.", sent: 500, opens: 210, clicks: 42, conversions: 18, winner: false },
-      { id: "v2", name: "B", label: "Tu descuento exclusivo caduca mañana ⏰", sent: 500, opens: 285, clicks: 68, conversions: 31, winner: true },
-    ],
-  },
-  {
-    id: "t2", name: "CTA landing servicios", type: "cta", status: "running",
-    winnerMetric: "conversion_rate", confidence: 61, splitPercent: 50, startedAt: "2026-06-20T10:00:00Z", endedAt: null,
-    variants: [
-      { id: "v3", name: "A", label: "Solicitar información", sent: 1240, opens: 1240, clicks: 87, conversions: 23, winner: false },
-      { id: "v4", name: "B", label: "Ver demostración gratis", sent: 1240, opens: 1240, clicks: 134, conversions: 41, winner: false },
-    ],
-  },
-  {
-    id: "t3", name: "Contenido email bienvenida", type: "email_content", status: "draft",
-    winnerMetric: "click_rate", confidence: null, splitPercent: 50, startedAt: null, endedAt: null,
-    variants: [
-      { id: "v5", name: "A", label: "Versión larga con vídeo tutorial", sent: 0, opens: 0, clicks: 0, conversions: 0, winner: false },
-      { id: "v6", name: "B", label: "Versión corta con 3 pasos clave", sent: 0, opens: 0, clicks: 0, conversions: 0, winner: false },
-    ],
-  },
-];
 
 function pct(n: number, d: number) { return d > 0 ? `${((n / d) * 100).toFixed(1)}%` : "—"; }
 
@@ -105,8 +79,20 @@ function VariantBar({ variant, metric, total, isWinner }: { variant: ABVariant; 
 }
 
 export default function SaasABTestingPage() {
-  const [tests] = useState<ABTest[]>(MOCK);
+  const [tests, setTests] = useState<ABTest[]>([]);
   const [filterStatus, setFilterStatus] = useState<ABStatus | "all">("all");
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/saas/ab-testing");
+      if (res.ok) {
+        const d = (await res.json()) as { tests?: ABTest[] };
+        setTests(d.tests ?? []);
+      }
+    } catch { /* silencioso */ }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
 
   const filtered = tests.filter(t => filterStatus === "all" || t.status === filterStatus);
 

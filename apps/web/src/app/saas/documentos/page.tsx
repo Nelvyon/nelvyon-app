@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -35,14 +35,6 @@ const TYPE_LABEL: Record<DocType, string> = {
   proposal: "Propuesta", contract: "Contrato", estimate: "Presupuesto", nda: "NDA",
 };
 
-const MOCK: Document[] = [
-  { id: "d1", name: "Propuesta Marketing Digital Q3", type: "proposal", status: "signed", clientName: "Tech Solutions SL", clientEmail: "ceo@techsolutions.es", value: 4800, sentAt: "2026-06-10T10:00:00Z", signedAt: "2026-06-12T15:30:00Z", expiresAt: null, createdAt: "2026-06-08T10:00:00Z" },
-  { id: "d2", name: "Contrato Anual SEO + Ads", type: "contract", status: "viewed", clientName: "Inmobiliaria Norte", clientEmail: "dir@inmonorte.com", value: 18000, sentAt: "2026-06-18T10:00:00Z", signedAt: null, expiresAt: "2026-07-18T10:00:00Z", createdAt: "2026-06-17T10:00:00Z" },
-  { id: "d3", name: "Presupuesto Rediseño Web", type: "estimate", status: "sent", clientName: "Restaurante La Plaza", clientEmail: "info@laplaza.com", value: 2200, sentAt: "2026-06-20T10:00:00Z", signedAt: null, expiresAt: "2026-07-20T10:00:00Z", createdAt: "2026-06-19T10:00:00Z" },
-  { id: "d4", name: "NDA Proyecto Confidencial", type: "nda", status: "draft", clientName: "Startup XYZ", clientEmail: "cto@startupxyz.io", value: null, sentAt: null, signedAt: null, expiresAt: null, createdAt: "2026-06-22T10:00:00Z" },
-  { id: "d5", name: "Propuesta Email Marketing", type: "proposal", status: "declined", clientName: "Moda Española", clientEmail: "marketing@modaes.com", value: 1500, sentAt: "2026-06-05T10:00:00Z", signedAt: null, expiresAt: null, createdAt: "2026-06-04T10:00:00Z" },
-];
-
 const TEMPLATES = [
   { id: "t1", name: "Propuesta de servicios", type: "proposal", sections: ["Resumen ejecutivo", "Servicios incluidos", "Cronograma", "Inversión", "Condiciones"] },
   { id: "t2", name: "Contrato de prestación de servicios", type: "contract", sections: ["Partes", "Objeto del contrato", "Duración", "Precio y forma de pago", "Propiedad intelectual", "Confidencialidad"] },
@@ -56,10 +48,30 @@ function fmt(iso: string | null) {
 }
 
 export default function SaasDocumentosPage() {
-  const [docs, setDocs] = useState<Document[]>(MOCK);
+  const [docs, setDocs] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"docs" | "templates">("docs");
   const [filterStatus, setFilterStatus] = useState<DocStatus | "all">("all");
   const [search, setSearch] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/documents");
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const d = (await res.json()) as { documents?: Document[] };
+      setDocs(d.documents ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al cargar documentos");
+      setDocs([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
 
   const filtered = docs.filter(d => {
     if (filterStatus !== "all" && d.status !== filterStatus) return false;
@@ -95,6 +107,13 @@ export default function SaasDocumentosPage() {
               ))}
             </div>
 
+            {error && (
+              <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
+                <p className="text-sm text-red-400">{error}</p>
+                <button onClick={() => void load()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
+              </NelvyonDsCard>
+            )}
+
             <div className="flex gap-2">
               {(["docs", "templates"] as const).map(t => (
                 <button key={t} onClick={() => setTab(t)}
@@ -115,45 +134,64 @@ export default function SaasDocumentosPage() {
                     {(Object.keys(STATUS_CONFIG) as DocStatus[]).map(s => <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
                   </select>
                 </div>
-                <NelvyonDsCard className="overflow-hidden p-0">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border bg-muted/20">
-                        {["Documento", "Cliente", "Tipo", "Estado", "Valor", "Enviado", "Firmado"].map(h => (
-                          <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
-                        ))}
-                        <th className="px-4 py-3" />
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {filtered.map(d => {
-                        const sc = STATUS_CONFIG[d.status];
-                        return (
-                          <tr key={d.id} className="hover:bg-muted/10 transition-colors">
-                            <td className="px-4 py-3">
-                              <p className="font-medium text-foreground truncate max-w-48">{d.name}</p>
-                            </td>
-                            <td className="px-4 py-3">
-                              <p className="text-sm text-foreground">{d.clientName}</p>
-                              <p className="text-xs text-muted-foreground">{d.clientEmail}</p>
-                            </td>
-                            <td className="px-4 py-3 text-xs text-muted-foreground">{TYPE_LABEL[d.type]}</td>
-                            <td className="px-4 py-3"><NelvyonDsBadge tone={sc.tone}>{sc.icon} {sc.label}</NelvyonDsBadge></td>
-                            <td className="px-4 py-3 text-sm font-medium text-foreground">{d.value ? `€${d.value.toLocaleString("es-ES")}` : "—"}</td>
-                            <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmt(d.sentAt)}</td>
-                            <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmt(d.signedAt)}</td>
-                            <td className="px-4 py-3">
-                              <div className="flex gap-1">
-                                <NelvyonDsButton variant="ghost" className="text-xs px-2">✎ Editar</NelvyonDsButton>
-                                {d.status === "draft" && <NelvyonDsButton className="text-xs px-2">↗ Enviar</NelvyonDsButton>}
-                              </div>
+                {loading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-muted/30" />)}
+                  </div>
+                ) : docs.length === 0 && !error ? (
+                  <NelvyonDsCard className="p-16 text-center">
+                    <p className="text-4xl">📄</p>
+                    <p className="mt-4 font-semibold text-foreground">Sin documentos todavía</p>
+                    <p className="mt-2 text-sm text-muted-foreground">Crea tu primera propuesta, contrato o presupuesto</p>
+                    <NelvyonDsButton className="mt-5">+ Nuevo documento</NelvyonDsButton>
+                  </NelvyonDsCard>
+                ) : (
+                  <NelvyonDsCard className="overflow-hidden p-0">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border bg-muted/20">
+                          {["Documento", "Cliente", "Tipo", "Estado", "Valor", "Enviado", "Firmado"].map(h => (
+                            <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
+                          ))}
+                          <th className="px-4 py-3" />
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {filtered.length === 0 ? (
+                          <tr>
+                            <td colSpan={8} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                              Sin resultados para los filtros aplicados
                             </td>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </NelvyonDsCard>
+                        ) : filtered.map(d => {
+                          const sc = STATUS_CONFIG[d.status];
+                          return (
+                            <tr key={d.id} className="hover:bg-muted/10 transition-colors">
+                              <td className="px-4 py-3">
+                                <p className="font-medium text-foreground truncate max-w-48">{d.name}</p>
+                              </td>
+                              <td className="px-4 py-3">
+                                <p className="text-sm text-foreground">{d.clientName}</p>
+                                <p className="text-xs text-muted-foreground">{d.clientEmail}</p>
+                              </td>
+                              <td className="px-4 py-3 text-xs text-muted-foreground">{TYPE_LABEL[d.type]}</td>
+                              <td className="px-4 py-3"><NelvyonDsBadge tone={sc.tone}>{sc.icon} {sc.label}</NelvyonDsBadge></td>
+                              <td className="px-4 py-3 text-sm font-medium text-foreground">{d.value ? `€${d.value.toLocaleString("es-ES")}` : "—"}</td>
+                              <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmt(d.sentAt)}</td>
+                              <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmt(d.signedAt)}</td>
+                              <td className="px-4 py-3">
+                                <div className="flex gap-1">
+                                  <NelvyonDsButton variant="ghost" className="text-xs px-2">✎ Editar</NelvyonDsButton>
+                                  {d.status === "draft" && <NelvyonDsButton className="text-xs px-2">↗ Enviar</NelvyonDsButton>}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </NelvyonDsCard>
+                )}
               </>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -25,18 +25,9 @@ interface CertTemplate {
   signatureTitle: string;
 }
 
-const MOCK_CERTS: Certificate[] = [
-  { id: "c1", recipientName: "María García", recipientEmail: "maria@empresa.com", courseName: "Marketing Digital Avanzado", completedAt: "2026-06-10T10:00:00Z", score: 92, verificationCode: "NELV-2026-MG001", issued: true },
-  { id: "c2", recipientName: "Carlos López", recipientEmail: "carlos@empresa.com", courseName: "Email Marketing Maestro", completedAt: "2026-06-15T10:00:00Z", score: 88, verificationCode: "NELV-2026-CL002", issued: true },
-  { id: "c3", recipientName: "Ana Torres", recipientEmail: "ana@startup.io", courseName: "Marketing Digital Avanzado", completedAt: "2026-06-20T10:00:00Z", score: 75, verificationCode: "NELV-2026-AT003", issued: false },
-  { id: "c4", recipientName: "Pedro Ruiz", recipientEmail: "pedro@consulting.es", courseName: "SEO y Posicionamiento", completedAt: "2026-06-22T10:00:00Z", score: 95, verificationCode: "NELV-2026-PR004", issued: false },
-];
-
-const MOCK_TEMPLATES: CertTemplate[] = [
-  { id: "t1", name: "Clásico Premium", primaryColor: "#6366f1", logoPosition: "top", signatureName: "Daniel Castedo", signatureTitle: "CEO, Nelvyon" },
-  { id: "t2", name: "Corporativo Oscuro", primaryColor: "#1e293b", logoPosition: "bottom", signatureName: "Daniel Castedo", signatureTitle: "CEO, Nelvyon" },
-  { id: "t3", name: "Moderno Verde", primaryColor: "#10b981", logoPosition: "top", signatureName: "Daniel Castedo", signatureTitle: "CEO, Nelvyon" },
-];
+const DEFAULT_TEMPLATE: CertTemplate = {
+  id: "t1", name: "Clásico Premium", primaryColor: "#6366f1", logoPosition: "top", signatureName: "Daniel Castedo", signatureTitle: "CEO, Nelvyon",
+};
 
 function CertPreview({ cert, template, brandName }: { cert: Certificate; template: CertTemplate; brandName: string }) {
   return (
@@ -74,20 +65,12 @@ function CertPreview({ cert, template, brandName }: { cert: Certificate; templat
 }
 
 export default function SaasCertificadosPage() {
-  const [certs, setCerts] = useState<Certificate[]>(MOCK_CERTS);
-  const [templates] = useState<CertTemplate[]>(MOCK_TEMPLATES);
-  const [selectedTemplate, setSelectedTemplate] = useState<CertTemplate>(MOCK_TEMPLATES[0]!);
-  const [previewCert, setPreviewCert] = useState<Certificate | null>(null);
+  const [certs] = useState<Certificate[]>([]);
+  const [templates] = useState<CertTemplate[]>([]);
+  const [selectedTemplate] = useState<CertTemplate>(DEFAULT_TEMPLATE);
+  const [previewCert] = useState<Certificate | null>(null);
   const [tab, setTab] = useState<"certs" | "templates">("certs");
   const [brandName] = useState("Nelvyon Academy");
-
-  function issueCert(id: string) {
-    setCerts(prev => prev.map(c => c.id === id ? { ...c, issued: true } : c));
-  }
-
-  function issueAll() {
-    setCerts(prev => prev.map(c => ({ ...c, issued: true })));
-  }
 
   const pendingCount = certs.filter(c => !c.issued).length;
 
@@ -95,14 +78,14 @@ export default function SaasCertificadosPage() {
     <SaasShellLayout sidebar={<SaasSidebar activeId="herramientas" />}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <NelvyonDsSectionHeader title="Certificados" subtitle="Emite y gestiona certificados de finalización para tus cursos LMS" />
-              {pendingCount > 0 && <NelvyonDsButton onClick={issueAll}>↗ Emitir {pendingCount} pendientes</NelvyonDsButton>}
+              {pendingCount > 0 && <NelvyonDsButton>↗ Emitir {pendingCount} pendientes</NelvyonDsButton>}
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: "Certificados emitidos", value: certs.filter(c => c.issued).length },
                 { label: "Pendientes de emitir", value: pendingCount },
-                { label: "Puntuación media", value: `${Math.round(certs.reduce((s, c) => s + c.score, 0) / certs.length)}/100` },
+                { label: "Puntuación media", value: certs.length > 0 ? `${Math.round(certs.reduce((s, c) => s + c.score, 0) / certs.length)}/100` : "—" },
               ].map(({ label, value }) => (
                 <NelvyonDsCard key={label} className="p-4">
                   <p className="text-xs text-muted-foreground">{label}</p>
@@ -121,58 +104,59 @@ export default function SaasCertificadosPage() {
             </div>
 
             {tab === "certs" ? (
-              <div className="space-y-3">
-                {certs.map(cert => (
-                  <NelvyonDsCard key={cert.id} className="p-4">
-                    <div className="flex flex-wrap items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xl font-bold text-primary">{cert.recipientName[0]}</div>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-semibold text-foreground">{cert.recipientName}</p>
-                          <NelvyonDsBadge tone={cert.issued ? "success" : "warning"}>{cert.issued ? "Emitido" : "Pendiente"}</NelvyonDsBadge>
+              certs.length === 0 ? (
+                <NelvyonDsCard className="p-16 text-center">
+                  <p className="text-4xl">🎓</p>
+                  <p className="mt-4 text-lg font-semibold text-foreground">Certificados no configurados</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Activa el módulo LMS para emitir certificados de finalización.</p>
+                </NelvyonDsCard>
+              ) : (
+                <div className="space-y-3">
+                  {certs.map(cert => (
+                    <NelvyonDsCard key={cert.id} className="p-4">
+                      <div className="flex flex-wrap items-start gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xl font-bold text-primary">{cert.recipientName[0]}</div>
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-semibold text-foreground">{cert.recipientName}</p>
+                            <NelvyonDsBadge tone={cert.issued ? "success" : "warning"}>{cert.issued ? "Emitido" : "Pendiente"}</NelvyonDsBadge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{cert.courseName}</p>
+                          <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                            <span>{cert.recipientEmail}</span>
+                            <span>Nota: <strong className="text-foreground">{cert.score}/100</strong></span>
+                            <span>Completado: {new Date(cert.completedAt).toLocaleDateString("es-ES")}</span>
+                            <span className="font-mono">{cert.verificationCode}</span>
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">{cert.courseName}</p>
-                        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                          <span>{cert.recipientEmail}</span>
-                          <span>Nota: <strong className="text-foreground">{cert.score}/100</strong></span>
-                          <span>Completado: {new Date(cert.completedAt).toLocaleDateString("es-ES")}</span>
-                          <span className="font-mono">{cert.verificationCode}</span>
+                        <div className="flex gap-2">
+                          {cert.issued && <NelvyonDsButton variant="ghost" className="text-xs">↓ PDF</NelvyonDsButton>}
+                          {cert.issued && <NelvyonDsButton variant="ghost" className="text-xs">↗ Email</NelvyonDsButton>}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => setPreviewCert(cert)}>👁 Ver</NelvyonDsButton>
-                        {!cert.issued && <NelvyonDsButton className="text-xs" onClick={() => issueCert(cert.id)}>↗ Emitir</NelvyonDsButton>}
-                        {cert.issued && <NelvyonDsButton variant="ghost" className="text-xs">↓ PDF</NelvyonDsButton>}
-                        {cert.issued && <NelvyonDsButton variant="ghost" className="text-xs">↗ Email</NelvyonDsButton>}
-                      </div>
-                    </div>
-                  </NelvyonDsCard>
-                ))}
-              </div>
+                    </NelvyonDsCard>
+                  ))}
+                </div>
+              )
             ) : (
-              <div className="grid gap-4 sm:grid-cols-3">
-                {templates.map(t => (
-                  <div key={t.id} onClick={() => setSelectedTemplate(t)}
-                    className={`cursor-pointer rounded-2xl border-2 p-1 transition-all ${selectedTemplate.id === t.id ? "border-primary shadow-lg" : "border-border hover:border-primary/40"}`}>
-                    <CertPreview cert={MOCK_CERTS[0]!} template={t} brandName={brandName} />
-                    <p className="mt-2 px-2 pb-2 text-center text-sm font-medium text-foreground">{t.name}</p>
-                  </div>
-                ))}
-              </div>
+              templates.length === 0 ? (
+                <NelvyonDsCard className="p-16 text-center">
+                  <p className="text-4xl">🖼️</p>
+                  <p className="mt-4 text-lg font-semibold text-foreground">Certificados no configurados</p>
+                  <p className="mt-2 text-sm text-muted-foreground">No hay plantillas de certificados disponibles.</p>
+                </NelvyonDsCard>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {templates.map(t => (
+                    <div key={t.id}
+                      className={`cursor-pointer rounded-2xl border-2 p-1 transition-all ${selectedTemplate.id === t.id ? "border-primary shadow-lg" : "border-border hover:border-primary/40"}`}>
+                      <p className="mt-2 px-2 pb-2 text-center text-sm font-medium text-foreground">{t.name}</p>
+                    </div>
+                  ))}
+                </div>
+              )
             )}
 
-      {previewCert && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-2xl">
-            <CertPreview cert={previewCert} template={selectedTemplate} brandName={brandName} />
-            <div className="mt-4 flex gap-3 justify-center">
-              <NelvyonDsButton variant="ghost" onClick={() => setPreviewCert(null)}>Cerrar</NelvyonDsButton>
-              <NelvyonDsButton>↓ Descargar PDF</NelvyonDsButton>
-              <NelvyonDsButton>↗ Enviar por email</NelvyonDsButton>
-            </div>
-          </div>
-        </div>
-      )}
     </SaasShellLayout>
   );
 }

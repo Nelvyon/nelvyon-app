@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -42,33 +42,6 @@ const EVENT_GROUPS: Record<string, WebhookEvent[]> = {
   "Facturación": ["invoice.paid", "subscription.activated", "subscription.cancelled"],
 };
 
-const MOCK_WEBHOOKS: Webhook[] = [
-  {
-    id: "w1", name: "CRM a Slack", url: "https://hooks.slack.com/services/T123/B456/xyz",
-    events: ["contact.created", "deal.won", "form.submitted"],
-    active: true, secret: "whsec_abc123xyz456", deliveries: 1247, failures: 3,
-    lastDeliveredAt: new Date(Date.now() - 5 * 60000).toISOString(), createdAt: "2026-03-01T10:00:00Z",
-  },
-  {
-    id: "w2", name: "Zapier — Lead a Sheets", url: "https://hooks.zapier.com/hooks/catch/123456/abcdef",
-    events: ["contact.created", "form.submitted", "appointment.booked"],
-    active: true, secret: "whsec_zapier789", deliveries: 892, failures: 0,
-    lastDeliveredAt: new Date(Date.now() - 3600000).toISOString(), createdAt: "2026-04-10T10:00:00Z",
-  },
-  {
-    id: "w3", name: "N8N — Automatización interna", url: "https://n8n.miempresa.com/webhook/nelvyon",
-    events: ["deal.stage_changed", "deal.won", "invoice.paid", "subscription.activated"],
-    active: false, secret: "whsec_n8n_custom", deliveries: 234, failures: 12,
-    lastDeliveredAt: new Date(Date.now() - 2 * 86400000).toISOString(), createdAt: "2026-05-15T10:00:00Z",
-  },
-];
-
-const MOCK_LOGS: WebhookLog[] = [
-  { id: "l1", webhookId: "w1", event: "contact.created", statusCode: 200, duration: 142, payload: '{"event":"contact.created","contact":{"id":"c123","name":"María García","email":"maria@empresa.com"}}', createdAt: new Date(Date.now() - 5 * 60000).toISOString() },
-  { id: "l2", webhookId: "w1", event: "form.submitted", statusCode: 200, duration: 89, payload: '{"event":"form.submitted","form":{"id":"f1","name":"Contacto web"}}', createdAt: new Date(Date.now() - 15 * 60000).toISOString() },
-  { id: "l3", webhookId: "w2", event: "appointment.booked", statusCode: 200, duration: 234, payload: '{"event":"appointment.booked","appointment":{"id":"a5","date":"2026-07-01"}}', createdAt: new Date(Date.now() - 3600000).toISOString() },
-  { id: "l4", webhookId: "w1", event: "deal.won", statusCode: 500, duration: 3041, payload: '{"event":"deal.won","deal":{"id":"d8","value":12000}}', createdAt: new Date(Date.now() - 2 * 3600000).toISOString() },
-];
 
 function CreateWebhookModal({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState("");
@@ -88,9 +61,16 @@ function CreateWebhookModal({ onClose }: { onClose: () => void }) {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await new Promise(r => setTimeout(r, 600));
-    setSaving(false);
-    onClose();
+    try {
+      await fetch("/api/saas/webhooks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, url, events: selectedEvents }),
+      });
+    } finally {
+      setSaving(false);
+      onClose();
+    }
   }
 
   return (
@@ -159,10 +139,40 @@ function timeAgo(iso: string) {
 }
 
 export default function SaasWebhooksPage() {
-  const [webhooks, setWebhooks] = useState<Webhook[]>(MOCK_WEBHOOKS);
+  const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [showLogs, setShowLogs] = useState<string | null>(null);
   const [copiedSecret, setCopiedSecret] = useState<string | null>(null);
+  const [logs, setLogs] = useState<WebhookLog[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/saas/webhooks");
+      if (res.ok) {
+        const d = (await res.json()) as { webhooks?: Webhook[] };
+        setWebhooks(d.webhooks ?? []);
+      }
+    } catch { /* silencioso */ }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function openLogs(id: string) {
+    if (showLogs === id) { setShowLogs(null); return; }
+    setShowLogs(id);
+    setLoadingLogs(true);
+    try {
+      const res = await fetch(`/api/saas/webhooks?id=${id}&logs=true`);
+      if (res.ok) {
+        const d = (await res.json()) as { logs?: WebhookLog[] };
+        setLogs(d.logs ?? []);
+      } else {
+        setLogs([]);
+      }
+    } catch { setLogs([]); }
+    finally { setLoadingLogs(false); }
+  }
 
   function toggleActive(id: string) {
     setWebhooks(prev => prev.map(w => w.id === id ? { ...w, active: !w.active } : w));
@@ -174,7 +184,7 @@ export default function SaasWebhooksPage() {
     setTimeout(() => setCopiedSecret(null), 1500);
   }
 
-  const visibleLogs = MOCK_LOGS.filter(l => l.webhookId === showLogs);
+  const visibleLogs = logs.filter(l => l.webhookId === showLogs);
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="webhooks" />}>
@@ -230,7 +240,7 @@ export default function SaasWebhooksPage() {
                           className={`relative inline-flex h-6 w-11 cursor-pointer rounded-full transition-colors ${w.active ? "bg-primary" : "bg-muted"}`}>
                           <span className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${w.active ? "translate-x-5" : "translate-x-1"}`} />
                         </button>
-                        <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => setShowLogs(showLogs === w.id ? null : w.id)}>
+                        <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => openLogs(w.id)}>
                           {showLogs === w.id ? "Ocultar logs" : "Ver logs"}
                         </NelvyonDsButton>
                         <NelvyonDsButton variant="ghost" className="text-xs">✉ Test</NelvyonDsButton>
@@ -242,7 +252,11 @@ export default function SaasWebhooksPage() {
                       <div className="px-5 py-3">
                         <p className="mb-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Entregas recientes</p>
                         <div className="space-y-2">
-                          {visibleLogs.map(log => (
+                          {loadingLogs ? (
+                            <div className="h-16 animate-pulse rounded-xl bg-muted/30" />
+                          ) : visibleLogs.length === 0 ? (
+                            <p className="text-xs text-muted-foreground">Sin entregas registradas.</p>
+                          ) : visibleLogs.map(log => (
                             <div key={log.id} className="flex items-start gap-3 rounded-lg bg-muted/10 p-3">
                               <span className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-mono font-bold ${log.statusCode >= 200 && log.statusCode < 300 ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"}`}>
                                 {log.statusCode}

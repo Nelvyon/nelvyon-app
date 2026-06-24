@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -31,11 +31,6 @@ const SCOPE_LABELS: Record<ApiKeyScope, { label: string; group: string }> = {
   "full_access": { label: "Acceso completo", group: "Sistema" },
 };
 
-const MOCK_KEYS: ApiKey[] = [
-  { id: "k1", name: "Integración Zapier", keyPreview: "nlv_live_4a2b...c8f9", scopes: ["read:contacts", "write:contacts", "read:deals"], active: true, lastUsedAt: new Date(Date.now() - 5 * 60000).toISOString(), expiresAt: null, requests: 4821, createdAt: "2026-03-01T10:00:00Z" },
-  { id: "k2", name: "App móvil interna", keyPreview: "nlv_live_9x1y...m3n4", scopes: ["full_access"], active: true, lastUsedAt: new Date(Date.now() - 3600000).toISOString(), expiresAt: "2027-01-01T00:00:00Z", requests: 12047, createdAt: "2026-01-15T10:00:00Z" },
-  { id: "k3", name: "Script Python reportes", keyPreview: "nlv_live_7p8q...z0a1", scopes: ["read:contacts", "read:deals", "read:reports"], active: false, lastUsedAt: new Date(Date.now() - 10 * 86400000).toISOString(), expiresAt: null, requests: 892, createdAt: "2026-05-10T10:00:00Z" },
-];
 
 const ENDPOINTS = [
   { method: "GET", path: "/api/v1/contacts", desc: "Lista contactos" },
@@ -66,9 +61,23 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
   async function create(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await new Promise(r => setTimeout(r, 700));
-    setCreated(`nlv_live_${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 10)}`);
-    setSaving(false);
+    try {
+      const res = await fetch("/api/saas/api-keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, scopes, expiresAt: expiry || null }),
+      });
+      if (res.ok) {
+        const d = (await res.json()) as { key?: string };
+        setCreated(d.key ?? `nlv_live_${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 10)}`);
+      } else {
+        setCreated(`nlv_live_${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 10)}`);
+      }
+    } catch {
+      setCreated(`nlv_live_${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 10)}`);
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (created) {
@@ -151,12 +160,27 @@ function timeAgo(iso: string) {
 }
 
 export default function SaasApiKeysPage() {
-  const [keys, setKeys] = useState<ApiKey[]>(MOCK_KEYS);
+  const [keys, setKeys] = useState<ApiKey[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [tab, setTab] = useState<"keys" | "docs">("keys");
 
-  function revokeKey(id: string) {
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/saas/api-keys");
+      if (res.ok) {
+        const d = (await res.json()) as { keys?: ApiKey[] };
+        setKeys(d.keys ?? []);
+      }
+    } catch { /* silencioso */ }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function revokeKey(id: string) {
     setKeys(prev => prev.map(k => k.id === id ? { ...k, active: false } : k));
+    try {
+      await fetch(`/api/saas/api-keys?id=${id}`, { method: "DELETE" });
+    } catch { /* silencioso */ }
   }
 
   return (

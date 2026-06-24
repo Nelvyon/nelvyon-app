@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -40,33 +40,6 @@ const STATUS_CONFIG: Record<MemberStatus, { label: string; tone: "success" | "wa
   suspended: { label: "Suspendido", tone: "danger" },
 };
 
-const MOCK_MEMBERS: TeamMember[] = [
-  {
-    id: "m1", name: "Daniel Castedo", email: "daniel@nelvyon.com", role: "owner", status: "active",
-    avatar: "D", lastActive: new Date(Date.now() - 1800000).toISOString(),
-    permissions: [],
-  },
-  {
-    id: "m2", name: "Ana García", email: "ana@empresa.com", role: "admin", status: "active",
-    avatar: "A", lastActive: new Date(Date.now() - 3600000).toISOString(),
-    permissions: [],
-  },
-  {
-    id: "m3", name: "Carlos López", email: "carlos@empresa.com", role: "manager", status: "active",
-    avatar: "C", lastActive: new Date(Date.now() - 86400000).toISOString(),
-    permissions: [],
-  },
-  {
-    id: "m4", name: "María Torres", email: "maria@empresa.com", role: "user", status: "active",
-    avatar: "M", lastActive: new Date(Date.now() - 2 * 86400000).toISOString(),
-    permissions: [],
-  },
-  {
-    id: "m5", name: "Pedro Ruiz", email: "pedro@freelance.com", role: "viewer", status: "invited",
-    avatar: "P", lastActive: null,
-    permissions: [],
-  },
-];
 
 const ROLE_PERMISSIONS: Record<Role, string[]> = {
   owner: ["Todo"],
@@ -85,9 +58,16 @@ function InviteMemberModal({ onClose }: { onClose: () => void }) {
   async function invite(e: React.FormEvent) {
     e.preventDefault();
     setSending(true);
-    await new Promise(r => setTimeout(r, 700));
-    setSending(false);
-    onClose();
+    try {
+      await fetch("/api/saas/team", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, name, role }),
+      });
+      onClose();
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -146,12 +126,40 @@ function timeAgo(iso: string) {
 }
 
 export default function SaasTeamPage() {
-  const [members, setMembers] = useState<TeamMember[]>(MOCK_MEMBERS);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showInvite, setShowInvite] = useState(false);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
 
-  function suspendMember(id: string) {
-    setMembers(prev => prev.map(m => m.id === id ? { ...m, status: m.status === "suspended" ? "active" : "suspended" } : m));
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/saas/team");
+      if (res.ok) {
+        const d = (await res.json()) as { members?: TeamMember[] };
+        setMembers(d.members ?? []);
+      } else {
+        setMembers([]);
+      }
+    } catch {
+      setMembers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function suspendMember(id: string) {
+    const member = members.find(m => m.id === id);
+    if (!member) return;
+    const newStatus = member.status === "suspended" ? "active" : "suspended";
+    setMembers(prev => prev.map(m => m.id === id ? { ...m, status: newStatus } : m));
+    await fetch("/api/saas/team", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: newStatus === "suspended" ? "suspend" : "reactivate" }),
+    });
   }
 
   return (
@@ -191,6 +199,16 @@ export default function SaasTeamPage() {
             </div>
 
             {/* Members table */}
+            {loading ? (
+              <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-muted/30" />)}</div>
+            ) : members.length === 0 ? (
+              <NelvyonDsCard className="p-16 text-center">
+                <p className="text-5xl">👥</p>
+                <p className="mt-4 text-lg font-semibold text-foreground">Sin miembros de equipo</p>
+                <p className="mt-2 text-sm text-muted-foreground">Invita a tu primer colaborador y asígnale un rol con permisos granulares</p>
+                <NelvyonDsButton className="mt-5" onClick={() => setShowInvite(true)}>+ Invitar miembro</NelvyonDsButton>
+              </NelvyonDsCard>
+            ) : (
             <NelvyonDsCard className="overflow-hidden p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -245,6 +263,7 @@ export default function SaasTeamPage() {
                 </table>
               </div>
             </NelvyonDsCard>
+            )}
 
             {/* Permissions info */}
             <NelvyonDsCard className="p-5">
@@ -278,7 +297,7 @@ export default function SaasTeamPage() {
                 </table>
               </div>
             </NelvyonDsCard>
-      {showInvite && <InviteMemberModal onClose={() => setShowInvite(false)} />}
+      {showInvite && <InviteMemberModal onClose={() => { setShowInvite(false); void load(); }} />}
     </SaasShellLayout>
   );
 }
