@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import {
   getSaasSequencesService,
-  getSaasWorkflowService,
   SaasSequencesError,
   saasErrorBody,
   saasErrorStatus,
@@ -18,15 +17,11 @@ export async function POST(req: Request, { params }: { params: { sequenceId: str
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const b = body as Record<string, unknown>;
     if (typeof b.contact_id !== "string") return NextResponse.json({ error: "contact_id required" }, { status: 400 });
-    const enrollment = await getSaasSequencesService().enroll(ctx.tenant.id, params.sequenceId, b.contact_id);
-    void getSaasWorkflowService().dispatchActiveWorkflows(ctx.tenant.id, "sequence_enrolled", {
-      sequenceId: params.sequenceId, contactId: b.contact_id,
-    }).catch(() => undefined);
-    return NextResponse.json({ enrollment }, { status: 201 });
+    await getSaasSequencesService().handleReplyHook(ctx.tenant.id, params.sequenceId, b.contact_id);
+    return NextResponse.json({ ok: true });
   } catch (e: unknown) {
     if (e instanceof SaasSequencesError) {
-      const status = e.code === "NOT_FOUND" ? 404 : 400;
-      return NextResponse.json({ error: e.message, code: e.code }, { status });
+      return NextResponse.json({ error: e.message, code: e.code }, { status: e.code === "NOT_FOUND" ? 404 : 400 });
     }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

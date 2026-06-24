@@ -47,7 +47,8 @@ export type TriggerType =
   | "email_opened"
   | "email_clicked"
   | "webhook_in"
-  | "date_reached";
+  | "date_reached"
+  | "sequence_enrolled";
 
 export type WorkflowConditionField =
   | "contact.status"
@@ -161,6 +162,7 @@ const TRIGGERS: readonly TriggerType[] = [
   "email_clicked",
   "webhook_in",
   "date_reached",
+  "sequence_enrolled",
 ] as const;
 const STAGES: readonly PipelineStage[] = ["new", "contacted", "qualified", "proposal", "won", "lost"] as const;
 const CONTACT_STATUSES: readonly ContactStatus[] = ["lead", "prospect", "client", "churned"] as const;

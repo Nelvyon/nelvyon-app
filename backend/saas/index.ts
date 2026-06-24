@@ -430,6 +430,9 @@ export {
   type SaasSequenceEnrollment,
   type CreateSequenceInput,
   type CreateStepInput,
+  type UpdateStepInput,
+  type SequenceStepType,
+  type BranchCondition,
   type SequenceStatus,
   type SequenceTrigger,
 } from "./SaasSequencesService";

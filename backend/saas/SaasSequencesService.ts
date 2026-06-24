@@ -3,6 +3,13 @@ import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type SequenceStatus = "active" | "paused" | "archived";
 export type SequenceTrigger = "manual" | "contact_created" | "form_submitted" | "tag_added";
+export type SequenceStepType = "email" | "wait" | "branch";
+
+export interface BranchCondition {
+  field: "replied" | "opened" | "clicked" | "tag";
+  op: "eq" | "has";
+  value: string | boolean;
+}
 
 export interface SaasSequence {
   id: string;
@@ -21,10 +28,14 @@ export interface SaasSequenceStep {
   id: string;
   sequenceId: string;
   position: number;
+  stepType: SequenceStepType;
   delayDays: number;
   delayHours: number;
   subject: string;
   bodyHtml: string;
+  branchCondition: BranchCondition | null;
+  branchYesPosition: number | null;
+  branchNoPosition: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -36,6 +47,7 @@ export interface SaasSequenceEnrollment {
   contactId: string;
   currentStep: number;
   status: "active" | "completed" | "unsubscribed" | "failed";
+  replyReceived: boolean;
   nextSendAt: string | null;
   enrolledAt: string;
   completedAt: string | null;
@@ -50,11 +62,17 @@ export interface CreateSequenceInput {
 
 export interface CreateStepInput {
   position?: number;
+  stepType?: SequenceStepType;
   delayDays?: number;
   delayHours?: number;
-  subject: string;
-  bodyHtml: string;
+  subject?: string;
+  bodyHtml?: string;
+  branchCondition?: BranchCondition | null;
+  branchYesPosition?: number | null;
+  branchNoPosition?: number | null;
 }
+
+export type UpdateStepInput = Partial<CreateStepInput>;
 
 export class SaasSequencesError extends Error {
   constructor(
@@ -74,16 +92,21 @@ type SeqRow = {
 };
 
 type StepRow = {
-  id: string; sequence_id: string; position: number | string; delay_days: number | string;
-  delay_hours: number | string; subject: string; body_html: string;
+  id: string; sequence_id: string; position: number | string; step_type: SequenceStepType;
+  delay_days: number | string; delay_hours: number | string; subject: string; body_html: string;
+  branch_condition: BranchCondition | null; branch_yes_position: number | null; branch_no_position: number | null;
   created_at: Date | string; updated_at: Date | string;
 };
 
 type EnrollRow = {
   id: string; sequence_id: string; tenant_id: string; contact_id: string;
   current_step: number | string; status: "active" | "completed" | "unsubscribed" | "failed";
+  reply_received: boolean;
   next_send_at: Date | string | null; enrolled_at: Date | string; completed_at: Date | string | null;
 };
+
+const STEP_COLS = `id, sequence_id, position, step_type, delay_days, delay_hours, subject, body_html,
+                   branch_condition, branch_yes_position, branch_no_position, created_at, updated_at`;
 
 function rowToSeq(r: SeqRow): SaasSequence {
   return {
@@ -98,8 +121,12 @@ function rowToSeq(r: SeqRow): SaasSequence {
 function rowToStep(r: StepRow): SaasSequenceStep {
   return {
     id: r.id, sequenceId: r.sequence_id, position: Number(r.position),
+    stepType: r.step_type ?? "email",
     delayDays: Number(r.delay_days), delayHours: Number(r.delay_hours),
     subject: r.subject, bodyHtml: r.body_html,
+    branchCondition: r.branch_condition ?? null,
+    branchYesPosition: r.branch_yes_position ?? null,
+    branchNoPosition: r.branch_no_position ?? null,
     createdAt: new Date(r.created_at).toISOString(),
     updatedAt: new Date(r.updated_at).toISOString(),
   };
@@ -109,6 +136,7 @@ function rowToEnroll(r: EnrollRow): SaasSequenceEnrollment {
   return {
     id: r.id, sequenceId: r.sequence_id, tenantId: r.tenant_id, contactId: r.contact_id,
     currentStep: Number(r.current_step), status: r.status,
+    replyReceived: r.reply_received ?? false,
     nextSendAt: r.next_send_at ? new Date(r.next_send_at).toISOString() : null,
     enrolledAt: new Date(r.enrolled_at).toISOString(),
     completedAt: r.completed_at ? new Date(r.completed_at).toISOString() : null,
@@ -117,6 +145,7 @@ function rowToEnroll(r: EnrollRow): SaasSequenceEnrollment {
 
 const TRIGGERS: SequenceTrigger[] = ["manual", "contact_created", "form_submitted", "tag_added"];
 const STATUSES: SequenceStatus[] = ["active", "paused", "archived"];
+const STEP_TYPES: SequenceStepType[] = ["email", "wait", "branch"];
 
 export class SaasSequencesService {
   constructor(private readonly db: SaasPostgresPort = DbClient.getInstance()) {}
@@ -180,8 +209,7 @@ export class SaasSequencesService {
     const seq = await this.get(tenantId, sequenceId);
     if (!seq) throw new SaasSequencesError("Sequence not found", "NOT_FOUND");
     const rows = await this.db.query<StepRow>(
-      `SELECT id, sequence_id, position, delay_days, delay_hours, subject, body_html, created_at, updated_at
-       FROM saas_sequence_steps WHERE sequence_id=$1 ORDER BY position ASC`,
+      `SELECT ${STEP_COLS} FROM saas_sequence_steps WHERE sequence_id=$1 ORDER BY position ASC`,
       [sequenceId],
     );
     return rows.map(rowToStep);
@@ -190,20 +218,60 @@ export class SaasSequencesService {
   async addStep(tenantId: string, sequenceId: string, input: CreateStepInput): Promise<SaasSequenceStep> {
     const seq = await this.get(tenantId, sequenceId);
     if (!seq) throw new SaasSequencesError("Sequence not found", "NOT_FOUND");
-    if (!input.subject.trim()) throw new SaasSequencesError("subject is required", "VALIDATION");
-    if (!input.bodyHtml.trim()) throw new SaasSequencesError("bodyHtml is required", "VALIDATION");
+    const stepType = input.stepType ?? "email";
+    if (!STEP_TYPES.includes(stepType)) throw new SaasSequencesError(`Invalid stepType: ${stepType}`, "VALIDATION");
+    if (stepType === "email") {
+      if (!input.subject?.trim()) throw new SaasSequencesError("subject is required for email steps", "VALIDATION");
+      if (!input.bodyHtml?.trim()) throw new SaasSequencesError("bodyHtml is required for email steps", "VALIDATION");
+    }
     const posRow = await this.db.query<{ max_pos: number | null }>(
       `SELECT MAX(position) AS max_pos FROM saas_sequence_steps WHERE sequence_id=$1`,
       [sequenceId],
     );
     const nextPos = input.position ?? (posRow[0]?.max_pos != null ? Number(posRow[0].max_pos) + 1 : 0);
     const rows = await this.db.query<StepRow>(
-      `INSERT INTO saas_sequence_steps (sequence_id, position, delay_days, delay_hours, subject, body_html, updated_at)
-       VALUES ($1,$2,$3,$4,$5,$6,NOW())
-       RETURNING id, sequence_id, position, delay_days, delay_hours, subject, body_html, created_at, updated_at`,
-      [sequenceId, nextPos, input.delayDays ?? 0, input.delayHours ?? 0, input.subject.trim(), input.bodyHtml.trim()],
+      `INSERT INTO saas_sequence_steps
+         (sequence_id, position, step_type, delay_days, delay_hours, subject, body_html,
+          branch_condition, branch_yes_position, branch_no_position, updated_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,NOW())
+       RETURNING ${STEP_COLS}`,
+      [
+        sequenceId, nextPos, stepType,
+        input.delayDays ?? 0, input.delayHours ?? 0,
+        input.subject?.trim() ?? "", input.bodyHtml?.trim() ?? "",
+        input.branchCondition ? JSON.stringify(input.branchCondition) : null,
+        input.branchYesPosition ?? null,
+        input.branchNoPosition ?? null,
+      ],
     );
     if (!rows[0]) throw new SaasSequencesError("Failed to add step", "CONSTRAINT");
+    return rowToStep(rows[0]);
+  }
+
+  async updateStep(tenantId: string, sequenceId: string, stepId: string, input: UpdateStepInput): Promise<SaasSequenceStep> {
+    const seq = await this.get(tenantId, sequenceId);
+    if (!seq) throw new SaasSequencesError("Sequence not found", "NOT_FOUND");
+    if (input.stepType !== undefined && !STEP_TYPES.includes(input.stepType)) {
+      throw new SaasSequencesError(`Invalid stepType: ${input.stepType}`, "VALIDATION");
+    }
+    const sets: string[] = [];
+    const vals: unknown[] = [sequenceId, stepId];
+    let i = 3;
+    if (input.stepType !== undefined) { sets.push(`step_type=$${i++}`); vals.push(input.stepType); }
+    if (input.delayDays !== undefined) { sets.push(`delay_days=$${i++}`); vals.push(input.delayDays); }
+    if (input.delayHours !== undefined) { sets.push(`delay_hours=$${i++}`); vals.push(input.delayHours); }
+    if (input.subject !== undefined) { sets.push(`subject=$${i++}`); vals.push(input.subject.trim()); }
+    if (input.bodyHtml !== undefined) { sets.push(`body_html=$${i++}`); vals.push(input.bodyHtml.trim()); }
+    if ("branchCondition" in input) { sets.push(`branch_condition=$${i++}::jsonb`); vals.push(input.branchCondition ? JSON.stringify(input.branchCondition) : null); }
+    if ("branchYesPosition" in input) { sets.push(`branch_yes_position=$${i++}`); vals.push(input.branchYesPosition ?? null); }
+    if ("branchNoPosition" in input) { sets.push(`branch_no_position=$${i++}`); vals.push(input.branchNoPosition ?? null); }
+    if (sets.length === 0) throw new SaasSequencesError("No fields to update", "VALIDATION");
+    sets.push("updated_at=NOW()");
+    const rows = await this.db.query<StepRow>(
+      `UPDATE saas_sequence_steps SET ${sets.join(",")} WHERE sequence_id=$1 AND id=$2 RETURNING ${STEP_COLS}`,
+      vals,
+    );
+    if (!rows[0]) throw new SaasSequencesError("Step not found", "NOT_FOUND");
     return rowToStep(rows[0]);
   }
 
@@ -236,14 +304,13 @@ export class SaasSequencesService {
         `INSERT INTO saas_sequence_enrollments (sequence_id, tenant_id, contact_id, next_send_at)
          VALUES ($1,$2,$3,$4)
          ON CONFLICT (sequence_id, contact_id) DO UPDATE
-           SET status='active', current_step=0, next_send_at=$4, completed_at=NULL
-         RETURNING id, sequence_id, tenant_id, contact_id, current_step, status, next_send_at, enrolled_at, completed_at`,
+           SET status='active', current_step=0, next_send_at=$4, completed_at=NULL, reply_received=false
+         RETURNING id, sequence_id, tenant_id, contact_id, current_step, status, reply_received, next_send_at, enrolled_at, completed_at`,
         [sequenceId, tenantId, contactId, nextSendAt],
       );
       if (!rows[0]) throw new SaasSequencesError("Failed to enroll contact", "CONSTRAINT");
       await this.db.query(
-        `UPDATE saas_sequences SET enrollments_count = enrollments_count + 1, updated_at = NOW()
-         WHERE id = $1`,
+        `UPDATE saas_sequences SET enrollments_count = enrollments_count + 1, updated_at = NOW() WHERE id = $1`,
         [sequenceId],
       );
       return rowToEnroll(rows[0]);
@@ -259,7 +326,7 @@ export class SaasSequencesService {
     const seq = await this.get(tenantId, sequenceId);
     if (!seq) throw new SaasSequencesError("Sequence not found", "NOT_FOUND");
     const rows = await this.db.query<EnrollRow>(
-      `SELECT id, sequence_id, tenant_id, contact_id, current_step, status, next_send_at, enrolled_at, completed_at
+      `SELECT id, sequence_id, tenant_id, contact_id, current_step, status, reply_received, next_send_at, enrolled_at, completed_at
        FROM saas_sequence_enrollments WHERE sequence_id=$1 ORDER BY enrolled_at DESC`,
       [sequenceId],
     );
@@ -276,27 +343,63 @@ export class SaasSequencesService {
   }
 
   /**
+   * Mark a contact as having replied to a sequence email.
+   * Advances enrollment immediately if on a branch step with field="replied".
+   */
+  async handleReplyHook(tenantId: string, sequenceId: string, contactId: string): Promise<void> {
+    const updated = await this.db.query<EnrollRow>(
+      `UPDATE saas_sequence_enrollments SET reply_received=true
+       WHERE sequence_id=$1 AND tenant_id=$2 AND contact_id=$3 AND status='active'
+       RETURNING id, sequence_id, tenant_id, contact_id, current_step, status, reply_received, next_send_at, enrolled_at, completed_at`,
+      [sequenceId, tenantId, contactId],
+    );
+    const enrollment = updated[0];
+    if (!enrollment) return;
+
+    // Check if current step is a branch on "replied" — if so, advance immediately to yes branch
+    const stepRows = await this.db.query<StepRow>(
+      `SELECT ${STEP_COLS} FROM saas_sequence_steps
+       WHERE sequence_id=$1 AND position=$2 LIMIT 1`,
+      [sequenceId, Number(enrollment.current_step)],
+    );
+    const step = stepRows[0];
+    if (!step || step.step_type !== "branch") return;
+    const cond = step.branch_condition;
+    if (!cond || cond.field !== "replied") return;
+
+    const nextPos = cond.value === true
+      ? (step.branch_yes_position ?? Number(enrollment.current_step) + 1)
+      : (step.branch_no_position ?? Number(enrollment.current_step) + 1);
+
+    await this.db.query(
+      `UPDATE saas_sequence_enrollments SET current_step=$1, next_send_at=NOW() WHERE id=$2`,
+      [nextPos, enrollment.id],
+    );
+  }
+
+  /**
    * Process due sequence emails. Called from cron.
-   * Returns count of emails sent.
+   * Returns count of emails sent / steps processed.
    */
   async processDueEnrollments(sendEmail: (to: string, subject: string, html: string) => Promise<void>): Promise<number> {
     const due = await this.db.query<{
       id: string; sequence_id: string; tenant_id: string; contact_id: string;
-      current_step: number | string;
+      current_step: number | string; reply_received: boolean;
     }>(
-      `SELECT e.id, e.sequence_id, e.tenant_id, e.contact_id, e.current_step
+      `SELECT e.id, e.sequence_id, e.tenant_id, e.contact_id, e.current_step, e.reply_received
        FROM saas_sequence_enrollments e
        WHERE e.status = 'active' AND e.next_send_at <= NOW()
        LIMIT 100`,
       [],
     );
 
-    let sent = 0;
+    let processed = 0;
     for (const enrollment of due) {
       const step = Number(enrollment.current_step);
       const stepRows = await this.db.query<StepRow & { contact_email: string | null; contact_name: string }>(
-        `SELECT s.id, s.sequence_id, s.position, s.delay_days, s.delay_hours, s.subject, s.body_html, s.created_at, s.updated_at,
-                c.email AS contact_email, c.name AS contact_name
+        `SELECT s.id, s.sequence_id, s.position, s.step_type, s.delay_days, s.delay_hours,
+                s.subject, s.body_html, s.branch_condition, s.branch_yes_position, s.branch_no_position,
+                s.created_at, s.updated_at, c.email AS contact_email, c.name AS contact_name
          FROM saas_sequence_steps s
          JOIN contacts c ON c.id = $3
          WHERE s.sequence_id = $1 AND s.position = $2
@@ -304,7 +407,41 @@ export class SaasSequencesService {
         [enrollment.sequence_id, step, enrollment.contact_id],
       );
       const stepData = stepRows[0];
-      if (!stepData?.contact_email) {
+      if (!stepData) {
+        await this.db.query(
+          `UPDATE saas_sequence_enrollments SET status='completed', completed_at=NOW() WHERE id=$1`,
+          [enrollment.id],
+        );
+        processed++;
+        continue;
+      }
+
+      const stepType = stepData.step_type ?? "email";
+
+      if (stepType === "branch") {
+        // Evaluate branch condition
+        const cond = stepData.branch_condition;
+        let condMet = false;
+        if (cond?.field === "replied") condMet = enrollment.reply_received === true;
+
+        const nextPos = condMet
+          ? (stepData.branch_yes_position ?? step + 1)
+          : (stepData.branch_no_position ?? step + 1);
+
+        await this._advanceToPosition(enrollment.id, enrollment.sequence_id, nextPos, step);
+        processed++;
+        continue;
+      }
+
+      if (stepType === "wait") {
+        // Wait step — just advance to next position (delay was already applied via next_send_at)
+        await this._advanceToPosition(enrollment.id, enrollment.sequence_id, step + 1, step);
+        processed++;
+        continue;
+      }
+
+      // email step
+      if (!stepData.contact_email) {
         await this.db.query(
           `UPDATE saas_sequence_enrollments SET status='failed' WHERE id=$1`,
           [enrollment.id],
@@ -314,29 +451,8 @@ export class SaasSequencesService {
 
       try {
         await sendEmail(stepData.contact_email, stepData.subject, stepData.body_html);
-        sent += 1;
-
-        const nextStepRows = await this.db.query<StepRow>(
-          `SELECT position, delay_days, delay_hours FROM saas_sequence_steps
-           WHERE sequence_id=$1 AND position > $2 ORDER BY position ASC LIMIT 1`,
-          [enrollment.sequence_id, step],
-        );
-        const nextStep = nextStepRows[0];
-
-        if (nextStep) {
-          const nextSendAt = new Date(
-            Date.now() + Number(nextStep.delay_days) * 86400_000 + Number(nextStep.delay_hours) * 3600_000,
-          ).toISOString();
-          await this.db.query(
-            `UPDATE saas_sequence_enrollments SET current_step=$2, next_send_at=$3 WHERE id=$1`,
-            [enrollment.id, Number(nextStep.position), nextSendAt],
-          );
-        } else {
-          await this.db.query(
-            `UPDATE saas_sequence_enrollments SET status='completed', completed_at=NOW() WHERE id=$1`,
-            [enrollment.id],
-          );
-        }
+        processed++;
+        await this._advanceToPosition(enrollment.id, enrollment.sequence_id, step + 1, step);
       } catch {
         await this.db.query(
           `UPDATE saas_sequence_enrollments SET status='failed' WHERE id=$1`,
@@ -344,7 +460,31 @@ export class SaasSequencesService {
         );
       }
     }
-    return sent;
+    return processed;
+  }
+
+  private async _advanceToPosition(enrollmentId: string, sequenceId: string, nextPos: number, currentPos: number): Promise<void> {
+    const nextStepRows = await this.db.query<StepRow>(
+      `SELECT position, delay_days, delay_hours FROM saas_sequence_steps
+       WHERE sequence_id=$1 AND position >= $2 ORDER BY position ASC LIMIT 1`,
+      [sequenceId, nextPos],
+    );
+    const nextStep = nextStepRows[0];
+
+    if (nextStep && Number(nextStep.position) > currentPos) {
+      const nextSendAt = new Date(
+        Date.now() + Number(nextStep.delay_days) * 86400_000 + Number(nextStep.delay_hours) * 3600_000,
+      ).toISOString();
+      await this.db.query(
+        `UPDATE saas_sequence_enrollments SET current_step=$2, next_send_at=$3 WHERE id=$1`,
+        [enrollmentId, Number(nextStep.position), nextSendAt],
+      );
+    } else {
+      await this.db.query(
+        `UPDATE saas_sequence_enrollments SET status='completed', completed_at=NOW() WHERE id=$1`,
+        [enrollmentId],
+      );
+    }
   }
 }
 
