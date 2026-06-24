@@ -26,8 +26,10 @@
 | O10 | 500 seeds Envato metadata: download-envato-seeds 10×50, metadata index JSON, seed-selector 3-tier, 5 beta→available | ef4293d |
 | S19 | Forms embed: honeypot spam, embed JS widget /public/embed/form.js, public GET /api/forms/[formId]; Surveys: share link /s/[id], create modal, responses panel | 53aa5cb |
 | O11 | Recurring monthly services: OsRecurringServicesService (SEO report, social calendar, ads snapshot), cron /api/cron/os-recurring-services, migration 432 | d05941e |
-| S20 | Social scheduler publish elite: cron /api/cron/social-publish (CRON_SECRET), no-account banner + post actions in /saas/social, 6 processDueScheduled tests | (current) |
-| O12 | QA visual + legal pre-portal: visualQaEngine (WCAG contrast + structural + legal), packOrchestrator qa_visual_score/qa_legal_passed, portal block if score<70 or legal fail | (current) |
+| S20 | Social scheduler publish elite: cron /api/cron/social-publish (CRON_SECRET), no-account banner + post actions in /saas/social, 6 processDueScheduled tests | a76032a |
+| O12 | QA visual + legal pre-portal: visualQaEngine (WCAG contrast + structural + legal), packOrchestrator qa_visual_score/qa_legal_passed, portal block if score<70 or legal fail | 418f46e |
+| S21 | Ads create/edit: createCampaign + updateCampaignBudget (Meta + Google), POST /campaigns/create, PATCH /campaigns/[id], CreateCampaignModal + EditBudgetModal in /saas/publicidad | (current) |
+| O13 | Learning loop GA4→seed weights: OsLearningService CVR per sector, os_seed_weights table (migration 433), getTopSectorsByCvr + rankSeedsByCvr in seed-selector, cron /api/cron/os-learning-loop | (current) |
 
 ---
 
@@ -71,6 +73,15 @@ TWILIO_FROM_WHATSAPP=+14155238886
 SEMRUSH_API_KEY=
 SEO_DOMAIN=app.nelvyon.com
 
+# Ads platforms — API credentials (S21)
+# Meta Ads: graph.facebook.com access token (system user or Marketing API)
+META_ADS_ACCESS_TOKEN=
+# Google Ads: OAuth access token + developer token
+GOOGLE_ADS_ACCESS_TOKEN=
+GOOGLE_ADS_DEVELOPER_TOKEN=
+# LinkedIn Ads: LinkedIn Marketing Solutions access token
+LINKEDIN_ADS_ACCESS_TOKEN=
+
 # Social Publish — OAuth tokens (S20)
 # Meta: generate at developers.facebook.com → Tools → Graph API Explorer
 META_APP_ID=
@@ -110,6 +121,7 @@ psql $DATABASE_URL -f backend/db/migrations/427_saas_lms.sql
 | `/api/cron/saas-workflows` | `*/4 * * * *` | Workflows scheduled + trigger |
 | `/api/cron/social-publish` | `* * * * *` | Publish social posts scheduled_at ≤ NOW() |
 | `/api/cron/os-recurring-services` | `0 8 1 * *` | Monthly deliverables (SEO, social calendar, ads) |
+| `/api/cron/os-learning-loop` | `0 6 1 * *` | GA4 → sector CVR weights (seed-selector improvement) |
 
 All crons use header `x-cron-secret: $CRON_SECRET`.
 

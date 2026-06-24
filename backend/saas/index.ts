@@ -497,7 +497,15 @@ export {
   type AdsCampaign,
   type AdsCampaignStatus,
   type RoasAlert,
+  type AdsCreateCampaignInput,
 } from "./SaasAdsDashboardService";
+export {
+  OsLearningService,
+  getOsLearningService,
+  resetOsLearningServiceForTests,
+  type SectorWeight,
+  type LearningResult,
+} from "./OsLearningService";
 export {
   SaasUtmService,
   SaasUtmError,

@@ -120,11 +120,131 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
 
 type AdsCampaign = { id: string; name: string; status: string; platform: string; dailyBudget: number | null };
 
+function CreateCampaignModal({ platform, onClose, onSaved }: { platform: AdsPlatform; onClose: () => void; onSaved: () => void }) {
+  const [name, setName] = useState("");
+  const [budget, setBudget] = useState("10");
+  const [objective, setObjective] = useState("LINK_CLICKS");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const dailyBudgetUsd = parseFloat(budget);
+    if (!name.trim() || isNaN(dailyBudgetUsd) || dailyBudgetUsd <= 0) { setError("Nombre y presupuesto válido son obligatorios"); return; }
+    setSaving(true); setError(null);
+    try {
+      const res = await fetch("/api/saas/ads/campaigns/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform, name: name.trim(), daily_budget_usd: dailyBudgetUsd, objective }),
+      });
+      const d = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (!d.ok) throw new Error(d.error ?? "Error al crear campaña");
+      onSaved(); onClose();
+    } catch (err) { setError(err instanceof Error ? err.message : "Error"); }
+    finally { setSaving(false); }
+  }
+
+  const OBJECTIVES: Record<string, string> = {
+    LINK_CLICKS: "Clics en enlace", LEAD_GENERATION: "Generación de leads",
+    CONVERSIONS: "Conversiones", BRAND_AWARENESS: "Notoriedad de marca",
+    REACH: "Alcance", VIDEO_VIEWS: "Visualizaciones de vídeo",
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-semibold text-foreground">Crear campaña — {platform.toUpperCase()}</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
+        </div>
+        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        <form onSubmit={(e) => void submit(e)} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre de campaña *</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Captación verano 2026"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Presupuesto diario (USD) *</label>
+            <input type="number" min="0.01" step="0.01" value={budget} onChange={e => setBudget(e.target.value)}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          </div>
+          {platform === "meta" && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Objetivo</label>
+              <select value={objective} onChange={e => setObjective(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
+                {Object.entries(OBJECTIVES).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">La campaña se creará en estado <strong>Pausada</strong>. Actívala desde el panel de campañas.</p>
+          <div className="flex gap-3 pt-1">
+            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Creando…" : "Crear campaña"}</NelvyonDsButton>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function EditBudgetModal({ campaign, platform, onClose, onSaved }: { campaign: AdsCampaign; platform: AdsPlatform; onClose: () => void; onSaved: () => void }) {
+  const [budget, setBudget] = useState(String(campaign.dailyBudget ?? 10));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const dailyBudgetUsd = parseFloat(budget);
+    if (isNaN(dailyBudgetUsd) || dailyBudgetUsd <= 0) { setError("Presupuesto debe ser mayor a 0"); return; }
+    setSaving(true); setError(null);
+    try {
+      const res = await fetch(`/api/saas/ads/campaigns/${campaign.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform, daily_budget_usd: dailyBudgetUsd }),
+      });
+      const d = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (!d.ok) throw new Error(d.error ?? "Error al actualizar presupuesto");
+      onSaved(); onClose();
+    } catch (err) { setError(err instanceof Error ? err.message : "Error"); }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-semibold text-foreground">Editar presupuesto</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
+        </div>
+        <p className="mb-4 text-sm text-muted-foreground truncate">{campaign.name}</p>
+        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        <form onSubmit={(e) => void submit(e)} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Presupuesto diario (USD) *</label>
+            <input type="number" min="0.01" step="0.01" value={budget} onChange={e => setBudget(e.target.value)}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          </div>
+          <div className="flex gap-3">
+            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Guardar"}</NelvyonDsButton>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function CampaignsSection({ platform }: { platform: AdsPlatform }) {
   const [campaigns, setCampaigns] = useState<AdsCampaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toggling, setToggling] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [editCampaign, setEditCampaign] = useState<AdsCampaign | null>(null);
 
   const load = useCallback(() => {
     setLoading(true); setError(null);
@@ -158,29 +278,49 @@ function CampaignsSection({ platform }: { platform: AdsPlatform }) {
 
   if (loading) return <div className="h-16 animate-pulse rounded-xl bg-muted/30" />;
   if (error) return <p className="text-sm text-red-400">{error}</p>;
-  if (!campaigns.length) return null;
 
   return (
     <div className="mt-4">
-      <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">Campañas activas</p>
-      <div className="flex flex-col gap-2">
-        {campaigns.map(c => (
-          <div key={c.id} className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card/50 px-4 py-3">
-            <div>
-              <p className="text-sm font-medium text-foreground">{c.name}</p>
-              {c.dailyBudget != null && <p className="text-xs text-muted-foreground">Ppto. diario: {c.dailyBudget.toFixed(2)} EUR</p>}
-            </div>
-            <div className="flex items-center gap-3">
-              <NelvyonDsBadge tone={c.status === "ACTIVE" ? "success" : "neutral"}>
-                {c.status === "ACTIVE" ? "Activa" : "Pausada"}
-              </NelvyonDsBadge>
-              <NelvyonDsButton size="sm" variant="ghost" disabled={toggling === c.id} onClick={() => void toggle(c)}>
-                {toggling === c.id ? "…" : c.status === "ACTIVE" ? "Pausar" : "Activar"}
-              </NelvyonDsButton>
-            </div>
-          </div>
-        ))}
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Campañas</p>
+        <NelvyonDsButton size="sm" variant="ghost" className="text-xs" onClick={() => setShowCreate(true)}>
+          + Crear campaña
+        </NelvyonDsButton>
       </div>
+      {campaigns.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-6 text-center">
+          <p className="text-sm text-muted-foreground">Sin campañas en {platform.toUpperCase()}.</p>
+          <NelvyonDsButton size="sm" className="mt-3 text-xs" onClick={() => setShowCreate(true)}>
+            + Crear primera campaña
+          </NelvyonDsButton>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {campaigns.map(c => (
+            <div key={c.id} className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card/50 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                {c.dailyBudget != null && (
+                  <p className="text-xs text-muted-foreground">
+                    Ppto. diario: {c.dailyBudget.toFixed(2)} USD
+                    <button onClick={() => setEditCampaign(c)} className="ml-2 text-primary hover:underline">Editar</button>
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <NelvyonDsBadge tone={c.status === "ACTIVE" ? "success" : "neutral"}>
+                  {c.status === "ACTIVE" ? "Activa" : "Pausada"}
+                </NelvyonDsBadge>
+                <NelvyonDsButton size="sm" variant="ghost" disabled={toggling === c.id} onClick={() => void toggle(c)}>
+                  {toggling === c.id ? "…" : c.status === "ACTIVE" ? "Pausar" : "Activar"}
+                </NelvyonDsButton>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {showCreate && <CreateCampaignModal platform={platform} onClose={() => setShowCreate(false)} onSaved={load} />}
+      {editCampaign && <EditBudgetModal campaign={editCampaign} platform={platform} onClose={() => setEditCampaign(null)} onSaved={load} />}
     </div>
   );
 }
