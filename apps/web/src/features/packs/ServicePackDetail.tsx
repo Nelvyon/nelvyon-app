@@ -18,7 +18,7 @@ export function ServicePackDetail({ slug }: { slug: string }) {
   if (!pack) notFound();
 
   const osSummary = getServicePackOsSummary(pack.id);
-  const canLaunch = pack.availability !== "coming_soon" && pack.kickoffPath;
+  const canLaunch = pack.availability === "available" && !!pack.kickoffPath;
 
   return (
     <ProtectedLayout module="campaigns">
@@ -99,10 +99,21 @@ export function ServicePackDetail({ slug }: { slug: string }) {
           </PanelCard>
         ) : null}
 
+        {pack.availability === "beta" && (
+          <div className="rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-primary">
+            <strong>Beta privada:</strong> Este pack no está disponible públicamente todavía. Estamos refinando el runner con clientes piloto. Escríbenos a{" "}
+            <a href="mailto:beta@nelvyon.com" className="underline">beta@nelvyon.com</a> para acceso anticipado.
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-3">
           {canLaunch ? (
             <Button asChild>
               <Link href={pack.kickoffPath!}>{SAAS_PACK_DETAIL.launchCta}</Link>
+            </Button>
+          ) : pack.availability === "beta" ? (
+            <Button asChild variant="outline">
+              <a href="mailto:beta@nelvyon.com">Solicitar acceso beta</a>
             </Button>
           ) : (
             <Button disabled variant="outline">

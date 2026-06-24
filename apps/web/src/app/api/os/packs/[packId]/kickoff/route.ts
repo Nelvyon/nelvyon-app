@@ -62,6 +62,26 @@ export async function POST(
   const meta = getPackMeta(packId);
   const runner = RUNNERS[packId];
 
+  // Beta packs are visible but don't have a runner yet — return explicit 422 (not 404)
+  const BETA_PACKS = new Set([
+    "social-calendar-pack",
+    "content-strategy-pack",
+    "cro-audit-pack",
+    "analytics-setup-pack",
+    "brand-voice-pack",
+  ]);
+  if (BETA_PACKS.has(packId)) {
+    return NextResponse.json(
+      {
+        status: "beta",
+        pack_id: packId,
+        message: "Este pack está en beta. Únete a la lista de espera en nelvyon.com/beta para acceso anticipado.",
+        available_at: null,
+      },
+      { status: 422 },
+    );
+  }
+
   if (!meta || !runner) {
     return NextResponse.json({ error: `Pack desconocido: ${packId}` }, { status: 404 });
   }
