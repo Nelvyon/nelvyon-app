@@ -1,7 +1,7 @@
 # LAUNCH_READY — Nelvyon producción
 
-> Generado: 2026-06-24  
-> Estado: **CÓDIGO TERMINADO — usuario puede hacer deploy manual**
+> Actualizado: 2026-06-24  
+> Estado: **CÓDIGO TERMINADO — Fase 8 hardening completado — deploy manual en Railway**
 
 ---
 
@@ -9,6 +9,13 @@
 
 | Área | Estado | Commit | Evidencia |
 |---|---|---|---|
+| Fase 8: CI gate anti-MOCK permanente | ✅ | `feat(fase8)` | `web-quality-gates.yml` — falla si `const MOCK` en /saas pages |
+| Fase 8: CI gate anti-stub vacío | ✅ | `feat(fase8)` | `scripts/check-saas-stubs.mjs` — falla si /api/saas/* stub sin requireSaasContext |
+| Fase 8: Playwright launch smoke | ✅ | `feat(fase8)` | `apps/web/e2e/launch.spec.ts` — signup, auth-gate, /api/health, 410s |
+| Fase 8: OS smoke (packAutoApprove) | ✅ | `feat(fase8)` | `src/lib/packs/__tests__/packAutoApprove.test.ts` — 3 tests QA≥85 |
+| Fase 8: /api/saas/certificados real o 410 | ✅ | `feat(fase8)` | 410 Gone (no está en nav, sin API real) |
+| Fases 7/7b: UI cableada, 0 const MOCK | ✅ | `73d3a3d` | grep vacío en /saas/**/page.tsx |
+| Fases 1–6: SaaS backend real | ✅ | `db0f81c` | 780 tests vitest |
 | Agency E2E (packOrchestrator + dbAutoApprovePackDeliverables) | ✅ | `9c6ce26` | `runGrowthPack` auto-aprueba si QA≥85 sin operador |
 | SaaS: /crm legacy → redirect /saas/crm | ✅ | `2672dea` | `apps/web/src/app/crm/page.tsx` — `redirect("/saas/crm")` |
 | SaaS: contacto sin email → bounced (no crash) | ✅ | `2672dea` | `backend/saas/SaasCampaniasService.ts` |
@@ -28,6 +35,58 @@
 - ❌ No se activó ningún `coming_soon` sin kickoff route
 - ❌ No se tocaron las 90 rutas legacy (ya responden 410)
 - ❌ No se clonaron hubs GHL mock
+
+---
+
+## Migraciones de base de datos — orden de ejecución
+
+Ejecutar **en orden numérico** en Railway Postgres antes del primer deploy (o con `pnpm -C apps/web migrate`):
+
+| Migración | Módulo | Estado |
+|---|---|---|
+| `400_nelvyon_pack_runs.sql` | OS packs | ✅ comiteada |
+| `401_inbox_conversations.sql` | Inbox omnicanal | pendiente commit |
+| `402_calendar_events.sql` | Calendario | pendiente commit |
+| `403_snippets.sql` | Snippets | pendiente commit |
+| `404_team_members.sql` | Team | pendiente commit |
+| `405_webhooks.sql` | Webhooks | pendiente commit |
+| `406_api_keys.sql` | API Keys | pendiente commit |
+| `407_lead_scoring.sql` | Lead Scoring | pendiente commit |
+| `408_social_posts.sql` | Social Media | pendiente commit |
+| `409_ads_connections.sql` | Publicidad Ads | pendiente commit |
+| `410_countdown_timers.sql` | Countdown | pendiente commit |
+| `411_custom_objects.sql` | Custom Objects | pendiente commit |
+| `412_audit_logs.sql` | Auditoría | pendiente commit |
+| `413_sequences.sql` | Sequences | pendiente commit |
+| `414_communities.sql` | Communities | pendiente commit |
+| `415_documents_products.sql` | Documentos + Productos | pendiente commit |
+| `416_surveys_qr_ab.sql` | Surveys, QR, A/B | pendiente commit |
+| `417_prospecting.sql` | Prospecting lists | pendiente commit |
+| `418_ab_testing.sql` | A/B Testing | pendiente commit |
+| `419_sms_campaigns.sql` | SMS Marketing | pendiente commit |
+| `420_subcuentas.sql` | Subcuentas agencia | pendiente commit |
+| `421_facturas.sql` | Facturas PDF | pendiente commit |
+| `422_white_label.sql` | White Label config | pendiente commit |
+| `423_sequences_advanced.sql` | Sequences avanzadas | pendiente commit |
+| `424_whitelabel_stripe_subcuentas.sql` | Stripe Connect + Subcuentas | ✅ comiteada |
+
+> **Acción requerida:** Commitear migraciones 401–423 desde `backend/db/migrations/`.  
+> Ejecutar: `pnpm -C apps/web migrate` (aplica todas en orden).
+
+### Cron jobs requeridos en producción
+
+| Endpoint | Frecuencia | Header requerido | Función |
+|---|---|---|---|
+| `POST /api/cron/saas-workflows` | Cada 5 min | `Authorization: Bearer $CRON_SECRET` | Ejecuta workflows scheduled + triggers |
+| `POST /api/cron/workflow-date` | Diario 00:05 UTC | `Authorization: Bearer $CRON_SECRET` | Workflows con trigger por fecha |
+| `POST /api/os/cron/pack-status` | Cada 10 min | `Authorization: Bearer $CRON_SECRET` | Actualiza estado packs OS |
+
+Configurar en Railway → **Cron** o usar servicio externo (cron-job.org, etc.).
+
+### SES webhook (bounces/complaints)
+
+Tras primer deploy: confirmar suscripción SNS → SES en la consola AWS.  
+Endpoint: `POST /api/webhooks/ses` (ya implementado, espera firma SNS).
 
 ---
 

@@ -41,6 +41,19 @@ jobs:
       - name: Quality gate
         run: pnpm gate
 
+      - name: Anti-MOCK gate (falla si const MOCK en /saas pages)
+        working-directory: .
+        run: |
+          if grep -r --include="*.tsx" "const MOCK" apps/web/src/app/saas/; then
+            echo "❌ FAIL: const MOCK encontrado en páginas /saas/. Elimina los datos falsos."
+            exit 1
+          fi
+          echo "✅ Anti-MOCK gate: 0 const MOCK encontrados"
+
+      - name: Anti-stub gate (falla si /api/saas/* stub sin requireSaasContext)
+        working-directory: .
+        run: node scripts/check-saas-stubs.mjs
+
       - name: Full regression tests (non-blocking signal)
         run: pnpm test:regression
         continue-on-error: true
