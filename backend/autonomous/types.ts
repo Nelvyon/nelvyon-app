@@ -73,6 +73,8 @@ export interface QaResult {
     seo_basic: number;
     brief_compliance: number;
   };
+  qa_visual_score?: number;
+  qa_legal_passed?: boolean;
 }
 
 export interface RetryDirective {

@@ -79,6 +79,8 @@ export type SkuRunResult = {
   passed: boolean;
   escalated: boolean;
   deliverable_ids: string[];
+  qa_visual_score?: number;
+  qa_legal_passed?: boolean;
 };
 
 export type PackReport = {

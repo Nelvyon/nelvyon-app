@@ -1,5 +1,6 @@
 import { simulateAutonomousJob } from "../../../../../backend/autonomous/simulator";
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
+import { runVisualQa } from "../../../../../backend/autonomous/qa/visualQaEngine";
 import { personalizeForSector } from "@/lib/packs/packSeedTemplates";
 import { getSeedByIndex } from "@/lib/packs/sectorSeeds";
 
@@ -283,6 +284,13 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     }
   }
 
+  // Visual QA — runs offline, no browser needed
+  const visualQa = runVisualQa({
+    copyText: personalized?.value_proposition ?? undefined,
+    brandColor: "#0084ff",
+    backgroundColor: "#020817",
+  });
+
   return {
     result: {
       sku: params.sku,
@@ -290,6 +298,8 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       passed,
       escalated: simulation.escalated,
       deliverable_ids: deliverableIds,
+      qa_visual_score: visualQa.score,
+      qa_legal_passed: visualQa.legal_passed,
     },
     deliverableIds,
   };
@@ -470,7 +480,12 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     steps = markStep(steps, "report", "done");
 
     const autoPublishThreshold = config.autoPublishQaThreshold ?? 85;
-    const needsReview = skuResults.some((r) => r.qa_score < autoPublishThreshold);
+    const needsReview = skuResults.some(
+      (r) =>
+        r.qa_score < autoPublishThreshold ||
+        (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
+        r.qa_legal_passed === false,
+    );
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
 
