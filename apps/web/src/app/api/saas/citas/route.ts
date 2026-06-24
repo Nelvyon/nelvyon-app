@@ -1,7 +1,37 @@
+import { SendEmailCommand } from "@aws-sdk/client-ses";
 import { NextResponse } from "next/server";
 
 import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
+import { getSesClient } from "../../../../../../../backend/email/sesClient";
+
+async function sendBookingConfirm(
+  to: string,
+  name: string,
+  title: string,
+  startAt: string,
+  companyName?: string,
+): Promise<void> {
+  const sesFrom = process.env.SES_FROM_EMAIL?.trim();
+  if (!sesFrom) return;
+  try {
+    const client = getSesClient();
+    if (!client) return;
+    const dateLabel = new Date(startAt).toLocaleString("es-ES");
+    const html = `<p>Hola ${name},</p>
+<p>Tu cita <strong>${title}</strong> ha sido confirmada para el <strong>${dateLabel}</strong>.</p>
+${companyName ? `<p>Nuestro equipo de <strong>${companyName}</strong> estará contigo puntualmente.</p>` : ""}
+<p>Si necesitas cambiar la cita, responde a este email.</p>`;
+    await client.send(new SendEmailCommand({
+      Source: sesFrom,
+      Destination: { ToAddresses: [to] },
+      Message: {
+        Subject: { Data: `Confirmación de cita: ${title}`, Charset: "UTF-8" },
+        Body: { Html: { Data: html, Charset: "UTF-8" } },
+      },
+    }));
+  } catch { /* non-fatal */ }
+}
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -105,7 +135,17 @@ export async function POST(req: Request) {
         body.meetingUrl ?? null,
       ],
     );
-    return NextResponse.json({ appointment: rows[0] }, { status: 201 });
+    const appt = rows[0] as { contactEmail?: string; contactName?: string; title?: string; startAt?: string } | undefined;
+    if (appt?.contactEmail) {
+      void sendBookingConfirm(
+        appt.contactEmail,
+        appt.contactName ?? "Cliente",
+        appt.title ?? body.title,
+        appt.startAt ?? body.startAt,
+        ctx.tenant.companyName ?? undefined,
+      );
+    }
+    return NextResponse.json({ appointment: appt }, { status: 201 });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

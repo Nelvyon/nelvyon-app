@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   getSaasCalendarService,
+  getSaasCrmService,
   SaasCalendarError,
   saasErrorBody,
   saasErrorStatus,
@@ -38,16 +39,34 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const b = body as Record<string, unknown>;
+
+    const contactId = typeof b.contact_id === "string" ? b.contact_id : null;
+    let contactEmail = typeof b.contact_email === "string" ? b.contact_email : null;
+    let contactName  = typeof b.contact_name  === "string" ? b.contact_name  : null;
+
+    // If appointment with contactId but no email provided, resolve from CRM
+    const type = typeof b.type === "string" ? (b.type as CalendarEventType) : "task";
+    if (type === "appointment" && contactId && !contactEmail) {
+      const contact = await getSaasCrmService().getContact(ctx.tenant.id, contactId);
+      if (contact) {
+        contactEmail = contact.email ?? null;
+        contactName  = contactName ?? contact.name ?? null;
+      }
+    }
+
     const event = await getSaasCalendarService().create(ctx.tenant.id, {
       title: typeof b.title === "string" ? b.title : "",
-      type: typeof b.type === "string" ? (b.type as CalendarEventType) : "task",
-      eventDate: typeof b.event_date === "string" ? b.event_date : "",
-      eventTime: typeof b.event_time === "string" ? b.event_time : null,
+      type,
+      eventDate:       typeof b.event_date       === "string" ? b.event_date       : "",
+      eventTime:       typeof b.event_time       === "string" ? b.event_time       : null,
       durationMinutes: typeof b.duration_minutes === "number" ? b.duration_minutes : null,
-      color: typeof b.color === "string" ? b.color : null,
-      contactId: typeof b.contact_id === "string" ? b.contact_id : null,
-      assignedTo: typeof b.assigned_to === "string" ? b.assigned_to : null,
-      notes: typeof b.notes === "string" ? b.notes : null,
+      color:           typeof b.color            === "string" ? b.color            : null,
+      contactId,
+      assignedTo:      typeof b.assigned_to      === "string" ? b.assigned_to      : null,
+      notes:           typeof b.notes            === "string" ? b.notes            : null,
+      contactEmail,
+      contactName,
+      companyName:     typeof b.company_name     === "string" ? b.company_name     : ctx.tenant.companyName ?? null,
     });
     return NextResponse.json({ event }, { status: 201 });
   } catch (e: unknown) {
