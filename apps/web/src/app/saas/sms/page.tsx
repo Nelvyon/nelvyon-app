@@ -57,14 +57,14 @@ function SendSmsModal({ onClose }: { onClose: () => void }) {
     setSending(true);
     setError(null);
     try {
-      const res = await fetch("/api/v1/sms/send", {
+      const res = await fetch("/api/saas/sms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to_number: to.trim(), message: msg.trim() }),
+        body: JSON.stringify({ to: to.trim(), body: msg.trim() }),
       });
       if (!res.ok) {
-        const j = (await res.json().catch(() => ({}))) as { detail?: string };
-        throw new Error(j.detail ?? "Error al enviar");
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(j.error ?? "Error al enviar");
       }
       setDone(true);
     } catch (err) {
@@ -137,14 +137,14 @@ function NewCampaignModal({ onClose, onSaved }: { onClose: () => void; onSaved: 
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/v1/sms/campaigns", {
+      const res = await fetch("/api/saas/sms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), message: msg.trim() }),
+        body: JSON.stringify({ action: "create_campaign", name: name.trim(), body: msg.trim() }),
       });
       if (!res.ok) {
-        const j = (await res.json().catch(() => ({}))) as { detail?: string };
-        throw new Error(j.detail ?? "Error al crear");
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(j.error ?? "Error al crear");
       }
       onSaved();
       onClose();
@@ -208,10 +208,11 @@ export default function SaasSmsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/sms/campaigns");
-      if (res.status === 503) { setConfigured(false); return; }
-      setConfigured(true);
-      const data = (await res.json().catch(() => ({ campaigns: [] }))) as { campaigns: SmsCampaign[] };
+      const res = await fetch("/api/saas/sms");
+      if (!res.ok) { setConfigured(false); return; }
+      const statusData = (await res.json().catch(() => ({}))) as { sms_configured?: boolean };
+      setConfigured(statusData.sms_configured ?? false);
+      const data: { campaigns: SmsCampaign[] } = { campaigns: [] };
       setCampaigns(data.campaigns ?? []);
     } finally {
       setLoading(false);

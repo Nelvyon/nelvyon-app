@@ -8,8 +8,8 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 interface Course {
   id: string; title: string; description: string | null;
   status: "draft" | "published" | "archived";
-  price: number; enrollments: number; completionRate: number;
-  modules: number; coverImage: string | null; createdAt: string;
+  price: number; enrollments: number;
+  modulesCount: number; coverImage: string | null; createdAt: string;
 }
 
 function NewCourseModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
@@ -24,7 +24,7 @@ function NewCourseModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
     if (!title.trim()) { setError("El título es obligatorio"); return; }
     setSaving(true);
     try {
-      const res = await fetch("/api/v1/lms/courses", {
+      const res = await fetch("/api/saas/lms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: title.trim(), description: desc.trim() || null, price: parseFloat(price) || 0 }),
@@ -74,7 +74,7 @@ export default function SaasLmsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/lms/courses");
+      const res = await fetch("/api/saas/lms");
       const data = (await res.json().catch(() => ({ courses: [] }))) as { courses: Course[] };
       setCourses(data.courses ?? []);
     } finally { setLoading(false); }
@@ -85,7 +85,7 @@ export default function SaasLmsPage() {
   const totalRevenue = courses.reduce((s, c) => s + c.price * c.enrollments, 0);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="workflows" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="lms" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="LMS — Cursos y Formación" subtitle="Crea y vende cursos online directamente desde Nelvyon" />
@@ -129,7 +129,7 @@ export default function SaasLmsPage() {
                 <div className="grid grid-cols-3 gap-2 text-center text-sm">
                   <div><p className="text-xs text-muted-foreground">Precio</p><p className="font-semibold text-foreground">{c.price === 0 ? "Gratis" : `${c.price}€`}</p></div>
                   <div><p className="text-xs text-muted-foreground">Alumnos</p><p className="font-semibold text-foreground">{c.enrollments}</p></div>
-                  <div><p className="text-xs text-muted-foreground">Completado</p><p className="font-semibold text-green-400">{c.completionRate.toFixed(0)}%</p></div>
+                  <div><p className="text-xs text-muted-foreground">Módulos</p><p className="font-semibold text-foreground">{c.modulesCount}</p></div>
                 </div>
                 <div className="flex gap-2">
                   <NelvyonDsButton variant="ghost" className="flex-1">Módulos</NelvyonDsButton>

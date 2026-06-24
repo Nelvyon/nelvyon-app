@@ -631,3 +631,24 @@ export {
   type CreatePageInput,
   type UpdatePageInput,
 } from "./SaasWebBuilderService";
+export {
+  SaasLmsService,
+  SaasLmsError,
+  getSaasLmsService,
+  resetSaasLmsServiceForTests,
+  type LmsCourse,
+  type LmsEnrollment,
+  type LmsCertificate,
+  type CourseStatus,
+  type CreateCourseInput,
+  type EnrollInput,
+} from "./SaasLmsService";
+export {
+  SaasKlaviyoService,
+  SaasKlaviyoError,
+  getSaasKlaviyoService,
+  resetSaasKlaviyoServiceForTests,
+  type KlaviyoProfile,
+  type KlaviyoList,
+  type KlaviyoCampaign,
+} from "./SaasKlaviyoService";
