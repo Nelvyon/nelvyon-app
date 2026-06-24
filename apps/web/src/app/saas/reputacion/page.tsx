@@ -46,7 +46,7 @@ function NewAlertModal({ onClose, onSaved }: { onClose: () => void; onSaved: () 
     if (!keyword.trim()) { setError("La keyword es obligatoria"); return; }
     setSaving(true);
     try {
-      const res = await fetch("/api/social-monitoring/alerts", {
+      const res = await fetch("/api/saas/reputation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keyword: keyword.trim(), platforms, notify_email: notifyEmail.trim() || null }),
@@ -104,17 +104,17 @@ export default function SaasReputacionPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [aRes, mRes] = await Promise.allSettled([
-        fetch("/api/social-monitoring/alerts"),
-        fetch("/api/social-monitoring/mentions"),
+      const [mentRes, alertRes] = await Promise.allSettled([
+        fetch("/api/saas/reputation"),
+        fetch("/api/saas/reputation?resource=alerts"),
       ]);
-      if (aRes.status === "fulfilled" && aRes.value.ok) {
-        const d = (await aRes.value.json().catch(() => ({}))) as { alerts?: Alert[] };
-        setAlerts(d.alerts ?? []);
-      }
-      if (mRes.status === "fulfilled" && mRes.value.ok) {
-        const d = (await mRes.value.json().catch(() => ({}))) as { mentions?: Mention[] };
+      if (mentRes.status === "fulfilled" && mentRes.value.ok) {
+        const d = (await mentRes.value.json().catch(() => ({}))) as { mentions?: Mention[]; gbp_reviews?: Array<{ id: string; author: string; rating: number; text: string; time: string }> };
         setMentions(d.mentions ?? []);
+      }
+      if (alertRes.status === "fulfilled" && alertRes.value.ok) {
+        const d = (await alertRes.value.json().catch(() => ({}))) as { alerts?: Alert[] };
+        setAlerts(d.alerts ?? []);
       }
     } finally { setLoading(false); }
   }, []);

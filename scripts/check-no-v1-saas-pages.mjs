@@ -13,13 +13,8 @@ const ROOT = join(__dir, "..");
 const SAAS_PAGES_DIR = join(ROOT, "apps/web/src/app/saas");
 // Only flag actual fetch/axios calls — not display strings or comments
 const V1_PATTERN = /(?:fetch|axios(?:\.\w+)?)\s*\(\s*["'`]\/api\/v1\//;
-// Pages with known v1 tech debt that will be fixed in dedicated sprints:
-// - coming_soon modules (afiliados, dialer, loyalty)
-// - pages pending dedicated API migration (helpdesk, integraciones, seo)
-const SKIP_PAGES = [
-  "afiliados", "dialer", "loyalty",
-  "helpdesk", "integraciones", "seo",
-];
+// All pages migrated in S13 — zero exceptions allowed.
+const SKIP_PAGES = [];
 
 function walk(dir) {
   const entries = [];

@@ -116,14 +116,16 @@ function IntegracionesContent() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/oauth/status");
+      const res = await fetch("/api/saas/integrations");
       if (res.ok) {
-        const data = (await res.json()) as OAuthStatus;
-        if (data.connections?.length) {
+        const data = (await res.json()) as { integrations: Array<{ id: string; provider: string; status: string; connectedAccount: string | null; note: string | null }> };
+        if (data.integrations?.length) {
           setIntegrations(prev =>
             prev.map(p => {
-              const live = data.connections.find(c => c.provider === p.provider);
-              return live ? { ...p, ...live } : p;
+              const live = data.integrations.find(c => c.provider === p.provider);
+              return live
+                ? { ...p, status: live.status as Integration["status"], connectedAccount: live.connectedAccount }
+                : p;
             })
           );
         }
@@ -138,12 +140,12 @@ function IntegracionesContent() {
     if (!integration) return;
     if (integration.status === "connected") {
       if (!confirm(`¿Desconectar ${integration.displayName}?`)) return;
-      await fetch(`/api/v1/oauth/disconnect/${id}`, { method: "POST" }).catch(() => {});
+      await fetch(`/api/saas/integrations?provider=${encodeURIComponent(id)}`, { method: "DELETE" }).catch(() => {});
       void load();
       return;
     }
     try {
-      const res = await fetch(`/api/v1/oauth/authorize/${id}`);
+      const res = await fetch(`/api/saas/integrations?provider=${encodeURIComponent(id)}&action=authorize`);
       const data = (await res.json().catch(() => ({}))) as { authorizeUrl?: string; error?: string };
       if (data.authorizeUrl) {
         window.location.href = data.authorizeUrl;

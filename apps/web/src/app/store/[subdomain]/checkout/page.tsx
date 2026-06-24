@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
 import { Button } from "@/core/ui/button";
-import { publicFetch } from "@/features/builders/publicFetch";
 import { CartItem, cartTotal, formatPrice, loadCart } from "@/features/store-public/cart";
 
 declare global {
@@ -37,20 +36,21 @@ export default function StoreCheckoutPage() {
     setLoading(true);
     setError("");
     try {
-      const result = await publicFetch<{
+      const checkoutRes = await fetch(`/api/store/${subdomain}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          name,
+          items: items.map((i) => ({ id: i.slug, name: i.name, price: i.price_cents / 100, quantity: i.quantity })),
+        }),
+      });
+      const result = (await checkoutRes.json().catch(() => ({}))) as {
         client_secret?: string;
         pending_stripe?: boolean;
         stripe_message?: string;
-        order_id?: string;
-      }>(`/store/${subdomain}/checkout`, {
-        method: "POST",
-        body: JSON.stringify({
-          customer_email: email,
-          customer_name: name,
-          items: items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
-          metadata: { shipping_address: address },
-        }),
-      });
+        error?: string;
+      };
 
       const pk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
       if (result.client_secret && pk && typeof window !== "undefined") {
@@ -73,6 +73,7 @@ export default function StoreCheckoutPage() {
         }
       }
 
+      if (result.error) { setError(result.error); return; }
       if (result.pending_stripe && result.stripe_message) {
         setError(result.stripe_message);
       }

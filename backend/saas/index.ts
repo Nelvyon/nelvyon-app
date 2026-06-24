@@ -652,3 +652,16 @@ export {
   type KlaviyoList,
   type KlaviyoCampaign,
 } from "./SaasKlaviyoService";
+
+export {
+  SaasHelpdeskService,
+  SaasHelpdeskError,
+  getSaasHelpdeskService,
+  resetSaasHelpdeskServiceForTests,
+  type HelpdeskTicket,
+  type HelpdeskMessage,
+  type TicketStatus,
+  type TicketPriority,
+  type CreateTicketInput,
+  type UpdateTicketInput,
+} from "./SaasHelpdeskService";

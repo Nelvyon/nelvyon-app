@@ -44,7 +44,7 @@ function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
     if (!subject.trim() || !contactEmail.trim()) { setError("Asunto y email son obligatorios"); return; }
     setSaving(true);
     try {
-      const res = await fetch("/api/v1/helpdesk_tickets/tickets", {
+      const res = await fetch("/api/saas/helpdesk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject: subject.trim(), description: desc.trim(), contactName: contactName.trim(), contactEmail: contactEmail.trim(), priority }),
@@ -113,7 +113,7 @@ export default function SaasHelpdeskPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/helpdesk_tickets/tickets");
+      const res = await fetch("/api/saas/helpdesk");
       const data = (await res.json().catch(() => ({ tickets: [] }))) as { tickets: Ticket[] };
       setTickets(data.tickets ?? []);
     } finally { setLoading(false); }

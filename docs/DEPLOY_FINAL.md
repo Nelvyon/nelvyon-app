@@ -1,6 +1,6 @@
 # DEPLOY FINAL — Nelvyon Production Checklist
 
-> Estado: **Código completado** (Fases 1–12). Este documento cubre el deploy final en Railway.
+> Estado: **Código completado** (Fases 1–12, S13). Este documento cubre el deploy final en Railway.
 
 ---
 
@@ -14,7 +14,8 @@
 | Fase 10 | Omnicanal: WhatsApp BFF, Social Publish, Funnels multi-step, Web Builder, Calendar booking | `53e5ad5` |
 | Fase 10b | Calendar contact email + citas SES booking confirm | `aef4dec` |
 | Fase 11 | Ads & Performance: Meta/Google campaigns, ROAS alerts, UTM en reportes | `aa92526` |
-| Fase 12 | LMS cursos/matrículas/certificados, Klaviyo connector, SMS→/api/saas, CI gate | (current) |
+| Fase 12 | LMS cursos/matrículas/certificados, Klaviyo connector, SMS→/api/saas, CI gate | `a7db3a0` |
+| S13 | Helpdesk, Integraciones, SEO, Reputación GBP, Store BFF Stripe, CI anti-v1 gate | (current) |
 
 ---
 
@@ -53,6 +54,14 @@ TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=...
 TWILIO_FROM_NUMBER=+34...
 TWILIO_FROM_WHATSAPP=+14155238886
+
+# SEO (opcional — sin clave muestra empty state)
+SEMRUSH_API_KEY=
+SEO_DOMAIN=app.nelvyon.com
+
+# Reputación / Google Business Profile (opcional)
+GOOGLE_PLACES_API_KEY=
+GBP_PLACE_ID=
 ```
 
 ---
@@ -68,7 +77,7 @@ psql $DATABASE_URL -f backend/db/migrations/001_*.sql
 psql $DATABASE_URL -f backend/db/migrations/427_saas_lms.sql
 ```
 
-**Última migración:** `427_saas_lms.sql` (LMS: cursos, módulos, matrículas, progreso, certificados)
+**Última migración:** `428_saas_helpdesk.sql` (Helpdesk: tickets + mensajes)
 
 ---
 

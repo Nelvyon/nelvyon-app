@@ -54,6 +54,10 @@ jobs:
         working-directory: .
         run: node scripts/check-saas-stubs.mjs
 
+      - name: Anti-v1 gate (falla si /saas/* pages llaman /api/v1/)
+        working-directory: .
+        run: node scripts/check-no-v1-saas-pages.mjs
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 

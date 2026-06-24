@@ -86,10 +86,10 @@ function AddKeywordModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch("/api/v1/seo/keywords", {
+      const res = await fetch("/api/saas/seo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keywords: kws }),
+        body: JSON.stringify({ keyword: kws[0] }),
       });
       if (!res.ok) {
         const j = (await res.json().catch(() => ({}))) as { detail?: string };
@@ -144,22 +144,12 @@ export default function SaasSeoPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [kwRes, issRes, sumRes] = await Promise.allSettled([
-        fetch("/api/v1/seo/keywords"),
-        fetch("/api/v1/seo/issues"),
-        fetch("/api/v1/seo/summary"),
-      ]);
-      if (kwRes.status === "fulfilled" && kwRes.value.ok) {
-        const d = (await kwRes.value.json().catch(() => ({ keywords: [] }))) as { keywords: Keyword[] };
+      const seoRes = await fetch("/api/saas/seo");
+      if (seoRes.ok) {
+        const d = (await seoRes.json().catch(() => ({}))) as { keywords?: Keyword[]; issues?: SeoIssue[]; summary?: SeoSummary; configured?: boolean; message?: string };
         setKeywords(d.keywords ?? []);
-      }
-      if (issRes.status === "fulfilled" && issRes.value.ok) {
-        const d = (await issRes.value.json().catch(() => ({ issues: [] }))) as { issues: SeoIssue[] };
         setIssues(d.issues ?? []);
-      }
-      if (sumRes.status === "fulfilled" && sumRes.value.ok) {
-        const d = (await sumRes.value.json().catch(() => null)) as SeoSummary | null;
-        setSummary(d);
+        if (d.summary) setSummary(d.summary);
       }
     } finally {
       setLoading(false);
