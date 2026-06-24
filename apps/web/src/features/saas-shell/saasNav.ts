@@ -45,7 +45,8 @@ export type SaasNavId =
   | "web-builder"
   | "lms"
   | "dialer"
-  | "secuencias";
+  | "secuencias"
+  | "store";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -92,6 +93,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "funnels", label: "🚀 Funnels", href: "/saas/funnels", group: "captacion" },
   { id: "web-builder", label: "🌐 Web Builder", href: "/saas/web-builder", group: "captacion" },
   { id: "lms", label: "🎓 LMS — Cursos", href: "/saas/lms", group: "gestion" },
+  { id: "store", label: "🛍️ Tienda Online", href: "/saas/store", group: "gestion" },
   { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes", group: "ia" },
   { id: "chat", label: "💬 Asistente IA", href: "/saas/chat", group: "ia" },
   { id: "copywriter", label: "✍️ Copywriter IA", href: "/saas/copywriter", group: "ia" },

@@ -718,3 +718,20 @@ export {
   type RecurringDeliverable,
   type OsRecurringServicesDeps,
 } from "./OsRecurringServicesService";
+
+export {
+  SaasStoreService,
+  getSaasStoreService,
+  SaasStoreError,
+  type StoreProduct,
+  type StoreSettings,
+  type StoreOrder,
+  type StoreOrderItem,
+  type StoreVariant,
+  type OrderStatus,
+  type CreateStoreProductInput,
+  type UpdateStoreProductInput,
+  type UpdateStoreSettingsInput,
+  type CreateOrderInput,
+  type CartItemInput,
+} from "./SaasStoreService";
