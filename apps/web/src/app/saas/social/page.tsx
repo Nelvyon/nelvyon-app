@@ -30,6 +30,7 @@ interface SocialPost {
   status: "draft" | "scheduled" | "published" | "failed";
   scheduledAt: string | null;
   publishedAt: string | null;
+  errorMessage: string | null;
 }
 
 const PLATFORM_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
@@ -208,6 +209,8 @@ export default function SaasSocialPage() {
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
   const [filterStatus, setFilterStatus] = useState<SocialPost["status"] | "all">("all");
+  const [publishing, setPublishing] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -232,6 +235,32 @@ export default function SaasSocialPage() {
 
   useEffect(() => { void load(); }, [load]);
 
+  async function handlePublishNow(postId: string) {
+    setPublishing(postId);
+    try {
+      const r = await fetch("/api/saas/social/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "publish", id: postId }),
+      });
+      const d = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (!d.ok) alert(d.error ?? "Error al publicar");
+      await load();
+    } finally {
+      setPublishing(null);
+    }
+  }
+
+  async function handleDelete(postId: string) {
+    setDeleting(postId);
+    try {
+      await fetch(`/api/saas/social/posts?id=${postId}`, { method: "DELETE" });
+      await load();
+    } finally {
+      setDeleting(null);
+    }
+  }
+
   const filtered = filterStatus === "all" ? posts : posts.filter((p) => p.status === filterStatus);
 
   const stats = {
@@ -251,6 +280,22 @@ export default function SaasSocialPage() {
           />
           <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo post</NelvyonDsButton>
         </div>
+
+        {/* No-account warning */}
+        {!loading && accounts.length === 0 && (
+          <NelvyonDsCard className="border-amber-500/30 bg-amber-500/5 p-4">
+            <div className="flex items-start gap-3">
+              <span className="text-xl">⚠️</span>
+              <div>
+                <p className="font-medium text-foreground">Sin cuentas de redes sociales conectadas</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Conecta tu cuenta de Meta o LinkedIn para poder programar y publicar posts.
+                  Ve a <strong>Configuración → Integraciones</strong> y pega tu Access Token.
+                </p>
+              </div>
+            </div>
+          </NelvyonDsCard>
+        )}
 
         {/* Connected accounts */}
         {accounts.length > 0 && (
@@ -327,6 +372,31 @@ export default function SaasSocialPage() {
                         )}
                       </div>
                       <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.content.replace(/<[^>]+>/g, "")}</p>
+                      {p.errorMessage && (
+                        <p className="mt-1.5 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-400">
+                          ❌ {p.errorMessage}
+                        </p>
+                      )}
+                      <div className="mt-3 flex gap-2">
+                        {(p.status === "draft" || p.status === "failed") && (
+                          <NelvyonDsButton
+                            variant="ghost"
+                            className="text-xs"
+                            onClick={() => void handlePublishNow(p.id)}
+                            disabled={publishing === p.id}
+                          >
+                            {publishing === p.id ? "Publicando…" : "↑ Publicar ahora"}
+                          </NelvyonDsButton>
+                        )}
+                        <NelvyonDsButton
+                          variant="ghost"
+                          className="text-xs text-red-400 hover:text-red-300"
+                          onClick={() => void handleDelete(p.id)}
+                          disabled={deleting === p.id}
+                        >
+                          {deleting === p.id ? "…" : "Eliminar"}
+                        </NelvyonDsButton>
+                      </div>
                     </div>
                   </div>
                 </NelvyonDsCard>

@@ -24,8 +24,10 @@
 | O9 | 20 sector agents: +10 sectores (veterinaria…tecnologia), sectorSeeds.ts getSeedByIndex, docs/OS_SEEDS.md | c3aa3e1 |
 | S18 | Sequences v2: branching, wait/branch steps, reply-hook, sequence_enrolled trigger, UI /saas/secuencias | 29a7822 |
 | O10 | 500 seeds Envato metadata: download-envato-seeds 10×50, metadata index JSON, seed-selector 3-tier, 5 beta→available | ef4293d |
-| S19 | Forms embed: honeypot spam, embed JS widget /public/embed/form.js, public GET /api/forms/[formId]; Surveys: share link /s/[id], create modal, responses panel | (current) |
-| O11 | Recurring monthly services: OsRecurringServicesService (SEO report, social calendar, ads snapshot), cron /api/cron/os-recurring-services, migration 432 | (current) |
+| S19 | Forms embed: honeypot spam, embed JS widget /public/embed/form.js, public GET /api/forms/[formId]; Surveys: share link /s/[id], create modal, responses panel | 53aa5cb |
+| O11 | Recurring monthly services: OsRecurringServicesService (SEO report, social calendar, ads snapshot), cron /api/cron/os-recurring-services, migration 432 | d05941e |
+| S20 | Social scheduler publish elite: cron /api/cron/social-publish (CRON_SECRET), no-account banner + post actions in /saas/social, 6 processDueScheduled tests | (current) |
+| O12 | QA visual + legal pre-portal: visualQaEngine (WCAG contrast + structural + legal), packOrchestrator qa_visual_score/qa_legal_passed, portal block if score<70 or legal fail | (current) |
 
 ---
 
@@ -69,6 +71,14 @@ TWILIO_FROM_WHATSAPP=+14155238886
 SEMRUSH_API_KEY=
 SEO_DOMAIN=app.nelvyon.com
 
+# Social Publish — OAuth tokens (S20)
+# Meta: generate at developers.facebook.com → Tools → Graph API Explorer
+META_APP_ID=
+META_APP_SECRET=
+# LinkedIn: generate at linkedin.com/developers → Auth → Access Token
+LINKEDIN_CLIENT_ID=
+LINKEDIN_CLIENT_SECRET=
+
 # Reputación / Google Business Profile (opcional)
 GOOGLE_PLACES_API_KEY=
 GBP_PLACE_ID=
@@ -92,6 +102,16 @@ psql $DATABASE_URL -f backend/db/migrations/427_saas_lms.sql
 ---
 
 ## Checklist de deploy
+
+### Railway Cron jobs
+
+| Endpoint | Schedule | Purpose |
+|---|---|---|
+| `/api/cron/saas-workflows` | `*/4 * * * *` | Workflows scheduled + trigger |
+| `/api/cron/social-publish` | `* * * * *` | Publish social posts scheduled_at ≤ NOW() |
+| `/api/cron/os-recurring-services` | `0 8 1 * *` | Monthly deliverables (SEO, social calendar, ads) |
+
+All crons use header `x-cron-secret: $CRON_SECRET`.
 
 ### Pre-deploy
 - [ ] Todas las variables de entorno configuradas en Railway
