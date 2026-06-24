@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "retail-001",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}}",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-002",
+    "headline": "Tu tienda de confianza en {{city}}",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-003",
+    "headline": "Productos que cuidan cada detalle",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-004",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-005",
+    "headline": "Tienda local con productos exclusivos en {{city}}",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-006",
+    "headline": "Calidad premium a precios accesibles",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-007",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}}",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-008",
+    "headline": "Productos seleccionados para los más exigentes",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-009",
+    "headline": "Atención personalizada que marca la diferencia",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-010",
+    "headline": "Tu comercio de barrio con todo lo que necesitas",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-011",
+    "headline": "Primeras marcas con el mejor servicio en {{city}}",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-012",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-013",
+    "headline": "La tienda que conocen todos en {{city}}",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-014",
+    "headline": "Asesoramiento experto para cada compra",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-015",
+    "headline": "Ofertas exclusivas para clientes de {{city}}",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-016",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-017",
+    "headline": "Productos artesanales y de producción local",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-018",
+    "headline": "Catálogo renovado cada temporada",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-019",
+    "headline": "Más de 1.000 referencias disponibles en {{city}}",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-020",
+    "headline": "La tienda que recomienda el boca a boca en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-021",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v2)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-022",
+    "headline": "Tu tienda de confianza en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-023",
+    "headline": "Productos que cuidan cada detalle (v2)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-024",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-025",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v2)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-026",
+    "headline": "Calidad premium a precios accesibles (v2)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-027",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v2)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-028",
+    "headline": "Productos seleccionados para los más exigentes (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-029",
+    "headline": "Atención personalizada que marca la diferencia (v2)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-030",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v2)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-031",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v2)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-032",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-033",
+    "headline": "La tienda que conocen todos en {{city}} (v2)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-034",
+    "headline": "Asesoramiento experto para cada compra (v2)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-035",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v2)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-036",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-037",
+    "headline": "Productos artesanales y de producción local (v2)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-038",
+    "headline": "Catálogo renovado cada temporada (v2)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-039",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v2)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-040",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-041",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v3)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-042",
+    "headline": "Tu tienda de confianza en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-043",
+    "headline": "Productos que cuidan cada detalle (v3)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-044",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-045",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v3)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-046",
+    "headline": "Calidad premium a precios accesibles (v3)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-047",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v3)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-048",
+    "headline": "Productos seleccionados para los más exigentes (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-049",
+    "headline": "Atención personalizada que marca la diferencia (v3)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-050",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v3)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-051",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v3)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-052",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-053",
+    "headline": "La tienda que conocen todos en {{city}} (v3)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-054",
+    "headline": "Asesoramiento experto para cada compra (v3)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-055",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v3)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-056",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-057",
+    "headline": "Productos artesanales y de producción local (v3)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-058",
+    "headline": "Catálogo renovado cada temporada (v3)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-059",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v3)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-060",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-061",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v4)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-062",
+    "headline": "Tu tienda de confianza en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-063",
+    "headline": "Productos que cuidan cada detalle (v4)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-064",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-065",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v4)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-066",
+    "headline": "Calidad premium a precios accesibles (v4)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-067",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v4)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-068",
+    "headline": "Productos seleccionados para los más exigentes (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-069",
+    "headline": "Atención personalizada que marca la diferencia (v4)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-070",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v4)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-071",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v4)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-072",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-073",
+    "headline": "La tienda que conocen todos en {{city}} (v4)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-074",
+    "headline": "Asesoramiento experto para cada compra (v4)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-075",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v4)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-076",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-077",
+    "headline": "Productos artesanales y de producción local (v4)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-078",
+    "headline": "Catálogo renovado cada temporada (v4)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-079",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v4)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-080",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-081",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v5)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-082",
+    "headline": "Tu tienda de confianza en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-083",
+    "headline": "Productos que cuidan cada detalle (v5)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-084",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-085",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v5)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-086",
+    "headline": "Calidad premium a precios accesibles (v5)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-087",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v5)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-088",
+    "headline": "Productos seleccionados para los más exigentes (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-089",
+    "headline": "Atención personalizada que marca la diferencia (v5)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-090",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v5)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-091",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v5)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-092",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-093",
+    "headline": "La tienda que conocen todos en {{city}} (v5)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-094",
+    "headline": "Asesoramiento experto para cada compra (v5)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-095",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v5)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-096",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-097",
+    "headline": "Productos artesanales y de producción local (v5)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-098",
+    "headline": "Catálogo renovado cada temporada (v5)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-099",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v5)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-100",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-101",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v6)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-102",
+    "headline": "Tu tienda de confianza en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-103",
+    "headline": "Productos que cuidan cada detalle (v6)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-104",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-105",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v6)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-106",
+    "headline": "Calidad premium a precios accesibles (v6)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-107",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v6)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-108",
+    "headline": "Productos seleccionados para los más exigentes (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-109",
+    "headline": "Atención personalizada que marca la diferencia (v6)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-110",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v6)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-111",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v6)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-112",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-113",
+    "headline": "La tienda que conocen todos en {{city}} (v6)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-114",
+    "headline": "Asesoramiento experto para cada compra (v6)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-115",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v6)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-116",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-117",
+    "headline": "Productos artesanales y de producción local (v6)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-118",
+    "headline": "Catálogo renovado cada temporada (v6)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-119",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v6)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-120",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-121",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v7)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-122",
+    "headline": "Tu tienda de confianza en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-123",
+    "headline": "Productos que cuidan cada detalle (v7)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-124",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-125",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v7)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-126",
+    "headline": "Calidad premium a precios accesibles (v7)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-127",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v7)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-128",
+    "headline": "Productos seleccionados para los más exigentes (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-129",
+    "headline": "Atención personalizada que marca la diferencia (v7)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-130",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v7)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-131",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v7)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-132",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-133",
+    "headline": "La tienda que conocen todos en {{city}} (v7)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-134",
+    "headline": "Asesoramiento experto para cada compra (v7)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-135",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v7)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-136",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-137",
+    "headline": "Productos artesanales y de producción local (v7)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-138",
+    "headline": "Catálogo renovado cada temporada (v7)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-139",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v7)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-140",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-141",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v8)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-142",
+    "headline": "Tu tienda de confianza en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-143",
+    "headline": "Productos que cuidan cada detalle (v8)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-144",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-145",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v8)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-146",
+    "headline": "Calidad premium a precios accesibles (v8)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-147",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v8)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-148",
+    "headline": "Productos seleccionados para los más exigentes (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-149",
+    "headline": "Atención personalizada que marca la diferencia (v8)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-150",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v8)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-151",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v8)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-152",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-153",
+    "headline": "La tienda que conocen todos en {{city}} (v8)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-154",
+    "headline": "Asesoramiento experto para cada compra (v8)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-155",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v8)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-156",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-157",
+    "headline": "Productos artesanales y de producción local (v8)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-158",
+    "headline": "Catálogo renovado cada temporada (v8)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-159",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v8)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-160",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-161",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v9)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-162",
+    "headline": "Tu tienda de confianza en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-163",
+    "headline": "Productos que cuidan cada detalle (v9)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-164",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-165",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v9)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-166",
+    "headline": "Calidad premium a precios accesibles (v9)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-167",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v9)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-168",
+    "headline": "Productos seleccionados para los más exigentes (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-169",
+    "headline": "Atención personalizada que marca la diferencia (v9)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-170",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v9)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-171",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v9)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-172",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-173",
+    "headline": "La tienda que conocen todos en {{city}} (v9)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-174",
+    "headline": "Asesoramiento experto para cada compra (v9)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-175",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v9)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-176",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-177",
+    "headline": "Productos artesanales y de producción local (v9)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-178",
+    "headline": "Catálogo renovado cada temporada (v9)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-179",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v9)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-180",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-181",
+    "headline": "Calidad y precio que no encontrarás en otro sitio en {{city}} (v10)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-182",
+    "headline": "Tu tienda de confianza en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-183",
+    "headline": "Productos que cuidan cada detalle (v10)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-184",
+    "headline": "Lo mejor para tu hogar a precios justos en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-185",
+    "headline": "Tienda local con productos exclusivos en {{city}} (v10)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-186",
+    "headline": "Calidad premium a precios accesibles (v10)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-187",
+    "headline": "El rincón donde encuentras lo que buscas en {{city}} (v10)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-188",
+    "headline": "Productos seleccionados para los más exigentes (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-189",
+    "headline": "Atención personalizada que marca la diferencia (v10)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-190",
+    "headline": "Tu comercio de barrio con todo lo que necesitas (v10)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-191",
+    "headline": "Primeras marcas con el mejor servicio en {{city}} (v10)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-192",
+    "headline": "Ahorra sin renunciar a la calidad en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-193",
+    "headline": "La tienda que conocen todos en {{city}} (v10)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-194",
+    "headline": "Asesoramiento experto para cada compra (v10)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-195",
+    "headline": "Ofertas exclusivas para clientes de {{city}} (v10)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-196",
+    "headline": "Envíos a domicilio y recogida en tienda en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Ver catálogo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-197",
+    "headline": "Productos artesanales y de producción local (v10)",
+    "meta_title": "Tienda en {{city}} — {{business_name}} | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-198",
+    "headline": "Catálogo renovado cada temporada (v10)",
+    "meta_title": "{{business_name}}: Comprar en {{city}} | Catálogo online",
+    "cta_label": "Visitar tienda",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  },
+  {
+    "id": "retail-199",
+    "headline": "Más de 1.000 referencias disponibles en {{city}} (v10)",
+    "meta_title": "Retail y tienda en {{city}} — {{business_name}}",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Buscas algún producto en concreto?"
+  },
+  {
+    "id": "retail-200",
+    "headline": "La tienda que recomienda el boca a boca en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tu comercio local | Ofertas",
+    "cta_label": "Solicitar info",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte hoy?"
+  }
+]

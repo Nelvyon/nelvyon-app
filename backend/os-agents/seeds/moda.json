@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "moda-001",
+    "headline": "Moda que te define en {{city}}",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-002",
+    "headline": "Tu estilo, tu identidad — {{business_name}}",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-003",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-004",
+    "headline": "Viste diferente, viste mejor con {{business_name}}",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-005",
+    "headline": "Moda sostenible con diseño de autor",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-006",
+    "headline": "Tu guardarropa empieza aquí",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-007",
+    "headline": "Tendencias de temporada a precios justos",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-008",
+    "headline": "Ropa que dura y que sienta bien",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-009",
+    "headline": "Diseño español para todo tipo de estilos",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-010",
+    "headline": "Ediciones limitadas para quienes marcan tendencia",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-011",
+    "headline": "Lo que llevan las que saben en {{city}}",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-012",
+    "headline": "Básicos y piezas especiales en un solo lugar",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-013",
+    "headline": "Envío a toda España en 24h — moda sin esperas",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-014",
+    "headline": "Devuelve gratis si no es lo que esperabas",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-015",
+    "headline": "Nueva colección disponible cada 2 semanas",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-016",
+    "headline": "Materiales naturales, producción responsable",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-017",
+    "headline": "Talla única hasta la 52 — moda para todas",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-018",
+    "headline": "El outlet online con las mejores marcas",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-019",
+    "headline": "Outfits completos por menos de lo que imaginas",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-020",
+    "headline": "La marca de moda que {{city}} está descubriendo",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-021",
+    "headline": "Moda que te define en {{city}} (v2)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-022",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v2)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-023",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v2)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-024",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v2)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-025",
+    "headline": "Moda sostenible con diseño de autor (v2)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-026",
+    "headline": "Tu guardarropa empieza aquí (v2)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-027",
+    "headline": "Tendencias de temporada a precios justos (v2)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-028",
+    "headline": "Ropa que dura y que sienta bien (v2)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-029",
+    "headline": "Diseño español para todo tipo de estilos (v2)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-030",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v2)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-031",
+    "headline": "Lo que llevan las que saben en {{city}} (v2)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-032",
+    "headline": "Básicos y piezas especiales en un solo lugar (v2)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-033",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v2)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-034",
+    "headline": "Devuelve gratis si no es lo que esperabas (v2)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-035",
+    "headline": "Nueva colección disponible cada 2 semanas (v2)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-036",
+    "headline": "Materiales naturales, producción responsable (v2)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-037",
+    "headline": "Talla única hasta la 52 — moda para todas (v2)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-038",
+    "headline": "El outlet online con las mejores marcas (v2)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-039",
+    "headline": "Outfits completos por menos de lo que imaginas (v2)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-040",
+    "headline": "La marca de moda que {{city}} está descubriendo (v2)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-041",
+    "headline": "Moda que te define en {{city}} (v3)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-042",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v3)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-043",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v3)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-044",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v3)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-045",
+    "headline": "Moda sostenible con diseño de autor (v3)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-046",
+    "headline": "Tu guardarropa empieza aquí (v3)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-047",
+    "headline": "Tendencias de temporada a precios justos (v3)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-048",
+    "headline": "Ropa que dura y que sienta bien (v3)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-049",
+    "headline": "Diseño español para todo tipo de estilos (v3)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-050",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v3)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-051",
+    "headline": "Lo que llevan las que saben en {{city}} (v3)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-052",
+    "headline": "Básicos y piezas especiales en un solo lugar (v3)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-053",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v3)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-054",
+    "headline": "Devuelve gratis si no es lo que esperabas (v3)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-055",
+    "headline": "Nueva colección disponible cada 2 semanas (v3)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-056",
+    "headline": "Materiales naturales, producción responsable (v3)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-057",
+    "headline": "Talla única hasta la 52 — moda para todas (v3)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-058",
+    "headline": "El outlet online con las mejores marcas (v3)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-059",
+    "headline": "Outfits completos por menos de lo que imaginas (v3)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-060",
+    "headline": "La marca de moda que {{city}} está descubriendo (v3)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-061",
+    "headline": "Moda que te define en {{city}} (v4)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-062",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v4)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-063",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v4)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-064",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v4)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-065",
+    "headline": "Moda sostenible con diseño de autor (v4)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-066",
+    "headline": "Tu guardarropa empieza aquí (v4)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-067",
+    "headline": "Tendencias de temporada a precios justos (v4)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-068",
+    "headline": "Ropa que dura y que sienta bien (v4)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-069",
+    "headline": "Diseño español para todo tipo de estilos (v4)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-070",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v4)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-071",
+    "headline": "Lo que llevan las que saben en {{city}} (v4)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-072",
+    "headline": "Básicos y piezas especiales en un solo lugar (v4)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-073",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v4)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-074",
+    "headline": "Devuelve gratis si no es lo que esperabas (v4)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-075",
+    "headline": "Nueva colección disponible cada 2 semanas (v4)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-076",
+    "headline": "Materiales naturales, producción responsable (v4)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-077",
+    "headline": "Talla única hasta la 52 — moda para todas (v4)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-078",
+    "headline": "El outlet online con las mejores marcas (v4)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-079",
+    "headline": "Outfits completos por menos de lo que imaginas (v4)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-080",
+    "headline": "La marca de moda que {{city}} está descubriendo (v4)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-081",
+    "headline": "Moda que te define en {{city}} (v5)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-082",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v5)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-083",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v5)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-084",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v5)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-085",
+    "headline": "Moda sostenible con diseño de autor (v5)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-086",
+    "headline": "Tu guardarropa empieza aquí (v5)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-087",
+    "headline": "Tendencias de temporada a precios justos (v5)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-088",
+    "headline": "Ropa que dura y que sienta bien (v5)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-089",
+    "headline": "Diseño español para todo tipo de estilos (v5)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-090",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v5)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-091",
+    "headline": "Lo que llevan las que saben en {{city}} (v5)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-092",
+    "headline": "Básicos y piezas especiales en un solo lugar (v5)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-093",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v5)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-094",
+    "headline": "Devuelve gratis si no es lo que esperabas (v5)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-095",
+    "headline": "Nueva colección disponible cada 2 semanas (v5)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-096",
+    "headline": "Materiales naturales, producción responsable (v5)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-097",
+    "headline": "Talla única hasta la 52 — moda para todas (v5)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-098",
+    "headline": "El outlet online con las mejores marcas (v5)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-099",
+    "headline": "Outfits completos por menos de lo que imaginas (v5)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-100",
+    "headline": "La marca de moda que {{city}} está descubriendo (v5)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-101",
+    "headline": "Moda que te define en {{city}} (v6)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-102",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v6)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-103",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v6)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-104",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v6)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-105",
+    "headline": "Moda sostenible con diseño de autor (v6)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-106",
+    "headline": "Tu guardarropa empieza aquí (v6)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-107",
+    "headline": "Tendencias de temporada a precios justos (v6)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-108",
+    "headline": "Ropa que dura y que sienta bien (v6)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-109",
+    "headline": "Diseño español para todo tipo de estilos (v6)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-110",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v6)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-111",
+    "headline": "Lo que llevan las que saben en {{city}} (v6)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-112",
+    "headline": "Básicos y piezas especiales en un solo lugar (v6)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-113",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v6)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-114",
+    "headline": "Devuelve gratis si no es lo que esperabas (v6)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-115",
+    "headline": "Nueva colección disponible cada 2 semanas (v6)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-116",
+    "headline": "Materiales naturales, producción responsable (v6)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-117",
+    "headline": "Talla única hasta la 52 — moda para todas (v6)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-118",
+    "headline": "El outlet online con las mejores marcas (v6)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-119",
+    "headline": "Outfits completos por menos de lo que imaginas (v6)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-120",
+    "headline": "La marca de moda que {{city}} está descubriendo (v6)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-121",
+    "headline": "Moda que te define en {{city}} (v7)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-122",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v7)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-123",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v7)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-124",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v7)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-125",
+    "headline": "Moda sostenible con diseño de autor (v7)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-126",
+    "headline": "Tu guardarropa empieza aquí (v7)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-127",
+    "headline": "Tendencias de temporada a precios justos (v7)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-128",
+    "headline": "Ropa que dura y que sienta bien (v7)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-129",
+    "headline": "Diseño español para todo tipo de estilos (v7)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-130",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v7)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-131",
+    "headline": "Lo que llevan las que saben en {{city}} (v7)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-132",
+    "headline": "Básicos y piezas especiales en un solo lugar (v7)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-133",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v7)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-134",
+    "headline": "Devuelve gratis si no es lo que esperabas (v7)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-135",
+    "headline": "Nueva colección disponible cada 2 semanas (v7)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-136",
+    "headline": "Materiales naturales, producción responsable (v7)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-137",
+    "headline": "Talla única hasta la 52 — moda para todas (v7)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-138",
+    "headline": "El outlet online con las mejores marcas (v7)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-139",
+    "headline": "Outfits completos por menos de lo que imaginas (v7)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-140",
+    "headline": "La marca de moda que {{city}} está descubriendo (v7)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-141",
+    "headline": "Moda que te define en {{city}} (v8)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-142",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v8)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-143",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v8)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-144",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v8)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-145",
+    "headline": "Moda sostenible con diseño de autor (v8)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-146",
+    "headline": "Tu guardarropa empieza aquí (v8)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-147",
+    "headline": "Tendencias de temporada a precios justos (v8)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-148",
+    "headline": "Ropa que dura y que sienta bien (v8)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-149",
+    "headline": "Diseño español para todo tipo de estilos (v8)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-150",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v8)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-151",
+    "headline": "Lo que llevan las que saben en {{city}} (v8)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-152",
+    "headline": "Básicos y piezas especiales en un solo lugar (v8)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-153",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v8)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-154",
+    "headline": "Devuelve gratis si no es lo que esperabas (v8)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-155",
+    "headline": "Nueva colección disponible cada 2 semanas (v8)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-156",
+    "headline": "Materiales naturales, producción responsable (v8)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-157",
+    "headline": "Talla única hasta la 52 — moda para todas (v8)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-158",
+    "headline": "El outlet online con las mejores marcas (v8)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-159",
+    "headline": "Outfits completos por menos de lo que imaginas (v8)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-160",
+    "headline": "La marca de moda que {{city}} está descubriendo (v8)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-161",
+    "headline": "Moda que te define en {{city}} (v9)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-162",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v9)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-163",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v9)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-164",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v9)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-165",
+    "headline": "Moda sostenible con diseño de autor (v9)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-166",
+    "headline": "Tu guardarropa empieza aquí (v9)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-167",
+    "headline": "Tendencias de temporada a precios justos (v9)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-168",
+    "headline": "Ropa que dura y que sienta bien (v9)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-169",
+    "headline": "Diseño español para todo tipo de estilos (v9)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-170",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v9)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-171",
+    "headline": "Lo que llevan las que saben en {{city}} (v9)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-172",
+    "headline": "Básicos y piezas especiales en un solo lugar (v9)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-173",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v9)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-174",
+    "headline": "Devuelve gratis si no es lo que esperabas (v9)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-175",
+    "headline": "Nueva colección disponible cada 2 semanas (v9)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-176",
+    "headline": "Materiales naturales, producción responsable (v9)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-177",
+    "headline": "Talla única hasta la 52 — moda para todas (v9)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-178",
+    "headline": "El outlet online con las mejores marcas (v9)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-179",
+    "headline": "Outfits completos por menos de lo que imaginas (v9)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-180",
+    "headline": "La marca de moda que {{city}} está descubriendo (v9)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-181",
+    "headline": "Moda que te define en {{city}} (v10)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-182",
+    "headline": "Tu estilo, tu identidad — {{business_name}} (v10)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-183",
+    "headline": "Colecciones exclusivas que no encontrarás en ningún sitio (v10)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-184",
+    "headline": "Viste diferente, viste mejor con {{business_name}} (v10)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-185",
+    "headline": "Moda sostenible con diseño de autor (v10)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-186",
+    "headline": "Tu guardarropa empieza aquí (v10)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-187",
+    "headline": "Tendencias de temporada a precios justos (v10)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-188",
+    "headline": "Ropa que dura y que sienta bien (v10)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-189",
+    "headline": "Diseño español para todo tipo de estilos (v10)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-190",
+    "headline": "Ediciones limitadas para quienes marcan tendencia (v10)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-191",
+    "headline": "Lo que llevan las que saben en {{city}} (v10)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-192",
+    "headline": "Básicos y piezas especiales en un solo lugar (v10)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-193",
+    "headline": "Envío a toda España en 24h — moda sin esperas (v10)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-194",
+    "headline": "Devuelve gratis si no es lo que esperabas (v10)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-195",
+    "headline": "Nueva colección disponible cada 2 semanas (v10)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-196",
+    "headline": "Materiales naturales, producción responsable (v10)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Ver colección",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-197",
+    "headline": "Talla única hasta la 52 — moda para todas (v10)",
+    "meta_title": "Tienda de moda online — {{business_name}} | Nueva colección",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-198",
+    "headline": "El outlet online con las mejores marcas (v10)",
+    "meta_title": "{{business_name}}: Ropa y moda online España | Ver colección",
+    "cta_label": "Nueva temporada",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  },
+  {
+    "id": "moda-199",
+    "headline": "Outfits completos por menos de lo que imaginas (v10)",
+    "meta_title": "{{business_name}} — Moda mujer/hombre España | Comprar",
+    "cta_label": "Ver lookbook",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a encontrar tu look perfecto?"
+  },
+  {
+    "id": "moda-200",
+    "headline": "La marca de moda que {{city}} está descubriendo (v10)",
+    "meta_title": "Moda online {{business_name}} | Envío gratis y devolución fácil",
+    "cta_label": "Últimas unidades",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. ¿Buscas algo en especial o quieres ver las novedades?"
+  }
+]

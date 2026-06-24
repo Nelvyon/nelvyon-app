@@ -8,6 +8,8 @@ import {
 } from "@/lib/portal/portalDeliverableStorage";
 
 const PORTAL_VISIBLE_STATUSES = ["published", "approved_by_client", "changes_requested"] as const;
+/** Deliverables with qa_score below this threshold are hidden from the client portal. */
+export const PORTAL_MIN_QA_SCORE = 85;
 const DOWNLOADABLE_STATUSES = ["published", "approved_by_client"] as const;
 const CLIENT_REVIEWED_STATUSES = new Set(["approved_by_client", "changes_requested"]);
 
@@ -121,6 +123,9 @@ export async function listPortalDeliverablesBff(params: {
 
   const statusPlaceholders = PORTAL_VISIBLE_STATUSES.map((_, i) => `$${i + 3}`).join(", ");
 
+  // QA gate: only expose deliverables that meet MIN_SCORE or have no score recorded.
+  const qaGate = ` AND (metadata->>'qa_score' IS NULL OR (metadata->>'qa_score')::numeric >= ${PORTAL_MIN_QA_SCORE})`;
+
   const countRows = await db().query<{ count: string }>(
     `SELECT COUNT(*)::text AS count
      FROM os_deliverables
@@ -129,7 +134,8 @@ export async function listPortalDeliverablesBff(params: {
        AND visibility = 'client_visible'
        AND status IN (${statusPlaceholders})
        ${projectFilter}
-       ${searchFilter}`,
+       ${searchFilter}
+       ${qaGate}`,
     values,
   );
   const total = Number(countRows[0]?.count ?? 0);
@@ -148,6 +154,7 @@ export async function listPortalDeliverablesBff(params: {
        AND status IN (${statusPlaceholders})
        ${projectFilter}
        ${searchFilter}
+       ${qaGate}
      ORDER BY updated_at DESC, title ASC
      LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
     values,

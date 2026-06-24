@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "restaurantes-001",
+    "headline": "Sabor auténtico en el corazón de {{city}}",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-002",
+    "headline": "La cocina de toda la vida en {{city}}",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-003",
+    "headline": "Tu mesa favorita en {{city}} te espera",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-004",
+    "headline": "Gastronomía de autor con ingredientes de temporada",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-005",
+    "headline": "El sabor que no encontrarás en otro restaurante",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-006",
+    "headline": "Donde cada plato cuenta una historia",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-007",
+    "headline": "La experiencia gastronómica que {{city}} merece",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-008",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-009",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}}",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-010",
+    "headline": "El restaurante que repites en {{city}}",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-011",
+    "headline": "Menú del día que hace que vuelvas",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-012",
+    "headline": "Cocina casera con toque de autor",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-013",
+    "headline": "Tu restaurante de confianza en {{city}}",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-014",
+    "headline": "Gastronomía local con productos del mercado",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-015",
+    "headline": "Donde comer bien no cuesta una fortuna",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-016",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-017",
+    "headline": "Ingredientes del huerto, sabor de siempre",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-018",
+    "headline": "La mesa que te hace sentir en casa",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-019",
+    "headline": "Cocina mediterránea con alma en {{city}}",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-020",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-021",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v2)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-022",
+    "headline": "La cocina de toda la vida en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-023",
+    "headline": "Tu mesa favorita en {{city}} te espera (v2)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-024",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v2)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-025",
+    "headline": "El sabor que no encontrarás en otro restaurante (v2)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-026",
+    "headline": "Donde cada plato cuenta una historia (v2)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-027",
+    "headline": "La experiencia gastronómica que {{city}} merece (v2)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-028",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v2)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-029",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v2)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-030",
+    "headline": "El restaurante que repites en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-031",
+    "headline": "Menú del día que hace que vuelvas (v2)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-032",
+    "headline": "Cocina casera con toque de autor (v2)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-033",
+    "headline": "Tu restaurante de confianza en {{city}} (v2)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-034",
+    "headline": "Gastronomía local con productos del mercado (v2)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-035",
+    "headline": "Donde comer bien no cuesta una fortuna (v2)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-036",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v2)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-037",
+    "headline": "Ingredientes del huerto, sabor de siempre (v2)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-038",
+    "headline": "La mesa que te hace sentir en casa (v2)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-039",
+    "headline": "Cocina mediterránea con alma en {{city}} (v2)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-040",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-041",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v3)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-042",
+    "headline": "La cocina de toda la vida en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-043",
+    "headline": "Tu mesa favorita en {{city}} te espera (v3)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-044",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v3)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-045",
+    "headline": "El sabor que no encontrarás en otro restaurante (v3)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-046",
+    "headline": "Donde cada plato cuenta una historia (v3)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-047",
+    "headline": "La experiencia gastronómica que {{city}} merece (v3)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-048",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v3)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-049",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v3)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-050",
+    "headline": "El restaurante que repites en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-051",
+    "headline": "Menú del día que hace que vuelvas (v3)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-052",
+    "headline": "Cocina casera con toque de autor (v3)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-053",
+    "headline": "Tu restaurante de confianza en {{city}} (v3)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-054",
+    "headline": "Gastronomía local con productos del mercado (v3)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-055",
+    "headline": "Donde comer bien no cuesta una fortuna (v3)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-056",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v3)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-057",
+    "headline": "Ingredientes del huerto, sabor de siempre (v3)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-058",
+    "headline": "La mesa que te hace sentir en casa (v3)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-059",
+    "headline": "Cocina mediterránea con alma en {{city}} (v3)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-060",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-061",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v4)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-062",
+    "headline": "La cocina de toda la vida en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-063",
+    "headline": "Tu mesa favorita en {{city}} te espera (v4)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-064",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v4)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-065",
+    "headline": "El sabor que no encontrarás en otro restaurante (v4)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-066",
+    "headline": "Donde cada plato cuenta una historia (v4)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-067",
+    "headline": "La experiencia gastronómica que {{city}} merece (v4)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-068",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v4)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-069",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v4)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-070",
+    "headline": "El restaurante que repites en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-071",
+    "headline": "Menú del día que hace que vuelvas (v4)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-072",
+    "headline": "Cocina casera con toque de autor (v4)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-073",
+    "headline": "Tu restaurante de confianza en {{city}} (v4)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-074",
+    "headline": "Gastronomía local con productos del mercado (v4)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-075",
+    "headline": "Donde comer bien no cuesta una fortuna (v4)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-076",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v4)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-077",
+    "headline": "Ingredientes del huerto, sabor de siempre (v4)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-078",
+    "headline": "La mesa que te hace sentir en casa (v4)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-079",
+    "headline": "Cocina mediterránea con alma en {{city}} (v4)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-080",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-081",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v5)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-082",
+    "headline": "La cocina de toda la vida en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-083",
+    "headline": "Tu mesa favorita en {{city}} te espera (v5)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-084",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v5)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-085",
+    "headline": "El sabor que no encontrarás en otro restaurante (v5)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-086",
+    "headline": "Donde cada plato cuenta una historia (v5)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-087",
+    "headline": "La experiencia gastronómica que {{city}} merece (v5)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-088",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v5)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-089",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v5)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-090",
+    "headline": "El restaurante que repites en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-091",
+    "headline": "Menú del día que hace que vuelvas (v5)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-092",
+    "headline": "Cocina casera con toque de autor (v5)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-093",
+    "headline": "Tu restaurante de confianza en {{city}} (v5)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-094",
+    "headline": "Gastronomía local con productos del mercado (v5)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-095",
+    "headline": "Donde comer bien no cuesta una fortuna (v5)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-096",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v5)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-097",
+    "headline": "Ingredientes del huerto, sabor de siempre (v5)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-098",
+    "headline": "La mesa que te hace sentir en casa (v5)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-099",
+    "headline": "Cocina mediterránea con alma en {{city}} (v5)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-100",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-101",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v6)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-102",
+    "headline": "La cocina de toda la vida en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-103",
+    "headline": "Tu mesa favorita en {{city}} te espera (v6)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-104",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v6)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-105",
+    "headline": "El sabor que no encontrarás en otro restaurante (v6)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-106",
+    "headline": "Donde cada plato cuenta una historia (v6)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-107",
+    "headline": "La experiencia gastronómica que {{city}} merece (v6)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-108",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v6)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-109",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v6)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-110",
+    "headline": "El restaurante que repites en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-111",
+    "headline": "Menú del día que hace que vuelvas (v6)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-112",
+    "headline": "Cocina casera con toque de autor (v6)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-113",
+    "headline": "Tu restaurante de confianza en {{city}} (v6)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-114",
+    "headline": "Gastronomía local con productos del mercado (v6)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-115",
+    "headline": "Donde comer bien no cuesta una fortuna (v6)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-116",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v6)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-117",
+    "headline": "Ingredientes del huerto, sabor de siempre (v6)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-118",
+    "headline": "La mesa que te hace sentir en casa (v6)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-119",
+    "headline": "Cocina mediterránea con alma en {{city}} (v6)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-120",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-121",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v7)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-122",
+    "headline": "La cocina de toda la vida en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-123",
+    "headline": "Tu mesa favorita en {{city}} te espera (v7)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-124",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v7)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-125",
+    "headline": "El sabor que no encontrarás en otro restaurante (v7)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-126",
+    "headline": "Donde cada plato cuenta una historia (v7)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-127",
+    "headline": "La experiencia gastronómica que {{city}} merece (v7)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-128",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v7)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-129",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v7)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-130",
+    "headline": "El restaurante que repites en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-131",
+    "headline": "Menú del día que hace que vuelvas (v7)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-132",
+    "headline": "Cocina casera con toque de autor (v7)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-133",
+    "headline": "Tu restaurante de confianza en {{city}} (v7)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-134",
+    "headline": "Gastronomía local con productos del mercado (v7)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-135",
+    "headline": "Donde comer bien no cuesta una fortuna (v7)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-136",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v7)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-137",
+    "headline": "Ingredientes del huerto, sabor de siempre (v7)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-138",
+    "headline": "La mesa que te hace sentir en casa (v7)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-139",
+    "headline": "Cocina mediterránea con alma en {{city}} (v7)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-140",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-141",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v8)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-142",
+    "headline": "La cocina de toda la vida en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-143",
+    "headline": "Tu mesa favorita en {{city}} te espera (v8)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-144",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v8)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-145",
+    "headline": "El sabor que no encontrarás en otro restaurante (v8)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-146",
+    "headline": "Donde cada plato cuenta una historia (v8)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-147",
+    "headline": "La experiencia gastronómica que {{city}} merece (v8)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-148",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v8)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-149",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v8)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-150",
+    "headline": "El restaurante que repites en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-151",
+    "headline": "Menú del día que hace que vuelvas (v8)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-152",
+    "headline": "Cocina casera con toque de autor (v8)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-153",
+    "headline": "Tu restaurante de confianza en {{city}} (v8)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-154",
+    "headline": "Gastronomía local con productos del mercado (v8)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-155",
+    "headline": "Donde comer bien no cuesta una fortuna (v8)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-156",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v8)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-157",
+    "headline": "Ingredientes del huerto, sabor de siempre (v8)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-158",
+    "headline": "La mesa que te hace sentir en casa (v8)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-159",
+    "headline": "Cocina mediterránea con alma en {{city}} (v8)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-160",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-161",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v9)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-162",
+    "headline": "La cocina de toda la vida en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-163",
+    "headline": "Tu mesa favorita en {{city}} te espera (v9)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-164",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v9)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-165",
+    "headline": "El sabor que no encontrarás en otro restaurante (v9)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-166",
+    "headline": "Donde cada plato cuenta una historia (v9)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-167",
+    "headline": "La experiencia gastronómica que {{city}} merece (v9)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-168",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v9)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-169",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v9)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-170",
+    "headline": "El restaurante que repites en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-171",
+    "headline": "Menú del día que hace que vuelvas (v9)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-172",
+    "headline": "Cocina casera con toque de autor (v9)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-173",
+    "headline": "Tu restaurante de confianza en {{city}} (v9)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-174",
+    "headline": "Gastronomía local con productos del mercado (v9)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-175",
+    "headline": "Donde comer bien no cuesta una fortuna (v9)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-176",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v9)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-177",
+    "headline": "Ingredientes del huerto, sabor de siempre (v9)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-178",
+    "headline": "La mesa que te hace sentir en casa (v9)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-179",
+    "headline": "Cocina mediterránea con alma en {{city}} (v9)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-180",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-181",
+    "headline": "Sabor auténtico en el corazón de {{city}} (v10)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-182",
+    "headline": "La cocina de toda la vida en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-183",
+    "headline": "Tu mesa favorita en {{city}} te espera (v10)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-184",
+    "headline": "Gastronomía de autor con ingredientes de temporada (v10)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-185",
+    "headline": "El sabor que no encontrarás en otro restaurante (v10)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-186",
+    "headline": "Donde cada plato cuenta una historia (v10)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-187",
+    "headline": "La experiencia gastronómica que {{city}} merece (v10)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-188",
+    "headline": "Cocina honesta, ingredientes frescos, sabor real (v10)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-189",
+    "headline": "Más de 10 años dando de comer con cariño en {{city}} (v10)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-190",
+    "headline": "El restaurante que repites en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-191",
+    "headline": "Menú del día que hace que vuelvas (v10)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-192",
+    "headline": "Cocina casera con toque de autor (v10)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-193",
+    "headline": "Tu restaurante de confianza en {{city}} (v10)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-194",
+    "headline": "Gastronomía local con productos del mercado (v10)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-195",
+    "headline": "Donde comer bien no cuesta una fortuna (v10)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-196",
+    "headline": "El sitio donde los locals de {{city}} comen de verdad (v10)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Reservar mesa",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-197",
+    "headline": "Ingredientes del huerto, sabor de siempre (v10)",
+    "meta_title": "Restaurante en {{city}} — {{business_name}} | Reserva online",
+    "cta_label": "Ver menú del día",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-198",
+    "headline": "La mesa que te hace sentir en casa (v10)",
+    "meta_title": "{{business_name}}: Cocina de calidad en {{city}} | Reservar mesa",
+    "cta_label": "Reserva online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  },
+  {
+    "id": "restaurantes-199",
+    "headline": "Cocina mediterránea con alma en {{city}} (v10)",
+    "meta_title": "Mejor restaurante en {{city}} — {{business_name}}",
+    "cta_label": "Pide tu mesa",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Quieres reservar una mesa o ver nuestra carta?"
+  },
+  {
+    "id": "restaurantes-200",
+    "headline": "El restaurante que recomiendan tus amigos en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Gastronomía auténtica | Reservas",
+    "cta_label": "Ver la carta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué puedo ayudarte? Puedo informarte sobre el menú o gestionar tu reserva."
+  }
+]

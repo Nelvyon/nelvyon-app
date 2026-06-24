@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "fintech-001",
+    "headline": "Finanzas inteligentes para empresas que crecen",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-002",
+    "headline": "Mueve tu dinero más rápido y con menos costes",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-003",
+    "headline": "El banco empresarial que entiende tu negocio",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-004",
+    "headline": "Gestión financiera automatizada para PYMEs",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-005",
+    "headline": "Crédito empresarial en 48h sin papeleo",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-006",
+    "headline": "Tu CFO virtual disponible 24/7",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-007",
+    "headline": "Pagos internacionales sin comisiones abusivas",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-008",
+    "headline": "Visibilidad total de tu cashflow en tiempo real",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-009",
+    "headline": "Open Banking para que tomes mejores decisiones",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-010",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-011",
+    "headline": "Cobros más rápidos, pagos más controlados",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-012",
+    "headline": "La plataforma fintech que tu contable también aprecia",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-013",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-014",
+    "headline": "Seguridad bancaria con agilidad startup",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-015",
+    "headline": "Integrado con tu ERP en menos de un día",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-016",
+    "headline": "Analítica financiera predictiva para anticiparte",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-017",
+    "headline": "Tarjetas de empresa con control por departamento",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-018",
+    "headline": "Reconciliación automática que ahorra horas al mes",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-019",
+    "headline": "Préstamos basados en datos reales de tu negocio",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-020",
+    "headline": "La fintech que crece con empresas como la tuya",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-021",
+    "headline": "Finanzas inteligentes para empresas que crecen (v2)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-022",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v2)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-023",
+    "headline": "El banco empresarial que entiende tu negocio (v2)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-024",
+    "headline": "Gestión financiera automatizada para PYMEs (v2)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-025",
+    "headline": "Crédito empresarial en 48h sin papeleo (v2)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-026",
+    "headline": "Tu CFO virtual disponible 24/7 (v2)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-027",
+    "headline": "Pagos internacionales sin comisiones abusivas (v2)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-028",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v2)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-029",
+    "headline": "Open Banking para que tomes mejores decisiones (v2)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-030",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v2)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-031",
+    "headline": "Cobros más rápidos, pagos más controlados (v2)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-032",
+    "headline": "La plataforma fintech que tu contable también aprecia (v2)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-033",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v2)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-034",
+    "headline": "Seguridad bancaria con agilidad startup (v2)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-035",
+    "headline": "Integrado con tu ERP en menos de un día (v2)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-036",
+    "headline": "Analítica financiera predictiva para anticiparte (v2)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-037",
+    "headline": "Tarjetas de empresa con control por departamento (v2)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-038",
+    "headline": "Reconciliación automática que ahorra horas al mes (v2)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-039",
+    "headline": "Préstamos basados en datos reales de tu negocio (v2)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-040",
+    "headline": "La fintech que crece con empresas como la tuya (v2)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-041",
+    "headline": "Finanzas inteligentes para empresas que crecen (v3)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-042",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v3)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-043",
+    "headline": "El banco empresarial que entiende tu negocio (v3)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-044",
+    "headline": "Gestión financiera automatizada para PYMEs (v3)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-045",
+    "headline": "Crédito empresarial en 48h sin papeleo (v3)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-046",
+    "headline": "Tu CFO virtual disponible 24/7 (v3)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-047",
+    "headline": "Pagos internacionales sin comisiones abusivas (v3)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-048",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v3)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-049",
+    "headline": "Open Banking para que tomes mejores decisiones (v3)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-050",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v3)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-051",
+    "headline": "Cobros más rápidos, pagos más controlados (v3)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-052",
+    "headline": "La plataforma fintech que tu contable también aprecia (v3)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-053",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v3)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-054",
+    "headline": "Seguridad bancaria con agilidad startup (v3)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-055",
+    "headline": "Integrado con tu ERP en menos de un día (v3)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-056",
+    "headline": "Analítica financiera predictiva para anticiparte (v3)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-057",
+    "headline": "Tarjetas de empresa con control por departamento (v3)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-058",
+    "headline": "Reconciliación automática que ahorra horas al mes (v3)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-059",
+    "headline": "Préstamos basados en datos reales de tu negocio (v3)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-060",
+    "headline": "La fintech que crece con empresas como la tuya (v3)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-061",
+    "headline": "Finanzas inteligentes para empresas que crecen (v4)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-062",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v4)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-063",
+    "headline": "El banco empresarial que entiende tu negocio (v4)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-064",
+    "headline": "Gestión financiera automatizada para PYMEs (v4)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-065",
+    "headline": "Crédito empresarial en 48h sin papeleo (v4)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-066",
+    "headline": "Tu CFO virtual disponible 24/7 (v4)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-067",
+    "headline": "Pagos internacionales sin comisiones abusivas (v4)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-068",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v4)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-069",
+    "headline": "Open Banking para que tomes mejores decisiones (v4)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-070",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v4)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-071",
+    "headline": "Cobros más rápidos, pagos más controlados (v4)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-072",
+    "headline": "La plataforma fintech que tu contable también aprecia (v4)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-073",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v4)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-074",
+    "headline": "Seguridad bancaria con agilidad startup (v4)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-075",
+    "headline": "Integrado con tu ERP en menos de un día (v4)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-076",
+    "headline": "Analítica financiera predictiva para anticiparte (v4)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-077",
+    "headline": "Tarjetas de empresa con control por departamento (v4)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-078",
+    "headline": "Reconciliación automática que ahorra horas al mes (v4)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-079",
+    "headline": "Préstamos basados en datos reales de tu negocio (v4)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-080",
+    "headline": "La fintech que crece con empresas como la tuya (v4)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-081",
+    "headline": "Finanzas inteligentes para empresas que crecen (v5)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-082",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v5)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-083",
+    "headline": "El banco empresarial que entiende tu negocio (v5)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-084",
+    "headline": "Gestión financiera automatizada para PYMEs (v5)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-085",
+    "headline": "Crédito empresarial en 48h sin papeleo (v5)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-086",
+    "headline": "Tu CFO virtual disponible 24/7 (v5)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-087",
+    "headline": "Pagos internacionales sin comisiones abusivas (v5)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-088",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v5)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-089",
+    "headline": "Open Banking para que tomes mejores decisiones (v5)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-090",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v5)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-091",
+    "headline": "Cobros más rápidos, pagos más controlados (v5)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-092",
+    "headline": "La plataforma fintech que tu contable también aprecia (v5)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-093",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v5)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-094",
+    "headline": "Seguridad bancaria con agilidad startup (v5)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-095",
+    "headline": "Integrado con tu ERP en menos de un día (v5)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-096",
+    "headline": "Analítica financiera predictiva para anticiparte (v5)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-097",
+    "headline": "Tarjetas de empresa con control por departamento (v5)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-098",
+    "headline": "Reconciliación automática que ahorra horas al mes (v5)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-099",
+    "headline": "Préstamos basados en datos reales de tu negocio (v5)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-100",
+    "headline": "La fintech que crece con empresas como la tuya (v5)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-101",
+    "headline": "Finanzas inteligentes para empresas que crecen (v6)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-102",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v6)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-103",
+    "headline": "El banco empresarial que entiende tu negocio (v6)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-104",
+    "headline": "Gestión financiera automatizada para PYMEs (v6)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-105",
+    "headline": "Crédito empresarial en 48h sin papeleo (v6)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-106",
+    "headline": "Tu CFO virtual disponible 24/7 (v6)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-107",
+    "headline": "Pagos internacionales sin comisiones abusivas (v6)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-108",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v6)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-109",
+    "headline": "Open Banking para que tomes mejores decisiones (v6)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-110",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v6)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-111",
+    "headline": "Cobros más rápidos, pagos más controlados (v6)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-112",
+    "headline": "La plataforma fintech que tu contable también aprecia (v6)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-113",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v6)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-114",
+    "headline": "Seguridad bancaria con agilidad startup (v6)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-115",
+    "headline": "Integrado con tu ERP en menos de un día (v6)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-116",
+    "headline": "Analítica financiera predictiva para anticiparte (v6)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-117",
+    "headline": "Tarjetas de empresa con control por departamento (v6)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-118",
+    "headline": "Reconciliación automática que ahorra horas al mes (v6)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-119",
+    "headline": "Préstamos basados en datos reales de tu negocio (v6)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-120",
+    "headline": "La fintech que crece con empresas como la tuya (v6)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-121",
+    "headline": "Finanzas inteligentes para empresas que crecen (v7)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-122",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v7)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-123",
+    "headline": "El banco empresarial que entiende tu negocio (v7)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-124",
+    "headline": "Gestión financiera automatizada para PYMEs (v7)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-125",
+    "headline": "Crédito empresarial en 48h sin papeleo (v7)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-126",
+    "headline": "Tu CFO virtual disponible 24/7 (v7)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-127",
+    "headline": "Pagos internacionales sin comisiones abusivas (v7)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-128",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v7)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-129",
+    "headline": "Open Banking para que tomes mejores decisiones (v7)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-130",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v7)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-131",
+    "headline": "Cobros más rápidos, pagos más controlados (v7)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-132",
+    "headline": "La plataforma fintech que tu contable también aprecia (v7)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-133",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v7)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-134",
+    "headline": "Seguridad bancaria con agilidad startup (v7)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-135",
+    "headline": "Integrado con tu ERP en menos de un día (v7)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-136",
+    "headline": "Analítica financiera predictiva para anticiparte (v7)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-137",
+    "headline": "Tarjetas de empresa con control por departamento (v7)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-138",
+    "headline": "Reconciliación automática que ahorra horas al mes (v7)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-139",
+    "headline": "Préstamos basados en datos reales de tu negocio (v7)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-140",
+    "headline": "La fintech que crece con empresas como la tuya (v7)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-141",
+    "headline": "Finanzas inteligentes para empresas que crecen (v8)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-142",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v8)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-143",
+    "headline": "El banco empresarial que entiende tu negocio (v8)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-144",
+    "headline": "Gestión financiera automatizada para PYMEs (v8)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-145",
+    "headline": "Crédito empresarial en 48h sin papeleo (v8)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-146",
+    "headline": "Tu CFO virtual disponible 24/7 (v8)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-147",
+    "headline": "Pagos internacionales sin comisiones abusivas (v8)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-148",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v8)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-149",
+    "headline": "Open Banking para que tomes mejores decisiones (v8)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-150",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v8)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-151",
+    "headline": "Cobros más rápidos, pagos más controlados (v8)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-152",
+    "headline": "La plataforma fintech que tu contable también aprecia (v8)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-153",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v8)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-154",
+    "headline": "Seguridad bancaria con agilidad startup (v8)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-155",
+    "headline": "Integrado con tu ERP en menos de un día (v8)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-156",
+    "headline": "Analítica financiera predictiva para anticiparte (v8)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-157",
+    "headline": "Tarjetas de empresa con control por departamento (v8)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-158",
+    "headline": "Reconciliación automática que ahorra horas al mes (v8)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-159",
+    "headline": "Préstamos basados en datos reales de tu negocio (v8)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-160",
+    "headline": "La fintech que crece con empresas como la tuya (v8)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-161",
+    "headline": "Finanzas inteligentes para empresas que crecen (v9)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-162",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v9)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-163",
+    "headline": "El banco empresarial que entiende tu negocio (v9)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-164",
+    "headline": "Gestión financiera automatizada para PYMEs (v9)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-165",
+    "headline": "Crédito empresarial en 48h sin papeleo (v9)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-166",
+    "headline": "Tu CFO virtual disponible 24/7 (v9)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-167",
+    "headline": "Pagos internacionales sin comisiones abusivas (v9)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-168",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v9)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-169",
+    "headline": "Open Banking para que tomes mejores decisiones (v9)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-170",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v9)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-171",
+    "headline": "Cobros más rápidos, pagos más controlados (v9)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-172",
+    "headline": "La plataforma fintech que tu contable también aprecia (v9)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-173",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v9)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-174",
+    "headline": "Seguridad bancaria con agilidad startup (v9)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-175",
+    "headline": "Integrado con tu ERP en menos de un día (v9)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-176",
+    "headline": "Analítica financiera predictiva para anticiparte (v9)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-177",
+    "headline": "Tarjetas de empresa con control por departamento (v9)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-178",
+    "headline": "Reconciliación automática que ahorra horas al mes (v9)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-179",
+    "headline": "Préstamos basados en datos reales de tu negocio (v9)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-180",
+    "headline": "La fintech que crece con empresas como la tuya (v9)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-181",
+    "headline": "Finanzas inteligentes para empresas que crecen (v10)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-182",
+    "headline": "Mueve tu dinero más rápido y con menos costes (v10)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-183",
+    "headline": "El banco empresarial que entiende tu negocio (v10)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-184",
+    "headline": "Gestión financiera automatizada para PYMEs (v10)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-185",
+    "headline": "Crédito empresarial en 48h sin papeleo (v10)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-186",
+    "headline": "Tu CFO virtual disponible 24/7 (v10)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-187",
+    "headline": "Pagos internacionales sin comisiones abusivas (v10)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-188",
+    "headline": "Visibilidad total de tu cashflow en tiempo real (v10)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-189",
+    "headline": "Open Banking para que tomes mejores decisiones (v10)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-190",
+    "headline": "Financiación flexible adaptada a tu ciclo de negocio (v10)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-191",
+    "headline": "Cobros más rápidos, pagos más controlados (v10)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-192",
+    "headline": "La plataforma fintech que tu contable también aprecia (v10)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-193",
+    "headline": "Sin permanencia, sin letra pequeña, sin sorpresas (v10)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-194",
+    "headline": "Seguridad bancaria con agilidad startup (v10)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-195",
+    "headline": "Integrado con tu ERP en menos de un día (v10)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-196",
+    "headline": "Analítica financiera predictiva para anticiparte (v10)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Abrir cuenta gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-197",
+    "headline": "Tarjetas de empresa con control por departamento (v10)",
+    "meta_title": "{{business_name}} — Fintech para empresas | Abre cuenta gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-198",
+    "headline": "Reconciliación automática que ahorra horas al mes (v10)",
+    "meta_title": "{{business_name}}: Finanzas empresariales | Prueba 30 días gratis",
+    "cta_label": "Solicitar financiación",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  },
+  {
+    "id": "fintech-199",
+    "headline": "Préstamos basados en datos reales de tu negocio (v10)",
+    "meta_title": "{{business_name}} — Soluciones financieras B2B | Ver planes",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué puedo ayudarte con tu gestión financiera?"
+  },
+  {
+    "id": "fintech-200",
+    "headline": "La fintech que crece con empresas como la tuya (v10)",
+    "meta_title": "Fintech empresarial {{business_name}} | Demo y precios",
+    "cta_label": "Hablar con ventas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres ver cómo podemos optimizar las finanzas de tu empresa?"
+  }
+]

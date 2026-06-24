@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "saasb2b-001",
+    "headline": "{{value_proposition}} — empieza gratis hoy",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-002",
+    "headline": "El software que los equipos de ventas B2B eligen",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-003",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-004",
+    "headline": "De lead a cliente en menos pasos con {{business_name}}",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-005",
+    "headline": "La plataforma que escala contigo sin fricciones",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-006",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-007",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-008",
+    "headline": "Integrado con las herramientas que ya usas",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-009",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-010",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-011",
+    "headline": "El CRM que los equipos de ventas realmente usan",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-012",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-013",
+    "headline": "Soporte humano incluido en todos los planes",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-014",
+    "headline": "Seguridad enterprise sin coste enterprise",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-015",
+    "headline": "API abierta, integraciones ilimitadas",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-016",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-017",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-018",
+    "headline": "Referencias reales disponibles bajo NDA",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-019",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas?",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-020",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-021",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v2)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-022",
+    "headline": "El software que los equipos de ventas B2B eligen (v2)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-023",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v2)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-024",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v2)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-025",
+    "headline": "La plataforma que escala contigo sin fricciones (v2)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-026",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v2)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-027",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v2)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-028",
+    "headline": "Integrado con las herramientas que ya usas (v2)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-029",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v2)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-030",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v2)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-031",
+    "headline": "El CRM que los equipos de ventas realmente usan (v2)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-032",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v2)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-033",
+    "headline": "Soporte humano incluido en todos los planes (v2)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-034",
+    "headline": "Seguridad enterprise sin coste enterprise (v2)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-035",
+    "headline": "API abierta, integraciones ilimitadas (v2)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-036",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v2)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-037",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v2)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-038",
+    "headline": "Referencias reales disponibles bajo NDA (v2)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-039",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v2)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-040",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v2)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-041",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v3)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-042",
+    "headline": "El software que los equipos de ventas B2B eligen (v3)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-043",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v3)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-044",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v3)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-045",
+    "headline": "La plataforma que escala contigo sin fricciones (v3)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-046",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v3)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-047",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v3)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-048",
+    "headline": "Integrado con las herramientas que ya usas (v3)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-049",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v3)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-050",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v3)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-051",
+    "headline": "El CRM que los equipos de ventas realmente usan (v3)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-052",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v3)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-053",
+    "headline": "Soporte humano incluido en todos los planes (v3)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-054",
+    "headline": "Seguridad enterprise sin coste enterprise (v3)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-055",
+    "headline": "API abierta, integraciones ilimitadas (v3)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-056",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v3)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-057",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v3)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-058",
+    "headline": "Referencias reales disponibles bajo NDA (v3)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-059",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v3)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-060",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v3)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-061",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v4)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-062",
+    "headline": "El software que los equipos de ventas B2B eligen (v4)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-063",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v4)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-064",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v4)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-065",
+    "headline": "La plataforma que escala contigo sin fricciones (v4)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-066",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v4)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-067",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v4)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-068",
+    "headline": "Integrado con las herramientas que ya usas (v4)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-069",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v4)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-070",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v4)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-071",
+    "headline": "El CRM que los equipos de ventas realmente usan (v4)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-072",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v4)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-073",
+    "headline": "Soporte humano incluido en todos los planes (v4)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-074",
+    "headline": "Seguridad enterprise sin coste enterprise (v4)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-075",
+    "headline": "API abierta, integraciones ilimitadas (v4)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-076",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v4)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-077",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v4)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-078",
+    "headline": "Referencias reales disponibles bajo NDA (v4)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-079",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v4)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-080",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v4)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-081",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v5)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-082",
+    "headline": "El software que los equipos de ventas B2B eligen (v5)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-083",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v5)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-084",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v5)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-085",
+    "headline": "La plataforma que escala contigo sin fricciones (v5)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-086",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v5)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-087",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v5)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-088",
+    "headline": "Integrado con las herramientas que ya usas (v5)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-089",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v5)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-090",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v5)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-091",
+    "headline": "El CRM que los equipos de ventas realmente usan (v5)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-092",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v5)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-093",
+    "headline": "Soporte humano incluido en todos los planes (v5)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-094",
+    "headline": "Seguridad enterprise sin coste enterprise (v5)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-095",
+    "headline": "API abierta, integraciones ilimitadas (v5)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-096",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v5)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-097",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v5)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-098",
+    "headline": "Referencias reales disponibles bajo NDA (v5)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-099",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v5)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-100",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v5)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-101",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v6)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-102",
+    "headline": "El software que los equipos de ventas B2B eligen (v6)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-103",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v6)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-104",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v6)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-105",
+    "headline": "La plataforma que escala contigo sin fricciones (v6)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-106",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v6)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-107",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v6)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-108",
+    "headline": "Integrado con las herramientas que ya usas (v6)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-109",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v6)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-110",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v6)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-111",
+    "headline": "El CRM que los equipos de ventas realmente usan (v6)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-112",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v6)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-113",
+    "headline": "Soporte humano incluido en todos los planes (v6)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-114",
+    "headline": "Seguridad enterprise sin coste enterprise (v6)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-115",
+    "headline": "API abierta, integraciones ilimitadas (v6)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-116",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v6)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-117",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v6)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-118",
+    "headline": "Referencias reales disponibles bajo NDA (v6)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-119",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v6)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-120",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v6)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-121",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v7)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-122",
+    "headline": "El software que los equipos de ventas B2B eligen (v7)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-123",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v7)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-124",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v7)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-125",
+    "headline": "La plataforma que escala contigo sin fricciones (v7)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-126",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v7)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-127",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v7)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-128",
+    "headline": "Integrado con las herramientas que ya usas (v7)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-129",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v7)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-130",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v7)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-131",
+    "headline": "El CRM que los equipos de ventas realmente usan (v7)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-132",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v7)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-133",
+    "headline": "Soporte humano incluido en todos los planes (v7)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-134",
+    "headline": "Seguridad enterprise sin coste enterprise (v7)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-135",
+    "headline": "API abierta, integraciones ilimitadas (v7)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-136",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v7)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-137",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v7)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-138",
+    "headline": "Referencias reales disponibles bajo NDA (v7)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-139",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v7)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-140",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v7)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-141",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v8)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-142",
+    "headline": "El software que los equipos de ventas B2B eligen (v8)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-143",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v8)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-144",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v8)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-145",
+    "headline": "La plataforma que escala contigo sin fricciones (v8)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-146",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v8)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-147",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v8)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-148",
+    "headline": "Integrado con las herramientas que ya usas (v8)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-149",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v8)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-150",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v8)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-151",
+    "headline": "El CRM que los equipos de ventas realmente usan (v8)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-152",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v8)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-153",
+    "headline": "Soporte humano incluido en todos los planes (v8)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-154",
+    "headline": "Seguridad enterprise sin coste enterprise (v8)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-155",
+    "headline": "API abierta, integraciones ilimitadas (v8)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-156",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v8)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-157",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v8)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-158",
+    "headline": "Referencias reales disponibles bajo NDA (v8)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-159",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v8)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-160",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v8)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-161",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v9)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-162",
+    "headline": "El software que los equipos de ventas B2B eligen (v9)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-163",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v9)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-164",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v9)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-165",
+    "headline": "La plataforma que escala contigo sin fricciones (v9)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-166",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v9)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-167",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v9)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-168",
+    "headline": "Integrado con las herramientas que ya usas (v9)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-169",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v9)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-170",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v9)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-171",
+    "headline": "El CRM que los equipos de ventas realmente usan (v9)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-172",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v9)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-173",
+    "headline": "Soporte humano incluido en todos los planes (v9)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-174",
+    "headline": "Seguridad enterprise sin coste enterprise (v9)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-175",
+    "headline": "API abierta, integraciones ilimitadas (v9)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-176",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v9)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-177",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v9)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-178",
+    "headline": "Referencias reales disponibles bajo NDA (v9)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-179",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v9)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-180",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v9)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-181",
+    "headline": "{{value_proposition}} — empieza gratis hoy (v10)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-182",
+    "headline": "El software que los equipos de ventas B2B eligen (v10)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-183",
+    "headline": "Automatiza lo repetitivo, céntrate en cerrar (v10)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-184",
+    "headline": "De lead a cliente en menos pasos con {{business_name}} (v10)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-185",
+    "headline": "La plataforma que escala contigo sin fricciones (v10)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-186",
+    "headline": "Prueba 14 días gratis, cancela cuando quieras (v10)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-187",
+    "headline": "ROI positivo en los primeros 30 días o te devolvemos el dinero (v10)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-188",
+    "headline": "Integrado con las herramientas que ya usas (v10)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-189",
+    "headline": "Onboarding en 20 minutos, resultados en 7 días (v10)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-190",
+    "headline": "Más pipelines cerrados con menos esfuerzo manual (v10)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-191",
+    "headline": "El CRM que los equipos de ventas realmente usan (v10)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-192",
+    "headline": "Dashboard en tiempo real para que el CEO duerma tranquilo (v10)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-193",
+    "headline": "Soporte humano incluido en todos los planes (v10)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-194",
+    "headline": "Seguridad enterprise sin coste enterprise (v10)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-195",
+    "headline": "API abierta, integraciones ilimitadas (v10)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-196",
+    "headline": "Adaptado a procesos B2B complejos con múltiples stakeholders (v10)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Prueba gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-197",
+    "headline": "De MVP a escala — crece sin cambiar de herramienta (v10)",
+    "meta_title": "{{business_name}} — Software B2B | Prueba gratis 14 días",
+    "cta_label": "Ver demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-198",
+    "headline": "Referencias reales disponibles bajo NDA (v10)",
+    "meta_title": "{{business_name}}: SaaS para equipos de ventas B2B | Demo",
+    "cta_label": "Empezar gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  },
+  {
+    "id": "saasb2b-199",
+    "headline": "Tu competidor ya lo usa — tú, ¿cuándo empiezas? (v10)",
+    "meta_title": "{{business_name}} — Automatización B2B | Prueba gratis",
+    "cta_label": "Solicitar demo",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Quieres ver una demo o hablar con ventas?"
+  },
+  {
+    "id": "saasb2b-200",
+    "headline": "El SaaS que cierra el gap entre marketing y ventas B2B (v10)",
+    "meta_title": "Software B2B {{business_name}} | Ver demo y precios",
+    "cta_label": "Ver planes",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿En qué reto de negocio puedo ayudarte hoy?"
+  }
+]

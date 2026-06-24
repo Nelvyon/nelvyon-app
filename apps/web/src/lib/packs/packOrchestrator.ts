@@ -1,5 +1,6 @@
 import { simulateAutonomousJob } from "../../../../../backend/autonomous/simulator";
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
+import { personalizeForSector } from "@/lib/packs/packSeedTemplates";
 
 import type { SimulationResult } from "../../../../../backend/autonomous/types";
 
@@ -187,6 +188,14 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     meetsThreshold ||
     Boolean(params.publishProductionDeliverables && params.mapSkuDeliverable);
 
+  // Personalize content for this sector — never ship raw templates.
+  const personalized = personalizeForSector(params.intake.sector, {
+    business_name: params.intake.business_name,
+    city: (params.intake as Record<string, unknown>).city as string | undefined,
+    value_proposition: (params.intake as Record<string, unknown>).value_proposition as string | undefined,
+    primary_cta: (params.intake as Record<string, unknown>).primary_cta as string | undefined,
+  });
+
   if (shouldPublish) {
     const mapped = params.mapSkuDeliverable?.({
       sku: params.sku,
@@ -201,7 +210,12 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     });
 
     if (mapped) {
-      const id = await dbCreatePackDeliverable(mapped);
+      // Enrich mapped deliverable with personalized content
+      const enriched: PackDeliverableInput = {
+        ...mapped,
+        metadata: { ...mapped.metadata, personalized_content: personalized ?? undefined },
+      };
+      const id = await dbCreatePackDeliverable(enriched);
       deliverableIds.push(id);
     } else if (simulation.os_publish) {
       for (const d of simulation.os_publish.deliverables) {
@@ -220,10 +234,40 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
             qa_score: qaScore,
             artifact_value: d.value,
             autonomous_job_id: simulation.os_publish.autonomous_job_id,
+            personalized_content: personalized ?? undefined,
           },
         });
         deliverableIds.push(id);
       }
+    } else {
+      // Fallback: always write at least one deliverable per SKU with real content.
+      // This prevents empty JSON from landing in the DB.
+      const skuLabels: Record<string, string> = {
+        "NELVYON-LANDING": "Landing Page personalizada",
+        "NELVYON-SEO": "Estrategia SEO personalizada",
+        "NELVYON-CHATBOT": "Script Chatbot personalizado",
+      };
+      const id = await dbCreatePackDeliverable({
+        workspaceId: params.workspaceId,
+        clientId: params.osClientId,
+        projectId: params.osProjectId,
+        title: skuLabels[params.sku] ?? `Entregable ${params.sku}`,
+        type: "document",
+        file_url: null,
+        visibility: "client_visible",
+        metadata: {
+          pack_id: params.packId,
+          sku: params.sku,
+          qa_score: qaScore,
+          brief_summary: {
+            business_name: params.intake.business_name,
+            sector: params.intake.sector,
+            value_proposition: (params.intake as Record<string, unknown>).value_proposition ?? null,
+          },
+          personalized_content: personalized ?? undefined,
+        },
+      });
+      deliverableIds.push(id);
     }
   }
 

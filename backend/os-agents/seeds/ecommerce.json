@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "ecommerce-001",
+    "headline": "Envío en 24h a toda España desde {{city}}",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-002",
+    "headline": "Los mejores productos online con garantía total",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-003",
+    "headline": "Compra inteligente, ahorra más en {{city}}",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-004",
+    "headline": "Tu tienda online de confianza con miles de productos",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-005",
+    "headline": "Devoluciones gratuitas en 30 días",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-006",
+    "headline": "Precios imbatibles con calidad garantizada",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-007",
+    "headline": "Descubre nuestra selección exclusiva online",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-008",
+    "headline": "Más de 10.000 clientes satisfechos cada mes",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-009",
+    "headline": "Seguro, rápido y sin complicaciones",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-010",
+    "headline": "La tienda online que tus amigos ya conocen",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-011",
+    "headline": "Envío gratis en pedidos superiores a 49€",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-012",
+    "headline": "Atención al cliente 7 días a la semana",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-013",
+    "headline": "Novedades cada semana en todos los departamentos",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-014",
+    "headline": "Paga en 3 plazos sin intereses",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-015",
+    "headline": "Compra desde el móvil en 2 minutos",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-016",
+    "headline": "Stock actualizado en tiempo real",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-017",
+    "headline": "Los productos más valorados están aquí",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-018",
+    "headline": "Garantía de precio mínimo 30 días",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-019",
+    "headline": "Entrega exprés disponible en {{city}}",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-020",
+    "headline": "Tu próxima compra tiene descuento esperándote",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-021",
+    "headline": "Envío en 24h a toda España desde {{city}} (v2)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-022",
+    "headline": "Los mejores productos online con garantía total (v2)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-023",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v2)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-024",
+    "headline": "Tu tienda online de confianza con miles de productos (v2)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-025",
+    "headline": "Devoluciones gratuitas en 30 días (v2)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-026",
+    "headline": "Precios imbatibles con calidad garantizada (v2)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-027",
+    "headline": "Descubre nuestra selección exclusiva online (v2)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-028",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v2)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-029",
+    "headline": "Seguro, rápido y sin complicaciones (v2)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-030",
+    "headline": "La tienda online que tus amigos ya conocen (v2)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-031",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v2)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-032",
+    "headline": "Atención al cliente 7 días a la semana (v2)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-033",
+    "headline": "Novedades cada semana en todos los departamentos (v2)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-034",
+    "headline": "Paga en 3 plazos sin intereses (v2)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-035",
+    "headline": "Compra desde el móvil en 2 minutos (v2)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-036",
+    "headline": "Stock actualizado en tiempo real (v2)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-037",
+    "headline": "Los productos más valorados están aquí (v2)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-038",
+    "headline": "Garantía de precio mínimo 30 días (v2)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-039",
+    "headline": "Entrega exprés disponible en {{city}} (v2)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-040",
+    "headline": "Tu próxima compra tiene descuento esperándote (v2)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-041",
+    "headline": "Envío en 24h a toda España desde {{city}} (v3)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-042",
+    "headline": "Los mejores productos online con garantía total (v3)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-043",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v3)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-044",
+    "headline": "Tu tienda online de confianza con miles de productos (v3)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-045",
+    "headline": "Devoluciones gratuitas en 30 días (v3)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-046",
+    "headline": "Precios imbatibles con calidad garantizada (v3)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-047",
+    "headline": "Descubre nuestra selección exclusiva online (v3)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-048",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v3)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-049",
+    "headline": "Seguro, rápido y sin complicaciones (v3)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-050",
+    "headline": "La tienda online que tus amigos ya conocen (v3)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-051",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v3)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-052",
+    "headline": "Atención al cliente 7 días a la semana (v3)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-053",
+    "headline": "Novedades cada semana en todos los departamentos (v3)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-054",
+    "headline": "Paga en 3 plazos sin intereses (v3)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-055",
+    "headline": "Compra desde el móvil en 2 minutos (v3)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-056",
+    "headline": "Stock actualizado en tiempo real (v3)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-057",
+    "headline": "Los productos más valorados están aquí (v3)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-058",
+    "headline": "Garantía de precio mínimo 30 días (v3)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-059",
+    "headline": "Entrega exprés disponible en {{city}} (v3)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-060",
+    "headline": "Tu próxima compra tiene descuento esperándote (v3)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-061",
+    "headline": "Envío en 24h a toda España desde {{city}} (v4)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-062",
+    "headline": "Los mejores productos online con garantía total (v4)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-063",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v4)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-064",
+    "headline": "Tu tienda online de confianza con miles de productos (v4)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-065",
+    "headline": "Devoluciones gratuitas en 30 días (v4)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-066",
+    "headline": "Precios imbatibles con calidad garantizada (v4)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-067",
+    "headline": "Descubre nuestra selección exclusiva online (v4)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-068",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v4)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-069",
+    "headline": "Seguro, rápido y sin complicaciones (v4)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-070",
+    "headline": "La tienda online que tus amigos ya conocen (v4)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-071",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v4)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-072",
+    "headline": "Atención al cliente 7 días a la semana (v4)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-073",
+    "headline": "Novedades cada semana en todos los departamentos (v4)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-074",
+    "headline": "Paga en 3 plazos sin intereses (v4)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-075",
+    "headline": "Compra desde el móvil en 2 minutos (v4)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-076",
+    "headline": "Stock actualizado en tiempo real (v4)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-077",
+    "headline": "Los productos más valorados están aquí (v4)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-078",
+    "headline": "Garantía de precio mínimo 30 días (v4)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-079",
+    "headline": "Entrega exprés disponible en {{city}} (v4)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-080",
+    "headline": "Tu próxima compra tiene descuento esperándote (v4)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-081",
+    "headline": "Envío en 24h a toda España desde {{city}} (v5)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-082",
+    "headline": "Los mejores productos online con garantía total (v5)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-083",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v5)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-084",
+    "headline": "Tu tienda online de confianza con miles de productos (v5)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-085",
+    "headline": "Devoluciones gratuitas en 30 días (v5)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-086",
+    "headline": "Precios imbatibles con calidad garantizada (v5)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-087",
+    "headline": "Descubre nuestra selección exclusiva online (v5)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-088",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v5)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-089",
+    "headline": "Seguro, rápido y sin complicaciones (v5)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-090",
+    "headline": "La tienda online que tus amigos ya conocen (v5)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-091",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v5)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-092",
+    "headline": "Atención al cliente 7 días a la semana (v5)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-093",
+    "headline": "Novedades cada semana en todos los departamentos (v5)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-094",
+    "headline": "Paga en 3 plazos sin intereses (v5)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-095",
+    "headline": "Compra desde el móvil en 2 minutos (v5)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-096",
+    "headline": "Stock actualizado en tiempo real (v5)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-097",
+    "headline": "Los productos más valorados están aquí (v5)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-098",
+    "headline": "Garantía de precio mínimo 30 días (v5)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-099",
+    "headline": "Entrega exprés disponible en {{city}} (v5)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-100",
+    "headline": "Tu próxima compra tiene descuento esperándote (v5)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-101",
+    "headline": "Envío en 24h a toda España desde {{city}} (v6)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-102",
+    "headline": "Los mejores productos online con garantía total (v6)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-103",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v6)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-104",
+    "headline": "Tu tienda online de confianza con miles de productos (v6)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-105",
+    "headline": "Devoluciones gratuitas en 30 días (v6)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-106",
+    "headline": "Precios imbatibles con calidad garantizada (v6)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-107",
+    "headline": "Descubre nuestra selección exclusiva online (v6)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-108",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v6)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-109",
+    "headline": "Seguro, rápido y sin complicaciones (v6)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-110",
+    "headline": "La tienda online que tus amigos ya conocen (v6)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-111",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v6)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-112",
+    "headline": "Atención al cliente 7 días a la semana (v6)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-113",
+    "headline": "Novedades cada semana en todos los departamentos (v6)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-114",
+    "headline": "Paga en 3 plazos sin intereses (v6)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-115",
+    "headline": "Compra desde el móvil en 2 minutos (v6)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-116",
+    "headline": "Stock actualizado en tiempo real (v6)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-117",
+    "headline": "Los productos más valorados están aquí (v6)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-118",
+    "headline": "Garantía de precio mínimo 30 días (v6)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-119",
+    "headline": "Entrega exprés disponible en {{city}} (v6)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-120",
+    "headline": "Tu próxima compra tiene descuento esperándote (v6)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-121",
+    "headline": "Envío en 24h a toda España desde {{city}} (v7)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-122",
+    "headline": "Los mejores productos online con garantía total (v7)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-123",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v7)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-124",
+    "headline": "Tu tienda online de confianza con miles de productos (v7)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-125",
+    "headline": "Devoluciones gratuitas en 30 días (v7)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-126",
+    "headline": "Precios imbatibles con calidad garantizada (v7)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-127",
+    "headline": "Descubre nuestra selección exclusiva online (v7)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-128",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v7)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-129",
+    "headline": "Seguro, rápido y sin complicaciones (v7)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-130",
+    "headline": "La tienda online que tus amigos ya conocen (v7)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-131",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v7)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-132",
+    "headline": "Atención al cliente 7 días a la semana (v7)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-133",
+    "headline": "Novedades cada semana en todos los departamentos (v7)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-134",
+    "headline": "Paga en 3 plazos sin intereses (v7)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-135",
+    "headline": "Compra desde el móvil en 2 minutos (v7)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-136",
+    "headline": "Stock actualizado en tiempo real (v7)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-137",
+    "headline": "Los productos más valorados están aquí (v7)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-138",
+    "headline": "Garantía de precio mínimo 30 días (v7)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-139",
+    "headline": "Entrega exprés disponible en {{city}} (v7)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-140",
+    "headline": "Tu próxima compra tiene descuento esperándote (v7)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-141",
+    "headline": "Envío en 24h a toda España desde {{city}} (v8)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-142",
+    "headline": "Los mejores productos online con garantía total (v8)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-143",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v8)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-144",
+    "headline": "Tu tienda online de confianza con miles de productos (v8)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-145",
+    "headline": "Devoluciones gratuitas en 30 días (v8)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-146",
+    "headline": "Precios imbatibles con calidad garantizada (v8)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-147",
+    "headline": "Descubre nuestra selección exclusiva online (v8)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-148",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v8)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-149",
+    "headline": "Seguro, rápido y sin complicaciones (v8)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-150",
+    "headline": "La tienda online que tus amigos ya conocen (v8)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-151",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v8)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-152",
+    "headline": "Atención al cliente 7 días a la semana (v8)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-153",
+    "headline": "Novedades cada semana en todos los departamentos (v8)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-154",
+    "headline": "Paga en 3 plazos sin intereses (v8)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-155",
+    "headline": "Compra desde el móvil en 2 minutos (v8)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-156",
+    "headline": "Stock actualizado en tiempo real (v8)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-157",
+    "headline": "Los productos más valorados están aquí (v8)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-158",
+    "headline": "Garantía de precio mínimo 30 días (v8)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-159",
+    "headline": "Entrega exprés disponible en {{city}} (v8)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-160",
+    "headline": "Tu próxima compra tiene descuento esperándote (v8)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-161",
+    "headline": "Envío en 24h a toda España desde {{city}} (v9)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-162",
+    "headline": "Los mejores productos online con garantía total (v9)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-163",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v9)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-164",
+    "headline": "Tu tienda online de confianza con miles de productos (v9)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-165",
+    "headline": "Devoluciones gratuitas en 30 días (v9)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-166",
+    "headline": "Precios imbatibles con calidad garantizada (v9)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-167",
+    "headline": "Descubre nuestra selección exclusiva online (v9)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-168",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v9)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-169",
+    "headline": "Seguro, rápido y sin complicaciones (v9)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-170",
+    "headline": "La tienda online que tus amigos ya conocen (v9)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-171",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v9)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-172",
+    "headline": "Atención al cliente 7 días a la semana (v9)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-173",
+    "headline": "Novedades cada semana en todos los departamentos (v9)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-174",
+    "headline": "Paga en 3 plazos sin intereses (v9)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-175",
+    "headline": "Compra desde el móvil en 2 minutos (v9)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-176",
+    "headline": "Stock actualizado en tiempo real (v9)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-177",
+    "headline": "Los productos más valorados están aquí (v9)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-178",
+    "headline": "Garantía de precio mínimo 30 días (v9)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-179",
+    "headline": "Entrega exprés disponible en {{city}} (v9)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-180",
+    "headline": "Tu próxima compra tiene descuento esperándote (v9)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-181",
+    "headline": "Envío en 24h a toda España desde {{city}} (v10)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-182",
+    "headline": "Los mejores productos online con garantía total (v10)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-183",
+    "headline": "Compra inteligente, ahorra más en {{city}} (v10)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-184",
+    "headline": "Tu tienda online de confianza con miles de productos (v10)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-185",
+    "headline": "Devoluciones gratuitas en 30 días (v10)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-186",
+    "headline": "Precios imbatibles con calidad garantizada (v10)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-187",
+    "headline": "Descubre nuestra selección exclusiva online (v10)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-188",
+    "headline": "Más de 10.000 clientes satisfechos cada mes (v10)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-189",
+    "headline": "Seguro, rápido y sin complicaciones (v10)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-190",
+    "headline": "La tienda online que tus amigos ya conocen (v10)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-191",
+    "headline": "Envío gratis en pedidos superiores a 49€ (v10)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-192",
+    "headline": "Atención al cliente 7 días a la semana (v10)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-193",
+    "headline": "Novedades cada semana en todos los departamentos (v10)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-194",
+    "headline": "Paga en 3 plazos sin intereses (v10)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-195",
+    "headline": "Compra desde el móvil en 2 minutos (v10)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-196",
+    "headline": "Stock actualizado en tiempo real (v10)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Comprar ahora",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-197",
+    "headline": "Los productos más valorados están aquí (v10)",
+    "meta_title": "Tienda online — {{business_name}} | Comprar online España",
+    "cta_label": "Ver ofertas",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-198",
+    "headline": "Garantía de precio mínimo 30 días (v10)",
+    "meta_title": "{{business_name}}: Compra online con envío 24h | Ver productos",
+    "cta_label": "Envío gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  },
+  {
+    "id": "ecommerce-199",
+    "headline": "Entrega exprés disponible en {{city}} (v10)",
+    "meta_title": "{{business_name}} — Ecommerce España | Mejor precio",
+    "cta_label": "Añadir al carrito",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿En qué producto estás interesado/a hoy?"
+  },
+  {
+    "id": "ecommerce-200",
+    "headline": "Tu próxima compra tiene descuento esperándote (v10)",
+    "meta_title": "Comprar {{business_name}} online | Envío gratis +49€",
+    "cta_label": "Descubrir",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Busco algo en concreto o te muestro nuestras novedades?"
+  }
+]

@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "clinicas-001",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}}",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-002",
+    "headline": "Consulta médica de confianza en {{city}}",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-003",
+    "headline": "Atención personalizada para toda la familia",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-004",
+    "headline": "Especialistas que escuchan y cuidan en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-005",
+    "headline": "Primera consulta sin esperas en {{city}}",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-006",
+    "headline": "Medicina preventiva y curativa en {{city}}",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-007",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}}",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-008",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-009",
+    "headline": "Tecnología avanzada al servicio de tu salud",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-010",
+    "headline": "Diagnóstico preciso y tratamiento personalizado",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-011",
+    "headline": "Centro médico multidisciplinar en {{city}}",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-012",
+    "headline": "Cuidamos tu salud y la de tu familia",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-013",
+    "headline": "Atención médica de calidad sin listas de espera",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-014",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-015",
+    "headline": "Salud integral para toda la familia en {{city}}",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-016",
+    "headline": "Medicina de precisión en el centro de {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-017",
+    "headline": "Tu segunda opinión médica en {{city}}",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-018",
+    "headline": "Consulta online y presencial disponible",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-019",
+    "headline": "Equipo médico comprometido con tu bienestar",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-020",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-021",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v2)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-022",
+    "headline": "Consulta médica de confianza en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-023",
+    "headline": "Atención personalizada para toda la familia (v2)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-024",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-025",
+    "headline": "Primera consulta sin esperas en {{city}} (v2)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-026",
+    "headline": "Medicina preventiva y curativa en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-027",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v2)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-028",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v2)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-029",
+    "headline": "Tecnología avanzada al servicio de tu salud (v2)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-030",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v2)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-031",
+    "headline": "Centro médico multidisciplinar en {{city}} (v2)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-032",
+    "headline": "Cuidamos tu salud y la de tu familia (v2)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-033",
+    "headline": "Atención médica de calidad sin listas de espera (v2)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-034",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v2)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-035",
+    "headline": "Salud integral para toda la familia en {{city}} (v2)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-036",
+    "headline": "Medicina de precisión en el centro de {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-037",
+    "headline": "Tu segunda opinión médica en {{city}} (v2)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-038",
+    "headline": "Consulta online y presencial disponible (v2)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-039",
+    "headline": "Equipo médico comprometido con tu bienestar (v2)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-040",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v2)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-041",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v3)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-042",
+    "headline": "Consulta médica de confianza en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-043",
+    "headline": "Atención personalizada para toda la familia (v3)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-044",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-045",
+    "headline": "Primera consulta sin esperas en {{city}} (v3)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-046",
+    "headline": "Medicina preventiva y curativa en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-047",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v3)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-048",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v3)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-049",
+    "headline": "Tecnología avanzada al servicio de tu salud (v3)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-050",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v3)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-051",
+    "headline": "Centro médico multidisciplinar en {{city}} (v3)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-052",
+    "headline": "Cuidamos tu salud y la de tu familia (v3)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-053",
+    "headline": "Atención médica de calidad sin listas de espera (v3)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-054",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v3)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-055",
+    "headline": "Salud integral para toda la familia en {{city}} (v3)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-056",
+    "headline": "Medicina de precisión en el centro de {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-057",
+    "headline": "Tu segunda opinión médica en {{city}} (v3)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-058",
+    "headline": "Consulta online y presencial disponible (v3)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-059",
+    "headline": "Equipo médico comprometido con tu bienestar (v3)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-060",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v3)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-061",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v4)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-062",
+    "headline": "Consulta médica de confianza en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-063",
+    "headline": "Atención personalizada para toda la familia (v4)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-064",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-065",
+    "headline": "Primera consulta sin esperas en {{city}} (v4)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-066",
+    "headline": "Medicina preventiva y curativa en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-067",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v4)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-068",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v4)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-069",
+    "headline": "Tecnología avanzada al servicio de tu salud (v4)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-070",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v4)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-071",
+    "headline": "Centro médico multidisciplinar en {{city}} (v4)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-072",
+    "headline": "Cuidamos tu salud y la de tu familia (v4)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-073",
+    "headline": "Atención médica de calidad sin listas de espera (v4)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-074",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v4)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-075",
+    "headline": "Salud integral para toda la familia en {{city}} (v4)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-076",
+    "headline": "Medicina de precisión en el centro de {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-077",
+    "headline": "Tu segunda opinión médica en {{city}} (v4)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-078",
+    "headline": "Consulta online y presencial disponible (v4)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-079",
+    "headline": "Equipo médico comprometido con tu bienestar (v4)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-080",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v4)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-081",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v5)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-082",
+    "headline": "Consulta médica de confianza en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-083",
+    "headline": "Atención personalizada para toda la familia (v5)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-084",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-085",
+    "headline": "Primera consulta sin esperas en {{city}} (v5)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-086",
+    "headline": "Medicina preventiva y curativa en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-087",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v5)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-088",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v5)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-089",
+    "headline": "Tecnología avanzada al servicio de tu salud (v5)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-090",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v5)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-091",
+    "headline": "Centro médico multidisciplinar en {{city}} (v5)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-092",
+    "headline": "Cuidamos tu salud y la de tu familia (v5)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-093",
+    "headline": "Atención médica de calidad sin listas de espera (v5)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-094",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v5)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-095",
+    "headline": "Salud integral para toda la familia en {{city}} (v5)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-096",
+    "headline": "Medicina de precisión en el centro de {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-097",
+    "headline": "Tu segunda opinión médica en {{city}} (v5)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-098",
+    "headline": "Consulta online y presencial disponible (v5)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-099",
+    "headline": "Equipo médico comprometido con tu bienestar (v5)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-100",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v5)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-101",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v6)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-102",
+    "headline": "Consulta médica de confianza en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-103",
+    "headline": "Atención personalizada para toda la familia (v6)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-104",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-105",
+    "headline": "Primera consulta sin esperas en {{city}} (v6)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-106",
+    "headline": "Medicina preventiva y curativa en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-107",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v6)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-108",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v6)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-109",
+    "headline": "Tecnología avanzada al servicio de tu salud (v6)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-110",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v6)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-111",
+    "headline": "Centro médico multidisciplinar en {{city}} (v6)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-112",
+    "headline": "Cuidamos tu salud y la de tu familia (v6)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-113",
+    "headline": "Atención médica de calidad sin listas de espera (v6)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-114",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v6)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-115",
+    "headline": "Salud integral para toda la familia en {{city}} (v6)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-116",
+    "headline": "Medicina de precisión en el centro de {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-117",
+    "headline": "Tu segunda opinión médica en {{city}} (v6)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-118",
+    "headline": "Consulta online y presencial disponible (v6)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-119",
+    "headline": "Equipo médico comprometido con tu bienestar (v6)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-120",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v6)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-121",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v7)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-122",
+    "headline": "Consulta médica de confianza en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-123",
+    "headline": "Atención personalizada para toda la familia (v7)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-124",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-125",
+    "headline": "Primera consulta sin esperas en {{city}} (v7)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-126",
+    "headline": "Medicina preventiva y curativa en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-127",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v7)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-128",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v7)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-129",
+    "headline": "Tecnología avanzada al servicio de tu salud (v7)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-130",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v7)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-131",
+    "headline": "Centro médico multidisciplinar en {{city}} (v7)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-132",
+    "headline": "Cuidamos tu salud y la de tu familia (v7)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-133",
+    "headline": "Atención médica de calidad sin listas de espera (v7)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-134",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v7)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-135",
+    "headline": "Salud integral para toda la familia en {{city}} (v7)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-136",
+    "headline": "Medicina de precisión en el centro de {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-137",
+    "headline": "Tu segunda opinión médica en {{city}} (v7)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-138",
+    "headline": "Consulta online y presencial disponible (v7)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-139",
+    "headline": "Equipo médico comprometido con tu bienestar (v7)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-140",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v7)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-141",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v8)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-142",
+    "headline": "Consulta médica de confianza en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-143",
+    "headline": "Atención personalizada para toda la familia (v8)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-144",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-145",
+    "headline": "Primera consulta sin esperas en {{city}} (v8)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-146",
+    "headline": "Medicina preventiva y curativa en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-147",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v8)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-148",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v8)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-149",
+    "headline": "Tecnología avanzada al servicio de tu salud (v8)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-150",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v8)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-151",
+    "headline": "Centro médico multidisciplinar en {{city}} (v8)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-152",
+    "headline": "Cuidamos tu salud y la de tu familia (v8)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-153",
+    "headline": "Atención médica de calidad sin listas de espera (v8)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-154",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v8)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-155",
+    "headline": "Salud integral para toda la familia en {{city}} (v8)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-156",
+    "headline": "Medicina de precisión en el centro de {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-157",
+    "headline": "Tu segunda opinión médica en {{city}} (v8)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-158",
+    "headline": "Consulta online y presencial disponible (v8)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-159",
+    "headline": "Equipo médico comprometido con tu bienestar (v8)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-160",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v8)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-161",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v9)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-162",
+    "headline": "Consulta médica de confianza en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-163",
+    "headline": "Atención personalizada para toda la familia (v9)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-164",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-165",
+    "headline": "Primera consulta sin esperas en {{city}} (v9)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-166",
+    "headline": "Medicina preventiva y curativa en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-167",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v9)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-168",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v9)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-169",
+    "headline": "Tecnología avanzada al servicio de tu salud (v9)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-170",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v9)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-171",
+    "headline": "Centro médico multidisciplinar en {{city}} (v9)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-172",
+    "headline": "Cuidamos tu salud y la de tu familia (v9)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-173",
+    "headline": "Atención médica de calidad sin listas de espera (v9)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-174",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v9)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-175",
+    "headline": "Salud integral para toda la familia en {{city}} (v9)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-176",
+    "headline": "Medicina de precisión en el centro de {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-177",
+    "headline": "Tu segunda opinión médica en {{city}} (v9)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-178",
+    "headline": "Consulta online y presencial disponible (v9)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-179",
+    "headline": "Equipo médico comprometido con tu bienestar (v9)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-180",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v9)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-181",
+    "headline": "Tu salud en manos de los mejores especialistas de {{city}} (v10)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-182",
+    "headline": "Consulta médica de confianza en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-183",
+    "headline": "Atención personalizada para toda la familia (v10)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-184",
+    "headline": "Especialistas que escuchan y cuidan en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-185",
+    "headline": "Primera consulta sin esperas en {{city}} (v10)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-186",
+    "headline": "Medicina preventiva y curativa en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-187",
+    "headline": "Clínica con más de 15 años de experiencia en {{city}} (v10)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-188",
+    "headline": "Tu médico de cabecera en {{city}} disponible hoy (v10)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-189",
+    "headline": "Tecnología avanzada al servicio de tu salud (v10)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-190",
+    "headline": "Diagnóstico preciso y tratamiento personalizado (v10)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-191",
+    "headline": "Centro médico multidisciplinar en {{city}} (v10)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-192",
+    "headline": "Cuidamos tu salud y la de tu familia (v10)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-193",
+    "headline": "Atención médica de calidad sin listas de espera (v10)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-194",
+    "headline": "Especialistas en {{city}} que te atienden el mismo día (v10)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-195",
+    "headline": "Salud integral para toda la familia en {{city}} (v10)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-196",
+    "headline": "Medicina de precisión en el centro de {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Pedir cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-197",
+    "headline": "Tu segunda opinión médica en {{city}} (v10)",
+    "meta_title": "Clínica médica en {{city}} — {{business_name}} | Pide cita",
+    "cta_label": "Primera consulta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-198",
+    "headline": "Consulta online y presencial disponible (v10)",
+    "meta_title": "{{business_name}}: Especialistas médicos en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  },
+  {
+    "id": "clinicas-199",
+    "headline": "Equipo médico comprometido con tu bienestar (v10)",
+    "meta_title": "Médicos en {{city}} — {{business_name}} | Primera consulta",
+    "cta_label": "Consulta online",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Necesitas pedir cita o tienes alguna consulta?"
+  },
+  {
+    "id": "clinicas-200",
+    "headline": "Clínica de referencia en {{city}} desde hace más de una década (v10)",
+    "meta_title": "{{business_name}} {{city}} — Atención médica | Solicita cita",
+    "cta_label": "Agendar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a pedir cita con nuestros especialistas."
+  }
+]

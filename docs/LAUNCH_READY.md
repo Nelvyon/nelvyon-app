@@ -44,34 +44,34 @@ Ejecutar **en orden numérico** en Railway Postgres antes del primer deploy (o c
 
 | Migración | Módulo | Estado |
 |---|---|---|
-| `400_nelvyon_pack_runs.sql` | OS packs | ✅ comiteada |
-| `401_inbox_conversations.sql` | Inbox omnicanal | pendiente commit |
-| `402_calendar_events.sql` | Calendario | pendiente commit |
-| `403_snippets.sql` | Snippets | pendiente commit |
-| `404_team_members.sql` | Team | pendiente commit |
-| `405_webhooks.sql` | Webhooks | pendiente commit |
-| `406_api_keys.sql` | API Keys | pendiente commit |
-| `407_lead_scoring.sql` | Lead Scoring | pendiente commit |
-| `408_social_posts.sql` | Social Media | pendiente commit |
-| `409_ads_connections.sql` | Publicidad Ads | pendiente commit |
-| `410_countdown_timers.sql` | Countdown | pendiente commit |
-| `411_custom_objects.sql` | Custom Objects | pendiente commit |
-| `412_audit_logs.sql` | Auditoría | pendiente commit |
-| `413_sequences.sql` | Sequences | pendiente commit |
-| `414_communities.sql` | Communities | pendiente commit |
-| `415_documents_products.sql` | Documentos + Productos | pendiente commit |
-| `416_surveys_qr_ab.sql` | Surveys, QR, A/B | pendiente commit |
-| `417_prospecting.sql` | Prospecting lists | pendiente commit |
-| `418_ab_testing.sql` | A/B Testing | pendiente commit |
-| `419_sms_campaigns.sql` | SMS Marketing | pendiente commit |
-| `420_subcuentas.sql` | Subcuentas agencia | pendiente commit |
-| `421_facturas.sql` | Facturas PDF | pendiente commit |
-| `422_white_label.sql` | White Label config | pendiente commit |
-| `423_sequences_advanced.sql` | Sequences avanzadas | pendiente commit |
-| `424_whitelabel_stripe_subcuentas.sql` | Stripe Connect + Subcuentas | ✅ comiteada |
+| `400_nelvyon_pack_runs.sql` | OS packs | ✅ en main |
+| `401_inbox_conversations.sql` | Inbox omnicanal | ✅ en main |
+| `402_pipeline_deals.sql` | Pipeline / Deals | ✅ en main |
+| `403_team_members.sql` | Team | ✅ en main |
+| `404_white_label.sql` | White Label | ✅ en main |
+| `405_webhooks.sql` | Webhooks | ✅ en main |
+| `406_api_keys.sql` | API Keys | ✅ en main |
+| `407_certificates.sql` | Certificados (410 Gone) | ✅ en main |
+| `408_calendar_events.sql` | Calendario | ✅ en main |
+| `409_snippets.sql` | Snippets | ✅ en main |
+| `410_countdown_timers.sql` | Countdown | ✅ en main |
+| `411_custom_objects.sql` | Custom Objects | ✅ en main |
+| `412_audit_logs.sql` | Auditoría | ✅ en main |
+| `413_lead_scoring.sql` | Lead Scoring | ✅ en main |
+| `414_communities.sql` | Communities | ✅ en main |
+| `415_documents_products_invoices.sql` | Documentos + Productos + Facturas | ✅ en main |
+| `416_surveys_qr_ab.sql` | Surveys, QR, A/B | ✅ en main |
+| `417_sequences.sql` | Sequences | ✅ en main |
+| `418_forms_public.sql` | Formularios públicos | ✅ en main |
+| `419_sms_log.sql` | SMS Marketing log | ✅ en main |
+| `420_social_posts.sql` | Redes Sociales posts | ✅ en main |
+| `421_ads_connections.sql` | Publicidad Ads | ✅ en main |
+| `422_utm_links.sql` | UTM Links | ✅ en main |
+| `423_dragdrop_tenant.sql` | Drag-drop tenant config | ✅ en main |
+| `424_whitelabel_stripe_subcuentas.sql` | Stripe Connect + Subcuentas | ✅ en main |
 
-> **Acción requerida:** Commitear migraciones 401–423 desde `backend/db/migrations/`.  
-> Ejecutar: `pnpm -C apps/web migrate` (aplica todas en orden).
+> Todas las migraciones 400–424 están comiteadas en main.  
+> Ejecutar: `pnpm -C apps/web migrate` (aplica todas en orden numérico).
 
 ### Cron jobs requeridos en producción
 

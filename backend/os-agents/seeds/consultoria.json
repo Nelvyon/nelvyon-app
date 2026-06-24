@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "consultoria-001",
+    "headline": "Resultados medibles o no cobramos",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-002",
+    "headline": "Consultoría B2B que transforma negocios en {{city}}",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-003",
+    "headline": "Estrategia y ejecución, no solo PowerPoints",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-004",
+    "headline": "Tu equipo externo de alto rendimiento",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-005",
+    "headline": "Del problema a la solución en semanas, no meses",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-006",
+    "headline": "Experiencia senior sin el coste de un equipo interno",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-007",
+    "headline": "Consultoría especializada para empresas que quieren crecer",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-008",
+    "headline": "Metodología probada en más de 100 proyectos",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-009",
+    "headline": "Diagnóstico gratuito en la primera sesión",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-010",
+    "headline": "El partner estratégico que tu empresa necesita",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-011",
+    "headline": "Nuestros clientes crecen un 30% de media",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-012",
+    "headline": "Consultoría de negocio + implementación real",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-013",
+    "headline": "Sin jerga innecesaria, con resultados concretos",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-014",
+    "headline": "Acompañamiento durante todo el proceso de cambio",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-015",
+    "headline": "Expertise en {{value_proposition}}",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-016",
+    "headline": "Talleres ejecutivos que aceleran decisiones",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-017",
+    "headline": "Análisis de datos para decisiones estratégicas",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-018",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-019",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-020",
+    "headline": "El consultor que tus inversores recomiendan",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-021",
+    "headline": "Resultados medibles o no cobramos (v2)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-022",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-023",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v2)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-024",
+    "headline": "Tu equipo externo de alto rendimiento (v2)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-025",
+    "headline": "Del problema a la solución en semanas, no meses (v2)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-026",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v2)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-027",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v2)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-028",
+    "headline": "Metodología probada en más de 100 proyectos (v2)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-029",
+    "headline": "Diagnóstico gratuito en la primera sesión (v2)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-030",
+    "headline": "El partner estratégico que tu empresa necesita (v2)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-031",
+    "headline": "Nuestros clientes crecen un 30% de media (v2)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-032",
+    "headline": "Consultoría de negocio + implementación real (v2)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-033",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v2)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-034",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v2)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-035",
+    "headline": "Expertise en {{value_proposition}} (v2)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-036",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v2)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-037",
+    "headline": "Análisis de datos para decisiones estratégicas (v2)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-038",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v2)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-039",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v2)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-040",
+    "headline": "El consultor que tus inversores recomiendan (v2)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-041",
+    "headline": "Resultados medibles o no cobramos (v3)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-042",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-043",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v3)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-044",
+    "headline": "Tu equipo externo de alto rendimiento (v3)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-045",
+    "headline": "Del problema a la solución en semanas, no meses (v3)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-046",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v3)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-047",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v3)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-048",
+    "headline": "Metodología probada en más de 100 proyectos (v3)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-049",
+    "headline": "Diagnóstico gratuito en la primera sesión (v3)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-050",
+    "headline": "El partner estratégico que tu empresa necesita (v3)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-051",
+    "headline": "Nuestros clientes crecen un 30% de media (v3)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-052",
+    "headline": "Consultoría de negocio + implementación real (v3)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-053",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v3)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-054",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v3)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-055",
+    "headline": "Expertise en {{value_proposition}} (v3)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-056",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v3)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-057",
+    "headline": "Análisis de datos para decisiones estratégicas (v3)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-058",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v3)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-059",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v3)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-060",
+    "headline": "El consultor que tus inversores recomiendan (v3)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-061",
+    "headline": "Resultados medibles o no cobramos (v4)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-062",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-063",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v4)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-064",
+    "headline": "Tu equipo externo de alto rendimiento (v4)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-065",
+    "headline": "Del problema a la solución en semanas, no meses (v4)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-066",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v4)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-067",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v4)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-068",
+    "headline": "Metodología probada en más de 100 proyectos (v4)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-069",
+    "headline": "Diagnóstico gratuito en la primera sesión (v4)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-070",
+    "headline": "El partner estratégico que tu empresa necesita (v4)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-071",
+    "headline": "Nuestros clientes crecen un 30% de media (v4)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-072",
+    "headline": "Consultoría de negocio + implementación real (v4)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-073",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v4)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-074",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v4)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-075",
+    "headline": "Expertise en {{value_proposition}} (v4)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-076",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v4)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-077",
+    "headline": "Análisis de datos para decisiones estratégicas (v4)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-078",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v4)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-079",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v4)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-080",
+    "headline": "El consultor que tus inversores recomiendan (v4)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-081",
+    "headline": "Resultados medibles o no cobramos (v5)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-082",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-083",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v5)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-084",
+    "headline": "Tu equipo externo de alto rendimiento (v5)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-085",
+    "headline": "Del problema a la solución en semanas, no meses (v5)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-086",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v5)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-087",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v5)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-088",
+    "headline": "Metodología probada en más de 100 proyectos (v5)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-089",
+    "headline": "Diagnóstico gratuito en la primera sesión (v5)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-090",
+    "headline": "El partner estratégico que tu empresa necesita (v5)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-091",
+    "headline": "Nuestros clientes crecen un 30% de media (v5)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-092",
+    "headline": "Consultoría de negocio + implementación real (v5)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-093",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v5)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-094",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v5)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-095",
+    "headline": "Expertise en {{value_proposition}} (v5)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-096",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v5)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-097",
+    "headline": "Análisis de datos para decisiones estratégicas (v5)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-098",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v5)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-099",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v5)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-100",
+    "headline": "El consultor que tus inversores recomiendan (v5)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-101",
+    "headline": "Resultados medibles o no cobramos (v6)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-102",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-103",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v6)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-104",
+    "headline": "Tu equipo externo de alto rendimiento (v6)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-105",
+    "headline": "Del problema a la solución en semanas, no meses (v6)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-106",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v6)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-107",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v6)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-108",
+    "headline": "Metodología probada en más de 100 proyectos (v6)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-109",
+    "headline": "Diagnóstico gratuito en la primera sesión (v6)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-110",
+    "headline": "El partner estratégico que tu empresa necesita (v6)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-111",
+    "headline": "Nuestros clientes crecen un 30% de media (v6)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-112",
+    "headline": "Consultoría de negocio + implementación real (v6)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-113",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v6)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-114",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v6)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-115",
+    "headline": "Expertise en {{value_proposition}} (v6)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-116",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v6)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-117",
+    "headline": "Análisis de datos para decisiones estratégicas (v6)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-118",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v6)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-119",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v6)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-120",
+    "headline": "El consultor que tus inversores recomiendan (v6)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-121",
+    "headline": "Resultados medibles o no cobramos (v7)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-122",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-123",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v7)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-124",
+    "headline": "Tu equipo externo de alto rendimiento (v7)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-125",
+    "headline": "Del problema a la solución en semanas, no meses (v7)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-126",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v7)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-127",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v7)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-128",
+    "headline": "Metodología probada en más de 100 proyectos (v7)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-129",
+    "headline": "Diagnóstico gratuito en la primera sesión (v7)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-130",
+    "headline": "El partner estratégico que tu empresa necesita (v7)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-131",
+    "headline": "Nuestros clientes crecen un 30% de media (v7)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-132",
+    "headline": "Consultoría de negocio + implementación real (v7)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-133",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v7)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-134",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v7)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-135",
+    "headline": "Expertise en {{value_proposition}} (v7)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-136",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v7)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-137",
+    "headline": "Análisis de datos para decisiones estratégicas (v7)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-138",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v7)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-139",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v7)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-140",
+    "headline": "El consultor que tus inversores recomiendan (v7)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-141",
+    "headline": "Resultados medibles o no cobramos (v8)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-142",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-143",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v8)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-144",
+    "headline": "Tu equipo externo de alto rendimiento (v8)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-145",
+    "headline": "Del problema a la solución en semanas, no meses (v8)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-146",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v8)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-147",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v8)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-148",
+    "headline": "Metodología probada en más de 100 proyectos (v8)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-149",
+    "headline": "Diagnóstico gratuito en la primera sesión (v8)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-150",
+    "headline": "El partner estratégico que tu empresa necesita (v8)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-151",
+    "headline": "Nuestros clientes crecen un 30% de media (v8)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-152",
+    "headline": "Consultoría de negocio + implementación real (v8)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-153",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v8)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-154",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v8)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-155",
+    "headline": "Expertise en {{value_proposition}} (v8)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-156",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v8)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-157",
+    "headline": "Análisis de datos para decisiones estratégicas (v8)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-158",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v8)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-159",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v8)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-160",
+    "headline": "El consultor que tus inversores recomiendan (v8)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-161",
+    "headline": "Resultados medibles o no cobramos (v9)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-162",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-163",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v9)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-164",
+    "headline": "Tu equipo externo de alto rendimiento (v9)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-165",
+    "headline": "Del problema a la solución en semanas, no meses (v9)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-166",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v9)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-167",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v9)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-168",
+    "headline": "Metodología probada en más de 100 proyectos (v9)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-169",
+    "headline": "Diagnóstico gratuito en la primera sesión (v9)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-170",
+    "headline": "El partner estratégico que tu empresa necesita (v9)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-171",
+    "headline": "Nuestros clientes crecen un 30% de media (v9)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-172",
+    "headline": "Consultoría de negocio + implementación real (v9)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-173",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v9)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-174",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v9)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-175",
+    "headline": "Expertise en {{value_proposition}} (v9)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-176",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v9)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-177",
+    "headline": "Análisis de datos para decisiones estratégicas (v9)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-178",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v9)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-179",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v9)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-180",
+    "headline": "El consultor que tus inversores recomiendan (v9)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-181",
+    "headline": "Resultados medibles o no cobramos (v10)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-182",
+    "headline": "Consultoría B2B que transforma negocios en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-183",
+    "headline": "Estrategia y ejecución, no solo PowerPoints (v10)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-184",
+    "headline": "Tu equipo externo de alto rendimiento (v10)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-185",
+    "headline": "Del problema a la solución en semanas, no meses (v10)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-186",
+    "headline": "Experiencia senior sin el coste de un equipo interno (v10)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-187",
+    "headline": "Consultoría especializada para empresas que quieren crecer (v10)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-188",
+    "headline": "Metodología probada en más de 100 proyectos (v10)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-189",
+    "headline": "Diagnóstico gratuito en la primera sesión (v10)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-190",
+    "headline": "El partner estratégico que tu empresa necesita (v10)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-191",
+    "headline": "Nuestros clientes crecen un 30% de media (v10)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-192",
+    "headline": "Consultoría de negocio + implementación real (v10)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-193",
+    "headline": "Sin jerga innecesaria, con resultados concretos (v10)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-194",
+    "headline": "Acompañamiento durante todo el proceso de cambio (v10)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-195",
+    "headline": "Expertise en {{value_proposition}} (v10)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-196",
+    "headline": "Talleres ejecutivos que aceleran decisiones (v10)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Primera sesión gratis",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-197",
+    "headline": "Análisis de datos para decisiones estratégicas (v10)",
+    "meta_title": "Consultoría empresarial en {{city}} — {{business_name}} | Contactar",
+    "cta_label": "Solicitar propuesta",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-198",
+    "headline": "Del benchmarking a la hoja de ruta ejecutable (v10)",
+    "meta_title": "{{business_name}}: Consultoría B2B en {{city}} | Primera sesión gratis",
+    "cta_label": "Ver casos de éxito",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  },
+  {
+    "id": "consultoria-199",
+    "headline": "Consultoría con skin in the game — compartimos el riesgo (v10)",
+    "meta_title": "{{business_name}} — Consultoría estratégica | Solicitar propuesta",
+    "cta_label": "Hablar con un consultor",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿En qué reto empresarial puedo ayudarte?"
+  },
+  {
+    "id": "consultoria-200",
+    "headline": "El consultor que tus inversores recomiendan (v10)",
+    "meta_title": "Consultoría {{city}} — {{business_name}} | Ver casos de éxito",
+    "cta_label": "Descargar metodología",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. ¿Quieres agendar una sesión diagnóstico gratuita?"
+  }
+]

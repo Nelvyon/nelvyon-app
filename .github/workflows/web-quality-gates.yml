@@ -54,6 +54,14 @@ jobs:
         working-directory: .
         run: node scripts/check-saas-stubs.mjs
 
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Playwright E2E smoke (launch.spec.ts)
+        run: pnpm test:e2e --project=chromium apps/web/e2e/launch.spec.ts
+        env:
+          CI: "true"
+
       - name: Full regression tests (non-blocking signal)
         run: pnpm test:regression
         continue-on-error: true

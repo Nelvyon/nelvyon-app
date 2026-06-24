@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "estetica-001",
+    "headline": "Luce mejor que nunca en {{city}}",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-002",
+    "headline": "Tratamientos de belleza que transforman en {{city}}",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-003",
+    "headline": "Tu centro de estética de confianza en {{city}}",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-004",
+    "headline": "Belleza y bienestar en el centro de {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-005",
+    "headline": "Resultados visibles desde la primera sesión",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-006",
+    "headline": "Tu imagen, nuestra pasión en {{city}}",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-007",
+    "headline": "Expertos en belleza que cuidan cada detalle",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-008",
+    "headline": "El centro de estética que recomienda {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-009",
+    "headline": "Tratamientos personalizados para tu tipo de piel",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-010",
+    "headline": "Donde la belleza se convierte en bienestar",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-011",
+    "headline": "Rituales de belleza exclusivos en {{city}}",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-012",
+    "headline": "Tu transformación comienza aquí en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-013",
+    "headline": "Estética avanzada con tecnología de última generación",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-014",
+    "headline": "El lugar donde te mimas en {{city}}",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-015",
+    "headline": "Tratamientos faciales y corporales que funcionan",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-016",
+    "headline": "Tu centro de belleza y relajación en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-017",
+    "headline": "Professionals de la estética con 10 años en {{city}}",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-018",
+    "headline": "Belleza natural potenciada en {{city}}",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-019",
+    "headline": "Cuídate como mereces en {{city}}",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-020",
+    "headline": "El spa urbano que {{city}} estaba esperando",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-021",
+    "headline": "Luce mejor que nunca en {{city}} (v2)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-022",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-023",
+    "headline": "Tu centro de estética de confianza en {{city}} (v2)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-024",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-025",
+    "headline": "Resultados visibles desde la primera sesión (v2)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-026",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-027",
+    "headline": "Expertos en belleza que cuidan cada detalle (v2)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-028",
+    "headline": "El centro de estética que recomienda {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-029",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v2)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-030",
+    "headline": "Donde la belleza se convierte en bienestar (v2)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-031",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v2)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-032",
+    "headline": "Tu transformación comienza aquí en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-033",
+    "headline": "Estética avanzada con tecnología de última generación (v2)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-034",
+    "headline": "El lugar donde te mimas en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-035",
+    "headline": "Tratamientos faciales y corporales que funcionan (v2)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-036",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-037",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v2)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-038",
+    "headline": "Belleza natural potenciada en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-039",
+    "headline": "Cuídate como mereces en {{city}} (v2)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-040",
+    "headline": "El spa urbano que {{city}} estaba esperando (v2)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-041",
+    "headline": "Luce mejor que nunca en {{city}} (v3)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-042",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-043",
+    "headline": "Tu centro de estética de confianza en {{city}} (v3)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-044",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-045",
+    "headline": "Resultados visibles desde la primera sesión (v3)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-046",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-047",
+    "headline": "Expertos en belleza que cuidan cada detalle (v3)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-048",
+    "headline": "El centro de estética que recomienda {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-049",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v3)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-050",
+    "headline": "Donde la belleza se convierte en bienestar (v3)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-051",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v3)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-052",
+    "headline": "Tu transformación comienza aquí en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-053",
+    "headline": "Estética avanzada con tecnología de última generación (v3)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-054",
+    "headline": "El lugar donde te mimas en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-055",
+    "headline": "Tratamientos faciales y corporales que funcionan (v3)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-056",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-057",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v3)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-058",
+    "headline": "Belleza natural potenciada en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-059",
+    "headline": "Cuídate como mereces en {{city}} (v3)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-060",
+    "headline": "El spa urbano que {{city}} estaba esperando (v3)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-061",
+    "headline": "Luce mejor que nunca en {{city}} (v4)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-062",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-063",
+    "headline": "Tu centro de estética de confianza en {{city}} (v4)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-064",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-065",
+    "headline": "Resultados visibles desde la primera sesión (v4)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-066",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-067",
+    "headline": "Expertos en belleza que cuidan cada detalle (v4)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-068",
+    "headline": "El centro de estética que recomienda {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-069",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v4)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-070",
+    "headline": "Donde la belleza se convierte en bienestar (v4)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-071",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v4)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-072",
+    "headline": "Tu transformación comienza aquí en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-073",
+    "headline": "Estética avanzada con tecnología de última generación (v4)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-074",
+    "headline": "El lugar donde te mimas en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-075",
+    "headline": "Tratamientos faciales y corporales que funcionan (v4)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-076",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-077",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v4)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-078",
+    "headline": "Belleza natural potenciada en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-079",
+    "headline": "Cuídate como mereces en {{city}} (v4)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-080",
+    "headline": "El spa urbano que {{city}} estaba esperando (v4)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-081",
+    "headline": "Luce mejor que nunca en {{city}} (v5)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-082",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-083",
+    "headline": "Tu centro de estética de confianza en {{city}} (v5)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-084",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-085",
+    "headline": "Resultados visibles desde la primera sesión (v5)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-086",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-087",
+    "headline": "Expertos en belleza que cuidan cada detalle (v5)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-088",
+    "headline": "El centro de estética que recomienda {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-089",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v5)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-090",
+    "headline": "Donde la belleza se convierte en bienestar (v5)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-091",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v5)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-092",
+    "headline": "Tu transformación comienza aquí en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-093",
+    "headline": "Estética avanzada con tecnología de última generación (v5)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-094",
+    "headline": "El lugar donde te mimas en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-095",
+    "headline": "Tratamientos faciales y corporales que funcionan (v5)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-096",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-097",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v5)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-098",
+    "headline": "Belleza natural potenciada en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-099",
+    "headline": "Cuídate como mereces en {{city}} (v5)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-100",
+    "headline": "El spa urbano que {{city}} estaba esperando (v5)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-101",
+    "headline": "Luce mejor que nunca en {{city}} (v6)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-102",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-103",
+    "headline": "Tu centro de estética de confianza en {{city}} (v6)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-104",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-105",
+    "headline": "Resultados visibles desde la primera sesión (v6)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-106",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-107",
+    "headline": "Expertos en belleza que cuidan cada detalle (v6)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-108",
+    "headline": "El centro de estética que recomienda {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-109",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v6)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-110",
+    "headline": "Donde la belleza se convierte en bienestar (v6)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-111",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v6)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-112",
+    "headline": "Tu transformación comienza aquí en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-113",
+    "headline": "Estética avanzada con tecnología de última generación (v6)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-114",
+    "headline": "El lugar donde te mimas en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-115",
+    "headline": "Tratamientos faciales y corporales que funcionan (v6)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-116",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-117",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v6)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-118",
+    "headline": "Belleza natural potenciada en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-119",
+    "headline": "Cuídate como mereces en {{city}} (v6)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-120",
+    "headline": "El spa urbano que {{city}} estaba esperando (v6)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-121",
+    "headline": "Luce mejor que nunca en {{city}} (v7)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-122",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-123",
+    "headline": "Tu centro de estética de confianza en {{city}} (v7)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-124",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-125",
+    "headline": "Resultados visibles desde la primera sesión (v7)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-126",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-127",
+    "headline": "Expertos en belleza que cuidan cada detalle (v7)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-128",
+    "headline": "El centro de estética que recomienda {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-129",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v7)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-130",
+    "headline": "Donde la belleza se convierte en bienestar (v7)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-131",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v7)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-132",
+    "headline": "Tu transformación comienza aquí en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-133",
+    "headline": "Estética avanzada con tecnología de última generación (v7)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-134",
+    "headline": "El lugar donde te mimas en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-135",
+    "headline": "Tratamientos faciales y corporales que funcionan (v7)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-136",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-137",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v7)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-138",
+    "headline": "Belleza natural potenciada en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-139",
+    "headline": "Cuídate como mereces en {{city}} (v7)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-140",
+    "headline": "El spa urbano que {{city}} estaba esperando (v7)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-141",
+    "headline": "Luce mejor que nunca en {{city}} (v8)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-142",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-143",
+    "headline": "Tu centro de estética de confianza en {{city}} (v8)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-144",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-145",
+    "headline": "Resultados visibles desde la primera sesión (v8)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-146",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-147",
+    "headline": "Expertos en belleza que cuidan cada detalle (v8)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-148",
+    "headline": "El centro de estética que recomienda {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-149",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v8)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-150",
+    "headline": "Donde la belleza se convierte en bienestar (v8)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-151",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v8)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-152",
+    "headline": "Tu transformación comienza aquí en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-153",
+    "headline": "Estética avanzada con tecnología de última generación (v8)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-154",
+    "headline": "El lugar donde te mimas en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-155",
+    "headline": "Tratamientos faciales y corporales que funcionan (v8)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-156",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-157",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v8)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-158",
+    "headline": "Belleza natural potenciada en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-159",
+    "headline": "Cuídate como mereces en {{city}} (v8)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-160",
+    "headline": "El spa urbano que {{city}} estaba esperando (v8)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-161",
+    "headline": "Luce mejor que nunca en {{city}} (v9)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-162",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-163",
+    "headline": "Tu centro de estética de confianza en {{city}} (v9)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-164",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-165",
+    "headline": "Resultados visibles desde la primera sesión (v9)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-166",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-167",
+    "headline": "Expertos en belleza que cuidan cada detalle (v9)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-168",
+    "headline": "El centro de estética que recomienda {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-169",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v9)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-170",
+    "headline": "Donde la belleza se convierte en bienestar (v9)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-171",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v9)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-172",
+    "headline": "Tu transformación comienza aquí en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-173",
+    "headline": "Estética avanzada con tecnología de última generación (v9)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-174",
+    "headline": "El lugar donde te mimas en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-175",
+    "headline": "Tratamientos faciales y corporales que funcionan (v9)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-176",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-177",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v9)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-178",
+    "headline": "Belleza natural potenciada en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-179",
+    "headline": "Cuídate como mereces en {{city}} (v9)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-180",
+    "headline": "El spa urbano que {{city}} estaba esperando (v9)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-181",
+    "headline": "Luce mejor que nunca en {{city}} (v10)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-182",
+    "headline": "Tratamientos de belleza que transforman en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-183",
+    "headline": "Tu centro de estética de confianza en {{city}} (v10)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-184",
+    "headline": "Belleza y bienestar en el centro de {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-185",
+    "headline": "Resultados visibles desde la primera sesión (v10)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-186",
+    "headline": "Tu imagen, nuestra pasión en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-187",
+    "headline": "Expertos en belleza que cuidan cada detalle (v10)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-188",
+    "headline": "El centro de estética que recomienda {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-189",
+    "headline": "Tratamientos personalizados para tu tipo de piel (v10)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-190",
+    "headline": "Donde la belleza se convierte en bienestar (v10)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-191",
+    "headline": "Rituales de belleza exclusivos en {{city}} (v10)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-192",
+    "headline": "Tu transformación comienza aquí en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-193",
+    "headline": "Estética avanzada con tecnología de última generación (v10)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-194",
+    "headline": "El lugar donde te mimas en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-195",
+    "headline": "Tratamientos faciales y corporales que funcionan (v10)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-196",
+    "headline": "Tu centro de belleza y relajación en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Reservar tratamiento",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-197",
+    "headline": "Professionals de la estética con 10 años en {{city}} (v10)",
+    "meta_title": "Centro de estética en {{city}} — {{business_name}} | Reservar",
+    "cta_label": "Primera sesión",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-198",
+    "headline": "Belleza natural potenciada en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Belleza y estética en {{city}} | Cita previa",
+    "cta_label": "Reservar cita",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  },
+  {
+    "id": "estetica-199",
+    "headline": "Cuídate como mereces en {{city}} (v10)",
+    "meta_title": "Estética y spa en {{city}} — {{business_name}}",
+    "cta_label": "Prueba gratuita",
+    "chatbot_greeting": "¡Hola! Soy el asistente de {{business_name}}. ¿Te ayudo a reservar un tratamiento o tienes alguna pregunta?"
+  },
+  {
+    "id": "estetica-200",
+    "headline": "El spa urbano que {{city}} estaba esperando (v10)",
+    "meta_title": "{{business_name}} {{city}} — Tratamientos de belleza | Reserva",
+    "cta_label": "Ver tratamientos",
+    "chatbot_greeting": "Bienvenida/o a {{business_name}}. Puedo informarte sobre nuestros tratamientos y ayudarte a reservar."
+  }
+]

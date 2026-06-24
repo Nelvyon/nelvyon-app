@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "realestate-001",
+    "headline": "Encuentra tu hogar ideal en {{city}}",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-002",
+    "headline": "Expertos inmobiliarios de confianza en {{city}}",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-003",
+    "headline": "Compra, vende o alquila con los mejores en {{city}}",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-004",
+    "headline": "Tu propiedad en {{city}} en las mejores manos",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-005",
+    "headline": "Más de 500 propiedades gestionadas en {{city}}",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-006",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-007",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}}",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-008",
+    "headline": "Compra el piso de tus sueños en {{city}}",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-009",
+    "headline": "Vendemos tu propiedad en menos de 60 días",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-010",
+    "headline": "Inversión inmobiliaria inteligente en {{city}}",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-011",
+    "headline": "Agentes locales que conocen cada barrio de {{city}}",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-012",
+    "headline": "Tu próximo hogar en {{city}} te está esperando",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-013",
+    "headline": "Gestión integral de propiedades en {{city}}",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-014",
+    "headline": "La inmobiliaria más valorada de {{city}}",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-015",
+    "headline": "Asesoramiento jurídico y financiero incluido",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-016",
+    "headline": "Compradores preseleccionados listos para tu piso",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-017",
+    "headline": "Sin comisiones ocultas, transparencia total",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-018",
+    "headline": "Valuación gratuita de tu propiedad en {{city}}",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-019",
+    "headline": "Tu agente inmobiliario local en {{city}}",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-020",
+    "headline": "Alquiler y compraventa en {{city}} con garantías",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-021",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v2)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-022",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-023",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v2)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-024",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v2)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-025",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v2)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-026",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v2)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-027",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v2)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-028",
+    "headline": "Compra el piso de tus sueños en {{city}} (v2)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-029",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v2)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-030",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-031",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v2)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-032",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v2)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-033",
+    "headline": "Gestión integral de propiedades en {{city}} (v2)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-034",
+    "headline": "La inmobiliaria más valorada de {{city}} (v2)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-035",
+    "headline": "Asesoramiento jurídico y financiero incluido (v2)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-036",
+    "headline": "Compradores preseleccionados listos para tu piso (v2)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-037",
+    "headline": "Sin comisiones ocultas, transparencia total (v2)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-038",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v2)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-039",
+    "headline": "Tu agente inmobiliario local en {{city}} (v2)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-040",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v2)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-041",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v3)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-042",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-043",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v3)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-044",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v3)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-045",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v3)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-046",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v3)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-047",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v3)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-048",
+    "headline": "Compra el piso de tus sueños en {{city}} (v3)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-049",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v3)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-050",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-051",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v3)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-052",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v3)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-053",
+    "headline": "Gestión integral de propiedades en {{city}} (v3)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-054",
+    "headline": "La inmobiliaria más valorada de {{city}} (v3)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-055",
+    "headline": "Asesoramiento jurídico y financiero incluido (v3)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-056",
+    "headline": "Compradores preseleccionados listos para tu piso (v3)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-057",
+    "headline": "Sin comisiones ocultas, transparencia total (v3)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-058",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v3)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-059",
+    "headline": "Tu agente inmobiliario local en {{city}} (v3)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-060",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v3)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-061",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v4)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-062",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-063",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v4)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-064",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v4)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-065",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v4)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-066",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v4)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-067",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v4)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-068",
+    "headline": "Compra el piso de tus sueños en {{city}} (v4)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-069",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v4)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-070",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-071",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v4)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-072",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v4)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-073",
+    "headline": "Gestión integral de propiedades en {{city}} (v4)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-074",
+    "headline": "La inmobiliaria más valorada de {{city}} (v4)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-075",
+    "headline": "Asesoramiento jurídico y financiero incluido (v4)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-076",
+    "headline": "Compradores preseleccionados listos para tu piso (v4)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-077",
+    "headline": "Sin comisiones ocultas, transparencia total (v4)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-078",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v4)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-079",
+    "headline": "Tu agente inmobiliario local en {{city}} (v4)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-080",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v4)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-081",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v5)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-082",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-083",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v5)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-084",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v5)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-085",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v5)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-086",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v5)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-087",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v5)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-088",
+    "headline": "Compra el piso de tus sueños en {{city}} (v5)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-089",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v5)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-090",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-091",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v5)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-092",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v5)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-093",
+    "headline": "Gestión integral de propiedades en {{city}} (v5)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-094",
+    "headline": "La inmobiliaria más valorada de {{city}} (v5)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-095",
+    "headline": "Asesoramiento jurídico y financiero incluido (v5)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-096",
+    "headline": "Compradores preseleccionados listos para tu piso (v5)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-097",
+    "headline": "Sin comisiones ocultas, transparencia total (v5)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-098",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v5)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-099",
+    "headline": "Tu agente inmobiliario local en {{city}} (v5)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-100",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v5)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-101",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v6)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-102",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-103",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v6)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-104",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v6)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-105",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v6)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-106",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v6)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-107",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v6)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-108",
+    "headline": "Compra el piso de tus sueños en {{city}} (v6)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-109",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v6)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-110",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-111",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v6)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-112",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v6)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-113",
+    "headline": "Gestión integral de propiedades en {{city}} (v6)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-114",
+    "headline": "La inmobiliaria más valorada de {{city}} (v6)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-115",
+    "headline": "Asesoramiento jurídico y financiero incluido (v6)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-116",
+    "headline": "Compradores preseleccionados listos para tu piso (v6)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-117",
+    "headline": "Sin comisiones ocultas, transparencia total (v6)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-118",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v6)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-119",
+    "headline": "Tu agente inmobiliario local en {{city}} (v6)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-120",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v6)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-121",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v7)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-122",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-123",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v7)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-124",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v7)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-125",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v7)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-126",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v7)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-127",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v7)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-128",
+    "headline": "Compra el piso de tus sueños en {{city}} (v7)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-129",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v7)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-130",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-131",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v7)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-132",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v7)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-133",
+    "headline": "Gestión integral de propiedades en {{city}} (v7)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-134",
+    "headline": "La inmobiliaria más valorada de {{city}} (v7)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-135",
+    "headline": "Asesoramiento jurídico y financiero incluido (v7)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-136",
+    "headline": "Compradores preseleccionados listos para tu piso (v7)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-137",
+    "headline": "Sin comisiones ocultas, transparencia total (v7)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-138",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v7)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-139",
+    "headline": "Tu agente inmobiliario local en {{city}} (v7)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-140",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v7)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-141",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v8)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-142",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-143",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v8)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-144",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v8)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-145",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v8)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-146",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v8)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-147",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v8)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-148",
+    "headline": "Compra el piso de tus sueños en {{city}} (v8)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-149",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v8)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-150",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-151",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v8)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-152",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v8)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-153",
+    "headline": "Gestión integral de propiedades en {{city}} (v8)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-154",
+    "headline": "La inmobiliaria más valorada de {{city}} (v8)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-155",
+    "headline": "Asesoramiento jurídico y financiero incluido (v8)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-156",
+    "headline": "Compradores preseleccionados listos para tu piso (v8)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-157",
+    "headline": "Sin comisiones ocultas, transparencia total (v8)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-158",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v8)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-159",
+    "headline": "Tu agente inmobiliario local en {{city}} (v8)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-160",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v8)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-161",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v9)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-162",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-163",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v9)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-164",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v9)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-165",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v9)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-166",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v9)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-167",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v9)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-168",
+    "headline": "Compra el piso de tus sueños en {{city}} (v9)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-169",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v9)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-170",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-171",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v9)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-172",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v9)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-173",
+    "headline": "Gestión integral de propiedades en {{city}} (v9)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-174",
+    "headline": "La inmobiliaria más valorada de {{city}} (v9)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-175",
+    "headline": "Asesoramiento jurídico y financiero incluido (v9)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-176",
+    "headline": "Compradores preseleccionados listos para tu piso (v9)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-177",
+    "headline": "Sin comisiones ocultas, transparencia total (v9)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-178",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v9)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-179",
+    "headline": "Tu agente inmobiliario local en {{city}} (v9)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-180",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v9)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-181",
+    "headline": "Encuentra tu hogar ideal en {{city}} (v10)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-182",
+    "headline": "Expertos inmobiliarios de confianza en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-183",
+    "headline": "Compra, vende o alquila con los mejores en {{city}} (v10)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-184",
+    "headline": "Tu propiedad en {{city}} en las mejores manos (v10)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-185",
+    "headline": "Más de 500 propiedades gestionadas en {{city}} (v10)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-186",
+    "headline": "La inmobiliaria que cierra tus operaciones al mejor precio (v10)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-187",
+    "headline": "Asesoría inmobiliaria personalizada en {{city}} (v10)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-188",
+    "headline": "Compra el piso de tus sueños en {{city}} (v10)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-189",
+    "headline": "Vendemos tu propiedad en menos de 60 días (v10)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-190",
+    "headline": "Inversión inmobiliaria inteligente en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-191",
+    "headline": "Agentes locales que conocen cada barrio de {{city}} (v10)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-192",
+    "headline": "Tu próximo hogar en {{city}} te está esperando (v10)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-193",
+    "headline": "Gestión integral de propiedades en {{city}} (v10)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-194",
+    "headline": "La inmobiliaria más valorada de {{city}} (v10)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-195",
+    "headline": "Asesoramiento jurídico y financiero incluido (v10)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-196",
+    "headline": "Compradores preseleccionados listos para tu piso (v10)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Ver propiedades",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-197",
+    "headline": "Sin comisiones ocultas, transparencia total (v10)",
+    "meta_title": "Inmobiliaria en {{city}} — {{business_name}} | Propiedades",
+    "cta_label": "Tasación gratuita",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-198",
+    "headline": "Valuación gratuita de tu propiedad en {{city}} (v10)",
+    "meta_title": "{{business_name}}: Pisos y casas en {{city}} | Ver oferta",
+    "cta_label": "Contactar agente",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  },
+  {
+    "id": "realestate-199",
+    "headline": "Tu agente inmobiliario local en {{city}} (v10)",
+    "meta_title": "Comprar piso en {{city}} — {{business_name}}",
+    "cta_label": "Ver pisos",
+    "chatbot_greeting": "Hola, soy el asistente de {{business_name}}. ¿Buscas comprar, vender o alquilar una propiedad en {{city}}?"
+  },
+  {
+    "id": "realestate-200",
+    "headline": "Alquiler y compraventa en {{city}} con garantías (v10)",
+    "meta_title": "{{business_name}} {{city}} — Inmobiliaria | Tasación gratuita",
+    "cta_label": "Solicitar visita",
+    "chatbot_greeting": "Bienvenido/a a {{business_name}}. Puedo ayudarte a encontrar la propiedad ideal en {{city}}."
+  }
+]
