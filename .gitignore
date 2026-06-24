@@ -84,3 +84,6 @@ blob-report/
 nelvyon_backend.zip
 tools/
 backend/autonomous/output/
+
+# Envato Elements seeds — ZIPs never committed, only JSON metadata
+backend/data/envato-seeds/**/*.zip

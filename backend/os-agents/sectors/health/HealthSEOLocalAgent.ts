@@ -4,7 +4,7 @@ import { tryLogCrmAgentOutput } from "../../crm/agentRunHook";
 import { ClientProfileService } from "../../client-profile";
 import { LlmClient } from "../../LlmClient";
 import type { HealthInput, HealthOutput } from "./shared";
-import { healthLlmOpts } from "./shared";
+import { healthLlmOpts, buildHealthSeedContext } from "./shared";
 
 export type HealthSEOLocalAgentDeps = { llm?: ILlmClient };
 export class HealthSEOLocalAgent {
@@ -47,7 +47,7 @@ Output: Propuesta accionable para health con dos variantes diferenciadas, oferta
 ### FIN EJEMPLOS
 
 ### BRIEF OPERATIVO
-Optimiza SEO local para ${enriched.clinicName} (${enriched.specialty}) en ${enriched.location ?? "España"}: keywords por ciudad, GMB, metas por servicio, schema MedicalBusiness/Physician/Dentist, reseñas y link building en directorios médicos.`;
+Optimiza SEO local para ${enriched.clinicName} (${enriched.specialty}) en ${enriched.location ?? "España"}: keywords por ciudad, GMB, metas por servicio, schema MedicalBusiness/Physician/Dentist, reseñas y link building en directorios médicos.${buildHealthSeedContext()}`;
     const __crmOut = { agentId: "health-seo-local", result: await this.llm.complete(prompt, healthLlmOpts(0.2)), generatedAt: new Date().toISOString() };
     await tryLogCrmAgentOutput(userId, input, __crmOut);
     try {

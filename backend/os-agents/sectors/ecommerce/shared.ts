@@ -2,6 +2,7 @@ import type { ILlmClient, LlmOptions } from "../../LlmClient";
 import { LlmClient } from "../../LlmClient";
 import { ModelRouter } from "../../llm/ModelRouter";
 import { LearningService } from "../../learning/LearningService";
+import { getSeedByIndex } from "../../seeds/seed-selector";
 
 import { ELITE_V300_STANDARDS } from "../../prompts/elitePromptLibrary";
 export interface EcommerceInput {
@@ -66,6 +67,7 @@ export function buildEcommercePrompt(params: {
   mission: string;
   fewShotExample: string;
   input: EcommerceInput;
+  seedIndex?: number;
 }): string {
   const metrics = params.input.metricsBrief?.trim() ? params.input.metricsBrief.trim() : "no indicado";
   const meta =
@@ -73,6 +75,8 @@ export function buildEcommercePrompt(params: {
       ? JSON.stringify(params.input.metadata, null, 0)
       : "{}";
   const ecommerceCtx = params.input.ecommerceBrief?.trim() ? params.input.ecommerceBrief.trim() : "inferir desde sector";
+  const seed = getSeedByIndex("ecommerce", params.seedIndex ?? 0);
+  const seedCtx = seed ? `\nSEED TEMPLATE (adaptar al cliente):\n- Headline: ${seed.headline}\n- CTA: ${seed.cta_label}\n- Chatbot: ${seed.chatbot_greeting}` : "";
 
   return `${params.eliteRole}
 
@@ -92,7 +96,7 @@ ${params.fewShotExample}
 - Marca / tenant: ${params.input.brand}
 - eCommerce / contexto: ${ecommerceCtx}
 - Métricas / contexto: ${metrics}
-- metadata: ${meta}
+- metadata: ${meta}${seedCtx}
 
 MISIÓN DEL AGENTE:
 ${params.mission}

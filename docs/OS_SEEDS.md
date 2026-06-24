@@ -1,0 +1,69 @@
+# OS Seeds — Nelvyon
+
+Seeds provide headline templates, CTAs, and chatbot greetings for sector agents.
+They enrich AI prompts so generated content is more specific and higher quality.
+
+## Seed priority
+
+1. **Envato on-disk seeds** — `backend/data/envato-seeds/{sector}/*.json`
+   Downloaded via `download-envato-seeds.ts` when `ENVATO_ELEMENTS_TOKEN` is set.
+2. **Synthetic JSON seeds** — `backend/os-agents/seeds/{sector}.json`
+   Curated templates checked into the repo. Used when Envato seeds are absent.
+
+The `getSectorSeeds(sector, limit?)` function in `seed-selector.ts` handles this fallback automatically.
+
+## Metadata index
+
+`backend/data/envato-seeds-metadata.json` — 51 items across 3 sectors (restaurantes, clinicas, ecommerce).
+
+When Envato seeds are downloaded, each item is stored as:
+- `backend/data/envato-seeds/{sector}/{item_id}.json` — metadata only
+- ZIPs are **NOT** committed (`.gitignore` entry: `backend/data/envato-seeds/**/*.zip`)
+
+## How to re-download Envato seeds
+
+Requires `ENVATO_ELEMENTS_TOKEN` (Envato Elements API Bearer token).
+
+```bash
+# One-time download (~50 items across 3 sectors)
+ENVATO_ELEMENTS_TOKEN=your_token_here npx tsx backend/os-agents/seeds/download-envato-seeds.ts
+
+# Output:
+#   backend/data/envato-seeds/restaurantes/*.zip
+#   backend/data/envato-seeds/clinicas/*.zip
+#   backend/data/envato-seeds/ecommerce/*.zip
+
+# Then commit the metadata JSON files only (not ZIPs):
+git add backend/data/envato-seeds/**/*.json backend/data/envato-seeds-metadata.json
+git commit -m "chore(seeds): refresh envato seeds metadata"
+```
+
+## Sector coverage
+
+| Sector | Synthetic seeds | Envato seeds (when downloaded) |
+|---|---|---|
+| restaurantes | `seeds/restaurantes.json` (20 items) | `data/envato-seeds/restaurantes/` |
+| clinicas | `seeds/clinicas.json` (20 items) | `data/envato-seeds/clinicas/` |
+| ecommerce | `seeds/ecommerce.json` (20 items) | `data/envato-seeds/ecommerce/` |
+
+## Integration with sector agents
+
+Each sector's `shared.ts` calls `getSeedByIndex(sector, index)` to inject a seed template into the AI prompt:
+
+```typescript
+// Example from restaurantes/shared.ts
+const seed = getSeedByIndex("restaurantes", params.seedIndex ?? 0);
+const seedCtx = seed
+  ? `\nSEED TEMPLATE:\n- Headline: ${seed.headline}\n- CTA: ${seed.cta_label}`
+  : "";
+```
+
+The seed context is appended to the agent's brief before LLM completion.
+Agents use `seedIndex % seeds.length` for deterministic, wrapping selection.
+
+## Envato Elements API
+
+- Base URL: `https://elements.envato.com/api`
+- Auth: `Authorization: Bearer {ENVATO_ELEMENTS_TOKEN}`
+- Rate limit: 300ms between requests (handled in `download-envato-seeds.ts`)
+- Items per sector: ~17 (configurable via `ITEMS_PER_SECTOR` in the script)

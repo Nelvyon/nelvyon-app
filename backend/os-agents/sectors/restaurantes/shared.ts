@@ -2,6 +2,7 @@ import type { ILlmClient, LlmOptions } from "../../LlmClient";
 import { LlmClient } from "../../LlmClient";
 import { ModelRouter } from "../../llm/ModelRouter";
 import { LearningService } from "../../learning/LearningService";
+import { getSeedByIndex } from "../../seeds/seed-selector";
 
 import { ELITE_V300_STANDARDS } from "../../prompts/elitePromptLibrary";
 export interface RestaurantesInput {
@@ -66,12 +67,15 @@ export function buildRestaurantesPrompt(params: {
   mission: string;
   fewShotExample: string;
   input: RestaurantesInput;
+  seedIndex?: number;
 }): string {
   const metrics = params.input.metricsBrief?.trim() ? params.input.metricsBrief.trim() : "no indicado";
   const meta =
     params.input.metadata && Object.keys(params.input.metadata).length > 0
       ? JSON.stringify(params.input.metadata, null, 0)
       : "{}";
+  const seed = getSeedByIndex("restaurantes", params.seedIndex ?? 0);
+  const seedCtx = seed ? `\nSEED TEMPLATE (adaptar al cliente):\n- Headline: ${seed.headline}\n- CTA: ${seed.cta_label}\n- Chatbot: ${seed.chatbot_greeting}` : "";
   const restaurantesCtx = params.input.restaurantesBrief?.trim()
     ? params.input.restaurantesBrief.trim()
     : "inferir desde sector";
@@ -94,7 +98,7 @@ ${params.fewShotExample}
 - Marca / tenant: ${params.input.brand}
 - Restaurantes / contexto: ${restaurantesCtx}
 - Métricas / contexto: ${metrics}
-- metadata: ${meta}
+- metadata: ${meta}${seedCtx}
 
 MISIÓN DEL AGENTE:
 ${params.mission}
