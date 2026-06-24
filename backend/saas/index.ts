@@ -452,3 +452,37 @@ export {
   type SaasSmsConfigured,
 } from "./SaasSmsService";
 export { dispatchFormSubmitted, dispatchTagAdded } from "./saasWorkflowDispatch";
+export {
+  SaasSocialService,
+  SaasSocialError,
+  getSaasSocialService,
+  resetSaasSocialServiceForTests,
+  type SocialPlatform,
+  type SocialPostStatus,
+  type SocialAccount,
+  type SocialPost,
+  type CreateSocialAccountInput,
+  type CreateSocialPostInput,
+  type PublishNowResult,
+} from "./SaasSocialService";
+export {
+  SaasAdsDashboardService,
+  SaasAdsDashboardError,
+  getSaasAdsDashboardService,
+  resetSaasAdsDashboardServiceForTests,
+  type AdsPlatform,
+  type AdsConnection,
+  type AdsMetrics,
+  type AdsConnectionInput,
+  type AdsStatusResult,
+} from "./SaasAdsDashboardService";
+export {
+  SaasUtmService,
+  SaasUtmError,
+  getSaasUtmService,
+  resetSaasUtmServiceForTests,
+  type UtmLink,
+  type CreateUtmLinkInput,
+  type UtmClickRecord,
+  type UtmStats,
+} from "./SaasUtmService";
