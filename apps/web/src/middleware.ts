@@ -116,9 +116,9 @@ export async function middleware(request: NextRequest) {
       if (pathname.startsWith("/api/")) {
         return end(NextResponse.json({ error: "Unauthorized", code: "UNAUTHORIZED" }, { status: 401 }));
       }
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+      const next = `${pathname}${request.nextUrl.search}`;
+      const url = new URL("/login", request.nextUrl.origin);
+      url.searchParams.set("next", next);
       return end(NextResponse.redirect(url));
     }
     if (pathname.startsWith("/api/")) {

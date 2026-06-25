@@ -5,6 +5,16 @@ export default defineConfig({
   timeout: 30_000,
   retries: 1,
   reporter: "list",
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        baseURL: "http://localhost:3000",
+        ...devices["Desktop Chrome"],
+        browserName: "chromium",
+      },
+    },
+  ],
   use: {
     baseURL: "http://localhost:3000",
     ...devices["Desktop Chrome"],

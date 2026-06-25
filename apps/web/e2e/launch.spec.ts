@@ -11,8 +11,7 @@ test("signup page carga formulario de registro", async ({ page }) => {
 
 test("/saas/dashboard requiere autenticación", async ({ page }) => {
   await page.goto("/saas/dashboard");
-  // Debe redirigir a /auth/login (con o sin ?next param)
-  await expect(page).toHaveURL(/\/auth\/login/);
+  await expect(page).toHaveURL(/\/login/);
 });
 
 test("GET /api/health responde 200 con status ok", async ({ request }) => {

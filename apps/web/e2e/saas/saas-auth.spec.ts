@@ -26,6 +26,11 @@ test.describe("SaaS Auth — redirect guards", () => {
     await page.goto("/saas/billing");
     await expect(page).toHaveURL(LOGIN_URL);
   });
+
+  test("redirect next param preservado en URL de login", async ({ page }) => {
+    await page.goto("/saas/dashboard?test=1");
+    await expect(page).toHaveURL(/\/login\?next=%2Fsaas%2Fdashboard%3Ftest%3D1/);
+  });
 });
 
 test.describe("SaaS Auth — autenticado carga dashboard", () => {
@@ -40,11 +45,5 @@ test.describe("SaaS Auth — autenticado carga dashboard", () => {
     await page.goto("/saas/dashboard");
     await expect(page).not.toHaveURL(LOGIN_URL);
     await expect(page.locator("body")).toBeVisible();
-  });
-
-  test("redirect next param preservado en URL de login", async ({ page, context }) => {
-    await context.clearCookies();
-    await page.goto("/saas/dashboard?test=1");
-    await expect(page).toHaveURL(/\/login\?next=/);
   });
 });
