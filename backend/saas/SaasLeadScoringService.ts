@@ -266,7 +266,7 @@ export class SaasLeadScoringService {
     const row = rows[0];
     if (!row) throw new SaasLeadScoringError("Error al guardar score", "VALIDATION");
 
-    return {
+    const result = {
       id: String(row.id),
       tenantId,
       contactId,
@@ -280,6 +280,17 @@ export class SaasLeadScoringService {
       ruleBreakdown: breakdown,
       scoredAt: new Date().toISOString(),
     };
+
+    // Dispatch score_threshold workflows (non-fatal)
+    try {
+      const { getSaasWorkflowService } = await import("./SaasWorkflowService");
+      await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "score_threshold", {
+        contact: { id: contactId, name: result.contactName, email: result.contactEmail },
+        score: { value: score, grade, category },
+      });
+    } catch { /* non-fatal */ }
+
+    return result;
   }
 
   async listScores(tenantId: string, opts?: { category?: SaasLeadCategory; limit?: number }): Promise<LeadScore[]> {

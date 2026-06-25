@@ -18,9 +18,27 @@ function mapError(e: SaasWorkflowError): NextResponse {
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }
 
+const ALL_TRIGGERS = [
+  "contact_created","contact_updated","stage_changed","deal_stage_changed",
+  "job_completed","manual","scheduled","form_submitted","tag_added",
+  "email_opened","email_clicked","webhook_in","date_reached",
+  "sequence_enrolled","review_received","score_threshold",
+] as const;
+
+const ALL_ACTIONS = [
+  "send_email","update_contact","change_stage","change_deal_stage","add_deal_note",
+  "create_activity","create_deal_activity","notify","delay_minutes","webhook_out",
+  "add_tag","send_sms","send_whatsapp","log_call_activity",
+  "enroll_sequence","create_task","update_field",
+] as const;
+
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "workflows.read");
+    const { searchParams } = new URL(req.url);
+    if (searchParams.get("resource") === "meta") {
+      return NextResponse.json({ triggers: ALL_TRIGGERS, actions: ALL_ACTIONS });
+    }
     const workflows = await getSaasWorkflowService().getWorkflows(ctx.tenant.id);
     const ses_configured = Boolean(process.env.SES_FROM_EMAIL && process.env.SES_ACCESS_KEY_ID);
     return NextResponse.json({ workflows, ses_configured });

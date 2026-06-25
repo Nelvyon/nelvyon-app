@@ -81,7 +81,10 @@ export type WorkflowAction =
   | { type: "add_tag"; config: { contactId?: string; tag: string } }
   | { type: "send_sms"; config: { to: string; body: string } }
   | { type: "send_whatsapp"; config: { to: string; body: string } }
-  | { type: "log_call_activity"; config: { to: string; message?: string; contactId?: string } };
+  | { type: "log_call_activity"; config: { to: string; message?: string; contactId?: string } }
+  | { type: "enroll_sequence"; config: { sequenceId: string; contactId?: string } }
+  | { type: "create_task"; config: { title: string; description?: string; contactId?: string; dueInDays?: number } }
+  | { type: "update_field"; config: { contactId?: string; field: "status" | "pipeline_stage" | "value" | "notes"; value: string | number } };
 
 export interface SaasWorkflow {
   id: string;
@@ -166,6 +169,7 @@ const TRIGGERS: readonly TriggerType[] = [
   "date_reached",
   "sequence_enrolled",
   "review_received",
+  "score_threshold",
 ] as const;
 const STAGES: readonly PipelineStage[] = ["new", "contacted", "qualified", "proposal", "won", "lost"] as const;
 const CONTACT_STATUSES: readonly ContactStatus[] = ["lead", "prospect", "client", "churned"] as const;
@@ -275,7 +279,9 @@ export class SaasWorkflowService {
       );
       const row = rows[0];
       if (!row) throw new SaasWorkflowError("Failed to create workflow", "CONSTRAINT");
-      return rowToWorkflow(row);
+      const wf = rowToWorkflow(row);
+      await this.saveVersion(tenantId, wf.id, wf).catch(() => void 0);
+      return wf;
     } catch (e: unknown) {
       if (isCheckViolation(e)) throw new SaasWorkflowError("Invalid status or trigger_type", "CONSTRAINT");
       throw e;
@@ -324,7 +330,9 @@ export class SaasWorkflowService {
       );
       const row = rows[0];
       if (!row) throw new SaasWorkflowError("Workflow not found", "NOT_FOUND");
-      return rowToWorkflow(row);
+      const wf = rowToWorkflow(row);
+      await this.saveVersion(tenantId, wf.id, wf).catch(() => void 0);
+      return wf;
     } catch (e: unknown) {
       if (isCheckViolation(e)) throw new SaasWorkflowError("Invalid status or trigger_type", "CONSTRAINT");
       throw e;
@@ -420,6 +428,24 @@ export class SaasWorkflowService {
       if (triggerConfig.form_id) {
         const form = (triggerData.form ?? {}) as Record<string, unknown>;
         if (String(triggerConfig.form_id) !== String(form.id ?? "")) return false;
+      }
+    }
+    if (triggerType === "score_threshold") {
+      const scoreData = (triggerData.score ?? {}) as Record<string, unknown>;
+      if (triggerConfig.min_score !== undefined) {
+        if (Number(scoreData.value ?? 0) < Number(triggerConfig.min_score)) return false;
+      }
+      if (triggerConfig.grade && String(triggerConfig.grade) !== String(scoreData.grade ?? "")) return false;
+      if (triggerConfig.category && String(triggerConfig.category) !== String(scoreData.category ?? "")) return false;
+    }
+    if (triggerType === "sequence_enrolled") {
+      if (triggerConfig.sequence_id) {
+        if (String(triggerConfig.sequence_id) !== String(triggerData.sequenceId ?? "")) return false;
+      }
+    }
+    if (triggerType === "review_received") {
+      if (triggerConfig.min_rating !== undefined) {
+        if (Number(triggerData.rating ?? 0) < Number(triggerConfig.min_rating)) return false;
       }
     }
     return true;
@@ -638,6 +664,51 @@ export class SaasWorkflowService {
           } catch (e) {
             stepsExecuted.push({ action: action.type, ok: false, error: e instanceof Error ? e.message : String(e) });
           }
+        } else if (action.type === "enroll_sequence") {
+          const contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+          const contactId = action.config.contactId ?? (typeof contact.id === "string" ? contact.id : null);
+          if (!contactId) {
+            stepsExecuted.push({ action: action.type, ok: false, error: "contactId not resolvable" });
+          } else {
+            try {
+              const { getSaasSequencesService } = await import("./SaasSequencesService");
+              const enrollment = await getSaasSequencesService().enroll(tenantId, action.config.sequenceId, contactId);
+              stepsExecuted.push({ action: action.type, ok: true, enrollmentId: enrollment.id, sequenceId: action.config.sequenceId, contactId });
+            } catch (e) {
+              stepsExecuted.push({ action: action.type, ok: false, error: e instanceof Error ? e.message : String(e) });
+            }
+          }
+        } else if (action.type === "create_task") {
+          const contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+          const contactId = action.config.contactId ?? (typeof contact.id === "string" ? contact.id : null);
+          const dueDate = action.config.dueInDays
+            ? new Date(Date.now() + action.config.dueInDays * 86400_000).toISOString().slice(0, 10)
+            : null;
+          await this.db.query(
+            `INSERT INTO saas_activity_log (tenant_id, event_type, description, metadata)
+             VALUES ($1, 'workflow_task', $2, $3::jsonb)`,
+            [tenantId, action.config.title, JSON.stringify({ description: action.config.description ?? null, contactId, dueDate })],
+          );
+          stepsExecuted.push({ action: action.type, ok: true, title: action.config.title, contactId, dueDate });
+        } else if (action.type === "update_field") {
+          const ALLOWED_FIELDS = ["status", "pipeline_stage", "value", "notes"] as const;
+          type AllowedField = (typeof ALLOWED_FIELDS)[number];
+          const field = action.config.field as AllowedField;
+          if (!(ALLOWED_FIELDS as readonly string[]).includes(field)) {
+            stepsExecuted.push({ action: action.type, ok: false, error: `Field '${field}' not allowed` });
+          } else {
+            const contact = (triggerData.contact ?? {}) as Record<string, unknown>;
+            const contactId = action.config.contactId ?? (typeof contact.id === "string" ? contact.id : null);
+            if (!contactId) {
+              stepsExecuted.push({ action: action.type, ok: false, error: "contactId not resolvable" });
+            } else {
+              await this.db.query(
+                `UPDATE saas_contacts SET ${field} = $3, updated_at = NOW() WHERE tenant_id = $1 AND id = $2::uuid`,
+                [tenantId, contactId, action.config.value],
+              );
+              stepsExecuted.push({ action: action.type, ok: true, contactId, field, value: action.config.value });
+            }
+          }
         }
       }
 
@@ -664,6 +735,29 @@ export class SaasWorkflowService {
     }
     const rows = await this.getWorkflowRuns(workflowId, tenantId);
     return rows[0] as WorkflowRun;
+  }
+
+  async saveVersion(tenantId: string, workflowId: string, snapshot: SaasWorkflow): Promise<void> {
+    await this.db.query(
+      `INSERT INTO saas_workflow_versions (tenant_id, workflow_id, version_num, snapshot)
+       VALUES ($1, $2::uuid,
+         COALESCE((SELECT MAX(version_num)+1 FROM saas_workflow_versions WHERE workflow_id=$2::uuid AND tenant_id=$1), 1),
+         $3::jsonb)`,
+      [tenantId, workflowId, JSON.stringify(snapshot)],
+    );
+  }
+
+  async getVersions(tenantId: string, workflowId: string): Promise<Array<{ id: string; versionNum: number; createdAt: string }>> {
+    const rows = await this.db.query<{ id: string; version_num: number; created_at: string }>(
+      `SELECT id, version_num, created_at FROM saas_workflow_versions
+       WHERE tenant_id=$1 AND workflow_id=$2::uuid ORDER BY version_num DESC LIMIT 20`,
+      [tenantId, workflowId],
+    );
+    return rows.map((r) => ({
+      id: String(r.id),
+      versionNum: Number(r.version_num),
+      createdAt: new Date(r.created_at).toISOString(),
+    }));
   }
 
   async getWorkflowRuns(workflowId: string, tenantId: string): Promise<WorkflowRun[]> {
