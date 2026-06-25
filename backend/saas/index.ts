@@ -881,3 +881,20 @@ export {
   INTEGRATIONS_CATALOG,
   getCatalogBySlug,
 } from "./integrationsCatalog";
+
+export {
+  SaasMembershipService,
+  getSaasMembershipService,
+  resetSaasMembershipServiceForTests,
+  SaasMembershipError,
+  type BillingInterval,
+  type MemberStatus,
+  type AccessResourceType,
+  type MembershipPlanIncludes,
+  type MembershipPlan,
+  type MembershipMember,
+  type MembershipAccess,
+  type CreatePlanInput,
+  type SubscribeMemberInput,
+  type MemberPortal,
+} from "./SaasMembershipService";

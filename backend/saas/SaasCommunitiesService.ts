@@ -122,6 +122,26 @@ export class SaasCommunitiesService {
     if (!input.content?.trim()) throw Object.assign(new Error("content is required"), { code: "VALIDATION" });
     if (!input.authorName?.trim()) throw Object.assign(new Error("authorName is required"), { code: "VALIDATION" });
 
+    // Gating: if community has required_plan_id, require active membership
+    if (input.authorEmail) {
+      try {
+        const gating = await this.db.query<{ required_plan_id: string | null }>(
+          `SELECT required_plan_id FROM communities WHERE id=$1::uuid AND tenant_id=$2 LIMIT 1`,
+          [communityId, tenantId],
+        );
+        const planId = gating[0]?.required_plan_id ?? null;
+        if (planId) {
+          const { getSaasMembershipService } = await import("./SaasMembershipService");
+          const ok = await getSaasMembershipService().checkAccess(tenantId, input.authorEmail, "community", communityId);
+          if (!ok) throw Object.assign(new Error("Active membership required to post in this community"), { code: "MEMBERSHIP_REQUIRED" });
+        }
+      } catch (e: unknown) {
+        const code = (e as { code?: string })?.code;
+        if (code === "MEMBERSHIP_REQUIRED" || code === "VALIDATION") throw e;
+        // Non-fatal: pre-migration or service unavailable
+      }
+    }
+
     const rows = await this.db.query<Record<string, unknown>>(
       `WITH ins AS (
          INSERT INTO community_posts (community_id, tenant_id, author_name, author_email, title, content)
