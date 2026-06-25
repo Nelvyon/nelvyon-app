@@ -4,7 +4,7 @@
  * lead-scoring, reportes.
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_SETTINGS, FIXTURE_AUDIT, FIXTURE_LEAD_SCORING, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_SETTINGS, FIXTURE_AUDIT, FIXTURE_LEAD_SCORING, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS — Afiliados & Loyalty", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -19,8 +19,7 @@ test.describe("SaaS — Afiliados & Loyalty", () => {
   });
 
   test("GET /api/saas/affiliates 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/affiliates", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/affiliates");
   });
 
   test("/saas/loyalty carga (no error 500)", async ({ page }) => {
@@ -30,8 +29,7 @@ test.describe("SaaS — Afiliados & Loyalty", () => {
   });
 
   test("GET /api/saas/loyalty 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/loyalty", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/loyalty");
   });
 });
 
@@ -49,8 +47,7 @@ test.describe("SaaS — API Keys & Developers", () => {
   });
 
   test("GET /api/saas/api-keys 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/api-keys", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/api-keys");
   });
 
   test("/saas/developers carga con docs de API", async ({ page }) => {
@@ -89,8 +86,7 @@ test.describe("SaaS — Settings SSO tab", () => {
   });
 
   test("GET /api/saas/sso 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/sso", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/sso");
   });
 });
 
@@ -110,8 +106,7 @@ test.describe("SaaS — Auditoría", () => {
   });
 
   test("GET /api/saas/audit 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/audit", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/audit");
   });
 
   test("paginación de auditoría con total > 0", async ({ page }) => {
@@ -139,8 +134,7 @@ test.describe("SaaS — Lead Scoring & Reportes", () => {
   });
 
   test("GET /api/saas/lead-scoring 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/lead-scoring", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/lead-scoring");
   });
 
   test("/saas/reportes carga panel de atribución", async ({ page }) => {
@@ -151,7 +145,6 @@ test.describe("SaaS — Lead Scoring & Reportes", () => {
   });
 
   test("GET /api/saas/reportes 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/reportes", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/reportes");
   });
 });

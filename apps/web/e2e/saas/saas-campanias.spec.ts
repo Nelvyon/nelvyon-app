@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_CAMPANIAS } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_CAMPANIAS, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS Campanias", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -14,8 +14,7 @@ test.describe("SaaS Campanias", () => {
   });
 
   test("GET /api/saas/campanias 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/campanias", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/campanias");
   });
 
   test("respuesta de campanias incluye ses_configured", async ({ page }) => {
@@ -31,8 +30,11 @@ test.describe("SaaS Campanias", () => {
   });
 
   test("POST /api/saas/campanias 401 sin auth header", async ({ request }) => {
-    const res = await request.post("/api/saas/campanias", { data: { name: "Test", subject: "s", body: "<p>b</p>" }, maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/campanias", "POST", {
+      name: "Test",
+      subject: "s",
+      body: "<p>b</p>",
+    });
   });
 
   test("banner SES visible cuando ses_configured=false (fixture)", async ({ page }) => {

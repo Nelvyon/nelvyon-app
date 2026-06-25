@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_WORKFLOWS, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_WORKFLOWS, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS Workflows", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -14,8 +14,7 @@ test.describe("SaaS Workflows", () => {
   });
 
   test("GET /api/saas/workflows 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/workflows", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/workflows");
   });
 
   test("respuesta de workflows incluye ses_configured", async ({ page }) => {
@@ -31,8 +30,10 @@ test.describe("SaaS Workflows", () => {
   });
 
   test("POST /api/saas/workflows 401 sin auth", async ({ request }) => {
-    const res = await request.post("/api/saas/workflows", { data: { name: "WF Test", trigger_type: "manual" }, maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/workflows", "POST", {
+      name: "WF Test",
+      trigger_type: "manual",
+    });
   });
 
   test("página workflows no produce errores JS críticos", async ({ page }) => {

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_BILLING, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_BILLING, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS Billing", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -14,8 +14,7 @@ test.describe("SaaS Billing", () => {
   });
 
   test("GET /api/saas/billing 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/billing", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/billing");
   });
 
   test("/saas/billing carga con token y plan visible", async ({ page }) => {

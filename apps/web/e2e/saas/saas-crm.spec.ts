@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_CONTACTS, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_CONTACTS, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS CRM — contacts", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -35,8 +35,7 @@ test.describe("SaaS CRM — contacts", () => {
   });
 
   test("GET /api/saas/crm/contacts 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/crm/contacts", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/crm/contacts");
   });
 
   test("GET /api/saas/crm/contacts 200 con fixture mock (page.route)", async ({ page }) => {
@@ -58,7 +57,6 @@ test.describe("SaaS CRM — contacts", () => {
   });
 
   test("POST /api/saas/crm/contacts 401 sin auth", async ({ request }) => {
-    const res = await request.post("/api/saas/crm/contacts", { data: { name: "Test" }, maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/crm/contacts", "POST", { name: "Test" });
   });
 });

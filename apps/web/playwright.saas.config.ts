@@ -13,6 +13,7 @@ const TEST_JWT_SECRET = process.env.JWT_SECRET ?? "test-secret-for-playwright-sa
 export default defineConfig({
   testDir: "./e2e/saas",
   timeout: 60_000,
+  fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI

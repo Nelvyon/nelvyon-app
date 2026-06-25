@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS Pipeline — deals", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -14,8 +14,7 @@ test.describe("SaaS Pipeline — deals", () => {
   });
 
   test("GET /api/saas/deals 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/deals", { maxRedirects: 0 });
-    expect(res.status()).toBe(401);
+    await expectUnauthorizedApi(request, "/api/saas/deals");
   });
 
   test("GET /api/saas/deals devuelve fixture con token mock", async ({ page }) => {
