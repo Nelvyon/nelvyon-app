@@ -898,3 +898,19 @@ export {
   type SubscribeMemberInput,
   type MemberPortal,
 } from "./SaasMembershipService";
+
+export {
+  SaasCpqEnterpriseService,
+  getSaasCpqEnterpriseService,
+  resetSaasCpqEnterpriseServiceForTests,
+  SaasCpqEnterpriseError,
+  type ContractStatus as CpqContractStatus,
+  type BillingInterval as ContractBillingInterval,
+  type DunningChannel,
+  type DunningStatus,
+  type SaasContract,
+  type CreateContractInput,
+  type SaasDunningEvent,
+  type DunningSummary,
+  type ExchangeRate,
+} from "./SaasCpqEnterpriseService";

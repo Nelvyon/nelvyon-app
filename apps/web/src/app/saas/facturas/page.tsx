@@ -161,16 +161,24 @@ export default function SaasFacturasPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | undefined>();
   const [filterStatus, setFilterStatus] = useState<InvoiceStatus | "all">("all");
+  const [dunningSummary, setDunningSummary] = useState<{ overdueCount: number; totalOverdueAmount: number; pendingAttempts: number } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/saas/facturas");
+      const [res, dRes] = await Promise.all([
+        fetch("/api/saas/facturas"),
+        fetch("/api/saas/facturas/dunning"),
+      ]);
       if (res.ok) {
         const d = (await res.json()) as { facturas?: Invoice[]; invoices?: Invoice[] };
         setInvoices(d.facturas ?? d.invoices ?? []);
       } else {
         setInvoices([]);
+      }
+      if (dRes.ok) {
+        const dd = await dRes.json() as { summary?: { overdueCount: number; totalOverdueAmount: number; pendingAttempts: number } };
+        setDunningSummary(dd.summary ?? null);
       }
     } catch {
       setInvoices([]);
@@ -196,6 +204,14 @@ export default function SaasFacturasPage() {
               <NelvyonDsSectionHeader title="Facturación a Clientes" subtitle="Crea, envía y gestiona las facturas de tus clientes desde Nelvyon" />
               <NelvyonDsButton onClick={() => { setEditingInvoice(undefined); setShowModal(true); }}>+ Nueva factura</NelvyonDsButton>
             </div>
+
+            {dunningSummary && dunningSummary.overdueCount > 0 && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex flex-wrap items-center gap-3">
+                <span className="text-red-400 font-medium text-sm">⚠️ Dunning activo</span>
+                <span className="text-red-300/70 text-sm">{dunningSummary.overdueCount} facturas vencidas · €{dunningSummary.totalOverdueAmount.toFixed(0)}</span>
+                <span className="ml-auto text-xs text-red-300/50">{dunningSummary.pendingAttempts} recordatorios pendientes</span>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
@@ -258,6 +274,12 @@ export default function SaasFacturasPage() {
                             <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => { setEditingInvoice(inv); setShowModal(true); }}>Ver</NelvyonDsButton>
                             {inv.status !== "paid" && <NelvyonDsButton variant="ghost" className="text-xs">↓ PDF</NelvyonDsButton>}
                             {inv.status === "draft" && <NelvyonDsButton className="text-xs">↗ Enviar</NelvyonDsButton>}
+                            {inv.status === "overdue" && (
+                              <NelvyonDsButton variant="ghost" className="text-xs text-red-400 hover:text-red-300"
+                                onClick={() => void fetch("/api/saas/facturas/dunning", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoiceId: inv.id }) }).then(() => void load())}>
+                                🔔 Recordatorio
+                              </NelvyonDsButton>
+                            )}
                           </div>
                         </td>
                       </tr>
