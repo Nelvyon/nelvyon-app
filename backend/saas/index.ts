@@ -1,4 +1,18 @@
 ﻿export {
+  SaasBriefToLaunchService,
+  SaasBriefToLaunchError,
+  getSaasBriefToLaunchService,
+  resetSaasBriefToLaunchServiceForTests,
+  type PackLaunch,
+  type LaunchStatus,
+  type LaunchStep,
+  type LaunchStatusDetail,
+  type AvailablePackDef,
+  type CreateLaunchInput,
+  type SaasBriefToLaunchErrorCode,
+  type PackRunnerPort,
+} from "./SaasBriefToLaunchService";
+export {
   SaasOnboardingService,
   SaasOnboardingError,
   assertSaasPlan,
