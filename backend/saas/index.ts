@@ -669,9 +669,14 @@ export {
   type WebPage,
   type WebPageType,
   type WebPageStatus,
+  type WebPageVersion,
   type PageSection,
+  type SectionType,
+  type DomainStatus,
+  type SslStatus,
   type CreatePageInput,
   type UpdatePageInput,
+  type AddSectionInput,
 } from "./SaasWebBuilderService";
 export {
   SaasLmsService,

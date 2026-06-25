@@ -3,19 +3,26 @@ import { SaasWebBuilderService, SaasWebBuilderError, resetSaasWebBuilderServiceF
 
 beforeEach(() => { resetSaasWebBuilderServiceForTests(); });
 
+const heroSection = { id: "s1", type: "hero", content: { headline: "H", subtitle: "", ctaLabel: "Go", ctaUrl: "#" } };
+
 const pageRow = {
   id: "p1", tenant_id: "t1", title: "My Landing", slug: "my-landing",
-  type: "landing", status: "draft", sections: [], views: 0,
-  published_at: null, created_at: new Date(), updated_at: new Date(),
+  type: "landing", status: "draft",
+  sections: [heroSection],
+  seo_title: null, seo_description: null, published_html: null, cdn_url: null,
+  views: 0, published_at: null, custom_domain: null,
+  domain_status: "none", domain_verified_at: null, ssl_status: "pending", ssl_verified_at: null,
+  created_at: new Date(), updated_at: new Date(),
 };
 
 function makeDb(pages: unknown[] = []) {
   return {
     query: vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("FROM saas_tenants")) return [{ subdomain: "demo", slug: "demo" }];
       if (sql.includes("FROM saas_web_pages")) return pages;
       if (sql.includes("INSERT INTO saas_web_pages")) return [pageRow];
-      if (sql.includes("UPDATE saas_web_pages SET status='published'")) {
-        return pages.length ? [{ ...pageRow, status: "published", published_at: new Date() }] : [];
+      if (sql.includes("UPDATE saas_web_pages") && sql.includes("status='published'")) {
+        return pages.length ? [{ ...pageRow, status: "published", published_at: new Date(), published_html: "<!DOCTYPE html>", cdn_url: "https://pages.nelvyon.com/demo/my-landing" }] : [];
       }
       if (sql.includes("UPDATE saas_web_pages")) return [pageRow];
       if (sql.includes("DELETE FROM saas_web_pages")) return pages.length ? [{ id: "p1" }] : [];
