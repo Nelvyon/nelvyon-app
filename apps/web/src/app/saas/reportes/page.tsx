@@ -53,6 +53,8 @@ export default function SaasReportesPage() {
   const [campaigns, setCampaigns]           = useState<CampaignBreakdown[]>([]);
   const [attrTab, setAttrTab]               = useState<"channels" | "campaigns">("channels");
   const [attrLoading, setAttrLoading]       = useState(false);
+  const [deliverableRevenue, setDeliverableRevenue] = useState<Array<{ deliverableId: string; packId: string | null; utmCampaign: string | null; conversions: number; adsSpend: number; attributedRevenue: number; roas: number | null }>>([]);
+  const [revenueLoading, setRevenueLoading] = useState(false);
 
   const loadAttribution = useCallback(async (d: number) => {
     setAttrLoading(true);
@@ -85,7 +87,18 @@ export default function SaasReportesPage() {
     } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { void load(); void loadAttribution(30); }, [load, loadAttribution]);
+  useEffect(() => {
+    void load();
+    void loadAttribution(30);
+    setRevenueLoading(true);
+    fetch("/api/saas/entregables/revenue?days=30")
+      .then(r => r.ok ? r.json() : { items: [] })
+      .then((d: { items?: Array<{ deliverableId: string; packId: string | null; utmCampaign: string | null; conversions: number; adsSpend: number; attributedRevenue: number; roas: number | null }> }) => {
+        setDeliverableRevenue((d.items ?? []).slice(0, 5));
+      })
+      .catch(() => null)
+      .finally(() => setRevenueLoading(false));
+  }, [load, loadAttribution]);
 
   async function generateReport(type: string) {
     setGenerating(type); setError(null);
@@ -308,6 +321,57 @@ export default function SaasReportesPage() {
             </div>
           )}
         </div>
+
+        {/* Revenue por entregable — top 5 */}
+        <div className="space-y-3">
+          <NelvyonDsSectionHeader title="Revenue por entregable (últimos 30 días)" />
+          {revenueLoading ? (
+            <NelvyonDsCard className="p-6 text-center text-muted-foreground text-sm">Cargando…</NelvyonDsCard>
+          ) : deliverableRevenue.length === 0 ? (
+            <NelvyonDsCard className="p-6 text-center">
+              <p className="text-muted-foreground text-sm">Sin datos de revenue atribuido.</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Vincula una campaña UTM a tus entregables desde{" "}
+                <a href="/saas/entregables" className="text-primary hover:underline">Entregables →</a>
+              </p>
+            </NelvyonDsCard>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border border-white/10">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 text-white/40 text-xs uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left">Entregable / Campaña</th>
+                    <th className="px-4 py-3 text-right">Conv.</th>
+                    <th className="px-4 py-3 text-right">Spend</th>
+                    <th className="px-4 py-3 text-right">Revenue</th>
+                    <th className="px-4 py-3 text-right">ROAS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {deliverableRevenue.map((row) => (
+                    <tr key={row.deliverableId} className="border-b border-white/5 hover:bg-white/5">
+                      <td className="px-4 py-3">
+                        <p className="text-white/70 text-xs font-mono truncate max-w-[180px]">{row.deliverableId.slice(0, 8)}…</p>
+                        {row.utmCampaign && <p className="text-white/40 text-xs">{row.utmCampaign}</p>}
+                      </td>
+                      <td className="px-4 py-3 text-right text-white/70">{row.conversions}</td>
+                      <td className="px-4 py-3 text-right text-white/70">€{row.adsSpend.toFixed(0)}</td>
+                      <td className="px-4 py-3 text-right text-white font-semibold">€{row.attributedRevenue.toFixed(0)}</td>
+                      <td className="px-4 py-3 text-right">
+                        {row.roas !== null ? (
+                          <span className={row.roas >= 2 ? "text-green-400 font-semibold" : "text-yellow-400"}>
+                            {row.roas.toFixed(1)}x
+                          </span>
+                        ) : <span className="text-white/30">—</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
       </div>
     </SaasShellLayout>
   );

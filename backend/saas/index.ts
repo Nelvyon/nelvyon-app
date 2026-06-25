@@ -944,3 +944,16 @@ export {
   type UpdateAutopilotInput,
   type RunNowResult,
 } from "./SaasAutopilotService";
+
+export {
+  SaasDeliverableRevenueService,
+  getSaasDeliverableRevenueService,
+  resetSaasDeliverableRevenueServiceForTests,
+  SaasDeliverableRevenueError,
+  type RevenueAttributionModel,
+  type DeliverableLink,
+  type LinkDeliverableInput,
+  type DeliverableRevenue,
+  type DeliverableRevenueWithMeta,
+  type PackRevenueSummary,
+} from "./SaasDeliverableRevenueService";
