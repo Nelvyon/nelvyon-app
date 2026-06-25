@@ -53,12 +53,9 @@ test.describe("SaaS Funnels — depth (S36)", () => {
 
   test("builder carga con lista de funnels y KPIs", async ({ page }) => {
     await page.goto("/saas/funnels");
-    await expect(page).not.toHaveURL(/\/auth\/login/);
-    await page.waitForTimeout(600);
-    const body = await page.locator("body").textContent();
-    expect(body).not.toContain("Something went wrong");
-    expect(body).toContain("Funnel Builder");
-    expect(body).toContain("E2E Test Funnel");
+    await expect(page).not.toHaveURL(/\/login/);
+    await expect(page.getByRole("heading", { name: "Funnel Builder" })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("E2E Test Funnel")).toBeVisible();
   });
 
   test("tab analytics se muestra al entrar al builder", async ({ page }) => {
@@ -72,7 +69,6 @@ test.describe("SaaS Funnels — depth (S36)", () => {
     await page.goto("/saas/funnels?id=f-e2e-1");
     await page.waitForTimeout(600);
 
-    // Click Analytics tab
     const analyticsTab = page.locator("button", { hasText: "Analytics" });
     if (await analyticsTab.isVisible()) {
       await analyticsTab.click();

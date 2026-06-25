@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Playwright configuration for the dedicated SaaS E2E suite.
  * Used by .github/workflows/playwright-saas.yml
  *
@@ -14,7 +14,7 @@ export default defineConfig({
   testDir: "./e2e/saas",
   timeout: 30_000,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 4 : undefined,
+  workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI
     ? [["list"], ["html", { open: "never", outputFolder: "playwright-report-saas" }]]
     : [["list"]],
@@ -36,7 +36,6 @@ export default defineConfig({
     env: {
       JWT_SECRET: TEST_JWT_SECRET,
       NODE_ENV: "test",
-      // DATABASE_URL intentionally empty — all DB calls mocked via page.route()
       DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://noop:noop@localhost:5432/noop",
     },
   },

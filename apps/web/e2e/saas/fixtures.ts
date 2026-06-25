@@ -7,6 +7,10 @@
  */
 import { type Page, type BrowserContext } from "@playwright/test";
 
+
+/** Matches login redirect from middleware (/login?next=...). */
+export const LOGIN_URL = /\/login/;
+
 export const DUMMY_TOKEN = "e2e-test-token-nelvyon";
 
 /** Injects the platform session cookie that lets middleware pass SaaS pages. */

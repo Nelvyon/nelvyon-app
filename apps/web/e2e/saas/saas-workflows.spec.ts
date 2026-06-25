@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_WORKFLOWS } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_WORKFLOWS, LOGIN_URL } from "./fixtures";
 
 test.describe("SaaS Workflows", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -14,8 +14,8 @@ test.describe("SaaS Workflows", () => {
   });
 
   test("GET /api/saas/workflows 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/workflows");
-    expect([401, 302]).toContain(res.status());
+    const res = await request.get("/api/saas/workflows", { maxRedirects: 0 });
+    expect(res.status()).toBe(401);
   });
 
   test("respuesta de workflows incluye ses_configured", async ({ page }) => {
@@ -31,8 +31,8 @@ test.describe("SaaS Workflows", () => {
   });
 
   test("POST /api/saas/workflows 401 sin auth", async ({ request }) => {
-    const res = await request.post("/api/saas/workflows", { data: { name: "WF Test", trigger_type: "manual" } });
-    expect([401, 302]).toContain(res.status());
+    const res = await request.post("/api/saas/workflows", { data: { name: "WF Test", trigger_type: "manual" }, maxRedirects: 0 });
+    expect(res.status()).toBe(401);
   });
 
   test("página workflows no produce errores JS críticos", async ({ page }) => {
@@ -49,6 +49,6 @@ test.describe("SaaS Workflows", () => {
       route.fulfill({ json: FIXTURE_WORKFLOWS }));
     await page.goto("/saas/workflows");
     await page.waitForTimeout(600);
-    expect(page.url()).not.toContain("auth/login");
+    await expect(page).not.toHaveURL(LOGIN_URL);
   });
 });

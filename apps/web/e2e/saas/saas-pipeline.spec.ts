@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis } from "./fixtures";
+import { setAuthCookie, mockSaasApis, LOGIN_URL } from "./fixtures";
 
 test.describe("SaaS Pipeline — deals", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -14,8 +14,8 @@ test.describe("SaaS Pipeline — deals", () => {
   });
 
   test("GET /api/saas/deals 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/deals");
-    expect([401, 302]).toContain(res.status());
+    const res = await request.get("/api/saas/deals", { maxRedirects: 0 });
+    expect(res.status()).toBe(401);
   });
 
   test("GET /api/saas/deals devuelve fixture con token mock", async ({ page }) => {
@@ -26,8 +26,7 @@ test.describe("SaaS Pipeline — deals", () => {
     });
     await page.goto("/saas/pipeline");
     await page.waitForTimeout(600);
-    // No redirect to login with auth cookie
-    expect(page.url()).not.toContain("auth/login");
+    await expect(page).not.toHaveURL(LOGIN_URL);
   });
 
   test("vista Kanban no produce error JS", async ({ page }) => {

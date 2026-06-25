@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
@@ -10,13 +10,13 @@ import {
   NelvyonDsButton,
 } from "@/design-system/components";
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ Types ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 interface LoyaltyTier { name: string; min_points: number }
 interface LoyaltyProgram { id: string; pointsPerEur: number; tiers: LoyaltyTier[]; active: boolean }
 interface LoyaltyBalance { id: string; contactId: string; points: number; tier: string; updatedAt: string }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ Helpers ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 type BadgeTone = "neutral" | "primary" | "success" | "warning" | "danger";
 const TIER_TONE: Record<string, BadgeTone> = { Bronze: "warning", Silver: "neutral", Gold: "success", Platinum: "primary" };
@@ -29,7 +29,7 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
 
 const inputCls = "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary";
 
-// ── Main Page ────────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ Main Page ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 export default function SaasLoyaltyPage() {
   const [program, setProgram]   = useState<LoyaltyProgram | null>(null);
@@ -84,7 +84,7 @@ export default function SaasLoyaltyPage() {
 
   if (loading) return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="loyalty" />}>
-      <p className="text-muted-foreground text-sm p-8">Cargando programa de fidelización…</p>
+      <p className="text-muted-foreground text-sm p-8">Cargando programa de fidelizaci├│nÔÇª</p>
     </SaasShellLayout>
   );
   if (error) return (
@@ -102,8 +102,8 @@ export default function SaasLoyaltyPage() {
     <SaasShellLayout sidebar={<SaasSidebar activeId="loyalty" />}>
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader
-          title="Programa de Fidelización"
-          subtitle={`${p.pointsPerEur} punto(s)/€ · ${p.tiers.length} niveles · ${balances.length} miembros`}
+          title="Programa de Fidelizaci├│n"
+          subtitle={`${p.pointsPerEur} punto(s)/Ôé¼ ┬À ${p.tiers.length} niveles ┬À ${balances.length} miembros`}
         />
 
         {/* KPIs */}
@@ -133,7 +133,7 @@ export default function SaasLoyaltyPage() {
           {p.tiers.map(tier => (
             <NelvyonDsCard key={tier.name} className="p-3 flex items-center gap-2">
               <NelvyonDsBadge tone={TIER_TONE[tier.name] ?? "neutral"}>{tier.name}</NelvyonDsBadge>
-              <span className="text-xs text-muted-foreground">≥ {tier.min_points.toLocaleString()} pts</span>
+              <span className="text-xs text-muted-foreground">ÔëÑ {tier.min_points.toLocaleString()} pts</span>
               <span className="text-xs font-semibold text-foreground ml-2">{tierCount[tier.name] ?? 0}</span>
             </NelvyonDsCard>
           ))}
@@ -146,7 +146,7 @@ export default function SaasLoyaltyPage() {
               onClick={() => setTab(t)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === t ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
             >
-              {t === "members" ? "Miembros" : t === "earn" ? "Dar puntos" : "Configuración"}
+              {t === "members" ? "Miembros" : t === "earn" ? "Dar puntos" : "Configuraci├│n"}
             </button>
           ))}
         </div>
@@ -156,7 +156,7 @@ export default function SaasLoyaltyPage() {
           <div className="flex flex-col gap-2">
             {balances.length === 0 ? (
               <NelvyonDsCard className="p-8 text-center text-muted-foreground text-sm">
-                Sin miembros todavía. Usa "Dar puntos" para enrolar el primer contacto.
+                Sin miembros todavía. Usa &quot;Dar puntos&quot; para enrolar el primer contacto.
               </NelvyonDsCard>
             ) : (
               balances.map(b => (
@@ -184,18 +184,18 @@ export default function SaasLoyaltyPage() {
               <input className={inputCls} value={earnContactId} onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEarnContactId(ev.target.value)} placeholder="uuid-del-contacto" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Importe en euros (€)</p>
+              <p className="text-xs text-muted-foreground mb-1">Importe en euros (Ôé¼)</p>
               <input className={inputCls} type="number" value={earnAmount} onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEarnAmount(ev.target.value)} placeholder="150" min="0.01" step="0.01" />
               {earnAmount && p && (
                 <p className="text-xs text-muted-foreground mt-1">= {Math.floor(Number(earnAmount) * p.pointsPerEur)} puntos</p>
               )}
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Razón (opcional)</p>
+              <p className="text-xs text-muted-foreground mb-1">Raz├│n (opcional)</p>
               <input className={inputCls} value={earnReason} onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEarnReason(ev.target.value)} placeholder="Compra #12345" />
             </div>
             <NelvyonDsButton onClick={earn} disabled={earning || !earnContactId.trim() || !earnAmount.trim()} variant="primary">
-              {earning ? "Procesando…" : "Dar puntos"}
+              {earning ? "ProcesandoÔÇª" : "Dar puntos"}
             </NelvyonDsButton>
           </NelvyonDsCard>
         )}
@@ -219,7 +219,7 @@ export default function SaasLoyaltyPage() {
               </div>
             </div>
             <NelvyonDsButton onClick={saveSettings} disabled={saving} variant="primary">
-              {saving ? "Guardando…" : "Guardar configuración"}
+              {saving ? "GuardandoÔÇª" : "Guardar configuraci├│n"}
             </NelvyonDsButton>
           </NelvyonDsCard>
         )}

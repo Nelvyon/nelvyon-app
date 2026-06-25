@@ -14,8 +14,8 @@ test.describe("SaaS Campanias", () => {
   });
 
   test("GET /api/saas/campanias 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/campanias");
-    expect([401, 302]).toContain(res.status());
+    const res = await request.get("/api/saas/campanias", { maxRedirects: 0 });
+    expect(res.status()).toBe(401);
   });
 
   test("respuesta de campanias incluye ses_configured", async ({ page }) => {
@@ -31,8 +31,8 @@ test.describe("SaaS Campanias", () => {
   });
 
   test("POST /api/saas/campanias 401 sin auth header", async ({ request }) => {
-    const res = await request.post("/api/saas/campanias", { data: { name: "Test", subject: "s", body: "<p>b</p>" } });
-    expect([401, 302]).toContain(res.status());
+    const res = await request.post("/api/saas/campanias", { data: { name: "Test", subject: "s", body: "<p>b</p>" }, maxRedirects: 0 });
+    expect(res.status()).toBe(401);
   });
 
   test("banner SES visible cuando ses_configured=false (fixture)", async ({ page }) => {
@@ -40,7 +40,6 @@ test.describe("SaaS Campanias", () => {
       route.fulfill({ json: { ...FIXTURE_CAMPANIAS, ses_configured: false } }));
     await page.goto("/saas/campanias");
     await page.waitForTimeout(600);
-    // Page loaded without crash
     await expect(page.locator("body")).toBeVisible();
   });
 });

@@ -11,24 +11,13 @@ import {
 } from "@/core/whitelabel/resolveWhitelabel";
 
 function isProtectedPath(pathname: string): boolean {
-  // /saas is the public marketing page — NOT protected
-  // /saas/dashboard and deeper routes remain protected
+  // /saas (exact) = public marketing landing; all other /saas/* routes require auth
+  if (pathname === "/saas" || pathname === "/saas/") return false;
+  if (pathname.startsWith("/saas/")) return true;
   return (
     pathname.startsWith("/os/") ||
     pathname === "/os" ||
     pathname.startsWith("/api/os/") ||
-    pathname.startsWith("/saas/dashboard") ||
-    pathname.startsWith("/saas/crm") ||
-    pathname.startsWith("/saas/campanas") ||
-    pathname.startsWith("/saas/workflows") ||
-    pathname.startsWith("/saas/billing") ||
-    pathname.startsWith("/saas/chatbot") ||
-    pathname.startsWith("/saas/seo") ||
-    pathname.startsWith("/saas/social") ||
-    pathname.startsWith("/saas/settings") ||
-    pathname.startsWith("/saas/leads") ||
-    pathname.startsWith("/saas/dialer") ||
-    pathname.startsWith("/saas/linkedin") ||
     pathname.startsWith("/api/saas/") ||
     pathname.startsWith("/admin/") ||
     pathname === "/admin" ||
@@ -124,8 +113,11 @@ export async function middleware(request: NextRequest) {
   if (isProtectedPath(pathname)) {
     const token = request.cookies.get("nelvyon_token")?.value;
     if (!token || token.length === 0) {
+      if (pathname.startsWith("/api/")) {
+        return end(NextResponse.json({ error: "Unauthorized", code: "UNAUTHORIZED" }, { status: 401 }));
+      }
       const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
+      url.pathname = "/login";
       url.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
       return end(NextResponse.redirect(url));
     }
