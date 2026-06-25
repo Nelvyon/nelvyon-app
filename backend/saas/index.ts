@@ -502,6 +502,10 @@ export {
   type AdsCampaignStatus,
   type RoasAlert,
   type AdsCreateCampaignInput,
+  type AdsAttributionModel,
+  type AdsCampaignLinkInput,
+  type AdsCampaignLink,
+  type AttributedRoasRow,
 } from "./SaasAdsDashboardService";
 export {
   OsLearningService,
@@ -645,6 +649,11 @@ export {
   type CloudWaSendInput,
   type CloudWaMessage,
   type InboundWaMessage,
+  type WaTemplate,
+  type WaTemplateComponent,
+  type WaTemplateStatus,
+  type WaTemplateCategory,
+  type WaCatalogProduct,
 } from "./SaasWhatsAppCloudService";
 export {
   SaasFunnelService,
@@ -848,4 +857,7 @@ export {
   type ChannelBreakdown,
   type CampaignBreakdown,
   type AttributionEventType,
+  type AttributionModel,
+  type ModelCredit,
+  type ModelBreakdown,
 } from "./SaasAttributionService";

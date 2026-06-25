@@ -29,14 +29,15 @@ export function SaasShellLayout({
           `,
         }}
       >
-        {/* Mobile top bar */}
-        <div className="flex items-center gap-3 px-4 py-3 lg:hidden border-b border-white/[0.05]">
+        {/* Mobile top bar — safe-area-inset-top for PWA standalone */}
+        <div className="flex items-center gap-3 px-4 lg:hidden border-b border-white/[0.05]"
+          style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top, 0.75rem))", paddingBottom: "0.75rem" }}>
           <button
             aria-label="Abrir menú"
             aria-expanded={sidebarOpen}
             aria-controls="saas-sidebar-mobile"
             onClick={() => setSidebarOpen(v => !v)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-white/60 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0084ff]/60"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-white/60 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0084ff]/60"
           >
             <span aria-hidden="true" className="text-sm">{sidebarOpen ? "✕" : "☰"}</span>
           </button>
