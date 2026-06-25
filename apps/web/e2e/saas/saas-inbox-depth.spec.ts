@@ -70,7 +70,7 @@ test.describe("SaaS Inbox Depth (S38)", () => {
   });
 
   test("filtro de canal funciona y tabs hilos/conversaciones visibles", async ({ page }) => {
-    await page.goto("/saas/inbox");
+    await page.goto("/saas/inbox", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(600);
 
     const body = await page.locator("body").textContent();
@@ -84,7 +84,7 @@ test.describe("SaaS Inbox Depth (S38)", () => {
   });
 
   test("SLA badge visible cuando hay conversación con slaDueAt próximo", async ({ page }) => {
-    await page.goto("/saas/inbox");
+    await page.goto("/saas/inbox", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(600);
 
     const body = await page.locator("body").textContent();

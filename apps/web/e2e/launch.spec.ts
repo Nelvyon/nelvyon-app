@@ -24,7 +24,6 @@ test("GET /api/health responde 200 con status ok", async ({ request }) => {
 test("rutas stub legacy devuelven 410 Gone", async ({ request }) => {
   const stubs = [
     "/api/saas/certificados",
-    "/api/saas/knowledge-base",
     "/api/saas/encuestas",
     "/api/saas/comunidades",
     "/api/saas/documentos",

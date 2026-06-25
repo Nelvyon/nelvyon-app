@@ -13,7 +13,6 @@ import {
 /** Legacy SaaS API stubs that return 410 Gone without auth — must not be blocked by middleware. */
 const SAAS_LEGACY_GONE = new Set([
   "/api/saas/certificados",
-  "/api/saas/knowledge-base",
   "/api/saas/encuestas",
   "/api/saas/comunidades",
   "/api/saas/documentos",

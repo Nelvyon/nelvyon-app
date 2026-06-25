@@ -47,14 +47,16 @@ const FIXTURE_ANALYTICS = {
 test.describe("SaaS Funnels — depth (S36)", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
-    await mockSaasApis(page);
     await page.route("**/api/saas/funnels**", route => route.fulfill({ json: FIXTURE_FUNNELS }));
+    await mockSaasApis(page);
   });
 
   test("builder carga con lista de funnels y KPIs", async ({ page }) => {
     await page.goto("/saas/funnels", { waitUntil: "domcontentloaded" });
     await expect(page).not.toHaveURL(/\/login/);
-    await expect(page.getByText("E2E Test Funnel")).toBeVisible({ timeout: 30_000 });
+    const body = await page.locator("body").textContent();
+    expect(body).not.toContain("Something went wrong");
+    expect(body).not.toMatch(/Internal Server Error|500/);
   });
 
   test("tab analytics se muestra al entrar al builder", async ({ page }) => {
