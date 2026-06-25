@@ -49,7 +49,8 @@ export type SaasNavId =
   | "store"
   | "affiliates"
   | "loyalty"
-  | "memberships";
+  | "memberships"
+  | "entregables";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -103,6 +104,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "chat", label: "💬 Asistente IA", href: "/saas/chat", group: "ia" },
   { id: "copywriter", label: "✍️ Copywriter IA", href: "/saas/copywriter", group: "ia" },
   // Cuenta
+  { id: "entregables", label: "📦 Entregables", href: "/saas/entregables", group: "cuenta" },
   { id: "reportes", label: "Reportes", href: "/saas/reportes", group: "cuenta" },
   { id: "integraciones", label: "Integraciones", href: "/saas/integraciones", group: "cuenta" },
   { id: "herramientas", label: "🛠️ Herramientas", href: "/saas/herramientas", group: "cuenta" },
