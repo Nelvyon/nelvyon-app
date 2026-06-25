@@ -24,7 +24,11 @@ export type SaasAction =
   | "notifications.write"
   | "profile.read"
   | "profile.write"
-  | "invoices.read";
+  | "invoices.read"
+  | "affiliates.read"
+  | "affiliates.write"
+  | "loyalty.read"
+  | "loyalty.write";
 
 const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
   owner: [
@@ -51,6 +55,10 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "profile.read",
     "profile.write",
     "invoices.read",
+    "affiliates.read",
+    "affiliates.write",
+    "loyalty.read",
+    "loyalty.write",
   ],
   admin: [
     "contacts.read",
@@ -76,6 +84,10 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "profile.read",
     "profile.write",
     "invoices.read",
+    "affiliates.read",
+    "affiliates.write",
+    "loyalty.read",
+    "loyalty.write",
   ],
   member: [
     "contacts.read",
@@ -91,6 +103,8 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "profile.read",
     "profile.write",
     "invoices.read",
+    "affiliates.read",
+    "loyalty.read",
   ],
   viewer: [
     "contacts.read",
