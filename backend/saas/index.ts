@@ -932,3 +932,15 @@ export {
   type DeliverableSummary,
   type ListDeliverablesFilters,
 } from "./SaasDeliverablesHubService";
+
+export {
+  SaasAutopilotService,
+  getSaasAutopilotService,
+  resetSaasAutopilotServiceForTests,
+  SaasAutopilotError,
+  type AutopilotService,
+  type AutopilotSettings,
+  type AutopilotStatus,
+  type UpdateAutopilotInput,
+  type RunNowResult,
+} from "./SaasAutopilotService";
