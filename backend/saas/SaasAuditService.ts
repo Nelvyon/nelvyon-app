@@ -106,6 +106,48 @@ export class SaasAuditService {
     return rows.map(mapRow);
   }
 
+  async getTotal(tenantId: string, filters: AuditFilters = {}): Promise<number> {
+    const conditions: string[] = ["tenant_id = $1"];
+    const params: unknown[] = [tenantId];
+    let idx = 2;
+    if (filters.module) { conditions.push(`module = $${idx++}`); params.push(filters.module); }
+    if (filters.userId) { conditions.push(`user_id = $${idx++}::uuid`); params.push(filters.userId); }
+    if (filters.action) { conditions.push(`action = $${idx++}`); params.push(filters.action); }
+    if (filters.from)   { conditions.push(`created_at >= $${idx++}::timestamptz`); params.push(filters.from); }
+    if (filters.to)     { conditions.push(`created_at <= $${idx++}::timestamptz`); params.push(filters.to); }
+    const rows = await this.db.query<{ count: string }>(
+      `SELECT COUNT(*)::text as count FROM audit_logs WHERE ${conditions.join(" AND ")}`,
+      params,
+    );
+    return parseInt(rows[0]?.count ?? "0", 10);
+  }
+
+  async exportCsv(tenantId: string, filters: AuditFilters = {}): Promise<string> {
+    const entries = await this.list(tenantId, { ...filters, limit: 5000, offset: 0 });
+    const header  = "id,tenant_id,user_id,user_email,action,module,resource_id,resource_type,ip_address,created_at";
+    const rows    = entries.map(e =>
+      [e.id, e.tenantId, e.userId ?? "", e.userEmail ?? "", e.action, e.module,
+       e.resourceId ?? "", e.resourceType ?? "", e.ipAddress ?? "", e.createdAt]
+        .map(v => `"${String(v).replace(/"/g, '""')}"`)
+        .join(","),
+    );
+    return [header, ...rows].join("\n");
+  }
+
+  /** Delete entries older than `days` days (retention policy). */
+  async purgeOlderThan(tenantId: string, days: number): Promise<number> {
+    if (days < 1) throw new Error("days must be >= 1");
+    const rows = await this.db.query<{ count: string }>(
+      `WITH deleted AS (
+         DELETE FROM audit_logs
+         WHERE tenant_id=$1 AND created_at < NOW() - ($2 || ' days')::interval
+         RETURNING id
+       ) SELECT COUNT(*)::text as count FROM deleted`,
+      [tenantId, String(days)],
+    );
+    return parseInt(rows[0]?.count ?? "0", 10);
+  }
+
   async getModuleStats(tenantId: string): Promise<AuditModuleStats[]> {
     const rows = await this.db.query<{ module: string; count: string }>(
       `SELECT module, COUNT(*)::text as count FROM audit_logs

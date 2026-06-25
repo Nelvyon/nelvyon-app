@@ -28,7 +28,14 @@ export type SaasAction =
   | "affiliates.read"
   | "affiliates.write"
   | "loyalty.read"
-  | "loyalty.write";
+  | "loyalty.write"
+  // SSO (Enterprise) — owner/admin manage, only owner can enforce
+  | "sso.read"
+  | "sso.write"
+  // Audit — owner/admin can read logs and export CSV
+  | "audit.read"
+  // Settings write — owner only: SSO enforce, retention policy
+  | "settings.write";
 
 const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
   owner: [
@@ -59,6 +66,10 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "affiliates.write",
     "loyalty.read",
     "loyalty.write",
+    "sso.read",
+    "sso.write",
+    "audit.read",
+    "settings.write",
   ],
   admin: [
     "contacts.read",
@@ -88,6 +99,9 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "affiliates.write",
     "loyalty.read",
     "loyalty.write",
+    "sso.read",
+    "sso.write",
+    "audit.read",
   ],
   member: [
     "contacts.read",
@@ -105,6 +119,7 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "invoices.read",
     "affiliates.read",
     "loyalty.read",
+    "sso.read",
   ],
   viewer: [
     "contacts.read",
@@ -117,6 +132,7 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "notifications.write",
     "profile.read",
     "invoices.read",
+    "sso.read",
   ],
 };
 

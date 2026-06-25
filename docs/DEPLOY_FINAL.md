@@ -41,7 +41,8 @@
 | S29 | Marketing Hub: SaasLeadScoringService (reglas CRUD + scoreContact, grade A-D, hot/warm/cold), SaasAttributionService (UTM multi-touch, channel/campaign breakdown, first-last-linear), score_threshold en WorkflowTriggerType, migration 440, /api/saas/lead-scoring + /api/saas/reportes, UIs /saas/lead-scoring + /saas/reportes cableadas con atribución, 35 tests | 54e14d51 |
 | S30 | Automations elite: score_threshold en TRIGGERS[] + matchesTriggerConfig (min_score/grade/category), review_received (min_rating) + sequence_enrolled (sequence_id), 3 nuevas acciones (enroll_sequence, create_task, update_field), version snapshots (saas_workflow_versions migration 441 + saveVersion/getVersions), /api/saas/workflows?resource=meta, /versions route, UI /saas/workflows reescrita (16 triggers, 17 acciones, builder visual paso a paso, panel detalle + runs + versiones), score_threshold dispatch en scoreContact, 23 tests | d63c315f |
 | S31 | Afiliados + Loyalty tenant real: migration 442 (6 tablas), SaasAffiliateService (programa, links únicos AFF*, trackClick/trackConversion, comisiones pending→approved→paid, payoutSummary), SaasLoyaltyService (programa, earn/redeem/adjust puntos, tiers Bronze/Silver/Gold/Platinum auto-upgrade, balances, transacciones), saasRbac: +affiliates.read/write +loyalty.read/write, /api/saas/affiliates + /api/saas/loyalty, saasNav: +affiliates +loyalty, UI /saas/affiliates (enlaces, comisiones, config) + /saas/loyalty reescrita (miembros, dar puntos, config), 27 tests | 20d6b55b |
-| S32 | API pública + OpenAPI + dev portal: migration 443 (api_key_usage_log + daily view), requirePublicApiContext (in-memory rate limit 60req/min + scope check), /api/public/v1/contacts (GET+POST crm.read/write), /api/public/v1/deals (GET pipeline.read), /api/public/v1/campaigns (GET campaigns.read), /api/public/v1/workflows/trigger (POST crm.write), /api/saas/api-keys/usage (GET 7d chart), docs/openapi/saas-public-v1.yaml (OpenAPI 3.1), /saas/developers (curl examples + endpoint table + scopes + OpenAPI download), /saas/api-keys fix (rawKey real, link developers), 24 tests | (current) |
+| S32 | API pública + OpenAPI + dev portal: migration 443 (api_key_usage_log + daily view), requirePublicApiContext (in-memory rate limit 60req/min + scope check), /api/public/v1/contacts (GET+POST crm.read/write), /api/public/v1/deals (GET pipeline.read), /api/public/v1/campaigns (GET campaigns.read), /api/public/v1/workflows/trigger (POST crm.write), /api/saas/api-keys/usage (GET 7d chart), docs/openapi/saas-public-v1.yaml (OpenAPI 3.1), /saas/developers (curl examples + endpoint table + scopes + OpenAPI download), /saas/api-keys fix (rawKey real, link developers), 24 tests | 27242cac |
+| S33 | Enterprise SSO + Audit 100% + RBAC total: migration 444 (saas_sso_configs + saas_sso_identities + audit_logs indices), SaasSsoService (OIDC/SAML upsertConfig AES-256-GCM, toggleEnforce, deleteConfig, JIT-provision getOrCreateIdentity, resolveTenantByDomain, buildOidcAuthUrl), /api/saas/sso (GET config/identities, POST configure/toggle-enforce/delete), /api/auth/sso/callback (code→token exchange, JIT provision, session JWT cookie), SaasAuditService v2 (getTotal, exportCsv, purgeOlderThan 90d retention), /api/saas/audit v2 (GET format=csv download, GET total+entries, POST purge), saasRbac: +sso.read +sso.write +audit.read +settings.write, /saas/settings tab SSO (owner/admin guard, OIDC form, toggle enforce, callback URL), /saas/auditoria reescrita (filtros módulo/acción/fechas API real, paginación server-side, export CSV), 39 tests | (current) |
 
 ---
 
@@ -101,6 +102,9 @@ TIKTOK_ADS_ADVERTISER_ID=
 # Snapchat Ads: Snap Marketing API → OAuth2 Bearer
 SNAPCHAT_ADS_ACCESS_TOKEN=
 SNAPCHAT_ADS_ACCOUNT_ID=
+
+# SSO Enterprise (S33) — 32-byte key as 64-char hex (openssl rand -hex 32)
+SAAS_SSO_ENCRYPTION_KEY=
 
 # OS Autonomous Production (O14)
 # Set to "true" only AFTER node scripts/run-os-autonomous-gate.mjs passes

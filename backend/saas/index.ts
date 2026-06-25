@@ -565,6 +565,19 @@ export {
   type CreateCustomObjectInput,
 } from "./SaasCustomObjectsService";
 export {
+  SaasSsoService,
+  getSaasSsoService,
+  resetSaasSsoServiceForTests,
+  SaasSsoError,
+  encryptSecret,
+  decryptSecret,
+  buildOidcAuthUrl,
+  type SsoConfig,
+  type ConfigureSsoInput,
+  type SsoIdentity,
+} from "./SaasSsoService";
+
+export {
   SaasAuditService,
   getSaasAuditService,
   resetSaasAuditServiceForTests,
