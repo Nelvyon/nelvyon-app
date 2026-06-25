@@ -10,7 +10,20 @@ import {
   normalizeHost,
 } from "@/core/whitelabel/resolveWhitelabel";
 
+/** Legacy SaaS API stubs that return 410 Gone without auth — must not be blocked by middleware. */
+const SAAS_LEGACY_GONE = new Set([
+  "/api/saas/certificados",
+  "/api/saas/knowledge-base",
+  "/api/saas/encuestas",
+  "/api/saas/comunidades",
+  "/api/saas/documentos",
+  "/api/saas/objects",
+  "/api/saas/productos",
+  "/api/saas/qr",
+]);
+
 function isProtectedPath(pathname: string): boolean {
+  if (SAAS_LEGACY_GONE.has(pathname)) return false;
   // /saas (exact) = public marketing landing; all other /saas/* routes require auth
   if (pathname === "/saas" || pathname === "/saas/") return false;
   if (pathname.startsWith("/saas/")) return true;

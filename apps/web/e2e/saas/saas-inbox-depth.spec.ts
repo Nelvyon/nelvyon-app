@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis } from "./fixtures";
+import { setAuthCookie, mockSaasApis, LOGIN_URL } from "./fixtures";
 
 const FIXTURE_CONVS = {
   conversations: [
@@ -55,8 +55,8 @@ test.describe("SaaS Inbox Depth (S38)", () => {
   });
 
   test("inbox carga sin error con KPIs y lista de conversaciones", async ({ page }) => {
-    await page.goto("/saas/inbox");
-    await expect(page).not.toHaveURL(/\/auth\/login/);
+    await page.goto("/saas/inbox", { waitUntil: "domcontentloaded" });
+    await expect(page).not.toHaveURL(LOGIN_URL);
     await page.waitForTimeout(700);
 
     const body = await page.locator("body").textContent();

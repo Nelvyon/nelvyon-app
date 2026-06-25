@@ -8,7 +8,7 @@ test.describe("SaaS Pipeline — deals", () => {
   });
 
   test("página /saas/pipeline carga", async ({ page }) => {
-    await page.goto("/saas/pipeline");
+    await page.goto("/saas/pipeline", { waitUntil: "domcontentloaded" });
     await expect(page.locator("body")).toBeVisible();
     expect(page.url()).not.toContain("500");
   });
