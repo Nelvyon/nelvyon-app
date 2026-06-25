@@ -502,6 +502,10 @@ export {
   type AdsCampaignStatus,
   type RoasAlert,
   type AdsCreateCampaignInput,
+  type AdsAttributionModel,
+  type AdsCampaignLinkInput,
+  type AdsCampaignLink,
+  type AttributedRoasRow,
 } from "./SaasAdsDashboardService";
 export {
   OsLearningService,
@@ -853,4 +857,7 @@ export {
   type ChannelBreakdown,
   type CampaignBreakdown,
   type AttributionEventType,
+  type AttributionModel,
+  type ModelCredit,
+  type ModelBreakdown,
 } from "./SaasAttributionService";

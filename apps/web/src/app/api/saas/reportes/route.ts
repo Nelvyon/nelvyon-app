@@ -10,6 +10,7 @@ import {
   requireSaasContext,
   type TrackEventInput,
   type AttributionEventType,
+  type AttributionModel,
 } from "@nelvyon/saas";
 
 function mapErr(e: SaasAttributionError): NextResponse {
@@ -38,6 +39,12 @@ export async function GET(req: Request) {
     if (resource === "campaigns") {
       const campaigns = await svc.getCampaignBreakdown(ctx.tenant.id, days);
       return NextResponse.json({ campaigns });
+    }
+
+    if (resource === "models") {
+      const model = (searchParams.get("model") ?? "linear") as AttributionModel;
+      const breakdown = await svc.getModelBreakdown(ctx.tenant.id, model, days);
+      return NextResponse.json({ breakdown });
     }
 
     if (resource === "journey") {

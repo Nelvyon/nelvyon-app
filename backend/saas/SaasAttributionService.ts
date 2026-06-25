@@ -35,6 +35,20 @@ export interface CampaignBreakdown {
   contacts: number;
 }
 
+export type AttributionModel = "first_touch" | "last_touch" | "linear" | "time_decay";
+
+export interface ModelCredit {
+  utmSource: string; utmMedium: string | null; utmCampaign: string | null;
+  credit: number;
+  conversions: number;
+}
+
+export interface ModelBreakdown {
+  model: AttributionModel;
+  days: number;
+  channels: ModelCredit[];
+}
+
 export class SaasAttributionError extends Error {
   constructor(message: string, public code: "VALIDATION") {
     super(message); this.name = "SaasAttributionError";
@@ -169,6 +183,93 @@ export class SaasAttributionService {
       totalContacts:    Number(r.total_contacts     ?? 0),
       topSource: topRow[0] ? String(topRow[0].utm_source) : null,
     };
+  }
+
+  /**
+   * Multi-touch attribution models.
+   * Loads all journeys (contacts with ≥1 conversion) in the window,
+   * computes fractional credit per touchpoint using the chosen model,
+   * then aggregates by utm_source/utm_medium/utm_campaign.
+   */
+  async getModelBreakdown(tenantId: string, model: AttributionModel, days = 30): Promise<ModelBreakdown> {
+    // Fetch all events in window that belong to contacts who converted
+    const rows = await this.db.query<Record<string, unknown>>(
+      `SELECT e.contact_id, e.utm_source, e.utm_medium, e.utm_campaign,
+              e.event_type, e.created_at,
+              ROW_NUMBER() OVER (PARTITION BY e.contact_id ORDER BY e.created_at) AS rn_asc,
+              COUNT(*) OVER (PARTITION BY e.contact_id) AS total_touches
+       FROM saas_lead_attribution e
+       WHERE e.tenant_id = $1
+         AND e.created_at >= NOW() - ($2 || ' days')::INTERVAL
+         AND e.contact_id IN (
+           SELECT DISTINCT contact_id FROM saas_lead_attribution
+           WHERE tenant_id = $1 AND event_type = 'conversion'
+             AND created_at >= NOW() - ($2 || ' days')::INTERVAL
+             AND contact_id IS NOT NULL
+         )
+       ORDER BY e.contact_id, e.created_at`,
+      [tenantId, String(days)],
+    );
+
+    if (!rows.length) return { model, days, channels: [] };
+
+    // Group events by contact
+    const byContact = new Map<string, typeof rows>();
+    for (const r of rows) {
+      const cid = String(r.contact_id);
+      if (!byContact.has(cid)) byContact.set(cid, []);
+      byContact.get(cid)!.push(r);
+    }
+
+    // credit[key] = { credit, conversions }
+    const creditMap = new Map<string, { credit: number; conversions: number; utmSource: string; utmMedium: string | null; utmCampaign: string | null }>();
+
+    const HALF_LIFE_MS = 7 * 86_400_000;
+
+    for (const events of byContact.values()) {
+      const touchpoints = events.filter(e => e.event_type !== "conversion");
+      if (!touchpoints.length) continue;
+      const conversions = events.filter(e => e.event_type === "conversion").length;
+      const n = touchpoints.length;
+
+      // Compute raw weights per touchpoint
+      const weights: number[] = touchpoints.map((tp, idx) => {
+        if (model === "first_touch") return idx === 0 ? 1 : 0;
+        if (model === "last_touch") return idx === n - 1 ? 1 : 0;
+        if (model === "linear") return 1 / n;
+        // time_decay: weight = exp(age / halfLife), normalised
+        const lastTs = new Date(events[events.length - 1].created_at as string).getTime();
+        const tpTs   = new Date(tp.created_at as string).getTime();
+        return Math.exp(-Math.abs(lastTs - tpTs) / HALF_LIFE_MS);
+      });
+
+      const totalW = weights.reduce((s, w) => s + w, 0);
+
+      touchpoints.forEach((tp, idx) => {
+        const w = totalW > 0 ? weights[idx] / totalW : 0;
+        if (w === 0) return;
+        const key = `${tp.utm_source ?? "(direct)"}|||${tp.utm_medium ?? ""}|||${tp.utm_campaign ?? ""}`;
+        const existing = creditMap.get(key);
+        if (existing) {
+          existing.credit += w * conversions;
+          existing.conversions += conversions;
+        } else {
+          creditMap.set(key, {
+            utmSource: String(tp.utm_source ?? "(direct)"),
+            utmMedium: tp.utm_medium != null ? String(tp.utm_medium) : null,
+            utmCampaign: tp.utm_campaign != null ? String(tp.utm_campaign) : null,
+            credit: w * conversions,
+            conversions,
+          });
+        }
+      });
+    }
+
+    const channels = Array.from(creditMap.values())
+      .sort((a, b) => b.credit - a.credit)
+      .map(c => ({ ...c, credit: Math.round(c.credit * 1000) / 1000 }));
+
+    return { model, days, channels };
   }
 }
 

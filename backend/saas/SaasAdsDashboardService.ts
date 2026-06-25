@@ -78,6 +78,38 @@ export type AdsCreateCampaignInput = {
   status?: "ACTIVE" | "PAUSED";
 };
 
+export type AdsAttributionModel = "first_touch" | "last_touch" | "linear" | "time_decay";
+
+export type AdsCampaignLinkInput = {
+  platform: AdsPlatform;
+  externalCampaignId: string;
+  externalCampaignName?: string;
+  utmCampaign: string;
+  utmSource?: string;
+  utmMedium?: string;
+};
+
+export type AdsCampaignLink = {
+  id: string;
+  tenantId: string;
+  platform: AdsPlatform;
+  externalCampaignId: string;
+  externalCampaignName: string | null;
+  utmCampaign: string;
+  utmSource: string | null;
+  utmMedium: string | null;
+  createdAt: string;
+};
+
+export type AttributedRoasRow = {
+  link: AdsCampaignLink;
+  spend: number;
+  attributedCredit: number;
+  attributedConversions: number;
+  attributedRoas: number | null;
+  model: AdsAttributionModel;
+};
+
 export class SaasAdsDashboardError extends Error {
   constructor(message: string, public readonly code: "NOT_FOUND" | "NOT_CONNECTED" | "VALIDATION" | "API_ERROR") {
     super(message);
@@ -101,6 +133,22 @@ type CacheRow = {
   spend: string; impressions: string; clicks: string; conversions: string;
   ctr: string | null; cpc: string | null; roas: string | null; fetched_at: Date;
 };
+
+type LinkRow = {
+  id: string; tenant_id: string; platform: string;
+  external_campaign_id: string; external_campaign_name: string | null;
+  utm_campaign: string; utm_source: string | null; utm_medium: string | null;
+  created_at: Date;
+};
+
+function rowToLink(r: LinkRow): AdsCampaignLink {
+  return {
+    id: r.id, tenantId: r.tenant_id, platform: r.platform as AdsPlatform,
+    externalCampaignId: r.external_campaign_id, externalCampaignName: r.external_campaign_name,
+    utmCampaign: r.utm_campaign, utmSource: r.utm_source, utmMedium: r.utm_medium,
+    createdAt: new Date(r.created_at).toISOString(),
+  };
+}
 
 function rowToConnection(r: ConnectionRow): AdsConnection {
   return {
@@ -659,6 +707,129 @@ export class SaasAdsDashboardService {
     const data = await res.json() as { success?: boolean; error?: { message: string } };
     if (!res.ok || data.error) throw new SaasAdsDashboardError(`Meta Ads: ${data.error?.message ?? "unknown error"}`, "API_ERROR");
     return { id: campaignId, name: "", status: "UNKNOWN", platform: "meta", dailyBudget: dailyBudgetUsd };
+  }
+
+  // ─── Attribution bridge ────────────────────────────────────────────────────
+
+  async linkCampaign(tenantId: string, input: AdsCampaignLinkInput): Promise<AdsCampaignLink> {
+    if (!input.externalCampaignId?.trim()) throw new SaasAdsDashboardError("externalCampaignId required", "VALIDATION");
+    if (!input.utmCampaign?.trim()) throw new SaasAdsDashboardError("utmCampaign required", "VALIDATION");
+    const rows = await this.db.query<LinkRow>(
+      `INSERT INTO saas_ads_campaign_links
+         (tenant_id, platform, external_campaign_id, external_campaign_name, utm_campaign, utm_source, utm_medium)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
+       ON CONFLICT (tenant_id, platform, external_campaign_id) DO UPDATE SET
+         external_campaign_name = EXCLUDED.external_campaign_name,
+         utm_campaign = EXCLUDED.utm_campaign,
+         utm_source   = EXCLUDED.utm_source,
+         utm_medium   = EXCLUDED.utm_medium
+       RETURNING *`,
+      [tenantId, input.platform, input.externalCampaignId, input.externalCampaignName ?? null,
+       input.utmCampaign, input.utmSource ?? null, input.utmMedium ?? null],
+    );
+    return rowToLink(rows[0]);
+  }
+
+  async listCampaignLinks(tenantId: string): Promise<AdsCampaignLink[]> {
+    const rows = await this.db.query<LinkRow>(
+      `SELECT * FROM saas_ads_campaign_links WHERE tenant_id=$1 ORDER BY created_at DESC`,
+      [tenantId],
+    );
+    return rows.map(rowToLink);
+  }
+
+  async getAttributedRoas(tenantId: string, days = 30, model: AdsAttributionModel = "linear"): Promise<AttributedRoasRow[]> {
+    const links = await this.listCampaignLinks(tenantId);
+    if (!links.length) return [];
+
+    // Spend from cache aggregated by platform
+    const dateEnd = new Date().toISOString().slice(0, 10);
+    const dateStart = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+    const spendRows = await this.db.query<Record<string, unknown>>(
+      `SELECT a.platform, SUM(c.spend::numeric) AS total_spend
+       FROM saas_ads_metrics_cache c
+       JOIN saas_ads_connections a ON a.id = c.connection_id
+       WHERE a.tenant_id = $1 AND c.date_start >= $2 AND c.date_end <= $3
+       GROUP BY a.platform`,
+      [tenantId, dateStart, dateEnd],
+    );
+    const spendByPlatform = new Map<string, number>();
+    for (const r of spendRows) {
+      spendByPlatform.set(String(r.platform), Number(r.total_spend ?? 0));
+    }
+
+    // Attribution: run inline model logic using same DB
+    const attrRows = await this.db.query<Record<string, unknown>>(
+      `SELECT contact_id, utm_source, utm_medium, utm_campaign, event_type, created_at
+       FROM saas_lead_attribution
+       WHERE tenant_id = $1
+         AND created_at >= NOW() - ($2 || ' days')::INTERVAL
+         AND contact_id IN (
+           SELECT DISTINCT contact_id FROM saas_lead_attribution
+           WHERE tenant_id = $1 AND event_type = 'conversion'
+             AND created_at >= NOW() - ($2 || ' days')::INTERVAL
+             AND contact_id IS NOT NULL
+         )
+       ORDER BY contact_id, created_at`,
+      [tenantId, String(days)],
+    );
+
+    // Group by contact
+    const byContact = new Map<string, typeof attrRows>();
+    for (const r of attrRows) {
+      const cid = String(r.contact_id);
+      if (!byContact.has(cid)) byContact.set(cid, []);
+      byContact.get(cid)!.push(r);
+    }
+
+    const HALF_LIFE_MS = 7 * 86_400_000;
+    // credit[utmCampaign] = { credit, conversions }
+    const creditMap = new Map<string, { credit: number; conversions: number }>();
+
+    for (const events of byContact.values()) {
+      const tps = events.filter(e => e.event_type !== "conversion");
+      const convCount = events.filter(e => e.event_type === "conversion").length;
+      if (!tps.length || !convCount) continue;
+      const n = tps.length;
+
+      const weights = tps.map((tp, idx) => {
+        if (model === "first_touch") return idx === 0 ? 1 : 0;
+        if (model === "last_touch") return idx === n - 1 ? 1 : 0;
+        if (model === "linear") return 1 / n;
+        const lastTs = new Date(events[events.length - 1].created_at as string).getTime();
+        const tpTs   = new Date(tp.created_at as string).getTime();
+        return Math.exp(-Math.abs(lastTs - tpTs) / HALF_LIFE_MS);
+      });
+
+      const totalW = weights.reduce((s, w) => s + w, 0);
+      tps.forEach((tp, idx) => {
+        const w = totalW > 0 ? weights[idx] / totalW : 0;
+        if (w === 0 || !tp.utm_campaign) return;
+        const key = String(tp.utm_campaign);
+        const existing = creditMap.get(key);
+        if (existing) {
+          existing.credit += w * convCount;
+          existing.conversions += convCount;
+        } else {
+          creditMap.set(key, { credit: w * convCount, conversions: convCount });
+        }
+      });
+    }
+
+    return links.map(link => {
+      const spend = spendByPlatform.get(link.platform) ?? 0;
+      const c = creditMap.get(link.utmCampaign);
+      const attrConversions = c?.conversions ?? 0;
+      const attrCredit = Math.round((c?.credit ?? 0) * 1000) / 1000;
+      return {
+        link,
+        spend,
+        attributedCredit: attrCredit,
+        attributedConversions: attrConversions,
+        attributedRoas: spend > 0 && attrConversions > 0 ? attrConversions / spend : null,
+        model,
+      };
+    });
   }
 
   private async _updateGoogleBudget(token: string, customerId: string, extra: Record<string, unknown>, campaignId: string, dailyBudgetUsd: number): Promise<AdsCampaign> {

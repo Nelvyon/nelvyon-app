@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -380,7 +380,252 @@ function MetricsCard({ platform, dateStart, dateEnd }: { platform: AdsPlatform; 
   );
 }
 
+// ─── Attribution types ──────────────────────────────────────────────────────
+
+type AdsAttributionModel = "first_touch" | "last_touch" | "linear" | "time_decay";
+
+interface AdsCampaignLink {
+  id: string; tenantId: string; platform: string;
+  externalCampaignId: string; externalCampaignName: string | null;
+  utmCampaign: string; utmSource: string | null; utmMedium: string | null;
+  createdAt: string;
+}
+
+interface AttributedRoasRow {
+  link: AdsCampaignLink;
+  spend: number;
+  attributedCredit: number;
+  attributedConversions: number;
+  attributedRoas: number | null;
+  model: AdsAttributionModel;
+}
+
+const MODEL_LABELS: Record<AdsAttributionModel, string> = {
+  first_touch: "Primer toque",
+  last_touch: "Último toque",
+  linear: "Lineal",
+  time_decay: "Decaimiento temporal",
+};
+
+function LinkCampaignModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+  const [platform, setPlatform] = useState<AdsPlatform>("meta");
+  const [campaignId, setCampaignId] = useState("");
+  const [campaignName, setCampaignName] = useState("");
+  const [utmCampaign, setUtmCampaign] = useState("");
+  const [utmSource, setUtmSource] = useState("");
+  const [utmMedium, setUtmMedium] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!campaignId.trim() || !utmCampaign.trim()) {
+      setError("Campaign ID y UTM Campaign son obligatorios"); return;
+    }
+    setSaving(true); setError(null);
+    try {
+      const res = await fetch("/api/saas/ads/attribution", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "link",
+          platform,
+          external_campaign_id: campaignId.trim(),
+          external_campaign_name: campaignName.trim() || undefined,
+          utm_campaign: utmCampaign.trim(),
+          utm_source: utmSource.trim() || undefined,
+          utm_medium: utmMedium.trim() || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(j.error ?? "Error al vincular campaña");
+      }
+      onSaved(); onClose();
+    } catch (err) { setError(err instanceof Error ? err.message : "Error"); }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-semibold text-foreground">Vincular campaña Ads ↔ UTM</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
+        </div>
+        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        <form onSubmit={(e) => void submit(e)} className="space-y-4">
+          <div>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Plataforma</label>
+            <div className="flex gap-2 flex-wrap">
+              {(Object.keys(PLATFORM_CFG) as AdsPlatform[]).map(p => (
+                <button key={p} type="button" onClick={() => setPlatform(p)}
+                  className={`rounded-lg border px-3 py-1.5 text-xs transition-all ${platform === p ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground"}`}>
+                  {PLATFORM_CFG[p].icon} {PLATFORM_CFG[p].label.split(" ")[0]}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Campaign ID (plataforma) *</label>
+              <input value={campaignId} onChange={e => setCampaignId(e.target.value)} placeholder="12345678"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre (opcional)</label>
+              <input value={campaignName} onChange={e => setCampaignName(e.target.value)} placeholder="Captación verano"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">utm_campaign *</label>
+              <input value={utmCampaign} onChange={e => setUtmCampaign(e.target.value)} placeholder="verano_2026"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">utm_source</label>
+              <input value={utmSource} onChange={e => setUtmSource(e.target.value)} placeholder="meta"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">utm_medium</label>
+              <input value={utmMedium} onChange={e => setUtmMedium(e.target.value)} placeholder="cpc"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-1">
+            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Vinculando…" : "Vincular campaña"}</NelvyonDsButton>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function AttributionTab() {
+  const [model, setModel] = useState<AdsAttributionModel>("linear");
+  const [days, setDays] = useState(30);
+  const [rows, setRows] = useState<AttributedRoasRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showLink, setShowLink] = useState(false);
+  const lastFetch = useRef<string>("");
+
+  const load = useCallback(() => {
+    const key = `${model}-${days}`;
+    lastFetch.current = key;
+    setLoading(true); setError(null);
+    fetch(`/api/saas/ads/attribution?resource=roas&model=${model}&days=${days}`)
+      .then(r => r.json() as Promise<{ roas?: AttributedRoasRow[]; error?: string }>)
+      .then(d => {
+        if (lastFetch.current !== key) return;
+        if (d.error) setError(d.error);
+        else setRows(d.roas ?? []);
+      })
+      .catch(() => setError("Error de red"))
+      .finally(() => setLoading(false));
+  }, [model, days]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div>
+            <label className="mb-1 block text-xs text-muted-foreground">Modelo</label>
+            <select value={model} onChange={e => setModel(e.target.value as AdsAttributionModel)}
+              className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground focus:border-primary focus:outline-none">
+              {(Object.entries(MODEL_LABELS) as [AdsAttributionModel, string][]).map(([v, l]) => (
+                <option key={v} value={v}>{l}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-muted-foreground">Ventana</label>
+            <select value={days} onChange={e => setDays(Number(e.target.value))}
+              className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground focus:border-primary focus:outline-none">
+              <option value={7}>7 días</option>
+              <option value={30}>30 días</option>
+              <option value={90}>90 días</option>
+            </select>
+          </div>
+        </div>
+        <NelvyonDsButton size="sm" onClick={() => setShowLink(true)}>+ Vincular campaña</NelvyonDsButton>
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col gap-2">{[1,2,3].map(i => <div key={i} className="h-12 animate-pulse rounded-xl bg-muted/30"/>)}</div>
+      ) : error ? (
+        <p className="text-sm text-red-400">{error}</p>
+      ) : rows.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-12 text-center">
+          <p className="text-4xl mb-3">🔗</p>
+          <p className="text-sm font-medium text-foreground">Sin campañas vinculadas</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Vincula una campaña de Ads con su <code className="text-primary">utm_campaign</code> para calcular ROAS atribuido.
+          </p>
+          <NelvyonDsButton size="sm" className="mt-4" onClick={() => setShowLink(true)}>+ Vincular primera campaña</NelvyonDsButton>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Campaña</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Plataforma</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">UTM Campaign</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Gasto</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Conv. atrib.</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">ROAS atrib.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(r => (
+                <tr key={r.link.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                  <td className="px-4 py-3 text-foreground font-medium">
+                    {r.link.externalCampaignName ?? r.link.externalCampaignId}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-xs font-medium text-muted-foreground uppercase">{r.link.platform}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <code className="text-xs text-primary">{r.link.utmCampaign}</code>
+                  </td>
+                  <td className="px-4 py-3 text-right text-foreground">{r.spend > 0 ? eur(r.spend) : "—"}</td>
+                  <td className="px-4 py-3 text-right text-foreground">{r.attributedConversions > 0 ? fmt(r.attributedConversions) : "—"}</td>
+                  <td className="px-4 py-3 text-right">
+                    {r.attributedRoas != null ? (
+                      <span className={r.attributedRoas >= 2 ? "font-semibold text-green-400" : r.attributedRoas >= 1 ? "text-yellow-400" : "text-red-400"}>
+                        {r.attributedRoas.toFixed(2)}x
+                      </span>
+                    ) : <span className="text-muted-foreground">—</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="px-4 py-2 border-t border-border/50">
+            <p className="text-xs text-muted-foreground">
+              Modelo: <strong className="text-foreground">{MODEL_LABELS[model]}</strong> · Ventana: {days} días ·
+              Spend de métricas en caché · Conversiones de <code className="text-primary">saas_lead_attribution</code>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {showLink && <LinkCampaignModal onClose={() => setShowLink(false)} onSaved={load} />}
+    </div>
+  );
+}
+
+type PublicidadTab = "metricas" | "atribucion";
+
 export default function SaasPublicidadPage() {
+  const [tab, setTab] = useState<PublicidadTab>("metricas");
   const [status, setStatus] = useState<AdsStatusResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [showConnect, setShowConnect] = useState(false);
@@ -415,7 +660,19 @@ export default function SaasPublicidadPage() {
           <NelvyonDsButton onClick={() => setShowConnect(true)}>+ Conectar plataforma</NelvyonDsButton>
         </div>
 
-        {loading ? (
+        {/* Tabs */}
+        <div className="flex gap-1 rounded-xl border border-border bg-card/50 p-1 w-fit">
+          {([["metricas", "Métricas y campañas"], ["atribucion", "Atribución multi-touch"]] as [PublicidadTab, string][]).map(([id, label]) => (
+            <button key={id} onClick={() => setTab(id)}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${tab === id ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {tab === "atribucion" ? (
+          <AttributionTab />
+        ) : loading ? (
           <div className="flex flex-col gap-3">{[1, 2, 3].map(i => <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/30" />)}</div>
         ) : connected.length === 0 ? (
           <NelvyonDsCard className="p-16 text-center">
