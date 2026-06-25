@@ -101,8 +101,8 @@ describe("SaasLmsService.enroll", () => {
   });
 
   it("creates enrollment successfully", async () => {
-    // no existing enrollment, insert row, update count
-    const svc = new SaasLmsService(makeDb([[], [enrollRow], []]));
+    // no existing enrollment, gating check (no plan), insert row, update count
+    const svc = new SaasLmsService(makeDb([[], [{ membership_plan_id: null }], [enrollRow], []]));
     const enrollment = await svc.enroll(TENANT, { courseId: "c1", contactEmail: "alumno@example.com", contactName: "Ana López" });
     expect(enrollment.id).toBe("e1");
     expect(enrollment.contactEmail).toBe("alumno@example.com");

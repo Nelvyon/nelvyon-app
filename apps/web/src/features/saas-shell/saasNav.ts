@@ -48,7 +48,8 @@ export type SaasNavId =
   | "secuencias"
   | "store"
   | "affiliates"
-  | "loyalty";
+  | "loyalty"
+  | "memberships";
 
 export type SaasNavItem = {
   id: SaasNavId;

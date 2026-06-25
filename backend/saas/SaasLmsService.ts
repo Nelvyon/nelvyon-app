@@ -226,6 +226,23 @@ export class SaasLmsService {
     );
     if (existing[0]) throw new SaasLmsError("Already enrolled", "CONFLICT");
 
+    // Gating: if the course has a membership_plan_id, require active membership
+    try {
+      const gating = await this.db.query<{ membership_plan_id: string | null }>(
+        `SELECT membership_plan_id FROM saas_lms_courses WHERE id=$1 AND tenant_id=$2 LIMIT 1`,
+        [input.courseId, tenantId],
+      );
+      const planId = gating[0]?.membership_plan_id ?? null;
+      if (planId) {
+        const { getSaasMembershipService } = await import("./SaasMembershipService");
+        const ok = await getSaasMembershipService().checkAccess(tenantId, input.contactEmail, "course", input.courseId);
+        if (!ok) throw new SaasLmsError("Active membership required to enroll in this course", "MEMBERSHIP_REQUIRED");
+      }
+    } catch (e) {
+      if (e instanceof SaasLmsError) throw e;
+      // Non-fatal: column may not exist yet (pre-migration) or service unavailable
+    }
+
     const rows = await this.db.query<EnrollRow>(
       `INSERT INTO saas_lms_enrollments (course_id,tenant_id,contact_id,contact_email,contact_name)
        VALUES ($1,$2,$3,$4,$5)
