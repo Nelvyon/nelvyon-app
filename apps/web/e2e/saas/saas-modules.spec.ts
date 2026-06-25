@@ -148,3 +148,42 @@ test.describe("SaaS — Lead Scoring & Reportes", () => {
     await expectUnauthorizedApi(request, "/api/saas/reportes");
   });
 });
+
+// ─── S45 additions — memberships, integrations in nav ────────────────────────
+
+test.describe("SaaS — Memberships & Integrations nav (S45)", () => {
+  test.beforeEach(async ({ page, context }) => {
+    await setAuthCookie(context);
+    await mockSaasApis(page);
+  });
+
+  test("/saas/memberships carga sin error", async ({ page }) => {
+    await page.goto("/saas/memberships");
+    await page.waitForTimeout(600);
+    await expect(page.locator("body")).toBeVisible();
+    expect(page.url()).not.toContain("500");
+  });
+
+  test("GET /api/saas/memberships 401 sin auth", async ({ request }) => {
+    await expectUnauthorizedApi(request, "/api/saas/memberships");
+  });
+
+  test("/saas/integraciones carga sin error", async ({ page }) => {
+    await page.goto("/saas/integraciones");
+    await page.waitForTimeout(600);
+    await expect(page.locator("body")).toBeVisible();
+    expect(page.url()).not.toContain("500");
+  });
+
+  test("GET /api/saas/integrations 401 sin auth", async ({ request }) => {
+    await expectUnauthorizedApi(request, "/api/saas/integrations");
+  });
+
+  test("GET /api/saas/contracts 401 sin auth", async ({ request }) => {
+    await expectUnauthorizedApi(request, "/api/saas/contracts");
+  });
+
+  test("GET /api/saas/facturas/dunning 401 sin auth", async ({ request }) => {
+    await expectUnauthorizedApi(request, "/api/saas/facturas/dunning");
+  });
+});

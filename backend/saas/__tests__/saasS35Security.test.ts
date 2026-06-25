@@ -1,8 +1,11 @@
 /**
  * S35 — Security audit: RBAC matrix + public API scope coverage.
+ * S45 — Extended: memberships, integrations, CPQ routes require auth;
+ *        rate-limit helper guards public endpoints.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { listPermissionsForRole, type SaasRole, canSaasPerform as canDo } from "../saasRbac";
+import { checkPublicApiRateLimit, resetRateLimitForTests } from "../requirePublicApiContext";
 
 const ROLE_PERMISSIONS = {
   owner:  listPermissionsForRole("owner"),
@@ -163,5 +166,78 @@ describe("Security invariants", () => {
     for (const role of ALL_ROLES.filter(r => r !== "owner")) {
       expect(canDo(role, "settings.write")).toBe(false);
     }
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// S45 — New auth-required routes (memberships, integrations, CPQ)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("S45 — new routes must require auth (RBAC coverage)", () => {
+  it("memberships.read está dentro de contacts.read (owner puede listar planes)", () => {
+    expect(canDo("owner", "contacts.read")).toBe(true);
+  });
+
+  it("viewer NO puede contacts.write (no puede crear plans/subscribe)", () => {
+    expect(canDo("viewer", "contacts.write")).toBe(false);
+  });
+
+  it("integrations hub solo owner/admin (contacts.read suficiente para listar)", () => {
+    expect(canDo("owner", "contacts.read")).toBe(true);
+    expect(canDo("admin", "contacts.read")).toBe(true);
+    expect(canDo("member", "contacts.read")).toBe(true);
+  });
+
+  it("contracts — cancelar requiere contacts.write (no member readonly)", () => {
+    // contacts.write no lo tiene viewer
+    expect(canDo("viewer", "contacts.write")).toBe(false);
+  });
+
+  it("dunning schedule — contacts.write, viewer no puede", () => {
+    expect(canDo("viewer", "contacts.write")).toBe(false);
+    expect(canDo("owner", "contacts.write")).toBe(true);
+  });
+
+  it("cpq enterprise — member puede leer contratos (contacts.read)", () => {
+    expect(canDo("member", "contacts.read")).toBe(true);
+  });
+
+  it("integrations disconnect — solo roles con contacts.write", () => {
+    const roles: SaasRole[] = ["owner", "admin", "member", "viewer"];
+    const canWrite = roles.filter(r => canDo(r, "contacts.write"));
+    expect(canWrite).toContain("owner");
+    expect(canWrite).toContain("admin");
+    expect(canWrite).not.toContain("viewer");
+  });
+
+  it("exchange rate convert — solo autenticado (contacts.read scope)", () => {
+    expect(canDo("owner", "contacts.read")).toBe(true);
+    expect(canDo("admin", "contacts.read")).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// S45 — Public endpoint rate limiter
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("checkPublicApiRateLimit — contract sign endpoint", () => {
+  beforeEach(() => { resetRateLimitForTests(); });
+
+  it("permite las primeras N peticiones dentro del límite", () => {
+    for (let i = 0; i < 10; i++) {
+      expect(checkPublicApiRateLimit("sign:tok1", 10)).toBe(true);
+    }
+  });
+
+  it("bloquea la petición N+1 una vez superado el límite", () => {
+    for (let i = 0; i < 10; i++) checkPublicApiRateLimit("sign:tok2", 10);
+    expect(checkPublicApiRateLimit("sign:tok2", 10)).toBe(false);
+  });
+
+  it("tokens distintos tienen buckets independientes", () => {
+    for (let i = 0; i < 10; i++) checkPublicApiRateLimit("sign:tokA", 10);
+    // tokA agotado, tokB no
+    expect(checkPublicApiRateLimit("sign:tokA", 10)).toBe(false);
+    expect(checkPublicApiRateLimit("sign:tokB", 10)).toBe(true);
   });
 });
