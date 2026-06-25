@@ -919,3 +919,16 @@ export {
   type DunningSummary,
   type ExchangeRate,
 } from "./SaasCpqEnterpriseService";
+
+export {
+  SaasDeliverablesHubService,
+  getSaasDeliverablesHubService,
+  resetSaasDeliverablesHubServiceForTests,
+  SaasDeliverablesHubError,
+  type DeliverableSource,
+  type DeliverableType,
+  type DeliverableStatus,
+  type SaasDeliverable,
+  type DeliverableSummary,
+  type ListDeliverablesFilters,
+} from "./SaasDeliverablesHubService";
