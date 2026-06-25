@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_BILLING, FIXTURE_SETTINGS } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_BILLING, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS Billing", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -7,15 +7,14 @@ test.describe("SaaS Billing", () => {
     await mockSaasApis(page);
   });
 
-  test("GET /saas/billing sin token → redirect /auth/login", async ({ page, context }) => {
+  test("GET /saas/billing sin token → redirect /login", async ({ page, context }) => {
     await context.clearCookies();
     await page.goto("/saas/billing");
-    await expect(page).toHaveURL(/\/auth\/login/);
+    await expect(page).toHaveURL(LOGIN_URL);
   });
 
   test("GET /api/saas/billing 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/billing");
-    expect([401, 302]).toContain(res.status());
+    await expectUnauthorizedApi(request, "/api/saas/billing");
   });
 
   test("/saas/billing carga con token y plan visible", async ({ page }) => {
@@ -23,7 +22,7 @@ test.describe("SaaS Billing", () => {
       route.fulfill({ json: FIXTURE_BILLING }));
     await page.goto("/saas/billing");
     await page.waitForTimeout(600);
-    expect(page.url()).not.toContain("auth/login");
+    expect(page.url()).not.toMatch(LOGIN_URL);
     await expect(page.locator("body")).toBeVisible();
   });
 

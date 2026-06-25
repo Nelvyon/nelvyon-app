@@ -21,12 +21,12 @@ test("Login inválido muestra error", async ({ page }) => {
   await expect(page.getByText("Invalid credentials")).toBeVisible();
 });
 
-test("Ruta protegida /saas/dashboard redirige a /auth/login sin auth", async ({ page }) => {
+test("Ruta protegida /saas/dashboard redirige a /login sin auth", async ({ page }) => {
   await page.goto("/saas/dashboard");
-  await expect(page).toHaveURL(/\/auth\/login\?next=%2Fsaas%2Fdashboard/);
+  await expect(page).toHaveURL(/\/login\?next=%2Fsaas%2Fdashboard/);
 });
 
-test("Ruta admin /admin redirige a /auth/login sin auth", async ({ page }) => {
+test("Ruta admin /admin redirige a /login sin auth", async ({ page }) => {
   await page.goto("/admin");
-  await expect(page).toHaveURL(/\/auth\/login\?next=%2Fadmin/);
+  await expect(page).toHaveURL(/\/login\?next=%2Fadmin/);
 });

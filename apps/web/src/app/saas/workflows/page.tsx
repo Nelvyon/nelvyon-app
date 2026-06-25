@@ -673,7 +673,7 @@ export default function SaasWorkflowsPage() {
 
         {sesOk === false && (
           <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-yellow-400">
-            ⚠️ <strong>Email no configurado</strong> — las acciones "Enviar email" fallarán hasta definir <code>SES_FROM_EMAIL</code> + <code>SES_ACCESS_KEY_ID</code> en Railway.
+            ⚠️ <strong>Email no configurado</strong> — las acciones &quot;Enviar email&quot; fallarán hasta definir <code>SES_FROM_EMAIL</code> + <code>SES_ACCESS_KEY_ID</code> en Railway.
           </div>
         )}
 

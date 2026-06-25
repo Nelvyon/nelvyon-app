@@ -108,19 +108,23 @@ export class SaasApiKeysService {
   }
 
   async verifyKey(rawKey: string): Promise<{ tenantId: string; scopes: string[] } | null> {
-    const keyHash = crypto.createHash("sha256").update(rawKey).digest("hex");
-    const rows = await this.db.query<{ tenant_id: string; scopes: string[]; expires_at: Date | string | null }>(
-      `SELECT tenant_id, scopes, expires_at FROM api_keys
+    try {
+      const keyHash = crypto.createHash("sha256").update(rawKey).digest("hex");
+      const rows = await this.db.query<{ tenant_id: string; scopes: string[]; expires_at: Date | string | null }>(
+        `SELECT tenant_id, scopes, expires_at FROM api_keys
        WHERE key_hash=$1 AND active=TRUE AND revoked_at IS NULL LIMIT 1`,
-      [keyHash],
-    );
-    if (!rows[0]) return null;
-    if (rows[0].expires_at && new Date(rows[0].expires_at) < new Date()) return null;
-    void this.db.query(
-      `UPDATE api_keys SET last_used_at=NOW(), requests_total=requests_total+1 WHERE key_hash=$1`,
-      [keyHash],
-    );
-    return { tenantId: rows[0].tenant_id, scopes: rows[0].scopes };
+        [keyHash],
+      );
+      if (!rows[0]) return null;
+      if (rows[0].expires_at && new Date(rows[0].expires_at) < new Date()) return null;
+      void this.db.query(
+        `UPDATE api_keys SET last_used_at=NOW(), requests_total=requests_total+1 WHERE key_hash=$1`,
+        [keyHash],
+      );
+      return { tenantId: rows[0].tenant_id, scopes: rows[0].scopes };
+    } catch {
+      return null;
+    }
   }
 }
 

@@ -5,14 +5,13 @@
 import { expect, test } from "@playwright/test";
 
 test("signup page carga formulario de registro", async ({ page }) => {
-  await page.goto("/auth/register");
-  await expect(page.getByRole("heading", { name: /crear cuenta/i })).toBeVisible();
+  await page.goto("/register", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("button", { name: /crear cuenta/i })).toBeVisible();
 });
 
 test("/saas/dashboard requiere autenticación", async ({ page }) => {
   await page.goto("/saas/dashboard");
-  // Debe redirigir a /auth/login (con o sin ?next param)
-  await expect(page).toHaveURL(/\/auth\/login/);
+  await expect(page).toHaveURL(/\/login/);
 });
 
 test("GET /api/health responde 200 con status ok", async ({ request }) => {
@@ -25,14 +24,13 @@ test("GET /api/health responde 200 con status ok", async ({ request }) => {
 test("rutas stub legacy devuelven 410 Gone", async ({ request }) => {
   const stubs = [
     "/api/saas/certificados",
-    "/api/saas/knowledge-base",
     "/api/saas/encuestas",
     "/api/saas/comunidades",
     "/api/saas/documentos",
     "/api/saas/objects",
   ];
   for (const path of stubs) {
-    const res = await request.get(path);
+    const res = await request.get(path, { maxRedirects: 0 });
     expect(res.status(), `${path} should be 410`).toBe(410);
   }
 });

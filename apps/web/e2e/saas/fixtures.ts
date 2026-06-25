@@ -5,7 +5,11 @@
  * present (non-empty). We set a dummy value and then intercept all
  * `/api/saas/*` calls with page.route() so no real DB is needed in CI.
  */
-import { type Page, type BrowserContext } from "@playwright/test";
+import { type Page, type BrowserContext, type APIRequestContext, expect } from "@playwright/test";
+
+
+/** Matches login redirect from middleware (/login?next=...). */
+export const LOGIN_URL = /\/login/;
 
 export const DUMMY_TOKEN = "e2e-test-token-nelvyon";
 
@@ -21,6 +25,33 @@ export async function setAuthCookie(context: BrowserContext): Promise<void> {
       secure: false,
     },
   ]);
+}
+
+/** GET/POST without auth must return 401; retries transient dev-server connection errors in CI. */
+export async function expectUnauthorizedApi(
+  request: APIRequestContext,
+  path: string,
+  method: "GET" | "POST" = "GET",
+  body?: object,
+): Promise<void> {
+  const opts = { maxRedirects: 0 as const };
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const res =
+        method === "GET"
+          ? await request.get(path, opts)
+          : await request.post(path, { ...opts, data: body ?? {} });
+      expect(res.status()).toBe(401);
+      return;
+    } catch (err) {
+      lastErr = err;
+      const msg = String(err);
+      if (!/ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket hang up/i.test(msg)) throw err;
+      await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
+    }
+  }
+  throw lastErr;
 }
 
 // ─── Common fixture payloads ─────────────────────────────────────────────────
@@ -105,6 +136,21 @@ export const FIXTURE_REPORTES = {
 
 export const FIXTURE_SSO = { config: null, identities: [] };
 
+export const FIXTURE_FUNNELS = {
+  funnels: [
+    {
+      id: "f-e2e-1", name: "E2E Test Funnel", description: "Funnel para E2E", status: "active",
+      publicSlug: "e2e-test-funnel-xyz", publishedAt: new Date().toISOString(),
+      stepsCount: 2, totalVisitors: 120, totalConversions: 30,
+      steps: [
+        { id: "s-e2e-1", funnelId: "f-e2e-1", type: "landing", name: "Landing Page", content: "<h1>Bienvenido</h1>", ctaLabel: "Empezar", ctaUrl: null, stepOrder: 0, visitors: 120, conversions: 60 },
+        { id: "s-e2e-2", funnelId: "f-e2e-1", type: "form", name: "Formulario", content: "<form>Tus datos</form>", ctaLabel: "Enviar", ctaUrl: null, stepOrder: 1, visitors: 60, conversions: 30 },
+      ],
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    },
+  ],
+};
+
 // ─── Route interceptors ──────────────────────────────────────────────────────
 
 /** Intercepts ALL /api/saas/* calls and returns fixture data. */
@@ -150,6 +196,12 @@ export async function mockSaasApis(page: Page): Promise<void> {
 
   await page.route("**/api/saas/pipeline**", route =>
     route.fulfill({ json: FIXTURE_DEALS }));
+
+  await page.route("**/api/saas/funnels**", route =>
+    route.fulfill({ json: FIXTURE_FUNNELS }));
+
+  await page.route("**/api/saas/inbox**", route =>
+    route.fulfill({ json: { conversations: [], total: 0 } }));
 
   await page.route("**/api/saas/**", route =>
     route.fulfill({ json: { ok: true }, status: 200 }));

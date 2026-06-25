@@ -10,25 +10,26 @@ import {
   normalizeHost,
 } from "@/core/whitelabel/resolveWhitelabel";
 
+/** Legacy SaaS API stubs that return 410 Gone without auth — must not be blocked by middleware. */
+const SAAS_LEGACY_GONE = new Set([
+  "/api/saas/certificados",
+  "/api/saas/encuestas",
+  "/api/saas/comunidades",
+  "/api/saas/documentos",
+  "/api/saas/objects",
+  "/api/saas/productos",
+  "/api/saas/qr",
+]);
+
 function isProtectedPath(pathname: string): boolean {
-  // /saas is the public marketing page — NOT protected
-  // /saas/dashboard and deeper routes remain protected
+  if (SAAS_LEGACY_GONE.has(pathname)) return false;
+  // /saas (exact) = public marketing landing; all other /saas/* routes require auth
+  if (pathname === "/saas" || pathname === "/saas/") return false;
+  if (pathname.startsWith("/saas/")) return true;
   return (
     pathname.startsWith("/os/") ||
     pathname === "/os" ||
     pathname.startsWith("/api/os/") ||
-    pathname.startsWith("/saas/dashboard") ||
-    pathname.startsWith("/saas/crm") ||
-    pathname.startsWith("/saas/campanas") ||
-    pathname.startsWith("/saas/workflows") ||
-    pathname.startsWith("/saas/billing") ||
-    pathname.startsWith("/saas/chatbot") ||
-    pathname.startsWith("/saas/seo") ||
-    pathname.startsWith("/saas/social") ||
-    pathname.startsWith("/saas/settings") ||
-    pathname.startsWith("/saas/leads") ||
-    pathname.startsWith("/saas/dialer") ||
-    pathname.startsWith("/saas/linkedin") ||
     pathname.startsWith("/api/saas/") ||
     pathname.startsWith("/admin/") ||
     pathname === "/admin" ||
@@ -124,9 +125,12 @@ export async function middleware(request: NextRequest) {
   if (isProtectedPath(pathname)) {
     const token = request.cookies.get("nelvyon_token")?.value;
     if (!token || token.length === 0) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
-      url.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+      if (pathname.startsWith("/api/")) {
+        return end(NextResponse.json({ error: "Unauthorized", code: "UNAUTHORIZED" }, { status: 401 }));
+      }
+      const next = `${pathname}${request.nextUrl.search}`;
+      const url = new URL("/login", request.nextUrl.origin);
+      url.searchParams.set("next", next);
       return end(NextResponse.redirect(url));
     }
     if (pathname.startsWith("/api/")) {

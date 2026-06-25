@@ -4,7 +4,7 @@
  * lead-scoring, reportes.
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_SETTINGS, FIXTURE_AUDIT, FIXTURE_LEAD_SCORING } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_SETTINGS, FIXTURE_AUDIT, FIXTURE_LEAD_SCORING, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS — Afiliados & Loyalty", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -19,8 +19,7 @@ test.describe("SaaS — Afiliados & Loyalty", () => {
   });
 
   test("GET /api/saas/affiliates 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/affiliates");
-    expect([401, 302]).toContain(res.status());
+    await expectUnauthorizedApi(request, "/api/saas/affiliates");
   });
 
   test("/saas/loyalty carga (no error 500)", async ({ page }) => {
@@ -30,8 +29,7 @@ test.describe("SaaS — Afiliados & Loyalty", () => {
   });
 
   test("GET /api/saas/loyalty 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/loyalty");
-    expect([401, 302]).toContain(res.status());
+    await expectUnauthorizedApi(request, "/api/saas/loyalty");
   });
 });
 
@@ -45,12 +43,11 @@ test.describe("SaaS — API Keys & Developers", () => {
     await page.goto("/saas/api-keys");
     await page.waitForTimeout(500);
     await expect(page.locator("body")).toBeVisible();
-    expect(page.url()).not.toContain("auth/login");
+    await expect(page).not.toHaveURL(LOGIN_URL);
   });
 
   test("GET /api/saas/api-keys 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/api-keys");
-    expect([401, 302]).toContain(res.status());
+    await expectUnauthorizedApi(request, "/api/saas/api-keys");
   });
 
   test("/saas/developers carga con docs de API", async ({ page }) => {
@@ -70,7 +67,7 @@ test.describe("SaaS — Settings SSO tab", () => {
   test("/saas/settings carga y muestra tabs", async ({ page }) => {
     await page.goto("/saas/settings");
     await page.waitForTimeout(600);
-    expect(page.url()).not.toContain("auth/login");
+    await expect(page).not.toHaveURL(LOGIN_URL);
     await expect(page.locator("body")).toBeVisible();
   });
 
@@ -79,7 +76,6 @@ test.describe("SaaS — Settings SSO tab", () => {
       route.fulfill({ json: { config: null, identities: [] } }));
     await page.goto("/saas/settings");
     await page.waitForTimeout(600);
-    // Click SSO tab if settings loaded
     const ssoButton = page.locator("button", { hasText: "SSO Enterprise" });
     const count = await ssoButton.count();
     if (count > 0) {
@@ -90,8 +86,7 @@ test.describe("SaaS — Settings SSO tab", () => {
   });
 
   test("GET /api/saas/sso 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/sso");
-    expect([401, 302]).toContain(res.status());
+    await expectUnauthorizedApi(request, "/api/saas/sso");
   });
 });
 
@@ -111,8 +106,7 @@ test.describe("SaaS — Auditoría", () => {
   });
 
   test("GET /api/saas/audit 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/audit");
-    expect([401, 302]).toContain(res.status());
+    await expectUnauthorizedApi(request, "/api/saas/audit");
   });
 
   test("paginación de auditoría con total > 0", async ({ page }) => {
@@ -140,8 +134,7 @@ test.describe("SaaS — Lead Scoring & Reportes", () => {
   });
 
   test("GET /api/saas/lead-scoring 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/lead-scoring");
-    expect([401, 302]).toContain(res.status());
+    await expectUnauthorizedApi(request, "/api/saas/lead-scoring");
   });
 
   test("/saas/reportes carga panel de atribución", async ({ page }) => {
@@ -152,7 +145,6 @@ test.describe("SaaS — Lead Scoring & Reportes", () => {
   });
 
   test("GET /api/saas/reportes 401 sin auth", async ({ request }) => {
-    const res = await request.get("/api/saas/reportes");
-    expect([401, 302]).toContain(res.status());
+    await expectUnauthorizedApi(request, "/api/saas/reportes");
   });
 });

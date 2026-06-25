@@ -62,7 +62,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Playwright E2E smoke (launch + local-pack)
-        run: pnpm test:e2e --project=chromium apps/web/e2e/launch.spec.ts apps/web/e2e/local-pack-smoke.spec.ts
+        run: pnpm test:e2e --project=chromium e2e/launch.spec.ts e2e/local-pack-smoke.spec.ts
         env:
           CI: "true"
 
