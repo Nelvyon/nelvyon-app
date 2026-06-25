@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
@@ -68,13 +69,15 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
         body: JSON.stringify({ name, scopes, expiresAt: expiry || null }),
       });
       if (res.ok) {
-        const d = (await res.json()) as { key?: string };
-        setCreated(d.key ?? `nlv_live_${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 10)}`);
+        const d = (await res.json()) as { rawKey?: string; key?: { id: string } };
+        if (d.rawKey) setCreated(d.rawKey);
+        else throw new Error("No rawKey in response");
       } else {
-        setCreated(`nlv_live_${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 10)}`);
+        const err = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(err.error ?? "Error creando API key");
       }
-    } catch {
-      setCreated(`nlv_live_${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 10)}`);
+    } catch (err) {
+      alert(String((err as Error).message));
     } finally {
       setSaving(false);
     }
@@ -187,7 +190,12 @@ export default function SaasApiKeysPage() {
     <SaasShellLayout sidebar={<SaasSidebar activeId="api-keys" />}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <NelvyonDsSectionHeader title="API Keys" subtitle="Accede a todos los datos de Nelvyon desde tus aplicaciones externas" />
-              <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nueva API Key</NelvyonDsButton>
+              <div className="flex gap-2 items-center">
+                <Link href="/saas/developers" className="rounded-lg border border-border px-3 py-2 text-sm text-primary hover:bg-primary/10 transition-colors">
+                  📖 Documentación API
+                </Link>
+                <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nueva API Key</NelvyonDsButton>
+              </div>
             </div>
 
             <div className="flex gap-2">
