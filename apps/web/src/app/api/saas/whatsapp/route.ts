@@ -8,6 +8,7 @@ import {
   saasErrorBody,
   saasErrorStatus,
   requireSaasContext,
+  type WaTemplateComponent,
 } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
@@ -54,16 +55,17 @@ export async function GET(req: Request) {
   }
 }
 
-/** POST — send WhatsApp message (Cloud API first, Twilio fallback) */
+/** POST — send WhatsApp message or template (Cloud API first, Twilio fallback) */
 export async function POST(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.write");
     const body = (await req.json()) as {
       to: string;
-      body: string;
+      body?: string;
       contactId?: string;
       templateName?: string;
       templateLanguage?: string;
+      templateComponents?: WaTemplateComponent[];
     };
 
     if (isMetaWaConfigured()) {
@@ -74,15 +76,16 @@ export async function POST(req: Request) {
         contactId: body.contactId ?? null,
         templateName: body.templateName,
         templateLanguage: body.templateLanguage,
+        templateComponents: body.templateComponents,
       });
       return NextResponse.json({ message: msg, provider: "meta" }, { status: 201 });
     }
 
-    // Twilio fallback
+    // Twilio fallback (templates not supported via Twilio path)
     const svc = getSaasWhatsAppService();
     const msg = await svc.send(ctx.tenant.id, {
       to: body.to,
-      body: body.body,
+      body: body.body ?? "",
       contactId: body.contactId ?? null,
     });
     return NextResponse.json({ message: msg, provider: "twilio" }, { status: 201 });

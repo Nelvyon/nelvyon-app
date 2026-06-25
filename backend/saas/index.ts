@@ -645,6 +645,11 @@ export {
   type CloudWaSendInput,
   type CloudWaMessage,
   type InboundWaMessage,
+  type WaTemplate,
+  type WaTemplateComponent,
+  type WaTemplateStatus,
+  type WaTemplateCategory,
+  type WaCatalogProduct,
 } from "./SaasWhatsAppCloudService";
 export {
   SaasFunnelService,
