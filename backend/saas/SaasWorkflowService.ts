@@ -255,11 +255,16 @@ export type WorkflowInput = {
 
 export type WorkflowPatch = Partial<WorkflowInput>;
 
+export interface WorkflowAuditPort {
+  log(tenantId: string, input: { action: string; module: string; resourceId?: string; details?: Record<string, unknown> }): Promise<void>;
+}
+
 export class SaasWorkflowService {
   constructor(
     private readonly db: SaasPostgresPort,
     private readonly crm: Pick<SaasCrmService, "updateContact" | "addActivity" | "getContact">,
     private readonly deals?: Pick<SaasDealsService, "changeStage" | "updateDeal" | "getDeal">,
+    private readonly audit?: WorkflowAuditPort,
   ) {}
 
   async createWorkflow(tenantId: string, data: WorkflowInput): Promise<SaasWorkflow> {
@@ -734,6 +739,7 @@ export class SaasWorkflowService {
       );
     }
     const rows = await this.getWorkflowRuns(workflowId, tenantId);
+    void this.audit?.log(tenantId, { action: "execute", module: "workflows", resourceId: workflowId, details: { steps: stepsExecuted.length } });
     return rows[0] as WorkflowRun;
   }
 

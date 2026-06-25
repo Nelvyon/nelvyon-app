@@ -8,6 +8,8 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { SaasShellLayout, DarkCard } from "@/features/saas-shell/components/SaasShellLayout";
 import { saasRoleLabel } from "@/features/saas-shell/saasPermissions";
 import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
+import { useLocaleContext } from "@/core/i18n/LocaleProvider";
+import type { AppLocale } from "../../../../i18n";
 
 type SettingsSummary = {
   tenant: {
@@ -39,9 +41,21 @@ const tabBtn = (active: boolean) =>
 
 type Tab = "general" | "sso" | "permisos";
 
+const LOCALE_OPTIONS: { value: AppLocale; label: string }[] = [
+  { value: "es", label: "Español" },
+  { value: "en", label: "English" },
+  { value: "fr", label: "Français" },
+  { value: "pt", label: "Português" },
+  { value: "de", label: "Deutsch" },
+  { value: "it", label: "Italiano" },
+];
+
 export default function SaasSettingsPage() {
   const router = useRouter();
   const { role: hookRole } = useSaasPermissions();
+  const { locale, setLocale } = useLocaleContext();
+  const [localeSaving, setLocaleSaving] = useState(false);
+  const [localeSaved, setLocaleSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<SettingsSummary | null>(null);
@@ -199,6 +213,30 @@ export default function SaasSettingsPage() {
                 </dd>
               </div>
             </dl>
+          </DarkCard>
+          <DarkCard>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Idioma de la interfaz</p>
+            <div className="flex items-center gap-3">
+              <select
+                value={locale}
+                onChange={async (e) => {
+                  setLocaleSaving(true);
+                  setLocaleSaved(false);
+                  await setLocale(e.target.value as AppLocale);
+                  setLocaleSaving(false);
+                  setLocaleSaved(true);
+                  setTimeout(() => setLocaleSaved(false), 2000);
+                }}
+                aria-label="Seleccionar idioma"
+                className={inputCls + " max-w-48"}
+              >
+                {LOCALE_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+              {localeSaving && <span className="text-xs text-white/40">Guardando…</span>}
+              {localeSaved && <span className="text-xs text-emerald-400">✓ Idioma actualizado</span>}
+            </div>
           </DarkCard>
         </>
       ) : null}

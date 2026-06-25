@@ -3,6 +3,11 @@ import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { dispatchContactCreated, dispatchContactStageChanged } from "./saasWorkflowDispatch";
 
+/** Minimal audit port — injected to avoid circular deps with SaasAuditService. */
+export interface CrmAuditPort {
+  log(tenantId: string, input: { action: string; module: string; resourceId?: string; details?: Record<string, unknown> }): Promise<void>;
+}
+
 export type ContactStatus = "lead" | "prospect" | "client" | "churned";
 export type PipelineStage = "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
 export type ActivityType = "note" | "call" | "email" | "meeting" | "task";
@@ -190,7 +195,7 @@ export type AddActivityInput = {
 };
 
 export class SaasCrmService {
-  constructor(private readonly db: SaasPostgresPort) {}
+  constructor(private readonly db: SaasPostgresPort, private readonly audit?: CrmAuditPort) {}
 
   async createContact(tenantId: string, data: CreateContactInput): Promise<SaasContact> {
     await assertSaasPlanCanCreate(this.db, tenantId, "contacts");
@@ -227,6 +232,7 @@ export class SaasCrmService {
       if (!row) throw new SaasCrmError("Failed to create contact", "CONSTRAINT");
       const contact = rowToContact(row);
       void dispatchContactCreated(tenantId, contact);
+      void this.audit?.log(tenantId, { action: "create", module: "crm", resourceId: contact.id, details: { name: contact.name } });
       return contact;
     } catch (e: unknown) {
       if (isCheckViolation(e)) {
@@ -324,11 +330,13 @@ export class SaasCrmService {
     if (stage !== undefined && stage !== existing.pipelineStage) {
       void dispatchContactStageChanged(tenantId, updated, existing.pipelineStage);
     }
+    void this.audit?.log(tenantId, { action: "update", module: "crm", resourceId: contactId });
     return updated;
   }
 
   async deleteContact(tenantId: string, contactId: string): Promise<void> {
     await this.db.query(`DELETE FROM saas_contacts WHERE tenant_id = $1 AND id = $2`, [tenantId, contactId]);
+    void this.audit?.log(tenantId, { action: "delete", module: "crm", resourceId: contactId });
   }
 
   async getPipelineSummary(tenantId: string): Promise<PipelineSummary> {

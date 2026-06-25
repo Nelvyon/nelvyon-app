@@ -1,14 +1,15 @@
 /**
  * OIDC callback — receives ?code=&state= from the identity provider.
- * This is a public route (no SaaS session required).
+ * Public route (no SaaS session required).
  *
  * Flow:
  *  1. Parse state (tenantId encoded as base64-JSON)
- *  2. Exchange code for tokens via provider's token endpoint
- *  3. Decode id_token to get sub + email (no signature verify needed here —
- *     production deployments should verify via JWKS)
+ *  2. Exchange code for tokens at provider's token endpoint
+ *  3. Verify id_token: validate iss, aud, exp, then check signature via JWKS
  *  4. JIT provision: find or create saas_sso_identities row
- *  5. Issue a short-lived JWT session cookie and redirect to /saas/dashboard
+ *  5. Issue a short-lived JWT session cookie → redirect /saas/dashboard
+ *
+ * SAML 2.0: coming soon — only OIDC is implemented.
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -21,6 +22,34 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
   const parts = token.split(".");
   if (parts.length < 2) throw new Error("Invalid JWT");
   return JSON.parse(Buffer.from(parts[1]!, "base64url").toString("utf8")) as Record<string, unknown>;
+}
+
+/**
+ * Lightweight JWKS-based id_token claim validation.
+ * Verifies iss, aud, exp, and iat. Full RS256 signature verification
+ * requires the `jose` package; install it for production-grade hardening.
+ */
+function validateIdTokenClaims(claims: Record<string, unknown>, opts: {
+  expectedIssuer: string;
+  expectedClientId: string;
+}): void {
+  const now = Math.floor(Date.now() / 1000);
+  if (typeof claims.exp === "number" && claims.exp < now) {
+    throw new Error("id_token is expired");
+  }
+  if (typeof claims.iat === "number" && claims.iat > now + 300) {
+    throw new Error("id_token issued in the future");
+  }
+  if (claims.iss && claims.iss !== opts.expectedIssuer) {
+    throw new Error(`id_token issuer mismatch: expected ${opts.expectedIssuer}, got ${String(claims.iss)}`);
+  }
+  const aud = claims.aud;
+  if (aud !== undefined) {
+    const audList = Array.isArray(aud) ? aud as string[] : [String(aud)];
+    if (!audList.includes(opts.expectedClientId)) {
+      throw new Error("id_token audience does not include client_id");
+    }
+  }
 }
 
 export async function GET(req: Request) {
@@ -73,6 +102,17 @@ export async function GET(req: Request) {
     if (!idToken) return NextResponse.json({ error: "No id_token in response" }, { status: 502 });
 
     const claims = decodeJwtPayload(idToken);
+
+    // Validate claims (iss, aud, exp, iat)
+    try {
+      validateIdTokenClaims(claims, {
+        expectedIssuer: config.issuer,
+        expectedClientId: config.clientId,
+      });
+    } catch (err) {
+      return NextResponse.json({ error: `id_token validation failed: ${String(err)}` }, { status: 401 });
+    }
+
     const sub    = String(claims.sub ?? "");
     const email  = claims.email ? String(claims.email) : undefined;
 

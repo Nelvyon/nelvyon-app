@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   getSaasApiKeysService,
+  getSaasAuditService,
   SaasApiKeysError,
   saasErrorBody,
   saasErrorStatus,
@@ -37,6 +38,11 @@ export async function POST(req: Request) {
       scopes: Array.isArray(b.scopes) ? b.scopes.filter((x): x is string => typeof x === "string") : undefined,
       expiresAt: typeof b.expires_at === "string" ? b.expires_at : null,
     });
+    void getSaasAuditService().log(ctx.tenant.id, {
+      action: "create", module: "api-keys",
+      resourceId: result.key.id,
+      details: { name: result.key.name, scopes: result.key.scopes },
+    });
     return NextResponse.json({ key: result.key, rawKey: result.rawKey }, { status: 201 });
   } catch (e: unknown) {
     if (e instanceof SaasApiKeysError) return mapError(e);
@@ -50,6 +56,10 @@ export async function DELETE(req: Request) {
     const id = new URL(req.url).searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     await getSaasApiKeysService().revoke(ctx.tenant.id, id);
+    void getSaasAuditService().log(ctx.tenant.id, {
+      action: "delete", module: "api-keys",
+      resourceId: id,
+    });
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
     if (e instanceof SaasApiKeysError) return mapError(e);

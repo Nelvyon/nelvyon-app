@@ -1,11 +1,11 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 /**
  * Premium dark shell wrapper for all real SaaS pages.
- * Provides the dark mesh background + 2-col grid.
+ * Provides the dark mesh background + 2-col grid + mobile sidebar toggle.
  * Do NOT use in mock/hub pages.
  */
 export function SaasShellLayout({
@@ -15,6 +15,8 @@ export function SaasShellLayout({
   sidebar: ReactNode;
   children: ReactNode;
 }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <DashboardLayout>
       <div
@@ -27,8 +29,40 @@ export function SaasShellLayout({
           `,
         }}
       >
+        {/* Mobile top bar */}
+        <div className="flex items-center gap-3 px-4 py-3 lg:hidden border-b border-white/[0.05]">
+          <button
+            aria-label="Abrir menú"
+            aria-expanded={sidebarOpen}
+            aria-controls="saas-sidebar-mobile"
+            onClick={() => setSidebarOpen(v => !v)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-white/60 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0084ff]/60"
+          >
+            <span aria-hidden="true" className="text-sm">{sidebarOpen ? "✕" : "☰"}</span>
+          </button>
+          <span className="text-sm font-semibold text-white/70">Nelvyon</span>
+        </div>
+
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-40 lg:hidden">
+            <div
+              className="absolute inset-0 bg-black/60"
+              aria-hidden="true"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <div
+              id="saas-sidebar-mobile"
+              className="absolute left-0 top-0 h-full w-72 overflow-y-auto bg-[#020817] border-r border-white/[0.06] z-10"
+            >
+              {sidebar}
+            </div>
+          </div>
+        )}
+
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          {sidebar}
+          {/* Desktop sidebar */}
+          <div className="hidden lg:block">{sidebar}</div>
           <main className="space-y-6 min-w-0">{children}</main>
         </div>
       </div>

@@ -250,8 +250,12 @@ export type CreateCampaniaInput = {
 
 export type UpdateCampaniaPatch = Partial<CreateCampaniaInput>;
 
+export interface CampaniasAuditPort {
+  log(tenantId: string, input: { action: string; module: string; resourceId?: string; details?: Record<string, unknown> }): Promise<void>;
+}
+
 export class SaasCampaniasService {
-  constructor(private readonly db: SaasPostgresPort) {}
+  constructor(private readonly db: SaasPostgresPort, private readonly audit?: CampaniasAuditPort) {}
 
   async createCampania(tenantId: string, data: CreateCampaniaInput): Promise<SaasCampania> {
     await assertSaasPlanCanCreate(this.db, tenantId, "campanias");
@@ -534,6 +538,7 @@ ${ctaBlock}
       [tenantId, campaniaId, sentCount],
     );
 
+    void this.audit?.log(tenantId, { action: "send", module: "campanias", resourceId: campaniaId, details: { totalSent: sentCount } });
     return { campaniaId, totalSent: sentCount, status: "completed" };
   }
 
