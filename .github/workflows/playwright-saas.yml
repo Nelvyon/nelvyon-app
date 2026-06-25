@@ -5,6 +5,8 @@ on:
     paths:
       - "apps/web/src/app/saas/**"
       - "apps/web/src/app/api/saas/**"
+      - "apps/web/src/app/api/public/**"
+      - "apps/web/src/app/contracts/**"
       - "apps/web/e2e/saas/**"
       - "backend/saas/**"
       - ".github/workflows/playwright-saas.yml"
@@ -14,8 +16,46 @@ on:
     paths:
       - "apps/web/src/app/saas/**"
       - "apps/web/src/app/api/saas/**"
+      - "apps/web/src/app/api/public/**"
+      - "apps/web/src/app/contracts/**"
+      - "backend/saas/**"
 
 jobs:
+  security-gate:
+    name: Security gate (RBAC + anti-stub + tsc)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: TypeScript check (0 errors)
+        run: pnpm exec tsc --noEmit
+      - name: Anti-stub gate
+        working-directory: ${{ github.workspace }}
+        run: node scripts/check-saas-stubs.mjs
+      - name: Anti-MOCK gate
+        working-directory: ${{ github.workspace }}
+        run: |
+          if grep -r --include="*.tsx" "const MOCK" apps/web/src/app/saas/; then
+            echo "❌ FAIL: const MOCK in /saas pages"; exit 1
+          fi
+          echo "✅ Anti-MOCK gate: OK"
+      - name: Security vitest (RBAC + rate-limit)
+        run: pnpm exec vitest run ../../backend/saas/__tests__/saasS35Security.test.ts --reporter=dot
+
   playwright-saas:
     name: SaaS E2E (Chromium)
     runs-on: ubuntu-latest

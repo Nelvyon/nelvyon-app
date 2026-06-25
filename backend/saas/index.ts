@@ -389,6 +389,11 @@ export {
   type CreateApiKeyResult,
 } from "./SaasApiKeysService";
 export {
+  checkPublicApiRateLimit,
+  getRateLimitRemaining,
+  resetRateLimitForTests,
+} from "./requirePublicApiContext";
+export {
   SaasCalendarService,
   SaasCalendarError,
   getSaasCalendarService,
