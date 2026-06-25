@@ -52,23 +52,26 @@ async function waitForDeploy() {
 }
 
 async function operatorLogin() {
-  const r = await fetch(`${BASE}/api/platform/portal/auth/login`, {
+  const r = await fetch(`${BASE}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: QA_EMAIL, password: QA_PASSWORD }),
   });
   if (!r.ok) { fail("login", "operator-login", `status ${r.status}`); return null; }
-  const cookies = r.headers.get("set-cookie") || "";
-  const match = cookies.match(new RegExp(`${COOKIE}=([^;]+)`));
-  if (!match) { fail("login", "cookie", "token cookie not set"); return null; }
-  pass("login", "operator-login");
-  return match[1];
+  const data = await r.json();
+  if (!data.token) { fail("login", "token", "missing token in response"); return null; }
+  pass("login", "operator-login", `userId=${data.userId ?? "?"}`);
+  return data.token;
 }
 
 async function kickoffPack(token) {
   const r = await fetch(`${BASE}/api/os/packs/saas-b2b-growth/kickoff`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Cookie: `${COOKIE}=${token}` },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      Cookie: `${COOKIE}=${token}`,
+    },
     body: JSON.stringify({
       productName: PRODUCT_NAME,
       icp: "VP Engineering",
@@ -92,16 +95,15 @@ async function portalLogin() {
     body: JSON.stringify({ email: PORTAL_EMAIL, password: PORTAL_PASSWORD }),
   });
   if (!r.ok) { fail("portal", "login", `status ${r.status}`); return null; }
-  const cookies = r.headers.get("set-cookie") || "";
-  const match = cookies.match(/portal_token=([^;]+)/);
-  if (!match) { fail("portal", "cookie", "portal_token not set"); return null; }
-  pass("portal", "login");
-  return match[1];
+  const auth = await r.json();
+  if (!auth.access_token) { fail("portal", "token", "missing access_token"); return null; }
+  pass("portal", "login", "via platform BFF");
+  return auth.access_token;
 }
 
 async function checkDeliverables(portalToken) {
   const r = await fetch(`${BASE}/api/platform/portal/deliverables`, {
-    headers: { Cookie: `portal_token=${portalToken}` },
+    headers: { Authorization: `Bearer ${portalToken}`, Accept: "application/json" },
   });
   if (!r.ok) { fail("deliverables", "list", `status ${r.status}`); return; }
   const body = await r.json();
