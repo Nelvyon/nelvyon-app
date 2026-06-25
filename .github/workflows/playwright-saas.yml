@@ -1,0 +1,82 @@
+name: Playwright SaaS E2E
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/src/app/saas/**"
+      - "apps/web/src/app/api/saas/**"
+      - "apps/web/e2e/saas/**"
+      - "backend/saas/**"
+      - ".github/workflows/playwright-saas.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/web/src/app/saas/**"
+      - "apps/web/src/app/api/saas/**"
+
+jobs:
+  playwright-saas:
+    name: SaaS E2E (Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers (Chromium only)
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Anti-MOCK gate (falla si const MOCK en /saas pages)
+        working-directory: ${{ github.workspace }}
+        run: |
+          if grep -r --include="*.tsx" "const MOCK" apps/web/src/app/saas/; then
+            echo "❌ FAIL: const MOCK encontrado en páginas /saas/."
+            exit 1
+          fi
+          echo "✅ Anti-MOCK gate: OK"
+
+      - name: Anti-stub gate
+        working-directory: ${{ github.workspace }}
+        run: node scripts/check-saas-stubs.mjs
+
+      - name: Run SaaS Playwright suite
+        env:
+          CI: "true"
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-for-playwright-saas-e2e' }}
+          # DATABASE_URL intentionally absent — all API calls mocked via page.route()
+        run: pnpm exec playwright test --config playwright.saas.config.ts
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-saas-report
+          path: apps/web/playwright-report-saas/
+          retention-days: 7
+
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-saas-results
+          path: apps/web/test-results/
+          retention-days: 7

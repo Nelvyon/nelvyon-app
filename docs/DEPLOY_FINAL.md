@@ -43,6 +43,7 @@
 | S31 | Afiliados + Loyalty tenant real: migration 442 (6 tablas), SaasAffiliateService (programa, links únicos AFF*, trackClick/trackConversion, comisiones pending→approved→paid, payoutSummary), SaasLoyaltyService (programa, earn/redeem/adjust puntos, tiers Bronze/Silver/Gold/Platinum auto-upgrade, balances, transacciones), saasRbac: +affiliates.read/write +loyalty.read/write, /api/saas/affiliates + /api/saas/loyalty, saasNav: +affiliates +loyalty, UI /saas/affiliates (enlaces, comisiones, config) + /saas/loyalty reescrita (miembros, dar puntos, config), 27 tests | 20d6b55b |
 | S32 | API pública + OpenAPI + dev portal: migration 443 (api_key_usage_log + daily view), requirePublicApiContext (in-memory rate limit 60req/min + scope check), /api/public/v1/contacts (GET+POST crm.read/write), /api/public/v1/deals (GET pipeline.read), /api/public/v1/campaigns (GET campaigns.read), /api/public/v1/workflows/trigger (POST crm.write), /api/saas/api-keys/usage (GET 7d chart), docs/openapi/saas-public-v1.yaml (OpenAPI 3.1), /saas/developers (curl examples + endpoint table + scopes + OpenAPI download), /saas/api-keys fix (rawKey real, link developers), 24 tests | 27242cac |
 | S33 | Enterprise SSO + Audit 100% + RBAC total: migration 444 (saas_sso_configs + saas_sso_identities + audit_logs indices), SaasSsoService (OIDC/SAML upsertConfig AES-256-GCM, toggleEnforce, deleteConfig, JIT-provision getOrCreateIdentity, resolveTenantByDomain, buildOidcAuthUrl), /api/saas/sso (GET config/identities, POST configure/toggle-enforce/delete), /api/auth/sso/callback (code→token exchange, JIT provision, session JWT cookie), SaasAuditService v2 (getTotal, exportCsv, purgeOlderThan 90d retention), /api/saas/audit v2 (GET format=csv download, GET total+entries, POST purge), saasRbac: +sso.read +sso.write +audit.read +settings.write, /saas/settings tab SSO (owner/admin guard, OIDC form, toggle enforce, callback URL), /saas/auditoria reescrita (filtros módulo/acción/fechas API real, paginación server-side, export CSV), 39 tests | 2b016bc5 |
+| S35 | E2E hardening + security audit: 51 Playwright tests en apps/web/e2e/saas/ (7 specs: saas-auth ×7, saas-crm ×8, saas-pipeline ×4, saas-campanias ×5, saas-workflows ×6, saas-billing ×4, saas-modules ×17) + saas-public-api ×10 (401 sin key ×5, formato inválido ×2, respuesta shape ×2); playwright.saas.config.ts (chromium only, 4 workers CI, artifacts on failure); .github/workflows/playwright-saas.yml (triggers PR/push saas/ paths, anti-MOCK gate, anti-stub gate, artifacts on failure); saasS35Security.test.ts: 57 tests (RBAC matrix owner/admin/member/viewer ×45, public API scope logic ×8, security invariants ×4); security audit: headers CSP+XFrameOptions ya presentes en next.config.ts, requirePublicApiContext ya incluye rate limit 60req/min, rutas públicas intencionales documentadas (unsubscribe/lms/cert/oauth/callback); TS 0, suite 107/1398 | (current) |
 | S34 | i18n ES/EN + audit wiring + UX polish: messages/es.json + en.json namespace saas.* (nav.groups ×6, nav.items ×37, common ×17, errors ×6, settings ×5, sso ×12, audit ×9) con paridad total ES↔EN; CrmAuditPort en SaasCrmService (create/update/delete contact → audit.log), CampaniasAuditPort en SaasCampaniasService (launchCampania → audit.log), WorkflowAuditPort en SaasWorkflowService (executeWorkflow → audit.log), audit.log en /api/saas/api-keys (POST create + DELETE revoke); SSO hardening: validateIdTokenClaims (iss/aud/exp/iat, SAML documented as coming soon); UX: SaasErrorBoundary (class, aria role=alert, retry), SaasBreadcrumb (semantic nav, aria-current, focus-visible), SaasShellLayout mobile sidebar (hamburger toggle, overlay, aria-expanded, aria-controls); /saas/settings selector idioma (useLocaleContext, cookie persistente); 20 tests (i18n parity ×8, CRM audit ×4, Campanias audit ×1, Workflow audit ×2, SSO claims ×4, SaasErrorBoundary) | (current) |
 
 ---
@@ -189,6 +190,81 @@ pnpm -C apps/web exec tsc --noEmit
 # Tests
 pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm --reporter=dot
 ```
+
+---
+
+## S35 COMPLETE — Listo para L1 deploy manual
+
+**Estado tras S35:** código 100% completo, TS 0 errores, 107 test files / 1398 tests passed, 51 Playwright E2E specs creados, CI workflow `.github/workflows/playwright-saas.yml` configurado.
+
+### Checklist L1 — Deploy manual en Railway
+
+#### 1. Variables de entorno (Railway → Settings → Variables)
+
+| Variable | Obligatoria | Notas |
+|---|---|---|
+| `JWT_SECRET` | ✅ | ≥32 chars — auth SaaS |
+| `DATABASE_URL` | ✅ | Railway Postgres 16 URL |
+| `NEXTAUTH_SECRET` | ✅ | random 32 chars |
+| `NEXTAUTH_URL` | ✅ | `https://app.nelvyon.com` |
+| `NEXT_PUBLIC_APP_URL` | ✅ | igual, sin trailing slash |
+| `SES_REGION` | ✅ | `eu-west-1` |
+| `SES_ACCESS_KEY_ID` | ✅ | |
+| `SES_SECRET_ACCESS_KEY` | ✅ | |
+| `SES_FROM_EMAIL` | ✅ | dirección verificada en SES |
+| `STRIPE_SECRET_KEY` | ✅ | `sk_live_...` |
+| `STRIPE_WEBHOOK_SECRET` | ✅ | `whsec_...` |
+| `STRIPE_PRICE_ID_STARTER` | ✅ | |
+| `STRIPE_PRICE_ID_PRO` | ✅ | |
+| `STRIPE_PRICE_ID_AGENCY` | ✅ | |
+| `CRON_SECRET` | ✅ | protege `/api/cron/*` |
+| `SAAS_SSO_ENCRYPTION_KEY` | ✅ | `openssl rand -hex 32` (64 chars hex) |
+| `TRACKING_SECRET` | ⚠️ | fallback: JWT_SECRET |
+| `AUTONOMOUS_PRODUCTION` | ⚠️ | default `false`; activar post-gate |
+| `TWILIO_ACCOUNT_SID` | opcional | SMS/WhatsApp |
+| `TWILIO_AUTH_TOKEN` | opcional | |
+
+#### 2. Migraciones
+
+```bash
+# Ejecutar todas las migraciones en orden en Railway Console o psql
+psql $DATABASE_URL < backend/db/migrations/001_*.sql
+# ... hasta ...
+psql $DATABASE_URL < backend/db/migrations/444_sso_config.sql
+```
+
+#### 3. Deploy
+
+```bash
+git push origin main
+# Railway detecta el push → build automático → deploy
+```
+
+#### 4. Post-deploy verification
+
+```bash
+# P0 smokes contra producción
+node scripts/run-staging-p0-smokes.mjs --base-url https://app.nelvyon.com
+
+# Public API 401 check
+curl -s https://app.nelvyon.com/api/public/v1/contacts | python3 -c "import sys,json; d=json.load(sys.stdin); assert 'error' in d"
+
+# Health check
+curl -sf https://app.nelvyon.com/api/health | grep '"ok":true'
+
+# Anti-MOCK y anti-stub gates
+node scripts/check-saas-stubs.mjs
+node scripts/check-no-v1-saas-pages.mjs
+```
+
+#### 5. Post-deploy acciones únicas
+
+- [ ] Confirmar SNS subscription en AWS SES (recibirás email de confirmación)
+- [ ] Configurar Cron jobs en Railway (ver tabla "Railway Cron jobs" abajo)
+- [ ] Crear primer tenant owner via `/auth/register`
+- [ ] Verificar skin dark `/saas/dashboard` en browser prod (`#020817`)
+- [ ] Enviar primera campaña de prueba y verificar open-pixel en SES logs
+- [ ] Activar `AUTONOMOUS_PRODUCTION=true` solo tras `scripts/run-os-autonomous-gate.mjs` exitoso
 
 ---
 
