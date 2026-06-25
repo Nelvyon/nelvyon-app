@@ -30,7 +30,14 @@ const QUOTE_TONE: Record<QuoteStatus, "success" | "warning" | "danger" | "primar
 const ACTION_ICON: Record<PlaybookActionType, string> = { task: "✅", email: "📧", call: "📞", note: "📝", wait: "⏳" };
 const fmt = (n: number, currency = "EUR") => new Intl.NumberFormat("es-ES", { style: "currency", currency }).format(n);
 
-type Tab = "forecast" | "deals" | "playbooks" | "quotes";
+type Tab = "forecast" | "deals" | "playbooks" | "quotes" | "contratos";
+
+interface Contract {
+  id: string; contractNumber: string; title: string;
+  clientName: string; clientEmail: string;
+  currency: string; amount: number; status: string;
+  createdAt: string; signedAt: string | null;
+}
 
 // ── Quote Create Modal ────────────────────────────────────────────────────────
 function QuoteModal({ deal, onClose, onCreated }: { deal?: Deal; onClose: () => void; onCreated: () => void }) {
@@ -192,6 +199,8 @@ export default function SaasPipelinePage() {
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showPlaybookModal, setShowPlaybookModal] = useState(false);
   const [quoteDeal, setQuoteDeal] = useState<Deal | undefined>(undefined);
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [contractLoading, setContractLoading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -206,6 +215,8 @@ export default function SaasPipelinePage() {
       if (forecastRes.ok) { const d = await forecastRes.json() as { forecast?: Forecast }; setForecast(d.forecast ?? null); }
       if (playbooksRes.ok) { const d = await playbooksRes.json() as { playbooks?: Playbook[] }; setPlaybooks(d.playbooks ?? []); }
       if (quotesRes.ok) { const d = await quotesRes.json() as { quotes?: Quote[] }; setQuotes(d.quotes ?? []); }
+      const contractsRes = await fetch("/api/saas/contracts");
+      if (contractsRes.ok) { const d = await contractsRes.json() as { contracts?: Contract[] }; setContracts(d.contracts ?? []); }
     } finally { setLoading(false); }
   }, []);
 
@@ -232,6 +243,7 @@ export default function SaasPipelinePage() {
           <NelvyonDsSectionHeader title="Sales Hub — Pipeline" subtitle="Forecast ponderado, playbooks por etapa y presupuestos CPQ" />
           <div className="flex gap-2">
             {tab === "quotes" && <NelvyonDsButton onClick={() => { setQuoteDeal(undefined); setShowQuoteModal(true); }}>+ Presupuesto</NelvyonDsButton>}
+          {tab === "contratos" && <NelvyonDsButton onClick={() => { void (async () => { setContractLoading(true); const r = await fetch("/api/saas/contracts"); if (r.ok) { const d = await r.json() as { contracts?: Contract[] }; setContracts(d.contracts ?? []); } setContractLoading(false); })(); }}>↻ Actualizar</NelvyonDsButton>}
             {tab === "playbooks" && <NelvyonDsButton onClick={() => setShowPlaybookModal(true)}>+ Playbook</NelvyonDsButton>}
           </div>
         </div>
@@ -253,10 +265,10 @@ export default function SaasPipelinePage() {
 
         {/* Tabs */}
         <div className="flex gap-1 border-b border-border">
-          {(["forecast", "deals", "playbooks", "quotes"] as Tab[]).map(t => (
+          {(["forecast", "deals", "playbooks", "quotes", "contratos"] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${tab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              {t === "forecast" ? "📊 Forecast" : t === "deals" ? `💼 Deals (${deals.length})` : t === "playbooks" ? `📋 Playbooks (${playbooks.length})` : `📄 Presupuestos (${quotes.length})`}
+              {t === "forecast" ? "📊 Forecast" : t === "deals" ? `💼 Deals (${deals.length})` : t === "playbooks" ? `📋 Playbooks (${playbooks.length})` : t === "quotes" ? `📄 Presupuestos (${quotes.length})` : `📝 Contratos (${contracts.length})`}
             </button>
           ))}
         </div>
@@ -421,6 +433,55 @@ export default function SaasPipelinePage() {
                       </div>
                     </NelvyonDsCard>
                   ))}
+                </div>
+              )
+            )}
+
+            {/* ── CONTRATOS ── */}
+            {tab === "contratos" && (
+              contractLoading ? (
+                <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-muted/30" />)}</div>
+              ) : contracts.length === 0 ? (
+                <NelvyonDsCard className="p-12 text-center">
+                  <p className="text-3xl">📝</p>
+                  <p className="mt-3 text-lg font-semibold text-foreground">Sin contratos</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Convierte un presupuesto aceptado en contrato para solicitar la firma</p>
+                </NelvyonDsCard>
+              ) : (
+                <div className="space-y-3">
+                  {contracts.map(c => {
+                    const statusTone: Record<string, "success" | "primary" | "warning" | "neutral" | "danger"> = {
+                      active: "success", signed: "primary", sent: "warning",
+                      draft: "neutral", expired: "danger", cancelled: "danger",
+                    };
+                    const statusLabel: Record<string, string> = {
+                      draft: "Borrador", sent: "Enviado", signed: "Firmado",
+                      active: "Activo", expired: "Vencido", cancelled: "Cancelado",
+                    };
+                    return (
+                      <NelvyonDsCard key={c.id} className="p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-medium text-foreground text-sm">{c.title}</p>
+                              <span className="text-xs text-muted-foreground font-mono">{c.contractNumber}</span>
+                              <NelvyonDsBadge tone={statusTone[c.status] ?? "default"}>{statusLabel[c.status] ?? c.status}</NelvyonDsBadge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">{c.clientName} · {c.clientEmail}</p>
+                            {c.signedAt && <p className="text-xs text-green-400 mt-0.5">Firmado {new Date(c.signedAt).toLocaleDateString("es-ES")}</p>}
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <p className="font-bold text-foreground">{fmt(c.amount, c.currency)}</p>
+                            {c.status === "draft" && (
+                              <button
+                                onClick={() => void fetch(`/api/saas/contracts/${c.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "send" }) }).then(() => void load())}
+                                className="text-xs text-primary hover:underline">Enviar →</button>
+                            )}
+                          </div>
+                        </div>
+                      </NelvyonDsCard>
+                    );
+                  })}
                 </div>
               )
             )}
