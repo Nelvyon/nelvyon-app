@@ -861,3 +861,23 @@ export {
   type ModelCredit,
   type ModelBreakdown,
 } from "./SaasAttributionService";
+
+export {
+  SaasIntegrationsHubService,
+  getSaasIntegrationsHubService,
+  resetSaasIntegrationsHubServiceForTests,
+  SaasIntegrationsHubError,
+  type IntegrationConnector,
+  type IntegrationCatalogStatus,
+  type IntegrationCategory,
+  type IntegrationConnectionType,
+  type IntegrationConnectionStatus,
+  type IntegrationConnection,
+  type IntegrationsCatalogItem,
+  type IntegrationsSummary,
+} from "./SaasIntegrationsHubService";
+
+export {
+  INTEGRATIONS_CATALOG,
+  getCatalogBySlug,
+} from "./integrationsCatalog";
