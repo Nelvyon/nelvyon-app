@@ -8,6 +8,7 @@ import {
   type UpdateFunnelInput,
   type CreateFunnelStepInput,
   type UpdateFunnelStepInput,
+  type CreateVariantInput,
 } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +31,13 @@ export async function GET(req: Request, ctx: Ctx) {
     if (searchParams.get("resource") === "analytics") {
       const analytics = await getSaasFunnelService().getAnalytics(saasCtx.tenant.id, funnelId);
       return NextResponse.json({ analytics });
+    }
+
+    if (searchParams.get("resource") === "variants") {
+      const stepId = searchParams.get("stepId") ?? "";
+      if (!stepId) return NextResponse.json({ error: "stepId required" }, { status: 400 });
+      const variants = await getSaasFunnelService().listVariants(stepId);
+      return NextResponse.json({ variants });
     }
 
     const funnel = await getSaasFunnelService().get(saasCtx.tenant.id, funnelId);
@@ -63,6 +71,32 @@ export async function POST(req: Request, ctx: Ctx) {
     if (body.action === "publish") {
       const funnel = await svc.publish(saasCtx.tenant.id, funnelId);
       return NextResponse.json({ funnel });
+    }
+
+    if (body.action === "pause") {
+      const funnel = await svc.pause(saasCtx.tenant.id, funnelId);
+      return NextResponse.json({ funnel });
+    }
+
+    if (body.action === "add-variant") {
+      const stepId = typeof body.step_id === "string" ? body.step_id : "";
+      if (!stepId) return NextResponse.json({ error: "step_id required" }, { status: 400 });
+      const input: CreateVariantInput = {
+        variantKey: body.variant_key === "B" ? "B" : "A",
+        content: typeof body.content === "object" && body.content !== null
+          ? (body.content as Record<string, unknown>) : {},
+        weightPct: typeof body.weight_pct === "number" ? body.weight_pct : 50,
+      };
+      const variant = await svc.createVariant(stepId, input);
+      return NextResponse.json({ variant }, { status: 201 });
+    }
+
+    if (body.action === "update-variant-weight") {
+      const variantId = typeof body.variant_id === "string" ? body.variant_id : "";
+      if (!variantId) return NextResponse.json({ error: "variant_id required" }, { status: 400 });
+      const weightPct = typeof body.weight_pct === "number" ? body.weight_pct : undefined;
+      const variant = await svc.updateVariant(variantId, { weightPct });
+      return NextResponse.json({ variant });
     }
 
     if (body.action === "step") {

@@ -655,6 +655,11 @@ export {
   type UpdateFunnelInput,
   type CreateFunnelStepInput,
   type UpdateFunnelStepInput,
+  type FunnelVariant,
+  type FunnelEvent,
+  type FunnelEventType,
+  type CreateVariantInput,
+  type RecordEventInput,
 } from "./SaasFunnelService";
 export {
   SaasWebBuilderService,
