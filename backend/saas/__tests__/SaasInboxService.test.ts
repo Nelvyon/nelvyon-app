@@ -12,8 +12,12 @@ const now = new Date();
 
 const convRow = {
   id: "cv1", tenant_id: TENANT, contact_id: null, channel: "email",
-  status: "open", assigned_to: null, unread_count: 0,
-  last_message: null, last_message_at: null, created_at: now, updated_at: now,
+  status: "open", priority: "normal", assigned_to: null,
+  thread_id: null, subject: null,
+  first_response_at: null, sla_due_at: null, sla_breached: false,
+  unread_count: 0, last_message: null, last_message_at: null,
+  created_at: now, updated_at: now,
+  contact_name: null, contact_email: null, contact_phone: null,
 };
 
 describe("SaasInboxService", () => {
@@ -30,7 +34,9 @@ describe("SaasInboxService", () => {
   });
 
   it("createConversation returns conversation", async () => {
-    const db = makeDb([[convRow]]);
+    // DB calls: getSlaPolicy, getOrCreateThread skipped (no contactId),
+    // assignRoundRobinNew: routing check, members query (empty → null), INSERT conv
+    const db = makeDb([[], [], [], [convRow]]);
     const svc = new SaasInboxService(db);
     const conv = await svc.createConversation(TENANT, { channel: "email" });
     expect(conv.id).toBe("cv1");
@@ -66,8 +72,8 @@ describe("SaasInboxService", () => {
 
 const msgRow = {
   id: "m1", conversation_id: "cv1", tenant_id: TENANT,
-  direction: "outbound", body: "Hello", status: "sent",
-  external_id: null, created_at: now,
+  direction: "outbound", channel: "email", body: "Hello", status: "sent",
+  external_id: null, parent_message_id: null, metadata: {}, created_at: now,
 };
 
 describe("SaasInboxService.replyToConversation", () => {
@@ -85,24 +91,20 @@ describe("SaasInboxService.replyToConversation", () => {
       .rejects.toMatchObject({ code: "VALIDATION" });
   });
 
-  it("stores message and returns channelDispatched=false for email channel (no external dispatch)", async () => {
-    // replyToConversation DB calls:
-    // 1: getConversation (SELECT convRow)
-    // 2: sendMessage → getConversation again (SELECT convRow)
-    // 3: sendMessage → INSERT message (msgRow)
-    // 4: sendMessage → UPDATE conversations []
-    const db = makeDb([[convRow], [convRow], [msgRow], []]);
+  it("stores message and returns channelDispatched=false for email with no SES contact", async () => {
+    // 1: getConversation 2: getConversation(sendMessage) 3: INSERT msg 4: UPDATE conv
+    // 5: UPDATE first_response_at 6: SELECT contact
+    const emailConv = { ...convRow, channel: "email", contact_id: "c1", first_response_at: null };
+    const db = makeDb([[emailConv], [emailConv], [msgRow], [], [], [{ id: "c1", name: "Ana", email: null, phone: null }]]);
     const svc = new SaasInboxService(db);
     const result = await svc.replyToConversation(TENANT, "cv1", "Hello");
     expect(result.message.id).toBe("m1");
     expect(result.channelDispatched).toBe(false);
-    expect(result.channelError).toBeUndefined();
   });
 
   it("returns channelDispatched=false + channelError when SMS contact has no phone", async () => {
     const smsConv = { ...convRow, channel: "sms", contact_id: "c1" };
-    // 1: getConversation, 2: getConversation (in sendMessage), 3: INSERT msg, 4: UPDATE conv, 5: phone lookup
-    const db = makeDb([[smsConv], [smsConv], [msgRow], [], [{ phone: null }]]);
+    const db = makeDb([[smsConv], [smsConv], [msgRow], [], [], [{ id: "c1", name: "X", email: null, phone: null }]]);
     const svc = new SaasInboxService(db);
     const result = await svc.replyToConversation(TENANT, "cv1", "Hello");
     expect(result.channelDispatched).toBe(false);
@@ -111,7 +113,7 @@ describe("SaasInboxService.replyToConversation", () => {
 
   it("returns channelDispatched=false + channelError when WhatsApp contact has no phone", async () => {
     const waConv = { ...convRow, channel: "whatsapp", contact_id: "c1" };
-    const db = makeDb([[waConv], [waConv], [msgRow], [], [{ phone: null }]]);
+    const db = makeDb([[waConv], [waConv], [msgRow], [], [], [{ id: "c1", name: "X", email: null, phone: null }]]);
     const svc = new SaasInboxService(db);
     const result = await svc.replyToConversation(TENANT, "cv1", "Hello");
     expect(result.channelDispatched).toBe(false);

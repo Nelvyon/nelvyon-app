@@ -414,11 +414,15 @@ export {
   resetSaasInboxServiceForTests,
   type SaasConversation,
   type SaasMessage,
+  type SaasThread,
+  type InboxSlaPolicy,
   type CreateConversationInput,
   type SendMessageInput,
   type InboxChannel,
   type ConversationStatus,
+  type ConversationPriority,
   type ReplyResult,
+  type EnrichedConversation,
 } from "./SaasInboxService";
 export {
   SaasSequencesService,
