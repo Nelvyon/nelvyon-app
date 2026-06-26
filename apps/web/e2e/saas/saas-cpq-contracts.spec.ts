@@ -49,6 +49,20 @@ test.describe("SaaS CPQ Contratos — auth guard", () => {
   });
 });
 
+async function gotoPipelineReady(page: import("@playwright/test").Page): Promise<void> {
+  await page.goto("/saas/pipeline", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("heading", { name: /Sales Hub/i })).toBeVisible({ timeout: 15_000 });
+  await page.waitForResponse(
+    (resp) => resp.url().includes("/api/saas/contracts") && resp.ok(),
+    { timeout: 15_000 },
+  ).catch(() => undefined);
+}
+
+function contratosTab(page: import("@playwright/test").Page) {
+  // Scope to tab bar — evita colisión con sidebar "Documentos & Contratos" u otros botones
+  return page.locator(".flex.gap-1.border-b").getByRole("button", { name: /Contratos/i });
+}
+
 test.describe("SaaS CPQ — Pipeline tab Contratos", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
@@ -58,50 +72,42 @@ test.describe("SaaS CPQ — Pipeline tab Contratos", () => {
     await page.route("**/api/saas/quotes**", route =>
       route.fulfill({ json: { quotes: [] } }));
     await page.route("**/api/saas/deals**", route =>
-      route.fulfill({ json: { deals: [], forecast: null } }));
-    await page.route("**/api/saas/playbooks**", route =>
-      route.fulfill({ json: { playbooks: [], forecast: null } }));
+      route.fulfill({ json: { deals: [] } }));
+    await page.route("**/api/saas/playbooks**", route => {
+      const url = route.request().url();
+      if (url.includes("resource=forecast")) {
+        return route.fulfill({
+          json: { forecast: { weightedTotal: 0, bestCase: 0, committed: 0, byStage: [] } },
+        });
+      }
+      return route.fulfill({ json: { playbooks: [] } });
+    });
   });
 
   test("carga pipeline sin error 500", async ({ page }) => {
-    await page.goto("/saas/pipeline");
+    await gotoPipelineReady(page);
     expect(page.url()).not.toContain("500");
     await expect(page).not.toHaveURL(LOGIN_URL);
     await expect(page.locator("body")).toBeVisible();
   });
 
   test("tab 'Contratos' visible en pipeline", async ({ page }) => {
-    await page.goto("/saas/pipeline");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
-    const bodyText = await page.locator("body").textContent() ?? "";
-    expect(bodyText).toMatch(/Contratos/i);
+    await gotoPipelineReady(page);
+    await expect(contratosTab(page)).toBeVisible();
   });
 
   test("click en tab Contratos no produce error 500", async ({ page }) => {
-    await page.goto("/saas/pipeline");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
-    const tabButton = page.locator("button", { hasText: /Contratos/i });
-    if (await tabButton.count() > 0) {
-      await tabButton.first().click();
-      await page.waitForTimeout(500);
-    }
+    await gotoPipelineReady(page);
+    await contratosTab(page).click();
+    await expect(page.getByText("CTR-2026-E2E001")).toBeVisible({ timeout: 10_000 });
     expect(page.url()).not.toContain("500");
-    await expect(page.locator("body")).toBeVisible();
   });
 
   test("contrato E2E aparece en contenido tras click en tab", async ({ page }) => {
-    await page.goto("/saas/pipeline");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
-    const tabButton = page.locator("button", { hasText: /Contratos/i });
-    if (await tabButton.count() > 0) {
-      await tabButton.first().click();
-      await page.waitForTimeout(800);
-      const bodyText = await page.locator("body").textContent() ?? "";
-      expect(bodyText).toMatch(/CTR-2026-E2E001|Acme E2E|Contrato/i);
-    } else {
-      // Tab not visible yet — page still loads OK
-      await expect(page.locator("body")).toBeVisible();
-    }
+    await gotoPipelineReady(page);
+    await contratosTab(page).click();
+    await expect(page.getByText("CTR-2026-E2E001")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Acme E2E/i)).toBeVisible();
   });
 });
 
