@@ -2,113 +2,142 @@
  * S48 — E2E: Revenue per Deliverable
  */
 import { expect, test } from "@playwright/test";
+import { setupAuthedSaas } from "./fixtures";
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
-const AUTH = { "x-test-tenant": "test-tenant-s48" };
+const FIXTURE_ENTREGABLES = {
+  deliverables: [
+    {
+      id: "d-1", source: "os", type: "landing", title: "Landing ACME E2E",
+      packId: "local-business-growth", status: "approved",
+      qaScore: 91, legalPassed: true,
+      downloadUrl: null, portalUrl: null,
+      createdAt: new Date().toISOString(), approvedAt: new Date().toISOString(),
+    },
+  ],
+  summary: { total: 1, pendingReview: 0, approved: 1, avgQaScore: 91, byType: {}, byStatus: {} },
+};
+
+const FIXTURE_REVENUE = {
+  items: [],
+};
+
+async function gotoEntregablesReady(page: import("@playwright/test").Page): Promise<void> {
+  await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("button", { name: /Revenue €|Lista/i }).first()).toBeVisible({ timeout: 15_000 });
+}
 
 test.describe("S48 — Entregables Revenue tab", () => {
+  test.beforeEach(async ({ page, context }) => {
+    await setupAuthedSaas(page, context);
+    await page.route("**/api/saas/entregables/revenue**", route => {
+      if (route.request().method() === "POST") {
+        return route.fulfill({ json: { refreshed: true, rows: [] } });
+      }
+      return route.fulfill({ json: FIXTURE_REVENUE });
+    });
+    await page.route("**/api/saas/entregables**", route =>
+      route.fulfill({ json: FIXTURE_ENTREGABLES }));
+  });
+
   test("Revenue tab is visible on /saas/entregables", async ({ page }) => {
-    await page.goto(`${BASE}/saas/entregables`, { waitUntil: "networkidle" });
+    await gotoEntregablesReady(page);
     await expect(page.getByRole("button", { name: /Revenue €/i })).toBeVisible();
   });
 
   test("clicking Revenue tab switches to revenue view", async ({ page }) => {
-    await page.goto(`${BASE}/saas/entregables`, { waitUntil: "networkidle" });
+    await gotoEntregablesReady(page);
     await page.getByRole("button", { name: /Revenue €/i }).click();
-    // Either revenue table OR empty state is shown
-    const tableOrEmpty = page.locator("table, :text('Sin revenue atribuido')");
+    const tableOrEmpty = page.getByText(/Sin revenue atribuido|Revenue atribuido/i).first();
     await expect(tableOrEmpty).toBeVisible();
   });
 
-  test("Recalcular button triggers POST /api/saas/entregables/revenue", async ({ page, request }) => {
-    await page.goto(`${BASE}/saas/entregables`, { waitUntil: "networkidle" });
+  test("Recalcular button triggers POST /api/saas/entregables/revenue", async ({ page }) => {
+    await gotoEntregablesReady(page);
     await page.getByRole("button", { name: /Revenue €/i }).click();
 
     const [resp] = await Promise.all([
       page.waitForResponse(
         (r) => r.url().includes("/api/saas/entregables/revenue") && r.request().method() === "POST",
-        { timeout: 8000 }
+        { timeout: 8000 },
       ).catch(() => null),
       page.getByRole("button", { name: /↻ Recalcular/i }).click(),
     ]);
-    // Either fires (authenticated) or 401 (test env without auth) — not 500
     if (resp) expect(resp.status()).not.toBe(500);
   });
 
-  test("Lista tab shows 'Vincular campaña' per row", async ({ page }) => {
-    await page.goto(`${BASE}/saas/entregables`, { waitUntil: "networkidle" });
+  test("Lista tab shows deliverable row", async ({ page }) => {
+    await gotoEntregablesReady(page);
     await page.getByRole("button", { name: /Lista/i }).click();
-    // This may or may not have rows in test env; check no page error
-    await expect(page).not.toHaveTitle(/Error/);
+    await expect(page.getByText("Landing ACME E2E")).toBeVisible();
   });
 
   test("Vincular campaña modal opens on click", async ({ page }) => {
-    await page.goto(`${BASE}/saas/entregables`, { waitUntil: "networkidle" });
-    // If any rows exist, click the first "Vincular campaña" link
+    await gotoEntregablesReady(page);
+    await page.getByRole("button", { name: /Lista/i }).click();
     const vincularBtn = page.getByRole("button", { name: /Vincular campaña/i }).first();
-    if (await vincularBtn.isVisible()) {
-      await vincularBtn.click();
-      await expect(page.getByText("Vincular campaña UTM")).toBeVisible();
-      await expect(page.getByPlaceholder(/ej: local-business-q2/i)).toBeVisible();
-    }
+    await vincularBtn.click();
+    await expect(page.getByText("Vincular campaña UTM")).toBeVisible();
   });
 
   test("modal closes on Cancelar click", async ({ page }) => {
-    await page.goto(`${BASE}/saas/entregables`, { waitUntil: "networkidle" });
-    const vincularBtn = page.getByRole("button", { name: /Vincular campaña/i }).first();
-    if (await vincularBtn.isVisible()) {
-      await vincularBtn.click();
-      await page.getByRole("button", { name: /Cancelar/i }).click();
-      await expect(page.getByText("Vincular campaña UTM")).not.toBeVisible();
-    }
+    await gotoEntregablesReady(page);
+    await page.getByRole("button", { name: /Lista/i }).click();
+    await page.getByRole("button", { name: /Vincular campaña/i }).first().click();
+    await page.getByRole("button", { name: /Cancelar/i }).click();
+    await expect(page.getByText("Vincular campaña UTM")).not.toBeVisible();
   });
 
   test("KPI strip shows Revenue atribuido and ROAS medio", async ({ page }) => {
-    await page.goto(`${BASE}/saas/entregables`, { waitUntil: "networkidle" });
+    await gotoEntregablesReady(page);
     await expect(page.getByText("Revenue atribuido")).toBeVisible();
     await expect(page.getByText("ROAS medio")).toBeVisible();
   });
 });
 
 test.describe("S48 — Reportes revenue section", () => {
+  test.beforeEach(async ({ page, context }) => {
+    await setupAuthedSaas(page, context);
+  });
+
   test("Revenue por entregable section visible in /saas/reportes", async ({ page }) => {
-    await page.goto(`${BASE}/saas/reportes`, { waitUntil: "networkidle" });
-    await expect(page.getByText(/Revenue por entregable/i)).toBeVisible();
+    await page.goto("/saas/reportes", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Revenue por entregable/i)).toBeVisible({ timeout: 15_000 });
   });
 
   test("no page crash on /saas/reportes with revenue data fetch", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.goto(`${BASE}/saas/reportes`, { waitUntil: "networkidle" });
+    await page.goto("/saas/reportes", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("body")).toBeVisible({ timeout: 10_000 });
     expect(errors.filter((e) => !e.includes("hydration"))).toHaveLength(0);
   });
 });
 
 test.describe("S48 — Revenue API routes", () => {
   test("GET /api/saas/entregables/revenue returns 200 or 401", async ({ request }) => {
-    const res = await request.get(`${BASE}/api/saas/entregables/revenue?days=30`);
+    const res = await request.get("/api/saas/entregables/revenue?days=30");
     expect([200, 401]).toContain(res.status());
   });
 
   test("GET /api/saas/entregables/revenue?model=first_touch is accepted", async ({ request }) => {
-    const res = await request.get(`${BASE}/api/saas/entregables/revenue?days=30&model=first_touch`);
+    const res = await request.get("/api/saas/entregables/revenue?days=30&model=first_touch");
     expect([200, 401]).toContain(res.status());
   });
 
   test("POST /api/saas/entregables/revenue refresh action returns 200 or 401", async ({ request }) => {
-    const res = await request.post(`${BASE}/api/saas/entregables/revenue`, {
+    const res = await request.post("/api/saas/entregables/revenue", {
       data: { action: "refresh" },
     });
     expect([200, 401]).toContain(res.status());
   });
 
   test("GET /api/saas/entregables/revenue/[id] returns 200 or 401 or 404", async ({ request }) => {
-    const res = await request.get(`${BASE}/api/saas/entregables/revenue/test-del-id`);
+    const res = await request.get("/api/saas/entregables/revenue/test-del-id");
     expect([200, 401, 404]).toContain(res.status());
   });
 
   test("POST without deliverableId returns 400 or 401", async ({ request }) => {
-    const res = await request.post(`${BASE}/api/saas/entregables/revenue`, {
+    const res = await request.post("/api/saas/entregables/revenue", {
       data: { deliverableSource: "os" },
     });
     expect([400, 401]).toContain(res.status());

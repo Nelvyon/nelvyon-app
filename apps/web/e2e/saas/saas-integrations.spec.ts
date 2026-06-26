@@ -68,7 +68,7 @@ test.describe("SaaS Integraciones — página autenticada", () => {
 
   test("filtro de búsqueda existe en DOM", async ({ page }) => {
     await page.goto("/saas/integraciones");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.waitForLoadState("domcontentloaded");
     // La página debe tener algún elemento interactivo
     const inputs = page.locator("input, button, select");
     await expect(inputs.first()).toBeVisible({ timeout: 8000 });
@@ -104,7 +104,7 @@ test.describe("SaaS Integraciones — interacción de categoría", () => {
       await route.fulfill({ json: FIXTURE_INTEGRATIONS });
     });
     await page.goto("/saas/integraciones");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.waitForLoadState("domcontentloaded");
     expect(captured).not.toBeNull();
     expect((captured as typeof FIXTURE_INTEGRATIONS).catalog.length).toBe(4);
   });

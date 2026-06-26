@@ -65,6 +65,7 @@ async function openContratosTab(page: import("@playwright/test").Page): Promise<
 test.describe("SaaS CPQ — Pipeline tab Contratos", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
+    await mockSaasApis(page);
     await page.route("**/api/saas/contracts**", route =>
       route.fulfill({ json: FIXTURE_CONTRACTS }));
     await page.route("**/api/saas/quotes**", route =>
@@ -80,7 +81,6 @@ test.describe("SaaS CPQ — Pipeline tab Contratos", () => {
       }
       return route.fulfill({ json: { playbooks: [] } });
     });
-    await mockSaasApis(page);
   });
 
   test("carga pipeline sin error 500", async ({ page }) => {
@@ -142,8 +142,7 @@ test.describe("SaaS CPQ — /contracts/sign/[token] página pública", () => {
   test("botón Firmar visible cuando contrato está en estado sent (mocked)", async ({ page }) => {
     await page.route("**/api/public/contracts/sign/**", route =>
       route.fulfill({ json: FIXTURE_CONTRACT_PUBLIC }));
-    await page.goto("/contracts/sign/e2e-test-token-abc123");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.goto("/contracts/sign/e2e-test-token-abc123", { waitUntil: "domcontentloaded" });
     const bodyText = await page.locator("body").textContent() ?? "";
     expect(bodyText).toMatch(/[Ff]irmar|[Ss]ign|[Cc]ontrato/i);
   });

@@ -78,9 +78,9 @@ test.describe("SaaS WhatsApp Depth (S39)", () => {
   });
 
   test("WhatsApp carga sin error con banner Meta configurado y KPIs", async ({ page }) => {
-    await page.goto("/saas/whatsapp");
-    await expect(page).not.toHaveURL(/\/auth\/login/);
-    await page.waitForTimeout(600);
+    await page.goto("/saas/whatsapp", { waitUntil: "domcontentloaded" });
+    await expect(page).not.toHaveURL(/\/login/);
+    await expect(page.getByText("WhatsApp Business")).toBeVisible({ timeout: 10_000 });
 
     const body = await page.locator("body").textContent();
     expect(body).not.toContain("Something went wrong");
@@ -99,12 +99,9 @@ test.describe("SaaS WhatsApp Depth (S39)", () => {
   });
 
   test("tab Plantillas muestra plantillas sincronizadas con nombre y estado", async ({ page }) => {
-    await page.goto("/saas/whatsapp");
-    await page.waitForTimeout(500);
-
-    // Click on Plantillas tab
+    await page.goto("/saas/whatsapp", { waitUntil: "domcontentloaded" });
     await page.getByText("📋 Plantillas").click();
-    await page.waitForTimeout(600);
+    await expect(page.getByText("promo_verano")).toBeVisible({ timeout: 10_000 });
 
     const body = await page.locator("body").textContent();
     expect(body).not.toContain("Something went wrong");
@@ -115,22 +112,13 @@ test.describe("SaaS WhatsApp Depth (S39)", () => {
   });
 
   test("envío template mock dispara POST y muestra confirmación", async ({ page }) => {
-    await page.goto("/saas/whatsapp");
-    await page.waitForTimeout(500);
-
-    // Go to Plantillas tab
+    await page.goto("/saas/whatsapp", { waitUntil: "domcontentloaded" });
     await page.getByText("📋 Plantillas").click();
-    await page.waitForTimeout(500);
+    await expect(page.getByText("promo_verano")).toBeVisible({ timeout: 10_000 });
 
-    // Click Enviar on first template
     const sendBtn = page.locator("button", { hasText: "↗ Enviar" }).first();
     await sendBtn.click();
-    await page.waitForTimeout(300);
-
-    // Modal should appear with template name
-    const modalBody = await page.locator("body").textContent();
-    expect(modalBody).toContain("Enviar plantilla");
-    expect(modalBody).toContain("Teléfono destino");
+    await expect(page.getByText("Enviar plantilla")).toBeVisible();
 
     // Fill form and submit
     await page.fill("input[type=tel]", "+34600000099");
@@ -141,12 +129,7 @@ test.describe("SaaS WhatsApp Depth (S39)", () => {
       await varInputs.nth(i).fill(`valor${i + 1}`);
     }
 
-    await page.locator("button", { hasText: "Enviar plantilla" }).click();
-    await page.waitForTimeout(400);
-
-    // Modal should close (no "Enviar plantilla" header visible anymore or
-    // we verify by checking the page went back to templates list)
-    const afterBody = await page.locator("body").textContent();
-    expect(afterBody).not.toContain("Something went wrong");
+    await page.getByRole("button", { name: "Enviar plantilla" }).click();
+    await expect(page.getByText("Enviar plantilla")).not.toBeVisible({ timeout: 5000 });
   });
 });
