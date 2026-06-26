@@ -100,7 +100,7 @@ export default function ContractSignPage() {
         {/* Action */}
         {!signed && contract?.status !== "signed" ? (
           <div className="text-center space-y-3">
-            <p className="text-white/50 text-xs">Al hacer clic en "Firmar contrato" acepta los términos indicados.</p>
+            <p className="text-white/50 text-xs">Al hacer clic en «Firmar contrato» acepta los términos indicados.</p>
             <button
               onClick={() => void handleSign()}
               disabled={signing}
