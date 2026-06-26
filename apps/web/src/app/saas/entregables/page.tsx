@@ -274,7 +274,7 @@ export default function EntregablesPage() {
                 <div className="text-4xl">💰</div>
                 <p className="text-white font-semibold">Sin revenue atribuido</p>
                 <p className="text-white/40 text-sm max-w-md mx-auto">
-                  Vincula una campaña UTM a tus entregables usando el botón "Vincular campaña" en la pestaña Lista.
+                  Vincula una campaña UTM a tus entregables usando el botón «Vincular campaña» en la pestaña Lista.
                 </p>
               </div>
             ) : (
