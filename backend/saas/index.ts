@@ -1,4 +1,21 @@
 ﻿export {
+  SaasDataPlaybooksService,
+  SaasDataPlaybooksError,
+  getSaasDataPlaybooksService,
+  resetSaasDataPlaybooksServiceForTests,
+  type TenantDataContext,
+  type DataPlaybook,
+  type DataPlaybookStep,
+  type GeneratedPlaybook,
+  type GeneratedStep,
+  type PlaybooksSummary,
+  type GenerateResult,
+  type PlaybookCategory,
+  type PlaybookStatus,
+  type PlaybookStepType,
+  type SaasDataPlaybooksErrorCode,
+} from "./SaasDataPlaybooksService";
+export {
   SaasPackStoreService,
   SaasPackStoreError,
   getSaasPackStoreService,

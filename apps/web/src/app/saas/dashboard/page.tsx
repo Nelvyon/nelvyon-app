@@ -204,6 +204,7 @@ export default function SaasDashboardPage() {
           <div className="space-y-1.5">
             {[
               { label: "🛒 Explorar packs", href: "/saas/packs" },
+              { label: "📋 Ver playbooks recomendados", href: "/saas/playbooks" },
               { label: "Abrir CRM", href: "/saas/crm" },
               { label: "Ver pipeline", href: "/saas/crm?tab=pipeline" },
               { label: "Campañas de email", href: "/saas/campanias" },

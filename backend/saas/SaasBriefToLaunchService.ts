@@ -316,6 +316,15 @@ export class SaasBriefToLaunchService {
         void this.entitlements.consumeLaunch(tenantId, launch.pack_id).catch(() => {});
       }
 
+      // Hook S53: regenerate data playbooks from fresh metrics (non-blocking)
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { getSaasDataPlaybooksService } = require("./SaasDataPlaybooksService") as {
+          getSaasDataPlaybooksService: () => { refreshPlaybooks(tenantId: string): Promise<unknown> };
+        };
+        void getSaasDataPlaybooksService().refreshPlaybooks(tenantId).catch(() => {});
+      } catch { /* never block launch */ }
+
       return rowToLaunch(updated[0]!);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

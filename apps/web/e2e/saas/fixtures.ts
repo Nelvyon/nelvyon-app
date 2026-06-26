@@ -255,6 +255,47 @@ export async function mockEntregablesRevenue(
   });
 }
 
+export const FIXTURE_DATA_PLAYBOOKS = {
+  summary: { suggested: 2, active: 0, completed: 0, dismissed: 0 },
+  playbooks: [
+    {
+      id: "pb-1", tenantId: "t1", slug: "improve-email-open-rate",
+      title: "Mejora la apertura de tus emails", triggerReason: "Tu apertura (12.0%) está por debajo de la media del sector (21.2%)",
+      category: "email", priority: 80, status: "suggested", contextSnapshot: {},
+      renderedSummary: "Acme abre el 12.0% de sus emails frente al 21.2% del sector.",
+      packId: null, ctaHref: "/saas/campanias",
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      activatedAt: null, completedAt: null,
+      steps: [
+        { id: "st-1", playbookId: "pb-1", sortOrder: 0, stepType: "insight", title: "Diagnóstico", body: "Apertura 12.0% vs 21.2%", metadata: {}, completed: false },
+        { id: "st-2", playbookId: "pb-1", sortOrder: 1, stepType: "email_draft", title: "Reescribe 3 asuntos", body: "Crea 3 variantes...", metadata: {}, completed: false },
+      ],
+    },
+    {
+      id: "pb-2", tenantId: "t1", slug: "launch-growth-pack",
+      title: "Lanza tu primer pack de crecimiento", triggerReason: "Todavía no has lanzado ningún pack",
+      category: "growth", priority: 90, status: "suggested", contextSnapshot: {},
+      renderedSummary: "Acme puede generar landing, SEO y chatbot lanzando Crecimiento Local.",
+      packId: "local-business-growth", ctaHref: "/saas/brief-to-launch?packId=local-business-growth",
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      activatedAt: null, completedAt: null,
+      steps: [
+        { id: "st-3", playbookId: "pb-2", sortOrder: 0, stepType: "launch_pack", title: "Lanza el pack", body: "Lanza Crecimiento Local", metadata: { packId: "local-business-growth" }, completed: false },
+      ],
+    },
+  ],
+};
+
+/** Intercepts data-playbooks endpoints. Call AFTER setupAuthedSaas (LIFO). */
+export async function mockDataPlaybooks(page: Page): Promise<void> {
+  await page.route("**/api/saas/data-playbooks/refresh**", route =>
+    route.fulfill({ json: { generated: 2, playbooks: FIXTURE_DATA_PLAYBOOKS.playbooks } }));
+  await page.route(/\/api\/saas\/data-playbooks\/[^/]+$/, route =>
+    route.fulfill({ json: { playbook: FIXTURE_DATA_PLAYBOOKS.playbooks[0] } }));
+  await page.route(/\/api\/saas\/data-playbooks(\?|$)/, route =>
+    route.fulfill({ json: FIXTURE_DATA_PLAYBOOKS }));
+}
+
 export const FIXTURE_PACK_STORE = {
   summary: { totalPacks: 3, available: 2, owned: 1, launchesRemaining: 1 },
   catalog: [
