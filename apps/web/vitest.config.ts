@@ -9,6 +9,7 @@ export default defineConfig({
     include: [
       "src/**/*.{test,spec}.?(c|m)[jt]s?(x)",
       "../../backend/os-agents/__tests__/**/*.test.ts",
+      "../../backend/os-agents/**/__tests__/**/*.test.ts",
       "../../backend/os-core/__tests__/**/*.test.ts",
       "../../backend/saas/__tests__/**/*.test.ts",
       "../../backend/saas-reports/__tests__/**/*.test.ts",

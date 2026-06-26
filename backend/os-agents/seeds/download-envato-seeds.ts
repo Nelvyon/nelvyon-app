@@ -97,15 +97,16 @@ async function downloadZip(url: string, dest: string): Promise<void> {
 async function downloadSector(
   sector: (typeof SECTORS)[number],
   metadata: MetadataEntry[],
+  perSector: number = ITEMS_PER_SECTOR,
 ): Promise<void> {
   const dir = join(OUTPUT_DIR, sector.id);
   mkdirSync(dir, { recursive: true });
 
-  console.log(`\n[${sector.label}] Buscando ${ITEMS_PER_SECTOR} items…`);
+  console.log(`\n[${sector.label}] Buscando ${perSector} items…`);
 
   const searchParams = new URLSearchParams({
     q: sector.query,
-    page_size: String(ITEMS_PER_SECTOR),
+    page_size: String(perSector),
     page: "1",
     category: sector.category,
     sort_by: "downloads",
@@ -163,24 +164,42 @@ async function downloadSector(
   }
 }
 
+/** Parse CLI flags: --lite, --sector <id>, --limit <n>. */
+function parseArgs(argv: string[]): { lite: boolean; sector: string | null; limit: number | null } {
+  let lite = false;
+  let sector: string | null = null;
+  let limit: number | null = null;
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === "--lite") lite = true;
+    else if (a === "--sector") sector = argv[++i] ?? null;
+    else if (a === "--limit") {
+      const n = parseInt(argv[++i] ?? "", 10);
+      if (Number.isFinite(n) && n > 0) limit = n;
+    }
+  }
+  return { lite, sector, limit };
+}
+
 async function main() {
+  const { lite, sector: sectorFilter, limit } = parseArgs(process.argv.slice(2));
+
   if (!TOKEN) {
-    console.error(
+    // CI-safe: exit 0 (no throw) — metadata catalog already committed works without ZIPs.
+    console.log(
       [
-        "❌ ENVATO_ELEMENTS_TOKEN no configurado.",
+        "ℹ️  ENVATO_ELEMENTS_TOKEN no configurado — modo metadata only.",
         "",
-        "Para descargar ZIPs reales de Envato Elements (10 sectores × 50 items = 500 total):",
-        "  1. Necesitas una suscripción Envato Elements (Professional o Unlimited).",
-        "  2. Genera un Personal API Token en: https://elements.envato.com/user/settings/api",
-        "  3. Ejecuta: ENVATO_ELEMENTS_TOKEN=your_token npx tsx backend/os-agents/seeds/download-envato-seeds.ts",
+        "El catálogo de 500 seeds (backend/data/envato-seeds-metadata.json) ya está commiteado",
+        "y es usable sin ZIPs. Los packs usarán los seeds sintéticos/metadata.",
         "",
-        "Los ZIPs se guardan en backend/data/envato-seeds/{sector}/ (gitignored).",
-        "Los metadatos se actualizan en backend/data/envato-seeds-metadata.json (commiteable).",
-        "",
-        "Sin el token, los packs usarán los seeds sintéticos incluidos en envato-seeds-metadata.json.",
+        "Para descargar ZIPs reales:",
+        "  1. Suscripción Envato Elements (Professional/Unlimited).",
+        "  2. Token: https://elements.envato.com/user/settings/api",
+        "  3. ENVATO_ELEMENTS_TOKEN=xxx npx tsx backend/os-agents/seeds/download-envato-seeds.ts [--lite] [--sector dental --limit 5]",
       ].join("\n"),
     );
-    process.exit(1);
+    process.exit(0);
   }
 
   mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -193,16 +212,34 @@ async function main() {
     } catch { metadata = []; }
   }
 
-  for (const sector of SECTORS) {
-    await downloadSector(sector, metadata);
+  // Lite mode: 1 item per sector (pilot). Otherwise ITEMS_PER_SECTOR (or --limit).
+  const perSector = lite ? 1 : (limit ?? ITEMS_PER_SECTOR);
+  const targets = sectorFilter ? SECTORS.filter((s) => s.id === sectorFilter) : SECTORS;
+  if (sectorFilter && targets.length === 0) {
+    console.error(`❌ Sector desconocido: ${sectorFilter}. Opciones: ${SECTORS.map((s) => s.id).join(", ")}`);
+    process.exit(1);
+  }
+
+  console.log(`Modo: ${lite ? "LITE (1/sector)" : `${perSector}/sector`}${sectorFilter ? ` · sector=${sectorFilter}` : ""}`);
+
+  for (const sector of targets) {
+    await downloadSector(sector, metadata, perSector);
   }
 
   writeFileSync(METADATA_FILE, JSON.stringify(metadata, null, 2));
   const downloaded = metadata.filter((m) => m.downloaded_at !== null).length;
   console.log(`\n✅ ${downloaded}/${metadata.length} items con ZIP descargado en ${OUTPUT_DIR}`);
   console.log(`📄 Metadatos actualizados: ${METADATA_FILE}`);
-  if (downloaded < ITEMS_PER_SECTOR * SECTORS.length) {
-    console.warn(`⚠️  Faltan ${ITEMS_PER_SECTOR * SECTORS.length - downloaded} items — algunos pueden no estar disponibles para tu suscripción.`);
+
+  // Best-effort: sync the registry if a DATABASE_URL is available.
+  if (process.env.DATABASE_URL?.trim()) {
+    try {
+      const { getOsEnvatoSeedService } = await import("./OsEnvatoSeedService");
+      const res = await getOsEnvatoSeedService().syncFromMetadataFile();
+      console.log(`🗄️  Registry sincronizado: ${res.synced} (insertados ${res.inserted}, actualizados ${res.updated})`);
+    } catch (e) {
+      console.warn(`⚠️  No se pudo sincronizar el registry: ${e instanceof Error ? e.message : e}`);
+    }
   }
 }
 
