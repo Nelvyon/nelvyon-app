@@ -255,6 +255,28 @@ export async function mockEntregablesRevenue(
   });
 }
 
+export const FIXTURE_VOICE = {
+  catalog: [
+    { id: "nav_crm", phrases: ["crm", "ir a crm"], actionType: "navigate", route: "/saas/crm", description: "Abrir el CRM" },
+    { id: "nav_packs", phrases: ["pack store", "packs"], actionType: "navigate", route: "/saas/packs", description: "Abrir el Pack Store" },
+    { id: "act_refresh_playbooks", phrases: ["sincronizar playbooks"], actionType: "action", action: "refresh_playbooks", route: "/saas/playbooks", description: "Regenerar tus playbooks" },
+    { id: "qry_subcuentas", phrases: ["cuantas subcuentas"], actionType: "query", action: "count_subcuentas", description: "Cuántas subcuentas tienes" },
+  ],
+  history: [
+    { id: "v1", tenantId: "t1", userId: null, transcript: "ir a crm", matchedIntent: "nav_crm", actionType: "navigate", actionPayload: {}, success: true, errorMessage: null, source: "web_speech", createdAt: new Date().toISOString() },
+  ],
+};
+
+/** Intercepts voice endpoints. Call AFTER setupAuthedSaas (LIFO). */
+export async function mockSaasVoice(page: Page): Promise<void> {
+  await page.route("**/api/saas/voice/execute**", route =>
+    route.fulfill({ json: { success: true, route: "/saas/crm", intent: { id: "nav_crm", actionType: "navigate", route: "/saas/crm" }, message: "Abrir el CRM" } }));
+  await page.route("**/api/saas/voice/parse**", route =>
+    route.fulfill({ json: { result: { success: true, route: "/saas/crm", intent: { id: "nav_crm" } }, intent: { id: "nav_crm" } } }));
+  await page.route(/\/api\/saas\/voice(\?|$)/, route =>
+    route.fulfill({ json: FIXTURE_VOICE }));
+}
+
 export const FIXTURE_PARTNER_ZONE = {
   eligibility: { eligible: true, plan: "agency", reason: "plan" },
   connect: { connected: false, accountId: null, status: "not_connected", chargesEnabled: false, payoutsEnabled: false, onboardedAt: null },

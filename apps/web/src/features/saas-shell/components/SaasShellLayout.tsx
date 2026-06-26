@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { SaasVoiceCommand } from "./SaasVoiceCommand";
 
 /**
  * Premium dark shell wrapper for all real SaaS pages.
@@ -66,6 +67,9 @@ export function SaasShellLayout({
           <div className="hidden lg:block">{sidebar}</div>
           <main className="space-y-6 min-w-0">{children}</main>
         </div>
+
+        {/* Global voice command FAB (free Web Speech API) */}
+        <SaasVoiceCommand />
       </div>
     </DashboardLayout>
   );

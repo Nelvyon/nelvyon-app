@@ -1,4 +1,18 @@
 ﻿export {
+  SaasVoiceCommandService,
+  SaasVoiceCommandError,
+  getSaasVoiceCommandService,
+  resetSaasVoiceCommandServiceForTests,
+  normalizeTranscript,
+  type VoiceActionType,
+  type VoiceCatalogItem,
+  type VoiceIntent,
+  type VoiceCommandResult,
+  type VoiceCommandLog,
+  type VoiceNavCatalogPort,
+  type SaasVoiceCommandErrorCode,
+} from "./SaasVoiceCommandService";
+export {
   SaasPartnerZoneService,
   SaasPartnerZoneError,
   getSaasPartnerZoneService,
