@@ -52,7 +52,8 @@ export type SaasNavId =
   | "memberships"
   | "entregables"
   | "autopilot"
-  | "brief-to-launch";
+  | "brief-to-launch"
+  | "compliance";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -103,6 +104,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "affiliates", label: "🤝 Programa Afiliados",     href: "/saas/affiliates", group: "gestion" },
   { id: "loyalty",    label: "🏆 Fidelización",           href: "/saas/loyalty",    group: "gestion" },
   { id: "brief-to-launch", label: "🚀 Lanzar Pack", href: "/saas/brief-to-launch", group: "ia" },
+  { id: "compliance", label: "🔒 Compliance", href: "/saas/compliance", group: "ia" },
   { id: "autopilot", label: "🤖 Autopilot", href: "/saas/autopilot", group: "ia" },
   { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes", group: "ia" },
   { id: "chat", label: "💬 Asistente IA", href: "/saas/chat", group: "ia" },
