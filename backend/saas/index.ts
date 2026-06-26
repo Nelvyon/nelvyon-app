@@ -1,4 +1,18 @@
 ﻿export {
+  SaasComplianceVaultService,
+  SaasComplianceVaultError,
+  getSaasComplianceVaultService,
+  resetSaasComplianceVaultServiceForTests,
+  type ComplianceArtifact,
+  type VaultSummary,
+  type ListVaultFilters,
+  type AttachDocumentInput,
+  type ComplianceStatus,
+  type ConsentType,
+  type DeliverableSourceCV,
+  type SaasComplianceVaultErrorCode,
+} from "./SaasComplianceVaultService";
+export {
   SaasBriefToLaunchService,
   SaasBriefToLaunchError,
   getSaasBriefToLaunchService,

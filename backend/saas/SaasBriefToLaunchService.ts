@@ -265,6 +265,16 @@ export class SaasBriefToLaunchService {
          RETURNING *`,
         [packRun.id, portalUrl, launchId],
       );
+
+      // Hook S50: sync compliance artifact for the pack run (non-blocking)
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { getSaasComplianceVaultService } = require("./SaasComplianceVaultService") as {
+          getSaasComplianceVaultService: () => { syncFromPackRun(tenantId: string, packRunId: string): Promise<unknown> };
+        };
+        void getSaasComplianceVaultService().syncFromPackRun(tenantId, packRun.id).catch(() => {});
+      } catch { /* never block launch */ }
+
       return rowToLaunch(updated[0]!);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
