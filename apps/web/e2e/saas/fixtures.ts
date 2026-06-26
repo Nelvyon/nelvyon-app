@@ -151,58 +151,177 @@ export const FIXTURE_FUNNELS = {
   ],
 };
 
+export const FIXTURE_BRIEF_TO_LAUNCH = {
+  packs: [
+    {
+      id: "local-business-growth", name: "Crecimiento Local", tagline: "Landing + SEO local",
+      availability: "available", estimatedMinutes: 45, inputs: [], outputs: [], accent: "#0084ff",
+    },
+    {
+      id: "ecommerce-growth", name: "Crecimiento Ecommerce", tagline: "DTC growth",
+      availability: "beta", estimatedMinutes: 60, inputs: [], outputs: [], accent: "#0084ff",
+    },
+  ],
+  launches: [],
+};
+
+export const FIXTURE_COMPLIANCE = {
+  summary: { total: 0, pending: 0, verified: 0, expiringSoon: 0 },
+  artifacts: [],
+};
+
+export const FIXTURE_AUTOPILOT = {
+  status: {
+    tenantId: "t1", seoEnabled: false, socialEnabled: true, reputationEnabled: false, adsEnabled: false,
+    seoDayOfMonth: 1, socialDayOfMonth: 1, lastSeoRunAt: null, lastSocialRunAt: "2026-06-01T08:00:00Z",
+    lastReputationRunAt: null, lastAdsRunAt: null, updatedAt: new Date().toISOString(),
+    activeCount: 1, nextSeoRun: null, nextSocialRun: "2026-07-01T08:00:00Z",
+  },
+};
+
+export const FIXTURE_ENTREGABLES = {
+  deliverables: [],
+  summary: { total: 0, pendingReview: 0, approved: 0, avgQaScore: null, byType: {}, byStatus: {} },
+};
+
+export const FIXTURE_PUBLICIDAD = {
+  ok: true,
+  attribution: {
+    model: "last_click",
+    channels: [{ channel: "meta", revenue: 12000, conversions: 48, roas: 4.2, spend: 2857 }],
+    totalRevenue: 12000, totalConversions: 48, totalSpend: 2857,
+  },
+  connections: {
+    meta: { status: "disconnected", accountName: null },
+    google: { status: "disconnected", accountName: null },
+    tiktok: { status: "disconnected", accountName: null },
+  },
+};
+
+export const FIXTURE_ADS = {
+  status: [
+    { platform: "meta", connected: false },
+    { platform: "google", connected: false },
+    { platform: "linkedin", connected: false },
+    { platform: "tiktok", connected: false },
+  ],
+};
+
+export const FIXTURE_INTEGRATIONS = {
+  catalog: [], connections: [],
+  summary: { total: 0, connected: 0, envOnly: 0, oauthReady: 0 },
+};
+
+export const FIXTURE_MEMBERSHIPS = {
+  program: null, plans: [], communities: [], stats: { members: 0, activePlans: 0 },
+};
+
+export const FIXTURE_WHATSAPP = {
+  whatsapp_configured: true, provider: "meta", phone_number_id: "123456789",
+  from_number: null,
+  messages: [{ id: "m1", to: "+34600000001", body: "Hola!", status: "sent", createdAt: new Date().toISOString() }],
+};
+
+/** Cookie + default SaaS API mocks — use in beforeEach for authenticated pages. */
+export async function setupAuthedSaas(page: Page, context: BrowserContext): Promise<void> {
+  await setAuthCookie(context);
+  await mockSaasApis(page);
+}
+
 // ─── Route interceptors ──────────────────────────────────────────────────────
 
-/** Intercepts ALL /api/saas/* calls and returns fixture data. */
+/** Intercepts /api/saas/* with fixtures. Catch-all registered FIRST (LIFO → lowest priority). */
 export async function mockSaasApis(page: Page): Promise<void> {
-  await page.route("**/api/saas/settings**", route =>
-    route.fulfill({ json: FIXTURE_SETTINGS }));
-
-  await page.route("**/api/saas/crm/contacts**", route =>
-    route.fulfill({ json: FIXTURE_CONTACTS }));
-
-  await page.route("**/api/saas/deals**", route =>
-    route.fulfill({ json: FIXTURE_DEALS }));
-
-  await page.route("**/api/saas/campanias**", route =>
-    route.fulfill({ json: FIXTURE_CAMPANIAS }));
-
-  await page.route("**/api/saas/workflows**", route =>
-    route.fulfill({ json: FIXTURE_WORKFLOWS }));
-
-  await page.route("**/api/saas/billing**", route =>
-    route.fulfill({ json: FIXTURE_BILLING }));
-
-  await page.route("**/api/saas/audit**", route =>
-    route.fulfill({ json: FIXTURE_AUDIT }));
-
-  await page.route("**/api/saas/affiliates**", route =>
-    route.fulfill({ json: FIXTURE_AFFILIATES }));
-
-  await page.route("**/api/saas/loyalty**", route =>
-    route.fulfill({ json: FIXTURE_LOYALTY }));
-
-  await page.route("**/api/saas/api-keys**", route =>
-    route.fulfill({ json: FIXTURE_API_KEYS }));
-
-  await page.route("**/api/saas/lead-scoring**", route =>
-    route.fulfill({ json: FIXTURE_LEAD_SCORING }));
-
-  await page.route("**/api/saas/reportes**", route =>
-    route.fulfill({ json: FIXTURE_REPORTES }));
-
-  await page.route("**/api/saas/sso**", route =>
-    route.fulfill({ json: FIXTURE_SSO }));
-
-  await page.route("**/api/saas/pipeline**", route =>
-    route.fulfill({ json: FIXTURE_DEALS }));
-
-  await page.route("**/api/saas/funnels**", route =>
-    route.fulfill({ json: FIXTURE_FUNNELS }));
-
-  await page.route("**/api/saas/inbox**", route =>
-    route.fulfill({ json: { conversations: [], total: 0 } }));
-
   await page.route("**/api/saas/**", route =>
     route.fulfill({ json: { ok: true }, status: 200 }));
+
+  await page.route("**/api/saas/settings**", route =>
+    route.fulfill({ json: FIXTURE_SETTINGS }));
+  await page.route("**/api/saas/crm/contacts**", route =>
+    route.fulfill({ json: FIXTURE_CONTACTS }));
+  await page.route("**/api/saas/deals**", route =>
+    route.fulfill({ json: FIXTURE_DEALS }));
+  await page.route("**/api/saas/campanias**", route =>
+    route.fulfill({ json: FIXTURE_CAMPANIAS }));
+  await page.route("**/api/saas/workflows**", route =>
+    route.fulfill({ json: FIXTURE_WORKFLOWS }));
+  await page.route("**/api/saas/billing**", route =>
+    route.fulfill({ json: FIXTURE_BILLING }));
+  await page.route("**/api/saas/audit**", route =>
+    route.fulfill({ json: FIXTURE_AUDIT }));
+  await page.route("**/api/saas/affiliates**", route =>
+    route.fulfill({ json: FIXTURE_AFFILIATES }));
+  await page.route("**/api/saas/loyalty**", route =>
+    route.fulfill({ json: FIXTURE_LOYALTY }));
+  await page.route("**/api/saas/api-keys**", route =>
+    route.fulfill({ json: FIXTURE_API_KEYS }));
+  await page.route("**/api/saas/lead-scoring**", route =>
+    route.fulfill({ json: FIXTURE_LEAD_SCORING }));
+  await page.route("**/api/saas/reportes**", route =>
+    route.fulfill({ json: FIXTURE_REPORTES }));
+  await page.route("**/api/saas/sso**", route =>
+    route.fulfill({ json: FIXTURE_SSO }));
+  await page.route("**/api/saas/pipeline**", route =>
+    route.fulfill({ json: FIXTURE_DEALS }));
+  await page.route("**/api/saas/funnels**", route =>
+    route.fulfill({ json: FIXTURE_FUNNELS }));
+  await page.route("**/api/saas/inbox**", route =>
+    route.fulfill({ json: { conversations: [], total: 0 } }));
+  await page.route("**/api/saas/brief-to-launch**", route => {
+    if (route.request().method() === "POST") {
+      return route.fulfill({ status: 201, json: { launch: { id: "launch-e2e", status: "queued", packId: "local-business-growth" } } });
+    }
+    return route.fulfill({ json: FIXTURE_BRIEF_TO_LAUNCH });
+  });
+  await page.route("**/api/saas/compliance**", route => {
+    if (route.request().url().includes("/sync")) {
+      return route.fulfill({ json: { synced: 0, artifacts: [] } });
+    }
+    return route.fulfill({ json: FIXTURE_COMPLIANCE });
+  });
+  await page.route("**/api/saas/autopilot**", route => {
+    if (route.request().method() === "PATCH") {
+      return route.fulfill({ json: { settings: FIXTURE_AUTOPILOT.status } });
+    }
+    return route.fulfill({ json: FIXTURE_AUTOPILOT });
+  });
+  await page.route("**/api/saas/entregables**", route =>
+    route.fulfill({ json: FIXTURE_ENTREGABLES }));
+  await page.route("**/api/saas/entregables/revenue**", route => {
+    if (route.request().method() === "POST") {
+      return route.fulfill({ json: { refreshed: true, items: [] } });
+    }
+    return route.fulfill({ json: { items: [], model: "last_click", days: 30 } });
+  });
+  await page.route("**/api/saas/publicidad**", route =>
+    route.fulfill({ json: FIXTURE_PUBLICIDAD }));
+  await page.route("**/api/saas/ads**", route => {
+    const url = route.request().url();
+    if (url.includes("attribution")) {
+      return route.fulfill({ json: { roas: [] } });
+    }
+    if (url.includes("campaigns")) {
+      return route.fulfill({ json: { campaigns: [] } });
+    }
+    return route.fulfill({ json: FIXTURE_ADS });
+  });
+  await page.route("**/api/saas/integrations**", route =>
+    route.fulfill({ json: FIXTURE_INTEGRATIONS }));
+  await page.route("**/api/saas/memberships**", route =>
+    route.fulfill({ json: FIXTURE_MEMBERSHIPS }));
+  await page.route("**/api/saas/whatsapp**", route =>
+    route.fulfill({ json: FIXTURE_WHATSAPP }));
+  await page.route("**/api/saas/contracts**", route =>
+    route.fulfill({ json: { contracts: [] } }));
+  await page.route("**/api/saas/quotes**", route =>
+    route.fulfill({ json: { quotes: [] } }));
+  await page.route("**/api/saas/playbooks**", route => {
+    const url = route.request().url();
+    if (url.includes("resource=forecast")) {
+      return route.fulfill({ json: { forecast: { weightedTotal: 0, bestCase: 0, committed: 0, byStage: [] } } });
+    }
+    return route.fulfill({ json: { playbooks: [] } });
+  });
+  await page.route("**/api/saas/web-builder**", route =>
+    route.fulfill({ json: { sites: [] } }));
 }

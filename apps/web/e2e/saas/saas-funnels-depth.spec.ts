@@ -47,8 +47,8 @@ const FIXTURE_ANALYTICS = {
 test.describe("SaaS Funnels — depth (S36)", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
-    await page.route("**/api/saas/funnels**", route => route.fulfill({ json: FIXTURE_FUNNELS }));
     await mockSaasApis(page);
+    await page.route("**/api/saas/funnels**", route => route.fulfill({ json: FIXTURE_FUNNELS }));
   });
 
   test("builder carga con lista de funnels y KPIs", async ({ page }) => {
@@ -67,8 +67,8 @@ test.describe("SaaS Funnels — depth (S36)", () => {
       return route.fulfill({ json: { funnel: FIXTURE_FUNNELS.funnels[0] } });
     });
 
-    await page.goto("/saas/funnels?id=f-e2e-1");
-    await page.waitForTimeout(600);
+    await page.goto("/saas/funnels?id=f-e2e-1", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText("E2E Test Funnel").or(page.getByText("Analytics"))).toBeVisible({ timeout: 10_000 });
 
     const analyticsTab = page.locator("button", { hasText: "Analytics" });
     if (await analyticsTab.isVisible()) {

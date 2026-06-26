@@ -63,8 +63,8 @@ test.describe("SaaS Entregables — estado vacío honesto", () => {
   });
 
   test("muestra hint honesto cuando no hay entregables", async ({ page }) => {
-    await page.goto("/saas/entregables");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
     const bodyText = await page.locator("body").textContent() ?? "";
     expect(bodyText).toMatch(/pack|recurrentes|sin entregables/i);
   });
@@ -79,22 +79,22 @@ test.describe("SaaS Entregables — página con datos", () => {
   });
 
   test("KPI strip muestra total = 2", async ({ page }) => {
-    await page.goto("/saas/entregables");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
     const bodyText = await page.locator("body").textContent() ?? "";
     expect(bodyText).toMatch(/2/);
   });
 
   test("título 'Landing ACME E2E' aparece en tabla", async ({ page }) => {
-    await page.goto("/saas/entregables");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
     const bodyText = await page.locator("body").textContent() ?? "";
     expect(bodyText).toMatch(/Landing ACME E2E/);
   });
 
   test("QA score 91% visible en verde", async ({ page }) => {
-    await page.goto("/saas/entregables");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
     const bodyText = await page.locator("body").textContent() ?? "";
     expect(bodyText).toMatch(/91%/);
   });
@@ -105,8 +105,8 @@ test.describe("SaaS Entregables — página con datos", () => {
       intercepted.push(route.request().url());
       return route.fulfill({ json: FIXTURE_DATA });
     });
-    await page.goto("/saas/entregables");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
 
     // Change type filter
     const select = page.locator("select").first();
@@ -116,16 +116,16 @@ test.describe("SaaS Entregables — página con datos", () => {
   });
 
   test("'Ver portal' link apunta a /portal/deliverables/", async ({ page }) => {
-    await page.goto("/saas/entregables");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
     const link = page.locator("a", { hasText: "Ver portal" }).first();
     const href = await link.getAttribute("href");
     expect(href).toContain("/portal/deliverables/");
   });
 
   test("no redirige a /login con cookie válida", async ({ page }) => {
-    await page.goto("/saas/entregables");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
     await expect(page).not.toHaveURL(LOGIN_URL);
   });
 });

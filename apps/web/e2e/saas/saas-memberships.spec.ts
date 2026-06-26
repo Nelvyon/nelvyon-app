@@ -78,20 +78,20 @@ test.describe("SaaS Memberships — página autenticada", () => {
 
   test("URL contiene /saas/memberships tras carga", async ({ page }) => {
     await page.goto("/saas/memberships");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.waitForLoadState("domcontentloaded");
     expect(page.url()).toContain("/saas/memberships");
   });
 
   test("tiene al menos un botón o elemento interactivo", async ({ page }) => {
     await page.goto("/saas/memberships");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.waitForLoadState("domcontentloaded");
     const buttons = page.locator("button");
     await expect(buttons.first()).toBeVisible({ timeout: 8000 });
   });
 
   test("3 tabs visibles (Planes / Miembros / Afiliados)", async ({ page }) => {
     await page.goto("/saas/memberships");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.waitForLoadState("domcontentloaded");
     // Tabs should contain "Planes", "Miembros", "Afiliados"
     const bodyText = await page.locator("body").textContent() ?? "";
     expect(bodyText).toMatch(/Planes|Miembros|Afiliados/);
@@ -106,14 +106,14 @@ test.describe("SaaS Memberships — página autenticada", () => {
       return route.fulfill({ json: FIXTURE_MEMBERSHIPS });
     });
     await page.goto("/saas/memberships");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.waitForLoadState("domcontentloaded");
     const bodyText = await page.locator("body").textContent() ?? "";
     expect(bodyText.length).toBeGreaterThan(100);
   });
 
   test("plan 'Pro' aparece en el texto de la página", async ({ page }) => {
     await page.goto("/saas/memberships");
-    await page.waitForLoadState("networkidle", { timeout: 8000 });
+    await page.waitForLoadState("domcontentloaded");
     const bodyText = await page.locator("body").textContent() ?? "";
     expect(bodyText).toMatch(/Pro|Memberships|Membresías|Planes/i);
   });
