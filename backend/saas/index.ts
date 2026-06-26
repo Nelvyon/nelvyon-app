@@ -1,4 +1,18 @@
 ﻿export {
+  SaasSectorBenchmarkService,
+  SaasSectorBenchmarkError,
+  getSaasSectorBenchmarkService,
+  resetSaasSectorBenchmarkServiceForTests,
+  type BenchmarkMetricKey,
+  type BenchmarkRating,
+  type ClientMetricValue,
+  type BenchmarkComparison,
+  type BenchmarkSummary,
+  type BenchmarkDashboard,
+  type SectorOption,
+  type SaasSectorBenchmarkErrorCode,
+} from "./SaasSectorBenchmarkService";
+export {
   SaasComplianceVaultService,
   SaasComplianceVaultError,
   getSaasComplianceVaultService,

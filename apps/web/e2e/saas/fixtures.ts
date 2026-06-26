@@ -255,6 +255,41 @@ export async function mockEntregablesRevenue(
   });
 }
 
+export const FIXTURE_BENCHMARK = {
+  dashboard: {
+    tenantId: "t1",
+    sectorKey: "ecommerce",
+    sectorLabel: "E-commerce",
+    periodDays: 30,
+    clientMetrics: [
+      { key: "email_open_rate", label: "Tasa de apertura email", value: 0.31, unit: "%", source: "Campañas email" },
+      { key: "conversion_rate", label: "Tasa de conversión", value: 0.04, unit: "%", source: "Atribución de leads" },
+      { key: "roas", label: "ROAS publicidad", value: 4.6, unit: "x", source: "Métricas de ads" },
+    ],
+    industryMetrics: { email_open_rate: 0.1568, conversion_rate: 0.0257, roas: 4.12 },
+    comparisons: [
+      { key: "email_open_rate", label: "Tasa de apertura email", clientValue: 0.31, industryValue: 0.1568, unit: "%", deltaPct: 97.7, higherBetter: true, rating: "excelente" },
+      { key: "conversion_rate", label: "Tasa de conversión", clientValue: 0.04, industryValue: 0.0257, unit: "%", deltaPct: 55.6, higherBetter: true, rating: "excelente" },
+      { key: "roas", label: "ROAS publicidad", clientValue: 4.6, industryValue: 4.12, unit: "x", deltaPct: 11.7, higherBetter: true, rating: "bueno" },
+    ],
+    summary: { metricsTracked: 3, metricsCompared: 3, aboveIndustry: 3, belowIndustry: 0, overallScore: 100 },
+    dataSources: ["Campañas email", "Atribución de leads", "Métricas de ads"],
+    degraded: false,
+    computedAt: new Date().toISOString(),
+  },
+  fromSnapshot: false,
+};
+
+/** Intercepts benchmark endpoints with a populated fixture dashboard. */
+export async function mockSectorBenchmark(page: Page): Promise<void> {
+  await page.route("**/api/saas/benchmark/refresh**", route =>
+    route.fulfill({ json: { dashboard: FIXTURE_BENCHMARK.dashboard } }));
+  await page.route("**/api/saas/benchmark**", route =>
+    route.fulfill({ json: FIXTURE_BENCHMARK }));
+  await page.route("**/api/saas/benchmarks/sectors**", route =>
+    route.fulfill({ json: { sectors: [{ key: "ecommerce", label: "E-commerce" }] } }));
+}
+
 // ─── Route interceptors ──────────────────────────────────────────────────────
 
 /** Intercepts /api/saas/* with fixtures. Catch-all registered FIRST (LIFO → lowest priority). */
