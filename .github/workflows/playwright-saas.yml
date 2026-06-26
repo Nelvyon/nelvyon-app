@@ -18,7 +18,9 @@ on:
       - "apps/web/src/app/api/saas/**"
       - "apps/web/src/app/api/public/**"
       - "apps/web/src/app/contracts/**"
+      - "apps/web/e2e/saas/**"
       - "backend/saas/**"
+      - ".github/workflows/playwright-saas.yml"
 
 jobs:
   security-gate:
