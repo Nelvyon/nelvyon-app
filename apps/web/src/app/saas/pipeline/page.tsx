@@ -264,9 +264,14 @@ export default function SaasPipelinePage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-border">
+        <div className="flex gap-1 border-b border-border" data-testid="pipeline-tabs">
           {(["forecast", "deals", "playbooks", "quotes", "contratos"] as Tab[]).map(t => (
-            <button key={t} onClick={() => setTab(t)}
+            <button
+              key={t}
+              type="button"
+              data-testid={`pipeline-tab-${t}`}
+              data-active={tab === t ? "true" : "false"}
+              onClick={() => setTab(t)}
               className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${tab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               {t === "forecast" ? "📊 Forecast" : t === "deals" ? `💼 Deals (${deals.length})` : t === "playbooks" ? `📋 Playbooks (${playbooks.length})` : t === "quotes" ? `📄 Presupuestos (${quotes.length})` : `📝 Contratos (${contracts.length})`}
             </button>
@@ -274,7 +279,7 @@ export default function SaasPipelinePage() {
         </div>
 
         {loading ? (
-          <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}</div>
+          <div className="space-y-3" data-testid="pipeline-loading">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}</div>
         ) : (
           <>
             {/* ── FORECAST ── */}
@@ -464,7 +469,7 @@ export default function SaasPipelinePage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <p className="font-medium text-foreground text-sm">{c.title}</p>
-                              <span className="text-xs text-muted-foreground font-mono">{c.contractNumber}</span>
+                              <span className="text-xs text-muted-foreground font-mono" data-testid={`contract-number-${c.id}`}>{c.contractNumber}</span>
                               <NelvyonDsBadge tone={statusTone[c.status] ?? "default"}>{statusLabel[c.status] ?? c.status}</NelvyonDsBadge>
                             </div>
                             <p className="text-xs text-muted-foreground mt-0.5">{c.clientName} · {c.clientEmail}</p>
