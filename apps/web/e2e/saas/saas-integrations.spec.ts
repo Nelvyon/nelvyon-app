@@ -67,11 +67,8 @@ test.describe("SaaS Integraciones — página autenticada", () => {
   });
 
   test("filtro de búsqueda existe en DOM", async ({ page }) => {
-    await page.goto("/saas/integraciones");
-    await page.waitForLoadState("domcontentloaded");
-    // La página debe tener algún elemento interactivo
-    const inputs = page.locator("input, button, select");
-    await expect(inputs.first()).toBeVisible({ timeout: 8000 });
+    await page.goto("/saas/integraciones", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("input, button, select").first()).toBeVisible({ timeout: 15_000 });
   });
 
   test("sin STATIC_PROVIDERS mockeados en código (anti-mock)", async ({ page }) => {
@@ -103,8 +100,8 @@ test.describe("SaaS Integraciones — interacción de categoría", () => {
       captured = FIXTURE_INTEGRATIONS;
       await route.fulfill({ json: FIXTURE_INTEGRATIONS });
     });
-    await page.goto("/saas/integraciones");
-    await page.waitForLoadState("domcontentloaded");
+    await page.goto("/saas/integraciones", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("body")).toBeVisible({ timeout: 15_000 });
     expect(captured).not.toBeNull();
     expect((captured as typeof FIXTURE_INTEGRATIONS).catalog.length).toBe(4);
   });

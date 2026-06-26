@@ -2,7 +2,7 @@
  * E2E — /saas/entregables (Deliverables Hub)
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, mockEntregablesList, mockEntregablesRevenue, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
 
 const FIXTURE_EMPTY = { deliverables: [], summary: { total: 0, pendingReview: 0, approved: 0, avgQaScore: null, byType: {}, byStatus: {} } };
 
@@ -52,8 +52,8 @@ test.describe("SaaS Entregables — estado vacío honesto", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
     await mockSaasApis(page);
-    await page.route("**/api/saas/entregables**", route =>
-      route.fulfill({ json: FIXTURE_EMPTY }));
+    await mockEntregablesRevenue(page);
+    await mockEntregablesList(page, FIXTURE_EMPTY);
   });
 
   test("carga sin error 500", async ({ page }) => {
@@ -74,8 +74,8 @@ test.describe("SaaS Entregables — página con datos", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
     await mockSaasApis(page);
-    await page.route("**/api/saas/entregables**", route =>
-      route.fulfill({ json: FIXTURE_DATA }));
+    await mockEntregablesRevenue(page);
+    await mockEntregablesList(page, FIXTURE_DATA);
   });
 
   test("KPI strip muestra total = 2", async ({ page }) => {
@@ -101,7 +101,8 @@ test.describe("SaaS Entregables — página con datos", () => {
 
   test("filtro de tipo cambia parámetro en fetch", async ({ page }) => {
     const intercepted: string[] = [];
-    await page.route("**/api/saas/entregables**", route => {
+    await mockEntregablesList(page, FIXTURE_DATA);
+    await page.route(/\/api\/saas\/entregables(\?|$)/, route => {
       intercepted.push(route.request().url());
       return route.fulfill({ json: FIXTURE_DATA });
     });

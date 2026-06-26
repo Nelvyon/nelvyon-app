@@ -35,7 +35,7 @@ test.describe("S49 — /saas/brief-to-launch page", () => {
 
   test("nav sidebar shows 'Lanzar Pack' item", async ({ page }) => {
     await page.goto("/saas/brief-to-launch", { waitUntil: "domcontentloaded" });
-    await expect(page.getByText("Lanzar Pack")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Lanzar Pack/i })).toBeVisible();
   });
 
   test("GET /api/saas/brief-to-launch returns 200 or 401", async ({ request }) => {
@@ -71,26 +71,28 @@ test.describe("S49 — Pack selection flow", () => {
 
   test("clicking a pack card selects it and shows Continuar button", async ({ page }) => {
     await page.goto("/saas/brief-to-launch", { waitUntil: "domcontentloaded" });
-    await page.getByText("Crecimiento Local").click();
+    await expect(page.getByRole("button", { name: /Crecimiento Local/i })).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /Crecimiento Local/i }).click();
     await expect(page.getByRole("button", { name: /Continuar con/i })).toBeVisible();
   });
 
   test("beta pack shows beta badge and waitlist message on select", async ({ page }) => {
     await page.goto("/saas/brief-to-launch", { waitUntil: "domcontentloaded" });
-    await page.getByText("Crecimiento Ecommerce").click();
+    await expect(page.getByRole("button", { name: /Crecimiento Ecommerce/i })).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /Crecimiento Ecommerce/i }).click();
     await expect(page.getByText(/beta/i)).toBeVisible();
   });
 
   test("Continuar button advances to brief step", async ({ page }) => {
     await page.goto("/saas/brief-to-launch", { waitUntil: "domcontentloaded" });
-    await page.getByText("Crecimiento Local").click();
+    await page.getByRole("button", { name: /Crecimiento Local/i }).click();
     await page.getByRole("button", { name: /Continuar con/i }).click();
     await expect(page.getByText("Brief del proyecto")).toBeVisible();
   });
 
   test("Lanzar pack button disabled when brief is incomplete", async ({ page }) => {
     await page.goto("/saas/brief-to-launch", { waitUntil: "domcontentloaded" });
-    await page.getByText("Crecimiento Local").click();
+    await page.getByRole("button", { name: /Crecimiento Local/i }).click();
     await page.getByRole("button", { name: /Continuar con/i }).click();
     await expect(page.getByRole("button", { name: /Lanzar pack/i })).toBeDisabled();
   });

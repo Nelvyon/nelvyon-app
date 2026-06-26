@@ -2,7 +2,7 @@
  * S48 — E2E: Revenue per Deliverable
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas } from "./fixtures";
+import { setupAuthedSaas, mockEntregablesList, mockEntregablesRevenue } from "./fixtures";
 
 const FIXTURE_ENTREGABLES = {
   deliverables: [
@@ -17,10 +17,6 @@ const FIXTURE_ENTREGABLES = {
   summary: { total: 1, pendingReview: 0, approved: 1, avgQaScore: 91, byType: {}, byStatus: {} },
 };
 
-const FIXTURE_REVENUE = {
-  items: [],
-};
-
 async function gotoEntregablesReady(page: import("@playwright/test").Page): Promise<void> {
   await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("button", { name: /Revenue €|Lista/i }).first()).toBeVisible({ timeout: 15_000 });
@@ -29,14 +25,8 @@ async function gotoEntregablesReady(page: import("@playwright/test").Page): Prom
 test.describe("S48 — Entregables Revenue tab", () => {
   test.beforeEach(async ({ page, context }) => {
     await setupAuthedSaas(page, context);
-    await page.route("**/api/saas/entregables/revenue**", route => {
-      if (route.request().method() === "POST") {
-        return route.fulfill({ json: { refreshed: true, rows: [] } });
-      }
-      return route.fulfill({ json: FIXTURE_REVENUE });
-    });
-    await page.route("**/api/saas/entregables**", route =>
-      route.fulfill({ json: FIXTURE_ENTREGABLES }));
+    await mockEntregablesRevenue(page);
+    await mockEntregablesList(page, FIXTURE_ENTREGABLES);
   });
 
   test("Revenue tab is visible on /saas/entregables", async ({ page }) => {

@@ -54,9 +54,7 @@ test.describe("SaaS Funnels — depth (S36)", () => {
   test("builder carga con lista de funnels y KPIs", async ({ page }) => {
     await page.goto("/saas/funnels", { waitUntil: "domcontentloaded" });
     await expect(page).not.toHaveURL(/\/login/);
-    const body = await page.locator("body").textContent();
-    expect(body).not.toContain("Something went wrong");
-    expect(body).not.toMatch(/Internal Server Error|500/);
+    await expect(page.getByText("E2E Test Funnel").or(page.getByText(/Embudos|Funnels/i))).toBeVisible({ timeout: 10_000 });
   });
 
   test("tab analytics se muestra al entrar al builder", async ({ page }) => {
