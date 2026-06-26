@@ -228,10 +228,15 @@ export async function setupAuthedSaas(page: Page, context: BrowserContext): Prom
   await mockSaasApis(page);
 }
 
+export type EntregablesListFixture = {
+  deliverables: Array<Record<string, unknown>>;
+  summary: Record<string, unknown>;
+};
+
 /** List GET /api/saas/entregables — does NOT match /revenue subpaths. */
 export async function mockEntregablesList(
   page: Page,
-  payload: typeof FIXTURE_ENTREGABLES,
+  payload: EntregablesListFixture,
 ): Promise<void> {
   await page.route(/\/api\/saas\/entregables(\?|$)/, route =>
     route.fulfill({ json: payload }));
