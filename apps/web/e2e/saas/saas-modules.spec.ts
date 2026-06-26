@@ -74,15 +74,14 @@ test.describe("SaaS — Settings SSO tab", () => {
   test("SSO tab renders con mock de config null", async ({ page }) => {
     await page.route("**/api/saas/sso**", route =>
       route.fulfill({ json: { config: null, identities: [] } }));
-    await page.goto("/saas/settings");
-    await page.waitForTimeout(600);
-    const ssoButton = page.locator("button", { hasText: "SSO Enterprise" });
-    const count = await ssoButton.count();
-    if (count > 0) {
-      await ssoButton.click();
-      await page.waitForTimeout(400);
+    await page.goto("/saas/settings", { waitUntil: "domcontentloaded" });
+    const ssoButton = page.getByRole("button", { name: /SSO Enterprise/i });
+    if (await ssoButton.count() > 0) {
+      await ssoButton.first().click();
+      await expect(page.locator("body")).toBeVisible();
+    } else {
+      await expect(page.locator("body")).toBeVisible();
     }
-    await expect(page.locator("body")).toBeVisible();
   });
 
   test("GET /api/saas/sso 401 sin auth", async ({ request }) => {

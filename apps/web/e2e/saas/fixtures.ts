@@ -228,6 +228,28 @@ export async function setupAuthedSaas(page: Page, context: BrowserContext): Prom
   await mockSaasApis(page);
 }
 
+/** List GET /api/saas/entregables — does NOT match /revenue subpaths. */
+export async function mockEntregablesList(
+  page: Page,
+  payload: typeof FIXTURE_ENTREGABLES,
+): Promise<void> {
+  await page.route(/\/api\/saas\/entregables(\?|$)/, route =>
+    route.fulfill({ json: payload }));
+}
+
+/** GET/POST /api/saas/entregables/revenue */
+export async function mockEntregablesRevenue(
+  page: Page,
+  items: unknown[] = [],
+): Promise<void> {
+  await page.route("**/api/saas/entregables/revenue**", route => {
+    if (route.request().method() === "POST") {
+      return route.fulfill({ json: { refreshed: true, items: [] } });
+    }
+    return route.fulfill({ json: { items, model: "last_click", days: 30 } });
+  });
+}
+
 // ─── Route interceptors ──────────────────────────────────────────────────────
 
 /** Intercepts /api/saas/* with fixtures. Catch-all registered FIRST (LIFO → lowest priority). */
@@ -285,14 +307,8 @@ export async function mockSaasApis(page: Page): Promise<void> {
     }
     return route.fulfill({ json: FIXTURE_AUTOPILOT });
   });
-  await page.route("**/api/saas/entregables**", route =>
-    route.fulfill({ json: FIXTURE_ENTREGABLES }));
-  await page.route("**/api/saas/entregables/revenue**", route => {
-    if (route.request().method() === "POST") {
-      return route.fulfill({ json: { refreshed: true, items: [] } });
-    }
-    return route.fulfill({ json: { items: [], model: "last_click", days: 30 } });
-  });
+  await mockEntregablesRevenue(page);
+  await mockEntregablesList(page, FIXTURE_ENTREGABLES);
   await page.route("**/api/saas/publicidad**", route =>
     route.fulfill({ json: FIXTURE_PUBLICIDAD }));
   await page.route("**/api/saas/ads**", route => {
@@ -309,6 +325,10 @@ export async function mockSaasApis(page: Page): Promise<void> {
     route.fulfill({ json: FIXTURE_INTEGRATIONS }));
   await page.route("**/api/saas/memberships**", route =>
     route.fulfill({ json: FIXTURE_MEMBERSHIPS }));
+  await page.route("**/api/saas/whatsapp/templates**", route =>
+    route.fulfill({ json: { templates: [] } }));
+  await page.route("**/api/saas/whatsapp/catalog**", route =>
+    route.fulfill({ json: { products: [] } }));
   await page.route("**/api/saas/whatsapp**", route =>
     route.fulfill({ json: FIXTURE_WHATSAPP }));
   await page.route("**/api/saas/contracts**", route =>

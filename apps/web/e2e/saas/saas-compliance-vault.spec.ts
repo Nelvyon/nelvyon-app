@@ -34,7 +34,7 @@ test.describe("S50 — /saas/compliance page", () => {
 
   test("nav sidebar shows Compliance item", async ({ page }) => {
     await page.goto("/saas/compliance", { waitUntil: "domcontentloaded" });
-    await expect(page.getByText("Compliance")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Compliance/i })).toBeVisible();
   });
 
   test("empty state shown when no artifacts", async ({ page }) => {

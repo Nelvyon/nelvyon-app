@@ -56,6 +56,7 @@ async function gotoPipelineReady(page: import("@playwright/test").Page): Promise
 }
 
 async function openContratosTab(page: import("@playwright/test").Page): Promise<void> {
+  await page.waitForResponse(r => r.url().includes("/api/saas/contracts") && r.ok(), { timeout: 15_000 }).catch(() => null);
   const tab = page.getByTestId("pipeline-tab-contratos");
   await expect(tab).toBeVisible();
   await tab.click({ force: true });

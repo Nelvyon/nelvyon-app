@@ -83,10 +83,9 @@ test.describe("SaaS Memberships — página autenticada", () => {
   });
 
   test("tiene al menos un botón o elemento interactivo", async ({ page }) => {
-    await page.goto("/saas/memberships");
-    await page.waitForLoadState("domcontentloaded");
-    const buttons = page.locator("button");
-    await expect(buttons.first()).toBeVisible({ timeout: 8000 });
+    await page.goto("/saas/memberships", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/Planes|Miembros|Membresías/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("button").first()).toBeVisible();
   });
 
   test("3 tabs visibles (Planes / Miembros / Afiliados)", async ({ page }) => {

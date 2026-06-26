@@ -84,16 +84,13 @@ test.describe("SaaS Autopilot — página autenticada", () => {
   });
 
   test("toggle click envía PATCH al API", async ({ page }) => {
-    const patched: string[] = [];
-    await page.route("**/api/saas/autopilot**", route => {
-      if (route.request().method() === "PATCH") patched.push("patched");
-      return route.fulfill({
-        json: { settings: { seoEnabled: true, socialEnabled: true, reputationEnabled: false, adsEnabled: false } },
-      });
-    });
     await gotoAutopilotReady(page);
+    const patchReq = page.waitForRequest(
+      r => r.url().includes("/api/saas/autopilot") && r.method() === "PATCH",
+      { timeout: 10_000 },
+    );
     await page.getByRole("button", { name: "Toggle SEO mensual" }).click();
-    await expect.poll(() => patched.length).toBeGreaterThan(0);
+    await patchReq;
   });
 
   test("no redirige a /login con cookie válida", async ({ page }) => {

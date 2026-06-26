@@ -6,7 +6,7 @@ import { setAuthCookie, mockSaasApis, LOGIN_URL } from "./fixtures";
 
 async function gotoPublicidadReady(page: import("@playwright/test").Page): Promise<void> {
   await page.goto("/saas/publicidad", { waitUntil: "domcontentloaded" });
-  await expect(page.getByText("Publicidad Digital")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "Publicidad Digital" })).toBeVisible({ timeout: 15_000 });
 }
 
 test.describe("SaaS Publicidad — auth guard", () => {
