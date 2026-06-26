@@ -1,4 +1,20 @@
 ﻿export {
+  SaasPackStoreService,
+  SaasPackStoreError,
+  getSaasPackStoreService,
+  resetSaasPackStoreServiceForTests,
+  type PackCatalogEntry,
+  type PackCatalogPort,
+  type PackEntitlement,
+  type PackStoreItem,
+  type PackStoreAccess,
+  type StoreSummary,
+  type PurchasePackInput,
+  type EntitlementSource,
+  type EntitlementStatus,
+  type SaasPackStoreErrorCode,
+} from "./SaasPackStoreService";
+export {
   SaasSectorBenchmarkService,
   SaasSectorBenchmarkError,
   getSaasSectorBenchmarkService,

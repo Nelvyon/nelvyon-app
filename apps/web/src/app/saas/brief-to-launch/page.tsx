@@ -144,8 +144,18 @@ export default function BriefToLaunchPage() {
     void fetch("/api/saas/brief-to-launch")
       .then((r) => (r.ok ? r.json() : { packs: [], launches: [] }))
       .then((d) => {
-        setPacks((d.packs ?? []) as AvailablePackDef[]);
+        const loaded = (d.packs ?? []) as AvailablePackDef[];
+        setPacks(loaded);
         setRecentLaunches((d.launches ?? []) as PackLaunch[]);
+        // Preselect pack from ?packId= (e.g. arriving from the Pack Store)
+        const preselectId = new URLSearchParams(window.location.search).get("packId");
+        if (preselectId) {
+          const match = loaded.find((p) => p.id === preselectId);
+          if (match) {
+            setSelectedPack(match);
+            setStep("brief");
+          }
+        }
       })
       .finally(() => setLoading(false));
   }, []);

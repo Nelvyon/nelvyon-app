@@ -124,6 +124,12 @@ export type PackRunnerPort = {
   } | undefined;
 };
 
+/** S52 — pack entitlement gating, injected to keep this service test-friendly. */
+export type EntitlementPort = {
+  canLaunch(tenantId: string, packId: string): Promise<{ allowed: boolean; reason?: string }>;
+  consumeLaunch(tenantId: string, packId: string): Promise<void>;
+};
+
 // ── Singleton ─────────────────────────────────────────────────────────────────
 
 let _instance: SaasBriefToLaunchService | null = null;
@@ -142,7 +148,24 @@ export function getSaasBriefToLaunchService(): SaasBriefToLaunchService {
         return RUNNERS[packId];
       },
     };
-    _instance = new SaasBriefToLaunchService(DbClient.getInstance(), runners);
+    // S52 — entitlement gating via the pack store service
+    const entitlements: EntitlementPort = {
+      async canLaunch(tenantId, packId) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { getSaasPackStoreService } = require("./SaasPackStoreService") as {
+          getSaasPackStoreService: () => EntitlementPort;
+        };
+        return getSaasPackStoreService().canLaunch(tenantId, packId);
+      },
+      async consumeLaunch(tenantId, packId) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { getSaasPackStoreService } = require("./SaasPackStoreService") as {
+          getSaasPackStoreService: () => EntitlementPort;
+        };
+        return getSaasPackStoreService().consumeLaunch(tenantId, packId);
+      },
+    };
+    _instance = new SaasBriefToLaunchService(DbClient.getInstance(), runners, entitlements);
   }
   return _instance;
 }
@@ -157,6 +180,7 @@ export class SaasBriefToLaunchService {
   constructor(
     private readonly db: SaasPostgresPort,
     private readonly runners?: PackRunnerPort,
+    private readonly entitlements?: EntitlementPort,
   ) {}
 
   /** Returns packs visible in the brief-to-launch UI (no coming_soon). */
@@ -178,6 +202,18 @@ export class SaasBriefToLaunchService {
     const { packId, brief, userId } = input;
     if (!packId?.trim()) {
       throw new SaasBriefToLaunchError("VALIDATION", "packId requerido");
+    }
+    // S52 — gate on pack entitlement when the port is wired (production singleton)
+    if (this.entitlements) {
+      const check = await this.entitlements.canLaunch(tenantId, packId);
+      if (!check.allowed) {
+        throw new SaasBriefToLaunchError(
+          "VALIDATION",
+          check.reason === "QUOTA_EXHAUSTED"
+            ? "Has agotado los lanzamientos disponibles de este pack"
+            : "No tienes acceso a este pack — adquiérelo en el Pack Store",
+        );
+      }
     }
     const rows = await this.db.query<LaunchRow>(
       `INSERT INTO saas_pack_launches
@@ -274,6 +310,11 @@ export class SaasBriefToLaunchService {
         };
         void getSaasComplianceVaultService().syncFromPackRun(tenantId, packRun.id).catch(() => {});
       } catch { /* never block launch */ }
+
+      // Hook S52: consume a launch from the pack entitlement (non-blocking)
+      if (this.entitlements) {
+        void this.entitlements.consumeLaunch(tenantId, launch.pack_id).catch(() => {});
+      }
 
       return rowToLaunch(updated[0]!);
     } catch (err) {

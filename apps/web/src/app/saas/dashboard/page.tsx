@@ -203,6 +203,7 @@ export default function SaasDashboardPage() {
           <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.quick_actions")}</p>
           <div className="space-y-1.5">
             {[
+              { label: "🛒 Explorar packs", href: "/saas/packs" },
               { label: "Abrir CRM", href: "/saas/crm" },
               { label: "Ver pipeline", href: "/saas/crm?tab=pipeline" },
               { label: "Campañas de email", href: "/saas/campanias" },

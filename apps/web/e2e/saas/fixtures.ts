@@ -255,6 +255,40 @@ export async function mockEntregablesRevenue(
   });
 }
 
+export const FIXTURE_PACK_STORE = {
+  summary: { totalPacks: 3, available: 2, owned: 1, launchesRemaining: 1 },
+  catalog: [
+    {
+      id: "local-business-growth", slug: "local-growth", name: "Crecimiento Local",
+      tagline: "Aparece en Google y convierte visitas en citas", category: "growth",
+      availability: "available", outputs: ["Landing", "SEO local", "Chatbot"], estimatedMinutes: 8,
+      launchPackId: "local-business-growth", access: "included", owned: true,
+      launchesRemaining: 1, canLaunch: true,
+    },
+    {
+      id: "ecommerce-growth", slug: "ecommerce-growth", name: "Crecimiento Ecommerce",
+      tagline: "Tienda que vende y retargeting en Meta", category: "growth",
+      availability: "available", outputs: ["Landing tienda", "Kit Meta Ads"], estimatedMinutes: 10,
+      launchPackId: "ecommerce-growth", access: "purchasable", owned: false,
+      launchesRemaining: null, canLaunch: false,
+    },
+    {
+      id: "future-pack", slug: "future", name: "Pack Futuro", tagline: "Próximamente",
+      category: "ads", availability: "coming_soon", outputs: [], estimatedMinutes: 5,
+      launchPackId: null, access: "coming_soon", owned: false, launchesRemaining: null, canLaunch: false,
+    },
+  ],
+  entitlements: [],
+};
+
+/** Intercepts pack store endpoints. Call AFTER setupAuthedSaas so it wins (LIFO). */
+export async function mockPackStore(page: Page): Promise<void> {
+  await page.route("**/api/saas/packs/*/purchase**", route =>
+    route.fulfill({ json: { granted: true, source: "plan" } }));
+  await page.route(/\/api\/saas\/packs(\?|$)/, route =>
+    route.fulfill({ json: FIXTURE_PACK_STORE }));
+}
+
 export const FIXTURE_BENCHMARK = {
   dashboard: {
     tenantId: "t1",
