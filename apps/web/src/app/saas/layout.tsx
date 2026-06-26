@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { SaasPwaInstallPrompt } from "@/features/saas-shell/components/SaasPwaInstallPrompt";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
   other: {
@@ -14,8 +15,10 @@ export const metadata: Metadata = {
 export default function SaasLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <link rel="manifest" href="/manifest-saas.json" />
+      {/* Dynamic white-label manifest; static file remains as fallback target */}
+      <link rel="manifest" href="/api/saas/pwa/manifest" />
       <meta name="theme-color" content="#0084ff" />
+      <ServiceWorkerRegister />
       {children}
       <SaasPwaInstallPrompt />
     </>

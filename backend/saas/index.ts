@@ -1,4 +1,18 @@
 ﻿export {
+  SaasPwaService,
+  SaasPwaError,
+  getSaasPwaService,
+  resetSaasPwaServiceForTests,
+  type PwaManifest,
+  type PwaIcon,
+  type PwaStatus,
+  type PwaInstallStats,
+  type PwaInstallPlatform,
+  type WhiteLabelBranding,
+  type WhiteLabelPwaPort,
+  type SaasPwaErrorCode,
+} from "./SaasPwaService";
+export {
   SaasVoiceCommandService,
   SaasVoiceCommandError,
   getSaasVoiceCommandService,

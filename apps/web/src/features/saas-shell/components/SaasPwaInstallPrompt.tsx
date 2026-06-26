@@ -62,10 +62,32 @@ export function SaasPwaInstallPrompt() {
     setVisible(false);
   }
 
+  function detectPlatform(): "ios" | "android" | "desktop" | "unknown" {
+    if (typeof navigator === "undefined") return "unknown";
+    const ua = navigator.userAgent;
+    if (/iPad|iPhone|iPod/.test(ua)) return "ios";
+    if (/Android/.test(ua)) return "android";
+    if (/Windows|Macintosh|Linux/.test(ua)) return "desktop";
+    return "unknown";
+  }
+
+  async function recordInstall() {
+    try {
+      await fetch("/api/saas/pwa/install", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform: detectPlatform(), displayMode: "standalone" }),
+      });
+    } catch {
+      /* install tracking is best-effort */
+    }
+  }
+
   async function install() {
     if (!deferred) return;
     await deferred.prompt();
-    await deferred.userChoice;
+    const choice = await deferred.userChoice;
+    if (choice.outcome === "accepted") void recordInstall();
     dismiss();
   }
 

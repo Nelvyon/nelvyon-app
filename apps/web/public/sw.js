@@ -1,5 +1,5 @@
 /* NELVYON PWA — network first, cache fallback */
-const CACHE_NAME = "nelvyon-saas-v1";
+const CACHE_NAME = "nelvyon-saas-v2";
 const LEGACY_CACHE = "nelvyon-v1";
 const PRECACHE_URLS = ["/", "/dashboard", "/offline.html", "/saas/dashboard", "/offline-saas.html"];
 

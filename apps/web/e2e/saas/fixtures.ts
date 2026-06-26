@@ -255,6 +255,30 @@ export async function mockEntregablesRevenue(
   });
 }
 
+export const FIXTURE_PWA_STATUS = {
+  installable: true,
+  scope: "/saas",
+  manifestUrl: "/api/saas/pwa/manifest",
+  fallbackManifestUrl: "/manifest-saas.json",
+  swUrl: "/sw.js",
+  offlineUrl: "/offline-saas.html",
+  themeColor: "#0084ff",
+  backgroundColor: "#020817",
+  appName: "Nelvyon SaaS",
+  whiteLabel: false,
+  stats: { total: 3, byPlatform: { ios: 2, android: 1 }, lastInstalledAt: new Date().toISOString() },
+};
+
+/** Intercepts PWA endpoints. Call AFTER setupAuthedSaas (LIFO). */
+export async function mockSaasPwa(page: Page): Promise<void> {
+  await page.route("**/api/saas/pwa/install**", route =>
+    route.fulfill({ json: { ok: true, id: "inst-1" } }));
+  await page.route("**/api/saas/pwa/status**", route =>
+    route.fulfill({ json: FIXTURE_PWA_STATUS }));
+  await page.route("**/api/saas/pwa/manifest**", route =>
+    route.fulfill({ contentType: "application/manifest+json", body: JSON.stringify({ name: "Nelvyon SaaS", short_name: "Nelvyon", scope: "/saas", start_url: "/saas/dashboard", display: "standalone", theme_color: "#0084ff", background_color: "#020817", icons: [] }) }));
+}
+
 export const FIXTURE_VOICE = {
   catalog: [
     { id: "nav_crm", phrases: ["crm", "ir a crm"], actionType: "navigate", route: "/saas/crm", description: "Abrir el CRM" },
