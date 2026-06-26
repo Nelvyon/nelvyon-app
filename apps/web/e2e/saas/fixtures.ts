@@ -255,6 +255,42 @@ export async function mockEntregablesRevenue(
   });
 }
 
+export const FIXTURE_PARTNER_ZONE = {
+  eligibility: { eligible: true, plan: "agency", reason: "plan" },
+  connect: { connected: false, accountId: null, status: "not_connected", chargesEnabled: false, payoutsEnabled: false, onboardedAt: null },
+  summary: {
+    eligible: true, plan: "agency", subcuentasActive: 2,
+    recentSubcuentas: [
+      { id: "s1", name: "Cliente Uno", status: "active" },
+      { id: "s2", name: "Cliente Dos", status: "active" },
+    ],
+    marginTotal: 240.5, grossTotal: 600,
+    connect: { connected: false, accountId: null, status: "not_connected", chargesEnabled: false, payoutsEnabled: false, onboardedAt: null },
+    referralCode: "AGENCY99",
+  },
+  catalog: [
+    { sku: "plan_pro", label: "Plan Pro", kind: "plan", wholesaleEur: 79, suggestedRetailEur: 199, retailEur: 199, marginEur: 120, marginPct: 60, hasOverride: false },
+    { sku: "pack_local_growth", label: "Pack Crecimiento Local", kind: "pack", wholesaleEur: 49, suggestedRetailEur: 149, retailEur: 149, marginEur: 100, marginPct: 67, hasOverride: false },
+  ],
+};
+
+const FIXTURE_PARTNER_LEDGER = {
+  entries: [
+    { source: "connect", grossEur: 100, wholesaleEur: 60, marginEur: 40, currency: "eur", status: "transferred", description: "Sub1", createdAt: new Date().toISOString() },
+  ],
+  totals: { gross: 100, wholesale: 60, margin: 40 },
+};
+
+/** Intercepts partner-zone endpoints. Call AFTER setupAuthedSaas (LIFO). */
+export async function mockPartnerZone(page: Page): Promise<void> {
+  await page.route("**/api/saas/partner/ledger**", route =>
+    route.fulfill({ json: FIXTURE_PARTNER_LEDGER }));
+  await page.route("**/api/saas/partner/referrals**", route =>
+    route.fulfill({ json: { partner: { id: "p1", referralCode: "AGENCY99" }, referrals: [] } }));
+  await page.route(/\/api\/saas\/partner(\?|$)/, route =>
+    route.fulfill({ json: FIXTURE_PARTNER_ZONE }));
+}
+
 export const FIXTURE_DATA_PLAYBOOKS = {
   summary: { suggested: 2, active: 0, completed: 0, dismissed: 0 },
   playbooks: [

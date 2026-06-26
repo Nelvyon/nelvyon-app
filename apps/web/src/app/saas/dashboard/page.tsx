@@ -205,6 +205,7 @@ export default function SaasDashboardPage() {
             {[
               { label: "🛒 Explorar packs", href: "/saas/packs" },
               { label: "📋 Ver playbooks recomendados", href: "/saas/playbooks" },
+              { label: "🤝 Abrir Partner Zone", href: "/saas/partner" },
               { label: "Abrir CRM", href: "/saas/crm" },
               { label: "Ver pipeline", href: "/saas/crm?tab=pipeline" },
               { label: "Campañas de email", href: "/saas/campanias" },

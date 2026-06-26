@@ -56,7 +56,8 @@ export type SaasNavId =
   | "compliance"
   | "benchmark"
   | "pack-store"
-  | "data-playbooks";
+  | "data-playbooks"
+  | "partner";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -123,6 +124,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "auditoria", label: "Auditoría", href: "/saas/auditoria", group: "cuenta" },
   { id: "lead-scoring", label: "Lead Scoring", href: "/saas/lead-scoring", group: "cuenta" },
   { id: "comunidades", label: "Comunidades", href: "/saas/comunidades", group: "cuenta" },
+  { id: "partner", label: "🤝 Partner Zone", href: "/saas/partner", group: "cuenta" },
   { id: "subcuentas", label: "Subcuentas / Agencia", href: "/saas/subcuentas", group: "cuenta" },
   { id: "team", label: "👥 Equipo", href: "/saas/team", group: "cuenta" },
   { id: "white-label", label: "🎨 White Label", href: "/saas/white-label", group: "cuenta" },

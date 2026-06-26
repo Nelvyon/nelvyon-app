@@ -1,4 +1,20 @@
 ﻿export {
+  SaasPartnerZoneService,
+  SaasPartnerZoneError,
+  getSaasPartnerZoneService,
+  resetSaasPartnerZoneServiceForTests,
+  WHOLESALE_CATALOG,
+  type WholesaleSku,
+  type RetailPriceOverride,
+  type LedgerEntry,
+  type LedgerTotals,
+  type ConnectStatus,
+  type PartnerEligibility,
+  type PartnerZoneSummary,
+  type PartnerZonePorts,
+  type SaasPartnerZoneErrorCode,
+} from "./SaasPartnerZoneService";
+export {
   SaasDataPlaybooksService,
   SaasDataPlaybooksError,
   getSaasDataPlaybooksService,
