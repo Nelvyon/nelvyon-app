@@ -16,12 +16,13 @@ function mapError(e: SaasSequencesError): NextResponse {
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }
 
-export async function GET(req: Request, { params }: { params: { sequenceId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ sequenceId: string }> }) {
+  const { sequenceId } = await params;
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const sequence = await getSaasSequencesService().get(ctx.tenant.id, params.sequenceId);
+    const sequence = await getSaasSequencesService().get(ctx.tenant.id, sequenceId);
     if (!sequence) return NextResponse.json({ error: "Sequence not found" }, { status: 404 });
-    const steps = await getSaasSequencesService().listSteps(ctx.tenant.id, params.sequenceId);
+    const steps = await getSaasSequencesService().listSteps(ctx.tenant.id, sequenceId);
     return NextResponse.json({ sequence, steps });
   } catch (e: unknown) {
     if (e instanceof SaasSequencesError) return mapError(e);
@@ -29,14 +30,15 @@ export async function GET(req: Request, { params }: { params: { sequenceId: stri
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { sequenceId: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ sequenceId: string }> }) {
+  const { sequenceId } = await params;
   try {
     const ctx = await requireSaasContext(req, "contacts.write");
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const b = body as Record<string, unknown>;
     if (typeof b.status === "string") {
-      const seq = await getSaasSequencesService().updateStatus(ctx.tenant.id, params.sequenceId, b.status as SequenceStatus);
+      const seq = await getSaasSequencesService().updateStatus(ctx.tenant.id, sequenceId, b.status as SequenceStatus);
       return NextResponse.json({ sequence: seq });
     }
     return NextResponse.json({ error: "No supported fields to update" }, { status: 400 });
@@ -46,10 +48,11 @@ export async function PATCH(req: Request, { params }: { params: { sequenceId: st
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { sequenceId: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ sequenceId: string }> }) {
+  const { sequenceId } = await params;
   try {
     const ctx = await requireSaasContext(req, "contacts.write");
-    await getSaasSequencesService().delete(ctx.tenant.id, params.sequenceId);
+    await getSaasSequencesService().delete(ctx.tenant.id, sequenceId);
     return new NextResponse(null, { status: 204 });
   } catch (e: unknown) {
     if (e instanceof SaasSequencesError) return mapError(e);

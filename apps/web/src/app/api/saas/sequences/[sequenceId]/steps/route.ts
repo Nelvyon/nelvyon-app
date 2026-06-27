@@ -17,10 +17,11 @@ function mapError(e: SaasSequencesError): NextResponse {
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }
 
-export async function GET(req: Request, { params }: { params: { sequenceId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ sequenceId: string }> }) {
+  const { sequenceId } = await params;
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const steps = await getSaasSequencesService().listSteps(ctx.tenant.id, params.sequenceId);
+    const steps = await getSaasSequencesService().listSteps(ctx.tenant.id, sequenceId);
     return NextResponse.json({ steps });
   } catch (e: unknown) {
     if (e instanceof SaasSequencesError) return mapError(e);
@@ -28,13 +29,14 @@ export async function GET(req: Request, { params }: { params: { sequenceId: stri
   }
 }
 
-export async function POST(req: Request, { params }: { params: { sequenceId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ sequenceId: string }> }) {
+  const { sequenceId } = await params;
   try {
     const ctx = await requireSaasContext(req, "contacts.write");
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const b = body as Record<string, unknown>;
-    const step = await getSaasSequencesService().addStep(ctx.tenant.id, params.sequenceId, {
+    const step = await getSaasSequencesService().addStep(ctx.tenant.id, sequenceId, {
       stepType: typeof b.step_type === "string" ? (b.step_type as SequenceStepType) : "email",
       subject: typeof b.subject === "string" ? b.subject : "",
       bodyHtml: typeof b.body_html === "string" ? b.body_html : "",

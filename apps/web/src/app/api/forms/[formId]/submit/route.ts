@@ -22,10 +22,10 @@ type ContactUpsertRow = { id: string };
 
 export async function POST(
   req: Request,
-  { params }: { params: { formId: string } },
+  { params }: { params: Promise<{ formId: string }> },
 ) {
   const db = DbClient.getInstance();
-  const formId = params.formId;
+  const { formId } = await params;
 
   const forms = await db.query<FormRow>(
     `SELECT id, tenant_id, name, fields, is_active, honeypot_field FROM saas_forms WHERE id=$1 LIMIT 1`,

@@ -11,16 +11,17 @@ import {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function POST(req: Request, { params }: { params: { sequenceId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ sequenceId: string }> }) {
+  const { sequenceId } = await params;
   try {
     const ctx = await requireSaasContext(req, "contacts.write");
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const b = body as Record<string, unknown>;
     if (typeof b.contact_id !== "string") return NextResponse.json({ error: "contact_id required" }, { status: 400 });
-    const enrollment = await getSaasSequencesService().enroll(ctx.tenant.id, params.sequenceId, b.contact_id);
+    const enrollment = await getSaasSequencesService().enroll(ctx.tenant.id, sequenceId, b.contact_id);
     void getSaasWorkflowService().dispatchActiveWorkflows(ctx.tenant.id, "sequence_enrolled", {
-      sequenceId: params.sequenceId, contactId: b.contact_id,
+      sequenceId, contactId: b.contact_id,
     }).catch(() => undefined);
     return NextResponse.json({ enrollment }, { status: 201 });
   } catch (e: unknown) {

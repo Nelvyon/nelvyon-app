@@ -12,3 +12,6 @@ export function deprecatedRoute(appRouterPath: string) {
     });
   };
 }
+
+/** Next.js pages typegen expects a default export for files under pages/api. */
+export default deprecatedRoute("/api/saas");
