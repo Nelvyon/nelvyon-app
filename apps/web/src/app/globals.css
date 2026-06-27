@@ -27,6 +27,10 @@
   --nelvyon-primary-blue: #0084ff;
   --nelvyon-primary-blue-deep: #0047ab;
   --nelvyon-primary-blue-rgb: 0, 132, 255;
+  /* D2 — canonical product accent (single source of truth for /saas + /os shells) */
+  --nelvyon-accent: #0084ff;
+  --nelvyon-accent-deep: #0047ab;
+  --nelvyon-accent-rgb: 0, 132, 255;
   --nelvyon-primary-dark: #020817;
   --nelvyon-primary-white: #ffffff;
   --nelvyon-dark: #020817;

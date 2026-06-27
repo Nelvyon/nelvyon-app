@@ -63,7 +63,7 @@ function NavGroup({
                 key={`${item.id}-${item.href}`}
                 href={item.href}
                 className={cn(
-                  "group relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-150",
+                  "group relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0084ff]/60",
                   active
                     ? "bg-[#0084ff]/10 text-[#0084ff] font-medium shadow-[inset_0_0_0_1px_rgba(0,132,255,0.2)]"
                     : "text-white/50 hover:bg-white/[0.04] hover:text-white/80",
@@ -176,7 +176,7 @@ export function SaasSidebar({
               resetUser();
               router.replace("/auth/login");
             }}
-            className="w-full rounded-lg border border-white/[0.07] bg-white/[0.03] px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.07] hover:text-white/80"
+            className="w-full rounded-lg border border-white/[0.07] bg-white/[0.03] px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.07] hover:text-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0084ff]/60"
           >
             Cerrar sesión
           </button>

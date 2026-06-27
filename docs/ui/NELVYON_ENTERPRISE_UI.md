@@ -59,7 +59,7 @@ Alternativas descartadas para la UI del **propio** Nelvyon:
 ## Decisiones “empresa multimillonaria”
 
 1. **Jerarquía tipográfica única** — Display 7xl semibold con tracking negativo; subtítulos en zinc muted; eyebrows en caps con letter-spacing amplio (`nv-enterprise-eyebrow`).
-2. **Color system dual** — Marketing oscuro `#050505` + electric `#0066FF`; app autenticada navy `#07122a` + accent `#0084ff` (misma familia, distinta luminosidad).
+2. **Color system dual** — Marketing oscuro `#050505` + electric `#0066FF`; app autenticada (`/saas` + `/os`) navy `#07122a` + accent `#0084ff` (misma familia, distinta luminosidad). **D2 — token canónico de producto:** `--nelvyon-accent: #0084ff` (con `--nelvyon-accent-deep: #0047ab` y `--nelvyon-accent-rgb`) en `globals.css :root` es la única fuente de verdad del acento de la app autenticada; el `#0066FF` de marketing es la variante hero del landing, no se usa dentro del shell SaaS/OS.
 3. **Product frame en landing** — Preview del dashboard real (sidebar + hero + KPIs) flotando suavemente; transmite “producto ya construido”, no mockup vacío.
 4. **Glass + grid sutil** — Cards `nv-enterprise-glass`, fondos con grid 64px y radial glow; sensación de profundidad sin ruido visual.
 5. **Sidebar enterprise** — Gradiente vertical navy, item activo con glow pulsante, wordmark con gradiente; badge **Enterprise** en topbar.
