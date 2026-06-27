@@ -187,6 +187,7 @@ export class SaasAutopilotService {
         const all = await svc.generateMonthlyDeliverables(tenantId, month);
         const seoRow = all.find((d) => d.serviceType === "seo_report");
         await this._markLastRun(tenantId, "seo");
+        await this._logRecurringRun(tenantId, month, all);
         return {
           service: "seo",
           success: true,
@@ -201,6 +202,7 @@ export class SaasAutopilotService {
         const all = await svc.generateMonthlyDeliverables(tenantId, month);
         const socialRow = all.find((d) => d.serviceType === "social_calendar");
         await this._markLastRun(tenantId, "social");
+        await this._logRecurringRun(tenantId, month, all);
         return {
           service: "social",
           success: true,
@@ -270,6 +272,22 @@ export class SaasAutopilotService {
        WHERE tenant_id = $1`,
       [tenantId],
     );
+  }
+
+  /** O19 — record the run in the recurring run log (best-effort, never throws). */
+  private async _logRecurringRun(
+    tenantId: string,
+    month: string,
+    deliverables: Array<{ serviceType: string; id: string }>,
+  ): Promise<void> {
+    try {
+      const { getOsRecurringRunLogService } = await import("./OsRecurringRunLogService");
+      await getOsRecurringRunLogService().recordGeneration(
+        tenantId,
+        month,
+        deliverables.map((d) => ({ serviceType: d.serviceType, deliverableId: d.id })),
+      );
+    } catch { /* run-log persistence is best-effort */ }
   }
 }
 

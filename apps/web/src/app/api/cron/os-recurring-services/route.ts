@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import { DbClient } from "@/../../backend/db/DbClient";
 import { getOsRecurringServicesService, type RecurringServiceType } from "@/../../backend/saas/OsRecurringServicesService";
 import { getSaasAutopilotService } from "@/../../backend/saas/SaasAutopilotService";
+import { getOsRecurringRunLogService } from "@/../../backend/saas/OsRecurringRunLogService";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -28,6 +29,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   const db = DbClient.getInstance();
   const svc = getOsRecurringServicesService();
   const autopilotSvc = getSaasAutopilotService();
+  const runLog = getOsRecurringRunLogService();
 
   // Tenants with autopilot rows that have at least one toggle ON
   const eligibleAutopilot = await db.query<{
@@ -69,6 +71,12 @@ export async function GET(req: Request): Promise<NextResponse> {
       const all = await svc.generateMonthlyDeliverables(row.tenant_id, month);
       // generateMonthlyDeliverables always tries all 3; filter by what's active
       const active = all.filter((d) => types.includes(d.serviceType));
+      // O19 — record run log (idempotent: new → completed, existing → skipped)
+      await runLog.recordGeneration(
+        row.tenant_id,
+        month,
+        all.map((d) => ({ serviceType: d.serviceType, deliverableId: d.id })),
+      ).catch(() => null);
       if (active.length > 0) {
         generated += active.length;
         // Mark last run timestamps
@@ -85,6 +93,11 @@ export async function GET(req: Request): Promise<NextResponse> {
   for (const { tenant_id } of legacyTenants) {
     try {
       const deliverables = await svc.generateMonthlyDeliverables(tenant_id, month);
+      await runLog.recordGeneration(
+        tenant_id,
+        month,
+        deliverables.map((d) => ({ serviceType: d.serviceType, deliverableId: d.id })),
+      ).catch(() => null);
       if (deliverables.length > 0) {
         generated += deliverables.length;
       } else {

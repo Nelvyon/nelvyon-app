@@ -1,4 +1,17 @@
 ﻿export {
+  OsRecurringRunLogService,
+  OsRecurringRunLogError,
+  getOsRecurringRunLogService,
+  resetOsRecurringRunLogServiceForTests,
+  RECURRING_TYPE_MAP,
+  type RecurringRun,
+  type RecurringRunServiceType,
+  type RecurringRunStatus,
+  type RecurringRunFilters,
+  type RecurringRunSummary,
+  type OsRecurringRunLogErrorCode,
+} from "./OsRecurringRunLogService";
+export {
   SaasPwaService,
   SaasPwaError,
   getSaasPwaService,
