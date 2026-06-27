@@ -38,10 +38,17 @@ const PLATFORM_LAYERS = [
   },
   {
     icon: Bot,
-    title: "OS de marketing",
-    desc: "Motores internos de SEO, ads, funnels y contenido que ejecutan campañas 24/7 con supervisión humana opcional.",
-    href: "/login",
-    cta: "Acceder al OS",
+    title: "SaaS CRM & billing",
+    desc: "CRM, campañas, workflows, pipeline e inbox con facturación Stripe — el panel que tu cliente usa cada día.",
+    href: "/saas",
+    cta: "Ver el SaaS",
+  },
+  {
+    icon: Layers,
+    title: "Partner white-label",
+    desc: "Revende NELVYON con tu marca: precios wholesale, panel de comisiones y entregables en portal propio.",
+    href: "/partners",
+    cta: "Programa partner",
   },
 ] as const;
 
@@ -99,16 +106,16 @@ function PlatformLayersSection() {
   return (
     <section className="border-t border-white/10 px-4 py-20 md:px-6 md:py-28">
       <FadeUp className="mx-auto max-w-3xl text-center">
-        <p className="nv-enterprise-eyebrow mb-4">Arquitectura dual</p>
+        <p className="nv-enterprise-eyebrow mb-4">Arquitectura modular</p>
         <NelvyonEnterpriseHeading as="h2" variant="title" className="text-white">
-          SaaS para el cliente. OS para escalar.
+          Packs, SaaS y Partner sobre un mismo OS.
         </NelvyonEnterpriseHeading>
         <p className="mt-4 text-zinc-500">
-          Dos capas separadas, una experiencia premium: lo que ve tu cliente no se mezcla con los motores internos que
-          Nelvyon opera.
+          Tres formas de crecer con una experiencia premium: entregables listos, panel SaaS para el cliente y un
+          programa partner — todo orquestado por los motores internos que Nelvyon opera.
         </p>
       </FadeUp>
-      <div className="mx-auto mt-14 grid max-w-5xl gap-6 md:grid-cols-2">
+      <div className="mx-auto mt-14 grid max-w-5xl gap-6 md:grid-cols-3">
         {PLATFORM_LAYERS.map((layer, i) => {
           const Icon = layer.icon;
           return (
