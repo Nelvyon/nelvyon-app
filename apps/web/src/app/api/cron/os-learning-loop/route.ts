@@ -24,6 +24,14 @@ export async function GET(req: Request): Promise<NextResponse> {
   const result = await prod.runProdLoop({ source: "cron" });
   const summary = await prod.getSummary().catch(() => null);
 
+  // O26 — recompute Template DNA scores from fresh weights (best-effort, non-blocking)
+  let dnaSectors = 0;
+  try {
+    const { getOsTemplateDnaService } = await import("@nelvyon/saas");
+    const r = await getOsTemplateDnaService().refreshAll();
+    dnaSectors = r.sectors;
+  } catch { /* dna refresh best-effort */ }
+
   return NextResponse.json({
     ok: true,
     skipped: result.skipped,
@@ -32,6 +40,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     status: result.status,
     processed: result.skipped ? 0 : result.stats.ga4Users,
     stats: result.stats,
+    dnaSectors,
     summary,
     at: new Date().toISOString(),
   });

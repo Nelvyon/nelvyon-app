@@ -228,8 +228,17 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     primary_cta: (params.intake as Record<string, unknown>).primary_cta as string | undefined,
   });
 
-  // Seed provenance for QA metadata — use structured seed registry when available
-  const seed = getSeedByIndex(params.intake.sector, 0);
+  // Seed provenance for QA metadata — use structured seed registry when available.
+  // O26 — pick the best-converting seed via Template DNA rank (best-effort, falls
+  // back to index 0 when no DNA data is available).
+  let dnaRanks: Map<string, number> | undefined;
+  try {
+    const { getOsTemplateDnaService } = await import("@nelvyon/saas");
+    dnaRanks = await getOsTemplateDnaService().getLearningRankMap(params.intake.sector);
+  } catch {
+    dnaRanks = undefined;
+  }
+  const seed = getSeedByIndex(params.intake.sector, 0, undefined, dnaRanks);
 
   // O16 — attach sector readiness score (non-blocking, DB-only lookup)
   let sectorReadinessScore: number | null = null;

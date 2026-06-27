@@ -1,4 +1,21 @@
 ﻿export {
+  OsTemplateDnaService,
+  OsTemplateDnaError,
+  getOsTemplateDnaService,
+  resetOsTemplateDnaServiceForTests,
+  computeDnaScore,
+  buildRankMap,
+  pickBestSeedIndex,
+  type WeightsPort as DnaWeightsPort,
+  type RegistryPort as DnaRegistryPort,
+  type PackOutcomesPort as DnaPackOutcomesPort,
+  type DnaSeedRegistryRow,
+  type PackOutcomeAgg,
+  type DnaScore,
+  type DnaSummary,
+  type OsTemplateDnaErrorCode,
+} from "./OsTemplateDnaService";
+export {
   OsRetainerAutopilotService,
   OsRetainerError,
   getOsRetainerAutopilotService,
