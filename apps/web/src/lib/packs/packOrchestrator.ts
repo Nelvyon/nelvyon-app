@@ -163,6 +163,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   packId: string;
   packRunId: string;
   intake: T;
+  userId?: string;
   buildBrief: (intake: T) => Record<string, unknown>;
   osClientId: string;
   osProjectId: string;
@@ -173,6 +174,30 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   autoPublishQaThreshold?: number;
 }): Promise<{ result: SkuRunResult; deliverableIds: string[] }> {
   const brief = params.buildBrief(params.intake);
+
+  // O21 — inject real SEO data (Semrush/DataForSEO) into SEO SKU briefs (best-effort)
+  const websiteUrl = (params.intake as Record<string, unknown>).website_url as string | undefined;
+  if (params.sku.includes("SEO") && websiteUrl) {
+    try {
+      const { getOsAgentDataService } = await import(
+        "../../../../../backend/saas/OsAgentDataService"
+      );
+      const svc = getOsAgentDataService();
+      const [kw, comp] = await Promise.all([
+        svc.fetchKeywordSnapshot({ userId: params.userId, domain: websiteUrl }),
+        svc.fetchCompetitorSnapshot({ userId: params.userId, domain: websiteUrl }),
+      ]);
+      (brief as Record<string, unknown>)._agent_data = {
+        provider: kw.provider,
+        cached: kw.cached,
+        fetched_at: kw.fetchedAt,
+        keywords: kw.keywords.slice(0, 20),
+        competitors: comp.competitors.slice(0, 5),
+      };
+    } catch {
+      /* agent data is best-effort — never block the pack run */
+    }
+  }
   const simulation = simulateAutonomousJob({
     sku: params.sku,
     tier: params.intake.tier ?? "professional",
@@ -444,6 +469,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         packId: meta.id,
         packRunId: run.id,
         intake,
+        userId: params.userId,
         buildBrief: config.buildBrief,
         osClientId,
         osProjectId,

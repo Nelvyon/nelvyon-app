@@ -1,4 +1,19 @@
 ﻿export {
+  OsAgentDataService,
+  getOsAgentDataService,
+  resetOsAgentDataServiceForTests,
+  type SemrushPort,
+  type DataForSeoPort,
+  type AgentKeyword,
+  type AgentCompetitor,
+  type AgentDataProvider,
+  type AgentQueryType,
+  type KeywordSnapshot,
+  type CompetitorSnapshot,
+  type AgentDataSummary,
+  type AgentDataRecent,
+} from "./OsAgentDataService";
+export {
   OsLearningLoopProdService,
   OsLearningLoopError,
   getOsLearningLoopProdService,
