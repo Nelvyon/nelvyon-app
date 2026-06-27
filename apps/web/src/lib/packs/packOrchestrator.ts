@@ -228,8 +228,17 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     primary_cta: (params.intake as Record<string, unknown>).primary_cta as string | undefined,
   });
 
-  // Seed provenance for QA metadata — use structured seed registry when available
-  const seed = getSeedByIndex(params.intake.sector, 0);
+  // Seed provenance for QA metadata — use structured seed registry when available.
+  // O26 — pick the best-converting seed via Template DNA rank (best-effort, falls
+  // back to index 0 when no DNA data is available).
+  let dnaRanks: Map<string, number> | undefined;
+  try {
+    const { getOsTemplateDnaService } = await import("@nelvyon/saas");
+    dnaRanks = await getOsTemplateDnaService().getLearningRankMap(params.intake.sector);
+  } catch {
+    dnaRanks = undefined;
+  }
+  const seed = getSeedByIndex(params.intake.sector, 0, undefined, dnaRanks);
 
   // O16 — attach sector readiness score (non-blocking, DB-only lookup)
   let sectorReadinessScore: number | null = null;
@@ -352,6 +361,25 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     qaGateStatus = undefined;
   }
 
+  // O27 — regulated sector shield: EU disclaimer + prohibited claims scan (best-effort)
+  let shieldStatus: string | undefined;
+  try {
+    const { getOsRegulatedSectorShieldService } = await import("@nelvyon/saas");
+    const shieldText = [
+      (params.intake as Record<string, unknown>).value_proposition as string | undefined,
+      typeof personalized === "object" && personalized ? JSON.stringify(personalized) : undefined,
+    ].filter(Boolean).join(" ");
+    const shield = await getOsRegulatedSectorShieldService().evaluateAndPersist({
+      sectorId: params.intake.sector,
+      packRunId: params.packRunId,
+      deliverableRef: params.sku,
+      htmlOrText: shieldText,
+    });
+    shieldStatus = shield.status;
+  } catch {
+    shieldStatus = undefined;
+  }
+
   return {
     result: {
       sku: params.sku,
@@ -362,6 +390,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       qa_visual_score: visualQa.score,
       qa_legal_passed: visualQa.legal_passed,
       qa_gate_status: qaGateStatus,
+      shield_status: shieldStatus,
     },
     deliverableIds,
   };
@@ -557,7 +586,8 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         r.qa_score < autoPublishThreshold ||
         (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
         r.qa_legal_passed === false ||
-        r.qa_gate_status === "blocked", // O18 — legal/hard block from the QA gate
+        r.qa_gate_status === "blocked" || // O18 — legal/hard block from the QA gate
+        r.shield_status === "blocked", // O27 — regulated sector shield hard block
     );
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
@@ -587,6 +617,16 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       report,
       completed_at: new Date().toISOString(),
     }))!;
+
+    // O23 — issue delivery certificate for completed runs (best-effort, non-blocking)
+    if (finalStatus === "completed") {
+      try {
+        const { getOsDeliveryCertificateService } = await import("@nelvyon/saas");
+        await getOsDeliveryCertificateService().issueCertificate(run.id);
+      } catch {
+        /* certificate issuance is best-effort — never blocks the pack run */
+      }
+    }
 
     return (await getPackRun(run.id))!;
   } catch (err) {

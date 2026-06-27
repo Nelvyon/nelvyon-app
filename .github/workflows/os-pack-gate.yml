@@ -1,0 +1,43 @@
+name: OS Pack Gate (blocking)
+
+# Blocking gate: validates all 8 pack fixtures + the OS QA vitest suite.
+# Unlike os-gate.yml (staging advisory), this MUST pass to merge — no staging needed.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "backend/saas/**"
+      - "backend/os-agents/**"
+      - "backend/autonomous/**"
+      - "scripts/**"
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "backend/saas/**"
+      - "backend/os-agents/**"
+      - "backend/autonomous/**"
+      - "scripts/**"
+
+jobs:
+  pack-gate-local:
+    runs-on: ubuntu-latest
+    # NO continue-on-error — this gate blocks the merge.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm -C apps/web exec tsc --noEmit
+      - name: Run blocking OS pack gate
+        run: node scripts/run-os-pack-gate.mjs --run-key ${{ github.sha }}
+      - name: Gate service unit tests
+        run: pnpm -C apps/web exec vitest run backend/saas/__tests__/OsPackGateService.o22.test.ts --reporter=dot

@@ -1,5 +1,10 @@
 ﻿name: OS Autonomous Gate
 
+# STAGING ADVISORY ONLY (continue-on-error). The BLOCKING gate is
+# .github/workflows/os-pack-gate.yml — that one must pass to merge.
+# This workflow needs STAGING_BASE_URL and stays advisory so forks without
+# staging secrets are not blocked.
+
 on:
   push:
     branches: [main]

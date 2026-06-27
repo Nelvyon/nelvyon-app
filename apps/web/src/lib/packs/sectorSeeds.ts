@@ -315,9 +315,26 @@ const SEEDS: Record<string, SectorSeed[]> = {
 // Public API
 // ---------------------------------------------------------------------------
 
-export function getSeedByIndex(sectorId: string, index: number): SectorSeed | null {
+export function getSeedByIndex(
+  sectorId: string,
+  index: number,
+  _rootOverride?: undefined,
+  learningRanks?: Map<string, number>,
+): SectorSeed | null {
   const seeds = SEEDS[sectorId];
-  if (!seeds || index < 0 || index >= seeds.length) return null;
+  if (!seeds || seeds.length === 0) return null;
+  // O26 — when a DNA/learning rank map is provided, prefer the best-ranked seed
+  // (lowest rank = highest priority) over the requested index. Falls back to index.
+  if (learningRanks && learningRanks.size > 0) {
+    let best: SectorSeed | null = null;
+    let bestRank = Infinity;
+    for (const s of seeds) {
+      const r = learningRanks.get(s.seed_id);
+      if (r !== undefined && r < bestRank) { bestRank = r; best = s; }
+    }
+    if (best) return best;
+  }
+  if (index < 0 || index >= seeds.length) return null;
   return seeds[index]!;
 }
 

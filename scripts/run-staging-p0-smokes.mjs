@@ -4,10 +4,14 @@
  *
  * Smokes (CI gate — validated against staging):
  *  1. staging-smoke-portal-packs.mjs
- *  2. staging-smoke-local-pack-e2e.mjs (local-business-growth full E2E)
+ *  2. staging-smoke-local-pack-e2e.mjs   (local-business-growth full E2E)
+ *  3. staging-smoke-ecommerce-pack-e2e.mjs (ecommerce-growth full E2E)
+ *  4. staging-smoke-saas-b2b-pack-e2e.mjs  (saas-b2b-growth full E2E)
  *
- * Manual / future: staging-smoke-ecommerce-pack-e2e.mjs, staging-smoke-saas-b2b-pack-e2e.mjs
- * (require local-pack-style workspace kickoff + portal invite flow — run via workflow_dispatch)
+ * O22 — the 3 growth packs now run end-to-end in P0. These require a live
+ * STAGING_BASE_URL + platform token secrets; run via workflow_dispatch or before a
+ * production deploy. The blocking local gate (no staging needed) is
+ * scripts/run-os-pack-gate.mjs / .github/workflows/os-pack-gate.yml.
  */
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -21,6 +25,8 @@ const extraArgs = skipWait ? ["--skip-wait"] : [];
 const SMOKES = [
   { name: "portal-packs", script: "staging-smoke-portal-packs.mjs" },
   { name: "local-pack-e2e", script: "staging-smoke-local-pack-e2e.mjs" },
+  { name: "ecommerce-pack-e2e", script: "staging-smoke-ecommerce-pack-e2e.mjs" },
+  { name: "saas-b2b-pack-e2e", script: "staging-smoke-saas-b2b-pack-e2e.mjs" },
 ];
 
 const results = [];

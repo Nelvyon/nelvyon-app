@@ -293,6 +293,23 @@ export async function approvePortalDeliverableBff(params: {
   if (!row) throw new Error("deliverable not found");
   ensureReviewable(row);
 
+  // O27 — regulated sector shield: block approval if shield failed (best-effort).
+  const dmeta = (row.deliverable_metadata && typeof row.deliverable_metadata === "object"
+    ? row.deliverable_metadata
+    : {}) as Record<string, unknown>;
+  const sectorId = String((dmeta.sector as string) ?? (dmeta.sector_id as string) ?? "");
+  if (sectorId) {
+    try {
+      const { getOsRegulatedSectorShieldService } = await import("@nelvyon/saas");
+      const gate = await getOsRegulatedSectorShieldService().canPublishToPortal(sectorId, dmeta);
+      if (!gate.allowed) {
+        throw Object.assign(new Error(gate.reason ?? "Shield bloqueado para sector regulado"), { code: "SHIELD_BLOCKED" });
+      }
+    } catch (e) {
+      if ((e as { code?: string }).code === "SHIELD_BLOCKED") throw e;
+    }
+  }
+
   const reviewedAt = new Date().toISOString();
   const meta = buildReviewMetadata(
     row.deliverable_metadata && typeof row.deliverable_metadata === "object" ? row.deliverable_metadata : {},

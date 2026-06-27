@@ -82,6 +82,7 @@ export type SkuRunResult = {
   qa_visual_score?: number;
   qa_legal_passed?: boolean;
   qa_gate_status?: string;
+  shield_status?: string;
 };
 
 export type PackReport = {
