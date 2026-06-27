@@ -1,4 +1,18 @@
 ﻿export {
+  OsDeliveryCertificateService,
+  OsDeliveryCertError,
+  getOsDeliveryCertificateService,
+  resetOsDeliveryCertificateServiceForTests,
+  type PackRunPort,
+  type QaAuditPort,
+  type VaultPort,
+  type DeliveryCertificate,
+  type CertSummary as DeliveryCertSummary,
+  type CertStatus as DeliveryCertStatus,
+  type AgentProvider as DeliveryAgentProvider,
+  type OsDeliveryCertErrorCode,
+} from "./OsDeliveryCertificateService";
+export {
   OsPackGateService,
   OsPackGateError,
   getOsPackGateService,

@@ -588,6 +588,16 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       completed_at: new Date().toISOString(),
     }))!;
 
+    // O23 — issue delivery certificate for completed runs (best-effort, non-blocking)
+    if (finalStatus === "completed") {
+      try {
+        const { getOsDeliveryCertificateService } = await import("@nelvyon/saas");
+        await getOsDeliveryCertificateService().issueCertificate(run.id);
+      } catch {
+        /* certificate issuance is best-effort — never blocks the pack run */
+      }
+    }
+
     return (await getPackRun(run.id))!;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido en el pack";
