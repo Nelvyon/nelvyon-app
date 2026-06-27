@@ -303,11 +303,29 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   }
 
   // Visual QA — runs offline, no browser needed
-  const visualQa = runVisualQa({
+  const qaInput = {
     copyText: (params.intake as Record<string, unknown>).value_proposition as string | undefined,
     brandColor: "#0084ff",
     backgroundColor: "#020817",
-  });
+  };
+  const visualQa = runVisualQa(qaInput);
+
+  // O18 — unified QA gate: persist audit run + capture gate status (non-blocking)
+  let qaGateStatus: string | undefined;
+  try {
+    const { getOsVisualQaGateService } = await import(
+      "../../../../../backend/autonomous/qa/OsVisualQaGateService"
+    );
+    const gate = await getOsVisualQaGateService().runAndPersist({
+      ...qaInput,
+      packRunId: params.packRunId,
+      deliverableRef: params.sku,
+      workspaceId: params.workspaceId,
+    });
+    qaGateStatus = gate.gateStatus;
+  } catch {
+    qaGateStatus = undefined;
+  }
 
   return {
     result: {
@@ -318,6 +336,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       deliverable_ids: deliverableIds,
       qa_visual_score: visualQa.score,
       qa_legal_passed: visualQa.legal_passed,
+      qa_gate_status: qaGateStatus,
     },
     deliverableIds,
   };
@@ -511,7 +530,8 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       (r) =>
         r.qa_score < autoPublishThreshold ||
         (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
-        r.qa_legal_passed === false,
+        r.qa_legal_passed === false ||
+        r.qa_gate_status === "blocked", // O18 — legal/hard block from the QA gate
     );
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");

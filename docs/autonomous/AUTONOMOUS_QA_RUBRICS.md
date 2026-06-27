@@ -4,6 +4,13 @@
 **SKUs:** Landing · Chatbot · SEO básico  
 **Umbral global:** **Score ≥ 85** para liberar · **Bloqueo obligatorio** si < 85
 
+> **O18 — QA Gate unificado:** `OsVisualQaGateService` aplica el gate pre-publish con
+> umbrales `MIN_VISUAL_SCORE=85`, `MIN_LIGHTHOUSE=90`, `MAX_DIFF_PERCENT=5` y bloqueo
+> legal EU. **Lighthouse es un *proxy* estructural en v1** (derivado de structural +
+> contrast); PSI real es opcional vía `GOOGLE_PSI_API_KEY`. Cada run se audita en
+> `os_qa_audit_runs` y se visualiza en `/os/qa`. El estado `blocked` (fallo legal)
+> bloquea el auto-approve; `failed` por proxy se registra como advisory en v1.
+
 ---
 
 ## 1. Sistema de scoring global
