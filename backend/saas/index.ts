@@ -1,4 +1,23 @@
 ﻿export {
+  OsRetainerAutopilotService,
+  OsRetainerError,
+  getOsRetainerAutopilotService,
+  resetOsRetainerAutopilotServiceForTests,
+  expectedServicesFromSettings,
+  computeCycleStatus,
+  type AutopilotPort as RetainerAutopilotPort,
+  type RecurringLogPort as RetainerRecurringLogPort,
+  type DeliverablesPort as RetainerDeliverablesPort,
+  type CertificatePort as RetainerCertificatePort,
+  type RetainerService,
+  type RetainerCycle,
+  type RetainerCycleStatus,
+  type RetainerSummary,
+  type PortalRetainerView,
+  type RetainerServiceView,
+  type OsRetainerErrorCode,
+} from "./OsRetainerAutopilotService";
+export {
   OsCompetitorGapService,
   OsCompetitorGapError,
   getOsCompetitorGapService,

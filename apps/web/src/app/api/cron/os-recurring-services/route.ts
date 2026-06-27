@@ -108,11 +108,20 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
   }
 
+  // O25 — sync retainer cycles for autopilot-eligible tenants (best-effort, non-blocking)
+  let retainerSynced = 0;
+  try {
+    const { getOsRetainerAutopilotService } = await import("@nelvyon/saas");
+    const r = await getOsRetainerAutopilotService().syncAllEligibleTenants(month);
+    retainerSynced = r.synced;
+  } catch { /* retainer sync best-effort */ }
+
   const totalTenants = eligibleAutopilot.length + legacyTenants.length;
 
   return NextResponse.json({
     ok: true,
     month,
+    retainerSynced,
     tenantsProcessed: totalTenants,
     autopilotTenants: eligibleAutopilot.length,
     legacyTenants: legacyTenants.length,
