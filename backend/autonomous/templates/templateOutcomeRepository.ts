@@ -1,6 +1,6 @@
 /** Template outcome persistence — DB when flagged, else local JSON (never throws) */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
@@ -279,10 +279,17 @@ export class TemplateOutcomeRepository {
 
 export const templateOutcomeRepository = new TemplateOutcomeRepository();
 
+/** Test helper — force local JSON storage regardless of CI env vars */
+export function forceLocalTemplateLearningForTests(): void {
+  delete process.env.ENABLE_TEMPLATE_LEARNING_DB;
+  delete process.env.DATABASE_URL;
+  resetTemplateOutcomeStorageForTests();
+}
+
 /** Test helper — reset local file and pool */
 export function resetTemplateOutcomeStorageForTests(): void {
   if (existsSync(LOCAL_OUTCOMES_PATH)) {
-    writeFileSync(LOCAL_OUTCOMES_PATH, "[]");
+    rmSync(LOCAL_OUTCOMES_PATH, { force: true });
   }
 }
 

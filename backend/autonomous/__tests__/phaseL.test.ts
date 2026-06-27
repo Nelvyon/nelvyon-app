@@ -1,12 +1,12 @@
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { simulatePhaseC } from "../simulatorPhaseC";
 import {
   LOCAL_OUTCOMES_PATH,
-  resetTemplateOutcomeStorageForTests,
+  forceLocalTemplateLearningForTests,
   templateOutcomeRepository,
   learningDbEnabled,
 } from "../templates/templateOutcomeRepository";
@@ -47,10 +47,12 @@ describe("Phase L — migration 323", () => {
 });
 
 describe("Phase L — templateOutcomeRepository", () => {
+  beforeEach(() => {
+    forceLocalTemplateLearningForTests();
+  });
+
   afterEach(() => {
-    delete process.env.DATABASE_URL;
-    delete process.env.ENABLE_TEMPLATE_LEARNING_DB;
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
   });
 
   it("does not require DATABASE_URL for recordOutcome (local fallback)", async () => {
@@ -160,10 +162,12 @@ describe("Phase L — pipeline template selector", () => {
 });
 
 describe("Phase L — pipeline retry with alternative template", () => {
+  beforeEach(() => {
+    forceLocalTemplateLearningForTests();
+  });
+
   afterEach(() => {
-    delete process.env.DATABASE_URL;
-    delete process.env.ENABLE_TEMPLATE_LEARNING_DB;
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
   });
 
   it("simulatePhaseC records template_id in retryHistory", async () => {
@@ -202,9 +206,12 @@ describe("Phase L — pipeline retry with alternative template", () => {
 });
 
 describe("Phase L — recordPostQaOutcome", () => {
+  beforeEach(() => {
+    forceLocalTemplateLearningForTests();
+  });
+
   afterEach(() => {
-    delete process.env.DATABASE_URL;
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
   });
 
   it("writes json snapshot without DB", async () => {

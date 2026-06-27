@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { runRankTemplatesJob, rankTemplates } from "../learning/runRankTemplatesJob";
 import {
@@ -12,7 +12,7 @@ import {
 import { resolveConversionMetrics } from "../portal/conversionMetricsPlaceholder";
 import {
   LOCAL_OUTCOMES_PATH,
-  resetTemplateOutcomeStorageForTests,
+  forceLocalTemplateLearningForTests,
   templateOutcomeRepository,
   learningDbEnabled,
 } from "../templates/templateOutcomeRepository";
@@ -59,10 +59,12 @@ describe("Phase M — conversion metrics placeholder", () => {
 });
 
 describe("Phase M — portal learning feedback", () => {
+  beforeEach(() => {
+    forceLocalTemplateLearningForTests();
+  });
+
   afterEach(() => {
-    delete process.env.DATABASE_URL;
-    delete process.env.ENABLE_TEMPLATE_LEARNING_DB;
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
   });
 
   it("approve on autonomous deliverable creates positive outcome", async () => {
@@ -140,10 +142,12 @@ describe("Phase M — portal learning feedback", () => {
 });
 
 describe("Phase M — rank templates job", () => {
+  beforeEach(() => {
+    forceLocalTemplateLearningForTests();
+  });
+
   afterEach(() => {
-    delete process.env.DATABASE_URL;
-    delete process.env.ENABLE_TEMPLATE_LEARNING_DB;
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
     if (existsSync(TEST_OUTPUT)) {
       rmSync(TEST_OUTPUT, { recursive: true, force: true });
     }

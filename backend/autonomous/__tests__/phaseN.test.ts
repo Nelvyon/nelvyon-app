@@ -18,7 +18,7 @@ import { loadTemplateRegistry } from "../templates/loadRegistry";
 import { loadOutcomesFromJson } from "../templates/templateOutcome";
 import { resolveConversionMetrics } from "../portal/conversionMetricsPlaceholder";
 import {
-  resetTemplateOutcomeStorageForTests,
+  forceLocalTemplateLearningForTests,
   templateOutcomeRepository,
 } from "../templates/templateOutcomeRepository";
 
@@ -153,11 +153,11 @@ describe("Phase N — conversion scoring", () => {
 describe("Phase N — enrich outcomes job", () => {
   beforeEach(() => {
     clearGa4Env();
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
   });
   afterEach(() => {
     clearGa4Env();
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
     if (existsSync(TEST_OUTPUT)) rmSync(TEST_OUTPUT, { recursive: true, force: true });
     vi.restoreAllMocks();
   });

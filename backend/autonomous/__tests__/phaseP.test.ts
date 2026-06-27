@@ -12,7 +12,7 @@ import {
 import { exportLearningCsv } from "../learning/learningCsvExport";
 import { runLearningRefreshJob } from "../learning/runLearningRefreshJob";
 import {
-  resetTemplateOutcomeStorageForTests,
+  forceLocalTemplateLearningForTests,
   templateOutcomeRepository,
 } from "../templates/templateOutcomeRepository";
 import { loadOutcomesFromJson } from "../templates/templateOutcome";
@@ -134,12 +134,10 @@ describe("Phase P — CSV export", () => {
 
 describe("Phase P — learning refresh job", () => {
   beforeEach(() => {
-    delete process.env.ENABLE_TEMPLATE_LEARNING_DB;
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
   });
   afterEach(() => {
-    delete process.env.ENABLE_TEMPLATE_LEARNING_DB;
-    resetTemplateOutcomeStorageForTests();
+    forceLocalTemplateLearningForTests();
     if (existsSync(TEST_OUTPUT)) rmSync(TEST_OUTPUT, { recursive: true, force: true });
   });
 
