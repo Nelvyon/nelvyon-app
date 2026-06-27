@@ -1,4 +1,17 @@
 ﻿export {
+  OsAgentAuditTrailService,
+  getOsAgentAuditTrailService,
+  resetOsAgentAuditTrailServiceForTests,
+  normalizeAgentLogEntry,
+  buildTrailSummary,
+  computeEventHash,
+  type AgentLogEntry as AuditAgentLogEntry,
+  type AgentAuditEvent,
+  type AgentAuditTrail,
+  type AgentAuditSummary,
+  type AgentInsertPayload,
+} from "./OsAgentAuditTrailService";
+export {
   OsRegulatedSectorShieldService,
   OsShieldError,
   getOsRegulatedSectorShieldService,

@@ -380,6 +380,23 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     shieldStatus = undefined;
   }
 
+  // O28 — persist the agent audit trail (agent_log → input/output/QA per SKU, best-effort)
+  let agentAuditCount: number | undefined;
+  try {
+    const { getOsAgentAuditTrailService } = await import("@nelvyon/saas");
+    const rec = await getOsAgentAuditTrailService().recordFromSimulation({
+      packRunId: params.packRunId,
+      sku: params.sku,
+      workspaceId: params.workspaceId,
+      agentLog: simulation.project.agent_log,
+      qa: simulation.project.qa ? { score: simulation.project.qa.score, passed: simulation.project.qa.passed } : null,
+      metadata: { sector: params.intake.sector, escalated: simulation.escalated },
+    });
+    agentAuditCount = rec.inserted;
+  } catch {
+    agentAuditCount = undefined;
+  }
+
   return {
     result: {
       sku: params.sku,
@@ -391,6 +408,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       qa_legal_passed: visualQa.legal_passed,
       qa_gate_status: qaGateStatus,
       shield_status: shieldStatus,
+      agent_audit_count: agentAuditCount,
     },
     deliverableIds,
   };
