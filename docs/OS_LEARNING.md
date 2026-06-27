@@ -2,6 +2,16 @@
 
 The learning loop reads real conversion data from Google Analytics 4 monthly and adjusts which OS sectors get priority in the seed-selector.
 
+> **O20 — Production loop + audit trail.** The cron now delegates to
+> `OsLearningLoopProdService.runProdLoop()`: aggregates GA4 sector CVR across active
+> `integration_ga4` users, re-ranks templates (autonomous M/N/P), persists
+> `learning_rank` / `learning_score` on `os_envato_seed_registry`, and writes an
+> idempotent row to **`os_learning_run_log`** (unique `period_key` + `trigger_source`).
+> Visible in **`/os/learning`** (KPIs, run history, top sectors by CVR, GA4 mode
+> `real|mock|none`) and triggerable via `POST /api/os/learning/trigger` (admin,
+> idempotent). No active GA4 integrations → run recorded `skipped`
+> (`metadata.reason = "no_ga4"`). Sector ids come from the 20-sector registry (O16).
+
 ---
 
 ## How it works

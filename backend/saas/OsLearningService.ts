@@ -9,16 +9,14 @@
  */
 import { DbClient } from "../db/DbClient";
 import { getGA4Service, type GoogleAnalytics4Service } from "../integrations/GoogleAnalytics4Service";
+import { SECTOR_IDS } from "../autonomous/sectors/sectorRegistry";
 
-// Sectors that OS currently supports — must stay in sync with sectorSeeds.ts
-const KNOWN_SECTORS = [
-  "dental", "restaurant", "ecommerce", "saas", "inmobiliaria",
-  "fitness", "legal", "educacion", "tecnologia", "veterinaria",
-  "clinica", "moda", "turismo", "finanzas", "construccion",
-  "marketing", "retail", "salud", "hosteleria", "consultoria",
-] as const;
+// Sectors OS supports — sourced from the 20-sector registry (O16) so the learning
+// loop stays aligned with sector readiness + seeds. pathToSector() keeps the
+// legacy synonyms below for GA4 paths that don't match a registry id directly.
+const KNOWN_SECTORS: readonly string[] = SECTOR_IDS;
 
-export type OsSector = (typeof KNOWN_SECTORS)[number];
+export type OsSector = string;
 
 export type SectorWeight = {
   sector: string;

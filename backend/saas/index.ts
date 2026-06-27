@@ -1,4 +1,20 @@
 ﻿export {
+  OsLearningLoopProdService,
+  OsLearningLoopError,
+  getOsLearningLoopProdService,
+  resetOsLearningLoopProdServiceForTests,
+  type LearningGa4Port,
+  type LearningRefreshPort,
+  type LearningTriggerSource,
+  type LearningRunStatus,
+  type LearningRun,
+  type LearningRunStats,
+  type LearningRunFilters,
+  type LearningRunSummary,
+  type RunProdLoopResult,
+  type OsLearningLoopErrorCode,
+} from "./OsLearningLoopProdService";
+export {
   OsRecurringRunLogService,
   OsRecurringRunLogError,
   getOsRecurringRunLogService,

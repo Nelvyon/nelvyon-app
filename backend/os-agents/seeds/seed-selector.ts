@@ -105,24 +105,51 @@ function loadSyntheticSeeds(sector: string, syntheticDir: string): SectorSeed[] 
  * @param limit         - max seeds to return (default 50)
  * @param _rootOverride - optional root dir for testing
  */
-export function getSectorSeeds(sector: string, limit = 50, _rootOverride?: string): SectorSeed[] {
+/**
+ * O20 — reorder seeds by GA4-driven learning rank (lower rank = higher priority).
+ * Seeds present in the rank map come first (ascending); the rest keep their order.
+ * No-op when the map is empty/undefined → current behavior intact.
+ */
+function applyLearningRank(seeds: SectorSeed[], rankMap?: Map<string, number>): SectorSeed[] {
+  if (!rankMap || rankMap.size === 0) return seeds;
+  return [...seeds].sort((a, b) => {
+    const ra = rankMap.get(a.id);
+    const rb = rankMap.get(b.id);
+    if (ra !== undefined && rb !== undefined) return ra - rb;
+    if (ra !== undefined) return -1;
+    if (rb !== undefined) return 1;
+    return 0;
+  });
+}
+
+export function getSectorSeeds(
+  sector: string,
+  limit = 50,
+  _rootOverride?: string,
+  learningRanks?: Map<string, number>,
+): SectorSeed[] {
   const { envatoDir, syntheticDir, metadataFile } = resolveRoots(_rootOverride);
 
   const onDisk = loadEnvatoSeeds(sector, envatoDir);
-  if (onDisk.length > 0) return onDisk.slice(0, limit);
+  if (onDisk.length > 0) return applyLearningRank(onDisk, learningRanks).slice(0, limit);
 
   const metadata = loadMetadataSeeds(sector, metadataFile);
-  if (metadata.length > 0) return metadata.slice(0, limit);
+  if (metadata.length > 0) return applyLearningRank(metadata, learningRanks).slice(0, limit);
 
-  return loadSyntheticSeeds(sector, syntheticDir).slice(0, limit);
+  return applyLearningRank(loadSyntheticSeeds(sector, syntheticDir), learningRanks).slice(0, limit);
 }
 
 /**
  * Get a single seed by index (wraps around) for deterministic selection.
  * Used by sector agents to pick a seed template given a job index.
  */
-export function getSeedByIndex(sector: string, index: number, _rootOverride?: string): SectorSeed | null {
-  const seeds = getSectorSeeds(sector, 50, _rootOverride);
+export function getSeedByIndex(
+  sector: string,
+  index: number,
+  _rootOverride?: string,
+  learningRanks?: Map<string, number>,
+): SectorSeed | null {
+  const seeds = getSectorSeeds(sector, 50, _rootOverride, learningRanks);
   if (!seeds.length) return null;
   return seeds[index % seeds.length];
 }

@@ -7,11 +7,11 @@
  * Header: x-cron-secret: $CRON_SECRET
  */
 import { NextResponse } from "next/server";
-import { getOsLearningService } from "@nelvyon/saas";
-import { DbClient } from "@/../../backend/db/DbClient";
+import { getOsLearningLoopProdService } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+export const maxDuration = 300;
 
 export async function GET(req: Request): Promise<NextResponse> {
   const secret = req.headers.get("x-cron-secret");
@@ -19,27 +19,20 @@ export async function GET(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Query all active GA4 integrations
-  const db = DbClient.getInstance();
-  const rows = await db.query<{ user_id: string }>(
-    `SELECT user_id::text FROM integration_ga4 WHERE is_active = true`,
-  );
+  // O20 — delegate to the production learning loop (GA4 → weights → templates → seeds)
+  const prod = getOsLearningLoopProdService();
+  const result = await prod.runProdLoop({ source: "cron" });
+  const summary = await prod.getSummary().catch(() => null);
 
-  if (rows.length === 0) {
-    return NextResponse.json({ ok: true, message: "No active GA4 integrations", processed: 0 });
-  }
-
-  const svc = getOsLearningService();
-  const results = [];
-  for (const { user_id } of rows) {
-    try {
-      const r = await svc.runLearningLoop(user_id);
-      results.push({ user_id, ...r });
-    } catch (err) {
-      results.push({ user_id, error: String(err) });
-    }
-  }
-
-  const processed = results.filter((r) => !("error" in r)).length;
-  return NextResponse.json({ ok: true, processed, results, at: new Date().toISOString() });
+  return NextResponse.json({
+    ok: true,
+    skipped: result.skipped,
+    periodKey: result.periodKey,
+    runId: result.runId,
+    status: result.status,
+    processed: result.skipped ? 0 : result.stats.ga4Users,
+    stats: result.stats,
+    summary,
+    at: new Date().toISOString(),
+  });
 }
