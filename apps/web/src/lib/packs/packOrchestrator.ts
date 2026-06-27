@@ -205,11 +205,24 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
 
   // Seed provenance for QA metadata — use structured seed registry when available
   const seed = getSeedByIndex(params.intake.sector, 0);
+
+  // O16 — attach sector readiness score (non-blocking, DB-only lookup)
+  let sectorReadinessScore: number | null = null;
+  try {
+    const { getOsSectorReadinessService } = await import(
+      "../../../../../backend/os-agents/sectors/OsSectorReadinessService"
+    );
+    sectorReadinessScore = await getOsSectorReadinessService().getReadinessScore(params.intake.sector);
+  } catch {
+    sectorReadinessScore = null;
+  }
+
   const seedMeta = {
     seed_id: seed?.seed_id ?? `${params.intake.sector}_tpl_0`,
     source: "synthetic" as const,
     sector: params.intake.sector,
     prompt_preview: seed?.prompt.slice(0, 80) ?? null,
+    sector_readiness_score: sectorReadinessScore,
   };
 
   if (shouldPublish) {
