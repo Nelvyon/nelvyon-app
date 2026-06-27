@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { SaasAdsDashboardService } from "../SaasAdsDashboardService";
+import { afterEach, describe, it, expect, vi } from "vitest";
+import { SaasAdsDashboardService, resetSaasAdsDashboardServiceForTests } from "../SaasAdsDashboardService";
 
 type DbPort = { query: <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]> };
 type FetchFn = typeof fetch;
@@ -23,6 +23,11 @@ const snapConn = {
 function connDb(conn: typeof tiktokConn | typeof snapConn) {
   return { query: async () => [conn] as never };
 }
+
+afterEach(() => {
+  resetSaasAdsDashboardServiceForTests();
+  vi.restoreAllMocks();
+});
 
 // ── TikTok listCampaigns ──────────────────────────────────────────────────────
 

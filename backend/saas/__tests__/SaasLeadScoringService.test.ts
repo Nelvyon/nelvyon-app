@@ -1,4 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+
+vi.mock("../SaasWorkflowService", () => ({
+  getSaasWorkflowService: () => ({
+    dispatchActiveWorkflows: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 import {
   SaasLeadScoringService,
   resetSaasLeadScoringServiceForTests,

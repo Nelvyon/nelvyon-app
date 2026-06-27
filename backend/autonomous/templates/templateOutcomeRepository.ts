@@ -11,7 +11,11 @@ import { loadTemplateRegistry } from "./loadRegistry";
 import type { TemplateCategory, TemplateOutcome, TemplateScoreBreakdown, TemplateSlice } from "./types";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const LOCAL_OUTCOMES_PATH = join(__dirname, "..", "output", "learning", "local-outcomes.json");
+const LOCAL_OUTCOMES_BASENAME =
+  process.env.VITEST === "true" && process.env.VITEST_WORKER_ID
+    ? `local-outcomes-w${process.env.VITEST_WORKER_ID}.json`
+    : "local-outcomes.json";
+const LOCAL_OUTCOMES_PATH = join(__dirname, "..", "output", "learning", LOCAL_OUTCOMES_BASENAME);
 
 export type StorageMode = "db" | "local" | "none";
 

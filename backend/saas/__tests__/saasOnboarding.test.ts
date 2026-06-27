@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as Auth from "@nelvyon/auth";
 import * as Saas from "@nelvyon/saas";
@@ -133,6 +133,19 @@ function authRequest(userId: string): Request {
 }
 
 describe("SaasOnboardingService", () => {
+  const savedDatabaseUrl = process.env.DATABASE_URL;
+
+  beforeEach(() => {
+    delete process.env.DATABASE_URL;
+    resetSaasOnboardingServiceForTests();
+  });
+
+  afterEach(() => {
+    if (savedDatabaseUrl !== undefined) process.env.DATABASE_URL = savedDatabaseUrl;
+    else delete process.env.DATABASE_URL;
+    resetSaasOnboardingServiceForTests();
+  });
+
   it("createTenant crea registro correctamente", async () => {
     const db = makeMemoryDb();
     const svc = new SaasOnboardingService(db);
@@ -212,7 +225,16 @@ describe("SaasOnboardingService", () => {
 });
 
 describe("API SaaS onboarding", () => {
+  const savedDatabaseUrl = process.env.DATABASE_URL;
+
+  beforeEach(() => {
+    delete process.env.DATABASE_URL;
+    resetSaasOnboardingServiceForTests();
+  });
+
   afterEach(() => {
+    if (savedDatabaseUrl !== undefined) process.env.DATABASE_URL = savedDatabaseUrl;
+    else delete process.env.DATABASE_URL;
     vi.restoreAllMocks();
     resetSaasOnboardingServiceForTests();
   });

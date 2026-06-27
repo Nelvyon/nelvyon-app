@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { SaasAdsDashboardService } from "../SaasAdsDashboardService";
+import { afterEach, describe, it, expect, vi } from "vitest";
+import { SaasAdsDashboardService, resetSaasAdsDashboardServiceForTests } from "../SaasAdsDashboardService";
 
 type Row = Record<string, unknown>;
 const makeDb = (rows: Row[][] = []) => {
@@ -17,6 +17,11 @@ const connRow = {
 };
 
 describe("SaasAdsDashboardService", () => {
+  afterEach(() => {
+    resetSaasAdsDashboardServiceForTests();
+    vi.restoreAllMocks();
+  });
+
   it("listConnections returns empty", async () => {
     const db = makeDb([[]]);
     const svc = new SaasAdsDashboardService(db);
@@ -166,11 +171,11 @@ describe("SaasAdsDashboardService", () => {
     await expect(svc.listCampaigns(TENANT, "meta")).rejects.toMatchObject({ code: "API_ERROR" });
   });
 
-  it("listCampaigns throws API_ERROR for tiktok (not implemented)", async () => {
-    const tiktokConn = { ...connRow, platform: "tiktok" };
-    const db = makeDb([[tiktokConn]]);
+  it("listCampaigns throws API_ERROR for linkedin (not implemented)", async () => {
+    const linkedInConn = { ...connRow, platform: "linkedin" };
+    const db = makeDb([[linkedInConn]]);
     const svc = new SaasAdsDashboardService(db);
-    await expect(svc.listCampaigns(TENANT, "tiktok")).rejects.toMatchObject({ code: "API_ERROR" });
+    await expect(svc.listCampaigns(TENANT, "linkedin")).rejects.toMatchObject({ code: "API_ERROR" });
   });
 
   it("setCampaignStatus throws NOT_CONNECTED when no connection", async () => {
