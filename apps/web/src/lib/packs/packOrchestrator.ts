@@ -361,6 +361,25 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     qaGateStatus = undefined;
   }
 
+  // O27 — regulated sector shield: EU disclaimer + prohibited claims scan (best-effort)
+  let shieldStatus: string | undefined;
+  try {
+    const { getOsRegulatedSectorShieldService } = await import("@nelvyon/saas");
+    const shieldText = [
+      (params.intake as Record<string, unknown>).value_proposition as string | undefined,
+      typeof personalized === "object" && personalized ? JSON.stringify(personalized) : undefined,
+    ].filter(Boolean).join(" ");
+    const shield = await getOsRegulatedSectorShieldService().evaluateAndPersist({
+      sectorId: params.intake.sector,
+      packRunId: params.packRunId,
+      deliverableRef: params.sku,
+      htmlOrText: shieldText,
+    });
+    shieldStatus = shield.status;
+  } catch {
+    shieldStatus = undefined;
+  }
+
   return {
     result: {
       sku: params.sku,
@@ -371,6 +390,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       qa_visual_score: visualQa.score,
       qa_legal_passed: visualQa.legal_passed,
       qa_gate_status: qaGateStatus,
+      shield_status: shieldStatus,
     },
     deliverableIds,
   };
@@ -566,7 +586,8 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         r.qa_score < autoPublishThreshold ||
         (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
         r.qa_legal_passed === false ||
-        r.qa_gate_status === "blocked", // O18 — legal/hard block from the QA gate
+        r.qa_gate_status === "blocked" || // O18 — legal/hard block from the QA gate
+        r.shield_status === "blocked", // O27 — regulated sector shield hard block
     );
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");

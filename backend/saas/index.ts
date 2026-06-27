@@ -1,4 +1,22 @@
 ﻿export {
+  OsRegulatedSectorShieldService,
+  OsShieldError,
+  getOsRegulatedSectorShieldService,
+  resetOsRegulatedSectorShieldServiceForTests,
+  EU_DISCLAIMERS,
+  PROHIBITED_CLAIMS,
+  scanClaims,
+  hasRequiredDisclaimer,
+  computeShieldStatus,
+  type SectorPort as ShieldSectorPort,
+  type QaPort as ShieldQaPort,
+  type ShieldStatus,
+  type ShieldCheck,
+  type ShieldAuditResult,
+  type ShieldSummary,
+  type OsShieldErrorCode,
+} from "./OsRegulatedSectorShieldService";
+export {
   OsTemplateDnaService,
   OsTemplateDnaError,
   getOsTemplateDnaService,
