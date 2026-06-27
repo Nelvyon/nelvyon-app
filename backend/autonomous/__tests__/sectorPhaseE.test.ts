@@ -17,8 +17,15 @@ function brief(name: string) {
 }
 
 describe("Phase E — sector registry", () => {
-  it("defines 10 priority sectors", () => {
-    expect(SECTOR_IDS).toHaveLength(10);
+  it("defines 20 priority sectors (TOP 10 + O9 expansion)", () => {
+    expect(SECTOR_IDS).toHaveLength(20);
+    for (const id of [
+      "veterinaria", "educacion", "turismo", "construccion", "automocion",
+      "logistica", "seguros", "contabilidad", "hosteleria", "tecnologia",
+    ] as const) {
+      expect(SECTOR_IDS).toContain(id);
+      expect(SECTOR_REGISTRY[id]).toBeDefined();
+    }
     expect(SECTOR_REGISTRY.dental.autonomy_score).toBeGreaterThanOrEqual(75);
     expect(SECTOR_REGISTRY.saas_b2b.autonomy_score).toBeGreaterThanOrEqual(90);
   });
