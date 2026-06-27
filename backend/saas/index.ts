@@ -1,4 +1,19 @@
 ﻿export {
+  OsPackGateService,
+  OsPackGateError,
+  getOsPackGateService,
+  resetOsPackGateServiceForTests,
+  type CertPort,
+  type VitestPort,
+  type GateTriggerSource,
+  type GateStatus as PackGateStatus,
+  type GateCheck,
+  type PackGateRun,
+  type PackGateSummary,
+  type RunLocalGateResult,
+  type OsPackGateErrorCode,
+} from "./OsPackGateService";
+export {
   OsAgentDataService,
   getOsAgentDataService,
   resetOsAgentDataServiceForTests,

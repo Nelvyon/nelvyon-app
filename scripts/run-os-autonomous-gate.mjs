@@ -5,7 +5,7 @@
  * activate the env flag in Railway:
  *
  *   1. Visual QA engine — verifies brand Nelvyon (#0084ff / #020817) passes WCAG AA
- *   2. Pack kickoff API smoke — ensures all 3 pack kickoff routes are reachable
+ *   2. Pack kickoff API smoke — ensures all 8 pack kickoff routes are reachable
  *   3. OS recurring services cron — ensures /api/cron/os-recurring-services responds 200
  *
  * Usage:
@@ -93,9 +93,16 @@ if (visualQaRunner.status !== 0) {
 console.log("\n=== CHECK 2: Pack kickoff API routes ===");
 
 const PACKS = [
+  // 3 growth packs
   { id: "local-business-growth", label: "local" },
   { id: "ecommerce-growth", label: "ecommerce" },
   { id: "saas-b2b-growth", label: "saas-b2b" },
+  // 5 beta packs (O22 — extend kickoff reachability to all 8)
+  { id: "social-calendar-pack", label: "social-calendar" },
+  { id: "content-strategy-pack", label: "content-strategy" },
+  { id: "cro-audit-pack", label: "cro-audit" },
+  { id: "analytics-setup-pack", label: "analytics-setup" },
+  { id: "brand-voice-pack", label: "brand-voice" },
 ];
 
 const HEADERS = { "Content-Type": "application/json" };
