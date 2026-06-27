@@ -438,6 +438,29 @@ export class SaasCampaniasService {
     if (campania.status === "completed") throw new SaasCampaniasError("Campania already completed", "VALIDATION");
     const contactIds = await this.resolveAudience(tenantId, campania.audienceFilter);
 
+    if (campania.channel === "email") {
+      try {
+        const { getOsTruthGuardService } = await import("./OsTruthGuardService");
+        const subject = campania.subject ?? campania.name;
+        const truth = await getOsTruthGuardService().evaluate({
+          channel: "email",
+          text: campania.body ?? "",
+          subject,
+          campaniaId,
+          tenantId,
+        });
+        if (truth.status === "blocked") {
+          throw new SaasCampaniasError(
+            `Truth guard blocked: ${truth.violations.slice(0, 3).join(", ") || "copy no permitido"}`,
+            "VALIDATION",
+          );
+        }
+        void getOsTruthGuardService().persistAudit(truth).catch(() => undefined);
+      } catch (e) {
+        if (e instanceof SaasCampaniasError) throw e;
+      }
+    }
+
     await this.db.query(
       `UPDATE saas_campanias SET
         status = 'running',

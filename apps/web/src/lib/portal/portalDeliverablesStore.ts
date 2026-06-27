@@ -310,6 +310,19 @@ export async function approvePortalDeliverableBff(params: {
     }
   }
 
+  if (dmeta.truth_status === "blocked") {
+    throw Object.assign(new Error("Truth guard bloqueado para este entregable"), { code: "TRUTH_BLOCKED" });
+  }
+  try {
+    const { getOsTruthGuardService } = await import("@nelvyon/saas");
+    const truthGate = getOsTruthGuardService().canPublish("landing", dmeta);
+    if (!truthGate.allowed) {
+      throw Object.assign(new Error(truthGate.reason ?? "Truth guard bloqueado"), { code: "TRUTH_BLOCKED" });
+    }
+  } catch (e) {
+    if ((e as { code?: string }).code === "TRUTH_BLOCKED") throw e;
+  }
+
   const reviewedAt = new Date().toISOString();
   const meta = buildReviewMetadata(
     row.deliverable_metadata && typeof row.deliverable_metadata === "object" ? row.deliverable_metadata : {},

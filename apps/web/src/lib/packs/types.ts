@@ -83,6 +83,7 @@ export type SkuRunResult = {
   qa_legal_passed?: boolean;
   qa_gate_status?: string;
   shield_status?: string;
+  truth_status?: string;
   agent_audit_count?: number;
 };
 

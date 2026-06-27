@@ -380,6 +380,27 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     shieldStatus = undefined;
   }
 
+  // O30 — truth guard: unified pre-publish rules for landing copy (best-effort)
+  let truthStatus: string | undefined;
+  try {
+    const { getOsTruthGuardService } = await import("@nelvyon/saas");
+    const truthText = [
+      (params.intake as Record<string, unknown>).value_proposition as string | undefined,
+      typeof personalized === "object" && personalized ? JSON.stringify(personalized) : undefined,
+    ].filter(Boolean).join(" ");
+    const truth = await getOsTruthGuardService().evaluateAndPersist({
+      channel: "landing",
+      text: truthText,
+      sectorId: params.intake.sector,
+      packRunId: params.packRunId,
+      deliverableRef: params.sku,
+      workspaceId: params.workspaceId,
+    });
+    truthStatus = truth.status;
+  } catch {
+    truthStatus = undefined;
+  }
+
   // O28 — persist the agent audit trail (agent_log → input/output/QA per SKU, best-effort)
   let agentAuditCount: number | undefined;
   try {
@@ -408,6 +429,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       qa_legal_passed: visualQa.legal_passed,
       qa_gate_status: qaGateStatus,
       shield_status: shieldStatus,
+      truth_status: truthStatus,
       agent_audit_count: agentAuditCount,
     },
     deliverableIds,
@@ -605,7 +627,8 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
         r.qa_legal_passed === false ||
         r.qa_gate_status === "blocked" || // O18 — legal/hard block from the QA gate
-        r.shield_status === "blocked", // O27 — regulated sector shield hard block
+        r.shield_status === "blocked" || // O27 — regulated sector shield hard block
+        r.truth_status === "blocked", // O30 — truth guard hard block
     );
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
