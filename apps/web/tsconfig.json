@@ -161,6 +161,7 @@
   ],
   "exclude": [
     "node_modules",
+    "../../backend/os-agents/seeds/download-envato-browser.ts",
     "../../backend/os-agents/__tests__/**/*",
     "../../backend/os-agents/**/__tests__/**/*",
     "../../backend/db/__tests__/**/*",
