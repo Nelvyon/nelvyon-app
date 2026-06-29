@@ -46,12 +46,12 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   // Tenants with completed pack runs but no autopilot row (legacy — generate all)
   const legacyTenants = await db.query<{ tenant_id: string }>(
-    `SELECT DISTINCT npr.tenant_id
+    `SELECT DISTINCT st.id::text AS tenant_id
      FROM nelvyon_pack_runs npr
+     INNER JOIN saas_tenants st ON st.workspace_id = npr.workspace_id
      WHERE npr.status = 'completed'
-       AND npr.tenant_id IS NOT NULL
        AND NOT EXISTS (
-         SELECT 1 FROM saas_autopilot_settings sap WHERE sap.tenant_id = npr.tenant_id
+         SELECT 1 FROM saas_autopilot_settings sap WHERE sap.tenant_id = st.id
        )`,
     [],
   );
