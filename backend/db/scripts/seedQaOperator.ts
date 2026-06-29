@@ -133,11 +133,12 @@ async function main(): Promise<void> {
     }
   }
 
-  const counts = await db.query<{ nelvyon_users: string; workspaces: string }>(
-    `SELECT
-      (SELECT COUNT(*)::text FROM nelvyon_users) AS nelvyon_users,
-      (SELECT COUNT(*)::text FROM workspaces) AS workspaces`,
-  );
+  const nelvyonRows = await db.query<{ n: string }>(`SELECT COUNT(*)::text AS n FROM nelvyon_users`);
+  let workspacesTotal = "0";
+  if (await tableExists(db, "workspaces")) {
+    const wsRows = await db.query<{ n: string }>(`SELECT COUNT(*)::text AS n FROM workspaces`);
+    workspacesTotal = wsRows[0]?.n ?? "0";
+  }
 
   console.log(
     JSON.stringify(
@@ -146,8 +147,8 @@ async function main(): Promise<void> {
         email: QA_EMAIL,
         userId,
         workspaceId,
-        nelvyon_users_total: counts[0]?.nelvyon_users,
-        workspaces_total: counts[0]?.workspaces,
+        nelvyon_users_total: nelvyonRows[0]?.n,
+        workspaces_total: workspacesTotal,
         next:
           "STAGING_BASE_URL=https://nelvyon.com node scripts/run-staging-p0-smokes.mjs --skip-wait",
       },
