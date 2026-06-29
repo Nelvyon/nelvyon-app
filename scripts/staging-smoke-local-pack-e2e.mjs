@@ -4,7 +4,7 @@
  *
  * Flow: operator login → POST kickoff → portal invite → portal login → 5 deliverables sin mock://
  */
-const BASE = "https://ideal-victory-staging.up.railway.app";
+const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const BACKEND_API =
   process.env.STAGING_BACKEND_API?.trim() || "https://nelvyon-app-production.up.railway.app";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";

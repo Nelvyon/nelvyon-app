@@ -4,7 +4,7 @@
  *
  * Flow: operator login → POST kickoff → portal invite → portal login → 5 deliverables sin mock://
  */
-const BASE = process.env.STAGING_URL?.trim() || "https://ideal-victory-staging.up.railway.app";
+const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
 const SKIP_WAIT = process.argv.includes("--skip-wait");
