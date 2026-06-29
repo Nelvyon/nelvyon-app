@@ -25,6 +25,11 @@ vi.mock("../SaasKlaviyoService", () => ({
   }),
 }));
 
+vi.mock("../integrationHubSync", () => ({
+  loadOAuthSlugStatus: vi.fn().mockResolvedValue(new Map()),
+  revokeOAuthProvider: vi.fn().mockResolvedValue(undefined),
+}));
+
 // ── Env reset ─────────────────────────────────────────────────────────────────
 
 const ENV_BACKUP: Record<string, string | undefined> = {};
@@ -186,12 +191,12 @@ describe("disconnect", () => {
 });
 
 describe("getAuthorizeUrl", () => {
-  it("returns ads related route for ads platforms when env configured", () => {
+  it("returns ads OAuth route for meta when env configured", () => {
     process.env.META_CLIENT_ID = "123";
     process.env.META_CLIENT_SECRET = "secret";
     const svc = makeSvc();
     const url = svc.getAuthorizeUrl("t1", "meta", "https://app.nelvyon.com");
-    expect(url).toBe("https://app.nelvyon.com/saas/publicidad");
+    expect(url).toBe("https://app.nelvyon.com/api/oauth/meta");
   });
 
   it("throws ENV_REQUIRED when OAuth env vars missing", () => {
@@ -225,6 +230,20 @@ describe("getAuthorizeUrl", () => {
     const url = svc.getAuthorizeUrl("tenant_abc", "hubspot", "https://app.nelvyon.com");
     expect(url).toContain("/api/saas/oauth/connect");
     expect(url).toContain("provider=hubspot");
+  });
+
+  it("returns manual related route for shopify", () => {
+    const svc = makeSvc();
+    const url = svc.getAuthorizeUrl("t1", "shopify", "https://app.nelvyon.com");
+    expect(url).toBe("https://app.nelvyon.com/saas/store");
+  });
+
+  it("returns Next OAuth route for google calendar", () => {
+    process.env.GOOGLE_CLIENT_ID = "g_id";
+    process.env.GOOGLE_CLIENT_SECRET = "g_secret";
+    const svc = makeSvc();
+    const url = svc.getAuthorizeUrl("tenant_abc", "google_calendar", "https://app.nelvyon.com");
+    expect(url).toBe("https://app.nelvyon.com/api/oauth/google");
   });
 });
 

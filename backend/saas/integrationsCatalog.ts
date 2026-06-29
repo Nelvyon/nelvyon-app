@@ -47,7 +47,7 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "snapchat", slug: "snapchat", displayName: "Snapchat Ads", icon: "👻",
     category: "ads", connectionType: "oauth",
     envKeys: ["SNAPCHAT_CLIENT_ID", "SNAPCHAT_CLIENT_SECRET"],
-    relatedRoute: "/saas/publicidad", status: "live",
+    relatedRoute: "/saas/publicidad", status: "coming_soon",
   },
   {
     id: "google_analytics", slug: "google_analytics", displayName: "Google Analytics 4", icon: "📈",
@@ -67,13 +67,13 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "salesforce", slug: "salesforce", displayName: "Salesforce", icon: "☁️",
     category: "crm", connectionType: "oauth",
     envKeys: ["SALESFORCE_CLIENT_ID", "SALESFORCE_CLIENT_SECRET"],
-    status: "live",
+    status: "coming_soon",
   },
   {
     id: "pipedrive", slug: "pipedrive", displayName: "Pipedrive", icon: "🔵",
     category: "crm", connectionType: "oauth",
     envKeys: ["PIPEDRIVE_CLIENT_ID", "PIPEDRIVE_CLIENT_SECRET"],
-    status: "live",
+    status: "coming_soon",
   },
   {
     id: "zoho", slug: "zoho", displayName: "Zoho CRM", icon: "🟢",
@@ -129,9 +129,9 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
   },
   {
     id: "shopify", slug: "shopify", displayName: "Shopify", icon: "🛒",
-    category: "commerce", connectionType: "oauth",
+    category: "commerce", connectionType: "manual",
     envKeys: ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET"],
-    relatedRoute: "/saas/store", status: "beta",
+    relatedRoute: "/saas/store", status: "live",
   },
   {
     id: "woocommerce", slug: "woocommerce", displayName: "WooCommerce", icon: "🏪",
@@ -189,19 +189,19 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "semrush", slug: "semrush", displayName: "SEMrush", icon: "🔎",
     category: "analytics", connectionType: "env",
     envKeys: ["SEMRUSH_API_KEY"],
-    status: "coming_soon",
+    status: "live",
   },
   {
     id: "hotjar", slug: "hotjar", displayName: "Hotjar", icon: "🔥",
     category: "analytics", connectionType: "env",
     envKeys: ["HOTJAR_SITE_ID"],
-    status: "coming_soon",
+    status: "live",
   },
   {
     id: "mixpanel", slug: "mixpanel", displayName: "Mixpanel", icon: "📊",
     category: "analytics", connectionType: "env",
     envKeys: ["MIXPANEL_TOKEN"],
-    status: "coming_soon",
+    status: "live",
   },
 
   // ── Productivity ──────────────────────────────────────────────────────────

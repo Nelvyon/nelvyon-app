@@ -40,7 +40,11 @@ export async function GET(req: Request) {
     }
 
     const catalog = svc.listCatalog();
-    const connections = await svc.listConnections(ctx.tenant.id);
+    const connections = await svc.listConnections(
+      ctx.tenant.id,
+      ctx.claims.userId,
+      ctx.tenant.workspaceId,
+    );
     const summary = svc.buildSummary(connections);
 
     return NextResponse.json({ catalog, connections, summary });
@@ -59,7 +63,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "provider required" }, { status: 400 });
     }
     const svc = getSaasIntegrationsHubService();
-    await svc.disconnect(ctx.tenant.id, provider);
+    await svc.disconnect(ctx.tenant.id, provider, ctx.claims.userId, ctx.tenant.workspaceId);
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
     if (e instanceof SaasIntegrationsHubError && e.code === "NOT_FOUND") {

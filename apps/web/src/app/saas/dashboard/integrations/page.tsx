@@ -1,28 +1,21 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { Suspense } from "react";
+export const dynamic = "force-dynamic";
 
-import { IntegrationsDashboard } from "@/components/integrations";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+/** Legacy route — redirect to unified SaaS integraciones hub. */
+export default async function IntegrationsDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const params = new URLSearchParams();
 
-function IntegrationsContent() {
-  return (
-    <div className="mx-auto max-w-4xl space-y-8 px-4 py-10">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold text-slate-900">Integraciones</h1>
-        <p className="text-lg text-slate-600">Conecta tus cuentas publicitarias y de analítica.</p>
-      </header>
-      <IntegrationsDashboard />
-    </div>
-  );
-}
+  const success = sp.success;
+  const error = sp.error;
+  if (typeof success === "string") params.set("oauth_success", success);
+  if (typeof error === "string") params.set("oauth_error", error);
 
-export default function IntegrationsDashboardPage() {
-  return (
-    <DashboardLayout>
-      <Suspense fallback={<p className="p-8 text-center text-sm text-slate-500">Cargando integraciones…</p>}>
-        <IntegrationsContent />
-      </Suspense>
-    </DashboardLayout>
-  );
+  const q = params.toString();
+  redirect(q ? `/saas/integraciones?${q}` : "/saas/integraciones");
 }

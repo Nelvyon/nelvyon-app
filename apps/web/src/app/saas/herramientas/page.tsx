@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   NelvyonDsButton,
@@ -107,28 +107,152 @@ function DisabledDownloadCard({
 
 // ─── Sección 2: Herramientas conectables ─────────────────────────────────────
 
-const TOOLS = [
-  { icon: "⚡", name: "Zapier", description: "Automatiza flujos entre Nelvyon y miles de apps", connected: false },
-  { icon: "🔄", name: "Make (Integromat)", description: "Workflows visuales avanzados", connected: false },
-  { icon: "🔧", name: "n8n", description: "Automatización self-hosted", connected: false },
-  { icon: "💬", name: "Slack", description: "Notificaciones de leads y alertas en tiempo real", connected: true },
-  { icon: "📊", name: "Google Analytics", description: "Seguimiento de conversiones en tu web", connected: false },
-  { icon: "🏷️", name: "Google Tag Manager", description: "Gestión centralizada de píxeles y scripts", connected: false },
-  { icon: "📘", name: "Meta Pixel", description: "Seguimiento de conversiones para Meta Ads", connected: false },
-  { icon: "💼", name: "LinkedIn Insight", description: "Analytics y retargeting LinkedIn", connected: false },
-  { icon: "🔥", name: "Hotjar", description: "Mapas de calor y grabaciones de sesión", connected: false },
+interface ToolConfig {
+  icon: string;
+  name: string;
+  slug: string | null;
+  description: string;
+  comingSoon?: boolean;
+}
+
+const TOOLS: ToolConfig[] = [
+  { icon: "⚡", name: "Zapier", slug: "zapier", description: "Automatiza flujos entre Nelvyon y miles de apps" },
+  { icon: "🔄", name: "Make (Integromat)", slug: null, description: "Workflows visuales avanzados", comingSoon: true },
+  { icon: "🔧", name: "n8n", slug: null, description: "Automatización self-hosted", comingSoon: true },
+  { icon: "💬", name: "Slack", slug: "slack", description: "Notificaciones de leads y alertas en tiempo real" },
+  { icon: "📊", name: "Google Analytics", slug: "google_analytics", description: "Seguimiento de conversiones en tu web" },
+  { icon: "🏷️", name: "Google Tag Manager", slug: null, description: "Gestión centralizada de píxeles y scripts", comingSoon: true },
+  { icon: "📘", name: "Meta Pixel", slug: "meta", description: "Seguimiento de conversiones para Meta Ads" },
+  { icon: "💼", name: "LinkedIn Insight", slug: "linkedin", description: "Analytics y retargeting LinkedIn" },
+  { icon: "🔥", name: "Hotjar", slug: "hotjar", description: "Mapas de calor y grabaciones de sesión" },
 ];
+
+interface IntegrationConnection {
+  slug: string;
+  status: "connected" | "disconnected" | "error" | "pending";
+  catalogStatus: "live" | "beta" | "coming_soon";
+}
+
+function ToolsSection() {
+  const [connections, setConnections] = useState<IntegrationConnection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch("/api/saas/integrations");
+        if (res.ok) {
+          const data = (await res.json()) as { connections?: IntegrationConnection[] };
+          setConnections(data.connections ?? []);
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  function toolStatus(tool: ToolConfig): { label: string; tone: "success" | "primary" | "warning" | "danger"; connected: boolean } {
+    if (tool.comingSoon) {
+      return { label: "Próximamente", tone: "warning", connected: false };
+    }
+    if (!tool.slug) {
+      return { label: "Próximamente", tone: "warning", connected: false };
+    }
+    const conn = connections.find((c) => c.slug === tool.slug);
+    if (!conn) {
+      return { label: loading ? "…" : "No conectado", tone: "primary", connected: false };
+    }
+    if (conn.catalogStatus === "coming_soon") {
+      return { label: "Próximamente", tone: "warning", connected: false };
+    }
+    if (conn.status === "connected") {
+      return { label: "Conectado", tone: "success", connected: true };
+    }
+    if (conn.status === "error") {
+      return { label: "Error", tone: "danger", connected: false };
+    }
+    return { label: "No conectado", tone: "primary", connected: false };
+  }
+
+  return (
+    <section className="space-y-4">
+      <p className="text-sm font-semibold text-muted-foreground">🔗 Conectar herramientas</p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {TOOLS.map((tool) => {
+          const { label, tone, connected } = toolStatus(tool);
+          return (
+            <NelvyonDsCard
+              key={tool.name}
+              className={`flex items-center gap-4 p-4 ${connected ? "border-green-500/30" : ""}`}
+            >
+              <span className="text-2xl">{tool.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-foreground">{tool.name}</p>
+                  <NelvyonDsBadge tone={tone}>{label}</NelvyonDsBadge>
+                </div>
+                <p className="text-xs text-muted-foreground">{tool.description}</p>
+              </div>
+              <Link href="/saas/integraciones">
+                <NelvyonDsButton variant="ghost" className="shrink-0">
+                  Configurar
+                </NelvyonDsButton>
+              </Link>
+            </NelvyonDsCard>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 // ─── Sección 3: API key reveal ────────────────────────────────────────────────
 
 function ApiKeyCard() {
-  const [revealed, setRevealed] = useState(false);
+  const [keys, setKeys] = useState<Array<{ id: string; keyPrefix: string; name: string }>>([]);
+  const [rawKey, setRawKey] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [copied, setCopied] = useState(false);
-  const EXAMPLE_KEY = "nv_sk_1a2b3c4d5e6f7g8h9i0j";
-  const displayKey = revealed ? EXAMPLE_KEY : "nv_••••••••••••••••";
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch("/api/saas/api-keys");
+        if (res.ok) {
+          const data = (await res.json()) as { keys?: Array<{ id: string; keyPrefix: string; name: string }> };
+          setKeys(data.keys ?? []);
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const displayKey = rawKey ?? (keys[0]?.keyPrefix ? `${keys[0].keyPrefix}••••••••` : "Sin API key");
+
+  async function handleCreate() {
+    setCreating(true);
+    try {
+      const res = await fetch("/api/saas/api-keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Herramientas" }),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { rawKey?: string; key?: { id: string; keyPrefix: string; name: string } };
+        if (data.key) setKeys((prev) => [data.key!, ...prev]);
+        if (data.rawKey) setRawKey(data.rawKey);
+      }
+    } finally {
+      setCreating(false);
+    }
+  }
 
   function handleCopy() {
-    void navigator.clipboard.writeText(EXAMPLE_KEY);
+    const text = rawKey ?? keys[0]?.keyPrefix;
+    if (!text) return;
+    void navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -137,18 +261,22 @@ function ApiKeyCard() {
     <NelvyonDsCard className="flex flex-col gap-4 p-5">
       <p className="text-sm font-semibold text-foreground">API Key</p>
       <div className="flex items-center gap-3 rounded-xl bg-muted/30 px-4 py-3">
-        <span className="flex-1 font-mono text-sm text-green-400">{displayKey}</span>
-        <button
-          onClick={() => setRevealed((v) => !v)}
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
-          {revealed ? "Ocultar" : "Revelar"}
-        </button>
-        <button onClick={handleCopy} className="text-xs text-muted-foreground hover:text-foreground">
-          {copied ? "✓" : "Copiar"}
-        </button>
+        <span className="flex-1 font-mono text-sm text-green-400">
+          {loading ? "Cargando…" : displayKey}
+        </span>
+        {rawKey && (
+          <button onClick={handleCopy} className="text-xs text-muted-foreground hover:text-foreground">
+            {copied ? "✓" : "Copiar"}
+          </button>
+        )}
       </div>
+      {rawKey && (
+        <p className="text-xs text-amber-400">Copia esta clave ahora — no se volverá a mostrar completa.</p>
+      )}
       <div className="flex flex-wrap gap-3">
+        <NelvyonDsButton variant="ghost" onClick={() => void handleCreate()} disabled={creating}>
+          {creating ? "Generando…" : keys.length === 0 ? "Generar API key" : "Nueva API key"}
+        </NelvyonDsButton>
         <Link href="/docs">
           <NelvyonDsButton variant="ghost">Ver documentación</NelvyonDsButton>
         </Link>
@@ -239,33 +367,7 @@ export default function HerramientasPage() {
             </section>
 
             {/* ── Sección 2: Conectar herramientas ── */}
-            <section className="space-y-4">
-              <p className="text-sm font-semibold text-muted-foreground">🔗 Conectar herramientas</p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {TOOLS.map((tool) => (
-                  <NelvyonDsCard
-                    key={tool.name}
-                    className={`flex items-center gap-4 p-4 ${tool.connected ? "border-green-500/30" : ""}`}
-                  >
-                    <span className="text-2xl">{tool.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-foreground">{tool.name}</p>
-                        <NelvyonDsBadge tone={tool.connected ? "success" : "primary"}>
-                          {tool.connected ? "Conectado" : "No conectado"}
-                        </NelvyonDsBadge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{tool.description}</p>
-                    </div>
-                    <Link href="/saas/integraciones">
-                      <NelvyonDsButton variant="ghost" className="shrink-0">
-                        Configurar
-                      </NelvyonDsButton>
-                    </Link>
-                  </NelvyonDsCard>
-                ))}
-              </div>
-            </section>
+            <ToolsSection />
 
             {/* ── Sección 3: API & Webhooks ── */}
             <section className="space-y-4">

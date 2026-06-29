@@ -7,14 +7,27 @@ import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL } from ".
 const FIXTURE_INTEGRATIONS = {
   catalog: [
     { id: "meta", slug: "meta", displayName: "Meta Ads", icon: "📘", category: "ads", connectionType: "oauth", status: "live", envConfigured: false },
-    { id: "google-ads", slug: "google-ads", displayName: "Google Ads", icon: "🎯", category: "ads", connectionType: "oauth", status: "live", envConfigured: false },
+    { id: "google", slug: "google", displayName: "Google Ads", icon: "🔍", category: "ads", connectionType: "oauth", status: "live", envConfigured: false },
     { id: "stripe", slug: "stripe", displayName: "Stripe", icon: "💳", category: "payments", connectionType: "env", status: "live", envConfigured: true },
-    { id: "shopify", slug: "shopify", displayName: "Shopify", icon: "🛍️", category: "commerce", connectionType: "oauth", status: "coming_soon", envConfigured: false },
+    { id: "shopify", slug: "shopify", displayName: "Shopify", icon: "🛒", category: "commerce", connectionType: "manual", status: "live", envConfigured: false },
   ],
   connections: [
-    { id: "conn-1", connectorSlug: "stripe", status: "connected", externalAccountName: "Nelvyon E2E", lastSyncAt: new Date().toISOString() },
+    {
+      slug: "stripe",
+      catalogStatus: "live",
+      displayName: "Stripe",
+      icon: "💳",
+      category: "payments",
+      connectionType: "env",
+      envKeys: [],
+      status: "connected",
+      envConfigured: true,
+      connectedAccount: "Nelvyon E2E",
+      lastSyncAt: new Date().toISOString(),
+      errorMessage: null,
+    },
   ],
-  summary: { total: 4, connected: 1, envOnly: 1, oauthReady: 2 },
+  summary: { total: 4, connected: 1, envOnly: 1, oauth: 0 },
 };
 
 test.describe("SaaS Integraciones — auth guard", () => {

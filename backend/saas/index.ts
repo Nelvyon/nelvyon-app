@@ -1200,6 +1200,15 @@ export {
   type IntegrationsCatalogItem,
   type IntegrationsSummary,
 } from "./SaasIntegrationsHubService";
+export {
+  syncOAuthProviderToHub,
+  loadOAuthSlugStatus,
+  resolveOAuthProviderByState,
+  revokeOAuthProvider,
+  slugToOAuthProvider,
+  OAUTH_PROVIDER_SLUGS,
+  type OAuthSlugStatus,
+} from "./integrationHubSync";
 
 export {
   INTEGRATIONS_CATALOG,

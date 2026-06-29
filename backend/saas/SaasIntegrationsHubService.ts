@@ -8,6 +8,7 @@ import {
 } from "./integrationsCatalog";
 import { getSaasAdsDashboardService } from "./SaasAdsDashboardService";
 import { getSaasKlaviyoService } from "./SaasKlaviyoService";
+import { loadOAuthSlugStatus, revokeOAuthProvider } from "./integrationHubSync";
 
 export { type IntegrationConnector, type IntegrationCatalogStatus };
 export type { IntegrationCategory, IntegrationConnectionType } from "./integrationsCatalog";
@@ -70,6 +71,19 @@ function isEnvConfigured(keys: string[]): boolean {
 
 const ADS_PLATFORMS = new Set(["meta", "google", "linkedin", "tiktok", "snapchat"]);
 
+/** OAuth handled by Next.js routes (cookie session on redirect). */
+const WEB_OAUTH_ROUTES: Record<string, string> = {
+  meta: "/api/oauth/meta",
+  google: "/api/oauth/google",
+  google_analytics: "/api/oauth/google",
+  google_calendar: "/api/oauth/google",
+  linkedin: "/api/oauth/linkedin",
+  tiktok: "/api/oauth/tiktok",
+};
+
+/** OAuth via FastAPI /api/v1/oauth/authorize/{provider} (hubspot, slack, …). */
+const PYTHON_OAUTH_SLUGS = new Set(["hubspot", "slack"]);
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 export class SaasIntegrationsHubService {
@@ -83,8 +97,12 @@ export class SaasIntegrationsHubService {
     }));
   }
 
-  /** Merged view: catalog + DB rows + ads oauth status + env checks */
-  async listConnections(tenantId: string): Promise<IntegrationConnection[]> {
+  /** Merged view: catalog + DB rows + ads/oauth status + env checks */
+  async listConnections(
+    tenantId: string,
+    userId?: string,
+    workspaceId?: number | null,
+  ): Promise<IntegrationConnection[]> {
     // 1. DB rows for this tenant
     const rows = await this.db.query<DbConnectionRow>(
       `SELECT connector_slug, status, external_account_name, last_sync_at, error_message, metadata
@@ -107,6 +125,11 @@ export class SaasIntegrationsHubService {
       klaviyoStatus = await getSaasKlaviyoService().getStatus();
     } catch { /* non-fatal */ }
 
+    // 4. Next.js + FastAPI OAuth tokens (non-fatal)
+    const oauthMap = userId
+      ? await loadOAuthSlugStatus(userId, workspaceId ?? null)
+      : new Map<string, { connected: boolean; accountName: string | null }>();
+
     return INTEGRATIONS_CATALOG.map((connector): IntegrationConnection => {
       const envConfigured = isEnvConfigured(connector.envKeys);
       const dbRow = dbMap.get(connector.slug);
@@ -114,7 +137,8 @@ export class SaasIntegrationsHubService {
       // Ads platforms: prefer DB row, then ads service status
       if (ADS_PLATFORMS.has(connector.slug)) {
         const ads = adsMap.get(connector.slug);
-        const connected = ads?.connected ?? false;
+        const oauth = oauthMap.get(connector.slug);
+        const connected = ads?.connected ?? oauth?.connected ?? false;
         return {
           slug: connector.slug,
           catalogStatus: connector.status,
@@ -126,7 +150,7 @@ export class SaasIntegrationsHubService {
           relatedRoute: connector.relatedRoute,
           status: dbRow?.status ?? (connected ? "connected" : "disconnected"),
           envConfigured,
-          connectedAccount: dbRow?.external_account_name ?? ads?.accountName ?? null,
+          connectedAccount: dbRow?.external_account_name ?? ads?.accountName ?? oauth?.accountName ?? null,
           lastSyncAt: dbRow?.last_sync_at ?? null,
           errorMessage: dbRow?.error_message ?? null,
           metadata: dbRow?.metadata ?? {},
@@ -175,6 +199,7 @@ export class SaasIntegrationsHubService {
       }
 
       // OAuth / manual connectors
+      const oauth = oauthMap.get(connector.slug);
       return {
         slug: connector.slug,
         catalogStatus: connector.status,
@@ -184,9 +209,9 @@ export class SaasIntegrationsHubService {
         connectionType: connector.connectionType,
         envKeys: connector.envKeys,
         relatedRoute: connector.relatedRoute,
-        status: dbRow?.status ?? "disconnected",
+        status: dbRow?.status ?? (oauth?.connected ? "connected" : "disconnected"),
         envConfigured,
-        connectedAccount: dbRow?.external_account_name ?? null,
+        connectedAccount: dbRow?.external_account_name ?? oauth?.accountName ?? null,
         lastSyncAt: dbRow?.last_sync_at ?? null,
         errorMessage: dbRow?.error_message ?? null,
         metadata: dbRow?.metadata ?? {},
@@ -194,16 +219,29 @@ export class SaasIntegrationsHubService {
     });
   }
 
-  async getConnectionStatus(tenantId: string, slug: string): Promise<IntegrationConnection | null> {
-    const all = await this.listConnections(tenantId);
+  async getConnectionStatus(
+    tenantId: string,
+    slug: string,
+    userId?: string,
+    workspaceId?: number | null,
+  ): Promise<IntegrationConnection | null> {
+    const all = await this.listConnections(tenantId, userId, workspaceId);
     return all.find((c) => c.slug === slug) ?? null;
   }
 
   /** Remove OAuth row; env-based connectors cannot be "disconnected" via UI */
-  async disconnect(tenantId: string, slug: string): Promise<void> {
+  async disconnect(
+    tenantId: string,
+    slug: string,
+    userId?: string,
+    workspaceId?: number | null,
+  ): Promise<void> {
     const connector = getCatalogBySlug(slug);
     if (!connector) {
       throw new SaasIntegrationsHubError(`Unknown connector: ${slug}`, "NOT_FOUND");
+    }
+    if (userId) {
+      await revokeOAuthProvider(userId, slug, workspaceId ?? null);
     }
     await this.db.query(
       `DELETE FROM saas_integration_connections WHERE tenant_id = $1 AND connector_slug = $2`,
@@ -220,6 +258,15 @@ export class SaasIntegrationsHubService {
     if (connector.status === "coming_soon") {
       throw new SaasIntegrationsHubError(`${connector.displayName} is coming soon`, "COMING_SOON");
     }
+    if (connector.connectionType === "manual") {
+      if (connector.relatedRoute) {
+        return `${baseUrl}${connector.relatedRoute}`;
+      }
+      throw new SaasIntegrationsHubError(
+        `${connector.displayName} requires manual configuration`,
+        "NOT_OAUTH"
+      );
+    }
     if (connector.connectionType !== "oauth") {
       throw new SaasIntegrationsHubError(
         `${connector.displayName} uses ${connector.connectionType} — configure via environment variables`,
@@ -233,12 +280,23 @@ export class SaasIntegrationsHubService {
         "ENV_REQUIRED"
       );
     }
-    // Ads platforms redirect to their dedicated management UI
-    if (ADS_PLATFORMS.has(slug) && connector.relatedRoute) {
-      return `${baseUrl}${connector.relatedRoute}`;
+    // Ads platforms: prefer real OAuth routes over manual token paste UI
+    if (ADS_PLATFORMS.has(slug)) {
+      const webRoute = WEB_OAUTH_ROUTES[slug];
+      if (webRoute) return `${baseUrl}${webRoute}`;
+      if (connector.relatedRoute) return `${baseUrl}${connector.relatedRoute}`;
     }
-    // Generic OAuth initiation via Python backend
-    return `${baseUrl}/api/saas/oauth/connect?provider=${encodeURIComponent(slug)}&tenant_id=${encodeURIComponent(tenantId)}`;
+    const webRoute = WEB_OAUTH_ROUTES[slug];
+    if (webRoute) {
+      return `${baseUrl}${webRoute}`;
+    }
+    if (PYTHON_OAUTH_SLUGS.has(slug)) {
+      return `${baseUrl}/api/saas/oauth/connect?provider=${encodeURIComponent(slug)}&tenant_id=${encodeURIComponent(tenantId)}`;
+    }
+    throw new SaasIntegrationsHubError(
+      `${connector.displayName} OAuth is not available yet`,
+      "COMING_SOON"
+    );
   }
 
   /** UPSERT a connection record (called from OAuth callback or manual setup) */

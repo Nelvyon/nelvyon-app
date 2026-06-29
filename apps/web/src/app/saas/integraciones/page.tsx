@@ -138,6 +138,18 @@ function ConnectorCard({
           <NelvyonDsButton variant="ghost" disabled className="w-full cursor-not-allowed opacity-60">
             Configurar en Railway
           </NelvyonDsButton>
+        ) : conn.connectionType === "manual" ? (
+          conn.relatedRoute ? (
+            <a href={conn.relatedRoute} className="w-full">
+              <NelvyonDsButton variant="primary" className="w-full">
+                Configurar
+              </NelvyonDsButton>
+            </a>
+          ) : (
+            <NelvyonDsButton variant="ghost" disabled className="w-full cursor-not-allowed opacity-60">
+              Configuración manual
+            </NelvyonDsButton>
+          )
         ) : (
           <NelvyonDsButton
             variant="primary"
@@ -214,7 +226,7 @@ function IntegracionesContent() {
   });
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="settings" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="integraciones" />}>
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader
           title="Integraciones"
