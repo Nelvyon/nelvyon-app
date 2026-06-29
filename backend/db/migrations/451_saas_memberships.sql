@@ -1,7 +1,7 @@
 -- Migration 451: Membership hub — plans, members, access gating
 CREATE TABLE IF NOT EXISTS saas_membership_plans (
   id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id                TEXT NOT NULL,
+  tenant_id                UUID NOT NULL,
   name                     TEXT NOT NULL,
   slug                     TEXT NOT NULL,
   price_amount             NUMERIC(10,2) NOT NULL DEFAULT 0,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS saas_membership_plans (
 
 CREATE TABLE IF NOT EXISTS saas_membership_members (
   id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id              TEXT NOT NULL,
+  tenant_id              UUID NOT NULL,
   plan_id                UUID NOT NULL REFERENCES saas_membership_plans(id) ON DELETE CASCADE,
   contact_id             UUID,
   contact_email          TEXT NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS saas_membership_members (
 
 CREATE TABLE IF NOT EXISTS saas_membership_access (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     TEXT NOT NULL,
+  tenant_id     UUID NOT NULL,
   member_id     UUID NOT NULL REFERENCES saas_membership_members(id) ON DELETE CASCADE,
   resource_type TEXT NOT NULL CHECK (resource_type IN ('course','community')),
   resource_id   UUID NOT NULL,

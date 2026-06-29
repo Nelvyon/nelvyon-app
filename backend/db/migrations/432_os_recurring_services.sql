@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS saas_recurring_deliverables (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    TEXT NOT NULL,
+  tenant_id    UUID NOT NULL,
   month        TEXT NOT NULL,  -- 'YYYY-MM', e.g. '2026-06'
   service_type TEXT NOT NULL
     CHECK (service_type IN ('seo_report', 'social_calendar', 'ads_snapshot')),

@@ -1,7 +1,7 @@
 -- 426_saas_web_pages.sql — tenant web page builder
 CREATE TABLE IF NOT EXISTS saas_web_pages (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    TEXT NOT NULL,
+  tenant_id    UUID NOT NULL,
   title        TEXT NOT NULL,
   slug         TEXT NOT NULL,
   type         TEXT NOT NULL DEFAULT 'landing' CHECK (type IN ('landing','blog','product','about','contact','custom')),

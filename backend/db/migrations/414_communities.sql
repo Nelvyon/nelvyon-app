@@ -1,7 +1,7 @@
 -- Migration 414: Community forums
 CREATE TABLE IF NOT EXISTS communities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT,
   icon TEXT NOT NULL DEFAULT '💬',
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS communities (
 CREATE TABLE IF NOT EXISTS community_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   community_id UUID NOT NULL REFERENCES communities(id) ON DELETE CASCADE,
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   author_name TEXT NOT NULL,
   author_email TEXT,
   title TEXT,

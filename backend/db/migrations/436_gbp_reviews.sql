@@ -1,7 +1,7 @@
 -- GBP reviews sync table
 CREATE TABLE IF NOT EXISTS gbp_reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id TEXT NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   google_review_id TEXT NOT NULL,
   author_name TEXT NOT NULL,
   rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),

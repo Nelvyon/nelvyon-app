@@ -1,7 +1,7 @@
 -- Migration 404: White-label configuration per tenant
 CREATE TABLE IF NOT EXISTS white_label_configs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE UNIQUE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE UNIQUE,
   brand_name TEXT NOT NULL DEFAULT 'My Platform',
   logo_url TEXT,
   favicon_url TEXT,

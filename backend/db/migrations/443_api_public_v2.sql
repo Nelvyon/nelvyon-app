@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS api_key_usage_log (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   api_key_id  UUID        NOT NULL REFERENCES api_keys(id) ON DELETE CASCADE,
-  tenant_id   TEXT        NOT NULL,
+  tenant_id   UUID        NOT NULL,
   endpoint    TEXT        NOT NULL,
   method      TEXT        NOT NULL DEFAULT 'GET',
   status_code INTEGER     NOT NULL DEFAULT 200,

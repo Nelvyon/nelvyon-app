@@ -9,7 +9,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_products_tenant_slug ON products(tenant_id
 
 -- Store settings per tenant (IVA, moneda, envío)
 CREATE TABLE IF NOT EXISTS store_settings (
-  tenant_id TEXT PRIMARY KEY REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id UUID PRIMARY KEY REFERENCES saas_tenants(id) ON DELETE CASCADE,
   currency TEXT NOT NULL DEFAULT 'EUR',
   vat_pct NUMERIC(5,2) NOT NULL DEFAULT 21,
   vat_included BOOLEAN NOT NULL DEFAULT true,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS store_settings (
 -- Orders
 CREATE TABLE IF NOT EXISTS store_orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id TEXT NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   order_number TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending',
   customer_email TEXT NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS store_orders (
 CREATE TABLE IF NOT EXISTS store_order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID NOT NULL REFERENCES store_orders(id) ON DELETE CASCADE,
-  tenant_id TEXT NOT NULL,
+  tenant_id UUID NOT NULL,
   product_id UUID REFERENCES products(id) ON DELETE SET NULL,
   product_name TEXT NOT NULL,
   variant_name TEXT,

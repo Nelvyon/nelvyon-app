@@ -40,8 +40,8 @@ CREATE TABLE IF NOT EXISTS stripe_webhook_events (
 -- Agency rebilling: tracks payments that have been charged through agency Stripe Connect
 CREATE TABLE IF NOT EXISTS saas_connect_rebilling (
   id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agency_tenant_id       TEXT NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
-  subcuenta_tenant_id    TEXT NOT NULL,
+  agency_tenant_id       UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  subcuenta_tenant_id    UUID NOT NULL,
   stripe_payment_intent  TEXT,
   stripe_transfer_id     TEXT,
   gross_amount_eur       NUMERIC(10,2) NOT NULL,

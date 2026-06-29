@@ -2,7 +2,7 @@
 -- Controls which recurring OS services are active per tenant + schedule day
 
 CREATE TABLE IF NOT EXISTS saas_autopilot_settings (
-  tenant_id             TEXT PRIMARY KEY,
+  tenant_id             UUID PRIMARY KEY,
   seo_enabled           BOOLEAN NOT NULL DEFAULT false,
   social_enabled        BOOLEAN NOT NULL DEFAULT false,
   reputation_enabled    BOOLEAN NOT NULL DEFAULT false,

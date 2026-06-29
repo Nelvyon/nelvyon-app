@@ -1,8 +1,8 @@
 -- Migration 415: Documents, products, invoices
 CREATE TABLE IF NOT EXISTS documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  contact_id UUID REFERENCES contacts(id) ON DELETE SET NULL,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  contact_id UUID REFERENCES saas_contacts(id) ON DELETE SET NULL,
   name TEXT NOT NULL,
   type TEXT NOT NULL DEFAULT 'document' CHECK (type IN ('document','contract','proposal','nda')),
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','sent','viewed','signed','declined','expired')),
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS documents (
 
 CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT,
   price NUMERIC(10,2) NOT NULL DEFAULT 0,
@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS products (
 
 CREATE TABLE IF NOT EXISTS invoices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  contact_id UUID REFERENCES contacts(id) ON DELETE SET NULL,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  contact_id UUID REFERENCES saas_contacts(id) ON DELETE SET NULL,
   invoice_number TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','sent','paid','overdue','cancelled')),
   line_items JSONB NOT NULL DEFAULT '[]',

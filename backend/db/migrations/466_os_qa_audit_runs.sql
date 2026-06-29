@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS os_qa_audit_runs (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   pack_run_id       UUID,
   deliverable_ref   TEXT,
-  tenant_id         TEXT,
+  tenant_id         UUID,
   workspace_id      INT,
   visual_score      INT NOT NULL,
   lighthouse_score  INT,

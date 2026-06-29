@@ -1,8 +1,8 @@
 -- Migration 403: Team members & roles
 CREATE TABLE IF NOT EXISTS team_members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  user_id UUID,
   email TEXT NOT NULL,
   name TEXT,
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('owner','admin','manager','user','viewer')),

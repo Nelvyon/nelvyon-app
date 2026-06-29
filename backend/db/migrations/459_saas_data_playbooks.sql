@@ -1,7 +1,7 @@
 -- S53 — Data Playbooks (auto-generated growth playbooks from tenant metrics)
 CREATE TABLE IF NOT EXISTS saas_data_playbooks (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id         TEXT NOT NULL,
+  tenant_id         UUID NOT NULL,
   slug              TEXT NOT NULL,
   title             TEXT NOT NULL,
   trigger_reason    TEXT NOT NULL,
@@ -28,7 +28,7 @@ CREATE INDEX IF NOT EXISTS saas_data_playbooks_tenant_status
 CREATE TABLE IF NOT EXISTS saas_data_playbook_steps (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   playbook_id  UUID NOT NULL REFERENCES saas_data_playbooks(id) ON DELETE CASCADE,
-  tenant_id    TEXT NOT NULL,
+  tenant_id    UUID NOT NULL,
   sort_order   INT NOT NULL DEFAULT 0,
   step_type    TEXT NOT NULL
                CHECK (step_type IN ('insight','action','email_draft','launch_pack','enable_autopilot','review_metric')),

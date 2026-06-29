@@ -1,7 +1,7 @@
 -- S49: saas_pack_launches — tracks brief-to-launch runs from SaaS UI
 CREATE TABLE IF NOT EXISTS saas_pack_launches (
   id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     TEXT        NOT NULL,
+  tenant_id     UUID        NOT NULL,
   pack_id       TEXT        NOT NULL,
   pack_run_id   UUID        REFERENCES nelvyon_pack_runs(id) ON DELETE SET NULL,
   brief         JSONB       NOT NULL DEFAULT '{}',

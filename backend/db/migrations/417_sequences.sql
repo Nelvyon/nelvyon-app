@@ -1,7 +1,7 @@
 -- Migration 417: Email sequences / drip campaigns
 CREATE TABLE IF NOT EXISTS saas_sequences (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT,
   trigger_type TEXT NOT NULL DEFAULT 'manual' CHECK (trigger_type IN ('manual','contact_created','form_submitted','tag_added')),
@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS saas_sequence_steps (
 CREATE TABLE IF NOT EXISTS saas_sequence_enrollments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   sequence_id UUID NOT NULL REFERENCES saas_sequences(id) ON DELETE CASCADE,
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  contact_id UUID NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  contact_id UUID NOT NULL REFERENCES saas_contacts(id) ON DELETE CASCADE,
   current_step INTEGER NOT NULL DEFAULT 0,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','completed','unsubscribed','failed')),
   next_send_at TIMESTAMPTZ,

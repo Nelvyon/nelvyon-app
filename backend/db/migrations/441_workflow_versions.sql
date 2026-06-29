@@ -2,7 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS saas_workflow_versions (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id   UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   workflow_id UUID        NOT NULL,
   version_num INTEGER     NOT NULL DEFAULT 1,
   snapshot    JSONB       NOT NULL,

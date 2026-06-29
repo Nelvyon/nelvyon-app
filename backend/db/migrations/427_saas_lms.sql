@@ -1,7 +1,7 @@
 -- LMS: cursos, módulos, lecciones, matrículas, progreso, certificados
 CREATE TABLE IF NOT EXISTS saas_lms_courses (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      TEXT NOT NULL,
+  tenant_id      UUID NOT NULL,
   title          TEXT NOT NULL,
   description    TEXT,
   slug           TEXT,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS saas_lms_courses (
 CREATE TABLE IF NOT EXISTS saas_lms_modules (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   course_id    UUID NOT NULL REFERENCES saas_lms_courses(id) ON DELETE CASCADE,
-  tenant_id    TEXT NOT NULL,
+  tenant_id    UUID NOT NULL,
   title        TEXT NOT NULL,
   description  TEXT,
   mod_order    INTEGER NOT NULL DEFAULT 0,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS saas_lms_modules (
 CREATE TABLE IF NOT EXISTS saas_lms_lessons (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   module_id    UUID NOT NULL REFERENCES saas_lms_modules(id) ON DELETE CASCADE,
-  tenant_id    TEXT NOT NULL,
+  tenant_id    UUID NOT NULL,
   title        TEXT NOT NULL,
   content_type TEXT NOT NULL DEFAULT 'text' CHECK (content_type IN ('text','video','quiz','file')),
   content      TEXT,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS saas_lms_lessons (
 CREATE TABLE IF NOT EXISTS saas_lms_enrollments (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   course_id    UUID NOT NULL REFERENCES saas_lms_courses(id) ON DELETE CASCADE,
-  tenant_id    TEXT NOT NULL,
+  tenant_id    UUID NOT NULL,
   contact_id   TEXT,
   contact_email TEXT NOT NULL,
   contact_name  TEXT,
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS saas_lms_progress (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   enrollment_id UUID NOT NULL REFERENCES saas_lms_enrollments(id) ON DELETE CASCADE,
   lesson_id   UUID NOT NULL REFERENCES saas_lms_lessons(id) ON DELETE CASCADE,
-  tenant_id   TEXT NOT NULL,
+  tenant_id   UUID NOT NULL,
   completed   BOOLEAN NOT NULL DEFAULT false,
   completed_at TIMESTAMPTZ,
   UNIQUE (enrollment_id, lesson_id)
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS saas_lms_progress (
 CREATE TABLE IF NOT EXISTS saas_lms_certificates (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   enrollment_id  UUID NOT NULL REFERENCES saas_lms_enrollments(id) ON DELETE CASCADE,
-  tenant_id      TEXT NOT NULL,
+  tenant_id      UUID NOT NULL,
   certificate_url TEXT,
   issued_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (enrollment_id)

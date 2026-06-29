@@ -1,7 +1,7 @@
 -- Migration 448: WhatsApp Business templates + product catalog
 CREATE TABLE IF NOT EXISTS saas_wa_templates (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       TEXT NOT NULL,
+  tenant_id       UUID NOT NULL,
   meta_template_id TEXT NOT NULL,
   name            TEXT NOT NULL,
   language        TEXT NOT NULL DEFAULT 'es',
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS saas_wa_templates (
 
 CREATE TABLE IF NOT EXISTS saas_wa_catalog_products (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id        TEXT NOT NULL,
+  tenant_id        UUID NOT NULL,
   meta_product_id  TEXT NOT NULL,
   catalog_id       TEXT NOT NULL,
   name             TEXT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS saas_wa_catalog_products (
 );
 
 CREATE TABLE IF NOT EXISTS saas_wa_settings (
-  tenant_id   TEXT PRIMARY KEY,
+  tenant_id   UUID PRIMARY KEY,
   waba_id     TEXT,
   catalog_id  TEXT,
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()

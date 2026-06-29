@@ -1,7 +1,7 @@
 -- Migration 449: Ads ↔ Attribution bridge
 CREATE TABLE IF NOT EXISTS saas_ads_campaign_links (
   id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id            TEXT NOT NULL,
+  tenant_id            UUID NOT NULL,
   platform             TEXT NOT NULL,
   external_campaign_id TEXT NOT NULL,
   external_campaign_name TEXT,

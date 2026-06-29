@@ -1,6 +1,6 @@
 -- 423 — Add tenant_id to dragdrop_workflows (nullable for backward compat)
 ALTER TABLE dragdrop_workflows
-  ADD COLUMN IF NOT EXISTS tenant_id TEXT;
+  ADD COLUMN IF NOT EXISTS tenant_id UUID;
 
 CREATE INDEX IF NOT EXISTS idx_dragdrop_workflows_tenant
   ON dragdrop_workflows(tenant_id)
@@ -9,7 +9,7 @@ CREATE INDEX IF NOT EXISTS idx_dragdrop_workflows_tenant
 -- Workflow recipes catalog (saas-level, official + tenant custom)
 CREATE TABLE IF NOT EXISTS saas_workflow_recipes (
   id           TEXT PRIMARY KEY,
-  tenant_id    TEXT,                          -- NULL = official/global
+  tenant_id    UUID,                          -- NULL = official/global
   name         TEXT NOT NULL,
   description  TEXT,
   category     TEXT NOT NULL DEFAULT 'general',

@@ -3,7 +3,7 @@
 -- ── Lead Scoring Rules ────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_lead_scoring_rules (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id  TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id  UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name       TEXT        NOT NULL,
   field      TEXT        NOT NULL,
   operator   TEXT        NOT NULL CHECK (operator IN ('equals','not_equals','greater_than','less_than','contains','not_contains','is_true','is_false')),
@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_lead_scoring_rules_tenant ON saas_lead_scori
 -- ── Lead Scores (latest per contact) ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_lead_scores (
   id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id      UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   contact_id     UUID        NOT NULL,
   score          INTEGER     NOT NULL DEFAULT 0,
   grade          TEXT        NOT NULL DEFAULT 'D' CHECK (grade IN ('A','B','C','D')),
@@ -35,7 +35,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_lead_scores_contact  ON saas_lead_scores(con
 -- ── Multi-touch Attribution ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_lead_attribution (
   id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id     UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   contact_id    UUID,
   utm_source    TEXT,
   utm_medium    TEXT,

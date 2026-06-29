@@ -1,7 +1,7 @@
 -- S52 — Pack Store entitlements (per-tenant pack access + launch quota)
 CREATE TABLE IF NOT EXISTS saas_pack_entitlements (
   id                        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id                 TEXT NOT NULL,
+  tenant_id                 UUID NOT NULL,
   pack_id                   TEXT NOT NULL,
   source                    TEXT NOT NULL DEFAULT 'plan'
                             CHECK (source IN ('plan','purchase','promo','admin')),

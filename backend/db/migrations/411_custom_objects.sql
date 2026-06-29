@@ -1,7 +1,7 @@
 -- Migration 411: Custom objects & records
 CREATE TABLE IF NOT EXISTS custom_objects (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   plural_name TEXT NOT NULL,
   icon TEXT NOT NULL DEFAULT '📦',
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS custom_objects (
 CREATE TABLE IF NOT EXISTS custom_object_records (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   object_id UUID NOT NULL REFERENCES custom_objects(id) ON DELETE CASCADE,
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   data JSONB NOT NULL DEFAULT '{}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

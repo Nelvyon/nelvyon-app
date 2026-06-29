@@ -1,7 +1,7 @@
 -- 420 — Social scheduler: connected accounts + scheduled/published posts (tenant-scoped)
 CREATE TABLE IF NOT EXISTS saas_social_accounts (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       TEXT NOT NULL,
+  tenant_id       UUID NOT NULL,
   platform        TEXT NOT NULL CHECK (platform IN ('meta', 'linkedin', 'instagram')),
   account_id      TEXT NOT NULL,
   account_name    TEXT NOT NULL,
@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS idx_social_accounts_active ON saas_social_accounts(te
 
 CREATE TABLE IF NOT EXISTS saas_social_posts (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id         TEXT NOT NULL,
+  tenant_id         UUID NOT NULL,
   social_account_id UUID NOT NULL REFERENCES saas_social_accounts(id) ON DELETE CASCADE,
   platform          TEXT NOT NULL CHECK (platform IN ('meta', 'linkedin', 'instagram')),
   content           TEXT NOT NULL,

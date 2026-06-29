@@ -2,7 +2,7 @@
 -- Links deliverables (os/recurring/pack_run) to UTM campaigns + computed revenue/spend
 
 CREATE TABLE IF NOT EXISTS saas_deliverable_links (
-  tenant_id             TEXT NOT NULL,
+  tenant_id             UUID NOT NULL,
   deliverable_id        TEXT NOT NULL,
   deliverable_source    TEXT NOT NULL CHECK (deliverable_source IN ('os', 'recurring', 'pack_run')),
   utm_campaign          TEXT,
@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_deliverable_links_utm
 
 CREATE TABLE IF NOT EXISTS saas_deliverable_revenue (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id           TEXT NOT NULL,
+  tenant_id           UUID NOT NULL,
   deliverable_id      TEXT NOT NULL,
   deliverable_source  TEXT NOT NULL CHECK (deliverable_source IN ('os', 'recurring', 'pack_run')),
   pack_id             TEXT,

@@ -1,7 +1,7 @@
 -- S51 — Sector Benchmark snapshots (tenant KPIs vs industry medians)
 CREATE TABLE IF NOT EXISTS saas_benchmark_snapshots (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id         TEXT NOT NULL,
+  tenant_id         UUID NOT NULL,
   sector_key        TEXT NOT NULL,
   sector_label      TEXT NOT NULL,
   period_days       INT NOT NULL DEFAULT 30,

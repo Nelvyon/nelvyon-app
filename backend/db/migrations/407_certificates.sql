@@ -1,7 +1,7 @@
 -- Migration 407: LMS certificates
 CREATE TABLE IF NOT EXISTS certificate_templates (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   primary_color TEXT NOT NULL DEFAULT '#6366f1',
   logo_position TEXT NOT NULL DEFAULT 'top' CHECK (logo_position IN ('top','bottom')),
@@ -13,9 +13,9 @@ CREATE TABLE IF NOT EXISTS certificate_templates (
 
 CREATE TABLE IF NOT EXISTS certificates (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   template_id UUID REFERENCES certificate_templates(id) ON DELETE SET NULL,
-  contact_id UUID REFERENCES contacts(id) ON DELETE SET NULL,
+  contact_id UUID REFERENCES saas_contacts(id) ON DELETE SET NULL,
   recipient_name TEXT NOT NULL,
   recipient_email TEXT NOT NULL,
   course_id UUID,

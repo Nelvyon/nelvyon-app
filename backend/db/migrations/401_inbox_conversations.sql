@@ -1,11 +1,11 @@
 -- Migration 401: Inbox (unified conversations)
 CREATE TABLE IF NOT EXISTS conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  contact_id UUID REFERENCES contacts(id) ON DELETE SET NULL,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  contact_id UUID REFERENCES saas_contacts(id) ON DELETE SET NULL,
   channel TEXT NOT NULL CHECK (channel IN ('email','sms','whatsapp','instagram','facebook','chat')),
   status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','closed','spam')),
-  assigned_to UUID REFERENCES users(id) ON DELETE SET NULL,
+  assigned_to UUID,
   unread_count INTEGER NOT NULL DEFAULT 0,
   last_message TEXT,
   last_message_at TIMESTAMPTZ,

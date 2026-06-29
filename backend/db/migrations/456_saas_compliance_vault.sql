@@ -2,7 +2,7 @@
 -- NOTE: compliance_results (migration 109) is legacy OS user-scoped; NOT reused here.
 CREATE TABLE IF NOT EXISTS saas_compliance_vault (
   id                 UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id          TEXT        NOT NULL,
+  tenant_id          UUID        NOT NULL,
   deliverable_source TEXT        NOT NULL
                                  CHECK (deliverable_source IN ('os','recurring','pack_run')),
   deliverable_ref    TEXT        NOT NULL,

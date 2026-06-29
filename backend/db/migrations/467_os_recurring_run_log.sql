@@ -1,7 +1,7 @@
 -- O19 — Recurring services run log (per-tenant monthly idempotency + audit)
 CREATE TABLE IF NOT EXISTS os_recurring_run_log (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       TEXT NOT NULL,
+  tenant_id       UUID NOT NULL,
   workspace_id    INT,
   service_type    TEXT NOT NULL CHECK (service_type IN ('seo','social','ads','reputation')),
   period_key      TEXT NOT NULL,

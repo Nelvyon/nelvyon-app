@@ -1,7 +1,7 @@
 -- 422 — UTM link builder + click tracking
 CREATE TABLE IF NOT EXISTS saas_utm_links (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       TEXT NOT NULL,
+  tenant_id       UUID NOT NULL,
   name            TEXT NOT NULL,
   destination_url TEXT NOT NULL,
   utm_source      TEXT NOT NULL,
@@ -22,7 +22,7 @@ CREATE INDEX IF NOT EXISTS idx_utm_links_campaign ON saas_utm_links(tenant_id, u
 CREATE TABLE IF NOT EXISTS saas_utm_clicks (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   utm_link_id     UUID NOT NULL REFERENCES saas_utm_links(id) ON DELETE CASCADE,
-  tenant_id       TEXT NOT NULL,
+  tenant_id       UUID NOT NULL,
   ip              TEXT,
   user_agent      TEXT,
   referer         TEXT,

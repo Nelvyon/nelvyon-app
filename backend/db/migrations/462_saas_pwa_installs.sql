@@ -1,7 +1,7 @@
 -- S56 — PWA install tracking (per-tenant install events)
 CREATE TABLE IF NOT EXISTS saas_pwa_installs (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     TEXT NOT NULL,
+  tenant_id     UUID NOT NULL,
   user_id       TEXT,
   platform      TEXT NOT NULL DEFAULT 'unknown'
                 CHECK (platform IN ('ios','android','desktop','unknown')),

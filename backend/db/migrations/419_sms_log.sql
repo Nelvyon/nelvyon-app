@@ -1,7 +1,7 @@
 -- Migration 419: SaaS-level SMS log (tenant-scoped, env Twilio credentials)
 CREATE TABLE IF NOT EXISTS saas_sms_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   to_number TEXT NOT NULL,
   body TEXT NOT NULL,
   twilio_sid TEXT,

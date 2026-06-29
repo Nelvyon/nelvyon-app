@@ -3,7 +3,7 @@
 -- Playbook: template de acciones por etapa del pipeline
 CREATE TABLE IF NOT EXISTS saas_playbooks (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   TEXT NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id   UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name        TEXT NOT NULL,
   stage       TEXT NOT NULL,  -- DealStage it applies to
   description TEXT,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS saas_playbooks (
 CREATE TABLE IF NOT EXISTS saas_playbook_actions (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   playbook_id  UUID NOT NULL REFERENCES saas_playbooks(id) ON DELETE CASCADE,
-  tenant_id    TEXT NOT NULL,
+  tenant_id    UUID NOT NULL,
   sort_order   INTEGER NOT NULL DEFAULT 0,
   action_type  TEXT NOT NULL CHECK (action_type IN ('task','email','call','note','wait')),
   title        TEXT NOT NULL,
@@ -32,7 +32,7 @@ CREATE INDEX IF NOT EXISTS idx_playbook_actions_pb    ON saas_playbook_actions(p
 -- Quotes (CPQ lite) — quotes linked to deals
 CREATE TABLE IF NOT EXISTS saas_quotes (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       TEXT NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id       UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   deal_id         UUID REFERENCES saas_deals(id) ON DELETE SET NULL,
   quote_number    TEXT NOT NULL,
   title           TEXT NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS saas_quotes (
 CREATE TABLE IF NOT EXISTS saas_quote_items (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   quote_id    UUID NOT NULL REFERENCES saas_quotes(id) ON DELETE CASCADE,
-  tenant_id   TEXT NOT NULL,
+  tenant_id   UUID NOT NULL,
   sort_order  INTEGER NOT NULL DEFAULT 0,
   description TEXT NOT NULL,
   quantity    NUMERIC(10,3) NOT NULL DEFAULT 1,
@@ -73,13 +73,13 @@ CREATE INDEX IF NOT EXISTS idx_quote_items_q    ON saas_quote_items(quote_id);
 
 -- Sequence for quote numbers per tenant (via a per-tenant counter)
 CREATE TABLE IF NOT EXISTS saas_quote_sequences (
-  tenant_id TEXT PRIMARY KEY,
+  tenant_id UUID PRIMARY KEY,
   last_seq  INTEGER NOT NULL DEFAULT 0
 );
 
 -- Win probability model per stage (tenant-overridable defaults)
 CREATE TABLE IF NOT EXISTS saas_stage_probabilities (
-  tenant_id   TEXT NOT NULL,
+  tenant_id   UUID NOT NULL,
   stage       TEXT NOT NULL,
   probability INTEGER NOT NULL CHECK (probability BETWEEN 0 AND 100),
   PRIMARY KEY (tenant_id, stage)

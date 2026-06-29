@@ -1,7 +1,7 @@
 -- Helpdesk tickets
 CREATE TABLE IF NOT EXISTS saas_helpdesk_tickets (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     TEXT NOT NULL,
+  tenant_id     UUID NOT NULL,
   subject       TEXT NOT NULL,
   description   TEXT,
   status        TEXT NOT NULL DEFAULT 'open'
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS saas_helpdesk_tickets (
 CREATE TABLE IF NOT EXISTS saas_helpdesk_messages (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   ticket_id  UUID NOT NULL REFERENCES saas_helpdesk_tickets(id) ON DELETE CASCADE,
-  tenant_id  TEXT NOT NULL,
+  tenant_id  UUID NOT NULL,
   author     TEXT NOT NULL DEFAULT 'agent',
   body       TEXT NOT NULL,
   is_internal BOOLEAN NOT NULL DEFAULT false,

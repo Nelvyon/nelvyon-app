@@ -1,7 +1,7 @@
 -- Migration 410: Countdown timers
 CREATE TABLE IF NOT EXISTS countdown_timers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('datetime','duration','evergreen')),
   target_datetime TIMESTAMPTZ,

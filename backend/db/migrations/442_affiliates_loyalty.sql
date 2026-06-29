@@ -3,7 +3,7 @@
 -- ── Affiliate Programs ──────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_affiliate_programs (
   id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      TEXT         NOT NULL UNIQUE REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id      UUID         NOT NULL UNIQUE REFERENCES saas_tenants(id) ON DELETE CASCADE,
   commission_pct NUMERIC(5,2) NOT NULL DEFAULT 20.00,
   cookie_days    INTEGER      NOT NULL DEFAULT 30,
   active         BOOLEAN      NOT NULL DEFAULT true,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS saas_affiliate_programs (
 -- ── Affiliate Links ─────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_affiliate_links (
   id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id         TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id         UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   code              TEXT        NOT NULL,
   affiliate_user_id TEXT        NOT NULL,
   clicks            INTEGER     NOT NULL DEFAULT 0,
@@ -29,7 +29,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_affiliate_links_code   ON saas_affiliate_lin
 -- ── Affiliate Commissions ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_affiliate_commissions (
   id                 UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id          TEXT          NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id          UUID          NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   link_id            UUID          NOT NULL REFERENCES saas_affiliate_links(id),
   affiliate_user_id  TEXT          NOT NULL,
   amount             NUMERIC(12,2) NOT NULL,
@@ -45,7 +45,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_affiliate_commissions_tenant ON saas_affilia
 -- ── Loyalty Programs ────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_loyalty_programs (
   id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      TEXT         NOT NULL UNIQUE REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id      UUID         NOT NULL UNIQUE REFERENCES saas_tenants(id) ON DELETE CASCADE,
   points_per_eur NUMERIC(8,2) NOT NULL DEFAULT 1.0,
   tiers          JSONB        NOT NULL DEFAULT '[{"name":"Bronze","min_points":0},{"name":"Silver","min_points":500},{"name":"Gold","min_points":2000},{"name":"Platinum","min_points":5000}]',
   active         BOOLEAN      NOT NULL DEFAULT true,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS saas_loyalty_programs (
 -- ── Loyalty Balances ────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_loyalty_balances (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id    UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   contact_id   UUID        NOT NULL,
   points       INTEGER     NOT NULL DEFAULT 0,
   tier         TEXT        NOT NULL DEFAULT 'Bronze',
@@ -68,7 +68,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_loyalty_balances_tenant ON saas_loyalty_bala
 -- ── Loyalty Transactions ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_loyalty_transactions (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id    UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   contact_id   UUID        NOT NULL,
   type         TEXT        NOT NULL CHECK (type IN ('earn','redeem','adjust')),
   points       INTEGER     NOT NULL,

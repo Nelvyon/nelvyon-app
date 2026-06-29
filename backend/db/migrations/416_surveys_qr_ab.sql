@@ -1,7 +1,7 @@
 -- Migration 416: Surveys, QR codes, A/B tests
 CREATE TABLE IF NOT EXISTS surveys (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   type TEXT NOT NULL DEFAULT 'survey' CHECK (type IN ('survey','nps','feedback','quiz')),
   questions JSONB NOT NULL DEFAULT '[]',
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS surveys (
 CREATE TABLE IF NOT EXISTS survey_responses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   survey_id UUID NOT NULL REFERENCES surveys(id) ON DELETE CASCADE,
-  contact_id UUID REFERENCES contacts(id) ON DELETE SET NULL,
+  contact_id UUID REFERENCES saas_contacts(id) ON DELETE SET NULL,
   answers JSONB NOT NULL DEFAULT '{}',
   score INTEGER,
   completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS survey_responses (
 
 CREATE TABLE IF NOT EXISTS qr_codes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   destination_url TEXT NOT NULL,
   color TEXT NOT NULL DEFAULT '#000000',
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS qr_codes (
 
 CREATE TABLE IF NOT EXISTS ab_tests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   type TEXT NOT NULL DEFAULT 'subject_line',
   status TEXT NOT NULL DEFAULT 'running' CHECK (status IN ('running','completed','paused')),
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS ab_tests (
 
 CREATE TABLE IF NOT EXISTS knowledge_base_articles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   category TEXT NOT NULL,
   title TEXT NOT NULL,
   content TEXT NOT NULL,

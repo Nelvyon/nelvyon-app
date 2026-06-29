@@ -1,7 +1,7 @@
 -- Migration 450: Integrations hub — unified connector table
 CREATE TABLE IF NOT EXISTS saas_integration_connections (
   id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id            TEXT NOT NULL,
+  tenant_id            UUID NOT NULL,
   connector_slug       TEXT NOT NULL,
   status               TEXT NOT NULL DEFAULT 'disconnected'
                          CHECK (status IN ('connected','disconnected','error','pending')),

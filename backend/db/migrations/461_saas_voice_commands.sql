@@ -1,7 +1,7 @@
 -- S55 — Voice Command log (web speech navigation + actions, SaaS tenant-scoped)
 CREATE TABLE IF NOT EXISTS saas_voice_commands (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       TEXT NOT NULL,
+  tenant_id       UUID NOT NULL,
   user_id         TEXT,
   transcript      TEXT NOT NULL,
   matched_intent  TEXT,

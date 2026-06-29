@@ -14,7 +14,7 @@ ALTER TABLE conversation_messages
   ADD COLUMN IF NOT EXISTS metadata          JSONB NOT NULL DEFAULT '{}';
 
 CREATE TABLE IF NOT EXISTS saas_inbox_sla_policies (
-  tenant_id                TEXT PRIMARY KEY,
+  tenant_id                UUID PRIMARY KEY,
   first_response_minutes   INT  NOT NULL DEFAULT 60,
   resolution_minutes       INT  NOT NULL DEFAULT 480,
   business_hours_only      BOOLEAN NOT NULL DEFAULT false,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS saas_inbox_sla_policies (
 );
 
 CREATE TABLE IF NOT EXISTS saas_inbox_routing (
-  tenant_id                TEXT PRIMARY KEY,
+  tenant_id                UUID PRIMARY KEY,
   round_robin_enabled      BOOLEAN NOT NULL DEFAULT true,
   last_assigned_member_id  TEXT,
   updated_at               TIMESTAMPTZ NOT NULL DEFAULT NOW()

@@ -12,7 +12,7 @@ ALTER TABLE saas_helpdesk_tickets
 -- ── Helpdesk Macros ───────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_helpdesk_macros (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id  TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id  UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name       TEXT        NOT NULL,
   actions    JSONB       NOT NULL DEFAULT '[]',
   active     BOOLEAN     NOT NULL DEFAULT true,
@@ -24,7 +24,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_helpdesk_macros_tenant ON saas_helpdesk_macr
 -- ── Knowledge Base Categories ─────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_kb_categories (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id  TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id  UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   name       TEXT        NOT NULL,
   icon       TEXT        NOT NULL DEFAULT '📁',
   slug       TEXT        NOT NULL,
@@ -37,7 +37,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_kb_categories_tenant ON saas_kb_categories(t
 -- ── Knowledge Base Articles ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_kb_articles (
   id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id     UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   category_id   UUID        REFERENCES saas_kb_categories(id) ON DELETE SET NULL,
   title         TEXT        NOT NULL,
   slug          TEXT        NOT NULL,

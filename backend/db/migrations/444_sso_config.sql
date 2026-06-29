@@ -3,7 +3,7 @@
 -- ── SSO Configs ──────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS saas_sso_configs (
   id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id               TEXT        NOT NULL UNIQUE REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id               UUID        NOT NULL UNIQUE REFERENCES saas_tenants(id) ON DELETE CASCADE,
   provider                TEXT        NOT NULL CHECK (provider IN ('oidc','saml')),
   issuer                  TEXT        NOT NULL,
   client_id               TEXT        NOT NULL,
@@ -20,7 +20,7 @@ CREATE INDEX IF NOT EXISTS idx_saas_sso_configs_tenant ON saas_sso_configs(tenan
 -- ── SSO Identities (provider_sub → local user mapping) ───────────────────────
 CREATE TABLE IF NOT EXISTS saas_sso_identities (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    TEXT        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  tenant_id    UUID        NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
   provider     TEXT        NOT NULL,
   provider_sub TEXT        NOT NULL,
   user_id      TEXT        NOT NULL,

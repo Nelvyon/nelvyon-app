@@ -16,8 +16,8 @@ CREATE INDEX IF NOT EXISTS idx_whitelabel_stripe_account
 -- Agency sub-accounts
 CREATE TABLE IF NOT EXISTS saas_subcuentas (
   id                              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agency_tenant_id                TEXT NOT NULL,
-  tenant_id                       TEXT NOT NULL UNIQUE,
+  agency_tenant_id                UUID NOT NULL,
+  tenant_id                       UUID NOT NULL UNIQUE,
   name                            TEXT NOT NULL,
   email                           TEXT NOT NULL,
   plan                            TEXT NOT NULL DEFAULT 'starter',

@@ -1,7 +1,7 @@
 -- 421 — Ads dashboard: tenant-scoped ad platform connections + metrics cache
 CREATE TABLE IF NOT EXISTS saas_ads_connections (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       TEXT NOT NULL,
+  tenant_id       UUID NOT NULL,
   platform        TEXT NOT NULL CHECK (platform IN ('meta', 'google', 'linkedin', 'tiktok')),
   account_id      TEXT NOT NULL,
   account_name    TEXT NOT NULL,
@@ -21,7 +21,7 @@ CREATE INDEX IF NOT EXISTS idx_ads_connections_active ON saas_ads_connections(te
 CREATE TABLE IF NOT EXISTS saas_ads_metrics_cache (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   connection_id   UUID NOT NULL REFERENCES saas_ads_connections(id) ON DELETE CASCADE,
-  tenant_id       TEXT NOT NULL,
+  tenant_id       UUID NOT NULL,
   date_start      DATE NOT NULL,
   date_end        DATE NOT NULL,
   spend           NUMERIC(12,2) NOT NULL DEFAULT 0,

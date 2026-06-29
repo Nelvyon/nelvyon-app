@@ -1,7 +1,7 @@
 -- Migration 452: CPQ enterprise — contracts, dunning, multi-currency
 CREATE TABLE IF NOT EXISTS saas_contracts (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id        TEXT NOT NULL,
+  tenant_id        UUID NOT NULL,
   quote_id         UUID REFERENCES saas_quotes(id) ON DELETE SET NULL,
   deal_id          UUID,
   contract_number  TEXT NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS saas_contracts (
 
 CREATE TABLE IF NOT EXISTS saas_dunning_events (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      TEXT NOT NULL,
+  tenant_id      UUID NOT NULL,
   invoice_id     UUID NOT NULL,
   attempt_number INT  NOT NULL DEFAULT 1,
   channel        TEXT NOT NULL DEFAULT 'email' CHECK (channel IN ('email','sms')),
