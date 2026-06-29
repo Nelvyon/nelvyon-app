@@ -32,8 +32,10 @@ os.environ["JWT_EXPIRE_MINUTES"] = "60"
 os.environ["JWT_ALGORITHM"] = "HS256"
 os.environ["ADMIN_EMAIL"] = "admin@test.com"
 os.environ["ADMIN_PASSWORD"] = "TestPassword123!"
-# Billing PR#2: at least one Stripe Price ID for tests that hit create_payment_session
-os.environ.setdefault("STRIPE_PRICE_STARTER_MONTHLY", "price_test_starter_monthly")
+# Billing PR#2: canonical monthly Price IDs (must match billing_catalog.STRIPE_PRICE_ID_ENV_MONTHLY)
+os.environ.setdefault("STRIPE_PRICE_ID_STARTER", "price_test_starter_monthly")
+os.environ.setdefault("STRIPE_PRICE_ID_PRO", "price_test_pro_monthly")
+os.environ.setdefault("STRIPE_PRICE_ID_AGENCY", "price_test_agency_monthly")
 os.environ.setdefault("STRIPE_SECRET_KEY", "sk_test_fake_not_for_production")
 # Fase 4: muchos tests crean workspaces efímeros; 10 es bajo y rompe la suite completa por orden acumulativo.
 os.environ.setdefault("NELVYON_TEST_MAX_WORKSPACES_PER_USER", "64")

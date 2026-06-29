@@ -8,9 +8,11 @@ import { describe, it, expect, vi } from "vitest";
 
 // ─── Legacy 410 tests ─────────────────────────────────────────────────────────
 
-import analyticsLegacy from "../../../apps/web/src/pages/api/saas/analytics/index";
-import invoicesLegacy from "../../../apps/web/src/pages/api/saas/invoices/index";
-import profileLegacy from "../../../apps/web/src/pages/api/saas/profile/index";
+import { deprecatedRoute } from "../../../apps/web/src/pages/api/saas/_deprecated";
+
+const analyticsLegacy = deprecatedRoute("/api/saas/analytics");
+const invoicesLegacy = deprecatedRoute("/api/saas/invoices");
+const profileLegacy = deprecatedRoute("/api/saas/profile");
 
 function makeApiReq(method = "GET"): Parameters<typeof analyticsLegacy>[0] {
   return { method } as never;

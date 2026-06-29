@@ -33,12 +33,12 @@ jobs:
 
       - name: Wait for staging deploy (Portal BFF routes)
         env:
-          STAGING_WEB_URL: https://ideal-victory-staging.up.railway.app
+          STAGING_WEB_URL: https://nelvyon.com
           P0_DEPLOY_MAX_ATTEMPTS: "36"
           P0_DEPLOY_INTERVAL_MS: "20000"
         run: node scripts/wait-staging-p0-deploy.mjs
 
       - name: Run P0 staging smokes
         env:
-          STAGING_WEB_URL: https://ideal-victory-staging.up.railway.app
+          STAGING_WEB_URL: https://nelvyon.com
         run: node scripts/run-staging-p0-smokes.mjs --skip-wait

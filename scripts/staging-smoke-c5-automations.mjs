@@ -2,7 +2,7 @@
  * Staging smoke test — FASE C élite (C5 Automations).
  * Usage: node scripts/staging-smoke-c5-automations.mjs [--skip-wait]
  */
-const BASE = "https://ideal-victory-staging.up.railway.app";
+const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
 const COOKIE = "nelvyon_token";

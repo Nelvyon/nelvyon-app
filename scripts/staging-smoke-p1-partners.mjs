@@ -2,7 +2,7 @@
  * Staging smoke — Partner HQ (P1 wholesale + P2a Stripe Connect).
  * Usage: node scripts/staging-smoke-p1-partners.mjs [--skip-wait]
  */
-const BASE = "https://ideal-victory-staging.up.railway.app";
+const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
 const COOKIE = "nelvyon_token";

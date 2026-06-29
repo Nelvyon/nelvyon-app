@@ -2,7 +2,7 @@
  * Staging smoke test — FASE B élite (B1 CRM, B2 Helpdesk, B3 Portal shell, B4 Reporting).
  * Usage: node scripts/staging-smoke-b1-b4.mjs [--skip-wait]
  */
-const BASE = "https://ideal-victory-staging.up.railway.app";
+const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
 const COOKIE = "nelvyon_token";

@@ -4,7 +4,7 @@
  *
  * Critical: health, A1 packs, C5 automation CEO, portal shell, hub/agency pages.
  */
-const BASE = process.env.STAGING_BASE_URL || "https://nelvyon.com";
+const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
 const COOKIE = "nelvyon_token";

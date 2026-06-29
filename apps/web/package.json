@@ -23,7 +23,7 @@
     "saas:deals-etl": "tsx ../../backend/saas/scripts/runDealsEtl.ts",
     "saas:billing-backfill": "tsx ../../backend/saas/scripts/runBillingSync.ts",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:staging": "playwright test -c playwright.staging.config.ts",
@@ -43,7 +43,18 @@
     "autonomous:enrich-outcomes": "tsx ../../backend/autonomous/scripts/run-enrich-outcomes.ts",
     "autonomous:learning-refresh": "tsx ../../backend/autonomous/scripts/run-learning-refresh.ts",
     "gate": "pnpm typecheck && pnpm lint && pnpm test:smoke && pnpm test:bot-evals",
-    "pwa:icons": "node ./scripts/generate-pwa-icons.mjs"
+    "pwa:icons": "node ./scripts/generate-pwa-icons.mjs",
+    "os:envato:login": "tsx ../../backend/os-agents/seeds/download-envato-browser.ts --login",
+    "os:envato:browser": "tsx ../../backend/os-agents/seeds/download-envato-browser.ts --cdp",
+    "os:envato:browser:lite": "tsx ../../backend/os-agents/seeds/download-envato-browser.ts --cdp --lite",
+    "os:envato:mejores": "tsx ../../backend/os-agents/seeds/download-envato-browser.ts --cdp --lite --parallel 5 --batch-delay 10",
+    "os:envato:full": "tsx ../../backend/os-agents/seeds/download-envato-browser.ts --cdp --parallel 2 --batch-delay 0",
+    "os:envato:multi": "tsx ../../backend/os-agents/seeds/run-envato-multi-download.ts",
+    "os:envato:market-bulk": "tsx ../../backend/os-agents/seeds/download-envato-market-bulk.ts",
+    "os:envato:watch-download": "tsx ../../backend/os-agents/seeds/run-envato-watch-download.ts",
+    "os:envato:index-os-full": "tsx ../../backend/os-agents/seeds/download-envato-seeds.ts --market --metadata-only --catalog all --os-full",
+    "os:envato:index-million": "tsx ../../backend/os-agents/seeds/download-envato-seeds.ts --market --metadata-only --million-client",
+    "os:envato:super-library": "tsx ../../backend/os-agents/seeds/run-envato-super-library.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0-beta.4",

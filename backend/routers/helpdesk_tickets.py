@@ -218,7 +218,7 @@ async def get_helpdesk_tickets(
 @router.post("", response_model=Helpdesk_ticketsResponse, status_code=201)
 async def create_helpdesk_tickets(
     data: Helpdesk_ticketsData,
-    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
