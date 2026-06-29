@@ -71,6 +71,7 @@ async function kickoffPack(token) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
       Cookie: `${COOKIE}=${token}`,
+      "X-Workspace-Id": process.env.QA_WORKSPACE_ID || "1",
     },
     body: JSON.stringify({
       business_name: PRODUCT_NAME,
