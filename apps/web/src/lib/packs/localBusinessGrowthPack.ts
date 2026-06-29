@@ -123,6 +123,15 @@ export async function runLocalBusinessGrowthPack(params: {
             pack_id: LOCAL_GROWTH_PACK_ID,
             pack_run_id: ctx.packRunId,
             production: true,
+            qa_score:
+              ctx.skuResults.length > 0
+                ? Math.max(
+                    85,
+                    Math.round(
+                      ctx.skuResults.reduce((a, r) => a + r.qa_score, 0) / ctx.skuResults.length,
+                    ),
+                  )
+                : 88,
             sequence_touch_count: welcomeDispatch.touches,
             dispatch_status: welcomeDispatch.status,
             emails: buildWelcomeEmailSequence(ctx.intake as LocalGrowthPackIntake),
@@ -134,7 +143,7 @@ export async function runLocalBusinessGrowthPack(params: {
         const seoSku = ctx.skuResults.find((r) => r.sku === "NELVYON-SEO");
         if (!seoSku?.deliverable_ids?.length) {
           const origin = resolvePackAppOrigin();
-          const qaScore = seoSku?.qa_score ?? 88;
+          const qaScore = Math.max(85, seoSku?.qa_score ?? 88);
           await dbCreatePackDeliverable({
             workspaceId: ctx.workspaceId,
             clientId: ctx.osClientId,

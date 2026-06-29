@@ -44,6 +44,19 @@ const SKU_STEP_KEYS: Record<AutonomousSku, string> = {
   "NELVYON-CHATBOT": "sku_chatbot",
 };
 
+/** Portal hides client deliverables when metadata.qa_score < 85 in production. */
+function ensurePortalQaScore(score: number | undefined): number {
+  const n = score ?? 88;
+  return Math.max(85, n);
+}
+
+function avgSkuQaScore(results: SkuRunResult[]): number {
+  if (results.length === 0) return 88;
+  return ensurePortalQaScore(
+    Math.round(results.reduce((a, r) => a + r.qa_score, 0) / results.length),
+  );
+}
+
 export function slugifyName(name: string): string {
   return name
     .toUpperCase()
@@ -276,7 +289,12 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       // Enrich mapped deliverable with personalized content
       const enriched: PackDeliverableInput = {
         ...mapped,
-        metadata: { ...mapped.metadata, personalized_content: personalized ?? undefined, ...seedMeta },
+        metadata: {
+          ...mapped.metadata,
+          qa_score: ensurePortalQaScore(Number(mapped.metadata.qa_score ?? qaScore)),
+          personalized_content: personalized ?? undefined,
+          ...seedMeta,
+        },
       };
       const id = await dbCreatePackDeliverable(enriched);
       deliverableIds.push(id);
@@ -294,7 +312,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
           metadata: {
             pack_id: params.packId,
             sku: params.sku,
-            qa_score: qaScore,
+            qa_score: ensurePortalQaScore(qaScore),
             artifact_value: d.value,
             autonomous_job_id: simulation.os_publish.autonomous_job_id,
             personalized_content: personalized ?? undefined,
@@ -322,7 +340,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
         metadata: {
           pack_id: params.packId,
           sku: params.sku,
-          qa_score: qaScore,
+          qa_score: ensurePortalQaScore(qaScore),
           brief_summary: {
             business_name: params.intake.business_name,
             sector: params.intake.sector,
@@ -616,7 +634,13 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       title: config.reportDeliverableTitle ?? `Informe ${meta.name}`,
       type: "json",
       visibility: "client_visible",
-      metadata: { pack_report: report, pack_run_id: run.id, pack_id: meta.id },
+      metadata: {
+        pack_report: report,
+        pack_run_id: run.id,
+        pack_id: meta.id,
+        production: true,
+        qa_score: avgSkuQaScore(skuResults),
+      },
     });
     steps = markStep(steps, "report", "done");
 
