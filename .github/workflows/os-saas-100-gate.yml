@@ -1,0 +1,47 @@
+name: OS + SaaS 100% Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "backend/**"
+      - "scripts/staging-smoke-os-all-services.mjs"
+      - "scripts/staging-smoke-saas-all-modules.mjs"
+      - "scripts/lib/**"
+      - "scripts/verify-os-saas-100.mjs"
+      - ".github/workflows/os-saas-100-gate.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: os-saas-100-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  os-100:
+    name: OS 100% (prod smoke)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: OS all services + previews
+        env:
+          STAGING_BASE_URL: https://nelvyon.com
+        run: node scripts/verify-os-saas-100.mjs --os-only --skip-wait
+
+  saas-100:
+    name: SaaS 100% (prod smoke)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: SaaS all nav modules + APIs
+        env:
+          STAGING_BASE_URL: https://nelvyon.com
+        run: node scripts/verify-os-saas-100.mjs --saas-only --skip-wait
