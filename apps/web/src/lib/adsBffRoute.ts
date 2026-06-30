@@ -39,7 +39,12 @@ async function resolveClaims(req: Request) {
 
 export async function adsBffGet(req: Request, upstreamPath: string, fallback: unknown) {
   const claims = await resolveClaims(req);
-  if (claims instanceof NextResponse) return claims;
+  if (claims instanceof NextResponse) {
+    if (claims.status === 401 || claims.status === 403) {
+      return NextResponse.json(fallback);
+    }
+    return claims;
+  }
   if (!claims) return NextResponse.json(fallback);
 
   try {
@@ -47,15 +52,15 @@ export async function adsBffGet(req: Request, upstreamPath: string, fallback: un
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
     }
-    if (upstreamFailed(upstream.status)) {
-      return NextResponse.json(fallback);
+    if (upstream.status === 404) {
+      const text = await upstream.text();
+      try {
+        return NextResponse.json(JSON.parse(text), { status: 404 });
+      } catch {
+        return NextResponse.json({ error: "Not found" }, { status: 404 });
+      }
     }
-    const text = await upstream.text();
-    try {
-      return NextResponse.json(JSON.parse(text), { status: upstream.status });
-    } catch {
-      return NextResponse.json(fallback);
-    }
+    return NextResponse.json(fallback);
   } catch {
     return NextResponse.json(fallback);
   }
@@ -63,7 +68,12 @@ export async function adsBffGet(req: Request, upstreamPath: string, fallback: un
 
 export async function adsBffPost(req: Request, upstreamPath: string, fallback: unknown) {
   const claims = await resolveClaims(req);
-  if (claims instanceof NextResponse) return claims;
+  if (claims instanceof NextResponse) {
+    if (claims.status === 401 || claims.status === 403) {
+      return NextResponse.json(fallback);
+    }
+    return claims;
+  }
   if (!claims) return NextResponse.json(fallback);
 
   let body: unknown = {};

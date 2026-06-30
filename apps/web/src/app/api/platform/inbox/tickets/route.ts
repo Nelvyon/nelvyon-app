@@ -44,7 +44,9 @@ export async function GET(req: Request) {
     }
     return NextResponse.json(EMPTY_TICKETS);
   }
-  if (claims instanceof NextResponse) return claims;
+  if (claims instanceof NextResponse) {
+    return NextResponse.json(EMPTY_TICKETS);
+  }
 
   try {
     const upstream = await proxyPlatformFetch(req, "GET", UPSTREAM);
