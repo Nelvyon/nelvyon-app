@@ -23,8 +23,8 @@ test.describe("SaaS Workflows", () => {
       captured = FIXTURE_WORKFLOWS;
       await route.fulfill({ json: FIXTURE_WORKFLOWS });
     });
-    await page.goto("/saas/workflows");
-    await page.waitForTimeout(400);
+    await page.goto("/saas/workflows", { waitUntil: "domcontentloaded" });
+    await page.waitForResponse("**/api/saas/workflows**", { timeout: 15_000 });
     expect(captured).not.toBeNull();
     expect(captured!.ses_configured).toBeDefined();
   });
@@ -48,8 +48,8 @@ test.describe("SaaS Workflows", () => {
   test("lista de workflows fixture renderiza la página", async ({ page }) => {
     await page.route("**/api/saas/workflows**", route =>
       route.fulfill({ json: FIXTURE_WORKFLOWS }));
-    await page.goto("/saas/workflows");
-    await page.waitForTimeout(600);
+    await page.goto("/saas/workflows", { waitUntil: "domcontentloaded" });
     await expect(page).not.toHaveURL(LOGIN_URL);
+    await expect(page.getByText(/Workflow E2E|Workflows/i).first()).toBeVisible({ timeout: 15_000 });
   });
 });

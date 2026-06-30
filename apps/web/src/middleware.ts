@@ -21,8 +21,12 @@ const SAAS_LEGACY_GONE = new Set([
   "/api/saas/qr",
 ]);
 
+/** SaaS API routes that must work without session (install-time manifest, etc.). */
+const SAAS_PUBLIC_API = new Set(["/api/saas/pwa/manifest"]);
+
 function isProtectedPath(pathname: string): boolean {
   if (SAAS_LEGACY_GONE.has(pathname)) return false;
+  if (SAAS_PUBLIC_API.has(pathname)) return false;
   // /saas (exact) = public marketing landing; all other /saas/* routes require auth
   if (pathname === "/saas" || pathname === "/saas/") return false;
   if (pathname.startsWith("/saas/")) return true;

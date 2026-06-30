@@ -114,6 +114,7 @@ test.describe("SaaS Integraciones — interacción de categoría", () => {
       await route.fulfill({ json: FIXTURE_INTEGRATIONS });
     });
     await page.goto("/saas/integraciones", { waitUntil: "domcontentloaded" });
+    await page.waitForResponse("**/api/saas/integrations**", { timeout: 15_000 });
     await expect(page.locator("body")).toBeVisible({ timeout: 15_000 });
     expect(captured).not.toBeNull();
     expect((captured as typeof FIXTURE_INTEGRATIONS).catalog.length).toBe(4);

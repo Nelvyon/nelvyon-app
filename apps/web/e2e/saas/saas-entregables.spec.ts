@@ -109,11 +109,10 @@ test.describe("SaaS Entregables — página con datos", () => {
     await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
     await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
 
-    // Change type filter
-    const select = page.locator("select").first();
-    await select.selectOption("seo");
-    await page.waitForTimeout(500);
-    expect(intercepted.some(u => u.includes("type=seo"))).toBe(true);
+    // Change type filter (skip header days select — first select in DOM)
+    const typeSelect = page.locator("select").filter({ has: page.locator('option[value="seo"]') });
+    await typeSelect.selectOption("seo");
+    await expect.poll(() => intercepted.some(u => u.includes("type=seo"))).toBe(true);
   });
 
   test("'Ver portal' link apunta a /portal/deliverables/", async ({ page }) => {

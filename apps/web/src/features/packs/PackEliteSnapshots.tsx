@@ -9,22 +9,15 @@ import { useFunnelsUnifiedReporting } from "@/features/funnels/hooks";
 import { useEcommerceUnifiedReporting } from "@/features/ecommerce/hooks";
 import { usePipelineSummary } from "@/features/deals/hooks";
 import {
-  buildDemoAdsUnified,
-  buildDemoEcommerceUnified,
-  buildDemoFunnelsUnified,
-  buildDemoSocialUnified,
-  DEMO_CRM_PIPELINE,
-} from "@/lib/demoDashboardData";
-import {
   ECOMMERCE_GROWTH_PACK_ID,
   LOCAL_GROWTH_PACK_ID,
   SAAS_B2B_GROWTH_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
 
-function pickNum(live: number | undefined | null, demo: number): number {
-  if (live != null && live > 0) return live;
-  return demo;
+function fmtNum(value: number | undefined | null, format: (n: number) => string): string {
+  if (value == null || value <= 0) return "—";
+  return format(value);
 }
 
 export function PackEliteSnapshots({ packId }: { packId: PackId }) {
@@ -34,14 +27,9 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
   const ecommerce = useEcommerceUnifiedReporting();
   const pipeline = usePipelineSummary();
 
-  const demoAds = buildDemoAdsUnified();
-  const demoSocial = buildDemoSocialUnified();
-  const demoEcom = buildDemoEcommerceUnified();
-  const demoFunnels = buildDemoFunnelsUnified();
-
   if (packId === LOCAL_GROWTH_PACK_ID) {
-    const spend = pickNum(ads.data?.unified?.total_spend, demoAds.unified.total_spend);
-    const reach = pickNum(social.data?.unified?.total_reach, demoSocial.unified.total_reach);
+    const spend = ads.data?.unified?.total_spend;
+    const reach = social.data?.unified?.total_reach;
     return (
       <PanelCard>
         <h3 className="text-base font-semibold">Impacto en servicios élite</h3>
@@ -53,13 +41,13 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
             href="/publicidad"
             label="Inversión publicitaria"
             loading={ads.isLoading}
-            value={`${spend.toLocaleString("es-ES")} €`}
+            value={fmtNum(spend, (n) => `${n.toLocaleString("es-ES")} €`)}
           />
           <Snapshot
             href="/social"
             label="Alcance social"
             loading={social.isLoading}
-            value={reach.toLocaleString("es-ES")}
+            value={fmtNum(reach, (n) => n.toLocaleString("es-ES"))}
           />
           <Snapshot
             href="/reputacion"
@@ -73,15 +61,9 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
   }
 
   if (packId === ECOMMERCE_GROWTH_PACK_ID) {
-    const revenueCents = pickNum(
-      ecommerce.data?.unified?.total_revenue_cents,
-      demoEcom.unified.total_revenue_cents,
-    );
-    const roas = pickNum(ads.data?.unified?.blended_roas, demoEcom.unified.ads_roas);
-    const abandon = pickNum(
-      ecommerce.data?.unified?.cart_abandonment_rate,
-      demoEcom.unified.cart_abandonment_rate,
-    );
+    const revenueCents = ecommerce.data?.unified?.total_revenue_cents;
+    const roas = ads.data?.unified?.blended_roas;
+    const abandon = ecommerce.data?.unified?.cart_abandonment_rate;
     return (
       <PanelCard>
         <h3 className="text-base font-semibold">Impacto en servicios élite</h3>
@@ -90,19 +72,19 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
             href="/ecommerce"
             label="Ingresos tienda"
             loading={ecommerce.isLoading}
-            value={`€${(revenueCents / 100).toLocaleString("es-ES")}`}
+            value={fmtNum(revenueCents, (n) => `€${(n / 100).toLocaleString("es-ES")}`)}
           />
           <Snapshot
             href="/publicidad"
             label="ROAS publicidad"
             loading={ads.isLoading}
-            value={`${roas.toFixed(2)}x`}
+            value={fmtNum(roas, (n) => `${n.toFixed(2)}x`)}
           />
           <Snapshot
             href="/analytics/ecommerce"
             label="Abandono de carrito"
             loading={ecommerce.isLoading}
-            value={`${abandon.toFixed(1)}%`}
+            value={fmtNum(abandon, (n) => `${n.toFixed(1)}%`)}
           />
         </dl>
       </PanelCard>
@@ -111,12 +93,8 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
 
   if (packId === SAAS_B2B_GROWTH_PACK_ID) {
     const stages = pipeline.data?.by_stage ?? pipeline.data?.items ?? [];
-    const liveDeals = pipeline.data?.total_count ?? stages.reduce((a, s) => a + (s.count ?? 0), 0);
-    const totalDeals = pickNum(liveDeals, DEMO_CRM_PIPELINE.total_count);
-    const conversions = pickNum(
-      funnels.data?.unified?.total_conversions,
-      demoFunnels.unified.total_conversions,
-    );
+    const totalDeals = pipeline.data?.total_count ?? stages.reduce((a, s) => a + (s.count ?? 0), 0);
+    const conversions = funnels.data?.unified?.total_conversions;
     return (
       <PanelCard>
         <h3 className="text-base font-semibold">Impacto en servicios élite</h3>
@@ -125,13 +103,13 @@ export function PackEliteSnapshots({ packId }: { packId: PackId }) {
             href="/crm/deals"
             label="Oportunidades en pipeline"
             loading={pipeline.isLoading}
-            value={String(totalDeals)}
+            value={fmtNum(totalDeals, (n) => String(n))}
           />
           <Snapshot
             href="/funnels"
             label="Conversiones embudo"
             loading={funnels.isLoading}
-            value={String(conversions)}
+            value={fmtNum(conversions, (n) => String(n))}
           />
           <Snapshot
             href="/campaigns"
