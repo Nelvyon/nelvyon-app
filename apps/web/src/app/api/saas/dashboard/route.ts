@@ -12,11 +12,19 @@ import { DbClient } from "../../../../../../../backend/db/DbClient";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+const EMPTY_MODULE_STATS = {
+  contacts: 0,
+  campaigns: 0,
+  activeWorkflows: 0,
+  forms: 0,
+  upcomingAppointments: 0,
+};
+
 async function getModuleStats(tenantId: string) {
   const db = DbClient.getInstance();
 
   const queries = await Promise.allSettled([
-    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_crm_contacts WHERE tenant_id = $1`, [tenantId]),
+    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_contacts WHERE tenant_id = $1`, [tenantId]),
     db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_campanias WHERE tenant_id = $1`, [tenantId]),
     db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_workflows WHERE tenant_id = $1 AND status = 'active'`, [tenantId]),
     db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_forms WHERE tenant_id = $1`, [tenantId]),
@@ -44,17 +52,18 @@ async function getModuleStats(tenantId: string) {
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const [summary, moduleStats] = await Promise.all([
-      getSaasDashboardService().getDashboardSummary(ctx.tenant.id),
-      getModuleStats(ctx.tenant.id).catch(() => ({
-        contacts: 0,
-        campaigns: 0,
-        activeWorkflows: 0,
-        forms: 0,
-        upcomingAppointments: 0,
+    const svc = getSaasDashboardService();
+    const authTenantId = await svc.resolveAuthTenantId(ctx.tenant.id);
+    const [metrics, moduleStats] = await Promise.all([
+      svc.getDashboardMetrics(ctx.tenant.id, authTenantId).catch(() => ({
+        activeJobs: 0,
+        completedJobs: 0,
+        totalSpend: 0,
+        recentActivity: [],
       })),
+      getModuleStats(ctx.tenant.id).catch(() => EMPTY_MODULE_STATS),
     ]);
-    return NextResponse.json({ ...summary, moduleStats });
+    return NextResponse.json({ tenant: ctx.tenant, ...metrics, moduleStats });
   } catch (e: unknown) {
     if (e instanceof SaasDashboardError && e.code === "NOT_FOUND") {
       return NextResponse.json({ error: e.message }, { status: 404 });

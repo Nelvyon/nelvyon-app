@@ -144,23 +144,27 @@ export class SaasDashboardService {
     );
   }
 
-  async getDashboardSummary(tenantId: string): Promise<DashboardSummary> {
-    const { tenant, authTenantId } = await this.fetchTenantWithAuthTenant(tenantId);
-
+  async getDashboardMetrics(tenantId: string, authTenantId?: string): Promise<{
+    activeJobs: number;
+    completedJobs: number;
+    totalSpend: number;
+    recentActivity: ActivityLog[];
+  }> {
+    const clientId = authTenantId?.trim() ? authTenantId : tenantId;
     const [activeJobs, completedJobs, totalSpend, recentActivity] = await Promise.all([
       this.safeCount(
         `SELECT CASE
            WHEN to_regclass('public.os_jobs') IS NULL THEN 0::text
            ELSE (SELECT COUNT(*)::text FROM os_jobs WHERE client_id = $1 AND status = 'running')
          END AS n`,
-        [authTenantId],
+        [clientId],
       ),
       this.safeCount(
         `SELECT CASE
            WHEN to_regclass('public.os_jobs') IS NULL THEN 0::text
            ELSE (SELECT COUNT(*)::text FROM os_jobs WHERE client_id = $1 AND status = 'completed')
          END AS n`,
-        [authTenantId],
+        [clientId],
       ),
       (async () => {
         try {
@@ -169,7 +173,7 @@ export class SaasDashboardService {
                WHEN to_regclass('public.billing_payments') IS NULL THEN 0
                ELSE COALESCE((SELECT SUM(amount_cents) / 100.0 FROM billing_payments WHERE tenant_id = $1), 0)
              END AS total`,
-            [authTenantId],
+            [clientId],
           );
           return toNum(spendRows[0]?.total);
         } catch {
@@ -178,14 +182,30 @@ export class SaasDashboardService {
       })(),
       this.getRecentActivity(tenantId, 10),
     ]);
+    return { activeJobs, completedJobs, totalSpend, recentActivity };
+  }
 
-    return {
-      tenant,
-      activeJobs,
-      completedJobs,
-      totalSpend,
-      recentActivity,
-    };
+  async resolveAuthTenantId(tenantId: string): Promise<string> {
+    try {
+      const rows = await this.db.query<{ auth_tenant_id: string | null }>(
+        `SELECT nu.tenant_id AS auth_tenant_id
+         FROM saas_tenants st
+         LEFT JOIN nelvyon_users nu ON nu.user_id = st.user_id
+         WHERE st.id = $1
+         LIMIT 1`,
+        [tenantId],
+      );
+      const authId = rows[0]?.auth_tenant_id;
+      return authId?.trim() ? authId : tenantId;
+    } catch {
+      return tenantId;
+    }
+  }
+
+  async getDashboardSummary(tenantId: string): Promise<DashboardSummary> {
+    const { tenant, authTenantId } = await this.fetchTenantWithAuthTenant(tenantId);
+    const metrics = await this.getDashboardMetrics(tenantId, authTenantId);
+    return { tenant, ...metrics };
   }
 }
 
