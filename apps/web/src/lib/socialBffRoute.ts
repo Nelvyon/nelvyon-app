@@ -1,4 +1,4 @@
-import { bffDegraded, BFF_DEGRADED_NO_DATA } from "@/lib/bffDegraded";
+import { bffDegraded, BFF_DEGRADED_NO_DATA, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 import { adsBffGet } from "@/lib/adsBffRoute";
 
 export { adsBffGet as socialBffGet };
@@ -99,3 +99,12 @@ export function mergeUnifiedSocial(
     },
   };
 }
+
+export function emptyUnifiedSocial(reason = BFF_DEGRADED_NO_DATA) {
+  return bffDegraded(
+    mergeUnifiedSocial(EMPTY_SOCIAL_SCHEDULER, EMPTY_SOCIAL_MONITORING, EMPTY_SOCIAL_PUBLISH),
+    reason,
+  );
+}
+
+export const EMPTY_UNIFIED_SOCIAL_DEGRADED = emptyUnifiedSocial(BFF_DEGRADED_UPSTREAM);

@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
-import { buildDemoFunnelsUnified } from "@/lib/demoDashboardData";
+import { BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 import {
   EMPTY_FUNNEL_ANALYTICS,
   EMPTY_FUNNELS_LIST,
+  EMPTY_UNIFIED_FUNNELS_DEGRADED,
+  emptyUnifiedFunnels,
   mergeUnifiedFunnels,
 } from "@/lib/funnelsBffRoute";
 import { OsAgentError } from "@nelvyon/os-agents";
@@ -30,7 +32,7 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(buildDemoFunnelsUnified());
+    return NextResponse.json(EMPTY_UNIFIED_FUNNELS_DEGRADED);
   }
   if (claims instanceof NextResponse) return claims;
 
@@ -61,7 +63,7 @@ export async function GET(req: Request) {
     }
 
     if (!funnelsRes.ok && upstreamFailed(funnelsRes.status)) {
-      return NextResponse.json(buildDemoFunnelsUnified());
+      return NextResponse.json(emptyUnifiedFunnels(BFF_DEGRADED_UPSTREAM));
     }
 
     const merged = mergeUnifiedFunnels(
@@ -71,10 +73,10 @@ export async function GET(req: Request) {
       analyticsSamples,
     );
     if ((funnelsList.items?.length ?? 0) === 0 && merged.unified.total_visits === 0) {
-      return NextResponse.json(buildDemoFunnelsUnified());
+      return NextResponse.json(emptyUnifiedFunnels());
     }
     return NextResponse.json(merged);
   } catch {
-    return NextResponse.json(buildDemoFunnelsUnified());
+    return NextResponse.json(EMPTY_UNIFIED_FUNNELS_DEGRADED);
   }
 }

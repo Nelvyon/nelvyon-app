@@ -1,3 +1,4 @@
+import { bffDegraded, BFF_DEGRADED_NO_DATA, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 import { adsBffGet, adsBffPost } from "@/lib/adsBffRoute";
 
 export { adsBffGet as funnelsBffGet, adsBffPost as funnelsBffPost };
@@ -92,6 +93,20 @@ export function mergeUnifiedFunnels(
     },
   };
 }
+
+export function emptyUnifiedFunnels(reason = BFF_DEGRADED_NO_DATA) {
+  return bffDegraded(
+    mergeUnifiedFunnels(
+      EMPTY_FUNNELS_LIST as { items?: Array<{ status?: string; step_count?: number }> },
+      { items: [], total: 0 },
+      { unified: { total_spend: 0, blended_roas: 0 } },
+      [],
+    ),
+    reason,
+  );
+}
+
+export const EMPTY_UNIFIED_FUNNELS_DEGRADED = emptyUnifiedFunnels(BFF_DEGRADED_UPSTREAM);
 
 export const DEFAULT_FUNNEL_STEPS = [
   { name: "Anuncio", exit_url: "/publicidad" },

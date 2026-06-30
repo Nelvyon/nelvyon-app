@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
-import { buildDemoReviewsList } from "@/lib/reputacionBffRoute";
+import { EMPTY_REVIEWS_LIST } from "@/lib/reputacionBffRoute";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +17,10 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    return NextResponse.json(EMPTY_REVIEWS_LIST);
   }
 
-  let data = buildDemoReviewsList();
+  let data = EMPTY_REVIEWS_LIST;
   if (sentiment) {
     data = {
       ...data,

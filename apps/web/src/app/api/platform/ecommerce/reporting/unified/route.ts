@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
-import { buildDemoEcommerceUnified } from "@/lib/demoDashboardData";
+import { BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 import {
   EMPTY_STORE_ANALYTICS,
   EMPTY_STORES_LIST,
+  EMPTY_UNIFIED_ECOMMERCE_DEGRADED,
+  emptyUnifiedEcommerce,
   mergeUnifiedEcommerce,
 } from "@/lib/ecommerceBffRoute";
 import { OsAgentError } from "@nelvyon/os-agents";
@@ -30,7 +32,7 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(buildDemoEcommerceUnified());
+    return NextResponse.json(EMPTY_UNIFIED_ECOMMERCE_DEGRADED);
   }
   if (claims instanceof NextResponse) return claims;
 
@@ -61,7 +63,7 @@ export async function GET(req: Request) {
     }
 
     if (!storesRes.ok && upstreamFailed(storesRes.status)) {
-      return NextResponse.json(buildDemoEcommerceUnified());
+      return NextResponse.json(emptyUnifiedEcommerce(BFF_DEGRADED_UPSTREAM));
     }
 
     const merged = mergeUnifiedEcommerce(
@@ -71,10 +73,10 @@ export async function GET(req: Request) {
       analyticsSamples,
     );
     if ((storesList.items?.length ?? 0) === 0 && merged.unified.total_revenue_cents === 0) {
-      return NextResponse.json(buildDemoEcommerceUnified());
+      return NextResponse.json(emptyUnifiedEcommerce());
     }
     return NextResponse.json(merged);
   } catch {
-    return NextResponse.json(buildDemoEcommerceUnified());
+    return NextResponse.json(EMPTY_UNIFIED_ECOMMERCE_DEGRADED);
   }
 }

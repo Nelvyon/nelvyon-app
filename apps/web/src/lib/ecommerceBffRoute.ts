@@ -1,3 +1,4 @@
+import { bffDegraded, BFF_DEGRADED_NO_DATA, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 import { adsBffGet, adsBffPost } from "@/lib/adsBffRoute";
 
 export { adsBffGet as ecommerceBffGet, adsBffPost as ecommerceBffPost };
@@ -104,3 +105,18 @@ export function mergeUnifiedEcommerce(
     },
   };
 }
+
+/** Honest empty unified payload when no stores / upstream unavailable. */
+export function emptyUnifiedEcommerce(reason = BFF_DEGRADED_NO_DATA) {
+  return bffDegraded(
+    mergeUnifiedEcommerce(
+      EMPTY_STORES_LIST as { items?: Array<{ id?: string; status?: string }> },
+      { unified: { total_spend: 0, blended_roas: 0 } },
+      { items: [], total: 0 },
+      [],
+    ),
+    reason,
+  );
+}
+
+export const EMPTY_UNIFIED_ECOMMERCE_DEGRADED = emptyUnifiedEcommerce(BFF_DEGRADED_UPSTREAM);

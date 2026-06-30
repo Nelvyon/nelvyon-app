@@ -1,4 +1,4 @@
-/** Rich demo payloads for empty workspaces — visual polish only, no business side effects. */
+/** Rich demo payloads for pack elite snapshots only — not used in production BFF fallbacks. */
 
 export function buildDemoAdsUnified() {
   const googleCampaigns = [

@@ -1,3 +1,4 @@
+import { bffDegraded, BFF_DEGRADED_NO_DATA } from "@/lib/bffDegraded";
 import { adsBffGet, adsBffPost } from "@/lib/adsBffRoute";
 
 export { adsBffGet as automationsBffGet, adsBffPost as automationsBffPost };
@@ -25,23 +26,26 @@ export const EMPTY_STATS = {
 
 export const EMPTY_EXECUTIONS_LIST = { items: [] as unknown[], total: 0, skip: 0, limit: 50 };
 
-export const EMPTY_UNIFIED_AUTOMATIONS = {
-  workflows: EMPTY_WORKFLOWS_LIST,
-  rules: EMPTY_RULES_LIST,
-  stats: EMPTY_STATS,
-  executions: EMPTY_EXECUTIONS_LIST,
-  unified: {
-    total_flows: 0,
-    active_flows: 0,
-    total_runs: 0,
-    rule_executions: 0,
-    workflow_runs: 0,
-    jobs_completed: 0,
-    jobs_failed: 0,
-    success_rate: 0,
-    events_24h: 0,
+export const EMPTY_UNIFIED_AUTOMATIONS = bffDegraded(
+  {
+    workflows: EMPTY_WORKFLOWS_LIST,
+    rules: EMPTY_RULES_LIST,
+    stats: EMPTY_STATS,
+    executions: EMPTY_EXECUTIONS_LIST,
+    unified: {
+      total_flows: 0,
+      active_flows: 0,
+      total_runs: 0,
+      rule_executions: 0,
+      workflow_runs: 0,
+      jobs_completed: 0,
+      jobs_failed: 0,
+      success_rate: 0,
+      events_24h: 0,
+    },
   },
-};
+  BFF_DEGRADED_NO_DATA,
+);
 
 export function mergeUnifiedAutomations(
   workflows: { items?: Array<{ is_active?: boolean; runs_count?: number }>; total?: number },

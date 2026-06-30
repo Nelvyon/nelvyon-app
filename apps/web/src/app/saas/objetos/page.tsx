@@ -71,7 +71,7 @@ function CreateObjectModal({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     setSaving(true);
     try {
-      await fetch("/api/saas/objects", {
+      await fetch("/api/saas/custom-objects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, pluralName, icon, color, fields }),

@@ -15,10 +15,13 @@ export const EMPTY_UNIFIED_REPORTING = bffDegraded(
   BFF_DEGRADED_UPSTREAM,
 );
 
-export const EMPTY_ROAS_ALERTS = {
-  threshold: 1.5,
-  alerts: [] as Array<{ platform: string; message: string; severity: string }>,
-};
+export const EMPTY_ROAS_ALERTS = bffDegraded(
+  {
+    threshold: 1.5,
+    alerts: [] as Array<{ platform: string; message: string; severity: string }>,
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 export const EMPTY_PLATFORM_STATUS = bffDegraded(
   { oauth_configured: false, connected: false },
