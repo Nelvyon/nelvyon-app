@@ -104,11 +104,15 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: node scripts/check-saas-stubs.mjs
 
+      - name: Build Next.js for E2E (prod server — stable under load)
+        run: pnpm build
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-for-playwright-saas-e2e' }}
+
       - name: Run SaaS Playwright suite
         env:
           CI: "true"
           JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-for-playwright-saas-e2e' }}
-          # DATABASE_URL intentionally absent — all API calls mocked via page.route()
         run: pnpm exec playwright test --config playwright.saas.config.ts
 
       - name: Upload Playwright report on failure

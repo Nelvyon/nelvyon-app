@@ -36,10 +36,10 @@ export default defineConfig({
   },
 
   webServer: {
-    command: "pnpm dev",
+    command: process.env.CI ? "pnpm start -p 3000" : "pnpm dev",
     url: "http://localhost:3000/api/health",
     reuseExistingServer: !process.env.CI,
-    timeout: 300_000,
+    timeout: process.env.CI ? 120_000 : 300_000,
     env: {
       JWT_SECRET: TEST_JWT_SECRET,
       NODE_ENV: "test",

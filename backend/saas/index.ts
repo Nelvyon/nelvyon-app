@@ -264,6 +264,7 @@ export {
   SaasPackStoreError,
   getSaasPackStoreService,
   resetSaasPackStoreServiceForTests,
+  grantPackEntitlementsForTenant,
   type PackCatalogEntry,
   type PackCatalogPort,
   type PackEntitlement,

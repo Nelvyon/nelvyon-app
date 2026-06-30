@@ -62,12 +62,13 @@ test.describe("SaaS Funnels — depth (S36)", () => {
       const url = route.request().url();
       if (url.includes("resource=analytics")) return route.fulfill({ json: FIXTURE_ANALYTICS });
       if (url.includes("resource=variants")) return route.fulfill({ json: { variants: [] } });
-      if (url.includes("f-e2e-1")) return route.fulfill({ json: { funnel: FIXTURE_FUNNELS.funnels[0] } });
       return route.fulfill({ json: FIXTURE_FUNNELS });
     });
 
-    await page.goto("/saas/funnels?id=f-e2e-1", { waitUntil: "domcontentloaded" });
+    await page.goto("/saas/funnels", { waitUntil: "domcontentloaded" });
     await expect(page.getByText("E2E Test Funnel")).toBeVisible({ timeout: 15_000 });
+    await page.getByRole("button", { name: "Abrir builder" }).click();
+    await expect(page.locator("h1", { hasText: "E2E Test Funnel" })).toBeVisible({ timeout: 15_000 });
 
     const analyticsTab = page.getByRole("button", { name: "Analytics" });
     await expect(analyticsTab).toBeVisible({ timeout: 10_000 });

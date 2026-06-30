@@ -118,7 +118,7 @@ export class SaasOnboardingService {
       );
       const row = inserted[0];
       if (row) {
-        const tenant = ensureWorkspaceBridge(userId, saasTenantFromRow(row));
+        const tenant = await ensureWorkspaceBridge(userId, saasTenantFromRow(row));
         try {
           const { grantPackEntitlementsForTenant } = await import("./SaasPackStoreService");
           await grantPackEntitlementsForTenant(this.db, tenant.id);
@@ -234,7 +234,7 @@ export class SaasOnboardingService {
     if (!row) {
       throw new SaasOnboardingError("Tenant not found", "NOT_FOUND");
     }
-    const tenant = ensureWorkspaceBridge(userId, saasTenantFromRow(row));
+    const tenant = await ensureWorkspaceBridge(userId, saasTenantFromRow(row));
     try {
       const { grantPackEntitlementsForTenant } = await import("./SaasPackStoreService");
       await grantPackEntitlementsForTenant(this.db, tenant.id);
