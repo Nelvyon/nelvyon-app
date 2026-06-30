@@ -184,6 +184,22 @@ export const FIXTURE_ENTREGABLES = {
   summary: { total: 0, pendingReview: 0, approved: 0, avgQaScore: null, byType: {}, byStatus: {} },
 };
 
+export const FIXTURE_ENTREGABLES_DATA = {
+  deliverables: [
+    {
+      id: "d-1", source: "os", type: "landing", title: "Landing ACME E2E",
+      packId: "local-business-growth", status: "approved",
+      qaScore: 91, legalPassed: true,
+      downloadUrl: null, portalUrl: "/portal/deliverables/d-1",
+      createdAt: new Date().toISOString(), approvedAt: new Date().toISOString(),
+    },
+  ],
+  summary: {
+    total: 1, pendingReview: 0, approved: 1, avgQaScore: 91,
+    byType: { landing: 1 }, byStatus: { approved: 1 },
+  },
+};
+
 export const FIXTURE_PUBLICIDAD = {
   ok: true,
   attribution: {
@@ -213,7 +229,33 @@ export const FIXTURE_INTEGRATIONS = {
 };
 
 export const FIXTURE_MEMBERSHIPS = {
-  program: null, plans: [], communities: [], stats: { members: 0, activePlans: 0 },
+  program: null,
+  plans: [
+    {
+      id: "plan-1", tenantId: "t1", name: "Pro", slug: "pro",
+      priceAmount: 29.99, priceCurrency: "EUR", billingInterval: "month",
+      includes: { courses: [], communities: [], features: ["Acceso total"] },
+      affiliateCommissionPct: 10, isActive: true, stripePriceId: null,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    },
+  ],
+  communities: [],
+  stats: { members: 0, activePlans: 1 },
+};
+
+export const FIXTURE_WHATSAPP_TEMPLATES = {
+  templates: [
+    {
+      id: "t1", metaTemplateId: "meta-1", name: "promo_verano",
+      language: "es", status: "APPROVED", category: "MARKETING",
+      components: [
+        { type: "HEADER", format: "TEXT", text: "¡Oferta especial!" },
+        { type: "BODY", text: "Hola {{1}}, tienes un descuento del {{2}}%." },
+      ],
+      qualityScore: "GREEN",
+      syncedAt: new Date().toISOString(),
+    },
+  ],
 };
 
 export const FIXTURE_WHATSAPP = {
@@ -238,12 +280,13 @@ export async function mockEntregablesList(
   page: Page,
   payload: EntregablesListFixture,
 ): Promise<void> {
-  await page.route("**/api/saas/entregables**", route => {
+  await page.route("**/api/saas/entregables**", async route => {
     const path = new URL(route.request().url()).pathname;
     if (path.includes("/revenue") || /\/entregables\/[^/]+$/.test(path)) {
-      return route.fallback();
+      await route.fallback();
+      return;
     }
-    return route.fulfill({ json: payload });
+    await route.fulfill({ json: payload });
   });
 }
 
@@ -448,12 +491,13 @@ export const FIXTURE_BENCHMARK = {
 
 /** Intercepts benchmark endpoints with a populated fixture dashboard. */
 export async function mockSectorBenchmark(page: Page): Promise<void> {
-  await page.route("**/api/saas/benchmark/refresh**", route =>
-    route.fulfill({ json: { dashboard: FIXTURE_BENCHMARK.dashboard } }));
+  // Register broad pattern first; specific refresh last (Playwright LIFO → refresh wins).
   await page.route("**/api/saas/benchmark**", route =>
     route.fulfill({ json: FIXTURE_BENCHMARK }));
   await page.route("**/api/saas/benchmarks/sectors**", route =>
     route.fulfill({ json: { sectors: [{ key: "ecommerce", label: "E-commerce" }] } }));
+  await page.route("**/api/saas/benchmark/refresh**", route =>
+    route.fulfill({ json: { dashboard: FIXTURE_BENCHMARK.dashboard } }));
 }
 
 // ─── Route interceptors ──────────────────────────────────────────────────────
@@ -514,7 +558,7 @@ export async function mockSaasApis(page: Page): Promise<void> {
     return route.fulfill({ json: FIXTURE_AUTOPILOT });
   });
   await mockEntregablesRevenue(page);
-  await mockEntregablesList(page, FIXTURE_ENTREGABLES);
+  await mockEntregablesList(page, FIXTURE_ENTREGABLES_DATA);
   await page.route("**/api/saas/publicidad**", route =>
     route.fulfill({ json: FIXTURE_PUBLICIDAD }));
   await page.route("**/api/saas/ads**", route => {
@@ -532,7 +576,7 @@ export async function mockSaasApis(page: Page): Promise<void> {
   await page.route("**/api/saas/memberships**", route =>
     route.fulfill({ json: FIXTURE_MEMBERSHIPS }));
   await page.route("**/api/saas/whatsapp/templates**", route =>
-    route.fulfill({ json: { templates: [] } }));
+    route.fulfill({ json: FIXTURE_WHATSAPP_TEMPLATES }));
   await page.route("**/api/saas/whatsapp/catalog**", route =>
     route.fulfill({ json: { products: [] } }));
   await page.route("**/api/saas/whatsapp**", route =>

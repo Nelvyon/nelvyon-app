@@ -48,7 +48,8 @@ test.describe("SaaS Publicidad — página autenticada", () => {
 
   test("texto de Publicidad o Atribución en página", async ({ page }) => {
     await gotoPublicidadReady(page);
-    await expect(page.getByText(/Atribución multi-touch|Métricas y campañas/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /Métricas y campañas/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Atribución multi-touch/i })).toBeVisible();
   });
 
   test("no redirige a /login con cookie válida", async ({ page }) => {
@@ -86,7 +87,10 @@ test.describe("SaaS Publicidad — atribución multi-touch", () => {
   test("tab atribución carga sin crash", async ({ page }) => {
     await gotoPublicidadReady(page);
     await page.getByRole("button", { name: /Atribución multi-touch/i }).click();
-    await expect(page.getByText(/Sin campañas vinculadas|Modelo/i).first()).toBeVisible({ timeout: 10_000 });
+    await page.waitForResponse("**/api/saas/ads/attribution**", { timeout: 15_000 });
+    await expect(
+      page.getByText(/Sin campañas vinculadas/i).or(page.getByLabel(/Modelo/i)),
+    ).toBeVisible({ timeout: 10_000 });
     expect(page.url()).not.toContain("500");
   });
 });

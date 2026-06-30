@@ -8,6 +8,8 @@ on:
       - "apps/web/src/app/api/public/**"
       - "apps/web/src/app/contracts/**"
       - "apps/web/e2e/saas/**"
+      - "apps/web/src/middleware.ts"
+      - "apps/web/playwright.saas.config.ts"
       - "backend/saas/**"
       - ".github/workflows/playwright-saas.yml"
   push:
@@ -19,6 +21,8 @@ on:
       - "apps/web/src/app/api/public/**"
       - "apps/web/src/app/contracts/**"
       - "apps/web/e2e/saas/**"
+      - "apps/web/src/middleware.ts"
+      - "apps/web/playwright.saas.config.ts"
       - "backend/saas/**"
       - ".github/workflows/playwright-saas.yml"
 
