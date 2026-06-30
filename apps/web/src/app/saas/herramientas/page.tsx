@@ -117,11 +117,11 @@ interface ToolConfig {
 
 const TOOLS: ToolConfig[] = [
   { icon: "⚡", name: "Zapier", slug: "zapier", description: "Automatiza flujos entre Nelvyon y miles de apps" },
-  { icon: "🔄", name: "Make (Integromat)", slug: null, description: "Workflows visuales avanzados", comingSoon: true },
-  { icon: "🔧", name: "n8n", slug: null, description: "Automatización self-hosted", comingSoon: true },
+  { icon: "🔄", name: "Make (Integromat)", slug: "make", description: "Workflows visuales — configura webhook en Integraciones" },
+  { icon: "🔧", name: "n8n", slug: "n8n", description: "Automatización self-hosted vía webhooks" },
   { icon: "💬", name: "Slack", slug: "slack", description: "Notificaciones de leads y alertas en tiempo real" },
   { icon: "📊", name: "Google Analytics", slug: "google_analytics", description: "Seguimiento de conversiones en tu web" },
-  { icon: "🏷️", name: "Google Tag Manager", slug: null, description: "Gestión centralizada de píxeles y scripts", comingSoon: true },
+  { icon: "🏷️", name: "Google Tag Manager", slug: "google_tag_manager", description: "Gestión centralizada de píxeles — pega container ID en Webhooks" },
   { icon: "📘", name: "Meta Pixel", slug: "meta", description: "Seguimiento de conversiones para Meta Ads" },
   { icon: "💼", name: "LinkedIn Insight", slug: "linkedin", description: "Analytics y retargeting LinkedIn" },
   { icon: "🔥", name: "Hotjar", slug: "hotjar", description: "Mapas de calor y grabaciones de sesión" },

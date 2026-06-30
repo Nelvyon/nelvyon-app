@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { bffDegraded, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { OsAgentError } from "@nelvyon/os-agents";
@@ -8,12 +9,14 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function emptyCrmReport(start: string, end: string) {
-  return {
-    period: { start_date: start, end_date: end },
-    contacts: { total: 0, new: 0 },
-    deals: { total: 0, won: 0, pipeline_value: 0 },
-    mock: true,
-  };
+  return bffDegraded(
+    {
+      period: { start_date: start, end_date: end },
+      contacts: { total: 0, new: 0 },
+      deals: { total: 0, won: 0, pipeline_value: 0 },
+    },
+    BFF_DEGRADED_UPSTREAM,
+  );
 }
 
 /** CRM report for analytics/reportes — FastAPI pipeline analytics or honest empty payload. */
@@ -42,7 +45,7 @@ export async function GET(req: Request) {
       return NextResponse.json({
         period: { start_date: start, end_date: end },
         pipeline: data,
-        mock: false,
+        degraded: false,
       });
     }
     if (upstreamFailed(upstream.status)) {

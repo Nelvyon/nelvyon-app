@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { bffDegraded, BFF_DEGRADED_OAUTH } from "@/lib/bffDegraded";
 import { EMPTY_CONNECTION } from "@/lib/reputacionBffRoute";
 
 export const dynamic = "force-dynamic";
@@ -10,11 +11,16 @@ export async function GET() {
 }
 
 export async function POST() {
-  return NextResponse.json({
-    ...EMPTY_CONNECTION,
-    connected: true,
-    mock: true,
-    profile_name: "Negocio demo · Google Business",
-    last_sync_at: new Date().toISOString(),
-  });
+  return NextResponse.json(
+    bffDegraded(
+      {
+        ...EMPTY_CONNECTION,
+        connected: false,
+        profile_name: null,
+        last_sync_at: null,
+      },
+      BFF_DEGRADED_OAUTH,
+    ),
+    { status: 503 },
+  );
 }

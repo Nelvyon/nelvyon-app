@@ -109,6 +109,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "store",      label: "🛍️ Tienda Online",         href: "/saas/store",      group: "gestion" },
   { id: "affiliates", label: "🤝 Programa Afiliados",     href: "/saas/affiliates", group: "gestion" },
   { id: "loyalty",    label: "🏆 Fidelización",           href: "/saas/loyalty",    group: "gestion" },
+  { id: "memberships", label: "🎫 Membresías", href: "/saas/memberships", group: "gestion" },
   { id: "pack-store", label: "🛒 Pack Store", href: "/saas/packs", group: "ia" },
   { id: "data-playbooks", label: "📋 Playbooks", href: "/saas/playbooks", group: "ia" },
   { id: "brief-to-launch", label: "🚀 Lanzar Pack", href: "/saas/brief-to-launch", group: "ia" },

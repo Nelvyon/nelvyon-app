@@ -179,6 +179,27 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     relatedRoute: "/saas/webhooks",
     status: "live",
   },
+  {
+    id: "make", slug: "make", displayName: "Make (Integromat)", icon: "🔄",
+    category: "productivity", connectionType: "manual",
+    envKeys: [],
+    relatedRoute: "/saas/webhooks",
+    status: "live",
+  },
+  {
+    id: "n8n", slug: "n8n", displayName: "n8n", icon: "🔧",
+    category: "productivity", connectionType: "manual",
+    envKeys: [],
+    relatedRoute: "/saas/webhooks",
+    status: "live",
+  },
+  {
+    id: "google_tag_manager", slug: "google_tag_manager", displayName: "Google Tag Manager", icon: "🏷️",
+    category: "analytics", connectionType: "manual",
+    envKeys: ["GTM_CONTAINER_ID"],
+    relatedRoute: "/saas/webhooks",
+    status: "live",
+  },
 
   // ── Analytics & Tools ─────────────────────────────────────────────────────
   {

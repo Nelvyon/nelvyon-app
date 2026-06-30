@@ -11,6 +11,10 @@ import {
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { EmailEditor } from "@/features/email-editor/EmailEditor";
+import {
+  formatSocialPresetContent,
+  listSocialElitePresets,
+} from "@/lib/eliteTemplates/socialTemplates";
 
 // ─── Types (shaped to match /api/saas/social/* responses) ─────────────────────
 
@@ -72,6 +76,14 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
   const [useRichEditor, setUseRichEditor] = useState(false);
 
   const connectedAccounts = accounts.filter((a) => a.isActive);
+  const templatePresets = listSocialElitePresets();
+
+  function applyPreset(presetId: string) {
+    const preset = templatePresets.find((p) => p.id === presetId);
+    if (!preset) return;
+    setContent(formatSocialPresetContent(preset));
+    if (preset.mediaHint) setMediaUrl("");
+  }
 
   function toggleAccount(id: string) {
     setSelectedAccountIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
@@ -117,6 +129,22 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
         </div>
         <form onSubmit={submit} className="space-y-5 p-6">
           {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+
+          <div>
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Plantillas élite</label>
+            <div className="flex flex-wrap gap-2">
+              {templatePresets.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => applyPreset(p.id)}
+                  className="rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Account selector */}
           <div>

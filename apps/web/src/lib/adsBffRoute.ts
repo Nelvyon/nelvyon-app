@@ -1,30 +1,42 @@
 import { NextResponse } from "next/server";
 
+import { bffDegraded, BFF_DEGRADED_OAUTH, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { readJsonBody } from "@/lib/platformBffRoute";
 import { OsAgentError } from "@nelvyon/os-agents";
 
-export const EMPTY_UNIFIED_REPORTING = {
-  google: { summary: {} as Record<string, number>, campaigns: [] as unknown[], mock: true },
-  meta: { summary: {} as Record<string, number>, campaigns: [] as unknown[], mock: true },
-  unified: { total_spend: 0, blended_roas: 0 },
-};
+export const EMPTY_UNIFIED_REPORTING = bffDegraded(
+  {
+    google: { summary: {} as Record<string, number>, campaigns: [] as unknown[] },
+    meta: { summary: {} as Record<string, number>, campaigns: [] as unknown[] },
+    unified: { total_spend: 0, blended_roas: 0 },
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 export const EMPTY_ROAS_ALERTS = {
   threshold: 1.5,
   alerts: [] as Array<{ platform: string; message: string; severity: string }>,
 };
 
-export const EMPTY_PLATFORM_STATUS = { mock: true, oauth_configured: false };
+export const EMPTY_PLATFORM_STATUS = bffDegraded(
+  { oauth_configured: false, connected: false },
+  BFF_DEGRADED_OAUTH,
+);
 
-export const EMPTY_CAMPAIGNS = { campaigns: [] as unknown[], mock: true };
+export const EMPTY_CAMPAIGNS = bffDegraded(
+  { campaigns: [] as unknown[] },
+  BFF_DEGRADED_UPSTREAM,
+);
 
-export const EMPTY_REPORTING = {
-  summary: {} as Record<string, number>,
-  campaigns: [] as unknown[],
-  mock: true,
-};
+export const EMPTY_REPORTING = bffDegraded(
+  {
+    summary: {} as Record<string, number>,
+    campaigns: [] as unknown[],
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 async function resolveClaims(req: Request) {
   try {

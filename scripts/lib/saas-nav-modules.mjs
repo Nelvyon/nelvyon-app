@@ -40,6 +40,7 @@ const SAAS_API_BY_ID = {
   store: "store",
   affiliates: "affiliates",
   loyalty: "loyalty",
+  memberships: "memberships",
   "pack-store": "packs",
   "data-playbooks": "playbooks",
   "brief-to-launch": "brief-to-launch",

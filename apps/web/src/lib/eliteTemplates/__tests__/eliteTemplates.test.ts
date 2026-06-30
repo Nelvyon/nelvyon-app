@@ -15,6 +15,10 @@ import {
   FUNNEL_FEATURED_PRESET,
   listFunnelElitePresets,
 } from "@/lib/eliteTemplates/funnelTemplates";
+import {
+  formatSocialPresetContent,
+  listSocialElitePresets,
+} from "@/lib/eliteTemplates/socialTemplates";
 
 describe("adsEliteTemplates", () => {
   it("lists presets for each sector group", () => {
@@ -66,5 +70,19 @@ describe("funnelEliteTemplates", () => {
       ...listFunnelElitePresets("saas_b2b"),
     ];
     expect(all.length).toBeGreaterThanOrEqual(5);
+  });
+});
+
+describe("socialEliteTemplates", () => {
+  it("lists presets per sector group", () => {
+    expect(listSocialElitePresets("local").length).toBeGreaterThanOrEqual(3);
+    expect(listSocialElitePresets("ecommerce").length).toBeGreaterThanOrEqual(1);
+    expect(listSocialElitePresets("saas_b2b").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("formats content with hashtags", () => {
+    const preset = listSocialElitePresets()[0]!;
+    const text = formatSocialPresetContent(preset);
+    expect(text).toContain("#");
   });
 });
