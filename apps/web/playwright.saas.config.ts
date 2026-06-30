@@ -28,13 +28,18 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "off",
     navigationTimeout: 60_000,
+    actionTimeout: 30_000,
+  },
+
+  expect: {
+    timeout: 15_000,
   },
 
   webServer: {
     command: "pnpm dev",
-    url: "http://localhost:3000",
+    url: "http://localhost:3000/api/health",
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 300_000,
     env: {
       JWT_SECRET: TEST_JWT_SECRET,
       NODE_ENV: "test",
