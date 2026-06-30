@@ -118,7 +118,14 @@ export class SaasOnboardingService {
       );
       const row = inserted[0];
       if (row) {
-        return ensureWorkspaceBridge(userId, saasTenantFromRow(row));
+        const tenant = ensureWorkspaceBridge(userId, saasTenantFromRow(row));
+        try {
+          const { grantPackEntitlementsForTenant } = await import("./SaasPackStoreService");
+          await grantPackEntitlementsForTenant(this.db, tenant.id);
+        } catch (err) {
+          console.error("[onboarding] grantFromPlan on create failed:", err);
+        }
+        return tenant;
       }
     } catch (e: unknown) {
       if (isPgCheckViolation(e)) {
@@ -227,7 +234,14 @@ export class SaasOnboardingService {
     if (!row) {
       throw new SaasOnboardingError("Tenant not found", "NOT_FOUND");
     }
-    return ensureWorkspaceBridge(userId, saasTenantFromRow(row));
+    const tenant = ensureWorkspaceBridge(userId, saasTenantFromRow(row));
+    try {
+      const { grantPackEntitlementsForTenant } = await import("./SaasPackStoreService");
+      await grantPackEntitlementsForTenant(this.db, tenant.id);
+    } catch (err) {
+      console.error("[onboarding] grantFromPlan failed:", err);
+    }
+    return tenant;
   }
 }
 

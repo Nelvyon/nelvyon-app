@@ -198,6 +198,15 @@ export function resetSaasPackStoreServiceForTests(): void {
   _instance = null;
 }
 
+/** Grant plan entitlements without singleton (onboarding / Stripe webhook). */
+export async function grantPackEntitlementsForTenant(
+  db: SaasPostgresPort,
+  tenantId: string,
+): Promise<void> {
+  const svc = new SaasPackStoreService(db, defaultCatalogPort);
+  await svc.grantFromPlan(tenantId);
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────────
 
 export class SaasPackStoreService {
@@ -263,6 +272,23 @@ export class SaasPackStoreService {
     return granted;
   }
 
+  /** Grant missing plan entitlements (idempotent). Call before catalog/launch checks. */
+  private async ensurePlanEntitlements(tenantId: string): Promise<void> {
+    const plan = await this.getPlan(tenantId);
+    const defaults = PLAN_DEFAULTS[plan] ?? PLAN_DEFAULTS.starter;
+    const packIds = Object.keys(defaults);
+    if (packIds.length === 0) return;
+
+    const ents = await this.listEntitlements(tenantId);
+    const grantedPlanPacks = new Set(
+      ents.filter((e) => e.source === "plan").map((e) => e.packId),
+    );
+    const missing = packIds.some((id) => !grantedPlanPacks.has(id));
+    if (missing) {
+      await this.grantFromPlan(tenantId);
+    }
+  }
+
   private async getEntitlementForPack(
     tenantId: string,
     packId: string,
@@ -285,6 +311,7 @@ export class SaasPackStoreService {
     tenantId: string,
     packId: string,
   ): Promise<{ allowed: boolean; reason?: string }> {
+    await this.ensurePlanEntitlements(tenantId);
     const { entitlement: ent } = await this.getEntitlementForPack(tenantId, packId);
     if (!ent) return { allowed: false, reason: "PACK_LOCKED" };
     if (ent.launchesRemaining !== null && ent.launchesRemaining <= 0) {
@@ -363,6 +390,7 @@ export class SaasPackStoreService {
   // ── Catalog merge ───────────────────────────────────────────────────────────
 
   async getStoreCatalog(tenantId: string): Promise<PackStoreItem[]> {
+    await this.ensurePlanEntitlements(tenantId);
     const [catalog, entitlements] = await Promise.all([
       this.catalog.getCatalog(),
       this.listEntitlements(tenantId),
@@ -384,7 +412,8 @@ export class SaasPackStoreService {
 
       const launchesRemaining = ent?.launchesRemaining ?? null;
       const hasQuota = !ent || ent.launchesRemaining === null || ent.launchesRemaining > 0;
-      const canLaunch = c.availability !== "coming_soon" && !!ent && hasQuota;
+      const canLaunch =
+        c.availability !== "coming_soon" && (includedInPlan || !!ent) && hasQuota;
 
       return {
         id: c.id,

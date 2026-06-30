@@ -218,6 +218,19 @@ async function upsertSubscription(
     `UPDATE saas_tenants SET plan = $2, updated_at = now() WHERE user_id = $1`,
     [opts.userId, saasPlan],
   );
+  try {
+    const tenantRows = await db.query<{ id: string }>(
+      `SELECT id FROM saas_tenants WHERE user_id = $1 LIMIT 1`,
+      [opts.userId],
+    );
+    const tenantId = tenantRows[0]?.id;
+    if (tenantId) {
+      const { grantPackEntitlementsForTenant } = await import("../saas/SaasPackStoreService");
+      await grantPackEntitlementsForTenant(db, tenantId);
+    }
+  } catch (err) {
+    console.error("[stripe] grantFromPlan after plan sync failed:", err);
+  }
 }
 
 async function notifyPlanActivated(
