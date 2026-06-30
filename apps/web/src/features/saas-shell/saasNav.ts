@@ -140,35 +140,35 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
 ] as const;
 
 /**
- * Routes kept in codebase but hidden from SaaS nav (legacy, mock, or incomplete).
- * See docs/PHASE_3B_SAAS_LEGACY_CLEANUP.md
+ * Legacy F62 hub URLs — now 301 → real `/saas/*` modules (see legacyF62Redirects.ts).
+ * Kept for grep/docs; no longer served as mock UI.
  */
 export const SAAS_HIDDEN_ROUTES = {
   legacyCrm: ["/dashboard/crm", "/crm/deals", "/crm/clients"],
   legacyBilling: ["/dashboard/settings"],
   os: ["/os/execution"],
   viteOnly: ["/saas/pipelines"],
-  f62Modules: [
-    "/saas/dashboard/affiliates",
-    "/saas/dashboard/cpq",
-    "/saas/dashboard/dialer",
-    "/saas/dashboard/email-warmup",
-    "/saas/dashboard/fb-messenger",
-    "/saas/dashboard/instagram-dm",
-    "/saas/dashboard/intent-data",
-    "/saas/dashboard/integrations",
-    "/saas/dashboard/leads",
-    "/saas/dashboard/linkedin",
-    "/saas/dashboard/pr-digital",
-    "/saas/dashboard/publicidad",
-    "/saas/dashboard/snapchat-ads",
-    "/saas/dashboard/social",
-    "/saas/dashboard/support",
-    "/saas/dashboard/text2pay",
-    "/saas/dashboard/tiktok-ads",
-    "/saas/dashboard/tiktok-dm",
-    "/saas/dashboard/web-builder",
-  ],
+  f62Modules: Object.keys({
+    affiliates: 1,
+    cpq: 1,
+    dialer: 1,
+    "email-warmup": 1,
+    "fb-messenger": 1,
+    "instagram-dm": 1,
+    "intent-data": 1,
+    integrations: 1,
+    leads: 1,
+    linkedin: 1,
+    "pr-digital": 1,
+    publicidad: 1,
+    "snapchat-ads": 1,
+    social: 1,
+    support: 1,
+    text2pay: 1,
+    "tiktok-ads": 1,
+    "tiktok-dm": 1,
+    "web-builder": 1,
+  }).map((slug) => `/saas/dashboard/${slug}`),
 } as const;
 
 export function isSaasNavActive(activeId: SaasNavId, itemId: SaasNavId): boolean {

@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
+﻿import { redirectLegacyF62Module } from "@/lib/saas/legacyF62Redirects";
 
-/** Legacy SaaS social auto-publish — redirige al hub C2 Social. */
-export default function LegacySaasSocialRedirect() {
-  redirect("/social/auto-publish");
+export default function LegacyRedirectPage() {
+  redirectLegacyF62Module("social");
 }

@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
+﻿import { redirectLegacyF62Module } from "@/lib/saas/legacyF62Redirects";
 
-/** Legacy SaaS publicidad — redirige al hub unificado C1. */
-export default function LegacySaasPublicidadRedirect() {
-  redirect("/publicidad");
+export default function LegacyRedirectPage() {
+  redirectLegacyF62Module("publicidad");
 }
