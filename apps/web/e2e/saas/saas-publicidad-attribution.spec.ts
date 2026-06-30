@@ -5,7 +5,10 @@ import { test, expect } from "@playwright/test";
 import { setAuthCookie, mockSaasApis, LOGIN_URL } from "./fixtures";
 
 async function gotoPublicidadReady(page: import("@playwright/test").Page): Promise<void> {
+  await page.route("**/api/saas/ads/attribution**", route =>
+    route.fulfill({ json: { roas: [] } }));
   await page.goto("/saas/publicidad", { waitUntil: "domcontentloaded" });
+  await page.waitForResponse("**/api/saas/ads**", { timeout: 15_000 }).catch(() => {});
   await expect(page.getByRole("heading", { name: "Publicidad Digital" })).toBeVisible({ timeout: 15_000 });
 }
 
@@ -20,6 +23,8 @@ test.describe("SaaS Publicidad — página autenticada", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
     await mockSaasApis(page);
+    await page.route("**/api/saas/ads/attribution**", route =>
+      route.fulfill({ json: { roas: [] } }));
   });
 
   test("carga sin error 500", async ({ page }) => {
@@ -62,6 +67,8 @@ test.describe("SaaS Publicidad — atribución multi-touch", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
     await mockSaasApis(page);
+    await page.route("**/api/saas/ads/attribution**", route =>
+      route.fulfill({ json: { roas: [] } }));
   });
 
   test("página carga datos sin 500 tras navegar desde pipeline", async ({ page }) => {

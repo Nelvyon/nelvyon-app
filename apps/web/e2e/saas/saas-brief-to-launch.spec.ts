@@ -78,9 +78,10 @@ test.describe("S49 — Pack selection flow", () => {
 
   test("beta pack shows beta badge and waitlist message on select", async ({ page }) => {
     await page.goto("/saas/brief-to-launch", { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("button", { name: /Crecimiento Ecommerce/i })).toBeVisible({ timeout: 10_000 });
+    await page.waitForResponse("**/api/saas/brief-to-launch**", { timeout: 15_000 });
+    await expect(page.getByRole("button", { name: /Crecimiento Ecommerce/i })).toBeVisible({ timeout: 15_000 });
     await page.getByRole("button", { name: /Crecimiento Ecommerce/i }).click();
-    await expect(page.getByText(/beta/i)).toBeVisible();
+    await expect(page.getByText(/Pack en beta|BETA/i)).toBeVisible({ timeout: 10_000 });
   });
 
   test("Continuar button advances to brief step", async ({ page }) => {

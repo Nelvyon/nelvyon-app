@@ -233,13 +233,18 @@ export type EntregablesListFixture = {
   summary: Record<string, unknown>;
 };
 
-/** List GET /api/saas/entregables — does NOT match /revenue subpaths. */
+/** List GET /api/saas/entregables — does NOT match /revenue or /:id subpaths. */
 export async function mockEntregablesList(
   page: Page,
   payload: EntregablesListFixture,
 ): Promise<void> {
-  await page.route(/\/api\/saas\/entregables(\?|$)/, route =>
-    route.fulfill({ json: payload }));
+  await page.route("**/api/saas/entregables**", route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.includes("/revenue") || /\/entregables\/[^/]+$/.test(path)) {
+      return route.fallback();
+    }
+    return route.fulfill({ json: payload });
+  });
 }
 
 /** GET/POST /api/saas/entregables/revenue */
@@ -297,8 +302,12 @@ export async function mockSaasVoice(page: Page): Promise<void> {
     route.fulfill({ json: { success: true, route: "/saas/crm", intent: { id: "nav_crm", actionType: "navigate", route: "/saas/crm" }, message: "Abrir el CRM" } }));
   await page.route("**/api/saas/voice/parse**", route =>
     route.fulfill({ json: { result: { success: true, route: "/saas/crm", intent: { id: "nav_crm" } }, intent: { id: "nav_crm" } } }));
-  await page.route(/\/api\/saas\/voice(\?|$)/, route =>
-    route.fulfill({ json: FIXTURE_VOICE }));
+  await page.route("**/api/saas/voice**", route => {
+    if (route.request().url().includes("/parse") || route.request().url().includes("/execute")) {
+      return route.fallback();
+    }
+    return route.fulfill({ json: FIXTURE_VOICE });
+  });
 }
 
 export const FIXTURE_PARTNER_ZONE = {
@@ -541,4 +550,5 @@ export async function mockSaasApis(page: Page): Promise<void> {
   });
   await page.route("**/api/saas/web-builder**", route =>
     route.fulfill({ json: { sites: [] } }));
+  await mockSaasVoice(page);
 }

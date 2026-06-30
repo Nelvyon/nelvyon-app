@@ -66,16 +66,17 @@ test.describe("SaaS Funnels — depth (S36)", () => {
     });
 
     await page.goto("/saas/funnels?id=f-e2e-1", { waitUntil: "domcontentloaded" });
-    await expect(page.getByText("E2E Test Funnel").or(page.getByText("Analytics"))).toBeVisible({ timeout: 10_000 });
+    await page.waitForResponse("**/api/saas/funnels/f-e2e-1**", { timeout: 15_000 });
+    await expect(page.getByText("E2E Test Funnel")).toBeVisible({ timeout: 15_000 });
 
-    const analyticsTab = page.locator("button", { hasText: "Analytics" });
-    if (await analyticsTab.isVisible()) {
-      await analyticsTab.click();
-      await page.waitForTimeout(400);
-    }
+    const analyticsTab = page.getByRole("button", { name: "Analytics" });
+    await expect(analyticsTab).toBeVisible({ timeout: 10_000 });
+    await analyticsTab.click();
+    await page.waitForResponse("**/api/saas/funnels/f-e2e-1**resource=analytics**", { timeout: 15_000 }).catch(() => {});
 
     const body = await page.locator("body").textContent();
     expect(body).not.toContain("Something went wrong");
+    expect(body).toMatch(/Analytics|Landing Page|Formulario/i);
   });
 
   test("public funnel 404 sin slug válido", async ({ request }) => {

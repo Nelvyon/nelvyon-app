@@ -81,7 +81,8 @@ test.describe("SaaS Integraciones — página autenticada", () => {
 
   test("filtro de búsqueda existe en DOM", async ({ page }) => {
     await page.goto("/saas/integraciones", { waitUntil: "domcontentloaded" });
-    await expect(page.locator("input, button, select").first()).toBeVisible({ timeout: 15_000 });
+    await page.waitForResponse("**/api/saas/integrations**", { timeout: 15_000 });
+    await expect(page.getByPlaceholder(/buscar integraci/i)).toBeVisible({ timeout: 15_000 });
   });
 
   test("sin STATIC_PROVIDERS mockeados en código (anti-mock)", async ({ page }) => {

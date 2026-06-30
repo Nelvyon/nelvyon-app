@@ -87,22 +87,20 @@ test.describe("SaaS Entregables — página con datos", () => {
 
   test("título 'Landing ACME E2E' aparece en tabla", async ({ page }) => {
     await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
-    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
-    const bodyText = await page.locator("body").textContent() ?? "";
-    expect(bodyText).toMatch(/Landing ACME E2E/);
+    await page.waitForResponse("**/api/saas/entregables**", { timeout: 15_000 });
+    await expect(page.getByText("Landing ACME E2E")).toBeVisible({ timeout: 15_000 });
   });
 
   test("QA score 91% visible en verde", async ({ page }) => {
     await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
-    await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
-    const bodyText = await page.locator("body").textContent() ?? "";
-    expect(bodyText).toMatch(/91%/);
+    await page.waitForResponse("**/api/saas/entregables**", { timeout: 15_000 });
+    await expect(page.getByText("91%")).toBeVisible({ timeout: 15_000 });
   });
 
   test("filtro de tipo cambia parámetro en fetch", async ({ page }) => {
     const intercepted: string[] = [];
     await mockEntregablesList(page, FIXTURE_DATA);
-    await page.route(/\/api\/saas\/entregables(\?|$)/, route => {
+    await page.route(/\/api\/saas\/entregables(?!\/revenue)/, route => {
       intercepted.push(route.request().url());
       return route.fulfill({ json: FIXTURE_DATA });
     });
