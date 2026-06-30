@@ -2,6 +2,7 @@
  * Staging smoke test — FASE B élite (B1 CRM, B2 Helpdesk, B3 Portal shell, B4 Reporting).
  * Usage: node scripts/staging-smoke-b1-b4.mjs [--skip-wait]
  */
+import { getWorkspaceIdWithFallback } from "./lib/smoke-workspace.mjs";
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
@@ -74,26 +75,7 @@ async function login() {
 }
 
 async function getWorkspaceId(token) {
-  const res = await fetch(`${BASE}/api/platform/workspaces/list`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    fail("auth", "workspaces", `status ${res.status}`);
-    return null;
-  }
-  const data = await res.json();
-  const items = data.items ?? data.workspaces ?? (Array.isArray(data) ? data : []);
-  const id = items[0]?.id ?? items[0]?.workspace_id;
-  if (!id) {
-    fail("auth", "workspaces", "no workspace in list");
-    return null;
-  }
-  pass("auth", "workspace", `id=${id}`);
-  return String(id);
+  return getWorkspaceIdWithFallback(BASE, token, pass);
 }
 
 function authHeaders(token, workspaceId) {

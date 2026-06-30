@@ -2,6 +2,7 @@
  * Staging visual polish smoke — dashboards must show demo KPIs (not empty zeros).
  * Usage: node scripts/staging-smoke-visual-polish.mjs [--skip-wait]
  */
+import { getWorkspaceIdWithFallback } from "./lib/smoke-workspace.mjs";
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
@@ -53,22 +54,7 @@ async function login() {
 }
 
 async function workspace(token) {
-  const res = await fetch(`${BASE}/api/platform/workspaces/list`, {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
-  });
-  if (!res.ok) {
-    fail("auth", "workspaces", `status ${res.status}`);
-    return "";
-  }
-  const data = await res.json();
-  const items = data.items ?? data.workspaces ?? (Array.isArray(data) ? data : []);
-  const id = items[0]?.id ?? items[0]?.workspace_id;
-  if (!id) {
-    fail("auth", "workspaces", "no workspace in list");
-    return "";
-  }
-  pass("auth", "workspace", `id=${id}`);
-  return String(id);
+  return getWorkspaceIdWithFallback(BASE, token, pass);
 }
 
 function headers(token, ws) {

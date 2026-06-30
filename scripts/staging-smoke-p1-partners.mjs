@@ -2,6 +2,7 @@
  * Staging smoke — Partner HQ (P1 wholesale + P2a Stripe Connect).
  * Usage: node scripts/staging-smoke-p1-partners.mjs [--skip-wait]
  */
+import { getWorkspaceIdWithFallback } from "./lib/smoke-workspace.mjs";
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
@@ -72,15 +73,7 @@ async function login() {
 }
 
 async function getWorkspaceId(token) {
-  const res = await fetch(`${BASE}/api/platform/workspaces/list`, {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`Workspaces ${res.status}`);
-  const list = await res.json();
-  const id = list[0]?.id;
-  if (id) pass("auth", "workspace", `id=${id}`);
-  return id ?? null;
+  return getWorkspaceIdWithFallback(BASE, token, pass);
 }
 
 async function probePage(module, check, path, token, workspaceId, opts = {}) {
