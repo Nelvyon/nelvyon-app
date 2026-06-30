@@ -607,4 +607,35 @@ export async function mockSaasApis(page: Page): Promise<void> {
     route.fulfill({ json: { sites: [] } }));
   await mockSaasVoice(page);
   await mockSectorBenchmark(page);
+  // Re-register last (Playwright LIFO) so funnels mock always wins over catch-all.
+  await page.route("**/api/saas/funnels**", route =>
+    route.fulfill({ json: FIXTURE_FUNNELS }));
+}
+
+/** Funnels list + optional analytics/variants for depth E2E. Register after mockSaasApis. */
+export async function mockSaasFunnelsDepth(
+  page: Page,
+  analytics: Record<string, unknown> = {
+    analytics: {
+      funnelId: "f-e2e-1",
+      totalVisitors: 120,
+      totalConversions: 30,
+      overallCvr: 25.0,
+      steps: [
+        { id: "s-e2e-1", name: "Landing Page", type: "landing", stepOrder: 0, visitors: 120, conversions: 60, cvr: 50.0, dropOff: 0, variants: [] },
+        { id: "s-e2e-2", name: "Formulario", type: "form", stepOrder: 1, visitors: 60, conversions: 30, cvr: 50.0, dropOff: 50, variants: [] },
+      ],
+    },
+  },
+): Promise<void> {
+  await page.route((url) => url.pathname.includes("/api/saas/funnels"), route => {
+    const reqUrl = route.request().url();
+    if (reqUrl.includes("resource=analytics")) {
+      return route.fulfill({ json: analytics });
+    }
+    if (reqUrl.includes("resource=variants")) {
+      return route.fulfill({ json: { variants: [] } });
+    }
+    return route.fulfill({ json: FIXTURE_FUNNELS });
+  });
 }
