@@ -115,7 +115,7 @@ async function main() {
   }
 
   await page("home pulse", "/dashboard", token, ws, ["Pulso del workspace", "Inversión ads"]);
-  await page("crm demo", "/crm", token, ws, ["Datos demo", "Deals recientes"]);
+  await page("crm demo", "/crm/clients", token, ws, ["Datos demo", "Deals recientes"]);
   await page("publicidad", "/publicidad", token, ws, ["Inversión total", "Google Ads"]);
   await page("social", "/social", token, ws, ["Alcance total", "Sentimiento"]);
   await page("funnels", "/funnels", token, ws, ["Conversión por paso", "Embudos"]);

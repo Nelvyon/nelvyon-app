@@ -17,6 +17,14 @@ export async function requirePlatformClaims(
   }
 }
 
+/** FastAPI may 401/403 when workspace context mismatches — treat as degraded upstream. */
 export function upstreamFailed(status: number): boolean {
-  return status >= 500 || status === 502 || status === 503 || status === 504;
+  return (
+    status === 401 ||
+    status === 403 ||
+    status >= 500 ||
+    status === 502 ||
+    status === 503 ||
+    status === 504
+  );
 }

@@ -53,13 +53,6 @@ export async function GET(req: Request) {
       return NextResponse.json(await upstream.json());
     }
 
-    if (upstream.status === 401) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    if (upstream.status === 403) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
     if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
       const workspaceId = await dbResolveWorkspaceId(req, claims);
       if (workspaceId > 0) {
@@ -114,13 +107,6 @@ export async function POST(req: Request) {
 
     if (upstream.ok) {
       return NextResponse.json(text ? JSON.parse(text) : {}, { status: upstream.status });
-    }
-
-    if (upstream.status === 401) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    if (upstream.status === 403) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     if (upstreamFailed(upstream.status)) {

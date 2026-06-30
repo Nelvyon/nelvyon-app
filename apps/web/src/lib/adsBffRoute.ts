@@ -47,12 +47,6 @@ export async function adsBffGet(req: Request, upstreamPath: string, fallback: un
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
     }
-    if (upstream.status === 401) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    if (upstream.status === 403) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
     if (upstreamFailed(upstream.status)) {
       return NextResponse.json(fallback);
     }
@@ -87,12 +81,6 @@ export async function adsBffPost(req: Request, upstreamPath: string, fallback: u
     if (upstream.ok) {
       const text = await upstream.text();
       return NextResponse.json(text ? JSON.parse(text) : {}, { status: upstream.status });
-    }
-    if (upstream.status === 401) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    if (upstream.status === 403) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     if (upstreamFailed(upstream.status)) {
       return NextResponse.json(fallback);

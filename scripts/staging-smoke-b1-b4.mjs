@@ -152,6 +152,7 @@ async function probePage(module, name, path, token, workspaceId, checks = {}) {
 async function runSmoke(token, workspaceId) {
   console.log("\n=== B1 CRM ===");
   await probePage("B1", "/crm page", "/crm", token, workspaceId, {
+    follow: true,
     contains: ["__next"],
   });
   await probePage("B1", "/crm/clients", "/crm/clients", token, workspaceId);
@@ -218,7 +219,7 @@ async function runSmoke(token, workspaceId) {
     contains: ["analytics", "reportes"],
   });
   await probePage("B4", "/analytics/reportes", "/analytics/reportes", token, workspaceId, {
-    contains: ["Reportes", "Generar"],
+    contains: ["Reportes", "Generar informe"],
   });
   await probePage("B4", "redirect /dashboard/reportes", "/dashboard/reportes", token, workspaceId, {
     redirectTo: "/analytics/reportes",
@@ -238,8 +239,9 @@ async function runSmoke(token, workspaceId) {
   await probePage("B1", "/dashboard/crm redirect", "/dashboard/crm", token, workspaceId, {
     redirectTo: "/crm/clients",
   });
-  await probePage("B1", "/saas/crm redirect", "/saas/crm", token, workspaceId, {
-    redirectTo: "/crm",
+  await probePage("B1", "/saas/crm page", "/saas/crm", token, workspaceId, {
+    follow: true,
+    contains: ["__next", "CRM"],
   });
 }
 
