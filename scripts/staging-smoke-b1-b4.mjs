@@ -219,7 +219,7 @@ async function runSmoke(token, workspaceId) {
     contains: ["analytics", "reportes"],
   });
   await probePage("B4", "/analytics/reportes", "/analytics/reportes", token, workspaceId, {
-    contains: ["Reportes", "Generar informe"],
+    contains: ["Reportes del workspace", "Informes visuales"],
   });
   await probePage("B4", "redirect /dashboard/reportes", "/dashboard/reportes", token, workspaceId, {
     redirectTo: "/analytics/reportes",
