@@ -32,7 +32,7 @@ test.describe("S55 — /saas/voice page", () => {
   test("history shows past transcript", async ({ page }) => {
     await page.goto("/saas/voice", { waitUntil: "domcontentloaded" });
     await page.waitForResponse("**/api/saas/voice**", { timeout: 15_000 });
-    await expect(page.getByText("«ir a crm»")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("«ir a crm»", { exact: true })).toBeVisible({ timeout: 15_000 });
   });
 
   test("nav sidebar shows Voz item", async ({ page }) => {

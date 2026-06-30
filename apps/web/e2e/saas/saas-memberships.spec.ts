@@ -87,7 +87,7 @@ test.describe("SaaS Memberships — página autenticada", () => {
     await page.waitForResponse("**/api/saas/memberships**", { timeout: 15_000 });
     await expect(page.getByRole("button", { name: "Planes" })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole("button", { name: "Miembros" })).toBeVisible();
-    await expect(page.locator("button").first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Afiliados" })).toBeVisible();
   });
 
   test("3 tabs visibles (Planes / Miembros / Afiliados)", async ({ page }) => {

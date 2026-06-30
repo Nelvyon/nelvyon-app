@@ -52,8 +52,8 @@ test.describe("S51 — /saas/benchmark page", () => {
 
   test("comparison table lists metric labels", async ({ page }) => {
     await gotoBenchmark(page);
-    await expect(page.getByText("Tasa de apertura email")).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText("ROAS publicidad")).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Tasa de apertura email" })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("cell", { name: "ROAS publicidad" })).toBeVisible();
   });
 
   test("data sources footer visible", async ({ page }) => {
@@ -63,8 +63,12 @@ test.describe("S51 — /saas/benchmark page", () => {
 
   test("Actualizar triggers refresh", async ({ page }) => {
     await gotoBenchmark(page);
+    const refreshResponse = page.waitForResponse(
+      res => res.url().includes("/api/saas/benchmark/refresh") && res.request().method() === "POST",
+      { timeout: 15_000 },
+    );
     await page.getByRole("button", { name: /Actualizar/i }).click();
-    await page.waitForResponse("**/api/saas/benchmark/refresh**", { timeout: 15_000 });
+    await refreshResponse;
     await expect(page.getByText(/Benchmark actualizado|Puntuación global/)).toBeVisible({ timeout: 10_000 });
   });
 });

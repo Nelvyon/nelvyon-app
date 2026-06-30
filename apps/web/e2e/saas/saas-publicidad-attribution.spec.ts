@@ -67,8 +67,7 @@ test.describe("SaaS Publicidad — página autenticada", () => {
 
   test("tiene elemento interactivo (tab o botón)", async ({ page }) => {
     await gotoPublicidadReady(page);
-    const buttons = page.locator("button, [role='tab']");
-    await expect(buttons.first()).toBeVisible();
+    await expect(page.getByRole("button", { name: /Métricas y campañas/i })).toBeVisible();
   });
 });
 
@@ -83,7 +82,7 @@ test.describe("SaaS Publicidad — atribución multi-touch", () => {
   test("página carga datos sin 500 tras navegar desde pipeline", async ({ page }) => {
     await page.goto("/saas/pipeline", { waitUntil: "domcontentloaded" });
     await page.goto("/saas/publicidad", { waitUntil: "domcontentloaded" });
-    await expect(page.getByText("Publicidad Digital")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: "Publicidad Digital" })).toBeVisible({ timeout: 15_000 });
     expect(page.url()).not.toContain("500");
   });
 
@@ -94,11 +93,10 @@ test.describe("SaaS Publicidad — atribución multi-touch", () => {
 
   test("tab atribución carga sin crash", async ({ page }) => {
     await gotoPublicidadReady(page);
+    const attributionResponse = page.waitForResponse("**/api/saas/ads/attribution**", { timeout: 15_000 });
     await page.getByRole("button", { name: /Atribución multi-touch/i }).click();
-    await page.waitForResponse("**/api/saas/ads/attribution**", { timeout: 15_000 });
-    await expect(
-      page.getByText(/Sin campañas vinculadas/i).or(page.getByLabel(/Modelo/i)),
-    ).toBeVisible({ timeout: 10_000 });
+    await attributionResponse;
+    await expect(page.getByText("Sin campañas vinculadas")).toBeVisible({ timeout: 10_000 });
     expect(page.url()).not.toContain("500");
   });
 });
