@@ -2,8 +2,8 @@
 
 > Actualizado: 2026-06-29  
 > Prod: https://nelvyon.com  
-> Origin HEAD desplegado: `00ea93e9`  
-> Local pendiente push: `f2e9f987` (BFF fallback 401/403) + smoke B4 SSR
+> Origin HEAD desplegado: `409ab4ac`  
+> Local: sync con origin/main
 
 ---
 
@@ -20,35 +20,21 @@
 | p1-partners | ✅ PASS | 1 WARN billing BFF 404 |
 | a1-packs | ✅ PASS | |
 | visual-polish | ✅ PASS | |
-| c1-ads | ❌ FAIL | google/meta/roas status → 401 upstream |
-| c2-social | ❌ FAIL | monitoring/scheduler → 401 |
-| c3-funnels | ❌ FAIL | API list → 401 |
-| c4-ecommerce | ❌ FAIL | API list → 401 |
-| c5-automations | ❌ FAIL | workflows/rules → 401 |
-| b1-b4 | ❌ FAIL | CRM/tickets API 401; reportes SSR (fix en local) |
-| Autonomous gate prod | ⚠️ | Requiere `--base-url https://nelvyon.com` + `CRON_SECRET` |
+| c1-ads | ✅ PASS | |
+| c2-social | ✅ PASS | |
+| c3-funnels | ✅ PASS | |
+| c4-ecommerce | ✅ PASS | |
+| c5-automations | ✅ PASS | |
+| b1-b4 | ✅ PASS | |
+| Autonomous gate prod | ✅ PASS | `--base-url https://nelvyon.com` |
 
-**Veredicto actual: NO LAUNCH_READY** — código listo en local; prod aún en `00ea93e9`.
+**Veredicto código + regresión: LAUNCH_READY (código)** — pendiente ops manual SES/Stripe/crons.
 
 ---
 
-## Desbloqueo inmediato (5 min)
+## Desbloqueo inmediato (hecho)
 
-```powershell
-git push origin main   # sube f2e9f987 + smoke B4
-# Esperar deploy Railway (~3 min)
-$env:STAGING_BASE_URL="https://nelvyon.com"
-node scripts/staging-smoke-c1-ads.mjs --skip-wait
-node scripts/staging-smoke-c2-social.mjs --skip-wait
-node scripts/staging-smoke-c3-funnels.mjs --skip-wait
-node scripts/staging-smoke-c4-ecommerce.mjs --skip-wait
-node scripts/staging-smoke-c5-automations.mjs --skip-wait
-node scripts/staging-smoke-b1-b4.mjs --skip-wait
-$env:BASE_URL="https://nelvyon.com"
-node scripts/run-os-autonomous-gate.mjs --base-url https://nelvyon.com
-```
-
-Criterio verde: todos `ALL_CRITICAL_PASS` + `ALL_GATE_PASS`.
+Commits en main: `f2e9f987` → `24f3e38e` → `409ab4ac`. Regresión prod verde tras deploy Railway.
 
 ---
 
