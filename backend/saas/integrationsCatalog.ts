@@ -47,7 +47,7 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "snapchat", slug: "snapchat", displayName: "Snapchat Ads", icon: "👻",
     category: "ads", connectionType: "oauth",
     envKeys: ["SNAPCHAT_CLIENT_ID", "SNAPCHAT_CLIENT_SECRET"],
-    relatedRoute: "/saas/publicidad", status: "coming_soon",
+    relatedRoute: "/saas/publicidad", status: "live",
   },
   {
     id: "google_analytics", slug: "google_analytics", displayName: "Google Analytics 4", icon: "📈",
@@ -67,25 +67,25 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "salesforce", slug: "salesforce", displayName: "Salesforce", icon: "☁️",
     category: "crm", connectionType: "oauth",
     envKeys: ["SALESFORCE_CLIENT_ID", "SALESFORCE_CLIENT_SECRET"],
-    status: "coming_soon",
+    status: "live",
   },
   {
     id: "pipedrive", slug: "pipedrive", displayName: "Pipedrive", icon: "🔵",
     category: "crm", connectionType: "oauth",
     envKeys: ["PIPEDRIVE_CLIENT_ID", "PIPEDRIVE_CLIENT_SECRET"],
-    status: "coming_soon",
+    status: "live",
   },
   {
     id: "zoho", slug: "zoho", displayName: "Zoho CRM", icon: "🟢",
     category: "crm", connectionType: "oauth",
     envKeys: ["ZOHO_CLIENT_ID", "ZOHO_CLIENT_SECRET"],
-    status: "coming_soon",
+    status: "live",
   },
   {
     id: "intercom", slug: "intercom", displayName: "Intercom", icon: "🔷",
     category: "crm", connectionType: "oauth",
     envKeys: ["INTERCOM_CLIENT_ID", "INTERCOM_CLIENT_SECRET"],
-    status: "coming_soon",
+    status: "live",
   },
 
   // ── Email ─────────────────────────────────────────────────────────────────
@@ -125,7 +125,7 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "paypal", slug: "paypal", displayName: "PayPal", icon: "🅿️",
     category: "payments", connectionType: "oauth",
     envKeys: ["PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET"],
-    status: "coming_soon",
+    status: "live",
   },
   {
     id: "shopify", slug: "shopify", displayName: "Shopify", icon: "🛒",
@@ -137,19 +137,20 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "woocommerce", slug: "woocommerce", displayName: "WooCommerce", icon: "🏪",
     category: "commerce", connectionType: "manual",
     envKeys: ["WOOCOMMERCE_URL", "WOOCOMMERCE_CONSUMER_KEY", "WOOCOMMERCE_CONSUMER_SECRET"],
-    status: "coming_soon",
+    relatedRoute: "/saas/store",
+    status: "live",
   },
   {
     id: "quickbooks", slug: "quickbooks", displayName: "QuickBooks", icon: "📒",
     category: "payments", connectionType: "oauth",
     envKeys: ["QUICKBOOKS_CLIENT_ID", "QUICKBOOKS_CLIENT_SECRET"],
-    status: "coming_soon",
+    status: "live",
   },
   {
     id: "xero", slug: "xero", displayName: "Xero", icon: "💹",
     category: "payments", connectionType: "oauth",
     envKeys: ["XERO_CLIENT_ID", "XERO_CLIENT_SECRET"],
-    status: "coming_soon",
+    status: "live",
   },
 
   // ── Comms ─────────────────────────────────────────────────────────────────
@@ -175,7 +176,8 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "zapier", slug: "zapier", displayName: "Zapier", icon: "⚡",
     category: "productivity", connectionType: "manual",
     envKeys: [],
-    status: "coming_soon",
+    relatedRoute: "/saas/webhooks",
+    status: "live",
   },
 
   // ── Analytics & Tools ─────────────────────────────────────────────────────
@@ -209,13 +211,13 @@ export const INTEGRATIONS_CATALOG: IntegrationConnector[] = [
     id: "notion", slug: "notion", displayName: "Notion", icon: "📝",
     category: "productivity", connectionType: "oauth",
     envKeys: ["NOTION_CLIENT_ID", "NOTION_CLIENT_SECRET"],
-    status: "coming_soon",
+    status: "live",
   },
   {
     id: "calendly", slug: "calendly", displayName: "Calendly", icon: "📆",
     category: "productivity", connectionType: "oauth",
     envKeys: ["CALENDLY_CLIENT_ID", "CALENDLY_CLIENT_SECRET"],
-    relatedRoute: "/saas/calendario", status: "coming_soon",
+    relatedRoute: "/saas/calendario", status: "live",
   },
 ];
 

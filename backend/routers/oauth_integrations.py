@@ -82,6 +82,96 @@ OAUTH_PROVIDERS: Dict[str, Dict[str, Any]] = {
         "env_client_id": "TWITTER_CLIENT_ID",
         "env_client_secret": "TWITTER_CLIENT_SECRET",
     },
+    "snapchat": {
+        "display_name": "Snapchat Ads",
+        "icon": "👻",
+        "authorize_url": "https://accounts.snapchat.com/login/oauth2/authorize",
+        "token_url": "https://accounts.snapchat.com/login/oauth2/access_token",
+        "scopes": ["snapchat-marketing-api"],
+        "env_client_id": "SNAPCHAT_CLIENT_ID",
+        "env_client_secret": "SNAPCHAT_CLIENT_SECRET",
+    },
+    "salesforce": {
+        "display_name": "Salesforce",
+        "icon": "☁️",
+        "authorize_url": "https://login.salesforce.com/services/oauth2/authorize",
+        "token_url": "https://login.salesforce.com/services/oauth2/token",
+        "scopes": ["api", "refresh_token", "offline_access"],
+        "env_client_id": "SALESFORCE_CLIENT_ID",
+        "env_client_secret": "SALESFORCE_CLIENT_SECRET",
+    },
+    "pipedrive": {
+        "display_name": "Pipedrive",
+        "icon": "🔵",
+        "authorize_url": "https://oauth.pipedrive.com/oauth/authorize",
+        "token_url": "https://oauth.pipedrive.com/oauth/token",
+        "scopes": ["deals:read", "contacts:read"],
+        "env_client_id": "PIPEDRIVE_CLIENT_ID",
+        "env_client_secret": "PIPEDRIVE_CLIENT_SECRET",
+    },
+    "zoho": {
+        "display_name": "Zoho CRM",
+        "icon": "🟢",
+        "authorize_url": "https://accounts.zoho.com/oauth/v2/auth",
+        "token_url": "https://accounts.zoho.com/oauth/v2/token",
+        "scopes": ["ZohoCRM.modules.ALL"],
+        "env_client_id": "ZOHO_CLIENT_ID",
+        "env_client_secret": "ZOHO_CLIENT_SECRET",
+    },
+    "intercom": {
+        "display_name": "Intercom",
+        "icon": "🔷",
+        "authorize_url": "https://app.intercom.com/oauth",
+        "token_url": "https://api.intercom.io/auth/easy_install",
+        "scopes": [],
+        "env_client_id": "INTERCOM_CLIENT_ID",
+        "env_client_secret": "INTERCOM_CLIENT_SECRET",
+    },
+    "paypal": {
+        "display_name": "PayPal",
+        "icon": "🅿️",
+        "authorize_url": "https://www.paypal.com/signin/authorize",
+        "token_url": "https://api-m.paypal.com/v1/oauth2/token",
+        "scopes": ["openid", "profile", "email"],
+        "env_client_id": "PAYPAL_CLIENT_ID",
+        "env_client_secret": "PAYPAL_CLIENT_SECRET",
+    },
+    "quickbooks": {
+        "display_name": "QuickBooks",
+        "icon": "📒",
+        "authorize_url": "https://appcenter.intuit.com/connect/oauth2",
+        "token_url": "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer",
+        "scopes": ["com.intuit.quickbooks.accounting"],
+        "env_client_id": "QUICKBOOKS_CLIENT_ID",
+        "env_client_secret": "QUICKBOOKS_CLIENT_SECRET",
+    },
+    "xero": {
+        "display_name": "Xero",
+        "icon": "💹",
+        "authorize_url": "https://login.xero.com/identity/connect/authorize",
+        "token_url": "https://identity.xero.com/connect/token",
+        "scopes": ["openid", "profile", "email", "accounting.transactions"],
+        "env_client_id": "XERO_CLIENT_ID",
+        "env_client_secret": "XERO_CLIENT_SECRET",
+    },
+    "notion": {
+        "display_name": "Notion",
+        "icon": "📝",
+        "authorize_url": "https://api.notion.com/v1/oauth/authorize",
+        "token_url": "https://api.notion.com/v1/oauth/token",
+        "scopes": [],
+        "env_client_id": "NOTION_CLIENT_ID",
+        "env_client_secret": "NOTION_CLIENT_SECRET",
+    },
+    "calendly": {
+        "display_name": "Calendly",
+        "icon": "📆",
+        "authorize_url": "https://auth.calendly.com/oauth/authorize",
+        "token_url": "https://auth.calendly.com/oauth/token",
+        "scopes": ["default"],
+        "env_client_id": "CALENDLY_CLIENT_ID",
+        "env_client_secret": "CALENDLY_CLIENT_SECRET",
+    },
 }
 
 
@@ -123,6 +213,42 @@ class OAuthCallbackRequest(BaseModel):
 
 class OAuthDisconnectRequest(BaseModel):
     provider: str
+
+
+async def _exchange_oauth_code(
+    config: Dict[str, Any],
+    code: str,
+    redirect_uri: str,
+    client_id: str,
+    client_secret: str,
+) -> Dict[str, Any]:
+    """Exchange authorization code for tokens via provider token endpoint."""
+    import httpx
+
+    token_url = config["token_url"]
+    data: Dict[str, str] = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": redirect_uri,
+        "client_id": client_id,
+        "client_secret": client_secret,
+    }
+    headers = {"Accept": "application/json"}
+    if config.get("token_auth") == "basic":
+        import base64
+        creds = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+        headers["Authorization"] = f"Basic {creds}"
+        data.pop("client_secret", None)
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        resp = await client.post(token_url, data=data, headers=headers)
+        if resp.status_code >= 400:
+            logger.warning("OAuth token exchange failed for %s: %s", token_url, resp.text[:500])
+            raise HTTPException(status_code=502, detail="Token exchange failed with provider")
+        try:
+            return resp.json()
+        except ValueError as exc:
+            raise HTTPException(status_code=502, detail="Invalid token response from provider") from exc
 
 
 # ── oauth_tokens: ORM `models.oauth_tokens` + Alembic / Base.metadata.create_all (tests) ──
@@ -335,17 +461,27 @@ async def oauth_callback(
     if stored_state and stored_state != data.state:
         raise HTTPException(status_code=400, detail="Invalid state parameter")
 
-    # In production: exchange code for token via HTTP call to token_url
-    # For now: simulate successful exchange if client_id/secret are set
-    if client_id and client_secret:
-        # Real token exchange would happen here with httpx
-        # For demo, we store a placeholder token
-        access_token = f"demo_{data.provider}_{secrets.token_urlsafe(16)}"
-        refresh_token = f"refresh_{data.provider}_{secrets.token_urlsafe(16)}"
-    else:
-        # Demo mode: simulate connection
-        access_token = f"demo_{data.provider}_{secrets.token_urlsafe(16)}"
-        refresh_token = f"demo_refresh_{secrets.token_urlsafe(16)}"
+    if not client_id or not client_secret:
+        raise HTTPException(
+            status_code=400,
+            detail=f"OAuth not configured for {data.provider}. Set {config['env_client_id']} and retry.",
+        )
+    if not redirect_uri:
+        raise HTTPException(status_code=400, detail="Missing redirect_uri in OAuth state")
+
+    token_payload = await _exchange_oauth_code(
+        config, data.code, redirect_uri, client_id, client_secret
+    )
+    access_token = str(token_payload.get("access_token") or "")
+    if not access_token:
+        raise HTTPException(status_code=502, detail="Provider returned no access_token")
+    refresh_token = token_payload.get("refresh_token")
+    expires_at = now
+    expires_in = token_payload.get("expires_in")
+    if isinstance(expires_in, (int, float)) and expires_in > 0:
+        from datetime import timedelta
+        expires_at = now + timedelta(seconds=int(expires_in))
+    account_name = token_payload.get("account_name") or f"NELVYON ({data.provider})"
 
     # Store token
     await db.execute(
@@ -368,9 +504,9 @@ async def oauth_callback(
             "provider": data.provider,
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "expires_at": now.replace(hour=now.hour),  # Simplified
+            "expires_at": expires_at,
             "scopes": json.dumps(config["scopes"]),
-            "account_name": f"NELVYON ({data.provider})",
+            "account_name": account_name,
             "now": now,
         },
     )

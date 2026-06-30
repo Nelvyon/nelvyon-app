@@ -211,10 +211,13 @@ describe("getAuthorizeUrl", () => {
       .toThrow(expect.objectContaining({ code: "NOT_OAUTH" }));
   });
 
-  it("throws COMING_SOON for coming_soon connector", () => {
+  it("returns generic OAuth URL for zoho when env configured", () => {
+    process.env.ZOHO_CLIENT_ID = "z_id";
+    process.env.ZOHO_CLIENT_SECRET = "z_secret";
     const svc = makeSvc();
-    expect(() => svc.getAuthorizeUrl("t1", "zoho", "https://app.nelvyon.com"))
-      .toThrow(expect.objectContaining({ code: "COMING_SOON" }));
+    const url = svc.getAuthorizeUrl("tenant_abc", "zoho", "https://app.nelvyon.com");
+    expect(url).toContain("/api/saas/oauth/connect");
+    expect(url).toContain("provider=zoho");
   });
 
   it("throws NOT_FOUND for unknown slug", () => {

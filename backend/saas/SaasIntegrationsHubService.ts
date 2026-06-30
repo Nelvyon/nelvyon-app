@@ -81,8 +81,10 @@ const WEB_OAUTH_ROUTES: Record<string, string> = {
   tiktok: "/api/oauth/tiktok",
 };
 
-/** OAuth via FastAPI /api/v1/oauth/authorize/{provider} (hubspot, slack, …). */
-const PYTHON_OAUTH_SLUGS = new Set(["hubspot", "slack"]);
+/** OAuth via FastAPI /api/v1/oauth/authorize/{provider} (all non-Next OAuth connectors). */
+function pythonOAuthConnectUrl(baseUrl: string, slug: string, tenantId: string): string {
+  return `${baseUrl}/api/saas/oauth/connect?provider=${encodeURIComponent(slug)}&tenant_id=${encodeURIComponent(tenantId)}`;
+}
 
 // ── Service ───────────────────────────────────────────────────────────────────
 
@@ -280,23 +282,16 @@ export class SaasIntegrationsHubService {
         "ENV_REQUIRED"
       );
     }
-    // Ads platforms: prefer real OAuth routes over manual token paste UI
+    // Ads platforms: prefer Next.js OAuth routes; snapchat etc. use FastAPI connect
     if (ADS_PLATFORMS.has(slug)) {
       const webRoute = WEB_OAUTH_ROUTES[slug];
       if (webRoute) return `${baseUrl}${webRoute}`;
-      if (connector.relatedRoute) return `${baseUrl}${connector.relatedRoute}`;
     }
     const webRoute = WEB_OAUTH_ROUTES[slug];
     if (webRoute) {
       return `${baseUrl}${webRoute}`;
     }
-    if (PYTHON_OAUTH_SLUGS.has(slug)) {
-      return `${baseUrl}/api/saas/oauth/connect?provider=${encodeURIComponent(slug)}&tenant_id=${encodeURIComponent(tenantId)}`;
-    }
-    throw new SaasIntegrationsHubError(
-      `${connector.displayName} OAuth is not available yet`,
-      "COMING_SOON"
-    );
+    return pythonOAuthConnectUrl(baseUrl, slug, tenantId);
   }
 
   /** UPSERT a connection record (called from OAuth callback or manual setup) */

@@ -92,7 +92,7 @@ export class SaasDashboardService {
       `SELECT st.id, st.user_id, st.workspace_id, st.company_name, st.industry, st.plan, st.website, st.phone, st.employees, st.goals,
               st.onboarding_completed, st.onboarding_step, st.created_at, st.updated_at, nu.tenant_id AS auth_tenant_id
        FROM saas_tenants st
-       JOIN nelvyon_users nu ON nu.user_id = st.user_id
+       LEFT JOIN nelvyon_users nu ON nu.user_id = st.user_id
        WHERE st.id = $1
        LIMIT 1`,
       [tenantId],
@@ -101,20 +101,34 @@ export class SaasDashboardService {
     if (!row) {
       throw new SaasDashboardError("Tenant not found", "NOT_FOUND");
     }
-    return { tenant: saasTenantFromRow(row), authTenantId: row.auth_tenant_id };
+    const authTenantId = row.auth_tenant_id?.trim() ? row.auth_tenant_id : tenantId;
+    return { tenant: saasTenantFromRow(row), authTenantId };
+  }
+
+  private async safeCount(sql: string, params: unknown[]): Promise<number> {
+    try {
+      const rows = await this.db.query<CountRow>(sql, params);
+      return toNum(rows[0]?.n);
+    } catch {
+      return 0;
+    }
   }
 
   async getRecentActivity(tenantId: string, limit = 10): Promise<ActivityLog[]> {
     const safeLimit = Number.isInteger(limit) ? Math.min(50, Math.max(1, limit)) : 10;
-    const rows = await this.db.query<ActivityRow>(
-      `SELECT id, tenant_id, event_type, description, metadata, created_at
-       FROM saas_activity_log
-       WHERE tenant_id = $1
-       ORDER BY created_at DESC
-       LIMIT $2`,
-      [tenantId, safeLimit],
-    );
-    return rows.map(rowToActivity);
+    try {
+      const rows = await this.db.query<ActivityRow>(
+        `SELECT id, tenant_id, event_type, description, metadata, created_at
+         FROM saas_activity_log
+         WHERE tenant_id = $1
+         ORDER BY created_at DESC
+         LIMIT $2`,
+        [tenantId, safeLimit],
+      );
+      return rows.map(rowToActivity);
+    } catch {
+      return [];
+    }
   }
 
   async logActivity(tenantId: string, eventType: string, description: string, metadata?: Record<string, unknown>): Promise<void> {
@@ -133,24 +147,43 @@ export class SaasDashboardService {
   async getDashboardSummary(tenantId: string): Promise<DashboardSummary> {
     const { tenant, authTenantId } = await this.fetchTenantWithAuthTenant(tenantId);
 
-    const [activeRows, completedRows, spendRows, recentActivity] = await Promise.all([
-      this.db.query<CountRow>(`SELECT COUNT(*)::text AS n FROM os_jobs WHERE client_id = $1 AND status = 'running'`, [authTenantId]),
-      this.db.query<CountRow>(`SELECT COUNT(*)::text AS n FROM os_jobs WHERE client_id = $1 AND status = 'completed'`, [authTenantId]),
-      this.db.query<SpendRow>(
+    const [activeJobs, completedJobs, totalSpend, recentActivity] = await Promise.all([
+      this.safeCount(
         `SELECT CASE
-                  WHEN to_regclass('public.billing_payments') IS NULL THEN 0
-                  ELSE COALESCE((SELECT SUM(amount_cents) / 100.0 FROM billing_payments WHERE tenant_id = $1), 0)
-                END AS total`,
+           WHEN to_regclass('public.os_jobs') IS NULL THEN 0::text
+           ELSE (SELECT COUNT(*)::text FROM os_jobs WHERE client_id = $1 AND status = 'running')
+         END AS n`,
         [authTenantId],
       ),
+      this.safeCount(
+        `SELECT CASE
+           WHEN to_regclass('public.os_jobs') IS NULL THEN 0::text
+           ELSE (SELECT COUNT(*)::text FROM os_jobs WHERE client_id = $1 AND status = 'completed')
+         END AS n`,
+        [authTenantId],
+      ),
+      (async () => {
+        try {
+          const spendRows = await this.db.query<SpendRow>(
+            `SELECT CASE
+               WHEN to_regclass('public.billing_payments') IS NULL THEN 0
+               ELSE COALESCE((SELECT SUM(amount_cents) / 100.0 FROM billing_payments WHERE tenant_id = $1), 0)
+             END AS total`,
+            [authTenantId],
+          );
+          return toNum(spendRows[0]?.total);
+        } catch {
+          return 0;
+        }
+      })(),
       this.getRecentActivity(tenantId, 10),
     ]);
 
     return {
       tenant,
-      activeJobs: toNum(activeRows[0]?.n),
-      completedJobs: toNum(completedRows[0]?.n),
-      totalSpend: toNum(spendRows[0]?.total),
+      activeJobs,
+      completedJobs,
+      totalSpend,
       recentActivity,
     };
   }

@@ -17,10 +17,14 @@ async function getModuleStats(tenantId: string) {
 
   const queries = await Promise.allSettled([
     db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_crm_contacts WHERE tenant_id = $1`, [tenantId]),
-    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_campaigns WHERE tenant_id = $1`, [tenantId]),
+    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_campanias WHERE tenant_id = $1`, [tenantId]),
     db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_workflows WHERE tenant_id = $1 AND status = 'active'`, [tenantId]),
     db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_forms WHERE tenant_id = $1`, [tenantId]),
-    db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_appointments WHERE tenant_id = $1 AND status NOT IN ('cancelled','completed') AND start_at > NOW()`, [tenantId]),
+    db.query<{ n: string }>(
+      `SELECT COUNT(*) AS n FROM calendar_events
+       WHERE tenant_id = $1 AND type = 'appointment' AND completed = FALSE AND event_date >= CURRENT_DATE`,
+      [tenantId],
+    ),
   ]);
 
   function count(r: PromiseSettledResult<{ n: string }[]>) {

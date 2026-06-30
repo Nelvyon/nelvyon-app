@@ -66,10 +66,16 @@ function makeMemoryDb() {
     const p = params ?? [];
     const s = sql.replace(/\s+/g, " ").trim();
 
-    if (s.includes("FROM saas_tenants st JOIN nelvyon_users")) {
+    if (s.includes("FROM saas_tenants st LEFT JOIN nelvyon_users")) {
       const tenantId = String(p[0]);
       const row = tenants.get(tenantId);
       return (row ? [row] : []) as T[];
+    }
+    if (s.includes("to_regclass('public.os_jobs')")) {
+      const clientId = String(p[0]);
+      const status = s.includes("status = 'running'") ? "running" : "completed";
+      const n = jobs.filter((j) => j.client_id === clientId && j.status === status).length;
+      return [{ n: String(n) }] as T[];
     }
     if (s.startsWith("SELECT COUNT(*)::text AS n FROM os_jobs")) {
       const clientId = String(p[0]);
