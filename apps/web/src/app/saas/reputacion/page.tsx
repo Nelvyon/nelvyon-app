@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
+import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -174,11 +175,12 @@ export default function SaasReputacionPage() {
         )}
 
         {/* GBP config banner when not configured */}
-        {!gbpConfig.placesConfigured && (
-          <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/10 px-4 py-3">
-            <span className="text-xl">🔗</span>
-            <p className="text-sm text-muted-foreground">Conecta Google Business Profile: añade <code className="text-primary">GOOGLE_PLACES_API_KEY</code> + <code className="text-primary">GBP_PLACE_ID</code> en Railway para sincronizar reseñas.</p>
-          </div>
+        {!loading && !gbpConfig.placesConfigured && (
+          <SaasDegradedBanner>
+            Conecta Google Business Profile: añade credenciales OAuth y Place IDs en Integraciones
+            (<code className="text-amber-200">GOOGLE_PLACES_API_KEY</code>, <code className="text-amber-200">GBP_PLACE_ID</code>)
+            para sincronizar reseñas en vivo.
+          </SaasDegradedBanner>
         )}
 
         {syncMsg && (

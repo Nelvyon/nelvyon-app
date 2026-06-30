@@ -13,7 +13,8 @@
 | Regresión OS c1–c6, b1-b4, P0, visual, autonomous | ✅ VERDE |
 | 59/59 SaaS API | ✅ |
 | Smoke 59 módulos | `node scripts/staging-smoke-saas-all-modules.mjs --skip-wait` |
-| **CÓDIGO ÉLITE** | ✅ tras smoke 59 ALL_PASS |
+| Smoke 25 OS previews + platform | `node scripts/staging-smoke-os-all-services.mjs --skip-wait` |
+| **CÓDIGO ÉLITE (Claude Code)** | ✅ cerrado — BFF degradado, banners UI, Sentry edge, 25 OS previews |
 | **OPS clientes reales** | ❌ manual abajo |
 
 ---

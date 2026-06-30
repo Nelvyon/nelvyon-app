@@ -65,6 +65,27 @@ async function login() {
   return data.token;
 }
 
+/** Warm SaaS tenant context so requireSaasContext resolves on API probes. */
+async function ensureSaasTenant(token, workspaceId) {
+  const h = headers(token, workspaceId);
+  const dash = await fetch(`${BASE}/api/saas/dashboard`, { headers: h, cache: "no-store" });
+  if (dash.ok) {
+    pass("auth", "saas-tenant", "dashboard OK");
+    return;
+  }
+  const onb = await fetch(`${BASE}/api/saas/onboarding/complete`, {
+    method: "POST",
+    headers: { ...h, "Content-Type": "application/json" },
+    body: JSON.stringify({ business_name: "QA Smoke Tenant" }),
+    cache: "no-store",
+  });
+  if (onb.ok || onb.status === 409) {
+    pass("auth", "saas-tenant", onb.ok ? "onboarding completed" : "already onboarded");
+    return;
+  }
+  warn("auth", "saas-tenant", `dashboard ${dash.status}, onboarding ${onb.status}`);
+}
+
 function headers(token, workspaceId) {
   return {
     Authorization: `Bearer ${token}`,
@@ -144,6 +165,7 @@ async function main() {
   await waitForDeploy();
   const token = await login();
   const workspaceId = await getWorkspaceIdWithFallback(BASE, token, pass);
+  await ensureSaasTenant(token, workspaceId);
 
   for (const mod of modules) {
     await probeModule(mod, token, workspaceId);

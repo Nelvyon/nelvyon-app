@@ -1,8 +1,8 @@
 # INVENTARIO_FRENTES — Nelvyon
 
 > Generado desde código: `saasNav.ts`, `osShellNav.ts`, `os-service-template-catalog.ts`  
-> HEAD: `71fd2388` | Prod: https://nelvyon.com  
-> Regresión prod: **VERDE** (sesión jun-2026 — no re-ejecutar salvo nuevo deploy)
+> HEAD: post `3f54dc39` + batch 2 | Prod: https://nelvyon.com  
+> Regresión prod: **VERDE** — `staging-smoke-saas-all-modules.mjs` (59) + `staging-smoke-os-all-services.mjs` (25 previews + 11 platform)
 
 ---
 
@@ -15,9 +15,9 @@
 | OS servicios premium | 29 |
 | OS platform (shell nav) | 10 |
 | **Código completo (UI + API)** | **98/98** SaaS tienen `/api/saas/*`; OS premium tienen preview |
-| **Smoke prod verificado** | **~22** global + script `staging-smoke-saas-all-modules.mjs` (59 páginas) |
-| **Bloqueado solo por ops** | **~12** módulos (SES, Stripe, Twilio, OAuth, crons) |
-| **Código pendiente real** | **≤6** (13 conectores `coming_soon`, afiliados dup, HubSpot/Slack Python demo) |
+| **Smoke prod verificado** | **59 SaaS** + **25 OS previews** + **11 platform** (scripts jun-2026) |
+| **Bloqueado solo por ops** | **~28** frentes (SES, Stripe, Twilio, OAuth, crons, redes, Envato) |
+| **Código pendiente real** | **0** — Claude Code cerrado; resto es ops manual |
 
 ### Veredicto
 
@@ -25,7 +25,7 @@
 |---|---|
 | **CÓDIGO 100%** | ✅ SÍ — 98 frentes con página + backend |
 | **QA global prod** | ✅ SÍ — regresión c1–c6, b1-b4, P0, autonomous gate |
-| **QA por módulo (59 SaaS 1×1)** | ❌ NO — smoke P2 pendiente |
+| **QA por módulo (59 SaaS 1×1)** | ✅ SÍ — `staging-smoke-saas-all-modules.mjs` |
 | **OPS clientes reales** | ❌ NO — SES + Stripe + crons + OAuth (manual Railway/AWS) |
 | **LAUNCH_READY clientes** | ⏳ Tras ops manual |
 
@@ -69,9 +69,10 @@ Leyenda ops: — | SES | Stripe | Twilio | OAuth | Cron
 | 29 | web-builder | `/saas/web-builder` | ✅ web-builder | P2 | — |
 | 30 | lms | `/saas/lms` | ✅ lms | P2 | — |
 | 31 | store | `/saas/store` | ✅ store | P2 | — |
-| 32 | affiliates | `/saas/affiliates` | ✅ affiliates | P2 | `/saas/afiliados` = Próximamente |
+| 32 | affiliates | `/saas/affiliates` | ✅ affiliates | P2 | `/saas/afiliados` → redirect |
 | 33 | loyalty | `/saas/loyalty` | ✅ loyalty | P2 | — |
-| 34 | pack-store | `/saas/packs` | ✅ packs | ✅ P0/a1 | — |
+| 34 | memberships | `/saas/memberships` | ✅ memberships | P2 | — |
+| 35 | pack-store | `/saas/packs` | ✅ packs | ✅ P0/a1 | — |
 | 35 | data-playbooks | `/saas/playbooks` | ✅ playbooks | P2 | — |
 | 36 | brief-to-launch | `/saas/brief-to-launch` | ✅ brief-to-launch | P2 | — |
 | 37 | compliance | `/saas/compliance` | ✅ compliance | P2 | — |
@@ -82,8 +83,8 @@ Leyenda ops: — | SES | Stripe | Twilio | OAuth | Cron
 | 42 | copywriter | `/saas/copywriter` | ✅ ai-copy | P2 | — |
 | 43 | entregables | `/saas/entregables` | ✅ entregables | P2 | — |
 | 44 | reportes | `/saas/reportes` | ✅ reportes | P2 | — |
-| 45 | integraciones | `/saas/integraciones` | ✅ integrations | ✅ | 13 conectores coming_soon |
-| 46 | herramientas | `/saas/herramientas` | ✅ integrations | ✅ | Make/n8n/GTM próximamente |
+| 45 | integraciones | `/saas/integraciones` | ✅ integrations | ✅ | 13 conectores **live** (OAuth manual) |
+| 46 | herramientas | `/saas/herramientas` | ✅ integrations | ✅ | Make/n8n/GTM manual en webhooks |
 | 47 | voice | `/saas/voice` | ✅ voice | P2 | ElevenLabs |
 | 48 | pwa | `/saas/pwa` | ✅ pwa | P2 | — |
 | 49 | auditoria | `/saas/auditoria` | ✅ audit | P2 | — |
@@ -107,9 +108,9 @@ Leyenda ops: — | SES | Stripe | Twilio | OAuth | Cron
 | # | Servicio | Preview UI | Kickoff | Smoke | Pendiente |
 |---|---|---|---|---|---|
 | 1 | Web Premium | ✅ `/os/web-premium` | intake | P2 | Envato prod |
-| 2 | Landing Premium | 🟡 (web) | intake | P2 | carpeta propia |
+| 2 | Landing Premium | ✅ `/os/landing-premium/preview` | intake | P2 | Envato prod |
 | 3 | eCommerce Premium | ✅ | intake | ✅ c4 | — |
-| 4 | Funnel Premium | 🟡 catálogo | intake | P2 | carpeta propia |
+| 4 | Funnel Premium | ✅ `/os/funnel-premium/preview` | intake | P2 | — |
 | 5 | Mantenimiento Web | ✅ | intake | P2 | — |
 | 6 | Email Marketing | ✅ | intake | P2 | SES ops |
 | 7 | Social Media | ✅ | intake | ✅ c2 | — |

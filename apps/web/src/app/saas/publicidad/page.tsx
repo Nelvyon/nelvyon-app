@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
+import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 type AdsPlatform = "meta" | "google" | "linkedin" | "tiktok" | "snapchat";
@@ -659,6 +660,13 @@ export default function SaasPublicidadPage() {
           />
           <NelvyonDsButton onClick={() => setShowConnect(true)}>+ Conectar plataforma</NelvyonDsButton>
         </div>
+
+        {!loading && connected.length === 0 && (
+          <SaasDegradedBanner reason="oauth_not_configured">
+            Conecta Meta, Google, LinkedIn o TikTok Ads en Integraciones para métricas y campañas en vivo.
+            Sin OAuth configurado, las métricas y campañas no se sincronizan.
+          </SaasDegradedBanner>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-1 rounded-xl border border-border bg-card/50 p-1 w-fit">

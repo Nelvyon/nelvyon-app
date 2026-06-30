@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
+import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 interface Report {
@@ -126,9 +127,15 @@ export default function SaasReportesPage() {
   const maxVisits = Math.max(1, ...channels.map(c => c.visits), ...campaigns.map(c => c.visits));
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="dashboard" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="reportes" />}>
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader title="Reportes" subtitle="Informes ejecutivos y atribución multi-touch por canal y campaña" />
+
+        {!loading && !attrLoading && (attrSummary?.totalVisits ?? 0) === 0 && roasAlerts.length === 0 && (
+          <SaasDegradedBanner>
+            Atribución parcial — conecta publicidad (Meta/Google) y activa enlaces UTM para ver ROAS y canales en vivo.
+          </SaasDegradedBanner>
+        )}
 
         {error && <p className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</p>}
 

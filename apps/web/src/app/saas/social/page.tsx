@@ -9,6 +9,7 @@ import {
   NelvyonDsSectionHeader,
 } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
+import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { EmailEditor } from "@/features/email-editor/EmailEditor";
 import {
@@ -311,18 +312,10 @@ export default function SaasSocialPage() {
 
         {/* No-account warning */}
         {!loading && accounts.length === 0 && (
-          <NelvyonDsCard className="border-amber-500/30 bg-amber-500/5 p-4">
-            <div className="flex items-start gap-3">
-              <span className="text-xl">⚠️</span>
-              <div>
-                <p className="font-medium text-foreground">Sin cuentas de redes sociales conectadas</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Conecta tu cuenta de Meta o LinkedIn para poder programar y publicar posts.
-                  Ve a <strong>Configuración → Integraciones</strong> y pega tu Access Token.
-                </p>
-              </div>
-            </div>
-          </NelvyonDsCard>
+          <SaasDegradedBanner>
+            Sin cuentas de redes sociales conectadas. Ve a Configuración → Integraciones y conecta Meta o LinkedIn
+            para programar y publicar posts en vivo.
+          </SaasDegradedBanner>
         )}
 
         {/* Connected accounts */}

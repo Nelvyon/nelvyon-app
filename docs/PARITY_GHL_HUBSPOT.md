@@ -17,8 +17,8 @@
 | Funnels | ✅ | 🟡 | `/saas/funnels` | ✅ | — |
 | Landing / web builder | ✅ | ✅ CMS | `/saas/web-builder` | ✅ | — |
 | Calendario / citas | ✅ | ✅ | `/saas/calendar`, `/saas/citas` | 🟡 | GCal OAuth |
-| Social planner | ✅ | ✅ | `/saas/social` | 🟡 | APIs publish |
-| Ads manager | ✅ | ✅ Ads | `/saas/publicidad` | 🟡 | OAuth Meta/Google |
+| Social planner | ✅ | ✅ | `/saas/social` | 🟡 | OAuth + banner degradado |
+| Ads manager | ✅ | ✅ Ads | `/saas/publicidad` | 🟡 | OAuth + banner degradado |
 | SEO | 🟡 | 🟡 | `/saas/seo` | ✅ | — |
 | Reputación / reviews | ✅ | 🟡 | `/saas/reputacion` | ✅ | — |
 | Helpdesk / tickets | ✅ | ✅ Service | `/saas/helpdesk` | ✅ | — |
@@ -26,7 +26,7 @@
 | Tienda / products | ✅ | ❌ | `/saas/store` | ✅ | — |
 | Afiliados | ✅ | ❌ | `/saas/affiliates` | ✅ | redirect `/saas/afiliados` |
 | Loyalty | 🟡 | ❌ | `/saas/loyalty` | ✅ | — |
-| Memberships | ✅ | ❌ | `/saas/memberships` | 🟡 | página extra |
+| Memberships | ✅ | ❌ | `/saas/memberships` | ✅ | sidebar + API |
 | A/B testing | 🟡 | ✅ | `/saas/ab-testing` | ✅ | — |
 | Encuestas / NPS | 🟡 | ✅ | `/saas/encuestas` | ✅ | — |
 | QR codes | 🟡 | ❌ | `/saas/qr` | ✅ | — |
@@ -44,7 +44,7 @@
 | Chat IA | 🟡 | ✅ | `/saas/chat` | ✅ | — |
 | Copywriter IA | 🟡 | ✅ | `/saas/copywriter` | ✅ | — |
 | Reportes / analytics | ✅ | ✅ | `/saas/reportes` | ✅ | — |
-| Integraciones hub | ✅ | ✅ | `/saas/integraciones` | ✅ | 13 coming_soon |
+| Integraciones hub | ✅ | ✅ | `/saas/integraciones` | ✅ | 13 live; OAuth manual |
 | API keys | 🟡 | ✅ | `/saas/api-keys` | ✅ | — |
 | Webhooks | ✅ | ✅ | `/saas/webhooks` | ✅ | — |
 | White label | ✅ | ❌ | `/saas/white-label` | ✅ | — |
