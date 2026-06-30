@@ -50,7 +50,7 @@ test.describe("S54 — /saas/partner page", () => {
   test("ledger tab shows totals", async ({ page }) => {
     await page.goto("/saas/partner", { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "Ledger" }).click();
-    await expect(page.getByText("Bruto")).toBeVisible({ timeout: 8000 });
+    await expect(page.getByRole("columnheader", { name: "Bruto" })).toBeVisible({ timeout: 8000 });
   });
 
   test("referidos tab shows referral code", async ({ page }) => {
