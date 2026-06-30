@@ -69,7 +69,7 @@ test.describe("S51 — /saas/benchmark page", () => {
     );
     await page.getByRole("button", { name: /Actualizar/i }).click();
     await refreshResponse;
-    await expect(page.getByText(/Benchmark actualizado|Puntuación global/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("Benchmark actualizado", { exact: true })).toBeVisible({ timeout: 10_000 });
   });
 });
 

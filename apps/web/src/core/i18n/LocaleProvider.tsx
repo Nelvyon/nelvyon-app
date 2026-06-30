@@ -72,7 +72,7 @@ export function LocaleProvider({
 
   return (
     <LocaleContext.Provider value={value}>
-      <NextIntlClientProvider locale={locale} messages={messages}>
+      <NextIntlClientProvider locale={locale} messages={messages} timeZone={timezone}>
         {children}
       </NextIntlClientProvider>
     </LocaleContext.Provider>
