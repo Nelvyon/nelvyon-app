@@ -113,7 +113,23 @@ jobs:
         env:
           CI: "true"
           JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-for-playwright-saas-e2e' }}
-        run: pnpm exec playwright test --config playwright.saas.config.ts
+        run: |
+          pnpm start -p 3000 &
+          SERVER_PID=$!
+          for i in $(seq 1 90); do
+            if curl -sf http://localhost:3000/api/health > /dev/null; then
+              echo "Server ready after ${i} attempts"
+              break
+            fi
+            if [ "$i" -eq 90 ]; then
+              echo "Server failed to start"
+              kill $SERVER_PID 2>/dev/null || true
+              exit 1
+            fi
+            sleep 2
+          done
+          pnpm exec playwright test --config playwright.saas.config.ts
+          kill $SERVER_PID 2>/dev/null || true
 
       - name: Upload Playwright report on failure
         if: failure()

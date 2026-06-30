@@ -35,15 +35,17 @@ export default defineConfig({
     timeout: 15_000,
   },
 
-  webServer: {
-    command: process.env.CI ? "pnpm start -p 3000" : "pnpm dev",
-    url: "http://localhost:3000/api/health",
-    reuseExistingServer: !process.env.CI,
-    timeout: process.env.CI ? 120_000 : 300_000,
-    env: {
-      JWT_SECRET: TEST_JWT_SECRET,
-      NODE_ENV: "test",
-      DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://noop:noop@localhost:5432/noop",
-    },
-  },
+  webServer: process.env.CI
+    ? undefined
+    : {
+        command: "pnpm dev",
+        url: "http://localhost:3000/api/health",
+        reuseExistingServer: true,
+        timeout: 300_000,
+        env: {
+          JWT_SECRET: TEST_JWT_SECRET,
+          NODE_ENV: "test",
+          DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://noop:noop@localhost:5432/noop",
+        },
+      },
 });
