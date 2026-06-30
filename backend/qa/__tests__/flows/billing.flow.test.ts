@@ -43,6 +43,12 @@ vi.mock("../../../onboarding", () => ({
   completeStep: (...args: unknown[]) => completeStepMock(...args),
 }));
 
+const grantPackEntitlementsMock = vi.fn().mockResolvedValue(undefined);
+
+vi.mock("../../../saas/SaasPackStoreService", () => ({
+  grantPackEntitlementsForTenant: (...args: unknown[]) => grantPackEntitlementsMock(...args),
+}));
+
 vi.mock("stripe", () => ({
   default: vi.fn(() => ({
     webhooks: { constructEvent: (...args: unknown[]) => constructEventMock(...args) },
@@ -66,6 +72,7 @@ describe("flow: billing — suscripción → webhook Stripe → dunning → canc
     handleReactivationMock.mockClear();
     processCancellationMock.mockClear();
     sendEmailMock.mockClear();
+    grantPackEntitlementsMock.mockClear();
     isVoluntaryCancellationPendingMock.mockResolvedValue(false);
     queryMock.mockResolvedValue([]);
     retrieveSubscriptionMock.mockResolvedValue({
@@ -98,6 +105,7 @@ describe("flow: billing — suscripción → webhook Stripe → dunning → canc
       .mockResolvedValueOnce([])                    // INSERT INTO subscriptions
       .mockResolvedValueOnce([])                    // UPDATE nelvyon_users SET plan
       .mockResolvedValueOnce([])                    // UPDATE saas_tenants SET plan
+      .mockResolvedValueOnce([{ id: "tenant-1" }])  // SELECT id FROM saas_tenants → grantFromPlan
       .mockResolvedValueOnce([{ email: "a@test.com" }]); // getUserEmail → notifyPlanActivated
 
     await handleStripeWebhook("{}", "sig", { query: queryMock } as never);
@@ -108,6 +116,7 @@ describe("flow: billing — suscripción → webhook Stripe → dunning → canc
       expect.arrayContaining(["user-1", "sub_stripe_1", "cus_1", mapStripePriceToNelvyon("price_pro")]),
     );
     expect(sendEmailMock).toHaveBeenCalledWith("plan_activated", expect.any(Object));
+    expect(grantPackEntitlementsMock).toHaveBeenCalledWith(expect.anything(), "tenant-1");
   });
 
   it("webhook customer.subscription.updated refleja nuevo plan", async () => {
