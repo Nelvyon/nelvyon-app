@@ -24,13 +24,24 @@ test("GET /api/health responde 200 con status ok", async ({ request }) => {
 test("rutas stub legacy devuelven 410 Gone", async ({ request }) => {
   const stubs = [
     "/api/saas/certificados",
-    "/api/saas/encuestas",
     "/api/saas/comunidades",
-    "/api/saas/documentos",
-    "/api/saas/objects",
+    "/api/saas/productos",
   ];
   for (const path of stubs) {
     const res = await request.get(path, { maxRedirects: 0 });
     expect(res.status(), `${path} should be 410`).toBe(410);
+  }
+});
+
+test("alias legacy activos requieren auth (401 sin cookie)", async ({ request }) => {
+  const aliases = [
+    "/api/saas/encuestas",
+    "/api/saas/documentos",
+    "/api/saas/objects",
+    "/api/saas/qr",
+  ];
+  for (const path of aliases) {
+    const res = await request.get(path, { maxRedirects: 0 });
+    expect(res.status(), `${path} should be 401`).toBe(401);
   }
 });

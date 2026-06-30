@@ -73,22 +73,35 @@ async function waitForDeploy() {
 }
 
 async function operatorLogin() {
-  const r = await fetch(`${BASE}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: QA_EMAIL, password: QA_PASSWORD }),
-  });
-  if (!r.ok) {
-    fail("login", "operator-login", `status ${r.status}`);
-    return null;
+  let lastStatus = 0;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const r = await fetch(`${BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: QA_EMAIL, password: QA_PASSWORD }),
+      });
+      lastStatus = r.status;
+      if (r.ok) {
+        const data = await r.json();
+        if (!data.token) {
+          fail("login", "token", "missing token in response");
+          return null;
+        }
+        pass("login", "operator-login", `userId=${data.userId ?? "?"}`);
+        return data.token;
+      }
+      if (![502, 503, 504].includes(r.status) || attempt === 3) break;
+    } catch (e) {
+      if (attempt === 3) {
+        fail("login", "operator-login", String(e));
+        return null;
+      }
+    }
+    await sleep(2000 * (attempt + 1));
   }
-  const data = await r.json();
-  if (!data.token) {
-    fail("login", "token", "missing token in response");
-    return null;
-  }
-  pass("login", "operator-login", `userId=${data.userId ?? "?"}`);
-  return data.token;
+  fail("login", "operator-login", `status ${lastStatus}`);
+  return null;
 }
 
 async function getWorkspaceId(token) {
