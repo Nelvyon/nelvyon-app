@@ -93,12 +93,35 @@ export class SaasPackStoreError extends Error {
 const LOCAL = "local-business-growth";
 const ECOM = "ecommerce-growth";
 const SAAS_B2B = "saas-b2b-growth";
+const SOCIAL = "social-calendar-pack";
+const CONTENT = "content-strategy-pack";
+const CRO = "cro-audit-pack";
+const ANALYTICS = "analytics-setup-pack";
+const BRAND = "brand-voice-pack";
 
 /** Packs + monthly launch quota included per plan. null quota = unlimited. */
 const PLAN_DEFAULTS: Record<string, Record<string, number | null>> = {
   starter: { [LOCAL]: 1 },
-  pro: { [LOCAL]: 2, [ECOM]: 2, [SAAS_B2B]: 2 },
-  agency: { [LOCAL]: null, [ECOM]: null, [SAAS_B2B]: null },
+  pro: {
+    [LOCAL]: 2,
+    [ECOM]: 2,
+    [SAAS_B2B]: 2,
+    [SOCIAL]: 2,
+    [CONTENT]: 2,
+    [CRO]: 1,
+    [ANALYTICS]: 1,
+    [BRAND]: 1,
+  },
+  agency: {
+    [LOCAL]: null,
+    [ECOM]: null,
+    [SAAS_B2B]: null,
+    [SOCIAL]: null,
+    [CONTENT]: null,
+    [CRO]: null,
+    [ANALYTICS]: null,
+    [BRAND]: null,
+  },
 };
 
 // ── Row mapping ──────────────────────────────────────────────────────────────────
@@ -240,12 +263,29 @@ export class SaasPackStoreService {
     return granted;
   }
 
+  private async getEntitlementForPack(
+    tenantId: string,
+    packId: string,
+  ): Promise<{ entitlement: PackEntitlement | null; consumePackId: string }> {
+    const direct = await this.getActiveEntitlement(tenantId, packId);
+    if (direct) return { entitlement: direct, consumePackId: packId };
+
+    const catalog = await this.catalog.getCatalog();
+    const entry = catalog.find((c) => c.id === packId);
+    const launchKey = entry?.launchPackId;
+    if (launchKey && launchKey !== packId) {
+      const inherited = await this.getActiveEntitlement(tenantId, launchKey);
+      if (inherited) return { entitlement: inherited, consumePackId: launchKey };
+    }
+    return { entitlement: null, consumePackId: packId };
+  }
+
   /** Whether the tenant may launch a pack right now. */
   async canLaunch(
     tenantId: string,
     packId: string,
   ): Promise<{ allowed: boolean; reason?: string }> {
-    const ent = await this.getActiveEntitlement(tenantId, packId);
+    const { entitlement: ent } = await this.getEntitlementForPack(tenantId, packId);
     if (!ent) return { allowed: false, reason: "PACK_LOCKED" };
     if (ent.launchesRemaining !== null && ent.launchesRemaining <= 0) {
       return { allowed: false, reason: "QUOTA_EXHAUSTED" };
@@ -255,6 +295,7 @@ export class SaasPackStoreService {
 
   /** Increment usage after a launch (decrements remaining unless unlimited). */
   async consumeLaunch(tenantId: string, packId: string): Promise<void> {
+    const { consumePackId } = await this.getEntitlementForPack(tenantId, packId);
     await this.db.query(
       `UPDATE saas_pack_entitlements
        SET launches_used = launches_used + 1,
@@ -264,7 +305,7 @@ export class SaasPackStoreService {
            END,
            updated_at = NOW()
        WHERE tenant_id = $1 AND pack_id = $2 AND status = 'active'`,
-      [tenantId, packId],
+      [tenantId, consumePackId],
     );
   }
 

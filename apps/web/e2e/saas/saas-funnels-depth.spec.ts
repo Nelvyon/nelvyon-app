@@ -58,20 +58,16 @@ test.describe("SaaS Funnels — depth (S36)", () => {
   });
 
   test("tab analytics se muestra al entrar al builder", async ({ page }) => {
-    await page.route("**/api/saas/funnels/f-e2e-1**", route => {
+    await page.route("**/api/saas/funnels**", route => {
       const url = route.request().url();
       if (url.includes("resource=analytics")) return route.fulfill({ json: FIXTURE_ANALYTICS });
       if (url.includes("resource=variants")) return route.fulfill({ json: { variants: [] } });
-      return route.fulfill({ json: { funnel: FIXTURE_FUNNELS.funnels[0] } });
+      if (url.includes("f-e2e-1")) return route.fulfill({ json: { funnel: FIXTURE_FUNNELS.funnels[0] } });
+      return route.fulfill({ json: FIXTURE_FUNNELS });
     });
 
-    const funnelsList = page.waitForResponse(
-      res => new URL(res.url()).pathname === "/api/saas/funnels" && res.request().method() === "GET",
-      { timeout: 15_000 },
-    );
     await page.goto("/saas/funnels?id=f-e2e-1", { waitUntil: "domcontentloaded" });
-    await funnelsList;
-    await expect(page.getByRole("heading", { name: "E2E Test Funnel" })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("E2E Test Funnel")).toBeVisible({ timeout: 15_000 });
 
     const analyticsTab = page.getByRole("button", { name: "Analytics" });
     await expect(analyticsTab).toBeVisible({ timeout: 10_000 });

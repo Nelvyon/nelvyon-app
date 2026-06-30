@@ -7,6 +7,11 @@ import {
   ECOMMERCE_GROWTH_PACK_ID,
   LOCAL_GROWTH_PACK_ID,
   SAAS_B2B_GROWTH_PACK_ID,
+  SOCIAL_CALENDAR_PACK_ID,
+  CONTENT_STRATEGY_PACK_ID,
+  CRO_AUDIT_PACK_ID,
+  ANALYTICS_SETUP_PACK_ID,
+  BRAND_VOICE_PACK_ID,
 } from "@/lib/packs/types";
 
 export type ServicePackCategory =
@@ -237,6 +242,7 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     category: "social",
     verticals: ["local", "ecommerce", "b2b_saas", "info_products"],
     availability: "available",
+    launchPackId: SOCIAL_CALENDAR_PACK_ID,
     benefits: [
       "Calendario editorial de 4 semanas",
       "Copies nativos por red",
@@ -257,6 +263,7 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     category: "content",
     verticals: ["b2b_saas", "info_products", "ecommerce"],
     availability: "available",
+    launchPackId: CONTENT_STRATEGY_PACK_ID,
     benefits: ["Plan 90 días", "Clusters SEO", "Briefs por artículo", "KPIs de contenido"],
     problem: "Publicas sin estrategia y el contenido no trae leads ni posicionamiento.",
     audience: "Marcas que apuestan por inbound: blog, LinkedIn, YouTube o newsletter.",
@@ -273,6 +280,7 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     category: "cro",
     verticals: ["ecommerce", "b2b_saas", "info_products"],
     availability: "available",
+    launchPackId: CRO_AUDIT_PACK_ID,
     benefits: ["Auditoría heurística", "Mapa de fricción", "Plan de tests A/B", "Quick wins 30d"],
     problem: "Tienes visitas pero la tasa de conversión está por debajo de lo que debería.",
     audience: "Landings, checkout y funnels con volumen para optimizar.",
@@ -289,6 +297,7 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     category: "analytics",
     verticals: ["local", "ecommerce", "b2b_saas", "generic"],
     availability: "available",
+    launchPackId: ANALYTICS_SETUP_PACK_ID,
     benefits: ["Mapa de eventos", "Plantilla de informe", "Checklist QA de tracking"],
     problem: "No confías en los datos o no sabes qué eventos configurar en GA4.",
     audience: "Equipos que empiezan con medición o migraron sin plan claro.",
@@ -305,6 +314,7 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     category: "brand",
     verticals: ["local", "ecommerce", "b2b_saas", "generic"],
     availability: "available",
+    launchPackId: BRAND_VOICE_PACK_ID,
     benefits: ["Guía de tono", "Propuestas de valor", "Messaging house", "Do/don't de copy"],
     problem: "Tu marca suena distinta en cada canal y no transmites confianza ni diferenciación.",
     audience: "Rebranding, startups definiendo posicionamiento o agencias unificando cliente.",

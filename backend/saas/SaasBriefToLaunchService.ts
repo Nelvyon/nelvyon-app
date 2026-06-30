@@ -194,6 +194,15 @@ export class SaasBriefToLaunchService {
     );
   }
 
+  /** Maps catalog SKU ids (e.g. seo-local-pack) to the autonomous runner pack id. */
+  private async resolveRunnerPackId(catalogPackId: string): Promise<string> {
+    const { getServicePack } = await import(
+      "../../apps/web/src/lib/saas/servicePacksCatalog"
+    );
+    const pack = getServicePack(catalogPackId);
+    return pack?.launchPackId ?? catalogPackId;
+  }
+
   /** Creates a queued launch row. Does NOT execute the pack — call executeLaunch separately. */
   async createLaunch(
     tenantId: string,
@@ -276,7 +285,8 @@ export class SaasBriefToLaunchService {
           return RUNNERS[packId];
         },
       };
-      const runner = runnersPort.getRunner(launch.pack_id);
+      const runnerPackId = await this.resolveRunnerPackId(launch.pack_id);
+      const runner = runnersPort.getRunner(runnerPackId);
       if (!runner) {
         throw new SaasBriefToLaunchError(
           "PACK_NOT_AVAILABLE",

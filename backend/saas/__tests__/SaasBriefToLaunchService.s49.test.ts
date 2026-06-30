@@ -190,6 +190,23 @@ describe("SaasBriefToLaunchService — executeLaunch", () => {
     expect(result.status).toBe("completed");
     expect(result.packRunId).toBe("run-123");
   });
+
+  it("resolves launchPackId runner for satellite catalog SKUs", async () => {
+    const getRunner = vi.fn((packId: string) => {
+      if (packId === "local-business-growth") return { run: mockRun };
+      return undefined;
+    });
+    const db = makeDb([
+      [{ ...LAUNCH_ROW, pack_id: "seo-local-pack" }],
+      [{ workspace_id: 42 }],
+      [],
+      [COMPLETED_LAUNCH],
+    ]);
+    const svc = new SaasBriefToLaunchService(db, { getRunner });
+    await svc.executeLaunch("t1", "launch-1");
+    expect(getRunner).toHaveBeenCalledWith("local-business-growth");
+    expect(mockRun).toHaveBeenCalled();
+  });
 });
 
 // ── getLaunchStatus ───────────────────────────────────────────────────────────

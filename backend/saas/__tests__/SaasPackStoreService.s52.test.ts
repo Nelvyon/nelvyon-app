@@ -19,6 +19,7 @@ function makeDb(handler: (sql: string, params: unknown[]) => unknown[]): SaasPos
 const CATALOG: PackCatalogEntry[] = [
   { id: "local-business-growth", slug: "local-growth", name: "Crecimiento Local", tagline: "...", category: "growth", availability: "available", outputs: ["Landing"], estimatedMinutes: 8, launchPackId: "local-business-growth" },
   { id: "ecommerce-growth", slug: "ecommerce-growth", name: "Crecimiento Ecommerce", tagline: "...", category: "growth", availability: "available", outputs: ["Tienda"], estimatedMinutes: 10, launchPackId: "ecommerce-growth" },
+  { id: "seo-local-pack", slug: "seo-local", name: "SEO Local", tagline: "...", category: "seo", availability: "available", outputs: ["SEO"], estimatedMinutes: 6, launchPackId: "local-business-growth" },
   { id: "future-pack", slug: "future", name: "Pack Futuro", tagline: "...", category: "ads", availability: "coming_soon", outputs: [], estimatedMinutes: 5 },
 ];
 
@@ -72,7 +73,7 @@ describe("SaasPackStoreService — grantFromPlan", () => {
     expect(inserts).toHaveLength(1);
   });
 
-  it("grants 3 packs for pro plan", async () => {
+  it("grants 8 packs for pro plan", async () => {
     const db = makeDb((sql, params) => {
       if (sql.includes("FROM saas_tenants")) return [{ plan: "pro" }];
       if (sql.includes("INSERT INTO saas_pack_entitlements"))
@@ -81,7 +82,7 @@ describe("SaasPackStoreService — grantFromPlan", () => {
     });
     const svc = new SaasPackStoreService(db, catalogPort);
     const granted = await svc.grantFromPlan("t1");
-    expect(granted).toHaveLength(3);
+    expect(granted).toHaveLength(8);
   });
 
   it("grants unlimited (null quota) for agency plan", async () => {
@@ -93,7 +94,7 @@ describe("SaasPackStoreService — grantFromPlan", () => {
     });
     const svc = new SaasPackStoreService(db, catalogPort);
     const granted = await svc.grantFromPlan("t1");
-    expect(granted).toHaveLength(3);
+    expect(granted).toHaveLength(8);
     expect(granted.every((g) => g.launchesRemaining === null)).toBe(true);
   });
 
@@ -138,17 +139,38 @@ describe("SaasPackStoreService — canLaunch", () => {
     expect(r.allowed).toBe(false);
     expect(r.reason).toBe("QUOTA_EXHAUSTED");
   });
+
+  it("allows satellite SKU when parent growth pack is entitled", async () => {
+    const db = makeDb((sql, params) => {
+      if (sql.includes("SELECT * FROM saas_pack_entitlements") && params[1] === "seo-local-pack") {
+        return [];
+      }
+      if (sql.includes("SELECT * FROM saas_pack_entitlements") && params[1] === "local-business-growth") {
+        return [entitlementRow({ launches_remaining: 2 })];
+      }
+      return [];
+    });
+    const svc = new SaasPackStoreService(db, catalogPort);
+    expect(await svc.canLaunch("t1", "seo-local-pack")).toEqual({ allowed: true });
+  });
 });
 
 // ── consumeLaunch ───────────────────────────────────────────────────────────────
 
 describe("SaasPackStoreService — consumeLaunch", () => {
   it("issues an UPDATE incrementing usage", async () => {
-    const db = makeDb(() => []) as SaasPostgresPort & { query: ReturnType<typeof vi.fn> };
+    const db = makeDb((sql) => {
+      if (sql.includes("SELECT * FROM saas_pack_entitlements")) {
+        return [entitlementRow()];
+      }
+      return [];
+    }) as SaasPostgresPort & { query: ReturnType<typeof vi.fn> };
     const svc = new SaasPackStoreService(db, catalogPort);
     await svc.consumeLaunch("t1", "local-business-growth");
-    const sql = (db.query as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    expect(sql).toContain("launches_used = launches_used + 1");
+    const updateCall = (db.query as ReturnType<typeof vi.fn>).mock.calls.find(
+      (c) => typeof c[0] === "string" && (c[0] as string).includes("launches_used = launches_used + 1"),
+    );
+    expect(updateCall).toBeTruthy();
   });
 });
 
@@ -256,10 +278,10 @@ describe("SaasPackStoreService — getStoreSummary", () => {
     });
     const svc = new SaasPackStoreService(db, catalogPort);
     const summary = await svc.getStoreSummary("t1");
-    expect(summary.totalPacks).toBe(3);
-    expect(summary.available).toBe(2);
-    expect(summary.owned).toBe(1);
-    expect(summary.launchesRemaining).toBe(1);
+    expect(summary.totalPacks).toBe(4);
+    expect(summary.available).toBe(3);
+    expect(summary.owned).toBe(2);
+    expect(summary.launchesRemaining).toBe(2);
   });
 
   it("launchesRemaining=null when an unlimited entitlement exists", async () => {

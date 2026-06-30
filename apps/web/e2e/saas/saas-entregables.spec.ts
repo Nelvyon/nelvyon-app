@@ -98,19 +98,17 @@ test.describe("SaaS Entregables — página con datos", () => {
   });
 
   test("filtro de tipo cambia parámetro en fetch", async ({ page }) => {
-    const intercepted: string[] = [];
-    await mockEntregablesList(page, FIXTURE_DATA);
-    await page.route(/\/api\/saas\/entregables(?!\/revenue)/, route => {
-      intercepted.push(route.request().url());
-      return route.fulfill({ json: FIXTURE_DATA });
-    });
     await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+    await page.waitForResponse("**/api/saas/entregables**", { timeout: 15_000 });
     await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
 
-    // Change type filter (skip header days select — first select in DOM)
     const typeSelect = page.locator("select").filter({ has: page.locator('option[value="seo"]') });
+    const seoFetch = page.waitForResponse(
+      res => res.url().includes("type=seo") && res.request().method() === "GET",
+      { timeout: 15_000 },
+    );
     await typeSelect.selectOption("seo");
-    await expect.poll(() => intercepted.some(u => u.includes("type=seo"))).toBe(true);
+    await seoFetch;
   });
 
   test("'Ver portal' link apunta a /portal/deliverables/", async ({ page }) => {
