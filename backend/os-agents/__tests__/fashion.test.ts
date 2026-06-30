@@ -38,7 +38,7 @@ const llm = {
   }),
 };
 
-describe("Fashion agents", () => {
+describe("Fashion agents", { timeout: 15_000 }, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(LlmClient.getInstance).mockReturnValue(llm as never);

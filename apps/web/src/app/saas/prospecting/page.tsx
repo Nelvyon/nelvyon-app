@@ -53,6 +53,8 @@ export default function SaasProspectingPage() {
   const [lists, setLists] = useState<ProspectingList[]>([]);
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [loading, setLoading] = useState(true);
+  const [configured, setConfigured] = useState<boolean | null>(null);
+  const [configMessage, setConfigMessage] = useState<string | null>(null);
   const [tab, setTab] = useState<"lists" | "search">("lists");
   const [selectedList, setSelectedList] = useState<string | null>(null);
   const [filter, setFilter] = useState<ProspectFilter>({ industry: "Todos", country: "Todos", minEmployees: 1, maxEmployees: 10000, jobTitle: "", keywords: "" });
@@ -64,9 +66,19 @@ export default function SaasProspectingPage() {
     try {
       const res = await fetch("/api/saas/prospecting");
       if (res.ok) {
-        const d = (await res.json()) as { lists?: ProspectingList[]; results?: ProspectingList[] };
+        const d = (await res.json()) as {
+          lists?: ProspectingList[];
+          results?: ProspectingList[];
+          configured?: boolean;
+          message?: string;
+        };
+        setConfigured(d.configured ?? true);
+        setConfigMessage(d.message ?? null);
         setLists(d.lists ?? d.results ?? []);
-      } else setLists([]);
+      } else {
+        setLists([]);
+        setConfigured(false);
+      }
     } catch { setLists([]); }
     finally { setLoading(false); }
   }, []);
@@ -75,7 +87,7 @@ export default function SaasProspectingPage() {
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
-    if (!listName.trim()) return;
+    if (!listName.trim() || configured === false) return;
     setSearching(true);
     try {
       const res = await fetch("/api/saas/prospecting/search", {
@@ -91,7 +103,23 @@ export default function SaasProspectingPage() {
     finally { setSearching(false); }
   }
 
-  function addToCrm(ids: string[]) {
+  async function addToCrm(ids: string[]) {
+    if (configured === false || ids.length === 0) return;
+    const selected = prospects.filter(p => ids.includes(p.id));
+    for (const p of selected) {
+      if (!p.email) continue;
+      await fetch("/api/saas/crm/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: p.name,
+          email: p.email,
+          company: p.company,
+          phone: p.phone ?? undefined,
+          source: "prospecting",
+        }),
+      });
+    }
     setProspects(prev => prev.map(p => ids.includes(p.id) ? { ...p, addedToCrm: true } : p));
   }
 
@@ -100,6 +128,13 @@ export default function SaasProspectingPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <NelvyonDsSectionHeader title="Prospección" subtitle="Encuentra y enriquece contactos B2B para tus campañas outbound" />
             </div>
+
+            {configured === false ? (
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+                <strong>Prospección no configurada:</strong>{" "}
+                {configMessage ?? "Define APOLLO_API_KEY en Railway para activar búsqueda B2B real."}
+              </div>
+            ) : null}
 
             {/* Tabs */}
             <div className="flex gap-2">

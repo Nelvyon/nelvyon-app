@@ -137,6 +137,8 @@ export default function SaasSeoPage() {
   const [issues, setIssues] = useState<SeoIssue[]>([]);
   const [summary, setSummary] = useState<SeoSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [configured, setConfigured] = useState<boolean | null>(null);
+  const [configMessage, setConfigMessage] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [tab, setTab] = useState<"keywords" | "issues">("keywords");
   const [sort, setSort] = useState<"position" | "volume" | "difficulty">("position");
@@ -147,6 +149,8 @@ export default function SaasSeoPage() {
       const seoRes = await fetch("/api/saas/seo");
       if (seoRes.ok) {
         const d = (await seoRes.json().catch(() => ({}))) as { keywords?: Keyword[]; issues?: SeoIssue[]; summary?: SeoSummary; configured?: boolean; message?: string };
+        setConfigured(d.configured ?? true);
+        setConfigMessage(d.message ?? null);
         setKeywords(d.keywords ?? []);
         setIssues(d.issues ?? []);
         if (d.summary) setSummary(d.summary);
@@ -169,15 +173,22 @@ export default function SaasSeoPage() {
   const errors = issues.filter((i) => i.type === "error").length;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="campanias" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="seo" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
             title="SEO"
             subtitle="Monitoriza posiciones, audita errores y optimiza tu presencia orgánica"
           />
-          <NelvyonDsButton onClick={() => setShowAdd(true)}>+ Añadir keywords</NelvyonDsButton>
+          <NelvyonDsButton onClick={() => setShowAdd(true)} disabled={configured === false}>+ Añadir keywords</NelvyonDsButton>
         </div>
+
+        {configured === false ? (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+            <strong>SEO no configurado:</strong>{" "}
+            {configMessage ?? "Configura SEMRUSH_API_KEY y SEO_DOMAIN en Railway para datos reales."}
+          </div>
+        ) : null}
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">

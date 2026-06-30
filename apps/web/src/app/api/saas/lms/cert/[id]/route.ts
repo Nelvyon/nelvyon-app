@@ -11,8 +11,9 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function verify(certId: string, tok: string): boolean {
-  const secret = process.env.JWT_SECRET ?? process.env.NEXTAUTH_SECRET ?? "nelvyon-cert-secret";
-  const expected = createHmac("sha256", secret).update(certId).digest("hex").slice(0, 32);
+  const secret = process.env.JWT_SECRET ?? process.env.NEXTAUTH_SECRET;
+  if (!secret?.trim()) return false;
+  const expected = createHmac("sha256", secret.trim()).update(certId).digest("hex").slice(0, 32);
   return tok === expected;
 }
 
