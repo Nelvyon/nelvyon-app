@@ -18,7 +18,7 @@ import type { TemplateOutcome, TemplateRegistryEntry } from "../templates/types"
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = join(__dirname, "..", "fixtures", "learning-outcomes-mock.json");
 const REGISTRY = join(__dirname, "..", "templates", "registry.json");
-const PHASE_H = join(__dirname, "..", "output", "phase-h", "restaurant-landing");
+const PHASE_H = join(__dirname, "..", "fixtures", "phase-h-restaurant-landing");
 
 function loadMockOutcomes(): TemplateOutcome[] {
   return loadOutcomesFromJson(JSON.parse(readFileSync(FIXTURE, "utf-8")));

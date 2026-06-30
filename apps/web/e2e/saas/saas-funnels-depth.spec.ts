@@ -65,11 +65,12 @@ test.describe("SaaS Funnels — depth (S36)", () => {
       return route.fallback();
     });
 
-    await page.goto("/saas/funnels", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse(
+    const listResponse = page.waitForResponse(
       res => res.url().includes("/api/saas/funnels") && res.request().method() === "GET" && !res.url().includes("resource="),
       { timeout: 15_000 },
     );
+    await page.goto("/saas/funnels", { waitUntil: "domcontentloaded" });
+    await listResponse;
     await expect(page.getByText("E2E Test Funnel")).toBeVisible({ timeout: 15_000 });
     await page.getByRole("button", { name: "Abrir builder" }).click();
     await expect(page.locator("h1", { hasText: "E2E Test Funnel" })).toBeVisible({ timeout: 15_000 });
