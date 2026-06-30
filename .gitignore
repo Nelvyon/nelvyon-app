@@ -87,3 +87,10 @@ backend/autonomous/output/
 
 # Envato Elements seeds — ZIPs never committed, only JSON metadata
 backend/data/envato-seeds/**/*.zip
+backend/data/envato-seeds-metadata.json
+backend/data/envato-seeds-metadata.json.*
+backend/data/*.bak
+backend/data/voice_pilot*/
+*.bat
+.envato-browser-profile/
+.edge-envato-download-profile*/

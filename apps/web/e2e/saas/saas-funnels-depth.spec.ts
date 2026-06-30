@@ -65,15 +65,14 @@ test.describe("SaaS Funnels — depth (S36)", () => {
       return route.fulfill({ json: FIXTURE_FUNNELS });
     });
 
-    await page.goto("/saas/funnels", { waitUntil: "domcontentloaded" });
-    await expect(page.getByText("E2E Test Funnel")).toBeVisible({ timeout: 15_000 });
-    await page.getByRole("button", { name: "Abrir builder" }).click();
+    await page.goto("/saas/funnels?id=f-e2e-1", { waitUntil: "domcontentloaded" });
     await expect(page.locator("h1", { hasText: "E2E Test Funnel" })).toBeVisible({ timeout: 15_000 });
 
     const analyticsTab = page.getByRole("button", { name: "Analytics" });
     await expect(analyticsTab).toBeVisible({ timeout: 10_000 });
     await analyticsTab.click();
-    await expect(page.getByText("Landing Page").first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("Visitas totales")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("Landing Page").first()).toBeVisible();
     await expect(page.getByText("Formulario").first()).toBeVisible();
   });
 
