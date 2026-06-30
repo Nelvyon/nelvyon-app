@@ -80,6 +80,7 @@ test.describe("S49 — Pack selection flow", () => {
     await page.goto("/saas/brief-to-launch", { waitUntil: "domcontentloaded" });
     await page.waitForResponse("**/api/saas/brief-to-launch**", { timeout: 15_000 });
     await expect(page.getByRole("button", { name: /Crecimiento Ecommerce/i })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("BETA")).toBeVisible({ timeout: 10_000 });
     await page.getByRole("button", { name: /Crecimiento Ecommerce/i }).click();
     await expect(page.getByText(/Pack en beta|BETA/i)).toBeVisible({ timeout: 10_000 });
   });

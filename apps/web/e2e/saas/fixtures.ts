@@ -341,16 +341,16 @@ export const FIXTURE_VOICE = {
 
 /** Intercepts voice endpoints. Call AFTER setupAuthedSaas (LIFO). */
 export async function mockSaasVoice(page: Page): Promise<void> {
-  await page.route("**/api/saas/voice/execute**", route =>
-    route.fulfill({ json: { success: true, route: "/saas/crm", intent: { id: "nav_crm", actionType: "navigate", route: "/saas/crm" }, message: "Abrir el CRM" } }));
-  await page.route("**/api/saas/voice/parse**", route =>
-    route.fulfill({ json: { result: { success: true, route: "/saas/crm", intent: { id: "nav_crm" } }, intent: { id: "nav_crm" } } }));
   await page.route("**/api/saas/voice**", route => {
     if (route.request().url().includes("/parse") || route.request().url().includes("/execute")) {
       return route.fallback();
     }
     return route.fulfill({ json: FIXTURE_VOICE });
   });
+  await page.route("**/api/saas/voice/parse**", route =>
+    route.fulfill({ json: { result: { success: true, route: "/saas/crm", intent: { id: "nav_crm" } }, intent: { id: "nav_crm" } } }));
+  await page.route("**/api/saas/voice/execute**", route =>
+    route.fulfill({ json: { success: true, route: "/saas/crm", intent: { id: "nav_crm", actionType: "navigate", route: "/saas/crm" }, message: "Abrir el CRM" } }));
 }
 
 export const FIXTURE_PARTNER_ZONE = {
@@ -575,12 +575,23 @@ export async function mockSaasApis(page: Page): Promise<void> {
     route.fulfill({ json: FIXTURE_INTEGRATIONS }));
   await page.route("**/api/saas/memberships**", route =>
     route.fulfill({ json: FIXTURE_MEMBERSHIPS }));
-  await page.route("**/api/saas/whatsapp/templates**", route =>
-    route.fulfill({ json: FIXTURE_WHATSAPP_TEMPLATES }));
+  // Broad pattern first; specific subpaths last (Playwright LIFO → specific wins).
+  await page.route("**/api/saas/whatsapp**", route => {
+    if (route.request().method() === "POST") {
+      return route.fulfill({
+        status: 201,
+        json: {
+          message: { id: "m2", to: "+34600000099", body: "[template]", status: "sent", createdAt: new Date().toISOString() },
+          provider: "meta",
+        },
+      });
+    }
+    return route.fulfill({ json: FIXTURE_WHATSAPP });
+  });
   await page.route("**/api/saas/whatsapp/catalog**", route =>
     route.fulfill({ json: { products: [] } }));
-  await page.route("**/api/saas/whatsapp**", route =>
-    route.fulfill({ json: FIXTURE_WHATSAPP }));
+  await page.route("**/api/saas/whatsapp/templates**", route =>
+    route.fulfill({ json: FIXTURE_WHATSAPP_TEMPLATES }));
   await page.route("**/api/saas/contracts**", route =>
     route.fulfill({ json: { contracts: [] } }));
   await page.route("**/api/saas/quotes**", route =>
@@ -595,4 +606,5 @@ export async function mockSaasApis(page: Page): Promise<void> {
   await page.route("**/api/saas/web-builder**", route =>
     route.fulfill({ json: { sites: [] } }));
   await mockSaasVoice(page);
+  await mockSectorBenchmark(page);
 }

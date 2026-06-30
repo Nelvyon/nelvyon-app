@@ -66,7 +66,8 @@ test.describe("SaaS Funnels — depth (S36)", () => {
     });
 
     await page.goto("/saas/funnels?id=f-e2e-1", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/funnels/f-e2e-1**", { timeout: 15_000 });
+    await page.waitForResponse("**/api/saas/funnels**", { timeout: 15_000 });
+    await page.waitForResponse("**/api/saas/funnels/f-e2e-1**", { timeout: 15_000 }).catch(() => {});
     await expect(page.getByText("E2E Test Funnel")).toBeVisible({ timeout: 15_000 });
 
     const analyticsTab = page.getByRole("button", { name: "Analytics" });

@@ -85,7 +85,8 @@ test.describe("SaaS Memberships — página autenticada", () => {
   test("tiene al menos un botón o elemento interactivo", async ({ page }) => {
     await page.goto("/saas/memberships", { waitUntil: "domcontentloaded" });
     await page.waitForResponse("**/api/saas/memberships**", { timeout: 15_000 });
-    await expect(page.getByRole("button", { name: /Planes|Miembros|Afiliados/i }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("button", { name: "Planes" })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("button", { name: "Miembros" })).toBeVisible();
     await expect(page.locator("button").first()).toBeVisible();
   });
 

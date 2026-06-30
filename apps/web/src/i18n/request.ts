@@ -10,9 +10,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   try {
     const messages = (await import(`../../messages/${locale}.json`)).default;
-    return { locale, messages };
+    return { locale, messages, timeZone: "Europe/Madrid" };
   } catch {
     const messages = (await import("../../messages/es.json")).default;
-    return { locale: routing.defaultLocale, messages };
+    return { locale: routing.defaultLocale, messages, timeZone: "Europe/Madrid" };
   }
 });

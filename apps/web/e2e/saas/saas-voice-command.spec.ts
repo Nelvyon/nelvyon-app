@@ -51,7 +51,12 @@ test.describe("S55 — /saas/voice page", () => {
         start() { /* noop */ }
         stop() { /* noop */ }
       }
-      (window as unknown as { SpeechRecognition: unknown }).SpeechRecognition = FakeRec;
+      const w = window as unknown as {
+        SpeechRecognition?: unknown;
+        webkitSpeechRecognition?: unknown;
+      };
+      w.SpeechRecognition = FakeRec;
+      w.webkitSpeechRecognition = FakeRec;
     });
     await page.goto("/saas/voice", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("button", { name: /Comando de voz/i })).toBeVisible({ timeout: 10_000 });

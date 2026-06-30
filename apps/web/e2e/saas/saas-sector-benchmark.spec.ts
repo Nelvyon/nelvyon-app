@@ -9,7 +9,7 @@ const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 async function gotoBenchmark(page: import("@playwright/test").Page): Promise<void> {
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      await gotoBenchmark(page);
+      await page.goto("/saas/benchmark", { waitUntil: "domcontentloaded" });
       await page.waitForResponse("**/api/saas/benchmark**", { timeout: 15_000 });
       return;
     } catch (err) {

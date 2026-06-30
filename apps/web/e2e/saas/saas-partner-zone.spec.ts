@@ -41,6 +41,7 @@ test.describe("S54 — /saas/partner page", () => {
 
   test("wholesale tab shows catalog SKUs", async ({ page }) => {
     await page.goto("/saas/partner", { waitUntil: "domcontentloaded" });
+    await page.waitForResponse("**/api/saas/partner**", { timeout: 15_000 });
     await page.getByRole("button", { name: "Wholesale" }).click();
     await expect(page.getByText("Plan Pro")).toBeVisible({ timeout: 8000 });
     await expect(page.getByText("Pack Crecimiento Local")).toBeVisible();
@@ -54,12 +55,14 @@ test.describe("S54 — /saas/partner page", () => {
 
   test("referidos tab shows referral code", async ({ page }) => {
     await page.goto("/saas/partner", { waitUntil: "domcontentloaded" });
+    await page.waitForResponse("**/api/saas/partner**", { timeout: 15_000 });
     await page.getByRole("button", { name: "Referidos" }).click();
     await expect(page.getByText("AGENCY99")).toBeVisible({ timeout: 8000 });
   });
 
   test("connect tab shows status", async ({ page }) => {
     await page.goto("/saas/partner", { waitUntil: "domcontentloaded" });
+    await page.waitForResponse("**/api/saas/partner**", { timeout: 15_000 });
     await page.getByRole("button", { name: "Connect" }).click();
     await expect(page.getByText("Charges habilitados")).toBeVisible({ timeout: 8000 });
   });
