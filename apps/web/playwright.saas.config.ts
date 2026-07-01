@@ -37,7 +37,7 @@ export default defineConfig({
     timeout: 15_000,
   },
 
-  webServer: process.env.CI
+  webServer: process.env.CI || process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
         command: "pnpm dev",

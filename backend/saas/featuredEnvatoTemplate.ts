@@ -29,20 +29,40 @@ export const FEATURED_ENVATO_TEMPLATE: FeaturedEnvatoTemplate = {
   slug: "inicio-premium",
 };
 
+/** Ecommerce growth showcase — Porto (Envato #10860525), adapted by Nelvyon. */
+export const FEATURED_ENVATO_ECOMMERCE: FeaturedEnvatoTemplate = {
+  id: "nelvyon-porto-ecommerce",
+  envato_id: "10860525",
+  name: "Porto Ecommerce Elite",
+  vendor: "Envato Market",
+  headline: "Porto — Tienda online premium con catálogo y checkout",
+  description:
+    "Plantilla ecommerce Envato adaptada por Nelvyon. Catálogo, producto, carrito y checkout optimizados para conversión.",
+  preview_url:
+    "https://previews.customer.envatousercontent.com/files/258856789/porto-preview.__large_preview.png",
+  sector: "ecommerce",
+  page_type: "storefront",
+  slug: "tienda-premium",
+};
+
 const FEATURED_ID = FEATURED_ENVATO_TEMPLATE.id;
+const FEATURED_ECOMMERCE_ID = FEATURED_ENVATO_ECOMMERCE.id;
 
 export function getFeaturedEnvatoTemplate(): FeaturedEnvatoTemplate {
   return FEATURED_ENVATO_TEMPLATE;
 }
 
 export function listFeaturedEnvatoTemplates(): FeaturedEnvatoTemplate[] {
-  return [FEATURED_ENVATO_TEMPLATE];
+  return [FEATURED_ENVATO_TEMPLATE, FEATURED_ENVATO_ECOMMERCE];
 }
 
 export function buildFeaturedTemplateSections(
   templateId: string,
   companyName = "Tu empresa",
 ): PageSection[] {
+  if (templateId === FEATURED_ECOMMERCE_ID) {
+    return buildPortoEcommerceSections(companyName);
+  }
   if (templateId !== FEATURED_ID) {
     throw new Error(`Unknown featured template: ${templateId}`);
   }
@@ -135,6 +155,45 @@ export function buildFeaturedTemplateSections(
       content: {
         heading: "Contacta con nosotros",
         ctaLabel: "Enviar mensaje",
+      },
+    },
+  ];
+}
+
+function buildPortoEcommerceSections(companyName: string): PageSection[] {
+  const brand = companyName.trim() || "Tu tienda";
+  return [
+    {
+      id: crypto.randomUUID(),
+      type: "hero",
+      content: {
+        badge: "Nelvyon × Porto · Envato #10860525",
+        headline: `${brand} — ecommerce que convierte`,
+        subtitle: "Catálogo, producto destacado y checkout optimizado. Plantilla premium adaptada por Nelvyon.",
+        ctaLabel: "Ver catálogo",
+        ctaUrl: "#products",
+      },
+    },
+    {
+      id: crypto.randomUUID(),
+      type: "features",
+      content: {
+        heading: "Categorías destacadas",
+        items: [
+          { icon: "🛍️", title: "Novedades", desc: "Últimos productos con stock en tiempo real." },
+          { icon: "🔥", title: "Más vendidos", desc: "Social proof y urgencia integrados." },
+          { icon: "💳", title: "Checkout Stripe", desc: "Pago seguro en un clic." },
+        ],
+      },
+    },
+    {
+      id: crypto.randomUUID(),
+      type: "cta",
+      content: {
+        heading: "Envío gratis desde 50€",
+        body: "Retargeting Meta + Google Shopping conectados desde Nelvyon.",
+        ctaLabel: "Comprar ahora",
+        ctaUrl: "#checkout",
       },
     },
   ];

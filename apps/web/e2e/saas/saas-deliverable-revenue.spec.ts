@@ -44,15 +44,26 @@ test.describe("S48 — Entregables Revenue tab", () => {
   test("Recalcular button triggers POST /api/saas/entregables/revenue", async ({ page }) => {
     await gotoEntregablesReady(page);
     await page.getByRole("button", { name: /Revenue €/i }).click();
+    await expect(page.getByText(/Sin revenue atribuido|Calculando revenue/i).first()).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const recalc = page.getByRole("button", { name: /Recalcular/i });
+    await expect(recalc).toBeVisible({ timeout: 15_000 });
+
+    const cookieOk = page.getByRole("button", { name: /Aceptar todo|Solo necesarias/i }).first();
+    if (await cookieOk.isVisible().catch(() => false)) {
+      await cookieOk.click();
+    }
 
     const [resp] = await Promise.all([
       page.waitForResponse(
         (r) => r.url().includes("/api/saas/entregables/revenue") && r.request().method() === "POST",
-        { timeout: 8000 },
-      ).catch(() => null),
-      page.getByRole("button", { name: /↻ Recalcular/i }).click(),
+        { timeout: 15_000 },
+      ),
+      recalc.click(),
     ]);
-    if (resp) expect(resp.status()).not.toBe(500);
+    expect(resp.status()).not.toBe(500);
   });
 
   test("Lista tab shows deliverable row", async ({ page }) => {

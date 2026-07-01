@@ -82,6 +82,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(await svc.markPaid(tid, id, body.stripeTransferId as string | undefined));
     }
 
+    if (action === "pay-stripe-connect") {
+      const id = String(body.id ?? "").trim();
+      const destinationAccountId = String(body.destinationAccountId ?? "").trim();
+      if (!id || !destinationAccountId) {
+        return NextResponse.json({ error: "id y destinationAccountId requeridos" }, { status: 400 });
+      }
+      return NextResponse.json(await svc.payViaStripeConnect(tid, id, destinationAccountId));
+    }
+
     if (action === "update-program") {
       return NextResponse.json(await svc.updateProgram(tid, {
         commissionPct: body.commissionPct !== undefined ? Number(body.commissionPct) : undefined,

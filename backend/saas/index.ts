@@ -410,6 +410,22 @@ export {
   type ActivityType,
 } from "./SaasCrmService";
 export {
+  SaasCrmDedupeService,
+  SaasCrmDedupeError,
+  getSaasCrmDedupeService,
+  resetSaasCrmDedupeServiceForTests,
+  type CrmDuplicateGroup,
+} from "./SaasCrmDedupeService";
+export {
+  SaasDashboardLayoutService,
+  SaasDashboardLayoutError,
+  getSaasDashboardLayoutService,
+  resetSaasDashboardLayoutServiceForTests,
+  DEFAULT_DASHBOARD_WIDGETS,
+  type DashboardLayout,
+  type DashboardWidgetId,
+} from "./SaasDashboardLayoutService";
+export {
   SaasDealsService,
   SaasDealsError,
   getSaasDealsService,
@@ -1262,6 +1278,7 @@ export {
 } from "./saasEnv";
 export {
   syncOAuthProviderToHub,
+  syncOAuthToProductModules,
   loadOAuthSlugStatus,
   resolveOAuthProviderByState,
   revokeOAuthProvider,

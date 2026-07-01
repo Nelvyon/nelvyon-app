@@ -14,20 +14,22 @@ const root = join(fileURLToPath(new URL("..", import.meta.url)));
 const jwt = process.env.JWT_SECRET ?? "test-secret-for-playwright-saas-e2e";
 
 async function resolvePort() {
-  if (process.env.PORT) return process.env.PORT;
-  for (const candidate of ["3010", "3011", "3012", "3020"]) {
+  if (process.env.PORT) return { port: process.env.PORT, reuse: false };
+  const candidates = ["3010", "3011", "3012", "3020"];
+  for (const candidate of candidates) {
     try {
-      const res = await fetch(`http://localhost:${candidate}/api/health`, { signal: AbortSignal.timeout(800) });
-      if (res.ok) continue;
+      const res = await fetch(`http://localhost:${candidate}/api/health`, {
+        signal: AbortSignal.timeout(800),
+      });
+      if (res.ok) return { port: candidate, reuse: true };
+      // Port occupied by another process — try next candidate.
     } catch {
-      return candidate;
+      // Connection refused / timeout — port appears free.
+      return { port: candidate, reuse: false };
     }
   }
-  return "3010";
+  return { port: "3010", reuse: false };
 }
-
-const port = await resolvePort();
-const baseUrl = `http://localhost:${port}`;
 
 const SYSTEM_CHROME_PATHS = [
   join(process.env.ProgramFiles ?? "C:\\Program Files", "Google", "Chrome", "Application", "chrome.exe"),
@@ -53,7 +55,7 @@ function run(cmd, args, opts = {}) {
   });
 }
 
-async function waitForHealth(maxAttempts = 90) {
+async function waitForHealth(baseUrl, maxAttempts = 90) {
   for (let i = 1; i <= maxAttempts; i++) {
     try {
       const res = await fetch(`${baseUrl}/api/health`);
@@ -99,40 +101,59 @@ async function main() {
   await ensureBrowser();
 
   const buildId = join(root, ".next", "BUILD_ID");
-  if (!existsSync(buildId)) {
+  const forceBuild = process.env.E2E_FORCE_BUILD === "1";
+  const skipBuild = process.env.E2E_SKIP_BUILD === "1";
+  if (!skipBuild && (!existsSync(buildId) || forceBuild)) {
     console.log("→ Building Next.js (prod)…");
     await run("pnpm", ["build"], {
       env: { JWT_SECRET: jwt, NODE_ENV: "production" },
     });
-  } else {
-    console.log("→ Build exists, skipping pnpm build");
+  } else if (!skipBuild && existsSync(buildId)) {
+    console.log("→ Build exists — set E2E_FORCE_BUILD=1 to rebuild after src changes");
+  } else if (skipBuild) {
+    console.log("→ E2E_SKIP_BUILD=1 — using existing .next build");
   }
 
-  console.log(`→ Starting prod server on :${port}…`);
-  const server = spawn("pnpm", ["start"], {
-    stdio: "inherit",
-    shell: process.platform === "win32",
-    cwd: root,
-    env: {
-      ...process.env,
-      PORT: port,
-      JWT_SECRET: jwt,
-      NODE_ENV: "production",
-      DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://noop:noop@localhost:5432/noop",
-    },
-  });
+  let port = process.env.PORT ?? "3010";
+  let reuseServer = false;
+  if (!forceBuild) {
+    const resolved = await resolvePort();
+    port = resolved.port;
+    reuseServer = resolved.reuse;
+  }
+  const baseUrl = `http://localhost:${port}`;
 
+  let server = null;
   const killServer = () => {
-    if (!server.killed) server.kill("SIGTERM");
+    if (server && !server.killed) server.kill("SIGTERM");
   };
-  process.on("SIGINT", () => {
-    killServer();
-    process.exit(130);
-  });
-  process.on("SIGTERM", killServer);
+
+  if (reuseServer) {
+    console.log(`→ Reusing existing server on :${port}`);
+  } else {
+    console.log(`→ Starting prod server on :${port}…`);
+    server = spawn("pnpm", ["start"], {
+      stdio: "inherit",
+      shell: process.platform === "win32",
+      cwd: root,
+      env: {
+        ...process.env,
+        PORT: port,
+        JWT_SECRET: jwt,
+        NODE_ENV: "production",
+        DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://noop:noop@localhost:5432/noop",
+      },
+    });
+
+    process.on("SIGINT", () => {
+      killServer();
+      process.exit(130);
+    });
+    process.on("SIGTERM", killServer);
+  }
 
   try {
-    await waitForHealth();
+    await waitForHealth(baseUrl);
     console.log("→ Running SaaS Playwright suite…");
     await run("pnpm", ["exec", "playwright", "test", "--config", "playwright.saas.config.ts"], {
       env: {

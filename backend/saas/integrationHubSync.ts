@@ -1,7 +1,9 @@
 import { DbClient } from "../db/DbClient";
 import { OAuthService } from "../oauth/OAuthService";
+import { getSaasAdsDashboardService } from "./SaasAdsDashboardService";
 import { getSaasIntegrationsHubService } from "./SaasIntegrationsHubService";
 import { getSaasOnboardingService } from "./SaasOnboardingService";
+import { getSaasSocialService } from "./SaasSocialService";
 
 /** OAuth provider id → integration catalog slugs fed by the same token. */
 export const OAUTH_PROVIDER_SLUGS: Record<string, string[]> = {
@@ -36,6 +38,69 @@ export async function syncOAuthProviderToHub(
       status: "connected",
       externalAccountName: accountName ?? null,
     });
+  }
+}
+
+const ADS_OAUTH_PLATFORMS: Record<string, "meta" | "google" | "linkedin" | "tiktok"> = {
+  meta: "meta",
+  google: "google",
+  linkedin: "linkedin",
+  tiktok: "tiktok",
+};
+
+const SOCIAL_OAUTH_PLATFORMS: Record<string, "meta" | "linkedin"> = {
+  meta: "meta",
+  linkedin: "linkedin",
+};
+
+/** After OAuth, wire tokens into ads + social product tables (not only integrations hub). */
+export async function syncOAuthToProductModules(
+  userId: string,
+  provider: string,
+  data: {
+    accessToken: string;
+    refreshToken?: string;
+    expiresAt?: Date;
+    accountId?: string;
+    accountName?: string;
+  },
+): Promise<void> {
+  const tenant = await getSaasOnboardingService().getTenant(userId);
+  if (!tenant || !data.accessToken?.trim()) return;
+
+  const accountId = data.accountId?.trim() || `${provider}-primary`;
+  const accountName = data.accountName?.trim() || accountId;
+  const tokenExpiresAt = data.expiresAt?.toISOString();
+
+  const adsPlatform = ADS_OAUTH_PLATFORMS[provider];
+  if (adsPlatform) {
+    try {
+      await getSaasAdsDashboardService().connectAccount(tenant.id, {
+        platform: adsPlatform,
+        accountId,
+        accountName,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        tokenExpiresAt,
+      });
+    } catch {
+      /* non-fatal — manual connect still available */
+    }
+  }
+
+  const socialPlatform = SOCIAL_OAUTH_PLATFORMS[provider];
+  if (socialPlatform) {
+    try {
+      await getSaasSocialService().connectAccount(tenant.id, {
+        platform: socialPlatform,
+        accountId,
+        accountName,
+        accessToken: data.accessToken,
+        tokenExpiresAt,
+      });
+    } catch {
+      /* non-fatal */
+    }
   }
 }
 

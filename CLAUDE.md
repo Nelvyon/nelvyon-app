@@ -141,7 +141,8 @@ Pendientes de commitear (untracked): `401_inbox_conversations.sql` … `416_surv
 | Legacy /crm → redirect /saas/crm | ✅ |
 
 ### Módulos coming_soon (sin kickoff — NO activar)
-- Afiliados, dialer avanzado, LMS, loyalty, publicidad, social, web-builder
+- Ninguno en los 7 módulos legacy (affiliates, dialer, LMS, loyalty, publicidad, social, web-builder) — **ya tienen API real**; falta ops OAuth/Twilio/cron en prod.
+- Pack OS `analytics-insights` → alias kickoff de `analytics-setup-pack` ✅
 
 ---
 

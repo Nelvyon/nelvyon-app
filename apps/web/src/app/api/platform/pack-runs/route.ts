@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { findLatestPackRunBySaasClient } from "@/lib/packs/packRunStore";
+import { findLatestPackRunBySaasClient, listPackRunsForWorkspace } from "@/lib/packs/packRunStore";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +23,17 @@ export async function GET(req: Request) {
   }
 
   const url = new URL(req.url);
-  const saasClientId = Number(url.searchParams.get("saas_client_id"));
+  const saasClientIdRaw = url.searchParams.get("saas_client_id");
+  const limitRaw = url.searchParams.get("limit");
+  const packId = url.searchParams.get("pack_id") ?? undefined;
+  const limit = Math.min(Math.max(Number(limitRaw ?? 20), 1), 100);
+
+  if (!saasClientIdRaw) {
+    const runs = await listPackRunsForWorkspace(workspaceId, limit, packId);
+    return NextResponse.json({ runs });
+  }
+
+  const saasClientId = Number(saasClientIdRaw);
   if (!Number.isFinite(saasClientId) || saasClientId <= 0) {
     return NextResponse.json({ error: "saas_client_id query required" }, { status: 400 });
   }

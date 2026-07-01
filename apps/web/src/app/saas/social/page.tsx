@@ -313,8 +313,28 @@ export default function SaasSocialPage() {
         {/* No-account warning */}
         {!loading && accounts.length === 0 && (
           <SaasDegradedBanner>
-            Sin cuentas de redes sociales conectadas. Ve a Configuración → Integraciones y conecta Meta o LinkedIn
-            para programar y publicar posts en vivo.
+            <div className="space-y-3">
+              <p>
+                Sin cuentas de redes sociales conectadas. Conecta Meta o LinkedIn con OAuth para programar y publicar posts en vivo.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href="/api/oauth/meta"
+                  className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25"
+                >
+                  Conectar Meta →
+                </a>
+                <a
+                  href="/api/oauth/linkedin"
+                  className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25"
+                >
+                  Conectar LinkedIn →
+                </a>
+                <a href="/saas/integraciones" className="text-xs text-muted-foreground underline hover:text-foreground">
+                  Ver todas las integraciones
+                </a>
+              </div>
+            </div>
           </SaasDegradedBanner>
         )}
 

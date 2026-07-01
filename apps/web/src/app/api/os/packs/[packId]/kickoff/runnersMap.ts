@@ -77,4 +77,13 @@ export const RUNNERS: Record<string, PackRunnerEntry> = {
     validate: validateBrandVoiceIntake,
     run: runBrandVoicePack as PackRunner,
   },
+  /** Alias — analytics-insights → analytics-setup-pack */
+  "analytics-insights": {
+    validate: validateAnalyticsSetupIntake,
+    run: runAnalyticsSetupPack as PackRunner,
+  },
+  "analytics-insights-pack": {
+    validate: validateAnalyticsSetupIntake,
+    run: runAnalyticsSetupPack as PackRunner,
+  },
 };

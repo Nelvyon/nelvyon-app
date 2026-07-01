@@ -19,7 +19,16 @@ export function PlatformHealthBanner() {
     if (pathname === "/saas/setup" || pathname?.startsWith("/saas/onboarding")) return;
     fetch("/api/saas/platform-health", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d: HealthReport | null) => { if (d) setReport(d); })
+      .then((d: HealthReport | null) => {
+        if (
+          d &&
+          typeof d.score === "number" &&
+          d.status &&
+          typeof d.summary?.missingCount === "number"
+        ) {
+          setReport(d);
+        }
+      })
       .catch(() => {});
   }, [pathname]);
 
@@ -68,7 +77,16 @@ export function AccountHealthScore({ className = "" }: { className?: string }) {
   useEffect(() => {
     fetch("/api/saas/platform-health", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d: HealthReport | null) => { if (d) setReport(d); })
+      .then((d: HealthReport | null) => {
+        if (
+          d &&
+          typeof d.score === "number" &&
+          d.status &&
+          typeof d.summary?.missingCount === "number"
+        ) {
+          setReport(d);
+        }
+      })
       .catch(() => {});
   }, []);
 

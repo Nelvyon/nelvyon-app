@@ -22,7 +22,7 @@ export async function POST(
 ) {
   const { packId } = await ctx.params;
   const meta = getPackMeta(packId);
-  const runner = RUNNERS[packId];
+  const runner = RUNNERS[packId] ?? (meta ? RUNNERS[meta.id] : undefined);
 
   if (!meta || !runner) {
     return NextResponse.json({ error: `Pack desconocido: ${packId}` }, { status: 404 });

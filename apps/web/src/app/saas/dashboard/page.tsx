@@ -39,7 +39,24 @@ type DashboardSummary = {
   recentActivity: ActivityItem[];
 };
 
+type DashboardWidgetId =
+  | "health"
+  | "activation"
+  | "pipeline"
+  | "modules"
+  | "kpis"
+  | "activity"
+  | "quickActions";
 
+const WIDGET_LABELS: Record<DashboardWidgetId, string> = {
+  health: "Salud de cuenta",
+  activation: "Checklist activación",
+  pipeline: "Pipeline comercial",
+  modules: "Módulos activos",
+  kpis: "KPIs operaciones",
+  activity: "Actividad reciente",
+  quickActions: "Acciones rápidas",
+};
 
 function activityStatus(type: string): NelvyonDsStatus {
   const v = type.toLowerCase();
@@ -59,6 +76,11 @@ export default function SaasDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [widgets, setWidgets] = useState<DashboardWidgetId[]>([
+    "health", "activation", "pipeline", "modules", "kpis", "activity", "quickActions",
+  ]);
+  const [showCustomize, setShowCustomize] = useState(false);
+  const [savingLayout, setSavingLayout] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [exportingReport, setExportingReport] = useState(false);
 
@@ -90,6 +112,14 @@ export default function SaasDashboardPage() {
               trackEvent("plan_upgraded", { plan, from: previous });
             }
             sessionStorage.setItem(storageKey, plan);
+          }
+        }
+
+        const layoutRes = await fetch("/api/saas/dashboard/layout", { credentials: "same-origin", cache: "no-store" });
+        if (layoutRes.ok) {
+          const layoutBody = (await layoutRes.json()) as { layout?: { widgets?: DashboardWidgetId[] } };
+          if (Array.isArray(layoutBody.layout?.widgets) && layoutBody.layout.widgets.length > 0 && !cancelled) {
+            setWidgets(layoutBody.layout.widgets);
           }
         }
       } finally {
@@ -129,6 +159,24 @@ export default function SaasDashboardPage() {
 
   const now = new Date().toLocaleDateString("es-ES", { dateStyle: "full" });
   const hasNoJobs = summary.activeJobs === 0 && summary.completedJobs === 0;
+  const show = (id: DashboardWidgetId) => widgets.includes(id);
+
+  async function toggleWidget(id: DashboardWidgetId) {
+    const next = widgets.includes(id) ? widgets.filter((w) => w !== id) : [...widgets, id];
+    if (next.length === 0) return;
+    setWidgets(next);
+    setSavingLayout(true);
+    try {
+      await fetch("/api/saas/dashboard/layout", {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ layout: { widgets: next } }),
+      });
+    } finally {
+      setSavingLayout(false);
+    }
+  }
 
   return (
     <SaasShellLayout
@@ -148,14 +196,47 @@ export default function SaasDashboardPage() {
           <h1 className="mt-1 text-2xl font-bold text-white">{t("dashboard.welcome", { company: tenant.companyName })}</h1>
           <p className="mt-0.5 text-sm text-white/40">{now}</p>
         </div>
-        <AccountHealthScore />
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/60 hover:border-[#0084ff]/40 hover:text-white"
+            onClick={() => setShowCustomize((v) => !v)}
+          >
+            {showCustomize ? "Cerrar widgets" : "Personalizar widgets"}
+          </button>
+          {show("health") ? <AccountHealthScore /> : null}
+        </div>
       </div>
 
-      <ActivationChecklist />
-      <CommercialPipelineSection />
+      {showCustomize && (
+        <DarkCard>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">
+            Widgets visibles {savingLayout ? "· guardando…" : ""}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {(Object.keys(WIDGET_LABELS) as DashboardWidgetId[]).map((id) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => toggleWidget(id)}
+                className={`rounded-full px-3 py-1 text-xs border transition-colors ${
+                  show(id)
+                    ? "border-[#0084ff]/50 bg-[#0084ff]/10 text-white"
+                    : "border-white/10 text-white/40"
+                }`}
+              >
+                {WIDGET_LABELS[id]}
+              </button>
+            ))}
+          </div>
+        </DarkCard>
+      )}
+
+      {show("activation") ? <ActivationChecklist /> : null}
+      {show("pipeline") ? <CommercialPipelineSection /> : null}
 
       {/* Module stats */}
-      {summary.moduleStats && (
+      {show("modules") && summary.moduleStats && (
         <section>
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Módulos activos</p>
           <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
@@ -173,6 +254,7 @@ export default function SaasDashboardPage() {
       )}
 
       {/* KPI row */}
+      {show("kpis") && (
       <section>
         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Operaciones</p>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -181,9 +263,12 @@ export default function SaasDashboardPage() {
           ))}
         </div>
       </section>
+      )}
 
       {/* Activity + quick actions */}
+      {(show("activity") || show("quickActions")) && (
       <section className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        {show("activity") && (
         <DarkCard>
           <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.recent_activity")}</p>
           {summary.recentActivity.length === 0 ? (
@@ -202,7 +287,9 @@ export default function SaasDashboardPage() {
             </ul>
           )}
         </DarkCard>
+        )}
 
+        {show("quickActions") && (
         <DarkCard>
           <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.quick_actions")}</p>
           <div className="space-y-1.5">
@@ -249,7 +336,9 @@ export default function SaasDashboardPage() {
             </div>
           )}
         </DarkCard>
+        )}
       </section>
+      )}
     </SaasShellLayout>
   );
 }

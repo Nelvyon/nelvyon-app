@@ -214,6 +214,7 @@
       },
       "items": {
         "dashboard":    "Dashboard",
+        "setup":        "⚙️ Setup",
         "inbox":        "Unified Inbox",
         "crm":          "CRM",
         "pipeline":     "Pipeline",

@@ -147,6 +147,14 @@ const nextConfig: NextConfig = {
       { source: "/saas/dashboard/web-builder", destination: "/saas/web-builder", permanent: true },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/sites/:subdomain/:slug",
+        destination: "/api/public/site/:subdomain/:slug",
+      },
+    ];
+  },
   async headers() {
     const webhookHeaders = [...SECURITY_HEADERS_WITHOUT_CSP];
     const defaultHeaders = [...SECURITY_HEADERS_WITH_CSP];

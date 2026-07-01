@@ -261,6 +261,8 @@ export default function EntregablesPage() {
           <div className="space-y-4">
             <div className="flex justify-end">
               <button
+                type="button"
+                data-testid="revenue-recalcular"
                 onClick={() => { void handleRefreshRevenue(); }}
                 className="rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white hover:bg-white/20"
               >

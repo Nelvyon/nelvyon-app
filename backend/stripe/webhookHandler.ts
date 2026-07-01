@@ -80,6 +80,17 @@ export async function handleStripeWebhook(rawBody: string, signatureHeader: stri
       } else {
         await notifyPlanActivated(db, userId, plan, periodEnd);
       }
+
+      if (tenantId) {
+        const { maybeEarnLoyaltyFromCheckout } = await import("../saas/stripeLoyaltyEarn");
+        await maybeEarnLoyaltyFromCheckout(
+          db,
+          tenantId,
+          session.metadata ?? undefined,
+          session.amount_total,
+          session.id,
+        );
+      }
       break;
     }
     case "customer.subscription.created":

@@ -187,8 +187,20 @@ function pickOsFields(packId: PackId) {
     osConnectorIds: b?.connectorIds ?? [],
   };
 }
+/** Public aliases for kickoff routes (legacy docs / service catalog slugs). */
+export const PACK_ID_ALIASES: Record<string, PackId> = {
+  "analytics-insights": ANALYTICS_SETUP_PACK_ID,
+  "analytics-insights-pack": ANALYTICS_SETUP_PACK_ID,
+};
+
+export function resolvePackId(packId: string): PackId | null {
+  const resolved = (PACK_ID_ALIASES[packId] ?? packId) as PackId;
+  return PACK_REGISTRY[resolved] ? resolved : null;
+}
+
 export function getPackMeta(packId: string): PackMeta | null {
-  return PACK_REGISTRY[packId as PackId] ?? null;
+  const resolved = resolvePackId(packId);
+  return resolved ? PACK_REGISTRY[resolved] : null;
 }
 
 export const ALL_PACKS = Object.values(PACK_REGISTRY);

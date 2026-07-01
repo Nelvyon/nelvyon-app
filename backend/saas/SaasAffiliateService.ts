@@ -210,6 +210,46 @@ export class SaasAffiliateService {
     return mapCommission(rows[0]);
   }
 
+  /** Stripe Connect payout — requires STRIPE_SECRET_KEY and destination Connect account id. */
+  async payViaStripeConnect(
+    tenantId: string,
+    commissionId: string,
+    destinationAccountId: string,
+  ): Promise<AffiliateCommission> {
+    const dest = destinationAccountId.trim();
+    if (!dest) throw new SaasAffiliateError("destinationAccountId requerido", "VALIDATION");
+
+    const pending = await this.db.query<Record<string, unknown>>(
+      `SELECT * FROM saas_affiliate_commissions WHERE tenant_id=$1 AND id=$2::uuid AND status='approved' LIMIT 1`,
+      [tenantId, commissionId],
+    );
+    if (!pending[0]) throw new SaasAffiliateError("Comisión no encontrada o no aprobada", "NOT_FOUND");
+
+    const amountEur = toNum(pending[0].commission_amount);
+    const amountCents = Math.round(amountEur * 100);
+    if (amountCents <= 0) throw new SaasAffiliateError("Importe de comisión inválido", "VALIDATION");
+
+    const stripeKey = process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_API_KEY ?? "";
+    if (!stripeKey.trim()) {
+      throw new SaasAffiliateError("STRIPE_SECRET_KEY no configurado", "VALIDATION");
+    }
+
+    const Stripe = (await import("stripe")).default;
+    const stripe = new Stripe(stripeKey.trim());
+    const transfer = await stripe.transfers.create({
+      amount: amountCents,
+      currency: "eur",
+      destination: dest,
+      metadata: {
+        tenant_id: tenantId,
+        commission_id: commissionId,
+        affiliate_user_id: String(pending[0].affiliate_user_id ?? ""),
+      },
+    });
+
+    return this.markPaid(tenantId, commissionId, transfer.id);
+  }
+
   async getPayoutSummary(tenantId: string): Promise<AffiliateProgramStats> {
     const program = await this.getOrCreateProgram(tenantId);
     const links   = await this.listLinks(tenantId);

@@ -1,5 +1,5 @@
 import { OAuthService } from "../../../../../backend/oauth/OAuthService";
-import { syncOAuthProviderToHub } from "@nelvyon/saas";
+import { syncOAuthProviderToHub, syncOAuthToProductModules } from "@nelvyon/saas";
 import {
   redirectIntegrationsError,
   redirectIntegrationsSuccess,
@@ -34,6 +34,7 @@ export async function finishOAuthCallback(
 ) {
   await OAuthService.instance().saveConnection(userId, provider, data);
   await syncOAuthProviderToHub(userId, provider, data.accountName ?? null);
+  await syncOAuthToProductModules(userId, provider, data);
   return redirectIntegrationsSuccess(origin, provider);
 }
 

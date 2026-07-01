@@ -24,6 +24,14 @@ export async function setAuthCookie(context: BrowserContext): Promise<void> {
       httpOnly: false,
       secure: false,
     },
+    {
+      name: "NELVYON_LOCALE",
+      value: "es",
+      domain: "localhost",
+      path: "/",
+      httpOnly: false,
+      secure: false,
+    },
   ]);
 }
 
@@ -54,7 +62,11 @@ export async function expectUnauthorizedApi(
   throw lastErr;
 }
 
-// ─── Common fixture payloads ─────────────────────────────────────────────────
+export const FIXTURE_PLATFORM_HEALTH = {
+  score: 100,
+  status: "healthy" as const,
+  summary: { missingCount: 0 },
+};
 
 export const FIXTURE_SETTINGS = {
   tenant: { companyName: "Nelvyon E2E Corp", industry: "tech", plan: "pro", website: null, phone: null, employees: null },
@@ -509,6 +521,8 @@ export async function mockSaasApis(page: Page): Promise<void> {
 
   await page.route("**/api/saas/settings**", route =>
     route.fulfill({ json: FIXTURE_SETTINGS }));
+  await page.route("**/api/saas/platform-health**", route =>
+    route.fulfill({ json: FIXTURE_PLATFORM_HEALTH }));
   await page.route("**/api/saas/crm/contacts**", route =>
     route.fulfill({ json: FIXTURE_CONTACTS }));
   await page.route("**/api/saas/deals**", route =>

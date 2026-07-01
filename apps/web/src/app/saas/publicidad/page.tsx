@@ -92,6 +92,33 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
               ))}
             </div>
           </div>
+          {(platform === "meta" || platform === "google" || platform === "linkedin" || platform === "tiktok") && (
+            <div className="rounded-lg border border-[#0084ff]/20 bg-[#0084ff]/5 px-4 py-3 space-y-2">
+              <p className="text-xs text-muted-foreground">Conexión recomendada — OAuth oficial:</p>
+              <div className="flex flex-wrap gap-2">
+                {platform === "meta" && (
+                  <a href="/api/oauth/meta" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                    Conectar Meta OAuth →
+                  </a>
+                )}
+                {platform === "google" && (
+                  <a href="/api/oauth/google" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                    Conectar Google OAuth →
+                  </a>
+                )}
+                {platform === "linkedin" && (
+                  <a href="/api/oauth/linkedin" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                    Conectar LinkedIn OAuth →
+                  </a>
+                )}
+                {platform === "tiktok" && (
+                  <a href="/api/oauth/tiktok" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                    Conectar TikTok OAuth →
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Account ID *</label>
             <input value={accountId} onChange={e => setAccountId(e.target.value)} placeholder="act_123456789"

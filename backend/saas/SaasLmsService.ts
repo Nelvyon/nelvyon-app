@@ -185,6 +185,65 @@ export class SaasLmsService {
     return rows.map(rowToCourse);
   }
 
+  async listPublishedCourses(limit = 50): Promise<LmsCourse[]> {
+    const rows = await this.db.query<CourseRow>(
+      `SELECT id,tenant_id,title,description,slug,cover_image,price,status,modules_count,enrollments,created_at,updated_at
+       FROM saas_lms_courses WHERE status='published' ORDER BY updated_at DESC LIMIT $1`,
+      [limit],
+    );
+    return rows.map(rowToCourse);
+  }
+
+  async getPublishedCourse(courseId: string): Promise<LmsCourse & { modules: LmsModule[] }> {
+    const rows = await this.db.query<CourseRow>(
+      `SELECT id,tenant_id,title,description,slug,cover_image,price,status,modules_count,enrollments,created_at,updated_at
+       FROM saas_lms_courses WHERE id=$1 AND status='published' LIMIT 1`,
+      [courseId],
+    );
+    if (!rows[0]) throw new SaasLmsError("Course not found", "NOT_FOUND");
+    const course = rowToCourse(rows[0]);
+    const modules = await this.listModulesWithLessons(course.tenantId, course.id);
+    return { ...course, modules };
+  }
+
+  async resolveCourseTenant(courseId: string): Promise<{ tenantId: string; course: LmsCourse }> {
+    const rows = await this.db.query<CourseRow>(
+      `SELECT id,tenant_id,title,description,slug,cover_image,price,status,modules_count,enrollments,created_at,updated_at
+       FROM saas_lms_courses WHERE id=$1 LIMIT 1`,
+      [courseId],
+    );
+    if (!rows[0]) throw new SaasLmsError("Course not found", "NOT_FOUND");
+    const course = rowToCourse(rows[0]);
+    if (course.status !== "published") throw new SaasLmsError("Course is not published", "NOT_FOUND");
+    return { tenantId: course.tenantId, course };
+  }
+
+  async getProgressByEmail(tenantId: string, courseId: string, email: string): Promise<LmsProgressSummary & { enrollmentId: string }> {
+    const enroll = await this.db.query<{ id: string; progress_pct: number; lessons_total: number; lessons_completed: number }>(
+      `SELECT id,progress_pct,lessons_total,lessons_completed
+       FROM saas_lms_enrollments
+       WHERE tenant_id=$1 AND course_id=$2 AND lower(contact_email)=lower($3) AND status!='refunded'
+       ORDER BY enrolled_at DESC LIMIT 1`,
+      [tenantId, courseId, email.trim()],
+    );
+    if (!enroll[0]) throw new SaasLmsError("Enrollment not found", "NOT_FOUND");
+    return {
+      enrollmentId: enroll[0].id,
+      progressPct: enroll[0].progress_pct,
+      lessonsCompleted: enroll[0].lessons_completed,
+      lessonsTotal: enroll[0].lessons_total,
+    };
+  }
+
+  async resolveEnrollmentTenant(enrollmentId: string): Promise<string> {
+    const rows = await this.db.query<{ tenant_id: string }>(
+      `SELECT tenant_id FROM saas_lms_enrollments WHERE id=$1 LIMIT 1`,
+      [enrollmentId],
+    );
+    if (!rows[0]) throw new SaasLmsError("Enrollment not found", "NOT_FOUND");
+    return rows[0].tenant_id;
+  }
+
   async createCourse(tenantId: string, input: CreateCourseInput): Promise<LmsCourse> {
     if (!input.title?.trim()) throw new SaasLmsError("title is required", "VALIDATION");
     const slug = input.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);

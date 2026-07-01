@@ -63,10 +63,13 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Playwright E2E smoke (launch + local-pack)
-        run: pnpm test:e2e --project=chromium e2e/launch.spec.ts e2e/local-pack-smoke.spec.ts
+      - name: Playwright E2E smoke (launch + local-pack + os packs)
+        run: pnpm test:e2e --project=chromium e2e/launch.spec.ts e2e/local-pack-smoke.spec.ts e2e/os-pack-kickoff.spec.ts
         env:
           CI: "true"
+
+      - name: Backend SaaS unit tests (elite frentes)
+        run: pnpm exec vitest run backend/saas/__tests__/eliteFrentesCompletion.test.ts backend/saas/__tests__/integrationHubSync.test.ts --reporter=dot
 
       - name: Full regression tests (non-blocking signal)
         run: pnpm test:regression
