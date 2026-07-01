@@ -51,7 +51,13 @@ export function loadEnvatoSectorSeed(sectorId: string, index: number): SectorSee
   if (!fs.existsSync(metaFile)) return null;
   try {
     const entries = JSON.parse(fs.readFileSync(metaFile, "utf8")) as MetadataEntry[];
-    const sectorEntries = entries.filter((e) => e.sector === sectorId && e.headline);
+    const sectorEntries = entries
+      .filter((e) => e.sector === sectorId && e.headline)
+      .sort((a, b) => {
+        const ae = a.source === "envato" ? 0 : 1;
+        const be = b.source === "envato" ? 0 : 1;
+        return ae - be;
+      });
     const entry = sectorEntries[index];
     if (!entry) return null;
     return metadataToSeed(sectorId, entry);

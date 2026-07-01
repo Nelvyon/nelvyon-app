@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     }
 
     // ── Require id for most actions ──────────────────────────────────────────
-    if (body.action !== "list-versions" && !id) {
+    if (body.action !== "list-versions" && body.action !== "import-template" && !id) {
       return NextResponse.json({ error: "id required" }, { status: 400 });
     }
 
@@ -150,6 +150,13 @@ export async function POST(req: Request) {
       case "verify-domain": {
         const result = await svc.verifyCustomDomain(tenantId, id);
         return NextResponse.json(result);
+      }
+      case "import-template": {
+        const templateId = typeof body.template_id === "string" ? body.template_id : "";
+        if (!templateId) return NextResponse.json({ error: "template_id required" }, { status: 400 });
+        const companyName = typeof body.company_name === "string" ? body.company_name : ctx.tenant.companyName ?? undefined;
+        const page = await svc.createFromFeaturedTemplate(tenantId, templateId, companyName);
+        return NextResponse.json({ page }, { status: 201 });
       }
       default:
         return NextResponse.json({ error: `Unknown action: ${String(body.action)}` }, { status: 400 });

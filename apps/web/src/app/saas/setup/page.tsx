@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import {
+  FeaturedEnvatoTemplateCard,
+  type FeaturedTemplateMeta,
+} from "@/features/saas-web-builder/components/FeaturedEnvatoTemplateCard";
 import { NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
 import { ActivationChecklist } from "@/features/saas-shell/components/ActivationChecklist";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
@@ -54,6 +58,7 @@ export default function SaasSetupPage() {
   const [loading, setLoading] = useState(true);
   const [packLoading, setPackLoading] = useState(false);
   const [packMsg, setPackMsg] = useState<string | null>(null);
+  const [featuredTemplate, setFeaturedTemplate] = useState<FeaturedTemplateMeta | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -64,6 +69,11 @@ export default function SaasSetupPage() {
         return;
       }
       if (res.ok) setReport((await res.json()) as HealthReport);
+      const tplRes = await fetch("/api/saas/web-builder/templates", { cache: "no-store" });
+      if (tplRes.ok) {
+        const tpl = (await tplRes.json()) as { templates: FeaturedTemplateMeta[] };
+        setFeaturedTemplate(tpl.templates?.[0] ?? null);
+      }
     } finally {
       setLoading(false);
     }
@@ -143,6 +153,15 @@ export default function SaasSetupPage() {
               </NelvyonDsButton>
             </div>
           </NelvyonDsCard>
+
+          {featuredTemplate && (
+            <section>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">
+                Landing premium (Envato)
+              </p>
+              <FeaturedEnvatoTemplateCard template={featuredTemplate} onImported={load} />
+            </section>
+          )}
 
           {grouped.map(([category, items]) => (
             <section key={category}>

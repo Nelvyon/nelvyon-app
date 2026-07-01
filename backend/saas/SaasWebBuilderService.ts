@@ -5,6 +5,12 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import dns from "dns";
+import {
+  buildFeaturedTemplateSections,
+  getFeaturedEnvatoTemplate,
+  listFeaturedEnvatoTemplates,
+  type FeaturedEnvatoTemplate,
+} from "./featuredEnvatoTemplate";
 
 export class SaasWebBuilderError extends Error {
   constructor(message: string, public readonly code: string) {
@@ -183,6 +189,30 @@ export class SaasWebBuilderService {
       [tenantId, slug],
     );
     return rows[0] ? rowToPage(rows[0]) : null;
+  }
+
+  async createFromFeaturedTemplate(
+    tenantId: string,
+    templateId: string,
+    companyName?: string,
+  ): Promise<WebPage> {
+    const meta = getFeaturedEnvatoTemplate();
+    if (meta.id !== templateId) {
+      throw new SaasWebBuilderError(`Unknown template: ${templateId}`, "VALIDATION");
+    }
+    const sections = buildFeaturedTemplateSections(templateId, companyName ?? meta.name);
+    return this.create(tenantId, {
+      title: `${companyName?.trim() || "Mi empresa"} — Landing Premium`,
+      slug: meta.slug,
+      type: "landing",
+      sections,
+      seoTitle: `${companyName?.trim() || "Nelvyon"} | ${meta.headline}`,
+      seoDescription: meta.description,
+    });
+  }
+
+  listFeaturedTemplates(): FeaturedEnvatoTemplate[] {
+    return listFeaturedEnvatoTemplates();
   }
 
   async create(tenantId: string, input: CreatePageInput): Promise<WebPage> {
@@ -461,12 +491,29 @@ export class SaasWebBuilderService {
     const sectionHtml = page.sections.map((s) => {
       const c = s.content as Record<string, unknown>;
       switch (s.type) {
-        case "hero":
-          return `<section class="section-hero" style="padding:80px 20px;text-align:center;background:#0a0a0a;color:#fff">
-            <h1 style="font-size:clamp(1.8rem,4vw,3rem);font-weight:700;margin:0 0 16px;line-height:1.15">${esc(String(c.headline ?? ""))}</h1>
-            ${c.subtitle ? `<p style="font-size:1.15rem;color:#aaa;margin:0 0 28px;max-width:600px;margin-left:auto;margin-right:auto">${esc(String(c.subtitle))}</p>` : ""}
-            ${c.ctaLabel ? `<a href="${esc(String(c.ctaUrl ?? "#"))}" style="display:inline-block;padding:14px 36px;background:#0084ff;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:1rem">${esc(String(c.ctaLabel))}</a>` : ""}
+        case "hero": {
+          const stats = Array.isArray(c.stats)
+            ? (c.stats as Array<{ value?: string; label?: string }>)
+            : [];
+          const statsHtml = stats.length
+            ? `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:32px;margin-top:40px">
+                ${stats.map((s) => `<div><p style="font-size:1.75rem;font-weight:700;margin:0;color:#fff">${esc(String(s.value ?? ""))}</p><p style="font-size:0.8rem;color:#888;margin:4px 0 0">${esc(String(s.label ?? ""))}</p></div>`).join("")}
+              </div>`
+            : "";
+          const badge = c.badge
+            ? `<span style="display:inline-block;margin-bottom:16px;padding:6px 14px;border-radius:999px;border:1px solid rgba(0,132,255,0.4);background:rgba(0,132,255,0.12);color:#7ec8ff;font-size:0.75rem;font-weight:600;letter-spacing:0.04em">${esc(String(c.badge))}</span><br/>`
+            : "";
+          const secondary = c.secondaryCtaLabel
+            ? `<a href="${esc(String(c.secondaryCtaUrl ?? "#"))}" style="display:inline-block;margin-left:12px;padding:14px 28px;border:1px solid #444;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:1rem">${esc(String(c.secondaryCtaLabel))}</a>`
+            : "";
+          return `<section class="section-hero" style="padding:88px 20px 72px;text-align:center;background:linear-gradient(180deg,#020817 0%,#0a1628 100%);color:#fff">
+            ${badge}
+            <h1 style="font-size:clamp(1.9rem,4.5vw,3.2rem);font-weight:800;margin:0 0 16px;line-height:1.12;max-width:900px;margin-left:auto;margin-right:auto">${esc(String(c.headline ?? ""))}</h1>
+            ${c.subtitle ? `<p style="font-size:1.15rem;color:#94a3b8;margin:0 0 32px;max-width:640px;margin-left:auto;margin-right:auto;line-height:1.65">${esc(String(c.subtitle))}</p>` : ""}
+            <div>${c.ctaLabel ? `<a href="${esc(String(c.ctaUrl ?? "#"))}" style="display:inline-block;padding:14px 36px;background:#0084ff;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:1rem">${esc(String(c.ctaLabel))}</a>` : ""}${secondary}</div>
+            ${statsHtml}
           </section>`;
+        }
         case "text":
           return `<section style="max-width:720px;margin:48px auto;padding:0 24px;color:#eee">
             ${c.heading ? `<h2 style="font-size:1.6rem;font-weight:600;margin:0 0 16px;color:#fff">${esc(String(c.heading))}</h2>` : ""}

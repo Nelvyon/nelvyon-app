@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import {
+  FeaturedEnvatoTemplateCard,
+  type FeaturedTemplateMeta,
+} from "@/features/saas-web-builder/components/FeaturedEnvatoTemplateCard";
 
 interface WebPage {
   id: string; title: string; slug: string; type: "landing" | "blog" | "product" | "about" | "contact" | "custom";
@@ -141,6 +145,7 @@ function DomainModal({ page, onClose, onSaved }: { page: WebPage; onClose: () =>
 
 export default function SaasWebBuilderPage() {
   const [pages, setPages] = useState<WebPage[]>([]);
+  const [templates, setTemplates] = useState<FeaturedTemplateMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
   const [domainPage, setDomainPage] = useState<WebPage | null>(null);
@@ -149,9 +154,16 @@ export default function SaasWebBuilderPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/saas/web-builder");
-      const data = (await res.json().catch(() => ({ pages: [] }))) as { pages: WebPage[] };
+      const [pagesRes, tplRes] = await Promise.all([
+        fetch("/api/saas/web-builder"),
+        fetch("/api/saas/web-builder/templates"),
+      ]);
+      const data = (await pagesRes.json().catch(() => ({ pages: [] }))) as { pages: WebPage[] };
       setPages(data.pages ?? []);
+      if (tplRes.ok) {
+        const tpl = (await tplRes.json()) as { templates: FeaturedTemplateMeta[] };
+        setTemplates(tpl.templates ?? []);
+      }
     } finally { setLoading(false); }
   }, []);
 
@@ -190,6 +202,10 @@ export default function SaasWebBuilderPage() {
           <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nueva página</NelvyonDsButton>
         </div>
 
+        {templates[0] && (
+          <FeaturedEnvatoTemplateCard template={templates[0]} onImported={load} />
+        )}
+
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
             { label: "Páginas", value: pages.length },
@@ -209,9 +225,9 @@ export default function SaasWebBuilderPage() {
         ) : pages.length === 0 ? (
           <NelvyonDsCard className="p-16 text-center">
             <p className="text-5xl">🌐</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin páginas</p>
-            <p className="mt-2 text-sm text-muted-foreground">Crea landing pages, blogs o páginas de producto sin necesidad de código</p>
-            <NelvyonDsButton className="mt-5" onClick={() => setShowNew(true)}>+ Crear primera página</NelvyonDsButton>
+            <p className="mt-4 text-lg font-semibold text-foreground">Sin páginas propias aún</p>
+            <p className="mt-2 text-sm text-muted-foreground">Importa la plantilla premium Landrick arriba o crea una página desde cero</p>
+            <NelvyonDsButton className="mt-5" onClick={() => setShowNew(true)}>+ Crear página en blanco</NelvyonDsButton>
           </NelvyonDsCard>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">

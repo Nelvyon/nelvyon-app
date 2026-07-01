@@ -1053,6 +1053,13 @@ export {
   type AddSectionInput,
 } from "./SaasWebBuilderService";
 export {
+  getFeaturedEnvatoTemplate,
+  listFeaturedEnvatoTemplates,
+  buildFeaturedTemplateSections,
+  FEATURED_ENVATO_TEMPLATE,
+  type FeaturedEnvatoTemplate,
+} from "./featuredEnvatoTemplate";
+export {
   SaasLmsService,
   SaasLmsError,
   getSaasLmsService,
