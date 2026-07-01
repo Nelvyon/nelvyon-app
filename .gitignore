@@ -73,6 +73,7 @@ Thumbs.db
 
 # --- E2E / Playwright ---
 playwright-report/
+playwright-report-saas/
 test-results/
 blob-report/
 

@@ -77,30 +77,32 @@ function CodeToggleCard({
   );
 }
 
-function DisabledDownloadCard({
+function DownloadLinkCard({
   icon,
   title,
   description,
-  badge,
+  href,
   buttonLabel,
 }: {
   icon: string;
   title: string;
   description: string;
-  badge: string;
+  href: string;
   buttonLabel: string;
 }) {
   return (
     <NelvyonDsCard className="flex flex-col gap-3 p-5">
       <div className="flex items-start justify-between gap-2">
         <span className="text-3xl">{icon}</span>
-        <NelvyonDsBadge tone="warning">{badge}</NelvyonDsBadge>
+        <NelvyonDsBadge tone="success">Disponible</NelvyonDsBadge>
       </div>
       <p className="text-sm font-semibold text-foreground">{title}</p>
       <p className="text-xs text-muted-foreground">{description}</p>
-      <NelvyonDsButton variant="ghost" className="w-full" disabled>
-        {buttonLabel}
-      </NelvyonDsButton>
+      <Link href={href}>
+        <NelvyonDsButton variant="ghost" className="w-full">
+          {buttonLabel}
+        </NelvyonDsButton>
+      </Link>
     </NelvyonDsCard>
   );
 }
@@ -110,9 +112,8 @@ function DisabledDownloadCard({
 interface ToolConfig {
   icon: string;
   name: string;
-  slug: string | null;
+  slug: string;
   description: string;
-  comingSoon?: boolean;
 }
 
 const TOOLS: ToolConfig[] = [
@@ -152,18 +153,12 @@ function ToolsSection() {
   }, []);
 
   function toolStatus(tool: ToolConfig): { label: string; tone: "success" | "primary" | "warning" | "danger"; connected: boolean } {
-    if (tool.comingSoon) {
-      return { label: "Próximamente", tone: "warning", connected: false };
-    }
-    if (!tool.slug) {
-      return { label: "Próximamente", tone: "warning", connected: false };
-    }
     const conn = connections.find((c) => c.slug === tool.slug);
+    if (conn?.catalogStatus === "coming_soon") {
+      return { label: "En catálogo", tone: "warning", connected: false };
+    }
     if (!conn) {
       return { label: loading ? "…" : "No conectado", tone: "primary", connected: false };
-    }
-    if (conn.catalogStatus === "coming_soon") {
-      return { label: "Próximamente", tone: "warning", connected: false };
     }
     if (conn.status === "connected") {
       return { label: "Conectado", tone: "success", connected: true };
@@ -311,26 +306,26 @@ export default function HerramientasPage() {
             <section className="space-y-4">
               <p className="text-sm font-semibold text-muted-foreground">📦 Descargas</p>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <DisabledDownloadCard
-                  icon="🔌"
-                  title="Extensión Chrome"
-                  description="Prospecta en LinkedIn, captura leads y añádelos al CRM con 1 clic"
-                  badge="Próximamente"
-                  buttonLabel="Descargar extensión"
-                />
-                <DisabledDownloadCard
+                <DownloadLinkCard
                   icon="📱"
-                  title="App iOS"
-                  description="Gestiona tu CRM, recibe alertas y llama a clientes desde el móvil"
-                  badge="Próximamente"
-                  buttonLabel="App Store"
+                  title="App móvil (PWA)"
+                  description="Instala Nelvyon en iPhone o Android desde el navegador — CRM, inbox y alertas"
+                  href="/saas/pwa"
+                  buttonLabel="Instalar PWA"
                 />
-                <DisabledDownloadCard
-                  icon="🤖"
-                  title="App Android"
-                  description="Mismas funciones que iOS, optimizada para Android"
-                  badge="Próximamente"
-                  buttonLabel="Google Play"
+                <DownloadLinkCard
+                  icon="🎯"
+                  title="Prospección B2B"
+                  description="Busca leads, enriquece contactos y añádelos al CRM desde la web"
+                  href="/saas/prospecting"
+                  buttonLabel="Abrir prospección"
+                />
+                <DownloadLinkCard
+                  icon="🔑"
+                  title="API & Webhooks"
+                  description="Integra Nelvyon con Zapier, Make, n8n y tus sistemas"
+                  href="/saas/integraciones"
+                  buttonLabel="Ver integraciones"
                 />
                 <CodeToggleCard
                   icon="💬"
@@ -357,11 +352,11 @@ export default function HerramientasPage() {
                   <p className="text-xs text-muted-foreground">
                     Conecta Nelvyon con +5.000 apps sin código
                   </p>
-                  <a href="https://zapier.com" target="_blank" rel="noopener noreferrer">
+                  <Link href="/saas/integraciones">
                     <NelvyonDsButton variant="ghost" className="w-full">
-                      Ir a Zapier ↗
+                      Configurar en Integraciones
                     </NelvyonDsButton>
-                  </a>
+                  </Link>
                 </NelvyonDsCard>
               </div>
             </section>
@@ -380,22 +375,21 @@ export default function HerramientasPage() {
               <p className="text-sm font-semibold text-muted-foreground">📚 Recursos</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  { icon: "📄", title: "Guía de inicio rápido", type: "PDF", label: "Descargar" },
-                  { icon: "📁", title: "Plantillas de workflows", type: "ZIP", label: "Descargar" },
-                  { icon: "🗂️", title: "Postman collection", type: "JSON", label: "Descargar" },
-                  { icon: "📦", title: "SDK JavaScript", type: "npm", label: "npm install @nelvyon/sdk" },
-                ].map(({ icon, title, type, label }) => (
+                  { icon: "📋", title: "Playbooks de datos", href: "/saas/playbooks", label: "Abrir" },
+                  { icon: "⚙️", title: "Workflows y automatizaciones", href: "/saas/workflows", label: "Abrir" },
+                  { icon: "🔑", title: "API keys", href: "/saas/api-keys", label: "Gestionar" },
+                  { icon: "🔗", title: "Webhooks", href: "/saas/webhooks", label: "Configurar" },
+                ].map(({ icon, title, href, label }) => (
                   <NelvyonDsCard key={title} className="flex items-center gap-4 p-4">
                     <span className="text-2xl">{icon}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground">{title}</p>
-                      <p className="text-xs text-muted-foreground">{type}</p>
                     </div>
-                    <a href="#">
+                    <Link href={href}>
                       <NelvyonDsButton variant="ghost" className="shrink-0 text-xs">
                         {label}
                       </NelvyonDsButton>
-                    </a>
+                    </Link>
                   </NelvyonDsCard>
                 ))}
               </div>

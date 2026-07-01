@@ -9,6 +9,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const TEST_JWT_SECRET = process.env.JWT_SECRET ?? "test-secret-for-playwright-saas-e2e";
+/** Local Windows: use installed Google Chrome when bundled Chromium install fails. CI unchanged. */
+const useSystemChrome = process.env.PLAYWRIGHT_CHANNEL === "chrome";
 
 export default defineConfig({
   testDir: "./e2e/saas",
@@ -23,7 +25,7 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3000",
     ...devices["Desktop Chrome"],
-    browserName: "chromium",
+    ...(useSystemChrome ? { channel: "chrome" as const } : { browserName: "chromium" as const }),
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "off",
