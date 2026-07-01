@@ -1,0 +1,122 @@
+name: Production Cron Executor
+
+# Replaces a dedicated Railway cron service — hits nelvyon.com on schedule.
+# Requires: repository variable STAGING_BASE_URL + secret CRON_SECRET
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # saas-workflows (scheduled triggers)
+    - cron: "*/15 * * * *"  # social-publish queue
+    - cron: "5 0 * * *"     # workflow-date (00:05 UTC daily)
+    - cron: "0 6 * * *"     # saas-dunning (daily 06:00 UTC)
+    - cron: "0 8 1 * *"     # os-recurring-services (1st of month)
+    - cron: "0 6 1 * *"     # os-learning-loop (1st of month)
+  workflow_dispatch:
+
+concurrency:
+  group: production-cron-${{ github.event.schedule || 'manual' }}
+  cancel-in-progress: false
+
+jobs:
+  saas-workflows:
+    if: github.event.schedule == '*/5 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger saas-workflows cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
+            -H "x-cron-secret: $CRON_SECRET" \
+            "$BASE_URL/api/cron/saas-workflows")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  social-publish:
+    if: github.event.schedule == '*/15 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger social-publish cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
+            -H "x-cron-secret: $CRON_SECRET" \
+            "$BASE_URL/api/cron/social-publish")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  workflow-date:
+    if: github.event.schedule == '5 0 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger workflow-date cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
+            -H "x-cron-secret: $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            "$BASE_URL/api/cron/workflow-date")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  saas-dunning:
+    if: github.event.schedule == '0 6 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger saas-dunning cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/saas-dunning")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  os-recurring-services:
+    if: github.event.schedule == '0 8 1 * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger os-recurring-services cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
+            -H "x-cron-secret: $CRON_SECRET" \
+            "$BASE_URL/api/cron/os-recurring-services")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  os-learning-loop:
+    if: github.event.schedule == '0 6 1 * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger os-learning-loop cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
+            -H "x-cron-secret: $CRON_SECRET" \
+            "$BASE_URL/api/cron/os-learning-loop")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
