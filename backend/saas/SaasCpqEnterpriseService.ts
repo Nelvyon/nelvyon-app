@@ -318,10 +318,11 @@ export class SaasCpqEnterpriseService {
   }
 
   async processDueDunning(limit = 50): Promise<{ processed: number; failed: number }> {
-    const rows = await this.db.query<DunningRow & { client_email: string; invoice_number: string; total: string }>(
-      `SELECT d.*, i.client_email, i.invoice_number, i.total
+    const rows = await this.db.query<DunningRow & { client_email: string | null; invoice_number: string; total: string }>(
+      `SELECT d.*, c.email AS client_email, i.invoice_number, i.total
        FROM saas_dunning_events d
        JOIN invoices i ON i.id = d.invoice_id
+       LEFT JOIN saas_contacts c ON c.id = i.contact_id
        WHERE d.status = 'pending' AND d.scheduled_at <= NOW()
        ORDER BY d.scheduled_at
        LIMIT $1`,
@@ -332,6 +333,13 @@ export class SaasCpqEnterpriseService {
     let failed = 0;
 
     for (const row of rows) {
+      if (!row.client_email?.trim()) {
+        await this.db.query(
+          `UPDATE saas_dunning_events SET status='skipped', error_message='no contact email' WHERE id=$1`,
+          [row.id],
+        );
+        continue;
+      }
       try {
         const { getSesClient } = await import("../email/sesClient");
         const { SendEmailCommand } = await import("@aws-sdk/client-ses");
