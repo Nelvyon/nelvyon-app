@@ -6,6 +6,8 @@ import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { buildOidcAuthUrl, getSaasSsoService } from "@nelvyon/saas";
 
+import { buildSamlAuthnRedirectUrl } from "@/lib/sso/samlParse";
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const tenantId = url.searchParams.get("tenantId")?.trim();
@@ -33,12 +35,17 @@ export async function GET(req: Request) {
 
   if (config.provider === "saml") {
     const acsUrl = `${appUrl}/api/auth/sso/saml/acs`;
-    const ssoUrl = config.metadataUrl ?? config.issuer;
-    const redirect = new URL(ssoUrl);
-    redirect.searchParams.set("SAMLRequest", Buffer.from(`RelayState=${state}`).toString("base64"));
-    redirect.searchParams.set("RelayState", state);
-    redirect.searchParams.set("ACS", acsUrl);
-    return NextResponse.redirect(redirect.toString());
+    const idpSsoUrl = config.metadataUrl ?? config.issuer;
+    if (!idpSsoUrl?.trim()) {
+      return NextResponse.json({ error: "SAML IdP SSO URL not configured" }, { status: 400 });
+    }
+    const redirectUrl = buildSamlAuthnRedirectUrl({
+      idpSsoUrl,
+      acsUrl,
+      issuer: appUrl,
+      relayState: state,
+    });
+    return NextResponse.redirect(redirectUrl);
   }
 
   const nonce = crypto.randomUUID();

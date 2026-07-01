@@ -124,11 +124,10 @@ export async function startPartnerConnectOnboarding(params: {
 }
 
 export async function maybeSeedDemoLedger(workspaceId: number): Promise<void> {
-  if (process.env.PARTNER_LEDGER_DEMO === "true" || process.env.ENVIRONMENT === "staging") {
-    try {
-      await seedDemoLedgerEntries(workspaceId);
-    } catch {
-      /* non-blocking */
-    }
+  if (process.env.PARTNER_LEDGER_DEMO !== "true") return;
+  try {
+    await seedDemoLedgerEntries(workspaceId);
+  } catch {
+    /* non-blocking */
   }
 }

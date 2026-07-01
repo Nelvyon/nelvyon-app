@@ -96,3 +96,66 @@ export async function createConnectAccountLink(params: {
 export async function retrieveConnectAccount(accountId: string): Promise<StripeAccountSnapshot> {
   return stripeForm<StripeAccountSnapshot>("GET", `/accounts/${encodeURIComponent(accountId)}`);
 }
+
+/** Platform customer for end-client rebilling (metadata: workspace ids). */
+export async function createPlatformCustomer(params: {
+  email: string;
+  name?: string;
+  metadata: Record<string, string>;
+}): Promise<{ id: string }> {
+  const body: Record<string, string> = {
+    email: params.email,
+    ...(params.name ? { name: params.name } : {}),
+  };
+  for (const [k, v] of Object.entries(params.metadata)) {
+    body[`metadata[${k}]`] = v;
+  }
+  return stripeForm<{ id: string }>("POST", "/customers", body);
+}
+
+/** Connect destination charge — Nelvyon retains wholesale via application_fee. */
+export async function createConnectPaymentIntent(params: {
+  amountCents: number;
+  currency: string;
+  connectedAccountId: string;
+  applicationFeeCents: number;
+  customerId?: string;
+  metadata?: Record<string, string>;
+}): Promise<{ id: string; client_secret: string | null; status: string }> {
+  const body: Record<string, string> = {
+    amount: String(params.amountCents),
+    currency: params.currency.toLowerCase(),
+    "automatic_payment_methods[enabled]": "true",
+    application_fee_amount: String(params.applicationFeeCents),
+    "transfer_data[destination]": params.connectedAccountId,
+  };
+  if (params.customerId) body.customer = params.customerId;
+  for (const [k, v] of Object.entries(params.metadata ?? {})) {
+    body[`metadata[${k}]`] = v;
+  }
+  return stripeForm("POST", "/payment_intents", body);
+}
+
+/** Monthly subscription with application fee (wholesale retained on platform). */
+export async function createConnectSubscription(params: {
+  customerId: string;
+  connectedAccountId: string;
+  retailAmountCents: number;
+  wholesaleAmountCents: number;
+  currency: string;
+  metadata?: Record<string, string>;
+}): Promise<{ id: string; status: string }> {
+  const body: Record<string, string> = {
+    customer: params.customerId,
+    "items[0][price_data][currency]": params.currency.toLowerCase(),
+    "items[0][price_data][unit_amount]": String(params.retailAmountCents),
+    "items[0][price_data][recurring][interval]": "month",
+    "items[0][price_data][product_data][name]": "Nelvyon Partner Client Plan",
+    application_fee_amount: String(params.wholesaleAmountCents),
+    "transfer_data[destination]": params.connectedAccountId,
+  };
+  for (const [k, v] of Object.entries(params.metadata ?? {})) {
+    body[`metadata[${k}]`] = v;
+  }
+  return stripeForm("POST", "/subscriptions", body);
+}

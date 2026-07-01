@@ -243,8 +243,13 @@ export class SaasAdsDashboardService {
       metrics = await this._fetchMetaMetrics(conn.access_token, conn.account_id, conn.extra_config, dateStart, dateEnd);
     } else if (platform === "google") {
       metrics = await this._fetchGoogleMetrics(conn.access_token, conn.account_id, conn.extra_config, dateStart, dateEnd);
+    } else if (platform === "tiktok") {
+      metrics = await this._fetchTikTokMetrics(conn.access_token, conn.account_id, dateStart, dateEnd);
+    } else if (platform === "linkedin") {
+      metrics = await this._fetchLinkedInMetrics(conn.access_token, conn.account_id, dateStart, dateEnd);
+    } else if (platform === "snapchat") {
+      metrics = await this._fetchSnapchatMetrics(conn.access_token, conn.account_id, dateStart, dateEnd);
     } else {
-      // linkedin / tiktok — endpoint not yet implemented
       throw new SaasAdsDashboardError(`Live metrics for ${platform} not yet implemented. Connect Meta or Google.`, "API_ERROR");
     }
 
@@ -343,6 +348,7 @@ export class SaasAdsDashboardService {
     if (platform === "google") return this._fetchGoogleCampaigns(conn.access_token, conn.account_id, conn.extra_config);
     if (platform === "tiktok") return this._fetchTikTokCampaigns(conn.access_token, conn.account_id);
     if (platform === "snapchat") return this._fetchSnapchatCampaigns(conn.access_token, conn.account_id);
+    if (platform === "linkedin") return this._fetchLinkedInCampaigns(conn.access_token, conn.account_id);
     throw new SaasAdsDashboardError(`Campaign listing for ${platform} not yet implemented`, "API_ERROR");
   }
 
@@ -357,6 +363,7 @@ export class SaasAdsDashboardService {
     if (input.platform === "google") return this._createGoogleCampaign(conn.access_token, conn.account_id, conn.extra_config, input);
     if (input.platform === "tiktok") return this._createTikTokCampaign(conn.access_token, conn.account_id, input);
     if (input.platform === "snapchat") return this._createSnapchatCampaign(conn.access_token, conn.account_id, input);
+    if (input.platform === "linkedin") return this._createLinkedInCampaign(conn.access_token, conn.account_id, conn.extra_config, input);
     throw new SaasAdsDashboardError(`Campaign creation for ${input.platform} not yet implemented`, "API_ERROR");
   }
 
@@ -372,6 +379,7 @@ export class SaasAdsDashboardService {
     if (platform === "google") return this._updateGoogleBudget(conn.access_token, conn.account_id, conn.extra_config, campaignId, dailyBudgetUsd);
     if (platform === "tiktok") return this._updateTikTokBudget(conn.access_token, conn.account_id, campaignId, dailyBudgetUsd);
     if (platform === "snapchat") return this._updateSnapchatBudget(conn.access_token, campaignId, dailyBudgetUsd);
+    if (platform === "linkedin") return this._updateLinkedInBudget(conn.access_token, campaignId, dailyBudgetUsd);
     throw new SaasAdsDashboardError(`Budget update for ${platform} not yet implemented`, "API_ERROR");
   }
 
@@ -386,6 +394,7 @@ export class SaasAdsDashboardService {
     if (platform === "google") return this._setGoogleCampaignStatus(conn.access_token, conn.account_id, conn.extra_config, campaignId, status);
     if (platform === "tiktok") return this._setTikTokCampaignStatus(conn.access_token, conn.account_id, campaignId, status);
     if (platform === "snapchat") return this._setSnapchatCampaignStatus(conn.access_token, campaignId, status);
+    if (platform === "linkedin") return this._setLinkedInCampaignStatus(conn.access_token, campaignId, status);
     throw new SaasAdsDashboardError(`Campaign management for ${platform} not yet implemented`, "API_ERROR");
   }
 
@@ -858,6 +867,246 @@ export class SaasAdsDashboardService {
     const data = await res.json() as { error?: { message: string } };
     if (!res.ok || data.error) throw new SaasAdsDashboardError(`Google Ads: ${data.error?.message ?? "unknown error"}`, "API_ERROR");
     return { id: campaignId, name: "", status: "UNKNOWN", platform: "google", dailyBudget: dailyBudgetUsd };
+  }
+
+  // ── LinkedIn Marketing API ─────────────────────────────────────────────────
+
+  private _linkedinHeaders(token: string): Record<string, string> {
+    return {
+      Authorization: `Bearer ${token}`,
+      "Linkedin-Version": "202401",
+      "X-Restli-Protocol-Version": "2.0.0",
+      "Content-Type": "application/json",
+    };
+  }
+
+  private _linkedinAccountUrn(accountId: string): string {
+    return accountId.startsWith("urn:") ? accountId : `urn:li:sponsoredAccount:${accountId}`;
+  }
+
+  private async _resolveLinkedInCampaignGroupUrn(
+    token: string,
+    accountId: string,
+    extra: Record<string, unknown>,
+  ): Promise<string> {
+    const fromConfig = extra["campaignGroupUrn"] ?? extra["campaignGroupId"];
+    if (typeof fromConfig === "string" && fromConfig.trim()) {
+      return fromConfig.startsWith("urn:") ? fromConfig : `urn:li:sponsoredCampaignGroup:${fromConfig}`;
+    }
+    const accountUrn = this._linkedinAccountUrn(accountId);
+    const listRes = await this.fetchFn(
+      `https://api.linkedin.com/rest/adAccounts/${encodeURIComponent(accountUrn)}/adCampaignGroups?q=search&search=(status:(values:List(ACTIVE,DRAFT)))`,
+      { headers: this._linkedinHeaders(token) },
+    );
+    const listData = await listRes.json() as { elements?: Array<{ id?: number | string }> };
+    if (listRes.ok && listData.elements?.length) {
+      const id = listData.elements[0].id;
+      return typeof id === "string" && id.startsWith("urn:") ? id : `urn:li:sponsoredCampaignGroup:${id}`;
+    }
+    const createRes = await this.fetchFn(
+      `https://api.linkedin.com/rest/adAccounts/${encodeURIComponent(accountUrn)}/adCampaignGroups`,
+      {
+        method: "POST",
+        headers: this._linkedinHeaders(token),
+        body: JSON.stringify({
+          account: accountUrn,
+          name: "Nelvyon Campaigns",
+          status: "ACTIVE",
+          runSchedule: { start: Date.now() },
+        }),
+      },
+    );
+    const created = await createRes.json() as { id?: number | string };
+    if (!createRes.ok || created.id == null) {
+      throw new SaasAdsDashboardError("LinkedIn Ads: could not resolve campaign group", "API_ERROR");
+    }
+    const id = created.id;
+    return typeof id === "string" && id.startsWith("urn:") ? id : `urn:li:sponsoredCampaignGroup:${id}`;
+  }
+
+  private async _fetchLinkedInMetrics(
+    token: string,
+    accountId: string,
+    dateStart: string,
+    dateEnd: string,
+  ): Promise<Omit<AdsMetrics, "platform" | "dateStart" | "dateEnd" | "fromCache" | "fetchedAt">> {
+    const [sy, sm, sd] = dateStart.split("-").map(Number);
+    const [ey, em, ed] = dateEnd.split("-").map(Number);
+    const accountUrn = accountId.startsWith("urn:") ? accountId : `urn:li:sponsoredAccount:${accountId}`;
+    const q = new URLSearchParams({
+      q: "analytics",
+      pivot: "ACCOUNT",
+      timeGranularity: "ALL",
+      dateRange: `(start:(year:${sy},month:${sm},day:${sd}),end:(year:${ey},month:${em},day:${ed}))`,
+      accounts: `List(${accountUrn})`,
+      fields: "costInLocalCurrency,impressions,clicks,externalWebsiteConversions",
+    });
+    const res = await this.fetchFn(`https://api.linkedin.com/rest/adAnalytics?${q}`, {
+      headers: this._linkedinHeaders(token),
+    });
+    const data = await res.json() as { elements?: Array<Record<string, number>> };
+    if (!res.ok) throw new SaasAdsDashboardError(`LinkedIn Ads: HTTP ${res.status}`, "API_ERROR");
+    const el = data.elements?.[0] ?? {};
+    const spend = Number(el.costInLocalCurrency ?? 0);
+    const impressions = Number(el.impressions ?? 0);
+    const clicks = Number(el.clicks ?? 0);
+    const conversions = Number(el.externalWebsiteConversions ?? 0);
+    const ctr = impressions > 0 ? (clicks / impressions) * 100 : null;
+    const cpc = clicks > 0 ? spend / clicks : null;
+    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null };
+  }
+
+  private async _fetchLinkedInCampaigns(token: string, accountId: string): Promise<AdsCampaign[]> {
+    const accountUrn = accountId.startsWith("urn:") ? accountId : `urn:li:sponsoredAccount:${accountId}`;
+    const res = await this.fetchFn(
+      `https://api.linkedin.com/rest/adAccounts/${encodeURIComponent(accountUrn)}/adCampaigns?q=search&search=(status:(values:List(ACTIVE,PAUSED)))`,
+      { headers: this._linkedinHeaders(token) },
+    );
+    const data = await res.json() as { elements?: Array<Record<string, unknown>> };
+    if (!res.ok) throw new SaasAdsDashboardError(`LinkedIn Ads: HTTP ${res.status}`, "API_ERROR");
+    return (data.elements ?? []).map((c) => ({
+      id: String(c.id ?? ""),
+      name: String(c.name ?? ""),
+      status: (c.status === "ACTIVE" ? "ACTIVE" : "PAUSED") as AdsCampaignStatus,
+      platform: "linkedin" as AdsPlatform,
+      dailyBudget: c.dailyBudget != null && typeof c.dailyBudget === "object"
+        ? Number((c.dailyBudget as { amount?: number }).amount ?? 0) || null
+        : null,
+    }));
+  }
+
+  private async _createLinkedInCampaign(
+    token: string,
+    accountId: string,
+    extra: Record<string, unknown>,
+    input: AdsCreateCampaignInput,
+  ): Promise<AdsCampaign> {
+    const accountUrn = this._linkedinAccountUrn(accountId);
+    const campaignGroup = await this._resolveLinkedInCampaignGroupUrn(token, accountId, extra);
+    const res = await this.fetchFn(
+      `https://api.linkedin.com/rest/adAccounts/${encodeURIComponent(accountUrn)}/adCampaigns`,
+      {
+        method: "POST",
+        headers: this._linkedinHeaders(token),
+        body: JSON.stringify({
+          account: accountUrn,
+          campaignGroup,
+          name: input.name,
+          status: input.status ?? "PAUSED",
+          type: "SPONSORED_UPDATES",
+          costType: "CPM",
+          dailyBudget: { currencyCode: "USD", amount: String(input.dailyBudgetUsd) },
+          locale: { country: "US", language: "en" },
+        }),
+      },
+    );
+    const data = await res.json() as { id?: number | string; name?: string; status?: string };
+    if (!res.ok || data.id == null) {
+      throw new SaasAdsDashboardError(`LinkedIn Ads: HTTP ${res.status}`, "API_ERROR");
+    }
+    const id = typeof data.id === "string" ? data.id : String(data.id);
+    return {
+      id,
+      name: input.name,
+      status: (data.status === "ACTIVE" ? "ACTIVE" : "PAUSED") as AdsCampaignStatus,
+      platform: "linkedin",
+      dailyBudget: input.dailyBudgetUsd,
+    };
+  }
+
+  private async _updateLinkedInBudget(token: string, campaignId: string, dailyBudgetUsd: number): Promise<AdsCampaign> {
+    const campaignUrn = campaignId.startsWith("urn:") ? campaignId : `urn:li:sponsoredCampaign:${campaignId}`;
+    const res = await this.fetchFn(
+      `https://api.linkedin.com/rest/adCampaigns/${encodeURIComponent(campaignUrn)}`,
+      {
+        method: "POST",
+        headers: { ...this._linkedinHeaders(token), "X-RestLi-Method": "PARTIAL_UPDATE" },
+        body: JSON.stringify({
+          patch: {
+            $set: {
+              dailyBudget: { currencyCode: "USD", amount: String(dailyBudgetUsd) },
+            },
+          },
+        }),
+      },
+    );
+    if (!res.ok) throw new SaasAdsDashboardError(`LinkedIn Ads: HTTP ${res.status}`, "API_ERROR");
+    return { id: campaignId, name: "", status: "UNKNOWN", platform: "linkedin", dailyBudget: dailyBudgetUsd };
+  }
+
+  private async _setLinkedInCampaignStatus(
+    token: string,
+    campaignId: string,
+    status: "ACTIVE" | "PAUSED",
+  ): Promise<void> {
+    const campaignUrn = campaignId.startsWith("urn:") ? campaignId : `urn:li:sponsoredCampaign:${campaignId}`;
+    const res = await this.fetchFn(
+      `https://api.linkedin.com/rest/adCampaigns/${encodeURIComponent(campaignUrn)}`,
+      {
+        method: "POST",
+        headers: { ...this._linkedinHeaders(token), "X-RestLi-Method": "PARTIAL_UPDATE" },
+        body: JSON.stringify({ patch: { $set: { status } } }),
+      },
+    );
+    if (!res.ok) throw new SaasAdsDashboardError(`LinkedIn Ads: HTTP ${res.status}`, "API_ERROR");
+  }
+
+  private async _fetchTikTokMetrics(
+    token: string,
+    advertiserId: string,
+    dateStart: string,
+    dateEnd: string,
+  ): Promise<Omit<AdsMetrics, "platform" | "dateStart" | "dateEnd" | "fromCache" | "fetchedAt">> {
+    const res = await this.fetchFn(
+      "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/",
+      {
+        method: "POST",
+        headers: { "Access-Token": token, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          advertiser_id: advertiserId,
+          report_type: "BASIC",
+          data_level: "AUCTION_ADVERTISER",
+          dimensions: ["advertiser_id"],
+          metrics: ["spend", "impressions", "clicks", "conversion"],
+          start_date: dateStart,
+          end_date: dateEnd,
+        }),
+      },
+    );
+    const data = await res.json() as { code?: number; message?: string; data?: { list?: Array<Record<string, unknown>> } };
+    if (!res.ok || (data.code !== undefined && data.code !== 0)) {
+      throw new SaasAdsDashboardError(`TikTok Ads: ${data.message ?? "unknown error"}`, "API_ERROR");
+    }
+    const row = data.data?.list?.[0]?.metrics as Record<string, number> | undefined ?? {};
+    const spend = Number(row.spend ?? 0);
+    const impressions = Number(row.impressions ?? 0);
+    const clicks = Number(row.clicks ?? 0);
+    const conversions = Number(row.conversion ?? 0);
+    const ctr = impressions > 0 ? (clicks / impressions) * 100 : null;
+    const cpc = clicks > 0 ? spend / clicks : null;
+    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null };
+  }
+
+  private async _fetchSnapchatMetrics(
+    token: string,
+    adAccountId: string,
+    dateStart: string,
+    dateEnd: string,
+  ): Promise<Omit<AdsMetrics, "platform" | "dateEnd" | "dateStart" | "fromCache" | "fetchedAt">> {
+    const res = await this.fetchFn(
+      `https://adsapi.snapchat.com/v1/adaccounts/${adAccountId}/stats?granularity=TOTAL&start_time=${dateStart}T00:00:00Z&end_time=${dateEnd}T23:59:59Z&fields=spend,impressions,swipes,conversion_purchases`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    const data = await res.json() as { total_stats?: Array<{ total_stat: Record<string, unknown> }> };
+    if (!res.ok) throw new SaasAdsDashboardError(`Snapchat Ads: HTTP ${res.status}`, "API_ERROR");
+    const stat = data.total_stats?.[0]?.total_stat ?? {};
+    const spend = Number(stat.spend ?? 0) / 1_000_000;
+    const impressions = Number(stat.impressions ?? 0);
+    const clicks = Number(stat.swipes ?? 0);
+    const conversions = Number(stat.conversion_purchases ?? 0);
+    const ctr = impressions > 0 ? (clicks / impressions) * 100 : null;
+    const cpc = clicks > 0 ? spend / clicks : null;
+    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null };
   }
 }
 

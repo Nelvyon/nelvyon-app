@@ -141,10 +141,12 @@ describe("updateCampaignBudget", () => {
       .rejects.toMatchObject({ code: "API_ERROR" });
   });
 
-  it("throws API_ERROR for unsupported platform linkedin", async () => {
+  it("updates LinkedIn campaign budget via partial update", async () => {
     const linkedinConn = { ...metaConn, platform: "linkedin" as const };
-    const svc = makeSvc(connDb(linkedinConn));
-    await expect(svc.updateCampaignBudget("t1", "linkedin", "x", 10))
-      .rejects.toMatchObject({ code: "API_ERROR" });
+    const fetch = vi.fn(async () => new Response("{}", { status: 200 }));
+    const svc = makeSvc(connDb(linkedinConn), fetch as unknown as FetchFn);
+    const result = await svc.updateCampaignBudget("t1", "linkedin", "12345", 10);
+    expect(result.dailyBudget).toBe(10);
+    expect(fetch).toHaveBeenCalledOnce();
   });
 });

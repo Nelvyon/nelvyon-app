@@ -7,7 +7,7 @@ import { DbClient } from "../../../../../../../backend/db/DbClient";
 import {
   getSaasAdsOptimizerService,
   getSaasHubSpotSyncService,
-  resolveHubSpotAccessToken,
+  refreshHubSpotAccessTokenIfNeeded,
 } from "@nelvyon/saas";
 
 function authorizeCron(req: Request): boolean {
@@ -42,7 +42,7 @@ export async function GET(req: Request) {
   );
   for (const row of hubRows) {
     try {
-      const token = await resolveHubSpotAccessToken(row.tenant_id);
+      const token = await refreshHubSpotAccessTokenIfNeeded(row.tenant_id);
       if (!token) continue;
       await hubSvc.runSync(row.tenant_id, token);
       hubspotTenants++;

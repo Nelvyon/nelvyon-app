@@ -31,7 +31,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid client workspace id" }, { status: 400 });
   }
 
-  const body = (await req.json()) as { retailPlanId?: string; retailEur?: number };
+  const body = (await req.json()) as { retailPlanId?: string; retailEur?: number; clientEmail?: string };
   const retailPlanId = String(body.retailPlanId ?? "starter").trim();
   if (!retailPlanId) {
     return NextResponse.json({ error: "retailPlanId required" }, { status: 400 });
@@ -43,6 +43,7 @@ export async function POST(
       clientWorkspaceId,
       retailPlanId,
       retailEur: body.retailEur,
+      clientEmail: body.clientEmail,
     });
     return NextResponse.json({ billing });
   } catch (e) {

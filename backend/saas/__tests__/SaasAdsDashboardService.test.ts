@@ -128,12 +128,20 @@ describe("SaasAdsDashboardService", () => {
       .rejects.toMatchObject({ code: "API_ERROR" });
   });
 
-  it("getMetrics throws API_ERROR for unimplemented platform (linkedin)", async () => {
+  it("getMetrics fetches LinkedIn metrics via API", async () => {
     const linkedInConn = { ...connRow, platform: "linkedin" };
     const db = makeDb([[linkedInConn], []]);
-    const svc = new SaasAdsDashboardService(db);
-    await expect(svc.getMetrics(TENANT, "linkedin", "2026-06-01", "2026-06-30"))
-      .rejects.toMatchObject({ code: "API_ERROR" });
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        elements: [{ costInLocalCurrency: 120, impressions: 1000, clicks: 50, externalWebsiteConversions: 3 }],
+      }),
+    });
+    const svc = new SaasAdsDashboardService(db, mockFetch as unknown as typeof fetch);
+    const metrics = await svc.getMetrics(TENANT, "linkedin", "2026-06-01", "2026-06-30");
+    expect(metrics.spend).toBe(120);
+    expect(metrics.clicks).toBe(50);
+    expect(mockFetch).toHaveBeenCalledOnce();
   });
 
   // ─── Campaign management ────────────────────────────────────────────────
@@ -171,11 +179,20 @@ describe("SaasAdsDashboardService", () => {
     await expect(svc.listCampaigns(TENANT, "meta")).rejects.toMatchObject({ code: "API_ERROR" });
   });
 
-  it("listCampaigns throws API_ERROR for linkedin (not implemented)", async () => {
+  it("listCampaigns fetches LinkedIn campaigns", async () => {
     const linkedInConn = { ...connRow, platform: "linkedin" };
     const db = makeDb([[linkedInConn]]);
-    const svc = new SaasAdsDashboardService(db);
-    await expect(svc.listCampaigns(TENANT, "linkedin")).rejects.toMatchObject({ code: "API_ERROR" });
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        elements: [{ id: 99, name: "LI Camp", status: "ACTIVE", dailyBudget: { amount: 25 } }],
+      }),
+    });
+    const svc = new SaasAdsDashboardService(db, mockFetch as unknown as typeof fetch);
+    const campaigns = await svc.listCampaigns(TENANT, "linkedin");
+    expect(campaigns).toHaveLength(1);
+    expect(campaigns[0].id).toBe("99");
+    expect(campaigns[0].dailyBudget).toBe(25);
   });
 
   it("setCampaignStatus throws NOT_CONNECTED when no connection", async () => {

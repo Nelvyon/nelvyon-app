@@ -1290,6 +1290,7 @@ export {
 export {
   resolveHubSpotAccessToken,
   bridgeHubSpotOAuthToken,
+  refreshHubSpotAccessTokenIfNeeded,
 } from "./hubspotIntegrationToken";
 
 export {

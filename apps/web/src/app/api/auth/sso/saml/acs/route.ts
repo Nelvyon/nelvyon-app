@@ -40,7 +40,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Tenant SSO is OIDC" }, { status: 400 });
     }
 
-    const assertion = parseSamlResponse(samlResponse);
+    const assertion = await parseSamlResponse(samlResponse, {
+      metadataUrl: config.metadataUrl,
+    });
     const email = assertion.email ?? (assertion.nameId.includes("@") ? assertion.nameId : undefined);
 
     const identity = await svcSso.getOrCreateIdentity({

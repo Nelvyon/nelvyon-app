@@ -28,7 +28,7 @@ describe("computeMlDealForecast", () => {
       baseDeal({ id: "2", stage: "qualified", value: 2000, probability: 30 }),
     ]);
     expect(result.forecastValue).toBeGreaterThan(0);
-    expect(result.method).toBe("weighted_ml_v1");
+    expect(result.method).toBe("weighted_heuristic_v1");
     expect(result.forecastConfidence).toBeGreaterThan(0);
   });
 

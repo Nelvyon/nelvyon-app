@@ -33,7 +33,7 @@ describe("parseSamlResponse", () => {
       </Assertion>
     </samlp:Response>`;
     const b64 = Buffer.from(xml).toString("base64");
-    const result = parseSamlResponse(b64);
+    const result = await parseSamlResponse(b64);
     expect(result.nameId).toBe("user@corp.com");
     expect(result.email).toBe("user@corp.com");
   });

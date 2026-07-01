@@ -14,7 +14,7 @@ export type MlForecastResult = {
   forecastValue: number;
   forecastConfidence: number;
   stageWinRates: Record<string, number>;
-  method: "weighted_ml_v1";
+  method: "weighted_heuristic_v1";
 };
 
 function isOpenStage(stage: string): boolean {
@@ -62,6 +62,6 @@ export function computeMlDealForecast(deals: SaasDeal[]): MlForecastResult {
     forecastValue: Math.round(forecastValue * 100) / 100,
     forecastConfidence,
     stageWinRates,
-    method: "weighted_ml_v1",
+    method: "weighted_heuristic_v1",
   };
 }

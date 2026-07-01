@@ -37,7 +37,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid client workspace id" }, { status: 400 });
   }
 
-  const body = (await req.json()) as { packSku?: string; retailEur?: number };
+  const body = (await req.json()) as { packSku?: string; retailEur?: number; clientEmail?: string };
   const packSku = String(body.packSku ?? "").trim();
   if (!packSku) {
     return NextResponse.json({ error: "packSku required" }, { status: 400 });
@@ -56,6 +56,7 @@ export async function POST(
       packSku,
       retailEur,
       wholesaleEur,
+      clientEmail: body.clientEmail,
     });
     return NextResponse.json(result);
   } catch (e) {

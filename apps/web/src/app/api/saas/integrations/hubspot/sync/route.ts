@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import {
   getSaasHubSpotSyncService,
   requireSaasContext,
-  resolveHubSpotAccessToken,
+  refreshHubSpotAccessTokenIfNeeded,
   saasErrorBody,
   saasErrorStatus,
 } from "@nelvyon/saas";
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "settings.write");
-    const token = await resolveHubSpotAccessToken(ctx.tenant.id);
+    const token = await refreshHubSpotAccessTokenIfNeeded(ctx.tenant.id);
     if (!token) {
       return NextResponse.json({ error: "HubSpot not connected" }, { status: 400 });
     }
