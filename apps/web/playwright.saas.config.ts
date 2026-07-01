@@ -23,7 +23,7 @@ export default defineConfig({
     : [["list"]],
 
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
     ...devices["Desktop Chrome"],
     ...(useSystemChrome ? { channel: "chrome" as const } : { browserName: "chromium" as const }),
     trace: "on-first-retry",

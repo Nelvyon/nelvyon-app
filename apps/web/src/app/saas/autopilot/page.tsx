@@ -222,6 +222,27 @@ export default function AutopilotPage() {
     }
   }
 
+  async function handleRunAll() {
+    setRunning("seo");
+    try {
+      const res = await fetch("/api/saas/autopilot/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ runAll: true }),
+      });
+      const d = await res.json() as { results?: Array<{ message: string; success: boolean }> };
+      const ok = res.ok && (d.results?.every((r) => r.success) ?? res.ok);
+      setToast({ msg: ok ? "Todos los servicios activos ejecutados" : "Algunos servicios fallaron", ok });
+      setTimeout(() => setToast(null), 4000);
+      void load();
+    } catch {
+      setToast({ msg: "Error al ejecutar", ok: false });
+      setTimeout(() => setToast(null), 4000);
+    } finally {
+      setRunning(null);
+    }
+  }
+
   const sidebar = <SaasSidebar activeId="autopilot" />;
 
   return (
@@ -229,10 +250,24 @@ export default function AutopilotPage() {
       <div className="p-6 space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-white">🤖 Autopilot</h1>
-          <p className="text-sm text-white/50 mt-0.5">
-            Activa los servicios recurrentes de IA que se ejecutan automáticamente cada mes
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-bold text-white">🤖 Autopilot</h1>
+              <p className="text-sm text-white/50 mt-0.5">
+                Activa los servicios recurrentes de IA que se ejecutan automáticamente cada mes
+              </p>
+            </div>
+            {status && status.activeCount > 0 && (
+              <button
+                type="button"
+                disabled={running !== null}
+                onClick={() => void handleRunAll()}
+                className="rounded-xl bg-[#0084ff] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0070dd] disabled:opacity-50"
+              >
+                {running ? "Ejecutando…" : "▶ Ejecutar todo"}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* KPI strip */}

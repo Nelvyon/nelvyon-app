@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
-type Tab = "mfa" | "ip" | "roles" | "territories" | "sandboxes";
+type Tab = "mfa" | "ip" | "roles" | "territories" | "sandboxes" | "sso";
 
 type SecurityData = {
   allowlist: { enabled: boolean; cidrs: string[] };
@@ -14,25 +15,65 @@ type SecurityData = {
   sandboxes?: Array<{ id: string; name: string }>;
 };
 
+type SsoConfig = {
+  provider: "oidc" | "saml";
+  issuer: string;
+  clientId: string;
+  domains: string[];
+  enforced: boolean;
+} | null;
+
+type TeamMember = { id: string; userId: string | null; email: string; name: string | null };
+
 export default function SaasSecurityPage() {
+  const t = useTranslations("saas.sso");
   const [tab, setTab] = useState<Tab>("mfa");
   const [data, setData] = useState<SecurityData | null>(null);
+  const [ssoConfig, setSsoConfig] = useState<SsoConfig>(null);
+  const [members, setMembers] = useState<TeamMember[]>([]);
   const [cidrs, setCidrs] = useState("");
   const [ipEnabled, setIpEnabled] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const [roleName, setRoleName] = useState("");
+  const [assignUserId, setAssignUserId] = useState("");
+  const [assignRoleId, setAssignRoleId] = useState("");
   const [territoryName, setTerritoryName] = useState("");
+  const [ssoProvider, setSsoProvider] = useState<"oidc" | "saml">("oidc");
+  const [ssoIssuer, setSsoIssuer] = useState("");
+  const [ssoClientId, setSsoClientId] = useState("");
+  const [ssoClientSecret, setSsoClientSecret] = useState("");
+  const [ssoDomains, setSsoDomains] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
 
   const flash = (msg: string) => { setNotice(msg); setTimeout(() => setNotice(null), 4000); };
 
   const load = useCallback(async () => {
-    const res = await fetch("/api/saas/security");
-    if (!res.ok) return;
-    const d = (await res.json()) as SecurityData & { sandboxes: SecurityData["sandboxes"] };
-    setData(d);
-    setCidrs((d.allowlist?.cidrs ?? []).join("\n"));
-    setIpEnabled(Boolean(d.allowlist?.enabled));
+    const [secRes, teamRes, ssoRes] = await Promise.all([
+      fetch("/api/saas/security"),
+      fetch("/api/saas/team"),
+      fetch("/api/saas/sso"),
+    ]);
+    if (secRes.ok) {
+      const d = (await secRes.json()) as SecurityData & { sandboxes: SecurityData["sandboxes"] };
+      setData(d);
+      setCidrs((d.allowlist?.cidrs ?? []).join("\n"));
+      setIpEnabled(Boolean(d.allowlist?.enabled));
+    }
+    if (teamRes.ok) {
+      const d = (await teamRes.json()) as { members: TeamMember[] };
+      setMembers(d.members ?? []);
+    }
+    if (ssoRes.ok) {
+      const d = (await ssoRes.json()) as { config: SsoConfig };
+      const c = d.config;
+      setSsoConfig(c);
+      if (c) {
+        setSsoProvider(c.provider);
+        setSsoIssuer(c.issuer);
+        setSsoClientId(c.clientId);
+        setSsoDomains(c.domains.join(", "));
+      }
+    }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
@@ -47,6 +88,37 @@ export default function SaasSecurityPage() {
     else flash("Error al guardar");
   }
 
+  async function saveSso() {
+    const res = await fetch("/api/saas/sso", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "configure",
+        provider: ssoProvider,
+        issuer: ssoIssuer,
+        clientId: ssoClientId,
+        clientSecret: ssoClientSecret,
+        domains: ssoDomains.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean),
+      }),
+    });
+    if (res.ok) { flash("SSO guardado"); void load(); }
+    else flash("Error SSO — comprueba permisos sso.write");
+  }
+
+  async function toggleSsoEnforce(enforced: boolean) {
+    const res = await fetch("/api/saas/sso", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "toggle-enforce", enforced }),
+    });
+    if (res.ok) { flash(enforced ? "SSO enforced activado" : "SSO enforced desactivado"); void load(); }
+    else flash("Error al cambiar SSO enforced");
+  }
+
+  const callbackUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/api/auth/sso/callback`
+    : "/api/auth/sso/callback";
+
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="security" />}>
       <div className="mx-auto max-w-5xl space-y-6 p-6">
@@ -60,6 +132,7 @@ export default function SaasSecurityPage() {
         <div className="flex flex-wrap gap-2">
           {([
             ["mfa", "2FA / TOTP"],
+            ["sso", "SSO / IdP"],
             ["ip", "IP Allowlist"],
             ["roles", "Roles custom"],
             ["territories", "Territorios"],
@@ -104,6 +177,54 @@ export default function SaasSecurityPage() {
               {data.mfa.enforced ? "Desactivar" : "Activar"} MFA obligatorio
             </button>
           </section>
+        ) : tab === "sso" ? (
+          <section className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-4">
+            <p className="text-sm text-white/70">
+              {ssoConfig?.enforced ? t("status_enforced") : t("status_optional")} · {t("title")}
+            </p>
+            <p className="text-xs text-white/40">{t("callback_url")}: <code className="text-white/60">{callbackUrl}</code></p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-sm text-white/60">
+                {t("provider")}
+                <select
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+                  value={ssoProvider}
+                  onChange={(e) => setSsoProvider(e.target.value as "oidc" | "saml")}
+                >
+                  <option value="oidc">OIDC</option>
+                  <option value="saml">SAML 2.0</option>
+                </select>
+              </label>
+              <label className="text-sm text-white/60 sm:col-span-2">
+                {t("issuer")}
+                <input className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" value={ssoIssuer} onChange={(e) => setSsoIssuer(e.target.value)} placeholder="https://idp.example.com" />
+              </label>
+              <label className="text-sm text-white/60">
+                {t("client_id")}
+                <input className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" value={ssoClientId} onChange={(e) => setSsoClientId(e.target.value)} />
+              </label>
+              <label className="text-sm text-white/60">
+                {t("client_secret")}
+                <input type="password" className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" value={ssoClientSecret} onChange={(e) => setSsoClientSecret(e.target.value)} placeholder={ssoConfig ? "••••••••" : ""} />
+              </label>
+              <label className="text-sm text-white/60 sm:col-span-2">
+                {t("domains")}
+                <input className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" value={ssoDomains} onChange={(e) => setSsoDomains(e.target.value)} placeholder="empresa.com, otra.com" />
+              </label>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className="rounded-lg bg-[#0084ff] px-4 py-2 text-sm text-white" onClick={() => void saveSso()}>
+                {t("save")}
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white"
+                onClick={() => void toggleSsoEnforce(!ssoConfig?.enforced)}
+              >
+                {ssoConfig?.enforced ? t("disable_enforce") : t("enable_enforce")}
+              </button>
+            </div>
+          </section>
         ) : tab === "ip" ? (
           <section className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
             <label className="flex items-center gap-2 text-sm text-white">
@@ -121,7 +242,7 @@ export default function SaasSecurityPage() {
             </button>
           </section>
         ) : tab === "roles" ? (
-          <section className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
+          <section className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-4">
             <div className="flex gap-2">
               <input className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white" placeholder="Nombre del rol" value={roleName} onChange={(e) => setRoleName(e.target.value)} />
               <button type="button" className="rounded-lg bg-[#0084ff] px-4 py-2 text-sm text-white" onClick={() => void post("custom-role", { name: roleName, permissions: ["contacts.read", "deals.read"] })}>
@@ -136,6 +257,39 @@ export default function SaasSecurityPage() {
                 </li>
               ))}
             </ul>
+            <div className="border-t border-white/10 pt-4 space-y-2">
+              <p className="text-sm font-medium text-white">Asignar rol a usuario</p>
+              <div className="flex flex-wrap gap-2">
+                <select
+                  className="flex-1 min-w-[160px] rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+                  value={assignUserId}
+                  onChange={(e) => setAssignUserId(e.target.value)}
+                >
+                  <option value="">Usuario…</option>
+                  {members.filter((m) => m.userId).map((m) => (
+                    <option key={m.id} value={m.userId!}>{m.name ?? m.email}</option>
+                  ))}
+                </select>
+                <select
+                  className="flex-1 min-w-[160px] rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+                  value={assignRoleId}
+                  onChange={(e) => setAssignRoleId(e.target.value)}
+                >
+                  <option value="">Rol…</option>
+                  {data.roles.map((r) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  disabled={!assignUserId || !assignRoleId}
+                  className="rounded-lg bg-[#0084ff] px-4 py-2 text-sm text-white disabled:opacity-40"
+                  onClick={() => void post("assign-role", { userId: assignUserId, roleId: assignRoleId })}
+                >
+                  Asignar
+                </button>
+              </div>
+            </div>
           </section>
         ) : tab === "territories" ? (
           <section className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">

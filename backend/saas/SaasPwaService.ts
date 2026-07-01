@@ -229,4 +229,56 @@ export class SaasPwaService {
       return { total: 0, byPlatform: {}, lastInstalledAt: null };
     }
   }
+
+  /** VAPID public key for browser push subscription (env or dev placeholder). */
+  getVapidPublicKey(): string | null {
+    const key = (process.env.VAPID_PUBLIC_KEY ?? "").trim();
+    return key || null;
+  }
+
+  async savePushSubscription(
+    tenantId: string,
+    input: { userId?: string | null; endpoint: string; p256dh: string; auth: string },
+  ): Promise<{ id: string }> {
+    if (!input.endpoint.trim() || !input.p256dh.trim() || !input.auth.trim()) {
+      throw new SaasPwaError("VALIDATION", "endpoint, p256dh and auth are required");
+    }
+    try {
+      const rows = await this.db.query<{ id: string }>(
+        `INSERT INTO saas_pwa_push_subscriptions (tenant_id, user_id, endpoint, p256dh, auth)
+         VALUES ($1,$2,$3,$4,$5)
+         ON CONFLICT (tenant_id, endpoint) DO UPDATE SET p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth, user_id = EXCLUDED.user_id
+         RETURNING id`,
+        [tenantId, input.userId ?? null, input.endpoint.trim(), input.p256dh.trim(), input.auth.trim()],
+      );
+      return { id: rows[0]!.id };
+    } catch {
+      throw new SaasPwaError("VALIDATION", "Push subscriptions table unavailable — run migration 484");
+    }
+  }
+
+  async removePushSubscription(tenantId: string, endpoint: string): Promise<void> {
+    try {
+      await this.db.query(
+        `DELETE FROM saas_pwa_push_subscriptions WHERE tenant_id = $1 AND endpoint = $2`,
+        [tenantId, endpoint.trim()],
+      );
+    } catch {
+      /* table may be absent in dev */
+    }
+  }
+
+  async countPushSubscriptions(tenantId: string, userId?: string | null): Promise<number> {
+    try {
+      const rows = await this.db.query<{ count: string }>(
+        userId
+          ? `SELECT COUNT(*)::text AS count FROM saas_pwa_push_subscriptions WHERE tenant_id = $1 AND user_id = $2`
+          : `SELECT COUNT(*)::text AS count FROM saas_pwa_push_subscriptions WHERE tenant_id = $1`,
+        userId ? [tenantId, userId] : [tenantId],
+      );
+      return parseInt(rows[0]?.count ?? "0", 10);
+    } catch {
+      return 0;
+    }
+  }
 }

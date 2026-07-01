@@ -32,6 +32,10 @@ out/
 .nx/
 .cache/
 *.tsbuildinfo
+/.build-out.txt
+/.vitest-out.txt
+/.tsc-out.txt
+/.smokes-out.txt
 coverage/
 htmlcov/
 .coverage

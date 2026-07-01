@@ -46,6 +46,10 @@ export default function PwaInstallHub() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushConfigured, setPushConfigured] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushEndpoint, setPushEndpoint] = useState<string | null>(null);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -58,6 +62,12 @@ export default function PwaInstallHub() {
       try {
         const res = await fetch("/api/saas/pwa/status");
         if (res.ok) setStatus((await res.json()) as PwaStatus);
+        const pushRes = await fetch("/api/saas/pwa/push");
+        if (pushRes.ok) {
+          const p = (await pushRes.json()) as { subscribed?: boolean; pushConfigured?: boolean };
+          setPushSubscribed(Boolean(p.subscribed));
+          setPushConfigured(Boolean(p.pushConfigured));
+        }
       } finally {
         setLoading(false);
       }
@@ -94,6 +104,80 @@ export default function PwaInstallHub() {
       setInstalled(true);
     }
     setDeferred(null);
+  }
+
+  function urlBase64ToUint8Array(base64: string): Uint8Array {
+    const padding = "=".repeat((4 - (base64.length % 4)) % 4);
+    const b64 = (base64 + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const raw = atob(b64);
+    const out = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+
+  async function subscribePush() {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      showToast("Push no soportado en este navegador");
+      return;
+    }
+    setPushBusy(true);
+    try {
+      const cfgRes = await fetch("/api/saas/pwa/push");
+      const cfg = (await cfgRes.json()) as { vapidPublicKey?: string | null };
+      if (!cfg.vapidPublicKey) {
+        showToast("Configura VAPID_PUBLIC_KEY en el servidor");
+        return;
+      }
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") {
+        showToast("Permiso de notificaciones denegado");
+        return;
+      }
+      const reg = await navigator.serviceWorker.register("/sw.js");
+      await reg.update();
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(cfg.vapidPublicKey) as BufferSource,
+      });
+      const json = sub.toJSON();
+      await fetch("/api/saas/pwa/push", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscription: json }),
+      });
+      setPushEndpoint(sub.endpoint);
+      setPushSubscribed(true);
+      showToast("Notificaciones push activadas");
+    } catch {
+      showToast("No se pudo activar push");
+    } finally {
+      setPushBusy(false);
+    }
+  }
+
+  async function unsubscribePush() {
+    if (!pushEndpoint && !("serviceWorker" in navigator)) return;
+    setPushBusy(true);
+    try {
+      const reg = await navigator.serviceWorker.getRegistration("/sw.js");
+      const sub = await reg?.pushManager.getSubscription();
+      const endpoint = sub?.endpoint ?? pushEndpoint;
+      if (sub) await sub.unsubscribe();
+      if (endpoint) {
+        await fetch("/api/saas/pwa/push", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ endpoint }),
+        });
+      }
+      setPushSubscribed(false);
+      setPushEndpoint(null);
+      showToast("Push desactivado");
+    } catch {
+      showToast("Error al desactivar push");
+    } finally {
+      setPushBusy(false);
+    }
   }
 
   const appName = status?.appName ?? "Nelvyon";
@@ -149,6 +233,40 @@ export default function PwaInstallHub() {
                   className="w-full rounded-xl bg-[#0084ff] px-4 py-2.5 text-sm text-white font-semibold hover:bg-[#0070dd] min-h-[44px]"
                 >
                   {deferred ? "Instalar app" : "Instalar desde el menú del navegador"}
+                </button>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-3 max-w-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-white/60 text-sm">Notificaciones push</span>
+                {pushSubscribed ? (
+                  <NelvyonDsBadge tone="success">Activas</NelvyonDsBadge>
+                ) : (
+                  <NelvyonDsBadge tone="neutral">Inactivas</NelvyonDsBadge>
+                )}
+              </div>
+              <p className="text-xs text-white/40">
+                Recibe alertas de inbox, leads y entregables aunque la app esté cerrada.
+                {!pushConfigured && " Requiere VAPID_PUBLIC_KEY en producción."}
+              </p>
+              {pushSubscribed ? (
+                <button
+                  type="button"
+                  disabled={pushBusy}
+                  onClick={() => void unsubscribePush()}
+                  className="w-full rounded-xl border border-white/20 px-4 py-2.5 text-sm text-white/80 hover:bg-white/5 disabled:opacity-50"
+                >
+                  {pushBusy ? "…" : "Desactivar push"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={pushBusy}
+                  onClick={() => void subscribePush()}
+                  className="w-full rounded-xl bg-[#0084ff] px-4 py-2.5 text-sm text-white font-semibold hover:bg-[#0070dd] disabled:opacity-50 min-h-[44px]"
+                >
+                  {pushBusy ? "Activando…" : "Activar notificaciones push"}
                 </button>
               )}
             </div>

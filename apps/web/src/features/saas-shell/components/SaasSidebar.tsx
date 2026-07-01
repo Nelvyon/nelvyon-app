@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
-import { NelvyonDsBadge } from "@/design-system/components";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { cn } from "@/core/ui/utils";
 import { resetUser } from "@/lib/analytics";
@@ -12,20 +12,22 @@ import { resetUser } from "@/lib/analytics";
 import { SAAS_NAV_ITEMS, filterSaasNavForPermissions, isSaasNavActive, type SaasNavId, type SaasNavItem } from "../saasNav";
 import { useSaasPermissions } from "../useSaasPermissions";
 
-function planTone(plan: "starter" | "pro" | "enterprise"): "primary" | "success" | "warning" {
-  if (plan === "enterprise") return "warning";
-  if (plan === "pro") return "success";
-  return "primary";
-}
-
-const GROUP_CONFIG: Record<string, { label: string; icon: string }> = {
-  principal: { label: "Principal", icon: "⬡" },
-  comunicacion: { label: "Comunicación", icon: "◈" },
-  captacion: { label: "Captación", icon: "◎" },
-  gestion: { label: "Gestión", icon: "⊞" },
-  ia: { label: "IA", icon: "✦" },
-  cuenta: { label: "Cuenta", icon: "◯" },
+const GROUP_ICONS: Record<string, string> = {
+  principal: "⬡",
+  comunicacion: "◈",
+  captacion: "◎",
+  gestion: "⊞",
+  ia: "✦",
+  cuenta: "◯",
 };
+
+function navLabel(t: ReturnType<typeof useTranslations>, item: SaasNavItem): string {
+  try {
+    return t(`items.${item.id}`);
+  } catch {
+    return item.label;
+  }
+}
 
 function NavGroup({
   groupId,
@@ -38,9 +40,16 @@ function NavGroup({
   activeId: SaasNavId;
   defaultOpen?: boolean;
 }) {
+  const t = useTranslations("saas.nav");
   const hasActive = items.some(i => isSaasNavActive(activeId, i.id));
   const [open, setOpen] = useState(defaultOpen || hasActive);
-  const cfg = GROUP_CONFIG[groupId] ?? { label: groupId, icon: "·" };
+  let groupLabel = groupId;
+  try {
+    groupLabel = t(`groups.${groupId}`);
+  } catch {
+    groupLabel = groupId;
+  }
+  const icon = GROUP_ICONS[groupId] ?? "·";
 
   return (
     <div>
@@ -49,8 +58,8 @@ function NavGroup({
         className="flex w-full items-center justify-between px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/50 transition-colors"
       >
         <span className="flex items-center gap-1.5">
-          <span className="text-[#0084ff]/60">{cfg.icon}</span>
-          <span>{cfg.label}</span>
+          <span className="text-[#0084ff]/60">{icon}</span>
+          <span>{groupLabel}</span>
         </span>
         <span className="text-white/20">{open ? "▾" : "▸"}</span>
       </button>
@@ -73,7 +82,7 @@ function NavGroup({
                 {active && (
                   <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-[#0084ff] shadow-[0_0_6px_#0084ff]" />
                 )}
-                {item.label}
+                {navLabel(t, item)}
               </Link>
             );
           })}

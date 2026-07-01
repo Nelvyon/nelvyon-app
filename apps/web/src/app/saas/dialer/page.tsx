@@ -12,6 +12,7 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { dialerAdvancedApi } from "@/features/dialer-advanced/api";
 
 type DialerTab = "click" | "power" | "a2p";
+type PowerMode = "sequential" | "parallel" | "voicemail";
 
 interface CallRecord {
   id: string;
@@ -104,6 +105,11 @@ export default function SaasDialerPage() {
   const [showCall, setShowCall] = useState(false);
   const [powerQueue, setPowerQueue] = useState("");
   const [powerBusy, setPowerBusy] = useState(false);
+  const [powerMode, setPowerMode] = useState<PowerMode>("sequential");
+  const [parallelLimit, setParallelLimit] = useState(3);
+  const [voicemailUrl, setVoicemailUrl] = useState("");
+  const [vmDropNumber, setVmDropNumber] = useState("");
+  const [vmBusy, setVmBusy] = useState(false);
   const [a2pRegs, setA2pRegs] = useState<Array<{ id: string; businessName: string; status: string }>>([]);
   const [a2pName, setA2pName] = useState("");
 
@@ -131,14 +137,42 @@ export default function SaasDialerPage() {
     if (!phones.length) return;
     setPowerBusy(true);
     try {
-      await dialerAdvancedApi.powerDial({
-        client_id: "saas-tenant",
-        queue: phones.map((phone) => ({ phone })),
-        max_calls: phones.length,
-      });
+      const queue = phones.map((phone) => ({
+        phone,
+        use_voicemail: Boolean(voicemailUrl.trim()),
+      }));
+      if (powerMode === "parallel") {
+        await dialerAdvancedApi.parallelDial({
+          client_id: "saas-tenant",
+          queue,
+          parallel_limit: Math.min(10, Math.max(1, parallelLimit)),
+          voicemail_url: voicemailUrl.trim() || null,
+        });
+      } else {
+        await dialerAdvancedApi.powerDial({
+          client_id: "saas-tenant",
+          queue,
+          max_calls: phones.length,
+          voicemail_url: voicemailUrl.trim() || null,
+        });
+      }
       void load();
     } finally {
       setPowerBusy(false);
+    }
+  }
+
+  async function runVoicemailDrop() {
+    if (!voicemailUrl.trim() || !vmDropNumber.trim()) return;
+    setVmBusy(true);
+    try {
+      await dialerAdvancedApi.voicemailDrop({
+        to_number: vmDropNumber.trim(),
+        voicemail_url: voicemailUrl.trim(),
+      });
+      void load();
+    } finally {
+      setVmBusy(false);
     }
   }
 
@@ -186,17 +220,80 @@ export default function SaasDialerPage() {
         </div>
 
         {tab === "power" && (
-          <NelvyonDsCard className="p-4 space-y-3">
-            <p className="text-sm text-muted-foreground">Un teléfono por línea — power dial secuencial vía Twilio.</p>
-            <textarea
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-mono min-h-[120px]"
-              placeholder={"+34612345678\n+34698765432"}
-              value={powerQueue}
-              onChange={(e) => setPowerQueue(e.target.value)}
-            />
-            <NelvyonDsButton disabled={powerBusy || !data?.dialer_configured} onClick={() => void runPowerDial()}>
-              {powerBusy ? "Marcando…" : "Iniciar power dial"}
-            </NelvyonDsButton>
+          <NelvyonDsCard className="p-4 space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {([
+                ["sequential", "Power dial"],
+                ["parallel", "Parallel dial"],
+                ["voicemail", "Voicemail drop"],
+              ] as const).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setPowerMode(id)}
+                  className={`rounded-lg px-3 py-1.5 text-sm ${powerMode === id ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {powerMode !== "voicemail" ? (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {powerMode === "parallel"
+                    ? `Hasta ${parallelLimit} llamadas simultáneas vía Twilio.`
+                    : "Un teléfono por línea — power dial secuencial vía Twilio."}
+                </p>
+                {powerMode === "parallel" && (
+                  <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                    Líneas paralelas
+                    <input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={parallelLimit}
+                      onChange={(e) => setParallelLimit(Number(e.target.value))}
+                      className="w-16 rounded-lg border border-border bg-background px-2 py-1 text-sm"
+                    />
+                  </label>
+                )}
+                <input
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="URL audio voicemail (opcional)"
+                  value={voicemailUrl}
+                  onChange={(e) => setVoicemailUrl(e.target.value)}
+                />
+                <textarea
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-mono min-h-[120px]"
+                  placeholder={"+34612345678\n+34698765432"}
+                  value={powerQueue}
+                  onChange={(e) => setPowerQueue(e.target.value)}
+                />
+                <NelvyonDsButton disabled={powerBusy || !data?.dialer_configured} onClick={() => void runPowerDial()}>
+                  {powerBusy ? "Marcando…" : powerMode === "parallel" ? "Iniciar parallel dial" : "Iniciar power dial"}
+                </NelvyonDsButton>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">Deja un mensaje de voz en un número sin contestar la llamada.</p>
+                <input
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="URL del audio MP3/WAV"
+                  value={voicemailUrl}
+                  onChange={(e) => setVoicemailUrl(e.target.value)}
+                />
+                <input
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="+34612345678"
+                  value={vmDropNumber}
+                  onChange={(e) => setVmDropNumber(e.target.value)}
+                />
+                <NelvyonDsButton disabled={vmBusy || !data?.dialer_configured} onClick={() => void runVoicemailDrop()}>
+                  {vmBusy ? "Enviando…" : "Enviar voicemail drop"}
+                </NelvyonDsButton>
+              </>
+            )}
           </NelvyonDsCard>
         )}
 

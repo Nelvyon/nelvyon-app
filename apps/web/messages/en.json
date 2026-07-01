@@ -249,7 +249,22 @@
         "billing":      "Billing",
         "settings":     "Settings",
         "api-keys":     "API Keys",
-        "webhooks":     "Webhooks"
+        "webhooks":     "Webhooks",
+        "deliverability": "Deliverability",
+        "security":     "Enterprise Security",
+        "autopilot":    "Autopilot",
+        "pwa":          "Install App",
+        "attribution":  "Attribution",
+        "marketplace":  "Marketplace",
+        "entregables":  "Deliverables",
+        "voice":        "Voice",
+        "partner":      "Partner Zone",
+        "white-label":  "White Label",
+        "pack-store":   "Pack Store",
+        "data-playbooks": "Playbooks",
+        "brief-to-launch": "Launch Pack",
+        "compliance":   "Compliance",
+        "benchmark":    "Benchmark"
       }
     },
     "common": {

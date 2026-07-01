@@ -43,6 +43,17 @@ describe("OsQaReviewQueueService", () => {
   });
 });
 
+describe("SaasPwaService push", () => {
+  it("returns null vapid when env unset", async () => {
+    const { SaasPwaService } = await import("../SaasPwaService");
+    const svc = new SaasPwaService({ query: vi.fn() } as never);
+    const prev = process.env.VAPID_PUBLIC_KEY;
+    delete process.env.VAPID_PUBLIC_KEY;
+    expect(svc.getVapidPublicKey()).toBeNull();
+    if (prev) process.env.VAPID_PUBLIC_KEY = prev;
+  });
+});
+
 describe("buildMinimalPdfFromText", () => {
   it("returns PDF magic bytes", () => {
     const pdf = buildMinimalPdfFromText(["Line 1", "Line 2"], "Test Cert");

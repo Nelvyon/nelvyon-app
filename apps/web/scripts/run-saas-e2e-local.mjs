@@ -12,7 +12,21 @@ import { fileURLToPath } from "node:url";
 
 const root = join(fileURLToPath(new URL("..", import.meta.url)));
 const jwt = process.env.JWT_SECRET ?? "test-secret-for-playwright-saas-e2e";
-const port = process.env.PORT ?? "3000";
+
+async function resolvePort() {
+  if (process.env.PORT) return process.env.PORT;
+  for (const candidate of ["3010", "3011", "3012", "3020"]) {
+    try {
+      const res = await fetch(`http://localhost:${candidate}/api/health`, { signal: AbortSignal.timeout(800) });
+      if (res.ok) continue;
+    } catch {
+      return candidate;
+    }
+  }
+  return "3010";
+}
+
+const port = await resolvePort();
 const baseUrl = `http://localhost:${port}`;
 
 const SYSTEM_CHROME_PATHS = [
@@ -124,6 +138,7 @@ async function main() {
       env: {
         CI: "true",
         JWT_SECRET: jwt,
+        PLAYWRIGHT_BASE_URL: baseUrl,
         ...(process.env.PLAYWRIGHT_CHANNEL ? { PLAYWRIGHT_CHANNEL: process.env.PLAYWRIGHT_CHANNEL } : {}),
       },
     });
