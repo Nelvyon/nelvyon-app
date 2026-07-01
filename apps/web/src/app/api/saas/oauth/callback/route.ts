@@ -3,6 +3,7 @@ import {
   getSaasOnboardingService,
   resolveOAuthProviderByState,
   syncOAuthProviderToHub,
+  bridgeHubSpotOAuthToken,
 } from "@nelvyon/saas";
 import {
   platformApiBase,
@@ -75,6 +76,10 @@ export async function GET(req: Request) {
     }
 
     await syncOAuthProviderToHub(userId, provider);
+    const tenant = await getSaasOnboardingService().getTenant(userId);
+    if (tenant && provider === "hubspot") {
+      await bridgeHubSpotOAuthToken(tenant.id, workspaceId, userId);
+    }
     return redirectIntegrationsSuccess(origin, provider);
   } catch {
     return redirectIntegrationsError(origin, "timeout");

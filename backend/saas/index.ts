@@ -1288,6 +1288,11 @@ export {
 } from "./integrationHubSync";
 
 export {
+  resolveHubSpotAccessToken,
+  bridgeHubSpotOAuthToken,
+} from "./hubspotIntegrationToken";
+
+export {
   INTEGRATIONS_CATALOG,
   getCatalogBySlug,
 } from "./integrationsCatalog";

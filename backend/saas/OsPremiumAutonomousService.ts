@@ -1,4 +1,5 @@
 import { OS_PREMIUM_SERVICE_IDS } from "../os-agents/constants";
+import { osOrchestrator } from "../os-agents/OsOrchestrator";
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 
@@ -22,23 +23,30 @@ export class OsPremiumAutonomousService {
     serviceId: string;
     workspaceId: number;
     intake: Record<string, unknown>;
+    userId?: string;
   }): Promise<OsAutonomousKickoffResult> {
     if (!OS_PREMIUM_SERVICE_IDS.includes(params.serviceId as typeof OS_PREMIUM_SERVICE_IDS[number])) {
       return { serviceId: params.serviceId, status: "skipped" };
     }
     const jobId = `auto_${params.serviceId}_${Date.now()}`;
-    await this.db.query(
-      `INSERT INTO os_jobs (job_id, service_id, client_id, status, steps, result)
-       VALUES ($1, $2, $3, 'queued', '[]', $4)`,
-      [jobId, params.serviceId, String(params.workspaceId), JSON.stringify({ ...params.intake, tenantId: params.tenantId, autonomous: true })],
-    );
-    return { serviceId: params.serviceId, status: "queued", jobId };
+    const result = await osOrchestrator.enqueueAndDispatch({
+      serviceId: params.serviceId,
+      clientId: String(params.workspaceId),
+      payload: { ...params.intake, tenantId: params.tenantId, autonomous: true },
+      jobId,
+      userId: params.userId,
+    });
+    if (result.status === "failed") {
+      return { serviceId: params.serviceId, status: "skipped" };
+    }
+    return { serviceId: params.serviceId, status: "queued", jobId: result.jobId || jobId };
   }
 
   async enqueueAll(params: {
     tenantId: string;
     workspaceId: number;
     intake: Record<string, unknown>;
+    userId?: string;
   }): Promise<OsAutonomousKickoffResult[]> {
     const out: OsAutonomousKickoffResult[] = [];
     for (const serviceId of this.listServiceIds()) {

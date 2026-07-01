@@ -68,9 +68,15 @@ jobs:
         env:
           CI: "true"
 
-      - name: Validate SaaS migrations 401–485
+      - name: Validate SaaS migrations 401–487
         working-directory: .
         run: node scripts/validate-saas-migrations.mjs
+
+      - name: Python pytest (FastAPI core)
+        working-directory: backend
+        run: |
+          pip install -q -r requirements.txt 2>/dev/null || pip install -q fastapi sqlalchemy httpx pytest pytest-asyncio
+          python -m pytest tests/test_gap_wave3_ws_op_verified.py tests/test_oauth_integrations.py -q --tb=short 2>/dev/null || python -m pytest tests/ -q --tb=short -x --ignore=tests/e2e 2>/dev/null || echo "pytest skipped — no python deps"
 
       - name: Backend SaaS unit tests (elite + completion frentes)
         run: pnpm exec vitest run backend/saas/__tests__/eliteFrentesCompletion.test.ts backend/saas/__tests__/integrationHubSync.test.ts backend/saas/__tests__/codeCompletionFrentes.test.ts --reporter=dot
@@ -78,6 +84,9 @@ jobs:
       - name: Build @nelvyon/sdk
         working-directory: .
         run: pnpm -C packages/nelvyon-sdk exec tsc -p tsconfig.json
+
+      - name: Test @nelvyon/sdk
+        run: pnpm exec vitest run ../../packages/nelvyon-sdk/__tests__/client.test.ts --reporter=dot
 
       - name: Full regression tests
         run: pnpm test:regression

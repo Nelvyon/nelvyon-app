@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { getSaasWebhookDlqService } from "./SaasWebhookDlqService";
 
 export interface SaasWebhook {
   id: string;
@@ -161,11 +162,12 @@ export class SaasWebhooksService {
       [tenantId, event],
     );
     for (const wh of webhooks) {
-      void this.deliver(wh.id, wh.url, wh.secret, event, payload);
+      void this.deliver(tenantId, wh.id, wh.url, wh.secret, event, payload);
     }
   }
 
   private async deliver(
+    tenantId: string,
     webhookId: string,
     url: string,
     secret: string,
@@ -178,6 +180,7 @@ export class SaasWebhooksService {
     let statusCode: number | null = null;
     let responseBody: string | null = null;
     let success = false;
+    let errorMessage: string | null = null;
     try {
       const res = await fetch(url, {
         method: "POST",
@@ -188,8 +191,19 @@ export class SaasWebhooksService {
       statusCode = res.status;
       responseBody = await res.text().catch(() => null);
       success = res.ok;
-    } catch {
+      if (!success) errorMessage = `HTTP ${statusCode}`;
+    } catch (err) {
       success = false;
+      errorMessage = err instanceof Error ? err.message : "Delivery failed";
+    }
+    if (!success) {
+      await getSaasWebhookDlqService().recordFailure({
+        tenantId,
+        webhookId,
+        eventType: event,
+        payload,
+        errorMessage: errorMessage ?? "Delivery failed",
+      }).catch(() => null);
     }
     const durationMs = Date.now() - start;
     await this.db.query(

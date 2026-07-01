@@ -305,6 +305,8 @@ export class SaasIntegrationsHubService {
       scopes?: string[];
       metadata?: Record<string, unknown>;
       errorMessage?: string | null;
+      accessTokenEnc?: string | null;
+      refreshTokenEnc?: string | null;
     }
   ): Promise<void> {
     const connector = getCatalogBySlug(slug);
@@ -314,14 +316,16 @@ export class SaasIntegrationsHubService {
     await this.db.query(
       `INSERT INTO saas_integration_connections
          (tenant_id, connector_slug, status, external_account_id, external_account_name,
-          scopes, metadata, last_sync_at, error_message, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, NOW(), $8, NOW())
+          scopes, metadata, access_token_enc, refresh_token_enc, last_sync_at, error_message, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, $9, NOW(), $10, NOW())
        ON CONFLICT (tenant_id, connector_slug) DO UPDATE SET
          status              = EXCLUDED.status,
          external_account_id = EXCLUDED.external_account_id,
          external_account_name = EXCLUDED.external_account_name,
          scopes              = EXCLUDED.scopes,
          metadata            = EXCLUDED.metadata,
+         access_token_enc    = COALESCE(EXCLUDED.access_token_enc, saas_integration_connections.access_token_enc),
+         refresh_token_enc   = COALESCE(EXCLUDED.refresh_token_enc, saas_integration_connections.refresh_token_enc),
          last_sync_at        = NOW(),
          error_message       = EXCLUDED.error_message,
          updated_at          = NOW()`,
@@ -333,6 +337,8 @@ export class SaasIntegrationsHubService {
         data.externalAccountName ?? null,
         JSON.stringify(data.scopes ?? []),
         JSON.stringify(data.metadata ?? {}),
+        data.accessTokenEnc ?? null,
+        data.refreshTokenEnc ?? null,
         data.errorMessage ?? null,
       ]
     );

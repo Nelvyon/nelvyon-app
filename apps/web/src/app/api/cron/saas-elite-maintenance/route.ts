@@ -7,6 +7,7 @@ import { DbClient } from "../../../../../../../backend/db/DbClient";
 import {
   getSaasAdsOptimizerService,
   getSaasHubSpotSyncService,
+  resolveHubSpotAccessToken,
 } from "@nelvyon/saas";
 
 function authorizeCron(req: Request): boolean {
@@ -35,16 +36,18 @@ export async function GET(req: Request) {
     adsTenants++;
   }
 
-  const hubRows = await db.query<{ tenant_id: string; access_token: string }>(
-    `SELECT tenant_id, access_token FROM saas_integration_connections
-     WHERE connector_slug='hubspot' AND status='connected' AND access_token IS NOT NULL`,
+  const hubRows = await db.query<{ tenant_id: string }>(
+    `SELECT tenant_id FROM saas_integration_connections
+     WHERE connector_slug='hubspot' AND status='connected'`,
   );
   for (const row of hubRows) {
     try {
-      await hubSvc.runSync(row.tenant_id, row.access_token);
+      const token = await resolveHubSpotAccessToken(row.tenant_id);
+      if (!token) continue;
+      await hubSvc.runSync(row.tenant_id, token);
       hubspotTenants++;
     } catch {
-      // continue other tenants
+      /* continue other tenants */
     }
   }
 

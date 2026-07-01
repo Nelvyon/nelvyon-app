@@ -79,6 +79,21 @@ export async function ensurePartnerRebillingSchema(): Promise<void> {
         description TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
+      CREATE TABLE IF NOT EXISTS partner_client_billing (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        partner_workspace_id INT NOT NULL,
+        client_workspace_id INT NOT NULL,
+        retail_plan_id TEXT,
+        retail_pack_id TEXT,
+        stripe_customer_id TEXT,
+        stripe_subscription_id TEXT,
+        monthly_retail_eur NUMERIC(10, 2) NOT NULL DEFAULT 0,
+        monthly_wholesale_eur NUMERIC(10, 2) NOT NULL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'active',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        UNIQUE (partner_workspace_id, client_workspace_id)
+      );
     `;
   }
   for (const stmt of raw.split(";").map((s) => s.trim()).filter(Boolean)) {
@@ -268,4 +283,110 @@ export async function seedDemoLedgerEntries(workspaceId: number): Promise<number
     if (row) inserted += 1;
   }
   return inserted;
+}
+
+const PLAN_PRICING: Record<string, { wholesale: number; retail: number }> = {
+  starter: { wholesale: 29, retail: 79 },
+  pro: { wholesale: 129, retail: 249 },
+  agency: { wholesale: 197, retail: 497 },
+};
+
+function mapClientBilling(row: Record<string, unknown>): import("@/lib/partners/partnerConnectTypes").PartnerClientBillingRow {
+  return {
+    id: String(row.id),
+    partner_workspace_id: Number(row.partner_workspace_id),
+    client_workspace_id: Number(row.client_workspace_id),
+    retail_plan_id: row.retail_plan_id != null ? String(row.retail_plan_id) : null,
+    retail_pack_id: row.retail_pack_id != null ? String(row.retail_pack_id) : null,
+    stripe_customer_id: row.stripe_customer_id != null ? String(row.stripe_customer_id) : null,
+    stripe_subscription_id: row.stripe_subscription_id != null ? String(row.stripe_subscription_id) : null,
+    monthly_retail_eur: Number(row.monthly_retail_eur ?? 0),
+    monthly_wholesale_eur: Number(row.monthly_wholesale_eur ?? 0),
+    status: String(row.status ?? "active"),
+    created_at: String(row.created_at),
+    updated_at: String(row.updated_at),
+  };
+}
+
+export async function upsertPartnerClientBilling(params: {
+  partnerWorkspaceId: number;
+  clientWorkspaceId: number;
+  retailPlanId: string;
+  retailEur?: number;
+}): Promise<import("@/lib/partners/partnerConnectTypes").PartnerClientBillingRow> {
+  await ensurePartnerRebillingSchema();
+  const planKey = params.retailPlanId.replace(/^plan_/, "");
+  const pricing = PLAN_PRICING[planKey] ?? PLAN_PRICING.starter!;
+  const retail = params.retailEur ?? pricing.retail;
+  const wholesale = pricing.wholesale;
+
+  const rows = await db().query<Record<string, unknown>>(
+    `INSERT INTO partner_client_billing (
+       partner_workspace_id, client_workspace_id, retail_plan_id,
+       monthly_retail_eur, monthly_wholesale_eur, status, updated_at
+     ) VALUES ($1, $2, $3, $4, $5, 'active', NOW())
+     ON CONFLICT (partner_workspace_id, client_workspace_id) DO UPDATE SET
+       retail_plan_id = EXCLUDED.retail_plan_id,
+       monthly_retail_eur = EXCLUDED.monthly_retail_eur,
+       monthly_wholesale_eur = EXCLUDED.monthly_wholesale_eur,
+       status = 'active',
+       updated_at = NOW()
+     RETURNING *`,
+    [params.partnerWorkspaceId, params.clientWorkspaceId, params.retailPlanId, retail, wholesale],
+  );
+  const billing = mapClientBilling(rows[0]!);
+
+  await insertLedgerEntry({
+    partnerWorkspaceId: params.partnerWorkspaceId,
+    clientWorkspaceId: params.clientWorkspaceId,
+    eventType: "subscription_invoice",
+    stripeEventId: `setup_${params.partnerWorkspaceId}_${params.clientWorkspaceId}_${Date.now()}`,
+    grossEur: retail,
+    wholesaleEur: wholesale,
+    partnerMarginEur: Math.max(0, retail - wholesale),
+    description: `Plan ${params.retailPlanId} asignado a cliente ws ${params.clientWorkspaceId}`,
+  });
+
+  return billing;
+}
+
+export async function getPartnerClientBilling(
+  partnerWorkspaceId: number,
+  clientWorkspaceId: number,
+): Promise<import("@/lib/partners/partnerConnectTypes").PartnerClientBillingRow | null> {
+  await ensurePartnerRebillingSchema();
+  const rows = await db().query<Record<string, unknown>>(
+    `SELECT * FROM partner_client_billing
+     WHERE partner_workspace_id=$1 AND client_workspace_id=$2 LIMIT 1`,
+    [partnerWorkspaceId, clientWorkspaceId],
+  );
+  return rows[0] ? mapClientBilling(rows[0]) : null;
+}
+
+export async function chargePartnerClientPack(params: {
+  partnerWorkspaceId: number;
+  clientWorkspaceId: number;
+  packSku: string;
+  retailEur: number;
+  wholesaleEur: number;
+}): Promise<{ ok: boolean; ledgerId: string | null }> {
+  await ensurePartnerRebillingSchema();
+  const row = await insertLedgerEntry({
+    partnerWorkspaceId: params.partnerWorkspaceId,
+    clientWorkspaceId: params.clientWorkspaceId,
+    eventType: "pack_payment",
+    stripeEventId: `pack_${params.packSku}_${params.clientWorkspaceId}_${Date.now()}`,
+    grossEur: params.retailEur,
+    wholesaleEur: params.wholesaleEur,
+    partnerMarginEur: Math.max(0, params.retailEur - params.wholesaleEur),
+    description: `Pack ${params.packSku} — cliente ws ${params.clientWorkspaceId}`,
+  });
+  if (row) {
+    await db().query(
+      `UPDATE partner_client_billing SET retail_pack_id=$3, updated_at=NOW()
+       WHERE partner_workspace_id=$1 AND client_workspace_id=$2`,
+      [params.partnerWorkspaceId, params.clientWorkspaceId, params.packSku],
+    ).catch(() => null);
+  }
+  return { ok: Boolean(row), ledgerId: row?.id ?? null };
 }

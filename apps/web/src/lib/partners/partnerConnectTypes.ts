@@ -49,3 +49,18 @@ export type PartnerLedgerTotals = {
   margin_mtd_eur: number;
   entry_count: number;
 };
+
+export type PartnerClientBillingRow = {
+  id: string;
+  partner_workspace_id: number;
+  client_workspace_id: number;
+  retail_plan_id: string | null;
+  retail_pack_id: string | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  monthly_retail_eur: number;
+  monthly_wholesale_eur: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+};

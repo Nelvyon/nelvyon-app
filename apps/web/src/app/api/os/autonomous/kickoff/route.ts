@@ -37,6 +37,7 @@ export async function POST(req: Request) {
       serviceId,
       workspaceId,
       intake: (body.intake ?? {}) as Record<string, unknown>,
+      userId: claims.userId,
     });
     return NextResponse.json(result, { status: 201 });
   }
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
     tenantId,
     workspaceId,
     intake: (body.intake ?? {}) as Record<string, unknown>,
+    userId: claims.userId,
   });
   return NextResponse.json({ queued: results.filter((r) => r.status === "queued").length, results }, { status: 201 });
 }
