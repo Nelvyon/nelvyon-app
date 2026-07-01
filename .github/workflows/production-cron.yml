@@ -12,6 +12,20 @@ on:
     - cron: "0 8 1 * *"     # os-recurring-services (1st of month)
     - cron: "0 6 1 * *"     # os-learning-loop (1st of month)
   workflow_dispatch:
+    inputs:
+      job:
+        description: "Which cron job to run (all = every job)"
+        required: false
+        default: "saas-workflows"
+        type: choice
+        options:
+          - saas-workflows
+          - social-publish
+          - workflow-date
+          - saas-dunning
+          - os-recurring-services
+          - os-learning-loop
+          - all
 
 concurrency:
   group: production-cron-${{ github.event.schedule || 'manual' }}
@@ -19,7 +33,7 @@ concurrency:
 
 jobs:
   saas-workflows:
-    if: github.event.schedule == '*/5 * * * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '*/5 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'saas-workflows' || github.event.inputs.job == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -36,7 +50,7 @@ jobs:
           test "$code" = "200" -o "$code" = "204"
 
   social-publish:
-    if: github.event.schedule == '*/15 * * * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '*/15 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'social-publish' || github.event.inputs.job == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -53,7 +67,7 @@ jobs:
           test "$code" = "200" -o "$code" = "204"
 
   workflow-date:
-    if: github.event.schedule == '5 0 * * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '5 0 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'workflow-date' || github.event.inputs.job == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -71,7 +85,7 @@ jobs:
           test "$code" = "200" -o "$code" = "204"
 
   saas-dunning:
-    if: github.event.schedule == '0 6 * * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '0 6 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'saas-dunning' || github.event.inputs.job == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -88,7 +102,7 @@ jobs:
           test "$code" = "200" -o "$code" = "204"
 
   os-recurring-services:
-    if: github.event.schedule == '0 8 1 * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '0 8 1 * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'os-recurring-services' || github.event.inputs.job == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -105,7 +119,7 @@ jobs:
           test "$code" = "200" -o "$code" = "204"
 
   os-learning-loop:
-    if: github.event.schedule == '0 6 1 * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '0 6 1 * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'os-learning-loop' || github.event.inputs.job == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
