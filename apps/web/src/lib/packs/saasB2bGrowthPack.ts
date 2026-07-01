@@ -1,6 +1,7 @@
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
+import { dbCreatePackDeliverable } from "@/lib/packs/packOsDb";
 import type {
   PackReport,
   PackRunRecord,
@@ -114,7 +115,7 @@ export async function runSaasB2bGrowthPack(params: {
       extraDeliverables: [
         ({ intake: i, packRunId }) => ({
           stepKey: "outbound_playbook",
-          title: "Playbook outbound ABM",
+          title: "Playbook outbound",
           type: "json",
           metadata: {
             pack_id: SAAS_B2B_GROWTH_PACK_ID,
@@ -150,6 +151,40 @@ export async function runSaasB2bGrowthPack(params: {
           },
         }),
       ],
+      onPackStepsComplete: async (ctx) => {
+        const i = ctx.intake as SaasB2bGrowthPackIntake;
+        await dbCreatePackDeliverable({
+          workspaceId: ctx.workspaceId,
+          clientId: ctx.osClientId,
+          projectId: ctx.osProjectId,
+          title: "Playbook outbound",
+          type: "json",
+          visibility: "client_visible",
+          metadata: {
+            pack_id: SAAS_B2B_GROWTH_PACK_ID,
+            pack_run_id: ctx.packRunId,
+            business_name: i.business_name,
+            icp_title: i.icp_title,
+            sales_motion: i.sales_motion ?? "hybrid",
+            production: true,
+          },
+        });
+        await dbCreatePackDeliverable({
+          workspaceId: ctx.workspaceId,
+          clientId: ctx.osClientId,
+          projectId: ctx.osProjectId,
+          title: "Secuencia nurture B2B",
+          type: "json",
+          visibility: "client_visible",
+          metadata: {
+            pack_id: SAAS_B2B_GROWTH_PACK_ID,
+            pack_run_id: ctx.packRunId,
+            campaign_id: ctx.saasCampaignId,
+            icp_title: i.icp_title,
+            touches: 5,
+          },
+        });
+      },
       buildReport: buildPackReport,
       projectDescription: (i) =>
         `SaaS B2B pack: landing + SEO demand gen + demo bot + outbound para ICP ${i.icp_title}`,
