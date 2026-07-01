@@ -193,6 +193,8 @@ export default function SaasPipelinePage() {
   const [tab, setTab] = useState<Tab>("forecast");
   const [deals, setDeals] = useState<Deal[]>([]);
   const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [forecastByRep, setForecastByRep] = useState<Array<{ ownerLabel: string; weightedTotal: number; bestCase: number; dealCount: number }>>([]);
+  const [scenarios, setScenarios] = useState<{ optimistic: { weightedTotal: number }; conservative: { weightedTotal: number } } | null>(null);
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
@@ -205,14 +207,21 @@ export default function SaasPipelinePage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [dealsRes, forecastRes, playbooksRes, quotesRes] = await Promise.all([
+      const [dealsRes, forecastRes, playbooksRes, quotesRes, byRepRes, scenRes] = await Promise.all([
         fetch("/api/saas/deals"),
         fetch("/api/saas/playbooks?resource=forecast"),
         fetch("/api/saas/playbooks"),
         fetch("/api/saas/quotes"),
+        fetch("/api/saas/playbooks?resource=forecast-by-rep"),
+        fetch("/api/saas/playbooks?resource=forecast-scenarios"),
       ]);
       if (dealsRes.ok) { const d = await dealsRes.json() as { deals?: Deal[] }; setDeals(d.deals ?? []); }
       if (forecastRes.ok) { const d = await forecastRes.json() as { forecast?: Forecast }; setForecast(d.forecast ?? null); }
+      if (byRepRes.ok) { const d = await byRepRes.json() as { byRep?: typeof forecastByRep }; setForecastByRep(d.byRep ?? []); }
+      if (scenRes.ok) {
+        const d = await scenRes.json() as { scenarios?: { optimistic: { weightedTotal: number }; conservative: { weightedTotal: number } } };
+        if (d.scenarios) setScenarios({ optimistic: d.scenarios.optimistic, conservative: d.scenarios.conservative });
+      }
       if (playbooksRes.ok) { const d = await playbooksRes.json() as { playbooks?: Playbook[] }; setPlaybooks(d.playbooks ?? []); }
       if (quotesRes.ok) { const d = await quotesRes.json() as { quotes?: Quote[] }; setQuotes(d.quotes ?? []); }
       const contractsRes = await fetch("/api/saas/contracts");
@@ -298,6 +307,33 @@ export default function SaasPipelinePage() {
                     </NelvyonDsCard>
                   ))}
                 </div>
+
+                {scenarios && (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <NelvyonDsCard className="p-4">
+                      <p className="text-xs text-muted-foreground">Escenario optimista (+15% prob)</p>
+                      <p className="mt-1 text-xl font-bold text-green-400">{fmt(scenarios.optimistic.weightedTotal)}</p>
+                    </NelvyonDsCard>
+                    <NelvyonDsCard className="p-4">
+                      <p className="text-xs text-muted-foreground">Escenario conservador (-15% prob)</p>
+                      <p className="mt-1 text-xl font-bold text-amber-400">{fmt(scenarios.conservative.weightedTotal)}</p>
+                    </NelvyonDsCard>
+                  </div>
+                )}
+
+                {forecastByRep.length > 0 && (
+                  <NelvyonDsCard className="p-5">
+                    <h3 className="mb-4 text-sm font-semibold text-foreground">Forecast por rep</h3>
+                    <div className="space-y-2">
+                      {forecastByRep.map((r) => (
+                        <div key={r.ownerLabel} className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{r.ownerLabel} · {r.dealCount} deals</span>
+                          <span className="font-semibold text-foreground">{fmt(r.weightedTotal)} <span className="text-xs text-muted-foreground">/ {fmt(r.bestCase)}</span></span>
+                        </div>
+                      ))}
+                    </div>
+                  </NelvyonDsCard>
+                )}
 
                 {forecast && forecast.byStage.length > 0 ? (
                   <NelvyonDsCard className="p-5">

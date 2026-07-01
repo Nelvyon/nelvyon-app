@@ -14,17 +14,23 @@ const VALID_SERVICES: AutopilotService[] = ["seo", "social", "reputation", "ads"
 export async function POST(req: NextRequest) {
   try {
     const ctx = await requireSaasContext(req, "settings.write");
-    const body = (await req.json()) as { service?: string };
+    const body = (await req.json()) as { service?: string; runAll?: boolean };
+    const svc = getSaasAutopilotService();
+
+    if (body.runAll === true) {
+      const results = await svc.runAllEnabled(ctx.tenant.id);
+      return NextResponse.json({ results });
+    }
+
     const service = body.service as AutopilotService | undefined;
 
     if (!service || !VALID_SERVICES.includes(service)) {
       return NextResponse.json(
-        { error: `service must be one of: ${VALID_SERVICES.join(", ")}` },
+        { error: `service must be one of: ${VALID_SERVICES.join(", ")} or set runAll: true` },
         { status: 400 },
       );
     }
 
-    const svc = getSaasAutopilotService();
     const result = await svc.runNow(ctx.tenant.id, service);
     return NextResponse.json({ result });
   } catch (e) {

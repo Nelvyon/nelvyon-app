@@ -24,6 +24,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ forecast });
     }
 
+    if (url.searchParams.get("resource") === "forecast-by-rep") {
+      const byRep = await svc.getForecastByRep(ctx.tenant.id);
+      return NextResponse.json({ byRep });
+    }
+
+    if (url.searchParams.get("resource") === "forecast-scenarios") {
+      const scenarios = await svc.getForecastScenarios(ctx.tenant.id);
+      return NextResponse.json({ scenarios });
+    }
+
     if (url.searchParams.get("resource") === "probabilities") {
       const probs = await svc.getStageProbabilities(ctx.tenant.id);
       return NextResponse.json({ probabilities: probs });

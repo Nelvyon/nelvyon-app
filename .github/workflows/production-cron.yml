@@ -12,6 +12,7 @@ on:
     - cron: "0 7 * * *"     # saas-sequences (daily 07:00 UTC)
     - cron: "0 8 1 * *"     # os-recurring-services (1st of month)
     - cron: "0 6 1 * *"     # os-learning-loop (1st of month)
+    - cron: "0 9 * * 1"     # os-competitor-gap digest (Mondays 09:00 UTC)
   workflow_dispatch:
     inputs:
       job:
@@ -27,6 +28,7 @@ on:
           - saas-sequences
           - os-recurring-services
           - os-learning-loop
+          - os-competitor-gap
           - all
 
 concurrency:
@@ -150,6 +152,23 @@ jobs:
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
             -H "x-cron-secret: $CRON_SECRET" \
             "$BASE_URL/api/cron/os-learning-loop")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  os-competitor-gap:
+    if: github.event.schedule == '0 9 * * 1' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'os-competitor-gap' || github.event.inputs.job == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger os-competitor-gap cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/os-competitor-gap")
           echo "HTTP $code"
           cat /tmp/cron.out
           test "$code" = "200" -o "$code" = "204"

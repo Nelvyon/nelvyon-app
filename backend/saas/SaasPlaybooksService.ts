@@ -265,6 +265,97 @@ export class SaasPlaybooksService {
 
     return { weightedTotal, bestCase, committed, byStage };
   }
+
+  /** Advanced forecast — weighted pipeline grouped by deal owner (rep). */
+  async getForecastByRep(tenantId: string): Promise<Array<{
+    ownerUserId: string | null;
+    ownerLabel: string;
+    weightedTotal: number;
+    bestCase: number;
+    dealCount: number;
+  }>> {
+    const probs = await this.getStageProbabilities(tenantId);
+    const rows = await this.db.query<{
+      owner_user_id: string | null;
+      owner_label: string;
+      stage: string;
+      cnt: string;
+      total: string;
+    }>(
+      `SELECT d.owner_user_id,
+              COALESCE(d.owner_user_id, 'unassigned') AS owner_label,
+              d.stage,
+              COUNT(*)::text AS cnt,
+              COALESCE(SUM(d.value), 0)::text AS total
+       FROM saas_deals d
+       WHERE d.tenant_id = $1 AND d.stage NOT IN ('won', 'lost')
+       GROUP BY d.owner_user_id, d.stage`,
+      [tenantId],
+    );
+
+    const byRep = new Map<string, {
+      ownerUserId: string | null;
+      ownerLabel: string;
+      weightedTotal: number;
+      bestCase: number;
+      dealCount: number;
+    }>();
+
+    for (const r of rows) {
+      const key = r.owner_user_id ?? "unassigned";
+      const stage = r.stage as DealStage;
+      const count = Number(r.cnt);
+      const value = Number(r.total);
+      const probability = probs[stage] ?? DEFAULT_STAGE_PROBS[stage] ?? 0;
+      const weightedValue = Math.round(value * probability) / 100;
+      const cur = byRep.get(key) ?? {
+        ownerUserId: r.owner_user_id,
+        ownerLabel: r.owner_user_id ? r.owner_user_id.slice(0, 8) : "Sin asignar",
+        weightedTotal: 0,
+        bestCase: 0,
+        dealCount: 0,
+      };
+      cur.weightedTotal += weightedValue;
+      cur.bestCase += value;
+      cur.dealCount += count;
+      byRep.set(key, cur);
+    }
+
+    return [...byRep.values()].sort((a, b) => b.weightedTotal - a.weightedTotal);
+  }
+
+  /** Scenario forecast — optimistic (+15% prob cap 95) vs conservative (-15% prob floor 5). */
+  async getForecastScenarios(tenantId: string): Promise<{
+    base: Awaited<ReturnType<SaasPlaybooksService["getForecast"]>>;
+    optimistic: { weightedTotal: number };
+    conservative: { weightedTotal: number };
+  }> {
+    const base = await this.getForecast(tenantId);
+    const probs = await this.getStageProbabilities(tenantId);
+    const rows = await this.db.query<{ stage: string; total: string }>(
+      `SELECT stage, COALESCE(SUM(value), 0)::text AS total
+       FROM saas_deals
+       WHERE tenant_id = $1 AND stage NOT IN ('won', 'lost')
+       GROUP BY stage`,
+      [tenantId],
+    );
+
+    let optimistic = 0;
+    let conservative = 0;
+    for (const r of rows) {
+      const stage = r.stage as DealStage;
+      const value = Number(r.total);
+      const p = probs[stage] ?? DEFAULT_STAGE_PROBS[stage] ?? 0;
+      optimistic += Math.round(value * Math.min(95, p + 15)) / 100;
+      conservative += Math.round(value * Math.max(5, p - 15)) / 100;
+    }
+
+    return {
+      base,
+      optimistic: { weightedTotal: optimistic },
+      conservative: { weightedTotal: conservative },
+    };
+  }
 }
 
 let _svc: SaasPlaybooksService | undefined;

@@ -22,13 +22,14 @@ export async function GET(req: Request) {
     if (resource === "sandboxes") return NextResponse.json({ sandboxes: await sec.listSandboxes(ctx.tenant.id) });
     if (resource === "mfa") return NextResponse.json({ mfa: await sec.getMfaStatus(ctx.tenant.id, ctx.claims.userId) });
 
-    const [allowlist, roles, territories, mfa] = await Promise.all([
+    const [allowlist, roles, territories, mfa, sandboxes] = await Promise.all([
       sec.getIpAllowlist(ctx.tenant.id),
       sec.listCustomRoles(ctx.tenant.id),
       sec.listTerritories(ctx.tenant.id),
       sec.getMfaStatus(ctx.tenant.id, ctx.claims.userId),
+      sec.listSandboxes(ctx.tenant.id),
     ]);
-    return NextResponse.json({ allowlist, roles, territories, mfa });
+    return NextResponse.json({ allowlist, roles, territories, mfa, sandboxes });
   } catch (e) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

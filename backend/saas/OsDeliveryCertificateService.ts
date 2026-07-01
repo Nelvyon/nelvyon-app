@@ -113,6 +113,57 @@ function num(v: string | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function escapePdfText(text: string): string {
+  return text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+}
+
+/** Minimal PDF 1.4 — plain text certificate without external deps. */
+export function buildMinimalPdfFromText(lines: string[], title: string): Buffer {
+  const safeTitle = escapePdfText(title.slice(0, 80));
+  const body = lines
+    .slice(0, 40)
+    .map((l, i) => `BT /F1 10 Tf 50 ${780 - i * 16} Td (${escapePdfText(l.slice(0, 100))}) Tj ET`)
+    .join("\n");
+  const stream = `BT /F1 14 Tf 50 800 Td (${safeTitle}) Tj ET\n${body}`;
+  const streamLen = Buffer.byteLength(stream, "utf8");
+  const pdf = `%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 842]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj
+4 0 obj<</Length ${streamLen}>>stream
+${stream}
+endstream endobj
+5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj
+xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000060 00000 n 
+0000000115 00000 n 
+0000000240 00000 n 
+0000000${(320 + streamLen).toString().padStart(3, "0")} 00000 n 
+trailer<</Size 6/Root 1 0 R>>
+startxref
+${400 + streamLen}
+%%EOF`;
+  return Buffer.from(pdf, "utf8");
+}
+
+export function certificateToPdfLines(cert: DeliveryCertificate): string[] {
+  return [
+    `Pack: ${cert.packId}`,
+    `Pack Run: ${cert.packRunId}`,
+    `QA Score: ${cert.qaScore ?? "—"}/100`,
+    `Visual: ${cert.visualScore ?? "—"} | Lighthouse: ${cert.lighthouseScore ?? "—"}`,
+    `Legal: ${cert.legalPassed === true ? "PASS" : cert.legalPassed === false ? "FAIL" : "—"}`,
+    `Seed: ${cert.seedId ?? "—"} (${cert.seedSource ?? "synthetic"})`,
+    `Agents: ${cert.agentsUsed.join(", ") || "—"}`,
+    `Hash: ${cert.contentHash ?? "—"}`,
+    `Issued: ${cert.issuedAt ?? "pending"}`,
+    `Nelvyon Delivery Certificate`,
+  ];
+}
+
 function rowToCert(r: CertRow, includeHtml = false): DeliveryCertificate {
   const cert: DeliveryCertificate = {
     id: r.id,

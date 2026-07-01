@@ -1,0 +1,17 @@
+{
+  "name": "Nelvyon Lead Capture",
+  "description": "Zap template — create CRM contact on new form submission",
+  "trigger": "webhook",
+  "actions": [
+    {
+      "type": "create_record",
+      "app": "nelvyon",
+      "endpoint": "/api/public/v2/contacts",
+      "fields": {
+        "name": "{{trigger.name}}",
+        "email": "{{trigger.email}}",
+        "phone": "{{trigger.phone}}"
+      }
+    }
+  ]
+}

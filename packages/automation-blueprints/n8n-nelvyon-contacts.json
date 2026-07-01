@@ -1,0 +1,27 @@
+{
+  "name": "Nelvyon — Crear contacto v2",
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [240, 300],
+      "parameters": { "path": "nelvyon-lead", "httpMethod": "POST" }
+    },
+    {
+      "name": "Nelvyon Create Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [480, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.NELVYON_APP_URL}}/api/public/v2/contacts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "jsonBody": "={\"name\": $json.body.name, \"email\": $json.body.email, \"phone\": $json.body.phone}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Nelvyon Create Contact", "type": "main", "index": 0 }]] }
+  }
+}

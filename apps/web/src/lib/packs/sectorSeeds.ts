@@ -11,9 +11,12 @@
  * the deliverable must include.
  */
 
+import { loadEnvatoSectorSeed } from "./envatoSeedBridge";
+
 export type SectorSeed = {
   seed_id: string;
   sector: string;
+  source?: "envato" | "synthetic";
   prompt: string;
   output_schema: { fields: string[] };
   landing_headline: string;
@@ -321,6 +324,11 @@ export function getSeedByIndex(
   _rootOverride?: undefined,
   learningRanks?: Map<string, number>,
 ): SectorSeed | null {
+  const envatoSeed = loadEnvatoSectorSeed(sectorId, index);
+  if (envatoSeed && (!learningRanks || learningRanks.size === 0)) {
+    return envatoSeed;
+  }
+
   const seeds = SEEDS[sectorId];
   if (!seeds || seeds.length === 0) return null;
   // O26 — when a DNA/learning rank map is provided, prefer the best-ranked seed

@@ -59,7 +59,11 @@ export type SaasNavId =
   | "data-playbooks"
   | "partner"
   | "voice"
-  | "pwa";
+  | "pwa"
+  | "security"
+  | "deliverability"
+  | "marketplace"
+  | "attribution";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -79,6 +83,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "calendar", label: "📅 Calendario", href: "/saas/calendar", group: "principal" },
   // Comunicación
   { id: "campanias", label: "Email Campañas", href: "/saas/campanias", group: "comunicacion" },
+  { id: "deliverability", label: "📬 Deliverability", href: "/saas/deliverability", group: "comunicacion" },
   { id: "sms", label: "SMS Marketing", href: "/saas/sms", group: "comunicacion" },
   { id: "social", label: "Redes Sociales", href: "/saas/social", group: "comunicacion" },
   { id: "whatsapp", label: "💬 WhatsApp", href: "/saas/whatsapp", group: "comunicacion" },
@@ -122,7 +127,9 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   // Cuenta
   { id: "entregables", label: "📦 Entregables", href: "/saas/entregables", group: "cuenta" },
   { id: "reportes", label: "Reportes", href: "/saas/reportes", group: "cuenta" },
+  { id: "attribution", label: "📈 Atribución", href: "/saas/reportes?tab=attribution", group: "cuenta" },
   { id: "integraciones", label: "Integraciones", href: "/saas/integraciones", group: "cuenta" },
+  { id: "marketplace", label: "🧩 Marketplace", href: "/saas/marketplace", group: "cuenta" },
   { id: "herramientas", label: "🛠️ Herramientas", href: "/saas/herramientas", group: "cuenta" },
   { id: "voice", label: "🎙️ Voz", href: "/saas/voice", group: "cuenta" },
   { id: "pwa", label: "📲 Instalar App", href: "/saas/pwa", group: "cuenta" },
@@ -137,6 +144,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "api-keys", label: "🔑 API Keys", href: "/saas/api-keys", group: "cuenta" },
   { id: "billing", label: "Facturación", href: "/saas/billing", group: "cuenta", permission: "billing.read" },
   { id: "settings", label: "Configuración", href: "/saas/settings", group: "cuenta", permission: "settings.read" },
+  { id: "security", label: "🔐 Seguridad Enterprise", href: "/saas/security", group: "cuenta", permission: "settings.read" },
 ] as const;
 
 /**

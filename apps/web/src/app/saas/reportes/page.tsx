@@ -52,22 +52,29 @@ export default function SaasReportesPage() {
   const [attrSummary, setAttrSummary]       = useState<AttributionSummary | null>(null);
   const [channels, setChannels]             = useState<ChannelBreakdown[]>([]);
   const [campaigns, setCampaigns]           = useState<CampaignBreakdown[]>([]);
-  const [attrTab, setAttrTab]               = useState<"channels" | "campaigns">("channels");
+  const [attrTab, setAttrTab]               = useState<"channels" | "campaigns" | "models">("channels");
+  const [attrModel, setAttrModel]           = useState<"linear" | "first_touch" | "last_touch" | "time_decay">("linear");
+  const [modelRows, setModelRows]           = useState<Array<{ source: string; credit: number; conversions: number }>>([]);
   const [attrLoading, setAttrLoading]       = useState(false);
   const [deliverableRevenue, setDeliverableRevenue] = useState<Array<{ deliverableId: string; packId: string | null; utmCampaign: string | null; conversions: number; adsSpend: number; attributedRevenue: number; roas: number | null }>>([]);
   const [revenueLoading, setRevenueLoading] = useState(false);
 
-  const loadAttribution = useCallback(async (d: number) => {
+  const loadAttribution = useCallback(async (d: number, model: typeof attrModel = "linear") => {
     setAttrLoading(true);
     try {
-      const [sumRes, chRes, camRes] = await Promise.all([
+      const [sumRes, chRes, camRes, modRes] = await Promise.all([
         fetch(`/api/saas/reportes?resource=summary&days=${d}`),
         fetch(`/api/saas/reportes?resource=channels&days=${d}`),
         fetch(`/api/saas/reportes?resource=campaigns&days=${d}`),
+        fetch(`/api/saas/reportes?resource=models&model=${model}&days=${d}`),
       ]);
       if (sumRes.ok)  { const s = await sumRes.json() as { summary?: AttributionSummary };  setAttrSummary(s.summary ?? null); }
       if (chRes.ok)   { const s = await chRes.json()  as { channels?: ChannelBreakdown[] }; setChannels(s.channels ?? []); }
       if (camRes.ok)  { const s = await camRes.json() as { campaigns?: CampaignBreakdown[] }; setCampaigns(s.campaigns ?? []); }
+      if (modRes.ok)  {
+        const s = await modRes.json() as { breakdown?: { channels: Array<{ utmSource: string; credit: number; conversions: number }> } };
+        setModelRows((s.breakdown?.channels ?? []).map((c) => ({ source: c.utmSource, credit: c.credit, conversions: c.conversions })));
+      }
     } finally { setAttrLoading(false); }
   }, []);
 
@@ -175,16 +182,44 @@ export default function SaasReportesPage() {
 
           {/* Sub-tabs */}
           <div className="mb-3 flex gap-1 border-b border-border">
-            {(["channels","campaigns"] as const).map(t => (
+            {(["channels","campaigns","models"] as const).map(t => (
               <button key={t} onClick={() => setAttrTab(t)}
                 className={`px-4 py-1.5 text-xs font-medium border-b-2 transition-colors ${attrTab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-                {t === "channels" ? "Por canal" : "Por campaña"}
+                {t === "channels" ? "Por canal" : t === "campaigns" ? "Por campaña" : "Multi-touch"}
               </button>
             ))}
           </div>
 
+          {attrTab === "models" && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {(["linear", "first_touch", "last_touch", "time_decay"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => { setAttrModel(m); void loadAttribution(days, m); }}
+                  className={`rounded-lg px-3 py-1 text-xs ${attrModel === m ? "bg-primary/20 text-primary" : "bg-muted/20 text-muted-foreground"}`}
+                >
+                  {m.replace("_", " ")}
+                </button>
+              ))}
+            </div>
+          )}
+
           {attrLoading ? (
             <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded-lg bg-muted/20" />)}</div>
+          ) : attrTab === "models" ? (
+            modelRows.length === 0 ? (
+              <p className="py-6 text-center text-xs text-muted-foreground">Sin datos multi-touch ({attrModel}) en los últimos {days} días.</p>
+            ) : (
+              <div className="space-y-2">
+                {modelRows.map((row, i) => (
+                  <div key={i} className="flex items-center justify-between rounded-xl bg-muted/10 p-3 text-sm">
+                    <span className="font-medium text-foreground">{row.source}</span>
+                    <span className="text-muted-foreground">{row.conversions.toLocaleString()} conv. · crédito {(row.credit * 100).toFixed(1)}%</span>
+                  </div>
+                ))}
+              </div>
+            )
           ) : attrTab === "channels" ? (
             channels.length === 0 ? (
               <p className="py-6 text-center text-xs text-muted-foreground">Sin datos de atribución por canal en los últimos {days} días.</p>

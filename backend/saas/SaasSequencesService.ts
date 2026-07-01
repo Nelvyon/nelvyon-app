@@ -3,7 +3,13 @@ import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type SequenceStatus = "active" | "paused" | "archived";
 export type SequenceTrigger = "manual" | "contact_created" | "form_submitted" | "tag_added";
-export type SequenceStepType = "email" | "wait" | "branch";
+export type SequenceStepType = "email" | "wait" | "branch" | "sms" | "whatsapp";
+
+export type SequenceProcessHandlers = {
+  sendEmail: (to: string, subject: string, html: string) => Promise<void>;
+  sendSms?: (tenantId: string, phone: string, body: string) => Promise<void>;
+  sendWhatsApp?: (tenantId: string, phone: string, body: string) => Promise<void>;
+};
 
 export interface BranchCondition {
   field: "replied" | "opened" | "clicked" | "tag";
@@ -381,7 +387,15 @@ export class SaasSequencesService {
    * Process due sequence emails. Called from cron.
    * Returns count of emails sent / steps processed.
    */
-  async processDueEnrollments(sendEmail: (to: string, subject: string, html: string) => Promise<void>): Promise<number> {
+  async processDueEnrollments(
+    sendOrHandlers:
+      | ((to: string, subject: string, html: string) => Promise<void>)
+      | SequenceProcessHandlers,
+  ): Promise<number> {
+    const handlers: SequenceProcessHandlers =
+      typeof sendOrHandlers === "function"
+        ? { sendEmail: sendOrHandlers }
+        : sendOrHandlers;
     const due = await this.db.query<{
       id: string; sequence_id: string; tenant_id: string; contact_id: string;
       current_step: number | string; reply_received: boolean;
@@ -396,10 +410,12 @@ export class SaasSequencesService {
     let processed = 0;
     for (const enrollment of due) {
       const step = Number(enrollment.current_step);
-      const stepRows = await this.db.query<StepRow & { contact_email: string | null; contact_name: string }>(
+      const stepRows = await this.db.query<
+        StepRow & { contact_email: string | null; contact_phone: string | null; contact_name: string }
+      >(
         `SELECT s.id, s.sequence_id, s.position, s.step_type, s.delay_days, s.delay_hours,
                 s.subject, s.body_html, s.branch_condition, s.branch_yes_position, s.branch_no_position,
-                s.created_at, s.updated_at, c.email AS contact_email, c.name AS contact_name
+                s.created_at, s.updated_at, c.email AS contact_email, c.phone AS contact_phone, c.name AS contact_name
          FROM saas_sequence_steps s
          JOIN contacts c ON c.id = $3
          WHERE s.sequence_id = $1 AND s.position = $2
@@ -440,6 +456,35 @@ export class SaasSequencesService {
         continue;
       }
 
+      if (stepType === "sms" || stepType === "whatsapp") {
+        const phone = stepData.contact_phone?.trim();
+        const body = (stepData.body_html || stepData.subject || "").trim();
+        if (!phone || !body) {
+          await this.db.query(
+            `UPDATE saas_sequence_enrollments SET status='failed' WHERE id=$1`,
+            [enrollment.id],
+          );
+          continue;
+        }
+        try {
+          if (stepType === "sms") {
+            if (!handlers.sendSms) throw new Error("SMS handler not configured");
+            await handlers.sendSms(enrollment.tenant_id, phone, body);
+          } else {
+            if (!handlers.sendWhatsApp) throw new Error("WhatsApp handler not configured");
+            await handlers.sendWhatsApp(enrollment.tenant_id, phone, body);
+          }
+          processed++;
+          await this._advanceToPosition(enrollment.id, enrollment.sequence_id, step + 1, step);
+        } catch {
+          await this.db.query(
+            `UPDATE saas_sequence_enrollments SET status='failed' WHERE id=$1`,
+            [enrollment.id],
+          );
+        }
+        continue;
+      }
+
       // email step
       if (!stepData.contact_email) {
         await this.db.query(
@@ -450,7 +495,7 @@ export class SaasSequencesService {
       }
 
       try {
-        await sendEmail(stepData.contact_email, stepData.subject, stepData.body_html);
+        await handlers.sendEmail(stepData.contact_email, stepData.subject, stepData.body_html);
         processed++;
         await this._advanceToPosition(enrollment.id, enrollment.sequence_id, step + 1, step);
       } catch {

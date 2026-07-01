@@ -15,6 +15,8 @@ type SequenceWithSteps = SaasSequence & { steps?: SaasSequenceStep[] };
 function StepTypeBadge({ type }: { type: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     email: { label: "Email", cls: "bg-blue-500/20 text-blue-300" },
+    sms: { label: "SMS", cls: "bg-green-500/20 text-green-300" },
+    whatsapp: { label: "WhatsApp", cls: "bg-emerald-500/20 text-emerald-300" },
     wait:  { label: "Espera", cls: "bg-yellow-500/20 text-yellow-300" },
     branch:{ label: "Bifurcación", cls: "bg-purple-500/20 text-purple-300" },
   };
@@ -102,7 +104,7 @@ function AddStepModal({
   onClose: () => void;
   onAdded: () => void;
 }) {
-  const [stepType, setStepType] = useState<"email" | "wait" | "branch">("email");
+  const [stepType, setStepType] = useState<"email" | "sms" | "whatsapp" | "wait" | "branch">("email");
   const [delayDays, setDelayDays] = useState("0");
   const [delayHours, setDelayHours] = useState("0");
   const [subject, setSubject] = useState("");
@@ -121,6 +123,7 @@ function AddStepModal({
       delay_hours: Number(delayHours) || 0,
     };
     if (stepType === "email") { body.subject = subject; body.body_html = bodyHtml; }
+    if (stepType === "sms" || stepType === "whatsapp") { body.body_html = bodyHtml || subject; }
     if (stepType === "branch") {
       body.branch_condition = { field: branchField, op: "eq", value: true };
       if (branchYes) body.branch_yes_position = Number(branchYes);
@@ -149,8 +152,8 @@ function AddStepModal({
       <div className="bg-[#0d1117] border border-white/10 rounded-xl p-6 w-full max-w-md shadow-2xl">
         <h3 className="text-white font-semibold mb-4">Añadir paso</h3>
 
-        <div className="flex gap-2 mb-4">
-          {(["email", "wait", "branch"] as const).map((t) => (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {(["email", "sms", "whatsapp", "wait", "branch"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setStepType(t)}
@@ -158,7 +161,7 @@ function AddStepModal({
                 stepType === t ? "bg-[#0084ff] text-white" : "bg-white/5 text-white/50 hover:bg-white/10"
               }`}
             >
-              {t === "email" ? "Email" : t === "wait" ? "Espera" : "Bifurcación"}
+              {t === "email" ? "Email" : t === "sms" ? "SMS" : t === "whatsapp" ? "WhatsApp" : t === "wait" ? "Espera" : "Bifurcación"}
             </button>
           ))}
         </div>
@@ -174,17 +177,19 @@ function AddStepModal({
           </div>
         </div>
 
-        {stepType === "email" && (
+        {(stepType === "email" || stepType === "sms" || stepType === "whatsapp") && (
           <>
-            <input
-              className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm mb-2 placeholder-white/30"
-              placeholder="Asunto del email"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-            />
+            {stepType === "email" && (
+              <input
+                className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm mb-2 placeholder-white/30"
+                placeholder="Asunto del email"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+              />
+            )}
             <textarea
               className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm mb-2 placeholder-white/30 h-24 resize-none"
-              placeholder="Cuerpo HTML del email"
+              placeholder={stepType === "email" ? "Cuerpo HTML del email" : "Mensaje SMS / WhatsApp"}
               value={bodyHtml}
               onChange={(e) => setBodyHtml(e.target.value)}
             />

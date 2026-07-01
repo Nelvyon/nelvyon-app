@@ -36,7 +36,7 @@ export default function MarketplacePage() {
   };
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="integraciones" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="marketplace" />}>
       <div className="mx-auto max-w-5xl space-y-6 p-6">
         <h1 className="text-2xl font-semibold text-white">Integration Marketplace</h1>
         <div className="grid gap-4 md:grid-cols-2">
@@ -44,7 +44,17 @@ export default function MarketplacePage() {
             <article key={app.id} className="rounded-xl border border-white/10 bg-white/5 p-4">
               <p className="text-xs uppercase text-white/40">{app.category}</p>
               <h2 className="text-lg font-semibold text-white">{app.name}</h2>
-              <p className="mt-2 text-sm text-white/60">{app.description}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{app.description}</p>
+              {["make", "n8n", "zapier"].includes(app.slug) && app.installed && (
+                <a
+                  href={`/api/saas/marketplace/blueprints?slug=${app.slug}`}
+                  className="mt-2 inline-block text-xs text-[#0084ff] hover:underline"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Descargar blueprint →
+                </a>
+              )}
               <button
                 type="button"
                 className="mt-4 rounded-lg bg-[#0084ff] px-3 py-1.5 text-sm text-white"

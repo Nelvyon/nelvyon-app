@@ -266,7 +266,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
 
   const seedMeta = {
     seed_id: seed?.seed_id ?? `${params.intake.sector}_tpl_0`,
-    source: "synthetic" as const,
+    source: (seed?.source ?? "synthetic") as "envato" | "synthetic",
     sector: params.intake.sector,
     prompt_preview: seed?.prompt.slice(0, 80) ?? null,
     sector_readiness_score: sectorReadinessScore,
@@ -656,6 +656,18 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     );
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
+
+    if (needsReview) {
+      try {
+        const { getOsQaReviewQueueService } = await import("@nelvyon/saas");
+        await getOsQaReviewQueueService().enqueue({
+          packRunId: run.id,
+          qaScore: avgSkuQaScore(skuResults),
+        });
+      } catch {
+        /* QA queue optional until migration 482 */
+      }
+    }
 
     // Auto-approve deliverables when all SKUs pass QA threshold — no human needed
     let autoApprovedCount = 0;

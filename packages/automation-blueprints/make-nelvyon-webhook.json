@@ -1,0 +1,25 @@
+{
+  "name": "Nelvyon — Webhook a CRM",
+  "description": "Importa este escenario en Make.com. Dispara un workflow Nelvyon cuando llega un lead.",
+  "flow": [
+    {
+      "module": "webhooks:CustomWebhook",
+      "label": "Lead entrante",
+      "mapper": {}
+    },
+    {
+      "module": "http:ActionSendData",
+      "label": "Trigger Nelvyon workflow",
+      "mapper": {
+        "url": "{{NELVYON_APP_URL}}/api/public/v2/workflows/trigger",
+        "method": "POST",
+        "headers": [
+          { "name": "Authorization", "value": "Bearer {{NELVYON_API_KEY}}" },
+          { "name": "Content-Type", "value": "application/json" }
+        ],
+        "body": "{\"workflowId\":\"{{WORKFLOW_ID}}\",\"payload\":{\"email\":\"{{1.email}}\",\"name\":\"{{1.name}}\",\"source\":\"make\"}}"
+      }
+    }
+  ],
+  "variables": ["NELVYON_APP_URL", "NELVYON_API_KEY", "WORKFLOW_ID"]
+}

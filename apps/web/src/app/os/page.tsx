@@ -127,6 +127,16 @@ export default function OsOverviewPage() {
             </Link>
           </p>
           <p className="mt-1">
+            <Link className="text-link underline" href="/os/qa-review">
+              Open /os/qa-review (human QA queue)
+            </Link>
+          </p>
+          <p className="mt-1">
+            <Link className="text-link underline" href="/os/competitor-gap">
+              Open /os/competitor-gap
+            </Link>
+          </p>
+          <p className="mt-1">
             <Link className="text-link underline" href="/os/i18n">
               Open /os/i18n
             </Link>

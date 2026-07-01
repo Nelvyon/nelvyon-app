@@ -138,6 +138,8 @@ export {
   type CertStatus as DeliveryCertStatus,
   type AgentProvider as DeliveryAgentProvider,
   type OsDeliveryCertErrorCode,
+  buildMinimalPdfFromText,
+  certificateToPdfLines,
 } from "./OsDeliveryCertificateService";
 export {
   OsPackGateService,
@@ -764,6 +766,7 @@ export {
   type BranchCondition,
   type SequenceStatus,
   type SequenceTrigger,
+  type SequenceProcessHandlers,
 } from "./SaasSequencesService";
 export {
   SaasAbTestingService,
@@ -1352,3 +1355,12 @@ export {
   getOsPremiumAutonomousService,
   type OsAutonomousKickoffResult,
 } from "./OsPremiumAutonomousService";
+export {
+  OsQaReviewQueueService,
+  OsQaReviewQueueError,
+  getOsQaReviewQueueService,
+  resetOsQaReviewQueueServiceForTests,
+  type QaReviewItem,
+  type QaReviewSummary,
+  type QaReviewStatus,
+} from "./OsQaReviewQueueService";

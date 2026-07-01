@@ -30,7 +30,7 @@ export default function DeliverabilityPage() {
   useEffect(() => { void load(); }, [load]);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="campanias" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="deliverability" />}>
       <div className="mx-auto max-w-5xl space-y-6 p-6">
         <h1 className="text-2xl font-semibold text-white">Deliverability Center</h1>
         {snapshot ? (

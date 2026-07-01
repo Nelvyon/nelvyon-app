@@ -9,6 +9,9 @@ import {
 } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { dialerAdvancedApi } from "@/features/dialer-advanced/api";
+
+type DialerTab = "click" | "power" | "a2p";
 
 interface CallRecord {
   id: string;
@@ -95,15 +98,27 @@ function CallModal({ onClose, onCalled }: { onClose: () => void; onCalled: () =>
 }
 
 export default function SaasDialerPage() {
+  const [tab, setTab] = useState<DialerTab>("click");
   const [data, setData] = useState<DialerStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCall, setShowCall] = useState(false);
+  const [powerQueue, setPowerQueue] = useState("");
+  const [powerBusy, setPowerBusy] = useState(false);
+  const [a2pRegs, setA2pRegs] = useState<Array<{ id: string; businessName: string; status: string }>>([]);
+  const [a2pName, setA2pName] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/saas/dialer?limit=50");
+      const [res, a2pRes] = await Promise.all([
+        fetch("/api/saas/dialer?limit=50"),
+        fetch("/api/saas/dialer/a2p"),
+      ]);
       if (res.ok) setData((await res.json()) as DialerStatus);
+      if (a2pRes.ok) {
+        const d = (await a2pRes.json()) as { registrations: Array<{ id: string; businessName: string; status: string }> };
+        setA2pRegs(d.registrations ?? []);
+      }
     } finally {
       setLoading(false);
     }
@@ -111,19 +126,105 @@ export default function SaasDialerPage() {
 
   useEffect(() => { void load(); }, [load]);
 
+  async function runPowerDial() {
+    const phones = powerQueue.split(/\n+/).map((s) => s.trim()).filter(Boolean);
+    if (!phones.length) return;
+    setPowerBusy(true);
+    try {
+      await dialerAdvancedApi.powerDial({
+        client_id: "saas-tenant",
+        queue: phones.map((phone) => ({ phone })),
+        max_calls: phones.length,
+      });
+      void load();
+    } finally {
+      setPowerBusy(false);
+    }
+  }
+
+  async function createA2pDraft() {
+    if (!a2pName.trim()) return;
+    await fetch("/api/saas/dialer/a2p", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ businessName: a2pName.trim() }),
+    });
+    setA2pName("");
+    void load();
+  }
+
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="dialer" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader
-            title="Dialer Avanzado"
-            subtitle="Llamadas salientes click-to-call vía Twilio"
+            title="Dialer Enterprise"
+            subtitle="Click-to-call, power dial, parallel dial y registro A2P 10DLC"
           />
-          <NelvyonDsButton onClick={() => setShowCall(true)} disabled={!data?.dialer_configured}>
-            + Nueva llamada
-          </NelvyonDsButton>
+          {tab === "click" && (
+            <NelvyonDsButton onClick={() => setShowCall(true)} disabled={!data?.dialer_configured}>
+              + Nueva llamada
+            </NelvyonDsButton>
+          )}
         </div>
 
+        <div className="flex flex-wrap gap-2">
+          {([
+            ["click", "Click-to-call"],
+            ["power", "Power / Parallel"],
+            ["a2p", "A2P 10DLC"],
+          ] as const).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setTab(id)}
+              className={`rounded-lg px-3 py-1.5 text-sm ${tab === id ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {tab === "power" && (
+          <NelvyonDsCard className="p-4 space-y-3">
+            <p className="text-sm text-muted-foreground">Un teléfono por línea — power dial secuencial vía Twilio.</p>
+            <textarea
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-mono min-h-[120px]"
+              placeholder={"+34612345678\n+34698765432"}
+              value={powerQueue}
+              onChange={(e) => setPowerQueue(e.target.value)}
+            />
+            <NelvyonDsButton disabled={powerBusy || !data?.dialer_configured} onClick={() => void runPowerDial()}>
+              {powerBusy ? "Marcando…" : "Iniciar power dial"}
+            </NelvyonDsButton>
+          </NelvyonDsCard>
+        )}
+
+        {tab === "a2p" && (
+          <NelvyonDsCard className="p-4 space-y-3">
+            <p className="text-sm text-muted-foreground">Registro A2P 10DLC para SMS masivo en EE.UU.</p>
+            <div className="flex gap-2">
+              <input
+                className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                placeholder="Nombre legal del negocio"
+                value={a2pName}
+                onChange={(e) => setA2pName(e.target.value)}
+              />
+              <NelvyonDsButton onClick={() => void createA2pDraft()}>Crear borrador</NelvyonDsButton>
+            </div>
+            <ul className="space-y-2">
+              {a2pRegs.map((r) => (
+                <li key={r.id} className="rounded-lg border border-border px-3 py-2 text-sm flex justify-between">
+                  <span>{r.businessName}</span>
+                  <NelvyonDsBadge tone={r.status === "approved" ? "success" : "neutral"}>{r.status}</NelvyonDsBadge>
+                </li>
+              ))}
+            </ul>
+          </NelvyonDsCard>
+        )}
+
+        {tab === "click" && (
+          <>
         {!loading && data && !data.dialer_configured && (
           <NelvyonDsCard className="border-yellow-500/30 bg-yellow-500/5 p-4">
             <p className="font-medium text-yellow-400">⚠️ Dialer no configurado</p>
@@ -202,6 +303,8 @@ export default function SaasDialerPage() {
               </NelvyonDsCard>
             ))}
           </div>
+        )}
+          </>
         )}
       </div>
 

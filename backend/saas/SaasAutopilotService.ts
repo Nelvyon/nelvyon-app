@@ -255,6 +255,21 @@ export class SaasAutopilotService {
     }
   }
 
+  /** Cross-module autopilot — runs all enabled services in sequence. */
+  async runAllEnabled(tenantId: string): Promise<RunNowResult[]> {
+    const settings = await this.getSettings(tenantId);
+    const results: RunNowResult[] = [];
+    const services: AutopilotService[] = [];
+    if (settings.seoEnabled) services.push("seo");
+    if (settings.socialEnabled) services.push("social");
+    if (settings.reputationEnabled) services.push("reputation");
+    if (settings.adsEnabled) services.push("ads");
+    for (const svc of services) {
+      results.push(await this.runNow(tenantId, svc));
+    }
+    return results;
+  }
+
   async listEligibleTenants(): Promise<string[]> {
     const rows = await this.db.query<{ tenant_id: string }>(
       `SELECT tenant_id FROM saas_autopilot_settings
