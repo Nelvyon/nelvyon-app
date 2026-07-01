@@ -8,6 +8,7 @@ import type {
   SkuRunResult,
 } from "@/lib/packs/types";
 import { SAAS_B2B_GROWTH_PACK_ID } from "@/lib/packs/types";
+import { mapSaasB2bSkuDeliverable } from "@/lib/packs/saasB2bPackProduction";
 
 const meta = PACK_REGISTRY[SAAS_B2B_GROWTH_PACK_ID];
 
@@ -91,6 +92,18 @@ export async function runSaasB2bGrowthPack(params: {
       meta,
       intake,
       buildBrief: buildSaasB2bBrief,
+      reportDeliverableTitle: "Informe ejecutivo",
+      publishProductionDeliverables: true,
+      mapSkuDeliverable: (p) =>
+        mapSaasB2bSkuDeliverable({
+          sku: p.sku,
+          simulation: p.simulation,
+          intake: p.intake as SaasB2bGrowthPackIntake,
+          packRunId: p.packRunId,
+          osClientId: p.osClientId,
+          osProjectId: p.osProjectId,
+          workspaceId: p.workspaceId,
+        }),
       primaryCampaign: (i) => ({
         platform: "email",
         campaign_type: "nurturing",
@@ -102,7 +115,7 @@ export async function runSaasB2bGrowthPack(params: {
       extraDeliverables: [
         ({ intake: i, packRunId }) => ({
           stepKey: "outbound_playbook",
-          title: "Playbook Outbound / ABM B2B",
+          title: "Playbook outbound ABM",
           type: "json",
           metadata: {
             pack_id: SAAS_B2B_GROWTH_PACK_ID,
