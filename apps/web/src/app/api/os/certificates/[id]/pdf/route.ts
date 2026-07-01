@@ -20,7 +20,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     const cert = await getOsDeliveryCertificateService().getCertificate(id);
     const lines = certificateToPdfLines(cert);
     const pdf = buildMinimalPdfFromText(lines, `Nelvyon Certificate — ${cert.packId}`);
-    return new NextResponse(pdf, {
+    return new NextResponse(new Uint8Array(pdf), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

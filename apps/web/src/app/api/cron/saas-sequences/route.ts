@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   const processed = await getSaasSequencesService().processDueEnrollments({
     sendEmail: async (to, subject, html) => {
       if (!process.env.SES_FROM_EMAIL || !process.env.SES_ACCESS_KEY_ID) return;
-      const { getSesClient } = await import("../../../../../../backend/email/sesClient");
+      const { getSesClient } = await import("../../../../../../../backend/email/sesClient");
       const { SendEmailCommand } = await import("@aws-sdk/client-ses");
       const from = process.env.SES_FROM_EMAIL;
       await getSesClient().send(

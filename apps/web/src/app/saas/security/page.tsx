@@ -10,7 +10,7 @@ type SecurityData = {
   allowlist: { enabled: boolean; cidrs: string[] };
   roles: Array<{ id: string; name: string; permissions: string[] }>;
   territories: Array<{ id: string; name: string; regions: string[] }>;
-  mfa: { enrolled: boolean; enforced: boolean; secretPending?: boolean };
+  mfa: { enabled: boolean; enforced: boolean; provisioningUri?: string };
   sandboxes?: Array<{ id: string; name: string }>;
 };
 
@@ -81,10 +81,10 @@ export default function SaasSecurityPage() {
         ) : tab === "mfa" ? (
           <section className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-4">
             <p className="text-sm text-white/70">
-              Estado: {data.mfa.enrolled ? "✅ MFA activo" : "⚠️ Sin MFA"} ·
+              Estado: {data.mfa.enabled ? "✅ MFA activo" : "⚠️ Sin MFA"} ·
               {data.mfa.enforced ? " obligatorio para el tenant" : " opcional"}
             </p>
-            {!data.mfa.enrolled && (
+            {!data.mfa.enabled && (
               <button type="button" className="rounded-lg bg-[#0084ff] px-4 py-2 text-sm text-white" onClick={() => void post("mfa-begin", {})}>
                 Iniciar enrolamiento TOTP
               </button>

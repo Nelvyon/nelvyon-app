@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { DbClient } from "../../../../../../../backend/db/DbClient";
+import { DbClient } from "../../../../../../../../../backend/db/DbClient";
 import {
   getSaasHubSpotSyncService,
   requireSaasContext,
