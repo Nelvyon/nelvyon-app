@@ -264,7 +264,19 @@
         "data-playbooks": "Playbooks",
         "brief-to-launch": "Lanzar Pack",
         "compliance":   "Compliance",
-        "benchmark":    "Benchmark"
+        "benchmark":    "Benchmark",
+        "prospecting":  "Prospección",
+        "snippets":     "Snippets",
+        "countdown":    "Temporizadores",
+        "objetos":      "Objetos Personalizados",
+        "encuestas":    "Encuestas & NPS",
+        "documentos":   "Documentos & Contratos",
+        "facturas":     "Facturas a Clientes",
+        "qr":           "Códigos QR",
+        "ab-testing":   "A/B Testing",
+        "memberships":  "Membresías",
+        "subcuentas":   "Subcuentas / Agencia",
+        "comunidades":  "Comunidades"
       }
     },
     "common": {

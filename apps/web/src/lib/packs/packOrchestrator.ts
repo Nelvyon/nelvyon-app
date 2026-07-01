@@ -168,7 +168,7 @@ export type GrowthPackRunConfig<T extends GrowthPackIntakeBase & { sector: strin
     osClientId: string;
     osProjectId: string;
     skuResults: SkuRunResult[];
-  }) => Promise<void>;
+  }) => Promise<number | void>;
 };
 
 async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string }>(params: {
@@ -602,7 +602,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     }
 
     if (config.onPackStepsComplete) {
-      await config.onPackStepsComplete({
+      const extraFromHook = await config.onPackStepsComplete({
         intake,
         packRunId: run.id,
         workspaceId: params.workspaceId,
@@ -613,6 +613,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         osProjectId,
         skuResults,
       });
+      if (typeof extraFromHook === "number") extraDeliverableCount += extraFromHook;
     }
 
     const report = config.buildReport({

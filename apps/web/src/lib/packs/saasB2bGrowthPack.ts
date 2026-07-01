@@ -112,45 +112,6 @@ export async function runSaasB2bGrowthPack(params: {
         target_audience: `${i.icp_title} — ${i.city}`,
         status: "ready",
       }),
-      extraDeliverables: [
-        ({ intake: i, packRunId }) => ({
-          stepKey: "outbound_playbook",
-          title: "Playbook outbound",
-          type: "json",
-          metadata: {
-            pack_id: SAAS_B2B_GROWTH_PACK_ID,
-            pack_run_id: packRunId,
-            business_name: i.business_name,
-            icp_title: i.icp_title,
-            sales_motion: i.sales_motion ?? "hybrid",
-            pricing_model: i.pricing_model ?? "subscription",
-            sequences: [
-              {
-                name: "LinkedIn connect + value",
-                touches: 3,
-                channel: "linkedin",
-              },
-              {
-                name: "Email cold — problem agitation",
-                touches: 4,
-                channel: "email",
-              },
-              {
-                name: "ABM account list — tier 1",
-                touches: 5,
-                channel: "multi",
-              },
-            ],
-            kpis_to_track: [
-              "demo_requests",
-              "mql_to_sql_rate",
-              "pipeline_created_eur",
-              "reply_rate",
-              "trial_signups",
-            ],
-          },
-        }),
-      ],
       onPackStepsComplete: async (ctx) => {
         const i = ctx.intake as SaasB2bGrowthPackIntake;
         await dbCreatePackDeliverable({
@@ -166,7 +127,20 @@ export async function runSaasB2bGrowthPack(params: {
             business_name: i.business_name,
             icp_title: i.icp_title,
             sales_motion: i.sales_motion ?? "hybrid",
+            pricing_model: i.pricing_model ?? "subscription",
             production: true,
+            sequences: [
+              { name: "LinkedIn connect + value", touches: 3, channel: "linkedin" },
+              { name: "Email cold — problem agitation", touches: 4, channel: "email" },
+              { name: "ABM account list — tier 1", touches: 5, channel: "multi" },
+            ],
+            kpis_to_track: [
+              "demo_requests",
+              "mql_to_sql_rate",
+              "pipeline_created_eur",
+              "reply_rate",
+              "trial_signups",
+            ],
           },
         });
         await dbCreatePackDeliverable({
@@ -184,6 +158,7 @@ export async function runSaasB2bGrowthPack(params: {
             touches: 5,
           },
         });
+        return 2;
       },
       buildReport: buildPackReport,
       projectDescription: (i) =>
