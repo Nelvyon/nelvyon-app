@@ -783,6 +783,20 @@ export {
   type GhlStarterPackResult,
 } from "./SaasGhlStarterPackService";
 export {
+  SaasFormTemplatesService,
+  SaasFormTemplatesError,
+  getSaasFormTemplatesService,
+  resetSaasFormTemplatesServiceForTests,
+  type FormTemplate,
+  type FormTemplateCategory,
+} from "./SaasFormTemplatesService";
+export {
+  SaasFunnelTemplatesService,
+  SaasFunnelTemplatesError,
+  getSaasFunnelTemplatesService,
+  type FunnelTemplate,
+} from "./SaasFunnelTemplatesService";
+export {
   SaasAbTestingService,
   SaasAbTestingError,
   getSaasAbTestingService,

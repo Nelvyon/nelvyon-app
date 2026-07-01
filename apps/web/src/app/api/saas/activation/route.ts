@@ -44,22 +44,26 @@ export async function GET(req: Request) {
 
     if (rows.length === 0) {
       // Auto-detect completed steps from existing data
-      const [contactCount, campaignCount, workflowCount] = await Promise.all([
-        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_crm_contacts WHERE tenant_id = $1`, [tenantId]).catch(() => [{ n: "0" }]),
-        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_campaigns WHERE tenant_id = $1`, [tenantId]).catch(() => [{ n: "0" }]),
-        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_workflows WHERE tenant_id = $1 AND status = 'active'`, [tenantId]).catch(() => [{ n: "0" }]),
+      const [contactCount, campaignCount, workflowCount, socialCount, tenantPlan] = await Promise.all([
+        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_contacts WHERE tenant_id = $1`, [tenantId]).catch(() => [{ n: "0" }]),
+        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_campanias WHERE tenant_id = $1`, [tenantId]).catch(() => [{ n: "0" }]),
+        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_workflows WHERE tenant_id = $1`, [tenantId]).catch(() => [{ n: "0" }]),
+        db.query<{ n: string }>(`SELECT COUNT(*) AS n FROM saas_social_posts WHERE tenant_id = $1`, [tenantId]).catch(() => [{ n: "0" }]),
+        db.query<{ plan: string }>(`SELECT plan FROM saas_tenants WHERE id = $1`, [tenantId]).catch(() => [{ plan: "starter" }]),
       ]);
 
       const hasContacts = parseInt(String(contactCount[0]?.n ?? 0)) > 0;
       const hasCampaigns = parseInt(String(campaignCount[0]?.n ?? 0)) > 0;
       const hasWorkflows = parseInt(String(workflowCount[0]?.n ?? 0)) > 0;
+      const hasSocial = parseInt(String(socialCount[0]?.n ?? 0)) > 0;
+      const billingDone = String(tenantPlan[0]?.plan ?? "starter") !== "starter";
       const profileDone = !!(ctx.tenant.companyName && ctx.tenant.industry);
 
       await db.query(
-        `INSERT INTO saas_activation_checklist (tenant_id, step_profile, step_contact, step_campaign, step_workflow)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO saas_activation_checklist (tenant_id, step_profile, step_contact, step_campaign, step_workflow, step_social, step_billing)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (tenant_id) DO NOTHING`,
-        [tenantId, profileDone, hasContacts, hasCampaigns, hasWorkflows],
+        [tenantId, profileDone, hasContacts, hasCampaigns, hasWorkflows, hasSocial, billingDone],
       );
 
       return NextResponse.json({
@@ -68,8 +72,8 @@ export async function GET(req: Request) {
           contact: hasContacts,
           campaign: hasCampaigns,
           workflow: hasWorkflows,
-          social: false,
-          billing: false,
+          social: hasSocial,
+          billing: billingDone,
         },
       });
     }

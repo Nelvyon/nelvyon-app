@@ -5,18 +5,18 @@
 
 | Feature | GHL | HubSpot | Nelvyon ruta | Estado | Acción |
 |---|---|---|---|---|---|
-| CRM contactos | ✅ | ✅ | `/saas/crm` | ✅ | — |
+| CRM contactos | ✅ | ✅ | `/saas/crm` | ✅ | Copilot IA por contacto |
 | Pipeline / deals | ✅ | ✅ | `/saas/pipeline` | ✅ | — |
 | Inbox unificado | ✅ | ✅ | `/saas/inbox` | ✅ | — |
-| Email campañas | ✅ | ✅ | `/saas/campanias` | 🟡 | SES ops |
+| Email campañas | ✅ | ✅ | `/saas/campanias` | ✅ | Plantillas elite + SES ops live |
 | SMS | ✅ | ✅ | `/saas/sms` | 🟡 | Twilio ops |
 | WhatsApp | ✅ | 🟡 | `/saas/whatsapp` | 🟡 | Twilio ops |
 | Workflows / automation | ✅ | ✅ | `/saas/workflows` | ✅ | 24+ plantillas importables |
 | Secuencias / drips | ✅ | ✅ | `/saas/secuencias` | ✅ | 10+ plantillas drip importables |
-| Formularios | ✅ | ✅ | `/saas/formularios` | ✅ | — |
-| Funnels | ✅ | 🟡 | `/saas/funnels` | ✅ | — |
+| Formularios | ✅ | ✅ | `/saas/formularios` | ✅ | 8 plantillas importables |
+| Funnels | ✅ | 🟡 | `/saas/funnels` | ✅ | 6 plantillas funnel importables |
 | Landing / web builder | ✅ | ✅ CMS | `/saas/web-builder` | ✅ | — |
-| Calendario / citas | ✅ | ✅ | `/saas/calendar`, `/saas/citas` | 🟡 | GCal OAuth |
+| Calendario / citas | ✅ | ✅ | `/saas/calendar`, `/saas/citas` | ✅ | API real + crear eventos; GCal OAuth opcional |
 | Social planner | ✅ | ✅ | `/saas/social` | 🟡 | OAuth + banner degradado |
 | Ads manager | ✅ | ✅ Ads | `/saas/publicidad` | 🟡 | OAuth + banner degradado |
 | SEO | 🟡 | 🟡 | `/saas/seo` | ✅ | — |

@@ -25,6 +25,8 @@ const CHECKLIST = [
 export function ActivationChecklist({ onDismiss }: { onDismiss?: () => void }) {
   const [steps, setSteps] = useState<Steps | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [packLoading, setPackLoading] = useState(false);
+  const [packDone, setPackDone] = useState(false);
 
   useEffect(() => {
     fetch("/api/saas/activation")
@@ -58,6 +60,19 @@ export function ActivationChecklist({ onDismiss }: { onDismiss?: () => void }) {
 
   const pct = Math.round((done / total) * 100);
 
+  async function installStarterPack() {
+    setPackLoading(true);
+    try {
+      const res = await fetch("/api/saas/starter-pack", { method: "POST" });
+      if (res.ok) {
+        setPackDone(true);
+        await markDone("workflow");
+      }
+    } finally {
+      setPackLoading(false);
+    }
+  }
+
   return (
     <NelvyonDsCard className="p-5 border-primary/30 bg-primary/5">
       <div className="flex items-center justify-between mb-3">
@@ -72,6 +87,21 @@ export function ActivationChecklist({ onDismiss }: { onDismiss?: () => void }) {
       <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-muted/30">
         <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
       </div>
+
+      {!packDone && !steps.workflow && (
+        <div className="mb-4 rounded-lg border border-primary/30 bg-primary/10 p-3">
+          <p className="text-sm font-medium text-foreground">⚡ Pack GHL + HubSpot Starter</p>
+          <p className="text-xs text-muted-foreground mt-1">6 workflows + 4 secuencias drip en 1 clic</p>
+          <button
+            type="button"
+            disabled={packLoading}
+            onClick={() => void installStarterPack()}
+            className="mt-2 w-full rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+          >
+            {packLoading ? "Instalando…" : "Instalar automatizaciones"}
+          </button>
+        </div>
+      )}
 
       <div className="space-y-2">
         {CHECKLIST.map(item => {

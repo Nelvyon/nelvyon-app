@@ -61,10 +61,12 @@ function ConnectorCard({
   conn,
   onConnect,
   onDisconnect,
+  onSync,
 }: {
   conn: IntegrationConnection;
   onConnect: (slug: string) => void;
   onDisconnect: (slug: string) => void;
+  onSync?: (slug: string) => void;
 }) {
   const isConnected = conn.status === "connected";
   const isComingSoon = conn.catalogStatus === "coming_soon";
@@ -125,7 +127,12 @@ function ConnectorCard({
         </a>
       )}
 
-      <div className="mt-auto flex gap-2">
+      <div className="mt-auto flex flex-col gap-2">
+        {isConnected && conn.slug === "hubspot" && onSync && (
+          <NelvyonDsButton variant="primary" onClick={() => onSync(conn.slug)} className="w-full">
+            Sincronizar HubSpot
+          </NelvyonDsButton>
+        )}
         {isConnected ? (
           <NelvyonDsButton variant="ghost" onClick={() => onDisconnect(conn.slug)} className="w-full">
             Desconectar
@@ -216,6 +223,13 @@ function IntegracionesContent() {
     void load();
   }
 
+  async function handleSync(slug: string) {
+    if (slug !== "hubspot") return;
+    const res = await fetch("/api/saas/integrations/hubspot/sync", { method: "POST" });
+    if (res.ok) void load();
+    else alert("Error al sincronizar HubSpot — verifica la conexión OAuth");
+  }
+
   const filtered = connections.filter((c) => {
     const matchesSearch =
       !search ||
@@ -301,7 +315,7 @@ function IntegracionesContent() {
         ) : activeCategory !== "all" ? (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((c) => (
-              <ConnectorCard key={c.slug} conn={c} onConnect={handleConnect} onDisconnect={handleDisconnect} />
+              <ConnectorCard key={c.slug} conn={c} onConnect={handleConnect} onDisconnect={handleDisconnect} onSync={handleSync} />
             ))}
           </div>
         ) : (
@@ -316,7 +330,7 @@ function IntegracionesContent() {
                   </p>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {catConns.map((c) => (
-                      <ConnectorCard key={c.slug} conn={c} onConnect={handleConnect} onDisconnect={handleDisconnect} />
+                      <ConnectorCard key={c.slug} conn={c} onConnect={handleConnect} onDisconnect={handleDisconnect} onSync={handleSync} />
                     ))}
                   </div>
                 </div>

@@ -570,6 +570,8 @@ export default function SaasFunnelsPage() {
   const [showNew, setShowNew] = useState(false);
   const [statusFilter, setStatusFilter] = useState<FunnelStatus | "all">("all");
   const [builderFunnel, setBuilderFunnel] = useState<Funnel | null>(null);
+  const [funnelTemplates, setFunnelTemplates] = useState<Array<{ id: string; name: string; description: string }>>([]);
+  const [importingFunnelTpl, setImportingFunnelTpl] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -581,6 +583,27 @@ export default function SaasFunnelsPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  useEffect(() => {
+    fetch("/api/saas/funnels/templates")
+      .then((r) => r.json())
+      .then((d: { templates?: Array<{ id: string; name: string; description: string }> }) => setFunnelTemplates(d.templates ?? []))
+      .catch(() => {});
+  }, []);
+
+  async function importFunnelTemplate(id: string) {
+    setImportingFunnelTpl(id);
+    try {
+      const res = await fetch("/api/saas/funnels/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "import", template_id: id }),
+      });
+      if (res.ok) await load();
+    } finally {
+      setImportingFunnelTpl(null);
+    }
+  }
 
   // Open builder if ?id= is set
   useEffect(() => {
@@ -641,6 +664,24 @@ export default function SaasFunnelsPage() {
               </DarkCard>
             ))}
           </div>
+
+          {funnelTemplates.length > 0 && (
+            <DarkCard className="p-4">
+              <p className="text-sm font-semibold text-white">Plantillas funnel GHL ({funnelTemplates.length})</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {funnelTemplates.map((t) => (
+                  <div key={t.id} className="rounded-lg border border-white/10 p-3">
+                    <p className="text-sm font-medium text-white">{t.name}</p>
+                    <p className="text-xs text-white/40 mt-0.5">{t.description}</p>
+                    <NelvyonDsButton className="mt-2 w-full" size="sm" disabled={importingFunnelTpl === t.id}
+                      onClick={() => void importFunnelTemplate(t.id)}>
+                      {importingFunnelTpl === t.id ? "…" : "Importar funnel"}
+                    </NelvyonDsButton>
+                  </div>
+                ))}
+              </div>
+            </DarkCard>
+          )}
 
           {/* Status filter tabs */}
           <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1 w-fit">

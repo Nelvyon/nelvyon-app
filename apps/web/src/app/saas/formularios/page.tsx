@@ -338,6 +338,54 @@ function EmbedModal({ form, onClose }: { form: Form; onClose: () => void }) {
   );
 }
 
+// ─── Template gallery ─────────────────────────────────────────────────────────
+
+function FormTemplateGallery({ onImported }: { onImported: () => void }) {
+  const [templates, setTemplates] = useState<Array<{ id: string; name: string; description: string }>>([]);
+  const [importing, setImporting] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/saas/formularios/templates")
+      .then((r) => r.json())
+      .then((d: { templates?: Array<{ id: string; name: string; description: string }> }) => setTemplates(d.templates ?? []))
+      .catch(() => {});
+  }, []);
+
+  async function importTpl(id: string) {
+    setImporting(id);
+    try {
+      const res = await fetch("/api/saas/formularios/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "import", template_id: id }),
+      });
+      if (res.ok) onImported();
+    } finally {
+      setImporting(null);
+    }
+  }
+
+  if (!templates.length) return null;
+
+  return (
+    <NelvyonDsCard className="p-4">
+      <p className="text-sm font-semibold text-foreground">Plantillas GHL / HubSpot ({templates.length})</p>
+      <p className="text-xs text-muted-foreground mt-0.5">Lead capture, presupuesto, RSVP, NPS…</p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {templates.map((t) => (
+          <div key={t.id} className="rounded-lg border border-border p-3">
+            <p className="text-xs font-medium text-foreground">{t.name}</p>
+            <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">{t.description}</p>
+            <NelvyonDsButton className="mt-2 w-full" size="sm" disabled={importing === t.id} onClick={() => void importTpl(t.id)}>
+              {importing === t.id ? "…" : "Importar"}
+            </NelvyonDsButton>
+          </div>
+        ))}
+      </div>
+    </NelvyonDsCard>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SaasFormulariosPage() {
@@ -386,6 +434,8 @@ export default function SaasFormulariosPage() {
             </NelvyonDsCard>
           ))}
         </div>
+
+        <FormTemplateGallery onImported={() => void load()} />
 
         {/* Forms grid */}
         {loading ? (

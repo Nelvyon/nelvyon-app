@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsStatusDot } from "@/design-system/components";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
 import { SaasCan } from "@/features/saas-shell/components/SaasCan";
+import { CampaniaTemplateQuickLaunch } from "@/features/saas-campanias/components/CampaniaTemplateQuickLaunch";
 import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { SaasShellLayout, DarkCard } from "@/features/saas-shell/components/SaasShellLayout";
@@ -240,6 +241,7 @@ export default function SaasCampaniasPage() {
               <strong>Email no configurado:</strong> las variables <code className="text-amber-200">SES_FROM_EMAIL</code> y <code className="text-amber-200">SES_ACCESS_KEY_ID</code> no están definidas en el servidor. Los envíos de email fallarán hasta que las configures en Railway.
             </div>
           ) : null}
+          <CampaniaTemplateQuickLaunch onCreated={() => void loadCampanias()} />
           <div className="flex flex-wrap gap-2">
             {(["all", "active", "completed", "draft"] as const).map((t) => (
               <button

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -26,25 +26,26 @@ const TYPE_CONFIG: Record<EventType, { label: string; color: string; icon: strin
   deadline: { label: "Deadline", color: "#ef4444", icon: "⚠️" },
 };
 
+type ApiCalEvent = {
+  id: string; title: string; type: EventType | "reminder";
+  eventDate: string; eventTime: string | null;
+  durationMinutes: number | null; color: string | null;
+  assignedTo: string | null;
+};
+
+function apiToCal(e: ApiCalEvent): CalEvent {
+  const type = (e.type === "reminder" ? "task" : e.type) as EventType;
+  return {
+    id: e.id, title: e.title, type,
+    date: e.eventDate, time: e.eventTime ?? undefined,
+    duration: e.durationMinutes ?? undefined,
+    color: e.color ?? TYPE_CONFIG[type].color,
+    assignedTo: e.assignedTo ?? undefined,
+  };
+}
+
 const DAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 const MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
-function makeEvents(year: number, month: number): CalEvent[] {
-  const base = new Date(year, month, 1);
-  return [
-    { id: "e1", title: "Llamada onboarding", type: "appointment", date: new Date(year, month, 3).toISOString().split("T")[0]!, time: "10:00", duration: 60, color: "#6366f1", contactName: "Tech Solutions SL", assignedTo: "Admin" },
-    { id: "e2", title: "Campaña Black Friday", type: "campaign", date: new Date(year, month, 5).toISOString().split("T")[0]!, time: "08:00", color: "#f59e0b", assignedTo: "Marketing" },
-    { id: "e3", title: "Reunión estrategia Q3", type: "appointment", date: new Date(year, month, 10).toISOString().split("T")[0]!, time: "11:00", duration: 90, color: "#6366f1", contactName: "Startup XYZ", assignedTo: "Admin" },
-    { id: "e4", title: "Entrega propuesta SEO", type: "deadline", date: new Date(year, month, 12).toISOString().split("T")[0]!, color: "#ef4444", assignedTo: "Admin" },
-    { id: "e5", title: "Email nurturing lunes", type: "campaign", date: new Date(year, month, 14).toISOString().split("T")[0]!, time: "09:00", color: "#f59e0b", assignedTo: "Marketing" },
-    { id: "e6", title: "Follow-up propuesta", type: "task", date: new Date(year, month, 15).toISOString().split("T")[0]!, color: "#10b981", contactName: "Inmobiliaria Norte", assignedTo: "Admin" },
-    { id: "e7", title: "Demo producto", type: "appointment", date: new Date(year, month, 18).toISOString().split("T")[0]!, time: "16:00", duration: 45, color: "#6366f1", contactName: "Agencia Digital", assignedTo: "Ventas" },
-    { id: "e8", title: "Newsletter mensual", type: "campaign", date: new Date(year, month, 20).toISOString().split("T")[0]!, time: "10:00", color: "#f59e0b", assignedTo: "Marketing" },
-    { id: "e9", title: "Revisión contratos Q3", type: "task", date: new Date(year, month, 22).toISOString().split("T")[0]!, color: "#10b981", assignedTo: "Admin" },
-    { id: "e10", title: "Cita consultoría", type: "appointment", date: new Date(year, month, 25).toISOString().split("T")[0]!, time: "12:00", duration: 60, color: "#6366f1", contactName: "Coach Bienestar", assignedTo: "Admin" },
-    { id: "e11", title: "Fin periodo trial clientes", type: "deadline", date: new Date(year, month, 28).toISOString().split("T")[0]!, color: "#ef4444", assignedTo: "Admin" },
-  ];
-}
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -62,8 +63,59 @@ export default function SaasCalendarPage() {
   const [view, setView] = useState<"month" | "week" | "list">("month");
   const [filterType, setFilterType] = useState<EventType | "all">("all");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [events, setEvents] = useState<CalEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newType, setNewType] = useState<EventType>("appointment");
+  const [newDate, setNewDate] = useState("");
+  const [newTime, setNewTime] = useState("10:00");
+  const [saving, setSaving] = useState(false);
 
-  const events = makeEvents(year, month);
+  const loadEvents = useCallback(async () => {
+    setLoading(true);
+    const from = `${year}-${String(month + 1).padStart(2, "0")}-01`;
+    const last = getDaysInMonth(year, month);
+    const to = `${year}-${String(month + 1).padStart(2, "0")}-${String(last).padStart(2, "0")}`;
+    try {
+      const res = await fetch(`/api/saas/calendar?from=${from}&to=${to}`);
+      if (res.ok) {
+        const d = await res.json() as { events?: ApiCalEvent[] };
+        setEvents((d.events ?? []).map(apiToCal));
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [year, month]);
+
+  useEffect(() => { void loadEvents(); }, [loadEvents]);
+
+  async function createEvent(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newTitle.trim() || !newDate) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/saas/calendar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newTitle.trim(),
+          type: newType,
+          event_date: newDate,
+          event_time: newTime || null,
+          duration_minutes: newType === "appointment" ? 60 : null,
+        }),
+      });
+      if (res.ok) {
+        setShowCreate(false);
+        setNewTitle("");
+        await loadEvents();
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
   const filtered = events.filter(e => filterType === "all" || e.type === filterType);
 
   const daysInMonth = getDaysInMonth(year, month);
@@ -97,7 +149,7 @@ export default function SaasCalendarPage() {
                     </button>
                   ))}
                 </div>
-                <NelvyonDsButton>+ Evento</NelvyonDsButton>
+                <NelvyonDsButton onClick={() => setShowCreate(true)}>+ Evento</NelvyonDsButton>
               </div>
             </div>
 
@@ -260,6 +312,26 @@ export default function SaasCalendarPage() {
                 </NelvyonDsCard>
               </div>
             </div>
+
+      {showCreate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <form onSubmit={createEvent} className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-foreground">Nuevo evento</h3>
+            <div className="mt-4 space-y-3">
+              <input className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="Título" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required />
+              <select className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" value={newType} onChange={(e) => setNewType(e.target.value as EventType)}>
+                {(Object.keys(TYPE_CONFIG) as EventType[]).map((t) => <option key={t} value={t}>{TYPE_CONFIG[t].label}</option>)}
+              </select>
+              <input type="date" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" value={newDate} onChange={(e) => setNewDate(e.target.value)} required />
+              <input type="time" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" value={newTime} onChange={(e) => setNewTime(e.target.value)} />
+            </div>
+            <div className="mt-4 flex gap-2">
+              <NelvyonDsButton type="button" variant="ghost" className="flex-1" onClick={() => setShowCreate(false)}>Cancelar</NelvyonDsButton>
+              <NelvyonDsButton type="submit" className="flex-1" disabled={saving}>{saving ? "Guardando…" : "Crear"}</NelvyonDsButton>
+            </div>
+          </form>
+        </div>
+      )}
     </SaasShellLayout>
   );
 }

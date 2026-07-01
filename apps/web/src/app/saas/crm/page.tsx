@@ -214,6 +214,21 @@ function NewContactModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
 function ContactDetail({ contact, onClose }: { contact: Contact; onClose: () => void }) {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const [copilot, setCopilot] = useState<{ summary: string; nextBestAction: string; emailDraft: string; score: number } | null>(null);
+  const [copilotLoading, setCopilotLoading] = useState(true);
+
+  useEffect(() => {
+    setCopilotLoading(true);
+    fetch("/api/saas/crm/copilot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contactId: contact.id }),
+    })
+      .then((r) => r.json())
+      .then((d: { suggestion?: typeof copilot }) => { if (d.suggestion) setCopilot(d.suggestion); })
+      .catch(() => {})
+      .finally(() => setCopilotLoading(false));
+  }, [contact.id]);
 
   async function addNote(e: React.FormEvent) {
     e.preventDefault();
@@ -267,6 +282,24 @@ function ContactDetail({ contact, onClose }: { contact: Contact; onClose: () => 
           ))}
         </div>
       )}
+
+      <NelvyonDsCard className="border-primary/20 bg-primary/5 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-primary">IA Copilot</p>
+        {copilotLoading ? (
+          <p className="mt-2 text-xs text-muted-foreground">Analizando contacto…</p>
+        ) : copilot ? (
+          <div className="mt-2 space-y-2 text-sm">
+            <p className="text-foreground">{copilot.summary}</p>
+            <p className="text-xs text-muted-foreground"><strong>Siguiente acción:</strong> {copilot.nextBestAction}</p>
+            <pre className="max-h-24 overflow-auto rounded bg-muted/20 p-2 text-xs text-muted-foreground whitespace-pre-wrap">{copilot.emailDraft}</pre>
+            <NelvyonDsButton size="sm" variant="ghost" onClick={() => void navigator.clipboard.writeText(copilot.emailDraft)}>
+              Copiar email
+            </NelvyonDsButton>
+          </div>
+        ) : (
+          <p className="mt-2 text-xs text-muted-foreground">Sin sugerencias</p>
+        )}
+      </NelvyonDsCard>
 
       {contact.notes && (
         <div className="rounded-lg bg-muted/10 p-3">

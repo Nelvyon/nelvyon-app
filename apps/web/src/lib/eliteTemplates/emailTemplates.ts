@@ -212,6 +212,28 @@ export function getEmailElitePreset(id: string): EmailElitePreset | undefined {
   return presets.find((p) => p.id === id);
 }
 
+export function buildSaasCampaniaFromPreset(preset: EmailElitePreset): {
+  name: string;
+  description: string;
+  channel: "email";
+  subject: string;
+  body: string;
+  status: "draft";
+} {
+  const first = preset.sequence[0];
+  const sequenceHtml = preset.sequence
+    .map((s) => `<li><strong>D+${s.day}:</strong> ${s.subject} — <em>${s.goal}</em></li>`)
+    .join("");
+  return {
+    name: preset.campaignName,
+    description: preset.tagline,
+    channel: "email",
+    subject: first?.subject ?? preset.campaignName,
+    body: `<p>${preset.targetAudience}</p><p>${preset.contentBrief}</p><ul>${sequenceHtml}</ul>`,
+    status: "draft",
+  };
+}
+
 export function buildEmailCampaignFromPreset(
   preset: EmailElitePreset,
   clientId: number,
