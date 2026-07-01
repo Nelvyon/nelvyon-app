@@ -769,6 +769,20 @@ export {
   type SequenceProcessHandlers,
 } from "./SaasSequencesService";
 export {
+  SaasSequenceTemplatesService,
+  SaasSequenceTemplatesError,
+  getSaasSequenceTemplatesService,
+  resetSaasSequenceTemplatesServiceForTests,
+  type SequenceTemplate,
+  type SequenceTemplateCategory,
+} from "./SaasSequenceTemplatesService";
+export {
+  SaasGhlStarterPackService,
+  getSaasGhlStarterPackService,
+  resetSaasGhlStarterPackServiceForTests,
+  type GhlStarterPackResult,
+} from "./SaasGhlStarterPackService";
+export {
   SaasAbTestingService,
   SaasAbTestingError,
   getSaasAbTestingService,

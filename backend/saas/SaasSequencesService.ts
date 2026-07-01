@@ -151,7 +151,7 @@ function rowToEnroll(r: EnrollRow): SaasSequenceEnrollment {
 
 const TRIGGERS: SequenceTrigger[] = ["manual", "contact_created", "form_submitted", "tag_added"];
 const STATUSES: SequenceStatus[] = ["active", "paused", "archived"];
-const STEP_TYPES: SequenceStepType[] = ["email", "wait", "branch"];
+const STEP_TYPES: SequenceStepType[] = ["email", "wait", "branch", "sms", "whatsapp"];
 
 export class SaasSequencesService {
   constructor(private readonly db: SaasPostgresPort = DbClient.getInstance()) {}
@@ -229,6 +229,9 @@ export class SaasSequencesService {
     if (stepType === "email") {
       if (!input.subject?.trim()) throw new SaasSequencesError("subject is required for email steps", "VALIDATION");
       if (!input.bodyHtml?.trim()) throw new SaasSequencesError("bodyHtml is required for email steps", "VALIDATION");
+    }
+    if (stepType === "sms" || stepType === "whatsapp") {
+      if (!input.bodyHtml?.trim()) throw new SaasSequencesError("bodyHtml is required for SMS/WhatsApp steps", "VALIDATION");
     }
     const posRow = await this.db.query<{ max_pos: number | null }>(
       `SELECT MAX(position) AS max_pos FROM saas_sequence_steps WHERE sequence_id=$1`,

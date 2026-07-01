@@ -12,7 +12,7 @@
 | SMS | ✅ | ✅ | `/saas/sms` | 🟡 | Twilio ops |
 | WhatsApp | ✅ | 🟡 | `/saas/whatsapp` | 🟡 | Twilio ops |
 | Workflows / automation | ✅ | ✅ | `/saas/workflows` | ✅ | 24+ plantillas importables |
-| Secuencias / drips | ✅ | ✅ | `/saas/secuencias` | 🟡 | SES ops |
+| Secuencias / drips | ✅ | ✅ | `/saas/secuencias` | ✅ | 10+ plantillas drip importables |
 | Formularios | ✅ | ✅ | `/saas/formularios` | ✅ | — |
 | Funnels | ✅ | 🟡 | `/saas/funnels` | ✅ | — |
 | Landing / web builder | ✅ | ✅ CMS | `/saas/web-builder` | ✅ | — |
@@ -59,4 +59,4 @@
 | Playbooks | 🟡 | ✅ | `/saas/playbooks` | ✅ | — |
 | Brief-to-launch | ❌ | ❌ | `/saas/brief-to-launch` | ✅ | único Nelvyon |
 
-**Resumen paridad:** ~45 ✅/🟡 con código real vs GHL+HubSpot core; gaps principales = ops (SES/Twilio/Stripe/OAuth) + 13 conectores + publicación social/ads live.
+**Resumen paridad:** ~48 ✅ features core GHL+HubSpot en código; gaps restantes = ops live (SES/Twilio/Stripe/OAuth) + apps móviles nativas + ecosistema marketplace.

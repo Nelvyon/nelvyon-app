@@ -289,6 +289,95 @@ function CreateSequenceModal({ onClose, onCreated }: { onClose: () => void; onCr
   );
 }
 
+// ── Sequence template gallery ────────────────────────────────────────────────
+
+type SeqTemplateCategory = "welcome" | "nurture" | "sales" | "re-engagement" | "reviews" | "multichannel";
+interface SeqTemplate {
+  id: string; name: string; description: string; category: SeqTemplateCategory; tags: string[];
+}
+
+const SEQ_CAT_LABELS: Record<SeqTemplateCategory | "all", string> = {
+  all: "Todas", welcome: "Welcome", nurture: "Nurture", sales: "Ventas",
+  "re-engagement": "Re-engage", reviews: "Reviews", multichannel: "Multi-canal",
+};
+
+function SequenceTemplateGallery({ onImported }: { onImported: () => void }) {
+  const [templates, setTemplates] = useState<SeqTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState<SeqTemplateCategory | "all">("all");
+  const [importing, setImporting] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const q = category === "all" ? "" : `?category=${category}`;
+      const res = await fetch(`/api/saas/sequences/templates${q}`);
+      if (res.ok) {
+        const d = await res.json() as { templates?: SeqTemplate[] };
+        setTemplates(d.templates ?? []);
+      }
+    } finally { setLoading(false); }
+  }, [category]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function importTpl(id: string) {
+    setImporting(id);
+    try {
+      const res = await fetch("/api/saas/sequences/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "import", template_id: id }),
+      });
+      if (res.ok) onImported();
+    } finally { setImporting(null); }
+  }
+
+  return (
+    <NelvyonDsCard className="mb-6 overflow-hidden border-[#0084ff]/20">
+      <button type="button" className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left" onClick={() => setExpanded((v) => !v)}>
+        <div>
+          <p className="font-semibold text-white">Plantillas drip (GHL / HubSpot)</p>
+          <p className="text-xs text-white/50">{templates.length} secuencias listas — email, SMS y WhatsApp</p>
+        </div>
+        <span className="text-white/40">{expanded ? "▲" : "▼"}</span>
+      </button>
+      {expanded && (
+        <div className="border-t border-white/10 px-5 pb-5 pt-4">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {(Object.keys(SEQ_CAT_LABELS) as Array<SeqTemplateCategory | "all">).map((c) => (
+              <button key={c} type="button" onClick={() => setCategory(c)}
+                className={`rounded-full px-3 py-1 text-xs ${category === c ? "bg-[#0084ff]/30 text-[#0084ff]" : "border border-white/10 text-white/50"}`}>
+                {SEQ_CAT_LABELS[c]}
+              </button>
+            ))}
+          </div>
+          {loading ? (
+            <p className="text-white/40 text-sm py-4">Cargando plantillas…</p>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {templates.map((t) => (
+                <div key={t.id} className="rounded-xl border border-white/10 p-4">
+                  <p className="text-sm font-medium text-white">{t.name}</p>
+                  <p className="mt-1 text-xs text-white/40 line-clamp-2">{t.description}</p>
+                  <button
+                    disabled={importing === t.id}
+                    onClick={() => void importTpl(t.id)}
+                    className="mt-3 w-full rounded-lg bg-[#0084ff]/20 py-2 text-xs font-medium text-[#0084ff] hover:bg-[#0084ff]/30 disabled:opacity-50"
+                  >
+                    {importing === t.id ? "Importando…" : "Importar secuencia"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </NelvyonDsCard>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────────────────────
 
 export default function SecuenciasPage() {
@@ -352,7 +441,7 @@ export default function SecuenciasPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Secuencias</h1>
-            <p className="text-white/50 text-sm mt-1">Drip campaigns con branching, steps de espera y detección de respuesta</p>
+            <p className="text-white/50 text-sm mt-1">Drip campaigns — email, SMS, WhatsApp. 10+ plantillas GHL importables.</p>
           </div>
           <button
             onClick={() => setShowCreate(true)}
@@ -365,6 +454,8 @@ export default function SecuenciasPage() {
         {err && (
           <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{err}</div>
         )}
+
+        <SequenceTemplateGallery onImported={() => void loadSequences()} />
 
         {loading ? (
           <div className="text-center py-16 text-white/40">Cargando secuencias…</div>

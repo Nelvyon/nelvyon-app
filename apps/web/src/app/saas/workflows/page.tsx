@@ -728,6 +728,20 @@ export default function SaasWorkflowsPage() {
   const [showBuilder, setShowBuilder] = useState(false);
   const [editing, setEditing]     = useState<Workflow | null>(null);
   const [filter, setFilter]       = useState<WorkflowStatus | "all">("all");
+  const [installingPack, setInstallingPack] = useState(false);
+  const [packMsg, setPackMsg] = useState<string | null>(null);
+
+  async function installStarterPack() {
+    setInstallingPack(true);
+    setPackMsg(null);
+    try {
+      const res = await fetch("/api/saas/starter-pack", { method: "POST" });
+      const d = await res.json() as { totalWorkflows?: number; totalSequences?: number; error?: string };
+      if (!res.ok) { setPackMsg(d.error ?? "Error al instalar pack"); return; }
+      setPackMsg(`✅ Pack instalado: ${d.totalWorkflows ?? 6} workflows + ${d.totalSequences ?? 4} secuencias`);
+      await load();
+    } finally { setInstallingPack(false); }
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -783,12 +797,21 @@ export default function SaasWorkflowsPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <NelvyonDsSectionHeader title="Workflows" subtitle="Automaciones trigger → condición → acción. 16 triggers, 17 acciones, 24+ plantillas." />
           <div className="flex gap-2">
+            <NelvyonDsButton variant="ghost" disabled={installingPack} onClick={() => void installStarterPack()}>
+              {installingPack ? "Instalando…" : "⚡ Pack GHL Starter"}
+            </NelvyonDsButton>
             <a href="/saas/workflows/editor" className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white">
               Editor visual
             </a>
             <NelvyonDsButton onClick={() => { setEditing(null); setShowBuilder(true); }}>+ Nuevo workflow</NelvyonDsButton>
           </div>
         </div>
+
+        {packMsg && (
+          <div className={`rounded-xl border px-4 py-3 text-sm ${packMsg.startsWith("✅") ? "border-green-500/30 bg-green-500/5 text-green-400" : "border-red-500/30 bg-red-500/5 text-red-400"}`}>
+            {packMsg}
+          </div>
+        )}
 
         {sesOk === false && (
           <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-yellow-400">
