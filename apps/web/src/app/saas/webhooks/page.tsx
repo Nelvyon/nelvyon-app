@@ -33,6 +33,16 @@ interface WebhookLog {
   createdAt: string;
 }
 
+type DlqFailure = {
+  id: string;
+  webhookId: string | null;
+  eventType: string | null;
+  errorMessage: string | null;
+  attempts: number;
+  lastAttemptAt: string;
+  replayedAt: string | null;
+};
+
 const EVENT_GROUPS: Record<string, WebhookEvent[]> = {
   "CRM": ["contact.created", "contact.updated"],
   "Pipeline": ["deal.created", "deal.stage_changed", "deal.won", "deal.lost"],
@@ -145,6 +155,9 @@ export default function SaasWebhooksPage() {
   const [copiedSecret, setCopiedSecret] = useState<string | null>(null);
   const [logs, setLogs] = useState<WebhookLog[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
+  const [dlqFailures, setDlqFailures] = useState<DlqFailure[]>([]);
+  const [loadingDlq, setLoadingDlq] = useState(false);
+  const [replayingId, setReplayingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -156,7 +169,20 @@ export default function SaasWebhooksPage() {
     } catch { /* silencioso */ }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  const loadDlq = useCallback(async () => {
+    setLoadingDlq(true);
+    try {
+      const res = await fetch("/api/saas/webhooks/dlq");
+      if (res.ok) {
+        const d = (await res.json()) as { failures?: DlqFailure[] };
+        setDlqFailures((d.failures ?? []).filter((f) => !f.replayedAt));
+      }
+    } finally {
+      setLoadingDlq(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); void loadDlq(); }, [load, loadDlq]);
 
   async function openLogs(id: string) {
     if (showLogs === id) { setShowLogs(null); return; }
@@ -182,6 +208,20 @@ export default function SaasWebhooksPage() {
     void navigator.clipboard.writeText(secret);
     setCopiedSecret(id);
     setTimeout(() => setCopiedSecret(null), 1500);
+  }
+
+  async function replayDlq(id: string) {
+    setReplayingId(id);
+    try {
+      const res = await fetch("/api/saas/webhooks/dlq", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "replay", id }),
+      });
+      if (res.ok) void loadDlq();
+    } finally {
+      setReplayingId(null);
+    }
   }
 
   const visibleLogs = logs.filter(l => l.webhookId === showLogs);
@@ -278,6 +318,37 @@ export default function SaasWebhooksPage() {
                 </NelvyonDsCard>
               ))}
             </div>
+
+            {/* DLQ — entregas fallidas */}
+            <NelvyonDsCard className="p-5">
+              <NelvyonDsSectionHeader
+                title="Cola de fallos (DLQ)"
+                subtitle="Reintenta entregas que no llegaron al destino"
+              />
+              {loadingDlq ? (
+                <div className="mt-4 h-16 animate-pulse rounded-xl bg-muted/30" />
+              ) : dlqFailures.length === 0 ? (
+                <p className="mt-3 text-sm text-muted-foreground">Sin fallos pendientes.</p>
+              ) : (
+                <ul className="mt-4 space-y-2">
+                  {dlqFailures.map((f) => (
+                    <li key={f.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-muted/10 p-3">
+                      <div className="min-w-0">
+                        <p className="text-xs font-mono text-foreground">{f.eventType ?? "event"}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{f.errorMessage ?? "Error de entrega"} · {timeAgo(f.lastAttemptAt)}</p>
+                      </div>
+                      <NelvyonDsButton
+                        variant="ghost"
+                        disabled={replayingId === f.id}
+                        onClick={() => void replayDlq(f.id)}
+                      >
+                        {replayingId === f.id ? "Reenviando…" : "Reintentar"}
+                      </NelvyonDsButton>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </NelvyonDsCard>
 
             {/* Docs */}
             <NelvyonDsCard className="border-primary/20 bg-primary/5 p-5">

@@ -328,6 +328,94 @@ function ContactDetail({ contact, onClose }: { contact: Contact; onClose: () => 
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+// ─── Dedupe panel ─────────────────────────────────────────────────────────────
+
+type DedupeGroup = {
+  dedupeKey: string;
+  email: string | null;
+  contactIds: string[];
+  count: number;
+};
+
+function CrmDedupePanel({ onMerged }: { onMerged: () => void }) {
+  const [groups, setGroups] = useState<DedupeGroup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [merging, setMerging] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/saas/crm/dedupe");
+      if (res.ok) {
+        const d = (await res.json()) as { groups?: DedupeGroup[] };
+        setGroups(d.groups ?? []);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function mergeGroup(group: DedupeGroup) {
+    const keepId = group.contactIds[0];
+    const mergeIds = group.contactIds.slice(1);
+    if (!keepId || mergeIds.length === 0) return;
+    setMerging(group.dedupeKey);
+    try {
+      const res = await fetch("/api/saas/crm/dedupe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keepId, mergeIds }),
+      });
+      if (res.ok) {
+        await load();
+        onMerged();
+      }
+    } finally {
+      setMerging(null);
+    }
+  }
+
+  if (loading) {
+    return (
+      <NelvyonDsCard className="p-8">
+        <div className="h-24 animate-pulse rounded-xl bg-muted/30" />
+      </NelvyonDsCard>
+    );
+  }
+
+  if (groups.length === 0) {
+    return (
+      <NelvyonDsCard className="p-10 text-center">
+        <p className="text-4xl">✨</p>
+        <p className="mt-3 text-lg font-semibold text-foreground">Sin duplicados detectados</p>
+        <p className="mt-1 text-sm text-muted-foreground">Los contactos se agrupan por email, teléfono o nombre normalizado.</p>
+      </NelvyonDsCard>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">{groups.length} grupos de duplicados · fusiona para limpiar el CRM</p>
+      {groups.map((g) => (
+        <NelvyonDsCard key={g.dedupeKey} className="flex flex-wrap items-center justify-between gap-3 p-4">
+          <div>
+            <p className="font-medium text-foreground">{g.email ?? g.dedupeKey}</p>
+            <p className="text-xs text-muted-foreground">{g.count} contactos · IDs: {g.contactIds.join(", ")}</p>
+          </div>
+          <NelvyonDsButton
+            disabled={merging === g.dedupeKey}
+            onClick={() => void mergeGroup(g)}
+          >
+            {merging === g.dedupeKey ? "Fusionando…" : "Fusionar (conservar el más antiguo)"}
+          </NelvyonDsButton>
+        </NelvyonDsCard>
+      ))}
+    </div>
+  );
+}
+
 export default function SaasCrmPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [pipeline, setPipeline] = useState<PipelineItem[]>([]);
@@ -336,7 +424,7 @@ export default function SaasCrmPage() {
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "">("");
   const [selected, setSelected] = useState<Contact | null>(null);
   const [showNew, setShowNew] = useState(false);
-  const [tab, setTab] = useState<"contacts" | "pipeline">("contacts");
+  const [tab, setTab] = useState<"contacts" | "pipeline" | "dedupe">("contacts");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -393,7 +481,7 @@ export default function SaasCrmPage() {
 
         {/* Tabs */}
         <div className="flex gap-0 border-b border-white/[0.07]">
-          {(["contacts", "pipeline"] as const).map((t) => (
+          {(["contacts", "pipeline", "dedupe"] as const).map((t) => (
             <button
               key={t}
               type="button"
@@ -404,10 +492,15 @@ export default function SaasCrmPage() {
                   : "text-white/40 hover:text-white/70"
               }`}
             >
-              {t === "contacts" ? "Contactos" : "Pipeline"}
+              {t === "contacts" ? "Contactos" : t === "pipeline" ? "Pipeline" : "Duplicados"}
             </button>
           ))}
         </div>
+
+        {/* Dedupe view */}
+        {tab === "dedupe" && (
+          <CrmDedupePanel onMerged={() => void load()} />
+        )}
 
         {/* Pipeline view */}
         {tab === "pipeline" && (

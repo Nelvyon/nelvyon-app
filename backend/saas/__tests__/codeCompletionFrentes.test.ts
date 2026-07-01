@@ -54,4 +54,19 @@ describe("SaasScimService", () => {
     expect(total).toBe(1);
     expect(items[0]?.userName).toBe("a@test.com");
   });
+
+  it("lists role groups with members", async () => {
+    const { SaasScimService } = await import("../SaasScimService");
+    const db = {
+      query: vi.fn().mockResolvedValue([
+        { id: "u1", email: "a@test.com", role: "admin" },
+        { id: "u2", email: "b@test.com", role: "user" },
+      ]),
+    };
+    const svc = new SaasScimService(db);
+    const { total, items } = await svc.listGroups("t1");
+    expect(total).toBe(3);
+    expect(items.find((g) => g.id === "admin")?.members).toHaveLength(1);
+    expect(items.find((g) => g.id === "user")?.members).toHaveLength(1);
+  });
 });

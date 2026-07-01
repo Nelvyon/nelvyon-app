@@ -24,8 +24,8 @@ export async function POST(req: Request) {
     const ctx = await requireSaasContext(req, "settings.write");
     const body = (await req.json()) as Record<string, unknown>;
     if (body.action === "replay") {
-      await getSaasWebhookDlqService().markReplayed(String(body.id), ctx.tenant.id);
-      return NextResponse.json({ ok: true });
+      const result = await getSaasWebhookDlqService().replayFailure(String(body.id), ctx.tenant.id);
+      return NextResponse.json(result);
     }
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
   } catch (e) {

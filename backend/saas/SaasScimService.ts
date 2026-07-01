@@ -26,6 +26,12 @@ export type ScimUser = {
   roles: string[];
 };
 
+export type ScimGroup = {
+  id: string;
+  displayName: string;
+  members: Array<{ value: string; display: string }>;
+};
+
 type MemberRow = {
   id: string;
   tenant_id: string;
@@ -127,6 +133,29 @@ export class SaasScimService {
       [tenantId, id],
     );
     if (!rows[0]) throw new SaasScimError("User not found", "NOT_FOUND", 404);
+  }
+
+  async listGroups(tenantId: string): Promise<{ total: number; items: ScimGroup[] }> {
+    const rows = await this.db.query<{ id: string; email: string; role: string }>(
+      `SELECT id, email, role FROM team_members WHERE tenant_id=$1 AND status IN ('active','invited')`,
+      [tenantId],
+    );
+    const roles = ["admin", "manager", "user"] as const;
+    const items: ScimGroup[] = roles.map((role) => ({
+      id: role,
+      displayName: role.charAt(0).toUpperCase() + role.slice(1),
+      members: rows
+        .filter((r) => r.role === role)
+        .map((r) => ({ value: r.id, display: r.email })),
+    }));
+    return { total: items.length, items };
+  }
+
+  async getGroup(tenantId: string, id: string): Promise<ScimGroup> {
+    const { items } = await this.listGroups(tenantId);
+    const group = items.find((g) => g.id === id);
+    if (!group) throw new SaasScimError("Group not found", "NOT_FOUND", 404);
+    return group;
   }
 }
 

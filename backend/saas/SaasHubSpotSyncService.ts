@@ -11,10 +11,13 @@ function mapHubSpotDealStage(raw: string | undefined): string {
   return "new";
 }
 
+const HUBSPOT_TAG = "source:hubspot";
+
 export type HubSpotSyncState = {
   lastSyncAt: string | null;
   contactsSynced: number;
   dealsSynced: number;
+  contactsPushed: number;
   status: string;
   errorMessage: string | null;
 };
@@ -34,12 +37,13 @@ export class SaasHubSpotSyncService {
       lastSyncAt: r?.last_sync_at != null ? String(r.last_sync_at) : null,
       contactsSynced: Number(r?.contacts_synced ?? 0),
       dealsSynced: Number(r?.deals_synced ?? 0),
+      contactsPushed: Number(r?.contacts_pushed ?? 0),
       status: String(r?.status ?? "idle"),
       errorMessage: r?.error_message != null ? String(r.error_message) : null,
     };
   }
 
-  /** Bidirectional sync stub — pulls HubSpot contacts via stored OAuth token. */
+  /** Pull HubSpot contacts + deals into Nelvyon CRM. */
   async runSync(tenantId: string, accessToken: string): Promise<HubSpotSyncState> {
     await this.db.query(
       `INSERT INTO saas_hubspot_sync_state (tenant_id, status) VALUES ($1,'running')
@@ -50,29 +54,40 @@ export class SaasHubSpotSyncService {
     let contactsSynced = 0;
     let dealsSynced = 0;
     try {
-      const res = await fetch("https://api.hubapi.com/crm/v3/objects/contacts?limit=100", {
+      const res = await fetch("https://api.hubapi.com/crm/v3/objects/contacts?limit=100&properties=email,firstname,lastname,phone,company", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (!res.ok) throw new Error(`HubSpot API ${res.status}`);
       const data = (await res.json()) as { results?: Array<{ id: string; properties?: Record<string, string> }> };
       for (const c of data.results ?? []) {
-        const email = c.properties?.email?.trim();
+        const email = c.properties?.email?.trim().toLowerCase();
         if (!email) continue;
+        const first = c.properties?.firstname?.trim() ?? "";
+        const last = c.properties?.lastname?.trim() ?? "";
+        const name = `${first} ${last}`.trim() || email;
+        const phone = c.properties?.phone?.trim() || null;
+        const company = c.properties?.company?.trim() || null;
+        const hubTag = `hubspot:id:${c.id}`;
+
+        const updated = await this.db.query<{ id: string }>(
+          `UPDATE saas_contacts SET name=$3, phone=COALESCE($4, phone), company=COALESCE($5, company),
+                  tags=CASE WHEN $6 = ANY(tags) THEN tags ELSE array_append(tags, $6) END, updated_at=NOW()
+           WHERE tenant_id=$1 AND lower(email)=lower($2) RETURNING id`,
+          [tenantId, email, name, phone, company, hubTag],
+        );
+        if (updated[0]) {
+          contactsSynced++;
+          continue;
+        }
         await this.db.query(
-          `INSERT INTO saas_contacts (tenant_id, email, first_name, last_name, status, source)
-           SELECT $1,$2,$3,$4,'lead','hubspot'
-           WHERE NOT EXISTS (SELECT 1 FROM saas_contacts WHERE tenant_id=$1 AND lower(email)=lower($2))`,
-          [
-            tenantId,
-            email.toLowerCase(),
-            c.properties?.firstname ?? "",
-            c.properties?.lastname ?? "",
-          ],
+          `INSERT INTO saas_contacts (tenant_id, name, email, phone, company, status, tags)
+           VALUES ($1,$2,$3,$4,$5,'lead', ARRAY[$6,$7]::text[])`,
+          [tenantId, name, email, phone, company, HUBSPOT_TAG, hubTag],
         );
         contactsSynced++;
       }
 
-      const dealRes = await fetch("https://api.hubapi.com/crm/v3/objects/deals?limit=50", {
+      const dealRes = await fetch("https://api.hubapi.com/crm/v3/objects/deals?limit=50&properties=dealname,amount,dealstage", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (dealRes.ok) {
@@ -84,20 +99,18 @@ export class SaasHubSpotSyncService {
           const stage = mapHubSpotDealStage(d.properties?.dealstage);
           const noteTag = `hubspot:deal:${hubspotId}`;
           const inserted = await this.db.query<{ id: string }>(
-            `INSERT INTO saas_deals (tenant_id, title, value, stage, source, notes)
-             SELECT $1::uuid, $2, $3, $4, 'hubspot', $5
-             WHERE NOT EXISTS (
-               SELECT 1 FROM saas_deals WHERE tenant_id = $1::uuid AND notes = $5
-             )
+            `INSERT INTO saas_deals (tenant_id, title, value, stage, notes, tags)
+             SELECT $1::uuid, $2, $3, $4, $5, ARRAY[$6]::text[]
+             WHERE NOT EXISTS (SELECT 1 FROM saas_deals WHERE tenant_id=$1::uuid AND notes=$5)
              RETURNING id`,
-            [tenantId, title, amount, stage, noteTag],
+            [tenantId, title, amount, stage, noteTag, HUBSPOT_TAG],
           );
           if (inserted.length) dealsSynced++;
         }
       }
 
       await this.db.query(
-        `UPDATE saas_hubspot_sync_state SET last_sync_at=NOW(), contacts_synced=$2, deals_synced=$3, status='ok'
+        `UPDATE saas_hubspot_sync_state SET last_sync_at=NOW(), contacts_synced=$2, deals_synced=$3, status='ok', error_message=NULL
          WHERE tenant_id=$1`,
         [tenantId, contactsSynced, dealsSynced],
       );
@@ -110,6 +123,53 @@ export class SaasHubSpotSyncService {
       throw e;
     }
     return this.getState(tenantId);
+  }
+
+  /** Push Nelvyon contacts (email) not yet in HubSpot. */
+  async pushContacts(tenantId: string, accessToken: string, limit = 50): Promise<{ pushed: number }> {
+    const rows = await this.db.query<{ email: string; name: string; phone: string | null; company: string | null }>(
+      `SELECT email, name, phone, company FROM saas_contacts
+       WHERE tenant_id=$1 AND email IS NOT NULL AND NOT ($2 = ANY(tags))
+       ORDER BY updated_at DESC LIMIT $3`,
+      [tenantId, HUBSPOT_TAG, limit],
+    );
+    let pushed = 0;
+    for (const c of rows) {
+      const parts = c.name.trim().split(/\s+/);
+      const firstname = parts[0] ?? "";
+      const lastname = parts.slice(1).join(" ");
+      const res = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          properties: {
+            email: c.email,
+            firstname,
+            lastname,
+            phone: c.phone ?? "",
+            company: c.company ?? "",
+          },
+        }),
+      });
+      if (res.ok || res.status === 409) {
+        await this.db.query(
+          `UPDATE saas_contacts SET tags=array_append(tags, $3), updated_at=NOW()
+           WHERE tenant_id=$1 AND lower(email)=lower($2) AND NOT ($3 = ANY(tags))`,
+          [tenantId, c.email, HUBSPOT_TAG],
+        );
+        pushed++;
+      }
+    }
+    await this.db.query(
+      `INSERT INTO saas_hubspot_sync_state (tenant_id, contacts_pushed, status)
+       VALUES ($1,$2,'ok')
+       ON CONFLICT (tenant_id) DO UPDATE SET contacts_pushed=COALESCE(saas_hubspot_sync_state.contacts_pushed,0)+$2`,
+      [tenantId, pushed],
+    );
+    return { pushed };
   }
 }
 

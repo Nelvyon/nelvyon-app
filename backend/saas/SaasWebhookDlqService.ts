@@ -47,6 +47,37 @@ export class SaasWebhookDlqService {
       [id, tenantId],
     );
   }
+
+  async replayFailure(id: string, tenantId: string): Promise<{ ok: boolean; status?: number }> {
+    const rows = await this.db.query<{ payload: Record<string, unknown>; webhook_id: string | null; event_type: string | null }>(
+      `SELECT payload, webhook_id, event_type FROM saas_webhook_failures WHERE id=$1 AND tenant_id=$2 LIMIT 1`,
+      [id, tenantId],
+    );
+    const row = rows[0];
+    if (!row) return { ok: false };
+
+    let targetUrl: string | null = null;
+    if (row.webhook_id) {
+      const wh = await this.db.query<{ url: string }>(
+        `SELECT url FROM webhooks WHERE id=$1 AND tenant_id=$2 LIMIT 1`,
+        [row.webhook_id, tenantId],
+      );
+      targetUrl = wh[0]?.url ?? null;
+    }
+
+    if (!targetUrl) {
+      await this.markReplayed(id, tenantId);
+      return { ok: true };
+    }
+
+    const res = await fetch(targetUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Nelvyon-Replay": "1" },
+      body: JSON.stringify({ event: row.event_type, data: row.payload }),
+    });
+    if (res.ok) await this.markReplayed(id, tenantId);
+    return { ok: res.ok, status: res.status };
+  }
 }
 
 function mapRow(r: Record<string, unknown>): WebhookFailure {

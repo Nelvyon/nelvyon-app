@@ -160,6 +160,13 @@ export default function SaasDashboardPage() {
   const now = new Date().toLocaleDateString("es-ES", { dateStyle: "full" });
   const hasNoJobs = summary.activeJobs === 0 && summary.completedJobs === 0;
   const show = (id: DashboardWidgetId) => widgets.includes(id);
+  const orderedWidgets = widgets.filter((id) => id !== "health");
+  const activityQuickAt = (() => {
+    const a = orderedWidgets.indexOf("activity");
+    const q = orderedWidgets.indexOf("quickActions");
+    const idx = [a, q].filter((i) => i >= 0);
+    return idx.length ? Math.min(...idx) : -1;
+  })();
 
   async function persistLayout(next: DashboardWidgetId[]) {
     setWidgets(next);
@@ -262,113 +269,123 @@ export default function SaasDashboardPage() {
         </DarkCard>
       )}
 
-      {show("activation") ? <ActivationChecklist /> : null}
-      {show("pipeline") ? <CommercialPipelineSection /> : null}
-
-      {/* Module stats */}
-      {show("modules") && summary.moduleStats && (
-        <section>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Módulos activos</p>
-          <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
-            {[
-              { label: "Contactos CRM", value: summary.moduleStats.contacts, href: "/saas/crm", accent: true },
-              { label: "Campañas", value: summary.moduleStats.campaigns, href: "/saas/campanias", accent: false },
-              { label: "Workflows", value: summary.moduleStats.activeWorkflows, href: "/saas/workflows", accent: false },
-              { label: "Formularios", value: summary.moduleStats.forms, href: "/saas/formularios", accent: false },
-              { label: "Citas próximas", value: summary.moduleStats.upcomingAppointments, href: "/saas/citas", accent: false },
-            ].map((s) => (
-              <StatCard key={s.label} label={s.label} value={s.value} href={s.href} accent={s.accent} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* KPI row */}
-      {show("kpis") && (
-      <section>
-        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Operaciones</p>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {kpis.map((k, i) => (
-            <StatCard key={k.label} label={k.label} value={k.value} accent={i === 0} />
-          ))}
-        </div>
-      </section>
-      )}
-
-      {/* Activity + quick actions */}
-      {(show("activity") || show("quickActions")) && (
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        {show("activity") && (
-        <DarkCard>
-          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.recent_activity")}</p>
-          {summary.recentActivity.length === 0 ? (
-            <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Cuando haya jobs o eventos del tenant aparecerán aquí." />
-          ) : (
-            <ul className="space-y-3">
-              {summary.recentActivity.slice(0, 10).map((a) => (
-                <li key={a.id} className="flex items-start gap-3 border-b border-white/[0.05] pb-3 text-sm last:border-none">
-                  <NelvyonDsStatusDot status={activityStatus(a.eventType)} label={a.eventType} />
-                  <div className="min-w-0">
-                    <p className="font-medium text-white/80">{a.description}</p>
-                    <p className="text-white/35">{a.eventType} · {formatDate(a.createdAt)}</p>
+      {orderedWidgets.map((id, idx) => {
+        if (id === "activity" || id === "quickActions") {
+          if (idx !== activityQuickAt) return null;
+          if (!show("activity") && !show("quickActions")) return null;
+          return (
+            <section key="activity-quick" className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+              {show("activity") && (
+              <DarkCard>
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.recent_activity")}</p>
+                {summary.recentActivity.length === 0 ? (
+                  <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Cuando haya jobs o eventos del tenant aparecerán aquí." />
+                ) : (
+                  <ul className="space-y-3">
+                    {summary.recentActivity.slice(0, 10).map((a) => (
+                      <li key={a.id} className="flex items-start gap-3 border-b border-white/[0.05] pb-3 text-sm last:border-none">
+                        <NelvyonDsStatusDot status={activityStatus(a.eventType)} label={a.eventType} />
+                        <div className="min-w-0">
+                          <p className="font-medium text-white/80">{a.description}</p>
+                          <p className="text-white/35">{a.eventType} · {formatDate(a.createdAt)}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </DarkCard>
+              )}
+              {show("quickActions") && (
+              <DarkCard>
+                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.quick_actions")}</p>
+                <div className="space-y-1.5">
+                  {[
+                    { label: "🛒 Explorar packs", href: "/saas/packs" },
+                    { label: "📋 Ver playbooks recomendados", href: "/saas/playbooks" },
+                    { label: "🤝 Abrir Partner Zone", href: "/saas/partner" },
+                    { label: "Abrir CRM", href: "/saas/crm" },
+                    { label: "Ver pipeline", href: "/saas/crm?tab=pipeline" },
+                    { label: "Campañas de email", href: "/saas/campanias" },
+                    { label: "Workflows", href: "/saas/workflows" },
+                    { label: "Formularios", href: "/saas/formularios" },
+                    { label: "Agenda y citas", href: "/saas/citas" },
+                    { label: "Facturación", href: "/saas/billing" },
+                  ].map((a) => (
+                    <Link
+                      key={a.href}
+                      href={a.href}
+                      className="block rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-white/60 transition-all hover:border-[#0084ff]/30 hover:bg-[#0084ff]/5 hover:text-white/90"
+                    >
+                      {a.label}
+                    </Link>
+                  ))}
+                  <button
+                    className="mt-2 w-full rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-3 py-2 text-sm font-medium text-white shadow-[0_0_16px_rgba(0,132,255,0.3)] transition-all hover:shadow-[0_0_24px_rgba(0,132,255,0.4)] disabled:opacity-50"
+                    disabled={exportingReport}
+                    onClick={async () => {
+                      setExportingReport(true);
+                      try {
+                        const res = await fetch("/api/saas/reports/generate", { method: "POST", credentials: "same-origin" });
+                        if (res.status === 401) { router.replace(`/auth/login?next=${encodeURIComponent("/saas/dashboard")}`); return; }
+                        if (!res.ok) return;
+                        const body = (await res.json()) as { downloadUrl?: string };
+                        if (body.downloadUrl) window.location.href = body.downloadUrl;
+                      } finally { setExportingReport(false); }
+                    }}
+                  >
+                    {exportingReport ? `${t("common.loading")}…` : "Exportar informe (ZIP)"}
+                  </button>
+                </div>
+                {hasNoJobs && (
+                  <div className="mt-4">
+                    <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Conecta datos o crea el primer registro." />
                   </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </DarkCard>
-        )}
+                )}
+              </DarkCard>
+              )}
+            </section>
+          );
+        }
 
-        {show("quickActions") && (
-        <DarkCard>
-          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.quick_actions")}</p>
-          <div className="space-y-1.5">
-            {[
-              { label: "🛒 Explorar packs", href: "/saas/packs" },
-              { label: "📋 Ver playbooks recomendados", href: "/saas/playbooks" },
-              { label: "🤝 Abrir Partner Zone", href: "/saas/partner" },
-              { label: "Abrir CRM", href: "/saas/crm" },
-              { label: "Ver pipeline", href: "/saas/crm?tab=pipeline" },
-              { label: "Campañas de email", href: "/saas/campanias" },
-              { label: "Workflows", href: "/saas/workflows" },
-              { label: "Formularios", href: "/saas/formularios" },
-              { label: "Agenda y citas", href: "/saas/citas" },
-              { label: "Facturación", href: "/saas/billing" },
-            ].map((a) => (
-              <Link
-                key={a.href}
-                href={a.href}
-                className="block rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-white/60 transition-all hover:border-[#0084ff]/30 hover:bg-[#0084ff]/5 hover:text-white/90"
-              >
-                {a.label}
-              </Link>
-            ))}
-            <button
-              className="mt-2 w-full rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-3 py-2 text-sm font-medium text-white shadow-[0_0_16px_rgba(0,132,255,0.3)] transition-all hover:shadow-[0_0_24px_rgba(0,132,255,0.4)] disabled:opacity-50"
-              disabled={exportingReport}
-              onClick={async () => {
-                setExportingReport(true);
-                try {
-                  const res = await fetch("/api/saas/reports/generate", { method: "POST", credentials: "same-origin" });
-                  if (res.status === 401) { router.replace(`/auth/login?next=${encodeURIComponent("/saas/dashboard")}`); return; }
-                  if (!res.ok) return;
-                  const body = (await res.json()) as { downloadUrl?: string };
-                  if (body.downloadUrl) window.location.href = body.downloadUrl;
-                } finally { setExportingReport(false); }
-              }}
-            >
-              {exportingReport ? `${t("common.loading")}…` : "Exportar informe (ZIP)"}
-            </button>
-          </div>
-          {hasNoJobs && (
-            <div className="mt-4">
-              <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Conecta datos o crea el primer registro." />
-            </div>
-          )}
-        </DarkCard>
-        )}
-      </section>
-      )}
+        if (!show(id)) return null;
+
+        if (id === "activation") return <ActivationChecklist key={id} />;
+        if (id === "pipeline") return show("pipeline") ? <CommercialPipelineSection key={id} /> : null;
+
+        if (id === "modules" && summary.moduleStats) {
+          return (
+            <section key={id}>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Módulos activos</p>
+              <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
+                {[
+                  { label: "Contactos CRM", value: summary.moduleStats.contacts, href: "/saas/crm", accent: true },
+                  { label: "Campañas", value: summary.moduleStats.campaigns, href: "/saas/campanias", accent: false },
+                  { label: "Workflows", value: summary.moduleStats.activeWorkflows, href: "/saas/workflows", accent: false },
+                  { label: "Formularios", value: summary.moduleStats.forms, href: "/saas/formularios", accent: false },
+                  { label: "Citas próximas", value: summary.moduleStats.upcomingAppointments, href: "/saas/citas", accent: false },
+                ].map((s) => (
+                  <StatCard key={s.label} label={s.label} value={s.value} href={s.href} accent={s.accent} />
+                ))}
+              </div>
+            </section>
+          );
+        }
+
+        if (id === "kpis") {
+          return (
+            <section key={id}>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Operaciones</p>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {kpis.map((k, i) => (
+                  <StatCard key={k.label} label={k.label} value={k.value} accent={i === 0} />
+                ))}
+              </div>
+            </section>
+          );
+        }
+
+        return null;
+      })}
     </SaasShellLayout>
   );
 }

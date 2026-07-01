@@ -66,7 +66,7 @@ function ConnectorCard({
   conn: IntegrationConnection;
   onConnect: (slug: string) => void;
   onDisconnect: (slug: string) => void;
-  onSync?: (slug: string) => void;
+  onSync?: (slug: string, direction?: "pull" | "push") => void;
 }) {
   const isConnected = conn.status === "connected";
   const isComingSoon = conn.catalogStatus === "coming_soon";
@@ -129,9 +129,14 @@ function ConnectorCard({
 
       <div className="mt-auto flex flex-col gap-2">
         {isConnected && conn.slug === "hubspot" && onSync && (
-          <NelvyonDsButton variant="primary" onClick={() => onSync(conn.slug)} className="w-full">
-            Sincronizar contactos
-          </NelvyonDsButton>
+          <div className="flex flex-col gap-2">
+            <NelvyonDsButton variant="primary" onClick={() => onSync(conn.slug, "pull")} className="w-full">
+              Importar desde HubSpot
+            </NelvyonDsButton>
+            <NelvyonDsButton variant="ghost" onClick={() => onSync(conn.slug, "push")} className="w-full">
+              Exportar a HubSpot
+            </NelvyonDsButton>
+          </div>
         )}
         {isConnected ? (
           <NelvyonDsButton variant="ghost" onClick={() => onDisconnect(conn.slug)} className="w-full">
@@ -223,11 +228,11 @@ function IntegracionesContent() {
     void load();
   }
 
-  async function handleSync(slug: string) {
+  async function handleSync(slug: string, direction: "pull" | "push" = "pull") {
     if (slug !== "hubspot") return;
-    const res = await fetch("/api/saas/integrations/hubspot/sync", { method: "POST" });
+    const res = await fetch(`/api/saas/integrations/hubspot/sync?direction=${direction}`, { method: "POST" });
     if (res.ok) void load();
-    else alert("Error al sincronizar — verifica la conexión OAuth");
+    else alert(`Error al sincronizar (${direction}) — verifica la conexión OAuth`);
   }
 
   const filtered = connections.filter((c) => {

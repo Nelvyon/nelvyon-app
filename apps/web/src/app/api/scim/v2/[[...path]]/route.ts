@@ -48,6 +48,16 @@ export async function GET(req: Request, ctx: { params: Promise<{ path?: string[]
       return NextResponse.json(user, { headers: { "Content-Type": "application/scim+json" } });
     }
 
+    if (segments[0] === "Groups" && segments.length === 1) {
+      const { total, items } = await svc.listGroups(tenantId);
+      return scimListResponse(total, items, 1);
+    }
+
+    if (segments[0] === "Groups" && segments[1]) {
+      const group = await svc.getGroup(tenantId, segments[1]);
+      return NextResponse.json(group, { headers: { "Content-Type": "application/scim+json" } });
+    }
+
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   } catch (e) {
     if (e instanceof SaasScimError) return scimError(e);

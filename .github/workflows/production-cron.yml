@@ -13,6 +13,7 @@ on:
     - cron: "0 8 1 * *"     # os-recurring-services (1st of month)
     - cron: "0 6 1 * *"     # os-learning-loop (1st of month)
     - cron: "0 9 * * 1"     # os-competitor-gap digest (Mondays 09:00 UTC)
+    - cron: "0 4 * * *"     # saas-elite-maintenance (daily 04:00 UTC)
   workflow_dispatch:
     inputs:
       job:
@@ -29,6 +30,7 @@ on:
           - os-recurring-services
           - os-learning-loop
           - os-competitor-gap
+          - saas-elite-maintenance
           - all
 
 concurrency:
@@ -169,6 +171,23 @@ jobs:
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
             -H "Authorization: Bearer $CRON_SECRET" \
             "$BASE_URL/api/cron/os-competitor-gap")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  saas-elite-maintenance:
+    if: github.event.schedule == '0 4 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'saas-elite-maintenance' || github.event.inputs.job == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger saas-elite-maintenance cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/saas-elite-maintenance")
           echo "HTTP $code"
           cat /tmp/cron.out
           test "$code" = "200" -o "$code" = "204"

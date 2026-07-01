@@ -29,7 +29,10 @@ export const OS_LIBRARY_CATEGORY_OPTIONS = [
   { value: "ads", label: "Plantillas anuncios" },
   { value: "prompt", label: "Prompts" },
   { value: "recurso", label: "Recursos internos" },
-  { value: "documento", label: "Documentos reutilizables" },
+  { value: "email", label: "Plantillas email" },
+  { value: "social", label: "Plantillas redes sociales" },
+  { value: "video", label: "Plantillas video" },
+  { value: "documento", label: "Presentaciones / informes" },
 ] as const;
 
 export const OS_OUTPUT_STATUS_FILTER = [

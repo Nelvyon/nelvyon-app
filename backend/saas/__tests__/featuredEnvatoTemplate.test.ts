@@ -13,8 +13,10 @@ describe("featuredEnvatoTemplate", () => {
     expect(t.preview_url).toContain("envatousercontent.com");
   });
 
-  it("lists single featured template", () => {
-    expect(listFeaturedEnvatoTemplates()).toHaveLength(1);
+  it("lists featured Envato templates catalog", () => {
+    const list = listFeaturedEnvatoTemplates();
+    expect(list.length).toBeGreaterThanOrEqual(8);
+    expect(list.some((t) => t.id === "nelvyon-landrick-saas")).toBe(true);
   });
 
   it("builds premium sections with company name", () => {
