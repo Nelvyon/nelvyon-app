@@ -11,7 +11,7 @@
 | Email campañas | ✅ | ✅ | `/saas/campanias` | 🟡 | SES ops |
 | SMS | ✅ | ✅ | `/saas/sms` | 🟡 | Twilio ops |
 | WhatsApp | ✅ | 🟡 | `/saas/whatsapp` | 🟡 | Twilio ops |
-| Workflows / automation | ✅ | ✅ | `/saas/workflows` | ✅ | Cron ops |
+| Workflows / automation | ✅ | ✅ | `/saas/workflows` | ✅ | 24+ plantillas importables |
 | Secuencias / drips | ✅ | ✅ | `/saas/secuencias` | 🟡 | SES ops |
 | Formularios | ✅ | ✅ | `/saas/formularios` | ✅ | — |
 | Funnels | ✅ | 🟡 | `/saas/funnels` | ✅ | — |

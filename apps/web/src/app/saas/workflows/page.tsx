@@ -603,6 +603,120 @@ function DetailPanel({
   );
 }
 
+// ── Recipe gallery (GHL-style templates) ─────────────────────────────────────
+type RecipeCategory = "lead-nurture" | "onboarding" | "re-engagement" | "sales" | "support" | "event-based" | "custom";
+interface WorkflowRecipe {
+  id: string; name: string; description: string; category: RecipeCategory;
+  triggerType: TriggerType; tags: string[]; isOfficial: boolean;
+}
+
+const RECIPE_CATEGORY_LABELS: Record<RecipeCategory | "all", string> = {
+  all: "Todas",
+  "lead-nurture": "Lead nurture",
+  onboarding: "Onboarding",
+  "re-engagement": "Re-engagement",
+  sales: "Ventas",
+  support: "Soporte",
+  "event-based": "Eventos",
+  custom: "Personalizadas",
+};
+
+function RecipeGallery({ onImported }: { onImported: () => void }) {
+  const [recipes, setRecipes] = useState<WorkflowRecipe[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState<RecipeCategory | "all">("all");
+  const [importing, setImporting] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(true);
+
+  const loadRecipes = useCallback(async () => {
+    setLoading(true);
+    try {
+      const q = category === "all" ? "" : `?category=${category}`;
+      const res = await fetch(`/api/saas/workflows/recipes${q}`);
+      if (res.ok) {
+        const d = await res.json() as { recipes?: WorkflowRecipe[] };
+        setRecipes(d.recipes ?? []);
+      }
+    } finally { setLoading(false); }
+  }, [category]);
+
+  useEffect(() => { void loadRecipes(); }, [loadRecipes]);
+
+  async function importRecipe(id: string) {
+    setImporting(id);
+    try {
+      const res = await fetch("/api/saas/workflows/recipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "import", recipe_id: id }),
+      });
+      if (res.ok) onImported();
+    } finally { setImporting(null); }
+  }
+
+  return (
+    <NelvyonDsCard className="overflow-hidden">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+        onClick={() => setExpanded((v) => !v)}
+      >
+        <div>
+          <p className="font-semibold text-foreground">Biblioteca de plantillas</p>
+          <p className="text-xs text-muted-foreground">
+            {recipes.length} automatizaciones listas — paridad GHL/HubSpot. Importa en 1 clic.
+          </p>
+        </div>
+        <span className="text-muted-foreground">{expanded ? "▲" : "▼"}</span>
+      </button>
+      {expanded && (
+        <div className="border-t border-border px-5 pb-5 pt-4">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {(Object.keys(RECIPE_CATEGORY_LABELS) as Array<RecipeCategory | "all">).map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCategory(c)}
+                className={`rounded-full px-3 py-1 text-xs transition-colors ${category === c ? "bg-primary/20 text-primary" : "border border-border text-muted-foreground hover:text-foreground"}`}
+              >
+                {RECIPE_CATEGORY_LABELS[c]}
+              </button>
+            ))}
+          </div>
+          {loading ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/30" />)}
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {recipes.map((r) => (
+                <div key={r.id} className="rounded-xl border border-border p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-foreground">{r.name}</p>
+                    {r.isOfficial && <NelvyonDsBadge tone="primary">Oficial</NelvyonDsBadge>}
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{r.description}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {TRIGGER_ICONS[r.triggerType as TriggerType]} {TRIGGER_LABELS[r.triggerType as TriggerType]}
+                  </p>
+                  <NelvyonDsButton
+                    className="mt-3 w-full"
+                    size="sm"
+                    disabled={importing === r.id}
+                    onClick={() => void importRecipe(r.id)}
+                  >
+                    {importing === r.id ? "Importando…" : "Importar workflow"}
+                  </NelvyonDsButton>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </NelvyonDsCard>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function SaasWorkflowsPage() {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
@@ -667,7 +781,7 @@ export default function SaasWorkflowsPage() {
     <SaasShellLayout sidebar={<SaasSidebar activeId="workflows" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <NelvyonDsSectionHeader title="Workflows" subtitle="Automaciones trigger → condición → acción. 16 triggers, 17 acciones." />
+          <NelvyonDsSectionHeader title="Workflows" subtitle="Automaciones trigger → condición → acción. 16 triggers, 17 acciones, 24+ plantillas." />
           <div className="flex gap-2">
             <a href="/saas/workflows/editor" className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white">
               Editor visual
@@ -681,6 +795,8 @@ export default function SaasWorkflowsPage() {
             ⚠️ <strong>Email no configurado</strong> — las acciones &quot;Enviar email&quot; fallarán hasta definir <code>SES_FROM_EMAIL</code> + <code>SES_ACCESS_KEY_ID</code> en Railway.
           </div>
         )}
+
+        <RecipeGallery onImported={() => void load()} />
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">

@@ -10,11 +10,11 @@ const makeDb = (rows: Row[][] = []) => {
 const TENANT = "tenant-recipes";
 
 describe("SaasWorkflowRecipesService — official catalog", () => {
-  it("list returns 10 official recipes when DB has no custom ones", async () => {
+  it("list returns 25+ official recipes when DB has no custom ones", async () => {
     const db = makeDb([[]]);
     const svc = new SaasWorkflowRecipesService(db);
     const recipes = await svc.list(TENANT);
-    expect(recipes.length).toBeGreaterThanOrEqual(10);
+    expect(recipes.length).toBeGreaterThanOrEqual(24);
     expect(recipes.every((r) => r.isOfficial)).toBe(true);
   });
 
@@ -63,16 +63,42 @@ describe("SaasWorkflowRecipesService — official catalog", () => {
     await expect(svc.get("nonexistent-recipe", TENANT)).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 
-  it("all 13 TriggerTypes are covered by at least one recipe", async () => {
+  it("all 16 trigger types are covered by at least one recipe", async () => {
     const db = makeDb([[]]);
     const svc = new SaasWorkflowRecipesService(db);
     const recipes = await svc.list(TENANT);
     const triggerTypes = new Set(recipes.map((r) => r.triggerType));
-    const expected = ["contact_created", "form_submitted", "deal_stage_changed", "manual", "tag_added",
-      "email_opened", "email_clicked", "webhook_in", "date_reached", "stage_changed"];
+    const expected = [
+      "contact_created", "contact_updated", "form_submitted", "deal_stage_changed", "manual", "tag_added",
+      "email_opened", "email_clicked", "webhook_in", "date_reached", "stage_changed",
+      "score_threshold", "review_received", "sequence_enrolled", "job_completed", "scheduled",
+    ];
     for (const t of expected) {
       expect(triggerTypes.has(t), `No recipe for trigger: ${t}`).toBe(true);
     }
+  });
+
+  it("importRecipe preserves conditions from recipe with condition nodes", async () => {
+    const workflowRow = { id: "wf-cond" };
+    const db = makeDb([[workflowRow]]);
+    const svc = new SaasWorkflowRecipesService(db);
+    await svc.importRecipe(TENANT, "stage-changed-proposal");
+    const insertCall = db.query.mock.calls.find((c) => String(c[0]).includes("INSERT INTO saas_workflows"));
+    expect(insertCall).toBeDefined();
+    const conditionsJson = insertCall![1]![5];
+    expect(JSON.parse(String(conditionsJson))).toEqual(
+      expect.arrayContaining([expect.objectContaining({ field: "contact.pipeline_stage", value: "proposal" })]),
+    );
+  });
+
+  it("importRecipe maps SMS and delay actions", async () => {
+    const workflowRow = { id: "wf-sms" };
+    const db = makeDb([[workflowRow]]);
+    const svc = new SaasWorkflowRecipesService(db);
+    await svc.importRecipe(TENANT, "missed-call-text-back");
+    const insertCall = db.query.mock.calls.find((c) => String(c[0]).includes("INSERT INTO saas_workflows"));
+    const actions = JSON.parse(String(insertCall![1]![6])) as Array<{ type: string }>;
+    expect(actions.some((a) => a.type === "send_sms")).toBe(true);
   });
 });
 
