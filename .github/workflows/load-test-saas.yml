@@ -1,0 +1,45 @@
+name: Load Test SaaS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "scripts/load-test-saas.mjs"
+      - ".github/workflows/load-test-saas.yml"
+  workflow_dispatch:
+
+jobs:
+  load-smoke:
+    name: Load smoke (health + public APIs)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          JWT_SECRET: test-secret-for-load-test-min-32-chars-long
+      - name: Start server and run load smoke
+        env:
+          JWT_SECRET: test-secret-for-load-test-min-32-chars-long
+          DATABASE_URL: postgresql://noop:noop@localhost:5432/noop
+          NODE_ENV: production
+          PORT: "3000"
+        run: |
+          pnpm start &
+          SERVER_PID=$!
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:3000/api/health && break
+            sleep 2
+          done
+          node ../../scripts/load-test-saas.mjs --base http://localhost:3000 --n 40
+          kill $SERVER_PID 2>/dev/null || true

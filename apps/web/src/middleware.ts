@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { checkIpRateLimit, getClientIp, getRateLimitRule } from "./lib/security/rateLimit";
 import { resolveRequestId, withRequestId } from "./lib/security/requestId";
+import { applySecurityHeaders } from "./lib/security/securityHeaders";
 import { createRequestLogger } from "@/lib/serverLogger";
 import {
   encodeWhitelabelHeader,
@@ -105,7 +106,7 @@ export async function middleware(request: NextRequest) {
         durationMs: Date.now() - startedAt,
       });
     }
-    return applyAffiliateRefCookie(request, withRequestId(res, requestId));
+    return applyAffiliateRefCookie(request, applySecurityHeaders(withRequestId(res, requestId)));
   }
 
   const rateRule = getRateLimitRule(pathname);

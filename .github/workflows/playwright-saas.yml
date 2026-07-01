@@ -6,11 +6,14 @@ on:
       - "apps/web/src/app/saas/**"
       - "apps/web/src/app/api/saas/**"
       - "apps/web/src/app/api/public/**"
+      - "apps/web/src/app/api/lms/**"
+      - "apps/web/src/app/api/scim/**"
       - "apps/web/src/app/contracts/**"
       - "apps/web/e2e/saas/**"
       - "apps/web/src/middleware.ts"
       - "apps/web/playwright.saas.config.ts"
       - "backend/saas/**"
+      - "packages/nelvyon-sdk/**"
       - ".github/workflows/playwright-saas.yml"
   push:
     branches:
@@ -19,11 +22,14 @@ on:
       - "apps/web/src/app/saas/**"
       - "apps/web/src/app/api/saas/**"
       - "apps/web/src/app/api/public/**"
+      - "apps/web/src/app/api/lms/**"
+      - "apps/web/src/app/api/scim/**"
       - "apps/web/src/app/contracts/**"
       - "apps/web/e2e/saas/**"
       - "apps/web/src/middleware.ts"
       - "apps/web/playwright.saas.config.ts"
       - "backend/saas/**"
+      - "packages/nelvyon-sdk/**"
       - ".github/workflows/playwright-saas.yml"
 
 jobs:

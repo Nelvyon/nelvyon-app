@@ -45,6 +45,85 @@ export const FEATURED_ENVATO_ECOMMERCE: FeaturedEnvatoTemplate = {
   slug: "tienda-premium",
 };
 
+/** Restaurant / local — Envato #25663891 style */
+export const FEATURED_ENVATO_RESTAURANT: FeaturedEnvatoTemplate = {
+  id: "nelvyon-restaurant-local",
+  envato_id: "25663891",
+  name: "Restaurante Local Pro",
+  vendor: "Envato Market",
+  headline: "Reservas online + menú digital + reseñas Google",
+  description: "Plantilla hostelería premium adaptada por Nelvyon.",
+  preview_url: "https://previews.customer.envatousercontent.com/files/651723762/01_landrick.__large_preview.png",
+  sector: "restaurant",
+  page_type: "landing",
+  slug: "restaurante-premium",
+};
+
+export const FEATURED_ENVATO_AGENCY: FeaturedEnvatoTemplate = {
+  id: "nelvyon-agency-dark",
+  envato_id: "29181234",
+  name: "Agencia Marketing Dark",
+  vendor: "Envato Market",
+  headline: "Agencia digital — casos de éxito, servicios y contacto",
+  description: "Landing oscura premium para agencias de marketing.",
+  preview_url: "https://previews.customer.envatousercontent.com/files/651723762/01_landrick.__large_preview.png",
+  sector: "agency",
+  page_type: "landing",
+  slug: "agencia-premium",
+};
+
+export const FEATURED_ENVATO_DENTAL: FeaturedEnvatoTemplate = {
+  id: "nelvyon-dental-clinic",
+  envato_id: "28456123",
+  name: "Clínica Dental Elite",
+  vendor: "Envato Market",
+  headline: "Citas online, tratamientos y confianza clínica",
+  description: "Plantilla clínica dental adaptada por Nelvyon.",
+  preview_url: "https://previews.customer.envatousercontent.com/files/651723762/01_landrick.__large_preview.png",
+  sector: "dental",
+  page_type: "landing",
+  slug: "clinica-dental",
+};
+
+export const FEATURED_ENVATO_FITNESS: FeaturedEnvatoTemplate = {
+  id: "nelvyon-fitness-gym",
+  envato_id: "30123456",
+  name: "Gimnasio & Fitness",
+  vendor: "Envato Market",
+  headline: "Membresías, clases y transformación",
+  description: "Landing fitness con pricing y CTA reserva.",
+  preview_url: "https://previews.customer.envatousercontent.com/files/651723762/01_landrick.__large_preview.png",
+  sector: "fitness",
+  page_type: "landing",
+  slug: "gimnasio-premium",
+};
+
+export const FEATURED_ENVATO_REAL_ESTATE: FeaturedEnvatoTemplate = {
+  id: "nelvyon-real-estate",
+  envato_id: "27890123",
+  name: "Inmobiliaria Premium",
+  vendor: "Envato Market",
+  headline: "Listados, tours virtuales y captación leads",
+  description: "Plantilla inmobiliaria con formulario de valoración.",
+  preview_url: "https://previews.customer.envatousercontent.com/files/651723762/01_landrick.__large_preview.png",
+  sector: "real_estate",
+  page_type: "landing",
+  slug: "inmobiliaria-premium",
+};
+
+export const FEATURED_ENVATO_COACHING: FeaturedEnvatoTemplate = {
+  id: "nelvyon-coaching",
+  envato_id: "31234567",
+  name: "Coaching & Formación",
+  vendor: "Envato Market",
+  headline: "Programas, testimonios y agenda de sesiones",
+  description: "Landing coaching con CTA reserva y lead magnet.",
+  preview_url: "https://previews.customer.envatousercontent.com/files/651723762/01_landrick.__large_preview.png",
+  sector: "coaching",
+  page_type: "landing",
+  slug: "coaching-premium",
+};
+
 const FEATURED_ID = FEATURED_ENVATO_TEMPLATE.id;
 const FEATURED_ECOMMERCE_ID = FEATURED_ENVATO_ECOMMERCE.id;
 
@@ -53,20 +132,39 @@ export function getFeaturedEnvatoTemplate(): FeaturedEnvatoTemplate {
 }
 
 export function listFeaturedEnvatoTemplates(): FeaturedEnvatoTemplate[] {
-  return [FEATURED_ENVATO_TEMPLATE, FEATURED_ENVATO_ECOMMERCE];
+  return [
+    FEATURED_ENVATO_TEMPLATE,
+    FEATURED_ENVATO_ECOMMERCE,
+    FEATURED_ENVATO_RESTAURANT,
+    FEATURED_ENVATO_AGENCY,
+    FEATURED_ENVATO_DENTAL,
+    FEATURED_ENVATO_FITNESS,
+    FEATURED_ENVATO_REAL_ESTATE,
+    FEATURED_ENVATO_COACHING,
+  ];
+}
+
+export function getFeaturedTemplateById(id: string): FeaturedEnvatoTemplate | null {
+  return listFeaturedEnvatoTemplates().find((t) => t.id === id) ?? null;
 }
 
 export function buildFeaturedTemplateSections(
   templateId: string,
   companyName = "Tu empresa",
 ): PageSection[] {
+  const meta = getFeaturedTemplateById(templateId);
+  if (!meta) throw new Error(`Unknown featured template: ${templateId}`);
+
   if (templateId === FEATURED_ECOMMERCE_ID) {
     return buildPortoEcommerceSections(companyName);
   }
-  if (templateId !== FEATURED_ID) {
-    throw new Error(`Unknown featured template: ${templateId}`);
+  if (templateId === FEATURED_ID) {
+    return buildLandrickSections(companyName);
   }
+  return buildSectorLandingSections(meta, companyName);
+}
 
+function buildLandrickSections(companyName: string): PageSection[] {
   const brand = companyName.trim() || "Tu empresa";
 
   return [
@@ -156,6 +254,40 @@ export function buildFeaturedTemplateSections(
         heading: "Contacta con nosotros",
         ctaLabel: "Enviar mensaje",
       },
+    },
+  ];
+}
+
+function buildSectorLandingSections(meta: FeaturedEnvatoTemplate, companyName: string): PageSection[] {
+  const brand = companyName.trim() || meta.name;
+  return [
+    {
+      id: crypto.randomUUID(),
+      type: "hero",
+      content: {
+        badge: `Nelvyon × Envato #${meta.envato_id}`,
+        headline: `${brand} — ${meta.headline}`,
+        subtitle: meta.description,
+        ctaLabel: "Reservar / Contactar",
+        ctaUrl: "#contact",
+      },
+    },
+    {
+      id: crypto.randomUUID(),
+      type: "features",
+      content: {
+        heading: "Servicios destacados",
+        items: [
+          { icon: "⭐", title: "Sector " + meta.sector, desc: "Optimizado para conversión local y SEO." },
+          { icon: "📱", title: "Mobile-first", desc: "Diseño responsive premium." },
+          { icon: "🎯", title: "CTA claro", desc: "Captación de leads integrada con Nelvyon CRM." },
+        ],
+      },
+    },
+    {
+      id: crypto.randomUUID(),
+      type: "contact",
+      content: { heading: "Contacto", ctaLabel: "Enviar mensaje" },
     },
   ];
 }

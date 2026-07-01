@@ -1437,3 +1437,12 @@ export {
   type QaReviewSummary,
   type QaReviewStatus,
 } from "./OsQaReviewQueueService";
+export {
+  SaasScimService,
+  SaasScimError,
+  getSaasScimService,
+  resetSaasScimServiceForTests,
+  resolveScimTenantId,
+  type ScimUser,
+} from "./SaasScimService";
+export { computeMlDealForecast, type MlForecastResult } from "./saasDealForecast";

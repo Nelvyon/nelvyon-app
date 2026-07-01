@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { computeMlDealForecast } from "./saasDealForecast";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { pickPrimaryPipelineStage } from "./pipelineStageSync";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
@@ -60,6 +61,8 @@ export interface SaasDealsMetrics {
   pipelineValue: number;
   wonValue: number;
   forecastValue: number;
+  mlForecastConfidence: number;
+  forecastMethod: string;
   currency: string;
   byStage: StageMetricsItem[];
 }
@@ -430,7 +433,6 @@ export class SaasDealsService {
     let lostCount = 0;
     let pipelineValue = 0;
     let wonValue = 0;
-    let forecastValue = 0;
     const currency = all[0]?.currency ?? "EUR";
 
     for (const d of all) {
@@ -442,9 +444,10 @@ export class SaasDealsService {
       } else if (isOpenDealStage(d.stage)) {
         openCount += 1;
         pipelineValue += d.value;
-        forecastValue += d.value * (d.probability / 100);
       }
     }
+
+    const ml = computeMlDealForecast(all);
 
     const total = all.length;
     const wonTotal = wonCount;
@@ -462,7 +465,9 @@ export class SaasDealsService {
       lostCount,
       pipelineValue,
       wonValue,
-      forecastValue,
+      forecastValue: ml.forecastValue,
+      mlForecastConfidence: ml.forecastConfidence,
+      forecastMethod: ml.method,
       currency,
       byStage: STAGES.map((s) => byStageMap.get(s) as StageMetricsItem),
     };

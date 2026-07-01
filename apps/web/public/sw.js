@@ -1,62 +1,48 @@
-/* NELVYON PWA — network first, cache fallback */
-const CACHE_NAME = "nelvyon-saas-v2";
-const LEGACY_CACHE = "nelvyon-v1";
-const PRECACHE_URLS = ["/", "/dashboard", "/offline.html", "/saas/dashboard", "/offline-saas.html"];
+/* NELVYON PWA v3 — stale-while-revalidate + offline-first SaaS shell */
+const CACHE_NAME = "nelvyon-saas-v3";
+const STATIC_CACHE = "nelvyon-static-v3";
+const PRECACHE_URLS = ["/", "/offline.html", "/offline-saas.html", "/saas/dashboard", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
-      .then(() => self.skipWaiting()),
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE_URLS)).then(() => self.skipWaiting()),
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(
-          keys
-            .filter((k) => k !== CACHE_NAME && k !== LEGACY_CACHE)
-            .map((k) => caches.delete(k)),
-        ),
-      )
-      .then(() => self.clients.claim()),
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME && k !== STATIC_CACHE).map((k) => caches.delete(k))),
+    ).then(() => self.clients.claim()),
   );
 });
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  const network = fetch(request)
+    .then((res) => {
+      if (res.ok) cache.put(request, res.clone());
+      return res;
+    })
+    .catch(() => null);
+  return cached ?? network ?? caches.match("/offline-saas.html");
+}
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
-
   const url = new URL(req.url);
-
-  // Never cache API calls or auth-sensitive routes
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/_next/")) return;
 
-  const isSaasNav = req.mode === "navigate" && url.pathname.startsWith("/saas");
-  const isLegacyNav = req.mode === "navigate" && !url.pathname.startsWith("/saas");
+  if (req.mode === "navigate" && url.pathname.startsWith("/saas")) {
+    event.respondWith(staleWhileRevalidate(req));
+    return;
+  }
 
-  event.respondWith(
-    fetch(req)
-      .then((res) => {
-        if (res.ok) {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-        }
-        return res;
-      })
-      .catch(() =>
-        caches.match(req).then((cached) => {
-          if (cached) return cached;
-          if (isSaasNav) return caches.match("/offline-saas.html");
-          if (isLegacyNav) return caches.match("/offline.html");
-          return new Response("", { status: 408 });
-        }),
-      ),
-  );
+  if (url.pathname.startsWith("/icons/") || url.pathname === "/manifest.json") {
+    event.respondWith(caches.open(STATIC_CACHE).then((c) => c.match(req).then((hit) => hit ?? fetch(req))));
+  }
 });
 
 self.addEventListener("push", (event) => {

@@ -7,7 +7,7 @@ import type { SaasPostgresPort } from "./SaasOnboardingService";
 import dns from "dns";
 import {
   buildFeaturedTemplateSections,
-  getFeaturedEnvatoTemplate,
+  getFeaturedTemplateById,
   listFeaturedEnvatoTemplates,
   type FeaturedEnvatoTemplate,
 } from "./featuredEnvatoTemplate";
@@ -196,15 +196,15 @@ export class SaasWebBuilderService {
     templateId: string,
     companyName?: string,
   ): Promise<WebPage> {
-    const meta = getFeaturedEnvatoTemplate();
-    if (meta.id !== templateId) {
+    const meta = getFeaturedTemplateById(templateId);
+    if (!meta) {
       throw new SaasWebBuilderError(`Unknown template: ${templateId}`, "VALIDATION");
     }
     const sections = buildFeaturedTemplateSections(templateId, companyName ?? meta.name);
     return this.create(tenantId, {
-      title: `${companyName?.trim() || "Mi empresa"} — Landing Premium`,
+      title: `${companyName?.trim() || "Mi empresa"} — ${meta.name}`,
       slug: meta.slug,
-      type: "landing",
+      type: meta.page_type === "storefront" ? "product" : "landing",
       sections,
       seoTitle: `${companyName?.trim() || "Nelvyon"} | ${meta.headline}`,
       seoDescription: meta.description,

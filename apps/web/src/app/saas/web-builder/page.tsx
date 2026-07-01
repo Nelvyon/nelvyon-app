@@ -202,8 +202,12 @@ export default function SaasWebBuilderPage() {
           <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nueva página</NelvyonDsButton>
         </div>
 
-        {templates[0] && (
-          <FeaturedEnvatoTemplateCard template={templates[0]} onImported={load} />
+        {templates.length > 0 && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {templates.map((tpl) => (
+              <FeaturedEnvatoTemplateCard key={tpl.id} template={tpl} onImported={load} />
+            ))}
+          </div>
         )}
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

@@ -161,9 +161,7 @@ export default function SaasDashboardPage() {
   const hasNoJobs = summary.activeJobs === 0 && summary.completedJobs === 0;
   const show = (id: DashboardWidgetId) => widgets.includes(id);
 
-  async function toggleWidget(id: DashboardWidgetId) {
-    const next = widgets.includes(id) ? widgets.filter((w) => w !== id) : [...widgets, id];
-    if (next.length === 0) return;
+  async function persistLayout(next: DashboardWidgetId[]) {
     setWidgets(next);
     setSavingLayout(true);
     try {
@@ -176,6 +174,21 @@ export default function SaasDashboardPage() {
     } finally {
       setSavingLayout(false);
     }
+  }
+
+  async function toggleWidget(id: DashboardWidgetId) {
+    const next = widgets.includes(id) ? widgets.filter((w) => w !== id) : [...widgets, id];
+    if (next.length === 0) return;
+    await persistLayout(next);
+  }
+
+  function moveWidget(from: number, to: number) {
+    if (from === to || from < 0 || to < 0 || from >= widgets.length || to >= widgets.length) return;
+    const next = [...widgets];
+    const [item] = next.splice(from, 1);
+    if (!item) return;
+    next.splice(to, 0, item);
+    void persistLayout(next);
   }
 
   return (
@@ -211,21 +224,38 @@ export default function SaasDashboardPage() {
       {showCustomize && (
         <DarkCard>
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">
-            Widgets visibles {savingLayout ? "· guardando…" : ""}
+            Orden widgets (arrastra) {savingLayout ? "· guardando…" : ""}
           </p>
+          <ul className="mb-4 space-y-1">
+            {widgets.map((id, index) => (
+              <li
+                key={id}
+                draggable
+                onDragStart={() => { (window as unknown as { __dragIdx?: number }).__dragIdx = index; }}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  const from = (window as unknown as { __dragIdx?: number }).__dragIdx;
+                  if (typeof from === "number") moveWidget(from, index);
+                }}
+                className="flex cursor-grab items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/70 active:cursor-grabbing"
+              >
+                <span>⋮⋮ {WIDGET_LABELS[id]}</span>
+                <button type="button" className="text-xs text-white/30 hover:text-red-400" onClick={() => toggleWidget(id)}>Ocultar</button>
+              </li>
+            ))}
+          </ul>
+          <p className="mb-2 text-xs text-white/30">Añadir widget</p>
           <div className="flex flex-wrap gap-2">
-            {(Object.keys(WIDGET_LABELS) as DashboardWidgetId[]).map((id) => (
+            {(Object.keys(WIDGET_LABELS) as DashboardWidgetId[])
+              .filter((id) => !show(id))
+              .map((id) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => toggleWidget(id)}
-                className={`rounded-full px-3 py-1 text-xs border transition-colors ${
-                  show(id)
-                    ? "border-[#0084ff]/50 bg-[#0084ff]/10 text-white"
-                    : "border-white/10 text-white/40"
-                }`}
+                className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/40 hover:border-[#0084ff]/40"
               >
-                {WIDGET_LABELS[id]}
+                + {WIDGET_LABELS[id]}
               </button>
             ))}
           </div>

@@ -68,9 +68,16 @@ jobs:
         env:
           CI: "true"
 
-      - name: Backend SaaS unit tests (elite frentes)
-        run: pnpm exec vitest run backend/saas/__tests__/eliteFrentesCompletion.test.ts backend/saas/__tests__/integrationHubSync.test.ts --reporter=dot
+      - name: Validate SaaS migrations 401–485
+        working-directory: .
+        run: node scripts/validate-saas-migrations.mjs
 
-      - name: Full regression tests (non-blocking signal)
+      - name: Backend SaaS unit tests (elite + completion frentes)
+        run: pnpm exec vitest run backend/saas/__tests__/eliteFrentesCompletion.test.ts backend/saas/__tests__/integrationHubSync.test.ts backend/saas/__tests__/codeCompletionFrentes.test.ts --reporter=dot
+
+      - name: Build @nelvyon/sdk
+        working-directory: .
+        run: pnpm -C packages/nelvyon-sdk exec tsc -p tsconfig.json
+
+      - name: Full regression tests
         run: pnpm test:regression
-        continue-on-error: true

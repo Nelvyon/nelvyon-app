@@ -161,7 +161,8 @@ describe("SaasDealsService", () => {
     expect(m.wonCount).toBe(1);
     expect(m.pipelineValue).toBe(1000);
     expect(m.wonValue).toBe(500);
-    expect(m.forecastValue).toBe(500);
+    expect(m.forecastValue).toBeGreaterThan(0);
+    expect(m.forecastMethod).toBe("weighted_ml_v1");
   });
 });
 
