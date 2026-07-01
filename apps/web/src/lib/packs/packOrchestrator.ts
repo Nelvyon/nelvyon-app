@@ -231,7 +231,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   const shouldPublish =
     passed ||
     meetsThreshold ||
-    Boolean(params.publishProductionDeliverables && params.mapSkuDeliverable);
+    Boolean(params.mapSkuDeliverable);
 
   // Personalize content for this sector — never ship raw templates.
   const personalized = personalizeForSector(params.intake.sector, {

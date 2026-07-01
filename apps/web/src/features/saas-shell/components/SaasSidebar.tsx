@@ -22,11 +22,7 @@ const GROUP_ICONS: Record<string, string> = {
 };
 
 function navLabel(t: ReturnType<typeof useTranslations>, item: SaasNavItem): string {
-  try {
-    return t(`items.${item.id}`);
-  } catch {
-    return item.label;
-  }
+  return t(`items.${item.id}`, { defaultMessage: item.label });
 }
 
 function NavGroup({
@@ -43,12 +39,7 @@ function NavGroup({
   const t = useTranslations("saas.nav");
   const hasActive = items.some(i => isSaasNavActive(activeId, i.id));
   const [open, setOpen] = useState(defaultOpen || hasActive);
-  let groupLabel = groupId;
-  try {
-    groupLabel = t(`groups.${groupId}`);
-  } catch {
-    groupLabel = groupId;
-  }
+  const groupLabel = t(`groups.${groupId}`, { defaultMessage: groupId });
   const icon = GROUP_ICONS[groupId] ?? "·";
 
   return (

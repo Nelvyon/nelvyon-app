@@ -93,7 +93,6 @@ export async function runSaasB2bGrowthPack(params: {
       intake,
       buildBrief: buildSaasB2bBrief,
       reportDeliverableTitle: "Informe ejecutivo",
-      publishProductionDeliverables: true,
       mapSkuDeliverable: (p) =>
         mapSaasB2bSkuDeliverable({
           sku: p.sku,
