@@ -6,7 +6,7 @@ const ROWS = [
   { feature: 'Meta Ads (FB + IG)',      tools: ['Meta','AdEspresso'],   price: '€400–1.500/mes' },
   { feature: 'TikTok Ads',             tools: ['TikTok'],              price: '€300–1.000/mes' },
   { feature: 'Email Marketing',         tools: ['Mailchimp','Klaviyo'], price: '€200–800/mes'  },
-  { feature: 'Content Marketing',       tools: ['HubSpot','Writer'],    price: '€500–2.000/mes' },
+  { feature: 'Content Marketing',       tools: ['Writer','Jasper'],    price: '€500–2.000/mes' },
   { feature: 'Social Media',           tools: ['Hootsuite','Buffer'],   price: '€400–1.500/mes' },
   { feature: 'Web & Landing Pages',    tools: ['Webflow','Wix'],        price: '€300–1.200/mes' },
   { feature: 'Vídeo Marketing',         tools: ['Wistia','Vimeo'],      price: '€600–2.500/mes' },

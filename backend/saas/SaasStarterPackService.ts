@@ -1,5 +1,5 @@
 /**
- * One-click GHL/HubSpot starter pack — imports core workflows + drip sequences.
+ * Kit de arranque oficial Nelvyon — importa workflows + secuencias en un clic.
  */
 import { getSaasWorkflowRecipesService } from "./SaasWorkflowRecipesService";
 import { getSaasSequenceTemplatesService } from "./SaasSequenceTemplatesService";
@@ -20,25 +20,25 @@ const STARTER_SEQUENCES = [
   "review-request-drip",
 ] as const;
 
-export type GhlStarterPackResult = {
+export type StarterPackResult = {
   workflows: Array<{ recipeId: string; workflowId: string; name: string }>;
   sequences: Array<{ templateId: string; sequenceId: string; name: string; stepsCreated: number }>;
   totalWorkflows: number;
   totalSequences: number;
 };
 
-export class SaasGhlStarterPackService {
-  async install(tenantId: string): Promise<GhlStarterPackResult> {
+export class SaasStarterPackService {
+  async install(tenantId: string): Promise<StarterPackResult> {
     const recipes = getSaasWorkflowRecipesService();
     const templates = getSaasSequenceTemplatesService();
 
-    const workflows: GhlStarterPackResult["workflows"] = [];
+    const workflows: StarterPackResult["workflows"] = [];
     for (const recipeId of STARTER_WORKFLOWS) {
       const result = await recipes.importRecipe(tenantId, recipeId);
       workflows.push({ recipeId, workflowId: result.workflowId, name: result.name });
     }
 
-    const sequences: GhlStarterPackResult["sequences"] = [];
+    const sequences: StarterPackResult["sequences"] = [];
     for (const templateId of STARTER_SEQUENCES) {
       const result = await templates.importTemplate(tenantId, templateId);
       sequences.push({
@@ -58,11 +58,20 @@ export class SaasGhlStarterPackService {
   }
 }
 
-let _instance: SaasGhlStarterPackService | null = null;
-export function getSaasGhlStarterPackService(): SaasGhlStarterPackService {
-  if (!_instance) _instance = new SaasGhlStarterPackService();
+let _instance: SaasStarterPackService | null = null;
+export function getSaasStarterPackService(): SaasStarterPackService {
+  if (!_instance) _instance = new SaasStarterPackService();
   return _instance;
 }
-export function resetSaasGhlStarterPackServiceForTests(): void {
+export function resetSaasStarterPackServiceForTests(): void {
   _instance = null;
 }
+
+/** @deprecated use SaasStarterPackService */
+export type GhlStarterPackResult = StarterPackResult;
+/** @deprecated use getSaasStarterPackService */
+export const getSaasGhlStarterPackService = getSaasStarterPackService;
+/** @deprecated use SaasStarterPackService */
+export const SaasGhlStarterPackService = SaasStarterPackService;
+/** @deprecated */
+export const resetSaasGhlStarterPackServiceForTests = resetSaasStarterPackServiceForTests;

@@ -603,7 +603,7 @@ function DetailPanel({
   );
 }
 
-// ── Recipe gallery (GHL-style templates) ─────────────────────────────────────
+// ── Biblioteca de plantillas oficiales Nelvyon ───────────────────────────────
 type RecipeCategory = "lead-nurture" | "onboarding" | "re-engagement" | "sales" | "support" | "event-based" | "custom";
 interface WorkflowRecipe {
   id: string; name: string; description: string; category: RecipeCategory;
@@ -664,7 +664,7 @@ function RecipeGallery({ onImported }: { onImported: () => void }) {
         <div>
           <p className="font-semibold text-foreground">Biblioteca de plantillas</p>
           <p className="text-xs text-muted-foreground">
-            {recipes.length} automatizaciones listas — paridad GHL/HubSpot. Importa en 1 clic.
+            {recipes.length} automatizaciones oficiales Nelvyon. Importa en 1 clic.
           </p>
         </div>
         <span className="text-muted-foreground">{expanded ? "▲" : "▼"}</span>
@@ -738,7 +738,7 @@ export default function SaasWorkflowsPage() {
       const res = await fetch("/api/saas/starter-pack", { method: "POST" });
       const d = await res.json() as { totalWorkflows?: number; totalSequences?: number; error?: string };
       if (!res.ok) { setPackMsg(d.error ?? "Error al instalar pack"); return; }
-      setPackMsg(`✅ Pack instalado: ${d.totalWorkflows ?? 6} workflows + ${d.totalSequences ?? 4} secuencias`);
+      setPackMsg(`✅ Kit instalado: ${d.totalWorkflows ?? 6} workflows + ${d.totalSequences ?? 4} secuencias`);
       await load();
     } finally { setInstallingPack(false); }
   }
@@ -798,7 +798,7 @@ export default function SaasWorkflowsPage() {
           <NelvyonDsSectionHeader title="Workflows" subtitle="Automaciones trigger → condición → acción. 16 triggers, 17 acciones, 24+ plantillas." />
           <div className="flex gap-2">
             <NelvyonDsButton variant="ghost" disabled={installingPack} onClick={() => void installStarterPack()}>
-              {installingPack ? "Instalando…" : "⚡ Pack GHL Starter"}
+              {installingPack ? "Instalando…" : "⚡ Kit arranque Nelvyon"}
             </NelvyonDsButton>
             <a href="/saas/workflows/editor" className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white">
               Editor visual

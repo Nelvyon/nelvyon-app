@@ -369,8 +369,8 @@ function FormTemplateGallery({ onImported }: { onImported: () => void }) {
 
   return (
     <NelvyonDsCard className="p-4">
-      <p className="text-sm font-semibold text-foreground">Plantillas GHL / HubSpot ({templates.length})</p>
-      <p className="text-xs text-muted-foreground mt-0.5">Lead capture, presupuesto, RSVP, NPS…</p>
+      <p className="text-sm font-semibold text-foreground">Plantillas oficiales Nelvyon ({templates.length})</p>
+      <p className="text-xs text-muted-foreground mt-0.5">Lead capture, presupuesto, RSVP, NPS y más</p>
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {templates.map((t) => (
           <div key={t.id} className="rounded-lg border border-border p-3">

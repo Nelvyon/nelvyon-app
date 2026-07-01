@@ -29,7 +29,7 @@ const STEPS = [
 ];
 
 const TESTIMONIALS = [
-  { name: "Carlos M.", role: "CEO · Agencia Digital", text: "Sustituí HubSpot (800€/mes) y GoHighLevel (500€/mes) por Nelvyon. Pago 297€ y tengo todo mucho más claro y rápido.", plan: "Pro 297€/mes" },
+  { name: "Carlos M.", role: "CEO · Agencia Digital", text: "Centralicé CRM, email, funnels y automatizaciones en Nelvyon. Pago 297€ y tengo todo mucho más claro y rápido.", plan: "Pro 297€/mes" },
   { name: "Laura S.", role: "Freelance Marketing", text: "Los 193 agentes IA me ahorran 20 horas a la semana. Es como tener un equipo entero a mi disposición.", plan: "Pro 297€/mes" },
   { name: "Marcos R.", role: "Director Marketing B2B", text: "El Asistente IA responde cualquier pregunta de marketing en segundos. Mejor que contratar un consultor.", plan: "Agency 797€/mes" },
 ];
@@ -49,8 +49,8 @@ export default function DemoPage() {
             <span className="text-[#0084FF]">completamente gratis</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
-            La plataforma de marketing digital con IA más completa del mercado. Mejor que HubSpot + GoHighLevel combinados.
-            24 módulos, 193 agentes IA, todo en uno.
+            La plataforma de marketing digital con IA más completa del mercado.
+            24 módulos, 193 agentes IA, todo en uno — diseñado y operado por Nelvyon.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link href="/auth/register" className="inline-flex items-center gap-2 rounded-2xl bg-[#0084FF] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#0084FF]/25 transition-all hover:bg-[#0066cc] hover:shadow-[#0084FF]/40">
@@ -125,20 +125,19 @@ export default function DemoPage() {
         </div>
       </section>
 
-      {/* Vs competition */}
+      {/* Value pillars */}
       <section className="px-4 py-16 bg-white/[0.02]">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mb-8 text-3xl font-bold text-white">¿Por qué no HubSpot o GoHighLevel?</h2>
+          <h2 className="mb-8 text-3xl font-bold text-white">Por qué Nelvyon</h2>
           <div className="grid gap-4 sm:grid-cols-3">
             {([
-              { competitor: "HubSpot", price: "800€+/mes", issues: "Demasiado complejo · Sin IA real · Caro", highlight: false },
-              { competitor: "GoHighLevel", price: "497$/mes", issues: "Solo para agencias · UX complicada · Sin IA", highlight: false },
-              { competitor: "Nelvyon", price: "97–797€/mes", issues: "Todo en uno · IA real · Más fácil · Precio justo", highlight: true },
+              { title: "Todo en uno", desc: "CRM, email, SMS, funnels, ads y IA en una sola plataforma oficial", highlight: false },
+              { title: "Plantillas oficiales", desc: "Workflows, secuencias y formularios creados por Nelvyon — listos en 1 clic", highlight: false },
+              { title: "Nelvyon", desc: "IA real · Precio justo · Soporte en español · Escala con tu negocio", highlight: true },
             ]).map((c) => (
-              <div key={c.competitor} className={`rounded-2xl border p-5 ${c.highlight ? "border-[#0084FF]/50 bg-[#0084FF]/10" : "border-white/10 bg-white/5"}`}>
-                <p className={`text-lg font-bold ${c.highlight ? "text-[#0084FF]" : "text-white/70"}`}>{c.competitor}</p>
-                <p className={`mt-1 text-xl font-bold ${c.highlight ? "text-white" : "text-white/50"}`}>{c.price}</p>
-                <p className={`mt-2 text-xs ${c.highlight ? "text-white/80" : "text-white/40"}`}>{c.issues}</p>
+              <div key={c.title} className={`rounded-2xl border p-5 ${c.highlight ? "border-[#0084FF]/50 bg-[#0084FF]/10" : "border-white/10 bg-white/5"}`}>
+                <p className={`text-lg font-bold ${c.highlight ? "text-[#0084FF]" : "text-white/90"}`}>{c.title}</p>
+                <p className={`mt-2 text-xs ${c.highlight ? "text-white/80" : "text-white/50"}`}>{c.desc}</p>
               </div>
             ))}
           </div>

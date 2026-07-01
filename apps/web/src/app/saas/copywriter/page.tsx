@@ -13,7 +13,7 @@ const COPY_TYPES: { id: CopyType; label: string; icon: string; placeholder: stri
   { id: "email_body", label: "Cuerpo de email", icon: "📝", placeholder: "Email de bienvenida para nuevos clientes de nuestro plan Pro. Incluir próximos pasos y soporte." },
   { id: "sms_message", label: "SMS Marketing", icon: "💬", placeholder: "Oferta flash de 48h: 30% descuento en todos nuestros servicios. Solo para clientes existentes." },
   { id: "social_post", label: "Post Redes Sociales", icon: "📱", placeholder: "Lanzamiento de nuestra nueva función de IA para automatizar campañas de email marketing." },
-  { id: "ad_copy", label: "Anuncio Digital", icon: "💰", placeholder: "Software de marketing todo en uno para pymes. Más barato que HubSpot. Prueba gratis 14 días." },
+  { id: "ad_copy", label: "Anuncio Digital", icon: "💰", placeholder: "Software de marketing todo en uno para pymes. Prueba gratis 14 días." },
   { id: "landing_headline", label: "Titular Landing Page", icon: "🚀", placeholder: "Plataforma SaaS de marketing digital con IA para empresas que quieren crecer sin contratar." },
   { id: "cta_button", label: "Texto CTA / Botón", icon: "🎯", placeholder: "Botón para empezar prueba gratuita de nuestro software de marketing." },
   { id: "blog_intro", label: "Intro de Blog", icon: "✍️", placeholder: "Artículo sobre cómo las pymes pueden usar IA para automatizar su marketing y ahorrar tiempo." },

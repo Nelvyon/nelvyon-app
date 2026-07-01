@@ -1,5 +1,5 @@
 /**
- * Official drip sequence templates — GHL/HubSpot parity (import → real saas_sequences + steps).
+ * Plantillas oficiales Nelvyon — secuencias drip multicanal.
  */
 import {
   SaasSequencesService,
@@ -43,7 +43,7 @@ const OFFICIAL_TEMPLATES: SequenceTemplate[] = [
   {
     id: "welcome-3-email",
     name: "Welcome Series (3 emails)",
-    description: "Classic GHL welcome drip: intro → value → CTA over 5 days.",
+    description: "Serie de bienvenida en 3 emails: intro → valor → CTA en 5 días.",
     category: "welcome",
     triggerType: "contact_created",
     tags: ["welcome", "email", "onboarding"],
@@ -58,7 +58,7 @@ const OFFICIAL_TEMPLATES: SequenceTemplate[] = [
   {
     id: "nurture-5-touch",
     name: "5-Touch Lead Nurture",
-    description: "HubSpot-style nurture: educate, social proof, offer, urgency, break-up.",
+    description: "Nurture B2B: educación, prueba social, oferta, urgencia y cierre.",
     category: "nurture",
     triggerType: "manual",
     tags: ["nurture", "b2b", "drip"],
@@ -77,7 +77,7 @@ const OFFICIAL_TEMPLATES: SequenceTemplate[] = [
   {
     id: "form-followup-24h",
     name: "Form Submitted → 24h Follow-up",
-    description: "Instant ack + next-day personal follow-up (GHL form trigger).",
+    description: "Confirmación inmediata + seguimiento al día siguiente tras formulario.",
     category: "sales",
     triggerType: "form_submitted",
     tags: ["form", "lead", "follow-up"],
@@ -93,7 +93,7 @@ const OFFICIAL_TEMPLATES: SequenceTemplate[] = [
     description: "Ask for Google review after positive experience — email then SMS nudge.",
     category: "reviews",
     triggerType: "manual",
-    tags: ["reviews", "reputation", "ghl"],
+    tags: ["reviews", "reputation", "nelvyon"],
     steps: [
       { stepType: "email", delayDays: 0, subject: "How did we do?", bodyHtml: "<p>Hi {{contact.name}},</p><p>We would love a quick review: {{review_link}}</p>" },
       { stepType: "wait", delayDays: 3, bodyHtml: "" },
@@ -118,7 +118,7 @@ const OFFICIAL_TEMPLATES: SequenceTemplate[] = [
   {
     id: "tag-vip-onboarding",
     name: "VIP Tag → Premium Onboarding",
-    description: "Triggered when contact is tagged VIP (GHL tag automation).",
+    description: "Automatización al etiquetar un contacto como VIP.",
     category: "welcome",
     triggerType: "tag_added",
     triggerConfig: { tag: "vip" },
@@ -132,7 +132,7 @@ const OFFICIAL_TEMPLATES: SequenceTemplate[] = [
   {
     id: "sales-multichannel",
     name: "Sales Outreach (Email + SMS + WhatsApp)",
-    description: "Multi-channel outreach sequence like GHL snapshot campaigns.",
+    description: "Secuencia multicanal: email, SMS y WhatsApp.",
     category: "multichannel",
     triggerType: "manual",
     tags: ["sms", "whatsapp", "outbound"],
@@ -176,7 +176,7 @@ const OFFICIAL_TEMPLATES: SequenceTemplate[] = [
   {
     id: "post-purchase-thanks",
     name: "Post-Purchase Thank You + Upsell",
-    description: "Thank you after purchase + cross-sell email (ecommerce GHL).",
+    description: "Agradecimiento post-compra + email de cross-sell.",
     category: "sales",
     triggerType: "tag_added",
     triggerConfig: { tag: "customer" },

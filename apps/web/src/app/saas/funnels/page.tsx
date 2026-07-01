@@ -667,7 +667,7 @@ export default function SaasFunnelsPage() {
 
           {funnelTemplates.length > 0 && (
             <DarkCard className="p-4">
-              <p className="text-sm font-semibold text-white">Plantillas funnel GHL ({funnelTemplates.length})</p>
+              <p className="text-sm font-semibold text-white">Plantillas funnel Nelvyon ({funnelTemplates.length})</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {funnelTemplates.map((t) => (
                   <div key={t.id} className="rounded-lg border border-white/10 p-3">

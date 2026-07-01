@@ -1,5 +1,5 @@
 /**
- * Official funnel templates — GHL snapshot parity.
+ * Plantillas oficiales Nelvyon — embudos de venta y captación.
  */
 import { getSaasFunnelService, type CreateFunnelInput } from "./SaasFunnelService";
 
@@ -50,7 +50,7 @@ const OFFICIAL: FunnelTemplate[] = [
   {
     id: "webinar-funnel",
     name: "Webinar registration",
-    description: "HubSpot-style webinar funnel.",
+    description: "Embudo de registro para webinars.",
     category: "lead-gen",
     steps: [
       { type: "landing", name: "Registro webinar", ctaLabel: "Reservar plaza" },
@@ -72,7 +72,7 @@ const OFFICIAL: FunnelTemplate[] = [
   {
     id: "vsl-funnel",
     name: "VSL → Oferta",
-    description: "Video sales letter clásico GHL.",
+    description: "Video sales letter con oferta y checkout.",
     category: "lead-gen",
     steps: [
       { type: "video", name: "VSL principal", content: "Vídeo de ventas 15 min" },

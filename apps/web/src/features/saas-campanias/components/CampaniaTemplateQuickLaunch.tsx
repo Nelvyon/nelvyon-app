@@ -42,8 +42,8 @@ export function CampaniaTemplateQuickLaunch({ onCreated }: { onCreated: () => vo
     <NelvyonDsCard className="mb-4 overflow-hidden border-[#0084ff]/20">
       <button type="button" className="flex w-full items-center justify-between px-4 py-3 text-left" onClick={() => setExpanded((v) => !v)}>
         <div>
-          <p className="text-sm font-semibold text-white">Plantillas campaña email</p>
-          <p className="text-xs text-white/50">HubSpot/GHL — importa en 1 clic ({presets.length})</p>
+          <p className="text-sm font-semibold text-white">Plantillas campaña Nelvyon</p>
+          <p className="text-xs text-white/50">Importa en 1 clic ({presets.length} plantillas)</p>
         </div>
         <span className="text-white/40">{expanded ? "▲" : "▼"}</span>
       </button>

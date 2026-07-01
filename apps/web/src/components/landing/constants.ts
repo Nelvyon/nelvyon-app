@@ -114,7 +114,7 @@ export const COMPARISON_ROWS = [
   { tool: "SEO y posicionamiento", competitor: "Semrush, Ahrefs", price: "€199/mes" },
   { tool: "Publicidad IA Google+Meta", competitor: "Agencia", price: "€500/mes" },
   { tool: "Email Marketing", competitor: "Klaviyo, Mailchimp", price: "€99/mes" },
-  { tool: "CRM y pipeline", competitor: "HubSpot, Salesforce", price: "€169/mes" },
+  { tool: "CRM y pipeline", competitor: "CRM externos", price: "€169/mes" },
   { tool: "Web Builder", competitor: "Webflow, WordPress", price: "€49/mes" },
   { tool: "Redes sociales", competitor: "Hootsuite, Buffer", price: "€79/mes" },
   { tool: "Dialer y llamadas", competitor: "Aircall, Twilio", price: "€99/mes" },

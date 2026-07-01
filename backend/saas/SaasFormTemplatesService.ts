@@ -1,5 +1,5 @@
 /**
- * Official form templates — GHL/HubSpot lead capture parity.
+ * Plantillas oficiales Nelvyon — captación de leads y formularios profesionales.
  */
 import { DbClient } from "../db/DbClient";
 
@@ -34,7 +34,7 @@ const OFFICIAL: FormTemplate[] = [
   {
     id: "lead-capture-basic",
     name: "Lead Capture",
-    description: "Nombre, email y teléfono — estándar GHL landing.",
+    description: "Nombre, email y teléfono — captación estándar para landing pages.",
     category: "lead-capture",
     tags: ["lead", "landing"],
     fields: [
@@ -59,7 +59,7 @@ const OFFICIAL: FormTemplate[] = [
   {
     id: "event-rsvp",
     name: "RSVP Evento / Webinar",
-    description: "Registro para eventos — estilo HubSpot forms.",
+    description: "Registro para eventos y webinars.",
     category: "event",
     tags: ["webinar", "event"],
     fields: [
@@ -84,7 +84,7 @@ const OFFICIAL: FormTemplate[] = [
   {
     id: "booking-request",
     name: "Reserva de cita",
-    description: "Formulario de citas para negocios locales (GHL calendar).",
+    description: "Formulario de citas para negocios locales.",
     category: "booking",
     tags: ["calendar", "local"],
     fields: [
@@ -109,7 +109,7 @@ const OFFICIAL: FormTemplate[] = [
   {
     id: "contact-us",
     name: "Contacto general",
-    description: "Formulario de contacto clásico HubSpot.",
+    description: "Formulario de contacto profesional.",
     category: "lead-capture",
     tags: ["contact"],
     fields: [

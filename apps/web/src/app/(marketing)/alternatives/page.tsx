@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "NELVYON vs Agencias y SaaS — Alternativa IA",
   description:
-    "Compara NELVYON con agencias de marketing, Jasper, Copy.ai, HubSpot y herramientas tradicionales. 80+ servicios IA a una fracción del coste.",
+    "Compara NELVYON con agencias de marketing, Jasper, Copy.ai y herramientas tradicionales. 80+ servicios IA a una fracción del coste.",
 };
 
 const COMPARISONS = [
@@ -29,14 +29,14 @@ const COMPARISONS = [
     ],
   },
   {
-    competitor: "HubSpot",
+    competitor: "Suite CRM tradicional",
     them: [
-      "800€+/mes en planes completos",
+      "Planes elevados en funciones avanzadas",
       "Configuración compleja",
       "Requiere equipo dedicado",
       "Curva de aprendizaje alta",
     ],
-    us: ["Desde 47€/mes", "Funciona desde el día 1", "Sin equipo necesario", "Cero configuración manual"],
+    us: ["Desde 47€/mes", "Funciona desde el día 1", "Sin equipo necesario", "Plantillas oficiales Nelvyon"],
   },
 ] as const;
 

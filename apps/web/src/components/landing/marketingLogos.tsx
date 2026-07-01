@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export type MarqueeLogo = { name: string; icon: ReactNode };
 
-export const GHL_MARQUEE_LOGOS: MarqueeLogo[] = [
+export const NELVYON_INTEGRATION_LOGOS: MarqueeLogo[] = [
   {
     name: "Zapier",
     icon: (
@@ -105,5 +105,8 @@ export const GHL_MARQUEE_LOGOS: MarqueeLogo[] = [
   },
 ];
 
-/** @deprecated use GHL_MARQUEE_LOGOS */
-export const INTEGRATION_LOGOS = GHL_MARQUEE_LOGOS;
+/** @deprecated use NELVYON_INTEGRATION_LOGOS */
+export const GHL_MARQUEE_LOGOS = NELVYON_INTEGRATION_LOGOS;
+
+/** @deprecated use NELVYON_INTEGRATION_LOGOS */
+export const INTEGRATION_LOGOS = NELVYON_INTEGRATION_LOGOS;

@@ -777,11 +777,16 @@ export {
   type SequenceTemplateCategory,
 } from "./SaasSequenceTemplatesService";
 export {
+  SaasStarterPackService,
+  getSaasStarterPackService,
+  resetSaasStarterPackServiceForTests,
+  type StarterPackResult,
+  // deprecated aliases
   SaasGhlStarterPackService,
   getSaasGhlStarterPackService,
   resetSaasGhlStarterPackServiceForTests,
   type GhlStarterPackResult,
-} from "./SaasGhlStarterPackService";
+} from "./SaasStarterPackService";
 export {
   SaasFormTemplatesService,
   SaasFormTemplatesError,

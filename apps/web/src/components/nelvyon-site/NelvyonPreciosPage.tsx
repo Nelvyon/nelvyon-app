@@ -31,7 +31,7 @@ export function NelvyonPreciosPage() {
         <FadeUp>
           <h1 className="text-4xl font-bold text-white md:text-6xl">Planes NELVYON</h1>
           <p className="mx-auto mt-6 max-w-xl text-zinc-400">
-            Estilo GoHighLevel, alma NELVYON. Elige el plan que escala con tu imperio.
+            Plataforma oficial NELVYON. Elige el plan que escala con tu negocio.
           </p>
           <div className="mt-10 inline-flex rounded-full border border-white/10 bg-white/5 p-1">
             <button

@@ -130,7 +130,7 @@ function ConnectorCard({
       <div className="mt-auto flex flex-col gap-2">
         {isConnected && conn.slug === "hubspot" && onSync && (
           <NelvyonDsButton variant="primary" onClick={() => onSync(conn.slug)} className="w-full">
-            Sincronizar HubSpot
+            Sincronizar contactos
           </NelvyonDsButton>
         )}
         {isConnected ? (
@@ -227,7 +227,7 @@ function IntegracionesContent() {
     if (slug !== "hubspot") return;
     const res = await fetch("/api/saas/integrations/hubspot/sync", { method: "POST" });
     if (res.ok) void load();
-    else alert("Error al sincronizar HubSpot — verifica la conexión OAuth");
+    else alert("Error al sincronizar — verifica la conexión OAuth");
   }
 
   const filtered = connections.filter((c) => {

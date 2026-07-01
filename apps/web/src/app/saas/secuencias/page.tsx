@@ -338,8 +338,8 @@ function SequenceTemplateGallery({ onImported }: { onImported: () => void }) {
     <NelvyonDsCard className="mb-6 overflow-hidden border-[#0084ff]/20">
       <button type="button" className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left" onClick={() => setExpanded((v) => !v)}>
         <div>
-          <p className="font-semibold text-white">Plantillas drip (GHL / HubSpot)</p>
-          <p className="text-xs text-white/50">{templates.length} secuencias listas — email, SMS y WhatsApp</p>
+          <p className="font-semibold text-white">Plantillas oficiales Nelvyon</p>
+          <p className="text-xs text-white/50">{templates.length} secuencias drip — email, SMS y WhatsApp</p>
         </div>
         <span className="text-white/40">{expanded ? "▲" : "▼"}</span>
       </button>
@@ -441,7 +441,7 @@ export default function SecuenciasPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Secuencias</h1>
-            <p className="text-white/50 text-sm mt-1">Drip campaigns — email, SMS, WhatsApp. 10+ plantillas GHL importables.</p>
+            <p className="text-white/50 text-sm mt-1">Secuencias drip multicanal — plantillas oficiales Nelvyon</p>
           </div>
           <button
             onClick={() => setShowCreate(true)}

@@ -288,10 +288,10 @@ const OFFICIAL_RECIPES: WorkflowRecipe[] = [
     id: "missed-call-text-back",
     tenantId: null,
     name: "Missed Call → SMS Text-Back",
-    description: "GHL-style: send an SMS when you miss a call (trigger manually or via webhook).",
+    description: "Envía un SMS de respuesta cuando pierdes una llamada.",
     category: "support",
     triggerType: "manual",
-    tags: ["sms", "missed-call", "ghl"],
+    tags: ["sms", "missed-call", "nelvyon"],
     isOfficial: true,
     nodes: [
       { id: "n1", type: "trigger", label: "Missed Call", data: { triggerType: "manual" } },
@@ -306,7 +306,7 @@ const OFFICIAL_RECIPES: WorkflowRecipe[] = [
     description: "Send a WhatsApp message after an unanswered outreach attempt.",
     category: "lead-nurture",
     triggerType: "manual",
-    tags: ["whatsapp", "follow-up", "ghl"],
+    tags: ["whatsapp", "follow-up", "nelvyon"],
     isOfficial: true,
     nodes: [
       { id: "n1", type: "trigger", label: "Manual Trigger", data: { triggerType: "manual" } },

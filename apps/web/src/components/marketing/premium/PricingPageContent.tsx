@@ -64,7 +64,7 @@ export function PricingPageContent() {
           className="mx-auto max-w-3xl text-center"
         >
           <span className="inline-block rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold text-indigo-400 mb-4">
-            Mejor que HubSpot + GoHighLevel juntos
+            Plataforma oficial Nelvyon — marketing con IA
           </span>
           <h1 className="text-4xl font-bold tracking-tight text-white md:text-6xl">
             Todo lo que necesitas.<br />
@@ -92,7 +92,7 @@ export function PricingPageContent() {
               >
                 {plan.featured && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-1 text-xs font-semibold text-white whitespace-nowrap">
-                    ⭐ Más popular — vs HubSpot 800€/mes
+                    ⭐ Más popular — plan recomendado
                   </span>
                 )}
                 <div>
@@ -195,7 +195,7 @@ export function PricingPageContent() {
                 { q: "¿Puedo cancelar en cualquier momento?", a: "Sí. Sin permanencia ni penalizaciones. Cancelas desde tu panel de facturación y mantienes acceso hasta el final del período pagado." },
                 { q: "¿Los precios incluyen IVA?", a: "Los precios mostrados son sin IVA. El IVA aplicable se calcula según tu país de residencia en el checkout de Stripe." },
                 { q: "¿Hay prueba gratuita?", a: "Ofrecemos 7 días de reembolso si el servicio no estuvo disponible más de 24 horas por causas nuestras. Consulta nuestra política de reembolso." },
-                { q: "¿Qué diferencia hay con HubSpot o GoHighLevel?", a: "NELVYON incluye agentes IA que ejecutan tareas reales (no solo dashboards), es más fácil de usar, y tiene todos los módulos en un solo plan sin add-ons. HubSpot Pro cuesta 800€/mes y GoHighLevel 497$/mes — ambos sin IA real." },
+                { q: "¿Qué incluye NELVYON?", a: "NELVYON incluye agentes IA que ejecutan tareas reales (no solo dashboards), todos los módulos en un solo plan sin add-ons, y plantillas oficiales de workflows, secuencias y formularios listas para importar." },
                 { q: "¿Puedo cambiar de plan?", a: "Sí. Puedes subir o bajar de plan en cualquier momento desde tu panel de facturación. El cambio aplica en el próximo ciclo." },
               ].map(({ q, a }) => (
                 <div key={q} className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6">

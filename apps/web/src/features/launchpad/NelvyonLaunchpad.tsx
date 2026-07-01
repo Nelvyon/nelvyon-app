@@ -164,8 +164,8 @@ export function NelvyonLaunchpad({ preferredPack }: { preferredPack?: EliteSecto
             </p>
             <h2 className="mt-1 text-xl font-semibold">De cero a resultados en 30 días</h2>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-              Mejor que el Launchpad de GHL: un solo hilo que conecta packs, Ads, embudos, email y
-              dashboards CEO. Sin pantallas vacías — cada paso abre una plantilla lista.
+              Tu centro de mando: un solo hilo que conecta packs, Ads, embudos, email y
+              dashboards CEO. Sin pantallas vacías — cada paso abre una plantilla oficial Nelvyon.
             </p>
           </div>
           <div className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-center">

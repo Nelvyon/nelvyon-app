@@ -61,7 +61,7 @@ export const PLANS = [
     id: "pro",
     name: "Pro",
     price: 297,
-    description: "El favorito de empresas que quieren superar a HubSpot y GHL juntos.",
+    description: "El favorito de empresas que quieren escalar marketing con IA y automatización real.",
     highlights: [
       "CRM ilimitado",
       "Email + SMS + WhatsApp ilimitados",

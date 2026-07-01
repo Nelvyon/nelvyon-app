@@ -16,7 +16,7 @@ export function SaasPlatformComparisonTable() {
           <div className="text-center">
             <SectionBadge>COMPARATIVA SAAS</SectionBadge>
             <h2 className="mt-4 text-2xl font-extrabold text-white md:text-4xl">
-              NELVYON vs plataformas del mercado
+              NELVYON: todo en uno vs stack fragmentado
             </h2>
           </div>
         </FadeIn>

@@ -90,8 +90,8 @@ export function ActivationChecklist({ onDismiss }: { onDismiss?: () => void }) {
 
       {!packDone && !steps.workflow && (
         <div className="mb-4 rounded-lg border border-primary/30 bg-primary/10 p-3">
-          <p className="text-sm font-medium text-foreground">⚡ Pack GHL + HubSpot Starter</p>
-          <p className="text-xs text-muted-foreground mt-1">6 workflows + 4 secuencias drip en 1 clic</p>
+          <p className="text-sm font-medium text-foreground">⚡ Kit de arranque Nelvyon</p>
+          <p className="text-xs text-muted-foreground mt-1">6 workflows + 4 secuencias oficiales en 1 clic</p>
           <button
             type="button"
             disabled={packLoading}
