@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { SaasVoiceCommand } from "./SaasVoiceCommand";
+import { PlatformHealthBanner } from "./PlatformHealthBanner";
 
 /**
  * Premium dark shell wrapper for all real SaaS pages.
@@ -65,7 +66,10 @@ export function SaasShellLayout({
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
           {/* Desktop sidebar */}
           <div className="hidden lg:block">{sidebar}</div>
-          <main className="space-y-6 min-w-0">{children}</main>
+          <main className="space-y-6 min-w-0">
+            <PlatformHealthBanner />
+            {children}
+          </main>
         </div>
 
         {/* Global voice command FAB (free Web Speech API) */}

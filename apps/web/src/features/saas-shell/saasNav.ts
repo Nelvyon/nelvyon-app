@@ -1,6 +1,7 @@
 /** Visible SaaS product navigation — only modules with real tenant APIs + wired UI. */
 export type SaasNavId =
   | "dashboard"
+  | "setup"
   | "crm"
   | "pipeline"
   | "campanias"
@@ -77,6 +78,7 @@ export type SaasNavItem = {
 export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   // Core
   { id: "dashboard", label: "Dashboard", href: "/saas/dashboard", group: "principal" },
+  { id: "setup", label: "⚙️ Configuración", href: "/saas/setup", group: "principal" },
   { id: "inbox", label: "📥 Bandeja Unificada", href: "/saas/inbox", group: "principal" },
   { id: "crm", label: "CRM", href: "/saas/crm", group: "principal" },
   { id: "pipeline", label: "Pipeline", href: "/saas/pipeline", group: "principal" },

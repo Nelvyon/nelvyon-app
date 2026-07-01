@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import {
   getSaasWorkflowService,
+  isSesEnvConfigured,
   requireSaasContext,
   SaasWorkflowError,
   saasErrorBody,
@@ -40,7 +41,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ triggers: ALL_TRIGGERS, actions: ALL_ACTIONS });
     }
     const workflows = await getSaasWorkflowService().getWorkflows(ctx.tenant.id);
-    const ses_configured = Boolean(process.env.SES_FROM_EMAIL && process.env.SES_ACCESS_KEY_ID);
+    const ses_configured = isSesEnvConfigured();
     return NextResponse.json({ workflows, ses_configured });
   } catch (e: unknown) {
     if (e instanceof SaasWorkflowError) return mapError(e);

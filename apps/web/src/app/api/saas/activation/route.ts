@@ -106,20 +106,38 @@ export async function PATCH(req: Request) {
     await ensureSchema();
     const db = DbClient.getInstance();
 
+    const fields: string[] = [];
+    const values: unknown[] = [tenantId];
+    let idx = 2;
+
+    const map: Array<[keyof typeof body, string]> = [
+      ["profile", "step_profile"],
+      ["contact", "step_contact"],
+      ["campaign", "step_campaign"],
+      ["workflow", "step_workflow"],
+      ["social", "step_social"],
+      ["billing", "step_billing"],
+    ];
+
+    for (const [key, col] of map) {
+      if (body[key] !== undefined) {
+        fields.push(`${col} = $${idx}`);
+        values.push(body[key]);
+        idx++;
+      }
+    }
+
+    if (fields.length === 0) {
+      return NextResponse.json({ ok: true });
+    }
+
     await db.query(
-      `INSERT INTO saas_activation_checklist (
-        tenant_id, step_profile, step_contact, step_campaign, step_workflow, step_social, step_billing
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-      ON CONFLICT (tenant_id) DO UPDATE SET
-        step_profile  = COALESCE(EXCLUDED.step_profile, saas_activation_checklist.step_profile),
-        step_contact  = COALESCE(EXCLUDED.step_contact, saas_activation_checklist.step_contact),
-        step_campaign = COALESCE(EXCLUDED.step_campaign, saas_activation_checklist.step_campaign),
-        step_workflow = COALESCE(EXCLUDED.step_workflow, saas_activation_checklist.step_workflow),
-        step_social   = COALESCE(EXCLUDED.step_social, saas_activation_checklist.step_social),
-        step_billing  = COALESCE(EXCLUDED.step_billing, saas_activation_checklist.step_billing),
-        updated_at    = NOW()`,
-      [tenantId, body.profile ?? false, body.contact ?? false, body.campaign ?? false,
-       body.workflow ?? false, body.social ?? false, body.billing ?? false],
+      `INSERT INTO saas_activation_checklist (tenant_id)
+       VALUES ($1)
+       ON CONFLICT (tenant_id) DO UPDATE SET
+         ${fields.join(", ")},
+         updated_at = NOW()`,
+      values,
     );
 
     return NextResponse.json({ ok: true });

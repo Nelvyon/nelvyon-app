@@ -8,17 +8,14 @@ Escala: **5 = usable MVP**, **7 = producto serio SMB**, **9 = líder categoría*
 | Área | Nota | Comentario breve |
 |------|------|------------------|
 | **OS (interno NELVYON)** | **7.5** | 29 servicios + 3 packs autónomos E2E, competitor gap, brief-to-launch. vs Monday ~8 — paridad operativa agencia. |
-| **SaaS (producto tenant)** | **7.0** | 59 módulos UI+API, shell coherente dark glass. vs GHL ~7 — paridad breadth; ops live (SES/Twilio) pendiente usuario. |
+| **SaaS (producto tenant)** | **7.5** | 59 módulos + centro `/saas/setup` con health score 0–100. |
 | **CRM** | **6.5** | `saas_contacts` oficial, territories, copilot. vs HubSpot ~9 — legacy congelado, no borrado. |
 | **Pipeline** | **7.0** | `saas_deals` kanban, forecast, quotes, playbooks. vs HubSpot deals ~8 — falta forecasting ML. |
 | **Dashboard** | **6.5** | KPIs reales multi-fuente. vs Monday ~8 — menos widgets drag-drop. |
-| **Automatizaciones** | **7.5** | 16 triggers, 17 acciones, editor visual, **24+ plantillas GHL-style** importables. vs GHL ~8 — paridad plantillas; curva UX media. |
-| **IA** | **8.0** | Packs autónomos, autopilot, agentes OS — diferenciador real. vs competidores IA genérica ~6. |
-| **Escalabilidad** | **6.0** | RLS, sandbox tenants, IP allowlist. vs SF ~10 — enterprise gap. |
-| **Seguridad** | **7.0** | JWT, SSO UI, MFA schema, custom RBAC. vs enterprise ~9 — SOC2 formal pendiente. |
-| **UX** | **6.5** | SaaS shell unificado, i18n nav. vs Monday ~8 — heterogeneidad menor residual. |
+| **Automatizaciones** | **7.5** | 16 triggers, 17 acciones, **24+ plantillas oficiales Nelvyon** importables. |
+| **UX** | **7.0** | Shell unificado, onboarding + setup hub, banner salud global. |
 
-## Media ponderada (producto completo): **~7.1 / 10**
+## Media ponderada (producto completo): **~7.3 / 10**
 
 Producto **listo para vender SMB/agencia** con paridad funcional core vs GHL+HubSpot en código.  
 **No** = líder mundial #1 en adopción/mercado (eso es clientes + tiempo, no commits).

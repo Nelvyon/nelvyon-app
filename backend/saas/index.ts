@@ -1238,6 +1238,22 @@ export {
   type IntegrationsSummary,
 } from "./SaasIntegrationsHubService";
 export {
+  SaasPlatformHealthService,
+  getSaasPlatformHealthService,
+  resetSaasPlatformHealthServiceForTests,
+  type PlatformHealthReport,
+  type PlatformHealthItem,
+  type HealthItemStatus,
+  type ActivationSteps,
+} from "./SaasPlatformHealthService";
+export {
+  isSesEnvConfigured,
+  isTwilioEnvConfigured,
+  isStripeEnvConfigured,
+  isEnvKeysConfigured,
+  missingEnvKeys,
+} from "./saasEnv";
+export {
   syncOAuthProviderToHub,
   loadOAuthSlugStatus,
   resolveOAuthProviderByState,

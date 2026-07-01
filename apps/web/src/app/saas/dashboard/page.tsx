@@ -11,6 +11,7 @@ import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/feat
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { SaasShellLayout, DarkCard, StatCard } from "@/features/saas-shell/components/SaasShellLayout";
 import { ActivationChecklist } from "@/features/saas-shell/components/ActivationChecklist";
+import { AccountHealthScore } from "@/features/saas-shell/components/PlatformHealthBanner";
 import { trackEvent } from "@/lib/analytics";
 import type { SaasPlan, SaasTenantDto } from "../onboarding/components/types";
 
@@ -141,10 +142,13 @@ export default function SaasDashboardPage() {
       }
     >
       {/* Header */}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">SaaS Dashboard</p>
-        <h1 className="mt-1 text-2xl font-bold text-white">{t("dashboard.welcome", { company: tenant.companyName })}</h1>
-        <p className="mt-0.5 text-sm text-white/40">{now}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">SaaS Dashboard</p>
+          <h1 className="mt-1 text-2xl font-bold text-white">{t("dashboard.welcome", { company: tenant.companyName })}</h1>
+          <p className="mt-0.5 text-sm text-white/40">{now}</p>
+        </div>
+        <AccountHealthScore />
       </div>
 
       <ActivationChecklist />

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import {
   getSaasCampaniasService,
+  isSesEnvConfigured,
   requireSaasContext,
   SaasCampaniasError,
   saasErrorBody,
@@ -22,7 +23,7 @@ export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "campanias.read");
     const campanias = await getSaasCampaniasService().getCampanias(ctx.tenant.id);
-    const ses_configured = Boolean(process.env.SES_FROM_EMAIL && process.env.SES_ACCESS_KEY_ID);
+    const ses_configured = isSesEnvConfigured();
     return NextResponse.json({ campanias, ses_configured });
   } catch (e: unknown) {
     if (e instanceof SaasCampaniasError) return mapError(e);
