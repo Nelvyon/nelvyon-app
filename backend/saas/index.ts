@@ -1286,3 +1286,69 @@ export {
   type DeliverableRevenueWithMeta,
   type PackRevenueSummary,
 } from "./SaasDeliverableRevenueService";
+export {
+  SaasSecurityEnterpriseService,
+  SaasSecurityEnterpriseError,
+  getSaasSecurityEnterpriseService,
+  resetSaasSecurityEnterpriseServiceForTests,
+  extractClientIp,
+  type IpAllowlistConfig,
+  type CustomRole,
+  type Territory,
+  type SandboxLink,
+  type MfaStatus,
+} from "./SaasSecurityEnterpriseService";
+export {
+  SaasDeliverabilityService,
+  getSaasDeliverabilityService,
+  resetSaasDeliverabilityServiceForTests,
+  type DeliverabilitySnapshot,
+  type DedicatedIpConfig,
+} from "./SaasDeliverabilityService";
+export {
+  SaasUsageMeterService,
+  getSaasUsageMeterService,
+  type UsageSnapshot,
+} from "./SaasUsageMeterService";
+export {
+  SaasMarketplaceService,
+  getSaasMarketplaceService,
+  type MarketplaceApp,
+} from "./SaasMarketplaceService";
+export {
+  SaasWebhookDlqService,
+  getSaasWebhookDlqService,
+  type WebhookFailure,
+} from "./SaasWebhookDlqService";
+export {
+  SaasAdsOptimizerService,
+  getSaasAdsOptimizerService,
+  type AdsOptimizerRule,
+} from "./SaasAdsOptimizerService";
+export {
+  SaasHubSpotSyncService,
+  getSaasHubSpotSyncService,
+  type HubSpotSyncState,
+} from "./SaasHubSpotSyncService";
+export {
+  SaasGdprService,
+  saasGdprService,
+  type GdprRequest,
+  type GdprRequestType,
+  type GdprRequestStatus,
+} from "./SaasGdprService";
+export {
+  SaasCrmCopilotService,
+  getSaasCrmCopilotService,
+  type CrmCopilotSuggestion,
+} from "./SaasCrmCopilotService";
+export {
+  SaasTwilioA2pService,
+  getSaasTwilioA2pService,
+  type A2pRegistration,
+} from "./SaasTwilioA2pService";
+export {
+  OsPremiumAutonomousService,
+  getOsPremiumAutonomousService,
+  type OsAutonomousKickoffResult,
+} from "./OsPremiumAutonomousService";

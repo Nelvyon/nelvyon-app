@@ -106,6 +106,20 @@ export class SaasGdprService {
       [userId],
     );
   }
+
+  /** Tenant-wide CRM export (admin compliance). */
+  async exportTenantBundle(tenantId: string): Promise<Record<string, unknown>> {
+    const [contacts, deals, auditLogs] = await Promise.all([
+      this.db.query(`SELECT * FROM saas_contacts WHERE tenant_id=$1`, [tenantId]),
+      this.db.query(`SELECT * FROM saas_deals WHERE tenant_id=$1`, [tenantId]),
+      this.db.query(`SELECT * FROM audit_logs WHERE tenant_id=$1 ORDER BY created_at DESC LIMIT 500`, [tenantId]),
+    ]);
+    return { tenantId, exportedAt: new Date().toISOString(), contacts, deals, auditLogs };
+  }
+
+  async deleteContactById(tenantId: string, contactId: string): Promise<void> {
+    await this.db.query(`DELETE FROM saas_contacts WHERE id=$1 AND tenant_id=$2`, [contactId, tenantId]);
+  }
 }
 
 export const saasGdprService = new SaasGdprService();

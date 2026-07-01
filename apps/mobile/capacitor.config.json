@@ -1,0 +1,14 @@
+{
+  "appId": "com.nelvyon.saas",
+  "appName": "Nelvyon",
+  "webDir": "../web/.next/standalone/apps/web",
+  "server": {
+    "url": "https://nelvyon.com/saas/dashboard",
+    "cleartext": false
+  },
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}

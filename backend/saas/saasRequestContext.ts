@@ -13,6 +13,11 @@ import {
   type SaasRole,
 } from "./saasRbac";
 import { SaasPlanQuotaError } from "./saasPlanLimits";
+import {
+  extractClientIp,
+  getSaasSecurityEnterpriseService,
+  SaasSecurityEnterpriseError,
+} from "./SaasSecurityEnterpriseService";
 
 export type SaasRequestContext = {
   claims: JwtPayload;
@@ -33,6 +38,30 @@ async function resolveTenantAccess(userId: string): Promise<{ tenant: SaasTenant
   }
 
   const db = DbClient.getInstance();
+
+  try {
+    const ssoRows = await db.query<MemberTenantRow>(
+      `SELECT 'member' AS member_role, ${ST_TENANT_SELECT}
+       FROM saas_sso_identities si
+       JOIN saas_tenants st ON st.id = si.tenant_id
+       WHERE si.user_id = $1::text
+         AND st.onboarding_completed = true
+       ORDER BY st.created_at ASC
+       LIMIT 1`,
+      [userId],
+    );
+    const ssoRow = ssoRows[0];
+    if (ssoRow) {
+      const { member_role, ...tenantRow } = ssoRow;
+      return {
+        tenant: saasTenantFromRow(tenantRow),
+        role: mapWorkspaceRoleToSaas(member_role),
+      };
+    }
+  } catch {
+    /* saas_sso_identities may be absent before migration 444 */
+  }
+
   const rows = await db.query<MemberTenantRow>(
     `SELECT wm.role AS member_role, ${ST_TENANT_SELECT}
      FROM workspace_members wm
@@ -68,7 +97,28 @@ export async function requireSaasContext(req: Request, action: SaasAction): Prom
   }
 
   const { tenant, role } = await resolveTenantAccess(claims.userId);
-  assertSaasPermission(role, action);
+
+  let customPerms: SaasAction[] | null = null;
+  try {
+    customPerms = await getSaasSecurityEnterpriseService().getCustomPermissions(tenant.id, claims.userId);
+  } catch {
+    /* migration 482 optional in test DB */
+  }
+  if (customPerms && !customPerms.includes(action)) {
+    throw new SaasRbacError("Forbidden", "FORBIDDEN");
+  } else if (!customPerms) {
+    assertSaasPermission(role, action);
+  }
+
+  try {
+    const ipCfg = await getSaasSecurityEnterpriseService().getIpAllowlist(tenant.id);
+    getSaasSecurityEnterpriseService().assertIpAllowed(ipCfg, extractClientIp(req));
+  } catch (e) {
+    if (e instanceof SaasSecurityEnterpriseError) {
+      throw new SaasRbacError(e.message, "FORBIDDEN");
+    }
+    /* missing saas_tenant_ip_allowlist table — skip until migrate 482 */
+  }
 
   return { claims, tenant, role };
 }

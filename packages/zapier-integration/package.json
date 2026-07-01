@@ -1,0 +1,10 @@
+{
+  "name": "nelvyon-zapier",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zapier integration for Nelvyon Public API",
+  "main": "index.js",
+  "scripts": {
+    "test": "node -e \"require('./index.js')\""
+  }
+}

@@ -668,7 +668,12 @@ export default function SaasWorkflowsPage() {
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <NelvyonDsSectionHeader title="Workflows" subtitle="Automaciones trigger → condición → acción. 16 triggers, 17 acciones." />
-          <NelvyonDsButton onClick={() => { setEditing(null); setShowBuilder(true); }}>+ Nuevo workflow</NelvyonDsButton>
+          <div className="flex gap-2">
+            <a href="/saas/workflows/editor" className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white">
+              Editor visual
+            </a>
+            <NelvyonDsButton onClick={() => { setEditing(null); setShowBuilder(true); }}>+ Nuevo workflow</NelvyonDsButton>
+          </div>
         </div>
 
         {sesOk === false && (

@@ -203,6 +203,42 @@ export class SaasSsoService {
     );
     return rows[0]?.tenant_id ?? null;
   }
+
+  /** Decrypt stored client secret for token exchange. */
+  async getClientSecret(tenantId: string): Promise<string> {
+    const rows = await this.db.query<{ client_secret_enc: string }>(
+      `SELECT client_secret_enc FROM saas_sso_configs WHERE tenant_id=$1 LIMIT 1`,
+      [tenantId],
+    );
+    if (!rows[0]?.client_secret_enc) {
+      throw new SaasSsoError("SSO not configured", "NOT_FOUND");
+    }
+    return decryptSecret(rows[0].client_secret_enc);
+  }
+
+  /** Link SSO user to tenant workspace for RBAC resolution. */
+  async ensureWorkspaceMember(params: {
+    tenantId: string;
+    userId: string;
+    email?: string;
+    role?: "member" | "viewer" | "admin";
+  }): Promise<void> {
+    const wsRows = await this.db.query<{ workspace_id: number }>(
+      `SELECT workspace_id FROM saas_tenants WHERE id=$1 LIMIT 1`,
+      [params.tenantId],
+    );
+    const workspaceId = wsRows[0]?.workspace_id;
+    if (!workspaceId) return;
+
+    await this.db.query(
+      `INSERT INTO workspace_members (workspace_id, user_id, role, status, email, joined_at, created_at)
+       SELECT $1, $2, $3, 'active', $4, NOW()::text, NOW()::text
+       WHERE NOT EXISTS (
+         SELECT 1 FROM workspace_members WHERE workspace_id=$1 AND user_id=$2
+       )`,
+      [workspaceId, params.userId, params.role ?? "member", params.email ?? null],
+    );
+  }
 }
 
 // ── Mappers ───────────────────────────────────────────────────────────────────

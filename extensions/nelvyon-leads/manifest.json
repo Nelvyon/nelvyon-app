@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Nelvyon Lead Capture",
+  "version": "1.0.0",
+  "description": "Captura leads desde LinkedIn y web hacia Nelvyon CRM",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://*.nelvyon.com/*", "https://nelvyon.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Nelvyon Capture"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

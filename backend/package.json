@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "dependencies": {
     "ioredis": "^5.8.2",
+    "otpauth": "^9.5.1",
     "posthog-node": "^5.8.4"
   }
 }

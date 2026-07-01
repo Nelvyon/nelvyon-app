@@ -9,6 +9,7 @@ on:
     - cron: "*/15 * * * *"  # social-publish queue
     - cron: "5 0 * * *"     # workflow-date (00:05 UTC daily)
     - cron: "0 6 * * *"     # saas-dunning (daily 06:00 UTC)
+    - cron: "0 7 * * *"     # saas-sequences (daily 07:00 UTC)
     - cron: "0 8 1 * *"     # os-recurring-services (1st of month)
     - cron: "0 6 1 * *"     # os-learning-loop (1st of month)
   workflow_dispatch:
@@ -23,6 +24,7 @@ on:
           - social-publish
           - workflow-date
           - saas-dunning
+          - saas-sequences
           - os-recurring-services
           - os-learning-loop
           - all
@@ -97,6 +99,23 @@ jobs:
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
             -H "Authorization: Bearer $CRON_SECRET" \
             "$BASE_URL/api/cron/saas-dunning")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  saas-sequences:
+    if: github.event.schedule == '0 7 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'saas-sequences' || github.event.inputs.job == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger saas-sequences cron
+        env:
+          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/saas-sequences")
           echo "HTTP $code"
           cat /tmp/cron.out
           test "$code" = "200" -o "$code" = "204"
