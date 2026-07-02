@@ -9,6 +9,7 @@ const navPath = join(root, "apps/web/src/features/saas-shell/saasNav.ts");
 /** Canonical GET probe path per sidebar id (must match real route.ts). */
 const SAAS_API_BY_ID = {
   dashboard: "/api/saas/dashboard",
+  setup: "/api/saas/setup",
   inbox: "/api/saas/inbox",
   crm: "/api/saas/crm/contacts",
   pipeline: "/api/saas/pipeline",
@@ -53,6 +54,10 @@ const SAAS_API_BY_ID = {
   copywriter: "/api/saas/ai-copy",
   entregables: "/api/saas/entregables",
   reportes: "/api/saas/reportes",
+  attribution: "/api/saas/attribution",
+  deliverability: "/api/saas/deliverability",
+  marketplace: "/api/saas/marketplace",
+  security: "/api/saas/security",
   integraciones: "/api/saas/integrations",
   herramientas: "/api/saas/integrations",
   voice: "/api/saas/voice",

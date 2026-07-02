@@ -91,6 +91,18 @@ VALUES
   ('hubspot-sync', 'HubSpot Sync', 'Sincronización bidireccional contactos y deals', 'Nelvyon', 'crm', 0),
   ('google-analytics', 'Google Analytics 4', 'Eventos de conversión desde funnels', 'Nelvyon', 'analytics', 0)
 ON CONFLICT (slug) DO NOTHING
+;
+CREATE TABLE IF NOT EXISTS saas_ads_optimizer_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,
+  platform TEXT NOT NULL,
+  name TEXT NOT NULL,
+  condition_json JSONB NOT NULL DEFAULT '{}',
+  action_json JSONB NOT NULL DEFAULT '{}',
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  last_run_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 `;
 
 function splitStatements(sql: string): string[] {

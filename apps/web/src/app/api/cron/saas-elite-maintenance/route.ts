@@ -33,18 +33,27 @@ export async function GET(req: Request) {
   let hubspotTenants = 0;
   let crmTenants = 0;
 
-  const adTenants = await db.query<{ tenant_id: string }>(
-    `SELECT DISTINCT tenant_id FROM saas_ads_optimizer_rules WHERE enabled=true`,
-  );
-  for (const row of adTenants) {
-    await adsSvc.evaluateRules(row.tenant_id, []);
-    adsTenants++;
+  try {
+    const adTenants = await db.query<{ tenant_id: string }>(
+      `SELECT DISTINCT tenant_id FROM saas_ads_optimizer_rules WHERE enabled=true`,
+    );
+    for (const row of adTenants) {
+      await adsSvc.evaluateRules(row.tenant_id, []);
+      adsTenants++;
+    }
+  } catch {
+    /* migration 482 optional until migrate */
   }
 
-  const hubRows = await db.query<{ tenant_id: string }>(
-    `SELECT tenant_id FROM saas_integration_connections
-     WHERE connector_slug='hubspot' AND status='connected'`,
-  );
+  let hubRows: { tenant_id: string }[] = [];
+  try {
+    hubRows = await db.query<{ tenant_id: string }>(
+      `SELECT tenant_id FROM saas_integration_connections
+       WHERE connector_slug='hubspot' AND status='connected'`,
+    );
+  } catch {
+    hubRows = [];
+  }
   for (const row of hubRows) {
     try {
       const token = await refreshHubSpotAccessTokenIfNeeded(row.tenant_id);
