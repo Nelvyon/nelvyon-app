@@ -32,6 +32,8 @@ import {
   dbCreateClient,
   platformDbFallbackEnabled,
 } from "@/lib/platformDbFallback";
+import { buildGenericProductionDeliverable } from "@/lib/packs/genericProductionDeliverable";
+import { containsMockUrl } from "@/lib/packs/localPackProduction";
 
 /** Returns true only when AUTONOMOUS_PRODUCTION=true is set in the environment. */
 export function isAutonomousProductionEnabled(): boolean {
@@ -273,19 +275,35 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   };
 
   if (shouldPublish) {
-    const mapped = params.mapSkuDeliverable?.({
-      sku: params.sku,
-      simulation,
-      intake: params.intake,
-      brief,
-      packRunId: params.packRunId,
-      osClientId: params.osClientId,
-      osProjectId: params.osProjectId,
-      workspaceId: params.workspaceId,
-      projectSlug: params.projectSlug,
-    });
+    const mapped =
+      params.mapSkuDeliverable?.({
+        sku: params.sku,
+        simulation,
+        intake: params.intake,
+        brief,
+        packRunId: params.packRunId,
+        osClientId: params.osClientId,
+        osProjectId: params.osProjectId,
+        workspaceId: params.workspaceId,
+        projectSlug: params.projectSlug,
+      }) ??
+      (params.publishProductionDeliverables
+        ? buildGenericProductionDeliverable({
+            sku: params.sku,
+            packId: params.packId,
+            packRunId: params.packRunId,
+            intake: params.intake,
+            simulation,
+            osClientId: params.osClientId,
+            osProjectId: params.osProjectId,
+            workspaceId: params.workspaceId,
+          })
+        : undefined);
 
     if (mapped) {
+      if (containsMockUrl(mapped.file_url) || containsMockUrl(mapped.metadata)) {
+        throw new Error(`Production deliverable for ${params.sku} contains mock:// — blocked`);
+      }
       // Enrich mapped deliverable with personalized content
       const enriched: PackDeliverableInput = {
         ...mapped,
@@ -298,9 +316,10 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       };
       const id = await dbCreatePackDeliverable(enriched);
       deliverableIds.push(id);
-    } else if (simulation.os_publish) {
+    } else if (simulation.os_publish && !params.publishProductionDeliverables) {
       for (const d of simulation.os_publish.deliverables) {
         if (d.visibility !== "client") continue;
+        if (containsMockUrl(d.value)) continue;
         const id = await dbCreatePackDeliverable({
           workspaceId: params.workspaceId,
           clientId: params.osClientId,

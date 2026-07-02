@@ -4,6 +4,8 @@
  *
  * Flow: operator login → POST kickoff → portal invite → portal login → 5 deliverables sin mock://
  */
+import { installScriptTimeoutGuard } from "./lib/smoke-fetch.mjs";
+
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const BACKEND_API =
   process.env.STAGING_BACKEND_API?.trim() || "https://nelvyon-app-production.up.railway.app";
@@ -399,6 +401,8 @@ async function verifyLiveAssets(slug) {
 }
 
 async function main() {
+  const clearGuard = installScriptTimeoutGuard(20 * 60 * 1000, "local-pack-e2e");
+  try {
   console.log(`Local Pack E2E → ${BASE}\n`);
   await waitForDeploy();
 
@@ -465,6 +469,9 @@ async function main() {
   }
   console.log(CRITICAL.length > 0 ? "CRITICAL_FAIL" : "WARN_FAIL");
   process.exit(1);
+  } finally {
+    clearGuard();
+  }
 }
 
 main().catch((e) => {

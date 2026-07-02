@@ -27,6 +27,13 @@ function run(label, cmd, args, opts = {}) {
 
 const steps = [
   {
+    label: "anti-mock-production",
+    run: () =>
+      run("anti-mock-production", process.execPath, [
+        join(root, "scripts/check-no-mock-production.mjs"),
+      ]),
+  },
+  {
     label: "anti-stub",
     run: () => run("anti-stub", process.execPath, [join(root, "scripts/check-saas-stubs.mjs")]),
   },
@@ -61,6 +68,8 @@ const steps = [
         "run",
         "src/lib/packs/__tests__",
         "../../backend/autonomous/__tests__/runAutonomousSimulation.test.ts",
+        "../../backend/autonomous/__tests__/productionDeliverables.test.ts",
+        "src/lib/packs/__tests__/genericProductionDeliverable.test.ts",
         "--reporter=dot",
       ]),
   },

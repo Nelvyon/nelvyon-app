@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { resolveLlmMode } from "./llm/llmAdapter";
 import { executePipelinePhaseC, initPhaseCProject } from "./pipelines/runPipelinePhaseC";
 import { buildOsPublishPayload } from "./publish/osPublishPayload";
+import { isAutonomousProductionPublish } from "./publish/productionDeliverableUrls";
 import { requiresOperatorEscalation } from "./sectors/sectorQa";
 import { pickPipelineTemplate, skuToTemplateContext } from "./templates/pipelineTemplateSelector";
 import { recordPostQaOutcome } from "./templates/recordPostQaOutcome";
@@ -119,10 +120,13 @@ export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResu
     if (sectorEscalate) {
       project.status = "ESCALATE_OPERATOR";
       escalated = true;
-      os_publish = buildOsPublishPayload(project, { dry_run: true });
+      os_publish = buildOsPublishPayload(project, { dry_run: true, production: isAutonomousProductionPublish() });
     } else {
       project.status = "OS_PUBLISH_READY";
-      os_publish = buildOsPublishPayload(project);
+      os_publish = buildOsPublishPayload(project, {
+        dry_run: !isAutonomousProductionPublish(),
+        production: isAutonomousProductionPublish(),
+      });
     }
   } else {
     project.status = "ESCALATE_OPERATOR";

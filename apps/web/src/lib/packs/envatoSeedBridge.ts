@@ -17,11 +17,26 @@ type MetadataEntry = {
 };
 
 function metadataPath(): string {
-  return path.join(process.cwd(), "backend", "data", "envato-seeds-metadata.json");
+  return path.join(resolveMonorepoRoot(), "backend", "data", "envato-seeds-metadata.json");
 }
 
 function onDiskDir(sector: string): string {
-  return path.join(process.cwd(), "backend", "data", "envato-seeds", sector);
+  return path.join(resolveMonorepoRoot(), "backend", "data", "envato-seeds", sector);
+}
+
+function resolveMonorepoRoot(): string {
+  const candidates = [
+    process.cwd(),
+    path.join(process.cwd(), ".."),
+    path.join(process.cwd(), "../.."),
+  ];
+  for (const root of candidates) {
+    if (fs.existsSync(path.join(root, "backend", "data"))) return root;
+    if (fs.existsSync(path.join(root, "backend", "autonomous", "templates", "registry.json"))) {
+      return root;
+    }
+  }
+  return process.cwd();
 }
 
 export function loadEnvatoSectorSeed(sectorId: string, index: number): SectorSeed | null {

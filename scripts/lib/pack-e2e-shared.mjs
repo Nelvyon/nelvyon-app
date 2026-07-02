@@ -1,6 +1,7 @@
 /**
  * Shared helpers for pack E2E staging smokes (growth + beta).
  */
+import { smokeFetch } from "./smoke-fetch.mjs";
 export const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 export const BACKEND_API =
   process.env.STAGING_BACKEND_API?.trim() || "https://nelvyon-app-production.up.railway.app";
@@ -27,7 +28,7 @@ export async function waitForDeploy(label, skipWait) {
   console.log(`Waiting for staging deploy (${label})…`);
   for (let i = 1; i <= 12; i += 1) {
     try {
-      const health = await fetch(`${BASE}/api/health/live`, { cache: "no-store" });
+      const health = await smokeFetch(`${BASE}/api/health/live`, { cache: "no-store" }, 20_000);
       if (health.status === 200) {
         console.log("DEPLOY_READY");
         return;
@@ -40,7 +41,7 @@ export async function waitForDeploy(label, skipWait) {
 }
 
 export async function operatorLogin() {
-  const res = await fetch(`${BASE}/api/auth/login`, {
+  const res = await smokeFetch(`${BASE}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: QA_EMAIL, password: QA_PASSWORD }),
@@ -53,7 +54,7 @@ export async function operatorLogin() {
 export async function getWorkspaceId(token) {
   const fallback = process.env.QA_WORKSPACE_ID || "1";
   try {
-    const res = await fetch(`${BASE}/api/platform/workspaces/list`, {
+    const res = await smokeFetch(`${BASE}/api/platform/workspaces/list`, {
       headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
       cache: "no-store",
     });
@@ -77,18 +78,18 @@ export async function resolveApiBase(path, token, workspaceId, method = "GET", b
   };
   if (body) headers["Content-Type"] = "application/json";
 
-  let res = await fetch(`${BASE}${path}`, {
+  let res = await smokeFetch(`${BASE}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
-  });
+  }, 60_000);
   if (res.status !== 404) return { res, base: BASE };
 
-  res = await fetch(`${BACKEND_API}${path}`, {
+  res = await smokeFetch(`${BACKEND_API}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
-  });
+  }, 60_000);
   return { res, base: BACKEND_API };
 }
 
@@ -130,7 +131,7 @@ export async function pollPackRun(token, workspaceId, packId, runId, maxAttempts
     if (res.ok) {
       const run = await res.json();
       console.log(JSON.stringify({ poll: i, status: run.status, steps: run.steps?.length }));
-      if (run.status === "completed" || run.status === "needs_review" || run.status === "failed") {
+      if (run.status === "completed" || run.status === "failed") {
         return run;
       }
     }
@@ -140,7 +141,7 @@ export async function pollPackRun(token, workspaceId, packId, runId, maxAttempts
 }
 
 export async function createPortalInvite(token, workspaceId, clientId, email) {
-  const res = await fetch(`${BASE}/api/platform/portal/invites`, {
+  const res = await smokeFetch(`${BASE}/api/platform/portal/invites`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -161,7 +162,7 @@ export async function createPortalInvite(token, workspaceId, clientId, email) {
 }
 
 export async function acceptPortalInvite(inviteToken, password) {
-  const res = await fetch(`${BASE}/api/platform/portal/auth/accept-invite`, {
+  const res = await smokeFetch(`${BASE}/api/platform/portal/auth/accept-invite`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -179,7 +180,7 @@ export async function acceptPortalInvite(inviteToken, password) {
 }
 
 export async function portalLogin(email, password) {
-  const res = await fetch(`${BASE}/api/platform/portal/auth/login`, {
+  const res = await smokeFetch(`${BASE}/api/platform/portal/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -202,7 +203,7 @@ export async function ensurePortalSmokeUser(token, workspaceId, opts = {}) {
     /* create via invite */
   }
 
-  const reportRes = await fetch(
+  const reportRes = await smokeFetch(
     `${BASE}/api/platform/pack-report?pack_id=local-business-growth&limit=5`,
     {
       headers: {
@@ -230,7 +231,7 @@ export async function ensurePortalSmokeUser(token, workspaceId, opts = {}) {
 }
 
 export async function fetchPortalDeliverables(portalToken, projectId) {
-  const res = await fetch(
+  const res = await smokeFetch(
     `${BASE}/api/platform/portal/deliverables?project_id=${projectId}&page_size=50`,
     { headers: { Authorization: `Bearer ${portalToken}`, Accept: "application/json" } },
   );

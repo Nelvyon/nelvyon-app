@@ -56,6 +56,10 @@ jobs:
         working-directory: .
         run: node scripts/check-saas-stubs.mjs
 
+      - name: Anti-mock production gate (0 mock:// in pack deliverable paths)
+        working-directory: .
+        run: node scripts/check-no-mock-production.mjs
+
       - name: Anti-v1 gate (falla si /saas/* pages llaman /api/v1/)
         working-directory: .
         run: node scripts/check-no-v1-saas-pages.mjs
@@ -71,6 +75,14 @@ jobs:
       - name: Validate SaaS migrations 401–490
         working-directory: .
         run: node scripts/validate-saas-migrations.mjs
+
+      - name: OS pack gate (8 packs fixtures + QA)
+        working-directory: .
+        run: node scripts/run-os-pack-gate.mjs
+
+      - name: Local elite reinforce (TSC + ESLint + pack tests)
+        working-directory: .
+        run: pnpm -C apps/web elite:reinforce
 
       - name: Python pytest (FastAPI core)
         working-directory: backend

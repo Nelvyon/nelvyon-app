@@ -182,7 +182,7 @@ export function buildLandingStagingIsolated(input: LandingStagingBuildInput): La
 
   const build = {
     version: 2,
-    staging_url: `mock://autonomous/phase-h/${host}/preview.html`,
+    staging_url: `https://staging.nelvyon.com/autonomous/phase-h/${host}/preview.html`,
     preview_file: "preview.html",
     builder_ref: "landing_builder_service",
     builder_mode: "staging_blocks_export",

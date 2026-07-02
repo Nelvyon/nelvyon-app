@@ -4,6 +4,7 @@ import type { AutonomousProject, OsPublishPayload } from "../types";
 import type { DeployPreviewResult } from "../deploy/types";
 import type { LiveQaComparison } from "../qa/playwrightLiveQa";
 import { buildPhaseHPublishPayload } from "./buildPhaseHPublishPayload";
+import { productionArtifactUrl, sanitizePublishValue } from "./productionDeliverableUrls";
 
 export function buildPhaseIPublishPayload(
   project: AutonomousProject,
@@ -19,6 +20,7 @@ export function buildPhaseIPublishPayload(
   const dryRun = options?.dry_run ?? true;
   const stagingUrl = input.deploy.staging_url ?? input.deploy.preview_url;
   const previewUrl = input.deploy.preview_url ?? stagingUrl;
+  const slug = project.os_refs.project_slug;
 
   const phaseH = buildPhaseHPublishPayload(
     {
@@ -27,7 +29,7 @@ export function buildPhaseIPublishPayload(
         ...project.artifacts,
         build: {
           ...(project.artifacts.build as Record<string, unknown>),
-          staging_url: stagingUrl ?? "mock://autonomous/phase-i/preview.html",
+          staging_url: stagingUrl ?? productionArtifactUrl(slug, "preview.html"),
           preview_url: previewUrl,
           preview_file: "preview.html",
         },
@@ -57,25 +59,28 @@ export function buildPhaseIPublishPayload(
       {
         type: "url",
         label: "Landing staging CDN",
-        value: stagingUrl ?? "mock://autonomous/phase-i/preview.html",
+        value: sanitizePublishValue(
+          stagingUrl ?? "",
+          productionArtifactUrl(slug, "preview.html"),
+        ),
         visibility: "internal",
       },
       {
         type: "file",
         label: "Preview HTML (source)",
-        value: "mock://autonomous/phase-i/preview.html",
+        value: productionArtifactUrl(slug, "preview.html"),
         visibility: "internal",
       },
       {
         type: "file",
         label: "Deploy metadata",
-        value: "mock://autonomous/phase-i/deploy_metadata.json",
+        value: productionArtifactUrl(slug, "deploy_metadata.json"),
         visibility: "internal",
       },
       {
         type: "file",
         label: "QA Report",
-        value: "mock://autonomous/phase-i/qaReport.json",
+        value: productionArtifactUrl(slug, "qaReport.json"),
         visibility: "internal",
       },
     ],

@@ -2,6 +2,7 @@
 
 import type { AutonomousProject, OsPublishPayload } from "../types";
 import { buildOsPublishPayload } from "./osPublishPayload";
+import { productionArtifactUrl, sanitizePublishValue } from "./productionDeliverableUrls";
 import type { PreviewMetadata } from "../wrappers/landingBuilderStaging";
 import type { StagingQaResult } from "../qa/playwrightStagingQa";
 
@@ -16,6 +17,8 @@ export function buildPhaseHPublishPayload(
 ): OsPublishPayload {
   const base = buildOsPublishPayload(project, { dry_run: options?.dry_run ?? true });
   const build = project.artifacts.build as { staging_url?: string; preview_file?: string };
+  const slug = project.os_refs.project_slug;
+  const previewFile = build?.preview_file ?? "preview.html";
 
   return {
     ...base,
@@ -25,25 +28,28 @@ export function buildPhaseHPublishPayload(
       {
         type: "url",
         label: "Landing preview staging",
-        value: build?.staging_url ?? "mock://autonomous/phase-h/preview.html",
+        value: sanitizePublishValue(
+          build?.staging_url ?? "",
+          productionArtifactUrl(slug, previewFile),
+        ),
         visibility: "internal",
       },
       {
         type: "file",
         label: "Preview HTML",
-        value: `mock://autonomous/phase-h/${build?.preview_file ?? "preview.html"}`,
+        value: productionArtifactUrl(slug, previewFile),
         visibility: "internal",
       },
       {
         type: "file",
         label: "QA Report",
-        value: "mock://autonomous/phase-h/qaReport.json",
+        value: productionArtifactUrl(slug, "qaReport.json"),
         visibility: "internal",
       },
       {
         type: "json",
         label: "Assets manifest",
-        value: "mock://autonomous/phase-h/assetsManifest.json",
+        value: productionArtifactUrl(slug, "assetsManifest.json"),
         visibility: "internal",
       },
     ],

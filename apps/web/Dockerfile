@@ -28,6 +28,12 @@ EXPOSE 3000
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=builder /app/backend/db ./backend/db
+# Runtime assets for pack kickoff (template registry, envato metadata, dynamic backend imports)
+COPY --from=builder /app/backend/autonomous ./backend/autonomous
+COPY --from=builder /app/backend/data ./backend/data
+COPY --from=builder /app/backend/saas ./backend/saas
+COPY --from=builder /app/backend/os-agents ./backend/os-agents
+COPY --from=builder /app/backend/email ./backend/email
 COPY --from=builder /app/apps/web/.next ./apps/web/.next
 COPY --from=builder /app/apps/web/.source ./apps/web/.source
 COPY --from=builder /app/apps/web/public ./apps/web/public

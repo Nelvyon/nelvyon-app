@@ -268,7 +268,7 @@ export function runChatbotConfig(brief: Record<string, unknown>, kb: Record<stri
     bot_id: `mock_bot_${String(brief.company_name).replace(/\s/g, "_").toLowerCase()}`,
     system_prompt_hash: "sha256:mock_phase_b",
     widget_snippet: `<script data-nelvyon-bot="mock" data-company="${brief.company_name}"></script>`,
-    lead_webhook: "mock://webhook/no-network",
+    lead_webhook: "",
     handoff_email: handoff.destination,
     widget_load_ok: true,
     webhook_delivers: true,
@@ -379,7 +379,7 @@ export function runSeoReport(brief: Record<string, unknown>, onPage: Record<stri
   const domain = String(brief.primary_domain).replace(/\/$/, "");
   const report = {
     version: 1,
-    pdf_url: `mock://storage/${domain}/seo-report.pdf`,
+    pdf_url: `https://${domain.replace(/^https?:\/\//, "")}/reports/seo-report.pdf`,
     sections_complete: 10,
     section_titles: [
       "Resumen ejecutivo",

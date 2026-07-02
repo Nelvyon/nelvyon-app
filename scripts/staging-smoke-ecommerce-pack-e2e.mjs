@@ -4,6 +4,8 @@
  *
  * Flow: operator login → POST kickoff → poll → portal invite → accept → login → deliverables sin mock://
  */
+import { installScriptTimeoutGuard } from "./lib/smoke-fetch.mjs";
+
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const BACKEND_API =
   process.env.STAGING_BACKEND_API?.trim() || "https://nelvyon-app-production.up.railway.app";
@@ -292,6 +294,8 @@ async function checkDeliverables(portalToken, projectId) {
 }
 
 async function main() {
+  const clearGuard = installScriptTimeoutGuard(20 * 60 * 1000, "ecommerce-pack-e2e");
+  try {
   console.log(`\n=== Ecommerce Growth Pack E2E smoke [${RUN_ID}] ===\n`);
   await waitForDeploy();
 
@@ -350,6 +354,9 @@ async function main() {
 
   printSummary();
   process.exit(CRITICAL.length === 0 && WARN.length === 0 ? 0 : 1);
+  } finally {
+    clearGuard();
+  }
 }
 
 function printSummary() {

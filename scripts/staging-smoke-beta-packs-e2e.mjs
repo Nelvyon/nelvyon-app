@@ -18,6 +18,7 @@ import {
   waitForDeploy,
 } from "./lib/pack-e2e-shared.mjs";
 import { finishSmokeGate } from "./lib/smoke-summary.mjs";
+import { installScriptTimeoutGuard } from "./lib/smoke-fetch.mjs";
 
 const SKIP_WAIT = process.argv.includes("--skip-wait");
 const packArgIdx = process.argv.indexOf("--pack");
@@ -150,6 +151,8 @@ async function runBetaPackE2e(token, workspaceId, pack) {
 }
 
 async function main() {
+  const clearGuard = installScriptTimeoutGuard(20 * 60 * 1000, "beta-packs-e2e");
+  try {
   console.log(`Beta Packs E2E → ${BASE}\n`);
   await waitForDeploy("beta packs", SKIP_WAIT);
 
@@ -177,6 +180,9 @@ async function main() {
   console.log(`Packs OK: ${ok}/${packs.length}`);
   const code = finishSmokeGate({ critical: CRITICAL, warn: WARN, passLabel: "ALL_BETA_PACKS_PASS" });
   process.exit(code);
+  } finally {
+    clearGuard();
+  }
 }
 
 main().catch((e) => {
