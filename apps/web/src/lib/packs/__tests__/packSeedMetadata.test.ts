@@ -33,8 +33,8 @@ vi.mock("@/lib/packs/packRunStore", () => ({
   markStep: (...args: any[]) => mockMarkStep(...args),
 }));
 
-vi.mock("../../../../../../backend/autonomous/simulator", () => ({
-  simulateAutonomousJob: ({ sku }: { sku: string }) => ({
+vi.mock("../../../../../../backend/autonomous/runAutonomousSimulation", () => ({
+  runAutonomousSimulation: ({ sku }: { sku: string }) => ({
     project: { qa: { score: 90, passed: true }, project_id: "proj-1", sku, artifacts: {}, os_refs: {} },
     escalated: false,
     os_publish: null,

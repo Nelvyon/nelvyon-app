@@ -79,7 +79,7 @@ export function validateConsistency(sku: AutonomousSku, brief: Record<string, un
 
   if (sku === "NELVYON-LANDING") {
     const strategy = artifacts.strategy as { single_cta?: string; template_id?: string } | undefined;
-    const copy = artifacts.copy as { hero?: { cta_label?: string } } | undefined;
+    const copy = artifacts.copy as { hero?: { cta_label?: string; headline?: string } } | undefined;
     const design = artifacts.design as { template_id?: string } | undefined;
     if (strategy?.single_cta && copy?.hero?.cta_label && strategy.single_cta !== copy.hero.cta_label) {
       issues.push({ code: "CONSIST-cta", message: "CTA mismatch strategy vs copy", blocking: false });
@@ -96,7 +96,7 @@ export function validateConsistency(sku: AutonomousSku, brief: Record<string, un
 
   if (sku === "NELVYON-CHATBOT") {
     const strategy = artifacts.strategy as { persona?: { name?: string } } | undefined;
-    const config = artifacts.config as { bot_id?: string } | undefined;
+    const config = artifacts.config as { bot_id?: string; widget_snippet?: string } | undefined;
     const botName = String(brief.bot_name ?? "");
     if (strategy?.persona?.name && strategy.persona.name !== botName) {
       issues.push({ code: "CONSIST-bot-name", message: "persona name != brief.bot_name", blocking: false });

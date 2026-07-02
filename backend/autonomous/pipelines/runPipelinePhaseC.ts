@@ -141,7 +141,7 @@ async function runSeoPhaseC(project: AutonomousProject, attempt: number): Promis
   }
 
   project.status = "PRODUCING";
-  const pagesTarget = (pm.data as { pages_target: number }).pages_target;
+  const pagesTarget = Number((pm.data as { pages_target?: unknown }).pages_target) || 5;
 
   const st = await llmStrategistSeo(brief, pagesTarget);
   artifacts.priority = st.data;

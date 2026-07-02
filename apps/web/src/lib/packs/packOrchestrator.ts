@@ -1,4 +1,4 @@
-import { simulateAutonomousJob } from "../../../../../backend/autonomous/simulator";
+import { runAutonomousSimulation } from "../../../../../backend/autonomous/runAutonomousSimulation";
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
 import { runVisualQa } from "../../../../../backend/autonomous/qa/visualQaEngine";
 import { personalizeForSector } from "@/lib/packs/packSeedTemplates";
@@ -211,7 +211,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       /* agent data is best-effort — never block the pack run */
     }
   }
-  const simulation = simulateAutonomousJob({
+  const simulation = await runAutonomousSimulation({
     sku: params.sku,
     tier: params.intake.tier ?? "professional",
     brief,

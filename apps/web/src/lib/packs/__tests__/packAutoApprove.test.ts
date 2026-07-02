@@ -47,8 +47,8 @@ const mockSimulate = vi.fn(({ sku }: { sku: string }) => ({
   },
   simulation_mode: "production",
 }));
-vi.mock("../../../../../../backend/autonomous/simulator", () => ({
-  simulateAutonomousJob: (args: unknown) => mockSimulate(args as { sku: string }),
+vi.mock("../../../../../../backend/autonomous/runAutonomousSimulation", () => ({
+  runAutonomousSimulation: (args: unknown) => mockSimulate(args as { sku: string }),
 }));
 
 // --- Email mock -------------------------------------------------------------

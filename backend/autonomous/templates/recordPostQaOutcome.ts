@@ -11,12 +11,17 @@ import {
   resolveStorageMode,
   templateOutcomeRepository,
   type RecordOutcomeInput,
+  type StorageMode,
 } from "./templateOutcomeRepository";
 import type { ResultStatus, TemplateOutcome } from "./types";
 import { normalizeOutcome } from "./templateOutcome";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTCOMES_SNAPSHOT_DIR = join(__dirname, "..", "output", "learning", "pipeline-outcomes");
+
+function toStoredMode(mode: StorageMode): PostQaRecordResult["stored"] {
+  return mode === "none" ? "json_only" : mode;
+}
 
 export interface PostQaRecordResult {
   stored: "db" | "local" | "json_only";
@@ -111,11 +116,11 @@ export async function recordPostQaOutcome(params: {
   if (!learningDbEnabled()) {
     if (resolveStorageMode() === "local") {
       const { id, mode } = await templateOutcomeRepository.recordOutcome(input);
-      return { stored: mode, outcome, id };
+      return { stored: toStoredMode(mode), outcome, id };
     }
     return { stored: "json_only", outcome };
   }
 
   const { id, mode } = await templateOutcomeRepository.recordOutcome(input);
-  return { stored: mode, outcome, id };
+  return { stored: toStoredMode(mode), outcome, id };
 }
