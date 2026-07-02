@@ -429,8 +429,6 @@ export async function chargePartnerClientPack(params: {
   await ensurePartnerRebillingSchema();
 
   let stripeEventId: string | null = null;
-  let paymentIntentId: string | undefined;
-  let clientSecret: string | null | undefined;
 
   if (!isStripeConnectConfigured()) {
     throw new Error("STRIPE_SECRET_KEY required for partner pack charges");
@@ -464,8 +462,8 @@ export async function chargePartnerClientPack(params: {
       client_workspace_id: String(params.clientWorkspaceId),
     },
   });
-  paymentIntentId = pi.id;
-  clientSecret = pi.client_secret;
+  const paymentIntentId = pi.id;
+  const clientSecret = pi.client_secret;
   stripeEventId = pi.id;
 
   const row = await insertLedgerEntry({

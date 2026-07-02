@@ -56,9 +56,23 @@ vi.mock("../../../../../../backend/email/emailService", () => ({
   sendEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
-// --- Visual QA mock — always passes for orchestrator tests ------------------
 vi.mock("../../../../../../backend/autonomous/qa/visualQaEngine", () => ({
   runVisualQa: vi.fn(() => ({ score: 95, legal_passed: true, checks: { contrast_passes_aa: true } })),
+}));
+
+vi.mock("@nelvyon/saas", () => ({
+  getOsTemplateDnaService: () => ({
+    getLearningRankMap: vi.fn().mockResolvedValue(new Map()),
+  }),
+  getOsQaReviewQueueService: () => ({
+    enqueue: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
+vi.mock("../../../../../../backend/os-agents/sectors/OsSectorReadinessService", () => ({
+  getOsSectorReadinessService: () => ({
+    getReadinessScore: vi.fn().mockResolvedValue(null),
+  }),
 }));
 
 // ---------------------------------------------------------------------------

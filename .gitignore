@@ -94,8 +94,15 @@ backend/autonomous/output/
 backend/data/envato-seeds/**/*.zip
 backend/data/envato-seeds-metadata.json
 backend/data/envato-seeds-metadata.json.*
+backend/data/sector-template-catalog.json
 backend/data/*.bak
+backend/os-agents/seeds/download-envato-*.ts
+backend/os-agents/seeds/run-envato-*.ts
+backend/os-agents/seeds/envato-metadata-io.ts
+backend/os-agents/seeds/os-service-template-catalog.ts
+backend/os-agents/seeds/sector-template-catalog.ts
 backend/data/voice_pilot*/
 *.bat
+.claude/agents/
 .envato-browser-profile/
 .edge-envato-download-profile*/

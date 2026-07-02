@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validates SaaS migration files 401–487 exist (no gaps in elite range).
+ * Validates SaaS migration files 401–490 exist (no gaps in elite range).
  */
 import fs from "node:fs";
 import path from "node:path";

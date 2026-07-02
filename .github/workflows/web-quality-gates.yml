@@ -68,7 +68,7 @@ jobs:
         env:
           CI: "true"
 
-      - name: Validate SaaS migrations 401–487
+      - name: Validate SaaS migrations 401–490
         working-directory: .
         run: node scripts/validate-saas-migrations.mjs
 

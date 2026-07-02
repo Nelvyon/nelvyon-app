@@ -1,8 +1,8 @@
 # INVENTARIO_FRENTES — Nelvyon
 
 > Generado desde código: `saasNav.ts`, `osShellNav.ts`, `os-service-template-catalog.ts`  
-> HEAD: post `3f54dc39` + batch 2 | Prod: https://nelvyon.com  
-> Regresión prod: **VERDE** — `staging-smoke-saas-all-modules.mjs` (59) + `staging-smoke-os-all-services.mjs` (25 previews + 11 platform)
+> HEAD: `a0f28677` (batch 6 + beta smokes) | Prod: https://nelvyon.com  
+> Código producto (sin Envato): **100%** · Envato plantillas: **último paso**
 
 ---
 
@@ -17,7 +17,7 @@
 | **Código completo (UI + API)** | **98/98** SaaS tienen `/api/saas/*`; OS premium tienen preview |
 | **Smoke prod verificado** | **59 SaaS** + **25 OS previews** + **11 platform** (scripts jun-2026) |
 | **Bloqueado solo por ops** | **~28** frentes (SES, Stripe, Twilio, OAuth, crons, redes, Envato) |
-| **Código pendiente real** | **0** — Claude Code cerrado; resto es ops manual |
+| **Código pendiente real** | **0** (excepto biblioteca Envato — último) |
 
 ### Veredicto
 
