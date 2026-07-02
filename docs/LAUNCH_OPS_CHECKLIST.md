@@ -86,9 +86,32 @@ curl -s -o /dev/null -w "%{http_code}" -X POST \
   https://nelvyon.com/api/cron/os-recurring-services
 ```
 
+```bash
+curl -s -o /dev/null -w "%{http_code}" -X POST \
+  -H "Authorization: Bearer $CRON_SECRET" \
+  https://nelvyon.com/api/cron/pwa-push-dispatch
+```
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" -X POST \
+  -H "Authorization: Bearer $CRON_SECRET" \
+  https://nelvyon.com/api/cron/os-sector-certification
+```
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" \
+  -H "Authorization: Bearer $CRON_SECRET" \
+  https://nelvyon.com/api/cron/saas-elite-maintenance
+```
+
+### PWA push
+
+- [ ] `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (mailto: o https://)
+
 ### OAuth integraciones
 
-- [ ] Meta, Google Ads, LinkedIn, HubSpot, Slack en Railway
+- [ ] Meta, Google Ads, LinkedIn, HubSpot, Salesforce, Pipedrive, Zoho, Snapchat en Railway
+- [ ] `STRIPE_WEBHOOK_CONNECT_SECRET` (partner ledger)
 - [ ] Conectar en https://nelvyon.com/saas/integraciones
 
 ### OS autónomo
@@ -100,7 +123,11 @@ $env:BASE_URL="https://nelvyon.com"
 node scripts/run-os-autonomous-gate.mjs --base-url https://nelvyon.com
 ```
 
-### Envato plantillas (opcional, local)
+```bash
+node scripts/run-staging-beta-packs-e2e.mjs --skip-wait
+```
+
+### Envato plantillas (opcional, local — ÚLTIMO)
 
 - [ ] Descargas `.bat` — **no commitear** metadata masivo
 - [ ] Post-launch biblioteca assets

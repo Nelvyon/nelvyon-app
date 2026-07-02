@@ -335,7 +335,7 @@
       "disable_enforce": "Disable SSO enforced",
       "callback_url":    "Callback URL for your IdP",
       "no_permission":   "Only owners/admins can configure SSO.",
-      "saml_coming_soon":"SAML 2.0 coming soon. Currently supported: OIDC.",
+      "saml_coming_soon":"SAML 2.0 is available. Configure IdP, SSO URL and certificate in Security. OIDC also supported.",
       "status_optional": "Optional",
       "status_enforced": "Enforced"
     },

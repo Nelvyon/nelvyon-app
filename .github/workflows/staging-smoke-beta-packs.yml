@@ -1,0 +1,35 @@
+name: Staging Beta Packs E2E
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/staging-smoke-beta-packs-e2e.mjs"
+      - "scripts/run-staging-beta-packs-e2e.mjs"
+      - "scripts/lib/pack-e2e-shared.mjs"
+      - "apps/web/src/lib/packs/betaPacksRunners.ts"
+      - "apps/web/src/lib/packs/packRegistry.ts"
+      - ".github/workflows/staging-smoke-beta-packs.yml"
+
+concurrency:
+  group: staging-beta-packs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  beta-packs-e2e:
+    name: Beta packs E2E (5)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run beta packs E2E smokes
+        env:
+          STAGING_BASE_URL: https://nelvyon.com
+        run: node scripts/run-staging-beta-packs-e2e.mjs --skip-wait

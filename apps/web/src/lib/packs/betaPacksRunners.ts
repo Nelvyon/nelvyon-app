@@ -94,6 +94,7 @@ async function runBetaPack(
           "Personaliza con tu branding en /saas/brand",
         ],
       }),
+      reportDeliverableTitle: "Informe ejecutivo",
       projectDescription: (i) => `${meta.name}: ${i.business_name} — ${i.city}`,
     },
   });
