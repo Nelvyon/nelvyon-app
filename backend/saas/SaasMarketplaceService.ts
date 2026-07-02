@@ -1,5 +1,6 @@
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
+import { ensureEliteWorldClassSchema } from "./ensureEliteWorldClassSchema";
 
 export type MarketplaceApp = {
   id: string;
@@ -16,7 +17,12 @@ export class SaasMarketplaceService {
   constructor(private readonly deps: { db?: Pick<DbClient, "query"> } = {}) {}
   private get db() { return this.deps.db ?? DbClientClass.getInstance(); }
 
+  private async ensureSchema(): Promise<void> {
+    await ensureEliteWorldClassSchema(this.db);
+  }
+
   async listApps(tenantId: string): Promise<MarketplaceApp[]> {
+    await this.ensureSchema();
     const rows = await this.db.query<Record<string, unknown>>(
       `SELECT a.id, a.slug, a.name, a.description, a.author, a.category, a.install_count,
               (ti.app_id IS NOT NULL) AS installed
@@ -39,6 +45,7 @@ export class SaasMarketplaceService {
   }
 
   async install(tenantId: string, appId: string): Promise<void> {
+    await this.ensureSchema();
     await this.db.query(
       `INSERT INTO saas_tenant_installed_apps (tenant_id, app_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`,
       [tenantId, appId],
@@ -50,6 +57,7 @@ export class SaasMarketplaceService {
   }
 
   async uninstall(tenantId: string, appId: string): Promise<void> {
+    await this.ensureSchema();
     await this.db.query(
       `DELETE FROM saas_tenant_installed_apps WHERE tenant_id=$1 AND app_id=$2`,
       [tenantId, appId],

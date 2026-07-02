@@ -14,6 +14,7 @@ const extraArgs = skipWait ? ["--skip-wait"] : [];
 const GATES = [
   { name: "P0", script: "run-staging-p0-smokes.mjs" },
   { name: "beta-packs", script: "run-staging-beta-packs-e2e.mjs" },
+  { name: "os-saas-100", script: "verify-os-saas-100.mjs" },
 ];
 
 let failed = false;

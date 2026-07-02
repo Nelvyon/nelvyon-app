@@ -4,6 +4,7 @@ import { Secret, TOTP } from "otpauth";
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import { encryptSecret, decryptSecret } from "./SaasSsoService";
+import { ensureEliteWorldClassSchema } from "./ensureEliteWorldClassSchema";
 import type { SaasAction } from "./saasRbac";
 
 export class SaasSecurityEnterpriseError extends Error {
@@ -42,7 +43,12 @@ export class SaasSecurityEnterpriseService {
   constructor(private readonly deps: { db?: Pick<DbClient, "query"> } = {}) {}
   private get db() { return this.deps.db ?? DbClientClass.getInstance(); }
 
+  private async ensureSchema(): Promise<void> {
+    await ensureEliteWorldClassSchema(this.db);
+  }
+
   async getIpAllowlist(tenantId: string): Promise<IpAllowlistConfig> {
+    await this.ensureSchema();
     const rows = await this.db.query<{ enabled: boolean; cidrs: string[] }>(
       `SELECT enabled, cidrs FROM saas_tenant_ip_allowlist WHERE tenant_id=$1`,
       [tenantId],
@@ -52,6 +58,7 @@ export class SaasSecurityEnterpriseService {
   }
 
   async upsertIpAllowlist(tenantId: string, cfg: IpAllowlistConfig): Promise<IpAllowlistConfig> {
+    await this.ensureSchema();
     const cidrs = (cfg.cidrs ?? []).map((c) => c.trim()).filter(Boolean);
     await this.db.query(
       `INSERT INTO saas_tenant_ip_allowlist (tenant_id, enabled, cidrs, updated_at)
@@ -70,6 +77,7 @@ export class SaasSecurityEnterpriseService {
   }
 
   async listCustomRoles(tenantId: string): Promise<CustomRole[]> {
+    await this.ensureSchema();
     const rows = await this.db.query<{ id: string; name: string; permissions: string[] }>(
       `SELECT id, name, permissions FROM saas_custom_roles WHERE tenant_id=$1 ORDER BY name`,
       [tenantId],
@@ -82,6 +90,7 @@ export class SaasSecurityEnterpriseService {
   }
 
   async upsertCustomRole(tenantId: string, input: { id?: string; name: string; permissions: SaasAction[] }): Promise<CustomRole> {
+    await this.ensureSchema();
     if (!input.name.trim()) throw new SaasSecurityEnterpriseError("name required", "VALIDATION");
     if (input.id) {
       const rows = await this.db.query<{ id: string; name: string; permissions: string[] }>(
@@ -120,6 +129,7 @@ export class SaasSecurityEnterpriseService {
   }
 
   async listTerritories(tenantId: string): Promise<Territory[]> {
+    await this.ensureSchema();
     const rows = await this.db.query<{ id: string; name: string; regions: string[]; owner_user_id: string | null }>(
       `SELECT id, name, regions, owner_user_id FROM saas_crm_territories WHERE tenant_id=$1 ORDER BY name`,
       [tenantId],
@@ -152,6 +162,7 @@ export class SaasSecurityEnterpriseService {
   }
 
   async listSandboxes(parentTenantId: string): Promise<SandboxLink[]> {
+    await this.ensureSchema();
     const rows = await this.db.query<{ id: string; name: string; sandbox_tenant_id: string; created_at: string }>(
       `SELECT id, name, sandbox_tenant_id, created_at FROM saas_sandbox_tenants WHERE parent_tenant_id=$1`,
       [parentTenantId],
@@ -194,6 +205,7 @@ export class SaasSecurityEnterpriseService {
   }
 
   async getMfaStatus(tenantId: string, userId: string): Promise<MfaStatus> {
+    await this.ensureSchema();
     const enforcedRows = await this.db.query<{ mfa_enforced: boolean }>(
       `SELECT mfa_enforced FROM saas_tenants WHERE id=$1`,
       [tenantId],

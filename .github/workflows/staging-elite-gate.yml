@@ -1,0 +1,33 @@
+name: Staging Elite Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "backend/saas/**"
+      - "scripts/run-staging-*.mjs"
+      - "scripts/staging-smoke-*.mjs"
+      - "scripts/verify-os-saas-100.mjs"
+      - "scripts/lib/**"
+      - ".github/workflows/staging-elite-gate.yml"
+
+concurrency:
+  group: staging-elite-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  elite-gate:
+    name: P0 + beta packs + SaaS/OS 100%
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run elite staging gate
+        env:
+          STAGING_BASE_URL: https://nelvyon.com
+        run: node scripts/run-staging-elite-gate.mjs --skip-wait

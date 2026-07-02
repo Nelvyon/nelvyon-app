@@ -1,5 +1,6 @@
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
+import { ensureEliteWorldClassSchema } from "./ensureEliteWorldClassSchema";
 
 export type DeliverabilitySnapshot = {
   bounceRate: number;
@@ -22,7 +23,12 @@ export class SaasDeliverabilityService {
   constructor(private readonly deps: { db?: Pick<DbClient, "query"> } = {}) {}
   private get db() { return this.deps.db ?? DbClientClass.getInstance(); }
 
+  private async ensureSchema(): Promise<void> {
+    await ensureEliteWorldClassSchema(this.db);
+  }
+
   async captureSnapshot(tenantId: string): Promise<DeliverabilitySnapshot> {
+    await this.ensureSchema();
     const stats = await this.db.query<{
       sent: string;
       bounced: string;
@@ -72,6 +78,7 @@ export class SaasDeliverabilityService {
   }
 
   async getLatest(tenantId: string): Promise<DeliverabilitySnapshot | null> {
+    await this.ensureSchema();
     const rows = await this.db.query<Record<string, unknown>>(
       `SELECT bounce_rate, complaint_rate, sent_30d, bounced_30d, complaints_30d,
               dedicated_ip, warmup_day, health_score, captured_at
@@ -112,6 +119,7 @@ export class SaasDeliverabilityService {
   }
 
   async listSuppressions(tenantId: string): Promise<Array<{ email: string; reason: string; createdAt: string }>> {
+    await this.ensureSchema();
     const rows = await this.db.query<{ email: string; reason: string; created_at: string }>(
       `SELECT c.email,
          cr.status AS reason,
