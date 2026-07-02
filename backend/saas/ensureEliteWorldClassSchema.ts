@@ -1,12 +1,10 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 
 let schemaReady = false;
 
-const FALLBACK_SQL = `
+/** Minimal DDL for migration 482 — avoids brittle split of full .sql file. */
+const ELITE_WORLD_CLASS_DDL = `
 CREATE TABLE IF NOT EXISTS saas_tenant_ip_allowlist (
   tenant_id UUID PRIMARY KEY REFERENCES saas_tenants(id) ON DELETE CASCADE,
   enabled BOOLEAN NOT NULL DEFAULT false,
@@ -95,25 +93,6 @@ VALUES
 ON CONFLICT (slug) DO NOTHING
 `;
 
-function migrationPaths(): string[] {
-  const cwd = process.cwd();
-  return [
-    join(cwd, "../../backend/db/migrations/482_elite_world_class_frentes.sql"),
-    join(cwd, "backend/db/migrations/482_elite_world_class_frentes.sql"),
-  ];
-}
-
-function loadSql(): string {
-  for (const p of migrationPaths()) {
-    try {
-      return readFileSync(p, "utf8");
-    } catch {
-      /* try next */
-    }
-  }
-  return FALLBACK_SQL;
-}
-
 function splitStatements(sql: string): string[] {
   return sql
     .split(";")
@@ -121,21 +100,38 @@ function splitStatements(sql: string): string[] {
     .filter((s) => s.length > 0 && !s.startsWith("--"));
 }
 
+async function tableExists(db: Pick<DbClient, "query">, table: string): Promise<boolean> {
+  const rows = await db.query<{ ok: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM information_schema.tables
+       WHERE table_schema = 'public' AND table_name = $1
+     ) AS ok`,
+    [table],
+  );
+  return Boolean(rows[0]?.ok);
+}
+
 /** Lazy DDL for migration 482 tables — avoids 500 when prod migrate lags behind deploy. */
 export async function ensureEliteWorldClassSchema(db: Pick<DbClient, "query"> = DbClientClass.getInstance()): Promise<void> {
   if (schemaReady) return;
-  const raw = loadSql();
-  for (const stmt of splitStatements(raw)) {
+
+  for (const stmt of splitStatements(ELITE_WORLD_CLASS_DDL)) {
     try {
       await db.query(stmt);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (!/already exists|duplicate/i.test(msg)) {
-        /* race on concurrent deploy — ignore */
+        /* concurrent deploy or partial DDL — continue */
       }
     }
   }
-  schemaReady = true;
+
+  const ok =
+    (await tableExists(db, "saas_deliverability_snapshots")) &&
+    (await tableExists(db, "saas_marketplace_apps")) &&
+    (await tableExists(db, "saas_tenant_ip_allowlist"));
+
+  if (ok) schemaReady = true;
 }
 
 export function resetEliteWorldClassSchemaForTests(): void {

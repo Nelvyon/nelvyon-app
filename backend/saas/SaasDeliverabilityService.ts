@@ -1,6 +1,7 @@
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import { ensureEliteWorldClassSchema } from "./ensureEliteWorldClassSchema";
+import { isPgMissingRelation } from "./saasRequestContext";
 
 export type DeliverabilitySnapshot = {
   bounceRate: number;
@@ -56,15 +57,7 @@ export class SaasDeliverabilityService {
     const warmupDay = prev?.warmupDay ?? 0;
     const dedicatedIp = prev?.dedicatedIp ?? null;
 
-    const rows = await this.db.query<{ captured_at: string }>(
-      `INSERT INTO saas_deliverability_snapshots
-         (tenant_id, bounce_rate, complaint_rate, sent_30d, bounced_30d, complaints_30d, dedicated_ip, warmup_day, health_score)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-       RETURNING captured_at`,
-      [tenantId, bounceRate, complaintRate, sent, bounced, complaints, dedicatedIp, warmupDay, healthScore],
-    );
-
-    return {
+    const snapshot: DeliverabilitySnapshot = {
       bounceRate,
       complaintRate,
       sent30d: sent,
@@ -73,19 +66,40 @@ export class SaasDeliverabilityService {
       dedicatedIp,
       warmupDay,
       healthScore,
-      capturedAt: String(rows[0]?.captured_at ?? new Date().toISOString()),
+      capturedAt: new Date().toISOString(),
     };
+
+    try {
+      const rows = await this.db.query<{ captured_at: string }>(
+        `INSERT INTO saas_deliverability_snapshots
+           (tenant_id, bounce_rate, complaint_rate, sent_30d, bounced_30d, complaints_30d, dedicated_ip, warmup_day, health_score)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+         RETURNING captured_at`,
+        [tenantId, bounceRate, complaintRate, sent, bounced, complaints, dedicatedIp, warmupDay, healthScore],
+      );
+      snapshot.capturedAt = String(rows[0]?.captured_at ?? snapshot.capturedAt);
+    } catch (e) {
+      if (!isPgMissingRelation(e)) throw e;
+    }
+
+    return snapshot;
   }
 
   async getLatest(tenantId: string): Promise<DeliverabilitySnapshot | null> {
     await this.ensureSchema();
-    const rows = await this.db.query<Record<string, unknown>>(
-      `SELECT bounce_rate, complaint_rate, sent_30d, bounced_30d, complaints_30d,
-              dedicated_ip, warmup_day, health_score, captured_at
-       FROM saas_deliverability_snapshots
-       WHERE tenant_id=$1 ORDER BY captured_at DESC LIMIT 1`,
-      [tenantId],
-    );
+    let rows: Record<string, unknown>[];
+    try {
+      rows = await this.db.query<Record<string, unknown>>(
+        `SELECT bounce_rate, complaint_rate, sent_30d, bounced_30d, complaints_30d,
+                dedicated_ip, warmup_day, health_score, captured_at
+         FROM saas_deliverability_snapshots
+         WHERE tenant_id=$1 ORDER BY captured_at DESC LIMIT 1`,
+        [tenantId],
+      );
+    } catch (e) {
+      if (isPgMissingRelation(e)) return null;
+      throw e;
+    }
     const r = rows[0];
     if (!r) return null;
     return {
@@ -102,12 +116,17 @@ export class SaasDeliverabilityService {
   }
 
   async setDedicatedIp(tenantId: string, cfg: DedicatedIpConfig): Promise<DedicatedIpConfig> {
-    await this.db.query(
-      `INSERT INTO saas_deliverability_snapshots
-         (tenant_id, dedicated_ip, warmup_day, bounce_rate, complaint_rate, sent_30d, bounced_30d, complaints_30d, health_score)
-       VALUES ($1,$2,$3,0,0,0,0,0,100)`,
-      [tenantId, cfg.dedicatedIp, cfg.warmupDay],
-    );
+    await this.ensureSchema();
+    try {
+      await this.db.query(
+        `INSERT INTO saas_deliverability_snapshots
+           (tenant_id, dedicated_ip, warmup_day, bounce_rate, complaint_rate, sent_30d, bounced_30d, complaints_30d, health_score)
+         VALUES ($1,$2,$3,0,0,0,0,0,100)`,
+        [tenantId, cfg.dedicatedIp, cfg.warmupDay],
+      );
+    } catch (e) {
+      if (!isPgMissingRelation(e)) throw e;
+    }
     return cfg;
   }
 

@@ -148,3 +148,9 @@ export function saasErrorBody(e: unknown): { error: string; code?: string } {
   }
   return { error: "Internal error" };
 }
+
+/** Postgres 42P01 — table/column not migrated yet. */
+export function isPgMissingRelation(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e);
+  return /relation .* does not exist|42P01|column .* does not exist/i.test(msg);
+}
