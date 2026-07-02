@@ -127,9 +127,9 @@ export async function ensureEliteWorldClassSchema(db: Pick<DbClient, "query"> = 
   }
 
   const ok =
-    (await tableExists(db, "saas_deliverability_snapshots")) &&
-    (await tableExists(db, "saas_marketplace_apps")) &&
-    (await tableExists(db, "saas_tenant_ip_allowlist"));
+    (await tableExists(db, "saas_deliverability_snapshots").catch(() => false)) &&
+    (await tableExists(db, "saas_marketplace_apps").catch(() => false)) &&
+    (await tableExists(db, "saas_tenant_ip_allowlist").catch(() => false));
 
   if (ok) schemaReady = true;
 }

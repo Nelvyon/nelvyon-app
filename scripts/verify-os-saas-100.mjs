@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const osOnly = process.argv.includes("--os-only");
 const saasOnly = process.argv.includes("--saas-only");
-const skipWait = process.argv.includes("--skip-wait") ? ["--skip-wait"] : ["--skip-wait"];
+const skipWait = process.argv.includes("--skip-wait") ? ["--skip-wait"] : [];
 
 function run(script) {
   const r = spawnSync(process.execPath, [join(root, "scripts", script), ...skipWait], {

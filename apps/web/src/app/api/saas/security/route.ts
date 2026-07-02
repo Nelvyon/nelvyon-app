@@ -4,10 +4,19 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import {
   getSaasSecurityEnterpriseService,
+  isPgMissingRelation,
   requireSaasContext,
   saasErrorBody,
   saasErrorStatus,
 } from "@nelvyon/saas";
+
+const SECURITY_EMPTY = {
+  allowlist: { enabled: false, cidrs: [] as string[] },
+  roles: [] as unknown[],
+  territories: [] as unknown[],
+  mfa: { enabled: false, enforced: false },
+  sandboxes: [] as unknown[],
+};
 
 export async function GET(req: Request) {
   try {
@@ -31,6 +40,9 @@ export async function GET(req: Request) {
     ]);
     return NextResponse.json({ allowlist, roles, territories, mfa, sandboxes });
   } catch (e) {
+    if (isPgMissingRelation(e)) {
+      return NextResponse.json({ ...SECURITY_EMPTY, schemaPending: true });
+    }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

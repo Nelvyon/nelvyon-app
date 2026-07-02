@@ -151,6 +151,8 @@ export function saasErrorBody(e: unknown): { error: string; code?: string } {
 
 /** Postgres 42P01 — table/column not migrated yet. */
 export function isPgMissingRelation(e: unknown): boolean {
+  const code = typeof e === "object" && e !== null && "code" in e ? String((e as { code: unknown }).code) : "";
+  if (code === "42P01" || code === "42703") return true;
   const msg = e instanceof Error ? e.message : String(e);
-  return /relation .* does not exist|42P01|column .* does not exist/i.test(msg);
+  return /relation .* does not exist|42P01|column .* does not exist|42703/i.test(msg);
 }

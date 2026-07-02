@@ -4,10 +4,23 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import {
   getSaasDeliverabilityService,
+  isPgMissingRelation,
   requireSaasContext,
   saasErrorBody,
   saasErrorStatus,
 } from "@nelvyon/saas";
+
+const EMPTY_SNAPSHOT = {
+  bounceRate: 0,
+  complaintRate: 0,
+  sent30d: 0,
+  bounced30d: 0,
+  complaints30d: 0,
+  dedicatedIp: null as string | null,
+  warmupDay: 0,
+  healthScore: 100,
+  capturedAt: new Date().toISOString(),
+};
 
 export async function GET(req: Request) {
   try {
@@ -20,6 +33,9 @@ export async function GET(req: Request) {
     const snapshot = (await svc.getLatest(ctx.tenant.id)) ?? (await svc.captureSnapshot(ctx.tenant.id));
     return NextResponse.json({ snapshot });
   } catch (e) {
+    if (isPgMissingRelation(e)) {
+      return NextResponse.json({ snapshot: EMPTY_SNAPSHOT, schemaPending: true });
+    }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

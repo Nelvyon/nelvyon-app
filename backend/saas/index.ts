@@ -691,6 +691,7 @@ export {
   requireSaasContext,
   saasErrorStatus,
   saasErrorBody,
+  isPgMissingRelation,
   type SaasRequestContext,
 } from "./saasRequestContext";
 export {

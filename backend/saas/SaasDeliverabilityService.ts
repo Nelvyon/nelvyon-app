@@ -25,7 +25,11 @@ export class SaasDeliverabilityService {
   private get db() { return this.deps.db ?? DbClientClass.getInstance(); }
 
   private async ensureSchema(): Promise<void> {
-    await ensureEliteWorldClassSchema(this.db);
+    try {
+      await ensureEliteWorldClassSchema(this.db);
+    } catch {
+      /* prod may block DDL — read fallbacks handle missing tables */
+    }
   }
 
   async captureSnapshot(tenantId: string): Promise<DeliverabilitySnapshot> {
