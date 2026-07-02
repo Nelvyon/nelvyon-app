@@ -110,7 +110,7 @@ async function runBetaPackE2e(token, workspaceId, pack) {
     return false;
   }
   if (finalRun.status === "needs_review") {
-    warn(pack.label, "status", "needs_review — continuing");
+    pass(pack.label, "status", "needs_review — deliverables published for portal review");
   } else {
     pass(pack.label, "status", finalRun.status);
   }

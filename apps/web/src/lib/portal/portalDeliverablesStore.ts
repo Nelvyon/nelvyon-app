@@ -420,13 +420,40 @@ export async function resolvePortalDeliverableDownloadBff(params: {
   workspaceId: number;
   clientId: string;
   deliverableId: string;
-}): Promise<string | null> {
+}): Promise<
+  | { mode: "redirect"; url: string }
+  | { mode: "inline"; body: string; contentType: string; filename: string }
+  | null
+> {
   const row = await fetchDeliverableRow({
     deliverableId: params.deliverableId,
     workspaceId: params.workspaceId,
     clientId: params.clientId,
     statuses: DOWNLOADABLE_STATUSES,
   });
-  if (!row || !deliverableHasFile(row.storage_key, row.file_url)) return null;
-  return resolveDeliverableDownloadUrl({ storageKey: row.storage_key, fileUrl: row.file_url });
+  if (!row) return null;
+
+  if (deliverableHasFile(row.storage_key, row.file_url)) {
+    const url = await resolveDeliverableDownloadUrl({
+      storageKey: row.storage_key,
+      fileUrl: row.file_url,
+    });
+    return url ? { mode: "redirect", url } : null;
+  }
+
+  const meta = row.deliverable_metadata;
+  if (meta && typeof meta === "object" && !Array.isArray(meta)) {
+    const report = meta.pack_report;
+    if (report && typeof report === "object") {
+      const safeTitle = (row.title ?? "informe").replace(/[^\w\s-]/g, "").trim() || "informe";
+      return {
+        mode: "inline",
+        body: JSON.stringify(report, null, 2),
+        contentType: "application/json; charset=utf-8",
+        filename: `${safeTitle}.json`,
+      };
+    }
+  }
+
+  return null;
 }

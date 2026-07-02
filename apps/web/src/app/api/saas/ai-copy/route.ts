@@ -34,6 +34,22 @@ const PROMPTS: Record<CopyType, string> = {
   blog_intro: "Genera introducciones de blog posts que enganchen al lector. Primeras 3-4 frases que planteen el problema y prometan la solución.",
 };
 
+const COPY_TYPES = Object.keys(PROMPTS) as CopyType[];
+
+export async function GET(req: Request) {
+  try {
+    const ctx = await requireSaasContext(req, "contacts.read");
+    return NextResponse.json({
+      types: COPY_TYPES,
+      tones: ["formal", "casual", "urgente", "inspirador"],
+      openai_configured: Boolean(process.env.OPENAI_API_KEY),
+      company: ctx.tenant.companyName ?? null,
+    });
+  } catch (e: unknown) {
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");

@@ -16,15 +16,24 @@ export async function GET(req: Request, ctx: RouteContext) {
 
   const { id } = await ctx.params;
   try {
-    const url = await resolvePortalDeliverableDownloadBff({
+    const resolved = await resolvePortalDeliverableDownloadBff({
       workspaceId: claims.workspaceId,
       clientId: claims.clientId,
       deliverableId: id,
     });
-    if (!url) {
+    if (!resolved) {
       return NextResponse.json({ error: "No file attached to this deliverable" }, { status: 404 });
     }
-    return NextResponse.redirect(url, 302);
+    if (resolved.mode === "redirect") {
+      return NextResponse.redirect(resolved.url, 302);
+    }
+    return new NextResponse(resolved.body, {
+      status: 200,
+      headers: {
+        "Content-Type": resolved.contentType,
+        "Content-Disposition": `attachment; filename="${resolved.filename}"`,
+      },
+    });
   } catch (e: unknown) {
     return portalErrorResponse(e);
   }

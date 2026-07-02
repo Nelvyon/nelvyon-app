@@ -1,1 +1,1 @@
-export { default } from "@/app/dashboard/workflows/editor/page";
+export { default } from "@/app/saas/workflows/editor/page";

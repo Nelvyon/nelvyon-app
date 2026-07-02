@@ -4,6 +4,8 @@
  *
  * Critical: health, A1 packs, C5 automation CEO, portal shell, hub/agency pages.
  */
+import { ensurePortalSmokeUser } from "./lib/pack-e2e-shared.mjs";
+
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
@@ -196,10 +198,28 @@ async function runSmoke(token, workspaceId) {
     body: JSON.stringify({ email: QA_EMAIL, password: QA_PASSWORD }),
   });
 
+  let portalToken = null;
   if (portalLogin.status === 200) {
     const portalAuth = await portalLogin.json();
-    const portalToken = portalAuth.access_token;
+    portalToken = portalAuth.access_token;
     pass("portal", "portal login BFF", "QA user has portal access");
+  } else {
+    try {
+      const ensured = await ensurePortalSmokeUser(token, workspaceId);
+      portalToken = ensured.token;
+      pass("portal", "portal login BFF", `provisioned ${ensured.email}`);
+    } catch (e) {
+      if (portalLogin.status === 401 || portalLogin.status === 403) {
+        fail("portal", "portal login BFF", `HTTP ${portalLogin.status} — ${String(e)}`);
+      } else if (portalLogin.status === 404) {
+        fail("portal", "portal login BFF", "HTTP 404 — route missing");
+      } else {
+        fail("portal", "portal login BFF", `HTTP ${portalLogin.status}`);
+      }
+    }
+  }
+
+  if (portalToken) {
     const projects = await fetch(`${BASE}/api/platform/portal/projects`, {
       headers: { Authorization: `Bearer ${portalToken}`, Accept: "application/json" },
     });
@@ -228,16 +248,6 @@ async function runSmoke(token, workspaceId) {
     } else {
       fail("portal", "portal projects BFF", `HTTP ${projects.status}`);
     }
-  } else if (portalLogin.status === 401 || portalLogin.status === 403) {
-    warn(
-      "portal",
-      "portal login BFF",
-      `HTTP ${portalLogin.status} — QA operator sin cuenta portal; shell UI OK`,
-    );
-  } else if (portalLogin.status === 404) {
-    fail("portal", "portal login BFF", "HTTP 404 — route missing");
-  } else {
-    fail("portal", "portal login BFF", `HTTP ${portalLogin.status}`);
   }
 
   const portalMe = await fetch(`${BASE}/api/platform/portal/me`, { cache: "no-store" });

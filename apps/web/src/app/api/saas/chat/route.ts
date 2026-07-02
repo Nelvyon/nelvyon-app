@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
+import { saasChatService } from "../../../../../../../backend/saas/SaasChatService";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -8,6 +9,22 @@ export const runtime = "nodejs";
 interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
+}
+
+export async function GET(req: Request) {
+  try {
+    const ctx = await requireSaasContext(req, "contacts.read");
+    const limitRaw = new URL(req.url).searchParams.get("limit");
+    const limit = Math.min(Math.max(Number(limitRaw ?? 50) || 50, 1), 100);
+    const messages = await saasChatService.getHistory(ctx.claims.userId, ctx.tenant.id, limit);
+    return NextResponse.json({
+      messages,
+      openai_configured: Boolean(process.env.OPENAI_API_KEY),
+      company: ctx.tenant.companyName ?? null,
+    });
+  } catch (e: unknown) {
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
+  }
 }
 
 export async function POST(req: Request) {

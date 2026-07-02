@@ -189,6 +189,46 @@ export async function portalLogin(email, password) {
   return auth.access_token;
 }
 
+/** Ensures a portal user exists for smoke (invite + accept if login fails). */
+export async function ensurePortalSmokeUser(token, workspaceId, opts = {}) {
+  const email = opts.email ?? "portal-smoke-qa@nelvyon.test";
+  const password = opts.password ?? "StagingPortalQA2026!";
+  const name = opts.name ?? "Portal Smoke QA";
+
+  try {
+    const existing = await portalLogin(email, password);
+    return { email, password, token: existing };
+  } catch {
+    /* create via invite */
+  }
+
+  const reportRes = await fetch(
+    `${BASE}/api/platform/pack-report?pack_id=local-business-growth&limit=5`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Cookie: `${COOKIE}=${token}`,
+        Accept: "application/json",
+        "X-Workspace-Id": String(workspaceId),
+      },
+      cache: "no-store",
+    },
+  );
+  if (!reportRes.ok) {
+    throw new Error(`pack-report HTTP ${reportRes.status} — cannot resolve portal client_id`);
+  }
+  const report = await reportRes.json();
+  const clientId = report.latest?.os_client_id ?? report.items?.[0]?.os_client_id;
+  if (!clientId) {
+    throw new Error("no os_client_id in pack-report — run a growth pack first");
+  }
+
+  const invite = await createPortalInvite(token, workspaceId, clientId, email);
+  const portalToken = await acceptPortalInvite(invite.token, password);
+  await portalLogin(email, password);
+  return { email, password, token: portalToken, clientId, name };
+}
+
 export async function fetchPortalDeliverables(portalToken, projectId) {
   const res = await fetch(
     `${BASE}/api/platform/portal/deliverables?project_id=${projectId}&page_size=50`,

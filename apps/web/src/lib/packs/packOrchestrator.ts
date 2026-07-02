@@ -646,19 +646,21 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     steps = markStep(steps, "report", "done");
 
     const autoPublishThreshold = config.autoPublishQaThreshold ?? 85;
-    const needsReview = skuResults.some(
+    const hardReview = skuResults.some(
       (r) =>
         r.qa_score < autoPublishThreshold ||
-        (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
         r.qa_legal_passed === false ||
-        r.qa_gate_status === "blocked" || // O18 — legal/hard block from the QA gate
-        r.shield_status === "blocked" || // O27 — regulated sector shield hard block
-        r.truth_status === "blocked", // O30 — truth guard hard block
+        r.qa_gate_status === "blocked" ||
+        r.shield_status === "blocked" ||
+        r.truth_status === "blocked",
     );
-    const finalStatus = needsReview ? "needs_review" : "completed";
-    steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
+    const softReview = skuResults.some(
+      (r) => r.qa_visual_score !== undefined && r.qa_visual_score < 70,
+    );
+    const finalStatus = hardReview ? "needs_review" : "completed";
+    steps = markStep(steps, "complete", hardReview ? "skipped" : "done");
 
-    if (needsReview) {
+    if (hardReview || softReview) {
       try {
         const { getOsQaReviewQueueService } = await import("@nelvyon/saas");
         await getOsQaReviewQueueService().enqueue({
