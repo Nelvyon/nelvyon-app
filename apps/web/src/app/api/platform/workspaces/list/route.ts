@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { platformApiBase, readSessionToken } from "@/lib/platformFastApiProxy";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import {
-  dbCreateWorkspace,
   dbListWorkspaces,
   platformDbFallbackEnabled,
 } from "@/lib/platformDbFallback";

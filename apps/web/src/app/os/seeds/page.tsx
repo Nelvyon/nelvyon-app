@@ -58,7 +58,7 @@ export default function OsSeedLibraryPage() {
     }
   }
 
-  useEffect(() => { void load("all"); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => { void load("all");   }, []);
 
   async function sync(mode: "metadata" | "download-lite") {
     setBusy(true);
@@ -161,7 +161,7 @@ export default function OsSeedLibraryPage() {
             {items.map((item) => (
               <div key={item.id} className="rounded-xl border border-border overflow-hidden">
                 {item.previewUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
+                   
                   <img src={item.previewUrl} alt={item.headline} className="h-32 w-full object-cover" />
                 ) : (
                   <div className="h-32 w-full bg-muted/40 flex items-center justify-center text-muted-foreground text-3xl">🌱</div>

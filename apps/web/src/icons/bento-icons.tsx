@@ -192,7 +192,7 @@ export const ThirdIcon = (props: React.SVGAttributes<SVGSVGElement>) => {
   );
 };
 
-export const FourthIcon = (props: React.SVGAttributes<SVGSVGElement>) => {
+export const FourthIcon = (_props: React.SVGAttributes<SVGSVGElement>) => {
   return (
     <svg
       width="12"

@@ -145,7 +145,7 @@ function SendTemplateModal({ template, onClose, onSent }: {
       // Build body components with parameters
       const components = template.components
         .filter(c => c.type === "BODY" && vars.length > 0)
-        .map(c => ({
+        .map(_c => ({
           type: "body",
           parameters: vars.map(v => ({ type: "text", text: varValues[v] ?? "" })),
         }));
@@ -240,7 +240,7 @@ export default function SaasWhatsAppPage() {
   const [syncingCatalog, setSyncingCatalog] = useState(false);
   const [showSend, setShowSend] = useState(false);
   const [sendTemplate, setSendTemplate] = useState<WaTemplate | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [syncMsg, setSyncMsg] = useState<string | null>(null);
 
   const loadMessages = useCallback(async () => {
@@ -545,7 +545,7 @@ export default function SaasWhatsAppPage() {
                   <NelvyonDsCard key={p.id} className="overflow-hidden p-0">
                     {p.imageUrl ? (
                       <div className="aspect-square w-full overflow-hidden bg-muted/20">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
                       </div>
                     ) : (

@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from "next";
 
 import { getBrandAppName, getBrandMode } from "@/core/platform/brand";
-import { getAppBaseUrl, getAppOrigin } from "@/lib/appUrl";
+import { getAppOrigin } from "@/lib/appUrl";
 
 const brandMode = getBrandMode();
 const appName = getBrandAppName(brandMode);
-const canonicalBase = getAppBaseUrl();
 
 const nelvyonMarketingDescription =
   "Agencia de marketing digital con inteligencia artificial. SEO, publicidad, email, webs y automatización desde un solo panel.";

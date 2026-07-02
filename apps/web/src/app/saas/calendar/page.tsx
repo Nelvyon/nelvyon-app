@@ -64,7 +64,7 @@ export default function SaasCalendarPage() {
   const [filterType, setFilterType] = useState<EventType | "all">("all");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [events, setEvents] = useState<CalEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<EventType>("appointment");

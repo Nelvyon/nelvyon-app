@@ -6,7 +6,6 @@ import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayou
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 type QuestionType = "rating" | "nps" | "text" | "multiple_choice" | "checkbox";
-type SurveyStatus = "draft" | "active" | "closed";
 type SurveyType = "survey" | "nps" | "feedback" | "quiz";
 
 interface SurveyQuestion {

@@ -116,7 +116,7 @@ export default function IaDashboardPage() {
             </Button>
             {imageUrl ? (
               <div className="rounded-xl border p-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                { }
                 <Image alt="Generada" className="max-h-96 rounded-lg" height={160} src={imageUrl} unoptimized width={160} />
               </div>
             ) : null}

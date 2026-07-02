@@ -10,7 +10,6 @@ import { DbClient } from "../../../backend/db/DbClient";
 import {
   LEGACY_PROJECT_SOURCE,
   buildProjectFallbackDedupeKey,
-  metadataLegacyProjectId,
 } from "../../../backend/os-core/osProjectsDedupe";
 
 const scriptsDir = path.dirname(fileURLToPath(import.meta.url));

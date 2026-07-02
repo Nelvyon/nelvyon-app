@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { NelvyonDsBadge } from "@/design-system/components";
 import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { SaasShellLayout, DarkCard } from "@/features/saas-shell/components/SaasShellLayout";

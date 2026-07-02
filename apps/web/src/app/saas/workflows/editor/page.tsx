@@ -23,7 +23,7 @@ const initialNodes: Node[] = [
 ];
 
 export default function WorkflowVisualEditorPage() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, _setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [name, setName] = useState("Flujo visual");
   const [savedId, setSavedId] = useState<string | null>(null);

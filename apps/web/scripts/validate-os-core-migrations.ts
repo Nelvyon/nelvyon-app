@@ -2,16 +2,8 @@
  * Valida migración OS-1-01 (315) y tabla os_clients.
  * Uso: DATABASE_URL=... pnpm -C apps/web validate:os-core-migrations
  */
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { DbClient } from "../../../backend/db/DbClient";
 import { loadEnvFiles } from "../../../backend/db/loadEnvFiles";
-
-const scriptsDir = path.dirname(fileURLToPath(import.meta.url));
-const webRoot = path.resolve(scriptsDir, "..");
-const repoRoot = path.resolve(webRoot, "../..");
 
 const REQUIRED_MIGRATIONS = [
   "315_os_clients.sql",

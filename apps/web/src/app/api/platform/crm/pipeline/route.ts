@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { EMPTY_CLIENT_LIST, proxyPlatformFetch } from "@/lib/platformFastApiProxy";
+import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import {
   dbPipelineSummary,

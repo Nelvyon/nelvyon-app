@@ -4,7 +4,7 @@
  * lead-scoring, reportes.
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_SETTINGS, FIXTURE_AUDIT, FIXTURE_LEAD_SCORING, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_AUDIT, FIXTURE_LEAD_SCORING, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
 
 test.describe("SaaS — Afiliados & Loyalty", () => {
   test.beforeEach(async ({ page, context }) => {

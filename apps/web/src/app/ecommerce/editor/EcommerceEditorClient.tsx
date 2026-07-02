@@ -25,7 +25,7 @@ export function EcommerceEditorClient() {
     currency: "EUR",
     country_code: "ES",
   });
-  const [products, setProducts] = useState([{ name: "Producto estrella", description: "", price: 29.99 }]);
+  const [products] = useState([{ name: "Producto estrella", description: "", price: 29.99 }]);
 
   useEffect(() => {
     if (!generating) return;

@@ -35,7 +35,7 @@ function WidgetPreview({ config }: { config: typeof DEFAULT_FORM }) {
       <div className="overflow-hidden rounded-lg border bg-background shadow-lg">
         <div className="flex items-center gap-2 px-3 py-2 text-sm text-white" style={{ background: config.color_primario }}>
           {config.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
+             
             <Image alt="" className="h-8 w-8 rounded-full object-cover" height={160} src={config.avatar_url} unoptimized width={160} />
           ) : (
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
@@ -151,7 +151,7 @@ export default function ChatbotListPage() {
                   <div className="mb-3 flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
                       {cfg.avatar_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
+                         
                         <Image alt="" className="h-10 w-10 rounded-full object-cover" height={160} src={str(cfg.avatar_url)} unoptimized width={160} />
                       ) : (
                         <span

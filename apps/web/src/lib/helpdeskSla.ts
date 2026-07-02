@@ -80,7 +80,6 @@ export function computeTicketSla(ticket: TicketSlaFields): TicketSlaView {
     : elapsed;
 
   const firstMet = hasFirstResponse && ticket.first_response_minutes! <= targets.first_response;
-  const resMet = closed; // if closed, consider resolution tracked
 
   return {
     priority,

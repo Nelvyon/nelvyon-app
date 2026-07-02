@@ -114,7 +114,7 @@ export default function PartnerZonePage() {
   useEffect(() => {
     if (tab === "ledger") void loadLedger();
     if (tab === "referidos") void loadReferrals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [tab]);
 
   async function saveRetail(sku: string, retailEur: number) {

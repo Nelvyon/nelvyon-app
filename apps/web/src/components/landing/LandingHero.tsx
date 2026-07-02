@@ -1,8 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 export function LandingHero() {
-  const [scrollY, setScrollY] = useState(0)
+  const [_scrollY, setScrollY] = useState(0)
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
     window.addEventListener('scroll', handleScroll, { passive: true })

@@ -328,10 +328,10 @@ function SidebarChrome({
             href="/dashboard"
           >
             {logoUrl && !collapsed ? (
-              // eslint-disable-next-line @next/next/no-img-element
+               
               <img alt={appName} className="max-h-8 max-w-[140px] object-contain" src={logoUrl} />
             ) : logoUrl && collapsed ? (
-              // eslint-disable-next-line @next/next/no-img-element
+               
               <img alt={appName} className="mx-auto h-8 w-8 object-contain" src={logoUrl} />
             ) : collapsed ? (
               <span className="text-[#66a3ff]">N</span>

@@ -29,7 +29,7 @@ const DEFAULT_TEMPLATE: CertTemplate = {
   id: "t1", name: "Clásico Premium", primaryColor: "#6366f1", logoPosition: "top", signatureName: "Daniel Castedo", signatureTitle: "CEO, Nelvyon",
 };
 
-function CertPreview({ cert, template, brandName }: { cert: Certificate; template: CertTemplate; brandName: string }) {
+function _CertPreview({ cert, template, brandName }: { cert: Certificate; template: CertTemplate; brandName: string }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border-4 p-8 text-center" style={{ borderColor: template.primaryColor, backgroundColor: "#fafafa", minHeight: 300 }}>
       <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `repeating-linear-gradient(45deg, ${template.primaryColor} 0, ${template.primaryColor} 1px, transparent 0, transparent 50%)`, backgroundSize: "20px 20px" }} />
@@ -68,9 +68,9 @@ export default function SaasCertificadosPage() {
   const [certs] = useState<Certificate[]>([]);
   const [templates] = useState<CertTemplate[]>([]);
   const [selectedTemplate] = useState<CertTemplate>(DEFAULT_TEMPLATE);
-  const [previewCert] = useState<Certificate | null>(null);
+  const [_previewCert] = useState<Certificate | null>(null);
   const [tab, setTab] = useState<"certs" | "templates">("certs");
-  const [brandName] = useState("Nelvyon Academy");
+  const [_brandName] = useState("Nelvyon Academy");
 
   const pendingCount = certs.filter(c => !c.issued).length;
 

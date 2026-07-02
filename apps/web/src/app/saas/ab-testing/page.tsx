@@ -46,7 +46,7 @@ const TYPE_LABEL: Record<ABType, string> = {
 
 function pct(n: number, d: number) { return d > 0 ? `${((n / d) * 100).toFixed(1)}%` : "—"; }
 
-function VariantBar({ variant, metric, total, isWinner }: { variant: ABVariant; metric: "open_rate" | "click_rate" | "conversion_rate"; total: number; isWinner: boolean }) {
+function VariantBar({ variant, metric, total: _total, isWinner }: { variant: ABVariant; metric: "open_rate" | "click_rate" | "conversion_rate"; total: number; isWinner: boolean }) {
   const value = metric === "open_rate" ? variant.opens / variant.sent : metric === "click_rate" ? variant.clicks / variant.opens || 0 : variant.conversions / variant.sent;
   const display = metric === "open_rate" ? pct(variant.opens, variant.sent) : metric === "click_rate" ? pct(variant.clicks, variant.opens) : pct(variant.conversions, variant.sent);
   const pctWidth = Math.min(100, value * 100 * 2);

@@ -177,7 +177,7 @@ export default function AutopilotPage() {
     }
   }
 
-  useEffect(() => { void load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { void load(); }, []);  
 
   async function handleToggle(service: AutopilotService, enabled: boolean) {
     const fieldMap: Record<AutopilotService, string> = {

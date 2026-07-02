@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton } from "@/design-system/components";
 import { SaasShellLayout, DarkCard } from "@/features/saas-shell/components/SaasShellLayout";

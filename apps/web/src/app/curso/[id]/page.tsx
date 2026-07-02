@@ -96,7 +96,7 @@ export default function PublicCursoPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-10">
       {course.thumbnail_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
+         
         <img alt="" className="h-56 w-full rounded-xl object-cover" src={str(course.thumbnail_url)} />
       ) : null}
       <header className="space-y-3">

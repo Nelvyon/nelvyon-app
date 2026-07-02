@@ -13,7 +13,6 @@ import {
   OsGhostButton,
   OsLoadingBlock,
   OsPageHeader,
-  OsPrimaryButton,
   OsStatusBadge,
   OsTable,
 } from "@/features/os-shell/components/ui/OsUi";

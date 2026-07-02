@@ -18,9 +18,7 @@ test.describe("SaaS Pipeline — deals", () => {
   });
 
   test("GET /api/saas/deals devuelve fixture con token mock", async ({ page }) => {
-    let called = false;
     await page.route("**/api/saas/deals**", route => {
-      called = true;
       return route.fulfill({ json: { deals: [], total: 0 } });
     });
     await page.goto("/saas/pipeline");

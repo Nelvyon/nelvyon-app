@@ -115,7 +115,7 @@ export default function PublicWebinarPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8 p-6">
       {webinar.thumbnail_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
+         
         <img src={str(webinar.thumbnail_url)} alt="" className="h-56 w-full rounded-xl object-cover" />
       ) : (
         <div className="flex h-56 items-center justify-center rounded-xl bg-muted">

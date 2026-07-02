@@ -129,7 +129,7 @@ export default function SaasTeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInvite, setShowInvite] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [_selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);

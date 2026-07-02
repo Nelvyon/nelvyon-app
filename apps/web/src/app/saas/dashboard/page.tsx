@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { NelvyonDsButton, NelvyonDsStatusDot, type NelvyonDsStatus } from "@/design-system/components";
+import { NelvyonDsStatusDot, type NelvyonDsStatus } from "@/design-system/components";
 import { CommercialPipelineSection } from "@/features/saas-deals/components/CommercialPipelineSection";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -13,7 +13,7 @@ import { SaasShellLayout, DarkCard, StatCard } from "@/features/saas-shell/compo
 import { ActivationChecklist } from "@/features/saas-shell/components/ActivationChecklist";
 import { AccountHealthScore } from "@/features/saas-shell/components/PlatformHealthBanner";
 import { trackEvent } from "@/lib/analytics";
-import type { SaasPlan, SaasTenantDto } from "../onboarding/components/types";
+import type { SaasTenantDto } from "../onboarding/components/types";
 
 type ActivityItem = {
   id: string;

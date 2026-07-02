@@ -116,7 +116,7 @@ export default function CursosDashboardPage() {
             {courses.map((c) => (
               <article key={str(c.id)} className="overflow-hidden rounded-xl border bg-card shadow-sm">
                 {c.thumbnail_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
+                   
                   <Image alt="" className="h-36 w-full object-cover" height={160} src={str(c.thumbnail_url)} unoptimized width={160} />
                 ) : (
                   <div className="flex h-36 items-center justify-center bg-muted text-muted-foreground">

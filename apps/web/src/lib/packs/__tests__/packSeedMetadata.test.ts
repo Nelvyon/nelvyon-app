@@ -143,7 +143,7 @@ describe("packOrchestrator — O7 seed metadata", () => {
     (mockMarkStep as ReturnType<typeof vi.fn>).mockImplementation((steps: unknown[]) => steps);
   });
 
-  function findDeliverableMetadata(calls: Array<[string, unknown[]]>, sector: string): Record<string, unknown> {
+  function findDeliverableMetadata(calls: Array<[string, unknown[]]>, _sector: string): Record<string, unknown> {
     // packOsDb inserts into os_deliverables; metadata is JSON.stringify'd at param index 9 ($10)
     const insertCall = calls.find(
       ([sql]) => typeof sql === "string" && sql.includes("INSERT INTO os_deliverables"),

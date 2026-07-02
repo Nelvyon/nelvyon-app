@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     const svc = getOsSectorCertificationService();
     const summary = await svc.getSummary();
     return NextResponse.json({ summary });
-  } catch (e) {
+  } catch (_e) {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

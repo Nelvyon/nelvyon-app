@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { NelvyonDsBadge, NelvyonDsStatusDot } from "@/design-system/components";
+import { NelvyonDsStatusDot } from "@/design-system/components";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
 import { SaasCan } from "@/features/saas-shell/components/SaasCan";
 import { CampaniaTemplateQuickLaunch } from "@/features/saas-campanias/components/CampaniaTemplateQuickLaunch";
@@ -105,7 +105,7 @@ export default function SaasCampaniasPage() {
 
   useEffect(() => {
     void refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const filtered = useMemo(() => {

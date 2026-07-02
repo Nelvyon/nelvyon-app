@@ -70,7 +70,7 @@ export async function POST(req: Request) {
         const err = (await backendRes.json().catch(() => ({}))) as { detail?: string };
         throw new Error(err.detail ?? `Backend returned ${backendRes.status}`);
       }
-    } catch (backendErr) {
+    } catch (_backendErr) {
       // Fallback: use OpenAI directly with agent context
       const openaiKey = process.env.OPENAI_API_KEY;
       if (openaiKey) {

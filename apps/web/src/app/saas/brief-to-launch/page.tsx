@@ -137,7 +137,7 @@ export default function BriefToLaunchPage() {
   const [launching, setLaunching] = useState(false);
   const [launchResult, setLaunchResult] = useState<LaunchStatusDetail | null>(null);
   const [launchError, setLaunchError] = useState<string | null>(null);
-  const [currentLaunchId, setCurrentLaunchId] = useState<string | null>(null);
+  const [_currentLaunchId, setCurrentLaunchId] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {

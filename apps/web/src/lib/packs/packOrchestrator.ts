@@ -671,9 +671,9 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     }
 
     // Auto-approve deliverables when all SKUs pass QA threshold — no human needed
-    let autoApprovedCount = 0;
+    let _autoApprovedCount = 0;
     if (finalStatus === "completed") {
-      autoApprovedCount = await dbAutoApprovePackDeliverables({
+      _autoApprovedCount = await dbAutoApprovePackDeliverables({
         workspaceId: params.workspaceId,
         projectId: osProjectId,
       }).catch(() => 0);

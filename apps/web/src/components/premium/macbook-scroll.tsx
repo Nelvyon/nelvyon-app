@@ -21,7 +21,7 @@ export function MacbookScroll({ src, alt, className, badge }: MacbookScrollProps
     <div className={cn("nelvyon-macbook-scroll", className)}>
       <div className="nelvyon-macbook-scroll__lid">
         <div className="nelvyon-macbook-scroll__screen">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img src={src} alt={alt} className="nelvyon-macbook-scroll__image" />
         </div>
       </div>

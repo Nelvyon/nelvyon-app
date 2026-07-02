@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { ApiError } from "@/core/api/types";
 import type { OsClientOperationalStatus } from "@/features/os-shell/constants";

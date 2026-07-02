@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 import {
-  portalDeliverableStatusLabel,
   portalDeliverableTypeLabel,
   portalProjectStatusLabel,
 } from "@/features/client_portal_v1/constants";

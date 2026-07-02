@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import {
   getSaasComplianceVaultService,
-  SaasComplianceVaultError,
   requireSaasContext,
   type ListVaultFilters,
   type ComplianceStatus,

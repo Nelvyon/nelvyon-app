@@ -320,7 +320,7 @@ function BuilderModal({
     } finally { setSaving(false); }
   }
 
-  const panels = [
+  const _panels = [
     { id: "trigger",     label: "① Trigger",     icon: "⚡" },
     { id: "conditions",  label: "② Condiciones",  icon: "🔀" },
     { id: "actions",     label: "③ Acciones",     icon: "🎬" },

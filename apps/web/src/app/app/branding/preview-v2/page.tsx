@@ -116,7 +116,7 @@ export default function BrandingPreviewV2Page() {
             <div className="rounded-lg border border-border bg-muted/30 p-4" style={{ borderTop: `4px solid ${previewAccent}` }}>
               <div className="flex items-center gap-3">
                 {logoUrl.trim() ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- local preview of tenant-provided URL
+                   
                   <img alt="" className="h-10 w-10 rounded-md border border-border bg-background p-1 object-contain" src={logoUrl.trim()} />
                 ) : (
                   <div className="flex h-10 w-10 items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">

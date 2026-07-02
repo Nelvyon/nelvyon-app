@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ProtectedLayout } from "@/core/routing/ProtectedLayout";
 import { Badge } from "@/core/ui/Badge";
-import { Button } from "@/core/ui/button";
 
 type Item = {
   id: string;

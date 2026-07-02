@@ -28,7 +28,7 @@ interface WhiteLabelConfig {
   stripeConnectOnboardedAt: string | null;
 }
 
-interface ConnectStatus {
+interface _ConnectStatus {
   connected: boolean;
   accountId: string | null;
   status: StripeConnectStatus;

@@ -188,7 +188,7 @@ export default function WorkspaceBrandingV1Page() {
                 <div className="flex items-center gap-3">
                   {logoUrl.trim() ? (
                     <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border border-border bg-background">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- user-supplied preview URL */}
+                      { }
                       <img alt="" className="h-full w-full object-contain p-1" src={logoUrl.trim()} />
                     </div>
                   ) : (

@@ -6,10 +6,9 @@ import {
   NelvyonDsBadge,
   NelvyonDsButton,
   NelvyonDsCard,
-  NelvyonDsSectionHeader,
 } from "@/design-system/components";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { SaasShellLayout, DarkCard, StatCard } from "@/features/saas-shell/components/SaasShellLayout";
+import { SaasShellLayout, StatCard } from "@/features/saas-shell/components/SaasShellLayout";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

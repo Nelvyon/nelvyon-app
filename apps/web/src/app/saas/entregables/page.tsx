@@ -181,7 +181,7 @@ export default function EntregablesPage() {
     }
   }
 
-  useEffect(() => { void load(); void loadRevenue(); }, [typeFilter, statusFilter, days]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { void load(); void loadRevenue(); }, [typeFilter, statusFilter, days]);  
 
   async function handleRefreshRevenue() {
     await fetch("/api/saas/entregables/revenue", {

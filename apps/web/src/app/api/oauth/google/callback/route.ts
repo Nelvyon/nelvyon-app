@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 import { GoogleOAuthProvider } from "../../../../../../../../backend/oauth/GoogleOAuthProvider";
 import {
   finishOAuthCallback,

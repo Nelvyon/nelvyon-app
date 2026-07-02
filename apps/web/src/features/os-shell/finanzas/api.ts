@@ -3,7 +3,6 @@ import { dashboardInvoicesApi } from "@/features/dashboard/api";
 import { entityListUrl } from "@/features/os-shell/lib/entityQuery";
 import { osDealsApi } from "@/features/os-shell/pipeline/api";
 import { osPlatformApi } from "@/features/os-shell/api";
-import { TERMINAL_PROJECT_STATUSES } from "@/features/os-shell/constants";
 
 import type { OsCashflowRow } from "./expenseTypes";
 import type { InvoiceStatsRow, OsContractFinanceRow, SpanishInvoiceRow } from "./types";

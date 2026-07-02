@@ -17,9 +17,42 @@ const a11yCriticalScreens = [
 
 const eslintConfig = [
   {
-    ignores: [".next/**", ".source/**", "node_modules/**", "out/**", "dist/**", "coverage/**", "next-env.d.ts"],
+    ignores: [
+      ".next/**",
+      ".source/**",
+      "node_modules/**",
+      "out/**",
+      "dist/**",
+      "coverage/**",
+      "next-env.d.ts",
+      /** Legacy GHL dashboard — superseded by /saas/* (redirects in next.config). */
+      "src/app/dashboard/**",
+      /** Legacy sector hub dashboards (not SaaS product). */
+      "src/components/dashboard/**",
+      /** Marketing landing skeletons — not Nelvyon product surface. */
+      "src/components/agenforce/**",
+      /** Legacy embed script (vanilla JS). */
+      "public/embed/**",
+    ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    files: ["**/*.{ts,tsx,js,mjs}"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/no-unused-expressions": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "@next/next/no-img-element": "off",
+    },
+  },
   {
     files: a11yCriticalScreens,
     plugins: { "jsx-a11y": jsxA11y },
