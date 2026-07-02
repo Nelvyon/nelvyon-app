@@ -1,6 +1,5 @@
 import {
   getPartnerStripeAccount,
-  seedDemoLedgerEntries,
   upsertPartnerStripeAccount,
 } from "@/lib/partners/partnerConnectStore";
 import type { PartnerConnectStatus } from "@/lib/partners/partnerConnectTypes";
@@ -121,14 +120,4 @@ export async function startPartnerConnectOnboarding(params: {
   });
 
   return { url: link.url, account_id: accountId };
-}
-
-export async function maybeSeedDemoLedger(workspaceId: number): Promise<void> {
-  if (process.env.NODE_ENV === "production") return;
-  if (process.env.PARTNER_LEDGER_DEMO !== "true") return;
-  try {
-    await seedDemoLedgerEntries(workspaceId);
-  } catch {
-    /* non-blocking */
-  }
 }

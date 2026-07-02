@@ -8,7 +8,6 @@ import {
 } from "@/lib/partners/partnerConnectStore";
 import {
   getPartnerConnectStatus,
-  maybeSeedDemoLedger,
   buildConnectStatus,
 } from "@/lib/partners/partnerConnectService";
 import { isStripeConnectConfigured } from "@/lib/partners/partnerStripeConnect";
@@ -55,12 +54,6 @@ export async function GET(req: Request) {
   const workspaceId = parseWorkspaceId(req);
   if (!workspaceId) {
     return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
-  }
-
-  try {
-    await maybeSeedDemoLedger(workspaceId);
-  } catch {
-    /* non-blocking */
   }
 
   const [clientsPayload, affiliatePayload] = await Promise.all([

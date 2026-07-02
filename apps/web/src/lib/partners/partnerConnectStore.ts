@@ -252,46 +252,6 @@ export async function getLedgerTotals(workspaceId: number): Promise<PartnerLedge
   };
 }
 
-export async function seedDemoLedgerEntries(workspaceId: number): Promise<number> {
-  await ensurePartnerRebillingSchema();
-  const existing = await getLedgerTotals(workspaceId);
-  if (existing.entry_count > 0) return 0;
-
-  const demos = [
-    {
-      eventType: "connect_test" as const,
-      stripeEventId: `demo_connect_${workspaceId}_1`,
-      gross: 497,
-      wholesale: 149,
-      margin: 348,
-      description: "Demo — Local Growth Pack (prueba P2a)",
-    },
-    {
-      eventType: "connect_test" as const,
-      stripeEventId: `demo_connect_${workspaceId}_2`,
-      gross: 79,
-      wholesale: 39,
-      margin: 40,
-      description: "Demo — Starter cliente (prueba P2a)",
-    },
-  ];
-
-  let inserted = 0;
-  for (const d of demos) {
-    const row = await insertLedgerEntry({
-      partnerWorkspaceId: workspaceId,
-      eventType: d.eventType,
-      stripeEventId: d.stripeEventId,
-      grossEur: d.gross,
-      wholesaleEur: d.wholesale,
-      partnerMarginEur: d.margin,
-      description: d.description,
-    });
-    if (row) inserted += 1;
-  }
-  return inserted;
-}
-
 const PLAN_PRICING: Record<string, { wholesale: number; retail: number }> = {
   starter: { wholesale: 29, retail: 79 },
   pro: { wholesale: 129, retail: 249 },

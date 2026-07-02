@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
 import { getLedgerTotals, listLedgerEntries } from "@/lib/partners/partnerConnectStore";
-import { maybeSeedDemoLedger } from "@/lib/partners/partnerConnectService";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -22,8 +21,6 @@ export async function GET(req: Request) {
   if (!workspaceId) {
     return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
   }
-
-  await maybeSeedDemoLedger(workspaceId);
 
   const [items, totals] = await Promise.all([
     listLedgerEntries(workspaceId, 50),
