@@ -46,6 +46,7 @@
     "autonomous:enrich-outcomes": "tsx ../../backend/autonomous/scripts/run-enrich-outcomes.ts",
     "autonomous:learning-refresh": "tsx ../../backend/autonomous/scripts/run-learning-refresh.ts",
     "gate": "pnpm typecheck && pnpm lint && pnpm test:smoke && pnpm test:bot-evals",
+    "elite:reinforce": "node ../../scripts/run-local-elite-reinforce.mjs",
     "pwa:icons": "node ./scripts/generate-pwa-icons.mjs",
     "os:envato:login": "tsx ../../backend/os-agents/seeds/download-envato-browser.ts --login",
     "os:envato:browser": "tsx ../../backend/os-agents/seeds/download-envato-browser.ts --cdp",
