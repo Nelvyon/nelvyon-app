@@ -281,4 +281,77 @@ export class SaasPwaService {
       return 0;
     }
   }
+
+  async enqueuePushNotification(
+    tenantId: string,
+    input: { title: string; body: string; url?: string; userId?: string | null },
+  ): Promise<{ id: string } | null> {
+    try {
+      const rows = await this.db.query<{ id: string }>(
+        `INSERT INTO saas_pwa_push_queue (tenant_id, user_id, title, body, url)
+         VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+        [tenantId, input.userId ?? null, input.title, input.body, input.url ?? null],
+      );
+      return rows[0] ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Send Web Push to tenant subscribers (requires VAPID keys + web-push). */
+  async sendPushToTenant(
+    tenantId: string,
+    payload: { title: string; body: string; url?: string },
+    userId?: string | null,
+  ): Promise<{ sent: number; failed: number }> {
+    const publicKey = (process.env.VAPID_PUBLIC_KEY ?? "").trim();
+    const privateKey = (process.env.VAPID_PRIVATE_KEY ?? "").trim();
+    const subject = (process.env.VAPID_SUBJECT ?? "mailto:support@nelvyon.com").trim();
+    if (!publicKey || !privateKey) return { sent: 0, failed: 0 };
+
+    type SubRow = { endpoint: string; p256dh: string; auth: string };
+    let subs: SubRow[] = [];
+    try {
+      subs = await this.db.query<SubRow>(
+        userId
+          ? `SELECT endpoint, p256dh, auth FROM saas_pwa_push_subscriptions WHERE tenant_id=$1 AND user_id=$2`
+          : `SELECT endpoint, p256dh, auth FROM saas_pwa_push_subscriptions WHERE tenant_id=$1`,
+        userId ? [tenantId, userId] : [tenantId],
+      );
+    } catch {
+      return { sent: 0, failed: 0 };
+    }
+
+    if (!subs.length) return { sent: 0, failed: 0 };
+
+    let webpush: typeof import("web-push");
+    try {
+      webpush = await import("web-push");
+    } catch {
+      return { sent: 0, failed: subs.length };
+    }
+
+    webpush.setVapidDetails(subject, publicKey, privateKey);
+    const message = JSON.stringify({
+      title: payload.title,
+      body: payload.body,
+      url: payload.url ?? "/saas/dashboard",
+    });
+
+    let sent = 0;
+    let failed = 0;
+    for (const sub of subs) {
+      try {
+        await webpush.sendNotification(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          message,
+        );
+        sent++;
+      } catch {
+        failed++;
+        await this.removePushSubscription(tenantId, sub.endpoint).catch(() => undefined);
+      }
+    }
+    return { sent, failed };
+  }
 }

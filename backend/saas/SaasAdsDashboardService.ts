@@ -4,6 +4,7 @@
  * If no connection → { connected: false }. Never returns fake data.
  */
 import { DbClient } from "../db/DbClient";
+import { resolveAdsConnectionToken } from "./saasAdsTokenRefresh";
 
 export type AdsPlatform = "meta" | "google" | "linkedin" | "tiktok" | "snapchat";
 
@@ -162,6 +163,12 @@ function rowToConnection(r: ConnectionRow): AdsConnection {
 export class SaasAdsDashboardService {
   constructor(private readonly db: DbPort, private readonly fetchFn: FetchFn = fetch) {}
 
+  private async _getLiveConnection(tenantId: string, platform: AdsPlatform): Promise<ConnectionRow> {
+    const conn = await resolveAdsConnectionToken(tenantId, platform, this.db);
+    if (!conn) throw new SaasAdsDashboardError(`No active ${platform} connection`, "NOT_CONNECTED");
+    return conn;
+  }
+
   async listConnections(tenantId: string): Promise<AdsConnection[]> {
     const rows = await this.db.query<ConnectionRow>(
       `SELECT id,tenant_id,platform,account_id,account_name,token_expires_at,is_active,extra_config,access_token,refresh_token,created_at
@@ -211,12 +218,7 @@ export class SaasAdsDashboardService {
   }
 
   async getMetrics(tenantId: string, platform: AdsPlatform, dateStart: string, dateEnd: string): Promise<AdsMetrics> {
-    const conns = await this.db.query<ConnectionRow>(
-      `SELECT * FROM saas_ads_connections WHERE tenant_id=$1 AND platform=$2 AND is_active=true ORDER BY created_at DESC LIMIT 1`,
-      [tenantId, platform],
-    );
-    if (!conns.length) throw new SaasAdsDashboardError(`No active ${platform} connection for this tenant`, "NOT_CONNECTED");
-    const conn = conns[0];
+    const conn = await this._getLiveConnection(tenantId, platform);
 
     // Check cache
     const cacheThreshold = new Date(Date.now() - CACHE_TTL_HOURS * 3600 * 1000).toISOString();
@@ -338,12 +340,7 @@ export class SaasAdsDashboardService {
   // ─── Campaign management ──────────────────────────────────────────────────
 
   async listCampaigns(tenantId: string, platform: AdsPlatform): Promise<AdsCampaign[]> {
-    const conns = await this.db.query<ConnectionRow>(
-      `SELECT * FROM saas_ads_connections WHERE tenant_id=$1 AND platform=$2 AND is_active=true ORDER BY created_at DESC LIMIT 1`,
-      [tenantId, platform],
-    );
-    if (!conns.length) throw new SaasAdsDashboardError(`No active ${platform} connection`, "NOT_CONNECTED");
-    const conn = conns[0];
+    const conn = await this._getLiveConnection(tenantId, platform);
     if (platform === "meta") return this._fetchMetaCampaigns(conn.access_token, conn.account_id);
     if (platform === "google") return this._fetchGoogleCampaigns(conn.access_token, conn.account_id, conn.extra_config);
     if (platform === "tiktok") return this._fetchTikTokCampaigns(conn.access_token, conn.account_id);
@@ -353,12 +350,7 @@ export class SaasAdsDashboardService {
   }
 
   async createCampaign(tenantId: string, input: AdsCreateCampaignInput): Promise<AdsCampaign> {
-    const conns = await this.db.query<ConnectionRow>(
-      `SELECT * FROM saas_ads_connections WHERE tenant_id=$1 AND platform=$2 AND is_active=true ORDER BY created_at DESC LIMIT 1`,
-      [tenantId, input.platform],
-    );
-    if (!conns.length) throw new SaasAdsDashboardError(`No active ${input.platform} connection`, "NOT_CONNECTED");
-    const conn = conns[0];
+    const conn = await this._getLiveConnection(tenantId, input.platform);
     if (input.platform === "meta") return this._createMetaCampaign(conn.access_token, conn.account_id, input);
     if (input.platform === "google") return this._createGoogleCampaign(conn.access_token, conn.account_id, conn.extra_config, input);
     if (input.platform === "tiktok") return this._createTikTokCampaign(conn.access_token, conn.account_id, input);
@@ -369,12 +361,7 @@ export class SaasAdsDashboardService {
 
   async updateCampaignBudget(tenantId: string, platform: AdsPlatform, campaignId: string, dailyBudgetUsd: number): Promise<AdsCampaign> {
     if (dailyBudgetUsd <= 0) throw new SaasAdsDashboardError("dailyBudgetUsd must be > 0", "VALIDATION");
-    const conns = await this.db.query<ConnectionRow>(
-      `SELECT * FROM saas_ads_connections WHERE tenant_id=$1 AND platform=$2 AND is_active=true ORDER BY created_at DESC LIMIT 1`,
-      [tenantId, platform],
-    );
-    if (!conns.length) throw new SaasAdsDashboardError(`No active ${platform} connection`, "NOT_CONNECTED");
-    const conn = conns[0];
+    const conn = await this._getLiveConnection(tenantId, platform);
     if (platform === "meta") return this._updateMetaBudget(conn.access_token, campaignId, dailyBudgetUsd);
     if (platform === "google") return this._updateGoogleBudget(conn.access_token, conn.account_id, conn.extra_config, campaignId, dailyBudgetUsd);
     if (platform === "tiktok") return this._updateTikTokBudget(conn.access_token, conn.account_id, campaignId, dailyBudgetUsd);
@@ -384,12 +371,7 @@ export class SaasAdsDashboardService {
   }
 
   async setCampaignStatus(tenantId: string, platform: AdsPlatform, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
-    const conns = await this.db.query<ConnectionRow>(
-      `SELECT * FROM saas_ads_connections WHERE tenant_id=$1 AND platform=$2 AND is_active=true ORDER BY created_at DESC LIMIT 1`,
-      [tenantId, platform],
-    );
-    if (!conns.length) throw new SaasAdsDashboardError(`No active ${platform} connection`, "NOT_CONNECTED");
-    const conn = conns[0];
+    const conn = await this._getLiveConnection(tenantId, platform);
     if (platform === "meta") return this._setMetaCampaignStatus(conn.access_token, campaignId, status);
     if (platform === "google") return this._setGoogleCampaignStatus(conn.access_token, conn.account_id, conn.extra_config, campaignId, status);
     if (platform === "tiktok") return this._setTikTokCampaignStatus(conn.access_token, conn.account_id, campaignId, status);

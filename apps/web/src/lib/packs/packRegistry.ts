@@ -101,7 +101,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     reportPath: "/dashboard/social-calendar",
     projectPrefix: "SCP",
     stepDefinitions: SOCIAL_CALENDAR_PACK_STEP_DEFINITIONS,
-    skuSequence: ["NELVYON-LANDING"],
+    skuSequence: ["NELVYON-LANDING", "NELVYON-CHATBOT"],
     sectors: [
       { id: "local", label: "Negocio local" },
       { id: "ecommerce", label: "Ecommerce" },
@@ -118,7 +118,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     reportPath: "/dashboard/content-strategy",
     projectPrefix: "CSP",
     stepDefinitions: CONTENT_STRATEGY_PACK_STEP_DEFINITIONS,
-    skuSequence: ["NELVYON-LANDING"],
+    skuSequence: ["NELVYON-LANDING", "NELVYON-SEO"],
     sectors: [
       { id: "local", label: "Negocio local" },
       { id: "ecommerce", label: "Ecommerce" },
@@ -135,7 +135,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     reportPath: "/dashboard/cro-audit",
     projectPrefix: "CAP",
     stepDefinitions: CRO_AUDIT_PACK_STEP_DEFINITIONS,
-    skuSequence: ["NELVYON-LANDING"],
+    skuSequence: ["NELVYON-LANDING", "NELVYON-SEO"],
     sectors: [
       { id: "ecommerce", label: "Ecommerce" },
       { id: "saas_b2b", label: "SaaS B2B" },
@@ -152,7 +152,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     reportPath: "/dashboard/analytics-setup",
     projectPrefix: "ASP",
     stepDefinitions: ANALYTICS_SETUP_PACK_STEP_DEFINITIONS,
-    skuSequence: ["NELVYON-LANDING"],
+    skuSequence: ["NELVYON-SEO", "NELVYON-LANDING"],
     sectors: [
       { id: "ecommerce", label: "Ecommerce" },
       { id: "saas_b2b", label: "SaaS B2B" },
@@ -169,7 +169,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     reportPath: "/dashboard/brand-voice",
     projectPrefix: "BVP",
     stepDefinitions: BRAND_VOICE_PACK_STEP_DEFINITIONS,
-    skuSequence: ["NELVYON-LANDING"],
+    skuSequence: ["NELVYON-LANDING", "NELVYON-CHATBOT"],
     sectors: [
       { id: "local", label: "Negocio local" },
       { id: "ecommerce", label: "Ecommerce" },

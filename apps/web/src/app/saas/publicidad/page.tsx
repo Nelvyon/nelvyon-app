@@ -48,6 +48,7 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
   const [accountId, setAccountId] = useState("");
   const [accountName, setAccountName] = useState("");
   const [accessToken, setAccessToken] = useState("");
+  const [developerToken, setDeveloperToken] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -59,7 +60,15 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
       const res = await fetch("/api/saas/ads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ platform, account_id: accountId.trim(), account_name: accountName.trim() || accountId.trim(), access_token: accessToken.trim() }),
+        body: JSON.stringify({
+          platform,
+          account_id: accountId.trim(),
+          account_name: accountName.trim() || accountId.trim(),
+          access_token: accessToken.trim(),
+          extra_config: platform === "google" && developerToken.trim()
+            ? { developerToken: developerToken.trim() }
+            : undefined,
+        }),
       });
       if (!res.ok) {
         const j = (await res.json().catch(() => ({}))) as { error?: string };
@@ -92,7 +101,7 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
               ))}
             </div>
           </div>
-          {(platform === "meta" || platform === "google" || platform === "linkedin" || platform === "tiktok") && (
+          {(platform === "meta" || platform === "google" || platform === "linkedin" || platform === "tiktok" || platform === "snapchat") && (
             <div className="rounded-lg border border-[#0084ff]/20 bg-[#0084ff]/5 px-4 py-3 space-y-2">
               <p className="text-xs text-muted-foreground">Conexión recomendada — OAuth oficial:</p>
               <div className="flex flex-wrap gap-2">
@@ -116,6 +125,11 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
                     Conectar TikTok OAuth →
                   </a>
                 )}
+                {platform === "snapchat" && (
+                  <a href="/api/oauth/snapchat" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                    Conectar Snapchat OAuth →
+                  </a>
+                )}
               </div>
             </div>
           )}
@@ -137,6 +151,14 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
               placeholder={PLATFORM_CFG[platform]?.tokenPlaceholder ?? "token..."}
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
           </div>
+          {platform === "google" && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Google Ads Developer Token *</label>
+              <input value={developerToken} onChange={e => setDeveloperToken(e.target.value)} type="password"
+                placeholder="Developer token de Google Ads API Center"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            </div>
+          )}
           {(platform === "tiktok" || platform === "snapchat") && (
             <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 px-4 py-3 text-xs text-blue-400">
               {platform === "tiktok"

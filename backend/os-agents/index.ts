@@ -50,6 +50,13 @@ export {
   resetInitOsQueueWorkerForTests,
   resetOsQueueWorkerForTests,
 } from "./OsQueueWorker";
+export {
+  OsSectorCertificationService,
+  getOsSectorCertificationService,
+  resetOsSectorCertificationServiceForTests,
+  type SectorCertification,
+  type SectorCertSummary,
+} from "./OsSectorCertificationService";
 export { WebPremiumAgent } from "./agents/WebPremiumAgent";
 export { EcommercePremiumAgent } from "./agents/EcommercePremiumAgent";
 export { SeoPremiumAgent } from "./agents/SeoPremiumAgent";

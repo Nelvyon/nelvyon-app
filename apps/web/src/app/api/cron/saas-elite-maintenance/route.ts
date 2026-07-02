@@ -6,9 +6,13 @@ import { NextResponse } from "next/server";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 import {
   getSaasAdsOptimizerService,
+  getSaasCrmSyncService,
   getSaasHubSpotSyncService,
+  refreshCrmAccessTokenIfNeeded,
   refreshHubSpotAccessTokenIfNeeded,
+  type CrmConnectorSlug,
 } from "@nelvyon/saas";
+import { getOsSectorCertificationService } from "@nelvyon/os-agents";
 
 function authorizeCron(req: Request): boolean {
   const secret = process.env.CRON_SECRET?.trim();
@@ -27,6 +31,7 @@ export async function GET(req: Request) {
   const hubSvc = getSaasHubSpotSyncService();
   let adsTenants = 0;
   let hubspotTenants = 0;
+  let crmTenants = 0;
 
   const adTenants = await db.query<{ tenant_id: string }>(
     `SELECT DISTINCT tenant_id FROM saas_ads_optimizer_rules WHERE enabled=true`,
@@ -51,5 +56,31 @@ export async function GET(req: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, adsTenants, hubspotTenants });
+  const crmSlugs: Exclude<CrmConnectorSlug, "hubspot">[] = ["salesforce", "pipedrive", "zoho"];
+  const crmSvc = getSaasCrmSyncService();
+  for (const slug of crmSlugs) {
+    const rows = await db.query<{ tenant_id: string }>(
+      `SELECT tenant_id FROM saas_integration_connections WHERE connector_slug=$1 AND status='connected'`,
+      [slug],
+    );
+    for (const row of rows) {
+      try {
+        const token = await refreshCrmAccessTokenIfNeeded(row.tenant_id, slug);
+        if (!token) continue;
+        await crmSvc.runSync(row.tenant_id, slug, token);
+        crmTenants++;
+      } catch {
+        /* continue */
+      }
+    }
+  }
+
+  let sectorCertBatch = { processed: 0, passed: 0, failed: 0 };
+  try {
+    sectorCertBatch = await getOsSectorCertificationService().runBatchCertification();
+  } catch {
+    /* non-blocking */
+  }
+
+  return NextResponse.json({ ok: true, adsTenants, hubspotTenants, crmTenants, sectorCertBatch });
 }

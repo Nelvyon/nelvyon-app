@@ -79,6 +79,7 @@ const WEB_OAUTH_ROUTES: Record<string, string> = {
   google_calendar: "/api/oauth/google",
   linkedin: "/api/oauth/linkedin",
   tiktok: "/api/oauth/tiktok",
+  snapchat: "/api/oauth/snapchat",
 };
 
 /** OAuth via FastAPI /api/v1/oauth/authorize/{provider} (all non-Next OAuth connectors). */

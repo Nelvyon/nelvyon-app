@@ -124,6 +124,7 @@ export async function startPartnerConnectOnboarding(params: {
 }
 
 export async function maybeSeedDemoLedger(workspaceId: number): Promise<void> {
+  if (process.env.NODE_ENV === "production") return;
   if (process.env.PARTNER_LEDGER_DEMO !== "true") return;
   try {
     await seedDemoLedgerEntries(workspaceId);

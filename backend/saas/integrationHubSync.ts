@@ -11,7 +11,11 @@ export const OAUTH_PROVIDER_SLUGS: Record<string, string[]> = {
   meta: ["meta"],
   linkedin: ["linkedin"],
   tiktok: ["tiktok"],
+  snapchat: ["snapchat"],
   hubspot: ["hubspot"],
+  salesforce: ["salesforce"],
+  pipedrive: ["pipedrive"],
+  zoho: ["zoho"],
   slack: ["slack"],
 };
 
@@ -41,11 +45,12 @@ export async function syncOAuthProviderToHub(
   }
 }
 
-const ADS_OAUTH_PLATFORMS: Record<string, "meta" | "google" | "linkedin" | "tiktok"> = {
+const ADS_OAUTH_PLATFORMS: Record<string, "meta" | "google" | "linkedin" | "tiktok" | "snapchat"> = {
   meta: "meta",
   google: "google",
   linkedin: "linkedin",
   tiktok: "tiktok",
+  snapchat: "snapchat",
 };
 
 const SOCIAL_OAUTH_PLATFORMS: Record<string, "meta" | "linkedin"> = {

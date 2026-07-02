@@ -117,6 +117,9 @@
       ],
       "stripe": [
         "./node_modules/stripe"
+      ],
+      "web-push": [
+        "./node_modules/web-push"
       ]
     },
     "types": [

@@ -1452,3 +1452,16 @@ export {
   type ScimUser,
 } from "./SaasScimService";
 export { computeMlDealForecast, type MlForecastResult } from "./saasDealForecast";
+export {
+  resolveCrmAccessToken,
+  refreshCrmAccessTokenIfNeeded,
+  type CrmConnectorSlug,
+} from "./crmIntegrationToken";
+export {
+  SaasCrmSyncService,
+  getSaasCrmSyncService,
+} from "./SaasCrmSyncService";
+export {
+  refreshAdsAccessTokenIfNeeded,
+  resolveAdsConnectionToken,
+} from "./saasAdsTokenRefresh";

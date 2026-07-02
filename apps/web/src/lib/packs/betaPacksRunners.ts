@@ -1,8 +1,7 @@
 /**
  * betaPacksRunners.ts — minimal real runners for the 5 beta packs.
  *
- * Each pack runs NELVYON-LANDING via packOrchestrator (real deliverable created,
- * QA gate applied, auto-approve at ≥85). No mocks.
+ * Each pack runs real SKUs via packOrchestrator (QA gate, auto-approve at ≥85). No mocks.
  */
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
