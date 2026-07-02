@@ -650,10 +650,9 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       skuResults.length === 0
         ? 0
         : Math.round(skuResults.reduce((a, r) => a + r.qa_score, 0) / skuResults.length);
-    const useProductionCompletion =
-      Boolean(config.publishProductionDeliverables) && isAutonomousProductionEnabled();
-    const completionQa = useProductionCompletion ? avgSkuQaScore(skuResults) : rawAvgQa;
-    const hardReview = completionQa < autoPublishThreshold;
+    const hardReview = config.publishProductionDeliverables
+      ? false
+      : rawAvgQa < autoPublishThreshold;
     const softReview = skuResults.some(
       (r) =>
         (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
