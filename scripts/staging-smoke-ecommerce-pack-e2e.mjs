@@ -349,7 +349,7 @@ async function main() {
   await checkDeliverables(portalAuth.token, osProjectId);
 
   printSummary();
-  process.exit(CRITICAL.length === 0 ? 0 : 1);
+  process.exit(CRITICAL.length === 0 && WARN.length === 0 ? 0 : 1);
 }
 
 function printSummary() {
@@ -357,7 +357,11 @@ function printSummary() {
   console.log(`CRITICAL: ${CRITICAL.length}  WARN: ${WARN.length}`);
   for (const c of CRITICAL) console.log(`  FAIL [${c.module}] ${c.check}: ${c.detail}`);
   for (const w of WARN) console.log(`  WARN [${w.module}] ${w.check}: ${w.detail}`);
-  console.log(CRITICAL.length === 0 ? "ALL_PASS" : "CRITICAL_FAILS");
+  if (CRITICAL.length === 0 && WARN.length === 0) {
+    console.log("ALL_PASS");
+  } else {
+    console.log(CRITICAL.length > 0 ? "CRITICAL_FAIL" : "WARN_FAIL");
+  }
 }
 
 main().catch((e) => {

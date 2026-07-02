@@ -456,13 +456,14 @@ async function main() {
   await verifyPortalBffFlows(portalAuth.token, portalAuth.base, osProjectId, deliverables);
 
   console.log("\n=== SUMMARY ===");
-  if (WARN.length) console.log(`WARNINGS: ${WARN.length}`);
-  if (CRITICAL.length === 0) {
-    console.log("ALL_CRITICAL_PASS");
+  console.log(`critical=${CRITICAL.length} warnings=${WARN.length}`);
+  for (const w of WARN) console.log(`  WARN [${w.module}] ${w.check}: ${w.detail}`);
+  for (const f of CRITICAL) console.log(`  FAIL [${f.module}] ${f.check}: ${f.detail}`);
+  if (CRITICAL.length === 0 && WARN.length === 0) {
+    console.log("ALL_PASS");
     process.exit(0);
   }
-  console.log(`CRITICAL_FAILS: ${CRITICAL.length}`);
-  for (const f of CRITICAL) console.log(`  [${f.module}] ${f.check}: ${f.detail}`);
+  console.log(CRITICAL.length > 0 ? "CRITICAL_FAIL" : "WARN_FAIL");
   process.exit(1);
 }
 

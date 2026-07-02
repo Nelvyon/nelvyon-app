@@ -17,6 +17,7 @@ import {
   verifyDeliverables,
   waitForDeploy,
 } from "./lib/pack-e2e-shared.mjs";
+import { finishSmokeGate } from "./lib/smoke-summary.mjs";
 
 const SKIP_WAIT = process.argv.includes("--skip-wait");
 const packArgIdx = process.argv.indexOf("--pack");
@@ -174,14 +175,8 @@ async function main() {
 
   console.log("\n=== SUMMARY ===");
   console.log(`Packs OK: ${ok}/${packs.length}`);
-  if (WARN.length) console.log(`WARNINGS: ${WARN.length}`);
-  if (CRITICAL.length === 0) {
-    console.log("ALL_BETA_PACKS_PASS");
-    process.exit(0);
-  }
-  console.log(`CRITICAL_FAILS: ${CRITICAL.length}`);
-  for (const f of CRITICAL) console.log(`  [${f.module}] ${f.check}: ${f.detail}`);
-  process.exit(1);
+  const code = finishSmokeGate({ critical: CRITICAL, warn: WARN, passLabel: "ALL_BETA_PACKS_PASS" });
+  process.exit(code);
 }
 
 main().catch((e) => {

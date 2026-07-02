@@ -3,6 +3,7 @@
  * Usage: node scripts/staging-smoke-p1-partners.mjs [--skip-wait]
  */
 import { getWorkspaceIdWithFallback } from "./lib/smoke-workspace.mjs";
+import { finishSmokeGate } from "./lib/smoke-summary.mjs";
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD = "StagingQA2026!";
@@ -245,14 +246,7 @@ async function main() {
   }
 
   console.log("\n=== SUMMARY ===");
-  if (WARN.length) console.log(`WARNINGS: ${WARN.length}`);
-  if (CRITICAL.length === 0) {
-    console.log("ALL_CRITICAL_PASS");
-    process.exit(0);
-  }
-  console.log(`CRITICAL_FAILS: ${CRITICAL.length}`);
-  for (const f of CRITICAL) console.log(`  [${f.module}] ${f.check}: ${f.detail}`);
-  process.exit(1);
+  process.exit(finishSmokeGate({ critical: CRITICAL, warn: WARN }));
 }
 
 main().catch((e) => {

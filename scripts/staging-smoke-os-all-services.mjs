@@ -6,6 +6,7 @@ import { readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getWorkspaceIdWithFallback } from "./lib/smoke-workspace.mjs";
+import { finishSmokeGate } from "./lib/smoke-summary.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const osAppDir = join(root, "apps/web/src/app/os");
@@ -159,12 +160,7 @@ async function main() {
 
   console.log("\n=== SUMMARY ===");
   console.log(`modules=${modules.length} critical=${CRITICAL.length} warnings=${WARN.length}`);
-  if (CRITICAL.length === 0) {
-    console.log("ALL_CRITICAL_PASS");
-    process.exit(0);
-  }
-  console.log(JSON.stringify(CRITICAL, null, 2));
-  process.exit(1);
+  process.exit(finishSmokeGate({ critical: CRITICAL, warn: WARN }));
 }
 
 main().catch((e) => {

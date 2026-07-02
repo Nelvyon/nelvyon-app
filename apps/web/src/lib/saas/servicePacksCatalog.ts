@@ -54,8 +54,8 @@ export type ServicePackDefinition = {
  *   ecommerce-growth        → NELVYON-LANDING + NELVYON-SEO + NELVYON-CHATBOT
  *   saas-b2b-growth         → NELVYON-LANDING + NELVYON-SEO + NELVYON-CHATBOT
  *
+ * All 8 packs have real kickoff runners via packOrchestrator (growth + beta).
  * coming_soon packs have no backend SKUs — do NOT change to "available" without kickoff runner.
- * "beta" packs are visible to users but lack a packOrchestrator runner — they show a waitlist/intake form only.
  */
 export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
   {
@@ -243,6 +243,8 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     verticals: ["local", "ecommerce", "b2b_saas", "info_products"],
     availability: "available",
     launchPackId: SOCIAL_CALENDAR_PACK_ID,
+    kickoffPath: "/os/packs/social-calendar",
+    reportPath: "/os/packs/social-calendar/report",
     benefits: [
       "Calendario editorial de 4 semanas",
       "Copies nativos por red",
@@ -264,6 +266,8 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     verticals: ["b2b_saas", "info_products", "ecommerce"],
     availability: "available",
     launchPackId: CONTENT_STRATEGY_PACK_ID,
+    kickoffPath: "/os/packs/content-strategy",
+    reportPath: "/os/packs/content-strategy/report",
     benefits: ["Plan 90 días", "Clusters SEO", "Briefs por artículo", "KPIs de contenido"],
     problem: "Publicas sin estrategia y el contenido no trae leads ni posicionamiento.",
     audience: "Marcas que apuestan por inbound: blog, LinkedIn, YouTube o newsletter.",
@@ -281,6 +285,8 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     verticals: ["ecommerce", "b2b_saas", "info_products"],
     availability: "available",
     launchPackId: CRO_AUDIT_PACK_ID,
+    kickoffPath: "/os/packs/cro-audit",
+    reportPath: "/os/packs/cro-audit/report",
     benefits: ["Auditoría heurística", "Mapa de fricción", "Plan de tests A/B", "Quick wins 30d"],
     problem: "Tienes visitas pero la tasa de conversión está por debajo de lo que debería.",
     audience: "Landings, checkout y funnels con volumen para optimizar.",
@@ -298,6 +304,8 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     verticals: ["local", "ecommerce", "b2b_saas", "generic"],
     availability: "available",
     launchPackId: ANALYTICS_SETUP_PACK_ID,
+    kickoffPath: "/os/packs/analytics-setup",
+    reportPath: "/os/packs/analytics-setup/report",
     benefits: ["Mapa de eventos", "Plantilla de informe", "Checklist QA de tracking"],
     problem: "No confías en los datos o no sabes qué eventos configurar en GA4.",
     audience: "Equipos que empiezan con medición o migraron sin plan claro.",
@@ -315,6 +323,8 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     verticals: ["local", "ecommerce", "b2b_saas", "generic"],
     availability: "available",
     launchPackId: BRAND_VOICE_PACK_ID,
+    kickoffPath: "/os/packs/brand-voice",
+    reportPath: "/os/packs/brand-voice/report",
     benefits: ["Guía de tono", "Propuestas de valor", "Messaging house", "Do/don't de copy"],
     problem: "Tu marca suena distinta en cada canal y no transmites confianza ni diferenciación.",
     audience: "Rebranding, startups definiendo posicionamiento o agencias unificando cliente.",

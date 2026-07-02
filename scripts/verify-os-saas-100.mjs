@@ -36,7 +36,7 @@ if (!osOnly) {
 }
 
 if (exit === 0) {
-  console.log("\n✅ OS + SaaS prod smokes: ALL_CRITICAL_PASS\n");
+  console.log("\n✅ OS + SaaS prod smokes: ALL_PASS (0 critical, 0 warnings)\n");
 } else {
   console.log("\n❌ OS or SaaS smoke failed — see logs above\n");
 }

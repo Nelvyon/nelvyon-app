@@ -1,5 +1,6 @@
 /**
- * Elite gate — P0 (3 growth packs) + beta packs E2E.
+ * Elite gate — P0 + beta packs E2E + OS/SaaS 100%.
+ * Zero tolerance: any CRITICAL or WARN fails the gate.
  * Usage: node scripts/run-staging-elite-gate.mjs [--skip-wait]
  */
 import { spawnSync } from "node:child_process";
