@@ -96,6 +96,7 @@ async function runBetaPack(
       }),
       reportDeliverableTitle: "Informe ejecutivo",
       projectDescription: (i) => `${meta.name}: ${i.business_name} — ${i.city}`,
+      publishProductionDeliverables: true,
     },
   });
 }

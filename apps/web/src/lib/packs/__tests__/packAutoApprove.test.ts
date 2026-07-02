@@ -179,6 +179,25 @@ describe("packOrchestrator — auto-approve", () => {
     expect(completedCall).toBeDefined();
   });
 
+  it("status = completed cuando QA ≥ 85 aunque gate/shield/truth requieran revisión suave", async () => {
+    mockSimulate.mockReturnValueOnce({
+      project: { qa: { score: 90, passed: true }, project_id: "proj-gate", sku: "NELVYON-LANDING", artifacts: {}, os_refs: {} },
+      escalated: false,
+      os_publish: { deliverables: [] },
+      simulation_mode: "production",
+    });
+
+    await runGrowthPack({ workspaceId: 1, userId: "user-1", config: makeConfig() });
+
+    const completedCall = (mockUpdatePackRun.mock.calls as unknown[][]).find(
+      (args) => {
+        const patch = args[1] as Record<string, unknown>;
+        return patch.status === "completed";
+      },
+    );
+    expect(completedCall).toBeDefined();
+  });
+
   it("status = needs_review y sin auto-approve cuando QA < 85", async () => {
     mockSimulate.mockReturnValueOnce({
       project: { qa: { score: 70, passed: false }, project_id: "proj-low", sku: "NELVYON-LANDING", artifacts: {}, os_refs: {} },

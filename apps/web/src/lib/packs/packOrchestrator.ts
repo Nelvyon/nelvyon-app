@@ -646,16 +646,21 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     steps = markStep(steps, "report", "done");
 
     const autoPublishThreshold = config.autoPublishQaThreshold ?? 85;
-    const hardReview = skuResults.some(
+    const rawAvgQa =
+      skuResults.length === 0
+        ? 0
+        : Math.round(skuResults.reduce((a, r) => a + r.qa_score, 0) / skuResults.length);
+    const useProductionCompletion =
+      Boolean(config.publishProductionDeliverables) && isAutonomousProductionEnabled();
+    const completionQa = useProductionCompletion ? avgSkuQaScore(skuResults) : rawAvgQa;
+    const hardReview = completionQa < autoPublishThreshold;
+    const softReview = skuResults.some(
       (r) =>
-        r.qa_score < autoPublishThreshold ||
+        (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
         r.qa_legal_passed === false ||
         r.qa_gate_status === "blocked" ||
         r.shield_status === "blocked" ||
         r.truth_status === "blocked",
-    );
-    const softReview = skuResults.some(
-      (r) => r.qa_visual_score !== undefined && r.qa_visual_score < 70,
     );
     const finalStatus = hardReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", hardReview ? "skipped" : "done");

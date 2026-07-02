@@ -105,15 +105,11 @@ async function runBetaPackE2e(token, workspaceId, pack) {
     return false;
   }
 
-  if (finalRun.status === "failed") {
-    fail(pack.label, "status", finalRun.error_message ?? "failed");
+  if (finalRun.status !== "completed") {
+    fail(pack.label, "status", finalRun.status === "needs_review" ? "needs_review — expected completed" : (finalRun.error_message ?? finalRun.status));
     return false;
   }
-  if (finalRun.status === "needs_review") {
-    pass(pack.label, "status", "needs_review — deliverables published for portal review");
-  } else {
-    pass(pack.label, "status", finalRun.status);
-  }
+  pass(pack.label, "status", "completed");
 
   const osClientId = finalRun.os_client_id;
   const osProjectId = finalRun.os_project_id;

@@ -163,6 +163,7 @@ export async function runSaasB2bGrowthPack(params: {
       buildReport: buildPackReport,
       projectDescription: (i) =>
         `SaaS B2B pack: landing + SEO demand gen + demo bot + outbound para ICP ${i.icp_title}`,
+      publishProductionDeliverables: true,
     },
   });
 }

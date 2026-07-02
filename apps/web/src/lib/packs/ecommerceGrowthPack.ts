@@ -141,6 +141,7 @@ export async function runEcommerceGrowthPack(params: {
       buildReport: buildPackReport,
       projectDescription: (i) =>
         `Ecommerce pack: landing + SEO catálogo + chatbot ventas + Meta Ads para ${i.product_category}`,
+      publishProductionDeliverables: true,
     },
   });
 }

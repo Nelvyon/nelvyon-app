@@ -316,16 +316,12 @@ async function main() {
     process.exit(1);
   }
 
-  if (finalRun.status === "failed") {
-    fail("kickoff", "status", finalRun.error_message ?? "failed");
+  if (finalRun.status !== "completed") {
+    fail("kickoff", "status", finalRun.status === "needs_review" ? "needs_review — expected completed" : (finalRun.error_message ?? finalRun.status));
     printSummary();
     process.exit(1);
   }
-  if (finalRun.status === "needs_review") {
-    pass("kickoff", "auto-approve", "status=needs_review — deliverables published for portal review");
-  } else {
-    pass("kickoff", "status", finalRun.status);
-  }
+  pass("kickoff", "status", "completed");
 
   const osClientId = finalRun.os_client_id;
   const osProjectId = finalRun.os_project_id;
