@@ -120,7 +120,7 @@ export default function CreativeStudio() {
           </div>
           {asset.status === "done" && asset.url ? (
             asset.assetType === "image" ? (
-              // eslint-disable-next-line @next/next/no-img-element
+               
               <img src={asset.url} alt={asset.prompt} className="max-h-[480px] w-auto max-w-full rounded-lg border border-zinc-800" />
             ) : (
               <video src={asset.url} className="max-h-[480px] w-full max-w-3xl rounded-lg border border-zinc-800" autoPlay loop muted playsInline controls />

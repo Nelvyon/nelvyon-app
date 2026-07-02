@@ -43,32 +43,6 @@ interface ScanEvent {
   browser: string;
 }
 
-/* ─────────────────────────── MOCK DATA ─────────────────────────── */
-const MOCK_QRS: QRCode[] = [
-  { id: "qr1", name: "Landing Principal", type: "dynamic", content: "https://nelvyon.com", scans: 2847, created: "2026-03-15", folder: "Marketing", campaign: "Spring 2026", status: "active", style: { fg: "#000000", bg: "#FFFFFF", shape: "rounded" } },
-  { id: "qr2", name: "Menú Restaurante", type: "static", content: "https://nelvyon.com/menu", scans: 1523, created: "2026-03-20", folder: "Clientes", status: "active", style: { fg: "#1a1a2e", bg: "#e8e8e8", shape: "dots" } },
-  { id: "qr3", name: "Tarjeta Digital", type: "dynamic", content: "https://nelvyon.com/card/ceo", scans: 892, created: "2026-04-01", folder: "Personal", status: "active", style: { fg: "#6c3ce0", bg: "#f5f0ff", logo: "logo.png", shape: "rounded" } },
-  { id: "qr4", name: "Promo Verano", type: "dynamic", content: "https://nelvyon.com/promo/summer", scans: 4201, created: "2026-04-05", folder: "Marketing", campaign: "Summer Sale", status: "active", style: { fg: "#e63946", bg: "#fff1f2", shape: "square" } },
-  { id: "qr5", name: "WiFi Oficina", type: "static", content: "WIFI:T:WPA;S:NelvyonHQ;P:s3cur3pass;;", scans: 312, created: "2026-02-10", folder: "Interno", status: "active", style: { fg: "#000", bg: "#fff", shape: "square" } },
-  { id: "qr6", name: "Encuesta NPS", type: "dynamic", content: "https://nelvyon.com/survey/nps-q1", scans: 156, created: "2026-01-20", folder: "Clientes", campaign: "NPS Q1", status: "paused", style: { fg: "#059669", bg: "#ecfdf5", shape: "rounded" } },
-];
-
-const MOCK_FOLDERS: QRFolder[] = [
-  { id: "f1", name: "Marketing", count: 12, color: "#e63946" },
-  { id: "f2", name: "Clientes", count: 8, color: "#3b82f6" },
-  { id: "f3", name: "Personal", count: 5, color: "#8b5cf6" },
-  { id: "f4", name: "Interno", count: 3, color: "#6b7280" },
-];
-
-const MOCK_SCANS: ScanEvent[] = [
-  { id: "s1", qrId: "qr1", qrName: "Landing Principal", timestamp: "2026-04-12 14:32", location: "Madrid, ES", device: "iPhone 15", browser: "Safari" },
-  { id: "s2", qrId: "qr4", qrName: "Promo Verano", timestamp: "2026-04-12 14:28", location: "Barcelona, ES", device: "Samsung S24", browser: "Chrome" },
-  { id: "s3", qrId: "qr3", qrName: "Tarjeta Digital", timestamp: "2026-04-12 14:15", location: "México DF, MX", device: "Pixel 8", browser: "Chrome" },
-  { id: "s4", qrId: "qr1", qrName: "Landing Principal", timestamp: "2026-04-12 13:55", location: "Buenos Aires, AR", device: "iPhone 14", browser: "Safari" },
-  { id: "s5", qrId: "qr2", qrName: "Menú Restaurante", timestamp: "2026-04-12 13:40", location: "Valencia, ES", device: "iPad Pro", browser: "Safari" },
-  { id: "s6", qrId: "qr4", qrName: "Promo Verano", timestamp: "2026-04-12 13:22", location: "Bogotá, CO", device: "Samsung A54", browser: "Samsung Internet" },
-];
-
 /* ─────────────────────────── QR CANVAS RENDERER ─────────────────────────── */
 function QRPreview({ content, style, size = 160 }: { content: string; style: QRCode["style"]; size?: number }) {
   const cellSize = size / 21;
@@ -129,7 +103,9 @@ function QRPreview({ content, style, size = 160 }: { content: string; style: QRC
 /* ─────────────────────────── MAIN COMPONENT ─────────────────────────── */
 export default function SaasQRService() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [qrs, setQrs] = useState<QRCode[]>(MOCK_QRS);
+  const [qrs, setQrs] = useState<QRCode[]>([]);
+  const [folders] = useState<QRFolder[]>([]);
+  const [scans] = useState<ScanEvent[]>([]);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<"all" | "static" | "dynamic">("all");
   const [filterFolder, setFilterFolder] = useState("all");
@@ -288,7 +264,7 @@ export default function SaasQRService() {
             </select>
             <select value={filterFolder} onChange={e => setFilterFolder(e.target.value)} className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-300">
               <option value="all">Todas las carpetas</option>
-              {MOCK_FOLDERS.map(f => <option key={f.id} value={f.name}>{f.name}</option>)}
+              {folders.map(f => <option key={f.id} value={f.name}>{f.name}</option>)}
             </select>
           </div>
 
@@ -464,7 +440,7 @@ export default function SaasQRService() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {MOCK_SCANS.map(s => (
+                {scans.map(s => (
                   <div key={s.id} className="flex items-center gap-3 p-2 bg-zinc-800/30 rounded-lg text-xs">
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="font-medium text-zinc-200 w-32 truncate">{s.qrName}</span>
@@ -527,7 +503,7 @@ export default function SaasQRService() {
         {/* ── FOLDERS TAB ── */}
         <TabsContent value="folders" className="space-y-4 mt-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {MOCK_FOLDERS.map(f => (
+            {folders.map(f => (
               <Card key={f.id} className="bg-zinc-900/60 border-zinc-800/50 hover:border-purple-600/30 transition-all cursor-pointer">
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="p-2.5 rounded-lg" style={{ backgroundColor: f.color + "20" }}>
@@ -601,7 +577,7 @@ export default function SaasQRService() {
                 <div>
                   <label className="text-xs text-zinc-400 mb-1 block">Carpeta</label>
                   <select value={newFolder} onChange={e => setNewFolder(e.target.value)} className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm">
-                    {MOCK_FOLDERS.map(f => <option key={f.id} value={f.name}>{f.name}</option>)}
+                    {folders.map(f => <option key={f.id} value={f.name}>{f.name}</option>)}
                   </select>
                 </div>
               </div>

@@ -375,7 +375,7 @@ export default function VideoEnhancerDashboard() {
               ) : (
                 <div className="space-y-3">
                   <div className="overflow-hidden rounded-lg bg-slate-950">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    { }
                     <img src={thumbResult.imageUrl} alt="Thumbnail" className="w-full object-cover" />
                   </div>
                   <p className="text-xs text-slate-500">{thumbResult.prompt}</p>

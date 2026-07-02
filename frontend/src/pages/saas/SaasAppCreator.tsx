@@ -42,7 +42,7 @@ interface AppTemplate {
   image: string;
 }
 
-/* ─────────────────────────── MOCK DATA ─────────────────────────── */
+/* ─────────────────────────── TEMPLATE CATALOG ─────────────────────────── */
 const APP_TEMPLATES: AppTemplate[] = [
   { id: "t1", name: "Landing SaaS Pro", type: "landing", description: "Landing page moderna para productos SaaS con hero, features, pricing y CTA", features: ["Hero animado", "Pricing table", "Testimonios", "CTA flotante"], popularity: 94, image: "🚀" },
   { id: "t2", name: "E-Commerce Starter", type: "business", description: "Tienda online completa con catálogo, carrito y checkout", features: ["Catálogo productos", "Carrito", "Checkout", "Filtros"], popularity: 89, image: "🛒" },
@@ -52,13 +52,6 @@ const APP_TEMPLATES: AppTemplate[] = [
   { id: "t6", name: "CRM Ligero", type: "business", description: "CRM simplificado para gestión de contactos y deals", features: ["Contactos", "Pipeline", "Actividades", "Reportes"], popularity: 85, image: "👥" },
   { id: "t7", name: "Encuestas & Forms", type: "mini-app", description: "Creador de encuestas con lógica condicional y analytics", features: ["Builder drag&drop", "Lógica", "Analytics", "Exportar"], popularity: 76, image: "📝" },
   { id: "t8", name: "Intranet Empresa", type: "internal", description: "Portal interno con noticias, directorio y documentos", features: ["Noticias", "Directorio", "Docs", "Chat"], popularity: 73, image: "🏢" },
-];
-
-const MOCK_PROJECTS: AppProject[] = [
-  { id: "p1", name: "Landing TechVenture", type: "landing", status: "delivered", created: "2026-03-10", updated: "2026-03-18", description: "Landing page para startup de IA", features: ["Hero 3D", "Pricing", "Blog"], colorScheme: "#6c3ce0", progress: 100, previewUrl: "https://techventure.nelvyon.app", client: "TechVenture Inc." },
-  { id: "p2", name: "Panel Logística", type: "internal", status: "editing", created: "2026-04-01", updated: "2026-04-10", description: "Dashboard interno para tracking de envíos", features: ["Mapa", "Tracking", "KPIs", "Alertas"], colorScheme: "#059669", progress: 72, client: "LogiExpress" },
-  { id: "p3", name: "App Reservas Dental", type: "mini-app", status: "generating", created: "2026-04-08", updated: "2026-04-12", description: "Mini-app de citas para clínica dental", features: ["Calendario", "Recordatorios", "Pagos"], colorScheme: "#3b82f6", progress: 35, client: "Dental Plus" },
-  { id: "p4", name: "Tienda Artesanal", type: "business", status: "review", created: "2026-04-05", updated: "2026-04-11", description: "E-commerce para productos artesanales", features: ["Catálogo", "Carrito", "Stripe", "SEO"], colorScheme: "#d97706", progress: 88, client: "ArteCraft" },
 ];
 
 const TYPE_CONFIG: Record<AppType, { label: string; icon: typeof Smartphone; color: string; bgColor: string }> = {
@@ -82,7 +75,7 @@ const WIZARD_STEPS = ["Tipo", "Briefing", "Diseño", "Features", "Generar"];
 /* ─────────────────────────── MAIN COMPONENT ─────────────────────────── */
 export default function SaasAppCreator() {
   const [activeTab, setActiveTab] = useState("projects");
-  const [projects, setProjects] = useState<AppProject[]>(MOCK_PROJECTS);
+  const [projects, setProjects] = useState<AppProject[]>([]);
   const [showWizard, setShowWizard] = useState(false);
   const [wizardStep, setWizardStep] = useState(0);
   const [selectedProject, setSelectedProject] = useState<AppProject | null>(null);

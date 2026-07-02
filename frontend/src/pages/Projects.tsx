@@ -108,7 +108,7 @@ export default function Projects() {
         setShowForm(true);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [clients, loading]);
 
   const filtered = projects.filter(p => {

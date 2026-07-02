@@ -10,6 +10,7 @@ import {
   isDefaultWhitelabelHost,
   normalizeHost,
 } from "@/core/whitelabel/resolveWhitelabel";
+import { resolveDashboardLegacyRedirect } from "@/lib/routing/dashboardLegacyRedirects";
 
 /** Legacy SaaS API stubs that return 410 Gone without auth — must not be blocked by middleware. */
 const SAAS_LEGACY_GONE = new Set([
@@ -83,6 +84,13 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   if (pathname.startsWith("/api/health/")) {
     return NextResponse.next();
+  }
+
+  const dashRedirect = resolveDashboardLegacyRedirect(pathname);
+  if (dashRedirect) {
+    const url = request.nextUrl.clone();
+    url.pathname = dashRedirect;
+    return NextResponse.redirect(url, 308);
   }
 
   const requestId = resolveRequestId(request);

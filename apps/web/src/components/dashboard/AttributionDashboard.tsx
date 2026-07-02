@@ -98,7 +98,7 @@ export default function AttributionDashboard() {
 
   useEffect(() => {
     void loadReport(model);
-  }, [model, periodRange.start, periodRange.end]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [model, periodRange.start, periodRange.end]);  
 
   async function compareModels(): Promise<void> {
     setStatus("");

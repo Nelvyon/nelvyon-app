@@ -25,10 +25,6 @@ const eslintConfig = [
       "dist/**",
       "coverage/**",
       "next-env.d.ts",
-      /** Legacy GHL dashboard — superseded by /saas/* (redirects in next.config). */
-      "src/app/dashboard/**",
-      /** Legacy sector hub dashboards (not SaaS product). */
-      "src/components/dashboard/**",
       /** Marketing landing skeletons — not Nelvyon product surface. */
       "src/components/agenforce/**",
       /** Legacy embed script (vanilla JS). */

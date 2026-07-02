@@ -144,7 +144,7 @@ export default function AgentsPanel() {
     };
 
     loadAgents();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   const filteredAgents = agents.filter((agent) => {

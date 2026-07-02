@@ -264,7 +264,7 @@ export default function LogoDesignerDashboard() {
                       className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 shadow-lg"
                     >
                       <div className="relative aspect-square w-full bg-slate-950">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img src={r.imageUrl} alt={`Variante ${idx + 1}`} className="h-full w-full object-contain p-4" />
                       </div>
                       <div className="space-y-3 border-t border-slate-800 p-4">
@@ -306,7 +306,7 @@ export default function LogoDesignerDashboard() {
                       className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 shadow-md transition hover:border-slate-600"
                     >
                       <div className="relative aspect-square bg-slate-950">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img src={logo.imageUrl} alt={logo.brandName} className="h-full w-full object-contain p-3" />
                       </div>
                       <div className="space-y-2 p-3">

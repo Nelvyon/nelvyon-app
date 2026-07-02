@@ -92,7 +92,7 @@ export default function E2EContextBanner({
       })
       .catch(() => { /* non-critical */ })
       .finally(() => setLoadingRels(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [merged.project_id]);
 
   if (!hasContext) return null;

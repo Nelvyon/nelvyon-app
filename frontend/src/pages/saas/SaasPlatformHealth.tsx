@@ -204,7 +204,7 @@ export default function SaasPlatformHealth() {
     loadData();
     const interval = setInterval(loadData, 30_000);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   if (loading) return <HealthSkeleton />;

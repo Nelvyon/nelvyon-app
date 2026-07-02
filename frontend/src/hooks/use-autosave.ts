@@ -78,7 +78,7 @@ export function useAutosave<T>(options: UseAutosaveOptions<T>): UseAutosaveRetur
       window.removeEventListener("online", goOnline);
       window.removeEventListener("offline", goOffline);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // Recover draft on mount
