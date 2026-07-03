@@ -93,6 +93,7 @@ const INTENT_CATALOG: readonly VoiceCatalogItem[] = [
   { id: "nav_lms", phrases: ["lms", "cursos", "formacion"], actionType: "navigate", route: "/saas/lms", description: "Abrir LMS" },
   { id: "nav_agent", phrases: ["agente", "agente ia", "activar agente", "inbox ia"], actionType: "navigate", route: "/saas/inbox", description: "Abrir Inbox con agente IA" },
   { id: "nav_campanias_create", phrases: ["nueva campana", "crear campana", "enviar email"], actionType: "navigate", route: "/saas/campanias", description: "Crear campaña de email" },
+  { id: "nav_settings", phrases: ["settings", "configuracion", "ajustes", "preferencias"], actionType: "navigate", route: "/saas/settings", description: "Abrir Configuración" },
   // Actions (client triggers an API call after navigation)
   { id: "act_refresh_playbooks", phrases: ["sincronizar playbooks", "actualizar playbooks", "generar playbooks"], actionType: "action", action: "refresh_playbooks", route: "/saas/playbooks", description: "Regenerar tus playbooks" },
   { id: "act_refresh_benchmark", phrases: ["actualizar benchmark", "recalcular benchmark", "refrescar benchmark"], actionType: "action", action: "refresh_benchmark", route: "/saas/benchmark", description: "Actualizar el benchmark" },
