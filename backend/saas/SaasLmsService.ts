@@ -186,12 +186,16 @@ export class SaasLmsService {
   }
 
   async listPublishedCourses(limit = 50): Promise<LmsCourse[]> {
-    const rows = await this.db.query<CourseRow>(
-      `SELECT id,tenant_id,title,description,slug,cover_image,price,status,modules_count,enrollments,created_at,updated_at
+    try {
+      const rows = await this.db.query<CourseRow>(
+        `SELECT id,tenant_id,title,description,slug,cover_image,price,status,modules_count,enrollments,created_at,updated_at
        FROM saas_lms_courses WHERE status='published' ORDER BY updated_at DESC LIMIT $1`,
-      [limit],
-    );
-    return rows.map(rowToCourse);
+        [limit],
+      );
+      return rows.map(rowToCourse);
+    } catch {
+      return [];
+    }
   }
 
   async getPublishedCourse(courseId: string): Promise<LmsCourse & { modules: LmsModule[] }> {

@@ -5,6 +5,7 @@ on:
     paths:
       - "apps/web/**"
       - "backend/**"
+      - "packages/nelvyon-sdk/**"
       - ".github/workflows/web-quality-gates.yml"
   push:
     branches:
@@ -13,6 +14,7 @@ on:
     paths:
       - "apps/web/**"
       - "backend/**"
+      - "packages/nelvyon-sdk/**"
       - ".github/workflows/web-quality-gates.yml"
 
 jobs:
@@ -98,7 +100,8 @@ jobs:
         run: pnpm -C packages/nelvyon-sdk exec tsc -p tsconfig.json
 
       - name: Test @nelvyon/sdk
-        run: pnpm exec vitest run ../../packages/nelvyon-sdk/__tests__/client.test.ts --reporter=dot
+        working-directory: packages/nelvyon-sdk
+        run: pnpm test
 
       - name: Full regression tests
         run: pnpm test:regression

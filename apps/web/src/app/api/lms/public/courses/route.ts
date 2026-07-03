@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
 
-import { getSaasLmsService, SaasLmsError } from "@nelvyon/saas";
+import { getSaasLmsService } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+/** Public catalog — empty list when DB unavailable (never 500 on read). */
 export async function GET() {
-  try {
-    const items = await getSaasLmsService().listPublishedCourses();
-    return NextResponse.json({ items });
-  } catch (e: unknown) {
-    const message = e instanceof SaasLmsError ? e.message : "Failed to list courses";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+  const items = await getSaasLmsService().listPublishedCourses();
+  return NextResponse.json({ items });
 }

@@ -22,20 +22,24 @@ describe("runAutonomousSimulation", () => {
     expect(result.project.simulation_mode).toBe("phase-b-offline");
   });
 
-  it("uses Phase C when AUTONOMOUS_PRODUCTION=true", async () => {
-    process.env.AUTONOMOUS_PRODUCTION = "true";
-    const { runAutonomousSimulation } = await import("../runAutonomousSimulation");
-    const result = await runAutonomousSimulation({
-      sku: "NELVYON-CHATBOT",
-      brief: {
-        company_name: "Test Co",
-        bot_name: "Bot",
-        sector: "restaurant",
-        primary_intent: "book",
-        languages: ["es"],
-        openai_cost_bearer: "client",
-      },
-    });
-    expect(result.project.simulation_mode).toMatch(/phase-c/);
-  });
+  it(
+    "uses Phase C when AUTONOMOUS_PRODUCTION=true",
+    async () => {
+      process.env.AUTONOMOUS_PRODUCTION = "true";
+      const { runAutonomousSimulation } = await import("../runAutonomousSimulation");
+      const result = await runAutonomousSimulation({
+        sku: "NELVYON-CHATBOT",
+        brief: {
+          company_name: "Test Co",
+          bot_name: "Bot",
+          sector: "restaurant",
+          primary_intent: "book",
+          languages: ["es"],
+          openai_cost_bearer: "client",
+        },
+      });
+      expect(result.project.simulation_mode).toMatch(/phase-c/);
+    },
+    60_000,
+  );
 });

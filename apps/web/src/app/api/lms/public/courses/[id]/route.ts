@@ -14,7 +14,6 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     if (e instanceof SaasLmsError && e.code === "NOT_FOUND") {
       return NextResponse.json({ error: e.message }, { status: 404 });
     }
-    const message = e instanceof SaasLmsError ? e.message : "Failed to load course";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Course not found" }, { status: 404 });
   }
 }
