@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
+import { buildMockChatReply, requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import { saasChatService } from "../../../../../../../backend/saas/SaasChatService";
 
 export const dynamic = "force-dynamic";
@@ -38,9 +38,12 @@ export async function POST(req: Request) {
 
     const openaiKey = process.env.OPENAI_API_KEY;
     if (!openaiKey) {
-      return NextResponse.json({
-        reply: "El asistente IA requiere OPENAI_API_KEY. Añádela en Railway para activarlo.",
+      const reply = buildMockChatReply({
+        messages: body.messages,
+        company: ctx.tenant.companyName,
+        plan: ctx.tenant.plan,
       });
+      return NextResponse.json({ reply, mock: true });
     }
 
     const systemPrompt = `Eres el asistente de marketing IA de Nelvyon para la empresa "${ctx.tenant.companyName ?? "tu empresa"}".
@@ -73,7 +76,7 @@ Plan actual del cliente: ${ctx.tenant.plan ?? "starter"}.`;
     const data = (await oaRes.json()) as { choices?: { message?: { content?: string } }[] };
     const reply = data.choices?.[0]?.message?.content ?? "No pude generar una respuesta.";
 
-    return NextResponse.json({ reply });
+    return NextResponse.json({ reply, mock: false });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

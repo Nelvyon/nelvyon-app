@@ -68,6 +68,7 @@ const steps = [
         "run",
         "../../backend/saas/__tests__/SaasInboxAgentService.test.ts",
         "../../backend/saas/__tests__/nelvyonAgentMockReplies.test.ts",
+        "../../backend/saas/__tests__/nelvyonZeroCostAi.test.ts",
         "../../backend/saas/__tests__/SaasVoiceLlmParser.test.ts",
         "--reporter=dot",
       ]),

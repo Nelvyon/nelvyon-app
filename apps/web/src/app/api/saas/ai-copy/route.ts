@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 
-import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
+import {
+  buildMockCopies,
+  requireSaasContext,
+  saasErrorBody,
+  saasErrorStatus,
+  type MockCopyType,
+  type MockTone,
+} from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -18,7 +25,7 @@ type CopyType =
 interface GenerateCopyRequest {
   type: CopyType;
   context: string;
-  tone?: "formal" | "casual" | "urgente" | "inspirador";
+  tone?: MockTone;
   language?: "es" | "en";
   variations?: number;
 }
@@ -61,7 +68,14 @@ export async function POST(req: Request) {
 
     const openaiKey = process.env.OPENAI_API_KEY;
     if (!openaiKey) {
-      return NextResponse.json({ error: "OPENAI_API_KEY no configurada" }, { status: 503 });
+      const copies = buildMockCopies({
+        type: body.type as MockCopyType,
+        context: body.context.trim(),
+        tone: body.tone,
+        variations: body.variations,
+        company: ctx.tenant.companyName,
+      });
+      return NextResponse.json({ copies, mock: true });
     }
 
     const variations = Math.min(body.variations ?? 3, 5);
@@ -102,7 +116,7 @@ Genera exactamente ${variations} variaciones numeradas (1., 2., 3...) separadas 
     const lines = raw.split(/\n\s*\n/).filter(Boolean);
     const copies = lines.map(l => l.replace(/^\d+\.\s*/, "").trim()).filter(Boolean);
 
-    return NextResponse.json({ copies, raw });
+    return NextResponse.json({ copies, raw, mock: false });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
+import { requireSaasContext, saasErrorBody, saasErrorStatus, buildMockAgentOutput } from "@nelvyon/saas";
 import { DbClient } from "../../../../../../../../backend/db/DbClient";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +49,7 @@ export async function POST(req: Request) {
     // Try to call Python backend agent
     let result = "";
     let status = "completed";
+    let usedMock = false;
 
     try {
       const backendRes = await fetch(`${BACKEND_URL}/api/v1/os/agents/execute`, {
@@ -99,8 +100,9 @@ export async function POST(req: Request) {
           result = `El agente "${body.agentId}" no pudo ejecutarse. Verifica la clave OPENAI_API_KEY en Railway.`;
         }
       } else {
-        status = "failed";
-        result = `El agente "${body.agentId}" está disponible pero requiere OPENAI_API_KEY en Railway para ejecutarse.`;
+        status = "completed";
+        usedMock = true;
+        result = buildMockAgentOutput(body.agentId.trim(), body.input.trim(), ctx.tenant.companyName);
       }
     }
 
@@ -110,7 +112,12 @@ export async function POST(req: Request) {
       [result, status, runId],
     ).catch(() => {});
 
-    return NextResponse.json({ result, runId, status });
+    return NextResponse.json({
+      result,
+      runId,
+      status,
+      mock: usedMock,
+    });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
