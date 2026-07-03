@@ -5,6 +5,7 @@
  * Flow: operator login → POST kickoff → poll → portal invite → accept → login → deliverables sin mock://
  */
 import { installScriptTimeoutGuard } from "./lib/smoke-fetch.mjs";
+import { waitForStagingDeploy } from "./lib/wait-for-deploy.mjs";
 
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const BACKEND_API =
@@ -53,24 +54,13 @@ function containsMock(value) {
 }
 
 async function waitForDeploy() {
-  if (SKIP_WAIT) {
-    console.log("SKIP deploy wait");
-    return;
+  const result = await waitForStagingDeploy(BASE, {
+    skipWait: SKIP_WAIT,
+    label: "saas-b2b-pack-e2e",
+  });
+  if (!result.ready) {
+    warn("deploy", "wait", "timeout waiting for staging deploy SHA");
   }
-  console.log("Waiting for staging deploy (saas-b2b pack E2E)…");
-  for (let i = 1; i <= 12; i += 1) {
-    try {
-      const health = await fetch(`${BASE}/api/health/live`, { cache: "no-store" });
-      if (health.status === 200) {
-        console.log("DEPLOY_READY");
-        return;
-      }
-    } catch (e) {
-      console.log(JSON.stringify({ attempt: i, error: String(e) }));
-    }
-    await sleep(15000);
-  }
-  warn("deploy", "wait", "timeout — running E2E anyway");
 }
 
 async function operatorLogin() {

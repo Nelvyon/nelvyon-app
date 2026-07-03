@@ -1,6 +1,12 @@
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
+import {
+  buildEcommerceCopyDeliverable,
+  buildEcommerceHandoffDeliverable,
+  mapEcommerceSkuDeliverable,
+} from "@/lib/packs/ecommercePackProduction";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
+import { dbCreatePackDeliverable } from "@/lib/packs/packOsDb";
 import type {
   EcommerceGrowthPackIntake,
   PackReport,
@@ -92,6 +98,17 @@ export async function runEcommerceGrowthPack(params: {
       meta,
       intake,
       buildBrief: buildEcommerceBrief,
+      reportDeliverableTitle: "Informe ejecutivo",
+      mapSkuDeliverable: (p) =>
+        mapEcommerceSkuDeliverable({
+          sku: p.sku,
+          simulation: p.simulation,
+          intake: p.intake as EcommerceGrowthPackIntake,
+          packRunId: p.packRunId,
+          osClientId: p.osClientId,
+          osProjectId: p.osProjectId,
+          workspaceId: p.workspaceId,
+        }),
       primaryCampaign: (i) => ({
         platform: "email",
         campaign_type: "welcome",
@@ -116,11 +133,12 @@ export async function runEcommerceGrowthPack(params: {
       extraDeliverables: [
         ({ intake: i, packRunId }) => ({
           stepKey: "meta_ads_kit",
-          title: "Kit Meta Ads Advantage+ Ecommerce",
+          title: "Kit Meta Ads Advantage+",
           type: "json",
           metadata: {
             pack_id: ECOMMERCE_GROWTH_PACK_ID,
             pack_run_id: packRunId,
+            production: true,
             template: "ads-meta-advantage-ecom-v1",
             business_name: i.business_name,
             product_category: i.product_category,
@@ -138,6 +156,28 @@ export async function runEcommerceGrowthPack(params: {
           },
         }),
       ],
+      onPackStepsComplete: async (ctx) => {
+        const i = ctx.intake as EcommerceGrowthPackIntake;
+        await dbCreatePackDeliverable(
+          buildEcommerceCopyDeliverable({
+            intake: i,
+            packRunId: ctx.packRunId,
+            osClientId: ctx.osClientId,
+            osProjectId: ctx.osProjectId,
+            workspaceId: ctx.workspaceId,
+          }),
+        );
+        await dbCreatePackDeliverable(
+          buildEcommerceHandoffDeliverable({
+            intake: i,
+            packRunId: ctx.packRunId,
+            osClientId: ctx.osClientId,
+            osProjectId: ctx.osProjectId,
+            workspaceId: ctx.workspaceId,
+          }),
+        );
+        return 2;
+      },
       buildReport: buildPackReport,
       projectDescription: (i) =>
         `Ecommerce pack: landing + SEO catálogo + chatbot ventas + Meta Ads para ${i.product_category}`,
