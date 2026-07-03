@@ -74,9 +74,37 @@ export const FIXTURE_SETTINGS = {
   permissions: [
     "contacts.read", "contacts.write", "deals.read", "deals.write",
     "campaigns.read", "campaigns.write", "workflows.read", "workflows.write",
+    "billing.read", "settings.read",
     "sso.read", "sso.write", "audit.read", "settings.write",
     "affiliates.read", "affiliates.write", "loyalty.read", "loyalty.write",
   ],
+};
+
+export const FIXTURE_DASHBOARD = {
+  tenant: {
+    id: "t-e2e",
+    userId: "u-e2e",
+    companyName: "Nelvyon E2E Corp",
+    industry: "tech",
+    plan: "pro",
+    website: null,
+    phone: null,
+    employees: null,
+    goals: [] as string[],
+    onboardingCompleted: true,
+    onboardingStep: 4,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  moduleStats: { contacts: 1, campaigns: 1, activeWorkflows: 1, forms: 0, upcomingAppointments: 0 },
+  activeJobs: 0,
+  completedJobs: 0,
+  totalSpend: 0,
+  recentActivity: [] as Array<{ id: string; eventType: string; description: string; createdAt: string }>,
+};
+
+export const FIXTURE_DASHBOARD_LAYOUT = {
+  layout: { widgets: ["health", "activation", "pipeline", "modules", "kpis", "activity", "quickActions"] },
 };
 
 export const FIXTURE_CONTACTS = {
@@ -621,6 +649,13 @@ export async function mockSaasApis(page: Page): Promise<void> {
     route.fulfill({ json: { sites: [] } }));
   await mockSaasVoice(page);
   await mockSectorBenchmark(page);
+  await page.route("**/api/saas/dashboard/layout**", route =>
+    route.fulfill({ json: FIXTURE_DASHBOARD_LAYOUT }));
+  await page.route("**/api/saas/dashboard**", route => {
+    const url = route.request().url();
+    if (url.includes("/layout") || url.includes("/activity")) return route.fallback();
+    return route.fulfill({ json: FIXTURE_DASHBOARD });
+  });
   // Re-register last (Playwright LIFO) so funnels mock always wins over catch-all.
   await page.route("**/api/saas/funnels**", route =>
     route.fulfill({ json: FIXTURE_FUNNELS }));

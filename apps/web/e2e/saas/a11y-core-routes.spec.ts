@@ -18,6 +18,7 @@ test.beforeEach(async ({ page, context }) => {
 for (const route of CRITICAL_SAAS_ROUTES) {
   test(`a11y landmarks: ${route} has main navigation`, async ({ page }) => {
     await page.goto(route, { waitUntil: "domcontentloaded" });
+    await expect(page.getByTestId("saas-sidebar")).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("nav, [role='navigation']").first()).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("main, [role='main']").first()).toBeVisible({ timeout: 15_000 });
   });
