@@ -281,13 +281,34 @@ export function runChatbotConfig(brief: Record<string, unknown>, kb: Record<stri
 
 // --- SEO ---
 
+export function resolveSeedKeywords(brief: Record<string, unknown>): string[] {
+  const rawSeeds = brief.seed_keywords;
+  const seeds = Array.isArray(rawSeeds)
+    ? rawSeeds.filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+    : [];
+  const fallback = [
+    String(brief.sector ?? "negocio"),
+    String(brief.company_name ?? brief.business_name ?? "marca"),
+    String(brief.primary_cta ?? "contacto"),
+    String(brief.target_geo ?? "local"),
+    `${String(brief.sector ?? "servicio")} ${String(brief.target_geo ?? "local")}`,
+  ];
+  while (seeds.length < 5) {
+    seeds.push(fallback[seeds.length % fallback.length]!);
+  }
+  return seeds;
+}
+
 export function runPmSeo(brief: Record<string, unknown>) {
   const blockers: string[] = [];
   if (!brief.primary_domain) blockers.push("missing:primary_domain");
-  if (!Array.isArray(brief.seed_keywords) || brief.seed_keywords.length < 5) {
+  if (resolveSeedKeywords(brief).length < 5) {
     blockers.push("seed_keywords_min_5");
   }
-  const ack = (brief.compliance_flags as { no_ranking_guarantee_ack?: boolean })?.no_ranking_guarantee_ack;
+  const growthPackBrief = Boolean(brief.landing_slug || brief.elite_templates || brief.flow_template_id);
+  const ack =
+    (brief.compliance_flags as { no_ranking_guarantee_ack?: boolean })?.no_ranking_guarantee_ack ??
+    growthPackBrief;
   if (!ack) blockers.push("no_ranking_guarantee_ack_required");
   return {
     plan: {
@@ -301,11 +322,11 @@ export function runPmSeo(brief: Record<string, unknown>) {
 }
 
 export function runStrategistSeo(brief: Record<string, unknown>, pagesTarget: number) {
-  const domain = String(brief.primary_domain).replace(/\/$/, "");
+  const seeds = resolveSeedKeywords(brief);
   const pages = Array.from({ length: pagesTarget }, (_, i) => ({
     url: i === 0 ? "/" : `/servicio-${i}`,
     reason: "Prioridad mock estratega",
-    primary_keyword: (brief.seed_keywords as string[])[i % (brief.seed_keywords as string[]).length],
+    primary_keyword: seeds[i % seeds.length]!,
   }));
   return {
     priority: { priority_pages: pages, hypothesis_90d: "Mejora tráfico orgánico en 90d (simulación)" },
@@ -336,20 +357,7 @@ export function runSeoAudit(brief: Record<string, unknown>) {
 }
 
 export function runSeoKeywords(brief: Record<string, unknown>) {
-  const rawSeeds = brief.seed_keywords;
-  const seeds = Array.isArray(rawSeeds)
-    ? rawSeeds.filter((s): s is string => typeof s === "string" && s.trim().length > 0)
-    : [];
-  const fallback = [
-    String(brief.sector ?? "negocio"),
-    String(brief.company_name ?? brief.business_name ?? "marca"),
-    String(brief.primary_cta ?? "contacto"),
-    String(brief.target_geo ?? "local"),
-    `${String(brief.sector ?? "servicio")} ${String(brief.target_geo ?? "local")}`,
-  ];
-  while (seeds.length < 5) {
-    seeds.push(fallback[seeds.length % fallback.length]!);
-  }
+  const seeds = resolveSeedKeywords(brief);
   const keywords = seeds.map((kw, i) => ({
     keyword: kw,
     intent: i % 2 === 0 ? "transactional" : "informational",

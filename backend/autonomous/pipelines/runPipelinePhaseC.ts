@@ -20,7 +20,7 @@ import { scoreOffline } from "../qa/offlineScorer";
 import type { AutonomousProject, AutonomousSku, AutonomousTier, QaResult } from "../types";
 import { buildChatbotIsolated } from "../wrappers/chatbotBuilder";
 import { buildLandingIsolated } from "../wrappers/landingBuilder";
-import { generateSeoPackIsolated } from "../wrappers/seoGenerator";
+import { generateSeoPackIsolated, normalizeKeywordsArtifact } from "../wrappers/seoGenerator";
 import { createProject } from "./runPipeline";
 
 export { createProject };
@@ -152,10 +152,14 @@ async function runSeoPhaseC(project: AutonomousProject, attempt: number): Promis
   agent_log.push({ ...audit.log, llm_mode: audit.llm_mode as "mock" | "real" });
 
   const kw = await llmSeoKeywords(brief);
-  artifacts.keywords = kw.data;
+  artifacts.keywords = normalizeKeywordsArtifact(kw.data, brief);
   agent_log.push({ ...kw.log, llm_mode: kw.llm_mode as "mock" | "real" });
 
-  const op = await llmCopywriterSeo(st.data as Record<string, unknown>, kw.data as Record<string, unknown>, attempt);
+  const op = await llmCopywriterSeo(
+    st.data as Record<string, unknown>,
+    artifacts.keywords as Record<string, unknown>,
+    attempt,
+  );
   artifacts.on_page_fixes = op.data;
   agent_log.push({ ...op.log, llm_mode: op.llm_mode as "mock" | "real" });
 
@@ -168,7 +172,7 @@ async function runSeoPhaseC(project: AutonomousProject, attempt: number): Promis
     brief,
     pages_target: pagesTarget,
     priority_override: st.data as Record<string, unknown>,
-    keywords_override: kw.data as Record<string, unknown>,
+    keywords_override: artifacts.keywords as Record<string, unknown>,
   });
   artifacts.audit = pack.audit;
   artifacts.keywords = pack.keywords;

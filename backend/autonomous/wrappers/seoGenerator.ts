@@ -15,7 +15,7 @@ export interface SeoGenerateInput {
   keywords_override?: Record<string, unknown>;
 }
 
-function normalizeKeywordsArtifact(raw: unknown, brief: Record<string, unknown>) {
+export function normalizeKeywordsArtifact(raw: unknown, brief: Record<string, unknown>) {
   if (raw && typeof raw === "object" && Array.isArray((raw as { keywords?: unknown }).keywords)) {
     return raw as Record<string, unknown>;
   }

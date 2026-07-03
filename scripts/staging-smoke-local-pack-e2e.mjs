@@ -5,6 +5,7 @@
  * Flow: operator login → POST kickoff → portal invite → portal login → 5 deliverables sin mock://
  */
 import { installScriptTimeoutGuard } from "./lib/smoke-fetch.mjs";
+import { waitForStagingDeploy } from "./lib/wait-for-deploy.mjs";
 
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const BACKEND_API =
@@ -56,37 +57,13 @@ function containsMock(value) {
 }
 
 async function waitForDeploy() {
-  if (SKIP_WAIT) {
-    console.log("SKIP deploy wait");
-    return;
+  const result = await waitForStagingDeploy(BASE, {
+    skipWait: SKIP_WAIT,
+    label: "local-pack-e2e",
+  });
+  if (!result.ready) {
+    fail("deploy", "wait", "timeout waiting for staging deploy SHA");
   }
-  console.log("Waiting for staging deploy (local pack E2E)…");
-  for (let i = 1; i <= 12; i += 1) {
-    try {
-      const health = await fetch(`${BASE}/api/health/live`, { cache: "no-store" });
-      const kickoff = await fetch(`${BASE}/api/os/packs/local-business-growth/kickoff`, {
-        method: "OPTIONS",
-        cache: "no-store",
-      }).catch(() => null);
-      const liveRoute = await fetch(`${BASE}/api/packs/local/live/smoke-probe`, { cache: "no-store" });
-      console.log(
-        JSON.stringify({
-          attempt: i,
-          health: health.status,
-          kickoff: kickoff?.status ?? "n/a",
-          liveRoute: liveRoute.status,
-        }),
-      );
-      if (health.status === 200) {
-        console.log("DEPLOY_READY");
-        return;
-      }
-    } catch (e) {
-      console.log(JSON.stringify({ attempt: i, error: String(e) }));
-    }
-    await sleep(15000);
-  }
-  warn("deploy", "wait", "timeout — running E2E anyway");
 }
 
 async function login() {
