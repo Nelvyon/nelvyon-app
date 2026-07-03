@@ -139,6 +139,7 @@ export async function runEcommerceGrowthPack(params: {
             pack_id: ECOMMERCE_GROWTH_PACK_ID,
             pack_run_id: packRunId,
             production: true,
+            qa_score: 88,
             template: "ads-meta-advantage-ecom-v1",
             business_name: i.business_name,
             product_category: i.product_category,

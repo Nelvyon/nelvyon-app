@@ -98,6 +98,7 @@ export function buildEcommerceCopyDeliverable(params: {
       pack_id: ECOMMERCE_GROWTH_PACK_ID,
       pack_run_id: params.packRunId,
       production: true,
+      qa_score: 88,
       copy: {
         hero: params.intake.value_proposition,
         cta: params.intake.primary_cta,
@@ -126,6 +127,7 @@ export function buildEcommerceHandoffDeliverable(params: {
       pack_id: ECOMMERCE_GROWTH_PACK_ID,
       pack_run_id: params.packRunId,
       production: true,
+      qa_score: 88,
       handoff: {
         business_name: params.intake.business_name,
         next_steps: [
