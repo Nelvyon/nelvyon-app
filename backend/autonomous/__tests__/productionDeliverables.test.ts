@@ -6,6 +6,7 @@ import {
   isAutonomousProductionPublish,
   sanitizePublishValue,
 } from "../publish/productionDeliverableUrls";
+import { loadTemplateRegistry, getBundledTemplateRegistryCount } from "../templates/loadRegistry";
 import type { AutonomousProject } from "../types";
 
 describe("productionDeliverableUrls", () => {
@@ -28,6 +29,17 @@ describe("productionDeliverableUrls", () => {
     const blob = JSON.stringify(items);
     expect(blob.includes("mock://")).toBe(false);
     expect(items[0]?.value.startsWith("https://")).toBe(true);
+  });
+});
+
+describe("loadTemplateRegistry production", () => {
+  it("uses bundled registry in production without disk", () => {
+    const prev = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    const reg = loadTemplateRegistry();
+    expect(reg.templates.length).toBe(getBundledTemplateRegistryCount());
+    expect(reg.templates.length).toBeGreaterThan(10);
+    process.env.NODE_ENV = prev;
   });
 });
 

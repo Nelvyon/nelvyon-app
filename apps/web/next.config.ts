@@ -62,6 +62,13 @@ const nextConfig: NextConfig = {
   experimental: {
     externalDir: true,
   },
+  outputFileTracingIncludes: {
+    "/api/**/*": [
+      "../../backend/autonomous/templates/registry.json",
+      "../../backend/autonomous/templates/**/*.json",
+      "../../backend/data/envato-seeds-metadata.json",
+    ],
+  },
   serverExternalPackages: [
     "ioredis",
     "pg",

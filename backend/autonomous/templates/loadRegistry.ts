@@ -1,4 +1,4 @@
-/** Load template registry — bundled JSON fallback; never throws ENOENT in production. */
+/** Load template registry — production uses bundled JSON only (no FS dependency). */
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -37,14 +37,19 @@ function registryPathCandidates(explicit?: string): string[] {
 }
 
 export function loadTemplateRegistry(path?: string): TemplateRegistry {
+  // Railway/Next production: webpack bundles registry.json — never touch disk.
+  if (process.env.NODE_ENV === "production" && !path) {
+    return validateRegistry(bundledRegistry as TemplateRegistry);
+  }
+
   for (const candidate of registryPathCandidates(path)) {
     const loaded = readRegistryFile(candidate);
     if (loaded) return loaded;
   }
+
   return validateRegistry(bundledRegistry as TemplateRegistry);
 }
 
-/** For health/smokes — confirms bundled registry is loadable without filesystem. */
 export function getBundledTemplateRegistryCount(): number {
   const reg = bundledRegistry as TemplateRegistry;
   return Array.isArray(reg.templates) ? reg.templates.length : 0;
