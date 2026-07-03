@@ -70,6 +70,7 @@ vi.mock("../../../../../../backend/os-agents/sectors/OsSectorReadinessService", 
 import { runGrowthPack } from "@/lib/packs/packOrchestrator";
 import type { GrowthPackRunConfig } from "@/lib/packs/packOrchestrator";
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
+import { getSeedByIndex } from "@/lib/packs/sectorSeeds";
 import type { GrowthPackIntakeBase, PackReport } from "@/lib/packs/types";
 import { LOCAL_GROWTH_PACK_ID } from "@/lib/packs/types";
 
@@ -157,17 +158,21 @@ describe("packOrchestrator — O7 seed metadata", () => {
     return meta;
   }
 
-  it("deliverable metadata includes seed_id and source:synthetic for restaurantes", async () => {
-    await runGrowthPack({ workspaceId: 1, userId: "user-1", config: makeConfig("restaurantes") });
-    const meta = findDeliverableMetadata(mockQuery.mock.calls as Array<[string, unknown[]]>, "restaurantes");
-    expect(meta.seed_id).toBe("restaurantes_tpl_0");
-    expect(meta.source).toBe("synthetic");
+  it("deliverable metadata includes seed_id from catalog for restaurantes", async () => {
+    const sector = "restaurantes";
+    const expected = getSeedByIndex(sector, 0);
+    await runGrowthPack({ workspaceId: 1, userId: "user-1", config: makeConfig(sector) });
+    const meta = findDeliverableMetadata(mockQuery.mock.calls as Array<[string, unknown[]]>, sector);
+    expect(meta.seed_id).toBe(expected?.seed_id ?? `${sector}_tpl_0`);
+    expect(meta.source).toBe(expected?.source ?? "synthetic");
   });
 
-  it("seed_id reflects the sector — ecommerce pack gets ecommerce_tpl_0", async () => {
-    await runGrowthPack({ workspaceId: 1, userId: "user-1", config: makeConfig("ecommerce") });
-    const meta = findDeliverableMetadata(mockQuery.mock.calls as Array<[string, unknown[]]>, "ecommerce");
-    expect(meta.seed_id).toBe("ecommerce_tpl_0");
-    expect(meta.source).toBe("synthetic");
+  it("seed_id reflects the sector catalog seed for ecommerce", async () => {
+    const sector = "ecommerce";
+    const expected = getSeedByIndex(sector, 0);
+    await runGrowthPack({ workspaceId: 1, userId: "user-1", config: makeConfig(sector) });
+    const meta = findDeliverableMetadata(mockQuery.mock.calls as Array<[string, unknown[]]>, sector);
+    expect(meta.seed_id).toBe(expected?.seed_id ?? `${sector}_tpl_0`);
+    expect(meta.source).toBe(expected?.source ?? "synthetic");
   });
 });

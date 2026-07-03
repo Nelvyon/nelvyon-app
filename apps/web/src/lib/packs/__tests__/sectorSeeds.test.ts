@@ -4,6 +4,7 @@ import {
   getSectorSeedCount,
   ALL_SECTOR_IDS,
 } from "../sectorSeeds";
+import { countEnvatoSectorSeeds } from "../envatoSeedBridge";
 
 // All 20 sectors that must have seeds
 const ALL_20_SECTORS = [
@@ -31,8 +32,14 @@ describe("getSeedByIndex — all 20 sectors return a seed at index 0", () => {
   it.each(ALL_20_SECTORS)("sector %s has seed at index 0", (sector) => {
     const seed = getSeedByIndex(sector, 0);
     expect(seed).not.toBeNull();
-    expect(seed!.seed_id).toBe(`${sector}_tpl_0`);
     expect(seed!.sector).toBe(sector);
+    expect(seed!.seed_id.length).toBeGreaterThan(0);
+    const catalogCount = countEnvatoSectorSeeds(sector);
+    if (catalogCount > 0) {
+      expect(seed!.seed_id).toMatch(new RegExp(`^${sector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}-\\d+$`));
+    } else {
+      expect(seed!.seed_id).toBe(`${sector}_tpl_0`);
+    }
   });
 });
 

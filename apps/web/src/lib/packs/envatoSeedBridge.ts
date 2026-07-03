@@ -39,6 +39,27 @@ function resolveMonorepoRoot(): string {
   return process.cwd();
 }
 
+export function countEnvatoSectorSeeds(sectorId: string): number {
+  const diskDir = onDiskDir(sectorId);
+  if (fs.existsSync(diskDir)) {
+    try {
+      const onDisk = fs.readdirSync(diskDir).filter((f) => f.endsWith(".json")).length;
+      if (onDisk > 0) return onDisk;
+    } catch {
+      /* fall through to metadata catalog */
+    }
+  }
+
+  const metaFile = metadataPath();
+  if (!fs.existsSync(metaFile)) return 0;
+  try {
+    const entries = JSON.parse(fs.readFileSync(metaFile, "utf8")) as MetadataEntry[];
+    return entries.filter((e) => e.sector === sectorId && e.headline).length;
+  } catch {
+    return 0;
+  }
+}
+
 export function loadEnvatoSectorSeed(sectorId: string, index: number): SectorSeed | null {
   const diskDir = onDiskDir(sectorId);
   if (fs.existsSync(diskDir)) {

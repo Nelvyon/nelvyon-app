@@ -11,7 +11,7 @@
  * the deliverable must include.
  */
 
-import { loadEnvatoSectorSeed } from "./envatoSeedBridge";
+import { countEnvatoSectorSeeds, loadEnvatoSectorSeed } from "./envatoSeedBridge";
 
 export type SectorSeed = {
   seed_id: string;
@@ -324,9 +324,12 @@ export function getSeedByIndex(
   _rootOverride?: undefined,
   learningRanks?: Map<string, number>,
 ): SectorSeed | null {
-  const envatoSeed = loadEnvatoSectorSeed(sectorId, index);
-  if (envatoSeed && (!learningRanks || learningRanks.size === 0)) {
-    return envatoSeed;
+  if (index < 0) return null;
+
+  const catalogCount = countEnvatoSectorSeeds(sectorId);
+  if (catalogCount > 0 && (!learningRanks || learningRanks.size === 0)) {
+    if (index >= catalogCount) return null;
+    return loadEnvatoSectorSeed(sectorId, index);
   }
 
   const seeds = SEEDS[sectorId];
@@ -342,11 +345,13 @@ export function getSeedByIndex(
     }
     if (best) return best;
   }
-  if (index < 0 || index >= seeds.length) return null;
+  if (index >= seeds.length) return null;
   return seeds[index]!;
 }
 
 export function getSectorSeedCount(sectorId: string): number {
+  const envatoCount = countEnvatoSectorSeeds(sectorId);
+  if (envatoCount > 0) return envatoCount;
   return SEEDS[sectorId]?.length ?? 0;
 }
 
