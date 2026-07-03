@@ -99,7 +99,15 @@ export function buildBaseBrief(
     compliance_flags: {
       regulated_sector: intake.sector === "dental" || intake.sector === "fintech_b2b",
       requires_legal_review: intake.sector === "dental",
+      no_ranking_guarantee_ack: true,
     },
+    seed_keywords: [
+      `${intake.sector} ${intake.city}`,
+      intake.primary_cta,
+      intake.business_name,
+      `mejor ${intake.sector}`,
+      `${intake.city} ${intake.sector}`,
+    ],
   };
 }
 
@@ -198,16 +206,16 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
         "../../../../../backend/saas/OsAgentDataService"
       );
       const svc = getOsAgentDataService();
-      const [kw, comp] = await Promise.all([
+      const [kwSnap, compSnap] = await Promise.all([
         svc.fetchKeywordSnapshot({ userId: params.userId, domain: websiteUrl }),
         svc.fetchCompetitorSnapshot({ userId: params.userId, domain: websiteUrl }),
       ]);
       (brief as Record<string, unknown>)._agent_data = {
-        provider: kw.provider,
-        cached: kw.cached,
-        fetched_at: kw.fetchedAt,
-        keywords: kw.keywords.slice(0, 20),
-        competitors: comp.competitors.slice(0, 5),
+        provider: kwSnap?.provider ?? "none",
+        cached: kwSnap?.cached ?? false,
+        fetched_at: kwSnap?.fetchedAt ?? new Date().toISOString(),
+        keywords: (kwSnap?.keywords ?? []).slice(0, 20),
+        competitors: (compSnap?.competitors ?? []).slice(0, 5),
       };
     } catch {
       /* agent data is best-effort — never block the pack run */

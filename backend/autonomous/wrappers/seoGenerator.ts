@@ -15,12 +15,22 @@ export interface SeoGenerateInput {
   keywords_override?: Record<string, unknown>;
 }
 
+function normalizeKeywordsArtifact(raw: unknown, brief: Record<string, unknown>) {
+  if (raw && typeof raw === "object" && Array.isArray((raw as { keywords?: unknown }).keywords)) {
+    return raw as Record<string, unknown>;
+  }
+  return runSeoKeywords(brief).keywords;
+}
+
 export function generateSeoPackIsolated(input: SeoGenerateInput) {
   const priority =
     input.priority_override ??
     runStrategistSeo(input.brief, input.pages_target).priority;
   const audit = runSeoAudit(input.brief).audit;
-  const keywords = input.keywords_override ?? runSeoKeywords(input.brief).keywords;
+  const keywords = normalizeKeywordsArtifact(
+    input.keywords_override ?? runSeoKeywords(input.brief).keywords,
+    input.brief,
+  );
   const on_page = runCopywriterSeoOnPage(priority, keywords).on_page;
   const report = runSeoReport(input.brief, on_page).report;
 

@@ -336,7 +336,20 @@ export function runSeoAudit(brief: Record<string, unknown>) {
 }
 
 export function runSeoKeywords(brief: Record<string, unknown>) {
-  const seeds = brief.seed_keywords as string[];
+  const rawSeeds = brief.seed_keywords;
+  const seeds = Array.isArray(rawSeeds)
+    ? rawSeeds.filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+    : [];
+  const fallback = [
+    String(brief.sector ?? "negocio"),
+    String(brief.company_name ?? brief.business_name ?? "marca"),
+    String(brief.primary_cta ?? "contacto"),
+    String(brief.target_geo ?? "local"),
+    `${String(brief.sector ?? "servicio")} ${String(brief.target_geo ?? "local")}`,
+  ];
+  while (seeds.length < 5) {
+    seeds.push(fallback[seeds.length % fallback.length]!);
+  }
   const keywords = seeds.map((kw, i) => ({
     keyword: kw,
     intent: i % 2 === 0 ? "transactional" : "informational",

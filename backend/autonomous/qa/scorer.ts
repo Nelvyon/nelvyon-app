@@ -240,8 +240,9 @@ export function scoreSeo(
   ];
 
   if (attempt >= 2) {
-    const kw = artifacts.keywords as { keywords?: unknown[] };
-    while ((kw?.keywords?.length ?? 0) < 10) {
+    const kw = (artifacts.keywords ?? {}) as { keywords?: unknown[] };
+    artifacts.keywords = kw;
+    while ((kw.keywords?.length ?? 0) < 10) {
       kw.keywords = kw.keywords ?? [];
       kw.keywords.push({ keyword: "mock-extra", intent: "info", target_url: "/", priority: 99 });
     }
