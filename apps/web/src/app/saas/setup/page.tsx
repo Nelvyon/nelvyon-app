@@ -63,6 +63,18 @@ export default function SaasSetupPage() {
   const [memoryChunks, setMemoryChunks] = useState<Array<{ id: string; title: string; content: string }>>([]);
   const [memoryInput, setMemoryInput] = useState("");
   const [eliteSaving, setEliteSaving] = useState(false);
+  const [setupProgress, setSetupProgress] = useState<Record<string, boolean>>({});
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoMsg, setGeoMsg] = useState<string | null>(null);
+
+  const SETUP_STEPS = [
+    { id: "starter_pack", label: "Kit de arranque", done: setupProgress.starter_pack },
+    { id: "autonomy", label: "Autonomía IA", done: setupProgress.autonomy },
+    { id: "memory", label: "Memoria IA", done: setupProgress.memory },
+    { id: "geo", label: "Auditoría GEO", done: setupProgress.geo },
+    { id: "health_ok", label: "Salud ≥90%", done: setupProgress.health_ok },
+  ] as const;
+  const setupDone = SETUP_STEPS.filter((s) => s.done).length;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -81,10 +93,13 @@ export default function SaasSetupPage() {
       const eliteRes = await fetch("/api/saas/setup", { cache: "no-store" });
       if (eliteRes.ok) {
         const elite = (await eliteRes.json()) as {
-          elite?: { autonomyMode?: string };
+          elite?: { autonomyMode?: string; setupProgress?: Record<string, boolean> };
         };
         if (elite.elite?.autonomyMode === "draft" || elite.elite?.autonomyMode === "propose" || elite.elite?.autonomyMode === "execute") {
           setAutonomyMode(elite.elite.autonomyMode);
+        }
+        if (elite.elite?.setupProgress) {
+          setSetupProgress(elite.elite.setupProgress);
         }
       }
       const memRes = await fetch("/api/saas/memory", { cache: "no-store" });
@@ -101,6 +116,16 @@ export default function SaasSetupPage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    if (report && report.score >= 90 && !setupProgress.health_ok) {
+      void fetch("/api/saas/setup", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ setupStep: "health_ok" }),
+      }).then(() => setSetupProgress((p) => ({ ...p, health_ok: true })));
+    }
+  }, [report, setupProgress.health_ok]);
+
   async function installStarterPack() {
     setPackLoading(true);
     setPackMsg(null);
@@ -112,6 +137,12 @@ export default function SaasSetupPage() {
         return;
       }
       setPackMsg(`✅ Kit instalado: ${d.totalWorkflows ?? 6} workflows + ${d.totalSequences ?? 4} secuencias`);
+      await fetch("/api/saas/setup", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ setupStep: "starter_pack" }),
+      });
+      setSetupProgress((p) => ({ ...p, starter_pack: true }));
       await load();
     } finally {
       setPackLoading(false);
@@ -159,6 +190,64 @@ export default function SaasSetupPage() {
 
       {report && (
         <>
+          <NelvyonDsCard className="p-5 border-emerald-500/20 bg-emerald-500/5">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+              <div>
+                <p className="font-semibold text-white">🎯 Onboarding productizado</p>
+                <p className="text-sm text-white/50">{setupDone}/{SETUP_STEPS.length} pasos elite completados</p>
+              </div>
+              <p className="text-2xl font-bold text-white tabular-nums">{Math.round((setupDone / SETUP_STEPS.length) * 100)}%</p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+              {SETUP_STEPS.map((step) => (
+                <div
+                  key={step.id}
+                  className={`rounded-lg border px-3 py-2 text-xs ${
+                    step.done ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-white/40"
+                  }`}
+                >
+                  {step.done ? "✓" : "○"} {step.label}
+                </div>
+              ))}
+            </div>
+          </NelvyonDsCard>
+
+          <NelvyonDsCard className="p-5 border-cyan-500/20 bg-cyan-500/5">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="font-semibold text-white">🌐 GEO / AI Visibility</p>
+                <p className="text-sm text-white/50 mt-1">Schema.org, FAQ, llms.txt — informe PDF vendible (0€ LLM)</p>
+                {geoMsg && <p className="text-xs text-emerald-400 mt-2">{geoMsg}</p>}
+              </div>
+              <NelvyonDsButton
+                disabled={geoLoading}
+                onClick={async () => {
+                  setGeoLoading(true);
+                  setGeoMsg(null);
+                  try {
+                    const res = await fetch("/api/saas/geo-visibility", { method: "POST" });
+                    const d = (await res.json()) as { run?: { score: number | null; domain: string; id: string }; error?: string };
+                    if (!res.ok) {
+                      setGeoMsg(d.error ?? "Error al analizar");
+                      return;
+                    }
+                    setGeoMsg(`✅ Score ${d.run?.score ?? 0}/100 — ${d.run?.domain ?? ""}`);
+                    await fetch("/api/saas/setup", {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ setupStep: "geo" }),
+                    });
+                    setSetupProgress((p) => ({ ...p, geo: true }));
+                  } finally {
+                    setGeoLoading(false);
+                  }
+                }}
+              >
+                {geoLoading ? "Analizando…" : "Analizar GEO"}
+              </NelvyonDsButton>
+            </div>
+          </NelvyonDsCard>
+
           <NelvyonDsCard className="p-5 border-[#0084ff]/20 bg-[#0084ff]/5">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
@@ -187,9 +276,10 @@ export default function SaasSetupPage() {
                       await fetch("/api/saas/setup", {
                         method: "PATCH",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ autonomyMode: mode }),
+                        body: JSON.stringify({ autonomyMode: mode, setupStep: "autonomy" }),
                       });
                       setAutonomyMode(mode);
+                      setSetupProgress((p) => ({ ...p, autonomy: true }));
                     } finally {
                       setEliteSaving(false);
                     }
@@ -228,6 +318,12 @@ export default function SaasSetupPage() {
                     });
                     if (res.ok) {
                       setMemoryInput("");
+                      await fetch("/api/saas/setup", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ setupStep: "memory" }),
+                      });
+                      setSetupProgress((p) => ({ ...p, memory: true }));
                       const mem = (await fetch("/api/saas/memory").then((r) => r.json())) as { chunks?: typeof memoryChunks };
                       setMemoryChunks(mem.chunks ?? []);
                     }

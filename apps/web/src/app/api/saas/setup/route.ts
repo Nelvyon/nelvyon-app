@@ -16,16 +16,22 @@ import {
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const [report, autonomyMode, memorySettings, latestBrief] = await Promise.all([
+    const { DbClient } = await import("../../../../../../../backend/db/DbClient");
+    const [report, autonomyMode, memorySettings, latestBrief, progressRows] = await Promise.all([
       getSaasPlatformHealthService().getReport(ctx.tenant.id, ctx.claims.userId),
       getSaasAutonomyService().getMode(ctx.tenant.id),
       getSaasTenantMemoryService().getSettings(ctx.tenant.id),
       getSaasCeoBriefService().getLatestBrief(ctx.tenant.id),
+      DbClient.getInstance().query<{ setup_progress: Record<string, unknown> }>(
+        `SELECT setup_progress FROM saas_tenants WHERE id = $1 LIMIT 1`,
+        [ctx.tenant.id],
+      ),
     ]);
+    const setupProgress = progressRows[0]?.setup_progress ?? {};
     return NextResponse.json({
       report,
       setup: report,
-      elite: { autonomyMode, memorySettings, latestBrief },
+      elite: { autonomyMode, memorySettings, latestBrief, setupProgress },
     });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
@@ -40,6 +46,7 @@ export async function PATCH(req: Request) {
       autonomyMode?: string;
       ceoBriefEnabled?: boolean;
       deliveryHourUtc?: number;
+      setupStep?: string;
     };
 
     const result: Record<string, unknown> = {};
@@ -64,6 +71,18 @@ export async function PATCH(req: Request) {
         ],
       );
       result.ceoBriefUpdated = true;
+    }
+
+    const ALLOWED_SETUP_STEPS = new Set(["starter_pack", "autonomy", "memory", "geo", "health_ok"]);
+    if (body.setupStep && ALLOWED_SETUP_STEPS.has(body.setupStep)) {
+      const { DbClient } = await import("../../../../../../../backend/db/DbClient");
+      await DbClient.getInstance().query(
+        `UPDATE saas_tenants
+         SET setup_progress = setup_progress || $2::jsonb, updated_at = NOW()
+         WHERE id = $1`,
+        [ctx.tenant.id, JSON.stringify({ [body.setupStep]: true, [`${body.setupStep}_at`]: new Date().toISOString() })],
+      );
+      result.setupStep = body.setupStep;
     }
 
     return NextResponse.json({ ok: true, ...result });

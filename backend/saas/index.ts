@@ -241,7 +241,7 @@ export {
   type NelvyonAgentSkill,
   type NelvyonAgentChannel,
 } from "./nelvyonAgentSkillsCatalog";
-export { buildMockAgentReply, buildMockSocialPost } from "./nelvyonAgentMockReplies";
+export { buildMockAgentReply, buildMockSocialPost, buildDeliverableSocialProofPost } from "./nelvyonAgentMockReplies";
 export {
   buildMockCopies,
   buildMockChatReply,
@@ -1544,3 +1544,29 @@ export {
   refreshAdsAccessTokenIfNeeded,
   resolveAdsConnectionToken,
 } from "./saasAdsTokenRefresh";
+export {
+  getSaasGeoVisibilityReportService,
+  resetSaasGeoVisibilityReportServiceForTests,
+  SaasGeoVisibilityReportService,
+  deriveGeoChecklist,
+  scoreGeoChecklist,
+  geoChecklistToPdfLines,
+  normalizeDomainInput,
+  type GeoCheckItem,
+  type GeoVisibilityRun,
+} from "./SaasGeoVisibilityReportService";
+export {
+  getSaasTwilioRebillingService,
+  resetSaasTwilioRebillingServiceForTests,
+  SaasTwilioRebillingService,
+} from "./SaasTwilioRebillingService";
+export {
+  getSaasStripeMeterService,
+  resetSaasStripeMeterServiceForTests,
+  SaasStripeMeterService,
+} from "./SaasStripeMeterService";
+export {
+  getSaasSocialProofService,
+  resetSaasSocialProofServiceForTests,
+  SaasSocialProofService,
+} from "./SaasSocialProofService";

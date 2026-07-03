@@ -84,6 +84,9 @@ export class SaasSmsService {
     try {
       const sid = await twilioSend(creds.accountSid, creds.authToken, creds.fromNumber, toNum, bodyText, this.fetchImpl);
       await this.logSms(tenantId, toNum, bodyText, sid, "sent");
+      void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) =>
+        getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, "smsSent"),
+      );
       return { to: toNum, ok: true, messageSid: sid };
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);

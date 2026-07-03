@@ -43,6 +43,7 @@ type DashboardWidgetId =
   | "health"
   | "activation"
   | "competitorGap"
+  | "geoVisibility"
   | "pipeline"
   | "modules"
   | "kpis"
@@ -53,6 +54,7 @@ const WIDGET_LABELS: Record<DashboardWidgetId, string> = {
   health: "Salud de cuenta",
   activation: "Checklist activación",
   competitorGap: "Competitor Gap",
+  geoVisibility: "GEO / AI Visibility",
   pipeline: "Pipeline comercial",
   modules: "Módulos activos",
   kpis: "KPIs operaciones",
@@ -64,6 +66,12 @@ type GapSummary = {
   gapScore: number | null;
   recommendedPackId: string | null;
   competitorDomain: string | null;
+} | null;
+
+type GeoSummary = {
+  domain: string;
+  score: number | null;
+  id: string;
 } | null;
 
 function activityStatus(type: string): NelvyonDsStatus {
@@ -92,6 +100,8 @@ export default function SaasDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [exportingReport, setExportingReport] = useState(false);
   const [gapSummary, setGapSummary] = useState<GapSummary>(null);
+  const [geoSummary, setGeoSummary] = useState<GeoSummary>(null);
+  const [geoAnalyzing, setGeoAnalyzing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -136,6 +146,15 @@ export default function SaasDashboardPage() {
         if (gapRes.ok && !cancelled) {
           const gapBody = (await gapRes.json()) as { summary?: GapSummary };
           setGapSummary(gapBody.summary ?? null);
+        }
+
+        const geoRes = await fetch("/api/saas/geo-visibility", { credentials: "same-origin", cache: "no-store" });
+        if (geoRes.ok && !cancelled) {
+          const geoBody = (await geoRes.json()) as { runs?: Array<{ id: string; domain: string; score: number | null }> };
+          const latest = geoBody.runs?.[0];
+          if (latest) {
+            setGeoSummary({ id: latest.id, domain: latest.domain, score: latest.score });
+          }
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -384,6 +403,56 @@ export default function SaasDashboardPage() {
                 </div>
               ) : (
                 <p className="text-sm text-white/40">Configura tu dominio en ajustes y ejecuta un análisis de gap.</p>
+              )}
+            </DarkCard>
+          );
+        }
+        if (id === "geoVisibility") {
+          return (
+            <DarkCard key={id}>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">GEO / AI Visibility</p>
+              {geoSummary ? (
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="text-3xl font-bold text-white tabular-nums">{geoSummary.score ?? "—"}<span className="text-lg text-white/40">/100</span></p>
+                    <p className="text-sm text-white/50">{geoSummary.domain}</p>
+                    <p className="text-xs text-white/30 mt-1">Schema · FAQ · llms.txt — 0€ sin LLM</p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href={`/api/saas/geo-visibility/${geoSummary.id}/pdf`}
+                      className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/70 hover:border-[#0084ff]/40 text-center"
+                    >
+                      PDF informe
+                    </a>
+                    <Link href="/saas/setup" className="rounded-lg bg-[#0084ff]/20 px-4 py-2 text-sm text-[#0084ff] hover:bg-[#0084ff]/30 text-center">
+                      Re-analizar →
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <p className="text-sm text-white/40">Audita citación en ChatGPT/Perplexity (determinístico).</p>
+                  <button
+                    type="button"
+                    disabled={geoAnalyzing}
+                    onClick={async () => {
+                      setGeoAnalyzing(true);
+                      try {
+                        const res = await fetch("/api/saas/geo-visibility", { method: "POST", credentials: "same-origin" });
+                        if (res.ok) {
+                          const body = (await res.json()) as { run?: { id: string; domain: string; score: number | null } };
+                          if (body.run) setGeoSummary({ id: body.run.id, domain: body.run.domain, score: body.run.score });
+                        }
+                      } finally {
+                        setGeoAnalyzing(false);
+                      }
+                    }}
+                    className="rounded-lg bg-[#0084ff]/20 px-4 py-2 text-sm text-[#0084ff] hover:bg-[#0084ff]/30 disabled:opacity-50"
+                  >
+                    {geoAnalyzing ? "Analizando…" : "Analizar GEO"}
+                  </button>
+                </div>
               )}
             </DarkCard>
           );

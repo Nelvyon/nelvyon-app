@@ -25,7 +25,12 @@ interface Subcuenta {
   updatedAt: string;
 }
 
-interface SubcuentaUsage { contacts: number; campaigns: number; workflows: number }
+interface SubcuentaUsage {
+  contacts: number;
+  campaigns: number;
+  workflows: number;
+  meter?: { emailsSent: number; smsSent: number; apiCalls: number; workflowRuns: number };
+}
 
 const PLAN_CFG: Record<SubcuentaPlan, { label: string; color: string }> = {
   starter: { label: "Starter", color: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
@@ -134,6 +139,10 @@ function UsagePanel({ sub, onClose }: { sub: Subcuenta; onClose: () => void }) {
               { label: "Contactos",      value: usage?.contacts ?? 0,  max: sub.maxContacts },
               { label: "Campañas",       value: usage?.campaigns ?? 0, max: sub.maxCampaigns },
               { label: "Workflows activos", value: usage?.workflows ?? 0, max: null },
+              { label: "Emails (mes)",   value: usage?.meter?.emailsSent ?? 0, max: null },
+              { label: "SMS (mes)",      value: usage?.meter?.smsSent ?? 0, max: null },
+              { label: "Workflows (mes)", value: usage?.meter?.workflowRuns ?? 0, max: null },
+              { label: "API calls (mes)", value: usage?.meter?.apiCalls ?? 0, max: null },
             ].map(({ label, value, max }) => (
               <div key={label}>
                 <div className="flex justify-between text-xs text-muted-foreground mb-1">
@@ -152,6 +161,71 @@ function UsagePanel({ sub, onClose }: { sub: Subcuenta; onClose: () => void }) {
         <NelvyonDsButton variant="ghost" onClick={onClose} className="w-full">Cerrar</NelvyonDsButton>
       </NelvyonDsCard>
     </div>
+  );
+}
+
+// ── Twilio rebilling panel ─────────────────────────────────────────────────────
+function TwilioRebillingPanel() {
+  const [summary, setSummary] = useState<{ pendingRetail: number; totalSms: number } | null>(null);
+  const [entries, setEntries] = useState<Array<{ subcuentaId: string; period: string; smsCount: number; retailEur: number; status: string }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [rolling, setRolling] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/saas/twilio/rebilling");
+      if (res.ok) {
+        const d = await res.json() as { summary?: { pendingRetail: number; totalSms: number }; entries?: typeof entries };
+        setSummary(d.summary ?? null);
+        setEntries(d.entries ?? []);
+      }
+    } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  return (
+    <NelvyonDsCard className="p-5 border-amber-500/20 bg-amber-500/5">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+        <div>
+          <p className="font-semibold text-foreground">📱 Twilio rebilling (3× markup)</p>
+          <p className="text-xs text-muted-foreground mt-1">SMS/voice subcuentas — factura al cliente, no a la plataforma</p>
+        </div>
+        <NelvyonDsButton
+          variant="ghost"
+          className="text-xs"
+          disabled={rolling}
+          onClick={async () => {
+            setRolling(true);
+            try {
+              await fetch("/api/saas/twilio/rebilling", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+              await load();
+            } finally { setRolling(false); }
+          }}
+        >
+          {rolling ? "Calculando…" : "Rollup mes actual"}
+        </NelvyonDsButton>
+      </div>
+      {loading ? (
+        <div className="h-12 animate-pulse rounded-lg bg-muted/30" />
+      ) : (
+        <div className="flex flex-wrap gap-6 text-sm">
+          <div>
+            <p className="text-xs text-muted-foreground">Retail pendiente</p>
+            <p className="text-xl font-bold text-foreground">€{(summary?.pendingRetail ?? 0).toFixed(2)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">SMS totales</p>
+            <p className="text-xl font-bold text-foreground">{(summary?.totalSms ?? 0).toLocaleString("es-ES")}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Entradas ledger</p>
+            <p className="text-xl font-bold text-foreground">{entries.length}</p>
+          </div>
+        </div>
+      )}
+    </NelvyonDsCard>
   );
 }
 
@@ -218,6 +292,8 @@ export default function SaasSubcuentasPage() {
             </NelvyonDsCard>
           ))}
         </div>
+
+        <TwilioRebillingPanel />
 
         {/* Filter chips */}
         <div className="flex gap-2 flex-wrap">

@@ -143,6 +143,27 @@ export default function EntregablesPage() {
   const [revenueTotal, setRevenueTotal] = useState(0);
   const [avgRoas, setAvgRoas] = useState<number | null>(null);
   const [linkModalId, setLinkModalId] = useState<string | null>(null);
+  const [socialProofMsg, setSocialProofMsg] = useState<string | null>(null);
+
+  async function createSocialProof(d: SaasDeliverable) {
+    setSocialProofMsg(null);
+    const res = await fetch("/api/saas/social/suggest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        deliverableId: d.id,
+        title: d.title,
+        qaScore: d.qaScore ?? undefined,
+        packName: d.packId ?? undefined,
+        save: true,
+      }),
+    });
+    if (res.ok) {
+      setSocialProofMsg(`✅ Borrador social proof creado para «${d.title}»`);
+    } else {
+      setSocialProofMsg("Error al crear borrador social proof");
+    }
+  }
 
   async function load() {
     setLoading(true);
@@ -357,6 +378,9 @@ export default function EntregablesPage() {
         {copyMsg && (
           <div className="text-xs text-[#0084ff] font-medium">{copyMsg}</div>
         )}
+        {socialProofMsg && (
+          <div className="text-xs text-emerald-400 font-medium">{socialProofMsg}</div>
+        )}
 
         {/* Content */}
         {loading ? (
@@ -456,6 +480,14 @@ export default function EntregablesPage() {
                         >
                           Vincular campaña
                         </button>
+                        {(d.status === "approved" || d.status === "published" || d.status === "delivered") && (
+                          <button
+                            onClick={() => { void createSocialProof(d); }}
+                            className="text-white/30 text-xs hover:text-emerald-400"
+                          >
+                            Social proof
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

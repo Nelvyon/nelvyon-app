@@ -26,6 +26,12 @@ export interface SubcuentaUsage {
   contacts: number;
   campaigns: number;
   workflows: number;
+  meter?: {
+    emailsSent: number;
+    smsSent: number;
+    apiCalls: number;
+    workflowRuns: number;
+  };
 }
 
 export interface CreateSubcuentaInput {
@@ -169,6 +175,9 @@ export class SaasSubcuentasService {
       contacts: parseInt(contRow[0]?.count ?? "0", 10),
       campaigns: parseInt(campRow[0]?.count ?? "0", 10),
       workflows: parseInt(wfRow[0]?.count ?? "0", 10),
+      meter: await import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) =>
+        getSaasUsageMeterService().getSubcuentaMonthMeter(id),
+      ).catch(() => undefined),
     };
   }
 }

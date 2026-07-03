@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { getOsCompetitorGapService } from "@nelvyon/saas";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 
 function assertCron(req: Request): NextResponse | null {
@@ -23,7 +22,6 @@ export async function POST(req: Request) {
   const tenants = await db.query<{ id: string; website: string | null }>(
     `SELECT id, website FROM saas_tenants WHERE website IS NOT NULL AND website != '' LIMIT 100`,
   );
-  const svc = getOsCompetitorGapService();
   let processed = 0;
 
   for (const t of tenants) {

@@ -5,6 +5,7 @@ export const DEFAULT_DASHBOARD_WIDGETS = [
   "health",
   "activation",
   "competitorGap",
+  "geoVisibility",
   "pipeline",
   "modules",
   "kpis",

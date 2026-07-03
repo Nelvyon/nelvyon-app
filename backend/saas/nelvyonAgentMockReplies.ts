@@ -220,3 +220,24 @@ export function buildMockSocialPost(input: {
   const t = templates[platform] ?? templates.instagram!;
   return { content: t.content, hashtags: t.hashtags, platform, mock: true };
 }
+
+/** Social proof from approved pack deliverable (0€). */
+export function buildDeliverableSocialProofPost(input: {
+  title?: string;
+  qaScore?: number;
+  packName?: string;
+  platform?: string;
+}): { content: string; hashtags: string[]; platform: string; mock: true } {
+  const title = (input.title ?? input.packName ?? "Nuevo entregable").trim().slice(0, 100);
+  const qa = input.qaScore != null ? ` QA ${input.qaScore}/100.` : "";
+  const platform = (input.platform ?? "linkedin").toLowerCase();
+  const content =
+    platform === "linkedin"
+      ? `🚀 Entregable aprobado: ${title}.${qa}\n\nResultados reales, proceso transparente. ¿Quieres lo mismo para tu negocio?`
+      : `✨ ${title}${qa}\n\nNuevo case live — escríbenos si quieres replicarlo en tu marca.`;
+  const hashtags =
+    platform === "linkedin"
+      ? ["#MarketingDigital", "#CasodeExito", "#B2B"]
+      : ["#negocioLocal", "#marketing", "#resultados"];
+  return { content, hashtags, platform, mock: true };
+}

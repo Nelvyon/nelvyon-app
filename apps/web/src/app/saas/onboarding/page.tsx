@@ -162,7 +162,7 @@ export default function SaasOnboardingPage() {
         setError(msg);
         return;
       }
-      router.replace("/saas/dashboard");
+      router.replace("/saas/setup");
     } finally {
       setBusy(false);
     }

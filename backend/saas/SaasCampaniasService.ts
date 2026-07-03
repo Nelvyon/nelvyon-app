@@ -562,6 +562,12 @@ ${ctaBlock}
     );
 
     void this.audit?.log(tenantId, { action: "send", module: "campanias", resourceId: campaniaId, details: { totalSent: sentCount } });
+    if (sentCount > 0) {
+      const meterField = campania.channel === "sms" ? "smsSent" as const : "emailsSent" as const;
+      void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) =>
+        getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, meterField, sentCount),
+      );
+    }
     return { campaniaId, totalSent: sentCount, status: "completed" };
   }
 

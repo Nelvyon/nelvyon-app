@@ -33,7 +33,7 @@ export async function POST(req: Request) {
           claims.email,
           "Cliente",
           tenant.companyName,
-          `${process.env.APP_URL ?? "https://app.nelvyon.com"}/saas/dashboard`,
+          `${process.env.APP_URL ?? "https://app.nelvyon.com"}/saas/setup`,
         )
         .catch((err) => {
           console.error("[Email] onboarding complete send failed:", err);
