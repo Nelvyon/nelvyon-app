@@ -1,7 +1,9 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
+import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import esMessages from "../../../../messages/es.json";
 import { SaasSidebar } from "../components/SaasSidebar";
 import { SAAS_NAV_ITEMS, SAAS_HIDDEN_ROUTES, isSaasNavActive } from "../saasNav";
 import { resetSaasPermissionsCacheForTests } from "../useSaasPermissions";
@@ -10,6 +12,14 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
   usePathname: () => "/saas/dashboard",
 }));
+
+function renderSidebar(ui: React.ReactElement) {
+  return render(
+    <NextIntlClientProvider locale="es" messages={esMessages}>
+      {ui}
+    </NextIntlClientProvider>,
+  );
+}
 
 beforeEach(() => {
   resetSaasPermissionsCacheForTests();
@@ -60,7 +70,7 @@ describe("saasNav", () => {
 describe("SaasSidebar", () => {
   it("renders clickable nav links for active modules", async () => {
     // activeId="billing" opens the "cuenta" group so billing/settings links render
-    render(<SaasSidebar activeId="billing" tenantCompany="Acme" tenantPlan="pro" />);
+    renderSidebar(<SaasSidebar activeId="billing" tenantCompany="Acme" tenantPlan="pro" />);
     expect(screen.getByTestId("saas-sidebar")).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.getByRole("link", { name: "Facturación" })).toBeInTheDocument();

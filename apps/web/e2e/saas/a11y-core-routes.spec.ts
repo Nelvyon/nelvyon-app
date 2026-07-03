@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 
+import { setupAuthedSaas } from "./fixtures";
+
 const CRITICAL_SAAS_ROUTES = [
   "/saas/dashboard",
   "/saas/crm",
@@ -8,6 +10,10 @@ const CRITICAL_SAAS_ROUTES = [
   "/saas/billing",
   "/saas/integraciones",
 ];
+
+test.beforeEach(async ({ page, context }) => {
+  await setupAuthedSaas(page, context);
+});
 
 for (const route of CRITICAL_SAAS_ROUTES) {
   test(`a11y landmarks: ${route} has main navigation`, async ({ page }) => {
