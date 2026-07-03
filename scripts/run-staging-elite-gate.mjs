@@ -1,5 +1,5 @@
 /**
- * Elite gate — local reinforce + P0 + beta packs E2E + OS/SaaS 100%.
+ * Elite gate — local reinforce + P0 + 8 OS packs E2E + OS/SaaS 100%.
  * Zero tolerance: any CRITICAL or WARN fails the gate.
  * Usage: node scripts/run-staging-elite-gate.mjs [--skip-wait] [--skip-local]
  */
@@ -21,7 +21,7 @@ const LOCAL_GATES = skipLocal
 
 const GATES = [
   { name: "P0", script: "run-staging-p0-smokes.mjs" },
-  { name: "beta-packs", script: "run-staging-beta-packs-e2e.mjs" },
+  { name: "extended-packs", script: "run-staging-beta-packs-e2e.mjs" },
   { name: "os-saas-100", script: "verify-os-saas-100.mjs" },
 ];
 

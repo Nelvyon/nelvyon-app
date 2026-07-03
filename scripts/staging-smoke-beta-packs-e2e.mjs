@@ -1,5 +1,5 @@
 /**
- * Staging E2E — 5 beta packs (social-calendar, content-strategy, cro-audit, analytics-setup, brand-voice).
+ * Staging E2E — 5 extended OS packs (social-calendar, content-strategy, cro-audit, analytics-setup, brand-voice).
  * Usage: node scripts/staging-smoke-beta-packs-e2e.mjs [--skip-wait] [--pack social-calendar-pack]
  */
 import {
@@ -178,7 +178,7 @@ async function main() {
 
   console.log("\n=== SUMMARY ===");
   console.log(`Packs OK: ${ok}/${packs.length}`);
-  const code = finishSmokeGate({ critical: CRITICAL, warn: WARN, passLabel: "ALL_BETA_PACKS_PASS" });
+  const code = finishSmokeGate({ critical: CRITICAL, warn: WARN, passLabel: "ALL_EXTENDED_PACKS_PASS" });
   process.exit(code);
   } finally {
     clearGuard();

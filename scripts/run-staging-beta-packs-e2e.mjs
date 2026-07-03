@@ -11,7 +11,7 @@ const root = join(__dirname, "..");
 const skipWait = process.argv.includes("--skip-wait");
 const extraArgs = skipWait ? ["--skip-wait"] : [];
 
-console.log("\n========== BETA PACKS E2E GATE ==========\n");
+console.log("\n========== EXTENDED OS PACKS E2E GATE ==========\n");
 const r = spawnSync(
   process.execPath,
   [join(__dirname, "staging-smoke-beta-packs-e2e.mjs"), ...extraArgs],
@@ -19,8 +19,8 @@ const r = spawnSync(
 );
 
 if (r.status === 0) {
-  console.log("\nALL_BETA_PACKS_PASS");
+  console.log("\nALL_EXTENDED_PACKS_PASS");
   process.exit(0);
 }
-console.log("\nBETA_PACKS_FAIL");
+console.log("\nEXTENDED_PACKS_FAIL");
 process.exit(r.status ?? 1);

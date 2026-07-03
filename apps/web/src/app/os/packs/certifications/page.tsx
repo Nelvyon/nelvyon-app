@@ -32,11 +32,11 @@ const PACK_LABELS: Record<string, string> = {
   "local-business-growth": "Crecimiento Local",
   "ecommerce-growth": "Crecimiento Ecommerce",
   "saas-b2b-growth": "Crecimiento SaaS B2B",
-  "social-calendar-pack": "Calendario Social (beta)",
-  "content-strategy-pack": "Estrategia Contenidos (beta)",
-  "cro-audit-pack": "Auditoría CRO (beta)",
-  "analytics-setup-pack": "Setup Analytics (beta)",
-  "brand-voice-pack": "Voz de Marca (beta)",
+  "social-calendar-pack": "Calendario Social",
+  "content-strategy-pack": "Estrategia Contenidos",
+  "cro-audit-pack": "Auditoría CRO",
+  "analytics-setup-pack": "Setup Analytics",
+  "brand-voice-pack": "Voz de Marca",
 };
 
 export default function PackCertificationsPage() {
@@ -102,7 +102,7 @@ export default function PackCertificationsPage() {
     }
   }
 
-  const betaPending = items.filter((i) => i.packId.match(/social-calendar|content-strategy|cro-audit|analytics-setup|brand-voice/) && i.status !== "passed").length;
+  const extendedPending = items.filter((i) => i.packId.match(/social-calendar|content-strategy|cro-audit|analytics-setup|brand-voice/) && i.status !== "passed").length;
 
   return (
     <ProtectedLayout module="os">
@@ -121,9 +121,9 @@ export default function PackCertificationsPage() {
 
         {notice && <div className="rounded-lg border border-border bg-muted/40 px-4 py-2 text-sm">{notice}</div>}
 
-        {betaPending > 0 && (
+        {extendedPending > 0 && (
           <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-sm text-yellow-700 dark:text-yellow-300">
-            {betaPending} pack(s) beta pendientes de certificación.
+            {extendedPending} pack(s) extendidos pendientes de certificación.
           </div>
         )}
 

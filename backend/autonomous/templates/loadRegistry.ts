@@ -1,4 +1,4 @@
-/** Load template registry — bundled JSON fallback for production containers. */
+/** Load template registry — bundled JSON fallback; never throws ENOENT in production. */
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -17,30 +17,35 @@ function validateRegistry(raw: TemplateRegistry): TemplateRegistry {
   return raw;
 }
 
-function resolveRegistryPath(path?: string): string {
-  const candidates = [
-    path,
+function readRegistryFile(filePath: string): TemplateRegistry | null {
+  try {
+    if (!existsSync(filePath)) return null;
+    return validateRegistry(JSON.parse(readFileSync(filePath, "utf-8")) as TemplateRegistry);
+  } catch {
+    return null;
+  }
+}
+
+function registryPathCandidates(explicit?: string): string[] {
+  return [
+    explicit,
     DEFAULT_REGISTRY_PATH,
     join(process.cwd(), "backend/autonomous/templates/registry.json"),
     join(process.cwd(), "../backend/autonomous/templates/registry.json"),
     join(process.cwd(), "../../backend/autonomous/templates/registry.json"),
   ].filter((p): p is string => Boolean(p));
-
-  for (const candidate of candidates) {
-    if (existsSync(candidate)) return candidate;
-  }
-  return path ?? DEFAULT_REGISTRY_PATH;
 }
 
 export function loadTemplateRegistry(path?: string): TemplateRegistry {
-  if (path && existsSync(path)) {
-    return validateRegistry(JSON.parse(readFileSync(path, "utf-8")) as TemplateRegistry);
+  for (const candidate of registryPathCandidates(path)) {
+    const loaded = readRegistryFile(candidate);
+    if (loaded) return loaded;
   }
-
-  const resolved = resolveRegistryPath(path);
-  if (existsSync(resolved)) {
-    return validateRegistry(JSON.parse(readFileSync(resolved, "utf-8")) as TemplateRegistry);
-  }
-
   return validateRegistry(bundledRegistry as TemplateRegistry);
+}
+
+/** For health/smokes — confirms bundled registry is loadable without filesystem. */
+export function getBundledTemplateRegistryCount(): number {
+  const reg = bundledRegistry as TemplateRegistry;
+  return Array.isArray(reg.templates) ? reg.templates.length : 0;
 }

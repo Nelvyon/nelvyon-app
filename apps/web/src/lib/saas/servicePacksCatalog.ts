@@ -54,7 +54,7 @@ export type ServicePackDefinition = {
  *   ecommerce-growth        → NELVYON-LANDING + NELVYON-SEO + NELVYON-CHATBOT
  *   saas-b2b-growth         → NELVYON-LANDING + NELVYON-SEO + NELVYON-CHATBOT
  *
- * All 8 packs have real kickoff runners via packOrchestrator (growth + beta).
+ * All 8 packs have real kickoff runners via packOrchestrator (3 growth + 5 extended).
  * coming_soon packs have no backend SKUs — do NOT change to "available" without kickoff runner.
  */
 export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [

@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   elite-gate:
-    name: P0 + beta packs + SaaS/OS 100%
+    name: P0 + 8 OS packs + SaaS/OS 100%
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
