@@ -241,6 +241,13 @@ export class SaasBriefToLaunchService {
    *  3. Updates launch with pack_run_id + status
    */
   async executeLaunch(tenantId: string, launchId: string): Promise<PackLaunch> {
+    const { getSaasAutonomyService } = await import("./SaasAutonomyService");
+    const autonomy = await getSaasAutonomyService().getMode(tenantId);
+    const gate = getSaasAutonomyService().gateOutbound(autonomy, "launch");
+    if (!gate.allowed) {
+      throw new SaasBriefToLaunchError("VALIDATION", gate.reason ?? "Autonomía en modo propuesta/borrador");
+    }
+
     const launchRows = await this.db.query<LaunchRow>(
       `SELECT * FROM saas_pack_launches WHERE id=$1 AND tenant_id=$2`,
       [launchId, tenantId],

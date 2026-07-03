@@ -4,6 +4,7 @@ import type { SaasPostgresPort } from "./SaasOnboardingService";
 export const DEFAULT_DASHBOARD_WIDGETS = [
   "health",
   "activation",
+  "competitorGap",
   "pipeline",
   "modules",
   "kpis",

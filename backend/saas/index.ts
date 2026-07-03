@@ -1494,6 +1494,53 @@ export {
   getSaasCrmSyncService,
 } from "./SaasCrmSyncService";
 export {
+  getSaasAutonomyService,
+  resetSaasAutonomyServiceForTests,
+  SaasAutonomyService,
+  type AutonomyMode,
+  type AutonomyGate,
+} from "./SaasAutonomyService";
+export {
+  getSaasTenantMemoryService,
+  resetSaasTenantMemoryServiceForTests,
+  SaasTenantMemoryService,
+  type MemoryChunk,
+  type MemorySource,
+} from "./SaasTenantMemoryService";
+export {
+  getSaasCeoBriefService,
+  resetSaasCeoBriefServiceForTests,
+  SaasCeoBriefService,
+  type CeoBrief,
+} from "./SaasCeoBriefService";
+export {
+  signPortalApprovalToken,
+  verifyPortalApprovalToken,
+  hashApprovalToken,
+  createPortalApprovalLinks,
+} from "./PortalApprovalTokenService";
+export {
+  getSaasUnifiedAuditExportService,
+  resetSaasUnifiedAuditExportServiceForTests,
+  SaasUnifiedAuditExportService,
+} from "./SaasUnifiedAuditExportService";
+export {
+  getSaasConnectRebillingService,
+  resetSaasConnectRebillingServiceForTests,
+  SaasConnectRebillingService,
+} from "./SaasConnectRebillingService";
+export {
+  getSaasApprovalCardsService,
+  resetSaasApprovalCardsServiceForTests,
+  SaasApprovalCardsService,
+} from "./SaasApprovalCardsService";
+export {
+  getNelvyonMcpService,
+  resetNelvyonMcpServiceForTests,
+  NelvyonMcpService,
+  MCP_TOOLS,
+} from "./NelvyonMcpService";
+export {
   refreshAdsAccessTokenIfNeeded,
   resolveAdsConnectionToken,
 } from "./saasAdsTokenRefresh";

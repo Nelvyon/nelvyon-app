@@ -42,6 +42,7 @@ type DashboardSummary = {
 type DashboardWidgetId =
   | "health"
   | "activation"
+  | "competitorGap"
   | "pipeline"
   | "modules"
   | "kpis"
@@ -51,12 +52,19 @@ type DashboardWidgetId =
 const WIDGET_LABELS: Record<DashboardWidgetId, string> = {
   health: "Salud de cuenta",
   activation: "Checklist activación",
+  competitorGap: "Competitor Gap",
   pipeline: "Pipeline comercial",
   modules: "Módulos activos",
   kpis: "KPIs operaciones",
   activity: "Actividad reciente",
   quickActions: "Acciones rápidas",
 };
+
+type GapSummary = {
+  gapScore: number | null;
+  recommendedPackId: string | null;
+  competitorDomain: string | null;
+} | null;
 
 function activityStatus(type: string): NelvyonDsStatus {
   const v = type.toLowerCase();
@@ -83,6 +91,7 @@ export default function SaasDashboardPage() {
   const [savingLayout, setSavingLayout] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [exportingReport, setExportingReport] = useState(false);
+  const [gapSummary, setGapSummary] = useState<GapSummary>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,6 +130,12 @@ export default function SaasDashboardPage() {
           if (Array.isArray(layoutBody.layout?.widgets) && layoutBody.layout.widgets.length > 0 && !cancelled) {
             setWidgets(layoutBody.layout.widgets);
           }
+        }
+
+        const gapRes = await fetch("/api/saas/competitor-gap", { credentials: "same-origin", cache: "no-store" });
+        if (gapRes.ok && !cancelled) {
+          const gapBody = (await gapRes.json()) as { summary?: GapSummary };
+          setGapSummary(gapBody.summary ?? null);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -350,6 +365,29 @@ export default function SaasDashboardPage() {
         if (!show(id)) return null;
 
         if (id === "activation") return <ActivationChecklist key={id} />;
+        if (id === "competitorGap") {
+          return (
+            <DarkCard key={id}>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Competitor Gap (semanal)</p>
+              {gapSummary ? (
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="text-3xl font-bold text-white tabular-nums">{gapSummary.gapScore ?? "—"}</p>
+                    <p className="text-sm text-white/50">vs {gapSummary.competitorDomain ?? "competidor"}</p>
+                    {gapSummary.recommendedPackId && (
+                      <p className="text-xs text-[#0084ff] mt-1">Pack recomendado: {gapSummary.recommendedPackId}</p>
+                    )}
+                  </div>
+                  <Link href="/saas/brief-to-launch" className="rounded-lg bg-[#0084ff]/20 px-4 py-2 text-sm text-[#0084ff] hover:bg-[#0084ff]/30">
+                    Lanzar pack →
+                  </Link>
+                </div>
+              ) : (
+                <p className="text-sm text-white/40">Configura tu dominio en ajustes y ejecuta un análisis de gap.</p>
+              )}
+            </DarkCard>
+          );
+        }
         if (id === "pipeline") return show("pipeline") ? <CommercialPipelineSection key={id} /> : null;
 
         if (id === "modules" && summary.moduleStats) {

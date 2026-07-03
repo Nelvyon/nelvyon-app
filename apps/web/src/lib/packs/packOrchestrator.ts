@@ -739,6 +739,51 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       }
     }
 
+    // S58 — Slack/Teams approval cards + one-click portal links (best-effort)
+    try {
+      const { getSaasApprovalCardsService, createPortalApprovalLinks } = await import("@nelvyon/saas");
+      const { DbClient } = await import("../../../../../backend/db/DbClient");
+      const db = DbClient.getInstance();
+      const tenantRows = await db.query<{ id: string }>(
+        `SELECT id FROM saas_tenants WHERE workspace_id = $1 LIMIT 1`,
+        [params.workspaceId],
+      );
+      const tenantId = tenantRows[0]?.id;
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com";
+      const delRows = await db.query<{ id: string; client_id: string }>(
+        `SELECT id, client_id FROM os_deliverables
+         WHERE project_id = $1::uuid AND deliverable_metadata->>'pack_run_id' = $2
+         ORDER BY created_at DESC LIMIT 1`,
+        [osProjectId, run.id],
+      ).catch(() => []);
+      const del = delRows[0];
+      let approveUrl: string | undefined;
+      let rejectUrl: string | undefined;
+      if (del && tenantId) {
+        const links = await createPortalApprovalLinks({
+          deliverableId: del.id,
+          workspaceId: params.workspaceId,
+          clientId: del.client_id,
+          baseUrl,
+        });
+        approveUrl = links.approveUrl;
+        rejectUrl = links.rejectUrl;
+      }
+      if (tenantId) {
+        await getSaasApprovalCardsService().sendPackApprovalCard({
+          tenantId,
+          packRunId: run.id,
+          packName: meta.name,
+          qaScore: avgSkuQaScore(skuResults),
+          deliverableId: del?.id,
+          portalApproveUrl: approveUrl,
+          portalRejectUrl: rejectUrl,
+        });
+      }
+    } catch {
+      /* approval cards best-effort */
+    }
+
     return (await getPackRun(run.id))!;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido en el pack";

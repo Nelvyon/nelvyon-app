@@ -120,6 +120,7 @@ export default function SaasAuditoriaPage() {
         <div className="flex gap-2">
           <NelvyonDsButton variant="ghost" onClick={() => void load()}>↺ Actualizar</NelvyonDsButton>
           <NelvyonDsButton variant="secondary" onClick={() => void exportCsv()}>⬇ Exportar CSV</NelvyonDsButton>
+          <NelvyonDsButton variant="secondary" onClick={() => { window.location.href = "/api/saas/audit/unified?format=pdf"; }}>⬇ Audit unificado PDF</NelvyonDsButton>
         </div>
       </div>
 

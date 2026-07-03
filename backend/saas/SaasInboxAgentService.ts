@@ -253,7 +253,11 @@ export class SaasInboxAgentService {
       confidence = 0.95;
     } else if (this.llm) {
       const history = formatHistory(messages);
-      const extra = settings.systemPrompt?.trim() ? `\nInstrucciones tenant: ${settings.systemPrompt}` : "";
+      const { getSaasTenantMemoryService } = await import("./SaasTenantMemoryService");
+      const memBlock = await getSaasTenantMemoryService().buildContextBlock(tenantId, 2000);
+      const extra =
+        (settings.systemPrompt?.trim() ? `\nInstrucciones tenant: ${settings.systemPrompt}` : "") +
+        (memBlock ? `\n\n${memBlock}` : "");
       const prompt =
         `${skill.systemPrompt}${extra}\n\nCanal: ${conv.channel}\nSkill: ${skill.name}\n\n` +
         `Historial:\n${history}\n\nRedacta UNA respuesta lista para enviar (máx 120 palabras, español):`;
@@ -319,6 +323,13 @@ export class SaasInboxAgentService {
 
     if (suggested.confidence < settings.autoReplyMinConfidence) {
       return { processed: true, suggested, autoReplied: false, reason: "low_confidence" };
+    }
+
+    const { getSaasAutonomyService } = await import("./SaasAutonomyService");
+    const autonomy = await getSaasAutonomyService().getMode(tenantId);
+    const gate = getSaasAutonomyService().gateAgentAuto(autonomy);
+    if (!gate.allowed) {
+      return { processed: true, suggested, autoReplied: false, reason: gate.reason ?? "autonomy_gate" };
     }
 
     await this.inbox.replyToConversation(tenantId, conversationId, suggested.suggestion);

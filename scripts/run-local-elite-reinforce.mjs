@@ -70,6 +70,7 @@ const steps = [
         "../../backend/saas/__tests__/nelvyonAgentMockReplies.test.ts",
         "../../backend/saas/__tests__/nelvyonZeroCostAi.test.ts",
         "../../backend/saas/__tests__/SaasVoiceLlmParser.test.ts",
+        "../../backend/saas/__tests__/EliteRoadmapS58.test.ts",
         "--reporter=dot",
       ]),
   },

@@ -67,7 +67,11 @@ function rowToKey(r: ApiKeyRow): SaasApiKey {
   };
 }
 
-const VALID_SCOPES = ["crm.read", "crm.write", "campaigns.read", "campaigns.write", "pipeline.read", "pipeline.write", "webhooks.read", "*"];
+const VALID_SCOPES = [
+  "crm.read", "crm.write", "campaigns.read", "campaigns.write",
+  "pipeline.read", "pipeline.write", "webhooks.read",
+  "mcp.read", "mcp.write", "agents.run", "audit.read", "*",
+];
 
 export class SaasApiKeysService {
   constructor(private readonly db: SaasPostgresPort = DbClient.getInstance()) {}

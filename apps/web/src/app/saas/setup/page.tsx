@@ -59,6 +59,10 @@ export default function SaasSetupPage() {
   const [packLoading, setPackLoading] = useState(false);
   const [packMsg, setPackMsg] = useState<string | null>(null);
   const [featuredTemplate, setFeaturedTemplate] = useState<FeaturedTemplateMeta | null>(null);
+  const [autonomyMode, setAutonomyMode] = useState<"draft" | "propose" | "execute">("propose");
+  const [memoryChunks, setMemoryChunks] = useState<Array<{ id: string; title: string; content: string }>>([]);
+  const [memoryInput, setMemoryInput] = useState("");
+  const [eliteSaving, setEliteSaving] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -73,6 +77,20 @@ export default function SaasSetupPage() {
       if (tplRes.ok) {
         const tpl = (await tplRes.json()) as { templates: FeaturedTemplateMeta[] };
         setFeaturedTemplate(tpl.templates?.[0] ?? null);
+      }
+      const eliteRes = await fetch("/api/saas/setup", { cache: "no-store" });
+      if (eliteRes.ok) {
+        const elite = (await eliteRes.json()) as {
+          elite?: { autonomyMode?: string };
+        };
+        if (elite.elite?.autonomyMode === "draft" || elite.elite?.autonomyMode === "propose" || elite.elite?.autonomyMode === "execute") {
+          setAutonomyMode(elite.elite.autonomyMode);
+        }
+      }
+      const memRes = await fetch("/api/saas/memory", { cache: "no-store" });
+      if (memRes.ok) {
+        const mem = (await memRes.json()) as { chunks?: Array<{ id: string; title: string; content: string }> };
+        setMemoryChunks(mem.chunks ?? []);
       }
     } finally {
       setLoading(false);
@@ -152,6 +170,82 @@ export default function SaasSetupPage() {
                 {packLoading ? "Instalando…" : "Instalar kit"}
               </NelvyonDsButton>
             </div>
+          </NelvyonDsCard>
+
+          <NelvyonDsCard className="p-5 border-purple-500/20 bg-purple-500/5">
+            <p className="font-semibold text-white mb-1">🎚 Autonomía IA (elite)</p>
+            <p className="text-sm text-white/50 mb-4">Borrador → solo genera · Propuesta → confirma tú · Ejecutar → auto-acciones</p>
+            <div className="flex gap-2 flex-wrap">
+              {(["draft", "propose", "execute"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  disabled={eliteSaving}
+                  onClick={async () => {
+                    setEliteSaving(true);
+                    try {
+                      await fetch("/api/saas/setup", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ autonomyMode: mode }),
+                      });
+                      setAutonomyMode(mode);
+                    } finally {
+                      setEliteSaving(false);
+                    }
+                  }}
+                  className={`rounded-lg px-4 py-2 text-sm capitalize transition ${
+                    autonomyMode === mode
+                      ? "bg-[#0084ff] text-white"
+                      : "border border-white/10 text-white/60 hover:border-[#0084ff]/40"
+                  }`}
+                >
+                  {mode === "draft" ? "Borrador" : mode === "propose" ? "Propuesta" : "Ejecutar"}
+                </button>
+              ))}
+            </div>
+          </NelvyonDsCard>
+
+          <NelvyonDsCard className="p-5">
+            <p className="font-semibold text-white mb-1">🧠 Memoria IA compartida</p>
+            <p className="text-sm text-white/50 mb-3">Contexto Moso-style para inbox, agentes y packs</p>
+            <div className="flex gap-2 mb-3">
+              <input
+                value={memoryInput}
+                onChange={(e) => setMemoryInput(e.target.value)}
+                placeholder="Ej: Somos clínica dental en Madrid, tono cercano…"
+                className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              />
+              <NelvyonDsButton
+                disabled={!memoryInput.trim() || eliteSaving}
+                onClick={async () => {
+                  setEliteSaving(true);
+                  try {
+                    const res = await fetch("/api/saas/memory", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ content: memoryInput }),
+                    });
+                    if (res.ok) {
+                      setMemoryInput("");
+                      const mem = (await fetch("/api/saas/memory").then((r) => r.json())) as { chunks?: typeof memoryChunks };
+                      setMemoryChunks(mem.chunks ?? []);
+                    }
+                  } finally {
+                    setEliteSaving(false);
+                  }
+                }}
+              >
+                Guardar
+              </NelvyonDsButton>
+            </div>
+            <ul className="space-y-2 max-h-40 overflow-y-auto">
+              {memoryChunks.slice(0, 8).map((c) => (
+                <li key={c.id} className="text-xs text-white/60 border-b border-white/5 pb-2">
+                  {c.content.slice(0, 120)}{c.content.length > 120 ? "…" : ""}
+                </li>
+              ))}
+            </ul>
           </NelvyonDsCard>
 
           {featuredTemplate && (

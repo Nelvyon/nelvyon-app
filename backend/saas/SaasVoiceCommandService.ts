@@ -101,6 +101,7 @@ const INTENT_CATALOG: readonly VoiceCatalogItem[] = [
   // Queries
   { id: "qry_subcuentas", phrases: ["cuantas subcuentas", "numero de subcuentas", "subcuentas activas"], actionType: "query", action: "count_subcuentas", description: "Cuántas subcuentas tienes" },
   { id: "qry_connect", phrases: ["estado connect", "estado de stripe", "stripe conectado"], actionType: "query", action: "connect_status", description: "Estado de Stripe Connect" },
+  { id: "qry_ceo_brief", phrases: ["brief ceo", "resumen del dia", "que tengo hoy", "morning brief", "informe diario", "lee mi brief"], actionType: "query", action: "ceo_brief", description: "Brief CEO del día" },
 ] as const;
 
 const defaultCatalogPort: VoiceNavCatalogPort = {
@@ -303,6 +304,16 @@ export class SaasVoiceCommandService {
     let result = this.parseTranscript(transcript);
     let usedLlm = false;
 
+    if (result.success && result.intent?.action === "ceo_brief") {
+      try {
+        const { getSaasCeoBriefService } = await import("./SaasCeoBriefService");
+        const brief = await getSaasCeoBriefService().composeBrief(tenantId);
+        result = { ...result, message: brief.summaryText, success: true };
+      } catch {
+        result = { ...result, message: "No pude generar el brief CEO ahora.", success: false };
+      }
+    }
+
     if (!result.success && opts?.useLlm !== false) {
       const port =
         this.llmPort ??
@@ -338,6 +349,6 @@ export class SaasVoiceCommandService {
         source: opts?.source ?? "web_speech",
       });
     } catch { /* logging must never break the command */ }
-    return { ...result, usedLlm };
+    return { ...result, usedLlm, speak: result.intent?.action === "ceo_brief" && result.success };
   }
 }
