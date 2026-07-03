@@ -103,10 +103,8 @@ Sin `SES_FROM_EMAIL` + `SES_ACCESS_KEY_ID`, la UI muestra un banner de advertenc
 ## Migraciones de base de datos
 
 Archivos en `backend/db/migrations/`. Ejecutar en orden numérico.  
-Última migración comiteada: `400_nelvyon_pack_runs.sql`  
-Pendientes de commitear (untracked): `401_inbox_conversations.sql` … `416_surveys_qr_ab.sql`
-
-**Regla:** no crear archivos 401+ sin una feature real que los requiera.
+**Última migración comiteada:** `492_saas_agent_runs.sql` (491 = inbox agent S57).  
+Rango elite SaaS validado en CI: **401–492** (92 archivos). Railway `releaseCommand` aplica todas en deploy.
 
 ---
 
@@ -183,8 +181,7 @@ cd backend && python -m pytest tests/ -q --tb=short
 
 ## Próximas tareas (post-deploy)
 
-1. Commitear migraciones `401_inbox_conversations.sql` … `416_surveys_qr_ab.sql`
-2. Confirmar SNS subscription en AWS tras primer deploy
-3. Activar GitHub Actions cron (`staging-smoke-p0.yml`) para CI continuo
-4. Verificar skin dark `/saas/dashboard` en browser prod (`#020817`)
-5. Primer envío real de campaña → comprobar open pixel en SES logs
+1. Confirmar SNS subscription en AWS tras primer deploy
+2. Activar GitHub Actions cron (`staging-smoke-p0.yml`) para CI continuo
+3. Verificar skin dark `/saas/dashboard` en browser prod (`#020817`)
+4. Primer envío real de campaña → comprobar open pixel en SES logs

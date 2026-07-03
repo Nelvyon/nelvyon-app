@@ -15,16 +15,16 @@ const nums = files
     const m = /^(\d+)_/.exec(f);
     return m ? Number(m[1]) : null;
   })
-  .filter((n) => n != null && n >= 401 && n <= 491)
+  .filter((n) => n != null && n >= 401 && n <= 492)
   .sort((a, b) => a - b);
 
 const expected = [];
-for (let i = 401; i <= 491; i++) expected.push(i);
+for (let i = 401; i <= 492; i++) expected.push(i);
 
 const present = new Set(nums);
 const missing = expected.filter((n) => !files.some((f) => f.startsWith(`${String(n).padStart(3, "0")}_`)));
 
-console.log(`[validate-saas-migrations] files in 401–491 range: ${nums.length}`);
+console.log(`[validate-saas-migrations] files in 401–492 range: ${nums.length}`);
 if (missing.length > 0) {
   console.error(`[validate-saas-migrations] FAIL — missing migration numbers: ${missing.join(", ")}`);
   process.exit(1);

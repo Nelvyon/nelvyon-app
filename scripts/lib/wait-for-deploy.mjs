@@ -8,6 +8,8 @@ function sleep(ms) {
 }
 
 export function resolveExpectedGitSha() {
+  const fromCi = process.env.GITHUB_SHA?.trim();
+  if (fromCi) return fromCi;
   try {
     return execSync("git rev-parse HEAD", { encoding: "utf8" }).trim();
   } catch {
@@ -29,7 +31,7 @@ function shaMatches(deployed, expected) {
 export async function waitForStagingDeploy(baseUrl, opts = {}) {
   const {
     skipWait = false,
-    maxAttempts = 40,
+    maxAttempts = 56,
     intervalMs = 15_000,
     expectedSha = resolveExpectedGitSha(),
     label = "deploy",

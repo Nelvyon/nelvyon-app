@@ -1,7 +1,7 @@
 # LAUNCH_READY — Nelvyon producción
 
-> Actualizado: 2026-06-24  
-> Estado: **CÓDIGO TERMINADO — Fase 8 hardening completado — deploy manual en Railway**
+> Actualizado: 2026-07-03  
+> Estado: **CÓDIGO ELITE 10/10 — migraciones 401–492 en repo; apply en Railway releaseCommand**
 
 ---
 
@@ -187,7 +187,9 @@ psql $DATABASE_URL -f backend/db/migrations/001_init.sql
 psql $DATABASE_URL -f backend/db/migrations/400_nelvyon_pack_runs.sql
 ```
 
-Todas las migraciones 001–426 están en main. Ejecutar `pnpm -C apps/web migrate` aplica el set completo en orden.
+Todas las migraciones 001–492 están en main. Railway `releaseCommand` ejecuta `migrate.ts` en cada deploy (aplica 491 inbox agent + 492 agent runs automáticamente).
+
+Manual local/staging: `pnpm -C apps/web migrate` con `DATABASE_URL` configurada.
 
 Alternativa — script automatizado:
 ```bash

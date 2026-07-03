@@ -8,23 +8,6 @@ export const runtime = "nodejs";
 
 const BACKEND_URL = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-async function ensureSchema() {
-  const db = DbClient.getInstance();
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS saas_agent_runs (
-      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      tenant_id   TEXT NOT NULL,
-      agent_id    TEXT NOT NULL,
-      input       TEXT NOT NULL,
-      output      TEXT,
-      status      TEXT NOT NULL DEFAULT 'running',
-      error       TEXT,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-}
-
 export async function POST(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "workflows.execute");
@@ -34,10 +17,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "agentId and input are required" }, { status: 400 });
     }
 
-    await ensureSchema();
     const db = DbClient.getInstance();
-
-    // Log the run
     const runRows = await db.query<{ id: string }>(
       `INSERT INTO saas_agent_runs (tenant_id, agent_id, input, status)
        VALUES ($1, $2, $3, 'running')
