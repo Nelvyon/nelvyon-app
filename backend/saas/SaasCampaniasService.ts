@@ -10,6 +10,10 @@ import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
 
 const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
 
+function stripHtmlForSms(html: string): string {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 1600);
+}
+
 async function sendCampaniaEmail(
   to: string,
   subject: string,
@@ -481,6 +485,8 @@ export class SaasCampaniasService {
     }
 
     let sentCount = 0;
+    let meterEmails = 0;
+    let meterSms = 0;
 
     if (campania.channel === "email") {
       const subject = campania.subject ?? campania.name;
@@ -540,15 +546,114 @@ ${ctaBlock}
         );
         if (status === "sent") sentCount++;
       }
-    } else {
-      // SMS / notification / multi: mark as sent (real dispatch per channel TBD in Fase 1.2)
-      await this.db.query(
-        `UPDATE saas_campania_recipients
-         SET status = 'sent', sent_at = NOW()
-         WHERE tenant_id = $1 AND campania_id = $2`,
-        [tenantId, campaniaId],
+      meterEmails = sentCount;
+    } else if (campania.channel === "sms") {
+      const { getSaasSmsService } = await import("./SaasSmsService");
+      const smsSvc = getSaasSmsService();
+      if (!smsSvc.getStatus().configured) {
+        throw new SaasCampaniasError(
+          "Twilio not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER.",
+          "FORBIDDEN",
+        );
+      }
+      type ContactPhoneRow = { id: string; phone: string | null };
+      const contacts = await this.db.query<ContactPhoneRow>(
+        `SELECT id, phone FROM saas_contacts WHERE tenant_id = $1 AND id = ANY($2::uuid[])`,
+        [tenantId, contactIds],
       );
-      sentCount = contactIds.length;
+      const phoneByContactId = new Map(contacts.map((c) => [c.id, c.phone]));
+      const smsBody = stripHtmlForSms(campania.body);
+
+      for (const contactId of contactIds) {
+        const phone = phoneByContactId.get(contactId)?.trim();
+        if (!phone) {
+          await this.db.query(
+            `UPDATE saas_campania_recipients SET status = 'bounced', sent_at = NOW()
+             WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+            [tenantId, campaniaId, contactId],
+          );
+          continue;
+        }
+        const result = await smsSvc.send(tenantId, phone, smsBody);
+        const status: RecipientStatus = result.ok ? "sent" : "bounced";
+        await this.db.query(
+          `UPDATE saas_campania_recipients SET status = $4, sent_at = NOW()
+           WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+          [tenantId, campaniaId, contactId, status],
+        );
+        if (result.ok) {
+          sentCount++;
+          meterSms++;
+        }
+      }
+    } else if (campania.channel === "notification") {
+      const title = campania.subject ?? campania.name;
+      for (const contactId of contactIds) {
+        await this.db.query(
+          `INSERT INTO saas_activity_log (tenant_id, event_type, description, metadata)
+           VALUES ($1, 'campania_notification', $2, $3::jsonb)`,
+          [
+            tenantId,
+            title,
+            JSON.stringify({ campaniaId, contactId, body: campania.body.slice(0, 2000) }),
+          ],
+        );
+        await this.db.query(
+          `UPDATE saas_campania_recipients SET status = 'sent', sent_at = NOW()
+           WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+          [tenantId, campaniaId, contactId],
+        );
+        sentCount++;
+      }
+    } else if (campania.channel === "multi") {
+      const { getSaasSmsService } = await import("./SaasSmsService");
+      const smsSvc = getSaasSmsService();
+      const smsConfigured = smsSvc.getStatus().configured;
+      const subject = campania.subject ?? campania.name;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "https://nelvyon.com";
+      const smsBody = stripHtmlForSms(campania.body);
+
+      type ContactMultiRow = { id: string; email: string | null; phone: string | null };
+      const contacts = await this.db.query<ContactMultiRow>(
+        `SELECT id, email, phone FROM saas_contacts WHERE tenant_id = $1 AND id = ANY($2::uuid[])`,
+        [tenantId, contactIds],
+      );
+      const byId = new Map(contacts.map((c) => [c.id, c]));
+
+      for (const contactId of contactIds) {
+        const contact = byId.get(contactId);
+        let delivered = false;
+
+        if (contact?.email?.trim()) {
+          const openToken = signTrackingToken({ tid: tenantId, cid: campaniaId, rid: contactId, t: "o" });
+          const pixelUrl = `${appUrl}/api/track/email/open/${openToken}`;
+          const html = `<div style="font-family:Arial,sans-serif;padding:24px;">${campania.body}
+<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;" /></div>`;
+          const status = await sendCampaniaEmail(contact.email, subject, html, { campaniaId, contactId, tenantId });
+          if (status === "sent") {
+            delivered = true;
+            meterEmails++;
+          }
+        }
+
+        if (!delivered && smsConfigured && contact?.phone?.trim()) {
+          const result = await smsSvc.send(tenantId, contact.phone.trim(), smsBody);
+          if (result.ok) {
+            delivered = true;
+            meterSms++;
+          }
+        }
+
+        const status: RecipientStatus = delivered ? "sent" : "bounced";
+        await this.db.query(
+          `UPDATE saas_campania_recipients SET status = $4, sent_at = NOW()
+           WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+          [tenantId, campaniaId, contactId, status],
+        );
+        if (delivered) sentCount++;
+      }
+    } else {
+      throw new SaasCampaniasError(`Unsupported channel: ${campania.channel}`, "VALIDATION");
     }
 
     await this.db.query(
@@ -562,11 +667,12 @@ ${ctaBlock}
     );
 
     void this.audit?.log(tenantId, { action: "send", module: "campanias", resourceId: campaniaId, details: { totalSent: sentCount } });
-    if (sentCount > 0) {
-      const meterField = campania.channel === "sms" ? "smsSent" as const : "emailsSent" as const;
-      void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) =>
-        getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, meterField, sentCount),
-      );
+    if (meterEmails > 0 || meterSms > 0) {
+      void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) => {
+        const meter = getSaasUsageMeterService();
+        if (meterEmails > 0) void meter.incrementWithSubcuentaMirror(tenantId, "emailsSent", meterEmails).catch(() => undefined);
+        if (meterSms > 0) void meter.incrementWithSubcuentaMirror(tenantId, "smsSent", meterSms).catch(() => undefined);
+      }).catch(() => undefined);
     }
     return { campaniaId, totalSent: sentCount, status: "completed" };
   }

@@ -17,6 +17,7 @@ import { GET as GET_CAMPANIAS, POST as POST_CAMPANIAS } from "../../../apps/web/
 import { POST as POST_LAUNCH } from "../../../apps/web/src/app/api/saas/campanias/[campaniaId]/launch/route";
 import { GET as GET_STATS } from "../../../apps/web/src/app/api/saas/campanias/[campaniaId]/stats/route";
 import { SaasCampaniasService } from "../SaasCampaniasService";
+import * as SmsModule from "../SaasSmsService";
 
 type CampaniaRow = {
   id: string;
@@ -56,6 +57,7 @@ type ContactRow = {
   id: string;
   tenant_id: string;
   email: string;
+  phone?: string | null;
   status: "lead" | "prospect" | "client" | "churned";
   pipeline_stage: "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
   tags: string[];
@@ -145,6 +147,23 @@ function makeDb() {
         .filter((x) => x.tenant_id === tenantId && ids.includes(x.id))
         .map((x) => ({ id: x.id, email: x.email })) as unknown as T[];
     }
+    if (s.startsWith("SELECT id, phone FROM saas_contacts")) {
+      const tenantId = String(p[0]);
+      const ids = (p[1] as string[]) ?? [];
+      return contacts
+        .filter((x) => x.tenant_id === tenantId && ids.includes(x.id))
+        .map((x) => ({ id: x.id, phone: x.phone ?? null })) as unknown as T[];
+    }
+    if (s.startsWith("SELECT id, email, phone FROM saas_contacts")) {
+      const tenantId = String(p[0]);
+      const ids = (p[1] as string[]) ?? [];
+      return contacts
+        .filter((x) => x.tenant_id === tenantId && ids.includes(x.id))
+        .map((x) => ({ id: x.id, email: x.email, phone: x.phone ?? null })) as unknown as T[];
+    }
+    if (s.startsWith("INSERT INTO saas_activity_log")) {
+      return [] as T[];
+    }
     if (s.startsWith("SELECT id FROM saas_contacts")) {
       const tenantId = String(p[0]);
       let out = contacts.filter((x) => x.tenant_id === tenantId);
@@ -223,6 +242,10 @@ function makeDb() {
 }
 
 describe("SaasCampaniasService", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("createCampania crea con status 'draft'", async () => {
     const db = makeDb();
     const svc = new SaasCampaniasService(db);
@@ -372,6 +395,44 @@ describe("SaasCampaniasService", () => {
     const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
     await svc.launchCampania("t1", c.id);
     await expect(svc.launchCampania("t1", c.id)).rejects.toThrow();
+  });
+
+  it("launchCampania SMS usa Twilio real (mock) y marca bounced sin teléfono", async () => {
+    vi.spyOn(SmsModule, "getSaasSmsService").mockReturnValue({
+      getStatus: () => ({ configured: true, fromNumber: "+34000" }),
+      send: vi.fn().mockResolvedValue({ ok: true, messageSid: "SM123" }),
+    } as never);
+
+    const db = makeDb();
+    db.contacts.push(
+      { id: "ct-1", tenant_id: "t1", email: "a@test.com", phone: "+34600111222", status: "lead", pipeline_stage: "new", tags: [] },
+      { id: "ct-2", tenant_id: "t1", email: "b@test.com", phone: null, status: "lead", pipeline_stage: "new", tags: [] },
+    );
+    const svc = new SaasCampaniasService(db);
+    const c = await svc.createCampania("t1", { name: "SMS", body: "<p>Hola</p>", channel: "sms" });
+    const out = await svc.launchCampania("t1", c.id);
+    expect(out.totalSent).toBe(1);
+  });
+
+  it("launchCampania notification escribe activity_log por contacto", async () => {
+    const db = makeDb();
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "a@test.com", status: "lead", pipeline_stage: "new", tags: [] });
+    const svc = new SaasCampaniasService(db);
+    const c = await svc.createCampania("t1", { name: "Notify", body: "Mensaje", channel: "notification" });
+    const out = await svc.launchCampania("t1", c.id);
+    expect(out.totalSent).toBe(1);
+  });
+
+  it("launchCampania SMS falla si Twilio no configurado", async () => {
+    vi.spyOn(SmsModule, "getSaasSmsService").mockReturnValue({
+      getStatus: () => ({ configured: false, fromNumber: null }),
+      send: vi.fn(),
+    } as never);
+    const db = makeDb();
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "a@test.com", phone: "+34600", status: "lead", pipeline_stage: "new", tags: [] });
+    const svc = new SaasCampaniasService(db);
+    const c = await svc.createCampania("t1", { name: "SMS", body: "Hi", channel: "sms" });
+    await expect(svc.launchCampania("t1", c.id)).rejects.toThrow(/Twilio not configured/);
   });
 });
 

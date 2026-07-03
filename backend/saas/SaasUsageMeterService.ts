@@ -31,7 +31,7 @@ export class SaasUsageMeterService {
        ON CONFLICT (tenant_id, meter_date) DO UPDATE SET ${col} = saas_usage_meter_daily.${col} + $2`,
       [tenantId, amount],
     );
-    if (process.env.STRIPE_METER_LIVE === "1") {
+    if (process.env.STRIPE_METER_LIVE !== "0" && process.env.STRIPE_SECRET_KEY?.trim()) {
       const meterKey = field === "emailsSent" ? "email" : field === "smsSent" ? "sms" : field === "apiCalls" ? "api_calls" : null;
       if (meterKey) {
         void import("./SaasStripeMeterService").then(({ getSaasStripeMeterService }) =>
