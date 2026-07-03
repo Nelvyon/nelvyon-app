@@ -118,6 +118,12 @@ export default function SaasInboxPage() {
   const [filterSla, setFilterSla] = useState(false);
   const [search, setSearch] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [agentEnabled, setAgentEnabled] = useState(false);
+  const [agentAuto, setAgentAuto] = useState(false);
+  const [agentLoading, setAgentLoading] = useState(false);
+  const [aiHint, setAiHint] = useState<string | null>(null);
+  const [skills, setSkills] = useState<Array<{ id: string; name: string; description: string }>>([]);
+  const [skillsOpen, setSkillsOpen] = useState(false);
 
   // KPI counters
   const totalOpen = convs.filter(c => c.status === "open").length;
@@ -162,6 +168,26 @@ export default function SaasInboxPage() {
   }, []);
 
   useEffect(() => {
+    void (async () => {
+      try {
+        const [agentRes, skillsRes] = await Promise.all([
+          fetch("/api/saas/inbox/agent"),
+          fetch("/api/saas/agent/skills"),
+        ]);
+        if (agentRes.ok) {
+          const d = (await agentRes.json()) as { settings?: { enabled?: boolean; autoReplyEnabled?: boolean } };
+          setAgentEnabled(!!d.settings?.enabled);
+          setAgentAuto(!!d.settings?.autoReplyEnabled);
+        }
+        if (skillsRes.ok) {
+          const sd = (await skillsRes.json()) as { skills?: Array<{ id: string; name: string; description: string }> };
+          setSkills(sd.skills ?? []);
+        }
+      } catch { /* optional */ }
+    })();
+  }, []);
+
+  useEffect(() => {
     if (view === "conversations") void loadConvs();
     else void loadThreads();
   }, [view, loadConvs, loadThreads]);
@@ -184,6 +210,49 @@ export default function SaasInboxPage() {
     }
     // mark read locally
     setConvs(prev => prev.map(c => c.id === conv.id ? { ...c, unreadCount: 0 } : c));
+  }
+
+  async function suggestAiReply() {
+    if (!selected) return;
+    setAgentLoading(true);
+    setAiHint(null);
+    try {
+      const res = await fetch(`/api/saas/inbox/${selected.id}/suggest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) {
+        const err = (await res.json()) as { error?: string };
+        setAiHint(err.error ?? "Activa el agente en Ajustes");
+        return;
+      }
+      const d = (await res.json()) as { suggestion?: string; skillName?: string; mock?: boolean };
+      if (d.suggestion) {
+        setReply(d.suggestion);
+        setAiHint(`✦ ${d.skillName ?? "Agente"}${d.mock ? " (modo ahorro)" : ""}`);
+      }
+    } finally {
+      setAgentLoading(false);
+    }
+  }
+
+  async function toggleAgent(enabled: boolean) {
+    setAgentEnabled(enabled);
+    await fetch("/api/saas/inbox/agent", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled, autoReplyEnabled: agentAuto }),
+    }).catch(() => null);
+  }
+
+  async function toggleAgentAuto(autoReplyEnabled: boolean) {
+    setAgentAuto(autoReplyEnabled);
+    await fetch("/api/saas/inbox/agent", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled: agentEnabled, autoReplyEnabled }),
+    }).catch(() => null);
   }
 
   async function sendReply() {
@@ -271,6 +340,40 @@ export default function SaasInboxPage() {
           <p className={`text-2xl font-bold ${totalBreached > 0 ? "text-red-400" : "text-foreground"}`}>{totalBreached}</p>
         </NelvyonDsCard>
       </div>
+
+      {/* Nelvyon AI Agent (skills nativos — email, WA, redes) */}
+      <NelvyonDsCard className="mb-4 flex flex-wrap items-center gap-4 p-3">
+        <div>
+          <p className="text-sm font-semibold text-foreground">🤖 Agente Nelvyon</p>
+          <p className="text-[11px] text-muted-foreground">Responde inbox con skills especializados (0€ sin API key)</p>
+        </div>
+        <label className="flex items-center gap-2 text-xs text-foreground">
+          <input type="checkbox" checked={agentEnabled} onChange={(e) => void toggleAgent(e.target.checked)} />
+          Activo
+        </label>
+        <label className="flex items-center gap-2 text-xs text-foreground">
+          <input type="checkbox" checked={agentAuto} disabled={!agentEnabled} onChange={(e) => void toggleAgentAuto(e.target.checked)} />
+          Auto-respuesta
+        </label>
+        <button
+          type="button"
+          onClick={() => setSkillsOpen((o) => !o)}
+          className="ml-auto text-[11px] text-primary hover:underline"
+        >
+          {skillsOpen ? "Ocultar skills" : `Ver ${skills.length || 6} skills →`}
+        </button>
+      </NelvyonDsCard>
+      {skillsOpen && skills.length > 0 && (
+        <NelvyonDsCard className="mb-4 grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">
+          {skills.map((s) => (
+            <div key={s.id} className="rounded-lg border border-border/40 bg-muted/10 p-2">
+              <p className="text-xs font-semibold text-foreground">{s.name}</p>
+              <p className="text-[10px] text-muted-foreground">{s.description}</p>
+              <p className="mt-1 text-[9px] text-emerald-500">0€ modo ahorro</p>
+            </div>
+          ))}
+        </NelvyonDsCard>
+      )}
 
       {/* View tabs */}
       <div className="mb-3 flex gap-2">
@@ -442,7 +545,16 @@ export default function SaasInboxPage() {
 
               {/* Reply box */}
               <div className="border-t border-border p-4">
+                {aiHint && <p className="mb-2 text-[11px] text-primary">{aiHint}</p>}
                 <div className="flex items-end gap-3">
+                  <NelvyonDsButton
+                    variant="ghost"
+                    className="h-10 shrink-0 text-xs"
+                    disabled={!agentEnabled || agentLoading}
+                    onClick={() => void suggestAiReply()}
+                  >
+                    {agentLoading ? "…" : "✦ IA"}
+                  </NelvyonDsButton>
                   <div className="flex-1 rounded-xl border border-border bg-background focus-within:border-primary">
                     <textarea
                       value={reply}

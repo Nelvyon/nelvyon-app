@@ -2,6 +2,17 @@
  * Tests for SaasWhatsAppCloudService — Meta Cloud API (no real HTTP calls).
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const inboxSendMock = vi.fn(async () => ({ id: "m-in" }));
+vi.mock("../SaasInboxService", () => ({
+  getSaasInboxService: () => ({ sendMessage: inboxSendMock }),
+}));
+vi.mock("../SaasInboxAgentService", () => ({
+  getSaasInboxAgentService: () => ({
+    handleInbound: vi.fn(async () => ({ processed: false, reason: "agent_disabled" })),
+  }),
+}));
+
 import {
   SaasWhatsAppCloudService,
   resetSaasWhatsAppCloudServiceForTests,
@@ -151,7 +162,7 @@ describe("SaasWhatsAppCloudService — configured", () => {
   });
 
   it("processInbound creates conversation and stores message", async () => {
-    // DB: SELECT conv (not found), INSERT conv, INSERT saas_messages
+    inboxSendMock.mockClear();
     const db = makeDb([[], [{ id: "conv-inbound" }], []]);
     const svc = new SaasWhatsAppCloudService(db as never);
     await expect(svc.processInbound(TENANT, {
@@ -161,22 +172,30 @@ describe("SaasWhatsAppCloudService — configured", () => {
       body: "Hola, quiero info",
       timestamp: 1700000000,
     })).resolves.toBeUndefined();
-    // Verify INSERT saas_messages was called
-    const insertMsgCall = (db.query.mock.calls as Array<[string]>)
-      .find(([sql]) => sql.includes("INSERT INTO saas_messages"));
-    expect(insertMsgCall).toBeDefined();
+    expect(inboxSendMock).toHaveBeenCalledWith(
+      TENANT,
+      "conv-inbound",
+      expect.objectContaining({
+        body: "Hola, quiero info",
+        direction: "inbound",
+        externalId: "wamid.inbound.1",
+      }),
+    );
   });
 
   it("processInbound updates existing conversation when found", async () => {
+    inboxSendMock.mockClear();
     const db = makeDb([[{ id: "conv-existing" }], [], []]);
     const svc = new SaasWhatsAppCloudService(db as never);
     await svc.processInbound(TENANT, {
       from: "+34699000111", waId: "34699000111",
       wamid: "wamid.2", body: "Respuesta", timestamp: 1700001000,
     });
-    const updateCall = (db.query.mock.calls as Array<[string]>)
-      .find(([sql]) => sql.includes("UPDATE conversations"));
-    expect(updateCall).toBeDefined();
+    expect(inboxSendMock).toHaveBeenCalledWith(
+      TENANT,
+      "conv-existing",
+      expect.objectContaining({ body: "Respuesta", direction: "inbound" }),
+    );
   });
 });
 

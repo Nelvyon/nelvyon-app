@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       intent: result.intent,
       message: result.message,
       suggestions: result.suggestions,
+      usedLlm: result.usedLlm ?? false,
     });
   } catch (e) {
     if (e instanceof SaasVoiceCommandError) {

@@ -519,11 +519,6 @@ export class SaasWhatsAppCloudService {
     let conversationId: string;
     if (convRows[0]) {
       conversationId = convRows[0].id;
-      await this.db.query(
-        `UPDATE conversations SET last_message=$1, last_message_at=NOW(), updated_at=NOW(),
-         unread_count = COALESCE(unread_count,0) + 1 WHERE id=$2`,
-        [msg.body.slice(0, 120), conversationId],
-      ).catch(() => null);
     } else {
       const newConv = await this.db.query<{ id: string }>(
         `INSERT INTO conversations
@@ -537,13 +532,26 @@ export class SaasWhatsAppCloudService {
 
     if (!conversationId) return;
 
-    await this.db.query(
-      `INSERT INTO saas_messages
-         (conversation_id, tenant_id, direction, body, status, external_id, created_at)
-       VALUES ($1,$2,'inbound',$3,'received',$4,to_timestamp($5))
-       ON CONFLICT (external_id) DO NOTHING`,
-      [conversationId, tenantId, msg.body, msg.wamid, msg.timestamp],
-    ).catch(() => null);
+    try {
+      const { getSaasInboxService } = await import("./SaasInboxService");
+      await getSaasInboxService().sendMessage(tenantId, conversationId, {
+        body: msg.body,
+        direction: "inbound",
+        channel: "whatsapp",
+        externalId: msg.wamid,
+        status: "received",
+        metadata: { wa_id: msg.waId, wa_from: msg.from },
+      });
+    } catch {
+      /* non-blocking persist */
+    }
+
+    try {
+      const { getSaasInboxAgentService } = await import("./SaasInboxAgentService");
+      await getSaasInboxAgentService().handleInbound(tenantId, conversationId, msg.body);
+    } catch {
+      /* non-blocking */
+    }
   }
 
   async listMessages(tenantId: string, opts?: { limit?: number }): Promise<CloudWaMessage[]> {

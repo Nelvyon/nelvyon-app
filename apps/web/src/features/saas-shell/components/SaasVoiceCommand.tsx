@@ -25,6 +25,15 @@ function getRecognitionCtor(): RecognitionCtor | null {
 
 type Status = "idle" | "listening" | "denied" | "unsupported";
 
+function speakText(text: string) {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "es-ES";
+  u.rate = 1.05;
+  window.speechSynthesis.speak(u);
+}
+
 export function SaasVoiceCommand() {
   const router = useRouter();
   const [status, setStatus] = useState<Status>("idle");
@@ -55,15 +64,19 @@ export function SaasVoiceCommand() {
         const d = (await res.json()) as {
           success: boolean; route: string | null; message: string;
           intent?: { action?: string } | null;
+          usedLlm?: boolean;
         };
+        const reply = d.message || "Listo";
+        if (d.success) speakText(reply);
         if (d.success && d.route) {
-          showToast(d.message);
+          showToast(reply);
           const action = d.intent?.action;
           // For action intents, pass a hint the target page can pick up.
           const url = action ? `${d.route}${d.route.includes("?") ? "&" : "?"}voice=${action}` : d.route;
           router.push(url);
         } else {
-          showToast(d.message || "Comando no reconocido");
+          showToast(reply);
+          if (!d.success) speakText("No reconocí el comando. Prueba con ir a CRM o abrir inbox.");
         }
       } catch {
         showToast("Error de red al procesar la voz");
@@ -133,7 +146,7 @@ export function SaasVoiceCommand() {
           right: "max(1rem, env(safe-area-inset-right, 1rem))",
           bottom: "max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1.5rem))",
         }}
-        title={status === "denied" ? "Micrófono bloqueado" : "Pulsa y habla: «ir a CRM»"}
+        title={status === "denied" ? "Micrófono bloqueado" : "JARVIS Nelvyon: pulsa y habla"}
       >
         <span aria-hidden="true" className="text-lg">{status === "listening" ? "🔴" : "🎙️"}</span>
       </button>

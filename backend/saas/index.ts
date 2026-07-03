@@ -229,6 +229,30 @@ export {
   type SaasVoiceCommandErrorCode,
 } from "./SaasVoiceCommandService";
 export {
+  createVoiceLlmParser,
+  mapLlmVoiceJson,
+  type VoiceLlmParsePort,
+} from "./SaasVoiceLlmParser";
+export {
+  NELVYON_AGENT_SKILLS,
+  getNelvyonAgentSkill,
+  resolveSkillsForChannel,
+  pickSkillForMessage,
+  type NelvyonAgentSkill,
+  type NelvyonAgentChannel,
+} from "./nelvyonAgentSkillsCatalog";
+export { buildMockAgentReply, buildMockSocialPost } from "./nelvyonAgentMockReplies";
+export {
+  SaasInboxAgentService,
+  SaasInboxAgentError,
+  getSaasInboxAgentService,
+  resetSaasInboxAgentServiceForTests,
+  type InboxAgentSettings,
+  type SuggestReplyResult,
+  type HandleInboundResult,
+  type SaasInboxAgentErrorCode,
+} from "./SaasInboxAgentService";
+export {
   SaasPartnerZoneService,
   SaasPartnerZoneError,
   getSaasPartnerZoneService,

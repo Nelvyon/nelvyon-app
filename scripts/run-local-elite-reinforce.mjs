@@ -58,6 +58,21 @@ const steps = [
     run: () => run("eslint", "pnpm", ["-C", "apps/web", "exec", "eslint", "src", "--max-warnings", "0"]),
   },
   {
+    label: "agent-tests",
+    run: () =>
+      run("agent-tests", "pnpm", [
+        "-C",
+        "apps/web",
+        "exec",
+        "vitest",
+        "run",
+        "../../backend/saas/__tests__/SaasInboxAgentService.test.ts",
+        "../../backend/saas/__tests__/nelvyonAgentMockReplies.test.ts",
+        "../../backend/saas/__tests__/SaasVoiceLlmParser.test.ts",
+        "--reporter=dot",
+      ]),
+  },
+  {
     label: "pack-tests",
     run: () =>
       run("pack-tests", "pnpm", [

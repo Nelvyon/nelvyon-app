@@ -76,6 +76,8 @@ const INTENT_CATALOG: readonly VoiceCatalogItem[] = [
   { id: "nav_campanias", phrases: ["campanias", "campanas", "email", "campanas de email", "correos"], actionType: "navigate", route: "/saas/campanias", description: "Abrir Campañas de email" },
   { id: "nav_workflows", phrases: ["workflows", "automatizaciones", "flujos"], actionType: "navigate", route: "/saas/workflows", description: "Abrir Workflows" },
   { id: "nav_inbox", phrases: ["inbox", "bandeja", "mensajes"], actionType: "navigate", route: "/saas/inbox", description: "Abrir la Bandeja unificada" },
+  { id: "nav_social", phrases: ["redes", "social", "instagram", "facebook"], actionType: "navigate", route: "/saas/social", description: "Abrir Redes Sociales" },
+  { id: "nav_whatsapp", phrases: ["whatsapp", "wasap", "wasa"], actionType: "navigate", route: "/saas/whatsapp", description: "Abrir WhatsApp" },
   { id: "nav_entregables", phrases: ["entregables", "deliverables"], actionType: "navigate", route: "/saas/entregables", description: "Abrir Entregables" },
   { id: "nav_packs", phrases: ["pack store", "tienda de packs", "packs", "comprar pack"], actionType: "navigate", route: "/saas/packs", description: "Abrir el Pack Store" },
   { id: "nav_brief", phrases: ["lanzar pack", "brief", "nuevo pack", "crear pack"], actionType: "navigate", route: "/saas/brief-to-launch", description: "Ir a Lanzar Pack" },
@@ -87,7 +89,10 @@ const INTENT_CATALOG: readonly VoiceCatalogItem[] = [
   { id: "nav_subcuentas", phrases: ["subcuentas", "clientes", "cuentas"], actionType: "navigate", route: "/saas/subcuentas", description: "Abrir Subcuentas" },
   { id: "nav_reportes", phrases: ["reportes", "informes", "reporting"], actionType: "navigate", route: "/saas/reportes", description: "Abrir Reportes" },
   { id: "nav_billing", phrases: ["billing", "facturacion", "pago", "suscripcion"], actionType: "navigate", route: "/saas/billing", description: "Abrir Facturación" },
-  { id: "nav_settings", phrases: ["settings", "configuracion", "ajustes", "preferencias"], actionType: "navigate", route: "/saas/settings", description: "Abrir Configuración" },
+  { id: "nav_surveys", phrases: ["encuestas", "surveys", "feedback"], actionType: "navigate", route: "/saas/surveys", description: "Abrir Encuestas" },
+  { id: "nav_lms", phrases: ["lms", "cursos", "formacion"], actionType: "navigate", route: "/saas/lms", description: "Abrir LMS" },
+  { id: "nav_agent", phrases: ["agente", "agente ia", "activar agente", "inbox ia"], actionType: "navigate", route: "/saas/inbox", description: "Abrir Inbox con agente IA" },
+  { id: "nav_campanias_create", phrases: ["nueva campana", "crear campana", "enviar email"], actionType: "navigate", route: "/saas/campanias", description: "Crear campaña de email" },
   // Actions (client triggers an API call after navigation)
   { id: "act_refresh_playbooks", phrases: ["sincronizar playbooks", "actualizar playbooks", "generar playbooks"], actionType: "action", action: "refresh_playbooks", route: "/saas/playbooks", description: "Regenerar tus playbooks" },
   { id: "act_refresh_benchmark", phrases: ["actualizar benchmark", "recalcular benchmark", "refrescar benchmark"], actionType: "action", action: "refresh_benchmark", route: "/saas/benchmark", description: "Actualizar el benchmark" },
@@ -178,6 +183,7 @@ export class SaasVoiceCommandService {
   constructor(
     private readonly db: SaasPostgresPort,
     private readonly catalogPort: VoiceNavCatalogPort = defaultCatalogPort,
+    private readonly llmPort: import("./SaasVoiceLlmParser").VoiceLlmParsePort | null = null,
   ) {}
 
   getCatalog(): VoiceCatalogItem[] {
@@ -291,21 +297,46 @@ export class SaasVoiceCommandService {
   async executeCommand(
     tenantId: string,
     transcript: string,
-    opts?: { userId?: string | null; source?: "web_speech" | "media_upload" },
-  ): Promise<VoiceCommandResult> {
-    const result = this.parseTranscript(transcript);
+    opts?: { userId?: string | null; source?: "web_speech" | "media_upload"; useLlm?: boolean },
+  ): Promise<VoiceCommandResult & { usedLlm?: boolean; speak?: boolean }> {
+    let result = this.parseTranscript(transcript);
+    let usedLlm = false;
+
+    if (!result.success && opts?.useLlm !== false) {
+      const port =
+        this.llmPort ??
+        (() => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { createVoiceLlmParser } = require("./SaasVoiceLlmParser") as typeof import("./SaasVoiceLlmParser");
+            return createVoiceLlmParser();
+          } catch {
+            return null;
+          }
+        })();
+      if (port?.isAvailable()) {
+        const llmResult = await port.parse(transcript, this.getCatalog());
+        if (llmResult?.success) {
+          result = llmResult;
+          usedLlm = true;
+        }
+      }
+    }
+
     try {
       await this.logCommand(tenantId, {
         userId: opts?.userId ?? null,
         transcript: result.transcript,
         matchedIntent: result.intent?.id ?? null,
         actionType: result.intent?.actionType ?? "unknown",
-        actionPayload: result.intent ? { route: result.intent.route, action: result.intent.action } : {},
+        actionPayload: result.intent
+          ? { route: result.intent.route, action: result.intent.action, usedLlm }
+          : { usedLlm },
         success: result.success,
         errorMessage: result.success ? null : "no_match",
         source: opts?.source ?? "web_speech",
       });
     } catch { /* logging must never break the command */ }
-    return result;
+    return { ...result, usedLlm };
   }
 }

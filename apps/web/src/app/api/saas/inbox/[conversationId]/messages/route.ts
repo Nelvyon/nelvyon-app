@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   getSaasInboxService,
+  getSaasInboxAgentService,
   SaasInboxError,
   saasErrorBody,
   saasErrorStatus,
@@ -54,7 +55,17 @@ export async function POST(req: Request, ctx: Ctx) {
         body: msgBody,
         direction: "inbound",
       });
-      return NextResponse.json({ message, channel_dispatched: false }, { status: 201 });
+      let agent = null;
+      try {
+        agent = await getSaasInboxAgentService().handleInbound(
+          saasCtx.tenant.id,
+          conversationId,
+          msgBody,
+        );
+      } catch {
+        /* agent must not block message ingest */
+      }
+      return NextResponse.json({ message, channel_dispatched: false, agent }, { status: 201 });
     }
 
     const result = await getSaasInboxService().replyToConversation(saasCtx.tenant.id, conversationId, msgBody);

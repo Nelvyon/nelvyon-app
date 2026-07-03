@@ -75,6 +75,7 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [useRichEditor, setUseRichEditor] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const connectedAccounts = accounts.filter((a) => a.isActive);
   const templatePresets = listSocialElitePresets();
@@ -84,6 +85,32 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
     if (!preset) return;
     setContent(formatSocialPresetContent(preset));
     if (preset.mediaHint) setMediaUrl("");
+  }
+
+  async function suggestWithAgent() {
+    setAiLoading(true);
+    setError(null);
+    try {
+      const platform = connectedAccounts[0]?.platform ?? "instagram";
+      const res = await fetch("/api/saas/social/suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: content.trim() || "promoción del negocio",
+          platform,
+        }),
+      });
+      if (!res.ok) throw new Error("No se pudo generar borrador");
+      const d = (await res.json()) as { draft?: { content: string; hashtags: string[] } };
+      if (d.draft?.content) {
+        const tags = d.draft.hashtags?.length ? `\n\n${d.draft.hashtags.join(" ")}` : "";
+        setContent(`${d.draft.content}${tags}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error IA");
+    } finally {
+      setAiLoading(false);
+    }
   }
 
   function toggleAccount(id: string) {
@@ -132,7 +159,18 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
           {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
 
           <div>
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">Plantillas élite</label>
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <label className="text-xs font-medium text-muted-foreground">Plantillas élite</label>
+              <NelvyonDsButton
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={aiLoading}
+                onClick={() => void suggestWithAgent()}
+              >
+                {aiLoading ? "…" : "✦ Agente redes (0€)"}
+              </NelvyonDsButton>
+            </div>
             <div className="flex flex-wrap gap-2">
               {templatePresets.map((p) => (
                 <button

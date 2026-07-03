@@ -84,6 +84,8 @@ export interface SendMessageInput {
   channel?: string | null;
   parentMessageId?: string | null;
   metadata?: Record<string, unknown>;
+  externalId?: string | null;
+  status?: string;
 }
 
 export interface ReplyResult {
@@ -324,17 +326,30 @@ export class SaasInboxService {
     if (!conv) throw new SaasInboxError("Conversation not found", "NOT_FOUND");
     if (!input.body.trim()) throw new SaasInboxError("body is required", "VALIDATION");
     const direction = input.direction ?? "outbound";
+    const status = input.status ?? (direction === "inbound" ? "received" : "sent");
     const rows = await this.db.query<MsgRow>(
       `INSERT INTO conversation_messages
-         (conversation_id, tenant_id, direction, channel, body, status, parent_message_id, metadata)
-       VALUES ($1,$2,$3,$4,$5,'sent',$6,$7::jsonb)
+         (conversation_id, tenant_id, direction, channel, body, status,
+          parent_message_id, metadata, external_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9)
+       ON CONFLICT (external_id) WHERE external_id IS NOT NULL DO NOTHING
        RETURNING id, conversation_id, tenant_id, direction, channel, body, status,
                  external_id, parent_message_id,
                  COALESCE(metadata,'{}') as metadata, created_at`,
       [conversationId, tenantId, direction, input.channel ?? conv.channel,
-       input.body.trim(), input.parentMessageId ?? null,
-       JSON.stringify(input.metadata ?? {})],
+       input.body.trim(), status, input.parentMessageId ?? null,
+       JSON.stringify(input.metadata ?? {}), input.externalId ?? null],
     );
+    if (!rows[0] && input.externalId) {
+      const dup = await this.db.query<MsgRow>(
+        `SELECT id, conversation_id, tenant_id, direction, channel, body, status,
+                external_id, parent_message_id,
+                COALESCE(metadata,'{}') as metadata, created_at
+         FROM conversation_messages WHERE external_id=$1 LIMIT 1`,
+        [input.externalId],
+      );
+      if (dup[0]) return rowToMsg(dup[0]);
+    }
     if (!rows[0]) throw new SaasInboxError("Failed to send message", "VALIDATION");
     const unreadDelta = direction === "inbound" ? 1 : 0;
     await this.db.query(
