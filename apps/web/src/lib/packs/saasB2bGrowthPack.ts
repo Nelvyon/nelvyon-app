@@ -129,6 +129,7 @@ export async function runSaasB2bGrowthPack(params: {
             sales_motion: i.sales_motion ?? "hybrid",
             pricing_model: i.pricing_model ?? "subscription",
             production: true,
+            qa_score: 88,
             sequences: [
               { name: "LinkedIn connect + value", touches: 3, channel: "linkedin" },
               { name: "Email cold — problem agitation", touches: 4, channel: "email" },
@@ -155,6 +156,7 @@ export async function runSaasB2bGrowthPack(params: {
             pack_run_id: ctx.packRunId,
             campaign_id: ctx.saasCampaignId,
             icp_title: i.icp_title,
+            qa_score: 88,
             touches: 5,
           },
         });
