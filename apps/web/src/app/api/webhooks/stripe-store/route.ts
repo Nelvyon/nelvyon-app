@@ -14,7 +14,11 @@ export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature");
   const rawBody = await req.text();
 
-  if (webhookSecret && sig) {
+  if (!webhookSecret?.trim() || !sig) {
+    return NextResponse.json({ error: "Webhook not configured or missing signature" }, { status: 401 });
+  }
+
+  {
     // Stripe signature verification (manual HMAC without stripe-node SDK)
     try {
       const parts = sig.split(",").reduce<Record<string, string>>((acc, part) => {

@@ -420,7 +420,7 @@ export class SaasSequencesService {
                 s.subject, s.body_html, s.branch_condition, s.branch_yes_position, s.branch_no_position,
                 s.created_at, s.updated_at, c.email AS contact_email, c.phone AS contact_phone, c.name AS contact_name
          FROM saas_sequence_steps s
-         JOIN contacts c ON c.id = $3
+         JOIN saas_contacts c ON c.id = $3 AND c.tenant_id = e.tenant_id
          WHERE s.sequence_id = $1 AND s.position = $2
          LIMIT 1`,
         [enrollment.sequence_id, step, enrollment.contact_id],

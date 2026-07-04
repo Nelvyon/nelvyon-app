@@ -45,56 +45,10 @@ class EmailWarmupService:
     def __init__(self, session: AsyncSession, workspace_id: int):
         self.session = session
         self.workspace_id = workspace_id
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS email_warmup_accounts (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    email TEXT NOT NULL,
-                    domain TEXT,
-                    ses_identity TEXT,
-                    status TEXT NOT NULL DEFAULT 'idle',
-                    warmup_day INTEGER NOT NULL DEFAULT 0,
-                    daily_limit INTEGER NOT NULL DEFAULT 5,
-                    sent_today INTEGER NOT NULL DEFAULT 0,
-                    deliverability_score INTEGER NOT NULL DEFAULT 80,
-                    dkim_ok INTEGER NOT NULL DEFAULT 0,
-                    spf_ok INTEGER NOT NULL DEFAULT 0,
-                    dmarc_ok INTEGER NOT NULL DEFAULT 0,
-                    is_active_pool INTEGER NOT NULL DEFAULT 0,
-                    stats_json TEXT NOT NULL DEFAULT '{}',
-                    started_at TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS email_warmup_logs (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    account_id TEXT NOT NULL,
-                    action TEXT NOT NULL,
-                    recipient TEXT,
-                    spam_score INTEGER,
-                    bounce INTEGER NOT NULL DEFAULT 0,
-                    details_json TEXT NOT NULL DEFAULT '{}',
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def start_warmup(self, email: str, domain: str | None = None) -> dict[str, Any]:
         await self.ensure_schema()

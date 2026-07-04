@@ -127,10 +127,10 @@ export class SaasCountdownService {
     return rows.length > 0;
   }
 
-  async trackScan(id: string): Promise<void> {
+  async trackScan(tenantId: string, id: string): Promise<void> {
     await this.db.query(
-      `UPDATE countdown_timers SET scans = scans + 1 WHERE id = $1::uuid`,
-      [id],
+      `UPDATE countdown_timers SET scans = scans + 1 WHERE id = $1::uuid AND tenant_id = $2`,
+      [id, tenantId],
     );
   }
 }

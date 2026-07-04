@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
 import { getStripePriceEnvVarName, getStripePriceId, normalizeBillablePlan, type BillablePlan } from "@nelvyon/billing";
 import { readStripePriceEnvDiagnostic, logStripePriceEnvDiagnostic } from "@nelvyon/billing";
 import {
@@ -10,6 +9,7 @@ import {
   readStripeKeyDiagnostic,
 } from "../../../../../../../backend/billing/stripePricePipelineTrace";
 import { OsAgentError } from "@nelvyon/os-agents";
+import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 import { EarlyAdopterService } from "../../../../../../../backend/billing/earlyAdopterService";
@@ -21,7 +21,11 @@ import {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-type CheckoutBody = { planId?: string };
+type CheckoutBody = {
+  planId?: string;
+  successUrl?: string;
+  cancelUrl?: string;
+};
 
 type CheckoutLogContext = Record<string, unknown>;
 
@@ -79,8 +83,20 @@ function checkoutError(
   return NextResponse.json({ error, code: step, ...extra }, { status });
 }
 
+function resolveCheckoutUrl(raw: string | undefined, fallback: string, appUrl: string): string {
+  if (!raw?.trim()) return fallback;
+  try {
+    const parsed = new URL(raw.trim(), appUrl);
+    const base = new URL(appUrl);
+    if (parsed.origin !== base.origin) return fallback;
+    return parsed.toString();
+  } catch {
+    return fallback;
+  }
+}
+
 export async function POST(req: NextRequest) {
-  const ctx: CheckoutLogContext = {
+  const logCtx: CheckoutLogContext = {
     stripeSecretKeyConfigured: stripeSecretKeyConfigured(),
     stripeKey: readStripeKeyDiagnostic(),
     railway: readRailwayDeployDiagnostic(),
@@ -88,19 +104,19 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    const claims = await authenticate(req);
-    ctx.userId = claims.userId;
+    const auth = await requireSaasContext(req, "billing.read");
+    logCtx.userId = auth.claims.userId;
 
     let body: CheckoutBody;
     try {
       body = (await req.json()) as CheckoutBody;
     } catch (parseErr) {
       const exception = parseErr instanceof Error ? parseErr.message : String(parseErr);
-      logCheckout("invalid_json", { ...ctx, exception });
+      logCheckout("invalid_json", { ...logCtx, exception });
       return NextResponse.json({ error: "Invalid JSON", code: "invalid_json" }, { status: 400 });
     }
 
-    ctx.planIdReceived = typeof body.planId === "string" ? body.planId : body.planId ?? null;
+    logCtx.planIdReceived = typeof body.planId === "string" ? body.planId : body.planId ?? null;
 
     const plan = typeof body.planId === "string" ? normalizeBillablePlan(body.planId) : null;
     if (!plan) {
@@ -108,25 +124,25 @@ export async function POST(req: NextRequest) {
         400,
         `planId inválido: "${String(body.planId ?? "")}". Valores válidos: starter, pro, agency, agency_partner`,
         "invalid_plan_id",
-        ctx,
+        logCtx,
       );
     }
-    ctx.planId = plan;
+    logCtx.planId = plan;
 
     const envDiagnostic = readStripePriceEnvDiagnostic(plan);
     logStripePriceEnvDiagnostic("checkout POST env", envDiagnostic, {
-      planIdReceived: ctx.planIdReceived,
-      userId: ctx.userId,
+      planIdReceived: logCtx.planIdReceived,
+      userId: logCtx.userId,
     });
-    ctx.stripePriceEnvRaw = envDiagnostic.raw ?? null;
-    ctx.stripePriceEnvTrimmed = envDiagnostic.trimmed ?? null;
+    logCtx.stripePriceEnvRaw = envDiagnostic.raw ?? null;
+    logCtx.stripePriceEnvTrimmed = envDiagnostic.trimmed ?? null;
 
     if (!stripeSecretKeyConfigured()) {
       return checkoutError(
         503,
         "Falta variable de entorno: STRIPE_SECRET_KEY (alternativa: STRIPE_API_KEY)",
         "missing_stripe_secret",
-        ctx,
+        logCtx,
         { missingEnvVar: "STRIPE_SECRET_KEY" },
       );
     }
@@ -141,17 +157,17 @@ export async function POST(req: NextRequest) {
         503,
         `Falta variable de entorno: ${missingEnvVar}`,
         "missing_stripe_price",
-        { ...ctx, planId: plan, exception },
+        { ...logCtx, planId: plan, exception },
         { missingEnvVar, planId: plan },
       );
     }
-    ctx.stripePriceId = stripePriceId;
+    logCtx.stripePriceId = stripePriceId;
 
     logPricePipelineTrace(
       "checkout route resolved price",
       buildPricePipelineTrace({
         plan,
-        planIdReceived: String(ctx.planIdReceived ?? ""),
+        planIdReceived: String(logCtx.planIdReceived ?? ""),
         envVar: envDiagnostic.envVar,
         raw: envDiagnostic.raw,
         trimmed: envDiagnostic.trimmed,
@@ -160,11 +176,11 @@ export async function POST(req: NextRequest) {
     );
 
     logCheckout("pre_checkout", {
-      ...ctx,
-      planIdReceived: ctx.planIdReceived,
+      ...logCtx,
+      planIdReceived: logCtx.planIdReceived,
       planId: plan,
       stripePriceId,
-      stripeSecretKeyConfigured: ctx.stripeSecretKeyConfigured,
+      stripeSecretKeyConfigured: logCtx.stripeSecretKeyConfigured,
     });
 
     let user: { email: string; stripe_customer_id: string | null } | undefined;
@@ -175,7 +191,7 @@ export async function POST(req: NextRequest) {
          LEFT JOIN subscriptions s ON s.user_id = u.user_id
          WHERE u.user_id = $1::uuid
          LIMIT 1`,
-        [claims.userId],
+        [auth.claims.userId],
       );
       user = userRows[0];
     } catch (dbErr) {
@@ -184,7 +200,7 @@ export async function POST(req: NextRequest) {
         500,
         `Error de base de datos al buscar usuario: ${exception}`,
         "database_error",
-        ctx,
+        logCtx,
         { exception },
       );
     }
@@ -192,43 +208,49 @@ export async function POST(req: NextRequest) {
     if (!user?.email) {
       return checkoutError(
         404,
-        `Usuario no encontrado para checkout (userId=${claims.userId})`,
+        `Usuario no encontrado para checkout (userId=${auth.claims.userId})`,
         "user_not_found",
-        ctx,
+        logCtx,
       );
     }
-    ctx.userEmail = user.email;
-    ctx.stripeCustomerId = user.stripe_customer_id;
+    logCtx.userEmail = user.email;
+    logCtx.stripeCustomerId = user.stripe_customer_id;
+
+    const tenantId = auth.tenant.id;
+    logCtx.tenantId = tenantId;
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? req.nextUrl.origin;
-    const successUrl = `${appUrl}/billing/upgrade?checkout=success&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${appUrl}/precios?checkout=cancelled`;
+    const defaultSuccess = `${appUrl}/saas/billing?checkout=success&session_id={CHECKOUT_SESSION_ID}`;
+    const defaultCancel = `${appUrl}/saas/billing?checkout=cancelled`;
+    const successUrl = resolveCheckoutUrl(body.successUrl, defaultSuccess, appUrl);
+    const cancelUrl = resolveCheckoutUrl(body.cancelUrl, defaultCancel, appUrl);
 
     let couponId: string | null = null;
     try {
       const ea = EarlyAdopterService.getInstance();
       if (await ea.isEarlyAdopterActive()) {
-        const claim = await ea.claimEarlyAdopterSlot(claims.userId);
+        const claim = await ea.claimEarlyAdopterSlot(auth.claims.userId);
         couponId = claim.discountCode;
       }
     } catch (eaErr) {
       const exception = eaErr instanceof Error ? eaErr.message : String(eaErr);
-      logCheckout("early_adopter_skipped", { ...ctx, exception });
+      logCheckout("early_adopter_skipped", { ...logCtx, exception });
     }
     if (couponId) {
-      ctx.couponId = couponId;
+      logCtx.couponId = couponId;
     }
 
     let session: { url: string | null; sessionId: string };
     try {
       session = await createSubscriptionCheckoutSession({
-        userId: claims.userId,
+        userId: auth.claims.userId,
         email: user.email,
         plan,
         successUrl,
         cancelUrl,
         couponId,
         customerId: user.stripe_customer_id,
+        tenantId,
       });
     } catch (stripeErr) {
       if (stripeErr instanceof StripePriceNotFoundError) {
@@ -237,7 +259,7 @@ export async function POST(req: NextRequest) {
           stripeErr.message,
           "stripe_price_not_found",
           {
-            ...ctx,
+            ...logCtx,
             planId: plan,
             stripePriceId: stripeErr.priceId,
             envVar: stripeErr.envVar,
@@ -258,7 +280,7 @@ export async function POST(req: NextRequest) {
         parsed.stripeMessage,
         "stripe_session_failed",
         {
-          ...ctx,
+          ...logCtx,
           exception,
           stripeHttpStatus,
           stripeType: parsed.stripeType,
@@ -278,7 +300,7 @@ export async function POST(req: NextRequest) {
         502,
         `Stripe creó la sesión (${session.sessionId}) pero no devolvió URL de checkout`,
         "stripe_missing_checkout_url",
-        ctx,
+        logCtx,
         { sessionId: session.sessionId },
       );
     }
@@ -288,6 +310,10 @@ export async function POST(req: NextRequest) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
     }
+    const rbacStatus = saasErrorStatus(e);
+    if (rbacStatus === 401 || rbacStatus === 403 || rbacStatus === 404) {
+      return NextResponse.json(saasErrorBody(e), { status: rbacStatus });
+    }
 
     const exception = e instanceof Error ? e.message : String(e);
     const stack = e instanceof Error ? e.stack : undefined;
@@ -295,7 +321,7 @@ export async function POST(req: NextRequest) {
       500,
       exception,
       "unhandled_exception",
-      { ...ctx, stack },
+      { ...logCtx, stack },
       { exception },
     );
   }

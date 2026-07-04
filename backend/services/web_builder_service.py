@@ -134,48 +134,10 @@ class WebBuilderService:
         self.session = session
         self.workspace_id = workspace_id
         self._schema_ready = False
+    async def _ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def _ensure_schema(self) -> None:
-        if self._schema_ready:
-            return
-        bind = self.session.get_bind()
-        dialect = bind.dialect.name if bind is not None else "postgresql"
-        if dialect == "sqlite":
-            stmts = [
-                """CREATE TABLE IF NOT EXISTS client_websites (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    client_id TEXT NOT NULL,
-                    workspace_id INTEGER,
-                    slug TEXT NOT NULL,
-                    html_content TEXT NOT NULL,
-                    css_content TEXT,
-                    version INTEGER NOT NULL DEFAULT 1,
-                    published_at TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )""",
-                """CREATE TABLE IF NOT EXISTS website_sections (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    website_id INTEGER NOT NULL,
-                    section_type TEXT NOT NULL,
-                    content_json TEXT NOT NULL,
-                    order_index INTEGER NOT NULL DEFAULT 0,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )""",
-            ]
-        else:
-            from pathlib import Path
-
-            path = Path(__file__).resolve().parent.parent / "migrations" / SCHEMA_PATH
-            stmts = []
-            if path.exists():
-                stmts = [s.strip() for s in path.read_text(encoding="utf-8").split(";") if s.strip() and not s.strip().startswith("--")]
-        for stmt in stmts:
-            try:
-                await self.session.execute(text(stmt))
-            except Exception as exc:
-                logger.debug("web_builder schema stmt skipped: %s", exc)
-        await self.session.commit()
-        self._schema_ready = True
 
     async def generate(
         self,

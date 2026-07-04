@@ -77,13 +77,13 @@ describe("SaasNotificationService", () => {
   it("markRead con id válido devuelve true", async () => {
     const query = vi.fn().mockResolvedValue([{ id: "x" }]);
     const svc = new SaasNotificationService({ db: { query } });
-    expect(await svc.markRead("00000000-0000-0000-0000-000000000099", "u1")).toBe(true);
+    expect(await svc.markRead("00000000-0000-0000-0000-000000000099", "u1", "t1")).toBe(true);
   });
 
   it("markRead con id de otro usuario devuelve false", async () => {
     const query = vi.fn().mockResolvedValue([]);
     const svc = new SaasNotificationService({ db: { query } });
-    expect(await svc.markRead("00000000-0000-0000-0000-000000000099", "otro")).toBe(false);
+    expect(await svc.markRead("00000000-0000-0000-0000-000000000099", "otro", "t1")).toBe(false);
   });
 
   it("getUnreadCount devuelve número correcto", async () => {

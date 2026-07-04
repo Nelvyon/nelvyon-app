@@ -1,19 +1,32 @@
 import { NextResponse } from "next/server";
 
+import { verifyTrackingToken } from "../../../../../../../../backend/email/trackingToken";
 import { DbClient } from "../../../../../../../../backend/db/DbClient";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+function invalidLinkHtml(): NextResponse {
+  return new NextResponse("Enlace de baja inválido o expirado.", {
+    status: 400,
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const campaniaId = searchParams.get("cid");
-  const contactId = searchParams.get("rid");
-  const tenantId = searchParams.get("tid");
+  const token = searchParams.get("token")?.trim();
 
-  if (!campaniaId || !contactId || !tenantId) {
-    return new NextResponse("Enlace de baja inválido.", { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } });
+  if (!token) {
+    return invalidLinkHtml();
   }
+
+  const verified = verifyTrackingToken(token);
+  if (!verified.ok || verified.payload.t !== "u") {
+    return invalidLinkHtml();
+  }
+
+  const { tid: tenantId, cid: campaniaId, rid: contactId } = verified.payload;
 
   try {
     const db = DbClient.getInstance();
@@ -23,7 +36,6 @@ export async function GET(req: Request) {
        WHERE campania_id = $1 AND contact_id = $2 AND tenant_id = $3`,
       [campaniaId, contactId, tenantId],
     );
-    // Mark contact as unsubscribed so future campaigns skip them
     await db.query(
       `UPDATE saas_contacts SET tags = array_append(COALESCE(tags, '{}'), 'unsubscribed')
        WHERE id = $1 AND tenant_id = $2 AND NOT (COALESCE(tags, '{}') @> ARRAY['unsubscribed'])`,

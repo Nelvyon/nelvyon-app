@@ -4,6 +4,7 @@ const SES_KEYS = ["SES_ACCESS_KEY_ID", "SES_SECRET_ACCESS_KEY", "SES_FROM_EMAIL"
 const TWILIO_KEYS = ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER"] as const;
 const STRIPE_KEYS = ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"] as const;
 const STRIPE_PRICE_KEYS = ["STRIPE_PRICE_ID_STARTER", "STRIPE_PRICE_ID_PRO", "STRIPE_PRICE_ID_AGENCY"] as const;
+const OPENAI_KEYS = ["OPENAI_API_KEY"] as const;
 
 export function isEnvKeysConfigured(keys: readonly string[]): boolean {
   return keys.every((k) => Boolean(process.env[k]?.trim()));
@@ -19,6 +20,10 @@ export function isTwilioEnvConfigured(): boolean {
 
 export function isStripeEnvConfigured(): boolean {
   return isEnvKeysConfigured(STRIPE_KEYS) && isEnvKeysConfigured(STRIPE_PRICE_KEYS);
+}
+
+export function isOpenAiEnvConfigured(): boolean {
+  return isEnvKeysConfigured(OPENAI_KEYS);
 }
 
 export function missingEnvKeys(keys: readonly string[]): string[] {

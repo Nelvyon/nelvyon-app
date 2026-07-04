@@ -135,7 +135,7 @@ describe("SaasWhatsAppCloudService — configured", () => {
       status: "sent", contact_id: null, created_at: now,
     };
     // DB calls: SELECT conv (found), INSERT saas_sms_log, UPDATE conv
-    const db = makeDb([[convRow], [msgRow], []]);
+    const db = makeDb([[convRow], [msgRow], []]) as { query: ReturnType<typeof vi.fn> };
     const svc = new SaasWhatsAppCloudService(db as never, fetchMock);
     const result = await svc.send(TENANT, { to: "+34699000111", body: "Hola" });
     expect(result.metaWamid).toBe("wamid.abc123");
@@ -145,6 +145,9 @@ describe("SaasWhatsAppCloudService — configured", () => {
       expect.stringContaining("123456789/messages"),
       expect.objectContaining({ method: "POST" }),
     );
+    const updateCall = db.query.mock.calls.find((c) => String(c[0]).includes("UPDATE conversations"));
+    expect(updateCall?.[0]).toContain("tenant_id");
+    expect(updateCall?.[1]).toEqual(["Hola", "conv-1", TENANT]);
   });
 
   it("stores failed status when Meta API returns error", async () => {

@@ -10,39 +10,12 @@ import type {
   PackStep,
 } from "@/lib/packs/types";
 
-let tableReady = false;
+export async function ensurePackRunsTable(): Promise<void> {
+  /* Schema owned by migration 400_nelvyon_pack_runs.sql — no runtime DDL */
+}
 
 function db() {
   return DbClient.getInstance();
-}
-
-export async function ensurePackRunsTable(): Promise<void> {
-  if (tableReady) return;
-  await db().query(`
-    CREATE TABLE IF NOT EXISTS nelvyon_pack_runs (
-      id UUID PRIMARY KEY,
-      workspace_id INTEGER NOT NULL,
-      user_id TEXT NOT NULL,
-      pack_id TEXT NOT NULL DEFAULT 'local-business-growth',
-      status TEXT NOT NULL DEFAULT 'running',
-      intake JSONB NOT NULL DEFAULT '{}'::jsonb,
-      saas_client_id INTEGER,
-      saas_campaign_id INTEGER,
-      os_client_id TEXT,
-      os_project_id TEXT,
-      steps JSONB NOT NULL DEFAULT '[]'::jsonb,
-      report JSONB,
-      error_message TEXT,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      completed_at TIMESTAMPTZ
-    )
-  `);
-  await db().query(`
-    CREATE INDEX IF NOT EXISTS idx_pack_runs_workspace
-    ON nelvyon_pack_runs (workspace_id, created_at DESC)
-  `);
-  tableReady = true;
 }
 
 function initialSteps(definitions: { key: string; label: string }[]): PackStep[] {

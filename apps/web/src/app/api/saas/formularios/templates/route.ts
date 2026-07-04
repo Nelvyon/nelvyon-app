@@ -7,27 +7,9 @@ import {
   requireSaasContext,
   type FormTemplateCategory,
 } from "@nelvyon/saas";
-import { DbClient } from "../../../../../../../../backend/db/DbClient";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-async function ensureFormsSchema() {
-  const db = DbClient.getInstance();
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS saas_forms (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      tenant_id TEXT NOT NULL,
-      name TEXT NOT NULL,
-      description TEXT,
-      fields JSONB NOT NULL DEFAULT '[]',
-      is_active BOOLEAN NOT NULL DEFAULT TRUE,
-      submissions INTEGER NOT NULL DEFAULT 0,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-}
 
 export async function GET(req: Request) {
   try {
@@ -49,7 +31,6 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "workflows.write");
-    await ensureFormsSchema();
     const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
     if (!body || body.action !== "import" || typeof body.template_id !== "string") {
       return NextResponse.json({ error: "action=import and template_id required" }, { status: 400 });

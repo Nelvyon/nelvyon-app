@@ -44,27 +44,12 @@ class OnboardingService:
     def __init__(self, session: AsyncSession, workspace_id: int | None = None):
         self.session = session
         self.workspace_id = int(workspace_id) if workspace_id is not None else None
-
     @staticmethod
-    async def ensure_schema() -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        if not db_manager.async_session_maker:
-            await db_manager.ensure_initialized()
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "onboarding.sql"
-        if sql_path.exists():
-            raw = sql_path.read_text(encoding="utf-8")
-            statements = [s.strip() for s in raw.split(";") if s.strip()]
-            async with db_manager.async_session_maker() as session:
-                for stmt in statements:
-                    try:
-                        await session.execute(text(stmt))
-                    except Exception as exc:
-                        if "already exists" not in str(exc).lower():
-                            logger.debug("onboarding schema stmt skipped: %s", exc)
-                await session.commit()
-        _SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     async def create_workspace_complete(
         self,

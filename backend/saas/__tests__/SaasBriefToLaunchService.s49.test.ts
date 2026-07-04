@@ -2,6 +2,15 @@
  * S49 — SaasBriefToLaunchService unit tests
  */
 import { describe, expect, it, vi, beforeEach } from "vitest";
+
+vi.mock("../SaasAutonomyService", () => ({
+  getSaasAutonomyService: () => ({
+    getMode: vi.fn().mockResolvedValue("execute"),
+    gateOutbound: vi.fn().mockReturnValue({ allowed: true, mode: "execute" }),
+  }),
+  resetSaasAutonomyServiceForTests: vi.fn(),
+}));
+
 import {
   SaasBriefToLaunchService,
   SaasBriefToLaunchError,

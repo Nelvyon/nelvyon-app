@@ -69,27 +69,12 @@ class LiveChatService:
     def __init__(self, session: AsyncSession, tenant_id: int | None = None):
         self.session = session
         self.tenant_id = int(tenant_id) if tenant_id is not None else None
-
     @staticmethod
-    async def ensure_schema() -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await TenantService.ensure_schema()
-        if not db_manager.async_session_maker:
-            await db_manager.ensure_initialized()
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "livechat.sql"
-        if sql_path.exists():
-            raw = sql_path.read_text(encoding="utf-8")
-            async with db_manager.async_session_maker() as session:
-                for stmt in [s.strip() for s in raw.split(";") if s.strip()]:
-                    try:
-                        await session.execute(text(stmt))
-                    except Exception as exc:
-                        if "already exists" not in str(exc).lower():
-                            logger.debug("livechat schema stmt skipped: %s", exc)
-                await session.commit()
-        _SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     async def _set_tenant(self, tenant_id: int) -> None:
         await TenantService(self.session).set_tenant_context(tenant_id)

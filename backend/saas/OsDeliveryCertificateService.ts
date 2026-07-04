@@ -430,14 +430,38 @@ export class OsDeliveryCertificateService {
     return rowToCert(rows[0]!, true);
   }
 
-  async getCertificate(id: string): Promise<DeliveryCertificate> {
-    const rows = await this.db.query<CertRow>(`SELECT * FROM os_delivery_certificates WHERE id = $1`, [id]);
+  async getCertificate(
+    id: string,
+    scope?: { tenantId?: string | null; workspaceId?: number | null },
+  ): Promise<DeliveryCertificate> {
+    const params: unknown[] = [id];
+    let sql = `SELECT * FROM os_delivery_certificates WHERE id = $1`;
+    if (scope?.tenantId) {
+      sql += ` AND tenant_id = $2::uuid`;
+      params.push(scope.tenantId);
+    } else if (scope?.workspaceId != null) {
+      sql += ` AND workspace_id = $2`;
+      params.push(scope.workspaceId);
+    }
+    const rows = await this.db.query<CertRow>(sql, params);
     if (!rows[0]) throw new OsDeliveryCertError("NOT_FOUND", `Certificado ${id} no encontrado`);
     return rowToCert(rows[0], true);
   }
 
-  async getByPackRun(packRunId: string): Promise<DeliveryCertificate | null> {
-    const rows = await this.db.query<CertRow>(`SELECT * FROM os_delivery_certificates WHERE pack_run_id = $1`, [packRunId]);
+  async getByPackRun(
+    packRunId: string,
+    scope?: { tenantId?: string | null; workspaceId?: number | null },
+  ): Promise<DeliveryCertificate | null> {
+    const params: unknown[] = [packRunId];
+    let sql = `SELECT * FROM os_delivery_certificates WHERE pack_run_id = $1`;
+    if (scope?.tenantId) {
+      sql += ` AND tenant_id = $2::uuid`;
+      params.push(scope.tenantId);
+    } else if (scope?.workspaceId != null) {
+      sql += ` AND workspace_id = $2`;
+      params.push(scope.workspaceId);
+    }
+    const rows = await this.db.query<CertRow>(sql, params);
     return rows[0] ? rowToCert(rows[0], true) : null;
   }
 

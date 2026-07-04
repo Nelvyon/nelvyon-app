@@ -103,13 +103,13 @@ describe("SaasInvoiceService", () => {
   it("markAsPaid actualiza status a 'paid' y devuelve true", async () => {
     const query = vi.fn().mockResolvedValue([{ id: "x" }]);
     const svc = new SaasInvoiceService({ db: { query } });
-    expect(await svc.markAsPaid("00000000-0000-0000-0000-000000000001")).toBe(true);
+    expect(await svc.markAsPaid("00000000-0000-0000-0000-000000000001", "t1", "u1")).toBe(true);
   });
 
   it("markAsPaid en factura ya pagada devuelve false", async () => {
     const query = vi.fn().mockResolvedValue([]);
     const svc = new SaasInvoiceService({ db: { query } });
-    expect(await svc.markAsPaid("00000000-0000-0000-0000-000000000001")).toBe(false);
+    expect(await svc.markAsPaid("00000000-0000-0000-0000-000000000001", "t1", "u1")).toBe(false);
   });
 
   it("generateMonthlyInvoice usa fallback 97 cuando amount_eur null", async () => {

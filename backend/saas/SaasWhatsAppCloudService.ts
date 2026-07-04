@@ -489,8 +489,8 @@ export class SaasWhatsAppCloudService {
     if (conversationId) {
       const snippet = bodyForLog.slice(0, 120);
       await this.db.query(
-        `UPDATE conversations SET last_message=$1, last_message_at=NOW(), updated_at=NOW() WHERE id=$2`,
-        [snippet, conversationId],
+        `UPDATE conversations SET last_message=$1, last_message_at=NOW(), updated_at=NOW() WHERE id=$2 AND tenant_id=$3`,
+        [snippet, conversationId, tenantId],
       ).catch(() => null);
     }
 

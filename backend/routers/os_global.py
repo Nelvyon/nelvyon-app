@@ -197,25 +197,7 @@ async def get_os_global_change_journal(
     ).mappings().all()
     ws_ids = _allowed_workspace_ids(memberships, int(ctx.workspace_id))
     ws_csv = ",".join(str(i) for i in ws_ids)
-
-    await db.execute(
-        text(
-            """
-            CREATE TABLE IF NOT EXISTS tenant_branding_activation_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                workspace_id INTEGER NOT NULL,
-                actor_user_id VARCHAR NOT NULL,
-                actor_email VARCHAR,
-                from_enabled INTEGER NOT NULL DEFAULT 0,
-                to_enabled INTEGER NOT NULL DEFAULT 0,
-                note VARCHAR,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-            """
-        )
-    )
-    await db.commit()
-
+    # tenant_branding_activation_logs: migration 507
     rows = (
         await db.execute(
             text(

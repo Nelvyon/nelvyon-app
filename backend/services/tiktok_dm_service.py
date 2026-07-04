@@ -30,43 +30,10 @@ class TikTokDMService:
         self.session = session
         self.workspace_id = workspace_id
         self.token = os.environ.get("TIKTOK_ACCESS_TOKEN", "").strip()
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS tiktok_dm_conversations (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    tiktok_open_id TEXT NOT NULL,
-                    status TEXT NOT NULL DEFAULT 'open',
-                    bot_enabled INTEGER NOT NULL DEFAULT 1,
-                    last_message_at TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS tiktok_dm_messages (
-                    id TEXT PRIMARY KEY,
-                    conversation_id TEXT NOT NULL,
-                    workspace_id INTEGER NOT NULL,
-                    direction TEXT NOT NULL,
-                    body TEXT NOT NULL,
-                    meta_json TEXT NOT NULL DEFAULT '{}',
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def handle_webhook(self, payload: dict[str, Any]) -> dict[str, Any]:
         await self.ensure_schema()

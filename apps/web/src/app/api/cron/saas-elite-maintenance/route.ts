@@ -16,7 +16,7 @@ import { getOsSectorCertificationService } from "@nelvyon/os-agents";
 
 function authorizeCron(req: Request): boolean {
   const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return process.env.NODE_ENV !== "production";
+  if (!secret) return false;
   return req.headers.get("authorization") === `Bearer ${secret}`;
 }
 

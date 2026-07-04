@@ -56,31 +56,10 @@ class SnapchatAdsService:
     def is_mock(self) -> bool:
         self._ensure_config()
         return self._mock
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS snapchat_ads_campaigns (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    external_id TEXT,
-                    name TEXT NOT NULL,
-                    objective TEXT NOT NULL DEFAULT 'conversions',
-                    daily_budget_eur REAL NOT NULL DEFAULT 50,
-                    status TEXT NOT NULL DEFAULT 'ACTIVE',
-                    metrics_json TEXT NOT NULL DEFAULT '{}',
-                    creative_json TEXT NOT NULL DEFAULT '{}',
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def create_campaign(
         self,

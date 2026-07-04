@@ -9,6 +9,7 @@ import {
   dbListCampaigns,
   dbResolveWorkspaceId,
   platformDbFallbackEnabled,
+  platformWorkspaceDeniedResponse,
 } from "@/lib/platformDbFallback";
 import { OsAgentError } from "@nelvyon/os-agents";
 
@@ -29,7 +30,9 @@ async function createCampaignViaDb(
     if (workspaceId <= 0) return null;
     const created = await dbCreateCampaign(workspaceId, claims.userId, body);
     return NextResponse.json(created, { status: 201 });
-  } catch {
+  } catch (e) {
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     return null;
   }
 }
@@ -71,14 +74,17 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     if (platformDbFallbackEnabled()) {
       try {
         const workspaceId = await dbResolveWorkspaceId(req, claims);
         if (workspaceId > 0) {
           return NextResponse.json(await dbListCampaigns(workspaceId, claims.userId));
         }
-      } catch {
-        /* fall through */
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
       }
     }
     return NextResponse.json(EMPTY_CAMPAIGNS);

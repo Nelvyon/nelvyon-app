@@ -3,6 +3,9 @@ import path from "path";
 
 import { DbClient } from "./DbClient";
 import { loadEnvFiles } from "./loadEnvFiles";
+import { isTolerableConsolidatedMigrationError, splitSqlStatements } from "./splitSqlStatements";
+
+const CONSOLIDATED_MIGRATION = "507_fastapi_runtime_schemas.sql";
 
 async function runMigrations(): Promise<void> {
   loadEnvFiles();
@@ -26,12 +29,37 @@ async function runMigrations(): Promise<void> {
     }
     const sql = fs.readFileSync(path.join(migrationsDir, file), "utf8");
     console.log(`[migrate] run: ${file}`);
-    await db.query(sql);
+    if (file === CONSOLIDATED_MIGRATION) {
+      await runConsolidatedMigration(db, file, sql);
+    } else {
+      await db.query(sql);
+    }
     await db.query("INSERT INTO _migrations (name) VALUES ($1)", [file]);
     console.log(`[migrate] done: ${file}`);
   }
   console.log("[migrate] all migrations complete");
   await db.end();
+}
+
+async function runConsolidatedMigration(db: DbClient, file: string, sql: string): Promise<void> {
+  const statements = splitSqlStatements(sql);
+  let ok = 0;
+  let warned = 0;
+  for (const stmt of statements) {
+    try {
+      await db.query(stmt);
+      ok += 1;
+    } catch (err: unknown) {
+      if (isTolerableConsolidatedMigrationError(err, stmt)) {
+        warned += 1;
+        const pg = err as { message?: string };
+        console.warn(`[migrate] warn ${file}: ${pg.message ?? String(err)}`);
+        continue;
+      }
+      throw err;
+    }
+  }
+  console.log(`[migrate] ${file}: ${ok} statements ok, ${warned} warnings (legacy schema drift)`);
 }
 
 runMigrations()

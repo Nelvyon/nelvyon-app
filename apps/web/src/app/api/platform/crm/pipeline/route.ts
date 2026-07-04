@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 
+import { platformUpstreamAuthResponse } from "@/lib/platformBffRoute";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import {
   dbPipelineSummary,
   dbResolveWorkspaceId,
   platformDbFallbackEnabled,
+  platformWorkspaceDeniedResponse,
 } from "@/lib/platformDbFallback";
 import { OsAgentError } from "@nelvyon/os-agents";
 
@@ -32,6 +34,8 @@ export async function GET(req: Request) {
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
     }
+    const authRes = platformUpstreamAuthResponse(upstream);
+    if (authRes) return authRes;
 
     if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
       const workspaceId = await dbResolveWorkspaceId(req, claims);
@@ -41,15 +45,18 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ by_stage: [], items: [], stages: [], total_count: 0, total_value: 0 });
-  } catch {
+  } catch (e) {
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     if (platformDbFallbackEnabled()) {
       try {
         const workspaceId = await dbResolveWorkspaceId(req, claims);
         if (workspaceId > 0) {
           return NextResponse.json(await dbPipelineSummary(workspaceId, claims.userId));
         }
-      } catch {
-        /* fall through */
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
       }
     }
     return NextResponse.json({ by_stage: [], items: [], stages: [], total_count: 0, total_value: 0 });

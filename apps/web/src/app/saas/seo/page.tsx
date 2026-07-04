@@ -147,13 +147,22 @@ export default function SaasSeoPage() {
     setLoading(true);
     try {
       const seoRes = await fetch("/api/saas/seo");
+      const d = (await seoRes.json().catch(() => ({}))) as {
+        keywords?: Keyword[]; issues?: SeoIssue[]; summary?: SeoSummary;
+        configured?: boolean; degraded?: boolean; message?: string; error?: string;
+      };
       if (seoRes.ok) {
-        const d = (await seoRes.json().catch(() => ({}))) as { keywords?: Keyword[]; issues?: SeoIssue[]; summary?: SeoSummary; configured?: boolean; message?: string };
-        setConfigured(d.configured ?? true);
-        setConfigMessage(d.message ?? null);
+        setConfigured(d.configured ?? false);
+        setConfigMessage(d.degraded ? (d.error ?? d.message ?? "Proveedor SEO temporalmente no disponible.") : (d.message ?? null));
         setKeywords(d.keywords ?? []);
         setIssues(d.issues ?? []);
         if (d.summary) setSummary(d.summary);
+      } else if (seoRes.status === 503) {
+        setConfigured(false);
+        setConfigMessage(d.error ?? d.message ?? "Proveedor SEO no disponible.");
+        setKeywords([]);
+        setIssues([]);
+        setSummary(null);
       }
     } finally {
       setLoading(false);

@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
-import { getSaasDealsEtlService, getSaasOnboardingService } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
+import {
+  getSaasDealsEtlService,
+  requireSaasContext,
+  saasErrorBody,
+  saasErrorStatus,
+} from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -13,10 +16,7 @@ export const runtime = "nodejs";
  */
 export async function POST(req: Request) {
   try {
-    const claims = await authenticate(req);
-    const onboarding = getSaasOnboardingService();
-    const tenant = await onboarding.getTenant(claims.userId);
-    if (!tenant) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+    const ctx = await requireSaasContext(req, "contacts.write");
 
     let body: unknown;
     try {
@@ -40,12 +40,9 @@ export async function POST(req: Request) {
     }
 
     const etl = getSaasDealsEtlService();
-    const report = await etl.run("dry-run", { tenantId: tenant.id });
-    return NextResponse.json({ report, tenantId: tenant.id, scope: "tenant" });
+    const report = await etl.run("dry-run", { tenantId: ctx.tenant.id });
+    return NextResponse.json({ report, tenantId: ctx.tenant.id, scope: "tenant" });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    throw e;
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

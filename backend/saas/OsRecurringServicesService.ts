@@ -23,6 +23,8 @@ function buildSeoReport(tenantId: string, month: string): Record<string, unknown
     tenantId,
     month,
     type: "seo_report",
+    synthetic: true,
+    dataSource: "template_v1",
     title: `Informe SEO mensual — ${month}`,
     sections: [
       {
@@ -94,6 +96,8 @@ function buildSocialCalendar(tenantId: string, month: string): Record<string, un
     tenantId,
     month,
     type: "social_calendar",
+    synthetic: true,
+    dataSource: "template_v1",
     title: `Calendario social — ${month}`,
     totalPosts: weeks.length * 3,
     weeks,
@@ -106,6 +110,8 @@ function buildAdsSnapshot(tenantId: string, month: string): Record<string, unkno
     tenantId,
     month,
     type: "ads_snapshot",
+    synthetic: true,
+    dataSource: "template_v1",
     title: `Snapshot campañas publicitarias — ${month}`,
     channels: [
       {

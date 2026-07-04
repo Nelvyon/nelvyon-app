@@ -123,10 +123,29 @@ describe("O24 — analyzeRun", () => {
     expect(run.recommendedPackId).toBe("local-business-growth");
   });
 
-  it("agent data throwing → still completes with empty agent_data", async () => {
+  it("agent data throwing → fails run", async () => {
     const agent = agentPort({ fetchKeywordSnapshot: async () => { throw new Error("semrush down"); } });
-    const run = await new OsCompetitorGapService(analyzeDb(), agent, launchPort).analyzeRun("gap-1");
-    expect(run.status).toBe("completed");
+    const run = await new OsCompetitorGapService(analyzeDb((sql) => {
+      if (sql.includes("SET status = 'failed'")) {
+        return [gapRow({ status: "failed", error_message: "semrush down" })];
+      }
+      return null;
+    }), agent, launchPort).analyzeRun("gap-1");
+    expect(run.status).toBe("failed");
+  });
+
+  it("no provider data → fails run", async () => {
+    const agent = agentPort({
+      fetchKeywordSnapshot: async () => ({ provider: "none", keywords: [] }),
+      fetchCompetitorSnapshot: async () => ({ provider: "none", competitors: [] }),
+    });
+    const run = await new OsCompetitorGapService(analyzeDb((sql) => {
+      if (sql.includes("SET status = 'failed'")) {
+        return [gapRow({ status: "failed", error_message: "Proveedor SEO no configurado" })];
+      }
+      return null;
+    }), agent, launchPort).analyzeRun("gap-1");
+    expect(run.status).toBe("failed");
   });
 
   it("missing run → NOT_FOUND", async () => {

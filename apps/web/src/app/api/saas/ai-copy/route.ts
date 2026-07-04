@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 
 import {
-  buildMockCopies,
+  isOpenAiEnvConfigured,
   requireSaasContext,
   saasErrorBody,
   saasErrorStatus,
-  type MockCopyType,
-  type MockTone,
 } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
@@ -22,10 +20,12 @@ type CopyType =
   | "cta_button"
   | "blog_intro";
 
+type CopyTone = "formal" | "casual" | "urgente" | "inspirador";
+
 interface GenerateCopyRequest {
   type: CopyType;
   context: string;
-  tone?: MockTone;
+  tone?: CopyTone;
   language?: "es" | "en";
   variations?: number;
 }
@@ -49,7 +49,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       types: COPY_TYPES,
       tones: ["formal", "casual", "urgente", "inspirador"],
-      openai_configured: Boolean(process.env.OPENAI_API_KEY),
+      openai_configured: isOpenAiEnvConfigured(),
       company: ctx.tenant.companyName ?? null,
     });
   } catch (e: unknown) {
@@ -66,17 +66,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "type y context son obligatorios" }, { status: 400 });
     }
 
-    const openaiKey = process.env.OPENAI_API_KEY;
-    if (!openaiKey) {
-      const copies = buildMockCopies({
-        type: body.type as MockCopyType,
-        context: body.context.trim(),
-        tone: body.tone,
-        variations: body.variations,
-        company: ctx.tenant.companyName,
-      });
-      return NextResponse.json({ copies, mock: true });
+    if (!isOpenAiEnvConfigured()) {
+      return NextResponse.json(
+        {
+          error: "OpenAI no configurado. Configura OPENAI_API_KEY en el servidor.",
+          code: "missing_openai",
+        },
+        { status: 503 },
+      );
     }
+    const openaiKey = process.env.OPENAI_API_KEY!.trim();
 
     const variations = Math.min(body.variations ?? 3, 5);
     const tone = body.tone ?? "casual";

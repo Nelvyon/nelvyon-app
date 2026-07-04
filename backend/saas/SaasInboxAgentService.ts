@@ -325,18 +325,23 @@ export class SaasInboxAgentService {
       return { processed: true, suggested, autoReplied: false, reason: "low_confidence" };
     }
 
-    const { getSaasAutonomyService } = await import("./SaasAutonomyService");
-    const autonomy = await getSaasAutonomyService().getMode(tenantId);
-    const gate = getSaasAutonomyService().gateAgentAuto(autonomy);
+    const { SaasAutonomyService } = await import("./SaasAutonomyService");
+    const autonomySvc = new SaasAutonomyService(this.db);
+    const autonomy = await autonomySvc.getMode(tenantId);
+    const gate = autonomySvc.gateAgentAuto(autonomy);
     if (!gate.allowed) {
       return { processed: true, suggested, autoReplied: false, reason: gate.reason ?? "autonomy_gate" };
+    }
+
+    if (suggested.mock) {
+      return { processed: true, suggested, autoReplied: false, reason: "llm_not_configured" };
     }
 
     await this.inbox.replyToConversation(tenantId, conversationId, suggested.suggestion);
     if (suggested.suggestionId) {
       await this.db.query(
-        `UPDATE saas_inbox_agent_suggestions SET auto_sent = true WHERE id = $1`,
-        [suggested.suggestionId],
+        `UPDATE saas_inbox_agent_suggestions SET auto_sent = true WHERE id = $1 AND tenant_id = $2`,
+        [suggested.suggestionId, tenantId],
       ).catch(() => null);
     }
 

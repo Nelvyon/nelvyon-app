@@ -132,6 +132,40 @@ async def setup_database(test_engine):
 
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Tables owned by migration 507 (no runtime DDL in services — bootstrap for sqlite tests)
+        await conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS tenant_branding_activation_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    workspace_id INTEGER NOT NULL,
+                    actor_user_id VARCHAR NOT NULL,
+                    actor_email VARCHAR,
+                    from_enabled INTEGER NOT NULL DEFAULT 0,
+                    to_enabled INTEGER NOT NULL DEFAULT 0,
+                    note VARCHAR,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+        )
+        await conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS tenant_module_permissions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    workspace_id INTEGER NOT NULL,
+                    user_id VARCHAR NOT NULL,
+                    email VARCHAR,
+                    module VARCHAR NOT NULL,
+                    actions_json TEXT NOT NULL DEFAULT '[]',
+                    granted_by VARCHAR,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(workspace_id, user_id, module)
+                )
+                """
+            )
+        )
         # Aligns with JWT subs in auth_headers / admin_headers (require_workspace + membership)
         await conn.execute(
             text(

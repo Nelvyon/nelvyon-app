@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { buildMockChatReply, requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
+import { isOpenAiEnvConfigured, requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import { saasChatService } from "../../../../../../../backend/saas/SaasChatService";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     const messages = await saasChatService.getHistory(ctx.claims.userId, ctx.tenant.id, limit);
     return NextResponse.json({
       messages,
-      openai_configured: Boolean(process.env.OPENAI_API_KEY),
+      openai_configured: isOpenAiEnvConfigured(),
       company: ctx.tenant.companyName ?? null,
     });
   } catch (e: unknown) {
@@ -36,15 +36,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "messages array required" }, { status: 400 });
     }
 
-    const openaiKey = process.env.OPENAI_API_KEY;
-    if (!openaiKey) {
-      const reply = buildMockChatReply({
-        messages: body.messages,
-        company: ctx.tenant.companyName,
-        plan: ctx.tenant.plan,
-      });
-      return NextResponse.json({ reply, mock: true });
+    if (!isOpenAiEnvConfigured()) {
+      return NextResponse.json(
+        {
+          error: "OpenAI no configurado. Configura OPENAI_API_KEY en el servidor.",
+          code: "missing_openai",
+        },
+        { status: 503 },
+      );
     }
+    const openaiKey = process.env.OPENAI_API_KEY!.trim();
 
     const systemPrompt = `Eres el asistente de marketing IA de Nelvyon para la empresa "${ctx.tenant.companyName ?? "tu empresa"}".
 Tienes acceso a todos los módulos: CRM, Email Marketing, SMS, WhatsApp, Redes Sociales, Publicidad, SEO, Workflows, Formularios, Agenda y 193 agentes especializados.

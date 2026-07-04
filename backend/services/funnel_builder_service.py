@@ -43,28 +43,12 @@ class FunnelBuilderService:
     def __init__(self, session: AsyncSession, workspace_id: int | None = None):
         self.session = session
         self.workspace_id = int(workspace_id) if workspace_id is not None else None
-
     @staticmethod
-    async def ensure_schema() -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await LandingBuilderService.ensure_schema()
-        await TenantService.ensure_schema()
-        if not db_manager.async_session_maker:
-            await db_manager.ensure_initialized()
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "funnel_builder.sql"
-        if sql_path.exists():
-            raw = sql_path.read_text(encoding="utf-8")
-            async with db_manager.async_session_maker() as session:
-                for stmt in [s.strip() for s in raw.split(";") if s.strip()]:
-                    try:
-                        await session.execute(text(stmt))
-                    except Exception as exc:
-                        if "already exists" not in str(exc).lower():
-                            logger.debug("funnel_builder schema skipped: %s", exc)
-                await session.commit()
-        _SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     async def _set_workspace(self, workspace_id: int) -> None:
         await TenantService(self.session).set_tenant_context(workspace_id)

@@ -6,27 +6,9 @@ import { DbClient } from "../../../../../../../backend/db/DbClient";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-async function ensureSchema() {
-  const db = DbClient.getInstance();
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS saas_forms (
-      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      tenant_id   TEXT NOT NULL,
-      name        TEXT NOT NULL,
-      description TEXT,
-      fields      JSONB NOT NULL DEFAULT '[]',
-      is_active   BOOLEAN NOT NULL DEFAULT TRUE,
-      submissions INTEGER NOT NULL DEFAULT 0,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-}
-
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "workflows.read");
-    await ensureSchema();
     const db = DbClient.getInstance();
     const rows = await db.query(
       `SELECT id, name, description, fields, is_active AS "isActive",
@@ -54,7 +36,6 @@ export async function POST(req: Request) {
     if (!body.name?.trim()) {
       return NextResponse.json({ error: "name is required" }, { status: 400 });
     }
-    await ensureSchema();
     const db = DbClient.getInstance();
     const rows = await db.query(
       `INSERT INTO saas_forms (tenant_id, name, description, fields)

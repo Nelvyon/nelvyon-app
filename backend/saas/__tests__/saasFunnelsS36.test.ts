@@ -50,6 +50,12 @@ function makeDb(overrides: Record<string, unknown[]> = {}) {
 
   return {
     query: vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("INNER JOIN saas_funnels f") && sql.includes("saas_funnel_steps fs")) {
+        return [{ id: "s1" }];
+      }
+      if (sql.includes("INNER JOIN saas_funnels f") && sql.includes("saas_funnel_step_variants v")) {
+        return [{ id: "v-a" }];
+      }
       if (sql.includes("FROM saas_funnel_step_variants") && sql.includes("WHERE step_id")) return data.variants;
       if (sql.includes("FROM saas_funnel_step_variants") && sql.includes("ANY")) return data.variants;
       if (sql.includes("INSERT INTO saas_funnel_step_variants")) return [variantRowA];
@@ -73,7 +79,7 @@ describe("SaasFunnelService.listVariants", () => {
   it("returns variants for a step", async () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
-    const variants = await svc.listVariants("s1");
+    const variants = await svc.listVariants("t1", "s1");
     expect(variants).toHaveLength(2);
     expect(variants[0].variantKey).toBe("A");
     expect(variants[1].variantKey).toBe("B");
@@ -82,14 +88,14 @@ describe("SaasFunnelService.listVariants", () => {
   it("returns empty array when no variants", async () => {
     const db = makeDb({ variants: [] });
     const svc = new SaasFunnelService(db as never);
-    const variants = await svc.listVariants("s99");
+    const variants = await svc.listVariants("t1", "s99");
     expect(variants).toEqual([]);
   });
 
   it("maps weightPct and visitors correctly", async () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
-    const [a, b] = await svc.listVariants("s1");
+    const [a, b] = await svc.listVariants("t1", "s1");
     expect(a!.weightPct).toBe(60);
     expect(b!.weightPct).toBe(40);
     expect(a!.visitors).toBe(60);
@@ -103,7 +109,7 @@ describe("SaasFunnelService.createVariant", () => {
   it("creates variant A with defaults", async () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
-    const v = await svc.createVariant("s1", { variantKey: "A" });
+    const v = await svc.createVariant("t1", "s1", { variantKey: "A" });
     expect(v.variantKey).toBe("A");
     expect(db.query).toHaveBeenCalledWith(
       expect.stringContaining("INSERT INTO saas_funnel_step_variants"),
@@ -115,7 +121,7 @@ describe("SaasFunnelService.createVariant", () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
     // @ts-expect-error — testing invalid input
-    await expect(svc.createVariant("s1", { variantKey: "C" })).rejects.toThrow(
+    await expect(svc.createVariant("t1", "s1", { variantKey: "C" })).rejects.toThrow(
       expect.objectContaining({ code: "VALIDATION" }),
     );
   });
@@ -123,7 +129,7 @@ describe("SaasFunnelService.createVariant", () => {
   it("throws VALIDATION for weight_pct out of range", async () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
-    await expect(svc.createVariant("s1", { variantKey: "A", weightPct: 150 })).rejects.toThrow(
+    await expect(svc.createVariant("t1", "s1", { variantKey: "A", weightPct: 150 })).rejects.toThrow(
       expect.objectContaining({ code: "VALIDATION" }),
     );
   });
@@ -401,7 +407,7 @@ describe("SaasFunnelService.updateVariant", () => {
   it("updates weight_pct", async () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
-    await svc.updateVariant("v-a", { weightPct: 70 });
+    await svc.updateVariant("t1", "v-a", { weightPct: 70 });
     expect(db.query).toHaveBeenCalledWith(
       expect.stringContaining("UPDATE saas_funnel_step_variants"),
       expect.arrayContaining([70]),
@@ -411,7 +417,7 @@ describe("SaasFunnelService.updateVariant", () => {
   it("throws VALIDATION for negative weight", async () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
-    await expect(svc.updateVariant("v-a", { weightPct: -1 })).rejects.toThrow(
+    await expect(svc.updateVariant("t1", "v-a", { weightPct: -1 })).rejects.toThrow(
       expect.objectContaining({ code: "VALIDATION" }),
     );
   });

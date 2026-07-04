@@ -59,32 +59,10 @@ class PrDigitalService:
     def __init__(self, session: AsyncSession, workspace_id: int):
         self.session = session
         self.workspace_id = workspace_id
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS pr_releases (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    client_id TEXT NOT NULL DEFAULT 'default',
-                    sector TEXT,
-                    type TEXT NOT NULL,
-                    title TEXT,
-                    content TEXT NOT NULL,
-                    media_targets_json TEXT NOT NULL DEFAULT '[]',
-                    estimated_reach INTEGER NOT NULL DEFAULT 0,
-                    publication_probability REAL,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def generate_release(
         self,

@@ -12,6 +12,10 @@ import {
 } from "@/lib/partners/partnerConnectService";
 import { isStripeConnectConfigured } from "@/lib/partners/partnerStripeConnect";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import {
+  assertUserCanAccessWorkspace,
+  WorkspaceAccessError,
+} from "@/lib/platformDbFallback";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +58,15 @@ export async function GET(req: Request) {
   const workspaceId = parseWorkspaceId(req);
   if (!workspaceId) {
     return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+  }
+
+  try {
+    await assertUserCanAccessWorkspace(claims, workspaceId);
+  } catch (e) {
+    if (e instanceof WorkspaceAccessError) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    throw e;
   }
 
   const [clientsPayload, affiliatePayload] = await Promise.all([

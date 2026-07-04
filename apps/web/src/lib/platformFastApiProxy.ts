@@ -1,5 +1,10 @@
-import { extractToken } from "@nelvyon/auth";
+import { extractToken, authenticate } from "@nelvyon/auth";
+import { OsAgentError } from "@nelvyon/os-agents";
 import type { WorkspaceRow } from "@/features/workspace/types";
+import {
+  assertUserCanAccessWorkspace,
+  WorkspaceAccessError,
+} from "@/lib/platformDbFallback";
 
 export function platformApiBase(): string {
   return (
@@ -72,10 +77,34 @@ export async function proxyPlatformFetch(
     });
   }
 
+  const workspaceId = req.headers.get("x-workspace-id")?.trim();
+  if (workspaceId) {
+    const wsNum = Number(workspaceId);
+    if (Number.isFinite(wsNum) && wsNum > 0) {
+      try {
+        const claims = await authenticate(req);
+        await assertUserCanAccessWorkspace(claims, wsNum);
+      } catch (e) {
+        if (e instanceof WorkspaceAccessError) {
+          return new Response(JSON.stringify({ error: "Forbidden" }), {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        if (e instanceof OsAgentError && e.message === "Unauthorized") {
+          return new Response(JSON.stringify({ detail: "Unauthorized" }), {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        throw e;
+      }
+    }
+  }
+
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${token}`);
   headers.set("Accept", "application/json");
-  const workspaceId = req.headers.get("x-workspace-id");
   if (workspaceId) headers.set("X-Workspace-Id", workspaceId);
 
   return fetch(`${platformApiBase()}${path}`, {

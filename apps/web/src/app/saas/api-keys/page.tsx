@@ -34,12 +34,12 @@ const SCOPE_LABELS: Record<ApiKeyScope, { label: string; group: string }> = {
 
 
 const ENDPOINTS = [
-  { method: "GET", path: "/api/v1/contacts", desc: "Lista contactos" },
-  { method: "POST", path: "/api/v1/contacts", desc: "Crear contacto" },
-  { method: "GET", path: "/api/v1/deals", desc: "Lista deals" },
-  { method: "POST", path: "/api/v1/deals", desc: "Crear deal" },
-  { method: "GET", path: "/api/v1/campaigns", desc: "Lista campañas" },
-  { method: "GET", path: "/api/v1/reports/summary", desc: "Resumen métricas" },
+  { method: "GET", path: "/api/public/v1/contacts", desc: "Lista contactos" },
+  { method: "POST", path: "/api/public/v1/contacts", desc: "Crear contacto" },
+  { method: "GET", path: "/api/public/v1/deals", desc: "Lista oportunidades" },
+  { method: "POST", path: "/api/public/v1/deals", desc: "Crear oportunidad" },
+  { method: "GET", path: "/api/public/v1/campaigns", desc: "Lista campañas" },
+  { method: "POST", path: "/api/public/v1/workflows/trigger", desc: "Disparar workflow" },
 ];
 
 const METHOD_COLOR: Record<string, string> = {

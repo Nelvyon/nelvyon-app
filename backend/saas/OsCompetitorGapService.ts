@@ -287,13 +287,15 @@ export class OsCompetitorGapService {
     return rowToRun(rows[0]!);
   }
 
-  /** Pull agent data (best-effort), derive gaps, score, recommend, build HTML, persist. */
+  /** Pull agent data, derive gaps, score, recommend, build HTML, persist. Fails closed without provider data. */
   async analyzeRun(runId: string, opts: { userId?: string; sector?: string; hasProductCategory?: boolean } = {}): Promise<CompetitorGapRun> {
     const existing = await this.getRun(runId);
 
     let agentData: Record<string, unknown> = {};
     let ownKeywords: GapKeyword[] = [];
     let competitors: GapCompetitor[] = [];
+    let provider = "none";
+
     try {
       const [kw, comp] = await Promise.all([
         this.agentData.fetchKeywordSnapshot({ domain: existing.ownDomain, userId: opts.userId }),
@@ -301,13 +303,25 @@ export class OsCompetitorGapService {
       ]);
       ownKeywords = kw.keywords ?? [];
       competitors = comp.competitors ?? [];
+      provider = kw.provider ?? comp.provider ?? "none";
       agentData = {
-        provider: kw.provider,
+        provider,
         ownKeywords: ownKeywords.slice(0, 20),
         competitors: competitors.slice(0, 5),
       };
-    } catch {
-      agentData = { provider: "none", reason: "no_provider" };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "agent_data_unavailable";
+      return this.failRun(runId, msg);
+    }
+
+    const hasData = ownKeywords.length > 0 || competitors.length > 0;
+    if (provider === "none" || provider === "mock" || !hasData) {
+      return this.failRun(
+        runId,
+        provider === "none" || provider === "mock"
+          ? "Proveedor SEO no configurado — conecta Semrush o configura APOLLO/SEMRUSH."
+          : "Datos insuficientes para análisis competitivo.",
+      );
     }
 
     const gaps = deriveGaps(ownKeywords, competitors, existing.competitorDomain);
@@ -396,8 +410,13 @@ export class OsCompetitorGapService {
     return rowToRun(rows[0]!, true);
   }
 
-  async getRun(id: string): Promise<CompetitorGapRun> {
-    const rows = await this.db.query<GapRow>(`SELECT * FROM os_competitor_gap_runs WHERE id = $1`, [id]);
+  async getRun(id: string, tenantId?: string | null): Promise<CompetitorGapRun> {
+    const rows = tenantId
+      ? await this.db.query<GapRow>(
+          `SELECT * FROM os_competitor_gap_runs WHERE id = $1 AND tenant_id = $2::uuid`,
+          [id, tenantId],
+        )
+      : await this.db.query<GapRow>(`SELECT * FROM os_competitor_gap_runs WHERE id = $1`, [id]);
     if (!rows[0]) throw new OsCompetitorGapError("NOT_FOUND", `Gap run ${id} no encontrado`);
     return rowToRun(rows[0], true);
   }
@@ -417,14 +436,12 @@ export class OsCompetitorGapService {
        FROM os_competitor_gap_runs`,
     );
     let topRecommendedPack: string | null = null;
-    try {
-      const top = await this.db.query<{ recommended_pack_id: string }>(
-        `SELECT recommended_pack_id FROM os_competitor_gap_runs
-         WHERE recommended_pack_id IS NOT NULL
-         GROUP BY recommended_pack_id ORDER BY COUNT(*) DESC LIMIT 1`,
-      );
-      topRecommendedPack = top[0]?.recommended_pack_id ?? null;
-    } catch { /* ignore */ }
+    const top = await this.db.query<{ recommended_pack_id: string }>(
+      `SELECT recommended_pack_id FROM os_competitor_gap_runs
+       WHERE recommended_pack_id IS NOT NULL
+       GROUP BY recommended_pack_id ORDER BY COUNT(*) DESC LIMIT 1`,
+    );
+    topRecommendedPack = top[0]?.recommended_pack_id ?? null;
     const r = rows[0];
     return {
       total: parseInt(r?.total ?? "0", 10),

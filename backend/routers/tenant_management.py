@@ -156,66 +156,19 @@ class TenantMemberWithPermissions(BaseModel):
 
 # ── Ensure tenant columns exist ──
 
-async def _ensure_tenant_columns(db: AsyncSession):
-    """Add tenant-specific columns to workspaces table if they don't exist."""
-    columns = {
-        "timezone": "VARCHAR DEFAULT 'UTC'",
-        "locale": "VARCHAR DEFAULT 'es'",
-        "industry": "VARCHAR DEFAULT 'other'",
-        "billing_email": "VARCHAR",
-        "max_users": "INTEGER DEFAULT 10",
-        "features_json": "TEXT",
-    }
-    for col_name, col_type in columns.items():
-        try:
-            await db.execute(text(
-                f"ALTER TABLE workspaces ADD COLUMN IF NOT EXISTS {col_name} {col_type}"
-            ))
-        except Exception:
-            pass
-    await db.commit()
+async def _ensure_tenant_columns(db):  # noqa: ARG001
+    """Schema owned by migration 507 — no runtime DDL."""
+    return
 
 
-async def _ensure_permissions_table(db: AsyncSession):
-    """Create tenant_module_permissions table if it doesn't exist."""
-    try:
-        await db.execute(text("""
-            CREATE TABLE IF NOT EXISTS tenant_module_permissions (
-                id SERIAL PRIMARY KEY,
-                workspace_id INTEGER NOT NULL,
-                user_id VARCHAR NOT NULL,
-                email VARCHAR,
-                module VARCHAR NOT NULL,
-                actions_json TEXT NOT NULL DEFAULT '[]',
-                granted_by VARCHAR,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                UNIQUE(workspace_id, user_id, module)
-            )
-        """))
-        await db.commit()
-    except Exception as e:
-        logger.warning(f"Failed to create tenant_module_permissions: {e}")
-        await db.rollback()
+async def _ensure_permissions_table(db):  # noqa: ARG001
+    """Schema owned by migration 507 — no runtime DDL."""
+    return
 
 
-async def _ensure_branding_activation_log_table(db: AsyncSession):
-    try:
-        await db.execute(text("""
-            CREATE TABLE IF NOT EXISTS tenant_branding_activation_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                workspace_id INTEGER NOT NULL,
-                actor_user_id VARCHAR NOT NULL,
-                actor_email VARCHAR,
-                from_enabled INTEGER NOT NULL DEFAULT 0,
-                to_enabled INTEGER NOT NULL DEFAULT 0,
-                note VARCHAR,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """))
-        await db.commit()
-    except Exception as e:
-        logger.warning(f"Failed to create tenant_branding_activation_logs: {e}")
-        await db.rollback()
+async def _ensure_branding_activation_log_table(db):  # noqa: ARG001
+    """Schema owned by migration 507 — no runtime DDL."""
+    return
 
 
 def _plan_in_advanced_allowlist(plan: Optional[str]) -> bool:
@@ -316,10 +269,6 @@ def _build_branding_policy(
         notes=notes,
     )
 
-
-# onboarding_progress: creada solo vía Alembic (pr03_onboarding_progress).
-
-# ── Get Tenant Settings ──
 
 @router.get("/settings", response_model=TenantSettingsResponse)
 async def get_tenant_settings(

@@ -41,6 +41,17 @@ CREATE TABLE IF NOT EXISTS email_queue (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Legacy FastAPI email_queue may exist without newer columns — align before indexes.
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS workspace_id INTEGER;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS to_name VARCHAR;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS body_html VARCHAR;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS body_text VARCHAR;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS email_type VARCHAR;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS error_message VARCHAR;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS sent_at TIMESTAMPTZ;
+ALTER TABLE email_queue ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+
 CREATE INDEX IF NOT EXISTS ix_email_queue_id ON email_queue (id);
 CREATE INDEX IF NOT EXISTS ix_email_queue_workspace_id ON email_queue (workspace_id);
 CREATE INDEX IF NOT EXISTS ix_email_queue_scheduled_at ON email_queue (status, scheduled_at);

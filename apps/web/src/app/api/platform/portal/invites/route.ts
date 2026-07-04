@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 
 import { createPortalInviteBff, listPortalInvitesBff } from "@/lib/portal/portalInviteStore";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
-import { platformDbFallbackEnabled } from "@/lib/platformDbFallback";
+import {
+  assertUserCanAccessWorkspace,
+  platformDbFallbackEnabled,
+  WorkspaceAccessError,
+} from "@/lib/platformDbFallback";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,6 +29,15 @@ export async function GET(req: Request) {
   const workspaceId = parseWorkspaceId(req);
   if (!workspaceId) {
     return NextResponse.json({ error: "X-Workspace-Id header required" }, { status: 400 });
+  }
+
+  try {
+    await assertUserCanAccessWorkspace(claims, workspaceId);
+  } catch (e) {
+    if (e instanceof WorkspaceAccessError) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    throw e;
   }
 
   const clientId = new URL(req.url).searchParams.get("client_id")?.trim();
@@ -52,6 +65,15 @@ export async function POST(req: Request) {
   const workspaceId = parseWorkspaceId(req);
   if (!workspaceId) {
     return NextResponse.json({ error: "X-Workspace-Id header required" }, { status: 400 });
+  }
+
+  try {
+    await assertUserCanAccessWorkspace(claims, workspaceId);
+  } catch (e) {
+    if (e instanceof WorkspaceAccessError) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    throw e;
   }
 
   let body: { client_id?: string; email?: string };

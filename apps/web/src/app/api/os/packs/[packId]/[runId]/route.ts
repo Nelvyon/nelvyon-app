@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import { getPackRun } from "@/lib/packs/packRunStore";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
-
+import {
+  assertUserCanAccessWorkspace,
+  WorkspaceAccessError,
+} from "@/lib/platformDbFallback";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
@@ -30,6 +33,15 @@ export async function GET(
   const workspaceId = parseWorkspaceId(req);
   if (!workspaceId) {
     return NextResponse.json({ error: "X-Workspace-Id header required" }, { status: 400 });
+  }
+
+  try {
+    await assertUserCanAccessWorkspace(claims, workspaceId);
+  } catch (e) {
+    if (e instanceof WorkspaceAccessError) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    throw e;
   }
 
   const run = await getPackRun(runId);

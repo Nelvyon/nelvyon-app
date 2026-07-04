@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { platformCollectAuthFailure } from "@/lib/platformBffRoute";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
@@ -43,6 +44,9 @@ export async function GET(req: Request) {
       proxyPlatformFetch(req, "GET", "/api/ads-agent/reporting/unified"),
     ]);
 
+    const authDenied = platformCollectAuthFailure(funnelsRes, dealsRes, adsRes);
+    if (authDenied) return authDenied;
+
     const funnelsList = (await safeJson(funnelsRes, EMPTY_FUNNELS_LIST)) as typeof EMPTY_FUNNELS_LIST;
     const deals = (await safeJson(dealsRes, { items: [], total: 0 })) as {
       items?: unknown[];
@@ -57,6 +61,8 @@ export async function GET(req: Request) {
     for (const item of items.slice(0, 5)) {
       if (!item.id) continue;
       const aRes = await proxyPlatformFetch(req, "GET", `/api/funnels/${item.id}/analytics`);
+      const aDenied = platformCollectAuthFailure(aRes);
+      if (aDenied) return aDenied;
       analyticsSamples.push(
         (await safeJson(aRes, EMPTY_FUNNEL_ANALYTICS)) as typeof EMPTY_FUNNEL_ANALYTICS,
       );

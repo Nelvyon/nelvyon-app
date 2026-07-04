@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { platformCollectAuthFailure } from "@/lib/platformBffRoute";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import {
@@ -45,6 +46,9 @@ export async function GET(req: Request) {
       proxyPlatformFetch(req, "GET", "/api/social-monitoring/dashboard"),
       proxyPlatformFetch(req, "GET", `/api/social-publish/analytics/${CLIENT_ID}`),
     ]);
+
+    const authDenied = platformCollectAuthFailure(schedulerRes, monitoringRes, publishRes);
+    if (authDenied) return authDenied;
 
     const scheduler = (await safeJson(schedulerRes, EMPTY_SOCIAL_SCHEDULER)) as typeof EMPTY_SOCIAL_SCHEDULER;
     const monitoring = (await safeJson(monitoringRes, EMPTY_SOCIAL_MONITORING)) as typeof EMPTY_SOCIAL_MONITORING;

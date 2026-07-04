@@ -36,8 +36,13 @@ export function GET(req: Request): NextResponse {
 
 /** POST — inbound messages and status updates from Meta */
 export async function POST(req: Request): Promise<NextResponse> {
-  // Optional HMAC signature verification
   const appSecret = process.env.META_WA_APP_SECRET?.trim();
+  const isProd = process.env.NODE_ENV === "production";
+
+  if (isProd && !appSecret) {
+    return NextResponse.json({ error: "META_WA_APP_SECRET required in production" }, { status: 503 });
+  }
+
   if (appSecret) {
     const signature = req.headers.get("x-hub-signature-256") ?? "";
     const rawBody = await req.text();
@@ -51,6 +56,10 @@ export async function POST(req: Request): Promise<NextResponse> {
       return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     }
     return processWebhookBody(body);
+  }
+
+  if (isProd) {
+    return NextResponse.json({ error: "META_WA_APP_SECRET required for webhook verification" }, { status: 401 });
   }
 
   let body: unknown;
@@ -85,8 +94,13 @@ async function processWebhookBody(body: unknown): Promise<NextResponse> {
     return NextResponse.json({ ok: true });
   }
 
+  const tenantId = process.env.DEFAULT_TENANT_ID?.trim();
+  if (!tenantId) {
+    console.error("[webhooks/whatsapp] DEFAULT_TENANT_ID not configured — skipping inbound messages");
+    return NextResponse.json({ ok: true, skipped: true });
+  }
+
   const svc = getSaasWhatsAppCloudService();
-  const TENANT_ID = process.env.DEFAULT_TENANT_ID ?? "default";
 
   for (const entry of payload.entry ?? []) {
     for (const change of entry.changes ?? []) {
@@ -100,7 +114,7 @@ async function processWebhookBody(body: unknown): Promise<NextResponse> {
           body: msg.text.body,
           timestamp: parseInt(msg.timestamp ?? "0", 10),
         };
-        await svc.processInbound(TENANT_ID, inbound).catch(() => null);
+        await svc.processInbound(tenantId, inbound).catch(() => null);
       }
     }
   }

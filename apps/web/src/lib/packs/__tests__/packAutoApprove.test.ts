@@ -82,6 +82,7 @@ import type { GrowthPackRunConfig } from "@/lib/packs/packOrchestrator";
 import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import type { GrowthPackIntakeBase, PackReport } from "@/lib/packs/types";
 import { LOCAL_GROWTH_PACK_ID } from "@/lib/packs/types";
+import { runVisualQa } from "../../../../../../backend/autonomous/qa/visualQaEngine";
 
 type TestIntake = GrowthPackIntakeBase & { sector: string };
 
@@ -179,7 +180,23 @@ describe("packOrchestrator — auto-approve", () => {
     expect(completedCall).toBeDefined();
   });
 
-  it("status = completed cuando QA ≥ 85 aunque gate/shield/truth requieran revisión suave", async () => {
+  it("status = needs_review cuando softReview (legal fail) aunque QA numérico ≥ 85", async () => {
+    vi.mocked(runVisualQa).mockReturnValueOnce({
+      score: 95,
+      legal_passed: false,
+      checks: {
+        structural_score: 90,
+        contrast_score: 95,
+        legal_score: 0,
+        has_h1: true,
+        has_cta: true,
+        has_meta_description: true,
+        contrast_ratio: 4.5,
+        contrast_passes_aa: true,
+        prohibited_terms: ["garantizado"],
+      },
+    });
+
     mockSimulate.mockReturnValueOnce({
       project: { qa: { score: 90, passed: true }, project_id: "proj-gate", sku: "NELVYON-LANDING", artifacts: {}, os_refs: {} },
       escalated: false,
@@ -189,13 +206,13 @@ describe("packOrchestrator — auto-approve", () => {
 
     await runGrowthPack({ workspaceId: 1, userId: "user-1", config: makeConfig() });
 
-    const completedCall = (mockUpdatePackRun.mock.calls as unknown[][]).find(
+    const reviewCall = (mockUpdatePackRun.mock.calls as unknown[][]).find(
       (args) => {
         const patch = args[1] as Record<string, unknown>;
-        return patch.status === "completed";
+        return patch.status === "needs_review";
       },
     );
-    expect(completedCall).toBeDefined();
+    expect(reviewCall).toBeDefined();
   });
 
   it("status = needs_review y sin auto-approve cuando QA < 85", async () => {

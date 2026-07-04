@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { requirePlatformAdmin } from "@/lib/platformBffAuth";
 import {
   getOsRecurringServicesService,
   getOsRecurringRunLogService,
@@ -13,7 +13,7 @@ export const runtime = "nodejs";
  * tenant (platform admin). Idempotent: already-generated services are logged skipped.
  */
 export async function POST(req: Request) {
-  const claims = await requirePlatformClaims(req);
+  const claims = await requirePlatformAdmin(req);
   if (claims instanceof NextResponse) return claims;
 
   try {

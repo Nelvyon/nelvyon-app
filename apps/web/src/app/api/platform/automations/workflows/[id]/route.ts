@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { authenticatePlatformRequest, readJsonBody } from "@/lib/platformBffRoute";
+import { authenticatePlatformRequest, platformUpstreamAuthResponse, readJsonBody } from "@/lib/platformBffRoute";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { EMPTY_WORKFLOW, automationsBffGet } from "@/lib/automationsBffRoute";
 
@@ -35,6 +35,8 @@ export async function PUT(req: Request, ctx: RouteCtx) {
     if (upstream.ok) {
       return NextResponse.json(text ? JSON.parse(text) : {});
     }
+    const authRes = platformUpstreamAuthResponse(upstream);
+    if (authRes) return authRes;
     try {
       return NextResponse.json(JSON.parse(text), { status: upstream.status });
     } catch {

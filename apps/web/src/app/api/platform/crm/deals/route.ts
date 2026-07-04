@@ -9,6 +9,7 @@ import {
   dbListDeals,
   dbResolveWorkspaceId,
   platformDbFallbackEnabled,
+  platformWorkspaceDeniedResponse,
 } from "@/lib/platformDbFallback";
 import { OsAgentError } from "@nelvyon/os-agents";
 
@@ -41,7 +42,9 @@ async function createDealViaDb(
     if (workspaceId <= 0) return null;
     const created = await dbCreateDeal(workspaceId, claims.userId, body);
     return NextResponse.json(created, { status: 201 });
-  } catch {
+  } catch (e) {
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     return null;
   }
 }
@@ -56,15 +59,19 @@ export async function GET(req: Request) {
     }
     return NextResponse.json(EMPTY_DEALS);
   }
-  if (claims instanceof NextResponse) {
-    return NextResponse.json(EMPTY_DEALS);
-  }
+  if (claims instanceof NextResponse) return claims;
 
   try {
     const upstream = await proxyPlatformFetch(req, "GET", UPSTREAM);
 
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
+    }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (upstream.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
@@ -81,6 +88,8 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     if (platformDbFallbackEnabled()) {
       try {
         const workspaceId = await dbResolveWorkspaceId(req, claims);
@@ -89,8 +98,9 @@ export async function GET(req: Request) {
             await dbListDeals(workspaceId, claims.userId, parseClientId(req)),
           );
         }
-      } catch {
-        /* fall through */
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
       }
     }
     return NextResponse.json(EMPTY_DEALS);

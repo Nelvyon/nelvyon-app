@@ -7,8 +7,23 @@ import type { ContactStatus, PipelineStage } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
+import { isSesEnvConfigured } from "./saasEnv";
 
 const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
+
+export type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
+export type CampaniaChannel = "email" | "sms" | "notification" | "multi";
+export type RecipientStatus = "pending" | "sent" | "opened" | "clicked" | "bounced" | "unsubscribed";
+
+export class SaasCampaniasError extends Error {
+  constructor(
+    message: string,
+    public readonly code: "NOT_FOUND" | "VALIDATION" | "CONSTRAINT" | "FORBIDDEN",
+  ) {
+    super(message);
+    this.name = "SaasCampaniasError";
+  }
+}
 
 function stripHtmlForSms(html: string): string {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 1600);
@@ -20,6 +35,12 @@ async function sendCampaniaEmail(
   html: string,
   meta?: { campaniaId: string; contactId: string; tenantId: string },
 ): Promise<"sent" | "bounced"> {
+  if (!isSesEnvConfigured()) {
+    throw new SaasCampaniasError(
+      "SES not configured. Set SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, SES_FROM_EMAIL.",
+      "FORBIDDEN",
+    );
+  }
   try {
     const client = getSesClient();
     await client.send(
@@ -45,9 +66,14 @@ async function sendCampaniaEmail(
   }
 }
 
-export type CampaniaStatus = "draft" | "scheduled" | "running" | "paused" | "completed" | "cancelled";
-export type CampaniaChannel = "email" | "sms" | "notification" | "multi";
-export type RecipientStatus = "pending" | "sent" | "opened" | "clicked" | "bounced" | "unsubscribed";
+function assertCampaniaChannelReady(channel: CampaniaChannel): void {
+  if (channel === "email" && !isSesEnvConfigured()) {
+    throw new SaasCampaniasError(
+      "SES not configured. Set SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, SES_FROM_EMAIL.",
+      "FORBIDDEN",
+    );
+  }
+}
 
 export type AudienceFilter = {
   status?: ContactStatus;
@@ -107,16 +133,6 @@ export interface CampaniaLaunchResult {
   campaniaId: string;
   totalSent: number;
   status: CampaniaStatus;
-}
-
-export class SaasCampaniasError extends Error {
-  constructor(
-    message: string,
-    public readonly code: "NOT_FOUND" | "VALIDATION" | "CONSTRAINT" | "FORBIDDEN",
-  ) {
-    super(message);
-    this.name = "SaasCampaniasError";
-  }
 }
 
 type CampaniaRow = {
@@ -440,6 +456,17 @@ export class SaasCampaniasService {
     const campania = await this.getCampania(tenantId, campaniaId);
     if (!campania) throw new SaasCampaniasError("Campania not found", "NOT_FOUND");
     if (campania.status === "completed") throw new SaasCampaniasError("Campania already completed", "VALIDATION");
+    assertCampaniaChannelReady(campania.channel);
+    if (campania.channel === "multi") {
+      const { getSaasSmsService } = await import("./SaasSmsService");
+      const smsConfigured = getSaasSmsService().getStatus().configured;
+      if (!isSesEnvConfigured() && !smsConfigured) {
+        throw new SaasCampaniasError(
+          "Multi channel requires SES and/or Twilio. Configure at least one before launch.",
+          "FORBIDDEN",
+        );
+      }
+    }
     const contactIds = await this.resolveAudience(tenantId, campania.audienceFilter);
 
     if (campania.channel === "email") {
@@ -504,7 +531,8 @@ export class SaasCampaniasService {
              </p>`;
         }
 
-        const unsubscribeUrl = `${appUrl}/api/saas/campanias/unsubscribe?cid=${encodeURIComponent(campaniaId)}&rid=${encodeURIComponent(contactId)}&tid=${encodeURIComponent(tenantId)}`;
+        const unsubToken = signTrackingToken({ tid: tenantId, cid: campaniaId, rid: contactId, t: "u" });
+        const unsubscribeUrl = `${appUrl}/api/saas/campanias/unsubscribe?token=${encodeURIComponent(unsubToken)}`;
         return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a;">
 ${campania.body}
 ${ctaBlock}
@@ -624,7 +652,7 @@ ${ctaBlock}
         const contact = byId.get(contactId);
         let delivered = false;
 
-        if (contact?.email?.trim()) {
+        if (contact?.email?.trim() && isSesEnvConfigured()) {
           const openToken = signTrackingToken({ tid: tenantId, cid: campaniaId, rid: contactId, t: "o" });
           const pixelUrl = `${appUrl}/api/track/email/open/${openToken}`;
           const html = `<div style="font-family:Arial,sans-serif;padding:24px;">${campania.body}

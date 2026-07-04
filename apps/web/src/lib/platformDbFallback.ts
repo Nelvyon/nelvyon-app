@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 import { DbClient } from "../../../../backend/db/DbClient";
 import type { JwtPayload } from "@nelvyon/auth";
 import type { WorkspaceRow } from "@/features/workspace/types";
@@ -10,11 +12,39 @@ export function platformDbFallbackEnabled(): boolean {
   return Boolean(process.env.DATABASE_URL?.trim());
 }
 
-function parseWorkspaceHeader(req: Request): number | null {
+export function parseWorkspaceHeader(req: Request): number | null {
   const raw = req.headers.get("x-workspace-id")?.trim();
   if (!raw) return null;
   const n = Number(raw);
   return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+/** Require X-Workspace-Id and verify the authenticated user can access it. */
+export async function requirePlatformWorkspace(
+  req: Request,
+  claims: JwtPayload,
+): Promise<number | NextResponse> {
+  const workspaceId = parseWorkspaceHeader(req);
+  if (!workspaceId) {
+    return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+  }
+  try {
+    await assertUserCanAccessWorkspace(claims, workspaceId);
+  } catch (e) {
+    if (e instanceof WorkspaceAccessError) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    throw e;
+  }
+  return workspaceId;
+}
+
+/** Map workspace IDOR failures to 403 for platform BFF DB fallback paths. */
+export function platformWorkspaceDeniedResponse(e: unknown): NextResponse | null {
+  if (e instanceof WorkspaceAccessError) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return null;
 }
 
 async function countMembers(workspaceId: number): Promise<number> {
@@ -115,9 +145,47 @@ export async function dbCreateWorkspace(
   return mapWorkspaceRow(ws, "owner", 0);
 }
 
+export class WorkspaceAccessError extends Error {
+  constructor(public readonly workspaceId: number) {
+    super("Workspace access denied");
+    this.name = "WorkspaceAccessError";
+  }
+}
+
+async function userCanAccessWorkspace(userId: string, workspaceId: number): Promise<boolean> {
+  const owned = await db().query<{ id: number }>(
+    `SELECT id FROM workspaces
+     WHERE id = $1 AND user_id = $2 AND (status = 'active' OR status IS NULL)
+     LIMIT 1`,
+    [workspaceId, userId],
+  );
+  if (owned[0]) return true;
+
+  const member = await db().query<{ id: number }>(
+    `SELECT wm.id FROM workspace_members wm
+     JOIN workspaces w ON w.id = wm.workspace_id
+     WHERE wm.workspace_id = $1 AND wm.user_id = $2 AND wm.status = 'active'
+       AND (w.status = 'active' OR w.status IS NULL)
+     LIMIT 1`,
+    [workspaceId, userId],
+  );
+  return Boolean(member[0]);
+}
+
+export async function assertUserCanAccessWorkspace(
+  claims: JwtPayload,
+  workspaceId: number,
+): Promise<void> {
+  const ok = await userCanAccessWorkspace(claims.userId, workspaceId);
+  if (!ok) throw new WorkspaceAccessError(workspaceId);
+}
+
 export async function dbResolveWorkspaceId(req: Request, claims: JwtPayload): Promise<number> {
   const fromHeader = parseWorkspaceHeader(req);
-  if (fromHeader) return fromHeader;
+  if (fromHeader) {
+    await assertUserCanAccessWorkspace(claims, fromHeader);
+    return fromHeader;
+  }
   const list = await dbListWorkspaces(claims);
   return list[0]?.id ?? 0;
 }

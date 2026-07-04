@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { CancellationService } from "../billing/cancellationService";
 import { DunningService, resolveTenantIdFromUserId } from "../billing/dunningService";
 import { mapStripePriceToNelvyon } from "./stripeApi";
-import { mapBillablePlanToSaasPlan } from "../saas/saasTenantMapper";
+import { mapBillablePlanToSaasPlan, shouldSyncSaasTenantPlan } from "../saas/saasTenantMapper";
 import type { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
 import { completeStep } from "../onboarding";
@@ -38,15 +38,24 @@ function priceIdFromSubscription(sub: Stripe.Subscription): string {
   return price?.id ?? "";
 }
 
-export async function handleStripeWebhook(rawBody: string, signatureHeader: string, db: DbClient): Promise<void> {
-  const event = verifyStripeWebhook(rawBody, signatureHeader);
+function logStripeEvent(event: Stripe.Event, detail: Record<string, unknown>): void {
+  console.error(
+    `[stripe-webhook] ${event.type}`,
+    JSON.stringify({ eventId: event.id, ...detail }),
+  );
+}
+
+export async function processStripeEvent(event: Stripe.Event, db: DbClient): Promise<void> {
   const dunning = DunningService.getInstance();
 
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.user_id ?? session.client_reference_id;
-      if (!userId) return;
+      if (!userId) {
+        logStripeEvent(event, { skipped: "missing_user_id" });
+        return;
+      }
 
       const subscriptionId =
         typeof session.subscription === "string" ? session.subscription : session.subscription?.id ?? null;
@@ -56,12 +65,14 @@ export async function handleStripeWebhook(rawBody: string, signatureHeader: stri
       let plan = "starter";
       let periodEnd: Date | null = null;
       let cancelAtPeriodEnd = false;
+      let status = "active";
 
       if (subscriptionId) {
         const sub = await getStripe().subscriptions.retrieve(subscriptionId);
         plan = mapStripePriceToNelvyon(priceIdFromSubscription(sub));
         periodEnd = periodEndFromSubscription(sub);
         cancelAtPeriodEnd = sub.cancel_at_period_end === true;
+        status = mapStripeStatus(sub.status);
       }
 
       const wasSuspended = await isTenantSuspended(db, userId);
@@ -72,9 +83,10 @@ export async function handleStripeWebhook(rawBody: string, signatureHeader: stri
         plan,
         periodEnd,
         cancelAtPeriodEnd,
+        status,
       });
 
-      const tenantId = await resolveTenantIdFromUserId(db, userId);
+      const tenantId = session.metadata?.tenant_id ?? (await resolveTenantIdFromUserId(db, userId));
       if (wasSuspended && tenantId && subscriptionId) {
         await dunning.handleReactivation(tenantId, subscriptionId);
       } else {
@@ -91,16 +103,22 @@ export async function handleStripeWebhook(rawBody: string, signatureHeader: stri
           session.id,
         );
       }
+
+      logStripeEvent(event, { userId, plan, subscriptionId, customerId, tenantId });
       break;
     }
     case "customer.subscription.created":
     case "customer.subscription.updated": {
       const sub = event.data.object as Stripe.Subscription;
       const userId = sub.metadata?.user_id;
-      if (!userId) return;
+      if (!userId) {
+        logStripeEvent(event, { skipped: "missing_user_id" });
+        return;
+      }
 
       const plan = mapStripePriceToNelvyon(priceIdFromSubscription(sub));
       const periodEnd = periodEndFromSubscription(sub);
+      const status = mapStripeStatus(sub.status);
       const wasSuspended = await isTenantSuspended(db, userId);
 
       await upsertSubscription(db, {
@@ -110,21 +128,26 @@ export async function handleStripeWebhook(rawBody: string, signatureHeader: stri
         plan,
         periodEnd,
         cancelAtPeriodEnd: sub.cancel_at_period_end === true,
-        status: mapStripeStatus(sub.status),
+        status,
       });
 
-      const tenantId = await resolveTenantIdFromUserId(db, userId);
+      const tenantId = sub.metadata?.tenant_id ?? (await resolveTenantIdFromUserId(db, userId));
       if (wasSuspended && tenantId) {
         await dunning.handleReactivation(tenantId, sub.id);
       } else if (event.type === "customer.subscription.created") {
         await notifyPlanActivated(db, userId, plan, periodEnd);
       }
+
+      logStripeEvent(event, { userId, plan, status, subscriptionId: sub.id, tenantId });
       break;
     }
     case "customer.subscription.deleted": {
       const sub = event.data.object as Stripe.Subscription;
       const userId = sub.metadata?.user_id;
-      if (!userId) return;
+      if (!userId) {
+        logStripeEvent(event, { skipped: "missing_user_id" });
+        return;
+      }
 
       const tenantId = await resolveTenantIdFromUserId(db, userId);
       const subStatus = await getSubscriptionStatus(db, userId);
@@ -132,6 +155,7 @@ export async function handleStripeWebhook(rawBody: string, signatureHeader: stri
         if (tenantId) {
           await dunning.handleSuspension(tenantId, sub.id);
         }
+        logStripeEvent(event, { userId, action: "suspension", tenantId });
         break;
       }
 
@@ -139,10 +163,12 @@ export async function handleStripeWebhook(rawBody: string, signatureHeader: stri
       const voluntary = await cancellation.isVoluntaryCancellationPending(userId);
       if (voluntary) {
         await cancellation.processCancellation(userId);
+        logStripeEvent(event, { userId, action: "voluntary_cancel" });
         break;
       }
 
       await db.query(`UPDATE subscriptions SET status='canceled', updated_at=now() WHERE user_id::text=$1`, [userId]);
+      await downgradeSaasTenantPlan(db, userId);
       const email = await getUserEmail(db, userId);
       const periodEnd = periodEndFromSubscription(sub);
       if (email) {
@@ -152,28 +178,90 @@ export async function handleStripeWebhook(rawBody: string, signatureHeader: stri
           appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
         });
       }
+      logStripeEvent(event, { userId, action: "canceled" });
+      break;
+    }
+    case "invoice.paid": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const subRaw = invoice.subscription;
+      const subscriptionId = typeof subRaw === "string" ? subRaw : subRaw?.id ?? "";
+      if (!subscriptionId) {
+        logStripeEvent(event, { skipped: "no_subscription" });
+        return;
+      }
+
+      const sub = await getStripe().subscriptions.retrieve(subscriptionId);
+      const userId = sub.metadata?.user_id;
+      if (!userId) {
+        logStripeEvent(event, { skipped: "missing_user_id", subscriptionId });
+        return;
+      }
+
+      const plan = mapStripePriceToNelvyon(priceIdFromSubscription(sub));
+      const status = mapStripeStatus(sub.status);
+      const tenantId = sub.metadata?.tenant_id ?? (await resolveTenantIdFromUserId(db, userId));
+      const wasPastDue = (await getSubscriptionStatus(db, userId)) === "past_due";
+
+      await upsertSubscription(db, {
+        userId,
+        stripeSubscriptionId: sub.id,
+        stripeCustomerId: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
+        plan,
+        periodEnd: periodEndFromSubscription(sub),
+        cancelAtPeriodEnd: sub.cancel_at_period_end === true,
+        status,
+      });
+
+      if (wasPastDue && tenantId) {
+        await dunning.handleReactivation(tenantId, sub.id);
+      }
+
+      logStripeEvent(event, { userId, plan, status, subscriptionId, invoiceId: invoice.id, tenantId });
       break;
     }
     case "invoice.payment_failed": {
       const invoice = event.data.object as Stripe.Invoice;
       const subRaw = invoice.subscription;
       const subscriptionId = typeof subRaw === "string" ? subRaw : subRaw?.id ?? "";
-      if (!subscriptionId) return;
+      if (!subscriptionId) {
+        logStripeEvent(event, { skipped: "no_subscription" });
+        return;
+      }
 
       const sub = await getStripe().subscriptions.retrieve(subscriptionId);
       const userId = sub.metadata?.user_id;
-      if (!userId) return;
+      if (!userId) {
+        logStripeEvent(event, { skipped: "missing_user_id", subscriptionId });
+        return;
+      }
+
+      await upsertSubscription(db, {
+        userId,
+        stripeSubscriptionId: sub.id,
+        stripeCustomerId: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
+        plan: mapStripePriceToNelvyon(priceIdFromSubscription(sub)),
+        periodEnd: periodEndFromSubscription(sub),
+        cancelAtPeriodEnd: sub.cancel_at_period_end === true,
+        status: "past_due",
+      });
 
       const tenantId = await resolveTenantIdFromUserId(db, userId);
       const attemptNumber = invoice.attempt_count ?? 1;
       if (tenantId) {
         await dunning.handlePaymentFailed(tenantId, subscriptionId, attemptNumber, event.id);
       }
+
+      logStripeEvent(event, { userId, subscriptionId, attemptNumber, tenantId });
       break;
     }
     default:
       break;
   }
+}
+
+export async function handleStripeWebhook(rawBody: string, signatureHeader: string, db: DbClient): Promise<void> {
+  const event = verifyStripeWebhook(rawBody, signatureHeader);
+  await processStripeEvent(event, db);
 }
 
 function mapStripeStatus(status: Stripe.Subscription.Status): string {
@@ -196,6 +284,8 @@ async function upsertSubscription(
     status?: string;
   },
 ): Promise<void> {
+  const status = opts.status ?? "active";
+
   await db.query(
     `INSERT INTO subscriptions
        (user_id, stripe_subscription_id, stripe_customer_id,
@@ -214,21 +304,27 @@ async function upsertSubscription(
       opts.stripeSubscriptionId,
       opts.stripeCustomerId,
       opts.plan,
-      opts.status ?? "active",
+      status,
       opts.periodEnd,
       opts.cancelAtPeriodEnd,
     ],
   );
+
+  if (!shouldSyncSaasTenantPlan(status)) {
+    return;
+  }
+
   await db.query(`UPDATE nelvyon_users SET plan = $2, updated_at = now() WHERE user_id = $1`, [
     opts.userId,
     opts.plan,
   ]);
-  // Sync plan to saas_tenants so quota checks (saasPlanQuota.ts) see the new plan immediately
+
   const saasPlan = mapBillablePlanToSaasPlan(opts.plan);
-  await db.query(
-    `UPDATE saas_tenants SET plan = $2, updated_at = now() WHERE user_id = $1`,
-    [opts.userId, saasPlan],
-  );
+  await db.query(`UPDATE saas_tenants SET plan = $2, updated_at = now() WHERE user_id = $1`, [
+    opts.userId,
+    saasPlan,
+  ]);
+
   try {
     const tenantRows = await db.query<{ id: string }>(
       `SELECT id FROM saas_tenants WHERE user_id = $1 LIMIT 1`,
@@ -242,6 +338,11 @@ async function upsertSubscription(
   } catch (err) {
     console.error("[stripe] grantFromPlan after plan sync failed:", err);
   }
+}
+
+async function downgradeSaasTenantPlan(db: DbClient, userId: string): Promise<void> {
+  await db.query(`UPDATE nelvyon_users SET plan = 'starter', updated_at = now() WHERE user_id = $1`, [userId]);
+  await db.query(`UPDATE saas_tenants SET plan = 'starter', updated_at = now() WHERE user_id = $1`, [userId]);
 }
 
 async function notifyPlanActivated(

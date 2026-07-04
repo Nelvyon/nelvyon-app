@@ -4,20 +4,7 @@ import {
   redirectIntegrationsError,
   redirectIntegrationsSuccess,
 } from "@/lib/integrations/oauthRedirect";
-
-export function parseOAuthState(state: string | null): { userId: string; ts: number } | null {
-  if (!state) return null;
-  try {
-    const parsed = JSON.parse(Buffer.from(state, "base64url").toString("utf8")) as {
-      userId?: string;
-      ts?: number;
-    };
-    if (!parsed.userId || typeof parsed.ts !== "number") return null;
-    return { userId: parsed.userId, ts: parsed.ts };
-  } catch {
-    return null;
-  }
-}
+export { createOAuthState, parseOAuthState } from "@/lib/integrations/oauthState";
 
 export async function finishOAuthCallback(
   origin: string,

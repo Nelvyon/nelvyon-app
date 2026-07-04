@@ -65,3 +65,15 @@ vi.mock("next/font/google", () => {
 });
 
 process.env.JWT_SECRET ??= "super-secret-key-min-32-chars-change-in-production";
+
+/** Fire-and-forget usage metering must not hit real DbClient in unit tests. */
+vi.mock("../../backend/saas/SaasUsageMeterService", () => ({
+  getSaasUsageMeterService: () => ({
+    increment: vi.fn().mockResolvedValue(undefined),
+    incrementWithSubcuentaMirror: vi.fn().mockResolvedValue(undefined),
+    getUsageSnapshot: vi.fn().mockResolvedValue({
+      usage: { contacts: 0, deals: 0, campanias: 0, workflows: 0, users: 0 },
+      limits: {},
+    }),
+  }),
+}));

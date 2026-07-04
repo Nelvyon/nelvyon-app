@@ -84,26 +84,12 @@ class InvoiceService:
             raise ValueError("workspace_id is required")
         self.session = session
         self.workspace_id = int(workspace_id)
-
     @staticmethod
-    async def ensure_schema() -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        if not db_manager.async_session_maker:
-            await db_manager.ensure_initialized()
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "invoices.sql"
-        if sql_path.exists() and db_manager.async_session_maker:
-            raw = sql_path.read_text(encoding="utf-8")
-            async with db_manager.async_session_maker() as session:
-                for stmt in [s.strip() for s in raw.split(";") if s.strip()]:
-                    try:
-                        await session.execute(text(stmt))
-                    except Exception as exc:
-                        if "already exists" not in str(exc).lower():
-                            logger.debug("invoices schema stmt skipped: %s", exc)
-                await session.commit()
-        _SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     @staticmethod
     def _normalize_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:

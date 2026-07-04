@@ -155,8 +155,8 @@ export class SaasWhatsAppService {
 
     // Update conversation last message
     await this.db.query(
-      `UPDATE conversations SET last_message=$1, last_message_at=NOW(), updated_at=NOW() WHERE id=$2`,
-      [input.body.slice(0, 120), conversationId],
+      `UPDATE conversations SET last_message=$1, last_message_at=NOW(), updated_at=NOW() WHERE id=$2 AND tenant_id=$3`,
+      [input.body.slice(0, 120), conversationId, tenantId],
     );
 
     if (!rows[0]) throw new SaasWhatsAppError("Failed to persist message", "DB_ERROR");

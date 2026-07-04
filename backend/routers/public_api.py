@@ -32,38 +32,8 @@ _SCHEMA_READY = False
 
 
 async def _ensure_public_schema() -> None:
-    global _SCHEMA_READY
-    if _SCHEMA_READY:
-        return
-    from pathlib import Path
-
-    from core.database import db_manager
-
-    if not db_manager.async_session_maker:
-        await db_manager.ensure_initialized()
-    if not db_manager.async_session_maker:
-        return
-    for name in ("api_keys.sql", "webhooks_public.sql"):
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / name
-        if not sql_path.is_file():
-            continue
-        raw = sql_path.read_text(encoding="utf-8")
-        async with db_manager.async_session_maker() as session:
-            bind = session.get_bind()
-            dialect = bind.dialect.name if bind is not None else "postgresql"
-            if dialect == "sqlite":
-                raw = raw.replace("JSONB", "TEXT").replace("::jsonb", "")
-                raw = raw.replace('CREATE EXTENSION IF NOT EXISTS "pgcrypto";', "")
-                raw = raw.replace("ADD COLUMN IF NOT EXISTS", "ADD COLUMN")
-            for stmt in raw.split(";"):
-                s = stmt.strip()
-                if s:
-                    try:
-                        await session.execute(text(s))
-                    except Exception:
-                        pass
-            await session.commit()
-    _SCHEMA_READY = True
+    """Schema owned by backend/db/migrations — no runtime DDL."""
+    return
 
 
 # ─── Schemas ──────────────────────────────────────────────────────────────────

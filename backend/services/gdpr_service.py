@@ -42,30 +42,12 @@ class GDPRService:
     @property
     def tenant_id(self) -> int:
         return self.workspace_id
-
     @staticmethod
-    async def ensure_schema() -> None:
-        global _GDPR_SCHEMA_READY
-        if _GDPR_SCHEMA_READY:
-            return
-        await TenantService.ensure_schema()
-        if not db_manager.async_session_maker:
-            await db_manager.ensure_initialized()
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "gdpr.sql"
-        if not sql_path.exists():
-            logger.warning("gdpr.sql not found at %s", sql_path)
-            return
-        raw = sql_path.read_text(encoding="utf-8")
-        statements = [s.strip() for s in raw.split(";") if s.strip()]
-        async with db_manager.async_session_maker() as session:
-            for stmt in statements:
-                try:
-                    await session.execute(text(stmt))
-                except Exception as exc:
-                    if "already exists" not in str(exc).lower():
-                        logger.debug("GDPR schema stmt skipped: %s", exc)
-            await session.commit()
-        _GDPR_SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     async def _resolve_subject_email(self, user_id: str) -> str | None:
         r = await self.session.execute(

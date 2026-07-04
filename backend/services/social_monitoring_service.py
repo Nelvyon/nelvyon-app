@@ -51,20 +51,12 @@ class SocialMonitoringService:
             raise ValueError("workspace_id is required")
         self.session = session
         self.workspace_id = int(workspace_id)
-
     @classmethod
-    async def ensure_schema(cls) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        from core.database import db_manager
+    async def ensure_schema(cls, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "social_monitoring.sql"
-        if sql_path.is_file():
-            async with db_manager.get_session() as session:
-                await session.execute(text(sql_path.read_text(encoding="utf-8")))
-                await session.commit()
-        _SCHEMA_READY = True
+
 
     async def create_alert(
         self,

@@ -50,47 +50,10 @@ class IntentDataService:
     def __init__(self, session: AsyncSession, workspace_id: int):
         self.session = session
         self.workspace_id = workspace_id
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS intent_events (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    lead_id TEXT NOT NULL,
-                    event_type TEXT NOT NULL,
-                    page TEXT,
-                    metadata_json TEXT NOT NULL DEFAULT '{}',
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS intent_scores (
-                    lead_id TEXT NOT NULL,
-                    workspace_id INTEGER NOT NULL,
-                    score INTEGER NOT NULL DEFAULT 0,
-                    tier TEXT NOT NULL DEFAULT 'cold',
-                    signals_json TEXT NOT NULL DEFAULT '[]',
-                    recommendation TEXT,
-                    lead_name TEXT,
-                    company TEXT,
-                    alerts_enabled INTEGER NOT NULL DEFAULT 1,
-                    last_updated TEXT DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (lead_id, workspace_id)
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def track_event(
         self,

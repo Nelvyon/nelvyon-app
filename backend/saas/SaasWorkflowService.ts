@@ -537,8 +537,8 @@ export class SaasWorkflowService {
           );
           stepsExecuted.push({ action: action.type, ok: true, to: toResolved });
           void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) =>
-            getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, "emailsSent"),
-          );
+            getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, "emailsSent").catch(() => undefined),
+          ).catch(() => undefined);
         } else if (action.type === "update_contact") {
           await this.crm.updateContact(tenantId, action.config.contactId, {
             name: (action.config.fields.name as string | undefined) ?? undefined,
@@ -635,8 +635,8 @@ export class SaasWorkflowService {
             stepsExecuted.push({ action: action.type, ok: result.ok, to: toResolved, sid: result.messageSid });
             if (result.ok) {
               void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) =>
-                getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, "smsSent"),
-              );
+                getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, "smsSent").catch(() => undefined),
+              ).catch(() => undefined);
             }
           } catch (e) {
             stepsExecuted.push({ action: action.type, ok: false, error: e instanceof Error ? e.message : String(e) });
@@ -738,8 +738,8 @@ export class SaasWorkflowService {
         [workflowId, tenantId],
       );
       void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) =>
-        getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, "workflowRuns"),
-      );
+        getSaasUsageMeterService().incrementWithSubcuentaMirror(tenantId, "workflowRuns").catch(() => undefined),
+      ).catch(() => undefined);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       await this.db.query(

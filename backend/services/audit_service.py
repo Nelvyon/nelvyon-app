@@ -44,12 +44,12 @@ class AuditService:
     def __init__(self, session: AsyncSession, tenant_id: int):
         self.session = session
         self.tenant_id = int(tenant_id)
-
     @staticmethod
-    async def ensure_schema() -> None:
-        await TenantService.ensure_schema()
-        global _SCHEMA_READY
-        _SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     async def _prepare_session(self) -> None:
         await self.ensure_schema()

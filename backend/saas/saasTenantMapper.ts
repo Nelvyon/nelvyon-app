@@ -37,6 +37,8 @@ export function mapBillablePlanToSaasPlan(billablePlanId: string): SaasPlan {
       return "enterprise";
     case "agency":
       return "enterprise";
+    case "agency_partner":
+      return "enterprise";
     case "partner":
       return "starter";
     default:

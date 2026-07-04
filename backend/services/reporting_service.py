@@ -85,23 +85,10 @@ class ReportingService:
     def __init__(self, session: AsyncSession, workspace_id: int):
         self.session = session
         self.workspace_id = int(workspace_id)
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        migration = Path(__file__).resolve().parent.parent / "migrations" / "report_schedules.sql"
-        if migration.is_file():
-            raw = migration.read_text(encoding="utf-8")
-            for stmt in raw.split(";"):
-                s = stmt.strip()
-                if s:
-                    try:
-                        await self.session.execute(text(s))
-                    except Exception as exc:
-                        logger.debug("report_schedules migration stmt skipped: %s", exc)
-            await self.session.commit()
-        _SCHEMA_READY = True
 
     async def generate_executive_report(
         self,

@@ -10,6 +10,14 @@ on:
       - "scripts/run-staging-p0-smokes.mjs"
       - "scripts/wait-staging-p0-deploy.mjs"
       - ".github/workflows/staging-smoke-p0.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/web/**"
+      - "scripts/staging-smoke*.mjs"
+      - "scripts/run-staging-p0-smokes.mjs"
+      - ".github/workflows/staging-smoke-p0.yml"
   workflow_dispatch:
 
 concurrency:
@@ -21,6 +29,8 @@ jobs:
     name: P0 smokes (staging)
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    # PRs: advisory only until staging matches branch; push main is blocking.
+    continue-on-error: ${{ github.event_name == 'pull_request' }}
 
     steps:
       - name: Checkout
@@ -42,3 +52,9 @@ jobs:
         env:
           STAGING_WEB_URL: https://nelvyon.com
         run: node scripts/run-staging-p0-smokes.mjs --skip-wait
+
+      - name: Stripe billing smoke (staging — requires deployed billing API)
+        continue-on-error: true
+        env:
+          STAGING_WEB_URL: https://nelvyon.com
+        run: node scripts/staging-smoke-stripe-billing.mjs

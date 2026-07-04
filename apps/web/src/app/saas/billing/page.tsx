@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -14,7 +14,11 @@ type BillingSummary = {
   role: string;
   limits: Record<string, number | null>;
   usage: Record<string, number>;
+  stripeConfigured?: boolean;
+  billingNote?: string;
 };
+
+type CheckoutNotice = "success" | "cancelled" | null;
 
 const PLANS = [
   { id: "starter", name: "Starter", price: 97, features: ["100 llamadas IA/mes", "3 sectores", "CRM + Email + Workflows"] },
@@ -37,31 +41,55 @@ const USAGE_LABELS: Record<string, string> = {
 
 export default function SaasBillingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<BillingSummary | null>(null);
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [portaling, setPortaling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [checkoutNotice, setCheckoutNotice] = useState<CheckoutNotice>(null);
+
+  const loadBilling = useCallback(async () => {
+    const res = await fetch("/api/saas/billing", { credentials: "same-origin" });
+    if (res.status === 401) {
+      router.replace("/auth/login?next=/saas/billing");
+      return null;
+    }
+    if (res.status === 403) {
+      setError("Tu rol no tiene acceso a facturación. Solo propietarios y administradores.");
+      return null;
+    }
+    if (!res.ok) throw new Error("No se pudo cargar la facturación");
+    const summary = (await res.json()) as BillingSummary;
+    setData(summary);
+    setError(null);
+    return summary;
+  }, [router]);
 
   useEffect(() => {
     void (async () => {
       try {
-        const res = await fetch("/api/saas/billing", { credentials: "same-origin" });
-        if (res.status === 401) { router.replace("/auth/login?next=/saas/billing"); return; }
-        if (res.status === 403) {
-          setError("Tu rol no tiene acceso a facturación. Solo propietarios y administradores.");
-          return;
-        }
-        if (!res.ok) throw new Error("No se pudo cargar la facturación");
-        setData((await res.json()) as BillingSummary);
+        await loadBilling();
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Error");
       } finally {
         setLoading(false);
       }
     })();
-  }, [router]);
+  }, [loadBilling]);
+
+  useEffect(() => {
+    const checkout = searchParams?.get("checkout");
+    if (checkout !== "success" && checkout !== "cancelled") return;
+
+    setCheckoutNotice(checkout);
+    router.replace("/saas/billing", { scroll: false });
+
+    if (checkout === "success") {
+      void loadBilling();
+    }
+  }, [searchParams, router, loadBilling]);
 
   async function handleUpgrade(planId: string) {
     setUpgrading(planId);
@@ -102,7 +130,10 @@ export default function SaasBillingPage() {
   }
 
   const activeId: SaasNavId = "billing";
-  const currentPlan = data?.tenant.plan ?? null;
+  /** saas_tenants.plan uses enterprise for agency; plan cards use starter/pro/agency ids */
+  const currentPlanRaw = data?.tenant.plan ?? null;
+  const currentPlan =
+    currentPlanRaw === "enterprise" ? "agency" : currentPlanRaw;
 
   return (
     <SaasShellLayout
@@ -126,6 +157,32 @@ export default function SaasBillingPage() {
         <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400 flex items-center justify-between gap-3">
           <span>{actionError}</span>
           <button onClick={() => setActionError(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
+        </div>
+      )}
+
+      {checkoutNotice === "success" && (
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-300 flex items-start justify-between gap-3">
+          <div>
+            <p className="font-medium text-emerald-200">Pago recibido en Stripe</p>
+            <p className="mt-1 text-emerald-300/80">
+              {data?.billingNote ??
+                "Tu plan se activará en unos segundos cuando Stripe confirme el webhook. Refresca si no ves el cambio."}
+            </p>
+          </div>
+          <button onClick={() => setCheckoutNotice(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
+        </div>
+      )}
+
+      {checkoutNotice === "cancelled" && (
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-300 flex items-center justify-between gap-3">
+          <span>Checkout cancelado. Tu plan actual no ha cambiado.</span>
+          <button onClick={() => setCheckoutNotice(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
+        </div>
+      )}
+
+      {!loading && !error && data && data.stripeConfigured === false && (
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-300">
+          {data.billingNote ?? "Stripe no está configurado en el servidor. Contacta soporte para activar checkout."}
         </div>
       )}
 

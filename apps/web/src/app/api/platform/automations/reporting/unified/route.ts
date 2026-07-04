@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { platformCollectAuthFailure } from "@/lib/platformBffRoute";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import {
@@ -43,6 +44,9 @@ export async function GET(req: Request) {
       proxyPlatformFetch(req, "GET", "/api/v1/automation/stats"),
       proxyPlatformFetch(req, "GET", "/api/v1/workflow-engine/executions"),
     ]);
+
+    const authDenied = platformCollectAuthFailure(workflowsRes, rulesRes, statsRes, executionsRes);
+    if (authDenied) return authDenied;
 
     const workflows = (await safeJson(workflowsRes, EMPTY_WORKFLOWS_LIST)) as typeof EMPTY_WORKFLOWS_LIST;
     const rules = (await safeJson(rulesRes, EMPTY_RULES_LIST)) as typeof EMPTY_RULES_LIST;

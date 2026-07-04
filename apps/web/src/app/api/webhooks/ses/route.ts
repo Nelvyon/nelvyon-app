@@ -107,7 +107,7 @@ async function handleBounce(db: ReturnType<typeof DbClient.getInstance>, notific
       `UPDATE saas_campanias SET updated_at = NOW() WHERE tenant_id = $1 AND id = $2`,
       [tenantId, campaniaId],
     );
-  } else {
+  } else if (process.env.NODE_ENV !== "production") {
     for (const email of emails) {
       await db.query(
         `UPDATE saas_campania_recipients scr SET status = 'bounced'
@@ -120,6 +120,25 @@ async function handleBounce(db: ReturnType<typeof DbClient.getInstance>, notific
 }
 
 async function handleComplaint(db: ReturnType<typeof DbClient.getInstance>, notification: SesNotification) {
+  const headers = notification.mail.headers ?? [];
+  const { campaniaId, contactId, tenantId } = extractIds(headers);
+
+  if (campaniaId && contactId && tenantId) {
+    await db.query(
+      `UPDATE saas_campania_recipients SET status = 'unsubscribed'
+       WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
+      [tenantId, campaniaId, contactId],
+    );
+    await db.query(
+      `UPDATE saas_contacts SET tags = array(SELECT DISTINCT unnest(tags || ARRAY['unsubscribed'])), updated_at = NOW()
+       WHERE tenant_id = $1 AND id = $2`,
+      [tenantId, contactId],
+    );
+    return;
+  }
+
+  if (process.env.NODE_ENV === "production") return;
+
   const emails = (notification.complaint?.complainedRecipients ?? []).map((r) => r.emailAddress);
   for (const email of emails) {
     // Mark unsubscribed in recipients

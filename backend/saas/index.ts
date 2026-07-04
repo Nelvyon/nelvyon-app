@@ -1305,6 +1305,7 @@ export {
   isSesEnvConfigured,
   isTwilioEnvConfigured,
   isStripeEnvConfigured,
+  isOpenAiEnvConfigured,
   isEnvKeysConfigured,
   missingEnvKeys,
 } from "./saasEnv";
@@ -1570,3 +1571,74 @@ export {
   resetSaasSocialProofServiceForTests,
   SaasSocialProofService,
 } from "./SaasSocialProofService";
+export {
+  getSaasPrivateAiService,
+  resetSaasPrivateAiServiceForTests,
+  SaasPrivateAiService,
+} from "./SaasPrivateAiService";
+export {
+  getPrivateAiRouter,
+  resetPrivateAiRouterForTests,
+  PrivateAiRouter,
+} from "../private-ai/PrivateAiRouter";
+export {
+  NELVYON_PRIVATE_AGENTS,
+  getPrivateAgent,
+  listPrivateAgents,
+  PILOT_AGENT_ID,
+} from "../private-ai/nelvyonAgentRegistry";
+export {
+  getGlobalPrivateAiConfig,
+  resetGlobalPrivateAiConfigForTests,
+  isPrivateAiOnlyEnv,
+  isNelvyonAiEnabled,
+  isLocalRuntimeConfigured,
+  isOpenClawBridgeEnabled,
+} from "../private-ai/config";
+export {
+  getProviderRegistry,
+  resetProviderRegistryForTests,
+  ProviderRegistry,
+} from "../private-ai/core/ProviderRegistry";
+export {
+  getAgentPermissionService,
+  AgentPermissionService,
+} from "../private-ai/agents/AgentPermissionService";
+export {
+  getTenantMemoryAdapter,
+  TenantMemoryAdapter,
+} from "../private-ai/memory/TenantMemoryAdapter";
+export {
+  getPrivateAiAuditService,
+  PrivateAiAuditService,
+} from "../private-ai/audit/PrivateAiAuditService";
+export {
+  getPrivateAiApprovalService,
+  PrivateAiApprovalService,
+} from "../private-ai/approvals/PrivateAiApprovalService";
+export {
+  getNelvyonRagStore,
+  NelvyonRagStore,
+} from "../private-ai/rag/NelvyonRagStore";
+export {
+  createOsLlmClientAdapter,
+  OsLlmClientAdapter,
+} from "../private-ai/adapters/OsLlmClientAdapter";
+export {
+  getOpenClawBridge,
+  resetOpenClawBridgeForTests,
+  setOpenClawBridgeForTests,
+  DisabledOpenClawBridge,
+  type IOpenClawBridge,
+} from "../private-ai/adapters/OpenClawBridge";
+export { PrivateAiOrchestrator } from "../private-ai/orchestrator/PrivateAiOrchestrator";
+export type {
+  AiMode,
+  PrivateAiSettings,
+  AgentRunResult,
+  NelvyonPrivateAgentDef,
+  SensitiveActionType,
+  PrivateAiPlatformStatus,
+  ProviderStatus,
+  LlmCompletionResult,
+} from "../private-ai/types";

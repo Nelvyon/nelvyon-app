@@ -8,7 +8,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const ctx = await requireSaasContext(req, "notifications.write");
     const { id } = await params;
-    const ok = await saasNotificationService.markRead(id, ctx.claims.userId);
+    const ok = await saasNotificationService.markRead(id, ctx.claims.userId, ctx.tenant.id);
     return NextResponse.json({ ok });
   } catch (e) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

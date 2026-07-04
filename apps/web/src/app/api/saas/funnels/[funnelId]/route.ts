@@ -36,7 +36,7 @@ export async function GET(req: Request, ctx: Ctx) {
     if (searchParams.get("resource") === "variants") {
       const stepId = searchParams.get("stepId") ?? "";
       if (!stepId) return NextResponse.json({ error: "stepId required" }, { status: 400 });
-      const variants = await getSaasFunnelService().listVariants(stepId);
+      const variants = await getSaasFunnelService().listVariants(saasCtx.tenant.id, stepId);
       return NextResponse.json({ variants });
     }
 
@@ -87,7 +87,7 @@ export async function POST(req: Request, ctx: Ctx) {
           ? (body.content as Record<string, unknown>) : {},
         weightPct: typeof body.weight_pct === "number" ? body.weight_pct : 50,
       };
-      const variant = await svc.createVariant(stepId, input);
+      const variant = await svc.createVariant(saasCtx.tenant.id, stepId, input);
       return NextResponse.json({ variant }, { status: 201 });
     }
 
@@ -95,7 +95,7 @@ export async function POST(req: Request, ctx: Ctx) {
       const variantId = typeof body.variant_id === "string" ? body.variant_id : "";
       if (!variantId) return NextResponse.json({ error: "variant_id required" }, { status: 400 });
       const weightPct = typeof body.weight_pct === "number" ? body.weight_pct : undefined;
-      const variant = await svc.updateVariant(variantId, { weightPct });
+      const variant = await svc.updateVariant(saasCtx.tenant.id, variantId, { weightPct });
       return NextResponse.json({ variant });
     }
 

@@ -269,7 +269,7 @@ export async function validateStripePriceForPlan(plan: BillablePlan): Promise<st
 
 export function mapStripePriceToNelvyon(priceId: string): string {
   const map: Record<string, string> = {};
-  for (const plan of ["starter", "pro", "agency"] as BillablePlan[]) {
+  for (const plan of ["starter", "pro", "agency", "agency_partner"] as BillablePlan[]) {
     try {
       map[getStripePriceId(plan)] = plan;
     } catch {
@@ -287,6 +287,7 @@ export async function createSubscriptionCheckoutSession(opts: {
   cancelUrl: string;
   couponId?: string | null;
   customerId?: string | null;
+  tenantId?: string | null;
 }): Promise<{ url: string | null; sessionId: string }> {
   const priceId = await validateStripePriceForPlan(opts.plan);
   const envDiagnostic = readStripePriceEnvDiagnostic(opts.plan);
@@ -302,6 +303,10 @@ export async function createSubscriptionCheckoutSession(opts: {
     customer_email: opts.customerId ? undefined : opts.email,
     customer: opts.customerId ?? undefined,
   };
+  if (opts.tenantId) {
+    body["metadata[tenant_id]"] = opts.tenantId;
+    body["subscription_data[metadata][tenant_id]"] = opts.tenantId;
+  }
   if (opts.couponId) {
     body["discounts[0][coupon]"] = opts.couponId;
   }

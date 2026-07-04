@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import { DbClient } from "../../../../../backend/db/DbClient";
 
 import type {
@@ -18,10 +15,12 @@ import {
   isStripeConnectConfigured,
 } from "@/lib/partners/partnerStripeConnect";
 
-let schemaReady = false;
-
 function db() {
   return DbClient.getInstance();
+}
+
+export async function ensurePartnerRebillingSchema(): Promise<void> {
+  /* Schema owned by migration 437_connect_rebilling.sql — no runtime DDL */
 }
 
 function mapAccount(row: Record<string, unknown>): PartnerStripeAccountRow {
@@ -52,68 +51,6 @@ function mapLedger(row: Record<string, unknown>): PartnerLedgerRow {
     description: row.description != null ? String(row.description) : null,
     created_at: String(row.created_at),
   };
-}
-
-export async function ensurePartnerRebillingSchema(): Promise<void> {
-  if (schemaReady) return;
-  const sqlPath = join(process.cwd(), "../../backend/migrations/partner_rebilling.sql");
-  let raw: string;
-  try {
-    raw = readFileSync(sqlPath, "utf8");
-  } catch {
-    raw = `
-      CREATE TABLE IF NOT EXISTS partner_stripe_accounts (
-        partner_workspace_id INTEGER PRIMARY KEY,
-        partner_user_id TEXT NOT NULL,
-        stripe_account_id TEXT NOT NULL UNIQUE,
-        onboarding_status TEXT NOT NULL DEFAULT 'pending',
-        charges_enabled BOOLEAN NOT NULL DEFAULT FALSE,
-        payouts_enabled BOOLEAN NOT NULL DEFAULT FALSE,
-        details_submitted BOOLEAN NOT NULL DEFAULT FALSE,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      );
-      CREATE TABLE IF NOT EXISTS partner_rebilling_ledger (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        partner_workspace_id INTEGER NOT NULL,
-        client_workspace_id INTEGER,
-        event_type TEXT NOT NULL,
-        stripe_event_id TEXT UNIQUE,
-        gross_eur NUMERIC(12, 2) NOT NULL DEFAULT 0,
-        wholesale_eur NUMERIC(12, 2) NOT NULL DEFAULT 0,
-        partner_margin_eur NUMERIC(12, 2) NOT NULL DEFAULT 0,
-        currency TEXT NOT NULL DEFAULT 'eur',
-        description TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      );
-      CREATE TABLE IF NOT EXISTS partner_client_billing (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        partner_workspace_id INT NOT NULL,
-        client_workspace_id INT NOT NULL,
-        retail_plan_id TEXT,
-        retail_pack_id TEXT,
-        stripe_customer_id TEXT,
-        stripe_subscription_id TEXT,
-        monthly_retail_eur NUMERIC(10, 2) NOT NULL DEFAULT 0,
-        monthly_wholesale_eur NUMERIC(10, 2) NOT NULL DEFAULT 0,
-        status TEXT NOT NULL DEFAULT 'active',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        UNIQUE (partner_workspace_id, client_workspace_id)
-      );
-    `;
-  }
-  for (const stmt of raw.split(";").map((s) => s.trim()).filter(Boolean)) {
-    try {
-      await db().query(stmt);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (!msg.toLowerCase().includes("already exists")) {
-        /* ignore extension/index races */
-      }
-    }
-  }
-  schemaReady = true;
 }
 
 export async function getPartnerStripeAccount(

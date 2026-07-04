@@ -8,6 +8,7 @@ import {
   dbResolveWorkspaceId,
   dbUpdateDeal,
   platformDbFallbackEnabled,
+  platformWorkspaceDeniedResponse,
 } from "@/lib/platformDbFallback";
 
 export const dynamic = "force-dynamic";
@@ -33,17 +34,30 @@ export async function GET(
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
     }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (upstream.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
       const workspaceId = await dbResolveWorkspaceId(req, claims);
       const deal = await dbGetDeal(dealId, workspaceId, claims.userId);
       if (deal) return NextResponse.json(deal);
     }
     return NextResponse.json({ error: "Not found" }, { status: 404 });
-  } catch {
+  } catch (e) {
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     if (platformDbFallbackEnabled()) {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      const deal = await dbGetDeal(dealId, workspaceId, claims.userId);
-      if (deal) return NextResponse.json(deal);
+      try {
+        const workspaceId = await dbResolveWorkspaceId(req, claims);
+        const deal = await dbGetDeal(dealId, workspaceId, claims.userId);
+        if (deal) return NextResponse.json(deal);
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
+      }
     }
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -87,11 +101,19 @@ export async function PUT(
     if (upstream.ok) {
       return NextResponse.json(text ? JSON.parse(text) : {});
     }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     if (upstreamFailed(upstream.status) && platformDbFallbackEnabled()) {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      const updated = await dbUpdateDeal(dealId, workspaceId, claims.userId, body);
-      if (updated) return NextResponse.json(updated);
+      try {
+        const workspaceId = await dbResolveWorkspaceId(req, claims);
+        const updated = await dbUpdateDeal(dealId, workspaceId, claims.userId, body);
+        if (updated) return NextResponse.json(updated);
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
+      }
     }
 
     try {
@@ -99,11 +121,18 @@ export async function PUT(
     } catch {
       return NextResponse.json({ error: "Update failed" }, { status: upstream.status >= 500 ? 503 : upstream.status });
     }
-  } catch {
+  } catch (e) {
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     if (platformDbFallbackEnabled()) {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      const updated = await dbUpdateDeal(dealId, workspaceId, claims.userId, body);
-      if (updated) return NextResponse.json(updated);
+      try {
+        const workspaceId = await dbResolveWorkspaceId(req, claims);
+        const updated = await dbUpdateDeal(dealId, workspaceId, claims.userId, body);
+        if (updated) return NextResponse.json(updated);
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
+      }
     }
     return NextResponse.json({ error: "Update failed" }, { status: 503 });
   }

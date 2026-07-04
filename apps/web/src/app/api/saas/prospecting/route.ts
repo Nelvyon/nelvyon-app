@@ -8,28 +8,18 @@ import {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function isProspectingConfigured(): boolean {
-  return Boolean(process.env.APOLLO_API_KEY?.trim());
-}
+const PROSPECTING_UNAVAILABLE = {
+  configured: false,
+  message:
+    "Prospección B2B vía Apollo no está operativa en este entorno. La integración se activará en un despliegue posterior.",
+  lists: [] as const,
+};
 
-/** GET /api/saas/prospecting — listas B2B (requiere APOLLO_API_KEY). */
+/** GET /api/saas/prospecting — listas B2B (requiere integración Apollo activa). */
 export async function GET(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
-    void ctx;
-
-    if (!isProspectingConfigured()) {
-      return NextResponse.json({
-        configured: false,
-        message: "Configura APOLLO_API_KEY en Railway para prospección B2B real.",
-        lists: [],
-      });
-    }
-
-    return NextResponse.json({
-      configured: true,
-      lists: [],
-    });
+    await requireSaasContext(req, "contacts.read");
+    return NextResponse.json(PROSPECTING_UNAVAILABLE, { status: 503 });
   } catch (err) {
     const status = saasErrorStatus(err);
     return NextResponse.json(saasErrorBody(err), { status });

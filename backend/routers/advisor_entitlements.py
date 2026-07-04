@@ -47,22 +47,9 @@ def _month_key_utc(now: datetime | None = None) -> str:
     return source.strftime("%Y-%m")
 
 
-async def _ensure_advisor_usage_table(db: AsyncSession) -> None:
-    await db.execute(
-        text(
-            """
-            CREATE TABLE IF NOT EXISTS advisor_session_usage (
-                workspace_id INTEGER NOT NULL,
-                month_key VARCHAR(7) NOT NULL,
-                used_sessions INTEGER NOT NULL DEFAULT 0,
-                created_at TIMESTAMP,
-                updated_at TIMESTAMP,
-                PRIMARY KEY (workspace_id, month_key)
-            )
-            """
-        )
-    )
-    await db.commit()
+async def _ensure_advisor_usage_table(db):  # noqa: ARG001
+    """Schema owned by migration 507 — no runtime DDL."""
+    return
 
 
 async def _get_month_usage(db: AsyncSession, workspace_id: int, month_key: str) -> int:

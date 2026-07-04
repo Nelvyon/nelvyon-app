@@ -61,14 +61,12 @@ class MarketplaceService:
     def __init__(self, session: AsyncSession, workspace_id: int | None = None):
         self.session = session
         self.workspace_id = int(workspace_id) if workspace_id is not None else None
-
     @staticmethod
-    async def ensure_schema() -> None:
-        await AffiliateService.ensure_schema()
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        _SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     async def list_agencies(
         self,

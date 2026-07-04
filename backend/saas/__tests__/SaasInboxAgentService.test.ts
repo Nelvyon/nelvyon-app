@@ -127,4 +127,46 @@ describe("SaasInboxAgentService", () => {
     expect(out.autoReplied).toBe(false);
     expect(inbox.replyToConversation).not.toHaveBeenCalled();
   });
+
+  it("handleInbound never auto-replies when suggestion is mock", async () => {
+    const db = {
+      query: vi.fn(async (sql: string) => {
+        if (sql.includes("saas_inbox_agent_settings")) {
+          return [
+            {
+              tenant_id: TENANT,
+              enabled: true,
+              auto_reply_enabled: true,
+              auto_reply_min_confidence: 0.5,
+              system_prompt: null,
+              escalate_keywords: [],
+              active_skill_ids: ["inbox_support"],
+              speak_responses: true,
+              updated_at: new Date(),
+            },
+          ];
+        }
+        if (sql.includes("INSERT INTO saas_inbox_agent_suggestions")) {
+          return [{ id: "sug-mock" }];
+        }
+        if (sql.includes("autonomy_mode") || sql.includes("saas_tenants")) {
+          return [{ autonomy_mode: "execute" }];
+        }
+        return [];
+      }),
+    };
+
+    const inbox = {
+      getConversation: vi.fn(async () => convRow),
+      listMessages: vi.fn(async () => [msgRow]),
+      replyToConversation: vi.fn(),
+    };
+
+    const svc = new SaasInboxAgentService({ db, inbox: inbox as never, llm: null });
+    const out = await svc.handleInbound(TENANT, "cv1", "hola precio pack");
+    expect(out.suggested?.mock).toBe(true);
+    expect(out.autoReplied).toBe(false);
+    expect(out.reason).toBe("llm_not_configured");
+    expect(inbox.replyToConversation).not.toHaveBeenCalled();
+  });
 });

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("../../email/sesClient", () => ({
   getSesClient: () => ({ send: vi.fn().mockResolvedValue({}) }),
@@ -128,6 +128,16 @@ function makeDb() {
 }
 
 describe("SaasCampaniasService deal audience", () => {
+  beforeEach(() => {
+    process.env.SES_ACCESS_KEY_ID = "test-key";
+    process.env.SES_SECRET_ACCESS_KEY = "test-secret";
+    process.env.SES_FROM_EMAIL = "noreply@test.com";
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("launchCampania filtra contactos por deal_stage proposal", async () => {
     const db = makeDb();
     const svc = new SaasCampaniasService(db);

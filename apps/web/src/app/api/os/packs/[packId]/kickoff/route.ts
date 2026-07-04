@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 
 import { getPackMeta } from "@/lib/packs/packRegistry";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
-import { platformDbFallbackEnabled } from "@/lib/platformDbFallback";
+import {
+  assertUserCanAccessWorkspace,
+  platformDbFallbackEnabled,
+  WorkspaceAccessError,
+} from "@/lib/platformDbFallback";
 import { RUNNERS } from "./runnersMap";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +45,15 @@ export async function POST(
   const workspaceId = parseWorkspaceId(req);
   if (!workspaceId) {
     return NextResponse.json({ error: "X-Workspace-Id header required" }, { status: 400 });
+  }
+
+  try {
+    await assertUserCanAccessWorkspace(claims, workspaceId);
+  } catch (e) {
+    if (e instanceof WorkspaceAccessError) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    throw e;
   }
 
   let body: unknown;

@@ -22,26 +22,12 @@ _MEMORY_CACHE: dict[str, dict[str, str]] = {}
 class AgentPromptService:
     def __init__(self, session: AsyncSession):
         self.session = session
-
     @staticmethod
-    async def ensure_schema() -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        if not db_manager.async_session_maker:
-            await db_manager.ensure_initialized()
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "os_agent_prompts.sql"
-        if sql_path.is_file() and db_manager.async_session_maker:
-            raw = sql_path.read_text(encoding="utf-8")
-            async with db_manager.async_session_maker() as session:
-                for stmt in [s.strip() for s in raw.split(";") if s.strip()]:
-                    try:
-                        await session.execute(text(stmt))
-                    except Exception as exc:
-                        if "already exists" not in str(exc).lower():
-                            logger.debug("os_agent_prompts schema skipped: %s", exc)
-                await session.commit()
-        _SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     async def get_prompt_payload(self, agent_id: str) -> dict[str, str]:
         """Return decrypted elite_role, mission, few_shot for an agent."""

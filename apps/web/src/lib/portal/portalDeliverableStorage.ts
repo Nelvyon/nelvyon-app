@@ -43,6 +43,9 @@ export async function resolveDeliverableDownloadUrl(params: {
     const cfg = supabaseConfig();
     const ttl = Math.max(60, Math.min(DEFAULT_SIGNED_URL_TTL_SEC, 3600));
     if (cfg.mock) {
+      if (process.env.NODE_ENV === "production") {
+        return null;
+      }
       const expiresAt = new Date(Date.now() + ttl * 1000).toISOString();
       return `https://mock.supabase.local/${OS_DELIVERABLES_BUCKET}/${key}?expires=${encodeURIComponent(expiresAt)}`;
     }

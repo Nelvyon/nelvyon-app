@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -35,6 +35,20 @@ export default function SaasCopywriterPage() {
   const [copies, setCopies] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<number | null>(null);
+  const [openaiConfigured, setOpenaiConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch("/api/saas/ai-copy", { credentials: "same-origin" });
+        if (!res.ok) return;
+        const data = (await res.json()) as { openai_configured?: boolean };
+        setOpenaiConfigured(data.openai_configured ?? false);
+      } catch {
+        setOpenaiConfigured(false);
+      }
+    })();
+  }, []);
 
   const selectedType = COPY_TYPES.find(t => t.id === type)!;
 
@@ -73,6 +87,13 @@ export default function SaasCopywriterPage() {
           title="Copywriter IA"
           subtitle="Genera textos de marketing persuasivos en segundos con IA"
         />
+
+        {openaiConfigured === false && (
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            OpenAI no está configurado (<code className="text-amber-100">OPENAI_API_KEY</code>).
+            La generación IA estará disponible cuando se configure en Railway.
+          </div>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-[1fr,1fr]">
           {/* Left: Config */}
@@ -125,7 +146,7 @@ export default function SaasCopywriterPage() {
 
                 {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">{error}</p>}
 
-                <NelvyonDsButton type="submit" disabled={loading || !context.trim()} className="w-full">
+                <NelvyonDsButton type="submit" disabled={loading || !context.trim() || openaiConfigured === false} className="w-full">
                   {loading ? "Generando con IA…" : `✨ Generar ${variations} variaciones`}
                 </NelvyonDsButton>
               </form>

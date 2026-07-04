@@ -36,33 +36,9 @@ ${companyName ? `<p>Nuestro equipo de <strong>${companyName}</strong> estará co
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-async function ensureSchema() {
-  const db = DbClient.getInstance();
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS saas_appointments (
-      id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      tenant_id         TEXT NOT NULL,
-      title             TEXT NOT NULL,
-      contact_name      TEXT NOT NULL,
-      contact_email     TEXT NOT NULL,
-      contact_phone     TEXT,
-      notes             TEXT,
-      status            TEXT NOT NULL DEFAULT 'scheduled',
-      start_at          TIMESTAMPTZ NOT NULL,
-      end_at            TIMESTAMPTZ NOT NULL,
-      duration_minutes  INTEGER NOT NULL DEFAULT 30,
-      assigned_to       TEXT,
-      meeting_url       TEXT,
-      created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-}
-
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "workflows.read");
-    await ensureSchema();
     const url = new URL(req.url);
     const limit = Math.min(parseInt(url.searchParams.get("limit") ?? "100"), 500);
     const db = DbClient.getInstance();
@@ -111,7 +87,6 @@ export async function POST(req: Request) {
     if (!body.title?.trim() || !body.contactEmail?.trim() || !body.startAt) {
       return NextResponse.json({ error: "title, contactEmail and startAt are required" }, { status: 400 });
     }
-    await ensureSchema();
     const db = DbClient.getInstance();
     const rows = await db.query(
       `INSERT INTO saas_appointments (

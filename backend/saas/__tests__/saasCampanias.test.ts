@@ -242,6 +242,12 @@ function makeDb() {
 }
 
 describe("SaasCampaniasService", () => {
+  beforeEach(() => {
+    process.env.SES_ACCESS_KEY_ID = "test-key";
+    process.env.SES_SECRET_ACCESS_KEY = "test-secret";
+    process.env.SES_FROM_EMAIL = "noreply@test.com";
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -433,6 +439,31 @@ describe("SaasCampaniasService", () => {
     const svc = new SaasCampaniasService(db);
     const c = await svc.createCampania("t1", { name: "SMS", body: "Hi", channel: "sms" });
     await expect(svc.launchCampania("t1", c.id)).rejects.toThrow(/Twilio not configured/);
+  });
+
+  it("launchCampania email falla si SES no configurado", async () => {
+    const saved = {
+      SES_ACCESS_KEY_ID: process.env.SES_ACCESS_KEY_ID,
+      SES_SECRET_ACCESS_KEY: process.env.SES_SECRET_ACCESS_KEY,
+      SES_FROM_EMAIL: process.env.SES_FROM_EMAIL,
+    };
+    delete process.env.SES_ACCESS_KEY_ID;
+    delete process.env.SES_SECRET_ACCESS_KEY;
+    delete process.env.SES_FROM_EMAIL;
+    try {
+      const db = makeDb();
+      db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "a@test.com", status: "lead", pipeline_stage: "new", tags: [] });
+      const svc = new SaasCampaniasService(db);
+      const c = await svc.createCampania("t1", { name: "Email", body: "Hi", channel: "email" });
+      await expect(svc.launchCampania("t1", c.id)).rejects.toThrow(/SES not configured/);
+    } finally {
+      if (saved.SES_ACCESS_KEY_ID !== undefined) process.env.SES_ACCESS_KEY_ID = saved.SES_ACCESS_KEY_ID;
+      else delete process.env.SES_ACCESS_KEY_ID;
+      if (saved.SES_SECRET_ACCESS_KEY !== undefined) process.env.SES_SECRET_ACCESS_KEY = saved.SES_SECRET_ACCESS_KEY;
+      else delete process.env.SES_SECRET_ACCESS_KEY;
+      if (saved.SES_FROM_EMAIL !== undefined) process.env.SES_FROM_EMAIL = saved.SES_FROM_EMAIL;
+      else delete process.env.SES_FROM_EMAIL;
+    }
   });
 });
 

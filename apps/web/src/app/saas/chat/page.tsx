@@ -29,7 +29,21 @@ export default function SaasChatPage() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [openaiConfigured, setOpenaiConfigured] = useState<boolean | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch("/api/saas/chat", { credentials: "same-origin" });
+        if (!res.ok) return;
+        const data = (await res.json()) as { openai_configured?: boolean };
+        setOpenaiConfigured(data.openai_configured ?? false);
+      } catch {
+        setOpenaiConfigured(false);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,6 +90,13 @@ export default function SaasChatPage() {
           title="Asistente IA"
           subtitle="Tu experto en marketing digital disponible 24/7"
         />
+
+        {openaiConfigured === false && (
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            OpenAI no está configurado en el servidor (<code className="text-amber-100">OPENAI_API_KEY</code>).
+            El chat estará disponible cuando el administrador active la integración.
+          </div>
+        )}
 
         {/* Messages */}
         <NelvyonDsCard className="flex flex-1 flex-col overflow-hidden p-0">
@@ -134,7 +155,7 @@ export default function SaasChatPage() {
                 rows={2}
                 className="flex-1 resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
               />
-              <NelvyonDsButton onClick={() => void send()} disabled={!input.trim() || loading} className="shrink-0">
+              <NelvyonDsButton onClick={() => void send()} disabled={!input.trim() || loading || openaiConfigured === false} className="shrink-0">
                 {loading ? "…" : "Enviar"}
               </NelvyonDsButton>
             </div>

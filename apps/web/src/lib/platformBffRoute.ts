@@ -20,6 +20,25 @@ export async function authenticatePlatformRequest(req: Request): Promise<NextRes
   }
 }
 
+export function platformUpstreamAuthResponse(upstream: Response): NextResponse | null {
+  if (upstream.status === 401) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (upstream.status === 403) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return null;
+}
+
+/** Return first 401/403 among parallel upstream responses. */
+export function platformCollectAuthFailure(...upstreams: Response[]): NextResponse | null {
+  for (const upstream of upstreams) {
+    const denied = platformUpstreamAuthResponse(upstream);
+    if (denied) return denied;
+  }
+  return null;
+}
+
 export async function forwardPlatformJson(
   req: Request,
   method: string,

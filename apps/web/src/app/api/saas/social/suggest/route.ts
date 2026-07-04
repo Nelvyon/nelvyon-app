@@ -39,11 +39,16 @@ export async function POST(req: NextRequest) {
       const draft = body.save
         ? await getSaasSocialProofService().createFromDeliverable(ctx.tenant.id, body)
         : buildDeliverableSocialProofPost(body);
-      return NextResponse.json({ draft, mock: !body.save });
+      return NextResponse.json({ draft, template: true });
     }
 
-    const draft = buildMockSocialPost({ topic: body.topic, platform: body.platform });
-    return NextResponse.json({ draft, mock: true });
+    const topic = body.topic?.trim();
+    if (!topic) {
+      return NextResponse.json({ error: "topic es obligatorio (o deliverableId/title)" }, { status: 400 });
+    }
+
+    const draft = buildMockSocialPost({ topic, platform: body.platform });
+    return NextResponse.json({ draft, template: true });
   } catch (e: unknown) {
     const status = (e as { status?: number }).status === 401 ? 401 : saasErrorStatus(e);
     return NextResponse.json(saasErrorBody(e), { status });

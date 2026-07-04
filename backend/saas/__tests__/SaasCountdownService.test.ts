@@ -81,9 +81,11 @@ describe("SaasCountdownService — delete", () => {
 });
 
 describe("SaasCountdownService — trackScan", () => {
-  it("calls UPDATE with increment", async () => {
+  it("calls UPDATE with increment scoped by tenant", async () => {
     const db = makeDb([[]]);
-    await new SaasCountdownService({ db }).trackScan("cd-1");
+    await new SaasCountdownService({ db }).trackScan(TENANT, "cd-1");
     expect(String(db.query.mock.calls[0][0])).toContain("scans = scans + 1");
+    expect(String(db.query.mock.calls[0][0])).toContain("tenant_id");
+    expect(db.query.mock.calls[0][1]).toEqual(["cd-1", TENANT]);
   });
 });

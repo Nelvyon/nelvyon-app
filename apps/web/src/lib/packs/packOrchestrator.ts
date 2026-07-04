@@ -46,17 +46,14 @@ const SKU_STEP_KEYS: Record<AutonomousSku, string> = {
   "NELVYON-CHATBOT": "sku_chatbot",
 };
 
-/** Portal hides client deliverables when metadata.qa_score < 85 in production. */
-function ensurePortalQaScore(score: number | undefined): number {
-  const n = score ?? 88;
-  return Math.max(85, n);
+/** Portal stores real QA scores — no inflation to pass auto-approve gates. */
+function deliverableQaScore(score: number | undefined): number {
+  return score ?? 0;
 }
 
 function avgSkuQaScore(results: SkuRunResult[]): number {
-  if (results.length === 0) return 88;
-  return ensurePortalQaScore(
-    Math.round(results.reduce((a, r) => a + r.qa_score, 0) / results.length),
-  );
+  if (results.length === 0) return 0;
+  return Math.round(results.reduce((a, r) => a + r.qa_score, 0) / results.length);
 }
 
 export function slugifyName(name: string): string {
@@ -317,7 +314,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
         ...mapped,
         metadata: {
           ...mapped.metadata,
-          qa_score: ensurePortalQaScore(Number(mapped.metadata.qa_score ?? qaScore)),
+          qa_score: deliverableQaScore(Number(mapped.metadata.qa_score ?? qaScore)),
           personalized_content: personalized ?? undefined,
           ...seedMeta,
         },
@@ -339,7 +336,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
           metadata: {
             pack_id: params.packId,
             sku: params.sku,
-            qa_score: ensurePortalQaScore(qaScore),
+            qa_score: deliverableQaScore(qaScore),
             artifact_value: d.value,
             autonomous_job_id: simulation.os_publish.autonomous_job_id,
             personalized_content: personalized ?? undefined,
@@ -367,7 +364,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
         metadata: {
           pack_id: params.packId,
           sku: params.sku,
-          qa_score: ensurePortalQaScore(qaScore),
+          qa_score: deliverableQaScore(qaScore),
           brief_summary: {
             business_name: params.intake.business_name,
             sector: params.intake.sector,
@@ -688,10 +685,11 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         r.shield_status === "blocked" ||
         r.truth_status === "blocked",
     );
-    const finalStatus = hardReview ? "needs_review" : "completed";
-    steps = markStep(steps, "complete", hardReview ? "skipped" : "done");
+    const needsReview = hardReview || softReview;
+    const finalStatus = needsReview ? "needs_review" : "completed";
+    steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
 
-    if (hardReview || softReview) {
+    if (needsReview) {
       try {
         const { getOsQaReviewQueueService } = await import("@nelvyon/saas");
         await getOsQaReviewQueueService().enqueue({

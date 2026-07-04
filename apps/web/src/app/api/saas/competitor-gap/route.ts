@@ -16,7 +16,7 @@ export async function GET(req: Request) {
        WHERE tenant_id = $1::uuid
        ORDER BY started_at DESC LIMIT 5`,
       [ctx.tenant.id],
-    ).catch(() => [] as Record<string, unknown>[]);
+    );
 
     const latest = runs[0];
     return NextResponse.json({

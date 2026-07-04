@@ -2,6 +2,7 @@ import type { SaasTenant } from "./SaasOnboardingService";
 import { getSaasPlanLimits, type SaasPlanLimits } from "./saasPlanLimits";
 import { getSaasPlanQuotaService } from "./SaasPlanQuotaService";
 import { listPermissionsForRole, type SaasRole } from "./saasRbac";
+import { isStripeEnvConfigured } from "./saasEnv";
 
 export type SaasUsageCounts = {
   contacts: number;
@@ -17,10 +18,13 @@ export type SaasBillingSummary = {
   permissions: ReturnType<typeof listPermissionsForRole>;
   limits: SaasPlanLimits;
   usage: SaasUsageCounts;
+  stripeConfigured: boolean;
+  billingNote: string;
 };
 
 export async function buildSaasBillingSummary(tenant: SaasTenant, role: SaasRole): Promise<SaasBillingSummary> {
   const snapshot = await getSaasPlanQuotaService().getUsageSnapshot(tenant.id);
+  const stripeConfigured = isStripeEnvConfigured();
 
   return {
     tenant: {
@@ -33,6 +37,10 @@ export async function buildSaasBillingSummary(tenant: SaasTenant, role: SaasRole
     permissions: listPermissionsForRole(role),
     limits: snapshot.limits,
     usage: snapshot.usage,
+    stripeConfigured,
+    billingNote: stripeConfigured
+      ? "El plan se activa vía webhook Stripe (no solo por la URL de éxito)."
+      : "Stripe no configurado en el servidor. Contacta soporte para activar checkout.",
   };
 }
 

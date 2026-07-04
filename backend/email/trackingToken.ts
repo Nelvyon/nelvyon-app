@@ -18,8 +18,8 @@ export type TrackingPayload = {
   cid: string;
   /** contact id (recipient) */
   rid: string;
-  /** "o" = open, "c" = click */
-  t: "o" | "c";
+  /** "o" = open, "c" = click, "u" = unsubscribe */
+  t: "o" | "c" | "u";
   /** destination URL (click only) */
   url?: string;
   /** expiry unix seconds */

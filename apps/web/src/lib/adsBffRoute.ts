@@ -55,8 +55,11 @@ async function resolveClaims(req: Request) {
 export async function adsBffGet(req: Request, upstreamPath: string, fallback: unknown) {
   const claims = await resolveClaims(req);
   if (claims instanceof NextResponse) {
-    if (claims.status === 401 || claims.status === 403) {
-      return NextResponse.json(fallback);
+    if (claims.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (claims.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return claims;
   }
@@ -66,6 +69,12 @@ export async function adsBffGet(req: Request, upstreamPath: string, fallback: un
     const upstream = await proxyPlatformFetch(req, "GET", upstreamPath);
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
+    }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (upstream.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (upstream.status === 404) {
       const text = await upstream.text();
@@ -84,8 +93,11 @@ export async function adsBffGet(req: Request, upstreamPath: string, fallback: un
 export async function adsBffPost(req: Request, upstreamPath: string, fallback: unknown) {
   const claims = await resolveClaims(req);
   if (claims instanceof NextResponse) {
-    if (claims.status === 401 || claims.status === 403) {
-      return NextResponse.json(fallback);
+    if (claims.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (claims.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return claims;
   }
@@ -106,6 +118,12 @@ export async function adsBffPost(req: Request, upstreamPath: string, fallback: u
     if (upstream.ok) {
       const text = await upstream.text();
       return NextResponse.json(text ? JSON.parse(text) : {}, { status: upstream.status });
+    }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (upstream.status === 401) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (upstreamFailed(upstream.status)) {
       return NextResponse.json(fallback);

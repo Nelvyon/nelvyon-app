@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import { sanitizeEnvValue } from "../db/envSanitize";
+import { isSesEnvConfigured, isStripeEnvConfigured, isOpenAiEnvConfigured, missingEnvKeys } from "../saas/saasEnv";
 
 export type HealthCheckResult = {
   status: "ok" | "degraded" | "down";
@@ -120,6 +121,15 @@ function connectivityResult(started: number, res: Response): HealthCheckResult {
 export async function checkOpenAI(timeoutMs = 3000): Promise<HealthCheckResult> {
   return withGlobalCap(async () => {
     const started = Date.now();
+    if (!isOpenAiEnvConfigured()) {
+      return {
+        status: "degraded",
+        latencyMs: Date.now() - started,
+        error: missingEnvKeys(["OPENAI_API_KEY"]).length
+          ? `Missing: ${missingEnvKeys(["OPENAI_API_KEY"]).join(", ")}`
+          : "OpenAI not configured",
+      };
+    }
     try {
       const ac = new AbortController();
       const tid = setTimeout(() => ac.abort(), timeoutMs);
@@ -142,22 +152,21 @@ export async function checkOpenAI(timeoutMs = 3000): Promise<HealthCheckResult> 
 export async function checkStripe(timeoutMs = 3000): Promise<HealthCheckResult> {
   return withGlobalCap(async () => {
     const started = Date.now();
+    if (!isStripeEnvConfigured()) {
+      const missing = missingEnvKeys([
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET",
+        "STRIPE_PRICE_ID_STARTER",
+        "STRIPE_PRICE_ID_PRO",
+        "STRIPE_PRICE_ID_AGENCY",
+      ]);
+      return {
+        status: "degraded",
+        latencyMs: Date.now() - started,
+        error: missing.length ? `Missing: ${missing.join(", ")}` : "Stripe not configured",
+      };
+    }
     const secret = process.env.STRIPE_SECRET_KEY?.trim() ?? process.env.STRIPE_API_KEY?.trim();
-    const priceStarter = process.env.STRIPE_PRICE_ID_STARTER?.trim();
-    const pricePro = process.env.STRIPE_PRICE_ID_PRO?.trim();
-    const priceAgency = process.env.STRIPE_PRICE_ID_AGENCY?.trim();
-    if (!secret) {
-      return { status: "degraded", latencyMs: Date.now() - started, error: "STRIPE_SECRET_KEY missing" };
-    }
-    if (!priceStarter) {
-      return { status: "degraded", latencyMs: Date.now() - started, error: "STRIPE_PRICE_ID_STARTER missing" };
-    }
-    if (!pricePro) {
-      return { status: "degraded", latencyMs: Date.now() - started, error: "STRIPE_PRICE_ID_PRO missing" };
-    }
-    if (!priceAgency) {
-      return { status: "degraded", latencyMs: Date.now() - started, error: "STRIPE_PRICE_ID_AGENCY missing" };
-    }
     try {
       const ac = new AbortController();
       const tid = setTimeout(() => ac.abort(), timeoutMs);
@@ -175,14 +184,18 @@ export async function checkStripe(timeoutMs = 3000): Promise<HealthCheckResult> 
 }
 
 /**
- * SES: only verifies SES_FROM_EMAIL is set (no AWS call).
+ * SES: full credential set required for sellable email (aligned with saasEnv).
  */
 export async function checkSES(): Promise<HealthCheckResult> {
   return withGlobalCap(async () => {
     const started = Date.now();
-    const from = process.env.SES_FROM_EMAIL?.trim();
-    if (!from) {
-      return { status: "degraded", latencyMs: Date.now() - started, error: "Not configured" };
+    if (!isSesEnvConfigured()) {
+      const missing = missingEnvKeys(["SES_ACCESS_KEY_ID", "SES_SECRET_ACCESS_KEY", "SES_FROM_EMAIL"]);
+      return {
+        status: "degraded",
+        latencyMs: Date.now() - started,
+        error: missing.length ? `Missing: ${missing.join(", ")}` : "SES not configured",
+      };
     }
     return { status: "ok", latencyMs: Date.now() - started };
   });

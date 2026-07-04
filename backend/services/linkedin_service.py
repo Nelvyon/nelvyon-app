@@ -67,47 +67,10 @@ class LinkedInService:
     def __init__(self, session: AsyncSession, workspace_id: int):
         self.session = session
         self.workspace_id = workspace_id
+    async def _ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def _ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS linkedin_outreach (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    client_id TEXT NOT NULL,
-                    contact_id TEXT,
-                    prospect_name TEXT,
-                    company TEXT,
-                    status TEXT NOT NULL DEFAULT 'pending',
-                    messages_json TEXT NOT NULL DEFAULT '{}',
-                    metrics_json TEXT NOT NULL DEFAULT '{}',
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS linkedin_inbox (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    client_id TEXT NOT NULL,
-                    outreach_id TEXT,
-                    from_name TEXT,
-                    message TEXT NOT NULL,
-                    received_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def _hourly_count(self) -> int:
         row = await self.session.execute(

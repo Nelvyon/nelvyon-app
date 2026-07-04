@@ -80,7 +80,7 @@ export async function POST(req: Request) {
           result = `El agente "${body.agentId}" no pudo ejecutarse. Verifica la clave OPENAI_API_KEY en Railway.`;
         }
       } else {
-        status = "completed";
+        status = "mock";
         usedMock = true;
         result = buildMockAgentOutput(body.agentId.trim(), body.input.trim(), ctx.tenant.companyName);
       }
@@ -88,15 +88,29 @@ export async function POST(req: Request) {
 
     // Update run record
     await db.query(
-      `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3`,
-      [result, status, runId],
+      `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
+      [result, status, runId, ctx.tenant.id],
     ).catch(() => {});
+
+    if (usedMock) {
+      return NextResponse.json(
+        {
+          error: "Agente en modo plantilla — configura OPENAI_API_KEY o el backend de agentes.",
+          code: "AGENT_MOCK",
+          result,
+          runId,
+          status: "mock",
+          mock: true,
+        },
+        { status: 503 },
+      );
+    }
 
     return NextResponse.json({
       result,
       runId,
       status,
-      mock: usedMock,
+      mock: false,
     });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

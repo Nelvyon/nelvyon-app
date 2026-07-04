@@ -4,6 +4,7 @@ import { authenticate } from "@/lib/auth";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 import { GoogleOAuthProvider } from "../../../../../../../backend/oauth/GoogleOAuthProvider";
+import { createOAuthState } from "@/lib/integrations/oauthState";
 
 export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
@@ -11,9 +12,7 @@ export const runtime = "nodejs";
 export async function GET(req: Request) {
   try {
     const claims = await authenticate(req);
-    const state = Buffer.from(
-      JSON.stringify({ userId: claims.userId, ts: Date.now() }),
-    ).toString("base64url");
+    const state = createOAuthState(claims.userId);
     const url = new GoogleOAuthProvider().getAuthUrl(state);
     return NextResponse.redirect(url);
   } catch (e: unknown) {

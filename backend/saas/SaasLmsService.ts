@@ -313,8 +313,8 @@ export class SaasLmsService {
       [input.courseId, tenantId, input.contactId ?? null, input.contactEmail.toLowerCase().trim(), input.contactName ?? null],
     );
     await this.db.query(
-      `UPDATE saas_lms_courses SET enrollments=enrollments+1,updated_at=NOW() WHERE id=$1`,
-      [input.courseId],
+      `UPDATE saas_lms_courses SET enrollments=enrollments+1,updated_at=NOW() WHERE id=$1 AND tenant_id=$2`,
+      [input.courseId, tenantId],
     );
     if (!rows[0]) throw new SaasLmsError("Failed to enroll", "DB_ERROR");
     return rowToEnrollment(rows[0]);
@@ -338,8 +338,8 @@ export class SaasLmsService {
     if (!enroll[0]) throw new SaasLmsError("Enrollment not found", "NOT_FOUND");
 
     await this.db.query(
-      `UPDATE saas_lms_enrollments SET status='completed',completed_at=NOW() WHERE id=$1`,
-      [enrollmentId],
+      `UPDATE saas_lms_enrollments SET status='completed',completed_at=NOW() WHERE id=$1 AND tenant_id=$2`,
+      [enrollmentId, tenantId],
     );
 
     // Generate signed certificate URL if no external URL provided
@@ -361,8 +361,8 @@ export class SaasLmsService {
     // Update certificate_url with the signed URL (if not externally provided)
     if (!certUrl) {
       await this.db.query(
-        `UPDATE saas_lms_certificates SET certificate_url=$1 WHERE id=$2`,
-        [signedUrl, certId],
+        `UPDATE saas_lms_certificates SET certificate_url=$1 WHERE id=$2 AND tenant_id=$3`,
+        [signedUrl, certId, tenantId],
       );
     }
 
@@ -421,8 +421,8 @@ export class SaasLmsService {
     );
     if (!rows[0]) throw new SaasLmsError("Failed to create module", "DB_ERROR");
     await this.db.query(
-      `UPDATE saas_lms_courses SET modules_count=modules_count+1,updated_at=NOW() WHERE id=$1`,
-      [courseId],
+      `UPDATE saas_lms_courses SET modules_count=modules_count+1,updated_at=NOW() WHERE id=$1 AND tenant_id=$2`,
+      [courseId, tenantId],
     );
     return rowToModule(rows[0]);
   }
@@ -451,8 +451,8 @@ export class SaasLmsService {
     );
     if (!mod[0]) throw new SaasLmsError("Module not found", "NOT_FOUND");
     await this.db.query(
-      `UPDATE saas_lms_courses SET modules_count=GREATEST(0,modules_count-1),updated_at=NOW() WHERE id=$1`,
-      [mod[0].course_id],
+      `UPDATE saas_lms_courses SET modules_count=GREATEST(0,modules_count-1),updated_at=NOW() WHERE id=$1 AND tenant_id=$2`,
+      [mod[0].course_id, tenantId],
     );
   }
 
@@ -483,8 +483,8 @@ export class SaasLmsService {
     );
     if (!rows[0]) throw new SaasLmsError("Failed to create lesson", "DB_ERROR");
     await this.db.query(
-      `UPDATE saas_lms_modules SET lessons_count=lessons_count+1 WHERE id=$1`,
-      [moduleId],
+      `UPDATE saas_lms_modules SET lessons_count=lessons_count+1 WHERE id=$1 AND tenant_id=$2`,
+      [moduleId, tenantId],
     );
     return rowToLesson(rows[0]);
   }
@@ -517,8 +517,8 @@ export class SaasLmsService {
     );
     if (!lesson[0]) throw new SaasLmsError("Lesson not found", "NOT_FOUND");
     await this.db.query(
-      `UPDATE saas_lms_modules SET lessons_count=GREATEST(0,lessons_count-1) WHERE id=$1`,
-      [lesson[0].module_id],
+      `UPDATE saas_lms_modules SET lessons_count=GREATEST(0,lessons_count-1) WHERE id=$1 AND tenant_id=$2`,
+      [lesson[0].module_id, tenantId],
     );
   }
 
@@ -568,8 +568,8 @@ export class SaasLmsService {
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
     await this.db.query(
-      `UPDATE saas_lms_enrollments SET progress_pct=$1,lessons_completed=$2,lessons_total=$3 WHERE id=$4`,
-      [pct, done, total, enrollmentId],
+      `UPDATE saas_lms_enrollments SET progress_pct=$1,lessons_completed=$2,lessons_total=$3 WHERE id=$4 AND tenant_id=$5`,
+      [pct, done, total, enrollmentId, tenantId],
     );
 
     return { enrollmentId, progressPct: pct, lessonsCompleted: done, lessonsTotal: total };

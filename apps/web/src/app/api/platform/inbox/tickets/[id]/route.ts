@@ -8,6 +8,7 @@ import {
   dbResolveWorkspaceId,
   dbUpdateTicket,
   platformDbFallbackEnabled,
+  platformWorkspaceDeniedResponse,
 } from "@/lib/platformDbFallback";
 
 export const dynamic = "force-dynamic";
@@ -30,17 +31,27 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
     }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     if (platformDbFallbackEnabled() && upstreamFailed(upstream.status)) {
       const workspaceId = await dbResolveWorkspaceId(req, claims);
       const ticket = await dbGetTicket(ticketId, workspaceId, claims.userId);
       if (ticket) return NextResponse.json(ticket);
     }
     return NextResponse.json({ error: "Not found" }, { status: 404 });
-  } catch {
+  } catch (e) {
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     if (platformDbFallbackEnabled()) {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      const ticket = await dbGetTicket(ticketId, workspaceId, claims.userId);
-      if (ticket) return NextResponse.json(ticket);
+      try {
+        const workspaceId = await dbResolveWorkspaceId(req, claims);
+        const ticket = await dbGetTicket(ticketId, workspaceId, claims.userId);
+        if (ticket) return NextResponse.json(ticket);
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
+      }
     }
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -81,11 +92,19 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
     if (upstream.ok) {
       return NextResponse.json(text ? JSON.parse(text) : {});
     }
+    if (upstream.status === 403) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     if (upstreamFailed(upstream.status) && platformDbFallbackEnabled()) {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      const updated = await dbUpdateTicket(ticketId, workspaceId, claims.userId, body);
-      if (updated) return NextResponse.json(updated);
+      try {
+        const workspaceId = await dbResolveWorkspaceId(req, claims);
+        const updated = await dbUpdateTicket(ticketId, workspaceId, claims.userId, body);
+        if (updated) return NextResponse.json(updated);
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
+      }
     }
 
     try {
@@ -93,11 +112,18 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
     } catch {
       return NextResponse.json({ error: "Update failed" }, { status: 503 });
     }
-  } catch {
+  } catch (e) {
+    const denied = platformWorkspaceDeniedResponse(e);
+    if (denied) return denied;
     if (platformDbFallbackEnabled()) {
-      const workspaceId = await dbResolveWorkspaceId(req, claims);
-      const updated = await dbUpdateTicket(ticketId, workspaceId, claims.userId, body);
-      if (updated) return NextResponse.json(updated);
+      try {
+        const workspaceId = await dbResolveWorkspaceId(req, claims);
+        const updated = await dbUpdateTicket(ticketId, workspaceId, claims.userId, body);
+        if (updated) return NextResponse.json(updated);
+      } catch (inner) {
+        const innerDenied = platformWorkspaceDeniedResponse(inner);
+        if (innerDenied) return innerDenied;
+      }
     }
     return NextResponse.json({ error: "Update failed" }, { status: 503 });
   }

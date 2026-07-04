@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import type { JwtPayload } from "@nelvyon/auth";
 import { authenticate } from "@nelvyon/auth";
+import { getNelvyonAdminService } from "@nelvyon/admin";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 export async function requirePlatformClaims(
@@ -15,6 +16,19 @@ export async function requirePlatformClaims(
     }
     throw e;
   }
+}
+
+/** Platform admin only — for OS cron triggers and learning loops. */
+export async function requirePlatformAdmin(
+  req: Request,
+): Promise<JwtPayload | NextResponse> {
+  const claims = await requirePlatformClaims(req);
+  if (claims instanceof NextResponse) return claims;
+  const isAdmin = await getNelvyonAdminService().isUserAdmin(claims.userId);
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return claims;
 }
 
 /** FastAPI may 401/403 when workspace context mismatches — treat as degraded upstream. */

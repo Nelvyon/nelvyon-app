@@ -6,24 +6,6 @@ import { sendEmail } from "../../../../../../backend/email";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-async function ensureSchema() {
-  const db = DbClient.getInstance();
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS marketing_leads (
-      id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      name       TEXT NOT NULL,
-      email      TEXT NOT NULL,
-      company    TEXT,
-      phone      TEXT,
-      message    TEXT NOT NULL,
-      plan       TEXT,
-      source     TEXT DEFAULT 'contact-form',
-      status     TEXT NOT NULL DEFAULT 'new',
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-}
-
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as {
@@ -44,7 +26,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email inválido" }, { status: 400 });
     }
 
-    await ensureSchema();
     const db = DbClient.getInstance();
 
     await db.query(

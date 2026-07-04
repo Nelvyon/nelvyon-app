@@ -63,11 +63,15 @@ describe("SaasWhatsAppService.send", () => {
     vi.stubEnv("TWILIO_AUTH_TOKEN", "tok");
     vi.stubEnv("TWILIO_FROM_WHATSAPP", "+14155238886");
     const fetchFn = mockFetch(true, { sid: "SM123" });
-    const svc = new SaasWhatsAppService(makeDb() as never, fetchFn as never);
+    const db = makeDb() as { query: ReturnType<typeof vi.fn> };
+    const svc = new SaasWhatsAppService(db as never, fetchFn as never);
     const msg = await svc.send("t1", { to: "+34612345678", body: "Hola" });
     expect(msg.status).toBe("sent");
     expect(msg.twilioSid).toBe("SM123");
     expect(fetchFn).toHaveBeenCalledOnce();
+    const updateCall = db.query.mock.calls.find((c) => String(c[0]).includes("UPDATE conversations"));
+    expect(updateCall?.[0]).toContain("tenant_id");
+    expect(updateCall?.[1]).toEqual(["Hola", "conv-1", "t1"]);
   });
 
   it("marks message as failed when Twilio errors", async () => {

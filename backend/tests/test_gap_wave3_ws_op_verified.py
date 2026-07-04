@@ -3,6 +3,8 @@ Oleada 3 — oauth_integrations, onboarding, email_service (tokens / wizard / co
 
 Ver `docs/NELVYON_ROUTERS_WS_OP_VERIFIED_BY_TESTS.md`.
 """
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from httpx import AsyncClient
 
@@ -51,20 +53,29 @@ async def test_oauth_callback_member_forbidden(client: AsyncClient, member_heade
 
 @pytest.mark.asyncio
 async def test_oauth_callback_owner_ok_after_authorize(client: AsyncClient, auth_headers: dict):
-    auth = await client.get(
-        "/api/v1/oauth/authorize/meta",
-        params={"redirect_uri": "http://localhost:3000/oauth/callback"},
-        headers=auth_headers,
-    )
-    assert auth.status_code == 200, auth.text
-    state = auth.json()["state"]
-    r = await client.post(
-        "/api/v1/oauth/callback",
-        headers=auth_headers,
-        json={"provider": "meta", "code": "test_auth_code", "state": state},
-    )
-    assert r.status_code == 200, r.text
-    assert r.json().get("status") == "connected"
+    with patch(
+        "routers.oauth_integrations._exchange_oauth_code",
+        new_callable=AsyncMock,
+        return_value={
+            "access_token": "test-access-token",
+            "refresh_token": "test-refresh-token",
+            "expires_in": 3600,
+        },
+    ):
+        auth = await client.get(
+            "/api/v1/oauth/authorize/meta",
+            params={"redirect_uri": "http://localhost:3000/oauth/callback"},
+            headers=auth_headers,
+        )
+        assert auth.status_code == 200, auth.text
+        state = auth.json()["state"]
+        r = await client.post(
+            "/api/v1/oauth/callback",
+            headers=auth_headers,
+            json={"provider": "meta", "code": "test_auth_code", "state": state},
+        )
+        assert r.status_code == 200, r.text
+        assert r.json().get("status") == "connected"
 
 
 @pytest.mark.asyncio

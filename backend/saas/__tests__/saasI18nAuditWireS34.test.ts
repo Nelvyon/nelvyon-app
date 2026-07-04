@@ -160,14 +160,26 @@ describe("Audit wiring — SaasCampaniasService", () => {
   const campaniaRow = {
     id: "camp-1", tenant_id: TENANT, name: "Test Campaign",
     subject: "Subject", body: "<p>Hi</p>", status: "draft",
-    audience_filter: "{}",
-    total_recipients: "0", sent_count: "0", open_count: "0", click_count: "0",
-    error_count: "0", scheduled_at: null, completed_at: null,
-    created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-    ses_configured: true,
+    channel: "email" as const,
+    description: null,
+    cta_text: null,
+    cta_url: null,
+    audience_filter: {},
+    scheduled_at: null,
+    started_at: null,
+    completed_at: null,
+    total_recipients: 0,
+    sent_count: 0,
+    opened_count: 0,
+    clicked_count: 0,
+    created_at: new Date(),
+    updated_at: new Date(),
   };
 
   beforeEach(() => {
+    process.env.SES_ACCESS_KEY_ID = "test-key";
+    process.env.SES_SECRET_ACCESS_KEY = "test-secret";
+    process.env.SES_FROM_EMAIL = "noreply@test.com";
     db = { query: vi.fn() } as unknown as SaasPostgresPort;
     auditLog = vi.fn().mockResolvedValue(undefined);
     const audit: CampaniasAuditPort = { log: auditLog };
@@ -179,7 +191,8 @@ describe("Audit wiring — SaasCampaniasService", () => {
       .mockResolvedValueOnce([campaniaRow])  // getCampania
       .mockResolvedValueOnce([])             // resolveAudience (no contacts)
       .mockResolvedValueOnce([])             // UPDATE running
-      .mockResolvedValueOnce([])             // UPDATE completed
+      .mockResolvedValueOnce([])             // SELECT contacts for email send (empty)
+      .mockResolvedValueOnce([]);            // UPDATE completed
     await svc.launchCampania(TENANT, "camp-1");
     expect(auditLog).toHaveBeenCalledWith(TENANT, expect.objectContaining({
       action: "send", module: "campanias", resourceId: "camp-1",

@@ -1,26 +1,19 @@
 import { NextResponse } from "next/server";
 
-import { authenticate } from "@nelvyon/auth";
 import { getSaasDashboardReportService } from "@nelvyon/saas-reports";
-import { getSaasOnboardingService } from "@nelvyon/saas";
-import { OsAgentError } from "@nelvyon/os-agents";
+import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /** Genera informe ZIP del dashboard con métricas reales del cliente y devuelve URL de descarga. */
 export async function POST(req: Request) {
   try {
-    const claims = await authenticate(req);
-    const onboarding = getSaasOnboardingService();
-    const tenant = await onboarding.getTenant(claims.userId);
-    if (!tenant) {
-      return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-    }
+    const ctx = await requireSaasContext(req, "contacts.read");
 
     const report = await getSaasDashboardReportService().generateAndPublish(
-      claims.userId,
-      claims.tenantId,
+      ctx.claims.userId,
+      ctx.tenant.id,
     );
 
     return NextResponse.json({
@@ -30,10 +23,6 @@ export async function POST(req: Request) {
       fileCount: report.fileCount,
     });
   } catch (e: unknown) {
-    if (e instanceof OsAgentError && e.message === "Unauthorized") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ error: message || "Error interno" }, { status: 500 });
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

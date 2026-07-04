@@ -92,46 +92,10 @@ class SocialAutoPublishService:
         self.session = session
         self.workspace_id = workspace_id
         self._schema_ready = False
+    async def _ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def _ensure_schema(self) -> None:
-        if self._schema_ready:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS social_auto_posts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    client_id TEXT NOT NULL,
-                    workspace_id INTEGER,
-                    platform TEXT NOT NULL,
-                    caption TEXT NOT NULL,
-                    image_url TEXT,
-                    status TEXT NOT NULL DEFAULT 'scheduled',
-                    frequency TEXT,
-                    scheduled_at TEXT,
-                    published_at TEXT,
-                    metrics_json TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS social_auto_settings (
-                    client_id TEXT PRIMARY KEY,
-                    workspace_id INTEGER,
-                    enabled INTEGER NOT NULL DEFAULT 0,
-                    frequency TEXT NOT NULL DEFAULT 'weekly',
-                    sector TEXT,
-                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        self._schema_ready = True
 
     async def get_settings(self, client_id: str) -> dict[str, Any]:
         await self._ensure_schema()

@@ -17,7 +17,8 @@ export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
     const { DbClient } = await import("../../../../../../../backend/db/DbClient");
-    const [report, autonomyMode, memorySettings, latestBrief, progressRows] = await Promise.all([
+
+    const [reportR, autonomyR, memoryR, briefR, progressR] = await Promise.allSettled([
       getSaasPlatformHealthService().getReport(ctx.tenant.id, ctx.claims.userId),
       getSaasAutonomyService().getMode(ctx.tenant.id),
       getSaasTenantMemoryService().getSettings(ctx.tenant.id),
@@ -27,11 +28,42 @@ export async function GET(req: Request) {
         [ctx.tenant.id],
       ),
     ]);
-    const setupProgress = progressRows[0]?.setup_progress ?? {};
+
+    const report =
+      reportR.status === "fulfilled"
+        ? reportR.value
+        : {
+            score: 0,
+            status: "critical" as const,
+            timestamp: new Date().toISOString(),
+            items: [],
+            activation: { steps: {}, done: 0, total: 0, percent: 0 },
+            summary: { platformReady: false, productReady: false, missingCount: 0 },
+            error: reportR.reason instanceof Error ? reportR.reason.message : String(reportR.reason),
+          };
+
+    const setupProgress =
+      progressR.status === "fulfilled" ? (progressR.value[0]?.setup_progress ?? {}) : {};
+
     return NextResponse.json({
       report,
       setup: report,
-      elite: { autonomyMode, memorySettings, latestBrief, setupProgress },
+      elite: {
+        autonomyMode: autonomyR.status === "fulfilled" ? autonomyR.value : "propose",
+        memorySettings:
+          memoryR.status === "fulfilled"
+            ? memoryR.value
+            : { maxChunks: 200, autoIngestEnabled: true },
+        latestBrief: briefR.status === "fulfilled" ? briefR.value : null,
+        setupProgress,
+        partialErrors: [
+          reportR.status === "rejected" ? "report" : null,
+          autonomyR.status === "rejected" ? "autonomy" : null,
+          memoryR.status === "rejected" ? "memory" : null,
+          briefR.status === "rejected" ? "brief" : null,
+          progressR.status === "rejected" ? "setup_progress" : null,
+        ].filter(Boolean),
+      },
     });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

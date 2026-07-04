@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import {
+  assertUserCanAccessWorkspace,
+  WorkspaceAccessError,
+} from "@/lib/platformDbFallback";
 import { chargePartnerClientPack } from "@/lib/partners/partnerConnectStore";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +33,15 @@ export async function POST(
   const partnerWorkspaceId = parseWorkspaceId(req);
   if (!partnerWorkspaceId) {
     return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+  }
+
+  try {
+    await assertUserCanAccessWorkspace(claims, partnerWorkspaceId);
+  } catch (e) {
+    if (e instanceof WorkspaceAccessError) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    throw e;
   }
 
   const { wsId } = await ctx.params;

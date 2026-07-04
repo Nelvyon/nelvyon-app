@@ -103,61 +103,10 @@ class DialerAdvancedService:
         self.workspace_id = workspace_id
         self._dialer = DialerService(session, workspace_id)
         self._supabase = SupabaseService()
-
     @classmethod
-    async def ensure_schema(cls, session: AsyncSession | None = None) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        from pathlib import Path
-
-        from core.database import db_manager
-
-        await DialerService.ensure_schema(session)
-        path = Path(__file__).resolve().parent.parent / "migrations" / "dialer_advanced.sql"
-
-        async def _apply(sess: AsyncSession) -> None:
-            bind = sess.get_bind()
-            dialect = bind.dialect.name if bind is not None else "postgresql"
-            if dialect == "sqlite":
-                stmts = [
-                    """CREATE TABLE IF NOT EXISTS dialer_advanced_sessions (
-                        id TEXT PRIMARY KEY,
-                        workspace_id INTEGER NOT NULL,
-                        client_id TEXT NOT NULL DEFAULT 'default',
-                        mode TEXT NOT NULL,
-                        status TEXT NOT NULL DEFAULT 'active',
-                        queue_json TEXT NOT NULL DEFAULT '[]',
-                        parallel_limit INTEGER NOT NULL DEFAULT 3,
-                        voicemail_url TEXT,
-                        stats_json TEXT NOT NULL DEFAULT '{}',
-                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-                    )""",
-                ]
-                for col in ("session_id", "amd_result", "call_score", "recording_storage_path", "local_from_number", "client_id"):
-                    try:
-                        await sess.execute(text(f"ALTER TABLE dialer_calls ADD COLUMN {col} TEXT"))
-                    except Exception:
-                        pass
-            else:
-                stmts = []
-                if path.is_file():
-                    stmts = [s.strip() for s in path.read_text(encoding="utf-8").split(";") if s.strip() and not s.strip().startswith("--")]
-            for stmt in stmts:
-                try:
-                    await sess.execute(text(stmt))
-                except Exception as exc:
-                    logger.debug("dialer_advanced schema: %s", exc)
-
-        if session is not None:
-            await _apply(session)
-        else:
-            await db_manager.ensure_initialized()
-            async with db_manager.async_session_maker() as sess:
-                await _apply(sess)
-                await sess.commit()
-        _SCHEMA_READY = True
+    async def ensure_schema(cls, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
     async def _save_session_stats(self, session_id: str) -> dict[str, Any]:
         bind = self.session.get_bind()

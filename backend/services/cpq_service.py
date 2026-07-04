@@ -39,38 +39,10 @@ class CpqService:
     def __init__(self, session: AsyncSession, workspace_id: int):
         self.session = session
         self.workspace_id = workspace_id
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS cpq_quotes (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    client_id TEXT NOT NULL DEFAULT 'default',
-                    lead_email TEXT NOT NULL,
-                    lead_name TEXT,
-                    sector TEXT,
-                    company_size TEXT,
-                    budget_hint TEXT,
-                    services_json TEXT NOT NULL DEFAULT '[]',
-                    price_breakdown_json TEXT NOT NULL DEFAULT '{}',
-                    total_eur REAL NOT NULL DEFAULT 0,
-                    roi_summary TEXT,
-                    status TEXT NOT NULL DEFAULT 'draft',
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    sent_at TEXT,
-                    viewed_at TEXT,
-                    accepted_at TEXT
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def generate_quote(
         self,

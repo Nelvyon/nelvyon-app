@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { platformCollectAuthFailure } from "@/lib/platformBffRoute";
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
@@ -43,6 +44,9 @@ export async function GET(req: Request) {
       proxyPlatformFetch(req, "GET", "/api/v1/entities/nelvyon_campaigns"),
     ]);
 
+    const authDenied = platformCollectAuthFailure(storesRes, adsRes, campaignsRes);
+    if (authDenied) return authDenied;
+
     const storesList = (await safeJson(storesRes, EMPTY_STORES_LIST)) as typeof EMPTY_STORES_LIST;
     const ads = (await safeJson(adsRes, { unified: { total_spend: 0, blended_roas: 0 } })) as {
       unified?: { total_spend?: number; blended_roas?: number };
@@ -57,6 +61,8 @@ export async function GET(req: Request) {
     for (const item of items.slice(0, 5)) {
       if (!item.id) continue;
       const aRes = await proxyPlatformFetch(req, "GET", `/api/os/store/projects/${item.id}/analytics`);
+      const aDenied = platformCollectAuthFailure(aRes);
+      if (aDenied) return aDenied;
       analyticsSamples.push(
         (await safeJson(aRes, EMPTY_STORE_ANALYTICS)) as typeof EMPTY_STORE_ANALYTICS,
       );

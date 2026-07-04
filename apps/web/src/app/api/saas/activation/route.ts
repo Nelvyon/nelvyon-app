@@ -6,29 +6,10 @@ import { DbClient } from "../../../../../../../backend/db/DbClient";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-async function ensureSchema() {
-  const db = DbClient.getInstance();
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS saas_activation_checklist (
-      id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      tenant_id    TEXT NOT NULL UNIQUE,
-      step_profile BOOLEAN NOT NULL DEFAULT FALSE,
-      step_contact BOOLEAN NOT NULL DEFAULT FALSE,
-      step_campaign BOOLEAN NOT NULL DEFAULT FALSE,
-      step_workflow BOOLEAN NOT NULL DEFAULT FALSE,
-      step_social   BOOLEAN NOT NULL DEFAULT FALSE,
-      step_billing  BOOLEAN NOT NULL DEFAULT FALSE,
-      completed_at  TIMESTAMPTZ,
-      updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-}
-
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
     const tenantId = ctx.tenant.id;
-    await ensureSchema();
     const db = DbClient.getInstance();
 
     const rows = await db.query<{
@@ -103,7 +84,6 @@ export async function PATCH(req: Request) {
       profile: boolean; contact: boolean; campaign: boolean;
       workflow: boolean; social: boolean; billing: boolean;
     }>;
-    await ensureSchema();
     const db = DbClient.getInstance();
 
     const fields: string[] = [];

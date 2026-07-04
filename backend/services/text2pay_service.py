@@ -53,36 +53,10 @@ class Text2PayService:
     @property
     def sms_configured(self) -> bool:
         return bool(self.twilio_sid and self.twilio_token and self.twilio_from)
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS text2pay_payments (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    client_id TEXT NOT NULL DEFAULT 'default',
-                    lead_phone TEXT NOT NULL,
-                    amount REAL NOT NULL,
-                    currency TEXT NOT NULL DEFAULT 'eur',
-                    description TEXT,
-                    channel TEXT NOT NULL DEFAULT 'sms',
-                    stripe_payment_link TEXT,
-                    stripe_session_id TEXT,
-                    status TEXT NOT NULL DEFAULT 'pending',
-                    send_result_json TEXT NOT NULL DEFAULT '{}',
-                    sent_at TEXT,
-                    paid_at TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def create_and_send(
         self,

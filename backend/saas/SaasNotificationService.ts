@@ -85,12 +85,12 @@ export class SaasNotificationService {
     return rows.length;
   }
 
-  async markRead(id: string, userId: string): Promise<boolean> {
+  async markRead(id: string, userId: string, tenantId: string): Promise<boolean> {
     const rows = await this.db.query<{ id: string }>(
       `UPDATE saas_notifications SET read = true
-       WHERE id = $1::uuid AND user_id = $2 AND read = false
+       WHERE id = $1::uuid AND user_id = $2 AND tenant_id = $3::uuid AND read = false
        RETURNING id`,
-      [id, userId],
+      [id, userId, tenantId],
     );
     return rows.length > 0;
   }

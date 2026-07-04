@@ -39,9 +39,11 @@ export async function GET(req: Request) {
       const domain = process.env.SEO_DOMAIN?.trim() ?? "";
       if (!domain) {
         return NextResponse.json({
-          configured: true,
+          configured: false,
+          domainConfigured: false,
           message: "Configura SEO_DOMAIN en Railway para ver posicionamiento de keywords.",
-          keywords: [], issues: [],
+          keywords: [],
+          issues: [],
           summary: { totalKeywords: 0, avgPosition: null, totalTraffic: 0, errors: 0, warnings: 0, info: 0 },
         });
       }
@@ -51,11 +53,13 @@ export async function GET(req: Request) {
       const text = await res.text();
       if (!res.ok || text.startsWith("ERROR")) {
         return NextResponse.json({
-          configured: true,
+          configured: false,
+          degraded: true,
           error: "SEMrush API error: " + text.slice(0, 200),
-          keywords: [], issues: [],
+          keywords: [],
+          issues: [],
           summary: { totalKeywords: 0, avgPosition: null, totalTraffic: 0, errors: 0, warnings: 0, info: 0 },
-        });
+        }, { status: 503 });
       }
 
       // Parse CSV response
@@ -87,7 +91,15 @@ export async function GET(req: Request) {
       });
     }
 
-    return NextResponse.json({ configured: true, keywords: [], issues: [] });
+    return NextResponse.json(
+      {
+        configured: false,
+        message: "Recurso SEO no implementado. Usa resource=keywords o resource=all.",
+        keywords: [],
+        issues: [],
+      },
+      { status: 501 },
+    );
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
@@ -105,11 +117,21 @@ export async function POST(req: Request) {
 
     const apiKey = process.env.SEMRUSH_API_KEY?.trim();
     if (!apiKey) {
-      return NextResponse.json({ error: "SEMRUSH_API_KEY not configured", code: "NOT_CONFIGURED" }, { status: 422 });
+      return NextResponse.json({ error: "SEMRUSH_API_KEY not configured", code: "NOT_CONFIGURED" }, { status: 503 });
     }
 
-    // Return the keyword as tracked — position data from next GET
-    return NextResponse.json({ keyword: { id: `kw-${Date.now()}`, keyword, position: 0, searchVolume: 0 } }, { status: 201 });
+    const domain = process.env.SEO_DOMAIN?.trim();
+    if (!domain) {
+      return NextResponse.json({ error: "SEO_DOMAIN not configured", code: "NOT_CONFIGURED" }, { status: 503 });
+    }
+
+    return NextResponse.json(
+      {
+        error: "Keyword tracking persistence not yet implemented. Use GET to read SEMrush positions.",
+        code: "NOT_IMPLEMENTED",
+      },
+      { status: 501 },
+    );
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

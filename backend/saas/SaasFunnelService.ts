@@ -270,7 +270,28 @@ export class SaasFunnelService {
 
   // ── A/B Variants ──────────────────────────────────────────────────────────
 
-  async listVariants(stepId: string): Promise<FunnelVariant[]> {
+  private async assertStepBelongsToTenant(tenantId: string, stepId: string): Promise<void> {
+    const rows = await this.db.query<{ id: string }>(
+      `SELECT fs.id FROM saas_funnel_steps fs
+       INNER JOIN saas_funnels f ON f.id = fs.funnel_id
+       WHERE fs.id = $1 AND f.tenant_id = $2 LIMIT 1`,
+      [stepId, tenantId],
+    );
+    if (!rows[0]) throw new SaasFunnelError("Step not found", "NOT_FOUND");
+  }
+
+  private async assertVariantBelongsToTenant(tenantId: string, variantId: string): Promise<void> {
+    const rows = await this.db.query<{ id: string }>(
+      `SELECT v.id FROM saas_funnel_step_variants v
+       INNER JOIN saas_funnel_steps fs ON fs.id = v.step_id
+       INNER JOIN saas_funnels f ON f.id = fs.funnel_id
+       WHERE v.id = $1 AND f.tenant_id = $2 LIMIT 1`,
+      [variantId, tenantId],
+    );
+    if (!rows[0]) throw new SaasFunnelError("Variant not found", "NOT_FOUND");
+  }
+
+  private async listVariantsByStepId(stepId: string): Promise<FunnelVariant[]> {
     const rows = await this.db.query<VariantRow>(
       `SELECT id,step_id,variant_key,content,weight_pct,visitors,conversions,created_at,updated_at
        FROM saas_funnel_step_variants WHERE step_id=$1 ORDER BY variant_key ASC`,
@@ -279,7 +300,13 @@ export class SaasFunnelService {
     return rows.map(rowToVariant);
   }
 
-  async createVariant(stepId: string, input: CreateVariantInput): Promise<FunnelVariant> {
+  async listVariants(tenantId: string, stepId: string): Promise<FunnelVariant[]> {
+    await this.assertStepBelongsToTenant(tenantId, stepId);
+    return this.listVariantsByStepId(stepId);
+  }
+
+  async createVariant(tenantId: string, stepId: string, input: CreateVariantInput): Promise<FunnelVariant> {
+    await this.assertStepBelongsToTenant(tenantId, stepId);
     if (input.variantKey !== "A" && input.variantKey !== "B") {
       throw new SaasFunnelError("variantKey must be A or B", "VALIDATION");
     }
@@ -297,7 +324,12 @@ export class SaasFunnelService {
     return rowToVariant(rows[0]);
   }
 
-  async updateVariant(variantId: string, input: Partial<Pick<CreateVariantInput, "content" | "weightPct">>): Promise<FunnelVariant> {
+  async updateVariant(
+    tenantId: string,
+    variantId: string,
+    input: Partial<Pick<CreateVariantInput, "content" | "weightPct">>,
+  ): Promise<FunnelVariant> {
+    await this.assertVariantBelongsToTenant(tenantId, variantId);
     const sets: string[] = ["updated_at=NOW()"];
     const params: unknown[] = [variantId];
     let idx = 2;
@@ -317,7 +349,7 @@ export class SaasFunnelService {
 
   /** Deterministic A/B pick for a session. Returns null if no variants configured. */
   async pickVariant(stepId: string, sessionId: string): Promise<FunnelVariant | null> {
-    const variants = await this.listVariants(stepId);
+    const variants = await this.listVariantsByStepId(stepId);
     return pickVariantFromList(variants, sessionId);
   }
 

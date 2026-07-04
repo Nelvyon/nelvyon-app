@@ -83,28 +83,10 @@ class ApolloService:
         self.session = session
         self.workspace_id = workspace_id
         self.api_key = os.environ.get("APOLLO_API_KEY", "").strip()
+    async def _ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def _ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS apollo_lead_cache (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL,
-                    apollo_id TEXT,
-                    payload_json TEXT NOT NULL,
-                    ai_score INTEGER,
-                    synced_contact_id TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     async def search(
         self,

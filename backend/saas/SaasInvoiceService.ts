@@ -101,11 +101,11 @@ export class SaasInvoiceService {
     return rows[0] ?? null;
   }
 
-  async markAsPaid(id: string): Promise<boolean> {
+  async markAsPaid(id: string, tenantId: string, userId: string): Promise<boolean> {
     const rows = await this.db.query<{ id: string }>(
       `UPDATE saas_invoices SET status = 'paid', paid_at = NOW()
-       WHERE id = $1::uuid AND status != 'paid' RETURNING id`,
-      [id],
+       WHERE id = $1::uuid AND tenant_id = $2::uuid AND user_id = $3 AND status != 'paid' RETURNING id`,
+      [id, tenantId, userId],
     );
     return rows.length > 0;
   }

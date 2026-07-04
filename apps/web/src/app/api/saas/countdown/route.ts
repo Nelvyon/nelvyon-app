@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const svc = getSaasCountdownService();
 
     if (action === "scan") {
-      await svc.trackScan(String(body.id ?? ""));
+      await svc.trackScan(ctx.tenant.id, String(body.id ?? ""));
       return NextResponse.json({ ok: true });
     }
 

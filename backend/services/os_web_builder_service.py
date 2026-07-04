@@ -142,40 +142,12 @@ class OsWebBuilderService:
     def __init__(self, session: AsyncSession, workspace_id: int | None = None):
         self.session = session
         self.workspace_id = int(workspace_id) if workspace_id is not None else None
-
     @staticmethod
-    async def ensure_schema() -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await LandingBuilderService.ensure_schema()
-        await TenantService.ensure_schema()
-        if not db_manager.async_session_maker:
-            await db_manager.ensure_initialized()
-        sql_path = Path(__file__).resolve().parent.parent / "migrations" / "os_web_builder.sql"
-        if sql_path.exists():
-            raw = sql_path.read_text(encoding="utf-8")
-            async with db_manager.async_session_maker() as session:
-                for stmt in [s.strip() for s in raw.split(";") if s.strip()]:
-                    try:
-                        await session.execute(text(stmt))
-                    except Exception as exc:
-                        if "already exists" not in str(exc).lower():
-                            logger.debug("os_web_builder schema skipped: %s", exc)
-                await session.commit()
-        await OsWebBuilderService._seed_templates()
-        perf_path = Path(__file__).resolve().parent.parent / "migrations" / "web_performance.sql"
-        if perf_path.exists():
-            raw_perf = perf_path.read_text(encoding="utf-8")
-            async with db_manager.async_session_maker() as session:
-                for stmt in [s.strip() for s in raw_perf.split(";") if s.strip()]:
-                    try:
-                        await session.execute(text(stmt))
-                    except Exception as exc:
-                        if "already exists" not in str(exc).lower():
-                            logger.debug("web_performance schema skipped: %s", exc)
-                await session.commit()
-        _SCHEMA_READY = True
+    async def ensure_schema(*_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
+
+
 
     @staticmethod
     async def _seed_templates() -> None:

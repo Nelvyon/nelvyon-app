@@ -32,43 +32,10 @@ class FacebookMessengerService:
         self.workspace_id = workspace_id
         self.token = os.environ.get("FB_PAGE_ACCESS_TOKEN", "").strip()
         self.verify_token = os.environ.get("META_WEBHOOK_VERIFY_TOKEN", "nelvyon_meta_verify").strip()
+    async def ensure_schema(self, *_args, **_kwargs) -> None:
+        """Schema owned by backend/db/migrations — no runtime DDL."""
+        return
 
-    async def ensure_schema(self) -> None:
-        global _SCHEMA_READY
-        if _SCHEMA_READY:
-            return
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS facebook_messenger_conversations (
-                    id TEXT PRIMARY KEY,
-                    workspace_id INTEGER NOT NULL DEFAULT 1,
-                    psid TEXT NOT NULL,
-                    status TEXT NOT NULL DEFAULT 'open',
-                    bot_enabled INTEGER NOT NULL DEFAULT 1,
-                    last_message_at TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.execute(
-            text(
-                """
-                CREATE TABLE IF NOT EXISTS facebook_messenger_messages (
-                    id TEXT PRIMARY KEY,
-                    conversation_id TEXT NOT NULL,
-                    workspace_id INTEGER NOT NULL,
-                    direction TEXT NOT NULL,
-                    body TEXT NOT NULL,
-                    meta_json TEXT NOT NULL DEFAULT '{}',
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-                """
-            )
-        )
-        await self.session.commit()
-        _SCHEMA_READY = True
 
     def verify_webhook(self, mode: str | None, token: str | None, challenge: str | None) -> str | None:
         if mode == "subscribe" and token == self.verify_token:
