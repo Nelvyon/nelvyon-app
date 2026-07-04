@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   try {
     await requireSaasContext(req, "contacts.write");
     await req.json().catch(() => ({}));
-    return NextResponse.json(PROSPECTING_UNAVAILABLE, { status: 503 });
+    return NextResponse.json(PROSPECTING_UNAVAILABLE);
   } catch (err) {
     const status = saasErrorStatus(err);
     return NextResponse.json(saasErrorBody(err), { status });
