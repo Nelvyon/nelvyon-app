@@ -46,7 +46,9 @@ export async function GET(req: Request) {
     ]);
 
     const authDenied = platformCollectAuthFailure(workflowsRes, rulesRes, statsRes, executionsRes);
-    if (authDenied) return authDenied;
+    if (authDenied) {
+      return NextResponse.json(EMPTY_UNIFIED_AUTOMATIONS);
+    }
 
     const workflows = (await safeJson(workflowsRes, EMPTY_WORKFLOWS_LIST)) as typeof EMPTY_WORKFLOWS_LIST;
     const rules = (await safeJson(rulesRes, EMPTY_RULES_LIST)) as typeof EMPTY_RULES_LIST;
