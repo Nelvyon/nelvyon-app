@@ -22,7 +22,7 @@ const BUSINESS_NAME = `QA Ecommerce ${RUN_ID}`;
 
 const EXPECTED_TITLES = [
   "Landing",
-  "Informe",
+  "SEO",
   "Handoff",
   "Copy",
 ];
