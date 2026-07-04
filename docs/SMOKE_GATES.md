@@ -15,7 +15,7 @@ Referencia de qué gates corren en CI, cuáles requieren deploy y qué variables
 | Anti-mock | `node scripts/check-no-mock-production.mjs` | `web-quality-gates.yml` |
 | Anti-stub SaaS | `node scripts/check-saas-stubs.mjs` | `web-quality-gates.yml` |
 | OS pack gate | `node scripts/run-os-pack-gate.mjs` | `web-quality-gates.yml` |
-| Migraciones 401–504 | `node scripts/validate-saas-migrations.mjs` | `web-quality-gates.yml` |
+| Migraciones 401–507 | `node scripts/validate-saas-migrations.mjs` | `web-quality-gates.yml` |
 
 ## Smokes staging (requieren deploy + secrets)
 

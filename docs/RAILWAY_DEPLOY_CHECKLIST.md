@@ -1,6 +1,6 @@
 # Railway Deploy Checklist — Nelvyon SaaS
 
-> Última actualización: 2026-06-23  
+> Última actualización: 2026-07-04  
 > Entorno objetivo: Railway (Node 20 + Postgres 16)
 
 ---
@@ -170,7 +170,7 @@ psql $DATABASE_URL -f backend/db/migrations/001_init.sql
 # ... hasta la última migración disponible
 ```
 
-La migración máxima actual del repo es `400_nelvyon_pack_runs.sql`.
+La migración máxima actual del repo es `507_fastapi_runtime_schemas.sql` (rango elite SaaS 401–507 validado en CI).
 
 ---
 

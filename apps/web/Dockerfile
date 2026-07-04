@@ -20,8 +20,10 @@ COPY . .
 RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm -C apps/web build:prod
 
 FROM base AS runner
+ARG BUILD_GIT_SHA
 WORKDIR /app
 ENV NODE_ENV=production
+ENV BUILD_GIT_SHA=${BUILD_GIT_SHA}
 # Do not set HOSTNAME — Docker injects the container ID and breaks HTTP binding.
 ENV PORT=3000
 EXPOSE 3000

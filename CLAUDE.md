@@ -103,8 +103,8 @@ Sin `SES_FROM_EMAIL` + `SES_ACCESS_KEY_ID`, la UI muestra un banner de advertenc
 ## Migraciones de base de datos
 
 Archivos en `backend/db/migrations/`. Ejecutar en orden numérico.  
-**Última migración comiteada:** `492_saas_agent_runs.sql` (491 = inbox agent S57).  
-Rango elite SaaS validado en CI: **401–492** (92 archivos). Railway `releaseCommand` aplica todas en deploy.
+**Última migración comiteada:** `507_fastapi_runtime_schemas.sql`.  
+Rango elite SaaS validado en CI: **401–507** (107 archivos). Railway `releaseCommand` aplica todas en deploy.
 
 ---
 
