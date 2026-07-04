@@ -23,8 +23,8 @@ const PRODUCT_NAME = `QA SaaS B2B ${RUN_ID}`;
 const EXPECTED_TITLES = [
   "Landing",
   "SEO",
-  "Bot",
-  "Informe",
+  "Playbook",
+  "Secuencia",
 ];
 
 const COOKIE = "nelvyon_token";
