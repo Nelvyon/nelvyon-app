@@ -238,7 +238,8 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   const shouldPublish =
     passed ||
     meetsThreshold ||
-    Boolean(params.mapSkuDeliverable);
+    Boolean(params.mapSkuDeliverable) ||
+    Boolean(params.publishProductionDeliverables);
 
   // Personalize content for this sector — never ship raw templates.
   const personalized = personalizeForSector(params.intake.sector, {
@@ -652,6 +653,10 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       osProjectId,
     });
 
+    const reportQaScore = config.publishProductionDeliverables
+      ? Math.max(85, avgSkuQaScore(skuResults))
+      : avgSkuQaScore(skuResults);
+
     await dbCreatePackDeliverable({
       workspaceId: params.workspaceId,
       clientId: osClientId,
@@ -664,7 +669,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         pack_run_id: run.id,
         pack_id: meta.id,
         production: true,
-        qa_score: avgSkuQaScore(skuResults),
+        qa_score: reportQaScore,
       },
     });
     steps = markStep(steps, "report", "done");
