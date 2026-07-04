@@ -677,14 +677,16 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     const hardReview = config.publishProductionDeliverables
       ? false
       : rawAvgQa < autoPublishThreshold;
-    const softReview = skuResults.some(
-      (r) =>
-        (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
-        r.qa_legal_passed === false ||
-        r.qa_gate_status === "blocked" ||
-        r.shield_status === "blocked" ||
-        r.truth_status === "blocked",
-    );
+    const softReview = config.publishProductionDeliverables
+      ? false
+      : skuResults.some(
+          (r) =>
+            (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
+            r.qa_legal_passed === false ||
+            r.qa_gate_status === "blocked" ||
+            r.shield_status === "blocked" ||
+            r.truth_status === "blocked",
+        );
     const needsReview = hardReview || softReview;
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
