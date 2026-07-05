@@ -114,7 +114,16 @@ function makeDb() {
         .filter((x) => x.tenant_id === tenantId && ids.includes(x.id))
         .map((x) => ({ id: x.id, email: x.email })) as unknown as T[];
     }
-    if (s.startsWith("UPDATE saas_campanias SET status = 'running'")) return [] as T[];
+    if (s.startsWith("UPDATE saas_campanias SET status = 'running'")) {
+      const row = campanias.find((x) => x.tenant_id === String(p[0]) && x.id === String(p[1]));
+      if (row && ["draft", "scheduled", "paused"].includes(row.status)) {
+        row.status = "running";
+        row.total_recipients = Number(p[2] ?? 0);
+        row.started_at = new Date();
+        if (s.includes("RETURNING id")) return [{ id: row.id }] as T[];
+      }
+      return [] as T[];
+    }
     if (s.startsWith("INSERT INTO saas_campania_recipients")) return [] as T[];
     if (s.startsWith("UPDATE saas_campania_recipients")) return [] as T[];
     if (s.startsWith("UPDATE saas_campanias SET") && s.includes("status = 'completed'")) return [] as T[];

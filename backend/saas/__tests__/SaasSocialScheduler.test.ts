@@ -36,7 +36,8 @@ describe("processDueScheduled", () => {
   it("publishes one Meta post → published:1 failed:0", async () => {
     const db: Partial<DbPort> = {
       query: async (sql: string) => {
-        if (sql.includes("status='scheduled'")) return [{ id: "post-1", tenant_id: "t1" }] as never;
+        if (sql.includes("UPDATE saas_social_posts") && sql.includes("RETURNING"))
+          return [{ id: "post-1", tenant_id: "t1" }] as never;
         if (sql.includes("JOIN saas_social_accounts"))
           return [joinRow()] as never;
         return [] as never; // UPDATE
@@ -54,7 +55,8 @@ describe("processDueScheduled", () => {
   it("counts failed when Meta API returns error response", async () => {
     const db: Partial<DbPort> = {
       query: async (sql: string) => {
-        if (sql.includes("status='scheduled'")) return [{ id: "post-1", tenant_id: "t1" }] as never;
+        if (sql.includes("UPDATE saas_social_posts") && sql.includes("RETURNING"))
+          return [{ id: "post-1", tenant_id: "t1" }] as never;
         if (sql.includes("JOIN saas_social_accounts"))
           return [joinRow()] as never;
         return [] as never;
@@ -72,7 +74,8 @@ describe("processDueScheduled", () => {
   it("publishes LinkedIn post successfully", async () => {
     const db: Partial<DbPort> = {
       query: async (sql: string) => {
-        if (sql.includes("status='scheduled'")) return [{ id: "p2", tenant_id: "t2" }] as never;
+        if (sql.includes("UPDATE saas_social_posts") && sql.includes("RETURNING"))
+          return [{ id: "p2", tenant_id: "t2" }] as never;
         if (sql.includes("JOIN saas_social_accounts"))
           return [joinRow({ id: "p2", tenant_id: "t2", platform: "linkedin", page_id: "urn:li:organization:999" })] as never;
         return [] as never;
@@ -90,7 +93,8 @@ describe("processDueScheduled", () => {
   it("Meta fails silently when page_id is null", async () => {
     const db: Partial<DbPort> = {
       query: async (sql: string) => {
-        if (sql.includes("status='scheduled'")) return [{ id: "p3", tenant_id: "t3" }] as never;
+        if (sql.includes("UPDATE saas_social_posts") && sql.includes("RETURNING"))
+          return [{ id: "p3", tenant_id: "t3" }] as never;
         if (sql.includes("JOIN saas_social_accounts"))
           return [joinRow({ id: "p3", tenant_id: "t3", page_id: null })] as never;
         return [] as never;
