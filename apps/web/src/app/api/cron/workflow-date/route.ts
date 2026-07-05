@@ -6,15 +6,17 @@
 import { NextResponse } from "next/server";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 import { dispatchDateReached } from "../../../../../../../backend/saas/saasWorkflowDispatch";
+import { verifyCronFlexible } from "@/lib/cronAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const secret = req.headers.get("x-cron-secret") ?? req.headers.get("authorization")?.replace("Bearer ", "");
-  if (!secret || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronFlexible(
+    req.headers.get("x-cron-secret"),
+    req.headers.get("authorization"),
+  );
+  if (denied) return denied;
 
   // Get all unique tenant_ids that have active date_reached workflows
   const db = DbClient.getInstance();

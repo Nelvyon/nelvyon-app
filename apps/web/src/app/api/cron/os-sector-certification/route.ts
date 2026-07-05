@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { getOsSectorCertificationService } from "@nelvyon/os-agents";
+import { verifyCronBearer } from "@/lib/cronAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function authorizeCron(req: Request): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  return req.headers.get("authorization") === `Bearer ${secret}`;
-}
-
 export async function POST(req: Request) {
-  if (!authorizeCron(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronBearer(req.headers.get("authorization"));
+  if (denied) return denied;
   try {
     const svc = getOsSectorCertificationService();
     const [batch, summary] = await Promise.all([svc.runBatchCertification(), svc.getSummary()]);
@@ -26,9 +20,8 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  if (!authorizeCron(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronBearer(req.headers.get("authorization"));
+  if (denied) return denied;
   try {
     const svc = getOsSectorCertificationService();
     const summary = await svc.getSummary();

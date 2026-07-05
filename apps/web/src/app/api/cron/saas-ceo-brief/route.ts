@@ -5,19 +5,11 @@ import { NextResponse } from "next/server";
 import { SendEmailCommand } from "@aws-sdk/client-ses";
 import { getSaasCeoBriefService } from "@nelvyon/saas";
 import { getSesClient } from "../../../../../../../backend/email/sesClient";
-
-function assertCron(req: Request): NextResponse | null {
-  const auth = req.headers.get("authorization");
-  const secret = process.env.CRON_SECRET ?? "";
-  if (!secret || auth !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  return null;
-}
+import { verifyCronBearer } from "@/lib/cronAuth";
 
 /** POST /api/cron/saas-ceo-brief — daily CEO morning brief per tenant */
 export async function POST(req: Request) {
-  const denied = assertCron(req);
+  const denied = verifyCronBearer(req.headers.get("authorization"));
   if (denied) return denied;
 
   const hourUtc = new Date().getUTCHours();

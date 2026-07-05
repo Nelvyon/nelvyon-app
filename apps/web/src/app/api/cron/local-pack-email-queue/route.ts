@@ -1,35 +1,22 @@
-import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { processPendingLocalWelcomeEmails } from "@/lib/packs/localPackWelcomeEmail";
+import { verifyCronHeader } from "@/lib/cronAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function timingSafeEqual(a: string, b: string): boolean {
-  try {
-    const aBuf = Buffer.from(a);
-    const bBuf = Buffer.from(b);
-    if (aBuf.length !== bBuf.length) return false;
-    return crypto.timingSafeEqual(aBuf, bBuf);
-  } catch {
-    return false;
-  }
-}
-
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get("x-cron-secret") ?? "";
-  const expected = process.env.CRON_SECRET ?? "";
-  if (!expected || !timingSafeEqual(secret, expected)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronHeader(req.headers.get("x-cron-secret"));
+  if (denied) return denied;
 
-  const limit = Number(req.nextUrl.searchParams.get("limit") ?? 100);
+  const limitRaw = Number(req.nextUrl.searchParams.get("limit") ?? 100);
+  const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(limitRaw, 1), 500) : 100;
   const workspaceIdRaw = req.nextUrl.searchParams.get("workspace_id");
   const workspaceId = workspaceIdRaw ? Number(workspaceIdRaw) : undefined;
   const result = await processPendingLocalWelcomeEmails({
-    limit: Number.isFinite(limit) ? limit : 100,
-    workspaceId: Number.isFinite(workspaceId as number) ? workspaceId : undefined,
+    limit,
+    workspaceId: workspaceId && Number.isFinite(workspaceId) ? workspaceId : undefined,
   });
 
   return NextResponse.json({

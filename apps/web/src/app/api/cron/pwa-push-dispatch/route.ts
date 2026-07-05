@@ -2,21 +2,15 @@ import { NextResponse } from "next/server";
 
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 import { getSaasPwaService } from "@nelvyon/saas";
+import { verifyCronBearer } from "@/lib/cronAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function authorizeCron(req: Request): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  return req.headers.get("authorization") === `Bearer ${secret}`;
-}
-
 /** Dispatch pending workflow push notifications (cron). */
 export async function POST(req: Request) {
-  if (!authorizeCron(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronBearer(req.headers.get("authorization"));
+  if (denied) return denied;
   if (!process.env.VAPID_PUBLIC_KEY?.trim() || !process.env.VAPID_PRIVATE_KEY?.trim()) {
     return NextResponse.json({ ok: true, skipped: true, reason: "VAPID not configured" });
   }

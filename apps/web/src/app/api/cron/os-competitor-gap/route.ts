@@ -3,19 +3,11 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { getOsCompetitorGapService } from "@nelvyon/saas";
-
-function assertCron(req: Request): NextResponse | null {
-  const auth = req.headers.get("authorization");
-  const secret = process.env.CRON_SECRET ?? "";
-  if (!secret || auth !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  return null;
-}
+import { verifyCronBearer } from "@/lib/cronAuth";
 
 /** Weekly digest — lists recent gap runs for OS dashboard (no auto-analyze). */
 export async function POST(req: Request) {
-  const denied = assertCron(req);
+  const denied = verifyCronBearer(req.headers.get("authorization"));
   if (denied) return denied;
 
   try {

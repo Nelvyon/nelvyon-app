@@ -7,14 +7,41 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const BACKEND_URL = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const MAX_AGENT_ID_LEN = 128;
+const MAX_INPUT_LEN = 50_000;
+
+async function persistAgentRunUpdate(
+  db: DbClient,
+  runId: string,
+  tenantId: string,
+  output: string,
+  status: string,
+): Promise<void> {
+  try {
+    await db.query(
+      `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
+      [output, status, runId, tenantId],
+    );
+  } catch (err) {
+    console.error("[saas/agentes/execute] failed to persist run update", { runId, tenantId, status, err });
+  }
+}
 
 export async function POST(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "workflows.execute");
     const body = (await req.json()) as { agentId?: string; input?: string };
 
-    if (!body.agentId?.trim() || !body.input?.trim()) {
+    const agentId = body.agentId?.trim() ?? "";
+    const input = body.input?.trim() ?? "";
+    if (!agentId || !input) {
       return NextResponse.json({ error: "agentId and input are required" }, { status: 400 });
+    }
+    if (agentId.length > MAX_AGENT_ID_LEN) {
+      return NextResponse.json({ error: `agentId must be at most ${MAX_AGENT_ID_LEN} characters` }, { status: 400 });
+    }
+    if (input.length > MAX_INPUT_LEN) {
+      return NextResponse.json({ error: `input must be at most ${MAX_INPUT_LEN} characters` }, { status: 400 });
     }
 
     const db = DbClient.getInstance();
@@ -22,9 +49,12 @@ export async function POST(req: Request) {
       `INSERT INTO saas_agent_runs (tenant_id, agent_id, input, status)
        VALUES ($1, $2, $3, 'running')
        RETURNING id`,
-      [ctx.tenant.id, body.agentId.trim(), body.input.trim()],
+      [ctx.tenant.id, agentId, input],
     );
-    const runId = runRows[0].id;
+    const runId = runRows[0]?.id;
+    if (!runId) {
+      return NextResponse.json({ error: "Failed to create agent run" }, { status: 500 });
+    }
 
     // Try to call Python backend agent
     let result = "";
@@ -35,8 +65,8 @@ export async function POST(req: Request) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          agent_id: body.agentId,
-          input: body.input,
+          agent_id: agentId,
+          input,
           tenant_id: ctx.tenant.id,
           dry_run: false,
         }),
@@ -62,9 +92,9 @@ export async function POST(req: Request) {
             messages: [
               {
                 role: "system",
-                content: `Eres el agente especializado de Nelvyon para el sector "${body.agentId}". Eres un experto en marketing digital, SEO, publicidad y crecimiento. Responde de forma estructurada, accionable y en español. Da resultados concretos que el usuario pueda implementar hoy mismo.`,
+                content: `Eres el agente especializado de Nelvyon para el sector "${agentId}". Eres un experto en marketing digital, SEO, publicidad y crecimiento. Responde de forma estructurada, accionable y en español. Da resultados concretos que el usuario pueda implementar hoy mismo.`,
               },
-              { role: "user", content: body.input },
+              { role: "user", content: input },
             ],
             max_tokens: 2000,
             temperature: 0.7,
@@ -76,7 +106,7 @@ export async function POST(req: Request) {
           result = oaData.choices?.[0]?.message?.content ?? "Sin respuesta del agente";
         } else {
           status = "failed";
-          result = `El agente "${body.agentId}" no pudo ejecutarse. Verifica la clave OPENAI_API_KEY en Railway.`;
+          result = `El agente "${agentId}" no pudo ejecutarse. Verifica la clave OPENAI_API_KEY en Railway.`;
         }
       } else {
         status = "failed";
@@ -85,10 +115,7 @@ export async function POST(req: Request) {
     }
 
     if (status === "failed" && !result.trim()) {
-      await db.query(
-        `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
-        ["Agent execution unavailable", "failed", runId, ctx.tenant.id],
-      ).catch(() => {});
+      await persistAgentRunUpdate(db, runId, ctx.tenant.id, "Agent execution unavailable", "failed");
 
       return NextResponse.json(
         {
@@ -102,10 +129,7 @@ export async function POST(req: Request) {
     }
 
     if (status === "failed") {
-      await db.query(
-        `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
-        [result, status, runId, ctx.tenant.id],
-      ).catch(() => {});
+      await persistAgentRunUpdate(db, runId, ctx.tenant.id, result, status);
 
       return NextResponse.json(
         {
@@ -118,10 +142,7 @@ export async function POST(req: Request) {
       );
     }
 
-    await db.query(
-      `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
-      [result, status, runId, ctx.tenant.id],
-    ).catch(() => {});
+    await persistAgentRunUpdate(db, runId, ctx.tenant.id, result, status);
 
     return NextResponse.json({
       result,

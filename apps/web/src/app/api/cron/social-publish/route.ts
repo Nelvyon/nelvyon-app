@@ -6,15 +6,14 @@
  */
 import { NextResponse } from "next/server";
 import { getSaasSocialService } from "@nelvyon/saas";
+import { verifyCronHeader } from "@/lib/cronAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(req: Request): Promise<NextResponse> {
-  const secret = req.headers.get("x-cron-secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronHeader(req.headers.get("x-cron-secret"));
+  if (denied) return denied;
 
   const { published, failed } = await getSaasSocialService().processDueScheduled();
 

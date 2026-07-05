@@ -3,7 +3,7 @@
  */
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
-import { buildMockSocialPost, buildDeliverableSocialProofPost } from "./nelvyonAgentMockReplies";
+import { buildDeliverableSocialProofPost } from "./nelvyonAgentMockReplies";
 
 export type SocialProofDraft = {
   id: string;
@@ -36,9 +36,7 @@ export class SaasSocialProofService {
     tenantId: string,
     input: { deliverableId?: string; title?: string; qaScore?: number; packName?: string; platform?: string },
   ): Promise<SocialProofDraft> {
-    const draft = input.title
-      ? buildDeliverableSocialProofPost(input)
-      : buildMockSocialPost({ topic: input.packName, platform: input.platform });
+    const draft = buildDeliverableSocialProofPost(input);
 
     const rows = await this.db.query<Record<string, unknown>>(
       `INSERT INTO saas_social_proof_drafts (tenant_id, deliverable_id, platform, content, hashtags)
@@ -56,9 +54,10 @@ export class SaasSocialProofService {
   }
 
   async list(tenantId: string, limit = 20): Promise<SocialProofDraft[]> {
+    const safeLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.trunc(limit), 1), 100) : 20;
     const rows = await this.db.query<Record<string, unknown>>(
       `SELECT * FROM saas_social_proof_drafts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT $2`,
-      [tenantId, limit],
+      [tenantId, safeLimit],
     );
     return rows.map((r) => this.mapRow(r));
   }

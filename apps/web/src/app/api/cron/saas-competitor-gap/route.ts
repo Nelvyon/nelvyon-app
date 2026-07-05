@@ -3,19 +3,11 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
-
-function assertCron(req: Request): NextResponse | null {
-  const auth = req.headers.get("authorization");
-  const secret = process.env.CRON_SECRET ?? "";
-  if (!secret || auth !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  return null;
-}
+import { verifyCronBearer } from "@/lib/cronAuth";
 
 /** Weekly SaaS competitor gap digest per tenant with configured domain */
 export async function POST(req: Request) {
-  const denied = assertCron(req);
+  const denied = verifyCronBearer(req.headers.get("authorization"));
   if (denied) return denied;
 
   const db = DbClient.getInstance();

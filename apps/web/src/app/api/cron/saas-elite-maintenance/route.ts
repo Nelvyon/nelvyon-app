@@ -13,18 +13,12 @@ import {
   type CrmConnectorSlug,
 } from "@nelvyon/saas";
 import { getOsSectorCertificationService } from "@nelvyon/os-agents";
-
-function authorizeCron(req: Request): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  return req.headers.get("authorization") === `Bearer ${secret}`;
-}
+import { verifyCronBearer } from "@/lib/cronAuth";
 
 /** Nightly: evaluate ads optimizer rules + HubSpot pull for connected tenants. */
 export async function GET(req: Request) {
-  if (!authorizeCron(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronBearer(req.headers.get("authorization"));
+  if (denied) return denied;
 
   const db = DbClient.getInstance();
   const adsSvc = getSaasAdsOptimizerService();

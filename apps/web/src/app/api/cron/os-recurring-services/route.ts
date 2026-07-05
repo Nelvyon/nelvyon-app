@@ -11,15 +11,14 @@ import { DbClient } from "@/../../backend/db/DbClient";
 import { getOsRecurringServicesService, type RecurringServiceType } from "@/../../backend/saas/OsRecurringServicesService";
 import { getSaasAutopilotService } from "@/../../backend/saas/SaasAutopilotService";
 import { getOsRecurringRunLogService } from "@/../../backend/saas/OsRecurringRunLogService";
+import { verifyCronHeader } from "@/lib/cronAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(req: Request): Promise<NextResponse> {
-  const secret = req.headers.get("x-cron-secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronHeader(req.headers.get("x-cron-secret"));
+  if (denied) return denied;
 
   const url = new URL(req.url);
   const monthParam = url.searchParams.get("month");

@@ -8,16 +8,15 @@
  */
 import { NextResponse } from "next/server";
 import { getOsLearningLoopProdService } from "@nelvyon/saas";
+import { verifyCronHeader } from "@/lib/cronAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 export async function GET(req: Request): Promise<NextResponse> {
-  const secret = req.headers.get("x-cron-secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronHeader(req.headers.get("x-cron-secret"));
+  if (denied) return denied;
 
   // O20 — delegate to the production learning loop (GA4 → weights → templates → seeds)
   const prod = getOsLearningLoopProdService();

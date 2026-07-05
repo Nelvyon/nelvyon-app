@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 import { getSaasWorkflowService } from "@/../../backend/saas/SaasWorkflowService";
 import { DbClient } from "@/../../backend/db/DbClient";
+import { verifyCronHeader } from "@/lib/cronAuth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request): Promise<NextResponse> {
-  const secret = req.headers.get("x-cron-secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronHeader(req.headers.get("x-cron-secret"));
+  if (denied) return denied;
 
   const db = DbClient.getInstance();
   type TenantRow = { id: string };

@@ -1,22 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSaasCpqEnterpriseService } from "@nelvyon/saas";
+import { verifyCronFlexible } from "@/lib/cronAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function isAuthorizedCron(req: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET?.trim();
-  if (!cronSecret) return false;
-  const auth = req.headers.get("authorization");
-  const headerSecret = req.headers.get("x-cron-secret");
-  const bearer = auth?.startsWith("Bearer ") ? auth.slice(7).trim() : null;
-  return bearer === cronSecret || headerSecret === cronSecret;
-}
-
 export async function GET(req: NextRequest) {
-  if (!isAuthorizedCron(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronFlexible(
+    req.headers.get("x-cron-secret"),
+    req.headers.get("authorization"),
+  );
+  if (denied) return denied;
   try {
     const result = await getSaasCpqEnterpriseService().processDueDunning(100);
     return NextResponse.json({ ok: true, ...result });
