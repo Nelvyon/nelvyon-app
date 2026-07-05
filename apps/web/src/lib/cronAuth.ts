@@ -12,6 +12,11 @@ function timingSafeEqual(a: string, b: string): boolean {
   }
 }
 
+/** Exported for webhook/HMAC comparisons outside cron routes. */
+export function timingSafeEqualStrings(a: string, b: string): boolean {
+  return timingSafeEqual(a, b);
+}
+
 function expectedCronSecret(): string {
   return process.env.CRON_SECRET?.trim() ?? "";
 }

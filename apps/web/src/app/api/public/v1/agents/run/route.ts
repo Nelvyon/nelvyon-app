@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 
 import { addAIMetadataToBody, getAIResponseHeaders } from "@/lib/aiMetadata";
+import { requirePublicApiContext } from "@/lib/requirePublicApiContext";
 import { captureUnknownApiError } from "@/lib/sentryCapture";
 import { AppError, toClientError } from "@nelvyon/errors";
 import { OsOrchestrator } from "@nelvyon/os-agents";
 import { RateLimitExceededError } from "@nelvyon/usage";
 
 import { saasPublicApiService } from "../../../../../../../../../backend/saas/SaasPublicApiService";
-import { authenticateApiKeyAppRouter } from "../../../../../../pages/api/public/v1/_auth";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function mergeHeaders(
@@ -21,17 +21,12 @@ function mergeHeaders(
 
 export async function POST(req: Request) {
   const started = Date.now();
-  const gate = await authenticateApiKeyAppRouter(req);
+  const gate = await requirePublicApiContext(req, "agents.run");
   if (!gate.ok) {
-    if ("apiKeyIdForLog" in gate && typeof gate.apiKeyIdForLog === "string") {
-      await saasPublicApiService
-        .logUsage(gate.apiKeyIdForLog, "/api/public/v1/agents/run", "POST", gate.response.status, Date.now() - started)
-        .catch(() => undefined);
-    }
     return gate.response;
   }
 
-  const { auth, rateHeaders } = gate;
+  const { ctx, rateHeaders } = gate;
   let statusCode = 500;
 
   try {
@@ -54,9 +49,9 @@ export async function POST(req: Request) {
 
     const result = await OsOrchestrator.enqueueAndDispatch({
       serviceId,
-      clientId: auth.userId,
+      clientId: ctx.tenantId,
       payload,
-      userId: auth.userId,
+      userId: ctx.tenantId,
     });
 
     statusCode = 200;
@@ -86,7 +81,7 @@ export async function POST(req: Request) {
     );
   } finally {
     await saasPublicApiService
-      .logUsage(auth.apiKeyId, "/api/public/v1/agents/run", "POST", statusCode, Date.now() - started)
+      .logUsage(ctx.keyId, "/api/public/v1/agents/run", "POST", statusCode, Date.now() - started)
       .catch(() => undefined);
   }
 }

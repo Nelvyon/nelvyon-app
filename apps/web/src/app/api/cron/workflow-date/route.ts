@@ -20,10 +20,16 @@ export async function POST(req: Request) {
 
   // Get all unique tenant_ids that have active date_reached workflows
   const db = DbClient.getInstance();
-  const rows = await db.query<{ tenant_id: string }>(
-    `SELECT DISTINCT tenant_id FROM saas_workflows
-     WHERE status = 'active' AND trigger_type = 'date_reached'`,
-  ).catch(() => [] as { tenant_id: string }[]);
+  let rows: { tenant_id: string }[];
+  try {
+    rows = await db.query<{ tenant_id: string }>(
+      `SELECT DISTINCT tenant_id FROM saas_workflows
+       WHERE status = 'active' AND trigger_type = 'date_reached'`,
+    );
+  } catch (e) {
+    console.error("[cron/workflow-date] failed to list tenants", e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
 
   let processed = 0;
   const errors: string[] = [];

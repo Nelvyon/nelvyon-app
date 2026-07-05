@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { CHECKOUT_STRIPE_PLANS, normalizeBillablePlan } from "@nelvyon/billing";
+import { verifyCronHeader } from "@/lib/cronAuth";
 
 import {
   auditStripeRepair,
@@ -11,21 +12,14 @@ import {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function authorize(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  return req.headers.get("x-cron-secret")?.trim() === secret;
-}
-
 /**
  * GET /api/billing/stripe-repair — auditoría: cuenta, modo live/test, prices activos, productos.
  * POST /api/billing/stripe-repair — repara prices inexistentes (crea/reutiliza) y actualiza Railway.
  * Auth: header x-cron-secret = CRON_SECRET
  */
 export async function GET(req: NextRequest) {
-  if (!authorize(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronHeader(req.headers.get("x-cron-secret"));
+  if (denied) return denied;
 
   try {
     const report = await auditStripeRepair();
@@ -41,9 +35,8 @@ export async function GET(req: NextRequest) {
 type RepairBody = { plans?: string[]; fix?: boolean };
 
 export async function POST(req: NextRequest) {
-  if (!authorize(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronHeader(req.headers.get("x-cron-secret"));
+  if (denied) return denied;
 
   let body: RepairBody = {};
   try {

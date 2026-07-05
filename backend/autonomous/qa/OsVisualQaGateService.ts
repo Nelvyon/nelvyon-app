@@ -219,12 +219,13 @@ export class OsVisualQaGateService {
     return { ...result, auditId };
   }
 
-  async listAuditRuns(filters: { packRunId?: string; gateStatus?: GateStatus; limit?: number } = {}): Promise<QaAuditRun[]> {
+  async listAuditRuns(filters: { packRunId?: string; gateStatus?: GateStatus; workspaceId?: number; limit?: number } = {}): Promise<QaAuditRun[]> {
     const conditions: string[] = [];
     const params: unknown[] = [];
     let idx = 1;
     if (filters.packRunId) { conditions.push(`pack_run_id = $${idx++}`); params.push(filters.packRunId); }
     if (filters.gateStatus) { conditions.push(`gate_status = $${idx++}`); params.push(filters.gateStatus); }
+    if (filters.workspaceId != null) { conditions.push(`workspace_id = $${idx++}`); params.push(filters.workspaceId); }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     const limit = Math.min(Math.max(filters.limit ?? 50, 1), 200);
 
@@ -252,6 +253,35 @@ export class OsVisualQaGateService {
       checks: r.checks,
       createdAt: r.created_at,
     }));
+  }
+
+  async getAuditRunById(id: string, workspaceId: number): Promise<QaAuditRun | null> {
+    const rows = await this.db.query<{
+      id: string; pack_run_id: string | null; deliverable_ref: string | null;
+      visual_score: number; lighthouse_score: number | null; legal_passed: boolean;
+      content_hash: string | null; baseline_hash: string | null; diff_percent: string | null;
+      gate_status: GateStatus; failure_reasons: string[]; checks: VisualQaResult["checks"]; created_at: string;
+    }>(
+      `SELECT * FROM os_qa_audit_runs WHERE id = $1::uuid AND workspace_id = $2 LIMIT 1`,
+      [id, workspaceId],
+    );
+    const r = rows[0];
+    if (!r) return null;
+    return {
+      id: r.id,
+      packRunId: r.pack_run_id,
+      deliverableRef: r.deliverable_ref,
+      visualScore: r.visual_score,
+      lighthouseScore: r.lighthouse_score ?? 0,
+      legalPassed: r.legal_passed,
+      contentHash: r.content_hash,
+      baselineHash: r.baseline_hash,
+      diffPercent: r.diff_percent !== null ? parseFloat(r.diff_percent) : null,
+      gateStatus: r.gate_status,
+      failureReasons: r.failure_reasons ?? [],
+      checks: r.checks,
+      createdAt: r.created_at,
+    };
   }
 
   async getGateSummary(): Promise<GateSummary> {

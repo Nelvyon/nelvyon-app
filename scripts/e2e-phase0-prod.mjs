@@ -53,7 +53,9 @@ async function main() {
   out.required.health_ready =
     out.steps.health_ready.status === 200 && out.steps.health_ready.body?.status === "ready";
 
-  out.steps.health_deep = await fetchJson(`${BASE}/api/health/deep`);
+  const cronSecret = process.env.CRON_SECRET?.trim();
+  const deepHeaders = cronSecret ? { "x-cron-secret": cronSecret } : {};
+  out.steps.health_deep = await fetchJson(`${BASE}/api/health/deep`, { headers: deepHeaders });
   out.required.health_deep =
     out.steps.health_deep.status === 200 && out.steps.health_deep.body?.status === "healthy";
 

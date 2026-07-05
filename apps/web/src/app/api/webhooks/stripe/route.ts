@@ -18,28 +18,25 @@ export async function POST(req: NextRequest) {
     eventId = event.id;
 
     try {
-      const existing = await db.query<{ status: string }>(
-        `SELECT status FROM stripe_webhook_events WHERE stripe_event_id = $1 LIMIT 1`,
-        [eventId],
-      );
-      if (existing[0]?.status === "processed") {
-        return NextResponse.json({ received: true, skipped: "duplicate" });
-      }
-    } catch {
-      // Table may not exist on first deploy — proceed.
-    }
-
-    try {
-      await db.query(
+      const claimed = await db.query<{ status: string }>(
         `INSERT INTO stripe_webhook_events (stripe_event_id, event_type, status, received_at)
          VALUES ($1, $2, 'processing', now())
          ON CONFLICT (stripe_event_id) DO UPDATE
-           SET status = 'processing', event_type = EXCLUDED.event_type
-         WHERE stripe_webhook_events.status <> 'processed'`,
+           SET event_type = EXCLUDED.event_type, received_at = now()
+           WHERE stripe_webhook_events.status NOT IN ('processed', 'processing')
+         RETURNING status`,
         [eventId, event.type],
       );
+      if (!claimed[0]) {
+        return NextResponse.json({ received: true, skipped: "duplicate" });
+      }
     } catch (err) {
-      console.error("[stripe-webhook] idempotency insert failed", err);
+      const msg = err instanceof Error ? err.message : String(err);
+      if (!/stripe_webhook_events/i.test(msg) || !/does not exist|relation/i.test(msg)) {
+        console.error("[stripe-webhook] idempotency claim failed", err);
+        return NextResponse.json({ error: "Idempotency check failed" }, { status: 503 });
+      }
+      console.warn("[stripe-webhook] idempotency table missing — proceeding without claim");
     }
 
     await processStripeEvent(event, db);

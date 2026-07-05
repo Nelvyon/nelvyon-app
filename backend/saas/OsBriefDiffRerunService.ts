@@ -263,6 +263,9 @@ export class OsBriefDiffRerunService {
     if (!source) {
       throw new OsBriefDiffError("NOT_FOUND", `Pack run ${input.sourcePackRunId} no encontrado`);
     }
+    if (input.workspaceId != null && source.workspaceId !== input.workspaceId) {
+      throw new OsBriefDiffError("NOT_FOUND", `Pack run ${input.sourcePackRunId} no encontrado`);
+    }
 
     const beforeIntake = source.intake;
     const afterIntake = mergeIntake(beforeIntake, input.newIntake);
@@ -305,6 +308,9 @@ export class OsBriefDiffRerunService {
     }
     if (diff.status === "no_change" || diff.changeCount === 0) {
       throw new OsBriefDiffError("NO_CHANGE", "Sin cambios — no se re-ejecuta el pack");
+    }
+    if (ctx.workspaceId != null && diff.workspaceId !== ctx.workspaceId) {
+      throw new OsBriefDiffError("NOT_FOUND", `Diff ${diffId} no encontrado`);
     }
 
     const workspaceId = ctx.workspaceId ?? diff.workspaceId;
@@ -387,6 +393,7 @@ export class OsBriefDiffRerunService {
   async listDiffs(filters: {
     sourcePackRunId?: string;
     status?: BriefDiffStatus;
+    workspaceId?: number;
     limit?: number;
   } = {}): Promise<BriefDiffRecord[]> {
     const clauses: string[] = [];
@@ -400,6 +407,10 @@ export class OsBriefDiffRerunService {
       clauses.push(`status = $${i++}`);
       params.push(filters.status);
     }
+    if (filters.workspaceId != null) {
+      clauses.push(`workspace_id = $${i++}`);
+      params.push(filters.workspaceId);
+    }
     const limit = filters.limit ?? 100;
     params.push(limit);
     const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
@@ -410,7 +421,10 @@ export class OsBriefDiffRerunService {
     return rows.map(rowToDiff);
   }
 
-  async getSummary(): Promise<BriefDiffSummary> {
+  async getSummary(workspaceId?: number): Promise<BriefDiffSummary> {
+    const params: unknown[] = [];
+    const where = workspaceId != null ? `WHERE workspace_id = $1` : "";
+    if (workspaceId != null) params.push(workspaceId);
     const rows = await this.db.query<{
       total: string;
       material: string;
@@ -426,7 +440,8 @@ export class OsBriefDiffRerunService {
          COUNT(*) FILTER (WHERE status = 'completed')::text AS completed,
          COUNT(*) FILTER (WHERE status = 'failed')::text AS failed,
          MAX(created_at) AS last_diff_at
-       FROM os_brief_diff_runs`,
+       FROM os_brief_diff_runs ${where}`,
+      params,
     );
     const r = rows[0];
     return {

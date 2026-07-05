@@ -325,12 +325,16 @@ export class SaasBriefToLaunchService {
         const { getSaasComplianceVaultService } = require("./SaasComplianceVaultService") as {
           getSaasComplianceVaultService: () => { syncFromPackRun(tenantId: string, packRunId: string): Promise<unknown> };
         };
-        void getSaasComplianceVaultService().syncFromPackRun(tenantId, packRun.id).catch(() => {});
+        void getSaasComplianceVaultService().syncFromPackRun(tenantId, packRun.id).catch((e) => {
+          console.error("[brief-to-launch] compliance vault sync failed", { tenantId, packRunId: packRun.id, err: e });
+        });
       } catch { /* never block launch */ }
 
       // Hook S52: consume a launch from the pack entitlement (non-blocking)
       if (this.entitlements) {
-        void this.entitlements.consumeLaunch(tenantId, launch.pack_id).catch(() => {});
+        void this.entitlements.consumeLaunch(tenantId, launch.pack_id).catch((e) => {
+          console.error("[brief-to-launch] consumeLaunch failed", { tenantId, packId: launch.pack_id, err: e });
+        });
       }
 
       // Hook S53: regenerate data playbooks from fresh metrics (non-blocking)
@@ -339,7 +343,9 @@ export class SaasBriefToLaunchService {
         const { getSaasDataPlaybooksService } = require("./SaasDataPlaybooksService") as {
           getSaasDataPlaybooksService: () => { refreshPlaybooks(tenantId: string): Promise<unknown> };
         };
-        void getSaasDataPlaybooksService().refreshPlaybooks(tenantId).catch(() => {});
+        void getSaasDataPlaybooksService().refreshPlaybooks(tenantId).catch((e) => {
+          console.error("[brief-to-launch] refreshPlaybooks failed", { tenantId, err: e });
+        });
       } catch { /* never block launch */ }
 
       return rowToLaunch(updated[0]!);

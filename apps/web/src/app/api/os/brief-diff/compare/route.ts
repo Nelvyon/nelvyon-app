@@ -1,21 +1,19 @@
 import { NextResponse } from "next/server";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { notFoundResponse, packRunBelongsToWorkspace, requireOsWorkspaceAccess } from "@/lib/osWorkspaceScope";
 import { createBriefDiffRunnerPort } from "@/lib/packs/briefDiffRunnerPort";
 import { getOsBriefDiffRerunService, OsBriefDiffError } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function parseWorkspaceId(req: Request): number | null {
-  const raw = req.headers.get("x-workspace-id")?.trim();
-  if (!raw) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
 export async function POST(req: Request) {
   const claims = await requirePlatformClaims(req);
   if (claims instanceof NextResponse) return claims;
+
+  const ws = await requireOsWorkspaceAccess(req, claims);
+  if (ws instanceof NextResponse) return ws;
+  const { workspaceId } = ws;
 
   let body: { sourcePackRunId?: string; intake?: Record<string, unknown>; execute?: boolean };
   try {
@@ -31,7 +29,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "intake required" }, { status: 400 });
   }
 
-  const workspaceId = parseWorkspaceId(req) ?? undefined;
+  if (!(await packRunBelongsToWorkspace(body.sourcePackRunId, workspaceId))) {
+    return notFoundResponse();
+  }
 
   try {
     const result = await getOsBriefDiffRerunService().compareAndRerun(

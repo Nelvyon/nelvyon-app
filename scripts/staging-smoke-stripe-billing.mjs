@@ -77,7 +77,13 @@ async function login() {
 }
 
 async function checkDeepHealthStripe() {
-  const res = await fetch(`${BASE}/api/health/deep`, { cache: "no-store" });
+  const cronSecret = process.env.CRON_SECRET?.trim();
+  const headers = cronSecret ? { "x-cron-secret": cronSecret } : {};
+  const res = await fetch(`${BASE}/api/health/deep`, { cache: "no-store", headers });
+  if (res.status === 401 && !cronSecret) {
+    warn("health", "deep_auth", "CRON_SECRET not set locally — skipping deep health (401 expected)");
+    return;
+  }
   if (!res.ok) {
     fail("health", "deep", `status ${res.status}`);
     return;

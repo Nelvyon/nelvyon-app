@@ -58,7 +58,6 @@ function sleep(ms: number): Promise<void> {
 
 async function processItem(item: OsQueueWorkItem): Promise<void> {
   const client = QueueClient.getInstance();
-  await client.setJobStatus(item.jobId, "processing");
 
   const queueItem: OsQueueItem = {
     jobId: item.jobId,
@@ -91,6 +90,8 @@ async function processItem(item: OsQueueWorkItem): Promise<void> {
       { jobId: item.jobId, error: msg },
       err instanceof Error ? err : undefined,
     );
+  } finally {
+    await client.acknowledgeDequeued(item).catch(() => undefined);
   }
 }
 

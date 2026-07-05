@@ -3,7 +3,7 @@
  * Public route — verifies HMAC signature and renders HTML certificate.
  * Print to PDF from browser (Ctrl+P / window.print).
  */
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { DbClient } from "@/../../backend/db/DbClient";
 
@@ -14,7 +14,12 @@ function verify(certId: string, tok: string): boolean {
   const secret = process.env.JWT_SECRET ?? process.env.NEXTAUTH_SECRET;
   if (!secret?.trim()) return false;
   const expected = createHmac("sha256", secret.trim()).update(certId).digest("hex").slice(0, 32);
-  return tok === expected;
+  if (tok.length !== expected.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(tok), Buffer.from(expected));
+  } catch {
+    return false;
+  }
 }
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {

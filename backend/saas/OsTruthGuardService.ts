@@ -341,6 +341,7 @@ export class OsTruthGuardService {
     channel?: TruthChannel;
     status?: TruthStatus;
     packRunId?: string;
+    workspaceId?: number;
     limit?: number;
   } = {}): Promise<Array<TruthAuditResult & { auditedAt: string }>> {
     const conditions: string[] = [];
@@ -358,12 +359,24 @@ export class OsTruthGuardService {
       conditions.push(`pack_run_id = $${idx++}::uuid`);
       params.push(filters.packRunId);
     }
+    if (filters.workspaceId != null) {
+      conditions.push(`workspace_id = $${idx++}`);
+      params.push(filters.workspaceId);
+    }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     const rows = await this.db.query<AuditRow>(
       `SELECT * FROM os_truth_guard_audits ${where} ORDER BY audited_at DESC LIMIT $${idx}`,
       [...params, Math.min(Math.max(filters.limit ?? 50, 1), 200)],
     );
     return rows.map(rowToAudit);
+  }
+
+  async getAuditById(id: string, workspaceId: number): Promise<(TruthAuditResult & { auditedAt: string }) | null> {
+    const rows = await this.db.query<AuditRow>(
+      `SELECT * FROM os_truth_guard_audits WHERE id = $1::uuid AND workspace_id = $2 LIMIT 1`,
+      [id, workspaceId],
+    );
+    return rows[0] ? rowToAudit(rows[0]) : null;
   }
 
   async getSummary(): Promise<TruthSummary> {

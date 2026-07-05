@@ -181,10 +181,11 @@ function makeDb() {
     }
     if (s.startsWith("UPDATE saas_campanias SET status = 'running'")) {
       const row = campanias.find((x) => x.tenant_id === String(p[0]) && x.id === String(p[1]));
-      if (row) {
+      if (row && ["draft", "scheduled", "paused"].includes(row.status)) {
         row.status = "running";
         row.total_recipients = Number(p[2] ?? 0);
         row.started_at = new Date(Date.now() + ++tick);
+        if (s.includes("RETURNING id")) return [{ id: row.id }] as T[];
       }
       return [] as T[];
     }

@@ -16,8 +16,8 @@ export async function dispatchContactCreated(tenantId: string, contact: SaasCont
         value: contact.value,
       },
     });
-  } catch {
-    // Must not roll back contact creation.
+  } catch (e) {
+    console.error("[workflow-dispatch] contact_created failed", { tenantId, contactId: contact.id, err: e });
   }
 }
 
@@ -40,8 +40,8 @@ export async function dispatchContactStageChanged(
         value: contact.value,
       },
     });
-  } catch {
-    // Must not roll back contact update.
+  } catch (e) {
+    console.error("[workflow-dispatch] stage_changed failed", { tenantId, contactId: contact.id, err: e });
   }
 }
 
@@ -59,8 +59,8 @@ export async function dispatchFormSubmitted(
       contact: contactId ? { id: contactId } : {},
       submission: data,
     });
-  } catch {
-    // Must not roll back form submission.
+  } catch (e) {
+    console.error("[workflow-dispatch] form_submitted failed", { tenantId, formId, err: e });
   }
 }
 
@@ -76,8 +76,8 @@ export async function dispatchTagAdded(
       contact: { id: contactId },
       tag,
     });
-  } catch {
-    // Must not roll back tag mutation.
+  } catch (e) {
+    console.error("[workflow-dispatch] tag_added failed", { tenantId, contactId, err: e });
   }
 }
 
@@ -92,8 +92,8 @@ export async function dispatchEmailOpened(
     await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "email_opened", {
       email: { campaniaId, contactId },
     });
-  } catch {
-    // Must not fail the pixel response.
+  } catch (e) {
+    console.error("[workflow-dispatch] email_opened failed", { tenantId, campaniaId, contactId, err: e });
   }
 }
 
@@ -109,8 +109,8 @@ export async function dispatchEmailClicked(
     await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "email_clicked", {
       email: { campaniaId, contactId, url },
     });
-  } catch {
-    // Must not fail the click redirect.
+  } catch (e) {
+    console.error("[workflow-dispatch] email_clicked failed", { tenantId, campaniaId, contactId, err: e });
   }
 }
 
@@ -126,8 +126,8 @@ export async function dispatchWebhookIn(
       source,
       payload,
     });
-  } catch {
-    // Must not fail the webhook acknowledgment.
+  } catch (e) {
+    console.error("[workflow-dispatch] webhook_in failed", { tenantId, source, err: e });
   }
 }
 
@@ -138,8 +138,8 @@ export async function dispatchDateReached(tenantId: string): Promise<void> {
     await getSaasWorkflowService().dispatchActiveWorkflows(tenantId, "date_reached", {
       date: new Date().toISOString().slice(0, 10),
     });
-  } catch {
-    // Cron — log but don't crash.
+  } catch (e) {
+    console.error("[workflow-dispatch] date_reached failed", { tenantId, err: e });
   }
 }
 
@@ -163,7 +163,7 @@ export async function dispatchDealStageChanged(
       },
       contact: deal.contactId ? { id: deal.contactId } : {},
     });
-  } catch {
-    // Workflow dispatch must not roll back deal stage changes.
+  } catch (e) {
+    console.error("[workflow-dispatch] deal_stage_changed failed", { tenantId, dealId: deal.id, err: e });
   }
 }

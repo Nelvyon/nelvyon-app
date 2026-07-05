@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { requirePlatformAdmin } from "@/lib/platformBffAuth";
 import {
   getOsPackCertificationService,
   OsPackCertError,
@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 
 /** POST { packId } — promote a beta pack to available (requires valid certification). */
 export async function POST(req: Request) {
-  const claims = await requirePlatformClaims(req);
+  const claims = await requirePlatformAdmin(req);
   if (claims instanceof NextResponse) return claims;
 
   try {

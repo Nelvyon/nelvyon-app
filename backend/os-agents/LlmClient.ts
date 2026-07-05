@@ -87,6 +87,7 @@ export class LlmClient implements ILlmClient {
         max_tokens,
         temperature,
       }),
+      signal: AbortSignal.timeout(90_000),
     });
 
     const raw = await res.text();

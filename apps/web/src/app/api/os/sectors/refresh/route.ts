@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { requirePlatformAdmin } from "@/lib/platformBffAuth";
 import { getOsSectorReadinessService } from "../../../../../../../../backend/os-agents/sectors/OsSectorReadinessService";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 /** Recompute readiness for all 20 sectors and persist. */
 export async function POST(req: Request) {
-  const claims = await requirePlatformClaims(req);
+  const claims = await requirePlatformAdmin(req);
   if (claims instanceof NextResponse) return claims;
 
   try {

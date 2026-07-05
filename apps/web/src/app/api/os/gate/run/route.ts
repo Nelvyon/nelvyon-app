@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { requirePlatformAdmin } from "@/lib/platformBffAuth";
 import { getOsPackGateService } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +8,7 @@ export const maxDuration = 300;
 
 /** POST { runKey? } — run the local pack gate (fixtures + dry-run; vitest skipped in API). */
 export async function POST(req: Request) {
-  const claims = await requirePlatformClaims(req);
+  const claims = await requirePlatformAdmin(req);
   if (claims instanceof NextResponse) return claims;
 
   try {

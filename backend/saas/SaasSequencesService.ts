@@ -403,10 +403,16 @@ export class SaasSequencesService {
       id: string; sequence_id: string; tenant_id: string; contact_id: string;
       current_step: number | string; reply_received: boolean;
     }>(
-      `SELECT e.id, e.sequence_id, e.tenant_id, e.contact_id, e.current_step, e.reply_received
-       FROM saas_sequence_enrollments e
-       WHERE e.status = 'active' AND e.next_send_at <= NOW()
-       LIMIT 100`,
+      `UPDATE saas_sequence_enrollments AS e
+       SET next_send_at = NOW() + INTERVAL '10 minutes'
+       WHERE e.id IN (
+         SELECT id FROM saas_sequence_enrollments
+         WHERE status = 'active' AND next_send_at <= NOW()
+         ORDER BY next_send_at ASC
+         LIMIT 100
+         FOR UPDATE SKIP LOCKED
+       )
+       RETURNING e.id, e.sequence_id, e.tenant_id, e.contact_id, e.current_step, e.reply_received`,
       [],
     );
 

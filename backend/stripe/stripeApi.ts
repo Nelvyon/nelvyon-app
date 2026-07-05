@@ -74,6 +74,7 @@ async function stripeRequest<T>(
     method,
     headers,
     body: payload,
+    signal: AbortSignal.timeout(15_000),
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => "");

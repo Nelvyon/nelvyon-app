@@ -462,11 +462,27 @@ export class SaasWorkflowService {
       if (wf.status !== "active" || wf.triggerType !== triggerType) continue;
       if (!this.matchesTriggerConfig(wf.triggerType, wf.triggerConfig, triggerData)) continue;
 
-      // Idempotency for scheduled workflows: skip if already ran in the last 4 minutes
-      // (cron runs every 5 min — prevents double execution on retries or overlapping calls)
-      if (triggerType === "scheduled" && wf.lastRunAt) {
-        const msSinceLast = Date.now() - new Date(wf.lastRunAt).getTime();
-        if (msSinceLast < 4 * 60 * 1000) continue;
+      // Atomic idempotency for scheduled / date_reached (prevents TOCTOU double-fire)
+      if (triggerType === "scheduled") {
+        const claimed = await this.db.query<{ id: string }>(
+          `UPDATE saas_workflows
+           SET last_run_at = NOW(), updated_at = NOW()
+           WHERE id = $1 AND tenant_id = $2 AND status = 'active'
+             AND (last_run_at IS NULL OR last_run_at < NOW() - INTERVAL '4 minutes')
+           RETURNING id`,
+          [wf.id, tenantId],
+        );
+        if (!claimed[0]) continue;
+      } else if (triggerType === "date_reached") {
+        const claimed = await this.db.query<{ id: string }>(
+          `UPDATE saas_workflows
+           SET last_run_at = NOW(), updated_at = NOW()
+           WHERE id = $1 AND tenant_id = $2 AND status = 'active'
+             AND (last_run_at IS NULL OR last_run_at::date < CURRENT_DATE)
+           RETURNING id`,
+          [wf.id, tenantId],
+        );
+        if (!claimed[0]) continue;
       }
 
       await this.executeWorkflow(wf.id, tenantId, triggerData);

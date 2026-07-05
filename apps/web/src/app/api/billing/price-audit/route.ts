@@ -5,6 +5,7 @@ import {
   getStripePriceEnvVarName,
   readStripePriceEnvDiagnostic,
 } from "@nelvyon/billing";
+import { verifyCronHeader } from "@/lib/cronAuth";
 
 import {
   buildPricePipelineTrace,
@@ -20,20 +21,13 @@ import {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function authorize(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return false;
-  return req.headers.get("x-cron-secret")?.trim() === secret;
-}
-
 /**
  * GET /api/billing/price-audit
  * Evidencia: process.env exacto, sin fallback legacy, retrieve vs checkout, cuenta/modo Stripe, deploy Railway.
  */
 export async function GET(req: NextRequest) {
-  if (!authorize(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const denied = verifyCronHeader(req.headers.get("x-cron-secret"));
+  if (denied) return denied;
 
   const stripeKey = readStripeKeyDiagnostic();
   const railway = readRailwayDeployDiagnostic();

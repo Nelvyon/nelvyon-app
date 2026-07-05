@@ -7,7 +7,8 @@
  * Env: META_WA_VERIFY_TOKEN (required for GET), META_WA_APP_SECRET (optional HMAC)
  */
 import { NextResponse } from "next/server";
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
+import { timingSafeEqualStrings } from "@/lib/cronAuth";
 import {
   getSaasWhatsAppCloudService,
   getMetaVerifyToken,
@@ -28,8 +29,10 @@ export function GET(req: Request): NextResponse {
   if (!verifyToken) {
     return NextResponse.json({ error: "META_WA_VERIFY_TOKEN not set" }, { status: 503 });
   }
-  if (mode === "subscribe" && token === verifyToken && challenge) {
-    return new NextResponse(challenge, { status: 200 });
+  if (mode === "subscribe" && token && challenge && verifyToken) {
+    if (timingSafeEqualStrings(token, verifyToken)) {
+      return new NextResponse(challenge, { status: 200 });
+    }
   }
   return NextResponse.json({ error: "Verification failed" }, { status: 403 });
 }
@@ -47,7 +50,9 @@ export async function POST(req: Request): Promise<NextResponse> {
     const signature = req.headers.get("x-hub-signature-256") ?? "";
     const rawBody = await req.text();
     const expected = "sha256=" + createHmac("sha256", appSecret).update(rawBody).digest("hex");
-    if (signature !== expected) {
+    const sigBuf = Buffer.from(signature);
+    const expBuf = Buffer.from(expected);
+    if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
     // Re-parse since we consumed the body

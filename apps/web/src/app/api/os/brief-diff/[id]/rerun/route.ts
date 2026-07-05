@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { notFoundResponse, requireOsWorkspaceAccess } from "@/lib/osWorkspaceScope";
 import { createBriefDiffRunnerPort } from "@/lib/packs/briefDiffRunnerPort";
 import { getOsBriefDiffRerunService, OsBriefDiffError } from "@nelvyon/saas";
 
@@ -7,16 +8,13 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
-function parseWorkspaceId(req: Request): number | null {
-  const raw = req.headers.get("x-workspace-id")?.trim();
-  if (!raw) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const claims = await requirePlatformClaims(req);
   if (claims instanceof NextResponse) return claims;
+
+  const ws = await requireOsWorkspaceAccess(req, claims);
+  if (ws instanceof NextResponse) return ws;
+  const { workspaceId } = ws;
 
   const { id } = await ctx.params;
   let body: { execute?: boolean } = {};
@@ -26,13 +24,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     /* default execute true */
   }
   const execute = body.execute !== false;
-  const workspaceId = parseWorkspaceId(req) ?? undefined;
 
   try {
     const svc = getOsBriefDiffRerunService();
+    const diff = await svc.getDiff(id);
+    if (!diff || diff.workspaceId !== workspaceId) {
+      return notFoundResponse();
+    }
     if (!execute) {
-      const diff = await svc.getDiff(id);
-      if (!diff) return NextResponse.json({ error: "Diff not found" }, { status: 404 });
       return NextResponse.json({ diff });
     }
     const result = await svc.executeRerun(id, {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { notFoundResponse, requireOsWorkspaceAccess } from "@/lib/osWorkspaceScope";
 import { getOsTruthGuardService } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
@@ -9,11 +10,14 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   const claims = await requirePlatformClaims(req);
   if (claims instanceof NextResponse) return claims;
 
+  const ws = await requireOsWorkspaceAccess(req, claims);
+  if (ws instanceof NextResponse) return ws;
+  const { workspaceId } = ws;
+
   try {
     const { id } = await ctx.params;
-    const audits = await getOsTruthGuardService().listAudits({ limit: 200 });
-    const audit = audits.find((a) => a.id === id);
-    if (!audit) return NextResponse.json({ error: "Not found", code: "NOT_FOUND" }, { status: 404 });
+    const audit = await getOsTruthGuardService().getAuditById(id, workspaceId);
+    if (!audit) return notFoundResponse();
     return NextResponse.json({ audit });
   } catch (e) {
     console.error("[os/truth-guard/[id] GET]", e);

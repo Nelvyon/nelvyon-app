@@ -204,11 +204,15 @@ export class OsAgentAuditTrailService {
     return { inserted: log.length };
   }
 
-  async getTrailForPackRun(packRunId: string): Promise<AgentAuditTrail[]> {
-    const rows = await this.db.query<EventRow>(
-      `SELECT * FROM os_agent_audit_events WHERE pack_run_id = $1::uuid ORDER BY sku ASC, step_order ASC`,
-      [packRunId],
-    );
+  async getTrailForPackRun(packRunId: string, workspaceId?: number): Promise<AgentAuditTrail[]> {
+    const params: unknown[] = [packRunId];
+    let sql = `SELECT * FROM os_agent_audit_events WHERE pack_run_id = $1::uuid`;
+    if (workspaceId != null) {
+      sql += ` AND workspace_id = $2`;
+      params.push(workspaceId);
+    }
+    sql += ` ORDER BY sku ASC, step_order ASC`;
+    const rows = await this.db.query<EventRow>(sql, params);
     const bySku = new Map<string, AgentAuditEvent[]>();
     for (const r of rows) {
       const ev = rowToEvent(r);
@@ -226,13 +230,14 @@ export class OsAgentAuditTrailService {
     }));
   }
 
-  async listEvents(filters: { packRunId?: string; sku?: string; agentId?: string; limit?: number } = {}): Promise<AgentAuditEvent[]> {
+  async listEvents(filters: { packRunId?: string; sku?: string; agentId?: string; workspaceId?: number; limit?: number } = {}): Promise<AgentAuditEvent[]> {
     const conditions: string[] = [];
     const params: unknown[] = [];
     let idx = 1;
     if (filters.packRunId) { conditions.push(`pack_run_id = $${idx++}::uuid`); params.push(filters.packRunId); }
     if (filters.sku) { conditions.push(`sku = $${idx++}`); params.push(filters.sku); }
     if (filters.agentId) { conditions.push(`agent_id = $${idx++}`); params.push(filters.agentId); }
+    if (filters.workspaceId != null) { conditions.push(`workspace_id = $${idx++}`); params.push(filters.workspaceId); }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     const rows = await this.db.query<EventRow>(
       `SELECT * FROM os_agent_audit_events ${where} ORDER BY recorded_at DESC LIMIT $${idx}`,
@@ -241,20 +246,27 @@ export class OsAgentAuditTrailService {
     return rows.map(rowToEvent);
   }
 
-  async getSummary(): Promise<AgentAuditSummary> {
+  async getSummary(workspaceId?: number): Promise<AgentAuditSummary> {
+    const params: unknown[] = [];
+    const where = workspaceId != null ? `WHERE workspace_id = $1` : "";
+    if (workspaceId != null) params.push(workspaceId);
     const rows = await this.db.query<{ total: string; pack_runs: string; agents: string; skus: string; last: string | null }>(
       `SELECT COUNT(*) AS total, COUNT(DISTINCT pack_run_id) AS pack_runs,
               COUNT(DISTINCT agent_id) AS agents, COUNT(DISTINCT (pack_run_id::text || '|' || sku)) AS skus,
               MAX(recorded_at) AS last
-       FROM os_agent_audit_events`,
+       FROM os_agent_audit_events ${where}`,
+      params,
     );
     const r = rows[0];
     const total = parseInt(r?.total ?? "0", 10);
     const skus = parseInt(r?.skus ?? "0", 10);
     let topAgents: Array<{ agentId: string; count: number }> = [];
     try {
+      const agentWhere = workspaceId != null ? `WHERE workspace_id = $1` : "";
+      const agentParams = workspaceId != null ? [workspaceId] : [];
       const t = await this.db.query<{ agent_id: string; count: string }>(
-        `SELECT agent_id, COUNT(*) AS count FROM os_agent_audit_events GROUP BY agent_id ORDER BY count DESC LIMIT 5`,
+        `SELECT agent_id, COUNT(*) AS count FROM os_agent_audit_events ${agentWhere} GROUP BY agent_id ORDER BY count DESC LIMIT 5`,
+        agentParams,
       );
       topAgents = t.map((x) => ({ agentId: x.agent_id, count: parseInt(x.count, 10) }));
     } catch { /* ignore */ }

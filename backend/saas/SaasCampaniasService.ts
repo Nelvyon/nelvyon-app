@@ -492,15 +492,23 @@ export class SaasCampaniasService {
       }
     }
 
-    await this.db.query(
+    const claimed = await this.db.query<{ id: string }>(
       `UPDATE saas_campanias SET
         status = 'running',
         total_recipients = $3,
         started_at = NOW(),
         updated_at = NOW()
-       WHERE tenant_id = $1 AND id = $2`,
+       WHERE tenant_id = $1 AND id = $2 AND status IN ('draft', 'scheduled', 'paused')
+       RETURNING id`,
       [tenantId, campaniaId, contactIds.length],
     );
+    if (!claimed[0]) {
+      const current = await this.getCampania(tenantId, campaniaId);
+      if (current?.status === "running") {
+        throw new SaasCampaniasError("Campania already running", "VALIDATION");
+      }
+      throw new SaasCampaniasError("Campania not in launchable state", "VALIDATION");
+    }
 
     for (const contactId of contactIds) {
       await this.db.query(
@@ -698,9 +706,15 @@ ${ctaBlock}
     if (meterEmails > 0 || meterSms > 0) {
       void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) => {
         const meter = getSaasUsageMeterService();
-        if (meterEmails > 0) void meter.incrementWithSubcuentaMirror(tenantId, "emailsSent", meterEmails).catch(() => undefined);
-        if (meterSms > 0) void meter.incrementWithSubcuentaMirror(tenantId, "smsSent", meterSms).catch(() => undefined);
-      }).catch(() => undefined);
+        if (meterEmails > 0) void meter.incrementWithSubcuentaMirror(tenantId, "emailsSent", meterEmails).catch((e) => {
+          console.error("[campanias] meter emailsSent failed", { tenantId, meterEmails, err: e });
+        });
+        if (meterSms > 0) void meter.incrementWithSubcuentaMirror(tenantId, "smsSent", meterSms).catch((e) => {
+          console.error("[campanias] meter smsSent failed", { tenantId, meterSms, err: e });
+        });
+      }).catch((e) => {
+        console.error("[campanias] usage meter import failed", { tenantId, err: e });
+      });
     }
     return { campaniaId, totalSent: sentCount, status: "completed" };
   }

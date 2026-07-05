@@ -231,7 +231,16 @@ export class SaasSocialService {
   /** Process all scheduled posts with scheduled_at <= NOW() (called from cron) */
   async processDueScheduled(): Promise<{ published: number; failed: number }> {
     const due = await this.db.query<{ id: string; tenant_id: string }>(
-      `SELECT id, tenant_id FROM saas_social_posts WHERE status='scheduled' AND scheduled_at <= NOW() LIMIT 50`,
+      `UPDATE saas_social_posts AS p
+       SET scheduled_at = NOW() + INTERVAL '10 minutes', updated_at = NOW()
+       WHERE p.id IN (
+         SELECT id FROM saas_social_posts
+         WHERE status = 'scheduled' AND scheduled_at <= NOW()
+         ORDER BY scheduled_at ASC
+         LIMIT 50
+         FOR UPDATE SKIP LOCKED
+       )
+       RETURNING p.id, p.tenant_id`,
     );
     let published = 0, failed = 0;
     for (const { id, tenant_id } of due) {

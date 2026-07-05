@@ -133,13 +133,28 @@ describe("/api/health/deep GET", () => {
     }) as typeof fetch;
   }
 
+  function deepHealthRequest() {
+    process.env.CRON_SECRET = "test-cron-secret";
+    return new Request("http://localhost/api/health/deep", {
+      headers: { "x-cron-secret": "test-cron-secret" },
+    });
+  }
+
   it("retorna 200 y healthy cuando todo ok", async () => {
     await setupAllChecksPassing();
     const { GET } = await import("../../../apps/web/src/app/api/health/deep/route");
-    const res = await GET();
+    const res = await GET(deepHealthRequest() as import("next/server").NextRequest);
     expect(res.status).toBe(200);
     const body = (await res.json()) as { status: string };
     expect(body.status).toBe("healthy");
+  });
+
+  it("retorna 401 sin CRON_SECRET", async () => {
+    await setupAllChecksPassing();
+    process.env.CRON_SECRET = "test-cron-secret";
+    const { GET } = await import("../../../apps/web/src/app/api/health/deep/route");
+    const res = await GET(new Request("http://localhost/api/health/deep") as import("next/server").NextRequest);
+    expect(res.status).toBe(401);
   });
 
   it("retorna 503 cuando database down", async () => {
@@ -148,7 +163,7 @@ describe("/api/health/deep GET", () => {
       query: vi.fn().mockRejectedValue(new Error("internal db failure")),
     } as unknown as InstanceType<typeof DbClient>);
     const { GET } = await import("../../../apps/web/src/app/api/health/deep/route");
-    const res = await GET();
+    const res = await GET(deepHealthRequest() as import("next/server").NextRequest);
     expect(res.status).toBe(503);
     const body = (await res.json()) as { status: string; checks: { database: { status: string } } };
     expect(body.status).toBe("unhealthy");

@@ -61,6 +61,16 @@ export async function POST(
     return NextResponse.json({ error: `Required fields missing: ${missing.join(", ")}` }, { status: 422 });
   }
 
+  const serialized = JSON.stringify(data);
+  if (serialized.length > 32_768) {
+    return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+  }
+  for (const [key, value] of Object.entries(data)) {
+    if (typeof value === "string" && value.length > 4_096) {
+      data[key] = value.slice(0, 4_096);
+    }
+  }
+
   // Upsert contact from form data (email is the dedup key)
   let contactId: string | null = null;
   const email = typeof data.email === "string" ? data.email.trim().toLowerCase() : null;

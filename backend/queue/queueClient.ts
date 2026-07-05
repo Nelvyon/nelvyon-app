@@ -4,6 +4,7 @@ import { osOrchestrator } from "../os-agents/OsOrchestrator";
 import type { JobStatus, OsQueueEnqueueInput, OsQueueWorkItem, QueueJobStatus } from "./types";
 
 const QUEUE_LIST_KEY = "os:async:queue";
+const PROCESSING_LIST_KEY = "os:async:processing";
 const JOB_KEY_PREFIX = "os:async:job:";
 const JOB_TTL_SECONDS = 24 * 60 * 60;
 
@@ -155,11 +156,25 @@ export class QueueClient {
 
   async dequeue(): Promise<OsQueueWorkItem | null> {
     if (this.redis) {
-      const raw = await this.redis.rpop<string>(QUEUE_LIST_KEY);
+      const raw = await this.redis.lmove<string>(QUEUE_LIST_KEY, PROCESSING_LIST_KEY, "right", "left");
       if (!raw) return null;
-      return parseWorkItem(raw);
+      const item = parseWorkItem(raw);
+      if (!item) return null;
+      await this.setJobStatus(item.jobId, "processing");
+      return item;
     }
-    return this.memoryQueue.shift() ?? null;
+    const item = this.memoryQueue.shift() ?? null;
+    if (item) {
+      await this.setJobStatus(item.jobId, "processing");
+    }
+    return item;
+  }
+
+  /** Remove a job from the processing list after worker completion (Redis only). */
+  async acknowledgeDequeued(item: OsQueueWorkItem): Promise<void> {
+    if (!this.redis) return;
+    const raw = JSON.stringify(item);
+    await this.redis.lrem(PROCESSING_LIST_KEY, 1, raw);
   }
 
   async jobBelongsToUser(jobId: string, userId: string): Promise<boolean> {

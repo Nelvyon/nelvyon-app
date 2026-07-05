@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { requirePlatformAdmin } from "@/lib/platformBffAuth";
 import {
   getOsPackCertificationService,
   OsPackCertError,
@@ -11,7 +11,7 @@ export const maxDuration = 300;
 
 /** POST { packId? } — certify one pack, or all 8 if packId omitted. */
 export async function POST(req: Request) {
-  const claims = await requirePlatformClaims(req);
+  const claims = await requirePlatformAdmin(req);
   if (claims instanceof NextResponse) return claims;
 
   try {

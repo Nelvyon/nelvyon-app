@@ -4,6 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const redisMock = {
   lpush: vi.fn().mockResolvedValue(1),
   rpop: vi.fn().mockResolvedValue(null),
+  rpoplpush: vi.fn().mockResolvedValue(null),
+  lmove: vi.fn().mockResolvedValue(null),
+  lrem: vi.fn().mockResolvedValue(1),
   set: vi.fn().mockResolvedValue("OK"),
   get: vi.fn().mockResolvedValue(null),
   expire: vi.fn().mockResolvedValue(1),
@@ -176,7 +179,7 @@ describe("osWorker", () => {
       enqueuedAt: new Date().toISOString(),
     };
 
-    redisMock.rpop.mockResolvedValueOnce(JSON.stringify(item));
+    redisMock.lmove.mockResolvedValueOnce(JSON.stringify(item));
     redisMock.get.mockResolvedValue({
       status: "pending",
       userId: "user-1",
@@ -219,7 +222,7 @@ describe("osWorker", () => {
       enqueuedAt: new Date().toISOString(),
     };
 
-    redisMock.rpop
+    redisMock.lmove
       .mockResolvedValueOnce(JSON.stringify(item))
       .mockResolvedValueOnce(JSON.stringify({ ...item, jobId: "os_user-1_job-3" }))
       .mockResolvedValue(null);
