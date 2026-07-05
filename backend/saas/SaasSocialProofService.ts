@@ -19,6 +19,19 @@ export type SocialProofDraft = {
 export class SaasSocialProofService {
   constructor(private readonly db: SaasPostgresPort = DbClient.getInstance()) {}
 
+  async createFromGenerated(
+    tenantId: string,
+    input: { platform: string; content: string; hashtags: string[] },
+  ): Promise<SocialProofDraft> {
+    const rows = await this.db.query<Record<string, unknown>>(
+      `INSERT INTO saas_social_proof_drafts (tenant_id, deliverable_id, platform, content, hashtags)
+       VALUES ($1, NULL, $2, $3, $4)
+       RETURNING *`,
+      [tenantId, input.platform, input.content, input.hashtags],
+    );
+    return this.mapRow(rows[0]!);
+  }
+
   async createFromDeliverable(
     tenantId: string,
     input: { deliverableId?: string; title?: string; qaScore?: number; packName?: string; platform?: string },

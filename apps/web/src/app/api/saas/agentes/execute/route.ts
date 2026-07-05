@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { requireSaasContext, saasErrorBody, saasErrorStatus, buildMockAgentOutput } from "@nelvyon/saas";
+import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import { DbClient } from "../../../../../../../../backend/db/DbClient";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +29,6 @@ export async function POST(req: Request) {
     // Try to call Python backend agent
     let result = "";
     let status = "completed";
-    let usedMock = false;
 
     try {
       const backendRes = await fetch(`${BACKEND_URL}/api/v1/os/agents/execute`, {
@@ -80,37 +79,54 @@ export async function POST(req: Request) {
           result = `El agente "${body.agentId}" no pudo ejecutarse. Verifica la clave OPENAI_API_KEY en Railway.`;
         }
       } else {
-        status = "mock";
-        usedMock = true;
-        result = buildMockAgentOutput(body.agentId.trim(), body.input.trim(), ctx.tenant.companyName);
+        status = "failed";
+        result = "";
       }
     }
 
-    // Update run record
-    await db.query(
-      `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
-      [result, status, runId, ctx.tenant.id],
-    ).catch(() => {});
+    if (status === "failed" && !result.trim()) {
+      await db.query(
+        `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
+        ["Agent execution unavailable", "failed", runId, ctx.tenant.id],
+      ).catch(() => {});
 
-    if (usedMock) {
       return NextResponse.json(
         {
-          error: "Agente en modo plantilla — configura OPENAI_API_KEY o el backend de agentes.",
-          code: "AGENT_MOCK",
-          result,
+          error: "Agente no disponible — configura OPENAI_API_KEY o el backend de agentes (FastAPI).",
+          code: "AGENT_UNAVAILABLE",
           runId,
-          status: "mock",
-          mock: true,
+          status: "failed",
         },
         { status: 503 },
       );
     }
 
+    if (status === "failed") {
+      await db.query(
+        `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
+        [result, status, runId, ctx.tenant.id],
+      ).catch(() => {});
+
+      return NextResponse.json(
+        {
+          error: result,
+          code: "AGENT_FAILED",
+          runId,
+          status: "failed",
+        },
+        { status: 503 },
+      );
+    }
+
+    await db.query(
+      `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
+      [result, status, runId, ctx.tenant.id],
+    ).catch(() => {});
+
     return NextResponse.json({
       result,
       runId,
       status,
-      mock: false,
     });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
