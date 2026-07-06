@@ -133,14 +133,19 @@ export class SaasSecurityEnterpriseService {
   }
 
   async getCustomPermissions(tenantId: string, userId: string): Promise<SaasAction[] | null> {
-    const rows = await this.db.query<{ permissions: string[] }>(
-      `SELECT cr.permissions FROM saas_member_custom_roles mr
-       JOIN saas_custom_roles cr ON cr.id = mr.role_id
-       WHERE mr.tenant_id=$1 AND mr.user_id=$2 LIMIT 1`,
-      [tenantId, userId],
-    );
-    if (!rows[0]) return null;
-    return rows[0].permissions as SaasAction[];
+    try {
+      const rows = await this.db.query<{ permissions: string[] }>(
+        `SELECT cr.permissions FROM saas_member_custom_roles mr
+         JOIN saas_custom_roles cr ON cr.id = mr.role_id
+         WHERE mr.tenant_id=$1 AND mr.user_id=$2 LIMIT 1`,
+        [tenantId, userId],
+      );
+      if (!rows[0]) return null;
+      return rows[0].permissions as SaasAction[];
+    } catch (e) {
+      if (isPgMissingRelation(e)) return null;
+      throw e;
+    }
   }
 
   async listTerritories(tenantId: string): Promise<Territory[]> {

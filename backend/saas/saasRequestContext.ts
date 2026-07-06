@@ -18,6 +18,9 @@ import {
   getSaasSecurityEnterpriseService,
   SaasSecurityEnterpriseError,
 } from "./SaasSecurityEnterpriseService";
+import { createLogger } from "../logger/logger";
+
+const saasCtxLog = createLogger("saas-request-context");
 
 export type SaasRequestContext = {
   claims: JwtPayload;
@@ -101,8 +104,16 @@ export async function requireSaasContext(req: Request, action: SaasAction): Prom
   let customPerms: SaasAction[] | null = null;
   try {
     customPerms = await getSaasSecurityEnterpriseService().getCustomPermissions(tenant.id, claims.userId);
-  } catch {
-    /* migration 482 optional in test DB */
+  } catch (e) {
+    if (isPgMissingRelation(e)) {
+      /* migration 482 optional — default role RBAC */
+    } else {
+      saasCtxLog.warn("custom permissions lookup failed — falling back to role RBAC", {
+        tenantId: tenant.id,
+        operation: "getCustomPermissions",
+        error: e instanceof Error ? e.message : String(e),
+      });
+    }
   }
   if (customPerms && !customPerms.includes(action)) {
     throw new SaasRbacError("Forbidden", "FORBIDDEN");
@@ -117,7 +128,15 @@ export async function requireSaasContext(req: Request, action: SaasAction): Prom
     if (e instanceof SaasSecurityEnterpriseError) {
       throw new SaasRbacError(e.message, "FORBIDDEN");
     }
-    /* missing saas_tenant_ip_allowlist table — skip until migrate 482 */
+    if (isPgMissingRelation(e)) {
+      /* missing saas_tenant_ip_allowlist — skip until migrate 482 */
+    } else {
+      saasCtxLog.warn("IP allowlist lookup failed — skipping check", {
+        tenantId: tenant.id,
+        operation: "getIpAllowlist",
+        error: e instanceof Error ? e.message : String(e),
+      });
+    }
   }
 
   return { claims, tenant, role };

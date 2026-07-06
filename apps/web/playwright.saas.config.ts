@@ -11,6 +11,11 @@ import { defineConfig, devices } from "@playwright/test";
 const TEST_JWT_SECRET = process.env.JWT_SECRET ?? "test-secret-for-playwright-saas-e2e";
 /** Local Windows: use installed Google Chrome when bundled Chromium install fails. CI unchanged. */
 const useSystemChrome = process.env.PLAYWRIGHT_CHANNEL === "chrome";
+/**
+ * Windows local: if `npx playwright install` fails (sandbox/AV), run:
+ *   pnpm test:e2e:saas:win
+ * Uses system Chrome via PLAYWRIGHT_CHANNEL=chrome (see playwright.saas.config.ts).
+ */
 
 export default defineConfig({
   testDir: "./e2e/saas",

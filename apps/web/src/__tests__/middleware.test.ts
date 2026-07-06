@@ -53,31 +53,36 @@ describe("security rateLimit", () => {
     expect(result.retryAfter).toBe(60);
   });
 
-  it("fail-open when Redis is unavailable", async () => {
+  it("uses in-memory fallback when Redis is unavailable", async () => {
     delete process.env.UPSTASH_REDIS_REST_URL;
     delete process.env.UPSTASH_REDIS_URL;
     delete process.env.UPSTASH_REDIS_REST_TOKEN;
     delete process.env.UPSTASH_REDIS_TOKEN;
 
-    const result = await checkIpRateLimit({
-      ip: "203.0.113.1",
-      rule: getRateLimitRule("/api/auth/login")!,
-    });
+    const { resetInMemoryRateLimitForTests } = await import("@/lib/security/inMemoryRateLimit");
+    resetInMemoryRateLimitForTests();
+    const rule = getRateLimitRule("/api/contact")!;
 
-    expect(result.allowed).toBe(true);
+    const first = await checkIpRateLimit({ ip: "203.0.113.1", rule });
+    expect(first.allowed).toBe(true);
+
+    for (let i = 0; i < rule.limit; i++) {
+      await checkIpRateLimit({ ip: "203.0.113.1", rule });
+    }
+    const blocked = await checkIpRateLimit({ ip: "203.0.113.1", rule });
+    expect(blocked.allowed).toBe(false);
   });
 
-  it("fail-open when Upstash fetch throws", async () => {
+  it("uses in-memory fallback when Upstash fetch throws", async () => {
+    const { resetInMemoryRateLimitForTests } = await import("@/lib/security/inMemoryRateLimit");
+    resetInMemoryRateLimitForTests();
     global.fetch = vi.fn(async () => {
       throw new Error("network down");
     }) as typeof fetch;
 
-    const result = await checkIpRateLimit({
-      ip: "203.0.113.1",
-      rule: getRateLimitRule("/api/auth/register")!,
-    });
-
-    expect(result.allowed).toBe(true);
+    const rule = getRateLimitRule("/api/waitlist")!;
+    const first = await checkIpRateLimit({ ip: "203.0.113.2", rule });
+    expect(first.allowed).toBe(true);
   });
 });
 

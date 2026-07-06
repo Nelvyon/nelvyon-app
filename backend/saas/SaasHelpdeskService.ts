@@ -1,6 +1,8 @@
 /**
- * SaasHelpdeskService — tickets de soporte + mensajes.
- * Tables: saas_helpdesk_tickets, saas_helpdesk_messages (migration 428).
+ * SaasHelpdeskService v1 — DEPRECATED.
+ * Use {@link SaasHelpdeskServiceV2} / getSaasHelpdeskServiceV2() for SLA tickets + macros.
+ * Retained for backward-compatible exports only; no active callers in production routes.
+ * @deprecated since 2026-07 — migrate to SaasHelpdeskServiceV2
  */
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
@@ -146,6 +148,7 @@ export class SaasHelpdeskService {
 }
 
 let _instance: SaasHelpdeskService | null = null;
+/** @deprecated Use getSaasHelpdeskServiceV2 */
 export function getSaasHelpdeskService(): SaasHelpdeskService {
   if (!_instance) _instance = new SaasHelpdeskService();
   return _instance;

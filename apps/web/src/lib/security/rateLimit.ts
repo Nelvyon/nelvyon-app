@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { checkInMemoryRateLimit } from "./inMemoryRateLimit";
 
 export interface RateLimitRule {
   id: string;
@@ -119,19 +120,29 @@ async function upstashIncrWithExpire(
 }
 
 /**
- * Fixed-window rate limit per IP. Fail-open when Redis is unavailable.
+ * Fixed-window rate limit per IP.
+ * Uses Upstash when configured; falls back to in-memory limits per instance when Redis is down.
  */
 export async function checkIpRateLimit(params: {
   ip: string;
   rule: RateLimitRule;
 }): Promise<RateLimitResult> {
+  const memoryKey = `${params.rule.id}:${params.ip}`;
+  const memoryFallback = (): RateLimitResult =>
+    checkInMemoryRateLimit({
+      key: memoryKey,
+      limit: params.rule.limit,
+      windowSec: params.rule.windowSec,
+    });
+
   const config = getUpstashConfig();
   if (!config) {
-    // Fail-open: rate limiting disabled when Redis is not configured.
     if (process.env.NODE_ENV === "production") {
-      console.warn("[rate-limit] Upstash Redis not configured — rate limiting disabled");
+      console.warn("[rate-limit] Upstash not configured — using in-memory fallback", {
+        rule: params.rule.id,
+      });
     }
-    return { allowed: true, retryAfter: params.rule.windowSec };
+    return memoryFallback();
   }
 
   const key = `ratelimit:${params.rule.id}:${params.ip}`;
@@ -142,7 +153,11 @@ export async function checkIpRateLimit(params: {
       return { allowed: false, retryAfter: params.rule.windowSec };
     }
     return { allowed: true, retryAfter: params.rule.windowSec };
-  } catch {
-    return { allowed: true, retryAfter: params.rule.windowSec };
+  } catch (err) {
+    console.warn("[rate-limit] Upstash error — in-memory fallback", {
+      rule: params.rule.id,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return memoryFallback();
   }
 }

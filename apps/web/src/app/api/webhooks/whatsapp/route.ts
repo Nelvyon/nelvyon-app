@@ -119,7 +119,13 @@ async function processWebhookBody(body: unknown): Promise<NextResponse> {
           body: msg.text.body,
           timestamp: parseInt(msg.timestamp ?? "0", 10),
         };
-        await svc.processInbound(tenantId, inbound).catch(() => null);
+        await svc.processInbound(tenantId, inbound).catch((e) => {
+          console.error("[webhooks/whatsapp] processInbound failed", {
+            tenantId,
+            wamid: inbound.wamid,
+            error: e instanceof Error ? e.message : String(e),
+          });
+        });
       }
     }
   }

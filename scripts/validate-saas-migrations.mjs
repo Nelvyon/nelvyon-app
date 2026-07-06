@@ -37,4 +37,7 @@ if (dupes.length) {
 }
 
 console.log("[validate-saas-migrations] OK — elite migration range present");
+console.log(
+  "[validate-saas-migrations] NOTE: 401–416 are committed in-repo; apply via `pnpm -C apps/web migrate` on each environment.",
+);
 void present;

@@ -47,6 +47,8 @@ export interface SaasMessage {
   parentMessageId: string | null;
   metadata: Record<string, unknown>;
   createdAt: string;
+  /** false when external_id already existed (idempotent inbound) */
+  inserted?: boolean;
 }
 
 export interface SaasThread {
@@ -348,7 +350,7 @@ export class SaasInboxService {
          FROM conversation_messages WHERE external_id=$1 LIMIT 1`,
         [input.externalId],
       );
-      if (dup[0]) return rowToMsg(dup[0]);
+      if (dup[0]) return { ...rowToMsg(dup[0]), inserted: false };
     }
     if (!rows[0]) throw new SaasInboxError("Failed to send message", "VALIDATION");
     const unreadDelta = direction === "inbound" ? 1 : 0;
@@ -358,7 +360,7 @@ export class SaasInboxService {
        WHERE tenant_id=$1 AND id=$2`,
       [tenantId, conversationId, input.body.trim().slice(0, 200), unreadDelta],
     );
-    return rowToMsg(rows[0]);
+    return { ...rowToMsg(rows[0]), inserted: true };
   }
 
   async replyToConversation(tenantId: string, conversationId: string, body: string): Promise<ReplyResult> {

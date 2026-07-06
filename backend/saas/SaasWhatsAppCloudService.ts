@@ -15,6 +15,9 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { EXTERNAL_FETCH_TIMEOUT_MS } from "../http/fetchWithTimeout";
+import { createLogger } from "../logger/logger";
+
+const waLog = createLogger("whatsapp");
 
 const GRAPH_VERSION = "v19.0";
 const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_VERSION}`;
@@ -537,7 +540,7 @@ export class SaasWhatsAppCloudService {
 
     try {
       const { getSaasInboxService } = await import("./SaasInboxService");
-      await getSaasInboxService().sendMessage(tenantId, conversationId, {
+      const saved = await getSaasInboxService().sendMessage(tenantId, conversationId, {
         body: msg.body,
         direction: "inbound",
         channel: "whatsapp",
@@ -545,15 +548,33 @@ export class SaasWhatsAppCloudService {
         status: "received",
         metadata: { wa_id: msg.waId, wa_from: msg.from },
       });
-    } catch {
-      /* non-blocking persist */
+      if (saved.inserted === false) {
+        waLog.info("duplicate inbound skipped", {
+          tenantId,
+          operation: "processInbound",
+          externalId: msg.wamid,
+        });
+        return;
+      }
+    } catch (e) {
+      waLog.error("inbound persist failed", {
+        tenantId,
+        operation: "processInbound",
+        externalId: msg.wamid,
+      }, e instanceof Error ? e : undefined);
+      return;
     }
 
     try {
       const { getSaasInboxAgentService } = await import("./SaasInboxAgentService");
       await getSaasInboxAgentService().handleInbound(tenantId, conversationId, msg.body);
-    } catch {
-      /* non-blocking */
+    } catch (e) {
+      waLog.warn("inbound agent handler failed", {
+        tenantId,
+        operation: "handleInbound",
+        conversationId,
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
   }
 

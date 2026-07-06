@@ -3,7 +3,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const inboxSendMock = vi.fn(async () => ({ id: "m-in" }));
+const inboxSendMock = vi.fn(async () => ({ id: "m-in", inserted: true }));
 vi.mock("../SaasInboxService", () => ({
   getSaasInboxService: () => ({ sendMessage: inboxSendMock }),
 }));
@@ -188,6 +188,7 @@ describe("SaasWhatsAppCloudService — configured", () => {
 
   it("processInbound updates existing conversation when found", async () => {
     inboxSendMock.mockClear();
+    inboxSendMock.mockResolvedValueOnce({ id: "msg-2", inserted: true, body: "Respuesta", direction: "inbound" });
     const db = makeDb([[{ id: "conv-existing" }], [], []]);
     const svc = new SaasWhatsAppCloudService(db as never);
     await svc.processInbound(TENANT, {
@@ -199,6 +200,24 @@ describe("SaasWhatsAppCloudService — configured", () => {
       "conv-existing",
       expect.objectContaining({ body: "Respuesta", direction: "inbound" }),
     );
+  });
+
+  it("processInbound skips duplicate wamid (idempotent)", async () => {
+    inboxSendMock.mockClear();
+    inboxSendMock.mockResolvedValueOnce({
+      id: "msg-dup",
+      inserted: false,
+      body: "Hola",
+      direction: "inbound",
+      externalId: "wamid.dup.1",
+    });
+    const db = makeDb([[{ id: "conv-existing" }], [], []]);
+    const svc = new SaasWhatsAppCloudService(db as never);
+    await svc.processInbound(TENANT, {
+      from: "+34699000111", waId: "34699000111",
+      wamid: "wamid.dup.1", body: "Hola", timestamp: 1700001000,
+    });
+    expect(inboxSendMock).toHaveBeenCalledTimes(1);
   });
 });
 

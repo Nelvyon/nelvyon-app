@@ -4,7 +4,10 @@ import { bffDegraded, BFF_DEGRADED_OAUTH, BFF_DEGRADED_UPSTREAM } from "@/lib/bf
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { readJsonBody } from "@/lib/platformBffRoute";
+import { createLogger } from "@/../../backend/logger/logger";
 import { OsAgentError } from "@nelvyon/os-agents";
+
+const log = createLogger("ads-bff");
 
 export const EMPTY_UNIFIED_REPORTING = bffDegraded(
   {
@@ -48,8 +51,14 @@ async function resolveClaims(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return null;
+    log.error("platform claims resolution failed", { route: "ads-bff" }, e instanceof Error ? e : undefined);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
+}
+
+function degradedResponse(fallback: unknown, reason: string, upstreamPath: string, status = 200) {
+  log.warn("ads BFF degraded response", { route: upstreamPath, operation: "proxy", reason });
+  return NextResponse.json(fallback, { status });
 }
 
 export async function adsBffGet(req: Request, upstreamPath: string, fallback: unknown) {
@@ -63,7 +72,6 @@ export async function adsBffGet(req: Request, upstreamPath: string, fallback: un
     }
     return claims;
   }
-  if (!claims) return NextResponse.json(fallback);
 
   try {
     const upstream = await proxyPlatformFetch(req, "GET", upstreamPath);
@@ -84,9 +92,10 @@ export async function adsBffGet(req: Request, upstreamPath: string, fallback: un
         return NextResponse.json({ error: "Not found" }, { status: 404 });
       }
     }
-    return NextResponse.json(fallback);
-  } catch {
-    return NextResponse.json(fallback);
+    return degradedResponse(fallback, BFF_DEGRADED_UPSTREAM, upstreamPath);
+  } catch (e) {
+    log.error("ads BFF GET upstream failed", { route: upstreamPath, operation: "GET" }, e instanceof Error ? e : undefined);
+    return degradedResponse(fallback, BFF_DEGRADED_UPSTREAM, upstreamPath);
   }
 }
 
@@ -101,7 +110,6 @@ export async function adsBffPost(req: Request, upstreamPath: string, fallback: u
     }
     return claims;
   }
-  if (!claims) return NextResponse.json(fallback);
 
   let body: unknown = {};
   try {
@@ -126,15 +134,16 @@ export async function adsBffPost(req: Request, upstreamPath: string, fallback: u
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (upstreamFailed(upstream.status)) {
-      return NextResponse.json(fallback);
+      return degradedResponse(fallback, BFF_DEGRADED_UPSTREAM, upstreamPath);
     }
     const text = await upstream.text();
     try {
       return NextResponse.json(JSON.parse(text), { status: upstream.status });
     } catch {
-      return NextResponse.json(fallback);
+      return degradedResponse(fallback, BFF_DEGRADED_UPSTREAM, upstreamPath);
     }
-  } catch {
-    return NextResponse.json(fallback);
+  } catch (e) {
+    log.error("ads BFF POST upstream failed", { route: upstreamPath, operation: "POST" }, e instanceof Error ? e : undefined);
+    return degradedResponse(fallback, BFF_DEGRADED_UPSTREAM, upstreamPath);
   }
 }
