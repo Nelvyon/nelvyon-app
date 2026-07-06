@@ -74,6 +74,7 @@ export function buildBaseBrief(
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 40);
+  const website_url = intake.website_url?.trim() || `https://${slug}.nelvyon-client.test`;
   return {
     company_name: intake.business_name,
     sector: intake.sector,
@@ -83,7 +84,10 @@ export function buildBaseBrief(
     traffic_source: "google_ads",
     target_geo: intake.city,
     locale: "es-ES",
-    primary_domain: intake.website_url ?? `https://${slug}.nelvyon-client.test`,
+    primary_domain: website_url,
+    website_url,
+    bot_name: `Asistente ${intake.business_name}`,
+    openai_cost_bearer: "client",
     brand: {
       primary_color: "#0F766E",
       secondary_color: "#F59E0B",
