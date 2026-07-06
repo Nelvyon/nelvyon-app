@@ -313,6 +313,7 @@
   "../../backend/saas/__tests__/transcription.test.ts",
   "../../backend/saas/__tests__/invoicing.test.ts",
   "src/lib/packs/__tests__/packRegistry.test.ts",
+  "src/lib/packs/__tests__/skuVisualQaInput.test.ts",
   "../../backend/saas/__tests__/SaasSeoService.test.ts",
   "../../backend/admin/__tests__/nelvyonAdmin.test.ts",
   "../../backend/admin/__tests__/adminAnalytics.test.ts",

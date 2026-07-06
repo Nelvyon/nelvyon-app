@@ -35,6 +35,7 @@ import {
 } from "@/lib/platformDbFallback";
 import { buildGenericProductionDeliverable } from "@/lib/packs/genericProductionDeliverable";
 import { containsMockUrl } from "@/lib/packs/localPackProduction";
+import { buildSkuVisualQaInput, skuNeedsSoftReview } from "@/lib/packs/skuVisualQaInput";
 
 /** Returns true only when AUTONOMOUS_PRODUCTION=true is set in the environment. */
 export function isAutonomousProductionEnabled(): boolean {
@@ -380,12 +381,8 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
     }
   }
 
-  // Visual QA — runs offline, no browser needed
-  const qaInput = {
-    copyText: (params.intake as Record<string, unknown>).value_proposition as string | undefined,
-    brandColor: "#0084ff",
-    backgroundColor: "#020817",
-  };
+  // Visual QA — uses real landing HTML from Phase C artifacts when available
+  const qaInput = buildSkuVisualQaInput(params.sku, simulation, params.intake as Record<string, unknown>);
   const visualQa = runVisualQa(qaInput);
 
   // O18 — unified QA gate: persist audit run + capture gate status (non-blocking)
@@ -695,14 +692,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         ? 0
         : Math.round(skuResults.reduce((a, r) => a + r.qa_score, 0) / skuResults.length);
     const hardReview = rawAvgQa < autoPublishThreshold;
-    const softReview = skuResults.some(
-      (r) =>
-        (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
-        r.qa_legal_passed === false ||
-        r.qa_gate_status === "blocked" ||
-        r.shield_status === "blocked" ||
-        r.truth_status === "blocked",
-    );
+    const softReview = skuResults.some((r) => skuNeedsSoftReview(r));
     const needsReview = hardReview || softReview;
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
