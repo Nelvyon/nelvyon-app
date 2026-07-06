@@ -52,6 +52,24 @@ export type LmsCertificate = {
   issuedAt: string;
 };
 
+/** Certificate with enrollment/course context for admin UI. */
+export type LmsCertificateRecord = LmsCertificate & {
+  recipientName: string;
+  recipientEmail: string;
+  courseId: string;
+  courseName: string;
+  verificationCode: string;
+};
+
+export type LmsCertificatePending = {
+  enrollmentId: string;
+  recipientName: string;
+  recipientEmail: string;
+  courseId: string;
+  courseName: string;
+  completedAt: string | null;
+};
+
 export type CreateCourseInput = {
   title: string;
   description?: string | null;
@@ -371,6 +389,64 @@ export class SaasLmsService {
       certificateUrl: certUrl ?? signedUrl,
       issuedAt: new Date(rows[0].issued_at).toISOString(),
     };
+  }
+
+  async listCertificates(tenantId: string): Promise<LmsCertificateRecord[]> {
+    const rows = await this.db.query<CertRow & {
+      contact_name: string | null;
+      contact_email: string;
+      course_id: string;
+      course_title: string;
+    }>(
+      `SELECT c.id, c.enrollment_id, c.tenant_id, c.certificate_url, c.issued_at,
+              e.contact_name, e.contact_email, e.course_id, co.title AS course_title
+       FROM saas_lms_certificates c
+       JOIN saas_lms_enrollments e ON e.id = c.enrollment_id
+       JOIN saas_lms_courses co ON co.id = e.course_id
+       WHERE c.tenant_id = $1
+       ORDER BY c.issued_at DESC`,
+      [tenantId],
+    );
+    return rows.map((r) => ({
+      id: r.id,
+      enrollmentId: r.enrollment_id,
+      tenantId: r.tenant_id,
+      certificateUrl: r.certificate_url,
+      issuedAt: new Date(r.issued_at).toISOString(),
+      recipientName: r.contact_name ?? r.contact_email,
+      recipientEmail: r.contact_email,
+      courseId: r.course_id,
+      courseName: r.course_title,
+      verificationCode: r.id.slice(0, 8).toUpperCase(),
+    }));
+  }
+
+  async listPendingCertificates(tenantId: string): Promise<LmsCertificatePending[]> {
+    const rows = await this.db.query<{
+      enrollment_id: string;
+      contact_name: string | null;
+      contact_email: string;
+      course_id: string;
+      course_title: string;
+      completed_at: Date | null;
+    }>(
+      `SELECT e.id AS enrollment_id, e.contact_name, e.contact_email, e.course_id,
+              co.title AS course_title, e.completed_at
+       FROM saas_lms_enrollments e
+       JOIN saas_lms_courses co ON co.id = e.course_id
+       LEFT JOIN saas_lms_certificates c ON c.enrollment_id = e.id
+       WHERE e.tenant_id = $1 AND e.status = 'completed' AND c.id IS NULL
+       ORDER BY e.completed_at DESC NULLS LAST`,
+      [tenantId],
+    );
+    return rows.map((r) => ({
+      enrollmentId: r.enrollment_id,
+      recipientName: r.contact_name ?? r.contact_email,
+      recipientEmail: r.contact_email,
+      courseId: r.course_id,
+      courseName: r.course_title,
+      completedAt: r.completed_at ? new Date(r.completed_at).toISOString() : null,
+    }));
   }
 
   // ── Modules ──────────────────────────────────────────────────────────────────

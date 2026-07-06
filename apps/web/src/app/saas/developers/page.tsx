@@ -178,18 +178,18 @@ export default function SaasDevelopersPage() {
           ))}
         </div>
 
-        {/* SDK placeholder */}
+        {/* OpenAPI spec download */}
         <NelvyonDsCard className="p-5 flex items-center gap-4 bg-primary/5 border-primary/20">
           <div className="text-3xl">📦</div>
           <div>
-            <p className="text-sm font-semibold text-foreground">OpenAPI Spec disponible</p>
+            <p className="text-sm font-semibold text-foreground">OpenAPI Spec v1</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Descarga la especificación OpenAPI 3.1 para generar SDKs con{" "}
+              Descarga la especificación OpenAPI 3.1 para generar clientes con{" "}
               <code className="font-mono">openapi-generator</code> o importar en Postman/Insomnia.
             </p>
             <a
-              href="/docs/openapi/saas-public-v1.yaml"
-              download
+              href="/api/public/v1/openapi"
+              download="saas-public-v1.yaml"
               className="mt-2 inline-block text-xs text-primary hover:underline"
             >
               ↓ saas-public-v1.yaml

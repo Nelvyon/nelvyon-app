@@ -72,7 +72,7 @@ export default function SaasProspectingPage() {
           configured?: boolean;
           message?: string;
         };
-        setConfigured(d.configured ?? true);
+        setConfigured(d.configured ?? false);
         setConfigMessage(d.message ?? null);
         setLists(d.lists ?? d.results ?? []);
       } else {
@@ -83,7 +83,25 @@ export default function SaasProspectingPage() {
     finally { setLoading(false); }
   }, []);
 
+  const loadProspects = useCallback(async (listId: string) => {
+    try {
+      const res = await fetch(`/api/saas/prospecting?listId=${encodeURIComponent(listId)}`);
+      if (res.ok) {
+        const d = (await res.json()) as { prospects?: Prospect[] };
+        setProspects(d.prospects ?? []);
+      } else {
+        setProspects([]);
+      }
+    } catch {
+      setProspects([]);
+    }
+  }, []);
+
   useEffect(() => { void load(); }, [load]);
+
+  useEffect(() => {
+    if (selectedList) void loadProspects(selectedList);
+  }, [selectedList, loadProspects]);
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
@@ -96,31 +114,30 @@ export default function SaasProspectingPage() {
         body: JSON.stringify({ name: listName, filter }),
       });
       if (res.ok) {
-        const d = (await res.json()) as { prospects?: Prospect[] };
+        const d = (await res.json()) as { prospects?: Prospect[]; list?: ProspectingList };
         setProspects(d.prospects ?? []);
+        if (d.list) {
+          setSelectedList(d.list.id);
+          setLists((prev) => [d.list!, ...prev.filter((l) => l.id !== d.list!.id)]);
+        }
+        await load();
+        setTab("lists");
       } else setProspects([]);
     } catch { setProspects([]); }
     finally { setSearching(false); }
   }
 
   async function addToCrm(ids: string[]) {
-    if (configured === false || ids.length === 0) return;
-    const selected = prospects.filter(p => ids.includes(p.id));
-    for (const p of selected) {
-      if (!p.email) continue;
-      await fetch("/api/saas/crm/contacts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: p.name,
-          email: p.email,
-          company: p.company,
-          phone: p.phone ?? undefined,
-          source: "prospecting",
-        }),
-      });
+    if (ids.length === 0) return;
+    const res = await fetch("/api/saas/prospecting/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prospectIds: ids }),
+    });
+    if (res.ok) {
+      setProspects((prev) => prev.map((p) => (ids.includes(p.id) ? { ...p, addedToCrm: true } : p)));
+      if (selectedList) void loadProspects(selectedList);
     }
-    setProspects(prev => prev.map(p => ids.includes(p.id) ? { ...p, addedToCrm: true } : p));
   }
 
   return (
@@ -192,7 +209,7 @@ export default function SaasProspectingPage() {
                           <div className="text-right">
                             <p className="text-xl font-bold text-foreground">{list.prospects.toLocaleString("es-ES")}</p>
                             <p className="text-xs text-muted-foreground">prospectos</p>
-                            <NelvyonDsButton variant="ghost" className="mt-2 text-xs" onClick={() => { setSelectedList(list.id); setTab("lists"); }}>
+                            <NelvyonDsButton variant="ghost" className="mt-2 text-xs" onClick={() => { setSelectedList(list.id); void loadProspects(list.id); }}>
                               Ver prospectos →
                             </NelvyonDsButton>
                           </div>

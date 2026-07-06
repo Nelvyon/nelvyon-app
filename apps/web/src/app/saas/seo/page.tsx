@@ -89,11 +89,11 @@ function AddKeywordModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
       const res = await fetch("/api/saas/seo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keyword: kws[0] }),
+        body: JSON.stringify({ keywords: kws }),
       });
       if (!res.ok) {
-        const j = (await res.json().catch(() => ({}))) as { detail?: string };
-        throw new Error(j.detail ?? "Error al añadir keywords");
+        const j = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
+        throw new Error(j.error ?? j.detail ?? "Error al añadir keywords");
       }
       onSaved();
       onClose();
@@ -138,6 +138,7 @@ export default function SaasSeoPage() {
   const [summary, setSummary] = useState<SeoSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [configured, setConfigured] = useState<boolean | null>(null);
+  const [trackingEnabled, setTrackingEnabled] = useState(true);
   const [configMessage, setConfigMessage] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [tab, setTab] = useState<"keywords" | "issues">("keywords");
@@ -149,10 +150,11 @@ export default function SaasSeoPage() {
       const seoRes = await fetch("/api/saas/seo");
       const d = (await seoRes.json().catch(() => ({}))) as {
         keywords?: Keyword[]; issues?: SeoIssue[]; summary?: SeoSummary;
-        configured?: boolean; degraded?: boolean; message?: string; error?: string;
+        configured?: boolean; trackingEnabled?: boolean; degraded?: boolean; message?: string; error?: string;
       };
       if (seoRes.ok) {
         setConfigured(d.configured ?? false);
+        setTrackingEnabled(d.trackingEnabled ?? true);
         setConfigMessage(d.degraded ? (d.error ?? d.message ?? "Proveedor SEO temporalmente no disponible.") : (d.message ?? null));
         setKeywords(d.keywords ?? []);
         setIssues(d.issues ?? []);
@@ -189,13 +191,13 @@ export default function SaasSeoPage() {
             title="SEO"
             subtitle="Monitoriza posiciones, audita errores y optimiza tu presencia orgánica"
           />
-          <NelvyonDsButton onClick={() => setShowAdd(true)} disabled={configured === false}>+ Añadir keywords</NelvyonDsButton>
+          <NelvyonDsButton onClick={() => setShowAdd(true)} disabled={!trackingEnabled}>+ Añadir keywords</NelvyonDsButton>
         </div>
 
         {configured === false ? (
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-            <strong>SEO no configurado:</strong>{" "}
-            {configMessage ?? "Configura SEMRUSH_API_KEY y SEO_DOMAIN en Railway para datos reales."}
+            <strong>SEMrush no configurado:</strong>{" "}
+            {configMessage ?? "Configura SEMRUSH_API_KEY y SEO_DOMAIN en Railway para posiciones en vivo. Puedes añadir keywords manualmente."}
           </div>
         ) : null}
 

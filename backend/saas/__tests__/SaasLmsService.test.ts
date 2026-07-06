@@ -128,6 +128,30 @@ describe("SaasLmsService.issueCertificate", () => {
   });
 });
 
+describe("SaasLmsService.listCertificates", () => {
+  it("returns certificates with course and recipient context", async () => {
+    const db = makeDb([
+      [{
+        id: "cert1",
+        enrollment_id: "e1",
+        tenant_id: TENANT,
+        certificate_url: "https://app.test/cert",
+        issued_at: now,
+        contact_name: "Ana",
+        contact_email: "ana@test.com",
+        course_id: "c1",
+        course_title: "Curso SEO",
+      }],
+      [],
+    ]);
+    const svc = new SaasLmsService(db);
+    const rows = await svc.listCertificates(TENANT);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.courseName).toBe("Curso SEO");
+    expect(rows[0]?.recipientEmail).toBe("ana@test.com");
+  });
+});
+
 describe("SaasLmsError", () => {
   it("has correct name and code", () => {
     const e = new SaasLmsError("msg", "VALIDATION");

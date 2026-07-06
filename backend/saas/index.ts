@@ -741,6 +741,24 @@ export {
   type CreateSnippetInput,
 } from "./SaasSnippetsService";
 export {
+  SaasProspectingService,
+  SaasProspectingError,
+  getSaasProspectingService,
+  resetSaasProspectingServiceForTests,
+  isApolloConfigured,
+  type ProspectingList,
+  type Prospect,
+  type ProspectFilter,
+} from "./SaasProspectingService";
+export {
+  SaasSeoService,
+  SaasSeoError,
+  getSaasSeoService,
+  resetSaasSeoServiceForTests,
+  isSemrushConfigured,
+  type SeoKeyword,
+} from "./SaasSeoService";
+export {
   SaasWebhooksService,
   SaasWebhooksError,
   getSaasWebhooksService,
