@@ -45,3 +45,4 @@ COPY --from=builder /app/apps/web/source.config.ts ./apps/web/source.config.ts
 COPY --from=builder /app/apps/web/server.js ./apps/web/server.js
 WORKDIR /app/apps/web
 CMD ["node", "server.js"]
+# noop rebuild trigger — SHA alignment only, no functional change (2026-07-06)
