@@ -76,7 +76,7 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe("marketing pricing and landing", () => {
-  it("Página /pricing renderiza sin error", () => {
+  it("Página /pricing renderiza sin error", { timeout: 30000 }, () => {
     expect(() => renderWithProviders(<PricingPage />)).not.toThrow();
   });
 

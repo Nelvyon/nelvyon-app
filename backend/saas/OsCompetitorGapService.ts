@@ -421,25 +421,37 @@ export class OsCompetitorGapService {
     return rowToRun(rows[0], true);
   }
 
-  async listRuns(limit = 50): Promise<CompetitorGapRun[]> {
+  async listRuns(limit = 50, workspaceId?: number): Promise<CompetitorGapRun[]> {
+    const params: unknown[] = [Math.min(Math.max(limit, 1), 200)];
+    const where = workspaceId != null ? `WHERE workspace_id = $2` : "";
+    if (workspaceId != null) params.push(workspaceId);
     const rows = await this.db.query<GapRow>(
-      `SELECT * FROM os_competitor_gap_runs ORDER BY started_at DESC LIMIT $1`,
-      [Math.min(Math.max(limit, 1), 200)],
+      `SELECT * FROM os_competitor_gap_runs ${where} ORDER BY started_at DESC LIMIT $1`,
+      params,
     );
     return rows.map((r) => rowToRun(r, false));
   }
 
-  async getSummary(): Promise<GapSummary> {
+  async getSummary(workspaceId?: number): Promise<GapSummary> {
+    const params: unknown[] = [];
+    const where = workspaceId != null ? `WHERE workspace_id = $1` : "";
+    if (workspaceId != null) params.push(workspaceId);
     const rows = await this.db.query<{ total: string; completed: string; avg_score: string | null }>(
       `SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE status='completed') AS completed,
               AVG(gap_score) FILTER (WHERE status='completed') AS avg_score
-       FROM os_competitor_gap_runs`,
+       FROM os_competitor_gap_runs ${where}`,
+      params,
     );
     let topRecommendedPack: string | null = null;
+    const topWhere = workspaceId != null
+      ? `WHERE recommended_pack_id IS NOT NULL AND workspace_id = $1`
+      : `WHERE recommended_pack_id IS NOT NULL`;
+    const topParams = workspaceId != null ? [workspaceId] : [];
     const top = await this.db.query<{ recommended_pack_id: string }>(
       `SELECT recommended_pack_id FROM os_competitor_gap_runs
-       WHERE recommended_pack_id IS NOT NULL
+       ${topWhere}
        GROUP BY recommended_pack_id ORDER BY COUNT(*) DESC LIMIT 1`,
+      topParams,
     );
     topRecommendedPack = top[0]?.recommended_pack_id ?? null;
     const r = rows[0];

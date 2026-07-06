@@ -148,6 +148,15 @@ describe("O29 — executeRerun", () => {
           metadata: {}, created_at: new Date().toISOString(), rerun_started_at: null, completed_at: null,
         }];
       }
+      if (sql.includes("UPDATE") && sql.includes("rerunning")) {
+        return [{
+          id: DIFF_ID, source_pack_run_id: SOURCE_ID, new_pack_run_id: null, pack_id: "local-business-growth",
+          tenant_id: null, workspace_id: 1, before_intake: baseIntake,
+          after_intake: { ...baseIntake, value_proposition: "Nueva" },
+          diff: [], change_count: 1, material: true, status: "rerunning", error_message: null, requested_by: null,
+          metadata: {}, created_at: new Date().toISOString(), rerun_started_at: new Date().toISOString(), completed_at: null,
+        }];
+      }
       if (sql.includes("UPDATE") && sql.includes("completed")) {
         return [{
           id: DIFF_ID, source_pack_run_id: SOURCE_ID, new_pack_run_id: NEW_RUN_ID, pack_id: "local-business-growth",
@@ -192,6 +201,14 @@ describe("O29 — executeRerun", () => {
           tenant_id: null, workspace_id: 1, before_intake: baseIntake, after_intake: baseIntake,
           diff: [], change_count: 1, material: true, status: "compared", error_message: null, requested_by: null,
           metadata: {}, created_at: new Date().toISOString(), rerun_started_at: null, completed_at: null,
+        }];
+      }
+      if (sql.includes("UPDATE") && sql.includes("rerunning")) {
+        return [{
+          id: DIFF_ID, source_pack_run_id: SOURCE_ID, new_pack_run_id: null, pack_id: "local-business-growth",
+          tenant_id: null, workspace_id: 1, before_intake: baseIntake, after_intake: baseIntake,
+          diff: [], change_count: 1, material: true, status: "rerunning", error_message: null, requested_by: null,
+          metadata: {}, created_at: new Date().toISOString(), rerun_started_at: new Date().toISOString(), completed_at: null,
         }];
       }
       return [];
@@ -251,6 +268,15 @@ describe("O29 — compareAndRerun", () => {
           tenant_id: null, workspace_id: 1, before_intake: baseIntake, after_intake: baseIntake,
           diff: [], change_count: 1, material: true, status: "completed", error_message: null, requested_by: null,
           metadata: {}, created_at: new Date().toISOString(), rerun_started_at: null, completed_at: new Date().toISOString(),
+        }];
+      }
+      if (sql.includes("UPDATE") && sql.includes("rerunning")) {
+        return [{
+          id: DIFF_ID, source_pack_run_id: SOURCE_ID, new_pack_run_id: null, pack_id: "local-business-growth",
+          tenant_id: null, workspace_id: 1, before_intake: baseIntake,
+          after_intake: { ...baseIntake, value_proposition: "Nueva" },
+          diff: [], change_count: 1, material: true, status: "rerunning", error_message: null, requested_by: null,
+          metadata: {}, created_at: new Date().toISOString(), rerun_started_at: new Date().toISOString(), completed_at: null,
         }];
       }
       if (sql.includes("UPDATE") && sql.includes("completed")) {

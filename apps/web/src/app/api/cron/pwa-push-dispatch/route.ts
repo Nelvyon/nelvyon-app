@@ -18,8 +18,16 @@ export async function POST(req: Request) {
   try {
     const db = DbClient.getInstance();
     const pending = await db.query<{ id: string; tenant_id: string; title: string; body: string; url: string | null }>(
-      `SELECT id, tenant_id, title, body, url FROM saas_pwa_push_queue
-       WHERE dispatched_at IS NULL ORDER BY created_at ASC LIMIT 50`,
+      `UPDATE saas_pwa_push_queue AS q
+       SET dispatched_at = NOW()
+       WHERE q.id IN (
+         SELECT id FROM saas_pwa_push_queue
+         WHERE dispatched_at IS NULL
+         ORDER BY created_at ASC
+         LIMIT 50
+         FOR UPDATE SKIP LOCKED
+       )
+       RETURNING q.id, q.tenant_id, q.title, q.body, q.url`,
     ).catch(() => [] as Array<{ id: string; tenant_id: string; title: string; body: string; url: string | null }>);
 
     const pwa = getSaasPwaService();
@@ -33,10 +41,6 @@ export async function POST(req: Request) {
       });
       sentTotal += result.sent;
       failedTotal += result.failed;
-      await db.query(
-        `UPDATE saas_pwa_push_queue SET dispatched_at=NOW() WHERE id=$1`,
-        [row.id],
-      ).catch(() => undefined);
     }
     return NextResponse.json({ ok: true, processed: pending.length, sentTotal, failedTotal });
   } catch (e) {

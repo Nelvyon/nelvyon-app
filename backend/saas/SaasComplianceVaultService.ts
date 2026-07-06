@@ -245,10 +245,15 @@ export class SaasComplianceVaultService {
     const runRows = await this.db.query<{
       id: string;
       pack_id: string;
+      workspace_id: number;
       report: Record<string, unknown> | null;
     }>(
-      `SELECT id, pack_id, report FROM nelvyon_pack_runs WHERE id = $1`,
-      [packRunId],
+      `SELECT pr.id, pr.pack_id, pr.workspace_id, pr.report
+       FROM nelvyon_pack_runs pr
+       JOIN saas_tenants t ON t.workspace_id = pr.workspace_id AND t.id = $2::uuid
+       WHERE pr.id = $1::uuid
+       LIMIT 1`,
+      [packRunId, tenantId],
     );
     const run = runRows[0];
     if (!run) {

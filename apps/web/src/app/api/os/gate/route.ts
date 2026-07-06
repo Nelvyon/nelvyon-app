@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { requirePlatformAdmin } from "@/lib/platformBffAuth";
 import { getOsPackGateService } from "@nelvyon/saas";
 import { getOsPackCertificationService } from "../../../../../../../backend/os-agents/packs/OsPackCertificationService";
 import { getOsVisualQaGateService } from "../../../../../../../backend/autonomous/qa/OsVisualQaGateService";
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
-  const claims = await requirePlatformClaims(req);
+  const claims = await requirePlatformAdmin(req);
   if (claims instanceof NextResponse) return claims;
 
   try {

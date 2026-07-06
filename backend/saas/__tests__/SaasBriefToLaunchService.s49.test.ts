@@ -181,7 +181,7 @@ describe("SaasBriefToLaunchService — executeLaunch", () => {
     const db = makeDb([
       [{ ...LAUNCH_ROW, pack_id: "unknown-pack" }],
       [{ workspace_id: 42 }],
-      [], // mark running
+      [LAUNCH_ROW], // atomic claim
     ]);
     const svc = new SaasBriefToLaunchService(db, makeRunners(false)); // disabled → returns undefined
     await expect(svc.executeLaunch("t1", "launch-1")).rejects.toThrow();
@@ -191,7 +191,7 @@ describe("SaasBriefToLaunchService — executeLaunch", () => {
     const db = makeDb([
       [LAUNCH_ROW],
       [{ workspace_id: 42 }],
-      [], // mark running
+      [LAUNCH_ROW], // atomic claim
       [COMPLETED_LAUNCH], // update completed
     ]);
     const svc = new SaasBriefToLaunchService(db, makeRunners());
@@ -208,7 +208,7 @@ describe("SaasBriefToLaunchService — executeLaunch", () => {
     const db = makeDb([
       [{ ...LAUNCH_ROW, pack_id: "seo-local-pack" }],
       [{ workspace_id: 42 }],
-      [],
+      [LAUNCH_ROW], // atomic claim
       [COMPLETED_LAUNCH],
     ]);
     const svc = new SaasBriefToLaunchService(db, { getRunner });

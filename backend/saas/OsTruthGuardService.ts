@@ -167,7 +167,7 @@ const defaultLegalPort: TruthLegalPort = {
       const r = runVisualQa({ copyText: text });
       return { ok: r.legal_passed, terms: r.checks.prohibited_terms ?? [] };
     } catch {
-      return { ok: true, terms: [] };
+      return { ok: false, terms: [] };
     }
   },
 };
@@ -255,13 +255,18 @@ export class OsTruthGuardService {
     let legalOk = true;
     try {
       const legal = await this.legal.runLegal(combined);
-      legalOk = legal.ok;
-      checks.push({
-        name: "legal",
-        ok: legal.ok,
-        detail: legal.ok ? "legal ok" : `${legal.terms.length} términos prohibidos`,
-      });
-      if (!legal.ok) violations = [...new Set([...violations, ...legal.terms])];
+      if (!legal.ok && legal.terms.length === 0) {
+        // Motor legal no disponible — no bloquear por infra; sí bloquear si hay términos detectados.
+        checks.push({ name: "legal", ok: true, detail: "legal unavailable" });
+      } else {
+        legalOk = legal.ok;
+        checks.push({
+          name: "legal",
+          ok: legal.ok,
+          detail: legal.ok ? "legal ok" : `${legal.terms.length} términos prohibidos`,
+        });
+        if (!legal.ok) violations = [...new Set([...violations, ...legal.terms])];
+      }
     } catch {
       checks.push({ name: "legal", ok: true, detail: "legal skip" });
     }

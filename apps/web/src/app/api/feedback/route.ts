@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { authenticate } from "@/lib/auth";
+import { requirePlatformAdmin } from "@/lib/platformBffAuth";
 import { createRequestLogger } from "@/lib/serverLogger";
 import { REQUEST_ID_HEADER } from "@/lib/security/requestId";
 import { OsAgentError } from "@nelvyon/os-agents";
@@ -13,6 +14,9 @@ export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
+  const claims = await requirePlatformAdmin(req);
+  if (claims instanceof NextResponse) return claims;
+
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type") ?? undefined;
   const status = searchParams.get("status") ?? undefined;

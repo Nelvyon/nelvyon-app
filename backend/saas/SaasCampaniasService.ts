@@ -471,9 +471,10 @@ export class SaasCampaniasService {
 
     if (campania.channel === "email") {
       try {
-        const { getOsTruthGuardService } = await import("./OsTruthGuardService");
+        const { OsTruthGuardService } = await import("./OsTruthGuardService");
+        const truthSvc = new OsTruthGuardService(this.db);
         const subject = campania.subject ?? campania.name;
-        const truth = await getOsTruthGuardService().evaluate({
+        const truth = await truthSvc.evaluate({
           channel: "email",
           text: campania.body ?? "",
           subject,
@@ -486,9 +487,11 @@ export class SaasCampaniasService {
             "VALIDATION",
           );
         }
-        void getOsTruthGuardService().persistAudit(truth).catch(() => undefined);
+        void truthSvc.persistAudit(truth).catch(() => undefined);
       } catch (e) {
         if (e instanceof SaasCampaniasError) throw e;
+        const msg = e instanceof Error ? e.message : String(e);
+        throw new SaasCampaniasError(`Truth guard error: ${msg}`, "VALIDATION");
       }
     }
 
@@ -698,7 +701,7 @@ ${ctaBlock}
         sent_count = $3,
         completed_at = NOW(),
         updated_at = NOW()
-       WHERE tenant_id = $1 AND id = $2`,
+       WHERE tenant_id = $1 AND id = $2 AND status = 'running'`,
       [tenantId, campaniaId, sentCount],
     );
 

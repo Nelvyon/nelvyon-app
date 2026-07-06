@@ -4,6 +4,9 @@ import { assertUserCanAccessWorkspace, WorkspaceAccessError } from "@/lib/platfo
 import { DbClient } from "../../../../../../../../backend/db/DbClient";
 import { getOsPremiumAutonomousService } from "@nelvyon/saas";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function GET(req: Request) {
   const claims = await requirePlatformClaims(req);
   if (claims instanceof NextResponse) return claims;

@@ -190,6 +190,7 @@ describe("Audit wiring — SaasCampaniasService", () => {
     vi.mocked(db.query)
       .mockResolvedValueOnce([campaniaRow])  // getCampania
       .mockResolvedValueOnce([])             // resolveAudience (no contacts)
+      .mockResolvedValueOnce([{ id: "audit-1" }]) // truth guard persistAudit
       .mockResolvedValueOnce([{ id: "camp-1" }]) // UPDATE running (atomic claim)
       .mockResolvedValueOnce([])             // SELECT contacts for email send (empty)
       .mockResolvedValueOnce([]);            // UPDATE completed

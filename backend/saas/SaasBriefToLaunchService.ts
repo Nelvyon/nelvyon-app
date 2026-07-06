@@ -60,7 +60,8 @@ export type SaasBriefToLaunchErrorCode =
   | "VALIDATION"
   | "NO_WORKSPACE"
   | "PACK_NOT_AVAILABLE"
-  | "RUNNER_ERROR";
+  | "RUNNER_ERROR"
+  | "ALREADY_RUNNING";
 
 export class SaasBriefToLaunchError extends Error {
   constructor(
@@ -273,13 +274,17 @@ export class SaasBriefToLaunchService {
       throw new SaasBriefToLaunchError("NO_WORKSPACE", "Tenant sin workspace_id");
     }
 
-    // Mark as running
-    await this.db.query(
+    // Mark as running (atomic claim — skip if already running/completed)
+    const claimed = await this.db.query<LaunchRow>(
       `UPDATE saas_pack_launches
        SET status='running', updated_at=NOW()
-       WHERE id=$1`,
-      [launchId],
+       WHERE id=$1 AND tenant_id=$2 AND status='queued'
+       RETURNING *`,
+      [launchId, tenantId],
     );
+    if (!claimed[0]) {
+      throw new SaasBriefToLaunchError("ALREADY_RUNNING", "Launch ya en curso o completado");
+    }
 
     try {
       // Resolve runner via injected port (testable) or lazy require (production)

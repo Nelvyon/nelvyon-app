@@ -23,7 +23,11 @@ export async function POST(req: NextRequest) {
          VALUES ($1, $2, 'processing', now())
          ON CONFLICT (stripe_event_id) DO UPDATE
            SET event_type = EXCLUDED.event_type, received_at = now()
-           WHERE stripe_webhook_events.status NOT IN ('processed', 'processing')
+           WHERE stripe_webhook_events.status NOT IN ('processed')
+             AND (
+               stripe_webhook_events.status <> 'processing'
+               OR stripe_webhook_events.received_at < NOW() - INTERVAL '10 minutes'
+             )
          RETURNING status`,
         [eventId, event.type],
       );

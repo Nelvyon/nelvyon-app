@@ -89,7 +89,7 @@ export type DiffRunnerPort = {
   }): Promise<{ id: string }>;
 };
 
-export type OsBriefDiffErrorCode = "NOT_FOUND" | "NO_CHANGE" | "VALIDATION" | "RUNNER_ERROR";
+export type OsBriefDiffErrorCode = "NOT_FOUND" | "NO_CHANGE" | "VALIDATION" | "RUNNER_ERROR" | "ALREADY_RUNNING";
 
 export class OsBriefDiffError extends Error {
   constructor(
@@ -318,10 +318,16 @@ export class OsBriefDiffRerunService {
       throw new OsBriefDiffError("VALIDATION", "workspace_id requerido para re-run");
     }
 
-    await this.db.query(
-      `UPDATE os_brief_diff_runs SET status = 'rerunning', rerun_started_at = NOW() WHERE id = $1::uuid`,
+    const claimRows = await this.db.query<DiffRow>(
+      `UPDATE os_brief_diff_runs
+       SET status = 'rerunning', rerun_started_at = NOW()
+       WHERE id = $1::uuid AND status NOT IN ('rerunning')
+       RETURNING *`,
       [diffId],
     );
+    if (!claimRows[0]) {
+      throw new OsBriefDiffError("ALREADY_RUNNING", "Re-run ya en curso para este diff");
+    }
 
     try {
       const validated = ctx.runner.validate(diff.packId, diff.afterIntake);
