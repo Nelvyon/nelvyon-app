@@ -23,6 +23,12 @@ function mapError(e: SaasProspectingError): NextResponse {
       { status: 503 },
     );
   }
+  if (e.code === "NOT_MIGRATED") {
+    return NextResponse.json(
+      { configured: false, code: e.code, message: e.message, prospects: [] },
+      { status: 503 },
+    );
+  }
   if (e.code === "APOLLO_ERROR") {
     return NextResponse.json(
       { configured: true, degraded: true, error: e.message, prospects: [] },

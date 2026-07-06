@@ -51,7 +51,7 @@ export default function PortalDeliverableDetailPage({
 
           <PortalDeliverablePreview deliverable={query.data} />
 
-          {query.data.has_file ?? Boolean(query.data.file_url) ? (
+          {query.data.has_file ?? Boolean(query.data.file_url) ?? Boolean(query.data.pack_summary) ? (
             <PortalDeliverableDownloadButton deliverableId={query.data.id} title={query.data.title} />
           ) : null}
 

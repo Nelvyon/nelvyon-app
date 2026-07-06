@@ -28,5 +28,9 @@ export function portalErrorResponse(e: unknown, fallback = "portal request faile
   ) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
+  const code = typeof e === "object" && e !== null && "code" in e ? String((e as { code: string }).code) : "";
+  if (code === "SHIELD_BLOCKED" || code === "TRUTH_BLOCKED" || code === "COMPLIANCE_GATE_ERROR") {
+    return NextResponse.json({ error: message, code }, { status: 403 });
+  }
   return NextResponse.json({ error: message }, { status: 500 });
 }

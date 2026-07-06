@@ -160,7 +160,10 @@ export async function runSaasB2bGrowthPack(params: {
             touches: 5,
           },
         });
-        return 2;
+        return {
+          extraDeliverables: 2,
+          markSteps: [{ key: "outbound_playbook", status: "done", detail: "Playbook outbound + nurture B2B" }],
+        };
       },
       buildReport: buildPackReport,
       projectDescription: (i) =>

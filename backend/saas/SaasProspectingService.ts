@@ -43,12 +43,17 @@ export class SaasProspectingError extends Error {
       | "NOT_FOUND"
       | "VALIDATION"
       | "NOT_CONFIGURED"
+      | "NOT_MIGRATED"
       | "APOLLO_ERROR"
       | "FORBIDDEN",
   ) {
     super(message);
     this.name = "SaasProspectingError";
   }
+}
+
+function isMissingRelation(e: unknown): boolean {
+  return typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === "42P01";
 }
 
 type ListRow = {
@@ -196,26 +201,36 @@ export class SaasProspectingService {
   }
 
   async listLists(tenantId: string): Promise<ProspectingList[]> {
-    const rows = await this.db.query<ListRow>(
-      `SELECT id, tenant_id, name, filter, status, prospects_count, enriched_count, created_at
-       FROM saas_prospecting_lists
-       WHERE tenant_id = $1
-       ORDER BY created_at DESC`,
-      [tenantId],
-    );
-    return rows.map(rowToList);
+    try {
+      const rows = await this.db.query<ListRow>(
+        `SELECT id, tenant_id, name, filter, status, prospects_count, enriched_count, created_at
+         FROM saas_prospecting_lists
+         WHERE tenant_id = $1
+         ORDER BY created_at DESC`,
+        [tenantId],
+      );
+      return rows.map(rowToList);
+    } catch (e) {
+      if (isMissingRelation(e)) return [];
+      throw e;
+    }
   }
 
   async listProspects(tenantId: string, listId: string): Promise<Prospect[]> {
-    const rows = await this.db.query<ProspectRow>(
-      `SELECT id, tenant_id, list_id, apollo_person_id, name, title, company, industry, country,
-              employees, email, linkedin_url, phone, enriched, added_to_crm, crm_contact_id
-       FROM saas_prospecting_prospects
-       WHERE tenant_id = $1 AND list_id = $2
-       ORDER BY created_at ASC`,
-      [tenantId, listId],
-    );
-    return rows.map(rowToProspect);
+    try {
+      const rows = await this.db.query<ProspectRow>(
+        `SELECT id, tenant_id, list_id, apollo_person_id, name, title, company, industry, country,
+                employees, email, linkedin_url, phone, enriched, added_to_crm, crm_contact_id
+         FROM saas_prospecting_prospects
+         WHERE tenant_id = $1 AND list_id = $2
+         ORDER BY created_at ASC`,
+        [tenantId, listId],
+      );
+      return rows.map(rowToProspect);
+    } catch (e) {
+      if (isMissingRelation(e)) return [];
+      throw e;
+    }
   }
 
   async searchAndCreateList(
@@ -230,22 +245,34 @@ export class SaasProspectingService {
     if (!listName) throw new SaasProspectingError("name is required", "VALIDATION");
     const filter = defaultFilter(filterInput);
 
-    const listRows = await this.db.query<ListRow>(
-      `INSERT INTO saas_prospecting_lists (tenant_id, name, filter, status)
-       VALUES ($1, $2, $3::jsonb, 'running')
-       RETURNING id, tenant_id, name, filter, status, prospects_count, enriched_count, created_at`,
-      [tenantId, listName, JSON.stringify(filter)],
-    );
-    const listRow = listRows[0];
-    if (!listRow) throw new SaasProspectingError("Failed to create list", "VALIDATION");
+    let listRow: ListRow;
+    let searchId: string | undefined;
+    try {
+      const listRows = await this.db.query<ListRow>(
+        `INSERT INTO saas_prospecting_lists (tenant_id, name, filter, status)
+         VALUES ($1, $2, $3::jsonb, 'running')
+         RETURNING id, tenant_id, name, filter, status, prospects_count, enriched_count, created_at`,
+        [tenantId, listName, JSON.stringify(filter)],
+      );
+      listRow = listRows[0]!;
+      if (!listRow) throw new SaasProspectingError("Failed to create list", "VALIDATION");
 
-    const searchRows = await this.db.query<{ id: string }>(
-      `INSERT INTO saas_prospecting_searches (tenant_id, list_id, filter, status)
-       VALUES ($1, $2, $3::jsonb, 'running')
-       RETURNING id`,
-      [tenantId, listRow.id, JSON.stringify(filter)],
-    );
-    const searchId = searchRows[0]?.id;
+      const searchRows = await this.db.query<{ id: string }>(
+        `INSERT INTO saas_prospecting_searches (tenant_id, list_id, filter, status)
+         VALUES ($1, $2, $3::jsonb, 'running')
+         RETURNING id`,
+        [tenantId, listRow.id, JSON.stringify(filter)],
+      );
+      searchId = searchRows[0]?.id;
+    } catch (e) {
+      if (isMissingRelation(e)) {
+        throw new SaasProspectingError(
+          "Prospecting tables not migrated — run migration 508",
+          "NOT_MIGRATED",
+        );
+      }
+      throw e;
+    }
 
     try {
       const apolloPeople = await this.fetchApolloPeople(filter);

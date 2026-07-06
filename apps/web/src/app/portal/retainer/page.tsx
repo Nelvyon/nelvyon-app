@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PortalPageShell } from "@/features/client_portal_v1/components/PortalPageShell";
+import { readPortalJwt } from "@/features/client_portal_v1/portalSession";
 import {
   PortalEmptyState,
   PortalErrorState,
@@ -39,7 +40,11 @@ export default function PortalRetainerPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/platform/portal/retainer", { credentials: "same-origin" });
+      const token = readPortalJwt();
+      if (!token) { setError("Sesión de portal no encontrada"); return; }
+      const res = await fetch("/api/platform/portal/retainer", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!res.ok) { setError(`No pudimos cargar tu retainer (${res.status})`); return; }
       setView((await res.json()) as RetainerView);
     } catch {

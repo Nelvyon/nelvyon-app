@@ -24,6 +24,7 @@ import type {
   GrowthPackIntakeBase,
   PackReport,
   PackRunRecord,
+  PackStepStatus,
   SkuRunResult,
 } from "@/lib/packs/types";
 
@@ -175,7 +176,7 @@ export type GrowthPackRunConfig<T extends GrowthPackIntakeBase & { sector: strin
     osClientId: string;
     osProjectId: string;
     skuResults: SkuRunResult[];
-  }) => Promise<number | void>;
+  }) => Promise<number | void | { extraDeliverables: number; markSteps?: Array<{ key: string; status: PackStepStatus; detail?: string }> }>;
 };
 
 async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string }>(params: {
@@ -627,7 +628,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     }
 
     if (config.onPackStepsComplete) {
-      const extraFromHook = await config.onPackStepsComplete({
+      const hookResult = await config.onPackStepsComplete({
         intake,
         packRunId: run.id,
         workspaceId: params.workspaceId,
@@ -638,7 +639,23 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         osProjectId,
         skuResults,
       });
-      if (typeof extraFromHook === "number") extraDeliverableCount += extraFromHook;
+      const extraCount =
+        typeof hookResult === "number"
+          ? hookResult
+          : hookResult && typeof hookResult === "object"
+            ? hookResult.extraDeliverables
+            : 0;
+      if (extraCount) extraDeliverableCount += extraCount;
+      const marks =
+        hookResult && typeof hookResult === "object" && Array.isArray(hookResult.markSteps)
+          ? hookResult.markSteps
+          : [];
+      for (const m of marks) {
+        steps = markStep(steps, m.key, m.status, m.detail);
+      }
+      if (marks.length > 0) {
+        run = (await updatePackRun(run.id, { steps }))!;
+      }
     }
 
     const report = config.buildReport({
@@ -653,9 +670,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       osProjectId,
     });
 
-    const reportQaScore = config.publishProductionDeliverables
-      ? Math.max(85, avgSkuQaScore(skuResults))
-      : avgSkuQaScore(skuResults);
+    const reportQaScore = avgSkuQaScore(skuResults);
 
     await dbCreatePackDeliverable({
       workspaceId: params.workspaceId,
@@ -679,19 +694,15 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       skuResults.length === 0
         ? 0
         : Math.round(skuResults.reduce((a, r) => a + r.qa_score, 0) / skuResults.length);
-    const hardReview = config.publishProductionDeliverables
-      ? false
-      : rawAvgQa < autoPublishThreshold;
-    const softReview = config.publishProductionDeliverables
-      ? false
-      : skuResults.some(
-          (r) =>
-            (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
-            r.qa_legal_passed === false ||
-            r.qa_gate_status === "blocked" ||
-            r.shield_status === "blocked" ||
-            r.truth_status === "blocked",
-        );
+    const hardReview = rawAvgQa < autoPublishThreshold;
+    const softReview = skuResults.some(
+      (r) =>
+        (r.qa_visual_score !== undefined && r.qa_visual_score < 70) ||
+        r.qa_legal_passed === false ||
+        r.qa_gate_status === "blocked" ||
+        r.shield_status === "blocked" ||
+        r.truth_status === "blocked",
+    );
     const needsReview = hardReview || softReview;
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");

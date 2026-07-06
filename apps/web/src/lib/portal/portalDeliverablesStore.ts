@@ -67,6 +67,45 @@ function sanitizePackSummary(meta: Record<string, unknown>): Record<string, unkn
   };
 }
 
+function productionQaGateSql(): string {
+  const isProd = process.env.NODE_ENV === "production";
+  return isProd
+    ? ` AND (metadata->>'qa_score')::numeric >= ${PORTAL_MIN_QA_SCORE}`
+    : ` AND (metadata->>'qa_score' IS NULL OR (metadata->>'qa_score')::numeric >= ${PORTAL_MIN_QA_SCORE})`;
+}
+
+async function assertDeliverableComplianceGates(dmeta: Record<string, unknown>): Promise<void> {
+  if (dmeta.shield_status === "blocked") {
+    throw Object.assign(new Error("Shield bloqueado para este entregable"), { code: "SHIELD_BLOCKED" });
+  }
+  if (dmeta.truth_status === "blocked") {
+    throw Object.assign(new Error("Truth guard bloqueado para este entregable"), { code: "TRUTH_BLOCKED" });
+  }
+  try {
+    const sectorId = String((dmeta.sector as string) ?? (dmeta.sector_id as string) ?? "");
+    if (sectorId) {
+      const { getOsRegulatedSectorShieldService } = await import("@nelvyon/saas");
+      const gate = await getOsRegulatedSectorShieldService().canPublishToPortal(sectorId, dmeta);
+      if (!gate.allowed) {
+        throw Object.assign(new Error(gate.reason ?? "Shield bloqueado para sector regulado"), {
+          code: "SHIELD_BLOCKED",
+        });
+      }
+    }
+    const { getOsTruthGuardService } = await import("@nelvyon/saas");
+    const truthGate = getOsTruthGuardService().canPublish("landing", dmeta);
+    if (!truthGate.allowed) {
+      throw Object.assign(new Error(truthGate.reason ?? "Truth guard bloqueado"), { code: "TRUTH_BLOCKED" });
+    }
+  } catch (e) {
+    const code = (e as { code?: string }).code;
+    if (code === "SHIELD_BLOCKED" || code === "TRUTH_BLOCKED") throw e;
+    throw Object.assign(new Error("Compliance gate unavailable — approval blocked"), {
+      code: "COMPLIANCE_GATE_ERROR",
+    });
+  }
+}
+
 function deliverableDict(row: DeliverableRow): Record<string, unknown> {
   const meta = row.deliverable_metadata && typeof row.deliverable_metadata === "object"
     ? row.deliverable_metadata
@@ -125,10 +164,7 @@ export async function listPortalDeliverablesBff(params: {
 
   // QA gate: in production, qa_score must meet MIN_SCORE (NULL = blocked — legacy rows without score).
   // In non-production environments, NULL is allowed to surface unscored deliverables for testing.
-  const isProd = process.env.NODE_ENV === "production";
-  const qaGate = isProd
-    ? ` AND (metadata->>'qa_score')::numeric >= ${PORTAL_MIN_QA_SCORE}`
-    : ` AND (metadata->>'qa_score' IS NULL OR (metadata->>'qa_score')::numeric >= ${PORTAL_MIN_QA_SCORE})`;
+  const qaGate = productionQaGateSql();
 
   const countRows = await db().query<{ count: string }>(
     `SELECT COUNT(*)::text AS count
@@ -180,6 +216,7 @@ async function fetchDeliverableRow(params: {
   workspaceId: number;
   clientId: string;
   statuses?: readonly string[];
+  enforceQaGate?: boolean;
 }): Promise<DeliverableRow | null> {
   const values: unknown[] = [params.deliverableId, params.workspaceId, params.clientId];
   let statusFilter = "";
@@ -188,6 +225,7 @@ async function fetchDeliverableRow(params: {
     statusFilter = ` AND status IN (${placeholders})`;
     values.push(...params.statuses);
   }
+  const qaGate = params.enforceQaGate === false ? "" : productionQaGateSql();
   const rows = await db().query<DeliverableRow>(
     `${DELIVERABLE_SELECT}
      FROM os_deliverables
@@ -196,6 +234,7 @@ async function fetchDeliverableRow(params: {
        AND client_id = $3
        AND visibility = 'client_visible'
        ${statusFilter}
+       ${qaGate}
      LIMIT 1`,
     values,
   );
@@ -292,36 +331,10 @@ export async function approvePortalDeliverableBff(params: {
   });
   if (!row) throw new Error("deliverable not found");
   ensureReviewable(row);
-
-  // O27 — regulated sector shield: block approval if shield failed (best-effort).
   const dmeta = (row.deliverable_metadata && typeof row.deliverable_metadata === "object"
     ? row.deliverable_metadata
     : {}) as Record<string, unknown>;
-  const sectorId = String((dmeta.sector as string) ?? (dmeta.sector_id as string) ?? "");
-  if (sectorId) {
-    try {
-      const { getOsRegulatedSectorShieldService } = await import("@nelvyon/saas");
-      const gate = await getOsRegulatedSectorShieldService().canPublishToPortal(sectorId, dmeta);
-      if (!gate.allowed) {
-        throw Object.assign(new Error(gate.reason ?? "Shield bloqueado para sector regulado"), { code: "SHIELD_BLOCKED" });
-      }
-    } catch (e) {
-      if ((e as { code?: string }).code === "SHIELD_BLOCKED") throw e;
-    }
-  }
-
-  if (dmeta.truth_status === "blocked") {
-    throw Object.assign(new Error("Truth guard bloqueado para este entregable"), { code: "TRUTH_BLOCKED" });
-  }
-  try {
-    const { getOsTruthGuardService } = await import("@nelvyon/saas");
-    const truthGate = getOsTruthGuardService().canPublish("landing", dmeta);
-    if (!truthGate.allowed) {
-      throw Object.assign(new Error(truthGate.reason ?? "Truth guard bloqueado"), { code: "TRUTH_BLOCKED" });
-    }
-  } catch (e) {
-    if ((e as { code?: string }).code === "TRUTH_BLOCKED") throw e;
-  }
+  await assertDeliverableComplianceGates(dmeta);
 
   const reviewedAt = new Date().toISOString();
   const meta = buildReviewMetadata(

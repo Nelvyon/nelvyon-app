@@ -46,7 +46,7 @@ export function buildGenericProductionDeliverable(params: {
   osProjectId: string;
   workspaceId: number;
 }): PackDeliverableInput {
-  const qaScore = Math.max(85, params.simulation.project.qa?.score ?? 88);
+  const qaScore = params.simulation.project.qa?.score ?? 0;
   const artifacts = stripMockUrls(params.simulation.project.artifacts ?? {});
   const origin = resolvePackAppOrigin();
   const slug = slugFromBusinessName(params.intake.business_name);

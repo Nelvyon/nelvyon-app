@@ -22,6 +22,17 @@ function mapError(e: SaasProspectingError): NextResponse {
       { status: 503 },
     );
   }
+  if (e.code === "NOT_MIGRATED") {
+    return NextResponse.json(
+      {
+        configured: false,
+        code: e.code,
+        message: e.message,
+        lists: [],
+      },
+      { status: 503 },
+    );
+  }
   const status = e.code === "NOT_FOUND" ? 404 : e.code === "FORBIDDEN" ? 403 : 400;
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }

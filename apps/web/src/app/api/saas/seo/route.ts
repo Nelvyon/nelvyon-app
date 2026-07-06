@@ -110,7 +110,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ keywords: saved, trackingEnabled: true }, { status: 201 });
   } catch (e: unknown) {
     if (e instanceof SaasSeoError) {
-      return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
+      const status = e.code === "NOT_MIGRATED" ? 503 : e.code === "NOT_FOUND" ? 404 : 400;
+      return NextResponse.json({ error: e.message, code: e.code }, { status });
     }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
@@ -125,7 +126,8 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
     if (e instanceof SaasSeoError) {
-      const status = e.code === "NOT_FOUND" ? 404 : 400;
+      const status =
+        e.code === "NOT_MIGRATED" ? 503 : e.code === "NOT_FOUND" ? 404 : 400;
       return NextResponse.json({ error: e.message, code: e.code }, { status });
     }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

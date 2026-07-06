@@ -170,8 +170,44 @@ const BETA_BASE_STEPS: { key: string; label: string }[] = [
   { key: "report", label: "Informe en portal" },
   { key: "complete", label: "Pack completado" },
 ];
-export const SOCIAL_CALENDAR_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
-export const CONTENT_STRATEGY_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
-export const CRO_AUDIT_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
-export const ANALYTICS_SETUP_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
-export const BRAND_VOICE_PACK_STEP_DEFINITIONS = BETA_BASE_STEPS;
+
+const SKU_STEP_LABELS: Record<string, { key: string; label: string }> = {
+  "NELVYON-LANDING": { key: "sku_landing", label: "Entregable autónomo (NELVYON-LANDING)" },
+  "NELVYON-SEO": { key: "sku_seo", label: "Auditoría SEO (NELVYON-SEO)" },
+  "NELVYON-CHATBOT": { key: "sku_chatbot", label: "Chatbot (NELVYON-CHATBOT)" },
+};
+
+/** Beta/extended packs: step definitions aligned with each pack's skuSequence. */
+export function buildBetaPackStepDefinitions(
+  skuSequence: readonly string[],
+): { key: string; label: string }[] {
+  const skuSteps = skuSequence.map(
+    (sku) => SKU_STEP_LABELS[sku] ?? { key: `sku_${sku.toLowerCase()}`, label: sku },
+  );
+  return [
+    ...BETA_BASE_STEPS.slice(0, 5),
+    ...skuSteps,
+    ...BETA_BASE_STEPS.slice(6),
+  ];
+}
+
+export const SOCIAL_CALENDAR_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
+  "NELVYON-LANDING",
+  "NELVYON-CHATBOT",
+]);
+export const CONTENT_STRATEGY_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
+  "NELVYON-LANDING",
+  "NELVYON-SEO",
+]);
+export const CRO_AUDIT_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
+  "NELVYON-LANDING",
+  "NELVYON-SEO",
+]);
+export const ANALYTICS_SETUP_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
+  "NELVYON-SEO",
+  "NELVYON-LANDING",
+]);
+export const BRAND_VOICE_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
+  "NELVYON-LANDING",
+  "NELVYON-CHATBOT",
+]);
