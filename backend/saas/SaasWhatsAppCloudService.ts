@@ -14,6 +14,7 @@
  */
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { EXTERNAL_FETCH_TIMEOUT_MS } from "../http/fetchWithTimeout";
 
 const GRAPH_VERSION = "v19.0";
 const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_VERSION}`;
@@ -176,6 +177,7 @@ async function metaSend(
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS),
   });
   const data = await res.json() as { messages?: Array<{ id: string }>; error?: { message: string } };
   if (!res.ok || data.error) {
@@ -209,6 +211,7 @@ async function metaSendTemplateMsg(
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS),
   });
   const data = await res.json() as { messages?: Array<{ id: string }>; error?: { message: string } };
   if (!res.ok || data.error) {

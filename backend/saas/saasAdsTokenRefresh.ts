@@ -1,6 +1,7 @@
 import { DbClient } from "../db/DbClient";
 import { decryptSecret, encryptSecret } from "./SaasSsoService";
 import type { AdsPlatform } from "./SaasAdsDashboardService";
+import { fetchWithTimeout } from "../http/fetchWithTimeout";
 
 type ConnectionRow = {
   id: string; tenant_id: string; platform: string; account_id: string; account_name: string;
@@ -17,7 +18,7 @@ async function refreshMetaToken(refreshToken: string): Promise<{ accessToken: st
   const clientId = process.env.META_CLIENT_ID?.trim();
   const clientSecret = process.env.META_CLIENT_SECRET?.trim();
   if (!clientId || !clientSecret) return null;
-  const res = await fetch(
+  const res = await fetchWithTimeout(
     `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${clientId}&client_secret=${clientSecret}&fb_exchange_token=${encodeURIComponent(refreshToken)}`,
   );
   if (!res.ok) return null;
@@ -33,7 +34,7 @@ async function refreshGoogleToken(refreshToken: string): Promise<{ accessToken: 
   const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
   if (!clientId || !clientSecret) return null;
-  const res = await fetch("https://oauth2.googleapis.com/token", {
+  const res = await fetchWithTimeout("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -56,7 +57,7 @@ async function refreshLinkedInToken(refreshToken: string): Promise<{ accessToken
   const clientId = process.env.LINKEDIN_CLIENT_ID?.trim();
   const clientSecret = process.env.LINKEDIN_CLIENT_SECRET?.trim();
   if (!clientId || !clientSecret) return null;
-  const res = await fetch("https://www.linkedin.com/oauth/v2/accessToken", {
+  const res = await fetchWithTimeout("https://www.linkedin.com/oauth/v2/accessToken", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -79,7 +80,7 @@ async function refreshSnapchatToken(refreshToken: string): Promise<{ accessToken
   const clientId = process.env.SNAPCHAT_CLIENT_ID?.trim();
   const clientSecret = process.env.SNAPCHAT_CLIENT_SECRET?.trim();
   if (!clientId || !clientSecret) return null;
-  const res = await fetch("https://accounts.snapchat.com/login/oauth2/access_token", {
+  const res = await fetchWithTimeout("https://accounts.snapchat.com/login/oauth2/access_token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({

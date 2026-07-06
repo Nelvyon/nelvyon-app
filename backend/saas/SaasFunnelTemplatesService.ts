@@ -30,7 +30,7 @@ const OFFICIAL: FunnelTemplate[] = [
     category: "ecommerce",
     steps: [
       { type: "landing", name: "Página producto", ctaLabel: "Comprar ahora" },
-      { type: "checkout", name: "Checkout", ctaLabel: "Pagar" },
+      { type: "checkout", name: "Checkout", ctaLabel: "Pagar", content: '{"amount":9900,"currency":"eur","productName":"Checkout"}' },
       { type: "upsell", name: "Oferta complementaria", ctaLabel: "Añadir al pedido" },
       { type: "thankyou", name: "Pedido confirmado", content: "Gracias por tu compra" },
     ],
@@ -77,7 +77,7 @@ const OFFICIAL: FunnelTemplate[] = [
     steps: [
       { type: "video", name: "VSL principal", content: "Vídeo de ventas 15 min" },
       { type: "landing", name: "Oferta limitada", ctaLabel: "Comprar ahora" },
-      { type: "checkout", name: "Checkout", ctaLabel: "Finalizar" },
+      { type: "checkout", name: "Checkout", ctaLabel: "Finalizar", content: '{"amount":9900,"currency":"eur","productName":"Checkout"}' },
       { type: "thankyou", name: "Acceso confirmado", content: "Bienvenido" },
     ],
   },

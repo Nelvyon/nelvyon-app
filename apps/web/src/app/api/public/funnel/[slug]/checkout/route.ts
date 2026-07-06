@@ -1,9 +1,10 @@
 /**
  * POST /api/public/funnel/[slug]/checkout
  * Creates a Stripe Checkout Session for a funnel checkout step.
- * Body: { stepId, sessionId?, amount, currency?, productName?, successPath?, cancelPath? }
+ * Body: { stepId, sessionId?, successPath?, cancelPath? }
  *
- * amount: integer in smallest currency unit (cents for EUR/USD)
+ * Price is resolved server-side from checkout step content JSON:
+ * { "amount": 9900, "currency": "eur", "productName": "..." }
  * Returns: { checkoutUrl }
  */
 export const dynamic = "force-dynamic";
@@ -11,6 +12,8 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { getSaasFunnelService } from "@nelvyon/saas";
+import { parseFunnelCheckoutStepConfig } from "../../../../../../../../../backend/saas/funnelCheckoutStepConfig";
+import { EXTERNAL_FETCH_TIMEOUT_MS } from "../../../../../../../../../backend/http/fetchWithTimeout";
 
 const ipCounts = new Map<string, { n: number; resetAt: number }>();
 function checkLimit(ip: string): boolean {
@@ -32,8 +35,8 @@ export async function POST(req: Request, ctx: RouteCtx) {
   try { body = await req.json() as Record<string, unknown>; }
   catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
-  const amount = typeof body.amount === "number" ? body.amount : 0;
-  if (amount < 50) return NextResponse.json({ error: "amount must be ≥50 (cents)" }, { status: 400 });
+  const stepId = typeof body.stepId === "string" ? body.stepId : null;
+  if (!stepId) return NextResponse.json({ error: "stepId required" }, { status: 400 });
 
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
@@ -42,13 +45,30 @@ export async function POST(req: Request, ctx: RouteCtx) {
     const svc = getSaasFunnelService();
     const funnel = await svc.getByPublicSlug(slug);
     if (!funnel) return NextResponse.json({ error: "Funnel not found" }, { status: 404 });
+    if (funnel.status !== "active") {
+      return NextResponse.json({ error: "Funnel not available" }, { status: 404 });
+    }
+
+    const step = funnel.steps.find((s) => s.id === stepId);
+    if (!step || step.type !== "checkout") {
+      return NextResponse.json({ error: "Invalid checkout step" }, { status: 400 });
+    }
+
+    const pricing = parseFunnelCheckoutStepConfig(step.content, step.name);
+    if (!pricing) {
+      return NextResponse.json(
+        {
+          error:
+            "Checkout price not configured. Set step content JSON: {\"amount\":9900,\"currency\":\"eur\",\"productName\":\"Offer\"}",
+        },
+        { status: 400 },
+      );
+    }
+    const { amount, currency, productName } = pricing;
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
     const successPath = typeof body.successPath === "string" ? body.successPath : `/f/${slug}/success`;
     const cancelPath  = typeof body.cancelPath  === "string" ? body.cancelPath  : `/f/${slug}`;
-    const currency    = typeof body.currency === "string" ? body.currency.toLowerCase() : "eur";
-    const productName = typeof body.productName === "string" ? body.productName : funnel.name;
-    const stepId      = typeof body.stepId === "string" ? body.stepId : null;
     const sessionId   = typeof body.sessionId === "string" ? body.sessionId : null;
 
     const params = new URLSearchParams({
@@ -73,6 +93,7 @@ export async function POST(req: Request, ctx: RouteCtx) {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: params.toString(),
+      signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS),
     });
 
     if (!stripeRes.ok) {

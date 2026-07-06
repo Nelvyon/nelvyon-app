@@ -1,6 +1,7 @@
 import { DbClient } from "../db/DbClient";
 import { getSaasIntegrationsHubService } from "./SaasIntegrationsHubService";
 import { decryptSecret, encryptSecret } from "./SaasSsoService";
+import { fetchWithTimeout } from "../http/fetchWithTimeout";
 
 /** Resolve HubSpot bearer token: connection vault first, then oauth_tokens fallback. */
 export async function resolveHubSpotAccessToken(tenantId: string): Promise<string | null> {
@@ -58,7 +59,7 @@ export async function refreshHubSpotAccessTokenIfNeeded(tenantId: string): Promi
     return resolveHubSpotAccessToken(tenantId);
   }
 
-  const res = await fetch("https://api.hubapi.com/oauth/v1/token", {
+  const res = await fetchWithTimeout("https://api.hubapi.com/oauth/v1/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({

@@ -79,35 +79,65 @@ export async function POST(
 
   if (email || name) {
     try {
-      const contactRows = await db.query<ContactUpsertRow>(
-        `INSERT INTO contacts (tenant_id, name, email, phone, status, pipeline_stage, value, tags, updated_at)
-         VALUES ($1,$2,$3,$4,'lead','new',0,'{}',NOW())
-         ON CONFLICT (tenant_id, email) WHERE email IS NOT NULL
-         DO UPDATE SET
-           name = COALESCE(EXCLUDED.name, contacts.name),
-           phone = COALESCE(EXCLUDED.phone, contacts.phone),
-           updated_at = NOW()
-         RETURNING id`,
-        [form.tenant_id, name ?? email ?? "Form submission", email, phone],
-      );
-      contactId = contactRows[0]?.id ?? null;
-    } catch {
-      // Contact upsert failure must not block submission recording
+      if (email) {
+        const existing = await db.query<ContactUpsertRow>(
+          `SELECT id FROM saas_contacts WHERE tenant_id = $1 AND lower(email) = lower($2) LIMIT 1`,
+          [form.tenant_id, email],
+        );
+        if (existing[0]) {
+          await db.query(
+            `UPDATE saas_contacts
+             SET name = COALESCE($3, name),
+                 phone = COALESCE($4, phone),
+                 updated_at = NOW()
+             WHERE id = $1 AND tenant_id = $2`,
+            [existing[0].id, form.tenant_id, name, phone],
+          );
+          contactId = existing[0].id;
+        } else {
+          const inserted = await db.query<ContactUpsertRow>(
+            `INSERT INTO saas_contacts (tenant_id, name, email, phone, status, pipeline_stage, value, tags, updated_at)
+             VALUES ($1,$2,$3,$4,'lead','new',0,'{}',NOW())
+             RETURNING id`,
+            [form.tenant_id, name ?? email, email, phone],
+          );
+          contactId = inserted[0]?.id ?? null;
+        }
+      } else {
+        const inserted = await db.query<ContactUpsertRow>(
+          `INSERT INTO saas_contacts (tenant_id, name, email, phone, status, pipeline_stage, value, tags, updated_at)
+           VALUES ($1,$2,NULL,$3,'lead','new',0,'{}',NOW())
+           RETURNING id`,
+          [form.tenant_id, name!, phone],
+        );
+        contactId = inserted[0]?.id ?? null;
+      }
+    } catch (e) {
+      console.error("[forms/submit] contact upsert failed", e);
     }
   }
 
   // Record submission
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  await db.query(
-    `INSERT INTO saas_form_submissions (form_id, tenant_id, contact_id, data, ip)
-     VALUES ($1,$2,$3,$4::jsonb,$5)`,
-    [formId, form.tenant_id, contactId, JSON.stringify(data), ip],
-  ).catch(() => null);
+  try {
+    await db.query(
+      `INSERT INTO saas_form_submissions (form_id, tenant_id, contact_id, data, ip)
+       VALUES ($1,$2,$3,$4::jsonb,$5)`,
+      [formId, form.tenant_id, contactId, JSON.stringify(data), ip],
+    );
+  } catch (e) {
+    console.error("[forms/submit] submission insert failed", e);
+    return NextResponse.json({ error: "Unable to record submission" }, { status: 503 });
+  }
 
-  await db.query(
-    `UPDATE saas_forms SET submissions = submissions + 1, updated_at = NOW() WHERE id = $1`,
-    [formId],
-  ).catch(() => null);
+  try {
+    await db.query(
+      `UPDATE saas_forms SET submissions = submissions + 1, updated_at = NOW() WHERE id = $1`,
+      [formId],
+    );
+  } catch (e) {
+    console.error("[forms/submit] submission counter update failed", e);
+  }
 
   // Dispatch workflow trigger (fire-and-forget)
   void dispatchFormSubmitted(form.tenant_id, formId, contactId, data);

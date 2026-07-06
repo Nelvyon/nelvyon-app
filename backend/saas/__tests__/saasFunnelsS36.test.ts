@@ -252,6 +252,40 @@ describe("SaasFunnelService.publish v2", () => {
     );
   });
 
+  it("throws VALIDATION when checkout step lacks server-side pricing", async () => {
+    const checkoutStep = {
+      ...stepRow2,
+      id: "s-checkout",
+      type: "checkout",
+      name: "Checkout",
+      content: "<h1>Pay here</h1>",
+      step_order: 2,
+    };
+    const db = makeDb({ steps: [stepRow1, stepRow2, checkoutStep] });
+    const svc = new SaasFunnelService(db as never);
+    await expect(svc.publish("t1", "f1")).rejects.toThrow(
+      expect.objectContaining({ code: "VALIDATION" }),
+    );
+  });
+
+  it("publishes when checkout step has pricing JSON", async () => {
+    const checkoutStep = {
+      ...stepRow2,
+      id: "s-checkout",
+      type: "checkout",
+      name: "Checkout",
+      content: '{"amount":9900,"currency":"eur","productName":"Offer"}',
+      step_order: 2,
+    };
+    const db = makeDb({ steps: [stepRow1, checkoutStep] });
+    const svc = new SaasFunnelService(db as never);
+    await svc.publish("t1", "f1");
+    const updateCall = db.query.mock.calls.find((c: [string]) =>
+      c[0].includes("UPDATE saas_funnels") && c[0].includes("public_slug"),
+    );
+    expect(updateCall).toBeDefined();
+  });
+
   it("generates public_slug when not set", async () => {
     const db = makeDb({ funnels: [{ ...funnelRow, public_slug: null }] });
     const svc = new SaasFunnelService(db as never);

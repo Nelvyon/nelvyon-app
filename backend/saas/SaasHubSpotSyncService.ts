@@ -1,5 +1,6 @@
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
+import { CRM_SYNC_FETCH_TIMEOUT_MS, fetchWithTimeout } from "../http/fetchWithTimeout";
 
 function mapHubSpotDealStage(raw: string | undefined): string {
   const s = (raw ?? "").toLowerCase();
@@ -54,8 +55,9 @@ export class SaasHubSpotSyncService {
     let contactsSynced = 0;
     let dealsSynced = 0;
     try {
-      const res = await fetch("https://api.hubapi.com/crm/v3/objects/contacts?limit=100&properties=email,firstname,lastname,phone,company", {
+      const res = await fetchWithTimeout("https://api.hubapi.com/crm/v3/objects/contacts?limit=100&properties=email,firstname,lastname,phone,company", {
         headers: { Authorization: `Bearer ${accessToken}` },
+        timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
       });
       if (!res.ok) throw new Error(`HubSpot API ${res.status}`);
       const data = (await res.json()) as { results?: Array<{ id: string; properties?: Record<string, string> }> };
@@ -87,8 +89,9 @@ export class SaasHubSpotSyncService {
         contactsSynced++;
       }
 
-      const dealRes = await fetch("https://api.hubapi.com/crm/v3/objects/deals?limit=50&properties=dealname,amount,dealstage", {
+      const dealRes = await fetchWithTimeout("https://api.hubapi.com/crm/v3/objects/deals?limit=50&properties=dealname,amount,dealstage", {
         headers: { Authorization: `Bearer ${accessToken}` },
+        timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
       });
       if (dealRes.ok) {
         const dealData = (await dealRes.json()) as { results?: Array<{ id: string; properties?: Record<string, string> }> };
@@ -138,7 +141,7 @@ export class SaasHubSpotSyncService {
       const parts = c.name.trim().split(/\s+/);
       const firstname = parts[0] ?? "";
       const lastname = parts.slice(1).join(" ");
-      const res = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
+      const res = await fetchWithTimeout("https://api.hubapi.com/crm/v3/objects/contacts", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -153,6 +156,7 @@ export class SaasHubSpotSyncService {
             company: c.company ?? "",
           },
         }),
+        timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
       });
       if (res.ok || res.status === 409) {
         await this.db.query(

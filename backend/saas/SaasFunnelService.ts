@@ -4,6 +4,7 @@
  */
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { parseFunnelCheckoutStepConfig } from "./funnelCheckoutStepConfig";
 
 export class SaasFunnelError extends Error {
   constructor(message: string, public readonly code: string) {
@@ -102,6 +103,19 @@ type VariantRow = { id: string; step_id: string; variant_key: string; content: R
 type StepRow = { id: string; funnel_id: string; tenant_id: string; step_order: number; type: string; name: string; content: string | null; cta_label: string | null; cta_url: string | null; visitors: number; conversions: number; created_at: Date; updated_at: Date };
 
 const STEP_TYPES: FunnelStepType[] = ["landing", "form", "video", "checkout", "upsell", "thankyou"];
+
+const CHECKOUT_PRICING_HINT =
+  '{"amount":9900,"currency":"eur","productName":"Offer"}';
+
+function assertCheckoutStepPricing(step: Pick<FunnelStep, "type" | "name" | "content">): void {
+  if (step.type !== "checkout") return;
+  if (!parseFunnelCheckoutStepConfig(step.content, step.name)) {
+    throw new SaasFunnelError(
+      `Checkout step "${step.name}" requires pricing JSON: ${CHECKOUT_PRICING_HINT}`,
+      "VALIDATION",
+    );
+  }
+}
 
 function rowToStep(r: StepRow): FunnelStep {
   return {
@@ -252,6 +266,9 @@ export class SaasFunnelService {
     const funnel = await this.get(tenantId, id);
     if (!funnel) throw new SaasFunnelError("Funnel not found", "NOT_FOUND");
     if (funnel.steps.length === 0) throw new SaasFunnelError("Cannot publish a funnel with no steps", "VALIDATION");
+    for (const step of funnel.steps) {
+      assertCheckoutStepPricing(step);
+    }
     const publicSlug = funnel.publicSlug ?? generatePublicSlug(funnel.name);
     await this.db.query(
       `UPDATE saas_funnels SET status='active', public_slug=$3, published_at=NOW(), updated_at=NOW()
@@ -429,6 +446,11 @@ export class SaasFunnelService {
     const funnel = await this.get(tenantId, funnelId);
     if (!funnel) throw new SaasFunnelError("Funnel not found", "NOT_FOUND");
     if (!STEP_TYPES.includes(input.type)) throw new SaasFunnelError(`Invalid step type: ${input.type}`, "VALIDATION");
+    assertCheckoutStepPricing({
+      type: input.type,
+      name: input.name,
+      content: input.content ?? null,
+    });
     const nextOrder = funnel.steps.length;
     const rows = await this.db.query<StepRow>(
       `INSERT INTO saas_funnel_steps (funnel_id,tenant_id,step_order,type,name,content,cta_label,cta_url,updated_at)
@@ -459,7 +481,9 @@ export class SaasFunnelService {
       params,
     );
     if (!rows[0]) throw new SaasFunnelError("Step not found", "NOT_FOUND");
-    return rowToStep(rows[0]);
+    const updated = rowToStep(rows[0]);
+    assertCheckoutStepPricing(updated);
+    return updated;
   }
 
   async deleteStep(tenantId: string, stepId: string): Promise<void> {

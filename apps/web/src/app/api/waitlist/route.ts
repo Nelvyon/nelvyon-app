@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
       [email.trim().toLowerCase()],
     );
     return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error("[waitlist] insert failed", e);
+    return NextResponse.json({ error: "Unable to join waitlist" }, { status: 503 });
   }
 }

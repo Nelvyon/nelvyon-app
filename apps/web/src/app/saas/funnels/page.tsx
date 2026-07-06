@@ -162,11 +162,18 @@ function StepEditor({
         <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className={inputCls} />
       </div>
       <div>
-        <label className={labelCls}>Contenido HTML</label>
+        <label className={labelCls}>
+          {step.type === "checkout" ? "Configuración checkout (JSON)" : "Contenido HTML"}
+        </label>
         <textarea
           value={form.content}
           onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-          rows={5} placeholder="<h1>Tu oferta</h1><p>Descripción…</p>"
+          rows={5}
+          placeholder={
+            step.type === "checkout"
+              ? '{"amount":9900,"currency":"eur","productName":"Oferta"}'
+              : "<h1>Tu oferta</h1><p>Descripción…</p>"
+          }
           className={inputCls + " resize-y font-mono text-xs"}
         />
       </div>

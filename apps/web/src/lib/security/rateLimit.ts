@@ -43,6 +43,30 @@ const RULES: RateLimitRule[] = [
     limit: 20,
     windowSec: 60,
   },
+  {
+    id: "contact",
+    match: (p) => p === "/api/contact",
+    limit: 10,
+    windowSec: 60,
+  },
+  {
+    id: "waitlist",
+    match: (p) => p === "/api/waitlist",
+    limit: 10,
+    windowSec: 60,
+  },
+  {
+    id: "form-submit",
+    match: (p) => /^\/api\/forms\/[^/]+\/submit$/.test(p),
+    limit: 20,
+    windowSec: 60,
+  },
+  {
+    id: "site-chat",
+    match: (p) => p === "/api/nelvyon-site/chat",
+    limit: 15,
+    windowSec: 60,
+  },
 ];
 
 export function getRateLimitRule(pathname: string): RateLimitRule | null {

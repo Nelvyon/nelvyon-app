@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSaasStoreService } from "@nelvyon/saas";
 import { DbClient } from "@/../../backend/db/DbClient";
+import { EXTERNAL_FETCH_TIMEOUT_MS } from "@/../../backend/http/fetchWithTimeout";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -50,16 +51,61 @@ export async function POST(req: Request, context: RouteContext) {
     if (!body?.items?.length) return NextResponse.json({ error: "items required" }, { status: 400 });
     if (!body.email?.trim()) return NextResponse.json({ error: "email required" }, { status: 400 });
 
-    // Resolve tenant for IVA/VAT settings
     const tenantId = await resolveTenantId(subdomain);
+    if (!tenantId) {
+      return NextResponse.json({ error: "Store not found" }, { status: 404 });
+    }
+
     const svc = getSaasStoreService();
-    const settings = tenantId ? await svc.getSettings(tenantId) : null;
+    const settings = await svc.getSettings(tenantId);
     const vatPct = settings?.vatPct ?? 21;
     const vatIncluded = settings?.vatIncluded ?? true;
     const shippingFee = settings?.shippingFee ?? 0;
     const currency = settings?.currency ?? "EUR";
 
-    const subtotal = body.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const resolvedItems: Array<{
+      productId: string;
+      productName: string;
+      variantName?: string;
+      sku?: string;
+      quantity: number;
+      unitPrice: number;
+    }> = [];
+
+    for (const item of body.items) {
+      const qty = Math.max(1, Math.min(99, Math.floor(Number(item.quantity) || 1)));
+      if (!item.id?.trim()) {
+        return NextResponse.json({ error: "Each cart item must include product id" }, { status: 400 });
+      }
+      let product;
+      try {
+        product = await svc.getStoreProduct(tenantId, item.id.trim());
+      } catch {
+        return NextResponse.json({ error: `Product not found: ${item.id}` }, { status: 400 });
+      }
+      if (!product.active) {
+        return NextResponse.json({ error: `Product unavailable: ${product.name}` }, { status: 400 });
+      }
+      let unitPrice = product.price;
+      const variantName = item.variantName?.trim();
+      if (variantName && product.variants?.length) {
+        const variant = product.variants.find((v) => v.name === variantName);
+        if (!variant) {
+          return NextResponse.json({ error: `Variant not found: ${variantName}` }, { status: 400 });
+        }
+        unitPrice += variant.priceModifier;
+      }
+      resolvedItems.push({
+        productId: product.id,
+        productName: product.name,
+        variantName: variantName || undefined,
+        sku: product.sku ?? item.sku,
+        quantity: qty,
+        unitPrice,
+      });
+    }
+
+    const subtotal = resolvedItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
     const vatAmount = vatIncluded ? 0 : Math.round(subtotal * vatPct) / 100;
     const total = subtotal + vatAmount + shippingFee;
 
@@ -79,6 +125,7 @@ export async function POST(req: Request, context: RouteContext) {
       method: "POST",
       headers: { Authorization: `Bearer ${stripeKey}`, "Content-Type": "application/x-www-form-urlencoded" },
       body: intentParams.toString(),
+      signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS),
     });
 
     const intent = await stripeRes.json() as { id?: string; client_secret?: string; error?: { message: string } };
@@ -88,7 +135,7 @@ export async function POST(req: Request, context: RouteContext) {
 
     // Persist order in DB with status=pending — webhook updates to paid
     let orderId: string | undefined;
-    if (tenantId && intent.id) {
+    if (intent.id) {
       try {
         const order = await svc.createOrder(tenantId, {
           customerEmail: body.email!,
@@ -96,18 +143,18 @@ export async function POST(req: Request, context: RouteContext) {
           customerAddress: body.address,
           paymentIntentId: intent.id,
           currency,
-          items: body.items.map(i => ({
-            productId: i.id,
-            productName: i.name,
+          items: resolvedItems.map((i) => ({
+            productId: i.productId,
+            productName: i.productName,
             variantName: i.variantName,
             sku: i.sku,
             quantity: i.quantity,
-            unitPrice: i.price,
+            unitPrice: i.unitPrice,
           })),
         });
         orderId = order.id;
-      } catch {
-        // Non-fatal — payment still proceeds even if order persistence fails
+      } catch (e) {
+        console.error("[store/checkout] order persistence failed", e);
       }
     }
 

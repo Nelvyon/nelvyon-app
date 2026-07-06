@@ -207,6 +207,11 @@ export class SaasHelpdeskServiceV2 {
 
   async addMessage(tenantId: string, ticketId: string, body: string, author = "agent", isInternal = false): Promise<HelpdeskMessage> {
     if (!body?.trim()) throw new SaasHelpdeskError("body es obligatorio", "VALIDATION");
+    const ticketRows = await this.db.query<{ id: string }>(
+      `SELECT id FROM saas_helpdesk_tickets WHERE id = $1::uuid AND tenant_id = $2 LIMIT 1`,
+      [ticketId, tenantId],
+    );
+    if (!ticketRows[0]) throw new SaasHelpdeskError("Ticket no encontrado", "NOT_FOUND");
     const rows = await this.db.query<Record<string, unknown>>(
       `INSERT INTO saas_helpdesk_messages (ticket_id,tenant_id,author,body,is_internal)
        VALUES ($1::uuid,$2,$3,$4,$5)

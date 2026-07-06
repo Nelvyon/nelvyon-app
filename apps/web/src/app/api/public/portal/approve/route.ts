@@ -50,11 +50,16 @@ export async function POST(req: Request) {
 
     const hash = hashApprovalToken(token);
     const db = DbClient.getInstance();
-    const used = await db.query<{ id: string }>(
-      `SELECT id FROM os_deliverable_approval_tokens WHERE token_hash = $1 AND used_at IS NULL AND expires_at > NOW() LIMIT 1`,
+
+    // Atomic single-use claim before any side effects
+    const claimed = await db.query<{ id: string }>(
+      `UPDATE os_deliverable_approval_tokens
+       SET used_at = NOW()
+       WHERE token_hash = $1 AND used_at IS NULL AND expires_at > NOW()
+       RETURNING id`,
       [hash],
     );
-    if (used.length === 0) {
+    if (!claimed[0]) {
       return NextResponse.json({ error: "token already used or invalid" }, { status: 410 });
     }
 
@@ -88,11 +93,6 @@ export async function POST(req: Request) {
             deliverableId: did,
             feedback: feedback ?? "Rejected via one-click link",
           });
-
-    await db.query(
-      `UPDATE os_deliverable_approval_tokens SET used_at = NOW() WHERE token_hash = $1`,
-      [hash],
-    );
 
     if (act === "approve") {
       void (async () => {

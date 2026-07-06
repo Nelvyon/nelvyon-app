@@ -136,10 +136,16 @@ describe("addMessage", () => {
     await expect(svc.addMessage(T, "t-1", "  ")).rejects.toThrow(SaasHelpdeskError);
   });
 
+  it("throws NOT_FOUND when ticket does not belong to tenant", async () => {
+    const svc = new SaasHelpdeskServiceV2(makeDb([]));
+    await expect(svc.addMessage(T, "t-1", "Hi")).rejects.toThrow(SaasHelpdeskError);
+  });
+
   it("marks first_responded_at for non-internal messages", async () => {
     const msgRow = { id: "msg-1", ticket_id: "t-1", tenant_id: T, author: "agent", body: "Hi", is_internal: false, created_at: now };
     const db = { query: vi.fn() } as unknown as SaasPostgresPort;
     (db.query as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce([{ id: "t-1" }]) // tenant ticket check
       .mockResolvedValueOnce([msgRow]) // INSERT message
       .mockResolvedValueOnce([]);      // UPDATE ticket
     const svc = new SaasHelpdeskServiceV2(db);
@@ -149,11 +155,13 @@ describe("addMessage", () => {
 
   it("does not update ticket for internal messages", async () => {
     const msgRow = { id: "msg-1", ticket_id: "t-1", tenant_id: T, author: "agent", body: "Note", is_internal: true, created_at: now };
-    const db = makeDb([msgRow]);
+    const db = { query: vi.fn() } as unknown as SaasPostgresPort;
+    (db.query as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce([{ id: "t-1" }])
+      .mockResolvedValueOnce([msgRow]);
     const svc = new SaasHelpdeskServiceV2(db);
     await svc.addMessage(T, "t-1", "Note", "agent", true);
-    // Only one query (INSERT), no UPDATE for internal
-    expect((db.query as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(1);
+    expect((db.query as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(2);
   });
 });
 

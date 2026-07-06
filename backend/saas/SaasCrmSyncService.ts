@@ -2,6 +2,7 @@
  * Generic CRM sync — Salesforce, Pipedrive, Zoho (HubSpot uses SaasHubSpotSyncService).
  */
 import { DbClient } from "../db/DbClient";
+import { CRM_SYNC_FETCH_TIMEOUT_MS, fetchWithTimeout } from "../http/fetchWithTimeout";
 
 export type CrmSyncSlug = "salesforce" | "pipedrive" | "zoho";
 
@@ -114,8 +115,9 @@ export class SaasCrmSyncService {
           String(meta[0]?.metadata?.instance_url ?? meta[0]?.metadata?.instanceUrl ?? "").replace(/\/$/, "")
           || "https://login.salesforce.com";
         const q = encodeURIComponent("SELECT Id,Email,Name,Phone FROM Contact WHERE Email != null LIMIT 100");
-        const res = await fetch(`${instance}/services/data/v59.0/query?q=${q}`, {
+        const res = await fetchWithTimeout(`${instance}/services/data/v59.0/query?q=${q}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         if (!res.ok) throw new Error(`Salesforce API ${res.status}`);
         const data = (await res.json()) as { records?: Array<{ Id: string; Email: string; Name: string; Phone?: string }> };
@@ -127,8 +129,9 @@ export class SaasCrmSyncService {
           }
         }
         const dq = encodeURIComponent("SELECT Id,Name,Amount,StageName FROM Opportunity LIMIT 50");
-        const dealRes = await fetch(`${instance}/services/data/v59.0/query?q=${dq}`, {
+        const dealRes = await fetchWithTimeout(`${instance}/services/data/v59.0/query?q=${dq}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         if (dealRes.ok) {
           const dealData = (await dealRes.json()) as { records?: Array<{ Id: string; Name: string; Amount?: number; StageName?: string }> };
@@ -147,8 +150,9 @@ export class SaasCrmSyncService {
           }
         }
       } else if (slug === "pipedrive") {
-        const res = await fetch("https://api.pipedrive.com/v1/persons?limit=100", {
+        const res = await fetchWithTimeout("https://api.pipedrive.com/v1/persons?limit=100", {
           headers: { Authorization: `Bearer ${accessToken}` },
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         if (!res.ok) throw new Error(`Pipedrive API ${res.status}`);
         const data = (await res.json()) as {
@@ -162,8 +166,9 @@ export class SaasCrmSyncService {
             contactsSynced++;
           }
         }
-        const dealRes = await fetch("https://api.pipedrive.com/v1/deals?limit=50", {
+        const dealRes = await fetchWithTimeout("https://api.pipedrive.com/v1/deals?limit=50", {
           headers: { Authorization: `Bearer ${accessToken}` },
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         if (dealRes.ok) {
           const dealData = (await dealRes.json()) as { data?: Array<{ id: number; title: string; value?: number; status?: string }> };
@@ -180,8 +185,9 @@ export class SaasCrmSyncService {
           }
         }
       } else if (slug === "zoho") {
-        const res = await fetch("https://www.zohoapis.com/crm/v2/Contacts?per_page=100", {
+        const res = await fetchWithTimeout("https://www.zohoapis.com/crm/v2/Contacts?per_page=100", {
           headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         if (!res.ok) throw new Error(`Zoho API ${res.status}`);
         const data = (await res.json()) as {
@@ -197,8 +203,9 @@ export class SaasCrmSyncService {
             contactsSynced++;
           }
         }
-        const dealRes = await fetch("https://www.zohoapis.com/crm/v2/Deals?per_page=50", {
+        const dealRes = await fetchWithTimeout("https://www.zohoapis.com/crm/v2/Deals?per_page=50", {
           headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         if (dealRes.ok) {
           const dealData = (await dealRes.json()) as { data?: Array<{ id: string; Deal_Name?: string; Amount?: number }> };
@@ -236,24 +243,27 @@ export class SaasCrmSyncService {
     for (const c of rows) {
       let ok = false;
       if (slug === "salesforce") {
-        const res = await fetch("https://login.salesforce.com/services/data/v59.0/sobjects/Contact", {
+        const res = await fetchWithTimeout("https://login.salesforce.com/services/data/v59.0/sobjects/Contact", {
           method: "POST",
           headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
           body: JSON.stringify({ LastName: c.name.split(/\s+/).pop() ?? c.name, FirstName: c.name.split(/\s+/)[0] ?? "", Email: c.email, Phone: c.phone ?? "", AccountId: null }),
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         ok = res.ok || res.status === 400;
       } else if (slug === "pipedrive") {
-        const res = await fetch("https://api.pipedrive.com/v1/persons", {
+        const res = await fetchWithTimeout("https://api.pipedrive.com/v1/persons", {
           method: "POST",
           headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
           body: JSON.stringify({ name: c.name, email: [{ value: c.email, primary: true }], phone: c.phone ? [{ value: c.phone }] : [] }),
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         ok = res.ok;
       } else if (slug === "zoho") {
-        const res = await fetch("https://www.zohoapis.com/crm/v2/Contacts", {
+        const res = await fetchWithTimeout("https://www.zohoapis.com/crm/v2/Contacts", {
           method: "POST",
           headers: { Authorization: `Zoho-oauthtoken ${accessToken}`, "Content-Type": "application/json" },
           body: JSON.stringify({ data: [{ Last_Name: c.name, Email: c.email, Phone: c.phone ?? "" }] }),
+          timeoutMs: CRM_SYNC_FETCH_TIMEOUT_MS,
         });
         ok = res.ok;
       }

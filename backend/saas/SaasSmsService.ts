@@ -5,6 +5,7 @@
  */
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { EXTERNAL_FETCH_TIMEOUT_MS } from "../http/fetchWithTimeout";
 
 export interface SmsSendResult {
   to: string;
@@ -53,6 +54,7 @@ async function twilioSend(
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: params.toString(),
+    signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS),
   });
   const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) {

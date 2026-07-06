@@ -4,6 +4,7 @@
  * If no token → { connected: false }; never returns fake data.
  */
 import { DbClient } from "../db/DbClient";
+import { EXTERNAL_FETCH_TIMEOUT_MS } from "../http/fetchWithTimeout";
 
 export type SocialPlatform = "meta" | "linkedin" | "instagram";
 export type SocialPostStatus = "draft" | "scheduled" | "published" | "failed";
@@ -261,6 +262,7 @@ export class SaasSocialService {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
+        signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS),
       });
       const data = await res.json() as { id?: string; error?: { message: string } };
       if (!res.ok || data.error) return { ok: false, error: `Meta API: ${data.error?.message ?? "unknown error"}` };
@@ -292,6 +294,7 @@ export class SaasSocialService {
           "X-Restli-Protocol-Version": "2.0.0",
         },
         body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({})) as { message?: string };

@@ -36,11 +36,11 @@ export async function POST(req: NextRequest) {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      if (!/stripe_webhook_events/i.test(msg) || !/does not exist|relation/i.test(msg)) {
-        console.error("[stripe-webhook] idempotency claim failed", err);
-        return NextResponse.json({ error: "Idempotency check failed" }, { status: 503 });
+      console.error("[stripe-webhook] idempotency claim failed", err);
+      if (/stripe_webhook_events/i.test(msg) && /does not exist|relation/i.test(msg)) {
+        return NextResponse.json({ error: "Idempotency table unavailable" }, { status: 503 });
       }
-      console.warn("[stripe-webhook] idempotency table missing — proceeding without claim");
+      return NextResponse.json({ error: "Idempotency check failed" }, { status: 503 });
     }
 
     await processStripeEvent(event, db);

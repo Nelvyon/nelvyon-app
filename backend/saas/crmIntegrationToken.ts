@@ -1,6 +1,7 @@
 import { DbClient } from "../db/DbClient";
 import { getSaasIntegrationsHubService } from "./SaasIntegrationsHubService";
 import { decryptSecret, encryptSecret } from "./SaasSsoService";
+import { fetchWithTimeout } from "../http/fetchWithTimeout";
 
 const REFRESH_ENDPOINTS: Record<string, { url: string; useForm: boolean }> = {
   hubspot: { url: "https://api.hubapi.com/oauth/v1/token", useForm: true },
@@ -83,7 +84,7 @@ export async function refreshCrmAccessTokenIfNeeded(
     refresh_token: refreshToken,
   });
 
-  const res = await fetch(endpoint.url, {
+  const res = await fetchWithTimeout(endpoint.url, {
     method: "POST",
     headers: endpoint.useForm ? { "Content-Type": "application/x-www-form-urlencoded" } : {},
     body: endpoint.useForm ? body : undefined,
