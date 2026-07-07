@@ -33,8 +33,8 @@ export async function requireOsWorkspaceAccess(
 }
 
 export async function packRunBelongsToWorkspace(packRunId: string, workspaceId: number): Promise<boolean> {
-  const run = await getPackRun(packRunId);
-  return !!run && run.workspace_id === workspaceId;
+  const run = await getPackRun(packRunId, workspaceId);
+  return !!run;
 }
 
 export function notFoundResponse(): NextResponse {

@@ -106,7 +106,7 @@ describe("SaasResultsService", () => {
   it("getResultById con id válido devuelve resultado", async () => {
     const query = vi.fn().mockResolvedValue([row()]);
     const svc = new SaasResultsService({ db: { query } });
-    const out = await svc.getResultById("00000000-0000-0000-0000-000000000001", "u1");
+    const out = await svc.getResultById("00000000-0000-0000-0000-000000000001", "u1", "t1");
     expect(out?.id).toBe("00000000-0000-0000-0000-000000000001");
     expect(String(query.mock.calls[0]?.[0])).toContain("id = $1::uuid");
   });
@@ -114,7 +114,7 @@ describe("SaasResultsService", () => {
   it("getResultById con id de otro usuario devuelve null", async () => {
     const query = vi.fn().mockResolvedValue([]);
     const svc = new SaasResultsService({ db: { query } });
-    expect(await svc.getResultById("00000000-0000-0000-0000-000000000001", "u2")).toBeNull();
+    expect(await svc.getResultById("00000000-0000-0000-0000-000000000001", "u2", "t1")).toBeNull();
   });
 
   it("getResults acota limit máximo a 100", async () => {

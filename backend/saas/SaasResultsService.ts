@@ -94,13 +94,13 @@ export class SaasResultsService {
     return { results, total };
   }
 
-  async getResultById(id: string, userId: string): Promise<ServiceResult | null> {
+  async getResultById(id: string, userId: string, tenantId: string): Promise<ServiceResult | null> {
     const rows = await this.db.query<ServiceResult>(
       `SELECT id, user_id as "userId", tenant_id as "tenantId", job_id as "jobId",
               service_id as "serviceId", service_name as "serviceName", summary,
               details, asset_urls as "assetUrls", status, created_at as "createdAt"
-       FROM saas_service_results WHERE id = $1::uuid AND user_id = $2`,
-      [id, userId],
+       FROM saas_service_results WHERE id = $1::uuid AND user_id = $2 AND tenant_id = $3::uuid`,
+      [id, userId, tenantId],
     );
     return rows[0] ?? null;
   }

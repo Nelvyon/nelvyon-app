@@ -30,7 +30,7 @@ export async function PUT(req: Request, ctx: RouteCtx) {
     const upstream = await proxyPlatformFetch(req, "PUT", `/api/funnels/${id}`, {
       body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" },
-    });
+    }, { requireWorkspace: true });
     const text = await upstream.text();
     if (upstream.ok) {
       return NextResponse.json(text ? JSON.parse(text) : {});
@@ -51,7 +51,7 @@ export async function DELETE(req: Request, ctx: RouteCtx) {
   if (authError) return authError;
 
   try {
-    const upstream = await proxyPlatformFetch(req, "DELETE", `/api/funnels/${id}`);
+    const upstream = await proxyPlatformFetch(req, "DELETE", `/api/funnels/${id}`, {}, { requireWorkspace: true });
     if (upstream.ok) {
       return NextResponse.json({ deleted: true });
     }

@@ -86,7 +86,7 @@ export class SaasInvoiceService {
     );
   }
 
-  async getInvoiceById(id: string, userId: string): Promise<Invoice | null> {
+  async getInvoiceById(id: string, userId: string, tenantId: string): Promise<Invoice | null> {
     const rows = await this.db.query<Invoice>(
       `SELECT id, user_id as "userId", tenant_id as "tenantId",
               invoice_number as "invoiceNumber",
@@ -95,8 +95,8 @@ export class SaasInvoiceService {
               line_items as "lineItems", pdf_url as "pdfUrl",
               issued_at as "issuedAt", paid_at as "paidAt",
               created_at as "createdAt"
-       FROM saas_invoices WHERE id = $1::uuid AND user_id = $2`,
-      [id, userId],
+       FROM saas_invoices WHERE id = $1::uuid AND user_id = $2 AND tenant_id = $3::uuid`,
+      [id, userId, tenantId],
     );
     return rows[0] ?? null;
   }

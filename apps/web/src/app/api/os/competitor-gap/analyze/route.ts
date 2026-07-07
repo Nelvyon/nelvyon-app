@@ -23,7 +23,12 @@ export async function POST(req: Request) {
       tenantId: auth.tenant.id,
       workspaceId: auth.tenant.workspaceId ?? null,
     });
-    const analyzed = await svc.analyzeRun(run.id, { userId, sector: body.sector, hasProductCategory: body.hasProductCategory });
+    const analyzed = await svc.analyzeRun(run.id, {
+      userId,
+      sector: body.sector,
+      hasProductCategory: body.hasProductCategory,
+      tenantId: auth.tenant.id,
+    });
     return NextResponse.json({ run: { ...analyzed, reportHtml: undefined } });
   } catch (e) {
     if (e instanceof OsCompetitorGapError) {

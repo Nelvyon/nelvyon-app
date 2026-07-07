@@ -371,6 +371,32 @@ export async function approvePortalDeliverableBff(params: {
     workspaceId: params.workspaceId,
     clientId: params.clientId,
   });
+
+  void (async () => {
+    try {
+      const { resolveTenantIdByWorkspace } = await import("@nelvyon/saas");
+      const tenantId = await resolveTenantIdByWorkspace(params.workspaceId);
+      if (!tenantId) return;
+      const { getSaasSocialProofService } = await import("@nelvyon/saas");
+      const rowForProof = updated ?? row;
+      const meta =
+        rowForProof.deliverable_metadata && typeof rowForProof.deliverable_metadata === "object"
+          ? rowForProof.deliverable_metadata
+          : {};
+      await getSaasSocialProofService().createFromDeliverable(tenantId, {
+        deliverableId: params.deliverableId,
+        title: rowForProof.title,
+        qaScore: typeof meta.qa_score === "number" ? meta.qa_score : undefined,
+        packName:
+          meta.pack_report && typeof meta.pack_report === "object" && "pack_name" in meta.pack_report
+            ? String((meta.pack_report as { pack_name?: string }).pack_name ?? "")
+            : undefined,
+      });
+    } catch {
+      /* best-effort social proof draft */
+    }
+  })();
+
   return reviewResultDict(updated ?? row);
 }
 

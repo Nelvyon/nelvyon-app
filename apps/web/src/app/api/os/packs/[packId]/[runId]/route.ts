@@ -44,8 +44,8 @@ export async function GET(
     throw e;
   }
 
-  const run = await getPackRun(runId);
-  if (!run || run.pack_id !== packId || run.workspace_id !== workspaceId) {
+  const run = await getPackRun(runId, workspaceId);
+  if (!run || run.pack_id !== packId) {
     return NextResponse.json({ error: "Run not found" }, { status: 404 });
   }
 

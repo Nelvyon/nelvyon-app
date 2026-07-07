@@ -94,35 +94,6 @@ export async function POST(req: Request) {
             feedback: feedback ?? "Rejected via one-click link",
           });
 
-    if (act === "approve") {
-      void (async () => {
-        try {
-          const metaRows = await db.query<{ title: string; qa_score: number | null; pack_name: string | null }>(
-            `SELECT d.title,
-                    (d.metadata->>'qa_score')::int AS qa_score,
-                    d.metadata->'pack_report'->>'pack_name' AS pack_name
-             FROM os_deliverables d WHERE d.id = $1::uuid LIMIT 1`,
-            [did],
-          );
-          const tenantRows = await db.query<{ id: string }>(
-            `SELECT id FROM saas_tenants WHERE workspace_id = $1 LIMIT 1`,
-            [wid],
-          );
-          const tenantId = tenantRows[0]?.id;
-          if (!tenantId) return;
-          const { getSaasSocialProofService } = await import("@nelvyon/saas");
-          await getSaasSocialProofService().createFromDeliverable(tenantId, {
-            deliverableId: did,
-            title: metaRows[0]?.title,
-            qaScore: metaRows[0]?.qa_score ?? undefined,
-            packName: metaRows[0]?.pack_name ?? undefined,
-          });
-        } catch {
-          /* best-effort social proof draft */
-        }
-      })();
-    }
-
     return NextResponse.json({ ok: true, action: act, deliverable: result });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Internal error";

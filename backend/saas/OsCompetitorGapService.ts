@@ -288,8 +288,11 @@ export class OsCompetitorGapService {
   }
 
   /** Pull agent data, derive gaps, score, recommend, build HTML, persist. Fails closed without provider data. */
-  async analyzeRun(runId: string, opts: { userId?: string; sector?: string; hasProductCategory?: boolean } = {}): Promise<CompetitorGapRun> {
-    const existing = await this.getRun(runId);
+  async analyzeRun(
+    runId: string,
+    opts: { userId?: string; sector?: string; hasProductCategory?: boolean; tenantId?: string } = {},
+  ): Promise<CompetitorGapRun> {
+    const existing = await this.getRun(runId, opts.tenantId);
 
     let agentData: Record<string, unknown> = {};
     let ownKeywords: GapKeyword[] = [];
@@ -311,7 +314,7 @@ export class OsCompetitorGapService {
       };
     } catch (e) {
       const msg = e instanceof Error ? e.message : "agent_data_unavailable";
-      return this.failRun(runId, msg);
+      return this.failRun(runId, msg, opts.tenantId);
     }
 
     const hasData = ownKeywords.length > 0 || competitors.length > 0;
@@ -321,6 +324,7 @@ export class OsCompetitorGapService {
         provider === "none" || provider === "mock"
           ? "Proveedor SEO no configurado — conecta Semrush o configura APOLLO/SEMRUSH."
           : "Datos insuficientes para análisis competitivo.",
+        opts.tenantId,
       );
     }
 
@@ -331,13 +335,17 @@ export class OsCompetitorGapService {
 
     const html = this.buildReportHtml({ ...existing, gaps, gapScore, recommendedPackId, recommendedSkus, agentData });
 
+    const tenantClause = opts.tenantId ? ` AND tenant_id = $8::uuid` : "";
+    const params: unknown[] = [runId, JSON.stringify(gaps), gapScore, recommendedPackId, JSON.stringify(recommendedSkus), JSON.stringify(agentData), html];
+    if (opts.tenantId) params.push(opts.tenantId);
+
     const rows = await this.db.query<GapRow>(
       `UPDATE os_competitor_gap_runs
        SET status = 'completed', gaps = $2::jsonb, gap_score = $3, recommended_pack_id = $4,
            recommended_skus = $5::jsonb, agent_data = $6::jsonb, report_html = $7, completed_at = NOW()
-       WHERE id = $1
+       WHERE id = $1${tenantClause}
        RETURNING *`,
-      [runId, JSON.stringify(gaps), gapScore, recommendedPackId, JSON.stringify(recommendedSkus), JSON.stringify(agentData), html],
+      params,
     );
     if (!rows[0]) throw new OsCompetitorGapError("NOT_FOUND", `Gap run ${runId} no encontrado`);
     return rowToRun(rows[0], true);
@@ -381,32 +389,48 @@ export class OsCompetitorGapService {
 </div></body></html>`;
   }
 
-  async failRun(runId: string, error: string): Promise<CompetitorGapRun> {
+  async failRun(runId: string, error: string, tenantId?: string | null): Promise<CompetitorGapRun> {
+    const tenantClause = tenantId ? ` AND tenant_id = $3::uuid` : "";
+    const params: unknown[] = tenantId ? [runId, error, tenantId] : [runId, error];
     const rows = await this.db.query<GapRow>(
-      `UPDATE os_competitor_gap_runs SET status = 'failed', error_message = $2, completed_at = NOW() WHERE id = $1 RETURNING *`,
-      [runId, error],
+      `UPDATE os_competitor_gap_runs SET status = 'failed', error_message = $2, completed_at = NOW() WHERE id = $1${tenantClause} RETURNING *`,
+      params,
     );
     if (!rows[0]) throw new OsCompetitorGapError("NOT_FOUND", `Gap run ${runId} no encontrado`);
     return rowToRun(rows[0]);
   }
 
   /** Launch (or stage) the recommended pack via Brief-to-Launch. */
-  async launchRecommendedPack(runId: string, opts: { userId?: string; execute?: boolean } = {}): Promise<CompetitorGapRun> {
-    const run = await this.getRun(runId);
+  async launchRecommendedPack(
+    runId: string,
+    opts: { userId?: string; execute?: boolean; tenantId?: string | null } = {},
+  ): Promise<CompetitorGapRun> {
+    const run = await this.getRun(runId, opts.tenantId);
     if (!run.recommendedPackId) {
       throw new OsCompetitorGapError("VALIDATION", "Run sin pack recomendado — ejecuta analyze primero");
     }
     if (!opts.execute) return run;
+    if (run.packRunId) return run;
 
     const brief = buildBriefPatch(run.ownDomain, run.competitorUrl, run.gaps, run.agentData);
     if (run.tenantId) brief.tenant_id = run.tenantId;
     const { launchId, packRunId } = await this.launches.suggestLaunch({
       packId: run.recommendedPackId, brief, userId: opts.userId, execute: true,
     });
+
+    const tenantClause = opts.tenantId ? ` AND tenant_id = $4::uuid` : "";
+    const updateParams: unknown[] = opts.tenantId
+      ? [runId, launchId, packRunId, opts.tenantId]
+      : [runId, launchId, packRunId];
     const rows = await this.db.query<GapRow>(
-      `UPDATE os_competitor_gap_runs SET launch_id = $2::uuid, pack_run_id = $3::uuid WHERE id = $1 RETURNING *`,
-      [runId, launchId, packRunId],
+      `UPDATE os_competitor_gap_runs SET launch_id = $2::uuid, pack_run_id = $3::uuid
+       WHERE id = $1 AND pack_run_id IS NULL${tenantClause}
+       RETURNING *`,
+      updateParams,
     );
+    if (!rows[0]) {
+      return this.getRun(runId, opts.tenantId);
+    }
     return rowToRun(rows[0]!, true);
   }
 

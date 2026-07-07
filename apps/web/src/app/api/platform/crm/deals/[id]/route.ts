@@ -30,7 +30,7 @@ export async function GET(
   if (claims instanceof NextResponse) return claims;
 
   try {
-    const upstream = await proxyPlatformFetch(req, "GET", `${UPSTREAM}/${dealId}`);
+    const upstream = await proxyPlatformFetch(req, "GET", `${UPSTREAM}/${dealId}`, {}, { requireWorkspace: true });
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
     }
@@ -95,7 +95,7 @@ export async function PUT(
     const upstream = await proxyPlatformFetch(req, "PUT", `${UPSTREAM}/${dealId}`, {
       body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" },
-    });
+    }, { requireWorkspace: true });
     const text = await upstream.text();
 
     if (upstream.ok) {

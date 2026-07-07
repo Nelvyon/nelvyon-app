@@ -183,6 +183,14 @@ describe("O24 — launchRecommendedPack", () => {
     expect(run.launchId).toBe("launch-1");
   });
 
+  it("execute with existing pack_run_id is idempotent", async () => {
+    const db = makeDb(() => [gapRow({ status: "completed", recommended_pack_id: "local-business-growth", pack_run_id: "existing-run" })]);
+    const launch = { suggestLaunch: vi.fn() };
+    const run = await svc(db, agentPort(), launch).launchRecommendedPack("gap-1", { execute: true });
+    expect(run.packRunId).toBe("existing-run");
+    expect(launch.suggestLaunch).not.toHaveBeenCalled();
+  });
+
   it("execute:false → no launch, returns run", async () => {
     const db = makeDb(() => [gapRow({ status: "completed", recommended_pack_id: "local-business-growth" })]);
     const run = await svc(db).launchRecommendedPack("gap-1", { execute: false });

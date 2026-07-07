@@ -513,15 +513,14 @@ export class SaasCampaniasService {
       throw new SaasCampaniasError("Campania not in launchable state", "VALIDATION");
     }
 
-    for (const contactId of contactIds) {
+    if (contactIds.length > 0) {
       await this.db.query(
         `INSERT INTO saas_campania_recipients (campania_id, contact_id, tenant_id, status)
-         VALUES ($1,$2,$3,'pending')
+         SELECT $1, unnest($2::uuid[]), $3, 'pending'
          ON CONFLICT (campania_id, contact_id) DO NOTHING`,
-        [campaniaId, contactId, tenantId],
+        [campaniaId, contactIds, tenantId],
       );
     }
-
     let sentCount = 0;
     let meterEmails = 0;
     let meterSms = 0;

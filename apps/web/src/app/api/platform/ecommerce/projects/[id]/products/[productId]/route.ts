@@ -18,6 +18,8 @@ export async function DELETE(req: Request, ctx: RouteCtx) {
       req,
       "DELETE",
       `/api/os/store/projects/${id}/products/${productId}`,
+      {},
+      { requireWorkspace: true },
     );
     if (upstream.ok) {
       return NextResponse.json({ deleted: true });

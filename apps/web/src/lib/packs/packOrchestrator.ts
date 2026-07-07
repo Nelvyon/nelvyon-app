@@ -488,6 +488,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
 export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: string }>(params: {
   workspaceId: number;
   userId: string;
+  idempotencyKey?: string | null;
   config: GrowthPackRunConfig<T>;
 }): Promise<PackRunRecord> {
   if (!platformDbFallbackEnabled()) {
@@ -505,13 +506,19 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     );
   }
   const { meta, intake } = config;
-  let run = await createPackRun({
+  const idempotencyKey = params.idempotencyKey?.trim().slice(0, 128) || null;
+  const createdPack = await createPackRun({
     workspaceId: params.workspaceId,
     userId: params.userId,
     packId: meta.id,
     intake,
     stepDefinitions: meta.stepDefinitions,
+    idempotencyKey,
   });
+  if (!createdPack.created) {
+    return createdPack.run;
+  }
+  let run = createdPack.run;
 
   let steps = run.steps;
   let extraCampaignCount = 0;
@@ -526,7 +533,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       website_url: intake.website_url,
     });
     steps = markStep(steps, "saas_client", "done", `Cliente SaaS #${saasClient.id}`);
-    run = (await updatePackRun(run.id, { steps, saas_client_id: Number(saasClient.id) }))!;
+    run = (await updatePackRun(run.id, { steps, saas_client_id: Number(saasClient.id) }, params.workspaceId))!;
 
     const primary = config.primaryCampaign(intake);
     const campaign = await dbCreateCampaign(params.workspaceId, params.userId, {
@@ -535,7 +542,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       ...primary,
     });
     steps = markStep(steps, "saas_campaign", "done", `Campaña #${campaign.id}`);
-    run = (await updatePackRun(run.id, { steps, saas_campaign_id: Number(campaign.id) }))!;
+    run = (await updatePackRun(run.id, { steps, saas_campaign_id: Number(campaign.id) }, params.workspaceId))!;
 
     for (const extra of config.extraCampaigns ?? []) {
       const spec = extra.spec(intake);
@@ -546,7 +553,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       });
       extraCampaignCount += 1;
       steps = markStep(steps, extra.stepKey, "done", `Campaña #${extraCamp.id}`);
-      run = (await updatePackRun(run.id, { steps }))!;
+      run = (await updatePackRun(run.id, { steps }, params.workspaceId))!;
     }
 
     const osClientId = await dbCreateOsClient({
@@ -562,7 +569,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       value_proposition: intake.value_proposition,
     });
     steps = markStep(steps, "os_client", "done", osClientId);
-    run = (await updatePackRun(run.id, { steps, os_client_id: osClientId }))!;
+    run = (await updatePackRun(run.id, { steps, os_client_id: osClientId }, params.workspaceId))!;
 
     const projectSlug = `${meta.projectPrefix}-${slugifyName(intake.business_name)}`;
     const osProjectId = await dbCreateOsProject({
@@ -574,13 +581,13 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       packId: meta.id,
     });
     steps = markStep(steps, "os_project", "done", osProjectId);
-    run = (await updatePackRun(run.id, { steps, os_project_id: osProjectId }))!;
+    run = (await updatePackRun(run.id, { steps, os_project_id: osProjectId }, params.workspaceId))!;
 
     const skuResults: SkuRunResult[] = [];
     for (const sku of meta.skuSequence) {
       const stepKey = SKU_STEP_KEYS[sku];
       steps = markStep(steps, stepKey, "running");
-      await updatePackRun(run.id, { steps });
+      await updatePackRun(run.id, { steps }, params.workspaceId);
 
       const { result } = await runSkuPipeline({
         sku,
@@ -604,7 +611,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         result.passed ? "done" : "failed",
         `QA ${result.qa_score}${result.escalated ? " — escalado" : ""}`,
       );
-      run = (await updatePackRun(run.id, { steps }))!;
+      run = (await updatePackRun(run.id, { steps }, params.workspaceId))!;
     }
 
     for (const buildExtra of config.extraDeliverables ?? []) {
@@ -616,7 +623,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         workspaceId: params.workspaceId,
       });
       steps = markStep(steps, spec.stepKey, "running");
-      await updatePackRun(run.id, { steps });
+      await updatePackRun(run.id, { steps }, params.workspaceId);
 
       await dbCreatePackDeliverable({
         workspaceId: params.workspaceId,
@@ -629,7 +636,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       });
       extraDeliverableCount += 1;
       steps = markStep(steps, spec.stepKey, "done", spec.title);
-      run = (await updatePackRun(run.id, { steps }))!;
+      run = (await updatePackRun(run.id, { steps }, params.workspaceId))!;
     }
 
     if (config.onPackStepsComplete) {
@@ -659,7 +666,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         steps = markStep(steps, m.key, m.status, m.detail);
       }
       if (marks.length > 0) {
-        run = (await updatePackRun(run.id, { steps }))!;
+        run = (await updatePackRun(run.id, { steps }, params.workspaceId))!;
       }
     }
 
@@ -741,7 +748,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       status: finalStatus,
       report,
       completed_at: new Date().toISOString(),
-    }))!;
+    }, params.workspaceId))!;
 
     // O23 — issue delivery certificate for completed runs (best-effort, non-blocking)
     if (finalStatus === "completed") {
@@ -758,15 +765,12 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       const { getSaasApprovalCardsService, createPortalApprovalLinks } = await import("@nelvyon/saas");
       const { DbClient } = await import("../../../../../backend/db/DbClient");
       const db = DbClient.getInstance();
-      const tenantRows = await db.query<{ id: string }>(
-        `SELECT id FROM saas_tenants WHERE workspace_id = $1 LIMIT 1`,
-        [params.workspaceId],
-      );
-      const tenantId = tenantRows[0]?.id;
+      const { resolveTenantIdByWorkspace } = await import("@nelvyon/saas");
+      const tenantId = await resolveTenantIdByWorkspace(params.workspaceId, db);
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com";
       const delRows = await db.query<{ id: string; client_id: string }>(
         `SELECT id, client_id FROM os_deliverables
-         WHERE project_id = $1::uuid AND deliverable_metadata->>'pack_run_id' = $2
+         WHERE project_id = $1::uuid AND metadata->>'pack_run_id' = $2
          ORDER BY created_at DESC LIMIT 1`,
         [osProjectId, run.id],
       ).catch(() => []);
@@ -798,14 +802,14 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       /* approval cards best-effort */
     }
 
-    return (await getPackRun(run.id))!;
+    return (await getPackRun(run.id, params.workspaceId))!;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error desconocido en el pack";
     await updatePackRun(run.id, {
       status: "failed",
       error_message: message,
       completed_at: new Date().toISOString(),
-    });
+    }, params.workspaceId);
     throw err;
   }
 }

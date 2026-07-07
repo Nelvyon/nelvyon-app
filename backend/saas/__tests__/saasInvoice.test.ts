@@ -90,14 +90,21 @@ describe("SaasInvoiceService", () => {
   it("getInvoiceById devuelve factura correcta", async () => {
     const query = vi.fn().mockResolvedValue([invoiceRow()]);
     const svc = new SaasInvoiceService({ db: { query } });
-    const out = await svc.getInvoiceById("00000000-0000-0000-0000-000000000001", "u1");
+    const out = await svc.getInvoiceById("00000000-0000-0000-0000-000000000001", "u1", "t1");
     expect(out?.id).toBe("00000000-0000-0000-0000-000000000001");
   });
 
   it("getInvoiceById con id de otro usuario devuelve null", async () => {
     const query = vi.fn().mockResolvedValue([]);
     const svc = new SaasInvoiceService({ db: { query } });
-    expect(await svc.getInvoiceById("00000000-0000-0000-0000-000000000001", "u2")).toBeNull();
+    expect(await svc.getInvoiceById("00000000-0000-0000-0000-000000000001", "u2", "t1")).toBeNull();
+  });
+
+  it("getInvoiceById con tenant distinto devuelve null", async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    const svc = new SaasInvoiceService({ db: { query } });
+    expect(await svc.getInvoiceById("00000000-0000-0000-0000-000000000001", "u1", "t2")).toBeNull();
+    expect(String(query.mock.calls[0]?.[0])).toContain("tenant_id");
   });
 
   it("markAsPaid actualiza status a 'paid' y devuelve true", async () => {

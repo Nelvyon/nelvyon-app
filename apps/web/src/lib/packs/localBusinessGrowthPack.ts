@@ -69,6 +69,7 @@ export async function runLocalBusinessGrowthPack(params: {
   workspaceId: number;
   userId: string;
   intake: LocalGrowthPackIntake;
+  idempotencyKey?: string;
 }): Promise<PackRunRecord> {
   const enriched = enrichLocalIntake(params.intake);
   let welcomeDispatch: WelcomeDispatchResult = {
@@ -80,6 +81,7 @@ export async function runLocalBusinessGrowthPack(params: {
   return runGrowthPack({
     workspaceId: params.workspaceId,
     userId: params.userId,
+    idempotencyKey: params.idempotencyKey,
     config: {
       meta,
       intake: enriched,
@@ -166,7 +168,7 @@ export async function runLocalBusinessGrowthPack(params: {
 
         await updatePackRun(ctx.packRunId, {
           intake: { ...ctx.intake, landing_slug: enriched.landing_slug } as typeof ctx.intake,
-        });
+        }, ctx.workspaceId);
       },
       buildReport: (p): PackReport => {
         const origin = resolvePackAppOrigin();

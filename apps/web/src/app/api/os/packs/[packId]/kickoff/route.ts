@@ -73,10 +73,27 @@ export async function POST(
   }
 
   try {
+    const idempotencyKey =
+      req.headers.get("idempotency-key")?.trim().slice(0, 128) ||
+      req.headers.get("x-idempotency-key")?.trim().slice(0, 128) ||
+      undefined;
+
+    if (idempotencyKey) {
+      const { findPackRunByIdempotencyKey } = await import("@/lib/packs/packRunStore");
+      const existing = await findPackRunByIdempotencyKey(workspaceId, idempotencyKey);
+      if (existing) {
+        return NextResponse.json(existing, {
+          status: 200,
+          headers: { "X-Idempotent-Replay": "true" },
+        });
+      }
+    }
+
     const run = await runner.run({
       workspaceId,
       userId: claims.userId,
       intake: intake as never,
+      idempotencyKey,
     });
     return NextResponse.json(run, { status: 201 });
   } catch (e: unknown) {

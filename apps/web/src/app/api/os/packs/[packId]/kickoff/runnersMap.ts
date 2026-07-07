@@ -37,6 +37,7 @@ export type PackRunner = (params: {
   workspaceId: number;
   userId: string;
   intake: never;
+  idempotencyKey?: string;
 }) => Promise<PackRunRecord>;
 
 export type PackRunnerEntry = {

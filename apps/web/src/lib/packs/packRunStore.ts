@@ -53,11 +53,48 @@ export async function createPackRun(params: {
   packId: string;
   intake: GrowthPackIntakeBase & { sector: string };
   stepDefinitions: { key: string; label: string }[];
-}): Promise<PackRunRecord> {
+  idempotencyKey?: string | null;
+}): Promise<{ run: PackRunRecord; created: boolean }> {
   await ensurePackRunsTable();
+  const idempotencyKey = params.idempotencyKey?.trim().slice(0, 128) || null;
+
+  if (idempotencyKey) {
+    const existing = await db().query<Record<string, unknown>>(
+      `SELECT * FROM nelvyon_pack_runs
+       WHERE workspace_id = $1 AND idempotency_key = $2
+       LIMIT 1`,
+      [params.workspaceId, idempotencyKey],
+    );
+    if (existing[0]) {
+      return { run: mapRow(existing[0]), created: false };
+    }
+  }
+
   const id = randomUUID();
   const steps = initialSteps(params.stepDefinitions);
   steps[0] = { ...steps[0], status: "done", at: new Date().toISOString(), detail: "Brief validado" };
+
+  if (idempotencyKey) {
+    const rows = await db().query<Record<string, unknown>>(
+      `INSERT INTO nelvyon_pack_runs
+         (id, workspace_id, user_id, pack_id, status, intake, steps, idempotency_key)
+       VALUES ($1, $2, $3, $4, 'running', $5::jsonb, $6::jsonb, $7)
+       ON CONFLICT (workspace_id, idempotency_key) DO NOTHING
+       RETURNING *`,
+      [id, params.workspaceId, params.userId, params.packId, JSON.stringify(params.intake), JSON.stringify(steps), idempotencyKey],
+    );
+    if (rows[0]) {
+      return { run: mapRow(rows[0]), created: true };
+    }
+    const replay = await db().query<Record<string, unknown>>(
+      `SELECT * FROM nelvyon_pack_runs
+       WHERE workspace_id = $1 AND idempotency_key = $2
+       LIMIT 1`,
+      [params.workspaceId, idempotencyKey],
+    );
+    if (!replay[0]) throw new Error("createPackRun: idempotent insert race failed");
+    return { run: mapRow(replay[0]), created: false };
+  }
 
   const rows = await db().query<Record<string, unknown>>(
     `INSERT INTO nelvyon_pack_runs
@@ -66,7 +103,7 @@ export async function createPackRun(params: {
      RETURNING *`,
     [id, params.workspaceId, params.userId, params.packId, JSON.stringify(params.intake), JSON.stringify(steps)],
   );
-  return mapRow(rows[0]);
+  return { run: mapRow(rows[0]), created: true };
 }
 
 export async function updatePackRun(
@@ -83,6 +120,7 @@ export async function updatePackRun(
     error_message: string;
     completed_at: string;
   }>,
+  workspaceId?: number,
 ): Promise<PackRunRecord | null> {
   await ensurePackRunsTable();
   const sets: string[] = ["updated_at = NOW()"];
@@ -130,18 +168,46 @@ export async function updatePackRun(
     values.push(patch.completed_at);
   }
 
+  const workspaceClause =
+    workspaceId != null && Number.isFinite(workspaceId) && workspaceId > 0
+      ? ` AND workspace_id = $${i++}`
+      : "";
+  if (workspaceClause) values.push(workspaceId);
+
   const rows = await db().query<Record<string, unknown>>(
-    `UPDATE nelvyon_pack_runs SET ${sets.join(", ")} WHERE id = $1 RETURNING *`,
+    `UPDATE nelvyon_pack_runs SET ${sets.join(", ")} WHERE id = $1${workspaceClause} RETURNING *`,
     values,
   );
   return rows[0] ? mapRow(rows[0]) : null;
 }
 
-export async function getPackRun(id: string): Promise<PackRunRecord | null> {
+export async function getPackRun(id: string, workspaceId?: number): Promise<PackRunRecord | null> {
+  await ensurePackRunsTable();
+  const rows =
+    workspaceId != null && Number.isFinite(workspaceId) && workspaceId > 0
+      ? await db().query<Record<string, unknown>>(
+          `SELECT * FROM nelvyon_pack_runs WHERE id = $1 AND workspace_id = $2 LIMIT 1`,
+          [id, workspaceId],
+        )
+      : await db().query<Record<string, unknown>>(
+          `SELECT * FROM nelvyon_pack_runs WHERE id = $1 LIMIT 1`,
+          [id],
+        );
+  return rows[0] ? mapRow(rows[0]) : null;
+}
+
+export async function findPackRunByIdempotencyKey(
+  workspaceId: number,
+  idempotencyKey: string,
+): Promise<PackRunRecord | null> {
+  const key = idempotencyKey.trim().slice(0, 128);
+  if (!key) return null;
   await ensurePackRunsTable();
   const rows = await db().query<Record<string, unknown>>(
-    `SELECT * FROM nelvyon_pack_runs WHERE id = $1 LIMIT 1`,
-    [id],
+    `SELECT * FROM nelvyon_pack_runs
+     WHERE workspace_id = $1 AND idempotency_key = $2
+     LIMIT 1`,
+    [workspaceId, key],
   );
   return rows[0] ? mapRow(rows[0]) : null;
 }

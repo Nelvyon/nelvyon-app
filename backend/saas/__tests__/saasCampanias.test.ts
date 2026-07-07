@@ -190,16 +190,21 @@ function makeDb() {
       return [] as T[];
     }
     if (s.startsWith("INSERT INTO saas_campania_recipients")) {
-      recipients.push({
-        id: `r-${recipients.length + 1}`,
-        campania_id: String(p[0]),
-        contact_id: String(p[1]),
-        tenant_id: String(p[2]),
-        status: "pending",
-        sent_at: null,
-        opened_at: null,
-        clicked_at: null,
-      });
+      const contactIds = Array.isArray(p[1]) ? (p[1] as string[]) : [String(p[1])];
+      const campaniaId = String(p[0]);
+      const tenantId = String(p[2]);
+      for (const contactId of contactIds) {
+        recipients.push({
+          id: `r-${recipients.length + 1}`,
+          campania_id: campaniaId,
+          contact_id: contactId,
+          tenant_id: tenantId,
+          status: "pending",
+          sent_at: null,
+          opened_at: null,
+          clicked_at: null,
+        });
+      }
       return [] as T[];
     }
     if (s.startsWith("UPDATE saas_campania_recipients SET status = $4")) {

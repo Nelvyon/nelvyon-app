@@ -63,11 +63,24 @@ export async function readSessionToken(req: Request): Promise<string | null> {
   return extractToken(req);
 }
 
+export function parsePlatformWorkspaceId(req: Request): number | null {
+  const raw = req.headers.get("x-workspace-id")?.trim();
+  if (!raw) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+export type PlatformProxyOptions = {
+  /** Entity routes must bind to a workspace before upstream proxy (IDOR defense). */
+  requireWorkspace?: boolean;
+};
+
 export async function proxyPlatformFetch(
   req: Request,
   method: string,
   path: string,
   init: RequestInit = {},
+  options: PlatformProxyOptions = {},
 ): Promise<Response> {
   const token = await readSessionToken(req);
   if (!token) {
@@ -78,27 +91,33 @@ export async function proxyPlatformFetch(
   }
 
   const workspaceId = req.headers.get("x-workspace-id")?.trim();
-  if (workspaceId) {
-    const wsNum = Number(workspaceId);
-    if (Number.isFinite(wsNum) && wsNum > 0) {
-      try {
-        const claims = await authenticate(req);
-        await assertUserCanAccessWorkspace(claims, wsNum);
-      } catch (e) {
-        if (e instanceof WorkspaceAccessError) {
-          return new Response(JSON.stringify({ error: "Forbidden" }), {
-            status: 403,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-        if (e instanceof OsAgentError && e.message === "Unauthorized") {
-          return new Response(JSON.stringify({ detail: "Unauthorized" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-        throw e;
+  const wsNum = parsePlatformWorkspaceId(req);
+
+  if (options.requireWorkspace && !wsNum) {
+    return new Response(JSON.stringify({ error: "X-Workspace-Id header required" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  if (wsNum) {
+    try {
+      const claims = await authenticate(req);
+      await assertUserCanAccessWorkspace(claims, wsNum);
+    } catch (e) {
+      if (e instanceof WorkspaceAccessError) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
       }
+      if (e instanceof OsAgentError && e.message === "Unauthorized") {
+        return new Response(JSON.stringify({ detail: "Unauthorized" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      throw e;
     }
   }
 

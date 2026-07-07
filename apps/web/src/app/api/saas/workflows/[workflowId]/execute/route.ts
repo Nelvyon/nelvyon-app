@@ -28,7 +28,20 @@ export async function POST(req: Request, ctx: { params: Promise<{ workflowId: st
       typeof (body as { triggerData: unknown }).triggerData === "object"
         ? ((body as { triggerData: Record<string, unknown> }).triggerData ?? {})
         : {};
-    const run = await getSaasWorkflowService().executeWorkflow(workflowId, saasCtx.tenant.id, triggerData);
+    const run = await getSaasWorkflowService().executeWorkflow(
+      workflowId,
+      saasCtx.tenant.id,
+      triggerData,
+      {
+        idempotencyKey:
+          req.headers.get("idempotency-key")?.trim().slice(0, 128) ||
+          req.headers.get("x-idempotency-key")?.trim().slice(0, 128) ||
+          (typeof body === "object" && body !== null && "idempotencyKey" in body
+            ? String((body as { idempotencyKey?: string }).idempotencyKey ?? "").trim().slice(0, 128)
+            : null) ||
+          null,
+      },
+    );
     return NextResponse.json({ run });
   } catch (e: unknown) {
     if (e instanceof SaasWorkflowError) {

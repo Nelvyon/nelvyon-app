@@ -2,11 +2,10 @@ import { PACK_REGISTRY } from "@/lib/packs/packRegistry";
 import { applyEliteTemplatesToBrief, resolveTemplatesForSector } from "@/lib/packs/packEliteTemplates";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
 import { dbCreatePackDeliverable } from "@/lib/packs/packOsDb";
+import { buildGrowthPackReport } from "@/lib/packs/growthPackReport";
 import type {
-  PackReport,
   PackRunRecord,
   SaasB2bGrowthPackIntake,
-  SkuRunResult,
 } from "@/lib/packs/types";
 import { SAAS_B2B_GROWTH_PACK_ID } from "@/lib/packs/types";
 import { mapSaasB2bSkuDeliverable } from "@/lib/packs/saasB2bPackProduction";
@@ -31,64 +30,43 @@ export function buildSaasB2bBrief(intake: SaasB2bGrowthPackIntake): Record<strin
 
 function buildPackReport(params: {
   intake: SaasB2bGrowthPackIntake;
-  skuResults: SkuRunResult[];
+  skuResults: import("@/lib/packs/types").SkuRunResult[];
   saasClientId: number;
   saasCampaignId: number;
   extraCampaignCount: number;
   extraDeliverableCount: number;
-  packRunId: string;
-  osClientId: string;
-  osProjectId: string;
-}): PackReport {
-  const passed = params.skuResults.filter((r) => r.passed);
-  const avgQa =
-    params.skuResults.length > 0
-      ? Math.round(
-          params.skuResults.reduce((a, r) => a + r.qa_score, 0) / params.skuResults.length,
-        )
-      : 0;
-  const deliverables =
-    params.skuResults.reduce((a, r) => a + r.deliverable_ids.length, 0) +
-    1 +
-    params.extraDeliverableCount;
-
-  return {
-    pack_name: meta.name,
-    pack_id: SAAS_B2B_GROWTH_PACK_ID,
-    business_name: params.intake.business_name,
-    sector: params.intake.sector,
-    completed_at: new Date().toISOString(),
-    summary: `${passed.length}/${params.skuResults.length} SKUs + playbook outbound ABM. Landing SaaS y demo bot listos en portal.`,
-    kpis: {
-      deliverables_published: deliverables,
-      avg_qa_score: avgQa,
-      skus_passed: passed.length,
-      skus_total: params.skuResults.length,
-      saas_client_id: params.saasClientId,
-      saas_campaign_id: params.saasCampaignId,
-      extra_campaigns: params.extraCampaignCount,
-    },
-    sku_results: params.skuResults,
-    next_steps: [
+}): import("@/lib/packs/types").PackReport {
+  return buildGrowthPackReport({
+    packName: meta.name,
+    packId: SAAS_B2B_GROWTH_PACK_ID,
+    intake: params.intake,
+    skuResults: params.skuResults,
+    saasClientId: params.saasClientId,
+    saasCampaignId: params.saasCampaignId,
+    extraCampaignCount: params.extraCampaignCount,
+    extraDeliverableCount: params.extraDeliverableCount,
+    summary: `${params.skuResults.filter((r) => r.passed).length}/${params.skuResults.length} SKUs + playbook outbound ABM. Landing SaaS y demo bot listos en portal.`,
+    nextSteps: [
       "Revisar landing y posicionamiento en portal",
       "Activar secuencia nurture B2B en panel SaaS",
       "Ejecutar playbook outbound con ICP definido",
       "Conectar CRM para tracking MQL → SQL",
       "Medir demo requests y pipeline a 30 días",
     ],
-    portal_path: "/portal",
-  };
+  });
 }
 
 export async function runSaasB2bGrowthPack(params: {
   workspaceId: number;
   userId: string;
   intake: SaasB2bGrowthPackIntake;
+  idempotencyKey?: string;
 }): Promise<PackRunRecord> {
   const { intake } = params;
   return runGrowthPack({
     workspaceId: params.workspaceId,
     userId: params.userId,
+    idempotencyKey: params.idempotencyKey,
     config: {
       meta,
       intake,

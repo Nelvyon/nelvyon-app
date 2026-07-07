@@ -117,6 +117,9 @@ export class SaasDealsEtlService {
     }
 
     const toInsert: DealCandidate[] = [];
+    const migratedSourceTags = await this.loadMigratedSourceTags(
+      candidates.map((c) => c.sourceTag),
+    );
 
     for (const [key, group] of byDedupe) {
       let pick = group[0];
@@ -146,7 +149,7 @@ export class SaasDealsEtlService {
         report.duplicates += 1;
         continue;
       }
-      const migrated = await this.isSourceAlreadyMigrated(pick.source, pick.legacyId);
+      const migrated = migratedSourceTags.has(pick.sourceTag);
       if (migrated) {
         report.skippedAlreadyMigrated += 1;
         report.duplicates += 1;
@@ -158,20 +161,8 @@ export class SaasDealsEtlService {
     report.newDeals = toInsert.length;
 
     if (mode === "apply" && toInsert.length > 0) {
-      for (const c of toInsert) {
-        try {
-          await this.insertDeal(c);
-          report.appliedInserts += 1;
-          existingKeys.add(c.dedupeKey);
-        } catch (e: unknown) {
-          report.errors.push({
-            source: c.source,
-            legacyId: c.legacyId,
-            workspaceId: c.workspaceId,
-            message: e instanceof Error ? e.message : String(e),
-          });
-        }
-      }
+      const inserted = await this.insertDealsBatch(toInsert, report);
+      report.appliedInserts += inserted;
     }
 
     return report;
@@ -459,6 +450,73 @@ export class SaasDealsEtlService {
       c.dedupeKey = buildDealDedupeKey(tenantId, null, title, value);
       out.push(c);
     }
+  }
+
+  private async loadMigratedSourceTags(sourceTags: string[]): Promise<Set<string>> {
+    const unique = [...new Set(sourceTags.filter(Boolean))];
+    if (unique.length === 0) return new Set();
+    const rows = await this.db.query<{ source: string }>(
+      `SELECT DISTINCT source FROM saas_deals WHERE source = ANY($1::text[])`,
+      [unique],
+    );
+    return new Set(rows.map((r) => r.source));
+  }
+
+  private async insertDealsBatch(
+    candidates: DealCandidate[],
+    report: SaasDealsEtlReport,
+  ): Promise<number> {
+    const CHUNK = 40;
+    let applied = 0;
+    for (let i = 0; i < candidates.length; i += CHUNK) {
+      const chunk = candidates.slice(i, i + CHUNK);
+      const values: unknown[] = [];
+      const tuples: string[] = [];
+      let p = 1;
+      for (const c of chunk) {
+        tuples.push(
+          `($${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},NOW())`,
+        );
+        values.push(
+          c.tenantId,
+          c.contactId,
+          c.title,
+          c.value,
+          c.currency,
+          c.stage,
+          Math.min(100, Math.max(0, c.probability)),
+          c.expectedCloseDate,
+          c.sourceTag,
+          c.notes,
+        );
+      }
+      try {
+        const rows = await this.db.query<{ id: string }>(
+          `INSERT INTO saas_deals
+             (tenant_id, contact_id, title, value, currency, stage, probability,
+              expected_close_date, source, notes, updated_at)
+           VALUES ${tuples.join(", ")}
+           RETURNING id`,
+          values,
+        );
+        applied += rows.length;
+      } catch (e: unknown) {
+        for (const c of chunk) {
+          try {
+            await this.insertDeal(c);
+            applied += 1;
+          } catch (inner: unknown) {
+            report.errors.push({
+              source: c.source,
+              legacyId: c.legacyId,
+              workspaceId: c.workspaceId,
+              message: inner instanceof Error ? inner.message : String(inner),
+            });
+          }
+        }
+      }
+    }
+    return applied;
   }
 
   private async insertDeal(c: DealCandidate): Promise<void> {

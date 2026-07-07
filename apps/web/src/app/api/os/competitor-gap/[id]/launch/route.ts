@@ -13,7 +13,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const body = (await req.json().catch(() => ({}))) as { execute?: boolean };
     const svc = getOsCompetitorGapService();
     await svc.getRun(id, auth.tenant.id);
-    const run = await svc.launchRecommendedPack(id, { userId, execute: body.execute });
+    const run = await svc.launchRecommendedPack(id, { userId, execute: body.execute, tenantId: auth.tenant.id });
     return NextResponse.json({ run: { ...run, reportHtml: undefined } });
   } catch (e) {
     if (e instanceof OsCompetitorGapError) {

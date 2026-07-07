@@ -7,11 +7,10 @@ import {
 } from "@/lib/packs/ecommercePackProduction";
 import { buildBaseBrief, runGrowthPack } from "@/lib/packs/packOrchestrator";
 import { dbCreatePackDeliverable } from "@/lib/packs/packOsDb";
+import { buildGrowthPackReport } from "@/lib/packs/growthPackReport";
 import type {
   EcommerceGrowthPackIntake,
-  PackReport,
   PackRunRecord,
-  SkuRunResult,
 } from "@/lib/packs/types";
 import { ECOMMERCE_GROWTH_PACK_ID } from "@/lib/packs/types";
 
@@ -36,64 +35,43 @@ export function buildEcommerceBrief(intake: EcommerceGrowthPackIntake): Record<s
 
 function buildPackReport(params: {
   intake: EcommerceGrowthPackIntake;
-  skuResults: SkuRunResult[];
+  skuResults: import("@/lib/packs/types").SkuRunResult[];
   saasClientId: number;
   saasCampaignId: number;
   extraCampaignCount: number;
   extraDeliverableCount: number;
-  packRunId: string;
-  osClientId: string;
-  osProjectId: string;
-}): PackReport {
-  const passed = params.skuResults.filter((r) => r.passed);
-  const avgQa =
-    params.skuResults.length > 0
-      ? Math.round(
-          params.skuResults.reduce((a, r) => a + r.qa_score, 0) / params.skuResults.length,
-        )
-      : 0;
-  const deliverables =
-    params.skuResults.reduce((a, r) => a + r.deliverable_ids.length, 0) +
-    1 +
-    params.extraDeliverableCount;
-
-  return {
-    pack_name: meta.name,
-    pack_id: ECOMMERCE_GROWTH_PACK_ID,
-    business_name: params.intake.business_name,
-    sector: params.intake.sector,
-    completed_at: new Date().toISOString(),
-    summary: `${passed.length}/${params.skuResults.length} SKUs + kit Meta Ads + campaña carrito abandonado. Tienda lista para revisión en portal.`,
-    kpis: {
-      deliverables_published: deliverables,
-      avg_qa_score: avgQa,
-      skus_passed: passed.length,
-      skus_total: params.skuResults.length,
-      saas_client_id: params.saasClientId,
-      saas_campaign_id: params.saasCampaignId,
-      extra_campaigns: params.extraCampaignCount,
-    },
-    sku_results: params.skuResults,
-    next_steps: [
+}): import("@/lib/packs/types").PackReport {
+  return buildGrowthPackReport({
+    packName: meta.name,
+    packId: ECOMMERCE_GROWTH_PACK_ID,
+    intake: params.intake,
+    skuResults: params.skuResults,
+    saasClientId: params.saasClientId,
+    saasCampaignId: params.saasCampaignId,
+    extraCampaignCount: params.extraCampaignCount,
+    extraDeliverableCount: params.extraDeliverableCount,
+    summary: `${params.skuResults.filter((r) => r.passed).length}/${params.skuResults.length} SKUs + kit Meta Ads + campaña carrito abandonado. Tienda lista para revisión en portal.`,
+    nextSteps: [
       "Revisar landing y catálogo SEO en portal",
       "Importar kit Meta Ads Advantage+ en Business Manager",
       "Activar secuencia carrito abandonado",
       "Conectar pixel Meta + GA4 ecommerce",
       "Medir ROAS a 14 días post-lanzamiento",
     ],
-    portal_path: "/portal",
-  };
+  });
 }
 
 export async function runEcommerceGrowthPack(params: {
   workspaceId: number;
   userId: string;
   intake: EcommerceGrowthPackIntake;
+  idempotencyKey?: string;
 }): Promise<PackRunRecord> {
   const { intake } = params;
   return runGrowthPack({
     workspaceId: params.workspaceId,
     userId: params.userId,
+    idempotencyKey: params.idempotencyKey,
     config: {
       meta,
       intake,

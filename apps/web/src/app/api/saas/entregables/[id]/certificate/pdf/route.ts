@@ -19,7 +19,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     const { id } = await ctx.params;
     const db = DbClient.getInstance();
     const delRows = await db.query<{ pack_run_id: string | null }>(
-      `SELECT deliverable_metadata->>'pack_run_id' AS pack_run_id
+      `SELECT metadata->>'pack_run_id' AS pack_run_id
        FROM os_deliverables d
        JOIN saas_tenants t ON t.workspace_id = d.workspace_id
        WHERE d.id = $1::uuid AND t.id = $2::uuid LIMIT 1`,

@@ -27,7 +27,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   if (claims instanceof NextResponse) return claims;
 
   try {
-    const upstream = await proxyPlatformFetch(req, "GET", entityPath(id));
+    const upstream = await proxyPlatformFetch(req, "GET", entityPath(id), {}, { requireWorkspace: true });
     if (upstream.ok) {
       return NextResponse.json(await upstream.json());
     }
@@ -86,7 +86,7 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
     const upstream = await proxyPlatformFetch(req, "PUT", entityPath(id), {
       body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" },
-    });
+    }, { requireWorkspace: true });
     const text = await upstream.text();
 
     if (upstream.ok) {

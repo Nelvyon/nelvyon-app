@@ -379,6 +379,7 @@ export {
   isSaasPlanSyncStatus,
   type BillablePlanId,
 } from "./saasTenantMapper";
+export { resolveTenantIdByWorkspace } from "./resolveTenantByWorkspace";
 export {
   SaasBillingSyncService,
   getSaasBillingSyncService,

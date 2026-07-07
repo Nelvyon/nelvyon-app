@@ -30,7 +30,7 @@ export async function PUT(req: Request, ctx: RouteCtx) {
     const upstream = await proxyPlatformFetch(req, "PUT", `/api/workflows/${id}`, {
       body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" },
-    });
+    }, { requireWorkspace: true });
     const text = await upstream.text();
     if (upstream.ok) {
       return NextResponse.json(text ? JSON.parse(text) : {});

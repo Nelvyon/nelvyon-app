@@ -8,7 +8,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const ctx = await requireSaasContext(req, "invoices.read");
     const { id } = await params;
-    const invoice = await saasInvoiceService.getInvoiceById(id, ctx.claims.userId);
+    const invoice = await saasInvoiceService.getInvoiceById(id, ctx.claims.userId, ctx.tenant.id);
     if (!invoice) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ invoice });
   } catch (e) {

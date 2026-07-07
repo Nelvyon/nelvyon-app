@@ -503,25 +503,64 @@ export class SaasWorkflowService {
     return typeof contact.id === "string" ? contact.id : null;
   }
 
-  async executeWorkflow(workflowId: string, tenantId: string, triggerData: Record<string, unknown> = {}): Promise<WorkflowRun> {
+  async executeWorkflow(
+    workflowId: string,
+    tenantId: string,
+    triggerData: Record<string, unknown> = {},
+    opts: { idempotencyKey?: string | null } = {},
+  ): Promise<WorkflowRun> {
+    const idempotencyKey = opts.idempotencyKey?.trim().slice(0, 128) || null;
+
+    if (idempotencyKey) {
+      const existing = await this.db.query<RunRow>(
+        `SELECT id, workflow_id, tenant_id, trigger_data, status, steps_executed, error, started_at, completed_at
+         FROM saas_workflow_runs
+         WHERE tenant_id = $1 AND workflow_id = $2::uuid AND idempotency_key = $3
+         ORDER BY started_at DESC LIMIT 1`,
+        [tenantId, workflowId, idempotencyKey],
+      );
+      if (existing[0]) return rowToRun(existing[0]);
+    } else {
+      const recent = await this.db.query<RunRow>(
+        `SELECT id, workflow_id, tenant_id, trigger_data, status, steps_executed, error, started_at, completed_at
+         FROM saas_workflow_runs
+         WHERE tenant_id = $1 AND workflow_id = $2::uuid AND status = 'running'
+           AND started_at > NOW() - INTERVAL '30 seconds'
+         ORDER BY started_at DESC LIMIT 1`,
+        [tenantId, workflowId],
+      );
+      if (recent[0]) return rowToRun(recent[0]);
+    }
+
     const wf = await this.getWorkflow(tenantId, workflowId);
     if (!wf) throw new SaasWorkflowError("Workflow not found", "NOT_FOUND");
 
     const runRows = await this.db.query<RunRow>(
-      `INSERT INTO saas_workflow_runs (workflow_id, tenant_id, trigger_data, status, steps_executed, started_at)
-       VALUES ($1,$2,$3,'running','[]'::jsonb,NOW())
+      `INSERT INTO saas_workflow_runs (workflow_id, tenant_id, trigger_data, status, steps_executed, started_at, idempotency_key)
+       VALUES ($1,$2,$3,'running','[]'::jsonb,NOW(),$4)
+       ON CONFLICT (tenant_id, workflow_id, idempotency_key) DO NOTHING
        RETURNING id, workflow_id, tenant_id, trigger_data, status, steps_executed, error, started_at, completed_at`,
-      [workflowId, tenantId, triggerData],
+      [workflowId, tenantId, triggerData, idempotencyKey],
     );
-    const run = runRows[0];
+    let run = runRows[0];
+    if (!run && idempotencyKey) {
+      const replay = await this.db.query<RunRow>(
+        `SELECT id, workflow_id, tenant_id, trigger_data, status, steps_executed, error, started_at, completed_at
+         FROM saas_workflow_runs
+         WHERE tenant_id = $1 AND workflow_id = $2::uuid AND idempotency_key = $3
+         ORDER BY started_at DESC LIMIT 1`,
+        [tenantId, workflowId, idempotencyKey],
+      );
+      run = replay[0];
+    }
     if (!run) throw new SaasWorkflowError("Failed to create run", "CONSTRAINT");
 
     const stepsExecuted: Array<Record<string, unknown>> = [];
     try {
       if (!this.evalConditions(wf.conditions, triggerData)) {
         await this.db.query(
-          `UPDATE saas_workflow_runs SET status='completed', steps_executed=$2, completed_at=NOW() WHERE id=$1`,
-          [run.id, stepsExecuted],
+          `UPDATE saas_workflow_runs SET status='completed', steps_executed=$2, completed_at=NOW() WHERE id=$1 AND tenant_id=$3`,
+          [run.id, stepsExecuted, tenantId],
         );
         const rows = await this.getWorkflowRuns(workflowId, tenantId);
         return rows[0] as WorkflowRun;
@@ -744,8 +783,8 @@ export class SaasWorkflowService {
       await this.db.query(
         `UPDATE saas_workflow_runs
          SET status='completed', steps_executed=$2, completed_at=NOW()
-         WHERE id=$1`,
-        [run.id, stepsExecuted],
+         WHERE id=$1 AND tenant_id=$3`,
+        [run.id, stepsExecuted, tenantId],
       );
       await this.db.query(
         `UPDATE saas_workflows
@@ -761,8 +800,8 @@ export class SaasWorkflowService {
       await this.db.query(
         `UPDATE saas_workflow_runs
          SET status='failed', steps_executed=$2, error=$3, completed_at=NOW()
-         WHERE id=$1`,
-        [run.id, stepsExecuted, msg],
+         WHERE id=$1 AND tenant_id=$4`,
+        [run.id, stepsExecuted, msg, tenantId],
       );
     }
     const rows = await this.getWorkflowRuns(workflowId, tenantId);

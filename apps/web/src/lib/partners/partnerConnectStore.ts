@@ -335,7 +335,10 @@ export async function chargePartnerClientPack(params: {
     throw new Error("Partner Stripe Connect must be active before charging packs");
   }
   const existing = await getPartnerClientBilling(params.partnerWorkspaceId, params.clientWorkspaceId);
-  let customerId = existing?.stripe_customer_id ?? null;
+  if (!existing || existing.status !== "active") {
+    throw new Error("Client workspace is not an active partner client");
+  }
+  let customerId = existing.stripe_customer_id ?? null;
   if (!customerId) {
     const email = params.clientEmail?.trim() || `client-${params.clientWorkspaceId}@partner.nelvyon.local`;
     const customer = await createPlatformCustomer({
