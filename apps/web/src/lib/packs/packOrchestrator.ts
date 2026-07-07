@@ -88,6 +88,10 @@ export function buildBaseBrief(
     website_url,
     bot_name: `Asistente ${intake.business_name}`,
     openai_cost_bearer: "client",
+    handoff: {
+      destination:
+        intake.contact_email?.trim() || `hola@${slug}.nelvyon-client.test`,
+    },
     brand: {
       primary_color: "#0F766E",
       secondary_color: "#F59E0B",
