@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-09 18:40 UTC**
+> Última actualización automática: **2026-07-09 18:39 UTC**
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | fix audit wire mocks + docs (pendiente push) |
-| **Rama** | `main` |
+| **Último commit** | `728f7b08` — `fix(tests): align audit wire mocks with workflow dedup query` |
+| **Rama** | `main` (sync with origin) |
 | **Prod** | `https://nelvyon.com` |
 | **Staging** | `https://ideal-victory-staging.up.railway.app` |
 | **P1** | 🟡 CI Web Quality Gates re-run post-fix `saasI18nAuditWireS34` |
