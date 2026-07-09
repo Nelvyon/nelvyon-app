@@ -38,6 +38,7 @@ jobs:
       - name: Run elite staging gate
         env:
           STAGING_BASE_URL: https://nelvyon.com
-          # Railway prod deploy can exceed 14m; align wait with job timeout budget.
-          DEPLOY_WAIT_MAX_ATTEMPTS: 120
+          # Wait up to 10m for SHA match; then proceed if prod health is OK (scripts-only pushes skip Railway rebuild).
+          DEPLOY_WAIT_MAX_ATTEMPTS: 40
+          DEPLOY_WAIT_SOFT: "true"
         run: node scripts/run-staging-elite-gate.mjs

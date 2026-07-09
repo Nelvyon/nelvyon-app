@@ -19,8 +19,8 @@
 - [x] Elite reinforce + gate + build local
 - [x] releaseCommand `migrate:prod` + Dockerfile
 - [x] Staging Elite Gate CI SUCCESS
-- [ ] Web Quality Gates CI — re-run post audit mock fix
-- [ ] SNS SES subscription (CEO/AWS)
+- [ ] Web Quality Gates CI — ✅ `29041445107`
+- [ ] Staging Elite Gate CI — fix `DEPLOY_WAIT_SOFT` push pendiente
 
 ---
 

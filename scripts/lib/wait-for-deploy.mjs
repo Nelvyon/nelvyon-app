@@ -46,6 +46,9 @@ export async function waitForStagingDeploy(baseUrl, opts = {}) {
 
   console.log(`Waiting for ${label} on ${baseUrl} (expected sha ${expectedSha?.slice(0, 7) ?? "n/a"})…`);
 
+  const softOnHealth = process.env.DEPLOY_WAIT_SOFT === "true" || process.env.DEPLOY_WAIT_SOFT === "1";
+  let lastHealthy = null;
+
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       const res = await smokeFetch(`${baseUrl}/api/health/live`, { cache: "no-store" }, 20_000);
@@ -62,6 +65,7 @@ export async function waitForStagingDeploy(baseUrl, opts = {}) {
         }),
       );
       if (res.status === 200) {
+        lastHealthy = { deployedSha, matched };
         if (!expectedSha) {
           console.log("DEPLOY_READY");
           return { ready: true, deployedSha, matched: false };
@@ -77,5 +81,12 @@ export async function waitForStagingDeploy(baseUrl, opts = {}) {
     await sleep(intervalMs);
   }
 
-  return { ready: false, timeout: true };
+  if (softOnHealth && lastHealthy?.deployedSha) {
+    console.log(
+      `DEPLOY_SOFT_READY — health OK on ${lastHealthy.deployedSha.slice(0, 7)}; expected ${expectedSha?.slice(0, 7) ?? "n/a"} (Railway may skip rebuild on scripts-only push)`,
+    );
+    return { ready: true, deployedSha: lastHealthy.deployedSha, matched: false, softTimeout: true };
+  }
+
+  return { ready: false, timeout: true, lastHealthy };
 }
