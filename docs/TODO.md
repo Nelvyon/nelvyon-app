@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-09** (P1 cierre)
+> Actualizado: **2026-07-10** (P1 cierre)
 
 ---
 
@@ -15,12 +15,12 @@
 - [x] Migrate 494 + cron CEO brief
 - [x] Pack orchestrator tests
 - [x] E2E launch.spec certificados 401 (`925add03`)
-- [x] Audit wire regression mocks (`saasI18nAuditWireS34`)
+- [x] Audit wire regression mocks (`728f7b08`)
 - [x] Elite reinforce + gate + build local
 - [x] releaseCommand `migrate:prod` + Dockerfile
-- [x] Staging Elite Gate CI SUCCESS
-- [ ] Web Quality Gates CI — ✅ `29041445107`
-- [ ] Staging Elite Gate CI — fix `DEPLOY_WAIT_SOFT` push pendiente
+- [x] Web Quality Gates CI SUCCESS (`29041445107`)
+- [ ] Staging Elite Gate CI — re-run post `DEPLOY_WAIT_SOFT` (`9937fb10`)
+- [ ] SNS SES subscription (CEO/AWS)
 
 ---
 
