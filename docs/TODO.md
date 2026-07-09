@@ -8,8 +8,8 @@
 
 - [x] **Push** commits `224a0a36` + `815e4c0f` a `origin/main`
 - [x] **Deploy Railway** servicio Web — deploy `5c2be62e` SUCCESS
-- [ ] **Confirmar migración 494** en prod — SQL `_migrations` + `saas_ceo_brief_settings` (bloqueado: SSH Railway)
-- [ ] **Verificar** POST `/api/cron/saas-ceo-brief` HTTP 200 tras deploy
+- [ ] **Aplicar migración 494** en prod — **SQL manual requerido** (releaseCommand no efectivo; cron confirma tablas ausentes)
+- [x] **Verificar** POST `/api/cron/saas-ceo-brief` — HTTP 200, `schema_not_ready` (sin 500)
 - [ ] Confirmar migraciones **495–511** aplicadas en prod (drift check `_migrations`)
 
 ---

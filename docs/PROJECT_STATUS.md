@@ -4,7 +4,7 @@
 
 ## Resumen ejecutivo
 
-Nelvyon tiene el **código de producción SaaS + OS cerrado** (hardening Fase 1 según `LAUNCH_READY.md`). Los commits **CEO brief fix + documentación viva** están **pusheados y desplegados** en Railway producción (`815e4c0f`). Pendiente: **confirmación SQL migración 494** y **verificación cron CEO brief** post-deploy.
+Nelvyon tiene el **código de producción SaaS + OS cerrado**. Commits CEO brief + docs **desplegados** (`815e4c0f`). **Bloqueante activo:** migración `494_saas_ceo_brief.sql` **no aplicada en prod** — cron devuelve `schema_not_ready` (sin crash HTTP 500).
 
 ---
 
@@ -12,7 +12,7 @@ Nelvyon tiene el **código de producción SaaS + OS cerrado** (hardening Fase 1 
 
 | Métrica | Valor |
 |---------|-------|
-| **Completitud Fase 1 (infra + SaaS core)** | ~94% |
+| **Completitud Fase 1 (infra + SaaS core)** | ~92% |
 | **Completitud Fase 2 (IA + agentes runtime)** | ~25% |
 | **Completitud global estimada** | ~78% |
 | **Fecha evaluación** | 2026-07-09 |
@@ -23,7 +23,7 @@ Nelvyon tiene el **código de producción SaaS + OS cerrado** (hardening Fase 1 
 
 | Área | Estado | Notas |
 |------|--------|-------|
-| **Producción** | 🟡 | Deploy OK `815e4c0f`; migrate 494 inferida; cron sin verificar post-deploy |
+| **Producción** | 🟡 | Deploy OK; migrate 494 **no aplicada**; cron HTTP 200 + schema_not_ready |
 | **Staging** | 🟡 | `ideal-victory-staging` health OK; git_sha aún `735dce62` (no redeployado) |
 | **Infraestructura** | ✅ | Railway prod Web online; Postgres online |
 | **IA / Agentes** | 🟡 | Infra `private-ai/`; sin LLM/RAG activos |

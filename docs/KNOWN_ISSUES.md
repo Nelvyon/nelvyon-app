@@ -14,8 +14,9 @@
 | **Ruta** | `POST /api/cron/saas-ceo-brief` |
 | **Causa** | Migración `494_saas_ceo_brief.sql` no estaba aplicada en prod (pre-deploy 2026-07-09) |
 | **Mitigación código** | ✅ commits `224a0a36` + deploy `815e4c0f` — respuesta `schema_not_ready` sin crash |
-| **Fix definitivo** | `releaseCommand` migrate en deploy `5c2be62e` (SUCCESS) — **confirmación SQL pendiente** |
-| **Estado** | 🟡 Código desplegado; tabla/índices no verificados por falta SSH Railway |
+| **Fix definitivo** | Ejecutar SQL `494_saas_ceo_brief.sql` en Postgres prod manualmente |
+| **Verificación** | Cron workflow `29019953131` (13:02 UTC): HTTP 200, body `skipped:schema_not_ready` |
+| **Estado** | ❌ Tablas ausentes; código mitiga crash pero brief no se genera |
 
 ---
 
@@ -61,13 +62,15 @@
 
 ---
 
-### KI-008 — CEO brief cron no verificado post-deploy
+### KI-008 — CEO brief cron: schema_not_ready tras deploy
 
 | Campo | Valor |
 |-------|-------|
-| **Severidad** | Media |
-| **Detalle** | Último cron prod conocido: HTTP 500 (2026-07-09 10:20 UTC, pre-deploy). Post-deploy `815e4c0f` sin test HTTP |
-| **Fix** | SSH Railway + `scripts/check-cron-ceo-brief.mjs` o esperar cron 07:00 UTC |
+| **Severidad** | Alta |
+| **Detalle** | POST cron HTTP 200 pero `{"ok":true,"processed":0,"skipped":"schema_not_ready","migration":"494_saas_ceo_brief.sql"}` |
+| **Workflow** | Production Cron Executor run `29019953131` — 2026-07-09 13:02 UTC |
+| **Causa** | Migración 494 no aplicada; `releaseCommand` no efectivo o drift `_migrations` |
+| **Fix** | SQL manual en Postgres prod + verificar índice `idx_ceo_brief_runs_tenant_created` |
 
 ---
 

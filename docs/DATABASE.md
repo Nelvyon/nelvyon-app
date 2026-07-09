@@ -59,7 +59,7 @@
 - `saas_tenant_memory` (497)
 - `saas_agent_runs` (492)
 - `saas_mcp_tool_audit` (493)
-- **`saas_ceo_brief_settings`** (494) — 🟡 inferida en prod (deploy 2026-07-09); confirmar SQL
+- **`saas_ceo_brief_settings`** (494) — ❌ **NO en prod** (cron `schema_not_ready` 2026-07-09)
 - **`saas_ceo_brief_runs`** (494) — índice `idx_ceo_brief_runs_tenant_created`
 
 ### Private AI

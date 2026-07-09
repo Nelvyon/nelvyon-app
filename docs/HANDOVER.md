@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-09 13:05 UTC**
+> Última actualización automática: **2026-07-09 13:16 UTC**
 
 ---
 
@@ -42,8 +42,8 @@
 | FastAPI (`backend/`) | ✅ online `nelvyon-app-production.up.railway.app` |
 | Postgres migraciones (407 SQL) | ✅ en repo; última: `511_idempotency_keys.sql` |
 | Railway releaseCommand migrate | ✅ configurado; ejecuta en cada deploy Web |
-| Migración 494 en prod | 🟡 **inferida aplicada** en deploy 5c2be62e; **SQL no verificado** (sin SSH keys Railway) |
-| CEO brief cron post-deploy | 🟡 no verificado HTTP 200 tras deploy (último cron prod: HTTP 500 a las 10:20 UTC, pre-fix) |
+| Migración 494 en prod | ❌ **NO aplicada** — cron 13:02 UTC devuelve `schema_not_ready` |
+| CEO brief cron post-deploy | 🟡 HTTP 200 sin crash; `processed:0, skipped:schema_not_ready` (workflow `29019953131`) |
 | Auth JWT SaaS | ✅ |
 | Stripe billing (código) | ✅ |
 | SES email (código) | ✅ |
@@ -91,8 +91,8 @@ Detalle: `INFRASTRUCTURE.md`, `INTEGRATIONS.md`, `ENVIRONMENTS.md`.
 
 ## Problemas abiertos
 
-1. **CEO brief cron:** verificar POST `/api/cron/saas-ceo-brief` HTTP 200 tras deploy (requiere SSH Railway o próximo cron 07:00 UTC).
-2. **Migración 494:** confirmar en `_migrations` y tablas vía SQL (bloqueado: sin SSH keys en `~/.ssh`).
+1. **Migración 494 NO aplicada en prod** — `releaseCommand` no creó tablas; cron confirma `schema_not_ready` (2026-07-09 13:02 UTC).
+2. **Fix manual requerido:** ejecutar `494_saas_ceo_brief.sql` en Postgres prod (Railway/Supabase SQL console).
 3. **CI:** Staging Elite Gate y Web Quality Gates fallaron en push `815e4c0f`.
 4. **Tests locales:** 7 fallos en `saasWorkflowsS30.test.ts` (`toIso` undefined).
 5. **Working tree:** cambios setup dev sin commitear.
@@ -112,7 +112,7 @@ Más: `KNOWN_ISSUES.md`.
 
 ## Próximo paso EXACTO
 
-**Registrar SSH key en Railway (`ssh-keygen -t ed25519` + `railway ssh keys add`), ejecutar `node scripts/check-migration-494.mjs` dentro del contenedor, y disparar/verificar POST `/api/cron/saas-ceo-brief` (workflow `production-cron.yml` job `saas-ceo-brief` o curl con `CRON_SECRET`).**
+**Ejecutar SQL de `backend/db/migrations/494_saas_ceo_brief.sql` en la consola Postgres de Railway/Supabase (proyecto `truthful-respect`). Luego verificar `_migrations` y re-disparar cron `saas-ceo-brief`. Si `494` ya está en `_migrations` sin tablas, borrar la fila y re-ejecutar el SQL.**
 
 ---
 
