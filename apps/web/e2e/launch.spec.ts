@@ -23,7 +23,6 @@ test("GET /api/health responde 200 con status ok", async ({ request }) => {
 
 test("rutas stub legacy devuelven 410 Gone", async ({ request }) => {
   const stubs = [
-    "/api/saas/certificados",
     "/api/saas/comunidades",
     "/api/saas/productos",
   ];
@@ -33,14 +32,15 @@ test("rutas stub legacy devuelven 410 Gone", async ({ request }) => {
   }
 });
 
-test("alias legacy activos requieren auth (401 sin cookie)", async ({ request }) => {
-  const aliases = [
+test("rutas API reales requieren auth (401 sin cookie)", async ({ request }) => {
+  const protectedRoutes = [
+    "/api/saas/certificados",
     "/api/saas/encuestas",
     "/api/saas/documentos",
     "/api/saas/objects",
     "/api/saas/qr",
   ];
-  for (const path of aliases) {
+  for (const path of protectedRoutes) {
     const res = await request.get(path, { maxRedirects: 0 });
     expect(res.status(), `${path} should be 401`).toBe(401);
   }

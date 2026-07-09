@@ -1,36 +1,35 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-09** (P1 cerrada)
+> Actualizado: **2026-07-09** (P1 cierre)
 
 ---
 
 ## P0 — Bloqueantes producción
 
-- [x] Push, deploy, migrate 494, cron CEO brief, migrate 495–511
+- [x] Completado
 
 ---
 
 ## P1 — Estabilidad y ops
 
-- [x] Push commits P1 (tests, Dockerfile, railway, dev setup)
-- [x] Fix CI tests `packSeedMetadata` + `packAutoApprove`
-- [x] `run-local-elite-reinforce` ALL_PASS
-- [x] `pnpm gate` + `pnpm build` OK
-- [x] Unificar `releaseCommand` → `migrate:prod` + Dockerfile scripts
-- [x] Commitear setup dev local
-- [x] Redeploy staging `ideal-victory`
-- [ ] Verificar CI GitHub post-push (automático tras push)
-- [ ] Confirmar SNS SES subscription (AWS manual — CEO)
+- [x] Migrate 494 + cron CEO brief
+- [x] Pack orchestrator tests
+- [x] Elite reinforce + gate + build local
+- [x] releaseCommand `migrate:prod` + Dockerfile
+- [x] Dev setup commiteado (`4c4112bd`)
+- [x] Staging Elite Gate CI SUCCESS
+- [ ] Web Quality Gates CI — fix e2e push pendiente
+- [ ] SNS SES subscription (CEO/AWS)
 
 ---
 
-## P2 — Desarrollo
+## P2 — No iniciar hasta P1 100%
 
-- [ ] `pnpm -C apps/web dev` como flujo diario principal
-- [ ] Seed demo local opcional
+- [ ] Flujo diario `pnpm -C apps/web dev`
+- [ ] Seed demo local
 
 ---
 
 ## P3 — Fase 2 IA
 
-- [ ] Activar provider LLM según ROADMAP
+- [ ] Activar provider LLM

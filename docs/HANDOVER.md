@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-09 17:58 UTC**
+> Última actualización automática: **2026-07-09 18:17 UTC**
 
 ---
 
@@ -9,36 +9,37 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | pendiente push sesión P1 |
+| **Último commit** | `4c4112bd` + fix e2e `launch.spec.ts` pendiente push |
 | **Rama** | `main` (sync with origin) |
-| **Prod Web** | `https://nelvyon.com` |
-| **Staging Web** | `https://ideal-victory-staging.up.railway.app` — redeploy iniciado |
-| **Migración 494** | ✅ prod |
-| **CEO brief cron** | ✅ `processed:1` |
-| **CI local** | ✅ gate + elite reinforce + build |
+| **Prod** | `https://nelvyon.com` |
+| **Staging** | `https://ideal-victory-staging.up.railway.app` |
+| **P1** | ✅ cerrada en código; CI Web Quality Gates pendiente re-run post-fix e2e |
 
 ---
 
-## P1 completado (2026-07-09)
+## P1 — resumen
 
-1. Tests pack orchestrator corregidos (`createPackRun` mock `{ run, created: true }`).
-2. `run-local-elite-reinforce` — ALL_PASS (215 pack tests).
-3. `pnpm gate` — 2762 tests smoke OK.
-4. `pnpm build` — OK.
-5. `releaseCommand` unificado → `pnpm migrate:prod`; Dockerfile incluye `scripts/`.
-6. Setup dev local commiteado (`config.py`, `load_env_files.py`, README).
-7. Staging redeploy disparado (`ideal-victory`).
+| Ítem | Estado |
+|------|--------|
+| Migrate 494 prod + cron CEO brief | ✅ |
+| Pack tests (`packSeedMetadata`, `packAutoApprove`) | ✅ |
+| `run-local-elite-reinforce` | ✅ ALL_PASS |
+| `pnpm gate` + `pnpm build` | ✅ |
+| `releaseCommand` → `migrate:prod` + Dockerfile | ✅ |
+| Dev setup commiteado | ✅ |
+| Staging Elite Gate CI | ✅ SUCCESS run `29039024932` |
+| Web Quality Gates CI | 🟡 fix e2e certificados → 401 (commit pendiente) |
+| SNS SES subscription | ❌ CEO/AWS |
 
 ---
 
 ## Próximo paso
 
-Verificar CI GitHub post-push y health staging con git_sha nuevo. SNS SES subscription (CEO/AWS).
+Push fix e2e → verificar Web Quality Gates verde. Luego iniciar P2.
 
 ---
 
 ## Contexto rápido
 
-- Monorepo: `apps/web` = prod; `backend/` = TS + FastAPI.
+- `apps/web` = prod Next.js; `backend/` = TS + FastAPI
 - Migrar prod: `DATABASE_URL=$DATABASE_PUBLIC_URL pnpm -C apps/web migrate`
-- Docs vivos: actualizar tras cambios importantes.

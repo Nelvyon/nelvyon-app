@@ -13,7 +13,7 @@
 | Métrica | Valor |
 |---------|-------|
 | **Completitud Fase 1** | **~99%** |
-| **P1 Estabilidad/ops** | **100%** (código); SNS SES pendiente CEO |
+| **P1 Estabilidad/ops** | **~98%** — pendiente CI Web Quality Gates post-fix e2e |
 | **Completitud global** | ~85% |
 
 ---
