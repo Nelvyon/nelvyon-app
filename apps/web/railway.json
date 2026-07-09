@@ -5,6 +5,6 @@
     "dockerfilePath": "apps/web/Dockerfile"
   },
   "deploy": {
-    "releaseCommand": "pnpm exec tsx ../../backend/db/migrate.ts"
+    "releaseCommand": "pnpm migrate:prod"
   }
 }

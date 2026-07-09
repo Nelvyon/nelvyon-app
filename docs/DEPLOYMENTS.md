@@ -21,6 +21,16 @@
 
 ---
 
+## 2026-07-09 — Staging redeploy (BUILDING)
+
+| Campo | Valor |
+|-------|-------|
+| **Servicio** | `ideal-victory` (staging) |
+| **Deployment** | `1231b981` BUILDING |
+| **Trigger** | `railway redeploy` post-P1 |
+
+---
+
 ## 2026-07-09 12:41 UTC — Producción Web (SUCCESS)
 
 | Campo | Valor |

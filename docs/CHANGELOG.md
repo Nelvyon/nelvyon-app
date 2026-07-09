@@ -10,7 +10,10 @@
 |--------------|----------------|--------|-------------|
 | 17:02 | Postgres prod | Migrate | 482–511 vía `DATABASE_PUBLIC_URL`; **494 aplicada** |
 | 17:02 | Cron CEO brief | Verificado | `processed:1`, email+stored; run `29035626812` |
-| 17:05 | `saasWorkflowsS30.test.ts` | Fix | Mock dedup recent-running en executeWorkflow |
+| 19:58 | Staging | Redeploy | `ideal-victory` staging Railway |
+| 19:53 | CI local | PASS | `run-local-elite-reinforce` 215 pack tests |
+| 19:52 | Pack tests | Fix | `packAutoApprove` + `packSeedMetadata` mocks |
+| 19:52 | Infra | Fix | `releaseCommand` → `migrate:prod`; Dockerfile scripts |
 | 17:00 | `scripts/apply-migration-494.mjs` | Creado | Utilidad apply+verify migración 494 |
 | 15:00 | `docs/*` | Actualizado | Post-deploy autónomo |
 | 14:52 | Railway prod | Deploy | `@nelvyon/web` deploy `5c2be62e` SUCCESS — git_sha `815e4c0f` |

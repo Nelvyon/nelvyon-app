@@ -1,83 +1,107 @@
 import logging
 import os
-from typing import Any
 
-from pydantic import ConfigDict, Field
-from pydantic_settings import BaseSettings
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from db.load_env_files import load_env_files
 
 logger = logging.getLogger(__name__)
+
+# Populate os.environ from repo/web .env files before Settings() is instantiated.
+load_env_files()
 
 
 class Settings(BaseSettings):
     # Application
-    app_name: str = "FastAPI Modular Template"
+    app_name: str = "NELVYON OS API"
     debug: bool = False
-    version: str = "1.0.0"
-    # production | staging | development | test — drives seeding & demo safety
-    environment: str = Field(default="development", description="ENVIRONMENT")
-    # OBS-ABCD-1: json | text — vacío = auto (json en prod/staging). Ver core/observability.log_format_from_environment
+    version: str = "2.0.0"
+    environment: str = Field(default="development", validation_alias="ENVIRONMENT")
     log_format: str = Field(default="", validation_alias="LOG_FORMAT")
-    super_admin_user_ids: str = Field(default="")
-    allow_admin_bootstrap: bool = Field(default=False)
-    # Public SPA origin for post-OIDC redirect (e.g. https://app.example.com). Empty = same host as API/request.
-    frontend_app_url: str = Field(default="")
+    super_admin_user_ids: str = Field(default="", validation_alias="SUPER_ADMIN_USER_IDS")
+    allow_admin_bootstrap: bool = Field(default=False, validation_alias="ALLOW_ADMIN_BOOTSTRAP")
+    frontend_app_url: str = Field(default="", validation_alias="FRONTEND_APP_URL")
 
     # Server
-    host: str = "0.0.0.0"
-    port: int = 8000
+    host: str = Field(default="0.0.0.0", validation_alias="HOST")
+    port: int = Field(default=8000, validation_alias="PORT")
 
-    # AWS Lambda Configuration
-    is_lambda: bool = False
-    lambda_function_name: str = "fastapi-backend"
-    aws_region: str = "us-east-1"
+    # Database
+    database_url: str = Field(default="", validation_alias="DATABASE_URL")
+
+    # Cache / queue
+    redis_url: str = Field(default="", validation_alias="REDIS_URL")
+
+    # Auth / JWT (Next.js uses JWT_SECRET; legacy Python paths use JWT_SECRET_KEY)
+    jwt_secret: str = Field(default="", validation_alias="JWT_SECRET")
+    jwt_secret_key: str = Field(default="", validation_alias="JWT_SECRET_KEY")
+    jwt_algorithm: str = Field(default="HS256", validation_alias="JWT_ALGORITHM")
+    jwt_expire_minutes: int = Field(default=60, validation_alias="JWT_EXPIRE_MINUTES")
+
+    # Admin bootstrap (local dev)
+    admin_email: str = Field(default="", validation_alias="ADMIN_EMAIL")
+    admin_password: str = Field(default="", validation_alias="ADMIN_PASSWORD")
+    admin_user_id: str = Field(default="", validation_alias="ADMIN_USER_ID")
+    admin_user_email: str = Field(default="", validation_alias="ADMIN_USER_EMAIL")
+
+    # Stripe
+    stripe_secret_key: str = Field(default="", validation_alias="STRIPE_SECRET_KEY")
+    stripe_webhook_secret: str = Field(default="", validation_alias="STRIPE_WEBHOOK_SECRET")
+
+    # OIDC (optional — enterprise SSO)
+    oidc_issuer_url: str = Field(default="", validation_alias="OIDC_ISSUER_URL")
+    oidc_client_id: str = Field(default="", validation_alias="OIDC_CLIENT_ID")
+    oidc_client_secret: str = Field(default="", validation_alias="OIDC_CLIENT_SECRET")
+    oidc_scope: str = Field(default="openid profile email", validation_alias="OIDC_SCOPE")
+
+    # AI providers
+    app_ai_base_url: str = Field(default="", validation_alias="APP_AI_BASE_URL")
+    app_ai_key: str = Field(default="", validation_alias="APP_AI_KEY")
+    openai_api_key: str = Field(default="", validation_alias="OPENAI_API_KEY")
+
+    # Object storage (optional)
+    oss_service_url: str = Field(default="", validation_alias="OSS_SERVICE_URL")
+    oss_api_key: str = Field(default="", validation_alias="OSS_API_KEY")
+
+    # Frontend origin (legacy FRONTEND_URL; prefer FRONTEND_APP_URL / NEXT_PUBLIC_APP_URL)
+    frontend_url: str = Field(default="", validation_alias="FRONTEND_URL")
+
+    # Observability
+    sentry_dsn: str = Field(default="", validation_alias="SENTRY_DSN")
+
+    # AWS Lambda
+    is_lambda: bool = Field(default=False, validation_alias="IS_LAMBDA")
+    lambda_function_name: str = Field(default="fastapi-backend", validation_alias="LAMBDA_FUNCTION_NAME")
+    aws_region: str = Field(default="us-east-1", validation_alias="AWS_REGION")
+
+    model_config = SettingsConfigDict(case_sensitive=False, extra="ignore")
 
     @property
     def backend_url(self) -> str:
-        """Generate backend URL from host and port."""
         if self.is_lambda:
-            # In Lambda environment, return the API Gateway URL
             return os.environ.get(
-                "PYTHON_BACKEND_URL", f"https://{self.lambda_function_name}.execute-api.{self.aws_region}.amazonaws.com"
+                "PYTHON_BACKEND_URL",
+                f"https://{self.lambda_function_name}.execute-api.{self.aws_region}.amazonaws.com",
             )
-        else:
-            # Use localhost for external callbacks instead of 0.0.0.0
-            display_host = "127.0.0.1" if self.host == "0.0.0.0" else self.host
-            return os.environ.get("PYTHON_BACKEND_URL", f"http://{display_host}:{self.port}")
-
-    model_config = ConfigDict(case_sensitive=False, extra="ignore")
+        display_host = "127.0.0.1" if self.host == "0.0.0.0" else self.host
+        return os.environ.get("PYTHON_BACKEND_URL", f"http://{display_host}:{self.port}")
 
     @property
     def is_production(self) -> bool:
         return self.environment.lower() in ("production", "prod")
 
-    def __getattr__(self, name: str) -> Any:
-        """
-        Dynamically read attributes from environment variables.
-        For example: settings.opapi_key reads from OPAPI_KEY environment variable.
+    @property
+    def effective_jwt_secret(self) -> str:
+        return self.jwt_secret.strip() or self.jwt_secret_key.strip()
 
-        Args:
-            name: Attribute name (e.g., 'opapi_key')
-
-        Returns:
-            Value from environment variable
-
-        Raises:
-            AttributeError: If attribute doesn't exist and not found in environment variables
-        """
-        # Convert attribute name to environment variable name (snake_case -> UPPER_CASE)
-        env_var_name = name.upper()
-
-        # Check if environment variable exists
-        if env_var_name in os.environ:
-            value = os.environ[env_var_name]
-            # Cache the value in instance dict to avoid repeated lookups
-            self.__dict__[name] = value
-            logger.debug(f"Read dynamic attribute {name} from environment variable {env_var_name}")
-            return value
-
-        # If not found, raise AttributeError to maintain normal Python behavior
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+    @property
+    def effective_frontend_url(self) -> str:
+        return (
+            self.frontend_url.strip()
+            or self.frontend_app_url.strip()
+            or os.environ.get("NEXT_PUBLIC_APP_URL", "").strip()
+        )
 
 
-# Global settings instance
 settings = Settings()

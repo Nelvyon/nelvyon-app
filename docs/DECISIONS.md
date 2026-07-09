@@ -103,6 +103,17 @@
 
 ---
 
+## ADR-011 — releaseCommand unificado con migrate:prod
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-09 |
+| **Decisión** | Railway `releaseCommand` = `pnpm migrate:prod` (apps/web); root = `pnpm -C apps/web migrate:prod` |
+| **Por qué** | Comandos `tsx` directos inconsistentes; `migrate-prod.ts` valida `DATABASE_URL` y logs claros |
+| **Consecuencias** | Dockerfile runner copia `apps/web/scripts/` para release en imagen prod |
+
+---
+
 ## ADR-010 — Verificación prod vía Railway CLI + scripts internos
 
 | Campo | Valor |

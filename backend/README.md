@@ -25,7 +25,7 @@ Railway → proyecto → servicio **API Python** (`nelvyon-app-production`) → 
 
 ```env
 ENVIRONMENT=staging
-DATABASE_URL=postgresql+asyncpg://postgres.mvktercdceydhaesngmv:Budylolaginger20.@aws-0-eu-west-3.pooler.supabase.com:5432/postgres
+DATABASE_URL=postgresql+asyncpg://USER:PASSWORD@HOST:5432/postgres
 JWT_SECRET=<copiar del servicio Web staging — ver abajo>
 JWT_SECRET_KEY=<mismo valor que JWT_SECRET>
 JWT_ALGORITHM=HS256

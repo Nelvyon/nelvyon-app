@@ -9,13 +9,15 @@ def load_env_files() -> None:
     repo_root = Path(__file__).resolve().parents[2]
     web_root = repo_root / "apps" / "web"
     staging = (os.environ.get("MIGRATE_ENV") or os.environ.get("NELVYON_ENV") or "").lower() == "staging"
+    backend_root = repo_root / "backend"
     files = [
-        *( [web_root / ".env.staging.local"] if staging else [] ),
+        *([web_root / ".env.staging.local"] if staging else []),
         web_root / ".env.production.local",
         web_root / ".env.production.local.txt",
         web_root / ".env.local",
         repo_root / ".env.production",
         repo_root / ".env",
+        backend_root / ".env",
     ]
     for file in files:
         if not file.is_file():

@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-09 17:06 UTC**
+> Última actualización automática: **2026-07-09 17:58 UTC**
 
 ---
 
@@ -9,49 +9,36 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Proyecto** | Nelvyon — agencia IA + SaaS B2B |
-| **Último commit** | pendiente commit sesión — migración 494 prod + fix tests |
+| **Último commit** | pendiente push sesión P1 |
 | **Rama** | `main` (sync with origin) |
-| **Prod Web** | `https://nelvyon.com` — git_sha `815e4c0f0e35` |
-| **Migración 494** | ✅ **Aplicada en prod** (2026-07-09 17:02 UTC vía `DATABASE_PUBLIC_URL`) |
-| **CEO brief cron** | ✅ `processed:1` — workflow `29035626812` (sin `schema_not_ready`) |
-| **Migraciones prod** | ✅ 482–511 aplicadas (drift cerrado) |
+| **Prod Web** | `https://nelvyon.com` |
+| **Staging Web** | `https://ideal-victory-staging.up.railway.app` — redeploy iniciado |
+| **Migración 494** | ✅ prod |
+| **CEO brief cron** | ✅ `processed:1` |
+| **CI local** | ✅ gate + elite reinforce + build |
 
 ---
 
-## Último trabajo (sesión 2026-07-09 tarde)
+## P1 completado (2026-07-09)
 
-1. Conexión prod DB vía `DATABASE_PUBLIC_URL` (Railway Postgres service).
-2. `pnpm -C apps/web exec tsx ../../backend/db/migrate.ts` — aplicó 482–511 incl. **494**.
-3. Cron CEO brief verificado: `{"ok":true,"processed":1,"delivered":["email","stored"]}`.
-4. Fix tests `saasWorkflowsS30.test.ts` (mock recent-running dedup).
-5. Scripts `apply-migration-494.mjs` / `check-migration-494.mjs` corregidos.
-
----
-
-## Estado Fase 1
-
-| Ítem | Estado |
-|------|--------|
-| Push + deploy prod | ✅ |
-| Migración 494 + tablas CEO brief | ✅ |
-| Cron CEO brief operativo | ✅ |
-| Migraciones 495–511 prod | ✅ |
-| Tests workflow S30 | ✅ |
-| CI Elite Gate | 🟡 pendiente re-run |
-| Staging en `735dce62` | 🟡 sin redeploy |
-| Setup dev local sin commit | 🟡 |
+1. Tests pack orchestrator corregidos (`createPackRun` mock `{ run, created: true }`).
+2. `run-local-elite-reinforce` — ALL_PASS (215 pack tests).
+3. `pnpm gate` — 2762 tests smoke OK.
+4. `pnpm build` — OK.
+5. `releaseCommand` unificado → `pnpm migrate:prod`; Dockerfile incluye `scripts/`.
+6. Setup dev local commiteado (`config.py`, `load_env_files.py`, README).
+7. Staging redeploy disparado (`ideal-victory`).
 
 ---
 
-## Próximo paso EXACTO
+## Próximo paso
 
-**Push commit pendiente (docs + scripts + tests). Opcional: redeploy staging y re-ejecutar CI gates. Verificar SNS SES subscription (manual AWS).**
+Verificar CI GitHub post-push y health staging con git_sha nuevo. SNS SES subscription (CEO/AWS).
 
 ---
 
 ## Contexto rápido
 
 - Monorepo: `apps/web` = prod; `backend/` = TS + FastAPI.
-- Migrar prod manual si `releaseCommand` no aplica drift: `railway service Postgres` → `DATABASE_URL=$DATABASE_PUBLIC_URL pnpm -C apps/web migrate`
-- Docs vivos: actualizar `docs/HANDOVER.md` tras cambios importantes.
+- Migrar prod: `DATABASE_URL=$DATABASE_PUBLIC_URL pnpm -C apps/web migrate`
+- Docs vivos: actualizar tras cambios importantes.

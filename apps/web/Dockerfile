@@ -29,6 +29,7 @@ ENV PORT=3000
 EXPOSE 3000
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=builder /app/apps/web/scripts ./scripts
 COPY --from=builder /app/backend/db ./backend/db
 # Runtime assets for pack kickoff (template registry, envato metadata, dynamic backend imports)
 COPY --from=builder /app/backend/autonomous ./backend/autonomous

@@ -135,7 +135,7 @@ describe("packOrchestrator — O7 seed metadata", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockQuery.mockResolvedValue([{ id: "deliverable-seed" }]);
-    mockCreatePackRun.mockResolvedValue({ ...FAKE_RUN });
+    mockCreatePackRun.mockResolvedValue({ run: { ...FAKE_RUN }, created: true });
     mockUpdatePackRun.mockImplementation(
       (_id: string, patch: Record<string, unknown>) =>
         Promise.resolve({ ...FAKE_RUN, ...patch }),
