@@ -4,6 +4,7 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { getSaasDashboardService } from "./SaasDashboardService";
+import { isPgMissingRelation } from "./saasRequestContext";
 
 export type CeoBriefMetrics = {
   activeJobs: number;
@@ -101,21 +102,30 @@ export class SaasCeoBriefService {
   }
 
   async recordRun(tenantId: string, brief: CeoBrief, deliveredVia: string[]): Promise<string> {
-    const rows = await this.db.query<{ id: string }>(
-      `INSERT INTO saas_ceo_brief_runs (tenant_id, summary_text, metrics_snapshot, delivered_via)
-       VALUES ($1, $2, $3::jsonb, $4) RETURNING id`,
-      [tenantId, brief.summaryText, JSON.stringify(brief.metrics), deliveredVia],
-    );
-    return rows[0]?.id ?? "";
+    try {
+      const rows = await this.db.query<{ id: string }>(
+        `INSERT INTO saas_ceo_brief_runs (tenant_id, summary_text, metrics_snapshot, delivered_via)
+         VALUES ($1, $2, $3::jsonb, $4) RETURNING id`,
+        [tenantId, brief.summaryText, JSON.stringify(brief.metrics), deliveredVia],
+      );
+      return rows[0]?.id ?? "";
+    } catch (e) {
+      if (isPgMissingRelation(e)) return "";
+      throw e;
+    }
   }
 
   async listTenantsForBrief(hourUtc: number): Promise<string[]> {
-    const rows = await this.db.query<{ tenant_id: string }>(
-      `SELECT s.tenant_id FROM saas_ceo_brief_settings s
-       WHERE s.enabled = TRUE AND s.delivery_hour_utc = $1`,
-      [hourUtc],
-    );
-    if (rows.length > 0) return rows.map((r) => r.tenant_id);
+    try {
+      const rows = await this.db.query<{ tenant_id: string }>(
+        `SELECT s.tenant_id FROM saas_ceo_brief_settings s
+         WHERE s.enabled = TRUE AND s.delivery_hour_utc = $1`,
+        [hourUtc],
+      );
+      if (rows.length > 0) return rows.map((r) => r.tenant_id);
+    } catch (e) {
+      if (!isPgMissingRelation(e)) throw e;
+    }
     const all = await this.db.query<{ id: string }>(
       `SELECT id FROM saas_tenants WHERE onboarding_completed = TRUE LIMIT 500`,
     );
@@ -123,18 +133,23 @@ export class SaasCeoBriefService {
   }
 
   async getLatestBrief(tenantId: string): Promise<CeoBrief | null> {
-    const rows = await this.db.query<{ summary_text: string; metrics_snapshot: Record<string, unknown>; created_at: string }>(
-      `SELECT summary_text, metrics_snapshot, created_at FROM saas_ceo_brief_runs
-       WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT 1`,
-      [tenantId],
-    );
-    if (!rows[0]) return null;
-    return {
-      tenantId,
-      summaryText: rows[0].summary_text,
-      metrics: rows[0].metrics_snapshot as CeoBriefMetrics,
-      generatedAt: rows[0].created_at,
-    };
+    try {
+      const rows = await this.db.query<{ summary_text: string; metrics_snapshot: Record<string, unknown>; created_at: string }>(
+        `SELECT summary_text, metrics_snapshot, created_at FROM saas_ceo_brief_runs
+         WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT 1`,
+        [tenantId],
+      );
+      if (!rows[0]) return null;
+      return {
+        tenantId,
+        summaryText: rows[0].summary_text,
+        metrics: rows[0].metrics_snapshot as CeoBriefMetrics,
+        generatedAt: rows[0].created_at,
+      };
+    } catch (e) {
+      if (isPgMissingRelation(e)) return null;
+      throw e;
+    }
   }
 }
 
