@@ -3,6 +3,8 @@
 Agencia de marketing digital 100% operada por IA + SaaS B2B.  
 Monorepo pnpm. Deploy target: **Railway** (Node 20 + Postgres 16).
 
+**Continuidad:** leer primero `docs/HANDOVER.md`
+
 ---
 
 ## Stack
@@ -103,8 +105,9 @@ Sin `SES_FROM_EMAIL` + `SES_ACCESS_KEY_ID`, la UI muestra un banner de advertenc
 ## Migraciones de base de datos
 
 Archivos en `backend/db/migrations/`. Ejecutar en orden numérico.  
-**Última migración comiteada:** `507_fastapi_runtime_schemas.sql`.  
-Rango elite SaaS validado en CI: **401–507** (107 archivos). Railway `releaseCommand` aplica todas en deploy.
+**Última migración en repo:** `511_idempotency_keys.sql` (407 archivos total).  
+**Documentación viva:** `docs/DATABASE.md`, `docs/HANDOVER.md`  
+Railway `releaseCommand` aplica todas en deploy.
 
 ---
 

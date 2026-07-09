@@ -1,0 +1,40 @@
+---
+description: Mantener documentación viva en docs/ tras cualquier cambio importante
+alwaysApply: true
+---
+
+# Documentación viva NELVYON
+
+## Fuente de verdad para continuidad
+
+1. **`docs/HANDOVER.md`** — leer primero; actualizar siempre tras cambios importantes
+2. **`docs/AI_CONTEXT.md`** — contexto técnico completo
+3. Resto de `docs/*.md` según el área afectada
+
+## Obligatorio después de CUALQUIER cambio importante
+
+Antes de dar por terminada una tarea que modifique código, config, migraciones, infra o integraciones:
+
+1. Actualizar **`docs/HANDOVER.md`** (estado, último trabajo, próximo paso EXACTO — nunca vacío)
+2. Añadir entrada en **`docs/CHANGELOG.md`**
+3. Actualizar los archivos afectados:
+   - Migraciones → `DATABASE.md`, `KNOWN_ISSUES.md` si aplica
+   - Integraciones → `INTEGRATIONS.md`
+   - Infra/deploy → `INFRASTRUCTURE.md`, `ENVIRONMENTS.md`, `DEPLOYMENTS.md`
+   - Bugs → `KNOWN_ISSUES.md` (mover a historial al resolver)
+   - Decisiones → `DECISIONS.md`
+   - Tareas → `TODO.md` (P0–P4)
+   - Roadmap → `ROADMAP.md` (✅/🟡/❌, sin borrar historial)
+   - Estado % → `PROJECT_STATUS.md`
+
+## Reglas
+
+- **Nunca inventar** estados no verificados
+- **Nunca eliminar** historial en CHANGELOG, DECISIONS, ROADMAP
+- **Nunca dejar vacío** "Próximo paso EXACTO" en HANDOVER
+- **Sin secretos** en documentación
+- Ejecutar `node scripts/sync-handover-metadata.mjs` para refrescar commit/fecha en HANDOVER si aplica
+
+## Auditoría al abrir proyecto
+
+Comparar HANDOVER con `git log -1`, última migración en `backend/db/migrations/`, y `git status`. Corregir inconsistencias antes de continuar desarrollo.
