@@ -147,10 +147,23 @@ Per `docs/PRIVATE_AI_ARCHITECTURE.md`:
 
 ## Próximos pasos (técnicos)
 
-1. Push + deploy CEO brief fix
-2. Confirmar migrate 494–511 en producción
+## Estado operativo (2026-07-09)
+
+- **Prod Web:** `https://nelvyon.com` — deploy `815e4c0f` SUCCESS
+- **Health:** `GET /api/health/live` → `git_sha: 815e4c0f0e35`
+- **Railway:** proyecto `truthful-respect`, servicio `@nelvyon/web`
+- **Migraciones:** releaseCommand en cada deploy; 494 inferida aplicada — confirmar SQL
+- **Cron CEO brief:** código mitiga `42P01`; verificación HTTP post-deploy pendiente
+
+---
+
+## Próximos pasos técnicos
+
+1. Confirmar migrate 494–511 en producción (SQL o `scripts/check-migration-494.mjs` vía SSH)
+2. Verificar POST `/api/cron/saas-ceo-brief` HTTP 200
 3. Fase 2 IA: activar provider (`NELVYON_AI_ENABLED`) cuando listo
 4. Commitear o descartar cambios setup PC (`config.py`, README)
+5. Arreglar tests CI Elite Gate + `saasWorkflowsS30`
 
 ---
 

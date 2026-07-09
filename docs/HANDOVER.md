@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-09 12:32 UTC**
+> Última actualización automática: **2026-07-09 13:05 UTC**
 
 ---
 
@@ -12,20 +12,24 @@
 | **Proyecto** | Nelvyon — agencia IA + SaaS B2B |
 | **Versión app** | `@nelvyon/web` 0.1.0 |
 | **Fecha doc** | 2026-07-09 |
-| **Último commit** | `224a0a36` — `fix: handle saas ceo brief settings table in production` |
-| **Rama** | `main` (ahead 1) |
-| **Último despliegue** | No verificado desde este entorno (aplicar push + Railway deploy) |
+| **Último commit en origin/main** | `815e4c0f` — `docs: add live documentation system with HANDOVER and project context` |
+| **Commit previo relevante** | `224a0a36` — `fix: handle saas ceo brief settings table in production` |
+| **Rama** | `main` (sync with origin) |
+| **Último despliegue prod** | ✅ Railway `@nelvyon/web` — deploy `5c2be62e` SUCCESS 2026-07-09 14:41 CEST |
+| **git_sha prod** | `815e4c0f0e35` en `https://nelvyon.com/api/health/live` |
 
 ---
 
-## Último trabajo realizado
+## Último trabajo realizado (sesión autónoma 2026-07-09)
 
-1. **Fix producción CEO brief cron** — `/api/cron/saas-ceo-brief` ya no crashea con `42P01` si falta `saas_ceo_brief_settings`.
-2. **Migración existente** — `494_saas_ceo_brief.sql` (tablas `saas_ceo_brief_settings`, `saas_ceo_brief_runs`).
-3. **Tests + build** — 3 tests nuevos, `tsc` OK, `pnpm -C apps/web build` OK.
-4. **Setup PC dev** (sesión previa, sin commit) — `config.py` Pydantic, `.env` local, `README-dev-Windows.md`.
+1. **Push a `origin/main`** — commits `224a0a36` + `815e4c0f` publicados.
+2. **Deploy Railway producción** — build + deploy SUCCESS; health live OK con SHA nuevo.
+3. **Validación local** — `tsc --noEmit` OK, `pnpm -C apps/web build` OK.
+4. **Railway CLI** — proyecto `truthful-respect` enlazado (production, `@nelvyon/web`).
+5. **Scripts utilidad** — `scripts/check-migration-494.mjs`, `scripts/check-cron-ceo-brief.mjs` (requieren SSH Railway o env interno).
+6. **Documentación** — actualización post-deploy de todos los archivos vivos en `docs/`.
 
-**Cambios locales sin commitear:** `backend/core/config.py`, `backend/db/load_env_files.py`, `README-dev-Windows.md`, `backend/README.md`.
+**Cambios locales sin commitear:** `backend/core/config.py`, `backend/db/load_env_files.py`, `README-dev-Windows.md`, `backend/README.md` (setup dev PC).
 
 ---
 
@@ -34,19 +38,20 @@
 | Ítem | Estado |
 |------|--------|
 | Monorepo pnpm | ✅ |
-| Next.js prod (`apps/web`) | ✅ código + build |
-| FastAPI (`backend/`) | ✅ |
+| Next.js prod (`apps/web`) | ✅ código + build + deploy prod |
+| FastAPI (`backend/`) | ✅ online `nelvyon-app-production.up.railway.app` |
 | Postgres migraciones (407 SQL) | ✅ en repo; última: `511_idempotency_keys.sql` |
-| Railway releaseCommand migrate | ✅ `apps/web/railway.json` |
+| Railway releaseCommand migrate | ✅ configurado; ejecuta en cada deploy Web |
+| Migración 494 en prod | 🟡 **inferida aplicada** en deploy 5c2be62e; **SQL no verificado** (sin SSH keys Railway) |
+| CEO brief cron post-deploy | 🟡 no verificado HTTP 200 tras deploy (último cron prod: HTTP 500 a las 10:20 UTC, pre-fix) |
 | Auth JWT SaaS | ✅ |
 | Stripe billing (código) | ✅ |
 | SES email (código) | ✅ |
 | Redis (código + fallback memoria) | 🟡 |
-| Docker local | 🟡 CLI instalado; daemon no verificado |
-| Supabase prod | 🟡 documentado; no verificado aquí |
-| Cloudflare DNS/WAF | 🟡 docs; no verificado aquí |
-| Migración 494 en prod | ❌ pendiente aplicar (causa raíz error CEO brief) |
-| Git push commit CEO fix | ❌ pendiente |
+| Git push commits CEO + docs | ✅ |
+| CI Staging Elite Gate | ❌ falló (tests packSeedMetadata + workflow) |
+| CI OS Autonomous Gate | ✅ |
+| CI Web Quality Gates | ❌ falló |
 
 ---
 
@@ -68,10 +73,9 @@
 | Componente | Estado |
 |------------|--------|
 | Docker Desktop | 🟡 |
-| WSL | — no documentado en repo |
 | Git / GitHub | ✅ |
-| Railway | 🟡 |
-| Supabase | 🟡 |
+| Railway | ✅ prod Web deploy OK; Postgres online |
+| Supabase | 🟡 documentado; no verificado SQL desde este entorno |
 | PostgreSQL | 🟡 prod; SQLite dev local |
 | Redis | 🟡 |
 | AWS SES | 🟡 |
@@ -79,7 +83,7 @@
 | Cloudflare | 🟡 |
 | OpenAI | 🟡 vars; opcional |
 | n8n | 🟡 blueprint JSON; sin instancia |
-| Dominios / DNS / SSL | 🟡 ver `ENVIRONMENTS.md` |
+| Dominios / DNS / SSL | 🟡 `nelvyon.com` OK; `app.nelvyon.com` no resuelve desde este entorno |
 
 Detalle: `INFRASTRUCTURE.md`, `INTEGRATIONS.md`, `ENVIRONMENTS.md`.
 
@@ -87,10 +91,11 @@ Detalle: `INFRASTRUCTURE.md`, `INTEGRATIONS.md`, `ENVIRONMENTS.md`.
 
 ## Problemas abiertos
 
-1. **Prod:** migración `494_saas_ceo_brief.sql` no aplicada → cron degradado hasta migrate.
-2. **Git:** commit `224a0a36` sin push a `origin/main`.
-3. **Working tree:** cambios de setup dev sin commitear (config/env docs).
-4. **CLAUDE.md desactualizado:** indica última migración `507`; repo tiene hasta `511`.
+1. **CEO brief cron:** verificar POST `/api/cron/saas-ceo-brief` HTTP 200 tras deploy (requiere SSH Railway o próximo cron 07:00 UTC).
+2. **Migración 494:** confirmar en `_migrations` y tablas vía SQL (bloqueado: sin SSH keys en `~/.ssh`).
+3. **CI:** Staging Elite Gate y Web Quality Gates fallaron en push `815e4c0f`.
+4. **Tests locales:** 7 fallos en `saasWorkflowsS30.test.ts` (`toIso` undefined).
+5. **Working tree:** cambios setup dev sin commitear.
 
 ---
 
@@ -98,7 +103,7 @@ Detalle: `INFRASTRUCTURE.md`, `INTEGRATIONS.md`, `ENVIRONMENTS.md`.
 
 | Error | Estado | Notas |
 |-------|--------|-------|
-| `relation "saas_ceo_brief_settings" does not exist` | 🟡 mitigado en código | Aplicar migración 494 en prod |
+| `relation "saas_ceo_brief_settings" does not exist` | 🟡 mitigado en código | Migración 494 inferida en deploy; confirmar SQL |
 | Mock hubs GHL legacy | ✅ documentado | No tocar rutas mock |
 
 Más: `KNOWN_ISSUES.md`.
@@ -107,7 +112,7 @@ Más: `KNOWN_ISSUES.md`.
 
 ## Próximo paso EXACTO
 
-**Push del commit `224a0a36` y deploy Railway Web; verificar en prod que `pnpm exec tsx ../../backend/db/migrate.ts` ejecuta `494_saas_ceo_brief.sql` (o aplicar SQL manual en Supabase); confirmar POST `/api/cron/saas-ceo-brief` devuelve `processed > 0` o `skipped` solo si no hay tenants.**
+**Registrar SSH key en Railway (`ssh-keygen -t ed25519` + `railway ssh keys add`), ejecutar `node scripts/check-migration-494.mjs` dentro del contenedor, y disparar/verificar POST `/api/cron/saas-ceo-brief` (workflow `production-cron.yml` job `saas-ceo-brief` o curl con `CRON_SECRET`).**
 
 ---
 

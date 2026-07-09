@@ -100,3 +100,14 @@
 | **Decisión** | HANDOVER.md es fuente de continuidad; actualización obligatoria post-cambio |
 | **Por qué** | No depender de memoria humana ni chats previos |
 | **Consecuencias** | Regla Cursor `.cursor/rules/live-documentation.mdc` |
+
+---
+
+## ADR-010 — Verificación prod vía Railway CLI + scripts internos
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-09 |
+| **Decisión** | Scripts `scripts/check-migration-494.mjs` y `check-cron-ceo-brief.mjs` se ejecutan dentro del contenedor Railway (`railway ssh`) |
+| **Por qué** | `DATABASE_URL` prod usa hostname interno `postgres.railway.internal`; `railway run` local falla con ENOTFOUND |
+| **Consecuencias** | Requiere SSH keys registradas en Railway; sin ellas solo health/git_sha y releaseCommand inferido |

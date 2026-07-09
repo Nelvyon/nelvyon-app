@@ -8,6 +8,10 @@
 
 | Hora (aprox) | Archivo / área | Cambio | Descripción |
 |--------------|----------------|--------|-------------|
+| 15:00 | `docs/*` | Actualizado | Post-deploy autónomo: HANDOVER, DEPLOYMENTS, KNOWN_ISSUES, PROJECT_STATUS, TODO |
+| 14:52 | Railway prod | Deploy | `@nelvyon/web` deploy `5c2be62e` SUCCESS — git_sha `815e4c0f` |
+| 14:41 | `origin/main` | Push | `git push origin main` — commits `224a0a36`, `815e4c0f` |
+| 14:30 | `scripts/check-*.mjs` | Creado | Utilidades verificación migración 494 y cron CEO brief |
 | 14:30 | `docs/*` | Creado | Sistema documentación viva (14 archivos + regla Cursor) |
 | 14:06 | `backend/saas/SaasCeoBriefService.ts` | Modificado | Manejo `42P01` en CEO brief |
 | 14:06 | `apps/web/src/app/api/cron/saas-ceo-brief/route.ts` | Modificado | Respuesta `schema_not_ready` sin crash |

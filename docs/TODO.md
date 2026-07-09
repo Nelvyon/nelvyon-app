@@ -1,26 +1,27 @@
 # TODO — NELVYON
 
-> Prioridades vivas. Eliminar al completar. Actualizado: **2026-07-09**
+> Prioridades vivas. Eliminar al completar. Actualizado: **2026-07-09** (post-deploy)
 
 ---
 
 ## P0 — Bloqueantes producción
 
-- [ ] **Push** commit `224a0a36` a `origin/main`
-- [ ] **Deploy Railway** servicio Web
-- [ ] **Aplicar migración 494** (`saas_ceo_brief_settings`) en prod — `pnpm -C apps/web migrate` o SQL manual
-- [ ] **Verificar** POST `/api/cron/saas-ceo-brief` sin `42P01` tras migrate
+- [x] **Push** commits `224a0a36` + `815e4c0f` a `origin/main`
+- [x] **Deploy Railway** servicio Web — deploy `5c2be62e` SUCCESS
+- [ ] **Confirmar migración 494** en prod — SQL `_migrations` + `saas_ceo_brief_settings` (bloqueado: SSH Railway)
+- [ ] **Verificar** POST `/api/cron/saas-ceo-brief` HTTP 200 tras deploy
 - [ ] Confirmar migraciones **495–511** aplicadas en prod (drift check `_migrations`)
 
 ---
 
 ## P1 — Estabilidad y ops
 
+- [ ] Configurar SSH keys Railway para verificación remota (`railway ssh keys add`)
 - [ ] Commitear o revertir cambios locales: `config.py`, `load_env_files.py`, `README-dev-Windows.md`
-- [ ] Actualizar `CLAUDE.md` — última migración → `511_idempotency_keys.sql`
+- [ ] Arreglar tests `saasWorkflowsS30.test.ts` (7 fallos `toIso`)
+- [ ] Arreglar CI Staging Elite Gate (`packSeedMetadata.test.ts`)
 - [ ] Confirmar SNS SES subscription post-deploy (LAUNCH_READY)
-- [ ] Activar GitHub Actions cron staging-smoke si no activo
-- [ ] Rotar credencial Supabase si estuvo expuesta en README (ya sustituida por placeholder)
+- [ ] Redeploy staging con último `main` (actualmente `735dce62`)
 
 ---
 
@@ -53,7 +54,8 @@
 
 ## Completado recientemente
 
+- [x] Push + deploy prod `815e4c0f` (2026-07-09)
 - [x] Fix cron CEO brief — graceful `42P01` + tests (2026-07-09)
-- [x] Sistema documentación viva `docs/HANDOVER.md` + 13 archivos (2026-07-09)
+- [x] Sistema documentación viva `docs/HANDOVER.md` + 14 archivos (2026-07-09)
 - [x] Setup PC dev — Node/Python/pnpm/Git (2026-07-07/08)
 - [x] Fix Settings `database_url` Pydantic (2026-07-07)

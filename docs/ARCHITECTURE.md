@@ -1,6 +1,6 @@
 # ARCHITECTURE — Arquitectura real NELVYON
 
-> Actualizado: 2026-07-09. Refleja código en repo.
+> Actualizado: 2026-07-09. Refleja código en repo. **Prod Web:** `815e4c0f` en `nelvyon.com`.
 
 ---
 

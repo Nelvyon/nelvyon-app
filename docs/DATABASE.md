@@ -59,8 +59,8 @@
 - `saas_tenant_memory` (497)
 - `saas_agent_runs` (492)
 - `saas_mcp_tool_audit` (493)
-- **`saas_ceo_brief_settings`** (494) — ⚠️ pendiente prod
-- **`saas_ceo_brief_runs`** (494)
+- **`saas_ceo_brief_settings`** (494) — 🟡 inferida en prod (deploy 2026-07-09); confirmar SQL
+- **`saas_ceo_brief_runs`** (494) — índice `idx_ceo_brief_runs_tenant_created`
 
 ### Private AI
 - `504_private_ai_modular.sql`, `503_private_ai_phase2.sql`

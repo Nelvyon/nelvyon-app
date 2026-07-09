@@ -15,7 +15,7 @@
 | **Python** | ✅ | 3.10+; FastAPI backend |
 | **Docker Desktop** | 🟡 | CLI instalado; daemon no siempre activo |
 | **WSL** | — | No documentado en repo |
-| **Railway** | 🟡 | Web + API Python separados (docs backend/README) |
+| **Railway** | ✅ | Proyecto `truthful-respect`; Web prod deploy OK 2026-07-09; API Python online |
 | **Supabase** | 🟡 | Postgres + auth; service_role en DATABASE_URL |
 | **PostgreSQL** | 🟡 | 16; 407 migraciones SQL |
 | **Redis** | 🟡 | Upstash/Railway opcional; in-memory fallback |

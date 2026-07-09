@@ -21,16 +21,25 @@
 
 ---
 
-## 2026-07-09 — Pendiente (no ejecutado desde este entorno)
+## 2026-07-09 12:41 UTC — Producción Web (SUCCESS)
 
 | Campo | Valor |
 |-------|-------|
-| **Commit** | `224a0a36` — fix CEO brief cron |
+| **Deployment ID** | `5c2be62e-891f-484f-9fed-78bb6f5fc0c2` |
+| **Commit** | `815e4c0f` — docs + incluye `224a0a36` CEO brief fix |
 | **Rama** | `main` |
-| **Estado** | ⏳ **No pusheado** — deploy pendiente |
-| **Objetivo** | Mitigar `42P01` + aplicar migrate 494 en prod |
-| **Comando push** | `git push origin main` |
-| **Verificación post-deploy** | `POST /api/cron/saas-ceo-brief` + `_migrations` 494 |
+| **Servicio** | Railway `@nelvyon/web` (proyecto `truthful-respect`, production) |
+| **URL** | `https://nelvyon.com` |
+| **Resultado** | ✅ SUCCESS |
+| **Health post-deploy** | `GET /api/health/live` → `{"ok":true,"git_sha":"815e4c0f0e35"}` |
+| **releaseCommand** | `pnpm exec tsx ../../backend/db/migrate.ts` (configurado; logs migrate no visibles en runtime logs) |
+| **Migraciones** | 🟡 Inferidas aplicadas (incl. 494 si pendiente); **no verificado SQL** |
+| **Errores runtime** | Ninguno crítico en logs de arranque (`Ready on http://0.0.0.0:3000`) |
+| **Rollback** | No |
+
+**Trigger:** push `git push origin main` (commits `224a0a36`, `815e4c0f`).
+
+**Deploy anterior:** `9e4c9c05` SUCCESS 2026-07-07 — commit `735dce62`.
 
 ---
 
@@ -41,7 +50,7 @@
 3. Start: `node server.js` (:3000)
 4. Health: `/api/health/live`
 
-**Checklist:** `docs/LAUNCH_READY.md`, `docs/RAILWAY_DEPLOY_CHECKLIST.md` (si existe)
+**Checklist:** `docs/LAUNCH_READY.md`, `docs/RAILWAY_DEPLOY_CHECKLIST.md`
 
 ---
 
@@ -50,6 +59,7 @@
 1. Build `backend/Dockerfile`
 2. `alembic upgrade head && uvicorn main:app`
 3. Health: `/health`
+4. URL prod: `https://nelvyon-app-production.up.railway.app`
 
 ---
 
@@ -57,7 +67,6 @@
 
 | Fecha | Evento | Fuente |
 |-------|--------|--------|
+| 2026-07-07 | Deploy prod `735dce62` | Railway deployment `9e4c9c05` |
 | 2026-07-04 | Hardening Fase 1 código cerrado | `LAUNCH_READY.md` |
 | — | Deploys staging documentados | `backend/README.md` |
-
-*Añadir filas aquí tras cada deploy real con fecha/hora/commit/resultado.*

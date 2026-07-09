@@ -27,7 +27,8 @@
 | Cloudflare DNS/WAF | 🟡 | Docs; manual deploy day |
 | Docker compose test (PG+Redis) | 🟡 | `docker-compose.test.yml` |
 | Documentación viva (`docs/HANDOVER`) | ✅ | 2026-07-09 |
-| Migraciones 494–511 en producción | ❌ | **Bloqueante parcial CEO brief** |
+| Migraciones 494–511 en producción | 🟡 | Deploy 2026-07-09 con releaseCommand; SQL 494 sin confirmar |
+| Push + deploy CEO brief fix | ✅ | `815e4c0f` en prod |
 | n8n self-hosted | ❌ | Solo blueprint JSON |
 | PC dev estandarizado | 🟡 | README-dev-Windows actualizado |
 
@@ -44,7 +45,7 @@
 | RAG store (`NelvyonRagStore`) | 🟡 | Sin ingest pipeline |
 | MCP server (5 tools) | 🟡 | `/api/mcp` + stdio |
 | OpenClaw bridge | ❌ | Deshabilitado |
-| CEO brief cron automatizado | 🟡 | Fix código; migrate 494 prod |
+| CEO brief cron automatizado | 🟡 | Código desplegado; verificación HTTP post-deploy pendiente |
 | Voice commands + brief | 🟡 | |
 | Agent runs audit (492) | 🟡 | |
 | Inbox agent (491) | 🟡 | |

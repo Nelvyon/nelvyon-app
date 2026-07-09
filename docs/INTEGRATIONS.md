@@ -1,7 +1,7 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: 2026-07-09. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
+> Actualizado: 2026-07-09. **Prod deploy:** `815e4c0f`. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
 ---
 
