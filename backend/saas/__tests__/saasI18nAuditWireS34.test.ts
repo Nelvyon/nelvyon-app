@@ -237,6 +237,7 @@ describe("Audit wiring — SaasWorkflowService", () => {
 
   it("calls audit.log after executeWorkflow (empty actions path)", async () => {
     vi.mocked(db.query)
+      .mockResolvedValueOnce([])                 // no recent running duplicate
       .mockResolvedValueOnce([wfRow])           // getWorkflow
       .mockResolvedValueOnce([runRow])           // INSERT run
       .mockResolvedValueOnce([])                 // evalConditions UPDATE completed
@@ -251,6 +252,7 @@ describe("Audit wiring — SaasWorkflowService", () => {
   it("does NOT call audit.log when no audit dep injected", async () => {
     const svcNoAudit = new SaasWorkflowService(db, mockCrm);
     vi.mocked(db.query)
+      .mockResolvedValueOnce([])                 // no recent running duplicate
       .mockResolvedValueOnce([wfRow])
       .mockResolvedValueOnce([runRow])
       .mockResolvedValueOnce([])

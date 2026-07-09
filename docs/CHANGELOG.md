@@ -10,6 +10,7 @@
 |--------------|----------------|--------|-------------|
 | 17:02 | Postgres prod | Migrate | 482–511 vía `DATABASE_PUBLIC_URL`; **494 aplicada** |
 | 17:02 | Cron CEO brief | Verificado | `processed:1`, email+stored; run `29035626812` |
+| 20:38 | `saasI18nAuditWireS34.test.ts` | Fix | Mock `[]` dedup recent-running antes de `getWorkflow` |
 | 20:15 | `e2e/launch.spec.ts` | Fix | `/api/saas/certificados` es API real (401), no stub 410 |
 | 19:53 | CI local | PASS | `run-local-elite-reinforce` 215 pack tests |
 | 19:52 | Pack tests | Fix | `packAutoApprove` + `packSeedMetadata` mocks |

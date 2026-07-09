@@ -38,6 +38,16 @@
 
 ## Historial resuelto
 
+### KI-R008 — CI regression: saasI18nAuditWireS34 mocks incompletos
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-09 |
+| **Causa** | `executeWorkflow` consulta runs `running` recientes; mock devolvía `wfRow` → `toISOString` en undefined |
+| **Solución** | `mockResolvedValueOnce([])` antes de `getWorkflow` en audit wire tests |
+
+---
+
 ### KI-R005 — CI pack tests fallaban (packSeedMetadata, packAutoApprove)
 
 | Campo | Valor |

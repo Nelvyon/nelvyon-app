@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-09 18:17 UTC**
+> Última actualización automática: **2026-07-09 18:40 UTC**
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `4c4112bd` + fix e2e `launch.spec.ts` pendiente push |
-| **Rama** | `main` (sync with origin) |
+| **Último commit** | fix audit wire mocks + docs (pendiente push) |
+| **Rama** | `main` |
 | **Prod** | `https://nelvyon.com` |
 | **Staging** | `https://ideal-victory-staging.up.railway.app` |
-| **P1** | ✅ cerrada en código; CI Web Quality Gates pendiente re-run post-fix e2e |
+| **P1** | 🟡 CI Web Quality Gates re-run post-fix `saasI18nAuditWireS34` |
 
 ---
 
@@ -23,19 +23,19 @@
 |------|--------|
 | Migrate 494 prod + cron CEO brief | ✅ |
 | Pack tests (`packSeedMetadata`, `packAutoApprove`) | ✅ |
-| `run-local-elite-reinforce` | ✅ ALL_PASS |
-| `pnpm gate` + `pnpm build` | ✅ |
+| E2E `launch.spec.ts` certificados → 401 | ✅ commit `925add03` |
+| Audit wire regression mocks | ✅ fix local |
+| `run-local-elite-reinforce` + `pnpm gate` + build | ✅ |
 | `releaseCommand` → `migrate:prod` + Dockerfile | ✅ |
-| Dev setup commiteado | ✅ |
-| Staging Elite Gate CI | ✅ SUCCESS run `29039024932` |
-| Web Quality Gates CI | 🟡 fix e2e certificados → 401 (commit pendiente) |
+| Staging Elite Gate CI | ✅ SUCCESS run `29040141156` |
+| Web Quality Gates CI | 🟡 re-run pendiente (falló run `29040141325` en full regression) |
 | SNS SES subscription | ❌ CEO/AWS |
 
 ---
 
 ## Próximo paso
 
-Push fix e2e → verificar Web Quality Gates verde. Luego iniciar P2.
+Verificar Web Quality Gates verde tras push fix audit mocks. Si verde → **P1 COMPLETADA** (salvo SNS CEO). No iniciar P2.
 
 ---
 

@@ -14,11 +14,12 @@
 
 - [x] Migrate 494 + cron CEO brief
 - [x] Pack orchestrator tests
+- [x] E2E launch.spec certificados 401 (`925add03`)
+- [x] Audit wire regression mocks (`saasI18nAuditWireS34`)
 - [x] Elite reinforce + gate + build local
 - [x] releaseCommand `migrate:prod` + Dockerfile
-- [x] Dev setup commiteado (`4c4112bd`)
 - [x] Staging Elite Gate CI SUCCESS
-- [ ] Web Quality Gates CI — fix e2e push pendiente
+- [ ] Web Quality Gates CI — re-run post audit mock fix
 - [ ] SNS SES subscription (CEO/AWS)
 
 ---
