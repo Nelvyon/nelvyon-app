@@ -29,10 +29,12 @@ function shaMatches(deployed, expected) {
  * @param {{ skipWait?: boolean; maxAttempts?: number; intervalMs?: number; expectedSha?: string | null; label?: string }} opts
  */
 export async function waitForStagingDeploy(baseUrl, opts = {}) {
+  const envMax = Number.parseInt(process.env.DEPLOY_WAIT_MAX_ATTEMPTS ?? "", 10);
+  const envInterval = Number.parseInt(process.env.DEPLOY_WAIT_INTERVAL_MS ?? "", 10);
   const {
     skipWait = false,
-    maxAttempts = 56,
-    intervalMs = 15_000,
+    maxAttempts = Number.isFinite(envMax) && envMax > 0 ? envMax : 56,
+    intervalMs = Number.isFinite(envInterval) && envInterval > 0 ? envInterval : 15_000,
     expectedSha = resolveExpectedGitSha(),
     label = "deploy",
   } = opts;
