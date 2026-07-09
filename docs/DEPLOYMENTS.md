@@ -33,7 +33,7 @@
 | **Resultado** | ✅ SUCCESS |
 | **Health post-deploy** | `GET /api/health/live` → `{"ok":true,"git_sha":"815e4c0f0e35"}` |
 | **releaseCommand** | `pnpm exec tsx ../../backend/db/migrate.ts` (configurado; logs migrate no visibles en runtime logs) |
-| **Migraciones** | ❌ 494 NO aplicada — cron confirma `schema_not_ready` post-deploy |
+| **Migraciones** | ✅ 494 + 482–511 aplicadas manualmente 2026-07-09 17:02 UTC |
 | **Errores runtime** | Ninguno crítico en logs de arranque (`Ready on http://0.0.0.0:3000`) |
 | **Rollback** | No |
 

@@ -6,20 +6,6 @@
 
 ## Activos
 
-### KI-001 — `relation "saas_ceo_brief_settings" does not exist` (42P01)
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | Alta (cron prod) |
-| **Ruta** | `POST /api/cron/saas-ceo-brief` |
-| **Causa** | Migración `494_saas_ceo_brief.sql` no estaba aplicada en prod (pre-deploy 2026-07-09) |
-| **Mitigación código** | ✅ commits `224a0a36` + deploy `815e4c0f` — respuesta `schema_not_ready` sin crash |
-| **Fix definitivo** | Ejecutar SQL `494_saas_ceo_brief.sql` en Postgres prod manualmente |
-| **Verificación** | Cron workflow `29019953131` (13:02 UTC): HTTP 200, body `skipped:schema_not_ready` |
-| **Estado** | ❌ Tablas ausentes; código mitiga crash pero brief no se genera |
-
----
-
 ### KI-003 — Working tree cambios setup dev sin commit
 
 | Campo | Valor |
@@ -55,22 +41,18 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Severidad** | Media |
-| **Archivo** | `backend/saas/__tests__/saasWorkflowsS30.test.ts` |
-| **Error** | `Cannot read properties of undefined (reading 'toISOString')` en `SaasWorkflowService.ts:178` |
-| **Fix** | Mock DB debe devolver `created_at`/`updated_at` en filas de workflow runs |
+| **Estado** | ✅ Resuelto 2026-07-09 — mock `[]` para dedup recent-running |
 
 ---
 
-### KI-008 — CEO brief cron: schema_not_ready tras deploy
+### KI-010 — releaseCommand no aplicó migraciones 482–494
 
 | Campo | Valor |
 |-------|-------|
-| **Severidad** | Alta |
-| **Detalle** | POST cron HTTP 200 pero `{"ok":true,"processed":0,"skipped":"schema_not_ready","migration":"494_saas_ceo_brief.sql"}` |
-| **Workflow** | Production Cron Executor run `29019953131` — 2026-07-09 13:02 UTC |
-| **Causa** | Migración 494 no aplicada; `releaseCommand` no efectivo o drift `_migrations` |
-| **Fix** | SQL manual en Postgres prod + verificar índice `idx_ceo_brief_runs_tenant_created` |
+| **Severidad** | Media (ops) |
+| **Detalle** | Deploy SUCCESS pero tablas 494 ausentes hasta migrate manual |
+| **Mitigación** | Migrate manual vía `DATABASE_PUBLIC_URL` aplicado |
+| **Fix** | Auditar logs releaseCommand Railway en próximo deploy |
 
 ---
 
@@ -79,10 +61,8 @@
 | Campo | Valor |
 |-------|-------|
 | **Severidad** | Baja (ops) |
-| **Detalle** | `railway ssh` requiere clave en `~/.ssh/` — no presente en PC agente |
+| **Detalle** | `railway ssh` requiere clave en `~/.ssh/` |
 | **Fix** | `ssh-keygen -t ed25519` + `railway ssh keys add` |
-
----
 
 ## Historial resuelto
 
@@ -105,12 +85,12 @@
 
 ---
 
-### KI-R003 — CLAUDE.md migración desactualizada
+### KI-R004 — CEO brief 42P01 + schema_not_ready
 
 | Campo | Valor |
 |-------|-------|
-| **Resuelto** | 2026-07-09 |
-| **Solución** | `CLAUDE.md` actualizado a `511_idempotency_keys.sql` en commit docs |
+| **Resuelto** | 2026-07-09 17:02 UTC |
+| **Solución** | Migrate prod 482–511; cron `processed:1` (run `29035626812`) |
 
 ---
 

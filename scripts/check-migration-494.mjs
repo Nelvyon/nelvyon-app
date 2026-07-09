@@ -1,12 +1,22 @@
 #!/usr/bin/env node
 /** One-off prod check: migration 494 + CEO brief tables. Uses DATABASE_URL from env. */
-import pg from "pg";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(__dirname, "..");
+const require = createRequire(path.join(root, "apps/web/package.json"));
+const pg = require("pg");
+
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL?.includes("railway.app") ? { rejectUnauthorized: false } : undefined,
+});
 
 try {
   const migration = await pool.query(
-    "SELECT name, applied_at FROM _migrations WHERE name = $1",
+    "SELECT name, executed_at FROM _migrations WHERE name = $1",
     ["494_saas_ceo_brief.sql"],
   );
   const table = await pool.query(

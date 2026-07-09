@@ -8,7 +8,11 @@
 
 | Hora (aprox) | Archivo / área | Cambio | Descripción |
 |--------------|----------------|--------|-------------|
-| 15:00 | `docs/*` | Actualizado | Post-deploy autónomo: HANDOVER, DEPLOYMENTS, KNOWN_ISSUES, PROJECT_STATUS, TODO |
+| 17:02 | Postgres prod | Migrate | 482–511 vía `DATABASE_PUBLIC_URL`; **494 aplicada** |
+| 17:02 | Cron CEO brief | Verificado | `processed:1`, email+stored; run `29035626812` |
+| 17:05 | `saasWorkflowsS30.test.ts` | Fix | Mock dedup recent-running en executeWorkflow |
+| 17:00 | `scripts/apply-migration-494.mjs` | Creado | Utilidad apply+verify migración 494 |
+| 15:00 | `docs/*` | Actualizado | Post-deploy autónomo |
 | 14:52 | Railway prod | Deploy | `@nelvyon/web` deploy `5c2be62e` SUCCESS — git_sha `815e4c0f` |
 | 14:41 | `origin/main` | Push | `git push origin main` — commits `224a0a36`, `815e4c0f` |
 | 14:30 | `scripts/check-*.mjs` | Creado | Utilidades verificación migración 494 y cron CEO brief |

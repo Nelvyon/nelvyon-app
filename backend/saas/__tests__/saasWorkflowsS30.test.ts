@@ -162,6 +162,8 @@ describe("SaasWorkflowService — S30", () => {
         conditions: [],
       });
       vi.mocked(db.query)
+        // no recent running duplicate
+        .mockResolvedValueOnce([])
         // getWorkflow
         .mockResolvedValueOnce([wf])
         // INSERT run
@@ -188,6 +190,7 @@ describe("SaasWorkflowService — S30", () => {
         conditions: [],
       });
       vi.mocked(db.query)
+        .mockResolvedValueOnce([])
         .mockResolvedValueOnce([wf])
         .mockResolvedValueOnce([{ id: "run-1", workflow_id: "wf-1", tenant_id: TENANT, trigger_data: {}, status: "running", steps_executed: [], error: null, started_at: new Date().toISOString(), completed_at: null }])
         // UPDATE saas_contacts
@@ -206,6 +209,7 @@ describe("SaasWorkflowService — S30", () => {
         conditions: [],
       });
       vi.mocked(db.query)
+        .mockResolvedValueOnce([])
         .mockResolvedValueOnce([wf])
         .mockResolvedValueOnce([{ id: "run-1", workflow_id: "wf-1", tenant_id: TENANT, trigger_data: {}, status: "running", steps_executed: [], error: null, started_at: new Date().toISOString(), completed_at: null }])
         .mockResolvedValueOnce([])
@@ -222,6 +226,7 @@ describe("SaasWorkflowService — S30", () => {
     it("runs notify action and completes", async () => {
       const wf = makeWorkflowRow({ actions: [{ type: "notify", config: { message: "Hello" } }], conditions: [] });
       vi.mocked(db.query)
+        .mockResolvedValueOnce([])
         .mockResolvedValueOnce([wf])
         .mockResolvedValueOnce([{ id: "run-1", workflow_id: "wf-1", tenant_id: TENANT, trigger_data: {}, status: "running", steps_executed: [], error: null, started_at: new Date().toISOString(), completed_at: null }])
         // INSERT activity_log (notify)
@@ -268,6 +273,8 @@ describe("SaasWorkflowService — S30", () => {
       vi.mocked(db.query)
         // getWorkflows
         .mockResolvedValueOnce([wf])
+        // executeWorkflow: no recent running duplicate
+        .mockResolvedValueOnce([])
         // executeWorkflow: getWorkflow
         .mockResolvedValueOnce([wf])
         // INSERT run
