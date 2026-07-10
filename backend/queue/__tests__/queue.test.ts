@@ -13,7 +13,9 @@ const redisMock = {
 };
 
 vi.mock("@upstash/redis", () => ({
-  Redis: vi.fn(() => redisMock),
+  Redis: vi.fn(function MockRedis() {
+    return redisMock;
+  }),
 }));
 
 const enqueueAndDispatchMock = vi.fn();

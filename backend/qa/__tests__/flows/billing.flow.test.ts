@@ -50,10 +50,12 @@ vi.mock("../../../saas/SaasPackStoreService", () => ({
 }));
 
 vi.mock("stripe", () => ({
-  default: vi.fn(() => ({
-    webhooks: { constructEvent: (...args: unknown[]) => constructEventMock(...args) },
-    subscriptions: { retrieve: (...args: unknown[]) => retrieveSubscriptionMock(...args) },
-  })),
+  default: vi.fn(function MockStripe() {
+    return {
+      webhooks: { constructEvent: (...args: unknown[]) => constructEventMock(...args) },
+      subscriptions: { retrieve: (...args: unknown[]) => retrieveSubscriptionMock(...args) },
+    };
+  }),
 }));
 
 import { handleStripeWebhook } from "../../../stripe/webhookHandler";
