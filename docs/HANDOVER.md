@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-10 02:30 UTC**
+> Última actualización automática: **2026-07-10 00:30 UTC**
 
 ---
 
@@ -10,7 +10,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Último commit** | P2 ops enterprise (pendiente push) |
-| **Rama** | `main` |
+| **Rama** | `main` (sync with origin) |
 | **Prod** | `https://nelvyon.com` |
 | **P1** | ✅ COMPLETADA |
 | **P2** | ✅ COMPLETADA (código + CI; CEO: DATABASE_URL backup secret, SNS SES) |
