@@ -13,9 +13,11 @@ vi.mock("../../../oauth/OAuthService", () => ({
 }));
 
 vi.mock("../../../oauth/GoogleOAuthProvider", () => ({
-  GoogleOAuthProvider: vi.fn().mockImplementation(() => ({
-    refreshAccessToken: refreshMock,
-  })),
+  GoogleOAuthProvider: vi.fn(function MockGoogleOAuthProvider() {
+    return {
+      refreshAccessToken: refreshMock,
+    };
+  }),
 }));
 
 vi.mock("../../../logger", () => ({
