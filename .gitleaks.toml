@@ -1,0 +1,44 @@
+# Nelvyon — gitleaks allowlist for CI (push, schedule, workflow_dispatch).
+# Scans still run on all events; these paths/patterns are known non-secrets:
+# tests, mocks, legacy frontend, example env templates, UI demo curl snippets.
+
+title = "Nelvyon gitleaks"
+
+[allowlist]
+description = "Tests, mocks, legacy UI, docs, and placeholder credentials"
+paths = [
+  '''(?i)(^|/)frontend/''',
+  '''(?i)mock_data/''',
+  '''(?i)\.example$''',
+  '''(?i)__tests__/''',
+  '''(?i)(^|/)backend/tests/''',
+  '''(?i)(^|/)backend/qa/''',
+  '''(?i)\.test\.(ts|tsx|js|py)$''',
+  '''(?i)\.flow\.test\.(ts|py)$''',
+  '''(?i)^docs/''',
+  '''(?i)^tools/''',
+  '''(?i)\.md$''',
+  '''(?i)apps/web/src/app/saas/api-keys/''',
+  '''(?i)apps/web/src/app/saas/developers/''',
+  '''(?i)apps/web/src/app/saas/herramientas/''',
+  '''(?i)apps/web/src/app/saas/webhooks/''',
+  '''(?i)apps/web/src/app/dashboard/api-docs/''',
+  '''(?i)apps/web/src/components/agenforce/''',
+]
+regexes = [
+  '''sk-\.\.\.''',
+  '''sk_live_\.\.\.''',
+  '''whsec_\.\.\.''',
+  '''whsec_test_''',
+  '''sk_test_''',
+  '''pk_test_''',
+  '''nlv_tu_api_key''',
+  '''nlv_<tu_api_key>''',
+  '''Bearer nlv_''',
+  '''PASSWORD@HOST''',
+  '''USER:PASSWORD@''',
+  '''test-secret-key-not-for-production''',
+  '''test_meta_client_secret''',
+  '''test_oidc_client_secret''',
+  '''sk_test_fake_not_for_production''',
+]
