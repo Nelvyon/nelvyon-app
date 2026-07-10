@@ -1,6 +1,6 @@
 name: Database Backup
 
-# Weekly Postgres backup — requires secret DATABASE_URL (production read-only recommended).
+# Weekly Postgres backup — requires DATABASE_PUBLIC_URL (or public DATABASE_URL).
 # Artifacts retained 30 days. Restore drill: see docs/CEO_FINAL_ACTIONS.md
 
 on:
@@ -33,11 +33,19 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install pg client + SQLAlchemy
+      - name: Install PostgreSQL 18 client (PGDG)
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y postgresql-client
-          pip install sqlalchemy psycopg2-binary pytest
+          sudo apt-get install -y curl ca-certificates gnupg lsb-release
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client-18
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+          pg_dump --version
+
+      - name: Install Python deps
+        run: pip install sqlalchemy psycopg2-binary
 
       - name: Validate DATABASE_URL is reachable from GitHub Actions
         env:
@@ -67,6 +75,22 @@ jobs:
             exit 0
           fi
 
+      - name: Verify pg_dump major matches Postgres server
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_PUBLIC_URL || secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            exit 0
+          fi
+          PG_DUMP_MAJOR=$(pg_dump --version | sed -n 's/.*PostgreSQL) \([0-9][0-9]*\).*/\1/p')
+          SERVER_MAJOR=$(psql "$DATABASE_URL" -tAc "SHOW server_version;" | sed -E 's/^([0-9]+).*/\1/')
+          echo "pg_dump major: $PG_DUMP_MAJOR"
+          echo "server major: $SERVER_MAJOR"
+          if [ "$PG_DUMP_MAJOR" != "$SERVER_MAJOR" ]; then
+            echo "::error::pg_dump major ($PG_DUMP_MAJOR) != server major ($SERVER_MAJOR)"
+            exit 1
+          fi
+
       - name: Create backup
         env:
           DATABASE_URL: ${{ secrets.DATABASE_PUBLIC_URL || secrets.DATABASE_URL }}
@@ -80,7 +104,7 @@ jobs:
             --database-url "$DATABASE_URL" \
             --output-dir backups
           ls -la backups/
-          test -n "$(ls -A backups 2>/dev/null)"
+          test -n "$(find backups -maxdepth 1 -name '*.dump' -print -quit)"
 
       - name: Upload backup artifact
         if: success()
@@ -101,5 +125,5 @@ jobs:
           python-version: "3.11"
       - name: Verify SQLite backup/restore
         run: |
-          pip install pytest sqlalchemy
+          pip install pytest pytest-asyncio sqlalchemy
           cd backend && python -m pytest tests/test_backup_phase1.py -q
