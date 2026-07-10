@@ -1,7 +1,8 @@
 # Railway Deploy Checklist — Nelvyon SaaS
 
-> Última actualización: 2026-07-04  
-> Entorno objetivo: Railway (Node 20 + Postgres 16)
+> **Actualizado:** 2026-07-10  
+> **Entorno:** Railway (Node 20 + Postgres 16) · **URL prod:** `https://nelvyon.com`  
+> **Inventario secretos:** `docs/PRODUCTION_SECRETS.md`
 
 ---
 
@@ -12,8 +13,8 @@
 |---|---|---|
 | `JWT_SECRET` | `openssl rand -hex 32` | Mínimo 32 chars. También fallback de TRACKING_SECRET |
 | `NEXTAUTH_SECRET` | `openssl rand -hex 32` | Para next-auth si se usa |
-| `NEXTAUTH_URL` | `https://app.nelvyon.com` | URL canónica del deploy |
-| `NEXT_PUBLIC_APP_URL` | `https://app.nelvyon.com` | Usado para tracking pixel URLs |
+| `NEXTAUTH_URL` | `https://nelvyon.com` | Legacy — LMS usa `JWT_SECRET` primero |
+| `NEXT_PUBLIC_APP_URL` | `https://nelvyon.com` | Usado para tracking pixel URLs |
 
 ### Database
 | Variable | Ejemplo | Notas |

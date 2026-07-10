@@ -157,7 +157,8 @@ Ejecutar en orden. Marcar cada ítem al completar.
 | SNS SES confirm | Alta | Sí (bounces) |
 | Redeploy prod Railway | Alta | No (pero recomendado) |
 | PRODUCTION_BASE_URL | — | ✅ Hecho |
-| DATABASE_URL secret | — | ✅ Hecho |
-| CRON_SECRET | — | ✅ Hecho |
+| `CRON_SECRET` | — | ✅ Sincronizado Railway + GitHub (2026-07-10) |
+| Inventario secretos / legacy cleanup | — | ✅ `docs/PRODUCTION_SECRETS.md` |
+| DATABASE_PUBLIC_URL (GitHub) | — | ✅ Backups CI |
 | Sentry | Baja | No |
 | Cloudflare WAF | Baja | No |
