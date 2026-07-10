@@ -14,7 +14,7 @@
 | **GitHub secrets** | ✅ `DATABASE_URL`, `CRON_SECRET` |
 | **GitHub variables** | ✅ `PRODUCTION_BASE_URL=https://nelvyon.com` |
 | **Crons GH → prod** | ✅ `Production Cron Executor` SUCCESS (cada ~8 min) |
-| **Backup workflow** | 🟡 0 ejecuciones históricas; secret configurado hoy — primer run manual |
+| **Backup workflow** | ❌ Falló: `DATABASE_URL` usa `railway.internal` — requiere `DATABASE_PUBLIC_URL` |
 | **AWS SES dominio** | ❌ `nelvyon.com` VerificationStatus **PENDING** — acción CEO |
 | **AWS SES producción** | ❌ `ProductionAccessEnabled: false` (sandbox) — acción CEO |
 | **SNS bounces** | ❌ 0 subscriptions — acción CEO |
