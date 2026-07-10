@@ -152,31 +152,29 @@ Per `docs/PRIVATE_AI_ARCHITECTURE.md`:
 
 ## Errores / deuda conocida
 
-- Migración 494 pendiente en prod (CEO brief)
-- `CLAUDE.md` cita migración 507 como última; repo tiene 511
-- Cambios locales sin commit (config dev)
+- Ver `KNOWN_ISSUES.md` — KI-011 (SNS), KI-013/014 (SES dominio + sandbox)
+- Fase 2 IA: `NELVYON_AI_ENABLED=0` por diseño
 
 ---
 
-## Próximos pasos (técnicos)
+## Estado operativo (2026-07-10)
 
-## Estado operativo (2026-07-09)
-
-- **Prod Web:** `https://nelvyon.com` — deploy `815e4c0f` SUCCESS
-- **Health:** `GET /api/health/live` → `git_sha: 815e4c0f0e35`
-- **Railway:** proyecto `truthful-respect`, servicio `@nelvyon/web`
-- **Migraciones:** releaseCommand en cada deploy; 494 inferida aplicada — confirmar SQL
-- **Cron CEO brief:** código mitiga `42P01`; verificación HTTP post-deploy pendiente
+| Campo | Valor |
+|-------|-------|
+| **Prod Web** | `https://nelvyon.com` — live/ready OK |
+| **git_sha prod** | `30404800` (redeploy pendiente → `636a47bc`) |
+| **git_sha staging** | `636a47bc` |
+| **Migraciones** | 401–511 en repo; releaseCommand en deploy |
+| **Crons GH** | SUCCESS con `PRODUCTION_BASE_URL` |
 
 ---
 
 ## Próximos pasos técnicos
 
-1. Confirmar migrate 494–511 en producción (SQL o `scripts/check-migration-494.mjs` vía SSH)
-2. Verificar POST `/api/cron/saas-ceo-brief` HTTP 200
-3. Fase 2 IA: activar provider (`NELVYON_AI_ENABLED`) cuando listo
-4. Commitear o descartar cambios setup PC (`config.py`, README)
-5. Arreglar tests CI Elite Gate + `saasWorkflowsS30`
+1. CEO: SES dominio + production access (`CEO_FINAL_ACTIONS.md` §4–5)
+2. CEO: primer run `Database Backup` workflow
+3. Deploy prod con fix `/api/os/health` middleware
+4. **No iniciar Fase 2** hasta ops al 100%
 
 ---
 

@@ -82,7 +82,7 @@ function applyAffiliateRefCookie(request: NextRequest, response: NextResponse): 
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  if (pathname.startsWith("/api/health/")) {
+  if (pathname.startsWith("/api/health/") || pathname === "/api/os/health") {
     return NextResponse.next();
   }
 

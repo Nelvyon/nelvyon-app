@@ -12,7 +12,7 @@
 | **App principal** | `apps/web` (Next.js) |
 | **API Python** | `nelvyon-app-production` (FastAPI) — ver `backend/README.md` |
 | **Dominio público** | `https://nelvyon.com` ✅ (health live OK); `app.nelvyon.com` en env examples — DNS no verificado desde agente |
-| **git_sha verificado** | `815e4c0f0e35` (2026-07-09 post-deploy) |
+| **git_sha verificado** | prod `30404800` / staging `636a47bc` (2026-07-10) |
 | **Base de datos** | Supabase Postgres o Railway Postgres via `DATABASE_URL` |
 | **NODE_ENV** | `production` |
 

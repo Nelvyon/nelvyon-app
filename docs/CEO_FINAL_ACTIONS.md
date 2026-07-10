@@ -7,61 +7,85 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 ---
 
-## 1. GitHub — Backups producción (obligatorio recomendado)
+## 1. GitHub — Backups producción
 
 | Campo | Valor |
 |-------|-------|
-| **Consola** | https://github.com/Nelvyon/nelvyon-app/settings/secrets/actions |
-| **Nombre** | `DATABASE_URL` |
-| **Valor** | Connection string Postgres **producción** (preferible usuario read-only + `pg_dump`) |
-| **Dónde obtenerlo** | Railway → servicio Postgres → `DATABASE_PUBLIC_URL` o `DATABASE_URL` |
-| **Verificación** | Actions → `Database Backup` → Run workflow → job `pg_dump to artifact` SUCCESS + artifact descargable |
-| **Impacto si no** | Sin backups off-site automatizados; RPO depende solo de Railway |
-| **Bloquea Fase 1 100%** | No (código listo; ops incompleto) |
+| **Estado** | ✅ Secret `DATABASE_URL` configurado (2026-07-10) |
+| **Pendiente** | Ejecutar workflow manualmente la primera vez (nunca ha corrido) |
+| **Consola** | https://github.com/Nelvyon/nelvyon-app/actions/workflows/db-backup.yml |
+| **Acción** | **Run workflow** → dejar `allow_missing_secret=false` |
+| **Verificación** | Job `pg_dump to artifact` SUCCESS + artifact descargable |
+| **Bloquea Fase 1 100%** | Sí hasta primer backup verificado |
 
 ---
 
-## 2. GitHub — URL producción para crons (obligatorio recomendado)
+## 2. GitHub — URL producción para crons
 
 | Campo | Valor |
 |-------|-------|
-| **Consola** | https://github.com/Nelvyon/nelvyon-app/settings/variables/actions |
-| **Nombre** | `PRODUCTION_BASE_URL` |
-| **Valor** | `https://nelvyon.com` (sin trailing slash) |
-| **Fallback actual** | `STAGING_BASE_URL` si no existe |
-| **Verificación** | Actions → `Production Cron Executor` → último run SUCCESS; logs muestran URL nelvyon.com |
-| **Impacto si no** | Crons pueden apuntar a staging si `STAGING_BASE_URL` ≠ prod |
-| **Bloquea Fase 1 100%** | No si `STAGING_BASE_URL` ya es prod |
+| **Estado** | ✅ `PRODUCTION_BASE_URL=https://nelvyon.com` (2026-07-10) |
+| **Verificación** | Production Cron Executor SUCCESS en logs |
 
 ---
 
-## 3. GitHub — Cron secret (verificar)
+## 3. GitHub — Cron secret
 
 | Campo | Valor |
 |-------|-------|
-| **Consola** | Settings → Secrets → Actions |
-| **Nombre** | `CRON_SECRET` |
-| **Valor** | ≥16 chars; debe coincidir con Railway `@nelvyon/web` |
-| **Verificación** | `curl -H "x-cron-secret: $CRON_SECRET" https://nelvyon.com/api/cron/status-check` → 200 |
-| **Impacto si no** | Crons GitHub fallan 401 |
-| **Bloquea Fase 1 100%** | Sí (si crons no funcionan en prod) |
+| **Estado** | ✅ `CRON_SECRET` configurado; crons schedule SUCCESS |
+| **Verificación opcional** | `curl -H "x-cron-secret: $CRON_SECRET" https://nelvyon.com/api/cron/status-check` → 200 |
 
 ---
 
-## 4. AWS — SNS SES subscription (obligatorio para bounces)
+## 4. AWS — Verificar dominio SES nelvyon.com (CRÍTICO)
 
 | Campo | Valor |
 |-------|-------|
-| **Consola** | AWS SES → Configuration → Notifications → Amazon SNS |
-| **Acción** | Confirmar subscription pendiente al webhook `https://nelvyon.com/api/webhooks/ses` |
-| **Verificación** | Enviar email test; bounce aparece en logs; tabla `saas_email_bounces` |
-| **Referencia** | KI-011 en `docs/KNOWN_ISSUES.md` |
-| **Impacto si no** | Bounces no procesados; reputación email degradada |
-| **Bloquea Fase 1 100%** | No código; sí ops email enterprise |
+| **Estado** | ❌ `VerificationStatus: PENDING`, `SendingEnabled: false` |
+| **Consola** | AWS SES → Verified identities → nelvyon.com |
+| **Acción DNS** | Añadir registro **TXT** en Cloudflare DNS con token de verificación SES |
+| **Token actual** | Visible en consola SES (no copiar en docs) |
+| **Verificación** | SES muestra **Verified**; `SendingEnabled: true` |
+| **Bloquea Fase 1 100%** | **Sí** — sin dominio verificado no hay email prod real |
 
 ---
 
-## 5. Sentry — Alertas producción (recomendado)
+## 5. AWS — Solicitar acceso producción SES (CRÍTICO)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ❌ `ProductionAccessEnabled: false` (sandbox: solo emails verificados) |
+| **Consola** | AWS SES → Account dashboard → **Request production access** |
+| **Datos** | Caso de uso: SaaS B2B transaccional + campañas opt-in |
+| **Verificación** | `aws sesv2 get-account` → `ProductionAccessEnabled: true` |
+| **Bloquea Fase 1 100%** | **Sí** para campañas a audiencias reales |
+
+---
+
+## 6. AWS — SNS SES subscription (bounces)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ❌ 0 SNS subscriptions activas |
+| **Consola** | AWS SES → Notifications → configurar bounce/complaint → SNS → confirmar subscription al webhook `https://nelvyon.com/api/webhooks/ses` |
+| **Referencia** | KI-011 |
+| **Bloquea Fase 1 100%** | Sí para reputación email enterprise |
+
+---
+
+## 7. Railway — Redeploy producción (recomendado)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | 🟡 Prod `git_sha: 30404800` vs repo `636a47bc` |
+| **Consola** | Railway → proyecto `truthful-respect` → environment **production** → servicio Web |
+| **Acción** | **Redeploy** último commit `main` (incluye fix middleware `/api/os/health`) |
+| **Verificación** | `GET /api/health/live` → `git_sha` empieza por `636a47bc` |
+
+---
+
+## 8. Sentry — Alertas producción (recomendado)
 
 | Campo | Valor |
 |-------|-------|
@@ -73,7 +97,7 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 ---
 
-## 6. Cloudflare — WAF (recomendado)
+## 9. Cloudflare — WAF (recomendado)
 
 | Campo | Valor |
 |-------|-------|
@@ -85,7 +109,7 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 ---
 
-## 7. Observabilidad externa (opcional)
+## 10. Observabilidad externa (opcional)
 
 | Ítem | Consola / servicio | Notas |
 |------|-------------------|-------|
@@ -95,7 +119,7 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 ---
 
-## 8. Railway — SSH ops (opcional)
+## 11. Railway — SSH ops (opcional)
 
 | Campo | Valor |
 |-------|-------|
@@ -126,12 +150,13 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 | Acción | Prioridad | Bloquea 100% |
 |--------|-----------|--------------|
-| DATABASE_URL backup | Alta | No |
-| PRODUCTION_BASE_URL | Alta | No* |
-| CRON_SECRET verificado | Alta | Condicional |
-| SNS SES confirm | Media | No |
+| SES dominio verificado | **Crítica** | **Sí** |
+| SES production access | **Crítica** | **Sí** |
+| Primer backup workflow | Alta | **Sí** |
+| SNS SES confirm | Alta | Sí (bounces) |
+| Redeploy prod Railway | Alta | No (pero recomendado) |
+| PRODUCTION_BASE_URL | — | ✅ Hecho |
+| DATABASE_URL secret | — | ✅ Hecho |
+| CRON_SECRET | — | ✅ Hecho |
 | Sentry | Baja | No |
 | Cloudflare WAF | Baja | No |
-| Prometheus/logs externos | Opcional | No |
-
-\* Bloquea solo si crons no apuntan a producción real.

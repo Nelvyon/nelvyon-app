@@ -4,7 +4,12 @@
 
 ## Resumen ejecutivo
 
-**Fase 1 completada técnicamente en repositorio.** P0–P4 implementadas y validadas localmente. Pendiente únicamente activaciones manuales del CEO (backups off-site, SNS SES, opcionales Sentry/WAF).
+**Fase 1 código cerrada.** Ops al 100% bloqueada por SES (dominio PENDING + sandbox) y primer backup manual.
+
+| Métrica | Valor |
+|---------|-------|
+| **Fase 1 código** | ✅ 100% |
+| **Fase 1 ops** | 🟡 ~85% — CEO: SES, backup run, redeploy prod |
 
 ---
 

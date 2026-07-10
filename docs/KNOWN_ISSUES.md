@@ -37,6 +37,28 @@
 
 ---
 
+### KI-013 — AWS SES dominio nelvyon.com sin verificar
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | **Alta** (bloquea email prod) |
+| **Detalle** | `VerificationStatus: PENDING`, `SendingEnabled: false` (verificado AWS CLI 2026-07-10) |
+| **Fix** | CEO — TXT DNS en Cloudflare + verificar en consola SES |
+| **Bloquea Fase 1 100%** | Sí |
+
+---
+
+### KI-014 — AWS SES en sandbox (sin production access)
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | **Alta** |
+| **Detalle** | `ProductionAccessEnabled: false` — solo destinatarios verificados |
+| **Fix** | CEO — Request production access en consola SES |
+| **Bloquea Fase 1 100%** | Sí para campañas reales |
+
+---
+
 ### KI-011 — SNS SES subscription sin confirmar
 
 | Campo | Valor |

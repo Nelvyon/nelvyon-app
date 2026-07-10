@@ -16,18 +16,17 @@
 
 ---
 
+> Actualizado: **2026-07-10** — auditoría cierre Fase 1
+
+---
+
 ## P2 — Operación enterprise
 
-- [x] Health checks + Railway healthcheckPath
-- [x] Prod env validation (`prodEnvValidation.ts`)
-- [x] Status monitoring (statusChecker + cron status-check)
-- [x] Ops summary API + cron/webhook registry
-- [x] Crons en production-cron.yml
-- [x] Log rotation Python
-- [x] Backup GH Action + SQLite verify CI
-- [x] Documentación OPS / INFRASTRUCTURE
-- [ ] CEO: `DATABASE_URL` secret GitHub (backup prod) — ver `CEO_FINAL_ACTIONS.md` §1
-- [ ] CEO: SNS SES subscription (KI-011) — ver `CEO_FINAL_ACTIONS.md` §4
+- [x] Completado
+- [x] CEO: `DATABASE_URL` secret GitHub (2026-07-10)
+- [x] CEO: `PRODUCTION_BASE_URL` variable (2026-07-10)
+- [ ] CEO: primer run workflow `Database Backup`
+- [ ] CEO: SNS SES + dominio SES verificado (KI-011, KI-013, KI-014)
 
 ---
 
