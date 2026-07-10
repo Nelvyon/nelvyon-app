@@ -43,12 +43,12 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ❌ `VerificationStatus: PENDING`, `SendingEnabled: false` |
-| **Consola** | AWS SES → Verified identities → nelvyon.com |
-| **Acción DNS** | Añadir registro **TXT** en Cloudflare DNS con token de verificación SES |
-| **Token actual** | Visible en consola SES (no copiar en docs) |
-| **Verificación** | SES muestra **Verified**; `SendingEnabled: true` |
-| **Bloquea Fase 1 100%** | **Sí** — sin dominio verificado no hay email prod real |
+| **Estado** | ❌ `VerificationStatus: PENDING`, `ErrorType: HOST_NOT_FOUND` — **falta DNS** |
+| **Causa** | `_amazonses.nelvyon.com` TXT no existe en Cloudflare |
+| **Guía** | `docs/SES_PRODUCTION_SETUP.md` §1 |
+| **Automatizable** | `node scripts/apply-ses-dns-cloudflare.mjs` (requiere `CLOUDFLARE_API_TOKEN`) |
+| **Manual** | Cloudflare → DNS → 1 TXT + 3 CNAME DKIM (proxy OFF) |
+| **Verificación** | `node scripts/audit-ses-production.mjs` → Domain SUCCESS |
 
 ---
 
@@ -56,11 +56,12 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ❌ `ProductionAccessEnabled: false` (sandbox: solo emails verificados) |
-| **Consola** | AWS SES → Account dashboard → **Request production access** |
-| **Datos** | Caso de uso: SaaS B2B transaccional + campañas opt-in |
-| **Verificación** | `aws sesv2 get-account` → `ProductionAccessEnabled: true` |
-| **Bloquea Fase 1 100%** | **Sí** para campañas a audiencias reales |
+| **Estado** | ❌ `ProductionAccessEnabled: false`, **`ReviewDetails.Status: DENIED`** |
+| **CaseId AWS** | `178372013800016` |
+| **CLI intentado** | `put-account-details` — enviado, **rechazado por AWS** |
+| **Consola** | [SES Account dashboard eu-west-1](https://eu-west-1.console.aws.amazon.com/ses/home?region=eu-west-1#/account) → **Request production access** / reopen case en Support |
+| **Datos use-case** | Ver `docs/SES_PRODUCTION_SETUP.md` §2 |
+| **Verificación** | `aws sesv2 get-account --region eu-west-1 --query ProductionAccessEnabled` → `true` |
 
 ---
 
@@ -68,10 +69,11 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ❌ 0 SNS subscriptions activas |
-| **Consola** | AWS SES → Notifications → configurar bounce/complaint → SNS → confirmar subscription al webhook `https://nelvyon.com/api/webhooks/ses` |
-| **Referencia** | KI-011 |
-| **Bloquea Fase 1 100%** | Sí para reputación email enterprise |
+| **Estado** | ✅ **COMPLETADO** (2026-07-10) |
+| **Topic** | `arn:aws:sns:eu-west-1:354780327276:nelvyon-ses-events` |
+| **Endpoint** | `https://nelvyon.com/api/webhooks/ses` — suscripción **confirmada** |
+| **Config set** | `nelvyon-prod` → BOUNCE, COMPLAINT, DELIVERY |
+| **Verificación** | `node scripts/audit-ses-production.mjs` |
 
 ---
 
@@ -151,10 +153,9 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 | Acción | Prioridad | Bloquea 100% |
 |--------|-----------|--------------|
-| SES dominio verificado | **Crítica** | **Sí** |
-| SES production access | **Crítica** | **Sí** |
-| Primer backup workflow | Alta | **Sí** |
-| SNS SES confirm | Alta | Sí (bounces) |
+| SES dominio verificado | **Crítica** | **Sí** — DNS Cloudflare (§4 CEO_FINAL_ACTIONS) |
+| SES production access | **Crítica** | **Sí** — appeal caso DENIED (§5) |
+| SNS SES webhook | — | ✅ Hecho 2026-07-10 |
 | Redeploy prod Railway | Alta | No (pero recomendado) |
 | PRODUCTION_BASE_URL | — | ✅ Hecho |
 | `CRON_SECRET` | — | ✅ Sincronizado Railway + GitHub (2026-07-10) |
