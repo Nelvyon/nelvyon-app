@@ -11,12 +11,13 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ✅ Secret `DATABASE_URL` configurado (2026-07-10) |
-| **Pendiente** | Ejecutar workflow manualmente la primera vez (nunca ha corrido) |
-| **Consola** | https://github.com/Nelvyon/nelvyon-app/actions/workflows/db-backup.yml |
-| **Acción** | **Run workflow** → dejar `allow_missing_secret=false` |
-| **Verificación** | Job `pg_dump to artifact` SUCCESS + artifact descargable |
-| **Bloquea Fase 1 100%** | Sí hasta primer backup verificado |
+| **Estado** | 🟡 Secret `DATABASE_URL` usa hostname **interno** Railway — backup falló |
+| **Acción requerida** | Añadir secret `DATABASE_PUBLIC_URL` con URL **pública** de Postgres |
+| **Consola GitHub** | https://github.com/Nelvyon/nelvyon-app/settings/secrets/actions |
+| **Dónde obtenerlo** | Railway → production → Postgres → **Connect** → **Public Network** → copy URL |
+| **Nombre secret** | `DATABASE_PUBLIC_URL` (preferido) o reemplazar `DATABASE_URL` por URL pública |
+| **Verificación** | Actions → `Database Backup` → Run workflow → SUCCESS + artifact |
+| **Bloquea Fase 1 100%** | **Sí** |
 
 ---
 

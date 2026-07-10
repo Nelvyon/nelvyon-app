@@ -37,27 +37,39 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y postgresql-client
-          pip install sqlalchemy psycopg2-binary
+          pip install sqlalchemy psycopg2-binary pytest
 
-      - name: Require DATABASE_URL on schedule
+      - name: Validate DATABASE_URL is reachable from GitHub Actions
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_PUBLIC_URL || secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::Set DATABASE_PUBLIC_URL (preferred) or DATABASE_URL in GitHub secrets"
+            exit 1
+          fi
+          if echo "$DATABASE_URL" | grep -q 'railway\.internal'; then
+            echo "::error::DATABASE_URL uses postgres.railway.internal — GitHub Actions cannot reach it."
+            echo "Use Railway Postgres → Connect → Public URL as secret DATABASE_PUBLIC_URL"
+            exit 1
+          fi
+
+      - name: Require backup URL on schedule
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_PUBLIC_URL || secrets.DATABASE_URL }}
           ALLOW_MISSING: ${{ github.event.inputs.allow_missing_secret || 'false' }}
           IS_SCHEDULE: ${{ github.event_name == 'schedule' }}
         run: |
           if [ -z "$DATABASE_URL" ]; then
             if [ "$IS_SCHEDULE" = "true" ] || [ "$ALLOW_MISSING" != "true" ]; then
-              echo "::error::DATABASE_URL secret not configured — backup cannot run"
-              echo "Configure in GitHub Settings → Secrets → Actions (see docs/CEO_FINAL_ACTIONS.md)"
+              echo "::error::DATABASE_PUBLIC_URL (or DATABASE_URL) not configured"
               exit 1
             fi
-            echo "DATABASE_URL missing — skip (manual allow_missing_secret=true)"
             exit 0
           fi
 
       - name: Create backup
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_PUBLIC_URL || secrets.DATABASE_URL }}
         run: |
           if [ -z "$DATABASE_URL" ]; then
             echo "Skipped — no DATABASE_URL"
@@ -88,4 +100,6 @@ jobs:
         with:
           python-version: "3.11"
       - name: Verify SQLite backup/restore
-        run: cd backend && python -m pytest tests/test_backup_phase1.py -q
+        run: |
+          pip install pytest sqlalchemy
+          cd backend && python -m pytest tests/test_backup_phase1.py -q
