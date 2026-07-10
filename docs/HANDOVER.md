@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-10 00:53 UTC**
+> Última actualización automática: **2026-07-10 02:10 UTC**
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `af8179ec` — `feat(phase1): complete P3/P4 hardening, security gates, and CEO checklist` |
+| **Último commit** | `bd1e4aee` — `fix(tests): GoogleOAuthProvider constructor mock for vitest 4` |
 | **Fecha doc** | 2026-07-10 |
-| **Rama** | `main` (ahead 1) |
+| **Rama** | `main` (sync with origin) |
 | **Prod** | `https://nelvyon.com` |
 | **Fase 1** | **COMPLETADA TÉCNICAMENTE** — pendiente activaciones CEO |
 | **P0–P2** | ✅ Validadas (sin regresión crítica 2026-07-10) |
