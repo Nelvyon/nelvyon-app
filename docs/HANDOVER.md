@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-10 01:45 UTC**
+> Última actualización automática: **2026-07-10 02:15 UTC**
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | fix CI deploy-wait soft mode (pendiente push) |
+| **Último commit** | `9937fb10` — `fix(ci): soft deploy wait when Railway skips scripts-only rebuild` |
 | **Rama** | `main` (sync with origin) |
-| **Prod** | `https://nelvyon.com` — git_sha `925add03` (Railway no rebuild en pushes scripts-only) |
+| **Prod** | `https://nelvyon.com` |
 | **Staging** | `https://ideal-victory-staging.up.railway.app` |
-| **P1** | 🟡 Staging Elite Gate re-run post deploy-wait soft fix |
+| **P1** | ✅ **COMPLETADA** (CI verde; SNS SES pendiente CEO) |
 
 ---
 
@@ -23,21 +23,21 @@
 |------|--------|
 | Migrate 494 prod + cron CEO brief | ✅ |
 | Pack + audit wire + e2e tests | ✅ |
-| Web Quality Gates CI | ✅ SUCCESS `29041445107` (`728f7b08`) |
-| Staging Elite Gate CI | 🟡 FAIL deploy SHA timeout → fix `DEPLOY_WAIT_SOFT` |
+| Web Quality Gates CI | ✅ SUCCESS `29041445107` |
+| Staging Elite Gate CI | ✅ SUCCESS `29058208980` |
 | `releaseCommand` → `migrate:prod` | ✅ |
-| SNS SES subscription | ❌ CEO/AWS |
+| SNS SES subscription | ❌ CEO/AWS (no bloquea código) |
 
 ---
 
 ## Próximo paso
 
-Push deploy-wait soft fix → verificar Staging Elite Gate verde → **P1 COMPLETADA**. No iniciar P2.
+**Iniciar P2** — flujo dev diario + seed demo local. CEO: confirmar SNS SES en AWS.
 
 ---
 
 ## Contexto rápido
 
 - `apps/web` = prod Next.js; `backend/` = TS + FastAPI
-- Railway solo rebuild Web en cambios `apps/web/**`; commits scripts/CI no actualizan git_sha prod
+- Railway rebuild Web solo en `apps/web/**`; `DEPLOY_WAIT_SOFT` en elite gate
 - Migrar prod: `DATABASE_URL=$DATABASE_PUBLIC_URL pnpm -C apps/web migrate`

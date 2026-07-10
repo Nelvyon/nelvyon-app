@@ -1,10 +1,10 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-09** (P1 cierre)
+> Actualizado: **2026-07-10** (P1 completada)
 
 ## Resumen ejecutivo
 
-**P1 ~99%** — código y validación local completos. Migración 494 en prod, cron CEO brief OK, e2e + pack + audit wire tests corregidos. Pendiente confirmación CI Web Quality Gates (full regression).
+**P1 cerrada al 100% en código, validación local y CI.** Migración 494 en prod, cron CEO brief OK, Web Quality Gates + Staging Elite Gate verdes, releaseCommand enterprise unificado.
 
 ---
 
@@ -13,7 +13,7 @@
 | Métrica | Valor |
 |---------|-------|
 | **Completitud Fase 1** | **~99%** |
-| **P1 Estabilidad/ops** | **~99%** — CI Web Quality Gates re-run |
+| **P1 Estabilidad/ops** | **100%** (SNS SES = CEO ops) |
 | **Completitud global** | ~85% |
 
 ---
@@ -23,7 +23,7 @@
 | Área | Estado |
 |------|--------|
 | **Producción** | ✅ |
-| **Staging** | ✅ redeploy `925add03` |
-| **Tests / CI** | 🟡 Web Quality Gates re-run |
+| **Staging** | ✅ |
+| **Tests / CI** | ✅ Web Quality Gates + Staging Elite Gate |
 | **Migraciones** | ✅ prod hasta 511 |
 | **Documentación** | ✅ |

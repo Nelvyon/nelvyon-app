@@ -38,13 +38,13 @@
 
 ## Historial resuelto
 
-### KI-R008 — CI regression: saasI18nAuditWireS34 mocks incompletos
+### KI-R008 — Staging Elite Gate fallaba por deploy SHA timeout
 
 | Campo | Valor |
 |-------|-------|
-| **Resuelto** | 2026-07-09 |
-| **Causa** | `executeWorkflow` consulta runs `running` recientes; mock devolvía `wfRow` → `toISOString` en undefined |
-| **Solución** | `mockResolvedValueOnce([])` antes de `getWorkflow` en audit wire tests |
+| **Resuelto** | 2026-07-10 |
+| **Causa** | Railway no rebuild en pushes scripts-only; gate esperaba SHA indefinidamente |
+| **Solución** | `DEPLOY_WAIT_SOFT` + timeout 10m; local-pack-e2e alineado con ecommerce smokes |
 
 ---
 
