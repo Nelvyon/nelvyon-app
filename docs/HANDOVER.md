@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-10 02:15 UTC**
+> Última actualización automática: **2026-07-10 00:19 UTC**
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `9937fb10` — `fix(ci): soft deploy wait when Railway skips scripts-only rebuild` |
+| **Último commit** | `5e9c4134` — `docs(P1): mark stability gate complete — CI green, handover sync` |
 | **Rama** | `main` (sync with origin) |
 | **Prod** | `https://nelvyon.com` |
 | **Staging** | `https://ideal-victory-staging.up.railway.app` |
