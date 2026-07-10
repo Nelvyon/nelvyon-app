@@ -8,7 +8,7 @@
 
 | Hora (aprox) | Archivo / área | Cambio | Descripción |
 |--------------|----------------|--------|-------------|
-| 02:55 | P3/P4 Fase 1 | Completado | optimizePackageImports, overrides pnpm, security-gates, Dependabot, CEO checklist |
+| 01:07 | `agent.flow.test.ts`, billing, queue | Fix | Vitest 3 constructor mocks Redis/Stripe (CI regresión post-override) |
 | 02:50 | `pnpm audit` | PASS critical | 0 critical tras overrides ws/axios/vitest |
 | 02:46 | `run-phase1-audit.mjs` | PASS | migrations, typecheck, lint, elite reinforce |
 | 02:45 | `pnpm build` | PASS | Build producción apps/web |
