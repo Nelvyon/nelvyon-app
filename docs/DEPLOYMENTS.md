@@ -21,6 +21,16 @@
 
 ---
 
+## 2026-07-10 — P2 Ops enterprise
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | env validation, statusChecker, ops API, crons, backup workflow, log rotation |
+| **Docs** | `docs/OPS.md` |
+| **CEO pendiente** | GitHub secret `DATABASE_URL` para backup prod |
+
+---
+
 ## 2026-07-10 — Staging Elite Gate SUCCESS
 
 | Campo | Valor |

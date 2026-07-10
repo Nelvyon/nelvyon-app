@@ -11,7 +11,8 @@
 | 17:02 | Postgres prod | Migrate | 482–511 vía `DATABASE_PUBLIC_URL`; **494 aplicada** |
 | 17:02 | Cron CEO brief | Verificado | `processed:1`, email+stored; run `29035626812` |
 | 18:55 | CI Web Quality Gates | SUCCESS | run `29041445107` commit `728f7b08` |
-| 02:10 | CI Staging Elite Gate | SUCCESS | run `29058208980` commit `9937fb10` |
+| 02:30 | P2 ops | Completado | env validation, statusChecker, ops API, crons, backup, logs |
+| 02:10 | CI Staging Elite Gate | SUCCESS | run `29058208980` |
 | 01:45 | `wait-for-deploy.mjs` | Fix | `DEPLOY_WAIT_SOFT` — proceed on health OK si SHA no match |
 | 20:15 | `e2e/launch.spec.ts` | Fix | `/api/saas/certificados` es API real (401), no stub 410 |
 | 19:53 | CI local | PASS | `run-local-elite-reinforce` 215 pack tests |

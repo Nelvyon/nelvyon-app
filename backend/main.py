@@ -37,6 +37,8 @@ def setup_logging():
     if os.environ.get("IS_LAMBDA") == "true":
         return
 
+    from logging.handlers import RotatingFileHandler
+
     from core.observability import (
         NelvyonJsonFormatter,
         NelvyonTextFormatter,
@@ -48,8 +50,9 @@ def setup_logging():
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = f"{log_dir}/app_{timestamp}.log"
+    log_file = f"{log_dir}/app.log"
+    max_bytes = int(os.environ.get("LOG_ROTATE_MAX_BYTES", str(10 * 1024 * 1024)))
+    backup_count = int(os.environ.get("LOG_ROTATE_BACKUP_COUNT", "5"))
 
     log_level = logging.DEBUG if IS_DEV else logging.INFO
     use_json = log_format_from_environment() == "json"
@@ -60,7 +63,12 @@ def setup_logging():
     root.handlers.clear()
     root.setLevel(log_level)
 
-    file_handler = logging.FileHandler(log_file, encoding="utf-8")
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=max_bytes,
+        backupCount=backup_count,
+        encoding="utf-8",
+    )
     stream_handler = logging.StreamHandler(sys.stdout)
     for h in (file_handler, stream_handler):
         h.setLevel(log_level)

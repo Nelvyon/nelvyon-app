@@ -1,0 +1,66 @@
+name: Database Backup
+
+# Weekly Postgres backup — requires secret DATABASE_URL (production read-only recommended).
+# Artifacts retained 30 days. Restore drill: see BACKUP_CHECKLIST.md
+
+on:
+  schedule:
+    - cron: "0 2 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: pg_dump to artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pg client + SQLAlchemy
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+          pip install sqlalchemy psycopg2-binary
+
+      - name: Create backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL secret not configured — skip backup"
+            exit 0
+          fi
+          mkdir -p backups
+          python backend/scripts/db_backup_restore.py backup \
+            --database-url "$DATABASE_URL" \
+            --output-dir backups
+          ls -la backups/
+
+      - name: Upload backup artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nelvyon-db-backup-${{ github.run_number }}
+          path: backups/*
+          retention-days: 30
+        continue-on-error: true
+
+  verify-sqlite:
+    name: SQLite backup round-trip (CI)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify SQLite backup/restore
+        run: cd backend && python -m pytest tests/test_backup_phase1.py -q

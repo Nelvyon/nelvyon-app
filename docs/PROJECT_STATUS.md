@@ -1,10 +1,10 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-10** (P1 completada)
+> Actualizado: **2026-07-10** (P2 completada)
 
 ## Resumen ejecutivo
 
-**P1 cerrada al 100% en código, validación local y CI.** Migración 494 en prod, cron CEO brief OK, Web Quality Gates + Staging Elite Gate verdes, releaseCommand enterprise unificado.
+**P2 cerrada al 100% en código y CI.** Operación enterprise: health tiered, env validation, status monitoring, ops dashboard API, crons completos, backups automatizados, log rotation, documentación ops.
 
 ---
 
@@ -13,8 +13,9 @@
 | Métrica | Valor |
 |---------|-------|
 | **Completitud Fase 1** | **~99%** |
-| **P1 Estabilidad/ops** | **100%** (SNS SES = CEO ops) |
-| **Completitud global** | ~85% |
+| **P1 Estabilidad** | **100%** |
+| **P2 Operación** | **100%** (CEO: backup secret + SNS) |
+| **Completitud global** | ~88% |
 
 ---
 
@@ -23,7 +24,7 @@
 | Área | Estado |
 |------|--------|
 | **Producción** | ✅ |
-| **Staging** | ✅ |
-| **Tests / CI** | ✅ Web Quality Gates + Staging Elite Gate |
-| **Migraciones** | ✅ prod hasta 511 |
-| **Documentación** | ✅ |
+| **Observabilidad** | ✅ base; Prometheus deploy externo opcional |
+| **Backups** | ✅ CI + workflow; prod requiere CEO secret |
+| **Crons / webhooks** | ✅ registry + GH Actions |
+| **Documentación ops** | ✅ `docs/OPS.md` |

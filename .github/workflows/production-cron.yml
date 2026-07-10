@@ -1,7 +1,7 @@
 name: Production Cron Executor
 
-# Replaces a dedicated Railway cron service — hits nelvyon.com on schedule.
-# Requires: repository variable STAGING_BASE_URL + secret CRON_SECRET
+# Replaces a dedicated Railway cron service — hits production URL on schedule.
+# Requires: vars.PRODUCTION_BASE_URL (or STAGING_BASE_URL fallback) + secret CRON_SECRET
 
 on:
   schedule:
@@ -15,7 +15,8 @@ on:
     - cron: "0 9 * * 1"     # os-competitor-gap digest (Mondays 09:00 UTC)
     - cron: "0 4 * * *"     # saas-elite-maintenance (daily 04:00 UTC)
     - cron: "0 3 * * *"     # os-sector-certification (daily 03:00 UTC)
-    - cron: "0 5 * * *"     # stripe-meter-flush (daily 05:00 UTC)
+    - cron: "*/10 * * * *"  # status-check (public status page probes)
+    - cron: "0 10 * * 1"    # saas-competitor-gap digest (Mondays 10:00 UTC)
   workflow_dispatch:
     inputs:
       job:
@@ -36,6 +37,9 @@ on:
           - saas-elite-maintenance
           - os-sector-certification
           - stripe-meter-flush
+          - status-check
+          - local-pack-email-queue
+          - saas-competitor-gap
           - pwa-push-dispatch
           - all
 
@@ -51,7 +55,7 @@ jobs:
     steps:
       - name: Trigger pwa-push-dispatch cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
@@ -68,7 +72,7 @@ jobs:
     steps:
       - name: Trigger saas-workflows cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
@@ -85,7 +89,7 @@ jobs:
     steps:
       - name: Trigger social-publish cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
@@ -102,7 +106,7 @@ jobs:
     steps:
       - name: Trigger workflow-date cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
@@ -120,7 +124,7 @@ jobs:
     steps:
       - name: Trigger saas-dunning cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
@@ -137,7 +141,7 @@ jobs:
     steps:
       - name: Trigger saas-sequences cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
@@ -154,7 +158,7 @@ jobs:
     steps:
       - name: Trigger saas-ceo-brief cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
@@ -171,7 +175,7 @@ jobs:
     steps:
       - name: Trigger os-recurring-services cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
@@ -188,7 +192,7 @@ jobs:
     steps:
       - name: Trigger os-learning-loop cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
@@ -205,7 +209,7 @@ jobs:
     steps:
       - name: Trigger os-competitor-gap cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
@@ -222,7 +226,7 @@ jobs:
     steps:
       - name: Trigger saas-elite-maintenance cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
@@ -239,7 +243,7 @@ jobs:
     steps:
       - name: Trigger os-sector-certification cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
@@ -256,12 +260,63 @@ jobs:
     steps:
       - name: Trigger stripe-meter-flush cron
         env:
-          BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
             -H "Authorization: Bearer $CRON_SECRET" \
             "$BASE_URL/api/cron/stripe-meter-flush")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  status-check:
+    if: github.event.schedule == '*/10 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'status-check' || github.event.inputs.job == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger status-check cron
+        env:
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
+            -H "x-cron-secret: $CRON_SECRET" \
+            "$BASE_URL/api/cron/status-check")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  local-pack-email-queue:
+    if: github.event.schedule == '*/15 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'local-pack-email-queue' || github.event.inputs.job == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger local-pack-email-queue cron
+        env:
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
+            -H "x-cron-secret: $CRON_SECRET" \
+            "$BASE_URL/api/cron/local-pack-email-queue")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  saas-competitor-gap:
+    if: github.event.schedule == '0 10 * * 1' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'saas-competitor-gap' || github.event.inputs.job == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger saas-competitor-gap cron
+        env:
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/saas-competitor-gap")
           echo "HTTP $code"
           cat /tmp/cron.out
           test "$code" = "200" -o "$code" = "204"

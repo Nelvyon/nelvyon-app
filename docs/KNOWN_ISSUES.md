@@ -38,6 +38,16 @@
 
 ## Historial resuelto
 
+### KI-R009 — Status page probes externos fallaban
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-10 |
+| **Causa** | statusChecker usaba URLs AWS/Stripe incorrectas; DB no usaba health checks reales |
+| **Solución** | Probes internos + checkDatabase/checkStripe/checkSES; cron status-check en GH Actions |
+
+---
+
 ### KI-R008 — Staging Elite Gate fallaba por deploy SHA timeout
 
 | Campo | Valor |

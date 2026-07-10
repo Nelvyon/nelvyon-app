@@ -69,6 +69,9 @@
 | Ruta | Entorno | Auth |
 |------|---------|------|
 | `/api/health/live` | Todos | Público |
+| `/api/health/ready` | Todos | Público |
+| `/api/health/deep` | Prod | `CRON_SECRET` |
+| `/api/platform/ops/summary` | Prod | Platform admin / `CRON_SECRET` |
 | `/api/saas/*` | Prod/dev | JWT cookie |
 | `/api/cron/*` | Prod | `CRON_SECRET` Bearer |
 | `/api/webhooks/stripe` | Prod | Stripe signature |

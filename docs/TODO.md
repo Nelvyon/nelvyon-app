@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-10** (P1 completada)
+> Actualizado: **2026-07-10** (P2 completada)
 
 ---
 
@@ -12,22 +12,22 @@
 
 ## P1 — Estabilidad y ops
 
-- [x] Migrate 494 + cron CEO brief
-- [x] Pack orchestrator tests
-- [x] E2E launch.spec certificados 401
-- [x] Audit wire regression mocks
-- [x] Elite reinforce + gate + build local
-- [x] releaseCommand `migrate:prod` + Dockerfile
-- [x] Web Quality Gates CI SUCCESS (`29041445107`)
-- [x] Staging Elite Gate CI SUCCESS (`29058208980`)
-- [ ] SNS SES subscription (CEO/AWS — ops, no bloquea P1)
+- [x] Completado (SNS SES = CEO ops)
 
 ---
 
-## P2 — Habilitado
+## P2 — Operación enterprise
 
-- [ ] Flujo diario `pnpm -C apps/web dev`
-- [ ] Seed demo local
+- [x] Health checks + Railway healthcheckPath
+- [x] Prod env validation (`prodEnvValidation.ts`)
+- [x] Status monitoring fix (statusChecker + cron status-check)
+- [x] Ops summary API + cron/webhook registry
+- [x] Crons faltantes en production-cron.yml
+- [x] Log rotation Python (RotatingFileHandler)
+- [x] Backup GH Action + SQLite verify CI
+- [x] Documentación OPS / INFRASTRUCTURE
+- [ ] CEO: `DATABASE_URL` secret en GitHub para backup prod
+- [ ] CEO: SNS SES subscription (KI-011)
 
 ---
 

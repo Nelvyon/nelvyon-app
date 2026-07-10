@@ -5,6 +5,8 @@
     "dockerfilePath": "apps/web/Dockerfile"
   },
   "deploy": {
-    "releaseCommand": "pnpm migrate:prod"
+    "releaseCommand": "pnpm migrate:prod",
+    "healthcheckPath": "/api/health/live",
+    "healthcheckTimeout": 120
   }
 }
