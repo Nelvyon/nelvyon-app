@@ -16,6 +16,7 @@ on:
       - "backend/**"
       - "packages/nelvyon-sdk/**"
       - ".github/workflows/web-quality-gates.yml"
+  workflow_dispatch:
 
 jobs:
   web-gates:
