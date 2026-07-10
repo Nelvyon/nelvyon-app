@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización automática: **2026-07-10 00:30 UTC**
+> Última actualización automática: **2026-07-10 02:55 UTC**
 
 ---
 
@@ -9,37 +9,54 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | P2 ops enterprise (pendiente push) |
+| **Último commit** | `88bfd597` — `docs: sync HANDOVER metadata after P2 push` |
+| **Fecha doc** | 2026-07-10 |
 | **Rama** | `main` (sync with origin) |
 | **Prod** | `https://nelvyon.com` |
-| **P1** | ✅ COMPLETADA |
-| **P2** | ✅ COMPLETADA (código + CI; CEO: DATABASE_URL backup secret, SNS SES) |
+| **Fase 1** | **COMPLETADA TÉCNICAMENTE** — pendiente activaciones CEO |
+| **P0–P2** | ✅ Validadas (sin regresión crítica 2026-07-10) |
+| **P3–P4** | ✅ Completadas en repositorio |
+| **Auditoría final** | ✅ Local `PHASE1_AUDIT_PASS` + build OK |
 
 ---
 
-## P2 — resumen ops
+## P3 — consolidación (resumen)
 
 | Ítem | Estado |
 |------|--------|
-| Health tiered + Railway healthcheck | ✅ |
-| Prod env validation fail-fast | ✅ |
-| Status page probes (statusChecker) | ✅ |
-| Ops summary API `/api/platform/ops/summary` | ✅ |
-| Cron registry + 3 crons faltantes en GH Actions | ✅ |
-| Log rotation Python | ✅ |
-| Backup GH Action semanal + verify SQLite CI | ✅ |
-| Docs OPS + INFRASTRUCTURE | ✅ |
+| `optimizePackageImports` Next.js (lucide, radix, recharts…) | ✅ |
+| Overrides pnpm (`ws`, `axios`, `vitest`) en `pnpm-workspace.yaml` | ✅ |
+| Validador migraciones 508–511 | ✅ |
+| Script auditoría local `run-phase1-audit.mjs` | ✅ |
+| Typecheck + lint + elite reinforce | ✅ |
+| Build producción `pnpm build` | ✅ |
 
 ---
 
-## Próximo paso
+## P4 — hardening (resumen)
 
-**P3** — activar provider LLM (no iniciar hasta confirmación CEO).  
-CEO: `DATABASE_URL` en GitHub secrets para backup; SNS SES confirm.
+| Ítem | Estado |
+|------|--------|
+| Workflow `security-gates.yml` (audit critical, Gitleaks, migrations) | ✅ |
+| Dependabot npm + github-actions | ✅ |
+| Backup fail-fast sin `DATABASE_URL` en schedule | ✅ |
+| Checklist CEO `docs/CEO_FINAL_ACTIONS.md` | ✅ |
+| 0 vulnerabilidades **critical** en `pnpm audit` (apps/web) | ✅ |
+| 17 high documentadas (transitive; gate solo critical) | 🟡 |
+
+---
+
+## Próximo paso EXACTO
+
+**CEO:** ejecutar checklist en `docs/CEO_FINAL_ACTIONS.md` (orden 1→8).  
+**Después:** declarar Fase 1 al 100% cuando CEO verifique backups, crons prod y SNS SES.  
+**No iniciar Fase 2** (LLM/MCP/RAG/agentes) hasta cierre CEO.
 
 ---
 
 ## Contexto rápido
 
 - Ops runbook: `docs/OPS.md`
+- Acciones manuales: `docs/CEO_FINAL_ACTIONS.md`
+- Auditoría local: `node scripts/run-phase1-audit.mjs`
 - Migrar prod: `DATABASE_URL=$DATABASE_PUBLIC_URL pnpm -C apps/web migrate`

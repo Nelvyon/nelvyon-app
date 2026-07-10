@@ -9,7 +9,7 @@
 | Componente | Estado | Notas |
 |------------|--------|-------|
 | **Git** | ✅ | 2.55+; remote GitHub Nelvyon/nelvyon-app |
-| **GitHub** | ✅ | Actions: CI, smokes, production-cron, **db-backup** |
+| **GitHub** | ✅ | Actions: CI, smokes, production-cron, db-backup, **security-gates**, Dependabot |
 | **Node.js** | ✅ | v20+ prod Docker; v24 dev local OK |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI backend |

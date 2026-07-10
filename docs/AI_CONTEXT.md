@@ -1,6 +1,19 @@
 # AI_CONTEXT — Contexto técnico completo NELVYON
 
-> Fuente para IAs. **Sin secretos.** Actualizado: 2026-07-09.
+> Fuente para IAs. **Sin secretos.** Actualizado: 2026-07-10.
+
+---
+
+## Fase 1 — estado (2026-07-10)
+
+| Prioridad | Estado |
+|-----------|--------|
+| P0–P2 | ✅ Validadas |
+| P3 | ✅ Consolidación (bundles, overrides, audit script) |
+| P4 | ✅ Hardening (security-gates, Dependabot, CEO checklist) |
+| Auditoría local | ✅ `node scripts/run-phase1-audit.mjs` |
+| CEO manual | ⏳ `docs/CEO_FINAL_ACTIONS.md` |
+| Fase 2 IA | ❌ No iniciar |
 
 ---
 

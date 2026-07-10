@@ -6,7 +6,7 @@
     "@sentry/node": "^10.51.0",
     "ioredis": "^5.8.2",
     "pg": "^8.16.3",
-    "ws": "^8.20.0"
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@types/pg": "^8.15.5",

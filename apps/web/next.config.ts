@@ -61,6 +61,13 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     externalDir: true,
+    optimizePackageImports: [
+      "lucide-react",
+      "@tabler/icons-react",
+      "recharts",
+      "framer-motion",
+      "@radix-ui/react-accordion",
+    ],
   },
   outputFileTracingIncludes: {
     "/api/**/*": [

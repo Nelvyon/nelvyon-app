@@ -1,12 +1,21 @@
 name: Database Backup
 
 # Weekly Postgres backup — requires secret DATABASE_URL (production read-only recommended).
-# Artifacts retained 30 days. Restore drill: see BACKUP_CHECKLIST.md
+# Artifacts retained 30 days. Restore drill: see docs/CEO_FINAL_ACTIONS.md
 
 on:
   schedule:
     - cron: "0 2 * * 0"
   workflow_dispatch:
+    inputs:
+      allow_missing_secret:
+        description: "Skip backup if DATABASE_URL missing (manual only)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 concurrency:
   group: db-backup
@@ -30,12 +39,28 @@ jobs:
           sudo apt-get install -y postgresql-client
           pip install sqlalchemy psycopg2-binary
 
+      - name: Require DATABASE_URL on schedule
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ALLOW_MISSING: ${{ github.event.inputs.allow_missing_secret || 'false' }}
+          IS_SCHEDULE: ${{ github.event_name == 'schedule' }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            if [ "$IS_SCHEDULE" = "true" ] || [ "$ALLOW_MISSING" != "true" ]; then
+              echo "::error::DATABASE_URL secret not configured — backup cannot run"
+              echo "Configure in GitHub Settings → Secrets → Actions (see docs/CEO_FINAL_ACTIONS.md)"
+              exit 1
+            fi
+            echo "DATABASE_URL missing — skip (manual allow_missing_secret=true)"
+            exit 0
+          fi
+
       - name: Create backup
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           if [ -z "$DATABASE_URL" ]; then
-            echo "DATABASE_URL secret not configured — skip backup"
+            echo "Skipped — no DATABASE_URL"
             exit 0
           fi
           mkdir -p backups
@@ -43,6 +68,7 @@ jobs:
             --database-url "$DATABASE_URL" \
             --output-dir backups
           ls -la backups/
+          test -n "$(ls -A backups 2>/dev/null)"
 
       - name: Upload backup artifact
         if: success()
@@ -51,7 +77,6 @@ jobs:
           name: nelvyon-db-backup-${{ github.run_number }}
           path: backups/*
           retention-days: 30
-        continue-on-error: true
 
   verify-sqlite:
     name: SQLite backup round-trip (CI)

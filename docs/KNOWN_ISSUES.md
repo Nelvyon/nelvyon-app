@@ -6,6 +6,17 @@
 
 ## Activos
 
+### KI-012 — Vulnerabilidades npm high (transitive)
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | Media (dependencias) |
+| **Detalle** | ~17 high en árbol pnpm tras overrides; 0 critical |
+| **Mitigación** | Gate CI falla solo en critical; Dependabot semanal; overrides documentados ADR-012 |
+| **Fix** | Actualizar deps upstream cuando patches disponibles; no exclusiones globales |
+
+---
+
 ### KI-005 — Private AI sin runtime
 
 | Campo | Valor |

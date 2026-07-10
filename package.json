@@ -16,13 +16,6 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ws": "^8.18.1"
   },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "19.1.16",
-      "@types/react-dom": "19.1.9",
-      "fumadocs-mdx>vite": "^7.1.12"
-    }
-  },
   "scripts": {
     "dev:frontend": "pnpm -C frontend dev",
     "dev:backend": "cd backend && python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000",

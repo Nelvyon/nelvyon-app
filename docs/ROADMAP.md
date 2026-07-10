@@ -26,9 +26,13 @@
 | Supabase + RLS service_role | 🟡 | Migración 280; apply prod |
 | Cloudflare DNS/WAF | 🟡 | Docs; manual deploy day |
 | Docker compose test (PG+Redis) | 🟡 | `docker-compose.test.yml` |
-| Documentación viva (`docs/HANDOVER`) | ✅ | 2026-07-09 |
-| Migraciones 494–511 en producción | 🟡 | Deploy 2026-07-09 con releaseCommand; SQL 494 sin confirmar |
-| Push + deploy CEO brief fix | ✅ | `815e4c0f` en prod |
+| Documentación viva (`docs/HANDOVER`) | ✅ | 2026-07-10 P3/P4 |
+| Migraciones 494–511 en producción | ✅ | Aplicadas 2026-07-09 |
+| P0–P2 validación regresión | ✅ | 2026-07-10 |
+| P3 consolidación rendimiento/deuda | ✅ | optimizePackageImports, overrides, audit script |
+| P4 hardening seguridad | ✅ | security-gates, Dependabot, Gitleaks, backup fail-fast |
+| Auditoría final Fase 1 (local) | ✅ | `run-phase1-audit.mjs` + build |
+| CEO activaciones externas Fase 1 | 🟡 | `docs/CEO_FINAL_ACTIONS.md` |
 | n8n self-hosted | ❌ | Solo blueprint JSON |
 | PC dev estandarizado | 🟡 | README-dev-Windows actualizado |
 

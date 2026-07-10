@@ -122,3 +122,14 @@
 | **Decisión** | Scripts `scripts/check-migration-494.mjs` y `check-cron-ceo-brief.mjs` se ejecutan dentro del contenedor Railway (`railway ssh`) |
 | **Por qué** | `DATABASE_URL` prod usa hostname interno `postgres.railway.internal`; `railway run` local falla con ENOTFOUND |
 | **Consecuencias** | Requiere SSH keys registradas en Railway; sin ellas solo health/git_sha y releaseCommand inferido |
+
+---
+
+## ADR-012 — Security Gates: fail on critical only + overrides en pnpm-workspace
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-10 |
+| **Decisión** | CI `security-gates.yml` falla en `pnpm audit --audit-level critical`; overrides (`ws`, `axios`, `vitest`) en `pnpm-workspace.yaml` (pnpm 10+) |
+| **Por qué** | Eliminar 3 critical (vitest legacy frontend, ws twilio); high transitive documentadas sin ocultar |
+| **Consecuencias** | 17 high restantes monitoreadas; Dependabot semanal; no exclusiones globales Gitleaks |

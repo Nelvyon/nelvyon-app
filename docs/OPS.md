@@ -74,3 +74,16 @@ Ejecuta al arranque vía `apps/web/src/instrumentation.ts` y en `/api/health/rea
 Stripe, Stripe Connect, SES/SNS, WhatsApp, Paddle — ver `opsRegistry.ts`.
 
 CEO pendiente: confirmar suscripción SNS SES (KI-011).
+
+---
+
+## Seguridad CI
+
+| Workflow | Frecuencia | Qué valida |
+|----------|------------|------------|
+| `security-gates.yml` | push main, PR deps, lunes 06:00 UTC | `pnpm audit --audit-level critical`, Gitleaks, migraciones 401–511 |
+| `dependabot.yml` | Semanal | npm + github-actions |
+| `web-quality-gates.yml` | push/PR | typecheck, lint, tests, anti-mock |
+| `staging-elite-gate.yml` | push main | smokes staging + deploy wait |
+
+Overrides de dependencias: `pnpm-workspace.yaml` (`ws`, `axios`, `vitest`).

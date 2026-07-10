@@ -4,3 +4,11 @@ packages:
   - "backend"
   - "backend/db"
   - "packages/*"
+
+overrides:
+  "@types/react": "19.1.16"
+  "@types/react-dom": "19.1.9"
+  "fumadocs-mdx>vite": "^7.1.12"
+  ws: ">=8.21.0"
+  axios: ">=1.16.0"
+  vitest: ">=3.2.6"

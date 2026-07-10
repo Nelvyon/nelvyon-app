@@ -28,6 +28,8 @@ Archivos oficiales (mantener actualizados automáticamente):
 | [DEPLOYMENTS.md](./DEPLOYMENTS.md) | Historial deploys |
 | [KNOWN_ISSUES.md](./KNOWN_ISSUES.md) | Errores activos y resueltos |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Diagramas y flujos |
+| [CEO_FINAL_ACTIONS.md](./CEO_FINAL_ACTIONS.md) | Checklist manual CEO (cierre Fase 1) |
+| [OPS.md](./OPS.md) | Runbook operación enterprise |
 
 **Sync metadata:** `node scripts/sync-handover-metadata.mjs`
 
