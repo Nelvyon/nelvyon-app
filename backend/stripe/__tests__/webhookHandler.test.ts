@@ -70,19 +70,21 @@ vi.mock("../stripeApi", () => ({
 }));
 
 vi.mock("stripe", () => ({
-  default: vi.fn().mockImplementation(() => ({
-    subscriptions: {
-      retrieve: vi.fn().mockResolvedValue({
-        id: "sub_test_1",
-        status: "active",
-        current_period_end: Math.floor(Date.now() / 1000) + 86400,
-        cancel_at_period_end: false,
-        customer: "cus_test_1",
-        metadata: { user_id: USER_ID, tenant_id: TENANT_ID },
-        items: { data: [{ price: { id: "price_pro" } }] },
-      }),
-    },
-  })),
+  default: vi.fn(function MockStripe() {
+    return {
+      subscriptions: {
+        retrieve: vi.fn().mockResolvedValue({
+          id: "sub_test_1",
+          status: "active",
+          current_period_end: Math.floor(Date.now() / 1000) + 86400,
+          cancel_at_period_end: false,
+          customer: "cus_test_1",
+          metadata: { user_id: USER_ID, tenant_id: TENANT_ID },
+          items: { data: [{ price: { id: "price_pro" } }] },
+        }),
+      },
+    };
+  }),
 }));
 
 vi.mock("../../billing/dunningService", () => ({
