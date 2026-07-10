@@ -125,5 +125,5 @@ jobs:
           python-version: "3.11"
       - name: Verify SQLite backup/restore
         run: |
-          pip install pytest pytest-asyncio sqlalchemy httpx aiosqlite
+          pip install -r backend/requirements.txt
           cd backend && python -m pytest tests/test_backup_phase1.py -q
