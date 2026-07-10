@@ -19,6 +19,7 @@ on:
       - "backend/os-agents/**"
       - "backend/autonomous/**"
       - "scripts/**"
+  workflow_dispatch:
 
 jobs:
   pack-gate-local:
