@@ -8,7 +8,9 @@
 
 | Hora (aprox) | Archivo / área | Cambio | Descripción |
 |--------------|----------------|--------|-------------|
-| 01:07 | `agent.flow.test.ts`, billing, queue | Fix | Vitest 3 constructor mocks Redis/Stripe (CI regresión post-override) |
+| 04:12 | CI Web Quality Gates | SUCCESS | run `29063441182` commit `bd1e4aee` |
+| 04:12 | CI Security Gates | SUCCESS | run `29063441188` commit `bd1e4aee` |
+| 01:07–03:54 | Vitest 3/4 mocks | Fix | Redis, Stripe, SES, GoogleOAuth — regresión post-override |
 | 02:50 | `pnpm audit` | PASS critical | 0 critical tras overrides ws/axios/vitest |
 | 02:46 | `run-phase1-audit.mjs` | PASS | migrations, typecheck, lint, elite reinforce |
 | 02:45 | `pnpm build` | PASS | Build producción apps/web |
