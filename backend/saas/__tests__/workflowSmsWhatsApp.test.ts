@@ -25,7 +25,9 @@ vi.mock("../../email/sesClient", () => ({
   getSesClient: () => ({ send: vi.fn().mockResolvedValue({}) }),
 }));
 vi.mock("@aws-sdk/client-ses", () => ({
-  SendEmailCommand: vi.fn().mockImplementation((input: unknown) => input),
+  SendEmailCommand: vi.fn(function MockSendEmailCommand(input: unknown) {
+    return input;
+  }),
 }));
 
 import { SaasWorkflowService } from "../SaasWorkflowService";

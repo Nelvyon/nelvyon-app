@@ -6,7 +6,9 @@ vi.mock("../../email/sesClient", () => ({
   }),
 }));
 vi.mock("@aws-sdk/client-ses", () => ({
-  SendEmailCommand: vi.fn().mockImplementation((input: unknown) => input),
+  SendEmailCommand: vi.fn(function MockSendEmailCommand(input: unknown) {
+    return input;
+  }),
 }));
 
 import * as Auth from "@nelvyon/auth";

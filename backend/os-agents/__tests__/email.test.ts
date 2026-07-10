@@ -2,10 +2,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@aws-sdk/client-ses", () => ({
-  SESClient: vi.fn().mockImplementation(() => ({
-    send: vi.fn().mockResolvedValue({}),
-  })),
-  SendEmailCommand: vi.fn().mockImplementation((input) => input),
+  SESClient: vi.fn(function MockSESClient() {
+    return {
+      send: vi.fn().mockResolvedValue({}),
+    };
+  }),
+  SendEmailCommand: vi.fn(function MockSendEmailCommand(input) {
+    return input;
+  }),
 }));
 
 import { resetSesClientForTests } from "../../email/sesClient";
