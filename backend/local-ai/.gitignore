@@ -1,0 +1,5 @@
+# Local AI runtime data — never commit
+storage/
+backups/
+*.enc
+.env.local

@@ -52,6 +52,18 @@
 
 ---
 
-## Fase 2 — IA (NO INICIAR)
+## Fase 2 — IA privada 100% local (2026-07-11)
 
-- [ ] Activar provider LLM — **fuera de alcance hasta cierre CEO Fase 1**
+- [x] Auditoría hardware (`docs/PHASE2_HARDWARE_AUDIT.md`)
+- [x] Docker Compose Postgres+pgvector local
+- [x] Migraciones `local_ai_*` + RLS tenant
+- [x] LocalMemoryStore + LocalVectorStore + RagIngestPipeline
+- [x] Embeddings Ollama local (sin API pago)
+- [x] Backup pg_dump + AES opcional
+- [x] PRIVATE_MODE allowlist (OpenClaw/MCP local OK)
+- [x] Tests unitarios egress + integración Docker (8 pass, 2026-07-11)
+- [x] Validación real: up/migrate/health/validate 7/7
+- [x] RLS FORCE + rol app `nelvyon_local_app` (NOBYPASSRLS)
+- [ ] CEO: Ollama + benchmark 3 candidatos 3B
+- [ ] Router multi-modelo
+- [ ] 22 agentes (**NO hasta base validada**)

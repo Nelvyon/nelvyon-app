@@ -8,6 +8,7 @@ Modular, model-agnostic infrastructure. **No LLM is required** for Nelvyon to ru
 backend/private-ai/
 ├── types.ts                 # Shared interfaces
 ├── config.ts                # Env parsing + feature flags
+├── privateMode.ts           # PRIVATE_MODE=ON egress policy (default)
 ├── sensitiveActions.ts      # Approval-required actions
 ├── nelvyonAgentRegistry.ts  # 17 expert agents (catalog)
 ├── PrivateAiRouter.ts       # Re-export → core/
@@ -42,11 +43,11 @@ backend/private-ai/
 
 | Step | Env vars | Effect |
 |------|----------|--------|
-| 0 (now) | defaults | `unconfigured`, no network calls |
+| 0 (now) | defaults (`PRIVATE_MODE=ON`) | `unconfigured`, no remote network |
 | Dev stub | `NELVYON_AI_ENABLED=1` + `NELVYON_AI_MODE=stub` | Deterministic dev responses |
-| Local model | + `OLLAMA_CONFIGURED=1` + `NELVYON_AI_MODE=local` | Ollama-compatible runtime |
-| Private only | `PRIVATE_AI_ONLY=1` | Blocks OpenAI/Anthropic |
-| OpenClaw (future) | `NELVYON_OPENCLAW_BRIDGE_ENABLED=1` + URL | Optional external orchestrator |
+| Local model | + `OLLAMA_CONFIGURED=1` + `NELVYON_AI_MODE=local` | Ollama on 127.0.0.1 only |
+| Task Internet | `PRIVATE_MODE_INTERNET_UNTIL=<ISO>` | Temporary authorized outbound window |
+| Disable privacy | `PRIVATE_MODE=OFF` | Owner only — enables remote providers if configured |
 
 ## Design rules
 

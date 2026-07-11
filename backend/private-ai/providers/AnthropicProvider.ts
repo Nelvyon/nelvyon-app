@@ -1,4 +1,5 @@
 import { getGlobalPrivateAiConfig, isNelvyonAiEnabled, isPrivateAiOnlyEnv } from "../config";
+import { assertPrivateOutboundAllowed } from "../privateMode";
 import type { GlobalPrivateAiConfig } from "../types";
 import type { ILlmProvider, LlmCompletionRequest, LlmCompletionResult } from "../types";
 
@@ -28,6 +29,7 @@ export class AnthropicProvider implements ILlmProvider {
   }
 
   async complete(request: LlmCompletionRequest): Promise<LlmCompletionResult> {
+    assertPrivateOutboundAllowed("remote_llm", "Anthropic API blocked in PRIVATE_MODE.");
     const key = this.cfg.anthropicApiKey;
     if (!key) throw new Error("ANTHROPIC_API_KEY is not configured (optional provider).");
 

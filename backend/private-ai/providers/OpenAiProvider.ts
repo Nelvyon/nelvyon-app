@@ -1,4 +1,5 @@
 import { getGlobalPrivateAiConfig, isNelvyonAiEnabled, isPrivateAiOnlyEnv } from "../config";
+import { assertPrivateOutboundAllowed } from "../privateMode";
 import type { GlobalPrivateAiConfig } from "../types";
 import type { ILlmProvider, LlmCompletionRequest, LlmCompletionResult } from "../types";
 
@@ -28,6 +29,7 @@ export class OpenAiProvider implements ILlmProvider {
   }
 
   async complete(request: LlmCompletionRequest): Promise<LlmCompletionResult> {
+    assertPrivateOutboundAllowed("remote_llm", "OpenAI API blocked in PRIVATE_MODE.");
     const key = this.cfg.openaiApiKey;
     if (!key) throw new Error("OPENAI_API_KEY is not configured (optional provider).");
 

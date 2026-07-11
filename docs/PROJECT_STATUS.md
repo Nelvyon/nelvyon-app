@@ -40,7 +40,7 @@
 | **Dependencias** | 🟡 0 critical; 17 high (transitive, documentadas) |
 | **Crons / webhooks** | ✅ Registry + GH Actions |
 | **Documentación viva** | ✅ Actualizada 2026-07-10 |
-| **Fase 2 IA** | ❌ No iniciada (por diseño) |
+| **Fase 2 IA local** | ✅ **Base validada** — Docker/pgvector/RLS/backup 7/7 (2026-07-11) |
 
 ---
 

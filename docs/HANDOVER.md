@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización: **2026-07-11 03:15 UTC**
+> Última actualización: **2026-07-11 18:05 UTC**
 
 ---
 
@@ -9,49 +9,47 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `5140521d` — pushed `main` |
-| **Rama** | `main` (sync with origin) |
-| **Prod** | `https://nelvyon.com` — redeploy en curso |
-| **Fase 1 código** | ✅ Cerrada |
-| **Fase 1 infra** | ✅ Cerrada (salvo SES production access) |
-| **Fase 1 ops 100%** | ❌ Solo bloquea **CEO → apelación AWS** |
+| **Fase 1 ops** | ⏳ Solo bloquea apelación SES AWS (CEO) |
+| **Fase 2 IA local** | ✅ **Base validada en ejecución real** (Docker + pgvector + RLS + backup) |
+| **Último commit** | Phase 2 local stack validation |
 
 ---
 
-## Único bloqueante restante
+## Fase 2 — IA privada local
 
-**SES Production Access** — `ProductionAccessEnabled: false`, Case `178372013800016` DENIED.  
-Apelación lista: **`docs/SES_PRODUCTION_ACCESS_APPEAL.md`** §3 (inglés) → enviar en [AWS Support](https://console.aws.amazon.com/support/home#/case/?displayId=178372013800016&language=en).
+**Validado en máquina propietario (2026-07-11):**
+- `local-ai-up` + `migrate` + health OK
+- Integración 8/8 (RLS memoria + RAG)
+- `local-ai-validate.mjs` 7/7 (persistencia, backup cifrado, restore temp DB, localhost bind, PRIVATE_MODE)
+- Rol app `nelvyon_local_app` (NOBYPASSRLS) + FORCE ROW LEVEL SECURITY
 
----
-
-## SES — completado (2026-07-11)
-
-| Componente | Estado |
-|------------|--------|
-| Dominio nelvyon.com | ✅ SUCCESS |
-| DKIM | ✅ SUCCESS |
-| Configuration set nelvyon-prod | ✅ BOUNCE/COMPLAINT/DELIVERY |
-| SNS + webhook HTTPS | ✅ Confirmado |
-| Notification headers | ✅ Habilitados |
-| Suppression BOUNCE/COMPLAINT | ✅ |
-| Webhook código prod | ✅ `5140521d` |
-| Production access | ❌ AWS manual |
-
-Auditoría: `node scripts/audit-ses-production.mjs` → 12/13 PASS (solo production access FAIL).
+**Propietario debe (siguiente fase):**
+1. Instalar **Ollama** + benchmark modelos 3B (ver hardware audit)
+2. **No** construir 22 agentes hasta router + modelos elegidos
 
 ---
 
-## Próximo paso EXACTO
+## Fase 1 — bloqueante restante
 
-**CEO:** pegar apelación §3 en caso AWS `178372013800016`. Nada más bloquea Fase 1.
-
-**No iniciar Fase 2** hasta `ProductionAccessEnabled: true`.
+**SES Production Access** → `docs/SES_PRODUCTION_ACCESS_APPEAL.md` §3
 
 ---
 
-## Contexto rápido
+## Comandos Fase 2
 
-- Apelación SES: `docs/SES_PRODUCTION_ACCESS_APPEAL.md`
-- Ops SES: `docs/SES_PRODUCTION_SETUP.md`
-- CEO checklist: `docs/CEO_FINAL_ACTIONS.md`
+```bash
+node scripts/hardware-audit.mjs
+node scripts/local-ai-up.mjs
+node scripts/local-ai-migrate.mjs
+pnpm -C apps/web exec tsx ../../scripts/local-ai-health.ts
+node scripts/local-ai-validate.mjs
+RUN_LOCAL_AI_INTEGRATION=1 pnpm -C apps/web exec vitest run backend/saas/__tests__/localAiPhase2.test.ts
+```
+
+---
+
+## Contexto
+
+- IA local: `backend/local-ai/README.md`
+- Privacidad: `docs/PHASE2_SECURITY_MODEL.md`
+- SES appeal: `docs/SES_PRODUCTION_ACCESS_APPEAL.md`

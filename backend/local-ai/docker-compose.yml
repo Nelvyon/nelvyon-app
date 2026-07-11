@@ -1,0 +1,60 @@
+# NELVYON Local Private AI — Docker stack
+# Binds ONLY to 127.0.0.1 — no public exposure, no tunnels.
+#
+# Usage:
+#   cd backend/local-ai
+#   docker compose up -d
+#   node ../../scripts/local-ai-migrate.mjs
+#   node ../../scripts/local-ai-health.mjs
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: nelvyon-local-ai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nelvyon_local
+      POSTGRES_PASSWORD: nelvyon_local_dev
+      POSTGRES_DB: nelvyon_local_ai
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - nelvyon_local_ai_pgdata:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nelvyon_local -d nelvyon_local_ai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - nelvyon_local_ai
+
+  # Optional — enable when queue workers are wired (not required for Phase 2 base)
+  redis:
+    image: redis:7-alpine
+    container_name: nelvyon-local-ai-redis
+    restart: unless-stopped
+    profiles: ["queue"]
+    ports:
+      - "127.0.0.1:6381:6379"
+    volumes:
+      - nelvyon_local_ai_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - nelvyon_local_ai
+
+volumes:
+  nelvyon_local_ai_pgdata:
+    name: nelvyon_local_ai_pgdata
+  nelvyon_local_ai_redis:
+    name: nelvyon_local_ai_redis
+
+networks:
+  nelvyon_local_ai:
+    name: nelvyon_local_ai
+    driver: bridge
+    internal: false

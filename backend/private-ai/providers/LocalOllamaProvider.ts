@@ -1,4 +1,5 @@
 import { getGlobalPrivateAiConfig, isLocalRuntimeConfigured, isNelvyonAiEnabled } from "../config";
+import { privateModeFetch } from "../privateMode";
 import type { GlobalPrivateAiConfig } from "../types";
 import type { ILlmProvider, LlmCompletionRequest, LlmCompletionResult } from "../types";
 
@@ -28,7 +29,8 @@ export class LocalOllamaProvider implements ILlmProvider {
   async isAvailable(): Promise<boolean> {
     if (!isNelvyonAiEnabled() || !isLocalRuntimeConfigured()) return false;
     try {
-      const res = await fetch(`${this.cfg.ollamaBaseUrl}/api/tags`, {
+      const url = `${this.cfg.ollamaBaseUrl}/api/tags`;
+      const res = await privateModeFetch(url, "external_fetch", {
         signal: AbortSignal.timeout(3_000),
       });
       return res.ok;
@@ -46,7 +48,8 @@ export class LocalOllamaProvider implements ILlmProvider {
     }
 
     const model = request.model ?? this.cfg.ollamaModel;
-    const res = await fetch(`${this.cfg.ollamaBaseUrl}/api/chat`, {
+    const chatUrl = `${this.cfg.ollamaBaseUrl}/api/chat`;
+    const res = await privateModeFetch(chatUrl, "external_fetch", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

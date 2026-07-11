@@ -1,4 +1,5 @@
 import type { AiMode, GlobalPrivateAiConfig } from "./types";
+import { isPrivateMode } from "./privateMode";
 
 const DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434";
 const DEFAULT_OLLAMA_MODEL = "qwen2.5:7b";
@@ -35,6 +36,7 @@ export function isLocalRuntimeConfigured(): boolean {
 }
 
 export function isPrivateAiOnlyEnv(): boolean {
+  if (isPrivateMode()) return true;
   const v = process.env.PRIVATE_AI_ONLY ?? process.env.NELVYON_PRIVATE_AI_ONLY ?? "";
   return v === "1" || v.toLowerCase() === "true";
 }
@@ -63,6 +65,9 @@ export function getGlobalPrivateAiConfig(): GlobalPrivateAiConfig {
 export function resetGlobalPrivateAiConfigForTests(): void {
   delete process.env.NELVYON_AI_ENABLED;
   delete process.env.NELVYON_AI_MODE;
+  delete process.env.PRIVATE_MODE;
+  delete process.env.NELVYON_PRIVATE_MODE;
+  delete process.env.PRIVATE_MODE_INTERNET_UNTIL;
   delete process.env.PRIVATE_AI_ONLY;
   delete process.env.NELVYON_PRIVATE_AI_ONLY;
   delete process.env.OLLAMA_BASE_URL;

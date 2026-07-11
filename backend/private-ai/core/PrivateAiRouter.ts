@@ -1,4 +1,5 @@
 import { getGlobalPrivateAiConfig, isNelvyonAiEnabled } from "../config";
+import { getPrivateModeStatus } from "../privateMode";
 import { getProviderRegistry } from "./ProviderRegistry";
 import type { AiMode, ILlmProvider, LlmCompletionRequest, LlmCompletionResult, PrivateAiSettings, PrivateAiPlatformStatus } from "../types";
 
@@ -119,6 +120,7 @@ export class PrivateAiRouter {
     return {
       enabled: isNelvyonAiEnabled(),
       privateAiOnly: Boolean(tenant?.privateAiOnly || this.global.privateAiOnly),
+      privateMode: getPrivateModeStatus(),
       mode,
       ready,
       configured,

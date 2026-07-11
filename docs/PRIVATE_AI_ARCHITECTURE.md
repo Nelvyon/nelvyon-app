@@ -4,6 +4,27 @@
 
 ---
 
+## 0. Política de propiedad y privacidad (NELVYON)
+
+La IA privada de NELVYON **no es un producto público, SaaS ni API expuesta**. Es propiedad exclusiva del propietario y debe operar **local-first**.
+
+**Fase 2 local stack:** `backend/local-ai/` + `docs/PHASE2_AI_ARCHITECTURE.md`
+
+| Requisito | Implementación |
+|-----------|----------------|
+| Sin telemetría / analíticas / envío de prompts a terceros | `PRIVATE_MODE=ON` (default) bloquea proveedores remotos y OpenClaw |
+| Modelos solo locales | `NELVYON_AI_MODE=local` + `OLLAMA_CONFIGURED=1` + `OLLAMA_BASE_URL=http://127.0.0.1:11434` |
+| Memoria y RAG en máquina del propietario | Postgres/Ollama en localhost (no cloud en despliegue privado) |
+| Sin puertos públicos / túneles por defecto | No exponer `/api/saas/private-ai/*` a Internet en modo privado |
+| Internet solo con autorización explícita | `PRIVATE_MODE_INTERNET_UNTIL=<ISO8601>` — ventana temporal por tarea |
+| Dependencias externas documentadas | Ver §4; cada una requiere autorización del propietario |
+
+**Interruptor maestro:** `PRIVATE_MODE=ON` (default si no se define). Equivalente a `PRIVATE_AI_ONLY=1` + bloqueo de egress en código.
+
+**Desactivar solo el propietario:** `PRIVATE_MODE=OFF` (nunca en despliegues privados de producción).
+
+---
+
 ## 1. Philosophy
 
 Nelvyon builds its **own** private AI platform:
@@ -58,9 +79,11 @@ Nelvyon builds its **own** private AI platform:
 ### Master switches
 
 ```bash
-NELVYON_AI_ENABLED=0          # Default OFF — no LLM activity
-NELVYON_AI_MODE=unconfigured  # unconfigured | stub | local | openai | anthropic | auto
-PRIVATE_AI_ONLY=0             # When 1, blocks remote providers
+PRIVATE_MODE=ON                 # Default ON — blocks remote LLM, OpenClaw, non-localhost Ollama
+PRIVATE_MODE_INTERNET_UNTIL=    # ISO8601 — owner-authorized Internet window for one task
+NELVYON_AI_ENABLED=0            # Default OFF — no LLM activity
+NELVYON_AI_MODE=unconfigured    # unconfigured | stub | local | openai | anthropic | auto
+PRIVATE_AI_ONLY=0               # Legacy alias; implied when PRIVATE_MODE=ON
 ```
 
 ### Local runtime (future — do not set until Ollama installed)

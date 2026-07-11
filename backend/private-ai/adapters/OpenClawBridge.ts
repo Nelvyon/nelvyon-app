@@ -1,4 +1,5 @@
 import { getGlobalPrivateAiConfig, isOpenClawBridgeEnabled } from "../config";
+import { assertUrlAllowed } from "../privateMode";
 
 export type OpenClawBridgeStatus = "disabled" | "available" | "connected";
 
@@ -33,6 +34,8 @@ export class DisabledOpenClawBridge implements IOpenClawBridge {
   }
 
   async dispatch(_request: OpenClawAgentRequest): Promise<OpenClawAgentResponse> {
+    const url = getGlobalPrivateAiConfig().openClawBridgeUrl;
+    if (url) assertUrlAllowed(url, "openclaw_bridge");
     return {
       ok: false,
       error:

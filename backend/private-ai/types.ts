@@ -70,6 +70,11 @@ export type PrivateAiSettings = {
 export type PrivateAiPlatformStatus = {
   enabled: boolean;
   privateAiOnly: boolean;
+  privateMode?: {
+    privateMode: boolean;
+    internetTaskAuthorized: boolean;
+    internetUntil: string | null;
+  };
   mode: AiMode;
   ready: boolean;
   configured: boolean;
