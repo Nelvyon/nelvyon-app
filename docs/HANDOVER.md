@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización: **2026-07-10 15:40 UTC**
+> Última actualización: **2026-07-11 03:15 UTC**
 
 ---
 
@@ -9,43 +9,49 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `636a47bc` — pendiente deploy prod |
+| **Último commit** | `5140521d` — pushed `main` |
 | **Rama** | `main` (sync with origin) |
-| **Prod** | `https://nelvyon.com` — health OK; `git_sha` detrás de main |
-| **Staging** | `ideal-victory-staging` — `git_sha: 636a47bc` |
+| **Prod** | `https://nelvyon.com` — redeploy en curso |
 | **Fase 1 código** | ✅ Cerrada |
-| **Fase 1 ops 100%** | ❌ Pendiente CEO (SES production access + redeploy + primer backup) |
+| **Fase 1 infra** | ✅ Cerrada (salvo SES production access) |
+| **Fase 1 ops 100%** | ❌ Solo bloquea **CEO → apelación AWS** |
 
 ---
 
-## Bloqueantes CEO para Fase 1 al 100%
+## Único bloqueante restante
 
-1. **SES production access** — sandbox (`ProductionAccessEnabled: false`, Case `178372013800016` DENIED) → **`docs/SES_PRODUCTION_ACCESS_APPEAL.md`**
-2. **SES dominio/DKIM** — ✅ SUCCESS (2026-07-11); SNS webhook ✅ confirmado
-3. **Backup** — ejecutar workflow `Database Backup` (secret ya configurado)
-4. **Railway** — redeploy production a `main` (fix webhook SES + `/api/os/health`)
-
-Detalle paso a paso: **`docs/CEO_FINAL_ACTIONS.md`**
+**SES Production Access** — `ProductionAccessEnabled: false`, Case `178372013800016` DENIED.  
+Apelación lista: **`docs/SES_PRODUCTION_ACCESS_APPEAL.md`** §3 (inglés) → enviar en [AWS Support](https://console.aws.amazon.com/support/home#/case/?displayId=178372013800016&language=en).
 
 ---
 
-## Verificado hoy (autónomo)
+## SES — completado (2026-07-11)
 
-- Typecheck, lint, build, `PHASE1_AUDIT_PASS`
-- GitHub: `DATABASE_URL`, `PRODUCTION_BASE_URL`, `CRON_SECRET`
-- Crons prod: SUCCESS
-- Fix código: middleware `/api/os/health` público
+| Componente | Estado |
+|------------|--------|
+| Dominio nelvyon.com | ✅ SUCCESS |
+| DKIM | ✅ SUCCESS |
+| Configuration set nelvyon-prod | ✅ BOUNCE/COMPLAINT/DELIVERY |
+| SNS + webhook HTTPS | ✅ Confirmado |
+| Notification headers | ✅ Habilitados |
+| Suppression BOUNCE/COMPLAINT | ✅ |
+| Webhook código prod | ✅ `5140521d` |
+| Production access | ❌ AWS manual |
+
+Auditoría: `node scripts/audit-ses-production.mjs` → 12/13 PASS (solo production access FAIL).
 
 ---
 
 ## Próximo paso EXACTO
 
-**CEO:** `docs/SES_PRODUCTION_ACCESS_APPEAL.md` → enviar apelación §5–6 → redeploy Railway → §1 backup.  
-**No iniciar Fase 2** hasta Fase 1 ops al 100%.
+**CEO:** pegar apelación §3 en caso AWS `178372013800016`. Nada más bloquea Fase 1.
+
+**No iniciar Fase 2** hasta `ProductionAccessEnabled: true`.
 
 ---
 
 ## Contexto rápido
 
-- Auditoría cierre: `docs/PHASE1_CLOSURE_AUDIT.md`
-- Ops: `docs/OPS.md`
+- Apelación SES: `docs/SES_PRODUCTION_ACCESS_APPEAL.md`
+- Ops SES: `docs/SES_PRODUCTION_SETUP.md`
+- CEO checklist: `docs/CEO_FINAL_ACTIONS.md`
