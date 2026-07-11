@@ -1,0 +1,245 @@
+/**
+ * NELVYON Knowledge Ontology — 18 mandatory domains + subtopics.
+ */
+export type KnowledgeDomainId =
+  | "nelvyon"
+  | "business_strategy"
+  | "digital_marketing"
+  | "paid_ads"
+  | "seo"
+  | "content"
+  | "copywriting"
+  | "social_media"
+  | "email_marketing"
+  | "crm_sales"
+  | "automation"
+  | "saas"
+  | "analytics_reporting"
+  | "customer_support"
+  | "finance_operations"
+  | "design"
+  | "video"
+  | "development_tech"
+  | "security_privacy"
+  | "planning_strategy";
+
+export type KnowledgeDomain = {
+  id: KnowledgeDomainId;
+  label: string;
+  labelEs: string;
+  subtopics: string[];
+  priority: 0 | 1 | 2 | 3;
+};
+
+export const NELVYON_ONTOLOGY: readonly KnowledgeDomain[] = [
+  {
+    id: "nelvyon",
+    label: "NELVYON",
+    labelEs: "NELVYON",
+    priority: 0,
+    subtopics: [
+      "mission", "vision", "positioning", "value_proposition", "saas", "os_packs",
+      "architecture", "security", "deployments", "integrations", "workflows", "crm",
+      "campaigns", "billing", "private_ai", "roadmap", "methodology", "compliance",
+    ],
+  },
+  {
+    id: "business_strategy",
+    label: "Business Strategy",
+    labelEs: "Estrategia empresarial",
+    priority: 1,
+    subtopics: [
+      "okr", "kpi", "competitive_analysis", "positioning", "pricing", "forecasting",
+      "risk_management", "scenarios", "unit_economics", "growth_plans",
+    ],
+  },
+  {
+    id: "digital_marketing",
+    label: "Digital Marketing",
+    labelEs: "Marketing digital",
+    priority: 1,
+    subtopics: [
+      "strategy", "icp", "buyer_persona", "customer_journey", "funnels", "lead_gen",
+      "nurturing", "cro", "retention", "growth", "b2b", "b2c", "local", "enterprise",
+    ],
+  },
+  {
+    id: "paid_ads",
+    label: "Paid Advertising",
+    labelEs: "Publicidad de pago",
+    priority: 1,
+    subtopics: [
+      "meta_ads", "google_ads", "linkedin_ads", "tiktok_ads", "youtube_ads",
+      "campaign_structure", "audiences", "creatives", "bidding", "attribution",
+      "optimization", "media_plans", "policy_compliance",
+    ],
+  },
+  {
+    id: "seo",
+    label: "SEO",
+    labelEs: "SEO",
+    priority: 1,
+    subtopics: [
+      "technical_seo", "on_page", "off_page", "local_seo", "saas_seo", "ecommerce_seo",
+      "keyword_research", "content_clusters", "core_web_vitals", "schema", "audits",
+    ],
+  },
+  {
+    id: "content",
+    label: "Content",
+    labelEs: "Contenido",
+    priority: 1,
+    subtopics: [
+      "content_strategy", "editorial_calendar", "landing_pages", "lead_magnets",
+      "newsletters", "video_scripts", "distribution", "repurposing", "qa",
+    ],
+  },
+  {
+    id: "copywriting",
+    label: "Copywriting",
+    labelEs: "Copywriting",
+    priority: 1,
+    subtopics: [
+      "headlines", "ctas", "aida", "pas", "bab", "sales_copy", "email_copy",
+      "ad_copy", "ux_writing", "objection_handling", "b2b_messaging",
+    ],
+  },
+  {
+    id: "social_media",
+    label: "Social Media",
+    labelEs: "Redes sociales",
+    priority: 2,
+    subtopics: [
+      "instagram", "facebook", "linkedin", "tiktok", "youtube", "content_calendar",
+      "community", "social_listening", "crisis", "governance",
+    ],
+  },
+  {
+    id: "email_marketing",
+    label: "Email Marketing",
+    labelEs: "Email marketing",
+    priority: 1,
+    subtopics: [
+      "transactional", "nurturing", "onboarding", "segmentation", "deliverability",
+      "spf_dkim_dmarc", "ses", "gdpr_consent", "automation_sequences", "testing",
+    ],
+  },
+  {
+    id: "crm_sales",
+    label: "CRM & Sales",
+    labelEs: "CRM y ventas",
+    priority: 1,
+    subtopics: [
+      "pipeline", "lead_scoring", "forecasting", "discovery", "qualification",
+      "proposals", "objections", "renewals", "churn", "customer_success",
+    ],
+  },
+  {
+    id: "automation",
+    label: "Automation",
+    labelEs: "Automatizaciones",
+    priority: 1,
+    subtopics: [
+      "triggers", "workflows", "webhooks", "cron", "idempotency", "approvals",
+      "marketing_automation", "sales_automation", "ops_automation",
+    ],
+  },
+  {
+    id: "saas",
+    label: "SaaS",
+    labelEs: "SaaS",
+    priority: 1,
+    subtopics: [
+      "multi_tenant", "onboarding", "activation", "retention", "billing", "stripe",
+      "permissions", "observability", "product_analytics", "release_management",
+    ],
+  },
+  {
+    id: "analytics_reporting",
+    label: "Analytics & Reporting",
+    labelEs: "Analítica y reporting",
+    priority: 1,
+    subtopics: [
+      "kpi_definition", "dashboards", "attribution", "cohorts", "funnels",
+      "executive_reporting", "operational_reporting", "data_quality",
+    ],
+  },
+  {
+    id: "customer_support",
+    label: "Customer Support",
+    labelEs: "Atención al cliente",
+    priority: 2,
+    subtopics: [
+      "ticket_classification", "sla", "escalation", "knowledge_base", "csat",
+      "retention", "troubleshooting", "crisis",
+    ],
+  },
+  {
+    id: "finance_operations",
+    label: "Finance & Operations",
+    labelEs: "Finanzas y operaciones",
+    priority: 2,
+    subtopics: [
+      "revenue", "margins", "cash_flow", "budgeting", "stripe_billing",
+      "profitability", "vendor_management", "audit",
+    ],
+  },
+  {
+    id: "design",
+    label: "Design",
+    labelEs: "Diseño",
+    priority: 2,
+    subtopics: [
+      "branding", "visual_identity", "ux_ui", "design_systems", "landing_design",
+      "ad_creatives", "accessibility", "visual_qa",
+    ],
+  },
+  {
+    id: "video",
+    label: "Video",
+    labelEs: "Vídeo",
+    priority: 3,
+    subtopics: [
+      "video_strategy", "scripts", "hooks", "ad_video", "product_demos",
+      "editing", "distribution", "measurement",
+    ],
+  },
+  {
+    id: "development_tech",
+    label: "Development & Tech",
+    labelEs: "Desarrollo y tecnología",
+    priority: 1,
+    subtopics: [
+      "nextjs", "typescript", "fastapi", "postgresql", "docker", "railway",
+      "aws_ses", "ci_cd", "testing", "security", "api_design",
+    ],
+  },
+  {
+    id: "security_privacy",
+    label: "Security & Privacy",
+    labelEs: "Seguridad y privacidad",
+    priority: 0,
+    subtopics: [
+      "private_mode", "rls", "tenant_isolation", "gdpr", "secrets_management",
+      "backup_restore", "adversarial_defense", "approval_gates",
+    ],
+  },
+  {
+    id: "planning_strategy",
+    label: "Planning & Strategy",
+    labelEs: "Planificación y estrategia",
+    priority: 0,
+    subtopics: [
+      "structured_plans", "roadmaps", "media_plans", "launch_plans", "growth_plans",
+      "contingency", "acceptance_criteria", "confidence_scoring",
+    ],
+  },
+] as const;
+
+export function getDomainById(id: KnowledgeDomainId): KnowledgeDomain | undefined {
+  return NELVYON_ONTOLOGY.find((d) => d.id === id);
+}
+
+export function allDomainIds(): KnowledgeDomainId[] {
+  return NELVYON_ONTOLOGY.map((d) => d.id);
+}

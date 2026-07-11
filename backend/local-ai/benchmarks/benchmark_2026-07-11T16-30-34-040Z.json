@@ -1,0 +1,419 @@
+{
+  "timestamp": "2026-07-11T16:30:34.137Z",
+  "ollamaVersion": "0.31.2",
+  "gpu": {
+    "vramUsedMiB": 1100,
+    "vramTotalMiB": 6144,
+    "gpuUtilPct": 31
+  },
+  "llm": [
+    {
+      "model": "llama3.2:3b-instruct-q4_K_M",
+      "label": "Llama 3.2 3B Instruct Q4",
+      "tests": {
+        "speed": {
+          "latencyMs": 48292,
+          "tokensOut": 140,
+          "tokensPerSec": 2.9,
+          "vramDuring": {
+            "vramUsedMiB": 1037,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 14
+          },
+          "responsePreview": "¡Claro! Aquí te dejo una posible descripción del marketing digital B2B en 3 frases:\n\nEl marketing digital B2B (Business to Business) se refiere a la promoción y venta de productos o servicios hacia otros negocios, utilizando herramientas digitales como el internet, redes sociales y publicidad en línea. El objetivo es generar interés y generar leads entre empresas potenciales, creando una conexión "
+        },
+        "spanish": {
+          "latencyMs": 2761,
+          "tokensOut": 157,
+          "tokensPerSec": 56.9,
+          "vramDuring": {
+            "vramUsedMiB": 3560,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 93
+          },
+          "responsePreview": "Asunto: ¿Necesitas un plan de marketing efectivo?\n\nEstimado/a [Nombre del destinatario],\n\nMe alegra conectarme contigo para hablar sobre cómo podemos ayudarte a alcanzar tus objetivos de marketing. En nuestra agencia, nos enfocamos en crear soluciones personalizadas que te permitan destacar en el mercado y aumentar tu visibilidad.\n\nNuestra propuesta de valor se basa en la experiencia y conocimient",
+          "qualityScore": 100
+        },
+        "reasoning": {
+          "latencyMs": 864,
+          "tokensOut": 36,
+          "tokensPerSec": 41.7,
+          "vramDuring": {
+            "vramUsedMiB": 3560,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 95
+          },
+          "responsePreview": "El margen bruto es del 65%, por lo que el cliente tiene un margen bruto de 780€/mes.\n\nLa respuesta final es 780.",
+          "qualityScore": 100
+        },
+        "tools": {
+          "latencyMs": 794,
+          "tokensOut": 31,
+          "tokensPerSec": 39.1,
+          "vramDuring": {
+            "vramUsedMiB": 3560,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 95
+          },
+          "responsePreview": "{\"tool\":\"create_campaign\",\"args\":{\"name\":\"Lanzamiento Q3\",\"budget_eur\":2500,\"channels\":[\"email\",\"linkedin\"]}}",
+          "qualityScore": 100
+        },
+        "context": {
+          "latencyMs": 1050,
+          "promptChars": 2930,
+          "qualityScore": 100,
+          "vramDuring": {
+            "vramUsedMiB": 3560,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 20
+          },
+          "responsePreview": "Las tres etapas del pipeline de ventas B2B mencionadas son: \n\n1. Awareness\n2. Consideración\n3. Decisión"
+        }
+      },
+      "gpuBefore": {
+        "vramUsedMiB": 1037,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 13
+      },
+      "ramBefore": {
+        "freeRamMiB": null
+      },
+      "gpuAfter": {
+        "vramUsedMiB": 3566,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 96
+      },
+      "ramAfter": {
+        "freeRamMiB": null
+      },
+      "composite": {
+        "speedScore": 7,
+        "spanish": 100,
+        "reasoning": 100,
+        "tools": 100,
+        "context": 100,
+        "vramScore": 100,
+        "total": 81.5
+      }
+    },
+    {
+      "model": "phi3:mini",
+      "label": "Phi-3 Mini 3.8B",
+      "tests": {
+        "speed": {
+          "latencyMs": 21718,
+          "tokensOut": 189,
+          "tokensPerSec": 8.7,
+          "vramDuring": {
+            "vramUsedMiB": 1037,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 19
+          },
+          "responsePreview": "El marketing digital para empresas (B2B) implica estrategias y tácticas dirigidas a clientes potenciales que son compañías, organizaciones o individuos con fines de lucro en lugar de consumidores individuales; se centra en construir relaciones duraderas mediante contenido relevante e informativo para establecer la credibilidad y el conocimiento del producto/servicio ofrecido. Utiliza plataformas c"
+        },
+        "spanish": {
+          "latencyMs": 14332,
+          "tokensOut": 332,
+          "tokensPerSec": 23.2,
+          "vramDuring": {
+            "vramUsedMiB": 4745,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 98
+          },
+          "responsePreview": "Estimado equipo [Nombre del Cliente],\n\nEspero este mensaje les encuentre bien. Me llamo [Su Nombre] y represento a [Empresa de Marketing]. Nuestra misión es ayudar a compañías como la suya, logrando un crecimiento sostenible mediante estrategias innovadoras que se adaptan al mercado actualizado español.\n\nNuestro servicio principal consiste en diseñar campañas personalizadas para posicionarse de ma",
+          "qualityScore": 85
+        },
+        "reasoning": {
+          "latencyMs": 1242,
+          "tokensOut": 65,
+          "tokensPerSec": 52.4,
+          "vramDuring": {
+            "vramUsedMiB": 4745,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 97
+          },
+          "responsePreview": "El margen bruto se calcula restando costes del total: 120 ends - 420€ = 780€/mes. Este es el ingreso después de deducir los servicios, pero antes de aplicar el margen objetivo sobre este valor.",
+          "qualityScore": 100
+        },
+        "tools": {
+          "latencyMs": 4454,
+          "tokensOut": 256,
+          "tokensPerSec": 57.5,
+          "vramDuring": {
+            "vramUsedMiB": 4745,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 97
+          },
+          "responsePreview": "```json\n{\n  \"tool\":\"create_campaign\",\n  \"args\":{\n    \"name\":\"Lanzamiento Q3\",\n    \"budget_eur\":250 endocrine system, and the role of hormones in regulating body functions. Explain how disruin... Answer: The human endocrine system is a network of glands that produce and secrete hormones directly into the bloodstream to regulate various bodily functions such as metabolism, growth, reproduction, and ",
+          "qualityScore": 0
+        },
+        "context": {
+          "latencyMs": 716,
+          "promptChars": 2930,
+          "qualityScore": 70,
+          "vramDuring": {
+            "vramUsedMiB": 4745,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 98
+          },
+          "responsePreview": "Awareness, Consideration, Decision"
+        }
+      },
+      "gpuBefore": {
+        "vramUsedMiB": 1037,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 23
+      },
+      "ramBefore": {
+        "freeRamMiB": null
+      },
+      "gpuAfter": {
+        "vramUsedMiB": 4749,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 97
+      },
+      "ramAfter": {
+        "freeRamMiB": null
+      },
+      "composite": {
+        "speedScore": 22,
+        "spanish": 85,
+        "reasoning": 100,
+        "tools": 0,
+        "context": 70,
+        "vramScore": 70,
+        "total": 58.9
+      }
+    },
+    {
+      "model": "qwen2.5:3b-instruct-q4_K_M",
+      "label": "Qwen2.5 3B Instruct Q4",
+      "tests": {
+        "speed": {
+          "latencyMs": 23800,
+          "tokensOut": 119,
+          "tokensPerSec": 5,
+          "vramDuring": {
+            "vramUsedMiB": 936,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 16
+          },
+          "responsePreview": "El marketing digital B2B (Business to Business) se refiere al uso de técnicas digitales para promover productos o servicios entre empresas, en lugar de consumidores finales. Se caracteriza por su naturaleza más profesional y orientada a resultados, con un enfoque fuerte en la construcción de relaciones duraderas con los clientes empresariales. Utiliza herramientas como el SEO (Mejora de las Posici"
+        },
+        "spanish": {
+          "latencyMs": 1983,
+          "tokensOut": 110,
+          "tokensPerSec": 55.5,
+          "vramDuring": {
+            "vramUsedMiB": 3086,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 94
+          },
+          "responsePreview": "Asunto: Oferta Especial para Mejorar tu Estrategia de Marketing\n\nEstimados profesionales,\n\nMe gustaría presentarles nuestra oferta especial que puede revolucionar su estrategia de marketing. Nuestros expertos en ventas y análisis pueden ayudar a identificar oportunidades únicas y implementar soluciones efectivas.\n\nPara comenzar esta colaboración, les invito a una reunión de información sin comprom",
+          "qualityScore": 85
+        },
+        "reasoning": {
+          "latencyMs": 1614,
+          "tokensOut": 86,
+          "tokensPerSec": 53.3,
+          "vramDuring": {
+            "vramUsedMiB": 3085,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 93
+          },
+          "responsePreview": "El margen bruto queda en 1890€. Se calcula restando los costes de servicio (420€) del ingreso mensual total (1200€ + 420€ = 1620€), luego multiplicando el resultado por el margen objetivo (1620€ x 35% = 1890€).",
+          "qualityScore": 40
+        },
+        "tools": {
+          "latencyMs": 789,
+          "tokensOut": 33,
+          "tokensPerSec": 41.8,
+          "vramDuring": {
+            "vramUsedMiB": 3095,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 93
+          },
+          "responsePreview": "{\"tool\":\"create_campaign\",\"args\":{\"name\":\"Lanzamiento Q3\",\"budget_eur\":2500,\"channels\":[\"email\",\"linkedin\"]}}",
+          "qualityScore": 100
+        },
+        "context": {
+          "latencyMs": 814,
+          "promptChars": 2930,
+          "qualityScore": 70,
+          "vramDuring": {
+            "vramUsedMiB": 3095,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 95
+          },
+          "responsePreview": "El pipeline de ventas B2B consta de awareness, consideración y decisión."
+        }
+      },
+      "gpuBefore": {
+        "vramUsedMiB": 936,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 20
+      },
+      "ramBefore": {
+        "freeRamMiB": null
+      },
+      "gpuAfter": {
+        "vramUsedMiB": 3095,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 86
+      },
+      "ramAfter": {
+        "freeRamMiB": null
+      },
+      "composite": {
+        "speedScore": 13,
+        "spanish": 85,
+        "reasoning": 40,
+        "tools": 100,
+        "context": 70,
+        "vramScore": 100,
+        "total": 63
+      }
+    }
+  ],
+  "embed": [
+    {
+      "model": "nomic-embed-text",
+      "label": "Nomic Embed Text",
+      "dim": 768,
+      "expectedDim": 768,
+      "latencyPerEmbedMs": 6217,
+      "gpuDuring": {
+        "vramUsedMiB": 938,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 16
+      },
+      "schemaFitScore": 100,
+      "speedScore": 50,
+      "dimMatchScore": 100,
+      "total": 85
+    },
+    {
+      "model": "mxbai-embed-large",
+      "label": "MxBai Embed Large",
+      "dim": 1024,
+      "expectedDim": 1024,
+      "latencyPerEmbedMs": 693,
+      "gpuDuring": {
+        "vramUsedMiB": 937,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 16
+      },
+      "schemaFitScore": 60,
+      "speedScore": 50,
+      "dimMatchScore": 100,
+      "total": 69
+    }
+  ],
+  "winners": {
+    "llm": {
+      "model": "llama3.2:3b-instruct-q4_K_M",
+      "label": "Llama 3.2 3B Instruct Q4",
+      "tests": {
+        "speed": {
+          "latencyMs": 48292,
+          "tokensOut": 140,
+          "tokensPerSec": 2.9,
+          "vramDuring": {
+            "vramUsedMiB": 1037,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 14
+          },
+          "responsePreview": "¡Claro! Aquí te dejo una posible descripción del marketing digital B2B en 3 frases:\n\nEl marketing digital B2B (Business to Business) se refiere a la promoción y venta de productos o servicios hacia otros negocios, utilizando herramientas digitales como el internet, redes sociales y publicidad en línea. El objetivo es generar interés y generar leads entre empresas potenciales, creando una conexión "
+        },
+        "spanish": {
+          "latencyMs": 2761,
+          "tokensOut": 157,
+          "tokensPerSec": 56.9,
+          "vramDuring": {
+            "vramUsedMiB": 3560,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 93
+          },
+          "responsePreview": "Asunto: ¿Necesitas un plan de marketing efectivo?\n\nEstimado/a [Nombre del destinatario],\n\nMe alegra conectarme contigo para hablar sobre cómo podemos ayudarte a alcanzar tus objetivos de marketing. En nuestra agencia, nos enfocamos en crear soluciones personalizadas que te permitan destacar en el mercado y aumentar tu visibilidad.\n\nNuestra propuesta de valor se basa en la experiencia y conocimient",
+          "qualityScore": 100
+        },
+        "reasoning": {
+          "latencyMs": 864,
+          "tokensOut": 36,
+          "tokensPerSec": 41.7,
+          "vramDuring": {
+            "vramUsedMiB": 3560,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 95
+          },
+          "responsePreview": "El margen bruto es del 65%, por lo que el cliente tiene un margen bruto de 780€/mes.\n\nLa respuesta final es 780.",
+          "qualityScore": 100
+        },
+        "tools": {
+          "latencyMs": 794,
+          "tokensOut": 31,
+          "tokensPerSec": 39.1,
+          "vramDuring": {
+            "vramUsedMiB": 3560,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 95
+          },
+          "responsePreview": "{\"tool\":\"create_campaign\",\"args\":{\"name\":\"Lanzamiento Q3\",\"budget_eur\":2500,\"channels\":[\"email\",\"linkedin\"]}}",
+          "qualityScore": 100
+        },
+        "context": {
+          "latencyMs": 1050,
+          "promptChars": 2930,
+          "qualityScore": 100,
+          "vramDuring": {
+            "vramUsedMiB": 3560,
+            "vramTotalMiB": 6144,
+            "gpuUtilPct": 20
+          },
+          "responsePreview": "Las tres etapas del pipeline de ventas B2B mencionadas son: \n\n1. Awareness\n2. Consideración\n3. Decisión"
+        }
+      },
+      "gpuBefore": {
+        "vramUsedMiB": 1037,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 13
+      },
+      "ramBefore": {
+        "freeRamMiB": null
+      },
+      "gpuAfter": {
+        "vramUsedMiB": 3566,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 96
+      },
+      "ramAfter": {
+        "freeRamMiB": null
+      },
+      "composite": {
+        "speedScore": 7,
+        "spanish": 100,
+        "reasoning": 100,
+        "tools": 100,
+        "context": 100,
+        "vramScore": 100,
+        "total": 81.5
+      }
+    },
+    "embed": {
+      "model": "nomic-embed-text",
+      "label": "Nomic Embed Text",
+      "dim": 768,
+      "expectedDim": 768,
+      "latencyPerEmbedMs": 6217,
+      "gpuDuring": {
+        "vramUsedMiB": 938,
+        "vramTotalMiB": 6144,
+        "gpuUtilPct": 16
+      },
+      "schemaFitScore": 100,
+      "speedScore": 50,
+      "dimMatchScore": 100,
+      "total": 85
+    }
+  }
+}

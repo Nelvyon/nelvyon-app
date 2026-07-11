@@ -94,7 +94,7 @@ export class RagIngestPipeline {
             content,
             vectorLiteral(vector),
             chunkChecksum,
-            JSON.stringify({ title: input.title, file: input.filePath }),
+            JSON.stringify({ title: input.title, file: input.filePath, ...(input.metadata ?? {}) }),
           ],
         );
       }

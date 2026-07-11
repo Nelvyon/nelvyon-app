@@ -11,6 +11,8 @@ export type RagChunk = {
   content: string;
   checksum: string;
   score?: number;
+  metadata?: Record<string, unknown>;
+  domain?: string;
 };
 
 export type RagSearchInput = {
@@ -30,9 +32,11 @@ export class LocalVectorStore {
       let n = 3;
       let sql = `
         SELECT c.id, c.tenant_id, c.client_id, c.document_id, c.source_id, c.chunk_index,
-               c.content, c.checksum,
+               c.content, c.checksum, c.metadata,
+               d.metadata AS doc_metadata,
                1 - (c.embedding <=> $1::vector) AS score
         FROM local_ai_rag_chunks c
+        JOIN local_ai_rag_documents d ON d.id = c.document_id
         WHERE c.tenant_id = $2 AND c.status = 'active' AND c.embedding IS NOT NULL`;
       if (input.clientId) {
         sql += ` AND c.client_id = $${n++}`;
@@ -42,17 +46,23 @@ export class LocalVectorStore {
       params.push(limit);
 
       const rows = await client.query(sql, params);
-      return rows.rows.map((r) => ({
-        id: String(r.id),
-        tenantId: String(r.tenant_id),
-        clientId: r.client_id ? String(r.client_id) : null,
-        documentId: String(r.document_id),
-        sourceId: String(r.source_id),
-        chunkIndex: Number(r.chunk_index),
-        content: String(r.content),
-        checksum: String(r.checksum),
-        score: Number(r.score),
-      }));
+      return rows.rows.map((r) => {
+        const chunkMeta = (r.metadata ?? {}) as Record<string, unknown>;
+        const docMeta = (r.doc_metadata ?? {}) as Record<string, unknown>;
+        return {
+          id: String(r.id),
+          tenantId: String(r.tenant_id),
+          clientId: r.client_id ? String(r.client_id) : null,
+          documentId: String(r.document_id),
+          sourceId: String(r.source_id),
+          chunkIndex: Number(r.chunk_index),
+          content: String(r.content),
+          checksum: String(r.checksum),
+          score: Number(r.score),
+          metadata: chunkMeta,
+          domain: String(docMeta.domain ?? chunkMeta.domain ?? ""),
+        };
+      });
     });
   }
 

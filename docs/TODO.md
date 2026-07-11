@@ -67,6 +67,7 @@
 - [x] Ollama instalado + benchmark real (ver `PHASE2_BENCHMARK_RESULTS.md`)
 - [x] Modelo LLM: `llama3.2:3b-instruct-q4_K_M`
 - [x] Embeddings: `nomic-embed-text`
-- [x] RAG smoke con embeddings reales
-- [ ] Router multi-modelo
+- [x] Constitución + ontología + 124 fuentes indexadas (`PHASE2_SPECIALIZATION.md`)
+- [x] Benchmark especialización ejecutado (1/7 gates — modelo 3B límite)
+- [ ] Mejorar gates antes de router (reranking, prompts, posible GPU mayor)
 - [ ] 22 agentes (**NO hasta base validada**)

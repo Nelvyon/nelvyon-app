@@ -10,7 +10,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Fase 1 ops** | ⏳ Solo bloquea apelación SES AWS (CEO) |
-| **Fase 2 IA local** | ✅ **Infra + Ollama + RAG real** — benchmark 2026-07-11 |
+| **Fase 2 IA local** | 🟡 **Especialización infra ~90%** — gates LLM 1/7 (modelo 3B) |
 | **Último commit** | Phase 2 local stack validation |
 
 ---
