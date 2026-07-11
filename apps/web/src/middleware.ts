@@ -19,8 +19,11 @@ const SAAS_LEGACY_GONE = new Set([
   "/api/saas/productos",
 ]);
 
-/** SaaS API routes that must work without session (install-time manifest, etc.). */
-const SAAS_PUBLIC_API = new Set(["/api/saas/pwa/manifest"]);
+/** SaaS API routes that must work without session (install-time manifest, email unsubscribe, etc.). */
+const SAAS_PUBLIC_API = new Set([
+  "/api/saas/pwa/manifest",
+  "/api/saas/campanias/unsubscribe",
+]);
 
 function isProtectedPath(pathname: string): boolean {
   if (SAAS_LEGACY_GONE.has(pathname)) return false;
