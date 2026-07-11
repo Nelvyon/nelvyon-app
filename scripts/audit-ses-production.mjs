@@ -42,10 +42,15 @@ const fail = (l, d) => {
 };
 const pass = (l, d) => check(l, true, d);
 
-async function probeHttp(url, expectStatus) {
+async function probeWebhook() {
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-    return res.status === expectStatus;
+    const res = await fetch(WEBHOOK, {
+      method: "POST",
+      body: "{}",
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(10000),
+    });
+    return res.status === 400 || res.status === 403;
   } catch {
     return false;
   }
@@ -166,11 +171,17 @@ try {
     fail("CLI account update probe", cliBlock.error.slice(0, 120));
   }
 
-  const webhookOk = await probeHttp(WEBHOOK, 403);
-  if (webhookOk) pass("HTTPS webhook endpoint", "reachable (403 without valid SNS signature expected)");
+  const webhookOk = await probeWebhook();
+  if (webhookOk) pass("HTTPS webhook endpoint", "reachable (400/403 without valid SNS expected)");
   else fail("HTTPS webhook endpoint", "not reachable");
 
-  const unsubOk = await probeHttp(UNSUBSCRIBE, 400);
+  let unsubOk = false;
+  try {
+    const res = await fetch(UNSUBSCRIBE, { signal: AbortSignal.timeout(10000) });
+    unsubOk = res.status === 400;
+  } catch {
+    unsubOk = false;
+  }
   if (unsubOk) pass("Unsubscribe flow endpoint", "public (400 invalid token expected)");
   else fail("Unsubscribe flow endpoint", "expected public 400 — check middleware deploy");
 
