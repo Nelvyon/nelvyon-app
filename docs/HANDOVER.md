@@ -10,22 +10,23 @@
 | Campo | Valor |
 |-------|-------|
 | **Fase 1 ops** | ⏳ Solo bloquea apelación SES AWS (CEO) |
-| **Fase 2 IA local** | ✅ **Base validada en ejecución real** (Docker + pgvector + RLS + backup) |
+| **Fase 2 IA local** | ✅ **Infra + Ollama + RAG real** — benchmark 2026-07-11 |
 | **Último commit** | Phase 2 local stack validation |
 
 ---
 
 ## Fase 2 — IA privada local
 
-**Validado en máquina propietario (2026-07-11):**
-- `local-ai-up` + `migrate` + health OK
-- Integración 8/8 (RLS memoria + RAG)
-- `local-ai-validate.mjs` 7/7 (persistencia, backup cifrado, restore temp DB, localhost bind, PRIVATE_MODE)
-- Rol app `nelvyon_local_app` (NOBYPASSRLS) + FORCE ROW LEVEL SECURITY
+**Validado (2026-07-11):**
+- Infra Docker/pgvector/RLS/backup 7/7
+- Ollama 0.31.2 + benchmark 3 LLM + 2 embeddings
+- **Modelo producción:** `llama3.2:3b-instruct-q4_K_M`
+- **Embeddings:** `nomic-embed-text` (768 dim)
+- RAG smoke con embeddings reales OK
 
 **Propietario debe (siguiente fase):**
-1. Instalar **Ollama** + benchmark modelos 3B (ver hardware audit)
-2. **No** construir 22 agentes hasta router + modelos elegidos
+1. **Router multi-modelo** + wiring agentes (no iniciado)
+2. **No** construir 22 agentes hasta router validado
 
 ---
 
@@ -43,7 +44,9 @@ node scripts/local-ai-up.mjs
 node scripts/local-ai-migrate.mjs
 pnpm -C apps/web exec tsx ../../scripts/local-ai-health.ts
 node scripts/local-ai-validate.mjs
-RUN_LOCAL_AI_INTEGRATION=1 pnpm -C apps/web exec vitest run backend/saas/__tests__/localAiPhase2.test.ts
+node scripts/local-ai-benchmark.mjs
+node scripts/local-ai-configure.mjs
+pnpm -C apps/web exec tsx ../../scripts/local-ai-rag-smoke.ts
 ```
 
 ---

@@ -1,5 +1,4 @@
 # Local AI runtime data — never commit
-storage/
-backups/
+backend/local-ai/benchmarks/
 *.enc
 .env.local

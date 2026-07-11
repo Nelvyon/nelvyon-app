@@ -64,6 +64,9 @@
 - [x] Tests unitarios egress + integración Docker (8 pass, 2026-07-11)
 - [x] Validación real: up/migrate/health/validate 7/7
 - [x] RLS FORCE + rol app `nelvyon_local_app` (NOBYPASSRLS)
-- [ ] CEO: Ollama + benchmark 3 candidatos 3B
+- [x] Ollama instalado + benchmark real (ver `PHASE2_BENCHMARK_RESULTS.md`)
+- [x] Modelo LLM: `llama3.2:3b-instruct-q4_K_M`
+- [x] Embeddings: `nomic-embed-text`
+- [x] RAG smoke con embeddings reales
 - [ ] Router multi-modelo
 - [ ] 22 agentes (**NO hasta base validada**)

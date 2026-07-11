@@ -24,17 +24,28 @@ export class LocalEmbeddingProvider {
     if (!input) throw new Error("Cannot embed empty text");
 
     const url = `${this.cfg.ollamaBaseUrl}/api/embeddings`;
-    const res = await privateModeFetch(url, "external_fetch", {
+    let res = await privateModeFetch(url, "external_fetch", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: this.cfg.embeddingModel, prompt: input }),
       signal: AbortSignal.timeout(120_000),
     });
 
-    const raw = await res.text();
-    let parsed: OllamaEmbedResponse;
+    let raw = await res.text();
+    if (!res.ok && res.status === 404) {
+      const embedUrl = `${this.cfg.ollamaBaseUrl}/api/embed`;
+      res = await privateModeFetch(embedUrl, "external_fetch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: this.cfg.embeddingModel, input }),
+        signal: AbortSignal.timeout(120_000),
+      });
+      raw = await res.text();
+    }
+
+    let parsed: OllamaEmbedResponse & { embeddings?: number[][] };
     try {
-      parsed = JSON.parse(raw) as OllamaEmbedResponse;
+      parsed = JSON.parse(raw) as OllamaEmbedResponse & { embeddings?: number[][] };
     } catch {
       throw new Error(`Ollama embeddings non-JSON (HTTP ${res.status}): ${raw.slice(0, 200)}`);
     }
@@ -43,7 +54,7 @@ export class LocalEmbeddingProvider {
       throw new Error(parsed.error ?? `Ollama embeddings HTTP ${res.status}`);
     }
 
-    const vector = parsed.embedding ?? [];
+    const vector = parsed.embedding ?? parsed.embeddings?.[0] ?? [];
     if (vector.length !== this.cfg.embeddingDim) {
       throw new Error(
         `Embedding dim mismatch: expected ${this.cfg.embeddingDim}, got ${vector.length}. ` +

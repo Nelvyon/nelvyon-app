@@ -38,19 +38,15 @@ Re-ejecutar: `node scripts/hardware-audit.mjs`
 
 ## Modelos open-weight — comparativa preliminar (licencia comercial)
 
-> **No descargados.** Selección final tras benchmarks locales (`scripts/local-ai-benchmark.mjs` — pendiente router).
+> **Benchmark ejecutado:** 2026-07-11 → `docs/PHASE2_BENCHMARK_RESULTS.md`
 
-| Familia | Licencia comercial | Tamaño recomendado | Fit hardware |
-|---------|-------------------|-------------------|--------------|
-| **Llama 3.2** | Llama Community License (revisar límites >700M MAU) | 3B Instruct Q4 | ✅ Óptimo |
-| **Phi-3 mini** | MIT | 3.8B Q4 | ✅ Óptimo |
-| **Mistral 7B** | Apache 2.0 | 7B Q4_K_M | 🟡 Marginal GPU |
-| **Qwen2.5** | Apache 2.0 | 3B/7B Q4 | 3B ✅ / 7B 🟡 |
-| **Gemma 2** | Gemma Terms | 2B/9B | 2B ✅ / 9B ❌ |
+**Selección final:** `llama3.2:3b-instruct-q4_K_M` (LLM) · `nomic-embed-text` (768 dim)
 
-**Recomendación provisional:** benchmark cortlist **Llama 3.2 3B**, **Phi-3 mini**, **Qwen2.5 3B** antes de fijar modelo de producción.
-
-**Embeddings (local):** `nomic-embed-text` (768 dim) — alinear con `LOCAL_AI_EMBEDDING_DIM=768`.
+| Familia | Licencia comercial | Tamaño recomendado | Fit hardware | Benchmark |
+|---------|-------------------|-------------------|--------------|-----------|
+| **Llama 3.2** | Llama Community License | 3B Instruct Q4 | ✅ Óptimo | **Ganador 81.5** |
+| Phi-3 mini | MIT | 3.8B Q4 | 🟡 VRAM alta | 58.9 — tools fail |
+| Qwen2.5 | Apache 2.0 | 3B Q4 | ✅ OK | 63.0 — reasoning fail |
 
 ---
 
@@ -58,7 +54,7 @@ Re-ejecutar: `node scripts/hardware-audit.mjs`
 
 | Runtime | Estado | Notas |
 |---------|--------|-------|
-| **Ollama** | Pendiente instalación/arranque propietario | `http://127.0.0.1:11434` |
+| **Ollama** | ✅ v0.31.2 · `llama3.2:3b-instruct-q4_K_M` + `nomic-embed-text` |
 | **OpenClaw local** | Permitido en PRIVATE_MODE | vía `PRIVATE_MODE_ALLOWED_HOSTS=openclaw` |
 | **MCP local** | Permitido | `http://localhost:*` en allowlist |
 

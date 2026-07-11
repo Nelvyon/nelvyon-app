@@ -67,7 +67,9 @@
 | `node scripts/local-ai-down.mjs` | Parada limpia |
 | `node scripts/local-ai-migrate.mjs` | Aplicar SQL |
 | `pnpm -C apps/web exec tsx ../../scripts/local-ai-health.ts` | Health JSON |
-| `node scripts/local-ai-validate.mjs` | Validación completa (7 checks) |
+| `node scripts/local-ai-benchmark.mjs` | Benchmark LLM + embeddings |
+| `node scripts/local-ai-configure.mjs` | Aplicar ganadores a `.env.local` |
+| `pnpm -C apps/web exec tsx ../../scripts/local-ai-rag-smoke.ts` | RAG con embeddings reales |
 | `node scripts/local-ai-backup.mjs` | pg_dump vía Docker |
 
 **Validado 2026-07-11:** up, migrate, health OK, validate 7/7, integración 8/8.
