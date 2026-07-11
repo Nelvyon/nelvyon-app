@@ -14,16 +14,16 @@
 | **Prod** | `https://nelvyon.com` — health OK; `git_sha` detrás de main |
 | **Staging** | `ideal-victory-staging` — `git_sha: 636a47bc` |
 | **Fase 1 código** | ✅ Cerrada |
-| **Fase 1 ops 100%** | ❌ Pendiente CEO (SES + primer backup) |
+| **Fase 1 ops 100%** | ❌ Pendiente CEO (SES production access + redeploy + primer backup) |
 
 ---
 
 ## Bloqueantes CEO para Fase 1 al 100%
 
-1. **SES** — dominio `nelvyon.com` PENDING + sandbox (`ProductionAccessEnabled: false`)
-2. **Backup** — ejecutar workflow `Database Backup` (secret ya configurado)
-3. **Railway** — redeploy production a `main` (fix status page `/api/os/health`)
-4. **SNS** — confirmar subscription bounces
+1. **SES production access** — sandbox (`ProductionAccessEnabled: false`, Case `178372013800016` DENIED) → **`docs/SES_PRODUCTION_ACCESS_APPEAL.md`**
+2. **SES dominio/DKIM** — ✅ SUCCESS (2026-07-11); SNS webhook ✅ confirmado
+3. **Backup** — ejecutar workflow `Database Backup` (secret ya configurado)
+4. **Railway** — redeploy production a `main` (fix webhook SES + `/api/os/health`)
 
 Detalle paso a paso: **`docs/CEO_FINAL_ACTIONS.md`**
 
@@ -40,7 +40,7 @@ Detalle paso a paso: **`docs/CEO_FINAL_ACTIONS.md`**
 
 ## Próximo paso EXACTO
 
-**CEO:** `docs/CEO_FINAL_ACTIONS.md` §4 → §5 → §1 (backup) → §7 (redeploy) → §6 (SNS).  
+**CEO:** `docs/SES_PRODUCTION_ACCESS_APPEAL.md` → enviar apelación §5–6 → redeploy Railway → §1 backup.  
 **No iniciar Fase 2** hasta Fase 1 ops al 100%.
 
 ---

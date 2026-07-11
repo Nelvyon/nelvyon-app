@@ -39,15 +39,11 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 ---
 
-## 4. AWS — Verificar dominio SES nelvyon.com (CRÍTICO)
+## 4. AWS — Verificar dominio SES nelvyon.com
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ❌ `VerificationStatus: PENDING`, `ErrorType: HOST_NOT_FOUND` — **falta DNS** |
-| **Causa** | `_amazonses.nelvyon.com` TXT no existe en Cloudflare |
-| **Guía** | `docs/SES_PRODUCTION_SETUP.md` §1 |
-| **Automatizable** | `node scripts/apply-ses-dns-cloudflare.mjs` (requiere `CLOUDFLARE_API_TOKEN`) |
-| **Manual** | Cloudflare → DNS → 1 TXT + 3 CNAME DKIM (proxy OFF) |
+| **Estado** | ✅ `VerificationStatus: SUCCESS`, DKIM `SUCCESS` (2026-07-11) |
 | **Verificación** | `node scripts/audit-ses-production.mjs` → Domain SUCCESS |
 
 ---
@@ -58,9 +54,8 @@ Ejecutar en orden. Marcar cada ítem al completar.
 |-------|-------|
 | **Estado** | ❌ `ProductionAccessEnabled: false`, **`ReviewDetails.Status: DENIED`** |
 | **CaseId AWS** | `178372013800016` |
-| **CLI intentado** | `put-account-details` — enviado, **rechazado por AWS** |
-| **Consola** | [SES Account dashboard eu-west-1](https://eu-west-1.console.aws.amazon.com/ses/home?region=eu-west-1#/account) → **Request production access** / reopen case en Support |
-| **Datos use-case** | Ver `docs/SES_PRODUCTION_SETUP.md` §2 |
+| **Apelación** | **`docs/SES_PRODUCTION_ACCESS_APPEAL.md`** — texto EN listo para copiar |
+| **Consola** | [SES Account dashboard eu-west-1](https://eu-west-1.console.aws.amazon.com/ses/home?region=eu-west-1#/account) o [Support case](https://console.aws.amazon.com/support/home#/case/?displayId=178372013800016&language=en) |
 | **Verificación** | `aws sesv2 get-account --region eu-west-1 --query ProductionAccessEnabled` → `true` |
 
 ---
@@ -153,8 +148,8 @@ Ejecutar en orden. Marcar cada ítem al completar.
 
 | Acción | Prioridad | Bloquea 100% |
 |--------|-----------|--------------|
-| SES dominio verificado | **Crítica** | **Sí** — DNS Cloudflare (§4 CEO_FINAL_ACTIONS) |
-| SES production access | **Crítica** | **Sí** — appeal caso DENIED (§5) |
+| SES dominio verificado | — | ✅ Hecho 2026-07-11 |
+| SES production access | **Crítica** | **Sí** — appeal `SES_PRODUCTION_ACCESS_APPEAL.md` (§5) |
 | SNS SES webhook | — | ✅ Hecho 2026-07-10 |
 | Redeploy prod Railway | Alta | No (pero recomendado) |
 | PRODUCTION_BASE_URL | — | ✅ Hecho |

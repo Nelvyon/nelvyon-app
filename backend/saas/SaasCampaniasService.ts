@@ -400,9 +400,10 @@ export class SaasCampaniasService {
   }
 
   private async resolveAudience(tenantId: string, audienceFilter: AudienceFilter): Promise<string[]> {
+    const excludeUnsubscribed = `NOT (COALESCE(c.tags, '{}') @> ARRAY['unsubscribed'])`;
     const usesDealJoin = Boolean(audienceFilter.deal_stage || audienceFilter.deal_open_only);
     if (usesDealJoin) {
-      const where: string[] = ["c.tenant_id = $1", "d.tenant_id = $1", "d.contact_id = c.id"];
+      const where: string[] = ["c.tenant_id = $1", "d.tenant_id = $1", "d.contact_id = c.id", excludeUnsubscribed];
       const params: unknown[] = [tenantId];
       let n = 2;
       if (audienceFilter.status) {
@@ -430,7 +431,7 @@ export class SaasCampaniasService {
       return rows.map((r) => r.id);
     }
 
-    const where: string[] = ["tenant_id = $1"];
+    const where: string[] = ["tenant_id = $1", `NOT (COALESCE(tags, '{}') @> ARRAY['unsubscribed'])`];
     const params: unknown[] = [tenantId];
     let n = 2;
     if (audienceFilter.status) {

@@ -36,6 +36,7 @@ type SesNotification = {
   delivery?: { recipients: string[] };
   mail: {
     headers?: Array<{ name: string; value: string }>;
+    tags?: Record<string, string[]>;
     commonHeaders?: { to?: string[] };
     destination?: string[];
   };
@@ -83,18 +84,54 @@ async function verifySnsSignature(msg: SnsEnvelope): Promise<boolean> {
 
 // ─── DB helpers ──────────────────────────────────────────────────────────────
 
-function extractIds(headers: Array<{ name: string; value: string }>) {
+function extractIds(mail: SesNotification["mail"]) {
+  const headers = mail.headers ?? [];
+  const tags = mail.tags ?? {};
   return {
-    campaniaId: headers.find((h) => h.name === "X-Campania-Id")?.value ?? null,
-    contactId: headers.find((h) => h.name === "X-Recipient-Id")?.value ?? null,
-    tenantId: headers.find((h) => h.name === "X-Tenant-Id")?.value ?? null,
+    campaniaId:
+      headers.find((h) => h.name === "X-Campania-Id")?.value ?? tags.campania_id?.[0] ?? null,
+    contactId:
+      headers.find((h) => h.name === "X-Recipient-Id")?.value ?? tags.contact_id?.[0] ?? null,
+    tenantId: headers.find((h) => h.name === "X-Tenant-Id")?.value ?? tags.tenant_id?.[0] ?? null,
   };
+}
+
+async function markRecipientsBouncedByEmail(
+  db: ReturnType<typeof DbClient.getInstance>,
+  emails: string[],
+) {
+  for (const email of emails) {
+    await db.query(
+      `UPDATE saas_campania_recipients scr SET status = 'bounced'
+       FROM saas_contacts sc
+       WHERE sc.id = scr.contact_id AND sc.email = $1`,
+      [email],
+    );
+  }
+}
+
+async function suppressContactsByEmail(
+  db: ReturnType<typeof DbClient.getInstance>,
+  emails: string[],
+) {
+  for (const email of emails) {
+    await db.query(
+      `UPDATE saas_campania_recipients scr SET status = 'unsubscribed'
+       FROM saas_contacts sc
+       WHERE sc.id = scr.contact_id AND sc.email = $1`,
+      [email],
+    );
+    await db.query(
+      `UPDATE saas_contacts SET tags = array(SELECT DISTINCT unnest(tags || ARRAY['unsubscribed'])), updated_at = NOW()
+       WHERE email = $1`,
+      [email],
+    );
+  }
 }
 
 async function handleBounce(db: ReturnType<typeof DbClient.getInstance>, notification: SesNotification) {
   const emails = (notification.bounce?.bouncedRecipients ?? []).map((r) => r.emailAddress);
-  const headers = notification.mail.headers ?? [];
-  const { campaniaId, contactId, tenantId } = extractIds(headers);
+  const { campaniaId, contactId, tenantId } = extractIds(notification.mail);
 
   if (campaniaId && contactId && tenantId) {
     await db.query(
@@ -102,26 +139,20 @@ async function handleBounce(db: ReturnType<typeof DbClient.getInstance>, notific
        WHERE tenant_id = $1 AND campania_id = $2 AND contact_id = $3`,
       [tenantId, campaniaId, contactId],
     );
-    // Increment bounced_count on the campania
     await db.query(
       `UPDATE saas_campanias SET updated_at = NOW() WHERE tenant_id = $1 AND id = $2`,
       [tenantId, campaniaId],
     );
-  } else if (process.env.NODE_ENV !== "production") {
-    for (const email of emails) {
-      await db.query(
-        `UPDATE saas_campania_recipients scr SET status = 'bounced'
-         FROM saas_contacts sc
-         WHERE sc.id = scr.contact_id AND sc.email = $1`,
-        [email],
-      );
-    }
+    return;
+  }
+
+  if (emails.length > 0) {
+    await markRecipientsBouncedByEmail(db, emails);
   }
 }
 
 async function handleComplaint(db: ReturnType<typeof DbClient.getInstance>, notification: SesNotification) {
-  const headers = notification.mail.headers ?? [];
-  const { campaniaId, contactId, tenantId } = extractIds(headers);
+  const { campaniaId, contactId, tenantId } = extractIds(notification.mail);
 
   if (campaniaId && contactId && tenantId) {
     await db.query(
@@ -137,29 +168,14 @@ async function handleComplaint(db: ReturnType<typeof DbClient.getInstance>, noti
     return;
   }
 
-  if (process.env.NODE_ENV === "production") return;
-
   const emails = (notification.complaint?.complainedRecipients ?? []).map((r) => r.emailAddress);
-  for (const email of emails) {
-    // Mark unsubscribed in recipients
-    await db.query(
-      `UPDATE saas_campania_recipients scr SET status = 'unsubscribed'
-       FROM saas_contacts sc
-       WHERE sc.id = scr.contact_id AND sc.email = $1`,
-      [email],
-    );
-    // Also mark contact as unsubscribed globally to prevent future sends
-    await db.query(
-      `UPDATE saas_contacts SET tags = array(SELECT DISTINCT unnest(tags || ARRAY['unsubscribed'])), updated_at = NOW()
-       WHERE email = $1`,
-      [email],
-    );
+  if (emails.length > 0) {
+    await suppressContactsByEmail(db, emails);
   }
 }
 
 async function handleDelivery(db: ReturnType<typeof DbClient.getInstance>, notification: SesNotification) {
-  const headers = notification.mail.headers ?? [];
-  const { campaniaId, contactId, tenantId } = extractIds(headers);
+  const { campaniaId, contactId, tenantId } = extractIds(notification.mail);
   if (!campaniaId || !contactId || !tenantId) return;
 
   await db.query(

@@ -5,17 +5,20 @@
 
 ---
 
-## Estado actual (CLI 2026-07-10)
+## Estado actual (CLI 2026-07-11)
 
 | Componente | Estado | Evidencia |
 |------------|--------|-----------|
-| Identidad dominio | ❌ `PENDING` | `ErrorType: HOST_NOT_FOUND` — falta TXT `_amazonses` |
-| DKIM | ❌ `PENDING` | 3 CNAME `_domainkey` ausentes en DNS |
-| Production access | ❌ `DENIED` | CaseId `178372013800016` — revisar en consola AWS |
+| Identidad dominio | ✅ `SUCCESS` | `VerifiedForSendingStatus: true` |
+| DKIM | ✅ `SUCCESS` | 3 CNAME `_domainkey` en Cloudflare (DNS only) |
+| Production access | ❌ `DENIED` | CaseId `178372013800016` — apelación: `docs/SES_PRODUCTION_ACCESS_APPEAL.md` |
+| EnforcementStatus | ✅ `HEALTHY` | `get-account` |
 | SNS topic | ✅ | `arn:aws:sns:eu-west-1:354780327276:nelvyon-ses-events` |
 | SNS → webhook | ✅ | Suscripción HTTPS **confirmada** (auto vía `/api/webhooks/ses`) |
 | Configuration set | ✅ | `nelvyon-prod` + eventos BOUNCE/COMPLAINT/DELIVERY → SNS |
 | Identity topics | ✅ | Bounce + Complaint → SNS |
+| Notification headers | ✅ | Bounce/Complaint/Delivery headers en payloads SNS |
+| Suppression list | ✅ | BOUNCE + COMPLAINT a nivel cuenta |
 | MAIL FROM custom | — | No configurado (usa default SES) |
 
 ---
@@ -59,28 +62,15 @@ Esperado: `SUCCESS` en ambos (5–30 min tras DNS).
 
 ## 2. Production Access (acción manual obligatoria — DENIED)
 
-CLI ya envió solicitud vía `put-account-details`. AWS respondió **`ReviewDetails.Status: DENIED`**.
+CLI envió solicitud vía `put-account-details` **antes** de verificar dominio/DKIM. AWS respondió **`ReviewDetails.Status: DENIED`**.
 
-### Pasos consola (exactos)
+**Apelación completa:** `docs/SES_PRODUCTION_ACCESS_APPEAL.md` (texto EN listo para copiar, pasos CEO, CLI post-aprobación).
 
-1. Abrir [Amazon SES → Account dashboard](https://eu-west-1.console.aws.amazon.com/ses/home?region=eu-west-1#/account) (región **eu-west-1**).
-2. Banner **Your Amazon SES account is in the sandbox** → clic **View details** o **Request production access**.
-3. Si aparece caso **178372013800016** → abrirlo en [AWS Support Center](https://console.aws.amazon.com/support/home).
-4. **Reabrir / appeal** con:
-   - **Mail type:** Transactional + marketing opt-in
-   - **Website:** `https://nelvyon.com`
-   - **Use case:** SaaS B2B — transactional (reset, booking, workflows) + campañas opt-in CRM
-   - **Bounce handling:** SNS → `https://nelvyon.com/api/webhooks/ses`
-   - **Volume:** &lt; 50k/mes inicial
-   - **Contact:** `dev@nelvyon.com`
-5. Tras aprobación:
+### Pasos consola (resumen)
 
-```bash
-aws sesv2 get-account --region eu-west-1 --query ProductionAccessEnabled
-# true
-```
-
-> **Nota:** `put-account-details --production-access-enabled` **no garantiza** aprobación; AWS revisa manualmente.
+1. [SES Account dashboard eu-west-1](https://eu-west-1.console.aws.amazon.com/ses/home?region=eu-west-1#/account) → **Request production access** o [Support case 178372013800016](https://console.aws.amazon.com/support/home#/case/?displayId=178372013800016&language=en) → Reply.
+2. Pegar texto de apelación (inglés) del doc §3.
+3. Tras aprobación: `aws sesv2 get-account --region eu-west-1 --query ProductionAccessEnabled` → `true`.
 
 ---
 
@@ -126,12 +116,13 @@ Opcional futuro: `SES_CONFIGURATION_SET=nelvyon-prod` en sends (delivery events 
 
 ## 5. Checklist cierre Fase 1 SES
 
-- [ ] DNS Cloudflare (4 registros) → dominio **Verified**
-- [ ] DKIM **Success**
-- [ ] Production access **Approved** (appeal caso DENIED)
+- [x] DNS Cloudflare (4 registros) → dominio **Verified** (2026-07-11)
+- [x] DKIM **Success**
+- [ ] Production access **Approved** (appeal caso DENIED — `SES_PRODUCTION_ACCESS_APPEAL.md`)
 - [x] SNS topic + webhook confirmado
 - [x] Bounce/complaint → SNS
-- [ ] Primer email test post-verificación
+- [ ] Production access **Approved** (CEO appeal)
+- [ ] Primer email test post-aprobación
 
 ---
 

@@ -30,7 +30,15 @@ const pass = (l, d) => check(l, true, d);
 try {
   const account = awsJson(`aws sesv2 get-account --region ${REGION}`);
   pass("SES account reachable", `ProductionAccessEnabled=${account.ProductionAccessEnabled}`);
-  if (!account.ProductionAccessEnabled) fail("Production access", "still false — AWS review pending or console action required");
+  if (account.EnforcementStatus === "HEALTHY") pass("EnforcementStatus", "HEALTHY");
+  else fail("EnforcementStatus", account.EnforcementStatus ?? "unknown");
+  const suppressed = account.SuppressionAttributes?.SuppressedReasons ?? [];
+  if (suppressed.includes("BOUNCE") && suppressed.includes("COMPLAINT")) {
+    pass("Account suppression list", "BOUNCE,COMPLAINT");
+  } else {
+    fail("Account suppression list", suppressed.join(",") || "not configured");
+  }
+  if (!account.ProductionAccessEnabled) fail("Production access", "still false — AWS manual appeal required (Case 178372013800016)");
 
   const identity = awsJson(`aws sesv2 get-email-identity --email-identity ${DOMAIN} --region ${REGION}`);
   const verified = identity.VerificationStatus === "SUCCESS";
@@ -74,6 +82,15 @@ try {
   ).NotificationAttributes?.[DOMAIN];
   if (notif?.BounceTopic && notif?.ComplaintTopic) pass("Identity bounce/complaint topics", "set");
   else fail("Identity notification topics", "incomplete");
+  if (
+    notif?.HeadersInBounceNotificationsEnabled &&
+    notif?.HeadersInComplaintNotificationsEnabled &&
+    notif?.HeadersInDeliveryNotificationsEnabled
+  ) {
+    pass("Notification headers", "bounce,complaint,delivery enabled");
+  } else {
+    fail("Notification headers", "enable via set-identity-headers-in-notifications-enabled");
+  }
 
   const identityConfig = identity.ConfigurationSetName ?? "";
   if (identityConfig === "nelvyon-prod") pass("Identity configuration set", "nelvyon-prod");

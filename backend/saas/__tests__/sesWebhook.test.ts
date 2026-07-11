@@ -85,6 +85,25 @@ describe("Bounce", () => {
     expect(upd).toBeDefined();
     expect(upd?.params).toContain("nohdr@x.com");
   });
+
+  it("usa SES message tags cuando no hay headers", async () => {
+    await POST(makeSnsPost({
+      notificationType: "Bounce",
+      bounce: { bouncedRecipients: [{ emailAddress: "bad@x.com" }], bounceType: "Permanent" },
+      mail: {
+        headers: [],
+        tags: {
+          campania_id: ["camp-tags"],
+          contact_id: ["contact-tags"],
+          tenant_id: ["tenant-tags"],
+        },
+      },
+    }) as never);
+
+    const upd = dbUpdates.find((u) => u.sql.includes("status = 'bounced'") && u.params.includes("tenant-tags"));
+    expect(upd).toBeDefined();
+    expect(upd?.params).toEqual(["tenant-tags", "camp-tags", "contact-tags"]);
+  });
 });
 
 // ─── Complaint ────────────────────────────────────────────────────────────────
