@@ -47,6 +47,20 @@ Texto exacto enviado en la solicitud denegada (`get-account`):
 
 **AWS no expone el motivo textual de la denegación vía CLI** sin plan Support. La apelación corrige los puntos verificables (dominio, DKIM, SNS, controles en código).
 
+### Bloqueo CLI demostrado (2026-07-11)
+
+Mientras `ReviewDetails.Status: DENIED`, **AWS rechaza cualquier `put-account-details` por CLI**:
+
+```
+aws sesv2 put-account-details ... --no-production-access-enabled
+→ ConflictException
+
+aws sesv2 put-account-details ... --production-access-enabled
+→ ConflictException
+```
+
+`ProductionAccessEnabled` **solo puede pasar a `true` por decisión humana de AWS** (Support case / consola). No existe otro API/CLI.
+
 ---
 
 ## 2. Evidencias verificadas (estado actual)
@@ -78,7 +92,7 @@ Ejecutado: `node scripts/audit-ses-production.mjs` (2026-07-11)
 | Rebotes (bounce) | SNS → `/api/webhooks/ses` → `saas_campania_recipients.status = 'bounced'` |
 | Reclamaciones (complaint) | SNS → webhook → `unsubscribed` + tag `unsubscribed` en `saas_contacts` |
 | Supresión AWS | `SuppressionAttributes: BOUNCE, COMPLAINT` a nivel cuenta |
-| Baja comercial | Enlace en campañas → `/api/saas/campanias/unsubscribe?token=…` |
+| Baja comercial | Enlace en campañas → `/api/saas/campanias/unsubscribe?token=…` (público, sin auth) |
 | Exclusión opt-out | Audiencias de campaña excluyen contactos con tag `unsubscribed` |
 | Sin listas compradas | Contactos solo desde registro SaaS, CRM del tenant y formularios con consentimiento |
 | Validación email | Registro, invitaciones equipo, waitlist, API (`email.includes("@")` + validaciones de servicio) |
@@ -87,7 +101,11 @@ Ejecutado: `node scripts/audit-ses-production.mjs` (2026-07-11)
 | Privacidad | `https://nelvyon.com/privacy` (RGPD, contacto `danicaste2004@gmail.com`) |
 | Abuso | Política de privacidad (prevención fraude); revisión manual vía contacto; métricas deliverability |
 
-**Corrección aplicada (2026-07-11):** webhook SES procesa rebotes/reclamaciones en producción por email y por tags SES (`campania_id`, `contact_id`, `tenant_id`); audiencias excluyen `unsubscribed`.
+**Correcciones aplicadas (2026-07-11):**
+- Webhook SES: rebotes/reclamaciones en producción (email + tags SES).
+- Audiencias excluyen contactos `unsubscribed`.
+- Middleware: `/api/saas/campanias/unsubscribe` público (fix 401 → 400).
+- AWS: headers en notificaciones bounce/complaint/delivery habilitados.
 
 ---
 
