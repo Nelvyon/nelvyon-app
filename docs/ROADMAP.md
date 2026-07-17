@@ -40,24 +40,21 @@
 
 ## FASE 2 — IA y Agentes
 
+> Base repo cohesiva. **Elite Real: CONDITIONAL PASS** (2026-07-17). `PHASE2_ELITE_CERTIFIED=false`.
+
 | Ítem | Estado | Notas |
 |------|--------|-------|
-| Private AI modular (`backend/private-ai/`) | 🟡 | Infra lista |
-| Provider registry (OpenAI, Anthropic, Ollama, stub) | 🟡 | Default unconfigured |
-| 17 agentes catálogo (`nelvyonAgentRegistry`) | 🟡 | Sin LLM runtime |
-| Tenant memory (`SaasTenantMemoryService`) | 🟡 | DB migración 497 |
-| RAG store (`NelvyonRagStore`) | 🟡 | Sin ingest pipeline |
-| MCP server (5 tools) | 🟡 | `/api/mcp` + stdio |
-| OpenClaw bridge | ❌ | Deshabilitado |
-| CEO brief cron automatizado | 🟡 | Código desplegado; verificación HTTP post-deploy pendiente |
-| Voice commands + brief | 🟡 | |
-| Agent runs audit (492) | 🟡 | |
-| Inbox agent (491) | 🟡 | |
-| Autonomía tenant (496) | 🟡 | |
-| Learning loop OS | 🟡 | Migraciones 468+ |
-| Sector OS agents (~1999 archivos) | 🟡 | Packs por sector |
-| LLM propio / Ollama producción | ❌ | |
-| RAG ingest docs corpus | ❌ | |
+| Especialización local certificada | ✅ | Intacta (freeze) |
+| Model Router certificado + SaaS | ✅ | Intacta (freeze) |
+| MCP Productivo | ✅ | SSOT; legacy deprecated |
+| Shared Memory | ✅ | + content security elite |
+| OpenClaw | 🟡 | Mock sandbox cert ✅ · URL real ops |
+| Orquestador | 🟡 | Sandbox executor real · LIVE LLM pendiente |
+| Panel + Metrics | ✅ | Elite status cards |
+| RAG unificado | 🟡 | Facade ✅ · corpus eval / ILIKE deprecación ops |
+| Prompt / Agent Registry | ✅ | Seed 17 + matrix |
+| Elite workflows + eval suite | 🟡 | Sandbox 10/10 · live E2E pendiente |
+| `PHASE2_ELITE_CERTIFIED` | ❌ | Criterios en `PHASE2_ELITE_CERT.md` |
 
 ---
 

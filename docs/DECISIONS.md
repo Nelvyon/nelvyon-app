@@ -133,3 +133,167 @@
 | **Decisión** | CI `security-gates.yml` falla en `pnpm audit --audit-level critical`; overrides (`ws`, `axios`, `vitest`) en `pnpm-workspace.yaml` (pnpm 10+) |
 | **Por qué** | Eliminar 3 critical (vitest legacy frontend, ws twilio); high transitive documentadas sin ocultar |
 | **Consecuencias** | 17 high restantes monitoreadas; Dependabot semanal; no exclusiones globales Gitleaks |
+
+---
+
+## ADR-013 — NELVYON-LABS bloque Seguridad: adaptadores Trivy/Gitleaks (sin vendor)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-15 |
+| **Decisión** | Integrar **Gitleaks** (ya en CI) y **Trivy fs** vía Action oficial + adaptador `backend/security/NelvyonSecurityScanAdapter.ts`; **no** copiar repos de NELVYON-LABS a `nelvyon-app` |
+| **Por qué** | Ganadores Labs bloque 1; mejora demostrable (vuln scan deps/fs + secrets); rollback por feature flag / job `if` |
+| **Consecuencias** | `security-gates.yml` + job `trivy-fs`; flags `NELVYON_GITLEAKS_ENABLED` / `NELVYON_TRIVY_ENABLED`; OpenClaw/MCP bloqueados hasta cierre bloque 1 |
+| **Rollback** | Variables repo = `0` → jobs omitidos; sin cambio de runtime SaaS |
+
+---
+
+## ADR-014 — NELVYON-LABS bloque maestro: cierre 461/461 sin vendor copy
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | Cerrar **461/461** con estados definitivos; cosechar **138** patrones en `nelvyon-labs-knowledge-patterns.json`; registry **24** dominios en `NelvyonLabsCapabilityRegistry.ts`; certificación `NelvyonLabsMasterClosure.ts` + lock `.labs-master-closure.lock` |
+| **Por qué** | Aprovechar arquitecturas/patrones/algoritmos sin copiar monorepos Labs; stack NELVYON superior donde sustituye; PRIVATE_MODE + Router certificado intactos |
+| **Consecuencias** | 10 ganador · 8 parcial · 138 conocimiento · 19 sustituido · 269 descartados (duplicidad/licencia/incompat/evidencia); **OpenClaw/MCP productivo/orquestador/agentes/panel bloqueados** hasta fase siguiente |
+| **Rollback** | Flags `NELVYON_*` off; sin servicios persistentes nuevos; RAM/VRAM runtime 0 |
+| **Evidencia** | `docs/NELVYON_LABS_MASTER_CLOSURE.md` · `node scripts/nelvyon-labs-master-closure.mjs` |
+
+---
+
+## ADR-015 — Router certificado → SaaS Private AI (wiring HTTP)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | `LocalModelRouterProvider` en cadena Private AI (`local_router` → `local_ollama`); `SaasPrivateAiService.executeInference/routeInference`; rutas `/api/saas/private-ai/inference` y `/router-health` con `requireSaasContext` |
+| **Por qué** | Unificar agentes SaaS con Router certificado (RAG, gate, fallback 8B, SecurityGuard) sin duplicar fetch Ollama crudo |
+| **Consecuencias** | `routerContext.tenantId` obligatorio en completions; audit en `saas_private_ai_audit`; rollback `NELVYON_LOCAL_ROUTER_ENABLED=0` |
+| **Evidencia** | `docs/PHASE2_ROUTER_SAAS_WIRING.md` · tests `saasPrivateAiRouterWiring.test.ts` |
+
+---
+
+## ADR-016 — MCP Productivo enterprise (sin OpenClaw)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | Capa `backend/mcp/` productiva: ToolRegistry, PolicyEngine, Client/Server, resiliencia, approvals, Router bridge, API `/api/saas/mcp`; tools destructivas denied; high → approval_required |
+| **Por qué** | Capa segura de herramientas para Router/orquestador/agentes futuros; PRIVATE_MODE; sin vendor SDK obligatorio |
+| **Consecuencias** | Flag `NELVYON_MCP_PRODUCTIVE_ENABLED`; certificación `completed: true` (2026-07-16); OpenClaw/orquestador/agentes siguen bloqueados (ADR-017) hasta Shared Memory runtime + decisión producto |
+| **Evidencia** | `mcp_certification_final.json` · soak `mcp_soak_2026-07-16T19-56-30-289Z.json` · `mcpProductive.test.ts` 23 pass · benchmark 100% gates |
+
+---
+
+## ADR-017 — Prep post-MCP: Shared Memory / OpenClaw / Orquestador / Agentes / Panel (sin runtime)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | Mientras soak MCP corre, preparar **solo contratos** en `backend/shared-memory`, `openclaw`, `orchestrator`, `agents`, `ai-panel`, `automations` + docs `PHASE2_*`. Flags OFF. Schema memoria en `schema.proposed.sql` (no migrar aún). |
+| **Por qué** | Cero tiempo muerto; arranque inmediato de Memoria Compartida tras cert MCP; sin invalidar soak/Router |
+| **Consecuencias** | Runtime Shared Memory = siguiente bloque implementación; OpenClaw/orch/agentes/panel siguen bloqueados hasta orden obligatorio |
+| **Evidencia** | `docs/PHASE2_PREP_INDEX.md` · tests prep 10 pass |
+
+---
+
+## ADR-018 — Auditoría maestra soak-safe: HMAC fail-closed + CI producto
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | Durante soak MCP, solo mejoras objetivas fuera de MCP/Router: `requireHmacSecret()` sin fallbacks hardcodeados; root `lint` → `apps/web`; Security Gates PR en `apps/web/**`+`backend/**`; mig 512 índice citas **autorada** sin apply en DB soak; typecheck local-ai en path Private AI |
+| **Por qué** | Firmas forjables y CI engañoso son riesgo enterprise inmediato; no invalidar evidencia de soak |
+| **Consecuencias** | Quotes/LMS/cert fallan cerrados sin secret ≥32; `lint:legacy` para Vite; aplicar 512 en próximo deploy seguro |
+| **Evidencia** | `docs/MASTER_AUDIT_2026-07-16.md` · `hmacSecret.test.ts` · `tsc` PASS |
+
+---
+
+## ADR-019 — Estándar definitivo de calidad (excelencia > velocidad de bloques)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | Criterio permanente: aceptar solo mejoras objetivas (limpieza, mantenibilidad, seguridad, escalabilidad, rendimiento, simplicidad, coherencia arquitectónica). Cerrar bloques solo con evidencia de que no queda mejora de alto impacto razonable. Prohibido “perfecto”, placeholders, deuda evitable, docs ficticias, reescrituras sin justificación. |
+| **Por qué** | Cantidad de bloques no garantiza producto enterprise; un arquitecto senior debe poder auditar coherencia, seguridad, tests y docs reales |
+| **Consecuencias** | Regla Cursor `enterprise-quality.mdc` alwaysApply; doc `QUALITY_STANDARD.md`; todo trabajo futuro (OS/SaaS/IA/infra) se juzga con este listón, sin invalidar Router/MCP/PRIVATE_MODE |
+| **Evidencia** | `.cursor/rules/enterprise-quality.mdc` · `docs/QUALITY_STANDARD.md` |
+
+---
+
+## ADR-020 — Auditoría elite soak-safe (auth context, XSS, rate-limit matcher)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | Durante soak MCP, aplicar solo P0/P1 objetivos: `ctx.claims.userId`, `escapeHtml` cert/citas, HMAC ≥32 en tracking/portal/OAuth, middleware matcher forms/contact, stripe-store skew+timingSafe, `saasErrorBody` genérico, web-gates 508–512 |
+| **Por qué** | Bugs reales (partner roto, XSS, rate-limit muerto, leak 500) sin invalidar evidencia soak |
+| **Consecuencias** | Lead-scoring/Ollama/mig apply aplazados; informe `MASTER_AUDIT_ELITE_2026-07-16.md` |
+| **Evidencia** | 42 tests PASS · anti-stub PASS · tsc PASS · soak fail=0 |
+
+---
+
+## ADR-021 — Programa definitivo de excelencia (verdad > declaración)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | Ejecutar programa por fases con distinción implementado/conectado/probado/certificado/desplegado/operativo; mapa + matriz en `EXCELLENCE_PROGRAM.md`; soak MCP intacto; certificar solo con artefactos; no “100%/perfecto” sin métricas |
+| **Por qué** | Evitar progreso simulado por docs/archivos; alinear CTO/owner con evidencia reproducible |
+| **Consecuencias** | Orden bloqueante post-MCP: cert → mig 512 → lead-scoring → Ollama/RAG → UUID 505 → regresión → Shared Memory… |
+| **Evidencia** | `docs/EXCELLENCE_PROGRAM.md` · checkpoint soak · tsc/tests snapshot |
+
+---
+
+## ADR-022 — Hardening SaaS: RBAC write, SSRF, BFF fail-closed, XSS public HTML
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-16 |
+| **Decisión** | Mutaciones privilegiadas (api-keys, webhooks, team, store settings) exigen `settings.write` (owner). Webhooks: `assertSafeEgressUrl`. BFF POST: 502 sin mock. Contratos/funnels: `sanitizeRichHtml`. OAuth connect: allowlist hosts. SSO: rol desde `workspace_members`. |
+| **Por qué** | Escalada de privilegios (viewer mint `*`), SSRF, mocks silenciosos y XSS público son P0/P1 objetivos sin invalidar soak MCP |
+| **Consecuencias** | Solo owner muta esos settings; CI `check-saas-privileged-write.mjs`; tests SSRF/XSS/RBAC/OAuth |
+| **Evidencia** | vitest suites + tsc PASS · soak MCP fail=0 |
+
+---
+
+## ADR-023 — Lead scoring SSOT (eliminar dual stack HTTP)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-17 |
+| **Decisión** | Fuente de verdad: `SaasLeadScoringService` + `/api/saas/lead-scoring`. Ruta legacy `/api/saas/lead-scoring/leads` responde **410 Gone**. |
+| **Por qué** | Dos sistemas de scoring (tenant CRM vs user-scoped LLM) contradicen certificación E2E y generan deuda/confusión de producto |
+| **Consecuencias** | Clase `LeadScoringService` **eliminada** (2026-07-17); tabla `scored_leads` dropeada en mig **513**; clientes de `/leads` deben usar `/api/saas/lead-scoring` |
+| **Evidencia** | `leadScoringDeprecatedRoute.test.ts` · KI-R015 · `513_drop_scored_leads.sql` |
+
+
+## ADR-024 — Shared Memory runtime + orquestador/panel Fase 2 (sin romper certs)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-17 |
+| **Decisión** | Tras MCP cert (ADR-016/017): Shared Memory runtime (mig 514, Postgres+InMemory, policy, SaaS API, MCP memory_* flag-gated). Orquestador in-memory + Panel /saas/ai + AgentRegistry + PromptRegistry. OpenClaw solo si Memory ON + flag; bridge Disabled. Flags default OFF. |
+| **Por qué** | Orden ADR-017; Fase 1/certs Router+MCP intactos; fail-closed sin flags |
+| **Consecuencias** | Ops habilita NELVYON_SHARED_MEMORY_ENABLED=1 tras migrate; OpenClaw bridge real pendiente URL/sandbox |
+| **Evidencia** | sharedMemoryContracts + phase2Runtime + mcpProductive 23 pass · tsc 0 |
+
+## ADR-025 — RAG unificado via facade (sin tocar Router cert)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-17 |
+| **Decisión** | UnifiedRagStore (IRagStore): prefer LocalRagRetriever; fallback NelvyonRagStore. LocalModelRouter unchanged. Rollback NELVYON_RAG_PREFER_LOCAL=0. Private AI orchestrator + MCP rag_search use facade. |
+| **Por qué** | Cierra KI-005 sin invalidar certificación Router/Specialization |
+| **Evidencia** | PHASE2_RAG_UNIFIED.md · phase2Integration.test.ts |
+
+## ADR-026 — Fase 2 Elite Real: sandbox-first certification
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-17 |
+| **Decisión** | Excelencia de agentes se certifica primero con ejecutor sandbox determinista, eval suite sin LLM de pago, OpenClaw mock local y workflows enterprise E2E. `PHASE2_ELITE_CERTIFIED` solo tras live + ops. Orquestador deja de marcar jobs `planned` stub. Memory writes pasan SecurityGuard + redacción. |
+| **Por qué** | Compilar/conectar/tests base ≠ agentes que completan trabajo empresarial validado; evita claims sin evidencia |
+| **Consecuencias** | Harness `run-phase2-elite-cert.mjs` emite máximo `CONDITIONAL_PASS`; LIVE vía `NELVYON_ORCHESTRATOR_LIVE` es bloque aparte |
+| **Evidencia** | `phase2Elite.test.ts` · `docs/PHASE2_ELITE_CERT.md` |
+

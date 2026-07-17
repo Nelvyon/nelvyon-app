@@ -4,7 +4,130 @@
 
 ---
 
-## 2026-07-10 (tarde)
+## 2026-07-17
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Fase 2 Elite | **CONDITIONAL PASS** | Memory content security · orchestrator sandbox executor · 10 workflows E2E · agent eval suite · OpenClaw mock · capability matrix · `run-phase2-elite-cert.mjs` · `PHASE2_ELITE_CERTIFIED=false` |
+| Fase 2 | **CIERRE AUDITORÍA** | UnifiedRag SSOT en SaaS · inference+Context Engine · platformStatus Memory/OpenClaw · OpenClaw delegate gated · Prompt seed 17 · legacy MCP deprecated · labs flags |
+| Fase 2 | **Integración** | Private AI ↔ Shared Memory (Context Engine) · auto STM write · PromptRegistry en agents |
+| Fase 2 | RAG | `UnifiedRagStore` facade (ADR-025) · MCP `rag_search` wired · rollback `NELVYON_RAG_PREFER_LOCAL=0` |
+| Fase 2 | OpenClaw | `HttpOpenClawBridge` + factory gated · docs ops |
+| Fase 2 | Tools | Agent↔MCP tool map + optional MCP invoke |
+| Fase 2 | Obs | `PrivateAiMetrics` + `/api/saas/private-ai/metrics` · panel widget |
+| Fase 2 | **Shared Memory runtime** | ADR-024 · mig **514** · API · MCP memory_* flag-gated |
+| Fase 2 | Orquestador | `InMemoryAgentOrchestrator` + API `/api/saas/orchestrator` (flag) |
+| Fase 2 | Agentes / prompts | `AgentRegistry` unificado · `PromptRegistry` · API `/api/saas/ai-agents` |
+| Fase 2 | Panel | `/saas/ai` + nav `ai` · widgets → APIs reales |
+| Fase 2 | OpenClaw | Auth gate = Memory ON + `NELVYON_OPENCLAW_BRIDGE_ENABLED` (bridge Disabled) |
+| SSOT IA packs | Ollama-first | `llmAdapter`: Ollama local antes que OpenAI; `isAutonomousOllamaConfigured`; `isPackLlmEnvConfigured` respeta `OLLAMA_CONFIGURED=1` |
+| Private AI | Thin-wrap | `LocalOllamaProvider` delega chat a `OllamaClient` (SSOT HTTP Router); eliminado shim `OllamaProvider.ts` |
+| Lead scoring | Consolidación | Eliminado `LeadScoringService` + dashboard muerto + smoke ref; mig **513** `DROP scored_leads`; ruta `/leads` sigue 410 |
+| Docs | Verdad | AI_CONTEXT / DATABASE / KI-015→R015 / EXCELLENCE / inventory / route audit; KI-005 = dual RAG only |
+| Tests | Adapter | `llmAdapter.ollama.test.ts` — prefer Ollama → OpenAI fallback → mock |
+| Health | SSOT | `local-ai-health.mjs` preferido; `.ts` alias documentado |
+| Readiness | Align | `run-production-readiness` acepta `OLLAMA_CONFIGURED=1`; critical e2e + env docs Ollama-first |
+| tsc | Scope | `tsconfig` incluye `backend/autonomous/llm/**` (sin arrastrar benchmarks local-ai) |
+| Excelencia | **DR CERRADO** | `run-postgres-restore-drill.mjs` → **8/8 PASS**; `internalReady=true` |
+| SES/Stripe | Hardening | Aliases AWS_SES_* / STRIPE_API_KEY en `saasEnv`; sequences `ses_configured` + banner UI |
+| OS packs | Preflight | Kickoff 503 `LLM_NOT_CONFIGURED` si `AUTONOMOUS_PRODUCTION` sin LLM |
+| Readiness | Script | `run-production-readiness.mjs` — agrega env + artefactos |
+| Docs | KI | KI-013/011 → historial; KI-014 activo; informe global actualizado |
+| Cert global | Re-run | **41/41 PASS** · vitest **2338** · tsc **0** |
+| Cert global | **FINAL** | `run-nelvyon-global-cert.mjs` → **40/40 PASS**; informe `NELVYON_GLOBAL_CERTIFICATION_FINAL.md` — veredicto **NO LISTO** (SES/Stripe/staging/DR) |
+| Workflows | Fix | `parseJsonField` en rowToWorkflow/rowToRun tras jsonb stringify (7 tests dispatch rotos) + re-cert módulo |
+| Amarillos | **DRAIN CERRADO** | Cola internos **VACÍA** — `run-yellow-queue-drain.mjs` → 14 CERTIFIED + 14 BLOCKED_EXTERNAL; consola `yellow_queue_drain_console.txt` |
+| Lead scoring | Fix bug | SQL snapshot/list: `c.company` + `saas_campania_recipients` (antes `company_name` / tabla inexistente → 500) + tests regresión |
+| Workflows | Fix bug | `createWorkflow`/`updateWorkflow` jsonb via `JSON.stringify` + `::jsonb` (antes 500 `22P02`) + test regresión |
+| Cert harness | Fix | Stage deals válidos; MODULES_OUT → `docs/evidence/...`; retry register 429; skip CERTIFIED |
+| Amarillos | Cert | `e2e.live_multitenant` + `saas.auth.jwt` (9/9 HTTP) + `saas.crm.contacts` (16/16 HTTP) → **CERTIFIED**; cola `YELLOW_ELIMINATION_QUEUE.md` |
+| Infra cert | **UP** | Docker + `pgvector/pg16` :5433 + Redis :6380 · migraciones 408 |
+| E2E live DB | **PASS** | multi-tenant cross-tenant=0 |
+| Schema | Fix P1 | Colisión api_keys (406) + invoices (415) |
+| Lead scoring | ADR-023 | `/leads` → 410 Gone |
+
+## 2026-07-16
+
+## 2026-07-16
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| MCP Productivo | **COMPLETADO** | Soak 2h `mcp_soak_2026-07-16T19-56-30-289Z.json` — 7200040 ms · 121912 ok · fail=0 · errors=0 · gates verdes; tests 23/23 re-verificados; `mcp_certification_final.json` `completed: true` — **MCP PRODUCTIVO NELVYON COMPLETADO** |
+| Calidad | Permanente | Refuerzo misión excelencia absoluta en `QUALITY_STANDARD.md` + regla Cursor — evidencia > volumen; soak MCP intacto |
+| Certificación OS/SaaS | Inventario | Suite `OS_SAAS_*.md` + `os-saas-functional-matrix.json` — 333 páginas / 513 APIs clasificadas; **NO** declarar COMPLETADOS (E2E aplazado por soak) |
+| Seguridad SaaS | Fix | RBAC: api-keys/webhooks/team/store mutations → `settings.write` (owner); SSRF egress webhooks; BFF POST fail-closed 502; sanitize contratos/funnels; OAuth authorize allowlist; SSO role vía workspace_members |
+| Excelencia | Programa | `EXCELLENCE_PROGRAM.md` — inventario real, matriz I/C/T/Cert/Ops, veredicto OS/SaaS; soak MCP intacto |
+| Docs verdad | Fix | `PHASE2_MODEL_ROUTER.md` alineado a Router `completed: true`; `PROJECT_STATUS` sin “100% ops” |
+| Auditoría elite | CTO | XSS HTML · ctx.claims.userId · HMAC unificado · forms rate-limit matcher · stripe-store skew · saasErrorBody · CI 508–512 · informe `MASTER_AUDIT_ELITE_2026-07-16.md` |
+| Calidad | ADR-019 | Estándar definitivo: excelencia > velocidad de bloques · `QUALITY_STANDARD.md` · regla Cursor alwaysApply |
+| Auditoría maestra | Refuerzo | HMAC fail-closed · typecheck local-ai · CI lint→apps/web · security-gates paths · mig 512 citas · docs KI-005 · informe `MASTER_AUDIT_2026-07-16.md` |
+| Seguridad | Fix | `requireHmacSecret()` — elimina fallbacks `dev-secret` / `nelvyon-cert-secret` (Quotes/LMS/cert) |
+| Tests | +5 | `hmacSecret.test.ts` + Quotes fail-closed; suite Quotes/LMS/wiring OK |
+| Typecheck | Fix | `LocalRagRetriever` tipado + `clientId` RAG; path `pg` en tsconfig; implicit any local-ai |
+| CI | Fix | Root `lint` → `apps/web` (`lint:legacy` frontend); Security Gates PR en `apps/web/**`+`backend/**` |
+| DB | Nuevo | `512_saas_appointments_tenant_start_idx.sql` (aún no aplicada en soak) |
+| MCP Productivo | Nuevo | `backend/mcp/` Server/Client/Policy/Tools/Resilience · ADR-016 |
+| MCP API | Nuevo | `GET/POST /api/saas/mcp` |
+| MCP Tests | 23 pass | `mcpProductive.test.ts` |
+| MCP Benchmark | 100% gates | selection/critical/approval |
+| MCP Soak | **FAIL incompleto** | Kill ~5 min sin JSON 2h; checkpoint fix en soak script; re-lanzado |
+| Fase 2 prep | ADR-017 | Shared Memory/OpenClaw/Orch/23 agents/Panel/Autos — contratos+docs+10 tests; runtime OFF |
+| Router SaaS | **CERRADO** | LocalModelRouterProvider + inference API + audit · ADR-015 |
+| API | Nuevo | `POST /api/saas/private-ai/inference` · `GET /router-health` |
+| Tests | 7 pass | `saasPrivateAiRouterWiring.test.ts` |
+| Labs bloque maestro | **CERRADO** | 461/461 · 138 patrones · registry 24 dominios |
+| Knowledge harvest | 138 | `nelvyon-labs-knowledge-patterns.json` + `NelvyonLabsKnowledgeHarvest.ts` |
+| Capability registry | 24 dominios | `NelvyonLabsCapabilityRegistry.ts` — IA/Router/MCP/RAG/CRM/… |
+| Certificación | Runtime | `NelvyonLabsMasterClosure.ts` + `.labs-master-closure.lock` |
+| Script | Verificación | `node scripts/nelvyon-labs-master-closure.mjs` |
+| ADR | 014 | Cierre maestro; OpenClaw/MCP productivo/agentes bloqueados |
+| Tests | 12 pass | Master closure + adapters Labs |
+
+---
+
+## 2026-07-15
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Router P0 | Fix | Cola depth+prune, cancel AbortSignal, ExecutionLimiter, circuit breaker scope |
+| Router | Fix | Ollama timeouts 120s/300s, gate wait timeout, GPU cache, sin implicitReclaim |
+| Router | Instrumentación | Latencia por clase + steady-state (`latencyMetrics.ts`) — no mezclar 3B/8B en un solo p95 |
+| Router soak | Completado | FINAL 2h — `router_soak_2026-07-15T19-09-13-073Z.json` — todos los gates verdes incl. `latencyByClass` |
+| Certificación | **COMPLETADO** | `router_certification_final.json` — `completed: true` — **ROUTER DE MODELOS NELVYON COMPLETADO** |
+| Labs Seguridad | Integrado | Gitleaks (CI existente) + Trivy fs (nuevo job) + `NelvyonSecurityScanAdapter` · ADR-013 |
+| Labs Observabilidad | Cerrado | `uptime-kuma` parcial + `prometheus` sustituido · `NelvyonObservabilityAdapter` |
+| Labs 46 RESERVA | Cerrado | 2 integ. · 8 parcial · 19 sustituidos · 17 descartados · **21.7%** real · informe FINAL |
+| Labs opcionales | Contratos | MCP TS / OCR / cheerio / ntfy / ffmpeg / whisper / fontsource (flags OFF) |
+| NELVYON-LABS | Eval | 461/461 decisiones + matriz/winners; catálogo `labsDecision` |
+| Tests | Adapter | Security+Observability+LabsOptional **8 pass** |
+
+## 2026-07-15 (anteriores — soak parcial)
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Router soak | Parcial | Primer soak 2h con `latencyStable` global falso (mezcla 3B/8B) — superado por soak FINAL |
+| NELVYON-LABS | Descarga | Clones + reconcile + descartes searxng/blender |
+
+## 2026-07-14
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Model Router | Nuevo | `backend/local-ai/router/` — clasificación, riesgo, cola, fallback 3B→8B |
+| Tests | 24 pass | `localAiModelRouter.test.ts` |
+| Benchmark routing | 100% | `router_benchmark_cert_v1_*.json` |
+| Benchmark E2E | PASS | `router_e2e_cert_e2e_pass_*.json` — executeTask + Ollama |
+| Recovery | PASS | `router_recovery_*.json` — circuit breaker, Postgres, cola |
+| Fixes | Router | VRAM swap-aware, JSON null retrieval, fallback JSON, recovery timeout |
+| Soak | En curso | 2h — `ROUTER_SOAK_MS=7200000` |
+| Docs | Actualizado | PHASE2_MODEL_ROUTER, BENCHMARK, SECURITY, PROJECT_STATUS, TODO |
+
+## 2026-07-12
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Especialización | Certificada | 15/15 gates × 3/3 — `v6_cert_fixed` |
+
+---
 
 | Hora | Área | Cambio | Descripción |
 |------|------|--------|-------------|

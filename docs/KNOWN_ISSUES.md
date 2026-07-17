@@ -6,6 +6,36 @@
 
 ## Activos
 
+### KI-018 — Fase 2 Elite: `PHASE2_ELITE_CERTIFIED` pendiente
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | Abierto |
+| **Severidad** | Controlada (no bloquea Fase 1 interna) |
+| **Detalle** | Sandbox elite CONDITIONAL PASS. Falta: E2E live con Ollama, umbrales por agente en producción, migrate 514 + flags, OpenClaw URL real, RAG corpus indexado, ciclo mejora controlada. |
+| **Docs** | `docs/PHASE2_ELITE_CERT.md` · ADR-026 |
+
+### KI-016 — Docker Desktop local no disponible para E2E live
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | ~~Alta~~ → **Resuelto 2026-07-17** |
+| **Detalle** | Engine UP; Postgres pgvector `:5433` + Redis `:6380`; live multi-tenant PASS |
+| **Evidencia** | `PRODUCTION_CERTIFICATION_REPORT.md` · `live_multitenant_latest.json` |
+
+---
+
+### KI-017 — Migraciones con colisiones CREATE IF NOT EXISTS (fresh Postgres)
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | Media |
+| **Detalle** | Tablas homónimas legacy vs SaaS (`api_keys`, `invoices`, …). 406/415 corregidas; 507 consolidated skip en migrate-pg |
+| **Mitigación** | Rename legacy + `MIGRATE_TOLERATE` stubs auth |
+| **Fix** | Auditoría restante de IF NOT EXISTS; portar splitter 507 a migrate-pg |
+
+---
+
 ### KI-012 — Vulnerabilidades npm high (transitive)
 
 | Campo | Valor |
@@ -17,13 +47,14 @@
 
 ---
 
-### KI-005 — Private AI sin runtime
+### KI-005 — Private AI: dual RAG stores (deuda controlada → facade)
 
 | Campo | Valor |
 |-------|-------|
-| **Severidad** | Esperado (Fase 2) |
-| **Detalle** | Sin LLM/RAG ingest activo |
-| **Fix** | Activar según ROADMAP Fase 2 |
+| **Severidad** | Baja (mitigada) |
+| **Detalle** | Facade `UnifiedRagStore` prefer LocalRagRetriever → fallback NelvyonRagStore. Router cert path sin cambios. |
+| **Mitigación** | `NELVYON_RAG_PREFER_LOCAL=0` rollback · docs `PHASE2_RAG_UNIFIED.md` |
+| **Fix** | Ingest vector completo + cutover ops (no bloquea repo) |
 
 ---
 
@@ -37,39 +68,54 @@
 
 ---
 
-### KI-013 — AWS SES dominio nelvyon.com sin verificar
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | **Alta** (bloquea email prod) |
-| **Detalle** | `VerificationStatus: PENDING`, `SendingEnabled: false` (verificado AWS CLI 2026-07-10) |
-| **Fix** | CEO — TXT DNS en Cloudflare + verificar en consola SES |
-| **Bloquea Fase 1 100%** | Sí |
-
----
-
 ### KI-014 — AWS SES en sandbox (sin production access)
 
 | Campo | Valor |
 |-------|-------|
 | **Severidad** | **Alta** |
-| **Detalle** | `ProductionAccessEnabled: false` — solo destinatarios verificados |
-| **Fix** | CEO — Request production access en consola SES |
-| **Bloquea Fase 1 100%** | Sí para campañas reales |
-
----
-
-### KI-011 — SNS SES subscription sin confirmar
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | Media (ops) |
-| **Detalle** | Confirmación manual AWS tras primer deploy |
-| **Fix** | CEO — consola AWS SES/SNS |
+| **Detalle** | `ProductionAccessEnabled: false` — `ReviewDetails.Status: DENIED` (CaseId `178372013800016`). Dominio sí verificado (KI-013 resuelto). |
+| **Fix** | CEO — apelación `docs/SES_PRODUCTION_ACCESS_APPEAL.md` + Support case AWS |
+| **Bloquea producción email** | Sí para campañas/secuencias a destinatarios no verificados |
 
 ---
 
 ## Historial resuelto
+
+### KI-R015 — Lead scoring legacy `scored_leads` / `LeadScoringService` (ex KI-015)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-17 |
+| **Solución** | Eliminada clase `LeadScoringService`; mig `513_drop_scored_leads.sql`; HTTP `/leads` permanece 410; SSOT = `SaasLeadScoringService` |
+
+---
+
+### KI-R012 — Restore drill Postgres (DR) sin evidencia
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-17 |
+| **Solución** | `scripts/run-postgres-restore-drill.mjs` — pg_dump → pg_restore ephemeral · **8/8 PASS** · `postgres_restore_drill_latest.json` |
+
+---
+
+### KI-R011 — SES dominio nelvyon.com (ex KI-013)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-11 (ops) / docs sync 2026-07-17 |
+| **Evidencia** | `CEO_FINAL_ACTIONS.md` — VerificationStatus SUCCESS, DKIM SUCCESS |
+
+---
+
+### KI-R010 — SNS SES subscription (ex KI-011)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-10 |
+| **Evidencia** | Topic `nelvyon-ses-events` confirmado · `CEO_FINAL_ACTIONS.md` |
+
+---
 
 ### KI-R009 — Status page probes externos fallaban
 

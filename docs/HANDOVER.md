@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
-> **Lee este archivo primero.** Tiempo de lectura: ~2 minutos.  
-> Última actualización: **2026-07-11 18:05 UTC**
+> **Lee este archivo primero.**  
+> Última actualización: **2026-07-17** — **Fase 2 Elite Real**: CONDITIONAL PASS (sandbox) · `PHASE2_ELITE_CERTIFIED=false`
 
 ---
 
@@ -9,50 +9,40 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Fase 1 ops** | ⏳ Solo bloquea apelación SES AWS (CEO) |
-| **Fase 2 IA local** | 🟡 **Especialización infra ~90%** — gates LLM 1/7 (modelo 3B) |
-| **Último commit** | Phase 2 local stack validation |
+| **Fase 1** | Interno READY · prod bloqueada por terceros |
+| **Fase 2 base** | Arquitectura repo cohesiva (Memory, RAG facade, Orchestrator, panel) |
+| **Fase 2 Elite** | **CONDITIONAL PASS** — ver `docs/PHASE2_ELITE_CERT.md` |
+| **Freeze** | Router / MCP / Specialization **intactos** |
+
+### Elite Real (repo) — hecho
+
+| Ítem | Estado |
+|------|--------|
+| Memory content security (SecurityGuard + redact) | ✅ tests |
+| Orchestrator ejecuta sandbox (no stub `planned`) | ✅ |
+| 10 workflows enterprise E2E sandbox | ✅ |
+| Agent eval suite determinista + umbrales | ✅ |
+| OpenClaw mock `/v1/dispatch` + bridge tests | ✅ |
+| Capability matrix honest | ✅ |
+| Quality gate `run-phase2-elite-cert.mjs` | ✅ |
+| `PHASE2_ELITE_CERTIFIED` | **false** (requiere live E2E + ops) |
 
 ---
 
-## Fase 2 — IA privada local
+## Próximo paso EXACTO
 
-**Validado (2026-07-11):**
-- Infra Docker/pgvector/RLS/backup 7/7
-- Ollama 0.31.2 + benchmark 3 LLM + 2 embeddings
-- **Modelo producción:** `llama3.2:3b-instruct-q4_K_M`
-- **Embeddings:** `nomic-embed-text` (768 dim)
-- RAG smoke con embeddings reales OK
+1. Ejecutar `node scripts/run-phase2-elite-cert.mjs` y archivar JSON de evidencia
+2. **Ops:** `pnpm -C apps/web migrate` (514+) en staging
+3. Activar Memory/Orchestrator en staging; validar panel `/saas/ai`
+4. Opcional: `NELVYON_ORCHESTRATOR_LIVE=1` + Ollama para E2E live (nuevo bloque cert)
+5. **Ops Fase 1:** SES KI-014 · Stripe · STAGING_*
 
-**Propietario debe (siguiente fase):**
-1. **Router multi-modelo** + wiring agentes (no iniciado)
-2. **No** construir 22 agentes hasta router validado
+## Evidencia
 
----
-
-## Fase 1 — bloqueante restante
-
-**SES Production Access** → `docs/SES_PRODUCTION_ACCESS_APPEAL.md` §3
-
----
-
-## Comandos Fase 2
-
-```bash
-node scripts/hardware-audit.mjs
-node scripts/local-ai-up.mjs
-node scripts/local-ai-migrate.mjs
-pnpm -C apps/web exec tsx ../../scripts/local-ai-health.ts
-node scripts/local-ai-validate.mjs
-node scripts/local-ai-benchmark.mjs
-node scripts/local-ai-configure.mjs
-pnpm -C apps/web exec tsx ../../scripts/local-ai-rag-smoke.ts
+```powershell
+pnpm -C apps/web exec tsc --noEmit
+pnpm -C apps/web exec vitest run backend/saas/__tests__/phase2Elite.test.ts backend/saas/__tests__/phase2Runtime.test.ts --reporter=dot
+node scripts/run-phase2-elite-cert.mjs
 ```
 
----
-
-## Contexto
-
-- IA local: `backend/local-ai/README.md`
-- Privacidad: `docs/PHASE2_SECURITY_MODEL.md`
-- SES appeal: `docs/SES_PRODUCTION_ACCESS_APPEAL.md`
+Veredicto esperado del harness: `CONDITIONAL_PASS` · no reclamar liderazgo mundial.

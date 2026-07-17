@@ -68,6 +68,38 @@
 - [x] Modelo LLM: `llama3.2:3b-instruct-q4_K_M`
 - [x] Embeddings: `nomic-embed-text`
 - [x] Constitución + ontología + 124 fuentes indexadas (`PHASE2_SPECIALIZATION.md`)
-- [x] Benchmark especialización ejecutado (1/7 gates — modelo 3B límite)
-- [ ] Mejorar gates antes de router (reranking, prompts, posible GPU mayor)
-- [ ] 22 agentes (**NO hasta base validada**)
+- [x] **Certificación especialización** 15/15 × 3/3 (`v6_cert_fixed`, 2026-07-12)
+- [x] Model Router — `backend/local-ai/router/` (2026-07-14)
+- [x] Benchmark router 100% + tests 24/24
+- [x] Benchmark E2E executeTask — gates en verde (2026-07-14)
+- [x] Recovery Ollama/Postgres/cola — 6/6 PASS (2026-07-14)
+- [x] Enterprise fixes P0 — cola, cancel, circuit breaker, ExecutionLimiter (2026-07-15)
+- [x] Soak router 2h FINAL — `router_soak_2026-07-15T19-09-13-073Z.json` (`passed=true`, 7201732ms, 0 errors, latencyByClass verdes)
+- [x] Gate `latencyStable` por clase — instrumentación + soak PASS
+- [x] **ROUTER DE MODELOS NELVYON COMPLETADO** — `router_certification_final.json` `completed=true`
+- [x] NELVYON-LABS — eval 461/461 + inventario (~50 GB)
+- [x] NELVYON-LABS bloque 1 Seguridad — `trivy` + `gitleaks` integrados (CI + adaptador; ADR-013)
+- [x] NELVYON-LABS bloque maestro — **461/461 CERRADO** (`NELVYON_LABS_MASTER_CLOSURE.md`, ADR-014)
+- [x] Knowledge harvest 138 patrones + registry 24 dominios + tests closure
+- [x] Wiring Router → SaaS PrivateAi — ADR-015 · inference + router-health API · 7 tests
+- [x] MCP Productivo código+tests+benchmark — ADR-016 · 23 tests · gates 100%
+- [x] Programa excelencia — ADR-021 · inventario + matriz · `EXCELLENCE_PROGRAM.md`
+- [x] Certificación funcional OS/SaaS — inventario estático `OS_SAAS_*.md` + JSON (**NO COMPLETADOS**)
+- [x] MCP soak 2h verde — `mcp_soak_2026-07-16T19-56-30-289Z.json` (7200040 ms, fail=0)
+- [x] **MCP PRODUCTIVO NELVYON COMPLETADO** — `mcp_certification_final.json` `completed=true`
+- [x] E2E crítica UI_CONTRACT — Playwright 53/53 + harness vitest/typecheck (2026-07-17)
+- [x] Lead scoring SSOT HTTP — legacy `/leads` 410 (ADR-023)
+- [x] Infra cert Docker/Postgres(pgvector)/Redis — UP
+- [x] Live multi-tenant CRM — cross-tenant=0 (19/19)
+- [x] Fix colisiones mig 406 api_keys + 415 invoices
+- [ ] E2E HTTP Next.js contra DB real (sin mocks `/api/saas/*`)
+- [ ] Staging OS pack smokes re-run
+- [ ] Portar splitter mig 507 a migrate-pg / Railway-only doc
+- [x] Drop/archive tabla `scored_leads` (KI-015) — mig `513_drop_scored_leads.sql`; clase `LeadScoringService` eliminada
+- [x] Fase 2 Elite sandbox — memory security · orch executor · 10 workflows · eval suite · OpenClaw mock · gate script (`PHASE2_ELITE_CERT.md`)
+- [ ] `PHASE2_ELITE_CERTIFIED` — live Ollama E2E workflows + umbrales agentes + ops Memory/514
+- [ ] RAG: corpus eval sintético indexado + deprecar ILIKE como primary en prod
+- [ ] Ciclo mejora controlada (propuestas offline vs baseline) — no auto-mutar prompts prod
+- [ ] Post-E2E: unificar Ollama/RAG (KI-005)
+- [ ] CEO: SES + SNS + backup restore drill
+- [ ] Declarar **NELVYON OS Y SAAS COMPLETADOS** — solo tras criterios verdes

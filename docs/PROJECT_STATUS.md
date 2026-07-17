@@ -1,63 +1,62 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-10** (P3/P4 completadas; auditoría local PASS)
+> Actualizado: **2026-07-17** — E2E UI_CONTRACT 53/53 · live multi-tenant BLOCKED (Docker) · MCP CERTIFIED freeze · OS/SaaS **NO COMPLETADOS**
 
-## Resumen ejecutivo
+## Resumen ejecutivo (honesto)
 
-**Fase 1 código cerrada.** Ops al 100% bloqueada por SES (dominio PENDING + sandbox) y primer backup manual.
-
-| Métrica | Valor |
-|---------|-------|
-| **Fase 1 código** | ✅ 100% |
-| **Fase 1 ops** | 🟡 ~85% — CEO: SES, backup run, redeploy prod |
-
----
-
-## Estado general
-
-| Métrica | Valor |
-|---------|-------|
-| **Fase 1 (código + CI + docs)** | **100%** autónomo |
-| **Fase 1 (incl. ops CEO)** | **Pendiente CEO** |
-| **P0 Producción** | ✅ Validada |
-| **P1 Estabilidad/CI** | ✅ Validada |
-| **P2 Operación** | ✅ Validada |
-| **P3 Consolidación** | ✅ Completada |
-| **P4 Hardening** | ✅ Completada |
-| **Auditoría final local** | ✅ `PHASE1_AUDIT_PASS` |
+| Capa | Estado | Evidencia |
+|------|--------|-----------|
+| **Fase 1 código** | Cerrada en su día (gates históricos) | `PHASE1_CLOSURE_AUDIT.md` — no equivale a “producto terminado” |
+| **Fase 1 ops** | **Abierta** | SES KI-013/014 · backup restore no drill · Docker KI-016 |
+| **Router / Especialización / MCP** | **Certificados (freeze)** | JSON bajo `backend/local-ai/benchmarks/` |
+| **E2E crítica OS/SaaS** | **Parcial** | UI_CONTRACT 53/53 · live DB **no** · `OS_SAAS_E2E_MATRIX.md` |
+| **Producto enterprise completo** | **No** | `OS_SAAS_FINAL_CERTIFICATION.md` |
 
 ---
 
-## Por área
+## Distinción obligatoria
+
+| Término | Significado |
+|---------|-------------|
+| Implementado | Código existe |
+| Conectado | Ruta/servicio wired |
+| Probado | Tests/gates con evidencia |
+| Certificado | Artefacto reproducible + gates |
+| Desplegado | En entorno target |
+| Operativo prod | Funciona con deps reales (SES, secrets, restore) |
+
+---
+
+## Por área (sin “100% ops”)
 
 | Área | Estado |
 |------|--------|
-| **Producción** | ✅ Operativa |
-| **Staging** | ✅ Elite Gate verde en P2 |
-| **Observabilidad** | ✅ Base; Prometheus/Sentry externos opcionales |
-| **Backups** | ✅ Workflow + fail-fast; CEO: secret DATABASE_URL |
-| **Seguridad CI** | ✅ Security Gates + Dependabot + Gitleaks |
-| **Dependencias** | 🟡 0 critical; 17 high (transitive, documentadas) |
-| **Crons / webhooks** | ✅ Registry + GH Actions |
-| **Documentación viva** | ✅ Actualizada 2026-07-10 |
-| **Fase 2 IA local** | ✅ **Infra + Ollama + RAG** — Llama 3.2 3B + nomic-embed (2026-07-11) |
+| **Producción web** | Operativa (código); email marketing **no** hasta SES |
+| **Staging** | Gates staging existen |
+| **Observabilidad** | Health + smokes; Kuma parcial |
+| **Backups** | Workflow; **restore drill pendiente** |
+| **Seguridad CI** | Gitleaks + Trivy + audit critical |
+| **Dependencias** | 0 critical; highs transitive (KI-012) |
+| **Fase 2 IA** | Base repo ✅ · **Elite CONDITIONAL PASS** (sandbox) · `PHASE2_ELITE_CERTIFIED=false` · ver `PHASE2_ELITE_CERT.md` |
+| **NELVYON-LABS** | Evaluación 461/461 cerrada (no = producto IA completo) |
+| **Auditoría elite** | `MASTER_AUDIT_ELITE_2026-07-16.md` |
+| **Programa excelencia** | `EXCELLENCE_PROGRAM.md` — matriz + veredicto |
 
 ---
 
-## Evidencias auditoría 2026-07-10
+## Evidencias gates (snapshot 2026-07-16 excelencia)
 
 | Comando | Resultado |
 |---------|-----------|
-| `node scripts/run-phase1-audit.mjs` | PASS |
-| `pnpm exec tsc --noEmit` | PASS |
-| `pnpm lint` | PASS |
-| `pnpm build` (apps/web) | PASS |
-| `pnpm audit --audit-level critical` (apps/web) | PASS (0 critical) |
-| `node scripts/validate-saas-migrations.mjs` | 107 files 401–507 |
-| `node scripts/validate-post-elite-migrations.mjs` | 508–511 OK |
+| MCP soak 2h | ✅ `mcp_soak_2026-07-16T19-56-30-289Z.json` passed · 7200040 ms |
+| `pnpm -C apps/web exec tsc --noEmit` | PASS |
+| `node scripts/validate-post-elite-migrations.mjs` | 508–512 OK (existencia; no apply) |
+| `node scripts/check-saas-stubs.mjs` | PASS |
+| Vitest HMAC/htmlEscape/wiring/MCP unit | 38 PASS |
+| E2E / load / restore / a11y full | **No re-ejecutados** esta pasada (soak lock) |
 
 ---
 
 ## CEO pendiente
 
-Ver **`docs/CEO_FINAL_ACTIONS.md`** — checklist único ordenado.
+Ver **`docs/CEO_FINAL_ACTIONS.md`** — SES, SNS, backup+restore.
