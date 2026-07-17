@@ -214,6 +214,9 @@ describe("Phase2 Elite — synthetic RAG corpus + improvement loop", () => {
     const {
       proposeImprovement,
       compareOfflineEval,
+      promoteImprovement,
+      rollbackImprovement,
+      getActiveImprovement,
       resetImprovementProposalsForTests,
       IMPROVEMENT_LOOP_GUARANTEES,
     } = await import("../../agents/improvement/controlledImprovement");
@@ -230,5 +233,48 @@ describe("Phase2 Elite — synthetic RAG corpus + improvement loop", () => {
     const cmp = compareOfflineEval(p.id, 0.9, 0.7);
     expect(cmp.regression).toBe(true);
     expect(cmp.allowed).toBe(false);
+    expect(() =>
+      promoteImprovement(p.id, { approvedBy: "owner", approval: true, version: "1.2.0" }),
+    ).toThrow(/blocked_regression/);
+
+    const p2 = proposeImprovement({
+      area: "prompt",
+      targetId: "seo",
+      rationale: "Clearer next steps",
+      baselineMetric: "instruction_follow",
+      proposedChange: "Strengthen Next steps section v1.3.0",
+      risk: "low",
+    });
+    compareOfflineEval(p2.id, 0.8, 0.85);
+    promoteImprovement(p2.id, { approvedBy: "owner", approval: true, version: "1.3.0" });
+    expect(getActiveImprovement("seo")?.version).toBe("1.3.0");
+    const p3 = proposeImprovement({
+      area: "prompt",
+      targetId: "seo",
+      rationale: "Tune tone",
+      baselineMetric: "instruction_follow",
+      proposedChange: "Tone v1.4.0",
+      risk: "low",
+    });
+    compareOfflineEval(p3.id, 0.85, 0.88);
+    promoteImprovement(p3.id, { approvedBy: "owner", approval: true, version: "1.4.0" });
+    expect(getActiveImprovement("seo")?.version).toBe("1.4.0");
+    rollbackImprovement("seo", { by: "owner" });
+    expect(getActiveImprovement("seo")?.version).toBe("1.3.0");
+  });
+
+  it("indexes synthetic corpus with hybrid retrieval + tenant isolation (hash embed)", async () => {
+    const { indexAndEvaluateSyntheticCorpus, ragMetricsPass } = await import(
+      "../../private-ai/rag/syntheticCorpusIngest"
+    );
+    const { join } = await import("node:path");
+    const { metrics } = await indexAndEvaluateSyntheticCorpus({
+      cwd: join(process.cwd(), "../.."),
+      mode: "hash",
+    });
+    const gate = ragMetricsPass(metrics);
+    expect(gate.ok, gate.reasons.join("; ")).toBe(true);
+    expect(metrics.tenantIsolationOk).toBe(true);
+    expect(metrics.precisionAtK).toBeGreaterThanOrEqual(0.75);
   });
 });

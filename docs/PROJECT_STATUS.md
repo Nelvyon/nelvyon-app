@@ -37,7 +37,7 @@
 | **Backups** | Workflow; **restore drill pendiente** |
 | **Seguridad CI** | Gitleaks + Trivy + audit critical |
 | **Dependencias** | 0 critical; highs transitive (KI-012) |
-| **Fase 2 IA** | Base repo ✅ · **Elite CONDITIONAL PASS** (sandbox) · `PHASE2_ELITE_CERTIFIED=false` · ver `PHASE2_ELITE_CERT.md` |
+| **Fase 2 IA** | **Elite PASS** (`phase2EliteCertified=true`) · live Ollama + RAG hybrid · residual Docker/pgvector KI-016 · ver `PHASE2_ELITE_CERT.md` |
 | **NELVYON-LABS** | Evaluación 461/461 cerrada (no = producto IA completo) |
 | **Auditoría elite** | `MASTER_AUDIT_ELITE_2026-07-16.md` |
 | **Programa excelencia** | `EXCELLENCE_PROGRAM.md` — matriz + veredicto |

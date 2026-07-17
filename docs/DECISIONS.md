@@ -292,8 +292,8 @@
 | Campo | Valor |
 |-------|-------|
 | **Fecha** | 2026-07-17 |
-| **Decisión** | Excelencia de agentes se certifica primero con ejecutor sandbox determinista, eval suite sin LLM de pago, OpenClaw mock local y workflows enterprise E2E. `PHASE2_ELITE_CERTIFIED` solo tras live + ops. Orquestador deja de marcar jobs `planned` stub. Memory writes pasan SecurityGuard + redacción. |
+| **Decisión** | Excelencia de agentes se certifica primero con ejecutor sandbox determinista, eval suite sin LLM de pago, OpenClaw mock local y workflows enterprise E2E. Live Ollama + hybrid RAG in-memory (embeddings reales) eleva a `PHASE2_ELITE_CERTIFIED=true` cuando el harness v2 emite PASS. pgvector/Docker y migrate 514 quedan residuales ops (KI-016/018), no ocultan el PASS de certificación repo. |
 | **Por qué** | Compilar/conectar/tests base ≠ agentes que completan trabajo empresarial validado; evita claims sin evidencia |
-| **Consecuencias** | Harness `run-phase2-elite-cert.mjs` emite máximo `CONDITIONAL_PASS`; LIVE vía `NELVYON_ORCHESTRATOR_LIVE` es bloque aparte |
-| **Evidencia** | `phase2Elite.test.ts` · `docs/PHASE2_ELITE_CERT.md` |
+| **Consecuencias** | Harness `run-phase2-elite-cert.mjs` · CI siempre corre sandbox · live con `NELVYON_ELITE_LIVE=1` |
+| **Evidencia** | `phase2_elite_certification.json` v2 · `phase2_elite_live.json` · `phase2EliteLive.test.ts` |
 

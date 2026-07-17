@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "documents": [
+    {
+      "sourceId": "doc-nelvyon-privacy",
+      "content": "Tenant isolation is enforced with RLS and app.tenant_id. Agents must not export or compare data across tenants. Privacy and cross-tenant isolation are mandatory."
+    },
+    {
+      "sourceId": "doc-nelvyon-seo-basics",
+      "content": "On-page SEO requires unique title, single H1, descriptive meta description, and internal links to conversion pages. Technical SEO audits check crawlability."
+    },
+    {
+      "sourceId": "doc-nelvyon-support-sla",
+      "content": "Support triage: classify urgency, acknowledge within SLA, escalate billing and security issues to human approval. Ticket classification and response."
+    },
+    {
+      "sourceId": "doc-nelvyon-crm-followup",
+      "content": "CRM follow-up: after 7 days of silence, send one value email; after 14 days, offer a short call; never invent tool execution without evidence. Lead nurturing cadence."
+    }
+  ],
+  "cases": [
+    { "query": "tenant isolation RLS privacy", "expectContains": "doc-nelvyon-privacy" },
+    { "query": "on-page SEO H1 title meta", "expectContains": "doc-nelvyon-seo-basics" },
+    { "query": "support escalate billing ticket SLA", "expectContains": "doc-nelvyon-support-sla" },
+    { "query": "CRM follow-up 14 days email call", "expectContains": "doc-nelvyon-crm-followup" }
+  ]
+}

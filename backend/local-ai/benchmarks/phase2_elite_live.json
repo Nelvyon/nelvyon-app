@@ -1,0 +1,87 @@
+{
+  "ollama": {
+    "available": true,
+    "model": "llama3.1:8b-instruct-q4_K_M",
+    "ms": 4852
+  },
+  "workflows": [
+    {
+      "id": "seo_audit",
+      "ok": true,
+      "sloMet": true,
+      "latencyMs": 47327,
+      "errors": []
+    },
+    {
+      "id": "support_triage",
+      "ok": true,
+      "sloMet": true,
+      "latencyMs": 50440,
+      "errors": []
+    },
+    {
+      "id": "crm_followup",
+      "ok": true,
+      "sloMet": true,
+      "latencyMs": 36282,
+      "errors": []
+    }
+  ],
+  "memory": {
+    "writeOk": true,
+    "injectionBlocked": true
+  },
+  "rag": {
+    "ok": true,
+    "reasons": [],
+    "metrics": {
+      "precisionAtK": 1,
+      "recallAtK": 1,
+      "coverage": 1,
+      "latencyMsP50": 40,
+      "latencyMsP95": 42,
+      "cases": [
+        {
+          "query": "tenant isolation RLS privacy",
+          "expect": "doc-nelvyon-privacy",
+          "hit": true,
+          "topSourceId": "doc-nelvyon-privacy",
+          "latencyMs": 40,
+          "via": "hybrid"
+        },
+        {
+          "query": "on-page SEO H1 title meta",
+          "expect": "doc-nelvyon-seo-basics",
+          "hit": true,
+          "topSourceId": "doc-nelvyon-seo-basics",
+          "latencyMs": 36,
+          "via": "hybrid"
+        },
+        {
+          "query": "support escalate billing ticket SLA",
+          "expect": "doc-nelvyon-support-sla",
+          "hit": true,
+          "topSourceId": "doc-nelvyon-support-sla",
+          "latencyMs": 42,
+          "via": "hybrid"
+        },
+        {
+          "query": "CRM follow-up 14 days email call",
+          "expect": "doc-nelvyon-crm-followup",
+          "hit": true,
+          "topSourceId": "doc-nelvyon-crm-followup",
+          "latencyMs": 40,
+          "via": "hybrid"
+        }
+      ],
+      "tenantIsolationOk": true,
+      "indexedChunks": 4,
+      "mode": "ollama"
+    }
+  },
+  "tools": {
+    "simulatedInvokeAudited": true
+  },
+  "ok": true,
+  "blockers": []
+}

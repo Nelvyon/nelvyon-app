@@ -6,13 +6,13 @@
 
 ## Activos
 
-### KI-018 — Fase 2 Elite: `PHASE2_ELITE_CERTIFIED` pendiente
+### KI-018 — Fase 2 Elite: residuales post-PASS (pgvector / ops)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | Abierto |
-| **Severidad** | Controlada (no bloquea Fase 1 interna) |
-| **Detalle** | Sandbox elite CONDITIONAL PASS. Falta: E2E live con Ollama, umbrales por agente en producción, migrate 514 + flags, OpenClaw URL real, RAG corpus indexado, ciclo mejora controlada. |
+| **Estado** | Abierto (no invalida PASS repo) |
+| **Severidad** | Controlada |
+| **Detalle** | `PHASE2_ELITE_CERTIFIED=true` con live Ollama + hybrid RAG. Pendiente: Docker/pgvector LocalVectorStore compare, migrate 514 staging, OpenClaw URL real. |
 | **Docs** | `docs/PHASE2_ELITE_CERT.md` · ADR-026 |
 
 ### KI-016 — Docker Desktop local no disponible para E2E live

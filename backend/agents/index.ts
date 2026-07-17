@@ -20,6 +20,8 @@ export {
 } from "./workflows/enterpriseWorkflows";
 export type { EnterpriseWorkflowDef, EnterpriseWorkflowId } from "./workflows/enterpriseWorkflows";
 export { runEnterpriseWorkflow, runAllEnterpriseWorkflows } from "./workflows/runEnterpriseWorkflow";
+export { runLiveEliteE2e } from "./workflows/liveEliteE2e";
+export type { LiveEliteReport } from "./workflows/liveEliteE2e";
 export {
   AGENT_EVAL_CASES,
   runAgentEvalSuite,
@@ -27,6 +29,17 @@ export {
   evaluateEliteThresholds,
 } from "./evaluation/agentEvalSuite";
 export type { AgentEvalCase, AgentEvalResult, EvalCaseKind } from "./evaluation/agentEvalSuite";
+export {
+  proposeImprovement,
+  compareOfflineEval,
+  promoteImprovement,
+  rollbackImprovement,
+  getActiveImprovement,
+  listImprovementProposals,
+  listImprovementVersions,
+  resetImprovementProposalsForTests,
+  IMPROVEMENT_LOOP_GUARANTEES,
+} from "./improvement/controlledImprovement";
 export {
   AGENT_CAPABILITY_MATRIX,
   capabilityMatrixSummary,

@@ -59,6 +59,10 @@ jobs:
         working-directory: .
         run: node scripts/check-saas-stubs.mjs
 
+      - name: Privileged SaaS mutations require settings.write
+        working-directory: .
+        run: node scripts/check-saas-privileged-write.mjs
+
       - name: Anti-mock production gate (0 mock:// in pack deliverable paths)
         working-directory: .
         run: node scripts/check-no-mock-production.mjs
@@ -79,13 +83,19 @@ jobs:
         working-directory: .
         run: node scripts/validate-saas-migrations.mjs
 
+      - name: Validate post-elite migrations 508–512
+        working-directory: .
+        run: node scripts/validate-post-elite-migrations.mjs
+
       - name: OS pack gate (8 packs fixtures + QA)
         working-directory: .
         run: node scripts/run-os-pack-gate.mjs
 
-      - name: Local elite reinforce (TSC + ESLint + pack tests)
+      - name: Phase 2 Elite certification gate
         working-directory: .
-        run: pnpm -C apps/web elite:reinforce
+        run: node scripts/run-phase2-elite-cert.mjs
+        # Sandbox/RAG-hash must pass (exit 0). Live Ollama is optional unless NELVYON_ELITE_LIVE=1.
+        # Verdict PASS only when live evidence present; CI typically CONDITIONAL_PASS.
 
       - name: Python pytest (FastAPI core)
         working-directory: backend

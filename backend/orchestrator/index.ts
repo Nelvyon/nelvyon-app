@@ -29,3 +29,4 @@ export type {
   OrchestratorExecuteInput,
   OrchestratorExecuteResult,
 } from "./jobExecutor";
+export { liveOllamaJobExecutor, probeOllamaForElite } from "./liveJobExecutor";

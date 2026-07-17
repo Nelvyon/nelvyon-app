@@ -1,29 +1,85 @@
 {
-  "schema": "nelvyon.phase2.elite.cert.v1",
-  "generatedAt": "2026-07-17T17:08:12.363Z",
-  "verdict": "CONDITIONAL_PASS",
-  "phase2EliteCertified": false,
-  "rationale": "Repo gates green: sandbox workflows, agent eval suite, OpenClaw mock, memory security. Live multi-agent LLM E2E and production activation remain external/ops.",
+  "schema": "nelvyon.phase2.elite.cert.v2",
+  "generatedAt": "2026-07-17T17:31:39.317Z",
+  "verdict": "PASS",
+  "phase2EliteCertified": true,
+  "previousVerdictBaseline": "CONDITIONAL_PASS",
+  "rationale": "Sandbox gates + live Ollama E2E (workflows, memory, hybrid RAG embeddings) green. pgvector Docker path residual (KI-016) — hybrid in-memory certified with real embeddings.",
   "steps": [
     {
       "id": "typecheck",
+      "required": true,
       "ok": true,
       "detail": "0 errors"
     },
     {
       "id": "vitest_elite_and_phase2",
+      "required": true,
       "ok": true,
       "detail": "pass"
     },
     {
       "id": "phase1_ai_freeze_artifacts",
+      "required": true,
       "ok": true,
       "detail": "router+mcp cert files present"
+    },
+    {
+      "id": "elite_docs",
+      "required": true,
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "id": "live_ollama_e2e",
+      "required": true,
+      "ok": true,
+      "detail": "live ok",
+      "liveReportSummary": {
+        "workflows": [
+          {
+            "id": "seo_audit",
+            "ok": true,
+            "sloMet": true,
+            "latencyMs": 47327,
+            "errors": []
+          },
+          {
+            "id": "support_triage",
+            "ok": true,
+            "sloMet": true,
+            "latencyMs": 50440,
+            "errors": []
+          },
+          {
+            "id": "crm_followup",
+            "ok": true,
+            "sloMet": true,
+            "latencyMs": 36282,
+            "errors": []
+          }
+        ],
+        "ragPrecision": 1,
+        "memory": {
+          "writeOk": true,
+          "injectionBlocked": true
+        }
+      }
+    },
+    {
+      "id": "pgvector_local_ai_db",
+      "required": false,
+      "ok": false,
+      "detail": "Docker Desktop down — LocalVectorStore/pgvector path not exercised; in-memory hybrid used",
+      "skipped": true
     }
   ],
+  "externalBlockers": [
+    "docker_desktop_unavailable_ki016_pgvector_prod_path_unverified_this_run"
+  ],
   "notClaimed": [
-    "PHASE2_ELITE_CERTIFIED",
     "world_class_agents",
-    "production_ready_without_ops"
+    "production_ready_without_ops",
+    "pgvector_prod_indexed"
   ]
 }

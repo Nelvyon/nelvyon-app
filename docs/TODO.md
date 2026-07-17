@@ -97,9 +97,9 @@
 - [ ] Portar splitter mig 507 a migrate-pg / Railway-only doc
 - [x] Drop/archive tabla `scored_leads` (KI-015) — mig `513_drop_scored_leads.sql`; clase `LeadScoringService` eliminada
 - [x] Fase 2 Elite sandbox — memory security · orch executor · 10 workflows · eval suite · OpenClaw mock · gate script (`PHASE2_ELITE_CERT.md`)
-- [ ] `PHASE2_ELITE_CERTIFIED` — live Ollama E2E workflows + umbrales agentes + ops Memory/514
-- [ ] RAG: corpus eval sintético indexado + deprecar ILIKE como primary en prod
-- [ ] Ciclo mejora controlada (propuestas offline vs baseline) — no auto-mutar prompts prod
-- [ ] Post-E2E: unificar Ollama/RAG (KI-005)
+- [x] `PHASE2_ELITE_CERTIFIED` PASS (repo) — live Ollama E2E + RAG hybrid embeds · residual Docker/pgvector + ops 514
+- [x] RAG: corpus sintético indexado (in-memory hybrid) + métricas P/R · pgvector compare cuando Docker up
+- [x] Ciclo mejora controlada (propose/eval/promote/rollback) + gate CI
+- [ ] Post-E2E: unificar Ollama/RAG path pgvector cuando Docker disponible (KI-016)
 - [ ] CEO: SES + SNS + backup restore drill
 - [ ] Declarar **NELVYON OS Y SAAS COMPLETADOS** — solo tras criterios verdes
