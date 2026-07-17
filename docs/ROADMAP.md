@@ -40,7 +40,7 @@
 
 ## FASE 2 — IA y Agentes
 
-> Base repo cohesiva. **Elite Real: CONDITIONAL PASS** (2026-07-17). `PHASE2_ELITE_CERTIFIED=false`.
+> Base repo cohesiva. **Elite Real: PASS** (2026-07-17). `phase2EliteCertified=true` · residuales Docker/ops.
 
 | Ítem | Estado | Notas |
 |------|--------|-------|
@@ -49,15 +49,13 @@
 | MCP Productivo | ✅ | SSOT; legacy deprecated |
 | Shared Memory | ✅ | + content security elite |
 | OpenClaw | 🟡 | Mock sandbox cert ✅ · URL real ops |
-| Orquestador | 🟡 | Sandbox executor real · LIVE LLM pendiente |
+| Orquestador | ✅ | Sandbox + live Ollama executor |
 | Panel + Metrics | ✅ | Elite status cards |
-| RAG unificado | 🟡 | Facade ✅ · corpus eval / ILIKE deprecación ops |
+| RAG unificado | 🟡 | Facade + hybrid synthetic cert · pgvector residual KI-016 |
 | Prompt / Agent Registry | ✅ | Seed 17 + matrix |
 | Elite workflows + eval suite | ✅ | Sandbox 10/10 + live 3/3 Ollama |
-| `PHASE2_ELITE_CERTIFIED` | ✅ | PASS repo 2026-07-17 · residuales ops/Docker documentados |
-| RAG enterprise (synthetic) | ✅ | Hybrid in-memory + Ollama embeds P/R=1 · pgvector path residual |
+| `PHASE2_ELITE_CERTIFIED` | ✅ | PASS repo · ver `PHASE2_ELITE_CERT.md` |
 | Improvement loop | ✅ | propose/eval/promote/rollback · CI gate |
-| OpenClaw | 🟡 | Mock sandbox cert ✅ · URL real ops |
 
 ---
 
