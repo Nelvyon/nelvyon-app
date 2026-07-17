@@ -1,0 +1,2 @@
+-- PROPOSED → promoted to backend/db/migrations/514_shared_memory.sql (ADR-024).
+-- Kept for reference; apply via migrate runner (514), not this file.
