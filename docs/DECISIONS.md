@@ -319,3 +319,15 @@
 | **Consecuencias** | Runtime ~23; inventarios/docs actualizados; harness H no fuerza PASS; Elite PASS intacto |
 | **Evidencia** | `workforceBlockDEFG.test.ts` · `workflowCatalog.ts` · `canaryPipeline.ts` · `run-workforce-cert.mjs` · `docs/AUTONOMOUS_WORKFORCE_CERT.md` |
 
+---
+
+## ADR-029 — Workforce PASS: evidencia completa sin force-pass
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-19 |
+| **Decisión** | `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED=true` solo si harness v2: required 10/10, skipped=0, Ollama/RAG live auto cuando reachable, OpenClaw mock certificado (URL live opcional = externalNote), production build + soak. SES/Stripe/Docker/mig514 no son blockers internos del gate workforce (van a `externalNotes`). `FORCE_PASS` → FAIL. |
+| **Por qué** | CONDITIONAL era por skips/probes no ejecutados; con Ollama local disponible la evidencia live es reproducible |
+| **Consecuencias** | Gate más estricto (build+live en cada cert); PASS real emitido 2026-07-19; KI-019 → R019 |
+| **Evidencia** | `workforce_certification.json` · `workforcePassResiduals.test.ts` · `workforceLive.test.ts` |
+

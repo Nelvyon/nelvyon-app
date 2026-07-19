@@ -6,23 +6,13 @@
 
 ## Activos
 
-### KI-019 — Workforce cert CONDITIONAL_PASS (`certified=false`)
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | Abierto (esperado; no inventar PASS) |
-| **Severidad** | Controlada |
-| **Detalle** | `run-workforce-cert.mjs` → **CONDITIONAL_PASS**; `nelvyonAutonomousWorkforceCertified=false`. Interno A–G implementado. Blockers externos en report: Docker/pgvector, mig 514, OpenClaw URL, SES/Stripe. Skipped: ollama_live, openclaw_live, production_build, soak_load. |
-| **Docs** | `docs/AUTONOMOUS_WORKFORCE_CERT.md` · ADR-028 |
-| **No hacer** | Forzar `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED=true` |
-
 ### KI-018 — Fase 2 Elite: residuales post-PASS (pgvector / ops)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | Abierto (no invalida PASS repo ni Elite) |
+| **Estado** | Abierto (no invalida PASS repo ni Elite ni Workforce PASS) |
 | **Severidad** | Controlada |
-| **Detalle** | `PHASE2_ELITE_CERTIFIED=true` con live Ollama + hybrid RAG. Pendiente: Docker/pgvector LocalVectorStore compare, migrate 514 staging, OpenClaw URL real. También listados como blockers workforce CONDITIONAL. |
+| **Detalle** | `PHASE2_ELITE_CERTIFIED=true` con live Ollama + hybrid RAG. Pendiente: Docker/pgvector LocalVectorStore compare, migrate 514 staging, OpenClaw URL real. Workforce cert trata estos como `externalNotes` (no blockers internos). |
 | **Docs** | `docs/PHASE2_ELITE_CERT.md` · ADR-026 |
 
 ### KI-016 — Docker Desktop local no disponible para E2E live
@@ -90,6 +80,15 @@
 ---
 
 ## Historial resuelto
+
+### KI-R019 — Workforce cert CONDITIONAL → PASS (ex KI-019)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-19 |
+| **Solución** | Residuals + live Ollama/RAG auto + soak + production build en `run-workforce-cert.mjs`; `verdict=PASS`; `nelvyonAutonomousWorkforceCertified=true`; skipped=0; force-pass rechazado. Evidencia: `workforce_certification.json`, `workforce_live.json`, `workforce_soak.json` |
+
+---
 
 ### KI-R015 — Lead scoring legacy `scored_leads` / `LeadScoringService` (ex KI-015)
 

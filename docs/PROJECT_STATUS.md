@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-19** — Workforce C–G interno done · cert **CONDITIONAL_PASS** · Elite PASS intacto · OS/SaaS **NO COMPLETADOS**
+> Actualizado: **2026-07-19** — Workforce **PASS** (`nelvyonAutonomousWorkforceCertified=true`) · Elite PASS intacto · OS/SaaS **NO COMPLETADOS**
 
 ## Resumen ejecutivo (honesto)
 
@@ -10,7 +10,7 @@
 | **Fase 1 ops** | **Abierta** | SES KI-013/014 · Stripe · residuales Docker/pgvector |
 | **Router / Especialización / MCP** | **Certificados (freeze)** | JSON bajo `backend/local-ai/benchmarks/` |
 | **Fase 2 Elite** | **PASS** | `phase2_elite_certification.json` · `phase2EliteCertified=true` |
-| **Workforce autónoma** | **~75% interno** · **0% certified flag** | Bloques A–G código+tests+docs; H = CONDITIONAL_PASS; `nelvyonAutonomousWorkforceCertified=false` |
+| **Workforce autónoma** | **PASS certificado** | `workforce_certification.json` · `nelvyonAutonomousWorkforceCertified=true` · skipped=0 · 10/10 |
 | **E2E crítica OS/SaaS** | **Parcial** | UI_CONTRACT 53/53 · `OS_SAAS_E2E_MATRIX.md` |
 | **Producto enterprise completo** | **No** | `OS_SAAS_FINAL_CERTIFICATION.md` |
 

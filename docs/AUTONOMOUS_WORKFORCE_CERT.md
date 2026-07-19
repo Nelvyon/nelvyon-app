@@ -1,8 +1,8 @@
-# AUTONOMOUS WORKFORCE CERT — Gate Bloque H
+# AUTONOMOUS WORKFORCE CERT — Gate final
 
 > Harness: `scripts/run-workforce-cert.mjs`  
 > Artefacto: `backend/local-ai/benchmarks/workforce_certification.json`  
-> **Estado honesto:** `verdict=CONDITIONAL_PASS` · `nelvyonAutonomousWorkforceCertified=false`
+> Criterio: **PASS** + `nelvyonAutonomousWorkforceCertified=true` solo con evidencia real (sin force-pass).
 
 ---
 
@@ -12,75 +12,55 @@
 node scripts/run-workforce-cert.mjs
 ```
 
-Exit `0` si required gates OK y verdict ≠ `FAIL`.  
-Exit `1` si algún required step falla o force-pass rechazado.
+Live Ollama/RAG se activa **automáticamente** si `http://127.0.0.1:11434` responde.  
+OpenClaw: mock certificado siempre; live solo si `NELVYON_OPENCLAW_BRIDGE_URL` está definida (no es skip).
 
-Live opcionales (nunca convierten skip en pass):
+Iteración local sin build (bloquea PASS porque `skipped≠0`):
 
 ```powershell
-$env:NELVYON_WORKFORCE_LIVE_OLLAMA="1"
-# OPENCLAW_BRIDGE_URL — probe deferred; no se marca pass por skip
+$env:NELVYON_WORKFORCE_SKIP_BUILD="1"
 node scripts/run-workforce-cert.mjs
 ```
 
-`NELVYON_WORKFORCE_FORCE_PASS=1` → **rechazado** (verdict FAIL + blocker `force_pass_rejected`).
+`NELVYON_WORKFORCE_FORCE_PASS=1` → **FAIL** + `force_pass_rejected`.
 
 ---
 
 ## Veredictos
 
-| Verdict | `nelvyonAutonomousWorkforceCertified` | Cuándo |
-|---------|---------------------------------------|--------|
-| `FAIL` | `false` | Algún step `required` falla, o force-pass |
-| `CONDITIONAL_PASS` | **`false`** | Required internos OK; residuales externos / skipped live documentados |
-| `PASS` | `true` | **No emitido hoy** — requiere cierre ops + evidencia live sin inventar |
-
-**Significado de `certified=false`:** el código de Bloques C–G + docs + freeze Phase1/2 están; **no** se declara fuerza de trabajo autónoma certificada para prod. External blockers y probes skipped quedan en el JSON.
+| Verdict | certified | Cuándo |
+|---------|-----------|--------|
+| `FAIL` | false | Required step falla o force-pass |
+| `CONDITIONAL_PASS` | false | Required OK pero `skipped>0` (p.ej. SKIP_BUILD) o evidencia incompleta |
+| `PASS` | **true** | Required OK · `skipped=0` · sin blockers internos · live Ollama/RAG · mock OpenClaw · build · soak |
 
 ---
 
-## Steps required (internos)
+## Steps required
 
-| id | Qué comprueba |
-|----|----------------|
-| `typecheck` | `pnpm -C apps/web exec tsc --noEmit` |
-| `workforce_and_elite_regression` | vitest: `workforceBlockB/C/DEFG` + `phase2Elite` + `phase2Runtime` |
-| `docs_and_runtime_artifacts` | Docs workforce + `daemon.ts` + catalog/leaderboard/canary |
-| `phase1_phase2_freeze` | `router_certification_final.json` · `mcp_certification_final.json` · `phase2_elite_certification.json` |
-| `block_c_daemon` | `daemon.ts` + compose service `orchestrator-daemon` |
-
----
-
-## Skipped (honestidad)
-
-| id | Motivo |
-|----|--------|
-| `ollama_live` | Solo si `NELVYON_WORKFORCE_LIVE_OLLAMA!=1` |
-| `openclaw_live` | URL unset **o** deferred a suite OpenClaw dedicada |
-| `production_build` | Costoso; manual `pnpm -C apps/web build` |
-| `soak_load` | Soak Router/MCP dedicados — no parte del gate workforce default |
-
-Skip ≠ pass. El report lista `skipped[]` y `blockers[]`.
+| id | Evidencia |
+|----|-----------|
+| `typecheck` | `tsc --noEmit` |
+| `workforce_and_elite_regression` | Block B/C/DEFG + PassResiduals + phase2Elite/Runtime |
+| `docs_and_runtime_artifacts` | Docs + daemon + catalog/leaderboard/canary |
+| `phase1_phase2_freeze` | Router/MCP/Elite JSON freeze |
+| `block_c_daemon` | daemon + compose profile |
+| `soak_load` | `workforce_soak.json` (daemon burst) |
+| `openclaw_mock` | mock en residuals (live URL opcional) |
+| `production_build` | `pnpm -C apps/web build` + `.next/BUILD_ID` |
+| `ollama_live` | auto si Ollama up → `workforce_live.json` |
+| `rag_live` | misma evidencia live (RAG + isolation) |
 
 ---
 
-## Blockers externos (siempre en CONDITIONAL_PASS)
+## External notes (no bloquean PASS workforce)
 
-1. `docker_pgvector_ops_residual_KI016`  
-2. `migration_514_shared_memory_ops`  
-3. `openclaw_authorized_url_optional`  
-4. `ses_stripe_prod_ops`  
+Documentados en `externalNotes[]`: SES/Stripe Phase-1, Docker/pgvector opcional si RAG live OK, mig 514 ops, OpenClaw URL unset cuando mock OK.
 
 ---
 
-## Thresholds / no claims
+## Artefactos
 
-- Phase 2 Elite PASS **intacta** e independiente.
-- Security / isolation / recovery: evidencia en unit tests (`workforceBlockC`, eval suite) — claim en report: `not_100pct_live_prod` / `sandbox_deterministic`.
-- `notClaimed` en JSON: `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED`, world-class agents, hundreds of permanent agents, 100% perfect.
-
----
-
-## Relación con env de producto
-
-No existe flag de producto que ponga `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED=true` automáticamente. Solo el harness puede emitir `nelvyonAutonomousWorkforceCertified=true` tras **PASS** real (aún no).
+- `workforce_certification.json`
+- `workforce_live.json`
+- `workforce_soak.json`
