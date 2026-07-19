@@ -8,8 +8,9 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Workforce | **Bloques C–H** | Daemon `OrchestratorDaemon` + persist + compose profile `orchestrator` · promotions runtime (~23) cto/marketing/operations/devops/social_media/product + ads evals · ~45 workflows catalog · leaderboard/canary · panel resources · cert harness **CONDITIONAL_PASS** · `nelvyonAutonomousWorkforceCertified=false` · docs runtime/cert/catalog/matrices/eval/org/Cursor OSS audit · ADR-028 |
 | Workforce | **Bloques B+C** | Hierarchy L1/L2 · lifecycle · 4 aliases deprecated · ephemeral workers · operation modes + kill switch · orchestrator file checkpoint/recovery · panel org · `run-workforce-cert.mjs` CONDITIONAL_PASS |
-| Workforce | **Bloque A** | Inventario completo `AGENT_WORKFORCE_INVENTORY.md` · 17/23/30 IDs · aliases · gaps · organigrama mapeado · ADR-027 · sin agentes nuevos |
+| Workforce | **Bloque A** | Inventario completo `AGENT_WORKFORCE_INVENTORY.md` · IDs/aliases/gaps · ADR-027 · sin mint masivo |
 
 ## 2026-07-17
 

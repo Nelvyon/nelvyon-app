@@ -307,3 +307,15 @@
 | **Consecuencias** | Bloque B añade lifecycle/hierarchy metadata; Bloque C runtime persistente; promoción de `cto`/`marketing`/etc. solo tras criterios ADR |
 | **Evidencia** | `docs/AGENT_WORKFORCE_INVENTORY.md` |
 
+---
+
+## ADR-028 — Workforce promotions, ephemeral-only creatives, canary gates
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-19 |
+| **Decisión** | Promover a Private AI runtime (con evals/tools/workflows): `cto`, `marketing`, `operations`, `devops`, `social_media`, `product`. Mantener `design` / `video` / `image` / `documentation` como **ephemeral-only** (no permanentes thin). Catálogo ~45 workflows certificados en sandbox. Mejora de prompts vía `canaryPipeline` + gates (`promotionAllowed`) — sin auto-mutate PromptRegistry prod. Cert workforce emite como máximo **CONDITIONAL_PASS** mientras existan blockers externos (Docker/pgvector, mig 514, OpenClaw, SES/Stripe) y probes skipped; `nelvyonAutonomousWorkforceCertified` permanece **false**. |
+| **Por qué** | Cerrar D–G con evidencia sin fingir PASS ni crear cientos de IDs; creativos thin no merecen asiento permanente |
+| **Consecuencias** | Runtime ~23; inventarios/docs actualizados; harness H no fuerza PASS; Elite PASS intacto |
+| **Evidencia** | `workforceBlockDEFG.test.ts` · `workflowCatalog.ts` · `canaryPipeline.ts` · `run-workforce-cert.mjs` · `docs/AUTONOMOUS_WORKFORCE_CERT.md` |
+

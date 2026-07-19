@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-10** (P3/P4 completadas; Fase 1 técnicamente cerrada)
+> Actualizado: **2026-07-19** (Workforce interno C–G cerrado; cert CONDITIONAL; externos P0 abiertos)
 
 ---
 
@@ -54,13 +54,23 @@
 
 ## Workforce IA autónoma (2026-07-19)
 
+### Interno (cerrado)
+
 - [x] Bloque A — auditoría e inventario (`docs/AGENT_WORKFORCE_INVENTORY.md`, ADR-027)
 - [x] Bloque B — hierarchy + lifecycle + alias deprecation + ephemeral workers + modes
-- [x] Bloque C — orchestrator persist checkpoint/recovery + kill switch + dedupe
-- [ ] Bloques D–F — certificar dominios (eng → growth → CS/finance)
-- [ ] Bloque G — leaderboard + canary promotion
-- [ ] Bloque H — gate `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED` PASS con evidencia
-- [ ] Declarar **NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED=true** — solo con evidencia
+- [x] Bloque C — daemon + persist checkpoint/recovery + kill switch + compose profile + tests
+- [x] Bloques D–F — promotions runtime + ads evals + ~45 workflow catalog + ephemeral-only designs (ADR-028)
+- [x] Bloque G — leaderboard + canary gates + panel resources
+- [x] Bloque H — harness `run-workforce-cert.mjs` → **CONDITIONAL_PASS** (docs + freeze + tests)
+- [ ] Declarar **NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED=true** — **bloqueado**; solo con PASS real (hoy `false`)
+
+### Externos P0 / P1 (abiertos)
+
+- [ ] **P0** Docker/pgvector residual ops (KI-016/018) — LocalVectorStore compare / entorno estable
+- [ ] **P0** Migración **514** Shared Memory aplicada y verificada en staging
+- [ ] **P1** OpenClaw URL autorizada (opcional; bridge sigue Disabled por defecto)
+- [ ] **P0** SES production access + Stripe prod (Fase 1 email/billing)
+- [ ] **P1** Live probes opcionales (`NELVYON_WORKFORCE_LIVE_OLLAMA=1`, OpenClaw suite) — documentar, no inventar pass
 
 - [x] Auditoría hardware (`docs/PHASE2_HARDWARE_AUDIT.md`)
 - [x] Docker Compose Postgres+pgvector local

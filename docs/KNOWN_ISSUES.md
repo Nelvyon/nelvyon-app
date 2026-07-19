@@ -6,13 +6,23 @@
 
 ## Activos
 
+### KI-019 — Workforce cert CONDITIONAL_PASS (`certified=false`)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | Abierto (esperado; no inventar PASS) |
+| **Severidad** | Controlada |
+| **Detalle** | `run-workforce-cert.mjs` → **CONDITIONAL_PASS**; `nelvyonAutonomousWorkforceCertified=false`. Interno A–G implementado. Blockers externos en report: Docker/pgvector, mig 514, OpenClaw URL, SES/Stripe. Skipped: ollama_live, openclaw_live, production_build, soak_load. |
+| **Docs** | `docs/AUTONOMOUS_WORKFORCE_CERT.md` · ADR-028 |
+| **No hacer** | Forzar `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED=true` |
+
 ### KI-018 — Fase 2 Elite: residuales post-PASS (pgvector / ops)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | Abierto (no invalida PASS repo) |
+| **Estado** | Abierto (no invalida PASS repo ni Elite) |
 | **Severidad** | Controlada |
-| **Detalle** | `PHASE2_ELITE_CERTIFIED=true` con live Ollama + hybrid RAG. Pendiente: Docker/pgvector LocalVectorStore compare, migrate 514 staging, OpenClaw URL real. |
+| **Detalle** | `PHASE2_ELITE_CERTIFIED=true` con live Ollama + hybrid RAG. Pendiente: Docker/pgvector LocalVectorStore compare, migrate 514 staging, OpenClaw URL real. También listados como blockers workforce CONDITIONAL. |
 | **Docs** | `docs/PHASE2_ELITE_CERT.md` · ADR-026 |
 
 ### KI-016 — Docker Desktop local no disponible para E2E live

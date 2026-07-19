@@ -1,15 +1,17 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-17** — E2E UI_CONTRACT 53/53 · live multi-tenant BLOCKED (Docker) · MCP CERTIFIED freeze · OS/SaaS **NO COMPLETADOS**
+> Actualizado: **2026-07-19** — Workforce C–G interno done · cert **CONDITIONAL_PASS** · Elite PASS intacto · OS/SaaS **NO COMPLETADOS**
 
 ## Resumen ejecutivo (honesto)
 
 | Capa | Estado | Evidencia |
 |------|--------|-----------|
 | **Fase 1 código** | Cerrada en su día (gates históricos) | `PHASE1_CLOSURE_AUDIT.md` — no equivale a “producto terminado” |
-| **Fase 1 ops** | **Abierta** | SES KI-013/014 · backup restore no drill · Docker KI-016 |
+| **Fase 1 ops** | **Abierta** | SES KI-013/014 · Stripe · residuales Docker/pgvector |
 | **Router / Especialización / MCP** | **Certificados (freeze)** | JSON bajo `backend/local-ai/benchmarks/` |
-| **E2E crítica OS/SaaS** | **Parcial** | UI_CONTRACT 53/53 · live DB **no** · `OS_SAAS_E2E_MATRIX.md` |
+| **Fase 2 Elite** | **PASS** | `phase2_elite_certification.json` · `phase2EliteCertified=true` |
+| **Workforce autónoma** | **~75% interno** · **0% certified flag** | Bloques A–G código+tests+docs; H = CONDITIONAL_PASS; `nelvyonAutonomousWorkforceCertified=false` |
+| **E2E crítica OS/SaaS** | **Parcial** | UI_CONTRACT 53/53 · `OS_SAAS_E2E_MATRIX.md` |
 | **Producto enterprise completo** | **No** | `OS_SAAS_FINAL_CERTIFICATION.md` |
 
 ---
@@ -37,7 +39,8 @@
 | **Backups** | Workflow; **restore drill pendiente** |
 | **Seguridad CI** | Gitleaks + Trivy + audit critical |
 | **Dependencias** | 0 critical; highs transitive (KI-012) |
-| **Fase 2 IA** | **Elite PASS** (`phase2EliteCertified=true`) · live Ollama + RAG hybrid · residual Docker/pgvector KI-016 · ver `PHASE2_ELITE_CERT.md` |
+| **Fase 2 IA** | **Elite PASS** (`phase2EliteCertified=true`) · live Ollama + RAG hybrid · residual Docker/pgvector · ver `PHASE2_ELITE_CERT.md` |
+| **Workforce** | Runtime ~23 · daemon+persist · ~45 workflows · leaderboard/canary · cert CONDITIONAL · **no** world-class claim · ver `AUTONOMOUS_WORKFORCE_CERT.md` |
 | **NELVYON-LABS** | Evaluación 461/461 cerrada (no = producto IA completo) |
 | **Auditoría elite** | `MASTER_AUDIT_ELITE_2026-07-16.md` |
 | **Programa excelencia** | `EXCELLENCE_PROGRAM.md` — matriz + veredicto |
