@@ -1,252 +1,423 @@
 {
-  "generatedAt": "2026-07-19T14:19:49.298Z",
-  "moved": 49,
-  "skipped": 0,
+  "generatedAt": "2026-07-19T14:25:50.972Z",
+  "moved": 44,
+  "skipped": 49,
   "log": [
     {
       "path": "docs/BETA_LAUNCH_AUDIT.md",
-      "status": "moved",
-      "to": "docs/archive/BETA_LAUNCH_AUDIT.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/BETA_LAUNCH_RUNBOOK.md",
-      "status": "moved",
-      "to": "docs/archive/BETA_LAUNCH_RUNBOOK.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/CEO_FINAL_ACTIONS.md",
-      "status": "moved",
-      "to": "docs/archive/CEO_FINAL_ACTIONS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/CLAUDE_SPRINT_ELITE.md",
-      "status": "moved",
-      "to": "docs/archive/CLAUDE_SPRINT_ELITE.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/CURSOR_NELVYON_MASTER_EXECUTION.md",
-      "status": "moved",
-      "to": "docs/archive/CURSOR_NELVYON_MASTER_EXECUTION.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/EXCELLENCE_PROGRAM.md",
-      "status": "moved",
-      "to": "docs/archive/EXCELLENCE_PROGRAM.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/FRONTEND_LEGACY.md",
-      "status": "moved",
-      "to": "docs/archive/FRONTEND_LEGACY.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/INVENTARIO_FRENTES.md",
-      "status": "moved",
-      "to": "docs/archive/INVENTARIO_FRENTES.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/MASTER_AUDIT_2026-07-16.md",
-      "status": "moved",
-      "to": "docs/archive/MASTER_AUDIT_2026-07-16.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/MASTER_AUDIT_ELITE_2026-07-16.md",
-      "status": "moved",
-      "to": "docs/archive/MASTER_AUDIT_ELITE_2026-07-16.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/MASTER_OPEN_SOURCE_COMPARISON.md",
-      "status": "moved",
-      "to": "docs/archive/MASTER_OPEN_SOURCE_COMPARISON.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/MASTER_OPEN_SOURCE_LIST.md",
-      "status": "moved",
-      "to": "docs/archive/MASTER_OPEN_SOURCE_LIST.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/MASTER_OPEN_SOURCE_ROADMAP.md",
-      "status": "moved",
-      "to": "docs/archive/MASTER_OPEN_SOURCE_ROADMAP.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_BACKEND_V1_CIERRE_FINAL.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_BACKEND_V1_CIERRE_FINAL.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_FINAL_STATE_AUDIT.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_FINAL_STATE_AUDIT.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_GLOBAL_CERTIFICATION_FINAL.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_GLOBAL_CERTIFICATION_FINAL.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_BLOCK1_SECURITY.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_BLOCK1_SECURITY.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_BLOCK2_OBSERVABILITY.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_BLOCK2_OBSERVABILITY.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_BY_CATEGORY.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_BY_CATEGORY.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_CAPABILITY_MATRIX.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_CAPABILITY_MATRIX.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_FINAL_COVERAGE.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_FINAL_COVERAGE.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_INTEGRATED.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_INTEGRATED.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_INTEGRATION_FINAL.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_INTEGRATION_FINAL.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_INTEGRATION_QUEUE.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_INTEGRATION_QUEUE.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_INTEGRATION_REPORT.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_INTEGRATION_REPORT.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_MASTER_TABLE.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_MASTER_TABLE.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_REJECTED_FINAL.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_REJECTED_FINAL.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/NELVYON_LABS_WINNERS.md",
-      "status": "moved",
-      "to": "docs/archive/NELVYON_LABS_WINNERS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_LEGACY_DEPRECATION_PLAN.md",
-      "status": "moved",
-      "to": "docs/archive/OS_LEGACY_DEPRECATION_PLAN.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PRODUCTION_READINESS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PRODUCTION_READINESS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_API_CLIENTS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_API_CLIENTS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_API_PROJECTS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_API_PROJECTS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_BACKFILL_CLIENTS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_BACKFILL_CLIENTS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_BACKFILL_PROJECTS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_BACKFILL_PROJECTS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_DELIVERABLES.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_DELIVERABLES.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_DELIVERABLE_DOWNLOAD.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_DELIVERABLE_DOWNLOAD.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_DELIVERABLE_UPLOAD.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_DELIVERABLE_UPLOAD.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_DELIVERABLE_VERSIONING.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_DELIVERABLE_VERSIONING.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_EMAIL_NOTIFICATIONS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_EMAIL_NOTIFICATIONS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_OS_DELIVERABLES_UI.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_OS_DELIVERABLES_UI.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_PLAN.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_PLAN.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_PORTAL_APPROVALS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_PORTAL_APPROVALS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_PORTAL_CLIENTE.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_PORTAL_CLIENTE.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_PORTAL_UI.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_PORTAL_UI.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_PROJECTS_SCHEMA.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_PROJECTS_SCHEMA.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_TASKS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_TASKS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_UI_CLIENTS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_UI_CLIENTS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_UI_PROJECTS.md",
-      "status": "moved",
-      "to": "docs/archive/OS_PHASE1_UI_PROJECTS.md"
+      "status": "already_archived"
     },
     {
       "path": "docs/OS_PHASE1_UI_TASKS.md",
+      "status": "already_archived"
+    },
+    {
+      "path": "docs/OS_SAAS_API_AUDIT.md",
       "status": "moved",
-      "to": "docs/archive/OS_PHASE1_UI_TASKS.md"
+      "to": "docs/archive/OS_SAAS_API_AUDIT.md"
+    },
+    {
+      "path": "docs/OS_SAAS_E2E_MATRIX.md",
+      "status": "moved",
+      "to": "docs/archive/OS_SAAS_E2E_MATRIX.md"
+    },
+    {
+      "path": "docs/OS_SAAS_FINAL_CERTIFICATION.md",
+      "status": "moved",
+      "to": "docs/archive/OS_SAAS_FINAL_CERTIFICATION.md"
+    },
+    {
+      "path": "docs/OS_SAAS_PERFORMANCE_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/OS_SAAS_PERFORMANCE_AUDIT.md"
+    },
+    {
+      "path": "docs/OS_SAAS_PRODUCTION_READINESS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_SAAS_PRODUCTION_READINESS.md"
+    },
+    {
+      "path": "docs/OS_SAAS_ROUTE_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/OS_SAAS_ROUTE_AUDIT.md"
+    },
+    {
+      "path": "docs/OS_SAAS_UX_A11Y_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/OS_SAAS_UX_A11Y_AUDIT.md"
+    },
+    {
+      "path": "docs/OS_SMOKE_TEST_FINAL.md",
+      "status": "moved",
+      "to": "docs/archive/OS_SMOKE_TEST_FINAL.md"
+    },
+    {
+      "path": "docs/OS_V1_COMMERCIAL_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/OS_V1_COMMERCIAL_AUDIT.md"
+    },
+    {
+      "path": "docs/OS_V1_FINAL_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/OS_V1_FINAL_AUDIT.md"
+    },
+    {
+      "path": "docs/PHASE1_CLOSURE_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE1_CLOSURE_AUDIT.md"
+    },
+    {
+      "path": "docs/PHASE2_HARDWARE_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE2_HARDWARE_AUDIT.md"
+    },
+    {
+      "path": "docs/PHASE2_PREP_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE2_PREP_AUDIT.md"
+    },
+    {
+      "path": "docs/PHASE2_PREP_INDEX.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE2_PREP_INDEX.md"
+    },
+    {
+      "path": "docs/PHASE2_SPECIALIZATION_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE2_SPECIALIZATION_AUDIT.md"
+    },
+    {
+      "path": "docs/PHASE2_SPECIALIZATION_DEFINITIVE.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE2_SPECIALIZATION_DEFINITIVE.md"
+    },
+    {
+      "path": "docs/PHASE2_SPECIALIZATION_ENTERPRISE_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE2_SPECIALIZATION_ENTERPRISE_AUDIT.md"
+    },
+    {
+      "path": "docs/PHASE2_SPECIALIZATION_FINAL.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE2_SPECIALIZATION_FINAL.md"
+    },
+    {
+      "path": "docs/PHASE_1A_CRM_TRANSITION.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1A_CRM_TRANSITION.md"
+    },
+    {
+      "path": "docs/PHASE_1A_LEGACY_INVENTORY.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1A_LEGACY_INVENTORY.md"
+    },
+    {
+      "path": "docs/PHASE_1A_TENANT_BRIDGE.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1A_TENANT_BRIDGE.md"
+    },
+    {
+      "path": "docs/PHASE_1B_CRM_ETL.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1B_CRM_ETL.md"
+    },
+    {
+      "path": "docs/PHASE_1B_QUOTAS.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1B_QUOTAS.md"
+    },
+    {
+      "path": "docs/PHASE_1C_LEGACY_DASHBOARDS.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1C_LEGACY_DASHBOARDS.md"
+    },
+    {
+      "path": "docs/PHASE_1C_QUOTAS.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1C_QUOTAS.md"
+    },
+    {
+      "path": "docs/PHASE_1C_SAAS_DEALS_PLAN.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1C_SAAS_DEALS_PLAN.md"
+    },
+    {
+      "path": "docs/PHASE_1C_SUMMARY.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_1C_SUMMARY.md"
+    },
+    {
+      "path": "docs/PHASE_2A_OS_SHELL.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_2A_OS_SHELL.md"
+    },
+    {
+      "path": "docs/PHASE_2B_OS_CLIENTS_PROJECTS.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_2B_OS_CLIENTS_PROJECTS.md"
+    },
+    {
+      "path": "docs/PHASE_2C_OS_PIPELINE_TASKS.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_2C_OS_PIPELINE_TASKS.md"
+    },
+    {
+      "path": "docs/PHASE_2D_OS_DOCUMENTS_LIBRARY.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_2D_OS_DOCUMENTS_LIBRARY.md"
+    },
+    {
+      "path": "docs/PHASE_2E_OS_FINANZAS.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_2E_OS_FINANZAS.md"
+    },
+    {
+      "path": "docs/PHASE_2F_READY_FOR_SAAS.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_2F_READY_FOR_SAAS.md"
+    },
+    {
+      "path": "docs/PHASE_3A_SAAS_DEALS_PIPELINE.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_3A_SAAS_DEALS_PIPELINE.md"
+    },
+    {
+      "path": "docs/PHASE_3B_PIPELINE_STAGE_SYNC.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_3B_PIPELINE_STAGE_SYNC.md"
+    },
+    {
+      "path": "docs/PHASE_3B_SAAS_DEALS_UI.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_3B_SAAS_DEALS_UI.md"
+    },
+    {
+      "path": "docs/PHASE_3B_SAAS_LEGACY_CLEANUP.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_3B_SAAS_LEGACY_CLEANUP.md"
+    },
+    {
+      "path": "docs/PHASE_3C_SAAS_RBAC_BILLING.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_3C_SAAS_RBAC_BILLING.md"
+    },
+    {
+      "path": "docs/PHASE_3D_SAAS_RBAC_UI.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_3D_SAAS_RBAC_UI.md"
+    },
+    {
+      "path": "docs/PHASE_3E_SAAS_DEALS_AUTOMATION.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_3E_SAAS_DEALS_AUTOMATION.md"
+    },
+    {
+      "path": "docs/PHASE_A_RAG_CORPUS_REPORT.md",
+      "status": "moved",
+      "to": "docs/archive/PHASE_A_RAG_CORPUS_REPORT.md"
+    },
+    {
+      "path": "docs/S45_POLISH_CHECKLIST.md",
+      "status": "moved",
+      "to": "docs/archive/S45_POLISH_CHECKLIST.md"
+    },
+    {
+      "path": "docs/STRATEGY_COHERENCE_ROOT_CAUSE.md",
+      "status": "moved",
+      "to": "docs/archive/STRATEGY_COHERENCE_ROOT_CAUSE.md"
+    },
+    {
+      "path": "docs/YELLOW_ELIMINATION_QUEUE.md",
+      "status": "moved",
+      "to": "docs/archive/YELLOW_ELIMINATION_QUEUE.md"
     }
   ]
 }

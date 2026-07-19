@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-19T14:19:58.457Z",
+  "generated": "2026-07-19T14:25:51.924Z",
   "entries": [
     {
       "path": "docs/CONSTITUTION_NELVYON_AI.md",
@@ -688,6 +688,374 @@
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "OSS Licenses"
+    },
+    {
+      "path": "docs/README.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Docs README Index"
+    },
+    {
+      "path": "docs/QUALITY_STANDARD.md",
+      "domain": "planning_strategy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Quality Standard"
+    },
+    {
+      "path": "docs/SMOKE_GATES.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "Smoke Gates"
+    },
+    {
+      "path": "docs/STAGING_P0_SMOKES.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "Staging P0 Smokes"
+    },
+    {
+      "path": "docs/SES_PRODUCTION_SETUP.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "SES Production Setup"
+    },
+    {
+      "path": "docs/SES_PRODUCTION_ACCESS_APPEAL.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "SES Access Appeal"
+    },
+    {
+      "path": "docs/STRIPE_BILLING_P0.md",
+      "domain": "saas",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Stripe Billing P0"
+    },
+    {
+      "path": "docs/STRIPE_BILLING_P0.md",
+      "domain": "finance_operations",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Stripe Billing P0"
+    },
+    {
+      "path": "docs/PRODUCTION_SECRETS.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Production Secrets Policy"
+    },
+    {
+      "path": "docs/PRODUCTION_READINESS_FINAL.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Production Readiness Final"
+    },
+    {
+      "path": "docs/PRODUCTION_CERTIFICATION_REPORT.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Production Certification Report"
+    },
+    {
+      "path": "docs/SAAS_TECHNICAL_AUDIT.md",
+      "domain": "saas",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "SaaS Technical Audit"
+    },
+    {
+      "path": "docs/PRIVATE_AI_PHASE2.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Private AI Phase2"
+    },
+    {
+      "path": "docs/PRIVATE_AI_PHASE2.md",
+      "domain": "security_privacy",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Private AI Phase2"
+    },
+    {
+      "path": "docs/PHASE2_AGENTS.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Phase2 Agents"
+    },
+    {
+      "path": "docs/PHASE2_AI_PANEL.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Phase2 AI Panel"
+    },
+    {
+      "path": "docs/PHASE2_AUTOMATIONS.md",
+      "domain": "automation",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Phase2 Automations"
+    },
+    {
+      "path": "docs/PHASE2_MCP.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Phase2 MCP"
+    },
+    {
+      "path": "docs/PHASE2_MCP_ARCHITECTURE.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "MCP Architecture"
+    },
+    {
+      "path": "docs/PHASE2_MCP_BENCHMARK.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "MCP Benchmark"
+    },
+    {
+      "path": "docs/PHASE2_MCP_SECURITY.md",
+      "domain": "security_privacy",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "MCP Security"
+    },
+    {
+      "path": "docs/PHASE2_MCP_TOOLS.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "MCP Tools"
+    },
+    {
+      "path": "docs/PHASE2_MODEL_ROUTER.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Model Router"
+    },
+    {
+      "path": "docs/PHASE2_OPENCLAW.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OpenClaw"
+    },
+    {
+      "path": "docs/PHASE2_ORCHESTRATOR.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Phase2 Orchestrator"
+    },
+    {
+      "path": "docs/PHASE2_ROUTER_ARCHITECTURE.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Router Architecture"
+    },
+    {
+      "path": "docs/PHASE2_ROUTER_BENCHMARK.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Router Benchmark"
+    },
+    {
+      "path": "docs/PHASE2_ROUTER_SAAS_WIRING.md",
+      "domain": "saas",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Router SaaS Wiring"
+    },
+    {
+      "path": "docs/PHASE2_ROUTER_SECURITY.md",
+      "domain": "security_privacy",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Router Security"
+    },
+    {
+      "path": "docs/PHASE2_SHARED_MEMORY.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Shared Memory"
+    },
+    {
+      "path": "docs/PHASE2_SHARED_MEMORY.md",
+      "domain": "security_privacy",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Shared Memory"
+    },
+    {
+      "path": "docs/PHASE2_SPECIALIZATION.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Specialization"
+    },
+    {
+      "path": "docs/PHASE2_SPECIALIZATION_CERTIFICATION.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Specialization Certification"
+    },
+    {
+      "path": "docs/PHASE2_THREAT_MODEL_ELITE.md",
+      "domain": "security_privacy",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Threat Model Elite"
+    },
+    {
+      "path": "docs/PARTNERS_WHITELABEL_PROGRAM.md",
+      "domain": "saas",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Partners Whitelabel"
+    },
+    {
+      "path": "docs/PARTNERS_WHITELABEL_PROGRAM.md",
+      "domain": "finance_operations",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Partners Whitelabel"
+    },
+    {
+      "path": "docs/PARTNERS_HQ_COMMISSION_ONBOARDING_FLOW.md",
+      "domain": "finance_operations",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Partners Commission Flow"
+    },
+    {
+      "path": "docs/PARTNERS_P2_REBILLING_PORTAL_WL.md",
+      "domain": "finance_operations",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Partners Rebilling"
+    },
+    {
+      "path": "docs/OS_RECURRING.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Recurring"
+    },
+    {
+      "path": "docs/OS_RETAINER_AUTOPILOT.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Retainer Autopilot"
+    },
+    {
+      "path": "docs/OS_REGULATED_SECTOR_SHIELD.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Regulated Sector Shield"
+    },
+    {
+      "path": "docs/OS_RLS_AUDIT.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS RLS Audit"
+    },
+    {
+      "path": "docs/OS_SAAS_SECURITY_AUDIT.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS SaaS Security Audit"
+    },
+    {
+      "path": "docs/OS_SAAS_FUNCTIONAL_INVENTORY.md",
+      "domain": "saas",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS SaaS Functional Inventory"
+    },
+    {
+      "path": "docs/OS_TRUTH_GUARD.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Truth Guard"
+    },
+    {
+      "path": "docs/OS_SEEDS.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Seeds"
     },
     {
       "path": "docs/services/AUTOMATION_SOP.md",
@@ -1739,20 +2107,20 @@
     }
   ],
   "summary": {
-    "total": 217,
-    "uniqueFiles": 192,
+    "total": 263,
+    "uniqueFiles": 234,
     "byDomain": {
-      "nelvyon": 60,
-      "development_tech": 35,
-      "security_privacy": 9,
-      "planning_strategy": 8,
+      "nelvyon": 77,
+      "development_tech": 44,
+      "security_privacy": 18,
+      "planning_strategy": 9,
       "digital_marketing": 26,
-      "saas": 4,
+      "saas": 9,
       "crm_sales": 17,
       "analytics_reporting": 2,
       "business_strategy": 5,
-      "finance_operations": 11,
-      "automation": 4,
+      "finance_operations": 15,
+      "automation": 5,
       "design": 6,
       "customer_support": 3,
       "paid_ads": 7,
@@ -1765,9 +2133,9 @@
     },
     "bySourceType": {
       "constitution": 1,
-      "official_doc": 119,
+      "official_doc": 163,
       "knowledge_pack": 25,
-      "runbook": 30,
+      "runbook": 32,
       "sop": 32,
       "playbook": 4,
       "case_study": 6

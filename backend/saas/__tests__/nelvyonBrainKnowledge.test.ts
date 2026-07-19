@@ -1,5 +1,5 @@
 /**
- * NELVYON brain — knowledge coverage, gaps, Nelvyon-first context.
+ * NELVYON brain — knowledge coverage, gaps, Nelvyon-first context, agent domains.
  */
 
 import { describe, expect, it } from "vitest";
@@ -14,6 +14,15 @@ import {
   listApprovedExternalKnowledge,
 } from "../../local-ai/externalKnowledgeRegistry";
 import { buildAgentContext } from "../../private-ai/context/AgentContextEngine";
+import {
+  AGENT_KNOWLEDGE_DOMAINS,
+  primaryDomainHint,
+} from "../../local-ai/specialization/agentKnowledgeDomains";
+import {
+  indexClassifications,
+  archiveClassifications,
+} from "../../local-ai/specialization/orphanClassification";
+import { listPrivateAgents } from "../../private-ai/nelvyonAgentRegistry";
 
 describe("NELVYON brain knowledge", () => {
   it("indexes critical living docs in manifest", () => {
@@ -25,17 +34,39 @@ describe("NELVYON brain knowledge", () => {
       "docs/AGENT_WORKFLOW_CATALOG.md",
       "docs/AUTONOMOUS_WORKFORCE_CERT.md",
       "docs/FINAL_ELITE_CLOSURE.md",
+      "docs/NELVYON_BRAIN_KNOWLEDGE.md",
+      "docs/OPS.md",
+      "docs/PHASE2_SHARED_MEMORY.md",
+      "docs/PHASE2_MCP.md",
     ]) {
       expect(rels.has(p), p).toBe(true);
     }
   });
 
-  it("gap detector never claims complete knowledge", () => {
+  it("gap detector never claims complete; ingest unverified keeps claimComplete false", () => {
     const g = detectKnowledgeGaps();
     expect(g.claimComplete).toBe(false);
     expect(g.coverageRatioEstimate).toBeGreaterThan(0);
-    expect(g.coverageRatioEstimate).toBeLessThanOrEqual(1);
+    expect(g.coverageRatioEstimate).toBeLessThanOrEqual(0.99);
     expect(g.proposals.length).toBeGreaterThan(0);
+    expect(g.domainCoverage.length).toBeGreaterThan(10);
+    expect(g.ingestEvidence.verified).toBe(false);
+    expect(g.unclassifiedActiveDocs.length).toBeLessThanOrEqual(5);
+  });
+
+  it("classifies orphans into index or archive", () => {
+    expect(indexClassifications().length).toBeGreaterThan(50);
+    expect(archiveClassifications().length).toBeGreaterThan(70);
+  });
+
+  it("all private agents have rag.search and domain map", () => {
+    const agents = listPrivateAgents();
+    for (const a of agents) {
+      expect(a.allowedTools.includes("rag.search"), `${a.id} needs rag.search`).toBe(true);
+      expect(AGENT_KNOWLEDGE_DOMAINS[a.id], `${a.id} domain map`).toBeTruthy();
+    }
+    expect(primaryDomainHint("seo")).toBe("seo");
+    expect(primaryDomainHint("google_ads")).toBe("paid_ads");
   });
 
   it("audit scans top-level docs orphans", () => {
@@ -49,9 +80,13 @@ describe("NELVYON brain knowledge", () => {
     expect(listApprovedExternalKnowledge().length).toBeGreaterThan(0);
   });
 
-  it("agent context is Nelvyon-first and marks grounded=false without RAG", async () => {
+  it("agent context is Nelvyon-first, passes domain, grounded=false without RAG", async () => {
+    const calls: unknown[] = [];
     const rag = {
-      searchPlatform: async () => ({ chunks: [], query: "", source: "platform" as const }),
+      searchPlatform: async (q: string, opts?: number | { limit?: number; domain?: string }) => {
+        calls.push({ q, opts });
+        return { chunks: [], query: q, source: "platform" as const };
+      },
       countPlatform: async () => 0,
     };
     const ctx = await buildAgentContext({
@@ -65,6 +100,8 @@ describe("NELVYON brain knowledge", () => {
     });
     expect(ctx.meta.nelvyonFirst).toBe(true);
     expect(ctx.meta.grounded).toBe(false);
+    expect(ctx.meta.domainHint).toBe("seo");
     expect(ctx.systemSuffix).toMatch(/Prioriza documentación interna/i);
+    expect(calls[0]).toMatchObject({ opts: { domain: "seo" } });
   });
 });
