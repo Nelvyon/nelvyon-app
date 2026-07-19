@@ -1,9 +1,6 @@
 name: CI Minimal
 
 on:
-  push:
-    branches:
-      - "**"
   pull_request:
   workflow_dispatch:
 
