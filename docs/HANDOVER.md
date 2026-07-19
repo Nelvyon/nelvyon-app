@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.**  
-> Última actualización: **2026-07-19** — Final Elite repo polish · Workforce PASS intacto
+> Última actualización: **2026-07-19** — Cerebro NELVYON (knowledge sync) · Elite/Workforce PASS intactos
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Workforce** | **PASS** · `nelvyonAutonomousWorkforceCertified=true` |
-| **Fase 2 Elite** | **PASS** · no romper |
-| **Repo polish** | Headers SSOT · SEO OG/sitemap/robots/schema · migrate-pg splitter · CI PR-only minimal · mig validator 514 |
+| **Workforce / Elite** | **PASS** · no romper freezes |
+| **Brain knowledge** | Manifest **184** · unique **161** · `coverageRatioEstimate` **0.75** · `claimComplete` **false** · orphans **80** |
+| **Informe brain** | `docs/NELVYON_BRAIN_KNOWLEDGE.md` |
 | **Prod email** | **Bloqueado** KI-014 SES production access |
 | **Freeze** | Router / MCP / Specialization / Elite / Workforce |
 
@@ -19,19 +19,17 @@
 
 ## Próximo paso EXACTO
 
-1. **CEO / ops:** apelación SES production (`docs/SES_PRODUCTION_ACCESS_APPEAL.md`) + Stripe prod keys/webhook  
-2. Aplicar/verificar mig **514** en staging Railway  
-3. Cloudflare DNS/WAF + primer backup programado con `DATABASE_URL` secret  
-4. Deploy Railway del commit de cierre (no hecho desde agente)
+1. Con local-ai Postgres UP: `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs`  
+2. Reducir orphans del gap report (mapear o archivar; no indexar basura)  
+3. Ops externos: SES / Stripe / mig 514 staging / Cloudflare (sin cambio de código)
 
 ---
 
 ## Evidencia
 
 ```powershell
-node scripts/run-workforce-cert.mjs
-node scripts/validate-post-elite-migrations.mjs
-pnpm -C apps/web exec vitest run src/__tests__/securityHeaders.ssot.test.ts --reporter=dot
+node scripts/nelvyon-knowledge-sync.mjs
+pnpm -C apps/web exec vitest run backend/saas/__tests__/nelvyonBrainKnowledge.test.ts --reporter=dot
 ```
 
-Informe: `docs/FINAL_ELITE_CLOSURE.md`
+Informes: `docs/NELVYON_BRAIN_KNOWLEDGE.md` · `docs/FINAL_ELITE_CLOSURE.md`

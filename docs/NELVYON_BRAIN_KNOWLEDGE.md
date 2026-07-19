@@ -18,8 +18,8 @@ Artefactos:
 | Ficheros únicos | **161** |
 | Dominios ontología | 20 (todos con ≥2 fuentes tras packs) |
 | Living docs críticos indexados | DECISIONS, CHANGELOG, HANDOVER, DATABASE, AGENT_WORKFLOW_CATALOG, AUTONOMOUS_WORKFORCE_CERT, FINAL_ELITE_CLOSURE, KNOWN_ISSUES, INFRASTRUCTURE |
-| `coverageRatioEstimate` | **&lt; 1.0** (penaliza orphans; nunca claimComplete) |
-| Orphans detectados | ~80 bajo `docs/*.md` / services / operations / runbooks no mapeados |
+| `coverageRatioEstimate` | **0.75** (penaliza orphans; tope &lt; 1.0; nunca claimComplete) |
+| Orphans detectados | **80** bajo `docs/*.md` / services / operations / runbooks no mapeados |
 
 **SSOT:** `buildKnowledgeManifest()` → ingest → `LocalVectorStore` / `LocalRagRetriever` → `UnifiedRagStore` → `AgentContextEngine` (Nelvyon-first).
 
