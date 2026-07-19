@@ -85,8 +85,14 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
       (j) => j.tenantId === job.tenantId && j.state === "running",
     ).length;
     const jobId = randomUUID();
-    const state: OrchestratorJobState =
-      running >= ORCHESTRATOR_RESILIENCE.maxConcurrentPerTenant ? "queued" : "running";
+    const defer =
+      (process.env.NELVYON_ORCHESTRATOR_DAEMON ?? "0") === "1" ||
+      (process.env.NELVYON_ORCH_DEFER ?? "0") === "1";
+    const state: OrchestratorJobState = defer
+      ? "queued"
+      : running >= ORCHESTRATOR_RESILIENCE.maxConcurrentPerTenant
+        ? "queued"
+        : "running";
     const full: OrchestratorJob = {
       ...job,
       jobId,
@@ -234,6 +240,25 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
       .filter((j) => j.tenantId === tenantId)
       .sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt))
       .slice(0, limit);
+  }
+
+  /** Daemon drain: highest priority queued jobs across tenants (respects nextRetryAt). */
+  drainQueuedJobs(limit = 4): OrchestratorJob[] {
+    const now = Date.now();
+    return [...this.jobs.values()]
+      .filter((j) => {
+        if (j.state !== "queued") return false;
+        const next = j.payload.nextRetryAt;
+        if (typeof next === "string" && Date.parse(next) > now) return false;
+        return true;
+      })
+      .sort((a, b) => b.priority - a.priority || a.scheduledAt.localeCompare(b.scheduledAt))
+      .slice(0, limit);
+  }
+
+  upsertJob(job: OrchestratorJob): void {
+    this.jobs.set(job.jobId, job);
+    this.persist();
   }
 
   resetCircuit(tenantId: string): void {

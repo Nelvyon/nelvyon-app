@@ -36,3 +36,9 @@ export {
   recoverJobsAfterRestart,
   getOrchestratorPersistDir,
 } from "./persistentStore";
+export {
+  OrchestratorDaemon,
+  readDaemonHealthFile,
+  isOrchestratorDaemonEnabled,
+} from "./daemon";
+export type { DaemonHealth, DaemonOptions } from "./daemon";

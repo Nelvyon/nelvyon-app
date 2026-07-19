@@ -47,11 +47,49 @@ services:
     networks:
       - nelvyon_local_ai
 
+  # Orchestrator daemon — supervised poll loop (Block C). Profile: orchestrator
+  #   docker compose --profile orchestrator up -d orchestrator-daemon
+  # Requires host Node + repo mount; persists under .nelvyon/orch-persist
+  orchestrator-daemon:
+    image: node:20-bookworm-slim
+    container_name: nelvyon-orchestrator-daemon
+    restart: unless-stopped
+    profiles: ["orchestrator"]
+    working_dir: /app
+    volumes:
+      - ../..:/app:ro
+      - nelvyon_orch_persist:/var/nelvyon/orch
+    environment:
+      NELVYON_ORCHESTRATOR_DAEMON: "1"
+      NELVYON_ORCHESTRATOR_ENABLED: "1"
+      NELVYON_ORCH_PERSIST_DIR: /var/nelvyon/orch/persist
+      NELVYON_ORCH_HEALTH_DIR: /var/nelvyon/orch/health
+      NELVYON_ORCH_POLL_MS: "2000"
+    command:
+      [
+        "node",
+        "scripts/orchestrator-daemon.mjs",
+      ]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"const fs=require('fs');const p='/var/nelvyon/orch/health/orchestrator_daemon_health.json';const h=JSON.parse(fs.readFileSync(p,'utf8'));process.exit(h.ready||h.status==='ok'?0:1)\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - nelvyon_local_ai
+
 volumes:
   nelvyon_local_ai_pgdata:
     name: nelvyon_local_ai_pgdata
   nelvyon_local_ai_redis:
     name: nelvyon_local_ai_redis
+  nelvyon_orch_persist:
+    name: nelvyon_orch_persist
 
 networks:
   nelvyon_local_ai:
