@@ -21,6 +21,13 @@ import {
   sandboxJobExecutor,
   type OrchestratorJobExecutor,
 } from "./jobExecutor";
+import {
+  checkpointJobs,
+  getOrchestratorPersistDir,
+  loadPersistedJobs,
+  recoverJobsAfterRestart,
+} from "./persistentStore";
+import { getGlobalOperationMode, isEmergencyStopped } from "../agents/workforce/operationModes";
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -31,14 +38,40 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
   private readonly jobs = new Map<string, OrchestratorJob>();
   private readonly tenantQueues = new Map<string, string[]>();
   private readonly circuitFailures = new Map<string, number>();
+  private readonly dedupeKeys = new Map<string, string>();
   private executor: OrchestratorJobExecutor;
+  private readonly persistDir: string | null;
+  private recoveredCount = 0;
 
-  constructor(executor: OrchestratorJobExecutor = sandboxJobExecutor) {
+  constructor(
+    executor: OrchestratorJobExecutor = sandboxJobExecutor,
+    opts?: { persistDir?: string | null },
+  ) {
     this.executor = executor;
+    this.persistDir = opts?.persistDir !== undefined ? opts.persistDir : getOrchestratorPersistDir();
+    if (this.persistDir) {
+      const loaded = loadPersistedJobs(this.persistDir);
+      for (const [id, j] of loaded) this.jobs.set(id, j);
+      this.recoveredCount = recoverJobsAfterRestart(this.jobs);
+      this.persist();
+    }
   }
 
   setExecutor(executor: OrchestratorJobExecutor): void {
     this.executor = executor;
+  }
+
+  getRecoveryStats(): { recovered: number; persistEnabled: boolean } {
+    return { recovered: this.recoveredCount, persistEnabled: Boolean(this.persistDir) };
+  }
+
+  private persist(): void {
+    if (!this.persistDir) return;
+    checkpointJobs(this.persistDir, this.jobs.values());
+  }
+
+  private dedupeKey(tenantId: string, agentId: string, input: string): string {
+    return `${tenantId}|${agentId}|${input.slice(0, 200)}`;
   }
 
   async enqueue(
@@ -66,6 +99,7 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
     this.jobs.set(jobId, full);
     queue.push(jobId);
     this.tenantQueues.set(job.tenantId, queue);
+    this.persist();
     return jobId;
   }
 
@@ -82,6 +116,7 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
     j.state = "cancelled";
     j.finishedAt = nowIso();
     this.jobs.set(jobId, j);
+    this.persist();
     return true;
   }
 
@@ -90,6 +125,10 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
    * Records validation evidence; fails jobs that do not meet acceptance.
    */
   async coordinate(tenantId: string, plan: OrchestratorCoordinationPlan, input: string): Promise<string> {
+    if (isEmergencyStopped() || getGlobalOperationMode() === "emergency_stop") {
+      throw new Error("orchestrator_emergency_stop");
+    }
+
     const failures = this.circuitFailures.get(tenantId) ?? 0;
     if (failures >= ORCHESTRATOR_RESILIENCE.circuitBreakerFailures) {
       throw new Error("orchestrator_circuit_open");
@@ -97,10 +136,18 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
 
     const correlationId = randomUUID();
     const traceId = randomUUID();
-    const agents =
-      plan.pattern === "parallel_fanout" ? plan.agents : plan.agents;
+    const agents = plan.agents;
 
     const runOne = async (agentId: string): Promise<boolean> => {
+      const dk = this.dedupeKey(tenantId, agentId, input);
+      const existingId = this.dedupeKeys.get(dk);
+      if (existingId) {
+        const prev = this.jobs.get(existingId);
+        if (prev && prev.state === "succeeded" && prev.tenantId === tenantId) {
+          return true; // idempotent skip
+        }
+      }
+
       const id = await this.enqueue({
         tenantId,
         agentId,
@@ -112,11 +159,13 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
         scheduledAt: nowIso(),
         parentJobId: null,
       });
+      this.dedupeKeys.set(dk, id);
       const job = this.jobs.get(id)!;
       job.state = "running";
       job.startedAt = nowIso();
       job.attempts += 1;
       this.jobs.set(id, job);
+      this.persist();
 
       try {
         const result = await Promise.race([
@@ -157,6 +206,7 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
       }
       job.finishedAt = nowIso();
       this.jobs.set(id, job);
+      this.persist();
       return job.state === "succeeded";
     };
 

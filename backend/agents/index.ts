@@ -45,3 +45,4 @@ export {
   capabilityMatrixSummary,
 } from "./capabilityMatrix";
 export type { AgentCapabilityRow } from "./capabilityMatrix";
+export * from "./workforce";

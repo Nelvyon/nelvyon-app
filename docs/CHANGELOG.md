@@ -8,6 +8,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Workforce | **Bloques B+C** | Hierarchy L1/L2 · lifecycle · 4 aliases deprecated · ephemeral workers · operation modes + kill switch · orchestrator file checkpoint/recovery · panel org · `run-workforce-cert.mjs` CONDITIONAL_PASS |
 | Workforce | **Bloque A** | Inventario completo `AGENT_WORKFORCE_INVENTORY.md` · 17/23/30 IDs · aliases · gaps · organigrama mapeado · ADR-027 · sin agentes nuevos |
 
 ## 2026-07-17

@@ -105,8 +105,17 @@ export default function SaasAiPanelPage() {
         id: "elite",
         title: "Elite cert (repo)",
         href: "docs/PHASE2_ELITE_CERT.md",
-        ok: false,
-        body: "CONDITIONAL PASS en sandbox · PHASE2_ELITE_CERTIFIED=false hasta E2E live + ops",
+        ok: true,
+        body: "PASS (phase2EliteCertified) · residuales Docker/ops documentados",
+      },
+      {
+        id: "workforce",
+        title: "Fuerza de trabajo",
+        href: "/api/saas/ai-agents?resource=org",
+        ok: unified.ok,
+        body: unified.ok
+          ? `unified ${unifiedTotal || "—"} · ready ${runtimeReady || "—"} · org chart ADR-027`
+          : `HTTP ${unified.status}`,
       },
       {
         id: "workflows",

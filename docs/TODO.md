@@ -55,11 +55,11 @@
 ## Workforce IA autónoma (2026-07-19)
 
 - [x] Bloque A — auditoría e inventario (`docs/AGENT_WORKFORCE_INVENTORY.md`, ADR-027)
-- [ ] Bloque B — hierarchy + lifecycle + alias deprecation + schemas
-- [ ] Bloque C — runtime persistente (queue/recovery/kill switch)
+- [x] Bloque B — hierarchy + lifecycle + alias deprecation + ephemeral workers + modes
+- [x] Bloque C — orchestrator persist checkpoint/recovery + kill switch + dedupe
 - [ ] Bloques D–F — certificar dominios (eng → growth → CS/finance)
 - [ ] Bloque G — leaderboard + canary promotion
-- [ ] Bloque H — gate `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED` con evidencia
+- [ ] Bloque H — gate `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED` PASS con evidencia
 - [ ] Declarar **NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED=true** — solo con evidencia
 
 - [x] Auditoría hardware (`docs/PHASE2_HARDWARE_AUDIT.md`)

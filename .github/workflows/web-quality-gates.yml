@@ -97,6 +97,11 @@ jobs:
         # Sandbox/RAG-hash must pass (exit 0). Live Ollama is optional unless NELVYON_ELITE_LIVE=1.
         # Verdict PASS only when live evidence present; CI typically CONDITIONAL_PASS.
 
+      - name: Autonomous workforce certification gate
+        working-directory: .
+        run: node scripts/run-workforce-cert.mjs
+        # Inventory + hierarchy + ephemeral workers + persistence. PASS not forced.
+
       - name: Python pytest (FastAPI core)
         working-directory: backend
         run: |

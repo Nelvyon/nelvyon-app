@@ -1,0 +1,42 @@
+{
+  "schema": "nelvyon.autonomous.workforce.cert.v1",
+  "generatedAt": "2026-07-19T11:03:46.683Z",
+  "verdict": "CONDITIONAL_PASS",
+  "nelvyonAutonomousWorkforceCertified": false,
+  "rationale": "Inventory+hierarchy+ephemeral workers+persist/kill-switch tests green. Not all permanent agents have evals/tools/workflows; aliases deprecated; no mass minting.",
+  "steps": [
+    {
+      "id": "typecheck",
+      "required": true,
+      "ok": true
+    },
+    {
+      "id": "workforce_and_elite_regression",
+      "required": true,
+      "ok": true,
+      "detail": "pass"
+    },
+    {
+      "id": "inventory_and_hierarchy",
+      "required": true,
+      "ok": true
+    },
+    {
+      "id": "phase1_phase2_freeze",
+      "required": true,
+      "ok": true,
+      "detail": "ok"
+    }
+  ],
+  "blockers": [
+    "7_runtime_agents_without_eval",
+    "13_design_only_not_promoted",
+    "toolIdMap_incomplete",
+    "persistent_scheduler_daemon_not_shipped"
+  ],
+  "notClaimed": [
+    "NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED",
+    "world_class_agents",
+    "hundreds_of_permanent_agents"
+  ]
+}

@@ -30,3 +30,9 @@ export type {
   OrchestratorExecuteResult,
 } from "./jobExecutor";
 export { liveOllamaJobExecutor, probeOllamaForElite } from "./liveJobExecutor";
+export {
+  checkpointJobs,
+  loadPersistedJobs,
+  recoverJobsAfterRestart,
+  getOrchestratorPersistDir,
+} from "./persistentStore";
