@@ -6,7 +6,7 @@ export const siteConfig = {
     "NELVYON une SaaS, marketing, automatización e IA para construir sistemas digitales con más claridad.",
   // Override in production via NEXT_PUBLIC_SITE_URL.
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://nelvyon.com",
-  ogImage: "/logo.png",
+  ogImage: "/opengraph-image",
   twitter: "@nelvyon",
 };
 

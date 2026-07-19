@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const LOGO = "/logo.png.png";
+const LOGO = "/logo.svg";
 
 type NvLogoProps = {
   size?: number;
@@ -13,7 +13,7 @@ type NvLogoProps = {
 export function NvLogo({ size = 32, showWordmark = true, href = "/", priority = false }: NvLogoProps) {
   const inner = (
     <>
-      <Image src={LOGO} alt="NELVYON" width={size} height={size} className="object-contain shrink-0" priority={priority} />
+      <Image src={LOGO} alt="NELVYON" width={size} height={size} className="object-contain shrink-0" priority={priority} unoptimized />
       {showWordmark ? <span className="nv-logo__wordmark">NELVYON</span> : null}
     </>
   );

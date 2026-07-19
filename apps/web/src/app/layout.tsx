@@ -78,7 +78,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     /* headers unavailable */
   }
 
-  const faviconHref = whitelabelInitial?.favicon_url?.trim() || "/favicon.ico";
+  const faviconHref = whitelabelInitial?.favicon_url?.trim() || "/logo.svg";
 
   return (
     <html lang={locale} suppressHydrationWarning className="scroll-smooth">

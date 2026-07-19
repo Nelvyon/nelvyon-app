@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono"
 const dmMono = DM_Mono({ subsets: ["latin"], variable: "--font-dm-mono", weight: ["300", "400", "500"] });
 
 const canonicalBase = getAppBaseUrl();
-const ogImageAbs = `${canonicalBase}/og-image.png`;
+const ogImageAbs = `${canonicalBase}/opengraph-image`;
 
 export const metadata: Metadata = {
   title: "NELVYON — OS de marketing + packs autónomos",
@@ -50,8 +50,32 @@ export const metadata: Metadata = {
 };
 
 export default function MarketingRouteLayout({ children }: { children: ReactNode }) {
+  const orgLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "NELVYON",
+    url: canonicalBase,
+    logo: `${canonicalBase}/logo.svg`,
+    description:
+      "Agencia de marketing digital con inteligencia artificial y SaaS B2B.",
+    sameAs: ["https://twitter.com/nelvyon"],
+  };
+  const websiteLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "NELVYON",
+    url: canonicalBase,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${canonicalBase}/blog?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <section lang="es" className={`${inter.variable} ${geistMono.variable} ${dmMono.variable} nelvyon-enterprise-theme`}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
       <MarketingChrome>{children}</MarketingChrome>
       <script
         dangerouslySetInnerHTML={{

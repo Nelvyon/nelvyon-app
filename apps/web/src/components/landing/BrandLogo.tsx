@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 export function BrandLogo({ href = "/", className = "" }: { href?: string; className?: string }) {
-  const [src, setSrc] = useState("/logo.png.png");
+  const [src, setSrc] = useState("/logo.svg");
 
   return (
     <Link className={`relative flex shrink-0 items-center ${className}`} href={href}>
@@ -18,6 +18,7 @@ export function BrandLogo({ href = "/", className = "" }: { href?: string; class
         }}
         priority
         src={src}
+        unoptimized
         width={150}
       />
     </Link>

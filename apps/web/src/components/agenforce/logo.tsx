@@ -16,7 +16,7 @@ export const LogoIcon = (props: React.SVGAttributes<SVGSVGElement>) => {
 export const Logo = ({ className }: { className?: string }) => {
   return (
     <Link href="/" className={`flex items-center gap-2 ${className ?? ""}`}>
-      <Image src="/logo.png.png" alt="NELVYON" width={32} height={32} className="object-contain" />
+      <Image src="/logo.svg" alt="NELVYON" width={32} height={32} className="object-contain" unoptimized />
       <span className="text-base font-bold text-neutral-900 dark:text-white tracking-tight">NELVYON</span>
     </Link>
   );

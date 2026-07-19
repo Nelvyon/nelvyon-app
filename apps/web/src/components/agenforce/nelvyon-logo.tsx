@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { LogoIcon } from "./logo";
 
-const LOGO_FULL = "/logo.png.png";
+const LOGO_FULL = "/logo.svg";
 const LOGO_FALLBACK = "/logo.svg";
 
 type NelvyonLogoProps = {
@@ -44,6 +44,7 @@ export function NelvyonLogo({
       className="nelvyon-logo__image"
       style={{ height, width: "auto" }}
       priority={priority}
+      unoptimized
       onError={() => setUseFallback(true)}
     />
   );
