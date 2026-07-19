@@ -1,9 +1,8 @@
 {
-  "generated": "2026-07-11T19:50:53.372Z",
-  "tenantId": "8f873b4e-a1d0-4009-9e29-9ad978bea0f9",
+  "generated": "2026-07-19T13:56:55.898Z",
   "entries": [
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\CONSTITUTION_NELVYON_AI.md",
+      "path": "docs/CONSTITUTION_NELVYON_AI.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -11,7 +10,7 @@
       "title": "Constitución IA NELVYON"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\HANDOVER.md",
+      "path": "docs/HANDOVER.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -19,7 +18,7 @@
       "title": "Handover"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\AI_CONTEXT.md",
+      "path": "docs/AI_CONTEXT.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -27,7 +26,7 @@
       "title": "AI Context"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\ARCHITECTURE.md",
+      "path": "docs/ARCHITECTURE.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -35,7 +34,23 @@
       "title": "Arquitectura"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\PRIVATE_AI_ARCHITECTURE.md",
+      "path": "docs/ARCHITECTURE.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Arquitectura técnica"
+    },
+    {
+      "path": "docs/PHASE2_ARCHITECTURE.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Phase 2 Architecture SSOT"
+    },
+    {
+      "path": "docs/PRIVATE_AI_ARCHITECTURE.md",
       "domain": "security_privacy",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -43,7 +58,7 @@
       "title": "Private AI Architecture"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\PHASE2_AI_ARCHITECTURE.md",
+      "path": "docs/PHASE2_AI_ARCHITECTURE.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -51,7 +66,7 @@
       "title": "Phase 2 AI Architecture"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\PHASE2_SECURITY_MODEL.md",
+      "path": "docs/PHASE2_SECURITY_MODEL.md",
       "domain": "security_privacy",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -59,7 +74,7 @@
       "title": "Phase 2 Security"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\PHASE2_BENCHMARK_RESULTS.md",
+      "path": "docs/PHASE2_BENCHMARK_RESULTS.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -67,7 +82,159 @@
       "title": "Benchmark Results"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\CLAUDE.md",
+      "path": "docs/PHASE2_ELITE_CERT.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Phase 2 Elite Cert"
+    },
+    {
+      "path": "docs/PHASE2_RAG_UNIFIED.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Unified RAG"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Architecture Decision Records"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "ADRs técnicos"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "domain": "planning_strategy",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "ADRs técnicos"
+    },
+    {
+      "path": "docs/CHANGELOG.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Changelog"
+    },
+    {
+      "path": "docs/KNOWN_ISSUES.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Known Issues"
+    },
+    {
+      "path": "docs/DEPLOYMENTS.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Deployments"
+    },
+    {
+      "path": "docs/INFRASTRUCTURE.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Infrastructure"
+    },
+    {
+      "path": "docs/AUTONOMOUS_RUNTIME.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Autonomous Runtime"
+    },
+    {
+      "path": "docs/AUTONOMOUS_WORKFORCE_CERT.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Workforce Cert"
+    },
+    {
+      "path": "docs/AGENT_WORKFORCE_INVENTORY.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Workforce Inventory"
+    },
+    {
+      "path": "docs/AGENT_WORKFORCE_ORGANIZATION.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Workforce Organization"
+    },
+    {
+      "path": "docs/AGENT_WORKFLOW_CATALOG.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Agent Workflow Catalog"
+    },
+    {
+      "path": "docs/AGENT_CAPABILITY_MATRIX.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Capability Matrix"
+    },
+    {
+      "path": "docs/AGENT_TOOL_PERMISSION_MATRIX.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Tool Permission Matrix"
+    },
+    {
+      "path": "docs/AGENT_EVALUATION_FRAMEWORK.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Agent Evaluation Framework"
+    },
+    {
+      "path": "docs/FINAL_ELITE_CLOSURE.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Final Elite Closure"
+    },
+    {
+      "path": "docs/CURSOR_OPEN_SOURCE_INTEGRATION_AUDIT.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Cursor OSS Audit"
+    },
+    {
+      "path": "CLAUDE.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -75,15 +242,23 @@
       "title": "CLAUDE coding rules"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\README.md",
+      "path": "CLAUDE.md",
       "domain": "development_tech",
       "priority": 0,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
-      "title": "Local AI README"
+      "title": "Stack NELVYON producto"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\ROADMAP.md",
+      "path": "backend/local-ai/README.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Local AI stack (PRIVATE_MODE)"
+    },
+    {
+      "path": "docs/ROADMAP.md",
       "domain": "planning_strategy",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -91,7 +266,7 @@
       "title": "Roadmap"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\TODO.md",
+      "path": "docs/TODO.md",
       "domain": "planning_strategy",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -99,7 +274,7 @@
       "title": "TODO"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\DATABASE.md",
+      "path": "docs/DATABASE.md",
       "domain": "development_tech",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -107,7 +282,7 @@
       "title": "Database"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\INTEGRATIONS.md",
+      "path": "docs/INTEGRATIONS.md",
       "domain": "development_tech",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -115,7 +290,7 @@
       "title": "Integrations"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\PROJECT_STATUS.md",
+      "path": "docs/PROJECT_STATUS.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -123,159 +298,319 @@
       "title": "Project Status"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\AUTOMATION_SOP.md",
-      "domain": "digital_marketing",
-      "priority": 1,
+      "path": "docs/SERVICES_MASTER_PLAN.md",
+      "domain": "nelvyon",
+      "priority": 0,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "AUTOMATION_SOP"
+      "sourceType": "official_doc",
+      "title": "Services Master Plan"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\BRANDING_SOP.md",
+      "path": "docs/SERVICES_MASTER_PLAN.md",
       "domain": "digital_marketing",
-      "priority": 1,
+      "priority": 0,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "BRANDING_SOP"
+      "sourceType": "official_doc",
+      "title": "Catálogo servicios agencia"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\CHATBOT_SOP.md",
-      "domain": "digital_marketing",
-      "priority": 1,
+      "path": "docs/SERVICES_MASTER_PLAN.md",
+      "domain": "planning_strategy",
+      "priority": 0,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "CHATBOT_SOP"
+      "sourceType": "official_doc",
+      "title": "Catálogo servicios agencia"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\ECOMMERCE_SOP.md",
-      "domain": "digital_marketing",
+      "path": "docs/PARITY_GHL_HUBSPOT.md",
+      "domain": "saas",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "ECOMMERCE_SOP"
+      "sourceType": "official_doc",
+      "title": "Parity GHL HubSpot"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\FREELANCER_SCORECARD.md",
-      "domain": "digital_marketing",
+      "path": "docs/PARITY_GHL_HUBSPOT.md",
+      "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "FREELANCER_SCORECARD"
+      "sourceType": "official_doc",
+      "title": "CRM parity GHL HubSpot"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\GOOGLE_ADS_SOP.md",
-      "domain": "digital_marketing",
+      "path": "docs/AUTONOMOUS_SERVICES_MODE.md",
+      "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "GOOGLE_ADS_SOP"
+      "sourceType": "official_doc",
+      "title": "Autonomous Services Mode"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\LANDING_SOP.md",
-      "domain": "digital_marketing",
+      "path": "docs/OS_TEMPLATE_DNA.md",
+      "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "LANDING_SOP"
+      "sourceType": "official_doc",
+      "title": "OS Template DNA"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\LOGO_SOP.md",
-      "domain": "digital_marketing",
+      "path": "docs/OS_LEARNING.md",
+      "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "LOGO_SOP"
+      "sourceType": "official_doc",
+      "title": "OS Learning"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\META_ADS_SOP.md",
-      "domain": "digital_marketing",
-      "priority": 1,
+      "path": "docs/OS_LEARNING.md",
+      "domain": "analytics_reporting",
+      "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "META_ADS_SOP"
+      "sourceType": "official_doc",
+      "title": "OS Learning Analytics"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\NELVYON_SERVICE_TIERS.md",
-      "domain": "digital_marketing",
+      "path": "docs/ENVIRONMENTS.md",
+      "domain": "development_tech",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "NELVYON_SERVICE_TIERS"
+      "sourceType": "official_doc",
+      "title": "Environments"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\PILOT_LANDING_PROJECT.md",
-      "domain": "digital_marketing",
-      "priority": 1,
+      "path": "docs/RAILWAY_DEPLOY_CHECKLIST.md",
+      "domain": "development_tech",
+      "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "PILOT_LANDING_PROJECT"
+      "sourceType": "official_doc",
+      "title": "Railway Deploy Checklist"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\SEO_SOP.md",
-      "domain": "digital_marketing",
+      "path": "backend/local-ai/knowledge/domains/entrepreneurship_ops.md",
+      "domain": "business_strategy",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "SEO_SOP"
+      "sourceType": "knowledge_pack",
+      "title": "Entrepreneurship Ops KB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\SERVICES_QA_MASTER.md",
-      "domain": "digital_marketing",
+      "path": "backend/local-ai/knowledge/domains/entrepreneurship_ops.md",
+      "domain": "planning_strategy",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "SERVICES_QA_MASTER"
+      "sourceType": "knowledge_pack",
+      "title": "Emprendimiento y ops"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\TIKTOK_ADS_SOP.md",
-      "domain": "digital_marketing",
+      "path": "backend/local-ai/knowledge/domains/entrepreneurship_ops.md",
+      "domain": "finance_operations",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "TIKTOK_ADS_SOP"
+      "sourceType": "knowledge_pack",
+      "title": "Emprendimiento y ops"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\services\\WEB_SOP.md",
-      "domain": "digital_marketing",
+      "path": "backend/local-ai/knowledge/domains/cybersecurity_cloud.md",
+      "domain": "security_privacy",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
-      "title": "WEB_SOP"
+      "sourceType": "knowledge_pack",
+      "title": "Cybersecurity Cloud KB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\agency-playbooks\\ECOMMERCE_GROWTH_PACK_DIA_A_DIA.md",
+      "path": "backend/local-ai/knowledge/domains/cybersecurity_cloud.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "DevOps Cloud Security"
+    },
+    {
+      "path": "docs/services/AUTOMATION_SOP.md",
+      "domain": "automation",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Automation SOP"
+    },
+    {
+      "path": "docs/services/BRANDING_SOP.md",
+      "domain": "design",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Branding SOP"
+    },
+    {
+      "path": "docs/services/CHATBOT_SOP.md",
+      "domain": "customer_support",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Chatbot SOP"
+    },
+    {
+      "path": "docs/services/ECOMMERCE_SOP.md",
       "domain": "digital_marketing",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "sop",
+      "title": "Ecommerce SOP"
+    },
+    {
+      "path": "docs/services/FREELANCER_SCORECARD.md",
+      "domain": "finance_operations",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Freelancer Scorecard"
+    },
+    {
+      "path": "docs/services/GOOGLE_ADS_SOP.md",
+      "domain": "paid_ads",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Google Ads SOP"
+    },
+    {
+      "path": "docs/services/LANDING_SOP.md",
+      "domain": "content",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Landing / CRO SOP"
+    },
+    {
+      "path": "docs/services/LANDING_SOP.md",
+      "domain": "digital_marketing",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Landing / CRO SOP"
+    },
+    {
+      "path": "docs/services/LOGO_SOP.md",
+      "domain": "design",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Logo SOP"
+    },
+    {
+      "path": "docs/services/META_ADS_SOP.md",
+      "domain": "paid_ads",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Meta Ads SOP"
+    },
+    {
+      "path": "docs/services/NELVYON_SERVICE_TIERS.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "NELVYON Service Tiers"
+    },
+    {
+      "path": "docs/services/PILOT_LANDING_PROJECT.md",
+      "domain": "content",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Pilot Landing Project"
+    },
+    {
+      "path": "docs/services/PILOT_LANDING_PROJECT.md",
+      "domain": "digital_marketing",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Pilot Landing Project"
+    },
+    {
+      "path": "docs/services/SEO_SOP.md",
+      "domain": "seo",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "SEO SOP"
+    },
+    {
+      "path": "docs/services/SERVICES_QA_MASTER.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Services QA Master"
+    },
+    {
+      "path": "docs/services/SERVICES_QA_MASTER.md",
+      "domain": "planning_strategy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Services QA Master"
+    },
+    {
+      "path": "docs/services/TIKTOK_ADS_SOP.md",
+      "domain": "paid_ads",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "TikTok Ads SOP"
+    },
+    {
+      "path": "docs/services/WEB_SOP.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "sop",
+      "title": "Web Development SOP"
+    },
+    {
+      "path": "docs/agency-playbooks/ECOMMERCE_GROWTH_PACK_DIA_A_DIA.md",
+      "domain": "digital_marketing",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "playbook",
       "title": "ECOMMERCE_GROWTH_PACK_DIA_A_DIA"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\agency-playbooks\\LOCAL_GROWTH_PACK_DIA_A_DIA.md",
+      "path": "docs/agency-playbooks/LOCAL_GROWTH_PACK_DIA_A_DIA.md",
       "domain": "digital_marketing",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "playbook",
       "title": "LOCAL_GROWTH_PACK_DIA_A_DIA"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\agency-playbooks\\SAAS_B2B_GROWTH_PACK_DIA_A_DIA.md",
+      "path": "docs/agency-playbooks/SAAS_B2B_GROWTH_PACK_DIA_A_DIA.md",
       "domain": "digital_marketing",
       "priority": 1,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "playbook",
       "title": "SAAS_B2B_GROWTH_PACK_DIA_A_DIA"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\operations\\ACCOUNT_MANAGER_SOP.md",
-      "domain": "finance_operations",
+      "path": "docs/agency-playbooks/SAAS_B2B_GROWTH_PACK_DIA_A_DIA.md",
+      "domain": "saas",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "playbook",
+      "title": "SAAS_B2B_GROWTH_PACK_DIA_A_DIA"
+    },
+    {
+      "path": "docs/operations/ACCOUNT_MANAGER_SOP.md",
+      "domain": "customer_support",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "sop",
       "title": "ACCOUNT_MANAGER_SOP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\operations\\CLIENT_ONBOARDING_SOP.md",
+      "path": "docs/operations/CLIENT_ONBOARDING_SOP.md",
       "domain": "finance_operations",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -283,7 +618,7 @@
       "title": "CLIENT_ONBOARDING_SOP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\operations\\CLIENT_RENEWAL_SOP.md",
+      "path": "docs/operations/CLIENT_RENEWAL_SOP.md",
       "domain": "finance_operations",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -291,7 +626,7 @@
       "title": "CLIENT_RENEWAL_SOP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\operations\\NELVYON_OPERATIONS_MANUAL.md",
+      "path": "docs/operations/NELVYON_OPERATIONS_MANUAL.md",
       "domain": "finance_operations",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -299,7 +634,7 @@
       "title": "NELVYON_OPERATIONS_MANUAL"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\operations\\PROJECT_CLOSURE_SOP.md",
+      "path": "docs/operations/PROJECT_CLOSURE_SOP.md",
       "domain": "finance_operations",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -307,7 +642,7 @@
       "title": "PROJECT_CLOSURE_SOP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\operations\\PROJECT_DELIVERY_SOP.md",
+      "path": "docs/operations/PROJECT_DELIVERY_SOP.md",
       "domain": "finance_operations",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -315,71 +650,71 @@
       "title": "PROJECT_DELIVERY_SOP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\operations\\SALES_SOP.md",
-      "domain": "finance_operations",
+      "path": "docs/operations/SALES_SOP.md",
+      "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "sop",
       "title": "SALES_SOP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\commercial\\NELVYON_CASE_STUDY_TEMPLATE.md",
+      "path": "docs/commercial/NELVYON_CASE_STUDY_TEMPLATE.md",
       "domain": "crm_sales",
       "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "official_doc",
       "title": "NELVYON_CASE_STUDY_TEMPLATE"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\commercial\\NELVYON_CLIENT_QUALIFICATION.md",
+      "path": "docs/commercial/NELVYON_CLIENT_QUALIFICATION.md",
       "domain": "crm_sales",
       "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "official_doc",
       "title": "NELVYON_CLIENT_QUALIFICATION"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\commercial\\NELVYON_COMPANY_DECK.md",
+      "path": "docs/commercial/NELVYON_COMPANY_DECK.md",
       "domain": "crm_sales",
       "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "official_doc",
       "title": "NELVYON_COMPANY_DECK"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\commercial\\NELVYON_CONTRACT_CHECKLIST.md",
+      "path": "docs/commercial/NELVYON_CONTRACT_CHECKLIST.md",
       "domain": "crm_sales",
       "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "official_doc",
       "title": "NELVYON_CONTRACT_CHECKLIST"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\commercial\\NELVYON_PORTFOLIO_STRUCTURE.md",
+      "path": "docs/commercial/NELVYON_PORTFOLIO_STRUCTURE.md",
       "domain": "crm_sales",
       "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "official_doc",
       "title": "NELVYON_PORTFOLIO_STRUCTURE"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\commercial\\NELVYON_PRICING.md",
+      "path": "docs/commercial/NELVYON_PRICING.md",
       "domain": "crm_sales",
       "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "official_doc",
       "title": "NELVYON_PRICING"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\commercial\\NELVYON_PROPOSAL_TEMPLATE.md",
+      "path": "docs/commercial/NELVYON_PROPOSAL_TEMPLATE.md",
       "domain": "crm_sales",
       "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "sop",
+      "sourceType": "official_doc",
       "title": "NELVYON_PROPOSAL_TEMPLATE"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\sales\\CLOSING_SCRIPT.md",
+      "path": "docs/sales/CLOSING_SCRIPT.md",
       "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -387,7 +722,7 @@
       "title": "CLOSING_SCRIPT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\sales\\DISCOVERY_CALL_SCRIPT.md",
+      "path": "docs/sales/DISCOVERY_CALL_SCRIPT.md",
       "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -395,7 +730,7 @@
       "title": "DISCOVERY_CALL_SCRIPT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\sales\\LINKEDIN_OUTREACH.md",
+      "path": "docs/sales/LINKEDIN_OUTREACH.md",
       "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -403,7 +738,7 @@
       "title": "LINKEDIN_OUTREACH"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\sales\\NELVYON_SALES_PLAYBOOK.md",
+      "path": "docs/sales/NELVYON_SALES_PLAYBOOK.md",
       "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -411,7 +746,7 @@
       "title": "NELVYON_SALES_PLAYBOOK"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\sales\\OBJECTION_HANDLING.md",
+      "path": "docs/sales/OBJECTION_HANDLING.md",
       "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -419,7 +754,7 @@
       "title": "OBJECTION_HANDLING"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\sales\\OUTREACH_EMAILS.md",
+      "path": "docs/sales/OUTREACH_EMAILS.md",
       "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -427,7 +762,7 @@
       "title": "OUTREACH_EMAILS"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\sales\\WHATSAPP_OUTREACH.md",
+      "path": "docs/sales/WHATSAPP_OUTREACH.md",
       "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -435,23 +770,239 @@
       "title": "WHATSAPP_OUTREACH"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\ADS_AGENTS_FOUNDATION.md",
-      "domain": "nelvyon",
+      "path": "backend/ops/runbooks/3d_contenido_inmersivo_premium_nelvyon_v1.md",
+      "domain": "video",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "3d_contenido_inmersivo_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/ads_premium_nelvyon_v1.md",
+      "domain": "paid_ads",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "ads_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/advisor_empresarial_premium_nelvyon_v1.md",
+      "domain": "business_strategy",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "advisor_empresarial_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/bots_premium_nelvyon_v1.md",
+      "domain": "automation",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "bots_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/branding_premium_nelvyon_v1.md",
+      "domain": "design",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "branding_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/canales_comunicaciones_premium_nelvyon_v1.md",
+      "domain": "social_media",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "canales_comunicaciones_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/consultoria_automatizacion_premium_nelvyon_v1.md",
+      "domain": "automation",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "consultoria_automatizacion_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/contenido_copywriting_premium_nelvyon_v1.md",
+      "domain": "copywriting",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "contenido_copywriting_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/diseno_grafico_creatividades_premium_nelvyon_v1.md",
+      "domain": "design",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "diseno_grafico_creatividades_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/ecommerce_premium_nelvyon_v1.md",
+      "domain": "digital_marketing",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "ecommerce_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/email_marketing_premium_nelvyon_v1.md",
+      "domain": "email_marketing",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "email_marketing_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/formacion_capacitacion_digital_premium_nelvyon_v1.md",
+      "domain": "digital_marketing",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "formacion_capacitacion_digital_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/fotografia_producto_premium_nelvyon_v1.md",
+      "domain": "design",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "fotografia_producto_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/influencer_marketing_premium_nelvyon_v1.md",
+      "domain": "social_media",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "influencer_marketing_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/integraciones_apis_premium_nelvyon_v1.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "integraciones_apis_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/mantenimiento_web_premium_nelvyon_v1.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "mantenimiento_web_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/nelvyon_master_operations_v1.md",
+      "domain": "finance_operations",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "nelvyon_master_operations_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/observability_v1_tuning_triage.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "observability_v1_tuning_triage"
+    },
+    {
+      "path": "backend/ops/runbooks/personal_digital_premium_nelvyon_v1.md",
+      "domain": "digital_marketing",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "personal_digital_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/phase9_observability_jobs.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "phase9_observability_jobs"
+    },
+    {
+      "path": "backend/ops/runbooks/reputacion_online_orm_premium_nelvyon_v1.md",
+      "domain": "seo",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "reputacion_online_orm_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/seo_premium_nelvyon_v1.md",
+      "domain": "seo",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "seo_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/social_media_premium_nelvyon_v1.md",
+      "domain": "social_media",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "social_media_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/video_multimedia_premium_nelvyon_v1.md",
+      "domain": "video",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "video_multimedia_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/voice_v2_pilot_runbook.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "voice_v2_pilot_runbook"
+    },
+    {
+      "path": "backend/ops/runbooks/voz_premium_nelvyon_v1.md",
+      "domain": "video",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "voz_premium_nelvyon_v1"
+    },
+    {
+      "path": "backend/ops/runbooks/web_premium_nelvyon_v1.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "web_premium_nelvyon_v1"
+    },
+    {
+      "path": "docs/autonomous/ADS_AGENTS_FOUNDATION.md",
+      "domain": "paid_ads",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "ADS_AGENTS_FOUNDATION"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\ADS_AGENTS_ROADMAP.md",
-      "domain": "nelvyon",
+      "path": "docs/autonomous/ADS_AGENTS_ROADMAP.md",
+      "domain": "paid_ads",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "ADS_AGENTS_ROADMAP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_JSON_CONTRACTS.md",
+      "path": "docs/autonomous/AUTONOMOUS_JSON_CONTRACTS.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -459,7 +1010,7 @@
       "title": "AUTONOMOUS_JSON_CONTRACTS"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_B_SIMULATION.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_B_SIMULATION.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -467,7 +1018,7 @@
       "title": "AUTONOMOUS_PHASE_B_SIMULATION"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_C_LLM_QA.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_C_LLM_QA.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -475,7 +1026,7 @@
       "title": "AUTONOMOUS_PHASE_C_LLM_QA"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_D_OS_PUBLISH.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_D_OS_PUBLISH.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -483,7 +1034,7 @@
       "title": "AUTONOMOUS_PHASE_D_OS_PUBLISH"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_F_RESTAURANT_LANDING_PILOT.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_F_RESTAURANT_LANDING_PILOT.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -491,7 +1042,7 @@
       "title": "AUTONOMOUS_PHASE_F_RESTAURANT_LANDING_PILOT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_G_OS_STAGING_PILOT_SETUP.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_G_OS_STAGING_PILOT_SETUP.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -499,7 +1050,7 @@
       "title": "AUTONOMOUS_PHASE_G_OS_STAGING_PILOT_SETUP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_G_STAGING_OS_RUNBOOK.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_G_STAGING_OS_RUNBOOK.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -507,7 +1058,7 @@
       "title": "AUTONOMOUS_PHASE_G_STAGING_OS_RUNBOOK"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_H_LANDING_PREVIEW_STAGING.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_H_LANDING_PREVIEW_STAGING.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -515,7 +1066,7 @@
       "title": "AUTONOMOUS_PHASE_H_LANDING_PREVIEW_STAGING"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_I_STAGING_DEPLOY.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_I_STAGING_DEPLOY.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -523,7 +1074,7 @@
       "title": "AUTONOMOUS_PHASE_I_STAGING_DEPLOY"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_K_LEARNING_ENGINE.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_K_LEARNING_ENGINE.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -531,7 +1082,7 @@
       "title": "AUTONOMOUS_PHASE_K_LEARNING_ENGINE"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_L_TEMPLATE_LEARNING_DB.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_L_TEMPLATE_LEARNING_DB.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -539,7 +1090,7 @@
       "title": "AUTONOMOUS_PHASE_L_TEMPLATE_LEARNING_DB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_M_REAL_LEARNING_LOOP.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_M_REAL_LEARNING_LOOP.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -547,7 +1098,7 @@
       "title": "AUTONOMOUS_PHASE_M_REAL_LEARNING_LOOP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_N_GA4_CONVERSION_LEARNING.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_N_GA4_CONVERSION_LEARNING.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -555,7 +1106,7 @@
       "title": "AUTONOMOUS_PHASE_N_GA4_CONVERSION_LEARNING"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_O_LEARNING_DASHBOARD.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_O_LEARNING_DASHBOARD.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -563,7 +1114,7 @@
       "title": "AUTONOMOUS_PHASE_O_LEARNING_DASHBOARD"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_PHASE_P_ALERTS_EXPORT_CRON.md",
+      "path": "docs/autonomous/AUTONOMOUS_PHASE_P_ALERTS_EXPORT_CRON.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -571,7 +1122,7 @@
       "title": "AUTONOMOUS_PHASE_P_ALERTS_EXPORT_CRON"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\AUTONOMOUS_QA_RUBRICS.md",
+      "path": "docs/autonomous/AUTONOMOUS_QA_RUBRICS.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -579,7 +1130,7 @@
       "title": "AUTONOMOUS_QA_RUBRICS"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\CHATBOT_AGENT_PROMPTS.md",
+      "path": "docs/autonomous/CHATBOT_AGENT_PROMPTS.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -587,7 +1138,7 @@
       "title": "CHATBOT_AGENT_PROMPTS"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\LANDING_AGENT_PROMPTS.md",
+      "path": "docs/autonomous/LANDING_AGENT_PROMPTS.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -595,7 +1146,7 @@
       "title": "LANDING_AGENT_PROMPTS"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\LEARNING_ENGINE_ROADMAP.md",
+      "path": "docs/autonomous/LEARNING_ENGINE_ROADMAP.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -603,87 +1154,87 @@
       "title": "LEARNING_ENGINE_ROADMAP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\BEAUTY_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/BEAUTY_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "BEAUTY_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\COACHING_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/COACHING_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "COACHING_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\DENTAL_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/DENTAL_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "DENTAL_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\ECOMMERCE_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/ECOMMERCE_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "ECOMMERCE_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\FITNESS_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/FITNESS_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "FITNESS_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\LEGAL_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/LEGAL_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "LEGAL_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\REAL_ESTATE_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/REAL_ESTATE_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "REAL_ESTATE_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\RESTAURANT_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/RESTAURANT_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "RESTAURANT_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\SAAS_B2B_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/SAAS_B2B_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "SAAS_B2B_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\sectors\\SOLAR_AGENT.md",
-      "domain": "nelvyon",
-      "priority": 1,
+      "path": "docs/autonomous/sectors/SOLAR_AGENT.md",
+      "domain": "digital_marketing",
+      "priority": 2,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "SOLAR_AGENT"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\SECTOR_AGENTS_MASTER.md",
+      "path": "docs/autonomous/SECTOR_AGENTS_MASTER.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -691,15 +1242,15 @@
       "title": "SECTOR_AGENTS_MASTER"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\SEO_AGENT_PROMPTS.md",
-      "domain": "nelvyon",
+      "path": "docs/autonomous/SEO_AGENT_PROMPTS.md",
+      "domain": "seo",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "SEO_AGENT_PROMPTS"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\TEMPLATE_FACTORY_ROADMAP.md",
+      "path": "docs/autonomous/TEMPLATE_FACTORY_ROADMAP.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -707,7 +1258,7 @@
       "title": "TEMPLATE_FACTORY_ROADMAP"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\docs\\autonomous\\TEMPLATE_LIBRARY_MASTER.md",
+      "path": "docs/autonomous/TEMPLATE_LIBRARY_MASTER.md",
       "domain": "nelvyon",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -715,223 +1266,55 @@
       "title": "TEMPLATE_LIBRARY_MASTER"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\3d_contenido_inmersivo_premium_nelvyon_v1.md",
+      "path": "docs/portfolio/CASE_STUDY_DENTAL.md",
       "domain": "digital_marketing",
-      "priority": 1,
+      "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "3d_contenido_inmersivo_premium_nelvyon_v1"
+      "sourceType": "case_study",
+      "title": "CASE_STUDY_DENTAL"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\ads_premium_nelvyon_v1.md",
+      "path": "docs/portfolio/CASE_STUDY_ECOMMERCE.md",
       "domain": "digital_marketing",
-      "priority": 1,
+      "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "ads_premium_nelvyon_v1"
+      "sourceType": "case_study",
+      "title": "CASE_STUDY_ECOMMERCE"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\advisor_empresarial_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
+      "path": "docs/portfolio/CASE_STUDY_ECOMMERCE.md",
+      "domain": "saas",
+      "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "advisor_empresarial_premium_nelvyon_v1"
+      "sourceType": "case_study",
+      "title": "CASE_STUDY_ECOMMERCE"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\bots_premium_nelvyon_v1.md",
+      "path": "docs/portfolio/CASE_STUDY_GYM.md",
       "domain": "digital_marketing",
-      "priority": 1,
+      "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "bots_premium_nelvyon_v1"
+      "sourceType": "case_study",
+      "title": "CASE_STUDY_GYM"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\branding_premium_nelvyon_v1.md",
+      "path": "docs/portfolio/CASE_STUDY_LAW_FIRM.md",
       "domain": "digital_marketing",
-      "priority": 1,
+      "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "branding_premium_nelvyon_v1"
+      "sourceType": "case_study",
+      "title": "CASE_STUDY_LAW_FIRM"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\canales_comunicaciones_premium_nelvyon_v1.md",
+      "path": "docs/portfolio/CASE_STUDY_SOLAR.md",
       "domain": "digital_marketing",
-      "priority": 1,
+      "priority": 2,
       "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "canales_comunicaciones_premium_nelvyon_v1"
+      "sourceType": "case_study",
+      "title": "CASE_STUDY_SOLAR"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\consultoria_automatizacion_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "consultoria_automatizacion_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\contenido_copywriting_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "contenido_copywriting_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\diseno_grafico_creatividades_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "diseno_grafico_creatividades_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\ecommerce_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "ecommerce_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\email_marketing_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "email_marketing_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\formacion_capacitacion_digital_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "formacion_capacitacion_digital_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\fotografia_producto_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "fotografia_producto_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\influencer_marketing_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "influencer_marketing_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\integraciones_apis_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "integraciones_apis_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\mantenimiento_web_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "mantenimiento_web_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\nelvyon_master_operations_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "nelvyon_master_operations_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\observability_v1_tuning_triage.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "observability_v1_tuning_triage"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\personal_digital_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "personal_digital_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\phase9_observability_jobs.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "phase9_observability_jobs"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\reputacion_online_orm_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "reputacion_online_orm_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\seo_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "seo_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\social_media_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "social_media_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\video_multimedia_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "video_multimedia_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\voice_v2_pilot_runbook.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "voice_v2_pilot_runbook"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\voz_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "voz_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\ops\\runbooks\\web_premium_nelvyon_v1.md",
-      "domain": "digital_marketing",
-      "priority": 1,
-      "license": "nelvyon_internal",
-      "sourceType": "runbook",
-      "title": "web_premium_nelvyon_v1"
-    },
-    {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\knowledge\\nelvyon\\platform.md",
+      "path": "backend/local-ai/knowledge/nelvyon/platform.md",
       "domain": "nelvyon",
       "priority": 0,
       "license": "nelvyon_internal",
@@ -939,7 +1322,7 @@
       "title": "NELVYON Platform"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\knowledge\\domains\\digital_marketing.md",
+      "path": "backend/local-ai/knowledge/domains/digital_marketing.md",
       "domain": "digital_marketing",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -947,7 +1330,7 @@
       "title": "Digital Marketing KB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\knowledge\\domains\\paid_ads.md",
+      "path": "backend/local-ai/knowledge/domains/paid_ads.md",
       "domain": "paid_ads",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -955,7 +1338,7 @@
       "title": "Paid Ads KB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\knowledge\\domains\\seo.md",
+      "path": "backend/local-ai/knowledge/domains/seo.md",
       "domain": "seo",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -963,7 +1346,7 @@
       "title": "SEO KB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\knowledge\\domains\\crm_email.md",
+      "path": "backend/local-ai/knowledge/domains/crm_email.md",
       "domain": "crm_sales",
       "priority": 1,
       "license": "nelvyon_internal",
@@ -971,44 +1354,159 @@
       "title": "CRM Email KB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\knowledge\\domains\\saas_analytics_tech.md",
+      "path": "backend/local-ai/knowledge/domains/crm_email.md",
+      "domain": "email_marketing",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "CRM Email KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/saas_analytics_tech.md",
       "domain": "saas",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "knowledge_pack",
-      "title": "SaaS Analytics Tech KB"
+      "title": "SaaS Tech KB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\knowledge\\domains\\content_copy_social.md",
+      "path": "backend/local-ai/knowledge/domains/saas_analytics_tech.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "SaaS Tech KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/saas_analytics_tech.md",
+      "domain": "analytics_reporting",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Analytics Reporting KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/content_copy_social.md",
       "domain": "copywriting",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "knowledge_pack",
-      "title": "Content Copy Social KB"
+      "title": "Copywriting KB"
     },
     {
-      "path": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\local-ai\\knowledge\\domains\\strategy_support.md",
+      "path": "backend/local-ai/knowledge/domains/content_copy_social.md",
+      "domain": "content",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Content Strategy KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/content_copy_social.md",
+      "domain": "social_media",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Social Media KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/strategy_support.md",
       "domain": "planning_strategy",
       "priority": 1,
       "license": "nelvyon_internal",
       "sourceType": "knowledge_pack",
       "title": "Strategy Support KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/strategy_support.md",
+      "domain": "business_strategy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Strategy Support KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/automation.md",
+      "domain": "automation",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Automation KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/design.md",
+      "domain": "design",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Design KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/video.md",
+      "domain": "video",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Video KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/support_ops.md",
+      "domain": "customer_support",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Support Ops KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/finance_strategy.md",
+      "domain": "finance_operations",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Finance Strategy KB"
+    },
+    {
+      "path": "backend/local-ai/knowledge/domains/finance_strategy.md",
+      "domain": "business_strategy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "knowledge_pack",
+      "title": "Finance Strategy KB"
     }
   ],
   "summary": {
-    "total": 124,
+    "total": 184,
+    "uniqueFiles": 161,
     "byDomain": {
-      "nelvyon": 44,
-      "security_privacy": 2,
-      "development_tech": 3,
-      "planning_strategy": 3,
-      "digital_marketing": 46,
-      "finance_operations": 7,
-      "crm_sales": 15,
-      "paid_ads": 1,
-      "seo": 1,
-      "saas": 1,
-      "copywriting": 1
+      "nelvyon": 52,
+      "development_tech": 19,
+      "security_privacy": 4,
+      "planning_strategy": 7,
+      "digital_marketing": 26,
+      "saas": 4,
+      "crm_sales": 17,
+      "analytics_reporting": 2,
+      "business_strategy": 4,
+      "finance_operations": 9,
+      "automation": 4,
+      "design": 6,
+      "customer_support": 3,
+      "paid_ads": 7,
+      "content": 3,
+      "seo": 5,
+      "video": 4,
+      "social_media": 4,
+      "copywriting": 2,
+      "email_marketing": 2
+    },
+    "bySourceType": {
+      "constitution": 1,
+      "official_doc": 89,
+      "knowledge_pack": 25,
+      "sop": 32,
+      "playbook": 4,
+      "runbook": 27,
+      "case_study": 6
     }
   }
 }

@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { closeLocalAiPool } from "../backend/local-ai/db";
 import { getKnowledgeIngestService } from "../backend/local-ai/KnowledgeIngestService";
-import { buildKnowledgeManifest, manifestSummary } from "../backend/local-ai/specialization/knowledgeManifest";
+import { buildKnowledgeManifest, manifestSummary, relativeManifestPath } from "../backend/local-ai/specialization/knowledgeManifest";
 import { NELVYON_ONTOLOGY } from "../backend/local-ai/specialization/ontology";
 
 import { fileURLToPath } from "node:url";
@@ -34,7 +34,16 @@ async function main(): Promise<void> {
   await fs.writeFile(ontologyPath, JSON.stringify(NELVYON_ONTOLOGY, null, 2));
   await fs.writeFile(
     manifestPath,
-    JSON.stringify({ generated: new Date().toISOString(), tenantId, entries: manifest, summary: manifestSummary(manifest) }, null, 2),
+    JSON.stringify(
+      {
+        generated: new Date().toISOString(),
+        tenantId,
+        entries: manifest.map((e) => ({ ...e, path: relativeManifestPath(e.path) })),
+        summary: manifestSummary(manifest),
+      },
+      null,
+      2,
+    ),
   );
 
   console.log(`Manifest: ${manifest.length} sources → ${manifestPath}`);

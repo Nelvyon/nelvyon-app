@@ -1,0 +1,841 @@
+{
+  "generatedAt": "2026-07-19T13:56:55.899Z",
+  "audit": {
+    "domains": [
+      "nelvyon",
+      "business_strategy",
+      "digital_marketing",
+      "paid_ads",
+      "seo",
+      "content",
+      "copywriting",
+      "social_media",
+      "email_marketing",
+      "crm_sales",
+      "automation",
+      "saas",
+      "analytics_reporting",
+      "customer_support",
+      "finance_operations",
+      "design",
+      "video",
+      "development_tech",
+      "security_privacy",
+      "planning_strategy"
+    ],
+    "byDomain": {
+      "nelvyon": {
+        "count": 52,
+        "sources": [
+          "kb:nelvyon:CONSTITUTION_NELVYON_AI.md",
+          "kb:nelvyon:HANDOVER.md",
+          "kb:nelvyon:AI_CONTEXT.md",
+          "kb:nelvyon:ARCHITECTURE.md",
+          "kb:nelvyon:PHASE2_ARCHITECTURE.md",
+          "kb:nelvyon:PHASE2_AI_ARCHITECTURE.md",
+          "kb:nelvyon:PHASE2_BENCHMARK_RESULTS.md",
+          "kb:nelvyon:PHASE2_ELITE_CERT.md",
+          "kb:nelvyon:PHASE2_RAG_UNIFIED.md",
+          "kb:nelvyon:DECISIONS.md",
+          "kb:nelvyon:CHANGELOG.md",
+          "kb:nelvyon:KNOWN_ISSUES.md",
+          "kb:nelvyon:AUTONOMOUS_RUNTIME.md",
+          "kb:nelvyon:AUTONOMOUS_WORKFORCE_CERT.md",
+          "kb:nelvyon:AGENT_WORKFORCE_INVENTORY.md",
+          "kb:nelvyon:AGENT_WORKFORCE_ORGANIZATION.md",
+          "kb:nelvyon:AGENT_WORKFLOW_CATALOG.md",
+          "kb:nelvyon:AGENT_CAPABILITY_MATRIX.md",
+          "kb:nelvyon:AGENT_EVALUATION_FRAMEWORK.md",
+          "kb:nelvyon:FINAL_ELITE_CLOSURE.md",
+          "kb:nelvyon:CLAUDE.md",
+          "kb:nelvyon:README.md",
+          "kb:nelvyon:PROJECT_STATUS.md",
+          "kb:nelvyon:SERVICES_MASTER_PLAN.md",
+          "kb:nelvyon:AUTONOMOUS_SERVICES_MODE.md",
+          "kb:nelvyon:OS_TEMPLATE_DNA.md",
+          "kb:nelvyon:OS_LEARNING.md",
+          "kb:nelvyon:NELVYON_SERVICE_TIERS.md",
+          "kb:nelvyon:SERVICES_QA_MASTER.md",
+          "kb:nelvyon:AUTONOMOUS_JSON_CONTRACTS.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_B_SIMULATION.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_C_LLM_QA.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_D_OS_PUBLISH.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_F_RESTAURANT_LANDING_PILOT.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_G_OS_STAGING_PILOT_SETUP.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_G_STAGING_OS_RUNBOOK.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_H_LANDING_PREVIEW_STAGING.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_I_STAGING_DEPLOY.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_K_LEARNING_ENGINE.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_L_TEMPLATE_LEARNING_DB.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_M_REAL_LEARNING_LOOP.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_N_GA4_CONVERSION_LEARNING.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_O_LEARNING_DASHBOARD.md",
+          "kb:nelvyon:AUTONOMOUS_PHASE_P_ALERTS_EXPORT_CRON.md",
+          "kb:nelvyon:AUTONOMOUS_QA_RUBRICS.md",
+          "kb:nelvyon:CHATBOT_AGENT_PROMPTS.md",
+          "kb:nelvyon:LANDING_AGENT_PROMPTS.md",
+          "kb:nelvyon:LEARNING_ENGINE_ROADMAP.md",
+          "kb:nelvyon:SECTOR_AGENTS_MASTER.md",
+          "kb:nelvyon:TEMPLATE_FACTORY_ROADMAP.md",
+          "kb:nelvyon:TEMPLATE_LIBRARY_MASTER.md",
+          "kb:nelvyon:platform.md"
+        ]
+      },
+      "business_strategy": {
+        "count": 4,
+        "sources": [
+          "kb:business_strategy:entrepreneurship_ops.md",
+          "kb:business_strategy:advisor_empresarial_premium_nelvyon_v1.md",
+          "kb:business_strategy:strategy_support.md",
+          "kb:business_strategy:finance_strategy.md"
+        ]
+      },
+      "digital_marketing": {
+        "count": 26,
+        "sources": [
+          "kb:digital_marketing:SERVICES_MASTER_PLAN.md",
+          "kb:digital_marketing:ECOMMERCE_SOP.md",
+          "kb:digital_marketing:LANDING_SOP.md",
+          "kb:digital_marketing:PILOT_LANDING_PROJECT.md",
+          "kb:digital_marketing:ECOMMERCE_GROWTH_PACK_DIA_A_DIA.md",
+          "kb:digital_marketing:LOCAL_GROWTH_PACK_DIA_A_DIA.md",
+          "kb:digital_marketing:SAAS_B2B_GROWTH_PACK_DIA_A_DIA.md",
+          "kb:digital_marketing:ecommerce_premium_nelvyon_v1.md",
+          "kb:digital_marketing:formacion_capacitacion_digital_premium_nelvyon_v1.md",
+          "kb:digital_marketing:personal_digital_premium_nelvyon_v1.md",
+          "kb:digital_marketing:BEAUTY_AGENT.md",
+          "kb:digital_marketing:COACHING_AGENT.md",
+          "kb:digital_marketing:DENTAL_AGENT.md",
+          "kb:digital_marketing:ECOMMERCE_AGENT.md",
+          "kb:digital_marketing:FITNESS_AGENT.md",
+          "kb:digital_marketing:LEGAL_AGENT.md",
+          "kb:digital_marketing:REAL_ESTATE_AGENT.md",
+          "kb:digital_marketing:RESTAURANT_AGENT.md",
+          "kb:digital_marketing:SAAS_B2B_AGENT.md",
+          "kb:digital_marketing:SOLAR_AGENT.md",
+          "kb:digital_marketing:CASE_STUDY_DENTAL.md",
+          "kb:digital_marketing:CASE_STUDY_ECOMMERCE.md",
+          "kb:digital_marketing:CASE_STUDY_GYM.md",
+          "kb:digital_marketing:CASE_STUDY_LAW_FIRM.md",
+          "kb:digital_marketing:CASE_STUDY_SOLAR.md",
+          "kb:digital_marketing:digital_marketing.md"
+        ]
+      },
+      "paid_ads": {
+        "count": 7,
+        "sources": [
+          "kb:paid_ads:GOOGLE_ADS_SOP.md",
+          "kb:paid_ads:META_ADS_SOP.md",
+          "kb:paid_ads:TIKTOK_ADS_SOP.md",
+          "kb:paid_ads:ads_premium_nelvyon_v1.md",
+          "kb:paid_ads:ADS_AGENTS_FOUNDATION.md",
+          "kb:paid_ads:ADS_AGENTS_ROADMAP.md",
+          "kb:paid_ads:paid_ads.md"
+        ]
+      },
+      "seo": {
+        "count": 5,
+        "sources": [
+          "kb:seo:SEO_SOP.md",
+          "kb:seo:reputacion_online_orm_premium_nelvyon_v1.md",
+          "kb:seo:seo_premium_nelvyon_v1.md",
+          "kb:seo:SEO_AGENT_PROMPTS.md",
+          "kb:seo:seo.md"
+        ]
+      },
+      "content": {
+        "count": 3,
+        "sources": [
+          "kb:content:LANDING_SOP.md",
+          "kb:content:PILOT_LANDING_PROJECT.md",
+          "kb:content:content_copy_social.md"
+        ]
+      },
+      "copywriting": {
+        "count": 2,
+        "sources": [
+          "kb:copywriting:contenido_copywriting_premium_nelvyon_v1.md",
+          "kb:copywriting:content_copy_social.md"
+        ]
+      },
+      "social_media": {
+        "count": 4,
+        "sources": [
+          "kb:social_media:canales_comunicaciones_premium_nelvyon_v1.md",
+          "kb:social_media:influencer_marketing_premium_nelvyon_v1.md",
+          "kb:social_media:social_media_premium_nelvyon_v1.md",
+          "kb:social_media:content_copy_social.md"
+        ]
+      },
+      "email_marketing": {
+        "count": 2,
+        "sources": [
+          "kb:email_marketing:email_marketing_premium_nelvyon_v1.md",
+          "kb:email_marketing:crm_email.md"
+        ]
+      },
+      "crm_sales": {
+        "count": 17,
+        "sources": [
+          "kb:crm_sales:PARITY_GHL_HUBSPOT.md",
+          "kb:crm_sales:SALES_SOP.md",
+          "kb:crm_sales:NELVYON_CASE_STUDY_TEMPLATE.md",
+          "kb:crm_sales:NELVYON_CLIENT_QUALIFICATION.md",
+          "kb:crm_sales:NELVYON_COMPANY_DECK.md",
+          "kb:crm_sales:NELVYON_CONTRACT_CHECKLIST.md",
+          "kb:crm_sales:NELVYON_PORTFOLIO_STRUCTURE.md",
+          "kb:crm_sales:NELVYON_PRICING.md",
+          "kb:crm_sales:NELVYON_PROPOSAL_TEMPLATE.md",
+          "kb:crm_sales:CLOSING_SCRIPT.md",
+          "kb:crm_sales:DISCOVERY_CALL_SCRIPT.md",
+          "kb:crm_sales:LINKEDIN_OUTREACH.md",
+          "kb:crm_sales:NELVYON_SALES_PLAYBOOK.md",
+          "kb:crm_sales:OBJECTION_HANDLING.md",
+          "kb:crm_sales:OUTREACH_EMAILS.md",
+          "kb:crm_sales:WHATSAPP_OUTREACH.md",
+          "kb:crm_sales:crm_email.md"
+        ]
+      },
+      "automation": {
+        "count": 4,
+        "sources": [
+          "kb:automation:AUTOMATION_SOP.md",
+          "kb:automation:bots_premium_nelvyon_v1.md",
+          "kb:automation:consultoria_automatizacion_premium_nelvyon_v1.md",
+          "kb:automation:automation.md"
+        ]
+      },
+      "saas": {
+        "count": 4,
+        "sources": [
+          "kb:saas:PARITY_GHL_HUBSPOT.md",
+          "kb:saas:SAAS_B2B_GROWTH_PACK_DIA_A_DIA.md",
+          "kb:saas:CASE_STUDY_ECOMMERCE.md",
+          "kb:saas:saas_analytics_tech.md"
+        ]
+      },
+      "analytics_reporting": {
+        "count": 2,
+        "sources": [
+          "kb:analytics_reporting:OS_LEARNING.md",
+          "kb:analytics_reporting:saas_analytics_tech.md"
+        ]
+      },
+      "customer_support": {
+        "count": 3,
+        "sources": [
+          "kb:customer_support:CHATBOT_SOP.md",
+          "kb:customer_support:ACCOUNT_MANAGER_SOP.md",
+          "kb:customer_support:support_ops.md"
+        ]
+      },
+      "finance_operations": {
+        "count": 9,
+        "sources": [
+          "kb:finance_operations:entrepreneurship_ops.md",
+          "kb:finance_operations:FREELANCER_SCORECARD.md",
+          "kb:finance_operations:CLIENT_ONBOARDING_SOP.md",
+          "kb:finance_operations:CLIENT_RENEWAL_SOP.md",
+          "kb:finance_operations:NELVYON_OPERATIONS_MANUAL.md",
+          "kb:finance_operations:PROJECT_CLOSURE_SOP.md",
+          "kb:finance_operations:PROJECT_DELIVERY_SOP.md",
+          "kb:finance_operations:nelvyon_master_operations_v1.md",
+          "kb:finance_operations:finance_strategy.md"
+        ]
+      },
+      "design": {
+        "count": 6,
+        "sources": [
+          "kb:design:BRANDING_SOP.md",
+          "kb:design:LOGO_SOP.md",
+          "kb:design:branding_premium_nelvyon_v1.md",
+          "kb:design:diseno_grafico_creatividades_premium_nelvyon_v1.md",
+          "kb:design:fotografia_producto_premium_nelvyon_v1.md",
+          "kb:design:design.md"
+        ]
+      },
+      "video": {
+        "count": 4,
+        "sources": [
+          "kb:video:3d_contenido_inmersivo_premium_nelvyon_v1.md",
+          "kb:video:video_multimedia_premium_nelvyon_v1.md",
+          "kb:video:voz_premium_nelvyon_v1.md",
+          "kb:video:video.md"
+        ]
+      },
+      "development_tech": {
+        "count": 19,
+        "sources": [
+          "kb:development_tech:ARCHITECTURE.md",
+          "kb:development_tech:DECISIONS.md",
+          "kb:development_tech:DEPLOYMENTS.md",
+          "kb:development_tech:INFRASTRUCTURE.md",
+          "kb:development_tech:CURSOR_OPEN_SOURCE_INTEGRATION_AUDIT.md",
+          "kb:development_tech:CLAUDE.md",
+          "kb:development_tech:DATABASE.md",
+          "kb:development_tech:INTEGRATIONS.md",
+          "kb:development_tech:ENVIRONMENTS.md",
+          "kb:development_tech:RAILWAY_DEPLOY_CHECKLIST.md",
+          "kb:development_tech:cybersecurity_cloud.md",
+          "kb:development_tech:WEB_SOP.md",
+          "kb:development_tech:integraciones_apis_premium_nelvyon_v1.md",
+          "kb:development_tech:mantenimiento_web_premium_nelvyon_v1.md",
+          "kb:development_tech:observability_v1_tuning_triage.md",
+          "kb:development_tech:phase9_observability_jobs.md",
+          "kb:development_tech:voice_v2_pilot_runbook.md",
+          "kb:development_tech:web_premium_nelvyon_v1.md",
+          "kb:development_tech:saas_analytics_tech.md"
+        ]
+      },
+      "security_privacy": {
+        "count": 4,
+        "sources": [
+          "kb:security_privacy:PRIVATE_AI_ARCHITECTURE.md",
+          "kb:security_privacy:PHASE2_SECURITY_MODEL.md",
+          "kb:security_privacy:AGENT_TOOL_PERMISSION_MATRIX.md",
+          "kb:security_privacy:cybersecurity_cloud.md"
+        ]
+      },
+      "planning_strategy": {
+        "count": 7,
+        "sources": [
+          "kb:planning_strategy:DECISIONS.md",
+          "kb:planning_strategy:ROADMAP.md",
+          "kb:planning_strategy:TODO.md",
+          "kb:planning_strategy:SERVICES_MASTER_PLAN.md",
+          "kb:planning_strategy:entrepreneurship_ops.md",
+          "kb:planning_strategy:SERVICES_QA_MASTER.md",
+          "kb:planning_strategy:strategy_support.md"
+        ]
+      }
+    },
+    "uniqueFiles": 161,
+    "totalEntries": 184,
+    "duplicatePathDomain": [],
+    "multiDomainFiles": [
+      {
+        "path": "docs/ARCHITECTURE.md",
+        "domains": [
+          "nelvyon",
+          "development_tech"
+        ]
+      },
+      {
+        "path": "docs/DECISIONS.md",
+        "domains": [
+          "nelvyon",
+          "development_tech",
+          "planning_strategy"
+        ]
+      },
+      {
+        "path": "CLAUDE.md",
+        "domains": [
+          "nelvyon",
+          "development_tech"
+        ]
+      },
+      {
+        "path": "docs/SERVICES_MASTER_PLAN.md",
+        "domains": [
+          "nelvyon",
+          "digital_marketing",
+          "planning_strategy"
+        ]
+      },
+      {
+        "path": "docs/PARITY_GHL_HUBSPOT.md",
+        "domains": [
+          "saas",
+          "crm_sales"
+        ]
+      },
+      {
+        "path": "docs/OS_LEARNING.md",
+        "domains": [
+          "nelvyon",
+          "analytics_reporting"
+        ]
+      },
+      {
+        "path": "backend/local-ai/knowledge/domains/entrepreneurship_ops.md",
+        "domains": [
+          "business_strategy",
+          "planning_strategy",
+          "finance_operations"
+        ]
+      },
+      {
+        "path": "backend/local-ai/knowledge/domains/cybersecurity_cloud.md",
+        "domains": [
+          "security_privacy",
+          "development_tech"
+        ]
+      },
+      {
+        "path": "docs/services/LANDING_SOP.md",
+        "domains": [
+          "content",
+          "digital_marketing"
+        ]
+      },
+      {
+        "path": "docs/services/PILOT_LANDING_PROJECT.md",
+        "domains": [
+          "content",
+          "digital_marketing"
+        ]
+      },
+      {
+        "path": "docs/services/SERVICES_QA_MASTER.md",
+        "domains": [
+          "nelvyon",
+          "planning_strategy"
+        ]
+      },
+      {
+        "path": "docs/agency-playbooks/SAAS_B2B_GROWTH_PACK_DIA_A_DIA.md",
+        "domains": [
+          "digital_marketing",
+          "saas"
+        ]
+      },
+      {
+        "path": "docs/portfolio/CASE_STUDY_ECOMMERCE.md",
+        "domains": [
+          "digital_marketing",
+          "saas"
+        ]
+      },
+      {
+        "path": "backend/local-ai/knowledge/domains/crm_email.md",
+        "domains": [
+          "crm_sales",
+          "email_marketing"
+        ]
+      },
+      {
+        "path": "backend/local-ai/knowledge/domains/saas_analytics_tech.md",
+        "domains": [
+          "saas",
+          "development_tech",
+          "analytics_reporting"
+        ]
+      },
+      {
+        "path": "backend/local-ai/knowledge/domains/content_copy_social.md",
+        "domains": [
+          "copywriting",
+          "content",
+          "social_media"
+        ]
+      },
+      {
+        "path": "backend/local-ai/knowledge/domains/strategy_support.md",
+        "domains": [
+          "planning_strategy",
+          "business_strategy"
+        ]
+      },
+      {
+        "path": "backend/local-ai/knowledge/domains/finance_strategy.md",
+        "domains": [
+          "finance_operations",
+          "business_strategy"
+        ]
+      }
+    ],
+    "filesWithoutDomain": [
+      "docs/BETA_LAUNCH_AUDIT.md",
+      "docs/BETA_LAUNCH_RUNBOOK.md",
+      "docs/CEO_FINAL_ACTIONS.md",
+      "docs/CLAUDE_SPRINT_ELITE.md",
+      "docs/CURSOR_NELVYON_MASTER_EXECUTION.md",
+      "docs/DEPLOY_FINAL.md",
+      "docs/EXCELLENCE_PROGRAM.md",
+      "docs/FRONTEND_LEGACY.md",
+      "docs/INVENTARIO_FRENTES.md",
+      "docs/LAUNCH_OPS_CHECKLIST.md",
+      "docs/LAUNCH_READY.md",
+      "docs/MANUAL_OPS_ONLY.md",
+      "docs/MASTER_AUDIT_2026-07-16.md",
+      "docs/MASTER_AUDIT_ELITE_2026-07-16.md",
+      "docs/MASTER_OPEN_SOURCE_COMPARISON.md",
+      "docs/MASTER_OPEN_SOURCE_LICENSES.md",
+      "docs/MASTER_OPEN_SOURCE_LIST.md",
+      "docs/MASTER_OPEN_SOURCE_ROADMAP.md",
+      "docs/MASTER_OPEN_SOURCE_SECURITY.md",
+      "docs/NELVYON_BACKEND_V1_CIERRE_FINAL.md",
+      "docs/NELVYON_BRAIN_KNOWLEDGE.md",
+      "docs/NELVYON_FINAL_STATE_AUDIT.md",
+      "docs/NELVYON_GLOBAL_CERTIFICATION_FINAL.md",
+      "docs/NELVYON_LABS.md",
+      "docs/NELVYON_LABS_ARCHITECTURE.md",
+      "docs/NELVYON_LABS_BLOCK1_SECURITY.md",
+      "docs/NELVYON_LABS_BLOCK2_OBSERVABILITY.md",
+      "docs/NELVYON_LABS_BY_CATEGORY.md",
+      "docs/NELVYON_LABS_CAPABILITY_MATRIX.md",
+      "docs/NELVYON_LABS_FINAL_COVERAGE.md",
+      "docs/NELVYON_LABS_INTEGRATED.md",
+      "docs/NELVYON_LABS_INTEGRATION_FINAL.md",
+      "docs/NELVYON_LABS_INTEGRATION_QUEUE.md",
+      "docs/NELVYON_LABS_INTEGRATION_REPORT.md",
+      "docs/NELVYON_LABS_LICENSE_FINAL.md",
+      "docs/NELVYON_LABS_MASTER_CLOSURE.md",
+      "docs/NELVYON_LABS_MASTER_TABLE.md",
+      "docs/NELVYON_LABS_REJECTED_FINAL.md",
+      "docs/NELVYON_LABS_SECURITY_FINAL.md",
+      "docs/NELVYON_LABS_SUMMARY.md",
+      "docs/NELVYON_LABS_WINNERS.md",
+      "docs/NELVYON_MUTATING_ROUTERS_CHECKLIST.md",
+      "docs/NELVYON_OBSERVABILITY_REALITY.md",
+      "docs/NELVYON_QUALITY_SCORE.md",
+      "docs/NELVYON_ROUTERS_WS_OP_VERIFIED_BY_TESTS.md",
+      "docs/NELVYON_SCALABILITY_REVIEW.md",
+      "docs/NELVYON_UNIVERSAL_PLATFORM.md",
+      "docs/NELVYON_WRITE_PATH_MATRIX.md",
+      "docs/OPS.md",
+      "docs/OS_AGENT_AUDIT_TRAIL.md",
+      "docs/OS_AGENT_DATA.md",
+      "docs/OS_AUTONOMOUS_PROD.md",
+      "docs/OS_BRIEF_DIFF_RERUN.md",
+      "docs/OS_COMPETITOR_GAP.md",
+      "docs/OS_DELIVERY_CERTIFICATE.md",
+      "docs/OS_GATE_RUNBOOK.md",
+      "docs/OS_LEGACY_DEPRECATION_PLAN.md",
+      "docs/OS_PHASE1_API_CLIENTS.md",
+      "docs/OS_PHASE1_API_PROJECTS.md",
+      "docs/OS_PHASE1_BACKFILL_CLIENTS.md",
+      "docs/OS_PHASE1_BACKFILL_PROJECTS.md",
+      "docs/OS_PHASE1_DELIVERABLES.md",
+      "docs/OS_PHASE1_DELIVERABLE_DOWNLOAD.md",
+      "docs/OS_PHASE1_DELIVERABLE_UPLOAD.md",
+      "docs/OS_PHASE1_DELIVERABLE_VERSIONING.md",
+      "docs/OS_PHASE1_EMAIL_NOTIFICATIONS.md",
+      "docs/OS_PHASE1_OS_DELIVERABLES_UI.md",
+      "docs/OS_PHASE1_PLAN.md",
+      "docs/OS_PHASE1_PORTAL_APPROVALS.md",
+      "docs/OS_PHASE1_PORTAL_CLIENTE.md",
+      "docs/OS_PHASE1_PORTAL_UI.md",
+      "docs/OS_PHASE1_PROJECTS_SCHEMA.md",
+      "docs/OS_PHASE1_TASKS.md",
+      "docs/OS_PHASE1_UI_CLIENTS.md",
+      "docs/OS_PHASE1_UI_PROJECTS.md",
+      "docs/OS_PHASE1_UI_TASKS.md",
+      "docs/OS_PRODUCTION_GO_LIVE_CHECKLIST.md",
+      "docs/OS_PRODUCTION_MIGRATIONS.md",
+      "docs/OS_PRODUCTION_READINESS.md",
+      "docs/OS_QA.md",
+      "docs/OS_RECURRING.md",
+      "docs/OS_REGULATED_SECTOR_SHIELD.md",
+      "docs/OS_RETAINER_AUTOPILOT.md",
+      "docs/OS_RLS_AUDIT.md",
+      "docs/OS_SAAS_API_AUDIT.md",
+      "docs/OS_SAAS_E2E_MATRIX.md",
+      "docs/OS_SAAS_FINAL_CERTIFICATION.md",
+      "docs/OS_SAAS_FUNCTIONAL_INVENTORY.md",
+      "docs/OS_SAAS_PERFORMANCE_AUDIT.md",
+      "docs/OS_SAAS_PRODUCTION_READINESS.md",
+      "docs/OS_SAAS_ROUTE_AUDIT.md",
+      "docs/OS_SAAS_SECURITY_AUDIT.md",
+      "docs/OS_SAAS_UX_A11Y_AUDIT.md",
+      "docs/OS_SEEDS.md",
+      "docs/OS_SMOKE_TEST_FINAL.md",
+      "docs/OS_TRUTH_GUARD.md",
+      "docs/OS_V1_COMMERCIAL_AUDIT.md",
+      "docs/OS_V1_FINAL_AUDIT.md",
+      "docs/PARTNERS_HQ_COMMISSION_ONBOARDING_FLOW.md",
+      "docs/PARTNERS_P2_REBILLING_PORTAL_WL.md",
+      "docs/PARTNERS_WHITELABEL_PROGRAM.md",
+      "docs/PHASE1_CLOSURE_AUDIT.md",
+      "docs/PHASE2_AGENTS.md",
+      "docs/PHASE2_AI_PANEL.md",
+      "docs/PHASE2_AUTOMATIONS.md",
+      "docs/PHASE2_HARDWARE_AUDIT.md",
+      "docs/PHASE2_MCP.md",
+      "docs/PHASE2_MCP_ARCHITECTURE.md",
+      "docs/PHASE2_MCP_BENCHMARK.md",
+      "docs/PHASE2_MCP_SECURITY.md",
+      "docs/PHASE2_MCP_TOOLS.md",
+      "docs/PHASE2_MODEL_ROUTER.md",
+      "docs/PHASE2_OPENCLAW.md",
+      "docs/PHASE2_ORCHESTRATOR.md",
+      "docs/PHASE2_PREP_AUDIT.md",
+      "docs/PHASE2_PREP_INDEX.md",
+      "docs/PHASE2_ROUTER_ARCHITECTURE.md",
+      "docs/PHASE2_ROUTER_BENCHMARK.md",
+      "docs/PHASE2_ROUTER_SAAS_WIRING.md",
+      "docs/PHASE2_ROUTER_SECURITY.md",
+      "docs/PHASE2_SHARED_MEMORY.md",
+      "docs/PHASE2_SPECIALIZATION.md",
+      "docs/PHASE2_SPECIALIZATION_AUDIT.md",
+      "docs/PHASE2_SPECIALIZATION_CERTIFICATION.md",
+      "docs/PHASE2_SPECIALIZATION_DEFINITIVE.md",
+      "docs/PHASE2_SPECIALIZATION_ENTERPRISE_AUDIT.md",
+      "docs/PHASE2_SPECIALIZATION_FINAL.md",
+      "docs/PHASE2_THREAT_MODEL_ELITE.md",
+      "docs/PHASE_1A_CRM_TRANSITION.md",
+      "docs/PHASE_1A_LEGACY_INVENTORY.md",
+      "docs/PHASE_1A_TENANT_BRIDGE.md",
+      "docs/PHASE_1B_CRM_ETL.md",
+      "docs/PHASE_1B_QUOTAS.md",
+      "docs/PHASE_1C_LEGACY_DASHBOARDS.md",
+      "docs/PHASE_1C_QUOTAS.md",
+      "docs/PHASE_1C_SAAS_DEALS_PLAN.md",
+      "docs/PHASE_1C_SUMMARY.md",
+      "docs/PHASE_2A_OS_SHELL.md",
+      "docs/PHASE_2B_OS_CLIENTS_PROJECTS.md",
+      "docs/PHASE_2C_OS_PIPELINE_TASKS.md",
+      "docs/PHASE_2D_OS_DOCUMENTS_LIBRARY.md",
+      "docs/PHASE_2E_OS_FINANZAS.md",
+      "docs/PHASE_2F_READY_FOR_SAAS.md",
+      "docs/PHASE_3A_SAAS_DEALS_PIPELINE.md",
+      "docs/PHASE_3B_PIPELINE_STAGE_SYNC.md",
+      "docs/PHASE_3B_SAAS_DEALS_UI.md",
+      "docs/PHASE_3B_SAAS_LEGACY_CLEANUP.md",
+      "docs/PHASE_3C_SAAS_RBAC_BILLING.md",
+      "docs/PHASE_3D_SAAS_RBAC_UI.md",
+      "docs/PHASE_3E_SAAS_DEALS_AUTOMATION.md",
+      "docs/PHASE_A_RAG_CORPUS_REPORT.md",
+      "docs/PRIVATE_AI_PHASE2.md",
+      "docs/PRODUCTION_CERTIFICATION_REPORT.md",
+      "docs/PRODUCTION_READINESS_FINAL.md",
+      "docs/PRODUCTION_SECRETS.md",
+      "docs/QUALITY_STANDARD.md",
+      "docs/README.md",
+      "docs/S45_POLISH_CHECKLIST.md",
+      "docs/SAAS_TECHNICAL_AUDIT.md",
+      "docs/SES_PRODUCTION_ACCESS_APPEAL.md",
+      "docs/SES_PRODUCTION_SETUP.md",
+      "docs/SMOKE_GATES.md",
+      "docs/STAGING_P0_SMOKES.md",
+      "docs/STRATEGY_COHERENCE_ROOT_CAUSE.md",
+      "docs/STRIPE_BILLING_P0.md",
+      "docs/YELLOW_ELIMINATION_QUEUE.md"
+    ],
+    "orphanCandidates": [
+      "docs/BETA_LAUNCH_AUDIT.md",
+      "docs/BETA_LAUNCH_RUNBOOK.md",
+      "docs/CEO_FINAL_ACTIONS.md",
+      "docs/CLAUDE_SPRINT_ELITE.md",
+      "docs/CURSOR_NELVYON_MASTER_EXECUTION.md",
+      "docs/DEPLOY_FINAL.md",
+      "docs/EXCELLENCE_PROGRAM.md",
+      "docs/FRONTEND_LEGACY.md",
+      "docs/INVENTARIO_FRENTES.md",
+      "docs/LAUNCH_OPS_CHECKLIST.md",
+      "docs/LAUNCH_READY.md",
+      "docs/MANUAL_OPS_ONLY.md",
+      "docs/MASTER_AUDIT_2026-07-16.md",
+      "docs/MASTER_AUDIT_ELITE_2026-07-16.md",
+      "docs/MASTER_OPEN_SOURCE_COMPARISON.md",
+      "docs/MASTER_OPEN_SOURCE_LICENSES.md",
+      "docs/MASTER_OPEN_SOURCE_LIST.md",
+      "docs/MASTER_OPEN_SOURCE_ROADMAP.md",
+      "docs/MASTER_OPEN_SOURCE_SECURITY.md",
+      "docs/NELVYON_BACKEND_V1_CIERRE_FINAL.md",
+      "docs/NELVYON_BRAIN_KNOWLEDGE.md",
+      "docs/NELVYON_FINAL_STATE_AUDIT.md",
+      "docs/NELVYON_GLOBAL_CERTIFICATION_FINAL.md",
+      "docs/NELVYON_LABS.md",
+      "docs/NELVYON_LABS_ARCHITECTURE.md",
+      "docs/NELVYON_LABS_BLOCK1_SECURITY.md",
+      "docs/NELVYON_LABS_BLOCK2_OBSERVABILITY.md",
+      "docs/NELVYON_LABS_BY_CATEGORY.md",
+      "docs/NELVYON_LABS_CAPABILITY_MATRIX.md",
+      "docs/NELVYON_LABS_FINAL_COVERAGE.md",
+      "docs/NELVYON_LABS_INTEGRATED.md",
+      "docs/NELVYON_LABS_INTEGRATION_FINAL.md",
+      "docs/NELVYON_LABS_INTEGRATION_QUEUE.md",
+      "docs/NELVYON_LABS_INTEGRATION_REPORT.md",
+      "docs/NELVYON_LABS_LICENSE_FINAL.md",
+      "docs/NELVYON_LABS_MASTER_CLOSURE.md",
+      "docs/NELVYON_LABS_MASTER_TABLE.md",
+      "docs/NELVYON_LABS_REJECTED_FINAL.md",
+      "docs/NELVYON_LABS_SECURITY_FINAL.md",
+      "docs/NELVYON_LABS_SUMMARY.md",
+      "docs/NELVYON_LABS_WINNERS.md",
+      "docs/NELVYON_MUTATING_ROUTERS_CHECKLIST.md",
+      "docs/NELVYON_OBSERVABILITY_REALITY.md",
+      "docs/NELVYON_QUALITY_SCORE.md",
+      "docs/NELVYON_ROUTERS_WS_OP_VERIFIED_BY_TESTS.md",
+      "docs/NELVYON_SCALABILITY_REVIEW.md",
+      "docs/NELVYON_UNIVERSAL_PLATFORM.md",
+      "docs/NELVYON_WRITE_PATH_MATRIX.md",
+      "docs/OPS.md",
+      "docs/OS_AGENT_AUDIT_TRAIL.md",
+      "docs/OS_AGENT_DATA.md",
+      "docs/OS_AUTONOMOUS_PROD.md",
+      "docs/OS_BRIEF_DIFF_RERUN.md",
+      "docs/OS_COMPETITOR_GAP.md",
+      "docs/OS_DELIVERY_CERTIFICATE.md",
+      "docs/OS_GATE_RUNBOOK.md",
+      "docs/OS_LEGACY_DEPRECATION_PLAN.md",
+      "docs/OS_PHASE1_API_CLIENTS.md",
+      "docs/OS_PHASE1_API_PROJECTS.md",
+      "docs/OS_PHASE1_BACKFILL_CLIENTS.md",
+      "docs/OS_PHASE1_BACKFILL_PROJECTS.md",
+      "docs/OS_PHASE1_DELIVERABLES.md",
+      "docs/OS_PHASE1_DELIVERABLE_DOWNLOAD.md",
+      "docs/OS_PHASE1_DELIVERABLE_UPLOAD.md",
+      "docs/OS_PHASE1_DELIVERABLE_VERSIONING.md",
+      "docs/OS_PHASE1_EMAIL_NOTIFICATIONS.md",
+      "docs/OS_PHASE1_OS_DELIVERABLES_UI.md",
+      "docs/OS_PHASE1_PLAN.md",
+      "docs/OS_PHASE1_PORTAL_APPROVALS.md",
+      "docs/OS_PHASE1_PORTAL_CLIENTE.md",
+      "docs/OS_PHASE1_PORTAL_UI.md",
+      "docs/OS_PHASE1_PROJECTS_SCHEMA.md",
+      "docs/OS_PHASE1_TASKS.md",
+      "docs/OS_PHASE1_UI_CLIENTS.md",
+      "docs/OS_PHASE1_UI_PROJECTS.md",
+      "docs/OS_PHASE1_UI_TASKS.md",
+      "docs/OS_PRODUCTION_GO_LIVE_CHECKLIST.md",
+      "docs/OS_PRODUCTION_MIGRATIONS.md",
+      "docs/OS_PRODUCTION_READINESS.md",
+      "docs/OS_QA.md",
+      "docs/OS_RECURRING.md",
+      "docs/OS_REGULATED_SECTOR_SHIELD.md",
+      "docs/OS_RETAINER_AUTOPILOT.md",
+      "docs/OS_RLS_AUDIT.md",
+      "docs/OS_SAAS_API_AUDIT.md",
+      "docs/OS_SAAS_E2E_MATRIX.md",
+      "docs/OS_SAAS_FINAL_CERTIFICATION.md",
+      "docs/OS_SAAS_FUNCTIONAL_INVENTORY.md",
+      "docs/OS_SAAS_PERFORMANCE_AUDIT.md",
+      "docs/OS_SAAS_PRODUCTION_READINESS.md",
+      "docs/OS_SAAS_ROUTE_AUDIT.md",
+      "docs/OS_SAAS_SECURITY_AUDIT.md",
+      "docs/OS_SAAS_UX_A11Y_AUDIT.md",
+      "docs/OS_SEEDS.md",
+      "docs/OS_SMOKE_TEST_FINAL.md",
+      "docs/OS_TRUTH_GUARD.md",
+      "docs/OS_V1_COMMERCIAL_AUDIT.md",
+      "docs/OS_V1_FINAL_AUDIT.md",
+      "docs/PARTNERS_HQ_COMMISSION_ONBOARDING_FLOW.md",
+      "docs/PARTNERS_P2_REBILLING_PORTAL_WL.md",
+      "docs/PARTNERS_WHITELABEL_PROGRAM.md",
+      "docs/PHASE1_CLOSURE_AUDIT.md",
+      "docs/PHASE2_AGENTS.md",
+      "docs/PHASE2_AI_PANEL.md",
+      "docs/PHASE2_AUTOMATIONS.md",
+      "docs/PHASE2_HARDWARE_AUDIT.md",
+      "docs/PHASE2_MCP.md",
+      "docs/PHASE2_MCP_ARCHITECTURE.md",
+      "docs/PHASE2_MCP_BENCHMARK.md",
+      "docs/PHASE2_MCP_SECURITY.md",
+      "docs/PHASE2_MCP_TOOLS.md",
+      "docs/PHASE2_MODEL_ROUTER.md",
+      "docs/PHASE2_OPENCLAW.md",
+      "docs/PHASE2_ORCHESTRATOR.md",
+      "docs/PHASE2_PREP_AUDIT.md",
+      "docs/PHASE2_PREP_INDEX.md",
+      "docs/PHASE2_ROUTER_ARCHITECTURE.md",
+      "docs/PHASE2_ROUTER_BENCHMARK.md",
+      "docs/PHASE2_ROUTER_SAAS_WIRING.md",
+      "docs/PHASE2_ROUTER_SECURITY.md",
+      "docs/PHASE2_SHARED_MEMORY.md",
+      "docs/PHASE2_SPECIALIZATION.md",
+      "docs/PHASE2_SPECIALIZATION_AUDIT.md",
+      "docs/PHASE2_SPECIALIZATION_CERTIFICATION.md",
+      "docs/PHASE2_SPECIALIZATION_DEFINITIVE.md",
+      "docs/PHASE2_SPECIALIZATION_ENTERPRISE_AUDIT.md",
+      "docs/PHASE2_SPECIALIZATION_FINAL.md",
+      "docs/PHASE2_THREAT_MODEL_ELITE.md",
+      "docs/PHASE_1A_CRM_TRANSITION.md",
+      "docs/PHASE_1A_LEGACY_INVENTORY.md",
+      "docs/PHASE_1A_TENANT_BRIDGE.md",
+      "docs/PHASE_1B_CRM_ETL.md",
+      "docs/PHASE_1B_QUOTAS.md",
+      "docs/PHASE_1C_LEGACY_DASHBOARDS.md",
+      "docs/PHASE_1C_QUOTAS.md",
+      "docs/PHASE_1C_SAAS_DEALS_PLAN.md",
+      "docs/PHASE_1C_SUMMARY.md",
+      "docs/PHASE_2A_OS_SHELL.md",
+      "docs/PHASE_2B_OS_CLIENTS_PROJECTS.md",
+      "docs/PHASE_2C_OS_PIPELINE_TASKS.md",
+      "docs/PHASE_2D_OS_DOCUMENTS_LIBRARY.md",
+      "docs/PHASE_2E_OS_FINANZAS.md",
+      "docs/PHASE_2F_READY_FOR_SAAS.md",
+      "docs/PHASE_3A_SAAS_DEALS_PIPELINE.md",
+      "docs/PHASE_3B_PIPELINE_STAGE_SYNC.md",
+      "docs/PHASE_3B_SAAS_DEALS_UI.md",
+      "docs/PHASE_3B_SAAS_LEGACY_CLEANUP.md",
+      "docs/PHASE_3C_SAAS_RBAC_BILLING.md",
+      "docs/PHASE_3D_SAAS_RBAC_UI.md",
+      "docs/PHASE_3E_SAAS_DEALS_AUTOMATION.md",
+      "docs/PHASE_A_RAG_CORPUS_REPORT.md",
+      "docs/PRIVATE_AI_PHASE2.md",
+      "docs/PRODUCTION_CERTIFICATION_REPORT.md",
+      "docs/PRODUCTION_READINESS_FINAL.md",
+      "docs/PRODUCTION_SECRETS.md",
+      "docs/QUALITY_STANDARD.md",
+      "docs/README.md",
+      "docs/S45_POLISH_CHECKLIST.md",
+      "docs/SAAS_TECHNICAL_AUDIT.md",
+      "docs/SES_PRODUCTION_ACCESS_APPEAL.md",
+      "docs/SES_PRODUCTION_SETUP.md",
+      "docs/SMOKE_GATES.md",
+      "docs/STAGING_P0_SMOKES.md",
+      "docs/STRATEGY_COHERENCE_ROOT_CAUSE.md",
+      "docs/STRIPE_BILLING_P0.md",
+      "docs/YELLOW_ELIMINATION_QUEUE.md"
+    ]
+  },
+  "external": {
+    "policy": {
+      "ok": true,
+      "policy": "External full-text ingest is deny-by-default. Only NELVYON repo manifests enter RAG automatically."
+    },
+    "approved": [
+      {
+        "id": "ext_nextjs_docs",
+        "title": "Next.js Documentation",
+        "sourceUrl": "https://nextjs.org/docs",
+        "publisher": "Vercel",
+        "fetchedAt": null,
+        "license": "proprietary_docs_fair_use",
+        "quality": "high",
+        "relevance": "domain_support",
+        "status": "approved",
+        "notes": "Cite patterns; do not copy wholesale into RAG."
+      },
+      {
+        "id": "ext_postgres_docs",
+        "title": "PostgreSQL Documentation",
+        "sourceUrl": "https://www.postgresql.org/docs/",
+        "publisher": "PostgreSQL Global Development Group",
+        "fetchedAt": null,
+        "license": "postgresql",
+        "quality": "high",
+        "relevance": "domain_support",
+        "status": "approved",
+        "notes": "RLS/vector ops reference only."
+      },
+      {
+        "id": "ext_owasp",
+        "title": "OWASP Top 10",
+        "sourceUrl": "https://owasp.org/www-project-top-ten/",
+        "publisher": "OWASP",
+        "fetchedAt": null,
+        "license": "cc-by-sa",
+        "quality": "high",
+        "relevance": "domain_support",
+        "status": "approved",
+        "notes": "Security agent grounding; prefer NELVYON security docs first."
+      },
+      {
+        "id": "ext_stripe_docs",
+        "title": "Stripe API Docs",
+        "sourceUrl": "https://docs.stripe.com",
+        "publisher": "Stripe",
+        "fetchedAt": null,
+        "license": "proprietary_docs",
+        "quality": "high",
+        "relevance": "nelvyon_core",
+        "status": "approved",
+        "notes": "Billing integration; never invent price IDs."
+      }
+    ]
+  }
+}
