@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-07-19T14:21:10.918Z",
+  "ok": false,
+  "verified": false,
+  "pipeline": [
+    "manifest",
+    "ingest",
+    "embeddings",
+    "vector_store",
+    "unified_rag",
+    "agent_context_engine"
+  ],
+  "checks": {
+    "manifestBuild": "ok_sync_2026-07-19",
+    "ollamaEmbed": "available_http_200_models_include_mxbai-embed-large",
+    "localAiPostgres": "down_docker_daemon_not_running",
+    "ingest": "not_run",
+    "vectorStoreChunks": null,
+    "unifiedRagSearch": "not_run_requires_chunks",
+    "agentContextGrounding": "unit_tested_nelvyon_first"
+  },
+  "blocker": "Docker Desktop daemon not running — local-ai Postgres (127.0.0.1:5434) unavailable. Start Docker + `docker compose -f backend/local-ai/docker-compose.yml up -d` then `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs`",
+  "claimComplete": false,
+  "dockerInfo": {
+    "checkedAt": "2026-07-19T14:21:10.919Z",
+    "daemonRunning": false,
+    "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine"
+  }
+}

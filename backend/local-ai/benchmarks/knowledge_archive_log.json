@@ -1,0 +1,252 @@
+{
+  "generatedAt": "2026-07-19T14:19:49.298Z",
+  "moved": 49,
+  "skipped": 0,
+  "log": [
+    {
+      "path": "docs/BETA_LAUNCH_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/BETA_LAUNCH_AUDIT.md"
+    },
+    {
+      "path": "docs/BETA_LAUNCH_RUNBOOK.md",
+      "status": "moved",
+      "to": "docs/archive/BETA_LAUNCH_RUNBOOK.md"
+    },
+    {
+      "path": "docs/CEO_FINAL_ACTIONS.md",
+      "status": "moved",
+      "to": "docs/archive/CEO_FINAL_ACTIONS.md"
+    },
+    {
+      "path": "docs/CLAUDE_SPRINT_ELITE.md",
+      "status": "moved",
+      "to": "docs/archive/CLAUDE_SPRINT_ELITE.md"
+    },
+    {
+      "path": "docs/CURSOR_NELVYON_MASTER_EXECUTION.md",
+      "status": "moved",
+      "to": "docs/archive/CURSOR_NELVYON_MASTER_EXECUTION.md"
+    },
+    {
+      "path": "docs/EXCELLENCE_PROGRAM.md",
+      "status": "moved",
+      "to": "docs/archive/EXCELLENCE_PROGRAM.md"
+    },
+    {
+      "path": "docs/FRONTEND_LEGACY.md",
+      "status": "moved",
+      "to": "docs/archive/FRONTEND_LEGACY.md"
+    },
+    {
+      "path": "docs/INVENTARIO_FRENTES.md",
+      "status": "moved",
+      "to": "docs/archive/INVENTARIO_FRENTES.md"
+    },
+    {
+      "path": "docs/MASTER_AUDIT_2026-07-16.md",
+      "status": "moved",
+      "to": "docs/archive/MASTER_AUDIT_2026-07-16.md"
+    },
+    {
+      "path": "docs/MASTER_AUDIT_ELITE_2026-07-16.md",
+      "status": "moved",
+      "to": "docs/archive/MASTER_AUDIT_ELITE_2026-07-16.md"
+    },
+    {
+      "path": "docs/MASTER_OPEN_SOURCE_COMPARISON.md",
+      "status": "moved",
+      "to": "docs/archive/MASTER_OPEN_SOURCE_COMPARISON.md"
+    },
+    {
+      "path": "docs/MASTER_OPEN_SOURCE_LIST.md",
+      "status": "moved",
+      "to": "docs/archive/MASTER_OPEN_SOURCE_LIST.md"
+    },
+    {
+      "path": "docs/MASTER_OPEN_SOURCE_ROADMAP.md",
+      "status": "moved",
+      "to": "docs/archive/MASTER_OPEN_SOURCE_ROADMAP.md"
+    },
+    {
+      "path": "docs/NELVYON_BACKEND_V1_CIERRE_FINAL.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_BACKEND_V1_CIERRE_FINAL.md"
+    },
+    {
+      "path": "docs/NELVYON_FINAL_STATE_AUDIT.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_FINAL_STATE_AUDIT.md"
+    },
+    {
+      "path": "docs/NELVYON_GLOBAL_CERTIFICATION_FINAL.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_GLOBAL_CERTIFICATION_FINAL.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_BLOCK1_SECURITY.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_BLOCK1_SECURITY.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_BLOCK2_OBSERVABILITY.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_BLOCK2_OBSERVABILITY.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_BY_CATEGORY.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_BY_CATEGORY.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_CAPABILITY_MATRIX.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_CAPABILITY_MATRIX.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_FINAL_COVERAGE.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_FINAL_COVERAGE.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_INTEGRATED.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_INTEGRATED.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_INTEGRATION_FINAL.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_INTEGRATION_FINAL.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_INTEGRATION_QUEUE.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_INTEGRATION_QUEUE.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_INTEGRATION_REPORT.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_INTEGRATION_REPORT.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_MASTER_TABLE.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_MASTER_TABLE.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_REJECTED_FINAL.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_REJECTED_FINAL.md"
+    },
+    {
+      "path": "docs/NELVYON_LABS_WINNERS.md",
+      "status": "moved",
+      "to": "docs/archive/NELVYON_LABS_WINNERS.md"
+    },
+    {
+      "path": "docs/OS_LEGACY_DEPRECATION_PLAN.md",
+      "status": "moved",
+      "to": "docs/archive/OS_LEGACY_DEPRECATION_PLAN.md"
+    },
+    {
+      "path": "docs/OS_PRODUCTION_READINESS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PRODUCTION_READINESS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_API_CLIENTS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_API_CLIENTS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_API_PROJECTS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_API_PROJECTS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_BACKFILL_CLIENTS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_BACKFILL_CLIENTS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_BACKFILL_PROJECTS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_BACKFILL_PROJECTS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_DELIVERABLES.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_DELIVERABLES.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_DELIVERABLE_DOWNLOAD.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_DELIVERABLE_DOWNLOAD.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_DELIVERABLE_UPLOAD.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_DELIVERABLE_UPLOAD.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_DELIVERABLE_VERSIONING.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_DELIVERABLE_VERSIONING.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_EMAIL_NOTIFICATIONS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_EMAIL_NOTIFICATIONS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_OS_DELIVERABLES_UI.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_OS_DELIVERABLES_UI.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_PLAN.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_PLAN.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_PORTAL_APPROVALS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_PORTAL_APPROVALS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_PORTAL_CLIENTE.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_PORTAL_CLIENTE.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_PORTAL_UI.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_PORTAL_UI.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_PROJECTS_SCHEMA.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_PROJECTS_SCHEMA.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_TASKS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_TASKS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_UI_CLIENTS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_UI_CLIENTS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_UI_PROJECTS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_UI_PROJECTS.md"
+    },
+    {
+      "path": "docs/OS_PHASE1_UI_TASKS.md",
+      "status": "moved",
+      "to": "docs/archive/OS_PHASE1_UI_TASKS.md"
+    }
+  ]
+}

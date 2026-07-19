@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-19T14:00:15.882Z",
+  "generated": "2026-07-19T14:19:58.457Z",
   "entries": [
     {
       "path": "docs/CONSTITUTION_NELVYON_AI.md",
@@ -424,6 +424,270 @@
       "license": "nelvyon_internal",
       "sourceType": "knowledge_pack",
       "title": "DevOps Cloud Security"
+    },
+    {
+      "path": "docs/NELVYON_BRAIN_KNOWLEDGE.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Brain Knowledge Coverage"
+    },
+    {
+      "path": "docs/OPS.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "Ops Manual"
+    },
+    {
+      "path": "docs/OPS.md",
+      "domain": "finance_operations",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "Ops Manual"
+    },
+    {
+      "path": "docs/LAUNCH_READY.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Launch Ready Checklist"
+    },
+    {
+      "path": "docs/LAUNCH_OPS_CHECKLIST.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Launch Ops Checklist"
+    },
+    {
+      "path": "docs/DEPLOY_FINAL.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Deploy Final"
+    },
+    {
+      "path": "docs/MANUAL_OPS_ONLY.md",
+      "domain": "finance_operations",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Manual Ops Only"
+    },
+    {
+      "path": "docs/OS_GATE_RUNBOOK.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "OS Gate Runbook"
+    },
+    {
+      "path": "docs/OS_AUTONOMOUS_PROD.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Autonomous Prod"
+    },
+    {
+      "path": "docs/OS_QA.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS QA"
+    },
+    {
+      "path": "docs/OS_DELIVERY_CERTIFICATE.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Delivery Certificate"
+    },
+    {
+      "path": "docs/OS_PRODUCTION_GO_LIVE_CHECKLIST.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Go-Live Checklist"
+    },
+    {
+      "path": "docs/OS_PRODUCTION_MIGRATIONS.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Production Migrations"
+    },
+    {
+      "path": "docs/OS_AGENT_AUDIT_TRAIL.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Agent Audit Trail"
+    },
+    {
+      "path": "docs/OS_AGENT_DATA.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Agent Data"
+    },
+    {
+      "path": "docs/OS_BRIEF_DIFF_RERUN.md",
+      "domain": "nelvyon",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Brief Diff Rerun"
+    },
+    {
+      "path": "docs/OS_COMPETITOR_GAP.md",
+      "domain": "business_strategy",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OS Competitor Gap"
+    },
+    {
+      "path": "docs/NELVYON_OBSERVABILITY_REALITY.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Observability Reality"
+    },
+    {
+      "path": "docs/NELVYON_WRITE_PATH_MATRIX.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Write Path Matrix"
+    },
+    {
+      "path": "docs/NELVYON_WRITE_PATH_MATRIX.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Write Path Matrix"
+    },
+    {
+      "path": "docs/NELVYON_MUTATING_ROUTERS_CHECKLIST.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Mutating Routers Checklist"
+    },
+    {
+      "path": "docs/NELVYON_ROUTERS_WS_OP_VERIFIED_BY_TESTS.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Routers WS Verified"
+    },
+    {
+      "path": "docs/NELVYON_SCALABILITY_REVIEW.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Scalability Review"
+    },
+    {
+      "path": "docs/NELVYON_UNIVERSAL_PLATFORM.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Universal Platform"
+    },
+    {
+      "path": "docs/NELVYON_QUALITY_SCORE.md",
+      "domain": "planning_strategy",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Quality Score"
+    },
+    {
+      "path": "docs/NELVYON_LABS.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Nelvyon Labs Index"
+    },
+    {
+      "path": "docs/NELVYON_LABS_ARCHITECTURE.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Labs Architecture"
+    },
+    {
+      "path": "docs/NELVYON_LABS_MASTER_CLOSURE.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Labs Master Closure"
+    },
+    {
+      "path": "docs/NELVYON_LABS_SECURITY_FINAL.md",
+      "domain": "security_privacy",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Labs Security Final"
+    },
+    {
+      "path": "docs/NELVYON_LABS_LICENSE_FINAL.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Labs License Final"
+    },
+    {
+      "path": "docs/NELVYON_LABS_SUMMARY.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Labs Summary"
+    },
+    {
+      "path": "docs/MASTER_OPEN_SOURCE_SECURITY.md",
+      "domain": "security_privacy",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OSS Security Research"
+    },
+    {
+      "path": "docs/MASTER_OPEN_SOURCE_LICENSES.md",
+      "domain": "development_tech",
+      "priority": 2,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "OSS Licenses"
     },
     {
       "path": "docs/services/AUTOMATION_SOP.md",
@@ -1475,19 +1739,19 @@
     }
   ],
   "summary": {
-    "total": 184,
-    "uniqueFiles": 161,
+    "total": 217,
+    "uniqueFiles": 192,
     "byDomain": {
-      "nelvyon": 52,
-      "development_tech": 19,
-      "security_privacy": 4,
-      "planning_strategy": 7,
+      "nelvyon": 60,
+      "development_tech": 35,
+      "security_privacy": 9,
+      "planning_strategy": 8,
       "digital_marketing": 26,
       "saas": 4,
       "crm_sales": 17,
       "analytics_reporting": 2,
-      "business_strategy": 4,
-      "finance_operations": 9,
+      "business_strategy": 5,
+      "finance_operations": 11,
       "automation": 4,
       "design": 6,
       "customer_support": 3,
@@ -1501,11 +1765,11 @@
     },
     "bySourceType": {
       "constitution": 1,
-      "official_doc": 89,
+      "official_doc": 119,
       "knowledge_pack": 25,
+      "runbook": 30,
       "sop": 32,
       "playbook": 4,
-      "runbook": 27,
       "case_study": 6
     }
   }

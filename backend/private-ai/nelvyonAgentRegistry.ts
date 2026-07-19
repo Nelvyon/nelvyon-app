@@ -39,7 +39,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "Ventas",
     role: "Ventas B2B",
     objective: "Calificar oportunidades y proponer siguientes pasos comerciales.",
-    allowedTools: ["crm.read", "crm.write", "memory.read", "reports.read"],
+    allowedTools: ["crm.read", "crm.write", "memory.read", "reports.read", "rag.search"],
     systemPrompt: "Eres el agente de ventas Nelvyon. Ayudas con pipeline, propuestas y follow-ups sin enviar mensajes masivos sin aprobación.",
   }),
   agent({
@@ -47,7 +47,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "CRM",
     role: "Operaciones CRM",
     objective: "Gestionar contactos, deals y actividades con trazabilidad.",
-    allowedTools: ["crm.read", "crm.write", "memory.read", "workflows.read"],
+    allowedTools: ["crm.read", "crm.write", "memory.read", "workflows.read", "rag.search"],
     systemPrompt: "Eres el agente CRM. Organizas contactos y deals; no borres datos ni cruces tenants.",
   }),
   agent({
@@ -71,7 +71,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "Google Ads",
     role: "Paid search",
     objective: "Estructura de campañas, keywords y optimización Google Ads.",
-    allowedTools: ["reports.read", "memory.read"],
+    allowedTools: ["reports.read", "memory.read", "rag.search"],
     systemPrompt: "Especialista Google Ads. Propones estructura y optimización; no publicas sin aprobación.",
   }),
   agent({
@@ -79,7 +79,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "Meta Ads",
     role: "Paid social Meta",
     objective: "Creatividades, audiencias y estructura Meta/Facebook/Instagram Ads.",
-    allowedTools: ["reports.read", "memory.read"],
+    allowedTools: ["reports.read", "memory.read", "rag.search"],
     systemPrompt: "Especialista Meta Ads. Drafts de campañas; lanzamiento requiere aprobación humana.",
   }),
   agent({
@@ -87,7 +87,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "TikTok Ads",
     role: "Paid social TikTok",
     objective: "Hooks, creatividades y targeting TikTok Ads.",
-    allowedTools: ["reports.read", "memory.read"],
+    allowedTools: ["reports.read", "memory.read", "rag.search"],
     systemPrompt: "Especialista TikTok Ads. Enfoque en hooks cortos y testing creativo.",
   }),
   agent({
@@ -95,7 +95,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "Email Marketing",
     role: "Campañas email",
     objective: "Asuntos, secuencias y optimización de campañas SES.",
-    allowedTools: ["campaigns.draft", "memory.read", "reports.read"],
+    allowedTools: ["campaigns.draft", "memory.read", "reports.read", "rag.search"],
     approvalRequiredActions: [...ALL_SENSITIVE, "send_mass_campaign"],
     systemPrompt: "Especialista email B2B. Generas borradores; envío masivo siempre requiere aprobación.",
   }),
@@ -112,7 +112,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "Workflows",
     role: "Automatización",
     objective: "Diseñar y explicar workflows; ejecutar solo con permiso.",
-    allowedTools: ["workflows.read", "workflows.execute", "crm.read"],
+    allowedTools: ["workflows.read", "workflows.execute", "crm.read", "memory.read", "rag.search"],
     systemPrompt: "Experto en automatizaciones Nelvyon. Sugieres triggers y acciones; ejecución en prod requiere aprobación.",
   }),
   agent({
@@ -120,7 +120,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "Reporting",
     role: "Analítica",
     objective: "Informes, métricas y dashboards accionables.",
-    allowedTools: ["reports.read", "audit.read", "memory.read"],
+    allowedTools: ["reports.read", "audit.read", "memory.read", "rag.search"],
     systemPrompt: "Analista reporting. Sintetizas métricas CRM, campañas y packs sin modificar datos.",
   }),
   agent({
@@ -145,7 +145,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "Finanzas",
     role: "Finanzas y billing",
     objective: "Resúmenes de facturación, usage y recomendaciones de plan.",
-    allowedTools: ["billing.read", "reports.read"],
+    allowedTools: ["billing.read", "reports.read", "memory.read", "rag.search"],
     forbiddenActions: [...ALL_SENSITIVE],
     approvalRequiredActions: [...ALL_SENSITIVE, "modify_billing"],
     systemPrompt: "Agente finanzas. Informas usage y billing; cambios de precios/plan requieren aprobación CEO.",
@@ -192,7 +192,7 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     name: "COO / Operations",
     role: "Operaciones internas",
     objective: "Procesos, continuidad y coordinación operativa.",
-    allowedTools: ["memory.read", "reports.read", "workflows.read", "audit.read"],
+    allowedTools: ["memory.read", "reports.read", "workflows.read", "audit.read", "rag.search"],
     systemPrompt: "Eres COO Nelvyon. Optimizas procesos y señalas riesgos operativos sin mutar producción.",
   }),
   agent({

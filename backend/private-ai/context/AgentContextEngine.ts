@@ -1,14 +1,9 @@
-/**
- * Agent Context Engine — SSOT assembler for Private AI agent prompts.
- * Composes Shared Memory + tenant inbox memory + RAG (IRagStore) without duplicating specialization PromptBuilder.
- * Nelvyon-first: prefer indexed internal docs; never invent when RAG returns grounded chunks.
- */
-
 import { isSharedMemoryEnabled } from "../../shared-memory/config";
 import { getSaasSharedMemoryService } from "../../saas/SaasSharedMemoryService";
 import type { IRagStore } from "../rag/IRagStore";
 import type { AgentToolId } from "../types";
 import { getTenantMemoryAdapter, type TenantMemoryAdapter } from "../memory/TenantMemoryAdapter";
+import { primaryDomainHint } from "../../local-ai/specialization/agentKnowledgeDomains";
 
 export type AgentContextInput = {
   tenantId: string;
@@ -32,6 +27,7 @@ export type AgentContextResult = {
     sharedMemoryEnabled: boolean;
     nelvyonFirst: true;
     grounded: boolean;
+    domainHint: string | null;
   };
 };
 
@@ -49,6 +45,7 @@ export async function buildAgentContext(input: AgentContextInput): Promise<Agent
   let tenantMemoryChunks = 0;
   let ragChunks = 0;
   const sharedMemoryEnabled = isSharedMemoryEnabled();
+  const domainHint = input.domainHint ?? primaryDomainHint(input.agentId);
 
   if (input.allowedTools.includes("memory.read") && sharedMemoryEnabled) {
     try {
@@ -96,11 +93,14 @@ export async function buildAgentContext(input: AgentContextInput): Promise<Agent
   if (input.allowedTools.includes("rag.search")) {
     try {
       const limit = Number(process.env.NELVYON_AGENT_RAG_LIMIT ?? 6);
-      const rag = await input.rag.searchPlatform(input.query.slice(0, 200), limit);
+      const rag = await input.rag.searchPlatform(input.query.slice(0, 200), {
+        limit,
+        domain: domainHint,
+      });
       ragChunks = rag.chunks.length;
       if (rag.chunks.length) {
         parts.push(
-          "\n\nDocumentación Nelvyon (RAG — fuente prioritaria):\n" +
+          `\n\nDocumentación Nelvyon (RAG — dominio preferido: ${domainHint}):\n` +
             rag.chunks
               .map((c, i) => `[${i + 1}] ${c.title || c.source}: ${c.content.slice(0, 280)}`)
               .join("\n"),
@@ -115,8 +115,6 @@ export async function buildAgentContext(input: AgentContextInput): Promise<Agent
     }
   }
 
-  void input.domainHint;
-
   return {
     systemSuffix: parts.join(""),
     meta: {
@@ -126,6 +124,7 @@ export async function buildAgentContext(input: AgentContextInput): Promise<Agent
       sharedMemoryEnabled,
       nelvyonFirst: true,
       grounded: ragChunks > 0,
+      domainHint,
     },
   };
 }

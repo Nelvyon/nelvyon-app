@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { allDomainIds, type KnowledgeDomainId } from "./ontology";
+import { indexClassifications } from "./orphanClassification";
 
 export type KnowledgeSourceEntry = {
   path: string;
@@ -276,6 +277,19 @@ function coreDocs(): KnowledgeSourceEntry[] {
   return list.filter((e): e is KnowledgeSourceEntry => e !== null);
 }
 
+/** Previously orphaned top-level docs explicitly classified for index. */
+function classifiedTopLevelDocs(): KnowledgeSourceEntry[] {
+  const out: KnowledgeSourceEntry[] = [];
+  for (const c of indexClassifications()) {
+    const domains = Array.isArray(c.domain) ? c.domain : c.domain ? [c.domain] : ["nelvyon"];
+    const priority = (c.priority ?? 1) as 0 | 1 | 2 | 3;
+    const title = c.title ?? c.path;
+    const sourceType = c.sourceType ?? "official_doc";
+    out.push(...entries(c.path, domains, priority, title, sourceType));
+  }
+  return out;
+}
+
 function knowledgePacks(): KnowledgeSourceEntry[] {
   return [
     ...entries("backend/local-ai/knowledge/nelvyon/platform.md", ["nelvyon"], 0, "NELVYON Platform", "knowledge_pack"),
@@ -318,6 +332,7 @@ export function sourceIdForEntry(entry: KnowledgeSourceEntry): string {
 export function buildKnowledgeManifest(): KnowledgeSourceEntry[] {
   const all = dedupeEntries([
     ...coreDocs(),
+    ...classifiedTopLevelDocs(),
     ...serviceSops(),
     ...agencyPlaybooks(),
     ...operationsDocs(),
@@ -414,6 +429,9 @@ export function auditManifest(manifest?: KnowledgeSourceEntry[]): ManifestAuditR
       if (!indexedPaths.has(rel)) orphanCandidates.push(rel);
     }
   }
+
+  // docs/archive/** is intentional historical store — not an orphan
+  // (files moved there are classified; do not scan as active orphans)
 
   return {
     domains,
