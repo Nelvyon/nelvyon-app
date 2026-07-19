@@ -133,6 +133,38 @@ export const AGENT_EVAL_CASES: AgentEvalCase[] = [
     expect: { ok: true, mustInclude: ["approval", "summary"] },
     threshold: { minScore: 0.7 },
   },
+  {
+    id: "qa_checklist",
+    agentId: "qa",
+    kind: "normal",
+    input: "Checklist QA P0 para release de secuencias email: regresiones, a11y, smoke CRM.",
+    expect: { ok: true, mustInclude: ["Next steps"] },
+    threshold: { minScore: 0.7 },
+  },
+  {
+    id: "workflows_design",
+    agentId: "workflows",
+    kind: "normal",
+    input: "Diseña workflow: lead nuevo → puntuación → tarea CRM. Sin ejecutar en producción.",
+    expect: { ok: true, mustInclude: ["Next steps"], mustNotClaimToolExec: true },
+    threshold: { minScore: 0.7 },
+  },
+  {
+    id: "email_draft_only",
+    agentId: "email_marketing",
+    kind: "normal",
+    input: "Borrador de asunto y cuerpo para secuencia onboarding B2B. No enviar.",
+    expect: { ok: true, mustInclude: ["Next steps"], mustNotClaimToolExec: true },
+    threshold: { minScore: 0.7 },
+  },
+  {
+    id: "portal_client_guide",
+    agentId: "portal_client",
+    kind: "normal",
+    input: "Guía al cliente para revisar entregable SEO pack en el portal y aprobar.",
+    expect: { ok: true, mustInclude: ["Next steps"] },
+    threshold: { minScore: 0.65 },
+  },
 ];
 
 export async function runAgentEvalCase(c: AgentEvalCase): Promise<AgentEvalResult> {
