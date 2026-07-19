@@ -89,43 +89,77 @@ Clasificación de huérfanos: `orphanClassification.ts` (index / archive / ignor
 
 ---
 
-## 4. Calidad RAG y memoria
+## 4. Cobertura por dominio (manifiesto)
 
-| Capa | Estado |
-|------|--------|
-| RAG ranking | Boosts NELVYON oficiales + domain; penaliza local-ai ops en queries producto |
-| Grounding | Prompt Nelvyon-first; declarar laguna sin hits |
-| Agent context | Reglas obligatorias + RAG limit configurable (`NELVYON_AGENT_RAG_LIMIT`) |
-| Shared Memory | Scopes + SecurityGuard; STM auto-write opt-in |
-| Tenant isolation | RLS + tenantId en vector store |
-| Eval | Synthetic corpus + specialization benchmark (existentes) |
-| Tests | `nelvyonBrainKnowledge.test.ts` — **7/7 PASS** (2026-07-19) |
+Fuente: `knowledge_gap_report.json` → `domainCoverage`. Todos **ok**; `domainsThin: []`.
 
-**No medido en este cierre:** latencia p95 live ingest (depende de Ollama/DB; Docker down).
+| Dominio | Docs | % manifiesto | Lagunas | Prioridad |
+|---------|------|--------------|---------|-----------|
+| nelvyon | 77 | 29.3% | — | P2 |
+| development_tech | 44 | 16.7% | — | P2 |
+| digital_marketing | 26 | 9.9% | — | P2 |
+| security_privacy | 18 | 6.8% | — | P2 |
+| crm_sales | 17 | 6.5% | — | P2 |
+| finance_operations | 15 | 5.7% | — | P2 |
+| saas | 9 | 3.4% | — | P2 |
+| planning_strategy | 9 | 3.4% | — | P2 |
+| paid_ads | 7 | 2.7% | — | P2 |
+| design | 6 | 2.3% | — | P2 |
+| business_strategy | 5 | 1.9% | — | P2 |
+| seo | 5 | 1.9% | — | P2 |
+| automation | 5 | 1.9% | — | P2 |
+| social_media | 4 | 1.5% | — | P2 |
+| video | 4 | 1.5% | — | P2 |
+| content | 3 | 1.1% | — | P2 |
+| customer_support | 3 | 1.1% | — | P2 |
+| copywriting | 2 | 0.8% | profundidad | P2 |
+| email_marketing | 2 | 0.8% | profundidad | P2 |
+| analytics_reporting | 2 | 0.8% | profundidad | P2 |
+
+Profundidad pendiente (no thin): HR/logística dedicadas; packs copy/email/analytics más densos.
 
 ---
 
-## 5. Propuesta de mejora continua
+## 5. Calidad RAG, agentes y memoria
+
+| Capa | Estado | Evidencia |
+|------|--------|-----------|
+| RAG ranking + domain hint | Cableado | `UnifiedRagStore` → `retrieve({ domain })` |
+| Grounding Nelvyon-first | OK (unit) | `AgentContextEngine` + test 7/7 |
+| Agentes con `rag.search` | **23/23** | `agentsWithoutRag: []` |
+| Mapa agente→dominio | **23/23** | `agentKnowledgeDomains.ts` |
+| Shared Memory | Intacta | scopes + SecurityGuard + STM opt-in |
+| Tenant / Agent memory | Intacta | `TenantMemoryAdapter` + Shared Memory layers |
+| Project / Knowledge / Session | Vía Shared Memory scopes | sin stack paralelo |
+| Tenant isolation | Intacta | RLS + tenantId vector store |
+| Ingest → embeddings → vector | **NO verificado live** | Docker down; Ollama UP |
+
+**No medido:** latencia p95 live retrieval ni grounding E2E con chunks reales.
+
+---
+
+## 6. Propuesta de mejora continua
 
 1. Arrancar Docker + local-ai Postgres; correr ingest con `NELVYON_KNOWLEDGE_INGEST=1` y actualizar evidence a `verified:true` solo con chunks reales.
-2. Mantener **0 orphans**: al añadir docs top-level, clasificar en `orphanClassification.ts` (index/archive/ignore) antes del merge.
+2. Mantener **0 orphans**: al añadir docs top-level, clasificar en `orphanClassification.ts` (index/archive) antes del merge.
 3. Tras cada merge de docs: CI sync ya corre; en staging con pgvector: ingest flag.
 4. Ampliar packs thin (HR, logística, product UX) solo con contenido NELVYON-verificado.
 5. Opcional: job post-commit que dispare sync solo si cambian `docs/**` o `backend/local-ai/knowledge/**`.
 
 ---
 
-## 6. Criterio de cierre de fase (honesto)
+## 7. Criterio de cierre de fase (honesto)
 
 | Criterio | ¿Cumple? |
 |----------|----------|
 | Manifest + gap detector operativos | Sí |
-| Orphans clasificados; wave 2 archivó 44 (acum. 93) | Sí |
 | Orphans activos / unclassified | **0 / 0** |
+| Archivados acumulados | **93** |
 | Agents sin RAG / sin domain map | Sí (listas vacías) |
+| Tests brain | **7/7 PASS** |
 | `claimComplete` | **false** (correcto) |
 | Ingest + UnifiedRag live verificado | **No** (Docker blocker) |
 | Cobertura 100% | **No** (0.95 estimate) |
 
-**Fase orphan classification (wave 2): cerrada** — 0 orphans activos.  
-**Fase de ingest verificado en vector store: abierta** hasta Docker + Postgres local-ai + evidence `verified:true`.
+**Fase clasificación orphans: cerrada.**  
+**Fase ingest verificado en vector store: abierta** hasta Docker + Postgres local-ai + evidence `verified:true`.
