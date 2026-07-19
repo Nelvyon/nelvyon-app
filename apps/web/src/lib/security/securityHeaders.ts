@@ -1,14 +1,17 @@
 import type { NextResponse } from "next/server";
+import { SECURITY_HEADERS_WITHOUT_CSP } from "./headers";
 
-/** Production security headers (CSP-lite + OWASP baseline). */
-export function applySecurityHeaders(res: NextResponse, isProd = process.env.NODE_ENV === "production"): NextResponse {
-  res.headers.set("X-Content-Type-Options", "nosniff");
-  res.headers.set("X-Frame-Options", "DENY");
-  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  res.headers.set("X-DNS-Prefetch-Control", "off");
-  if (isProd) {
-    res.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+/**
+ * Apply baseline security headers on middleware responses.
+ * Must match next.config (SSOT: headers.ts) — especially X-Frame-Options=SAMEORIGIN.
+ */
+export function applySecurityHeaders(
+  res: NextResponse,
+  isProd = process.env.NODE_ENV === "production",
+): NextResponse {
+  for (const h of SECURITY_HEADERS_WITHOUT_CSP) {
+    if (h.key === "Strict-Transport-Security" && !isProd) continue;
+    res.headers.set(h.key, h.value);
   }
   return res;
 }

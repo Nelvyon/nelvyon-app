@@ -1,4 +1,7 @@
-/** HTTP security headers (MIG 281). CSP tuned for PostHog, Stripe Checkout, Sentry. */
+/** HTTP security headers (MIG 281). SSOT for next.config + middleware.
+ * CSP tuned for PostHog, Stripe Checkout, Sentry, Formspree contact.
+ */
+
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://eu.i.posthog.com https://js.stripe.com",
@@ -9,10 +12,11 @@ export const CONTENT_SECURITY_POLICY = [
   "frame-src https://js.stripe.com https://hooks.stripe.com",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://formspree.io",
   "upgrade-insecure-requests",
 ].join("; ");
 
+/** SAMEORIGIN: aligns with Stripe Checkout iframes; do not use DENY in middleware. */
 export const SECURITY_HEADERS_WITHOUT_CSP = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "X-Content-Type-Options", value: "nosniff" },
