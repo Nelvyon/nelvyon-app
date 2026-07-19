@@ -1,9 +1,9 @@
 # AGENT WORKFORCE INVENTORY — NELVYON
 
-> **Bloque A — Auditoría obligatoria**  
+> **Bloque A — Auditoría obligatoria** · **B/C implementados** · **D parcial**  
 > Fecha: **2026-07-19**  
-> Regla: **no se crean agentes nuevos hasta cerrar este inventario**  
-> Veredicto de auditoría: inventario completo · gaps documentados · plan de consolidación  
+> Regla: **no se crean agentes nuevos hasta cerrar este inventario** *(inventario cerrado; promoción controlada)*  
+> Workforce cert: **CONDITIONAL_PASS** · `nelvyonAutonomousWorkforceCertified=false`  
 > **No** afirma “mejores del mundo” ni certificación de fuerza de trabajo completa.
 
 ---
