@@ -80,3 +80,14 @@ Un cliente **nunca** recupera datos de otro tenant.
 ```bash
 pnpm -C apps/web exec vitest run backend/saas/__tests__/privateAiPrivateMode.test.ts backend/saas/__tests__/localAiPhase2.test.ts
 ```
+
+---
+
+## Flags post-MCP (prep ADR-017 — default OFF)
+
+| Flag | Default | Nota |
+|------|---------|------|
+| `NELVYON_SHARED_MEMORY_ENABLED` | `0` | Runtime memoria compartida |
+| `NELVYON_OPENCLAW_BRIDGE_ENABLED` | `0` | Bridge OpenClaw |
+| `NELVYON_ORCHESTRATOR_ENABLED` | `0` | Orquestador multi-agente |
+| `NELVYON_MCP_PRODUCTIVE_ENABLED` | `1` | MCP productivo — **no cambiar durante soak** |

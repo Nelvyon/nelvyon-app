@@ -8,6 +8,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Elite closure | **Repo polish** | Security headers SSOT · migrate-pg splitter (KI-017) · SEO OG/sitemap/robots/schema/logo.svg · CI cleanup · docs INFRA/DEPLOY/ROADMAP · `FINAL_ELITE_CLOSURE.md` |
 | Workforce | **PASS certificado** | Residuals Product/DevOps/Social · workflow audit 45 · OpenClaw mock · RAG isolation · soak daemon · live Ollama/RAG auto · production build en gate · `nelvyonAutonomousWorkforceCertified=true` · skipped=0 · force-pass rechazado · KI-019→historial |
 | Workforce | **Bloques C–H** | Daemon `OrchestratorDaemon` + persist + compose profile `orchestrator` · promotions runtime (~23) · ~45 workflows · leaderboard/canary · panel · docs · ADR-028 |
 | Workforce | **Bloques B+C** | Hierarchy L1/L2 · lifecycle · 4 aliases deprecated · ephemeral workers · operation modes + kill switch · orchestrator file checkpoint/recovery · panel org · `run-workforce-cert.mjs` CONDITIONAL_PASS |

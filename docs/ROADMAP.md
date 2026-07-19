@@ -56,6 +56,7 @@
 | Elite workflows + eval suite | ✅ | Sandbox 10/10 + live 3/3 Ollama |
 | `PHASE2_ELITE_CERTIFIED` | ✅ | PASS repo · ver `PHASE2_ELITE_CERT.md` |
 | Improvement loop | ✅ | propose/eval/promote/rollback · CI gate |
+| Workforce autónoma certificada | ✅ | `nelvyonAutonomousWorkforceCertified=true` · 45 workflows · daemon · live Ollama/RAG |
 
 ---
 

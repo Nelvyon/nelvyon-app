@@ -1,0 +1,58 @@
+{
+  "module": "saas.ads",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:19:11.361Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 5,
+    "fail": 1,
+    "flows": 6
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 126,
+      "at": "2026-07-17T11:19:00.358Z"
+    },
+    {
+      "flow": "adsA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjOTU4N2VmNS1hZDc2LTQ5YjYtYjAzYy1kZDdhMWZmZWJkODEiLCJlbWFpbCI6ImNlcnQtYWRzYS04M2E5ZGQ1ZkBuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6IjYxNDQyZjVmLTZmNzMtNGE4YS04MWQzLTIzOWFiOWU5Y2UyZSIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MTQ3LCJleHAiOjE3ODQ4OTE5NDd9.79Xxggyh0oRuG57GVV2FBCddXxJ-mMELDKRZNqrXiFI",
+      "status": 200,
+      "ms": 1030,
+      "at": "2026-07-17T11:19:08.416Z"
+    },
+    {
+      "flow": "adsA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 197,
+      "at": "2026-07-17T11:19:08.613Z"
+    },
+    {
+      "flow": "adsA.onboard_complete",
+      "ok": "f71c96cb-69e9-4619-95ad-64b469f3f703",
+      "status": 200,
+      "ms": 202,
+      "tenantId": "f71c96cb-69e9-4619-95ad-64b469f3f703",
+      "at": "2026-07-17T11:19:08.815Z"
+    },
+    {
+      "flow": "ads.surface",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:19:11.361Z"
+    },
+    {
+      "flow": "external.dependency",
+      "ok": false,
+      "error": "OAuth ads providers (Google/Meta) not connected in cert env",
+      "at": "2026-07-17T11:19:11.361Z"
+    }
+  ],
+  "hash": "69ab57f5806872d2",
+  "decision": "BLOCKED_EXTERNAL",
+  "forceBlockedExternal": true,
+  "blocker": "OAuth ads providers (Google/Meta) not connected in cert env"
+}

@@ -1,0 +1,297 @@
+{
+  "tag": "nelvyon_global_certification",
+  "timestamp": "2026-07-17T11:24:07.390Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "decision": "FAIL",
+  "reason": null,
+  "elapsedMs": 71715,
+  "totals": {
+    "pass": 39,
+    "fail": 1,
+    "flows": 40
+  },
+  "failures": [
+    {
+      "flow": "cross.webhook_ok",
+      "status": 400
+    }
+  ],
+  "results": [
+    {
+      "flow": "global.health",
+      "ok": true,
+      "status": 200,
+      "ms": 162,
+      "at": "2026-07-17T11:22:55.849Z"
+    },
+    {
+      "flow": "gA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjNmZmMTQyMy0wZjAyLTQ5ZDYtODQwYy0wY2I2ZjVmNzBhOWQiLCJlbWFpbCI6ImNlcnQtZ2EtMWUxZDAwYTFAbmVsdnlvbi50ZXN0IiwidGVuYW50SWQiOiIxYTMwN2M5My1hZWM2LTQ2MTYtOWY0Yy1mMTY1OGY1NWVlZjUiLCJwbGFuIjoiZnJlZSIsImlhdCI6MTc4NDI4NzM4NCwiZXhwIjoxNzg0ODkyMTg0fQ.d-hZ-5Hy-YaHhTHHyKC-7GXo0EaMf9X5bRzb3E9Jcgk",
+      "status": 200,
+      "ms": 9451,
+      "at": "2026-07-17T11:23:05.302Z"
+    },
+    {
+      "flow": "gA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2658,
+      "at": "2026-07-17T11:23:07.960Z"
+    },
+    {
+      "flow": "gA.onboard_complete",
+      "ok": "90cd8697-f748-49de-b2c1-773f3bd402be",
+      "status": 200,
+      "ms": 1813,
+      "tenantId": "90cd8697-f748-49de-b2c1-773f3bd402be",
+      "at": "2026-07-17T11:23:09.773Z"
+    },
+    {
+      "flow": "gB.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyNmRhYWFiMC1jNGMxLTQ1OTEtYmM0Ni0xMjcxYTVmOTYwMzYiLCJlbWFpbCI6ImNlcnQtZ2ItMzg1MmExMjlAbmVsdnlvbi50ZXN0IiwidGVuYW50SWQiOiIxZjUxMTcxNS1lMTU5LTQyZjctODVhYS1mYjJkNzYxNDk0NDMiLCJwbGFuIjoiZnJlZSIsImlhdCI6MTc4NDI4NzM5MCwiZXhwIjoxNzg0ODkyMTkwfQ.yKiERTBsV1V3G-GuekFGGz-K4mCn-AZGzpHz_I4D_HM",
+      "status": 200,
+      "ms": 1079,
+      "at": "2026-07-17T11:23:10.852Z"
+    },
+    {
+      "flow": "gB.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 219,
+      "at": "2026-07-17T11:23:11.072Z"
+    },
+    {
+      "flow": "gB.onboard_complete",
+      "ok": "add2370c-687f-40fa-84e8-551b8bc720a2",
+      "status": 200,
+      "ms": 139,
+      "tenantId": "add2370c-687f-40fa-84e8-551b8bc720a2",
+      "at": "2026-07-17T11:23:11.211Z"
+    },
+    {
+      "flow": "cross.crm_contact",
+      "ok": "44066980-e3a6-4040-acee-d967ccd0ce87",
+      "status": 201,
+      "ms": 2107,
+      "id": "44066980-e3a6-4040-acee-d967ccd0ce87",
+      "at": "2026-07-17T11:23:13.318Z"
+    },
+    {
+      "flow": "cross.deal_create",
+      "ok": "dcaa28d2-8566-41a8-991d-551837bc3b3d",
+      "status": 201,
+      "ms": 2048,
+      "id": "dcaa28d2-8566-41a8-991d-551837bc3b3d",
+      "at": "2026-07-17T11:23:15.366Z"
+    },
+    {
+      "flow": "cross.deal_stage",
+      "ok": true,
+      "status": 200,
+      "ms": 3593,
+      "at": "2026-07-17T11:23:18.960Z"
+    },
+    {
+      "flow": "cross.lead_rule",
+      "ok": "634a3beb-895a-4b11-971a-3933d61195df",
+      "status": 201,
+      "ms": 1925,
+      "at": "2026-07-17T11:23:20.886Z"
+    },
+    {
+      "flow": "cross.lead_score",
+      "ok": true,
+      "status": 200,
+      "ms": 138,
+      "score": 10,
+      "at": "2026-07-17T11:23:21.025Z"
+    },
+    {
+      "flow": "cross.workflow",
+      "ok": "e6631814-d787-49c7-bdf9-e402900ee43b",
+      "status": 201,
+      "ms": 2006,
+      "id": "e6631814-d787-49c7-bdf9-e402900ee43b",
+      "at": "2026-07-17T11:23:23.031Z"
+    },
+    {
+      "flow": "cross.api_key",
+      "ok": "fbaf4765-f598-4276-820a-6b84aadf7277",
+      "status": 201,
+      "ms": 2064,
+      "id": "fbaf4765-f598-4276-820a-6b84aadf7277",
+      "at": "2026-07-17T11:23:25.095Z"
+    },
+    {
+      "flow": "cross.webhook_ssrf_blocked",
+      "ok": true,
+      "status": 400,
+      "ms": 1988,
+      "at": "2026-07-17T11:23:27.084Z"
+    },
+    {
+      "flow": "cross.webhook_ok",
+      "ok": false,
+      "status": 400,
+      "ms": 129,
+      "at": "2026-07-17T11:23:27.213Z"
+    },
+    {
+      "flow": "cross.analytics",
+      "ok": true,
+      "status": 200,
+      "ms": 2239,
+      "at": "2026-07-17T11:23:29.452Z"
+    },
+    {
+      "flow": "cross.dashboard",
+      "ok": true,
+      "status": 200,
+      "ms": 5781,
+      "at": "2026-07-17T11:23:35.233Z"
+    },
+    {
+      "flow": "cross.inbox",
+      "ok": true,
+      "status": 200,
+      "ms": 12571,
+      "at": "2026-07-17T11:23:47.804Z"
+    },
+    {
+      "flow": "cross.private_ai",
+      "ok": true,
+      "status": 200,
+      "ms": 2494,
+      "at": "2026-07-17T11:23:50.299Z"
+    },
+    {
+      "flow": "cross.pipeline_view",
+      "ok": true,
+      "status": 200,
+      "ms": 2538,
+      "at": "2026-07-17T11:23:52.837Z"
+    },
+    {
+      "flow": "iso.deals",
+      "ok": true,
+      "status": 200,
+      "countB": 0,
+      "at": "2026-07-17T11:23:53.269Z"
+    },
+    {
+      "flow": "iso.idor_deal",
+      "ok": true,
+      "status": 404,
+      "at": "2026-07-17T11:23:57.627Z"
+    },
+    {
+      "flow": "iso.scores",
+      "ok": true,
+      "status": 200,
+      "count": 0,
+      "at": "2026-07-17T11:23:57.907Z"
+    },
+    {
+      "flow": "iso.workflows",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:23:58.193Z"
+    },
+    {
+      "flow": "iso.api_keys",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:23:58.493Z"
+    },
+    {
+      "flow": "auth401._api_saas_crm_contacts",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:23:58.509Z"
+    },
+    {
+      "flow": "auth401._api_saas_deals",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:23:58.523Z"
+    },
+    {
+      "flow": "auth401._api_saas_workflows",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:23:58.539Z"
+    },
+    {
+      "flow": "auth401._api_saas_api_keys",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:23:58.555Z"
+    },
+    {
+      "flow": "auth401._api_saas_webhooks",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:23:58.570Z"
+    },
+    {
+      "flow": "auth401._api_saas_analytics",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:23:58.589Z"
+    },
+    {
+      "flow": "auth401._api_saas_private_ai_status",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:23:58.605Z"
+    },
+    {
+      "flow": "perf.contacts_list_p95",
+      "ok": true,
+      "p95_ms": 176,
+      "samples": 20,
+      "budget_ms": 2000,
+      "at": "2026-07-17T11:24:01.545Z"
+    },
+    {
+      "flow": "ext.email_surface",
+      "ok": true,
+      "status": 200,
+      "ses_configured": false,
+      "at": "2026-07-17T11:24:04.814Z"
+    },
+    {
+      "flow": "ext.ses_not_ready_for_prod_send",
+      "ok": true,
+      "ses_configured": false,
+      "note": "KI-013/014 — real send blocked externally when false",
+      "at": "2026-07-17T11:24:04.814Z"
+    },
+    {
+      "flow": "ext.billing_surface",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:24:07.369Z"
+    },
+    {
+      "flow": "ext.stripe_keys_absent",
+      "ok": true,
+      "hasStripe": false,
+      "note": "Checkout/webhook live cannot be certified without keys",
+      "at": "2026-07-17T11:24:07.369Z"
+    },
+    {
+      "flow": "ext.os_kickoff_fail_closed",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:24:07.390Z"
+    },
+    {
+      "flow": "ext.staging_absent",
+      "ok": true,
+      "hasStaging": false,
+      "at": "2026-07-17T11:24:07.390Z"
+    }
+  ],
+  "hash": "d019385de2c30a04"
+}

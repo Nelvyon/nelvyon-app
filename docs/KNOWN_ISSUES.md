@@ -15,27 +15,6 @@
 | **Detalle** | `PHASE2_ELITE_CERTIFIED=true` con live Ollama + hybrid RAG. Pendiente: Docker/pgvector LocalVectorStore compare, migrate 514 staging, OpenClaw URL real. Workforce cert trata estos como `externalNotes` (no blockers internos). |
 | **Docs** | `docs/PHASE2_ELITE_CERT.md` · ADR-026 |
 
-### KI-016 — Docker Desktop local no disponible para E2E live
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | ~~Alta~~ → **Resuelto 2026-07-17** |
-| **Detalle** | Engine UP; Postgres pgvector `:5433` + Redis `:6380`; live multi-tenant PASS |
-| **Evidencia** | `PRODUCTION_CERTIFICATION_REPORT.md` · `live_multitenant_latest.json` |
-
----
-
-### KI-017 — Migraciones con colisiones CREATE IF NOT EXISTS (fresh Postgres)
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | Media |
-| **Detalle** | Tablas homónimas legacy vs SaaS (`api_keys`, `invoices`, …). 406/415 corregidas; 507 consolidated skip en migrate-pg |
-| **Mitigación** | Rename legacy + `MIGRATE_TOLERATE` stubs auth |
-| **Fix** | Auditoría restante de IF NOT EXISTS; portar splitter 507 a migrate-pg |
-
----
-
 ### KI-012 — Vulnerabilidades npm high (transitive)
 
 | Campo | Valor |
@@ -80,6 +59,24 @@
 ---
 
 ## Historial resuelto
+
+### KI-R017 — Migraciones dollar-quote / CREATE IF NOT EXISTS (ex KI-017)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-19 (mitigado) |
+| **Solución** | Splitter portado a `scripts/lib/splitSqlStatements.mjs` + `scripts/validate-split-sql.mjs`; migrate-pg usa el mismo port. Colisiones 406/415 corregidas; 507 consolidated skip. Residual: auditoría IF NOT EXISTS restante no bloquea fresh migrate. |
+
+---
+
+### KI-R016 — Docker Desktop local no disponible para E2E live (ex KI-016)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-17 |
+| **Solución** | Engine UP; Postgres pgvector `:5433` + Redis `:6380`; live multi-tenant PASS · `PRODUCTION_CERTIFICATION_REPORT.md` · `live_multitenant_latest.json` |
+
+---
 
 ### KI-R019 — Workforce cert CONDITIONAL → PASS (ex KI-019)
 

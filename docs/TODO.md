@@ -26,7 +26,7 @@
 - [x] CEO: `DATABASE_URL` secret GitHub (2026-07-10)
 - [x] CEO: `PRODUCTION_BASE_URL` variable (2026-07-10)
 - [ ] CEO: primer run workflow `Database Backup`
-- [ ] CEO: SNS SES + dominio SES verificado (KI-011, KI-013, KI-014)
+- [ ] CEO: SNS SES (KI-014 — SES production access; dominio/SNS KI-011/KI-013 ya resueltos)
 
 ---
 
@@ -111,12 +111,13 @@
 - [x] Fix colisiones mig 406 api_keys + 415 invoices
 - [ ] E2E HTTP Next.js contra DB real (sin mocks `/api/saas/*`)
 - [ ] Staging OS pack smokes re-run
-- [ ] Portar splitter mig 507 a migrate-pg / Railway-only doc
+- [x] Portar splitter mig 507 a migrate-pg (`scripts/lib/splitSqlStatements.mjs` + `scripts/validate-split-sql.mjs`) — KI-R017
 - [x] Drop/archive tabla `scored_leads` (KI-015) — mig `513_drop_scored_leads.sql`; clase `LeadScoringService` eliminada
 - [x] Fase 2 Elite sandbox — memory security · orch executor · 10 workflows · eval suite · OpenClaw mock · gate script (`PHASE2_ELITE_CERT.md`)
 - [x] `PHASE2_ELITE_CERTIFIED` PASS (repo) — live Ollama E2E + RAG hybrid embeds · residual Docker/pgvector + ops 514
 - [x] RAG: corpus sintético indexado (in-memory hybrid) + métricas P/R · pgvector compare cuando Docker up
 - [x] Ciclo mejora controlada (propose/eval/promote/rollback) + gate CI
-- [ ] Post-E2E: unificar Ollama/RAG path pgvector cuando Docker disponible (KI-016)
-- [ ] CEO: SES + SNS + backup restore drill
+- [ ] Post-E2E: unificar Ollama/RAG path pgvector cuando Docker disponible (ex KI-016 / KI-R016)
+- [x] Backup restore drill — `scripts/run-postgres-restore-drill.mjs` · KI-R012 · 8/8 PASS
+- [ ] CEO: SNS SES production access (KI-014 only)
 - [ ] Declarar **NELVYON OS Y SAAS COMPLETADOS** — solo tras criterios verdes

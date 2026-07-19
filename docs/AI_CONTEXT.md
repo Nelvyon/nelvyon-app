@@ -1,6 +1,6 @@
 # AI_CONTEXT — Contexto técnico completo NELVYON
 
-> Fuente para IAs. **Sin secretos.** Actualizado: 2026-07-10.
+> Fuente para IAs. **Sin secretos.** Actualizado: 2026-07-16.
 
 ---
 
@@ -13,7 +13,10 @@
 | P4 | ✅ Hardening (security-gates, Dependabot, CEO checklist) |
 | Auditoría local | ✅ `node scripts/run-phase1-audit.mjs` |
 | CEO manual | ⏳ `docs/CEO_FINAL_ACTIONS.md` |
-| Fase 2 IA | ❌ No iniciar |
+| Fase 2 especialización | ✅ Certificada 15/15 × 3/3 |
+| Fase 2 Model Router | ✅ Certificado + wired SaaS (ADR-015) |
+| Fase 2 MCP Productivo | ✅ CERTIFIED — `mcp_certification_final.json` |
+| Prep Shared Memory / Orch / Agents / Panel | ✅ Contratos ADR-017 — runtime OFF |
 
 ---
 
@@ -131,8 +134,9 @@ Detalle estado: `INTEGRATIONS.md`
 
 ## Base de datos
 
-- **407** archivos `.sql` en `backend/db/migrations/`
-- Última: `511_idempotency_keys.sql`
+- **408** archivos `.sql` en `backend/db/migrations/`
+- Última: `512_saas_appointments_tenant_start_idx.sql`
+- Propuesta no aplicada: `backend/shared-memory/schema.proposed.sql`
 - Runner: `backend/db/migrate.ts` — tabla `_migrations`
 - RLS: migración `280_rls_service_role.sql`; backend usa service_role URL
 
@@ -142,39 +146,49 @@ Detalle: `DATABASE.md`
 
 ## Private AI (estado real)
 
-Per `docs/PRIVATE_AI_ARCHITECTURE.md`:
-- Infra lista; **sin modelo instalado**
-- **Sin RAG ingest**
-- **OpenClaw no conectado**
-- 17 agentes en `nelvyonAgentRegistry.ts` (CEO, ventas, SEO, etc.)
+- **Runtime wired:** `LocalModelRouterProvider` → Model Router certificado (`ADR-015`)
+- API: `POST /api/saas/private-ai/inference`, `GET .../router-health`
+- Legacy fallback: `LocalOllamaProvider` → `OllamaClient` (HTTP SSOT)
+- RAG: `LocalRagRetriever` (cert) vs `NelvyonRagStore` (KI-005 dual)
+- **Shared Memory:** runtime ADR-024 · **wired** Context Engine · mig 514 · flag OFF
+- **RAG:** UnifiedRagStore ADR-025 (prefer local → ILIKE fallback)
+- **OpenClaw:** HttpOpenClawBridge si Memory+flag+URL; si no Disabled
+- **Orquestador / Panel / PromptRegistry / Metrics / Tool map:** ver `PHASE2_PREP_INDEX.md`
+- 17 agentes runtime + 23 especialistas (`backend/agents/`)
+- HMAC SaaS: `requireHmacSecret()` fail-closed (`backend/saas/hmacSecret.ts`)
+
+### Lead scoring
+
+- `/api/saas/lead-scoring` → `SaasLeadScoringService` (SSOT)
+- `/api/saas/lead-scoring/leads` → **410 Gone** (ADR-023; mig 513)
 
 ---
 
 ## Errores / deuda conocida
 
-- Ver `KNOWN_ISSUES.md` — KI-011 (SNS), KI-013/014 (SES dominio + sandbox)
-- Fase 2 IA: `NELVYON_AI_ENABLED=0` por diseño
+- Ver `KNOWN_ISSUES.md` — KI-005 (dual RAG), KI-014 (SES production), KI-012 (npm high)
+- Auditoría maestra: `docs/MASTER_AUDIT_2026-07-16.md`
 
 ---
 
-## Estado operativo (2026-07-10)
+## Estado operativo (2026-07-17)
 
 | Campo | Valor |
 |-------|-------|
 | **Prod Web** | `https://nelvyon.com` — live/ready OK |
-| **git_sha prod** | `30404800` (redeploy pendiente → `636a47bc`) |
-| **git_sha staging** | `636a47bc` |
-| **Migraciones** | 401–511 en repo; releaseCommand en deploy |
-| **Crons GH** | SUCCESS con `PRODUCTION_BASE_URL` |
+| **MCP Productivo** | ✅ CERTIFIED — soak 7200040 ms |
+| **Migraciones** | Hasta **514** (`514_shared_memory`) |
+| **Fase 2** | Shared Memory runtime + orch/panel (flags OFF) |
 
 ---
 
 ## Próximos pasos técnicos
 
-1. CEO: SES dominio + production access (`CEO_FINAL_ACTIONS.md` §4–5)
-2. CEO: primer run `Database Backup` workflow
-3. Deploy prod con fix `/api/os/health` middleware
-4. **No iniciar Fase 2** hasta ops al 100%
+1. Ops: migrate 514 + opcional `NELVYON_SHARED_MEMORY_ENABLED=1`
+2. Ops OpenClaw: sandbox URL + flags (+ opcional `NELVYON_OPENCLAW_DELEGATE=1`)
+3. Ops: ingest corpus RAG vector (cutover KI-005)
+4. CEO: SES KI-014 · Stripe · STAGING_* (Fase 1)
+6. **No declarar OS/SaaS COMPLETADOS** hasta criterios en `OS_SAAS_FINAL_CERTIFICATION.md`
 
 ---
 

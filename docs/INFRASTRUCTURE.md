@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado 2026-07-10. Sin secretos.
+> Estado real documentado **2026-07-19**. Sin secretos.
 
 ---
 
@@ -8,25 +8,23 @@
 
 | Componente | Estado | Notas |
 |------------|--------|-------|
-| **Git** | ✅ | 2.55+; remote GitHub Nelvyon/nelvyon-app |
-| **GitHub** | ✅ | Actions: CI, smokes, production-cron, db-backup, **security-gates**, Dependabot |
-| **Node.js** | ✅ | v20+ prod Docker; v24 dev local OK |
+| **Git** | ✅ | remote GitHub Nelvyon/nelvyon-app |
+| **GitHub Actions** | ✅ | web-quality-gates · security-gates · smokes · db-backup · ci-minimal (PR only) |
+| **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
-| **Python** | ✅ | 3.10+; FastAPI backend |
-| **Docker Desktop** | 🟡 | CLI instalado; daemon no siempre activo |
-| **WSL** | — | No documentado en repo |
+| **Python** | ✅ | 3.10+; FastAPI |
+| **Docker** | 🟡 | Compose local-ai + test; Desktop ops residual |
 | **Railway** | ✅ | Web healthcheck `/api/health/live`; releaseCommand migrate |
-| **Supabase** | 🟡 | Postgres + auth; service_role en DATABASE_URL |
-| **PostgreSQL** | 🟡 | 16; migraciones SQL |
-| **Redis** | 🟡 | Upstash/Railway opcional; in-memory fallback |
-| **AWS SES** | 🟡 | eu-west-1 recomendado |
-| **Stripe** | 🟡 | Billing + Connect partners |
-| **Cloudflare** | 🟡 | DNS/WAF manual (`cloudflare-waf-rules.md`) |
-| **OpenAI** | 🟡 | Opcional packs/agents |
-| **n8n** | ❌ | Sin instancia; blueprint en `packages/automation-blueprints/` |
-| **Sentry** | 🟡 | `NEXT_PUBLIC_SENTRY_DSN` |
-| **PostHog** | 🟡 | EU hosting GDPR |
-| **Backups** | ✅ | GH Action semanal + CLI; CEO: secret DATABASE_URL |
+| **PostgreSQL** | ✅ | 16; migraciones hasta **514** (validator CI 508–514) |
+| **pgvector** | 🟡 | Local stack; residual ops KI-018 |
+| **Redis** | 🟡 | Opcional; in-memory fallback |
+| **Ollama** | ✅ | Live workforce/Elite cuando servicio local UP |
+| **OpenClaw** | 🟡 | Mock certificado; URL real ops |
+| **AWS SES** | 🟡 | Dominio OK; **production access DENIED** (KI-014) |
+| **Stripe** | 🟡 | Código listo; claves prod ops |
+| **Cloudflare** | 🟡 | DNS/WAF manual |
+| **Backups / DR** | ✅ | GH Action + restore drill PASS 8/8 (evidencia) |
+| **Security headers** | ✅ | SSOT `apps/web/src/lib/security/headers.ts` |
 | **Ops dashboard** | ✅ | `GET /api/platform/ops/summary` |
 
 ---

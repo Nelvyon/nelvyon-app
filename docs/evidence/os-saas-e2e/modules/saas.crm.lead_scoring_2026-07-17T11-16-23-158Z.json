@@ -1,0 +1,114 @@
+{
+  "module": "saas.crm.lead_scoring",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:16:23.158Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 14,
+    "fail": 0,
+    "flows": 14
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 624,
+      "at": "2026-07-17T11:15:45.873Z"
+    },
+    {
+      "flow": "leadA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3Nzk3NDNlNS0wNWM3LTQ2YTgtYjEyZi02YmExMjIyMTQxMjgiLCJlbWFpbCI6ImNlcnQtbGVhZGEtNzc2Njc2YTdAbmVsdnlvbi50ZXN0IiwidGVuYW50SWQiOiI2YzM1MjY5NS04NjNmLTQ5MDgtYmU4NC00YWM5MGU5NGEyOGMiLCJwbGFuIjoiZnJlZSIsImlhdCI6MTc4NDI4Njk2MSwiZXhwIjoxNzg0ODkxNzYxfQ.w22bwrXhPim6gTV-IweCv78yjt7qlDNrs0iKvgRxTdI",
+      "status": 200,
+      "ms": 16402,
+      "at": "2026-07-17T11:16:02.276Z"
+    },
+    {
+      "flow": "leadA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 4500,
+      "at": "2026-07-17T11:16:06.777Z"
+    },
+    {
+      "flow": "leadA.onboard_complete",
+      "ok": "04c44b60-b97f-4045-9a2f-381340c69ea9",
+      "status": 200,
+      "ms": 1809,
+      "tenantId": "04c44b60-b97f-4045-9a2f-381340c69ea9",
+      "at": "2026-07-17T11:16:08.586Z"
+    },
+    {
+      "flow": "leadB.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4N2YyYTlmYS0yNDQxLTQ2ZjktYTU5Mi03NDk3NWU1Y2FhNzEiLCJlbWFpbCI6ImNlcnQtbGVhZGItYzk4N2E0MmJAbmVsdnlvbi50ZXN0IiwidGVuYW50SWQiOiJlNmQ0Mjk5OS1lMjMxLTQwNjgtYjEzNC1kYjI1Mzc0NDk2YTYiLCJwbGFuIjoiZnJlZSIsImlhdCI6MTc4NDI4Njk2OSwiZXhwIjoxNzg0ODkxNzY5fQ.EDCBdxSR0VGr_dwG2vOiUl66AQ81kPULKgI0h-y2dck",
+      "status": 200,
+      "ms": 1181,
+      "at": "2026-07-17T11:16:09.767Z"
+    },
+    {
+      "flow": "leadB.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 199,
+      "at": "2026-07-17T11:16:09.967Z"
+    },
+    {
+      "flow": "leadB.onboard_complete",
+      "ok": "9aad3f85-f3cf-4ab4-b9a2-e830ffe35fbb",
+      "status": 200,
+      "ms": 152,
+      "tenantId": "9aad3f85-f3cf-4ab4-b9a2-e830ffe35fbb",
+      "at": "2026-07-17T11:16:10.120Z"
+    },
+    {
+      "flow": "lead.legacy_410",
+      "ok": true,
+      "status": 410,
+      "ms": 8877,
+      "at": "2026-07-17T11:16:18.997Z"
+    },
+    {
+      "flow": "lead.list_rules",
+      "ok": true,
+      "status": 200,
+      "ms": 2030,
+      "at": "2026-07-17T11:16:21.028Z"
+    },
+    {
+      "flow": "lead.create_rule",
+      "ok": true,
+      "status": 201,
+      "ms": 121,
+      "ruleId": "1235e51c-c5d0-4886-a621-12dfade9cb84",
+      "at": "2026-07-17T11:16:21.149Z"
+    },
+    {
+      "flow": "lead.contact",
+      "ok": true,
+      "status": 201,
+      "at": "2026-07-17T11:16:22.822Z"
+    },
+    {
+      "flow": "lead.score_contact",
+      "ok": true,
+      "status": 200,
+      "ms": 181,
+      "at": "2026-07-17T11:16:23.003Z"
+    },
+    {
+      "flow": "lead.scores_isolation",
+      "ok": true,
+      "status": 200,
+      "count": 0,
+      "at": "2026-07-17T11:16:23.136Z"
+    },
+    {
+      "flow": "lead.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:16:23.158Z"
+    }
+  ],
+  "hash": "8b44e4fb5a8b121d",
+  "decision": "CERTIFIED"
+}

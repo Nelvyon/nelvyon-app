@@ -1,0 +1,84 @@
+{
+  "tag": "os_saas_critical_e2e",
+  "timestamp": "2026-07-17T10:18:02.120Z",
+  "commit": "a67a8501",
+  "commitFull": "a67a8501dc1b732d37cc08f7dc1a9295b82548a8",
+  "branch": "main",
+  "environment": {
+    "timestamp": "2026-07-17T10:16:58.131Z",
+    "commit": "a67a8501dc1b732d37cc08f7dc1a9295b82548a8",
+    "commitShort": "a67a8501",
+    "branch": "main",
+    "node": "v24.18.0",
+    "platform": "win32",
+    "docker": {
+      "ok": true,
+      "containers": [
+        "nelvyon-test-postgres",
+        "nelvyon-test-redis",
+        "nelvyon-local-ai-postgres",
+        "n8n-n8n-1"
+      ],
+      "error": null
+    },
+    "databaseUrlSet": true,
+    "jwtSecretSet": true,
+    "playwrightBaseUrl": null,
+    "note": "SaaS Playwright suite mocks /api/saas/* — classify as UI_CONTRACT unless LIVE_DB=1"
+  },
+  "suites": [
+    {
+      "label": "typecheck",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 46584,
+      "exitCode": 0,
+      "reason": null
+    },
+    {
+      "label": "anti_stub",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 135,
+      "exitCode": 0,
+      "reason": null
+    },
+    {
+      "label": "privileged_write_gate",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 54,
+      "exitCode": 0,
+      "reason": null
+    },
+    {
+      "label": "vitest_critical",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 17125,
+      "exitCode": 0,
+      "reason": null
+    },
+    {
+      "label": "playwright_saas_critical_ui",
+      "ok": false,
+      "skipped": true,
+      "durationMs": 0,
+      "exitCode": null,
+      "reason": "SKIP_PLAYWRIGHT=1"
+    }
+  ],
+  "totals": {
+    "pass": 4,
+    "fail": 0,
+    "skipped": 1,
+    "suiteCount": 5
+  },
+  "classificationNotes": [
+    "vitest_critical = service/RBAC/security unit+static isolation — PASS supports IMPLEMENTED + security gates, not full live multi-tenant HTTP E2E",
+    "playwright_saas_critical_ui = cookie + mocked /api/saas/* — PASS = UI_CONTRACT only, NOT live DB CERTIFIED",
+    "LIVE multi-tenant E2E requires Docker Postgres + JWT + seeded tenants A/B — see env docker status",
+    "MCP/Router/Specialization frozen — not re-run here"
+  ],
+  "hash": "4902646a6493a080"
+}

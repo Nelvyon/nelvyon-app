@@ -1,0 +1,67 @@
+{
+  "module": "ai.private_ai",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:18:48.873Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 7,
+    "fail": 0,
+    "flows": 7
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 113,
+      "at": "2026-07-17T11:18:34.396Z"
+    },
+    {
+      "flow": "aiA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MTQ5M2YyYS1hZTkyLTQzMDQtOTM2Yy1hNjhjZGRlNDFmN2UiLCJlbWFpbCI6ImNlcnQtYWlhLTZlYzY5YWNkQG5lbHZ5b24udGVzdCIsInRlbmFudElkIjoiNmIxM2M4MzMtMjc1NC00YjBkLTljM2UtNmRkYTJjMzkzMTY1IiwicGxhbiI6ImZyZWUiLCJpYXQiOjE3ODQyODcxMTYsImV4cCI6MTc4NDg5MTkxNn0.U01OIwnXykb-BXLvQcFPSOgt6pjd8UBprG7wdph4b7g",
+      "status": 200,
+      "ms": 3385,
+      "at": "2026-07-17T11:18:37.782Z"
+    },
+    {
+      "flow": "aiA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 421,
+      "at": "2026-07-17T11:18:38.203Z"
+    },
+    {
+      "flow": "aiA.onboard_complete",
+      "ok": "2fab441b-b9d4-404e-a7f6-e57a544ce6b7",
+      "status": 200,
+      "ms": 322,
+      "tenantId": "2fab441b-b9d4-404e-a7f6-e57a544ce6b7",
+      "at": "2026-07-17T11:18:38.525Z"
+    },
+    {
+      "flow": "private_ai.status",
+      "ok": true,
+      "status": 200,
+      "ms": 8114,
+      "body": "{\"enabled\":false,\"privateAiOnly\":true,\"privateMode\":{\"privateMode\":true,\"internetTaskAuthorized\":false,\"internetUntil\":n",
+      "at": "2026-07-17T11:18:46.640Z"
+    },
+    {
+      "flow": "private_ai.router_health",
+      "ok": true,
+      "status": 200,
+      "ms": 2212,
+      "note": "Router certified separately; flag may be OFF",
+      "at": "2026-07-17T11:18:48.852Z"
+    },
+    {
+      "flow": "private_ai.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:18:48.873Z"
+    }
+  ],
+  "hash": "6669bce385273134",
+  "decision": "CERTIFIED",
+  "note": "Does not re-run Router soak; wiring + auth + degraded status only"
+}

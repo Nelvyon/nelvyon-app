@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-09
+> Actualizado: 2026-07-16
 
 ---
 
@@ -9,8 +9,9 @@
 | Campo | Valor |
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
-| **Total archivos** | 407 |
-| **Última migración** | `511_idempotency_keys.sql` |
+| **Total archivos** | 408 |
+| **Última migración** | `514_shared_memory.sql` |
+| **Shared Memory schema** | Aplicado en mig 514 · `schema.proposed.sql` es referencia histórica |
 | **Runner** | `backend/db/migrate.ts` |
 | **Tracking** | Tabla `_migrations (name, executed_at)` |
 | **Comando** | `pnpm -C apps/web migrate` |
@@ -70,6 +71,9 @@
 - `509_saas_seo_tracked_keywords.sql` — SEO keywords
 - `510_enterprise_performance_indexes.sql` — índices performance
 - `511_idempotency_keys.sql` — idempotencia API
+- `512_saas_appointments_tenant_start_idx.sql` — índice `(tenant_id, start_at)` para citas (añadir en deploy; no requiere downtime)
+- `513_drop_scored_leads.sql` — elimina tabla legacy `scored_leads` (KI-015); SSOT = `SaasLeadScoringService`
+- `514_shared_memory.sql` — Shared Memory Phase 2 (entries + audit); flag `NELVYON_SHARED_MEMORY_ENABLED`
 
 ---
 

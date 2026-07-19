@@ -1,0 +1,64 @@
+{
+  "module": "saas.analytics",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:18:20.291Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 7,
+    "fail": 0,
+    "flows": 7
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 2407,
+      "at": "2026-07-17T11:18:06.385Z"
+    },
+    {
+      "flow": "anA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ZTFhYjc5OC1hOTcwLTQxYTctYWNlZS1hOTYzMzY2ZTM2YTIiLCJlbWFpbCI6ImNlcnQtYW5hLWEyZDhlOTc5QG5lbHZ5b24udGVzdCIsInRlbmFudElkIjoiYWZhYzM3YjgtZjE0MS00NzRkLTgwYWYtMWFlZDQwOTM2M2QxIiwicGxhbiI6ImZyZWUiLCJpYXQiOjE3ODQyODcwODgsImV4cCI6MTc4NDg5MTg4OH0.bLXY3DKgBSzOQL_MCqQS2HpR-IojHFB4dXUMTGpov_0",
+      "status": 200,
+      "ms": 2619,
+      "at": "2026-07-17T11:18:09.004Z"
+    },
+    {
+      "flow": "anA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 1953,
+      "at": "2026-07-17T11:18:10.958Z"
+    },
+    {
+      "flow": "anA.onboard_complete",
+      "ok": "82e13380-75d2-4e7c-b9db-583e07dc7e9d",
+      "status": 200,
+      "ms": 1794,
+      "tenantId": "82e13380-75d2-4e7c-b9db-583e07dc7e9d",
+      "at": "2026-07-17T11:18:12.752Z"
+    },
+    {
+      "flow": "analytics_api_saas_analytics",
+      "ok": true,
+      "status": 200,
+      "ms": 3825,
+      "at": "2026-07-17T11:18:16.577Z"
+    },
+    {
+      "flow": "analytics_api_saas_dashboard",
+      "ok": true,
+      "status": 200,
+      "ms": 3694,
+      "at": "2026-07-17T11:18:20.272Z"
+    },
+    {
+      "flow": "analytics.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:18:20.290Z"
+    }
+  ],
+  "hash": "be325eeb9dfb9be4",
+  "decision": "CERTIFIED"
+}

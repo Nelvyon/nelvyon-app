@@ -1,0 +1,267 @@
+{
+  "module": "saas.crm.contacts",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T10:33:49.082Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 16,
+    "fail": 0,
+    "flows": 16
+  },
+  "meta": {
+    "tenantA": "e95b1397-7c47-4603-a2e8-93baad47f066",
+    "tenantB": "c641fd16-a82b-4e96-881a-215d8d1fed38"
+  },
+  "results": [
+    {
+      "flow": "crm.http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 165,
+      "at": "2026-07-17T10:33:49.250Z"
+    },
+    {
+      "flow": "crm.setup.register_A",
+      "ok": "4202137e-e05d-4261-b46c-1a93ef44953d",
+      "status": 200,
+      "ms": 1798,
+      "at": "2026-07-17T10:33:51.049Z"
+    },
+    {
+      "flow": "crm.setup.register_B",
+      "ok": "4b53200f-9700-4a2c-8421-9a50cf11c705",
+      "status": 200,
+      "ms": 689,
+      "at": "2026-07-17T10:33:51.738Z"
+    },
+    {
+      "flow": "crm.setup.onboarding_create_CertCRM-A",
+      "ok": {
+        "id": "e95b1397-7c47-4603-a2e8-93baad47f066",
+        "userId": "4202137e-e05d-4261-b46c-1a93ef44953d",
+        "workspaceId": null,
+        "companyName": "CertCRM-A",
+        "industry": "tech",
+        "plan": "pro",
+        "website": null,
+        "phone": null,
+        "employees": null,
+        "goals": [
+          "cert"
+        ],
+        "onboardingCompleted": false,
+        "onboardingStep": 4,
+        "createdAt": "2026-07-17T10:33:53.673Z",
+        "updatedAt": "2026-07-17T10:33:53.689Z"
+      },
+      "status": 200,
+      "ms": 1955,
+      "at": "2026-07-17T10:33:53.694Z"
+    },
+    {
+      "flow": "crm.setup.onboarding_complete_CertCRM-A",
+      "ok": true,
+      "status": 200,
+      "ms": 1544,
+      "tenantId": "e95b1397-7c47-4603-a2e8-93baad47f066",
+      "onboardingCompleted": true,
+      "at": "2026-07-17T10:33:55.238Z"
+    },
+    {
+      "flow": "crm.setup.onboarding_create_CertCRM-B",
+      "ok": {
+        "id": "c641fd16-a82b-4e96-881a-215d8d1fed38",
+        "userId": "4b53200f-9700-4a2c-8421-9a50cf11c705",
+        "workspaceId": null,
+        "companyName": "CertCRM-B",
+        "industry": "tech",
+        "plan": "pro",
+        "website": null,
+        "phone": null,
+        "employees": null,
+        "goals": [
+          "cert"
+        ],
+        "onboardingCompleted": false,
+        "onboardingStep": 4,
+        "createdAt": "2026-07-17T10:33:55.429Z",
+        "updatedAt": "2026-07-17T10:33:55.443Z"
+      },
+      "status": 200,
+      "ms": 208,
+      "at": "2026-07-17T10:33:55.447Z"
+    },
+    {
+      "flow": "crm.setup.onboarding_complete_CertCRM-B",
+      "ok": true,
+      "status": 200,
+      "ms": 139,
+      "tenantId": "c641fd16-a82b-4e96-881a-215d8d1fed38",
+      "onboardingCompleted": true,
+      "at": "2026-07-17T10:33:55.586Z"
+    },
+    {
+      "flow": "crm.http.401",
+      "ok": true,
+      "status": 401,
+      "ms": 25,
+      "at": "2026-07-17T10:33:55.613Z"
+    },
+    {
+      "flow": "crm.http.create_a",
+      "ok": true,
+      "status": 201,
+      "ms": 1562,
+      "id": "2bd549cd-5564-45db-8862-82082d9307a3",
+      "at": "2026-07-17T10:33:57.176Z"
+    },
+    {
+      "flow": "crm.http.create_b",
+      "ok": true,
+      "status": 201,
+      "ms": 133,
+      "id": "902efa94-baca-46fe-88d5-361308c90973",
+      "at": "2026-07-17T10:33:57.309Z"
+    },
+    {
+      "flow": "crm.http.list_isolation",
+      "ok": true,
+      "status": 200,
+      "ms": 134,
+      "count": 1,
+      "at": "2026-07-17T10:33:57.444Z"
+    },
+    {
+      "flow": "crm.http.idor_get",
+      "ok": true,
+      "status": 404,
+      "ms": 3650,
+      "at": "2026-07-17T10:34:01.095Z"
+    },
+    {
+      "flow": "crm.http.update_a",
+      "ok": true,
+      "status": 200,
+      "ms": 149,
+      "at": "2026-07-17T10:34:01.244Z"
+    },
+    {
+      "flow": "crm.http.search",
+      "ok": true,
+      "status": 200,
+      "ms": 301,
+      "count": 1,
+      "at": "2026-07-17T10:34:01.545Z"
+    },
+    {
+      "flow": "crm.http.perf_list_p95",
+      "ok": true,
+      "p50": 135,
+      "p95": 204,
+      "p99": 341,
+      "budgetMs": 500,
+      "at": "2026-07-17T10:34:04.576Z"
+    },
+    {
+      "flow": "crm.http.delete_a",
+      "ok": true,
+      "status": 200,
+      "ms": 141,
+      "at": "2026-07-17T10:34:04.716Z"
+    }
+  ],
+  "latenciesTail": [
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 119,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 135,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 134,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 155,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 142,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 132,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 123,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 134,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 204,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 176,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 341,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 134,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 126,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts",
+      "method": "GET",
+      "ms": 126,
+      "status": 200
+    },
+    {
+      "path": "/api/saas/crm/contacts/2bd549cd-5564-45db-8862-82082d9307a3",
+      "method": "DELETE",
+      "ms": 141,
+      "status": 200
+    }
+  ],
+  "hash": "4c0aa45a66c71709",
+  "decision": "CERTIFIED"
+}

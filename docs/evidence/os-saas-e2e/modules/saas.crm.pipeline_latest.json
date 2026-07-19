@@ -1,0 +1,134 @@
+{
+  "module": "saas.crm.pipeline",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:15:45.247Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 16,
+    "fail": 0,
+    "flows": 16
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 2140,
+      "at": "2026-07-17T11:15:23.445Z"
+    },
+    {
+      "flow": "pipeA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzN2ZmMDQxOS0wOTc3LTQ3NzUtOTY1NS04YzIyYmU2Y2ZmMjEiLCJlbWFpbCI6ImNlcnQtcGlwZWEtYzg2YTYxMmJAbmVsdnlvbi50ZXN0IiwidGVuYW50SWQiOiI1NjY3Y2I0Yy04MjhmLTRkOWUtYTc2OS0xOTVlOGVmZTU3ZmMiLCJwbGFuIjoiZnJlZSIsImlhdCI6MTc4NDI4NjkyNCwiZXhwIjoxNzg0ODkxNzI0fQ.QrHq1aBD0qBfj1V5VCw0ZHKQ5ijbZSZ68Dr9xjS-qok",
+      "status": 200,
+      "ms": 1684,
+      "at": "2026-07-17T11:15:25.130Z"
+    },
+    {
+      "flow": "pipeA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 397,
+      "at": "2026-07-17T11:15:25.528Z"
+    },
+    {
+      "flow": "pipeA.onboard_complete",
+      "ok": "d332372d-ec2d-46b4-8f2a-9bfa91d9586d",
+      "status": 200,
+      "ms": 314,
+      "tenantId": "d332372d-ec2d-46b4-8f2a-9bfa91d9586d",
+      "at": "2026-07-17T11:15:25.842Z"
+    },
+    {
+      "flow": "pipeB.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1N2ZlYTY2ZC0xNWM1LTQ3ZGUtOWQyMC00MjY4MGQ2ZGUxNWQiLCJlbWFpbCI6ImNlcnQtcGlwZWItZmQ1YmVmZjNAbmVsdnlvbi50ZXN0IiwidGVuYW50SWQiOiI5NTU3ZjNhMC02MWY3LTQ4OTQtOWQxNS1lNjA2OWE3MTQzYzUiLCJwbGFuIjoiZnJlZSIsImlhdCI6MTc4NDI4NjkyNiwiZXhwIjoxNzg0ODkxNzI2fQ.8w8IgtLLUc5lhSlBRPXgHV39x1KiPW-ovnIToaO7I1g",
+      "status": 200,
+      "ms": 691,
+      "at": "2026-07-17T11:15:26.533Z"
+    },
+    {
+      "flow": "pipeB.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 160,
+      "at": "2026-07-17T11:15:26.694Z"
+    },
+    {
+      "flow": "pipeB.onboard_complete",
+      "ok": "9afd30d9-f71b-4c4e-b9f5-e06279e34efc",
+      "status": 200,
+      "ms": 149,
+      "tenantId": "9afd30d9-f71b-4c4e-b9f5-e06279e34efc",
+      "at": "2026-07-17T11:15:26.843Z"
+    },
+    {
+      "flow": "pipeline.contact_a",
+      "ok": true,
+      "status": 201,
+      "ms": 2809,
+      "at": "2026-07-17T11:15:29.653Z"
+    },
+    {
+      "flow": "pipeline.reject_invalid_stage",
+      "ok": true,
+      "status": 400,
+      "ms": 1968,
+      "body": {
+        "error": "Invalid stage",
+        "code": "VALIDATION"
+      },
+      "at": "2026-07-17T11:15:31.621Z"
+    },
+    {
+      "flow": "pipeline.create_a",
+      "ok": "0a58f14c-bfb5-43e2-9c29-41ee25b50d1c",
+      "status": 201,
+      "ms": 141,
+      "id": "0a58f14c-bfb5-43e2-9c29-41ee25b50d1c",
+      "at": "2026-07-17T11:15:31.762Z"
+    },
+    {
+      "flow": "pipeline.create_b",
+      "ok": "ad4a9600-65cf-4b54-b42d-83ee35b4b5fb",
+      "status": 201,
+      "ms": 139,
+      "at": "2026-07-17T11:15:31.902Z"
+    },
+    {
+      "flow": "pipeline.list_isolation",
+      "ok": true,
+      "status": 200,
+      "ms": 131,
+      "count": 1,
+      "at": "2026-07-17T11:15:32.034Z"
+    },
+    {
+      "flow": "pipeline.idor_get",
+      "ok": true,
+      "status": 404,
+      "ms": 3816,
+      "at": "2026-07-17T11:15:35.850Z"
+    },
+    {
+      "flow": "pipeline.change_stage",
+      "ok": true,
+      "status": 200,
+      "ms": 3656,
+      "at": "2026-07-17T11:15:39.506Z"
+    },
+    {
+      "flow": "pipeline.summary",
+      "ok": true,
+      "status": 200,
+      "ms": 2097,
+      "at": "2026-07-17T11:15:41.604Z"
+    },
+    {
+      "flow": "pipeline.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:15:45.247Z"
+    }
+  ],
+  "hash": "430defdcc894509f",
+  "decision": "CERTIFIED"
+}

@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-07-17T09:58:12.039Z",
+  "label": "anti_stub",
+  "command": "node C:\\Proyectos\\Nelvyon\\nelvyon-app\\scripts\\check-saas-stubs.mjs",
+  "cwd": "C:\\Proyectos\\Nelvyon\\nelvyon-app",
+  "exitCode": 0,
+  "ok": true,
+  "durationMs": 135,
+  "stdoutTail": "✅ Anti-stub gate: 0 stubs vacíos / 0 ctx.user incorrectos\n",
+  "stderrTail": ""
+}

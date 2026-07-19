@@ -1,0 +1,261 @@
+{
+  "tag": "live_multitenant_crm_cert",
+  "timestamp": "2026-07-17T10:23:52.625Z",
+  "commit": "ref: refs/heads/main",
+  "database": "postgresql://nelvyon:***@localhost:5433/nelvyon_test",
+  "totals": {
+    "pass": 19,
+    "fail": 0,
+    "flows": 19
+  },
+  "crossTenantZero": true,
+  "results": [
+    {
+      "flow": "db.connect",
+      "ok": true,
+      "ms": 19,
+      "error": null,
+      "at": "2026-07-17T10:23:52.533Z"
+    },
+    {
+      "flow": "schema.saas_tenants",
+      "ok": true,
+      "ms": 0,
+      "at": "2026-07-17T10:23:52.537Z"
+    },
+    {
+      "flow": "schema.saas_contacts",
+      "ok": true,
+      "ms": 0,
+      "at": "2026-07-17T10:23:52.537Z"
+    },
+    {
+      "flow": "schema.nelvyon_users",
+      "ok": true,
+      "ms": 0,
+      "at": "2026-07-17T10:23:52.537Z"
+    },
+    {
+      "flow": "seed.users",
+      "ok": true,
+      "ms": 0,
+      "found": 2,
+      "userA": "a8e836dc-6659-4e8e-9287-320a0b6b1579",
+      "userB": "f8d039a5-1838-43ee-a63e-739d902208b3",
+      "error": null,
+      "at": "2026-07-17T10:23:52.548Z"
+    },
+    {
+      "flow": "seed.tenant_a",
+      "ok": true,
+      "ms": 1,
+      "id": "33a1b5ff-12bb-40b6-859a-aa4e4858f904",
+      "error": null,
+      "at": "2026-07-17T10:23:52.551Z"
+    },
+    {
+      "flow": "seed.tenant_b",
+      "ok": true,
+      "ms": 1,
+      "id": "e68f323f-7961-43e0-a888-10c46e29a801",
+      "error": null,
+      "at": "2026-07-17T10:23:52.551Z"
+    },
+    {
+      "flow": "crm.create_a",
+      "ok": true,
+      "ms": 1,
+      "id": "52161dde-d1c0-4b98-af00-e4d0bc5a2b7d",
+      "error": null,
+      "at": "2026-07-17T10:23:52.553Z"
+    },
+    {
+      "flow": "crm.create_b",
+      "ok": true,
+      "ms": 1,
+      "id": "9c4cf917-9622-4449-954e-dd126aa1648a",
+      "error": null,
+      "at": "2026-07-17T10:23:52.553Z"
+    },
+    {
+      "flow": "isolation.list_a_excludes_b",
+      "ok": true,
+      "ms": 1,
+      "count": 1,
+      "leakId": false,
+      "leakNotes": false,
+      "error": null,
+      "at": "2026-07-17T10:23:52.554Z"
+    },
+    {
+      "flow": "idor.raw_by_id_exists",
+      "ok": true,
+      "ms": 1,
+      "note": "Unscoped SELECT by id finds row — app MUST always filter tenant_id",
+      "at": "2026-07-17T10:23:52.554Z"
+    },
+    {
+      "flow": "idor.cross_tenant_read",
+      "ok": true,
+      "ms": 1,
+      "rows": 0,
+      "error": null,
+      "at": "2026-07-17T10:23:52.555Z"
+    },
+    {
+      "flow": "idor.cross_tenant_update",
+      "ok": true,
+      "ms": 1,
+      "rowCount": 0,
+      "error": null,
+      "at": "2026-07-17T10:23:52.556Z"
+    },
+    {
+      "flow": "idor.cross_tenant_update_data_intact",
+      "ok": true,
+      "ms": 0,
+      "notes": "secret-B",
+      "at": "2026-07-17T10:23:52.556Z"
+    },
+    {
+      "flow": "idor.cross_tenant_delete",
+      "ok": true,
+      "ms": 1,
+      "rowCount": 0,
+      "error": null,
+      "at": "2026-07-17T10:23:52.557Z"
+    },
+    {
+      "flow": "security.sqli_parameterized",
+      "ok": true,
+      "ms": 1,
+      "stillExists": true,
+      "error": null,
+      "at": "2026-07-17T10:23:52.558Z"
+    },
+    {
+      "flow": "crm.list_contacts",
+      "ok": true,
+      "ms": 0,
+      "samples": 50,
+      "p50": 1,
+      "p95": 1,
+      "p99": 1,
+      "max": 1,
+      "budgetMs": {
+        "p95": 100,
+        "p99": 250
+      },
+      "at": "2026-07-17T10:23:52.602Z"
+    },
+    {
+      "flow": "cleanup.cert_rows",
+      "ok": true,
+      "ms": 0,
+      "tenants": [
+        "33a1b5ff-12bb-40b6-859a-aa4e4858f904",
+        "e68f323f-7961-43e0-a888-10c46e29a801"
+      ],
+      "at": "2026-07-17T10:23:52.625Z"
+    },
+    {
+      "flow": "gate.cross_tenant_zero",
+      "ok": true,
+      "ms": 0,
+      "failures": [],
+      "at": "2026-07-17T10:23:52.625Z"
+    }
+  ],
+  "advisory": [
+    {
+      "flow": "idor.raw_by_id_exists",
+      "ok": true,
+      "ms": 1,
+      "note": "Unscoped SELECT by id finds row — app MUST always filter tenant_id",
+      "at": "2026-07-17T10:23:52.554Z"
+    }
+  ],
+  "latenciesSample": [
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "SELECT id FROM saas_contacts WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT",
+      "ms": 1
+    },
+    {
+      "sql": "DELETE FROM saas_contacts WHERE tenant_id = ANY($1::uuid[])",
+      "ms": 4
+    },
+    {
+      "sql": "DELETE FROM saas_tenants WHERE id = ANY($1::uuid[])",
+      "ms": 19
+    }
+  ],
+  "hash": "eafa2f9c2cdf08e8"
+}

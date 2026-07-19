@@ -1,0 +1,63 @@
+{
+  "module": "public.api",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:18:34.282Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 7,
+    "fail": 0,
+    "flows": 7
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 170,
+      "at": "2026-07-17T11:18:20.463Z"
+    },
+    {
+      "flow": "public.health",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:18:20.577Z"
+    },
+    {
+      "flow": "public.funnel_missing",
+      "ok": true,
+      "status": 404,
+      "at": "2026-07-17T11:18:24.138Z"
+    },
+    {
+      "flow": "pubA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiNTk5MzRjMy0yNGVlLTQzNjEtYTRiNC0xMWFlOGRkN2M2NzAiLCJlbWFpbCI6ImNlcnQtcHViYS1mMGIwMmM0N0BuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6IjUyMGQ1ZmU1LTAwOTUtNDQ0MC1iMzJlLWM3OWEyZDA2YjM3ZCIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MTA0LCJleHAiOjE3ODQ4OTE5MDR9.WlMsKyAmrNWMhmM4rL54PCO1BTBSeMtL6F-MOiluOF4",
+      "status": 200,
+      "ms": 1132,
+      "at": "2026-07-17T11:18:25.270Z"
+    },
+    {
+      "flow": "pubA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 306,
+      "at": "2026-07-17T11:18:25.577Z"
+    },
+    {
+      "flow": "pubA.onboard_complete",
+      "ok": "446474f3-5a67-4bc2-8d5d-31817b537728",
+      "status": 200,
+      "ms": 303,
+      "tenantId": "446474f3-5a67-4bc2-8d5d-31817b537728",
+      "at": "2026-07-17T11:18:25.880Z"
+    },
+    {
+      "flow": "public.saas_public_api_surface",
+      "ok": true,
+      "status": 404,
+      "ms": 8393,
+      "at": "2026-07-17T11:18:34.282Z"
+    }
+  ],
+  "hash": "fd6516685f077bbc",
+  "decision": "CERTIFIED"
+}

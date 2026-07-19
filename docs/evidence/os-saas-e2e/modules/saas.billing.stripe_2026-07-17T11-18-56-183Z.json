@@ -1,0 +1,59 @@
+{
+  "module": "saas.billing.stripe",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:18:56.183Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 5,
+    "fail": 1,
+    "flows": 6
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 124,
+      "at": "2026-07-17T11:18:52.441Z"
+    },
+    {
+      "flow": "billA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOTMyNDU0Zi01ZjZiLTQ0NWQtOWMzNy05ZGEzMDZhMGY1YTciLCJlbWFpbCI6ImNlcnQtYmlsbGEtNjczOTA5ZGNAbmVsdnlvbi50ZXN0IiwidGVuYW50SWQiOiIyZTNjYmQxMC1kMDc1LTQzYmMtYmY5ZC1hOWJiZDEzZmY1ZWMiLCJwbGFuIjoiZnJlZSIsImlhdCI6MTc4NDI4NzEzMiwiZXhwIjoxNzg0ODkxOTMyfQ.ZbJyvkTnOn9mgcbgFCpdaiiB6a2EKXPYR3UzGEqqgb4",
+      "status": 200,
+      "ms": 1116,
+      "at": "2026-07-17T11:18:53.558Z"
+    },
+    {
+      "flow": "billA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 282,
+      "at": "2026-07-17T11:18:53.840Z"
+    },
+    {
+      "flow": "billA.onboard_complete",
+      "ok": "0d4e2500-6092-4e97-be89-1f44d649bb81",
+      "status": 200,
+      "ms": 199,
+      "tenantId": "0d4e2500-6092-4e97-be89-1f44d649bb81",
+      "at": "2026-07-17T11:18:54.040Z"
+    },
+    {
+      "flow": "billing.get",
+      "ok": true,
+      "status": 200,
+      "ms": 2143,
+      "at": "2026-07-17T11:18:56.183Z"
+    },
+    {
+      "flow": "billing.stripe_keys",
+      "ok": false,
+      "error": "STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET not set in cert env",
+      "at": "2026-07-17T11:18:56.183Z"
+    }
+  ],
+  "hash": "1bafb47cb80cf5f4",
+  "decision": "BLOCKED_EXTERNAL",
+  "forceBlockedExternal": true,
+  "blocker": "Stripe test keys not configured in local cert environment; billing GET surface exercised without checkout/webhook live."
+}

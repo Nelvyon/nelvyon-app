@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-07-17T09:58:12.097Z",
+  "label": "privileged_write_gate",
+  "command": "node C:\\Proyectos\\Nelvyon\\nelvyon-app\\scripts\\check-saas-privileged-write.mjs",
+  "cwd": "C:\\Proyectos\\Nelvyon\\nelvyon-app",
+  "exitCode": 0,
+  "ok": true,
+  "durationMs": 57,
+  "stdoutTail": "✅ Privileged SaaS mutations require settings.write\n",
+  "stderrTail": ""
+}

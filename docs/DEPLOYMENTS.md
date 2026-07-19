@@ -1,6 +1,6 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: 2026-07-09
+> Registrar cada deploy significativo. Actualizado: **2026-07-19**
 
 ---
 
@@ -18,6 +18,17 @@
 | Errores | |
 | Rollback | sí/no — cómo |
 ```
+
+---
+
+## 2026-07-19 — Final Elite repo closure (código)
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Security headers SSOT · migrate-pg splitter · SEO OG/sitemap/robots/schema · CI cleanup · Workforce PASS intacto |
+| **Evidencia** | `tsc` OK · securityHeaders tests · validate-post-elite 508–514 · `workforce_certification.json` PASS |
+| **Deploy prod** | **No ejecutado desde agente** — requiere Railway/CEO |
+| **Pendiente ops** | SES production · Stripe prod · mig 514 staging · Cloudflare |
 
 ---
 

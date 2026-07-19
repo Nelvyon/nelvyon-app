@@ -1,0 +1,87 @@
+{
+  "module": "saas.auth.jwt",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T10:31:44.377Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 9,
+    "fail": 0,
+    "flows": 9
+  },
+  "meta": {
+    "email": "cert-auth-1aca6386@nelvyon.test",
+    "userId": "4110edb8-2cc9-4d1f-9c64-66724e35bf5d"
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 124,
+      "at": "2026-07-17T10:31:44.504Z"
+    },
+    {
+      "flow": "auth.register_validation",
+      "ok": true,
+      "status": 400,
+      "ms": 15852,
+      "at": "2026-07-17T10:32:00.356Z"
+    },
+    {
+      "flow": "auth.register",
+      "ok": true,
+      "status": 200,
+      "ms": 1062,
+      "hasToken": true,
+      "hasCookie": true,
+      "userId": "4110edb8-2cc9-4d1f-9c64-66724e35bf5d",
+      "at": "2026-07-17T10:32:01.419Z"
+    },
+    {
+      "flow": "auth.register_duplicate_409",
+      "ok": true,
+      "status": 409,
+      "ms": 417,
+      "at": "2026-07-17T10:32:01.837Z"
+    },
+    {
+      "flow": "auth.login_bad_401",
+      "ok": true,
+      "status": 401,
+      "ms": 1920,
+      "at": "2026-07-17T10:32:03.757Z"
+    },
+    {
+      "flow": "auth.login",
+      "ok": true,
+      "status": 200,
+      "ms": 370,
+      "hasCookie": true,
+      "at": "2026-07-17T10:32:04.127Z"
+    },
+    {
+      "flow": "auth.saas_api_401_no_token",
+      "ok": true,
+      "status": 401,
+      "ms": 15,
+      "at": "2026-07-17T10:32:04.145Z"
+    },
+    {
+      "flow": "auth.saas_api_with_token_no_500",
+      "ok": true,
+      "status": 404,
+      "ms": 4315,
+      "note": "200 requires saas_tenants onboarding; 401/403/404 acceptable for auth-module scope",
+      "at": "2026-07-17T10:32:08.460Z"
+    },
+    {
+      "flow": "auth.logout_endpoint",
+      "ok": true,
+      "status": 200,
+      "ms": 955,
+      "at": "2026-07-17T10:32:09.415Z"
+    }
+  ],
+  "hash": "547b6c7855391776",
+  "decision": "CERTIFIED"
+}

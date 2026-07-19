@@ -87,8 +87,10 @@
 |-------------|--------|-----------|-------|
 | OpenAI | 🟡 | `OPENAI_API_KEY` | Packs, LlmClient |
 | Anthropic | 🟡 | `ANTHROPIC_API_KEY` | Private AI provider |
-| Ollama (local) | 🟡 | `OLLAMA_CONFIGURED` | Private AI |
-| **OpenClaw** | ❌ | `NELVYON_OPENCLAW_BRIDGE_*` | Bridge deshabilitado |
+| Ollama (local) | 🟡 | `OLLAMA_CONFIGURED` | Private AI + Router |
+| **MCP Productivo** | ✅ | `NELVYON_MCP_PRODUCTIVE_ENABLED` | `/api/saas/mcp` — **CERTIFIED** (`mcp_certification_final.json`) |
+| **OpenClaw** | 🟡 | `NELVYON_OPENCLAW_BRIDGE_*` + Memory | HttpOpenClawBridge listo; OFF hasta ops URL |
+| **Shared Memory** | 🟡 | `NELVYON_SHARED_MEMORY_ENABLED` | Runtime mig 514; flag OFF default |
 
 ---
 

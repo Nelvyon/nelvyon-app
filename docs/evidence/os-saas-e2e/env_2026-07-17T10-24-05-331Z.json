@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-07-17T10:24:05.411Z",
+  "commit": "a67a8501dc1b732d37cc08f7dc1a9295b82548a8",
+  "commitShort": "a67a8501",
+  "branch": "main",
+  "node": "v24.18.0",
+  "platform": "win32",
+  "docker": {
+    "ok": true,
+    "containers": [
+      "nelvyon-test-redis",
+      "nelvyon-test-postgres",
+      "nelvyon-local-ai-postgres",
+      "n8n-n8n-1"
+    ],
+    "error": null
+  },
+  "databaseUrlSet": true,
+  "jwtSecretSet": true,
+  "playwrightBaseUrl": null,
+  "note": "SaaS Playwright suite mocks /api/saas/* — classify as UI_CONTRACT unless LIVE_DB=1"
+}

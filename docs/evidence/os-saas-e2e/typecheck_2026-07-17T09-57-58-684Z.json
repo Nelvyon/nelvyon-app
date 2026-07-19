@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-07-17T09:58:11.902Z",
+  "label": "typecheck",
+  "command": "pnpm exec tsc --noEmit",
+  "cwd": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\apps\\web",
+  "exitCode": 0,
+  "ok": true,
+  "durationMs": 13058,
+  "stdoutTail": "",
+  "stderrTail": ""
+}

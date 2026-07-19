@@ -1,0 +1,65 @@
+{
+  "tag": "production_readiness",
+  "timestamp": "2026-07-17T11:43:35.241Z",
+  "decision": "NOT_PRODUCTION_READY",
+  "internalReady": true,
+  "externalBlockers": [
+    "SES: faltan claves env (SES_FROM_EMAIL + access/secret o aliases AWS_SES_*)",
+    "SES KI-014: ProductionAccessEnabled debe ser true en AWS (sandbox/DENIED bloquea campañas reales)",
+    "Stripe: faltan STRIPE_SECRET_KEY|STRIPE_API_KEY + WEBHOOK_SECRET + PRICE_ID_STARTER/PRO/AGENCY",
+    "OS packs E2E: STAGING_BASE_URL / STAGING_E2E_EMAIL no configurados",
+    "OS packs autónomos: OPENAI_API_KEY o OLLAMA_HOST/NELVYON_LOCAL_AI_URL (requerido si AUTONOMOUS_PRODUCTION=true)"
+  ],
+  "checks": [
+    {
+      "id": "env.jwt_secret",
+      "ok": true
+    },
+    {
+      "id": "env.database_url",
+      "ok": true
+    },
+    {
+      "id": "env.cron_secret",
+      "ok": false
+    },
+    {
+      "id": "env.ses",
+      "ok": false,
+      "note": "KI-014 production access still external if sandbox"
+    },
+    {
+      "id": "env.stripe",
+      "ok": false
+    },
+    {
+      "id": "env.openai_or_ollama",
+      "ok": false
+    },
+    {
+      "id": "env.staging",
+      "ok": false
+    },
+    {
+      "id": "artifact.global_cert",
+      "ok": true
+    },
+    {
+      "id": "artifact.restore_drill",
+      "ok": true
+    },
+    {
+      "id": "artifact.live_multitenant",
+      "ok": true
+    },
+    {
+      "id": "gate.global_cert_pass",
+      "ok": true
+    },
+    {
+      "id": "gate.restore_drill_pass",
+      "ok": true
+    }
+  ],
+  "hash": "462e653a1c32bcfd"
+}

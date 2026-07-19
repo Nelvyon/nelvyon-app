@@ -14,8 +14,12 @@ NELVYON-LANDING, NELVYON-SEO, NELVYON-CHATBOT
 
 ## IA privada local (Fase 2)
 - PostgreSQL+pgvector @ 127.0.0.1:5434
-- Ollama: llama3.2:3b-instruct-q4_K_M
-- Embeddings: nomic-embed-text (768 dim)
+- Código de validación RAG interno: **NELVYON-RAG-SMOKE-2026** (solo corpus autorizado)
+- Ollama: llama3.1:8b-instruct-q4_K_M (live) / llama3.2:3b-instruct-q4_K_M
+- Embeddings: mxbai-embed-large (1024) / nomic-embed-text (768)
+- Unified RAG facade + Shared Memory + MCP productivo
+- Workforce autónoma: `nelvyonAutonomousWorkforceCertified=true` (PASS 2026-07-19)
+- Orquestador: daemon + persist + soak; OpenClaw mock certificado
 - RLS por tenant, FORCE ROW LEVEL SECURITY
 - Rol app: nelvyon_local_app (NOBYPASSRLS)
 

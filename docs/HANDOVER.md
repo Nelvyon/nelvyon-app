@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.**  
-> Última actualización: **2026-07-19** — Workforce **PASS** · `nelvyonAutonomousWorkforceCertified=true`
+> Última actualización: **2026-07-19** — Final Elite repo polish · Workforce PASS intacto
 
 ---
 
@@ -9,19 +9,20 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Fase 1** | Interno READY · prod SES/Stripe = ops externo (no bloquea workforce cert) |
-| **Fase 2 Elite** | **PASS** repo · no romper |
-| **Workforce** | **PASS** · 10/10 required · skipped=0 · live Ollama/RAG · soak · build · mock OpenClaw |
-| **Artefacto** | `backend/local-ai/benchmarks/workforce_certification.json` |
-| **Freeze** | Router / MCP / Specialization / Elite **intactos** |
+| **Workforce** | **PASS** · `nelvyonAutonomousWorkforceCertified=true` |
+| **Fase 2 Elite** | **PASS** · no romper |
+| **Repo polish** | Headers SSOT · SEO OG/sitemap/robots/schema · migrate-pg splitter · CI PR-only minimal · mig validator 514 |
+| **Prod email** | **Bloqueado** KI-014 SES production access |
+| **Freeze** | Router / MCP / Specialization / Elite / Workforce |
 
 ---
 
 ## Próximo paso EXACTO
 
-1. **Ops Phase-1 (externos):** SES production + Stripe prod · mig 514 staging · Docker/pgvector residual (KI-016/018) — no invalidan Workforce PASS  
-2. **Opcional:** `NELVYON_OPENCLAW_BRIDGE_URL` real cuando haya bridge autorizado (mock ya certificado)  
-3. Re-ejecutar `node scripts/run-workforce-cert.mjs` tras cambios que toquen orquestador/agentes/RAG para regenerar evidencia  
+1. **CEO / ops:** apelación SES production (`docs/SES_PRODUCTION_ACCESS_APPEAL.md`) + Stripe prod keys/webhook  
+2. Aplicar/verificar mig **514** en staging Railway  
+3. Cloudflare DNS/WAF + primer backup programado con `DATABASE_URL` secret  
+4. Deploy Railway del commit de cierre (no hecho desde agente)
 
 ---
 
@@ -29,5 +30,8 @@
 
 ```powershell
 node scripts/run-workforce-cert.mjs
-# Esperado: verdict=PASS · nelvyonAutonomousWorkforceCertified=true · skippedCount=0
+node scripts/validate-post-elite-migrations.mjs
+pnpm -C apps/web exec vitest run src/__tests__/securityHeaders.ssot.test.ts --reporter=dot
 ```
+
+Informe: `docs/FINAL_ELITE_CLOSURE.md`

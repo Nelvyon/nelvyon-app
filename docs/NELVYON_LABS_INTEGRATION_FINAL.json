@@ -1,0 +1,91 @@
+{
+  "generatedAt": "2026-07-15T20:39:07.339Z",
+  "router": "ROUTER DE MODELOS NELVYON COMPLETADO",
+  "block1Security": "closed",
+  "openClawOrchestratorAgents": "blocked_until_mcp_policy_complete",
+  "totals": {
+    "evaluatedReserves": 46,
+    "integrado": [
+      "trivy",
+      "gitleaks"
+    ],
+    "integrado_parcialmente": [
+      "mcp-sdk-typescript",
+      "uptime-kuma",
+      "ntfy",
+      "tesseract",
+      "cheerio",
+      "ffmpeg",
+      "whisper",
+      "fontsource"
+    ],
+    "sustituido": [
+      "mcp-sdk-python",
+      "llamaindex",
+      "mem0",
+      "bullmq",
+      "prometheus",
+      "docker",
+      "traefik",
+      "compose",
+      "chatwoot",
+      "atomic-crm",
+      "email-suppression-db",
+      "umami",
+      "faster-whisper",
+      "tailwindcss",
+      "strapi",
+      "playwright",
+      "typescript",
+      "fastapi",
+      "playwright-browsers"
+    ],
+    "descartado": [
+      "hayhooks",
+      "instructor",
+      "trigger-dev",
+      "kanboard",
+      "mattermost",
+      "goaccess",
+      "evidence-dev",
+      "cube",
+      "growthbook",
+      "stirling-pdf",
+      "opencv",
+      "ghost",
+      "cal-com",
+      "bookstack",
+      "hoppscotch",
+      "excalidraw",
+      "chromedp"
+    ]
+  },
+  "counts": {
+    "integrado": 2,
+    "integrado_parcialmente": 8,
+    "sustituido": 19,
+    "descartado": 17
+  },
+  "integrationPctReal": 21.7,
+  "note": "Porcentaje = (integrado + parcial) / 46. Sustituidos mejoran NELVYON vía stack propio sin vendor.",
+  "newCapabilities": [
+    "CI Trivy fs CRITICAL/HIGH",
+    "Security scan adapter + flags",
+    "Observability probe blueprint (optional Uptime Kuma)",
+    "MCP TS adapter contract (flag, no OpenClaw)",
+    "Optional OCR/ffmpeg/whisper/ntfy/cheerio/fontsource contracts"
+  ],
+  "resources": {
+    "ramRuntimeDeltaMb": 0,
+    "vramDeltaMb": 0,
+    "diskProductDeltaMb": "<5 (adapters+docs)",
+    "newPersistentServices": 0
+  },
+  "security": {
+    "noVendorCopy": true,
+    "licensesReviewed": true,
+    "blockedDuplicates": 167,
+    "blockedLicense": 95,
+    "blockedIncompatible": 7
+  }
+}

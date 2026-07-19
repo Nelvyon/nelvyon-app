@@ -61,7 +61,9 @@
 ### AI / Agents (opcionales según módulos activos)
 | Variable | Notas |
 |---|---|
-| `OPENAI_API_KEY` | Si se usa GPT para agentes |
+| `OPENAI_API_KEY` | Opcional si hay Ollama; packs/agentes cloud |
+| `OLLAMA_CONFIGURED` | Preferido para packs autónomos (`=1` + Ollama en host) |
+| `OLLAMA_BASE_URL` | Endpoint Ollama si no es localhost por defecto |
 | `ANTHROPIC_API_KEY` | Si se usa Claude para agentes |
 | `ELEVENLABS_API_KEY` | Para voice/dialer |
 

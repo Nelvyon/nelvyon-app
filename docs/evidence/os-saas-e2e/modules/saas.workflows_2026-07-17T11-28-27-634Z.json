@@ -1,0 +1,103 @@
+{
+  "module": "saas.workflows",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:28:27.634Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 13,
+    "fail": 0,
+    "flows": 13
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:28:09.101Z"
+    },
+    {
+      "flow": "recertWfA.register",
+      "ok": true,
+      "status": 200,
+      "ms": 5395,
+      "at": "2026-07-17T11:28:14.499Z"
+    },
+    {
+      "flow": "recertWfA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 3452,
+      "at": "2026-07-17T11:28:17.951Z"
+    },
+    {
+      "flow": "recertWfA.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 3042,
+      "tenantId": "962c6cd4-6a9b-4ac7-8e8e-7e5609b50357",
+      "at": "2026-07-17T11:28:20.993Z"
+    },
+    {
+      "flow": "recertWfB.register",
+      "ok": true,
+      "status": 200,
+      "ms": 1503,
+      "at": "2026-07-17T11:28:22.497Z"
+    },
+    {
+      "flow": "recertWfB.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 486,
+      "at": "2026-07-17T11:28:22.983Z"
+    },
+    {
+      "flow": "recertWfB.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 361,
+      "tenantId": "afad2294-9f47-4cfd-bb32-db2ef6794164",
+      "at": "2026-07-17T11:28:23.346Z"
+    },
+    {
+      "flow": "wf.meta",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:28:26.492Z"
+    },
+    {
+      "flow": "wf.create",
+      "ok": "3b447860-5f56-469b-9f7c-890c695400dd",
+      "status": 201,
+      "id": "3b447860-5f56-469b-9f7c-890c695400dd",
+      "at": "2026-07-17T11:28:26.822Z"
+    },
+    {
+      "flow": "wf.list_a",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:28:27.611Z"
+    },
+    {
+      "flow": "wf.isolation",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:28:27.611Z"
+    },
+    {
+      "flow": "wf.ses_flag_present",
+      "ok": true,
+      "ses_configured": false,
+      "at": "2026-07-17T11:28:27.611Z"
+    },
+    {
+      "flow": "wf.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:28:27.634Z"
+    }
+  ],
+  "hash": "aefbe02a178d4ef6",
+  "decision": "CERTIFIED",
+  "note": "re-certified after jsonb parseJsonField harden"
+}

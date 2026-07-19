@@ -1,0 +1,30 @@
+{
+  "module": "saas.auth.sso",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:19:21.426Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 1,
+    "fail": 1,
+    "flows": 2
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 123,
+      "at": "2026-07-17T11:19:21.425Z"
+    },
+    {
+      "flow": "external.dependency",
+      "ok": false,
+      "error": "External IdP (SAML/OIDC) not configured in cert env",
+      "at": "2026-07-17T11:19:21.425Z"
+    }
+  ],
+  "hash": "e86f36a86919db1a",
+  "decision": "BLOCKED_EXTERNAL",
+  "forceBlockedExternal": true,
+  "blocker": "External IdP (SAML/OIDC) not configured in cert env"
+}

@@ -1,0 +1,63 @@
+{
+  "module": "portal.client",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:17:05.284Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 7,
+    "fail": 0,
+    "flows": 7
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 126,
+      "at": "2026-07-17T11:16:54.547Z"
+    },
+    {
+      "flow": "portalA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwODYwY2NmMy03ZTNkLTQ1OGQtYTM5NS04YjhmZTlmNzJhNzYiLCJlbWFpbCI6ImNlcnQtcG9ydGFsYS1mNjliMDUyZkBuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6IjI5NGU1N2EyLTQ5NDItNDM1Mi1iOWZiLWQzZmI1NTk2NDMwMyIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MDE1LCJleHAiOjE3ODQ4OTE4MTV9.uxR4X1OgPJCM6vTt68ILOGdKAxWoWuacJnjXdbjCtbE",
+      "status": 200,
+      "ms": 1104,
+      "at": "2026-07-17T11:16:55.651Z"
+    },
+    {
+      "flow": "portalA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 324,
+      "at": "2026-07-17T11:16:55.976Z"
+    },
+    {
+      "flow": "portalA.onboard_complete",
+      "ok": "d11667b3-7dd7-4c40-9e78-701cadcbacae",
+      "status": 200,
+      "ms": 308,
+      "tenantId": "d11667b3-7dd7-4c40-9e78-701cadcbacae",
+      "at": "2026-07-17T11:16:56.284Z"
+    },
+    {
+      "flow": "portal.entregables_list",
+      "ok": true,
+      "status": 200,
+      "ms": 2493,
+      "at": "2026-07-17T11:16:58.777Z"
+    },
+    {
+      "flow": "portal.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:16:58.786Z"
+    },
+    {
+      "flow": "portal.page",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-17T11:17:05.284Z"
+    }
+  ],
+  "hash": "508786f97be136b2",
+  "decision": "CERTIFIED"
+}

@@ -1,0 +1,61 @@
+﻿
+ RUN  v4.1.10 C:/Proyectos/Nelvyon/nelvyon-app/apps/web
+
+node.exe : stderr | ../../backend/saas/__tests__/saasDeals.test.ts > SaasDealsService > changeStage a won pone 
+probability 100
+En C:\Users\Daniel\AppData\Roaming\npm\pnpm.ps1: 24 Carácter: 5
++     & "node$exe"  "$basedir/node_modules/pnpm/bin/pnpm.mjs" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | ../../...probability 100:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[workflow-dispatch] deal_stage_changed failed {
+  tenantId: 't1',
+  dealId: 'd-1',
+  err: Error: Cannot find module './SaasDealsService'
+  Require stack:
+  - C:\Proyectos\Nelvyon\nelvyon-app\backend\saas\SaasWorkflowService.ts
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1122:12)
+      at Module._load (node:internal/modules/cjs/loader:1294:5)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1617:12)
+      at require (node:internal/modules/helpers:153:16)
+      at getSaasWorkflowService (C:/Proyectos/Nelvyon/nelvyon-app/backend/saas/SaasWorkflowService.ts:853:34)
+      at dispatchDealStageChanged (C:/Proyectos/Nelvyon/nelvyon-app/backend/saas/saasWorkflowDispatch.ts:154:11) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      'C:\\Proyectos\\Nelvyon\\nelvyon-app\\backend\\saas\\SaasWorkflowService.ts'
+    ]
+  }
+}
+
+stderr | ../../backend/saas/__tests__/saasDeals.test.ts > API /api/saas/deals > POST ÔåÆ 201 crea deal
+[2m2026-07-17T10:45:57.720Z[0m [33mWARN[0m [36m[saas-request-context][0m custom permissions lookup failed ÔÇö 
+falling back to role RBAC [2m{"tenantId":"tenant-1","operation":"getCustomPermissions","error":"invalid input syntax 
+for type uuid: \"tenant-1\""}[0m
+
+stderr | ../../backend/saas/__tests__/saasDeals.test.ts > API /api/saas/deals > POST ÔåÆ 201 crea deal
+[2m2026-07-17T10:45:57.731Z[0m [33mWARN[0m [36m[saas-request-context][0m IP allowlist lookup failed ÔÇö skipping 
+check [2m{"tenantId":"tenant-1","operation":"getIpAllowlist","error":"invalid input syntax for type uuid: 
+\"tenant-1\""}[0m
+
+stderr | ../../backend/saas/__tests__/saasDeals.test.ts > API /api/saas/deals > GET metrics ÔåÆ 200
+[2m2026-07-17T10:45:57.741Z[0m [33mWARN[0m [36m[saas-request-context][0m custom permissions lookup failed ÔÇö 
+falling back to role RBAC [2m{"tenantId":"tenant-1","operation":"getCustomPermissions","error":"invalid input syntax 
+for type uuid: \"tenant-1\""}[0m
+
+stderr | ../../backend/saas/__tests__/saasDeals.test.ts > API /api/saas/deals > GET metrics ÔåÆ 200
+[2m2026-07-17T10:45:57.750Z[0m [33mWARN[0m [36m[saas-request-context][0m IP allowlist lookup failed ÔÇö skipping 
+check [2m{"tenantId":"tenant-1","operation":"getIpAllowlist","error":"invalid input syntax for type uuid: 
+\"tenant-1\""}[0m
+
+┬À┬À┬À┬À┬À┬À┬À
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  12:45:44
+   Duration  13.11s (transform 8.67s, setup 145ms, import 12.00s, tests 67ms, environment 739ms)
+

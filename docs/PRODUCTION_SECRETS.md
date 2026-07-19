@@ -72,7 +72,9 @@ Fallan validación crítica o impiden operación core si faltan.
 | `TRACKING_SECRET` | Web | HMAC open/click email; fallback: `JWT_SECRET` |
 | `NEXT_PUBLIC_SENTRY_DSN` | Web | Errores cliente — emparejar con `SENTRY_DSN` |
 | `SENTRY_DSN` | Web (+ API) | Errores servidor Python/Node |
-| `OPENAI_API_KEY` | Web (+ API) | Agentes IA, packs OS, inbox agent |
+| `OPENAI_API_KEY` | Web (+ API) | **Opcional** — agentes/packs cloud; preferir Ollama local |
+| `OLLAMA_CONFIGURED` | Web | `1` = runtime local listo (packs autónomos / Private AI) |
+| `OLLAMA_BASE_URL` / `OLLAMA_HOST` | Web | Endpoint Ollama (default `http://127.0.0.1:11434`) |
 | `OAUTH_ENCRYPTION_KEY` | Web | Cifrado tokens OAuth en reposo |
 | `API_KEYS_ENCRYPTION_SECRET` | Web | Cifrado API keys por tenant |
 
@@ -88,9 +90,9 @@ Solo configurar si el módulo está activo en prod.
 | **Voice / Twilio** | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` |
 | **Meta / Google ads** | `META_*`, `GOOGLE_ADS_*`, `GOOGLE_CLIENT_*` |
 | **PostHog** | `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` |
-| **Private AI** | `OLLAMA_BASE_URL`, `NELVYON_AI_MODE`, … |
+| **Private AI** | `OLLAMA_CONFIGURED=1`, `OLLAMA_BASE_URL`, `NELVYON_AI_ENABLED`, `NELVYON_AI_MODE`, … |
 | **Portal storage** | `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (signed URLs entregables) |
-| **Autonomous OS** | `AUTONOMOUS_PRODUCTION`, `GA4_PROPERTY_ID`, … |
+| **Autonomous OS** | `AUTONOMOUS_PRODUCTION`, `GA4_PROPERTY_ID`, … (LLM: Ollama-first; `OPENAI_API_KEY` opcional) |
 
 Ver `apps/web/.env.example` y `backend/.env.railway.example` para lista extendida.
 

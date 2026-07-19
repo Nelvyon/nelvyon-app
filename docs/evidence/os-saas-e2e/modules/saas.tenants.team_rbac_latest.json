@@ -1,0 +1,74 @@
+{
+  "module": "saas.tenants.team_rbac",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:16:29.069Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 8,
+    "fail": 0,
+    "flows": 8
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 124,
+      "at": "2026-07-17T11:16:23.284Z"
+    },
+    {
+      "flow": "rbacOwner.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWYxZjQwMC1mOGZkLTQzMTQtODYwMi01ZGY0YjA1YTIzZjMiLCJlbWFpbCI6ImNlcnQtcmJhY293bmVyLTUyN2YyM2Y0QG5lbHZ5b24udGVzdCIsInRlbmFudElkIjoiNTFiZjEzN2ItNTQzYy00YTkwLTk3YzAtODIzNWI2NDgwM2Q2IiwicGxhbiI6ImZyZWUiLCJpYXQiOjE3ODQyODY5ODMsImV4cCI6MTc4NDg5MTc4M30.IDIvsfA3jeOpvT47pylmtgUE8gBMPuoT1g0oQBSckLE",
+      "status": 200,
+      "ms": 1110,
+      "at": "2026-07-17T11:16:24.390Z"
+    },
+    {
+      "flow": "rbacOwner.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 310,
+      "at": "2026-07-17T11:16:24.700Z"
+    },
+    {
+      "flow": "rbacOwner.onboard_complete",
+      "ok": "7bb8ea10-c2f8-43b3-904c-72e9a11b5d6a",
+      "status": 200,
+      "ms": 331,
+      "tenantId": "7bb8ea10-c2f8-43b3-904c-72e9a11b5d6a",
+      "at": "2026-07-17T11:16:25.032Z"
+    },
+    {
+      "flow": "rbac.team_get",
+      "ok": true,
+      "status": 200,
+      "ms": 2060,
+      "note": "owner can read team surface",
+      "at": "2026-07-17T11:16:27.092Z"
+    },
+    {
+      "flow": "rbac.invite_or_surface",
+      "ok": true,
+      "status": 201,
+      "ms": 120,
+      "body": "{\"member\":{\"id\":\"768cde2d-4e1f-44fe-902e-0528e956c0c0\",\"tenantId\":\"7bb8ea10-c2f8-43b3-904c-72e9a11b5d6a\",\"userId\":null,\"",
+      "at": "2026-07-17T11:16:27.212Z"
+    },
+    {
+      "flow": "rbac.owner_api_keys_write",
+      "ok": true,
+      "status": 201,
+      "ms": 1841,
+      "at": "2026-07-17T11:16:29.053Z"
+    },
+    {
+      "flow": "rbac.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-17T11:16:29.069Z"
+    }
+  ],
+  "hash": "a07320dca88a7abe",
+  "decision": "CERTIFIED",
+  "note": "Viewer escalation covered by saasS35Security + privilegedSettingsWriteRbac unit suites"
+}

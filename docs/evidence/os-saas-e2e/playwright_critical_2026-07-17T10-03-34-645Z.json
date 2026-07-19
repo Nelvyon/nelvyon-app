@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-07-17T10:03:34.645Z",
+  "tag": "playwright_saas_critical_ui",
+  "commit": "a67a8501",
+  "environment": "local_dev_mocked_apis",
+  "classification": "UI_CONTRACT_PASS_NOT_LIVE_DB",
+  "specs": [
+    "saas-auth",
+    "saas-crm",
+    "saas-pipeline",
+    "saas-workflows",
+    "saas-billing",
+    "saas-campanias",
+    "saas-entregables",
+    "a11y-core-routes"
+  ],
+  "totals": {
+    "passed": 53,
+    "failed": 0,
+    "durationApproxSec": 72
+  },
+  "note": "fixtures.ts mocks /api/saas/* — not multi-tenant live Postgres E2E",
+  "evidenceConsole": "docs/evidence/os-saas-e2e/playwright_critical_console.txt"
+}

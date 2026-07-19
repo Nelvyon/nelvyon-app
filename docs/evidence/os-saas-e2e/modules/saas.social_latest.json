@@ -1,0 +1,58 @@
+{
+  "module": "saas.social",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:19:13.332Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 5,
+    "fail": 1,
+    "flows": 6
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 135,
+      "at": "2026-07-17T11:19:11.498Z"
+    },
+    {
+      "flow": "socA.register",
+      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YjU2NDM5MS1jODY1LTQyMjYtYTc5OS1iZWYxYWY5YzAyNDQiLCJlbWFpbCI6ImNlcnQtc29jYS1lNzAzMzNkYUBuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6ImNmN2IyMGY1LTg4Y2EtNDZhMC04ODYzLTc0YjBkMTlhYTBlOSIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MTUxLCJleHAiOjE3ODQ4OTE5NTF9.sTR7UZF-T5RMsNaIf07HuT3LBspXjEMjg3FIaTOT6ZE",
+      "status": 200,
+      "ms": 1143,
+      "at": "2026-07-17T11:19:12.641Z"
+    },
+    {
+      "flow": "socA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 239,
+      "at": "2026-07-17T11:19:12.881Z"
+    },
+    {
+      "flow": "socA.onboard_complete",
+      "ok": "3b90a2d2-e769-419a-aeb3-0df04d51c2f7",
+      "status": 200,
+      "ms": 214,
+      "tenantId": "3b90a2d2-e769-419a-aeb3-0df04d51c2f7",
+      "at": "2026-07-17T11:19:13.095Z"
+    },
+    {
+      "flow": "social.surface",
+      "ok": true,
+      "status": 404,
+      "at": "2026-07-17T11:19:13.332Z"
+    },
+    {
+      "flow": "external.dependency",
+      "ok": false,
+      "error": "Social OAuth publish not connected in cert env",
+      "at": "2026-07-17T11:19:13.332Z"
+    }
+  ],
+  "hash": "ad651261fdefdbc2",
+  "decision": "BLOCKED_EXTERNAL",
+  "forceBlockedExternal": true,
+  "blocker": "Social OAuth publish not connected in cert env"
+}

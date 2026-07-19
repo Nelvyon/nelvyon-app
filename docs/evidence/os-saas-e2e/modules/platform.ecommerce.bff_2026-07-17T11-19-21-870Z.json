@@ -1,0 +1,30 @@
+{
+  "module": "platform.ecommerce.bff",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-17T11:19:21.870Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "totals": {
+    "pass": 1,
+    "fail": 1,
+    "flows": 2
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 145,
+      "at": "2026-07-17T11:19:21.870Z"
+    },
+    {
+      "flow": "external.dependency",
+      "ok": false,
+      "error": "Ecommerce BFF requires external store credentials",
+      "at": "2026-07-17T11:19:21.870Z"
+    }
+  ],
+  "hash": "4550d073c4c8aa40",
+  "decision": "BLOCKED_EXTERNAL",
+  "forceBlockedExternal": true,
+  "blocker": "Ecommerce BFF requires external store credentials"
+}
