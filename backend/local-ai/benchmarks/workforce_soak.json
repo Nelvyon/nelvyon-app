@@ -1,0 +1,11 @@
+{
+  "soakMs": 8000,
+  "ticks": 29923,
+  "jobs": 24,
+  "succeeded": 21,
+  "dead_letter": 3,
+  "queued_remaining": 0,
+  "running_leaked": 0,
+  "jobsProcessed": 27,
+  "ok": true
+}
