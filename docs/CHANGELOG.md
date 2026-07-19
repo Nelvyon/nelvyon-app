@@ -8,6 +8,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Brain | **Fase knowledge (cierre honesto)** | Orphan classification + archive **49** → `docs/archive/` · agent domains · gap detector+ingestEvidence · manifest **217**/unique **192**/orphans **86**/coverage **0.65**/claimComplete **false** · ingest `verified:false` (Docker) · `NELVYON_BRAIN_KNOWLEDGE.md` |
 | Brain | **Conocimiento NELVYON** | Manifest ampliado (ADR/CHANGELOG/workforce/…) · packs entrepreneurship/security · gap detector · external registry · checksum skip · Nelvyon-first AgentContext · CI sync · `NELVYON_BRAIN_KNOWLEDGE.md` |
 | Elite closure | **Repo polish** | Security headers SSOT · migrate-pg splitter (KI-017) · SEO OG/sitemap/robots/schema/logo.svg · CI cleanup · docs INFRA/DEPLOY/ROADMAP · `FINAL_ELITE_CLOSURE.md` |
 | Workforce | **PASS certificado** | Residuals Product/DevOps/Social · workflow audit 45 · OpenClaw mock · RAG isolation · soak daemon · live Ollama/RAG auto · production build en gate · `nelvyonAutonomousWorkforceCertified=true` · skipped=0 · force-pass rechazado · KI-019→historial |
