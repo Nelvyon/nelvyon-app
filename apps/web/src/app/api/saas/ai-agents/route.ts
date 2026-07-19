@@ -48,6 +48,52 @@ export async function GET(req: Request) {
         status: agentRegistryStatus(),
       });
     }
+    if (resource === "workflows") {
+      const { workflowCatalogStatus, listCertifiedWorkflows } = await import("../../../../../../../backend/agents/workforce/workflowCatalog");
+      return NextResponse.json({
+        ...workflowCatalogStatus(),
+        workflows: listCertifiedWorkflows().map((w: { id: string; domain: string; title: string; pattern: string; agents: string[]; requiresHumanApproval: boolean; sloMs: number }) => ({
+          id: w.id,
+          domain: w.domain,
+          title: w.title,
+          pattern: w.pattern,
+          agents: w.agents,
+          requiresHumanApproval: w.requiresHumanApproval,
+          sloMs: w.sloMs,
+        })),
+      });
+    }
+    if (resource === "leaderboard") {
+      const { listLeaderboardEntries, leaderboardForCapability } = await import("../../../../../../../backend/agents/workforce/leaderboard");
+      const capability = url.searchParams.get("capability") ?? "task_success";
+      return NextResponse.json({
+        capability,
+        ranking: leaderboardForCapability(capability as "task_success"),
+        all: listLeaderboardEntries().slice(-100),
+      });
+    }
+    if (resource === "canaries") {
+      const { listCanaries } = await import("../../../../../../../backend/agents/workforce/canaryPipeline");
+      const { listImprovementProposals, listImprovementVersions } = await import("../../../../../../../backend/agents/improvement/controlledImprovement");
+      return NextResponse.json({
+        canaries: listCanaries(),
+        proposals: listImprovementProposals(),
+        versions: listImprovementVersions(),
+      });
+    }
+    if (resource === "runtime") {
+      const { isOrchestratorDaemonEnabled, readDaemonHealthFile } = await import("../../../../../../../backend/orchestrator/daemon");
+      const { getOrchestratorPersistDir } = await import("../../../../../../../backend/orchestrator/persistentStore");
+      const { isEmergencyStopped, getGlobalOperationMode } = await import("../../../../../../../backend/agents/workforce/operationModes");
+      const healthDir = process.env.NELVYON_ORCH_HEALTH_DIR?.trim() || getOrchestratorPersistDir();
+      return NextResponse.json({
+        daemonEnabled: isOrchestratorDaemonEnabled(),
+        emergencyStop: isEmergencyStopped(),
+        operationMode: getGlobalOperationMode(),
+        persistDir: getOrchestratorPersistDir(),
+        health: healthDir ? readDaemonHealthFile(healthDir) : null,
+      });
+    }
     if (resource === "get") {
       const id = url.searchParams.get("id");
       if (!id) return NextResponse.json({ error: "id_required" }, { status: 400 });

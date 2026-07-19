@@ -28,7 +28,7 @@ export default function SaasAiPanelPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [router, mcp, memory, agents, orch, metrics, unified] = await Promise.all([
+    const [router, mcp, memory, agents, orch, metrics, unified, workflows, runtime, canaries] = await Promise.all([
       fetchJson("/api/saas/private-ai/router-health"),
       fetchJson("/api/saas/mcp"),
       fetchJson("/api/saas/shared-memory?resource=status"),
@@ -36,6 +36,9 @@ export default function SaasAiPanelPage() {
       fetchJson("/api/saas/orchestrator?resource=status"),
       fetchJson("/api/saas/private-ai/metrics"),
       fetchJson("/api/saas/ai-agents?resource=status"),
+      fetchJson("/api/saas/ai-agents?resource=workflows"),
+      fetchJson("/api/saas/ai-agents?resource=runtime"),
+      fetchJson("/api/saas/ai-agents?resource=canaries"),
     ]);
 
     const agentCount = Array.isArray((agents.data as { agents?: unknown[] })?.agents)
@@ -120,9 +123,36 @@ export default function SaasAiPanelPage() {
       {
         id: "workflows",
         title: "Workflows enterprise",
-        href: "/api/saas/orchestrator",
-        ok: orch.ok,
-        body: "10 workflows sandbox-certificables (seo, CRM, support, informe…)",
+        href: "/api/saas/ai-agents?resource=workflows",
+        ok: workflows.ok,
+        body: workflows.ok
+          ? `${(workflows.data as { certified?: number }).certified ?? "—"} certificados · ${(workflows.data as { total?: number }).total ?? "—"} total`
+          : `HTTP ${workflows.status}`,
+      },
+      {
+        id: "runtime",
+        title: "Runtime / daemon",
+        href: "/api/saas/ai-agents?resource=runtime",
+        ok: runtime.ok,
+        body: runtime.ok
+          ? `daemon=${(runtime.data as { daemonEnabled?: boolean }).daemonEnabled ? "on" : "off"} · mode=${(runtime.data as { operationMode?: string }).operationMode ?? "—"} · kill=${(runtime.data as { emergencyStop?: boolean }).emergencyStop ? "ON" : "off"}`
+          : `HTTP ${runtime.status}`,
+      },
+      {
+        id: "canary",
+        title: "Canary / mejoras",
+        href: "/api/saas/ai-agents?resource=canaries",
+        ok: canaries.ok,
+        body: canaries.ok
+          ? `canaries=${Array.isArray((canaries.data as { canaries?: unknown[] }).canaries) ? (canaries.data as { canaries: unknown[] }).canaries.length : 0} · leaderboard /api/saas/ai-agents?resource=leaderboard`
+          : `HTTP ${canaries.status}`,
+      },
+      {
+        id: "leaderboard",
+        title: "Leaderboard por capacidad",
+        href: "/api/saas/ai-agents?resource=leaderboard",
+        ok: unified.ok,
+        body: "Ranking por capacidad (no score global engañoso)",
       },
     ]);
     setLoading(false);
