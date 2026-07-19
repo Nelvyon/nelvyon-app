@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-07-19
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Workforce | **Bloque A** | Inventario completo `AGENT_WORKFORCE_INVENTORY.md` · 17/23/30 IDs · aliases · gaps · organigrama mapeado · ADR-027 · sin agentes nuevos |
+
 ## 2026-07-17
 
 | Área | Cambio | Descripción |

@@ -52,7 +52,15 @@
 
 ---
 
-## Fase 2 — IA privada 100% local (2026-07-11)
+## Workforce IA autónoma (2026-07-19)
+
+- [x] Bloque A — auditoría e inventario (`docs/AGENT_WORKFORCE_INVENTORY.md`, ADR-027)
+- [ ] Bloque B — hierarchy + lifecycle + alias deprecation + schemas
+- [ ] Bloque C — runtime persistente (queue/recovery/kill switch)
+- [ ] Bloques D–F — certificar dominios (eng → growth → CS/finance)
+- [ ] Bloque G — leaderboard + canary promotion
+- [ ] Bloque H — gate `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED` con evidencia
+- [ ] Declarar **NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED=true** — solo con evidencia
 
 - [x] Auditoría hardware (`docs/PHASE2_HARDWARE_AUDIT.md`)
 - [x] Docker Compose Postgres+pgvector local

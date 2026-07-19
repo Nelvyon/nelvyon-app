@@ -297,3 +297,13 @@
 | **Consecuencias** | Harness `run-phase2-elite-cert.mjs` · CI siempre corre sandbox · live con `NELVYON_ELITE_LIVE=1` |
 | **Evidencia** | `phase2_elite_certification.json` v2 · `phase2_elite_live.json` · `phase2EliteLive.test.ts` |
 
+## ADR-027 — Autonomous workforce: hierarchy, aliases, ephemeral workers
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-19 |
+| **Decisión** | La fuerza de trabajo permanente es el Unified Registry (Private AI + designs). OS (~1634) y Autonomous (14) permanecen stacks separados. IDs canónicos: `google_ads`, `workflows`, `reporting`, `security_compliance` — deprecar aliases `sem_google_ads`, `automation`, `analytics`, `security`. Permanentes solo con tools+workflows+evals+permisos. Subtareas → workers efímeros del orquestador (sin memoria permanente por defecto). No mintar cientos de agentes decorativos. Gate `NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED` independiente de Phase 2 Elite. |
+| **Por qué** | Inventario Bloque A muestra 13 designs sin runtime, 7 agents sin eval, 4 aliases, y tool map incompleto; expandir sin consolidar multiplica deuda |
+| **Consecuencias** | Bloque B añade lifecycle/hierarchy metadata; Bloque C runtime persistente; promoción de `cto`/`marketing`/etc. solo tras criterios ADR |
+| **Evidencia** | `docs/AGENT_WORKFORCE_INVENTORY.md` |
+
