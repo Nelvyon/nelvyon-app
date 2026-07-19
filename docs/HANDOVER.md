@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.**  
-> Última actualización: **2026-07-19** — Brain: classify/archive orphans + agent domains; gap 0.65; ingest blocked (Docker)
+> Última actualización: **2026-07-19** — Brain orphan wave 2: 0 orphans; coverage 0.95; archived 93; ingest blocked (Docker)
 
 ---
 
@@ -10,7 +10,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Workforce / Elite** | **PASS** · no romper freezes |
-| **Brain knowledge** | Manifest **217** · unique **192** · `coverageRatioEstimate` **0.65** · `claimComplete` **false** · orphans **86** · archived **49** · ingest `verified:false` (Docker down) |
+| **Brain knowledge** | Manifest **263** · unique **234** · `coverageRatioEstimate` **0.95** · `claimComplete` **false** · orphans **0** · unclassified **0** · archived **93** · ingest `verified:false` (Docker down) |
 | **Informe brain** | `docs/NELVYON_BRAIN_KNOWLEDGE.md` |
 | **Prod email** | **Bloqueado** KI-014 SES production access |
 | **Freeze** | Router / MCP / Specialization / Elite / Workforce |
@@ -21,7 +21,7 @@
 
 1. Arrancar Docker Desktop + `docker compose -f backend/local-ai/docker-compose.yml up -d`
 2. Con local-ai Postgres UP: `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs` y confirmar `knowledge_ingest_evidence.json` → `verified:true`
-3. Reducir los **86** orphans restantes (mapear dominio o archivar; no indexar basura)
+3. Al añadir docs top-level: clasificar en `orphanClassification.ts` (mantener orphans = 0)
 4. Ops externos: SES / Stripe / mig 514 staging / Cloudflare (sin cambio de código)
 
 

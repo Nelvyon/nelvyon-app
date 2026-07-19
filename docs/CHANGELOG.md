@@ -8,6 +8,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Brain | **Orphan wave 2** | Archive **44** moved (acum. archivedCount **93**) · manifest **263**/unique **234**/orphans **0**/unclassified **0**/coverage **0.95**/claimComplete **false** · tests 7/7 · `NELVYON_BRAIN_KNOWLEDGE.md` |
 | Brain | **Fase knowledge (cierre honesto)** | Orphan classification + archive **49** → `docs/archive/` · agent domains · gap detector+ingestEvidence · manifest **217**/unique **192**/orphans **86**/coverage **0.65**/claimComplete **false** · ingest `verified:false` (Docker) · `NELVYON_BRAIN_KNOWLEDGE.md` |
 | Brain | **Conocimiento NELVYON** | Manifest ampliado (ADR/CHANGELOG/workforce/…) · packs entrepreneurship/security · gap detector · external registry · checksum skip · Nelvyon-first AgentContext · CI sync · `NELVYON_BRAIN_KNOWLEDGE.md` |
 | Elite closure | **Repo polish** | Security headers SSOT · migrate-pg splitter (KI-017) · SEO OG/sitemap/robots/schema/logo.svg · CI cleanup · docs INFRA/DEPLOY/ROADMAP · `FINAL_ELITE_CLOSURE.md` |
