@@ -88,7 +88,13 @@ blob-report/
 # --- Artefactos locales (no subir al repo) ---
 nelvyon_backend.zip
 tools/
+# Track intentional Private AI MCP bridge sources (negates broad tools/ above)
+!backend/private-ai/tools/
+!backend/private-ai/tools/**
 backend/autonomous/output/
+
+# Accidental local-ai copy under Next app (canonical: backend/local-ai/)
+apps/web/backend/
 
 # Envato Elements seeds — ZIPs never committed, only JSON metadata
 backend/data/envato-seeds/**/*.zip
