@@ -31,12 +31,13 @@ describe("Workforce hierarchy + aliases", () => {
     expect(isDeprecatedAgentId("seo")).toBe(false);
   });
 
-  it("maps L1 executives and interim runtime covers", () => {
-    expect(listWorkforceByLevel("L1_executive").length).toBeGreaterThanOrEqual(6);
-    expect(effectiveRuntimeAgentId("cto")).toBe("development");
-    expect(effectiveRuntimeAgentId("marketing")).toBe("content");
+  it("maps L1 executives with promoted runtime identities", () => {
+    expect(listWorkforceByLevel("L1_executive").length).toBeGreaterThanOrEqual(8);
+    expect(effectiveRuntimeAgentId("cto")).toBe("cto");
+    expect(effectiveRuntimeAgentId("marketing")).toBe("marketing");
     expect(getWorkforceProfile("ceo_supervisor")?.lifecycle).toBe("evaluated");
-    expect(getWorkforceProfile("cto")?.lifecycle).toBe("draft");
+    expect(getWorkforceProfile("cto")?.lifecycle).toBe("evaluated");
+    expect(getWorkforceProfile("product")?.lifecycle).toBe("evaluated");
   });
 
   it("marks aliases deprecated in unified registry", () => {

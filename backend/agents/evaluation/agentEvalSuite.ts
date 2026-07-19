@@ -165,6 +165,46 @@ export const AGENT_EVAL_CASES: AgentEvalCase[] = [
     expect: { ok: true, mustInclude: ["Next steps"] },
     threshold: { minScore: 0.65 },
   },
+  {
+    id: "google_ads_draft",
+    agentId: "google_ads",
+    kind: "normal",
+    input: "Propón estructura de campaña Google Ads Search para SaaS B2B. Sin publicar ni gastar.",
+    expect: { ok: true, mustInclude: ["Next steps"], mustNotClaimToolExec: true },
+    threshold: { minScore: 0.7 },
+  },
+  {
+    id: "meta_ads_draft",
+    agentId: "meta_ads",
+    kind: "normal",
+    input: "Draft de audiencias y creatividades Meta Ads. Lanzamiento requiere aprobación humana.",
+    expect: { ok: true, mustInclude: ["Next steps"], mustNotClaimToolExec: true },
+    threshold: { minScore: 0.7 },
+  },
+  {
+    id: "tiktok_ads_draft",
+    agentId: "tiktok_ads",
+    kind: "normal",
+    input: "Hooks cortos TikTok Ads para demo producto. No publicar.",
+    expect: { ok: true, mustInclude: ["Next steps"], mustNotClaimToolExec: true },
+    threshold: { minScore: 0.7 },
+  },
+  {
+    id: "cto_arch_review",
+    agentId: "cto",
+    kind: "normal",
+    input: "Revisa riesgos de arquitectura para añadir daemon de orquestación local. Sin desplegar.",
+    expect: { ok: true, mustInclude: ["Next steps"] },
+    threshold: { minScore: 0.7 },
+  },
+  {
+    id: "marketing_gtm",
+    agentId: "marketing",
+    kind: "normal",
+    input: "Brief go-to-market Q3 para Private AI B2B. Solo plan, sin envíos.",
+    expect: { ok: true, mustInclude: ["Next steps"] },
+    threshold: { minScore: 0.7 },
+  },
 ];
 
 export async function runAgentEvalCase(c: AgentEvalCase): Promise<AgentEvalResult> {
