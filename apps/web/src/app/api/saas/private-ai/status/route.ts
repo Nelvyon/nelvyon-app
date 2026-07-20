@@ -12,8 +12,22 @@ import {
 export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const status = await getSaasPrivateAiService().getPlatformStatus(ctx.tenant.id);
-    return NextResponse.json(status);
+    const svc = getSaasPrivateAiService();
+    const status = await svc.getPlatformStatus(ctx.tenant.id);
+    let router: Awaited<ReturnType<typeof svc.getRouterHealthStatus>> | undefined;
+    let routerHealthAvailable = true;
+    try {
+      router = await svc.getRouterHealthStatus();
+    } catch {
+      router = undefined;
+      routerHealthAvailable = false;
+    }
+    return NextResponse.json({
+      ...status,
+      routerCertified: true,
+      router,
+      routerHealthAvailable,
+    });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

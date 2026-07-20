@@ -44,7 +44,7 @@ vi.mock("../db/DbClient", () => ({
   },
 }));
 
-import { requireSaasContext } from "../saasRequestContext";
+import { requireSaasContext, saasErrorBody } from "../saasRequestContext";
 import { SaasSecurityEnterpriseError } from "../SaasSecurityEnterpriseService";
 
 describe("isPgMissingRelation", () => {
@@ -52,6 +52,21 @@ describe("isPgMissingRelation", () => {
     expect(isPgMissingRelation({ code: "42P01" })).toBe(true);
     expect(isPgMissingRelation(new Error('relation "x" does not exist'))).toBe(true);
     expect(isPgMissingRelation(new Error("other"))).toBe(false);
+  });
+});
+
+describe("saasErrorBody", () => {
+  it("does not leak arbitrary Error.message to clients", () => {
+    expect(saasErrorBody(new Error('relation "secret_table" does not exist'))).toEqual({
+      error: "Internal error",
+    });
+  });
+
+  it("preserves SaasRbacError messages", () => {
+    expect(saasErrorBody(new SaasRbacError("Forbidden", "FORBIDDEN"))).toEqual({
+      error: "Forbidden",
+      code: "FORBIDDEN",
+    });
   });
 });
 

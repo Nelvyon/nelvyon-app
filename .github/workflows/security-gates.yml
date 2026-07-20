@@ -5,6 +5,8 @@ on:
     paths:
       - "**/package.json"
       - "**/pnpm-lock.yaml"
+      - "apps/web/**"
+      - "backend/**"
       - ".github/workflows/security-gates.yml"
   push:
     branches: [main]
@@ -18,7 +20,7 @@ concurrency:
 
 jobs:
   audit:
-    name: pnpm audit (critical/high)
+    name: pnpm audit (critical)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -32,7 +34,7 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Audit apps/web (fail on critical)
+      - name: Audit apps/web (fail on critical only; high tracked as KI-012)
         working-directory: apps/web
         run: pnpm audit --audit-level critical
 
@@ -40,6 +42,8 @@ jobs:
     name: Gitleaks secret scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Rollback: repo variable NELVYON_GITLEAKS_ENABLED=0
+    if: ${{ vars.NELVYON_GITLEAKS_ENABLED != '0' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,6 +52,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_COMMENTS: "false"
+
+  trivy-fs:
+    name: Trivy filesystem scan (apps/web)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Feature flag: set repo variable NELVYON_TRIVY_ENABLED=0 to rollback
+    if: ${{ vars.NELVYON_TRIVY_ENABLED != '0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy vulnerability scanner (fs)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: apps/web
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: true
+          format: table
 
   migrations:
     name: Validate migration integrity
@@ -60,5 +82,5 @@ jobs:
           node-version: "20"
       - name: Elite range 401–507
         run: node scripts/validate-saas-migrations.mjs
-      - name: Post-elite 508–511
+      - name: Post-elite 508–514
         run: node scripts/validate-post-elite-migrations.mjs

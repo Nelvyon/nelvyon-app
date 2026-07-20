@@ -32,7 +32,7 @@ export class WidgetLiveCounterAgent {
         mission:
           "Genera widget de contador en vivo con placeholder de API y animación segura.",
         fewShotExample:
-          "Input: usuarios activos. Output JSON: embedCode JS vanilla; previewData endpoint TODO.",
+          "Input: usuarios activos. Output JSON: embedCode JS vanilla; previewData opcional (stub o omitir si no hay endpoint).",
       },
       input,
       0.1,

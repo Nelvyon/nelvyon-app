@@ -44,9 +44,13 @@ async function resolveTenantAccess(userId: string): Promise<{ tenant: SaasTenant
 
   try {
     const ssoRows = await db.query<MemberTenantRow>(
-      `SELECT 'member' AS member_role, ${ST_TENANT_SELECT}
+      `SELECT COALESCE(wm.role, 'member') AS member_role, ${ST_TENANT_SELECT}
        FROM saas_sso_identities si
        JOIN saas_tenants st ON st.id = si.tenant_id
+       LEFT JOIN workspace_members wm
+         ON wm.workspace_id = st.workspace_id
+        AND wm.user_id = si.user_id
+        AND wm.status = 'active'
        WHERE si.user_id = $1::text
          AND st.onboarding_completed = true
        ORDER BY st.created_at ASC
@@ -61,8 +65,17 @@ async function resolveTenantAccess(userId: string): Promise<{ tenant: SaasTenant
         role: mapWorkspaceRoleToSaas(member_role),
       };
     }
-  } catch {
-    /* saas_sso_identities may be absent before migration 444 */
+  } catch (e) {
+    if (isPgMissingRelation(e)) {
+      /* saas_sso_identities may be absent before migration 444 */
+    } else {
+      saasCtxLog.warn("SSO tenant lookup failed — falling back to workspace_members", {
+        userId,
+        operation: "resolveTenantAccess.sso",
+        error: e instanceof Error ? e.message : String(e),
+      });
+      throw e;
+    }
   }
 
   const rows = await db.query<MemberTenantRow>(
@@ -162,8 +175,9 @@ export function saasErrorBody(e: unknown): { error: string; code?: string } {
   if (e instanceof OsAgentError && e.message === "Unauthorized") {
     return { error: "Unauthorized" };
   }
+  // Do not leak driver/SQL internals to API clients.
   if (e instanceof Error) {
-    return { error: e.message };
+    console.error("[saasErrorBody]", e.message);
   }
   return { error: "Internal error" };
 }

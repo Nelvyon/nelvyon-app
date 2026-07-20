@@ -21,8 +21,8 @@ describe("Private AI modular architecture", () => {
     resetSaasPrivateAiServiceForTests();
   });
 
-  it("registers 17 expert agents including pilot CEO", () => {
-    expect(NELVYON_PRIVATE_AGENTS.length).toBe(17);
+  it("registers 23 expert agents including pilot CEO", () => {
+    expect(NELVYON_PRIVATE_AGENTS.length).toBe(23);
     expect(getPrivateAgent(PILOT_AGENT_ID)?.role).toMatch(/Supervisor/i);
   });
 
