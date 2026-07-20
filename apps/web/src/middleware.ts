@@ -11,6 +11,7 @@ import {
   normalizeHost,
 } from "@/core/whitelabel/resolveWhitelabel";
 import { resolveDashboardLegacyRedirect } from "@/lib/routing/dashboardLegacyRedirects";
+import { assertSaasCookieMutationOrigin } from "@/lib/security/assertSaasOrigin";
 
 /** Legacy SaaS API stubs that return 410 Gone without auth — must not be blocked by middleware. */
 const SAAS_LEGACY_GONE = new Set([
@@ -146,6 +147,22 @@ export async function middleware(request: NextRequest) {
       return end(NextResponse.redirect(url));
     }
     if (pathname.startsWith("/api/")) {
+      const csrf = assertSaasCookieMutationOrigin({
+        method: request.method,
+        pathname,
+        origin: request.headers.get("origin"),
+        referer: request.headers.get("referer"),
+        hasAuthCookie: true,
+        hasAuthorizationHeader: Boolean(request.headers.get("authorization")?.trim()),
+      });
+      if (csrf) {
+        return end(
+          NextResponse.json(
+            { error: "CSRF validation failed", code: csrf.toUpperCase() },
+            { status: 403 },
+          ),
+        );
+      }
       return end(NextResponse.next());
     }
   }
@@ -178,6 +195,10 @@ export const config = {
     "/api/public/:path*",
     "/api/webhooks/:path*",
     "/api/early-adopter/:path*",
+    "/api/forms/:path*",
+    "/api/contact",
+    "/api/waitlist",
+    "/api/nelvyon-site/:path*",
     "/os/:path*",
     "/api/os/:path*",
     "/saas/:path*",

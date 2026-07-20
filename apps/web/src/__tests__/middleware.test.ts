@@ -32,6 +32,8 @@ describe("security rateLimit", () => {
     expect(getRateLimitRule("/api/auth/login")?.limit).toBe(10);
     expect(getRateLimitRule("/api/auth/register")?.limit).toBe(5);
     expect(getRateLimitRule("/api/public/v1/keys")?.limit).toBe(30);
+    expect(getRateLimitRule("/api/forms/abc/submit")?.id).toBe("form-submit");
+    expect(getRateLimitRule("/api/forms/abc/submit")?.limit).toBe(20);
     expect(getRateLimitRule("/api/os/execute")).toBeNull();
   });
 

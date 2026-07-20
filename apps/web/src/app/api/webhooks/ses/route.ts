@@ -99,13 +99,17 @@ function extractIds(mail: SesNotification["mail"]) {
 async function markRecipientsBouncedByEmail(
   db: ReturnType<typeof DbClient.getInstance>,
   emails: string[],
+  tenantId: string,
 ) {
   for (const email of emails) {
     await db.query(
       `UPDATE saas_campania_recipients scr SET status = 'bounced'
        FROM saas_contacts sc
-       WHERE sc.id = scr.contact_id AND sc.email = $1`,
-      [email],
+       WHERE sc.id = scr.contact_id
+         AND scr.tenant_id = $2::uuid
+         AND sc.tenant_id = $2::uuid
+         AND sc.email = $1`,
+      [email, tenantId],
     );
   }
 }
@@ -113,18 +117,22 @@ async function markRecipientsBouncedByEmail(
 async function suppressContactsByEmail(
   db: ReturnType<typeof DbClient.getInstance>,
   emails: string[],
+  tenantId: string,
 ) {
   for (const email of emails) {
     await db.query(
       `UPDATE saas_campania_recipients scr SET status = 'unsubscribed'
        FROM saas_contacts sc
-       WHERE sc.id = scr.contact_id AND sc.email = $1`,
-      [email],
+       WHERE sc.id = scr.contact_id
+         AND scr.tenant_id = $2::uuid
+         AND sc.tenant_id = $2::uuid
+         AND sc.email = $1`,
+      [email, tenantId],
     );
     await db.query(
       `UPDATE saas_contacts SET tags = array(SELECT DISTINCT unnest(tags || ARRAY['unsubscribed'])), updated_at = NOW()
-       WHERE email = $1`,
-      [email],
+       WHERE tenant_id = $2::uuid AND email = $1`,
+      [email, tenantId],
     );
   }
 }
@@ -146,8 +154,8 @@ async function handleBounce(db: ReturnType<typeof DbClient.getInstance>, notific
     return;
   }
 
-  if (emails.length > 0) {
-    await markRecipientsBouncedByEmail(db, emails);
+  if (emails.length > 0 && tenantId) {
+    await markRecipientsBouncedByEmail(db, emails, tenantId);
   }
 }
 
@@ -169,8 +177,8 @@ async function handleComplaint(db: ReturnType<typeof DbClient.getInstance>, noti
   }
 
   const emails = (notification.complaint?.complainedRecipients ?? []).map((r) => r.emailAddress);
-  if (emails.length > 0) {
-    await suppressContactsByEmail(db, emails);
+  if (emails.length > 0 && tenantId) {
+    await suppressContactsByEmail(db, emails, tenantId);
   }
 }
 

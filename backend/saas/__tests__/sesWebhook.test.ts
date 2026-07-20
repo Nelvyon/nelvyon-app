@@ -1,12 +1,12 @@
 /**
- * SES/SNS webhook tests — Bounce, Complaint, Delivery, SubscriptionConfirmation.
+ * SES/SNS webhook tests â€” Bounce, Complaint, Delivery, SubscriptionConfirmation.
  * SKIP_SNS_VERIFY=true bypasses RSA signature check (set before import).
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 process.env.SKIP_SNS_VERIFY = "true";
 
-// ─── Mock DbClient ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Mock DbClient â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const dbUpdates: Array<{ sql: string; params: unknown[] }> = [];
 
 vi.mock("../../db/DbClient", () => ({
@@ -22,7 +22,7 @@ vi.mock("../../db/DbClient", () => ({
 
 import { POST } from "../../../apps/web/src/app/api/webhooks/ses/route";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function makeSnsPost(sesNotification: object, overrides: Record<string, unknown> = {}): Request {
   const envelope = {
@@ -55,7 +55,7 @@ function withHeaders(campaniaId: string, contactId: string, tenantId: string) {
 
 beforeEach(() => { dbUpdates.length = 0; });
 
-// ─── Bounce ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Bounce â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("Bounce", () => {
   it("actualiza recipient a 'bounced' usando ids de headers", async () => {
@@ -74,16 +74,29 @@ describe("Bounce", () => {
     expect(upd?.params).toEqual(["tenant-1", "camp-1", "contact-1"]);
   });
 
-  it("cae a email-match si no hay headers de correlación", async () => {
+  it("cae a email-match si no hay headers de correlacion pero hay tenant_id", async () => {
+    await POST(makeSnsPost({
+      notificationType: "Bounce",
+      bounce: { bouncedRecipients: [{ emailAddress: "nohdr@x.com" }], bounceType: "Permanent" },
+      mail: {
+        headers: [],
+        tags: { tenant_id: ["tenant-email"] },
+      },
+    }) as never);
+
+    const upd = dbUpdates.find((u) => u.sql.includes("sc.email = $1"));
+    expect(upd).toBeDefined();
+    expect(upd?.params).toEqual(["nohdr@x.com", "tenant-email"]);
+  });
+
+  it("no actualiza por email sin tenant_id (scope obligatorio)", async () => {
+    const before = dbUpdates.length;
     await POST(makeSnsPost({
       notificationType: "Bounce",
       bounce: { bouncedRecipients: [{ emailAddress: "nohdr@x.com" }], bounceType: "Permanent" },
       mail: { headers: [] },
     }) as never);
-
-    const upd = dbUpdates.find((u) => u.sql.includes("sc.email = $1"));
-    expect(upd).toBeDefined();
-    expect(upd?.params).toContain("nohdr@x.com");
+    expect(dbUpdates.length).toBe(before);
   });
 
   it("usa SES message tags cuando no hay headers", async () => {
@@ -106,25 +119,30 @@ describe("Bounce", () => {
   });
 });
 
-// ─── Complaint ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Complaint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("Complaint", () => {
-  it("marca recipient como 'unsubscribed' y añade tag al contacto", async () => {
+  it("marca recipient como 'unsubscribed' y anade tag al contacto", async () => {
     await POST(makeSnsPost({
       notificationType: "Complaint",
       complaint: { complainedRecipients: [{ emailAddress: "spam@x.com" }] },
-      mail: { headers: [] },
+      mail: {
+        headers: [],
+        tags: { tenant_id: ["tenant-complaint"] },
+      },
     }) as never);
 
     const recipientUpd = dbUpdates.find((u) => u.sql.includes("'unsubscribed'") && u.params.includes("spam@x.com"));
     expect(recipientUpd).toBeDefined();
+    expect(recipientUpd?.params).toEqual(["spam@x.com", "tenant-complaint"]);
 
     const tagUpd = dbUpdates.find((u) => u.sql.includes("saas_contacts") && u.sql.includes("unsubscribed"));
     expect(tagUpd).toBeDefined();
+    expect(tagUpd?.params).toEqual(["spam@x.com", "tenant-complaint"]);
   });
 });
 
-// ─── Delivery ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Delivery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("Delivery", () => {
   it("actualiza recipient de 'pending' a 'sent' con sent_at", async () => {
@@ -139,7 +157,7 @@ describe("Delivery", () => {
     expect(upd?.params).toEqual(["tenant-2", "camp-2", "contact-2"]);
   });
 
-  it("no hace nada si no hay ids de correlación", async () => {
+  it("no hace nada si no hay ids de correlaciÃ³n", async () => {
     const before = dbUpdates.length;
     await POST(makeSnsPost({
       notificationType: "Delivery",
@@ -150,7 +168,7 @@ describe("Delivery", () => {
   });
 });
 
-// ─── SubscriptionConfirmation ─────────────────────────────────────────────────
+// â”€â”€â”€ SubscriptionConfirmation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("SubscriptionConfirmation", () => {
   it("llama a SubscribeURL y responde confirmed:true", async () => {
@@ -184,7 +202,7 @@ describe("SubscriptionConfirmation", () => {
   });
 });
 
-// ─── Error cases ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Error cases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("Error cases", () => {
   it("retorna 400 con body no-JSON", async () => {
@@ -195,7 +213,7 @@ describe("Error cases", () => {
     expect(res.status).toBe(400);
   });
 
-  it("retorna 400 si Message no es JSON válido", async () => {
+  it("retorna 400 si Message no es JSON vÃ¡lido", async () => {
     // Construct envelope manually with an un-parseable Message field
     const envelope = {
       Type: "Notification",
