@@ -1,7 +1,7 @@
-﻿# HANDOVER â€” NELVYON
+﻿# HANDOVER — NELVYON
 
 > **Lee este archivo primero.**  
-> Ãšltima actualizaciÃ³n: **2026-07-19** â€” Brain orphan wave 2: 0 orphans; coverage 0.95; archived 93; ingest blocked (Docker)
+> Última actualización: **2026-07-20** — Elite quality finalization · Workforce/Elite PASS intactos
 
 ---
 
@@ -9,27 +9,30 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Workforce / Elite** | **PASS** — elite quality pass **2026-07-20** (`docs/ELITE_QUALITY_FINALIZATION.md`); no romper freezes |
-| **Brain knowledge** | Manifest **263** Â· unique **234** Â· `coverageRatioEstimate` **0.95** Â· `claimComplete` **false** Â· orphans **0** Â· unclassified **0** Â· archived **93** Â· ingest `verified:false` (Docker down) |
-| **Informe brain** | `docs/NELVYON_BRAIN_KNOWLEDGE.md` |
+| **Workforce / Elite** | **PASS** · elite quality round 2026-07-20 (`docs/ELITE_QUALITY_FINALIZATION.md`) · no romper freezes |
+| **Brain knowledge** | Manifest **263** · unique **234** · coverage **0.95** · `claimComplete` **false** · orphans **0** · ingest `verified:false` (Docker) |
+| **QA local** | `tsc` OK · vitest principal **2401 passed / 4 skipped** · migraciones **508–514** OK |
 | **Prod email** | **Bloqueado** KI-014 SES production access |
 | **Freeze** | Router / MCP / Specialization / Elite / Workforce |
 
 ---
 
-## PrÃ³ximo paso EXACTO
+## Próximo paso EXACTO
 
-1. Arrancar Docker Desktop + `docker compose -f backend/local-ai/docker-compose.yml up -d`
-2. Con local-ai Postgres UP: `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs` y confirmar `knowledge_ingest_evidence.json` â†’ `verified:true`
-3. Al aÃ±adir docs top-level: clasificar en `orphanClassification.ts` (mantener orphans = 0)
-4. Ops externos: SES / Stripe / mig 514 staging / Cloudflare (sin cambio de cÃ³digo)
+1. Arrancar Docker Desktop + `docker compose -f backend/local-ai/docker-compose.yml up -d`  
+2. Con local-ai Postgres UP: `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs` → `knowledge_ingest_evidence.json` `verified:true` solo con chunks reales  
+3. Ops externos: SES (KI-014) / Stripe prod / mig **514** staging Railway / Cloudflare / Railway deploy  
+4. Remediación gradual KI-012 (npm high) vía Dependabot — sin exclusiones globales
 
+---
 
 ## Evidencia
 
 ```powershell
+pnpm -C apps/web exec tsc --noEmit
+pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm --reporter=dot
+node scripts/validate-post-elite-migrations.mjs
 node scripts/nelvyon-knowledge-sync.mjs
-pnpm -C apps/web exec vitest run backend/saas/__tests__/nelvyonBrainKnowledge.test.ts --reporter=dot
 ```
 
-Informes: `docs/NELVYON_BRAIN_KNOWLEDGE.md` Â· `docs/FINAL_ELITE_CLOSURE.md`
+Informes: `docs/ELITE_QUALITY_FINALIZATION.md` · `docs/NELVYON_BRAIN_KNOWLEDGE.md` · `docs/FINAL_ELITE_CLOSURE.md`

@@ -69,7 +69,7 @@ async function resolveTenantAccess(userId: string): Promise<{ tenant: SaasTenant
     if (isPgMissingRelation(e)) {
       /* saas_sso_identities may be absent before migration 444 */
     } else {
-      saasCtxLog.warn("SSO tenant lookup failed — falling back to workspace_members", {
+      saasCtxLog.warn("SSO tenant lookup failed — not falling back (fail-fast)", {
         userId,
         operation: "resolveTenantAccess.sso",
         error: e instanceof Error ? e.message : String(e),
