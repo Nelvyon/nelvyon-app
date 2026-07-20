@@ -6,6 +6,8 @@
 
 ## Lo completado
 
+- Master gate `nelvyon-verify-all` + `preflight-prod-env` (tsx path absoluto)
+- Reputación BFF auth + `EMPTY_ALERTS` degraded honesty
 - CSRF Origin en mutaciones cookie `/api/saas/*` y `/api/os/*`
 - SES bounce/complaint scoped por `tenant_id`
 - Mig `515_shared_memory_rls` + verify script + OPS docs
@@ -41,6 +43,8 @@
 | knowledge sync | orphans **0**, coverage **0.95**, claimComplete **false** |
 | npm audit doc | critical **0**, high **0** |
 | Docker / ingest | **DOWN** / no verificado |
+| `nelvyon-verify-all` | **CONDITIONAL_READY** (7 PASS · 0 FAIL · 1 SKIPPED_EXTERNAL · 2 NOT_CONFIGURED) |
+| preflight-prod-env | **ok** (dev; Stripe/SES missing listed) |
 | Shared memory remote | exit 2 sin DATABASE_URL |
 
-Commits de esta línea: ver `git log` desde `091021be` hasta HEAD (incl. sprint final).
+Commits: `5e901e2e` (sprint final) · línea desde `091021be` (cierre prioritario).

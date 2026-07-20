@@ -5,6 +5,8 @@
 
 ## 2026-07-20
 
+| Ops | **nelvyon-verify-all + prod-env preflight** | Master gate CONDITIONAL_READY; preflight tsx path fix; CTO_FINAL_VERIFY + TEST_SKIPS SSOT |
+| Security | **Reputación BFF auth / EMPTY_ALERTS** | Platform reputacion routes require auth; degraded empty alerts honesty |
 | �rea | Cambio | Descripci�n |
 |------|--------|-------------|
 | Sprint | **Sprint final absoluto** | CSRF /api/os · signup→register real · saasEnv exports · mig 515 docs · build/lint/tsc green · `SPRINT_FINAL_ABSOLUTO.md` |

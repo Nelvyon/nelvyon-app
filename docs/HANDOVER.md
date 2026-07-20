@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee este archivo primero.**  
-> Última actualización: **2026-07-20** — Sprint final absoluto · **CONDITIONAL_READY**
+> Última actualización: **2026-07-20** — verify-all master gate · **CONDITIONAL_READY**
 
 ---
 
@@ -14,7 +14,8 @@
 | **QA local** | `tsc` OK · lint OK · build OK · vitest **2431 passed / 6 skipped** · mig **508–515** OK |
 | **Brain** | orphans **0** · coverage **0.95** · `claimComplete` **false** · ingest `verified:false` (Docker DOWN) |
 | **Última mig** | `515_shared_memory_rls.sql` (411 archivos) |
-| **Informe** | `docs/SPRINT_FINAL_ABSOLUTO.md` |
+| **Informe** | `docs/SPRINT_FINAL_ABSOLUTO.md` · `docs/CTO_FINAL_VERIFY.md` |
+| **verify-all** | **CONDITIONAL_READY** — 7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED |
 
 ---
 
@@ -36,4 +37,6 @@ pnpm -C apps/web build
 pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm backend/db --reporter=dot
 node scripts/validate-post-elite-migrations.mjs
 node scripts/nelvyon-knowledge-sync.mjs
+node scripts/nelvyon-verify-all.mjs
+node scripts/preflight-prod-env.mjs
 ```
