@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-07-20T10:05:06.137Z",
+  "ok": true,
+  "criticalCount": 0,
+  "highCount": 0,
+  "metadata": {
+    "info": 0,
+    "low": 9,
+    "moderate": 35,
+    "high": 17,
+    "critical": 0
+  },
+  "criticals": [],
+  "highs": [],
+  "policy": {
+    "ciFailsOn": "critical",
+    "highTrackedAs": "KI-012",
+    "nextAction": "Dependabot PRs; bump direct deps when fixAvailable && tests green"
+  },
+  "claimComplete": false
+}

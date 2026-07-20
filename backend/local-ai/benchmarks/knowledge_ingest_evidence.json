@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19T14:21:10.918Z",
+  "generatedAt": "2026-07-20T10:05:04.591Z",
   "ok": false,
   "verified": false,
   "pipeline": [
@@ -11,19 +11,48 @@
     "agent_context_engine"
   ],
   "checks": {
-    "manifestBuild": "ok_sync_2026-07-19",
-    "ollamaEmbed": "available_http_200_models_include_mxbai-embed-large",
+    "manifestBuild": "not_rechecked_this_run",
+    "ollamaEmbed": "http_ok_tags_reachable",
     "localAiPostgres": "down_docker_daemon_not_running",
     "ingest": "not_run",
     "vectorStoreChunks": null,
     "unifiedRagSearch": "not_run_requires_chunks",
-    "agentContextGrounding": "unit_tested_nelvyon_first"
+    "agentContextGrounding": "not_rechecked_this_run",
+    "preflight": "fail"
   },
-  "blocker": "Docker Desktop daemon not running — local-ai Postgres (127.0.0.1:5434) unavailable. Start Docker + `docker compose -f backend/local-ai/docker-compose.yml up -d` then `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs`",
+  "blocker": "Docker Desktop daemon not running -- local-ai Postgres (127.0.0.1:5434) unavailable. Run: node scripts/preflight-local-ai-ingest.mjs",
+  "preflight": {
+    "path": "scripts/preflight-local-ai-ingest.mjs",
+    "ranAt": "2026-07-20T10:05:04.591Z",
+    "passed": false,
+    "checks": [
+      {
+        "id": "docker",
+        "ok": false,
+        "detail": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+      },
+      {
+        "id": "postgres",
+        "ok": false,
+        "detail": "connect ECONNREFUSED 127.0.0.1:5434"
+      },
+      {
+        "id": "ollama",
+        "ok": true,
+        "detail": "HTTP 200, models=6 (http://127.0.0.1:11434/api/tags)"
+      }
+    ],
+    "nextCommands": [
+      "Start Docker Desktop and wait until the engine is running",
+      "docker compose -f backend/local-ai/docker-compose.yml up -d",
+      "node scripts/preflight-local-ai-ingest.mjs",
+      "$env:NELVYON_KNOWLEDGE_INGEST=\"1\"; node scripts/nelvyon-knowledge-sync.mjs"
+    ]
+  },
   "claimComplete": false,
   "dockerInfo": {
-    "checkedAt": "2026-07-19T14:21:10.919Z",
+    "checkedAt": "2026-07-20T10:05:04.591Z",
     "daemonRunning": false,
-    "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine"
+    "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
   }
 }

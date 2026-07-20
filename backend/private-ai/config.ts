@@ -41,6 +41,12 @@ export function isPrivateAiOnlyEnv(): boolean {
   return v === "1" || v.toLowerCase() === "true";
 }
 
+export function isLocalRouterEnabled(): boolean {
+  const v = process.env.NELVYON_LOCAL_ROUTER_ENABLED ?? "1";
+  if (v === "0" || v.toLowerCase() === "false") return false;
+  return isLocalRuntimeConfigured();
+}
+
 export function isOpenClawBridgeEnabled(): boolean {
   const v = process.env.NELVYON_OPENCLAW_BRIDGE_ENABLED ?? "0";
   return v === "1" || v.toLowerCase() === "true";

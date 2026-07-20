@@ -66,6 +66,39 @@ export function isOpenClawRuntimeAuthorized(): boolean {
   return mem;
 }
 
+/**
+ * Single runtime resolution point for OpenClaw (flag + memory + URL).
+ * Set NELVYON_OPENCLAW_BRIDGE_URL once here — do not scatter URL reads.
+ */
+export type OpenClawRuntimeConfig = {
+  authorized: boolean;
+  bridgeEnabled: boolean;
+  sharedMemoryEnabled: boolean;
+  bridgeUrl: string | null;
+  liveReady: boolean;
+  mode: "disabled" | "mock_certified" | "live_ready";
+};
+
+export function resolveOpenClawRuntimeConfig(): OpenClawRuntimeConfig {
+  const bridgeEnabled =
+    (process.env.NELVYON_OPENCLAW_BRIDGE_ENABLED ?? "0") === "1" ||
+    (process.env.NELVYON_OPENCLAW_BRIDGE_ENABLED ?? "").toLowerCase() === "true";
+  const sharedMemoryEnabled =
+    (process.env.NELVYON_SHARED_MEMORY_ENABLED ?? "0") === "1" ||
+    (process.env.NELVYON_SHARED_MEMORY_ENABLED ?? "").toLowerCase() === "true";
+  const bridgeUrl = process.env.NELVYON_OPENCLAW_BRIDGE_URL?.trim() || null;
+  const authorized = isOpenClawRuntimeAuthorized();
+  const liveReady = authorized && Boolean(bridgeUrl);
+  return {
+    authorized,
+    bridgeEnabled,
+    sharedMemoryEnabled,
+    bridgeUrl,
+    liveReady,
+    mode: !bridgeEnabled ? "disabled" : liveReady ? "live_ready" : "mock_certified",
+  };
+}
+
 export type OpenClawBenchmarkPlan = {
   cases: Array<{ id: string; goal: string; expect: string }>;
   gates: Record<string, string>;
