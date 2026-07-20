@@ -82,5 +82,5 @@ jobs:
           node-version: "20"
       - name: Elite range 401–507
         run: node scripts/validate-saas-migrations.mjs
-      - name: Post-elite 508–514
+      - name: Post-elite 508–515
         run: node scripts/validate-post-elite-migrations.mjs

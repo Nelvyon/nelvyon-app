@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validates post-elite migrations 508–514 exist (Phase 1 extension + Shared Memory).
+ * Validates post-elite migrations 508–515 exist (Phase 1 extension + Shared Memory + RLS).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -11,7 +11,7 @@ const dir = path.join(root, "backend/db/migrations");
 const files = fs.readdirSync(dir).filter((f) => f.endsWith(".sql"));
 
 const MIN = 508;
-const MAX = 514;
+const MAX = 515;
 const missing = [];
 
 for (let n = MIN; n <= MAX; n += 1) {

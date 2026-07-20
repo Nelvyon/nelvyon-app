@@ -83,7 +83,7 @@ jobs:
         working-directory: .
         run: node scripts/validate-saas-migrations.mjs
 
-      - name: Validate post-elite migrations 508–514
+      - name: Validate post-elite migrations 508–515
         working-directory: .
         run: node scripts/validate-post-elite-migrations.mjs
 

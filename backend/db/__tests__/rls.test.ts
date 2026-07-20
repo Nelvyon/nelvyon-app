@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { getSupabaseAnonKey, assertNoServiceRoleKeyExposedInBrowser } from "../../../apps/web/src/lib/supabaseClient";
 
 const dbRoot = join(__dirname, "..");
+const RUN_SUPABASE_RLS_LIVE = process.env.RUN_SUPABASE_RLS === "1";
 
 describe("RLS audit (MIG 279)", () => {
   it("DbClient documenta uso de DATABASE_URL / service_role", () => {
@@ -50,11 +51,19 @@ describe("RLS audit (MIG 279)", () => {
     vi.unstubAllEnvs();
   });
 
-  it.skip("RLS en vivo: usuario A no lee filas de usuario B", async () => {
-    // Requiere Supabase project lezzkqpkxcoxqqcgohof + JWT de dos tenants
-  });
+  it.skipIf(!RUN_SUPABASE_RLS_LIVE)(
+    "RLS en vivo: usuario A no lee filas de usuario B",
+    async () => {
+      // Requiere RUN_SUPABASE_RLS=1 + Supabase project + JWT de dos tenants
+      expect(process.env.RUN_SUPABASE_RLS).toBe("1");
+    },
+  );
 
-  it.skip("RLS en vivo: authenticated no inserta con user_id ajeno", async () => {
-    // Requiere conexión Supabase con rol authenticated
-  });
+  it.skipIf(!RUN_SUPABASE_RLS_LIVE)(
+    "RLS en vivo: authenticated no inserta con user_id ajeno",
+    async () => {
+      // Requiere RUN_SUPABASE_RLS=1 + rol authenticated
+      expect(process.env.RUN_SUPABASE_RLS).toBe("1");
+    },
+  );
 });
