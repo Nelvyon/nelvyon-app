@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-19T14:25:51.924Z",
+  "generated": "2026-07-20T10:30:51.775Z",
   "entries": [
     {
       "path": "docs/CONSTITUTION_NELVYON_AI.md",
@@ -688,6 +688,78 @@
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "OSS Licenses"
+    },
+    {
+      "path": "docs/CIERRE_FINAL_PRIORITARIO.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Cierre Final Prioritario"
+    },
+    {
+      "path": "docs/CIERRE_FINAL_PRIORITARIO.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Cierre Final Prioritario"
+    },
+    {
+      "path": "docs/ELITE_QUALITY_FINALIZATION.md",
+      "domain": "nelvyon",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Elite Quality Finalization"
+    },
+    {
+      "path": "docs/ELITE_QUALITY_FINALIZATION.md",
+      "domain": "development_tech",
+      "priority": 1,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Elite Quality Finalization"
+    },
+    {
+      "path": "docs/OPS_SES_PROD.md",
+      "domain": "finance_operations",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "OPS SES Production Checklist"
+    },
+    {
+      "path": "docs/OPS_SES_PROD.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "OPS SES Production Checklist"
+    },
+    {
+      "path": "docs/OPS_SHARED_MEMORY_514.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "OPS Shared Memory 514 Checklist"
+    },
+    {
+      "path": "docs/OPS_SHARED_MEMORY_514.md",
+      "domain": "security_privacy",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "OPS Shared Memory 514 Checklist"
+    },
+    {
+      "path": "docs/OPS_STRIPE_PROD.md",
+      "domain": "finance_operations",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "runbook",
+      "title": "OPS Stripe Production Checklist"
     },
     {
       "path": "docs/README.md",
@@ -2107,19 +2179,19 @@
     }
   ],
   "summary": {
-    "total": 263,
-    "uniqueFiles": 234,
+    "total": 272,
+    "uniqueFiles": 239,
     "byDomain": {
-      "nelvyon": 77,
-      "development_tech": 44,
-      "security_privacy": 18,
+      "nelvyon": 79,
+      "development_tech": 48,
+      "security_privacy": 19,
       "planning_strategy": 9,
       "digital_marketing": 26,
       "saas": 9,
       "crm_sales": 17,
       "analytics_reporting": 2,
       "business_strategy": 5,
-      "finance_operations": 15,
+      "finance_operations": 17,
       "automation": 5,
       "design": 6,
       "customer_support": 3,
@@ -2133,9 +2205,9 @@
     },
     "bySourceType": {
       "constitution": 1,
-      "official_doc": 163,
+      "official_doc": 167,
       "knowledge_pack": 25,
-      "runbook": 32,
+      "runbook": 37,
       "sop": 32,
       "playbook": 4,
       "case_study": 6

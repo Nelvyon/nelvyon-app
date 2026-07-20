@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-07-19T14:25:51.922Z",
+  "generatedAt": "2026-07-20T10:30:51.771Z",
   "summary": {
-    "total": 263,
-    "uniqueFiles": 234,
+    "total": 272,
+    "uniqueFiles": 239,
     "byDomain": {
-      "nelvyon": 77,
-      "development_tech": 44,
-      "security_privacy": 18,
+      "nelvyon": 79,
+      "development_tech": 48,
+      "security_privacy": 19,
       "planning_strategy": 9,
       "digital_marketing": 26,
       "saas": 9,
       "crm_sales": 17,
       "analytics_reporting": 2,
       "business_strategy": 5,
-      "finance_operations": 15,
+      "finance_operations": 17,
       "automation": 5,
       "design": 6,
       "customer_support": 3,
@@ -27,9 +27,9 @@
     },
     "bySourceType": {
       "constitution": 1,
-      "official_doc": 163,
+      "official_doc": 167,
       "knowledge_pack": 25,
-      "runbook": 32,
+      "runbook": 37,
       "sop": 32,
       "playbook": 4,
       "case_study": 6
@@ -61,8 +61,8 @@
   "domainCoverage": [
     {
       "domain": "nelvyon",
-      "documents": 77,
-      "percentOfManifest": 29.3,
+      "documents": 79,
+      "percentOfManifest": 29,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -70,7 +70,7 @@
     {
       "domain": "business_strategy",
       "documents": 5,
-      "percentOfManifest": 1.9,
+      "percentOfManifest": 1.8,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -78,7 +78,7 @@
     {
       "domain": "digital_marketing",
       "documents": 26,
-      "percentOfManifest": 9.9,
+      "percentOfManifest": 9.6,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -86,7 +86,7 @@
     {
       "domain": "paid_ads",
       "documents": 7,
-      "percentOfManifest": 2.7,
+      "percentOfManifest": 2.6,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -94,7 +94,7 @@
     {
       "domain": "seo",
       "documents": 5,
-      "percentOfManifest": 1.9,
+      "percentOfManifest": 1.8,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -110,7 +110,7 @@
     {
       "domain": "copywriting",
       "documents": 2,
-      "percentOfManifest": 0.8,
+      "percentOfManifest": 0.7,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -126,7 +126,7 @@
     {
       "domain": "email_marketing",
       "documents": 2,
-      "percentOfManifest": 0.8,
+      "percentOfManifest": 0.7,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -134,7 +134,7 @@
     {
       "domain": "crm_sales",
       "documents": 17,
-      "percentOfManifest": 6.5,
+      "percentOfManifest": 6.3,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -142,7 +142,7 @@
     {
       "domain": "automation",
       "documents": 5,
-      "percentOfManifest": 1.9,
+      "percentOfManifest": 1.8,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -150,7 +150,7 @@
     {
       "domain": "saas",
       "documents": 9,
-      "percentOfManifest": 3.4,
+      "percentOfManifest": 3.3,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -158,7 +158,7 @@
     {
       "domain": "analytics_reporting",
       "documents": 2,
-      "percentOfManifest": 0.8,
+      "percentOfManifest": 0.7,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -173,8 +173,8 @@
     },
     {
       "domain": "finance_operations",
-      "documents": 15,
-      "percentOfManifest": 5.7,
+      "documents": 17,
+      "percentOfManifest": 6.3,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -182,7 +182,7 @@
     {
       "domain": "design",
       "documents": 6,
-      "percentOfManifest": 2.3,
+      "percentOfManifest": 2.2,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -197,16 +197,16 @@
     },
     {
       "domain": "development_tech",
-      "documents": 44,
-      "percentOfManifest": 16.7,
+      "documents": 48,
+      "percentOfManifest": 17.6,
       "status": "ok",
       "priority": "P2",
       "gaps": []
     },
     {
       "domain": "security_privacy",
-      "documents": 18,
-      "percentOfManifest": 6.8,
+      "documents": 19,
+      "percentOfManifest": 7,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -214,7 +214,7 @@
     {
       "domain": "planning_strategy",
       "documents": 9,
-      "percentOfManifest": 3.4,
+      "percentOfManifest": 3.3,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -329,10 +329,10 @@
     "artifactExists": true,
     "artifactPath": "backend/local-ai/benchmarks/knowledge_ingest_evidence.json",
     "verified": false,
-    "blocker": "Docker Desktop daemon not running — local-ai Postgres (127.0.0.1:5434) unavailable. Start Docker + `docker compose -f backend/local-ai/docker-compose.yml up -d` then `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs`"
+    "blocker": "Docker Desktop daemon not running -- local-ai Postgres (127.0.0.1:5434) unavailable. Run: node scripts/preflight-local-ai-ingest.mjs"
   },
   "proposals": [
-    "Docker Desktop daemon not running — local-ai Postgres (127.0.0.1:5434) unavailable. Start Docker + `docker compose -f backend/local-ai/docker-compose.yml up -d` then `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs`",
+    "Docker Desktop daemon not running -- local-ai Postgres (127.0.0.1:5434) unavailable. Run: node scripts/preflight-local-ai-ingest.mjs",
     "Run `node scripts/nelvyon-knowledge-sync.mjs` after doc changes (CI on docs/**)"
   ],
   "coverageRatioEstimate": 0.95,
