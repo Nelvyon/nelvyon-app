@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-19** — Workforce **PASS** · Final Elite repo polish · Elite PASS intacto · OS/SaaS ops **NO** = producción email/billing completa
+> Actualizado: **2026-07-20** - Cierre final prioritario **CONDITIONAL_READY** (`docs/CIERRE_FINAL_PRIORITARIO.md`); Workforce/Elite PASS intactos; ops SES/Stripe/Docker abiertas
 
 ## Resumen ejecutivo (honesto)
 

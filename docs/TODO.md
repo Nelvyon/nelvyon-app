@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-19** — Workforce **PASS** (`nelvyonAutonomousWorkforceCertified=true`); ops Phase-1 externos abiertos
+> Actualizado: **2026-07-20** - Cierre final prioritario CONDITIONAL_READY; P2 ops (Docker ingest, 514/515 verify, SES/Stripe) abiertos
 
 ---
 

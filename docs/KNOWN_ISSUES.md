@@ -6,6 +6,25 @@
 
 ## Activos
 
+### KI-020 - CSRF Origin en mutaciones cookie SaaS (mitigado en codigo)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | Mitigado en repo (2026-07-20) - no cerrar hasta smoke staging |
+| **Severidad** | Alta (antes); controlada tras fix |
+| **Detalle** | Mutaciones `/api/saas/*` con cookie sin Origin/Referer validos -> 403 via `assertSaasOrigin`. Fallback SES bounce/complaint ahora exige `tenant_id`. |
+| **Docs** | `docs/CIERRE_FINAL_PRIORITARIO.md` |
+
+### KI-021 - Shared Memory RLS 515 pendiente de aplicar en remoto
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | Abierto (ops) |
+| **Severidad** | Media |
+| **Detalle** | Migracion `515_shared_memory_rls.sql` en repo; `verify-shared-memory-schema.mjs` exit 2 sin DATABASE_URL. Aplicar migrate + verify en staging/prod. |
+| **Docs** | `docs/OPS_SHARED_MEMORY_514.md` |
+
+
 ### KI-018 — Fase 2 Elite: residuales post-PASS (pgvector / ops)
 
 | Campo | Valor |

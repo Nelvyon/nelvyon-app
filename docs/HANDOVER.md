@@ -1,7 +1,7 @@
-﻿# HANDOVER — NELVYON
+# HANDOVER - NELVYON
 
 > **Lee este archivo primero.**  
-> Última actualización: **2026-07-20** — Elite quality finalization · Workforce/Elite PASS intactos
+> Ultima actualizacion: **2026-07-20** - Cierre final prioritario - veredicto **CONDITIONAL_READY**
 
 ---
 
@@ -9,30 +9,36 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Workforce / Elite** | **PASS** · elite quality round 2026-07-20 (`docs/ELITE_QUALITY_FINALIZATION.md`) · no romper freezes |
-| **Brain knowledge** | Manifest **263** · unique **234** · coverage **0.95** · `claimComplete` **false** · orphans **0** · ingest `verified:false` (Docker) |
-| **QA local** | `tsc` OK · vitest principal **2401 passed / 4 skipped** · migraciones **508–514** OK |
+| **Veredicto** | **CONDITIONAL_READY** (codigo + gates locales; go-live bloqueado por ops externas) |
+| **Workforce / Elite** | **PASS** - freezes intactos (Router / MCP / Specialization / Elite / Workforce) |
+| **Cierre prioritario** | CSRF Origin SaaS, SES bounce tenant-scope, mig **515** RLS Shared Memory, preflight ingest, OpenClaw runtime SSOT, checklists OPS Stripe/SES/514 |
+| **Brain knowledge** | Manifest **263** / unique **234** / orphans **5** / coverage **~0.83** / `claimComplete` **false** / ingest `verified:false` (Docker DOWN) |
+| **QA local (2026-07-20)** | `tsc` OK; focused **28 passed / 2 skipped**; suite principal **2402 passed / 4 skipped**; migraciones **508-515** OK; npm audit **0 critical / 0 high** (documenter) |
 | **Prod email** | **Bloqueado** KI-014 SES production access |
-| **Freeze** | Router / MCP / Specialization / Elite / Workforce |
+| **Shared Memory 514/515** | En repo; aplicacion staging/prod **NO verificada** sin `DATABASE_URL` |
+| **Informe** | [`docs/CIERRE_FINAL_PRIORITARIO.md`](CIERRE_FINAL_PRIORITARIO.md) |
 
 ---
 
-## Próximo paso EXACTO
+## Proximo paso EXACTO
 
-1. Arrancar Docker Desktop + `docker compose -f backend/local-ai/docker-compose.yml up -d`  
-2. Con local-ai Postgres UP: `NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs` → `knowledge_ingest_evidence.json` `verified:true` solo con chunks reales  
-3. Ops externos: SES (KI-014) / Stripe prod / mig **514** staging Railway / Cloudflare / Railway deploy  
-4. Remediación gradual KI-012 (npm high) vía Dependabot — sin exclusiones globales
+1. Arrancar Docker Desktop + `docker compose -f backend/local-ai/docker-compose.yml up -d`
+2. `node scripts/preflight-local-ai-ingest.mjs` hasta RESULT=OK; luego `$env:NELVYON_KNOWLEDGE_INGEST="1"; node scripts/nelvyon-knowledge-sync.mjs` y exigir `knowledge_ingest_evidence.json` con `verified:true` solo con chunks reales
+3. Con `DATABASE_URL` staging/prod: `pnpm -C apps/web migrate` + `node scripts/verify-shared-memory-schema.mjs` (514 tablas + 515 RLS)
+4. Checklists humanos: [`docs/OPS_SES_PROD.md`](OPS_SES_PROD.md) (KI-014) y [`docs/OPS_STRIPE_PROD.md`](OPS_STRIPE_PROD.md); luego Cloudflare/Railway deploy + OpenClaw URL si aplica
 
 ---
 
-## Evidencia
+## Evidencia (gates 2026-07-20)
 
 ```powershell
+node scripts/validate-post-elite-migrations.mjs
+node scripts/preflight-local-ai-ingest.mjs
+node scripts/verify-shared-memory-schema.mjs
+node scripts/document-npm-audit-high.mjs
+node scripts/nelvyon-knowledge-sync.mjs
 pnpm -C apps/web exec tsc --noEmit
 pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm --reporter=dot
-node scripts/validate-post-elite-migrations.mjs
-node scripts/nelvyon-knowledge-sync.mjs
 ```
 
-Informes: `docs/ELITE_QUALITY_FINALIZATION.md` · `docs/NELVYON_BRAIN_KNOWLEDGE.md` · `docs/FINAL_ELITE_CLOSURE.md`
+Detalle y SHAs: [`docs/CIERRE_FINAL_PRIORITARIO.md`](CIERRE_FINAL_PRIORITARIO.md)
