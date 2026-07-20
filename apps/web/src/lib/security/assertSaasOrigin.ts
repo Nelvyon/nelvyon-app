@@ -48,7 +48,7 @@ export function assertSaasCookieMutationOrigin(opts: {
   /** Bearer / API-key style — skip Origin (not cookie CSRF). */
   hasAuthorizationHeader: boolean;
 }): "csrf_origin_required" | "csrf_origin_mismatch" | null {
-  if (!opts.pathname.startsWith("/api/saas/")) return null;
+  if (!opts.pathname.startsWith("/api/saas/") && !opts.pathname.startsWith("/api/os/")) return null;
   if (!isMutatingMethod(opts.method)) return null;
   if (!opts.hasAuthCookie) return null;
   if (opts.hasAuthorizationHeader) return null;

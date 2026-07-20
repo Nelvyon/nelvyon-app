@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-07-20T10:30:51.771Z",
+  "generatedAt": "2026-07-20T10:53:43.042Z",
   "summary": {
-    "total": 272,
-    "uniqueFiles": 239,
+    "total": 273,
+    "uniqueFiles": 240,
     "byDomain": {
-      "nelvyon": 79,
+      "nelvyon": 80,
       "development_tech": 48,
       "security_privacy": 19,
       "planning_strategy": 9,
@@ -27,7 +27,7 @@
     },
     "bySourceType": {
       "constitution": 1,
-      "official_doc": 167,
+      "official_doc": 168,
       "knowledge_pack": 25,
       "runbook": 37,
       "sop": 32,
@@ -61,8 +61,8 @@
   "domainCoverage": [
     {
       "domain": "nelvyon",
-      "documents": 79,
-      "percentOfManifest": 29,
+      "documents": 80,
+      "percentOfManifest": 29.3,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -78,7 +78,7 @@
     {
       "domain": "digital_marketing",
       "documents": 26,
-      "percentOfManifest": 9.6,
+      "percentOfManifest": 9.5,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -134,7 +134,7 @@
     {
       "domain": "crm_sales",
       "documents": 17,
-      "percentOfManifest": 6.3,
+      "percentOfManifest": 6.2,
       "status": "ok",
       "priority": "P2",
       "gaps": []
@@ -174,7 +174,7 @@
     {
       "domain": "finance_operations",
       "documents": 17,
-      "percentOfManifest": 6.3,
+      "percentOfManifest": 6.2,
       "status": "ok",
       "priority": "P2",
       "gaps": []

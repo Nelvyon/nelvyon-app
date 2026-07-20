@@ -60,6 +60,7 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/OPS_SES_PROD.md", disposition: "index", domain: ["finance_operations", "development_tech"], priority: 0, title: "OPS SES Production Checklist", sourceType: "runbook", reason: "SES prod ops" },
   { path: "docs/OPS_SHARED_MEMORY_514.md", disposition: "index", domain: ["development_tech", "security_privacy"], priority: 0, title: "OPS Shared Memory 514 Checklist", sourceType: "runbook", reason: "Shared memory migrate verify" },
   { path: "docs/OPS_STRIPE_PROD.md", disposition: "index", domain: "finance_operations", priority: 0, title: "OPS Stripe Production Checklist", sourceType: "runbook", reason: "Stripe prod ops" },
+  { path: "docs/SPRINT_FINAL_ABSOLUTO.md", disposition: "index", domain: "nelvyon", priority: 0, title: "Sprint Final Absoluto", reason: "CONDITIONAL_READY status" },
 
   // —— Archive: historical / superseded / research dumps ——
   { path: "docs/BETA_LAUNCH_AUDIT.md", disposition: "archive", reason: "Pre-beta historical audit" },

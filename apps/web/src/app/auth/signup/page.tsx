@@ -23,8 +23,21 @@ export default function ClientSignupPage() {
     setErrorMessage(null);
     setPhase("loading");
     try {
-      // v1 intentionally uses a controlled placeholder flow while auth backend is finalized.
-      await new Promise((resolve) => setTimeout(resolve, 650));
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+          fullName: form.fullName.trim(),
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+      if (!res.ok) {
+        setPhase("error");
+        setErrorMessage(data.error ?? data.message ?? `Registro falló (${res.status})`);
+        return;
+      }
       setPhase("success");
     } catch {
       setPhase("error");

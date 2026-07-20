@@ -93,4 +93,30 @@ describe("assertSaasOrigin", () => {
       }),
     ).toBeNull();
   });
+
+  it("rejects mismatched Origin on /api/os", () => {
+    expect(
+      assertSaasCookieMutationOrigin({
+        method: "POST",
+        pathname: "/api/os/execute",
+        origin: "https://evil.example",
+        referer: null,
+        hasAuthCookie: true,
+        hasAuthorizationHeader: false,
+      }),
+    ).toBe("csrf_origin_mismatch");
+  });
+
+  it("allows legitimate Origin on /api/os", () => {
+    expect(
+      assertSaasCookieMutationOrigin({
+        method: "POST",
+        pathname: "/api/os/packs/local-business-growth/kickoff",
+        origin: "https://app.nelvyon.com",
+        referer: null,
+        hasAuthCookie: true,
+        hasAuthorizationHeader: false,
+      }),
+    ).toBeNull();
+  });
 });

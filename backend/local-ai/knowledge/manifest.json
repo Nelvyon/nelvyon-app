@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-20T10:30:51.775Z",
+  "generated": "2026-07-20T10:53:43.045Z",
   "entries": [
     {
       "path": "docs/CONSTITUTION_NELVYON_AI.md",
@@ -760,6 +760,14 @@
       "license": "nelvyon_internal",
       "sourceType": "runbook",
       "title": "OPS Stripe Production Checklist"
+    },
+    {
+      "path": "docs/SPRINT_FINAL_ABSOLUTO.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Sprint Final Absoluto"
     },
     {
       "path": "docs/README.md",
@@ -2179,10 +2187,10 @@
     }
   ],
   "summary": {
-    "total": 272,
-    "uniqueFiles": 239,
+    "total": 273,
+    "uniqueFiles": 240,
     "byDomain": {
-      "nelvyon": 79,
+      "nelvyon": 80,
       "development_tech": 48,
       "security_privacy": 19,
       "planning_strategy": 9,
@@ -2205,7 +2213,7 @@
     },
     "bySourceType": {
       "constitution": 1,
-      "official_doc": 167,
+      "official_doc": 168,
       "knowledge_pack": 25,
       "runbook": 37,
       "sop": 32,

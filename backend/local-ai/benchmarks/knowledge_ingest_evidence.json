@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T10:05:04.591Z",
+  "generatedAt": "2026-07-20T10:41:43.521Z",
   "ok": false,
   "verified": false,
   "pipeline": [
@@ -23,7 +23,7 @@
   "blocker": "Docker Desktop daemon not running -- local-ai Postgres (127.0.0.1:5434) unavailable. Run: node scripts/preflight-local-ai-ingest.mjs",
   "preflight": {
     "path": "scripts/preflight-local-ai-ingest.mjs",
-    "ranAt": "2026-07-20T10:05:04.591Z",
+    "ranAt": "2026-07-20T10:41:43.521Z",
     "passed": false,
     "checks": [
       {
@@ -51,7 +51,7 @@
   },
   "claimComplete": false,
   "dockerInfo": {
-    "checkedAt": "2026-07-20T10:05:04.591Z",
+    "checkedAt": "2026-07-20T10:41:43.521Z",
     "daemonRunning": false,
     "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
   }

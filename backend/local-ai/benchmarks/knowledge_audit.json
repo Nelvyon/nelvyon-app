@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T10:30:51.775Z",
+  "generatedAt": "2026-07-20T10:53:43.046Z",
   "audit": {
     "domains": [
       "nelvyon",
@@ -25,7 +25,7 @@
     ],
     "byDomain": {
       "nelvyon": {
-        "count": 79,
+        "count": 80,
         "sources": [
           "kb:nelvyon:CONSTITUTION_NELVYON_AI.md",
           "kb:nelvyon:HANDOVER.md",
@@ -64,6 +64,7 @@
           "kb:nelvyon:NELVYON_UNIVERSAL_PLATFORM.md",
           "kb:nelvyon:CIERRE_FINAL_PRIORITARIO.md",
           "kb:nelvyon:ELITE_QUALITY_FINALIZATION.md",
+          "kb:nelvyon:SPRINT_FINAL_ABSOLUTO.md",
           "kb:nelvyon:README.md",
           "kb:nelvyon:PRODUCTION_CERTIFICATION_REPORT.md",
           "kb:nelvyon:PRIVATE_AI_PHASE2.md",
@@ -397,8 +398,8 @@
         ]
       }
     },
-    "uniqueFiles": 239,
-    "totalEntries": 272,
+    "uniqueFiles": 240,
+    "totalEntries": 273,
     "duplicatePathDomain": [],
     "multiDomainFiles": [
       {

@@ -177,7 +177,7 @@ Detalle: `DATABASE.md`
 |-------|-------|
 | **Prod Web** | `https://nelvyon.com` — live/ready OK |
 | **MCP Productivo** | ✅ CERTIFIED — soak 7200040 ms |
-| **Migraciones** | Hasta **514** (`514_shared_memory`) |
+| **Migraciones** | Hasta **515** (`515_shared_memory_rls`) |
 | **Fase 2** | Shared Memory runtime + orch/panel (flags OFF) |
 
 ---
