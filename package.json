@@ -17,9 +17,14 @@
     "@types/ws": "^8.18.1"
   },
   "scripts": {
+    "nelvyon:verify:all": "node scripts/nelvyon-verify-all.mjs",
+    "nelvyon:verify:all:build": "node scripts/nelvyon-verify-all.mjs --with-build",
+    "nelvyon:preflight:ingest": "node scripts/preflight-local-ai-ingest.mjs",
+    "nelvyon:preflight:prod-env": "node scripts/preflight-prod-env.mjs",
     "dev:frontend": "pnpm -C frontend dev",
     "dev:backend": "cd backend && python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000",
-    "lint": "pnpm -C frontend lint",
+    "lint": "pnpm -C apps/web exec eslint src --max-warnings 0",
+    "lint:legacy": "pnpm -C frontend lint",
     "test:fast": "cd backend && python -m pytest tests/test_audit_rbac_phase1.py tests/test_secrets_phase1.py tests/test_messages_workspace_consistency.py tests/test_regression_abcd_smoke.py tests/test_voice_pilot_v2.py tests/test_os_observability_v1.py tests/test_tenant_branding_v2_policy.py tests/test_os_global_v2.py tests/test_os_excellence_v1.py -q --tb=short"
   }
 }
