@@ -17,14 +17,14 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(EMPTY_REVIEWS_LIST);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 
   let data = EMPTY_REVIEWS_LIST;
   if (sentiment) {
     data = {
       ...data,
-      items: data.items.filter((r) => r.sentiment === sentiment),
+      items: data.items.filter((r) => (r as { sentiment?: string }).sentiment === sentiment),
     };
   }
   return NextResponse.json(data);

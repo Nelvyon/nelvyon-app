@@ -4,7 +4,7 @@ import { bffDegraded, BFF_DEGRADED_OAUTH, BFF_DEGRADED_UPSTREAM } from "@/lib/bf
 import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
 import { readJsonBody } from "@/lib/platformBffRoute";
-import { createLogger } from "@/../../backend/logger/logger";
+import { createLogger } from "@nelvyon/logger";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 const log = createLogger("ads-bff");
@@ -61,6 +61,15 @@ function degradedResponse(fallback: unknown, reason: string, upstreamPath: strin
   return NextResponse.json(fallback, { status });
 }
 
+/** Writes must never invent successful mock payloads (anti-silent-mock). */
+function writeUpstreamUnavailable(upstreamPath: string, reason: string) {
+  log.warn("ads BFF write fail-closed", { route: upstreamPath, operation: "POST", reason });
+  return NextResponse.json(
+    { error: "Upstream unavailable", degraded: true, reason },
+    { status: 502 },
+  );
+}
+
 export async function adsBffGet(req: Request, upstreamPath: string, fallback: unknown) {
   const claims = await resolveClaims(req);
   if (claims instanceof NextResponse) {
@@ -99,7 +108,7 @@ export async function adsBffGet(req: Request, upstreamPath: string, fallback: un
   }
 }
 
-export async function adsBffPost(req: Request, upstreamPath: string, fallback: unknown) {
+export async function adsBffPost(req: Request, upstreamPath: string, _fallback?: unknown) {
   const claims = await resolveClaims(req);
   if (claims instanceof NextResponse) {
     if (claims.status === 403) {
@@ -134,16 +143,16 @@ export async function adsBffPost(req: Request, upstreamPath: string, fallback: u
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (upstreamFailed(upstream.status)) {
-      return degradedResponse(fallback, BFF_DEGRADED_UPSTREAM, upstreamPath);
+      return writeUpstreamUnavailable(upstreamPath, BFF_DEGRADED_UPSTREAM);
     }
     const text = await upstream.text();
     try {
       return NextResponse.json(JSON.parse(text), { status: upstream.status });
     } catch {
-      return degradedResponse(fallback, BFF_DEGRADED_UPSTREAM, upstreamPath);
+      return writeUpstreamUnavailable(upstreamPath, BFF_DEGRADED_UPSTREAM);
     }
   } catch (e) {
     log.error("ads BFF POST upstream failed", { route: upstreamPath, operation: "POST" }, e instanceof Error ? e : undefined);
-    return degradedResponse(fallback, BFF_DEGRADED_UPSTREAM, upstreamPath);
+    return writeUpstreamUnavailable(upstreamPath, BFF_DEGRADED_UPSTREAM);
   }
 }

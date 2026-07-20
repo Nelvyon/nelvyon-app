@@ -19,10 +19,13 @@ export const EMPTY_CONNECTION = bffDegraded(
   BFF_DEGRADED_OAUTH,
 );
 
-export const EMPTY_ALERTS = {
-  items: [] as Array<{ id: string; review_id: string; severity: string; message: string; created_at: string }>,
-  active_count: 0,
-};
+export const EMPTY_ALERTS = bffDegraded(
+  {
+    items: [] as Array<{ id: string; review_id: string; severity: string; message: string; created_at: string }>,
+    active_count: 0,
+  },
+  BFF_DEGRADED_NO_DATA,
+);
 
 export const EMPTY_EMBED = {
   widget_id: "nelvyon-reviews",
