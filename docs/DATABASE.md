@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-16
+> Actualizado: 2026-07-20
 
 ---
 
@@ -9,7 +9,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
-| **Total archivos** | 408 |
+| **Total archivos** | 410 |
 | **Última migración** | `514_shared_memory.sql` |
 | **Shared Memory schema** | Aplicado en mig 514 · `schema.proposed.sql` es referencia histórica |
 | **Runner** | `backend/db/migrate.ts` |
@@ -17,7 +17,8 @@
 | **Comando** | `pnpm -C apps/web migrate` |
 | **Prod** | Railway `releaseCommand` en deploy Web |
 
-**Rango elite SaaS CI (referencia):** 401–507+ (verificar CI actual si se amplía).
+**Rango post-elite CI:** 508–514 (`scripts/validate-post-elite-migrations.mjs` en security-gates + web-quality-gates).
+**Rango elite SaaS CI:** 401–507 (`scripts/validate-saas-migrations.mjs`).
 
 ---
 
@@ -104,14 +105,15 @@
 | Problema | Migración | Estado |
 |----------|-----------|--------|
 | `saas_ceo_brief_settings` missing prod | 494 | 🟡 código mitigado; apply migrate |
-| Drift 495–511 en prod | 495–511 | ❓ verificar `_migrations` |
-| CLAUDE.md dice última 507 | — | Doc desactualizada |
+| Drift 495–514 en staging/prod | 495–514 | ❓ verificar `_migrations` (incl. 514 Shared Memory) |
+| Ingest vector local-ai (pgvector) | — | 🟡 código listo; ops: Docker + `NELVYON_KNOWLEDGE_INGEST=1` |
 
 ---
 
 ## Tablas pendientes / ingest
 
-- RAG: `nelvyon_rag_chunks` existe; **pipeline ingest no implementado** (PRIVATE_AI_ARCHITECTURE)
+- RAG plataforma: `nelvyon_rag_chunks` (ILIKE adjunct) + LocalVectorStore (pgvector) vía `KnowledgeIngestService`
+- Ingest live: requiere Postgres local-ai UP; ver `docs/NELVYON_BRAIN_KNOWLEDGE.md`
 
 ---
 
