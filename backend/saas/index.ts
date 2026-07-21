@@ -1559,18 +1559,6 @@ export {
   MCP_TOOLS,
 } from "./NelvyonMcpService";
 export {
-  getSaasMcpProductiveService,
-  resetSaasMcpProductiveServiceForTests,
-  SaasMcpProductiveService,
-} from "./SaasMcpProductiveService";
-export {
-  getMcpProductiveServer,
-  getMcpProductiveClient,
-  planMcpForRouter,
-  executeRouterToolPlan,
-  isMcpProductiveEnabled,
-} from "../mcp";
-export {
   refreshAdsAccessTokenIfNeeded,
   resolveAdsConnectionToken,
 } from "./saasAdsTokenRefresh";
@@ -1643,23 +1631,12 @@ export {
   OPENCLAW_ADAPTER_CONTRACT,
 } from "../openclaw";
 export {
-  getPrivateAiMetricsSnapshot,
-  resetPrivateAiMetricsForTests,
-  incPrivateAiMetric,
-} from "../private-ai/observability/PrivateAiMetrics";
-export {
   getUnifiedRagStore,
   preferLocalRag,
   resetUnifiedRagStoreForTests,
 } from "../private-ai/rag/UnifiedRagStore";
 export { buildAgentContext, maybeWriteAgentMemory } from "../private-ai/context/AgentContextEngine";
 export { agentToolToMcp, mcpToolToAgent, listMappedAgentTools } from "../private-ai/tools/toolIdMap";
-export {
-  AI_PANEL_NAV,
-  AI_PANEL_WIDGETS,
-  AI_PANEL_ROUTE_PLAN,
-  assertAiPanelDesign,
-} from "../ai-panel";
 export {
   getPrivateAiRouter,
   resetPrivateAiRouterForTests,
@@ -1680,19 +1657,6 @@ export {
   isLocalRouterEnabled,
   isOpenClawBridgeEnabled,
 } from "../private-ai/config";
-export {
-  routeTask,
-  executeTask,
-  getRouterHealth,
-  getTaskStatus,
-  classifyTask,
-} from "../local-ai/router";
-export type {
-  RouterTaskInput,
-  RouterTaskResult,
-  RouterDecision,
-  RouterHealth,
-} from "../local-ai/router";
 export {
   getProviderRegistry,
   resetProviderRegistryForTests,
