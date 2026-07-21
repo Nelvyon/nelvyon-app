@@ -580,15 +580,6 @@ export {
   type SentimentChannelDistribution,
 } from "./SentimentMonitorService";
 export {
-  LeadScoringService,
-  getLeadScoringService,
-  resetLeadScoringServiceForTests,
-  type LeadCategory,
-  type LeadData,
-  type LeadScoreResult,
-  type ScoredLead,
-} from "./LeadScoringService";
-export {
   ClientBriefingService,
   getClientBriefingService,
   resetClientBriefingServiceForTests,
@@ -1324,9 +1315,16 @@ export {
   isSesEnvConfigured,
   isTwilioEnvConfigured,
   isStripeEnvConfigured,
+  isStripeStoreWebhookConfigured,
   isOpenAiEnvConfigured,
+  isPackLlmEnvConfigured,
   isEnvKeysConfigured,
+  isAnyEnvKeyConfigured,
   missingEnvKeys,
+  missingSesEnvKeys,
+  missingStripeEnvKeys,
+  missingStripeStoreWebhookSecret,
+  missingStripeConnectWebhookSecret,
 } from "./saasEnv";
 export {
   syncOAuthProviderToHub,
