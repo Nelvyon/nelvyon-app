@@ -1,5 +1,5 @@
 # Nelvyon web — production Dockerfile (Railway @nelvyon/web)
-# release: 2026-07-21 migrations-through-516 (build-fix 89b34a4)
+# release: 2026-07-21 build-fix revert-phase2-barrel
 FROM node:20-alpine AS base
 RUN npm install -g pnpm
 
@@ -46,6 +46,8 @@ COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
 COPY --from=builder /app/apps/web/next.config.ts ./apps/web/next.config.ts
 COPY --from=builder /app/apps/web/source.config.ts ./apps/web/source.config.ts
 COPY --from=builder /app/apps/web/server.js ./apps/web/server.js
+# next.config.ts imports SSOT headers at process start (runtime require)
+COPY --from=builder /app/apps/web/src/lib/security ./apps/web/src/lib/security
 WORKDIR /app/apps/web
 CMD ["node", "server.js"]
-# noop rebuild trigger — SHA alignment only, no functional change (2026-07-06)
+# release: 2026-07-21 runtime headers COPY for next.config
