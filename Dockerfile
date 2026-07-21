@@ -35,5 +35,7 @@ COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
 COPY --from=builder /app/apps/web/next.config.ts ./apps/web/next.config.ts
 COPY --from=builder /app/apps/web/source.config.ts ./apps/web/source.config.ts
 COPY --from=builder /app/apps/web/server.js ./apps/web/server.js
+# next.config.ts requires this at process start (Railway uses this root Dockerfile)
+COPY --from=builder /app/apps/web/src/lib/security ./apps/web/src/lib/security
 WORKDIR /app/apps/web
 CMD ["node", "server.js"]
