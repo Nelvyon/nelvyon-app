@@ -1594,6 +1594,29 @@ export {
   SaasPrivateAiService,
 } from "./SaasPrivateAiService";
 export {
+  getSaasSharedMemoryService,
+  resetSaasSharedMemoryServiceForTests,
+  SaasSharedMemoryService,
+} from "./SaasSharedMemoryService";
+export {
+  SharedMemoryNotEnabledError,
+  SharedMemoryDeniedError,
+  SharedMemoryApprovalRequiredError,
+  isSharedMemoryEnabled,
+  getSharedMemoryConfig,
+} from "../shared-memory";
+export {
+  listUnifiedAgents,
+  getUnifiedAgent,
+  agentRegistryStatus,
+} from "../agents/AgentRegistry";
+export type { UnifiedAgentRecord } from "../agents/AgentRegistry";
+export {
+  getPromptRegistry,
+  resetPromptRegistryForTests,
+  PROMPT_REGISTRY_CONTRACT_VERSION,
+} from "../prompt-registry";
+export {
   getPrivateAiRouter,
   resetPrivateAiRouterForTests,
   PrivateAiRouter,
