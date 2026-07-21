@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T10:05:04.637Z",
+  "generatedAt": "2026-07-21T11:42:44.747Z",
   "ok": false,
   "verified": false,
   "blocker": "DATABASE_URL (or LOCAL_AI_DATABASE_URL) not set — cannot verify applied state",

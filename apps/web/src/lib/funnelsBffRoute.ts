@@ -3,48 +3,57 @@ import { adsBffGet, adsBffPost } from "@/lib/adsBffRoute";
 
 export { adsBffGet as funnelsBffGet, adsBffPost as funnelsBffPost };
 
-export const EMPTY_FUNNELS_LIST = { items: [] as unknown[] };
+export const EMPTY_FUNNELS_LIST = bffDegraded({ items: [] as unknown[] }, BFF_DEGRADED_UPSTREAM);
 
-export const EMPTY_FUNNEL = {
-  id: "",
-  name: "",
-  status: "draft",
-  steps: [] as unknown[],
-  step_count: 0,
-};
-
-export const EMPTY_FUNNEL_ANALYTICS = {
-  funnel_id: "",
-  name: "",
-  campaign_id: null as number | null,
-  steps: [] as Array<{
-    step_id: string;
-    name: string;
-    visits: number;
-    conversions: number;
-    conversion_rate: number;
-    drop_off_rate: number;
-    attributed_revenue?: number;
-  }>,
-  total_attributed_revenue: 0,
-};
-
-export const EMPTY_UNIFIED_FUNNELS = {
-  funnels: EMPTY_FUNNELS_LIST,
-  crm: { deals_total: 0, pipeline_value: 0 },
-  ads: { total_spend: 0, blended_roas: 0 },
-  unified: {
-    active_funnels: 0,
-    total_funnels: 0,
-    total_visits: 0,
-    total_conversions: 0,
-    avg_conversion_rate: 0,
-    attributed_revenue: 0,
-    deals_total: 0,
-    ads_spend: 0,
-    ads_roas: 0,
+export const EMPTY_FUNNEL = bffDegraded(
+  {
+    id: "",
+    name: "",
+    status: "draft",
+    steps: [] as unknown[],
+    step_count: 0,
   },
-};
+  BFF_DEGRADED_NO_DATA,
+);
+
+export const EMPTY_FUNNEL_ANALYTICS = bffDegraded(
+  {
+    funnel_id: "",
+    name: "",
+    campaign_id: null as number | null,
+    steps: [] as Array<{
+      step_id: string;
+      name: string;
+      visits: number;
+      conversions: number;
+      conversion_rate: number;
+      drop_off_rate: number;
+      attributed_revenue?: number;
+    }>,
+    total_attributed_revenue: 0,
+  },
+  BFF_DEGRADED_NO_DATA,
+);
+
+export const EMPTY_UNIFIED_FUNNELS = bffDegraded(
+  {
+    funnels: EMPTY_FUNNELS_LIST,
+    crm: { deals_total: 0, pipeline_value: 0 },
+    ads: { total_spend: 0, blended_roas: 0 },
+    unified: {
+      active_funnels: 0,
+      total_funnels: 0,
+      total_visits: 0,
+      total_conversions: 0,
+      avg_conversion_rate: 0,
+      attributed_revenue: 0,
+      deals_total: 0,
+      ads_spend: 0,
+      ads_roas: 0,
+    },
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 export function mergeUnifiedFunnels(
   funnelsList: { items?: Array<{ status?: string; step_count?: number }> },

@@ -1,7 +1,13 @@
 import { expect, test, type Page, request as playwrightRequest } from "@playwright/test";
 
 const email = process.env.STAGING_E2E_EMAIL ?? "qa-audit-20260612@nelvyon.test";
-const password = process.env.STAGING_E2E_PASSWORD ?? "StagingQA2026!";
+const password =
+  process.env.STAGING_E2E_PASSWORD?.trim() ||
+  process.env.STAGING_QA_PASSWORD?.trim() ||
+  (process.env.STAGING_QA_ALLOW_DEFAULT === "1" ? "StagingQA2026!" : "");
+if (!password) {
+  throw new Error("STAGING_E2E_PASSWORD or STAGING_QA_PASSWORD is required (or STAGING_QA_ALLOW_DEFAULT=1)");
+}
 
 async function dismissCookieBanner(page: Page) {
   const accept = page.getByRole("button", { name: /aceptar todo/i });

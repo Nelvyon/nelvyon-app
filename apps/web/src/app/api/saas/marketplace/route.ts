@@ -25,7 +25,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ apps });
   } catch (e) {
     if (isPgMissingRelation(e)) {
-      return NextResponse.json({ apps: CATALOG_FALLBACK, schemaPending: true });
+      return NextResponse.json({ apps: CATALOG_FALLBACK, schemaPending: true, degraded: true, degraded_reason: "schema_pending" });
     }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

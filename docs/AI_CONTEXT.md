@@ -1,6 +1,8 @@
 # AI_CONTEXT — Contexto técnico completo NELVYON
 
-> Fuente para IAs. **Sin secretos.** Actualizado: 2026-07-16.
+> Fuente para IAs. **Sin secretos.** Actualizado: 2026-07-16.  
+> **Onboarding preferido:** leer primero `docs/NELVYON_MASTER_CONTEXT.md` (biblia) y luego `docs/HANDOVER.md` (estado + próximo paso).  
+> Si este archivo contradice HANDOVER / DATABASE / DECISIONS / KNOWN_ISSUES → **gana el documento más reciente de esa jerarquía** (p. ej. mig **515**, no el conteo 408 de abajo).
 
 ---
 

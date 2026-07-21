@@ -24,8 +24,10 @@ describe("platformFastApiProxy", () => {
     expect(rows[0]?.role).toBe("member");
   });
 
-  it("EMPTY_CLIENT_LIST is a valid empty payload", () => {
+  it("EMPTY_CLIENT_LIST is a valid empty degraded payload", () => {
     expect(EMPTY_CLIENT_LIST.items).toEqual([]);
     expect(EMPTY_CLIENT_LIST.total).toBe(0);
+    expect(EMPTY_CLIENT_LIST.degraded).toBe(true);
+    expect(EMPTY_CLIENT_LIST.degraded_reason).toBeTruthy();
   });
 });

@@ -126,7 +126,7 @@ export function IntegrationsHub() {
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >
             <div className="nelvyon-integrations-hub__core-ring" aria-hidden />
-            <Image src="/logo.png" alt="" width={40} height={40} className="nelvyon-integrations-hub__logo" />
+            <Image src="/logo.svg" alt="" width={40} height={40} className="nelvyon-integrations-hub__logo" unoptimized />
             <span className="nelvyon-integrations-hub__brand">NELVYON</span>
           </motion.div>
 

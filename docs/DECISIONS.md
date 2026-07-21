@@ -331,3 +331,43 @@
 | **Consecuencias** | Gate más estricto (build+live en cada cert); PASS real emitido 2026-07-19; KI-019 → R019 |
 | **Evidencia** | `workforce_certification.json` · `workforcePassResiduals.test.ts` · `workforceLive.test.ts` |
 
+---
+
+## ADR-030 — Ingest local-ai: tsconfig dedicado (no mapear `pg` en apps/web)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-20 |
+| **Decisión** | (1) **No** añadir `paths.pg` en `apps/web/tsconfig.json`. (2) Ejecutar ingest con `tsx --tsconfig scripts/tsconfig.local-ai-ingest.json` desde `nelvyon-knowledge-sync.mjs` / invocación directa. |
+| **Por qué** | Mapear `pg` → `@types/pg/*.d.ts` rompe esbuild/tsx (`TransformError`). Mapear `pg` → paquete runtime sin `types` rompe `tsc` (`TS7016`). Separar configs evita ambos. |
+| **Consecuencias** | `tsc` apps/web verde; ingest Brain sigue verificado con Docker+Ollama UP. Añadir `@types/pg` en workspace root si local-ai se tipa vía árbol apps/web. Router/MCP/Workforce/Elite sin cambios. |
+| **Evidencia** | `knowledge_ingest_evidence.json` · `scripts/tsconfig.local-ai-ingest.json` · typecheck PASS post-revisión · `@types/pg` -w |
+| **Relación** | No contradice ADR-002/004/015/024/025/029. Complementa tooling de ADR-025 (RAG) sin tocar certs. |
+
+---
+
+## ADR-031 — RECLASIFICADO (no es decisión arquitectónica duradera)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha original** | 2026-07-20 |
+| **Estado** | **Reclasificado 2026-07-20** — no se elimina el historial; deja de tratarse como ADR vinculante |
+| **Motivo de reclasificación** | Documentaba una reconciliación operativa de staging (KI-022 rename `conversations`), no una decisión de arquitectura de producto. El patrón útil (“archivo `NNNa_*.sql` intercalado por orden léxico del migrator sin editar migraciones históricas”) queda en `docs/DATABASE.md` § reconciliaciones staging, no como ADR. |
+| **Qué permanece válido** | ADR-002 (migraciones SQL numeradas + `migrate.ts` `.sort()`) sigue siendo la decisión arquitectónica. |
+| **Evidencia operativa** | KI-022 resuelto en staging · ver `KNOWN_ISSUES` / HANDOVER |
+
+---
+
+## ADR-032 — Dual-plane tenant isolation (SaaS UUID vs FastAPI workspace INTEGER)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-21 |
+| **Decisión** | Coexisten **dos planos** de aislamiento multi-tenant, no unificados: **(A) SaaS** — `tenant_id UUID` + RLS `nelvyon_current_saas_tenant_uuid()` (JWT/`requireSaasContext`); aplica a `saas_*`, `audit_logs`, Shared Memory. **(B/C) FastAPI** — `workspace_id INTEGER` o `tenant_id INTEGER` (= workspace) + RLS `current_tenant_id()` tras `set_tenant_context(ws)`; aplica a CDP, dialer, funnels, LMS, social unprefixed. **(D) Chatbot SaaS** — `chatbot_conversations` vía `chatbot_configs.user_id` + `nelvyon_jwt_user_id()`. Puente: `saas_tenants.workspace_id` (mig 310). |
+| **Por qué** | Unificar a un solo tipo rompería FastAPI (INTEGER) o SaaS (UUID). Mig 507 mezcló planos y falló policies early (42883) / uuid≠integer en `audit_logs`. |
+| **Consecuencias** | Nunca comparar UUID con `current_tenant_id()`. Tablas `saas_*` vs unprefixed FastAPI son intencionales hasta convergencia futura. Reparación operativa = mig **516** (policies aditivas; **no** editar 507). `DbClient` service_role sigue bypass RLS (defensa app-layer); RLS es defensa en profundidad para roles JWT. |
+| **Relación** | Complementa ADR-002 (migraciones), ADR-024 (Shared Memory SaaS UUID), KI-026. |
+| **Evidencia** | `516_fastapi_rls_repair.sql` · KI-026 audit · HANDOVER |
+
+---
+

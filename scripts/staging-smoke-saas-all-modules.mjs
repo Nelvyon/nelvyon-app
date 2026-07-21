@@ -8,7 +8,7 @@ import { finishSmokeGate } from "./lib/smoke-summary.mjs";
 
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
-const QA_PASSWORD = "StagingQA2026!";
+const QA_PASSWORD = process.env.STAGING_QA_PASSWORD?.trim() || (process.env.STAGING_QA_ALLOW_DEFAULT === "1" ? "StagingQA2026!" : (() => { throw new Error("STAGING_QA_PASSWORD is required (or STAGING_QA_ALLOW_DEFAULT=1)"); })());
 const COOKIE = "nelvyon_token";
 const SKIP_WAIT = process.argv.includes("--skip-wait");
 

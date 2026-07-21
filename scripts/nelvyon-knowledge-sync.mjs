@@ -42,10 +42,21 @@ if (r.status !== 0) {
 try { unlinkSync(tmp); } catch { /* ignore */ }
 
 if (process.env.NELVYON_KNOWLEDGE_INGEST === "1") {
-  const ingest = run("pnpm", ["-C", "apps/web", "exec", "tsx", "../../scripts/local-ai-ingest-knowledge.ts"]);
+  // Dedicated tsconfig: apps/web paths must not map `pg` → @types/pg (esbuild TransformError)
+  // nor strip @types (tsc TS7016). See ADR-030.
+  const ingest = run("pnpm", [
+    "-C",
+    "apps/web",
+    "exec",
+    "tsx",
+    "--tsconfig",
+    "../../scripts/tsconfig.local-ai-ingest.json",
+    "../../scripts/local-ai-ingest-knowledge.ts",
+  ]);
   console.log(ingest.stdout || "");
   if (ingest.status !== 0) {
     console.warn("[nelvyon-knowledge-sync] ingest failed (DB may be down) — manifest/gaps still written");
+    if (ingest.stderr) console.warn(ingest.stderr.slice(0, 800));
   }
 } else {
   console.log("[nelvyon-knowledge-sync] skip ingest (set NELVYON_KNOWLEDGE_INGEST=1 when local-ai Postgres is up)");

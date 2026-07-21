@@ -45,7 +45,7 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(EMPTY_TICKETS);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
   if (claims instanceof NextResponse) return claims;
 

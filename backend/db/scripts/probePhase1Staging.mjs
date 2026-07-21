@@ -7,8 +7,13 @@ import { fileURLToPath } from "node:url";
 import pg from "pg";
 
 const BASE = "https://ideal-victory-staging.up.railway.app";
-const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
-const QA_PASSWORD = "StagingQA2026!";
+const QA_EMAIL = process.env.STAGING_QA_EMAIL?.trim() || "qa-audit-20260612@nelvyon.test";
+const QA_PASSWORD =
+  process.env.STAGING_QA_PASSWORD?.trim() ||
+  (process.env.STAGING_QA_ALLOW_DEFAULT === "1" ? "StagingQA2026!" : "");
+if (!QA_PASSWORD) {
+  throw new Error("STAGING_QA_PASSWORD is required (or STAGING_QA_ALLOW_DEFAULT=1)");
+}
 const RUN_ID = Date.now();
 const TEST_EMAIL = process.env.PHASE1_TEST_EMAIL?.trim() || `phase1-${RUN_ID}@nelvyon.test`;
 const CRON_SECRET = process.env.CRON_SECRET?.trim() || "";

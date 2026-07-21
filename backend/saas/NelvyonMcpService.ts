@@ -1,4 +1,8 @@
 /**
+ * @deprecated Phase 2 SSOT MCP = productive stack (`backend/mcp` + `/api/saas/mcp`).
+ * This legacy 5-tool HTTP bridge remains for backward clients only — do not extend.
+ * Prefer `getMcpProductiveClient()` / `SaasMcpProductiveService`.
+ *
  * S58 — Nelvyon MCP tool registry (HTTP bridge for MCP clients).
  * Maps tool names → existing SaaS services.
  */

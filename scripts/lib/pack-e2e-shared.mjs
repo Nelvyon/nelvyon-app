@@ -5,8 +5,19 @@ import { smokeFetch } from "./smoke-fetch.mjs";
 export const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 export const BACKEND_API =
   process.env.STAGING_BACKEND_API?.trim() || "https://nelvyon-app-production.up.railway.app";
-export const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
-export const QA_PASSWORD = "StagingQA2026!";
+export const QA_EMAIL = process.env.STAGING_QA_EMAIL?.trim() || "qa-audit-20260612@nelvyon.test";
+/**
+ * Staging QA password: require STAGING_QA_PASSWORD in CI/ops.
+ * Local default only when STAGING_QA_ALLOW_DEFAULT=1 (never embed as silent prod secret).
+ */
+export const QA_PASSWORD = (() => {
+  const fromEnv = process.env.STAGING_QA_PASSWORD?.trim();
+  if (fromEnv) return fromEnv;
+  if (process.env.STAGING_QA_ALLOW_DEFAULT === "1") return "StagingQA2026!";
+  throw new Error(
+    "STAGING_QA_PASSWORD is required (or set STAGING_QA_ALLOW_DEFAULT=1 for local smoke only)",
+  );
+})();
 export const COOKIE = "nelvyon_token";
 
 export function containsMock(value) {

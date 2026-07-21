@@ -14,7 +14,7 @@ const ROOT = path.resolve(__dirname, "..");
 
 const BASE = process.env.STAGING_WEB_URL?.trim() || "https://ideal-victory-staging.up.railway.app";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
-const QA_PASSWORD = "StagingQA2026!";
+const QA_PASSWORD = process.env.STAGING_QA_PASSWORD?.trim() || (process.env.STAGING_QA_ALLOW_DEFAULT === "1" ? "StagingQA2026!" : (() => { throw new Error("STAGING_QA_PASSWORD is required (or STAGING_QA_ALLOW_DEFAULT=1)"); })());
 const RUN_ID = `phase1-${Date.now()}`;
 const TEST_CONTACT_EMAIL = process.env.PHASE1_TEST_EMAIL?.trim() || `phase1-welcome-${RUN_ID}@nelvyon.test`;
 

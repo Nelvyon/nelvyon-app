@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(EMPTY_UNIFIED_AUTOMATIONS);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
   if (claims instanceof NextResponse) return claims;
 
@@ -46,9 +46,7 @@ export async function GET(req: Request) {
     ]);
 
     const authDenied = platformCollectAuthFailure(workflowsRes, rulesRes, statsRes, executionsRes);
-    if (authDenied) {
-      return NextResponse.json(EMPTY_UNIFIED_AUTOMATIONS);
-    }
+    if (authDenied) return authDenied;
 
     const workflows = (await safeJson(workflowsRes, EMPTY_WORKFLOWS_LIST)) as typeof EMPTY_WORKFLOWS_LIST;
     const rules = (await safeJson(rulesRes, EMPTY_RULES_LIST)) as typeof EMPTY_RULES_LIST;

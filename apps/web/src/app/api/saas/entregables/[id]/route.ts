@@ -3,10 +3,15 @@ import {
   getSaasDeliverablesHubService,
   SaasDeliverablesHubError,
   requireSaasContext,
+  saasErrorBody,
+  saasErrorStatus,
 } from "@nelvyon/saas";
+import { createLogger } from "@/lib/serverLogger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+const log = createLogger("saas-entregables");
 
 export async function GET(
   req: NextRequest,
@@ -23,10 +28,7 @@ export async function GET(
       const status = e.code === "NOT_FOUND" ? 404 : 400;
       return NextResponse.json({ error: e.message, code: e.code }, { status });
     }
-    if ((e as { status?: number }).status === 401)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    console.error("[entregables/[id] GET]", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
@@ -35,7 +37,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "contacts.write");
     const { id } = await params;
     const body = (await req.json()) as { action?: string };
     const action = body.action;
@@ -44,26 +46,31 @@ export async function POST(
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
-    // Verify deliverable belongs to tenant
+    // Verify deliverable belongs to tenant (fail closed if missing)
     const svc = getSaasDeliverablesHubService();
     const deliverable = await svc.getDeliverable(ctx.tenant.id, id);
 
-    // Audit log (non-fatal) — noop but logged
-    console.info(`[entregables action] tenant=${ctx.tenant.id} id=${id} action=${action}`);
-
-    return NextResponse.json({
-      ok: true,
-      action,
+    log.info("entregables action not implemented", {
+      tenantId: ctx.tenant.id,
       deliverableId: deliverable.id,
+      action,
     });
+
+    return NextResponse.json(
+      {
+        ok: false,
+        code: "NOT_IMPLEMENTED",
+        action,
+        deliverableId: deliverable.id,
+        error: "Portal link actions are not implemented yet",
+      },
+      { status: 501 },
+    );
   } catch (e) {
     if (e instanceof SaasDeliverablesHubError) {
       const status = e.code === "NOT_FOUND" ? 404 : 400;
       return NextResponse.json({ error: e.message, code: e.code }, { status });
     }
-    if ((e as { status?: number }).status === 401)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    console.error("[entregables/[id] POST]", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

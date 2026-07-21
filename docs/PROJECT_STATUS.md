@@ -1,65 +1,30 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-20** - Cierre final prioritario **CONDITIONAL_READY** (`docs/CIERRE_FINAL_PRIORITARIO.md`); Workforce/Elite PASS intactos; ops SES/Stripe/Docker abiertas
+> Actualizado: **2026-07-21** — Bloques 3–13 · KI-014 cerrado · KI-028 Stripe STARTER · CONDITIONAL_READY; `claimComplete:false`
 
 ## Resumen ejecutivo (honesto)
 
 | Capa | Estado | Evidencia |
 |------|--------|-----------|
-| **Fase 1 código** | Cerrada en su día (gates históricos) | `PHASE1_CLOSURE_AUDIT.md` — no equivale a “producto terminado” |
-| **Fase 1 ops** | **Abierta** | SES KI-013/014 · Stripe · residuales Docker/pgvector |
-| **Router / Especialización / MCP** | **Certificados (freeze)** | JSON bajo `backend/local-ai/benchmarks/` |
-| **Fase 2 Elite** | **PASS** | `phase2_elite_certification.json` · `phase2EliteCertified=true` |
-| **Workforce autónoma** | **PASS certificado** | `workforce_certification.json` · `nelvyonAutonomousWorkforceCertified=true` · skipped=0 · 10/10 |
-| **E2E crítica OS/SaaS** | **Parcial** | UI_CONTRACT 53/53 · `OS_SAAS_E2E_MATRIX.md` |
-| **Producto enterprise completo** | **No** | `OS_SAAS_FINAL_CERTIFICATION.md` |
+| **Veredicto** | **CONDITIONAL_READY** | No READY · no prod READY |
+| **SES** | **Operativo** (KI-R014) | Production access + self-send 2026-07-21 |
+| **Stripe Live** | **Parcial** (KI-028) | sk_live OK · STARTER price missing |
+| **Staging DB** | **516** + B3 iso PASS | `saas_uuid_isolation_evidence.json` |
+| **Prod DB** | **≤511** | 516 ausente — bloquea deploy controlado |
+| **DNS** | **Parcial** | nelvyon.com CF 200 · app.nelvyon.com NXDOMAIN |
+| **IA flags prod** | **OFF** | SM/MCP/Router/OpenClaw unset |
+| **verify-all** | **CONDITIONAL_READY** | 7 PASS · 0 FAIL |
+| **Backups** | **OK** | GH success · restore drill PASS 2026-07-17 |
+| **Producto enterprise completo** | **No** | — |
 
 ---
 
-## Distinción obligatoria
+## CEO / ops pendiente (orden)
 
-| Término | Significado |
-|---------|-------------|
-| Implementado | Código existe |
-| Conectado | Ruta/servicio wired |
-| Probado | Tests/gates con evidencia |
-| Certificado | Artefacto reproducible + gates |
-| Desplegado | En entorno target |
-| Operativo prod | Funciona con deps reales (SES, secrets, restore) |
+1. Fix `STRIPE_PRICE_ID_STARTER` (KI-028)
+2. Cloudflare: `app.nelvyon.com` CNAME
+3. `STAGING_QA_PASSWORD` + P0 smokes
+4. Autorización migrate prod 512–516
+5. Decisión flags IA (default OFF)
 
----
-
-## Por área (sin “100% ops”)
-
-| Área | Estado |
-|------|--------|
-| **Producción web** | Operativa (código); email marketing **no** hasta SES |
-| **Staging** | Gates staging existen |
-| **Observabilidad** | Health + smokes; Kuma parcial |
-| **Backups** | Workflow; **restore drill pendiente** |
-| **Seguridad CI** | Gitleaks + Trivy + audit critical |
-| **Dependencias** | 0 critical; highs transitive (KI-012) |
-| **Fase 2 IA** | **Elite PASS** (`phase2EliteCertified=true`) · live Ollama + RAG hybrid · residual Docker/pgvector · ver `PHASE2_ELITE_CERT.md` |
-| **Workforce** | Runtime ~23 · daemon+persist · ~45 workflows · leaderboard/canary · cert CONDITIONAL · **no** world-class claim · ver `AUTONOMOUS_WORKFORCE_CERT.md` |
-| **NELVYON-LABS** | Evaluación 461/461 cerrada (no = producto IA completo) |
-| **Auditoría elite** | `MASTER_AUDIT_ELITE_2026-07-16.md` |
-| **Programa excelencia** | `EXCELLENCE_PROGRAM.md` — matriz + veredicto |
-
----
-
-## Evidencias gates (snapshot 2026-07-16 excelencia)
-
-| Comando | Resultado |
-|---------|-----------|
-| MCP soak 2h | ✅ `mcp_soak_2026-07-16T19-56-30-289Z.json` passed · 7200040 ms |
-| `pnpm -C apps/web exec tsc --noEmit` | PASS |
-| `node scripts/validate-post-elite-migrations.mjs` | 508–512 OK (existencia; no apply) |
-| `node scripts/check-saas-stubs.mjs` | PASS |
-| Vitest HMAC/htmlEscape/wiring/MCP unit | 38 PASS |
-| E2E / load / restore / a11y full | **No re-ejecutados** esta pasada (soak lock) |
-
----
-
-## CEO pendiente
-
-Ver **`docs/CEO_FINAL_ACTIONS.md`** — SES, SNS, backup+restore.
+Ver `docs/CTO_FINAL_VERIFY.md` · `docs/HANDOVER.md`.

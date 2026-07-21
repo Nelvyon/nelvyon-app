@@ -22,6 +22,17 @@ describe("SaasWebhooksService", () => {
     await expect(svc.create(TENANT, { name: "Test", url: "http://example.com", events: [] })).rejects.toThrow("HTTPS");
   });
 
+  it("create rejects private/metadata SSRF targets", async () => {
+    const db = makeDb();
+    const svc = new SaasWebhooksService(db);
+    await expect(
+      svc.create(TENANT, { name: "Test", url: "https://169.254.169.254/latest", events: ["contact.created"] }),
+    ).rejects.toThrow(/not allowed/i);
+    await expect(
+      svc.create(TENANT, { name: "Test", url: "https://10.0.0.8/hook", events: ["contact.created"] }),
+    ).rejects.toThrow(/not allowed/i);
+  });
+
   it("create rejects invalid events", async () => {
     const db = makeDb();
     const svc = new SaasWebhooksService(db);

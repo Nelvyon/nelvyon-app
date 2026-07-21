@@ -52,6 +52,7 @@ const psql = spawnSync(
 
 let row = null;
 let method = "psql";
+let methodError = null;
 if (psql.status === 0 && psql.stdout.trim()) {
   const parts = psql.stdout.trim().split(",");
   row = {
@@ -63,7 +64,34 @@ if (psql.status === 0 && psql.stdout.trim()) {
     audit_rls: parts[5] === "t",
   };
 } else {
-  method = "unavailable";
+  methodError = (psql.stderr || psql.stdout || "").slice(0, 400);
+  // Fallback: node-pg (Windows / CI without psql on PATH)
+  try {
+    const { createRequire } = await import("node:module");
+    // Resolve pg from apps/web workspace (scripts/ has no local node_modules)
+    const requireFromWeb = createRequire(join(root, "apps/web/package.json"));
+    const pg = requireFromWeb("pg");
+    const client = new pg.Client({ connectionString: url });
+    await client.connect();
+    try {
+      const res = await client.query(sql);
+      const r = res.rows[0];
+      row = {
+        entries_table: Boolean(r.entries_table),
+        audit_table: Boolean(r.audit_table),
+        mig_514_recorded: Boolean(r.mig_514_recorded),
+        mig_515_recorded: Boolean(r.mig_515_recorded),
+        entries_rls: Boolean(r.entries_rls),
+        audit_rls: Boolean(r.audit_rls),
+      };
+      method = "node-pg";
+    } finally {
+      await client.end();
+    }
+  } catch (err) {
+    method = "unavailable";
+    methodError = `${methodError || ""}\nnode-pg: ${err instanceof Error ? err.message : String(err)}`.slice(0, 600);
+  }
 }
 
 const evidence = {
@@ -72,7 +100,7 @@ const evidence = {
   ok: false,
   verified: false,
   checks: row,
-  psqlError: psql.status === 0 ? null : (psql.stderr || psql.stdout || "").slice(0, 400),
+  psqlError: method === "psql" ? null : methodError,
   applyCommands: [
     "pnpm -C apps/web migrate",
     "node scripts/verify-shared-memory-schema.mjs",
@@ -85,7 +113,8 @@ if (row) {
   evidence.ok = Boolean(
     row.entries_table && row.audit_table && row.mig_514_recorded,
   );
-  evidence.verified = evidence.ok && row.entries_rls && row.mig_515_recorded;
+  evidence.verified =
+    evidence.ok && row.entries_rls && row.audit_rls && row.mig_515_recorded;
 }
 
 writeFileSync(evidencePath, JSON.stringify(evidence, null, 2));

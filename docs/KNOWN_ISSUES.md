@@ -6,6 +6,26 @@
 
 ## Activos
 
+### KI-027 - Test drift brain knowledge (`ingestEvidence.verified`)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Resuelto 2026-07-21** |
+| **Severidad** | Era Baja (P2) — mitigada |
+| **Reparación** | Test `nelvyonBrainKnowledge.test.ts` ahora mirrors `knowledge_ingest_evidence.json` (`ok && verified`); conserva `claimComplete:false`. Validador post-elite → 508–516. |
+| **Evidencia** | Brain tests 7/7 PASS · `nelvyon-verify-all` → **CONDITIONAL_READY** (0 FAIL) · `validate-post-elite-migrations` OK 508–516 |
+| **Nota** | No se debilitó cobertura; `claimComplete` sigue tipado `false`. |
+
+### KI-028 - Stripe Live STARTER price resource_missing
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | Abierto 2026-07-21 |
+| **Severidad** | Media (P1 ops) |
+| **Detalle** | `GET /api/billing/price-audit` → `allValid=false`; plan starter `stripeRetrieveOk=false` / `resource_missing`. PRO y AGENCY OK. `sk_live` + webhook secret presentes. |
+| **Fix** | Humano: Stripe Dashboard Live → Price Starter activo → actualizar `STRIPE_PRICE_ID_STARTER` en Railway → re-auditar. |
+| **No hacer** | Crear cobros/suscripciones desde el agente sin confirmación. |
+
 ### KI-020 - CSRF Origin en mutaciones cookie SaaS (mitigado en codigo)
 
 | Campo | Valor |
@@ -15,24 +35,80 @@
 | **Detalle** | Mutaciones `/api/saas/*` con cookie sin Origin/Referer validos -> 403 via `assertSaasOrigin`. Fallback SES bounce/complaint ahora exige `tenant_id`. |
 | **Docs** | `docs/CIERRE_FINAL_PRIORITARIO.md` |
 
-### KI-021 - Shared Memory RLS 515 pendiente de aplicar en remoto
+### KI-022 - Staging schema drift: legacy `conversations` (integer) vs mig 401 (UUID)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | Abierto (ops) |
-| **Severidad** | Media |
-| **Detalle** | Migracion `515_shared_memory_rls.sql` en repo; `verify-shared-memory-schema.mjs` exit 2 sin DATABASE_URL. Aplicar migrate + verify en staging/prod. |
-| **Docs** | `docs/OPS_SHARED_MEMORY_514.md` |
+| **Estado** | **Resuelto en staging 2026-07-20** (histórico activo para referencia) |
+| **Severidad** | Era Alta — mitigada |
+| **Reparación** | Mig `400a_reconcile_legacy_integer_conversations.sql` (rename legacy vacío) → `401` aplicada. Postcheck: `conversations.id` uuid · `conversation_messages` FK OK · legacy 0 filas. |
+| **Evidencia** | Staging `_migrations` contiene `400a_*` + `401_inbox_conversations.sql`. Backup local fuera de repo. |
+| **Nota** | No se editó 401. Producción no tocada. |
 
-
-### KI-018 — Fase 2 Elite: residuales post-PASS (pgvector / ops)
+### KI-023 - Staging migrate bloqueado en `402_pipeline_deals.sql` (tenant_id)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | Abierto (no invalida PASS repo ni Elite ni Workforce PASS) |
+| **Estado** | **Resuelto en staging 2026-07-20** |
+| **Severidad** | Era Alta — mitigada |
+| **Reparación** | Mig `401a_reconcile_legacy_integer_deals.sql` (idempotencia UUID+tenant_id antes de abort destino; check seq `deals_legacy_integer_id_seq`) → `402`…`407` OK. Postcheck: `deals.id` uuid + `tenant_id` · pipelines/stages+FKs · legacy 0 filas. |
+| **Evidencia** | Staging `_migrations` contiene `401a_*` + `402_pipeline_deals.sql` … `407_*`. Backup local fuera de repo. |
+| **Nota** | No se editó 402. Producción no tocada. Cadena continuó hasta **FATAL @408** → KI-024. |
+
+### KI-024 - Staging migrate bloqueado en `408_calendar_events.sql` (tenant_id)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Resuelto en staging 2026-07-20** |
+| **Severidad** | Era Alta — mitigada |
+| **Reparación** | Mig `407a_reconcile_legacy_integer_calendar_events.sql` (idempotencia UUID+tenant; check destino/seq) → `408`…`506` OK. **Nota:** nombre `407a` no `408a` porque sort lexicográfico tiene `408_*` < `408a_*`. |
+| **Postcheck** | `calendar_events.id` uuid + `tenant_id` · `calendar_events_legacy_integer` 0 filas · `_migrations` 407a+408…506 · **507 ausente** |
+| **Nota** | No se editó 408. Producción no tocada. Verify Shared Memory diferido. Stop siguiente = KI-025 @507. |
+
+### KI-025 - Staging: mig 507 dual-schema + orden `current_tenant_id()` (audit)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Resuelto en staging 2026-07-21** (cadena migrate + Shared Memory) |
+| **Severidad** | Era Alta — mitigada para bloqueo 507 |
+| **Reparación** | `506a_reconcile_legacy_pre_507_social_posts.sql` (rename vacío) → 507…515. **507 no editada** (prod ya la tiene). |
+| **Postcheck** | `_migrations` 506a+507…515 · `social_posts` UUID+tenant_id int · legacy 0 · SM **verified:true** |
+| **Residual** | Warnings 507 tolerados + policies tenant ausentes → **KI-026** |
+
+### KI-026 - Staging: RLS policies tenant ausentes tras 507 (42883 / type drift)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Resuelto en staging 2026-07-21** |
+| **Severidad** | Era Media–Alta — mitigada (defensa en profundidad) |
+| **Reparación** | Mig aditiva `516_fastapi_rls_repair.sql` (idempotente; no edita 507; no toca SM). **ADR-032** dual-plane. |
+| **Postcheck** | 13 tablas RLS ON + policies · predicado funnels/chatbot aislamiento OK · SM `verified:true` · `_migrations` contiene 516 |
+| **Nota** | Runtime SET ROLE no disponible en pooler/superuser; evidencia = catalog + predicados = expresiones de policy. Audit JWT skip si &lt;2 tenants onboarding. |
+
+### KI-021 - Shared Memory 514/515 no aplicadas en staging
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Resuelto en staging 2026-07-21** |
+| **Detalle** | 514+515 en `_migrations` · tablas + RLS + policies SaaS · `verify-shared-memory-schema.mjs` → `verified:true` (`method: node-pg`) |
+| **Nota** | Flags runtime Shared Memory **siguen OFF** por defecto; no activar en prod. |
+
+
+### KI-018 — Fase 2 Elite: residuales post-PASS (ops remotas)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | Parcialmente mitigado 2026-07-20 (local) |
 | **Severidad** | Controlada |
-| **Detalle** | `PHASE2_ELITE_CERTIFIED=true` con live Ollama + hybrid RAG. Pendiente: Docker/pgvector LocalVectorStore compare, migrate 514 staging, OpenClaw URL real. Workforce cert trata estos como `externalNotes` (no blockers internos). |
-| **Docs** | `docs/PHASE2_ELITE_CERT.md` · ADR-026 |
+| **Detalle** | Elite/Workforce PASS intactos. **Local:** Docker+pgvector+ingest Brain **verified** (1559 chunks). Sigue pendiente ops remota: migrate **514/515** staging (KI-021), OpenClaw URL real. |
+| **Docs** | `docs/PHASE2_ELITE_CERT.md` · ADR-026 · HANDOVER Bloque 1 |
+
+### KI-016 — (histórico residual) Docker/pgvector LocalVectorStore
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | Mitigado en local 2026-07-20 — ver KI-018 |
+| **Detalle** | Compose local-ai UP + ingest verified; comparar entornos staging sigue ops |
 
 ### KI-012 — Vulnerabilidades npm high (transitive)
 
@@ -52,7 +128,7 @@
 | **Severidad** | Baja (mitigada) |
 | **Detalle** | Facade `UnifiedRagStore` prefer LocalRagRetriever → fallback NelvyonRagStore. Router cert path sin cambios. |
 | **Mitigación** | `NELVYON_RAG_PREFER_LOCAL=0` rollback · docs `PHASE2_RAG_UNIFIED.md` |
-| **Fix** | Ingest vector completo + cutover ops (no bloquea repo) |
+| **Fix** | Ingest vector local **verified** 2026-07-20 (1559 chunks). Cutover ops staging/prod RAG sigue aparte. |
 
 ---
 
@@ -66,18 +142,15 @@
 
 ---
 
-### KI-014 — AWS SES en sandbox (sin production access)
+## Historial resuelto
+
+### KI-R014 — AWS SES production access (ex KI-014)
 
 | Campo | Valor |
 |-------|-------|
-| **Severidad** | **Alta** |
-| **Detalle** | `ProductionAccessEnabled: false` — `ReviewDetails.Status: DENIED` (CaseId `178372013800016`). Dominio sí verificado (KI-013 resuelto). |
-| **Fix** | CEO — apelación `docs/SES_PRODUCTION_ACCESS_APPEAL.md` + Support case AWS |
-| **Bloquea producción email** | Sí para campañas/secuencias a destinatarios no verificados |
-
----
-
-## Historial resuelto
+| **Resuelto** | 2026-07-21 |
+| **Solución** | AWS Review GRANTED · ProductionAccessEnabled true · SendingEnabled true · nelvyon.com Verification/DKIM SUCCESS · self-send OK · SNS webhook confirmed |
+| **Evidencia** | Bloque 4 ejecución · `docs/OPS_SES_PROD.md` (actualizar checklist) |
 
 ### KI-R017 — Migraciones dollar-quote / CREATE IF NOT EXISTS (ex KI-017)
 

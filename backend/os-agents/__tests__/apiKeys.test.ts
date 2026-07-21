@@ -19,7 +19,7 @@ describe("apiKeys", () => {
     await saveApiKey("user-1", "openai", "sk-test-key");
     expect(queryMock).toHaveBeenCalledTimes(1);
     const sql = queryMock.mock.calls[0][0] as string;
-    expect(sql).toContain("INSERT INTO api_keys");
+    expect(sql).toContain("INSERT INTO user_provider_api_keys");
     const params = queryMock.mock.calls[0][1] as unknown[];
     expect(params[2]).not.toBe("sk-test-key");
   });

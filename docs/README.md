@@ -4,8 +4,9 @@
 
 | Prioridad | Archivo | Para qué |
 |-----------|---------|----------|
-| **1** | [**HANDOVER.md**](./HANDOVER.md) | Continuar el proyecto en 2 minutos |
-| **2** | [**AI_CONTEXT.md**](./AI_CONTEXT.md) | Contexto técnico completo para IA |
+| **0** | [**NELVYON_MASTER_CONTEXT.md**](./NELVYON_MASTER_CONTEXT.md) | **Biblia oficial** — onboarding completo de cualquier IA |
+| **1** | [**HANDOVER.md**](./HANDOVER.md) | Continuar el proyecto en 2 minutos (SSOT operativo) |
+| **2** | [**AI_CONTEXT.md**](./AI_CONTEXT.md) | Contexto técnico amplio (ceder ante HANDOVER/DB/DECISIONS si hay contradicción) |
 | **3** | Resto de esta carpeta | Detalle por área |
 
 ## Sistema de documentación viva

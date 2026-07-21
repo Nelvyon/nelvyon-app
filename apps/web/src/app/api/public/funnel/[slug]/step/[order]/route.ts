@@ -7,6 +7,7 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { getSaasFunnelService } from "@nelvyon/saas";
+import { sanitizeRichHtml } from "@/lib/sanitizeRichHtml";
 
 const ipCounts = new Map<string, { n: number; resetAt: number }>();
 function checkLimit(ip: string): boolean {
@@ -38,6 +39,7 @@ export async function GET(req: Request, ctx: RouteCtx) {
     if (!step) return NextResponse.json({ error: "Step not found" }, { status: 404 });
 
     const selectedVariant = sessionId ? await svc.pickVariant(step.id, sessionId) : null;
+    const rawContent = selectedVariant?.content.html ?? step.content;
 
     return NextResponse.json({
       stepOrder,
@@ -46,7 +48,7 @@ export async function GET(req: Request, ctx: RouteCtx) {
         id: step.id,
         type: step.type,
         name: step.name,
-        content: selectedVariant?.content.html ?? step.content,
+        content: typeof rawContent === "string" ? sanitizeRichHtml(rawContent) : rawContent,
         ctaLabel: (selectedVariant?.content.ctaLabel as string | undefined) ?? step.ctaLabel,
         ctaUrl: (selectedVariant?.content.ctaUrl as string | undefined) ?? step.ctaUrl,
       },

@@ -8,17 +8,31 @@ import {
   saasErrorStatus,
 } from "@nelvyon/saas";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
+import { bffDegraded, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const EMPTY_MODULE_STATS = {
-  contacts: 0,
-  campaigns: 0,
-  activeWorkflows: 0,
-  forms: 0,
-  upcomingAppointments: 0,
-};
+const EMPTY_MODULE_STATS = bffDegraded(
+  {
+    contacts: 0,
+    campaigns: 0,
+    activeWorkflows: 0,
+    forms: 0,
+    upcomingAppointments: 0,
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
+
+const EMPTY_DASHBOARD_METRICS = bffDegraded(
+  {
+    activeJobs: 0,
+    completedJobs: 0,
+    totalSpend: 0,
+    recentActivity: [] as unknown[],
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 async function getModuleStats(tenantId: string) {
   const db = DbClient.getInstance();
@@ -55,12 +69,7 @@ export async function GET(req: Request) {
     const svc = getSaasDashboardService();
     const authTenantId = await svc.resolveAuthTenantId(ctx.tenant.id);
     const [metrics, moduleStats] = await Promise.all([
-      svc.getDashboardMetrics(ctx.tenant.id, authTenantId).catch(() => ({
-        activeJobs: 0,
-        completedJobs: 0,
-        totalSpend: 0,
-        recentActivity: [],
-      })),
+      svc.getDashboardMetrics(ctx.tenant.id, authTenantId).catch(() => EMPTY_DASHBOARD_METRICS),
       getModuleStats(ctx.tenant.id).catch(() => EMPTY_MODULE_STATS),
     ]);
     return NextResponse.json({ tenant: ctx.tenant, ...metrics, moduleStats });

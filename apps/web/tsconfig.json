@@ -160,7 +160,14 @@
     "../../backend/changelog/**/*.ts",
     "../../backend/affiliates/**/*.ts",
     "../../backend/oauth/**/*.ts",
-    "../../backend/integrations/**/*.ts"
+    "../../backend/integrations/**/*.ts",
+    "../../backend/autonomous/llm/**/*.ts",
+    "../../backend/orchestrator/**/*.ts",
+    "../../backend/agents/**/*.ts",
+    "../../backend/prompt-registry/**/*.ts",
+    "../../backend/shared-memory/**/*.ts",
+    "../../backend/openclaw/**/*.ts",
+    "../../backend/ai-panel/**/*.ts"
   ],
   "exclude": [
     "node_modules",
@@ -181,6 +188,7 @@
     "../../backend/oauth/__tests__/**/*",
     "../../backend/integrations/**/__tests__/**/*",
     "../../backend/qa/**/__tests__/**/*",
-    "../../backend/stripe/__tests__/**/*"
+    "../../backend/stripe/__tests__/**/*",
+    "../../backend/agents/**/__tests__/**/*"
   ]
 }

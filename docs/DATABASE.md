@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-20
+> Actualizado: 2026-07-21
 
 ---
 
@@ -9,15 +9,15 @@
 | Campo | Valor |
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
-| **Total archivos** | 411 |
-| **Última migración** | `515_shared_memory_rls.sql` |
-| **Shared Memory schema** | Aplicado en mig 514 · `schema.proposed.sql` es referencia histórica |
+| **Total archivos** | 411+ |
+| **Última migración** | `516_fastapi_rls_repair.sql` (KI-026 · ADR-032) |
+| **Shared Memory schema** | 514 + RLS 515 · `schema.proposed.sql` referencia histórica |
 | **Runner** | `backend/db/migrate.ts` |
 | **Tracking** | Tabla `_migrations (name, executed_at)` |
 | **Comando** | `pnpm -C apps/web migrate` |
 | **Prod** | Railway `releaseCommand` en deploy Web |
 
-**Rango post-elite CI:** 508–514 (`scripts/validate-post-elite-migrations.mjs` en security-gates + web-quality-gates).
+**Rango post-elite CI:** 508–516 (`scripts/validate-post-elite-migrations.mjs`).
 **Rango elite SaaS CI:** 401–507 (`scripts/validate-saas-migrations.mjs`).
 
 ---
@@ -106,15 +106,25 @@
 | Problema | Migración | Estado |
 |----------|-----------|--------|
 | `saas_ceo_brief_settings` missing prod | 494 | 🟡 código mitigado; apply migrate |
-| Drift 495–514 en staging/prod | 495–514 | ❓ verificar `_migrations` (incl. 514 Shared Memory) |
-| Ingest vector local-ai (pgvector) | — | 🟡 código listo; ops: Docker + `NELVYON_KNOWLEDGE_INGEST=1` |
+| Staging mig drift KI-022…026 | 400a–516 | ✅ **resuelto staging 2026-07-21** |
+| Prod mig vs staging | 516 | 🟡 **prod max 511** (2026-07-21); staging **516** |
+| Ingest vector local-ai (pgvector) | — | ✅ **verified** 2026-07-20 (1559 chunks) |
+| Shared Memory 514/515 staging | 514–515 | ✅ KI-021 resuelto · `verified:true` |
+| FastAPI RLS post-507 | 516 | ✅ KI-026 resuelto staging · ADR-032 |
 
 ---
 
 ## Tablas pendientes / ingest
 
 - RAG plataforma: `nelvyon_rag_chunks` (ILIKE adjunct) + LocalVectorStore (pgvector) vía `KnowledgeIngestService`
-- Ingest live: requiere Postgres local-ai UP; ver `docs/NELVYON_BRAIN_KNOWLEDGE.md`
+- **Ingest local-ai [VERIFICADO 2026-07-20]:** Docker UP · Postgres `:5434` healthy · `knowledge_ingest_evidence.json` → `verified:true`, **1559** chunks · orphans 0 · coverage 0.99 · `claimComplete:false`
+- **KI-022 [RESUELTO staging 2026-07-20]:** mig `400a_reconcile_legacy_integer_conversations.sql` aplicada · `401` OK · `conversations.id` uuid · `conversation_messages` FK OK.
+- **KI-023 [RESUELTO staging 2026-07-20]:** mig `401a_reconcile_legacy_integer_deals.sql` + `402`…`407` OK · `deals.id` uuid + `tenant_id` · pipelines/stages OK · legacy 0 filas.
+- **KI-024 [RESUELTO staging 2026-07-20]:** mig `407a_reconcile_legacy_integer_calendar_events.sql` + `408`…`506` OK · `calendar_events` UUID+tenant_id · legacy 0 filas. **Nombre `407a`** (no `408a`): sort `408_*` < `408a_*`.
+- **KI-025 [RESUELTO staging 2026-07-21]:** `506a_reconcile_legacy_pre_507_social_posts.sql` + `507`…`515` · `social_posts` UUID+tenant_id · legacy 0 · SM verified. **507 no editada.**
+- **KI-021 [RESUELTO staging 2026-07-21]:** 514+515 + RLS Shared Memory · `verified:true` (node-pg fallback en verify script).
+- **KI-026 [RESUELTO staging 2026-07-21]:** `516_fastapi_rls_repair.sql` + **ADR-032**. Policies dual-plane (SaaS UUID / FastAPI INT / chatbot JWT). Evidencia: `ki026_rls_isolation_evidence.json` (`ok:true`). SM intacta.
+- **Reconciliaciones staging:** `NNNa_*` por sort; `(N-1)a` si `Na` iría después de `N_`.
 
 ---
 

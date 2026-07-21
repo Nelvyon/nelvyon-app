@@ -3,44 +3,52 @@ import { adsBffGet, adsBffPost } from "@/lib/adsBffRoute";
 
 export { adsBffGet as ecommerceBffGet, adsBffPost as ecommerceBffPost };
 
-export const EMPTY_STORES_LIST = { items: [] as unknown[] };
+export const EMPTY_STORES_LIST = bffDegraded({ items: [] as unknown[] }, BFF_DEGRADED_UPSTREAM);
 
-export const EMPTY_STORE = {
-  id: "",
-  name: "",
-  status: "draft",
-  products: [] as unknown[],
-};
-
-export const EMPTY_STORE_ANALYTICS = {
-  total_revenue_cents: 0,
-  orders_by_status: {} as Record<string, { count: number; revenue_cents: number }>,
-  pending_orders: 0,
-  top_products: [] as Array<{ name?: string; qty?: number }>,
-  visits: 0,
-  conversion_rate: 0,
-  cart_abandonment_rate: 0,
-  checkout_completed: 0,
-};
-
-export const EMPTY_UNIFIED_ECOMMERCE = {
-  stores: EMPTY_STORES_LIST,
-  ads: { total_spend: 0, blended_roas: 0 },
-  email: { campaigns_total: 0, active_campaigns: 0 },
-  unified: {
-    total_stores: 0,
-    published_stores: 0,
-    total_revenue_cents: 0,
-    total_visits: 0,
-    avg_conversion_rate: 0,
-    pending_checkouts: 0,
-    paid_orders: 0,
-    cart_abandonment_rate: 0,
-    ads_spend: 0,
-    ads_roas: 0,
-    email_campaigns: 0,
+export const EMPTY_STORE = bffDegraded(
+  {
+    id: "",
+    name: "",
+    status: "draft",
+    products: [] as unknown[],
   },
-};
+  BFF_DEGRADED_NO_DATA,
+);
+
+export const EMPTY_STORE_ANALYTICS = bffDegraded(
+  {
+    total_revenue_cents: 0,
+    orders_by_status: {} as Record<string, { count: number; revenue_cents: number }>,
+    pending_orders: 0,
+    top_products: [] as Array<{ name?: string; qty?: number }>,
+    visits: 0,
+    conversion_rate: 0,
+    cart_abandonment_rate: 0,
+    checkout_completed: 0,
+  },
+  BFF_DEGRADED_NO_DATA,
+);
+
+export const EMPTY_UNIFIED_ECOMMERCE = bffDegraded(
+  {
+    stores: EMPTY_STORES_LIST,
+    ads: { total_spend: 0, blended_roas: 0 },
+    email: { campaigns_total: 0, active_campaigns: 0 },
+    unified: {
+      total_stores: 0,
+      published_stores: 0,
+      total_revenue_cents: 0,
+      total_visits: 0,
+      avg_conversion_rate: 0,
+      pending_checkouts: 0,
+      paid_orders: 0,
+      cart_abandonment_rate: 0,
+      ads_spend: 0,
+      ads_roas: 0,
+    },
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 export function mergeUnifiedEcommerce(
   storesList: { items?: Array<{ id?: string; status?: string }> },

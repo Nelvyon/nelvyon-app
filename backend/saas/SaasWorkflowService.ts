@@ -211,6 +211,18 @@ function assertContactStatus(v: string): ContactStatus {
   throw new SaasWorkflowError("Invalid contact status", "VALIDATION");
 }
 
+function parseJsonField<T>(value: unknown, fallback: T): T {
+  if (value == null) return fallback;
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return fallback;
+    }
+  }
+  return value as T;
+}
+
 function rowToWorkflow(r: WorkflowRow): SaasWorkflow {
   return {
     id: r.id,
@@ -219,9 +231,9 @@ function rowToWorkflow(r: WorkflowRow): SaasWorkflow {
     description: r.description,
     status: r.status,
     triggerType: r.trigger_type,
-    triggerConfig: r.trigger_config ?? {},
-    conditions: r.conditions ?? [],
-    actions: r.actions ?? [],
+    triggerConfig: parseJsonField(r.trigger_config, {}),
+    conditions: parseJsonField(r.conditions, []),
+    actions: parseJsonField(r.actions, []),
     runCount: toNumber(r.run_count),
     lastRunAt: r.last_run_at ? toIso(r.last_run_at) : null,
     createdAt: toIso(r.created_at),
@@ -234,9 +246,9 @@ function rowToRun(r: RunRow): WorkflowRun {
     id: r.id,
     workflowId: r.workflow_id,
     tenantId: r.tenant_id,
-    triggerData: r.trigger_data ?? {},
+    triggerData: parseJsonField(r.trigger_data, {}),
     status: r.status,
-    stepsExecuted: r.steps_executed ?? [],
+    stepsExecuted: parseJsonField(r.steps_executed, []),
     error: r.error,
     startedAt: toIso(r.started_at),
     completedAt: r.completed_at ? toIso(r.completed_at) : null,
@@ -278,9 +290,18 @@ export class SaasWorkflowService {
       const rows = await this.db.query<WorkflowRow>(
         `INSERT INTO saas_workflows
          (tenant_id, name, description, status, trigger_type, trigger_config, conditions, actions, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW())
+         VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb,NOW())
          RETURNING id, tenant_id, name, description, status, trigger_type, trigger_config, conditions, actions, run_count, last_run_at, created_at, updated_at`,
-        [tenantId, name, data.description ?? null, status, triggerType, data.triggerConfig ?? {}, data.conditions ?? [], data.actions ?? []],
+        [
+          tenantId,
+          name,
+          data.description ?? null,
+          status,
+          triggerType,
+          JSON.stringify(data.triggerConfig ?? {}),
+          JSON.stringify(data.conditions ?? []),
+          JSON.stringify(data.actions ?? []),
+        ],
       );
       const row = rows[0];
       if (!row) throw new SaasWorkflowError("Failed to create workflow", "CONSTRAINT");
@@ -325,13 +346,16 @@ export class SaasWorkflowService {
           description = COALESCE($4, description),
           status = COALESCE($5, status),
           trigger_type = COALESCE($6, trigger_type),
-          trigger_config = COALESCE($7, trigger_config),
-          conditions = COALESCE($8, conditions),
-          actions = COALESCE($9, actions),
+          trigger_config = COALESCE($7::jsonb, trigger_config),
+          conditions = COALESCE($8::jsonb, conditions),
+          actions = COALESCE($9::jsonb, actions),
           updated_at = NOW()
          WHERE tenant_id = $1 AND id = $2
          RETURNING id, tenant_id, name, description, status, trigger_type, trigger_config, conditions, actions, run_count, last_run_at, created_at, updated_at`,
-        [tenantId, workflowId, name ?? null, data.description ?? null, status ?? null, triggerType ?? null, data.triggerConfig ?? null, data.conditions ?? null, data.actions ?? null],
+        [tenantId, workflowId, name ?? null, data.description ?? null, status ?? null, triggerType ?? null,
+          data.triggerConfig !== undefined && data.triggerConfig !== null ? JSON.stringify(data.triggerConfig) : null,
+          data.conditions !== undefined && data.conditions !== null ? JSON.stringify(data.conditions) : null,
+          data.actions !== undefined && data.actions !== null ? JSON.stringify(data.actions) : null],
       );
       const row = rows[0];
       if (!row) throw new SaasWorkflowError("Workflow not found", "NOT_FOUND");

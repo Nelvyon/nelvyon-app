@@ -64,7 +64,8 @@ export type SaasNavId =
   | "security"
   | "deliverability"
   | "marketplace"
-  | "attribution";
+  | "attribution"
+  | "ai";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -122,6 +123,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "brief-to-launch", label: "🚀 Lanzar Pack", href: "/saas/brief-to-launch", group: "ia" },
   { id: "compliance", label: "🔒 Compliance", href: "/saas/compliance", group: "ia" },
   { id: "benchmark", label: "📊 Benchmark", href: "/saas/benchmark", group: "ia" },
+  { id: "ai", label: "🧠 Panel IA", href: "/saas/ai", group: "ia" },
   { id: "autopilot", label: "🤖 Autopilot", href: "/saas/autopilot", group: "ia" },
   { id: "agentes", label: "⚡ Agentes IA", href: "/saas/agentes", group: "ia" },
   { id: "chat", label: "💬 Asistente IA", href: "/saas/chat", group: "ia" },

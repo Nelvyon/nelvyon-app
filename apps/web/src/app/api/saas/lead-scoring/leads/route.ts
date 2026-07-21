@@ -1,45 +1,38 @@
 import { NextResponse } from "next/server";
-import {
-  getLeadScoringService,
-  saasErrorBody,
-  saasErrorStatus,
-  requireSaasContext,
-} from "@nelvyon/saas";
+import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 
+/**
+ * Legacy dual-stack lead scoring — REMOVED from write/read surface.
+ *
+ * SSOT: `GET/POST /api/saas/lead-scoring` → `SaasLeadScoringService`
+ * (tenant CRM rules/scores on saas_contacts).
+ *
+ * This route returns 410 Gone so two scoring systems cannot diverge.
+ * See docs/DECISIONS.md ADR-023 and docs/KNOWN_ISSUES.md KI-015.
+ */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET(req: Request) {
+const GONE = {
+  error: "gone",
+  code: "LEAD_SCORING_LEGACY_GONE",
+  message:
+    "Legacy /api/saas/lead-scoring/leads is removed. Use /api/saas/lead-scoring (SaasLeadScoringService).",
+  ssot: "/api/saas/lead-scoring",
+};
+
+async function gone(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
-    const svc = getLeadScoringService();
-    const leads = await svc.getLeads(ctx.claims.userId ?? ctx.tenant.id);
-    return NextResponse.json({ leads });
+    // Still require auth so unauthenticated probes get 401, not a free 410 info leak pattern for scanners that ignore bodies.
+    await requireSaasContext(req, "contacts.read");
+    return NextResponse.json(GONE, { status: 410 });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
-export async function POST(req: Request) {
-  try {
-    const ctx = await requireSaasContext(req, "contacts.write");
-    const body = await req.json().catch(() => null);
-    if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-    const b = body as Record<string, unknown>;
-    if (typeof b.name !== "string" || !b.name.trim()) return NextResponse.json({ error: "name required" }, { status: 400 });
-    if (typeof b.email !== "string" || !b.email.trim()) return NextResponse.json({ error: "email required" }, { status: 400 });
-    const svc = getLeadScoringService();
-    const lead = await svc.saveLead(ctx.claims.userId ?? ctx.tenant.id, {
-      name: b.name as string,
-      email: b.email as string,
-      company: typeof b.company === "string" ? b.company : undefined,
-      source: typeof b.source === "string" ? b.source : "saas-form",
-      industry: typeof b.industry === "string" ? b.industry : undefined,
-      revenue: typeof b.revenue === "number" ? b.revenue : undefined,
-      employees: typeof b.employees === "number" ? b.employees : undefined,
-    });
-    return NextResponse.json({ lead }, { status: 201 });
-  } catch (e: unknown) {
-    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
-  }
-}
+export const GET = gone;
+export const POST = gone;
+export const PUT = gone;
+export const PATCH = gone;
+export const DELETE = gone;

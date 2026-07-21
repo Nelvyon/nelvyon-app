@@ -189,6 +189,25 @@ describe("renderQuotePdfHtml", () => {
     expect(html).toMatch(/ref: [a-f0-9]{16}/);
   });
 
+  it("fails closed when HMAC secret is missing", () => {
+    const prev = process.env.JWT_SECRET;
+    const prevNext = process.env.NEXTAUTH_SECRET;
+    delete process.env.JWT_SECRET;
+    delete process.env.NEXTAUTH_SECRET;
+    try {
+      const svc = new SaasQuotesService(makeDb([]));
+      const quote = { ...quoteRow, items: [] };
+      expect(() =>
+        svc.renderQuotePdfHtml(quote as Parameters<typeof svc.renderQuotePdfHtml>[0]),
+      ).toThrow(/HMAC|JWT_SECRET/);
+    } finally {
+      if (prev === undefined) delete process.env.JWT_SECRET;
+      else process.env.JWT_SECRET = prev;
+      if (prevNext === undefined) delete process.env.NEXTAUTH_SECRET;
+      else process.env.NEXTAUTH_SECRET = prevNext;
+    }
+  });
+
   it("omits discount row when discountAmount = 0", () => {
     const svc = new SaasQuotesService(makeDb([]));
     const quote = { ...quoteRow, discountAmount: 0, discountPct: 0, items: [] };

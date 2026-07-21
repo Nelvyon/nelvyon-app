@@ -6,14 +6,20 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { DbClient } from "@/../../backend/db/DbClient";
+import { escapeHtml } from "@/../../backend/saas/htmlEscape";
+import { requireHmacSecret } from "@/../../backend/saas/hmacSecret";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function verify(certId: string, tok: string): boolean {
-  const secret = process.env.JWT_SECRET ?? process.env.NEXTAUTH_SECRET;
-  if (!secret?.trim()) return false;
-  const expected = createHmac("sha256", secret.trim()).update(certId).digest("hex").slice(0, 32);
+  let secret: string;
+  try {
+    secret = requireHmacSecret();
+  } catch {
+    return false;
+  }
+  const expected = createHmac("sha256", secret).update(certId).digest("hex").slice(0, 32);
   if (tok.length !== expected.length) return false;
   try {
     return timingSafeEqual(Buffer.from(tok), Buffer.from(expected));
@@ -51,14 +57,17 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
   const cert = rows[0];
   const issuedDate = new Date(cert.issued_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-  const studentName = cert.contact_name ?? cert.contact_email;
+  const studentName = escapeHtml(cert.contact_name ?? cert.contact_email);
+  const courseTitle = escapeHtml(cert.course_title);
+  const certIdSafe = escapeHtml(cert.id);
+  const issuedSafe = escapeHtml(issuedDate);
 
   const html = `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Certificado — ${cert.course_title}</title>
+  <title>Certificado — ${courseTitle}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -89,9 +98,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     <p class="sub">Este certificado acredita que</p>
     <div class="student">${studentName}</div>
     <p class="course">ha completado satisfactoriamente el curso</p>
-    <p style="font-size:1.5rem;font-weight:600;color:#111;margin-top:.5rem">${cert.course_title}</p>
-    <p class="date">Emitido el ${issuedDate}</p>
-    <p class="cert-id">ID: ${cert.id}</p>
+    <p style="font-size:1.5rem;font-weight:600;color:#111;margin-top:.5rem">${courseTitle}</p>
+    <p class="date">Emitido el ${issuedSafe}</p>
+    <p class="cert-id">ID: ${certIdSafe}</p>
     <div class="seal">
       <div class="seal-circle"><span>✓</span>Verificado</div>
     </div>

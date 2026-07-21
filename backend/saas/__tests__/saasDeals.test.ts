@@ -151,6 +151,14 @@ describe("SaasDealsService", () => {
     expect(won.probability).toBe(100);
   });
 
+  it("createDeal rechaza stage inválido (p.ej. prospecting)", async () => {
+    const db = makeDb();
+    const svc = new SaasDealsService(db);
+    await expect(
+      svc.createDeal("t1", { title: "Bad", stage: "prospecting" as never }),
+    ).rejects.toMatchObject({ code: "VALIDATION", message: "Invalid stage" });
+  });
+
   it("getMetrics calcula pipeline y forecast", async () => {
     const db = makeDb();
     const svc = new SaasDealsService(db);

@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const userId = (ctx as { user?: { id: string } }).user?.id ?? null;
+    const userId = ctx.claims.userId ?? null;
     const body = (await req.json().catch(() => ({}))) as { transcript?: string; source?: "web_speech" | "media_upload" };
     if (!body.transcript?.trim()) {
       return NextResponse.json({ error: "transcript requerido", code: "VALIDATION" }, { status: 400 });

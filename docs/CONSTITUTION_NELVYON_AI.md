@@ -63,11 +63,12 @@ criterios de aceptación · escenarios · contingencia · fuentes · confianza (
 
 ## 5. Jerarquía de fuentes (prioridad)
 
-1. Documentación oficial NELVYON (`docs/`, `CLAUDE.md`, código)
-2. Constitución y ontología (`CONSTITUTION_*`, `ontology.json`)
-3. Knowledge packs internos (`backend/local-ai/knowledge/`)
-4. Runbooks y SOPs (`docs/services/`, `backend/ops/runbooks/`)
-5. Estándares y referencias públicas pre-indexadas con licencia compatible
+1. **`docs/NELVYON_MASTER_CONTEXT.md`** (biblia de contexto) + **`docs/HANDOVER.md`** (SSOT operativo diario)
+2. Documentación oficial NELVYON (`docs/`, `CLAUDE.md`, código)
+3. Constitución y ontología (`CONSTITUTION_*`, `ontology.json`)
+4. Knowledge packs internos (`backend/local-ai/knowledge/`)
+5. Runbooks y SOPs (`docs/services/`, `backend/ops/runbooks/`)
+6. Estándares y referencias públicas pre-indexadas con licencia compatible
 
 ---
 

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-20T10:53:43.045Z",
+  "generated": "2026-07-21T11:42:45.767Z",
   "entries": [
     {
       "path": "docs/CONSTITUTION_NELVYON_AI.md",
@@ -8,6 +8,30 @@
       "license": "nelvyon_internal",
       "sourceType": "constitution",
       "title": "Constitución IA NELVYON"
+    },
+    {
+      "path": "docs/NELVYON_MASTER_CONTEXT.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Master Context Biblia"
+    },
+    {
+      "path": "docs/AUDITORIA_TECNICA_ABSOLUTA.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Auditoría Técnica Absoluta"
+    },
+    {
+      "path": "docs/AUDITORIA_TECNICA_ABSOLUTA.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Auditoría Técnica Absoluta"
     },
     {
       "path": "docs/HANDOVER.md",
@@ -768,6 +792,22 @@
       "license": "nelvyon_internal",
       "sourceType": "official_doc",
       "title": "Sprint Final Absoluto"
+    },
+    {
+      "path": "docs/TEST_SKIPS.md",
+      "domain": "development_tech",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "Vitest Skipped Tests SSOT"
+    },
+    {
+      "path": "docs/CTO_FINAL_VERIFY.md",
+      "domain": "nelvyon",
+      "priority": 0,
+      "license": "nelvyon_internal",
+      "sourceType": "official_doc",
+      "title": "CTO Final Verify"
     },
     {
       "path": "docs/README.md",
@@ -2187,11 +2227,11 @@
     }
   ],
   "summary": {
-    "total": 273,
-    "uniqueFiles": 240,
+    "total": 278,
+    "uniqueFiles": 244,
     "byDomain": {
-      "nelvyon": 80,
-      "development_tech": 48,
+      "nelvyon": 83,
+      "development_tech": 50,
       "security_privacy": 19,
       "planning_strategy": 9,
       "digital_marketing": 26,
@@ -2213,7 +2253,7 @@
     },
     "bySourceType": {
       "constitution": 1,
-      "official_doc": 168,
+      "official_doc": 173,
       "knowledge_pack": 25,
       "runbook": 37,
       "sop": 32,

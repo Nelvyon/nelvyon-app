@@ -224,6 +224,9 @@ function portfolioCases(): KnowledgeSourceEntry[] {
 function coreDocs(): KnowledgeSourceEntry[] {
   const list: (KnowledgeSourceEntry | null)[] = [
     entry("docs/CONSTITUTION_NELVYON_AI.md", "nelvyon", 0, "Constitución IA NELVYON", "constitution"),
+    entry("docs/NELVYON_MASTER_CONTEXT.md", "nelvyon", 0, "Master Context Biblia"),
+    entry("docs/AUDITORIA_TECNICA_ABSOLUTA.md", "nelvyon", 0, "Auditoría Técnica Absoluta"),
+    ...entries("docs/AUDITORIA_TECNICA_ABSOLUTA.md", ["development_tech"], 0, "Auditoría Técnica Absoluta"),
     entry("docs/HANDOVER.md", "nelvyon", 0, "Handover"),
     entry("docs/AI_CONTEXT.md", "nelvyon", 0, "AI Context"),
     entry("docs/ARCHITECTURE.md", "nelvyon", 0, "Arquitectura"),

@@ -1,15 +1,12 @@
+import { getLocalAiConfig } from "../../local-ai/config";
+import { OllamaClient } from "../../local-ai/OllamaClient";
 import { getGlobalPrivateAiConfig, isLocalRuntimeConfigured, isNelvyonAiEnabled } from "../config";
-import { privateModeFetch } from "../privateMode";
 import type { GlobalPrivateAiConfig } from "../types";
 import type { ILlmProvider, LlmCompletionRequest, LlmCompletionResult } from "../types";
 
-type OllamaChatResponse = {
-  message?: { content?: string };
-  error?: string;
-};
-
 /**
- * Ollama-compatible local provider.
+ * Ollama-compatible local provider (Private AI chain fallback).
+ * HTTP SSOT: delegates chat to `OllamaClient` (same client as certified Router path).
  * Does NOT probe the network unless NELVYON_AI_ENABLED=1 AND OLLAMA_CONFIGURED=1.
  */
 export class LocalOllamaProvider implements ILlmProvider {
@@ -26,14 +23,18 @@ export class LocalOllamaProvider implements ILlmProvider {
     return this.cfg.localRuntimeConfigured && Boolean(this.cfg.ollamaBaseUrl);
   }
 
+  private client(): OllamaClient {
+    return new OllamaClient({
+      ...getLocalAiConfig(),
+      ollamaBaseUrl: this.cfg.ollamaBaseUrl.replace(/\/$/, ""),
+      ollamaModel: this.cfg.ollamaModel,
+    });
+  }
+
   async isAvailable(): Promise<boolean> {
     if (!isNelvyonAiEnabled() || !isLocalRuntimeConfigured()) return false;
     try {
-      const url = `${this.cfg.ollamaBaseUrl}/api/tags`;
-      const res = await privateModeFetch(url, "external_fetch", {
-        signal: AbortSignal.timeout(3_000),
-      });
-      return res.ok;
+      return await this.client().isModelAvailable(this.cfg.ollamaModel);
     } catch {
       return false;
     }
@@ -48,38 +49,22 @@ export class LocalOllamaProvider implements ILlmProvider {
     }
 
     const model = request.model ?? this.cfg.ollamaModel;
-    const chatUrl = `${this.cfg.ollamaBaseUrl}/api/chat`;
-    const res = await privateModeFetch(chatUrl, "external_fetch", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const result = await this.client().chat(
+      request.messages.map((m) => ({
+        role: m.role as "system" | "user" | "assistant",
+        content: m.content,
+      })),
+      {
         model,
-        messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
-        stream: false,
-        options: {
-          temperature: request.temperature ?? 0.3,
-          num_predict: request.maxTokens ?? 2048,
-        },
-      }),
-      signal: AbortSignal.timeout(120_000),
-    });
+        temperature: request.temperature ?? 0.3,
+        numPredict: request.maxTokens ?? 2048,
+      },
+    );
 
-    const raw = await res.text();
-    let parsed: OllamaChatResponse;
-    try {
-      parsed = JSON.parse(raw) as OllamaChatResponse;
-    } catch {
-      throw new Error(`Local runtime non-JSON (HTTP ${res.status}): ${raw.slice(0, 200)}`);
-    }
-
-    if (!res.ok) {
-      throw new Error(parsed.error ?? `Local runtime HTTP ${res.status}: ${raw.slice(0, 300)}`);
-    }
-
-    const text = parsed.message?.content?.trim();
+    const text = result.content?.trim();
     if (!text) throw new Error("Local runtime returned empty completion.");
 
-    return { text, provider: this.id, model, mock: false, configured: true, ready: true };
+    return { text, provider: this.id, model: result.model || model, mock: false, configured: true, ready: true };
   }
 }
 

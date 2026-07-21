@@ -2,9 +2,11 @@
 
 Código: `sesClient`, bounce/complaint webhooks con **tenant_id** obligatorio en fallbacks, health env-only.
 
-## Bloqueo actual
+## Estado 2026-07-21
 
-**KI-014** — AWS SES `ProductionAccessEnabled: false` (DENIED). Ver `docs/SES_PRODUCTION_ACCESS_APPEAL.md`.
+**KI-014 cerrado.** AWS SES `ProductionAccessEnabled: true` · Review **GRANTED** · `SendingEnabled: true`.  
+Dominio `nelvyon.com` Verification/DKIM **SUCCESS**. Self-send From=To SES_FROM **OK**.  
+SNS topic `nelvyon-ses-events` → `https://nelvyon.com/api/webhooks/ses` (PendingConfirmation=false).
 
 ## Variables
 
@@ -16,17 +18,14 @@ SES_FROM_EMAIL=
 SES_FROM_NAME=NELVYON
 ```
 
-## Acciones humanas (exactas)
+## Acciones humanas residuales (opcionales)
 
-1. Completar apelación SES production access (documento appeal).
-2. Tras aprobación AWS: verificar dominio + DKIM/SPF/DMARC (Cloudflare DNS).
-3. Crear SNS topic → suscribir HTTPS `https://<host>/api/webhooks/ses` (bounce/complaint/delivery).
-4. Confirmar suscripción SNS (URL de confirmación).
-5. Enviar a 1 destinatario externo no sandbox → verificar open/bounce logs.
-6. Health: UI campaña muestra `ses_configured` cuando keys + from presentes.
+1. Primer envío a destinatario externo real (campaña) → verificar open/bounce en logs.
+2. Health UI: `ses_configured` cuando keys + from presentes.
+3. Mantener DKIM/SPF/DMARC en Cloudflare.
 
 ## In-repo (ya cerrado)
 
-- Fallbacks bounce/complaint **scoped por tenant_id** (no update global por email)
+- Fallbacks bounce/complaint **scoped por tenant_id**
 - `isSesEnvConfigured` / `missingSesEnvKeys`
-- `.env.example` con keys SES assignables
+- Apelación histórica: `docs/SES_PRODUCTION_ACCESS_APPEAL.md` (obsoleta como bloqueo)

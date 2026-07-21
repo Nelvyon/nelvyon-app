@@ -1,30 +1,45 @@
-import { bffDegraded, BFF_DEGRADED_NO_DATA } from "@/lib/bffDegraded";
+import { bffDegraded, BFF_DEGRADED_NO_DATA, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 import { adsBffGet, adsBffPost } from "@/lib/adsBffRoute";
 
 export { adsBffGet as automationsBffGet, adsBffPost as automationsBffPost };
 
-export const EMPTY_WORKFLOWS_LIST = { items: [] as unknown[], total: 0, skip: 0, limit: 50 };
+export const EMPTY_WORKFLOWS_LIST = bffDegraded(
+  { items: [] as unknown[], total: 0, skip: 0, limit: 50 },
+  BFF_DEGRADED_UPSTREAM,
+);
 
-export const EMPTY_WORKFLOW = {
-  id: 0,
-  name: "",
-  status: "draft",
-  nodes: [] as unknown[],
-  edges: [] as unknown[],
-};
+export const EMPTY_WORKFLOW = bffDegraded(
+  {
+    id: 0,
+    name: "",
+    status: "draft",
+    nodes: [] as unknown[],
+    edges: [] as unknown[],
+  },
+  BFF_DEGRADED_NO_DATA,
+);
 
-export const EMPTY_RULES_LIST = { items: [] as unknown[], total: 0, skip: 0, limit: 50 };
+export const EMPTY_RULES_LIST = bffDegraded(
+  { items: [] as unknown[], total: 0, skip: 0, limit: 50 },
+  BFF_DEGRADED_UPSTREAM,
+);
 
-export const EMPTY_STATS = {
-  total_jobs: 0,
-  completed: 0,
-  pending: 0,
-  failed: 0,
-  average_processing_ms: 0,
-  success_rate: 0,
-};
+export const EMPTY_STATS = bffDegraded(
+  {
+    total_jobs: 0,
+    completed: 0,
+    pending: 0,
+    failed: 0,
+    average_processing_ms: 0,
+    success_rate: 0,
+  },
+  BFF_DEGRADED_NO_DATA,
+);
 
-export const EMPTY_EXECUTIONS_LIST = { items: [] as unknown[], total: 0, skip: 0, limit: 50 };
+export const EMPTY_EXECUTIONS_LIST = bffDegraded(
+  { items: [] as unknown[], total: 0, skip: 0, limit: 50 },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 export const EMPTY_UNIFIED_AUTOMATIONS = bffDegraded(
   {

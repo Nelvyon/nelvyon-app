@@ -29,7 +29,7 @@ export async function saveApiKey(userId: string, provider: ApiKeyProvider, plain
   const db = DbClient.getInstance();
   const encrypted = encryptApiKey(plainKey);
   await db.query(
-    `INSERT INTO api_keys (user_id, provider, encrypted_key, updated_at)
+    `INSERT INTO user_provider_api_keys (user_id, provider, encrypted_key, updated_at)
      VALUES ($1, $2, $3, now())
      ON CONFLICT (user_id, provider) DO UPDATE SET
        encrypted_key = EXCLUDED.encrypted_key,
@@ -41,7 +41,7 @@ export async function saveApiKey(userId: string, provider: ApiKeyProvider, plain
 export async function getApiKey(userId: string, provider: ApiKeyProvider): Promise<string | null> {
   const db = DbClient.getInstance();
   const rows = await db.query<{ encrypted_key: string }>(
-    `SELECT encrypted_key FROM api_keys
+    `SELECT encrypted_key FROM user_provider_api_keys
      WHERE user_id = $1 AND provider = $2`,
     [userId, provider],
   );
@@ -56,12 +56,12 @@ export async function getApiKey(userId: string, provider: ApiKeyProvider): Promi
 
 export async function deleteApiKey(userId: string, provider: ApiKeyProvider): Promise<void> {
   const db = DbClient.getInstance();
-  await db.query(`DELETE FROM api_keys WHERE user_id = $1 AND provider = $2`, [userId, provider]);
+  await db.query(`DELETE FROM user_provider_api_keys WHERE user_id = $1 AND provider = $2`, [userId, provider]);
 }
 
 export async function listUserProviders(userId: string): Promise<ApiKeyProvider[]> {
   const db = DbClient.getInstance();
-  const rows = await db.query<{ provider: string }>(`SELECT provider FROM api_keys WHERE user_id = $1`, [userId]);
+  const rows = await db.query<{ provider: string }>(`SELECT provider FROM user_provider_api_keys WHERE user_id = $1`, [userId]);
   return rows.map((r) => r.provider).filter((p): p is ApiKeyProvider => isApiKeyProvider(p));
 }
 

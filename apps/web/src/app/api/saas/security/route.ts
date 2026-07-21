@@ -41,7 +41,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ allowlist, roles, territories, mfa, sandboxes });
   } catch (e) {
     if (isPgMissingRelation(e)) {
-      return NextResponse.json({ ...SECURITY_EMPTY, schemaPending: true });
+      return NextResponse.json({ ...SECURITY_EMPTY, schemaPending: true, degraded: true, degraded_reason: "schema_pending" });
     }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

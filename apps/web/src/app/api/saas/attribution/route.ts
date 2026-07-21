@@ -29,7 +29,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ summary });
   } catch (e: unknown) {
     if (isPgMissingRelation(e)) {
-      return NextResponse.json({ summary: EMPTY_SUMMARY, schemaPending: true });
+      return NextResponse.json({ summary: EMPTY_SUMMARY, schemaPending: true, degraded: true, degraded_reason: "schema_pending" });
     }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

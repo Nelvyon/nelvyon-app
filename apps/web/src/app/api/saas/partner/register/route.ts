@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   try {
     const ctx = await requireSaasContext(req, "settings.write");
-    const userId = (ctx as { user?: { id: string } }).user?.id;
+    const userId = ctx.claims.userId;
     if (!userId) {
       return NextResponse.json({ error: "No user context", code: "VALIDATION" }, { status: 400 });
     }

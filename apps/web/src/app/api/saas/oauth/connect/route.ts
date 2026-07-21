@@ -9,6 +9,7 @@ import {
   readSessionToken,
   stableWorkspaceIdFromTenant,
 } from "@/lib/platformFastApiProxy";
+import { isAllowedOAuthAuthorizeUrl } from "@/lib/integrations/oauthAuthorizeAllowlist";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -60,6 +61,12 @@ export async function GET(req: Request) {
     if (!data.authorize_url) {
       return NextResponse.redirect(
         new URL("/saas/integraciones?oauth_error=missing_authorize_url", appUrl),
+      );
+    }
+
+    if (!isAllowedOAuthAuthorizeUrl(data.authorize_url)) {
+      return NextResponse.redirect(
+        new URL("/saas/integraciones?oauth_error=authorize_url_not_allowed", appUrl),
       );
     }
 

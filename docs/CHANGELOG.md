@@ -3,15 +3,37 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-21
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Bloques 3–13 | **Ejecución final** | B3 SaaS UUID iso staging PASS · B4 SES GRANTED+send · B5 Stripe STARTER missing (KI-028) · B6 NO deploy (prod≤511) · B7 app.nelvyon.com NXDOMAIN · B8 health-only · B9/10 OK · B12 IA OFF · costes 0 |
+| KI-014 | **Cerrado → KI-R014** | SES ProductionAccess true · self-send · SNS confirmed |
+| KI-028 | **Abierto** | Stripe Live STARTER `resource_missing` en price-audit |
+| Script | **verify-saas-uuid-isolation.mjs** | Tenants efímeros + audit JWT + contacts cross-tenant · evidencia JSON |
+| KI-027 | **Cerrado** | Test brain mirrors ingest evidence; validador **508–516**; verify-all **CONDITIONAL_READY** |
+| Audit | **Cierre élite total (solo lectura)** | Tabla 16 sistemas · GHL/HubSpot · (histórico pre B3–13) |
+| Docs | **Sync drift post-KI-026** | DATABASE/PROJECT_STATUS/ROADMAP/INFRA/HANDOVER alineados a mig **516** |
+
 ## 2026-07-20
 
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| KI-026 | **RLS dual-plane aplicado staging** | Mig `516_*` + ADR-032 · 13 policies core · aislamiento predicado funnels/chatbot OK · audit skip (&lt;2 tenants) · SM verified · CONDITIONAL_READY |
+| KI-025 | **Stop @507 confirmado** | Error 42804 `social_post_analytics_post_id_fkey` uuid vs integer; dual-schema + `current_tenant_id` orden; **sin** 506a/edit 507 |
+| KI-024 | **Audit drift calendar_events staging** | Causa: `calendar_events` legacy int sin `tenant_id` (0 filas) + 408 IF NOT EXISTS → idx tenant_id FATAL; **sin mutación**; bloquea KI-021 |
+| Brain | **Knowledge ingest verified** | Fix tsconfig `pg` path (tsx/esbuild TransformError on `@types/pg`); ingest writes `verified:true` + chunk count; preflight preserves evidence; MASTER_CONTEXT + AUDITORIA in coreDocs; orphans **0** · chunks **1559** |
+| Docs | **NELVYON_MASTER_CONTEXT (biblia)** | `docs/NELVYON_MASTER_CONTEXT.md` — contexto CTO completo 20 secciones para cualquier IA; README/HANDOVER apuntan como prioridad 0 |
+| Brain | **Bloque 1 Docker+ingest VERIFICADO** | Docker Desktop UP · compose local-ai postgres healthy :5434 · preflight PASS · ingest `verified:true` · **1559** chunks · orphans 0 · coverage **0.99** · ADR-030 · `claimComplete` false |
+| KI-023 | **Audit drift deals staging** | Causa: `deals` legacy int sin `tenant_id` (0 filas) + 402 IF NOT EXISTS → idx tenant_id FATAL; plan `401a` rename; **sin mutación**; ADR-031 reclasificado (ops ≠ ADR) |
+| KI-022 | **Reparación staging ejecutada** | `400a` + `401` OK · conversations UUID · messages FK · migrate stop @ **402** → KI-023 |
+| Docs | **ADR-031 + docs KI-022/023** | `400a` lexicographic pre-401; MASTER/STATUS/ROADMAP/TODO/INFRA/DEPLOY/CTO/AUDITORIA sync; CONDITIONAL_READY; `claimComplete` false |
+| Audit | **Auditoría técnica absoluta** | P0/P1 BFF honesty+auth; `AUDITORIA_TECNICA_ABSOLUTA.md` · CONDITIONAL_READY |
 | Ops | **nelvyon-verify-all + prod-env preflight** | Master gate CONDITIONAL_READY; preflight tsx path fix; CTO_FINAL_VERIFY + TEST_SKIPS SSOT |
 | Security | **Reputación BFF auth / EMPTY_ALERTS** | Platform reputacion routes require auth; degraded empty alerts honesty |
-| �rea | Cambio | Descripci�n |
-|------|--------|-------------|
 | Sprint | **Sprint final absoluto** | CSRF /api/os · signup→register real · saasEnv exports · mig 515 docs · build/lint/tsc green · `SPRINT_FINAL_ABSOLUTO.md` |
 | Cierre | **Cierre final prioritario CONDITIONAL_READY** | CSRF Origin cookie SaaS; SES bounce/complaint tenant-scope; mig **515** RLS Shared Memory + verify; preflight ingest (Docker DOWN); OpenClaw runtime SSOT; OPS Stripe/SES/514; npm audit documenter 0c/0h; tsc OK; focused 28p/2s; suite 2402p/4s; migrations 508-515 OK - `CIERRE_FINAL_PRIORITARIO.md` |
-| Quality | **Elite finalization pass** | SSO tenant lookup + `saasErrorBody` hardening; `local-ai-health.mjs` ? tsx SSOT; security-gates **508�514** + audit critical-only label; private-ai `routerHealthAvailable`; DATABASE.md sync; Widget few-shot; test agent count 23 � `ELITE_QUALITY_FINALIZATION.md` |
+| Quality | **Elite finalization pass** | SSO tenant lookup + `saasErrorBody` hardening; `local-ai-health.mjs` → tsx SSOT; security-gates **508–514** + audit critical-only label; private-ai `routerHealthAvailable`; DATABASE.md sync; Widget few-shot; test agent count 23 · `ELITE_QUALITY_FINALIZATION.md` |
 | Tests | **Evidencia** | tsc OK; vitest focal 15/15; suite principal 2401 passed; validate-post-elite OK; knowledge sync orphans 0 coverage 0.95 |
 ---
 

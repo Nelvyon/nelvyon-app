@@ -5,6 +5,7 @@ import {
   assertUserCanAccessWorkspace,
   WorkspaceAccessError,
 } from "@/lib/platformDbFallback";
+import { bffDegraded, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 
 export function platformApiBase(): string {
   return (
@@ -48,12 +49,26 @@ export function fallbackWorkspaceList(claims: {
   ];
 }
 
-export const EMPTY_CLIENT_LIST = {
-  items: [] as unknown[],
-  total: 0,
-  skip: 0,
-  limit: 20,
-};
+export const EMPTY_CLIENT_LIST = bffDegraded(
+  {
+    items: [] as unknown[],
+    total: 0,
+    skip: 0,
+    limit: 20,
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
+
+export const EMPTY_PIPELINE = bffDegraded(
+  {
+    by_stage: [] as unknown[],
+    items: [] as unknown[],
+    stages: [] as unknown[],
+    total_count: 0,
+    total_value: 0,
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 export async function readSessionToken(req: Request): Promise<string | null> {
   const header = req.headers.get("authorization");

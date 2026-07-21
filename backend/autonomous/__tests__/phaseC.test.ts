@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { invokeLlm, resolveLlmMode, setLlmInvokeForTests } from "../llm/llmAdapter";
+import { invokeLlm, isAutonomousOllamaConfigured, resolveLlmMode, setLlmInvokeForTests } from "../llm/llmAdapter";
 import { parseJsonFromLlm } from "../llm/parseJson";
 import { scoreOffline } from "../qa/offlineScorer";
 import { executePipelinePhaseC, initPhaseCProject } from "../pipelines/runPipelinePhaseC";
@@ -21,11 +21,22 @@ describe("Phase C — LLM adapter", () => {
     setLlmInvokeForTests(null);
     delete process.env.OPENAI_API_KEY;
     delete process.env.AUTONOMOUS_LLM_MODE;
+    delete process.env.OLLAMA_CONFIGURED;
+    delete process.env.OLLAMA_HOST;
+    delete process.env.OLLAMA_BASE_URL;
   });
 
-  it("resolveLlmMode is mock without API key", () => {
+  it("resolveLlmMode is mock without Ollama or OpenAI", () => {
     delete process.env.OPENAI_API_KEY;
+    delete process.env.OLLAMA_CONFIGURED;
+    delete process.env.OLLAMA_HOST;
     expect(resolveLlmMode()).toBe("mock");
+  });
+
+  it("resolveLlmMode is real when OLLAMA_CONFIGURED=1", () => {
+    process.env.OLLAMA_CONFIGURED = "1";
+    expect(isAutonomousOllamaConfigured()).toBe(true);
+    expect(resolveLlmMode()).toBe("real");
   });
 
   it("invokeLlm mock never throws without API key", async () => {

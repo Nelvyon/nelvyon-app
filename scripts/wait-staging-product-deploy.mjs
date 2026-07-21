@@ -6,7 +6,7 @@ async function loginToken() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       email: "qa-audit-20260612@nelvyon.test",
-      password: "StagingQA2026!",
+      password: process.env.STAGING_QA_PASSWORD?.trim() || (process.env.STAGING_QA_ALLOW_DEFAULT === "1" ? "StagingQA2026!" : (() => { throw new Error("STAGING_QA_PASSWORD is required (or STAGING_QA_ALLOW_DEFAULT=1)"); })()),
     }),
   });
   if (!login.ok) return null;

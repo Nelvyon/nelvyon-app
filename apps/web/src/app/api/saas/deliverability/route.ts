@@ -34,7 +34,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ snapshot });
   } catch (e) {
     if (isPgMissingRelation(e)) {
-      return NextResponse.json({ snapshot: EMPTY_SNAPSHOT, schemaPending: true });
+      return NextResponse.json({ snapshot: EMPTY_SNAPSHOT, schemaPending: true, degraded: true, degraded_reason: "schema_pending" });
     }
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

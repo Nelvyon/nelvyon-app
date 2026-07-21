@@ -89,7 +89,7 @@ export class DataSubjectService {
       : [];
 
     const apiKeys = await this.db.query<ApiKeyExportRow>(
-      `SELECT id, user_id, provider, created_at, updated_at FROM api_keys WHERE user_id = $1`,
+      `SELECT id, user_id, provider, created_at, updated_at FROM user_provider_api_keys WHERE user_id = $1`,
       [userId],
     );
 
@@ -225,7 +225,7 @@ export class DataSubjectService {
 
     await this.tryCancelStripeSubscription(userId);
 
-    await this.db.query(`DELETE FROM api_keys WHERE user_id = $1`, [userId]);
+    await this.db.query(`DELETE FROM user_provider_api_keys WHERE user_id = $1`, [userId]);
     await tryQuery(this.db, `DELETE FROM saas_api_keys WHERE user_id::text = $1`, [userId]);
     await tryExec(this.db, `DELETE FROM onboarding WHERE user_id = $1`, [userId]);
 

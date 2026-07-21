@@ -52,9 +52,23 @@ function makeDb() {
   const activity: Array<{ tenant_id: string; event_type: string; description: string; metadata: Record<string, unknown> }> = [];
   let tick = 0;
 
+  const calls: Array<{ sql: string; params?: unknown[] }> = [];
+
   async function query<T>(sql: string, params?: unknown[]): Promise<T[]> {
+    calls.push({ sql, params });
     const s = sql.replace(/\s+/g, " ").trim();
     const p = params ?? [];
+    const asJson = <TVal>(v: unknown, fallback: TVal): TVal => {
+      if (v == null) return fallback;
+      if (typeof v === "string") {
+        try {
+          return JSON.parse(v) as TVal;
+        } catch {
+          return fallback;
+        }
+      }
+      return v as TVal;
+    };
     if (s.startsWith("INSERT INTO saas_workflows")) {
       const status = String(p[3]);
       const trigger = String(p[4]);
@@ -70,9 +84,9 @@ function makeDb() {
         description: (p[2] as string | null) ?? null,
         status: status as WorkflowRow["status"],
         trigger_type: trigger as WorkflowRow["trigger_type"],
-        trigger_config: (p[5] as Record<string, unknown>) ?? {},
-        conditions: (p[6] as Array<Record<string, unknown>>) ?? [],
-        actions: (p[7] as Array<Record<string, unknown>>) ?? [],
+        trigger_config: asJson(p[5], {}),
+        conditions: asJson(p[6], []),
+        actions: asJson(p[7], []),
         run_count: 0,
         last_run_at: null,
         created_at: new Date(Date.now() + ++tick),
@@ -95,9 +109,9 @@ function makeDb() {
       if (p[3] !== null) row.description = String(p[3]);
       if (p[4] !== null) row.status = String(p[4]) as WorkflowRow["status"];
       if (p[5] !== null) row.trigger_type = String(p[5]) as WorkflowRow["trigger_type"];
-      if (p[6] !== null) row.trigger_config = p[6] as Record<string, unknown>;
-      if (p[7] !== null) row.conditions = p[7] as Array<Record<string, unknown>>;
-      if (p[8] !== null) row.actions = p[8] as Array<Record<string, unknown>>;
+      if (p[6] !== null) row.trigger_config = asJson(p[6], {});
+      if (p[7] !== null) row.conditions = asJson(p[7], []);
+      if (p[8] !== null) row.actions = asJson(p[8], []);
       row.updated_at = new Date(Date.now() + ++tick);
       return [row as unknown as T];
     }
@@ -163,10 +177,28 @@ function makeDb() {
     return [] as T[];
   }
 
-  return { query, workflows, runs, activity };
+  return { query, workflows, runs, activity, calls };
 }
 
 describe("SaasWorkflowService", () => {
+  it("createWorkflow serializa jsonb con JSON.stringify", async () => {
+    const db = makeDb();
+    const svc = new SaasWorkflowService(db);
+    const wf = await svc.createWorkflow("t1", {
+      name: "WF",
+      triggerType: "manual",
+      triggerConfig: { x: 1 },
+      conditions: [],
+      actions: [{ type: "notify", config: { message: "ok" } }] as never[],
+    });
+    expect(wf.triggerConfig).toEqual({ x: 1 });
+    expect(wf.actions[0]).toMatchObject({ type: "notify" });
+    const insertCall = db.calls.find((c) => String(c.sql).includes("INSERT INTO saas_workflows"));
+    expect(typeof insertCall?.params?.[5]).toBe("string");
+    expect(typeof insertCall?.params?.[7]).toBe("string");
+    expect(JSON.parse(String(insertCall?.params?.[5]))).toEqual({ x: 1 });
+  });
+
   it("createWorkflow crea con status 'draft'", async () => {
     const db = makeDb();
     const svc = new SaasWorkflowService(db, new SaasCrmService(db));

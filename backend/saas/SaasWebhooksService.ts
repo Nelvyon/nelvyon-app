@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { getSaasWebhookDlqService } from "./SaasWebhookDlqService";
+import { assertSafeEgressUrl } from "./safeEgressUrl";
 
 export interface SaasWebhook {
   id: string;
@@ -109,7 +110,11 @@ export class SaasWebhooksService {
 
   async create(tenantId: string, input: CreateWebhookInput): Promise<SaasWebhook> {
     if (!input.name.trim()) throw new SaasWebhooksError("name is required", "VALIDATION");
-    if (!input.url.startsWith("https://")) throw new SaasWebhooksError("url must be HTTPS", "VALIDATION");
+    try {
+      assertSafeEgressUrl(input.url);
+    } catch (e) {
+      throw new SaasWebhooksError(e instanceof Error ? e.message : "url must be a safe HTTPS endpoint", "VALIDATION");
+    }
     const invalid = input.events.filter((e) => !VALID_EVENTS.includes(e));
     if (invalid.length > 0) throw new SaasWebhooksError(`Invalid events: ${invalid.join(", ")}`, "VALIDATION");
     const secret = crypto.randomBytes(32).toString("hex");
@@ -132,7 +137,11 @@ export class SaasWebhooksService {
     let idx = 3;
     if (input.name !== undefined) { sets.push(`name = $${idx++}`); params.push(input.name.trim()); }
     if (input.url !== undefined) {
-      if (!input.url.startsWith("https://")) throw new SaasWebhooksError("url must be HTTPS", "VALIDATION");
+      try {
+        assertSafeEgressUrl(input.url);
+      } catch (e) {
+        throw new SaasWebhooksError(e instanceof Error ? e.message : "url must be a safe HTTPS endpoint", "VALIDATION");
+      }
       sets.push(`url = $${idx++}`); params.push(input.url);
     }
     if (input.events !== undefined) { sets.push(`events = $${idx++}::text[]`); params.push(input.events); }
@@ -182,6 +191,7 @@ export class SaasWebhooksService {
     let success = false;
     let errorMessage: string | null = null;
     try {
+      assertSafeEgressUrl(url);
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Nelvyon-Signature": `sha256=${sig}`, "X-Nelvyon-Event": event },

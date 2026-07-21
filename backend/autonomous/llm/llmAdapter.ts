@@ -1,8 +1,9 @@
 /**
- * LLM Adapter — mock | real (OpenAI) with automatic fallback
+ * LLM Adapter — local Nelvyon Ollama (primary) | OpenAI (optional) | mock fallback.
  * No sensitive prompt logging — only agent id, mode, token count.
  */
 
+import { getOllamaClient } from "../../local-ai/OllamaClient";
 import { parseJsonFromLlm } from "./parseJson";
 import type { AgentRole } from "./promptTemplates";
 import { buildUserPrompt, getSystemPrompt } from "./promptTemplates";
@@ -34,11 +35,23 @@ export function setLlmInvokeForTests(fn: LlmInvokeFn | null): void {
   customInvoke = fn;
 }
 
+/** True when local Ollama path is opted-in (Nelvyon AI primary; no paid API required). */
+export function isAutonomousOllamaConfigured(): boolean {
+  if (process.env.OLLAMA_CONFIGURED?.trim() === "1") return true;
+  return Boolean(
+    process.env.OLLAMA_HOST?.trim() ||
+      process.env.OLLAMA_BASE_URL?.trim() ||
+      process.env.NELVYON_LOCAL_AI_URL?.trim() ||
+      process.env.LOCAL_AI_BASE_URL?.trim(),
+  );
+}
+
 export function resolveLlmMode(): LlmMode {
   if (process.env.AUTONOMOUS_LLM_MODE === "mock") return "mock";
   if (process.env.AUTONOMOUS_LLM_MODE === "real") return "real";
-  const key = process.env.OPENAI_API_KEY?.trim();
-  return key ? "real" : "mock";
+  if (isAutonomousOllamaConfigured()) return "real";
+  if (process.env.OPENAI_API_KEY?.trim()) return "real";
+  return "mock";
 }
 
 function logLlmEvent(event: {
@@ -62,6 +75,28 @@ function logLlmEvent(event: {
     .filter(Boolean)
     .join(" ");
   console.error(msg);
+}
+
+async function callOllama(
+  system: string,
+  user: string,
+): Promise<{ content: string; tokens: number; model: string }> {
+  const client = getOllamaClient();
+  const result = await client.chat(
+    [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+    {
+      format: "json",
+      temperature: 0.3,
+      numPredict: 2048,
+    },
+  );
+  const content = result.content?.trim() ?? "";
+  if (!content) throw new Error("Ollama empty content");
+  const tokens = (result.promptEvalCount ?? 0) + (result.evalCount ?? 0);
+  return { content, tokens, model: result.model };
 }
 
 async function callOpenAi(system: string, user: string): Promise<{ content: string; tokens: number; model: string }> {
@@ -115,6 +150,32 @@ async function callOpenAi(system: string, user: string): Promise<{ content: stri
   }
 }
 
+/** Prefer local Ollama; OpenAI only as optional fallback. */
+async function callRealLlm(
+  system: string,
+  user: string,
+): Promise<{ content: string; tokens: number; model: string }> {
+  const errors: string[] = [];
+
+  if (isAutonomousOllamaConfigured()) {
+    try {
+      return await callOllama(system, user);
+    } catch (e) {
+      errors.push(`ollama: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  if (process.env.OPENAI_API_KEY?.trim()) {
+    try {
+      return await callOpenAi(system, user);
+    } catch (e) {
+      errors.push(`openai: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  throw new Error(errors.length ? errors.join(" | ") : "No LLM provider configured (Ollama or OpenAI)");
+}
+
 export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
   if (customInvoke) return customInvoke(req);
 
@@ -131,7 +192,7 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
       model: "mock-rules-v1",
       parsed,
       tokens: 0,
-      fallbackReason: "AUTONOMOUS_LLM_MODE=mock or no OPENAI_API_KEY",
+      fallbackReason: "AUTONOMOUS_LLM_MODE=mock or no local Ollama / OPENAI_API_KEY",
       duration_ms: Date.now() - started,
     };
     logLlmEvent({
@@ -147,7 +208,7 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
   }
 
   try {
-    const { content, tokens, model } = await callOpenAi(system, user);
+    const { content, tokens, model } = await callRealLlm(system, user);
     const parsed = parseJsonFromLlm(content);
     if (!parsed || typeof parsed !== "object") {
       throw new Error("LLM response is not valid JSON object");

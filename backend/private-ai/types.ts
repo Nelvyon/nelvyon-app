@@ -24,6 +24,24 @@ export type LlmCompletionRequest = {
   model?: string;
   maxTokens?: number;
   temperature?: number;
+  /** Required for certified LocalModelRouter provider (tenant-scoped inference). */
+  routerContext?: RouterCompletionContext;
+};
+
+/** Context passed to LocalModelRouter when using provider `local_router`. */
+export type RouterCompletionContext = {
+  tenantId: string;
+  clientId?: string | null;
+  agentId?: string;
+  domain?: string;
+  hints?: {
+    taskType?: string;
+    requireJson?: boolean;
+    requirePlan?: boolean;
+    requireCitations?: boolean;
+    structuredOutput?: boolean;
+    ownerApproved?: boolean;
+  };
 };
 
 export type LlmCompletionResult = {
@@ -81,6 +99,9 @@ export type PrivateAiPlatformStatus = {
   providers: ProviderStatus[];
   openClawBridge: "disabled" | "available" | "connected";
   ragIngest: "not_started" | "ready";
+  /** Phase 2 Shared Memory runtime flag */
+  sharedMemoryEnabled?: boolean;
+  sharedMemoryContractVersion?: string;
   message: string;
 };
 

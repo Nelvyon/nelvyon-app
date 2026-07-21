@@ -40,7 +40,7 @@ export async function runLocalAiHealthCheck(): Promise<LocalAiHealthReport> {
     const ext = await getLocalAiPool().query(
       `SELECT extname FROM pg_extension WHERE extname IN ('vector', 'pgcrypto')`,
     );
-    const names = ext.rows.map((r) => String(r.extname));
+    const names = ext.rows.map((r: { extname: string }) => String(r.extname));
     report.pgvector = { ok: names.includes("vector") && names.includes("pgcrypto"), detail: names.join(",") };
   } catch (e) {
     report.pgvector = { ok: false, detail: e instanceof Error ? e.message : String(e) };
@@ -50,7 +50,7 @@ export async function runLocalAiHealthCheck(): Promise<LocalAiHealthReport> {
     const tables = await getLocalAiPool().query<{ tablename: string }>(
       `SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE 'local_ai_%' ORDER BY 1`,
     );
-    const names = tables.rows.map((r) => r.tablename);
+    const names = tables.rows.map((r: { tablename: string }) => r.tablename);
     const required = ["local_ai_memory", "local_ai_rag_chunks", "local_ai_rag_documents", "local_ai_audit"];
     report.schema = { ok: required.every((t) => names.includes(t)), tables: names };
   } catch (e) {

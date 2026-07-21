@@ -2,6 +2,12 @@
 
 Código listo: firma SDK, idempotencia `stripe_webhook_events`, tests unitarios webhook.
 
+## Estado 2026-07-21
+
+Core vars presentes en Railway (`sk_live`, webhook, PRICE_ID_*).  
+**Bloqueo:** `price-audit` → STARTER `resource_missing` (**KI-028**). PRO/AGENCY OK.  
+No se crearon cobros ni precios desde el agente.
+
 ## Variables (Railway / prod)
 
 | Variable | Uso |

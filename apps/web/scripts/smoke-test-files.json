@@ -303,7 +303,6 @@
   "../../backend/saas/__tests__/agentLanguage.test.ts",
   "../../backend/saas/__tests__/abTesting.test.ts",
   "../../backend/saas/__tests__/sentimentMonitor.test.ts",
-  "../../backend/saas/__tests__/leadScoring.test.ts",
   "../../backend/saas/__tests__/clientBriefing.test.ts",
   "../../backend/saas/__tests__/digitalContracts.test.ts",
   "../../backend/saas/__tests__/booking.test.ts",

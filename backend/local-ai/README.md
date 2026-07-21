@@ -14,6 +14,8 @@ node scripts/local-ai-migrate.mjs
 
 # 3. Health check
 pnpm -C apps/web exec tsx ../../scripts/local-ai-health.ts
+# preferido (SSOT):
+node scripts/local-ai-health.mjs
 
 # 4. Full validation (persistence, RLS, backup/restore, localhost, PRIVATE_MODE)
 node scripts/local-ai-validate.mjs

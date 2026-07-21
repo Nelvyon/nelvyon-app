@@ -9,6 +9,7 @@ import {
   platformDbFallbackEnabled,
   platformWorkspaceDeniedResponse,
 } from "@/lib/platformDbFallback";
+import { EMPTY_PIPELINE } from "@/lib/platformFastApiProxy";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +25,7 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json({ by_stage: [], items: [], stages: [], total_count: 0, total_value: 0 });
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
   if (claims instanceof NextResponse) return claims;
 
@@ -44,7 +45,7 @@ export async function GET(req: Request) {
       }
     }
 
-    return NextResponse.json({ by_stage: [], items: [], stages: [], total_count: 0, total_value: 0 });
+    return NextResponse.json(EMPTY_PIPELINE);
   } catch (e) {
     const denied = platformWorkspaceDeniedResponse(e);
     if (denied) return denied;
@@ -59,6 +60,6 @@ export async function GET(req: Request) {
         if (innerDenied) return innerDenied;
       }
     }
-    return NextResponse.json({ by_stage: [], items: [], stages: [], total_count: 0, total_value: 0 });
+    return NextResponse.json(EMPTY_PIPELINE);
   }
 }

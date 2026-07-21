@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const userId = (ctx as { user?: { id: string } }).user?.id;
+    const userId = ctx.claims.userId;
     const svc = getSaasPartnerZoneService();
     const [summary, eligibility, catalog] = await Promise.all([
       svc.getZoneSummary(ctx.tenant.id, userId),

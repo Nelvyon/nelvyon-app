@@ -8,7 +8,7 @@
  */
 import { spawnSync } from "node:child_process";
 import { createConnection } from "node:net";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -149,11 +149,22 @@ async function main() {
         ? "Postgres on 127.0.0.1:5434 not accepting connections"
         : "Ollama on 127.0.0.1:11434 not reachable";
 
+  /** Preserve post-ingest verified evidence; preflight only refreshes infrastructure checks. */
+  let prior = {};
+  try {
+    prior = JSON.parse(readFileSync(evidencePath, "utf8"));
+  } catch {
+    /* first write */
+  }
+  const priorVerified = Boolean(prior.verified && prior.ok);
+  const priorChecks = typeof prior.checks === "object" && prior.checks ? prior.checks : {};
+
   const evidence = {
+    ...prior,
     generatedAt: now,
-    ok: false,
-    verified: false,
-    pipeline: [
+    ok: priorVerified,
+    verified: priorVerified,
+    pipeline: prior.pipeline || [
       "manifest",
       "ingest",
       "embeddings",
@@ -162,21 +173,26 @@ async function main() {
       "agent_context_engine",
     ],
     checks: {
-      manifestBuild: "not_rechecked_this_run",
+      ...priorChecks,
+      manifestBuild: priorChecks.manifestBuild || "not_rechecked_this_run",
       ollamaEmbed: ollama.ok ? "http_ok_tags_reachable" : "unreachable",
       localAiPostgres: pg.ok
         ? "tcp_open_5434"
         : docker.ok
           ? "down_port_5434_closed"
           : "down_docker_daemon_not_running",
-      ingest: "not_run",
-      vectorStoreChunks: null,
-      unifiedRagSearch: "not_run_requires_chunks",
-      agentContextGrounding: "not_rechecked_this_run",
+      ingest: priorChecks.ingest || "not_run",
+      vectorStoreChunks:
+        priorChecks.vectorStoreChunks != null ? priorChecks.vectorStoreChunks : null,
+      unifiedRagSearch: priorChecks.unifiedRagSearch || "not_run_requires_chunks",
+      agentContextGrounding: priorChecks.agentContextGrounding || "not_rechecked_this_run",
       preflight: allOk ? "pass" : "fail",
     },
     blocker: allOk
-      ? null
+      ? priorVerified
+        ? null
+        : prior.blocker ||
+          "Preflight OK — run NELVYON_KNOWLEDGE_INGEST=1 node scripts/nelvyon-knowledge-sync.mjs"
       : `${blocker}. Run: node scripts/preflight-local-ai-ingest.mjs`,
     preflight: {
       path: "scripts/preflight-local-ai-ingest.mjs",

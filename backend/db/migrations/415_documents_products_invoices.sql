@@ -1,4 +1,19 @@
--- Migration 415: Documents, products, invoices
+-- Migration 415: Documents, products, invoices (SaaS tenant-scoped)
+-- Collision: legacy user-scoped `invoices` (mig 018) lacks tenant_id. Rename before create.
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'invoices'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'invoices' AND column_name = 'tenant_id'
+  ) THEN
+    ALTER TABLE invoices RENAME TO saas_user_invoices_legacy;
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES saas_tenants(id) ON DELETE CASCADE,

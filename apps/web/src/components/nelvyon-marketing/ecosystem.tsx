@@ -36,7 +36,7 @@ export function NvEcosystem() {
           })}
         </svg>
         <div className="nv-ecosystem__core">
-          <Image src="/logo.png" alt="" width={52} height={52} className="object-contain" />
+          <Image src="/logo.svg" alt="" width={52} height={52} className="object-contain" unoptimized />
           <span>NELVYON</span>
         </div>
         {NODES.map((n) => (

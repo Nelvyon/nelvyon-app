@@ -14,11 +14,14 @@ export function validateNoForbiddenPhrases(text: string): ValidationResult {
   return { ok: violations.length === 0, score: violations.length === 0 ? 1 : 0, violations };
 }
 
+import { parseToolJson, extractJsonObject } from "./JsonOutputService";
+
 export function validateJsonOutput(text: string): ValidationResult {
-  const cleaned = text.replace(/```json|```/g, "").trim();
+  const parsed = parseToolJson(text);
+  if (parsed.ok) return { ok: true, score: 1, violations: [] };
   try {
-    JSON.parse(cleaned);
-    return { ok: true, score: 1, violations: [] };
+    JSON.parse(extractJsonObject(text));
+    return { ok: true, score: 0.8, violations: ["json_valid_but_not_tool_schema"] };
   } catch {
     return { ok: false, score: 0, violations: ["invalid_json"] };
   }

@@ -17,8 +17,6 @@ import { OsAgentError } from "@nelvyon/os-agents";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const CLIENT_ID = "ws-client-1";
-
 async function safeJson(res: Response, fallback: unknown) {
   if (!res.ok) return fallback;
   try {
@@ -36,15 +34,23 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(EMPTY_UNIFIED_SOCIAL_DEGRADED);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
   if (claims instanceof NextResponse) return claims;
 
   try {
+    const workspaceHeader = req.headers.get("x-workspace-id")?.trim();
+    const clientId =
+      workspaceHeader && /^\d+$/.test(workspaceHeader)
+        ? `ws-${workspaceHeader}`
+        : claims.tenantId
+          ? `tenant-${claims.tenantId.slice(0, 8)}`
+          : "workspace";
+
     const [schedulerRes, monitoringRes, publishRes] = await Promise.all([
       proxyPlatformFetch(req, "GET", "/api/social/stats/overview"),
       proxyPlatformFetch(req, "GET", "/api/social-monitoring/dashboard"),
-      proxyPlatformFetch(req, "GET", `/api/social-publish/analytics/${CLIENT_ID}`),
+      proxyPlatformFetch(req, "GET", `/api/social-publish/analytics/${encodeURIComponent(clientId)}`),
     ]);
 
     const authDenied = platformCollectAuthFailure(schedulerRes, monitoringRes, publishRes);

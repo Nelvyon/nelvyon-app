@@ -157,10 +157,17 @@ describe("SaasLeadScoringService", () => {
       expect(score.ruleBreakdown).toHaveLength(0);
     });
 
-    it("throws NOT_FOUND when contact missing", async () => {
+    it("snapshot SQL usa company y saas_campania_recipients (no company_name / campaign_contacts)", async () => {
       vi.mocked(db.query).mockResolvedValueOnce([makeRule()]);
-      vi.mocked(db.query).mockResolvedValueOnce([]); // no contact
-      await expect(svc.scoreContact(TENANT, CONTACT_ID)).rejects.toThrow(SaasLeadScoringError);
+      vi.mocked(db.query).mockResolvedValueOnce([makeContactSnap()]);
+      vi.mocked(db.query).mockResolvedValueOnce([makeScore({ score: 10 })]);
+      await svc.scoreContact(TENANT, CONTACT_ID);
+      const snapSql = String(vi.mocked(db.query).mock.calls[1]?.[0] ?? "");
+      expect(snapSql).toMatch(/c\.company\s+AS\s+company_name/i);
+      expect(snapSql).toMatch(/saas_campania_recipients/i);
+      expect(snapSql).not.toMatch(/c\.company_name/);
+      expect(snapSql).not.toMatch(/saas_campaign_contacts/);
+      expect(snapSql).toMatch(/saas_contact_activities/);
     });
 
     it("computes grade D when score is 0 and max > 0", async () => {
@@ -212,6 +219,14 @@ describe("SaasLeadScoringService", () => {
       vi.mocked(db.query).mockResolvedValueOnce([]);
       const scores = await svc.listScores(TENANT, { category: "hot" });
       expect(scores).toHaveLength(0);
+    });
+
+    it("listScores SQL usa c.company AS contact_company", async () => {
+      vi.mocked(db.query).mockResolvedValueOnce([]);
+      await svc.listScores(TENANT);
+      const sql = String(vi.mocked(db.query).mock.calls[0]?.[0] ?? "");
+      expect(sql).toMatch(/c\.company\s+AS\s+contact_company/i);
+      expect(sql).not.toMatch(/c\.company_name/);
     });
   });
 

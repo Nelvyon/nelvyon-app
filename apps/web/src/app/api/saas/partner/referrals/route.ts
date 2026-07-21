@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const userId = (ctx as { user?: { id: string } }).user?.id;
+    const userId = ctx.claims.userId;
     if (!userId) {
       return NextResponse.json({ error: "No user context", code: "NOT_FOUND" }, { status: 404 });
     }

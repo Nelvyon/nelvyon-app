@@ -65,7 +65,7 @@ export function PlataformaOs() {
           </svg>
 
           <div className="nelvyon-ecosystem-orbit__core">
-            <Image src="/logo.png" alt="" width={56} height={56} className="nelvyon-ecosystem-orbit__logo" priority={false} />
+            <Image src="/logo.svg" alt="" width={56} height={56} className="nelvyon-ecosystem-orbit__logo" priority={false} unoptimized />
             <span className="nelvyon-ecosystem-orbit__brand">NELVYON</span>
           </div>
 

@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import { DbClient } from "../../../../../../../backend/db/DbClient";
 import { getSesClient } from "../../../../../../../backend/email/sesClient";
+import { escapeHtml } from "../../../../../../../backend/saas/htmlEscape";
 
 async function sendBookingConfirm(
   to: string,
@@ -17,16 +18,19 @@ async function sendBookingConfirm(
   try {
     const client = getSesClient();
     if (!client) return;
-    const dateLabel = new Date(startAt).toLocaleString("es-ES");
-    const html = `<p>Hola ${name},</p>
-<p>Tu cita <strong>${title}</strong> ha sido confirmada para el <strong>${dateLabel}</strong>.</p>
-${companyName ? `<p>Nuestro equipo de <strong>${companyName}</strong> estará contigo puntualmente.</p>` : ""}
+    const dateLabel = escapeHtml(new Date(startAt).toLocaleString("es-ES"));
+    const safeName = escapeHtml(name);
+    const safeTitle = escapeHtml(title);
+    const safeCompany = companyName ? escapeHtml(companyName) : "";
+    const html = `<p>Hola ${safeName},</p>
+<p>Tu cita <strong>${safeTitle}</strong> ha sido confirmada para el <strong>${dateLabel}</strong>.</p>
+${safeCompany ? `<p>Nuestro equipo de <strong>${safeCompany}</strong> estará contigo puntualmente.</p>` : ""}
 <p>Si necesitas cambiar la cita, responde a este email.</p>`;
     await client.send(new SendEmailCommand({
       Source: sesFrom,
       Destination: { ToAddresses: [to] },
       Message: {
-        Subject: { Data: `Confirmación de cita: ${title}`, Charset: "UTF-8" },
+        Subject: { Data: `Confirmación de cita: ${title.replace(/[\r\n]+/g, " ").slice(0, 120)}`, Charset: "UTF-8" },
         Body: { Html: { Data: html, Charset: "UTF-8" } },
       },
     }));

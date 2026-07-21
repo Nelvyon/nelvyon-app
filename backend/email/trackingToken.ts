@@ -1,15 +1,12 @@
 /**
  * HMAC-SHA256 tokens for email open/click tracking.
  * Token format: base64url(payload_json) + "." + base64url(hmac_sha256)
- * Secret from env TRACKING_SECRET (fallback to JWT_SECRET).
+ * Secret: TRACKING_SECRET (preferred) or JWT_SECRET — fail-closed ≥32 chars.
  */
 import { createHmac, timingSafeEqual } from "crypto";
+import { requireHmacSecret } from "../saas/hmacSecret";
 
-const SECRET = () => {
-  const s = process.env.TRACKING_SECRET ?? process.env.JWT_SECRET;
-  if (!s) throw new Error("TRACKING_SECRET or JWT_SECRET env var required");
-  return s;
-};
+const SECRET = () => requireHmacSecret({ preferTracking: true });
 
 export type TrackingPayload = {
   /** tenant id */

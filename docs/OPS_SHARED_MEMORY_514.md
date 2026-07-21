@@ -2,6 +2,18 @@
 
 > Verificación **read-only** en DB. No aplica migraciones ni toca producción sin aprobación.
 
+## Estado Bloque 2 (2026-07-21)
+
+| Paso | Resultado |
+|------|-----------|
+| KI-022…025 | ✅ |
+| KI-026 | ✅ `516` + ADR-032 · policies dual-plane |
+| Shared Memory | **verified:true** |
+| Última mig staging | **`516_fastapi_rls_repair.sql`** |
+| CLI | **production** / `@nelvyon/web` |
+
+**Próximo:** ops externas + flags (OFF por defecto). No READY.
+
 ## Qué hace 514
 
 - Tablas `saas_shared_memory_entries` + `saas_shared_memory_audit`

@@ -385,6 +385,7 @@ export default function SecuenciasPage() {
   const [selected, setSelected] = useState<SequenceWithSteps | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [sesConfigured, setSesConfigured] = useState<boolean | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [enrollTarget, setEnrollTarget] = useState<SaasSequence | null>(null);
   const [showAddStep, setShowAddStep] = useState(false);
@@ -394,8 +395,9 @@ export default function SecuenciasPage() {
     try {
       const res = await fetch("/api/saas/sequences");
       if (!res.ok) throw new Error("Error al cargar secuencias");
-      const d = await res.json() as { sequences: SaasSequence[] };
+      const d = await res.json() as { sequences: SaasSequence[]; ses_configured?: boolean };
       setSequences(d.sequences);
+      setSesConfigured(typeof d.ses_configured === "boolean" ? d.ses_configured : null);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error");
     } finally {
@@ -454,6 +456,15 @@ export default function SecuenciasPage() {
         {err && (
           <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{err}</div>
         )}
+
+        {sesConfigured === false ? (
+          <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+            <strong>Email no configurado:</strong> las variables{" "}
+            <code className="text-amber-200">SES_FROM_EMAIL</code> y{" "}
+            <code className="text-amber-200">SES_ACCESS_KEY_ID</code> no están definidas en el servidor.
+            Los pasos de email en secuencias fallarán hasta configurar SES (y salir de sandbox si aplica).
+          </div>
+        ) : null}
 
         <SequenceTemplateGallery onImported={() => void loadSequences()} />
 

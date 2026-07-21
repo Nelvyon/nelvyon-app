@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-19**. Sin secretos.
+> Estado real documentado **2026-07-21**. Sin secretos.
 
 ---
 
@@ -13,16 +13,16 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | 🟡 | Compose local-ai + test; Desktop ops residual |
+| **Docker** | ✅ local-ai | Desktop + compose local-ai **UP** 2026-07-20 (`nelvyon-local-ai-postgres` healthy). |
 | **Railway** | ✅ | Web healthcheck `/api/health/live`; releaseCommand migrate |
-| **PostgreSQL** | ✅ | 16; migraciones hasta **514** (validator CI 508–514) |
-| **pgvector** | 🟡 | Local stack; residual ops KI-018 |
+| **PostgreSQL** | ✅ repo / 🟡 remoto | Staging: **`516_fastapi_rls_repair.sql`** (KI-026 ✅ · SM verified · ADR-032). Prod: ~511+ (drift vs staging). |
+| **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |
-| **Ollama** | ✅ | Live workforce/Elite cuando servicio local UP |
+| **Ollama** | ✅ | Preflight 2026-07-20: HTTP 200, models=6 |
 | **OpenClaw** | 🟡 | Mock certificado; URL real ops |
-| **AWS SES** | 🟡 | Dominio OK; **production access DENIED** (KI-014) |
-| **Stripe** | 🟡 | Código listo; claves prod ops |
-| **Cloudflare** | 🟡 | DNS/WAF manual |
+| **AWS SES** | ✅ | Production access GRANTED 2026-07-21 · self-send OK · KI-R014 |
+| **Stripe** | 🟡 | sk_live + webhook; **STARTER price missing** (KI-028) |
+| **Cloudflare** | 🟡 | nelvyon.com OK · **app.nelvyon.com NXDOMAIN** |
 | **Backups / DR** | ✅ | GH Action + restore drill PASS 8/8 (evidencia) |
 | **Security headers** | ✅ | SSOT `apps/web/src/lib/security/headers.ts` |
 | **Ops dashboard** | ✅ | `GET /api/platform/ops/summary` |
@@ -54,6 +54,7 @@
 | `apps/web/Dockerfile` | Railway Web |
 | `backend/Dockerfile` | FastAPI + `alembic upgrade head` |
 | `backend/docker-compose.test.yml` | Postgres :5433, Redis :6380 tests |
+| `backend/local-ai/docker-compose.yml` | Postgres+pgvector **127.0.0.1:5434** — Brain ingest **verified** 2026-07-20 |
 
 ---
 
@@ -63,7 +64,7 @@
 |-----|-------------------|
 | `git` | ✅ |
 | `gh` | ❌ opcional |
-| `railway` | ❌ opcional |
+| `railway` | ❌ opcional — Bloque 2: CLI temporal staging → repair `400a`+`401` → FATAL @402 → **restaurado a production** / `@nelvyon/web` |
 | `supabase` | ❌ opcional |
 | `wrangler` | ❌ opcional (Cloudflare) |
 

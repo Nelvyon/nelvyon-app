@@ -2,20 +2,41 @@ import { DbClient } from "../db/DbClient";
 import { PrivateAiOrchestrator } from "../private-ai/orchestrator/PrivateAiOrchestrator";
 import { PrivateAiApprovalService } from "../private-ai/approvals/PrivateAiApprovalService";
 import { PrivateAiAuditService } from "../private-ai/audit/PrivateAiAuditService";
-import { NelvyonRagStore } from "../private-ai/rag/NelvyonRagStore";
+import { getUnifiedRagStore } from "../private-ai/rag/UnifiedRagStore";
+import type { IRagStore } from "../private-ai/rag/IRagStore";
 import { listPrivateAgents, PILOT_AGENT_ID } from "../private-ai/nelvyonAgentRegistry";
 import type { PrivateAiSettings } from "../private-ai/types";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import {
+  executeTask,
+  getRouterHealth,
+  getTaskStatus,
+  routeTask,
+} from "../local-ai/router";
+import type { RouterDecision, RouterHealth, RouterTaskInput, RouterTaskResult } from "../local-ai/router/types";
+import { buildAgentContext, maybeWriteAgentMemory } from "../private-ai/context/AgentContextEngine";
+import { incPrivateAiMetric } from "../private-ai/observability/PrivateAiMetrics";
+
+export type SaasRouterInferenceInput = RouterTaskInput & {
+  userId: string;
+};
+
+export type SaasRouterInferenceResult = RouterTaskResult & {
+  auditId?: string;
+  approvalRequired?: boolean;
+  approvalId?: string;
+};
 
 export class SaasPrivateAiService {
   private readonly audit: PrivateAiAuditService;
   private readonly approvals: PrivateAiApprovalService;
-  private readonly rag: NelvyonRagStore;
+  private readonly rag: IRagStore;
 
   constructor(private readonly db: SaasPostgresPort = DbClient.getInstance()) {
     this.approvals = new PrivateAiApprovalService(db);
     this.audit = new PrivateAiAuditService(db);
-    this.rag = new NelvyonRagStore(db);
+    // SSOT RAG facade (ADR-025) — do not inject NelvyonRagStore alone
+    this.rag = getUnifiedRagStore(db);
     this.orchestrator = new PrivateAiOrchestrator(db, {
       audit: this.audit,
       approvals: this.approvals,
@@ -106,6 +127,107 @@ export class SaasPrivateAiService {
   async runAgent(input: Parameters<PrivateAiOrchestrator["runAgent"]>[0]) {
     const settings = await this.getSettings(input.tenantId);
     return this.orchestrator.runAgent(input, settings);
+  }
+
+  /** Routing decision only — no Ollama execution (certified classifier + policy). */
+  routeInference(tenantId: string, input: Omit<RouterTaskInput, "tenantId">): RouterDecision {
+    return routeTask({ ...input, tenantId });
+  }
+
+  /** Full certified router execution with SaaS audit + Shared Memory/RAG context (flag-gated). */
+  async executeInference(input: SaasRouterInferenceInput): Promise<SaasRouterInferenceResult> {
+    const { userId, tenantId, ...taskFields } = input;
+    const agentId = input.agentId ?? "router_inference";
+
+    let contextMeta: Record<string, unknown> | undefined;
+    let enrichedSystem = input.systemPrompt;
+    try {
+      const ctx = await buildAgentContext({
+        tenantId,
+        userId,
+        agentId,
+        query: input.query,
+        roles: ["member"],
+        allowedTools: ["memory.read", "rag.search", "memory.write"],
+        rag: this.rag,
+      });
+      contextMeta = ctx.meta as unknown as Record<string, unknown>;
+      if (ctx.meta.sharedMemoryEntries > 0) incPrivateAiMetric("sharedMemoryReads");
+      if (ctx.meta.ragChunks > 0) incPrivateAiMetric("ragHits");
+      if (ctx.systemSuffix) {
+        enrichedSystem = `${input.systemPrompt ?? "router"}${ctx.systemSuffix}`;
+      }
+    } catch {
+      /* context optional — never block certified router */
+    }
+
+    const result = await executeTask({
+      ...taskFields,
+      tenantId,
+      systemPrompt: enrichedSystem,
+    });
+
+    let approvalId: string | undefined;
+    let approvalRequired = false;
+
+    if (result.blocked && result.requiresApproval) {
+      approvalId = await this.approvals.queue({
+        tenantId: input.tenantId,
+        agentId,
+        actionType: "touch_production",
+        payload: { query: input.query, taskId: result.taskId, blockReason: result.blockReason },
+        requestedBy: userId,
+      });
+      approvalRequired = true;
+      incPrivateAiMetric("approvalsQueued");
+    }
+
+    if (!result.blocked && result.content) {
+      const memWrite = await maybeWriteAgentMemory({
+        tenantId,
+        userId,
+        agentId,
+        roles: ["owner"],
+        allowedTools: ["memory.write"],
+        query: input.query,
+        output: result.content,
+      });
+      if (memWrite.written) incPrivateAiMetric("sharedMemoryWrites");
+    }
+
+    const auditId = await this.audit.log({
+      tenantId: input.tenantId,
+      userId,
+      agentId,
+      action: "router_execute",
+      provider: "local_router",
+      model: result.meta.finalModel || result.meta.initialModel || "router",
+      prompt: enrichedSystem ?? "router",
+      userInput: input.query,
+      output: result.content,
+      metadata: {
+        taskId: result.taskId,
+        status: result.status,
+        blocked: result.blocked,
+        taskType: result.meta.taskType,
+        fallbackUsed: result.meta.fallbackUsed,
+        validationPass: result.meta.validationPass,
+        approvalId,
+        context: contextMeta,
+      },
+    });
+
+    incPrivateAiMetric("inferenceRuns");
+
+    return { ...result, auditId, approvalRequired, approvalId };
+  }
+
+  async getRouterHealthStatus(): Promise<RouterHealth> {
+    return getRouterHealth();
+  }
+
+  getRouterTaskStatus(taskId: string) {
+    return getTaskStatus(taskId);
   }
 }
 

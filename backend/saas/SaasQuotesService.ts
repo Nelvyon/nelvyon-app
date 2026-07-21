@@ -1,5 +1,6 @@
 import { createHmac } from "crypto";
 import { DbClient } from "../db/DbClient";
+import { requireHmacSecret } from "./hmacSecret";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -257,7 +258,7 @@ export class SaasQuotesService {
         <td style="text-align:right">${fmt(it.subtotal)}</td>
       </tr>`).join("");
 
-    const sig = createHmac("sha256", process.env.JWT_SECRET ?? "dev-secret")
+    const sig = createHmac("sha256", requireHmacSecret())
       .update(`quote:${quote.id}`)
       .digest("hex")
       .slice(0, 16);

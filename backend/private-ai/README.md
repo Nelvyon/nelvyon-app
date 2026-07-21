@@ -18,9 +18,10 @@ backend/private-ai/
 ├── providers/
 │   ├── UnconfiguredProvider.ts  # Default — zero network
 │   ├── StubProvider.ts          # Dev only (mock:true)
-│   ├── LocalOllamaProvider.ts   # Future local runtime
-│   ├── OpenAiProvider.ts        # Optional remote
-│   └── AnthropicProvider.ts     # Optional remote
+│   ├── LocalModelRouterProvider.ts  # Preferred local path → Model Router
+│   ├── LocalOllamaProvider.ts       # Legacy direct Ollama (fallback)
+│   ├── OpenAiProvider.ts            # Optional remote (PRIVATE_MODE gate)
+│   └── AnthropicProvider.ts         # Optional remote (PRIVATE_MODE gate)
 ├── agents/
 │   └── AgentPermissionService.ts
 ├── memory/
@@ -30,8 +31,8 @@ backend/private-ai/
 ├── approvals/
 │   └── PrivateAiApprovalService.ts
 ├── rag/
-│   ├── IRagStore.ts             # Contract only
-│   └── NelvyonRagStore.ts       # Read-only; no ingest yet
+│   ├── IRagStore.ts             # Contract
+│   └── NelvyonRagStore.ts       # Read path; vector ingest lives in local-ai
 ├── adapters/
 │   ├── OsLlmClientAdapter.ts    # OS ILlmClient bridge (not wired)
 │   └── OpenClawBridge.ts        # Optional; disabled by default
@@ -39,13 +40,14 @@ backend/private-ai/
     └── PrivateAiOrchestrator.ts # Composes all layers
 ```
 
-## Activation ladder (when ready)
+## Activation ladder
 
 | Step | Env vars | Effect |
 |------|----------|--------|
-| 0 (now) | defaults (`PRIVATE_MODE=ON`) | `unconfigured`, no remote network |
+| 0 | defaults (`PRIVATE_MODE=ON`) | No remote egress; providers may still be local |
 | Dev stub | `NELVYON_AI_ENABLED=1` + `NELVYON_AI_MODE=stub` | Deterministic dev responses |
-| Local model | + `OLLAMA_CONFIGURED=1` + `NELVYON_AI_MODE=local` | Ollama on 127.0.0.1 only |
+| Local router (preferred) | Router enabled + SaaS Private AI wiring | `LocalModelRouterProvider` → certified Model Router |
+| Legacy local Ollama | `OLLAMA_CONFIGURED=1` + `NELVYON_AI_MODE=local` | Direct Ollama on 127.0.0.1 (fallback) |
 | Task Internet | `PRIVATE_MODE_INTERNET_UNTIL=<ISO>` | Temporary authorized outbound window |
 | Disable privacy | `PRIVATE_MODE=OFF` | Owner only — enables remote providers if configured |
 

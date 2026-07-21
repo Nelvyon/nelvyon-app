@@ -1,13 +1,10 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { requireHmacSecret } from "../../../../../backend/saas/hmacSecret";
 
 const MAX_AGE_MS = 10 * 60 * 1000;
 
 function oauthSecret(): string {
-  const s = process.env.JWT_SECRET ?? process.env.TRACKING_SECRET;
-  if (!s || s.length < 16) {
-    throw new Error("JWT_SECRET required for OAuth state signing");
-  }
-  return s;
+  return requireHmacSecret();
 }
 
 type OAuthStatePayload = { userId: string; ts: number };

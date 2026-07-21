@@ -32,10 +32,10 @@ export async function GET(req: Request) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(emptyCrmReport(start, end));
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
   if (claims instanceof NextResponse) {
-    return NextResponse.json(emptyCrmReport(start, end));
+    return claims;
   }
 
   try {

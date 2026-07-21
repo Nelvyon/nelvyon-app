@@ -1,17 +1,24 @@
 import { socialBffGet } from "@/lib/socialBffRoute";
+import { bffDegraded, BFF_DEGRADED_UPSTREAM } from "@/lib/bffDegraded";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const EMPTY_MODULE = {
-  module: "social",
-  period: "30d",
-  kpis: {},
-  charts: {},
-};
+const EMPTY_MODULE = bffDegraded(
+  {
+    module: "social",
+    period: "30d",
+    kpis: {},
+    charts: {},
+  },
+  BFF_DEGRADED_UPSTREAM,
+);
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const period = url.searchParams.get("period") ?? "30d";
-  return socialBffGet(req, `/api/v1/analytics/social?period=${period}`, EMPTY_MODULE);
+  return socialBffGet(req, `/api/v1/analytics/social?period=${period}`, {
+    ...EMPTY_MODULE,
+    period,
+  });
 }

@@ -7,6 +7,7 @@ import {
   platformDbFallbackEnabled,
   WorkspaceAccessError,
 } from "@/lib/platformDbFallback";
+import { isPackLlmEnvConfigured } from "@nelvyon/saas";
 import { RUNNERS } from "./runnersMap";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +39,20 @@ export async function POST(
 
   if (!platformDbFallbackEnabled()) {
     return NextResponse.json(
-      { error: "Growth Pack requiere DATABASE_URL en el entorno web" },
+      { error: "Growth Pack requiere DATABASE_URL en el entorno web", code: "DATABASE_URL_MISSING" },
+      { status: 503 },
+    );
+  }
+
+  // Production autonomous runs must have an LLM path configured (OpenAI or local Ollama).
+  // Local/dev without AUTONOMOUS_PRODUCTION may still dry-run templates.
+  if (process.env.AUTONOMOUS_PRODUCTION === "true" && !isPackLlmEnvConfigured()) {
+    return NextResponse.json(
+      {
+        error:
+          "Pack LLM no configurado: define OPENAI_API_KEY o OLLAMA_HOST / NELVYON_LOCAL_AI_URL antes de kickoff en producción autónoma.",
+        code: "LLM_NOT_CONFIGURED",
+      },
       { status: 503 },
     );
   }

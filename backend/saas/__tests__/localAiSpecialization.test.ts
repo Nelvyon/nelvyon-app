@@ -35,6 +35,7 @@ describe("NELVYON specialization infrastructure", () => {
   it("plan structure validator detects missing sections", () => {
     const r = validatePlanStructure("solo un párrafo sin estructura");
     expect(r.ok).toBe(false);
+    expect(CONSTITUTION_RULES.requiredPlanSections.length).toBe(16);
   });
 
   it("quality gates aggregate infrastructure scores", () => {

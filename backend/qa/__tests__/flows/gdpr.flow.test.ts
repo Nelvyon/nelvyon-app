@@ -103,7 +103,7 @@ describe("flow: GDPR — export → deletion → audit trail", () => {
 
     await svc.deleteUserData("u1");
 
-    expect(queryMock).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM api_keys"), ["u1"]);
+    expect(queryMock).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM user_provider_api_keys"), ["u1"]);
     const updateUser = queryMock.mock.calls.find(
       ([q]) => typeof q === "string" && String(q).includes("deleted_at"),
     );

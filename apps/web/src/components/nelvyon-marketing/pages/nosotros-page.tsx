@@ -32,7 +32,7 @@ function NosotrosVisual() {
         border: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <Image src="/logo.png" alt="" width={120} height={120} className="object-contain" />
+      <Image src="/logo.svg" alt="" width={120} height={120} className="object-contain" unoptimized />
     </div>
   );
 }

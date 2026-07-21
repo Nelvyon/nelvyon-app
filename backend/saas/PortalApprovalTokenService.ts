@@ -2,12 +2,9 @@
  * HMAC tokens for portal one-click approve/reject (no login).
  */
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
+import { requireHmacSecret } from "./hmacSecret";
 
-const SECRET = () => {
-  const s = process.env.TRACKING_SECRET ?? process.env.JWT_SECRET;
-  if (!s) throw new Error("TRACKING_SECRET or JWT_SECRET env var required");
-  return s;
-};
+const SECRET = () => requireHmacSecret({ preferTracking: true });
 
 export type PortalApprovalPayload = {
   did: string; // deliverable_id

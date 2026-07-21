@@ -1,7 +1,9 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: 2026-07-09. **Prod deploy:** `815e4c0f`. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
+> Actualizado: **2026-07-21**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
+
+**Bloqueadores go-live:** KI-028 Stripe STARTER · Cloudflare `app.nelvyon.com` · prod mig≤511 · flags SM/OpenClaw OFF.
 
 ---
 
@@ -9,7 +11,7 @@
 
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
-| **Stripe** | 🟡 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_*`, `STRIPE_WEBHOOK_CONNECT_SECRET` | Webhooks `/api/webhooks/stripe` |
+| **Stripe** | 🟡 | `STRIPE_*` | sk_live + webhook; STARTER **resource_missing** (KI-028) |
 | Shopify | 🟡 | OAuth + `ShopifyService.ts` | Commerce |
 
 ---
@@ -18,7 +20,7 @@
 
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
-| **AWS SES** | 🟡 | `SES_REGION`, `SES_ACCESS_KEY_ID`, `SES_SECRET_ACCESS_KEY`, `SES_FROM_EMAIL` | Primario prod |
+| **AWS SES** | ✅ | `SES_*` | Production GRANTED 2026-07-21 · self-send · SNS OK |
 | SendGrid | 🟡 | `SENDGRID_API_KEY` | Fallback Python paths |
 
 ---
@@ -87,10 +89,11 @@
 |-------------|--------|-----------|-------|
 | OpenAI | 🟡 | `OPENAI_API_KEY` | Packs, LlmClient |
 | Anthropic | 🟡 | `ANTHROPIC_API_KEY` | Private AI provider |
-| Ollama (local) | 🟡 | `OLLAMA_CONFIGURED` | Private AI + Router |
+| Ollama (local) | ✅ | `OLLAMA_BASE_URL` / local :11434 | Preflight 2026-07-20 HTTP 200 (models=6); Private AI + Router + Brain ingest |
+| Local-ai Postgres/pgvector | ✅ | Compose `127.0.0.1:5434` | Ingest **verified** (1559 chunks) · ADR-030 |
 | **MCP Productivo** | ✅ | `NELVYON_MCP_PRODUCTIVE_ENABLED` | `/api/saas/mcp` — **CERTIFIED** (`mcp_certification_final.json`) |
 | **OpenClaw** | 🟡 | `NELVYON_OPENCLAW_BRIDGE_*` + Memory | HttpOpenClawBridge listo; OFF hasta ops URL |
-| **Shared Memory** | 🟡 | `NELVYON_SHARED_MEMORY_ENABLED` | Runtime mig 514; flag OFF default |
+| **Shared Memory** | 🟡 | `NELVYON_SHARED_MEMORY_ENABLED` | Flag **OFF** default · schema 514/515 en repo · **schema not verified on staging** (Bloque 2 BLOCKED 2026-07-20: DATABASE_URL unset · verify exit 2 · migrate NOT run) |
 
 ---
 

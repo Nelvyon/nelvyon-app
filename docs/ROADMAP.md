@@ -11,7 +11,7 @@
 | Monorepo pnpm + workspaces | ✅ | |
 | Next.js 15 apps/web producción | ✅ | |
 | FastAPI backend Python | ✅ | Puerto 8000 |
-| Postgres + migraciones SQL (407) | ✅ | Última: 511 |
+| Postgres + migraciones SQL | ✅ | Última repo: **516** (`516_fastapi_rls_repair.sql`) |
 | Railway deploy + releaseCommand migrate | ✅ | `apps/web/railway.json` |
 | Auth JWT SaaS cookies | ✅ | |
 | SaasShellLayout 41 páginas | ✅ | Jun 2026 |
@@ -32,7 +32,7 @@
 | P3 consolidación rendimiento/deuda | ✅ | optimizePackageImports, overrides, audit script |
 | P4 hardening seguridad | ✅ | security-gates, Dependabot, Gitleaks, backup fail-fast |
 | Auditoría final Fase 1 (local) | ✅ | `run-phase1-audit.mjs` + build |
-| CEO activaciones externas Fase 1 | 🟡 | `docs/CEO_FINAL_ACTIONS.md` |
+| CEO activaciones externas Fase 1 | 🟡 | SES ✅ 2026-07-21 · Stripe STARTER (KI-028) · Cloudflare app DNS |
 | n8n self-hosted | ❌ | Solo blueprint JSON |
 | PC dev estandarizado | 🟡 | README-dev-Windows actualizado |
 
@@ -51,7 +51,10 @@
 | OpenClaw | 🟡 | Mock sandbox cert ✅ · URL real ops |
 | Orquestador | ✅ | Sandbox + live Ollama executor |
 | Panel + Metrics | ✅ | Elite status cards |
-| RAG unificado | 🟡 | Facade + hybrid synthetic cert · pgvector residual KI-016 |
+| RAG unificado | 🟡→✅ local | Facade + ingest local **verified** 2026-07-20 (1559 chunks) · cutover staging/prod aparte · KI-005 mitigado |
+| OpenClaw | 🟡 | Mock ✅ · URL live ops |
+| Shared Memory | 🟡 | Schema 514+515+516 **verified staging** · flag OFF · no READY |
+| Local-ai Docker/pgvector | ✅ | Compose UP + preflight PASS + ingest verified (Bloque 1) |
 | Prompt / Agent Registry | ✅ | Seed 17 + matrix |
 | Elite workflows + eval suite | ✅ | Sandbox 10/10 + live 3/3 Ollama |
 | `PHASE2_ELITE_CERTIFIED` | ✅ | PASS repo · ver `PHASE2_ELITE_CERT.md` |

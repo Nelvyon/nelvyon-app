@@ -27,11 +27,14 @@ export const EMPTY_ALERTS = bffDegraded(
   BFF_DEGRADED_NO_DATA,
 );
 
-export const EMPTY_EMBED = {
-  widget_id: "nelvyon-reviews",
-  embed_html: '<div data-nelvyon-reviews="nelvyon"></div>',
-  script_url: "/embed/reviews.js",
-};
+export const EMPTY_EMBED = bffDegraded(
+  {
+    widget_id: "nelvyon-reviews",
+    embed_html: '<div data-nelvyon-reviews="nelvyon"></div>',
+    script_url: "/embed/reviews.js",
+  },
+  BFF_DEGRADED_NO_DATA,
+);
 
 export const EMPTY_UNIFIED_REPUTACION = bffDegraded(
   {

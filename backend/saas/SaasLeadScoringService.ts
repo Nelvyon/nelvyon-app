@@ -209,13 +209,13 @@ export class SaasLeadScoringService {
     // Build contact snapshot from DB
     const snapRows = await this.db.query<Record<string, unknown>>(
       `SELECT
-         c.name, c.email, c.phone, c.company_name, c.notes, c.status, c.pipeline_stage, c.value,
-         COUNT(DISTINCT cc.id) FILTER (WHERE cc.status='opened') AS email_opens,
+         c.name, c.email, c.phone, c.company AS company_name, c.notes, c.status, c.pipeline_stage, c.value,
+         COUNT(DISTINCT cc.id) FILTER (WHERE cc.status IN ('opened','clicked')) AS email_opens,
          COUNT(DISTINCT cc.id) FILTER (WHERE cc.status='clicked') AS email_clicks,
          COUNT(DISTINCT a.id)  AS activity_count
        FROM saas_contacts c
-       LEFT JOIN saas_campaign_contacts cc ON cc.contact_id = c.id
-       LEFT JOIN saas_contact_activities a ON a.contact_id = c.id::text
+       LEFT JOIN saas_campania_recipients cc ON cc.contact_id = c.id AND cc.tenant_id = c.tenant_id
+       LEFT JOIN saas_contact_activities a ON a.contact_id = c.id AND a.tenant_id = c.tenant_id
        WHERE c.id=$1::uuid AND c.tenant_id=$2
        GROUP BY c.id`,
       [contactId, tenantId],
@@ -301,9 +301,9 @@ export class SaasLeadScoringService {
     params.push(opts?.limit ?? 200);
     const rows = await this.db.query<Record<string, unknown>>(
       `SELECT ls.*,
-              c.name AS contact_name, c.email AS contact_email, c.company_name AS contact_company
+              c.name AS contact_name, c.email AS contact_email, c.company AS contact_company
        FROM saas_lead_scores ls
-       LEFT JOIN saas_contacts c ON c.id = ls.contact_id::uuid AND c.tenant_id = ls.tenant_id
+       LEFT JOIN saas_contacts c ON c.id = ls.contact_id AND c.tenant_id = ls.tenant_id
        WHERE ${conds.join(" AND ")}
        ORDER BY ls.score DESC LIMIT $${i}`,
       params,

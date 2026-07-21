@@ -1,6 +1,19 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-19**
+> Registrar cada deploy significativo. Actualizado: **2026-07-21**
+
+---
+
+## 2026-07-21 — Auditoría cierre élite total (solo lectura)
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Re-ejecución gates locales + tabla release-readiness 16 sistemas |
+| **Entorno** | Repo local · staging evidencia KI-026 (no re-migrate) |
+| **Gates** | tsc PASS · vitest 2430/2437 (KI-027 FAIL) · verify-all NOT_READY · stubs PASS |
+| **Deploy** | **No** |
+| **Veredicto** | **CONDITIONAL_READY** · no READY |
+| **Docs** | HANDOVER · AUDITORIA §9 · CTO_FINAL_VERIFY · PROJECT_STATUS · DATABASE · etc. |
 
 ---
 
@@ -18,6 +31,128 @@
 | Errores | |
 | Rollback | sí/no — cómo |
 ```
+
+---
+
+## 2026-07-21 — Bloques 3–13 (sin deploy prod)
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Aislamiento staging · SES live · Stripe audit · Cloudflare audit · health · backups |
+| **Deploy prod** | **NO** (mig prod≤511 · KI-028 · DNS app) |
+| **Commit/push** | **NO** esta pasada |
+| **Costes nuevos** | **0** |
+| **Veredicto** | **CONDITIONAL_READY** |
+
+---
+
+## 2026-07-21 — Staging KI-026 RLS repair (`516`) + ADR-032
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Policies dual-plane post-507 (operativo) |
+| **Entorno** | Railway **staging** / `ideal-victory` — CLI **restaurado production** |
+| **Mig creada** | `516_fastapi_rls_repair.sql` |
+| **ADR** | **ADR-032** Dual-plane tenant isolation |
+| **Resultado** | **SUCCESS** · 13 policies core · predicado funnels/chatbot OK · SM verified |
+| **507 / 515 editadas** | **No** |
+| **Deploy** | **No** |
+| **Veredicto** | **CONDITIONAL_READY** · no READY |
+
+---
+
+## 2026-07-21 — Staging KI-025 unlock (`506a`+507…515) + Shared Memory verified
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Rename `social_posts` legacy + migrate hasta Shared Memory |
+| **Entorno** | Railway **staging** / `ideal-victory` — CLI **restaurado production** |
+| **Mig creada** | `506a_reconcile_legacy_pre_507_social_posts.sql` |
+| **Resultado** | **SUCCESS** 506a+507…515 · SM **verified:true** (node-pg) · 507: 498 ok / 81 warns |
+| **507 editada** | **No** (prod ya tiene 507) |
+| **Deploy** | **No** |
+| **KI** | KI-025 ✅ · KI-021 ✅ staging · **KI-026** abierto (RLS gap) |
+| **Veredicto** | **CONDITIONAL_READY** · no READY |
+
+---
+
+## 2026-07-20 — Staging repair KI-024 (`407a`+`408`…`506`) then stop @507
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Reparación drift calendar_events + avance controlado hasta 506 |
+| **Entorno** | Railway **staging** / `ideal-victory` — CLI **restaurado production** |
+| **Mig creada** | `407a_reconcile_legacy_integer_calendar_events.sql` (sort ante 408; **no** `408a`) |
+| **Resultado** | **SUCCESS** 407a+408…506 · `calendar_events` uuid+tenant_id · legacy 0 filas |
+| **Stop** | **FATAL** @ `507_fastapi_runtime_schemas.sql` — 42804 `social_post_analytics_post_id_fkey` uuid vs integer (**KI-025**) |
+| **514/515 / verify SM** | **No** / **NOT run** |
+| **Deploy** | **No** |
+| **KI** | KI-024 ✅ · KI-025 abierto · KI-021 bloqueado por 025 |
+
+---
+
+## 2026-07-20 — Staging repair KI-023 (`401a`+`402`…`407`) then stop @408
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Reparación drift deals + reintento migrate hacia Shared Memory |
+| **Entorno** | Railway **staging** / `ideal-victory` — CLI luego **restaurado a production** / `@nelvyon/web` |
+| **Mig creada** | `backend/db/migrations/401a_reconcile_legacy_integer_deals.sql` (sort `401_ < 401a < 402`; idempotencia UUID+tenant antes de abort destino; check seq destino) |
+| **Resultado parcial** | **SUCCESS** `401a`+`402`…`407` · `deals.id` uuid + `tenant_id` · pipelines/stages+FKs · legacy 0 filas |
+| **Stop** | **FATAL** @ `408_calendar_events.sql` — `column "tenant_id" does not exist` (**KI-024**) |
+| **514/515** | **No** aplicadas |
+| **verify-shared-memory** | **NOT run** |
+| **Deploy Railway** | **No ejecutado** |
+| **KI** | KI-023 **resuelto staging** · KI-024 **abierto** · KI-021 sigue abierto (bloqueado por 024) |
+| **Veredicto** | **CONDITIONAL_READY** · `claimComplete` **false** — **no** READY |
+| **Próximo humano** | Auditar/reparar **408** (KI-024) con nueva autorización CTO → migrate → verify |
+
+---
+
+## 2026-07-20 — Staging repair KI-022 (`400a`+`401`) then stop @402
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Reparación drift inbox + reintento migrate hacia Shared Memory |
+| **Entorno** | Railway **staging** — CLI luego **restaurado a production** / `@nelvyon/web` |
+| **Mig creada** | `backend/db/migrations/400a_reconcile_legacy_integer_conversations.sql` (sort `400_ < 400a < 401`; ADR-031) |
+| **Resultado parcial** | **SUCCESS** `400a`+`401` · `conversations.id` uuid · `conversation_messages` FK OK · legacy 0 filas |
+| **Stop** | **FATAL** @ `402_pipeline_deals.sql` — `column "tenant_id" does not exist` (**KI-023**) — **superseded** por repair KI-023 abajo/arriba |
+| **514/515** | **No** aplicadas |
+| **verify-shared-memory** | **NOT run** |
+| **Deploy Railway** | **No ejecutado** |
+| **KI** | KI-022 **resuelto staging** · KI-023 → luego **resuelto** (ver entry KI-023) |
+| **Veredicto** | **CONDITIONAL_READY** · `claimComplete` **false** — **no** READY |
+| **Próximo humano** | Ver entry repair KI-023 / KI-024 |
+
+---
+
+## 2026-07-20 — Bloque 2 Shared Memory staging attempt (BLOCKED @401 — histórico)
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Intento migrate 514/515 + `verify-shared-memory-schema.mjs` en staging |
+| **Entorno** | Railway **staging** / servicio `ideal-victory` — `DATABASE_URL` **existe** |
+| **DB fingerprint** | Staging ≠ production (Supabase vs Railway-internal) |
+| **Resultado** | **BLOCKED** · `pnpm -C apps/web migrate` **FAIL** @ `401_inbox_conversations.sql` (42804: FK `conversation_messages_conversation_id_fkey` uuid vs integer) |
+| **514/515 en `_migrations`** | **No** (migrate no llegó) |
+| **verify-shared-memory** | **NOT run** |
+| **Railway CLI** | Temporal staging → **restaurado a production** / `@nelvyon/web` |
+| **Deploy Railway** | **No ejecutado** |
+| **KI** | KI-021 · KI-022 (schema drift) — **superseded** por repair entry arriba |
+| **Próximo humano** | Ver entry repair `400a`/`401` / KI-023 |
+
+---
+
+## 2026-07-20 — Bloque 1 local-ai (NO es deploy Railway)
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Docker Desktop + `backend/local-ai/docker-compose.yml` + Brain ingest |
+| **Entorno** | **local** (127.0.0.1:5434) — **no** staging/prod |
+| **Resultado** | success local · ingest `verified:true` · 1559 chunks |
+| **Deploy Railway** | **No ejecutado** |
+| **Pendiente ops** | migrate 514/515 remoto · SES · Stripe · Cloudflare |
 
 ---
 

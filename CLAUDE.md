@@ -3,7 +3,7 @@
 Agencia de marketing digital 100% operada por IA + SaaS B2B.  
 Monorepo pnpm. Deploy target: **Railway** (Node 20 + Postgres 16).
 
-**Continuidad:** leer primero `docs/HANDOVER.md`
+**Continuidad:** biblia `docs/NELVYON_MASTER_CONTEXT.md` → luego `docs/HANDOVER.md` (próximo paso EXACTO)
 
 ---
 

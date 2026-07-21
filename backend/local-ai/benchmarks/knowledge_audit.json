@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T10:53:43.046Z",
+  "generatedAt": "2026-07-21T11:42:45.768Z",
   "audit": {
     "domains": [
       "nelvyon",
@@ -25,9 +25,11 @@
     ],
     "byDomain": {
       "nelvyon": {
-        "count": 80,
+        "count": 83,
         "sources": [
           "kb:nelvyon:CONSTITUTION_NELVYON_AI.md",
+          "kb:nelvyon:NELVYON_MASTER_CONTEXT.md",
+          "kb:nelvyon:AUDITORIA_TECNICA_ABSOLUTA.md",
           "kb:nelvyon:HANDOVER.md",
           "kb:nelvyon:AI_CONTEXT.md",
           "kb:nelvyon:ARCHITECTURE.md",
@@ -65,6 +67,7 @@
           "kb:nelvyon:CIERRE_FINAL_PRIORITARIO.md",
           "kb:nelvyon:ELITE_QUALITY_FINALIZATION.md",
           "kb:nelvyon:SPRINT_FINAL_ABSOLUTO.md",
+          "kb:nelvyon:CTO_FINAL_VERIFY.md",
           "kb:nelvyon:README.md",
           "kb:nelvyon:PRODUCTION_CERTIFICATION_REPORT.md",
           "kb:nelvyon:PRIVATE_AI_PHASE2.md",
@@ -307,8 +310,9 @@
         ]
       },
       "development_tech": {
-        "count": 48,
+        "count": 50,
         "sources": [
+          "kb:development_tech:AUDITORIA_TECNICA_ABSOLUTA.md",
           "kb:development_tech:ARCHITECTURE.md",
           "kb:development_tech:DECISIONS.md",
           "kb:development_tech:DEPLOYMENTS.md",
@@ -340,6 +344,7 @@
           "kb:development_tech:ELITE_QUALITY_FINALIZATION.md",
           "kb:development_tech:OPS_SES_PROD.md",
           "kb:development_tech:OPS_SHARED_MEMORY_514.md",
+          "kb:development_tech:TEST_SKIPS.md",
           "kb:development_tech:SMOKE_GATES.md",
           "kb:development_tech:STAGING_P0_SMOKES.md",
           "kb:development_tech:SES_PRODUCTION_SETUP.md",
@@ -398,10 +403,17 @@
         ]
       }
     },
-    "uniqueFiles": 240,
-    "totalEntries": 273,
+    "uniqueFiles": 244,
+    "totalEntries": 278,
     "duplicatePathDomain": [],
     "multiDomainFiles": [
+      {
+        "path": "docs/AUDITORIA_TECNICA_ABSOLUTA.md",
+        "domains": [
+          "nelvyon",
+          "development_tech"
+        ]
+      },
       {
         "path": "docs/ARCHITECTURE.md",
         "domains": [

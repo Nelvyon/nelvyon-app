@@ -1,6 +1,7 @@
-import { getGlobalPrivateAiConfig, isNelvyonAiEnabled } from "../config";
+import { getGlobalPrivateAiConfig, isLocalRouterEnabled, isNelvyonAiEnabled } from "../config";
 import { getPrivateModeStatus } from "../privateMode";
 import { getProviderRegistry } from "./ProviderRegistry";
+import { getOpenClawBridge } from "../adapters/OpenClawBridge";
 import type { AiMode, ILlmProvider, LlmCompletionRequest, LlmCompletionResult, PrivateAiSettings, PrivateAiPlatformStatus } from "../types";
 
 export type ProviderResolution = {
@@ -33,20 +34,33 @@ export class PrivateAiRouter {
     return m;
   }
 
+  private localProviderChain(): string[] {
+    const chain: string[] = [];
+    if (isLocalRouterEnabled()) chain.push("local_router");
+    chain.push("local_ollama");
+    return chain;
+  }
+
   private async pickChain(mode: AiMode, privateOnly: boolean): Promise<string[]> {
     if (!isNelvyonAiEnabled()) return ["unconfigured"];
     if (mode === "unconfigured") return ["unconfigured"];
     if (mode === "stub") return ["stub"];
-    if (mode === "local") return ["local_ollama", "unconfigured"];
-    if (mode === "openai") return privateOnly ? ["local_ollama", "unconfigured"] : ["openai", "local_ollama", "unconfigured"];
+    if (mode === "local") return [...this.localProviderChain(), "unconfigured"];
+    if (mode === "openai") {
+      return privateOnly ? [...this.localProviderChain(), "unconfigured"] : ["openai", ...this.localProviderChain(), "unconfigured"];
+    }
     if (mode === "anthropic") {
-      return privateOnly ? ["local_ollama", "unconfigured"] : ["anthropic", "local_ollama", "unconfigured"];
+      return privateOnly
+        ? [...this.localProviderChain(), "unconfigured"]
+        : ["anthropic", ...this.localProviderChain(), "unconfigured"];
     }
 
     // auto — only probe when enabled
     const chain: string[] = [];
-    const local = this.registry.get("local_ollama");
-    if (local && (await local.isAvailable())) chain.push("local_ollama");
+    for (const id of this.localProviderChain()) {
+      const p = this.registry.get(id);
+      if (p && (await p.isAvailable())) chain.push(id);
+    }
     if (!privateOnly) {
       for (const id of ["openai", "anthropic"]) {
         const p = this.registry.get(id);
@@ -101,7 +115,10 @@ export class PrivateAiRouter {
   async platformStatus(tenant?: Partial<PrivateAiSettings>): Promise<PrivateAiPlatformStatus> {
     const mode = this.resolveMode(tenant);
     const providers = await this.registry.status();
-    const localReady = providers.find((p) => p.id === "local_ollama")?.available ?? false;
+    const localReady =
+      providers.find((p) => p.id === "local_router")?.available ??
+      providers.find((p) => p.id === "local_ollama")?.available ??
+      false;
     const anyRemote = providers.some((p) => p.kind === "remote" && p.available);
     const ready = localReady || anyRemote;
     const configured = isNelvyonAiEnabled() && mode !== "unconfigured";
@@ -125,14 +142,16 @@ export class PrivateAiRouter {
       ready,
       configured,
       providers,
-      openClawBridge: "disabled",
+      openClawBridge: getOpenClawBridge().status(),
       ragIngest: "not_started",
       message,
     };
   }
 
   private modelForProvider(providerId: string, tenant?: Partial<PrivateAiSettings>): string | undefined {
-    if (providerId === "local_ollama") return tenant?.ollamaModel ?? this.global.ollamaModel;
+    if (providerId === "local_ollama" || providerId === "local_router") {
+      return tenant?.ollamaModel ?? this.global.ollamaModel;
+    }
     if (providerId === "openai") return tenant?.openaiModel ?? this.global.openaiModel;
     if (providerId === "anthropic") return tenant?.anthropicModel ?? this.global.anthropicModel;
     return undefined;

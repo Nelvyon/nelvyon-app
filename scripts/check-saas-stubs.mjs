@@ -51,11 +51,19 @@ for (const file of walk(ROOT)) {
     console.error(`   → Implementa lógica real con requireSaasContext, o devuelve 410 Gone`);
     failed++;
   }
+
+  // Forbid broken auth wiring: SaasRequestContext has claims.userId, not user.id
+  if (/ctx\s+as\s+\{\s*user\s*\?/.test(content) || /\(ctx\s+as\s+\{\s*user/.test(content)) {
+    const rel = file.replace(/\\/g, "/").split("apps/web/src/app/api/saas/")[1];
+    console.error(`❌ Auth context incorrecto: /api/saas/${rel}`);
+    console.error(`   → Usa ctx.claims.userId (no ctx.user?.id)`);
+    failed++;
+  }
 }
 
 if (failed > 0) {
-  console.error(`\n${failed} stub(s) vacío(s) encontrado(s). Elimínalos antes de hacer push.`);
+  console.error(`\n${failed} problema(s) en rutas SaaS. Corrige antes de hacer push.`);
   process.exit(1);
 }
 
-console.log("✅ Anti-stub gate: 0 stubs vacíos sin auth encontrados");
+console.log("✅ Anti-stub gate: 0 stubs vacíos / 0 ctx.user incorrectos");

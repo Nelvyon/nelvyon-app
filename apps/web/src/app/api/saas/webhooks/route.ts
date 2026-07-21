@@ -28,7 +28,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "settings.read");
+    const ctx = await requireSaasContext(req, "settings.write");
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const b = body as Record<string, unknown>;

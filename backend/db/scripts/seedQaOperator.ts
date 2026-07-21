@@ -12,7 +12,13 @@ import { DbClient } from "../DbClient";
 import { loadEnvFiles } from "../loadEnvFiles";
 
 const QA_EMAIL = process.env.QA_OPERATOR_EMAIL?.trim() || "qa-audit-20260612@nelvyon.test";
-const QA_PASSWORD = process.env.QA_OPERATOR_PASSWORD?.trim() || "StagingQA2026!";
+const QA_PASSWORD =
+  process.env.QA_OPERATOR_PASSWORD?.trim() ||
+  process.env.STAGING_QA_PASSWORD?.trim() ||
+  (process.env.STAGING_QA_ALLOW_DEFAULT === "1" ? "StagingQA2026!" : "");
+if (!QA_PASSWORD) {
+  throw new Error("QA_OPERATOR_PASSWORD or STAGING_QA_PASSWORD is required (or STAGING_QA_ALLOW_DEFAULT=1)");
+}
 const QA_NAME = process.env.QA_OPERATOR_NAME?.trim() || "QA Audit Operator";
 const QA_PLAN = process.env.QA_OPERATOR_PLAN?.trim() || "starter";
 

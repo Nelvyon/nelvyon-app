@@ -2,6 +2,9 @@
  * NELVYON brain — knowledge coverage, gaps, Nelvyon-first context, agent domains.
  */
 
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   buildKnowledgeManifest,
@@ -24,6 +27,12 @@ import {
 } from "../../local-ai/specialization/orphanClassification";
 import { listPrivateAgents } from "../../private-ai/nelvyonAgentRegistry";
 
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+const INGEST_EVIDENCE = path.join(
+  REPO,
+  "backend/local-ai/benchmarks/knowledge_ingest_evidence.json",
+);
+
 describe("NELVYON brain knowledge", () => {
   it("indexes critical living docs in manifest", () => {
     const m = buildKnowledgeManifest();
@@ -43,15 +52,27 @@ describe("NELVYON brain knowledge", () => {
     }
   });
 
-  it("gap detector never claims complete; ingest unverified keeps claimComplete false", () => {
+  it("gap detector never claims complete; verified mirrors ingest evidence artifact", () => {
     const g = detectKnowledgeGaps();
+    // Typed contract: claimComplete is always literal false (never invent completeness).
     expect(g.claimComplete).toBe(false);
     expect(g.coverageRatioEstimate).toBeGreaterThan(0);
     expect(g.coverageRatioEstimate).toBeLessThanOrEqual(0.99);
     expect(g.proposals.length).toBeGreaterThan(0);
     expect(g.domainCoverage.length).toBeGreaterThan(10);
-    expect(g.ingestEvidence.verified).toBe(false);
     expect(g.unclassifiedActiveDocs.length).toBeLessThanOrEqual(5);
+
+    // verified mirrors knowledge_ingest_evidence.json (ok && verified) — not a hardcoded false.
+    expect(g.ingestEvidence.artifactExists).toBe(true);
+    expect(fs.existsSync(INGEST_EVIDENCE)).toBe(true);
+    const raw = JSON.parse(fs.readFileSync(INGEST_EVIDENCE, "utf8")) as {
+      ok?: boolean;
+      verified?: boolean;
+    };
+    const expectedVerified = Boolean(raw.verified && raw.ok);
+    expect(g.ingestEvidence.verified).toBe(expectedVerified);
+    // Bloque 1 (2026-07-20+): evidence must stay verified with claimComplete still false.
+    expect(expectedVerified).toBe(true);
   });
 
   it("classifies orphans into index or archive", () => {

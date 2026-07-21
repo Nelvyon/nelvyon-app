@@ -11,7 +11,7 @@ const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const BACKEND_API =
   process.env.STAGING_BACKEND_API?.trim() || "https://nelvyon-app-production.up.railway.app";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
-const QA_PASSWORD = "StagingQA2026!";
+const QA_PASSWORD = process.env.STAGING_QA_PASSWORD?.trim() || (process.env.STAGING_QA_ALLOW_DEFAULT === "1" ? "StagingQA2026!" : (() => { throw new Error("STAGING_QA_PASSWORD is required (or STAGING_QA_ALLOW_DEFAULT=1)"); })());
 const SKIP_WAIT = process.argv.includes("--skip-wait");
 
 const RUN_ID = `local-e2e-${Date.now()}`;

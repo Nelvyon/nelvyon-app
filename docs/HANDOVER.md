@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
-> **Lee este archivo primero.**  
-> Última actualización: **2026-07-20** — verify-all master gate · **CONDITIONAL_READY**
+> **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
+> Última actualización: **2026-07-21** — Release prod autorizado · Stripe allValid · P0 smokes PASS · Cloudflare app DNS humano
 
 ---
 
@@ -9,34 +9,30 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** — gates locales verdes; go-live bloqueado por ops externas |
-| **Workforce / Elite** | **PASS** · freezes intactos |
-| **QA local** | `tsc` OK · lint OK · build OK · vitest **2431 passed / 6 skipped** · mig **508–515** OK |
-| **Brain** | orphans **0** · coverage **0.95** · `claimComplete` **false** · ingest `verified:false` (Docker DOWN) |
-| **Última mig** | `515_shared_memory_rls.sql` (411 archivos) |
-| **Informe** | `docs/SPRINT_FINAL_ABSOLUTO.md` · `docs/CTO_FINAL_VERIFY.md` |
-| **verify-all** | **CONDITIONAL_READY** — 7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED |
+| **Estado** | **CONDITIONAL_READY** → post-deploy verificar **READY parcial** (Cloudflare app pendiente) |
+| **Stripe** | ✅ `price-audit` **allValid=true** (STARTER typo fix · KI-028 cerrado) |
+| **SES** | ✅ Live (KI-R014) |
+| **P0 smokes staging** | ✅ 4/4 PASS (portal + 3 packs) tras `AUTONOMOUS_PRODUCTION=true` |
+| **Cloudflare** | 🟡 nelvyon.com OK · **app.nelvyon.com NXDOMAIN** (wrangler MFA / sin API token) |
+| **CLI Railway** | **production** / `@nelvyon/web` |
+| **Staging mig** | **516** |
+| **Prod mig** | Objetivo release: **516** via `pnpm migrate:prod` |
+| **IA flags prod** | OFF / unset (SM · MCP · OpenClaw · Router) |
+| **Costes nuevos** | **0** |
 
 ---
 
-## Próximo paso EXACTO (solo humano / infra)
+## Release en curso (autorizado)
 
-1. Arrancar Docker Desktop → `docker compose -f backend/local-ai/docker-compose.yml up -d` → `node scripts/preflight-local-ai-ingest.mjs` → `$env:NELVYON_KNOWLEDGE_INGEST="1"; node scripts/nelvyon-knowledge-sync.mjs`  
-2. Staging: `$env:DATABASE_URL="…"; pnpm -C apps/web migrate; node scripts/verify-shared-memory-schema.mjs`  
-3. SES production access (`docs/OPS_SES_PROD.md`) + Stripe live (`docs/OPS_STRIPE_PROD.md`)  
-4. Railway deploy + Cloudflare DNS/WAF + `NELVYON_OPENCLAW_BRIDGE_URL` si aplica  
+1. Stripe STARTER: typo `ZTIu` vs `ZTIu` corregido en Railway · allValid=true  
+2. Staging QA password + seed · smokes 4/4 PASS  
+3. Gates locales: tsc · lint · stubs · validate 508–516 · verify-all · **build** PASS  
+4. Cloudflare: **humano** — `wrangler login` o `CLOUDFLARE_API_TOKEN` → CNAME `app` → `nelvyonweb-production.up.railway.app`  
+5. Commit + push + deploy Railway (releaseCommand migrate 512–516)
 
 ---
 
-## Evidencia local
+## Próximo paso EXACTO
 
-```powershell
-pnpm -C apps/web exec tsc --noEmit
-pnpm -C apps/web lint
-pnpm -C apps/web build
-pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm backend/db --reporter=dot
-node scripts/validate-post-elite-migrations.mjs
-node scripts/nelvyon-knowledge-sync.mjs
-node scripts/nelvyon-verify-all.mjs
-node scripts/preflight-prod-env.mjs
-```
+Tras deploy: confirmar `_migrations` prod incluye **516**, health/ready 200, price-audit allValid, IA flags OFF.  
+Humano: crear CNAME **app.nelvyon.com** → `nelvyonweb-production.up.railway.app` (solo ese registro).

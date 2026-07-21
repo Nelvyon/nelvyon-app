@@ -34,7 +34,7 @@ describe("DataSubjectService", () => {
       if (s.includes("FROM subscriptions")) return Promise.resolve([{ id: "sub1" }]);
       if (s.includes("FROM usage_events")) return Promise.resolve([{ id: "evt1" }]);
       if (s.includes("FROM dunning_log")) return Promise.resolve([]);
-      if (s.includes("FROM api_keys") && s.includes("SELECT id")) return Promise.resolve([{ id: "k1", provider: "openai" }]);
+      if (s.includes("FROM user_provider_api_keys") && s.includes("SELECT id")) return Promise.resolve([{ id: "k1", provider: "openai" }]);
       if (s.includes("FROM onboarding")) return Promise.resolve([{ user_id: "u1" }]);
       if (s.includes("FROM os_jobs")) return Promise.resolve([{ job_id: "j1" }]);
       if (s.includes("FROM os_job_results")) return Promise.resolve([{ id: "jr1" }]);

@@ -53,7 +53,7 @@ function ServiciosVisual() {
         border: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <Image src="/logo.png" alt="" width={100} height={100} className="object-contain" style={{ opacity: 0.95 }} />
+      <Image src="/logo.svg" alt="" width={100} height={100} className="object-contain" style={{ opacity: 0.95 }} unoptimized />
     </div>
   );
 }

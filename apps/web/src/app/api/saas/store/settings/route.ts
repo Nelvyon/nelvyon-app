@@ -23,7 +23,7 @@ export async function GET(req: Request) {
 /** PATCH /api/saas/store/settings */
 export async function PATCH(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "settings.read");
+    const ctx = await requireSaasContext(req, "settings.write");
     const b = (await req.json().catch(() => null)) as Record<string, unknown> | null;
     if (!b) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const settings = await getSaasStoreService().updateSettings(ctx.tenant.id, {

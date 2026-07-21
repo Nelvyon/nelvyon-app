@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const userId = (ctx as { user?: { id: string } }).user?.id ?? null;
+    const userId = ctx.claims.userId ?? null;
     const svc = getSaasPwaService();
     const subscribed = (await svc.countPushSubscriptions(ctx.tenant.id, userId)) > 0;
     return NextResponse.json({
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
-    const userId = (ctx as { user?: { id: string } }).user?.id ?? null;
+    const userId = ctx.claims.userId ?? null;
     const body = (await req.json().catch(() => ({}))) as {
       subscription?: { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
     };

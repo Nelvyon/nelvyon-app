@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-20** - Cierre final prioritario CONDITIONAL_READY; P2 ops (Docker ingest, 514/515 verify, SES/Stripe) abiertos
+> Actualizado: **2026-07-21** — Bloque 1 Docker+ingest **done**; Bloque 2 SM staging **verified**; KI-026 RLS ✅; SES/Stripe abiertos
 
 ---
 
@@ -17,6 +17,24 @@
 ---
 
 > Actualizado: **2026-07-10** — auditoría cierre Fase 1
+
+---
+
+> Actualizado: **2026-07-21** — Bloques 3–13 · KI-014✅ · KI-028 abierto
+
+---
+
+## P2 — Post-auditoría / ops
+
+- [x] **KI-027** — Test brain · verify-all CONDITIONAL_READY
+- [x] Validador post-elite **508–516**
+- [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
+- [x] Bloque 3 SaaS UUID isolation staging
+- [ ] **KI-028** — Stripe STARTER price Live
+- [ ] Cloudflare `app.nelvyon.com` CNAME
+- [ ] `STAGING_QA_PASSWORD` + P0 smokes login
+- [ ] KI-020 smoke staging CSRF Origin
+- [ ] Prod migrate 512–516 (solo con autorización CTO)
 
 ---
 
@@ -66,8 +84,10 @@
 
 ### Externos P0 / P1 (abiertos — no invalidan Workforce PASS)
 
-- [ ] **P0** Docker/pgvector residual ops (KI-016/018) — LocalVectorStore compare / entorno estable
-- [ ] **P0** Migración **514** Shared Memory aplicada y verificada en staging
+- [x] **P0** Docker/pgvector local-ai + Brain ingest **verified** 2026-07-20 (KI-018 local mitigado; remoto OpenClaw/514 sigue)
+- [x] **P0** Desbloquear **KI-025** (`506a`+507…515) + Shared Memory verify staging — **done 2026-07-21**
+- [x] **P1** **KI-026** — mig `516` RLS dual-plane + ADR-032 — **done staging 2026-07-21**
+- [ ] **P0** SES production access + Stripe prod (Fase 1 email/billing)
 - [ ] **P1** OpenClaw URL autorizada (opcional; mock ya certificado; bridge Disabled por defecto)
 - [ ] **P0** SES production access + Stripe prod (Fase 1 email/billing)
 
@@ -117,7 +137,8 @@
 - [x] `PHASE2_ELITE_CERTIFIED` PASS (repo) — live Ollama E2E + RAG hybrid embeds · residual Docker/pgvector + ops 514
 - [x] RAG: corpus sintético indexado (in-memory hybrid) + métricas P/R · pgvector compare cuando Docker up
 - [x] Ciclo mejora controlada (propose/eval/promote/rollback) + gate CI
-- [ ] Post-E2E: unificar Ollama/RAG path pgvector cuando Docker disponible (ex KI-016 / KI-R016)
+- [x] Post-E2E: ingest pgvector local cuando Docker disponible — **done** 2026-07-20 (ex KI-016)
+- [x] Cutover RAG / Shared Memory schema en staging (KI-021) — **done 2026-07-21** (`verified:true`); flags OFF; residual KI-026 RLS FastAPI
 - [x] Backup restore drill — `scripts/run-postgres-restore-drill.mjs` · KI-R012 · 8/8 PASS
 - [ ] CEO: SNS SES production access (KI-014 only)
 - [ ] Declarar **NELVYON OS Y SAAS COMPLETADOS** — solo tras criterios verdes

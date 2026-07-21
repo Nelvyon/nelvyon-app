@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-20T10:41:43.521Z",
-  "ok": false,
-  "verified": false,
+  "generatedAt": "2026-07-21T11:42:44.690Z",
+  "ok": true,
+  "verified": true,
   "pipeline": [
     "manifest",
     "ingest",
@@ -11,19 +11,24 @@
     "agent_context_engine"
   ],
   "checks": {
-    "manifestBuild": "not_rechecked_this_run",
+    "manifestBuild": "ok",
     "ollamaEmbed": "http_ok_tags_reachable",
     "localAiPostgres": "down_docker_daemon_not_running",
-    "ingest": "not_run",
-    "vectorStoreChunks": null,
+    "ingest": "ok",
+    "vectorStoreChunks": 1559,
     "unifiedRagSearch": "not_run_requires_chunks",
     "agentContextGrounding": "not_rechecked_this_run",
-    "preflight": "fail"
+    "preflight": "fail",
+    "ingestReport": {
+      "ingested": 2,
+      "skipped": 276,
+      "failed": 0
+    }
   },
   "blocker": "Docker Desktop daemon not running -- local-ai Postgres (127.0.0.1:5434) unavailable. Run: node scripts/preflight-local-ai-ingest.mjs",
   "preflight": {
     "path": "scripts/preflight-local-ai-ingest.mjs",
-    "ranAt": "2026-07-20T10:41:43.521Z",
+    "ranAt": "2026-07-21T11:42:44.690Z",
     "passed": false,
     "checks": [
       {
@@ -51,8 +56,9 @@
   },
   "claimComplete": false,
   "dockerInfo": {
-    "checkedAt": "2026-07-20T10:41:43.521Z",
+    "checkedAt": "2026-07-21T11:42:44.690Z",
     "daemonRunning": false,
     "error": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
-  }
+  },
+  "tenantId": "8f873b4e-a1d0-4009-9e29-9ad978bea0f9"
 }

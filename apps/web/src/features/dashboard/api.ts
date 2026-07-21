@@ -1,5 +1,6 @@
 import { apiClient } from "@/core/api";
 import type { LandingBlock } from "@/features/builders/types";
+import { getAppBaseUrl } from "@/lib/appUrl";
 
 type List<T> = { items: T[]; total?: number };
 
@@ -244,10 +245,9 @@ export const dashboardChatbotApi = {
   stats: (id: string) => apiClient.get<Record<string, unknown>>(`/api/chatbot/${id}/stats`, { tenantScoped: true }),
 };
 
-const WIDGET_CDN = "https://nelvyon-app-production.up.railway.app/static/widget.js";
-
 export function chatbotEmbedSnippet(embedToken: string): string {
-  return `<script src="${WIDGET_CDN}" data-token="${embedToken}"></script>`;
+  const widgetSrc = `${getAppBaseUrl()}/static/widget.js`;
+  return `<script src="${widgetSrc}" data-token="${embedToken}"></script>`;
 }
 
 export const dashboardLmsApi = {

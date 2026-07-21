@@ -33,7 +33,7 @@ export function SaasDashboardMock({ compact = false, className = "" }: SaasDashb
       <div className="nelvyon-dashboard-mock">
         <aside className="nelvyon-dashboard-sidebar">
           <div className="nelvyon-dashboard-sidebar__brand">
-            <Image src="/logo.png" alt="" width={20} height={20} className="object-contain shrink-0" />
+            <Image src="/logo.svg" alt="" width={20} height={20} className="object-contain shrink-0" unoptimized />
             <span>NELVYON</span>
           </div>
           {NAV.map((item) => (

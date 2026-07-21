@@ -6,6 +6,7 @@
  */
 import { createHmac } from "node:crypto";
 import { DbClient } from "../db/DbClient";
+import { requireHmacSecret } from "./hmacSecret";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export class SaasLmsError extends Error {
@@ -166,8 +167,7 @@ function rowToModule(r: ModuleRow, lessons: LmsLesson[] = []): LmsModule {
 }
 
 function signCertId(certId: string): string {
-  const secret = process.env.JWT_SECRET ?? process.env.NEXTAUTH_SECRET ?? "nelvyon-cert-secret";
-  return createHmac("sha256", secret).update(certId).digest("hex").slice(0, 32);
+  return createHmac("sha256", requireHmacSecret()).update(certId).digest("hex").slice(0, 32);
 }
 
 function rowToCourse(r: CourseRow): LmsCourse {

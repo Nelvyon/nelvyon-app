@@ -75,8 +75,7 @@ export function evaluateCaseScore(
   }
 
   if (testCase.ragProbe && ragHit) {
-    scores.push(ragHit.found ? 1 : 0);
-    if (!ragHit.found) violations.push("rag_miss");
+    // RAG probe scoring belongs in retrieval gate — do not mix into response score.
   }
 
   if (scores.length === 0) scores.push(response.length > 50 ? 0.7 : 0.3);

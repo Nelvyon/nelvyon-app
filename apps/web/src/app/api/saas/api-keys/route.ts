@@ -29,7 +29,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "settings.read");
+    // settings.write = owner only — prevents member/viewer minting keys with scopes including "*"
+    const ctx = await requireSaasContext(req, "settings.write");
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const b = body as Record<string, unknown>;
@@ -52,7 +53,7 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "settings.read");
+    const ctx = await requireSaasContext(req, "settings.write");
     const id = new URL(req.url).searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     await getSaasApiKeysService().revoke(ctx.tenant.id, id);

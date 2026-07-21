@@ -35,7 +35,7 @@ export function ModuleScreenShell({ active, route, children, flat = false }: Mod
       <div className="nelvyon-dashboard-mock nelvyon-dashboard-mock--module">
         <aside className="nelvyon-dashboard-sidebar">
           <div className="nelvyon-dashboard-sidebar__brand">
-            <Image src="/logo.png" alt="" width={20} height={20} className="object-contain shrink-0" />
+            <Image src="/logo.svg" alt="" width={20} height={20} className="object-contain shrink-0" unoptimized />
             <span>NELVYON</span>
           </div>
           {SIDEBAR.map((item) => (

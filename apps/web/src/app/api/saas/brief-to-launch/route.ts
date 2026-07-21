@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const launch = await svc.createLaunch(ctx.tenant.id, {
       packId: body.packId,
       brief: body.brief ?? {},
-      userId: (ctx as { user?: { id: string } }).user?.id,
+      userId: ctx.claims.userId,
     });
 
     // Execute async — do not await (long running). Client polls getLaunchStatus.

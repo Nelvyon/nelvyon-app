@@ -27,7 +27,7 @@ export function NvDashboardMock() {
       <div className="nv-mock__body">
         <aside className="nv-mock__sidebar">
           <div className="nv-mock__brand">
-            <Image src="/logo.png" alt="" width={20} height={20} className="object-contain" />
+            <Image src="/logo.svg" alt="" width={20} height={20} className="object-contain" unoptimized />
             <span>NELVYON</span>
           </div>
           {NAV.map((item, i) => (
