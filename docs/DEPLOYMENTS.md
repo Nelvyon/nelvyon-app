@@ -4,15 +4,36 @@
 
 ---
 
-## 2026-07-21 — KI-029 preDeployCommand versionado (pendiente verificación post-redeploy)
+## 2026-07-21 17:20–17:36 UTC — Prod redeploy KI-029 `a82d618f` (mig OK · app FAILED)
+
+| Campo | Valor |
+|-------|-------|
+| **Deploy ID** | `922c8039-2aa3-42a0-8a18-e5ae9c5a8142` |
+| **Commit** | `a82d618fa016da3eaf45244566ec54a2667988c0` |
+| **Método** | `railway redeploy --from-source -y` (único autorizado; **no** 2º) |
+| **Servicio** | `@nelvyon/web` / production |
+| **Resultado app** | **FAILED** · healthcheck `/api/health/live` · réplicas never healthy |
+| **preDeployCommand (manifest)** | `["pnpm -C apps/web migrate:prod"]` |
+| **Migrate logs** | **SÍ** — `[migrate] run/done` 512…516 · `all migrations complete` |
+| **Migraciones 512–516** | **SÍ** — read-only `all512to516=true` · ejecutadas `2026-07-21T17:31:04Z` |
+| **Error runtime** | `Cannot find module './src/lib/security/headers'` → **KI-030** |
+| **SHA vivo (health)** | sigue `3d2bba18bcae` (deploy anterior SUCCESS) |
+| **Smokes staging** | portal-packs **PASS** · local-pack-e2e **FAIL** `LLM_NOT_CONFIGURED` |
+| **Prohibido** | No SQL manual · no 2º redeploy · IA prod OFF |
+| **Evidencia** | `.release-logs/ki029-922c8039-*.txt` · `ki029-mig-check-512-516.txt` · `p0-smokes-post-ki029.txt` |
+| **KI-029** | **Resuelto** (schema) → historial **KI-R029** |
+
+---
+
+## 2026-07-21 — KI-029 preDeployCommand versionado (config push)
 
 | Campo | Valor |
 |-------|-------|
 | **Cambio** | `/railway.toml` + `/railway.json`: `preDeployCommand = ["pnpm -C apps/web migrate:prod"]` |
 | **Dockerfile raíz** | COPY `apps/web/scripts` + workspace manifests; `WORKDIR /app`; `CMD ["node","apps/web/server.js"]` |
-| **Motivo CMD/WORKDIR** | Requerido para `pnpm -C apps/web` desde monorepo root en pre-deploy |
+| **Commit** | `a82d618f` |
 | **No UI** | Config-as-code only |
-| **Verificación** | Tras un redeploy: logs migrate:prod · `_migrations` 512–516 |
+| **Verificación post-redeploy** | Ver entrada `922c8039` arriba |
 
 ---
 

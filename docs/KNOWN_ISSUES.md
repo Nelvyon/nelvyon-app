@@ -6,17 +6,17 @@
 
 ## Activos
 
-### KI-029 — Prod releaseCommand no aplicó migraciones 512–516
+### KI-030 — Prod deploy `a82d618f` FAILED: missing `./src/lib/security/headers`
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **En reparación 2026-07-21** (config-as-code) |
-| **Severidad** | Alta (P1 ops) — app OK; schema drift vs staging/repo |
-| **Evidencia inicial** | Deploy `93957043` SUCCESS · SHA `3d2bba18` · deploy logs sin migrate · `_migrations` prod máx `511_idempotency_keys.sql` |
-| **Causa** | Service usaba `configFile=/railway.toml` con `preDeployCommand: []`; `releaseCommand` en JSON no se ejecutaba. Runner root Dockerfile sin `apps/web/scripts` |
-| **Fix versionado** | `railway.toml` + `railway.json` root: `preDeployCommand = ["pnpm -C apps/web migrate:prod"]`; Dockerfile raíz copia scripts/workspace + `WORKDIR /app` + `CMD node apps/web/server.js` |
-| **Verificación** | Tras redeploy: logs pre-deploy con migrate:prod · `_migrations` incluye 512…516 |
-| **Prohibido** | SQL/migrate manual · UI-only Release Command · 2º redeploy automático |
+| **Estado** | **Abierto 2026-07-21** |
+| **Severidad** | Alta (P1 ops) — schema OK; nuevo deploy no arranca; prod sigue en `3d2bba18` |
+| **Deploy** | `922c8039-2aa3-42a0-8a18-e5ae9c5a8142` **FAILED** · commit `a82d618f` · 1 redeploy only |
+| **Error exacto** | `[nelvyon] Failed to start Next.js Error: Cannot find module './src/lib/security/headers'` · healthcheck fail |
+| **Nota** | Dockerfile raíz ya tiene `COPY .../src/lib/security`; falla en runtime tras preDeploy OK |
+| **Prohibido** | 2º redeploy del mismo FAILED · SQL manual · activar IA prod |
+| **Fix** | Asegurar resolución/COPY de `headers` en runner image → un redeploy nuevo autorizado |
 
 ### KI-027 - Test drift brain knowledge (`ingestEvidence.verified`)
 
@@ -155,6 +155,15 @@
 ---
 
 ## Historial resuelto
+
+### KI-R029 — Prod migraciones 512–516 vía preDeployCommand (ex KI-029)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-21 |
+| **Solución** | `/railway.toml` + `/railway.json`: `preDeployCommand = ["pnpm -C apps/web migrate:prod"]`; Dockerfile raíz copia `apps/web/scripts` + workspace + `WORKDIR /app` |
+| **Evidencia** | Deploy `922c8039` logs `[migrate] run/done` 512…516 · `all migrations complete` · read-only `_migrations` `all512to516=true` (ejecutado ~2026-07-21T17:31:04Z) |
+| **Nota** | App start del mismo deploy falló → **KI-030**; schema drift KI-029 **cerrado** |
 
 ### KI-R014 — AWS SES production access (ex KI-014)
 

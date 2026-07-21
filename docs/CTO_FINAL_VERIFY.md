@@ -1,27 +1,35 @@
-# CTO Final Verify — 2026-07-21 (post redeploy `93957043`)
+# CTO Final Verify — 2026-07-21 (post redeploy KI-029 `922c8039`)
 
 > Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimProductionReady` **false** · **no** READY
 
-## Deploy (autorizado CTO)
+## Deploy (autorizado CTO — único)
 
 | Campo | Resultado |
 |-------|-----------|
 | Comando | `railway redeploy --from-source -y` |
-| Deploy | `93957043-9edd-41bc-b12b-5ffab3853805` **SUCCESS** |
-| Commit | `3d2bba18` |
-| SHA vivo | `3d2bba18bcae` |
-| live / ready | **200** / **ready** (DB ok) |
-| Build | Dockerfile raíz · COPY `src/lib/security` (paso 12/13) · healthcheck OK |
+| Deploy | `922c8039-2aa3-42a0-8a18-e5ae9c5a8142` **FAILED** |
+| Commit tip | `a82d618f` |
+| SHA vivo (health) | `3d2bba18bcae` (réplica previa; nuevo no healthy) |
+| live / ready | **200** / **ready** sobre SHA anterior |
+| preDeployCommand | **Presente** `["pnpm -C apps/web migrate:prod"]` |
 | 2º redeploy | **No** |
 
-## Migraciones prod (release)
+## Migraciones prod (KI-029 → KI-R029)
 
 | Check | Resultado |
 |-------|-----------|
-| `_migrations` incluye 512–516 | **NO** |
-| Última mig prod | **`511_idempotency_keys.sql`** (2026-07-09) |
-| Logs release/migrate | **Ausentes** |
-| Issue | **KI-029** |
+| Logs migrate | **SÍ** — `[migrate] run/done` 512…516 · `all migrations complete` |
+| `_migrations` 512–516 | **SÍ** (`all512to516=true`) |
+| Ejecutado | `2026-07-21T17:31:04Z` |
+| Issue mig | **KI-R029 resuelto** |
+
+## Fallo runtime (nuevo)
+
+| Campo | Resultado |
+|-------|-----------|
+| Error | `Cannot find module './src/lib/security/headers'` |
+| Efecto | Healthcheck fail · deploy FAILED |
+| Issue | **KI-030** |
 
 ## Smokes staging
 
@@ -29,25 +37,25 @@
 |-------|-----------|
 | portal-packs | **PASS** |
 | local-pack-e2e | **FAIL** `LLM_NOT_CONFIGURED` |
-| ecommerce / saas-b2b | No ejecutados (stop en 1er FAIL) |
 
-## Gates previos (sesión build-fix)
+## Gates / restricciones
 
 | Gate | Resultado |
 |------|-----------|
-| typecheck / build local | PASS (pre-push fixes) |
-| IA prod | **OFF** (no activada) |
+| IA prod | **OFF** |
 | Costes nuevos | **0** |
 | SQL manual | **No** |
+| 2º redeploy | **No** |
 
 ## PENDIENTES / bloqueos
 
 | Item | Sev. | Acción exacta |
 |------|------|----------------|
-| **KI-029** releaseCommand | P1 | Fijar Release Command en Railway UI → un release → `_migrations` ≥516 |
+| **KI-030** headers runtime | P1 | Fix COPY/resolución `src/lib/security/headers` en root Dockerfile → **un** redeploy nuevo |
 | `app.nelvyon.com` NXDOMAIN | P1 | CNAME humano Cloudflare |
 | Pack smokes LLM staging | P2 | OPENAI/Ollama en staging (no prod IA) |
+| **KI-028** Stripe STARTER | P1 | Price Live + env |
 
 ## Siguiente paso único
 
-Redeploy único tras push de `/railway.toml` `preDeployCommand` + Dockerfile scripts (KI-029). **No** UI. Verificar logs `migrate:prod` y `_migrations` 512–516.
+Fix **KI-030** (module `security/headers` en runner) → un redeploy autorizado → SHA vivo del tip + health 200. **No** reintentar `922c8039`.

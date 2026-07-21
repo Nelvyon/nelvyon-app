@@ -7,6 +7,9 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| KI-029 | **Resuelto → KI-R029** | Deploy `922c8039` preDeploy OK · mig 512–516 aplicadas · read-only confirm |
+| Deploy | **Prod FAILED `922c8039`** | tip `a82d618f` · migrate OK · start fail `security/headers` → **KI-030** · sin 2º redeploy · SHA vivo sigue `3d2bba18` |
+| Smokes | **Post-KI-029** | portal-packs PASS · local-pack-e2e FAIL `LLM_NOT_CONFIGURED` · `.release-logs/p0-smokes-post-ki029.txt` |
 | KI-029 | **Fix config-as-code** | `/railway.toml` `preDeployCommand=["pnpm -C apps/web migrate:prod"]` · Dockerfile scripts+WORKDIR /app |
 | Deploy | **Prod SUCCESS `93957043`** | Redeploy from-source `3d2bba18` · SHA vivo · health OK · COPY security en root Dockerfile |
 | KI-029 | **Detectado** | releaseCommand no aplicó 512–516; prod `_migrations` máx 511; sin logs migrate |
