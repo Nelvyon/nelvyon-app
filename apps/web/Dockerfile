@@ -1,3 +1,5 @@
+# Nelvyon web — production Dockerfile (Railway @nelvyon/web)
+# release: 2026-07-21 migrations-through-516
 FROM node:20-alpine AS base
 RUN npm install -g pnpm
 
