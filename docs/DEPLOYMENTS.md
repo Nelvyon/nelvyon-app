@@ -4,6 +4,38 @@
 
 ---
 
+## 2026-07-21 — KI-029 preDeployCommand versionado (pendiente verificación post-redeploy)
+
+| Campo | Valor |
+|-------|-------|
+| **Cambio** | `/railway.toml` + `/railway.json`: `preDeployCommand = ["pnpm -C apps/web migrate:prod"]` |
+| **Dockerfile raíz** | COPY `apps/web/scripts` + workspace manifests; `WORKDIR /app`; `CMD ["node","apps/web/server.js"]` |
+| **Motivo CMD/WORKDIR** | Requerido para `pnpm -C apps/web` desde monorepo root en pre-deploy |
+| **No UI** | Config-as-code only |
+| **Verificación** | Tras un redeploy: logs migrate:prod · `_migrations` 512–516 |
+
+---
+
+## 2026-07-21 16:30–16:41 UTC — Prod redeploy `3d2bba18` (build fix headers)
+
+| Campo | Valor |
+|-------|-------|
+| **Deploy ID** | `93957043-9edd-41bc-b12b-5ffab3853805` |
+| **Commit** | `3d2bba18bcae6d6a817f259aaa6277c69dc1619d` |
+| **Método** | `railway redeploy --from-source -y` (único; push previo SKIPPED por watchPatterns) |
+| **Servicio** | `@nelvyon/web` / production |
+| **Resultado app** | **SUCCESS** · healthcheck `/api/health/live` OK · SHA vivo `3d2bba18bcae` · ready 200 |
+| **Build** | Dockerfile **raíz** (`/Dockerfile`) · runner **12/13** `COPY .../src/lib/security` · image push OK |
+| **Runtime logs** | `[prod-env] validation OK` · `Ready on :3000` · **sin** líneas migrate/release |
+| **Migraciones 512–516** | **NO aplicadas** — `_migrations` prod máx **`511_idempotency_keys.sql`** (query read-only `DATABASE_PUBLIC_URL`) |
+| **Causa mig** | Release phase ausente en logs; service manifest sin release efectivo (repo `railway.json` declara `migrate:prod` pero no se ejecutó) |
+| **Smokes** | staging portal-packs **PASS** · local-pack-e2e **FAIL** `LLM_NOT_CONFIGURED` |
+| **Rollback** | No necesario (app sana; SHA anterior `60d098…` sustituido) |
+| **Prohibido** | No SQL manual · no 2º redeploy automático · IA prod OFF |
+| **Evidencia** | `.release-logs/deploy-93957043-*.txt` · `check-prod-migrations-512-516.mjs` · `p0-smokes-post-93957043.txt` |
+
+---
+
 ## 2026-07-21 — Auditoría cierre élite total (solo lectura)
 
 | Campo | Valor |

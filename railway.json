@@ -2,13 +2,13 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "apps/web/Dockerfile"
+    "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "restartPolicyType": "ON_FAILURE",
+    "preDeployCommand": ["pnpm -C apps/web migrate:prod"],
     "healthcheckPath": "/api/health/live",
     "healthcheckTimeout": 300,
-    "port": 3000,
-    "releaseCommand": "pnpm -C apps/web migrate:prod"
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
   }
 }

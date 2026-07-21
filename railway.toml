@@ -1,31 +1,17 @@
-# Railway monorepo configuration — Nelvyon
-# Two services: web (Next.js) and api (Python FastAPI).
-# Each service must reference its own Dockerfile in the Railway UI.
-# This file documents build and deploy settings for reproducibility.
+# Railway config-as-code for @nelvyon/web (production / monorepo root).
+# Evidence 2026-07-21: deploy meta configFile=/railway.toml, dockerfilePath=/Dockerfile.
+# Dashboard settings are overridden by this file for the fields defined here.
+# Docs: https://docs.railway.com/config-as-code/reference
 
 [build]
 builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
-# --- Web service (apps/web/Dockerfile) ---
-# Railway UI: Root Directory = / , Dockerfile Path = apps/web/Dockerfile
-# Release Command (Railway UI):
-#   node -e "require('./backend/db/migrate').runMigrations()" || true
-# Start Command: (defined in Dockerfile CMD)
-# Health Check Path: /api/health/live
-
-# --- API service (backend/Dockerfile) ---
-# Railway UI: Root Directory = /backend , Dockerfile Path = Dockerfile
-# Release Command: (handled by CMD — alembic upgrade head runs at container start)
-# Health Check Path: /health
-# Required env vars: DATABASE_URL, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
-#   STRIPE_PRICE_ID_STARTER, STRIPE_PRICE_ID_PRO, STRIPE_PRICE_ID_AGENCY,
-#   JWT_SECRET, APP_AI_KEY, FRONTEND_APP_URL, SENDGRID_API_KEY
-
-# --- Cron jobs (Railway Scheduler, attach to web service) ---
-# GET /api/cron/status-check
-#   Header: x-cron-secret = $CRON_SECRET
-#   Schedule: every 5 minutes
-#
-# GET /api/cron/local-pack-email-queue
-#   Header: x-cron-secret = $CRON_SECRET
-#   Schedule: every 10 minutes
+[deploy]
+# Official preDeployCommand (array, max 1). Runs after build, before traffic.
+# Requires runner image to include apps/web/scripts + workspace manifests (see root Dockerfile).
+preDeployCommand = ["pnpm -C apps/web migrate:prod"]
+healthcheckPath = "/api/health/live"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

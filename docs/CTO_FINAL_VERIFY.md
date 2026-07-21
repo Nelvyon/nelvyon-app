@@ -1,60 +1,53 @@
-# CTO Final Verify — 2026-07-21 (Bloques 3–13)
+# CTO Final Verify — 2026-07-21 (post redeploy `93957043`)
 
 > Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimProductionReady` **false** · **no** READY
 
-## Gates locales (re-ejecutados)
+## Deploy (autorizado CTO)
+
+| Campo | Resultado |
+|-------|-----------|
+| Comando | `railway redeploy --from-source -y` |
+| Deploy | `93957043-9edd-41bc-b12b-5ffab3853805` **SUCCESS** |
+| Commit | `3d2bba18` |
+| SHA vivo | `3d2bba18bcae` |
+| live / ready | **200** / **ready** (DB ok) |
+| Build | Dockerfile raíz · COPY `src/lib/security` (paso 12/13) · healthcheck OK |
+| 2º redeploy | **No** |
+
+## Migraciones prod (release)
+
+| Check | Resultado |
+|-------|-----------|
+| `_migrations` incluye 512–516 | **NO** |
+| Última mig prod | **`511_idempotency_keys.sql`** (2026-07-09) |
+| Logs release/migrate | **Ausentes** |
+| Issue | **KI-029** |
+
+## Smokes staging
+
+| Smoke | Resultado |
+|-------|-----------|
+| portal-packs | **PASS** |
+| local-pack-e2e | **FAIL** `LLM_NOT_CONFIGURED` |
+| ecommerce / saas-b2b | No ejecutados (stop en 1er FAIL) |
+
+## Gates previos (sesión build-fix)
 
 | Gate | Resultado |
 |------|-----------|
-| tsc / lint / stubs / validate 508–516 | **PASS** |
-| `nelvyon-verify-all.mjs` | **CONDITIONAL_READY** · 7 PASS · 0 FAIL · 1 SKIP Docker · 2 NOT_CONFIGURED |
-
-## Matriz sistemas (Bloque 11)
-
-| Sistema | Implementado | Verif. local | Verif. staging | Operativo prod | Bloq. externo |
-|---------|:------------:|:------------:|:--------------:|:--------------:|:-------------:|
-| SaaS core | ✅ | ✅ | 🟡 health | 🟡 web health | QA smokes pwd |
-| OS / packs | ✅ | ✅ | 🟡 | 🟡 | — |
-| CRM | ✅ | ✅ | ✅ B3 iso | 🟡 | — |
-| Workflows | ✅ | ✅ | 🟡 | 🟡 | — |
-| Email / SES | ✅ | ✅ | — | ✅ send self-test | — |
-| Billing / Stripe | ✅ | ✅ | — | 🟡 STARTER price missing | Dashboard price |
-| Shared Memory | ✅ | 🟡 | ✅ schema | ❌ flags OFF | decisión + mig 516 |
-| MCP / Router | ✅ cert | ✅ freeze | — | ❌ flags OFF | decisión |
-| Seguridad / RLS | ✅ | ✅ | ✅ B3+KI026 | 🟡 prod≤511 | migrate 516 |
-| Observabilidad | ✅ | ✅ | ✅ health | 🟡 | app DNS |
-| Crons | ✅ | ✅ | — | ✅ GH success | — |
-| Backups / DR | ✅ | ✅ drill hist. | — | ✅ GH Backup | Docker re-run |
-| Deploy / DNS | ✅ | — | ✅ staging host | 🟡 | **app.nelvyon.com NXDOMAIN** |
-| Documentación | ✅ | ✅ | — | — | — |
-
-## PASS reales (evidencia)
-
-- Bloque 3: `saas_uuid_isolation_evidence.json` · `ok:true` · audit JWT + contacts cross=0 · cleanup OK
-- Bloque 4: SES ProductionAccessEnabled=true · self-send MessageId · SNS confirmed · **KI-014 cerrado**
-- Health prod/staging 200 · restore drill PASS · Database Backup GH success · verify-all CONDITIONAL_READY
-- IA flags prod unset (seguro)
+| typecheck / build local | PASS (pre-push fixes) |
+| IA prod | **OFF** (no activada) |
+| Costes nuevos | **0** |
+| SQL manual | **No** |
 
 ## PENDIENTES / bloqueos
 
-| Item | Sev. | Acción humana exacta |
-|------|------|----------------------|
-| Stripe STARTER price `resource_missing` | P1 | Live Dashboard → price válido → Railway `STRIPE_PRICE_ID_STARTER` |
-| Prod mig max **511** (516 ausente) | P1 | Autorización CTO + migrate controlado 512–516 |
-| `app.nelvyon.com` NXDOMAIN | P1 | Cloudflare DNS → CNAME Railway verificado |
-| `STAGING_QA_PASSWORD` ausente | P1 | Variable en staging Railway → P0 smokes |
-| www.nelvyon.com 404 | P2 | CF/Railway routing |
-| OpenClaw / SM / MCP prod | P1 | Mantener OFF hasta evidencia |
-
-## Bloque 6 / 12
-
-- **Deploy prod: NO** (mig 516 missing + Stripe STARTER + tree sucio · sin commit/push esta pasada).
-- **IA canary: NO** — flags OFF.
-
-## Costes nuevos
-
-**0**
+| Item | Sev. | Acción exacta |
+|------|------|----------------|
+| **KI-029** releaseCommand | P1 | Fijar Release Command en Railway UI → un release → `_migrations` ≥516 |
+| `app.nelvyon.com` NXDOMAIN | P1 | CNAME humano Cloudflare |
+| Pack smokes LLM staging | P2 | OPENAI/Ollama en staging (no prod IA) |
 
 ## Siguiente paso único
 
-Fix **STRIPE_PRICE_ID_STARTER** en Live + Railway → `price-audit allValid=true`. Luego DNS `app.nelvyon.com` y QA password staging.
+Redeploy único tras push de `/railway.toml` `preDeployCommand` + Dockerfile scripts (KI-029). **No** UI. Verificar logs `migrate:prod` y `_migrations` 512–516.

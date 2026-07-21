@@ -27,6 +27,12 @@ ENV PORT=3000
 EXPOSE 3000
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=deps /app/backend/db/node_modules ./backend/db/node_modules
+# preDeployCommand: pnpm -C apps/web migrate:prod (cwd must be monorepo root)
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=builder /app/apps/web/scripts ./apps/web/scripts
 COPY --from=builder /app/backend/db ./backend/db
 COPY --from=builder /app/apps/web/.next ./apps/web/.next
 COPY --from=builder /app/apps/web/.source ./apps/web/.source
@@ -37,5 +43,5 @@ COPY --from=builder /app/apps/web/source.config.ts ./apps/web/source.config.ts
 COPY --from=builder /app/apps/web/server.js ./apps/web/server.js
 # next.config.ts requires this at process start (Railway uses this root Dockerfile)
 COPY --from=builder /app/apps/web/src/lib/security ./apps/web/src/lib/security
-WORKDIR /app/apps/web
-CMD ["node", "server.js"]
+WORKDIR /app
+CMD ["node", "apps/web/server.js"]

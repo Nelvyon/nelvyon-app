@@ -7,6 +7,11 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| KI-029 | **Fix config-as-code** | `/railway.toml` `preDeployCommand=["pnpm -C apps/web migrate:prod"]` · Dockerfile scripts+WORKDIR /app |
+| Deploy | **Prod SUCCESS `93957043`** | Redeploy from-source `3d2bba18` · SHA vivo · health OK · COPY security en root Dockerfile |
+| KI-029 | **Detectado** | releaseCommand no aplicó 512–516; prod `_migrations` máx 511; sin logs migrate |
+| Build | **Fix headers Docker** | Commits `201c82b2` / `56216ba8` / `3d2bba18` (typecheck + COPY security root) |
+| Smokes | **Parcial** | portal-packs PASS · local-pack-e2e FAIL `LLM_NOT_CONFIGURED` |
 | Bloques 3–13 | **Ejecución final** | B3 SaaS UUID iso staging PASS · B4 SES GRANTED+send · B5 Stripe STARTER missing (KI-028) · B6 NO deploy (prod≤511) · B7 app.nelvyon.com NXDOMAIN · B8 health-only · B9/10 OK · B12 IA OFF · costes 0 |
 | KI-014 | **Cerrado → KI-R014** | SES ProductionAccess true · self-send · SNS confirmed |
 | KI-028 | **Abierto** | Stripe Live STARTER `resource_missing` en price-audit |

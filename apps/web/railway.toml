@@ -3,8 +3,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "apps/web/Dockerfile"
 
 [deploy]
-# Runs SQL migrations (backend/db/migrations/*.sql) before each deploy.
-releaseCommand = "pnpm -C apps/web migrate:prod"
+# Kept in sync with root railway.toml for services that point config at apps/web.
+# Official preDeployCommand (array). Prefer root /railway.toml when Root Directory = /.
+preDeployCommand = ["pnpm -C apps/web migrate:prod"]
 healthcheckPath = "/api/health/live"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"

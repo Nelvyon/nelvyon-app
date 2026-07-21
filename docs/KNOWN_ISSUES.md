@@ -6,6 +6,18 @@
 
 ## Activos
 
+### KI-029 — Prod releaseCommand no aplicó migraciones 512–516
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **En reparación 2026-07-21** (config-as-code) |
+| **Severidad** | Alta (P1 ops) — app OK; schema drift vs staging/repo |
+| **Evidencia inicial** | Deploy `93957043` SUCCESS · SHA `3d2bba18` · deploy logs sin migrate · `_migrations` prod máx `511_idempotency_keys.sql` |
+| **Causa** | Service usaba `configFile=/railway.toml` con `preDeployCommand: []`; `releaseCommand` en JSON no se ejecutaba. Runner root Dockerfile sin `apps/web/scripts` |
+| **Fix versionado** | `railway.toml` + `railway.json` root: `preDeployCommand = ["pnpm -C apps/web migrate:prod"]`; Dockerfile raíz copia scripts/workspace + `WORKDIR /app` + `CMD node apps/web/server.js` |
+| **Verificación** | Tras redeploy: logs pre-deploy con migrate:prod · `_migrations` incluye 512…516 |
+| **Prohibido** | SQL/migrate manual · UI-only Release Command · 2º redeploy automático |
+
 ### KI-027 - Test drift brain knowledge (`ingestEvidence.verified`)
 
 | Campo | Valor |

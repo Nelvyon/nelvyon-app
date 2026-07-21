@@ -14,8 +14,8 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ local-ai | Desktop + compose local-ai **UP** 2026-07-20 (`nelvyon-local-ai-postgres` healthy). |
-| **Railway** | ✅ | Web healthcheck `/api/health/live`; releaseCommand migrate |
-| **PostgreSQL** | ✅ repo / 🟡 remoto | Staging: **`516_fastapi_rls_repair.sql`** (KI-026 ✅ · SM verified · ADR-032). Prod: ~511+ (drift vs staging). |
+| **Railway** | 🟡 | Web **SUCCESS** SHA `3d2bba18` · health OK · **releaseCommand migrate no ejecutó** en deploy `93957043` (KI-029) |
+| **PostgreSQL** | ✅ repo / 🟡 remoto | Staging: **`516`**. Prod verificado 2026-07-21: máx **`511`** (512–516 ausentes). |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |
 | **Ollama** | ✅ | Preflight 2026-07-20: HTTP 200, models=6 |
@@ -33,14 +33,21 @@
 
 | Servicio | Artefacto | Puerto |
 |----------|-----------|--------|
-| **Web** | `apps/web/Dockerfile` | 3000 |
+| **Web** | Dockerfile **raíz** (`/Dockerfile`) vía `railway.toml` | 3000 |
 | **API Python** | `backend/Dockerfile` | 8000 |
 
-**Web `railway.json`:**
-```json
-"releaseCommand": "pnpm migrate:prod",
-"healthcheckPath": "/api/health/live"
+**Web config-as-code (root — lo que usa prod):** `/railway.toml`
+```toml
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+preDeployCommand = ["pnpm -C apps/web migrate:prod"]
+healthcheckPath = "/api/health/live"
 ```
+
+**KI-029:** `releaseCommand` previo no corría; `preDeployCommand` vacío en manifest. Fix versionado (no UI). Runner copia `apps/web/scripts` + manifests; `WORKDIR /app`; `CMD node apps/web/server.js`.
 
 **Ops runbook:** `docs/OPS.md`
 

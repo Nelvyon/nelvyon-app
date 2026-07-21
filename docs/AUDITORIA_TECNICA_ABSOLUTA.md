@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-21**  
-> Veredicto interno: **CONDITIONAL_READY** (Bloques 3–13; SES operativo; Stripe STARTER P1; prod mig≤511; IA OFF)  
-> Evidencia: `saas_uuid_isolation_evidence.json` · SES self-send · price-audit · health · `CTO_FINAL_VERIFY.md`
+> Veredicto interno: **CONDITIONAL_READY** (prod SHA `3d2bba18` sano; **KI-029** mig 511; DNS app; smokes pack LLM; IA OFF)  
+> Evidencia: deploy `93957043` SUCCESS · health live/ready · `_migrations` máx 511 · `CTO_FINAL_VERIFY.md`
 
 ---
 
