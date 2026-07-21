@@ -1,6 +1,5 @@
 import { getGlobalPrivateAiConfig } from "../config";
 import { AnthropicProvider } from "../providers/AnthropicProvider";
-import { LocalModelRouterProvider } from "../providers/LocalModelRouterProvider";
 import { LocalOllamaProvider } from "../providers/LocalOllamaProvider";
 import { OpenAiProvider } from "../providers/OpenAiProvider";
 import { StubProvider } from "../providers/StubProvider";
@@ -15,7 +14,6 @@ export class ProviderRegistry {
     this.providers = [
       new UnconfiguredProvider(),
       new StubProvider(),
-      new LocalModelRouterProvider(cfg),
       new LocalOllamaProvider(cfg),
       new OpenAiProvider(cfg),
       new AnthropicProvider(cfg),

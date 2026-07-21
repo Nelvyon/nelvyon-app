@@ -1,4 +1,4 @@
-export {
+﻿export {
   OsTruthGuardService,
   getOsTruthGuardService,
   resetOsTruthGuardServiceForTests,
@@ -579,6 +579,15 @@ export {
   type SentimentTrendPoint,
   type SentimentChannelDistribution,
 } from "./SentimentMonitorService";
+export {
+  LeadScoringService,
+  getLeadScoringService,
+  resetLeadScoringServiceForTests,
+  type LeadCategory,
+  type LeadData,
+  type LeadScoreResult,
+  type ScoredLead,
+} from "./LeadScoringService";
 export {
   ClientBriefingService,
   getClientBriefingService,
@@ -1315,16 +1324,9 @@ export {
   isSesEnvConfigured,
   isTwilioEnvConfigured,
   isStripeEnvConfigured,
-  isStripeStoreWebhookConfigured,
   isOpenAiEnvConfigured,
-  isPackLlmEnvConfigured,
   isEnvKeysConfigured,
-  isAnyEnvKeyConfigured,
   missingEnvKeys,
-  missingSesEnvKeys,
-  missingStripeEnvKeys,
-  missingStripeStoreWebhookSecret,
-  missingStripeConnectWebhookSecret,
 } from "./saasEnv";
 export {
   syncOAuthProviderToHub,
@@ -1594,50 +1596,6 @@ export {
   SaasPrivateAiService,
 } from "./SaasPrivateAiService";
 export {
-  getSaasSharedMemoryService,
-  resetSaasSharedMemoryServiceForTests,
-  SaasSharedMemoryService,
-} from "./SaasSharedMemoryService";
-export {
-  SharedMemoryNotEnabledError,
-  SharedMemoryDeniedError,
-  SharedMemoryApprovalRequiredError,
-  isSharedMemoryEnabled,
-  getSharedMemoryConfig,
-} from "../shared-memory";
-export {
-  getAgentOrchestrator,
-  isOrchestratorEnabled,
-  ORCHESTRATOR_CONTRACT_VERSION,
-  ORCHESTRATOR_RESILIENCE,
-  OrchestratorNotEnabledError,
-  InMemoryAgentOrchestrator,
-  resetOrchestratorForTests,
-} from "../orchestrator";
-export {
-  listUnifiedAgents,
-  getUnifiedAgent,
-  agentRegistryStatus,
-  assertAgentCatalogComplete,
-} from "../agents";
-export type { UnifiedAgentRecord } from "../agents";
-export {
-  getPromptRegistry,
-  resetPromptRegistryForTests,
-  PROMPT_REGISTRY_CONTRACT_VERSION,
-} from "../prompt-registry";
-export {
-  isOpenClawRuntimeAuthorized,
-  OPENCLAW_ADAPTER_CONTRACT,
-} from "../openclaw";
-export {
-  getUnifiedRagStore,
-  preferLocalRag,
-  resetUnifiedRagStoreForTests,
-} from "../private-ai/rag/UnifiedRagStore";
-export { buildAgentContext, maybeWriteAgentMemory } from "../private-ai/context/AgentContextEngine";
-export { agentToolToMcp, mcpToolToAgent, listMappedAgentTools } from "../private-ai/tools/toolIdMap";
-export {
   getPrivateAiRouter,
   resetPrivateAiRouterForTests,
   PrivateAiRouter,
@@ -1654,7 +1612,6 @@ export {
   isPrivateAiOnlyEnv,
   isNelvyonAiEnabled,
   isLocalRuntimeConfigured,
-  isLocalRouterEnabled,
   isOpenClawBridgeEnabled,
 } from "../private-ai/config";
 export {
@@ -1689,7 +1646,6 @@ export {
 export {
   getOpenClawBridge,
   resetOpenClawBridgeForTests,
-  HttpOpenClawBridge,
   setOpenClawBridgeForTests,
   DisabledOpenClawBridge,
   type IOpenClawBridge,
