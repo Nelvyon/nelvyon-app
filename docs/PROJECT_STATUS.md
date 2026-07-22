@@ -11,7 +11,7 @@
 | **Web git_sha** | **OK** | deploy `7d625161` · `9ca0cf29a5e5` |
 | **app.nelvyon.com** | **OK** | DNS+SSL · live/ready 200 |
 | **KI-020** | **PASS** | KI020_PASS |
-| **portal-packs** | **PASS** | GH `29943785978` · secret synced |
+| **portal-packs** | **PASS** | GH P0 SUCCESS `29944606938` · secret synced |
 | **Pack E2E** | **SKIP_IA_OFF** | LLM_NOT_CONFIGURED · honest (IA OFF) |
 | **Backup** | **OK** | run `29932453133` |
 | **IA flags** | **OFF** | OpenAI key revoked · cost 0 |

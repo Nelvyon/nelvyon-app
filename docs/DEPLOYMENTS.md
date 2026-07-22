@@ -10,7 +10,7 @@
 |-------|-------|
 | **Live SHA** | unchanged `9ca0cf29a5e5` · deploy `7d625161` |
 | **FastAPI** | `/health` **200** · deploy `25e2109d` |
-| **Smokes** | portal-packs **PASS** `29943785978` · pack E2E → SKIP_IA_OFF (post-push) |
+| **Smokes** | portal-packs **PASS** · P0 SUCCESS `29944606938` · pack E2E SKIP_IA_OFF |
 | **Backup** | **DONE** `29932453133` |
 | **Redeploy** | **NO** (smokes/docs/prep only) |
 | **IA flags** | OFF · cost 0 |

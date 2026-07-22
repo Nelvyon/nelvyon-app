@@ -32,7 +32,7 @@
 - [x] Ops: 1× web redeploy `--from-source` → `git_sha=9ca0cf29a5e5` (deploy `7d625161`)
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
 - [ ] CEO: mesh/canary IA staging opcional (`docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md`)
-- [x] Ops: portal-packs refresh GH — **PASS** `29943785978` (secret synced)
+- [x] Ops: portal-packs refresh GH — **PASS** · P0 SUCCESS `29944606938`
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
 - [x] Bloque 3 SaaS UUID isolation staging
 - [x] **KI-028** — Stripe STARTER · price-audit **allValid=true** (KI-R028) 2026-07-22

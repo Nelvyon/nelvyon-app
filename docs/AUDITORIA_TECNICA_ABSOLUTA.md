@@ -208,7 +208,7 @@ Ver tabla completa en `docs/CTO_FINAL_VERIFY.md` y HANDOVER. Costes nuevos: **0*
 | Ítem | Resultado |
 |------|-----------|
 | STAGING_QA_PASSWORD sync | **DONE** (Login 401 → PASS) |
-| portal-packs GH | **PASS** run `29943785978` |
+| portal-packs GH | **PASS** run `29944606938` (SUCCESS; prior `29943785978` was FAIL overall) |
 | Pack E2E vs IA OFF | **SKIP_IA_OFF** (exit 78) — no mock PASS |
 | OllamaRuntimePrep metrics/rollback | **DONE** + tests |
 | ADR-036 + weak 3B needs_review | **DONE** vitest |

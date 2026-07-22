@@ -1,7 +1,7 @@
 # CTO Final Verify — 2026-07-22 (Total internal-safe closure)
 
 > Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimReady` **false**  
-> Tip repo post-push · Web live SHA **`9ca0cf29a5e5`** · deploy **`7d625161`** · FastAPI **`25e2109d`** · Coste **0**  
+> Tip repo **`0f6ae7c5fb09`** · Web live SHA **`9ca0cf29a5e5`** · deploy **`7d625161`** · FastAPI **`25e2109d`** · Coste **0**  
 > **Plataforma lista técnicamente (condicional)** ≠ **superioridad con clientes**
 
 ## Strict matrix
@@ -12,7 +12,7 @@
 | FastAPI `/health` | ✅ | — | — | ✅ 200 | — | — | — | — | — |
 | Automations unified | ✅ | — | — | ✅ auth 200 hist · unauth 401 | — | — | — | — | — |
 | SQL SSOT 517/518 | ✅ | ✅ ALL_PASS | — | ✅ DB hist | — | — | — | — | — |
-| portal-packs P0 | ✅ | — | ✅ PASS run `29943785978` | ✅ same host | — | — | — | — | — |
+| portal-packs P0 | ✅ | — | ✅ PASS run `29944606938` | ✅ same host | — | — | — | — | — |
 | Pack E2E growth×3 | ✅ código | ✅ unit | SKIP_IA_OFF | SKIP_IA_OFF | ✅ IA OFF | CEO mesh | ⬜ | — | — |
 | Quality routing 3b/8b | ✅ ADR-036 | ✅ vitest | — | OFF | ✅ | CEO canary | ⬜ | — | — |
 | OllamaRuntimePrep | ✅ | ✅ vitest | — | OFF | ✅ | mesh | ⬜ | — | — |
@@ -34,8 +34,8 @@
 | live/ready app+apex | **200** `git_sha=9ca0cf29a5e5` |
 | FastAPI `/health` | **200** `healthy` |
 | Automations unauth | **401** expected |
-| Staging P0 `29943785978` | portal-packs **PASS** · pack-e2e **LLM_NOT_CONFIGURED** (pre-skip fix) |
-| Staging P0 post-fix | re-dispatch after push (honest SKIP_IA_OFF) |
+| Staging P0 `29943785978` | **failure** overall · portal-packs PASS · pack-e2e LLM_NOT_CONFIGURED (pre-skip) |
+| Staging P0 `29944606938` | **SUCCESS** · portal-packs PASS · pack E2E SKIP_IA_OFF · `ALL_P0_PASS_WITH_IA_OFF_SKIPS` |
 | Backup workflow | **success** `29932453133` |
 | Restore drill | **SKIP** Docker daemon DOWN |
 | KI-020 | prior **KI020_PASS** |
