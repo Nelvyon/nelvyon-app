@@ -1,7 +1,7 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (SHA `e62d52cc5d61` · DNS/SSL app **PASS** · P0 **ALL_P0_PASS** · flags OFF · cost 0). Pendiente: legal campañas · CEO IA mesh · CSRF app Origin redeploy.  
+> Veredicto interno: **CONDITIONAL_READY** (SHA `8d84036055a1` · DNS/SSL app **PASS** · KI020_PASS · P0 ALL_P0_PASS · flags OFF · cost 0). Pendiente: legal campañas · CEO IA mesh.  
 > Evidencia: `CTO_FINAL_VERIFY.md` · `dns-app-verify-pass-20260722.txt`
 
 ---
