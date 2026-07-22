@@ -41,8 +41,12 @@
 - [x] Dual-path OS `LlmClient`→Ollama (ADR-034) + capability registry 11 servicios
 - [x] Partners: facade + gate `NELVYON_CEO_PARTNER_PAYOUTS` (sin pagos auto)
 - [x] Runbook `OS_AUTONOMOUS_OPERATIONS.md`
-- [ ] Redeploy prod post-unificación (solo con auth CEO; IA flags OFF)
-- [ ] Dual-path soak E2E Ollama en staging alcanzable (nunca localhost PC)
+- [x] Redeploy prod post-unificación (IA flags OFF) — `4cb01795` / SHA `2b51581d`
+- [x] ADR-036 quality routing 3b/8b opt-in + arch local-AI doc (no activar)
+- [x] OS/ops flow audits + sector playbooks (beta no promote)
+- [ ] Dual-path soak E2E Ollama en staging vía mesh privado (CEO + arch; nunca localhost PC)
+- [ ] Promote beta packs solo con cert+deliverables+E2E evidencia
+- [ ] CEO: aprobar Option A Tailscale (`ARCHITECTURE_LOCAL_AI_RUNTIME.md`) si se quiere IA local alcanzable
 
 ---
 

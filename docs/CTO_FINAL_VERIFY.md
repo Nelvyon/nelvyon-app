@@ -1,44 +1,33 @@
-# CTO Final Verify — 2026-07-22 (Prod unify `2b51581d` SUCCESS)
+# CTO Final Verify — 2026-07-22 (Elite-next blocks · no IA activation)
 
-> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · **no** READY (DNS app)  
-> SHA vivo: **`2b51581ddaf6`** · Deploy **`4cb01795` SUCCESS** · Costes **0**  
-> Flags IA/MCP/SM/OpenClaw/OpenAI/CEO payouts: **ABSENT / OFF** (no set)
+> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimEliteOps` **false**  
+> Prod SHA vivo: **`2b51581ddaf6`** · tip código: **`26ce8d00`** · Coste **0** · Flags IA **OFF**
 
-## Pre-deploy
+## Entregado esta fase
 
-| Gate | Resultado |
-|------|-----------|
-| Tip autorizado | `4bc0282b` + fail-closed MCP `66f3f516` + track modules `308462a8`/`2b51581d` |
-| tsc | **0** |
-| vitest affected | PASS |
-| pack gate | ALL_GATE_PASS 51 |
-| build:prod | PASS (local) |
-| Archive import-chain | 69 visited · **0** missing |
-| MCP default | OFF (`?? "0"` / require `=1`) |
+| Bloque | Resultado |
+|--------|-----------|
+| 1 Local AI arch | `ARCHITECTURE_LOCAL_AI_RUNTIME.md` — Option A Tailscale · **no activado** |
+| 2 Routing 3b/8b | ADR-036 · `AUTONOMOUS_QUALITY_ROUTING` opt-in · tests PASS · Router cert **intacto** |
+| 3 Beta→available | **NO promote** — faltan cert+deliverables dedicados (`OS_FLOW_AUDIT.md`) |
+| 4 Flujos OS | Growth: wiring PASS · LOCAL partial · PROD IA **blocked** |
+| 5 Partners | `?view=unified` · `calculatePartnerCommission` · payouts CEO_GATE |
+| 6 Ops | `OPS_QUALITY_AUDIT.md` — DNS + STAGING_QA_PASSWORD abiertos (honestos) |
+| 7 Sector playbooks | LOCAL_SMB · ECOMMERCE · SAAS_B2B + tests existencia/QA |
 
-## Redeploy history (same day)
+## No hecho (CEO)
 
-| Deploy ID | Tip | Result |
-|-----------|-----|--------|
-| `d6af9ec0` | `66f3f516` | **FAILED** — untracked MCP/router |
-| `dbd09735` | `308462a8` | **FAILED** — untracked specialization |
-| `4cb01795` | `2b51581d` | **SUCCESS** — live |
+- Activar mesh Ollama / quality routing en staging o prod  
+- OpenAI / MCP / SM / OpenClaw / CEO payouts  
+- Promote beta packs  
+- Redeploy (no requerido para docs/código opt-in OFF)
 
-## Post-deploy
+## Bloqueos externos
 
-| Check | Resultado |
-|-------|-----------|
-| live / ready | **200** / **200** |
-| git_sha | `2b51581ddaf6` |
-| Logs | migrate complete · Ready :3000 · no OpenAI egress sample |
-| Flags ABSENT | AUTONOMOUS_ALLOW_OPENAI · NELVYON_MCP_PRODUCTIVE_ENABLED · NELVYON_SHARED_MEMORY_ENABLED · NELVYON_CEO_PARTNER_PAYOUTS · OPENCLAW* |
-| Partner payout gate | vitest **2/2** throws without flag |
-| Smokes staging | **Blocked** `STAGING_QA_PASSWORD` |
+1. CNAME `app.nelvyon.com` → Railway  
+2. `STAGING_QA_PASSWORD`  
+3. Licencia base empresas — sin bypass
 
 ## Costes
 
 **0**
-
-## Siguiente
-
-CNAME `app.nelvyon.com` → Railway. No flags. No redeploy.

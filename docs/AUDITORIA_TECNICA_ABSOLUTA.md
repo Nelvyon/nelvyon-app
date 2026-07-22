@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (SHA vivo `2b51581ddaf6` · deploy `4cb01795` SUCCESS · OS unify live · flags OFF · MCP default OFF · coste 0). Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`.  
-> Evidencia: `.release-logs/prod-redeploy-unify-20260722-final.txt` · archive closure 69/0 · `CTO_FINAL_VERIFY.md`
+> Veredicto interno: **CONDITIONAL_READY** (prod `2b51581ddaf6` · tip `26ce8d00` elite-next · ADR-036 · arch local-AI no activada · flags OFF · cost 0). Unique blocker DNS: CNAME `app.nelvyon.com`. Smokes: `STAGING_QA_PASSWORD`.  
+> Evidencia: `OS_FLOW_AUDIT.md` · `OPS_QUALITY_AUDIT.md` · `ARCHITECTURE_LOCAL_AI_RUNTIME.md` · `CTO_FINAL_VERIFY.md`
 
 ---
 

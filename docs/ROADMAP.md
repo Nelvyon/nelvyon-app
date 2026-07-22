@@ -65,7 +65,10 @@
 | Agencia OS capability registry | ✅ | 11 servicios · playbooks · sector legacy |
 | Partners CEO payout gate | ✅ | `NELVYON_CEO_PARTNER_PAYOUTS` default OFF |
 | Runbook ops sin Cursor | ✅ | `OS_AUTONOMOUS_OPERATIONS.md` |
-| Agencia OS unificada élite (ops) | 🟡 | Código unificado parcial · DNS + IA prod OFF · claimComplete false |
+| Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
+| Local AI runtime mesh | 🟡 | Arquitectura doc · **no activada** |
+| Beta packs → available | ❌ | Falta cert + deliverables dedicados |
+| Agencia OS unificada élite (ops) | 🟡 | Código+docs · DNS · IA OFF · claimComplete false |
 
 ---
 

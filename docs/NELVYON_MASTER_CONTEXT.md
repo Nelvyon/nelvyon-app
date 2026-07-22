@@ -1809,8 +1809,8 @@ cd backend && python -m pytest tests/ -q --tb=short
 | Router / MCP / Specialization | **CERTIFIED** · MCP productive **default OFF** |
 | Shared Memory / OpenClaw | **Wired / OFF** |
 | Migraciones | última **516** |
-| ADRs | **001–034** |
-| Próximo paso ops | **CNAME `app.nelvyon.com`** · ver `HANDOVER.md` |
+| ADRs | **001–036** |
+| Próximo paso ops | **CNAME `app`** · CEO arch local-AI · ver `HANDOVER.md` |
 | Secretos en este archivo | **Ninguno** |
 | Invención deliberada | **Prohibida** |
 | SSOT del próximo paso | **`docs/HANDOVER.md`** |
