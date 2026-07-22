@@ -3,6 +3,13 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-22
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| KI-030 | **Fix local PASS** | CMD `cd /app/apps/web && exec node server.js` · WORKDIR `/app` · `.dockerignore` WIP · docker Ready sin headers error · vitest 3/3 · tsc 0 |
+| Docs | **KI-030 pre-redeploy** | HANDOVER/DEPLOYMENTS/INFRA/KNOWN_ISSUES/CTO/AUDITORIA actualizados con evidencia local |
+
 ## 2026-07-21
 
 | Área | Cambio | Descripción |

@@ -10,13 +10,14 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto 2026-07-21** |
-| **Severidad** | Alta (P1 ops) — schema OK; nuevo deploy no arranca; prod sigue en `3d2bba18` |
-| **Deploy** | `922c8039-2aa3-42a0-8a18-e5ae9c5a8142` **FAILED** · commit `a82d618f` · 1 redeploy only |
+| **Estado** | **Fix local verificado 2026-07-22** — pendiente SUCCESS redeploy prod |
+| **Severidad** | Alta (P1 ops) — schema OK; prod vivo aún `3d2bba18` hasta nuevo deploy |
+| **Deploy fallido** | `922c8039-2aa3-42a0-8a18-e5ae9c5a8142` **FAILED** · commit `a82d618f` · **no** reintentar ese FAILED |
 | **Error exacto** | `[nelvyon] Failed to start Next.js Error: Cannot find module './src/lib/security/headers'` · healthcheck fail |
-| **Nota** | Dockerfile raíz ya tiene `COPY .../src/lib/security`; falla en runtime tras preDeploy OK |
-| **Prohibido** | 2º redeploy del mismo FAILED · SQL manual · activar IA prod |
-| **Fix** | Asegurar resolución/COPY de `headers` en runner image → un redeploy nuevo autorizado |
+| **Causa raíz** | `next.config.ts` resuelve `./src/lib/security/headers` desde `process.cwd()`; CMD previo `node apps/web/server.js` con `WORKDIR /app` → cwd incorrecto |
+| **Fix** | CMD `sh -c "cd /app/apps/web && exec node server.js"` · mantener `WORKDIR /app` para preDeploy migrate · COPY security + `.dockerignore` WIP |
+| **Evidencia local** | `docker build -t nelvyon-ki030:fixed` OK · `docker run` → `Ready on :3000` · **sin** module headers · vitest 3/3 · tsc 0 |
+| **Prohibido** | 2º redeploy del FAILED `922c8039` · SQL manual · activar IA prod |
 
 ### KI-027 - Test drift brain knowledge (`ingestEvidence.verified`)
 

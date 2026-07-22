@@ -1,6 +1,21 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-21**
+> Registrar cada deploy significativo. Actualizado: **2026-07-22**
+
+---
+
+## 2026-07-22 — KI-030 fix local Docker PASS (pre-redeploy)
+
+| Campo | Valor |
+|-------|-------|
+| **Cambio** | Root `Dockerfile` CMD: `cd /app/apps/web && exec node server.js` · `WORKDIR /app` · `.dockerignore` WIP API routes |
+| **Causa** | `next.config` resuelve `./src/lib/security/headers` desde cwd; cwd `/app` fallaba tras KI-029 |
+| **Local build** | `docker build -f Dockerfile -t nelvyon-ki030:fixed .` **PASS** |
+| **Local start** | `Ready on http://0.0.0.0:3000` · **sin** `Cannot find module './src/lib/security/headers'` |
+| **Gates** | vitest securityHeaders SSOT 3/3 · tsc 0 |
+| **Prod pre** | live 200 SHA `3d2bba18bcae` · ready 503 |
+| **Redeploy** | Autorizado **uno** `railway redeploy --from-source -y` tras push (ver entrada post-deploy) |
+| **Prohibido** | No 2º redeploy · no SQL · IA prod OFF |
 
 ---
 

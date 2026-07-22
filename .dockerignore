@@ -1,0 +1,32 @@
+# Root build context for Railway /Dockerfile (monorepo).
+# Prevents host node_modules / huge artifacts from clobbering Linux deps on COPY . .
+node_modules
+**/node_modules
+.git
+.github
+.next
+**/.next
+.turbo
+**/.turbo
+.release-logs
+.cursor
+.claude
+frontend
+docs
+**/.env
+**/.env.*
+!**/.env.example
+**/coverage
+**/dist
+**/*.log
+backend/local-ai/benchmarks
+backend/local-ai/.venv
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+# Local WIP API routes (untracked) — not on origin/main; break build:prod typecheck if copied
+apps/web/src/app/api/saas/mcp
+apps/web/src/app/api/saas/orchestrator
+apps/web/src/app/api/saas/private-ai/inference
+apps/web/src/app/api/saas/private-ai/metrics
+apps/web/src/app/api/saas/private-ai/router-health

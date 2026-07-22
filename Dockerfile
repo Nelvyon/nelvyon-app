@@ -41,7 +41,9 @@ COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
 COPY --from=builder /app/apps/web/next.config.ts ./apps/web/next.config.ts
 COPY --from=builder /app/apps/web/source.config.ts ./apps/web/source.config.ts
 COPY --from=builder /app/apps/web/server.js ./apps/web/server.js
-# next.config.ts requires this at process start (Railway uses this root Dockerfile)
+# next.config.ts imports ./src/lib/security/headers (resolved from process.cwd()).
+# File lives at apps/web/src/lib/security — keep WORKDIR=/app for preDeploy migrate.
 COPY --from=builder /app/apps/web/src/lib/security ./apps/web/src/lib/security
 WORKDIR /app
-CMD ["node", "apps/web/server.js"]
+# KI-030: cwd must be apps/web when Next loads next.config.ts (not /app).
+CMD ["sh", "-c", "cd /app/apps/web && exec node server.js"]

@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-21** — KI-029 mig 512–516 OK; deploy `922c8039` FAILED (headers)
+> Última actualización: **2026-07-22** — KI-030 local Docker PASS; fix CMD cwd `apps/web`; redeploy autorizado pendiente/en curso
 
 ---
 
@@ -9,13 +9,12 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** — schema prod ≥516; app viva aún SHA `3d2bba18` (deploy KI-029 falló al arrancar) |
-| **Deploy KI-029** | `922c8039-2aa3-42a0-8a18-e5ae9c5a8142` **FAILED** · tip `a82d618f` · **sin 2º redeploy** |
-| **preDeployCommand** | Manifest final: `["pnpm -C apps/web migrate:prod"]` |
-| **Migrate logs** | **SÍ** — `[migrate] run/done` 512…516 · `all migrations complete` |
-| **Prod mig** | **512–516 presentes** (read-only `DATABASE_PUBLIC_URL`) |
-| **SHA vivo (health)** | `3d2bba18bcae` (réplica anterior; nuevo deploy no healthy) |
-| **Falló runtime** | `Cannot find module './src/lib/security/headers'` → healthcheck fail · **KI-030** |
+| **Estado** | **CONDITIONAL_READY** — schema prod ≥516; app viva aún SHA `3d2bba18` hasta SUCCESS del redeploy KI-030 |
+| **KI-030 fix** | Root `Dockerfile` CMD: `cd /app/apps/web && exec node server.js` · `WORKDIR /app` (preDeploy migrate) · COPY security intacto · `.dockerignore` WIP API routes |
+| **Local Docker** | **PASS** `nelvyon-ki030:fixed` · build OK · start ~20s: `Ready on http://0.0.0.0:3000` · **sin** `Cannot find module './src/lib/security/headers'` |
+| **Gates** | vitest `securityHeaders.ssot` **3/3 PASS** · `tsc --noEmit` **0** (WIP API dirs stashed/restored) |
+| **Prod health (pre-redeploy)** | live **200** `git_sha=3d2bba18bcae` · ready **503** |
+| **Deploy KI-029** | `922c8039` **FAILED** (histórico) · tip docs `a82d618f` · **sin 2º redeploy** de ese FAILED |
 | **IA prod** | OFF |
 | **Costes nuevos** | **0** |
 
@@ -23,4 +22,4 @@
 
 ## Próximo paso EXACTO
 
-Reparar runtime `apps/web/src/lib/security/headers` en imagen root Dockerfile (COPY/resolución bajo `WORKDIR /app`) → **un** redeploy autorizado → verificar SHA vivo=`a82d618f` (o tip del fix) + health 200. **No** 2º redeploy del FAILED `922c8039`. SQL/migrate manual **prohibido**.
+Tras commit+push del fix KI-030: **un** `railway redeploy --from-source -y` en production `@nelvyon/web` / `truthful-respect` → poll SUCCESS|FAILED (sin 2º redeploy) → verificar SHA vivo ≠ `3d2bba18` + health live/ready + logs sin headers error + staging smokes vía `railway run` en `ideal-victory`. SQL/migrate manual **prohibido**.

@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-21**. Sin secretos.
+> Estado real documentado **2026-07-22**. Sin secretos.
 
 ---
 
@@ -14,8 +14,8 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ local-ai | Desktop + compose local-ai **UP** 2026-07-20 (`nelvyon-local-ai-postgres` healthy). |
-| **Railway** | 🟡 | Web **SUCCESS** SHA `3d2bba18` · health OK · **releaseCommand migrate no ejecutó** en deploy `93957043` (KI-029) |
-| **PostgreSQL** | ✅ repo / 🟡 remoto | Staging: **`516`**. Prod verificado 2026-07-21: máx **`511`** (512–516 ausentes). |
+| **Railway** | 🟡 | Web vivo SHA `3d2bba18` · KI-029 mig 512–516 OK vía preDeploy · deploy `922c8039` FAILED headers (**KI-030**) · fix local Docker PASS 2026-07-22 |
+| **PostgreSQL** | ✅ repo / ✅ prod mig | Staging: **`516`**. Prod: **512–516** aplicadas 2026-07-21 (KI-R029). |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |
 | **Ollama** | ✅ | Preflight 2026-07-20: HTTP 200, models=6 |
@@ -47,7 +47,9 @@ preDeployCommand = ["pnpm -C apps/web migrate:prod"]
 healthcheckPath = "/api/health/live"
 ```
 
-**KI-029:** `releaseCommand` previo no corría; `preDeployCommand` vacío en manifest. Fix versionado (no UI). Runner copia `apps/web/scripts` + manifests; `WORKDIR /app`; `CMD node apps/web/server.js`.
+**KI-029:** `releaseCommand` previo no corría; `preDeployCommand` vacío en manifest. Fix versionado (no UI). Runner copia `apps/web/scripts` + manifests; `WORKDIR /app`.
+
+**KI-030:** `next.config.ts` resuelve `./src/lib/security/headers` desde cwd. CMD runner: `sh -c "cd /app/apps/web && exec node server.js"` (WORKDIR sigue `/app` para preDeploy migrate). Evidencia local 2026-07-22: Ready sin module error.
 
 **Ops runbook:** `docs/OPS.md`
 

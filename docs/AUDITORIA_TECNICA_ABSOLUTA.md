@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-21**  
-> Veredicto interno: **CONDITIONAL_READY** (prod SHA `3d2bba18` sano; **KI-029** mig 511; DNS app; smokes pack LLM; IA OFF)  
-> Evidencia: deploy `93957043` SUCCESS · health live/ready · `_migrations` máx 511 · `CTO_FINAL_VERIFY.md`
+> Fecha: **2026-07-22**  
+> Veredicto interno: **CONDITIONAL_READY** (prod vivo `3d2bba18` hasta SUCCESS KI-030; schema ≥516 KI-R029; fix headers local Docker PASS; DNS app; smokes pack LLM; IA OFF)  
+> Evidencia: local `nelvyon-ki030:fixed` Ready sin headers error · `CTO_FINAL_VERIFY.md` · HANDOVER
 
 ---
 
@@ -182,7 +182,7 @@ Ver `docs/PARITY_GHL_HUBSPOT.md`. Resumen honesto: **~48 features core en códig
 
 ### Veredicto auditoría
 
-**CONDITIONAL_READY** — Bloques 3–13 ejecutados · SES ✅ · B3 iso ✅ · **no READY** (KI-028 Stripe STARTER · prod≤511 · app.nelvyon.com NXDOMAIN · IA flags OFF · sin smokes login).
+**CONDITIONAL_READY** — Bloques 3–13 ejecutados · SES ✅ · B3 iso ✅ · prod mig 512–516 ✅ (KI-R029) · **KI-030** fix local PASS (cwd apps/web) pendiente SUCCESS redeploy · **no READY** (KI-028 Stripe STARTER · app.nelvyon.com NXDOMAIN · IA flags OFF · sin smokes login).
 
 ### 10. Bloques 3–13 (2026-07-21)
 
