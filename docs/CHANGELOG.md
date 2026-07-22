@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Deploy | **Web git_sha restored** | tip `9ca0cf29a5e5` · ONE `railway redeploy --from-source` → deploy `7d625161` SUCCESS · live/apex `git_sha` match · ready 200 · FastAPI auto `25e2109d` · KI020_PASS · portal-packs SKIP (no QA password) · claimReady **false** |
 | Hardening | **SQL SSOT post-automations** | `is_duplicate_table_error` cause-chain · pytest 5/5 · `validate-sql-alembic-ssot.mjs` ALL_PASS (files + DB 517/518) · wired in `nelvyon-verify-all` · post-elite **508–518** · `SKIP_ALEMBIC=1` confirmed FastAPI · claimReady **false** |
 | Fix | **Automations 401 → 200** | Causa: FastAPI JWT_SECRET ≠ web. Sync ADR-038 · mig 517 workspaces · FastAPI DB=web Postgres · SKIP_ALEMBIC · mig 518 workflows.is_active · BFF unified **200** · portal-packs ALL_PASS · evidence `automations-401-closure-20260722.txt` |
 | Ops | **DNS/SSL app.nelvyon.com PASS** | CF CNAME+TXT · Railway verified · cert VALID · live/ready **200** · tip `8d84036055a1` · evidence `dns-app-verify-pass-20260722.txt` |

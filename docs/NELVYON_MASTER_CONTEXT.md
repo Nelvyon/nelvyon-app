@@ -1021,8 +1021,8 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | FastAPI **`0d5a7ce9`** (tip `b8a5f921`) · web `git_sha` **null** hasta 1× `--from-source` · SQL SSOT tip post-harden pending |
-| **P0 smokes** | portal-packs **ALL_PASS** · automations unified **200** · KI-020 **KI020_PASS** · mig 517/518 DB **PASS** |
+| **SHA / deploys** | tip **`9ca0cf29a5e5`** · Web **`7d625161`** · FastAPI **`25e2109d`** · SQL SSOT harden landed |
+| **P0 smokes** | KI-020 **KI020_PASS** · automations unified **200** (prior auth) · portal-packs **SKIP** this pass · mig 517/518 DB **PASS** |
 | **Blocker go-live DNS** | **RESUELTO** 2026-07-22 — `app.nelvyon.com` DNS/SSL/health PASS |
 | **verify-all** | **7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED** |
 | Bloque 1 Docker+ingest | **VERIFICADO** (`verified:true` · chunks 1559 · coverage 0.99 · claimComplete **false**) |

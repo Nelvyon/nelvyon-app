@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-07-22 — Web git_sha restore tip `9ca0cf29` (`7d625161`)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip** | `9ca0cf29a5e5` (SQL SSOT harden + docs) |
+| **Command** | `railway redeploy --service "@nelvyon/web" --from-source -y` × **1** |
+| **Web deploy** | `7d625161-5d81-4295-8c6b-5cd1417fbbc5` **SUCCESS** |
+| **SHA vivo** | `9ca0cf29a5e5` (app + apex) · live/ready **200** |
+| **FastAPI** | auto-deploy `25e2109d` **SUCCESS** · `SKIP_ALEMBIC=1` |
+| **Auto-deploy web** | tip push was **SKIPPED** (no watched files) → manual `--from-source` required |
+| **Smokes** | KI020_PASS · portal-packs **SKIP** (no STAGING_QA_PASSWORD) · prior automations 200 evidence |
+| **IA flags** | OFF · cost 0 |
+| **claimReady** | **false** |
+
 ## 2026-07-22 — Post-automations SQL SSOT harden (pre web git_sha restore)
 
 | Campo | Valor |
@@ -11,7 +25,7 @@
 | **Code** | `is_duplicate_table_error` cause-chain · pytest 5/5 · `validate-sql-alembic-ssot` ALL_PASS |
 | **FastAPI** | deploy **`0d5a7ce9` SUCCESS** · tip `b8a5f921` · `SKIP_ALEMBIC=1` confirmed |
 | **Schema DB probe** | `_migrations` **517**+**518** · `workspaces.timezone` · `workflows.is_active` |
-| **Web** | live `git_sha:null` (railway up artifact) · **1×** `--from-source` pending after tip push |
+| **Web** | was `git_sha:null` → restored in deploy `7d625161` |
 | **IA flags** | OFF · cost 0 |
 | **claimReady** | **false** |
 

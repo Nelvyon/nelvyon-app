@@ -14,7 +14,7 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ | Desktop UP 2026-07-22. `nelvyon-test-postgres` :5433 healthy · `nelvyon-local-ai-postgres` :5434 healthy. |
-| **Railway** | ✅ | FastAPI `0d5a7ce9` SUCCESS · `SKIP_ALEMBIC=1` · shared Postgres · Web live/ready 200 · `git_sha` null hasta 1× redeploy git |
+| **Railway** | ✅ | Web `7d625161` SUCCESS · SHA `9ca0cf29a5e5` · FastAPI `25e2109d` · `SKIP_ALEMBIC=1` · shared Postgres |
 | **PostgreSQL** | ✅ repo / ✅ prod | Prod `_migrations` **517+518** verified (SSOT gate DB probe) · SQL SSOT ADR-002/039 |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |

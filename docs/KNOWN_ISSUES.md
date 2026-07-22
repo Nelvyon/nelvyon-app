@@ -10,10 +10,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Ops** — restore with **one** `railway redeploy --service "@nelvyon/web" --from-source -y` after tip push |
-| **Severidad** | Baja (health live/ready OK; SHA observability only) |
-| **Detalle** | `/api/health/live` returns `git_sha:null` from CLI upload artifact. Does **not** block automations 200 / SQL SSOT. |
-| **Nota** | Do not spam redeploys. claimReady remains **false** (legal + CEO IA). |
+| **Estado** | **Resuelto 2026-07-22** → historial |
+| **Reparación** | ONE `railway redeploy --service "@nelvyon/web" --from-source -y` → deploy `7d625161` · live `git_sha=9ca0cf29a5e5` |
+| **Nota** | claimReady remains **false** (legal + CEO IA). |
 
 ### Ops (no KI) — Staging pack E2E `LLM_NOT_CONFIGURED`
 

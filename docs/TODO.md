@@ -29,9 +29,10 @@
 - [x] **KI-027** — Test brain · verify-all CONDITIONAL_READY
 - [x] Validador post-elite **508–518** + SQL SSOT gate (`validate-sql-alembic-ssot`) · DuplicateTable guard
 - [x] Automations unified **200** · JWT sync ADR-038 · mig 517/518 · `SKIP_ALEMBIC=1`
-- [ ] Ops: 1× web redeploy `--from-source` para restaurar `git_sha` (post-push tip SSOT)
+- [x] Ops: 1× web redeploy `--from-source` → `git_sha=9ca0cf29a5e5` (deploy `7d625161`)
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
 - [ ] CEO: mesh/canary IA staging opcional (flags OFF hasta aprobación)
+- [ ] Ops opcional: portal-packs refresh con `STAGING_QA_PASSWORD` (GH)
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
 - [x] Bloque 3 SaaS UUID isolation staging
 - [x] **KI-028** — Stripe STARTER · price-audit **allValid=true** (KI-R028) 2026-07-22
