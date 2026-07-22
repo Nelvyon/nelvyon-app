@@ -10,7 +10,8 @@
 | Ítem | Estado |
 |------|--------|
 | `JWT_SECRET` web = FastAPI | **Synced** 2026-07-22 (ADR-038) · FastAPI `JWT_SECRET_KEY` remains native-only |
-| Automations unified BFF | Auth 401 resolved; schema 517 for `workspaces.timezone` |
+| Automations unified BFF | **HTTP 200** · shared Postgres · mig 517/518 · `SKIP_ALEMBIC=1` |
+| OpenAI | **Key revoked** · `AUTONOMOUS_ALLOW_OPENAI` OFF · no replacement |
 
 ---
 

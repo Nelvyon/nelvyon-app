@@ -407,6 +407,17 @@
 
 ---
 
+## ADR-039 — FastAPI shares web Postgres + SKIP_ALEMBIC
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-22 |
+| **Decisión** | `nelvyon-app` `DATABASE_URL` = `@nelvyon/web` Postgres. Startup: `SKIP_ALEMBIC=1` (Node SQL migrations SSOT). Alembic non-fatal if run. `create_all` ignores wrapped DuplicateTableError. |
+| **Por qué** | Separate FastAPI DB lacked mig 517 columns; alembic `upgrade head` crashed on existing `contacts`. |
+| **Relación** | ADR-038 · mig 517/518. |
+
+---
+
 ## ADR-038 — FastAPI JWT_SECRET aligns with Next.js app JWT (bridge)
 
 | Campo | Valor |

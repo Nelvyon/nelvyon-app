@@ -1,8 +1,9 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (SHA `8d84036055a1` · DNS/SSL app **PASS** · KI020_PASS · P0 ALL_P0_PASS · flags OFF · cost 0). Pendiente: legal campañas · CEO IA mesh.  
-> Evidencia: `CTO_FINAL_VERIFY.md` · `dns-app-verify-pass-20260722.txt`
+> Veredicto interno: **CONDITIONAL_READY** (automations unified **200** · DNS/SSL app PASS · KI020_PASS · flags OFF · OpenAI key revoked · cost 0). Pendiente: legal campañas · CEO IA mesh.  
+> Evidencia: `CTO_FINAL_VERIFY.md` · `automations-401-closure-20260722.txt`
+
 
 ---
 

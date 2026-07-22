@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Fix | **Automations 401 → 200** | Causa: FastAPI JWT_SECRET ≠ web. Sync ADR-038 · mig 517 workspaces · FastAPI DB=web Postgres · SKIP_ALEMBIC · mig 518 workflows.is_active · BFF unified **200** · portal-packs ALL_PASS · evidence `automations-401-closure-20260722.txt` |
 | Ops | **DNS/SSL app.nelvyon.com PASS** | CF CNAME+TXT · Railway verified · cert VALID · live/ready **200** · tip `8d84036055a1` · evidence `dns-app-verify-pass-20260722.txt` |
 | Security | **KI-020 CSRF LIVE** | `assertSaasOrigin` prod hosts · smoke **KI020_PASS** · deploy `bebc41d7` |
 | Ops | **CEO closure DNS+smokes+backup** | Railway custom domain `app.nelvyon.com` added · CF DNS was BLOCKED_HUMAN (now PASS) · `STAGING_QA_PASSWORD` EXISTS + wired · portal-packs OPS_DEGRADED · **ALL_P0_PASS** · Backup `29932453133` · IA OFF · `claimReady: false` |

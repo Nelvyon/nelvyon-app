@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-07-22 — Automations 401 closure (FastAPI `0460249e`)
+
+| Campo | Valor |
+|-------|-------|
+| **Auth** | JWT_SECRET sync web→FastAPI (ADR-038) |
+| **Schema** | mig 517+518 applied prod Postgres |
+| **FastAPI** | shared DB · `SKIP_ALEMBIC=1` · deploy **SUCCESS** `0460249e` |
+| **BFF unified** | **200** · portal-packs ALL_PASS |
+| **claimReady** | **false** |
+
 ## 2026-07-22 — DNS/SSL verify + CSRF app Origin fix (`8d840360`)
 
 | Campo | Valor |
