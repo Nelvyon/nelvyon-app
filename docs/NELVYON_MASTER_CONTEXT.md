@@ -1016,17 +1016,20 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 ### 8.1 Veredicto
 
-**[VERIFICADO]** Fuente: HANDOVER + `AUDITORIA_TECNICA_ABSOLUTA.md` — **2026-07-21**
+**[VERIFICADO]** Fuente: HANDOVER + `AUDITORIA_TECNICA_ABSOLUTA.md` — **2026-07-22**
 
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY**) |
+| **SHA vivo prod** | `e62d52cc5d61` · deploy `1613fbb5` |
+| **P0 smokes** | **ALL_P0_PASS** · `STAGING_QA_PASSWORD` EXISTS |
+| **Blocker go-live DNS** | Cloudflare CNAME+TXT `app.nelvyon.com` (`docs/ops/DNS_APP_NELVYON.md`) |
 | **verify-all** | **7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED** |
 | Bloque 1 Docker+ingest | **VERIFICADO** (`verified:true` · chunks 1559 · coverage 0.99 · claimComplete **false**) |
 | Bloque 2 Shared Memory staging | **KI-021 verified:true** · KI-022…026 ✅ · última mig **516** · `506a` · **507 no editada** · **ADR-032** dual-plane · CLI production · `claimComplete` **false** |
 | Workforce | **PASS** (ADR-029) |
 | Elite | **PASS** (ADR-026) |
-| Freezes Router / MCP | **intactos** |
+| Freezes Router / MCP | **intactos** (flags OFF) |
 | Producto enterprise completo | **NO** |
 
 ### 8.2 Interpretación de CONDITIONAL_READY

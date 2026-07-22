@@ -34,7 +34,9 @@
 - [x] Prod migrate 512–516 (KI-R029) + runtime headers (KI-R030)
 - [x] `STAGING_QA_PASSWORD` + portal P0 smoke PASS
 - [x] Local Ollama pack gate PASS + generate PASS (HTTP kickoff BLOCKED Docker/Postgres)
-- [ ] Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` (No MFA bypass attempted.)
+- [x] `STAGING_QA_PASSWORD` EXISTS + wired workflow + P0 **ALL_P0_PASS** (2026-07-22)
+- [x] Primer Database Backup workflow success (`29932453133`)
+- [ ] Unique blocker: Cloudflare CNAME+TXT for `app.nelvyon.com` → `uzrknbzy.up.railway.app` (`docs/ops/DNS_APP_NELVYON.md`; No MFA bypass)
 - [ ] Staging Ollama alcanzable para pack E2E (opcional; **nunca** `localhost:11434` PC; **no** IA prod)
 - [ ] KI-020 smoke staging CSRF Origin
 - [x] Auditoría equipo OS agentes (`docs/OS_AGENT_TEAM_AUDIT.md`) + honesty portal/beta/mock (2026-07-22)

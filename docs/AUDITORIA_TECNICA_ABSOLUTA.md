@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (SHA vivo `06690725a67d` · deploy `9d489e77` SUCCESS · elite-next · flags OFF · cost 0). Unique blocker: CNAME `app.nelvyon.com`. Smokes: `STAGING_QA_PASSWORD`.  
-> Evidencia: `.release-logs/prod-redeploy-elite-next-20260722.txt` · `CTO_FINAL_VERIFY.md`
+> Veredicto interno: **CONDITIONAL_READY** (SHA vivo `e62d52cc5d61` · deploy `1613fbb5` · flags OFF · cost 0 · P0 **ALL_P0_PASS** · backup OK). Blocker: Cloudflare DNS `app.nelvyon.com` + legal campañas.  
+> Evidencia: `CTO_FINAL_VERIFY.md` · `CTO_FINAL_CLOSURE_AUDIT.md` · `.release-logs/staging-p0-smokes-ceo-rerun-20260722.txt`
 
 ---
 

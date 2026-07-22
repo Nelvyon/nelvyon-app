@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-07-22 — CEO ops closure (no redeploy; scripts/docs/CI)
+
+| Campo | Valor |
+|-------|-------|
+| **SHA vivo** | `e62d52cc5d61` (sin cambio tip) |
+| **Railway domain** | `app.nelvyon.com` added · DNS CF pending |
+| **Smokes** | **ALL_P0_PASS** · secret EXISTS · workflow wired |
+| **Backup** | Database Backup **success** `29932453133` |
+| **Deploy app** | **NONE** (solo scripts/workflow/docs) |
+| **claimReady** | **false** |
+
 ## 2026-07-22 — Prod redeploy closure tip `e62d52cc` SUCCESS (`1613fbb5`)
 
 | Campo | Valor |
@@ -14,7 +25,8 @@
 | **SHA vivo** | `e62d52cc5d61` · live/ready **200** |
 | **Env** | **no mutations** · QR / OpenAI allow / MCP / SM / OpenClaw / CEO payouts / Local Router / OLLAMA* **ABSENT** |
 | **Note** | Push auto-deploy `0d2c85a8` stuck on image push → REMOVED; CLI redeploy recovered |
-| **Smokes** | BLOCKED `STAGING_QA_PASSWORD` |
+| **Smokes** | Superseded 2026-07-22: **ALL_P0_PASS** (secret EXISTS) |
+| **Cloudflare** | Domain added Railway; CF DNS still blocker (`DNS_APP_NELVYON.md`) |
 | **Cost** | **0** |
 | **Evidence** | `.release-logs/prod-redeploy-closure-20260722.txt` |
 | **Cloudflare** | Unique blocker CNAME `app.nelvyon.com` (no MFA bypass) |

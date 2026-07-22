@@ -22,7 +22,7 @@
 | **OpenClaw** | 🟡 | Mock certificado; URL real ops |
 | **AWS SES** | ✅ | Production access GRANTED 2026-07-21 · self-send OK · KI-R014 |
 | **Stripe** | ✅ | sk_live + webhook; price-audit **allValid=true** (KI-R028) |
-| **Cloudflare** | 🟡 | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
+| **Cloudflare** | 🟡 | Railway domain `app.nelvyon.com` **added**; CF DNS pending — CNAME `app` → `uzrknbzy.up.railway.app` + TXT verify (`docs/ops/DNS_APP_NELVYON.md`). No MFA bypass. |
 | **Backups / DR** | ✅ | GH Action + restore drill PASS 8/8 (evidencia) |
 | **Security headers** | ✅ | SSOT `apps/web/src/lib/security/headers.ts` |
 | **Ops dashboard** | ✅ | `GET /api/platform/ops/summary` |

@@ -5,12 +5,16 @@
 
 ## Software ya existente (referencia)
 
-| Capacidad | Ubicación |
-|-----------|-----------|
-| GDPR subject rights SaaS | `SaasGdprService` · `/api/saas/compliance/gdpr` |
-| Unsubscribe campañas | `/api/saas/campanias/unsubscribe` |
-| Suppressions / bounce | SES webhook · `SaasDeliverabilityService` |
-| Cookie consent UI | `CookieBanner` · `cookieConsent.ts` |
+| Capacidad | Ubicación | Estado técnico |
+|-----------|-----------|----------------|
+| GDPR subject rights SaaS | `SaasGdprService` · `/api/saas/compliance/gdpr` | Controles de código presentes |
+| Unsubscribe campañas | `/api/saas/campanias/unsubscribe` | Controles de código presentes |
+| Suppressions / bounce | SES webhook · `SaasDeliverabilityService` | Controles de código presentes |
+| Cookie consent UI | `CookieBanner` · `cookieConsent.ts` | Controles de código presentes |
+| Audit / límites envío | Campañas + deliverability services | Controles de código presentes |
+| Trazabilidad bajas | GDPR + unsubscribe paths | Controles de código presentes |
+
+> Completar controles técnicos ≠ cumplimiento legal. No afirmar RGPD/LSSI “cumplido”.
 
 ## Checklist CEO antes de campaña
 

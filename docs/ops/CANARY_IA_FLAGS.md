@@ -1,7 +1,7 @@
 # Canary IA flags — prep only (all OFF by default)
 
 > **Status:** PREPARADO · **no activated** · 2026-07-22 · Coste 0  
-> Prod SHA live: `06690725a67d` · Flags Railway: **ABSENT**
+> Prod SHA live: `e62d52cc5d61` · Flags Railway: **ABSENT**
 
 ## Principle
 

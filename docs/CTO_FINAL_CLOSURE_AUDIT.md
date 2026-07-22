@@ -2,7 +2,7 @@
 
 > `claimComplete: false` · `claimReady: false` · `claimEliteOps: false`  
 > Prod: SHA **`e62d52cc5d61`** · deploy `1613fbb5` · live/ready **200** · coste **0**  
-> Evidence: `.release-logs/prod-redeploy-closure-20260722.txt`
+> Evidence: `.release-logs/prod-redeploy-closure-20260722.txt` · `staging-p0-smokes-ceo-rerun-20260722.txt` · backup run `29932453133`
 
 ## Clasificación
 
@@ -16,28 +16,29 @@
 | Local AI mesh Tailscale | **PREPARADO** doc · **BLOQUEADO EXTERNO** (CEO) |
 | Quality routing 3b/8b | **IMPLEMENTADO** OFF default · **PREPARADO** canary |
 | Router/MCP/SM/OpenClaw/OpenAI/payouts | **OFF** ABSENT Railway |
-| Growth packs wiring | **VERIFICADO LOCAL** path · PROD IA **BLOQUEADO** (flags) |
+| Growth packs P0 smokes | **ALL_P0_PASS** (2026-07-22 rerun) |
 | Beta → available | **BLOQUEADO** evidencia insuficiente (correcto) |
 | Partners calc/dashboard | **OPERATIVO LIVE** · payouts **OFF** |
 | Sector/SERVICE playbooks | **IMPLEMENTADO** (11+3+beta honesty) |
 | Crons CRON_SECRET | **VERIFICADO** fail-closed código |
-| Backups / restore drill | **PREPARADO** · evidence JSON existe · CEO primer run |
-| Cloudflare `app.nelvyon.com` | **BLOQUEADO EXTERNO** NXDOMAIN |
-| `STAGING_QA_PASSWORD` | **BLOQUEADO EXTERNO** secret ausente |
+| Backups | **VERIFICADO** workflow success `29932453133` · restore drill doc |
+| Railway `app.nelvyon.com` domain | **AÑADIDO** · pending CF DNS |
+| Cloudflare DNS | **BLOQUEADO EXTERNO** NXDOMAIN |
+| `STAGING_QA_PASSWORD` | **EXISTS** · wired en workflow |
+| Automations unified BFF | **OPS_DEGRADED** 401 (FastAPI auth/tenant) — packs P0 no bloqueados |
 | Campañas base empresas | **BLOQUEADO LEGAL** checklist |
 
-## Pendientes reales (solo)
+## Pendientes reales (solo externos / CEO / legal)
 
 | Pendiente | Responsable |
 |-----------|-------------|
-| CNAME `app` → Railway | Humano Cloudflare |
-| Secret `STAGING_QA_PASSWORD` en CI | CEO / ops |
+| CNAME+TXT Cloudflare (`docs/ops/DNS_APP_NELVYON.md`) | Humano |
 | Aprobar mesh Ollama Option A/B | CEO |
-| Canary staging Router+QR (opcional) | CEO vía `CANARY_IA_FLAGS.md` |
-| Primer run workflow Database Backup | CEO |
+| Canary staging Router+QR (+SM opcional) | CEO vía `CANARY_IA_FLAGS.md` |
 | Revisión legal antes campañas | CEO + abogado |
 | Promote beta packs | Ingeniería tras cert+mappers |
+| Alinear seed QA hash con secret (si CI login falla) | Ops |
 
 ## Flags OFF confirmados (Railway)
 
-ABSENT: `AUTONOMOUS_QUALITY_ROUTING`, `AUTONOMOUS_ALLOW_OPENAI`, `NELVYON_MCP_PRODUCTIVE_ENABLED`, `NELVYON_SHARED_MEMORY_ENABLED`, `NELVYON_CEO_PARTNER_PAYOUTS`, `NELVYON_LOCAL_ROUTER_ENABLED`, `NELVYON_AI_ENABLED`, `OPENCLAW*`, `OLLAMA*`
+ABSENT (no activados en este cierre): quality routing, OpenAI allow, MCP productive, Shared Memory, CEO partner payouts, Local Router, AI enabled, OpenClaw*, OLLAMA*

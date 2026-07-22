@@ -12,7 +12,7 @@
 |-------|-------|
 | **Estado** | **Abierto** (ops humano) |
 | **Severidad** | Bloqueador go-live DNS |
-| **Detalle** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
+| **Detalle** | Railway custom domain ACTIVE (pending ownership). CF: CNAME `app` → `uzrknbzy.up.railway.app` (DNS-only) + TXT `_railway-verify.app` — `docs/ops/DNS_APP_NELVYON.md`. No MFA bypass. |
 | **Nota** | Sin API token / wrangler; no bypass MFA |
 
 ### Ops (no KI) — Staging pack E2E `LLM_NOT_CONFIGURED`
