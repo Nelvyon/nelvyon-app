@@ -7,7 +7,9 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
-| Local E2E | **Ollama evidence** | tags=6 · generate PASS · pack gate PASS 51 · vitest ollama FAIL 1/3 WIP · HTTP kickoff BLOCKED (Docker/Postgres) · docs `e15055e9`+ · no staging localhost · IA OFF |
+| Autonomous | **Ollama-first llmAdapter** | `isAutonomousOllamaConfigured` · Ollama→OpenAI→mock · vitest `llmAdapter.ollama` **3/3** · phaseC **10/10** |
+| Local E2E | **HTTP pack + Ollama** | Docker :5433/:5434 healthy · migrate+seed QA · Next dev OLLAMA_* · kickoff `mode=real` ×56 · smoke as-complete 🟡 `needs_review` (QA&lt;85 3b) · gate ALL_PASS 51 · logs `.release-logs/local-http-pack-e2e-ollama-20260722.txt` · `.release-logs/local-cierre-tecnico-20260722.txt` |
+| Local E2E | **Ollama evidence (prev)** | tags=6 · generate PASS · pack gate PASS 51 · vitest ollama FAIL 1/3 WIP (superseded) · HTTP kickoff BLOCKED Docker (superseded) · docs `e15055e9`+ · no staging localhost · IA OFF |
 | Cloudflare | **Sole blocker** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
 | KI-028 | **Cerrado → KI-R028** | price-audit prod **allValid=true** (starter/pro/agency retrieve+active); sin crear precios/cobros |
 | DNS | **app NXDOMAIN** | wrangler/API token ausentes · paso humano CNAME `app` → `nelvyonweb-production.up.railway.app` |

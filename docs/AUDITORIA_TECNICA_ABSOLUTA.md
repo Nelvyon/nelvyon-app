@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (SHA `bba71f14` · KI-R028/R029/R030 · local Ollama E2E parcial · IA OFF). Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted.  
-> Evidencia: price-audit allValid · health 200 · `.release-logs/local-pack-e2e-ollama-20260722.txt` · `CTO_FINAL_VERIFY.md`
+> Veredicto interno: **CONDITIONAL_READY** (SHA `bba71f14` · KI-R028/R029/R030 · Ollama-first llmAdapter + local HTTP kickoff `mode=real` · IA OFF). Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted.  
+> Evidencia: price-audit allValid · health 200 · vitest ollama 3/3 · pack gate 51 · `.release-logs/local-http-pack-e2e-ollama-20260722.txt` · `CTO_FINAL_VERIFY.md`
 
 ---
 

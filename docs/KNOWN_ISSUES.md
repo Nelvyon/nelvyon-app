@@ -20,8 +20,17 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Ops gap** — **no** reabrir KI |
-| **Detalle** | Staging AUTONOMOUS sin Ollama/OpenAI. Local Ollama OK (2026-07-22). **Prohibido** staging `OLLAMA_HOST=localhost:11434`. |
-| **Evidencia** | `.release-logs/local-pack-e2e-ollama-20260722.txt` · pack gate local PASS |
+| **Detalle** | Staging AUTONOMOUS sin Ollama/OpenAI. Local Ollama OK (2026-07-22) + Ollama-first `llmAdapter` (vitest 3/3; HTTP kickoff 56× `mode=real`). **Prohibido** staging `OLLAMA_HOST=localhost:11434`. |
+| **Evidencia** | `.release-logs/local-http-pack-e2e-ollama-20260722.txt` · pack gate local PASS · as-complete local 🟡 `needs_review` (QA&lt;85 3b, no config fail) |
+
+### Ops (no KI) — Local pack as-complete con Ollama 3b
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Observado** — no bloquea go-live DNS |
+| **Severidad** | Baja (local QA quality) |
+| **Detalle** | Kickoff HTTP local+Ollama completa pipeline en `needs_review` cuando artifacts 3b no alcanzan QA≥85. Mock fixtures / modelos mayores pueden auto-aprobar. Adapter contract OK. |
+| **Evidencia** | run `67b41b54…` status=needs_review · Next logs 56× real |
 
 ### KI-027 - Test drift brain knowledge (`ingestEvidence.verified`)
 

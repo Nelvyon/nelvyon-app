@@ -13,12 +13,12 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | 🟡 | Desktop **DOWN** 2026-07-22 (pack HTTP E2E local BLOCKED). Compose local-ai was UP 2026-07-20. |
-| **Railway** | ✅ | Web **SUCCESS** SHA `bba71f14` · health live/ready 200 · KI-R030 · schema ≥516 (KI-R029) |
-| **PostgreSQL** | ✅ repo / ✅ prod mig | Staging: **`516`**. Prod: **512–516** aplicadas 2026-07-21 (KI-R029). Local :5432/5433/5434 **closed** 2026-07-22. |
+| **Docker** | ✅ | Desktop UP 2026-07-22. `nelvyon-test-postgres` :5433 healthy · `nelvyon-local-ai-postgres` :5434 healthy. |
+| **Railway** | ✅ | Web **SUCCESS** SHA `bba71f14` · health live/ready 200 · KI-R030 · schema ≥516 (KI-R029) · **no deploy** esta pasada |
+| **PostgreSQL** | ✅ repo / ✅ prod mig / ✅ local test | Staging: **`516`**. Prod: **512–516** (KI-R029). Local test `nelvyon_test` :5433 migrated+seed QA 2026-07-22. |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |
-| **Ollama** | ✅ local | 2026-07-22: `127.0.0.1:11434` HTTP 200 · 6 models · `/api/generate` PASS. **No** set staging `OLLAMA_HOST=localhost` (Railway cannot reach PC). |
+| **Ollama** | ✅ local | 2026-07-22: `127.0.0.1:11434` · 6 models · `/api/generate` PASS · pack kickoff HTTP **56× mode=real** via Ollama-first `llmAdapter`. **No** set staging `OLLAMA_HOST=localhost` (Railway cannot reach PC). |
 | **OpenClaw** | 🟡 | Mock certificado; URL real ops |
 | **AWS SES** | ✅ | Production access GRANTED 2026-07-21 · self-send OK · KI-R014 |
 | **Stripe** | ✅ | sk_live + webhook; price-audit **allValid=true** (KI-R028) |

@@ -4,17 +4,36 @@
 
 ---
 
-## 2026-07-22 — Docs push + local pack E2E Ollama (sin deploy)
+## 2026-07-22 — Ollama-first llmAdapter + local HTTP pack E2E (sin deploy)
+
+| Campo | Valor |
+|-------|-------|
+| **Deploy** | **No** (code+docs only; no Railway; no prod AI flags) |
+| **Commit** | `fix(autonomous): Ollama-first llmAdapter contract + local pack E2E evidence` |
+| **Ollama** | `:11434` models=6 · `/api/generate` PASS (`llama3.2:3b`) |
+| **Vitest** | `llmAdapter.ollama` **3/3** · `phaseC` **10/10** |
+| **Pack gate** | `run-os-pack-gate` **ALL_GATE_PASS** 51 · `.release-logs/local-cierre-tecnico-20260722.txt` |
+| **HTTP kickoff** | Next **dev** + OLLAMA_* · kickoff POST PASS · **56× mode=real** · smoke as-complete 🟡 `needs_review` (QA&lt;85) |
+| **Docker** | test Postgres :5433 + local-ai Postgres :5434 healthy · migrate+seed QA |
+| **Staging localhost** | **No** set |
+| **OpenAI paid** | **None** |
+| **IA prod** | OFF |
+| **Evidencia** | `.release-logs/local-http-pack-e2e-ollama-20260722.txt` |
+| **Cloudflare** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
+
+---
+
+## 2026-07-22 — Docs push + local pack E2E Ollama (pasada previa, sin deploy)
 
 | Campo | Valor |
 |-------|-------|
 | **Deploy** | **No** (docs only) |
 | **Commit 1** | `e15055e9` — `docs(ops): close KI-R028 Stripe; classify LLM staging; DNS CNAME blocker` · pushed |
-| **Commit 2** | local E2E evidence + Cloudflare sole blocker (docs) |
+| **Commit 2** | `7d543d6e` local E2E evidence + Cloudflare sole blocker (docs) |
 | **Ollama** | `:11434` models=6 · `/api/generate` PASS (`llama3.2:3b`) |
 | **Pack gate B** | `run-os-pack-gate` **ALL_GATE_PASS** 51 tests |
-| **Vitest A** | `llmAdapter.ollama` **FAIL** 1/3 (WIP mocks) |
-| **HTTP kickoff C** | **BLOCKED** — Docker DOWN · Postgres ports closed · sqlite `.env` · no QA auth |
+| **Vitest A** | `llmAdapter.ollama` **FAIL** 1/3 (WIP — superseded by Ollama-first fix) |
+| **HTTP kickoff C** | **BLOCKED** then — Docker was DOWN (superseded) |
 | **Staging localhost** | **No** set |
 | **IA prod** | OFF |
 | **Evidencia** | `.release-logs/local-pack-e2e-ollama-20260722.txt` |

@@ -1,8 +1,9 @@
 /**
- * LLM Adapter — mock | real (OpenAI) with automatic fallback
+ * LLM Adapter — mock | real (Ollama-first, OpenAI fallback) with automatic mock fallback.
  * No sensitive prompt logging — only agent id, mode, token count.
  */
 
+import { getOllamaClient } from "../../local-ai/OllamaClient";
 import { parseJsonFromLlm } from "./parseJson";
 import type { AgentRole } from "./promptTemplates";
 import { buildUserPrompt, getSystemPrompt } from "./promptTemplates";
@@ -34,9 +35,21 @@ export function setLlmInvokeForTests(fn: LlmInvokeFn | null): void {
   customInvoke = fn;
 }
 
+/** True when autonomous pack pipeline can use local Ollama (primary real path). */
+export function isAutonomousOllamaConfigured(): boolean {
+  if (process.env.OLLAMA_CONFIGURED?.trim() === "1") return true;
+  return Boolean(
+    process.env.OLLAMA_HOST?.trim() ||
+      process.env.OLLAMA_BASE_URL?.trim() ||
+      process.env.NELVYON_LOCAL_AI_URL?.trim() ||
+      process.env.LOCAL_AI_BASE_URL?.trim(),
+  );
+}
+
 export function resolveLlmMode(): LlmMode {
   if (process.env.AUTONOMOUS_LLM_MODE === "mock") return "mock";
   if (process.env.AUTONOMOUS_LLM_MODE === "real") return "real";
+  if (isAutonomousOllamaConfigured()) return "real";
   const key = process.env.OPENAI_API_KEY?.trim();
   return key ? "real" : "mock";
 }
@@ -62,6 +75,26 @@ function logLlmEvent(event: {
     .filter(Boolean)
     .join(" ");
   console.error(msg);
+}
+
+async function callOllama(
+  system: string,
+  user: string,
+): Promise<{ content: string; tokens: number; model: string }> {
+  const result = await getOllamaClient().chat(
+    [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+    { format: "json" },
+  );
+  const content = result.content?.trim() ?? "";
+  if (!content) throw new Error("Ollama empty content");
+  return {
+    content,
+    tokens: (result.evalCount ?? 0) + (result.promptEvalCount ?? 0),
+    model: result.model || "ollama",
+  };
 }
 
 async function callOpenAi(system: string, user: string): Promise<{ content: string; tokens: number; model: string }> {
@@ -115,6 +148,33 @@ async function callOpenAi(system: string, user: string): Promise<{ content: stri
   }
 }
 
+function mockFallback(
+  req: LlmRequest,
+  started: number,
+  reason: string,
+): LlmResponse {
+  const parsed = req.mockGenerator();
+  const response: LlmResponse = {
+    mode: "mock",
+    agentId: req.agentId,
+    model: "mock-rules-v1",
+    parsed,
+    tokens: 0,
+    fallbackReason: reason,
+    duration_ms: Date.now() - started,
+  };
+  logLlmEvent({
+    agentId: req.agentId,
+    mode: "mock",
+    model: response.model,
+    ok: true,
+    tokens: 0,
+    fallbackReason: response.fallbackReason,
+    duration_ms: response.duration_ms,
+  });
+  return response;
+}
+
 export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
   if (customInvoke) return customInvoke(req);
 
@@ -124,72 +184,78 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
   const user = buildUserPrompt(req.agentId, req.payload);
 
   if (preferred === "mock") {
-    const parsed = req.mockGenerator();
-    const response: LlmResponse = {
-      mode: "mock",
-      agentId: req.agentId,
-      model: "mock-rules-v1",
-      parsed,
-      tokens: 0,
-      fallbackReason: "AUTONOMOUS_LLM_MODE=mock or no OPENAI_API_KEY",
-      duration_ms: Date.now() - started,
-    };
-    logLlmEvent({
-      agentId: req.agentId,
-      mode: "mock",
-      model: response.model,
-      ok: true,
-      tokens: 0,
-      fallbackReason: response.fallbackReason,
-      duration_ms: response.duration_ms,
-    });
-    return response;
+    return mockFallback(
+      req,
+      started,
+      "AUTONOMOUS_LLM_MODE=mock or no Ollama/OpenAI configured",
+    );
   }
 
-  try {
-    const { content, tokens, model } = await callOpenAi(system, user);
-    const parsed = parseJsonFromLlm(content);
-    if (!parsed || typeof parsed !== "object") {
-      throw new Error("LLM response is not valid JSON object");
+  const failures: string[] = [];
+
+  if (isAutonomousOllamaConfigured()) {
+    try {
+      const { content, tokens, model } = await callOllama(system, user);
+      const parsed = parseJsonFromLlm(content);
+      if (!parsed || typeof parsed !== "object") {
+        throw new Error("Ollama response is not valid JSON object");
+      }
+      const response: LlmResponse = {
+        mode: "real",
+        agentId: req.agentId,
+        model,
+        parsed,
+        tokens,
+        duration_ms: Date.now() - started,
+      };
+      logLlmEvent({
+        agentId: req.agentId,
+        mode: "real",
+        model,
+        ok: true,
+        tokens,
+        duration_ms: response.duration_ms,
+      });
+      return response;
+    } catch (err) {
+      failures.push(`ollama: ${err instanceof Error ? err.message : "unknown_error"}`);
     }
-    const response: LlmResponse = {
-      mode: "real",
-      agentId: req.agentId,
-      model,
-      parsed,
-      tokens,
-      duration_ms: Date.now() - started,
-    };
-    logLlmEvent({
-      agentId: req.agentId,
-      mode: "real",
-      model,
-      ok: true,
-      tokens,
-      duration_ms: response.duration_ms,
-    });
-    return response;
-  } catch (err) {
-    const reason = err instanceof Error ? err.message : "unknown_error";
-    const parsed = req.mockGenerator();
-    const response: LlmResponse = {
-      mode: "mock",
-      agentId: req.agentId,
-      model: "mock-rules-v1",
-      parsed,
-      tokens: 0,
-      fallbackReason: reason,
-      duration_ms: Date.now() - started,
-    };
-    logLlmEvent({
-      agentId: req.agentId,
-      mode: "mock",
-      model: response.model,
-      ok: true,
-      tokens: 0,
-      fallbackReason: reason,
-      duration_ms: response.duration_ms,
-    });
-    return response;
   }
+
+  if (process.env.OPENAI_API_KEY?.trim()) {
+    try {
+      const { content, tokens, model } = await callOpenAi(system, user);
+      const parsed = parseJsonFromLlm(content);
+      if (!parsed || typeof parsed !== "object") {
+        throw new Error("LLM response is not valid JSON object");
+      }
+      const response: LlmResponse = {
+        mode: "real",
+        agentId: req.agentId,
+        model,
+        parsed,
+        tokens,
+        duration_ms: Date.now() - started,
+        fallbackReason: failures.length ? failures.join("; ") : undefined,
+      };
+      logLlmEvent({
+        agentId: req.agentId,
+        mode: "real",
+        model,
+        ok: true,
+        tokens,
+        fallbackReason: response.fallbackReason,
+        duration_ms: response.duration_ms,
+      });
+      return response;
+    } catch (err) {
+      failures.push(`openai: ${err instanceof Error ? err.message : "unknown_error"}`);
+    }
+  }
+
+  return mockFallback(
+    req,
+    started,
+    failures.length > 0 ? failures.join("; ") : "no_llm_provider_available",
+  );
 }
