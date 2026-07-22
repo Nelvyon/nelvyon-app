@@ -10,7 +10,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** |
-| **Tip repo** | `0f6ae7c5fb09` · **SHA vivo web** `9ca0cf29a5e5` (sin redeploy) |
+| **Tip repo** | `776ae8533bf8` · **SHA vivo web** `9ca0cf29a5e5` (sin redeploy) |
 | **Web prod** | deploy `7d625161` **SUCCESS** · live `git_sha=9ca0cf29a5e5` · ready **200** |
 | **FastAPI prod** | deploy `25e2109d` **SUCCESS** · `/health` **200** · `SKIP_ALEMBIC=1` |
 | **app.nelvyon.com** | DNS/SSL/health **PASS** |
