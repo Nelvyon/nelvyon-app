@@ -238,4 +238,45 @@ describe("packOrchestrator — auto-approve", () => {
     );
     expect(approveUpdates.length).toBe(0);
   });
+
+  it("weak 3B-class QA (score 55) never false PASS — needs_review + no auto-approve (threshold ≥85)", async () => {
+    mockSimulate.mockReturnValueOnce({
+      project: {
+        qa: { score: 55, passed: false, model: "llama3.2:3b-instruct-q4_K_M" },
+        project_id: "proj-3b-weak",
+        sku: "NELVYON-LANDING",
+        artifacts: {},
+        os_refs: {},
+      },
+      escalated: false,
+      os_publish: { deliverables: [] },
+      simulation_mode: "production",
+    });
+
+    await runGrowthPack({ workspaceId: 1, userId: "user-1", config: makeConfig() });
+
+    const completedCall = (mockUpdatePackRun.mock.calls as unknown[][]).find(
+      (args) => {
+        const patch = args[1] as Record<string, unknown>;
+        return patch.status === "completed";
+      },
+    );
+    expect(completedCall).toBeUndefined();
+
+    const reviewCall = (mockUpdatePackRun.mock.calls as unknown[][]).find(
+      (args) => {
+        const patch = args[1] as Record<string, unknown>;
+        return patch.status === "needs_review";
+      },
+    );
+    expect(reviewCall).toBeDefined();
+
+    const approveUpdates = (mockQuery.mock.calls as unknown[][]).filter(
+      (args) =>
+        typeof args[0] === "string" &&
+        (args[0] as string).includes("approved_by_client") &&
+        (args[0] as string).includes("UPDATE"),
+    );
+    expect(approveUpdates.length).toBe(0);
+  });
 });

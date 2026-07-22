@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-07-22 — Total internal-safe closure (docs + P0 honesty · **no** web redeploy)
+
+| Campo | Valor |
+|-------|-------|
+| **Live SHA** | unchanged `9ca0cf29a5e5` · deploy `7d625161` |
+| **FastAPI** | `/health` **200** · deploy `25e2109d` |
+| **Smokes** | portal-packs **PASS** `29943785978` · pack E2E → SKIP_IA_OFF (post-push) |
+| **Backup** | **DONE** `29932453133` |
+| **Redeploy** | **NO** (smokes/docs/prep only) |
+| **IA flags** | OFF · cost 0 |
+| **claimReady** | **false** |
+
 ## 2026-07-22 — Web git_sha restore tip `9ca0cf29` (`7d625161`)
 
 | Campo | Valor |

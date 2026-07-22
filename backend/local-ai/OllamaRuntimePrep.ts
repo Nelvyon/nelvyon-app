@@ -122,6 +122,8 @@ export function getLocalAiRuntimePrepSnapshot(): {
   strategyModel: string | null;
   fastModel: string | null;
   neoActivationBlocked: string[];
+  probeTimeoutMsDefault: number;
+  rollbackHints: string[];
 } {
   const hostSafety = assertOllamaHostSafeForRuntime();
   return {
@@ -138,5 +140,39 @@ export function getLocalAiRuntimePrepSnapshot(): {
       "Do not set AUTONOMOUS_ALLOW_OPENAI=1 by default",
       "Do not install Tailscale/WireGuard without CEO approval",
     ],
+    probeTimeoutMsDefault: 5_000,
+    rollbackHints: [
+      "Unset OLLAMA_HOST / OLLAMA_BASE_URL / OLLAMA_CONFIGURED",
+      "Set AUTONOMOUS_QUALITY_ROUTING=0",
+      "Set NELVYON_LOCAL_ROUTER_ENABLED=0 / NELVYON_AI_ENABLED=0",
+      "Verify /api/health/ready after env rollback",
+    ],
+  };
+}
+
+/** Ops metrics-shaped probe (fail-closed) — safe when IA OFF. */
+export async function collectLocalAiPrepMetrics(opts?: {
+  timeoutMs?: number;
+  allowLoopback?: boolean;
+}): Promise<{
+  prepared: boolean;
+  qualityRouting: boolean;
+  hostOk: boolean;
+  probeOk: boolean;
+  latencyMs: number;
+  reason: string;
+}> {
+  const snap = getLocalAiRuntimePrepSnapshot();
+  const probe = await probeOllamaHealth({
+    timeoutMs: opts?.timeoutMs ?? snap.probeTimeoutMsDefault,
+    allowLoopback: opts?.allowLoopback,
+  });
+  return {
+    prepared: snap.hostSafety.ok && !snap.qualityRouting,
+    qualityRouting: snap.qualityRouting,
+    hostOk: snap.hostSafety.ok,
+    probeOk: probe.ok,
+    latencyMs: probe.latencyMs,
+    reason: probe.ok ? "ok" : probe.reason || snap.hostSafety.reason,
   };
 }

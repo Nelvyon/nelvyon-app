@@ -22,7 +22,7 @@
 | Portal cliente BFF | ✅ | |
 | OS packs (3 growth) + kickoff | ✅ | |
 | CEO metrics dashboard packs | ✅ | PackReportDashboard |
-| CI GitHub Actions (gates, smokes) | ✅ | `.github/workflows/` |
+| CI GitHub Actions (gates, smokes) | ✅ | portal-packs PASS · pack E2E SKIP_IA_OFF (ADR-040) |
 | Supabase + RLS service_role | 🟡 | Migración 280; apply prod |
 | Cloudflare DNS/WAF | ✅ | `app.nelvyon.com` verified · cert VALID · health 200 (2026-07-22) |
 | Docker compose test (PG+Redis) | 🟡 | `docker-compose.test.yml` |

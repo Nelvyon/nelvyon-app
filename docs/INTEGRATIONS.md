@@ -3,7 +3,7 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-22**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** DNS `app.nelvyon.com` **RESUELTO** · legal campañas · CEO IA mesh. Flags SM/OpenClaw/OpenAI/MCP/Router/QR **OFF**. OpenAI API key **revoked**. Pack E2E staging LLM = ops gap (no KI reopen).
+**Bloqueadores go-live:** DNS `app.nelvyon.com` **RESUELTO** · legal campañas · CEO IA mesh. Flags SM/OpenClaw/OpenAI/MCP/Router/QR **OFF**. OpenAI API key **revoked**. Pack E2E staging = **SKIP_IA_OFF** honesto hasta canary (ADR-040). OAuth ops checklist: `docs/ops/INTEGRATIONS_OAUTH_HEALTH_CHECKLIST.md`.
 
 ### Auth bridge Web ↔ FastAPI
 

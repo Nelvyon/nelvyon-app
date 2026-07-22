@@ -6,6 +6,7 @@
  */
 import { installScriptTimeoutGuard } from "./lib/smoke-fetch.mjs";
 import { waitForStagingDeploy } from "./lib/wait-for-deploy.mjs";
+import { exitSkipIaOff, isLlmNotConfiguredResponse } from "./lib/p0-llm-skip.mjs";
 
 const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
 const BACKEND_API =
@@ -136,6 +137,9 @@ async function kickoffLocalPack(token, workspaceId) {
 
   if (!res.ok) {
     const err = await res.text();
+    if (isLlmNotConfiguredResponse(res.status, err)) {
+      exitSkipIaOff("local-pack-e2e", res.status, err);
+    }
     fail("kickoff", "POST local-business-growth", `HTTP ${res.status} ${err.slice(0, 200)}`);
     return null;
   }

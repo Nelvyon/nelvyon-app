@@ -37,6 +37,16 @@ describe("autonomous quality routing 3b/8b (ADR-036)", () => {
     expect(resolveAutonomousOllamaModel("agent-copywriter-landing").reason).toBe("quality_routing_off");
   });
 
+  it("never enables 8b path unless AUTONOMOUS_QUALITY_ROUTING=1 exactly", () => {
+    process.env.AUTONOMOUS_QUALITY_ROUTING = "true";
+    expect(isAutonomousQualityRoutingEnabled()).toBe(false);
+    process.env.AUTONOMOUS_QUALITY_ROUTING = "0";
+    expect(isAutonomousQualityRoutingEnabled()).toBe(false);
+    process.env.OLLAMA_STRATEGY_MODEL = "llama3.1:8b-instruct-q4_K_M";
+    expect(resolveAutonomousOllamaModel("agent-copywriter-landing").slot).toBe("fast");
+    expect(resolveAutonomousOllamaModel("agent-copywriter-landing").reason).toBe("quality_routing_off");
+  });
+
   it("routes critical copywriter to strategy 8b when enabled", () => {
     process.env.AUTONOMOUS_QUALITY_ROUTING = "1";
     process.env.OLLAMA_MODEL = "llama3.2:3b-instruct-q4_K_M";

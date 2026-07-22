@@ -37,5 +37,7 @@ describe("OllamaRuntimePrep fail-closed", () => {
     const s = getLocalAiRuntimePrepSnapshot();
     expect(s.qualityRouting).toBe(false);
     expect(s.neoActivationBlocked.length).toBeGreaterThan(0);
+    expect(s.probeTimeoutMsDefault).toBe(5_000);
+    expect(s.rollbackHints.length).toBeGreaterThan(0);
   });
 });

@@ -8,6 +8,7 @@ import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
 import { isSesEnvConfigured } from "./saasEnv";
+import { buildCampaniaLegalAuditDetails } from "./companyDbCampaignLegalGate";
 
 const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
 
@@ -84,6 +85,11 @@ export type AudienceFilter = {
   deal_stage?: DealStage;
   /** Contacts with any open deal (stage not won/lost). */
   deal_open_only?: boolean;
+  /**
+   * Optional honesty field: provenance of the audience list
+   * (e.g. "crm_opt_in", "partner_licensed"). Never invent; required for company-DB imports.
+   */
+  source_trace?: string;
 };
 
 export interface SaasCampania {
@@ -215,6 +221,14 @@ function assertAudienceFilter(filter: AudienceFilter): void {
   }
   if (filter.deal_open_only !== undefined && typeof filter.deal_open_only !== "boolean") {
     throw new SaasCampaniasError("Invalid audience deal_open_only", "VALIDATION");
+  }
+  if (filter.source_trace !== undefined) {
+    if (typeof filter.source_trace !== "string" || filter.source_trace.trim().length === 0) {
+      throw new SaasCampaniasError("Invalid audience source_trace", "VALIDATION");
+    }
+    if (filter.source_trace.length > 200) {
+      throw new SaasCampaniasError("audience source_trace too long", "VALIDATION");
+    }
   }
 }
 
@@ -705,7 +719,15 @@ ${ctaBlock}
       [tenantId, campaniaId, sentCount],
     );
 
-    void this.audit?.log(tenantId, { action: "send", module: "campanias", resourceId: campaniaId, details: { totalSent: sentCount } });
+    void this.audit?.log(tenantId, {
+      action: "send",
+      module: "campanias",
+      resourceId: campaniaId,
+      details: buildCampaniaLegalAuditDetails({
+        totalSent: sentCount,
+        audienceFilter: campania.audienceFilter as Record<string, unknown>,
+      }),
+    });
     if (meterEmails > 0 || meterSms > 0) {
       void import("./SaasUsageMeterService").then(({ getSaasUsageMeterService }) => {
         const meter = getSaasUsageMeterService();

@@ -11,10 +11,13 @@
 | Unsubscribe campañas | `/api/saas/campanias/unsubscribe` | Controles de código presentes |
 | Suppressions / bounce | SES webhook · `SaasDeliverabilityService` | Controles de código presentes |
 | Cookie consent UI | `CookieBanner` · `cookieConsent.ts` | Controles de código presentes |
-| Audit / límites envío | Campañas + deliverability services | Controles de código presentes |
+| Audit / límites envío | Campañas + deliverability + usage meter | Controles de código presentes |
 | Trazabilidad bajas | GDPR + unsubscribe paths | Controles de código presentes |
+| Source trace audiencia | `audience_filter.source_trace` + audit `legalGate` | **2026-07-22** · `companyDbCampaignLegalGate.ts` |
+| Env marker legal | `NELVYON_COMPANY_DB_CAMPAIGNS_LEGAL=1` | Solo tras firma humana — **no set** |
 
 > Completar controles técnicos ≠ cumplimiento legal. No afirmar RGPD/LSSI “cumplido”.
+> **BLOQUEADO_LEGAL** permanece hasta firma CEO + asesoría. No importar DB empresas desde Cursor.
 
 ## Checklist CEO antes de campaña
 

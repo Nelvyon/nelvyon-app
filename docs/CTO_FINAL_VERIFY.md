@@ -1,38 +1,57 @@
-# CTO Final Verify — 2026-07-22 (Post-automations SQL SSOT + web git_sha)
+# CTO Final Verify — 2026-07-22 (Total internal-safe closure)
 
-> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimReady` **false** (legal + IA CEO)  
-> Tip **`9ca0cf29a5e5`** · Web deploy **`7d625161` SUCCESS** · FastAPI **`25e2109d` SUCCESS** · Coste **0**
+> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimReady` **false**  
+> Tip repo post-push · Web live SHA **`9ca0cf29a5e5`** · deploy **`7d625161`** · FastAPI **`25e2109d`** · Coste **0**  
+> **Plataforma lista técnicamente (condicional)** ≠ **superioridad con clientes**
 
-## Automations 401 — causa y solución
+## Strict matrix
 
-| Paso | Evidencia |
-|------|-----------|
-| Causa | FastAPI `JWT_SECRET` ≠ web → `Invalid or expired authentication token` |
-| Fix auth | Sync JWT_SECRET (ADR-038); keep `JWT_SECRET_KEY` native |
-| Fix schema | mig **517** workspaces.* · mig **518** workflows.is_active+ |
-| Fix runtime | FastAPI DB = web Postgres · `SKIP_ALEMBIC=1` · create_all duplicate ignore |
-| BFF unified | **HTTP 200** (auth) · portal-packs prior PASS · unauth **401** expected |
+| Capacidad | IMPLEMENTADO | VERIFICADO LOCAL | VERIFICADO STAGING | VERIFICADO PROD | PREPARADO OFF | BLOQUEO EXTERNO | CEO | LEGAL | MERCADO |
+|-----------|--------------|------------------|--------------------|-----------------|---------------|-----------------|-----|-------|---------|
+| Web live/ready | ✅ | ✅ | ✅ | ✅ `9ca0cf29a5e5` | — | — | — | — | — |
+| FastAPI `/health` | ✅ | — | — | ✅ 200 | — | — | — | — | — |
+| Automations unified | ✅ | — | — | ✅ auth 200 hist · unauth 401 | — | — | — | — | — |
+| SQL SSOT 517/518 | ✅ | ✅ ALL_PASS | — | ✅ DB hist | — | — | — | — | — |
+| portal-packs P0 | ✅ | — | ✅ PASS run `29943785978` | ✅ same host | — | — | — | — | — |
+| Pack E2E growth×3 | ✅ código | ✅ unit | SKIP_IA_OFF | SKIP_IA_OFF | ✅ IA OFF | CEO mesh | ⬜ | — | — |
+| Quality routing 3b/8b | ✅ ADR-036 | ✅ vitest | — | OFF | ✅ | CEO canary | ⬜ | — | — |
+| OllamaRuntimePrep | ✅ | ✅ vitest | — | OFF | ✅ | mesh | ⬜ | — | — |
+| Partner payouts | ✅ gate | ✅ vitest | — | OFF | ✅ | — | ⬜ | — | — |
+| Campañas company DB | ✅ controles + source_trace | ✅ vitest | — | BLOQUEADO_LEGAL | — | checklist | ⬜ | ⬜ | — |
+| Beta packs | ✅ beta | ✅ catalog | — | beta | — | cert E2E | — | — | ⬜ |
+| DNS app.nelvyon.com | ✅ | — | — | ✅ | — | — | — | — | — |
+| Database Backup | ✅ | — | — | ✅ run `29932453133` | — | — | — | — | — |
+| Restore drill | ✅ script | SKIP Docker DOWN | — | — | — | Docker local | — | — | — |
+| Mobile / marketplace scale | NO / parcial | — | — | — | — | — | ⬜ | — | ⬜ |
 
-## SQL SSOT harden
+## Gates evidence (this pass)
 
 | Gate | Resultado |
 |------|-----------|
-| pytest `test_create_all_duplicate_guard` | **5/5 PASS** |
-| `validate-sql-alembic-ssot.mjs` | **ALL_PASS** (files + DB probe) |
-| `validate-post-elite-migrations.mjs` | **OK 508–518** |
-| FastAPI `SKIP_ALEMBIC` | **=1** |
-| `_migrations` 517/518 | **PASS** |
+| `validate-sql-alembic-ssot` | **ALL_PASS** (DB probe SKIP local) |
+| `validate-post-elite-migrations` | **OK 508–518** |
+| vitest qualityRouting + OllamaRuntimePrep + packAutoApprove + partners + companyDb gate | **22/22 PASS** |
+| live/ready app+apex | **200** `git_sha=9ca0cf29a5e5` |
+| FastAPI `/health` | **200** `healthy` |
+| Automations unauth | **401** expected |
+| Staging P0 `29943785978` | portal-packs **PASS** · pack-e2e **LLM_NOT_CONFIGURED** (pre-skip fix) |
+| Staging P0 post-fix | re-dispatch after push (honest SKIP_IA_OFF) |
+| Backup workflow | **success** `29932453133` |
+| Restore drill | **SKIP** Docker daemon DOWN |
+| KI-020 | prior **KI020_PASS** |
 
-## Gates (honest)
+## Bugs fixed
 
-| Gate | Resultado |
-|------|-----------|
-| live/ready | **200** / **200** · `git_sha=9ca0cf29a5e5` (apex+app) |
-| KI-020 | **KI020_PASS** (re-smoke) |
-| portal-packs | **SKIP** — `STAGING_QA_PASSWORD` absent locally · prior ALL_PASS on closure log |
-| unified unauth | **401** expected |
-| IA flags | **OFF** · OpenAI key revoked · cost 0 |
+1. **STAGING_QA_PASSWORD** GH secret out of sync with DB QA user → Login 401 → **synced** (no secret in docs).  
+2. Pack E2E treated intentional `LLM_NOT_CONFIGURED` as hard FAIL while IA OFF → **honest exit 78 SKIP_IA_OFF**.
 
-## Pendientes externos
+## Flags OFF (prod)
 
-CEO mesh/canary IA · legal campañas · optional portal-packs refresh with GH secret
+`NELVYON_AI_ENABLED` · Router · Shared Memory · MCP · Quality Routing · OpenAI allow · OpenClaw · `NELVYON_CEO_PARTNER_PAYOUTS` · company DB legal env
+
+## Pendientes externos ONLY
+
+- CEO: firma `CEO_IA_STAGING_APPROVAL_REQUEST.md` (staging canary; no OpenAI/OpenClaw/payouts)  
+- Legal+CEO: `COMPLIANCE_COMPANY_DB_CHECKLIST.md`  
+- Mercado: adopción clientes / OAuth por cuenta  
+- Opcional: Docker restore drill cuando daemon UP · `P0_REQUIRE_PACK_E2E=1` tras canary IA

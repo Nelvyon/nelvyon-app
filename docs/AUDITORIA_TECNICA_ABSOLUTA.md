@@ -1,8 +1,22 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (automations unified **200** · SQL SSOT 517/518 DB PASS · web `git_sha=9ca0cf29a5e5` · DNS/SSL app PASS · KI020_PASS · flags OFF · OpenAI key revoked · cost 0 · `claimReady: false`). Pendiente: legal campañas · CEO IA mesh.  
-> Evidencia: `CTO_FINAL_VERIFY.md` · `automations-401-closure-20260722.txt` · deploy `7d625161` / `25e2109d`
+> Fecha: **2026-07-22** (cierre total internal-safe)  
+> Veredicto interno: **CONDITIONAL_READY** · `claimReady: false`  
+> **Plataforma lista técnicamente (condicional)** · **NO** superioridad con clientes  
+> Evidencia SSOT: `docs/CTO_FINAL_VERIFY.md` · gaps: `docs/CTO_STRATEGIC_GAPS_MATRIX.md`
+
+### Matriz estricta (resumen)
+
+| Dimensión | Estado |
+|-----------|--------|
+| IMPLEMENTADO | Core SaaS/OS/Portal/SQL SSOT/billing/SES/partners gate/IA prep |
+| VERIFICADO LOCAL | SQL gates ALL_PASS · vitest 22/22 subset · Docker restore SKIP |
+| VERIFICADO STAGING/PROD | live/ready 200 · FastAPI health 200 · portal-packs PASS · automations 401 unauth |
+| PREPARADO OFF | IA · Router · SM · MCP · QR · OpenAI · OpenClaw · partner payouts |
+| BLOQUEO EXTERNO | CEO IA canary · legal campañas · mercado/adopción · OAuth por cuenta |
+| CEO / LEGAL / MERCADO | Pendientes — bloquean claimReady |
+
+---
 
 
 ---
@@ -183,11 +197,29 @@ Ver `docs/PARITY_GHL_HUBSPOT.md`. Resumen honesto: **~48 features core en códig
 
 ### Veredicto auditoría
 
-**CONDITIONAL_READY** — Bloques 3–13 ejecutados · SES ✅ · B3 iso ✅ · prod mig 512–516 ✅ (KI-R029) · **KI-R030** headers cwd ✅ · Stripe **KI-R028** · SHA `3f860c06` redeploy ✅ · **no READY** (app.nelvyon.com NXDOMAIN · IA flags OFF · sin smokes login).
+**CONDITIONAL_READY** — DNS/SSL/health PASS · SES/Stripe ops cerrados en hist. · SHA vivo `9ca0cf29a5e5` · portal-packs PASS (GH) · pack E2E SKIP_IA_OFF honesto · **no READY** · **claimReady false**.
 
 ### 10. Bloques 3–13 (2026-07-21) + redeploy 2026-07-22
 
 Ver tabla completa en `docs/CTO_FINAL_VERIFY.md` y HANDOVER. Costes nuevos: **0**. Deploy prod: **YES** `d4650e99` SUCCESS tip `3f860c06` · IA not activated · proposal `PROPOSAL_QUALITY_ROUTING_LOCAL.md` only.
+
+### 11. Cierre total internal-safe — 2026-07-22 (tarde)
+
+| Ítem | Resultado |
+|------|-----------|
+| STAGING_QA_PASSWORD sync | **DONE** (Login 401 → PASS) |
+| portal-packs GH | **PASS** run `29943785978` |
+| Pack E2E vs IA OFF | **SKIP_IA_OFF** (exit 78) — no mock PASS |
+| OllamaRuntimePrep metrics/rollback | **DONE** + tests |
+| ADR-036 + weak 3B needs_review | **DONE** vitest |
+| Beta packs | Permanecen **beta** |
+| OAuth health checklist | `docs/ops/INTEGRATIONS_OAUTH_HEALTH_CHECKLIST.md` |
+| CEO IA approval request | `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md` |
+| Strategic gaps matrix | `docs/CTO_STRATEGIC_GAPS_MATRIX.md` |
+| Campañas source_trace + legal audit | `companyDbCampaignLegalGate` · BLOQUEADO_LEGAL |
+| Backup | **DONE** `29932453133` · TODO stale cerrado |
+| Restore drill | **SKIP** Docker DOWN |
+| Redeploy web | **NO** (docs+smokes; live SHA intacto) |
 
 ---
 

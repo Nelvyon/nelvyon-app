@@ -13,8 +13,8 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | ✅ | Desktop UP 2026-07-22. `nelvyon-test-postgres` :5433 healthy · `nelvyon-local-ai-postgres` :5434 healthy. |
-| **Railway** | ✅ | Web `7d625161` SUCCESS · SHA `9ca0cf29a5e5` · FastAPI `25e2109d` · `SKIP_ALEMBIC=1` · shared Postgres |
+| **Docker** | 🟡 | Desktop **DOWN** this pass (restore drill SKIP). Hist: `nelvyon-test-postgres` :5433 · local-ai :5434. |
+| **Railway** | ✅ | Web `7d625161` SUCCESS · SHA `9ca0cf29a5e5` · FastAPI `25e2109d` · `/health` 200 · `SKIP_ALEMBIC=1` · shared Postgres |
 | **PostgreSQL** | ✅ repo / ✅ prod | Prod `_migrations` **517+518** verified (SSOT gate DB probe) · SQL SSOT ADR-002/039 |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |
@@ -23,7 +23,7 @@
 | **AWS SES** | ✅ | Production access GRANTED 2026-07-21 · self-send OK · KI-R014 |
 | **Stripe** | ✅ | sk_live + webhook; price-audit **allValid=true** (KI-R028) |
 | **Cloudflare** | ✅ | `app.nelvyon.com` DNS+SSL+health PASS 2026-07-22 (`docs/ops/DNS_APP_NELVYON.md`) |
-| **Backups / DR** | ✅ | GH Action + restore drill PASS 8/8 (evidencia) |
+| **Backups / DR** | ✅ | GH Action Backup **DONE** `29932453133` · restore drill SKIP Docker DOWN this pass (hist 8/8) |
 | **Security headers** | ✅ | SSOT `apps/web/src/lib/security/headers.ts` |
 | **Ops dashboard** | ✅ | `GET /api/platform/ops/summary` |
 

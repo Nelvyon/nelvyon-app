@@ -3,15 +3,14 @@
  * Usage: node scripts/run-staging-p0-smokes.mjs [--skip-wait]
  *
  * Smokes (CI gate — validated against staging):
- *  1. staging-smoke-portal-packs.mjs
- *  2. staging-smoke-local-pack-e2e.mjs   (local-business-growth full E2E)
- *  3. staging-smoke-ecommerce-pack-e2e.mjs (ecommerce-growth full E2E)
- *  4. staging-smoke-saas-b2b-pack-e2e.mjs  (saas-b2b-growth full E2E)
+ *  1. staging-smoke-portal-packs.mjs          (always blocking)
+ *  2. staging-smoke-local-pack-e2e.mjs        (SKIP exit 78 when LLM_NOT_CONFIGURED / IA OFF)
+ *  3. staging-smoke-ecommerce-pack-e2e.mjs    (idem)
+ *  4. staging-smoke-saas-b2b-pack-e2e.mjs     (idem)
  *
- * O22 — the 3 growth packs now run end-to-end in P0. These require a live
- * STAGING_BASE_URL + platform token secrets; run via workflow_dispatch or before a
- * production deploy. The blocking local gate (no staging needed) is
- * scripts/run-os-pack-gate.mjs / .github/workflows/os-pack-gate.yml.
+ * Pack E2E requires Ollama/OpenAI. While IA flags stay OFF (CEO), exit 78 =
+ * honest SKIP — not a silent mock PASS. Set P0_REQUIRE_PACK_E2E=1 to treat
+ * LLM_NOT_CONFIGURED as hard FAIL (after CEO IA canary).
  */
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -21,12 +20,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const skipWait = process.argv.includes("--skip-wait");
 const extraArgs = skipWait ? ["--skip-wait"] : [];
+/** EX_CONFIG — pack E2E deferred because LLM intentionally not configured. */
+const SKIP_IA_OFF = 78;
+const requirePackE2e = process.env.P0_REQUIRE_PACK_E2E?.trim() === "1";
 
 const SMOKES = [
-  { name: "portal-packs", script: "staging-smoke-portal-packs.mjs" },
-  { name: "local-pack-e2e", script: "staging-smoke-local-pack-e2e.mjs" },
-  { name: "ecommerce-pack-e2e", script: "staging-smoke-ecommerce-pack-e2e.mjs" },
-  { name: "saas-b2b-pack-e2e", script: "staging-smoke-saas-b2b-pack-e2e.mjs" },
+  { name: "portal-packs", script: "staging-smoke-portal-packs.mjs", optionalIa: false },
+  { name: "local-pack-e2e", script: "staging-smoke-local-pack-e2e.mjs", optionalIa: true },
+  { name: "ecommerce-pack-e2e", script: "staging-smoke-ecommerce-pack-e2e.mjs", optionalIa: true },
+  { name: "saas-b2b-pack-e2e", script: "staging-smoke-saas-b2b-pack-e2e.mjs", optionalIa: true },
 ];
 
 const results = [];
@@ -39,20 +41,30 @@ for (const smoke of SMOKES) {
     env: process.env,
   });
   const code = r.status ?? 1;
+  const skipped = smoke.optionalIa && code === SKIP_IA_OFF && !requirePackE2e;
   const pass = code === 0;
-  results.push({ name: smoke.name, pass, code });
-  console.log(`\n>>> ${smoke.name}: ${pass ? "PASS" : "FAIL"} (exit ${code})\n`);
-  if (!pass) break;
+  const ok = pass || skipped;
+  results.push({ name: smoke.name, pass, skipped, ok, code });
+  const label = skipped ? "SKIP_IA_OFF" : pass ? "PASS" : "FAIL";
+  console.log(`\n>>> ${smoke.name}: ${label} (exit ${code})\n`);
+  if (!ok) break;
 }
 
 console.log("\n========== P0 SUMMARY ==========");
 for (const r of results) {
-  console.log(`${r.pass ? "PASS" : "FAIL"}  ${r.name}`);
+  const label = r.skipped ? "SKIP_IA_OFF" : r.pass ? "PASS" : "FAIL";
+  console.log(`${label}  ${r.name}`);
 }
-const allPass = results.every((r) => r.pass) && results.length === SMOKES.length;
-if (allPass) {
-  console.log("ALL_P0_PASS");
+const portalOk = results.some((r) => r.name === "portal-packs" && r.pass);
+const allOk = results.every((r) => r.ok) && results.length === SMOKES.length && portalOk;
+if (allOk) {
+  if (results.some((r) => r.skipped)) {
+    console.log("ALL_P0_PASS_WITH_IA_OFF_SKIPS");
+  } else {
+    console.log("ALL_P0_PASS");
+  }
   process.exit(0);
 }
 console.log("P0_FAIL");
 process.exit(1);
+}

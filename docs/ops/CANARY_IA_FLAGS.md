@@ -53,3 +53,14 @@ Redeploy not always required for env-only; verify health after.
 
 Approve **staging-first** canary of: Local Router + Quality Routing (+ optional Shared Memory).  
 **Do not** approve OpenAI, OpenClaw, or partner payouts in the same batch.
+
+**Documento formal:** `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md` (firma pendiente).
+
+## Local probe / metrics (prep)
+
+```ts
+import { collectLocalAiPrepMetrics, getLocalAiRuntimePrepSnapshot } from "../backend/local-ai/OllamaRuntimePrep";
+// Never enables flags. Fail-closed when host unset / loopback remoto.
+```
+
+Timeout default probe: **5000 ms**. Rollback hints en snapshot.

@@ -454,3 +454,15 @@
 
 ---
 
+## ADR-040 — P0 pack E2E SKIP when LLM intentionally OFF
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-22 |
+| **Decisión** | Si kickoff growth pack responde `LLM_NOT_CONFIGURED` (503) mientras IA está OFF por política, el smoke sale **exit 78** (`SKIP_IA_OFF`). El orquestador P0 cuenta SKIP como OK salvo `P0_REQUIRE_PACK_E2E=1`. portal-packs sigue siendo blocking. |
+| **Por qué** | Evitar falso FAIL de CI cuando CEO mantiene IA OFF; evitar falso PASS/mock. |
+| **Consecuencias** | `scripts/lib/p0-llm-skip.mjs` · `run-staging-p0-smokes.mjs` imprime `ALL_P0_PASS_WITH_IA_OFF_SKIPS`. |
+| **Relación** | ADR-036/037 · canary IA. |
+
+---
+

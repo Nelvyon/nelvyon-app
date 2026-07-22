@@ -76,7 +76,12 @@ async function login() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: QA_EMAIL, password: QA_PASSWORD }),
   });
-  if (!res.ok) throw new Error(`Login ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(
+      `Login ${res.status} — sync GitHub secret STAGING_QA_PASSWORD with QA user in DB (do not log secret). body=${body.slice(0, 120)}`,
+    );
+  }
   const data = await res.json();
   pass("auth", "login", `userId=${data.userId}`);
   return data.token;

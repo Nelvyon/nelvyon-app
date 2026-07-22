@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-22** — Post-automations SQL SSOT · claimReady false · pendientes solo CEO/legal
+> Actualizado: **2026-07-22** — Post total internal-safe closure · claimReady false · pendientes solo CEO/legal/mercado
 
 ---
 
@@ -31,15 +31,15 @@
 - [x] Automations unified **200** · JWT sync ADR-038 · mig 517/518 · `SKIP_ALEMBIC=1`
 - [x] Ops: 1× web redeploy `--from-source` → `git_sha=9ca0cf29a5e5` (deploy `7d625161`)
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
-- [ ] CEO: mesh/canary IA staging opcional (flags OFF hasta aprobación)
-- [ ] Ops opcional: portal-packs refresh con `STAGING_QA_PASSWORD` (GH)
+- [ ] CEO: mesh/canary IA staging opcional (`docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md`)
+- [x] Ops: portal-packs refresh GH — **PASS** `29943785978` (secret synced)
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
 - [x] Bloque 3 SaaS UUID isolation staging
 - [x] **KI-028** — Stripe STARTER · price-audit **allValid=true** (KI-R028) 2026-07-22
 - [x] Prod migrate 512–516 (KI-R029) + runtime headers (KI-R030)
 - [x] `STAGING_QA_PASSWORD` + portal P0 smoke PASS
 - [x] Local Ollama pack gate PASS + generate PASS (HTTP kickoff BLOCKED Docker/Postgres)
-- [x] `STAGING_QA_PASSWORD` EXISTS + wired workflow + P0 **ALL_P0_PASS** (2026-07-22)
+- [x] `STAGING_QA_PASSWORD` EXISTS + wired workflow + portal-packs **PASS** (2026-07-22)
 - [x] Primer Database Backup workflow success (`29932453133`)
 - [x] Cloudflare CNAME+TXT `app.nelvyon.com` → Railway (`DNS_APP_NELVYON.md`) · DNS/SSL/health **PASS** 2026-07-22
 - [x] KI-020 smoke staging CSRF Origin (script + apex PASS; app Origin allowlist fix → redeploy)
@@ -51,6 +51,7 @@
 - [x] Redeploy prod post-unificación (IA flags OFF) — `4cb01795` / SHA `2b51581d`
 - [x] ADR-036 quality routing 3b/8b opt-in + arch local-AI doc (no activar)
 - [x] OS/ops flow audits + sector playbooks (beta no promote)
+- [x] P0 pack E2E honest SKIP when `LLM_NOT_CONFIGURED` (ADR-040)
 - [ ] Dual-path soak E2E Ollama en staging vía mesh privado (CEO + arch; nunca localhost PC)
 - [ ] Promote beta packs solo con cert+deliverables+E2E evidencia
 - [ ] CEO: aprobar Option A Tailscale (`ARCHITECTURE_LOCAL_AI_RUNTIME.md`) si se quiere IA local alcanzable
@@ -62,7 +63,7 @@
 - [x] Completado
 - [x] CEO: `DATABASE_URL` secret GitHub (2026-07-10)
 - [x] CEO: `PRODUCTION_BASE_URL` variable (2026-07-10)
-- [ ] CEO: primer run workflow `Database Backup`
+- [x] CEO: primer run workflow `Database Backup` (`29932453133`)
 - [x] SES production access (KI-R014)
 
 ---
