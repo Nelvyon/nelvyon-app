@@ -26,23 +26,14 @@
 
 ## Beta packs — promote?
 
-| Pack | Catalog | Promote to available? | Missing |
-|------|---------|----------------------|---------|
-| social-calendar | beta | **NO** | dedicated deliverables · cert PASS · E2E in P0 · pack-specific playbook |
-| content-strategy | beta | **NO** | same |
-| cro-audit | beta | **NO** | same |
-| analytics-setup | beta | **NO** | same |
-| brand-voice | beta | **NO** | same |
+| Pack | Promote? | Missing |
+|------|----------|---------|
+| 5 betas | **NO** | Ver `SERVICE_BETA_PACKS.md` · generic deliverables · no cert PASS artifact · no P0 E2E |
 
-All stay `availability: "beta"` until cert + dedicated production mappers + evidence.
+## Local AI / canary
 
----
-
-## Quality routing (code)
-
-- ADR-036: `AUTONOMOUS_QUALITY_ROUTING=1` → critical roles use `OLLAMA_STRATEGY_MODEL` (8b); others 3b.
-- Certified Model Router **unchanged**.
-- QA threshold **85** unchanged; fail → `needs_review` (orchestrator).
+- Prep: `OllamaRuntimePrep` · canary: `docs/ops/CANARY_IA_FLAGS.md` · mesh **CEO**
+- Quality routing ADR-036 OFF default · Router cert intacto
 
 ---
 

@@ -1,26 +1,20 @@
-# OPS QUALITY AUDIT — 2026-07-22
+# OPS QUALITY AUDIT — 2026-07-22 (refresh cierre)
 
-## P0 / P1 reales
+## P0 / P1
 
-| ID | Severity | Status | Acción |
-|----|----------|--------|--------|
-| DNS `app.nelvyon.com` | P0 go-live | **Open** | Humano CNAME → Railway |
-| `STAGING_QA_PASSWORD` | P1 smokes | **Open** | Secret CI — no commit |
-| Prod IA OFF | Expected | OK | No activar sin CEO |
-| Partner payouts OFF | Expected | OK | CEO flag |
-| LLM staging | Ops gap | Open | Mesh local-AI arch — no localhost |
+| ID | Severity | Status |
+|----|----------|--------|
+| DNS `app.nelvyon.com` | P0 | **Open** NXDOMAIN · CNAME humano |
+| `STAGING_QA_PASSWORD` | P1 | **Open** · no está en `gh secret list` |
+| Prod health | OK | live/ready 200 · SHA `06690725a67d` |
+| IA flags | OK OFF | ABSENT Railway |
+| Local Router default | Fixed | ADR-037 fail-closed |
 
 ## Crons
-16 rutas `/api/cron/*` — requieren `CRON_SECRET`. Fail-closed sin secret (no ocultar).
+`cronAuth.ts` timing-safe · fail-closed sin `CRON_SECRET` — **OK**
 
-## Backups
-`db-backup.yml` — necesita `DATABASE_PUBLIC_URL` (no `railway.internal`). CEO: primer run manual pendiente (TODO).
+## Backups / restore
+Workflow `db-backup.yml` · drill `docs/ops/POSTGRES_RESTORE_DRILL.md` · evidence JSON existe · CEO primer run pendiente
 
-## Health
-`/api/health/live` · `/api/health/ready` — prod **200** post-unify.
-
-## Observabilidad
-Private AI metrics flag-gated · no alert spam when IA OFF. Logs Railway sample: Ready + migrate.
-
-## No ocultar
-Smokes staging **blocked** por password — documentado, no marcado PASS.
+## Compliance campañas
+`docs/COMPLIANCE_COMPANY_DB_CHECKLIST.md` · **no** dictamen legal · bloqueo envío masivo

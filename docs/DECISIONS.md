@@ -407,6 +407,17 @@
 
 ---
 
+## ADR-037 — Local Router flag fail-closed (default OFF)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-22 |
+| **Decisión** | `NELVYON_LOCAL_ROUTER_ENABLED` default **OFF** (`0`). Requiere `=1` **y** `OLLAMA_CONFIGURED`. Antes el env default era `"1"` pero igual dependía de runtime; ahora explícito fail-closed alineado MCP/SM. |
+| **Por qué** | Canary prep · CTO “Router local OFF por defecto”. |
+| **Relación** | ADR-015 · `CANARY_IA_FLAGS.md`. |
+
+---
+
 ## ADR-036 — Autonomous pack quality routing 3b/8b (opt-in)
 
 | Campo | Valor |

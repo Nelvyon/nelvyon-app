@@ -76,6 +76,32 @@ Unset `OLLAMA_HOST` / `OLLAMA_BASE_URL` / `AUTONOMOUS_QUALITY_ROUTING` → fail-
 
 ---
 
+## Prep implementada (código · sin activar mesh)
+
+| Pieza | Rol |
+|-------|-----|
+| `backend/local-ai/OllamaRuntimePrep.ts` | Host safety (ban loopback remoto) · `probeOllamaHealth` · snapshot prep |
+| Tests | `backend/local-ai/__tests__/OllamaRuntimePrep.test.ts` |
+| Canary doc | `docs/ops/CANARY_IA_FLAGS.md` |
+
+### Procedimiento humano (solo tras CEO Option A)
+
+```bash
+# En el host GPU (privado): Ollama escuchando solo en IP mesh, no 0.0.0.0 público
+# En Railway STAGING (no prod primero):
+# OLLAMA_HOST=http://100.x.y.z:11434
+# OLLAMA_CONFIGURED=1
+# OLLAMA_MODEL=llama3.2:3b-instruct-q4_K_M
+# OLLAMA_STRATEGY_MODEL=llama3.1:8b-instruct-q4_K_M
+# NELVYON_LOCAL_ROUTER_ENABLED=1   # canary
+# AUTONOMOUS_QUALITY_ROUTING=1     # canary opcional
+# Nunca: AUTONOMOUS_ALLOW_OPENAI=1 por defecto
+```
+
+Rollback: unset todas las vars anteriores.
+
+---
+
 ## Decision gate
 
-**Do not implement infra in this phase.** This document is the architecture deliverable. Implementation of mesh/worker requires explicit CEO approval (even at $0) because it changes production blast radius.
+**No instalar Tailscale/WireGuard/Ollama remoto desde Cursor.** CEO aprueba Option A/B → ops ejecuta mesh → canary staging vía `CANARY_IA_FLAGS.md`.

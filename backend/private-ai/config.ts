@@ -42,8 +42,9 @@ export function isPrivateAiOnlyEnv(): boolean {
 }
 
 export function isLocalRouterEnabled(): boolean {
-  const v = process.env.NELVYON_LOCAL_ROUTER_ENABLED ?? "1";
-  if (v === "0" || v.toLowerCase() === "false") return false;
+  // Fail-closed: require explicit opt-in AND configured local runtime (ADR canary prep).
+  const v = process.env.NELVYON_LOCAL_ROUTER_ENABLED ?? "0";
+  if (v !== "1" && v.toLowerCase() !== "true") return false;
   return isLocalRuntimeConfigured();
 }
 
