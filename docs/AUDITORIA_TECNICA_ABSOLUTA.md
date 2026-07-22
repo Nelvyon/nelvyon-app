@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (SHA `bba71f14` · KI-R028/R029/R030 · OpenAI opt-in only + Ollama primary · local Phase C 3b qa=55 / 8b qa=89 · HTTP `needs_review` 3b · IA OFF). Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted.  
-> Evidencia: price-audit allValid · health 200 · vitest 22/22 · tsc 0 · pack gate 51 · `.release-logs/hardening-ia-packs-20260722.txt` · `CTO_FINAL_VERIFY.md`
+> Veredicto interno: **CONDITIONAL_READY** (SHA vivo `3f860c06eaca` · deploy `d4650e99` SUCCESS · KI-R028/R029/R030 · OpenAI opt-in only + Ollama primary · local Phase C 3b qa=55 / 8b qa=89 · HTTP `needs_review` 3b · IA OFF · quality-routing **proposal only**). Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted.  
+> Evidencia: price-audit allValid · health 200 · vitest 22/22 · tsc 0 · pack gate 51 · redeploy Ready · `.release-logs/prod-post-redeploy-verify-20260722.txt` · `CTO_FINAL_VERIFY.md` · `PROPOSAL_QUALITY_ROUTING_LOCAL.md`
 
 ---
 
@@ -182,11 +182,11 @@ Ver `docs/PARITY_GHL_HUBSPOT.md`. Resumen honesto: **~48 features core en códig
 
 ### Veredicto auditoría
 
-**CONDITIONAL_READY** — Bloques 3–13 ejecutados · SES ✅ · B3 iso ✅ · prod mig 512–516 ✅ (KI-R029) · **KI-R030** headers cwd ✅ · **no READY** (KI-028 Stripe STARTER · app.nelvyon.com NXDOMAIN · IA flags OFF · sin smokes login).
+**CONDITIONAL_READY** — Bloques 3–13 ejecutados · SES ✅ · B3 iso ✅ · prod mig 512–516 ✅ (KI-R029) · **KI-R030** headers cwd ✅ · Stripe **KI-R028** · SHA `3f860c06` redeploy ✅ · **no READY** (app.nelvyon.com NXDOMAIN · IA flags OFF · sin smokes login).
 
-### 10. Bloques 3–13 (2026-07-21)
+### 10. Bloques 3–13 (2026-07-21) + redeploy 2026-07-22
 
-Ver tabla completa en `docs/CTO_FINAL_VERIFY.md` y HANDOVER. Costes nuevos: **0**. Deploy prod: **NO**.
+Ver tabla completa en `docs/CTO_FINAL_VERIFY.md` y HANDOVER. Costes nuevos: **0**. Deploy prod: **YES** `d4650e99` SUCCESS tip `3f860c06` · IA not activated · proposal `PROPOSAL_QUALITY_ROUTING_LOCAL.md` only.
 
 ---
 

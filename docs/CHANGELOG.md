@@ -7,6 +7,8 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Deploy | **Prod SUCCESS `d4650e99`** | `--from-source` tip `3f860c06` · SHA vivo `3f860c06eaca` · live/ready 200 · Ready · no headers error · IA flags not set · gates tsc/vitest22/pack51 PASS |
+| Docs | **Quality routing proposal** | `PROPOSAL_QUALITY_ROUTING_LOCAL.md` — 3b fast vs 8b QA≥85 · evidence 55/89 · no cert invalidation · opt-in later |
 | Autonomous | **OpenAI opt-in only** | `AUTONOMOUS_ALLOW_OPENAI=1` required · no auto-fallback on Ollama fail · `isInternetTaskAuthorized` · prompt schema examples for small models · vitest 22/22 · tsc 0 · gate 51 |
 | Local QA | **Phase C 3b/8b evidence** | heliovolt 3b **qa=55** (model limit) · 8b **qa=89** · HTTP E2E `needs_review` · `.release-logs/hardening-ia-packs-20260722.txt` · threshold 85 unchanged |
 | Autonomous | **Ollama-first llmAdapter** | `isAutonomousOllamaConfigured` · Ollama→OpenAI→mock · vitest `llmAdapter.ollama` **3/3** · phaseC **10/10** |

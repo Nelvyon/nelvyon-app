@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-07-22 — Prod redeploy OpenAI opt-in (`3f860c06`) SUCCESS
+
+| Campo | Valor |
+|-------|-------|
+| **Deploy ID** | `d4650e99-8fe1-41bf-b80b-a1b3fb8aca88` |
+| **Command** | `railway redeploy --from-source -y` · `truthful-respect` / production / `@nelvyon/web` |
+| **Commit** | `3f860c06eaca8c60ca14edd3831f94e026bb95d6` |
+| **Status** | **SUCCESS** (BUILDING→DEPLOYING→SUCCESS ~10 min) |
+| **Gates pre** | tsc **0** · vitest **22/22** · pack gate **51** ALL_PASS |
+| **Health** | live **200** `git_sha=3f860c06eaca` · ready **200** db ok |
+| **Logs** | migrate complete · `[nelvyon] Ready on http://0.0.0.0:3000` · healthcheck succeeded · no headers error · no OpenAI egress visible |
+| **IA flags set** | **None** (`AUTONOMOUS_ALLOW_OPENAI` absent · no OLLAMA/SHARED_MEMORY/MCP/OpenClaw ON) |
+| **Second redeploy** | **No** |
+| **Costes** | **0** |
+| **Cloudflare** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
+| **Evidencia** | `.release-logs/prod-redeploy-20260722.txt` · `prod-redeploy-poll-20260722.txt` · `prod-post-redeploy-verify-20260722.txt` · `final-gates-*.txt` |
+| **Proposal** | `docs/PROPOSAL_QUALITY_ROUTING_LOCAL.md` (docs only; no model cert change) |
+
+---
+
 ## 2026-07-22 — OpenAI opt-in only + prompt schemas (sin deploy)
 
 | Campo | Valor |
