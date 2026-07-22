@@ -10,7 +10,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** |
-| **Tip repo** | `a0c46fe7` (docs sync) · **SHA vivo web** `9ca0cf29a5e5` (SSOT code deploy; no 2º redeploy) |
+| **Tip repo** | `1c425883` · **SHA vivo web** `9ca0cf29a5e5` (SSOT code deploy; no 2º redeploy) |
 | **Web prod** | deploy `7d625161` **SUCCESS** · live `git_sha=9ca0cf29a5e5` · ready **200** |
 | **FastAPI prod** | deploy `25e2109d` **SUCCESS** · health 200 · shared DB + `SKIP_ALEMBIC=1` |
 | **app.nelvyon.com** | DNS/SSL/health **PASS** · apex+app `git_sha` match tip |
