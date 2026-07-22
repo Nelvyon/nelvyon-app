@@ -1,7 +1,8 @@
-# CTO Final Verify — 2026-07-22 (post-ops Stripe/DNS/LLM)
+# CTO Final Verify — 2026-07-22 (local Ollama E2E + Cloudflare sole blocker)
 
 > Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimProductionReady` **false** · **no** READY  
-> Bloqueo externo restante: **DNS `app.nelvyon.com`**
+> Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`  
+> No MFA bypass attempted.
 
 ## Prod (sin redeploy esta pasada)
 
@@ -11,38 +12,42 @@
 | live / ready | **200** / **ready** |
 | Mig | **512–516** (KI-R029) |
 | KI-030 | **KI-R030** |
+| IA prod | **OFF** |
 
-## Stripe (KI-028 → KI-R028)
+## Stripe (KI-R028)
 
 | Campo | Resultado |
 |-------|-----------|
-| price-audit | **allValid=true** (nelvyon.com + railway.app) |
-| starter/pro/agency | `stripeRetrieveOk=true` · `stripeActive=true` |
+| price-audit | **allValid=true** (starter/pro/agency) |
 | resource_missing | **false** |
-| AGENCY_PARTNER | var ausente (fuera del audit checkout) |
+| Costes nuevos | **0** |
 
 ## Cloudflare
 
 | Campo | Resultado |
 |-------|-----------|
-| Acceso API/wrangler | **No** (token unset · wrangler no instalado) |
-| `app.nelvyon.com` | **NXDOMAIN** |
-| Paso humano | CNAME `app` → `nelvyonweb-production.up.railway.app` → HTTPS health |
+| Acceso API/wrangler | **No** |
+| Unique blocker | CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` |
+| MFA bypass | **No** attempted |
+| `app.nelvyon.com` | **NXDOMAIN** until humano CNAME |
 
-## Smokes / LLM
+## Smokes / IA
 
 | Campo | Resultado |
 |-------|-----------|
-| portal-packs | **PASS** |
-| local-pack-e2e | **FAIL** `LLM_NOT_CONFIGURED` = **staging config** (AUTONOMOUS sin Ollama/OpenAI) |
-| Local Ollama | reachable · 6 models |
-| Fallo producción | **No** |
-| IA prod | **OFF** |
+| portal-packs (staging) | **PASS** |
+| local-pack-e2e (staging) | **FAIL** `LLM_NOT_CONFIGURED` = **ops staging** (no KI reopen · no fallo prod) |
+| Local Ollama | **PASS** tags=6 · generate `OK` |
+| OS pack gate local | **PASS** 51/51 |
+| HTTP pack kickoff local | **BLOCKED** (Docker/Postgres/QA) |
+| staging→localhost Ollama | **Forbidden / not set** |
+| OpenAI / paid | **None** |
 
 ## Costes
 
-**0** · sin productos/precios/cobros Stripe creados · sin OpenAI
+**0** · sin productos/precios/cobros Stripe · sin OpenAI · sin deploy
 
 ## Siguiente paso único
 
-Cloudflare DNS: CNAME **`app.nelvyon.com`** → **`nelvyonweb-production.up.railway.app`**.
+Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`.  
+No MFA bypass attempted.

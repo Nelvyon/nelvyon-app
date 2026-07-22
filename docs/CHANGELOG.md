@@ -7,6 +7,8 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Local E2E | **Ollama evidence** | tags=6 · generate PASS · pack gate PASS 51 · vitest ollama FAIL 1/3 WIP · HTTP kickoff BLOCKED (Docker/Postgres) · docs `e15055e9`+ · no staging localhost · IA OFF |
+| Cloudflare | **Sole blocker** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
 | KI-028 | **Cerrado → KI-R028** | price-audit prod **allValid=true** (starter/pro/agency retrieve+active); sin crear precios/cobros |
 | DNS | **app NXDOMAIN** | wrangler/API token ausentes · paso humano CNAME `app` → `nelvyonweb-production.up.railway.app` |
 | LLM smoke | **Clasificado** | `LLM_NOT_CONFIGURED` = staging AUTONOMOUS sin Ollama/OpenAI · **no** fallo prod · Ollama local OK |

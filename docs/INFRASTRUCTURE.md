@@ -13,16 +13,16 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | ✅ local-ai | Desktop + compose local-ai **UP** 2026-07-20 (`nelvyon-local-ai-postgres` healthy). |
+| **Docker** | 🟡 | Desktop **DOWN** 2026-07-22 (pack HTTP E2E local BLOCKED). Compose local-ai was UP 2026-07-20. |
 | **Railway** | ✅ | Web **SUCCESS** SHA `bba71f14` · health live/ready 200 · KI-R030 · schema ≥516 (KI-R029) |
-| **PostgreSQL** | ✅ repo / ✅ prod mig | Staging: **`516`**. Prod: **512–516** aplicadas 2026-07-21 (KI-R029). |
+| **PostgreSQL** | ✅ repo / ✅ prod mig | Staging: **`516`**. Prod: **512–516** aplicadas 2026-07-21 (KI-R029). Local :5432/5433/5434 **closed** 2026-07-22. |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |
-| **Ollama** | ✅ | Preflight 2026-07-20: HTTP 200, models=6 |
+| **Ollama** | ✅ local | 2026-07-22: `127.0.0.1:11434` HTTP 200 · 6 models · `/api/generate` PASS. **No** set staging `OLLAMA_HOST=localhost` (Railway cannot reach PC). |
 | **OpenClaw** | 🟡 | Mock certificado; URL real ops |
 | **AWS SES** | ✅ | Production access GRANTED 2026-07-21 · self-send OK · KI-R014 |
 | **Stripe** | ✅ | sk_live + webhook; price-audit **allValid=true** (KI-R028) |
-| **Cloudflare** | 🟡 | nelvyon.com OK · **app.nelvyon.com NXDOMAIN** (humano: CNAME `app` → `nelvyonweb-production.up.railway.app`) |
+| **Cloudflare** | 🟡 | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
 | **Backups / DR** | ✅ | GH Action + restore drill PASS 8/8 (evidencia) |
 | **Security headers** | ✅ | SSOT `apps/web/src/lib/security/headers.ts` |
 | **Ops dashboard** | ✅ | `GET /api/platform/ops/summary` |

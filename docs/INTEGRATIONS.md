@@ -1,9 +1,9 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-21**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
+> Actualizado: **2026-07-22**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** Cloudflare `app.nelvyon.com` NXDOMAIN · flags SM/OpenClaw OFF · pack E2E staging LLM opcional.
+**Bloqueadores go-live:** Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. · flags SM/OpenClaw OFF · pack E2E staging LLM = ops gap (no KI reopen).
 
 ---
 
@@ -11,7 +11,7 @@
 
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
-| **Stripe** | ✅ | `STRIPE_*` | Live sk + webhook; price-audit **allValid=true** (KI-R028 2026-07-22); `AGENCY_PARTNER` opcional ausente |
+| **Stripe** | ✅ | `STRIPE_*` | Live sk + webhook; price-audit **allValid=true** (KI-R028); `AGENCY_PARTNER` opcional ausente · **OK** |
 | Shopify | 🟡 | OAuth + `ShopifyService.ts` | Commerce |
 
 ---
@@ -89,8 +89,8 @@
 |-------------|--------|-----------|-------|
 | OpenAI | 🟡 | `OPENAI_API_KEY` | Packs, LlmClient |
 | Anthropic | 🟡 | `ANTHROPIC_API_KEY` | Private AI provider |
-| Ollama (local) | ✅ | `OLLAMA_BASE_URL` / local :11434 | Preflight 2026-07-20 HTTP 200 (models=6); Private AI + Router + Brain ingest |
-| Local-ai Postgres/pgvector | ✅ | Compose `127.0.0.1:5434` | Ingest **verified** (1559 chunks) · ADR-030 |
+| Ollama (local) | ✅ | `OLLAMA_HOST` / `:11434` | Local 2026-07-22: 6 models + generate PASS. Staging: **sin** Ollama/OpenAI → `LLM_NOT_CONFIGURED` (ops). **Prohibido** staging→`localhost:11434`. |
+| Local-ai Postgres/pgvector | 🟡 | Compose `127.0.0.1:5434` | Ingest **verified** hist. · Docker **DOWN** 2026-07-22 (HTTP pack E2E BLOCKED) |
 | **MCP Productivo** | ✅ | `NELVYON_MCP_PRODUCTIVE_ENABLED` | `/api/saas/mcp` — **CERTIFIED** (`mcp_certification_final.json`) |
 | **OpenClaw** | 🟡 | `NELVYON_OPENCLAW_BRIDGE_*` + Memory | HttpOpenClawBridge listo; OFF hasta ops URL |
 | **Shared Memory** | 🟡 | `NELVYON_SHARED_MEMORY_ENABLED` | Flag **OFF** default · schema 514/515 en repo · **schema not verified on staging** (Bloque 2 BLOCKED 2026-07-20: DATABASE_URL unset · verify exit 2 · migrate NOT run) |

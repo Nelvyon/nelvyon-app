@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-07-22 — Docs push + local pack E2E Ollama (sin deploy)
+
+| Campo | Valor |
+|-------|-------|
+| **Deploy** | **No** (docs only) |
+| **Commit 1** | `e15055e9` — `docs(ops): close KI-R028 Stripe; classify LLM staging; DNS CNAME blocker` · pushed |
+| **Commit 2** | local E2E evidence + Cloudflare sole blocker (docs) |
+| **Ollama** | `:11434` models=6 · `/api/generate` PASS (`llama3.2:3b`) |
+| **Pack gate B** | `run-os-pack-gate` **ALL_GATE_PASS** 51 tests |
+| **Vitest A** | `llmAdapter.ollama` **FAIL** 1/3 (WIP mocks) |
+| **HTTP kickoff C** | **BLOCKED** — Docker DOWN · Postgres ports closed · sqlite `.env` · no QA auth |
+| **Staging localhost** | **No** set |
+| **IA prod** | OFF |
+| **Evidencia** | `.release-logs/local-pack-e2e-ollama-20260722.txt` |
+| **Cloudflare** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
+
+---
+
 ## 2026-07-22 — Ops audit post-deploy (sin redeploy)
 
 | Campo | Valor |

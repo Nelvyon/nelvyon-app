@@ -6,6 +6,23 @@
 
 ## Activos
 
+### Ops (no KI) — Cloudflare DNS `app.nelvyon.com`
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Abierto** (ops humano) |
+| **Severidad** | Bloqueador go-live DNS |
+| **Detalle** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
+| **Nota** | Sin API token / wrangler; no bypass MFA |
+
+### Ops (no KI) — Staging pack E2E `LLM_NOT_CONFIGURED`
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Ops gap** — **no** reabrir KI |
+| **Detalle** | Staging AUTONOMOUS sin Ollama/OpenAI. Local Ollama OK (2026-07-22). **Prohibido** staging `OLLAMA_HOST=localhost:11434`. |
+| **Evidencia** | `.release-logs/local-pack-e2e-ollama-20260722.txt` · pack gate local PASS |
+
 ### KI-027 - Test drift brain knowledge (`ingestEvidence.verified`)
 
 | Campo | Valor |

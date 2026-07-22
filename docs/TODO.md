@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-22** — KI-R028 Stripe cerrado · DNS app + LLM staging config
+> Actualizado: **2026-07-22** — Local Ollama E2E evidence · Cloudflare CNAME sole blocker
 
 ---
 
@@ -33,8 +33,9 @@
 - [x] **KI-028** — Stripe STARTER · price-audit **allValid=true** (KI-R028) 2026-07-22
 - [x] Prod migrate 512–516 (KI-R029) + runtime headers (KI-R030)
 - [x] `STAGING_QA_PASSWORD` + portal P0 smoke PASS
-- [ ] Cloudflare `app.nelvyon.com` CNAME → `nelvyonweb-production.up.railway.app`
-- [ ] Staging Ollama/`NELVYON_LOCAL_AI_URL` para pack E2E (opcional; **no** IA prod)
+- [x] Local Ollama pack gate PASS + generate PASS (HTTP kickoff BLOCKED Docker/Postgres)
+- [ ] Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` (No MFA bypass attempted.)
+- [ ] Staging Ollama alcanzable para pack E2E (opcional; **nunca** `localhost:11434` PC; **no** IA prod)
 - [ ] KI-020 smoke staging CSRF Origin
 
 ---
