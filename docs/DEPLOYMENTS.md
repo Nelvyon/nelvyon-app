@@ -4,7 +4,21 @@
 
 ---
 
-## 2026-07-22 — Prod redeploy unify tip `2b51581d` SUCCESS (`4cb01795`)
+## 2026-07-22 — Prod redeploy elite-next tip `06690725` SUCCESS (`9d489e77`)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip** | `06690725a67d359d090dd8c9b387a59b21f44e94` (incluye `26ce8d00`) |
+| **Command** | `railway redeploy --from-source -y` × **1** |
+| **Deployment** | `9d489e77-6a73-4d9b-a5d5-1b2b17b8d09c` **SUCCESS** |
+| **SHA vivo** | `06690725a67d` · live/ready **200** |
+| **Env** | **no mutations** · quality routing / OpenAI / MCP / SM / OpenClaw / CEO payouts / OLLAMA **ABSENT** |
+| **Smokes** | BLOCKED `STAGING_QA_PASSWORD` |
+| **Cost** | **0** |
+| **Evidence** | `.release-logs/prod-redeploy-elite-next-20260722.txt` |
+| **Cloudflare** | Unique blocker CNAME `app.nelvyon.com` (no MFA bypass) |
+
+---
 
 | Campo | Valor |
 |-------|-------|

@@ -1,17 +1,13 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-22** — Elite-next `26ce8d00` · prod `2b51581ddaf6` · CONDITIONAL_READY
+> Actualizado: **2026-07-22** — Prod SHA `06690725a67d` · elite-next deploy · CONDITIONAL_READY
 
 | Capa | Estado | Evidencia |
 |------|--------|-----------|
-| **Veredicto** | **CONDITIONAL_READY** | No READY · no élite ops |
-| **Prod** | OK | SHA `2b51581ddaf6` |
-| **Código tip** | `26ce8d00` | ADR-036 · audits · playbooks |
-| **IA prod** | OFF | — |
-| **Quality routing** | Código OFF default | ADR-036 |
-| **Local AI mesh** | Diseño only | ARCHITECTURE doc |
-| **Beta packs** | beta | no promote |
-| **DNS / smokes** | bloqueados | CNAME · STAGING_QA_PASSWORD |
+| **Veredicto** | **CONDITIONAL_READY** | DNS app pendiente |
+| **Prod** | **OK** | SHA `06690725a67d` · deploy `9d489e77` · live/ready 200 |
+| **IA flags** | **OFF** | all ABSENT incl. quality routing |
+| **Smokes staging** | **Blocked** | STAGING_QA_PASSWORD |
 | **Costes** | **0** | |
 
-CEO: DNS → arch local-AI approval → optional staging quality routing. Sin OpenAI default.
+CEO: CNAME `app.nelvyon.com` · no activar IA.

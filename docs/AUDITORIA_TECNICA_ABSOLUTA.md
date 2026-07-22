@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (prod `2b51581ddaf6` · tip `26ce8d00` elite-next · ADR-036 · arch local-AI no activada · flags OFF · cost 0). Unique blocker DNS: CNAME `app.nelvyon.com`. Smokes: `STAGING_QA_PASSWORD`.  
-> Evidencia: `OS_FLOW_AUDIT.md` · `OPS_QUALITY_AUDIT.md` · `ARCHITECTURE_LOCAL_AI_RUNTIME.md` · `CTO_FINAL_VERIFY.md`
+> Veredicto interno: **CONDITIONAL_READY** (SHA vivo `06690725a67d` · deploy `9d489e77` SUCCESS · elite-next · flags OFF · cost 0). Unique blocker: CNAME `app.nelvyon.com`. Smokes: `STAGING_QA_PASSWORD`.  
+> Evidencia: `.release-logs/prod-redeploy-elite-next-20260722.txt` · `CTO_FINAL_VERIFY.md`
 
 ---
 

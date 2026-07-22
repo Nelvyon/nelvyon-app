@@ -1,33 +1,35 @@
-# CTO Final Verify — 2026-07-22 (Elite-next blocks · no IA activation)
+# CTO Final Verify — 2026-07-22 (Elite-next prod deploy `06690725`)
 
-> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimEliteOps` **false**  
-> Prod SHA vivo: **`2b51581ddaf6`** · tip código: **`26ce8d00`** · Coste **0** · Flags IA **OFF**
+> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · **no** READY (DNS)  
+> SHA vivo: **`06690725a67d`** · Deploy **`9d489e77` SUCCESS** · Coste **0**  
+> Flags: quality routing / OpenAI / MCP / SM / OpenClaw / CEO payouts / OLLAMA **ABSENT**
 
-## Entregado esta fase
+## Pre-deploy
 
-| Bloque | Resultado |
-|--------|-----------|
-| 1 Local AI arch | `ARCHITECTURE_LOCAL_AI_RUNTIME.md` — Option A Tailscale · **no activado** |
-| 2 Routing 3b/8b | ADR-036 · `AUTONOMOUS_QUALITY_ROUTING` opt-in · tests PASS · Router cert **intacto** |
-| 3 Beta→available | **NO promote** — faltan cert+deliverables dedicados (`OS_FLOW_AUDIT.md`) |
-| 4 Flujos OS | Growth: wiring PASS · LOCAL partial · PROD IA **blocked** |
-| 5 Partners | `?view=unified` · `calculatePartnerCommission` · payouts CEO_GATE |
-| 6 Ops | `OPS_QUALITY_AUDIT.md` — DNS + STAGING_QA_PASSWORD abiertos (honestos) |
-| 7 Sector playbooks | LOCAL_SMB · ECOMMERCE · SAAS_B2B + tests existencia/QA |
+| Gate | Resultado |
+|------|-----------|
+| Tip | `06690725` (ancestor `26ce8d00`) |
+| tsc | **0** |
+| vitest | **23/23** PASS |
+| build:prod | **PASS** |
+| Flag defaults OFF | quality routing · OpenAI · MCP · CEO payouts |
 
-## No hecho (CEO)
+## Deploy
 
-- Activar mesh Ollama / quality routing en staging o prod  
-- OpenAI / MCP / SM / OpenClaw / CEO payouts  
-- Promote beta packs  
-- Redeploy (no requerido para docs/código opt-in OFF)
+| Campo | Valor |
+|-------|-------|
+| Command | `railway redeploy --from-source -y` × **1** |
+| ID | `9d489e77-6a73-4d9b-a5d5-1b2b17b8d09c` |
+| Status | **SUCCESS** |
+| Env mutations | **NONE** |
+| live / ready | **200** / **200** |
+| Logs | migrate complete · Ready :3000 · no OpenAI |
+| Smokes | **BLOCKED** STAGING_QA_PASSWORD |
 
-## Bloqueos externos
+## No activado
 
-1. CNAME `app.nelvyon.com` → Railway  
-2. `STAGING_QA_PASSWORD`  
-3. Licencia base empresas — sin bypass
+Tailscale · WireGuard · Ollama remoto · `AUTONOMOUS_QUALITY_ROUTING` · OpenAI · MCP · SM · OpenClaw · payouts
 
-## Costes
+## Siguiente
 
-**0**
+CNAME `app.nelvyon.com` → Railway. Sin flags. Sin redeploy.

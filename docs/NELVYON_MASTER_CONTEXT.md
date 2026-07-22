@@ -1802,7 +1802,7 @@ cd backend && python -m pytest tests/ -q --tb=short
 | Título | NELVYON — MASTER CONTEXT (Biblia oficial) |
 | Veredicto citado | **CONDITIONAL_READY** (**NOT READY**) |
 | Producto enterprise completo / READY | **NO** |
-| SHA vivo prod | **`2b51581ddaf6`** (unify deploy `4cb01795`) |
+| SHA vivo prod | **`06690725a67d`** (elite-next deploy `9d489e77`) |
 | Workforce | **PASS** (ADR-029) |
 | Elite | **PASS** (ADR-026) |
 | OS agent fleet | **4 universos** + registry 11 · **ADR-033/034** · flags OFF |
