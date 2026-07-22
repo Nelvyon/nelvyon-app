@@ -33,7 +33,10 @@ export interface AffiliateProgramStats {
 }
 
 export class SaasAffiliateError extends Error {
-  constructor(message: string, public code: "NOT_FOUND" | "VALIDATION" | "CONFLICT") {
+  constructor(
+    message: string,
+    public code: "NOT_FOUND" | "VALIDATION" | "CONFLICT" | "CEO_GATE",
+  ) {
     super(message); this.name = "SaasAffiliateError";
   }
 }
@@ -201,6 +204,15 @@ export class SaasAffiliateService {
   }
 
   async markPaid(tenantId: string, id: string, stripeTransferId?: string): Promise<AffiliateCommission> {
+    const { assertCeoPartnerPayoutAuthorized } = await import("../agency/ceoPartnerPayoutGate");
+    try {
+      assertCeoPartnerPayoutAuthorized();
+    } catch (e) {
+      throw new SaasAffiliateError(
+        e instanceof Error ? e.message : "CEO_GATE payout blocked",
+        "CEO_GATE",
+      );
+    }
     const rows = await this.db.query<Record<string, unknown>>(
       `UPDATE saas_affiliate_commissions SET status='paid', stripe_transfer_id=$3, updated_at=NOW()
        WHERE tenant_id=$1 AND id=$2::uuid AND status='approved' RETURNING *`,
@@ -210,12 +222,21 @@ export class SaasAffiliateService {
     return mapCommission(rows[0]);
   }
 
-  /** Stripe Connect payout — requires STRIPE_SECRET_KEY and destination Connect account id. */
+  /** Stripe Connect payout — requires CEO gate + STRIPE_SECRET_KEY and destination Connect account id. */
   async payViaStripeConnect(
     tenantId: string,
     commissionId: string,
     destinationAccountId: string,
   ): Promise<AffiliateCommission> {
+    const { assertCeoPartnerPayoutAuthorized } = await import("../agency/ceoPartnerPayoutGate");
+    try {
+      assertCeoPartnerPayoutAuthorized();
+    } catch (e) {
+      throw new SaasAffiliateError(
+        e instanceof Error ? e.message : "CEO_GATE payout blocked",
+        "CEO_GATE",
+      );
+    }
     const dest = destinationAccountId.trim();
     if (!dest) throw new SaasAffiliateError("destinationAccountId requerido", "VALIDATION");
 

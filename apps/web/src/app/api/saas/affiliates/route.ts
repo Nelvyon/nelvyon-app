@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function mapErr(e: SaasAffiliateError): NextResponse {
-  const status = e.code === "NOT_FOUND" ? 404 : e.code === "CONFLICT" ? 409 : 400;
+  const status =
+    e.code === "NOT_FOUND" ? 404 : e.code === "CONFLICT" ? 409 : e.code === "CEO_GATE" ? 403 : 400;
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }
 

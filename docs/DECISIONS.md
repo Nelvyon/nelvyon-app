@@ -376,10 +376,22 @@
 | Campo | Valor |
 |-------|-------|
 | **Fecha** | 2026-07-22 |
-| **Decisión** | Mantener separados: (1) Private AI registry (~23, tools+RAG, `canAutoExecute:false`); (2) Autonomous pack roles (14, Ollama-first / OpenAI opt-in); (3) OS premium (25, `LlmClient` OpenAI-required); (4) OS sector fleet (~1605 wrappers, OpenAI). No inventar un “único equipo OS” ni dual-path Ollama en `LlmClient` sin ADR+auth CEO. |
-| **Por qué** | Inventario `docs/OS_AGENT_TEAM_AUDIT.md` muestra stacks reales distintos; fusionar rompería certs / costes / honestidad. |
-| **Consecuencias** | Documentar gaps con honestidad (beta catálogo, portal_path, generative `metadata.mock`). Pagos partner y IA prod siguen gated CEO. |
-| **Relación** | Complementa ADR-005/006/015/016/027/029; no invalida Router/MCP/Workforce certs. |
+| **Decisión** | Mantener separados: (1) Private AI registry (~23, tools+RAG, `canAutoExecute:false`); (2) Autonomous pack roles (14, Ollama-first / OpenAI opt-in); (3) OS premium (25); (4) OS sector fleet (~1605) como **legacy satellite**. Unificación operativa vía `OsCapabilityRegistry` (11 servicios) — no mintar flotilla. Dual-path LLM: ver **ADR-034**. |
+| **Por qué** | Inventario `docs/OS_AGENT_TEAM_AUDIT.md` muestra stacks reales distintos; fusionar mal rompería certs / costes / honestidad. |
+| **Consecuencias** | Documentar gaps con honestidad. Pagos partner y IA prod gated CEO. Sector: `mintNewSectorAgents: false`. |
+| **Relación** | Complementa ADR-005/006/015/016/027/029; extendido por **ADR-034**. |
+
+---
+
+## ADR-034 — OS LLM dual-path (Ollama-first; OpenAI opt-in)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-22 |
+| **Decisión** | `backend/os-agents/LlmClient` es dual-path: **primary Ollama** / local AI; **OpenAI** solo con `AUTONOMOUS_ALLOW_OPENAI=1` + key + PRIVATE_MODE permite egress. Sin path → `OsAgentError` (nunca mock éxito). Registry `backend/agency/OsCapabilityRegistry.ts` (11 servicios). Partners: `NELVYON_CEO_PARTNER_PAYOUTS` para dinero. |
+| **Por qué** | Visión IA privada; 0 coste; unificar ejecución sin romper Router/MCP/Workforce/Elite. |
+| **Consecuencias** | Contract tests dual-path; playbooks `SERVICE_*.md`; runbook `OS_AUTONOMOUS_OPERATIONS.md`. |
+| **Relación** | Extiende ADR-033/005; no invalida certs. |
 
 ---
 

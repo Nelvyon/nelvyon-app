@@ -86,7 +86,10 @@ CRM, pipeline, email/SES, WhatsApp, social, funnels, store, helpdesk, SEO KW, ad
 | 3 growth packs + portal + QA85 | Élite verificable | — | bajo | 0 | Mantener; staging LLM ops |
 | Private AI 23 + approvals | Existe · mejora | P1 | medio | 0 | Certificar workforce; no auto-exec sin CEO |
 | Autonomous 14 + Ollama | Existe · mejora | P1 | medio | 0 | Quality routing 3b/8b (proposal); no bajar umbral |
-| OS premium/sector OpenAI-only | Mejora crítica vs visión | P0 | alto | 0 | Dual-path LlmClient→Ollama (ADR + auth CTO; sin romper certs) |
+| OS premium/sector OpenAI-only | **Superseded ADR-034** | — | — | 0 | Dual-path Ollama-first implementado |
+| Capability registry 11 | **Implementado** | P1 | bajo | 0 | `OsCapabilityRegistry` + playbooks |
+| Partners CEO gate | **Implementado** | P1 | bajo | 0 | `NELVYON_CEO_PARTNER_PAYOUTS` |
+| Sector 1605 volumen | Legacy satellite | P2 | medio | 0 | `mintNewSectorAgents:false` — no expandir |
 | Beta portal_path | **Fix aplicado** | P1 | bajo | 0 | `portal_path: "/portal"` |
 | Beta catálogo `available` | **Fix aplicado** | P1 | bajo | 0 | 5 packs → `availability: "beta"` |
 | Generative placeholders | **Fix aplicado** | P1 | medio | 0 | `metadata.mock: true` |

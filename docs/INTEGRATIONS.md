@@ -87,7 +87,7 @@
 
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
-| OpenAI | 🟡 | `OPENAI_API_KEY` (+ `AUTONOMOUS_ALLOW_OPENAI=1` solo packs autónomos) | **Autonomous packs:** opt-in only (no auto-fallback). **OS premium/sector `LlmClient`:** OpenAI-required hoy (ADR-033). Ver `OS_AGENT_TEAM_AUDIT.md`. |
+| OpenAI | 🟡 | `OPENAI_API_KEY` + `AUTONOMOUS_ALLOW_OPENAI=1` | **OFF default.** Autonomous + OS `LlmClient` (ADR-034): opt-in only; PRIVATE_MODE blocks egress. Ollama primary. |
 | Anthropic | 🟡 | `ANTHROPIC_API_KEY` | Private AI provider |
 | Ollama (local) | ✅ | `OLLAMA_HOST` / `:11434` | Primary autonomous path. Local 2026-07-22: 6 models · Phase C 3b qa=55 / 8b qa=89 · HTTP `mode=real`. Staging: **sin** Ollama/OpenAI → `LLM_NOT_CONFIGURED` (ops). **Prohibido** staging→`localhost:11434`. |
 | Local-ai Postgres/pgvector | 🟡 | Compose `127.0.0.1:5434` | Ingest **verified** hist. · Docker **DOWN** 2026-07-22 (HTTP pack E2E BLOCKED) |

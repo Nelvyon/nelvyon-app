@@ -3,8 +3,9 @@ import { getPrivateAiRouter } from "../core/PrivateAiRouter";
 import type { PrivateAiSettings } from "../types";
 
 /**
- * Adapter OS packs → Private AI router.
- * NOT wired into os-agents yet — import when ready to migrate off OpenAI-only LlmClient.
+ * Adapter OS packs → Private AI router (certified path).
+ * Prefer `LlmClient.getInstance()` dual-path (ADR-034 Ollama-first) for premium/sector agents.
+ * Use this adapter when tenant settings / PrivateAiRouter chain is required.
  */
 export class OsLlmClientAdapter implements ILlmClient {
   constructor(private readonly tenantSettings?: Partial<PrivateAiSettings>) {}

@@ -1,34 +1,34 @@
-# CTO Final Verify — 2026-07-22 (OS agent audit + honesty fixes · no redeploy)
+# CTO Final Verify — 2026-07-22 (OS unification Phases 1–5 · no prod IA)
 
-> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimProductionReady` **false** · **no** READY  
+> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · **no** READY · **no** “élite unificada” sin ops DNS  
 > Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`  
-> No MFA bypass · No prod AI flags · No OpenAI paid · No architecture dual-path OS LLM (needs CEO ADR)
+> Costes nuevos: **0** · IA prod **OFF** · Partner payouts **OFF** (`NELVYON_CEO_PARTNER_PAYOUTS` unset)
 
-## OS agent team (auditoría)
+## Fase 1 — calidad base
 
-| Campo | Resultado |
-|-------|-----------|
-| SSOT | `docs/OS_AGENT_TEAM_AUDIT.md` |
-| Universos | Private AI 23 · Autonomous 14 · OS premium 25 · OS sector ~1605 |
-| Élite verificable | 3 growth packs + portal QA≥85 |
-| Gap visión IA privada | OS `LlmClient` **OpenAI-only** (contract test añadido) |
-| Partners | Base sí · CEO gate pagos **no** |
-| Honesty fixes | portal `/portal` · catalog `beta` · generative `metadata.mock` |
-| vitest | **8/8** PASS (esta pasada) |
+| Gate | Resultado |
+|------|-----------|
+| tsc | **0** |
+| honesty+wiring commit | **`80da2def`** pushed |
+| pack gate (prev) | ALL_GATE_PASS 51 |
 
-## Prod (sin redeploy esta pasada)
+## Fases 2–5 — unificación
 
-| Campo | Resultado |
-|-------|-----------|
-| SHA vivo | `3f860c06eaca` · live/ready **200** |
-| Deploy previo | `d4650e99` SUCCESS |
-| IA prod | **OFF** |
+| Fase | Resultado |
+|------|-----------|
+| 2 Dual-path + registry | ADR-034 · LlmClient Ollama-first · 11 capabilities · vitest dual-path PASS |
+| 3 Servicios reales | Playbooks SERVICE_* · sector `mintNewSectorAgents:false` |
+| 4 Partners | Facade 3 stacks · CEO gate pagos |
+| 5 Ops | `OS_AUTONOMOUS_OPERATIONS.md` |
 
-## Costes
+## No hecho (CEO)
 
-**0**
+- Activar IA / MCP / SM / OpenClaw en prod
+- `AUTONOMOUS_ALLOW_OPENAI=1`
+- `NELVYON_CEO_PARTNER_PAYOUTS=1`
+- Redeploy prod de unificación
+- Acuerdos legales / pagos auto
 
 ## Siguiente paso único
 
-Humano: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` → health 200.  
-Luego: commit honesty OS si CEO aprueba; dual-path LlmClient→Ollama solo con ADR.
+Humano DNS CNAME `app` → Railway · luego commit unificación si pending · sin IA prod.

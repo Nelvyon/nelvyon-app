@@ -7,12 +7,19 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| OS Unify | **ADR-034 dual-path LLM** | `LlmClient` Ollama-first · OpenAI solo `AUTONOMOUS_ALLOW_OPENAI=1` · fail-closed · contract tests |
+| OS Unify | **Capability registry** | `backend/agency/OsCapabilityRegistry` · 11 servicios reales · sector legacy satellite |
+| OS Unify | **Playbooks** | `docs/agency-playbooks/SERVICE_*.md` (11) |
+| Partners | **CEO payout gate** | `NELVYON_CEO_PARTNER_PAYOUTS` default OFF · `markPaid`/`payViaStripeConnect` · facade 3 stacks |
+| Ops | **Runbook sin Cursor** | `docs/OS_AUTONOMOUS_OPERATIONS.md` |
+| SaaS | **tsc 0 + wiring** | MCP/orchestrator/private-ai exports · `routeInference`/`executeInference`/`getRouterHealthStatus` · commit `80da2def` |
 | OS Audit | **Equipo agentes OS** | Inventario real 4 universos · `docs/OS_AGENT_TEAM_AUDIT.md` · sin claim élite unificada |
 | Honesty | **Beta portal_path** | `betaPacksRunners` → `/portal` (antes `/portal/packs/*` inexistente) |
 | Honesty | **Catálogo beta** | 5 packs → `availability: "beta"` (no `available` sin cert promote) |
 | Honesty | **GenerativeClient mock** | placeholders con `metadata.mock: true` · Meshy respeta VITEST |
-| Tests | **Contract 8/8** | portal · catalog · LlmClient OpenAI-only · generative mock |
-| Deploy | **Prod SUCCESS `d4650e99`** | `--from-source` tip `3f860c06` · SHA vivo `3f860c06eaca` · live/ready 200 · Ready · no headers error · IA flags not set · gates tsc/vitest22/pack51 PASS |
+| Tests | **Contract honesty 8/8** | portal · catalog · LlmClient · generative mock (prev) |
+| Deploy | **Prod SUCCESS `d4650e99`** | tip `3f860c06` · SHA vivo `3f860c06eaca` · IA flags not set |
+
 | Docs | **Quality routing proposal** | `PROPOSAL_QUALITY_ROUTING_LOCAL.md` — 3b fast vs 8b QA≥85 · evidence 55/89 · no cert invalidation · opt-in later |
 | Autonomous | **OpenAI opt-in only** | `AUTONOMOUS_ALLOW_OPENAI=1` required · no auto-fallback on Ollama fail · `isInternetTaskAuthorized` · prompt schema examples for small models · vitest 22/22 · tsc 0 · gate 51 |
 | Local QA | **Phase C 3b/8b evidence** | heliovolt 3b **qa=55** (model limit) · 8b **qa=89** · HTTP E2E `needs_review` · `.release-logs/hardening-ia-packs-20260722.txt` · threshold 85 unchanged |

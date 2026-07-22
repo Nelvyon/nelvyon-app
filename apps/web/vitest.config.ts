@@ -28,6 +28,7 @@ export default defineConfig({
       "../../backend/support/__tests__/**/*.test.ts",
       "../../backend/feedback/__tests__/**/*.test.ts",
       "../../backend/changelog/__tests__/**/*.test.ts",
+      "../../backend/agency/__tests__/**/*.test.ts",
       "../../backend/affiliates/__tests__/**/*.test.ts",
       "../../backend/oauth/__tests__/**/*.test.ts",
       "../../backend/qa/__tests__/flows/**/*.test.ts",

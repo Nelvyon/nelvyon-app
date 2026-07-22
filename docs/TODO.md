@@ -38,8 +38,11 @@
 - [ ] Staging Ollama alcanzable para pack E2E (opcional; **nunca** `localhost:11434` PC; **no** IA prod)
 - [ ] KI-020 smoke staging CSRF Origin
 - [x] Auditoría equipo OS agentes (`docs/OS_AGENT_TEAM_AUDIT.md`) + honesty portal/beta/mock (2026-07-22)
-- [ ] Dual-path OS `LlmClient`→Ollama (ADR + auth CEO; 0 coste runtime si local)
-- [ ] Partners: unificar stacks + gate aprobación CEO (sin pagos auto)
+- [x] Dual-path OS `LlmClient`→Ollama (ADR-034) + capability registry 11 servicios
+- [x] Partners: facade + gate `NELVYON_CEO_PARTNER_PAYOUTS` (sin pagos auto)
+- [x] Runbook `OS_AUTONOMOUS_OPERATIONS.md`
+- [ ] Redeploy prod post-unificación (solo con auth CEO; IA flags OFF)
+- [ ] Dual-path soak E2E Ollama en staging alcanzable (nunca localhost PC)
 
 ---
 
