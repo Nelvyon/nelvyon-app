@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-22** — Prod unify SUCCESS `4cb01795` · SHA vivo `2b51581ddaf6` · flags OFF · Cloudflare CNAME sole blocker
+> Última actualización: **2026-07-22** — Elite-next: arch local-AI + ADR-036 quality routing + flow/ops audits · prod SHA `2b51581ddaf6` · flags OFF
 
 ---
 
@@ -9,22 +9,24 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** (app unificada live; DNS app pendiente) |
+| **Estado** | **CONDITIONAL_READY** |
 | **SHA vivo prod** | `2b51581ddaf6` · live/ready **200** |
-| **Deploy** | `4cb01795` **SUCCESS** · tip `2b51581d` (cadena: `4bc0282b` + MCP fail-closed + track router/MCP + specialization) |
-| **Fallidos previos** | `d6af9ec0` / `dbd09735` — módulos untracked (corregidos; no reintentar) |
-| **IA / MCP / SM / OpenClaw / OpenAI opt-in / CEO payouts** | **ABSENT / OFF** (ningún flag set este deploy) |
-| **MCP productive default** | **OFF** (`NELVYON_MCP_PRODUCTIVE_ENABLED` require `=1`) |
-| **Partner payouts** | Calculables · `markPaid`/Stripe **CEO_GATE** sin flag |
-| **Smokes staging** | 🟡 bloqueados `STAGING_QA_PASSWORD` |
+| **IA / MCP / SM / OpenClaw / OpenAI / CEO payouts** | **OFF / ABSENT** |
+| **Quality routing** | Código ADR-036 · flag `AUTONOMOUS_QUALITY_ROUTING` **OFF** default |
+| **Local AI runtime** | Arquitectura lista · **no activada** (`ARCHITECTURE_LOCAL_AI_RUNTIME.md`) |
+| **Beta packs** | Permanecen **beta** (no promote sin cert+deliverables) |
+| **OS flows prod** | Kickoff wiring PASS · ejecución IA **blocked** (flags OFF) — `OS_FLOW_AUDIT.md` |
 | **Costes nuevos** | **0** |
-| **Cloudflare** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` |
+| **Cloudflare** | CNAME `app.nelvyon.com` pendiente |
+| **Smokes staging** | Bloqueados `STAGING_QA_PASSWORD` |
 
 ---
 
 ## Próximo paso EXACTO
 
-Humano Cloudflare DNS: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` → `https://app.nelvyon.com/api/health/live` 200.  
-No MFA bypass. No activar IA/MCP/SM/OpenClaw/OpenAI/CEO payouts. No segundo redeploy.
+1. Humano: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`.  
+2. CEO: revisar `ARCHITECTURE_LOCAL_AI_RUNTIME.md` (Option A Tailscale) antes de cualquier Ollama alcanzable.  
+3. No activar `AUTONOMOUS_QUALITY_ROUTING` / IA prod / OpenAI / CEO payouts sin auth.  
+4. Opcional: secret `STAGING_QA_PASSWORD` para smokes.
 
-Evidencia: `.release-logs/prod-redeploy-unify-20260722-final.txt` · `docs/CTO_FINAL_VERIFY.md`
+SSOT: `docs/OS_FLOW_AUDIT.md` · `docs/OPS_QUALITY_AUDIT.md` · ADR-036

@@ -407,3 +407,15 @@
 
 ---
 
+## ADR-036 — Autonomous pack quality routing 3b/8b (opt-in)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-22 |
+| **Decisión** | `AUTONOMOUS_QUALITY_ROUTING=1` habilita selección de modelo Ollama por rol: roles críticos de entregable usan `OLLAMA_STRATEGY_MODEL` (8b); resto `OLLAMA_MODEL` (3b). Default OFF. **No** modifica Model Router certificado ni umbral QA 85. |
+| **Por qué** | Evidencia Phase C: 3b qa=55 / 8b qa=89; packs necesitan path de calidad local sin OpenAI. |
+| **Consecuencias** | Tests `qualityRouting.test.ts`; prod sigue IA OFF; mesh local-AI = doc `ARCHITECTURE_LOCAL_AI_RUNTIME.md` sin activar. |
+| **Relación** | ADR-034 · proposal quality routing. |
+
+---
+

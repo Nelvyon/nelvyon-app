@@ -1,7 +1,7 @@
 # PROPOSAL — Quality routing local (3b vs 8b)
 
-> **Status:** proposal only · **no code** · does **not** change certified Router/models · **not** activated in prod  
-> Date: **2026-07-22** · Evidence: `.release-logs/hardening-ia-packs-20260722.txt`
+> **Status:** **implemented opt-in** (ADR-036) · certified Router **unchanged** · prod IA **OFF**  
+> Date: **2026-07-22** · Code: `resolveAutonomousOllamaModel` in `backend/autonomous/llm/llmAdapter.ts`
 
 ---
 
@@ -29,12 +29,14 @@ When running **local** autonomous packs against Ollama (never prod IA activation
 
 ---
 
-## Acceptance criteria (future implementation — out of scope here)
+## Acceptance criteria (ADR-036 — implemented)
 
-- Explicit opt-in only (flag or model override); 3b remains default unless quality path requested.
-- Threshold 85 and certified model locks untouched unless a dedicated certification re-run is planned.
-- Evidence logged (model id + QA score) per pack run.
-- Zero OpenAI paid path required for this routing.
+- Explicit opt-in: `AUTONOMOUS_QUALITY_ROUTING=1`
+- Critical roles → `OLLAMA_STRATEGY_MODEL` (8b); others → `OLLAMA_MODEL` (3b)
+- Threshold 85 unchanged; `needs_review` when QA fails (orchestrator)
+- Certified Router soak/locks untouched
+- Zero OpenAI required
+- Architecture for runtime reachability: `docs/ARCHITECTURE_LOCAL_AI_RUNTIME.md` (not activated)
 
 ---
 

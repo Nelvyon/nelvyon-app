@@ -19,3 +19,5 @@ export {
   isCeoPartnerPayoutEnabled,
 } from "./PartnerProgramFacade";
 export type { PartnerProgramSnapshot, PartnerStackId } from "./PartnerProgramFacade";
+export { calculatePartnerCommission } from "./commissionCalc";
+export type { CommissionCalcInput, CommissionCalcResult } from "./commissionCalc";

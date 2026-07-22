@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Agency | **ADR-036 quality routing + partner calc** | Opt-in `AUTONOMOUS_QUALITY_ROUTING` 3b/8b · `ARCHITECTURE_LOCAL_AI_RUNTIME` · OS/ops audits · sector playbooks · partner unified view + `commissionCalc` · flags OFF · beta packs stay beta · tsc 0 · vitest phase 18/18 |
 | Deploy | **Prod SUCCESS `4cb01795`** | tip `2b51581d` · archive 69/0 · live `2b51581ddaf6` · live/ready 200 · flags ABSENT · ADR-035 MCP default OFF · payout gate 2/2 · smokes blocked STAGING_QA_PASSWORD · cost 0 |
 | Deploy | **FAILED then fixed** | `d6af9ec0` / `dbd09735` untracked modules → track MCP/router/specialization · then SUCCESS |
 | Docs | **ADR-035** | MCP productive fail-closed default OFF |
