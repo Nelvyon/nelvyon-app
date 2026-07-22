@@ -89,9 +89,11 @@ blob-report/
 # --- Artefactos locales (no subir al repo) ---
 nelvyon_backend.zip
 tools/
-# Track intentional Private AI MCP bridge sources (negates broad tools/ above)
+# Track intentional MCP / Private AI tool sources (negates broad tools/ above)
 !backend/private-ai/tools/
 !backend/private-ai/tools/**
+!backend/mcp/tools/
+!backend/mcp/tools/**
 backend/autonomous/output/
 
 # Accidental local-ai copy under Next app (canonical: backend/local-ai/)
