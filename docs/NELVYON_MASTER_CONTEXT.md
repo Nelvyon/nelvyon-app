@@ -1021,8 +1021,8 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY**) |
-| **SHA vivo prod** | `e62d52cc5d61` · deploy `1613fbb5` |
-| **P0 smokes** | **ALL_P0_PASS** · `STAGING_QA_PASSWORD` EXISTS |
+| **SHA vivo prod** | `8d84036055a1` · deploy `bebc41d7` |
+| **P0 smokes** | **ALL_P0_PASS** · KI-020 **KI020_PASS** |
 | **Blocker go-live DNS** | **RESUELTO** 2026-07-22 — `app.nelvyon.com` DNS/SSL/health PASS |
 | **verify-all** | **7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED** |
 | Bloque 1 Docker+ingest | **VERIFICADO** (`verified:true` · chunks 1559 · coverage 0.99 · claimComplete **false**) |

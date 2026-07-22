@@ -1,14 +1,14 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-22** — DNS/SSL `app.nelvyon.com` **PASS** · CSRF app Origin fix · CONDITIONAL_READY
+> Actualizado: **2026-07-22** — DNS/SSL app **PASS** · KI020_PASS · SHA `8d84036055a1` · CONDITIONAL_READY
 
 | Capa | Estado | Evidencia |
 |------|--------|-----------|
-| **Veredicto** | **CONDITIONAL_READY** | Legal campañas · IA mesh CEO · claimReady false |
-| **Prod** | **OK** | SHA `e62d52cc5d61` · deploy `1613fbb5` · live/ready 200 |
+| **Veredicto** | **CONDITIONAL_READY** | Legal campañas · IA mesh CEO |
+| **Prod** | **OK** | SHA `8d84036055a1` · deploy `bebc41d7` · live/ready 200 |
 | **app.nelvyon.com** | **OK** | DNS+SSL+health PASS |
-| **IA flags** | **OFF** | ABSENT · canaries preparados |
-| **Smokes staging** | **ALL_P0_PASS** | secret EXISTS |
-| **KI-020** | **Fix pending redeploy** | apex PASS · app Origin allowlist in code |
+| **KI-020 CSRF** | **PASS** | KI020_PASS apex + app |
+| **IA flags** | **OFF** | ABSENT |
+| **Smokes P0** | **ALL_P0_PASS** | secret EXISTS |
 | **Backup** | **OK** | `29932453133` |
 | **Costes** | **0** | |

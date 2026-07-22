@@ -1,24 +1,15 @@
-# CTO Final Verify — 2026-07-22 (DNS PASS + CSRF fix)
+# CTO Final Verify — 2026-07-22 (DNS PASS + CSRF LIVE)
 
 > Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · **no** READY (legal + IA CEO)  
-> SHA vivo (pre-CSRF redeploy): **`e62d52cc5d61`** · Coste **0**
+> SHA vivo: **`8d84036055a1`** · Deploy **`bebc41d7` SUCCESS** · Coste **0**
 
 ## Verified
 
 | Gate | Resultado |
 |------|-----------|
-| `app.nelvyon.com` DNS | PROPAGATED · Railway verified |
-| SSL | VALID · CN=`app.nelvyon.com` · LE |
-| live / ready | **200** / **200** |
-| P0 smokes | **ALL_P0_PASS** |
+| `app.nelvyon.com` DNS/SSL | **PASS** · LE CN=`app.nelvyon.com` |
+| live / ready (apex + app) | **200** / **200** · SHA `8d84036055a1` |
+| KI-020 CSRF smoke | **KI020_PASS** |
+| P0 smokes | **ALL_P0_PASS** (prev session) |
 | Backup | **success** `29932453133` |
-| KI-020 apex Origin | **PASS** |
-| KI-020 app Origin | **FAIL→FIX** allowlist · redeploy |
-
-## No activado
-
-Tailscale · Ollama remoto · quality routing · OpenAI allow · MCP · SM · OpenClaw · payouts · campañas
-
-## Siguiente
-
-Redeploy CSRF fix · re-smoke KI-020 · CEO IA batch solo si se desea.
+| IA / payouts / campañas | **OFF** / **BLOQUEADO_LEGAL** |

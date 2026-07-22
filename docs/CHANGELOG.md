@@ -7,8 +7,8 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
-| Ops | **DNS/SSL app.nelvyon.com PASS** | CF CNAME+TXT DNS-only · Railway verified · cert VALID LE · live/ready **200** SHA `e62d52cc5d61` · evidence `dns-app-verify-pass-20260722.txt` |
-| Security | **KI-020 CSRF app Origin** | Smoke: apex OK · `app.nelvyon.com` blocked → allowlist prod hosts in `assertSaasOrigin` · script `staging-smoke-ki020-csrf.mjs` · redeploy required |
+| Ops | **DNS/SSL app.nelvyon.com PASS** | CF CNAME+TXT · Railway verified · cert VALID · live/ready **200** · tip `8d84036055a1` · evidence `dns-app-verify-pass-20260722.txt` |
+| Security | **KI-020 CSRF LIVE** | `assertSaasOrigin` prod hosts · smoke **KI020_PASS** · deploy `bebc41d7` |
 | Ops | **CEO closure DNS+smokes+backup** | Railway custom domain `app.nelvyon.com` added · CF DNS was BLOCKED_HUMAN (now PASS) · `STAGING_QA_PASSWORD` EXISTS + wired · portal-packs OPS_DEGRADED · **ALL_P0_PASS** · Backup `29932453133` · IA OFF · `claimReady: false` |
 | Ops | **STAGING_QA_PASSWORD EXISTS** | Secret creado en GitHub Actions (stdin, sin valor en chat/repo) · P0 smokes iniciales `P0_FAIL` (superseded by ALL_P0_PASS rerun) · evidence `.release-logs/staging-p0-smokes-ceo-closure-20260722.txt` · sin weaken auth |
 | Deploy | **Prod SUCCESS `1613fbb5`** | tip `e62d52cc` · live `e62d52cc5d61` · live/ready 200 · flags ABSENT (router/QR/MCP/SM/OLLAMA*) · cost 0 · evidence `prod-redeploy-closure-20260722.txt` |
