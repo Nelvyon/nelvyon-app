@@ -67,4 +67,3 @@ if (allOk) {
 }
 console.log("P0_FAIL");
 process.exit(1);
-}
