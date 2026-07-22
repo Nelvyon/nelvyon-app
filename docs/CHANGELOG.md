@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Deploy | **Track specialization deps** | RouterValidator closure: `PipelineResponseValidator` · `CitationService` · `JsonOutputService` · `ContextEnforcer` · `DirectAnswerFromContext` · import-closure gaps **0** · sin benchmarks/locks · sin redeploy |
 | Deploy | **Track MCP + router** | `SaasMcpProductiveService` · `backend/mcp/**` (sin benchmark) · `local-ai/router` · PromptBuilder chain · `.gitignore` `!backend/mcp/tools/**` · tsc 0 · `build:prod` PASS · sin redeploy aún |
 | OS Unify | **ADR-034 dual-path LLM** | `LlmClient` Ollama-first · OpenAI solo `AUTONOMOUS_ALLOW_OPENAI=1` · fail-closed · contract tests |
 | OS Unify | **Capability registry** | `backend/agency/OsCapabilityRegistry` · 11 servicios reales · sector legacy satellite |

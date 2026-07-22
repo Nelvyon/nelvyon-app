@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-22** — Deploy fix: track MCP + local-ai router for Railway webpack · DNS CNAME sigue pendiente
+> Última actualización: **2026-07-22** — Deploy fix: track RouterValidator specialization deps · DNS CNAME sigue pendiente
 
 ---
 
@@ -10,8 +10,8 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** (app+schema OK; DNS app pendiente) |
-| **SHA vivo prod** | `3f860c06eaca` (prod sin redeploy aún) · tip: fix MCP/router track pending push |
-| **Deploy fix** | ✅ `SaasMcpProductiveService` + `backend/mcp/**` + `local-ai/router` + PromptBuilder chain tracked · tsc 0 · `build:prod` PASS · sin redeploy aún |
+| **SHA vivo prod** | `3f860c06eaca` (prod sin redeploy aún) · tip: specialization deps track pending push |
+| **Deploy fix** | ✅ MCP/router + **RouterValidator specialization** (`PipelineResponseValidator`/`CitationService`/`JsonOutputService`/`ContextEnforcer`/`DirectAnswerFromContext`) tracked · closure gaps **0** · sin redeploy aún |
 | **Fase 1** | ✅ tsc **0** · honesty+router wiring commit **`80da2def`** pushed |
 | **Fase 2** | ✅ ADR-034 · `LlmClient` Ollama-first · `OsCapabilityRegistry` 11 servicios |
 | **Fase 3** | ✅ Playbooks `SERVICE_*.md` · sector = legacy satellite (no mint) |
@@ -25,7 +25,7 @@
 
 ## Próximo paso EXACTO
 
-1. Tras push del fix deploy: esperar Railway build SUCCESS (sin tocar env; redeploy solo si el auto-deploy no dispara).  
+1. Tras push del fix specialization deps: esperar Railway build SUCCESS (sin tocar env; **no** forzar redeploy manual salvo que auto-deploy no dispare).  
 2. Humano: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` → health 200.  
 3. **No** activar IA prod · **No** `NELVYON_CEO_PARTNER_PAYOUTS` sin auth CEO · **No** OpenAI sin `AUTONOMOUS_ALLOW_OPENAI=1`.
 
