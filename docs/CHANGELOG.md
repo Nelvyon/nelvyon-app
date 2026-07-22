@@ -7,6 +7,11 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| OS Audit | **Equipo agentes OS** | Inventario real 4 universos · `docs/OS_AGENT_TEAM_AUDIT.md` · sin claim élite unificada |
+| Honesty | **Beta portal_path** | `betaPacksRunners` → `/portal` (antes `/portal/packs/*` inexistente) |
+| Honesty | **Catálogo beta** | 5 packs → `availability: "beta"` (no `available` sin cert promote) |
+| Honesty | **GenerativeClient mock** | placeholders con `metadata.mock: true` · Meshy respeta VITEST |
+| Tests | **Contract 8/8** | portal · catalog · LlmClient OpenAI-only · generative mock |
 | Deploy | **Prod SUCCESS `d4650e99`** | `--from-source` tip `3f860c06` · SHA vivo `3f860c06eaca` · live/ready 200 · Ready · no headers error · IA flags not set · gates tsc/vitest22/pack51 PASS |
 | Docs | **Quality routing proposal** | `PROPOSAL_QUALITY_ROUTING_LOCAL.md` — 3b fast vs 8b QA≥85 · evidence 55/89 · no cert invalidation · opt-in later |
 | Autonomous | **OpenAI opt-in only** | `AUTONOMOUS_ALLOW_OPENAI=1` required · no auto-fallback on Ollama fail · `isInternetTaskAuthorized` · prompt schema examples for small models · vitest 22/22 · tsc 0 · gate 51 |

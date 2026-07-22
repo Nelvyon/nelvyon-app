@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (SHA vivo `3f860c06eaca` · deploy `d4650e99` SUCCESS · KI-R028/R029/R030 · OpenAI opt-in only + Ollama primary · local Phase C 3b qa=55 / 8b qa=89 · HTTP `needs_review` 3b · IA OFF · quality-routing **proposal only**). Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted.  
-> Evidencia: price-audit allValid · health 200 · vitest 22/22 · tsc 0 · pack gate 51 · redeploy Ready · `.release-logs/prod-post-redeploy-verify-20260722.txt` · `CTO_FINAL_VERIFY.md` · `PROPOSAL_QUALITY_ROUTING_LOCAL.md`
+> Veredicto interno: **CONDITIONAL_READY** (SHA vivo `3f860c06eaca` · OS agent audit `OS_AGENT_TEAM_AUDIT.md` · honesty portal/beta/mock · deploy `d4650e99` SUCCESS · KI-R028/R029/R030 · OpenAI opt-in + Ollama primary packs · IA OFF). Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass.  
+> Evidencia: audit vitest **8/8** · price-audit allValid · health 200 · `CTO_FINAL_VERIFY.md` · `OS_AGENT_TEAM_AUDIT.md`
 
 ---
 

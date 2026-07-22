@@ -1778,7 +1778,8 @@ cd backend && python -m pytest tests/ -q --tb=short
 | [`docs/DECISIONS.md`](./DECISIONS.md) | ADRs 001–030 |
 | [`docs/DATABASE.md`](./DATABASE.md) | Migraciones, dominios, RLS, comandos DB |
 | [`docs/KNOWN_ISSUES.md`](./KNOWN_ISSUES.md) | KI abiertos e historial |
-| [`docs/AUDITORIA_TECNICA_ABSOLUTA.md`](./AUDITORIA_TECNICA_ABSOLUTA.md) | Informe CONDITIONAL_READY 2026-07-20 |
+| [`docs/AUDITORIA_TECNICA_ABSOLUTA.md`](./AUDITORIA_TECNICA_ABSOLUTA.md) | Informe CONDITIONAL_READY |
+| [`docs/OS_AGENT_TEAM_AUDIT.md`](./OS_AGENT_TEAM_AUDIT.md) | Inventario real agentes/servicios/partners OS (2026-07-22) |
 | [`docs/CHANGELOG.md`](./CHANGELOG.md) | Historial de cambios (no borrar) |
 | [`docs/CONSTITUTION_NELVYON_AI.md`](./CONSTITUTION_NELVYON_AI.md) | P1–P10 IA privada |
 | [`docs/QUALITY_STANDARD.md`](./QUALITY_STANDARD.md) | Estándar ADR-019 |
@@ -1797,20 +1798,18 @@ cd backend && python -m pytest tests/ -q --tb=short
 
 | Check | Valor |
 |-------|-------|
-| Fecha documento | **2026-07-21** |
+| Fecha documento | **2026-07-22** |
 | Título | NELVYON — MASTER CONTEXT (Biblia oficial) |
 | Veredicto citado | **CONDITIONAL_READY** (**NOT READY**) |
 | Producto enterprise completo / READY | **NO** |
 | Workforce | **PASS** (ADR-029) |
 | Elite | **PASS** (ADR-026) |
+| OS agent fleet | **4 universos** — `OS_AGENT_TEAM_AUDIT.md` · **ADR-033** · no élite unificada |
 | Router / MCP / Specialization | **CERTIFIED** (sin cambios Bloque 1) |
-| Shared Memory / OpenClaw | **Wired / OFF** — KI-021 staging **`verified:true`** · KI-022…026 ✅ · última mig **516** · `506a` · **507** no editada · **ADR-032** dual-plane; no “product complete” · claimComplete **false** |
-| Brain / Bloque 1 | orphans **0** · coverage **0.99** · chunks **1559** · claimComplete **false** · ingest **`verified:true`** · Docker local-ai **UP** · Postgres healthy `:5434` · Ollama **UP** · ADR-030 |
-| Migraciones | última **516** (staging: **516** aplicada · Shared Memory verified · KI-026 ✅) |
-| ADRs | **001–032** |
-| Cron routes | **16** |
-| GHA workflows | **14** |
-| Próximo paso ops | **SES Live + Stripe Live** (no KI-026) · Shared Memory staging cerrado · Docker+ingest DONE · **CONDITIONAL_READY** |
+| Shared Memory / OpenClaw | **Wired / OFF** — última mig **516** · **ADR-032** dual-plane · claimComplete **false** |
+| Migraciones | última **516** |
+| ADRs | **001–033** |
+| Próximo paso ops | **CNAME `app.nelvyon.com`** · ver `HANDOVER.md` · **CONDITIONAL_READY** |
 | Secretos en este archivo | **Ninguno** |
 | Invención deliberada | **Prohibida** |
 | SSOT del próximo paso | **`docs/HANDOVER.md`** |

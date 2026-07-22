@@ -1593,6 +1593,15 @@ export {
   resetSaasPrivateAiServiceForTests,
   SaasPrivateAiService,
 } from "./SaasPrivateAiService";
+export type {
+  PrivateAiInferenceTaskInput,
+  PrivateAiExecuteInferenceInput,
+} from "./SaasPrivateAiService";
+export {
+  getSaasMcpProductiveService,
+  resetSaasMcpProductiveServiceForTests,
+  SaasMcpProductiveService,
+} from "./SaasMcpProductiveService";
 export {
   getSaasSharedMemoryService,
   resetSaasSharedMemoryServiceForTests,
@@ -1605,6 +1614,17 @@ export {
   isSharedMemoryEnabled,
   getSharedMemoryConfig,
 } from "../shared-memory";
+export {
+  ORCHESTRATOR_CONTRACT_VERSION,
+  ORCHESTRATOR_RESILIENCE,
+  OrchestratorNotEnabledError,
+  isOrchestratorEnabled,
+  InMemoryAgentOrchestrator,
+  getAgentOrchestrator,
+} from "../orchestrator";
+export { isOpenClawRuntimeAuthorized } from "../openclaw";
+export { getPrivateAiMetricsSnapshot } from "../private-ai/observability/PrivateAiMetrics";
+export { preferLocalRag } from "../private-ai/rag/UnifiedRagStore";
 export {
   listUnifiedAgents,
   getUnifiedAgent,

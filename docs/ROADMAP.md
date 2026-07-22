@@ -60,6 +60,9 @@
 | `PHASE2_ELITE_CERTIFIED` | ✅ | PASS repo · ver `PHASE2_ELITE_CERT.md` |
 | Improvement loop | ✅ | propose/eval/promote/rollback · CI gate |
 | Workforce autónoma certificada | ✅ | `nelvyonAutonomousWorkforceCertified=true` · 45 workflows · daemon · live Ollama/RAG |
+| Auditoría equipo OS (4 universos) | ✅ | `docs/OS_AGENT_TEAM_AUDIT.md` 2026-07-22 · honesty portal/beta/mock |
+| OS premium dual-path Ollama | ❌ | OpenAI-only `LlmClient` hoy · requiere ADR + auth CEO |
+| Agencia OS unificada élite (ops) | 🟡 | Growth packs élite · sector flotilla OpenAI · Private AI advisory |
 
 ---
 

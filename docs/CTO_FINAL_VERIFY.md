@@ -1,67 +1,34 @@
-# CTO Final Verify — 2026-07-22 (Prod redeploy `3f860c06` + quality-routing proposal)
+# CTO Final Verify — 2026-07-22 (OS agent audit + honesty fixes · no redeploy)
 
 > Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimProductionReady` **false** · **no** READY  
 > Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`  
-> No MFA bypass attempted. · Prod redeploy **SUCCESS** · No prod AI flags set · No OpenAI paid calls · No 3b→8b cert change
+> No MFA bypass · No prod AI flags · No OpenAI paid · No architecture dual-path OS LLM (needs CEO ADR)
 
-## Prod (redeploy 2026-07-22)
-
-| Campo | Resultado |
-|-------|-----------|
-| Deploy ID | `d4650e99-8fe1-41bf-b80b-a1b3fb8aca88` |
-| Command | `railway redeploy --from-source -y` |
-| Commit / SHA vivo | `3f860c06` / `3f860c06eaca` |
-| Status | **SUCCESS** |
-| live / ready | **200** / **ready** (db ok) |
-| Logs | Ready · migrate complete · healthcheck OK · no headers error |
-| Mig | **512–516** (KI-R029) |
-| KI-030 | **KI-R030** |
-| IA prod | **OFF** · no flags set this pass · `AUTONOMOUS_ALLOW_OPENAI` absent |
-
-## Gates (pre-deploy)
+## OS agent team (auditoría)
 
 | Campo | Resultado |
 |-------|-----------|
-| `tsc --noEmit` | **PASS** 0 |
-| vitest llmAdapter+phaseC+saasEnv | **PASS** 22/22 |
-| `run-os-pack-gate.mjs` | **PASS** 51/51 ALL_GATE_PASS |
+| SSOT | `docs/OS_AGENT_TEAM_AUDIT.md` |
+| Universos | Private AI 23 · Autonomous 14 · OS premium 25 · OS sector ~1605 |
+| Élite verificable | 3 growth packs + portal QA≥85 |
+| Gap visión IA privada | OS `LlmClient` **OpenAI-only** (contract test añadido) |
+| Partners | Base sí · CEO gate pagos **no** |
+| Honesty fixes | portal `/portal` · catalog `beta` · generative `metadata.mock` |
+| vitest | **8/8** PASS (esta pasada) |
 
-## Stripe (KI-R028)
-
-| Campo | Resultado |
-|-------|-----------|
-| price-audit | **allValid=true** (starter/pro/agency) |
-| resource_missing | **false** |
-| Costes nuevos | **0** |
-
-## Cloudflare
+## Prod (sin redeploy esta pasada)
 
 | Campo | Resultado |
 |-------|-----------|
-| Acceso API/wrangler | **No** |
-| Unique blocker | CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` |
-| MFA bypass | **No** attempted |
-| `app.nelvyon.com` | **NXDOMAIN** until humano CNAME |
-
-## Smokes / IA (local 2026-07-22 hardening)
-
-| Campo | Resultado |
-|-------|-----------|
-| portal-packs (staging) | **PASS** (prev) |
-| local-pack-e2e (staging) | **FAIL** `LLM_NOT_CONFIGURED` = **ops staging** (no KI reopen · no fallo prod) |
-| Local Ollama | **PASS** tags=6 |
-| Phase C 3b heliovolt | **qa=55** · passed=false · **model/hardware limit** |
-| Phase C 8b (opcional) | **qa=89** · passed=true · evidence only |
-| Quality routing | **Proposal only** — `docs/PROPOSAL_QUALITY_ROUTING_LOCAL.md` · no Router/cert change |
-| OpenAI auto-fallback | **Removed** — requires `AUTONOMOUS_ALLOW_OPENAI=1` |
-| staging→localhost Ollama | **Forbidden / not set** |
-| OpenAI / paid | **None** |
+| SHA vivo | `3f860c06eaca` · live/ready **200** |
+| Deploy previo | `d4650e99` SUCCESS |
+| IA prod | **OFF** |
 
 ## Costes
 
-**0** · sin productos/precios/cobros Stripe · sin OpenAI · un solo redeploy
+**0**
 
 ## Siguiente paso único
 
-Humano: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` → `https://app.nelvyon.com/api/health/live` 200.  
-No MFA bypass. No activar IA en prod. No segundo redeploy.
+Humano: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` → health 200.  
+Luego: commit honesty OS si CEO aprueba; dual-path LlmClient→Ollama solo con ADR.

@@ -37,6 +37,9 @@
 - [ ] Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` (No MFA bypass attempted.)
 - [ ] Staging Ollama alcanzable para pack E2E (opcional; **nunca** `localhost:11434` PC; **no** IA prod)
 - [ ] KI-020 smoke staging CSRF Origin
+- [x] Auditoría equipo OS agentes (`docs/OS_AGENT_TEAM_AUDIT.md`) + honesty portal/beta/mock (2026-07-22)
+- [ ] Dual-path OS `LlmClient`→Ollama (ADR + auth CEO; 0 coste runtime si local)
+- [ ] Partners: unificar stacks + gate aprobación CEO (sin pagos auto)
 
 ---
 

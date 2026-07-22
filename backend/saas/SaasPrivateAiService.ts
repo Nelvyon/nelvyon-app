@@ -1,4 +1,13 @@
 import { DbClient } from "../db/DbClient";
+import {
+  executeTask,
+  getRouterHealth,
+  routeTask,
+  type RouterDecision,
+  type RouterHealth,
+  type RouterTaskInput,
+  type RouterTaskResult,
+} from "../local-ai/router";
 import { PrivateAiOrchestrator } from "../private-ai/orchestrator/PrivateAiOrchestrator";
 import { PrivateAiApprovalService } from "../private-ai/approvals/PrivateAiApprovalService";
 import { PrivateAiAuditService } from "../private-ai/audit/PrivateAiAuditService";
@@ -6,6 +15,14 @@ import { NelvyonRagStore } from "../private-ai/rag/NelvyonRagStore";
 import { listPrivateAgents, PILOT_AGENT_ID } from "../private-ai/nelvyonAgentRegistry";
 import type { PrivateAiSettings } from "../private-ai/types";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+
+/** Inference task body without tenant (injected from SaaS context). */
+export type PrivateAiInferenceTaskInput = Omit<RouterTaskInput, "tenantId">;
+
+export type PrivateAiExecuteInferenceInput = PrivateAiInferenceTaskInput & {
+  tenantId: string;
+  userId?: string;
+};
 
 export class SaasPrivateAiService {
   private readonly audit: PrivateAiAuditService;
@@ -106,6 +123,44 @@ export class SaasPrivateAiService {
   async runAgent(input: Parameters<PrivateAiOrchestrator["runAgent"]>[0]) {
     const settings = await this.getSettings(input.tenantId);
     return this.orchestrator.runAgent(input, settings);
+  }
+
+  /** Certified Model Router — deterministic route decision (no egress). */
+  routeInference(tenantId: string, taskInput: PrivateAiInferenceTaskInput): RouterDecision {
+    return routeTask({ tenantId, ...taskInput });
+  }
+
+  /** Certified Model Router — execute locally; audit on completion. */
+  async executeInference(input: PrivateAiExecuteInferenceInput): Promise<RouterTaskResult> {
+    const { tenantId, userId, ...taskInput } = input;
+    const result = await executeTask({ tenantId, ...taskInput });
+    try {
+      await this.audit.log({
+        tenantId,
+        userId,
+        agentId: taskInput.agentId ?? "router_inference",
+        action: "router_execute",
+        provider: "local_router",
+        model: result.meta?.finalModel ?? "unknown",
+        prompt: taskInput.query,
+        userInput: taskInput.query,
+        output: result.content ?? "",
+        metadata: {
+          status: result.status,
+          blocked: result.blocked,
+          taskId: result.taskId,
+          requiresApproval: result.requiresApproval,
+          fallbackUsed: result.meta?.fallbackUsed ?? false,
+        },
+      });
+    } catch {
+      // Audit must not fail the inference path; fail-open for observability only.
+    }
+    return result;
+  }
+
+  async getRouterHealthStatus(): Promise<RouterHealth> {
+    return getRouterHealth();
   }
 }
 

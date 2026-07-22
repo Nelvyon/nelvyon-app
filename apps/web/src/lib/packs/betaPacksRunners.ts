@@ -77,7 +77,7 @@ async function runBetaPack(
         sector: i.sector,
         completed_at: new Date().toISOString(),
         summary: `${meta.name} completado para ${i.business_name} en ${i.city}.`,
-        portal_path: `/portal/packs/${packId}`,
+        portal_path: "/portal",
         kpis: {
           deliverables_published: skuResults.filter((r) => r.passed).length,
           avg_qa_score:

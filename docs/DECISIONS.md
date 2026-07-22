@@ -371,3 +371,15 @@
 
 ---
 
+## ADR-033 — Cuatro universos de agentes (no fusionar sin ADR)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-22 |
+| **Decisión** | Mantener separados: (1) Private AI registry (~23, tools+RAG, `canAutoExecute:false`); (2) Autonomous pack roles (14, Ollama-first / OpenAI opt-in); (3) OS premium (25, `LlmClient` OpenAI-required); (4) OS sector fleet (~1605 wrappers, OpenAI). No inventar un “único equipo OS” ni dual-path Ollama en `LlmClient` sin ADR+auth CEO. |
+| **Por qué** | Inventario `docs/OS_AGENT_TEAM_AUDIT.md` muestra stacks reales distintos; fusionar rompería certs / costes / honestidad. |
+| **Consecuencias** | Documentar gaps con honestidad (beta catálogo, portal_path, generative `metadata.mock`). Pagos partner y IA prod siguen gated CEO. |
+| **Relación** | Complementa ADR-005/006/015/016/027/029; no invalida Router/MCP/Workforce certs. |
+
+---
+

@@ -33,6 +33,14 @@ function useGenerativeMocks(): boolean {
   return process.env.VITEST === "true";
 }
 
+/** Explicit mock marker — callers must not treat placeholders as real assets. */
+function placeholderResult(path: string, reason: "vitest" | "missing_api_key"): GenerativeResult {
+  return {
+    url: `${PLACEHOLDER_BASE}/${path}`,
+    metadata: { mock: true, reason },
+  };
+}
+
 async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -53,7 +61,7 @@ export class GenerativeClient {
   static async generateImage(prompt: string, options?: ImageGenerationOptions): Promise<GenerativeResult> {
     const key = process.env.OPENAI_API_KEY?.trim();
     if (!key || useGenerativeMocks()) {
-      return { url: `${PLACEHOLDER_BASE}/image.jpg` };
+      return placeholderResult("image.jpg", useGenerativeMocks() ? "vitest" : "missing_api_key");
     }
 
     const res = await fetch("https://api.openai.com/v1/images/generations", {
@@ -90,7 +98,7 @@ export class GenerativeClient {
   static async generateVideo(prompt: string, options?: VideoGenerationOptions): Promise<GenerativeResult> {
     const key = process.env.RUNWAY_API_KEY?.trim();
     if (!key || useGenerativeMocks()) {
-      return { url: `${PLACEHOLDER_BASE}/video.mp4` };
+      return placeholderResult("video.mp4", useGenerativeMocks() ? "vitest" : "missing_api_key");
     }
 
     const createRes = await fetch("https://api.dev.runwayml.com/v1/image_to_video", {
@@ -148,8 +156,8 @@ export class GenerativeClient {
 
   static async generate3D(prompt: string, options?: ThreeDGenerationOptions): Promise<GenerativeResult> {
     const key = process.env.MESHY_API_KEY?.trim();
-    if (!key) {
-      return { url: `${PLACEHOLDER_BASE}/model.glb` };
+    if (!key || useGenerativeMocks()) {
+      return placeholderResult("model.glb", useGenerativeMocks() ? "vitest" : "missing_api_key");
     }
 
     const createRes = await fetch("https://api.meshy.ai/v2/text-to-3d", {
@@ -204,7 +212,7 @@ export class GenerativeClient {
   static async generateVoice(text: string, options?: VoiceGenerationOptions): Promise<GenerativeResult> {
     const key = process.env.ELEVENLABS_API_KEY?.trim();
     if (!key || useGenerativeMocks()) {
-      return { url: `${PLACEHOLDER_BASE}/audio.mp3` };
+      return placeholderResult("audio.mp3", useGenerativeMocks() ? "vitest" : "missing_api_key");
     }
 
     const voiceId = options?.voiceId ?? DEFAULT_VOICE_ID;
