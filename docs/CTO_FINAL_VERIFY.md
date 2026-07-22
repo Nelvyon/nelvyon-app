@@ -1,34 +1,44 @@
-# CTO Final Verify — 2026-07-22 (OS unification Phases 1–5 · no prod IA)
+# CTO Final Verify — 2026-07-22 (Prod unify `2b51581d` SUCCESS)
 
-> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · **no** READY · **no** “élite unificada” sin ops DNS  
-> Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`  
-> Costes nuevos: **0** · IA prod **OFF** · Partner payouts **OFF** (`NELVYON_CEO_PARTNER_PAYOUTS` unset)
+> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · **no** READY (DNS app)  
+> SHA vivo: **`2b51581ddaf6`** · Deploy **`4cb01795` SUCCESS** · Costes **0**  
+> Flags IA/MCP/SM/OpenClaw/OpenAI/CEO payouts: **ABSENT / OFF** (no set)
 
-## Fase 1 — calidad base
+## Pre-deploy
 
 | Gate | Resultado |
 |------|-----------|
+| Tip autorizado | `4bc0282b` + fail-closed MCP `66f3f516` + track modules `308462a8`/`2b51581d` |
 | tsc | **0** |
-| honesty+wiring commit | **`80da2def`** pushed |
-| pack gate (prev) | ALL_GATE_PASS 51 |
+| vitest affected | PASS |
+| pack gate | ALL_GATE_PASS 51 |
+| build:prod | PASS (local) |
+| Archive import-chain | 69 visited · **0** missing |
+| MCP default | OFF (`?? "0"` / require `=1`) |
 
-## Fases 2–5 — unificación
+## Redeploy history (same day)
 
-| Fase | Resultado |
-|------|-----------|
-| 2 Dual-path + registry | ADR-034 · LlmClient Ollama-first · 11 capabilities · vitest dual-path PASS |
-| 3 Servicios reales | Playbooks SERVICE_* · sector `mintNewSectorAgents:false` |
-| 4 Partners | Facade 3 stacks · CEO gate pagos |
-| 5 Ops | `OS_AUTONOMOUS_OPERATIONS.md` |
+| Deploy ID | Tip | Result |
+|-----------|-----|--------|
+| `d6af9ec0` | `66f3f516` | **FAILED** — untracked MCP/router |
+| `dbd09735` | `308462a8` | **FAILED** — untracked specialization |
+| `4cb01795` | `2b51581d` | **SUCCESS** — live |
 
-## No hecho (CEO)
+## Post-deploy
 
-- Activar IA / MCP / SM / OpenClaw en prod
-- `AUTONOMOUS_ALLOW_OPENAI=1`
-- `NELVYON_CEO_PARTNER_PAYOUTS=1`
-- Redeploy prod de unificación
-- Acuerdos legales / pagos auto
+| Check | Resultado |
+|-------|-----------|
+| live / ready | **200** / **200** |
+| git_sha | `2b51581ddaf6` |
+| Logs | migrate complete · Ready :3000 · no OpenAI egress sample |
+| Flags ABSENT | AUTONOMOUS_ALLOW_OPENAI · NELVYON_MCP_PRODUCTIVE_ENABLED · NELVYON_SHARED_MEMORY_ENABLED · NELVYON_CEO_PARTNER_PAYOUTS · OPENCLAW* |
+| Partner payout gate | vitest **2/2** throws without flag |
+| Smokes staging | **Blocked** `STAGING_QA_PASSWORD` |
 
-## Siguiente paso único
+## Costes
 
-Humano DNS CNAME `app` → Railway · luego commit unificación si pending · sin IA prod.
+**0**
+
+## Siguiente
+
+CNAME `app.nelvyon.com` → Railway. No flags. No redeploy.

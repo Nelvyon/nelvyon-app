@@ -4,6 +4,23 @@
 
 ---
 
+## 2026-07-22 — Prod redeploy unify tip `2b51581d` SUCCESS (`4cb01795`)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip** | `2b51581ddaf6ecb8405a9dc4ba9a1a9f6a80feb5` (cadena desde `4bc0282b` + MCP OFF + track deps) |
+| **Command** | `railway redeploy --from-source -y` (truthful-respect / @nelvyon/web / production) |
+| **Deployment** | `4cb01795-f6b5-41fe-8257-546d95ee23ae` **SUCCESS** |
+| **Failed earlier** | `d6af9ec0` (untracked MCP/router) · `dbd09735` (untracked specialization) — corregidos antes del SUCCESS |
+| **Preflight** | git archive + import-chain · visited **69** · missing **0** |
+| **SHA vivo** | `2b51581ddaf6` · live/ready **200** |
+| **Env flags** | **not set** · ABSENT: AUTONOMOUS_ALLOW_OPENAI · MCP · SHARED_MEMORY · CEO_PAYOUTS · OPENCLAW* |
+| **Cost** | **0** |
+| **Evidence** | `.release-logs/prod-redeploy-unify-20260722-final.txt` |
+| **Cloudflare** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` |
+
+---
+
 ## 2026-07-22 — Prod redeploy OpenAI opt-in (`3f860c06`) SUCCESS
 
 | Campo | Valor |

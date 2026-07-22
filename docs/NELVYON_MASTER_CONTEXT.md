@@ -1802,14 +1802,15 @@ cd backend && python -m pytest tests/ -q --tb=short
 | Título | NELVYON — MASTER CONTEXT (Biblia oficial) |
 | Veredicto citado | **CONDITIONAL_READY** (**NOT READY**) |
 | Producto enterprise completo / READY | **NO** |
+| SHA vivo prod | **`2b51581ddaf6`** (unify deploy `4cb01795`) |
 | Workforce | **PASS** (ADR-029) |
 | Elite | **PASS** (ADR-026) |
-| OS agent fleet | **4 universos** — `OS_AGENT_TEAM_AUDIT.md` · **ADR-033** · no élite unificada |
-| Router / MCP / Specialization | **CERTIFIED** (sin cambios Bloque 1) |
-| Shared Memory / OpenClaw | **Wired / OFF** — última mig **516** · **ADR-032** dual-plane · claimComplete **false** |
+| OS agent fleet | **4 universos** + registry 11 · **ADR-033/034** · flags OFF |
+| Router / MCP / Specialization | **CERTIFIED** · MCP productive **default OFF** |
+| Shared Memory / OpenClaw | **Wired / OFF** |
 | Migraciones | última **516** |
-| ADRs | **001–033** |
-| Próximo paso ops | **CNAME `app.nelvyon.com`** · ver `HANDOVER.md` · **CONDITIONAL_READY** |
+| ADRs | **001–034** |
+| Próximo paso ops | **CNAME `app.nelvyon.com`** · ver `HANDOVER.md` |
 | Secretos en este archivo | **Ninguno** |
 | Invención deliberada | **Prohibida** |
 | SSOT del próximo paso | **`docs/HANDOVER.md`** |

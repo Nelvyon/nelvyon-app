@@ -7,6 +7,9 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Deploy | **Prod SUCCESS `4cb01795`** | tip `2b51581d` · archive 69/0 · live `2b51581ddaf6` · live/ready 200 · flags ABSENT · ADR-035 MCP default OFF · payout gate 2/2 · smokes blocked STAGING_QA_PASSWORD · cost 0 |
+| Deploy | **FAILED then fixed** | `d6af9ec0` / `dbd09735` untracked modules → track MCP/router/specialization · then SUCCESS |
+| Docs | **ADR-035** | MCP productive fail-closed default OFF |
 | Deploy | **Track specialization deps** | RouterValidator closure: `PipelineResponseValidator` · `CitationService` · `JsonOutputService` · `ContextEnforcer` · `DirectAnswerFromContext` · import-closure gaps **0** · sin benchmarks/locks · sin redeploy |
 | Deploy | **Track MCP + router** | `SaasMcpProductiveService` · `backend/mcp/**` (sin benchmark) · `local-ai/router` · PromptBuilder chain · `.gitignore` `!backend/mcp/tools/**` · tsc 0 · `build:prod` PASS · sin redeploy aún |
 | OS Unify | **ADR-034 dual-path LLM** | `LlmClient` Ollama-first · OpenAI solo `AUTONOMOUS_ALLOW_OPENAI=1` · fail-closed · contract tests |

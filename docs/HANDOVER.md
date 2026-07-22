@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-22** — Deploy fix: track RouterValidator specialization deps · DNS CNAME sigue pendiente
+> Última actualización: **2026-07-22** — Prod unify SUCCESS `4cb01795` · SHA vivo `2b51581ddaf6` · flags OFF · Cloudflare CNAME sole blocker
 
 ---
 
@@ -9,15 +9,14 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** (app+schema OK; DNS app pendiente) |
-| **SHA vivo prod** | `3f860c06eaca` (prod sin redeploy aún) · tip: specialization deps track pending push |
-| **Deploy fix** | ✅ MCP/router + **RouterValidator specialization** (`PipelineResponseValidator`/`CitationService`/`JsonOutputService`/`ContextEnforcer`/`DirectAnswerFromContext`) tracked · closure gaps **0** · sin redeploy aún |
-| **Fase 1** | ✅ tsc **0** · honesty+router wiring commit **`80da2def`** pushed |
-| **Fase 2** | ✅ ADR-034 · `LlmClient` Ollama-first · `OsCapabilityRegistry` 11 servicios |
-| **Fase 3** | ✅ Playbooks `SERVICE_*.md` · sector = legacy satellite (no mint) |
-| **Fase 4** | ✅ Partner facade + `NELVYON_CEO_PARTNER_PAYOUTS` gate (default OFF) |
-| **Fase 5** | ✅ `docs/OS_AUTONOMOUS_OPERATIONS.md` |
-| **IA prod** | **OFF** |
+| **Estado** | **CONDITIONAL_READY** (app unificada live; DNS app pendiente) |
+| **SHA vivo prod** | `2b51581ddaf6` · live/ready **200** |
+| **Deploy** | `4cb01795` **SUCCESS** · tip `2b51581d` (cadena: `4bc0282b` + MCP fail-closed + track router/MCP + specialization) |
+| **Fallidos previos** | `d6af9ec0` / `dbd09735` — módulos untracked (corregidos; no reintentar) |
+| **IA / MCP / SM / OpenClaw / OpenAI opt-in / CEO payouts** | **ABSENT / OFF** (ningún flag set este deploy) |
+| **MCP productive default** | **OFF** (`NELVYON_MCP_PRODUCTIVE_ENABLED` require `=1`) |
+| **Partner payouts** | Calculables · `markPaid`/Stripe **CEO_GATE** sin flag |
+| **Smokes staging** | 🟡 bloqueados `STAGING_QA_PASSWORD` |
 | **Costes nuevos** | **0** |
 | **Cloudflare** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` |
 
@@ -25,19 +24,7 @@
 
 ## Próximo paso EXACTO
 
-1. Tras push del fix specialization deps: esperar Railway build SUCCESS (sin tocar env; **no** forzar redeploy manual salvo que auto-deploy no dispare).  
-2. Humano: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` → health 200.  
-3. **No** activar IA prod · **No** `NELVYON_CEO_PARTNER_PAYOUTS` sin auth CEO · **No** OpenAI sin `AUTONOMOUS_ALLOW_OPENAI=1`.
+Humano Cloudflare DNS: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app` → `https://app.nelvyon.com/api/health/live` 200.  
+No MFA bypass. No activar IA/MCP/SM/OpenClaw/OpenAI/CEO payouts. No segundo redeploy.
 
-SSOT unificación: `docs/OS_AGENT_TEAM_AUDIT.md` · `docs/OS_AUTONOMOUS_OPERATIONS.md` · ADR-033/034.
-
----
-
-## Evidencia Fase 1 (cerrada)
-
-| Gate | Resultado |
-|------|-----------|
-| tsc | **0** |
-| vitest honesty+wiring | PASS |
-| pack gate | ALL_GATE_PASS 51 |
-| commit/push | `80da2def` → `origin/main` |
+Evidencia: `.release-logs/prod-redeploy-unify-20260722-final.txt` · `docs/CTO_FINAL_VERIFY.md`

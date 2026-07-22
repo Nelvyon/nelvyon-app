@@ -395,3 +395,15 @@
 
 ---
 
+## ADR-035 — MCP Productivo fail-closed (default OFF)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-22 |
+| **Decisión** | `isMcpProductiveEnabled()` requiere `NELVYON_MCP_PRODUCTIVE_ENABLED=1` (antes default ON). Alineado con Shared Memory / OpenClaw / OpenAI opt-in. |
+| **Por qué** | CTO deploy unify: MCP debe permanecer OFF sin flag explícito. |
+| **Consecuencias** | Suite vitest opt-in en `beforeEach`; prod absente = disabled. |
+| **Relación** | ADR-016 · deploy `4cb01795`. |
+
+---
+
