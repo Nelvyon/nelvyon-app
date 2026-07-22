@@ -24,7 +24,7 @@
 | CEO metrics dashboard packs | ✅ | PackReportDashboard |
 | CI GitHub Actions (gates, smokes) | ✅ | `.github/workflows/` |
 | Supabase + RLS service_role | 🟡 | Migración 280; apply prod |
-| Cloudflare DNS/WAF | 🟡 | Railway domain added; CF CNAME+TXT pending (`DNS_APP_NELVYON.md`) |
+| Cloudflare DNS/WAF | ✅ | `app.nelvyon.com` verified · cert VALID · health 200 (2026-07-22) |
 | Docker compose test (PG+Redis) | 🟡 | `docker-compose.test.yml` |
 | Documentación viva (`docs/HANDOVER`) | ✅ | 2026-07-10 P3/P4 |
 | Migraciones 494–511 en producción | ✅ | Aplicadas 2026-07-09 |

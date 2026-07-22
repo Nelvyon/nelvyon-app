@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (SHA vivo `e62d52cc5d61` · deploy `1613fbb5` · flags OFF · cost 0 · P0 **ALL_P0_PASS** · backup OK). Blocker: Cloudflare DNS `app.nelvyon.com` + legal campañas.  
-> Evidencia: `CTO_FINAL_VERIFY.md` · `CTO_FINAL_CLOSURE_AUDIT.md` · `.release-logs/staging-p0-smokes-ceo-rerun-20260722.txt`
+> Veredicto interno: **CONDITIONAL_READY** (SHA `e62d52cc5d61` · DNS/SSL app **PASS** · P0 **ALL_P0_PASS** · flags OFF · cost 0). Pendiente: legal campañas · CEO IA mesh · CSRF app Origin redeploy.  
+> Evidencia: `CTO_FINAL_VERIFY.md` · `dns-app-verify-pass-20260722.txt`
 
 ---
 

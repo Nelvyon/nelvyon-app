@@ -6,15 +6,6 @@
 
 ## Activos
 
-### Ops (no KI) — Cloudflare DNS `app.nelvyon.com`
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | **Abierto** (ops humano) |
-| **Severidad** | Bloqueador go-live DNS |
-| **Detalle** | Railway custom domain ACTIVE (pending ownership). CF: CNAME `app` → `uzrknbzy.up.railway.app` (DNS-only) + TXT `_railway-verify.app` — `docs/ops/DNS_APP_NELVYON.md`. No MFA bypass. |
-| **Nota** | Sin API token / wrangler; no bypass MFA |
-
 ### Ops (no KI) — Staging pack E2E `LLM_NOT_CONFIGURED`
 
 | Campo | Valor |
@@ -46,7 +37,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | Mitigado en repo (2026-07-20) - no cerrar hasta smoke staging |
+| **Estado** | Mitigado en repo · smoke staging apex PASS · app Origin allowlist fix 2026-07-22 (`assertSaasOrigin` + `staging-smoke-ki020-csrf.mjs`) |
 | **Severidad** | Alta (antes); controlada tras fix |
 | **Detalle** | Mutaciones `/api/saas/*` con cookie sin Origin/Referer validos -> 403 via `assertSaasOrigin`. Fallback SES bounce/complaint ahora exige `tenant_id`. |
 | **Docs** | `docs/CIERRE_FINAL_PRIORITARIO.md` |
@@ -159,6 +150,14 @@
 ---
 
 ## Historial resuelto
+
+### Ops-R — Cloudflare DNS `app.nelvyon.com`
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-22** |
+| **Evidencia** | Railway verified+cert VALID · live/ready 200 · `.release-logs/dns-app-verify-pass-20260722.txt` · `docs/ops/DNS_APP_NELVYON.md` |
+| **Nota** | CNAME+TXT DNS-only en Cloudflare |
 
 ### KI-R028 — Stripe Live STARTER price (ex KI-028)
 

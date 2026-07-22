@@ -68,6 +68,20 @@ describe("assertSaasOrigin", () => {
     ).toBeNull();
   });
 
+  it("allows production apex Origin even if env points at app host", () => {
+    expect(originAllowed("https://nelvyon.com")).toBe(true);
+    expect(
+      assertSaasCookieMutationOrigin({
+        method: "POST",
+        pathname: "/api/saas/team",
+        origin: "https://nelvyon.com",
+        referer: null,
+        hasAuthCookie: true,
+        hasAuthorizationHeader: false,
+      }),
+    ).toBeNull();
+  });
+
   it("skips CSRF when Authorization header present", () => {
     expect(
       assertSaasCookieMutationOrigin({

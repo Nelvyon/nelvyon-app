@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-07-22 — DNS/SSL verify + CSRF app Origin fix
+
+| Campo | Valor |
+|-------|-------|
+| **DNS/SSL** | `app.nelvyon.com` **PASS** · evidence `dns-app-verify-pass-20260722.txt` |
+| **Health** | live/ready **200** · SHA `e62d52cc5d61` |
+| **CSRF** | KI-020 smoke: apex OK · app Origin blocked → `assertSaasOrigin` prod hosts |
+| **Deploy** | Redeploy after commit (this tip) |
+| **claimReady** | **false** (legal + IA CEO) |
+
 ## 2026-07-22 — CEO ops closure (no redeploy; scripts/docs/CI)
 
 | Campo | Valor |

@@ -1023,7 +1023,7 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY**) |
 | **SHA vivo prod** | `e62d52cc5d61` · deploy `1613fbb5` |
 | **P0 smokes** | **ALL_P0_PASS** · `STAGING_QA_PASSWORD` EXISTS |
-| **Blocker go-live DNS** | Cloudflare CNAME+TXT `app.nelvyon.com` (`docs/ops/DNS_APP_NELVYON.md`) |
+| **Blocker go-live DNS** | **RESUELTO** 2026-07-22 — `app.nelvyon.com` DNS/SSL/health PASS |
 | **verify-all** | **7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED** |
 | Bloque 1 Docker+ingest | **VERIFICADO** (`verified:true` · chunks 1559 · coverage 0.99 · claimComplete **false**) |
 | Bloque 2 Shared Memory staging | **KI-021 verified:true** · KI-022…026 ✅ · última mig **516** · `506a` · **507 no editada** · **ADR-032** dual-plane · CLI production · `claimComplete` **false** |

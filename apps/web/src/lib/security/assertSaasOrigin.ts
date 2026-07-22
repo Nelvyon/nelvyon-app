@@ -26,6 +26,9 @@ export function allowedSaasOrigins(): string[] {
   // Local dev defaults
   out.add("http://localhost:3000");
   out.add("http://127.0.0.1:3000");
+  // Production brand hosts (app custom domain + apex) — safe CSRF allowlist anchors
+  out.add("https://nelvyon.com");
+  out.add("https://app.nelvyon.com");
   return [...out];
 }
 

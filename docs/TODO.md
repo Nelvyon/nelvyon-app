@@ -36,9 +36,9 @@
 - [x] Local Ollama pack gate PASS + generate PASS (HTTP kickoff BLOCKED Docker/Postgres)
 - [x] `STAGING_QA_PASSWORD` EXISTS + wired workflow + P0 **ALL_P0_PASS** (2026-07-22)
 - [x] Primer Database Backup workflow success (`29932453133`)
-- [ ] Unique blocker: Cloudflare CNAME+TXT for `app.nelvyon.com` → `uzrknbzy.up.railway.app` (`docs/ops/DNS_APP_NELVYON.md`; No MFA bypass)
+- [x] Cloudflare CNAME+TXT `app.nelvyon.com` → Railway (`DNS_APP_NELVYON.md`) · DNS/SSL/health **PASS** 2026-07-22
+- [x] KI-020 smoke staging CSRF Origin (script + apex PASS; app Origin allowlist fix → redeploy)
 - [ ] Staging Ollama alcanzable para pack E2E (opcional; **nunca** `localhost:11434` PC; **no** IA prod)
-- [ ] KI-020 smoke staging CSRF Origin
 - [x] Auditoría equipo OS agentes (`docs/OS_AGENT_TEAM_AUDIT.md`) + honesty portal/beta/mock (2026-07-22)
 - [x] Dual-path OS `LlmClient`→Ollama (ADR-034) + capability registry 11 servicios
 - [x] Partners: facade + gate `NELVYON_CEO_PARTNER_PAYOUTS` (sin pagos auto)
