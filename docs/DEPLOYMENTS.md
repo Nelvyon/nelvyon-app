@@ -4,6 +4,23 @@
 
 ---
 
+## 2026-07-22 — Prod redeploy closure tip `e62d52cc` SUCCESS (`1613fbb5`)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip** | `e62d52cc5d610e8f87d9f22e52c310616d85bf2c` (ADR-037 · OllamaRuntimePrep · canary docs) |
+| **Command** | `railway redeploy --from-source -y` × **1** (truthful-respect / `@nelvyon/web` / production) |
+| **Deployment** | `1613fbb5-c0b2-41f1-9c4a-4c122cdd248e` **SUCCESS** |
+| **SHA vivo** | `e62d52cc5d61` · live/ready **200** |
+| **Env** | **no mutations** · QR / OpenAI allow / MCP / SM / OpenClaw / CEO payouts / Local Router / OLLAMA* **ABSENT** |
+| **Note** | Push auto-deploy `0d2c85a8` stuck on image push → REMOVED; CLI redeploy recovered |
+| **Smokes** | BLOCKED `STAGING_QA_PASSWORD` |
+| **Cost** | **0** |
+| **Evidence** | `.release-logs/prod-redeploy-closure-20260722.txt` |
+| **Cloudflare** | Unique blocker CNAME `app.nelvyon.com` (no MFA bypass) |
+
+---
+
 ## 2026-07-22 — Prod redeploy elite-next tip `06690725` SUCCESS (`9d489e77`)
 
 | Campo | Valor |

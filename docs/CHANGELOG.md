@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Deploy | **Prod SUCCESS `1613fbb5`** | tip `e62d52cc` · live `e62d52cc5d61` · live/ready 200 · flags ABSENT (router/QR/MCP/SM/OLLAMA*) · cost 0 · evidence `prod-redeploy-closure-20260722.txt` |
 | Ops | **Local AI prep fail-closed + ADR-037** | `OllamaRuntimePrep` · router default OFF · canary docs · CTO/ops/compliance audits · beta packs stay beta · mesh/IA flags **not** set · tsc 0 · vitest 13/13 |
 | Deploy | **Prod SUCCESS `9d489e77`** | tip `06690725` (+`26ce8d00`) · live `06690725a67d` · live/ready 200 · flags ABSENT incl. quality routing · smokes blocked STAGING_QA_PASSWORD · cost 0 · no Tailscale/Ollama remoto |
 | Agency | **ADR-036 quality routing + partner calc** | Opt-in `AUTONOMOUS_QUALITY_ROUTING` 3b/8b · `ARCHITECTURE_LOCAL_AI_RUNTIME` · OS/ops audits · sector playbooks · partner unified view + `commissionCalc` · flags OFF · beta packs stay beta · tsc 0 · vitest phase 18/18 |

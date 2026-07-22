@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-22** — Cierre pendientes: prep IA + canaries OFF + audits · DNS/STAGING secrets bloqueados humanos
+> Última actualización: **2026-07-22** — Prod closure tip `e62d52cc` SUCCESS · DNS/STAGING secrets bloqueados humanos
 
 ---
 
@@ -10,8 +10,8 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** |
-| **SHA vivo prod** | `06690725a67d` · live/ready **200** (pendiente redeploy tip cierre si aplica) |
-| **IA flags Railway** | **ABSENT** (quality routing, OpenAI, MCP, SM, OpenClaw, CEO payouts, OLLAMA) |
+| **SHA vivo prod** | `e62d52cc5d61` · live/ready **200** · deploy `1613fbb5` |
+| **IA flags Railway** | **ABSENT** (quality routing, OpenAI allow, MCP, SM, OpenClaw, CEO payouts, Local Router, OLLAMA*) |
 | **Local AI prep** | Código `OllamaRuntimePrep` + canary doc · **mesh NO activado** |
 | **Local Router default** | **OFF** (ADR-037) |
 | **Beta packs** | Permanecen **beta** |
@@ -19,6 +19,7 @@
 | **STAGING_QA_PASSWORD** | **BLOCKED_HUMAN** — secret ausente en gh |
 | **Campañas empresas** | **BLOQUEADO_LEGAL** — checklist |
 | **Costes** | **0** |
+| **Evidence** | `.release-logs/prod-redeploy-closure-20260722.txt` |
 
 ---
 
