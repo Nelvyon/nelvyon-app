@@ -6,7 +6,7 @@
 |----|----------|--------|
 | DNS `app.nelvyon.com` | P0 | **Open** NXDOMAIN · CNAME humano |
 | `STAGING_QA_PASSWORD` | P1 | **Open** · no está en `gh secret list` |
-| Prod health | OK | live/ready 200 · SHA `06690725a67d` |
+| Prod health | OK | live/ready 200 · SHA `e62d52cc5d61` · deploy `1613fbb5` |
 | IA flags | OK OFF | ABSENT Railway |
 | Local Router default | Fixed | ADR-037 fail-closed |
 
