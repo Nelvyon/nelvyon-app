@@ -1,4 +1,8 @@
-"""Decode JWTs issued by @nelvyon/auth (Next.js /api/auth/login)."""
+"""Decode JWTs issued by @nelvyon/auth (Next.js /api/auth/login).
+
+Ops: FastAPI env JWT_SECRET must match apps/web JWT_SECRET (ADR-038).
+FastAPI-native tokens continue to use JWT_SECRET_KEY via core.auth.
+"""
 
 from __future__ import annotations
 

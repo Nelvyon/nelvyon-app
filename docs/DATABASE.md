@@ -10,14 +10,14 @@
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
 | **Total archivos** | 411+ |
-| **Última migración** | `516_fastapi_rls_repair.sql` (KI-026 · ADR-032) |
+| **Última migración** | `517_workspaces_tenant_extension_columns.sql` (automations/workspaces schema) |
 | **Shared Memory schema** | 514 + RLS 515 · `schema.proposed.sql` referencia histórica |
 | **Runner** | `backend/db/migrate.ts` |
 | **Tracking** | Tabla `_migrations (name, executed_at)` |
 | **Comando** | `pnpm -C apps/web migrate` |
 | **Prod** | Railway `releaseCommand` en deploy Web |
 
-**Rango post-elite CI:** 508–516 (`scripts/validate-post-elite-migrations.mjs`).
+**Rango post-elite CI:** 508–517 (`scripts/validate-post-elite-migrations.mjs`).
 **Rango elite SaaS CI:** 401–507 (`scripts/validate-saas-migrations.mjs`).
 
 ---

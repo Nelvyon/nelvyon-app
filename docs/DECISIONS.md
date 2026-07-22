@@ -407,6 +407,18 @@
 
 ---
 
+## ADR-038 — FastAPI JWT_SECRET aligns with Next.js app JWT (bridge)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-22 |
+| **Decisión** | `nelvyon-app` (FastAPI) `JWT_SECRET` **must equal** `@nelvyon/web` `JWT_SECRET` so `try_decode_nelvyon_app_token` accepts `/api/auth/login` tokens. FastAPI-native tokens keep using `JWT_SECRET_KEY` only (`core.auth`). |
+| **Por qué** | Automations BFF 401: FastAPI returned `Invalid or expired authentication token` when secrets diverged (web len≠FastAPI len). |
+| **Consecuencias** | Ops sync 2026-07-22 · BFF keeps fail-closed on real 401/403 · empty degraded only on upstream 5xx. |
+| **Relación** | `backend/core/nelvyon_jwt.py` · platform automations unified BFF. |
+
+---
+
 ## ADR-037 — Local Router flag fail-closed (default OFF)
 
 | Campo | Valor |

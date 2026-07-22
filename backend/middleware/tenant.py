@@ -226,7 +226,7 @@ def _extract_bearer(request: Request) -> Optional[str]:
 
 
 def _resolve_tenant_id(request: Request, payload: dict) -> Optional[int]:
-    for key in ("tenant_id", "workspace_id", "ws_id"):
+    for key in ("tenant_id", "tenantId", "workspace_id", "workspaceId", "ws_id"):
         raw = payload.get(key)
         if raw is not None:
             try:

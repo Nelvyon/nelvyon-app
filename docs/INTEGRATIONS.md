@@ -3,7 +3,14 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-22**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. · flags SM/OpenClaw OFF · pack E2E staging LLM = ops gap (no KI reopen).
+**Bloqueadores go-live:** DNS `app.nelvyon.com` **RESUELTO** · legal campañas · CEO IA mesh. Flags SM/OpenClaw/OpenAI/MCP/Router/QR **OFF**. OpenAI API key **revoked**. Pack E2E staging LLM = ops gap (no KI reopen).
+
+### Auth bridge Web ↔ FastAPI
+
+| Ítem | Estado |
+|------|--------|
+| `JWT_SECRET` web = FastAPI | **Synced** 2026-07-22 (ADR-038) · FastAPI `JWT_SECRET_KEY` remains native-only |
+| Automations unified BFF | Auth 401 resolved; schema 517 for `workspaces.timezone` |
 
 ---
 
