@@ -212,8 +212,14 @@ class DatabaseManager:
                 self._initialized = True
                 logger.info(f"Duplicate table creation: {e}, ignored.")
             except Exception as e:
-                logger.error(f"Failed to create tables: {e}")
-                raise
+                # asyncpg DuplicateTableError is often wrapped as SQLAlchemy ProgrammingError
+                msg = str(e).lower()
+                if "already exists" in msg or "duplicatetable" in msg:
+                    self._initialized = True
+                    logger.info("Duplicate table creation (wrapped): ignored.")
+                else:
+                    logger.error(f"Failed to create tables: {e}")
+                    raise
         finally:
             self._table_creation_lock.release()
 
