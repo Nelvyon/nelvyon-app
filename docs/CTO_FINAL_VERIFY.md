@@ -1,26 +1,34 @@
-# CTO Final Verify — 2026-07-22 (KI-030 local PASS · pre/post redeploy)
+# CTO Final Verify — 2026-07-22 (post KI-030 SUCCESS `3f08f13d`)
 
 > Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimProductionReady` **false** · **no** READY
 
-## KI-030 — fix runtime headers (cwd)
+## Deploy KI-030 (autorizado — único)
 
 | Campo | Resultado |
 |-------|-----------|
-| Causa | `next.config` resuelve `./src/lib/security/headers` desde `process.cwd()`; CMD `node apps/web/server.js` con WORKDIR `/app` |
-| Fix | `CMD ["sh","-c","cd /app/apps/web && exec node server.js"]` · WORKDIR `/app` (preDeploy migrate) · COPY security + `.dockerignore` |
-| Local build | **PASS** `nelvyon-ki030:fixed` |
-| Local start | **PASS** `Ready on http://0.0.0.0:3000` · **sin** `Cannot find module './src/lib/security/headers'` |
-| vitest SSOT | **3/3 PASS** |
-| tsc | **0** (WIP API dirs stashed/restored) |
+| Comando | `railway redeploy --from-source -y` |
+| Deploy | `3f08f13d-4cd1-469e-9761-80f4576612b6` **SUCCESS** |
+| Commit tip | `bba71f14` |
+| SHA vivo (health) | `bba71f14afc1` |
+| live / ready | **200** / **200** |
+| Logs | Ready · migrate complete · **sin** headers module error |
+| 2º redeploy | **No** |
 
-## Prod (pre-redeploy KI-030)
+## KI-030 → KI-R030
 
 | Campo | Resultado |
 |-------|-----------|
-| live | **200** `git_sha=3d2bba18bcae` |
-| ready | **503** |
-| Deploy FAILED histórico | `922c8039` · tip `a82d618f` · **no** reintentar |
-| Schema 512–516 | **OK** (KI-R029) |
+| Causa | cwd `/app` vs `./src/lib/security/headers` en next.config |
+| Fix | `cd /app/apps/web && exec node server.js` · WORKDIR `/app` |
+| Local Docker | **PASS** pre-redeploy |
+| Gates | vitest SSOT 3/3 · tsc 0 |
+
+## Smokes staging (`ideal-victory` + `railway run`)
+
+| Smoke | Resultado |
+|-------|-----------|
+| portal-packs | **PASS** |
+| local-pack-e2e | **FAIL** `LLM_NOT_CONFIGURED` |
 
 ## Gates / restricciones
 
@@ -29,17 +37,16 @@
 | IA prod | **OFF** |
 | Costes nuevos | **0** |
 | SQL manual | **No** |
-| 2º redeploy | **No** (un solo redeploy autorizado tras push fix) |
+| 2º redeploy | **No** |
 
 ## PENDIENTES / bloqueos
 
 | Item | Sev. | Acción exacta |
 |------|------|----------------|
-| **KI-030** redeploy prod | P1 | Push fix → **un** `railway redeploy --from-source -y` → SHA vivo nuevo + health |
 | `app.nelvyon.com` NXDOMAIN | P1 | CNAME humano Cloudflare |
 | Pack smokes LLM staging | P2 | OPENAI/Ollama en staging (no prod IA) |
 | **KI-028** Stripe STARTER | P1 | Price Live + env |
 
 ## Siguiente paso único
 
-Redeploy KI-030 autorizado (único) → verificar SHA + health + logs limpios + staging smokes. **No** reintentar `922c8039`.
+Ops: DNS `app.nelvyon.com` y/o **KI-028** Stripe STARTER. No redeploy automático.

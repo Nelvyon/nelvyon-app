@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-22** — KI-030 local Docker PASS; fix CMD cwd `apps/web`; redeploy autorizado pendiente/en curso
+> Última actualización: **2026-07-22** — KI-030 **CERRADO** · deploy `3f08f13d` SUCCESS · SHA vivo `bba71f14`
 
 ---
 
@@ -9,12 +9,14 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** — schema prod ≥516; app viva aún SHA `3d2bba18` hasta SUCCESS del redeploy KI-030 |
-| **KI-030 fix** | Root `Dockerfile` CMD: `cd /app/apps/web && exec node server.js` · `WORKDIR /app` (preDeploy migrate) · COPY security intacto · `.dockerignore` WIP API routes |
-| **Local Docker** | **PASS** `nelvyon-ki030:fixed` · build OK · start ~20s: `Ready on http://0.0.0.0:3000` · **sin** `Cannot find module './src/lib/security/headers'` |
-| **Gates** | vitest `securityHeaders.ssot` **3/3 PASS** · `tsc --noEmit` **0** (WIP API dirs stashed/restored) |
-| **Prod health (pre-redeploy)** | live **200** `git_sha=3d2bba18bcae` · ready **503** |
-| **Deploy KI-029** | `922c8039` **FAILED** (histórico) · tip docs `a82d618f` · **sin 2º redeploy** de ese FAILED |
+| **Estado** | **CONDITIONAL_READY** — KI-030 resuelto; schema ≥516; app sana |
+| **Deploy KI-030** | `3f08f13d-4cd1-469e-9761-80f4576612b6` **SUCCESS** · tip `bba71f14` · **1** redeploy only |
+| **SHA vivo (health)** | `bba71f14afc1` |
+| **Health** | live **200** · ready **200** (db ok, auth ok, env ok) |
+| **Runtime logs** | `Ready on :3000` · migrate skip/complete · **sin** `Cannot find module './src/lib/security/headers'` |
+| **Fix** | CMD `cd /app/apps/web && exec node server.js` · WORKDIR `/app` · `.dockerignore` WIP |
+| **Local Docker** | PASS `nelvyon-ki030:fixed` (pre-redeploy gate) |
+| **Smokes staging** | portal-packs **PASS** · local-pack-e2e **FAIL** `LLM_NOT_CONFIGURED` |
 | **IA prod** | OFF |
 | **Costes nuevos** | **0** |
 
@@ -22,4 +24,4 @@
 
 ## Próximo paso EXACTO
 
-Tras commit+push del fix KI-030: **un** `railway redeploy --from-source -y` en production `@nelvyon/web` / `truthful-respect` → poll SUCCESS|FAILED (sin 2º redeploy) → verificar SHA vivo ≠ `3d2bba18` + health live/ready + logs sin headers error + staging smokes vía `railway run` en `ideal-victory`. SQL/migrate manual **prohibido**.
+Ops humano: (1) Cloudflare CNAME `app.nelvyon.com` → Railway; (2) Stripe Live Price STARTER + `STRIPE_PRICE_ID_STARTER` (**KI-028**); (3) opcional staging LLM (`OPENAI_API_KEY` o Ollama) para pack E2E smokes — **sin** activar IA en prod. SQL/migrate manual **prohibido**.

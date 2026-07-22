@@ -4,6 +4,27 @@
 
 ---
 
+## 2026-07-22 00:39–00:51 UTC — Prod redeploy KI-030 `bba71f14` SUCCESS
+
+| Campo | Valor |
+|-------|-------|
+| **Deploy ID** | `3f08f13d-4cd1-469e-9761-80f4576612b6` |
+| **Commit** | `bba71f14afc1` |
+| **Método** | `railway redeploy --from-source -y` (único; push previo SKIPPED `063e4b96`) |
+| **Servicio** | `@nelvyon/web` / production / `truthful-respect` |
+| **Resultado** | **SUCCESS** |
+| **SHA vivo** | `bba71f14afc1` |
+| **Health** | live **200** · ready **200** (db/auth/env ok) |
+| **Runtime logs** | `[migrate] all migrations complete` · `Ready on :3000` · **sin** headers module error |
+| **Fix** | CMD `cd /app/apps/web && exec node server.js` · WORKDIR `/app` · `.dockerignore` |
+| **Local gate** | `nelvyon-ki030:fixed` Ready PASS pre-redeploy |
+| **Smokes staging** | portal-packs **PASS** · local-pack-e2e **FAIL** `LLM_NOT_CONFIGURED` · `railway run` en `ideal-victory` |
+| **Prohibido** | No 2º redeploy · no SQL · IA prod OFF |
+| **Evidencia** | `.release-logs/ki030-poll-3f08f13d.txt` · `p0-smokes-post-ki030.txt` |
+| **KI-030** | **Resuelto** → historial **KI-R030** |
+
+---
+
 ## 2026-07-22 — KI-030 fix local Docker PASS (pre-redeploy)
 
 | Campo | Valor |

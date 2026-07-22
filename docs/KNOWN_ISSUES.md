@@ -6,19 +6,6 @@
 
 ## Activos
 
-### KI-030 — Prod deploy `a82d618f` FAILED: missing `./src/lib/security/headers`
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | **Fix local verificado 2026-07-22** — pendiente SUCCESS redeploy prod |
-| **Severidad** | Alta (P1 ops) — schema OK; prod vivo aún `3d2bba18` hasta nuevo deploy |
-| **Deploy fallido** | `922c8039-2aa3-42a0-8a18-e5ae9c5a8142` **FAILED** · commit `a82d618f` · **no** reintentar ese FAILED |
-| **Error exacto** | `[nelvyon] Failed to start Next.js Error: Cannot find module './src/lib/security/headers'` · healthcheck fail |
-| **Causa raíz** | `next.config.ts` resuelve `./src/lib/security/headers` desde `process.cwd()`; CMD previo `node apps/web/server.js` con `WORKDIR /app` → cwd incorrecto |
-| **Fix** | CMD `sh -c "cd /app/apps/web && exec node server.js"` · mantener `WORKDIR /app` para preDeploy migrate · COPY security + `.dockerignore` WIP |
-| **Evidencia local** | `docker build -t nelvyon-ki030:fixed` OK · `docker run` → `Ready on :3000` · **sin** module headers · vitest 3/3 · tsc 0 |
-| **Prohibido** | 2º redeploy del FAILED `922c8039` · SQL manual · activar IA prod |
-
 ### KI-027 - Test drift brain knowledge (`ingestEvidence.verified`)
 
 | Campo | Valor |
@@ -156,6 +143,16 @@
 ---
 
 ## Historial resuelto
+
+### KI-R030 — Runtime `security/headers` cwd apps/web (ex KI-030)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-22** |
+| **Causa** | `next.config` resolvía `./src/lib/security/headers` desde cwd `/app` |
+| **Fix** | CMD `cd /app/apps/web && exec node server.js` · WORKDIR `/app` · `.dockerignore` WIP |
+| **Deploy** | `3f08f13d` **SUCCESS** · SHA vivo `bba71f14afc1` · live/ready 200 · logs Ready sin headers error |
+| **Evidencia** | Local docker PASS · vitest 3/3 · tsc 0 · `.release-logs/p0-smokes-post-ki030.txt` |
 
 ### KI-R029 — Prod migraciones 512–516 vía preDeployCommand (ex KI-029)
 

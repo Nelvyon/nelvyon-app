@@ -14,7 +14,7 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ local-ai | Desktop + compose local-ai **UP** 2026-07-20 (`nelvyon-local-ai-postgres` healthy). |
-| **Railway** | 🟡 | Web vivo SHA `3d2bba18` · KI-029 mig 512–516 OK vía preDeploy · deploy `922c8039` FAILED headers (**KI-030**) · fix local Docker PASS 2026-07-22 |
+| **Railway** | ✅ | Web **SUCCESS** SHA `bba71f14` · health live/ready 200 · KI-R030 · schema ≥516 (KI-R029) |
 | **PostgreSQL** | ✅ repo / ✅ prod mig | Staging: **`516`**. Prod: **512–516** aplicadas 2026-07-21 (KI-R029). |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |

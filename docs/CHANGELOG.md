@@ -7,8 +7,10 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| KI-030 | **Cerrado → KI-R030** | Deploy `3f08f13d` SUCCESS · SHA vivo `bba71f14` · live/ready 200 · logs Ready sin headers error |
+| Smokes | **Post-KI-030** | portal-packs PASS · local-pack-e2e FAIL `LLM_NOT_CONFIGURED` · `.release-logs/p0-smokes-post-ki030.txt` |
 | KI-030 | **Fix local PASS** | CMD `cd /app/apps/web && exec node server.js` · WORKDIR `/app` · `.dockerignore` WIP · docker Ready sin headers error · vitest 3/3 · tsc 0 |
-| Docs | **KI-030 pre-redeploy** | HANDOVER/DEPLOYMENTS/INFRA/KNOWN_ISSUES/CTO/AUDITORIA actualizados con evidencia local |
+| Docs | **KI-030 pre/post redeploy** | HANDOVER/DEPLOYMENTS/INFRA/KNOWN_ISSUES/CTO/AUDITORIA con evidencia |
 
 ## 2026-07-21
 
