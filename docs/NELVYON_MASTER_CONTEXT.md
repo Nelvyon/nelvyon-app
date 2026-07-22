@@ -28,7 +28,7 @@
 
 | Tema | Doc envejecido | Doc que gana | Valor correcto |
 |------|----------------|--------------|----------------|
-| Última migración | INFRASTRUCTURE “hasta 514” · ROADMAP “511” | HANDOVER / CLAUDE / DATABASE | **`516_fastapi_rls_repair.sql`** (KI-026 ✅ · ADR-032) |
+| Última migración | INFRASTRUCTURE “hasta 514” · ROADMAP “511” | HANDOVER / CLAUDE / DATABASE | **`518_workflows_list_columns.sql`** (517/518 prod verified · ADR-002/039) |
 | Shared Memory staging | PROJECT_STATUS “BLOCKED” | HANDOVER + KI-021 | **verified:true** (flags OFF) |
 | verify-all | AUDITORIA previa “NOT_READY KI-027” | HANDOVER / CTO_FINAL_VERIFY 2026-07-21 | **CONDITIONAL_READY** — KI-027 ✅ |
 | Workforce | PROJECT_STATUS “CONDITIONAL” (si aparece) | HANDOVER + ADR-029 | **PASS** |
@@ -1020,9 +1020,9 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 | Campo | Valor |
 |-------|-------|
-| **Veredicto** | **CONDITIONAL_READY** (**NOT READY**) |
-| **SHA vivo prod** | tip `644a1556` · FastAPI deploy `0460249e` · web git_sha may be null (`railway up`) |
-| **P0 smokes** | portal-packs **ALL_PASS** · automations unified **200** · KI-020 **KI020_PASS** |
+| **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
+| **SHA / deploys** | FastAPI **`0d5a7ce9`** (tip `b8a5f921`) · web `git_sha` **null** hasta 1× `--from-source` · SQL SSOT tip post-harden pending |
+| **P0 smokes** | portal-packs **ALL_PASS** · automations unified **200** · KI-020 **KI020_PASS** · mig 517/518 DB **PASS** |
 | **Blocker go-live DNS** | **RESUELTO** 2026-07-22 — `app.nelvyon.com` DNS/SSL/health PASS |
 | **verify-all** | **7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED** |
 | Bloque 1 Docker+ingest | **VERIFICADO** (`verified:true` · chunks 1559 · coverage 0.99 · claimComplete **false**) |

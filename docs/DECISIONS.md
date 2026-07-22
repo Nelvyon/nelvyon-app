@@ -412,9 +412,10 @@
 | Campo | Valor |
 |-------|-------|
 | **Fecha** | 2026-07-22 |
-| **Decisión** | `nelvyon-app` `DATABASE_URL` = `@nelvyon/web` Postgres. Startup: `SKIP_ALEMBIC=1` (Node SQL migrations SSOT). Alembic non-fatal if run. `create_all` ignores wrapped DuplicateTableError. |
+| **Decisión** | `nelvyon-app` `DATABASE_URL` = `@nelvyon/web` Postgres. Startup: `SKIP_ALEMBIC=1` (Node SQL migrations SSOT — ADR-002). Alembic non-fatal if run. `create_all` swallows **only** duplicate-table via `is_duplicate_table_error` (cause/context walk; no generic ProgrammingError). Gate: `scripts/validate-sql-alembic-ssot.mjs` (+ optional DB probe). |
 | **Por qué** | Separate FastAPI DB lacked mig 517 columns; alembic `upgrade head` crashed on existing `contacts`. |
-| **Relación** | ADR-038 · mig 517/518. |
+| **Evidencia** | pytest `test_create_all_duplicate_guard` 5/5 · SSOT gate ALL_PASS · prod `_migrations` 517/518 · `SKIP_ALEMBIC=1` on FastAPI |
+| **Relación** | ADR-002 · ADR-038 · mig 517/518. |
 
 ---
 

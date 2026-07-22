@@ -6,6 +6,15 @@
 
 ## Activos
 
+### Ops (no KI) — Web `git_sha` null after `railway up`
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Ops** — restore with **one** `railway redeploy --service "@nelvyon/web" --from-source -y` after tip push |
+| **Severidad** | Baja (health live/ready OK; SHA observability only) |
+| **Detalle** | `/api/health/live` returns `git_sha:null` from CLI upload artifact. Does **not** block automations 200 / SQL SSOT. |
+| **Nota** | Do not spam redeploys. claimReady remains **false** (legal + CEO IA). |
+
 ### Ops (no KI) — Staging pack E2E `LLM_NOT_CONFIGURED`
 
 | Campo | Valor |

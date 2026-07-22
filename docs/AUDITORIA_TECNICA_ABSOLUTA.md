@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (automations unified **200** · DNS/SSL app PASS · KI020_PASS · flags OFF · OpenAI key revoked · cost 0). Pendiente: legal campañas · CEO IA mesh.  
-> Evidencia: `CTO_FINAL_VERIFY.md` · `automations-401-closure-20260722.txt`
+> Veredicto interno: **CONDITIONAL_READY** (automations unified **200** · SQL SSOT 517/518 DB PASS · DNS/SSL app PASS · KI020_PASS · flags OFF · OpenAI key revoked · cost 0 · `claimReady: false`). Pendiente: legal campañas · CEO IA mesh · web `git_sha` restore (1× redeploy).  
+> Evidencia: `CTO_FINAL_VERIFY.md` · `automations-401-closure-20260722.txt` · `validate-sql-alembic-ssot` ALL_PASS
 
 
 ---

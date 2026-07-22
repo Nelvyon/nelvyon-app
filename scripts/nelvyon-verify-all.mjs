@@ -82,6 +82,9 @@ runNode("verify.shared-memory-schema", "scripts/verify-shared-memory-schema.mjs"
 // 3) Migrations files present
 runNode("validate.post-elite-migrations", "scripts/validate-post-elite-migrations.mjs");
 
+// 3b) SQL SSOT vs Alembic (ADR-002/039) — optional DB probe if DATABASE_URL set
+runNode("validate.sql-alembic-ssot", "scripts/validate-sql-alembic-ssot.mjs");
+
 // 4) Knowledge sync (no ingest)
 runNode("knowledge.sync", "scripts/nelvyon-knowledge-sync.mjs");
 

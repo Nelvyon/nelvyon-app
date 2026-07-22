@@ -22,6 +22,36 @@ from sqlalchemy.pool import NullPool
 logger = logging.getLogger(__name__)
 
 
+def _message_is_duplicate_table(msg: str) -> bool:
+    """Strict message match — relation/table already exists only."""
+    lowered = msg.lower()
+    if "duplicatetable" in lowered.replace(" ", ""):
+        return True
+    return "already exists" in lowered and ("relation" in lowered or "table" in lowered)
+
+
+def is_duplicate_table_error(exc: BaseException) -> bool:
+    """
+    True only for expected create_all races on shared Postgres (ADR-002/039).
+    Must not swallow unrelated ProgrammingError / schema drift.
+    """
+    if isinstance(exc, DuplicateTableError):
+        return True
+    # Walk __cause__/__context__ for asyncpg wrapped in SQLAlchemy
+    cur: BaseException | None = exc
+    seen: set[int] = set()
+    while cur is not None and id(cur) not in seen:
+        seen.add(id(cur))
+        if isinstance(cur, DuplicateTableError):
+            return True
+        if type(cur).__name__ == "DuplicateTableError":
+            return True
+        if _message_is_duplicate_table(str(cur)):
+            return True
+        cur = cur.__cause__ or cur.__context__  # type: ignore[assignment]
+    return False
+
+
 class Base(DeclarativeBase):
     pass
 
@@ -210,13 +240,25 @@ class DatabaseManager:
                     logger.debug(f"[DB_OP] Create tables completed in {time.time() - start_time:.4f}s")
             except (UniqueViolationError, DuplicateTableError) as e:
                 self._initialized = True
-                logger.info(f"Duplicate table creation: {e}, ignored.")
+                logger.info("Duplicate table creation: ignored (expected on shared SQL SSOT DB).")
+                log_structured(
+                    logger,
+                    logging.INFO,
+                    "db.create_all_duplicate_ignored",
+                    message=sanitize_text(str(e))[:240],
+                )
             except Exception as e:
-                # asyncpg DuplicateTableError is often wrapped as SQLAlchemy ProgrammingError
-                msg = str(e).lower()
-                if "already exists" in msg or "duplicatetable" in msg:
+                if is_duplicate_table_error(e):
                     self._initialized = True
-                    logger.info("Duplicate table creation (wrapped): ignored.")
+                    logger.info(
+                        "Duplicate table creation (wrapped DuplicateTableError): ignored (ADR-039)."
+                    )
+                    log_structured(
+                        logger,
+                        logging.INFO,
+                        "db.create_all_duplicate_ignored",
+                        message=sanitize_text(str(e))[:240],
+                    )
                 else:
                     logger.error(f"Failed to create tables: {e}")
                     raise

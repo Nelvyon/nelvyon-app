@@ -14,8 +14,8 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ | Desktop UP 2026-07-22. `nelvyon-test-postgres` :5433 healthy · `nelvyon-local-ai-postgres` :5434 healthy. |
-| **Railway** | ✅ | Web **SUCCESS** SHA `bba71f14` · health live/ready 200 · KI-R030 · schema ≥516 (KI-R029) · **no deploy** esta pasada |
-| **PostgreSQL** | ✅ repo / ✅ prod mig / ✅ local test | Staging: **`516`**. Prod: **512–516** (KI-R029). Local test `nelvyon_test` :5433 migrated+seed QA 2026-07-22. |
+| **Railway** | ✅ | FastAPI `0d5a7ce9` SUCCESS · `SKIP_ALEMBIC=1` · shared Postgres · Web live/ready 200 · `git_sha` null hasta 1× redeploy git |
+| **PostgreSQL** | ✅ repo / ✅ prod | Prod `_migrations` **517+518** verified (SSOT gate DB probe) · SQL SSOT ADR-002/039 |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |
 | **Ollama** | ✅ local | 2026-07-22: `127.0.0.1:11434` · 6 models · primary autonomous LLM · OpenAI **opt-in only** (`AUTONOMOUS_ALLOW_OPENAI`). Phase C 3b qa=55 / 8b qa=89 · HTTP kickoff `mode=real` → `needs_review` on 3b. **No** set staging `OLLAMA_HOST=localhost` (Railway cannot reach PC). |
@@ -61,7 +61,7 @@ healthcheckPath = "/api/health/live"
 |---------|-----|
 | `Dockerfile` (raíz) | Build Next.js prod |
 | `apps/web/Dockerfile` | Railway Web |
-| `backend/Dockerfile` | FastAPI + `alembic upgrade head` |
+| `backend/Dockerfile` | FastAPI · `SKIP_ALEMBIC=1` skips Alembic (SQL SSOT); alembic non-fatal otherwise |
 | `backend/docker-compose.test.yml` | Postgres :5433, Redis :6380 tests |
 | `backend/local-ai/docker-compose.yml` | Postgres+pgvector **127.0.0.1:5434** — Brain ingest **verified** 2026-07-20 |
 

@@ -4,13 +4,24 @@
 
 ---
 
-## 2026-07-22 — Automations 401 closure (FastAPI `0460249e`)
+## 2026-07-22 — Post-automations SQL SSOT harden (pre web git_sha restore)
+
+| Campo | Valor |
+|-------|-------|
+| **Code** | `is_duplicate_table_error` cause-chain · pytest 5/5 · `validate-sql-alembic-ssot` ALL_PASS |
+| **FastAPI** | deploy **`0d5a7ce9` SUCCESS** · tip `b8a5f921` · `SKIP_ALEMBIC=1` confirmed |
+| **Schema DB probe** | `_migrations` **517**+**518** · `workspaces.timezone` · `workflows.is_active` |
+| **Web** | live `git_sha:null` (railway up artifact) · **1×** `--from-source` pending after tip push |
+| **IA flags** | OFF · cost 0 |
+| **claimReady** | **false** |
+
+## 2026-07-22 — Automations 401 closure (FastAPI `0460249e` → superseded by `0d5a7ce9`)
 
 | Campo | Valor |
 |-------|-------|
 | **Auth** | JWT_SECRET sync web→FastAPI (ADR-038) |
 | **Schema** | mig 517+518 applied prod Postgres |
-| **FastAPI** | shared DB · `SKIP_ALEMBIC=1` · deploy **SUCCESS** `0460249e` |
+| **FastAPI** | shared DB · `SKIP_ALEMBIC=1` · deploy **SUCCESS** `0460249e` (later `0d5a7ce9`) |
 | **BFF unified** | **200** · portal-packs ALL_PASS |
 | **claimReady** | **false** |
 

@@ -1,7 +1,7 @@
-# CTO Final Verify — 2026-07-22 (Automations 401 closed)
+# CTO Final Verify — 2026-07-22 (Post-automations SQL SSOT)
 
-> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · **no** READY (legal + IA CEO)  
-> FastAPI deploy **`0460249e` SUCCESS** · tip `644a1556` · Coste **0**
+> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimReady` **false** (legal + IA CEO)  
+> FastAPI deploy **`0d5a7ce9` SUCCESS** · prior tip `b8a5f921` · Coste **0**
 
 ## Automations 401 — causa y solución
 
@@ -13,16 +13,25 @@
 | Fix runtime | FastAPI DB = web Postgres · `SKIP_ALEMBIC=1` · create_all duplicate ignore |
 | BFF unified | **HTTP 200** · portal-packs PASS · no Unauthorized |
 
+## SQL SSOT harden (esta pasada)
+
+| Gate | Resultado |
+|------|-----------|
+| pytest `test_create_all_duplicate_guard` | **5/5 PASS** |
+| `validate-sql-alembic-ssot.mjs` | **ALL_PASS** (files + DB probe via Postgres public URL) |
+| `validate-post-elite-migrations.mjs` | **OK 508–518** |
+| FastAPI `SKIP_ALEMBIC` | **=1** (railway variables, no secret printed) |
+| `_migrations` 517/518 | **PASS** · columns timezone / is_active present |
+
 ## Gates
 
 | Gate | Resultado |
 |------|-----------|
-| live/ready | **200** / **200** |
-| portal-packs | **ALL_PASS** |
-| KI-020 | **KI020_PASS** |
-| mig validate 508–518 | **OK** |
-| IA flags | **OFF** · OpenAI key revoked |
+| live/ready | **200** / **200** (`git_sha` null hasta web git redeploy) |
+| portal-packs | **ALL_PASS** (evidencia previa closure) |
+| KI-020 | **KI020_PASS** (evidencia previa) |
+| IA flags | **OFF** · OpenAI key revoked · cost 0 |
 
 ## Pendientes externos
 
-CEO mesh/canary IA · legal campañas · optional web git_sha restore
+CEO mesh/canary IA · legal campañas · **1×** web `--from-source` para `git_sha`
