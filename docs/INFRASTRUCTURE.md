@@ -18,7 +18,7 @@
 | **PostgreSQL** | ✅ repo / ✅ prod mig / ✅ local test | Staging: **`516`**. Prod: **512–516** (KI-R029). Local test `nelvyon_test` :5433 migrated+seed QA 2026-07-22. |
 | **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
 | **Redis** | 🟡 | Opcional; in-memory fallback |
-| **Ollama** | ✅ local | 2026-07-22: `127.0.0.1:11434` · 6 models · `/api/generate` PASS · pack kickoff HTTP **56× mode=real** via Ollama-first `llmAdapter`. **No** set staging `OLLAMA_HOST=localhost` (Railway cannot reach PC). |
+| **Ollama** | ✅ local | 2026-07-22: `127.0.0.1:11434` · 6 models · primary autonomous LLM · OpenAI **opt-in only** (`AUTONOMOUS_ALLOW_OPENAI`). Phase C 3b qa=55 / 8b qa=89 · HTTP kickoff `mode=real` → `needs_review` on 3b. **No** set staging `OLLAMA_HOST=localhost` (Railway cannot reach PC). |
 | **OpenClaw** | 🟡 | Mock certificado; URL real ops |
 | **AWS SES** | ✅ | Production access GRANTED 2026-07-21 · self-send OK · KI-R014 |
 | **Stripe** | ✅ | sk_live + webhook; price-audit **allValid=true** (KI-R028) |

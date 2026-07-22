@@ -87,9 +87,9 @@
 
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
-| OpenAI | 🟡 | `OPENAI_API_KEY` | Packs, LlmClient |
+| OpenAI | 🟡 | `OPENAI_API_KEY` + `AUTONOMOUS_ALLOW_OPENAI=1` | Autonomous packs: **opt-in only** (no auto-fallback). Also LlmClient / private-ai providers. |
 | Anthropic | 🟡 | `ANTHROPIC_API_KEY` | Private AI provider |
-| Ollama (local) | ✅ | `OLLAMA_HOST` / `:11434` | Local 2026-07-22: 6 models + generate PASS. Staging: **sin** Ollama/OpenAI → `LLM_NOT_CONFIGURED` (ops). **Prohibido** staging→`localhost:11434`. |
+| Ollama (local) | ✅ | `OLLAMA_HOST` / `:11434` | Primary autonomous path. Local 2026-07-22: 6 models · Phase C 3b qa=55 / 8b qa=89 · HTTP `mode=real`. Staging: **sin** Ollama/OpenAI → `LLM_NOT_CONFIGURED` (ops). **Prohibido** staging→`localhost:11434`. |
 | Local-ai Postgres/pgvector | 🟡 | Compose `127.0.0.1:5434` | Ingest **verified** hist. · Docker **DOWN** 2026-07-22 (HTTP pack E2E BLOCKED) |
 | **MCP Productivo** | ✅ | `NELVYON_MCP_PRODUCTIVE_ENABLED` | `/api/saas/mcp` — **CERTIFIED** (`mcp_certification_final.json`) |
 | **OpenClaw** | 🟡 | `NELVYON_OPENCLAW_BRIDGE_*` + Memory | HttpOpenClawBridge listo; OFF hasta ops URL |

@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-07-22 — OpenAI opt-in only + prompt schemas (sin deploy)
+
+| Campo | Valor |
+|-------|-------|
+| **Deploy** | **No** (code+docs only; no Railway; no prod AI flags) |
+| **Commit** | `fix(autonomous): OpenAI opt-in only; prompt schemas for local packs` |
+| **Policy** | OpenAI requires `AUTONOMOUS_ALLOW_OPENAI=1` · no auto-fallback · Ollama primary |
+| **Vitest** | `llmAdapter.ollama`+`phaseC`+`saasEnv` **22/22** |
+| **tsc** | **0** (`isInternetTaskAuthorized`) |
+| **Pack gate** | **ALL_GATE_PASS** 51 |
+| **Phase C QA** | 3b **55** (model limit) · 8b **89** (evidence) · threshold 85 |
+| **HTTP E2E** | kickoff `needs_review` 3b · `.release-logs/hardening-ia-packs-20260722.txt` |
+| **OpenAI paid** | **None** |
+| **IA prod** | OFF |
+| **Cloudflare** | Unique blocker: CNAME `app.nelvyon.com` → `nelvyonweb-production.up.railway.app`. No MFA bypass attempted. |
+
+---
+
 ## 2026-07-22 — Ollama-first llmAdapter + local HTTP pack E2E (sin deploy)
 
 | Campo | Valor |

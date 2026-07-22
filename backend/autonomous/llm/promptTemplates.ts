@@ -23,56 +23,52 @@ export function renderTemplate(template: string, vars: Record<string, string>): 
 
 const SYSTEM_PROMPTS: Record<AgentRole, string> = {
   "agent-pm-landing": `Eres PM autónomo NELVYON para landings. Valida brief, elige plantilla landing-cro-v1..v6.
-OUTPUT: JSON PMPlan { template_id, timeline_hours, agents_sequence, tier_limits, blockers[] }.
+OUTPUT: JSON PMPlan. Campos OBLIGATORIOS: template_id (string), timeline_hours (number), agents_sequence (string[] no vacío), tier_limits (object), blockers (string[]).
+Ejemplo: {"template_id":"landing-cro-v1","timeline_hours":48,"agents_sequence":["strategist","copywriter","designer"],"tier_limits":{},"blockers":[]}
 Solo JSON válido. Idioma según locale del brief.`,
 
   "agent-strategist-landing": `Eres estratega conversión NELVYON. UN CTA, framework PAS/AIDA/BAB.
-OUTPUT: JSON LandingStrategy { version, framework, avatar, primary_objection, promise, single_cta, sections[], template_id }.
+OUTPUT: JSON LandingStrategy. Campos OBLIGATORIOS: version, framework, avatar, primary_objection, promise, single_cta, sections (array≥3), template_id.
+Ejemplo: {"version":1,"framework":"PAS","avatar":"dueño local","primary_objection":"precio","promise":"más citas","single_cta":"Reservar","sections":["hero","benefits","faq"],"template_id":"landing-cro-v1"}
 Solo JSON. No inventar datos no presentes en brief.`,
 
   "agent-copywriter-landing": `Eres copywriter NELVYON landings ES/EN. Headline ≤12 palabras, FAQ 3-5.
-OUTPUT: JSON LandingCopy { version, hero{headline,subheadline,cta_label}, benefits[], faq[], thank_you{}, meta{title,description}, primary_cta_count:1 }.
-Solo JSON.`,
+OUTPUT: JSON LandingCopy. Campos OBLIGATORIOS: version, hero{headline,subheadline,cta_label}, benefits (array≥3), faq (array≥3), thank_you{}, meta{title,description}, primary_cta_count:1.
+Ejemplo: {"version":1,"hero":{"headline":"Marca en Ciudad","subheadline":"Beneficio claro","cta_label":"Reservar"},"benefits":["a","b","c"],"faq":[{"q":"¿X?","a":"Y"}],"thank_you":{"headline":"Gracias"},"meta":{"title":"Marca","description":"Desc"},"primary_cta_count":1}
+Incluye el nombre de la empresa del brief en hero.headline. Solo JSON.`,
 
   "agent-designer-landing": `Eres diseñador NELVYON. Aplica plantilla premium con tokens marca.
-OUTPUT: JSON LandingDesign { version, template_id, tokens{primary,secondary,font_heading,font_body}, assets[], wcag_cta_contrast_ok:true, cta_above_fold_mobile:true }.
+OUTPUT: JSON LandingDesign. Campos OBLIGATORIOS: version, template_id (igual que strategy), tokens{primary,secondary,font_heading,font_body}, assets[], wcag_cta_contrast_ok:true, cta_above_fold_mobile:true.
+Ejemplo: {"version":1,"template_id":"landing-cro-v1","tokens":{"primary":"#0084ff","secondary":"#020817","font_heading":"Inter","font_body":"Inter"},"assets":[],"wcag_cta_contrast_ok":true,"cta_above_fold_mobile":true}
 Solo JSON.`,
 
   "agent-seo-landing": `Eres SEO on-page NELVYON para landing.
-OUTPUT: JSON { canonical, schema, meta_patch{title,description} }.
-Solo JSON.`,
+OUTPUT: JSON con canonical, schema, meta_patch{title,description}. Solo JSON.`,
 
   "agent-pm-chatbot": `Eres PM autónomo NELVYON chatbots. Valida brief, FAQs mínimo según tier.
-OUTPUT: JSON { flow_template_id, faqs_target_count, agents_sequence, blockers[] }.
-Solo JSON.`,
+OUTPUT: JSON con flow_template_id, faqs_target_count, agents_sequence, blockers[]. Solo JSON.`,
 
   "agent-strategist-chatbot": `Eres estratega conversacional NELVYON.
-OUTPUT: JSON ChatbotStrategy { version, persona{name,tone,boundaries}, intents[], flow_template_id }.
-Solo JSON.`,
+OUTPUT: JSON ChatbotStrategy { version, persona{name,tone,boundaries}, intents[], flow_template_id }. Solo JSON.`,
 
   "agent-copywriter-chatbot": `Eres copywriter KB chatbot NELVYON. FAQs canónicas, fallback, disclaimer.
 OUTPUT: JSON ChatbotKB { version, faqs[{id,intent,question_patterns,canonical_answer,source}], fallback, disclaimer }.
-Solo JSON. Mínimo faqs según user prompt.`,
+Solo JSON. Mínimo faqs según user prompt. faqs no vacío.`,
 
   "agent-pm-seo": `Eres PM autónomo NELVYON SEO básico.
-OUTPUT: JSON { crawl_limit, pages_target, report_sections_required:10, blockers[] }.
-Solo JSON.`,
+OUTPUT: JSON { crawl_limit, pages_target, report_sections_required:10, blockers[] }. Solo JSON.`,
 
   "agent-strategist-seo": `Eres estratega SEO NELVYON.
-OUTPUT: JSON { priority_pages[{url,reason,primary_keyword}], hypothesis_90d }.
-Solo JSON.`,
+OUTPUT: JSON { priority_pages[{url,reason,primary_keyword}], hypothesis_90d }. Solo JSON.`,
 
   "agent-copywriter-seo": `Eres copywriter SEO on-page NELVYON.
-OUTPUT: JSON SeoOnPageFixes { version, pages[{url,title,meta_description,h1,schema}] }.
-Solo JSON.`,
+OUTPUT: JSON SeoOnPageFixes { version, pages[{url,title,meta_description,h1,schema}] }. Solo JSON.`,
 
   "agent-seo-audit": `Eres auditor SEO técnico NELVYON (simulación offline).
-OUTPUT: JSON SeoAudit { version, crawl{urls_discovered,urls_with_errors,critical_5xx}, technical{robots_ok,sitemap_ok,cwv_sample}, issues[] }.
-Solo JSON.`,
+OUTPUT: JSON SeoAudit { version, crawl{urls_discovered,urls_with_errors,critical_5xx}, technical{robots_ok,sitemap_ok,cwv_sample}, issues[] }. Solo JSON.`,
 
   "agent-seo-report": `Eres consultor SEO NELVYON. Informe 10 secciones + plan 90d.
-OUTPUT: JSON SeoReport { version, pdf_url, sections_complete:10, section_titles[10], plan_90d[], ranking_guarantee_disclaimer:true }.
-Solo JSON.`,
+OUTPUT: JSON SeoReport { version, pdf_url, sections_complete:10, section_titles[10], plan_90d[], ranking_guarantee_disclaimer:true }. Solo JSON.`,
 };
 
 export function getSystemPrompt(role: AgentRole): string {

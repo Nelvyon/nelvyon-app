@@ -1,9 +1,16 @@
 /**
- * LLM Adapter — mock | real (Ollama-first, OpenAI fallback) with automatic mock fallback.
+ * LLM Adapter — mock | real (Ollama primary).
+ * OpenAI is OPTIONAL and OFF by default: requires AUTONOMOUS_ALLOW_OPENAI=1 + key,
+ * and is blocked while PRIVATE_MODE is ON without an owner internet window.
  * No sensitive prompt logging — only agent id, mode, token count.
  */
 
 import { getOllamaClient } from "../../local-ai/OllamaClient";
+import {
+  assertPrivateOutboundAllowed,
+  isInternetTaskAuthorized,
+  isPrivateMode,
+} from "../../private-ai/privateMode";
 import { parseJsonFromLlm } from "./parseJson";
 import type { AgentRole } from "./promptTemplates";
 import { buildUserPrompt, getSystemPrompt } from "./promptTemplates";
@@ -46,12 +53,23 @@ export function isAutonomousOllamaConfigured(): boolean {
   );
 }
 
+/**
+ * Explicit opt-in for remote OpenAI. Never automatic fallback.
+ * Defaults OFF; also fail-closed under PRIVATE_MODE without internet window.
+ */
+export function isAutonomousOpenAiAllowed(): boolean {
+  if (process.env.AUTONOMOUS_ALLOW_OPENAI?.trim() !== "1") return false;
+  if (!process.env.OPENAI_API_KEY?.trim()) return false;
+  if (isPrivateMode() && !isInternetTaskAuthorized()) return false;
+  return true;
+}
+
 export function resolveLlmMode(): LlmMode {
   if (process.env.AUTONOMOUS_LLM_MODE === "mock") return "mock";
   if (process.env.AUTONOMOUS_LLM_MODE === "real") return "real";
   if (isAutonomousOllamaConfigured()) return "real";
-  const key = process.env.OPENAI_API_KEY?.trim();
-  return key ? "real" : "mock";
+  if (isAutonomousOpenAiAllowed()) return "real";
+  return "mock";
 }
 
 function logLlmEvent(event: {
@@ -86,7 +104,7 @@ async function callOllama(
       { role: "system", content: system },
       { role: "user", content: user },
     ],
-    { format: "json" },
+    { format: "json", numPredict: 3072 },
   );
   const content = result.content?.trim() ?? "";
   if (!content) throw new Error("Ollama empty content");
@@ -98,6 +116,11 @@ async function callOllama(
 }
 
 async function callOpenAi(system: string, user: string): Promise<{ content: string; tokens: number; model: string }> {
+  if (!isAutonomousOpenAiAllowed()) {
+    throw new Error("OpenAI not allowed (set AUTONOMOUS_ALLOW_OPENAI=1; check PRIVATE_MODE)");
+  }
+  assertPrivateOutboundAllowed("remote_llm");
+
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) throw new Error("OPENAI_API_KEY missing");
 
@@ -187,7 +210,7 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
     return mockFallback(
       req,
       started,
-      "AUTONOMOUS_LLM_MODE=mock or no Ollama/OpenAI configured",
+      "AUTONOMOUS_LLM_MODE=mock or no Ollama configured (OpenAI opt-in only)",
     );
   }
 
@@ -222,7 +245,8 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
     }
   }
 
-  if (process.env.OPENAI_API_KEY?.trim()) {
+  // OpenAI is never an automatic fallback — explicit owner opt-in only.
+  if (isAutonomousOpenAiAllowed()) {
     try {
       const { content, tokens, model } = await callOpenAi(system, user);
       const parsed = parseJsonFromLlm(content);
@@ -251,6 +275,8 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
     } catch (err) {
       failures.push(`openai: ${err instanceof Error ? err.message : "unknown_error"}`);
     }
+  } else if (process.env.OPENAI_API_KEY?.trim() && failures.length > 0) {
+    failures.push("openai: skipped (AUTONOMOUS_ALLOW_OPENAI!=1 or PRIVATE_MODE)");
   }
 
   return mockFallback(
