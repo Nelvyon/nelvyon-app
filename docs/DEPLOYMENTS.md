@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-07-22 — Ops audit post-deploy (sin redeploy)
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Stripe KI-028 · DNS app · clasificar LLM_NOT_CONFIGURED |
+| **Deploy** | **No** |
+| **Stripe** | price-audit **allValid=true** → **KI-R028** |
+| **DNS** | `app.nelvyon.com` **NXDOMAIN** · sin Cloudflare API/wrangler |
+| **LLM** | Staging AUTONOMOUS sin Ollama/OpenAI · local Ollama OK · **no** fallo prod |
+| **SHA vivo** | `bba71f14afc1` · live/ready 200 |
+
+---
+
 ## 2026-07-22 00:39–00:51 UTC — Prod redeploy KI-030 `bba71f14` SUCCESS
 
 | Campo | Valor |

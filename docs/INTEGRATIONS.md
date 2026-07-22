@@ -3,7 +3,7 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-21**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** KI-028 Stripe STARTER · Cloudflare `app.nelvyon.com` · prod mig≤511 · flags SM/OpenClaw OFF.
+**Bloqueadores go-live:** Cloudflare `app.nelvyon.com` NXDOMAIN · flags SM/OpenClaw OFF · pack E2E staging LLM opcional.
 
 ---
 
@@ -11,7 +11,7 @@
 
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
-| **Stripe** | 🟡 | `STRIPE_*` | sk_live + webhook; STARTER **resource_missing** (KI-028) |
+| **Stripe** | ✅ | `STRIPE_*` | Live sk + webhook; price-audit **allValid=true** (KI-R028 2026-07-22); `AGENCY_PARTNER` opcional ausente |
 | Shopify | 🟡 | OAuth + `ShopifyService.ts` | Commerce |
 
 ---

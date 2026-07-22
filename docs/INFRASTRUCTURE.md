@@ -21,8 +21,8 @@
 | **Ollama** | ✅ | Preflight 2026-07-20: HTTP 200, models=6 |
 | **OpenClaw** | 🟡 | Mock certificado; URL real ops |
 | **AWS SES** | ✅ | Production access GRANTED 2026-07-21 · self-send OK · KI-R014 |
-| **Stripe** | 🟡 | sk_live + webhook; **STARTER price missing** (KI-028) |
-| **Cloudflare** | 🟡 | nelvyon.com OK · **app.nelvyon.com NXDOMAIN** |
+| **Stripe** | ✅ | sk_live + webhook; price-audit **allValid=true** (KI-R028) |
+| **Cloudflare** | 🟡 | nelvyon.com OK · **app.nelvyon.com NXDOMAIN** (humano: CNAME `app` → `nelvyonweb-production.up.railway.app`) |
 | **Backups / DR** | ✅ | GH Action + restore drill PASS 8/8 (evidencia) |
 | **Security headers** | ✅ | SSOT `apps/web/src/lib/security/headers.ts` |
 | **Ops dashboard** | ✅ | `GET /api/platform/ops/summary` |

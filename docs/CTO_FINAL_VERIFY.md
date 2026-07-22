@@ -1,52 +1,48 @@
-# CTO Final Verify — 2026-07-22 (post KI-030 SUCCESS `3f08f13d`)
+# CTO Final Verify — 2026-07-22 (post-ops Stripe/DNS/LLM)
 
-> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimProductionReady` **false** · **no** READY
+> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimProductionReady` **false** · **no** READY  
+> Bloqueo externo restante: **DNS `app.nelvyon.com`**
 
-## Deploy KI-030 (autorizado — único)
-
-| Campo | Resultado |
-|-------|-----------|
-| Comando | `railway redeploy --from-source -y` |
-| Deploy | `3f08f13d-4cd1-469e-9761-80f4576612b6` **SUCCESS** |
-| Commit tip | `bba71f14` |
-| SHA vivo (health) | `bba71f14afc1` |
-| live / ready | **200** / **200** |
-| Logs | Ready · migrate complete · **sin** headers module error |
-| 2º redeploy | **No** |
-
-## KI-030 → KI-R030
+## Prod (sin redeploy esta pasada)
 
 | Campo | Resultado |
 |-------|-----------|
-| Causa | cwd `/app` vs `./src/lib/security/headers` en next.config |
-| Fix | `cd /app/apps/web && exec node server.js` · WORKDIR `/app` |
-| Local Docker | **PASS** pre-redeploy |
-| Gates | vitest SSOT 3/3 · tsc 0 |
+| SHA vivo | `bba71f14afc1` |
+| live / ready | **200** / **ready** |
+| Mig | **512–516** (KI-R029) |
+| KI-030 | **KI-R030** |
 
-## Smokes staging (`ideal-victory` + `railway run`)
+## Stripe (KI-028 → KI-R028)
 
-| Smoke | Resultado |
+| Campo | Resultado |
+|-------|-----------|
+| price-audit | **allValid=true** (nelvyon.com + railway.app) |
+| starter/pro/agency | `stripeRetrieveOk=true` · `stripeActive=true` |
+| resource_missing | **false** |
+| AGENCY_PARTNER | var ausente (fuera del audit checkout) |
+
+## Cloudflare
+
+| Campo | Resultado |
+|-------|-----------|
+| Acceso API/wrangler | **No** (token unset · wrangler no instalado) |
+| `app.nelvyon.com` | **NXDOMAIN** |
+| Paso humano | CNAME `app` → `nelvyonweb-production.up.railway.app` → HTTPS health |
+
+## Smokes / LLM
+
+| Campo | Resultado |
 |-------|-----------|
 | portal-packs | **PASS** |
-| local-pack-e2e | **FAIL** `LLM_NOT_CONFIGURED` |
-
-## Gates / restricciones
-
-| Gate | Resultado |
-|------|-----------|
+| local-pack-e2e | **FAIL** `LLM_NOT_CONFIGURED` = **staging config** (AUTONOMOUS sin Ollama/OpenAI) |
+| Local Ollama | reachable · 6 models |
+| Fallo producción | **No** |
 | IA prod | **OFF** |
-| Costes nuevos | **0** |
-| SQL manual | **No** |
-| 2º redeploy | **No** |
 
-## PENDIENTES / bloqueos
+## Costes
 
-| Item | Sev. | Acción exacta |
-|------|------|----------------|
-| `app.nelvyon.com` NXDOMAIN | P1 | CNAME humano Cloudflare |
-| Pack smokes LLM staging | P2 | OPENAI/Ollama en staging (no prod IA) |
-| **KI-028** Stripe STARTER | P1 | Price Live + env |
+**0** · sin productos/precios/cobros Stripe creados · sin OpenAI
 
 ## Siguiente paso único
 
-Ops: DNS `app.nelvyon.com` y/o **KI-028** Stripe STARTER. No redeploy automático.
+Cloudflare DNS: CNAME **`app.nelvyon.com`** → **`nelvyonweb-production.up.railway.app`**.

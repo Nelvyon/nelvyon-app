@@ -16,16 +16,6 @@
 | **Evidencia** | Brain tests 7/7 PASS · `nelvyon-verify-all` → **CONDITIONAL_READY** (0 FAIL) · `validate-post-elite-migrations` OK 508–516 |
 | **Nota** | No se debilitó cobertura; `claimComplete` sigue tipado `false`. |
 
-### KI-028 - Stripe Live STARTER price resource_missing
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | Abierto 2026-07-21 |
-| **Severidad** | Media (P1 ops) |
-| **Detalle** | `GET /api/billing/price-audit` → `allValid=false`; plan starter `stripeRetrieveOk=false` / `resource_missing`. PRO y AGENCY OK. `sk_live` + webhook secret presentes. |
-| **Fix** | Humano: Stripe Dashboard Live → Price Starter activo → actualizar `STRIPE_PRICE_ID_STARTER` en Railway → re-auditar. |
-| **No hacer** | Crear cobros/suscripciones desde el agente sin confirmación. |
-
 ### KI-020 - CSRF Origin en mutaciones cookie SaaS (mitigado en codigo)
 
 | Campo | Valor |
@@ -143,6 +133,15 @@
 ---
 
 ## Historial resuelto
+
+### KI-R028 — Stripe Live STARTER price (ex KI-028)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-22** |
+| **Evidencia** | `GET /api/billing/price-audit` (auth cron) en `nelvyon.com` + `nelvyonweb-production.up.railway.app` → **allValid=true** · starter/pro/agency `stripeRetrieveOk=true` · `stripeActive=true` · sin `resource_missing` |
+| **Vars** | `STRIPE_PRICE_ID_STARTER` / `PRO` / `AGENCY` SET (`price_*`); `STRIPE_PRICE_ID_AGENCY_PARTNER` ausente (fuera del audit checkout; no bloquea KI-028) |
+| **Nota** | Sin crear precios/cobros en esta pasada |
 
 ### KI-R030 — Runtime `security/headers` cwd apps/web (ex KI-030)
 

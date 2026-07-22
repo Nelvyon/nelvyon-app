@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-22** — KI-030 **CERRADO** · deploy `3f08f13d` SUCCESS · SHA vivo `bba71f14`
+> Última actualización: **2026-07-22** — Post-deploy ops: **KI-R028** Stripe · DNS app humano · LLM staging config
 
 ---
 
@@ -9,19 +9,29 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** — KI-030 resuelto; schema ≥516; app sana |
-| **Deploy KI-030** | `3f08f13d-4cd1-469e-9761-80f4576612b6` **SUCCESS** · tip `bba71f14` · **1** redeploy only |
-| **SHA vivo (health)** | `bba71f14afc1` |
-| **Health** | live **200** · ready **200** (db ok, auth ok, env ok) |
-| **Runtime logs** | `Ready on :3000` · migrate skip/complete · **sin** `Cannot find module './src/lib/security/headers'` |
-| **Fix** | CMD `cd /app/apps/web && exec node server.js` · WORKDIR `/app` · `.dockerignore` WIP |
-| **Local Docker** | PASS `nelvyon-ki030:fixed` (pre-redeploy gate) |
-| **Smokes staging** | portal-packs **PASS** · local-pack-e2e **FAIL** `LLM_NOT_CONFIGURED` |
+| **Estado** | **CONDITIONAL_READY** (app+schema OK; DNS app pendiente) |
+| **SHA vivo** | `bba71f14afc1` · live/ready **200** |
+| **Prod mig** | **512–516** (KI-R029) |
+| **Stripe** | ✅ **KI-R028** — `price-audit` **allValid=true** (starter/pro/agency) |
+| **SES** | ✅ KI-R014 |
+| **Cloudflare** | 🟡 nelvyon.com OK · **`app.nelvyon.com` NXDOMAIN** (sin API token / wrangler) |
+| **P0 portal smoke** | ✅ PASS |
+| **Pack E2E smoke** | 🟡 `LLM_NOT_CONFIGURED` = **staging config** (no fallo prod) |
 | **IA prod** | OFF |
 | **Costes nuevos** | **0** |
 
 ---
 
+## Clasificación LLM_NOT_CONFIGURED
+
+- Staging `ideal-victory`: `AUTONOMOUS_PRODUCTION` SET · **sin** `OPENAI_API_KEY` / `OLLAMA_*` / `NELVYON_LOCAL_AI_URL`
+- Local Ollama: reachable `127.0.0.1:11434` (6 models) — **no** enlazado a staging
+- **No** es regresión de producción ni de SHA `bba71f14`
+- Camino seguro 0-coste: en staging solo, `OLLAMA_HOST` o `NELVYON_LOCAL_AI_URL` → Ollama alcanzable; **prohibido** activar IA en prod
+
+---
+
 ## Próximo paso EXACTO
 
-Ops humano: (1) Cloudflare CNAME `app.nelvyon.com` → Railway; (2) Stripe Live Price STARTER + `STRIPE_PRICE_ID_STARTER` (**KI-028**); (3) opcional staging LLM (`OPENAI_API_KEY` o Ollama) para pack E2E smokes — **sin** activar IA en prod. SQL/migrate manual **prohibido**.
+Humano Cloudflare DNS (zona `nelvyon.com`): crear **CNAME** `app` → `nelvyonweb-production.up.railway.app` → verificar `https://app.nelvyon.com/api/health/live` 200.  
+Opcional staging: enlazar Ollama para pack E2E — sin OpenAI de pago y sin flags IA prod.

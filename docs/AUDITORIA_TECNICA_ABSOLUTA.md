@@ -1,8 +1,8 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
 > Fecha: **2026-07-22**  
-> Veredicto interno: **CONDITIONAL_READY** (prod SHA `bba71f14` sano · KI-R030 · schema ≥516 KI-R029; DNS app; smokes pack LLM; IA OFF)  
-> Evidencia: deploy `3f08f13d` SUCCESS · health live/ready 200 · `CTO_FINAL_VERIFY.md`
+> Veredicto interno: **CONDITIONAL_READY** (SHA `bba71f14` · KI-R028/R029/R030 · **DNS app NXDOMAIN** · pack LLM staging config · IA OFF)  
+> Evidencia: price-audit allValid · health 200 · `CTO_FINAL_VERIFY.md`
 
 ---
 

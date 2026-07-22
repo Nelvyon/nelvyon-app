@@ -7,6 +7,10 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| KI-028 | **Cerrado → KI-R028** | price-audit prod **allValid=true** (starter/pro/agency retrieve+active); sin crear precios/cobros |
+| DNS | **app NXDOMAIN** | wrangler/API token ausentes · paso humano CNAME `app` → `nelvyonweb-production.up.railway.app` |
+| LLM smoke | **Clasificado** | `LLM_NOT_CONFIGURED` = staging AUTONOMOUS sin Ollama/OpenAI · **no** fallo prod · Ollama local OK |
+| Docs | **Cierre pendientes externos** | HANDOVER/STATUS/TODO/INFRA/INTEGRATIONS/DEPLOYMENTS/CTO/AUDITORIA |
 | KI-030 | **Cerrado → KI-R030** | Deploy `3f08f13d` SUCCESS · SHA vivo `bba71f14` · live/ready 200 · logs Ready sin headers error |
 | Smokes | **Post-KI-030** | portal-packs PASS · local-pack-e2e FAIL `LLM_NOT_CONFIGURED` · `.release-logs/p0-smokes-post-ki030.txt` |
 | KI-030 | **Fix local PASS** | CMD `cd /app/apps/web && exec node server.js` · WORKDIR `/app` · `.dockerignore` WIP · docker Ready sin headers error · vitest 3/3 · tsc 0 |

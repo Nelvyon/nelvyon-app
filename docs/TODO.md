@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-21** — Bloques 3–13 · KI-014✅ · KI-028 abierto
+> Actualizado: **2026-07-22** — KI-R028 Stripe cerrado · DNS app + LLM staging config
 
 ---
 
@@ -30,11 +30,12 @@
 - [x] Validador post-elite **508–516**
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
 - [x] Bloque 3 SaaS UUID isolation staging
-- [ ] **KI-028** — Stripe STARTER price Live
-- [ ] Cloudflare `app.nelvyon.com` CNAME
-- [ ] `STAGING_QA_PASSWORD` + P0 smokes login
+- [x] **KI-028** — Stripe STARTER · price-audit **allValid=true** (KI-R028) 2026-07-22
+- [x] Prod migrate 512–516 (KI-R029) + runtime headers (KI-R030)
+- [x] `STAGING_QA_PASSWORD` + portal P0 smoke PASS
+- [ ] Cloudflare `app.nelvyon.com` CNAME → `nelvyonweb-production.up.railway.app`
+- [ ] Staging Ollama/`NELVYON_LOCAL_AI_URL` para pack E2E (opcional; **no** IA prod)
 - [ ] KI-020 smoke staging CSRF Origin
-- [ ] Prod migrate 512–516 (solo con autorización CTO)
 
 ---
 
@@ -44,7 +45,7 @@
 - [x] CEO: `DATABASE_URL` secret GitHub (2026-07-10)
 - [x] CEO: `PRODUCTION_BASE_URL` variable (2026-07-10)
 - [ ] CEO: primer run workflow `Database Backup`
-- [ ] CEO: SNS SES (KI-014 — SES production access; dominio/SNS KI-011/KI-013 ya resueltos)
+- [x] SES production access (KI-R014)
 
 ---
 
