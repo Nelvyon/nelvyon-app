@@ -1,7 +1,7 @@
 # Mesh Option A — STAGING only (Tailscale → Ollama local)
 
-> **Status 2026-07-23:** LOCAL PRIVATE **PASS** · Staging container live/ready **200** · Tailscale join **FAIL** (`TS_AUTHKEY` invalid) · Prod IA **ABSENT** · Coste **0** · `claimReady: false`  
-> ADR-042 · Evidence: Railway logs `MESH_JOIN_FAIL` / `invalid key` · peer `nelvyon-staging-web` offline  
+> **Status 2026-07-23 (tip `1d5d620a`):** LOCAL PRIVATE **PASS** · Deploy `03a16532` **SUCCESS** · live/ready **200** · Tailscale join **FAIL** (`MESH_JOIN_FAIL` · ephemeral `TS_AUTHKEY` invalid/consumed) · Pack E2E **WARN** (critical=0 · not mesh-proven) · Prod IA **ABSENT** · Coste **0** · `claimReady: false`  
+> ADR-042 · ADR-043 · ADR-044 · Evidence: Railway logs `MESH_JOIN_FAIL` / `invalid key` · peer offline  
 
 ## Scope (CEO-approved)
 
@@ -16,15 +16,17 @@
 
 | Check | Result |
 |-------|--------|
+| Tip SHA live | `1d5d620ab4e9` · deploy `03a16532` SUCCESS |
+| Code (ADR-044) | CGNAT allowlist · HTTP proxy fetch · entrypoint `mesh_ok` · vitest 44/44 |
 | Ollama listen | Tailscale IPv4 **only** (loopback closed) |
 | Ollama private `/api/tags` | **PASS** |
-| Staging `live` / `ready` | **200** · `git_sha=bf9b24d1d4c5` |
-| Staging Tailscale join | **FAIL** — auth key rejected by Tailscale control plane |
-| Staging peer | `nelvyon-staging-web` seen then **offline** |
+| Staging `live` / `ready` | **200** |
+| Staging Tailscale join | **FAIL** — ephemeral auth key rejected/consumed on redeploy |
+| Staging peer | `nelvyon-staging-web*` **offline** |
 | Staging AI flags | AI=1 · OLLAMA_CONFIGURED=1 · MESH=1 · OpenAI=0 · Router=1 · QR=1 |
 | Prod IA/mesh keys | **ABSENT** |
-| Pack E2E / Router remote | **BLOCKED** until valid `TS_AUTHKEY` + `MESH_JOIN_OK` |
-| Tenant isolation unit | **PASS** (localAiModelRouter 25/25) |
+| Pack E2E | **WARN_FAIL** critical=0 · 1 WARN portal download 404 · **not** mesh path proven |
+| Unit tests | **44/44 PASS** |
 
 ## Emergency rollback (exactly two flags → 0)
 
@@ -39,7 +41,7 @@ Optional cleanup: unset `TS_AUTHKEY` · set `NELVYON_MESH_OPTION_A=0`.
 
 ## Fix required (CEO — do not paste key in chat)
 
-Current `TS_AUTHKEY` was **rejected** (`invalid key`). Ephemeral keys are single-use / expire.
+`TS_AUTHKEY` ephemeral is **single-use**. Every successful `tailscale up` / redeploy that joins consumes it → next redeploy needs a **new** key.
 
 ### Regenerate
 
@@ -55,7 +57,7 @@ Current `TS_AUTHKEY` was **rejected** (`invalid key`). Ephemeral keys are single
 3. Confirm `NELVYON_MESH_OPTION_A=1` · `OLLAMA_HOST=http://<tailscale-ipv4>:11434` · `OLLAMA_CONFIGURED=1` · `NELVYON_AI_ENABLED=1` · `AUTONOMOUS_ALLOW_OPENAI=0`  
 4. **Redeploy** `ideal-victory` once  
 5. Confirm logs show **`MESH_JOIN_OK`** (not `MESH_JOIN_FAIL`)  
-6. On PC: `"C:\Program Files\Tailscale\tailscale.exe" status` → `nelvyon-staging-web` **online**
+6. On PC: `"C:\Program Files\Tailscale\tailscale.exe" status` → `nelvyon-staging-web*` **online**
 
 ## Local verify (PC)
 
@@ -71,7 +73,8 @@ node scripts/mesh-option-a-local-prep.mjs
 | Probe | `GET {OLLAMA_HOST}/api/tags` |
 | Timeout | **5000 ms** |
 | Host allowlist | Tailscale CGNAT `100.64/10` or `*.ts.net` |
-| Proxies | Set **only** after successful `tailscale up` |
+| Proxies | Set **only** after successful `tailscale up` (`mesh_ok=1`) |
+| Proxy fetch | HTTP absolute-form via Node `http` (ADR-044) |
 
 ## Tenant isolation
 

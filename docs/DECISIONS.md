@@ -502,3 +502,15 @@
 
 ---
 
+## ADR-044 — PRIVATE_MODE CGNAT allowlist + mesh HTTP proxy fetch
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-23 |
+| **Decisión** | Allowlist PRIVATE_MODE incluye Tailscale CGNAT `100.64.0.0/10` y `*.ts.net`. `OLLAMA_HOST` puede ser IP Tailscale. Con `NELVYON_MESH_OPTION_A=1`, `privateModeFetch` usa proxy HTTP local (`NELVYON_MESH_HTTP_PROXY` / `HTTP_PROXY`) vía Node `http` absolute-form (**http:// only**, sin undici). Entrypoint setea proxies solo si `mesh_ok=1`. |
+| **Por qué** | Railway userspace Tailscale no enruta CGNAT sin HTTP/SOCKS proxy; Node fetch nativo ignora `HTTP_PROXY`. |
+| **Consecuencias** | tip `1d5d620a` build PASS; mesh join sigue requiriendo `TS_AUTHKEY` válida por redeploy (ephemeral); HTTPS mesh no soportado en proxy helper. |
+| **Relación** | ADR-042 · ADR-043 · `privateMode.ts` · `railway-mesh-option-a-entrypoint.sh`. |
+
+---
+

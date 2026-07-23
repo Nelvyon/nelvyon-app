@@ -15,10 +15,10 @@
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | 🟡 | Desktop often DOWN for restore drill |
 | **Railway prod** | ✅ | `@nelvyon/web` · SHA vivo `fcf2622cc02d` · IA canary keys **ABSENT** |
-| **Railway staging** | ✅ | `ideal-victory` · SHA `e52f851a9142` · Router+QR flags ON · AI master **0** · ADR-041 |
+| **Railway staging** | 🟡 | `ideal-victory` · tip `1d5d620a` · deploy `03a16532` SUCCESS · MESH_JOIN_FAIL · AI=1 mesh flags ON |
 | **PostgreSQL** | ✅ | SQL SSOT · mig 517/518 hist |
 | **Ollama** | ✅ local mesh | Bind Tailscale IP only · private PASS · loopback closed |
-| **Tailscale** | 🟡 | PC online · staging join **FAIL** (invalid auth key) · no Funnel/exit |
+| **Tailscale** | 🟡 | PC online · staging join **FAIL** (ephemeral key) · no Funnel/exit |
 | **OpenAI** | ❌ | allow **0** · revoked |
 | **Costes** | **0** | |
 

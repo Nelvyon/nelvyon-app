@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-07-23 — Mesh ADR-044 tip `1d5d620a` (deploy SUCCESS · join FAIL)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip** | `1d5d620a` (prior failed `2a7bc689` types; fix HTTP-only proxy) |
+| **Staging deploy** | `03a16532-8246-417f-9024-63ef10b0ddcc` **SUCCESS** |
+| **Live** | `git_sha=1d5d620ab4e9` · live/ready **200** |
+| **Join** | **FAIL** `MESH_JOIN_FAIL` invalid/consumed ephemeral key · peer offline |
+| **Pack E2E** | WARN_FAIL critical=0 · 1 WARN download 404 |
+| **Unit tests** | 44/44 PASS |
+| **Prod** | IA/mesh **ABSENT** |
+| **Rollback** | `NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0` |
+| **claimReady** | **false** |
+
 ## 2026-07-23 — Mesh staging verify (join FAIL · entrypoint harden)
 
 | Campo | Valor |

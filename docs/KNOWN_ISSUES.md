@@ -6,16 +6,16 @@
 
 ## Activos
 
-### KI-031 — Staging Mesh Option A: Tailscale join FAIL (invalid TS_AUTHKEY)
+### KI-031 — Staging Mesh Option A: Tailscale join FAIL (invalid/consumed TS_AUTHKEY)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto 2026-07-23** |
-| **Síntoma** | Logs: `tailscale up failed` / `invalid key` · peer `nelvyon-staging-web` offline · Pack E2E remoto BLOCKED |
-| **Mitigación** | Ollama privado PASS · staging live/ready 200 · prod IA ABSENT · entrypoint no setea proxies si up falla (ADR-043) |
+| **Estado** | **Abierto 2026-07-23** (reconfirmado tras tip `1d5d620a`) |
+| **Síntoma** | Logs: `MESH_JOIN_FAIL` / `invalid key` · peer `nelvyon-staging-web*` offline · proxies_set=0 |
+| **Mitigación** | Ollama privado PASS · staging live/ready 200 · tip deploy SUCCESS · ADR-044 code PASS · Pack E2E WARN critical=0 (no mesh-proven) · prod IA ABSENT · entrypoint no setea proxies si up falla (ADR-043) |
 | **Rollback** | `NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0` (staging only) |
-| **Acción CEO** | Regenerar auth key (`docs/ops/MESH_OPTION_A_STAGING.md`) · reemplazar `TS_AUTHKEY` · redeploy staging · esperar `MESH_JOIN_OK` |
-| **Nota** | No declarar READY ni Pack E2E PASS hasta join OK. Sin secretos en git/chat. |
+| **Acción CEO** | Regenerar auth key ephemeral (`docs/ops/MESH_OPTION_A_STAGING.md`) · reemplazar `TS_AUTHKEY` · **un** redeploy · esperar `MESH_JOIN_OK` · nota: cada join consume key ephemeral |
+| **Nota** | claimReady **false**. No READY. Sin secretos en git/chat. |
 
 ### Ops (no KI) — Web `git_sha` null after `railway up`
 
@@ -29,9 +29,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Superseded parcialmente por KI-031** — mesh flags ON pero join FAIL |
-| **Detalle** | Tras `MESH_JOIN_OK` re-correr Pack E2E contra `ideal-victory-staging`. OpenAI sigue OFF. |
-| **Evidencia** | `.release-logs/mesh-option-a-staging-verify-20260723.txt` |
+| **Estado** | **Superseded parcialmente por KI-031** — tip `1d5d620a` Pack E2E **WARN** critical=0 sin `MESH_JOIN_OK` (no declara mesh path) |
+| **Detalle** | Tras `MESH_JOIN_OK` re-correr Pack E2E + probe Ollama vía proxy. OpenAI sigue OFF. |
+| **Evidencia** | deploy `03a16532` · HANDOVER 2026-07-23 |
 
 ### Ops (no KI) — Local pack as-complete con Ollama 3b
 

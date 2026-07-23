@@ -1016,14 +1016,14 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 ### 8.1 Veredicto
 
-**[VERIFICADO]** Fuente: HANDOVER + `AUDITORIA_TECNICA_ABSOLUTA.md` — **2026-07-22**
+**[VERIFICADO]** Fuente: HANDOVER + `AUDITORIA_TECNICA_ABSOLUTA.md` — **2026-07-23**
 
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | staging live `bf9b24d1` · mesh join **FAIL** · prod mesh ABSENT |
-| **Canary IA** | Router+QR ON staging · Ollama privado PASS · OpenAI 0 · Pack E2E BLOCKED |
-| **P0 smokes** | KI-020 **KI020_PASS** · automations unified **200** (prior auth) · portal-packs **PASS** · P0 SUCCESS `29944606938` · pack E2E **SKIP_IA_OFF** (ADR-040) · mig 517/518 DB **PASS** |
+| **SHA / deploys** | staging tip `1d5d620a` · deploy `03a16532` SUCCESS · MESH_JOIN_FAIL · prod mesh ABSENT |
+| **Canary IA** | Router+QR ON staging · ADR-044 code PASS · Ollama privado PASS · OpenAI 0 · Pack E2E WARN critical=0 |
+| **P0 smokes** | KI-020 **KI020_PASS** · automations unified **200** (prior auth) · portal-packs **PASS** · P0 SUCCESS `29944606938` · local-pack E2E WARN · mig 517/518 DB **PASS** |
 | **Blocker go-live DNS** | **RESUELTO** 2026-07-22 — `app.nelvyon.com` DNS/SSL/health PASS |
 | **verify-all** | **7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED** |
 | Bloque 1 Docker+ingest | **VERIFICADO** (`verified:true` · chunks 1559 · coverage 0.99 · claimComplete **false**) |

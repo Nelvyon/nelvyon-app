@@ -1,16 +1,16 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-23** (Mesh staging verify — join FAIL)  
+> Fecha: **2026-07-23** (tip `1d5d620a` · ADR-044 · MESH_JOIN_FAIL)  
 > Veredicto interno: **CONDITIONAL_READY** · `claimReady: false` · **no READY**  
-> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · logs `MESH_JOIN_FAIL` / invalid key
+> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · deploy `03a16532` · Pack E2E WARN
 
 ### Matriz estricta (resumen)
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO | Mesh entrypoint · allowlist · Router+QR · core SaaS/OS |
-| VERIFICADO LOCAL | Ollama TS IP PASS · vitest 37 (prep+QR+tenant router) |
-| VERIFICADO STAGING | live/ready 200 · join **FAIL** · Pack E2E BLOCKED |
+| IMPLEMENTADO | Mesh entrypoint · ADR-044 CGNAT+proxy · Router+QR · core SaaS/OS |
+| VERIFICADO LOCAL | Ollama TS IP PASS · vitest **44/44** |
+| VERIFICADO STAGING | live/ready 200 · tip `1d5d620a` · join **FAIL** · Pack E2E WARN critical=0 |
 | VERIFICADO PROD | Mesh/IA keys **ABSENT** |
 | PREPARADO OFF | OpenAI · Funnel · Serve · exit · subnet · MCP · SM · payouts |
 | BLOQUEO EXTERNO | Auth key válida CEO · legal campañas |
@@ -197,7 +197,7 @@ Ver `docs/PARITY_GHL_HUBSPOT.md`. Resumen honesto: **~48 features core en códig
 
 ### Veredicto auditoría
 
-**CONDITIONAL_READY** — DNS/SSL/health PASS · SES/Stripe ops cerrados en hist. · SHA vivo `9ca0cf29a5e5` · portal-packs PASS (GH) · pack E2E SKIP_IA_OFF honesto · **no READY** · **claimReady false**.
+**CONDITIONAL_READY** — tip `1d5d620a` ADR-044 · deploy `03a16532` SUCCESS · MESH_JOIN_FAIL · Pack E2E WARN critical=0 · Ollama privado PASS · prod IA ABSENT · **no READY** · **claimReady false**.
 
 ### 10. Bloques 3–13 (2026-07-21) + redeploy 2026-07-22
 

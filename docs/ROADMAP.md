@@ -66,9 +66,9 @@
 | Partners CEO payout gate | ✅ | `NELVYON_CEO_PARTNER_PAYOUTS` default OFF |
 | Runbook ops sin Cursor | ✅ | `OS_AUTONOMOUS_OPERATIONS.md` |
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
-| Local AI runtime mesh | 🟡 | Arquitectura doc · **no activada** |
+| Local AI runtime mesh | 🟡 | ADR-044 code PASS · join FAIL · no MESH_JOIN_OK |
 | Beta packs → available | ❌ | Falta cert + deliverables dedicados |
-| Agencia OS unificada élite (ops) | 🟡 | Mesh: Ollama privado PASS · Tailscale join FAIL (auth key) · claimReady false |
+| Agencia OS unificada élite (ops) | 🟡 | tip `1d5d620a` ADR-044 · Pack E2E WARN · MESH_JOIN_FAIL (ephemeral key) · claimReady false |
 
 ---
 
