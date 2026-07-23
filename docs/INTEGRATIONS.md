@@ -3,14 +3,14 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-23**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas. Prod IA flags **ABSENT** (OpenAI key ABSENT). Staging Mesh **JOIN_OK** · Pack E2E **ALL_PASS completed** · OpenAI staging **0**. KI-031 **resuelto**.
+**Bloqueadores go-live:** legal campañas. Prod IA **ABSENT**. Staging mesh Pack E2E ALL_PASS. OS catalog: `OS_UNIVERSAL_SERVICE_CATALOG.md`. Free tools: eval only (`FREE_TOOLS_EVALUATION.md`).
 
 ### Auth bridge Web ↔ FastAPI
 
 | Ítem | Estado |
 |------|--------|
 | OpenAI | allow **0** · revoked |
-| Mesh Option A | Ollama privado **PASS** · Railway join **PASS** · Pack E2E ALL_PASS · ADR-044/045/046 |
+| Mesh Option A | Ollama privado PASS · Pack E2E ALL_PASS · ADR-044–047 |
 
 ---
 

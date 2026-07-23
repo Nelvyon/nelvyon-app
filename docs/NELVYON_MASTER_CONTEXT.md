@@ -1016,21 +1016,17 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 ### 8.1 Veredicto
 
-**[VERIFICADO]** Fuente: HANDOVER + `AUDITORIA_TECNICA_ABSOLUTA.md` — **2026-07-23**
+**[VERIFICADO]** Fuente: HANDOVER + `OS_UNIVERSAL_SERVICE_CATALOG.md` — **2026-07-24**
 
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | staging deploy `6aeb4106` SUCCESS · MESH_JOIN_OK · prod mesh ABSENT |
-| **Canary IA** | Router+QR ON staging · Ollama privado PASS · OpenAI 0 · Pack E2E mesh needs_review `f5de9c43` |
-| **P0 smokes** | KI-020 **KI020_PASS** · automations unified **200** (prior auth) · portal-packs **PASS** · P0 SUCCESS `29944606938` · local-pack E2E WARN · mig 517/518 DB **PASS** |
-| **Blocker go-live DNS** | **RESUELTO** 2026-07-22 — `app.nelvyon.com` DNS/SSL/health PASS |
-| **verify-all** | **7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED** |
-| Bloque 1 Docker+ingest | **VERIFICADO** (`verified:true` · chunks 1559 · coverage 0.99 · claimComplete **false**) |
-| Bloque 2 Shared Memory staging | **KI-021 verified:true** · KI-022…026 ✅ · última mig **516** · `506a` · **507 no editada** · **ADR-032** dual-plane · CLI production · `claimComplete` **false** |
-| Workforce | **PASS** (ADR-029) |
-| Elite | **PASS** (ADR-026) |
-| Freezes Router / MCP | **intactos** (flags OFF) |
+| **SHA / deploys** | Pack E2E tip `99b30730` · mesh JOIN_OK · prod IA ABSENT |
+| **OS Universal** | Catálogo SSOT · local growth **IMPLEMENTED_VERIFIED** · ecom/saas **PREPARED_OFF** · 5 **BETA** · ADR-047 |
+| **Free tools** | Eval only · 0 installs · `FREE_TOOLS_EVALUATION.md` |
+| **Canary IA** | Staging mesh PASS · Pack E2E **ALL_PASS completed** · OpenAI 0 |
+| **Blocker claimReady** | Legal checklist campañas |
+| Freezes Router / MCP / prod IA | **intactos** (flags OFF) |
 | Producto enterprise completo | **NO** |
 
 ### 8.2 Interpretación de CONDITIONAL_READY

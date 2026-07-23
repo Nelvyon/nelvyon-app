@@ -538,3 +538,15 @@
 
 ---
 
+## ADR-047 — OS Universal catalog + free-tools research gate
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | (1) `docs/OS_UNIVERSAL_SERVICE_CATALOG.md` es SSOT de estado real OS (`IMPLEMENTED_VERIFIED`/`BETA`/`PREPARED_OFF`/`BLOCKED_EXTERNAL`/`NOT_IMPLEMENTED`). (2) `docs/FREE_TOOLS_EVALUATION.md` documenta investigación OSS; **prohibido** instalar sin ADR específico + aprobación CTO. (3) No promover beta→available sin evidencia `SERVICE_BETA_PACKS.md`. (4) No declarar READY mientras legal campañas bloquee claimReady. |
+| **Por qué** | Evitar humo (AVAILABLE por UI) y deuda de tools freemium/duplicadas. |
+| **Consecuencias** | Fase A = certificar ecommerce/saas-b2b E2E; tools = DEFER/REJECT salvo propuesta analytics. |
+| **Relación** | `OsCapabilityRegistry.ts` · packRegistry · MESH ADR-042–046. |
+
+---
+

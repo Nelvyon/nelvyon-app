@@ -193,7 +193,7 @@ export const OS_CAPABILITY_REGISTRY: readonly OsCapability[] = [
     portalPath: "/portal",
     qaMinScore: OS_QA_MIN_SCORE,
     ceoApprovalRequired: false,
-    status: "elite",
+    status: "partial",
     primaryAgentIds: ["NELVYON-LANDING", "NELVYON-SEO"],
     metricsKeys: ["orders", "conversion_rate", "qa_score"],
   },

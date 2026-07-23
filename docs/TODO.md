@@ -20,25 +20,23 @@
 
 ---
 
-> Actualizado: **2026-07-24** — Post-mesh Pack E2E ALL_PASS · claimReady false (legal)
+> Actualizado: **2026-07-24** — OS Universal + free-tools · claimReady false (legal)
 
 ---
 
 ## P2 — Post-auditoría / ops
 
-- [x] **KI-027** — Test brain · verify-all CONDITIONAL_READY
-- [x] Validador post-elite **508–518** + SQL SSOT gate (`validate-sql-alembic-ssot`) · DuplicateTable guard
-- [x] Automations unified **200** · JWT sync ADR-038 · mig 517/518 · `SKIP_ALEMBIC=1`
-- [x] Ops: 1× web redeploy `--from-source` → `git_sha=9ca0cf29a5e5` (deploy `7d625161`)
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
-- [x] CEO: canary staging Router+QR (ADR-041) — flags ON · local Option C ALL_PASS
-- [x] CEO: Mesh Option A prep (ADR-042) — Ollama Tailscale IP PASS · staging prep
-- [x] Code: ADR-044 CGNAT allowlist + HTTP proxy fetch · vitest 44/44 · tip `1d5d620a` deploy SUCCESS
-- [x] CEO: `TS_AUTHKEY` reusable → **MESH_JOIN_OK** (KI-031 resuelto) · peer active
-- [x] Ops: Pack E2E mesh — tip `99b30730` **ALL_PASS completed** · portal invite · ADR-045/046
-- [x] Ops: tip git push + staging deploy desde origin (`99b30730` live)
-- [x] Ops: prod residual `OPENAI_API_KEY` eliminado (ABSENT) · allow OpenAI ABSENT
+- [x] Mesh staging · Pack E2E ALL_PASS · ADR-044–046
+- [x] `OS_UNIVERSAL_SERVICE_CATALOG.md` + `FREE_TOOLS_EVALUATION.md` · ADR-047
+- [x] Honesty: ecommerce capability `elite` → `partial` hasta E2E ALL_PASS
+- [ ] Fase A: Pack E2E mesh `ecommerce-growth` → ALL_PASS
+- [ ] Fase A: Pack E2E mesh `saas-b2b-growth` → ALL_PASS
+- [ ] Fase B: certificar betas (cro → analytics → content…) sin promote prematuro
+- [ ] CTO: aprobar/rechazar ADR-048 analytics Matomo/Umami (staging privado)
+- [ ] No instalar Helio/Mautic/Twenty/n8n/Listmonk sin necesidad
 - [ ] Ops: Router remoto soak mesh (opcional)
+- [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts en prod sin CEO
 
 - [x] Ops: portal-packs refresh GH — **PASS** · P0 SUCCESS `29944606938`
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)

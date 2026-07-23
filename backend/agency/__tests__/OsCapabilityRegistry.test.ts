@@ -15,10 +15,10 @@ describe("OsCapabilityRegistry", () => {
     expect(check.ok).toBe(true);
   });
 
-  it("marks growth-backed services as elite", () => {
-    expect(listEliteOsServices()).toEqual(
-      expect.arrayContaining(["seo", "web_landing", "ecommerce"]),
-    );
+  it("marks mesh-verified growth SKU services as elite (not ecommerce until E2E ALL_PASS)", () => {
+    expect(listEliteOsServices()).toEqual(expect.arrayContaining(["seo", "web_landing"]));
+    expect(listEliteOsServices()).not.toContain("ecommerce");
+    expect(getOsCapability("ecommerce")?.status).toBe("partial");
   });
 
   it("forbids minting new sector flotilla agents as policy", () => {

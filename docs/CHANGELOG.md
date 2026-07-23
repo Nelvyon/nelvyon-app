@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| OS | **Universal catalog + free tools audit** | `OS_UNIVERSAL_SERVICE_CATALOG.md` · `FREE_TOOLS_EVALUATION.md` · ADR-047 · ecommerce registry `elite`→`partial` (honest) · nada instalado · claimReady **false** |
 | Mesh | **CIERRE POST-MESH** | tip `99b30730` · staging live match · `MESH_JOIN_OK` · peer `nelvyon-staging-web-3` active · Pack E2E **ALL_PASS completed** (5 auto-approve) · portal-packs **ALL_PASS** · SEO fix ADR-046 (ignore LLM blockers + pad keywords + JSON repair + soft-continue) · prod `OPENAI_API_KEY` **ABSENT** · flags IA/mesh OFF · Ollama privado PASS · tenant iso 16/16 · claimReady **false** (legal) · rollback `AI=0`+`OLLAMA=0` |
 
 ## 2026-07-23

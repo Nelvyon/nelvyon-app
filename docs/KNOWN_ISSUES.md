@@ -10,8 +10,15 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto** — único bloqueo claimReady |
-| **Detalle** | Gates mesh/pack staging PASS 2026-07-24; falta firma legal campañas |
+| **Estado** | **Abierto** — único bloqueo claimReady / READY |
+| **Detalle** | Mesh+Pack PASS · OS catalog live · free tools 0 installs |
+
+### Ops (no KI) — ecommerce/saas Pack E2E pendiente
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **PREPARED_OFF** en catálogo |
+| **Detalle** | Harness existe · falta ALL_PASS mesh reciente → no `IMPLEMENTED_VERIFIED` |
 
 ---
 

@@ -1,20 +1,20 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-24** (tip `99b30730` · ADR-044/045/046 · Pack E2E ALL_PASS)  
+> Fecha: **2026-07-24** (OS Universal catalog · free-tools · Pack E2E ALL_PASS)  
 > Veredicto interno: **CONDITIONAL_READY** · `claimReady: false` · **no READY**  
-> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · Pack E2E completed · Ollama real mesh
+> Evidencia: `OS_UNIVERSAL_SERVICE_CATALOG.md` · `FREE_TOOLS_EVALUATION.md` · ADR-047
 
 ### Matriz estricta (resumen)
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO | Mesh entrypoint · ADR-044–046 · Router+QR · core SaaS/OS |
-| VERIFICADO LOCAL | Ollama TS IP PASS · tenant iso 16/16 · meshQaFixes |
-| VERIFICADO STAGING | live/ready 200 · `MESH_JOIN_OK` · Pack E2E **ALL_PASS completed** · portal-packs ALL_PASS |
-| VERIFICADO PROD | Mesh/IA flags **ABSENT** · `OPENAI_API_KEY` **ABSENT** |
-| PREPARADO OFF | OpenAI allow · Funnel · Serve · exit · subnet · MCP · SM · payouts |
-| BLOQUEO EXTERNO | Legal campañas |
-| CEO / LEGAL / MERCADO | Bloquean claimReady |
+| IMPLEMENTADO | Mesh · local growth SKUs · portal · CRM SaaS · workflows |
+| VERIFICADO STAGING | Pack E2E ALL_PASS · MESH_JOIN_OK · portal-packs |
+| VERIFICADO PROD | IA/OpenAI/mesh **ABSENT** |
+| BETA | 5 packs extendidos (sin promote) |
+| PREPARADO OFF | ecommerce/saas packs · automations/reputation SaaS |
+| BLOQUEO EXTERNO | Legal campañas · ads OAuth |
+| FREE TOOLS | Eval only · 0 installs |
 
 ---
 
