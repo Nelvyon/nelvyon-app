@@ -514,3 +514,15 @@
 
 ---
 
+## ADR-045 — Pack kickoff async (HTTP 202) for mesh/Ollama
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-23 |
+| **Decisión** | Kickoff OS packs responde **202** tras `createPackRun` (`onRunCreated`) y continúa SKUs/LLM en el event loop del proceso Node (Railway). Sync solo con `X-Pack-Sync: 1` o `NELVYON_PACK_KICKOFF_ASYNC=0`. Idempotency insert usa `ON CONFLICT (workspace_id, idempotency_key) WHERE idempotency_key IS NOT NULL`. Entrypoint mesh scripts force LF (`.gitattributes`). Si Ollama está configurado y falla, **no** silent-mock. |
+| **Por qué** | Packs 8B vía mesh superan `maxDuration`/gateway; abort del cliente dejaba runs `running` forever. |
+| **Consecuencias** | Smoke acepta 202 + poll largo; Pack E2E mesh `f5de9c43` → `needs_review` con LLM real. |
+| **Relación** | ADR-044 · `kickoff/route.ts` · `packOrchestrator.ts` · `llmAdapter.ts`. |
+
+---
+

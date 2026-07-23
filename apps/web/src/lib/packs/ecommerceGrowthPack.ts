@@ -66,12 +66,14 @@ export async function runEcommerceGrowthPack(params: {
   userId: string;
   intake: EcommerceGrowthPackIntake;
   idempotencyKey?: string;
+  onRunCreated?: (run: PackRunRecord) => void;
 }): Promise<PackRunRecord> {
   const { intake } = params;
   return runGrowthPack({
     workspaceId: params.workspaceId,
     userId: params.userId,
     idempotencyKey: params.idempotencyKey,
+    onRunCreated: params.onRunCreated,
     config: {
       meta,
       intake,

@@ -489,6 +489,8 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
   workspaceId: number;
   userId: string;
   idempotencyKey?: string | null;
+  /** Fires once a new pack run row exists (before SKUs/LLM). Enables async kickoff HTTP 202. */
+  onRunCreated?: (run: PackRunRecord) => void;
   config: GrowthPackRunConfig<T>;
 }): Promise<PackRunRecord> {
   if (!platformDbFallbackEnabled()) {
@@ -519,6 +521,7 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     return createdPack.run;
   }
   let run = createdPack.run;
+  params.onRunCreated?.(run);
 
   let steps = run.steps;
   let extraCampaignCount = 0;

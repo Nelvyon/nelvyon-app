@@ -1,20 +1,20 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-23** (tip `1d5d620a` · ADR-044 · MESH_JOIN_FAIL)  
+> Fecha: **2026-07-23** (deploy `6aeb4106` · ADR-044/045 · MESH_JOIN_OK)  
 > Veredicto interno: **CONDITIONAL_READY** · `claimReady: false` · **no READY**  
-> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · deploy `03a16532` · Pack E2E WARN
+> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · Pack `f5de9c43` needs_review · Ollama real
 
 ### Matriz estricta (resumen)
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO | Mesh entrypoint · ADR-044 CGNAT+proxy · Router+QR · core SaaS/OS |
+| IMPLEMENTADO | Mesh entrypoint · ADR-044 CGNAT+proxy · ADR-045 async kickoff · Router+QR · core SaaS/OS |
 | VERIFICADO LOCAL | Ollama TS IP PASS · vitest **44/44** |
-| VERIFICADO STAGING | live/ready 200 · tip `1d5d620a` · join **FAIL** · Pack E2E WARN critical=0 |
-| VERIFICADO PROD | Mesh/IA keys **ABSENT** |
-| PREPARADO OFF | OpenAI · Funnel · Serve · exit · subnet · MCP · SM · payouts |
-| BLOQUEO EXTERNO | Auth key válida CEO · legal campañas |
-| CEO / LEGAL / MERCADO | Bloquean claimReady / mesh remoto |
+| VERIFICADO STAGING | live/ready 200 · `MESH_JOIN_OK` · Pack E2E mesh needs_review · peer active |
+| VERIFICADO PROD | Mesh/IA flags **ABSENT** (residual OpenAI key PRESENT, gates OFF) |
+| PREPARADO OFF | OpenAI allow · Funnel · Serve · exit · subnet · MCP · SM · payouts |
+| BLOQUEO EXTERNO | Legal campañas · tip git sync |
+| CEO / LEGAL / MERCADO | Bloquean claimReady |
 
 ---
 
@@ -197,7 +197,7 @@ Ver `docs/PARITY_GHL_HUBSPOT.md`. Resumen honesto: **~48 features core en códig
 
 ### Veredicto auditoría
 
-**CONDITIONAL_READY** — tip `1d5d620a` ADR-044 · deploy `03a16532` SUCCESS · MESH_JOIN_FAIL · Pack E2E WARN critical=0 · Ollama privado PASS · prod IA ABSENT · **no READY** · **claimReady false**.
+**CONDITIONAL_READY** — deploy `6aeb4106` SUCCESS · MESH_JOIN_OK · Pack E2E `f5de9c43` needs_review (Ollama real) · Ollama privado PASS · prod IA flags ABSENT · **no READY** · **claimReady false**.
 
 ### 10. Bloques 3–13 (2026-07-21) + redeploy 2026-07-22
 

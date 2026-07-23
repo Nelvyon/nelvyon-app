@@ -79,7 +79,7 @@ export async function createPackRun(params: {
       `INSERT INTO nelvyon_pack_runs
          (id, workspace_id, user_id, pack_id, status, intake, steps, idempotency_key)
        VALUES ($1, $2, $3, $4, 'running', $5::jsonb, $6::jsonb, $7)
-       ON CONFLICT (workspace_id, idempotency_key) DO NOTHING
+       ON CONFLICT (workspace_id, idempotency_key) WHERE idempotency_key IS NOT NULL DO NOTHING
        RETURNING *`,
       [id, params.workspaceId, params.userId, params.packId, JSON.stringify(params.intake), JSON.stringify(steps), idempotencyKey],
     );

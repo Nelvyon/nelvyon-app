@@ -47,7 +47,13 @@ export function validateBetaPackIntake(body: unknown, validSectors: string[]): B
 
 async function runBetaPack(
   packId: string,
-  params: { workspaceId: number; userId: string; intake: BetaPackIntake; idempotencyKey?: string },
+  params: {
+    workspaceId: number;
+    userId: string;
+    intake: BetaPackIntake;
+    idempotencyKey?: string;
+    onRunCreated?: (run: PackRunRecord) => void;
+  },
 ): Promise<PackRunRecord> {
   const meta = PACK_REGISTRY[packId as keyof typeof PACK_REGISTRY]!;
   const intake = params.intake;
@@ -55,6 +61,7 @@ async function runBetaPack(
     workspaceId: params.workspaceId,
     userId: params.userId,
     idempotencyKey: params.idempotencyKey,
+    onRunCreated: params.onRunCreated,
     config: {
       meta,
       intake,

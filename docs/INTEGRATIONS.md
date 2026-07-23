@@ -3,14 +3,14 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-23**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas · **TS_AUTHKEY** nueva (KI-031 · join FAIL). Prod IA **OFF**. Staging tip `1d5d620a` ADR-044 code PASS · Pack E2E WARN · mesh **no unido**. OpenAI **0**.
+**Bloqueadores go-live:** legal campañas. Prod IA flags **ABSENT**. Staging Mesh **JOIN_OK** · Pack E2E mesh needs_review · OpenAI staging **0**. KI-031 **resuelto**.
 
 ### Auth bridge Web ↔ FastAPI
 
 | Ítem | Estado |
 |------|--------|
 | OpenAI | allow **0** · revoked |
-| Mesh Option A | Ollama privado **PASS** · Railway join **FAIL** · regen key · ADR-044 |
+| Mesh Option A | Ollama privado **PASS** · Railway join **PASS** · Pack mesh needs_review · ADR-044/045 |
 
 ---
 

@@ -4,6 +4,22 @@
 
 ---
 
+# DEPLOYMENTS — Historial de despliegues
+
+> No borrar entradas. Añadir al inicio.
+
+## 2026-07-23 — Mesh final verify (JOIN_OK · async kickoff)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Deploy** | `6aeb4106-0f55-4198-863b-a396e6d118e2` SUCCESS (railway up) |
+| **Prior fails** | `e3029db9` TS never · `fd33977f` entrypoint CRLF · `a36ca330` model?:string |
+| **Join** | **PASS** `MESH_JOIN_OK` · peer `nelvyon-staging-web-1` active |
+| **Pack** | `f5de9c43` needs_review · Ollama real |
+| **Prod** | untouched · IA flags ABSENT |
+| **claimReady** | **false** |
+
 ## 2026-07-23 — Mesh ADR-044 tip `1d5d620a` (deploy SUCCESS · join FAIL)
 
 | Campo | Valor |

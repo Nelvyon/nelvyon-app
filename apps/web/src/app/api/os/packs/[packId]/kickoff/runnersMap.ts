@@ -38,6 +38,7 @@ export type PackRunner = (params: {
   userId: string;
   intake: never;
   idempotencyKey?: string;
+  onRunCreated?: (run: PackRunRecord) => void;
 }) => Promise<PackRunRecord>;
 
 export type PackRunnerEntry = {

@@ -70,6 +70,7 @@ export async function runLocalBusinessGrowthPack(params: {
   userId: string;
   intake: LocalGrowthPackIntake;
   idempotencyKey?: string;
+  onRunCreated?: (run: PackRunRecord) => void;
 }): Promise<PackRunRecord> {
   const enriched = enrichLocalIntake(params.intake);
   let welcomeDispatch: WelcomeDispatchResult = {
@@ -82,6 +83,7 @@ export async function runLocalBusinessGrowthPack(params: {
     workspaceId: params.workspaceId,
     userId: params.userId,
     idempotencyKey: params.idempotencyKey,
+    onRunCreated: params.onRunCreated,
     config: {
       meta,
       intake: enriched,

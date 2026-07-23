@@ -12,7 +12,8 @@ import { RUNNERS } from "./runnersMap";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-export const maxDuration = 120;
+/** Mesh/Ollama 8B packs routinely exceed 120s; Railway Pro allows up to 300s. */
+export const maxDuration = 300;
 
 function parseWorkspaceId(req: Request): number | null {
   const raw = req.headers.get("x-workspace-id")?.trim();
@@ -103,13 +104,72 @@ export async function POST(
       }
     }
 
-    const run = await runner.run({
+    // Default async: mesh/Ollama packs exceed HTTP/gateway limits if awaited.
+    // Opt into sync with X-Pack-Sync: 1 or NELVYON_PACK_KICKOFF_ASYNC=0.
+    const syncMode =
+      req.headers.get("x-pack-sync")?.trim() === "1" ||
+      process.env.NELVYON_PACK_KICKOFF_ASYNC?.trim() === "0";
+
+    if (syncMode) {
+      const run = await runner.run({
+        workspaceId,
+        userId: claims.userId,
+        intake: intake as never,
+        idempotencyKey,
+      });
+      return NextResponse.json(run, { status: 201 });
+    }
+
+    const createdBox: { run: import("@/lib/packs/types").PackRunRecord | null } = { run: null };
+    const work = runner.run({
       workspaceId,
       userId: claims.userId,
       intake: intake as never,
       idempotencyKey,
+      onRunCreated: (run) => {
+        createdBox.run = run;
+      },
     });
-    return NextResponse.json(run, { status: 201 });
+
+    const createDeadline = Date.now() + 20_000;
+    while (!createdBox.run && Date.now() < createDeadline) {
+      const raced = await Promise.race([
+        work.then((run) => ({ kind: "done" as const, run })),
+        new Promise<{ kind: "tick" }>((resolve) => {
+          setTimeout(() => resolve({ kind: "tick" }), 40);
+        }),
+      ]);
+      if (raced.kind === "done") {
+        return NextResponse.json(raced.run, { status: 201 });
+      }
+    }
+
+    if (!createdBox.run) {
+      // Create should be near-instant; if not, await fully (fail closed with error).
+      const run = await work;
+      return NextResponse.json(run, { status: 201 });
+    }
+
+    const runId = createdBox.run.id;
+    void work.catch(async (err: unknown) => {
+      const message = err instanceof Error ? err.message : "Pack async execution failed";
+      console.error(`[pack-kickoff-async] run=${runId} failed:`, message);
+      try {
+        const { updatePackRun } = await import("@/lib/packs/packRunStore");
+        await updatePackRun(
+          runId,
+          { status: "failed", error_message: message.slice(0, 2000) },
+          workspaceId,
+        );
+      } catch (updateErr) {
+        console.error(`[pack-kickoff-async] run=${runId} status update failed:`, updateErr);
+      }
+    });
+
+    return NextResponse.json(createdBox.run, {
+      status: 202,
+      headers: { "X-Pack-Async": "1" },
+    });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Pack execution failed";
     return NextResponse.json({ error: message }, { status: 500 });

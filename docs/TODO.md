@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-23** — tip `1d5d620a` ADR-044 · Pack E2E WARN · MESH_JOIN_FAIL · claimReady false
+> Actualizado: **2026-07-23** — Mesh JOIN_OK · Pack E2E needs_review · claimReady false
 
 ---
 
@@ -34,9 +34,10 @@
 - [x] CEO: canary staging Router+QR (ADR-041) — flags ON · local Option C ALL_PASS
 - [x] CEO: Mesh Option A prep (ADR-042) — Ollama Tailscale IP PASS · staging prep
 - [x] Code: ADR-044 CGNAT allowlist + HTTP proxy fetch · vitest 44/44 · tip `1d5d620a` deploy SUCCESS
-- [ ] CEO: **regenerar** `TS_AUTHKEY` ephemeral + redeploy staging hasta `MESH_JOIN_OK` (KI-031 · key consumed on redeploy)
-- [x] Ops: Pack E2E staging corrido — **WARN** critical=0 (download 404) · **re-run tras MESH_JOIN_OK** para path mesh
-- [ ] Ops: Router remoto + soak mesh tras MESH_JOIN_OK
+- [x] CEO: `TS_AUTHKEY` reusable → **MESH_JOIN_OK** (KI-031 resuelto) · peer active
+- [x] Ops: Pack E2E mesh path — run `f5de9c43` **needs_review** · real 3b/8b · ADR-045 async 202
+- [ ] Ops: tip git push + deploy desde origin (hoy railway up `6aeb4106`)
+- [ ] Ops: Router remoto soak mesh (opcional)
 - [x] Ops: portal-packs refresh GH — **PASS** · P0 SUCCESS `29944606938`
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
 - [x] Bloque 3 SaaS UUID isolation staging
@@ -48,7 +49,7 @@
 - [x] Primer Database Backup workflow success (`29932453133`)
 - [x] Cloudflare CNAME+TXT `app.nelvyon.com` → Railway (`DNS_APP_NELVYON.md`) · DNS/SSL/health **PASS** 2026-07-22
 - [x] KI-020 smoke staging CSRF Origin (script + apex PASS; app Origin allowlist fix → redeploy)
-- [ ] Staging Ollama alcanzable para pack E2E (opcional; **nunca** `localhost:11434` PC; **no** IA prod)
+- [x] Staging Ollama alcanzable vía mesh Tailscale (pack E2E `f5de9c43`)
 - [x] Auditoría equipo OS agentes (`docs/OS_AGENT_TEAM_AUDIT.md`) + honesty portal/beta/mock (2026-07-22)
 - [x] Dual-path OS `LlmClient`→Ollama (ADR-034) + capability registry 11 servicios
 - [x] Partners: facade + gate `NELVYON_CEO_PARTNER_PAYOUTS` (sin pagos auto)
@@ -57,9 +58,9 @@
 - [x] ADR-036 quality routing 3b/8b opt-in + arch local-AI doc (no activar)
 - [x] OS/ops flow audits + sector playbooks (beta no promote)
 - [x] P0 pack E2E honest SKIP when `LLM_NOT_CONFIGURED` (ADR-040)
-- [ ] Dual-path soak E2E Ollama en staging vía mesh privado (CEO + arch; nunca localhost PC)
+- [x] Dual-path E2E Ollama staging vía mesh (JOIN_OK · needs_review)
 - [ ] Promote beta packs solo con cert+deliverables+E2E evidencia
-- [ ] CEO: aprobar Option A Tailscale (`ARCHITECTURE_LOCAL_AI_RUNTIME.md`) si se quiere IA local alcanzable
+- [x] CEO: Option A Tailscale staging autorizado y verificado
 
 ---
 

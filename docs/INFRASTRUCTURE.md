@@ -18,7 +18,7 @@
 | **Railway staging** | 🟡 | `ideal-victory` · tip `1d5d620a` · deploy `03a16532` SUCCESS · MESH_JOIN_FAIL · AI=1 mesh flags ON |
 | **PostgreSQL** | ✅ | SQL SSOT · mig 517/518 hist |
 | **Ollama** | ✅ local mesh | Bind Tailscale IP only · private PASS · loopback closed |
-| **Tailscale** | 🟡 | PC online · staging join **FAIL** (ephemeral key) · no Funnel/exit |
+| **Tailscale** | ✅ staging | PC online · staging `MESH_JOIN_OK` · peer active · no Funnel/exit |
 | **OpenAI** | ❌ | allow **0** · revoked |
 | **Costes** | **0** | |
 

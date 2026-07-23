@@ -6,16 +6,32 @@
 
 ## Activos
 
+### Ops (no KI) — Staging mesh Pack E2E QA soft-fail (`needs_review`)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Observado 2026-07-23** — no bloquea mesh verify |
+| **Detalle** | Run `f5de9c43` · landing QA88 · SEO QA84 · chatbot QA72 · status `needs_review` · LLM `mode=real` 3b/8b · `deliverables_published:5` |
+| **Nota** | claimReady **false** (legal). Mesh path **PASS**. |
+
+### Ops (no KI) — Prod residual `OPENAI_API_KEY` PRESENT
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Observado** — AI flags ABSENT · `AUTONOMOUS_ALLOW_OPENAI` ABSENT → path OFF |
+| **Acción** | CEO puede rotar/borrar key residual; **no** activar IA prod |
+
+---
+
+## Historial resuelto
+
 ### KI-031 — Staging Mesh Option A: Tailscale join FAIL (invalid/consumed TS_AUTHKEY)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto 2026-07-23** (reconfirmado tras tip `1d5d620a`) |
-| **Síntoma** | Logs: `MESH_JOIN_FAIL` / `invalid key` · peer `nelvyon-staging-web*` offline · proxies_set=0 |
-| **Mitigación** | Ollama privado PASS · staging live/ready 200 · tip deploy SUCCESS · ADR-044 code PASS · Pack E2E WARN critical=0 (no mesh-proven) · prod IA ABSENT · entrypoint no setea proxies si up falla (ADR-043) |
-| **Rollback** | `NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0` (staging only) |
-| **Acción CEO** | Regenerar auth key ephemeral (`docs/ops/MESH_OPTION_A_STAGING.md`) · reemplazar `TS_AUTHKEY` · **un** redeploy · esperar `MESH_JOIN_OK` · nota: cada join consume key ephemeral |
-| **Nota** | claimReady **false**. No READY. Sin secretos en git/chat. |
+| **Resuelto** | 2026-07-23 |
+| **Causa** | Auth key ephemeral consumida en redeploys |
+| **Solución** | `TS_AUTHKEY` reusable+ephemeral · `MESH_JOIN_OK` · peer `nelvyon-staging-web-1` active · deploy `6aeb4106` |
 
 ### Ops (no KI) — Web `git_sha` null after `railway up`
 

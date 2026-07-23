@@ -1,7 +1,7 @@
 # Mesh Option A — STAGING only (Tailscale → Ollama local)
 
-> **Status 2026-07-23 (tip `1d5d620a`):** LOCAL PRIVATE **PASS** · Deploy `03a16532` **SUCCESS** · live/ready **200** · Tailscale join **FAIL** (`MESH_JOIN_FAIL` · ephemeral `TS_AUTHKEY` invalid/consumed) · Pack E2E **WARN** (critical=0 · not mesh-proven) · Prod IA **ABSENT** · Coste **0** · `claimReady: false`  
-> ADR-042 · ADR-043 · ADR-044 · Evidence: Railway logs `MESH_JOIN_FAIL` / `invalid key` · peer offline  
+> **Status 2026-07-23 (final verify):** LOCAL PRIVATE **PASS** · Deploy `6aeb4106` **SUCCESS** · live/ready **200** · Tailscale join **PASS** (`MESH_JOIN_OK`) · peer `nelvyon-staging-web-1` **active** · Pack E2E mesh **PASS** (`needs_review`, Ollama real) · Prod IA flags **ABSENT** · Coste **0** · `claimReady: false`  
+> ADR-042 · ADR-043 · ADR-044 · ADR-045 · Evidence: Railway logs `MESH_JOIN_OK` · pack `f5de9c43`
 
 ## Scope (CEO-approved)
 
@@ -16,16 +16,15 @@
 
 | Check | Result |
 |-------|--------|
-| Tip SHA live | `1d5d620ab4e9` · deploy `03a16532` SUCCESS |
-| Code (ADR-044) | CGNAT allowlist · HTTP proxy fetch · entrypoint `mesh_ok` · vitest 44/44 |
-| Ollama listen | Tailscale IPv4 **only** (loopback closed) |
-| Ollama private `/api/tags` | **PASS** |
+| Deploy | `6aeb4106` SUCCESS (async kickoff + LF entrypoint) |
+| Ollama listen | Tailscale IPv4 **only** (loopback closed · public blocked) |
+| Ollama private `/api/tags` + 3b/8b generate | **PASS** |
 | Staging `live` / `ready` | **200** |
-| Staging Tailscale join | **FAIL** — ephemeral auth key rejected/consumed on redeploy |
-| Staging peer | `nelvyon-staging-web*` **offline** |
-| Staging AI flags | AI=1 · OLLAMA_CONFIGURED=1 · MESH=1 · OpenAI=0 · Router=1 · QR=1 |
-| Prod IA/mesh keys | **ABSENT** |
-| Pack E2E | **WARN_FAIL** critical=0 · 1 WARN portal download 404 · **not** mesh path proven |
+| Staging Tailscale join | **PASS** — `MESH_JOIN_OK proxies_set=1` |
+| Staging peer | `nelvyon-staging-web-1` `100.71.134.87` **active** (old `nelvyon-staging-web` offline) |
+| Staging AI flags | AI=1 · OLLAMA=1 · MESH=1 · OpenAI=0 · Router=1 · QR=1 · MCP=0 · SM=0 · PAY=0 |
+| Prod IA/mesh flags | **ABSENT** (residual `OPENAI_API_KEY` PRESENT, gates OFF) |
+| Pack E2E | Kickoff **202** · run `f5de9c43` **needs_review** · real 3b/8b · deliverables_published=5 |
 | Unit tests | **44/44 PASS** |
 
 ## Emergency rollback (exactly two flags → 0)
@@ -39,47 +38,13 @@ Then redeploy staging (or wait for restart). This fail-closes IA immediately wit
 
 Optional cleanup: unset `TS_AUTHKEY` · set `NELVYON_MESH_OPTION_A=0`.
 
-## Fix required (CEO — do not paste key in chat)
+## Auth key policy (staging)
 
-`TS_AUTHKEY` ephemeral is **single-use**. Every successful `tailscale up` / redeploy that joins consumes it → next redeploy needs a **new** key.
+- Prefer **Reusable ON** + ephemeral nodes for canary (redeploys must not burn the key).  
+- Never paste full keys into chat/docs/git.  
+- Optional: set `TS_HOSTNAME=nelvyon-staging-web` to stabilize peer name.
 
-### Regenerate
+## Async kickoff (ADR-045)
 
-1. [https://login.tailscale.com/admin/settings/keys](https://login.tailscale.com/admin/settings/keys)  
-2. **Generate auth key…** → Reusable **OFF** · Ephemeral **ON** · Pre-approved **ON**  
-3. Prefer key that starts with `tskey-auth-`  
-4. **Generate key** → copy once  
-
-### Replace on Railway staging only
-
-1. Railway → **truthful-respect** → env **staging** → **ideal-victory** → **Variables**  
-2. Edit `TS_AUTHKEY` → paste new key → save  
-3. Confirm `NELVYON_MESH_OPTION_A=1` · `OLLAMA_HOST=http://<tailscale-ipv4>:11434` · `OLLAMA_CONFIGURED=1` · `NELVYON_AI_ENABLED=1` · `AUTONOMOUS_ALLOW_OPENAI=0`  
-4. **Redeploy** `ideal-victory` once  
-5. Confirm logs show **`MESH_JOIN_OK`** (not `MESH_JOIN_FAIL`)  
-6. On PC: `"C:\Program Files\Tailscale\tailscale.exe" status` → `nelvyon-staging-web*` **online**
-
-## Local verify (PC)
-
-```powershell
-node scripts/mesh-option-a-local-prep.mjs
-# exit 0 = peer online · exit 2 = waiting railway node
-```
-
-## Health / timeout
-
-| Item | Value |
-|------|-------|
-| Probe | `GET {OLLAMA_HOST}/api/tags` |
-| Timeout | **5000 ms** |
-| Host allowlist | Tailscale CGNAT `100.64/10` or `*.ts.net` |
-| Proxies | Set **only** after successful `tailscale up` (`mesh_ok=1`) |
-| Proxy fetch | HTTP absolute-form via Node `http` (ADR-044) |
-
-## Tenant isolation
-
-Mesh does not bypass JWT/RLS. Pack/Private AI still require `tenant_id`.
-
-## Forbidden UI
-
-Funnel · Serve · exit node · subnet routes · any mesh vars on **production**.
+Mesh packs return **HTTP 202** after run row creation; clients must poll `/api/os/packs/{packId}/{runId}`.  
+Sync: `X-Pack-Sync: 1` or `NELVYON_PACK_KICKOFF_ASYNC=0` (not recommended for 8B mesh).

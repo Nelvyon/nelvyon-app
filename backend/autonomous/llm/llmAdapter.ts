@@ -338,6 +338,21 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
     failures.push("openai: skipped (AUTONOMOUS_ALLOW_OPENAI!=1 or PRIVATE_MODE)");
   }
 
+  // Fail closed when Ollama is configured — never silent-mock critical pack agents.
+  if (isAutonomousOllamaConfigured() && failures.some((f) => f.startsWith("ollama:"))) {
+    const message = failures.join("; ");
+    logLlmEvent({
+      agentId: req.agentId,
+      mode: "real",
+      model: resolveAutonomousOllamaModel(req.agentId).model ?? "ollama-unresolved",
+      ok: false,
+      tokens: 0,
+      fallbackReason: message,
+      duration_ms: Date.now() - started,
+    });
+    throw new Error(`LLM Ollama failed (no silent mock): ${message}`);
+  }
+
   return mockFallback(
     req,
     started,
