@@ -21,7 +21,11 @@ import type { AutonomousProject, AutonomousSku, AutonomousTier, QaResult } from 
 import { buildChatbotIsolated } from "../wrappers/chatbotBuilder";
 import { normalizeChatbotKnowledgeBase } from "../wrappers/chatbotKbNormalize";
 import { buildLandingIsolated } from "../wrappers/landingBuilder";
-import { generateSeoPackIsolated, normalizeKeywordsArtifact } from "../wrappers/seoGenerator";
+import {
+  generateSeoPackIsolated,
+  normalizeKeywordsArtifact,
+  normalizeSeoPlan,
+} from "../wrappers/seoGenerator";
 import { createProject } from "./runPipeline";
 
 export { createProject };
@@ -139,15 +143,15 @@ async function runSeoPhaseC(project: AutonomousProject, attempt: number): Promis
   const { brief, artifacts, agent_log } = project;
 
   const pm = await llmPmSeo(brief);
-  artifacts.plan = pm.data;
+  artifacts.plan = normalizeSeoPlan(pm.data, brief);
   agent_log.push({ ...pm.log, llm_mode: pm.llm_mode as "mock" | "real" });
-  if ((pm.data as { blockers?: string[] }).blockers?.length) {
+  if ((artifacts.plan as { blockers?: string[] }).blockers?.length) {
     project.status = "INTAKE_VALIDATING";
     return scoreOffline("NELVYON-SEO", brief, artifacts, attempt);
   }
 
   project.status = "PRODUCING";
-  const pagesTarget = Number((pm.data as { pages_target?: unknown }).pages_target) || 5;
+  const pagesTarget = Number((artifacts.plan as { pages_target?: unknown }).pages_target) || 5;
 
   const st = await llmStrategistSeo(brief, pagesTarget);
   artifacts.priority = st.data;

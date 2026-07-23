@@ -2,6 +2,7 @@
 
 import {
   runCopywriterSeoOnPage,
+  runPmSeo,
   runSeoAudit,
   runSeoKeywords,
   runSeoReport,
@@ -15,11 +16,50 @@ export interface SeoGenerateInput {
   keywords_override?: Record<string, unknown>;
 }
 
+const MIN_SEO_KEYWORDS = 10;
+
+/** Merge LLM plan with deterministic blockers/pages — never trust LLM blockers (abort → QA~65). */
+export function normalizeSeoPlan(raw: unknown, brief: Record<string, unknown>): Record<string, unknown> {
+  const deterministic = runPmSeo(brief).plan as Record<string, unknown>;
+  const incoming = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const pagesTarget = Math.max(
+    3,
+    Math.min(10, Number(incoming.pages_target) || Number(deterministic.pages_target) || 5),
+  );
+  return {
+    ...deterministic,
+    crawl_limit: Number(incoming.crawl_limit) || Number(deterministic.crawl_limit) || 50,
+    pages_target: pagesTarget,
+    report_sections_required: 10,
+    blockers: Array.isArray(deterministic.blockers) ? deterministic.blockers : [],
+  };
+}
+
 export function normalizeKeywordsArtifact(raw: unknown, brief: Record<string, unknown>) {
+  const fallback = runSeoKeywords(brief).keywords as { keywords?: unknown[]; version?: number };
+  const fallbackList = Array.isArray(fallback.keywords) ? fallback.keywords : [];
   if (raw && typeof raw === "object" && Array.isArray((raw as { keywords?: unknown }).keywords)) {
-    return raw as Record<string, unknown>;
+    const keywords = [...((raw as { keywords: unknown[] }).keywords)];
+    let i = 0;
+    while (keywords.length < MIN_SEO_KEYWORDS && i < fallbackList.length) {
+      keywords.push(fallbackList[i]!);
+      i += 1;
+    }
+    while (keywords.length < MIN_SEO_KEYWORDS) {
+      keywords.push({
+        keyword: `seo local ${keywords.length + 1}`,
+        intent: "commercial",
+        target_url: "/",
+        priority: keywords.length + 1,
+      });
+    }
+    return {
+      ...(raw as Record<string, unknown>),
+      version: Number((raw as { version?: unknown }).version) || 1,
+      keywords,
+    };
   }
-  return runSeoKeywords(brief).keywords;
+  return fallback as Record<string, unknown>;
 }
 
 /** Ensure priority_pages length === pages_target so CONSIST-pages / S-SOP-02 cannot false-fail. */

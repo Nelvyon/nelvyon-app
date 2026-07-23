@@ -21,9 +21,12 @@ export function slugFromBusinessName(name: string): string {
 }
 
 export function resolvePackAppOrigin(): string {
+  const railwayPublic = process.env.RAILWAY_PUBLIC_DOMAIN?.trim();
   const raw =
     process.env.FRONTEND_APP_URL?.trim() ||
     process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    process.env.NEXTAUTH_URL?.trim() ||
+    (railwayPublic ? `https://${railwayPublic.replace(/^https?:\/\//, "")}` : "") ||
     process.env.VERCEL_URL?.trim();
   if (!raw) return "http://127.0.0.1:3000";
   if (raw.startsWith("http://") || raw.startsWith("https://")) return raw.replace(/\/$/, "");

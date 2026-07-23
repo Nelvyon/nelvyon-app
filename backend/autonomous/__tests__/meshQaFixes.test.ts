@@ -5,7 +5,12 @@ import {
   normalizeChatbotKnowledgeBase,
   passesHallucinationPriceCheck,
 } from "../wrappers/chatbotKbNormalize";
-import { clampSeoPriorityPages, generateSeoPackIsolated } from "../wrappers/seoGenerator";
+import {
+  clampSeoPriorityPages,
+  generateSeoPackIsolated,
+  normalizeKeywordsArtifact,
+  normalizeSeoPlan,
+} from "../wrappers/seoGenerator";
 import { scoreOffline } from "../qa/offlineScorer";
 
 describe("chatbotKbNormalize", () => {
@@ -48,6 +53,35 @@ describe("chatbotKbNormalize", () => {
 });
 
 describe("SEO plan/pages sync", () => {
+  it("normalizeSeoPlan ignores invented LLM blockers when brief is complete", () => {
+    const brief = {
+      primary_domain: "https://example.test",
+      company_name: "Biz",
+      sector: "restaurant",
+      primary_cta: "Reservar",
+      target_geo: "Madrid",
+      landing_slug: "biz-local",
+      seed_keywords: ["a", "b", "c", "d", "e"],
+      compliance_flags: { no_ranking_guarantee_ack: true },
+    };
+    const plan = normalizeSeoPlan(
+      { pages_target: 7, blockers: ["invented-by-llm", "missing:primary_domain"] },
+      brief,
+    );
+    expect(plan.pages_target).toBe(7);
+    expect(plan.blockers).toEqual([]);
+  });
+
+  it("normalizeKeywordsArtifact pads thin LLM keyword lists to ≥10", () => {
+    const brief = {
+      primary_domain: "https://example.test",
+      company_name: "Biz",
+      seed_keywords: ["uno", "dos", "tres", "cuatro", "cinco"],
+    };
+    const normalized = normalizeKeywordsArtifact({ keywords: [{ keyword: "solo" }, { keyword: "dos" }, { keyword: "tres" }] }, brief);
+    expect((normalized.keywords as unknown[]).length).toBeGreaterThanOrEqual(10);
+  });
+
   it("clampSeoPriorityPages forces exact pages_target", () => {
     const clamped = clampSeoPriorityPages(
       { priority_pages: [{ url: "/", primary_keyword: "a", reason: "x" }] },
