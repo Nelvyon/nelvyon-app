@@ -1,20 +1,21 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-22** (cierre total internal-safe)  
+> Fecha: **2026-07-23** (CEO canary staging Router+QR)  
 > Veredicto interno: **CONDITIONAL_READY** · `claimReady: false`  
 > **Plataforma lista técnicamente (condicional)** · **NO** superioridad con clientes  
-> Evidencia SSOT: `docs/CTO_FINAL_VERIFY.md` · gaps: `docs/CTO_STRATEGIC_GAPS_MATRIX.md`
+> Evidencia SSOT: `docs/CTO_FINAL_VERIFY.md` · canary: `docs/ops/CANARY_IA_FLAGS.md`
 
 ### Matriz estricta (resumen)
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO | Core SaaS/OS/Portal/SQL SSOT/billing/SES/partners gate/IA prep |
-| VERIFICADO LOCAL | SQL gates ALL_PASS · vitest 22/22 subset · Docker restore SKIP |
-| VERIFICADO STAGING/PROD | live/ready 200 · FastAPI health 200 · portal-packs PASS · automations 401 unauth |
-| PREPARADO OFF | IA · Router · SM · MCP · QR · OpenAI · OpenClaw · partner payouts |
-| BLOQUEO EXTERNO | CEO IA canary · legal campañas · mercado/adopción · OAuth por cuenta |
-| CEO / LEGAL / MERCADO | Pendientes — bloquean claimReady |
+| IMPLEMENTADO | Core SaaS/OS/Portal/SQL SSOT/billing/SES/partners gate/IA Router+QR |
+| VERIFICADO LOCAL | Option C Router+QR **ALL_PASS** (3b+8b generate + vitest) |
+| VERIFICADO STAGING | Flags Router+QR ON · AI master 0 · live `e52f851a9142` · inference BLOCKED_UNTIL_MESH |
+| VERIFICADO PROD | live `fcf2622cc02d` · IA canary keys **ABSENT** |
+| PREPARADO OFF | SM · MCP · OpenAI · OpenClaw · partner payouts · AI master staging |
+| BLOQUEO EXTERNO | Mesh Option A · legal campañas · mercado |
+| CEO / LEGAL / MERCADO | Mesh + legal bloquean claimReady / inferencia remota |
 
 ---
 

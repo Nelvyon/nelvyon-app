@@ -27,11 +27,12 @@
 | Campo | Valor |
 |-------|-------|
 | **Web** | `ideal-victory-staging.up.railway.app` |
-| **API Python** | `nelvyon-app-production.up.railway.app` (nombre doc backend/README) |
+| **API Python** | `comfortable-empathy` (staging) / prod FastAPI separado |
+| **Canary IA 2026-07-23** | Router+QR flags ON · AI master **0** · OpenAI **0** · sin `OLLAMA_HOST` (ADR-041) |
 | **Env file ejemplo** | `backend/env.staging.example` |
-| **Smokes** | `scripts/run-staging-p0-smokes.mjs` |
+| **Smokes** | `scripts/run-staging-p0-smokes.mjs` (nota: workflow P0 apunta a `nelvyon.com` prod host) |
 
-`JWT_SECRET` Web staging debe coincidir con API Python.
+`JWT_SECRET` Web staging debe coincidir con API Python del mismo entorno.
 
 ---
 

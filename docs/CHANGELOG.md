@@ -3,6 +3,12 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-23
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Canary | **CEO staging Router+QR** | ADR-041 · Railway staging `ideal-victory`: Router+QR+3b/8b flags · AI master **0** · OpenAI **0** · prod IA keys **ABSENT** · local Option C probe **ALL_PASS** · remote inference **BLOCKED_UNTIL_MESH** · evidence `canary-staging-router-qr-20260723.txt` · claimReady **false** · coste **0** |
+
 ## 2026-07-22
 
 | Área | Cambio | Descripción |

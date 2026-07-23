@@ -1,8 +1,8 @@
 # ARCHITECTURE — Local AI runtime for agents (cost = 0)
 
-> Status: **design only** · **not activated** · Date: **2026-07-22**  
+> Status: **staging canary flags ON (ADR-041)** · remote inference **BLOCKED_UNTIL_MESH** · Date: **2026-07-23**  
 > Constraint: no paid APIs · no new paid infra · **do not expose owner PC to public Internet**  
-> Related: ADR-034/036 · `docs/PROPOSAL_QUALITY_ROUTING_LOCAL.md` · HANDOVER IA OFF in prod
+> Related: ADR-034/036/041 · `docs/ops/CANARY_IA_FLAGS.md` · prod IA OFF
 
 ---
 

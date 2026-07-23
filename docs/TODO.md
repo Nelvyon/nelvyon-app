@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-22** — Post total internal-safe closure · claimReady false · pendientes solo CEO/legal/mercado
+> Actualizado: **2026-07-23** — CEO canary staging Router+QR aprobado · claimReady false · mesh + legal pendientes
 
 ---
 
@@ -31,7 +31,8 @@
 - [x] Automations unified **200** · JWT sync ADR-038 · mig 517/518 · `SKIP_ALEMBIC=1`
 - [x] Ops: 1× web redeploy `--from-source` → `git_sha=9ca0cf29a5e5` (deploy `7d625161`)
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
-- [ ] CEO: mesh/canary IA staging opcional (`docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md`)
+- [x] CEO: canary staging Router+QR (ADR-041) — flags ON · local Option C ALL_PASS · remote BLOCKED_UNTIL_MESH
+- [ ] CEO: mesh Option A para `OLLAMA_HOST` privado staging (opcional; sin Cursor install)
 - [x] Ops: portal-packs refresh GH — **PASS** · P0 SUCCESS `29944606938`
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
 - [x] Bloque 3 SaaS UUID isolation staging

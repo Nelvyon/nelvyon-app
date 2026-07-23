@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-22** — Tip `4ffc72f0` · P0 SUCCESS `29944606938` · IA OFF · `claimReady: false`
+> Última actualización: **2026-07-23** — CEO canary staging Router+QR · prod IA OFF · `claimReady: false`
 
 ---
 
@@ -10,26 +10,22 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** |
-| **Tip repo** | `4ffc72f04daf` · **SHA vivo web** `9ca0cf29a5e5` (sin redeploy) |
-| **Web prod** | deploy `7d625161` **SUCCESS** · live `git_sha=9ca0cf29a5e5` · ready **200** |
-| **FastAPI prod** | deploy `25e2109d` **SUCCESS** · `/health` **200** · `SKIP_ALEMBIC=1` |
-| **app.nelvyon.com** | DNS/SSL/health **PASS** |
-| **Automations** | Auth **200** hist · unauth **401** expected |
-| **SQL SSOT** | Gate ALL_PASS · post-elite 508–518 · DB 517/518 hist |
-| **KI-020** | **KI020_PASS** |
-| **portal-packs / P0** | **PASS** GH run **`29944606938`** SUCCESS (`ALL_P0_PASS_WITH_IA_OFF_SKIPS`) |
-| **Pack E2E×3** | **SKIP_IA_OFF** (`LLM_NOT_CONFIGURED` — honest; no IA activate) |
-| **Database Backup** | **DONE** run `29932453133` |
-| **IA / OpenAI / MCP / SM / Router / QR / payouts / campañas** | **OFF** · OpenAI key **revoked** · coste **0** |
+| **SHA vivo prod** | `fcf2622cc02d` · live/ready **200** |
+| **SHA vivo staging** | `e52f851a9142` (`ideal-victory`) · live **200** |
+| **Canary staging** | Router+QR **flags ON** · modelos 3b/8b · `NELVYON_AI_ENABLED=0` · sin mesh · OpenAI **0** |
+| **Canary local Option C** | **ALL_PASS** · evidence `canary-staging-router-qr-20260723.txt` |
+| **Prod IA** | Canary keys **ABSENT** |
+| **Automations / SQL / DNS / KI-020** | Hist PASS (sin cambio este canary) |
 | **Beta packs** | Permanecen **beta** |
 | **claimReady** | **false** |
+| **Coste** | **0** |
 
 ---
 
 ## Próximo paso EXACTO
 
-1. CEO: firmar `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md` (staging canary only; no OpenAI/OpenClaw/payouts) — **opcional**.  
+1. CEO opcional: aprobar mesh Option A (`ARCHITECTURE_LOCAL_AI_RUNTIME.md`) para inferencia remota staging (`OLLAMA_HOST` privado) — **no** instalar desde Cursor sin OK.  
 2. Legal+CEO: firmar `docs/COMPLIANCE_COMPANY_DB_CHECKLIST.md` antes de cualquier envío masivo.  
-3. Tras canary IA: `P0_REQUIRE_PACK_E2E=1` + mesh Option A (humano; no Cursor install).
+3. Tras mesh: `P0_REQUIRE_PACK_E2E=1` contra host **staging** (no prod).
 
-SSOT: `docs/CTO_FINAL_VERIFY.md` · `docs/AUDITORIA_TECNICA_ABSOLUTA.md` · `docs/CTO_STRATEGIC_GAPS_MATRIX.md`
+SSOT: `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md` · `docs/ops/CANARY_IA_FLAGS.md` · `docs/CTO_FINAL_VERIFY.md`

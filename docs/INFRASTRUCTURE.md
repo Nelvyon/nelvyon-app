@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-22**. Sin secretos.
+> Estado real documentado **2026-07-23**. Sin secretos.
 
 ---
 
@@ -13,19 +13,15 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | 🟡 | Desktop **DOWN** this pass (restore drill SKIP). Hist: `nelvyon-test-postgres` :5433 · local-ai :5434. |
-| **Railway** | ✅ | Web `7d625161` SUCCESS · SHA `9ca0cf29a5e5` · FastAPI `25e2109d` · `/health` 200 · `SKIP_ALEMBIC=1` · shared Postgres |
-| **PostgreSQL** | ✅ repo / ✅ prod | Prod `_migrations` **517+518** verified (SSOT gate DB probe) · SQL SSOT ADR-002/039 |
-| **pgvector** | ✅ local / ✅ staging SM | Ingest Brain **verified** local (1559 chunks); staging Shared Memory **verified:true** (KI-021) |
-| **Redis** | 🟡 | Opcional; in-memory fallback |
-| **Ollama** | ✅ local | 2026-07-22: `127.0.0.1:11434` · 6 models · primary autonomous LLM · OpenAI **opt-in only** (`AUTONOMOUS_ALLOW_OPENAI`). Phase C 3b qa=55 / 8b qa=89 · HTTP kickoff `mode=real` → `needs_review` on 3b. **No** set staging `OLLAMA_HOST=localhost` (Railway cannot reach PC). |
-| **OpenClaw** | 🟡 | Mock certificado; URL real ops |
-| **AWS SES** | ✅ | Production access GRANTED 2026-07-21 · self-send OK · KI-R014 |
-| **Stripe** | ✅ | sk_live + webhook; price-audit **allValid=true** (KI-R028) |
-| **Cloudflare** | ✅ | `app.nelvyon.com` DNS+SSL+health PASS 2026-07-22 (`docs/ops/DNS_APP_NELVYON.md`) |
-| **Backups / DR** | ✅ | GH Action Backup **DONE** `29932453133` · restore drill SKIP Docker DOWN this pass (hist 8/8) |
-| **Security headers** | ✅ | SSOT `apps/web/src/lib/security/headers.ts` |
-| **Ops dashboard** | ✅ | `GET /api/platform/ops/summary` |
+| **Docker** | 🟡 | Desktop often DOWN for restore drill |
+| **Railway prod** | ✅ | `@nelvyon/web` · SHA vivo `fcf2622cc02d` · IA canary keys **ABSENT** |
+| **Railway staging** | ✅ | `ideal-victory` · SHA `e52f851a9142` · Router+QR flags ON · AI master **0** · ADR-041 |
+| **PostgreSQL** | ✅ | SQL SSOT · mig 517/518 hist |
+| **Ollama** | ✅ local / 🟡 staging remote | Local Option C ALL_PASS 3b+8b · staging remote **BLOCKED_UNTIL_MESH** |
+| **OpenAI** | ❌ | Key revoked · allow **0** |
+| **Cloudflare** | ✅ | `app.nelvyon.com` DNS+SSL PASS |
+| **Backups / DR** | ✅ | Backup `29932453133` |
+| **Costes** | **0** | Canary sin GPU cloud |
 
 ---
 

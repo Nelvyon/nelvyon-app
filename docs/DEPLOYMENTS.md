@@ -1,8 +1,21 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-22**
+> Registrar cada deploy significativo. Actualizado: **2026-07-23**
 
 ---
+
+## 2026-07-23 — CEO staging canary Router+QR (ADR-041 · **no** prod IA)
+
+| Campo | Valor |
+|-------|-------|
+| **Scope** | Railway env **staging** · service `ideal-victory` only |
+| **Flags** | Router=1 · QR=1 · models 3b/8b · AI=0 · OLLAMA_CONFIGURED=0 · OpenAI=0 · payouts=0 |
+| **Prod** | IA canary keys **ABSENT** · live SHA `fcf2622cc02d` |
+| **Staging live** | `e52f851a9142` |
+| **Evidence** | local Option C ALL_PASS · `.release-logs/canary-staging-router-qr-20260723.txt` |
+| **Redeploy prod** | **NO** |
+| **Coste** | **0** |
+| **claimReady** | **false** |
 
 ## 2026-07-22 — Total internal-safe closure (docs + P0 honesty · **no** web redeploy)
 

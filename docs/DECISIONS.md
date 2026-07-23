@@ -466,3 +466,15 @@
 
 ---
 
+## ADR-041 — CEO staging canary Router + Quality Routing (no prod, no OpenAI)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-23 |
+| **Decisión** | Tras aprobación CEO: en Railway **staging** `ideal-victory` se setean `NELVYON_LOCAL_ROUTER_ENABLED=1` + `AUTONOMOUS_QUALITY_ROUTING=1` + modelos 3b/8b. **Prod** permanece con keys IA ABSENT. `NELVYON_AI_ENABLED=0` y `OLLAMA_CONFIGURED=0` en staging hasta mesh Option A. OpenAI allow **0**. Prueba real Option C local (`staging-canary-router-qr-local-probe.mjs`) = evidencia. |
+| **Por qué** | Probar routing sin coste ni OpenAI ni tocar producción; sin mesh no inventar inferencia remota PASS. |
+| **Consecuencias** | Inferencia Railway staging **BLOCKED_UNTIL_MESH**. Rollback = flags `0`. Docs `CEO_IA_STAGING_APPROVAL_REQUEST` firmado. |
+| **Relación** | ADR-036/037/040 · `ARCHITECTURE_LOCAL_AI_RUNTIME.md`. |
+
+---
+

@@ -1,9 +1,9 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-22**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
+> Actualizado: **2026-07-23**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** DNS `app.nelvyon.com` **RESUELTO** · legal campañas · CEO IA mesh. Flags SM/OpenClaw/OpenAI/MCP/Router/QR **OFF**. OpenAI API key **revoked**. Pack E2E staging = **SKIP_IA_OFF** honesto hasta canary (ADR-040). OAuth ops checklist: `docs/ops/INTEGRATIONS_OAUTH_HEALTH_CHECKLIST.md`.
+**Bloqueadores go-live:** legal campañas · mesh Option A (opcional IA remota). Prod IA **OFF**. Staging Router+QR **flags ON** (ADR-041) · OpenAI **0**. Pack E2E remoto staging = BLOCKED_UNTIL_MESH. OAuth ops checklist: `docs/ops/INTEGRATIONS_OAUTH_HEALTH_CHECKLIST.md`.
 
 ### Auth bridge Web ↔ FastAPI
 
@@ -12,7 +12,8 @@
 | `JWT_SECRET` web = FastAPI | **Synced** 2026-07-22 (ADR-038) · FastAPI `JWT_SECRET_KEY` remains native-only |
 | Automations unified BFF | **HTTP 200** · shared Postgres · mig 517/518 · `SKIP_ALEMBIC=1` |
 | SQL SSOT gate | **ALL_PASS** 2026-07-22 · ADR-002/039 · DuplicateTable guard + DB probe |
-| OpenAI | **Key revoked** · `AUTONOMOUS_ALLOW_OPENAI` OFF · no replacement · cost 0 |
+| OpenAI | **Key revoked** · `AUTONOMOUS_ALLOW_OPENAI=0` staging · ABSENT prod · cost 0 |
+| Staging Router+QR | **Flags ON** `ideal-victory` · local Option C ALL_PASS · remote mesh pending |
 
 ---
 

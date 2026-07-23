@@ -1,66 +1,50 @@
-# Canary IA flags — prep only (all OFF by default)
+# Canary IA flags — staging Router + Quality Routing
 
-> **Status:** PREPARADO · **no activated** · 2026-07-22 · Coste 0  
-> Prod SHA live: tip post-517 deploy · Flags Railway: **ABSENT** · OpenAI key **revoked/absent**
+> **Status:** **STAGING CANARY ON (flags)** · prod **OFF** · 2026-07-23 · Coste 0  
+> Evidencia: `.release-logs/canary-staging-router-qr-20260723.txt` · CEO approval signed
 
 ## Principle
 
-Canaries are **reversible env flips**. Default = OFF. No OpenAI · no OpenClaw · no partner payouts in this canary set.
+Canaries are **reversible env flips**. Default prod = OFF. No OpenAI · no OpenClaw · no partner payouts.
 
-## Flags (entry criteria)
+## Staging (`ideal-victory`) — 2026-07-23
 
-| Flag | Default | Canary ON value | Depends on |
-|------|---------|-----------------|------------|
-| `NELVYON_AI_ENABLED` | OFF (`0`) | `1` | CEO |
-| `OLLAMA_CONFIGURED` / host | OFF | `1` + private `OLLAMA_HOST` | Arch Option A/B |
-| `NELVYON_LOCAL_ROUTER_ENABLED` | OFF (`0`) | `1` | OLLAMA configured |
-| `NELVYON_SHARED_MEMORY_ENABLED` | OFF | `1` | mig 514–516 · RLS |
-| `NELVYON_MCP_PRODUCTIVE_ENABLED` | OFF | `1` | AI enabled optional |
-| `AUTONOMOUS_QUALITY_ROUTING` | OFF | `1` | OLLAMA_STRATEGY_MODEL |
-| `AUTONOMOUS_ALLOW_OPENAI` | **never in canary** | — | Forbidden default |
-| `NELVYON_OPENCLAW_*` | OFF | — | Out of scope |
-| `NELVYON_CEO_PARTNER_PAYOUTS` | OFF | — | Out of scope |
+| Flag | Staging value | Notes |
+|------|---------------|-------|
+| `NELVYON_LOCAL_ROUTER_ENABLED` | `1` | Flag ON; runtime needs `OLLAMA_CONFIGURED=1` + private host |
+| `AUTONOMOUS_QUALITY_ROUTING` | `1` | 3b fast / 8b critical (ADR-036) |
+| `OLLAMA_MODEL` | `llama3.2:3b-instruct-q4_K_M` | Set |
+| `OLLAMA_STRATEGY_MODEL` | `llama3.1:8b-instruct-q4_K_M` | Set |
+| `NELVYON_AI_ENABLED` | `0` | Master OFF until mesh |
+| `OLLAMA_CONFIGURED` | `0` | No false “configured” without host |
+| `OLLAMA_HOST` | unset | Mesh Option A **not** approved |
+| `AUTONOMOUS_ALLOW_OPENAI` | `0` | Forbidden |
+| `NELVYON_SHARED_MEMORY_ENABLED` | `0` | Out of this batch |
+| `NELVYON_MCP_PRODUCTIVE_ENABLED` | `0` | Out of this batch |
+| `NELVYON_CEO_PARTNER_PAYOUTS` | `0` | Out of this batch |
 
-## Entry metrics (before ON)
+## Production (`@nelvyon/web`)
 
-1. Health live/ready 200  
-2. `assertOllamaHostSafeForRuntime({ allowLoopback: false })` PASS for remote  
-3. Tenant isolation smoke (SaaS UUID) PASS  
-4. Pack gate / unit tests green  
-5. Rollback plan written (below)
+All IA canary keys above: **ABSENT** (fail-closed defaults).
+
+## Local Option C (verified)
+
+```bash
+node scripts/staging-canary-router-qr-local-probe.mjs
+# ALL_PASS — Ollama loopback · vitest · generate 3b+8b · routing
+```
 
 ## Rollback (immediate)
 
 ```
-# Railway / staging — unset or set 0 (CEO ops)
-NELVYON_AI_ENABLED=0
+# Railway / staging — ideal-victory
 NELVYON_LOCAL_ROUTER_ENABLED=0
-NELVYON_SHARED_MEMORY_ENABLED=0
-NELVYON_MCP_PRODUCTIVE_ENABLED=0
 AUTONOMOUS_QUALITY_ROUTING=0
-# leave OLLAMA_* unset to fail-closed
+NELVYON_AI_ENABLED=0
+OLLAMA_CONFIGURED=0
+# leave OLLAMA_HOST unset
 ```
 
-Redeploy not always required for env-only; verify health after.
+## Next CEO gate (optional)
 
-## Tenant isolation checks
-
-- Shared Memory queries scoped by `tenant_id` UUID  
-- MCP tools deny cross-tenant args  
-- Pack runs workspace/tenant scoped  
-
-## CEO single approval request (batch)
-
-Approve **staging-first** canary of: Local Router + Quality Routing (+ optional Shared Memory).  
-**Do not** approve OpenAI, OpenClaw, or partner payouts in the same batch.
-
-**Documento formal:** `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md` (firma pendiente).
-
-## Local probe / metrics (prep)
-
-```ts
-import { collectLocalAiPrepMetrics, getLocalAiRuntimePrepSnapshot } from "../backend/local-ai/OllamaRuntimePrep";
-// Never enables flags. Fail-closed when host unset / loopback remoto.
-```
-
-Timeout default probe: **5000 ms**. Rollback hints en snapshot.
+Approve **Option A mesh** (`ARCHITECTURE_LOCAL_AI_RUNTIME.md`) → set private `OLLAMA_HOST` + `OLLAMA_CONFIGURED=1` + `NELVYON_AI_ENABLED=1` **staging only** → then pack E2E with `P0_REQUIRE_PACK_E2E=1` against staging host (not prod).

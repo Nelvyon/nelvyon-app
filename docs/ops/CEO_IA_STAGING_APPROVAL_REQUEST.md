@@ -1,50 +1,52 @@
 # CEO — Solicitud única de aprobación IA (staging only)
 
-> **Estado:** PENDIENTE CEO · **Coste incremental:** 0 · Fecha: **2026-07-22**  
+> **Estado:** **APROBADO CEO 2026-07-23** · Router + Quality Routing 3B/8B · **Coste incremental:** 0  
 > **No** incluye OpenAI · OpenClaw · partner payouts · campañas · mesh Tailscale/WireGuard (instalación).  
-> Referencias: `docs/ops/CANARY_IA_FLAGS.md` · `docs/ARCHITECTURE_LOCAL_AI_RUNTIME.md` · ADR-036/037
+> Referencias: `docs/ops/CANARY_IA_FLAGS.md` · `docs/ARCHITECTURE_LOCAL_AI_RUNTIME.md` · ADR-036/037/041  
+> Evidencia: `.release-logs/canary-staging-router-qr-20260723.txt`
 
-## Qué se pide aprobar (un solo batch)
+## Qué se aprobó (batch ejecutado)
 
-| # | Ítem | Alcance | Default |
-|---|------|---------|---------|
-| 1 | Canary staging Local Router | `NELVYON_LOCAL_ROUTER_ENABLED=1` **solo staging** | OFF |
-| 2 | Canary staging Quality Routing | `AUTONOMOUS_QUALITY_ROUTING=1` + modelos 3b/8b | OFF |
-| 3 | Host Ollama privado | `OLLAMA_HOST` mesh privado (Option A) **si** CEO aprueba mesh por separado | unset |
+| # | Ítem | Alcance | Estado 2026-07-23 |
+|---|------|---------|-------------------|
+| 1 | Canary staging Local Router | `NELVYON_LOCAL_ROUTER_ENABLED=1` en Railway **staging** `ideal-victory` | **SET** (inference OFF hasta mesh) |
+| 2 | Canary staging Quality Routing | `AUTONOMOUS_QUALITY_ROUTING=1` + modelos 3b/8b | **SET** |
+| 3 | Host Ollama privado | `OLLAMA_HOST` mesh Option A | **NO** — pendiente CEO separado |
 
-## Qué queda explícitamente fuera
+## Qué queda explícitamente fuera (sigue vigente)
 
-- `AUTONOMOUS_ALLOW_OPENAI` / nueva API key OpenAI  
+- `AUTONOMOUS_ALLOW_OPENAI` / nueva API key OpenAI → **=0** staging · **ABSENT** prod  
 - OpenClaw bridge  
-- `NELVYON_CEO_PARTNER_PAYOUTS`  
+- `NELVYON_CEO_PARTNER_PAYOUTS` → **=0**  
 - Campañas / envío masivo  
-- Activación en **producción** en el mismo batch  
-- Instalar Tailscale/WireGuard desde Cursor (CEO/ops humano)
+- Activación en **producción** → prod IA keys **ABSENT**  
+- Instalar Tailscale/WireGuard desde Cursor  
 
-## Criterios de entrada (antes de ON)
+## Ejecución honesta
 
-1. Health live/ready 200 en staging  
-2. `assertOllamaHostSafeForRuntime({ allowLoopback: false })` PASS  
-3. Unit: `qualityRouting` + `OllamaRuntimePrep` + pack auto-approve QA≥85  
-4. Rollback escrito (abajo) ensayable en <5 min  
-5. Pack E2E P0 con `P0_REQUIRE_PACK_E2E=1` solo **después** de canary ON
+| Capa | Resultado |
+|------|-----------|
+| Railway staging `ideal-victory` | Router+QR flags + modelos · `NELVYON_AI_ENABLED=0` · `OLLAMA_CONFIGURED=0` · sin `OLLAMA_HOST` |
+| Railway production `@nelvyon/web` | IA canary keys **ABSENT** (fail-closed) |
+| Local Option C probe | **ALL_PASS** · vitest 9/9 · generate 3b+8b · routing crítico→8b / PM→3b |
+| Inferencia remota staging | **BLOCKED_UNTIL_MESH** (sin coste; sin OpenAI) |
 
 ## Rollback inmediato
 
 ```
-NELVYON_AI_ENABLED=0
+# Railway environment=staging · service=ideal-victory
 NELVYON_LOCAL_ROUTER_ENABLED=0
 AUTONOMOUS_QUALITY_ROUTING=0
-# unset OLLAMA_HOST / OLLAMA_CONFIGURED
+# leave NELVYON_AI_ENABLED=0 · OLLAMA_CONFIGURED=0 · no OLLAMA_HOST
 ```
 
-Verificar `/api/health/ready`. Sin migración de datos.
+Verificar health staging + prod. Sin migración de datos.
 
 ## Firma
 
 | Rol | Nombre | Fecha | OK |
 |-----|--------|-------|----|
-| CEO | | | [ ] |
-| CTO (prep) | Cursor agent | 2026-07-22 | prep only — no flags set |
+| CEO | (mensaje chat Cursor) | 2026-07-23 | [x] Router+QR staging only |
+| CTO (exec) | Cursor agent | 2026-07-23 | flags staging · prod OFF · local probe PASS |
 
-**claimReady permanece false** hasta legal campañas + (opcional) este batch si se desea superioridad IA.
+**claimReady permanece false** (legal campañas + mesh si se desea inferencia remota staging).
