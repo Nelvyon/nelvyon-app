@@ -28,7 +28,8 @@
 |-------|-------|
 | **Web** | `ideal-victory-staging.up.railway.app` |
 | **API Python** | `comfortable-empathy` (staging) / prod FastAPI separado |
-| **Canary IA 2026-07-23** | Router+QR flags ON · AI master **0** · OpenAI **0** · sin `OLLAMA_HOST` (ADR-041) |
+| **Canary IA 2026-07-23** | Router+QR ON · Mesh Option A prep · AI master **0** · OpenAI **0** · WAITING_TS_AUTHKEY |
+| **Mesh runbook** | `docs/ops/MESH_OPTION_A_STAGING.md` |
 | **Env file ejemplo** | `backend/env.staging.example` |
 | **Smokes** | `scripts/run-staging-p0-smokes.mjs` (nota: workflow P0 apunta a `nelvyon.com` prod host) |
 

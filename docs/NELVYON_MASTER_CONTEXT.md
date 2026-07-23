@@ -1021,8 +1021,8 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | prod live **`fcf2622cc02d`** · staging **`e52f851a9142`** · canary ADR-041 |
-| **Canary IA** | Staging Router+QR flags ON · AI master 0 · OpenAI 0 · local Option C ALL_PASS · remote BLOCKED_UNTIL_MESH |
+| **SHA / deploys** | Mesh ADR-042 prep · staging WAITING_TS_AUTHKEY · prod mesh ABSENT |
+| **Canary IA** | Router+QR flags · Mesh local PASS · OpenAI 0 · Funnel/exit forbidden |
 | **P0 smokes** | KI-020 **KI020_PASS** · automations unified **200** (prior auth) · portal-packs **PASS** · P0 SUCCESS `29944606938` · pack E2E **SKIP_IA_OFF** (ADR-040) · mig 517/518 DB **PASS** |
 | **Blocker go-live DNS** | **RESUELTO** 2026-07-22 — `app.nelvyon.com` DNS/SSL/health PASS |
 | **verify-all** | **7 PASS / 0 FAIL / 1 SKIPPED_EXTERNAL / 2 NOT_CONFIGURED** |

@@ -1,8 +1,8 @@
 # ARCHITECTURE — Local AI runtime for agents (cost = 0)
 
-> Status: **staging canary flags ON (ADR-041)** · remote inference **BLOCKED_UNTIL_MESH** · Date: **2026-07-23**  
-> Constraint: no paid APIs · no new paid infra · **do not expose owner PC to public Internet**  
-> Related: ADR-034/036/041 · `docs/ops/CANARY_IA_FLAGS.md` · prod IA OFF
+> Status: **Mesh Option A local PASS** · Railway staging **WAITING_TS_AUTHKEY** · prod OFF · Date: **2026-07-23**  
+> Constraint: no paid APIs · no Funnel/Serve/exit/subnet · **do not expose owner PC to public Internet**  
+> Related: ADR-034/036/041/042 · `docs/ops/MESH_OPTION_A_STAGING.md`
 
 ---
 

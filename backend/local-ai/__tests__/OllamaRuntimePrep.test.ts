@@ -33,6 +33,35 @@ describe("OllamaRuntimePrep fail-closed", () => {
     expect(r.ok).toBe(true);
   });
 
+  it("allows MagicDNS ts.net host", () => {
+    process.env.OLLAMA_HOST = "http://gpu.tailnet.ts.net:11434";
+    const r = assertOllamaHostSafeForRuntime({
+      allowLoopback: false,
+      requirePrivateMesh: true,
+    });
+    expect(r.ok).toBe(true);
+  });
+
+  it("rejects public hostname when mesh required", () => {
+    process.env.OLLAMA_HOST = "http://ollama.example.com:11434";
+    const r = assertOllamaHostSafeForRuntime({
+      allowLoopback: false,
+      requirePrivateMesh: true,
+    });
+    expect(r.ok).toBe(false);
+    expect(r.reason).toBe("OLLAMA_HOST_not_tailscale_mesh");
+  });
+
+  it("rejects public IPv4 when mesh required", () => {
+    process.env.OLLAMA_HOST = "http://8.8.8.8:11434";
+    const r = assertOllamaHostSafeForRuntime({
+      allowLoopback: false,
+      requirePrivateMesh: true,
+    });
+    expect(r.ok).toBe(false);
+    expect(r.reason).toBe("OLLAMA_HOST_not_tailscale_mesh");
+  });
+
   it("snapshot reports quality routing OFF by default", () => {
     const s = getLocalAiRuntimePrepSnapshot();
     expect(s.qualityRouting).toBe(false);

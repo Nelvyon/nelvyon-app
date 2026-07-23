@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-07-23 — Mesh Option A staging prep (ADR-042 · **no** prod)
+
+| Campo | Valor |
+|-------|-------|
+| **PC** | Ollama listen Tailscale IP only · `/api/tags` PASS |
+| **Staging** | `NELVYON_MESH_OPTION_A=1` · `OLLAMA_HOST` set · AI=0 · no `TS_AUTHKEY` yet |
+| **Prod** | mesh keys **ABSENT** |
+| **Dockerfile** | optional mesh entrypoint (no-op without key) |
+| **Coste** | **0** |
+| **claimReady** | **false** |
+
 ## 2026-07-23 — CEO staging canary Router+QR (ADR-041 · **no** prod IA)
 
 | Campo | Valor |

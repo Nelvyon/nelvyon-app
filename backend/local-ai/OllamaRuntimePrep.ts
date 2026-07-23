@@ -1,6 +1,7 @@
 /**
- * Safe prep helpers for private Ollama runtime — fail-closed, no mesh install.
- * Does NOT activate Tailscale/WireGuard/remote Ollama. Cost 0.
+ * Safe prep helpers for private Ollama runtime — fail-closed.
+ * Mesh Option A: Tailscale CGNAT / MagicDNS only. No Funnel/Serve/public bind.
+ * Cost 0. Does not install Tailscale.
  */
 export type OllamaHostSafety = {
   ok: boolean;
@@ -24,17 +25,49 @@ function isLoopbackHostname(hostname: string): boolean {
   return h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "0.0.0.0";
 }
 
+/** Tailscale CGNAT IPv4 (100.64.0.0/10). */
+export function isTailscaleCgnatIpv4(hostname: string): boolean {
+  const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(hostname.trim());
+  if (!m) return false;
+  const a = Number(m[1]);
+  const b = Number(m[2]);
+  if (![a, b, Number(m[3]), Number(m[4])].every((n) => Number.isInteger(n) && n >= 0 && n <= 255)) {
+    return false;
+  }
+  // 100.64.0.0 – 100.127.255.255
+  return a === 100 && b >= 64 && b <= 127;
+}
+
+/** Tailscale MagicDNS (*.ts.net). */
+export function isTailscaleMagicDns(hostname: string): boolean {
+  const h = hostname.toLowerCase().replace(/\.$/, "");
+  return h.endsWith(".ts.net");
+}
+
+export function isPrivateMeshOllamaHost(hostname: string): boolean {
+  return isTailscaleCgnatIpv4(hostname) || isTailscaleMagicDns(hostname);
+}
+
 /**
  * Staging/production must not point Ollama at the CEO laptop loopback.
+ * Remote runtimes must use Tailscale CGNAT / MagicDNS only (Option A).
  * Local/dev may use loopback (Option C).
  */
 export function assertOllamaHostSafeForRuntime(opts?: {
   /** When true, loopback is allowed (local cert/dev). */
   allowLoopback?: boolean;
+  /** When true (default on Railway/production), require Tailscale mesh host. */
+  requirePrivateMesh?: boolean;
 }): OllamaHostSafety {
   const allowLoopback =
     opts?.allowLoopback ??
     (process.env.NODE_ENV !== "production" && process.env.RAILWAY_ENVIRONMENT !== "production");
+  const requirePrivateMesh =
+    opts?.requirePrivateMesh ??
+    (process.env.RAILWAY_ENVIRONMENT === "production" ||
+      process.env.RAILWAY_ENVIRONMENT === "staging" ||
+      process.env.NELVYON_MESH_OPTION_A?.trim() === "1" ||
+      (!allowLoopback && process.env.NODE_ENV === "production"));
   const host = readOllamaBaseUrl();
   if (!host) {
     return { ok: false, host: null, reason: "OLLAMA_HOST_unset", allowsLoopback: allowLoopback };
@@ -55,6 +88,14 @@ export function assertOllamaHostSafeForRuntime(opts?: {
   }
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     return { ok: false, host, reason: "OLLAMA_HOST_bad_protocol", allowsLoopback: allowLoopback };
+  }
+  if (requirePrivateMesh && !isLoopbackHostname(url.hostname) && !isPrivateMeshOllamaHost(url.hostname)) {
+    return {
+      ok: false,
+      host,
+      reason: "OLLAMA_HOST_not_tailscale_mesh",
+      allowsLoopback: allowLoopback,
+    };
   }
   return { ok: true, host, reason: "ok", allowsLoopback: allowLoopback };
 }
@@ -135,16 +176,17 @@ export function getLocalAiRuntimePrepSnapshot(): {
     strategyModel: process.env.OLLAMA_STRATEGY_MODEL?.trim() || null,
     fastModel: process.env.OLLAMA_MODEL?.trim() || null,
     neoActivationBlocked: [
-      "CEO must approve Option A/B in ARCHITECTURE_LOCAL_AI_RUNTIME.md",
+      "CEO mesh Option A: staging only — see docs/ops/MESH_OPTION_A_STAGING.md",
       "Do not set OLLAMA_HOST=localhost from Railway",
       "Do not set AUTONOMOUS_ALLOW_OPENAI=1 by default",
-      "Do not install Tailscale/WireGuard without CEO approval",
+      "Do not enable Funnel/Serve/exit-node/subnet-routing",
+      "Do not install Tailscale on production",
     ],
     probeTimeoutMsDefault: 5_000,
     rollbackHints: [
-      "Unset OLLAMA_HOST / OLLAMA_BASE_URL / OLLAMA_CONFIGURED",
-      "Set AUTONOMOUS_QUALITY_ROUTING=0",
-      "Set NELVYON_LOCAL_ROUTER_ENABLED=0 / NELVYON_AI_ENABLED=0",
+      "Unset OLLAMA_HOST / OLLAMA_BASE_URL / OLLAMA_CONFIGURED / TS_AUTHKEY",
+      "Set NELVYON_MESH_OPTION_A=0 · NELVYON_AI_ENABLED=0",
+      "Set AUTONOMOUS_QUALITY_ROUTING=0 · NELVYON_LOCAL_ROUTER_ENABLED=0",
       "Verify /api/health/ready after env rollback",
     ],
   };

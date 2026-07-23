@@ -44,6 +44,10 @@ COPY --from=builder /app/apps/web/server.js ./apps/web/server.js
 # next.config.ts imports ./src/lib/security/headers (resolved from process.cwd()).
 # File lives at apps/web/src/lib/security — keep WORKDIR=/app for preDeploy migrate.
 COPY --from=builder /app/apps/web/src/lib/security ./apps/web/src/lib/security
+COPY scripts/railway-mesh-option-a-entrypoint.sh /app/scripts/railway-mesh-option-a-entrypoint.sh
+RUN chmod +x /app/scripts/railway-mesh-option-a-entrypoint.sh \
+  && (apk add --no-cache wget ca-certificates >/dev/null 2>&1 || true)
 WORKDIR /app
 # KI-030: cwd must be apps/web when Next loads next.config.ts (not /app).
-CMD ["sh", "-c", "cd /app/apps/web && exec node server.js"]
+# Mesh Option A: optional Tailscale userspace when NELVYON_MESH_OPTION_A=1 + TS_AUTHKEY (staging only).
+CMD ["sh", "/app/scripts/railway-mesh-option-a-entrypoint.sh"]

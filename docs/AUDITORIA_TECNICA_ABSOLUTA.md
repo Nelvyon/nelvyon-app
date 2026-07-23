@@ -1,21 +1,20 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-23** (CEO canary staging Router+QR)  
+> Fecha: **2026-07-23** (Mesh Option A staging prep)  
 > Veredicto interno: **CONDITIONAL_READY** · `claimReady: false`  
-> **Plataforma lista técnicamente (condicional)** · **NO** superioridad con clientes  
-> Evidencia SSOT: `docs/CTO_FINAL_VERIFY.md` · canary: `docs/ops/CANARY_IA_FLAGS.md`
+> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · `docs/CTO_FINAL_VERIFY.md`
 
 ### Matriz estricta (resumen)
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO | Core SaaS/OS/Portal/SQL SSOT/billing/SES/partners gate/IA Router+QR |
-| VERIFICADO LOCAL | Option C Router+QR **ALL_PASS** (3b+8b generate + vitest) |
-| VERIFICADO STAGING | Flags Router+QR ON · AI master 0 · live `e52f851a9142` · inference BLOCKED_UNTIL_MESH |
-| VERIFICADO PROD | live `fcf2622cc02d` · IA canary keys **ABSENT** |
-| PREPARADO OFF | SM · MCP · OpenAI · OpenClaw · partner payouts · AI master staging |
-| BLOQUEO EXTERNO | Mesh Option A · legal campañas · mercado |
-| CEO / LEGAL / MERCADO | Mesh + legal bloquean claimReady / inferencia remota |
+| IMPLEMENTADO | Mesh Option A prep · Router+QR · SQL SSOT · SaaS/OS core |
+| VERIFICADO LOCAL | Ollama Tailscale IP `/api/tags` PASS · vitest mesh allowlist 7/7 |
+| VERIFICADO STAGING | Prep vars · WAITING_TS_AUTHKEY · AI master 0 |
+| VERIFICADO PROD | Mesh/IA keys **ABSENT** |
+| PREPARADO OFF | OpenAI · Funnel · Serve · exit · subnet · MCP · SM · payouts |
+| BLOQUEO EXTERNO | Auth key CEO · legal campañas |
+| CEO / LEGAL / MERCADO | Bloquean claimReady / inferencia remota staging |
 
 ---
 

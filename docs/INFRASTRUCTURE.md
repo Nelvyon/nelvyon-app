@@ -17,11 +17,10 @@
 | **Railway prod** | ✅ | `@nelvyon/web` · SHA vivo `fcf2622cc02d` · IA canary keys **ABSENT** |
 | **Railway staging** | ✅ | `ideal-victory` · SHA `e52f851a9142` · Router+QR flags ON · AI master **0** · ADR-041 |
 | **PostgreSQL** | ✅ | SQL SSOT · mig 517/518 hist |
-| **Ollama** | ✅ local / 🟡 staging remote | Local Option C ALL_PASS 3b+8b · staging remote **BLOCKED_UNTIL_MESH** |
+| **Ollama** | ✅ local mesh | Bind **Tailscale IP only** · private `/api/tags` PASS · Railway WAITING_TS_AUTHKEY |
+| **Tailscale** | ✅ PC / 🟡 Railway | Host online · no Funnel/exit/subnet · staging entrypoint gated by `TS_AUTHKEY` |
 | **OpenAI** | ❌ | Key revoked · allow **0** |
-| **Cloudflare** | ✅ | `app.nelvyon.com` DNS+SSL PASS |
-| **Backups / DR** | ✅ | Backup `29932453133` |
-| **Costes** | **0** | Canary sin GPU cloud |
+| **Costes** | **0** | Mesh prep sin GPU cloud |
 
 ---
 

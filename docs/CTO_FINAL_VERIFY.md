@@ -1,35 +1,29 @@
-# CTO Final Verify — 2026-07-23 (CEO staging canary Router+QR)
+# CTO Final Verify — 2026-07-23 (Mesh Option A staging prep)
 
-> Veredicto: **CONDITIONAL_READY** · `claimComplete` **false** · `claimReady` **false**  
-> Prod live SHA **`fcf2622cc02d`** · Staging live **`e52f851a9142`** · Coste **0**  
+> Veredicto: **CONDITIONAL_READY** · `claimReady` **false** · Coste **0**  
 > **Plataforma lista técnicamente (condicional)** ≠ **superioridad con clientes**
 
 ## Strict matrix
 
 | Capacidad | IMPLEMENTADO | VERIFICADO LOCAL | VERIFICADO STAGING | VERIFICADO PROD | PREPARADO OFF | BLOQUEO EXTERNO | CEO | LEGAL | MERCADO |
 |-----------|--------------|------------------|--------------------|-----------------|---------------|-----------------|-----|-------|---------|
-| Web live/ready | ✅ | ✅ | ✅ staging | ✅ `fcf2622cc02d` | — | — | — | — | — |
-| Quality routing 3b/8b | ✅ ADR-036 | ✅ Option C ALL_PASS | Flags ON `ideal-victory` | OFF ABSENT | — | mesh for remote | ✅ batch | — | — |
-| Local Router flag | ✅ | ✅ Option C | Flag ON · AI master 0 | OFF ABSENT | — | mesh | ✅ batch | — | — |
-| OpenAI | ❌ revoked | — | allow=0 | ABSENT | ✅ | — | — | — | — |
-| Pack E2E growth×3 | ✅ código | — | SKIP until mesh | SKIP | — | mesh | ⬜ mesh | — | — |
-| Partner payouts | ✅ gate | — | =0 | ABSENT | ✅ | — | — | — | — |
-| Campañas company DB | ✅ controles | — | — | BLOQUEADO_LEGAL | — | checklist | ⬜ | ⬜ | — |
-| Mesh Option A | PREP doc | — | no host | — | ✅ | human install | ⬜ | — | — |
+| Mesh Option A | ✅ ADR-042 | ✅ Ollama TS IP PASS | Prep flags · WAITING key | ABSENT | — | auth key UI | ⬜ key | — | — |
+| Ollama host allowlist | ✅ CGNAT/ts.net | ✅ vitest 7/7 | — | — | — | — | — | — | — |
+| Router+QR canary | ✅ | ✅ | Flags ON | OFF | — | — | ✅ | — | — |
+| OpenAI / Funnel / exit | ❌ | — | =0 | ABSENT | ✅ | — | — | — | — |
+| Tenant isolation | ✅ JWT/RLS | ✅ router tenant tests | — | — | — | — | — | — | — |
+| Campañas | ✅ controles | — | — | BLOQUEADO_LEGAL | — | checklist | ⬜ | ⬜ | — |
 
-## Gates evidence (this canary)
+## Evidence
 
-| Gate | Resultado |
-|------|-----------|
-| Local Option C probe | **ALL_PASS** |
-| Staging flags Router+QR | **SET** · AI=0 · OLLAMA_CONFIGURED=0 |
-| Prod IA canary keys | **ABSENT** |
-| OpenAI | **0** / revoked |
-| Remote staging inference | **BLOCKED_UNTIL_MESH** |
-| claimReady | **false** |
+| Gate | Result |
+|------|--------|
+| `mesh-option-a-local-prep.mjs` | exit **2** LOCAL_PRIVATE_PASS_WAITING_RAILWAY_NODE |
+| OllamaRuntimePrep tests | **7/7** |
+| Prod mesh keys | **ABSENT** |
+| Staging MESH + OLLAMA_HOST | **SET** · AI=0 |
 
 ## Pendientes externos ONLY
 
-- CEO: mesh Option A (opcional)  
-- Legal+CEO: checklist campañas  
-- Mercado: adopción / OAuth por cuenta
+1. CEO: `TS_AUTHKEY` via `MESH_OPTION_A_STAGING.md` clicks → staging redeploy  
+2. Legal+CEO: compliance campañas  

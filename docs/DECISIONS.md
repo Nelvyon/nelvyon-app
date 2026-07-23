@@ -478,3 +478,15 @@
 
 ---
 
+## ADR-042 — Mesh Option A staging (Tailscale → Ollama local)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-23 |
+| **Decisión** | CEO autoriza Mesh Option A **solo staging**: Ollama escucha en IP Tailscale (no pública); `OLLAMA_HOST` allowlist CGNAT/`*.ts.net`; entrypoint opcional `railway-mesh-option-a-entrypoint.sh` si `NELVYON_MESH_OPTION_A=1` + `TS_AUTHKEY`; prod sin keys mesh; sin Funnel/Serve/exit/subnet. |
+| **Por qué** | Railway no alcanza `100.x` sin nodo Tailscale; auth key solo vía UI CEO (nunca chat). |
+| **Consecuencias** | Local private PASS; Railway **WAITING_TS_AUTHKEY**; AI staging permanece 0 hasta key+redeploy; docs `MESH_OPTION_A_STAGING.md`. |
+| **Relación** | ADR-041 · `ARCHITECTURE_LOCAL_AI_RUNTIME.md`. |
+
+---
+

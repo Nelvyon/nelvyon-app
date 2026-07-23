@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-23** — CEO canary staging Router+QR · prod IA OFF · `claimReady: false`
+> Última actualización: **2026-07-23** — Mesh Option A **local PASS** · Railway node WAITING_TS_AUTHKEY · prod OFF · `claimReady: false`
 
 ---
 
@@ -10,22 +10,19 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** |
-| **SHA vivo prod** | `fcf2622cc02d` · live/ready **200** |
-| **SHA vivo staging** | `e52f851a9142` (`ideal-victory`) · live **200** |
-| **Canary staging** | Router+QR **flags ON** · modelos 3b/8b · `NELVYON_AI_ENABLED=0` · sin mesh · OpenAI **0** |
-| **Canary local Option C** | **ALL_PASS** · evidence `canary-staging-router-qr-20260723.txt` |
-| **Prod IA** | Canary keys **ABSENT** |
-| **Automations / SQL / DNS / KI-020** | Hist PASS (sin cambio este canary) |
-| **Beta packs** | Permanecen **beta** |
+| **Mesh Option A** | PC Tailscale + Ollama **privado PASS** · peer_count **0** · staging prep flags · **WAITING** auth key CEO |
+| **Staging** | `NELVYON_MESH_OPTION_A=1` · `OLLAMA_HOST` Tailscale IP · AI master **0** hasta `TS_AUTHKEY` + redeploy |
+| **Prod IA / mesh** | Keys **ABSENT** |
+| **OpenAI / OpenClaw / payouts / campañas** | **OFF** · coste **0** |
+| **Funnel/Serve/exit/subnet** | **Forbidden** (no activados) |
 | **claimReady** | **false** |
-| **Coste** | **0** |
 
 ---
 
 ## Próximo paso EXACTO
 
-1. CEO opcional: aprobar mesh Option A (`ARCHITECTURE_LOCAL_AI_RUNTIME.md`) para inferencia remota staging (`OLLAMA_HOST` privado) — **no** instalar desde Cursor sin OK.  
-2. Legal+CEO: firmar `docs/COMPLIANCE_COMPANY_DB_CHECKLIST.md` antes de cualquier envío masivo.  
-3. Tras mesh: `P0_REQUIRE_PACK_E2E=1` contra host **staging** (no prod).
+1. CEO: crear auth key ephemeral (clics exactos en `docs/ops/MESH_OPTION_A_STAGING.md` §1–2) → pegar **solo** en Railway **staging** `ideal-victory` como `TS_AUTHKEY` → set `OLLAMA_CONFIGURED=1` + `NELVYON_AI_ENABLED=1` → redeploy staging.  
+2. Verificar `tailscale status` peer + probe Ollama desde staging.  
+3. Legal: `docs/COMPLIANCE_COMPANY_DB_CHECKLIST.md` (sigue bloqueando claimReady).
 
-SSOT: `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md` · `docs/ops/CANARY_IA_FLAGS.md` · `docs/CTO_FINAL_VERIFY.md`
+SSOT: `docs/ops/MESH_OPTION_A_STAGING.md` · `docs/CTO_FINAL_VERIFY.md`

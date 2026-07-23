@@ -31,8 +31,9 @@
 - [x] Automations unified **200** · JWT sync ADR-038 · mig 517/518 · `SKIP_ALEMBIC=1`
 - [x] Ops: 1× web redeploy `--from-source` → `git_sha=9ca0cf29a5e5` (deploy `7d625161`)
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
-- [x] CEO: canary staging Router+QR (ADR-041) — flags ON · local Option C ALL_PASS · remote BLOCKED_UNTIL_MESH
-- [ ] CEO: mesh Option A para `OLLAMA_HOST` privado staging (opcional; sin Cursor install)
+- [x] CEO: canary staging Router+QR (ADR-041) — flags ON · local Option C ALL_PASS
+- [x] CEO: Mesh Option A prep (ADR-042) — Ollama Tailscale IP PASS · staging prep · **WAITING_TS_AUTHKEY**
+- [ ] CEO: pegar `TS_AUTHKEY` en Railway staging + `AI=1`/`OLLAMA_CONFIGURED=1` + redeploy (`MESH_OPTION_A_STAGING.md`)
 - [x] Ops: portal-packs refresh GH — **PASS** · P0 SUCCESS `29944606938`
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
 - [x] Bloque 3 SaaS UUID isolation staging
