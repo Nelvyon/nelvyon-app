@@ -129,7 +129,9 @@ export async function probeOllamaHealth(opts?: {
   const timeoutMs = Math.max(500, opts?.timeoutMs ?? 5_000);
   const started = Date.now();
   try {
-    const res = await fetch(`${safety.host}/api/tags`, {
+    // Use privateModeFetch so Mesh Option A HTTP proxy is applied (Node fetch ignores ALL_PROXY).
+    const { privateModeFetch } = await import("../private-ai/privateMode");
+    const res = await privateModeFetch(`${safety.host}/api/tags`, "external_fetch", {
       method: "GET",
       signal: AbortSignal.timeout(timeoutMs),
     });

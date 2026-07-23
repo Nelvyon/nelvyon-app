@@ -27,7 +27,12 @@ export function getLocalAiConfig(): LocalAiConfig {
   return {
     databaseUrl: process.env.LOCAL_AI_DATABASE_URL?.trim() || DEFAULT_DB,
     embeddingDim: Number(process.env.LOCAL_AI_EMBEDDING_DIM ?? 768),
-    ollamaBaseUrl: (process.env.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434").replace(/\/$/, ""),
+    ollamaBaseUrl: (
+      process.env.OLLAMA_HOST?.trim() ||
+      process.env.OLLAMA_BASE_URL?.trim() ||
+      process.env.NELVYON_LOCAL_AI_URL?.trim() ||
+      "http://127.0.0.1:11434"
+    ).replace(/\/$/, ""),
     ollamaModel: process.env.OLLAMA_MODEL ?? "llama3.2:3b-instruct-q4_K_M",
     strategyModel,
     strategyNumGpu: strategyNumGpuRaw ? Number(strategyNumGpuRaw) : strategyModel ? 22 : undefined,

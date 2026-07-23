@@ -83,6 +83,7 @@ if [ "$mesh_on" = "1" ] && [ -n "$auth" ]; then
     export ALL_PROXY="socks5://127.0.0.1:1055"
     export HTTP_PROXY="http://127.0.0.1:1055"
     export HTTPS_PROXY="http://127.0.0.1:1055"
+    export NELVYON_MESH_HTTP_PROXY="http://127.0.0.1:1055"
     export NO_PROXY="127.0.0.1,localhost,.railway.internal,.rlwy.app"
     echo "[mesh-option-a] MESH_JOIN_OK proxies_set=1"
   else

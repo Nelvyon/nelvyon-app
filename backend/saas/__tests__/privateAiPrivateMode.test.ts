@@ -36,6 +36,11 @@ describe("privateMode", () => {
     expect(() => assertLocalRuntimeUrl("http://127.0.0.1:11434")).not.toThrow();
   });
 
+  it("allows Tailscale CGNAT and MagicDNS for mesh Option A", () => {
+    expect(() => assertLocalRuntimeUrl("http://100.102.207.30:11434")).not.toThrow();
+    expect(() => assertLocalRuntimeUrl("http://nelvyon.tail8fa77a.ts.net:11434")).not.toThrow();
+  });
+
   it("blocks public Internet URLs", () => {
     expect(() => assertUrlAllowed("https://api.openai.com/v1/models", "external_fetch")).toThrow();
   });

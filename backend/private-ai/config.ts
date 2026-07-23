@@ -59,7 +59,12 @@ export function getGlobalPrivateAiConfig(): GlobalPrivateAiConfig {
     aiMode: parseAiMode(process.env.NELVYON_AI_MODE),
     privateAiOnly: isPrivateAiOnlyEnv(),
     localRuntimeConfigured: isLocalRuntimeConfigured(),
-    ollamaBaseUrl: (process.env.OLLAMA_BASE_URL ?? DEFAULT_OLLAMA_URL).replace(/\/$/, ""),
+    ollamaBaseUrl: (
+      process.env.OLLAMA_HOST?.trim() ||
+      process.env.OLLAMA_BASE_URL?.trim() ||
+      process.env.NELVYON_LOCAL_AI_URL?.trim() ||
+      DEFAULT_OLLAMA_URL
+    ).replace(/\/$/, ""),
     ollamaModel: process.env.OLLAMA_MODEL ?? process.env.NELVYON_OLLAMA_MODEL ?? DEFAULT_OLLAMA_MODEL,
     openaiModel: process.env.NELVYON_OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL,
     anthropicModel: process.env.NELVYON_ANTHROPIC_MODEL ?? DEFAULT_ANTHROPIC_MODEL,
