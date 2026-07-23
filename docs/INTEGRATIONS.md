@@ -3,16 +3,14 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-23**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas · Railway `TS_AUTHKEY` staging (mesh). Prod IA **OFF**. Staging Mesh Option A **prep** (ADR-042) · OpenAI **0**. OAuth: `docs/ops/INTEGRATIONS_OAUTH_HEALTH_CHECKLIST.md`.
+**Bloqueadores go-live:** legal campañas · **TS_AUTHKEY válida** (join FAIL actual). Prod IA **OFF**. Staging AI flags ON pero mesh **no unido**. OpenAI **0**.
 
 ### Auth bridge Web ↔ FastAPI
 
 | Ítem | Estado |
 |------|--------|
-| `JWT_SECRET` web = FastAPI | **Synced** 2026-07-22 (ADR-038) |
-| Automations unified BFF | **HTTP 200** hist |
-| OpenAI | **Key revoked** · allow **0** |
-| Mesh Option A | Local private **PASS** · Railway **WAITING_TS_AUTHKEY** · `MESH_OPTION_A_STAGING.md` |
+| OpenAI | allow **0** · revoked |
+| Mesh Option A | Ollama privado **PASS** · Railway join **FAIL** · regen key |
 
 ---
 

@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-07-23 — Mesh staging verify (join FAIL · entrypoint harden)
+
+| Campo | Valor |
+|-------|-------|
+| **Staging deploy** | `6f7d025a` SUCCESS · live/ready 200 · sha `bf9b24d1` |
+| **Join** | **FAIL** invalid `TS_AUTHKEY` · peer offline |
+| **Fix** | Entrypoint: proxies only on MESH_JOIN_OK (ADR-043) |
+| **Prod** | IA/mesh **ABSENT** |
+| **Rollback** | `NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0` |
+| **claimReady** | **false** |
+
 ## 2026-07-23 — Mesh Option A staging prep (ADR-042 · **no** prod)
 
 | Campo | Valor |

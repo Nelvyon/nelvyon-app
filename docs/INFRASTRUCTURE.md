@@ -17,10 +17,10 @@
 | **Railway prod** | ✅ | `@nelvyon/web` · SHA vivo `fcf2622cc02d` · IA canary keys **ABSENT** |
 | **Railway staging** | ✅ | `ideal-victory` · SHA `e52f851a9142` · Router+QR flags ON · AI master **0** · ADR-041 |
 | **PostgreSQL** | ✅ | SQL SSOT · mig 517/518 hist |
-| **Ollama** | ✅ local mesh | Bind **Tailscale IP only** · private `/api/tags` PASS · Railway WAITING_TS_AUTHKEY |
-| **Tailscale** | ✅ PC / 🟡 Railway | Host online · no Funnel/exit/subnet · staging entrypoint gated by `TS_AUTHKEY` |
-| **OpenAI** | ❌ | Key revoked · allow **0** |
-| **Costes** | **0** | Mesh prep sin GPU cloud |
+| **Ollama** | ✅ local mesh | Bind Tailscale IP only · private PASS · loopback closed |
+| **Tailscale** | 🟡 | PC online · staging join **FAIL** (invalid auth key) · no Funnel/exit |
+| **OpenAI** | ❌ | allow **0** · revoked |
+| **Costes** | **0** | |
 
 ---
 

@@ -485,8 +485,20 @@
 | **Fecha** | 2026-07-23 |
 | **Decisión** | CEO autoriza Mesh Option A **solo staging**: Ollama escucha en IP Tailscale (no pública); `OLLAMA_HOST` allowlist CGNAT/`*.ts.net`; entrypoint opcional `railway-mesh-option-a-entrypoint.sh` si `NELVYON_MESH_OPTION_A=1` + `TS_AUTHKEY`; prod sin keys mesh; sin Funnel/Serve/exit/subnet. |
 | **Por qué** | Railway no alcanza `100.x` sin nodo Tailscale; auth key solo vía UI CEO (nunca chat). |
-| **Consecuencias** | Local private PASS; Railway **WAITING_TS_AUTHKEY**; AI staging permanece 0 hasta key+redeploy; docs `MESH_OPTION_A_STAGING.md`. |
-| **Relación** | ADR-041 · `ARCHITECTURE_LOCAL_AI_RUNTIME.md`. |
+| **Consecuencias** | Local private PASS; Railway join requiere `TS_AUTHKEY` válida (`tskey-auth-`); entrypoint setea proxies **solo** tras `MESH_JOIN_OK`; rollback emergencia `NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0`. |
+| **Relación** | ADR-041 · `ARCHITECTURE_LOCAL_AI_RUNTIME.md` · `MESH_OPTION_A_STAGING.md`. |
+
+---
+
+## ADR-043 — Staging mesh proxies only after successful Tailscale up
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-23 |
+| **Decisión** | Si `tailscale up` falla (p.ej. auth key inválida), **no** exportar `ALL_PROXY`/`HTTP_PROXY`. Log `MESH_JOIN_FAIL` redactado. App arranca; Ollama remoto fail-closed. |
+| **Por qué** | Proxies SOCKS rotos degradan outbound y ocultan la causa real. |
+| **Consecuencias** | `railway-mesh-option-a-entrypoint.sh` actualizado; verify documenta join FAIL honesto. |
+| **Relación** | ADR-042. |
 
 ---
 

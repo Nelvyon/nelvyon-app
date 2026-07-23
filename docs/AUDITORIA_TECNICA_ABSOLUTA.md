@@ -1,20 +1,20 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-23** (Mesh Option A staging prep)  
-> Veredicto interno: **CONDITIONAL_READY** · `claimReady: false`  
-> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · `docs/CTO_FINAL_VERIFY.md`
+> Fecha: **2026-07-23** (Mesh staging verify — join FAIL)  
+> Veredicto interno: **CONDITIONAL_READY** · `claimReady: false` · **no READY**  
+> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · logs `MESH_JOIN_FAIL` / invalid key
 
 ### Matriz estricta (resumen)
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO | Mesh Option A prep · Router+QR · SQL SSOT · SaaS/OS core |
-| VERIFICADO LOCAL | Ollama Tailscale IP `/api/tags` PASS · vitest mesh allowlist 7/7 |
-| VERIFICADO STAGING | Prep vars · WAITING_TS_AUTHKEY · AI master 0 |
+| IMPLEMENTADO | Mesh entrypoint · allowlist · Router+QR · core SaaS/OS |
+| VERIFICADO LOCAL | Ollama TS IP PASS · vitest 37 (prep+QR+tenant router) |
+| VERIFICADO STAGING | live/ready 200 · join **FAIL** · Pack E2E BLOCKED |
 | VERIFICADO PROD | Mesh/IA keys **ABSENT** |
 | PREPARADO OFF | OpenAI · Funnel · Serve · exit · subnet · MCP · SM · payouts |
-| BLOQUEO EXTERNO | Auth key CEO · legal campañas |
-| CEO / LEGAL / MERCADO | Bloquean claimReady / inferencia remota staging |
+| BLOQUEO EXTERNO | Auth key válida CEO · legal campañas |
+| CEO / LEGAL / MERCADO | Bloquean claimReady / mesh remoto |
 
 ---
 

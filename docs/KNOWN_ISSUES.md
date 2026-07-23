@@ -6,6 +6,17 @@
 
 ## Activos
 
+### KI-031 — Staging Mesh Option A: Tailscale join FAIL (invalid TS_AUTHKEY)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Abierto 2026-07-23** |
+| **Síntoma** | Logs: `tailscale up failed` / `invalid key` · peer `nelvyon-staging-web` offline · Pack E2E remoto BLOCKED |
+| **Mitigación** | Ollama privado PASS · staging live/ready 200 · prod IA ABSENT · entrypoint no setea proxies si up falla (ADR-043) |
+| **Rollback** | `NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0` (staging only) |
+| **Acción CEO** | Regenerar auth key (`docs/ops/MESH_OPTION_A_STAGING.md`) · reemplazar `TS_AUTHKEY` · redeploy staging · esperar `MESH_JOIN_OK` |
+| **Nota** | No declarar READY ni Pack E2E PASS hasta join OK. Sin secretos en git/chat. |
+
 ### Ops (no KI) — Web `git_sha` null after `railway up`
 
 | Campo | Valor |
@@ -14,13 +25,13 @@
 | **Reparación** | ONE `railway redeploy --service "@nelvyon/web" --from-source -y` → deploy `7d625161` · live `git_sha=9ca0cf29a5e5` |
 | **Nota** | claimReady remains **false** (legal + CEO IA). |
 
-### Ops (no KI) — Staging pack E2E `LLM_NOT_CONFIGURED`
+### Ops (no KI) — Staging pack E2E `LLM_NOT_CONFIGURED` / mesh
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Ops gap** — **no** reabrir KI |
-| **Detalle** | Staging AUTONOMOUS sin Ollama/OpenAI. Local Ollama OK (2026-07-22) + OpenAI **opt-in only** `llmAdapter` (vitest 22/22; HTTP kickoff `mode=real`). **Prohibido** staging `OLLAMA_HOST=localhost:11434`. |
-| **Evidencia** | `.release-logs/local-http-pack-e2e-ollama-20260722.txt` · pack gate local PASS · as-complete local 🟡 `needs_review` (QA&lt;85 3b, no config fail) |
+| **Estado** | **Superseded parcialmente por KI-031** — mesh flags ON pero join FAIL |
+| **Detalle** | Tras `MESH_JOIN_OK` re-correr Pack E2E contra `ideal-victory-staging`. OpenAI sigue OFF. |
+| **Evidencia** | `.release-logs/mesh-option-a-staging-verify-20260723.txt` |
 
 ### Ops (no KI) — Local pack as-complete con Ollama 3b
 

@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Mesh | **Staging verify — join FAIL** | Ollama privado PASS · staging live/ready 200 · `TS_AUTHKEY` **invalid** · peer offline · Pack E2E BLOCKED · entrypoint fix (proxies solo si up OK) · rollback `AI=0`+`OLLAMA_CONFIGURED=0` · prod ABSENT · claimReady **false** |
 | Mesh | **Option A staging prep (ADR-042)** | Ollama bind Tailscale IP only · private `/api/tags` PASS · allowlist CGNAT/ts.net · entrypoint mesh opcional · staging `NELVYON_MESH_OPTION_A=1` + `OLLAMA_HOST` · AI=0 hasta `TS_AUTHKEY` · prod ABSENT · Funnel/Serve/exit/subnet forbidden · runbook clics exactos · coste **0** · claimReady **false** |
 | Canary | **CEO staging Router+QR** | ADR-041 · Railway staging `ideal-victory`: Router+QR+3b/8b flags · AI master **0** · OpenAI **0** · prod IA keys **ABSENT** · local Option C probe **ALL_PASS** · remote inference **BLOCKED_UNTIL_MESH** · evidence `canary-staging-router-qr-20260723.txt` · claimReady **false** · coste **0** |
 

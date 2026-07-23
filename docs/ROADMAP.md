@@ -68,7 +68,7 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | 🟡 | Arquitectura doc · **no activada** |
 | Beta packs → available | ❌ | Falta cert + deliverables dedicados |
-| Agencia OS unificada élite (ops) | 🟡 | Staging Router+QR flags (ADR-041) · prod IA OFF · mesh pending · claimReady false |
+| Agencia OS unificada élite (ops) | 🟡 | Mesh: Ollama privado PASS · Tailscale join FAIL (auth key) · claimReady false |
 
 ---
 
