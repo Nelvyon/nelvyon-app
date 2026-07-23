@@ -1,38 +1,43 @@
-# CTO Final Verify — 2026-07-23 (Mesh Option A · MESH_JOIN_OK)
+# CTO Final Verify — 2026-07-24 (Post-mesh cierre)
 
 > Veredicto: **CONDITIONAL_READY** · `claimReady` **false** · Coste **0**  
-> Mesh join **PASS** · Pack E2E mesh path **PASS** (`needs_review`, Ollama real) — **no** READY (legal campañas + tip git sync)
+> Pack E2E staging **ALL_PASS completed** · Mesh **PASS** — **no** READY (legal campañas)
 
 ## Strict matrix
 
 | Capacidad | IMPLEMENTADO | VERIFICADO LOCAL | VERIFICADO STAGING | VERIFICADO PROD | PREPARADO OFF | BLOQUEO EXTERNO | CEO | LEGAL | MERCADO |
 |-----------|--------------|------------------|--------------------|-----------------|---------------|-----------------|-----|-------|---------|
-| Ollama privado | ✅ | ✅ TS IP PASS | vía mesh | — | — | — | — | — | — |
-| Staging health | ✅ | — | ✅ live/ready 200 | — | — | — | — | — | — |
-| CGNAT+proxy code | ✅ ADR-044 | ✅ vitest 44/44 | ✅ deploy `6aeb4106` | ABSENT | — | — | — | — | — |
-| Tailscale join | ✅ entrypoint | — | ✅ `MESH_JOIN_OK` | ABSENT | — | — | ✅ key | — | — |
+| Ollama privado | ✅ | ✅ TS IP PASS | vía mesh ESTABLISHED | — | — | — | — | — | — |
+| Staging health | ✅ | — | ✅ live/ready 200 · SHA `99b30730` | — | — | — | — | — | — |
+| Tailscale join | ✅ | — | ✅ `MESH_JOIN_OK` · peer `-web-3` active | ABSENT | — | — | ✅ key | — | — |
 | Async kickoff | ✅ ADR-045 | ✅ | ✅ HTTP 202 | — | — | — | — | — | — |
-| Router+QR 3B/8B | ✅ | ✅ unit | ✅ logs `fast_path_3b` / `critical_deliverable_8b` | ABSENT | — | — | — | — | — |
-| Pack E2E | ✅ | — | ✅ run `f5de9c43` needs_review · real LLM | — | — | QA soft-fail | — | — | — |
-| OpenAI/payouts/MCP/SM | OFF | — | =0 | flags ABSENT | ✅ | residual OpenAI key present | — | — | — |
+| SEO QA mesh | ✅ ADR-046 | ✅ vitest | ✅ sku_seo done · pack completed | — | — | — | — | — | — |
+| Router+QR 3B/8B | ✅ | ✅ | ✅ logs real 3b/8b | ABSENT | — | — | — | — | — |
+| Pack E2E | ✅ | — | ✅ **ALL_PASS completed** · 5 auto-approve | — | — | — | — | — | — |
+| Portal invite E2E | ✅ | — | ✅ invite+accept+5 deliverables+BFF | — | — | — | — | — | — |
+| Portal packs smoke | ✅ | — | ✅ **ALL_PASS** | — | — | — | — | — | — |
+| Tenant isolation | ✅ | ✅ 16/16 | — | — | — | — | — | — | — |
+| OpenAI/payouts/MCP/SM | OFF | — | =0 | **ABSENT** incl. `OPENAI_API_KEY` | ✅ | — | — | — | — |
 | Campañas | controles | — | — | BLOQUEADO | — | checklist | ⬜ | ⬜ | — |
 
 ## Evidence IDs
 
 | Item | Value |
 |------|-------|
-| Deploy | `6aeb4106-0f55-4198-863b-a396e6d118e2` SUCCESS |
+| Tip / live SHA | `99b307306078` |
+| Deploy | `c2e48d13-0a5e-49c6-bc1f-aa1e69f43345` SUCCESS |
 | MESH | `MESH_JOIN_OK proxies_set=1` |
-| Peer | `nelvyon-staging-web-1` `100.71.134.87` active |
-| Ollama | `100.102.207.30:11434` only |
-| Pack | `f5de9c43-24da-44ba-81aa-b70a5ca0079c` · `needs_review` · deliverables_published=5 |
-| Units | 44/44 |
+| Peer | `nelvyon-staging-web-3` `100.97.102.64` active |
+| Ollama | `100.102.207.30:11434` only · public False · loopback CLOSED |
+| Pack E2E | `.release-logs/pack-e2e-99b30730-*.txt` · status **completed** · critical=0 |
+| Portal packs | ALL_PASS |
+| Prod OpenAI key | **ABSENT** |
 
 ## Rollback (2 flags)
 
-`NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0` en staging.
+`NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0` en staging `ideal-victory` only.
 
-## Pendientes externos
+## Pendientes externos / legal
 
-1. Legal: checklist campañas (claimReady)  
-2. Push tip git + deploy desde origin (hoy: railway up)  
+1. Legal: checklist campañas firmada (bloquea claimReady)  
+2. Opcional: rotar clave OpenAI histórica si se expuso en logs de agente  

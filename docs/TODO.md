@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-23** — Mesh JOIN_OK · Pack E2E needs_review · claimReady false
+> Actualizado: **2026-07-24** — Post-mesh Pack E2E ALL_PASS · claimReady false (legal)
 
 ---
 
@@ -35,9 +35,11 @@
 - [x] CEO: Mesh Option A prep (ADR-042) — Ollama Tailscale IP PASS · staging prep
 - [x] Code: ADR-044 CGNAT allowlist + HTTP proxy fetch · vitest 44/44 · tip `1d5d620a` deploy SUCCESS
 - [x] CEO: `TS_AUTHKEY` reusable → **MESH_JOIN_OK** (KI-031 resuelto) · peer active
-- [x] Ops: Pack E2E mesh path — run `f5de9c43` **needs_review** · real 3b/8b · ADR-045 async 202
-- [ ] Ops: tip git push + deploy desde origin (hoy railway up `6aeb4106`)
+- [x] Ops: Pack E2E mesh — tip `99b30730` **ALL_PASS completed** · portal invite · ADR-045/046
+- [x] Ops: tip git push + staging deploy desde origin (`99b30730` live)
+- [x] Ops: prod residual `OPENAI_API_KEY` eliminado (ABSENT) · allow OpenAI ABSENT
 - [ ] Ops: Router remoto soak mesh (opcional)
+
 - [x] Ops: portal-packs refresh GH — **PASS** · P0 SUCCESS `29944606938`
 - [x] **KI-014 SES** — Production GRANTED + self-send (KI-R014)
 - [x] Bloque 3 SaaS UUID isolation staging

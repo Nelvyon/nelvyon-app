@@ -3,6 +3,12 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-24
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Mesh | **CIERRE POST-MESH** | tip `99b30730` · staging live match · `MESH_JOIN_OK` · peer `nelvyon-staging-web-3` active · Pack E2E **ALL_PASS completed** (5 auto-approve) · portal-packs **ALL_PASS** · SEO fix ADR-046 (ignore LLM blockers + pad keywords + JSON repair + soft-continue) · prod `OPENAI_API_KEY` **ABSENT** · flags IA/mesh OFF · Ollama privado PASS · tenant iso 16/16 · claimReady **false** (legal) · rollback `AI=0`+`OLLAMA=0` |
+
 ## 2026-07-23
 
 | Área | Cambio | Descripción |

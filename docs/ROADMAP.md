@@ -68,7 +68,7 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | 🟡 | ADR-044 code PASS · join FAIL · no MESH_JOIN_OK |
 | Beta packs → available | ❌ | Falta cert + deliverables dedicados |
-| Agencia OS unificada élite (ops) | 🟡 | Mesh JOIN_OK · Pack E2E needs_review (Ollama real) · ADR-045 · claimReady false |
+| Agencia OS unificada élite (ops) | 🟡 | Mesh JOIN_OK · Pack E2E ALL_PASS completed (2026-07-24) · ADR-045/046 · claimReady false (legal) |
 
 ---
 

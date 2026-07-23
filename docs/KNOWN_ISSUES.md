@@ -6,20 +6,30 @@
 
 ## Activos
 
-### Ops (no KI) — Staging mesh Pack E2E QA soft-fail (`needs_review`)
+### Ops (no KI) — Legal checklist campañas (claimReady)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Observado 2026-07-23** — no bloquea mesh verify |
-| **Detalle** | Run `f5de9c43` · landing QA88 · SEO QA84 · chatbot QA72 · status `needs_review` · LLM `mode=real` 3b/8b · `deliverables_published:5` |
-| **Nota** | claimReady **false** (legal). Mesh path **PASS**. |
+| **Estado** | **Abierto** — único bloqueo claimReady |
+| **Detalle** | Gates mesh/pack staging PASS 2026-07-24; falta firma legal campañas |
 
-### Ops (no KI) — Prod residual `OPENAI_API_KEY` PRESENT
+---
+
+## Historial resuelto (reciente)
+
+### Ops — Staging mesh Pack E2E QA soft-fail → ALL_PASS
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Observado** — AI flags ABSENT · `AUTONOMOUS_ALLOW_OPENAI` ABSENT → path OFF |
-| **Acción** | CEO puede rotar/borrar key residual; **no** activar IA prod |
+| **Resuelto** | 2026-07-24 |
+| **Detalle** | tip `99b30730` · ADR-046 · Pack E2E **completed** · 5 auto-approve · supersede `needs_review` `f5de9c43` |
+
+### Ops — Prod residual `OPENAI_API_KEY`
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-24 |
+| **Detalle** | Variable eliminada · **ABSENT** · `AUTONOMOUS_ALLOW_OPENAI` ABSENT |
 
 ---
 

@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-23**. Sin secretos.
+> Estado real documentado **2026-07-24**. Sin secretos.
 
 ---
 
@@ -14,12 +14,12 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | 🟡 | Desktop often DOWN for restore drill |
-| **Railway prod** | ✅ | `@nelvyon/web` · SHA vivo `fcf2622cc02d` · IA canary keys **ABSENT** |
-| **Railway staging** | 🟡 | `ideal-victory` · tip `1d5d620a` · deploy `03a16532` SUCCESS · MESH_JOIN_FAIL · AI=1 mesh flags ON |
+| **Railway prod** | ✅ | `@nelvyon/web` · IA/mesh/OpenAI keys **ABSENT** |
+| **Railway staging** | ✅ mesh | `ideal-victory` · live `99b30730` · `MESH_JOIN_OK` · Pack E2E ALL_PASS |
 | **PostgreSQL** | ✅ | SQL SSOT · mig 517/518 hist |
-| **Ollama** | ✅ local mesh | Bind Tailscale IP only · private PASS · loopback closed |
-| **Tailscale** | ✅ staging | PC online · staging `MESH_JOIN_OK` · peer active · no Funnel/exit |
-| **OpenAI** | ❌ | allow **0** · revoked |
+| **Ollama** | ✅ local mesh | Bind Tailscale IP only · private PASS · loopback closed · no public port |
+| **Tailscale** | ✅ staging | PC online · peer `-web-3` active · no Funnel/exit |
+| **OpenAI** | ❌ | allow ABSENT · key ABSENT in prod |
 | **Costes** | **0** | |
 
 ---

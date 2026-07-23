@@ -1,15 +1,15 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-23** — Mesh JOIN_OK · Pack E2E needs_review · `claimReady: false`
+> Actualizado: **2026-07-24** — Post-mesh Pack E2E ALL_PASS · `claimReady: false`
 
 | Capa | Estado | Evidencia |
 |------|--------|-----------|
-| **Veredicto** | **CONDITIONAL_READY** | Mesh staging PASS · claimReady false (legal) |
-| **Code ADR-044/045** | **PASS** | CGNAT + HTTP proxy · async kickoff · vitest 44/44 · deploy `6aeb4106` |
-| **Ollama privado** | **PASS** | Tailscale IP only · loopback closed |
-| **Staging health** | **PASS** | live/ready 200 |
-| **Tailscale join** | **PASS** | `MESH_JOIN_OK` · peer `nelvyon-staging-web-1` active |
-| **Pack E2E remoto** | **PASS mesh** | run `f5de9c43` needs_review · real 3b/8b · deliverables_published=5 |
-| **Prod IA/mesh** | **OFF** | flags ABSENT · residual OpenAI key PRESENT |
+| **Veredicto** | **CONDITIONAL_READY** | Gates mesh+pack PASS · claimReady false (legal) |
+| **Tip staging** | **PASS** | live `99b30730` · ready 200 · deploy `c2e48d13` |
+| **Ollama privado** | **PASS** | Tailscale IP only · loopback closed · public blocked |
+| **Tailscale join** | **PASS** | `MESH_JOIN_OK` · peer `-web-3` active |
+| **Pack E2E remoto** | **ALL_PASS** | completed · 5 auto-approve · portal invite PASS |
+| **Portal packs** | **ALL_PASS** | |
+| **Prod IA/mesh** | **OFF** | all relevant flags ABSENT incl. OpenAI key |
 | **Rollback 2 flags** | Documentado | AI=0 · OLLAMA_CONFIGURED=0 |
 | **Costes** | **0** | |

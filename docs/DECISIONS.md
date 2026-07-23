@@ -526,3 +526,15 @@
 
 ---
 
+## ADR-046 — SEO mesh QA: deterministic plan + keyword pad + JSON repair
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | (1) `normalizeSeoPlan` ignora blockers inventados por LLM y usa blockers deterministas del brief. (2) `normalizeKeywordsArtifact` rellena a ≥10 keywords. (3) `parseJsonFromLlm` tolera trailing commas; Ollama hace **1** repair retry. (4) Agentes SEO intermedios soft-continue ante fallo JSON; `generateSeoPackIsolated` sigue siendo SSOT de artefactos QA. Sin silent-mock mode cuando Ollama está configurado. |
+| **Por qué** | Pack E2E fallaba SEO QA~65 (abort por blockers LLM / keywords thin) o abort hard por JSON inválido del copywriter aunque el pack aislado sobrescribe on_page. |
+| **Consecuencias** | tip `99b30730` · Pack E2E staging **completed** ALL_PASS · 5 auto-approve. |
+| **Relación** | ADR-045 · `seoGenerator.ts` · `runPipelinePhaseC.ts` · `llmAdapter.ts` · `parseJson.ts`. |
+
+---
+

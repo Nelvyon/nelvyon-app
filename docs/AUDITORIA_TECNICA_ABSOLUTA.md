@@ -1,19 +1,19 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-23** (deploy `6aeb4106` · ADR-044/045 · MESH_JOIN_OK)  
+> Fecha: **2026-07-24** (tip `99b30730` · ADR-044/045/046 · Pack E2E ALL_PASS)  
 > Veredicto interno: **CONDITIONAL_READY** · `claimReady: false` · **no READY**  
-> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · Pack `f5de9c43` needs_review · Ollama real
+> Evidencia: `docs/ops/MESH_OPTION_A_STAGING.md` · Pack E2E completed · Ollama real mesh
 
 ### Matriz estricta (resumen)
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO | Mesh entrypoint · ADR-044 CGNAT+proxy · ADR-045 async kickoff · Router+QR · core SaaS/OS |
-| VERIFICADO LOCAL | Ollama TS IP PASS · vitest **44/44** |
-| VERIFICADO STAGING | live/ready 200 · `MESH_JOIN_OK` · Pack E2E mesh needs_review · peer active |
-| VERIFICADO PROD | Mesh/IA flags **ABSENT** (residual OpenAI key PRESENT, gates OFF) |
+| IMPLEMENTADO | Mesh entrypoint · ADR-044–046 · Router+QR · core SaaS/OS |
+| VERIFICADO LOCAL | Ollama TS IP PASS · tenant iso 16/16 · meshQaFixes |
+| VERIFICADO STAGING | live/ready 200 · `MESH_JOIN_OK` · Pack E2E **ALL_PASS completed** · portal-packs ALL_PASS |
+| VERIFICADO PROD | Mesh/IA flags **ABSENT** · `OPENAI_API_KEY` **ABSENT** |
 | PREPARADO OFF | OpenAI allow · Funnel · Serve · exit · subnet · MCP · SM · payouts |
-| BLOQUEO EXTERNO | Legal campañas · tip git sync |
+| BLOQUEO EXTERNO | Legal campañas |
 | CEO / LEGAL / MERCADO | Bloquean claimReady |
 
 ---
@@ -197,7 +197,7 @@ Ver `docs/PARITY_GHL_HUBSPOT.md`. Resumen honesto: **~48 features core en códig
 
 ### Veredicto auditoría
 
-**CONDITIONAL_READY** — deploy `6aeb4106` SUCCESS · MESH_JOIN_OK · Pack E2E `f5de9c43` needs_review (Ollama real) · Ollama privado PASS · prod IA flags ABSENT · **no READY** · **claimReady false**.
+**CONDITIONAL_READY** — tip `99b30730` · `MESH_JOIN_OK` · Pack E2E **ALL_PASS completed** · portal-packs ALL_PASS · Ollama privado PASS · prod IA/OpenAI **ABSENT** · **no READY** · **claimReady false** (legal campañas).
 
 ### 10. Bloques 3–13 (2026-07-21) + redeploy 2026-07-22
 

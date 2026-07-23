@@ -1,12 +1,25 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-23**
+> Registrar cada deploy significativo. Actualizado: **2026-07-24**
 
 ---
 
 # DEPLOYMENTS — Historial de despliegues
 
 > No borrar entradas. Añadir al inicio.
+
+## 2026-07-24 — Post-mesh cierre (Pack E2E ALL_PASS)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Tip / live** | `99b307306078` |
+| **Deploy** | `c2e48d13-0a5e-49c6-bc1f-aa1e69f43345` SUCCESS |
+| **Join** | **PASS** `MESH_JOIN_OK` · peer `nelvyon-staging-web-3` active |
+| **Pack E2E** | **ALL_PASS completed** · 5 auto-approve · portal invite PASS |
+| **Portal packs** | **ALL_PASS** |
+| **Prod** | untouched · IA flags ABSENT · `OPENAI_API_KEY` **ABSENT** |
+| **claimReady** | **false** (legal campañas) |
 
 ## 2026-07-23 — Mesh final verify (JOIN_OK · async kickoff)
 
