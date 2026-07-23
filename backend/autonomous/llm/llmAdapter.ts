@@ -83,6 +83,9 @@ const QUALITY_CRITICAL_ROLES = new Set<AgentRole>([
   "agent-seo-report",
   "agent-strategist-landing",
   "agent-strategist-seo",
+  "agent-strategist-chatbot",
+  "agent-pm-seo",
+  "agent-pm-chatbot",
 ]);
 
 export type AutonomousOllamaSlot = "fast" | "strategy";

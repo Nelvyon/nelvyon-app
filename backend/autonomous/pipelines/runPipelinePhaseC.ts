@@ -19,6 +19,7 @@ import {
 import { scoreOffline } from "../qa/offlineScorer";
 import type { AutonomousProject, AutonomousSku, AutonomousTier, QaResult } from "../types";
 import { buildChatbotIsolated } from "../wrappers/chatbotBuilder";
+import { normalizeChatbotKnowledgeBase } from "../wrappers/chatbotKbNormalize";
 import { buildLandingIsolated } from "../wrappers/landingBuilder";
 import { generateSeoPackIsolated, normalizeKeywordsArtifact } from "../wrappers/seoGenerator";
 import { createProject } from "./runPipeline";
@@ -103,14 +104,19 @@ async function runChatbotPhaseC(project: AutonomousProject, attempt: number): Pr
   artifacts.strategy = st.data;
   agent_log.push({ ...st.log, llm_mode: st.llm_mode as "mock" | "real" });
 
-  const faqsTarget = (pm.data as { faqs_target_count: number }).faqs_target_count;
+  const faqsTargetRaw = Number((pm.data as { faqs_target_count?: unknown }).faqs_target_count);
+  const faqsTarget = Number.isFinite(faqsTargetRaw) && faqsTargetRaw > 0 ? Math.min(60, faqsTargetRaw) : 15;
+  if (pm.data && typeof pm.data === "object") {
+    (pm.data as { faqs_target_count: number }).faqs_target_count = faqsTarget;
+    artifacts.plan = pm.data;
+  }
   const cp = await llmCopywriterChatbot(brief, st.data as Record<string, unknown>, faqsTarget, attempt);
-  artifacts.knowledge_base = cp.data;
+  artifacts.knowledge_base = normalizeChatbotKnowledgeBase(cp.data, brief, faqsTarget);
   agent_log.push({ ...cp.log, llm_mode: cp.llm_mode as "mock" | "real" });
 
   artifacts.config = buildChatbotIsolated({
     brief,
-    knowledge_base: cp.data as Record<string, unknown>,
+    knowledge_base: artifacts.knowledge_base as Record<string, unknown>,
     strategy: st.data as Record<string, unknown>,
   });
   agent_log.push({
@@ -167,17 +173,25 @@ async function runSeoPhaseC(project: AutonomousProject, attempt: number): Promis
   artifacts.report = rep.data;
   agent_log.push({ ...rep.log, llm_mode: rep.llm_mode as "mock" | "real" });
 
-  // Wrapper ensures isolated pack consistency
+  // Wrapper ensures isolated pack consistency (priority clamped to pages_target)
   const pack = generateSeoPackIsolated({
     brief,
     pages_target: pagesTarget,
     priority_override: st.data as Record<string, unknown>,
     keywords_override: artifacts.keywords as Record<string, unknown>,
   });
+  artifacts.priority = pack.priority;
   artifacts.audit = pack.audit;
   artifacts.keywords = pack.keywords;
   artifacts.on_page_fixes = pack.on_page_fixes;
   artifacts.report = pack.report;
+  const pageCount = Array.isArray((pack.on_page_fixes as { pages?: unknown[] })?.pages)
+    ? ((pack.on_page_fixes as { pages: unknown[] }).pages.length)
+    : pagesTarget;
+  artifacts.plan = {
+    ...(artifacts.plan as Record<string, unknown>),
+    pages_target: pageCount,
+  };
 
   project.status = "QA_SCORING";
   return scoreOffline("NELVYON-SEO", brief, artifacts, attempt);

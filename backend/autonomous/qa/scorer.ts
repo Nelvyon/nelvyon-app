@@ -189,11 +189,8 @@ export function scoreChatbot(
     check("C-CMP-03", true, 2),
   ];
 
-  if (attempt >= 2 && Number(kb?.gold_set_useful_rate) < 0.8) {
-    kb.gold_set_useful_rate = 0.82;
-    const c = checks.find((x) => x.id === "C-CNT-01");
-    if (c) c.passed = true;
-  }
+  // Retry must not invent gold_set — normalizeChatbotKnowledgeBase computes real rates.
+  // Keep attempt hook for future repairs that re-score without hardcoding pass marks.
 
   return finalize(
     "NELVYON-CHATBOT",

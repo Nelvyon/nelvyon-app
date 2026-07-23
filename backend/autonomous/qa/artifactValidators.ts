@@ -172,5 +172,20 @@ export function scoreSeoBasic(sku: AutonomousSku, artifacts: Record<string, unkn
     if ((kw?.keywords?.length ?? 0) >= 10) points += 7;
   }
 
+  if (sku === "NELVYON-CHATBOT") {
+    const config = artifacts.config as {
+      rgpd_notice?: boolean;
+      system_prompt_hash?: string;
+      widget_snippet?: string;
+    };
+    const kb = artifacts.knowledge_base as { faqs?: unknown[] };
+    if (config?.rgpd_notice === true) points += 5;
+    if (config?.system_prompt_hash) points += 5;
+    if ((kb?.faqs?.length ?? 0) >= 15 && config?.widget_snippet) points += 5;
+    else if ((kb?.faqs?.length ?? 0) < 15) {
+      issues.push({ code: "SEO-chatbot-faq-coverage", message: "FAQ coverage below 15", blocking: false });
+    }
+  }
+
   return { points: Math.min(points, max), max, issues };
 }
