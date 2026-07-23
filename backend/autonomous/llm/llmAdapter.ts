@@ -278,8 +278,18 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
   if (isAutonomousOllamaConfigured()) {
     try {
       const route = resolveAutonomousOllamaModel(req.agentId);
-      const { content, tokens, model } = await callOllama(system, user, route.model);
-      const parsed = parseJsonFromLlm(content);
+      let { content, tokens, model } = await callOllama(system, user, route.model);
+      let parsed = parseJsonFromLlm(content);
+      if (!parsed || typeof parsed !== "object") {
+        // One repair pass — still real Ollama, never silent mock.
+        const repairUser =
+          `${user}\n\nCRITICAL: previous output was not valid JSON. Respond with ONE JSON object only, no markdown.`;
+        const repaired = await callOllama(system, repairUser, route.model);
+        content = repaired.content;
+        tokens += repaired.tokens;
+        model = repaired.model || model;
+        parsed = parseJsonFromLlm(content);
+      }
       if (!parsed || typeof parsed !== "object") {
         throw new Error("Ollama response is not valid JSON object");
       }

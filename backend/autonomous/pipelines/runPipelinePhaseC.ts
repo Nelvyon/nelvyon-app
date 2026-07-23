@@ -141,6 +141,22 @@ async function runChatbotPhaseC(project: AutonomousProject, attempt: number): Pr
 
 async function runSeoPhaseC(project: AutonomousProject, attempt: number): Promise<QaResult> {
   const { brief, artifacts, agent_log } = project;
+  const nowIso = () => new Date().toISOString();
+  const logLlmFail = (agent: string, outputArtifact: string, err: unknown) => {
+    const msg = err instanceof Error ? err.message.slice(0, 180) : "llm_failed";
+    agent_log.push({
+      agent,
+      started_at: nowIso(),
+      ended_at: nowIso(),
+      input_artifact_versions: {},
+      output_artifact: `${outputArtifact}:${msg}`,
+      output_version: attempt,
+      model: "ollama-error",
+      tokens: 0,
+      status: "failed",
+      llm_mode: "real",
+    });
+  };
 
   const pm = await llmPmSeo(brief);
   artifacts.plan = normalizeSeoPlan(pm.data, brief);
@@ -153,36 +169,61 @@ async function runSeoPhaseC(project: AutonomousProject, attempt: number): Promis
   project.status = "PRODUCING";
   const pagesTarget = Number((artifacts.plan as { pages_target?: unknown }).pages_target) || 5;
 
-  const st = await llmStrategistSeo(brief, pagesTarget);
-  artifacts.priority = st.data;
-  agent_log.push({ ...st.log, llm_mode: st.llm_mode as "mock" | "real" });
+  // Intermediate LLM steps enrich context; generateSeoPackIsolated is the SSOT for QA.
+  // Soft-continue on agent JSON failures so one bad Ollama response cannot abort the pack.
+  try {
+    const st = await llmStrategistSeo(brief, pagesTarget);
+    artifacts.priority = st.data;
+    agent_log.push({ ...st.log, llm_mode: st.llm_mode as "mock" | "real" });
+  } catch (err) {
+    logLlmFail("agent-strategist-seo", "priority", err);
+  }
 
-  const audit = await llmSeoAudit(brief);
-  artifacts.audit = audit.data;
-  agent_log.push({ ...audit.log, llm_mode: audit.llm_mode as "mock" | "real" });
+  try {
+    const audit = await llmSeoAudit(brief);
+    artifacts.audit = audit.data;
+    agent_log.push({ ...audit.log, llm_mode: audit.llm_mode as "mock" | "real" });
+  } catch (err) {
+    logLlmFail("agent-seo-audit", "audit", err);
+  }
 
-  const kw = await llmSeoKeywords(brief);
-  artifacts.keywords = normalizeKeywordsArtifact(kw.data, brief);
-  agent_log.push({ ...kw.log, llm_mode: kw.llm_mode as "mock" | "real" });
+  try {
+    const kw = await llmSeoKeywords(brief);
+    artifacts.keywords = normalizeKeywordsArtifact(kw.data, brief);
+    agent_log.push({ ...kw.log, llm_mode: kw.llm_mode as "mock" | "real" });
+  } catch (err) {
+    artifacts.keywords = normalizeKeywordsArtifact(null, brief);
+    logLlmFail("agent-seo-keywords", "keywords", err);
+  }
 
-  const op = await llmCopywriterSeo(
-    st.data as Record<string, unknown>,
-    artifacts.keywords as Record<string, unknown>,
-    attempt,
-  );
-  artifacts.on_page_fixes = op.data;
-  agent_log.push({ ...op.log, llm_mode: op.llm_mode as "mock" | "real" });
+  try {
+    const op = await llmCopywriterSeo(
+      (artifacts.priority as Record<string, unknown>) ?? {},
+      (artifacts.keywords as Record<string, unknown>) ?? {},
+      attempt,
+    );
+    artifacts.on_page_fixes = op.data;
+    agent_log.push({ ...op.log, llm_mode: op.llm_mode as "mock" | "real" });
+  } catch (err) {
+    logLlmFail("agent-copywriter-seo", "on_page_fixes", err);
+  }
 
-  const rep = await llmSeoReport(brief, op.data as Record<string, unknown>);
-  artifacts.report = rep.data;
-  agent_log.push({ ...rep.log, llm_mode: rep.llm_mode as "mock" | "real" });
+  try {
+    if (artifacts.on_page_fixes) {
+      const rep = await llmSeoReport(brief, artifacts.on_page_fixes as Record<string, unknown>);
+      artifacts.report = rep.data;
+      agent_log.push({ ...rep.log, llm_mode: rep.llm_mode as "mock" | "real" });
+    }
+  } catch (err) {
+    logLlmFail("agent-seo-report", "report", err);
+  }
 
   // Wrapper ensures isolated pack consistency (priority clamped to pages_target)
   const pack = generateSeoPackIsolated({
     brief,
     pages_target: pagesTarget,
-    priority_override: st.data as Record<string, unknown>,
-    keywords_override: artifacts.keywords as Record<string, unknown>,
+    priority_override: artifacts.priority as Record<string, unknown> | undefined,
+    keywords_override: artifacts.keywords as Record<string, unknown> | undefined,
   });
   artifacts.priority = pack.priority;
   artifacts.audit = pack.audit;

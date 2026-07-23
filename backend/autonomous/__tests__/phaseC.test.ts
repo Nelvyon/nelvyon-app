@@ -72,6 +72,11 @@ describe("Phase C — LLM adapter", () => {
     const parsed = parseJsonFromLlm('```json\n{"a":1}\n```');
     expect(parsed).toEqual({ a: 1 });
   });
+
+  it("parseJsonFromLlm tolerates trailing commas", () => {
+    expect(parseJsonFromLlm('{"a":1,}')).toEqual({ a: 1 });
+    expect(parseJsonFromLlm('[{"a":1,},]')).toEqual([{ a: 1 }]);
+  });
 });
 
 describe("Phase C — offline QA", () => {
