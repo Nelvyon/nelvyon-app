@@ -10,7 +10,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** (no READY) |
-| **Tip / staging** | `eb462545` |
+| **Tip / staging** | runtime `eb462545` · docs tip `bcbd6830` |
 | **Certificados** | 3 growth + strategy/funnel/retention + 5 (social/content/cro/analytics/brand) |
 | **BETA** | ninguno |
 | **ADR-048** | REJECT/DEFER Matomo/Umami · 0 installs |
