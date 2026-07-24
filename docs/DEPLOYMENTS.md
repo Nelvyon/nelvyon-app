@@ -8,6 +8,19 @@
 
 > No borrar entradas. Añadir al inicio.
 
+## 2026-07-24 — ADR-054 cierre 6 puntos (staging)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Tip / live** | `980ea216` · `git_sha=980ea2167cc4` |
+| **Deploy** | `23f637b9-88cc-43ef-ac85-d8bc45ad68e5` SUCCESS |
+| **E2E** | 11 packs + auditor **ALL_PASS** |
+| **Flags** | AUDITOR=1 · OPENCLAW staging_mock · VISUAL=0 · SM/MCP/OpenAI/payouts=0 |
+| **Evidence** | `auditor.all_packs_e2e_latest.md` |
+| **Prod** | untouched |
+| **claimReady** | **false** |
+
 ## 2026-07-24 — ADR-053 OS v1 closure (staging)
 
 | Campo | Valor |

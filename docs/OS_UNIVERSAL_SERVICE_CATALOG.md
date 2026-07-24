@@ -1,6 +1,6 @@
 # OS Universal Service Catalog — NELVYON
 
-> **SSOT packs** · **2026-07-24** · tip `37b8bd42` · ver también **`docs/OS_CATALOG_V1.md`** (catálogo versionado) · `claimReady: false`
+> **SSOT packs** · **2026-07-24** · tip `980ea216` · ver **`docs/OS_CATALOG_V1.md` v1.1.0** · `claimReady: false`
 
 ---
 

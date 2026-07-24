@@ -11,32 +11,39 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — **BLOCKED_LEGAL** claimReady / READY |
-| **Detalle** | Catalog v1 · packs CERT · auditor/OpenClaw **staging** · prod OFF · 0 costes |
+| **Detalle** | Checklist técnico listo (`CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`) · `claimReadyLegal` hard-false · Pepito forbidden · falta licencia escrita |
+
+### Ops (no KI) — Social oficial NELVYON
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **PREPARED_OFF** |
+| **Detalle** | `NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md` · 8 cuentas PENDING_CEO · sin publish/OAuth |
 
 ### Ops (no KI) — OpenClaw live / prod
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **BLOCKED_CEO** |
-| **Detalle** | Staging_mock CERT · prod/live requiere nueva autorización CEO + SM productiva |
-
-### Ops (no KI) — Paid social / OAuth publish
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | **PREPARED_OFF** / **BLOCKED_CEO** |
-| **Detalle** | ADR-052 fail-closed · sin OAuth ni presupuesto · no auto-publish |
+| **Detalle** | Staging_mock CERT · prod requiere nueva auth CEO |
 
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — ADR-054 11 packs + auditor ALL_PASS
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-24 |
+| **Evidencia** | tip `980ea216` · deploy `23f637b9` · `auditor.all_packs_e2e_latest.md` |
 
 ### Ops — ADR-053 OS v1 staging closure
 
 | Campo | Valor |
 |-------|-------|
 | **Resuelto** | 2026-07-24 |
-| **Evidencia** | tip `37b8bd42` · deploy `dd7505e9` · closure smoke ALL_PASS · social+auditor ALL_PASS |
+| **Evidencia** | tip `37b8bd42` · deploy `dd7505e9` |
 
 ### Ops — Social ADR-052 staging CERT
 

@@ -1021,12 +1021,12 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | tip `37b8bd42` · deploy `dd7505e9` · ADR-053 auditor+OpenClaw staging+Catalog v1 · prod untouched |
-| **OS Universal / Catalog v1** | SSOT `OS_CATALOG_V1.md` · packs CERT · OpenClaw staging_mock · auditor staging · SM productiva OFF |
-| **Free tools** | Eval only · 0 installs · `FREE_TOOLS_EVALUATION.md` |
-| **Canary IA** | Staging mesh PASS · OpenAI 0 · OpenClaw **staging only** |
-| **Blocker claimReady** | Legal checklist campañas |
-| Freezes Router / MCP / prod IA | **intactos** (flags OFF) |
+| **SHA / deploys** | tip `980ea216` · deploy `23f637b9` · ADR-054 · 11 packs+auditor ALL_PASS · prod untouched |
+| **OS Catalog v1.1** | canónico · roles/flow/criteria · visual strategy_only · social oficial PREPARED_OFF |
+| **Free tools** | Eval only · 0 installs |
+| **Canary IA** | Staging mesh · OpenClaw staging_mock · OpenAI 0 |
+| **Blocker claimReady** | Legal licencia escrita + revisión (checklist técnico listo) |
+| Freezes Router / MCP / prod IA | **intactos** |
 | Producto enterprise completo | **NO** |
 
 ### 8.2 Interpretación de CONDITIONAL_READY

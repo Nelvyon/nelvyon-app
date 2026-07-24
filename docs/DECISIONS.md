@@ -598,6 +598,18 @@
 
 ---
 
+## ADR-054 — Cierre 6 puntos: packs+auditor, visual élite, social oficial, legal técnico
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | (1) E2E **11 packs** certificados con auditor staging ON. (2) OpenClaw staging_mock con `teamAssignments`. (3) Catalog v1.1.0 roles/flow/criteria. (4) `NelvyonOfficialSocialPrep` + checklist CEO 8 cuentas sin publish. (5) `VisualEliteStrategyPipeline` strategy_only · spend OFF. (6) `CampaignsLegalTechnicalGate` técnico completo · `claimReadyLegal` hard-false · Pepito forbidden · LEGAL BLOCKED sin licencia escrita. |
+| **Por qué** | Cerrar verde real verificable sin READY falso. |
+| **Evidencia** | tip `980ea216` · deploy `23f637b9` · `auditor.all_packs_e2e_latest.md` · agency 43/43 |
+| **Relación** | ADR-051–053 · `OS_CATALOG_V1.md` |
+
+---
+
 ## ADR-053 — Auditor independiente staging + OpenClaw staging_mock + OS Catalog v1
 
 | Campo | Valor |

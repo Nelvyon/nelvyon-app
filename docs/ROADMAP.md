@@ -68,11 +68,14 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
 | Beta packs → available | ✅ | 5 packs E2E ALL_PASS · ADR-050 · catalog available |
-| Agencia OS unificada élite (ops) | 🟡 | Catalog v1 · auditor/OpenClaw **staging** CERT · prod OFF · claimReady false |
-| Redes sociales integral por cliente | ✅ | ADR-052 · staging E2E ALL_PASS · 7 entregables portal · paid/publish OFF |
-| Auditor independiente staging | ✅ | ADR-053 · PASS/REJECT/repair/PASS |
-| OpenClaw staging_mock | ✅ | ADR-053 · fail-closed · SM productiva 0 · prod BLOCKED_CEO |
-| OS Catalog v1 | ✅ | `OS_CATALOG_V1.md` · sin “servicios futuros” ambiguos |
+| Agencia OS unificada élite (ops) | 🟡 | ADR-054 · 11 packs+auditor CERT · claimReady false |
+| Redes sociales integral por cliente | ✅ | ADR-052/054 |
+| Auditor independiente staging | ✅ | 11 packs E2E + session PASS/REJECT/repair |
+| OpenClaw staging_mock | ✅ | teamAssignments · prod BLOCKED_CEO |
+| OS Catalog v1.1 | ✅ | roles/flow/criteria |
+| Visual élite strategy_only | ✅ | spend OFF · paid BLOCKED_CEO |
+| Social oficial NELVYON | 🟡 | PREPARED_OFF · checklist CEO |
+| Legal campañas técnico | 🟡 | checklist técnico · LEGAL BLOCKED |
 
 ---
 

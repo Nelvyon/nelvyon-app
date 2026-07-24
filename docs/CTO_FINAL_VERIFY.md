@@ -1,35 +1,31 @@
-# CTO Final Verify — 2026-07-24 (ADR-053 OS v1 staging closure)
+# CTO Final Verify — 2026-07-24 (ADR-054)
 
-> Veredicto: **CONDITIONAL_READY** · `claimReady` **false** · Coste **0** · **no READY** · prod untouched
+> **CONDITIONAL_READY** · `claimReady: false` · **no READY** · coste 0 · prod untouched
 
 ## Tabla final
 
 | Ítem | Valor |
 |------|--------|
-| SHA tip | `37b8bd42` |
-| Deploy staging | `dd7505e9` SUCCESS · live `37b8bd425479` |
-| Auditor | staging ON · E2E PASS/REJECT/repair/PASS |
-| OpenClaw | staging_mock ON · SM productiva 0 · OFF regression PASS |
-| Catalog v1 | integrity PASS · `docs/OS_CATALOG_V1.md` |
-| Social + auditor | ALL_PASS `c4883798` |
-| Evidencia | `auditor.openclaw.catalog_v1.md` · `social.auditor_on_e2e_latest.txt` |
-| Prod | untouched |
+| SHA | `980ea216` |
+| Deploy staging | `23f637b9` SUCCESS · live `980ea2167cc4` |
+| 11 packs + auditor | **ALL_PASS** |
+| OpenClaw staging | PASS + teamAssignments · SM=0 |
+| Visual | strategy_only · VISUAL=0 |
+| Social oficial | PREPARED_OFF · checklist CEO |
+| Legal | técnico OK · claimReadyLegal **false** |
+| Evidencia | `auditor.all_packs_e2e_latest.md` |
+| Agency tests | 43/43 |
 
-## Estados reales
+## Clasificación
 
-| Capacidad | Estado |
-|-----------|--------|
-| Packs + social | IMPLEMENTED_VERIFIED |
-| Auditor / OpenClaw staging | IMPLEMENTED_VERIFIED (staging) |
-| OpenClaw prod / SM productiva / MCP / OpenAI / payouts | PREPARED_OFF / BLOCKED_CEO |
-| Ads | BLOCKED_EXTERNAL |
-| Automations / Reputation packs | PREPARED_OFF |
-| Influencers/PR | NOT_IMPLEMENTED |
-| claimReady | BLOCKED_LEGAL |
+| Verde verificado | Preparado OFF | Bloqueado externo/CEO/legal |
+|------------------|---------------|------------------------------|
+| 11 packs · auditor staging · OpenClaw staging · catalog · visual strategy | social oficial · automations · reputation · SM/MCP/visual spend | ads · OpenClaw prod · OpenAI · payouts · claimReady · Pepito |
 
 ## Next
 
-1. Legal campañas  
-2. CEO: OpenClaw prod/live solo con nueva auth  
+1. CEO: 8 cuentas sociales  
+2. Legal: licencia escrita  
+3. No READY  
 
-Rollback: ver HANDOVER
+Rollback: HANDOVER

@@ -3,18 +3,20 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-23**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas. Prod IA **ABSENT**. Staging: Catalog v1 · auditor ON · OpenClaw staging_mock · social CERT. SSOT: `OS_CATALOG_V1.md`.
+**Bloqueadores go-live:** legal campañas (licencia escrita). Prod IA **ABSENT**. Staging ADR-054: 11 packs+auditor ALL_PASS. SSOT: `OS_CATALOG_V1.md`.
 
 ### Auth bridge Web ↔ FastAPI
 
 | Ítem | Estado |
 |------|--------|
-| OpenAI | allow **0** · revoked |
-| Mesh Option A | Ollama privado PASS · Pack E2E ALL_PASS · ADR-044–053 |
-| OpenClaw | **staging_mock ON** · prod **BLOCKED_CEO** · SM productiva **0** |
-| Auditor independiente | **staging ON** · prod OFF |
-| Visual generation spend | **PREPARED_OFF** |
-| Paid social / auto-publish / OAuth social | **PREPARED_OFF** · ADR-052 |
+| OpenAI | allow **0** |
+| Mesh / packs | E2E ALL_PASS · ADR-054 |
+| OpenClaw | staging_mock ON · prod **BLOCKED_CEO** |
+| Auditor | staging ON · prod OFF |
+| Visual spend | **OFF** · strategy_only |
+| Paid social / publish | **PREPARED_OFF** |
+| Social oficial NELVYON | **PREPARED_OFF** · checklist CEO |
+| Datos Pepito / company DB campañas | **forbidden** · BLOQUEADO_LEGAL |
 
 ---
 

@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-24 — ADR-053 **sin migración nueva** (auditor/OpenClaw/catalog = código + flags staging)
+> Actualizado: 2026-07-24 — ADR-054 **sin migración nueva** (gates/código/flags only)
 
 ---
 
