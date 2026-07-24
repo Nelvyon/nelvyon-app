@@ -242,7 +242,7 @@ describe("packOrchestrator — auto-approve", () => {
   it("weak 3B-class QA (score 55) never false PASS — needs_review + no auto-approve (threshold ≥85)", async () => {
     mockSimulate.mockReturnValueOnce({
       project: {
-        qa: { score: 55, passed: false, model: "llama3.2:3b-instruct-q4_K_M" },
+        qa: { score: 55, passed: false },
         project_id: "proj-3b-weak",
         sku: "NELVYON-LANDING",
         artifacts: {},

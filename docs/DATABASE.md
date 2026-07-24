@@ -1,8 +1,16 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-24 — ADR-054 **sin migración nueva** (gates/código/flags only)
+> Actualizado: 2026-07-24 — ADR-055 **sin migración nueva** (packs/gates/harness código only)
 
 ---
+
+## ADR-055 — notas schema
+
+| Campo | Valor |
+|-------|-------|
+| **Migración nueva** | **No** — última sigue `518_workflows_list_columns.sql` |
+| **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` en código |
+| **SM/MCP synthetic harness** | Usa tenants sintéticos in-memory en staging drills — **no** nuevas tablas · no implica SM productiva |
 
 ## Sistema de migraciones
 

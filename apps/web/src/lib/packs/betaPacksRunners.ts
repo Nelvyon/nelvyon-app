@@ -60,7 +60,7 @@ type RunParams = {
   onRunCreated?: (run: PackRunRecord) => void;
 };
 
-function avgQa(skuResults: { qa_score: number }[]): number {
+export function avgQa(skuResults: { qa_score: number }[]): number {
   if (!skuResults.length) return 85;
   return Math.max(
     85,
@@ -68,7 +68,7 @@ function avgQa(skuResults: { qa_score: number }[]): number {
   );
 }
 
-async function runCertifiedBetaPack(
+export async function runCertifiedBetaPack(
   packId: PackId,
   params: RunParams,
   opts: {

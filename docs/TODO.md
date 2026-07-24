@@ -20,13 +20,13 @@
 
 ---
 
-> Actualizado: **2026-07-24** — Cert ecommerce+saas-b2b · Strategy/Funnel/Retention BETA · claimReady false
+> Actualizado: **2026-07-24** — ADR-055 CODE_READY_LOCAL · tip TBA · E2E automations/reputation pending · claimReady false
 
 ---
 
 ## P2 — Post-auditoría / ops
 
-- [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
+- [ ] CEO: legal checklist campañas firmada + dossier Pepito escrito (bloquea claimReady)
 - [x] Mesh staging · Pack E2E ALL_PASS · ADR-044–046
 - [x] `OS_UNIVERSAL_SERVICE_CATALOG.md` + `FREE_TOOLS_EVALUATION.md` · ADR-047
 - [x] Fase A: Pack E2E mesh `ecommerce-growth` → ALL_PASS
@@ -41,9 +41,13 @@
 - [x] ADR-053: auditor staging + OpenClaw staging_mock + OS Catalog v1 · closure smoke ALL_PASS
 - [x] ADR-054: 11 packs+auditor ALL_PASS · visual strategy_only · social oficial checklist · legal técnico · catalog 1.1
 - [x] CEO closure pack: Visual élite (NO spend) + Social oficial NELVYON (prep) + Legal gate campañas + Catalog v1.1.0 + OpenClaw teamAssignments — vitest 43/43 PASS
+- [x] ADR-055 local: automations/reputation packs wired beta · catalog 1.2.0 · NelvyonOfficialSocialOps · SM/MCP synthetic harness · legal Pepito dossier · OpenClaw canary doc · agency 64+ PASS · tsc 0
+- [ ] Commit + push ADR-055 → deploy staging `ideal-victory` (tip TBA)
+- [ ] Ops: staging flags `NELVYON_SHARED_MEMORY_STAGING=1` + `NELVYON_MCP_STAGING_SYNTHETIC=1` (post-deploy; productivo SM/MCP **0**)
+- [ ] Ops: E2E staging `automations-ops-pack` + `reputation-ops-pack` → evidencia antes de promote beta
 - [ ] CEO: abrir/conectar 8 cuentas sociales oficiales NELVYON (`docs/ops/NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md`)
-- [ ] Legal: licencia comercial escrita + revisión (`CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`) — bloquea claimReady
-- [ ] CEO: OpenClaw **prod/live** / SM productiva / visual paid (nueva autorización)
+- [ ] Legal: dossier Pepito + licencia comercial escrita (`DATOS_PEPITO_LICENSE_DOSSIER.md` + `CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`) — bloquea claimReady
+- [ ] CEO: OpenClaw **prod canary** (`CEO_OPENCLAW_PROD_CANARY_REQUEST.md` PENDING_CEO) / SM productiva / visual paid (nueva autorización)
 - [ ] CEO: autorización OpenClaw live (hoy BLOCKED_CEO) si se requiere
 - [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts/campañas/visual spend en prod
 

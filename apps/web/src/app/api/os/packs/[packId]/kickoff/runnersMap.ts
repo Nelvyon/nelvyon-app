@@ -38,6 +38,12 @@ import {
   runRetentionPack,
   validateRetentionPackIntake,
 } from "@/lib/packs/retentionPack";
+import {
+  runAutomationsOpsPack,
+  validateAutomationsOpsIntake,
+  runReputationOpsPack,
+  validateReputationOpsIntake,
+} from "@/lib/packs/automationsReputationPacksRunners";
 import type { PackRunRecord } from "@/lib/packs/types";
 import {
   ECOMMERCE_GROWTH_PACK_ID,
@@ -51,6 +57,8 @@ import {
   STRATEGY_PACK_ID,
   FUNNEL_GROWTH_PACK_ID,
   RETENTION_PACK_ID,
+  AUTOMATIONS_OPS_PACK_ID,
+  REPUTATION_OPS_PACK_ID,
 } from "@/lib/packs/types";
 
 export type PackRunner = (params: {
@@ -110,6 +118,14 @@ export const RUNNERS: Record<string, PackRunnerEntry> = {
   [RETENTION_PACK_ID]: {
     validate: validateRetentionPackIntake,
     run: runRetentionPack as PackRunner,
+  },
+  [AUTOMATIONS_OPS_PACK_ID]: {
+    validate: validateAutomationsOpsIntake,
+    run: runAutomationsOpsPack as PackRunner,
+  },
+  [REPUTATION_OPS_PACK_ID]: {
+    validate: validateReputationOpsIntake,
+    run: runReputationOpsPack as PackRunner,
   },
   /** Alias — analytics-insights → analytics-setup-pack */
   "analytics-insights": {

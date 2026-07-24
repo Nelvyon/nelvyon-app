@@ -145,6 +145,20 @@ export const PACK_OS_BINDINGS: Record<string, PackOsBinding> = {
     connectorIds: ["amazon-ses"],
     autonomousSkus: ["NELVYON-CHATBOT"],
   },
+  "automations-ops-pack": {
+    packId: "automations-ops-pack",
+    agentIds: ["autonomous-pm-chatbot", "workflows", "operations", "crm"],
+    processTemplateIds: ["deliverable-checklist-launch", "deliverable-action-plan-30d"],
+    connectorIds: [],
+    autonomousSkus: ["NELVYON-CHATBOT"],
+  },
+  "reputation-ops-pack": {
+    packId: "reputation-ops-pack",
+    agentIds: ["autonomous-pm-chatbot", "support", "email_marketing_premium"],
+    processTemplateIds: ["deliverable-action-plan-30d", "deliverable-report-executive"],
+    connectorIds: [],
+    autonomousSkus: ["NELVYON-CHATBOT"],
+  },
 };
 
 export function getPackOsBinding(packId: string): PackOsBinding | undefined {

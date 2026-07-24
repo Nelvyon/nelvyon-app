@@ -15,10 +15,11 @@
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | 🟡 | Desktop often DOWN for restore drill |
 | **Railway prod** | ✅ | `@nelvyon/web` · IA/mesh/OpenAI keys **ABSENT** |
-| **Railway staging** | ✅ | tip `980ea216` · ADR-054 · 11 packs+auditor ALL_PASS |
-| **OpenClaw** | ✅ staging_mock / ❌ prod | ADR-054 |
-| **Auditor** | ✅ staging / ❌ prod | ADR-054 |
-| **Visual spend** | ❌ OFF | strategy_only |
+| **Railway staging** | 🟡 | live ADR-054 `980ea216` · ADR-055 deploy **pending** · https://ideal-victory-staging.up.railway.app |
+| **OpenClaw** | ✅ staging_mock / ❌ prod | ADR-055 deepened · canary doc PENDING_CEO |
+| **Auditor** | ✅ staging / ❌ prod | ADR-054 live |
+| **SM/MCP synthetic** | 🟡 | harness ADR-055 · flags **not set** · productivo **0** |
+| **Visual spend** | ❌ OFF | creative_direction + decision matrix |
 | **Costes** | **0** | |
 
 ---
@@ -90,6 +91,27 @@ Cloudflare (DNS) → Railway Web → DATABASE_URL → Supabase/Railway Postgres
 Railway Python API → misma DATABASE_URL (staging)
 GitHub Actions cron → POST /api/cron/* + CRON_SECRET
 ```
+
+---
+
+## ADR-055 — flags staging (synthetic SM/MCP)
+
+> Staging URL: https://ideal-victory-staging.up.railway.app  
+> **Live hoy:** ADR-054 (`980ea216`). ADR-055 deploy **pending**.
+
+| Flag | Staging live | Post ADR-055 deploy (plan ops) | Prod |
+|------|--------------|--------------------------------|------|
+| `NELVYON_PACK_INDEPENDENT_AUDITOR` | 1 | 1 | 0 |
+| `NELVYON_OPENCLAW_BRIDGE_ENABLED` + `NELVYON_OPENCLAW_STAGING_MODE` | 1 | 1 | 0 |
+| `NELVYON_SHARED_MEMORY_STAGING` | **0** | **1** (synthetic drills only) | 0 |
+| `NELVYON_MCP_STAGING_SYNTHETIC` | **0** | **1** (synthetic drills only) | 0 |
+| `NELVYON_SHARED_MEMORY_ENABLED` | 0 | 0 | 0/ABSENT |
+| `NELVYON_MCP_PRODUCTIVE_ENABLED` | 0 | 0 | 0/ABSENT |
+| `NELVYON_VISUAL_GENERATION_ENABLED` | 0 | 0 | 0/ABSENT |
+| `AUTONOMOUS_ALLOW_OPENAI` | 0 | 0 | ABSENT |
+| `NELVYON_CEO_PARTNER_PAYOUTS` | 0 | 0 | 0/ABSENT |
+
+Código: `backend/agency/StagingSharedMemoryMcpHarness.ts`. Synthetic **≠** productivo.
 
 ---
 

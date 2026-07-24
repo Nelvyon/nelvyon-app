@@ -6,30 +6,45 @@
 
 ## Activos
 
-### Ops (no KI) — Legal checklist campañas (claimReady)
+### Ops (no KI) — Legal checklist campañas + Datos Pepito (claimReady)
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — **BLOCKED_LEGAL** claimReady / READY |
-| **Detalle** | Checklist técnico listo (`CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`) · `claimReadyLegal` hard-false · Pepito forbidden · falta licencia escrita |
+| **Detalle** | Gate reforzado ADR-055 · `DATOS_PEPITO_LICENSE_DOSSIER.md` · `claimReadyLegal` hard-false · Pepito **forbidden** · falta confirmación escrita + licencia comercial |
 
 ### Ops (no KI) — Social oficial NELVYON
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **PREPARED_OFF** |
-| **Detalle** | `NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md` · 8 cuentas PENDING_CEO · sin publish/OAuth |
+| **Detalle** | `NelvyonOfficialSocialOps` + `NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md` · 8 cuentas **PENDING_CEO** · sin publish/OAuth |
 
-### Ops (no KI) — OpenClaw live / prod
+### Ops (no KI) — ADR-055 deploy + E2E automations/reputation
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Abierto** |
+| **Detalle** | Código local CODE_READY · tip TBA · E2E `automations-ops-pack` + `reputation-ops-pack` **pending** · SM/MCP synthetic flags **not set** |
+
+### Ops (no KI) — OpenClaw prod canary
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **BLOCKED_CEO** |
-| **Detalle** | Staging_mock CERT · prod requiere nueva auth CEO |
+| **Detalle** | Staging_mock CERT · `CEO_OPENCLAW_PROD_CANARY_REQUEST.md` **PENDING_CEO** · prod requiere nueva auth CEO |
 
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — ADR-055 local CODE_READY (deploy pending)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-24 (código local) |
+| **Evidencia** | agency **64+ PASS** · tsc **0** · catalog **1.2.0** · tip **TBA** |
+| **Nota** | E2E automations/reputation + staging deploy **pending** |
 
 ### Ops — ADR-054 11 packs + auditor ALL_PASS
 

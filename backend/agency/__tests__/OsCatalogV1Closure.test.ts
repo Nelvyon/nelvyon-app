@@ -9,6 +9,7 @@ import {
 import { runIndependentAuditor, isPackIndependentAuditorEnabled } from "../OsIndependentAuditor";
 import {
   assertOpenClawStagingIntegrity,
+  exportOpenClawStagingAuditTrail,
   isOpenClawStagingAuthorized,
   resetOpenClawStagingIdempotencyForTests,
   runOpenClawStagingCoordination,
@@ -113,6 +114,17 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
         expect.objectContaining({ teamId: "global_ops_success", roleId: "cs_ops" }),
       ]),
     );
+    expect(r.backoffPlanMs.length).toBeGreaterThan(0);
+    expect(r.idempotencyMapSize).toBeGreaterThanOrEqual(1);
+    expect(r.unauthorizedRejectionOk).toBe(true);
+    expect(r.failureInjectionRecoveryOk).toBe(true);
+    expect(r.steps.find((s) => s.step === "task_assignment")?.ok).toBe(true);
+    expect(r.steps.find((s) => s.step === "unauthorized_action_rejected")?.ok).toBe(true);
+    expect(r.steps.find((s) => s.step === "failure_injection_recovery")?.ok).toBe(true);
+
+    const trail = exportOpenClawStagingAuditTrail(r);
+    expect(trail.length).toBe(r.steps.length);
+    expect(trail.every((e) => typeof e.exportedAt === "string")).toBe(true);
 
     const dup = await runOpenClawStagingCoordination({
       tenantId: "tenant-a",
@@ -144,7 +156,7 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
   }, 30_000);
 
   it("OS Catalog v1 is versioned and honest", () => {
-    expect(OS_CATALOG_V1_VERSION).toBe("1.1.0");
+    expect(OS_CATALOG_V1_VERSION).toBe("1.2.0");
     const check = assertOsCatalogV1Integrity();
     expect(check.violations).toEqual([]);
     expect(listOsCatalogV1().length).toBeGreaterThanOrEqual(15);

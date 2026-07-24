@@ -11,6 +11,8 @@ export const BRAND_VOICE_PACK_ID = "brand-voice-pack" as const;
 export const STRATEGY_PACK_ID = "strategy-pack" as const;
 export const FUNNEL_GROWTH_PACK_ID = "funnel-growth-pack" as const;
 export const RETENTION_PACK_ID = "retention-pack" as const;
+export const AUTOMATIONS_OPS_PACK_ID = "automations-ops-pack" as const;
+export const REPUTATION_OPS_PACK_ID = "reputation-ops-pack" as const;
 
 export type PackId =
   | typeof LOCAL_GROWTH_PACK_ID
@@ -23,7 +25,9 @@ export type PackId =
   | typeof BRAND_VOICE_PACK_ID
   | typeof STRATEGY_PACK_ID
   | typeof FUNNEL_GROWTH_PACK_ID
-  | typeof RETENTION_PACK_ID;
+  | typeof RETENTION_PACK_ID
+  | typeof AUTOMATIONS_OPS_PACK_ID
+  | typeof REPUTATION_OPS_PACK_ID;
 
 /** Common intake for the 5 beta packs (minimal fields, sector required) */
 export type BetaPackIntake = GrowthPackIntakeBase & {
@@ -264,6 +268,20 @@ export const FUNNEL_GROWTH_PACK_STEP_DEFINITIONS = [
 export const RETENTION_PACK_STEP_DEFINITIONS = [
   ...buildBetaPackStepDefinitions(["NELVYON-CHATBOT"]).slice(0, -2),
   { key: "retention_plan", label: "Secuencia retención + churn" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+
+export const AUTOMATIONS_OPS_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-CHATBOT"]).slice(0, -2),
+  { key: "automations_ops", label: "Mapa de workflows + triggers + CRM" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+
+export const REPUTATION_OPS_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-CHATBOT"]).slice(0, -2),
+  { key: "reputation_ops", label: "Playbook reputación + plantillas" },
   { key: "report", label: "Informe en portal" },
   { key: "complete", label: "Pack completado" },
 ];

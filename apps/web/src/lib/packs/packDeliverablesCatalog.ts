@@ -10,6 +10,8 @@ import {
   STRATEGY_PACK_ID,
   FUNNEL_GROWTH_PACK_ID,
   RETENTION_PACK_ID,
+  AUTOMATIONS_OPS_PACK_ID,
+  REPUTATION_OPS_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -152,6 +154,22 @@ const CATALOG: Record<PackId, PackDeliverableItem[]> = {
     { title: "Secuencia retención", description: "Touches email/CRM por cohort.", portalLabel: "Ver secuencia" },
     { title: "Reglas churn", description: "Triggers y acciones anti-churn.", portalLabel: "Ver reglas" },
     { title: "Informe ejecutivo retención", description: "KPIs churn/retention y próximos pasos.", portalLabel: "Abrir informe" },
+  ],
+  [AUTOMATIONS_OPS_PACK_ID]: [
+    { title: "Asistente de automatizaciones", description: "Bot que explica workflows y owners.", portalLabel: "Probar asistente" },
+    { title: "Mapa de workflows", description: "Flujos onboarding, post-venta e inactividad.", portalLabel: "Ver mapa" },
+    { title: "Playbook de triggers", description: "Eventos, latencias e idempotencia.", portalLabel: "Ver playbook" },
+    { title: "Borrador de automatización CRM", description: "Etapas y reglas de pipeline.", portalLabel: "Revisar borrador" },
+    { title: "Checklist QA de operaciones", description: "Controles anti-campaña y anti-gasto.", portalLabel: "Abrir checklist" },
+    { title: "Informe ejecutivo", description: "Resumen QA y próximos pasos de ops.", portalLabel: "Abrir informe" },
+  ],
+  [REPUTATION_OPS_PACK_ID]: [
+    { title: "Asistente de reputación", description: "Bot de guías de respuesta a reseñas.", portalLabel: "Probar asistente" },
+    { title: "Playbook de monitorización de reseñas", description: "Fuentes, cadencia y escalado.", portalLabel: "Ver playbook" },
+    { title: "Plantillas de respuesta", description: "Respuestas por rating con revisión humana.", portalLabel: "Ver plantillas" },
+    { title: "Plan de recuperación de reputación", description: "Plan 30 días sin mass DM.", portalLabel: "Ver plan" },
+    { title: "Kit de señales de confianza", description: "Señales para web y ficha local.", portalLabel: "Ver kit" },
+    { title: "Informe ejecutivo", description: "KPIs de reputación y siguientes pasos.", portalLabel: "Abrir informe" },
   ],
 };
 

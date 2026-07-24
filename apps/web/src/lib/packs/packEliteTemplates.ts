@@ -10,6 +10,8 @@ import {
   STRATEGY_PACK_ID,
   FUNNEL_GROWTH_PACK_ID,
   RETENTION_PACK_ID,
+  AUTOMATIONS_OPS_PACK_ID,
+  REPUTATION_OPS_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -335,6 +337,38 @@ const FEATURED: Record<PackId, PackElitePreset> = {
       tier: "professional",
     },
     templates: SECTOR_TEMPLATES.saas_b2b,
+  },
+  [AUTOMATIONS_OPS_PACK_ID]: {
+    id: "automations-ops-demo",
+    label: "AutomationsOpsDemo",
+    sector: "saas_b2b",
+    tagline: "Workflows + triggers + CRM draft",
+    intake: {
+      business_name: "AutomationsOpsDemo",
+      sector: "saas_b2b",
+      city: "Madrid",
+      country: "ES",
+      value_proposition: "Operaciones CRM sin campañas masivas",
+      primary_cta: "Mapear workflows",
+      tier: "professional",
+    },
+    templates: SECTOR_TEMPLATES.saas_b2b,
+  },
+  [REPUTATION_OPS_PACK_ID]: {
+    id: "reputation-ops-demo",
+    label: "ReputationOpsDemo",
+    sector: "local",
+    tagline: "Reviews + recovery + trust signals",
+    intake: {
+      business_name: "ReputationOpsDemo",
+      sector: "local",
+      city: "Sevilla",
+      country: "ES",
+      value_proposition: "Reputación local con respuesta humana",
+      primary_cta: "Activar monitorización",
+      tier: "professional",
+    },
+    templates: SECTOR_TEMPLATES.restaurant ?? SECTOR_TEMPLATES.saas_b2b,
   },
 };
 

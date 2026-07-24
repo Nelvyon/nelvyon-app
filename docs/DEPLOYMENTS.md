@@ -8,6 +8,18 @@
 
 > No borrar entradas. Añadir al inicio.
 
+## 2026-07-24 — ADR-055 cierre local (deploy staging **pending**)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` — **not deployed yet** |
+| **Tip / live** | **TBA** (working tree ADR-055 · push pending) · live sigue ADR-054 `980ea216` |
+| **Local verify** | agency **64+ PASS** · tsc **0** · catalog **1.2.0** |
+| **Packs** | `automations-ops-pack` + `reputation-ops-pack` wired **beta** · E2E **pending** |
+| **Flags (post-deploy plan)** | AUDITOR=1 · OPENCLAW staging_mock · `NELVYON_SHARED_MEMORY_STAGING=1` · `NELVYON_MCP_STAGING_SYNTHETIC=1` · SM/MCP productivo=0 · VISUAL=0 · OpenAI/payouts=0 |
+| **Prod** | untouched |
+| **claimReady** | **false** |
+
 ## 2026-07-24 — ADR-054 cierre 6 puntos (staging)
 
 | Campo | Valor |

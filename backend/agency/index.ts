@@ -56,12 +56,14 @@ export type {
 } from "./OsIndependentAuditSession";
 export {
   assertOpenClawStagingIntegrity,
+  exportOpenClawStagingAuditTrail,
   isOpenClawStagingAuthorized,
   resetOpenClawStagingIdempotencyForTests,
   runOpenClawStagingCoordination,
 } from "./OpenClawStagingCoordinator";
 export type {
   CoordinationStepResult,
+  OpenClawAuditTrailEntry,
   OpenClawStagingCoordinationResult,
   OpenClawTeamAssignment,
 } from "./OpenClawStagingCoordinator";
@@ -106,6 +108,7 @@ export {
 } from "./VisualEliteStrategyPipeline";
 export type {
   VisualEliteBrief,
+  VisualEliteCreativeDirection,
   VisualEliteDeliveryResult,
   VisualEliteGate,
   VisualEliteRenderOutcome,
@@ -142,6 +145,55 @@ export type {
   NelvyonSocialAccountChecklistItem,
   NelvyonSocialAccountStatus,
 } from "./NelvyonOfficialSocialPrep";
+export {
+  assertNelvyonOfficialSocialOpsIntegrity,
+  attemptNelvyonManualPublish,
+  buildNelvyonBrandLibrary,
+  buildNelvyonOfficialSocialContentDrafts,
+  buildNelvyonOfficialSocialOpsPackage,
+  buildNelvyonOfficialSocialProfiles,
+  buildNelvyonSocialAnalyticsPlan,
+  buildNelvyonSocialPermissionsMatrix,
+  resetNelvyonOfficialSocialOpsStateForTests,
+} from "./NelvyonOfficialSocialOps";
+export type {
+  NelvyonBrandAssetType,
+  NelvyonBrandAssetVersion,
+  NelvyonBrandLibrary,
+  NelvyonManualPublishDenial,
+  NelvyonManualPublishDenialCode,
+  NelvyonManualPublishRequest,
+  NelvyonManualPublishResult,
+  NelvyonManualPublishSimulation,
+  NelvyonOfficialSocialContentDraft,
+  NelvyonOfficialSocialOpsPackage,
+  NelvyonOfficialSocialProfile,
+  NelvyonSocialAnalyticsPlan,
+  NelvyonSocialPermissionAction,
+  NelvyonSocialPermissionRole,
+  NelvyonSocialPermissionsMatrix,
+} from "./NelvyonOfficialSocialOps";
+export {
+  assertStagingSharedMemoryMcpHarnessIntegrity,
+  buildStagingSharedMemoryMcpEvidenceMarkdown,
+  checkSmPermission,
+  isMcpProductiveEnabled,
+  isMcpStagingSyntheticAuthorized,
+  isSharedMemoryStagingSyntheticAuthorized,
+  listSmMcpAuditLog,
+  minPermissionsForRole,
+  readSyntheticMemory,
+  resetStagingSharedMemoryMcpHarnessForTests,
+  runStagingSharedMemoryMcpDrill,
+} from "./StagingSharedMemoryMcpHarness";
+export type {
+  SmMcpAuditLogEntry,
+  SmMcpPermissionAction,
+  SmMcpPermissionRole,
+  StagingSharedMemoryMcpDrillResult,
+  SyntheticMemoryRecord,
+  SyntheticTenantId,
+} from "./StagingSharedMemoryMcpHarness";
 export {
   assertCampaignsLegalTechnicalGateIntegrity,
   evaluateCampaignsLegalTechnicalReadiness,

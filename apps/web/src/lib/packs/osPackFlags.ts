@@ -33,11 +33,15 @@ export const OS_PACK_FLAG_KEYS = {
   strategy: "NELVYON_STRATEGY_PACK",
   funnel: "NELVYON_FUNNEL_PACK",
   retention: "NELVYON_RETENTION_PACK",
+  automationsOps: "NELVYON_AUTOMATIONS_OPS_PACK",
+  reputationOps: "NELVYON_REPUTATION_OPS_PACK",
 } as const;
 
 export function flagKeyForPackId(packId: string): string | null {
   if (packId === "strategy-pack") return OS_PACK_FLAG_KEYS.strategy;
   if (packId === "funnel-growth-pack") return OS_PACK_FLAG_KEYS.funnel;
   if (packId === "retention-pack") return OS_PACK_FLAG_KEYS.retention;
+  if (packId === "automations-ops-pack") return OS_PACK_FLAG_KEYS.automationsOps;
+  if (packId === "reputation-ops-pack") return OS_PACK_FLAG_KEYS.reputationOps;
   return null;
 }

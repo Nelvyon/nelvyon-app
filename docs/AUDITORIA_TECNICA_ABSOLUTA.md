@@ -1,21 +1,22 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-24** (ADR-054 · tip `980ea216` · claimReady false)  
-> Veredicto: **CONDITIONAL_READY** · **no READY**  
-> SSOT: `OS_ELITE_STATE_MATRIX.md` · `OS_CATALOG_V1.md`
+> Fecha: **2026-07-24** (ADR-055 provisional · tip **TBA** · claimReady false)  
+> Veredicto: **CODE_READY_LOCAL** · **no READY** · E2E automations/reputation **pending**  
+> SSOT: `OS_ELITE_STATE_MATRIX.md` · `OS_CATALOG_V1.md` v1.2.0
 
 ### Matriz estricta
 
 | Dimensión | Estado |
 |-----------|--------|
-| VERDE VERIFICADO | 11 packs+auditor · OpenClaw staging · catalog 1.1 · visual strategy_only |
-| PREPARADO OFF | social oficial · automations · reputation · SM/MCP/visual spend · auditor prod |
+| VERDE VERIFICADO (staging live ADR-054) | 11 packs+auditor · OpenClaw staging_mock · catalog 1.1 live |
+| VERDE LOCAL ADR-055 | agency 64+ PASS · tsc 0 · catalog 1.2.0 código · automations/reputation wired beta |
+| PREPARADO OFF | social oficial · automations/reputation E2E · SM/MCP synthetic (flags not set) · visual spend · auditor prod |
 | BLOQUEO EXTERNO | ads OAuth |
-| BLOQUEO CEO | OpenClaw prod · OpenAI · payouts · paid visual · paid social |
-| BLOQUEO LEGAL | claimReady · campañas · Pepito forbidden |
+| BLOQUEO CEO | OpenClaw prod canary · OpenAI · payouts · paid visual · paid social |
+| BLOQUEO LEGAL | claimReady · campañas · Pepito forbidden · dossier pending |
 | NO IMPLEMENTADO | influencers/PR |
 | COSTES | 0 |
-| Evidencia | `auditor.all_packs_e2e_latest.md` |
+| Evidencia staging live | `auditor.all_packs_e2e_latest.md` |
 
 ---
 

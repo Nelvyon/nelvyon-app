@@ -68,14 +68,16 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
 | Beta packs → available | ✅ | 5 packs E2E ALL_PASS · ADR-050 · catalog available |
-| Agencia OS unificada élite (ops) | 🟡 | ADR-054 · 11 packs+auditor CERT · claimReady false |
+| Agencia OS unificada élite (ops) | 🟡 | ADR-055 local · 11 packs+auditor CERT staging · automations/reputation beta wired · E2E pending |
 | Redes sociales integral por cliente | ✅ | ADR-052/054 |
 | Auditor independiente staging | ✅ | 11 packs E2E + session PASS/REJECT/repair |
-| OpenClaw staging_mock | ✅ | teamAssignments · prod BLOCKED_CEO |
-| OS Catalog v1.1 | ✅ | roles/flow/criteria |
-| Visual élite strategy_only | ✅ | spend OFF · paid BLOCKED_CEO |
-| Social oficial NELVYON | 🟡 | PREPARED_OFF · checklist CEO |
-| Legal campañas técnico | 🟡 | checklist técnico · LEGAL BLOCKED |
+| OpenClaw staging_mock | 🟡 | ADR-055 deepened · prod canary doc PENDING_CEO |
+| OS Catalog v1.2.0 | 🟡 | código listo · deploy staging pending |
+| Automations/reputation OS packs | 🟡 | wired beta · kickoff+runners · E2E pending |
+| SM/MCP synthetic staging harness | 🟡 | código listo · flags not set · productivo 0 |
+| Visual élite strategy_only | ✅ | creative_direction + decision matrix · spend OFF |
+| Social oficial NELVYON | 🟡 | PREPARED_OFF · NelvyonOfficialSocialOps · checklist CEO |
+| Legal campañas + Pepito dossier | 🟡 | gate reforzado · claimReadyLegal hard-false · LEGAL BLOCKED |
 
 ---
 

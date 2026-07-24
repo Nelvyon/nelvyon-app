@@ -7,12 +7,19 @@
  * (deliverable flow — service-specific for social/`svc_social_creative`, `OS_DELIVERABLE_FLOW`
  * otherwise), and `certificationCriteria` (auto-derived, never empty; required non-empty for
  * IMPLEMENTED_VERIFIED per `assertOsCatalogV1Integrity`).
+ *
+ * v1.2.0 (ADR-055 closure): wires `automations`/`reputation` kickoff packs
+ * (`automations-ops-pack` / `reputation-ops-pack`, flags default OFF outside staging),
+ * richer `nelvyon_official_social` deliverables (profiles/contents/brand library/manual
+ * publish fail-closed), `creative_direction` step for `visual_elite_strategy`, and a new
+ * `shared_memory_mcp_staging` entry for the synthetic-only SM/MCP staging harness. All
+ * remain PREPARED_OFF until parent promotes after real staging E2E evidence.
  */
 
 import { OS_DELIVERABLE_FLOW, getOsProfessionalTeam, type OsTeamId } from "./OsProfessionalTeams";
 import { SOCIAL_SERVICE_FLOW } from "./OsSocialNetworksService";
 
-export const OS_CATALOG_V1_VERSION = "1.1.0" as const;
+export const OS_CATALOG_V1_VERSION = "1.2.0" as const;
 
 export type OsCatalogV1Status =
   | "IMPLEMENTED_VERIFIED"
@@ -263,36 +270,50 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     title: "Automations / workflows",
     teamId: "svc_automations_crm",
     playbookPath: "docs/agency-playbooks/SERVICE_AUTOMATIONS.md",
-    kickoffPackIds: [],
+    kickoffPackIds: ["automations-ops-pack"],
     permissions: ["draft", "assisted"],
     forbidden: [...forbidSpend],
-    deliverables: ["workflow_draft"],
+    deliverables: ["workflow_map", "trigger_playbook", "crm_automation_draft", "qa_ops_checklist", "informe"],
     qaRubric: { min: 85, criticalMin: 90 },
     independentAuditor: true,
     portalPath: "/saas/workflows",
-    metrics: ["workflow_runs"],
-    tests: ["backend/agency/__tests__/OsCatalogV1Closure.test.ts"],
+    metrics: ["workflow_runs", "qa_score"],
+    tests: [
+      "backend/agency/__tests__/OsCatalogV1Closure.test.ts",
+      "apps/web/src/lib/packs/__tests__/automationsReputationPacksRunners.test.ts",
+    ],
     e2eEvidence: null,
     status: "PREPARED_OFF",
-    nextAction: "Pack OS opcional + E2E mesh",
+    nextAction:
+      "flag NELVYON_AUTOMATIONS_OPS_PACK=1 en staging · ejecutar staging-smoke-automations-reputation-e2e.mjs --only=automations · promover tras E2E PASS",
   },
   {
     serviceId: "reputation",
     title: "Reputation / reviews",
     teamId: "svc_retention_reputation",
     playbookPath: "docs/agency-playbooks/SERVICE_REPUTATION.md",
-    kickoffPackIds: [],
+    kickoffPackIds: ["reputation-ops-pack"],
     permissions: ["draft", "assisted"],
-    forbidden: [...forbidSpend, "sensitive_auto_reply"],
-    deliverables: ["reputation_playbook"],
+    forbidden: [...forbidSpend, "sensitive_auto_reply", "mass_dm"],
+    deliverables: [
+      "review_monitoring_playbook",
+      "response_templates",
+      "reputation_recovery_plan",
+      "trust_signals_kit",
+      "informe",
+    ],
     qaRubric: { min: 85, criticalMin: 90 },
     independentAuditor: true,
     portalPath: "/saas",
-    metrics: ["sentiment"],
-    tests: ["backend/agency/__tests__/OsCatalogV1Closure.test.ts"],
+    metrics: ["sentiment", "avg_rating", "qa_score"],
+    tests: [
+      "backend/agency/__tests__/OsCatalogV1Closure.test.ts",
+      "apps/web/src/lib/packs/__tests__/automationsReputationPacksRunners.test.ts",
+    ],
     e2eEvidence: null,
     status: "PREPARED_OFF",
-    nextAction: "Pack OS + E2E",
+    nextAction:
+      "flag NELVYON_REPUTATION_OPS_PACK=1 en staging · ejecutar staging-smoke-automations-reputation-e2e.mjs --only=reputation · promover tras E2E PASS",
   },
   {
     serviceId: "support",
@@ -338,11 +359,19 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     kickoffPackIds: [],
     permissions: ["draft"],
     forbidden: [...forbidSpend, "touch_production", "send_mass_campaign"],
-    deliverables: ["coordination_trace"],
+    deliverables: ["coordination_trace", "audit_trail_export", "rollback_checklist"],
     qaRubric: { min: 85, criticalMin: 90 },
     independentAuditor: true,
     portalPath: "/portal",
-    metrics: ["idempotency", "tenant_isolation", "retries", "team_assignments"],
+    metrics: [
+      "idempotency",
+      "tenant_isolation",
+      "retries",
+      "team_assignments",
+      "backoff_plan",
+      "unauthorized_rejection",
+      "failure_injection_recovery",
+    ],
     tests: ["backend/agency/__tests__/OsCatalogV1Closure.test.ts"],
     e2eEvidence: "scripts/docs/evidence/os-saas-e2e/modules/auditor.openclaw.catalog_v1.md",
     status: "IMPLEMENTED_VERIFIED",
@@ -356,7 +385,16 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     kickoffPackIds: [],
     permissions: ["draft"],
     forbidden: [...forbidSpend, "paid_render_without_approval"],
-    deliverables: ["brief", "script", "storyboard", "prompts", "variants", "visual_qa", "delivery_package"],
+    deliverables: [
+      "brief",
+      "creative_direction",
+      "script",
+      "storyboard",
+      "prompts",
+      "variants",
+      "visual_qa",
+      "delivery_package",
+    ],
     qaRubric: { min: 85, criticalMin: 90 },
     independentAuditor: true,
     portalPath: "/portal",
@@ -374,15 +412,52 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     kickoffPackIds: ["social-calendar-pack"],
     permissions: ["draft"],
     forbidden: [...forbidSpend, "publish_post", "oauth_connect", "mass_dm"],
-    deliverables: ["official_strategy", "calendar", "formats", "qa_rubric", "ceo_account_checklist"],
+    deliverables: [
+      "official_strategy",
+      "calendar",
+      "profiles",
+      "contents",
+      "brand_library",
+      "analytics_plan",
+      "permissions_matrix",
+      "ceo_approval_gate",
+      "manual_publish_pathway_fail_closed",
+      "single_test_post_protocol",
+      "rollback_plan",
+      "qa_rubric",
+      "ceo_account_checklist",
+    ],
     qaRubric: { min: 85, criticalMin: 90 },
     independentAuditor: true,
     portalPath: "/portal",
     metrics: ["accounts_pending_ceo"],
-    tests: ["backend/agency/__tests__/NelvyonOfficialSocialPrep.test.ts"],
+    tests: [
+      "backend/agency/__tests__/NelvyonOfficialSocialPrep.test.ts",
+      "backend/agency/__tests__/NelvyonOfficialSocialOps.test.ts",
+    ],
     e2eEvidence: null,
     status: "PREPARED_OFF",
-    nextAction: "CEO abrir/conectar 8 cuentas · sin publish hasta auth",
+    nextAction: "CEO abrir/conectar 8 cuentas · sin publish hasta OAuth + aprobación CEO explícita",
+  },
+  {
+    serviceId: "shared_memory_mcp_staging",
+    title: "Shared Memory + MCP (staging sintético)",
+    teamId: "global_security_compliance",
+    playbookPath: "docs/PHASE2_OPENCLAW.md",
+    kickoffPackIds: [],
+    permissions: ["observe"],
+    forbidden: [...forbidSpend, "touch_production", "productive_mcp_without_staging_synthetic"],
+    deliverables: ["tenant_isolation_evidence", "audit_log", "deny_by_default_report", "rollback_flag_list"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/portal",
+    metrics: ["tenant_isolation_ok", "deny_by_default_ok"],
+    tests: ["backend/agency/__tests__/StagingSharedMemoryMcpHarness.test.ts"],
+    e2eEvidence: null,
+    status: "PREPARED_OFF",
+    nextAction:
+      "flags NELVYON_SHARED_MEMORY_STAGING=1 + NELVYON_MCP_STAGING_SYNTHETIC=1 en staging únicamente · " +
+      "ejecutar scripts/staging-smoke-sm-mcp-synthetic.mjs · MCP/SM productivos permanecen BLOCKED_CEO",
   },
   {
     serviceId: "influencers_pr",
@@ -436,7 +511,7 @@ export function listOsCatalogV1(): OsCatalogV1Entry[] {
 
 export function assertOsCatalogV1Integrity(): { ok: boolean; violations: string[] } {
   const violations: string[] = [];
-  if (OS_CATALOG_V1_VERSION !== "1.1.0") violations.push("version_mismatch");
+  if (OS_CATALOG_V1_VERSION !== "1.2.0") violations.push("version_mismatch");
   for (const e of OS_CATALOG_V1) {
     if (!e.teamId) violations.push(`no_team:${e.serviceId}`);
     if (!e.playbookPath) violations.push(`no_playbook:${e.serviceId}`);

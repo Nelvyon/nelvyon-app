@@ -30,6 +30,27 @@ function resolveTeamAssignment(teamId: OsTeamId, roleId: string, task: string): 
 }
 
 /**
+ * Fail-closed authorization check: throws when the role's `forbidden` list includes
+ * the requested action. Used to prove OpenClaw staging coordination correctly rejects
+ * unauthorized actions (e.g. the independent auditor never produces deliverables).
+ */
+function assertActionAuthorized(teamId: OsTeamId, roleId: string, action: string): void {
+  const team = getOsProfessionalTeam(teamId);
+  const role = team?.roles.find((r) => r.roleId === roleId);
+  if (!team || !role) {
+    throw new Error(`invalid_team_assignment:${teamId}/${roleId}`);
+  }
+  if (role.forbidden.includes(action)) {
+    throw new Error(`unauthorized_action:${teamId}/${roleId}/${action}`);
+  }
+}
+
+/** Simple exponential backoff schedule (ms), documented rather than actually slept in tests. */
+function planBackoffMs(maxRetries: number): number[] {
+  return Array.from({ length: Math.max(0, maxRetries) }, (_, i) => 50 * 2 ** i);
+}
+
+/**
  * Staging coordinator gate: bridge + staging_mock mode (no productive SM required).
  * Live URL + SM path stays separate (BLOCKED_CEO for prod).
  */
@@ -57,12 +78,46 @@ export type OpenClawStagingCoordinationResult = {
   auditorE2eOk: boolean;
   /** Explicit specialist team/role assignments recorded along the coordination flow. */
   teamAssignments: OpenClawTeamAssignment[];
+  /** Planned exponential backoff (ms) documented for the specialist retry dispatch. */
+  backoffPlanMs: number[];
+  /** Current size of the in-memory idempotency map — NOT durable across process restarts (documented). */
+  idempotencyMapSize: number;
+  /** True when an unauthorized action (e.g. auditor producing a deliverable) was correctly rejected. */
+  unauthorizedRejectionOk: boolean;
+  /** True when a forced failure was injected and the retry path recovered to success. */
+  failureInjectionRecoveryOk: boolean;
 };
 
-const SEEN_IDEMPOTENCY = new Set<string>();
+export type OpenClawIdempotencyRecord = {
+  firstSeenAt: string;
+  tenantId: string;
+  briefId: string;
+};
+
+/**
+ * In-memory idempotency map — durable for the lifetime of this process only. Persisting
+ * across restarts would require a real store (Redis/Postgres); documented here rather
+ * than silently assumed. Cleared on process restart or `resetOpenClawStagingIdempotencyForTests`.
+ */
+const SEEN_IDEMPOTENCY = new Map<string, OpenClawIdempotencyRecord>();
 
 export function resetOpenClawStagingIdempotencyForTests(): void {
   SEEN_IDEMPOTENCY.clear();
+}
+
+export type OpenClawAuditTrailEntry = {
+  exportedAt: string;
+  step: string;
+  ok: boolean;
+  detail: string;
+};
+
+/** Audit trail export — flattens coordination steps for external evidence writers. */
+export function exportOpenClawStagingAuditTrail(
+  result: Pick<OpenClawStagingCoordinationResult, "steps">,
+): OpenClawAuditTrailEntry[] {
+  const exportedAt = new Date().toISOString();
+  return result.steps.map((s) => ({ exportedAt, step: s.step, ok: s.ok, detail: s.detail }));
 }
 
 async function dispatchWithRetry(
@@ -109,6 +164,8 @@ export async function runOpenClawStagingCoordination(input?: {
     "NELVYON_OPENCLAW_STAGING_MODE=0",
     "NELVYON_SHARED_MEMORY_ENABLED=0 (staging SM only — never prod productive)",
     "NELVYON_ORCHESTRATOR_ENABLED=0",
+    "Clear in-memory idempotency map (resetOpenClawStagingIdempotencyForTests / process restart)",
+    "Revoke NELVYON_OPENCLAW_BRIDGE_URL if it was ever set",
     OPENCLAW_ADAPTER_CONTRACT.rollback,
   ];
 
@@ -123,6 +180,10 @@ export async function runOpenClawStagingCoordination(input?: {
       rollback,
       auditorE2eOk: false,
       teamAssignments: [],
+      backoffPlanMs: [],
+      idempotencyMapSize: SEEN_IDEMPOTENCY.size,
+      unauthorizedRejectionOk: false,
+      failureInjectionRecoveryOk: false,
     };
   }
 
@@ -140,9 +201,17 @@ export async function runOpenClawStagingCoordination(input?: {
       rollback,
       auditorE2eOk: false,
       teamAssignments: [],
+      backoffPlanMs: [],
+      idempotencyMapSize: SEEN_IDEMPOTENCY.size,
+      unauthorizedRejectionOk: false,
+      failureInjectionRecoveryOk: false,
     };
   }
-  SEEN_IDEMPOTENCY.add(idem);
+  SEEN_IDEMPOTENCY.set(idem, {
+    firstSeenAt: new Date().toISOString(),
+    tenantId: input?.tenantId ?? "t",
+    briefId: input?.briefId ?? "b",
+  });
 
   if (input?.forceMissingContext) {
     const d = planNelvyonOsOrchestration({
@@ -161,6 +230,10 @@ export async function runOpenClawStagingCoordination(input?: {
       rollback,
       auditorE2eOk: false,
       teamAssignments: [],
+      backoffPlanMs: [],
+      idempotencyMapSize: SEEN_IDEMPOTENCY.size,
+      unauthorizedRejectionOk: false,
+      failureInjectionRecoveryOk: false,
     };
   }
 
@@ -179,10 +252,18 @@ export async function runOpenClawStagingCoordination(input?: {
   let mock: OpenClawMockHandle | null = null;
   let retries = 0;
   const teamAssignments: OpenClawTeamAssignment[] = [];
+  const backoffPlanMs = planBackoffMs(2);
   try {
     mock = await startOpenClawMockServer(
       input?.forceError ? { failStatus: 500 } : { latencyMs: 5 },
     );
+
+    // Task assignment to teams — recorded explicitly before dispatch, not implied.
+    steps.push({
+      step: "task_assignment",
+      ok: true,
+      detail: "svc_social_creative/social_strategist ← plan brief; backoffPlanMs=" + backoffPlanMs.join(","),
+    });
 
     // Tenant isolation: other tenant must not share correlation
     const a = await dispatchWithRetry(
@@ -276,6 +357,43 @@ export async function runOpenClawStagingCoordination(input?: {
       steps.push({ step: "error_path_ready", ok: true, detail: "mock_can_force_500" });
     }
 
+    // Unauthorized action rejection: the independent auditor must never be allowed to
+    // produce a deliverable — proves fail-closed authorization, not just documentation.
+    let unauthorizedRejectionOk = false;
+    try {
+      assertActionAuthorized("global_independent_auditor", "independent_auditor", "produce_deliverable");
+      unauthorizedRejectionOk = false;
+    } catch {
+      unauthorizedRejectionOk = true;
+    }
+    steps.push({
+      step: "unauthorized_action_rejected",
+      ok: unauthorizedRejectionOk,
+      detail: unauthorizedRejectionOk
+        ? "independent_auditor cannot produce_deliverable"
+        : "unauthorized_action_was_not_rejected",
+    });
+
+    // Failure injection + recovery: dedicated mock fails the first 2 dispatches, then
+    // succeeds — proves the retry path actually recovers, not just that retries exist.
+    let failureInjectionRecoveryOk = false;
+    const failureMock = await startOpenClawMockServer({ failFirstN: 2, latencyMs: 2 });
+    try {
+      const recovery = await dispatchWithRetry(
+        failureMock,
+        { agentId: "qa", tenantId, input: "failure_injection", correlationId: `${idem}-fi` },
+        3,
+      );
+      failureInjectionRecoveryOk = recovery.ok && recovery.retries >= 2;
+      steps.push({
+        step: "failure_injection_recovery",
+        ok: failureInjectionRecoveryOk,
+        detail: `retries=${recovery.retries} detail=${recovery.detail}`,
+      });
+    } finally {
+      await failureMock.close().catch(() => undefined);
+    }
+
     steps.push({ step: "qa", ok: true, detail: "qa_elite_gate" });
     teamAssignments.push(resolveTeamAssignment("global_qa_elite", "qa_technical", "qa_elite_gate"));
     const auditor = runIndependentAuditorE2eScenario();
@@ -303,6 +421,10 @@ export async function runOpenClawStagingCoordination(input?: {
       rollback,
       auditorE2eOk: auditor.ok,
       teamAssignments,
+      backoffPlanMs,
+      idempotencyMapSize: SEEN_IDEMPOTENCY.size,
+      unauthorizedRejectionOk,
+      failureInjectionRecoveryOk,
     };
   } finally {
     if (mock) await mock.close().catch(() => undefined);

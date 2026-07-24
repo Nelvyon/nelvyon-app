@@ -9,10 +9,16 @@ import { OPENCLAW_ADAPTER_CONTRACT } from "./contracts";
 export type OpenClawMockOptions = {
   /** Artificial delay ms */
   latencyMs?: number;
-  /** Force HTTP error status */
+  /** Force HTTP error status on every dispatch */
   failStatus?: number;
   /** Reject oversized payloads */
   enforceMaxPayload?: boolean;
+  /**
+   * Fail the first N dispatch calls with `failStatus` (default 500), then succeed.
+   * Used for failure-injection + recovery drills — distinct from `failStatus` which
+   * fails every call.
+   */
+  failFirstN?: number;
 };
 
 export type OpenClawMockHandle = {
@@ -36,6 +42,7 @@ export async function startOpenClawMockServer(
 ): Promise<OpenClawMockHandle> {
   let dispatches = 0;
   let lastCorrelationId: string | null = null;
+  let failedSoFar = 0;
   const latencyMs = opts.latencyMs ?? 0;
   const enforceMaxPayload = opts.enforceMaxPayload !== false;
 
@@ -52,6 +59,13 @@ export async function startOpenClawMockServer(
         if (opts.failStatus) {
           res.writeHead(opts.failStatus, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ ok: false, error: `forced_${opts.failStatus}` }));
+          return;
+        }
+        if (opts.failFirstN && failedSoFar < opts.failFirstN) {
+          failedSoFar += 1;
+          const status = opts.failStatus ?? 500;
+          res.writeHead(status, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: `failure_injection_${failedSoFar}_of_${opts.failFirstN}` }));
           return;
         }
 

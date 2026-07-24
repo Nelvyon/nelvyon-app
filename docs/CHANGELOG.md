@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| OS | **ADR-055 cierre local** | **CODE_READY_LOCAL** · tip **TBA** · agency **64+ PASS** · tsc **0** · catalog **1.2.0** · `automations-ops-pack`+`reputation-ops-pack` wired **beta** · E2E **pending** · `NelvyonOfficialSocialOps` PREPARED_OFF · SM/MCP synthetic harness (flags not set) · OpenClaw staging deepened · `CEO_OPENCLAW_PROD_CANARY_REQUEST` PENDING_CEO · visual `creative_direction`+matrix spend OFF · legal gate+`DATOS_PEPITO_LICENSE_DOSSIER` · `claimReadyLegal` hard-false · Pepito forbidden · prod untouched · claimReady **false** |
 | OS | **ADR-054 cierre 6 puntos** | tip `980ea216` · deploy `23f637b9` · **11 packs+auditor ALL_PASS** · visual strategy_only · social oficial PREPARED_OFF · legal técnico · catalog 1.1 · claimReady **false** · prod untouched |
 | OS | **CEO closure pack (visual élite + social oficial + legal gate + catalog v1.1.0)** | `VisualEliteStrategyPipeline` · `NelvyonOfficialSocialPrep` · `CampaignsLegalTechnicalGate` · catalog v1.1 · OpenClaw teamAssignments · vitest 43/43 · claimReady **false** |
 | OS | **ADR-053 closure staging** | Auditor ON · OpenClaw staging_mock · Catalog v1 · tip `37b8bd42` · deploy `dd7505e9` · smoke ALL_PASS · social+auditor ALL_PASS · SM/MCP/OpenAI/payouts OFF · claimReady **false** · prod untouched |

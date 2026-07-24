@@ -15,6 +15,8 @@ import {
   STRATEGY_PACK_ID,
   FUNNEL_GROWTH_PACK_ID,
   RETENTION_PACK_ID,
+  AUTOMATIONS_OPS_PACK_ID,
+  REPUTATION_OPS_PACK_ID,
 } from "@/lib/packs/types";
 
 export type ServicePackCategory =
@@ -29,7 +31,9 @@ export type ServicePackCategory =
   | "brand"
   | "strategy"
   | "funnel"
-  | "retention";
+  | "retention"
+  | "automations"
+  | "reputation";
 
 export type ServicePackAvailability = "available" | "beta" | "coming_soon";
 
@@ -395,6 +399,44 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     outputs: ["Secuencia", "Churn rules", "Bot", "Informe ejecutivo"],
     accent: "from-teal-500/10 via-card to-card",
     estimatedMinutes: 8,
+  },
+  {
+    id: "automations-ops-pack",
+    slug: "automations-ops",
+    name: "Automations Ops OS",
+    tagline: "Mapa de workflows, triggers y borrador CRM sin campañas masivas",
+    category: "automations",
+    verticals: ["b2b_saas", "ecommerce", "local"],
+    availability: "beta",
+    launchPackId: AUTOMATIONS_OPS_PACK_ID,
+    kickoffPath: "/os/packs/automations-ops",
+    reportPath: "/os/packs/automations-ops/report",
+    benefits: ["Mapa workflows", "Playbook triggers", "Borrador CRM", "Checklist QA ops"],
+    problem: "Tienes CRM pero no un mapa operativo de automatizaciones con owners y QA.",
+    audience: "Equipos ops/CRM que necesitan workflows sin envíos masivos.",
+    inputs: ["Negocio", "Sector", "Propuesta", "CTA"],
+    outputs: ["Mapa", "Triggers", "CRM draft", "Checklist QA", "Informe"],
+    accent: "from-cyan-500/10 via-card to-card",
+    estimatedMinutes: 10,
+  },
+  {
+    id: "reputation-ops-pack",
+    slug: "reputation-ops",
+    name: "Reputation Ops OS",
+    tagline: "Monitorización de reseñas, plantillas y plan de recuperación",
+    category: "reputation",
+    verticals: ["local", "ecommerce", "b2b_saas"],
+    availability: "beta",
+    launchPackId: REPUTATION_OPS_PACK_ID,
+    kickoffPath: "/os/packs/reputation-ops",
+    reportPath: "/os/packs/reputation-ops/report",
+    benefits: ["Playbook reseñas", "Plantillas respuesta", "Plan 30d", "Kit confianza"],
+    problem: "Las reseñas llegan sin proceso, plantillas ni escalado humano.",
+    audience: "Negocios locales y marcas con ficha/reseñas públicas.",
+    inputs: ["Negocio", "Sector", "Ciudad", "Propuesta"],
+    outputs: ["Playbook", "Plantillas", "Plan recovery", "Trust kit", "Informe"],
+    accent: "from-amber-500/10 via-card to-card",
+    estimatedMinutes: 10,
   },
 ];
 

@@ -2,20 +2,32 @@ import { describe, expect, it } from "vitest";
 import {
   assertCampaignsLegalTechnicalGateIntegrity,
   evaluateCampaignsLegalTechnicalReadiness,
+  type CampaignsLegalTechnicalInput,
 } from "../CampaignsLegalTechnicalGate";
+
+function fullTechnicalInput(
+  overrides: Partial<CampaignsLegalTechnicalInput> = {},
+): CampaignsLegalTechnicalInput {
+  return {
+    sourceTraceImplemented: true,
+    consentFieldsImplemented: true,
+    unsubscribeImplemented: true,
+    suppressionListImplemented: true,
+    auditLogImplemented: true,
+    sendRateLimitPerHourMax: 500,
+    sesConfiguredOverride: true,
+    pepitoDbReferenced: false,
+    ceoLegalSendAuthorized: true,
+    ...overrides,
+  };
+}
 
 describe("Campaigns legal + technical readiness gate (claimReadyLegal always false)", () => {
   it("claimReadyLegal is always false, even in the best-case technical scenario", () => {
-    const result = evaluateCampaignsLegalTechnicalReadiness({
-      sourceTraceImplemented: true,
-      consentFieldsImplemented: true,
-      unsubscribeImplemented: true,
-      sesConfiguredOverride: true,
-      pepitoDbReferenced: false,
-      ceoLegalSendAuthorized: true,
-    });
+    const result = evaluateCampaignsLegalTechnicalReadiness(fullTechnicalInput());
     expect(result.claimReadyLegal).toBe(false);
     expect(result.technicalComplete).toBe(true);
+    expect(result.sendAuthorized).toBe(true);
     expect(result.pepitoDbForbidden).toBe(true);
     expect(result.blockers).toEqual(
       expect.arrayContaining([
@@ -25,16 +37,12 @@ describe("Campaigns legal + technical readiness gate (claimReadyLegal always fal
     );
   });
 
-  it("Pepito DB reference is always forbidden and blocks technicalComplete", () => {
-    const result = evaluateCampaignsLegalTechnicalReadiness({
-      sourceTraceImplemented: true,
-      consentFieldsImplemented: true,
-      unsubscribeImplemented: true,
-      sesConfiguredOverride: true,
-      pepitoDbReferenced: true,
-      ceoLegalSendAuthorized: true,
-    });
+  it("Pepito DB reference is always forbidden and blocks technicalComplete + sendAuthorized", () => {
+    const result = evaluateCampaignsLegalTechnicalReadiness(
+      fullTechnicalInput({ pepitoDbReferenced: true }),
+    );
     expect(result.technicalComplete).toBe(false);
+    expect(result.sendAuthorized).toBe(false);
     expect(result.pepitoDbForbidden).toBe(true);
     expect(result.blockers).toContain("pepito_db_forbidden_reference_detected");
     expect(result.claimReadyLegal).toBe(false);
@@ -45,29 +53,59 @@ describe("Campaigns legal + technical readiness gate (claimReadyLegal always fal
       sourceTraceImplemented: false,
       consentFieldsImplemented: false,
       unsubscribeImplemented: false,
+      suppressionListImplemented: false,
+      auditLogImplemented: false,
+      sendRateLimitPerHourMax: 0,
       sesConfiguredOverride: false,
     });
     expect(result.technicalComplete).toBe(false);
+    expect(result.sendAuthorized).toBe(false);
     expect(result.blockers).toEqual(
       expect.arrayContaining([
         "source_trace_missing",
         "consent_fields_missing",
         "unsubscribe_missing",
+        "suppression_list_missing",
+        "audit_log_missing",
+        "send_rate_limit_missing_or_invalid",
         "ses_not_configured",
       ]),
     );
     expect(result.claimReadyLegal).toBe(false);
   });
 
+  it("requires a positive, sane send rate limit — zero, negative, NaN, or absurdly high all block", () => {
+    for (const badRate of [0, -1, Number.NaN, 1_000_000]) {
+      const result = evaluateCampaignsLegalTechnicalReadiness(
+        fullTechnicalInput({ sendRateLimitPerHourMax: badRate }),
+      );
+      expect(result.checks.rateLimitDeclared).toBe(false);
+      expect(result.checks.sendRateLimitPerHourMax).toBeNull();
+      expect(result.technicalComplete).toBe(false);
+      expect(result.blockers).toContain("send_rate_limit_missing_or_invalid");
+    }
+  });
+
+  it("requires suppression list + audit log implemented for technicalComplete", () => {
+    const noSuppression = evaluateCampaignsLegalTechnicalReadiness(
+      fullTechnicalInput({ suppressionListImplemented: false }),
+    );
+    expect(noSuppression.technicalComplete).toBe(false);
+    expect(noSuppression.blockers).toContain("suppression_list_missing");
+
+    const noAudit = evaluateCampaignsLegalTechnicalReadiness(
+      fullTechnicalInput({ auditLogImplemented: false }),
+    );
+    expect(noAudit.technicalComplete).toBe(false);
+    expect(noAudit.blockers).toContain("audit_log_missing");
+  });
+
   it("never sends without explicit CEO + legal authorization, even with technicalComplete true", () => {
-    const result = evaluateCampaignsLegalTechnicalReadiness({
-      sourceTraceImplemented: true,
-      consentFieldsImplemented: true,
-      unsubscribeImplemented: true,
-      sesConfiguredOverride: true,
-      ceoLegalSendAuthorized: false,
-    });
+    const result = evaluateCampaignsLegalTechnicalReadiness(
+      fullTechnicalInput({ ceoLegalSendAuthorized: false }),
+    );
     expect(result.technicalComplete).toBe(true);
+    expect(result.sendAuthorized).toBe(false);
     expect(result.blockers).toContain("no_send_without_ceo_and_legal");
     expect(result.claimReadyLegal).toBe(false);
   });

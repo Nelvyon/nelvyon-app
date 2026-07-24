@@ -1,5 +1,6 @@
 /**
- * Contract: certified packs are `available`; no remaining "beta" after ADR-050 E2E ALL_PASS.
+ * Contract: certified packs are `available`; new ADR-055 packs may remain `beta`
+ * until staging E2E ALL_PASS (then promote to available).
  */
 import { describe, expect, it } from "vitest";
 import { SERVICE_PACK_CATALOG } from "../servicePacksCatalog";
@@ -18,6 +19,8 @@ const CERTIFIED_PACK_IDS = [
   "brand-voice-pack",
 ] as const;
 
+const PENDING_E2E_BETA_PACK_IDS = ["automations-ops-pack", "reputation-ops-pack"] as const;
+
 describe("servicePacksCatalog availability honesty", () => {
   it("certified packs are available (ADR-050)", () => {
     for (const id of CERTIFIED_PACK_IDS) {
@@ -27,8 +30,16 @@ describe("servicePacksCatalog availability honesty", () => {
     }
   });
 
-  it("no pack remains beta after certification", () => {
-    const betas = SERVICE_PACK_CATALOG.filter((p) => p.availability === "beta");
-    expect(betas.map((p) => p.id)).toEqual([]);
+  it("ADR-055 ops packs stay beta until E2E promotion", () => {
+    for (const id of PENDING_E2E_BETA_PACK_IDS) {
+      const pack = SERVICE_PACK_CATALOG.find((p) => p.id === id);
+      expect(pack, id).toBeDefined();
+      expect(pack!.availability, id).toBe("beta");
+    }
+  });
+
+  it("only ADR-055 pending packs may remain beta", () => {
+    const betas = SERVICE_PACK_CATALOG.filter((p) => p.availability === "beta").map((p) => p.id);
+    expect(betas.sort()).toEqual([...PENDING_E2E_BETA_PACK_IDS].sort());
   });
 });

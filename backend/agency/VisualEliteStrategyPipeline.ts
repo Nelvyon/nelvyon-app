@@ -1,7 +1,8 @@
 /**
- * Visual elite strategy pipeline (ADR-051 extension).
- * Flow: brief → script → storyboard → prompts → variants (2+) → elite visual review
- *       → human approval required → delivery package (strategy_only by default).
+ * Visual elite strategy pipeline (ADR-051 extension, ADR-055 closure).
+ * Flow: brief → creative_direction → script → storyboard → prompts → variants (2+)
+ *       → elite visual review → human approval required → delivery package
+ *       (strategy_only by default).
  *
  * NO spend by default: `NELVYON_VISUAL_GENERATION_ENABLED` stays OFF; `render_approved`
  * mode is only reachable when the flag is explicitly ON (never set in this repo) AND every
@@ -19,6 +20,7 @@ import {
 
 export const VISUAL_ELITE_STRATEGY_FLOW = [
   "brief",
+  "creative_direction",
   "script",
   "storyboard",
   "prompts",
@@ -79,10 +81,18 @@ export type VisualEliteRenderOutcome = {
   license: string | null;
 };
 
+export type VisualEliteCreativeDirection = {
+  moodKeywords: string[];
+  colorDirection: string;
+  toneOfVoice: string;
+  visualDoNots: string[];
+};
+
 export type VisualEliteDeliveryResult = {
   ok: boolean;
   mode: "strategy_only" | "render_approved";
   flow: typeof VISUAL_ELITE_STRATEGY_FLOW;
+  creativeDirection: VisualEliteCreativeDirection;
   script: string;
   storyboard: string[];
   prompts: string[];
@@ -111,6 +121,20 @@ const MEDIOCRE_PATTERNS: readonly RegExp[] = [
 ];
 
 const STORYBOARD_SCENES = ["hook", "problema", "solucion", "cta"] as const;
+
+/**
+ * Creative direction step — runs right after the brief and before script/storyboard,
+ * so every downstream prompt/variant is anchored to an explicit mood/tone/color
+ * direction instead of being improvised ad hoc per variant.
+ */
+function buildCreativeDirection(brief: VisualEliteBrief): VisualEliteCreativeDirection {
+  return {
+    moodKeywords: ["auténtico", "profesional", "cercano", brief.sector.trim().toLowerCase() || "genérico"],
+    colorDirection: "Paleta de marca NELVYON — sin stock genérico, contraste alto para móvil",
+    toneOfVoice: "Directo, sin promesas absolutas, prueba social real",
+    visualDoNots: ["stock photos genéricas", "promesas de resultado garantizado", "texto ilegible en móvil"],
+  };
+}
 
 function buildScript(brief: VisualEliteBrief): string {
   return `${brief.clientName} — ${brief.objective}. Sector: ${brief.sector}.`.slice(0, 500);
@@ -177,6 +201,7 @@ export async function runVisualEliteStrategyPipeline(
   brief: VisualEliteBrief,
 ): Promise<VisualEliteDeliveryResult> {
   const blockers: string[] = [];
+  const creativeDirection = buildCreativeDirection(brief);
   const script = buildScript(brief);
   const storyboard = buildStoryboard();
   const prompts = buildPrompts(brief, storyboard);
@@ -270,6 +295,7 @@ export async function runVisualEliteStrategyPipeline(
     ok,
     mode,
     flow: VISUAL_ELITE_STRATEGY_FLOW,
+    creativeDirection,
     script,
     storyboard,
     prompts,
@@ -288,8 +314,12 @@ export function assertVisualEliteStrategyIntegrity(): { ok: boolean; violations:
   if (isVisualGenerationSpendEnabled()) {
     violations.push("spend_flag_must_be_off_in_repo_default");
   }
-  if (VISUAL_ELITE_STRATEGY_FLOW.length < 8) violations.push("flow_incomplete");
+  if (VISUAL_ELITE_STRATEGY_FLOW.length < 9) violations.push("flow_incomplete");
   if (!VISUAL_ELITE_STRATEGY_FLOW.includes("human_approval")) violations.push("missing_human_approval_step");
   if (!VISUAL_ELITE_STRATEGY_FLOW.includes("elite_visual_review")) violations.push("missing_elite_review_step");
+  if (!VISUAL_ELITE_STRATEGY_FLOW.includes("creative_direction")) violations.push("missing_creative_direction_step");
+  if (VISUAL_ELITE_STRATEGY_FLOW.indexOf("creative_direction") !== VISUAL_ELITE_STRATEGY_FLOW.indexOf("brief") + 1) {
+    violations.push("creative_direction_must_follow_brief");
+  }
   return { ok: violations.length === 0, violations };
 }

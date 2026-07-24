@@ -17,6 +17,8 @@ import {
   STRATEGY_PACK_ID,
   FUNNEL_GROWTH_PACK_ID,
   RETENTION_PACK_ID,
+  AUTOMATIONS_OPS_PACK_ID,
+  REPUTATION_OPS_PACK_ID,
   STRATEGY_PACK_STEP_DEFINITIONS,
   FUNNEL_GROWTH_PACK_STEP_DEFINITIONS,
   RETENTION_PACK_STEP_DEFINITIONS,
@@ -25,6 +27,8 @@ import {
   CRO_AUDIT_PACK_STEP_DEFINITIONS,
   ANALYTICS_SETUP_PACK_STEP_DEFINITIONS,
   BRAND_VOICE_PACK_STEP_DEFINITIONS,
+  AUTOMATIONS_OPS_PACK_STEP_DEFINITIONS,
+  REPUTATION_OPS_PACK_STEP_DEFINITIONS,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -234,6 +238,40 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
       { id: "local", label: "Negocio local" },
     ],
     ...pickOsFields(RETENTION_PACK_ID),
+  },
+  [AUTOMATIONS_OPS_PACK_ID]: {
+    id: AUTOMATIONS_OPS_PACK_ID,
+    name: "Automatizaciones OS",
+    tagline: "Mapa de workflows, playbook de triggers y automatización CRM lista para operar",
+    accent: "from-lime-500/10 via-card to-card",
+    kickoffPath: "/os/packs/automations-ops",
+    reportPath: "/os/packs/automations-ops/report",
+    projectPrefix: "AOP",
+    stepDefinitions: AUTOMATIONS_OPS_PACK_STEP_DEFINITIONS,
+    skuSequence: ["NELVYON-CHATBOT"],
+    sectors: [
+      { id: "local", label: "Negocio local" },
+      { id: "ecommerce", label: "Ecommerce" },
+      { id: "saas_b2b", label: "SaaS B2B" },
+    ],
+    ...pickOsFields(AUTOMATIONS_OPS_PACK_ID),
+  },
+  [REPUTATION_OPS_PACK_ID]: {
+    id: REPUTATION_OPS_PACK_ID,
+    name: "Reputación OS",
+    tagline: "Monitorización de reseñas, plantillas de respuesta y plan de recuperación de reputación",
+    accent: "from-rose-500/10 via-card to-card",
+    kickoffPath: "/os/packs/reputation-ops",
+    reportPath: "/os/packs/reputation-ops/report",
+    projectPrefix: "ROP",
+    stepDefinitions: REPUTATION_OPS_PACK_STEP_DEFINITIONS,
+    skuSequence: ["NELVYON-CHATBOT"],
+    sectors: [
+      { id: "local", label: "Negocio local" },
+      { id: "ecommerce", label: "Ecommerce" },
+      { id: "saas_b2b", label: "SaaS B2B" },
+    ],
+    ...pickOsFields(REPUTATION_OPS_PACK_ID),
   },
 };
 

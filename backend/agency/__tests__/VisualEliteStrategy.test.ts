@@ -30,9 +30,10 @@ describe("Visual elite strategy pipeline (ADR-051 extension, NO spend)", () => {
     delete process.env.NELVYON_VISUAL_GENERATION_ENABLED;
   });
 
-  it("flow always includes elite review + human approval before delivery", () => {
+  it("flow always includes creative direction right after brief, plus elite review + human approval before delivery", () => {
     expect(VISUAL_ELITE_STRATEGY_FLOW).toEqual([
       "brief",
+      "creative_direction",
       "script",
       "storyboard",
       "prompts",
@@ -50,6 +51,8 @@ describe("Visual elite strategy pipeline (ADR-051 extension, NO spend)", () => {
 
     expect(result.ok).toBe(true);
     expect(result.mode).toBe("strategy_only");
+    expect(result.creativeDirection.moodKeywords.length).toBeGreaterThan(0);
+    expect(result.creativeDirection.visualDoNots.length).toBeGreaterThan(0);
     expect(result.variants.length).toBeGreaterThanOrEqual(2);
     expect(result.approvedVariantId).not.toBeNull();
     expect(result.render.costCents).toBe(0);
