@@ -2,6 +2,15 @@ name: Staging Beta Packs E2E
 
 on:
   workflow_dispatch:
+    inputs:
+      only:
+        description: "Pack filter (social|content|cro|analytics|brand) — empty = all 5"
+        required: false
+        default: ""
+      skip_wait:
+        description: "Skip deploy SHA wait"
+        type: boolean
+        default: true
   push:
     branches:
       - main
@@ -19,7 +28,7 @@ concurrency:
 
 jobs:
   beta-packs-e2e:
-    name: Beta packs E2E (5)
+    name: Beta packs E2E
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
@@ -31,5 +40,33 @@ jobs:
 
       - name: Run beta packs E2E smokes
         env:
-          STAGING_BASE_URL: https://nelvyon.com
-        run: node scripts/run-staging-beta-packs-e2e.mjs --skip-wait
+          # Staging only — never production apex for pack E2E
+          STAGING_BASE_URL: https://ideal-victory-staging.up.railway.app
+          STAGING_QA_PASSWORD: ${{ secrets.STAGING_QA_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p .release-logs
+          ARGS=(--skip-wait)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.skip_wait }}" != "true" ]; then
+              ARGS=()
+            fi
+            ONLY="${{ inputs.only }}"
+            if [ -n "${ONLY}" ]; then
+              ARGS+=(--only="${ONLY}")
+            fi
+          fi
+          echo "Running: node scripts/staging-smoke-beta-packs-e2e.mjs ${ARGS[*]}"
+          set +e
+          node scripts/staging-smoke-beta-packs-e2e.mjs "${ARGS[@]}" 2>&1 | tee ".release-logs/beta-packs-e2e-${{ github.run_id }}.txt"
+          code=${PIPESTATUS[0]}
+          set -e
+          exit "$code"
+
+      - name: Upload evidence log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beta-packs-e2e-log
+          path: .release-logs/
+          if-no-files-found: ignore
