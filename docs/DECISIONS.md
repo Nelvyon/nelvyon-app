@@ -586,3 +586,15 @@
 
 ---
 
+## ADR-051 — OS Elite: equipos profesionales, orquestador, OpenClaw OFF, QA élite, Visual OFF
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | (1) Catálogo `OsProfessionalTeams` (globales + especialistas). (2) Flujo `OS_DELIVERABLE_FLOW`. (3) `OsEliteQaPolicy` ≥85 / críticos ≥90. (4) Auditor independiente flag default OFF. (5) Orquestación + OpenClaw coordination fail-closed OFF. (6) `VisualGenerationProvider` OFF sin gasto. (7) No tocar packs certificados ni umbrales. (8) Matriz `OS_ELITE_STATE_MATRIX.md`. |
+| **Por qué** | Agencia autónoma de calidad demostrable sin costes ni mocks. |
+| **Consecuencias** | OpenClaw/orchestrator/visual/auditor = PREPARED_OFF · claimReady BLOCKED_LEGAL. |
+| **Relación** | ADR-045–050 · `packOrchestrator` hook opcional · openclaw/contracts. |
+
+---
+

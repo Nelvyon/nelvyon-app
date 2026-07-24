@@ -10,8 +10,15 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto** — único bloqueo claimReady / READY |
-| **Detalle** | 11 packs OS CERT · ADR-048 · free tools 0 installs |
+| **Estado** | **Abierto** — **BLOCKED_LEGAL** claimReady / READY |
+| **Detalle** | 11 packs CERT · ADR-051 OpenClaw OFF · 0 costes |
+
+### Ops (no KI) — OpenClaw live
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **BLOCKED_CEO** / PREPARED_OFF |
+| **Detalle** | Requiere autorización CEO + SM + evidencia · flag default 0 |
 
 ---
 

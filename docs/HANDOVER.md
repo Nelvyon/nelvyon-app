@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-24** — 11 packs OS CERT · ADR-048 REJECT · `claimReady: false`
+> Última actualización: **2026-07-24** — OS Elite equipos + OpenClaw OFF (ADR-051) · `claimReady: false`
 
 ---
 
@@ -10,30 +10,28 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** (no READY) |
-| **Tip / staging** | runtime `eb462545` · docs tip `bcbd6830` |
-| **Certificados** | 3 growth + strategy/funnel/retention + 5 (social/content/cro/analytics/brand) |
-| **BETA** | ninguno |
-| **ADR-048** | REJECT/DEFER Matomo/Umami · 0 installs |
+| **Packs OS** | 11 **IMPLEMENTED_VERIFIED** (intactos) |
+| **Equipos profesionales** | Catálogo código `OsProfessionalTeams` · ADR-051 |
+| **OpenClaw / Orchestrator / Visual spend** | **PREPARED_OFF** |
+| **claimReady** | **false** — **BLOCKED_LEGAL** campañas |
 | **Prod IA** | OFF/ABSENT |
-| **claimReady** | **false** — legal campañas |
 
-### Evidencia
+### Matriz SSOT
 
-| Bloque | Log |
-|--------|-----|
-| beta ×5 | `.release-logs/beta-packs-e2e-2026-07-24T13-42-38.txt` ALL_PASS |
+`docs/OS_ELITE_STATE_MATRIX.md`
 
 ### Rollback
 
-`NELVYON_AI_ENABLED=0` · `OLLAMA_CONFIGURED=0`
+`NELVYON_OPENCLAW_BRIDGE_ENABLED=0` · `NELVYON_ORCHESTRATOR_ENABLED=0` · `NELVYON_PACK_INDEPENDENT_AUDITOR=0` · `NELVYON_VISUAL_GENERATION_ENABLED=0` · `NELVYON_AI_ENABLED=0` · `OLLAMA_CONFIGURED=0`
 
 ---
 
 ## Próximo paso EXACTO
 
-1. **Legal:** checklist campañas (único bloqueo claimReady / READY).  
-2. Push tip promote docs/registry → confirmar staging SHA.  
-3. **No** instalar Matomo/Umami ni tools nuevas.  
-4. **No** activar IA/mesh/OpenAI/MCP/SM/payouts/campañas en prod sin CEO.
+1. **Legal:** checklist campañas (bloquea claimReady / READY).  
+2. **CEO:** si se desea OpenClaw live → autorización explícita + SM ON + ADR + evidencia staging (hoy **BLOCKED_CEO**).  
+3. Opcional staging: soak `NELVYON_PACK_INDEPENDENT_AUDITOR=1` sin bajar QA.  
+4. **No** activar OpenAI/MCP/SM/payouts/campañas/visual spend en prod.  
+5. **No** romper packs certificados.
 
-SSOT: `OS_UNIVERSAL_SERVICE_CATALOG.md` · ADR-048 · ADR-050 · `CTO_FINAL_VERIFY.md`
+SSOT: `OS_ELITE_STATE_MATRIX.md` · ADR-051 · `CTO_FINAL_VERIFY.md`

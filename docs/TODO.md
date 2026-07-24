@@ -36,8 +36,10 @@
 - [x] E2E mesh Strategy/Funnel/Retention → ALL_PASS → IMPLEMENTED_VERIFIED
 - [x] ADR-048: REJECT/DEFER Matomo/Umami (0 installs)
 - [x] Certificar 5 packs (social/content/cro/analytics/brand) → ALL_PASS → available
+- [x] ADR-051: equipos profesionales + QA élite + OpenClaw/Visual OFF
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
-- [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts en prod sin CEO
+- [ ] CEO: autorización OpenClaw live (hoy BLOCKED_CEO) si se requiere
+- [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts/campañas/visual spend en prod
 
 - [ ] No instalar Helio/Mautic/Twenty/n8n/Listmonk sin necesidad
 - [ ] Ops: Router remoto soak mesh (opcional)

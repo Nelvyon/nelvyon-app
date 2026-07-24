@@ -711,7 +711,35 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
         : Math.round(skuResults.reduce((a, r) => a + r.qa_score, 0) / skuResults.length);
     const hardReview = rawAvgQa < autoPublishThreshold;
     const softReview = skuResults.some((r) => skuNeedsSoftReview(r));
-    const needsReview = hardReview || softReview;
+
+    // Optional independent auditor (ADR-051) — default OFF; does not change cert path.
+    let auditorBlock = false;
+    try {
+      const { runIndependentAuditor } = await import(
+        "../../../../../backend/agency/OsIndependentAuditor"
+      );
+      const audit = runIndependentAuditor({
+        packId: meta.id,
+        packRunId: run.id,
+        workspaceId: params.workspaceId,
+        avgQaScore: rawAvgQa,
+        critical: true,
+        containsMockUrl: false,
+      });
+      auditorBlock = audit.blockPublish;
+      if (audit.enabled && !audit.skipped) {
+        steps = markStep(
+          steps,
+          "complete",
+          audit.blockPublish ? "failed" : "running",
+          audit.reason.slice(0, 180),
+        );
+      }
+    } catch {
+      /* auditor module optional */
+    }
+
+    const needsReview = hardReview || softReview || auditorBlock;
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
 

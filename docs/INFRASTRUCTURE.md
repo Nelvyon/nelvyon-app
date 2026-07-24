@@ -18,7 +18,8 @@
 | **Railway staging** | ✅ mesh | 11 packs OS E2E ALL_PASS · ADR-048 no Matomo/Umami |
 | **Ollama** | ✅ local mesh | Tailscale only · no public port |
 | **OpenAI** | ❌ | ABSENT prod |
-| **OSS tools externos** | ❌ no install | Ver `FREE_TOOLS_EVALUATION.md` |
+| **OSS tools externos** | ❌ no install | ADR-048 Matomo/Umami REJECT |
+| **OpenClaw / Visual spend** | ❌ OFF | ADR-051 PREPARED_OFF |
 | **Costes** | **0** | |
 
 ---

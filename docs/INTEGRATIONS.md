@@ -10,8 +10,9 @@
 | Ítem | Estado |
 |------|--------|
 | OpenAI | allow **0** · revoked |
-| Mesh Option A | Ollama privado PASS · Pack E2E ALL_PASS · ADR-044–050 |
-| Analytics self-host | **REJECT/DEFER** Matomo/Umami |
+| Mesh Option A | Ollama privado PASS · Pack E2E ALL_PASS · ADR-044–051 |
+| OpenClaw | **PREPARED_OFF** · coordination rules fail-closed |
+| Visual generation spend | **PREPARED_OFF** · `VisualGenerationProvider` |
 
 ---
 
