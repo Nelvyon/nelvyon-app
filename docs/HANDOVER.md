@@ -10,7 +10,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** (**NOT READY** · no claimReady · no prod) |
-| **Tip / deploy staging** | **`fd81c8bc`** · deploy en curso/SUCCESS ver DEPLOYMENTS · https://ideal-victory-staging.up.railway.app |
+| **Tip / deploy staging** | tip **`fd81c8bc`** (docs `823159f2`) · deploy **`4dff8950` SUCCESS** · https://ideal-victory-staging.up.railway.app |
 | **Tests locales** | agency **109 PASS** · tsc **0** · P0/P1 suites **PASS** · eslint rutas tocadas **0** |
 | **13 packs + auditor** | **ALL_PASS** ADR-055 (staging) |
 | **P0 corregido** | `launchCampania` bloqueado si `claimReadyLegal=false` |
