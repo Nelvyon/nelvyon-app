@@ -68,7 +68,7 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
 | Beta packs → available | ✅ | 5 packs E2E ALL_PASS · ADR-050 · catalog available |
-| Agencia OS unificada élite (ops) | ✅ | ADR-055 E2E PASS · 13 packs+auditor staging · tip `53149384` |
+| Agencia OS unificada élite (ops) | ✅ | ADR-055 E2E PASS staging runtime · ADR-056 P0/P1 audit fixes local · tip TBA (base `6364c28c`) |
 | Redes sociales integral por cliente | ✅ | ADR-052/054 |
 | Auditor independiente staging | ✅ | 13 packs E2E + session PASS/REJECT/repair |
 | OpenClaw staging_mock | 🟡 | ADR-055 deepened · prod canary doc PENDING_CEO |
@@ -77,7 +77,8 @@
 | SM/MCP synthetic staging harness | ✅ | flags ON staging · productivo 0 · harness unit tests PASS · smoke Windows fix |
 | Visual élite strategy_only | ✅ | creative_direction + decision matrix · spend OFF |
 | Social oficial NELVYON | 🟡 | PREPARED_OFF · NelvyonOfficialSocialOps · checklist CEO |
-| Legal campañas + Pepito dossier | 🟡 | gate reforzado · claimReadyLegal hard-false · LEGAL BLOCKED |
+| Legal campañas + Pepito dossier | 🟡 | gate reforzado · claimReadyLegal hard-false · LEGAL BLOCKED · ADR-056 P0 campaign launch block |
+| ADR-056 elite absolute audit | 🟡 | P0/P1 fixes local uncommitted · tip TBA · staging runtime ADR-055 · NOT READY |
 
 ---
 

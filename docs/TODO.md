@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-24** — ADR-055 E2E PASS · tip `53149384` · deploy `e514bbd7` · CONDITIONAL_READY · claimReady false · NOT READY
+> Actualizado: **2026-07-24** — ADR-056 elite absolute audit · **AUDIT_FIXES_LOCAL** · tip TBA (base `6364c28c`) · runtime staging ADR-055 `53149384` · CONDITIONAL_READY · claimReady false · NOT READY
 
 ---
 
@@ -43,6 +43,7 @@
 - [x] CEO closure pack: Visual élite (NO spend) + Social oficial NELVYON (prep) + Legal gate campañas + Catalog v1.1.0 + OpenClaw teamAssignments — vitest 43/43 PASS
 - [x] ADR-055 local: automations/reputation packs wired beta · catalog 1.2.0 · NelvyonOfficialSocialOps · SM/MCP synthetic harness · legal Pepito dossier · OpenClaw canary doc · agency 64+ PASS · tsc 0
 - [x] ADR-055 deploy staging `ideal-victory` · tip `53149384` · deploy `e514bbd7` SUCCESS
+- [x] ADR-056 elite absolute audit: P0 campaign launch block (`getCampaignLaunchBlockReason`) · P1 chat/ai-copy `isOpenAiSpendAllowed` · mcp.write honesty · shared-memory scopes split · meta-ads-pack beta OAuth OFF · agency **109 PASS** · tsc **0** · eslint changed routes **0** · prod flag read ABSENT · fixes **uncommitted** (tip TBA)
 - [x] Ops: staging flags `NELVYON_SHARED_MEMORY_STAGING=1` + `NELVYON_MCP_STAGING_SYNTHETIC=1` (productivo SM/MCP **0**)
 - [x] Ops: E2E staging `automations-ops-pack` + `reputation-ops-pack` → **ALL_PASS** · evidencia `automations_reputation_e2e_latest.md`
 - [ ] CEO: abrir/conectar 8 cuentas sociales oficiales NELVYON (`docs/ops/NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md`)

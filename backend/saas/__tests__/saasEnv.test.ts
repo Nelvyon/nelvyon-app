@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import {
   isOpenAiEnvConfigured,
+  isOpenAiSpendAllowed,
   isPackLlmEnvConfigured,
   isSesEnvConfigured,
   isStripeEnvConfigured,
@@ -22,6 +23,24 @@ describe("saasEnv connector readiness", () => {
     expect(isOpenAiEnvConfigured()).toBe(false);
     process.env.OPENAI_API_KEY = "sk-test";
     expect(isOpenAiEnvConfigured()).toBe(true);
+  });
+
+  it("isOpenAiSpendAllowed denies spend when AUTONOMOUS_ALLOW_OPENAI is unset, even with a valid key", () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    delete process.env.AUTONOMOUS_ALLOW_OPENAI;
+    expect(isOpenAiSpendAllowed()).toBe(false);
+  });
+
+  it("isOpenAiSpendAllowed denies spend when the key is missing, even with the flag on", () => {
+    delete process.env.OPENAI_API_KEY;
+    process.env.AUTONOMOUS_ALLOW_OPENAI = "1";
+    expect(isOpenAiSpendAllowed()).toBe(false);
+  });
+
+  it("isOpenAiSpendAllowed allows spend only when both the flag and key are set", () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.AUTONOMOUS_ALLOW_OPENAI = "1";
+    expect(isOpenAiSpendAllowed()).toBe(true);
   });
 
   it("isSesEnvConfigured requires all SES keys", () => {

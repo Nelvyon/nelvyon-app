@@ -1,12 +1,21 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-24**
+> Registrar cada deploy significativo. Actualizado: **2026-07-24** (ADR-056 audit). No borrar entradas. Añadir al inicio.
 
----
+## 2026-07-24 — ADR-056 elite absolute audit (local fixes · deploy pending)
 
-# DEPLOYMENTS — Historial de despliegues
-
-> No borrar entradas. Añadir al inicio.
+| Campo | Valor |
+|-------|-------|
+| **Env** | local fixes · staging runtime unchanged |
+| **Tip / live** | **TBA** (ADR-056 fixes uncommitted · base **`6364c28c`**) · runtime staging still ADR-055 **`53149384`** |
+| **Deploy staging** | **`e514bbd7`** SUCCESS (ADR-055 lineage · no redeploy yet) |
+| **P0 fix** | Campaign launch blocked by `getCampaignLaunchBlockReason` while `claimReadyLegal=false` (test bypass only) |
+| **P1 fixes** | `isOpenAiSpendAllowed` gates chat+ai-copy · `mcp.write` no longer invented · shared-memory scopes split · `meta-ads-pack` → beta OAuth OFF |
+| **Tests** | tsc **0** · CampaignsLegal+saasCampanias+saasEnv+mcpProductive+catalog availability **PASS** · agency **109 PASS** · eslint changed routes **0** |
+| **Staging flags** | `ideal-victory` Online · `AI_ENABLED=1` · `OLLAMA_HOST` Tailscale CGNAT private · `AUTONOMOUS_ALLOW_OPENAI=0` · MCP/SM productivo=0 · VISUAL=0 |
+| **Prod flag read** | Railway briefly switched · `NELVYON_*` OpenAI/MCP/SM/OpenClaw/visual **ABSENT** · restored to staging + re-linked `ideal-victory` |
+| **Pepito** | untouched |
+| **claimReady** | **false** · **NOT READY** · **AUDIT_FIXES_LOCAL** |
 
 ## 2026-07-24 — ADR-055 E2E PASS (staging)
 

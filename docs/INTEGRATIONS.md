@@ -1,16 +1,16 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-24**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
+> Actualizado: **2026-07-24** (ADR-056 elite absolute audit). **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas (dossier Pepito + licencia escrita). Prod IA **ABSENT**. Staging live ADR-055: 13 packs+auditor ALL_PASS · automations/reputation E2E ALL_PASS · SM/MCP synthetic ON. SSOT: `OS_CATALOG_V1.md` v1.2.0.
+**Bloqueadores go-live:** legal campañas (dossier Pepito + licencia escrita · mass-send blocked). Prod IA **ABSENT** (flag read verified ADR-056). Staging runtime ADR-055: 13 packs+auditor ALL_PASS · automations/reputation E2E ALL_PASS · SM/MCP synthetic ON. ADR-056 P0/P1 fixes **local uncommitted**. SSOT: `OS_CATALOG_V1.md` v1.2.0.
 
 ### Auth bridge Web ↔ FastAPI
 
 | Ítem | Estado |
 |------|--------|
-| OpenAI | allow **0** |
-| Mesh / packs | E2E ALL_PASS ADR-055 staging live (13 packs) · tip `53149384` |
+| OpenAI | allow **0** · ADR-056: `isOpenAiSpendAllowed` gates chat+ai-copy |
+| Mesh / packs | E2E ALL_PASS ADR-055 staging runtime (13 packs) · tip `53149384` · ADR-056 meta-ads-pack beta OAuth OFF |
 | OpenClaw | staging_mock ON · prod canary **PENDING_CEO** |
 | Auditor | staging ON · prod OFF |
 | Visual spend | **OFF** · creative_direction + decision matrix |
@@ -18,7 +18,8 @@
 | Social oficial NELVYON | **PREPARED_OFF** · `NelvyonOfficialSocialOps` · 8 cuentas PENDING_CEO |
 | SM/MCP productivo | **OFF** (0) |
 | SM/MCP synthetic staging | **ON** · `NELVYON_SHARED_MEMORY_STAGING=1` + `NELVYON_MCP_STAGING_SYNTHETIC=1` · harness unit tests PASS · no implica SM/MCP productivo |
-| Datos Pepito / company DB campañas | **forbidden** · BLOQUEADO_LEGAL · `DATOS_PEPITO_LICENSE_DOSSIER` |
+| Datos Pepito / company DB campañas | **forbidden** · BLOQUEADO_LEGAL · `DATOS_PEPITO_LICENSE_DOSSIER` · ADR-056 P0 launch block |
+| Campaign mass-send | **legally blocked** · `getCampaignLaunchBlockReason` while `claimReadyLegal=false` |
 
 ---
 
@@ -44,8 +45,8 @@
 
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
-| **Google Ads** | 🟡 | `GOOGLE_ADS_*`, OAuth `GOOGLE_CLIENT_ID/SECRET` | `GoogleAdsService.ts` |
-| **Meta Ads** | 🟡 | `META_*`, `META_ACCESS_TOKEN`, `META_WA_*` | `MetaAdsService.ts` |
+| **Google Ads** | 🟡 | `GOOGLE_ADS_*`, OAuth `GOOGLE_CLIENT_ID/SECRET` | `GoogleAdsService.ts` · **no live OAuth spend path** (ADR-056) |
+| **Meta Ads** | 🟡 | `META_*`, `META_ACCESS_TOKEN`, `META_WA_*` | `MetaAdsService.ts` · **no live OAuth spend path** · `meta-ads-pack` beta OAuth OFF |
 | **LinkedIn Ads** | 🟡 | `LINKEDIN_CLIENT_ID/SECRET` | `LinkedInAdsService.ts` |
 | **TikTok Ads** | 🟡 | `TIKTOK_APP_ID/SECRET`, `TIKTOK_ACCESS_TOKEN` | `TikTokAdsService.ts` |
 | Snapchat | 🟡 | `SNAPCHAT_*` | Catálogo |
@@ -69,7 +70,7 @@
 |-------------|--------|-----------|-------|
 | **WhatsApp Business** | 🟡 | `META_WA_PHONE_NUMBER_ID`, `META_WA_ACCESS_TOKEN`, `META_WA_VERIFY_TOKEN` | Cloud API |
 | **Telegram** | 🟡 | Bot token por usuario en `integration_telegram` | `TelegramService.ts` |
-| Twilio SMS | 🟡 | `TWILIO_*` | Dialer/inbox |
+| Twilio SMS | 🟡 | `TWILIO_*` | Dialer/inbox · **no GHL native telephony dialer parity** |
 | **Discord** | ❌ | — | Solo copy agentes OS |
 | **Slack** | 🟡 | Workflow `notify_slack`; approval channels API | Sin OAuth service dedicado |
 
@@ -102,14 +103,14 @@
 
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
-| OpenAI | 🟡 | `OPENAI_API_KEY` + `AUTONOMOUS_ALLOW_OPENAI=1` | **OFF default.** Autonomous + OS `LlmClient` (ADR-034): opt-in only; PRIVATE_MODE blocks egress. Ollama primary. |
+| OpenAI | 🟡 | `OPENAI_API_KEY` + `AUTONOMOUS_ALLOW_OPENAI=1` | **OFF default.** ADR-056: `isOpenAiSpendAllowed` gates chat+ai-copy. Autonomous + OS `LlmClient` (ADR-034): opt-in only; PRIVATE_MODE blocks egress. Ollama primary. |
 | Anthropic | 🟡 | `ANTHROPIC_API_KEY` | Private AI provider |
-| Ollama (local) | ✅ | `OLLAMA_HOST` / `:11434` · `OLLAMA_STRATEGY_MODEL` | Primary autonomous/OS path. Quality routing opt-in: `AUTONOMOUS_QUALITY_ROUTING=1` (ADR-036). **Prohibido** staging→`localhost` PC. Mesh: ver `ARCHITECTURE_LOCAL_AI_RUNTIME.md` (no activado). |
+| Ollama (local) | ✅ | `OLLAMA_HOST` / `:11434` · `OLLAMA_STRATEGY_MODEL` | Primary autonomous/OS path. Staging: `http://100.102.207.30:11434` (Tailscale CGNAT private — not public). Quality routing opt-in: `AUTONOMOUS_QUALITY_ROUTING=1` (ADR-036). **Prohibido** staging→`localhost` PC. Mesh: ver `ARCHITECTURE_LOCAL_AI_RUNTIME.md`. |
 | Local-ai Postgres/pgvector | 🟡 | Compose `127.0.0.1:5434` | Ingest **verified** hist. · Docker **DOWN** 2026-07-22 (HTTP pack E2E BLOCKED) |
-| **MCP Productivo** | ✅ | `NELVYON_MCP_PRODUCTIVE_ENABLED` | `/api/saas/mcp` — **CERTIFIED** (`mcp_certification_final.json`) · **OFF** en runtime |
+| **MCP Productivo** | ✅ | `NELVYON_MCP_PRODUCTIVE_ENABLED` | `/api/saas/mcp` — **CERTIFIED** (`mcp_certification_final.json`) · **OFF** en runtime · ADR-056: `mcp.write` no longer invented |
 | **MCP Staging synthetic** | ✅ | `NELVYON_MCP_STAGING_SYNTHETIC` | ADR-055 harness · flags **ON** staging · productivo **0** · harness unit tests PASS |
 | **OpenClaw** | 🟡 | `NELVYON_OPENCLAW_BRIDGE_*` + Memory | staging_mock deepened · prod canary PENDING_CEO |
-| **Shared Memory productivo** | 🟡 | `NELVYON_SHARED_MEMORY_ENABLED` | Flag **OFF** default · schema 514/515 verified staging |
+| **Shared Memory productivo** | 🟡 | `NELVYON_SHARED_MEMORY_ENABLED` | Flag **OFF** default · schema 514/515 verified staging · ADR-056: scopes split |
 | **Shared Memory staging synthetic** | ✅ | `NELVYON_SHARED_MEMORY_STAGING` | ADR-055 harness · flags **ON** staging · productivo **0** · no implica SM productiva |
 
 ---

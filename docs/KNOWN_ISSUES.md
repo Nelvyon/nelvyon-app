@@ -11,7 +11,14 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — **BLOCKED_LEGAL** claimReady / READY |
-| **Detalle** | Gate reforzado ADR-055 · `DATOS_PEPITO_LICENSE_DOSSIER.md` · `claimReadyLegal` hard-false · Pepito **forbidden** · falta confirmación escrita + licencia comercial |
+| **Detalle** | Gate reforzado ADR-055/056 · `DATOS_PEPITO_LICENSE_DOSSIER.md` · `claimReadyLegal` hard-false · Pepito **forbidden** · falta confirmación escrita + licencia comercial · ADR-056 P0: campaign launch blocked by `getCampaignLaunchBlockReason` (test bypass only) · mass-send **legally blocked** |
+
+### Ops (no KI) — Ads OAuth spend path
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **BLOCKED_EXTERNAL** |
+| **Detalle** | No live Meta/Google Ads OAuth spend path · `meta-ads-pack` → beta **OAuth OFF** (ADR-056) |
 
 ### Ops (no KI) — Social oficial NELVYON
 
@@ -30,6 +37,14 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — ADR-056 P0/P1 audit fixes (local · deploy pending)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-24 (código local) |
+| **Evidencia** | base tip **`6364c28c`** · tsc **0** · agency **109 PASS** · CampaignsLegal+saasCampanias+saasEnv+mcpProductive+catalog availability **PASS** · eslint changed routes **0** |
+| **Nota** | Fixes **uncommitted** · tip TBA · staging runtime still ADR-055 `53149384` |
 
 ### Ops — ADR-055 E2E PASS (automations/reputation + SM/MCP synthetic)
 

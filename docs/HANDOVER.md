@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-24** — ADR-055 E2E PASS · tip **`53149384`** · deploy **`e514bbd7`** · `claimReady: false`
+> Última actualización: **2026-07-24** — ADR-056 elite absolute audit · **AUDIT_FIXES_LOCAL** · tip pending push of ADR-056 fixes · base tip **`6364c28c`** / runtime staging still ADR-055 lineage · `claimReady: false`
 
 ---
 
@@ -9,23 +9,24 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** (**NOT READY** · no claimReady · no prod) |
-| **Tip / deploy staging** | **`53149384`** · deploy **`e514bbd7`** SUCCESS · https://ideal-victory-staging.up.railway.app |
-| **Tests locales** | agency **64+ PASS** · tsc **0** · SM/MCP harness unit tests **PASS** |
-| **13 packs + auditor (staging live)** | **ALL_PASS** ADR-055 (11 ADR-054 + automations + reputation) |
-| **Packs ADR-055 E2E** | `automations-ops-pack` + `reputation-ops-pack` **ALL_PASS** · 6 entregables/pack · auto-approve |
+| **Estado** | **AUDIT_FIXES_LOCAL** · **CONDITIONAL_READY** (**NOT READY** · no claimReady · no prod) |
+| **Tip / deploy staging** | **TBA** (ADR-056 fixes uncommitted · base **`6364c28c`**) · runtime staging still ADR-055 **`53149384`** · deploy **`e514bbd7`** SUCCESS · https://ideal-victory-staging.up.railway.app |
+| **Tests locales** | agency **109 PASS** · tsc **0** · CampaignsLegal+saasCampanias+saasEnv+mcpProductive+catalog availability **PASS** · eslint changed routes **0** |
+| **13 packs + auditor (staging live)** | **ALL_PASS** ADR-055 (11 ADR-054 + automations + reputation) — runtime unchanged pending ADR-056 deploy |
+| **P0 audit fix (local)** | Campaign launch blocked by `getCampaignLaunchBlockReason` while `claimReadyLegal=false` (test bypass only) |
+| **P1 audit fixes (local)** | `isOpenAiSpendAllowed` gates chat+ai-copy · `mcp.write` no longer invented · shared-memory scopes split · `meta-ads-pack` → beta **OAuth OFF** |
 | **Catalog** | **v1.2.0** (`OS_CATALOG_V1_VERSION`) · automations · reputation · sm_mcp_synthetic_staging → **IMPLEMENTED_VERIFIED (staging)** |
 | **OpenClaw** | staging_mock deepened · prod canary doc **`PENDING_CEO`** |
 | **Visual** | `creative_direction` + `VISUAL_PROVIDER_DECISION_MATRIX` · spend **OFF** |
 | **Social oficial NELVYON** | **PREPARED_OFF** · `NelvyonOfficialSocialOps` · 8 cuentas **PENDING_CEO** |
-| **SM / MCP** | staging synthetic flags **ON** (`NELVYON_SHARED_MEMORY_STAGING=1` · `NELVYON_MCP_STAGING_SYNTHETIC=1`) · productivo **0** · smoke script Windows fix |
-| **Legal campañas** | gate reforzado · `DATOS_PEPITO_LICENSE_DOSSIER` · `claimReadyLegal=false` · Pepito **forbidden** · no campañas |
-| **Staging URL** | https://ideal-victory-staging.up.railway.app |
-| **Prod** | untouched · OpenAI/payouts/campaigns/visual spend/OpenClaw prod **OFF** |
+| **SM / MCP** | staging synthetic flags **ON** · productivo **0** · `OLLAMA_HOST=http://100.102.207.30:11434` (Tailscale CGNAT private — not public) |
+| **Legal campañas** | gate reforzado · `DATOS_PEPITO_LICENSE_DOSSIER` · `claimReadyLegal=false` · Pepito **forbidden** · mass-send **legally blocked** |
+| **Staging URL** | https://ideal-victory-staging.up.railway.app · `ideal-victory` Online · `AI_ENABLED=1` staging only · `AUTONOMOUS_ALLOW_OPENAI=0` |
+| **Prod** | untouched · Railway briefly switched for flag read — `NELVYON_*` OpenAI/MCP/SM/OpenClaw/visual vars **ABSENT** (default OFF) · restored to staging + re-linked `ideal-victory` |
 
 ### Evidencia
 
-`scripts/docs/evidence/os-saas-e2e/modules/automations_reputation_e2e_latest.md` (ADR-055 E2E)  
+`scripts/docs/evidence/os-saas-e2e/modules/automations_reputation_e2e_latest.md` (ADR-055 E2E · staging runtime)  
 `scripts/docs/evidence/os-saas-e2e/modules/auditor.all_packs_e2e_latest.md` (ADR-054 staging)  
 `docs/ops/NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md`  
 `docs/ops/CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`  
@@ -59,4 +60,4 @@ NELVYON_CEO_PARTNER_PAYOUTS=0
 3. **CEO:** revisar solicitud OpenClaw prod canary — `docs/ops/CEO_OPENCLAW_PROD_CANARY_REQUEST.md` (**PENDING_CEO**).  
 4. **No** READY · **no** prod OpenClaw/OpenAI/MCP productivo/SM productiva/payouts/campañas/visual spend.
 
-SSOT: `OS_ELITE_STATE_MATRIX.md` · `OS_CATALOG_V1.md` · ADR-055
+SSOT: `OS_ELITE_STATE_MATRIX.md` · `OS_CATALOG_V1.md` · ADR-056

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import {
   isOpenAiEnvConfigured,
+  isOpenAiSpendAllowed,
   requireSaasContext,
   saasErrorBody,
   saasErrorStatus,
@@ -50,6 +51,7 @@ export async function GET(req: Request) {
       types: COPY_TYPES,
       tones: ["formal", "casual", "urgente", "inspirador"],
       openai_configured: isOpenAiEnvConfigured(),
+      openai_spend_allowed: isOpenAiSpendAllowed(),
       company: ctx.tenant.companyName ?? null,
     });
   } catch (e: unknown) {
@@ -71,6 +73,15 @@ export async function POST(req: Request) {
         {
           error: "OpenAI no configurado. Configura OPENAI_API_KEY en el servidor.",
           code: "missing_openai",
+        },
+        { status: 503 },
+      );
+    }
+    if (!isOpenAiSpendAllowed()) {
+      return NextResponse.json(
+        {
+          error: "Gasto OpenAI deshabilitado. Requiere AUTONOMOUS_ALLOW_OPENAI=1.",
+          code: "openai_spend_disabled",
         },
         { status: 503 },
       );

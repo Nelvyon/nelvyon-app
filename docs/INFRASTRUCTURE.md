@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-24**. Sin secretos.
+> Estado real documentado **2026-07-24** (ADR-056 elite absolute audit). Sin secretos.
 
 ---
 
@@ -14,8 +14,8 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | 🟡 | Desktop often DOWN for restore drill |
-| **Railway prod** | ✅ | `@nelvyon/web` · IA/mesh/OpenAI keys **ABSENT** |
-| **Railway staging** | ✅ | live ADR-055 **`53149384`** · deploy **`e514bbd7`** SUCCESS · https://ideal-victory-staging.up.railway.app |
+| **Railway prod** | ✅ | `@nelvyon/web` · IA/mesh/OpenAI keys **ABSENT** · ADR-056 flag read verified (brief switch, restored) |
+| **Railway staging** | ✅ | `ideal-victory` Online · runtime ADR-055 **`53149384`** · deploy **`e514bbd7`** SUCCESS · ADR-056 fixes **uncommitted** (tip TBA · base `6364c28c`) · https://ideal-victory-staging.up.railway.app |
 | **OpenClaw** | ✅ staging_mock / ❌ prod | ADR-055 deepened · canary doc PENDING_CEO |
 | **Auditor** | ✅ staging / ❌ prod | ADR-055 live (13 packs) |
 | **SM/MCP synthetic** | ✅ staging | flags **ON** · productivo **0** · harness unit tests PASS · smoke Windows fix |
@@ -68,7 +68,7 @@ healthcheckPath = "/api/health/live"
 |-----|-------------------|
 | `git` | ✅ |
 | `gh` | ❌ opcional |
-| `railway` | ❌ opcional — Bloque 2: CLI temporal staging → repair `400a`+`401` → FATAL @402 → **restaurado a production** / `@nelvyon/web` |
+| `railway` | ❌ opcional — ADR-056: CLI briefly switched to prod for flag read (`NELVYON_*` ABSENT) → **restored to staging** / re-linked `ideal-victory` |
 | `supabase` | ❌ opcional |
 | `wrangler` | ❌ opcional (Cloudflare) |
 
@@ -94,13 +94,16 @@ GitHub Actions cron → POST /api/cron/* + CRON_SECRET
 
 ---
 
-## ADR-055 — flags staging (synthetic SM/MCP)
+## ADR-055/056 — flags staging (synthetic SM/MCP + Ollama mesh)
 
 > Staging URL: https://ideal-victory-staging.up.railway.app  
-> **Live hoy:** ADR-055 (`53149384`) · deploy **`e514bbd7`** SUCCESS.
+> **Runtime hoy:** ADR-055 (`53149384`) · deploy **`e514bbd7`** SUCCESS · ADR-056 code fixes **local uncommitted**.  
+> **Ollama:** `OLLAMA_HOST=http://100.102.207.30:11434` — Tailscale CGNAT private IP (**not public**).
 
 | Flag | Staging live | Prod |
 |------|--------------|------|
+| `AI_ENABLED` | **1** (staging only) | ABSENT/OFF |
+| `OLLAMA_HOST` | `http://100.102.207.30:11434` (Tailscale private) | ABSENT |
 | `NELVYON_PACK_INDEPENDENT_AUDITOR` | 1 | 0 |
 | `NELVYON_OPENCLAW_BRIDGE_ENABLED` + `NELVYON_OPENCLAW_STAGING_MODE` | 1 | 0 |
 | `NELVYON_SHARED_MEMORY_STAGING` | **1** | 0 |

@@ -1,8 +1,17 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-24 — ADR-055 E2E PASS · **sin migración nueva** (packs/gates/harness código only) · tip `53149384`
+> Actualizado: 2026-07-24 — ADR-056 elite absolute audit · **sin migración nueva** · tip TBA (base `6364c28c`) · runtime staging ADR-055 `53149384`
 
 ---
+
+## ADR-056 — notas schema
+
+| Campo | Valor |
+|-------|-------|
+| **Migración nueva** | **No** — última sigue `518_workflows_list_columns.sql` |
+| **Cambios código** | P0 campaign launch block · P1 chat/ai-copy OpenAI gate · mcp.write honesty · shared-memory scopes · meta-ads-pack beta — **sin cambios schema** |
+| **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` en código · **untouched** ADR-056 |
+| **E2E verificado (staging runtime)** | tip `53149384` · deploy `e514bbd7` · automations/reputation ALL_PASS · sin cambios schema |
 
 ## ADR-055 — notas schema
 

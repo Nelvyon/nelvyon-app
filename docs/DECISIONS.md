@@ -647,3 +647,16 @@
 
 ---
 
+## ADR-056 — Elite absolute audit (P0/P1 honesty fixes)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | (1) **P0:** Block campaign mass-send via `getCampaignLaunchBlockReason` while `claimReadyLegal=false` (test bypass only). (2) **P1:** Gate chat+ai-copy spend with `isOpenAiSpendAllowed`; stop inventing `mcp.write`; split shared-memory scopes; demote `meta-ads-pack` to beta **OAuth OFF**. (3) Prod flag read: confirm `NELVYON_*` OpenAI/MCP/SM/OpenClaw/visual vars **ABSENT** (default OFF) — Railway briefly switched, restored to staging. (4) No READY · no competitive superiority claims · Pepito untouched. |
+| **Por qué** | Close demonstrable P0/P1 honesty gaps without false READY or prod activation. |
+| **Evidencia** | base tip **`6364c28c`** · fixes **uncommitted** (tip TBA pending parent push) · runtime staging still ADR-055 **`53149384`** · tsc **0** · CampaignsLegal+saasCampanias+saasEnv+mcpProductive+catalog availability **PASS** · agency **109 PASS** · eslint changed routes **0** · staging `ideal-victory` Online · `OLLAMA_HOST=http://100.102.207.30:11434` (Tailscale CGNAT private) · `AUTONOMOUS_ALLOW_OPENAI=0` · MCP/SM productivo=0 · VISUAL=0 · `AI_ENABLED=1` staging only |
+| **Consecuencias** | **AUDIT_FIXES_LOCAL** · **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` · competitive honesty gaps documented (no Meta/Google Ads OAuth spend path · no GHL telephony dialer parity · no Odoo ERP/accounting/manufacturing · campaign mass-send legally blocked · official social accounts pending CEO · no proven multi-tenant production customer outcomes in this audit). |
+| **Relación** | ADR-055 · `CampaignsLegalTechnicalGate` · `SaasCampaniasService` · `SaasMcpProductiveService` · shared-memory routes · `servicePacksCatalog`. |
+
+---
+

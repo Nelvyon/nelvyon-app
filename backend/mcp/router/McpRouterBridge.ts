@@ -76,7 +76,9 @@ export async function executeRouterToolPlan(
       userId: hint.userId,
       agentId: hint.agentId ?? "router",
       model: hint.model,
-      scopes: hint.scopes ?? ["mcp.read", "mcp.write", "workflows.execute"],
+      // Minimal default — never invent mcp.write. Router-selected write tools still
+      // pass through PolicyEngine's role/scope check (default role "owner" covers it).
+      scopes: hint.scopes ?? ["mcp.read"],
       roles: hint.roles ?? ["owner"],
     });
     out.push(result);

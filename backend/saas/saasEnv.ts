@@ -45,6 +45,15 @@ export function isOpenAiEnvConfigured(): boolean {
   return isEnvKeysConfigured(OPENAI_KEYS);
 }
 
+/**
+ * Real spend gate for SaaS OpenAI usage (ADR-034 pattern). Having the API key
+ * configured is NOT enough — spend requires explicit opt-in via
+ * `AUTONOMOUS_ALLOW_OPENAI=1`. OFF by default in every environment, including prod.
+ */
+export function isOpenAiSpendAllowed(): boolean {
+  return process.env.AUTONOMOUS_ALLOW_OPENAI?.trim() === "1" && isOpenAiEnvConfigured();
+}
+
 /** LLM path usable for OS packs (local Ollama primary, OpenAI optional). */
 export function isPackLlmEnvConfigured(): boolean {
   if (process.env.OLLAMA_CONFIGURED?.trim() === "1") return true;

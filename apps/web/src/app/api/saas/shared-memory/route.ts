@@ -20,13 +20,13 @@ function memoryStatus(e: unknown): number {
   return saasErrorStatus(e);
 }
 
-function policyCtx(ctx: SaasRequestContext) {
+function policyCtx(ctx: SaasRequestContext, scopes: string[]) {
   return {
     tenantId: ctx.tenant.id,
     userId: ctx.claims.userId,
     agentId: "saas_api",
     roles: [ctx.role],
-    scopes: ["memory.read", "memory.write"],
+    scopes,
   };
 }
 
@@ -43,7 +43,7 @@ export async function GET(req: Request) {
     }
 
     if (resource === "search") {
-      const result = await svc.search(policyCtx(ctx), {
+      const result = await svc.search(policyCtx(ctx, ["memory.read"]), {
         query: url.searchParams.get("q") ?? undefined,
         scope: (url.searchParams.get("scope") as "tenant" | "agent" | "session" | "user" | undefined) ?? undefined,
         agentId: url.searchParams.get("agentId") ?? undefined,
@@ -57,7 +57,7 @@ export async function GET(req: Request) {
     if (resource === "get") {
       const id = url.searchParams.get("id");
       if (!id) return NextResponse.json({ error: "id_required" }, { status: 400 });
-      const entry = await svc.read(policyCtx(ctx), id);
+      const entry = await svc.read(policyCtx(ctx, ["memory.read"]), id);
       if (!entry) return NextResponse.json({ error: "not_found" }, { status: 404 });
       return NextResponse.json({ entry });
     }
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     const ctx = await requireSaasContext(req, "contacts.write");
     const body = (await req.json()) as Record<string, unknown>;
     const svc = getSaasSharedMemoryService();
-    const entry = await svc.write(policyCtx(ctx), {
+    const entry = await svc.write(policyCtx(ctx, ["memory.write"]), {
       tenantId: ctx.tenant.id,
       scope: (body.scope as "tenant") ?? "tenant",
       visibility: (body.visibility as "private") ?? "private",
@@ -108,7 +108,7 @@ export async function DELETE(req: Request) {
     const ctx = await requireSaasContext(req, "contacts.write");
     const id = new URL(req.url).searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id_required" }, { status: 400 });
-    const ok = await getSaasSharedMemoryService().delete(policyCtx(ctx), id);
+    const ok = await getSaasSharedMemoryService().delete(policyCtx(ctx, ["memory.write"]), id);
     return NextResponse.json({ deleted: ok });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: memoryStatus(e) });

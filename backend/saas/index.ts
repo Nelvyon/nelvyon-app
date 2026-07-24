@@ -1317,6 +1317,7 @@ export {
   isStripeEnvConfigured,
   isStripeStoreWebhookConfigured,
   isOpenAiEnvConfigured,
+  isOpenAiSpendAllowed,
   isPackLlmEnvConfigured,
   isEnvKeysConfigured,
   isAnyEnvKeyConfigured,

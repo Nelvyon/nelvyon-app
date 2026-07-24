@@ -9,6 +9,7 @@ import { assertSaasPlanCanCreate } from "./saasPlanQuota";
 import { isOpenDealStage, type DealStage } from "./saasDealsDedupe";
 import { isSesEnvConfigured } from "./saasEnv";
 import { buildCampaniaLegalAuditDetails } from "./companyDbCampaignLegalGate";
+import { getCampaignLaunchBlockReason } from "../agency/CampaignsLegalTechnicalGate";
 
 const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
 
@@ -471,6 +472,10 @@ export class SaasCampaniasService {
     const campania = await this.getCampania(tenantId, campaniaId);
     if (!campania) throw new SaasCampaniasError("Campania not found", "NOT_FOUND");
     if (campania.status === "completed") throw new SaasCampaniasError("Campania already completed", "VALIDATION");
+    const launchBlockReason = getCampaignLaunchBlockReason();
+    if (launchBlockReason) {
+      throw new SaasCampaniasError(launchBlockReason, "FORBIDDEN");
+    }
     assertCampaniaChannelReady(campania.channel);
     if (campania.channel === "multi") {
       const { getSaasSmsService } = await import("./SaasSmsService");

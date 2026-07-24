@@ -1,25 +1,50 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-24** (ADR-055 E2E PASS · tip **`53149384`** · deploy **`e514bbd7`** · claimReady false)  
-> Veredicto: **CONDITIONAL_READY** · **NOT READY** · E2E automations/reputation **ALL_PASS**  
-> SSOT: `OS_ELITE_STATE_MATRIX.md` · `OS_CATALOG_V1.md` v1.2.0
+> Fecha: **2026-07-24** (ADR-056 elite absolute audit · **AUDIT_FIXES_LOCAL** · tip **TBA** (base **`6364c28c`**) · runtime staging ADR-055 **`53149384`** · claimReady false)  
+> Veredicto: **AUDIT_FIXES_LOCAL** · **CONDITIONAL_READY** · **NOT READY**  
+> SSOT: `OS_ELITE_STATE_MATRIX.md` · `OS_CATALOG_V1.md` v1.2.0 · ADR-056
 
 ### Matriz estricta
 
 | Dimensión | Estado |
 |-----------|--------|
-| VERDE VERIFICADO (staging live ADR-055) | 13 packs+auditor · automations/reputation E2E ALL_PASS · SM/MCP synthetic flags ON · catalog 1.2.0 |
-| VERDE LOCAL | agency 64+ PASS · tsc 0 · SM/MCP harness unit tests PASS |
+| VERDE VERIFICADO (staging live ADR-055 runtime) | 13 packs+auditor · automations/reputation E2E ALL_PASS · SM/MCP synthetic flags ON · catalog 1.2.0 |
+| VERDE LOCAL (ADR-056 fixes uncommitted) | agency **109 PASS** · tsc **0** · CampaignsLegal+saasCampanias+saasEnv+mcpProductive+catalog availability **PASS** · P0/P1 audit fixes applied |
 | PREPARADO OFF | social oficial 8 cuentas · visual spend · auditor prod |
-| BLOQUEO EXTERNO | ads OAuth |
+| BLOQUEO EXTERNO | ads OAuth · no live Meta/Google Ads spend path |
 | BLOQUEO CEO | OpenClaw prod canary · OpenAI · payouts · paid visual · paid social |
-| BLOQUEO LEGAL | claimReady · campañas · Pepito forbidden · dossier pending |
-| NO IMPLEMENTADO | influencers/PR |
+| BLOQUEO LEGAL | claimReady · campañas mass-send · Pepito forbidden · dossier pending |
+| COMPETITIVE HONESTY | No GHL telephony dialer parity · no Odoo ERP/accounting/manufacturing · no proven multi-tenant production customer outcomes |
 | COSTES | 0 |
 | Evidencia staging | `automations_reputation_e2e_latest.md` · `auditor.all_packs_e2e_latest.md` |
 
 ---
 
+## ADR-056 — P0/P1 corregidos (elite absolute audit)
+
+### P0 (corregido)
+
+| Hallazgo | Fix |
+|----------|-----|
+| Campaign launch posible con `claimReadyLegal=false` | `getCampaignLaunchBlockReason` bloquea launch · test bypass only |
+
+### P1 (corregidos)
+
+| Hallazgo | Fix |
+|----------|-----|
+| Chat/ai-copy podían gastar OpenAI sin gate explícito | `isOpenAiSpendAllowed` gates chat+ai-copy |
+| `mcp.write` inventado | Eliminado — no write ficticio |
+| Shared-memory scopes mezclados | Scopes split en rutas |
+| `meta-ads-pack` disponible sin OAuth | Demoted to beta **OAuth OFF** |
+
+### Evidencia local
+
+- tsc **0**
+- CampaignsLegal + saasCampanias + saasEnv + mcpProductive + catalog availability **PASS**
+- agency suite **109 PASS**
+- eslint changed routes **0**
+- Pepito **untouched**
+- Prod flag read: `NELVYON_*` OpenAI/MCP/SM/OpenClaw/visual **ABSENT** — restored to staging
 
 ---
 
@@ -35,15 +60,16 @@ Barrido del monorepo (código, no solo docs) en:
 | Multi-tenancy / RLS | mig **515** Shared Memory RLS · bounce/complaint tenant-scope (previo) |
 | IA | Router health certification honesty · OpenClaw SSOT · Brain orphans/coverage |
 | CRM / Billing / Ads / Social / Funnels / Ecom / Automations / Reputación | empty payloads, auth swallow, stubs |
+| Campañas legal gate | `CampaignsLegalTechnicalGate` · `getCampaignLaunchBlockReason` |
 | Scripts / CI | staging smokes passwords · verify-all · security-gates |
 | Docs | HANDOVER · CHANGELOG · CLAUDE mig alignment · DATABASE |
 | Deuda | TODO/FIXME en auth/BFF · `console.log` en API · catch vacío en API · Railway hardcodes |
 
 ---
 
-## 2. Qué se encontró
+## 2. Qué se encontró (histórico + ADR-056)
 
-### P0 (corregidos en esta pasada)
+### P0 (corregidos en pasadas previas + ADR-056)
 
 1. **Billing summary** devolvía `EMPTY_SUMMARY` (parece plan Starter real) cuando claims era 401 `NextResponse` o error interno.
 2. **CRM reports** tragaba Unauthorized `NextResponse` → empty 200.
@@ -52,8 +78,9 @@ Barrido del monorepo (código, no solo docs) en:
 5. **Entregables POST** `resend_portal_link` / `open_in_portal` → `{ ok: true }` noop (sesión previa → 501).
 6. **Router-health** `certified: true` siempre (sesión previa → `health.ok`).
 7. Varios EMPTY_* BFF sin `degraded` (sesión previa + extensión).
+8. **ADR-056:** Campaign launch no bloqueado legalmente → `getCampaignLaunchBlockReason`.
 
-### P1 (corregidos)
+### P1 (corregidos + ADR-056)
 
 - Ads unified marcaba **empty real** (0 spend) como degraded.
 - Widget CDN hardcodeado a Railway.
@@ -61,12 +88,13 @@ Barrido del monorepo (código, no solo docs) en:
 - Claims internos → empty 200 en funnels/ecom/social/automations (→ 500).
 - `schemaPending` SaaS sin `degraded`.
 - Staging QA password embebido en smokes.
+- **ADR-056:** chat/ai-copy OpenAI spend · mcp.write inventado · shared-memory scopes · meta-ads-pack OAuth OFF.
 
 ### Limpio (evidencia)
 
 - Sin `console.log` en `apps/web/src/app/api`.
 - Sin TODO/FIXME/HACK en paths críticos auth/BFF.
-- Última mig **515** alineada CLAUDE/HANDOVER/DATABASE.
+- Última mig **518** alineada CLAUDE/HANDOVER/DATABASE.
 - Cron routes con CRON helpers.
 - verify-all: **0 FAIL**.
 
@@ -87,6 +115,11 @@ Barrido del monorepo (código, no solo docs) en:
 | Social clientId tenant/workspace | `social/reporting/unified` |
 | schemaPending + degraded | deliverability, attribution, security, marketplace |
 | Staging password env | `pack-e2e-shared` + 19 smokes |
+| **ADR-056 P0** campaign launch block | `CampaignsLegalTechnicalGate` · `SaasCampaniasService` |
+| **ADR-056 P1** OpenAI spend gate | chat + ai-copy routes · `isOpenAiSpendAllowed` |
+| **ADR-056 P1** MCP write honesty | `SaasMcpProductiveService` |
+| **ADR-056 P1** shared-memory scopes | shared-memory route |
+| **ADR-056 P1** meta-ads beta | `servicePacksCatalog` |
 
 ---
 
@@ -97,6 +130,7 @@ Barrido del monorepo (código, no solo docs) en:
 - Fallos de auth upstream en reporting unified → propagar 401/403.
 - Smokes staging no embeben secreto QA por defecto (requieren env o allow-default explícito).
 - Embed reputación: auth + URL desde `NEXT_PUBLIC_APP_URL`.
+- **ADR-056:** Legal gate en campaign launch · OpenAI spend fail-closed · MCP write honesty · competitive honesty documented.
 
 ---
 
@@ -119,8 +153,11 @@ Barrido del monorepo (código, no solo docs) en:
 | SES / Stripe Live | Alta/Media | KI-014 + OPS Stripe |
 | Sector agents `catch {}` best-effort | Bajo | No API path; deuda de agentes |
 | Cobertura live RLS/elite gated por env | Esperado | Skips documentados en `TEST_SKIPS.md` |
+| No live ads OAuth spend | Externo | Meta/Google Ads OAuth OFF · meta-ads-pack beta |
+| No GHL telephony dialer parity | Producto | Twilio código; no dialer nativo GHL |
+| No Odoo ERP parity | Producto | CRM/SaaS scope; no accounting/manufacturing |
 
-Ningún **P0** abierto conocido en repositorio tras esta pasada. Bloqueadores externos §7 actualizados post Bloque 2.
+Ningún **P0** abierto conocido en repositorio tras ADR-056 (fixes local uncommitted). Bloqueadores externos §7 actualizados.
 
 ---
 
@@ -130,98 +167,45 @@ Ningún **P0** abierto conocido en repositorio tras esta pasada. Bloqueadores ex
 2. ~~Shared Memory + KI-026 RLS staging~~ ✅ 2026-07-21. Siguiente: SES/Stripe/flags · **CONDITIONAL_READY** (no READY)
 3. SES Live (`docs/OPS_SES_PROD.md`) — KI-014
 4. Stripe Live (`docs/OPS_STRIPE_PROD.md`)
-5. Railway deploy + env secrets (staging env **existe**; CLI restaurado a production)
+5. Railway deploy + env secrets (staging env **existe**; CLI restored to staging after prod flag read)
 6. Cloudflare DNS/WAF
 7. `NELVYON_OPENCLAW_BRIDGE_URL` (+ Shared Memory ON si aplica)
+8. CEO: 8 cuentas sociales oficiales · Legal: dossier Pepito
 
 ---
 
 ## 8. ¿Técnicamente terminado el repositorio?
 
-**Internamente: sí, con veredicto CONDITIONAL_READY** — gates locales PASS, hallazgos P0/P1 de honesty/auth/BFF corregidos, sin P0 abierto demostrable en código.
+**Internamente: sí, con veredicto AUDIT_FIXES_LOCAL / CONDITIONAL_READY** — gates locales PASS, hallazgos P0/P1 de honesty/auth/BFF/campaigns corregidos, sin P0 abierto demostrable en código (ADR-056 fixes pending commit/deploy).
 
 **Producción READY: no** — mientras existan bloqueos externos listados en §7 sin evidencia live, no se declara READY ni “perfecto”.
 
 Criterio de cierre enterprise del repo (código):
 
-- [x] tsc / lint PASS (2026-07-21)  
+- [x] tsc / lint PASS (2026-07-24 ADR-056)  
 - [x] verify-all sin FAIL — **KI-027 cerrado** · CONDITIONAL_READY (skips Docker/DATABASE_URL honestos)  
 - [x] Sin éxito silencioso en BFF críticos auditados  
 - [x] Multi-tenancy / auth paths reforzados · KI-026 RLS staging ✅  
-- [x] DB staging hasta **516** + SM verified (sesión KI-026)  
-- [x] Validador post-elite **508–516**  
+- [x] DB staging hasta **518** + SM verified (sesión KI-026)  
+- [x] Validador post-elite **508–518**  
+- [x] ADR-056 P0/P1 fixes local verified (109 agency tests)  
+- [ ] ADR-056 commit + deploy staging (tip TBA)  
 - [ ] SES/Stripe live + deploy prod (humano/ops)
 
 ---
 
-## 9. Auditoría cierre élite total — 2026-07-21 (solo lectura)
+## 9. Competitive honesty (ADR-056)
 
-### Tabla sistemas principales
+| Gap factual | Estado |
+|-------------|--------|
+| Live Meta/Google Ads OAuth spend path | **No** — meta-ads-pack beta OAuth OFF |
+| Native telephony dialer parity (GHL) | **No** |
+| Full ERP/accounting/manufacturing (Odoo) | **No** |
+| Campaign mass-send | **Legally blocked** |
+| Official social accounts NELVYON | **Pending CEO** |
+| Multi-tenant production customer outcomes | **Not proven** in this audit |
 
-| Sistema | Implementado | Verificado local | Verificado staging | Prep. no operativo | Bloq. externo | Riesgo/deuda |
-|---------|:------------:|:----------------:|:------------------:|:------------------:|:-------------:|:------------:|
-| **SaaS core** (41 págs, shell) | ✅ | ✅ tsc · brain 7/7 · verify-all CONDITIONAL | 🟡 smokes existen; live A≠B pendiente | — | — | — |
-| **OS / packs** | ✅ kickoff 3 growth | ✅ UI_CONTRACT 53/53 | 🟡 pack E2E parcial | — | — | — |
-| **CRM / pipeline** | ✅ | ✅ UNIT + UI_CONTRACT | 🟡 no live cross-tenant | — | — | — |
-| **Workflows / secuencias** | ✅ idempotencia | ✅ UNIT | 🟡 cron live no re-auditado | — | CRON_SECRET prod | — |
-| **Email / campañas** | ✅ SES código | ✅ UNIT bounce | ❌ envío real | ✅ código listo | **KI-014 SES DENIED** | — |
-| **Billing / Stripe** | ✅ webhooks | ✅ UNIT | 🟡 | ✅ | **Stripe Live ops** | — |
-| **IA privada / Router** | ✅ | ✅ cert freeze | 🟡 no prod | flags OFF | — | freeze ADR-015 |
-| **RAG / Brain** | ✅ UnifiedRagStore | ✅ ingest 1559 chunks | ❌ cutover remoto | local verified | Docker down = skip | KI-005 facade |
-| **MCP** | ✅ SSOT | ✅ cert + soak freeze | 🟡 | flag OFF prod | — | freeze ADR-016 |
-| **Shared Memory** | ✅ 514–515 | ❌ sin DATABASE_URL | ✅ verified:true | flags OFF | — | ADR-032 RLS |
-| **Seguridad** | ✅ CSRF/auth | ✅ security tests 12/12 | 🟡 KI-020 smoke | — | — | service_role bypass RLS |
-| **Observabilidad** | ✅ health/ops | ✅ verify-all parcial | 🟡 Kuma parcial | — | — | — |
-| **Crons** (16 rutas) | ✅ CRON_SECRET | ✅ código auditado | 🟡 GH Actions | — | secrets prod | — |
-| **Backups / DR** | ✅ workflow | ✅ restore drill 8/8 hist. | 🟡 CEO 1er run | — | CEO manual | — |
-| **Deploy** | ✅ railway.json | ✅ build hist. PASS | ✅ mig **516** | prod ~511+ | Cloudflare | no deploy esta pasada |
-| **Documentación** | ✅ viva | ✅ sync esta pasada | — | — | — | drift corregido |
-
-Leyenda: ✅ evidencia · 🟡 parcial · ❌ no verificado · — no aplica
-
-### Hallazgos adicionales
-
-| Categoría | Detalle |
-|-----------|---------|
-| Tests faltantes | E2E live multi-tenant CRM/workflows; MFA login gate; registro/recover live |
-| E2E | 40 specs Playwright; mayoría **UI_CONTRACT** (mock API); staging-platform-flow existe |
-| Auth/RLS | 517 rutas API; 206 sin import directo auth (muchos BFF/public intencional); KI-026 RLS staging ✅ |
-| Integraciones simuladas | `mock_briefing` ads (demo explícito); reputación reviews/alerts stub degradado |
-| Errores silenciados | P0/P1 BFF corregidos 2026-07-20; residual degraded honesto |
-| P0/P1 abiertos | **KI-014 SES** · Stripe Live · KI-020 smoke · prod mig <516 |
-| Duplicidades | Hubs GHL legacy redirect OBSOLETE (`OS_SAAS_FUNCTIONAL_INVENTORY`) |
-| Rendimiento/obs | Índices 510; Redis opcional in-memory fallback |
-| Docs contradictorias | DATABASE/PROJECT_STATUS/ROADMAP/INFRA envejecidos → corregidos 2026-07-21 |
-
-### Comparativa GHL / HubSpot
-
-Ver `docs/PARITY_GHL_HUBSPOT.md`. Resumen honesto: **~48 features core en código** con rutas SaaS reales; NELVYON añade packs OS, brief-to-launch, workforce IA certificada. **Gaps vs referentes:** SES/Twilio/Stripe/OAuth live, apps móviles nativas, marketplace maduro, white-label subcuentas (Stripe Connect ops). **No superioridad demostrada** en ops ni ecosistema.
-
-### Veredicto auditoría
-
-**CONDITIONAL_READY** — tip `99b30730` · `MESH_JOIN_OK` · Pack E2E **ALL_PASS completed** · portal-packs ALL_PASS · Ollama privado PASS · prod IA/OpenAI **ABSENT** · **no READY** · **claimReady false** (legal campañas).
-
-### 10. Bloques 3–13 (2026-07-21) + redeploy 2026-07-22
-
-Ver tabla completa en `docs/CTO_FINAL_VERIFY.md` y HANDOVER. Costes nuevos: **0**. Deploy prod: **YES** `d4650e99` SUCCESS tip `3f860c06` · IA not activated · proposal `PROPOSAL_QUALITY_ROUTING_LOCAL.md` only.
-
-### 11. Cierre total internal-safe — 2026-07-22 (tarde)
-
-| Ítem | Resultado |
-|------|-----------|
-| STAGING_QA_PASSWORD sync | **DONE** (Login 401 → PASS) |
-| portal-packs GH | **PASS** run `29944606938` (SUCCESS; prior `29943785978` was FAIL overall) |
-| Pack E2E vs IA OFF | **SKIP_IA_OFF** (exit 78) — no mock PASS |
-| OllamaRuntimePrep metrics/rollback | **DONE** + tests |
-| ADR-036 + weak 3B needs_review | **DONE** vitest |
-| Beta packs | Permanecen **beta** |
-| OAuth health checklist | `docs/ops/INTEGRATIONS_OAUTH_HEALTH_CHECKLIST.md` |
-| CEO IA approval request | `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md` |
-| Strategic gaps matrix | `docs/CTO_STRATEGIC_GAPS_MATRIX.md` |
-| Campañas source_trace + legal audit | `companyDbCampaignLegalGate` · BLOQUEADO_LEGAL |
-| Backup | **DONE** `29932453133` · TODO stale cerrado |
-| Restore drill | **SKIP** Docker DOWN |
-| Redeploy web | **NO** (docs+smokes; live SHA intacto) |
+**No competitive superiority claims.**
 
 ---
 
@@ -230,6 +214,6 @@ Ver tabla completa en `docs/CTO_FINAL_VERIFY.md` y HANDOVER. Costes nuevos: **0*
 ```powershell
 pnpm -C apps/web exec tsc --noEmit
 pnpm -C apps/web lint
-pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm backend/db --reporter=dot
+pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm backend/db backend/agency --reporter=dot
 node scripts/nelvyon-verify-all.mjs
 ```

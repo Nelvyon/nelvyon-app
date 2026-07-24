@@ -8,6 +8,7 @@ import {
   evaluatePolicy,
   resetMcpConfigEnvForTests,
 } from "../../mcp";
+import { SaasMcpProductiveService } from "../SaasMcpProductiveService";
 import { resetMcpConfigEnvForTests as resetCfg } from "../../mcp/config";
 import { getTenantCircuit, resetAllCircuitsForTests } from "../../mcp/resilience/CircuitBreaker";
 import { resetRateLimitsForTests } from "../../mcp/resilience/RateLimiter";
@@ -284,6 +285,34 @@ describe("MCP Productivo — Router integration", () => {
   it("client discover matches server", () => {
     const client = getMcpProductiveClient();
     expect(client.discover().length).toBe(getMcpProductiveServer().listTools().length);
+  });
+});
+
+describe("MCP Productivo — default scopes never invent mcp.write", () => {
+  it("SaasMcpProductiveService.invoke defaults to mcp.read only and denies a write tool for a member with no explicit scope", async () => {
+    const mockDb = { query: async () => [] };
+    const svc = new SaasMcpProductiveService(mockDb as never);
+    const r = await svc.invoke({
+      tenantId: TENANT,
+      userId: "u1",
+      toolName: "crm_upsert_contact",
+      args: { name: "Test" },
+      roles: ["member"],
+      // scopes omitted → service default must be mcp.read only (no mcp.write)
+    });
+    expect(r.decision).toBe("denied");
+    expect(r.errorCode).toBe("authorization");
+  });
+
+  it("executeRouterToolPlan defaults to mcp.read only and denies a write tool for a non-owner role", async () => {
+    const results = await executeRouterToolPlan(
+      { query: "borrador de email", tenantId: TENANT, userId: "u1", roles: ["member"] },
+      { email_draft: { subject: "s", body: "b" } },
+    );
+    const emailResult = results.find((r) => r.toolCallId);
+    expect(emailResult).toBeTruthy();
+    expect(emailResult!.decision).toBe("denied");
+    expect(emailResult!.errorCode).toBe("authorization");
   });
 });
 

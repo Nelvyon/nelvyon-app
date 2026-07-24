@@ -172,11 +172,11 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
   {
     id: "meta-ads-pack",
     slug: "meta-ads",
-    name: "Campañas Meta Ads",
-    tagline: "Estructura, copies y creatividades para vender en Facebook e Instagram",
+    name: "Meta Ads kit (draft · OAuth OFF)",
+    tagline: "Kit de estructura, copies y creatividades en borrador — sin conexión OAuth ni gasto en Meta",
     category: "ads",
     verticals: ["local", "ecommerce"],
-    availability: "available",
+    availability: "beta",
     benefits: [
       "Estructura de campaña lista para Meta Business",
       "Copies probados para feed y stories",

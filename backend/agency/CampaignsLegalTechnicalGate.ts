@@ -128,6 +128,51 @@ export function evaluateCampaignsLegalTechnicalReadiness(
   };
 }
 
+/**
+ * Test-only bypass: allows unit tests that exercise `launchCampania` (and similar
+ * send-path code) to run without asserting real legal/technical readiness. NEVER
+ * honored outside `NODE_ENV=test`/`VITEST=true` — production and staging always
+ * evaluate real readiness, which is always blocked while `claimReadyLegal` is false.
+ */
+function isCampaignLaunchTestBypassActive(): boolean {
+  const isTestRuntime = process.env.NODE_ENV === "test" || process.env.VITEST === "true";
+  return isTestRuntime && process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS === "1";
+}
+
+/**
+ * Hard launch gate for real campaign sends. Returns `null` only when the test bypass
+ * is active (unit tests only). Otherwise evaluates real readiness with honest,
+ * conservative defaults (nothing assumed `true` unless the input says so) and ALWAYS
+ * returns a non-null block reason today, because `claimReadyLegal` is permanently
+ * `false` until a manual code change follows a real written license + legal sign-off.
+ * Also hard-blocks when `pepitoDbClean` is false (Pepito forbidden as campaign source).
+ */
+export function getCampaignLaunchBlockReason(
+  input?: Partial<CampaignsLegalTechnicalInput>,
+): string | null {
+  if (isCampaignLaunchTestBypassActive()) return null;
+
+  const result = evaluateCampaignsLegalTechnicalReadiness({
+    sourceTraceImplemented: input?.sourceTraceImplemented ?? false,
+    consentFieldsImplemented: input?.consentFieldsImplemented ?? false,
+    unsubscribeImplemented: input?.unsubscribeImplemented ?? false,
+    suppressionListImplemented: input?.suppressionListImplemented ?? false,
+    auditLogImplemented: input?.auditLogImplemented ?? false,
+    sendRateLimitPerHourMax: input?.sendRateLimitPerHourMax ?? 0,
+    sesConfiguredOverride: input?.sesConfiguredOverride,
+    pepitoDbReferenced: input?.pepitoDbReferenced ?? false,
+    ceoLegalSendAuthorized: input?.ceoLegalSendAuthorized ?? false,
+  });
+
+  if (!result.checks.pepitoDbClean) {
+    return `Campaign launch blocked: claimReadyLegal=false and pepitoDbClean=false — blockers: ${result.blockers.join(", ")}`;
+  }
+  if (!result.claimReadyLegal) {
+    return `Campaign launch blocked: claimReadyLegal=false — blockers: ${result.blockers.join(", ")}`;
+  }
+  return null;
+}
+
 export function assertCampaignsLegalTechnicalGateIntegrity(): { ok: boolean; violations: string[] } {
   const violations: string[] = [];
   const bestCase = evaluateCampaignsLegalTechnicalReadiness({
@@ -182,6 +227,25 @@ export function assertCampaignsLegalTechnicalGateIntegrity(): { ok: boolean; vio
   });
   if (noRateLimitCase.technicalComplete !== false) {
     violations.push("missing_rate_limit_must_block_technical_complete");
+  }
+
+  const savedBypass = process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+  delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+  const blockReasonWithoutBypass = getCampaignLaunchBlockReason({
+    sourceTraceImplemented: true,
+    consentFieldsImplemented: true,
+    unsubscribeImplemented: true,
+    suppressionListImplemented: true,
+    auditLogImplemented: true,
+    sendRateLimitPerHourMax: 500,
+    sesConfiguredOverride: true,
+    pepitoDbReferenced: false,
+    ceoLegalSendAuthorized: true,
+  });
+  if (savedBypass !== undefined) process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS = savedBypass;
+  else delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+  if (blockReasonWithoutBypass === null) {
+    violations.push("launch_block_reason_must_be_non_null_without_bypass");
   }
 
   return { ok: violations.length === 0, violations };

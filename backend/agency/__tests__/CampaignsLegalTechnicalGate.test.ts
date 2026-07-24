@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
   assertCampaignsLegalTechnicalGateIntegrity,
   evaluateCampaignsLegalTechnicalReadiness,
+  getCampaignLaunchBlockReason,
   type CampaignsLegalTechnicalInput,
 } from "../CampaignsLegalTechnicalGate";
 
@@ -112,5 +113,39 @@ describe("Campaigns legal + technical readiness gate (claimReadyLegal always fal
 
   it("passes its own integrity assertion", () => {
     expect(assertCampaignsLegalTechnicalGateIntegrity()).toEqual({ ok: true, violations: [] });
+  });
+});
+
+describe("getCampaignLaunchBlockReason", () => {
+  const savedBypass = process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+
+  afterEach(() => {
+    if (savedBypass !== undefined) process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS = savedBypass;
+    else delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+  });
+
+  it("without bypass, returns a non-null string mentioning claimReadyLegal=false, even in the best-case input", () => {
+    delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+    const reason = getCampaignLaunchBlockReason(fullTechnicalInput());
+    expect(typeof reason).toBe("string");
+    expect(reason).toContain("claimReadyLegal=false");
+  });
+
+  it("without bypass and with no input at all, still blocks with honest/conservative defaults", () => {
+    delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+    const reason = getCampaignLaunchBlockReason();
+    expect(typeof reason).toBe("string");
+    expect(reason).toContain("claimReadyLegal=false");
+  });
+
+  it("without bypass, pepitoDbReferenced=true is mentioned as a hard block", () => {
+    delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+    const reason = getCampaignLaunchBlockReason(fullTechnicalInput({ pepitoDbReferenced: true }));
+    expect(reason).toContain("pepitoDbClean=false");
+  });
+
+  it("with bypass active (NODE_ENV=test/VITEST=true), returns null", () => {
+    process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS = "1";
+    expect(getCampaignLaunchBlockReason(fullTechnicalInput())).toBeNull();
   });
 });

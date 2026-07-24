@@ -40,7 +40,9 @@ export class SaasMcpProductiveService {
       userId: input.userId,
       agentId: input.agentId ?? "saas_mcp",
       roles: input.roles ?? ["member"],
-      scopes: input.scopes ?? ["mcp.read", "mcp.write", "workflows.execute"],
+      // Minimal default — never invent mcp.write. Callers must pass an explicit
+      // scope claim when write access is genuinely authorized.
+      scopes: input.scopes ?? ["mcp.read"],
       model: input.model,
     }, {
       dryRun: input.dryRun,

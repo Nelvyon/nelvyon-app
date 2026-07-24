@@ -29,8 +29,15 @@ describe("servicePacksCatalog availability honesty", () => {
     }
   });
 
-  it("no pack remains beta after ADR-055 E2E promotion", () => {
+  it("no pack remains beta after ADR-055 E2E promotion, except meta-ads-pack (no live OAuth/spend)", () => {
     const betas = SERVICE_PACK_CATALOG.filter((p) => p.availability === "beta");
-    expect(betas.map((p) => p.id)).toEqual([]);
+    expect(betas.map((p) => p.id)).toEqual(["meta-ads-pack"]);
+  });
+
+  it("meta-ads-pack is honestly labeled beta with OAuth/spend OFF disclosed", () => {
+    const pack = SERVICE_PACK_CATALOG.find((p) => p.id === "meta-ads-pack");
+    expect(pack).toBeDefined();
+    expect(pack!.availability).toBe("beta");
+    expect(pack!.name.toLowerCase()).toContain("oauth off");
   });
 });

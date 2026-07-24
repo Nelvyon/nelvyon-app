@@ -197,6 +197,7 @@ export type {
 export {
   assertCampaignsLegalTechnicalGateIntegrity,
   evaluateCampaignsLegalTechnicalReadiness,
+  getCampaignLaunchBlockReason,
 } from "./CampaignsLegalTechnicalGate";
 export type {
   CampaignsLegalTechnicalInput,

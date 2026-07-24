@@ -449,6 +449,21 @@ describe("SaasCampaniasService", () => {
     await expect(svc.launchCampania("t1", c.id)).rejects.toThrow(/Twilio not configured/);
   });
 
+  it("launchCampania sin bypass del gate legal lanza FORBIDDEN (claimReadyLegal=false)", async () => {
+    const savedBypass = process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+    delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+    try {
+      const db = makeDb();
+      db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "a@test.com", status: "lead", pipeline_stage: "new", tags: [] });
+      const svc = new SaasCampaniasService(db);
+      const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
+      await expect(svc.launchCampania("t1", c.id)).rejects.toMatchObject({ code: "FORBIDDEN" });
+    } finally {
+      if (savedBypass !== undefined) process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS = savedBypass;
+      else delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+    }
+  });
+
   it("launchCampania email falla si SES no configurado", async () => {
     const saved = {
       SES_ACCESS_KEY_ID: process.env.SES_ACCESS_KEY_ID,
