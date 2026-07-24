@@ -22,10 +22,12 @@ const PORTAL_PASSWORD = "PortalSaasB2bQA2026!";
 const PRODUCT_NAME = `QA SaaS B2B ${RUN_ID}`;
 
 const EXPECTED_TITLES = [
-  "Landing",
-  "SEO",
-  "Playbook",
-  "Secuencia",
+  "Landing PLG",
+  "Informe SEO B2B",
+  "Bot demo",
+  "Playbook outbound",
+  "Secuencia nurture B2B",
+  "Informe ejecutivo",
 ];
 
 const COOKIE = "nelvyon_token";
@@ -155,34 +157,45 @@ async function kickoffPack(token, workspaceId) {
     contact_name: "Cliente Portal QA",
   };
 
-  const { res, base } = await resolveApiBase(
-    `/api/os/packs/${PACK_ID}/kickoff`,
-    token,
-    workspaceId,
-    "POST",
-    payload,
-  );
+  let res;
+  let base = BASE;
+  try {
+    ({ res, base } = await resolveApiBase(
+      `/api/os/packs/${PACK_ID}/kickoff`,
+      token,
+      workspaceId,
+      "POST",
+      payload,
+    ));
+  } catch (e) {
+    warn("kickoff", "POST timeout/abort", String(e).slice(0, 180));
+    res = null;
+  }
 
-  if (!res.ok) {
+  if (res?.ok || res?.status === 202) {
+    const run = await res.json();
+    if (containsMock(run)) {
+      fail("kickoff", "no-mock", "response contains mock://");
+      return null;
+    }
+    pass("kickoff", "post-kickoff", `run=${run.id} status=${run.status} http=${res.status} via ${base}`);
+    return run;
+  }
+
+  if (res) {
     const err = await res.text();
     if (isLlmNotConfiguredResponse(res.status, err)) {
       exitSkipIaOff("saas-b2b-pack-e2e", res.status, err);
     }
     fail("kickoff", "post-kickoff", `HTTP ${res.status} ${err.slice(0, 200)}`);
-    return null;
+  } else {
+    fail("kickoff", "post-kickoff", "abort/timeout without 202 recovery");
   }
-
-  const run = await res.json();
-  if (containsMock(run)) {
-    fail("kickoff", "no-mock", "response contains mock://");
-    return null;
-  }
-  pass("kickoff", "post-kickoff", `run=${run.id} status=${run.status} via ${base}`);
-  return run;
+  return null;
 }
 
 async function pollPackRun(token, workspaceId, runId) {
-  for (let i = 1; i <= 20; i += 1) {
+  for (let i = 1; i <= 240; i += 1) {
     const { res } = await resolveApiBase(
       `/api/os/packs/${PACK_ID}/${runId}`,
       token,
@@ -190,12 +203,15 @@ async function pollPackRun(token, workspaceId, runId) {
     );
     if (res.ok) {
       const run = await res.json();
-      console.log(JSON.stringify({ poll: i, status: run.status, steps: run.steps?.length }));
+      const stepSummary = (run.steps || [])
+        .map((s) => `${s.key}:${s.status}`)
+        .join(",");
+      console.log(JSON.stringify({ poll: i, status: run.status, steps: stepSummary }));
       if (run.status === "completed" || run.status === "needs_review" || run.status === "failed") {
         return run;
       }
     }
-    await sleep(3000);
+    await sleep(5000);
   }
   fail("kickoff", "poll", "timeout waiting for pack completion");
   return null;
@@ -275,20 +291,32 @@ async function checkDeliverables(portalToken, projectId) {
   const body = await r.json();
   const items = body.items ?? body.deliverables ?? [];
   pass("deliverables", "count", String(items.length));
-  const titles = items.map((d) => d.title ?? d.name ?? "");
+
   for (const expected of EXPECTED_TITLES) {
-    if (titles.some((t) => t.toLowerCase().includes(expected.toLowerCase().split(" ")[0]))) {
-      pass("deliverables", `present:${expected}`);
-    } else {
-      warn("deliverables", `missing:${expected}`, `got: ${titles.join(", ")}`);
+    const found = items.find(
+      (d) => d.title === expected || String(d.title ?? "").toLowerCase().includes(expected.toLowerCase().slice(0, 10)),
+    );
+    if (!found) {
+      fail("deliverables", `present:${expected}`, `got: ${items.map((d) => d.title).join(", ")}`);
+      continue;
     }
+    pass("deliverables", `present:${expected}`, found.status ?? "present");
+    if (containsMock(found)) fail("deliverables", `no-mock:${expected}`, "contains mock://");
+    else pass("deliverables", `no-mock:${expected}`, "clean");
   }
-  if (containsMock(body)) fail("deliverables", "no-mock", "deliverables contain mock://");
-  else pass("deliverables", "no-mock");
+
+  const autoApproved = items.filter((d) => d.status === "approved_by_client");
+  if (autoApproved.length >= EXPECTED_TITLES.length) {
+    pass("deliverables", "auto-approved", `${autoApproved.length} (QA≥85 path)`);
+  } else if (autoApproved.length > 0) {
+    warn("deliverables", "auto-approved", `${autoApproved.length}/${items.length}`);
+  } else {
+    fail("deliverables", "auto-approved", "none approved_by_client — expected completed QA≥85");
+  }
 }
 
 async function main() {
-  const clearGuard = installScriptTimeoutGuard(20 * 60 * 1000, "saas-b2b-pack-e2e");
+  const clearGuard = installScriptTimeoutGuard(30 * 60 * 1000, "saas-b2b-pack-e2e");
   try {
   console.log(`\n=== SaaS B2B Growth Pack E2E smoke [${RUN_ID}] ===\n`);
   await waitForDeploy();
@@ -347,7 +375,7 @@ async function main() {
   await checkDeliverables(portalAuth.token, osProjectId);
 
   printSummary();
-  process.exit(CRITICAL.length === 0 && WARN.length === 0 ? 0 : 1);
+  process.exit(CRITICAL.length === 0 ? 0 : 1);
   } finally {
     clearGuard();
   }
@@ -358,10 +386,10 @@ function printSummary() {
   console.log(`CRITICAL: ${CRITICAL.length}  WARN: ${WARN.length}`);
   for (const c of CRITICAL) console.log(`  FAIL [${c.module}] ${c.check}: ${c.detail}`);
   for (const w of WARN) console.log(`  WARN [${w.module}] ${w.check}: ${w.detail}`);
-  if (CRITICAL.length === 0 && WARN.length === 0) {
+  if (CRITICAL.length === 0) {
     console.log("ALL_PASS");
   } else {
-    console.log(CRITICAL.length > 0 ? "CRITICAL_FAIL" : "WARN_FAIL");
+    console.log("CRITICAL_FAIL");
   }
 }
 

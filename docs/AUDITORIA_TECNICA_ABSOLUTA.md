@@ -1,18 +1,18 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-24** (OS Universal catalog · free-tools · Pack E2E ALL_PASS)  
+> Fecha: **2026-07-24** (cert ecommerce+saas-b2b · Strategy/Funnel/Retention BETA · Pack E2E)  
 > Veredicto interno: **CONDITIONAL_READY** · `claimReady: false` · **no READY**  
-> Evidencia: `OS_UNIVERSAL_SERVICE_CATALOG.md` · `FREE_TOOLS_EVALUATION.md` · ADR-047
+> Evidencia: `OS_UNIVERSAL_SERVICE_CATALOG.md` · ADR-049 · release-logs ecommerce/saas-b2b ALL_PASS
 
 ### Matriz estricta (resumen)
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO | Mesh · local growth SKUs · portal · CRM SaaS · workflows |
-| VERIFICADO STAGING | Pack E2E ALL_PASS · MESH_JOIN_OK · portal-packs |
+| IMPLEMENTADO | Mesh · local/ecom/saas-b2b growth · portal · CRM SaaS · workflows |
+| VERIFICADO STAGING | Pack E2E ecommerce+saas-b2b ALL_PASS · MESH_JOIN_OK |
 | VERIFICADO PROD | IA/OpenAI/mesh **ABSENT** |
-| BETA | 5 packs extendidos (sin promote) |
-| PREPARADO OFF | ecommerce/saas packs · automations/reputation SaaS |
+| BETA | 5 packs + strategy/funnel/retention (sin promote a available) |
+| PREPARADO OFF | automations/reputation SaaS · prod IA · new packs flags OFF prod |
 | BLOQUEO EXTERNO | Legal campañas · ads OAuth |
 | FREE TOOLS | Eval only · 0 installs |
 

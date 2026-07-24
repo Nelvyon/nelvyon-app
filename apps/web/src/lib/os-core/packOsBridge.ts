@@ -124,6 +124,27 @@ export const PACK_OS_BINDINGS: Record<string, PackOsBinding> = {
     connectorIds: ["google-analytics-4"],
     autonomousSkus: ["NELVYON-LANDING"],
   },
+  "strategy-pack": {
+    packId: "strategy-pack",
+    agentIds: ["autonomous-pm-landing", "landing_premium"],
+    processTemplateIds: ["deliverable-action-plan-30d", "deliverable-report-executive"],
+    connectorIds: [],
+    autonomousSkus: ["NELVYON-LANDING"],
+  },
+  "funnel-growth-pack": {
+    packId: "funnel-growth-pack",
+    agentIds: ["landing_premium", "funnel_premium", "autonomous-pm-landing", "autonomous-pm-seo"],
+    processTemplateIds: ["landing-funnel-map-full", "landing-cro-audit-landing", "seo-audit-local"],
+    connectorIds: ["google-analytics-4"],
+    autonomousSkus: ["NELVYON-LANDING", "NELVYON-SEO"],
+  },
+  "retention-pack": {
+    packId: "retention-pack",
+    agentIds: ["autonomous-pm-chatbot", "sector-email-nurture", "email_marketing_premium"],
+    processTemplateIds: ["email-nurture-5-b2b", "deliverable-action-plan-30d"],
+    connectorIds: ["amazon-ses"],
+    autonomousSkus: ["NELVYON-CHATBOT"],
+  },
 };
 
 export function getPackOsBinding(packId: string): PackOsBinding | undefined {

@@ -8,17 +8,17 @@ import {
 } from "../OsCapabilityRegistry";
 
 describe("OsCapabilityRegistry", () => {
-  it("has 11 real services with integrity", () => {
-    expect(listOsCapabilities()).toHaveLength(11);
+  it("has 14 real services with integrity", () => {
+    expect(listOsCapabilities()).toHaveLength(14);
     const check = assertOsCapabilityRegistryIntegrity();
     expect(check.violations).toEqual([]);
     expect(check.ok).toBe(true);
   });
 
-  it("marks mesh-verified growth SKU services as elite (not ecommerce until E2E ALL_PASS)", () => {
-    expect(listEliteOsServices()).toEqual(expect.arrayContaining(["seo", "web_landing"]));
-    expect(listEliteOsServices()).not.toContain("ecommerce");
-    expect(getOsCapability("ecommerce")?.status).toBe("partial");
+  it("marks mesh-verified growth services as elite including ecommerce + crm after E2E ALL_PASS", () => {
+    expect(listEliteOsServices()).toEqual(
+      expect.arrayContaining(["seo", "web_landing", "ecommerce", "crm_sales"]),
+    );
   });
 
   it("forbids minting new sector flotilla agents as policy", () => {

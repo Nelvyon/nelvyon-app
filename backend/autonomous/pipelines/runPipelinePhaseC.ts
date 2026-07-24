@@ -158,9 +158,15 @@ async function runSeoPhaseC(project: AutonomousProject, attempt: number): Promis
     });
   };
 
-  const pm = await llmPmSeo(brief);
-  artifacts.plan = normalizeSeoPlan(pm.data, brief);
-  agent_log.push({ ...pm.log, llm_mode: pm.llm_mode as "mock" | "real" });
+  // Soft-continue: PM SEO hang/fail must not leave sku_seo:running forever.
+  try {
+    const pm = await llmPmSeo(brief);
+    artifacts.plan = normalizeSeoPlan(pm.data, brief);
+    agent_log.push({ ...pm.log, llm_mode: pm.llm_mode as "mock" | "real" });
+  } catch (err) {
+    artifacts.plan = normalizeSeoPlan(null, brief);
+    logLlmFail("agent-pm-seo", "plan", err);
+  }
   if ((artifacts.plan as { blockers?: string[] }).blockers?.length) {
     project.status = "INTAKE_VALIDATING";
     return scoreOffline("NELVYON-SEO", brief, artifacts, attempt);

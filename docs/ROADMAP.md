@@ -62,13 +62,13 @@
 | Workforce autónoma certificada | ✅ | `nelvyonAutonomousWorkforceCertified=true` · 45 workflows · daemon · live Ollama/RAG |
 | Auditoría equipo OS (4 universos) | ✅ | `docs/OS_AGENT_TEAM_AUDIT.md` 2026-07-22 · honesty portal/beta/mock |
 | OS premium dual-path Ollama | ✅ | ADR-034 · LlmClient Ollama-first · OpenAI opt-in |
-| Agencia OS capability registry | ✅ | 11 servicios · playbooks · sector legacy |
+| Agencia OS capability registry | ✅ | **14** servicios · playbooks · sector legacy |
 | Partners CEO payout gate | ✅ | `NELVYON_CEO_PARTNER_PAYOUTS` default OFF |
 | Runbook ops sin Cursor | ✅ | `OS_AUTONOMOUS_OPERATIONS.md` |
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
-| Local AI runtime mesh | 🟡 | ADR-044 code PASS · join FAIL · no MESH_JOIN_OK |
-| Beta packs → available | ❌ | Falta cert + deliverables dedicados |
-| Agencia OS unificada élite (ops) | 🟡 | Catalog universal · local **IMPLEMENTED_VERIFIED** · ecom/saas **PREPARED_OFF** · 5 **BETA** · ADR-047 · claimReady false |
+| Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
+| Beta packs → available | ❌ | 5 originales + strategy/funnel/retention · sin promote prematuro |
+| Agencia OS unificada élite (ops) | 🟡 | local/ecom/saas-b2b **IMPLEMENTED_VERIFIED** · 8 **BETA** · ADR-049 · claimReady false |
 
 ---
 

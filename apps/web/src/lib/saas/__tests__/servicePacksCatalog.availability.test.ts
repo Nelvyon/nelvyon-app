@@ -11,6 +11,9 @@ const BETA_PACK_IDS = [
   "cro-audit-pack",
   "analytics-setup-pack",
   "brand-voice-pack",
+  "strategy-pack",
+  "funnel-growth-pack",
+  "retention-pack",
 ] as const;
 
 const GROWTH_PACK_IDS = [

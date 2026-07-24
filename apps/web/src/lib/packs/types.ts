@@ -8,6 +8,9 @@ export const CONTENT_STRATEGY_PACK_ID = "content-strategy-pack" as const;
 export const CRO_AUDIT_PACK_ID = "cro-audit-pack" as const;
 export const ANALYTICS_SETUP_PACK_ID = "analytics-setup-pack" as const;
 export const BRAND_VOICE_PACK_ID = "brand-voice-pack" as const;
+export const STRATEGY_PACK_ID = "strategy-pack" as const;
+export const FUNNEL_GROWTH_PACK_ID = "funnel-growth-pack" as const;
+export const RETENTION_PACK_ID = "retention-pack" as const;
 
 export type PackId =
   | typeof LOCAL_GROWTH_PACK_ID
@@ -17,7 +20,10 @@ export type PackId =
   | typeof CONTENT_STRATEGY_PACK_ID
   | typeof CRO_AUDIT_PACK_ID
   | typeof ANALYTICS_SETUP_PACK_ID
-  | typeof BRAND_VOICE_PACK_ID;
+  | typeof BRAND_VOICE_PACK_ID
+  | typeof STRATEGY_PACK_ID
+  | typeof FUNNEL_GROWTH_PACK_ID
+  | typeof RETENTION_PACK_ID;
 
 /** Common intake for the 5 beta packs (minimal fields, sector required) */
 export type BetaPackIntake = GrowthPackIntakeBase & {
@@ -71,6 +77,25 @@ export type SaasB2bGrowthPackIntake = GrowthPackIntakeBase & {
   icp_title: string;
   pricing_model?: "subscription" | "usage" | "hybrid";
   sales_motion?: "plg" | "sales_led" | "hybrid";
+};
+
+export type StrategyPackIntake = GrowthPackIntakeBase & {
+  sector: string;
+  goals?: string[];
+  horizon_days?: number;
+};
+
+export type FunnelGrowthPackIntake = GrowthPackIntakeBase & {
+  sector: string;
+  funnel_steps?: number;
+  offer?: string;
+};
+
+export type RetentionPackIntake = GrowthPackIntakeBase & {
+  sector: string;
+  cohort?: string;
+  channels?: string[];
+  loyalty_goal?: string;
 };
 
 export type SkuRunResult = {
@@ -211,3 +236,24 @@ export const BRAND_VOICE_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
   "NELVYON-LANDING",
   "NELVYON-CHATBOT",
 ]);
+
+export const STRATEGY_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-LANDING"]).slice(0, -2),
+  { key: "strategy_plan", label: "Plan estratégico 90d" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+
+export const FUNNEL_GROWTH_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-SEO"]).slice(0, -2),
+  { key: "funnel_map", label: "Mapa funnel + eventos" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+
+export const RETENTION_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-CHATBOT"]).slice(0, -2),
+  { key: "retention_plan", label: "Secuencia retención + churn" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];

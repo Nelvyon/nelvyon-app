@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-24** — OS Universal + free-tools · claimReady false (legal)
+> Actualizado: **2026-07-24** — Cert ecommerce+saas-b2b · Strategy/Funnel/Retention BETA · claimReady false
 
 ---
 
@@ -29,10 +29,11 @@
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
 - [x] Mesh staging · Pack E2E ALL_PASS · ADR-044–046
 - [x] `OS_UNIVERSAL_SERVICE_CATALOG.md` + `FREE_TOOLS_EVALUATION.md` · ADR-047
-- [x] Honesty: ecommerce capability `elite` → `partial` hasta E2E ALL_PASS
-- [ ] Fase A: Pack E2E mesh `ecommerce-growth` → ALL_PASS
-- [ ] Fase A: Pack E2E mesh `saas-b2b-growth` → ALL_PASS
-- [ ] Fase B: certificar betas (cro → analytics → content…) sin promote prematuro
+- [x] Fase A: Pack E2E mesh `ecommerce-growth` → ALL_PASS
+- [x] Fase A: Pack E2E mesh `saas-b2b-growth` → ALL_PASS
+- [x] Auditoría betas: **permanecen BETA** (no promote)
+- [x] Strategy/Funnel/Retention: código + flags + contratos (ADR-049) · E2E post-deploy
+- [ ] E2E mesh Strategy/Funnel/Retention → ALL_PASS → promote a IMPLEMENTED_VERIFIED
 - [ ] CTO: aprobar/rechazar ADR-048 analytics Matomo/Umami (staging privado)
 - [ ] No instalar Helio/Mautic/Twenty/n8n/Listmonk sin necesidad
 - [ ] Ops: Router remoto soak mesh (opcional)

@@ -16,7 +16,10 @@ export type OsServiceId =
   | "reputation"
   | "reporting"
   | "support"
-  | "ecommerce";
+  | "ecommerce"
+  | "strategy"
+  | "funnel"
+  | "retention";
 
 export type OsCapabilityStatus = "elite" | "partial" | "beta" | "planned";
 
@@ -40,7 +43,7 @@ export type OsCapability = {
 export const OS_QA_MIN_SCORE = 85 as const;
 
 /**
- * Canonical 11 agency services. Sector flotilla (~1605) is legacy satellite — not listed as primary.
+ * Canonical agency services (14). Sector flotilla (~1605) is legacy satellite — not listed as primary.
  */
 export const OS_CAPABILITY_REGISTRY: readonly OsCapability[] = [
   {
@@ -95,7 +98,7 @@ export const OS_CAPABILITY_REGISTRY: readonly OsCapability[] = [
     portalPath: "/portal",
     qaMinScore: OS_QA_MIN_SCORE,
     ceoApprovalRequired: false,
-    status: "partial",
+    status: "elite",
     primaryAgentIds: ["crm", "sales"],
     metricsKeys: ["pipeline_value", "deals_open"],
   },
@@ -193,9 +196,51 @@ export const OS_CAPABILITY_REGISTRY: readonly OsCapability[] = [
     portalPath: "/portal",
     qaMinScore: OS_QA_MIN_SCORE,
     ceoApprovalRequired: false,
-    status: "partial",
+    status: "elite",
     primaryAgentIds: ["NELVYON-LANDING", "NELVYON-SEO"],
     metricsKeys: ["orders", "conversion_rate", "qa_score"],
+  },
+  {
+    serviceId: "strategy",
+    title: "Strategy OS",
+    universes: ["autonomous", "private_ai"],
+    llmPath: "ollama_first",
+    playbookPath: "docs/agency-playbooks/SERVICE_STRATEGY.md",
+    kickoffPackIds: ["strategy-pack"],
+    portalPath: "/portal",
+    qaMinScore: OS_QA_MIN_SCORE,
+    ceoApprovalRequired: false,
+    status: "beta",
+    primaryAgentIds: ["NELVYON-LANDING"],
+    metricsKeys: ["strategy_plans_published", "qa_score"],
+  },
+  {
+    serviceId: "funnel",
+    title: "Funnel OS",
+    universes: ["autonomous", "os_premium"],
+    llmPath: "ollama_first",
+    playbookPath: "docs/agency-playbooks/SERVICE_FUNNEL.md",
+    kickoffPackIds: ["funnel-growth-pack"],
+    portalPath: "/portal",
+    qaMinScore: OS_QA_MIN_SCORE,
+    ceoApprovalRequired: false,
+    status: "beta",
+    primaryAgentIds: ["NELVYON-LANDING", "NELVYON-SEO"],
+    metricsKeys: ["funnel_conversion", "qa_score"],
+  },
+  {
+    serviceId: "retention",
+    title: "Retention OS",
+    universes: ["private_ai", "autonomous"],
+    llmPath: "ollama_first",
+    playbookPath: "docs/agency-playbooks/SERVICE_RETENTION.md",
+    kickoffPackIds: ["retention-pack"],
+    portalPath: "/portal",
+    qaMinScore: OS_QA_MIN_SCORE,
+    ceoApprovalRequired: false,
+    status: "beta",
+    primaryAgentIds: ["NELVYON-CHATBOT", "email_marketing", "crm"],
+    metricsKeys: ["retention_rate", "churn_rate", "qa_score"],
   },
 ] as const;
 
@@ -231,8 +276,8 @@ export function assertOsCapabilityRegistryIntegrity(): { ok: boolean; violations
       violations.push(`playbook_path:${c.serviceId}`);
     }
   }
-  if (OS_CAPABILITY_REGISTRY.length !== 11) {
-    violations.push(`expected_11_got_${OS_CAPABILITY_REGISTRY.length}`);
+  if (OS_CAPABILITY_REGISTRY.length !== 14) {
+    violations.push(`expected_14_got_${OS_CAPABILITY_REGISTRY.length}`);
   }
   return { ok: violations.length === 0, violations };
 }

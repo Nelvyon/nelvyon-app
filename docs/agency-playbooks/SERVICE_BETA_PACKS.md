@@ -12,14 +12,17 @@
 | cro-audit | **beta** | `/os/packs/cro-audit` | idem |
 | analytics-setup | **beta** | `/os/packs/analytics-setup` | idem |
 | brand-voice | **beta** | `/os/packs/brand-voice` | idem |
+| strategy | **beta** | `/os/packs/strategy` | mapper dedicado · E2E mesh pendiente post-deploy |
+| funnel-growth | **beta** | `/os/packs/funnel-growth` | idem |
+| retention | **beta** | `/os/packs/retention` | idem |
 
-## Growth `available` (kickoff real)
+## Growth `available` (kickoff real · E2E ALL_PASS 2026-07-24)
 
-| Pack | availability | Kickoff API |
-|------|--------------|-------------|
-| local-business-growth | available | `/api/os/packs/local-business-growth/kickoff` |
-| ecommerce-growth | available | `/api/os/packs/ecommerce-growth/kickoff` |
-| saas-b2b-growth | available | `/api/os/packs/saas-b2b-growth/kickoff` |
+| Pack | availability | Kickoff API | Evidencia |
+|------|--------------|-------------|-----------|
+| local-business-growth | available | `/api/os/packs/local-business-growth/kickoff` | Pack E2E mesh |
+| ecommerce-growth | available | `/api/os/packs/ecommerce-growth/kickoff` | `ecommerce-pack-e2e-20260724-015452` |
+| saas-b2b-growth | available | `/api/os/packs/saas-b2b-growth/kickoff` | `saas-b2b-pack-e2e-20260724-022752` |
 
 Alias focus packs (seo-local, meta-ads, email-welcome, landing-funnel) reutilizan growth kickoffs — **available** con binding real.
 
@@ -33,7 +36,7 @@ Alias focus packs (seo-local, meta-ads, email-welcome, landing-funnel) reutiliza
 6. Tenant isolation  
 7. Observabilidad / rollback  
 
-Hasta entonces: catalog `availability: "beta"` (test honesty lock). **Ningún promote en este cierre.**
+Hasta entonces: catalog `availability: "beta"` (test honesty lock). **Ningún promote de betas en este cierre** (audit 2026-07-24).
 
 ## Núcleo reusable
 

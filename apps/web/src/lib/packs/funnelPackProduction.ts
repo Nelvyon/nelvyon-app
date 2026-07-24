@@ -2,16 +2,33 @@ import type { AutonomousSku } from "../../../../../backend/autonomous/types";
 import type { SimulationResult } from "../../../../../backend/autonomous/types";
 
 import type { PackDeliverableInput } from "@/lib/packs/packOsDb";
-import type { SaasB2bGrowthPackIntake } from "@/lib/packs/types";
-import { SAAS_B2B_GROWTH_PACK_ID } from "@/lib/packs/types";
-
+import type { FunnelGrowthPackIntake } from "@/lib/packs/types";
+import { FUNNEL_GROWTH_PACK_ID } from "@/lib/packs/types";
 import { resolvePackAppOrigin, slugFromBusinessName } from "./localPackProduction";
 
-/** Titles aligned with staging-smoke-saas-b2b-pack-e2e EXPECTED_TITLES */
-export function mapSaasB2bSkuDeliverable(params: {
+export function buildFunnelMap(intake: FunnelGrowthPackIntake, qaScore: number) {
+  const steps = Math.max(3, intake.funnel_steps ?? 3);
+  const labels = ["Awareness", "Consideration", "Conversion", "Upsell", "Referral"];
+  return {
+    business_name: intake.business_name,
+    offer: intake.offer ?? intake.value_proposition,
+    primary_cta: intake.primary_cta,
+    steps: Array.from({ length: steps }, (_, i) => ({
+      step: i + 1,
+      name: labels[i] ?? `Step ${i + 1}`,
+      copy: `${intake.primary_cta} — ${intake.value_proposition}`.slice(0, 160),
+      event: `funnel_step_${i + 1}`,
+    })),
+    tracking_events: Array.from({ length: steps }, (_, i) => `funnel_step_${i + 1}`),
+    qa_score: qaScore,
+    production: true,
+  };
+}
+
+export function mapFunnelSkuDeliverable(params: {
   sku: AutonomousSku;
   simulation: SimulationResult;
-  intake: SaasB2bGrowthPackIntake;
+  intake: FunnelGrowthPackIntake;
   packRunId: string;
   osClientId: string;
   osProjectId: string;
@@ -26,19 +43,16 @@ export function mapSaasB2bSkuDeliverable(params: {
     projectId: params.osProjectId,
     visibility: "client_visible" as const,
     metadata: {
-      pack_id: SAAS_B2B_GROWTH_PACK_ID,
+      pack_id: FUNNEL_GROWTH_PACK_ID,
       pack_run_id: params.packRunId,
-      landing_slug: slug,
       production: true,
-      icp_title: params.intake.icp_title,
     },
   };
-
   switch (params.sku) {
     case "NELVYON-LANDING":
       return {
         ...base,
-        title: "Landing PLG",
+        title: "Landing funnel",
         type: "url",
         file_url: `${origin}/api/packs/local/live/${slug}`,
         metadata: { ...base.metadata, sku: params.sku, qa_score: qaScore },
@@ -46,28 +60,10 @@ export function mapSaasB2bSkuDeliverable(params: {
     case "NELVYON-SEO":
       return {
         ...base,
-        title: "Informe SEO B2B",
+        title: "Informe CRO funnel",
         type: "json",
         file_url: `${origin}/api/packs/local/seo/${slug}/report`,
-        metadata: {
-          ...base.metadata,
-          sku: params.sku,
-          qa_score: qaScore,
-          report_type: "b2b_demand_gen",
-        },
-      };
-    case "NELVYON-CHATBOT":
-      return {
-        ...base,
-        title: "Bot demo",
-        type: "url",
-        file_url: `${origin}/api/packs/local/bot/${slug}`,
-        metadata: {
-          ...base.metadata,
-          sku: params.sku,
-          qa_score: qaScore,
-          demo_qualification: true,
-        },
+        metadata: { ...base.metadata, sku: params.sku, qa_score: qaScore, report_type: "funnel_cro" },
       };
     default:
       return null;

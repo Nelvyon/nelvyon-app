@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getPackMeta, resolveKickoffPackId } from "@/lib/packs/packRegistry";
+import { flagKeyForPackId, isOsPackFeatureEnabled } from "@/lib/packs/osPackFlags";
 import { requirePlatformClaims } from "@/lib/platformBffAuth";
 import {
   assertUserCanAccessWorkspace,
@@ -33,6 +34,17 @@ export async function POST(
 
   if (!meta || !runner) {
     return NextResponse.json({ error: `Pack desconocido: ${rawPackId}` }, { status: 404 });
+  }
+
+  const flagKey = flagKeyForPackId(resolvedId ?? rawPackId);
+  if (flagKey && !isOsPackFeatureEnabled(flagKey)) {
+    return NextResponse.json(
+      {
+        error: `Pack ${meta.name} desactivado (flag ${flagKey}=OFF). Solo staging/dev o flag=1.`,
+        code: "PACK_FLAG_OFF",
+      },
+      { status: 503 },
+    );
   }
 
   const claims = await requirePlatformClaims(req);

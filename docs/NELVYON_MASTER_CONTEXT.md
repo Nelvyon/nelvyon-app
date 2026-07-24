@@ -1021,10 +1021,10 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | Pack E2E tip `99b30730` · mesh JOIN_OK · prod IA ABSENT |
-| **OS Universal** | Catálogo SSOT · local growth **IMPLEMENTED_VERIFIED** · ecom/saas **PREPARED_OFF** · 5 **BETA** · ADR-047 |
+| **SHA / deploys** | ecommerce+saas-b2b Pack E2E ALL_PASS · mesh JOIN_OK · prod IA ABSENT |
+| **OS Universal** | Catálogo SSOT · local/ecom/saas-b2b **IMPLEMENTED_VERIFIED** · 8 **BETA** · ADR-049 |
 | **Free tools** | Eval only · 0 installs · `FREE_TOOLS_EVALUATION.md` |
-| **Canary IA** | Staging mesh PASS · Pack E2E **ALL_PASS completed** · OpenAI 0 |
+| **Canary IA** | Staging mesh PASS · Pack E2E growth **ALL_PASS** · OpenAI 0 |
 | **Blocker claimReady** | Legal checklist campañas |
 | Freezes Router / MCP / prod IA | **intactos** (flags OFF) |
 | Producto enterprise completo | **NO** |

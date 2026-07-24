@@ -7,6 +7,9 @@ import {
   CRO_AUDIT_PACK_ID,
   ANALYTICS_SETUP_PACK_ID,
   BRAND_VOICE_PACK_ID,
+  STRATEGY_PACK_ID,
+  FUNNEL_GROWTH_PACK_ID,
+  RETENTION_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -132,6 +135,23 @@ const CATALOG: Record<PackId, PackDeliverableItem[]> = {
     { title: "3 propuestas de valor", description: "Para segmentos de cliente diferenciados.", portalLabel: "Descargar props" },
     { title: "3 arquetipos de cliente", description: "Buyer personas con motivaciones y objeciones.", portalLabel: "Descargar arquetipos" },
     { title: "Informe ejecutivo", description: "Resumen de posicionamiento y aplicación.", portalLabel: "Abrir informe" },
+  ],
+  [STRATEGY_PACK_ID]: [
+    { title: "Landing estrategia", description: "Landing de posicionamiento alineada al plan 90d.", portalLabel: "Ver landing" },
+    { title: "Plan 90d", description: "OKRs, hitos, packs sugeridos y riesgos.", portalLabel: "Descargar plan" },
+    { title: "Informe ejecutivo estrategia", description: "Resumen CEO y próximos packs.", portalLabel: "Abrir informe" },
+  ],
+  [FUNNEL_GROWTH_PACK_ID]: [
+    { title: "Landing funnel", description: "Landing del funnel multi-step.", portalLabel: "Ver landing" },
+    { title: "Informe CRO funnel", description: "Auditoría SEO/CRO del funnel.", portalLabel: "Ver informe CRO" },
+    { title: "Mapa funnel", description: "Steps, copy y eventos de tracking.", portalLabel: "Descargar mapa" },
+    { title: "Informe ejecutivo funnel", description: "Plan de conversión y tests.", portalLabel: "Abrir informe" },
+  ],
+  [RETENTION_PACK_ID]: [
+    { title: "Bot retención", description: "Asistente de retención y win-back.", portalLabel: "Probar bot" },
+    { title: "Secuencia retención", description: "Touches email/CRM por cohort.", portalLabel: "Ver secuencia" },
+    { title: "Reglas churn", description: "Triggers y acciones anti-churn.", portalLabel: "Ver reglas" },
+    { title: "Informe ejecutivo retención", description: "KPIs churn/retention y próximos pasos.", portalLabel: "Abrir informe" },
   ],
 };
 

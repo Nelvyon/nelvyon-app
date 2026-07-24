@@ -11,18 +11,25 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — único bloqueo claimReady / READY |
-| **Detalle** | Mesh+Pack PASS · OS catalog live · free tools 0 installs |
+| **Detalle** | Mesh+Pack ecommerce/saas-b2b PASS · OS catalog · free tools 0 installs |
 
-### Ops (no KI) — ecommerce/saas Pack E2E pendiente
+### Ops (no KI) — Strategy/Funnel/Retention E2E post-deploy
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **PREPARED_OFF** en catálogo |
-| **Detalle** | Harness existe · falta ALL_PASS mesh reciente → no `IMPLEMENTED_VERIFIED` |
+| **Estado** | **BETA** (código+flags) · falta ALL_PASS mesh tip nuevo |
+| **Detalle** | Smoke `staging-smoke-new-os-packs-e2e.mjs` · no promover a IMPLEMENTED_VERIFIED sin evidencia |
 
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — ecommerce + saas-b2b Pack E2E → ALL_PASS
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Resuelto** 2026-07-24 |
+| **Detalle** | `ecommerce-pack-e2e-20260724-015452` · `saas-b2b-pack-e2e-20260724-022752` · registry elite ecommerce+crm_sales |
 
 ### Ops — Staging mesh Pack E2E QA soft-fail → ALL_PASS
 

@@ -12,6 +12,9 @@ import {
   CRO_AUDIT_PACK_ID,
   ANALYTICS_SETUP_PACK_ID,
   BRAND_VOICE_PACK_ID,
+  STRATEGY_PACK_ID,
+  FUNNEL_GROWTH_PACK_ID,
+  RETENTION_PACK_ID,
 } from "@/lib/packs/types";
 
 export type ServicePackCategory =
@@ -23,7 +26,10 @@ export type ServicePackCategory =
   | "content"
   | "cro"
   | "analytics"
-  | "brand";
+  | "brand"
+  | "strategy"
+  | "funnel"
+  | "retention";
 
 export type ServicePackAvailability = "available" | "beta" | "coming_soon";
 
@@ -333,6 +339,63 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     accent: "from-indigo-500/10 via-card to-card",
     estimatedMinutes: 5,
   },
+  {
+    id: "strategy-pack",
+    slug: "strategy",
+    name: "Strategy OS",
+    tagline: "Plan estratégico 90 días con OKRs y packs sugeridos",
+    category: "strategy",
+    verticals: ["local", "ecommerce", "b2b_saas", "generic"],
+    availability: "beta",
+    launchPackId: STRATEGY_PACK_ID,
+    kickoffPath: "/os/packs/strategy",
+    reportPath: "/os/packs/strategy/report",
+    benefits: ["Plan 90d", "OKRs", "Packs sugeridos", "Riesgos"],
+    problem: "No hay un plan accionable que priorice qué pack ejecutar primero.",
+    audience: "CEO / founders que necesitan roadmap de crecimiento IA.",
+    inputs: ["Objetivos", "Sector", "Propuesta de valor", "Horizonte"],
+    outputs: ["Plan 90d JSON", "Landing estrategia", "Informe ejecutivo"],
+    accent: "from-indigo-500/10 via-card to-card",
+    estimatedMinutes: 8,
+  },
+  {
+    id: "funnel-growth-pack",
+    slug: "funnel-growth",
+    name: "Funnel OS",
+    tagline: "Funnel multi-step con mapa CRO, copy y eventos",
+    category: "funnel",
+    verticals: ["ecommerce", "b2b_saas", "info_products"],
+    availability: "beta",
+    launchPackId: FUNNEL_GROWTH_PACK_ID,
+    kickoffPath: "/os/packs/funnel-growth",
+    reportPath: "/os/packs/funnel-growth/report",
+    benefits: ["Mapa funnel", "Copy por step", "Eventos tracking", "Informe CRO"],
+    problem: "Tienes landing pero no un funnel medible de 3+ pasos.",
+    audience: "Equipos con oferta clara y tráfico para optimizar conversión.",
+    inputs: ["Oferta", "CTA", "Steps ≥3", "Sector"],
+    outputs: ["Landing funnel", "Mapa funnel", "Informe CRO", "Informe ejecutivo"],
+    accent: "from-fuchsia-500/10 via-card to-card",
+    estimatedMinutes: 10,
+  },
+  {
+    id: "retention-pack",
+    slug: "retention",
+    name: "Retention OS",
+    tagline: "Secuencia de retención, reglas de churn y cohort CRM",
+    category: "retention",
+    verticals: ["b2b_saas", "ecommerce", "local"],
+    availability: "beta",
+    launchPackId: RETENTION_PACK_ID,
+    kickoffPath: "/os/packs/retention",
+    reportPath: "/os/packs/retention/report",
+    benefits: ["Secuencia retención", "Reglas churn", "Bot retención", "Informe cohort"],
+    problem: "Adquieres clientes pero no tienes playbook post-compra / anti-churn.",
+    audience: "SaaS y ecommerce con base activa a retener.",
+    inputs: ["Cohort", "Canales", "Loyalty goal", "Propuesta"],
+    outputs: ["Secuencia", "Churn rules", "Bot", "Informe ejecutivo"],
+    accent: "from-teal-500/10 via-card to-card",
+    estimatedMinutes: 8,
+  },
 ];
 
 export function getServicePack(id: string): ServicePackDefinition | undefined {
@@ -364,12 +427,15 @@ export function getServicePackOsSummary(packId: string) {
 
 export const SERVICE_PACK_CATEGORIES: { id: ServicePackCategory; label: string }[] = [
   { id: "growth", label: "Crecimiento integral" },
+  { id: "strategy", label: "Estrategia" },
   { id: "seo", label: "SEO" },
   { id: "ads", label: "Publicidad" },
   { id: "social", label: "Redes sociales" },
   { id: "email", label: "Email marketing" },
   { id: "content", label: "Contenido" },
   { id: "cro", label: "Conversión (CRO)" },
+  { id: "funnel", label: "Funnels" },
   { id: "analytics", label: "Analítica" },
   { id: "brand", label: "Marca" },
+  { id: "retention", label: "Retención" },
 ];

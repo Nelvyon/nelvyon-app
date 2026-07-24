@@ -550,3 +550,15 @@
 
 ---
 
+## ADR-049 — Certificar growth packs + Strategy/Funnel/Retention OS
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | (1) Certificar `ecommerce-growth` y `saas-b2b-growth` con mismo estándar que local (mesh, brief real, QA≥85, portal, auto-approve, completed). (2) Registry: `ecommerce` + `crm_sales` → **elite** tras E2E ALL_PASS. (3) Auditoría 5 betas: **permanecen BETA** (mapper genérico / sin ALL_PASS). (4) Construir `strategy-pack` · `funnel-growth-pack` · `retention-pack` con mappers dedicados, playbooks, flags `NELVYON_*_PACK` default OFF fuera staging, catalog `beta` hasta E2E. (5) Soft-continue en `llmPmSeo` para no dejar `sku_seo:running` eterno. (6) **0** tools nuevas · prod IA OFF · claimReady false. |
+| **Por qué** | Expandir OS sin humo ni costes; reutilizar SKUs autónomos. |
+| **Consecuencias** | Catálogo 14 capabilities · smoke `staging-smoke-new-os-packs-e2e.mjs` · promote nuevos packs solo tras ALL_PASS. |
+| **Relación** | ADR-047 · `OS_NEW_SERVICES_CONTRACTS.md` · `OS_UNIVERSAL_SERVICE_CATALOG.md`. |
+
+---
+
