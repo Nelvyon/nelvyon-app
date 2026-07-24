@@ -1021,8 +1021,8 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | ecommerce+saas-b2b Pack E2E ALL_PASS · mesh JOIN_OK · prod IA ABSENT |
-| **OS Universal** | 11 packs **IMPLEMENTED_VERIFIED** · equipos ADR-051 · OpenClaw **PREPARED_OFF** |
+| **SHA / deploys** | staging tip `4d331b55` · deploy `85fe50cc` · social ADR-052 E2E ALL_PASS · prod untouched / IA ABSENT |
+| **OS Universal** | 11 packs **IMPLEMENTED_VERIFIED** · social integral ADR-052 · equipos ADR-051 · OpenClaw/paid/publish **PREPARED_OFF** |
 | **Free tools** | Eval only · 0 installs · `FREE_TOOLS_EVALUATION.md` |
 | **Canary IA** | Staging mesh PASS · Pack E2E growth **ALL_PASS** · OpenAI 0 |
 | **Blocker claimReady** | Legal checklist campañas |

@@ -37,6 +37,7 @@
 - [x] ADR-048: REJECT/DEFER Matomo/Umami (0 installs)
 - [x] Certificar 5 packs (social/content/cro/analytics/brand) → ALL_PASS → available
 - [x] ADR-051: equipos profesionales + QA élite + OpenClaw/Visual OFF
+- [x] ADR-052: redes sociales integral + staging E2E `--only=social` ALL_PASS → IMPLEMENTED_VERIFIED
 - [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
 - [ ] CEO: autorización OpenClaw live (hoy BLOCKED_CEO) si se requiere
 - [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts/campañas/visual spend en prod

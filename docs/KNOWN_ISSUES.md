@@ -11,7 +11,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — **BLOCKED_LEGAL** claimReady / READY |
-| **Detalle** | 11 packs CERT · ADR-051 OpenClaw OFF · 0 costes |
+| **Detalle** | 11 packs CERT · social ADR-052 CERT · OpenClaw/paid/publish OFF · 0 costes |
 
 ### Ops (no KI) — OpenClaw live
 
@@ -20,9 +20,24 @@
 | **Estado** | **BLOCKED_CEO** / PREPARED_OFF |
 | **Detalle** | Requiere autorización CEO + SM + evidencia · flag default 0 |
 
+### Ops (no KI) — Paid social / OAuth publish
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **PREPARED_OFF** / **BLOCKED_CEO** |
+| **Detalle** | ADR-052 fail-closed · sin OAuth ni presupuesto · no auto-publish |
+
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — Social ADR-052 staging CERT
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-24 |
+| **Evidencia** | E2E `--only=social` ALL_PASS · tip `4d331b55` · deploy `85fe50cc` · 7 entregables portal |
+| **Nota** | Login 401 corregido resync `STAGING_QA_PASSWORD` + `seedQaOperator` (staging only) |
 
 ### Ops — 5 packs beta → ALL_PASS / available
 

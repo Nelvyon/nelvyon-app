@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-24** — Redes sociales integral ADR-052 · `claimReady: false`
+> Última actualización: **2026-07-24** — Social ADR-052 staging CERT ALL_PASS · `claimReady: false`
 
 ---
 
@@ -10,28 +10,28 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** (no READY) |
+| **Tip / live staging** | `4d331b55` · deploy `85fe50cc` SUCCESS |
+| **Social integral** | **IMPLEMENTED_VERIFIED** (ADR-052 E2E ALL_PASS · 7 entregables portal) |
 | **Packs OS** | 11 **IMPLEMENTED_VERIFIED** |
-| **Social integral** | ADR-052 · `OsSocialNetworksService` · equipo 10 roles · paid/publish OFF |
-| **OpenClaw / Orchestrator / Visual spend** | **PREPARED_OFF** |
+| **OpenClaw / Orchestrator / Visual / Paid social / Publish** | **PREPARED_OFF** / NOT_AUTHORIZED |
 | **claimReady** | **false** — **BLOCKED_LEGAL** campañas |
-| **Prod IA** | OFF/ABSENT |
+| **Prod** | untouched · IA OFF/ABSENT |
 
-### Matriz SSOT
+### Evidencia social
 
-`docs/OS_ELITE_STATE_MATRIX.md` · playbook `SERVICE_CONTENT_SOCIAL.md`
+`scripts/docs/evidence/os-saas-e2e/modules/social.adr052_e2e.md` · log `social.adr052_e2e_2026-07-24T14-51-08.txt`
 
 ### Rollback
 
-`NELVYON_PAID_SOCIAL_ENABLED=0` · no publish · `NELVYON_VISUAL_GENERATION_ENABLED=0` · `NELVYON_OPENCLAW_BRIDGE_ENABLED=0` · `NELVYON_AI_ENABLED=0` · `OLLAMA_CONFIGURED=0`
+`NELVYON_PAID_SOCIAL_ENABLED=0` · no publish · `NELVYON_VISUAL_GENERATION_ENABLED=0` · `NELVYON_OPENCLAW_BRIDGE_ENABLED=0` · `NELVYON_MCP_PRODUCTIVE_ENABLED=0` · `NELVYON_SHARED_MEMORY_ENABLED=0` · `NELVYON_CEO_PARTNER_PAYOUTS=0` · prod IA ABSENT
 
 ---
 
 ## Próximo paso EXACTO
 
-1. **Deploy staging** tip con ADR-052 y ejecutar `node scripts/staging-smoke-beta-packs-e2e.mjs --only=social --skip-wait` (mesh IA ON) → adjuntar evidencia.  
-2. **Legal:** checklist campañas (bloquea claimReady / READY).  
-3. **CEO:** OpenClaw live / paid social / publish OAuth solo con autorización explícita (hoy **BLOCKED_CEO** / **PREPARED_OFF**).  
-4. **No** activar OpenAI/MCP/SM/payouts/campañas/visual spend/paid social en prod.  
-5. **No** romper packs certificados.
+1. **Legal:** checklist campañas (bloquea claimReady / READY).  
+2. **CEO:** OpenClaw live / paid social / OAuth publish solo con autorización explícita.  
+3. **No** activar OpenAI/MCP/SM/payouts/campañas/visual spend/paid social en prod.  
+4. **No** tocar producción para este cierre social.
 
 SSOT: `OS_ELITE_STATE_MATRIX.md` · ADR-052 · `SERVICE_CONTENT_SOCIAL.md`

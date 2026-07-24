@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| OS | **Social ADR-052 CERT staging** | tip `4d331b55` · deploy `85fe50cc` · E2E `--only=social` **ALL_PASS** · 7 entregables portal · paid/publish OFF · evidencia `social.adr052_e2e*` · claimReady **false** · prod untouched · 0 costes |
 | OS | **Redes sociales integral (ADR-052)** | `OsSocialNetworksService` · 11 plataformas · 10 roles `svc_social_creative` · pack social +4 entregables portal · paid/publish fail-closed · playbook `SERVICE_CONTENT_SOCIAL.md` · claimReady **false** · 0 costes |
 | OS | **Elite equipos + OpenClaw OFF (ADR-051)** | `OsProfessionalTeams` · QA élite ≥85/90 · auditor flag OFF · orquestador/OpenClaw contratos fail-closed OFF · VisualGenerationProvider OFF · matriz `OS_ELITE_STATE_MATRIX.md` · packs certificados intactos · claimReady **false** · 0 costes |
 | OS | **Cert 5 packs + ADR-048** | social/content/cro/analytics/brand E2E **ALL_PASS** · mappers dedicados · catalog available · content_social+reporting elite · Matomo/Umami **REJECT/DEFER** · tip `eb462545` · claimReady **false** · 0 tools · prod IA OFF |

@@ -68,7 +68,8 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
 | Beta packs → available | ✅ | 5 packs E2E ALL_PASS · ADR-050 · catalog available |
-| Agencia OS unificada élite (ops) | 🟡 | 11 packs CERT · equipos ADR-051 · OpenClaw OFF · claimReady false |
+| Agencia OS unificada élite (ops) | 🟡 | 11 packs CERT · social ADR-052 CERT · equipos ADR-051 · OpenClaw/paid/publish OFF · claimReady false |
+| Redes sociales integral por cliente | ✅ | ADR-052 · staging E2E ALL_PASS · 7 entregables portal · paid/publish OFF |
 
 ---
 

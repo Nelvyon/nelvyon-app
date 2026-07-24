@@ -22,7 +22,7 @@ Estados permitidos: `IMPLEMENTED_VERIFIED` | `PREPARED_OFF` | `BLOCKED_EXTERNAL`
 | Shared Memory | **PREPARED_OFF** | Flag OFF | CTO | Medio | SM=0 | Staging verified previo; prod OFF |
 | MCP productivo | **PREPARED_OFF** | Flag OFF | CTO | Alto | MCP=0 | No tocar soak cert |
 | VisualGenerationProvider | **PREPARED_OFF** | OFF · strategy_only | CTO | Coste si ON | VISUAL=0 | Provider audit antes de gasto |
-| Redes sociales integral (ADR-052) | **IMPLEMENTED_VERIFIED** (contratos+equipo+tests) · pack deliverables **pendiente re-E2E** post-deploy | `OsSocialNetworksService` · 10 roles · 11 plataformas | CTO | Medio si publish ON | no publish · paid=0 | `staging-smoke-beta-packs-e2e.mjs --only=social` |
+| Redes sociales integral (ADR-052) | **IMPLEMENTED_VERIFIED** | E2E staging ALL_PASS `social.adr052_e2e_2026-07-24T14-51-08` · deploy `85fe50cc` · tip `4d331b55` · 7 entregables portal | CTO | Bajo (publish OFF) | no publish · paid=0 | Mantener gates OFF |
 | Paid social / publish OAuth | **PREPARED_OFF** / **BLOCKED_CEO** | Sin OAuth ni presupuesto | CEO | Alto | paid=0 · no OAuth | Autorización explícita |
 | Ads spend / OAuth | **BLOCKED_EXTERNAL** | OAuth + presupuesto | CEO/Ads | Alto | no spend | OAuth CEO |
 | Campañas masivas send | **BLOCKED_CEO** | Autorización envío | CEO | Alto | no send | Checklist + OK CEO |

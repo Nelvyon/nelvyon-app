@@ -8,6 +8,20 @@
 
 > No borrar entradas. Añadir al inicio.
 
+## 2026-07-24 — Social ADR-052 CERT (staging only)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Tip / live** | `4d331b55` · `git_sha=4d331b5540fd` |
+| **Deploy** | `85fe50cc-fa23-4094-a7e6-852713cd0db1` SUCCESS (push ADR-052; único deploy de servicio) |
+| **CI follow-up** | tip `83b757da` workflow fix (deploy secundario posible; no tocado prod) |
+| **Pack E2E** | `social-calendar-pack` **ALL_PASS** · 7 entregables portal auto-approve |
+| **Evidence** | `scripts/docs/evidence/os-saas-e2e/modules/social.adr052_e2e.md` |
+| **Gates** | OpenAI/OpenClaw/MCP/SM/payouts/paid social/publish/visual **OFF** |
+| **Prod** | untouched · coste 0 |
+| **claimReady** | **false** |
+
 ## 2026-07-24 — Cert 5 packs beta (ADR-048/050)
 
 | Campo | Valor |

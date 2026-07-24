@@ -1,6 +1,6 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-24** (OS Elite ADR-051 · 11 packs CERT · OpenClaw OFF)  
+> Fecha: **2026-07-24** (Social ADR-052 CERT · 11 packs CERT · OpenClaw/paid OFF)  
 > Veredicto: **CONDITIONAL_READY** · `claimReady: false` · **no READY**  
 > SSOT: `OS_ELITE_STATE_MATRIX.md`
 
@@ -8,13 +8,14 @@
 
 | Dimensión | Estado |
 |-----------|--------|
-| IMPLEMENTADO / VERIFICADO | 11 packs · teams · QA élite contratos |
-| PREPARADO OFF | OpenClaw · orchestrator · auditor flag · visual spend · SM · MCP |
+| IMPLEMENTADO / VERIFICADO | 11 packs · social ADR-052 E2E · teams · QA élite |
+| PREPARADO OFF | OpenClaw · orchestrator · auditor · visual · SM · MCP · paid social · auto-publish |
 | BLOQUEO EXTERNO | ads OAuth |
-| BLOQUEO CEO | campañas · payouts · OpenAI · visual paid · OpenClaw live |
+| BLOQUEO CEO | campañas · payouts · OpenAI · visual paid · OpenClaw live · paid social live |
 | BLOQUEO LEGAL | claimReady |
 | NO IMPLEMENTADO | influencers/PR pack |
 | COSTES | 0 |
+| Evidencia social | `social.adr052_e2e.md` · tip `4d331b55` · deploy `85fe50cc` |
 
 ---
 
