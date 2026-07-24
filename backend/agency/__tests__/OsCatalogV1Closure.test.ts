@@ -156,19 +156,33 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
   }, 30_000);
 
   it("OS Catalog v1 is versioned and honest", () => {
-    expect(OS_CATALOG_V1_VERSION).toBe("1.2.0");
+    expect(OS_CATALOG_V1_VERSION).toBe("1.4.0");
     const check = assertOsCatalogV1Integrity();
     expect(check.violations).toEqual([]);
     expect(listOsCatalogV1().length).toBeGreaterThanOrEqual(15);
     const summary = osCatalogV1Summary();
     expect(summary.IMPLEMENTED_VERIFIED).toBeGreaterThanOrEqual(10);
-    expect(summary.NOT_IMPLEMENTED).toBeGreaterThanOrEqual(1);
+    expect(summary.NOT_IMPLEMENTED).toBeGreaterThanOrEqual(0);
     expect(summary.PREPARED_OFF + summary.BLOCKED_EXTERNAL).toBeGreaterThanOrEqual(2);
     const ads = listOsCatalogV1().find((e) => e.serviceId === "ads");
     expect(ads?.status).toBe("BLOCKED_EXTERNAL");
     const social = listOsCatalogV1().find((e) => e.serviceId === "content_social");
     expect(social?.status).toBe("IMPLEMENTED_VERIFIED");
     expect(social?.e2eEvidence).toBeTruthy();
+    const influencersPr = listOsCatalogV1().find((e) => e.serviceId === "influencers_pr");
+    expect(influencersPr?.status).toBe("PREPARED_OFF");
+    expect(influencersPr?.kickoffPackIds).toContain("influencers-pr-pack");
+    const adsCore = listOsCatalogV1().find((e) => e.serviceId === "ads_attribution_core");
+    expect(adsCore?.status).toBe("PREPARED_OFF");
+    const communityCore = listOsCatalogV1().find((e) => e.serviceId === "community_publish_core");
+    expect(communityCore?.status).toBe("PREPARED_OFF");
+    const telephonyCore = listOsCatalogV1().find((e) => e.serviceId === "telephony_core");
+    expect(telephonyCore?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(telephonyCore?.nextAction).toMatch(/BLOCKED_EXTERNAL/);
+    const oauthMt = listOsCatalogV1().find((e) => e.serviceId === "oauth_multitenant");
+    expect(oauthMt?.status).toBe("IMPLEMENTED_VERIFIED");
+    const integrationsMarketplace = listOsCatalogV1().find((e) => e.serviceId === "integrations_marketplace");
+    expect(integrationsMarketplace?.status).toBe("IMPLEMENTED_VERIFIED");
   });
 
   it("OS Catalog v1.1.0 entries carry roles, flow, and non-empty certificationCriteria", () => {

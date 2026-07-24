@@ -660,3 +660,17 @@
 
 ---
 
+## ADR-057 — Blocks 11–25 internal cores (agency platform completion)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | Cerrar **Blocks 11–25** como cores internos verificados con honestidad fail-closed. Sin activar rutas externas de pago, OAuth real, publish real, telefonía real, App Store, pgvector live ni canary productivo de IA. Catalog bump **OsCatalogV1 v1.4.0**. |
+| **Blocks** | **11** `TelephonyCore` simulator IMPLEMENTED_VERIFIED · real **BLOCKED_EXTERNAL** · **12** `influencers-pr-pack` PREPARED_OFF/beta (unit+kickoff wired) · **13** `AdsAttributionCore` IMPLEMENTED_VERIFIED · spend/OAuth **BLOCKED_EXTERNAL** · **14** `CommunityPublishCore` simulator IMPLEMENTED_VERIFIED · publish **BLOCKED_EXTERNAL** · **15** `MassSendTechnicalControls` IMPLEMENTED_VERIFIED · send **BLOCKED_LEGAL** · **16** `OAuthMultiTenantFramework` mock IMPLEMENTED_VERIFIED · real apps **BLOCKED_EXTERNAL** · **17** `IntegrationsMarketplaceV1` internal ping IMPLEMENTED_VERIFIED · **18** mobile Capacitor PREPARED_OFF/contract VERIFIED · stores **BLOCKED_EXTERNAL** · **19** PWA IMPLEMENTED_VERIFIED (`pwa-certify`) · iOS **PARTIAL** · **20** `LocalizationCore` es/en IMPLEMENTED_VERIFIED · fr/de/it/pt **PARTIAL** · **21** HA/DR runbook IMPLEMENTED_VERIFIED · multi-region **BLOCKED_EXTERNAL** · **22** `OpsObservabilityCore` local IMPLEMENTED_VERIFIED · paid **PREPARED_OFF** · **23** `LegacyConsolidationAudit` IMPLEMENTED_VERIFIED · zero unsafe deletes · **24** `PrivateVectorRagCore` synthetic IMPLEMENTED_VERIFIED · pgvector **PREPARED_OFF** · **25** `PrivateAiCanaryPrep` PREPARED_OFF · **BLOCKED_CEO** |
+| **Por qué** | Completar la capa agency/OS con cores demostrables sin false READY ni activación productiva. Separar “core verificado” de “integración externa pendiente CEO/legal”. |
+| **Evidencia** | `tsc` **0** · `vitest run backend/agency` **249 PASS** · influencers pack tests **PASS** · `pwa-certify` **PASS** (`pwa.cert_latest.md`) · private-rag synthetic **ALL_PASS** (27 tests · `private-rag.synthetic_latest.md`) · staging https://ideal-victory-staging.up.railway.app · prod flags **OFF** |
+| **Consecuencias** | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` · tip **TBA** (parent commit pending) · próximo paso: CEO checklists + confirm staging deploy after push · sin OpenAI · sin Pepito · sin credenciales reales Twilio/ads/publish/OAuth · sin App Store publish |
+| **Relación** | ADR-056 · `OsCatalogV1.ts` · runbooks `docs/ops/*` · `CEO_IA_PROD_CANARY_REQUEST.md` · `PRIVATE_RAG_RUNBOOK.md` |
+
+---
+

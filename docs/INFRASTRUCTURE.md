@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-24** (ADR-056 elite absolute audit). Sin secretos.
+> Estado real documentado **2026-07-24** (**ADR-057 Blocks 11–25 complete**). Sin secretos.
 
 ---
 
@@ -13,13 +13,17 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | 🟡 | Desktop often DOWN for restore drill |
-| **Railway prod** | ✅ | `@nelvyon/web` · IA/mesh/OpenAI keys **ABSENT** · ADR-056 flag read verified (brief switch, restored) |
-| **Railway staging** | ✅ | `ideal-victory` Online · runtime ADR-055 **`53149384`** · deploy **`e514bbd7`** SUCCESS · ADR-056 fixes **uncommitted** (tip TBA · base `6364c28c`) · https://ideal-victory-staging.up.railway.app |
-| **OpenClaw** | ✅ staging_mock / ❌ prod | ADR-055 deepened · canary doc PENDING_CEO |
-| **Auditor** | ✅ staging / ❌ prod | ADR-055 live (13 packs) |
-| **SM/MCP synthetic** | ✅ staging | flags **ON** · productivo **0** · harness unit tests PASS · smoke Windows fix |
-| **Visual spend** | ❌ OFF | creative_direction + decision matrix |
+| **Docker** | 🟡 | Desktop often DOWN for restore drill · local-ai/pgvector **PREPARED_OFF** (Block 24) |
+| **Railway prod** | ✅ | `@nelvyon/web` · flags **OFF** / **ABSENT** · no OpenAI · no credenciales reales |
+| **Railway staging** | ✅ | `ideal-victory` · https://ideal-victory-staging.up.railway.app · **confirm deploy after push** · tip **TBA** |
+| **ADR-057 cores** | ✅ local | Blocks 11–25 internal cores verified · agency **249 PASS** · tsc **0** |
+| **OpenClaw** | ✅ staging_mock / ❌ prod | canary doc PENDING_CEO |
+| **Auditor** | ✅ staging / ❌ prod | 13 packs ADR-055 |
+| **SM/MCP synthetic** | ✅ staging | flags ON · productivo 0 |
+| **Telephony (Block 11)** | ✅ simulator | real Twilio **BLOCKED_EXTERNAL** |
+| **Mobile (Block 18)** | 🟡 | Capacitor contract verified · App Store/Play **BLOCKED_EXTERNAL** |
+| **PWA (Block 19)** | ✅ | `pwa-certify` PASS · iOS Safari PARTIAL |
+| **Private RAG (Block 24)** | ✅ synthetic / 🟡 pgvector | in-process verified · Docker live PREPARED_OFF |
 | **Costes** | **0** | |
 
 ---

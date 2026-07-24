@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-21** — Bloque 1 Docker+ingest **done**; Bloque 2 SM staging **verified**; KI-026 RLS ✅; SES/Stripe abiertos
+> Actualizado: **2026-07-24** — ADR-057 Blocks 11–25 complete · tip TBA · CONDITIONAL_READY · NOT READY
 
 ---
 
@@ -20,11 +20,42 @@
 
 ---
 
-> Actualizado: **2026-07-24** — ADR-056 elite absolute audit · **AUDIT_FIXES_LOCAL** · tip TBA (base `6364c28c`) · runtime staging ADR-055 `53149384` · CONDITIONAL_READY · claimReady false · NOT READY
+> Actualizado: **2026-07-24** — **ADR-057 Blocks 11–25 complete** · tip **TBA** · CONDITIONAL_READY · claimReady false · NOT READY
 
 ---
 
-## P2 — Post-auditoría / ops
+## P2 — Post-auditoría / ops (ADR-057)
+
+- [x] ADR-057 Blocks 11–25 internal cores — agency **249 PASS** · tsc **0** · catalog **v1.4.0** · tip TBA
+- [x] Block 11: `TelephonyCore` simulator IMPLEMENTED_VERIFIED · real **BLOCKED_EXTERNAL**
+- [x] Block 12: `influencers-pr-pack` PREPARED_OFF/beta · unit+kickoff wired · smoke script ready
+- [x] Block 13: `AdsAttributionCore` IMPLEMENTED_VERIFIED · spend/OAuth **BLOCKED_EXTERNAL**
+- [x] Block 14: `CommunityPublishCore` simulator IMPLEMENTED_VERIFIED · publish **BLOCKED_EXTERNAL**
+- [x] Block 15: `MassSendTechnicalControls` IMPLEMENTED_VERIFIED · send **BLOCKED_LEGAL**
+- [x] Block 16: `OAuthMultiTenantFramework` mock IMPLEMENTED_VERIFIED · real apps **BLOCKED_EXTERNAL**
+- [x] Block 17: `IntegrationsMarketplaceV1` internal ping IMPLEMENTED_VERIFIED
+- [x] Block 18: mobile Capacitor PREPARED_OFF · contract VERIFIED · stores **BLOCKED_EXTERNAL**
+- [x] Block 19: PWA IMPLEMENTED_VERIFIED · `pwa-certify` **PASS** (`pwa.cert_latest.md`) · iOS **PARTIAL**
+- [x] Block 20: `LocalizationCore` es/en IMPLEMENTED_VERIFIED · fr/de/it/pt **PARTIAL**
+- [x] Block 21: HA/DR runbook+checks IMPLEMENTED_VERIFIED · multi-region **BLOCKED_EXTERNAL**
+- [x] Block 22: `OpsObservabilityCore` local IMPLEMENTED_VERIFIED · paid **PREPARED_OFF**
+- [x] Block 23: legacy audit IMPLEMENTED_VERIFIED · zero unsafe deletes
+- [x] Block 24: `PrivateVectorRagCore` synthetic IMPLEMENTED_VERIFIED (27 tests) · pgvector **PREPARED_OFF**
+- [x] Block 25: `PrivateAiCanaryPrep` PREPARED_OFF · **BLOCKED_CEO**
+- [ ] **CEO:** telefonía — `TELEPHONY_PROVIDER_CEO_CHECKLIST.md`
+- [ ] **CEO:** OAuth apps — `OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md`
+- [ ] **CEO:** ads OAuth/spend — `ADS_OAUTH_SPEND_CEO_CHECKLIST.md`
+- [ ] **CEO:** social publish — `SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md`
+- [ ] **CEO:** mobile stores — `MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md`
+- [ ] **Legal:** Pepito dossier + licencia — `DATOS_PEPITO_LICENSE_DOSSIER.md`
+- [ ] **CEO:** IA prod canary — `CEO_IA_PROD_CANARY_REQUEST.md`
+- [ ] **Ops:** confirm staging deploy after push (tip TBA → `ideal-victory`)
+- [ ] Ops (opcional): `NELVYON_INFLUENCERS_PR_PACK=1` + staging E2E smoke Block 12
+- [ ] No READY · no flags productivos en prod
+
+---
+
+## P2 — Post-auditoría / ops (histórico ADR-055/056)
 
 - [ ] CEO: legal checklist campañas firmada + dossier Pepito escrito (bloquea claimReady)
 - [x] Mesh staging · Pack E2E ALL_PASS · ADR-044–046
@@ -46,10 +77,29 @@
 - [x] ADR-056 elite absolute audit: P0 campaign launch block (`getCampaignLaunchBlockReason`) · P1 chat/ai-copy `isOpenAiSpendAllowed` · mcp.write honesty · shared-memory scopes split · meta-ads-pack beta OAuth OFF · agency **109 PASS** · tsc **0** · eslint changed routes **0** · prod flag read ABSENT · fixes **uncommitted** (tip TBA)
 - [x] Ops: staging flags `NELVYON_SHARED_MEMORY_STAGING=1` + `NELVYON_MCP_STAGING_SYNTHETIC=1` (productivo SM/MCP **0**)
 - [x] Ops: E2E staging `automations-ops-pack` + `reputation-ops-pack` → **ALL_PASS** · evidencia `automations_reputation_e2e_latest.md`
+- [x] ADR-057: `PrivateVectorRagCore` (Block 24) — sintético in-process **IMPLEMENTED_VERIFIED** (43 tests) · pgvector productivo **PREPARED_OFF**
+- [x] ADR-057: `PrivateAiCanaryPrep` (Block 25) — checklist 12 ítems + `isProductionCanaryAuthorized()` hardcoded false · `CEO_IA_PROD_CANARY_REQUEST.md` PENDING_CEO
+- [x] Block 18: `MobileSecureSession` + `MobileAppContract` — tenant isolation + offline queue tested; App/Play Store publish honestly `BLOCKED_EXTERNAL` (no Apple paid account, no Play budget) · `MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md`
+- [x] Block 19: `PwaCertification` + `scripts/pwa-certify.mjs` · fixed real gap `manifest-saas.json` (8 non-existent PNG icon paths → existing `icon-base.svg`)
+- [x] Block 20: `LocalizationCore` — es/en `FULL_VERIFIED`, fr/de/it/pt honestly `PARTIAL_NOT_AUDITED`
+- [x] Block 21: `docs/ops/HA_DR_SCALE_RUNBOOK.md` + `HaDrReadiness` — RPO/RTO, multi-region `BLOCKED_EXTERNAL`
+- [x] Block 22: `OpsObservabilityCore` + `docs/ops/INCIDENT_RUNBOOK.md` — correlation ids/metrics/health snapshot, no paid vendor
+- [x] Block 23: `docs/ops/LEGACY_CONSOLIDATION_PLAN.md` + `LegacyConsolidationAudit` — frontend/alembic/pages-api audited, zero deletes
+- [x] Ops: `pnpm -C apps/web exec vitest run backend/agency` para Blocks 18–23 → **27 files / 249 tests PASS** (confirmado en sesión Blocks 12–15) · `tsc --noEmit` **0**
+- [x] Ops: `node scripts/pwa-certify.mjs` → evidencia `pwa.cert_latest.md` **PASS**
+- [x] Block 12: pack `influencers-pr-pack` (research matching, scoring, brief outreach, contrato/checklist, metrics plan, informe) — `outreach_authorized` hardcoded false, no es red de influencers real; catalog `influencers_pr` **PREPARED_OFF**; smoke `staging-smoke-influencers-pr-e2e.mjs` (no ejecutado en staging aún) · playbook `SERVICE_INFLUENCERS_PR.md`
+- [x] Block 13: `AdsAttributionCore` — campaign draft/audiencias/UTM/conversion events sintéticos, budget cap hard-fail, conectores Google/Meta/LinkedIn Ads fail-closed (`BLOCKED_EXTERNAL`/`SPEND_DISABLED`), `NELVYON_ADS_SPEND_ENABLED` default 0 · `ADS_OAUTH_SPEND_CEO_CHECKLIST.md`; catalog `ads_attribution_core` **PREPARED_OFF**
+- [x] Block 14: `CommunityPublishCore` — inbox/calendario/approval/variantes/cola/moderación/auditoría; `SimulatorPublishProvider` only, `assertPublishDisabled()` bloquea salvo oauth+CEO · `SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md`; catalog `community_publish_core` **PREPARED_OFF**
+- [x] Block 15: `MassSendTechnicalControls` (suppression/unsubscribe proof/rate limit/warming/reputation sintética/template audit) wired como campos informativos en `CampaignsLegalTechnicalGate` sin alterar `technicalComplete`/`sendAuthorized`; `claimReadyLegal` sigue false · `CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md` actualizado
+- [ ] Ops: flag `NELVYON_INFLUENCERS_PR_PACK=1` en staging + smoke E2E antes de promover `influencers-pr-pack` a available
 - [ ] CEO: abrir/conectar 8 cuentas sociales oficiales NELVYON (`docs/ops/NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md`)
 - [ ] Legal: dossier Pepito + licencia comercial escrita (`DATOS_PEPITO_LICENSE_DOSSIER.md` + `CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`) — bloquea claimReady
 - [ ] CEO: OpenClaw **prod canary** (`CEO_OPENCLAW_PROD_CANARY_REQUEST.md` PENDING_CEO) / SM productiva / visual paid (nueva autorización)
+- [ ] CEO: Private AI **prod canary** (`CEO_IA_PROD_CANARY_REQUEST.md` PENDING_CEO) — distinto del staging ya aprobado
+- [ ] Ops: levantar Docker local-ai + re-verificar `LocalVectorStore.hybridSearch` en vivo para promover Private RAG productivo de PREPARED_OFF a IMPLEMENTED_VERIFIED
 - [ ] CEO: autorización OpenClaw live (hoy BLOCKED_CEO) si se requiere
+- [ ] CEO: `docs/ops/TELEPHONY_PROVIDER_CEO_CHECKLIST.md` (cuenta Twilio, números, A2P, consentimiento legal) antes de un proveedor de telefonía real — hoy `telephony_core` es simulador únicamente, real **BLOCKED_EXTERNAL** por diseño (Block 11)
+- [ ] CEO: `docs/ops/OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md` (apps Google/Meta/LinkedIn/Twilio, redirect URI, `ENCRYPTION_KEY` real) antes de sustituir proveedores mock del `OAuthMultiTenantFramework` por reales (Block 16)
 - [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts/campañas/visual spend en prod
 
 - [ ] No instalar Helio/Mautic/Twenty/n8n/Listmonk sin necesidad

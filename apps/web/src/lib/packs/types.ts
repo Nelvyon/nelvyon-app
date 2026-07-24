@@ -13,6 +13,7 @@ export const FUNNEL_GROWTH_PACK_ID = "funnel-growth-pack" as const;
 export const RETENTION_PACK_ID = "retention-pack" as const;
 export const AUTOMATIONS_OPS_PACK_ID = "automations-ops-pack" as const;
 export const REPUTATION_OPS_PACK_ID = "reputation-ops-pack" as const;
+export const INFLUENCERS_PR_PACK_ID = "influencers-pr-pack" as const;
 
 export type PackId =
   | typeof LOCAL_GROWTH_PACK_ID
@@ -27,7 +28,8 @@ export type PackId =
   | typeof FUNNEL_GROWTH_PACK_ID
   | typeof RETENTION_PACK_ID
   | typeof AUTOMATIONS_OPS_PACK_ID
-  | typeof REPUTATION_OPS_PACK_ID;
+  | typeof REPUTATION_OPS_PACK_ID
+  | typeof INFLUENCERS_PR_PACK_ID;
 
 /** Common intake for the 5 beta packs (minimal fields, sector required) */
 export type BetaPackIntake = GrowthPackIntakeBase & {
@@ -282,6 +284,13 @@ export const AUTOMATIONS_OPS_PACK_STEP_DEFINITIONS = [
 export const REPUTATION_OPS_PACK_STEP_DEFINITIONS = [
   ...buildBetaPackStepDefinitions(["NELVYON-CHATBOT"]).slice(0, -2),
   { key: "reputation_ops", label: "Playbook reputación + plantillas" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+
+export const INFLUENCERS_PR_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-CHATBOT"]).slice(0, -2),
+  { key: "influencers_pr", label: "Research + scoring + brief outreach + contrato + métricas" },
   { key: "report", label: "Informe en portal" },
   { key: "complete", label: "Pack completado" },
 ];

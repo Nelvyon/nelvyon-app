@@ -13,6 +13,16 @@
  */
 
 import { isSesEnvConfigured } from "../saas/saasEnv";
+import {
+  auditEmailTemplate,
+  checkUnsubscribeProof,
+  buildWarmingMetadata,
+  getSyntheticReputationScoreStub,
+  type ReputationScoreSnapshot,
+  type TemplateAuditInput,
+  type UnsubscribeProofInput,
+  type WarmingMetadata,
+} from "./MassSendTechnicalControls";
 
 export type CampaignsLegalTechnicalInput = {
   /** Every outbound message links back to its consent/source record. */
@@ -33,6 +43,16 @@ export type CampaignsLegalTechnicalInput = {
   pepitoDbReferenced?: boolean;
   /** CEO + legal explicitly authorized THIS send (per-campaign, never a global always-on flag). */
   ceoLegalSendAuthorized?: boolean;
+  /**
+   * Optional additional technical hardening (ADR-055 extension) — purely informational,
+   * surfaced in `checks` for visibility. None of these affect `technicalComplete` or
+   * `sendAuthorized`: they reinforce the checklist but never substitute for it, and never
+   * relax `claimReadyLegal`. See `MassSendTechnicalControls.ts`.
+   */
+  unsubscribeProof?: UnsubscribeProofInput;
+  templateAudit?: TemplateAuditInput;
+  /** ISO date the current IP/domain warm-up started, if warming is in progress. */
+  warmingStartedAt?: string;
 };
 
 export type CampaignsLegalTechnicalResult = {
@@ -59,6 +79,12 @@ export type CampaignsLegalTechnicalResult = {
     sesConfigured: boolean;
     pepitoDbClean: boolean;
     ceoLegalSendAuthorized: boolean;
+    /** Informational technical reinforcement (ADR-055 extension) — never gates the send. */
+    unsubscribeProofOk: boolean | null;
+    templateAuditOk: boolean | null;
+    templateAuditIssues: string[];
+    warming: WarmingMetadata | null;
+    reputationScoreSynthetic: ReputationScoreSnapshot;
   };
 };
 
@@ -107,6 +133,10 @@ export function evaluateCampaignsLegalTechnicalReadiness(
     sesConfigured &&
     pepitoDbClean;
 
+  const unsubscribeProofOk = input.unsubscribeProof ? checkUnsubscribeProof(input.unsubscribeProof).ok : null;
+  const templateAuditResult = input.templateAudit ? auditEmailTemplate(input.templateAudit) : null;
+  const warming = input.warmingStartedAt ? buildWarmingMetadata(input.warmingStartedAt) : null;
+
   return {
     technicalComplete,
     claimReadyLegal: false,
@@ -124,6 +154,11 @@ export function evaluateCampaignsLegalTechnicalReadiness(
       sesConfigured,
       pepitoDbClean,
       ceoLegalSendAuthorized,
+      unsubscribeProofOk,
+      templateAuditOk: templateAuditResult?.ok ?? null,
+      templateAuditIssues: templateAuditResult?.issues ?? [],
+      warming,
+      reputationScoreSynthetic: getSyntheticReputationScoreStub(),
     },
   };
 }
@@ -246,6 +281,33 @@ export function assertCampaignsLegalTechnicalGateIntegrity(): { ok: boolean; vio
   else delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
   if (blockReasonWithoutBypass === null) {
     violations.push("launch_block_reason_must_be_non_null_without_bypass");
+  }
+
+  const withoutReinforcementInputs = evaluateCampaignsLegalTechnicalReadiness({
+    sourceTraceImplemented: true,
+    consentFieldsImplemented: true,
+    unsubscribeImplemented: true,
+    suppressionListImplemented: true,
+    auditLogImplemented: true,
+    sendRateLimitPerHourMax: 500,
+    sesConfiguredOverride: true,
+    pepitoDbReferenced: false,
+    ceoLegalSendAuthorized: true,
+  });
+  if (withoutReinforcementInputs.checks.unsubscribeProofOk !== null) {
+    violations.push("unsubscribe_proof_must_default_to_null_when_not_provided");
+  }
+  if (withoutReinforcementInputs.checks.templateAuditOk !== null) {
+    violations.push("template_audit_must_default_to_null_when_not_provided");
+  }
+  if (withoutReinforcementInputs.checks.warming !== null) {
+    violations.push("warming_must_default_to_null_when_not_provided");
+  }
+  if (withoutReinforcementInputs.checks.reputationScoreSynthetic.source !== "synthetic_placeholder") {
+    violations.push("reputation_score_must_stay_synthetic_placeholder");
+  }
+  if (!withoutReinforcementInputs.technicalComplete || !withoutReinforcementInputs.sendAuthorized) {
+    violations.push("reinforcement_fields_must_not_block_when_absent");
   }
 
   return { ok: violations.length === 0, violations };

@@ -35,6 +35,7 @@ export const OS_PACK_FLAG_KEYS = {
   retention: "NELVYON_RETENTION_PACK",
   automationsOps: "NELVYON_AUTOMATIONS_OPS_PACK",
   reputationOps: "NELVYON_REPUTATION_OPS_PACK",
+  influencersPr: "NELVYON_INFLUENCERS_PR_PACK",
 } as const;
 
 export function flagKeyForPackId(packId: string): string | null {
@@ -43,5 +44,6 @@ export function flagKeyForPackId(packId: string): string | null {
   if (packId === "retention-pack") return OS_PACK_FLAG_KEYS.retention;
   if (packId === "automations-ops-pack") return OS_PACK_FLAG_KEYS.automationsOps;
   if (packId === "reputation-ops-pack") return OS_PACK_FLAG_KEYS.reputationOps;
+  if (packId === "influencers-pr-pack") return OS_PACK_FLAG_KEYS.influencersPr;
   return null;
 }

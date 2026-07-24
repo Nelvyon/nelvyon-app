@@ -36,6 +36,27 @@ que es el único gate "duro" de envío a nivel técnico+CEO. Aun con `sendAuthor
 `claimReadyLegal` sigue `false` y los bloqueadores legales permanentes siguen presentes: nada
 en este módulo autoriza legalmente un envío real por sí solo.
 
+## Refuerzo técnico adicional (ADR-055 — informativo, no gatea el envío)
+
+`backend/agency/MassSendTechnicalControls.ts` añade helpers técnicos concretos que
+`CampaignsLegalTechnicalGate.ts` expone en `checks` como **información adicional**. Ninguno
+de estos ítems cambia `technicalComplete` ni `sendAuthorized` — son refuerzo verificable,
+no sustituyen a la checklist 1–9 ni relajan `claimReadyLegal`.
+
+| # | Ítem | Qué verifica | Dónde vive en código |
+|---|------|--------------|-----------------------|
+| 10 | `suppression_list_helper` | Filtrado real de destinatarios contra la lista de suprimidos antes de construir cualquier lote de envío (case-insensitive). | `filterSuppressedRecipients()` / `isSuppressed()` en `MassSendTechnicalControls.ts` |
+| 11 | `unsubscribe_proof_helper` | Verificación explícita de enlace de un clic + headers `List-Unsubscribe` (RFC 2369) y `List-Unsubscribe-Post` (RFC 8058). | `checkUnsubscribeProof()` → `checks.unsubscribeProofOk` |
+| 12 | `rate_limit_helper` | Ventana deslizante en memoria que compara envíos de la última hora contra el máximo declarado. | `checkRateLimit()` / `currentHourSendCount()` |
+| 13 | `warming_metadata` | Metadata declarativa del calendario de calentamiento de IP/dominio (curva conservadora por día) — nunca ejecuta envíos automáticamente. | `buildWarmingMetadata()` / `DEFAULT_WARMING_PLAN` → `checks.warming` |
+| 14 | `reputation_score_stub` | Placeholder sintético de reputación — **no** es una integración real con Postmaster Tools/SNDS/JMRPP; nunca debe usarse para decidir un envío real. | `getSyntheticReputationScoreStub()` → `checks.reputationScoreSynthetic` |
+| 15 | `template_audit` | Escaneo de plantilla: enlace de baja presente, dirección física presente (CAN-SPAM), ausencia de frases gatillo de spam. | `auditEmailTemplate()` → `checks.templateAuditOk` / `checks.templateAuditIssues` |
+
+Estos campos son `null`/valor sintético por defecto cuando el caller no proporciona el
+input correspondiente (`unsubscribeProof`, `templateAudit`, `warmingStartedAt`), y nunca
+bloquean `technicalComplete` — su ausencia no es un fallo, es simplemente refuerzo
+adicional aún no ejercitado por ese caller concreto.
+
 ## Checklist legal (NO verificable en código — requiere confirmación humana)
 
 | # | Ítem | Estado |
@@ -63,7 +84,7 @@ día que exista evidencia real de licencia + revisión legal.
 ## Cómo verificar
 
 ```bash
-pnpm -C apps/web exec vitest run backend/agency/__tests__/CampaignsLegalTechnicalGate.test.ts --reporter=dot
+pnpm -C apps/web exec vitest run backend/agency/__tests__/CampaignsLegalTechnicalGate.test.ts backend/agency/__tests__/MassSendTechnicalControls.test.ts --reporter=dot
 ```
 
 ## Próximo paso EXACTO

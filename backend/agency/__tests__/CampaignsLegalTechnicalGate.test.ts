@@ -116,6 +116,56 @@ describe("Campaigns legal + technical readiness gate (claimReadyLegal always fal
   });
 });
 
+describe("CampaignsLegalTechnicalGate — technical reinforcement fields (ADR-055 extension)", () => {
+  it("reinforcement checks default to null/synthetic when not provided and never gate the send", () => {
+    const result = evaluateCampaignsLegalTechnicalReadiness(fullTechnicalInput());
+    expect(result.checks.unsubscribeProofOk).toBeNull();
+    expect(result.checks.templateAuditOk).toBeNull();
+    expect(result.checks.templateAuditIssues).toEqual([]);
+    expect(result.checks.warming).toBeNull();
+    expect(result.checks.reputationScoreSynthetic.source).toBe("synthetic_placeholder");
+    expect(result.technicalComplete).toBe(true);
+    expect(result.sendAuthorized).toBe(true);
+  });
+
+  it("surfaces unsubscribe proof and template audit results without affecting technicalComplete", () => {
+    const badResult = evaluateCampaignsLegalTechnicalReadiness(
+      fullTechnicalInput({
+        unsubscribeProof: { hasOneClickLink: false, hasListUnsubscribeHeader: false, hasListUnsubscribePostHeader: false },
+        templateAudit: { html: "100% GRATIS actúa ahora", hasUnsubscribeLink: false, hasPhysicalAddress: false },
+      }),
+    );
+    expect(badResult.checks.unsubscribeProofOk).toBe(false);
+    expect(badResult.checks.templateAuditOk).toBe(false);
+    expect(badResult.checks.templateAuditIssues.length).toBeGreaterThan(0);
+    // Informational only — the hard technical/legal gate is unaffected.
+    expect(badResult.technicalComplete).toBe(true);
+    expect(badResult.claimReadyLegal).toBe(false);
+
+    const goodResult = evaluateCampaignsLegalTechnicalReadiness(
+      fullTechnicalInput({
+        unsubscribeProof: { hasOneClickLink: true, hasListUnsubscribeHeader: true, hasListUnsubscribePostHeader: true },
+        templateAudit: {
+          html: "Gracias por tu interés",
+          hasUnsubscribeLink: true,
+          hasPhysicalAddress: true,
+        },
+      }),
+    );
+    expect(goodResult.checks.unsubscribeProofOk).toBe(true);
+    expect(goodResult.checks.templateAuditOk).toBe(true);
+  });
+
+  it("surfaces warming metadata when warmingStartedAt is provided", () => {
+    const result = evaluateCampaignsLegalTechnicalReadiness(
+      fullTechnicalInput({ warmingStartedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() }),
+    );
+    expect(result.checks.warming).not.toBeNull();
+    expect(result.checks.warming?.dayNumber).toBeGreaterThanOrEqual(1);
+    expect(result.checks.warming?.stage.maxSendsPerDay).toBeGreaterThan(0);
+  });
+});
+
 describe("getCampaignLaunchBlockReason", () => {
   const savedBypass = process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
 

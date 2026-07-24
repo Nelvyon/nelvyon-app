@@ -1,9 +1,9 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-24** (ADR-056 elite absolute audit). **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
+> Actualizado: **2026-07-24** (**ADR-057 Blocks 11–25 complete**). **✅ = verificado** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas (dossier Pepito + licencia escrita · mass-send blocked). Prod IA **ABSENT** (flag read verified ADR-056). Staging runtime ADR-055: 13 packs+auditor ALL_PASS · automations/reputation E2E ALL_PASS · SM/MCP synthetic ON. ADR-056 P0/P1 fixes **local uncommitted**. SSOT: `OS_CATALOG_V1.md` v1.2.0.
+**Bloqueadores go-live:** CEO checklists (telephony · OAuth · ads · publish · mobile · IA canary) · legal Pepito (mass-send **BLOCKED_LEGAL**). Prod flags **OFF**. Staging: https://ideal-victory-staging.up.railway.app · **confirm deploy after push**. SSOT: `OS_CATALOG_V1.md` v**1.4.0**.
 
 ### Auth bridge Web ↔ FastAPI
 
@@ -19,7 +19,17 @@
 | SM/MCP productivo | **OFF** (0) |
 | SM/MCP synthetic staging | **ON** · `NELVYON_SHARED_MEMORY_STAGING=1` + `NELVYON_MCP_STAGING_SYNTHETIC=1` · harness unit tests PASS · no implica SM/MCP productivo |
 | Datos Pepito / company DB campañas | **forbidden** · BLOQUEADO_LEGAL · `DATOS_PEPITO_LICENSE_DOSSIER` · ADR-056 P0 launch block |
-| Campaign mass-send | **legally blocked** · `getCampaignLaunchBlockReason` while `claimReadyLegal=false` |
+| Campaign mass-send | **legally blocked** · Block 15 controls verified · `claimReadyLegal=false` |
+
+### ADR-057 — Agency cores (Blocks 11–17)
+
+| Block | Módulo | Core | Externo |
+|-------|--------|------|---------|
+| 11 | `TelephonyCore` | simulator **IMPLEMENTED_VERIFIED** | Twilio real **BLOCKED_EXTERNAL** · `TELEPHONY_PROVIDER_CEO_CHECKLIST.md` |
+| 13 | `AdsAttributionCore` | core **IMPLEMENTED_VERIFIED** | spend/OAuth **BLOCKED_EXTERNAL** · `NELVYON_ADS_SPEND_ENABLED=0` |
+| 14 | `CommunityPublishCore` | simulator **IMPLEMENTED_VERIFIED** | publish **BLOCKED_EXTERNAL** · `SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md` |
+| 16 | `OAuthMultiTenantFramework` | mock **IMPLEMENTED_VERIFIED** | real apps **BLOCKED_EXTERNAL** · `OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md` |
+| 17 | `IntegrationsMarketplaceV1` | internal ping **IMPLEMENTED_VERIFIED** | external publish rejected |
 
 ---
 
@@ -51,6 +61,8 @@
 | **TikTok Ads** | 🟡 | `TIKTOK_APP_ID/SECRET`, `TIKTOK_ACCESS_TOKEN` | `TikTokAdsService.ts` |
 | Snapchat | 🟡 | `SNAPCHAT_*` | Catálogo |
 
+**Ads & attribution CORE (Block 13, 2026-07-24, uncommitted):** `backend/agency/AdsAttributionCore.ts` añade un core sintético independiente (campaign draft, audiencias, UTM, conversion events, budget cap, reporting) con conectores propios `GoogleAdsConnector`/`MetaAdsConnector`/`LinkedInAdsConnector` **fail-closed** — `connect()`/`spend()` siempre lanzan `BLOCKED_EXTERNAL`/`SPEND_DISABLED`, independientemente de los servicios `*AdsService.ts` de la tabla anterior. `NELVYON_ADS_SPEND_ENABLED` default **0**. Ver `docs/ops/ADS_OAUTH_SPEND_CEO_CHECKLIST.md`.
+
 ---
 
 ## Analytics
@@ -70,7 +82,7 @@
 |-------------|--------|-----------|-------|
 | **WhatsApp Business** | 🟡 | `META_WA_PHONE_NUMBER_ID`, `META_WA_ACCESS_TOKEN`, `META_WA_VERIFY_TOKEN` | Cloud API |
 | **Telegram** | 🟡 | Bot token por usuario en `integration_telegram` | `TelegramService.ts` |
-| Twilio SMS | 🟡 | `TWILIO_*` | Dialer/inbox · **no GHL native telephony dialer parity** |
+| Twilio SMS / Dialer | 🟡 | `TWILIO_*` | Block 11: `TelephonyCore` simulator verified · `TwilioTelephonyProvider` constructor **always throws BLOCKED_EXTERNAL** · legacy `TwilioService.ts` untouched · **no GHL telephony parity** |
 | **Discord** | ❌ | — | Solo copy agentes OS |
 | **Slack** | 🟡 | Workflow `notify_slack`; approval channels API | Sin OAuth service dedicado |
 
@@ -106,7 +118,7 @@
 | OpenAI | 🟡 | `OPENAI_API_KEY` + `AUTONOMOUS_ALLOW_OPENAI=1` | **OFF default.** ADR-056: `isOpenAiSpendAllowed` gates chat+ai-copy. Autonomous + OS `LlmClient` (ADR-034): opt-in only; PRIVATE_MODE blocks egress. Ollama primary. |
 | Anthropic | 🟡 | `ANTHROPIC_API_KEY` | Private AI provider |
 | Ollama (local) | ✅ | `OLLAMA_HOST` / `:11434` · `OLLAMA_STRATEGY_MODEL` | Primary autonomous/OS path. Staging: `http://100.102.207.30:11434` (Tailscale CGNAT private — not public). Quality routing opt-in: `AUTONOMOUS_QUALITY_ROUTING=1` (ADR-036). **Prohibido** staging→`localhost` PC. Mesh: ver `ARCHITECTURE_LOCAL_AI_RUNTIME.md`. |
-| Local-ai Postgres/pgvector | 🟡 | Compose `127.0.0.1:5434` | Ingest **verified** hist. · Docker **DOWN** 2026-07-22 (HTTP pack E2E BLOCKED) |
+| Local-ai Postgres/pgvector | 🟡 | Compose `127.0.0.1:5434` | Block 24: synthetic RAG **IMPLEMENTED_VERIFIED** · pgvector Docker live **PREPARED_OFF** · `PRIVATE_RAG_RUNBOOK.md` |
 | **MCP Productivo** | ✅ | `NELVYON_MCP_PRODUCTIVE_ENABLED` | `/api/saas/mcp` — **CERTIFIED** (`mcp_certification_final.json`) · **OFF** en runtime · ADR-056: `mcp.write` no longer invented |
 | **MCP Staging synthetic** | ✅ | `NELVYON_MCP_STAGING_SYNTHETIC` | ADR-055 harness · flags **ON** staging · productivo **0** · harness unit tests PASS |
 | **OpenClaw** | 🟡 | `NELVYON_OPENCLAW_BRIDGE_*` + Memory | staging_mock deepened · prod canary PENDING_CEO |

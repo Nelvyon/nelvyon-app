@@ -159,6 +159,13 @@ export const PACK_OS_BINDINGS: Record<string, PackOsBinding> = {
     connectorIds: [],
     autonomousSkus: ["NELVYON-CHATBOT"],
   },
+  "influencers-pr-pack": {
+    packId: "influencers-pr-pack",
+    agentIds: ["autonomous-pm-chatbot", "branding_premium", "contenido_copywriting_premium"],
+    processTemplateIds: ["deliverable-action-plan-30d", "deliverable-report-executive"],
+    connectorIds: [],
+    autonomousSkus: ["NELVYON-CHATBOT"],
+  },
 };
 
 export function getPackOsBinding(packId: string): PackOsBinding | undefined {

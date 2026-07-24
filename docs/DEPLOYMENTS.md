@@ -1,6 +1,19 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-24** (ADR-056 audit). No borrar entradas. Añadir al inicio.
+> Registrar cada deploy significativo. Actualizado: **2026-07-24** (ADR-057). No borrar entradas. Añadir al inicio.
+
+## 2026-07-24 — ADR-057 Blocks 11–25 complete (local · deploy pending)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | local verified · staging deploy **pending push** |
+| **Tip / live** | **TBA** (parent commit pending) |
+| **Staging URL** | https://ideal-victory-staging.up.railway.app |
+| **Blocks** | 11–25 internal cores complete · catalog **v1.4.0** |
+| **Tests** | `tsc` **0** · `backend/agency` **249 PASS** · influencers pack **PASS** · `pwa-certify` **PASS** · private-rag synthetic **ALL_PASS** (27 tests) |
+| **Prod flags** | **OFF** / **ABSENT** · no OpenAI · no Pepito · no Twilio/ads/publish/OAuth reales · no App Store publish |
+| **claimReady** | **false** · **NOT READY** · **CONDITIONAL_READY** |
+| **Próximo** | CEO checklists + **confirm staging deploy after push** |
 
 ## 2026-07-24 — ADR-056 elite absolute audit (local fixes · deploy pending)
 

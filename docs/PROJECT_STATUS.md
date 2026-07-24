@@ -1,17 +1,39 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> **2026-07-24** — ADR-056 elite absolute audit · **AUDIT_FIXES_LOCAL** · tip pending push (base **`6364c28c`**) · runtime staging ADR-055 **`53149384`** · `claimReady: false`
+> **2026-07-24** — **ADR-057 Blocks 11–25 complete (internal cores)** · tip **TBA** · `claimReady: false` · **NOT READY**
 
 | Capa | Estado |
 |------|--------|
-| **Veredicto** | **AUDIT_FIXES_LOCAL** · **CONDITIONAL_READY** · **NOT READY** |
-| **Verde verificado (staging live ADR-055 runtime)** | 13 packs+auditor · automations/reputation E2E ALL_PASS · SM/MCP synthetic flags ON · catalog 1.2.0 |
-| **Verde local (ADR-056 fixes uncommitted)** | agency **109 PASS** · tsc **0** · CampaignsLegal+saasCampanias+saasEnv+mcpProductive+catalog availability **PASS** · P0/P1 audit fixes applied |
-| **PREPARED_OFF** | social oficial NELVYON · visual spend · auditor prod |
-| **BLOCKED_EXTERNAL** | ads OAuth · no live Meta/Google Ads spend path |
-| **BLOCKED_CEO** | OpenClaw prod canary · OpenAI · payouts · paid visual · paid social · 8 cuentas oficiales |
-| **BLOCKED_LEGAL** | claimReady · campañas mass-send · Pepito forbidden |
-| **Competitive honesty** | No GHL telephony dialer parity · no Odoo ERP/accounting/manufacturing · no proven multi-tenant production customer outcomes in this audit |
+| **Veredicto** | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` |
+| **Tests locales** | `tsc` **0** · `backend/agency` **249 PASS** · influencers pack **PASS** · `pwa-certify` **PASS** · private-rag synthetic **ALL_PASS** (27 tests) |
+| **Catalog** | **OsCatalogV1 v1.4.0** (+ `private_vector_rag`, `private_ai_canary_prep`) |
+| **Staging** | https://ideal-victory-staging.up.railway.app · **confirm deploy after push** |
+| **Prod** | flags **OFF** / **ABSENT** · no OpenAI · no Pepito · no credenciales reales |
+| **ADR-057 Blocks 11–25** | internal cores **IMPLEMENTED_VERIFIED** (ver matriz) · externos **BLOCKED_EXTERNAL/CEO/LEGAL** |
+| **PREPARED_OFF** | influencers_pr staging E2E · mobile stores · pgvector live · paid observability · private_ai_canary_prep · social oficial |
+| **BLOCKED_EXTERNAL** | Twilio real · ads OAuth/spend · social publish real · App Store/Play · multi-region |
+| **BLOCKED_CEO** | IA prod canary · OpenClaw prod · OpenAI · payouts · 8 cuentas oficiales |
+| **BLOCKED_LEGAL** | claimReady · mass-send · Pepito forbidden |
 | **Coste** | 0 |
-| **Prod** | untouched · `NELVYON_*` OpenAI/MCP/SM/OpenClaw/visual **ABSENT** (flag read verified) |
-| **Staging** | https://ideal-victory-staging.up.railway.app · `ideal-victory` Online · runtime **`53149384`** · deploy **`e514bbd7`** SUCCESS · `AI_ENABLED=1` staging only |
+
+## ADR-057 Blocks 11–25 (resumen)
+
+| Block | Capacidad | Core | Bloqueo |
+|-------|-----------|------|---------|
+| 11 | telephony | IMPLEMENTED_VERIFIED (simulator) | real **BLOCKED_EXTERNAL** |
+| 12 | influencers_pr | PREPARED_OFF / beta | staging E2E opcional |
+| 13 | ads_attribution | IMPLEMENTED_VERIFIED (core) | spend/OAuth **BLOCKED_EXTERNAL** |
+| 14 | community_publish | IMPLEMENTED_VERIFIED (simulator) | publish **BLOCKED_EXTERNAL** |
+| 15 | mass-send | IMPLEMENTED_VERIFIED (controls) | **BLOCKED_LEGAL** |
+| 16 | oauth_multitenant | IMPLEMENTED_VERIFIED (mock) | real apps **BLOCKED_EXTERNAL** |
+| 17 | integrations_marketplace | IMPLEMENTED_VERIFIED (internal ping) | — |
+| 18 | mobile | PREPARED_OFF / contract VERIFIED | stores **BLOCKED_EXTERNAL** |
+| 19 | PWA | IMPLEMENTED_VERIFIED (Chrome/Windows) | iOS **PARTIAL** |
+| 20 | localization | IMPLEMENTED_VERIFIED (es/en) | fr/de/it/pt **PARTIAL** |
+| 21 | HA/DR | IMPLEMENTED_VERIFIED (runbook) | multi-region **BLOCKED_EXTERNAL** |
+| 22 | observability | IMPLEMENTED_VERIFIED (local) | paid **PREPARED_OFF** |
+| 23 | legacy | IMPLEMENTED_VERIFIED (audit) | zero deletes |
+| 24 | private_vector_rag | IMPLEMENTED_VERIFIED (synthetic) | pgvector **PREPARED_OFF** |
+| 25 | private_ai_canary | PREPARED_OFF | **BLOCKED_CEO** |
+
+SSOT: `HANDOVER.md` · `CTO_FINAL_VERIFY.md` · `OS_ELITE_STATE_MATRIX.md`

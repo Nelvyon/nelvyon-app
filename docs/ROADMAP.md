@@ -78,7 +78,23 @@
 | Visual élite strategy_only | ✅ | creative_direction + decision matrix · spend OFF |
 | Social oficial NELVYON | 🟡 | PREPARED_OFF · NelvyonOfficialSocialOps · checklist CEO |
 | Legal campañas + Pepito dossier | 🟡 | gate reforzado · claimReadyLegal hard-false · LEGAL BLOCKED · ADR-056 P0 campaign launch block |
-| ADR-056 elite absolute audit | 🟡 | P0/P1 fixes local uncommitted · tip TBA · staging runtime ADR-055 · NOT READY |
+| ADR-056 elite absolute audit | ✅ | P0/P1 fixes · tip TBA · NOT READY |
+| **ADR-057 Blocks 11–25 (internal cores)** | ✅ | telephony · influencers · ads · publish · mass-send · OAuth · marketplace · mobile · PWA · i18n · HA/DR · observability · legacy · private RAG · AI canary PREP · catalog **v1.4.0** · agency **249 PASS** · tsc **0** · tip TBA · NOT READY |
+| Block 11 telephony_core | ✅ | simulator IMPLEMENTED_VERIFIED · real calls BLOCKED_EXTERNAL |
+| Block 12 influencers_pr | 🟡 | PREPARED_OFF/beta · unit+kickoff wired · staging E2E opcional |
+| Block 13 ads_attribution_core | ✅ | core IMPLEMENTED_VERIFIED · spend/OAuth BLOCKED_EXTERNAL |
+| Block 14 community_publish_core | ✅ | simulator IMPLEMENTED_VERIFIED · publish BLOCKED_EXTERNAL |
+| Block 15 mass-send technical | ✅ | controls IMPLEMENTED_VERIFIED · send BLOCKED_LEGAL |
+| Block 16 oauth_multitenant | ✅ | framework+mock IMPLEMENTED_VERIFIED · real apps BLOCKED_EXTERNAL |
+| Block 17 integrations_marketplace | ✅ | internal ping IMPLEMENTED_VERIFIED |
+| Block 18 mobile Capacitor | 🟡 | PREPARED_OFF · contract VERIFIED · stores BLOCKED_EXTERNAL |
+| Block 19 PWA | ✅ | Chrome/Windows verified · iOS Safari PARTIAL |
+| Block 20 localization | ✅ | es/en verified · fr/de/it/pt PARTIAL |
+| Block 21 HA/DR | ✅ | runbook+checks · multi-region BLOCKED_EXTERNAL |
+| Block 22 observability | ✅ | local core · paid vendors PREPARED_OFF |
+| Block 23 legacy consolidation | ✅ | audit+plan · zero unsafe deletes |
+| Block 24 private_vector_rag | ✅ | synthetic IMPLEMENTED_VERIFIED (27 tests) · pgvector PREPARED_OFF |
+| Block 25 private_ai_canary_prep | 🟡 | PREPARED_OFF · BLOCKED_CEO |
 
 ---
 

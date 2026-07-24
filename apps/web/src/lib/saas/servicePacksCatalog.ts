@@ -17,6 +17,7 @@ import {
   RETENTION_PACK_ID,
   AUTOMATIONS_OPS_PACK_ID,
   REPUTATION_OPS_PACK_ID,
+  INFLUENCERS_PR_PACK_ID,
 } from "@/lib/packs/types";
 
 export type ServicePackCategory =
@@ -33,7 +34,8 @@ export type ServicePackCategory =
   | "funnel"
   | "retention"
   | "automations"
-  | "reputation";
+  | "reputation"
+  | "influencers_pr";
 
 export type ServicePackAvailability = "available" | "beta" | "coming_soon";
 
@@ -438,6 +440,30 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
     accent: "from-amber-500/10 via-card to-card",
     estimatedMinutes: 10,
   },
+  {
+    id: INFLUENCERS_PR_PACK_ID,
+    slug: "influencers-pr",
+    name: "Influencers / PR OS (beta)",
+    tagline: "Research de creadores, scoring y brief de outreach listos para revisión humana — sin envío real",
+    category: "influencers_pr",
+    verticals: ["local", "ecommerce", "b2b_saas"],
+    availability: "beta",
+    launchPackId: INFLUENCERS_PR_PACK_ID,
+    kickoffPath: "/os/packs/influencers-pr",
+    reportPath: "/os/packs/influencers-pr/report",
+    benefits: [
+      "Research + matching de candidatos por nicho",
+      "Scoring sheet con criterios ponderados",
+      "Brief de outreach con requisitos de disclosure legal",
+      "Checklist de contrato + plan de métricas",
+    ],
+    problem: "Quieres explorar colaboraciones con creadores/PR pero no tienes proceso, scoring ni checklist legal.",
+    audience: "Negocios y marcas que evalúan influencer marketing o relaciones con prensa antes de invertir.",
+    inputs: ["Negocio", "Sector", "Propuesta de valor", "CTA"],
+    outputs: ["Research matching", "Scoring sheet", "Brief outreach", "Contrato/checklist", "Metrics plan", "Informe"],
+    accent: "from-purple-500/10 via-card to-card",
+    estimatedMinutes: 10,
+  },
 ];
 
 export function getServicePack(id: string): ServicePackDefinition | undefined {
@@ -480,4 +506,5 @@ export const SERVICE_PACK_CATEGORIES: { id: ServicePackCategory; label: string }
   { id: "analytics", label: "Analítica" },
   { id: "brand", label: "Marca" },
   { id: "retention", label: "Retención" },
+  { id: "influencers_pr", label: "Influencers / PR" },
 ];

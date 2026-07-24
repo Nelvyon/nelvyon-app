@@ -19,6 +19,7 @@ import {
   RETENTION_PACK_ID,
   AUTOMATIONS_OPS_PACK_ID,
   REPUTATION_OPS_PACK_ID,
+  INFLUENCERS_PR_PACK_ID,
   STRATEGY_PACK_STEP_DEFINITIONS,
   FUNNEL_GROWTH_PACK_STEP_DEFINITIONS,
   RETENTION_PACK_STEP_DEFINITIONS,
@@ -29,6 +30,7 @@ import {
   BRAND_VOICE_PACK_STEP_DEFINITIONS,
   AUTOMATIONS_OPS_PACK_STEP_DEFINITIONS,
   REPUTATION_OPS_PACK_STEP_DEFINITIONS,
+  INFLUENCERS_PR_PACK_STEP_DEFINITIONS,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -272,6 +274,23 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
       { id: "saas_b2b", label: "SaaS B2B" },
     ],
     ...pickOsFields(REPUTATION_OPS_PACK_ID),
+  },
+  [INFLUENCERS_PR_PACK_ID]: {
+    id: INFLUENCERS_PR_PACK_ID,
+    name: "Influencers / PR OS",
+    tagline: "Research de creadores, scoring, brief de outreach y checklist de contrato — sin envío real",
+    accent: "from-purple-500/10 via-card to-card",
+    kickoffPath: "/os/packs/influencers-pr",
+    reportPath: "/os/packs/influencers-pr/report",
+    projectPrefix: "IPP",
+    stepDefinitions: INFLUENCERS_PR_PACK_STEP_DEFINITIONS,
+    skuSequence: ["NELVYON-CHATBOT"],
+    sectors: [
+      { id: "local", label: "Negocio local" },
+      { id: "ecommerce", label: "Ecommerce" },
+      { id: "saas_b2b", label: "SaaS B2B" },
+    ],
+    ...pickOsFields(INFLUENCERS_PR_PACK_ID),
   },
 };
 

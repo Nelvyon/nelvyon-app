@@ -29,9 +29,9 @@ describe("servicePacksCatalog availability honesty", () => {
     }
   });
 
-  it("no pack remains beta after ADR-055 E2E promotion, except meta-ads-pack (no live OAuth/spend)", () => {
+  it("no pack remains beta after ADR-055 E2E promotion, except meta-ads-pack (no live OAuth/spend) and influencers-pr-pack (pending staging E2E)", () => {
     const betas = SERVICE_PACK_CATALOG.filter((p) => p.availability === "beta");
-    expect(betas.map((p) => p.id)).toEqual(["meta-ads-pack"]);
+    expect(betas.map((p) => p.id)).toEqual(["meta-ads-pack", "influencers-pr-pack"]);
   });
 
   it("meta-ads-pack is honestly labeled beta with OAuth/spend OFF disclosed", () => {

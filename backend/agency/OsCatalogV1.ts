@@ -14,12 +14,29 @@
  * publish fail-closed), `creative_direction` step for `visual_elite_strategy`, and a new
  * `shared_memory_mcp_staging` entry for the synthetic-only SM/MCP staging harness. All
  * remain PREPARED_OFF until parent promotes after real staging E2E evidence.
+ *
+ * v1.3.0: wires `influencers_pr` to its kickoff pack (`influencers-pr-pack`, flag
+ * `NELVYON_INFLUENCERS_PR_PACK` OFF outside staging — no real influencer network, no
+ * outreach send). Adds `ads_attribution_core` (synthetic campaign/attribution core,
+ * providers fail-closed, `NELVYON_ADS_SPEND_ENABLED=0`) and `community_publish_core`
+ * (content/calendar/approval core, `SimulatorPublishProvider` only, publish fail-closed
+ * unless OAuth+CEO). All three remain `PREPARED_OFF`/`NOT_IMPLEMENTED` until real staging
+ * E2E evidence promotes them — never claim `IMPLEMENTED_VERIFIED` without it.
+ *
+ * v1.4.0 (ADR-056 blocks 11/16/17): adds `telephony_core` (dialer domain model — consent,
+ * queue, draft-only campaigns, recording defaults off — `SimulatorTelephonyProvider`
+ * VERIFIED, real provider permanently `BLOCKED_EXTERNAL` via a constructor that always
+ * throws), `oauth_multitenant` (tenant-scoped OAuth framework — AES-256-GCM vault, PKCE,
+ * CSRF state, min-scopes policy — mock providers only, VERIFIED), and
+ * `integrations_marketplace` (internal-only manifest catalog + per-tenant install
+ * lifecycle, VERIFIED via the built-in `nelvyon.internal.ping` integration). No spend, no
+ * real network calls, no Twilio live dial in any of the three.
  */
 
 import { OS_DELIVERABLE_FLOW, getOsProfessionalTeam, type OsTeamId } from "./OsProfessionalTeams";
 import { SOCIAL_SERVICE_FLOW } from "./OsSocialNetworksService";
 
-export const OS_CATALOG_V1_VERSION = "1.2.0" as const;
+export const OS_CATALOG_V1_VERSION = "1.4.0" as const;
 
 export type OsCatalogV1Status =
   | "IMPLEMENTED_VERIFIED"
@@ -460,19 +477,173 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     serviceId: "influencers_pr",
     title: "Influencers / PR externos",
     teamId: "svc_social_creative",
-    playbookPath: "docs/agency-playbooks/SERVICE_CONTENT_SOCIAL.md",
-    kickoffPackIds: [],
+    playbookPath: "docs/agency-playbooks/SERVICE_INFLUENCERS_PR.md",
+    kickoffPackIds: ["influencers-pr-pack"],
     permissions: ["draft"],
-    forbidden: [...forbidSpend],
-    deliverables: [],
+    forbidden: [...forbidSpend, "real_outreach_send", "publish_post"],
+    deliverables: [
+      "research_matching",
+      "scoring_sheet",
+      "brief_outreach",
+      "contract_checklist",
+      "metrics_plan",
+      "informe",
+    ],
     qaRubric: { min: 85, criticalMin: 90 },
     independentAuditor: true,
     portalPath: "/portal",
-    metrics: [],
-    tests: [],
+    metrics: ["qa_score"],
+    tests: ["apps/web/src/lib/packs/__tests__/influencersPrPacksRunners.test.ts"],
     e2eEvidence: null,
-    status: "NOT_IMPLEMENTED",
-    nextAction: "Definir contrato + pack",
+    status: "PREPARED_OFF",
+    nextAction: "Flag NELVYON_INFLUENCERS_PR_PACK ON en staging + smoke E2E antes de promover",
+  },
+  {
+    serviceId: "ads_attribution_core",
+    title: "Ads & attribution (core, providers OFF)",
+    teamId: "svc_ads_attribution",
+    playbookPath: "docs/agency-playbooks/SERVICE_ADS.md",
+    kickoffPackIds: [],
+    permissions: ["draft"],
+    forbidden: [...forbidSpend, "oauth_connect", "publish_ads"],
+    deliverables: [
+      "campaign_draft",
+      "audiences_synthetic",
+      "utm_plan",
+      "conversion_events_log",
+      "budget_cap_report",
+      "reporting_snapshot",
+    ],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/portal",
+    metrics: ["budget_cap_enforced", "spend_cents_zero"],
+    tests: ["backend/agency/__tests__/AdsAttributionCore.test.ts"],
+    e2eEvidence: null,
+    status: "PREPARED_OFF",
+    nextAction:
+      "OAuth real + NELVYON_ADS_SPEND_ENABLED=1 + presupuesto CEO antes de conectar cualquier proveedor",
+  },
+  {
+    serviceId: "community_publish_core",
+    title: "Publish & community management (core)",
+    teamId: "svc_social_creative",
+    playbookPath: "docs/ops/SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md",
+    kickoffPackIds: [],
+    permissions: ["draft", "assisted"],
+    forbidden: [...forbidSpend, "publish_post", "oauth_connect", "mass_dm", "real_direct_message"],
+    deliverables: [
+      "content_inbox",
+      "editorial_calendar",
+      "approval_workflow",
+      "network_variants",
+      "publish_queue_simulated",
+      "moderation_escalation_log",
+      "audit_trail",
+    ],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/portal",
+    metrics: ["queue_depth", "escalation_rate"],
+    tests: ["backend/agency/__tests__/CommunityPublishCore.test.ts"],
+    e2eEvidence: null,
+    status: "PREPARED_OFF",
+    nextAction: "OAuth real + aprobación CEO explícita antes de habilitar cualquier publish real",
+  },
+  {
+    serviceId: "telephony_core",
+    title: "Dialer / Telefonía (core simulador)",
+    teamId: "svc_automations_crm",
+    playbookPath: "docs/agency-playbooks/SERVICE_DIALER.md",
+    kickoffPackIds: [],
+    permissions: ["draft", "assisted"],
+    forbidden: [...forbidSpend, "real_outbound_call", "real_inbound_call", "construct_real_provider"],
+    deliverables: ["call_queue_simulation", "consent_registry", "audit_log", "crm_timeline_stub"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/saas",
+    metrics: ["tenant_isolation_ok", "opt_out_enforced", "rate_limit_respected"],
+    tests: ["backend/agency/__tests__/TelephonyCore.test.ts"],
+    e2eEvidence:
+      "backend/agency/__tests__/TelephonyCore.test.ts (simulator-only, tenant isolation + opt-out + rate limit proven)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "simulador VERIFIED · llamadas reales BLOCKED_EXTERNAL permanente · ver docs/ops/TELEPHONY_PROVIDER_CEO_CHECKLIST.md",
+  },
+  {
+    serviceId: "oauth_multitenant",
+    title: "OAuth multi-tenant framework (mock)",
+    teamId: "global_security_compliance",
+    playbookPath: "docs/ops/OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md",
+    kickoffPackIds: [],
+    permissions: ["draft", "assisted"],
+    forbidden: [...forbidSpend, "oauth_connect_real_provider"],
+    deliverables: ["token_vault", "pkce_state_csrf", "tenant_scoped_connections", "audit_log"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/saas",
+    metrics: ["encryption_round_trip_ok", "tenant_isolation_ok", "fail_closed_key_ok"],
+    tests: ["backend/agency/__tests__/OAuthMultiTenantFramework.test.ts"],
+    e2eEvidence:
+      "backend/agency/__tests__/OAuthMultiTenantFramework.test.ts (mock providers, PKCE+CSRF+AES-256-GCM proven)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "framework + mock providers VERIFIED · proveedores reales requieren docs/ops/OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md",
+  },
+  {
+    serviceId: "integrations_marketplace",
+    title: "Integrations marketplace v1 (interno)",
+    teamId: "svc_automations_crm",
+    playbookPath: "docs/ops/INTEGRATIONS_MARKETPLACE_V1.md",
+    kickoffPackIds: [],
+    permissions: ["draft", "assisted"],
+    forbidden: [...forbidSpend, "publish_external_third_party"],
+    deliverables: ["manifest_catalog", "tenant_install_lifecycle", "internal_ping_integration", "audit_log"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/saas",
+    metrics: ["ping_healthcheck_ok", "tenant_isolation_ok", "publisher_gate_ok"],
+    tests: ["backend/agency/__tests__/IntegrationsMarketplaceV1.test.ts"],
+    e2eEvidence:
+      "backend/agency/__tests__/IntegrationsMarketplaceV1.test.ts (internal nelvyon.internal.ping install+healthcheck proven)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction: "internal ping VERIFIED · publicación de terceros (v2) no definida, sin plan hasta que se pida",
+  },
+  {
+    serviceId: "private_vector_rag",
+    title: "RAG vectorial privado (sintético)",
+    teamId: "global_security_compliance",
+    playbookPath: "docs/ops/PRIVATE_RAG_RUNBOOK.md",
+    kickoffPackIds: [],
+    permissions: ["observe"],
+    forbidden: [...forbidSpend, "openai_embeddings", "cross_tenant_retrieval"],
+    deliverables: ["vector_ingest", "cosine_retrieval", "source_citations", "refuse_without_evidence", "tenant_isolation"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/portal",
+    metrics: ["tenant_isolation_ok", "refuse_without_evidence"],
+    tests: ["backend/agency/__tests__/PrivateVectorRagCore.test.ts"],
+    e2eEvidence: "scripts/docs/evidence/os-saas-e2e/modules/private-rag.synthetic_latest.md",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction: "núcleo sintético VERIFIED · pgvector Docker live PREPARED_OFF hasta re-certificación",
+  },
+  {
+    serviceId: "private_ai_canary_prep",
+    title: "IA propia — prep canary productivo",
+    teamId: "global_security_compliance",
+    playbookPath: "docs/ops/CEO_IA_PROD_CANARY_REQUEST.md",
+    kickoffPackIds: [],
+    permissions: ["observe"],
+    forbidden: [...forbidSpend, "touch_production", "openai_api"],
+    deliverables: ["canary_checklist", "staging_drill", "kill_switch", "ceo_request"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/portal",
+    metrics: ["production_canary_authorized_false"],
+    tests: ["backend/agency/__tests__/PrivateAiCanaryPrep.test.ts"],
+    e2eEvidence: "backend/agency/__tests__/PrivateAiCanaryPrep.test.ts (isProductionCanaryAuthorized hard-false)",
+    status: "PREPARED_OFF",
+    nextAction: "CEO: docs/ops/CEO_IA_PROD_CANARY_REQUEST.md · prod OFF hasta autorización escrita",
   },
 ] as const;
 
@@ -508,7 +679,7 @@ export function listOsCatalogV1(): OsCatalogV1Entry[] {
 
 export function assertOsCatalogV1Integrity(): { ok: boolean; violations: string[] } {
   const violations: string[] = [];
-  if (OS_CATALOG_V1_VERSION !== "1.2.0") violations.push("version_mismatch");
+  if (OS_CATALOG_V1_VERSION !== "1.4.0") violations.push("version_mismatch");
   for (const e of OS_CATALOG_V1) {
     if (!e.teamId) violations.push(`no_team:${e.serviceId}`);
     if (!e.playbookPath) violations.push(`no_playbook:${e.serviceId}`);

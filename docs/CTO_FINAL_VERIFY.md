@@ -1,52 +1,65 @@
-# CTO Final Verify — 2026-07-24 (ADR-056 elite absolute audit)
+# CTO Final Verify — 2026-07-24 (ADR-057 Blocks 11–25 complete)
 
-> **AUDIT_FIXES_LOCAL** · **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0 · prod untouched  
-> Evidencia staging runtime: `scripts/docs/evidence/os-saas-e2e/modules/automations_reputation_e2e_latest.md`
+> **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0 · prod flags **OFF**  
+> Evidencia: `backend/agency` **249 PASS** · `tsc` **0** · `pwa.cert_latest.md` · `private-rag.synthetic_latest.md`
 
 ## Tabla final
 
 | Ítem | Valor |
 |------|--------|
-| SHA (local fixes) | **TBA** pending push · base **`6364c28c`** |
-| SHA (staging runtime) | **`53149384`** (ADR-055 lineage · deploy **`e514bbd7`** SUCCESS) |
-| Deploy staging | **`e514bbd7`** SUCCESS · https://ideal-victory-staging.up.railway.app · `ideal-victory` Online |
-| ADR-056 P0 fix | Campaign launch blocked by `getCampaignLaunchBlockReason` while `claimReadyLegal=false` (test bypass only) |
-| ADR-056 P1 fixes | `isOpenAiSpendAllowed` gates chat+ai-copy · `mcp.write` no longer invented · shared-memory scopes split · `meta-ads-pack` → beta OAuth OFF |
-| 13 packs + auditor (staging live) | **ALL_PASS** ADR-055 runtime (11 ADR-054 + automations + reputation) |
-| OpenClaw staging | staging_mock deepened · canary doc **PENDING_CEO** · SM productiva=0 |
-| Visual | creative_direction + decision matrix · VISUAL=0 |
-| Social oficial | PREPARED_OFF · `NelvyonOfficialSocialOps` · 8 cuentas **PENDING_CEO** |
-| Legal | gate reforzado · `DATOS_PEPITO_LICENSE_DOSSIER` · claimReadyLegal **false** · Pepito **forbidden** · mass-send **legally blocked** |
-| SM/MCP | synthetic flags **ON** staging · productivo **0** · `OLLAMA_HOST=http://100.102.207.30:11434` (Tailscale CGNAT private) |
-| Staging IA flags | `AI_ENABLED=1` staging only · `AUTONOMOUS_ALLOW_OPENAI=0` · MCP/SM productivo=0 · VISUAL=0 |
-| Prod flag read | Railway briefly switched · `NELVYON_*` OpenAI/MCP/SM/OpenClaw/visual **ABSENT** (default OFF) · restored to staging |
-| Catalog | **1.2.0** · automations · reputation · sm_mcp_synthetic_staging → **IMPLEMENTED_VERIFIED (staging)** |
-| Agency tests | **109 PASS** · tsc **0** · CampaignsLegal+saasCampanias+saasEnv+mcpProductive+catalog availability **PASS** · eslint changed routes **0** |
+| SHA (local) | **TBA** (parent commit pending) |
+| Staging URL | https://ideal-victory-staging.up.railway.app |
+| Deploy staging | **confirm after push** |
+| Veredicto | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` |
+| Tests | `tsc` **0** · `backend/agency` **249 PASS** · influencers pack **PASS** · `pwa-certify` **PASS** · private-rag synthetic **ALL_PASS** (27 tests) |
+| Catalog | **OsCatalogV1 v1.4.0** (+ `private_vector_rag`, `private_ai_canary_prep`) |
+| 13 packs + auditor (staging) | **ALL_PASS** ADR-055 runtime |
+| Prod flags | **OFF** / **ABSENT** · no OpenAI · no Pepito · no Twilio/ads/publish/OAuth reales · no App Store publish |
+| Legal | `claimReadyLegal` **false** · mass-send **BLOCKED_LEGAL** · Pepito **forbidden** |
+
+## ADR-057 — Blocks 11–25
+
+| Block | Capacidad | Estado | Bloqueo |
+|-------|-----------|--------|---------|
+| 11 | `telephony_core` | **IMPLEMENTED_VERIFIED** (simulator) | real calls **BLOCKED_EXTERNAL** |
+| 12 | `influencers_pr` | **PREPARED_OFF** / beta | unit+kickoff wired · staging E2E opcional pendiente flag |
+| 13 | `ads_attribution_core` | **IMPLEMENTED_VERIFIED** (core) | spend/OAuth **BLOCKED_EXTERNAL** |
+| 14 | `community_publish_core` | **IMPLEMENTED_VERIFIED** (simulator) | real publish **BLOCKED_EXTERNAL** |
+| 15 | mass-send technical | **IMPLEMENTED_VERIFIED** (controls) | send **BLOCKED_LEGAL** (`claimReadyLegal` false) |
+| 16 | `oauth_multitenant` | **IMPLEMENTED_VERIFIED** (framework+mock) | real apps **BLOCKED_EXTERNAL** |
+| 17 | `integrations_marketplace` | **IMPLEMENTED_VERIFIED** (internal ping) | — |
+| 18 | mobile Capacitor | **PREPARED_OFF** / contract **VERIFIED** | App Store/Play **BLOCKED_EXTERNAL** |
+| 19 | PWA | **IMPLEMENTED_VERIFIED** (Chrome/Windows) | iOS Safari **PARTIAL** |
+| 20 | `localization` | **IMPLEMENTED_VERIFIED** (es/en) | fr/de/it/pt **PARTIAL** |
+| 21 | HA/DR | **IMPLEMENTED_VERIFIED** (runbook+checks) | multi-region **BLOCKED_EXTERNAL** |
+| 22 | `observability` | **IMPLEMENTED_VERIFIED** (local core) | paid vendors **PREPARED_OFF** |
+| 23 | legacy consolidation | **IMPLEMENTED_VERIFIED** (audit+plan) | zero unsafe deletes |
+| 24 | `private_vector_rag` | **IMPLEMENTED_VERIFIED** (synthetic) | pgvector Docker **PREPARED_OFF** |
+| 25 | `private_ai_canary_prep` | **PREPARED_OFF** | **BLOCKED_CEO** |
 
 ## Clasificación
 
-| Verde verificado | Preparado OFF / pending | Bloqueado externo/CEO/legal |
-|------------------|-------------------------|------------------------------|
-| 13 packs+auditor staging runtime · automations/reputation E2E · SM/MCP synthetic ON · OpenClaw staging_mock · visual strategy · ADR-056 P0/P1 fixes local | social oficial 8 cuentas · OpenClaw prod canary review · ADR-056 deploy pending | ads OAuth · OpenClaw prod · OpenAI · payouts · claimReady · Pepito · campañas mass-send |
+| Verde verificado (internal cores) | Preparado OFF / pending | Bloqueado externo/CEO/legal |
+|-----------------------------------|-------------------------|------------------------------|
+| Blocks 11–25 cores internos (tabla arriba) · 13 packs+auditor staging · PWA cert · private-rag synthetic 27 tests · catalog v1.4.0 | influencers_pr staging E2E · mobile stores · pgvector live · paid observability · IA prod canary prep | Twilio/ads/publish/OAuth reales · App Store/Play · multi-region · Pepito · mass-send · claimReady |
 
 ## Competitive honesty (factual gaps — NOT parity)
 
-| Referente | Gap verificado en este audit |
-|-----------|------------------------------|
-| HubSpot / Meta / Google Ads | **No live Meta/Google Ads OAuth spend path** |
-| GoHighLevel (GHL) | **No native telephony dialer parity** |
+| Referente | Gap verificado |
+|-----------|----------------|
+| HubSpot / Meta / Google Ads | **No live OAuth spend path** (core verified · providers OFF) |
+| GoHighLevel (GHL) | **No native telephony dialer parity** (simulator verified · real calls BLOCKED) |
 | Odoo | **No full ERP/accounting/manufacturing** |
 | Campañas email | **Mass-send legally blocked** (`claimReadyLegal=false`) |
-| Social NELVYON | **Official accounts pending CEO** (8 cuentas PREPARED_OFF) |
-| Producción multi-tenant | **No proven multi-tenant production customer outcomes** in this audit |
+| Social NELVYON | **Official accounts + real publish pending CEO** |
+| Producción multi-tenant | **No proven multi-tenant production customer outcomes** |
 
-**No competitive superiority claims.** NELVYON adds OS packs, local IA workforce, and agency automation — gaps above remain open.
+**No competitive superiority claims.**
 
 ## Next
 
-1. CEO: 8 cuentas sociales oficiales  
-2. Legal: dossier Pepito + licencia escrita  
-3. CEO: OpenClaw prod canary request review  
-4. **No READY**
+1. CEO checklists: telephony · OAuth apps · ads · social publish · mobile stores · Pepito legal · IA prod canary  
+2. Ops: **confirm staging deploy after push**  
+3. **No READY**
 
-Rollback: HANDOVER
+Rollback: `HANDOVER.md`

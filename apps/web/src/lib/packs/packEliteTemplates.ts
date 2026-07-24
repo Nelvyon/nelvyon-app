@@ -12,6 +12,7 @@ import {
   RETENTION_PACK_ID,
   AUTOMATIONS_OPS_PACK_ID,
   REPUTATION_OPS_PACK_ID,
+  INFLUENCERS_PR_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -369,6 +370,22 @@ const FEATURED: Record<PackId, PackElitePreset> = {
       tier: "professional",
     },
     templates: SECTOR_TEMPLATES.restaurant ?? SECTOR_TEMPLATES.saas_b2b,
+  },
+  [INFLUENCERS_PR_PACK_ID]: {
+    id: "influencers-pr-demo",
+    label: "InfluencersPrDemo",
+    sector: "ecommerce",
+    tagline: "Research + scoring + brief outreach — sin outreach real",
+    intake: {
+      business_name: "InfluencersPrDemo",
+      sector: "ecommerce",
+      city: "Barcelona",
+      country: "ES",
+      value_proposition: "Colaboraciones con creadores evaluadas antes de invertir",
+      primary_cta: "Explorar candidatos",
+      tier: "professional",
+    },
+    templates: SECTOR_TEMPLATES.ecommerce ?? SECTOR_TEMPLATES.saas_b2b,
   },
 };
 

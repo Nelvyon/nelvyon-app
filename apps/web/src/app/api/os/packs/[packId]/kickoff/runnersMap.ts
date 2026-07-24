@@ -44,6 +44,10 @@ import {
   runReputationOpsPack,
   validateReputationOpsIntake,
 } from "@/lib/packs/automationsReputationPacksRunners";
+import {
+  runInfluencersPrPack,
+  validateInfluencersPrIntake,
+} from "@/lib/packs/influencersPrPacksRunners";
 import type { PackRunRecord } from "@/lib/packs/types";
 import {
   ECOMMERCE_GROWTH_PACK_ID,
@@ -59,6 +63,7 @@ import {
   RETENTION_PACK_ID,
   AUTOMATIONS_OPS_PACK_ID,
   REPUTATION_OPS_PACK_ID,
+  INFLUENCERS_PR_PACK_ID,
 } from "@/lib/packs/types";
 
 export type PackRunner = (params: {
@@ -126,6 +131,10 @@ export const RUNNERS: Record<string, PackRunnerEntry> = {
   [REPUTATION_OPS_PACK_ID]: {
     validate: validateReputationOpsIntake,
     run: runReputationOpsPack as PackRunner,
+  },
+  [INFLUENCERS_PR_PACK_ID]: {
+    validate: validateInfluencersPrIntake,
+    run: runInfluencersPrPack as PackRunner,
   },
   /** Alias — analytics-insights → analytics-setup-pack */
   "analytics-insights": {

@@ -6,19 +6,26 @@
 
 ## Activos
 
+### Ops (no KI) — ADR-057 external integrations pending CEO
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **BLOCKED_EXTERNAL** / **BLOCKED_CEO** |
+| **Detalle** | Blocks 11–25 cores internos verified · rutas externas pendientes: Twilio real (Block 11) · OAuth apps reales (Block 16) · ads spend/OAuth (Block 13) · social publish (Block 14) · App Store/Play (Block 18) · multi-region (Block 21) · pgvector Docker live (Block 24) · IA prod canary (Block 25 · `CEO_IA_PROD_CANARY_REQUEST.md`) |
+
 ### Ops (no KI) — Legal checklist campañas + Datos Pepito (claimReady)
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — **BLOCKED_LEGAL** claimReady / READY |
-| **Detalle** | Gate reforzado ADR-055/056 · `DATOS_PEPITO_LICENSE_DOSSIER.md` · `claimReadyLegal` hard-false · Pepito **forbidden** · falta confirmación escrita + licencia comercial · ADR-056 P0: campaign launch blocked by `getCampaignLaunchBlockReason` (test bypass only) · mass-send **legally blocked** |
+| **Detalle** | Gate reforzado ADR-055/056/057 · Block 15 mass-send controls verified · `claimReadyLegal` hard-false · send **BLOCKED_LEGAL** · `DATOS_PEPITO_LICENSE_DOSSIER.md` · Pepito **forbidden** · falta confirmación escrita + licencia comercial |
 
 ### Ops (no KI) — Ads OAuth spend path
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **BLOCKED_EXTERNAL** |
-| **Detalle** | No live Meta/Google Ads OAuth spend path · `meta-ads-pack` → beta **OAuth OFF** (ADR-056) |
+| **Detalle** | Block 13 core **IMPLEMENTED_VERIFIED** · no live Meta/Google/LinkedIn OAuth spend path · `NELVYON_ADS_SPEND_ENABLED=0` · `ADS_OAUTH_SPEND_CEO_CHECKLIST.md` |
 
 ### Ops (no KI) — Social oficial NELVYON
 
@@ -26,6 +33,13 @@
 |-------|-------|
 | **Estado** | **PREPARED_OFF** |
 | **Detalle** | `NelvyonOfficialSocialOps` + `NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md` · 8 cuentas **PENDING_CEO** · sin publish/OAuth |
+
+### Ops (no KI) — Private AI prod canary (Block 25)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **PREPARED_OFF** · **BLOCKED_CEO** |
+| **Detalle** | `PrivateAiCanaryPrep` checklist verified · `isProductionCanaryAuthorized()` hardcoded **false** · `CEO_IA_PROD_CANARY_REQUEST.md` **PENDING_CEO** |
 
 ### Ops (no KI) — OpenClaw prod canary
 
@@ -37,6 +51,14 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — ADR-057 Blocks 11–25 internal cores (local · deploy pending)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-24 (código local verificado) |
+| **Evidencia** | `tsc` **0** · `backend/agency` **249 PASS** · influencers pack **PASS** · `pwa-certify` **PASS** · private-rag synthetic **ALL_PASS** (27 tests) · catalog **v1.4.0** |
+| **Nota** | tip **TBA** · staging deploy **pending push** · externos siguen **BLOCKED** |
 
 ### Ops — ADR-056 P0/P1 audit fixes (local · deploy pending)
 

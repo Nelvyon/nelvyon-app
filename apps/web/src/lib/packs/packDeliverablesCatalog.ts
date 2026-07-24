@@ -12,6 +12,7 @@ import {
   RETENTION_PACK_ID,
   AUTOMATIONS_OPS_PACK_ID,
   REPUTATION_OPS_PACK_ID,
+  INFLUENCERS_PR_PACK_ID,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -170,6 +171,15 @@ const CATALOG: Record<PackId, PackDeliverableItem[]> = {
     { title: "Plan de recuperación de reputación", description: "Plan 30 días sin mass DM.", portalLabel: "Ver plan" },
     { title: "Kit de señales de confianza", description: "Señales para web y ficha local.", portalLabel: "Ver kit" },
     { title: "Informe ejecutivo", description: "KPIs de reputación y siguientes pasos.", portalLabel: "Abrir informe" },
+  ],
+  [INFLUENCERS_PR_PACK_ID]: [
+    { title: "Asistente de campañas de influencers y PR", description: "Bot que explica research y siguientes pasos.", portalLabel: "Probar asistente" },
+    { title: "Research matching", description: "Candidatos sintéticos por nicho — sin outreach real.", portalLabel: "Ver research" },
+    { title: "Scoring sheet", description: "Criterios ponderados y ranking de candidatos.", portalLabel: "Ver scoring" },
+    { title: "Brief outreach", description: "Mensajes clave y requisitos de disclosure legal.", portalLabel: "Ver brief" },
+    { title: "Contrato / checklist", description: "Cláusulas y checklist legal antes de firmar.", portalLabel: "Ver checklist" },
+    { title: "Metrics plan", description: "KPIs, UTM y cadencia de reporting.", portalLabel: "Ver plan" },
+    { title: "Informe ejecutivo", description: "Resumen y próximos pasos antes de cualquier contacto real.", portalLabel: "Abrir informe" },
   ],
 };
 

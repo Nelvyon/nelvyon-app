@@ -204,6 +204,105 @@ export type {
   CampaignsLegalTechnicalResult,
 } from "./CampaignsLegalTechnicalGate";
 export {
+  DEFAULT_WARMING_PLAN,
+  addToSuppressionList,
+  assertMassSendTechnicalControlsIntegrity,
+  auditEmailTemplate,
+  buildWarmingMetadata,
+  checkRateLimit,
+  checkUnsubscribeProof,
+  currentHourSendCount,
+  filterSuppressedRecipients,
+  getSyntheticReputationScoreStub,
+  getWarmingStageForDay,
+  isSuppressed,
+  listSuppressionEntries,
+  recordSendForRateLimit,
+  resetRateLimitWindowForTests,
+  resetSuppressionListForTests,
+} from "./MassSendTechnicalControls";
+export type {
+  ReputationScoreSnapshot,
+  SuppressionEntry,
+  SuppressionReason,
+  TemplateAuditInput,
+  TemplateAuditResult,
+  UnsubscribeProofInput,
+  UnsubscribeProofResult,
+  WarmingMetadata,
+  WarmingStage,
+} from "./MassSendTechnicalControls";
+export {
+  AdsConnectorBlockedError,
+  GoogleAdsConnector,
+  LinkedInAdsConnector,
+  MetaAdsConnector,
+  appendUtmToUrl,
+  assertAdsAttributionCoreIntegrity,
+  buildCampaignDraft,
+  buildReportingSnapshot,
+  buildSyntheticAudiences,
+  buildUtmParams,
+  enforceBudgetCap,
+  evaluateAdsApprovalGates,
+  getAdsConnector,
+  isAdsSpendEnabled,
+  listConversionEvents,
+  recordConversionEvent,
+  resetConversionLedgerForTests,
+} from "./AdsAttributionCore";
+export type {
+  AdsApprovalGateInput,
+  AdsApprovalGateResult,
+  AdsAudienceSynthetic,
+  AdsCampaignDraft,
+  AdsCampaignDraftInput,
+  AdsCreativeMetadata,
+  AdsObjective,
+  AdsPlatform,
+  AdsReportingSnapshot,
+  BudgetCapCheckInput,
+  BudgetCapCheckResult,
+  ConversionEvent,
+  UtmParams,
+} from "./AdsAttributionCore";
+export {
+  COMMUNITY_PUBLISH_ROLLBACK_PLAN,
+  SimulatorPublishProvider,
+  addToContentInbox,
+  assertCommunityPublishCoreIntegrity,
+  assertPublishDisabled,
+  buildEditorialCalendar,
+  buildMetricsPlaceholders,
+  buildNetworkVariants,
+  classifyModerationEvent,
+  decideContentInboxItem,
+  enqueuePublishItem,
+  evaluateApprovalWorkflow,
+  listAuditLog,
+  listContentInbox,
+  listEditorialCalendar,
+  listModerationLog,
+  listPublishQueue,
+  recordAuditLogEntry,
+  resetCommunityPublishStateForTests,
+} from "./CommunityPublishCore";
+export type {
+  ApprovalWorkflowInput,
+  ApprovalWorkflowResult,
+  AuditLogEntry,
+  CalendarEntry,
+  CommunityPlatform,
+  ContentInboxItem,
+  ContentInboxStatus,
+  ModerationCategory,
+  ModerationEvent,
+  MetricsPlaceholder,
+  NetworkVariant,
+  PublishQueueItem,
+  PublishQueueStatus,
+} from "./CommunityPublishCore";
+export {
   assertCeoPartnerPayoutAuthorized,
   getPartnerProgramSnapshot,
   isCeoPartnerPayoutEnabled,
@@ -211,3 +310,202 @@ export {
 export type { PartnerProgramSnapshot, PartnerStackId } from "./PartnerProgramFacade";
 export { calculatePartnerCommission } from "./commissionCalc";
 export type { CommissionCalcInput, CommissionCalcResult } from "./commissionCalc";
+export {
+  MobileOfflineQueue,
+  assertMobileSecureSessionIntegrity,
+  assertMobileTenantIsolation,
+  buildMobileAuthHeaders,
+  isMobileSessionValid,
+} from "./MobileSecureSession";
+export type {
+  MobileAuthHeaders,
+  MobileSessionContext,
+  OfflineActionKind,
+  OfflineQueueDrainResult,
+  OfflineQueueItem,
+} from "./MobileSecureSession";
+export {
+  MOBILE_APP_CAPABILITIES,
+  assertMobileAppContractIntegrity,
+  getMobileCapability,
+  getMobileStorePublishBlockReason,
+  listMobileAppCapabilities,
+} from "./MobileAppContract";
+export type { MobileCapabilityEntry, MobileCapabilityStatus } from "./MobileAppContract";
+export {
+  assertPwaCertificationCoreIntegrity,
+  assertPwaCertificationHonesty,
+  evaluatePwaManifest,
+} from "./PwaCertification";
+export type {
+  PwaCertificationInput,
+  PwaCertificationResult,
+  PwaIconCheck,
+  PwaManifestLike,
+} from "./PwaCertification";
+export {
+  LOCALE_CATALOG,
+  LOCALIZATION_FALLBACK_LOCALE,
+  assertLocalizationCoreIntegrity,
+  formatCurrency,
+  formatDateInTimezone,
+  getLocale,
+  isSupportedLocale,
+  listFullyVerifiedLocales,
+  listLocales,
+  listPartialLocales,
+  resolveLocale,
+  resolveTenantLocale,
+} from "./LocalizationCore";
+export type { CurrencyCode, LocaleCatalogEntry, LocaleCoverage, LocaleId } from "./LocalizationCore";
+export {
+  HA_DR_CHECKLIST,
+  HA_DR_RUNBOOK_PATH,
+  HA_DR_STAGING_HEALTH_URL_PATTERN,
+  assertHaDrReadinessIntegrity,
+  buildStagingHealthUrl,
+  getHaDrItem,
+  isMultiRegionEnabled,
+  listHaDrChecklist,
+} from "./HaDrReadiness";
+export type { HaDrChecklistItem, HaDrItemStatus } from "./HaDrReadiness";
+export {
+  INCIDENT_RUNBOOK_PATH,
+  assertOpsObservabilityCoreIntegrity,
+  buildOpsHealthSnapshot,
+  buildStructuredLog,
+  generateCorrelationId,
+  listSimulatedAlerts,
+  opsMetrics,
+  resetOpsObservabilityForTests,
+  simulateAlert,
+} from "./OpsObservabilityCore";
+export type {
+  AlertSeverity,
+  LogLevel,
+  OpsHealthSnapshot,
+  SimulatedAlert,
+  StructuredLogEntry,
+} from "./OpsObservabilityCore";
+export {
+  LEGACY_AREAS,
+  LEGACY_CONSOLIDATION_DOC_PATH,
+  assertLegacyConsolidationAuditIntegrity,
+  getLegacyArea,
+  listLegacyAreas,
+} from "./LegacyConsolidationAudit";
+export type { LegacyAreaEntry, LegacyAreaStatus } from "./LegacyConsolidationAudit";
+export {
+  DEFAULT_RATE_LIMIT,
+  DEFAULT_RECORDING_CONFIG,
+  SimulatorTelephonyProvider,
+  TelephonyProviderError,
+  TwilioTelephonyProvider,
+  assertTelephonyCoreIntegrity,
+  assertTelephonyRealProviderDisabled,
+  getSimulatorTelephonyProvider,
+  isCallTranscriptionEnabled,
+  resetSimulatorTelephonyProviderForTests,
+} from "./TelephonyCore";
+export type {
+  AuditEntry as TelephonyAuditEntry,
+  CallCampaign,
+  CallQueueItem,
+  CallQueueItemStatus,
+  ContactConsent,
+  ContactConsentStatus,
+  CrmTimelineEvent,
+  CrmTimelineEventType,
+  RateLimitMeta,
+  RecordingConfig,
+  RecordingMeta,
+  TelephonyProvider,
+  TelephonyProviderErrorCode,
+  TenantId as TelephonyTenantId,
+} from "./TelephonyCore";
+export {
+  AesGcmOAuthTokenVault,
+  GoogleMockOAuthProvider,
+  LinkedInMockOAuthProvider,
+  MetaMockOAuthProvider,
+  OAUTH_MT_MIN_SCOPES,
+  OAuthMtError,
+  OAuthMultiTenantFramework,
+  TwilioMockOAuthProvider,
+  assertOAuthMultiTenantFrameworkIntegrity,
+  assertScopesIncludeMinimum,
+  generatePkce,
+  getOAuthMultiTenantFramework,
+  minimalScopesFor,
+  resetOAuthMultiTenantFrameworkForTests,
+  verifyPkce,
+} from "./OAuthMultiTenantFramework";
+export type {
+  MockOAuthProviderAdapter,
+  OAuthMtAuditAction,
+  OAuthMtAuditEntry,
+  OAuthMtConnectionStatus,
+  OAuthMtConnectionSummary,
+  OAuthMtProviderId,
+  OAuthTokenVault,
+  PkcePair,
+  StartAuthorizationResult,
+} from "./OAuthMultiTenantFramework";
+export {
+  IntegrationsMarketplaceError,
+  IntegrationsMarketplaceV1,
+  NELVYON_INTERNAL_PING_MANIFEST,
+  assertIntegrationsMarketplaceIntegrity,
+  assertValidManifest,
+  getIntegrationsMarketplace,
+  resetIntegrationsMarketplaceForTests,
+} from "./IntegrationsMarketplaceV1";
+export type {
+  IntegrationHandlers,
+  IntegrationHealthcheckResult,
+  IntegrationInstallRecord,
+  IntegrationInstallStatus,
+  IntegrationManifest,
+  IntegrationPublisher,
+  IntegrationsMarketplaceAuditAction,
+  IntegrationsMarketplaceAuditEntry,
+} from "./IntegrationsMarketplaceV1";
+export {
+  PRIVATE_RAG_ROLLBACK_FLAGS,
+  PRIVATE_VECTOR_RAG_STATUS,
+  PrivateVectorRagCore,
+  assertPrivateVectorRagCoreIntegrity,
+  cosineSimilarity,
+  getPrivateVectorRagCore,
+  hashEmbed,
+  resetPrivateVectorRagCoreForTests,
+} from "./PrivateVectorRagCore";
+export type {
+  PrivateRagAnswer,
+  PrivateRagChunk,
+  PrivateRagCitation,
+  PrivateRagDocumentInput,
+  PrivateRagMetrics,
+  PrivateRagRefusalReason,
+  PrivateRagRetrievalResult,
+  PrivateRagTenantId,
+  PrivateVectorRagRollbackFlag,
+} from "./PrivateVectorRagCore";
+export {
+  PRIVATE_AI_CANARY_ROLLBACK_FLAGS,
+  assertPrivateAiCanaryPrepIntegrity,
+  buildStagingCanaryDrillEvidenceMarkdown,
+  evaluatePrivateAiCanaryChecklist,
+  getPrivateAiCanaryExitCriteria,
+  getPrivateAiCanaryLoadTestCriteria,
+  isCanaryKillSwitchEngaged,
+  isProductionCanaryAuthorized,
+  runStagingCanaryDrill,
+} from "./PrivateAiCanaryPrep";
+export type {
+  PrivateAiCanaryChecklistInput,
+  PrivateAiCanaryChecklistItemId,
+  PrivateAiCanaryChecklistItemResult,
+  PrivateAiCanaryChecklistResult,
+  StagingCanaryDrillResult,
+} from "./PrivateAiCanaryPrep";

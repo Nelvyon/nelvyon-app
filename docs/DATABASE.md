@@ -1,8 +1,17 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-24 — ADR-056 elite absolute audit · **sin migración nueva** · tip TBA (base `6364c28c`) · runtime staging ADR-055 `53149384`
+> Actualizado: 2026-07-24 — **ADR-057 Blocks 11–25** · **sin migración nueva** · tip **TBA**
 
 ---
+
+## ADR-057 — notas schema
+
+| Campo | Valor |
+|-------|-------|
+| **Migración nueva** | **No** — última sigue `518_workflows_list_columns.sql` |
+| **Cambios código** | Blocks 11–25 agency cores (telephony, ads, publish, OAuth, marketplace, mobile contract, PWA, i18n, HA/DR, observability, legacy audit, private RAG synthetic, AI canary prep) — **sin cambios schema** |
+| **Private RAG (Block 24)** | `PrivateVectorRagCore` in-process synthetic — **no** tablas pgvector productivas tocadas · pgvector Docker **PREPARED_OFF** |
+| **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` · **untouched** |
 
 ## ADR-056 — notas schema
 
