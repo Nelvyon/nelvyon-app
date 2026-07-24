@@ -1,7 +1,6 @@
 # OS Universal Service Catalog — NELVYON
 
-> **SSOT** · **2026-07-24** · tip `4d331b55` · social ADR-052 E2E **ALL_PASS** · ADR-048 REJECT Matomo/Umami · `claimReady: false`  
-> Vocabulario: `IMPLEMENTED_VERIFIED` | `BETA` | `PREPARED_OFF` | `BLOCKED_EXTERNAL` | `NOT_IMPLEMENTED`
+> **SSOT packs** · **2026-07-24** · tip `37b8bd42` · ver también **`docs/OS_CATALOG_V1.md`** (catálogo versionado) · `claimReady: false`
 
 ---
 

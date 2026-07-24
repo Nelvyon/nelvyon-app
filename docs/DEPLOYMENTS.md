@@ -8,6 +8,19 @@
 
 > No borrar entradas. Añadir al inicio.
 
+## 2026-07-24 — ADR-053 OS v1 closure (staging)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Tip / live** | `37b8bd42` · `git_sha=37b8bd425479` |
+| **Deploy** | `dd7505e9-7786-4712-8cd5-84dbb7fb2441` SUCCESS |
+| **Flags** | AUDITOR=1 · OPENCLAW=1 · STAGING_MODE=1 · SM=0 · MCP=0 · OpenAI=0 |
+| **Smokes** | `staging-smoke-os-v1-closure` ALL_PASS · social+auditor ALL_PASS |
+| **Evidence** | `auditor.openclaw.catalog_v1.md` |
+| **Prod** | untouched · coste 0 |
+| **claimReady** | **false** |
+
 ## 2026-07-24 — Social ADR-052 CERT (staging only)
 
 | Campo | Valor |

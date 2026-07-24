@@ -1,33 +1,35 @@
-# CTO Final Verify — 2026-07-24 (Social ADR-052 CERT)
+# CTO Final Verify — 2026-07-24 (ADR-053 OS v1 staging closure)
 
 > Veredicto: **CONDITIONAL_READY** · `claimReady` **false** · Coste **0** · **no READY** · prod untouched
 
-## Strict matrix (resumen)
+## Tabla final
+
+| Ítem | Valor |
+|------|--------|
+| SHA tip | `37b8bd42` |
+| Deploy staging | `dd7505e9` SUCCESS · live `37b8bd425479` |
+| Auditor | staging ON · E2E PASS/REJECT/repair/PASS |
+| OpenClaw | staging_mock ON · SM productiva 0 · OFF regression PASS |
+| Catalog v1 | integrity PASS · `docs/OS_CATALOG_V1.md` |
+| Social + auditor | ALL_PASS `c4883798` |
+| Evidencia | `auditor.openclaw.catalog_v1.md` · `social.auditor_on_e2e_latest.txt` |
+| Prod | untouched |
+
+## Estados reales
 
 | Capacidad | Estado |
 |-----------|--------|
-| 11 packs OS | IMPLEMENTED_VERIFIED |
-| Social integral ADR-052 | **IMPLEMENTED_VERIFIED** (staging E2E ALL_PASS · 7 portal deliverables) |
-| Equipos profesionales + QA élite | IMPLEMENTED_VERIFIED |
-| OpenClaw / Orchestrator / Visual / Paid social / Publish | PREPARED_OFF / NOT_AUTHORIZED |
-| Ads OAuth / spend | BLOCKED_EXTERNAL |
-| Campañas send / payouts / OpenAI prod | BLOCKED_CEO |
+| Packs + social | IMPLEMENTED_VERIFIED |
+| Auditor / OpenClaw staging | IMPLEMENTED_VERIFIED (staging) |
+| OpenClaw prod / SM productiva / MCP / OpenAI / payouts | PREPARED_OFF / BLOCKED_CEO |
+| Ads | BLOCKED_EXTERNAL |
+| Automations / Reputation packs | PREPARED_OFF |
+| Influencers/PR | NOT_IMPLEMENTED |
 | claimReady | BLOCKED_LEGAL |
-| Influencers/PR pack | NOT_IMPLEMENTED |
-
-## Evidencia social
-
-| Campo | Valor |
-|-------|-------|
-| Tip | `4d331b55` |
-| Deploy | `85fe50cc` SUCCESS |
-| Smoke | `--only=social` ALL_PASS |
-| Log | `scripts/docs/evidence/os-saas-e2e/modules/social.adr052_e2e_2026-07-24T14-51-08.txt` |
-| Summary | `social.adr052_e2e.md` |
 
 ## Next
 
 1. Legal campañas  
-2. CEO gates (OpenClaw / paid social / OAuth publish) solo con autorización  
+2. CEO: OpenClaw prod/live solo con nueva auth  
 
-Rollback: paid=0 · visual=0 · openclaw=0 · mcp=0 · sm=0 · payouts=0 · no publish
+Rollback: ver HANDOVER

@@ -3,16 +3,17 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-23**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas. Prod IA **ABSENT**. Staging: 11 packs OS E2E ALL_PASS · social ADR-052 CERT. Analytics: GA4/GSC (ADR-048 REJECT Matomo/Umami). SSOT: `OS_UNIVERSAL_SERVICE_CATALOG.md`.
+**Bloqueadores go-live:** legal campañas. Prod IA **ABSENT**. Staging: Catalog v1 · auditor ON · OpenClaw staging_mock · social CERT. SSOT: `OS_CATALOG_V1.md`.
 
 ### Auth bridge Web ↔ FastAPI
 
 | Ítem | Estado |
 |------|--------|
 | OpenAI | allow **0** · revoked |
-| Mesh Option A | Ollama privado PASS · Pack E2E ALL_PASS · ADR-044–052 |
-| OpenClaw | **PREPARED_OFF** · coordination rules fail-closed |
-| Visual generation spend | **PREPARED_OFF** · `VisualGenerationProvider` |
+| Mesh Option A | Ollama privado PASS · Pack E2E ALL_PASS · ADR-044–053 |
+| OpenClaw | **staging_mock ON** · prod **BLOCKED_CEO** · SM productiva **0** |
+| Auditor independiente | **staging ON** · prod OFF |
+| Visual generation spend | **PREPARED_OFF** |
 | Paid social / auto-publish / OAuth social | **PREPARED_OFF** · ADR-052 |
 
 ---

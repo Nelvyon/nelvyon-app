@@ -11,14 +11,14 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — **BLOCKED_LEGAL** claimReady / READY |
-| **Detalle** | 11 packs CERT · social ADR-052 CERT · OpenClaw/paid/publish OFF · 0 costes |
+| **Detalle** | Catalog v1 · packs CERT · auditor/OpenClaw **staging** · prod OFF · 0 costes |
 
-### Ops (no KI) — OpenClaw live
+### Ops (no KI) — OpenClaw live / prod
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **BLOCKED_CEO** / PREPARED_OFF |
-| **Detalle** | Requiere autorización CEO + SM + evidencia · flag default 0 |
+| **Estado** | **BLOCKED_CEO** |
+| **Detalle** | Staging_mock CERT · prod/live requiere nueva autorización CEO + SM productiva |
 
 ### Ops (no KI) — Paid social / OAuth publish
 
@@ -30,6 +30,13 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — ADR-053 OS v1 staging closure
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-24 |
+| **Evidencia** | tip `37b8bd42` · deploy `dd7505e9` · closure smoke ALL_PASS · social+auditor ALL_PASS |
 
 ### Ops — Social ADR-052 staging CERT
 

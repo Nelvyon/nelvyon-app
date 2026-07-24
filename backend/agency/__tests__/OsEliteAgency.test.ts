@@ -65,6 +65,9 @@ describe("OS Elite agency (ADR-051)", () => {
   });
 
   it("OpenClaw coordination stays blocked while OFF", () => {
+    delete process.env.NELVYON_OPENCLAW_BRIDGE_ENABLED;
+    delete process.env.NELVYON_OPENCLAW_STAGING_MODE;
+    delete process.env.NELVYON_SHARED_MEMORY_ENABLED;
     expect(OPENCLAW_COORDINATION_RULES.defaultOff).toBe(true);
     expect(OPENCLAW_COORDINATION_RULES.noSelfApprove).toBe(true);
     const d = planNelvyonOsOrchestration({

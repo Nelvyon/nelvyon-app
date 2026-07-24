@@ -15,11 +15,12 @@
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | 🟡 | Desktop often DOWN for restore drill |
 | **Railway prod** | ✅ | `@nelvyon/web` · IA/mesh/OpenAI keys **ABSENT** |
-| **Railway staging** | ✅ mesh | tip `4d331b55` · social ADR-052 E2E ALL_PASS · ADR-048 no Matomo/Umami |
+| **Railway staging** | ✅ mesh | tip `37b8bd42` · ADR-053 auditor+OpenClaw staging · social CERT |
 | **Ollama** | ✅ local mesh | Tailscale only · no public port |
 | **OpenAI** | ❌ | ABSENT prod |
 | **OSS tools externos** | ❌ no install | ADR-048 Matomo/Umami REJECT |
-| **OpenClaw / Visual / Paid social** | ❌ OFF | ADR-051/052 PREPARED_OFF |
+| **OpenClaw** | ✅ staging_mock / ❌ prod | ADR-053 · SM productiva 0 |
+| **Auditor independiente** | ✅ staging / ❌ prod | ADR-053 |
 | **Costes** | **0** | |
 
 ---

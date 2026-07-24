@@ -1021,10 +1021,10 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | staging tip `4d331b55` · deploy `85fe50cc` · social ADR-052 E2E ALL_PASS · prod untouched / IA ABSENT |
-| **OS Universal** | 11 packs **IMPLEMENTED_VERIFIED** · social integral ADR-052 · equipos ADR-051 · OpenClaw/paid/publish **PREPARED_OFF** |
+| **SHA / deploys** | tip `37b8bd42` · deploy `dd7505e9` · ADR-053 auditor+OpenClaw staging+Catalog v1 · prod untouched |
+| **OS Universal / Catalog v1** | SSOT `OS_CATALOG_V1.md` · packs CERT · OpenClaw staging_mock · auditor staging · SM productiva OFF |
 | **Free tools** | Eval only · 0 installs · `FREE_TOOLS_EVALUATION.md` |
-| **Canary IA** | Staging mesh PASS · Pack E2E growth **ALL_PASS** · OpenAI 0 |
+| **Canary IA** | Staging mesh PASS · OpenAI 0 · OpenClaw **staging only** |
 | **Blocker claimReady** | Legal checklist campañas |
 | Freezes Router / MCP / prod IA | **intactos** (flags OFF) |
 | Producto enterprise completo | **NO** |

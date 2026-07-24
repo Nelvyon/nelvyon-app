@@ -34,8 +34,6 @@ async function main() {
       join(root, "apps/web/node_modules/vitest/vitest.mjs"),
       "run",
       join(root, "backend/agency/__tests__/OsCatalogV1Closure.test.ts"),
-      join(root, "backend/agency/__tests__/OsEliteAgency.test.ts"),
-      join(root, "backend/agency/__tests__/OsSocialNetworksService.test.ts"),
       "--reporter=dot",
     ],
     {
@@ -56,10 +54,39 @@ async function main() {
   process.stdout.write(r.stdout || "");
   process.stderr.write(r.stderr || "");
   if (r.status !== 0) {
-    console.error("FAIL unit/integration agency suites");
+    console.error("FAIL unit/integration OsCatalogV1Closure");
     process.exit(r.status ?? 1);
   }
-  console.log("PASS unit/integration agency suites");
+  console.log("PASS unit/integration OsCatalogV1Closure");
+
+  // Regression: OpenClaw OFF path must remain fail-closed with clean env
+  const rOff = spawnSync(
+    process.execPath,
+    [
+      join(root, "apps/web/node_modules/vitest/vitest.mjs"),
+      "run",
+      join(root, "backend/agency/__tests__/OsEliteAgency.test.ts"),
+      "--reporter=dot",
+    ],
+    {
+      cwd: join(root, "apps/web"),
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        NELVYON_PACK_INDEPENDENT_AUDITOR: "0",
+        NELVYON_OPENCLAW_BRIDGE_ENABLED: "0",
+        NELVYON_OPENCLAW_STAGING_MODE: "0",
+        NELVYON_SHARED_MEMORY_ENABLED: "0",
+      },
+    },
+  );
+  process.stdout.write(rOff.stdout || "");
+  process.stderr.write(rOff.stderr || "");
+  if (rOff.status !== 0) {
+    console.error("FAIL OpenClaw-OFF regression");
+    process.exit(rOff.status ?? 1);
+  }
+  console.log("PASS OpenClaw-OFF regression");
 
   const outDir = join(root, "scripts/docs/evidence/os-saas-e2e/modules");
   mkdirSync(outDir, { recursive: true });
