@@ -17,6 +17,7 @@ import {
 import {
   mapSocialCalendarSkuDeliverable,
   buildSocialCalendar30d,
+  buildSocialIntegralFromIntake,
   mapContentStrategySkuDeliverable,
   buildContentEditorial90d,
   mapCroAuditSkuDeliverable,
@@ -156,31 +157,76 @@ export function runSocialCalendarPack(p: RunParams) {
         workspaceId: x.workspaceId,
       }),
     nextSteps: [
-      "Publicar semana 1 del calendario",
-      "Ajustar hooks con voz de marca",
-      "Medir reach/engagement a 14 días",
+      "Revisar estrategia mensual y calendario en portal (sin publicar)",
+      "Aprobar piezas semana 1 tras QA ≥85 / crítico ≥90",
+      "Paid social permanece OFF hasta OAuth + presupuesto CEO",
+      "Medir reach/engagement a 14 días tras publicación autorizada",
     ],
     onComplete: async (ctx) => {
       const score = avgQa(ctx.skuResults);
       const calendar = buildSocialCalendar30d(ctx.intake, score);
-      await dbCreatePackDeliverable({
+      const integral = buildSocialIntegralFromIntake(ctx.intake, score);
+      const common = {
         workspaceId: ctx.workspaceId,
         clientId: ctx.osClientId,
         projectId: ctx.osProjectId,
+        visibility: "client_visible" as const,
+      };
+      const metaBase = {
+        pack_id: SOCIAL_CALENDAR_PACK_ID,
+        pack_run_id: ctx.packRunId,
+        production: true,
+        qa_score: score,
+        paid_social_status: "PREPARED_OFF",
+        publish_status: "NOT_AUTHORIZED",
+      };
+      await dbCreatePackDeliverable({
+        ...common,
         title: "Calendario 30 días",
         type: "json",
-        visibility: "client_visible",
+        metadata: { ...metaBase, social_calendar: calendar, portal_visible: true },
+      });
+      await dbCreatePackDeliverable({
+        ...common,
+        title: "Estrategia social mensual",
+        type: "json",
+        metadata: { ...metaBase, strategy_monthly: integral.strategy_monthly, flow: integral.flow },
+      });
+      await dbCreatePackDeliverable({
+        ...common,
+        title: "Kit multi-red + formatos",
+        type: "json",
         metadata: {
-          pack_id: SOCIAL_CALENDAR_PACK_ID,
-          pack_run_id: ctx.packRunId,
-          production: true,
-          qa_score: score,
-          social_calendar: calendar,
+          ...metaBase,
+          platforms: integral.platforms,
+          copies: integral.copies,
+          creative_line: integral.creative_line,
+          video_plan: integral.video_plan,
+          asset_library: integral.asset_library,
+        },
+      });
+      await dbCreatePackDeliverable({
+        ...common,
+        title: "Playbook community + paid OFF",
+        type: "json",
+        metadata: {
+          ...metaBase,
+          community_playbook: integral.community_playbook,
+          paid_social_off: integral.paid_social_off,
+          trends_competition: integral.trends_competition,
+          analytics_plan: integral.analytics_plan,
+          qa_rubric: integral.qa_rubric,
+          rollback: integral.rollback,
         },
       });
       return {
-        extraDeliverables: 1,
-        markSteps: [{ key: "social_calendar", status: "done", detail: "Calendario 30d" }],
+        extraDeliverables: 4,
+        markSteps: [
+          { key: "social_strategy", status: "done", detail: "Estrategia mensual" },
+          { key: "social_calendar", status: "done", detail: "Calendario 30d portal" },
+          { key: "social_multinet_kit", status: "done", detail: "Formatos + creatividades" },
+          { key: "social_cm_paid_off", status: "done", detail: "CM + paid PREPARED_OFF" },
+        ],
       };
     },
   });

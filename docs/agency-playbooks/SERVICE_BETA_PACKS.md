@@ -7,9 +7,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Agentes | LANDING · CHATBOT · social_media_premium |
-| Entregables | Landing social · Asistente social · Calendario 30 días · Informe ejecutivo |
-| Playbook | Brief → SKUs → calendario 4 semanas → QA≥85 → portal |
+| Agentes / equipo | `svc_social_creative` (10 roles) · LANDING · CHATBOT · social_media* |
+| Entregables | Landing social · Asistente · Calendario 30d · Estrategia mensual · Kit multi-red · Playbook CM+paid OFF · Informe |
+| Plataformas | TikTok · IG Reels/Stories/Posts · FB · YT Shorts/long · LinkedIn · X · Pinterest · GBP |
+| Gates | publish NOT_AUTHORIZED · paid PREPARED_OFF · QA≥85/90 · ADR-052 |
+| Playbook | `SERVICE_CONTENT_SOCIAL.md` · brief→estrategia→calendario→piezas→QA→aprobación→pub autorizada→analítica |
 
 ## content-strategy-pack
 

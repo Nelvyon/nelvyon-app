@@ -23,7 +23,7 @@
 |--------|---------|---------------|--------|
 | local / ecommerce / saas-b2b | available | logs 2026-07-24 | **IMPLEMENTED_VERIFIED** |
 | strategy / funnel / retention | available | `new-os-packs-e2e-2026-07-24T02-55-24` | **IMPLEMENTED_VERIFIED** |
-| social-calendar | available | `beta-packs-e2e-2026-07-24T13-42-38` | **IMPLEMENTED_VERIFIED** |
+| social-calendar | available | `beta-packs-e2e-2026-07-24T13-42-38` + ADR-052 integral (re-E2E social post-deploy) | **IMPLEMENTED_VERIFIED** |
 | content-strategy | available | idem | **IMPLEMENTED_VERIFIED** |
 | cro-audit | available | idem | **IMPLEMENTED_VERIFIED** |
 | analytics-setup | available | idem · stack GA4/GSC (ADR-048) | **IMPLEMENTED_VERIFIED** |

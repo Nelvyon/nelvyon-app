@@ -25,7 +25,15 @@ const PACKS = [
     key: "social",
     packId: "social-calendar-pack",
     sector: "local",
-    titles: ["Landing social", "Asistente social", "Calendario 30 días", "Informe ejecutivo"],
+    titles: [
+      "Landing social",
+      "Asistente social",
+      "Calendario 30 días",
+      "Estrategia social mensual",
+      "Kit multi-red + formatos",
+      "Playbook community + paid OFF",
+      "Informe ejecutivo",
+    ],
   },
   {
     key: "content",

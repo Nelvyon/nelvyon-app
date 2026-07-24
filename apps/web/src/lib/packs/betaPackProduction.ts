@@ -4,6 +4,7 @@
  */
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
 import type { SimulationResult } from "../../../../../backend/autonomous/types";
+import { buildSocialIntegralBundle } from "../../../../../backend/agency/OsSocialNetworksService";
 
 import type { PackDeliverableInput } from "@/lib/packs/packOsDb";
 import type { BetaPackIntake } from "@/lib/packs/types";
@@ -75,27 +76,42 @@ export function mapSocialCalendarSkuDeliverable(params: {
 }
 
 export function buildSocialCalendar30d(intake: BetaPackIntake, qaScore: number) {
-  const pillars = ["autoridad", "comunidad", "oferta", "prueba_social"];
-  const channels = ["instagram", "linkedin", "tiktok"];
-  const weeks = [1, 2, 3, 4].map((w) => ({
-    week: w,
-    pillar: pillars[(w - 1) % pillars.length],
-    posts: channels.map((ch) => ({
-      channel: ch,
-      day: w * 2,
-      hook: `${intake.business_name}: ${intake.value_proposition}`.slice(0, 120),
-      cta: intake.primary_cta,
-    })),
-  }));
+  // Thin wrapper — integral bundle is SSOT (ADR-052); calendar shape kept for portal compat.
+  const bundle = buildSocialIntegralBundle(
+    {
+      business_name: intake.business_name,
+      sector: intake.sector,
+      city: intake.city,
+      value_proposition: intake.value_proposition,
+      primary_cta: intake.primary_cta,
+    },
+    qaScore,
+  );
   return {
     business_name: intake.business_name,
     sector: intake.sector,
     city: intake.city,
-    weeks,
+    weeks: (bundle.calendar as { weeks: unknown }).weeks,
     hashtags: [`#${intake.city.replace(/\s+/g, "")}`, `#${intake.sector}`, "#nelvyon"],
     qa_score: qaScore,
-    production: true,
+    production: true as const,
+    platforms: bundle.platforms.map((p) => p.id),
+    portal_visible: true,
+    publish_authorized: false,
   };
+}
+
+export function buildSocialIntegralFromIntake(intake: BetaPackIntake, qaScore: number) {
+  return buildSocialIntegralBundle(
+    {
+      business_name: intake.business_name,
+      sector: intake.sector,
+      city: intake.city,
+      value_proposition: intake.value_proposition,
+      primary_cta: intake.primary_cta,
+    },
+    qaScore,
+  );
 }
 
 export function mapContentStrategySkuDeliverable(params: {

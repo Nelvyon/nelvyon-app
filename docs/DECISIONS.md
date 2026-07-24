@@ -598,3 +598,15 @@
 
 ---
 
+## ADR-052 — Redes sociales completas por cliente (integral social OS)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | (1) `OsSocialNetworksService` SSOT de plataformas (11), roles (10), flujo obligatorio y bundle integral. (2) Ampliar `social-calendar-pack` con entregables estrategia / kit multi-red / CM+paid OFF (portal-visible). (3) Paid social + OAuth + publish **fail-closed** (`PREPARED_OFF` / `NOT_AUTHORIZED`). (4) Equipo `svc_social_creative` con roster completo. (5) Re-certificar pack con smoke `--only=social` tras deploy; no bajar QA; sin gasto visual/ads. |
+| **Por qué** | Servicio social integral demostrable sin publicar ni gastar sin autorización. |
+| **Consecuencias** | Playbook `SERVICE_CONTENT_SOCIAL.md` · tests unitarios · matriz elite actualizada · claimReady sigue false. |
+| **Relación** | ADR-050 · ADR-051 · pack `social-calendar-pack`. |
+
+---
+

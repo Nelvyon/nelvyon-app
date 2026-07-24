@@ -67,6 +67,25 @@ export type {
   VisualGenerationResult,
 } from "./VisualGenerationProvider";
 export {
+  SOCIAL_PLATFORM_SPECS,
+  SOCIAL_PROFESSIONAL_ROLES,
+  SOCIAL_SERVICE_FLOW,
+  assertSocialNetworksIntegrity,
+  assertSocialPublishAuthorized,
+  buildSocialIntegralBundle,
+  evaluateSocialQaElite,
+  isPaidSocialEnabled,
+  resolveSocialPlatforms,
+} from "./OsSocialNetworksService";
+export type {
+  SocialIntegralBrief,
+  SocialIntegralBundle,
+  SocialPlatformId,
+  SocialPlatformSpec,
+  SocialTeamRole,
+  SocialTeamRoleId,
+} from "./OsSocialNetworksService";
+export {
   assertCeoPartnerPayoutAuthorized,
   getPartnerProgramSnapshot,
   isCeoPartnerPayoutEnabled,

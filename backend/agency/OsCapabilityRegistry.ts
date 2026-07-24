@@ -132,7 +132,7 @@ export const OS_CAPABILITY_REGISTRY: readonly OsCapability[] = [
   },
   {
     serviceId: "content_social",
-    title: "Contenidos / Redes",
+    title: "Redes sociales / contenidos (integral)",
     universes: ["private_ai", "os_premium"],
     llmPath: "ollama_first",
     playbookPath: "docs/agency-playbooks/SERVICE_CONTENT_SOCIAL.md",
