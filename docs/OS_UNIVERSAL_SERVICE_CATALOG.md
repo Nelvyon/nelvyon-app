@@ -1,6 +1,6 @@
 # OS Universal Service Catalog — NELVYON
 
-> **SSOT packs** · **2026-07-24** · tip **TBA** · ver **`docs/OS_CATALOG_V1.md` v1.2.0** · `claimReady: false`
+> **SSOT packs** · **2026-07-24** · tip **`53149384`** · deploy **`e514bbd7`** · ver **`docs/OS_CATALOG_V1.md` v1.2.0** · `claimReady: false`
 
 ---
 
@@ -8,9 +8,9 @@
 
 | Estado | Count | Ejemplos |
 |--------|------:|----------|
-| IMPLEMENTED_VERIFIED | 15 | 3 growth · strategy/funnel/retention · 5 social/content/cro/analytics/brand · landing/SEO/chatbot/email |
-| BETA | 2 | `automations-ops-pack` · `reputation-ops-pack` (wired · E2E pending) |
-| PREPARED_OFF | 4 | social oficial NELVYON · SM/MCP synthetic flags · funnels SaaS UI · prod IA |
+| IMPLEMENTED_VERIFIED | 17 | 3 growth · strategy/funnel/retention · 5 social/content/cro/analytics/brand · landing/SEO/chatbot/email · automations · reputation · SM/MCP synthetic |
+| BETA | 0 | — |
+| PREPARED_OFF | 2 | social oficial NELVYON · prod IA |
 | BLOCKED_EXTERNAL | 2 | ads OAuth/spend · legal campañas/Pepito |
 | NOT_IMPLEMENTED | 0 | — |
 
@@ -27,15 +27,15 @@
 | cro-audit | available | idem | **IMPLEMENTED_VERIFIED** |
 | analytics-setup | available | idem · stack GA4/GSC (ADR-048) | **IMPLEMENTED_VERIFIED** |
 | brand-voice | available | idem | **IMPLEMENTED_VERIFIED** |
-| automations-ops-pack | **beta** | kickoff+runners wired · E2E **pending** | **PREPARED_OFF** |
-| reputation-ops-pack | **beta** | kickoff+runners wired · E2E **pending** | **PREPARED_OFF** |
+| automations-ops-pack | available | ADR-055 `automations_reputation_e2e_latest.md` ALL_PASS (6 deliverables) · tip `53149384` | **IMPLEMENTED_VERIFIED** |
+| reputation-ops-pack | available | ADR-055 `automations_reputation_e2e_latest.md` ALL_PASS (6 deliverables) · tip `53149384` | **IMPLEMENTED_VERIFIED** |
 
 ## Servicios agencia (no-pack)
 
 | Servicio | Estado | Notas |
 |----------|--------|-------|
-| nelvyon_official_social | **PREPARED_OFF** | `NelvyonOfficialSocialOps` · checklist CEO · sin publish |
-| sm_mcp_synthetic_staging | **PREPARED_OFF** | harness · flags not set · productivo 0 |
+| nelvyon_official_social | **PREPARED_OFF** | `NelvyonOfficialSocialOps` · 8 cuentas PENDING_CEO · sin publish |
+| sm_mcp_synthetic_staging | **IMPLEMENTED_VERIFIED (staging)** | flags ON · productivo 0 · harness unit tests PASS |
 
 ## Tools
 
@@ -43,4 +43,4 @@ Matomo / Umami: **REJECT/DEFER** (ADR-048) · 0 installs · analítica NELVYON =
 
 ## claimReady
 
-**false** — legal dossier Pepito + licencia escrita. **No READY.**
+**false** — legal dossier Pepito + licencia escrita. **NOT READY.**

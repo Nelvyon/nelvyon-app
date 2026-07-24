@@ -282,10 +282,9 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
       "backend/agency/__tests__/OsCatalogV1Closure.test.ts",
       "apps/web/src/lib/packs/__tests__/automationsReputationPacksRunners.test.ts",
     ],
-    e2eEvidence: null,
-    status: "PREPARED_OFF",
-    nextAction:
-      "flag NELVYON_AUTOMATIONS_OPS_PACK=1 en staging · ejecutar staging-smoke-automations-reputation-e2e.mjs --only=automations · promover tras E2E PASS",
+    e2eEvidence: "scripts/docs/evidence/os-saas-e2e/modules/automations_reputation_e2e_latest.md",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction: "mantener · flag OFF fuera staging · sin campañas masivas",
   },
   {
     serviceId: "reputation",
@@ -310,10 +309,9 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
       "backend/agency/__tests__/OsCatalogV1Closure.test.ts",
       "apps/web/src/lib/packs/__tests__/automationsReputationPacksRunners.test.ts",
     ],
-    e2eEvidence: null,
-    status: "PREPARED_OFF",
-    nextAction:
-      "flag NELVYON_REPUTATION_OPS_PACK=1 en staging · ejecutar staging-smoke-automations-reputation-e2e.mjs --only=reputation · promover tras E2E PASS",
+    e2eEvidence: "scripts/docs/evidence/os-saas-e2e/modules/automations_reputation_e2e_latest.md",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction: "mantener · flag OFF fuera staging · mass_dm forever OFF",
   },
   {
     serviceId: "support",
@@ -453,11 +451,10 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     portalPath: "/portal",
     metrics: ["tenant_isolation_ok", "deny_by_default_ok"],
     tests: ["backend/agency/__tests__/StagingSharedMemoryMcpHarness.test.ts"],
-    e2eEvidence: null,
-    status: "PREPARED_OFF",
+    e2eEvidence: "scripts/docs/evidence/os-saas-e2e/modules/sm-mcp.synthetic_latest.md",
+    status: "IMPLEMENTED_VERIFIED",
     nextAction:
-      "flags NELVYON_SHARED_MEMORY_STAGING=1 + NELVYON_MCP_STAGING_SYNTHETIC=1 en staging únicamente · " +
-      "ejecutar scripts/staging-smoke-sm-mcp-synthetic.mjs · MCP/SM productivos permanecen BLOCKED_CEO",
+      "mantener staging-only · NELVYON_SHARED_MEMORY_ENABLED=0 · NELVYON_MCP_PRODUCTIVE_ENABLED=0 · prod BLOCKED_CEO",
   },
   {
     serviceId: "influencers_pr",

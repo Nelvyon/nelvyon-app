@@ -1020,14 +1020,14 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 | Campo | Valor |
 |-------|-------|
-| **Veredicto** | **CODE_READY_LOCAL** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | tip **TBA** · ADR-055 local · staging live ADR-054 `980ea216` · deploy ADR-055 **pending** |
-| **OS Catalog v1.2.0** | automations/reputation kickoff · NelvyonOfficialSocialOps · SM/MCP synthetic harness |
-| **Packs ADR-055** | `automations-ops-pack` + `reputation-ops-pack` wired **beta** · E2E **pending** |
-| **Tests locales** | agency **64+ PASS** · tsc **0** |
+| **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
+| **SHA / deploys** | tip **`53149384`** · deploy **`e514bbd7`** SUCCESS · staging https://ideal-victory-staging.up.railway.app · prod untouched |
+| **OS Catalog v1.2.0** | automations · reputation · sm_mcp_synthetic_staging → **IMPLEMENTED_VERIFIED (staging)** |
+| **Packs ADR-055** | `automations-ops-pack` + `reputation-ops-pack` E2E **ALL_PASS** · 6 entregables/pack · auto-approve |
+| **Tests locales** | agency **64+ PASS** · tsc **0** · SM/MCP harness unit tests **PASS** |
 | **Free tools** | Eval only · 0 installs |
-| **Canary IA** | Staging mesh · OpenClaw staging_mock deepened · OpenAI 0 · prod canary doc PENDING_CEO |
-| **Blocker claimReady** | Legal dossier Pepito + licencia escrita (gate reforzado · Pepito forbidden) |
+| **Canary IA** | Staging mesh · OpenClaw staging_mock deepened · SM/MCP synthetic flags ON · OpenAI 0 · prod canary doc PENDING_CEO |
+| **Blocker claimReady** | Legal dossier Pepito + licencia escrita (gate reforzado · Pepito forbidden · no campañas) |
 | Freezes Router / MCP / prod IA | **intactos** |
 | Producto enterprise completo | **NO** |
 

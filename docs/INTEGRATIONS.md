@@ -3,21 +3,21 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-24**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas (dossier Pepito + licencia escrita). Prod IA **ABSENT**. Staging live ADR-054: 11 packs+auditor ALL_PASS. ADR-055 local: automations/reputation beta wired · E2E pending. SSOT: `OS_CATALOG_V1.md` v1.2.0.
+**Bloqueadores go-live:** legal campañas (dossier Pepito + licencia escrita). Prod IA **ABSENT**. Staging live ADR-055: 13 packs+auditor ALL_PASS · automations/reputation E2E ALL_PASS · SM/MCP synthetic ON. SSOT: `OS_CATALOG_V1.md` v1.2.0.
 
 ### Auth bridge Web ↔ FastAPI
 
 | Ítem | Estado |
 |------|--------|
 | OpenAI | allow **0** |
-| Mesh / packs | E2E ALL_PASS ADR-054 staging live · automations/reputation E2E **pending** |
+| Mesh / packs | E2E ALL_PASS ADR-055 staging live (13 packs) · tip `53149384` |
 | OpenClaw | staging_mock ON · prod canary **PENDING_CEO** |
 | Auditor | staging ON · prod OFF |
 | Visual spend | **OFF** · creative_direction + decision matrix |
 | Paid social / publish | **PREPARED_OFF** |
-| Social oficial NELVYON | **PREPARED_OFF** · `NelvyonOfficialSocialOps` · checklist CEO |
+| Social oficial NELVYON | **PREPARED_OFF** · `NelvyonOfficialSocialOps` · 8 cuentas PENDING_CEO |
 | SM/MCP productivo | **OFF** (0) |
-| SM/MCP synthetic staging | **PREPARED_OFF** · harness código · flags `NELVYON_SHARED_MEMORY_STAGING` + `NELVYON_MCP_STAGING_SYNTHETIC` **not set** |
+| SM/MCP synthetic staging | **ON** · `NELVYON_SHARED_MEMORY_STAGING=1` + `NELVYON_MCP_STAGING_SYNTHETIC=1` · harness unit tests PASS · no implica SM/MCP productivo |
 | Datos Pepito / company DB campañas | **forbidden** · BLOQUEADO_LEGAL · `DATOS_PEPITO_LICENSE_DOSSIER` |
 
 ---
@@ -107,10 +107,10 @@
 | Ollama (local) | ✅ | `OLLAMA_HOST` / `:11434` · `OLLAMA_STRATEGY_MODEL` | Primary autonomous/OS path. Quality routing opt-in: `AUTONOMOUS_QUALITY_ROUTING=1` (ADR-036). **Prohibido** staging→`localhost` PC. Mesh: ver `ARCHITECTURE_LOCAL_AI_RUNTIME.md` (no activado). |
 | Local-ai Postgres/pgvector | 🟡 | Compose `127.0.0.1:5434` | Ingest **verified** hist. · Docker **DOWN** 2026-07-22 (HTTP pack E2E BLOCKED) |
 | **MCP Productivo** | ✅ | `NELVYON_MCP_PRODUCTIVE_ENABLED` | `/api/saas/mcp` — **CERTIFIED** (`mcp_certification_final.json`) · **OFF** en runtime |
-| **MCP Staging synthetic** | 🟡 | `NELVYON_MCP_STAGING_SYNTHETIC` | ADR-055 harness · staging-only drills · **not set** · no implica MCP productivo |
+| **MCP Staging synthetic** | ✅ | `NELVYON_MCP_STAGING_SYNTHETIC` | ADR-055 harness · flags **ON** staging · productivo **0** · harness unit tests PASS |
 | **OpenClaw** | 🟡 | `NELVYON_OPENCLAW_BRIDGE_*` + Memory | staging_mock deepened · prod canary PENDING_CEO |
 | **Shared Memory productivo** | 🟡 | `NELVYON_SHARED_MEMORY_ENABLED` | Flag **OFF** default · schema 514/515 verified staging |
-| **Shared Memory staging synthetic** | 🟡 | `NELVYON_SHARED_MEMORY_STAGING` | ADR-055 harness · synthetic drills only · **not set** · no implica SM productiva |
+| **Shared Memory staging synthetic** | ✅ | `NELVYON_SHARED_MEMORY_STAGING` | ADR-055 harness · flags **ON** staging · productivo **0** · no implica SM productiva |
 
 ---
 

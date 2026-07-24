@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-24 — ADR-055 **sin migración nueva** (packs/gates/harness código only)
+> Actualizado: 2026-07-24 — ADR-055 E2E PASS · **sin migración nueva** (packs/gates/harness código only) · tip `53149384`
 
 ---
 
@@ -9,6 +9,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Migración nueva** | **No** — última sigue `518_workflows_list_columns.sql` |
+| **E2E verificado** | tip `53149384` · deploy `e514bbd7` · automations/reputation ALL_PASS · sin cambios schema |
 | **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` en código |
 | **SM/MCP synthetic harness** | Usa tenants sintéticos in-memory en staging drills — **no** nuevas tablas · no implica SM productiva |
 

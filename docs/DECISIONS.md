@@ -641,8 +641,8 @@
 | **Fecha** | 2026-07-24 |
 | **Decisión** | (1) Wire `automations-ops-pack` + `reputation-ops-pack` (beta, flags default OFF) con runners/mappers/kickoff. (2) Catalog **v1.2.0** — kickoffPackIds automations/reputation. (3) `NelvyonOfficialSocialOps` + checklist CEO — **PREPARED_OFF**, sin OAuth/publish. (4) `StagingSharedMemoryMcpHarness` — flags `NELVYON_SHARED_MEMORY_STAGING` + `NELVYON_MCP_STAGING_SYNTHETIC` staging-only; productivo SM/MCP **0**. (5) OpenClaw staging deepened + `CEO_OPENCLAW_PROD_CANARY_REQUEST.md` **PENDING_CEO**. (6) Visual `creative_direction` + `VISUAL_PROVIDER_DECISION_MATRIX` · spend OFF. (7) `CampaignsLegalTechnicalGate` reforzado + `DATOS_PEPITO_LICENSE_DOSSIER` · `claimReadyLegal` hard-false · Pepito **forbidden**. |
 | **Por qué** | Cerrar wiring local verificable sin READY falso ni coste prod. |
-| **Evidencia** | agency tests **64+ PASS** · tsc **0** · tip **TBA** · E2E automations/reputation **pending** · staging deploy **pending** |
-| **Consecuencias** | `claimReady: false` · prod untouched · no OpenAI/payouts/campaigns/visual spend/OpenClaw prod. |
+| **Evidencia** | tip **`53149384`** · deploy **`e514bbd7`** SUCCESS · E2E `automations-ops-pack`+`reputation-ops-pack` **ALL_PASS** (6 entregables/pack · auto-approve) · `automations_reputation_e2e_latest.md` · agency **64+ PASS** · tsc **0** · SM/MCP synthetic flags **ON** staging · productivo **0** · harness unit tests PASS |
+| **Consecuencias** | Catalog: automations · reputation · sm_mcp_synthetic_staging → **IMPLEMENTED_VERIFIED (staging)** · `claimReady: false` · **NOT READY** · prod untouched · no OpenAI/payouts/campaigns/visual spend/OpenClaw prod. |
 | **Relación** | ADR-051–054 · `OsCatalogV1` · `automationsReputationPacksRunners` · `NelvyonOfficialSocialOps`. |
 
 ---

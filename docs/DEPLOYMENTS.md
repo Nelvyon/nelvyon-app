@@ -8,6 +8,19 @@
 
 > No borrar entradas. Añadir al inicio.
 
+## 2026-07-24 — ADR-055 E2E PASS (staging)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Tip / live** | **`53149384`** · `git_sha=531493844597` |
+| **Deploy** | **`e514bbd7`** SUCCESS |
+| **E2E** | `automations-ops-pack` + `reputation-ops-pack` **ALL_PASS** · 6 entregables/pack · auto-approve |
+| **Flags** | AUDITOR=1 · OPENCLAW staging_mock · `NELVYON_SHARED_MEMORY_STAGING=1` · `NELVYON_MCP_STAGING_SYNTHETIC=1` · AUTOMATIONS_OPS=1 · REPUTATION_OPS=1 · SM/MCP productivo=0 · VISUAL=0 · OpenAI/payouts=0 |
+| **Evidence** | `automations_reputation_e2e_latest.md` |
+| **Prod** | untouched |
+| **claimReady** | **false** · **NOT READY** |
+
 ## 2026-07-24 — ADR-055 cierre local (deploy staging **pending**)
 
 | Campo | Valor |

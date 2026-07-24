@@ -1,6 +1,6 @@
 # NELVYON OS Catalog v1
 
-> **Version** `1.2.0` · ADR-055 · tip **TBA** · `claimReady: false`  
+> **Version** `1.2.0` · ADR-055 E2E PASS · tip **`53149384`** · deploy **`e514bbd7`** · `claimReady: false`  
 > Código SSOT: `backend/agency/OsCatalogV1.ts` (`OS_CATALOG_V1_VERSION`)  
 > Vocabulario: `IMPLEMENTED_VERIFIED` | `PREPARED_OFF` | `BLOCKED_EXTERNAL` | `BLOCKED_CEO` | `BLOCKED_LEGAL` | `NOT_IMPLEMENTED`
 
@@ -12,7 +12,7 @@ Sustituye el estado ambiguo “todos los servicios futuros”. **Solo** servicio
 | Estado | Count (código) |
 |--------|------:|
 | IMPLEMENTED_VERIFIED | ver `osCatalogV1Summary()` |
-| PREPARED_OFF | automations · reputation · nelvyon_official_social · SM/MCP synthetic |
+| PREPARED_OFF | nelvyon_official_social |
 | BLOCKED_EXTERNAL | ads |
 | NOT_IMPLEMENTED | influencers_pr |
 | claimReady / READY | **BLOCKED_LEGAL** |
@@ -32,15 +32,15 @@ Sustituye el estado ambiguo “todos los servicios futuros”. **Solo** servicio
 | independent_auditor | global_independent_auditor | IMPLEMENTED_VERIFIED | session E2E staging |
 | openclaw_coordination | global_direction | IMPLEMENTED_VERIFIED | staging_mock · prod BLOCKED_CEO |
 | visual_elite_strategy | creative | IMPLEMENTED_VERIFIED (strategy_only) | creative_direction · spend OFF |
-| nelvyon_official_social | svc_social_creative | PREPARED_OFF | `NelvyonOfficialSocialOps` · PENDING_CEO cuentas |
-| automations | svc_automations_crm | PREPARED_OFF | `automations-ops-pack` beta · E2E pending |
-| reputation | svc_retention_reputation | PREPARED_OFF | `reputation-ops-pack` beta · E2E pending |
-| sm_mcp_synthetic_staging | platform | PREPARED_OFF | harness código · flags not set · productivo 0 |
+| automations | svc_automations_crm | IMPLEMENTED_VERIFIED (staging) | `automations-ops-pack` E2E ALL_PASS · 6 entregables |
+| reputation | svc_retention_reputation | IMPLEMENTED_VERIFIED (staging) | `reputation-ops-pack` E2E ALL_PASS · 6 entregables |
+| sm_mcp_synthetic_staging | platform | IMPLEMENTED_VERIFIED (staging) | flags ON · productivo 0 · harness unit tests PASS |
+| nelvyon_official_social | svc_social_creative | PREPARED_OFF | `NelvyonOfficialSocialOps` · 8 cuentas PENDING_CEO |
 | ads | svc_ads_attribution | BLOCKED_EXTERNAL | OAuth + presupuesto |
 | influencers_pr | — | NOT_IMPLEMENTED | Definir contrato |
 
 ## Gates
 
 - Prod: OpenClaw / auditor / SM / MCP / OpenAI / payouts / paid / visual spend **OFF**
-- Staging live (ADR-054): auditor=1 · OpenClaw staging_mock=1 · SM productiva=0 · visual=0
-- Staging post ADR-055 deploy: + `NELVYON_SHARED_MEMORY_STAGING=1` · `NELVYON_MCP_STAGING_SYNTHETIC=1` (synthetic only)
+- Staging live (ADR-055): auditor=1 · OpenClaw staging_mock=1 · `NELVYON_SHARED_MEMORY_STAGING=1` · `NELVYON_MCP_STAGING_SYNTHETIC=1` · SM/MCP productivo=0 · visual=0
+- Evidencia: `automations_reputation_e2e_latest.md`

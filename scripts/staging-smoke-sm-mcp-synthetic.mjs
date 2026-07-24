@@ -61,8 +61,9 @@ async function checkHealth() {
 }
 
 function runHarnessVitest() {
+  const isWin = process.platform === "win32";
   const result = spawnSync(
-    process.platform === "win32" ? "pnpm.cmd" : "pnpm",
+    isWin ? "pnpm.cmd" : "pnpm",
     [
       "-C",
       "apps/web",
@@ -72,8 +73,17 @@ function runHarnessVitest() {
       "backend/agency/__tests__/StagingSharedMemoryMcpHarness.test.ts",
       "--reporter=dot",
     ],
-    { cwd: REPO_ROOT, stdio: "inherit" },
+    {
+      cwd: REPO_ROOT,
+      stdio: "inherit",
+      shell: isWin,
+      env: process.env,
+    },
   );
+  if (result.error) {
+    console.error("vitest spawn error:", result.error.message);
+    return false;
+  }
   return result.status === 0;
 }
 

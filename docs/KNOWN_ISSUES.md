@@ -20,13 +20,6 @@
 | **Estado** | **PREPARED_OFF** |
 | **Detalle** | `NelvyonOfficialSocialOps` + `NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md` · 8 cuentas **PENDING_CEO** · sin publish/OAuth |
 
-### Ops (no KI) — ADR-055 deploy + E2E automations/reputation
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | **Abierto** |
-| **Detalle** | Código local CODE_READY · tip TBA · E2E `automations-ops-pack` + `reputation-ops-pack` **pending** · SM/MCP synthetic flags **not set** |
-
 ### Ops (no KI) — OpenClaw prod canary
 
 | Campo | Valor |
@@ -37,6 +30,13 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — ADR-055 E2E PASS (automations/reputation + SM/MCP synthetic)
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-24 |
+| **Evidencia** | tip **`53149384`** · deploy **`e514bbd7`** SUCCESS · `automations_reputation_e2e_latest.md` · SM/MCP synthetic flags ON · productivo 0 |
 
 ### Ops — ADR-055 local CODE_READY (deploy pending)
 
