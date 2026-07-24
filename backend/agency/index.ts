@@ -41,6 +41,38 @@ export {
 } from "./OsIndependentAuditor";
 export type { IndependentAuditInput, IndependentAuditResult } from "./OsIndependentAuditor";
 export {
+  auditorReview,
+  getIndependentAuditSession,
+  listIndependentAuditSessions,
+  openIndependentAuditSession,
+  resetIndependentAuditSessionsForTests,
+  runIndependentAuditorE2eScenario,
+  submitProducerRepair,
+} from "./OsIndependentAuditSession";
+export type {
+  AuditorDecision,
+  AuditorEvidenceEntry,
+  IndependentAuditSession,
+} from "./OsIndependentAuditSession";
+export {
+  assertOpenClawStagingIntegrity,
+  isOpenClawStagingAuthorized,
+  resetOpenClawStagingIdempotencyForTests,
+  runOpenClawStagingCoordination,
+} from "./OpenClawStagingCoordinator";
+export type {
+  CoordinationStepResult,
+  OpenClawStagingCoordinationResult,
+} from "./OpenClawStagingCoordinator";
+export {
+  OS_CATALOG_V1,
+  OS_CATALOG_V1_VERSION,
+  assertOsCatalogV1Integrity,
+  listOsCatalogV1,
+  osCatalogV1Summary,
+} from "./OsCatalogV1";
+export type { OsCatalogV1Entry, OsCatalogV1Status } from "./OsCatalogV1";
+export {
   OPENCLAW_COORDINATION_RULES,
   isNelvyonOsOrchestratorEnabled,
   planNelvyonOsOrchestration,

@@ -598,6 +598,18 @@
 
 ---
 
+## ADR-053 — Auditor independiente staging + OpenClaw staging_mock + OS Catalog v1
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | (1) `NELVYON_PACK_INDEPENDENT_AUDITOR=1` **solo staging** · sesiones approve/reject/repair con evidencia · E2E PASS/REJECT/repair/PASS. (2) OpenClaw **staging_mock** via `NELVYON_OPENCLAW_BRIDGE_ENABLED=1` + `NELVYON_OPENCLAW_STAGING_MODE=1` sin SM productiva · coordinación fail-closed (tenant, permisos, retries, idempotencia, timeout, rollback). (3) Catálogo versionado `OS_CATALOG_V1` / `docs/OS_CATALOG_V1.md` — sin “servicios futuros” ambiguos. (4) Prod OpenClaw/auditor/SM/MCP/OpenAI/payouts OFF sin nueva autorización CEO. |
+| **Por qué** | Cerrar verde real OS en staging sin coste ni riesgo prod. |
+| **Consecuencias** | Matriz elite + SSOT actualizados · claimReady false. |
+| **Relación** | ADR-051 · ADR-052 · `OsIndependentAuditSession` · `OpenClawStagingCoordinator` · `OsCatalogV1`. |
+
+---
+
 ## ADR-052 — Redes sociales completas por cliente (integral social OS)
 
 | Campo | Valor |

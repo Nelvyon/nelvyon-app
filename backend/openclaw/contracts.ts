@@ -54,12 +54,19 @@ export const OPENCLAW_ADAPTER_CONTRACT: OpenClawAdapterContract = {
   featureFlag: "NELVYON_OPENCLAW_BRIDGE_ENABLED",
 };
 
+export function isOpenClawStagingMode(): boolean {
+  const v = process.env.NELVYON_OPENCLAW_STAGING_MODE?.trim();
+  return v === "1" || v?.toUpperCase() === "ON" || v?.toLowerCase() === "true";
+}
+
 export function isOpenClawRuntimeAuthorized(): boolean {
-  // Hard prerequisites: explicit flag + Shared Memory runtime (ADR-017 order).
+  // Hard prerequisites: explicit flag + (Shared Memory OR staging mock mode).
+  // Staging mock never implies productive SM / spend / publish.
   const flag =
     (process.env.NELVYON_OPENCLAW_BRIDGE_ENABLED ?? "0") === "1" ||
     (process.env.NELVYON_OPENCLAW_BRIDGE_ENABLED ?? "").toLowerCase() === "true";
   if (!flag) return false;
+  if (isOpenClawStagingMode()) return true;
   const mem =
     (process.env.NELVYON_SHARED_MEMORY_ENABLED ?? "0") === "1" ||
     (process.env.NELVYON_SHARED_MEMORY_ENABLED ?? "").toLowerCase() === "true";
@@ -74,9 +81,10 @@ export type OpenClawRuntimeConfig = {
   authorized: boolean;
   bridgeEnabled: boolean;
   sharedMemoryEnabled: boolean;
+  stagingMode: boolean;
   bridgeUrl: string | null;
   liveReady: boolean;
-  mode: "disabled" | "mock_certified" | "live_ready";
+  mode: "disabled" | "mock_certified" | "live_ready" | "staging_mock";
 };
 
 export function resolveOpenClawRuntimeConfig(): OpenClawRuntimeConfig {
@@ -86,16 +94,22 @@ export function resolveOpenClawRuntimeConfig(): OpenClawRuntimeConfig {
   const sharedMemoryEnabled =
     (process.env.NELVYON_SHARED_MEMORY_ENABLED ?? "0") === "1" ||
     (process.env.NELVYON_SHARED_MEMORY_ENABLED ?? "").toLowerCase() === "true";
+  const stagingMode = isOpenClawStagingMode();
   const bridgeUrl = process.env.NELVYON_OPENCLAW_BRIDGE_URL?.trim() || null;
   const authorized = isOpenClawRuntimeAuthorized();
-  const liveReady = authorized && Boolean(bridgeUrl);
+  const liveReady = authorized && Boolean(bridgeUrl) && !stagingMode;
+  let mode: OpenClawRuntimeConfig["mode"] = "disabled";
+  if (bridgeEnabled && stagingMode) mode = "staging_mock";
+  else if (liveReady) mode = "live_ready";
+  else if (bridgeEnabled && authorized) mode = "mock_certified";
   return {
     authorized,
     bridgeEnabled,
     sharedMemoryEnabled,
+    stagingMode,
     bridgeUrl,
     liveReady,
-    mode: !bridgeEnabled ? "disabled" : liveReady ? "live_ready" : "mock_certified",
+    mode,
   };
 }
 

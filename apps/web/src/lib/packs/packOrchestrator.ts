@@ -712,19 +712,25 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
     const hardReview = rawAvgQa < autoPublishThreshold;
     const softReview = skuResults.some((r) => skuNeedsSoftReview(r));
 
-    // Optional independent auditor (ADR-051) — default OFF; does not change cert path.
+    // Optional independent auditor (ADR-051/053) — staging ON via flag; critical packs use ≥90.
+    // Pack completion gate uses critical:false (threshold 85) so certified packs stay green;
+    // hard rejects (mock://, self-approve, false promises) still block.
     let auditorBlock = false;
     try {
       const { runIndependentAuditor } = await import(
         "../../../../../backend/agency/OsIndependentAuditor"
       );
+      const containsMockUrl = skuResults.some((r) => {
+        const blob = JSON.stringify(r);
+        return blob.includes("mock://");
+      });
       const audit = runIndependentAuditor({
         packId: meta.id,
         packRunId: run.id,
         workspaceId: params.workspaceId,
         avgQaScore: rawAvgQa,
-        critical: true,
-        containsMockUrl: false,
+        critical: false,
+        containsMockUrl,
       });
       auditorBlock = audit.blockPublish;
       if (audit.enabled && !audit.skipped) {

@@ -1,67 +1,51 @@
-# OS Elite — Matriz canónica de estado (ADR-051)
+# OS Elite — Matriz canónica de estado (ADR-051/053)
 
-> Actualizado: **2026-07-24** · Vocabulario estricto · `claimReady: false` · **no READY**  
-> Evidencia packs: tip runtime `eb462545` · docs tip ver `git rev-parse HEAD`
+> Actualizado: **2026-07-24** · Catalog v1 · `claimReady: false` · **no READY**  
+> SSOT catálogo: `docs/OS_CATALOG_V1.md` · código `backend/agency/OsCatalogV1.ts`
 
-Estados permitidos: `IMPLEMENTED_VERIFIED` | `PREPARED_OFF` | `BLOCKED_EXTERNAL` | `BLOCKED_CEO` | `BLOCKED_LEGAL` | `NOT_IMPLEMENTED`
+Estados: `IMPLEMENTED_VERIFIED` | `PREPARED_OFF` | `BLOCKED_EXTERNAL` | `BLOCKED_CEO` | `BLOCKED_LEGAL` | `NOT_IMPLEMENTED`
 
 ---
 
 ## Matriz
 
-| Capacidad | Estado | Evidencia faltante / nota | Propietario | Riesgo | Rollback | Siguiente acción mínima |
-|-----------|--------|---------------------------|-------------|--------|----------|-------------------------|
-| Packs OS (11) | **IMPLEMENTED_VERIFIED** | E2E ALL_PASS 2026-07-24 | CTO | Bajo | AI=0 OLLAMA=0 | Mantener; no romper |
-| Landing/SEO/Chatbot SKUs | **IMPLEMENTED_VERIFIED** | Pack E2E | CTO | Bajo | idem | — |
-| Email welcome (pack) | **IMPLEMENTED_VERIFIED** | Pack local | CTO | Bajo | SES ops | — |
-| Catálogo equipos profesionales | **IMPLEMENTED_VERIFIED** | Código + tests ADR-051 | CTO | Bajo | revert module | Ampliar bindings runtime |
-| Política QA élite (≥85/90) | **IMPLEMENTED_VERIFIED** | `OsEliteQaPolicy` + tests | CTO | Bajo | — | Regresiones por defecto |
-| Auditor independiente (flag) | **PREPARED_OFF** | Flag `NELVYON_PACK_INDEPENDENT_AUDITOR=0` | CTO | Medio si ON sin soak | flag=0 | Soak staging con flag=1 |
-| Orquestador SaaS multi-agent | **PREPARED_OFF** | `NELVYON_ORCHESTRATOR_ENABLED=0` | CTO | Medio | flag=0 | Certificar coordinate() en staging |
-| OpenClaw bridge | **PREPARED_OFF** | Flag+SM OFF · contrato listo | CTO/CEO | Alto si ON | OPENCLAW=0 SM=0 | **BLOCKED_CEO** para live |
-| Shared Memory | **PREPARED_OFF** | Flag OFF | CTO | Medio | SM=0 | Staging verified previo; prod OFF |
-| MCP productivo | **PREPARED_OFF** | Flag OFF | CTO | Alto | MCP=0 | No tocar soak cert |
-| VisualGenerationProvider | **PREPARED_OFF** | OFF · strategy_only | CTO | Coste si ON | VISUAL=0 | Provider audit antes de gasto |
-| Redes sociales integral (ADR-052) | **IMPLEMENTED_VERIFIED** | E2E staging ALL_PASS `social.adr052_e2e_2026-07-24T14-51-08` · deploy `85fe50cc` · tip `4d331b55` · 7 entregables portal | CTO | Bajo (publish OFF) | no publish · paid=0 | Mantener gates OFF |
-| Paid social / publish OAuth | **PREPARED_OFF** / **BLOCKED_CEO** | Sin OAuth ni presupuesto | CEO | Alto | paid=0 · no OAuth | Autorización explícita |
-| Ads spend / OAuth | **BLOCKED_EXTERNAL** | OAuth + presupuesto | CEO/Ads | Alto | no spend | OAuth CEO |
-| Campañas masivas send | **BLOCKED_CEO** | Autorización envío | CEO | Alto | no send | Checklist + OK CEO |
-| Partner payouts | **BLOCKED_CEO** | `NELVYON_CEO_PARTNER_PAYOUTS` OFF | CEO | Financiero | flag=0 | OK CEO explícito |
-| OpenAI / cloud LLM prod | **BLOCKED_CEO** | Keys ABSENT | CEO | Coste/privacidad | no keys | Prohibido sin OK |
-| claimReady / READY | **BLOCKED_LEGAL** | Checklist campañas | Legal/CEO | Compliance | — | Firmar checklist |
-| Reputation pack OS | **PREPARED_OFF** | SaaS UI; sin pack E2E | CTO | Bajo | — | Pack + E2E futuro |
-| Automations OS pack | **PREPARED_OFF** | Engine SaaS real | CTO | Bajo | — | Pack opcional |
-| Influencers / PR externos | **NOT_IMPLEMENTED** | Sin contrato | CTO | — | — | Definir contrato |
-| Foto/vídeo render de pago | **BLOCKED_CEO** | Sin proveedor aprobado | CEO | Coste | VISUAL=0 | ADR proveedor + presupuesto |
-| Matomo/Umami | **BLOCKED_CEO** (REJECT) | ADR-048 | CTO | Ops | no install | Reevaluar solo con brecha |
+| Capacidad | Estado | Evidencia / nota | Propietario | Riesgo | Rollback | Siguiente acción |
+|-----------|--------|------------------|-------------|--------|----------|------------------|
+| Packs OS (11) | **IMPLEMENTED_VERIFIED** | E2E ALL_PASS 2026-07-24 | CTO | Bajo | AI=0 | Mantener |
+| Social integral ADR-052 | **IMPLEMENTED_VERIFIED** | `social.adr052_e2e*` | CTO | Bajo | paid=0 | Mantener |
+| OS Catalog v1 | **IMPLEMENTED_VERIFIED** | `OsCatalogV1` + docs | CTO | Bajo | — | Sin “futuros” ambiguos |
+| Auditor independiente | **IMPLEMENTED_VERIFIED** (staging) · prod **PREPARED_OFF** | ADR-053 session E2E · flag staging=1 | CTO | Medio | AUDITOR=0 | Prod OFF sin CEO |
+| OpenClaw staging_mock | **IMPLEMENTED_VERIFIED** (staging) · prod **BLOCKED_CEO** | coordinación E2E · STAGING_MODE=1 · SM productiva 0 | CTO/CEO | Alto si live | OPENCLAW=0 STAGING_MODE=0 | Prod requiere nueva auth CEO |
+| Shared Memory productiva | **PREPARED_OFF** | staging SM=0 | CTO | Medio | SM=0 | No activar productiva |
+| Orquestador SaaS | **PREPARED_OFF** | ORCHESTRATOR=0 | CTO | Medio | flag=0 | — |
+| MCP productivo | **PREPARED_OFF** | MCP=0 | CTO | Alto | MCP=0 | — |
+| Visual spend | **PREPARED_OFF** | VISUAL=0 | CTO | Coste | VISUAL=0 | — |
+| Paid social / publish | **PREPARED_OFF** / **BLOCKED_CEO** | ADR-052 | CEO | Alto | paid=0 | Auth CEO |
+| Ads OAuth/spend | **BLOCKED_EXTERNAL** | — | CEO | Alto | no spend | OAuth |
+| Campañas send | **BLOCKED_CEO** | — | CEO | Alto | no send | Checklist |
+| Payouts / OpenAI | **BLOCKED_CEO** | flags 0 / ABSENT | CEO | Alto | flag=0 | — |
+| claimReady / READY | **BLOCKED_LEGAL** | legal campañas | Legal | — | — | Firmar checklist |
+| Automations / Reputation OS pack | **PREPARED_OFF** | sin pack E2E | CTO | Bajo | — | Pack+E2E |
+| Influencers/PR | **NOT_IMPLEMENTED** | — | CTO | — | — | Contrato |
 
 ---
 
-## Flujo de entrega (obligatorio)
+## Flags
 
-```
-equipo especialista → QA técnico/creativo/negocio → auditor competitivo
-→ auditor independiente → portal cliente → métricas reales → mejora continua
-```
-
-Implementación: `OS_DELIVERABLE_FLOW` en `OsProfessionalTeams.ts`.
-
----
-
-## Flags (default OFF)
-
-| Flag | Default |
-|------|---------|
-| `NELVYON_OPENCLAW_BRIDGE_ENABLED` | 0 |
-| `NELVYON_SHARED_MEMORY_ENABLED` | 0 |
-| `NELVYON_ORCHESTRATOR_ENABLED` | 0 |
-| `NELVYON_PACK_INDEPENDENT_AUDITOR` | 0 |
-| `NELVYON_VISUAL_GENERATION_ENABLED` | 0 |
-| `NELVYON_CEO_PARTNER_PAYOUTS` | 0 |
-| `NELVYON_MCP_PRODUCTIVE_ENABLED` | 0 |
+| Flag | Prod default | Staging ADR-053 |
+|------|--------------|-----------------|
+| `NELVYON_PACK_INDEPENDENT_AUDITOR` | 0 | **1** |
+| `NELVYON_OPENCLAW_BRIDGE_ENABLED` | 0 | **1** |
+| `NELVYON_OPENCLAW_STAGING_MODE` | 0 | **1** |
+| `NELVYON_SHARED_MEMORY_ENABLED` | 0 | **0** |
+| `NELVYON_ORCHESTRATOR_ENABLED` | 0 | 0 |
+| `NELVYON_MCP_PRODUCTIVE_ENABLED` | 0 | 0 |
+| `AUTONOMOUS_ALLOW_OPENAI` | 0 | 0 |
+| `NELVYON_CEO_PARTNER_PAYOUTS` | 0 | 0 |
+| `NELVYON_VISUAL_GENERATION_ENABLED` | 0 | 0 |
 
 ---
 
 ## claimReady
 
-**false** — `BLOCKED_LEGAL` (campañas). No declarar READY.
+**false** — `BLOCKED_LEGAL`. **No READY** mientras queden PREPARED_OFF/BLOCKED del catálogo v1 sin certificar o gates fallidos.

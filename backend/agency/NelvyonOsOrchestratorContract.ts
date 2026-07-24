@@ -31,7 +31,7 @@ export type NelvyonOrchestrationPlan = {
   idempotencyKey?: string;
   timeoutMs: number;
   maxRetries: number;
-  openClawMode: "disabled" | "mock_certified" | "live_ready";
+  openClawMode: "disabled" | "mock_certified" | "live_ready" | "staging_mock";
   allowSpend: boolean;
   allowCampaignSend: boolean;
 };
@@ -138,6 +138,7 @@ export const OPENCLAW_COORDINATION_RULES: OpenClawCoordinationRules = {
   defaultOff: true,
   featureFlags: [
     "NELVYON_OPENCLAW_BRIDGE_ENABLED",
+    "NELVYON_OPENCLAW_STAGING_MODE",
     "NELVYON_SHARED_MEMORY_ENABLED",
     "NELVYON_ORCHESTRATOR_ENABLED",
     "NELVYON_PACK_INDEPENDENT_AUDITOR",
