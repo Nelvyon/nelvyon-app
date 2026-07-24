@@ -9,9 +9,25 @@ import {
   OPENCLAW_ADAPTER_CONTRACT,
 } from "../openclaw/contracts";
 import { startOpenClawMockServer, type OpenClawMockHandle } from "../openclaw/mockServer";
-import { OS_DELIVERABLE_FLOW } from "./OsProfessionalTeams";
+import { OS_DELIVERABLE_FLOW, getOsProfessionalTeam, type OsTeamId } from "./OsProfessionalTeams";
 import { planNelvyonOsOrchestration } from "./NelvyonOsOrchestratorContract";
 import { runIndependentAuditorE2eScenario } from "./OsIndependentAuditSession";
+
+export type OpenClawTeamAssignment = {
+  teamId: string;
+  roleId: string;
+  task: string;
+};
+
+/** Fail-closed: throws if teamId/roleId do not exist in `OsProfessionalTeams` — no silent typos. */
+function resolveTeamAssignment(teamId: OsTeamId, roleId: string, task: string): OpenClawTeamAssignment {
+  const team = getOsProfessionalTeam(teamId);
+  const role = team?.roles.find((r) => r.roleId === roleId);
+  if (!team || !role) {
+    throw new Error(`invalid_team_assignment:${teamId}/${roleId}`);
+  }
+  return { teamId, roleId, task };
+}
 
 /**
  * Staging coordinator gate: bridge + staging_mock mode (no productive SM required).
@@ -39,6 +55,8 @@ export type OpenClawStagingCoordinationResult = {
   blocked: string[];
   rollback: string[];
   auditorE2eOk: boolean;
+  /** Explicit specialist team/role assignments recorded along the coordination flow. */
+  teamAssignments: OpenClawTeamAssignment[];
 };
 
 const SEEN_IDEMPOTENCY = new Set<string>();
@@ -104,6 +122,7 @@ export async function runOpenClawStagingCoordination(input?: {
       blocked: ["openclaw_off"],
       rollback,
       auditorE2eOk: false,
+      teamAssignments: [],
     };
   }
 
@@ -120,6 +139,7 @@ export async function runOpenClawStagingCoordination(input?: {
       blocked: ["idempotency_conflict"],
       rollback,
       auditorE2eOk: false,
+      teamAssignments: [],
     };
   }
   SEEN_IDEMPOTENCY.add(idem);
@@ -140,6 +160,7 @@ export async function runOpenClawStagingCoordination(input?: {
       blocked,
       rollback,
       auditorE2eOk: false,
+      teamAssignments: [],
     };
   }
 
@@ -157,6 +178,7 @@ export async function runOpenClawStagingCoordination(input?: {
 
   let mock: OpenClawMockHandle | null = null;
   let retries = 0;
+  const teamAssignments: OpenClawTeamAssignment[] = [];
   try {
     mock = await startOpenClawMockServer(
       input?.forceError ? { failStatus: 500 } : { latencyMs: 5 },
@@ -176,6 +198,9 @@ export async function runOpenClawStagingCoordination(input?: {
     );
     retries = a.retries;
     steps.push({ step: "specialists", ok: a.ok, detail: a.detail });
+    teamAssignments.push(
+      resolveTeamAssignment("svc_social_creative", "social_strategist", `plan ${briefId}`),
+    );
 
     const iso = await dispatchWithRetry(
       mock,
@@ -223,6 +248,9 @@ export async function runOpenClawStagingCoordination(input?: {
       ok: forbid.ok && String(forbid.detail).includes("tools=1"),
       detail: forbid.detail,
     });
+    teamAssignments.push(
+      resolveTeamAssignment("svc_social_creative", "paid_social", "forbidden_tools_check_no_spend"),
+    );
 
     // Timeout path (AbortSignal)
     try {
@@ -249,13 +277,20 @@ export async function runOpenClawStagingCoordination(input?: {
     }
 
     steps.push({ step: "qa", ok: true, detail: "qa_elite_gate" });
+    teamAssignments.push(resolveTeamAssignment("global_qa_elite", "qa_technical", "qa_elite_gate"));
     const auditor = runIndependentAuditorE2eScenario();
     steps.push({
       step: "independent_auditor",
       ok: auditor.ok,
       detail: auditor.ok ? "pass_reject_repair_pass" : "auditor_e2e_fail",
     });
+    teamAssignments.push(
+      resolveTeamAssignment("global_independent_auditor", "independent_auditor", "independent_audit"),
+    );
     steps.push({ step: "portal", ok: auditor.ok, detail: "portal_ready_after_audit" });
+    teamAssignments.push(
+      resolveTeamAssignment("global_ops_success", "cs_ops", "portal_ready_after_audit"),
+    );
 
     const allOk = steps.every((s) => s.ok) && !input?.forceError;
     return {
@@ -267,6 +302,7 @@ export async function runOpenClawStagingCoordination(input?: {
       blocked,
       rollback,
       auditorE2eOk: auditor.ok,
+      teamAssignments,
     };
   } finally {
     if (mock) await mock.close().catch(() => undefined);

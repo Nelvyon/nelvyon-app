@@ -2,9 +2,17 @@
  * NELVYON OS Catalog v1 — versioned SSOT of defined services (ADR-053).
  * Status vocabulary: IMPLEMENTED_VERIFIED | PREPARED_OFF | BLOCKED_EXTERNAL | BLOCKED_CEO | BLOCKED_LEGAL | NOT_IMPLEMENTED
  * Never mark IMPLEMENTED_VERIFIED without evidence.
+ *
+ * v1.1.0: adds `roles` (auto-derived from `OsProfessionalTeams` by `teamId`), `flow`
+ * (deliverable flow — service-specific for social/`svc_social_creative`, `OS_DELIVERABLE_FLOW`
+ * otherwise), and `certificationCriteria` (auto-derived, never empty; required non-empty for
+ * IMPLEMENTED_VERIFIED per `assertOsCatalogV1Integrity`).
  */
 
-export const OS_CATALOG_V1_VERSION = "1.0.0" as const;
+import { OS_DELIVERABLE_FLOW, getOsProfessionalTeam, type OsTeamId } from "./OsProfessionalTeams";
+import { SOCIAL_SERVICE_FLOW } from "./OsSocialNetworksService";
+
+export const OS_CATALOG_V1_VERSION = "1.1.0" as const;
 
 export type OsCatalogV1Status =
   | "IMPLEMENTED_VERIFIED"
@@ -31,11 +39,19 @@ export type OsCatalogV1Entry = {
   e2eEvidence: string | null;
   status: OsCatalogV1Status;
   nextAction: string;
+  /** Role ids of the assigned team — auto-derived from `OsProfessionalTeams` by `teamId`. */
+  roles?: string[];
+  /** Deliverable flow for this service — `OS_DELIVERABLE_FLOW` or service-specific (social). */
+  flow?: readonly string[];
+  /** Non-empty checklist a service must satisfy to earn/keep IMPLEMENTED_VERIFIED. */
+  certificationCriteria?: string[];
 };
 
 const forbidSpend = ["paid_spend", "oauth_spend", "send_mass_campaign", "charge_payment"] as const;
 
-export const OS_CATALOG_V1: readonly OsCatalogV1Entry[] = [
+type OsCatalogV1RawEntry = Omit<OsCatalogV1Entry, "roles" | "flow" | "certificationCriteria">;
+
+const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
   {
     serviceId: "web_landing",
     title: "Web / Landing",
@@ -326,11 +342,47 @@ export const OS_CATALOG_V1: readonly OsCatalogV1Entry[] = [
     qaRubric: { min: 85, criticalMin: 90 },
     independentAuditor: true,
     portalPath: "/portal",
-    metrics: ["idempotency", "tenant_isolation", "retries"],
+    metrics: ["idempotency", "tenant_isolation", "retries", "team_assignments"],
     tests: ["backend/agency/__tests__/OsCatalogV1Closure.test.ts"],
     e2eEvidence: "scripts/docs/evidence/os-saas-e2e/modules/auditor.openclaw.catalog_v1.md",
     status: "IMPLEMENTED_VERIFIED",
     nextAction: "staging_mock only · prod BLOCKED_CEO",
+  },
+  {
+    serviceId: "visual_elite_strategy",
+    title: "Generación visual élite (strategy_only)",
+    teamId: "svc_social_creative",
+    playbookPath: "docs/agency-playbooks/SERVICE_CONTENT_SOCIAL.md",
+    kickoffPackIds: [],
+    permissions: ["draft"],
+    forbidden: [...forbidSpend, "paid_render_without_approval"],
+    deliverables: ["brief", "script", "storyboard", "prompts", "variants", "visual_qa", "delivery_package"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/portal",
+    metrics: ["cost_cents_zero", "variants_min_2", "human_approval_gate"],
+    tests: ["backend/agency/__tests__/VisualEliteStrategy.test.ts"],
+    e2eEvidence: "backend/agency/__tests__/VisualEliteStrategy.test.ts (strategy_only · spend OFF)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction: "CEO auth before any paid provider · NELVYON_VISUAL_GENERATION_ENABLED=0",
+  },
+  {
+    serviceId: "nelvyon_official_social",
+    title: "Redes oficiales NELVYON (prep)",
+    teamId: "svc_social_creative",
+    playbookPath: "docs/ops/NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md",
+    kickoffPackIds: ["social-calendar-pack"],
+    permissions: ["draft"],
+    forbidden: [...forbidSpend, "publish_post", "oauth_connect", "mass_dm"],
+    deliverables: ["official_strategy", "calendar", "formats", "qa_rubric", "ceo_account_checklist"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/portal",
+    metrics: ["accounts_pending_ceo"],
+    tests: ["backend/agency/__tests__/NelvyonOfficialSocialPrep.test.ts"],
+    e2eEvidence: null,
+    status: "PREPARED_OFF",
+    nextAction: "CEO abrir/conectar 8 cuentas · sin publish hasta auth",
   },
   {
     serviceId: "influencers_pr",
@@ -352,13 +404,39 @@ export const OS_CATALOG_V1: readonly OsCatalogV1Entry[] = [
   },
 ] as const;
 
+function buildCertificationCriteria(e: OsCatalogV1RawEntry): string[] {
+  const criteria: string[] = [`QA score >= ${e.qaRubric.min} (critical >= ${e.qaRubric.criticalMin})`];
+  if (e.independentAuditor) criteria.push("Independent auditor PASS (no self-approve)");
+  if (e.tests.length) criteria.push(`Tests green: ${e.tests.join(", ")}`);
+  criteria.push(e.e2eEvidence ? `E2E evidence: ${e.e2eEvidence}` : "E2E evidence pending");
+  if (e.status !== "IMPLEMENTED_VERIFIED") {
+    criteria.push(`Reach IMPLEMENTED_VERIFIED: ${e.nextAction}`);
+  }
+  return criteria;
+}
+
+function resolveFlow(e: OsCatalogV1RawEntry): readonly string[] {
+  return e.teamId === "svc_social_creative" ? SOCIAL_SERVICE_FLOW : OS_DELIVERABLE_FLOW;
+}
+
+function resolveRoles(e: OsCatalogV1RawEntry): string[] {
+  return getOsProfessionalTeam(e.teamId as OsTeamId)?.roles.map((r) => r.roleId) ?? [];
+}
+
+export const OS_CATALOG_V1: readonly OsCatalogV1Entry[] = OS_CATALOG_V1_RAW.map((e) => ({
+  ...e,
+  roles: resolveRoles(e),
+  flow: resolveFlow(e),
+  certificationCriteria: buildCertificationCriteria(e),
+}));
+
 export function listOsCatalogV1(): OsCatalogV1Entry[] {
   return [...OS_CATALOG_V1];
 }
 
 export function assertOsCatalogV1Integrity(): { ok: boolean; violations: string[] } {
   const violations: string[] = [];
-  if (OS_CATALOG_V1_VERSION !== "1.0.0") violations.push("version_mismatch");
+  if (OS_CATALOG_V1_VERSION !== "1.1.0") violations.push("version_mismatch");
   for (const e of OS_CATALOG_V1) {
     if (!e.teamId) violations.push(`no_team:${e.serviceId}`);
     if (!e.playbookPath) violations.push(`no_playbook:${e.serviceId}`);
@@ -369,6 +447,11 @@ export function assertOsCatalogV1Integrity(): { ok: boolean; violations: string[
     if (e.status === "IMPLEMENTED_VERIFIED" && e.tests.length === 0) {
       violations.push(`verified_without_tests:${e.serviceId}`);
     }
+    if (e.status === "IMPLEMENTED_VERIFIED" && (e.certificationCriteria?.length ?? 0) === 0) {
+      violations.push(`verified_without_certification_criteria:${e.serviceId}`);
+    }
+    if (!e.roles || e.roles.length === 0) violations.push(`no_roles:${e.serviceId}`);
+    if (!e.flow || e.flow.length === 0) violations.push(`no_flow:${e.serviceId}`);
   }
   return { ok: violations.length === 0, violations };
 }

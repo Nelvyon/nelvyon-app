@@ -104,6 +104,15 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
     expect(r.auditorE2eOk).toBe(true);
     expect(r.steps.find((s) => s.step === "tenant_isolation")?.ok).toBe(true);
     expect(r.steps.find((s) => s.step === "permissions_tenant_required")?.ok).toBe(true);
+    expect(r.teamAssignments.length).toBeGreaterThanOrEqual(4);
+    expect(r.teamAssignments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ teamId: "svc_social_creative", roleId: "social_strategist" }),
+        expect.objectContaining({ teamId: "global_qa_elite", roleId: "qa_technical" }),
+        expect.objectContaining({ teamId: "global_independent_auditor", roleId: "independent_auditor" }),
+        expect.objectContaining({ teamId: "global_ops_success", roleId: "cs_ops" }),
+      ]),
+    );
 
     const dup = await runOpenClawStagingCoordination({
       tenantId: "tenant-a",
@@ -113,6 +122,7 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
     });
     expect(dup.ok).toBe(false);
     expect(dup.blocked).toContain("idempotency_conflict");
+    expect(dup.teamAssignments).toEqual([]);
 
     const miss = await runOpenClawStagingCoordination({
       forceMissingContext: true,
@@ -134,7 +144,7 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
   }, 30_000);
 
   it("OS Catalog v1 is versioned and honest", () => {
-    expect(OS_CATALOG_V1_VERSION).toBe("1.0.0");
+    expect(OS_CATALOG_V1_VERSION).toBe("1.1.0");
     const check = assertOsCatalogV1Integrity();
     expect(check.violations).toEqual([]);
     expect(listOsCatalogV1().length).toBeGreaterThanOrEqual(15);
@@ -147,5 +157,21 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
     const social = listOsCatalogV1().find((e) => e.serviceId === "content_social");
     expect(social?.status).toBe("IMPLEMENTED_VERIFIED");
     expect(social?.e2eEvidence).toBeTruthy();
+  });
+
+  it("OS Catalog v1.1.0 entries carry roles, flow, and non-empty certificationCriteria", () => {
+    const entries = listOsCatalogV1();
+    for (const e of entries) {
+      expect(e.roles?.length ?? 0).toBeGreaterThan(0);
+      expect(e.flow?.length ?? 0).toBeGreaterThan(0);
+      expect(e.certificationCriteria?.length ?? 0).toBeGreaterThan(0);
+    }
+    const social = entries.find((e) => e.serviceId === "content_social");
+    expect(social?.flow).toContain("authorized_schedule_or_publish");
+    expect(social?.roles).toEqual(expect.arrayContaining(["social_strategist", "paid_social"]));
+    const webLanding = entries.find((e) => e.serviceId === "web_landing");
+    expect(webLanding?.flow).toEqual(expect.arrayContaining(["independent_auditor", "client_portal"]));
+    const implemented = entries.filter((e) => e.status === "IMPLEMENTED_VERIFIED");
+    expect(implemented.every((e) => (e.certificationCriteria?.length ?? 0) > 0)).toBe(true);
   });
 });

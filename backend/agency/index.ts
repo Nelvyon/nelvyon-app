@@ -63,6 +63,7 @@ export {
 export type {
   CoordinationStepResult,
   OpenClawStagingCoordinationResult,
+  OpenClawTeamAssignment,
 } from "./OpenClawStagingCoordinator";
 export {
   OS_CATALOG_V1,
@@ -99,6 +100,19 @@ export type {
   VisualGenerationResult,
 } from "./VisualGenerationProvider";
 export {
+  VISUAL_ELITE_STRATEGY_FLOW,
+  assertVisualEliteStrategyIntegrity,
+  runVisualEliteStrategyPipeline,
+} from "./VisualEliteStrategyPipeline";
+export type {
+  VisualEliteBrief,
+  VisualEliteDeliveryResult,
+  VisualEliteGate,
+  VisualEliteRenderOutcome,
+  VisualEliteReviewedVariant,
+  VisualEliteVariant,
+} from "./VisualEliteStrategyPipeline";
+export {
   SOCIAL_PLATFORM_SPECS,
   SOCIAL_PROFESSIONAL_ROLES,
   SOCIAL_SERVICE_FLOW,
@@ -117,6 +131,25 @@ export type {
   SocialTeamRole,
   SocialTeamRoleId,
 } from "./OsSocialNetworksService";
+export {
+  NELVYON_OFFICIAL_SOCIAL_QA_SCORE,
+  assertNelvyonOfficialSocialIntegrity,
+  buildNelvyonOfficialSocialPackage,
+  listNelvyonSocialAccountsChecklist,
+} from "./NelvyonOfficialSocialPrep";
+export type {
+  NelvyonOfficialSocialPackage,
+  NelvyonSocialAccountChecklistItem,
+  NelvyonSocialAccountStatus,
+} from "./NelvyonOfficialSocialPrep";
+export {
+  assertCampaignsLegalTechnicalGateIntegrity,
+  evaluateCampaignsLegalTechnicalReadiness,
+} from "./CampaignsLegalTechnicalGate";
+export type {
+  CampaignsLegalTechnicalInput,
+  CampaignsLegalTechnicalResult,
+} from "./CampaignsLegalTechnicalGate";
 export {
   assertCeoPartnerPayoutAuthorized,
   getPartnerProgramSnapshot,

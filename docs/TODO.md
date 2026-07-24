@@ -39,7 +39,9 @@
 - [x] ADR-051: equipos profesionales + QA élite + OpenClaw/Visual OFF
 - [x] ADR-052: redes sociales integral + staging E2E `--only=social` ALL_PASS → IMPLEMENTED_VERIFIED
 - [x] ADR-053: auditor staging + OpenClaw staging_mock + OS Catalog v1 · closure smoke ALL_PASS
-- [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
+- [x] CEO closure pack: Visual élite (NO spend) + Social oficial NELVYON (prep) + Legal gate campañas + Catalog v1.1.0 + OpenClaw teamAssignments — vitest 43/43 PASS
+- [ ] CEO: abrir/conectar 8 cuentas sociales oficiales NELVYON (`docs/ops/NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md`)
+- [ ] CEO: legal checklist campañas firmada (bloquea claimReady) — ver `docs/ops/CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`
 - [ ] CEO: OpenClaw **prod/live** / SM productiva (requiere nueva autorización)
 - [ ] CEO: autorización OpenClaw live (hoy BLOCKED_CEO) si se requiere
 - [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts/campañas/visual spend en prod
