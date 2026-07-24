@@ -17,8 +17,8 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **BETA** (código+flags) · falta ALL_PASS mesh tip nuevo |
-| **Detalle** | Smoke `staging-smoke-new-os-packs-e2e.mjs` · no promover a IMPLEMENTED_VERIFIED sin evidencia |
+| **Estado** | **Resuelto** 2026-07-24 — ALL_PASS · IMPLEMENTED_VERIFIED |
+| **Detalle** | `.release-logs/new-os-packs-e2e-2026-07-24T02-55-24.txt` |
 
 ---
 

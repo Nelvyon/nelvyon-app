@@ -11,15 +11,15 @@ const BETA_PACK_IDS = [
   "cro-audit-pack",
   "analytics-setup-pack",
   "brand-voice-pack",
-  "strategy-pack",
-  "funnel-growth-pack",
-  "retention-pack",
 ] as const;
 
 const GROWTH_PACK_IDS = [
   "local-business-growth",
   "ecommerce-growth",
   "saas-b2b-growth",
+  "strategy-pack",
+  "funnel-growth-pack",
+  "retention-pack",
 ] as const;
 
 describe("servicePacksCatalog availability honesty", () => {

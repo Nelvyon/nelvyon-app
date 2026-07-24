@@ -1,33 +1,25 @@
-# CTO Final Verify — 2026-07-24 (OS pack certification + new services)
+# CTO Final Verify — 2026-07-24 (OS pack certification complete)
 
 > Veredicto: **CONDITIONAL_READY** · `claimReady` **false** · Coste **0** · **no READY**
 
-## Strict matrix (delta)
+## Strict matrix
 
-| Capacidad | STAGING | PROD | Notas |
-|-----------|---------|------|-------|
-| Mesh + Pack E2E local | ✅ ALL_PASS | IA ABSENT | tip `99b30730` lineage |
-| ecommerce-growth | ✅ ALL_PASS | OFF | `ecommerce-pack-e2e-20260724-015452` |
-| saas-b2b-growth | ✅ ALL_PASS | OFF | `saas-b2b-pack-e2e-20260724-022752` |
-| Strategy/Funnel/Retention | Código BETA + flags | OFF | E2E post-deploy tip |
-| 5 betas originales | BETA | — | **no promote** |
-| Free tools | 0 installs | — | Matomo/Umami pending CTO |
-| Ads spend | BLOCKED_EXTERNAL | OFF | OAuth/CEO |
-| Legal campañas | — | BLOCKED | claimReady |
+| Capacidad | STAGING | PROD |
+|-----------|---------|------|
+| local / ecommerce / saas-b2b | ✅ ALL_PASS | OFF |
+| strategy / funnel / retention | ✅ ALL_PASS | flags OFF |
+| 5 betas originales | BETA | — |
+| Free tools | 0 installs | — |
+| Ads / legal | BLOCKED | claimReady false |
 
-## Built this phase
+## SHA / evidencia
 
-- Cert ecommerce + saas-b2b (mesh, portal, QA≥85, completed)  
-- Registry elite: ecommerce + crm_sales  
-- New packs: strategy / funnel / retention (mappers, flags, kickoff)  
-- SEO PM soft-continue  
-- Docs SSOT + ADR-049  
-- **No** READY · **no** prod IA · **no** tools install
+- Tip / live: `be61f02d`  
+- Logs: ecommerce `015452` · saas-b2b `022752` · new-os-packs `02-55-24`
 
-## Next (exact)
+## Next
 
-1. Deploy tip → `staging-smoke-new-os-packs-e2e.mjs` ALL_PASS  
-2. Legal campañas  
-3. CTO Matomo/Umami (ADR-048) o REJECT  
+1. Legal campañas  
+2. CTO Matomo/Umami (ADR-048) o REJECT  
 
-Rollback staging: `NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0` + `NELVYON_*_PACK=0`
+Rollback: `AI=0` + `OLLAMA=0` + `NELVYON_*_PACK=0`

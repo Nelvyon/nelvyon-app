@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| OS | **Promote Strategy/Funnel/Retention** | E2E `new-os-packs-e2e-2026-07-24T02-55-24` **ALL_PASS** · catalog available · registry elite · tip `be61f02d` · claimReady **false** |
 | OS | **Cert ecommerce + saas-b2b + new packs** | Pack E2E ecommerce **ALL_PASS** · saas-b2b **ALL_PASS** · registry `ecommerce`+`crm_sales` elite · Strategy/Funnel/Retention packs (mappers+flags+kickoff) · betas audit **no promote** · SEO soft-continue PM · ADR-049 · claimReady **false** · prod IA OFF · 0 tools |
 | OS | **Universal catalog + free tools audit** | `OS_UNIVERSAL_SERVICE_CATALOG.md` · `FREE_TOOLS_EVALUATION.md` · ADR-047 · nada instalado · claimReady **false** |
 | Mesh | **CIERRE POST-MESH** | tip `99b30730` · staging live match · `MESH_JOIN_OK` · peer `nelvyon-staging-web-3` active · Pack E2E **ALL_PASS completed** (5 auto-approve) · portal-packs **ALL_PASS** · SEO fix ADR-046 (ignore LLM blockers + pad keywords + JSON repair + soft-continue) · prod `OPENAI_API_KEY` **ABSENT** · flags IA/mesh OFF · Ollama privado PASS · tenant iso 16/16 · claimReady **false** (legal) · rollback `AI=0`+`OLLAMA=0` |
