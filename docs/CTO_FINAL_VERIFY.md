@@ -1,4 +1,4 @@
-# CTO Final Verify — 2026-07-24 (OS pack certification complete)
+# CTO Final Verify — 2026-07-24 (5 beta packs certified)
 
 > Veredicto: **CONDITIONAL_READY** · `claimReady` **false** · Coste **0** · **no READY**
 
@@ -6,20 +6,19 @@
 
 | Capacidad | STAGING | PROD |
 |-----------|---------|------|
-| local / ecommerce / saas-b2b | ✅ ALL_PASS | OFF |
-| strategy / funnel / retention | ✅ ALL_PASS | flags OFF |
-| 5 betas originales | BETA | — |
-| Free tools | 0 installs | — |
+| 11 packs OS (growth+strategy+funnel+retention+5) | ✅ ALL_PASS | OFF |
+| Matomo/Umami | REJECT/DEFER | — |
 | Ads / legal | BLOCKED | claimReady false |
+| Prod IA/mesh/MCP/SM/payouts | ABSENT | OFF |
 
 ## SHA / evidencia
 
-- Tip / live: `be61f02d`  
-- Logs: ecommerce `015452` · saas-b2b `022752` · new-os-packs `02-55-24`
+- Tip: `eb462545a992af8fe65f1c221ab7576c39b51542`  
+- Log: `.release-logs/beta-packs-e2e-2026-07-24T13-42-38.txt`
 
 ## Next
 
 1. Legal campañas  
-2. CTO Matomo/Umami (ADR-048) o REJECT  
+2. No installs analytics self-host  
 
-Rollback: `AI=0` + `OLLAMA=0` + `NELVYON_*_PACK=0`
+Rollback: `AI=0` + `OLLAMA=0`

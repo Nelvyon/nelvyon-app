@@ -11,20 +11,20 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — único bloqueo claimReady / READY |
-| **Detalle** | Mesh+Pack ecommerce/saas-b2b PASS · OS catalog · free tools 0 installs |
-
-### Ops (no KI) — Strategy/Funnel/Retention E2E post-deploy
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | **Resuelto** 2026-07-24 — ALL_PASS · IMPLEMENTED_VERIFIED |
-| **Detalle** | `.release-logs/new-os-packs-e2e-2026-07-24T02-55-24.txt` |
+| **Detalle** | 11 packs OS CERT · ADR-048 · free tools 0 installs |
 
 ---
 
 ## Historial resuelto (reciente)
 
-### Ops — ecommerce + saas-b2b Pack E2E → ALL_PASS
+### Ops — 5 packs beta → ALL_PASS / available
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Resuelto** 2026-07-24 |
+| **Detalle** | `.release-logs/beta-packs-e2e-2026-07-24T13-42-38.txt` · tip `eb462545` |
+
+### Ops — Strategy/Funnel/Retention E2E post-deploy
 
 | Campo | Valor |
 |-------|-------|

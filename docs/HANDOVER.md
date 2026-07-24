@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-24** — Cert 5 packs beta (ADR-048/050) · `claimReady: false`
+> Última actualización: **2026-07-24** — 11 packs OS CERT · ADR-048 REJECT · `claimReady: false`
 
 ---
 
@@ -10,12 +10,20 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** (no READY) |
-| **Fase** | Certificar social/content/cro/analytics/brand |
-| **ADR-048** | **REJECT/DEFER** Matomo/Umami · 0 installs |
-| **Prod IA** | **OFF/ABSENT** |
+| **Tip / staging** | `eb462545` |
+| **Certificados** | 3 growth + strategy/funnel/retention + 5 (social/content/cro/analytics/brand) |
+| **BETA** | ninguno |
+| **ADR-048** | REJECT/DEFER Matomo/Umami · 0 installs |
+| **Prod IA** | OFF/ABSENT |
 | **claimReady** | **false** — legal campañas |
 
-### Rollback staging
+### Evidencia
+
+| Bloque | Log |
+|--------|-----|
+| beta ×5 | `.release-logs/beta-packs-e2e-2026-07-24T13-42-38.txt` ALL_PASS |
+
+### Rollback
 
 `NELVYON_AI_ENABLED=0` · `OLLAMA_CONFIGURED=0`
 
@@ -23,10 +31,9 @@
 
 ## Próximo paso EXACTO
 
-1. Push tip mappers beta → esperar staging live SHA.  
-2. `railway run --service ideal-victory --environment staging -- node scripts/staging-smoke-beta-packs-e2e.mjs --skip-wait` → exigir ALL_PASS por pack.  
-3. Promote solo packs ALL_PASS; los que fallen permanecen BETA.  
-4. Legal checklist campañas (bloquea claimReady).  
-5. No activar IA/mesh en prod sin CEO.
+1. **Legal:** checklist campañas (único bloqueo claimReady / READY).  
+2. Push tip promote docs/registry → confirmar staging SHA.  
+3. **No** instalar Matomo/Umami ni tools nuevas.  
+4. **No** activar IA/mesh/OpenAI/MCP/SM/payouts/campañas en prod sin CEO.
 
-SSOT: `OS_UNIVERSAL_SERVICE_CATALOG.md` · `SERVICE_BETA_PACKS.md` · ADR-048 · ADR-050
+SSOT: `OS_UNIVERSAL_SERVICE_CATALOG.md` · ADR-048 · ADR-050 · `CTO_FINAL_VERIFY.md`

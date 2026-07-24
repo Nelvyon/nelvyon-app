@@ -15,7 +15,7 @@
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | 🟡 | Desktop often DOWN for restore drill |
 | **Railway prod** | ✅ | `@nelvyon/web` · IA/mesh/OpenAI keys **ABSENT** |
-| **Railway staging** | ✅ mesh | live Pack E2E ALL_PASS · OS catalog · free-tools eval only |
+| **Railway staging** | ✅ mesh | 11 packs OS E2E ALL_PASS · ADR-048 no Matomo/Umami |
 | **Ollama** | ✅ local mesh | Tailscale only · no public port |
 | **OpenAI** | ❌ | ABSENT prod |
 | **OSS tools externos** | ❌ no install | Ver `FREE_TOOLS_EVALUATION.md` |

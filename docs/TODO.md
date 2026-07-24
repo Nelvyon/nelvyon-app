@@ -34,7 +34,11 @@
 - [x] Auditoría betas: **permanecen BETA** (no promote)
 - [x] Strategy/Funnel/Retention: código + flags + contratos (ADR-049) · E2E post-deploy
 - [x] E2E mesh Strategy/Funnel/Retention → ALL_PASS → IMPLEMENTED_VERIFIED
-- [ ] CTO: aprobar/rechazar ADR-048 analytics Matomo/Umami (staging privado)
+- [x] ADR-048: REJECT/DEFER Matomo/Umami (0 installs)
+- [x] Certificar 5 packs (social/content/cro/analytics/brand) → ALL_PASS → available
+- [ ] CEO: legal checklist campañas firmada (bloquea claimReady)
+- [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts en prod sin CEO
+
 - [ ] No instalar Helio/Mautic/Twenty/n8n/Listmonk sin necesidad
 - [ ] Ops: Router remoto soak mesh (opcional)
 - [ ] No activar IA/mesh/OpenAI/MCP/SM/payouts en prod sin CEO

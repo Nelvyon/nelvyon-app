@@ -15,7 +15,7 @@ describe("OsCapabilityRegistry", () => {
     expect(check.ok).toBe(true);
   });
 
-  it("marks mesh-verified growth services as elite including ecommerce + crm + strategy/funnel/retention after E2E ALL_PASS", () => {
+  it("marks mesh-verified growth services as elite including content_social + reporting after beta E2E", () => {
     expect(listEliteOsServices()).toEqual(
       expect.arrayContaining([
         "seo",
@@ -25,6 +25,8 @@ describe("OsCapabilityRegistry", () => {
         "strategy",
         "funnel",
         "retention",
+        "content_social",
+        "reporting",
       ]),
     );
   });

@@ -8,6 +8,18 @@
 
 > No borrar entradas. Añadir al inicio.
 
+## 2026-07-24 — Cert 5 packs beta (ADR-048/050)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Tip / live** | `eb462545a992` |
+| **Pack E2E** | social/content/cro/analytics/brand **ALL_PASS** |
+| **Evidence** | `.release-logs/beta-packs-e2e-2026-07-24T13-42-38.txt` |
+| **Tools** | Matomo/Umami **REJECT/DEFER** · 0 installs |
+| **Prod** | IA/mesh OFF · coste 0 |
+| **claimReady** | **false** |
+
 ## 2026-07-24 — Post-mesh cierre (Pack E2E ALL_PASS)
 
 | Campo | Valor |

@@ -3,14 +3,15 @@
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
 > Actualizado: **2026-07-23**. **✅ = verificado en prod** · **🟡 = código/vars** · **❌ = no implementado**
 
-**Bloqueadores go-live:** legal campañas. Prod IA **ABSENT**. Staging mesh Pack E2E ALL_PASS. OS catalog: `OS_UNIVERSAL_SERVICE_CATALOG.md`. Free tools: eval only (`FREE_TOOLS_EVALUATION.md`).
+**Bloqueadores go-live:** legal campañas. Prod IA **ABSENT**. Staging: 11 packs OS E2E ALL_PASS. Analytics: GA4/GSC (ADR-048 REJECT Matomo/Umami). SSOT: `OS_UNIVERSAL_SERVICE_CATALOG.md`.
 
 ### Auth bridge Web ↔ FastAPI
 
 | Ítem | Estado |
 |------|--------|
 | OpenAI | allow **0** · revoked |
-| Mesh Option A | Ollama privado PASS · Pack E2E ALL_PASS · ADR-044–047 |
+| Mesh Option A | Ollama privado PASS · Pack E2E ALL_PASS · ADR-044–050 |
+| Analytics self-host | **REJECT/DEFER** Matomo/Umami |
 
 ---
 

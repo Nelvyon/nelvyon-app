@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| OS | **Cert 5 packs + ADR-048** | social/content/cro/analytics/brand E2E **ALL_PASS** · mappers dedicados · catalog available · content_social+reporting elite · Matomo/Umami **REJECT/DEFER** · tip `eb462545` · claimReady **false** · 0 tools · prod IA OFF |
 | OS | **Promote Strategy/Funnel/Retention** | E2E `new-os-packs-e2e-2026-07-24T02-55-24` **ALL_PASS** · catalog available · registry elite · tip `be61f02d` · claimReady **false** |
 | OS | **Cert ecommerce + saas-b2b + new packs** | Pack E2E ecommerce **ALL_PASS** · saas-b2b **ALL_PASS** · registry `ecommerce`+`crm_sales` elite · Strategy/Funnel/Retention packs (mappers+flags+kickoff) · betas audit **no promote** · SEO soft-continue PM · ADR-049 · claimReady **false** · prod IA OFF · 0 tools |
 | OS | **Universal catalog + free tools audit** | `OS_UNIVERSAL_SERVICE_CATALOG.md` · `FREE_TOOLS_EVALUATION.md` · ADR-047 · nada instalado · claimReady **false** |

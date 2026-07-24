@@ -1,15 +1,13 @@
 # PROJECT_STATUS — Estado del proyecto
 
-> Actualizado: **2026-07-24** — 6 packs OS CERT · 5 BETA · `claimReady: false`
+> Actualizado: **2026-07-24** — 11 packs OS CERT · ADR-048 · `claimReady: false`
 
 | Capa | Estado | Evidencia |
 |------|--------|-----------|
-| **Veredicto** | **CONDITIONAL_READY** | Growth+new packs PASS · legal bloquea READY |
-| **IMPLEMENTED_VERIFIED** | local · ecommerce · saas-b2b · strategy · funnel · retention | E2E ALL_PASS logs |
-| **BETA** | social · content · cro · analytics · brand | no promote |
-| **PREPARED_OFF** | automations/reputation SaaS · prod IA | flags OFF |
-| **BLOCKED_EXTERNAL** | ads · legal campañas | claimReady false |
-| **Staging mesh** | **PASS** | tip `be61f02d` / docs `ef40224f` |
-| **Prod IA** | **OFF** | |
+| **Veredicto** | **CONDITIONAL_READY** | Packs ALL_PASS · legal bloquea READY |
+| **IMPLEMENTED_VERIFIED** | 11 packs OS + SKUs core | beta-packs E2E 13-42-38 |
+| **BETA** | 0 | — |
+| **PREPARED_OFF** | automations/reputation SaaS · prod IA | |
+| **BLOCKED_EXTERNAL** | ads · legal | claimReady false |
+| **Tools** | 0 installs · Matomo/Umami REJECT | ADR-048 |
 | **Costes** | **0** | |
-| **Tools nuevas** | **0 installs** | |

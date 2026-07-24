@@ -67,8 +67,8 @@
 | Runbook ops sin Cursor | ✅ | `OS_AUTONOMOUS_OPERATIONS.md` |
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
-| Beta packs → available | ❌ | 5 originales + strategy/funnel/retention · sin promote prematuro |
-| Agencia OS unificada élite (ops) | 🟡 | local/ecom/saas-b2b **IMPLEMENTED_VERIFIED** · 8 **BETA** · ADR-049 · claimReady false |
+| Beta packs → available | ✅ | 5 packs E2E ALL_PASS · ADR-050 · catalog available |
+| Agencia OS unificada élite (ops) | 🟡 | 11 packs **IMPLEMENTED_VERIFIED** · claimReady false (legal) |
 
 ---
 
