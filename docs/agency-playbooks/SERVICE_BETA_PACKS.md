@@ -1,43 +1,49 @@
-# Beta packs — stay beta (honesty)
+# Pack playbooks — social · content · cro · analytics · brand
 
-> Los 5 packs beta **no** se promocionan a `available` sin evidencia completa.  
-> Re-audit catálogo: `apps/web/src/lib/saas/servicePacksCatalog.ts` · **2026-07-22**
+> ADR-050 · 2026-07-24 · QA ≥85 · portal `/portal` · flags prod OFF  
+> Promote solo con E2E mesh ALL_PASS.
 
-## Packs
+## social-calendar-pack
 
-| Pack | Catalog `availability` | Kickoff path | Motivo / blockers exactos |
-|------|------------------------|--------------|---------------------------|
-| social-calendar | **beta** | `/os/packs/social-calendar` | deliverables genéricos · sin cert PASS artifact · no P0 E2E verde con IA |
-| content-strategy | **beta** | `/os/packs/content-strategy` | idem |
-| cro-audit | **beta** | `/os/packs/cro-audit` | idem |
-| analytics-setup | **beta** | `/os/packs/analytics-setup` | idem |
-| brand-voice | **beta** | `/os/packs/brand-voice` | idem |
-| strategy | **beta** | `/os/packs/strategy` | mapper dedicado · E2E mesh pendiente post-deploy |
-| funnel-growth | **beta** | `/os/packs/funnel-growth` | idem |
-| retention | **beta** | `/os/packs/retention` | idem |
+| Campo | Valor |
+|-------|-------|
+| Agentes | LANDING · CHATBOT · social_media_premium |
+| Entregables | Landing social · Asistente social · Calendario 30 días · Informe ejecutivo |
+| Playbook | Brief → SKUs → calendario 4 semanas → QA≥85 → portal |
 
-## Growth `available` (kickoff real · E2E ALL_PASS 2026-07-24)
+## content-strategy-pack
 
-| Pack | availability | Kickoff API | Evidencia |
-|------|--------------|-------------|-----------|
-| local-business-growth | available | `/api/os/packs/local-business-growth/kickoff` | Pack E2E mesh |
-| ecommerce-growth | available | `/api/os/packs/ecommerce-growth/kickoff` | `ecommerce-pack-e2e-20260724-015452` |
-| saas-b2b-growth | available | `/api/os/packs/saas-b2b-growth/kickoff` | `saas-b2b-pack-e2e-20260724-022752` |
+| Campo | Valor |
+|-------|-------|
+| Agentes | LANDING · SEO · contenido_copywriting_premium |
+| Entregables | Landing contenido · Keywords · Plan editorial 90d · Guía mensajes · Informe |
+| Playbook | Brief → clusters → messaging → QA≥85 → portal |
 
-Alias focus packs (seo-local, meta-ads, email-welcome, landing-funnel) reutilizan growth kickoffs — **available** con binding real.
+## cro-audit-pack
 
-## Criterio promote (todos obligatorios)
+| Campo | Valor |
+|-------|-------|
+| Agentes | LANDING · SEO · funnel_premium |
+| Entregables | Landing CRO · Informe fricción · Auditoría · Plan A/B 30d · Informe |
+| Playbook | Brief → fricción → A/B → QA≥85 → portal |
 
-1. Mapper de producción dedicado (no solo `buildGenericProductionDeliverable`)  
-2. Cert `passed` + QA ≥85 real  
-3. Playbook pack-specific  
-4. Tests unitarios + E2E/smoke en orquestador P0 o equivalente  
-5. Portal `/portal`  
-6. Tenant isolation  
-7. Observabilidad / rollback  
+## analytics-setup-pack
 
-Hasta entonces: catalog `availability: "beta"` (test honesty lock). **Ningún promote de betas en este cierre** (audit 2026-07-24).
+| Campo | Valor |
+|-------|-------|
+| Agentes | SEO · LANDING · sector-analytics-ga4 |
+| Entregables | Mapa eventos · Landing analytics · Setup GA4+GSC · Dashboard · Informe |
+| Stack | **GA4 + Search Console existentes** · **ADR-048 REJECT/DEFER Matomo/Umami** |
+| Playbook | Brief → event map → checklist GA4 → QA≥85 → portal |
 
-## Núcleo reusable
+## brand-voice-pack
 
-Usar `SERVICE_*` + growth packs. No mintar agentes sectoriales decorativos.
+| Campo | Valor |
+|-------|-------|
+| Agentes | LANDING · CHATBOT · branding_premium |
+| Entregables | Landing marca · Bot voz · Guía voz · 3 value props · 3 arquetipos · Informe |
+| Playbook | Brief → voice guide → personas → QA≥85 → portal |
+
+## Rollback
+
+Sin flags dedicadas (packs en registry estándar). Staging: `NELVYON_AI_ENABLED=0` + `OLLAMA_CONFIGURED=0`. Prod: IA/mesh OFF.

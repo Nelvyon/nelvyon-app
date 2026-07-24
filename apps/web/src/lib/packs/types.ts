@@ -216,26 +216,36 @@ export function buildBetaPackStepDefinitions(
   ];
 }
 
-export const SOCIAL_CALENDAR_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
-  "NELVYON-LANDING",
-  "NELVYON-CHATBOT",
-]);
-export const CONTENT_STRATEGY_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
-  "NELVYON-LANDING",
-  "NELVYON-SEO",
-]);
-export const CRO_AUDIT_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
-  "NELVYON-LANDING",
-  "NELVYON-SEO",
-]);
-export const ANALYTICS_SETUP_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
-  "NELVYON-SEO",
-  "NELVYON-LANDING",
-]);
-export const BRAND_VOICE_PACK_STEP_DEFINITIONS = buildBetaPackStepDefinitions([
-  "NELVYON-LANDING",
-  "NELVYON-CHATBOT",
-]);
+export const SOCIAL_CALENDAR_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-CHATBOT"]).slice(0, -2),
+  { key: "social_calendar", label: "Calendario social 30d" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+export const CONTENT_STRATEGY_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-SEO"]).slice(0, -2),
+  { key: "content_plan", label: "Plan editorial + messaging" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+export const CRO_AUDIT_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-SEO"]).slice(0, -2),
+  { key: "cro_plan", label: "Auditoría CRO + A/B" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+export const ANALYTICS_SETUP_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-SEO", "NELVYON-LANDING"]).slice(0, -2),
+  { key: "analytics_setup", label: "Setup GA4 + dashboard" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
+export const BRAND_VOICE_PACK_STEP_DEFINITIONS = [
+  ...buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-CHATBOT"]).slice(0, -2),
+  { key: "brand_voice", label: "Voz + props + personas" },
+  { key: "report", label: "Informe en portal" },
+  { key: "complete", label: "Pack completado" },
+];
 
 export const STRATEGY_PACK_STEP_DEFINITIONS = [
   ...buildBetaPackStepDefinitions(["NELVYON-LANDING"]).slice(0, -2),

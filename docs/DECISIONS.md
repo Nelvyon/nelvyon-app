@@ -562,3 +562,27 @@
 
 ---
 
+## ADR-048 — REJECT/DEFER Matomo y Umami
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | **No instalar** Matomo ni Umami. Mantener analítica NELVYON (GA4 + Search Console vía `analytics-setup-pack`). Reevaluar solo si aparece brecha demostrada. |
+| **Por qué** | Evitar duplicidad, mantenimiento y costes; analytics-setup entrega checklist/event map/dashboard sin infra nueva. |
+| **Consecuencias** | 0 installs · FREE_TOOLS_EVALUATION actualizado · sin puertos públicos · coste 0. |
+| **Relación** | ADR-047 · `analytics-setup-pack` · `FREE_TOOLS_EVALUATION.md`. |
+
+---
+
+## ADR-050 — Certificar 5 packs (social/content/cro/analytics/brand)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-24 |
+| **Decisión** | Sustituir mapper genérico por mappers dedicados (`betaPackProduction.ts`) + entregables específicos + playbooks. E2E mesh staging obligatorio (QA≥85, portal, auto-approve, completed). Promote a `available` / IMPLEMENTED_VERIFIED **solo** con ALL_PASS. Prod IA OFF. |
+| **Por qué** | Cerrar deuda beta sin humo ni tools nuevas. |
+| **Consecuencias** | Smoke `staging-smoke-beta-packs-e2e.mjs` · catálogo honestidad. |
+| **Relación** | ADR-048 · ADR-049 · `SERVICE_BETA_PACKS.md`. |
+
+---
+

@@ -10,7 +10,6 @@ import {
   SAAS_B2B_GROWTH_PACK_ID,
   SAAS_B2B_PACK_STEP_DEFINITIONS,
   SOCIAL_CALENDAR_PACK_ID,
-  buildBetaPackStepDefinitions,
   CONTENT_STRATEGY_PACK_ID,
   CRO_AUDIT_PACK_ID,
   ANALYTICS_SETUP_PACK_ID,
@@ -21,6 +20,11 @@ import {
   STRATEGY_PACK_STEP_DEFINITIONS,
   FUNNEL_GROWTH_PACK_STEP_DEFINITIONS,
   RETENTION_PACK_STEP_DEFINITIONS,
+  SOCIAL_CALENDAR_PACK_STEP_DEFINITIONS,
+  CONTENT_STRATEGY_PACK_STEP_DEFINITIONS,
+  CRO_AUDIT_PACK_STEP_DEFINITIONS,
+  ANALYTICS_SETUP_PACK_STEP_DEFINITIONS,
+  BRAND_VOICE_PACK_STEP_DEFINITIONS,
   type PackId,
 } from "@/lib/packs/types";
 
@@ -103,7 +107,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     kickoffPath: "/os/packs/social-calendar",
     reportPath: "/os/packs/social-calendar/report",
     projectPrefix: "SCP",
-    stepDefinitions: buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-CHATBOT"]),
+    stepDefinitions: SOCIAL_CALENDAR_PACK_STEP_DEFINITIONS,
     skuSequence: ["NELVYON-LANDING", "NELVYON-CHATBOT"],
     sectors: [
       { id: "local", label: "Negocio local" },
@@ -120,7 +124,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     kickoffPath: "/os/packs/content-strategy",
     reportPath: "/os/packs/content-strategy/report",
     projectPrefix: "CSP",
-    stepDefinitions: buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-SEO"]),
+    stepDefinitions: CONTENT_STRATEGY_PACK_STEP_DEFINITIONS,
     skuSequence: ["NELVYON-LANDING", "NELVYON-SEO"],
     sectors: [
       { id: "local", label: "Negocio local" },
@@ -137,7 +141,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     kickoffPath: "/os/packs/cro-audit",
     reportPath: "/os/packs/cro-audit/report",
     projectPrefix: "CAP",
-    stepDefinitions: buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-SEO"]),
+    stepDefinitions: CRO_AUDIT_PACK_STEP_DEFINITIONS,
     skuSequence: ["NELVYON-LANDING", "NELVYON-SEO"],
     sectors: [
       { id: "ecommerce", label: "Ecommerce" },
@@ -154,7 +158,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     kickoffPath: "/os/packs/analytics-setup",
     reportPath: "/os/packs/analytics-setup/report",
     projectPrefix: "ASP",
-    stepDefinitions: buildBetaPackStepDefinitions(["NELVYON-SEO", "NELVYON-LANDING"]),
+    stepDefinitions: ANALYTICS_SETUP_PACK_STEP_DEFINITIONS,
     skuSequence: ["NELVYON-SEO", "NELVYON-LANDING"],
     sectors: [
       { id: "ecommerce", label: "Ecommerce" },
@@ -171,7 +175,7 @@ export const PACK_REGISTRY: Record<PackId, PackMeta> = {
     kickoffPath: "/os/packs/brand-voice",
     reportPath: "/os/packs/brand-voice/report",
     projectPrefix: "BVP",
-    stepDefinitions: buildBetaPackStepDefinitions(["NELVYON-LANDING", "NELVYON-CHATBOT"]),
+    stepDefinitions: BRAND_VOICE_PACK_STEP_DEFINITIONS,
     skuSequence: ["NELVYON-LANDING", "NELVYON-CHATBOT"],
     sectors: [
       { id: "local", label: "Negocio local" },

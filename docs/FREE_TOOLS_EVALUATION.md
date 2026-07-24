@@ -35,8 +35,8 @@ Decisiones: `REJECT` | `DEFER` | `WATCH` | `PROPOSE` (requiere ADR + OK CTO ante
 | **Chatwoot** | Soporte omnicanal | MIT | Alto | 0 | Medio | Parcial vs chatbot+inbox | Media | **WATCH** — solo si tickets OS lo exigen |
 | **Typebot** | Chatbots visuales | AGPL | Alto | 0 | Medio | Alta vs NELVYON-CHATBOT | Media | **REJECT** — SKU chatbot verificado |
 | **n8n** | Automatización visual | Sustainable Use / fair-code | Alto | 0 self-host · cloud pago | Medio (licencia cloud) | Alta vs SaasWorkflowService | Media | **DEFER** — motor workflows ya existe |
-| **Matomo** | Analytics privacidad | GPL | Alto | 0 | Bajo | Baja (analytics beta débil) | Alta | **PROPOSE** — ver ADR-048 borrador abajo |
-| **Umami** | Analytics ligero | MIT | Alto | 0 | Bajo | Baja | Alta | **PROPOSE** (alternativa a Matomo; preferir 1) |
+| **Matomo** | Analytics privacidad | GPL | Alto | 0 | Bajo | Baja (analytics pack usa GA4) | Alta | **REJECT/DEFER** — ADR-048 |
+| **Umami** | Analytics ligero | MIT | Alto | 0 | Bajo | Baja | Alta | **REJECT/DEFER** — ADR-048 |
 | **Plausible** | Analytics | AGPL | Alto | 0 self-host · cloud pago | Bajo | Baja | Alta | **WATCH** — AGPL + ops |
 | **PostHog** | Product analytics | MIT | Alto | 0 self-host · cloud metered | Medio (complejidad) | Media | Media | **DEFER** — pesado vs necesidad |
 | **Metabase** | BI SQL | AGPL | Alto | 0 | Bajo | Baja (reporting beta) | Alta | **WATCH** — tras analytics-setup cert |
@@ -55,15 +55,13 @@ Decisiones: `REJECT` | `DEFER` | `WATCH` | `PROPOSE` (requiere ADR + OK CTO ante
 
 ## Propuestas (requieren ADR + OK CTO — **no instaladas**)
 
-### P1 — Analytics self-host (Matomo **o** Umami, no ambos)
+### P1 — Analytics self-host (Matomo **o** Umami) — **REJECT/DEFER**
 
 | Campo | Valor |
 |-------|-------|
-| Necesidad | `analytics-setup-pack` es **BETA**; falta evidencia real de tracking sin Google |
-| Valor | Métricas portal/pack sin vendor analytics |
-| Coste | 0 incremental si corre en red privada / mismo cluster |
-| Riesgo | Otro servicio que mantener · cookies/GDPR |
-| Decisión | **PROPOSE** · esperar ADR-048 + aprobación · staging only · sin puerto público (Tailscale o private Railway) |
+| Necesidad | Cubierta por `analytics-setup-pack` + GA4/GSC existentes (ADR-048) |
+| Decisión | **REJECT/DEFER** · no instalar · reevaluar solo si hay brecha demostrada |
+| Coste / riesgo | Evita duplicidad, mantenimiento y coste ops |
 
 ### P2 — Chatwoot (solo si soporte tickets OS se prioriza)
 
