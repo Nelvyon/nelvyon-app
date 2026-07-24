@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-24** — **ADR-057 Blocks 11–25 complete (internal cores)** · tip **pending_commit** (parent commit pending) · `claimReady: false`
+> Última actualización: **2026-07-24** — **ADR-057 Blocks 11–25 complete (internal cores)** · tip **`54d9149a`** (parent commit pending) · `claimReady: false`
 
 ---
 
@@ -10,7 +10,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** (**NOT READY** · no claimReady · no prod) |
-| **Tip / deploy staging** | tip **pending_commit** (parent commit pending) · staging https://ideal-victory-staging.up.railway.app · **confirm staging deploy after push** |
+| **Tip / deploy staging** | tip **`54d9149a`** (parent commit pending) · staging https://ideal-victory-staging.up.railway.app · **confirm staging deploy after push** |
 | **Tests locales** | `tsc --noEmit` **0** · `vitest run backend/agency` **249 PASS** · influencers pack tests **PASS** · `pwa-certify` **PASS** · private-rag synthetic **ALL_PASS** (27 tests) |
 | **13 packs + auditor** | **ALL_PASS** ADR-055 (staging runtime) |
 | **Catalog** | **OsCatalogV1 v1.4.0** (+ `private_vector_rag`, `private_ai_canary_prep`) |

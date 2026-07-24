@@ -7,7 +7,7 @@
 
 | Ítem | Valor |
 |------|--------|
-| SHA (local) | **TBA** (parent commit pending) |
+| SHA (local) | **54d9149a** (parent commit pending) |
 | Staging URL | https://ideal-victory-staging.up.railway.app |
 | Deploy staging | **confirm after push** |
 | Veredicto | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` |
