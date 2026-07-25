@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-25** — **ADR-061 VERIFIED staging** · tip **`9e931f08`** · deploy **`794662d7` SUCCESS** · mig **519+520** · restart **ALL_PASS** · `claimReady: false` · **NOT READY**
+> Actualizado: **2026-07-25** — TOTAL QUALITY · tip **`5a36809c`** · ERP reval **ALL_PASS** · prod 519/520 **applied** · CEO ack pending · `claimReady: false` · **NOT READY**
 
 ---
 
@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-25** — tip **`5a36809c`** · A/B+concurrency **ALL_PASS** · ADR-062 PREPARED_OFF · prod migrate **BLOCKED_CEO** · **NOT READY**
+> Actualizado: **2026-07-25** — TOTAL QUALITY · tip **`5a36809c`** · ERP reval **ALL_PASS** · prod 519/520 **applied** (auto-deploy) · CEO ack pending · **NOT READY**
 
 ---
 
@@ -47,8 +47,8 @@
 - [x] **ADR-061 ERP API → `with*Persistence`:** purchases/inventory/manufacturing/projects-fs · Postgres SSOT when `DATABASE_URL` · process-memory **not** SSOT · 409 on version conflict · smoke script ready
 - [x] **P0 memory risk closed (staging VERIFIED):** restart/redeploy survival **ALL_PASS** · tip **`9e931f08`**
 - [x] **Ops:** staging restart smoke `--phase=before|after` → `erp.persistence_restart_latest.md` **ALL_PASS**
-- [x] Staging tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · HTTP A/B + concurrency **ALL_PASS**
-- [x] **CTO/Daniel:** runbook prod ERP ready — execution still **BLOCKED_CEO** (`ERP_PROD_MIGRATE_519_520_RUNBOOK.md`)
+- [x] Staging tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · HTTP A/B + concurrency **ALL_PASS** · reval TOTAL QUALITY **ALL_PASS**
+- [ ] **Daniel/CEO:** formal ack ERP schema prod + auto-deploy policy (`ERP_PROD_MIGRATE_519_520_RUNBOOK.md`)
 - [x] **Opcional HTTP A/B:** **DONE** `erp.http_ab_isolation_latest.md`
 - [ ] **ERP dual-write relational companions (ADR-062):** **PREPARED_OFF**
 - [ ] **2ª réplica staging concurrency:** **PREPARED_OFF** (coste Railway — CEO)

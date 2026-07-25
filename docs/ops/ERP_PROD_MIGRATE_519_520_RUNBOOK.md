@@ -92,16 +92,19 @@ Checklist:
 - SSOT en Postgres + `FOR UPDATE` por (tenant, domain) → seguro con N réplicas app.
 - Demostración con 2 réplicas: **PREPARED_OFF / 0€** — ver HANDOVER; prueba = escalar staging réplicas temporalmente **solo con CEO** (puede implicar coste Railway → no hacer sin aprobación).
 
-## 9. Firma CEO (vacío hasta autorización)
+## Estado (RUNBOOK UPDATE 2026-07-25)
+
+> **Schema 519/520 en producción: YA APLICADO** (evidencia: deploy `05abdfa7` → `migrate` **skip** ambos ficheros).  
+> Esta sección deja de ser “no ejecutar migrate” y pasa a **reconocimiento CEO / gobernanza auto-deploy**.
 
 | Campo | Valor |
 |-------|-------|
-| Autorizo migrate 519+520 en **producción** | ☐ SÍ / ☐ NO |
+| Autorizo **narrativa** “ERP prod schema approved” | ☐ SÍ / ☐ NO |
+| Política auto-deploy+migrate en prod | ☐ mantener / ☐ desactivar / ☐ manual promote only |
 | Nombre | |
 | Fecha | |
-| Tip git autorizado | |
-| Notas | |
 
----
+### Hallazgo
 
-**Próximo paso técnico sin CEO:** mantener staging verde (A/B HTTP + concurrency + restart) · **no** tocar prod.
+Pushes a `main` disparan Railway production `@nelvyon/web` + `preDeployCommand` `migrate:prod`. Eso aplicó 519/520 sin firma CEO en el runbook. Staging evidencia de calidad permanece válida; el gap es **proceso**, no “schema ausente”.
+

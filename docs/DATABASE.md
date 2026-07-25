@@ -8,9 +8,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Staging** | tip **`5a36809c`** · **519+520** applied · restart+A/B+concurrency **ALL_PASS** |
-| **Prod** | **519/520 not claimed** · local probe ENOTFOUND internal · runbook **BLOCKED_CEO** |
-| **SSOT** | `erp_domain_snapshots` JSONB · dual-write companions **PREPARED_OFF** (ADR-062) |
+| **Prod** | tip **`5a36809c`** · **519/520 in `_migrations`** (migrate skip 2026-07-25) · CEO formal ack pending · IA keys ABSENT |
+| **Staging** | tip **`5a36809c`** · reval A/B+concurrency+persist **ALL_PASS** |
+| **SSOT** | `erp_domain_snapshots` · dual-write **PREPARED_OFF** (ADR-062) |
 
 ## ADR-060 — ERP product surface (catalog v1.7.0 · superseded SSOT by ADR-061)
 

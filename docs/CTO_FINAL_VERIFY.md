@@ -1,40 +1,46 @@
-# CTO Final Verify — 2026-07-25 (ERP staging closure)
+# CTO Final Verify — 2026-07-25 (TOTAL QUALITY / RELEASE-READINESS)
 
 > **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0  
-> tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · mig **519+520** · A/B + concurrency + restart **ALL_PASS**
+> Staging+prod tip **`5a36809c`** · ERP reval **ALL_PASS** · código P0 **none** · schema ERP prod **already applied** (auto-deploy)
 
 ## Tabla final
 
 | Ítem | Valor |
 |------|--------|
-| Staging tip | **`5a36809c`** |
-| Deploy | **`5965c32b` SUCCESS** |
-| URL | https://ideal-victory-staging.up.railway.app |
+| Staging tip / deploy | **`5a36809c`** / **`5965c32b` SUCCESS** |
+| Prod tip | **`5a36809c`** (nelvyon.com + app.nelvyon.com live) |
+| Prod ready | **ok** (retry; brief 503 observed once) |
+| Prod IA/MCP/SM keys | **ABSENT** (39 vars; sensitive filter empty) |
+| Prod mig 519/520 | **skip** on deploy `05abdfa7` → already in `_migrations` |
 | Veredicto | **CONDITIONAL_READY** · **NOT READY** |
-| ERP SSOT | Postgres `erp_domain_snapshots` (ADR-061) |
-| Dual-write relacional | **PREPARED_OFF** (ADR-062) |
-| Prod migrate 519/520 | **BLOCKED_CEO** · runbook ready |
-| Multirréplica 2+ | Architecture OK · **2ª réplica no demostrada** (0€) |
+| Competitive claims | **none** |
 
-## Clasificación
-
-| IMPLEMENTED_VERIFIED | PREPARED_OFF | BLOCKED_* |
-|----------------------|--------------|-----------|
-| ERP 26–29+35 staging (persist + A/B HTTP + concurrency + restart) · cores agency verified · PWA Chrome · HA 1-región · RAG Docker | Dual-write 519 · Railway pgvector · IA canary · 2ª réplica app · paid APM | Prod ERP migrate **CEO** · payments/IoT/signature **SCOPE/EXTERNAL** · Pepito/mass-send **LEGAL** · OAuth/Twilio/iOS/multi-region **EXTERNAL/COST** |
-
-## Evidencia gates
+## Gates (esta sesión)
 
 | Gate | Resultado |
 |------|-----------|
-| HTTP A/B | **ALL_PASS** |
-| Concurrency | **ALL_PASS** (idempotent receive; over-reserve `INSUFFICIENT_STOCK`; PR/MO parallel) |
-| Restart persistence | **ALL_PASS** (prior tip `9e931f08` / recycle) |
-| vitest ERP subset | **PASS** |
-| tsc | **0** (session) |
-| health ready | DB ok |
-| Prod `_migrations` local probe | **ENOTFOUND** internal host — not claimed; 519/520 **not** asserted on prod |
+| tsc --noEmit | **0** |
+| vitest ERP+legal subset | **70 PASS / 2 skip** |
+| eslint `/api/saas/erp/**` | **0** |
+| check-no-mock-production | **PASS** |
+| ERP HTTP A/B reval | **ALL_PASS** |
+| ERP concurrency reval | **ALL_PASS** |
+| ERP persist after | **ALL_PASS** |
+| Staging health live/ready | **ok** |
+| Prod health live/ready | **ok** (ready after retry) |
+| Code P0/P1 audit | **none found** |
+
+## Clasificación módulos
+
+| IMPLEMENTED_VERIFIED | PREPARED_OFF | BLOCKED_CEO | BLOCKED_EXTERNAL / LEGAL / SCOPE |
+|----------------------|--------------|-------------|----------------------------------|
+| ERP staging full path · OS/agency cores verified · influencers · PWA Chrome · HA 1-región · RAG Docker · anti-mock gate | Dual-write ADR-062 · Railway pgvector · IA canary · 2ª réplica · paid APM · email/PDF FULL | Formal CEO ack ERP prod narrative · prod IA canary | OAuth/Twilio/ads/publish/iOS/multi-region COST · Pepito/mass-send · payments/GL/IoT/signature |
+
+## Ops finding (honest)
+
+Railway `preDeployCommand` = `migrate:prod` on **production** `@nelvyon/web` auto-applies new SQL when `main` deploys. ERP **519/520** landed via that path (now `skip`). CEO runbook sign-off remains required for **authorization narrative**, not for “schema absent”.
 
 ## Next
 
-1. CEO firma runbook prod ERP (o NO)  
+1. CEO ack runbook / auto-deploy policy  
 2. **No READY** · `claimReady: false`

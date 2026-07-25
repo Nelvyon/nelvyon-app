@@ -14,8 +14,8 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ local / 🟡 Railway | local-ai/pgvector Docker **VERIFIED** · Railway pgvector **PREPARED_OFF** |
-| **Railway prod** | ✅ | `@nelvyon/web` · flags **OFF** / **ABSENT** · no OpenAI · no credenciales reales · **ERP 519/520 not claimed** |
-| **Railway staging** | ✅ | `ideal-victory` · tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · ERP A/B+concurrency+restart **ALL_PASS** |
+| **Railway prod** | ✅ | `@nelvyon/web` · tip **`5a36809c`** · IA keys ABSENT · ERP 519/520 **applied** · CEO ack pending |
+| **Railway staging** | ✅ | `ideal-victory` · tip **`5a36809c`** · ERP reval A/B+concurrency+persist **ALL_PASS** |
 | **ERP non-financial (26–29+35)** | ✅ **IMPLEMENTED_VERIFIED** (staging) | Snapshot SSOT · HTTP A/B · concurrency · ADR-062 dual-write **PREPARED_OFF** · prod migrate **BLOCKED_CEO** |
 | **App multi-replica ERP** | 🟡 | FOR UPDATE designed · **2ª réplica no provisionada** (0€ / COST if scaled) |
 | **HA single-region** | ✅ **VERIFIED** | Runbook + readiness · RPO/RTO documentados |

@@ -1,27 +1,29 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-25** · tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · ERP A/B+concurrency+restart **ALL_PASS** · claimReady false  
-> Veredicto: **CONDITIONAL_READY** · **NOT READY**  
-> SSOT: `HANDOVER.md` · ADR-061 · ADR-062
+> Fecha: **2026-07-25** TOTAL QUALITY · tip **`5a36809c`** · claimReady false  
+> Veredicto: **CONDITIONAL_READY** · **NOT READY**
 
 ### Matriz
 
 | Dimensión | Estado |
 |-----------|--------|
-| VERDE VERIFICADO | ERP staging persist+A/B+concurrency · agency cores · influencers · ads/community/telephony/oauth/marketplace (core/sim) · RAG Docker · PWA Chrome · HA 1-región |
-| PREPARADO OFF | Dual-write relacional · Railway pgvector · IA canary · 2ª réplica app · paid APM |
-| BLOQUEO CEO | Prod ERP migrate · prod IA canary |
-| BLOQUEO SCOPE/EXTERNAL/LEGAL | Payments/GL · IoT/signature · OAuth/Twilio/iOS/multi-region · Pepito/mass-send |
+| VERDE VERIFICADO | ERP staging reval · agency/OS cores · anti-mock · tsc/vitest/eslint ERP · prod live tip + ready · flags IA ABSENT |
+| PREPARADO OFF | Dual-write · pgvector Railway · IA canary · 2ª réplica |
+| BLOQUEO CEO | Formal ack ERP prod / auto-deploy policy · prod IA canary |
+| BLOQUEO EXTERNAL/LEGAL/SCOPE | OAuth/Twilio/iOS/multi-region · Pepito/mass-send · payments/GL |
+| P0 código (sesión) | **none** |
 | COSTES | 0 |
+
+### Hallazgo ops
+
+Prod migrate log deploy `05abdfa7`: `skip: 519` / `skip: 520` → schema **ya** en `_migrations` (auto-deploy previo). No afirmar “prod sin 519/520”.
 
 ### Evidencia
 
-- `erp.http_ab_isolation_latest.md` **ALL_PASS**
-- `erp.concurrency_latest.md` **ALL_PASS**
-- `erp.persistence_restart_latest.md` **ALL_PASS**
-- Runbook prod: `docs/ops/ERP_PROD_MIGRATE_519_520_RUNBOOK.md` (**no ejecutado**)
+- Reval A/B + concurrency + persist **ALL_PASS**
+- Gates locales PASS
+- Prod sensitive keys filter empty / openai_absent true
 
 ### Próximo
 
-1. CEO firma runbook prod ERP SÍ/NO  
-2. **No READY**
+CEO ack runbook · **No READY**

@@ -1021,9 +1021,9 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | staging tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · mig **519+520** · A/B+concurrency+restart **ALL_PASS** · prod ERP migrate **BLOCKED_CEO** |
+| **SHA / deploys** | staging+prod tip **`5a36809c`** · ERP reval **ALL_PASS** · prod 519/520 **applied** (auto-deploy skip evidence) · IA keys ABSENT · CEO formal ack pending |
 | **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-061 snapshot SSOT · ADR-062 dual-write **PREPARED_OFF** |
-| **ERP honesty** | HTTP A/B VERIFIED · concurrency VERIFIED · restart VERIFIED · payments **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · **no Odoo** · prod migrate gated |
+| **ERP honesty** | Staging full path VERIFIED · prod schema live · payments **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · **no Odoo** · claimReady false |
 | **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker **VERIFIED** / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile Android build VERIFIED / device+stores **BLOCKED** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |
 | **Competitive honesty** | No live OAuth spend · no GHL telephony parity (sim only) · **no Odoo ERP/finance** · mass-send blocked · social/publish pending CEO · no proven multi-tenant prod outcomes |
 | **Blocker claimReady** | Legal Pepito + licencia · mass-send **BLOCKED_LEGAL** |

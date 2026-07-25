@@ -1,17 +1,26 @@
-# DEPLOYMENTS — Historial de despliegues
+# DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-25** (ERP staging closure A/B+concurrency). No borrar entradas.
+> Actualizado: **2026-07-25** TOTAL QUALITY. No borrar.
 
-## 2026-07-25 — tip `5a36809c` · deploy `5965c32b` · reserve + A/B + concurrency
+## 2026-07-25 — TOTAL QUALITY · prod tip `5a36809c` · 519/520 already applied
+
+| Campo | Valor |
+|-------|-------|
+| **Staging tip** | **`5a36809c`** · deploy **`5965c32b` SUCCESS** |
+| **Prod tip** | **`5a36809c`** · deploy **`05abdfa7` SUCCESS** |
+| **Prod migrate** | `skip: 519_erp_non_financial_cores.sql` · `skip: 520_erp_postgres_persistence.sql` |
+| **Flags prod** | OpenAI/MCP/SM/canary keys **ABSENT** (filter) |
+| **Reval** | ERP A/B+concurrency+persist **ALL_PASS** |
+| **claimReady** | **false** |
+
+## 2026-07-25 — tip `5a36809c` staging · reserve + A/B + concurrency
 
 | Campo | Valor |
 |-------|-------|
 | **Env** | staging `ideal-victory` |
 | **Tip** | **`5a36809c`** |
 | **Deploy** | **`5965c32b` SUCCESS** |
-| **Evidence** | `erp.http_ab_isolation_latest.md` **ALL_PASS** · `erp.concurrency_latest.md` **ALL_PASS** |
-| **ADR-062** | Relational dual-write **PREPARED_OFF** |
-| **Prod** | migrate **not** run · runbook ready · **BLOCKED_CEO** |
+| **Evidence** | `erp.http_ab_isolation_latest.md` · `erp.concurrency_latest.md` |
 | **claimReady** | **false** |
 
 ## 2026-07-25 — ADR-061 VERIFIED · tip `9e931f08` · mig 519+520 · restart ALL_PASS

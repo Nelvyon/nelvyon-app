@@ -6,13 +6,14 @@
 
 ## Activos
 
-### Ops (no KI) — ERP prod migrate still gated (ADR-061/062 · staging VERIFIED)
+### Ops (no KI) — Prod ERP 519/520 schema live via auto-deploy (CEO formal ack pending)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto (prod gate)** — staging A/B+concurrency+restart **ALL_PASS**; prod **BLOCKED_CEO** |
-| **Detalle** | tip **`5a36809c`** · runbook `ERP_PROD_MIGRATE_519_520_RUNBOOK.md`. Local prod DB probe via `railway run` → **ENOTFOUND** `postgres.railway.internal` (no migrate). Dual-write relacional **PREPARED_OFF** (ADR-062). 2ª réplica app **no** demostrada (0€). |
-| **Evidencia** | HANDOVER · CTO_FINAL_VERIFY · erp.*_latest.md |
+| **Estado** | **Abierto (governance)** — schema **applied**; formal CEO authorization narrative pending |
+| **Detalle** | Deploy prod `05abdfa7` ran `migrate:prod` and **skipped** 519/520 (already in `_migrations`). Tip prod **`5a36809c`**. Sensitive IA/MCP/SM keys **ABSENT**. Auto-deploy on `main` bypassed “no migrate without CEO” process gate. |
+| **Remediación** | CEO sign runbook acknowledgment · consider disable prod auto-migrate or require manual promote |
+| **Evidencia** | Railway migrate logs · `CTO_FINAL_VERIFY.md` · HANDOVER |
 
 ### Ops (no KI) — Email + PDF locale PARTIAL (no FULL_VERIFIED)
 

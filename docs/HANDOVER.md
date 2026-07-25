@@ -1,13 +1,13 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-25** — ERP staging closure · tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · HTTP A/B + concurrency **ALL_PASS** · ADR-062 PREPARED_OFF · prod migrate runbook **BLOCKED_CEO** · `claimReady: false` · **NOT READY**  
+> Última actualización: **2026-07-25** — **TOTAL QUALITY / RELEASE-READINESS** · staging tip **`5a36809c`** · reval ERP A/B+concurrency+persist **ALL_PASS** · prod live tip **`5a36809c`** · mig 519/520 prod **already applied** (auto-deploy; CEO formal ack pending) · `claimReady: false` · **NOT READY**  
 
-> Última actualización automática: **2026-07-25 15:10 UTC**
+> Última actualización automática: **2026-07-25 15:19 UTC**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `5a36809c` — `feat(erp): HTTP A/B + concurrency smokes, reserve API, ADR-062 runbook` |
+| **Último commit** | docs tip pending this sync · código tip **`5a36809c`** |
 | **Fecha doc** | 2026-07-25 |
 | **Rama** | `main` (sync with origin) |
 
@@ -18,58 +18,57 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** · sin `claimReady` |
-| **Staging live** | https://ideal-victory-staging.up.railway.app · tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · mig **519+520** · `AUTONOMOUS_ALLOW_OPENAI=0` |
-| **ERP** | Postgres SSOT · restart **ALL_PASS** · HTTP A/B **ALL_PASS** · concurrency **ALL_PASS** · reserve API · dual-write relacional **PREPARED_OFF** (ADR-062) |
-| **Prod** | **no** 519/520 claimed · runbook `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` · **BLOCKED_CEO** · OpenAI=0 |
+| **Staging** | https://ideal-victory-staging.up.railway.app · tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · health ready OK |
+| **Prod** | https://nelvyon.com · tip **`5a36809c`** · ready OK · OpenAI/MCP/SM keys **ABSENT** · ERP schema 519/520 **present** (`migrate skip`) |
+| **Auditoría código** | **0 P0/P1** demostrables en ERP/saas/auth paths (sesión) |
 | **Legal** | `claimReady` **false** · Pepito **forbidden** |
 | **Coste** | 0 |
 
-### Tabla capacidades (honestidad)
+### Capacidades (honestidad)
 
 | Capacidad | Estado | Matiz |
 |-----------|--------|-------|
-| ERP 26–29 + 35 | **IMPLEMENTED_VERIFIED** (staging) | Snapshot SSOT · A/B HTTP · concurrency · restart |
-| Dual-write relacional 519 | **PREPARED_OFF** | ADR-062 plan only |
-| Prod ERP migrate 519/520 | **BLOCKED_CEO** | Runbook listo · no ejecutar |
-| Multirréplica 2+ app | **PREPARED_OFF** (0€) | FOR UPDATE designed; 2ª réplica no provisionada |
-| influencers / ads / community / telephony / oauth / marketplace | **VERIFIED** (core/sim/mock) | Externos **BLOCKED_EXTERNAL** |
+| ERP 26–29+35 staging | **IMPLEMENTED_VERIFIED** | Persist+A/B+concurrency reval **ALL_PASS** |
+| ERP schema prod 519/520 | **IMPLEMENTED** (schema) · product use **CONDITIONAL** | Applied via Railway `preDeployCommand` on main auto-deploy · **CEO formal sign-off still required** for “ERP prod authorized” narrative |
+| Dual-write relacional | **PREPARED_OFF** | ADR-062 |
+| Multirréplica 2+ | **PREPARED_OFF** | 0€ · FOR UPDATE designed |
+| OS packs / influencers / agency cores | **VERIFIED** (staging/core) | Externals **BLOCKED_EXTERNAL** |
 | private_vector_rag | Docker **VERIFIED** | Railway **PREPARED_OFF** |
 | private_ai_canary | **PREPARED_OFF** | **BLOCKED_CEO** |
 | i18n UI / email+PDF | **FULL** / **PARTIAL** | — |
-| PWA / mobile / HA / multi-region | Chrome VERIFIED / Android build / single-region VERIFIED / multi-region **BLOCKED_EXTERNAL/COST** | — |
-| Mass-send / claimReady | **BLOCKED_LEGAL** | Pepito forbidden |
+| PWA / mobile / HA / multi-region | Chrome VERIFIED / Android build / 1-región / multi-region **BLOCKED_EXTERNAL/COST** | — |
+| Mass-send / claimReady | **BLOCKED_LEGAL** | — |
 
-**No READY.**
+**No READY.** No superioridad de mercado.
 
-## Último trabajo
+## Último trabajo (esta sesión)
 
-- HTTP Tenant A/B staging **ALL_PASS** (`erp.http_ab_isolation_latest.md`)
-- Concurrency/idempotency **ALL_PASS** (`erp.concurrency_latest.md`) — same-key receive no double stock; over-reserve → `INSUFFICIENT_STOCK`; PR/MO parallel OK
-- Inventory API `reserve` + regression contract test
-- ADR-062 PREPARED_OFF · prod runbook (no execute)
-- Prior: ADR-061 restart **ALL_PASS** tip `9e931f08`
+- Auditoría scoped: sin P0 código; BFF mocks fail-closed; flags fail-closed
+- Reval staging: HTTP A/B · concurrency · persist after **ALL_PASS**
+- Gates: `tsc` 0 · vitest ERP/legal **70 PASS / 2 skip** · eslint ERP routes 0 · `check-no-mock-production` PASS
+- Prod read-only: live/ready · tip `5a36809c` · sensitive IA keys **ABSENT** · migrate log **skip 519/520** (= already in `_migrations`)
+- Ops finding: pushes a `main` auto-deploy + migrate prod → bypasses CEO gate narrativo (documentado)
 
 ## Próximo paso EXACTO
 
-1. **CEO:** firmar SÍ/NO en `docs/ops/ERP_PROD_MIGRATE_519_520_RUNBOOK.md` antes de cualquier migrate prod (hoy: **no** ejecutar).
-2. **Opcional:** escalar 2ª réplica staging **solo** con aprobación coste Railway → smoke concurrency multi-instance.
-3. **Opcional:** dual-write ADR-062 cuando se decida (no hoy).
-4. **CEO:** canary IA prod / PWA iOS / Pepito legal — ver tabla abajo.
+1. **Daniel/CEO:** firmar reconocimiento formal en `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` (schema **ya** en prod vía auto-deploy) **o** documentar política: desactivar auto-deploy/migrate en prod.
+2. **CEO:** canary IA prod SÍ/NO · PWA iOS · Pepito legal.
+3. **Opcional:** 2ª réplica staging (coste) · dual-write ADR-062.
 
 ## Acciones solo Daniel
 
 | # | Acción | Doc |
 |---|--------|-----|
-| 1 | Firmar migrate ERP prod 519/520 SÍ/NO | `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` |
+| 1 | Ack formal ERP schema prod / política auto-deploy | `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` |
 | 2 | Canary IA prod | `CEO_IA_PROD_CANARY_REQUEST.md` |
 | 3 | PWA iOS Safari | `PWA_IOS_SAFARI_CEO_CHECKLIST.md` |
 | 4 | Licencia Pepito | `DATOS_PEPITO_LICENSE_DOSSIER.md` |
-| 5 | 2ª réplica staging (coste) | Railway · solo si presupuesto |
+| 5 | OAuth/Twilio/ads/publish reales | checklists ops |
+| 6 | 2ª réplica (si presupuesto) | Railway |
 
 ### Rollback staging
 
 ```
-NELVYON_INFLUENCERS_PR_PACK=0
 AUTONOMOUS_ALLOW_OPENAI=0
 NELVYON_PRIVATE_VECTOR_RAG_DISABLED=1
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1

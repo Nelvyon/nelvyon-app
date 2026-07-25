@@ -769,3 +769,15 @@ Sin dual-write live + backfill + read flip + smokes relacionales + runbook firma
 ### Consecuencias
 
 Prod migrate 519/520 = runbook listo, ejecución **BLOCKED_CEO** · `claimReady: false`
+
+---
+
+## ADR-063 — Prod auto-deploy migrate vs CEO ERP gate (governance)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-25 |
+| **Decisión** | Documentar que Railway production `@nelvyon/web` `preDeployCommand` = `migrate:prod` aplica SQL nuevos en cada deploy de `main`. ERP 519/520 quedaron **applied** sin firma CEO en runbook. |
+| **Por qué** | Honestidad operativa: no afirmar “prod sin 519/520” tras skip en logs. |
+| **Consecuencias** | Runbook pasa a **ack CEO / política auto-deploy**; schema aditivo ya live; `claimReady` sigue false; considerar manual promote. |
+| **Evidencia** | deploy `05abdfa7` migrate skip 519/520 · tip prod `5a36809c` |

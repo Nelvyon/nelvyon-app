@@ -1,10 +1,10 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-25** (ERP staging closure). Staging tip **`5a36809c`**.  
-> ERP ops UI ✅ staging · dual-write **PREPARED_OFF** · prod migrate **BLOCKED_CEO** · **sin Odoo**.
+> Actualizado: **2026-07-25** TOTAL QUALITY. Staging+prod tip **`5a36809c`**.  
+> ERP ✅ staging verified · schema prod applied (auto-deploy) · dual-write **PREPARED_OFF** · **sin Odoo**.
 
-**Bloqueadores go-live:** CEO runbook ERP prod · checklists OAuth/Twilio/iOS/IA · Pepito legal.
+**Bloqueadores go-live:** CEO ack ERP/auto-deploy · OAuth/Twilio/iOS/IA · Pepito legal.
 
 ### Auth bridge Web ↔ FastAPI
 
