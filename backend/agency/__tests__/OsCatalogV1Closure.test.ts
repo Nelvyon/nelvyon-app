@@ -156,7 +156,7 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
   }, 30_000);
 
   it("OS Catalog v1 is versioned and honest", () => {
-    expect(OS_CATALOG_V1_VERSION).toBe("1.4.0");
+    expect(OS_CATALOG_V1_VERSION).toBe("1.5.0");
     const check = assertOsCatalogV1Integrity();
     expect(check.violations).toEqual([]);
     expect(listOsCatalogV1().length).toBeGreaterThanOrEqual(15);
@@ -170,8 +170,9 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
     expect(social?.status).toBe("IMPLEMENTED_VERIFIED");
     expect(social?.e2eEvidence).toBeTruthy();
     const influencersPr = listOsCatalogV1().find((e) => e.serviceId === "influencers_pr");
-    expect(influencersPr?.status).toBe("PREPARED_OFF");
+    expect(influencersPr?.status).toBe("IMPLEMENTED_VERIFIED");
     expect(influencersPr?.kickoffPackIds).toContain("influencers-pr-pack");
+    expect(influencersPr?.e2eEvidence).toMatch(/influencers_pr_e2e_latest/);
     const adsCore = listOsCatalogV1().find((e) => e.serviceId === "ads_attribution_core");
     expect(adsCore?.status).toBe("PREPARED_OFF");
     const communityCore = listOsCatalogV1().find((e) => e.serviceId === "community_publish_core");

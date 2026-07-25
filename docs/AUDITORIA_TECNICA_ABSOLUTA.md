@@ -9,7 +9,7 @@
 | Dimensión | Estado |
 |-----------|--------|
 | VERDE VERIFICADO (internal cores) | ADR-057 Blocks 11–25 · 13 packs+auditor staging · `tsc` **0** · agency **249 PASS** · PWA cert · private-rag 27 tests |
-| PREPARADO OFF | influencers_pr staging E2E · mobile stores · pgvector live · paid observability · private_ai_canary_prep · social oficial |
+| PREPARADO OFF | mobile stores · pgvector live · paid observability · private_ai_canary_prep · social oficial |
 | BLOQUEO EXTERNO | Twilio real · ads OAuth/spend · social publish · App Store/Play · multi-region |
 | BLOQUEO CEO | IA prod canary · OpenClaw prod · OpenAI · payouts · 8 cuentas oficiales |
 | BLOQUEO LEGAL | claimReady · mass-send · Pepito forbidden |
@@ -21,7 +21,7 @@
 | Block | Capacidad | Core | Bloqueo |
 |-------|-----------|------|---------|
 | 11 | telephony_core | IMPLEMENTED_VERIFIED (simulator) | real **BLOCKED_EXTERNAL** |
-| 12 | influencers_pr | PREPARED_OFF / beta | ADR-058 fix · E2E post-redeploy pending |
+| 12 | influencers_pr | **IMPLEMENTED_VERIFIED** / available | Staging E2E ALL_PASS tip e81b5034 · catalog v1.5.0 · outreach=false |
 | 13 | ads_attribution_core | IMPLEMENTED_VERIFIED (core) | spend/OAuth **BLOCKED_EXTERNAL** |
 | 14 | community_publish_core | IMPLEMENTED_VERIFIED (simulator) | publish **BLOCKED_EXTERNAL** |
 | 15 | mass-send technical | IMPLEMENTED_VERIFIED (controls) | **BLOCKED_LEGAL** |

@@ -18,6 +18,7 @@ const CERTIFIED_PACK_IDS = [
   "brand-voice-pack",
   "automations-ops-pack",
   "reputation-ops-pack",
+  "influencers-pr-pack",
 ] as const;
 
 describe("servicePacksCatalog availability honesty", () => {
@@ -29,9 +30,9 @@ describe("servicePacksCatalog availability honesty", () => {
     }
   });
 
-  it("no pack remains beta after ADR-055 E2E promotion, except meta-ads-pack (no live OAuth/spend) and influencers-pr-pack (pending staging E2E)", () => {
+  it("no pack remains beta after ADR-055/ADR-058 E2E promotion, except meta-ads-pack (no live OAuth/spend)", () => {
     const betas = SERVICE_PACK_CATALOG.filter((p) => p.availability === "beta");
-    expect(betas.map((p) => p.id)).toEqual(["meta-ads-pack", "influencers-pr-pack"]);
+    expect(betas.map((p) => p.id)).toEqual(["meta-ads-pack"]);
   });
 
   it("meta-ads-pack is honestly labeled beta with OAuth/spend OFF disclosed", () => {

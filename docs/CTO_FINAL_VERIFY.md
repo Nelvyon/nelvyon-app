@@ -22,7 +22,7 @@
 | Block | Capacidad | Estado | Bloqueo |
 |-------|-----------|--------|---------|
 | 11 | `telephony_core` | **IMPLEMENTED_VERIFIED** (simulator) | real calls **BLOCKED_EXTERNAL** |
-| 12 | `influencers_pr` | **PREPARED_OFF** / beta | ADR-058 chatbot fix committed · staging E2E pending redeploy |
+| 12 | `influencers_pr` | **IMPLEMENTED_VERIFIED** / available | Staging E2E ALL_PASS tip e81b5034 · catalog v1.5.0 · outreach=false |
 | 13 | `ads_attribution_core` | **IMPLEMENTED_VERIFIED** (core) | spend/OAuth **BLOCKED_EXTERNAL** |
 | 14 | `community_publish_core` | **IMPLEMENTED_VERIFIED** (simulator) | real publish **BLOCKED_EXTERNAL** |
 | 15 | mass-send technical | **IMPLEMENTED_VERIFIED** (controls) | send **BLOCKED_LEGAL** (`claimReadyLegal` false) |
@@ -41,7 +41,7 @@
 
 | Verde verificado (internal cores) | Preparado OFF / pending | Bloqueado externo/CEO/legal |
 |-----------------------------------|-------------------------|------------------------------|
-| Blocks 11–25 cores internos (tabla arriba) · 13 packs+auditor staging · PWA cert · private-rag synthetic 27 tests · catalog v1.4.0 | influencers_pr staging E2E · mobile stores · pgvector live · paid observability · IA prod canary prep | Twilio/ads/publish/OAuth reales · App Store/Play · multi-region · Pepito · mass-send · claimReady |
+| Blocks 11–25 cores internos (tabla arriba) · 13 packs+auditor staging · PWA cert · private-rag synthetic 27 tests · catalog v1.4.0 |  mobile stores · pgvector live · paid observability · IA prod canary prep | Twilio/ads/publish/OAuth reales · App Store/Play · multi-region · Pepito · mass-send · claimReady |
 
 ## Competitive honesty (factual gaps — NOT parity)
 

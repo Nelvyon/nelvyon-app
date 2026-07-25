@@ -443,11 +443,11 @@ export const SERVICE_PACK_CATALOG: ServicePackDefinition[] = [
   {
     id: INFLUENCERS_PR_PACK_ID,
     slug: "influencers-pr",
-    name: "Influencers / PR OS (beta)",
+    name: "Influencers / PR OS",
     tagline: "Research de creadores, scoring y brief de outreach listos para revisión humana — sin envío real",
     category: "influencers_pr",
     verticals: ["local", "ecommerce", "b2b_saas"],
-    availability: "beta",
+    availability: "available",
     launchPackId: INFLUENCERS_PR_PACK_ID,
     kickoffPath: "/os/packs/influencers-pr",
     reportPath: "/os/packs/influencers-pr/report",

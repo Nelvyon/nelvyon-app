@@ -28,7 +28,7 @@
 
 - [x] ADR-057 Blocks 11–25 internal cores — agency **249 PASS** · tsc **0** · catalog **v1.4.0** · tip TBA
 - [x] Block 11: `TelephonyCore` simulator IMPLEMENTED_VERIFIED · real **BLOCKED_EXTERNAL**
-- [x] Block 12: `influencers-pr-pack` PREPARED_OFF/beta · unit+kickoff wired · smoke script ready
+- [x] Block 12: influencers-pr-pack IMPLEMENTED_VERIFIED / available · staging E2E ALL_PASS tip e81b5034 · outreach_authorized=false
 - [x] Block 13: `AdsAttributionCore` IMPLEMENTED_VERIFIED · spend/OAuth **BLOCKED_EXTERNAL**
 - [x] Block 14: `CommunityPublishCore` simulator IMPLEMENTED_VERIFIED · publish **BLOCKED_EXTERNAL**
 - [x] Block 15: `MassSendTechnicalControls` IMPLEMENTED_VERIFIED · send **BLOCKED_LEGAL**
@@ -52,7 +52,7 @@
 - [ ] **Legal:** Pepito dossier + licencia — `DATOS_PEPITO_LICENSE_DOSSIER.md`
 - [ ] **CEO:** IA prod canary — `CEO_IA_PROD_CANARY_REQUEST.md`
 - [ ] **Ops:** confirm staging deploy after push (tip TBA → `ideal-victory`)
-- [ ] Ops (opcional): `NELVYON_INFLUENCERS_PR_PACK=1` + staging E2E smoke Block 12
+- [x] Ops: NELVYON_INFLUENCERS_PR_PACK=1 + staging E2E smoke Block 12 ALL_PASS (tip e81b5034) -> IMPLEMENTED_VERIFIED
 - [ ] No READY · no flags productivos en prod
 
 ---
@@ -89,11 +89,11 @@
 - [x] Block 23: `docs/ops/LEGACY_CONSOLIDATION_PLAN.md` + `LegacyConsolidationAudit` — frontend/alembic/pages-api audited, zero deletes
 - [x] Ops: `pnpm -C apps/web exec vitest run backend/agency` para Blocks 18–23 → **27 files / 249 tests PASS** (confirmado en sesión Blocks 12–15) · `tsc --noEmit` **0**
 - [x] Ops: `node scripts/pwa-certify.mjs` → evidencia `pwa.cert_latest.md` **PASS**
-- [x] Block 12: pack `influencers-pr-pack` (research matching, scoring, brief outreach, contrato/checklist, metrics plan, informe) — `outreach_authorized` hardcoded false, no es red de influencers real; catalog `influencers_pr` **PREPARED_OFF**; smoke `staging-smoke-influencers-pr-e2e.mjs` (no ejecutado en staging aún) · playbook `SERVICE_INFLUENCERS_PR.md`
+- [x] Block 12: pack `influencers-pr-pack` (research matching, scoring, brief outreach, contrato/checklist, metrics plan, informe) — `outreach_authorized` hardcoded false, no es red de influencers real; catalog `influencers_pr` **IMPLEMENTED_VERIFIED (v1.5.0)**; smoke `staging-smoke-influencers-pr-e2e.mjs` (ALL_PASS tip e81b5034) · playbook `SERVICE_INFLUENCERS_PR.md`
 - [x] Block 13: `AdsAttributionCore` — campaign draft/audiencias/UTM/conversion events sintéticos, budget cap hard-fail, conectores Google/Meta/LinkedIn Ads fail-closed (`BLOCKED_EXTERNAL`/`SPEND_DISABLED`), `NELVYON_ADS_SPEND_ENABLED` default 0 · `ADS_OAUTH_SPEND_CEO_CHECKLIST.md`; catalog `ads_attribution_core` **PREPARED_OFF**
 - [x] Block 14: `CommunityPublishCore` — inbox/calendario/approval/variantes/cola/moderación/auditoría; `SimulatorPublishProvider` only, `assertPublishDisabled()` bloquea salvo oauth+CEO · `SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md`; catalog `community_publish_core` **PREPARED_OFF**
 - [x] Block 15: `MassSendTechnicalControls` (suppression/unsubscribe proof/rate limit/warming/reputation sintética/template audit) wired como campos informativos en `CampaignsLegalTechnicalGate` sin alterar `technicalComplete`/`sendAuthorized`; `claimReadyLegal` sigue false · `CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md` actualizado
-- [ ] Ops: redeploy ADR-058 → `NELVYON_INFLUENCERS_PR_PACK=1` + `staging-smoke-influencers-pr-e2e.mjs` ALL_PASS → promover `influencers_pr` IMPLEMENTED_VERIFIED
+- [x] Ops: redeploy ADR-058 → `NELVYON_INFLUENCERS_PR_PACK=1` + `staging-smoke-influencers-pr-e2e.mjs` ALL_PASS → promover `influencers_pr` IMPLEMENTED_VERIFIED
 - [x] Ops: flag `NELVYON_INFLUENCERS_PR_PACK=1` en staging (seteado) · E2E pre-ADR-058 FALLÓ QA30 · fix local listo
 - [ ] CEO: abrir/conectar 8 cuentas sociales oficiales NELVYON (`docs/ops/NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md`)
 - [ ] Legal: dossier Pepito + licencia comercial escrita (`DATOS_PEPITO_LICENSE_DOSSIER.md` + `CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`) — bloquea claimReady

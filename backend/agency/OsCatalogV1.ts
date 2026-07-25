@@ -31,12 +31,17 @@
  * `integrations_marketplace` (internal-only manifest catalog + per-tenant install
  * lifecycle, VERIFIED via the built-in `nelvyon.internal.ping` integration). No spend, no
  * real network calls, no Twilio live dial in any of the three.
+ *
+ * v1.5.0 (ADR-058): promotes `influencers_pr` → IMPLEMENTED_VERIFIED after staging E2E
+ * ALL_PASS on tip `e81b5034` (chatbot normalize + soft-continue). Outreach send remains
+ * forbidden (`outreach_authorized=false`). ads_attribution_core / community_publish_core
+ * remain PREPARED_OFF until their own E2E evidence.
  */
 
 import { OS_DELIVERABLE_FLOW, getOsProfessionalTeam, type OsTeamId } from "./OsProfessionalTeams";
 import { SOCIAL_SERVICE_FLOW } from "./OsSocialNetworksService";
 
-export const OS_CATALOG_V1_VERSION = "1.4.0" as const;
+export const OS_CATALOG_V1_VERSION = "1.5.0" as const;
 
 export type OsCatalogV1Status =
   | "IMPLEMENTED_VERIFIED"
@@ -494,9 +499,10 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     portalPath: "/portal",
     metrics: ["qa_score"],
     tests: ["apps/web/src/lib/packs/__tests__/influencersPrPacksRunners.test.ts"],
-    e2eEvidence: null,
-    status: "PREPARED_OFF",
-    nextAction: "Flag NELVYON_INFLUENCERS_PR_PACK ON en staging + smoke E2E antes de promover",
+    e2eEvidence: "scripts/docs/evidence/os-saas-e2e/modules/influencers_pr_e2e_latest.md",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "staging VERIFIED (ADR-058) · outreach_authorized=false forever until CEO+Legal · rollback NELVYON_INFLUENCERS_PR_PACK=0 · no real send",
   },
   {
     serviceId: "ads_attribution_core",
@@ -687,7 +693,7 @@ export function listOsCatalogV1(): OsCatalogV1Entry[] {
 
 export function assertOsCatalogV1Integrity(): { ok: boolean; violations: string[] } {
   const violations: string[] = [];
-  if (OS_CATALOG_V1_VERSION !== "1.4.0") violations.push("version_mismatch");
+  if (OS_CATALOG_V1_VERSION !== "1.5.0") violations.push("version_mismatch");
   for (const e of OS_CATALOG_V1) {
     if (!e.teamId) violations.push(`no_team:${e.serviceId}`);
     if (!e.playbookPath) violations.push(`no_playbook:${e.serviceId}`);

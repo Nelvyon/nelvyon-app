@@ -10,7 +10,7 @@
 | **Staging** | https://ideal-victory-staging.up.railway.app · **confirm deploy after push** |
 | **Prod** | flags **OFF** / **ABSENT** · no OpenAI · no Pepito · no credenciales reales |
 | **ADR-057 Blocks 11–25** | internal cores **IMPLEMENTED_VERIFIED** (ver matriz) · externos **BLOCKED_EXTERNAL/CEO/LEGAL** |
-| **PREPARED_OFF** | influencers_pr staging E2E · mobile stores · pgvector RAG **en staging** (local ya VERIFIED) · paid observability · private_ai_canary_prep · social oficial |
+| **PREPARED_OFF** | mobile stores · pgvector RAG **en staging** (local ya VERIFIED) · paid observability · private_ai_canary_prep · social oficial |
 | **BLOCKED_EXTERNAL** | Twilio real · ads OAuth/spend · social publish real · App Store/Play · multi-region |
 | **BLOCKED_CEO** | IA prod canary · OpenClaw prod · OpenAI · payouts · 8 cuentas oficiales |
 | **BLOCKED_LEGAL** | claimReady · mass-send · Pepito forbidden |
@@ -21,7 +21,7 @@
 | Block | Capacidad | Core | Bloqueo |
 |-------|-----------|------|---------|
 | 11 | telephony | IMPLEMENTED_VERIFIED (simulator) | real **BLOCKED_EXTERNAL** |
-| 12 | influencers_pr | PREPARED_OFF / beta | E2E QA30 fixed locally (ADR-058) · redeploy+E2E pending |
+| 12 | influencers_pr | **IMPLEMENTED_VERIFIED** / available | Staging E2E ALL_PASS tip `e81b5034` · catalog v1.5.0 · outreach=false |
 | 13 | ads_attribution | IMPLEMENTED_VERIFIED (core) | spend/OAuth **BLOCKED_EXTERNAL** |
 | 14 | community_publish | IMPLEMENTED_VERIFIED (simulator) | publish **BLOCKED_EXTERNAL** |
 | 15 | mass-send | IMPLEMENTED_VERIFIED (controls) | **BLOCKED_LEGAL** |
