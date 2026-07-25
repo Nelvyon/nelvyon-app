@@ -61,4 +61,23 @@ describe("MobileAppContract", () => {
     expect(queue?.status).toBe("IMPLEMENTED_VERIFIED");
     expect(queue?.evidence).toContain("MobileSecureSession");
   });
+
+  it("android_local_build is VERIFIED with APK assembleDebug evidence", () => {
+    const cap = getMobileCapability("android_local_build");
+    expect(cap?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(cap?.evidence).toContain("mobile.android_build_latest.md");
+    expect(cap?.blockedReason).toBeNull();
+  });
+
+  it("android device smoke stays BLOCKED_EXTERNAL until adb has a device", () => {
+    const cap = getMobileCapability("android_device_smoke");
+    expect(cap?.status).toBe("BLOCKED_EXTERNAL");
+    expect(cap?.blockedReason?.toLowerCase()).toMatch(/adb|device|emulator/);
+  });
+
+  it("never claims iOS local build or store publish is green", () => {
+    expect(getMobileCapability("ios_local_build")?.status).toBe("BLOCKED_EXTERNAL");
+    expect(getMobileCapability("ios_app_store_publish")?.status).toBe("BLOCKED_EXTERNAL");
+    expect(getMobileCapability("android_play_store_publish")?.status).toBe("BLOCKED_EXTERNAL");
+  });
 });

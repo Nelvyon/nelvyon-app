@@ -1,6 +1,7 @@
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import { logger } from "../os-agents/cron/logger";
+import { getInvoicePdfLabels, resolvePdfLocale } from "./pdfLocaleLabels";
 
 export type FacturaStatus = "draft" | "sent" | "paid" | "overdue" | "cancelled";
 
@@ -212,17 +213,24 @@ export class SaasFacturasService {
     return stats;
   }
 
-  generatePdfHtml(factura: Factura, brandName = "Nelvyon", logoUrl?: string): string {
+  generatePdfHtml(
+    factura: Factura,
+    brandName = "Nelvyon",
+    logoUrl?: string,
+    locale?: string | null,
+  ): string {
+    const L = getInvoicePdfLabels(locale);
+    const lang = resolvePdfLocale(locale);
     const fmt = (n: number) => `${n.toFixed(2)} ${factura.currency}`;
     const rows = factura.lineItems.map((i) =>
       `<tr><td>${i.description}</td><td class="r">${i.quantity}</td><td class="r">${fmt(i.unitPrice)}</td><td class="r">${fmt(i.total)}</td></tr>`
     ).join("");
 
     return `<!DOCTYPE html>
-<html lang="es">
+<html lang="${lang}">
 <head>
 <meta charset="utf-8"/>
-<title>Factura ${factura.invoiceNumber}</title>
+<title>${L.documentTitle} ${factura.invoiceNumber}</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:system-ui,sans-serif;font-size:13px;color:#111;padding:40px}
@@ -258,7 +266,7 @@ export class SaasFacturasService {
     ${logoUrl ? `<img src="${logoUrl}" alt="${brandName}" style="height:48px;margin-bottom:8px"/>` : `<div class="logo">${brandName}</div>`}
   </div>
   <div style="text-align:right">
-    <h1>FACTURA</h1>
+    <h1>${L.documentTitle}</h1>
     <div class="meta">${factura.invoiceNumber}</div>
     <span class="badge badge-${factura.status}">${factura.status}</span>
   </div>
@@ -266,20 +274,20 @@ export class SaasFacturasService {
 
 <div style="display:flex;justify-content:space-between;margin-bottom:32px">
   <div>
-    <strong>Fecha</strong><br/>
+    <strong>${L.date}</strong><br/>
     <span class="meta">${factura.createdAt.slice(0, 10)}</span>
   </div>
-  ${factura.dueDate ? `<div><strong>Vencimiento</strong><br/><span class="meta">${factura.dueDate.slice(0, 10)}</span></div>` : ""}
-  ${factura.paidAt ? `<div><strong>Pagada</strong><br/><span class="meta">${factura.paidAt.slice(0, 10)}</span></div>` : ""}
+  ${factura.dueDate ? `<div><strong>${L.dueDate}</strong><br/><span class="meta">${factura.dueDate.slice(0, 10)}</span></div>` : ""}
+  ${factura.paidAt ? `<div><strong>${L.paidAt}</strong><br/><span class="meta">${factura.paidAt.slice(0, 10)}</span></div>` : ""}
 </div>
 
 <table>
   <thead>
     <tr>
-      <th>Descripción</th>
-      <th class="r">Cant.</th>
-      <th class="r">Precio unit.</th>
-      <th class="r">Total</th>
+      <th>${L.description}</th>
+      <th class="r">${L.quantity}</th>
+      <th class="r">${L.unitPrice}</th>
+      <th class="r">${L.total}</th>
     </tr>
   </thead>
   <tbody>
@@ -289,19 +297,19 @@ export class SaasFacturasService {
 
 <div class="totals">
   <table>
-    <tr><td>Subtotal</td><td class="r">${fmt(factura.subtotal)}</td></tr>
-    <tr><td>IVA (${factura.taxRate}%)</td><td class="r">${fmt(factura.taxAmount)}</td></tr>
+    <tr><td>${L.subtotal}</td><td class="r">${fmt(factura.subtotal)}</td></tr>
+    <tr><td>${L.tax(factura.taxRate)}</td><td class="r">${fmt(factura.taxAmount)}</td></tr>
     <tr><td>TOTAL</td><td class="r">${fmt(factura.total)}</td></tr>
   </table>
 </div>
 
-${factura.notes ? `<div style="margin-top:32px"><strong>Notas</strong><p style="margin-top:8px;color:#555">${factura.notes}</p></div>` : ""}
+${factura.notes ? `<div style="margin-top:32px"><strong>${L.notes}</strong><p style="margin-top:8px;color:#555">${factura.notes}</p></div>` : ""}
 
-<div class="footer">${brandName} · Generado por Nelvyon</div>
+<div class="footer">${L.generatedBy(brandName)}</div>
 
 <div class="no-print" style="margin-top:32px;text-align:center">
   <button onclick="window.print()" style="background:#0084ff;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer">
-    Descargar PDF (Ctrl+P → Guardar como PDF)
+    ${L.downloadHint}
   </button>
 </div>
 </body>

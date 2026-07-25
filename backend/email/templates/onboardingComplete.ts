@@ -1,11 +1,18 @@
 import { renderBaseEmail } from "./_base";
+import { getOnboardingCompleteCopy } from "../localeCopy";
 
-export function onboardingCompleteTemplate(name: string, companyName: string, dashboardUrl: string): string {
+export function onboardingCompleteTemplate(
+  name: string,
+  companyName: string,
+  dashboardUrl: string,
+  locale?: string | null,
+): string {
+  const copy = getOnboardingCompleteCopy(locale);
   return renderBaseEmail(
-    `${companyName} esta lista en NELVYON`,
-    `Hola ${name}, tu empresa ${companyName} esta configurada. El OS esta listo para trabajar.`,
-    `<p style="margin:0; color:#D1D5DB;">Ya puedes lanzar servicios, flujos y campanas desde tu panel.</p>`,
-    "Ir al dashboard",
+    copy.title(companyName),
+    copy.body(name, companyName),
+    copy.detailHtml,
+    copy.cta,
     dashboardUrl,
   );
 }

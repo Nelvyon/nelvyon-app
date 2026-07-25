@@ -67,6 +67,10 @@ logs/
 *.db
 *.sqlite3
 
+# --- Mobile / Android (SDK paths must never commit) ---
+apps/mobile/android/local.properties
+**/local.properties
+
 # --- IDE / OS ---
 .idea/
 .vscode/*.local.json

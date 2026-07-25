@@ -698,3 +698,16 @@
 | **Por qué** | Staging influencers-pr E2E: `sku_chatbot` **QA 30 — escalado** → `needs_review` despite pack deliverables OK (`influencers_pr:done`). |
 | **Consecuencias** | Mesh chatbot packs (automations/reputation/influencers) resilient to invented blockers. Promote `influencers_pr` only after staging E2E ALL_PASS post-deploy. |
 | **Relación** | ADR-046 · `runPipelinePhaseC.ts` · `chatbotKbNormalize.ts` · `meshQaFixes.test.ts`. |
+
+---
+
+## ADR-059 — Catalog v1.6.0 ads/community promote + email locale PARTIAL + Android scaffold
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-25 |
+| **Decisión** | (1) OsCatalogV1 bump **v1.6.0** — promote `ads_attribution_core` + `community_publish_core` to **IMPLEMENTED_VERIFIED** on unit/core evidence (mismo patrón que `telephony_core`); OAuth/spend/publish real permanecen **BLOCKED_EXTERNAL**. (2) Email locale expand (Resend invoice/job/onboarding + SES payment_failed/cancellation es/en/fr/de/it/pt) se documenta como **PARTIAL** — no FULL_VERIFIED hasta auditoría SES catalog restante + `billing/*EmailTemplates`. PDF labels **PARTIAL**. UI catalogs fr/de/it/pt **FULL**. (3) Android Capacitor scaffold en `apps/mobile/android/` documentado como presente; APK `assembleDebug` **BLOCKED_EXTERNAL** hasta JDK/Android SDK. (4) Observability drill + legacy consolidation evidence escritas; HA single-region **VERIFIED**; multi-region **BLOCKED_EXTERNAL/COST**. (5) Sin OAuth real, sin spend, sin publish real, sin App Store/Play green, sin claimReady. |
+| **Por qué** | Cierre interno honestidad: promover solo cores demostrables; separar UI i18n FULL de email/PDF PARTIAL; no inventar verde móvil ni multi-región. |
+| **Evidencia** | Staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · catalog v1.6.0 (local tip post-commit) · `mobile.android_scaffold.md` · `observability.drill_latest.md` · `legacy.consolidation_latest.md` · `ha-dr-readiness_latest.md` · influencers E2E prior VERIFIED · private_vector_rag Docker VERIFIED / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** |
+| **Consecuencias** | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` · email/PDF **PARTIAL** · APK **BLOCKED_EXTERNAL** · multi-region **BLOCKED_EXTERNAL/COST** · próximos pasos = acciones solo Daniel en HANDOVER |
+| **Relación** | ADR-057 · ADR-058 · `OsCatalogV1.ts` · `LocalizationCore` · `MobileAppContract` · `AdsAttributionCore` · `CommunityPublishCore` |

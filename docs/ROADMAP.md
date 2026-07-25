@@ -68,7 +68,7 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
 | Beta packs → available | ✅ | 5 packs E2E ALL_PASS · ADR-050 · catalog available |
-| Agencia OS unificada élite (ops) | ✅ | ADR-055 E2E PASS staging runtime · ADR-056 P0/P1 audit fixes local · tip TBA (base `6364c28c`) |
+| Agencia OS unificada élite (ops) | ✅ | ADR-055 E2E PASS staging · ADR-056–059 · tip live **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** |
 | Redes sociales integral por cliente | ✅ | ADR-052/054 |
 | Auditor independiente staging | ✅ | 13 packs E2E + session PASS/REJECT/repair |
 | OpenClaw staging_mock | 🟡 | ADR-055 deepened · prod canary doc PENDING_CEO |
@@ -78,22 +78,23 @@
 | Visual élite strategy_only | ✅ | creative_direction + decision matrix · spend OFF |
 | Social oficial NELVYON | 🟡 | PREPARED_OFF · NelvyonOfficialSocialOps · checklist CEO |
 | Legal campañas + Pepito dossier | 🟡 | gate reforzado · claimReadyLegal hard-false · LEGAL BLOCKED · ADR-056 P0 campaign launch block |
-| ADR-056 elite absolute audit | ✅ | P0/P1 fixes · tip TBA · NOT READY |
-| **ADR-057 Blocks 11–25 (internal cores)** | ✅ | telephony · influencers · ads · publish · mass-send · OAuth · marketplace · mobile · PWA · i18n · HA/DR · observability · legacy · private RAG · AI canary PREP · catalog **v1.4.0** · agency **249 PASS** · tsc **0** · tip TBA · NOT READY |
-| Block 11 telephony_core | ✅ | simulator IMPLEMENTED_VERIFIED · real calls BLOCKED_EXTERNAL |
-| Block 12 influencers_pr | ✅ | **IMPLEMENTED_VERIFIED** · catalog v1.5.0 · tip e81b5034 ALL_PASS · outreach forbidden |
-| Block 13 ads_attribution_core | ✅ | core IMPLEMENTED_VERIFIED · spend/OAuth BLOCKED_EXTERNAL |
-| Block 14 community_publish_core | ✅ | simulator IMPLEMENTED_VERIFIED · publish BLOCKED_EXTERNAL |
+| ADR-056 elite absolute audit | ✅ | P0/P1 fixes · NOT READY |
+| **ADR-057 Blocks 11–25 (internal cores)** | ✅ | cores internos VERIFIED · externos BLOCKED_* · **NOT READY** |
+| **ADR-059 catalog v1.6.0 + i18n/mobile honesty** | ✅ | ads/community promote (core/sim) · email locale PARTIAL · Android scaffold · tip live `5adbfcd2` · local tip post-commit |
+| Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |
+| Block 12 influencers_pr | ✅ | **VERIFIED** · outreach forbidden |
+| Block 13 ads_attribution_core | ✅ | **VERIFIED** (core) · spend/OAuth BLOCKED_EXTERNAL · catalog v1.6.0 |
+| Block 14 community_publish_core | ✅ | **VERIFIED** (sim) · publish BLOCKED_EXTERNAL · catalog v1.6.0 |
 | Block 15 mass-send technical | ✅ | controls IMPLEMENTED_VERIFIED · send BLOCKED_LEGAL |
-| Block 16 oauth_multitenant | ✅ | framework+mock IMPLEMENTED_VERIFIED · real apps BLOCKED_EXTERNAL |
-| Block 17 integrations_marketplace | ✅ | internal ping IMPLEMENTED_VERIFIED |
-| Block 18 mobile Capacitor | 🟡 | shell VERIFIED · android local BLOCKED_EXTERNAL · stores BLOCKED_EXTERNAL |
-| Block 19 PWA | ✅ | Chrome/Windows verified · iOS Safari BLOCKED_EXTERNAL |
-| Block 20 localization | ✅ | es/en/fr/de/it/pt UI FULL_VERIFIED · email/PDF ES-only |
-| Block 21 HA/DR | ✅ | runbook+checks · multi-region BLOCKED_EXTERNAL |
-| Block 22 observability | ✅ | local core · paid vendors PREPARED_OFF |
-| Block 23 legacy consolidation | ✅ | audit+plan · zero unsafe deletes |
-| Block 24 private_vector_rag | ✅ | synthetic IMPLEMENTED_VERIFIED (27 tests) · pgvector real local VERIFIED en vivo 2026-07-25 (Docker+Ollama, aislamiento app+RLS) · staging PREPARED_OFF · gap P2 minScore documentado |
+| Block 16 oauth_multitenant | ✅ | **VERIFIED** (mock) · real apps BLOCKED_EXTERNAL |
+| Block 17 integrations_marketplace | ✅ | **VERIFIED** (internal ping) |
+| Block 18 mobile Capacitor | 🟡 | scaffold present · APK BLOCKED_EXTERNAL · stores BLOCKED_EXTERNAL |
+| Block 19 PWA | ✅ | Chrome VERIFIED · iOS BLOCKED |
+| Block 20 localization | 🟡 | UI FULL · email/PDF PARTIAL |
+| Block 21 HA/DR | ✅ | single-region VERIFIED · multi-region BLOCKED_EXTERNAL/COST |
+| Block 22 observability | ✅ | local VERIFIED · paid PREPARED_OFF |
+| Block 23 legacy consolidation | ✅ | VERIFIED · zero unsafe deletes |
+| Block 24 private_vector_rag | ✅ | Docker VERIFIED · Railway PREPARED_OFF · P2 minScore |
 | Block 25 private_ai_canary_prep | 🟡 | PREPARED_OFF · BLOCKED_CEO |
 
 ---

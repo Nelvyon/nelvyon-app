@@ -1,11 +1,11 @@
 import { renderBaseEmail } from "./_base";
+import { getPasswordResetCopy } from "../localeCopy";
 
-export function passwordResetTemplate(name: string, resetUrl: string): string {
-  return renderBaseEmail(
-    "Restablece tu contrasena NELVYON",
-    `Hola ${name}, has solicitado restablecer tu contrasena.`,
-    `<p style="margin:0; color:#D1D5DB;">Este enlace expira en 1 hora.</p>`,
-    "Restablecer contrasena",
-    resetUrl,
-  );
+export function passwordResetTemplate(
+  name: string,
+  resetUrl: string,
+  locale?: string | null,
+): string {
+  const copy = getPasswordResetCopy(locale);
+  return renderBaseEmail(copy.title, copy.body(name), copy.detailHtml, copy.cta, resetUrl);
 }

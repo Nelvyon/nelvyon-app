@@ -6,18 +6,18 @@
     "cta_secondary": "Voir les services"
   },
   "pricing": {
-    "title": "Planes NELVYON",
+    "title": "Plans NELVYON",
     "starter": "STARTER",
     "pro": "PRO",
     "enterprise": "ENTERPRISE",
-    "monthly": "Mensual",
-    "annual": "Anual (2 meses gratis)",
-    "most_popular": "Más popular"
+    "monthly": "Mensuel",
+    "annual": "Annuel (2 mois offerts)",
+    "most_popular": "Le plus populaire"
   },
   "partners": {
-    "title": "Gana vendiendo NELVYON",
-    "subtitle": "30% de comisión mensual por cada cliente que traigas. Sin límite de ganancias. Sin coste de entrada.",
-    "how_it_works": "Cómo funciona"
+    "title": "Gagnez en vendant NELVYON",
+    "subtitle": "30% de commission mensuelle pour chaque client apporté. Gains illimités. Sans frais d'entrée.",
+    "how_it_works": "Comment ça marche"
   },
   "nav": {
     "services": "Services",
@@ -30,19 +30,19 @@
   },
   "auth": {
     "login": {
-      "title": "Entrar a NELVYON OS",
+      "title": "Connexion à NELVYON OS",
       "email": "Email",
-      "password": "Contraseña",
-      "submit": "Entrar",
-      "no_account": "¿Sin cuenta?"
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "no_account": "Pas encore de compte ?"
     },
     "register": {
-      "title": "Crear cuenta",
-      "name": "Nombre completo",
+      "title": "Créer un compte",
+      "name": "Nom complet",
       "email": "Email",
-      "password": "Contraseña",
-      "submit": "Crear cuenta",
-      "has_account": "¿Ya tienes cuenta?"
+      "password": "Mot de passe",
+      "submit": "Créer un compte",
+      "has_account": "Vous avez déjà un compte ?"
     }
   },
   "dashboard": {
@@ -56,44 +56,44 @@
     "quick_actions": "Actions rapides"
   },
   "crm": {
-    "title": "CRM integrado",
-    "contacts": "Contactos",
+    "title": "CRM intégré",
+    "contacts": "Contacts",
     "pipeline": "Pipeline",
-    "new_contact": "Nuevo contacto",
-    "search": "Buscar nombre o email",
-    "filter": "Filtro",
-    "no_contacts": "No hay contactos todavía."
+    "new_contact": "Nouveau contact",
+    "search": "Rechercher nom ou email",
+    "filter": "Filtre",
+    "no_contacts": "Aucun contact pour le moment."
   },
   "workflows": {
     "title": "Workflows",
-    "new_workflow": "Nuevo workflow",
-    "no_workflows": "No hay workflows",
+    "new_workflow": "Nouveau workflow",
+    "no_workflows": "Aucun workflow",
     "status": {
-      "draft": "Borrador",
-      "active": "Activo",
-      "paused": "Pausado"
+      "draft": "Brouillon",
+      "active": "Actif",
+      "paused": "En pause"
     }
   },
   "campanias": {
-    "title": "Campañas",
-    "new": "Nueva campaña",
-    "no_campanias": "No hay campañas",
+    "title": "Campagnes",
+    "new": "Nouvelle campagne",
+    "no_campanias": "Aucune campagne",
     "status": {
-      "draft": "Borrador",
-      "running": "En ejecución",
-      "completed": "Completada"
+      "draft": "Brouillon",
+      "running": "En cours",
+      "completed": "Terminée"
     }
   },
   "admin": {
     "title": "Admin",
     "tenants": "Tenants",
     "jobs": "Jobs",
-    "activity": "Actividad",
+    "activity": "Activité",
     "stats": {
-      "total_tenants": "Tenants totales",
-      "active_tenants": "Tenants activos",
-      "total_jobs": "Jobs totales",
-      "running_jobs": "Jobs en ejecución"
+      "total_tenants": "Total des tenants",
+      "active_tenants": "Tenants actifs",
+      "total_jobs": "Total des jobs",
+      "running_jobs": "Jobs en cours"
     }
   },
   "common": {
@@ -115,17 +115,17 @@
   },
   "os": {
     "execution": {
-      "title": "Ejecución OS",
-      "no_jobs": "No hay jobs"
+      "title": "Exécution OS",
+      "no_jobs": "Aucun job"
     },
     "intake": {
-      "title": "Intake de servicio"
+      "title": "Intake de service"
     },
     "status": {
-      "pending": "Pendiente",
-      "running": "En ejecución",
-      "completed": "Completado",
-      "failed": "Fallido"
+      "pending": "En attente",
+      "running": "En cours",
+      "completed": "Terminé",
+      "failed": "Échoué"
     }
   },
   "shell": {

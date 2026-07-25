@@ -3,10 +3,11 @@
 import { useEffect } from "react";
 
 import { useLocaleContext } from "@/core/i18n/LocaleProvider";
+import { resolveBootstrapLocale } from "@/core/i18n/resolveBootstrapLocale";
 import { localeSettingsApi } from "@/features/settings/localeApi";
 import { isAppLocale } from "../../../i18n";
 
-/** Load workspace timezone + user language from API after auth is ready. */
+/** Load workspace timezone + locale from API after auth is ready. */
 export function RegionBootstrap() {
   const { setTimezone, setDateFormat, setLocale, locale } = useLocaleContext();
 
@@ -16,8 +17,15 @@ export function RegionBootstrap() {
       .then((r) => {
         if (r.timezone) setTimezone(r.timezone);
         if (r.date_format) setDateFormat(r.date_format);
-        if (r.language && isAppLocale(r.language) && r.language !== locale) {
-          void setLocale(r.language);
+        // Precedence: workspace locale > user language > cookie > es.
+        // Cookie remains the source when the API call fails (catch below).
+        const resolved = resolveBootstrapLocale({
+          workspaceLocale: r.workspace_locale,
+          userLanguage: r.language,
+          cookieLocale: locale,
+        });
+        if (isAppLocale(resolved) && resolved !== locale) {
+          void setLocale(resolved);
         }
       })
       .catch(() => undefined);

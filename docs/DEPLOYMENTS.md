@@ -1,6 +1,18 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-24** (ADR-057). No borrar entradas. Añadir al inicio.
+> Registrar cada deploy significativo. Actualizado: **2026-07-25** (cierre interno). No borrar entradas. Añadir al inicio.
+
+## 2026-07-25 — Staging tip confirm (cierre interno)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Tip / live** | **`5adbfcd2`** · `git_sha=5adbfcd2` |
+| **Deploy** | **`d5caafc0` SUCCESS** |
+| **Flags** | `AUTONOMOUS_ALLOW_OPENAI=0` · prod canary OFF · ads spend 0 |
+| **Catalog** | Live tip may precede local **v1.6.0** tip (catalog/i18n/obs/mobile scaffold post-commit local) |
+| **claimReady** | **false** · **NOT READY** · **CONDITIONAL_READY** |
+| **Nota** | Staging tip **confirmado** para cierre interno; no inventar multi-región ni Railway pgvector |
 
 ## 2026-07-24 — ADR-057 Blocks 11–25 complete (local · deploy pending)
 

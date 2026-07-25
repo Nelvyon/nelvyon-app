@@ -1,5 +1,7 @@
 # pgvector RAG — live e2e (Docker Postgres+pgvector + Ollama embeddings)
 
+> **Nota sesión 2026-07-25 ~11:27Z:** re-run **BLOCKED** (Docker Desktop down). Este archivo conserva el último **VERIFIED**. Ver `pgvector-rag.rerun_blocked_latest.md`. Railway pgvector sigue **PREPARED_OFF**.
+
 | Campo | Valor |
 |-------|-------|
 | Fecha | 2026-07-25T01:13:45.969Z |

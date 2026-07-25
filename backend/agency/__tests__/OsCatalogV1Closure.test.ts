@@ -156,7 +156,7 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
   }, 30_000);
 
   it("OS Catalog v1 is versioned and honest", () => {
-    expect(OS_CATALOG_V1_VERSION).toBe("1.5.0");
+    expect(OS_CATALOG_V1_VERSION).toBe("1.6.0");
     const check = assertOsCatalogV1Integrity();
     expect(check.violations).toEqual([]);
     expect(listOsCatalogV1().length).toBeGreaterThanOrEqual(15);
@@ -174,9 +174,13 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
     expect(influencersPr?.kickoffPackIds).toContain("influencers-pr-pack");
     expect(influencersPr?.e2eEvidence).toMatch(/influencers_pr_e2e_latest/);
     const adsCore = listOsCatalogV1().find((e) => e.serviceId === "ads_attribution_core");
-    expect(adsCore?.status).toBe("PREPARED_OFF");
+    expect(adsCore?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(adsCore?.e2eEvidence).toMatch(/AdsAttributionCore\.test\.ts/);
+    expect(adsCore?.nextAction).toMatch(/BLOCKED_EXTERNAL/);
     const communityCore = listOsCatalogV1().find((e) => e.serviceId === "community_publish_core");
-    expect(communityCore?.status).toBe("PREPARED_OFF");
+    expect(communityCore?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(communityCore?.e2eEvidence).toMatch(/CommunityPublishCore\.test\.ts/);
+    expect(communityCore?.nextAction).toMatch(/BLOCKED_EXTERNAL/);
     const telephonyCore = listOsCatalogV1().find((e) => e.serviceId === "telephony_core");
     expect(telephonyCore?.status).toBe("IMPLEMENTED_VERIFIED");
     expect(telephonyCore?.nextAction).toMatch(/BLOCKED_EXTERNAL/);

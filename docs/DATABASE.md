@@ -1,16 +1,16 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: 2026-07-24 — **ADR-057 Blocks 11–25** · **sin migración nueva** · tip **TBA**
+> Actualizado: **2026-07-25** — cierre interno · **sin migración nueva** · staging tip **`5adbfcd2`**
 
 ---
 
-## ADR-057 — notas schema
+## ADR-057/059 — notas schema
 
 | Campo | Valor |
 |-------|-------|
 | **Migración nueva** | **No** — última sigue `518_workflows_list_columns.sql` |
-| **Cambios código** | Blocks 11–25 agency cores (telephony, ads, publish, OAuth, marketplace, mobile contract, PWA, i18n, HA/DR, observability, legacy audit, private RAG synthetic, AI canary prep) — **sin cambios schema** |
-| **Private RAG (Block 24)** | `PrivateVectorRagCore` in-process synthetic — **no** tablas pgvector productivas tocadas · pgvector Docker **PREPARED_OFF** |
+| **Cambios código** | Blocks 11–25 agency cores + catalog v1.6.0 — **sin cambios schema** |
+| **Private RAG (Block 24)** | Docker local pgvector path **VERIFIED** (2026-07-25) · **Railway pgvector PREPARED_OFF** (no provisionado en staging/prod Railway) · P2 minScore documentado |
 | **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` · **untouched** |
 
 ## ADR-056 — notas schema

@@ -165,4 +165,13 @@ describe("SaasFacturasService — generatePdfHtml", () => {
     expect(html).toContain("21%");
     expect(html).toContain("605.00 EUR");
   });
+
+  it("uses English labels when locale=en", () => {
+    const svc = new SaasFacturasService();
+    const html = svc.generatePdfHtml(baseFactura as unknown as Factura, "TestAgency", undefined, "en");
+    expect(html).toContain("INVOICE");
+    expect(html).toContain("Description");
+    expect(html).toContain("Tax (21%)");
+    expect(html).not.toContain("FACTURA");
+  });
 });

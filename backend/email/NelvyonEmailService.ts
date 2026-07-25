@@ -1,5 +1,12 @@
 import { Resend } from "resend";
 
+import {
+  getInvoiceCopy,
+  getJobCompletedCopy,
+  getOnboardingCompleteCopy,
+  getPasswordResetCopy,
+  getWelcomeCopy,
+} from "./localeCopy";
 import { invoiceTemplate } from "./templates/invoice";
 import { jobCompletedTemplate } from "./templates/jobCompleted";
 import { onboardingCompleteTemplate } from "./templates/onboardingComplete";
@@ -59,35 +66,85 @@ export class NelvyonEmailService {
     }
   }
 
-  async sendWelcome(to: string, name: string, companyName: string): Promise<EmailResult> {
+  async sendWelcome(
+    to: string,
+    name: string,
+    companyName: string,
+    locale?: string | null,
+  ): Promise<EmailResult> {
     const onboardingUrl = `${process.env.APP_URL ?? "https://app.nelvyon.com"}/saas/onboarding`;
-    return this.sendEmail("welcome", to, `Bienvenido a NELVYON, ${name}`, welcomeTemplate(name, companyName, onboardingUrl));
-  }
-
-  async sendJobCompleted(to: string, name: string, serviceId: string, jobId: string, summary: string): Promise<EmailResult> {
-    const jobUrl = `${process.env.APP_URL ?? "https://app.nelvyon.com"}/os/jobs/${jobId}`;
+    const copy = getWelcomeCopy(locale);
     return this.sendEmail(
-      "job_completed",
+      "welcome",
       to,
-      `Tu servicio ${serviceId} esta listo`,
-      jobCompletedTemplate(name, serviceId, jobId, summary, jobUrl),
+      copy.subject(name),
+      welcomeTemplate(name, companyName, onboardingUrl, locale),
     );
   }
 
-  async sendInvoice(to: string, name: string, plan: string, amount: number, invoiceUrl: string): Promise<EmailResult> {
-    return this.sendEmail("invoice", to, `Factura NELVYON - Plan ${plan}`, invoiceTemplate(name, plan, amount, invoiceUrl));
+  async sendJobCompleted(
+    to: string,
+    name: string,
+    serviceId: string,
+    jobId: string,
+    summary: string,
+    locale?: string | null,
+  ): Promise<EmailResult> {
+    const jobUrl = `${process.env.APP_URL ?? "https://app.nelvyon.com"}/os/jobs/${jobId}`;
+    const copy = getJobCompletedCopy(locale);
+    return this.sendEmail(
+      "job_completed",
+      to,
+      copy.subject(serviceId),
+      jobCompletedTemplate(name, serviceId, jobId, summary, jobUrl, locale),
+    );
   }
 
-  async sendPasswordReset(to: string, name: string, resetUrl: string): Promise<EmailResult> {
-    return this.sendEmail("password_reset", to, "Restablece tu contrasena NELVYON", passwordResetTemplate(name, resetUrl));
+  async sendInvoice(
+    to: string,
+    name: string,
+    plan: string,
+    amount: number,
+    invoiceUrl: string,
+    locale?: string | null,
+  ): Promise<EmailResult> {
+    const copy = getInvoiceCopy(locale);
+    return this.sendEmail(
+      "invoice",
+      to,
+      copy.subject(plan),
+      invoiceTemplate(name, plan, amount, invoiceUrl, locale),
+    );
   }
 
-  async sendOnboardingComplete(to: string, name: string, companyName: string, dashboardUrl: string): Promise<EmailResult> {
+  async sendPasswordReset(
+    to: string,
+    name: string,
+    resetUrl: string,
+    locale?: string | null,
+  ): Promise<EmailResult> {
+    const copy = getPasswordResetCopy(locale);
+    return this.sendEmail(
+      "password_reset",
+      to,
+      copy.subject,
+      passwordResetTemplate(name, resetUrl, locale),
+    );
+  }
+
+  async sendOnboardingComplete(
+    to: string,
+    name: string,
+    companyName: string,
+    dashboardUrl: string,
+    locale?: string | null,
+  ): Promise<EmailResult> {
+    const copy = getOnboardingCompleteCopy(locale);
     return this.sendEmail(
       "onboarding_complete",
       to,
-      `${companyName} esta lista en NELVYON`,
-      onboardingCompleteTemplate(name, companyName, dashboardUrl),
+      copy.subject(companyName),
+      onboardingCompleteTemplate(name, companyName, dashboardUrl, locale),
     );
   }
 }

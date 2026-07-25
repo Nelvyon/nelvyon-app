@@ -1,11 +1,18 @@
 import { renderBaseEmail } from "./_base";
+import { getWelcomeCopy } from "../localeCopy";
 
-export function welcomeTemplate(name: string, companyName: string, onboardingUrl: string): string {
+export function welcomeTemplate(
+  name: string,
+  companyName: string,
+  onboardingUrl: string,
+  locale?: string | null,
+): string {
+  const copy = getWelcomeCopy(locale);
   return renderBaseEmail(
-    `Bienvenido a NELVYON, ${name}`,
-    `Tu cuenta en ${companyName} esta activa. Completa tu onboarding para empezar.`,
-    `<p style="margin:0; color:#D1D5DB;">Activa tu espacio y configura tus primeros servicios premium.</p>`,
-    "Ir al onboarding",
+    copy.title(name),
+    copy.body(companyName),
+    copy.detailHtml,
+    copy.cta,
     onboardingUrl,
   );
 }

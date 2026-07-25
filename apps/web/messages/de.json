@@ -6,18 +6,18 @@
     "cta_secondary": "Services ansehen"
   },
   "pricing": {
-    "title": "Planes NELVYON",
+    "title": "NELVYON-Pläne",
     "starter": "STARTER",
     "pro": "PRO",
     "enterprise": "ENTERPRISE",
-    "monthly": "Mensual",
-    "annual": "Anual (2 meses gratis)",
-    "most_popular": "Más popular"
+    "monthly": "Monatlich",
+    "annual": "Jährlich (2 Monate gratis)",
+    "most_popular": "Beliebteste"
   },
   "partners": {
-    "title": "Gana vendiendo NELVYON",
-    "subtitle": "30% de comisión mensual por cada cliente que traigas. Sin límite de ganancias. Sin coste de entrada.",
-    "how_it_works": "Cómo funciona"
+    "title": "Verdienen Sie mit dem Verkauf von NELVYON",
+    "subtitle": "30% monatliche Provision für jeden geworbenen Kunden. Unbegrenzte Einnahmen. Keine Einstiegskosten.",
+    "how_it_works": "So funktioniert's"
   },
   "nav": {
     "services": "Services",
@@ -30,19 +30,19 @@
   },
   "auth": {
     "login": {
-      "title": "Entrar a NELVYON OS",
-      "email": "Email",
-      "password": "Contraseña",
-      "submit": "Entrar",
-      "no_account": "¿Sin cuenta?"
+      "title": "Bei NELVYON OS anmelden",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "submit": "Anmelden",
+      "no_account": "Noch kein Konto?"
     },
     "register": {
-      "title": "Crear cuenta",
-      "name": "Nombre completo",
-      "email": "Email",
-      "password": "Contraseña",
-      "submit": "Crear cuenta",
-      "has_account": "¿Ya tienes cuenta?"
+      "title": "Konto erstellen",
+      "name": "Vollständiger Name",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "submit": "Konto erstellen",
+      "has_account": "Bereits ein Konto?"
     }
   },
   "dashboard": {
@@ -56,44 +56,44 @@
     "quick_actions": "Schnellaktionen"
   },
   "crm": {
-    "title": "CRM integrado",
-    "contacts": "Contactos",
+    "title": "Integriertes CRM",
+    "contacts": "Kontakte",
     "pipeline": "Pipeline",
-    "new_contact": "Nuevo contacto",
-    "search": "Buscar nombre o email",
-    "filter": "Filtro",
-    "no_contacts": "No hay contactos todavía."
+    "new_contact": "Neuer Kontakt",
+    "search": "Name oder E-Mail suchen",
+    "filter": "Filter",
+    "no_contacts": "Noch keine Kontakte."
   },
   "workflows": {
     "title": "Workflows",
-    "new_workflow": "Nuevo workflow",
-    "no_workflows": "No hay workflows",
+    "new_workflow": "Neuer Workflow",
+    "no_workflows": "Keine Workflows",
     "status": {
-      "draft": "Borrador",
-      "active": "Activo",
-      "paused": "Pausado"
+      "draft": "Entwurf",
+      "active": "Aktiv",
+      "paused": "Pausiert"
     }
   },
   "campanias": {
-    "title": "Campañas",
-    "new": "Nueva campaña",
-    "no_campanias": "No hay campañas",
+    "title": "Kampagnen",
+    "new": "Neue Kampagne",
+    "no_campanias": "Keine Kampagnen",
     "status": {
-      "draft": "Borrador",
-      "running": "En ejecución",
-      "completed": "Completada"
+      "draft": "Entwurf",
+      "running": "Läuft",
+      "completed": "Abgeschlossen"
     }
   },
   "admin": {
     "title": "Admin",
     "tenants": "Tenants",
     "jobs": "Jobs",
-    "activity": "Actividad",
+    "activity": "Aktivität",
     "stats": {
-      "total_tenants": "Tenants totales",
-      "active_tenants": "Tenants activos",
-      "total_jobs": "Jobs totales",
-      "running_jobs": "Jobs en ejecución"
+      "total_tenants": "Tenants gesamt",
+      "active_tenants": "Aktive Tenants",
+      "total_jobs": "Jobs gesamt",
+      "running_jobs": "Laufende Jobs"
     }
   },
   "common": {
@@ -115,17 +115,17 @@
   },
   "os": {
     "execution": {
-      "title": "Ejecución OS",
-      "no_jobs": "No hay jobs"
+      "title": "OS-Ausführung",
+      "no_jobs": "Keine Jobs"
     },
     "intake": {
-      "title": "Intake de servicio"
+      "title": "Service-Intake"
     },
     "status": {
-      "pending": "Pendiente",
-      "running": "En ejecución",
-      "completed": "Completado",
-      "failed": "Fallido"
+      "pending": "Ausstehend",
+      "running": "Läuft",
+      "completed": "Abgeschlossen",
+      "failed": "Fehlgeschlagen"
     }
   },
   "shell": {

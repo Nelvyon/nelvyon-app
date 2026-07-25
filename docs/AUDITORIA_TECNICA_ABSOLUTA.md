@@ -1,49 +1,47 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> Fecha: **2026-07-24** (**ADR-057 Blocks 11–25 complete**) · tip **TBA** · claimReady false  
+> Fecha: **2026-07-25** (cierre interno honestidad) · tip live **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · claimReady false  
 > Veredicto: **CONDITIONAL_READY** · **NOT READY**  
-> SSOT: `OS_ELITE_STATE_MATRIX.md` · `OS_CATALOG_V1.md` v**1.4.0** · ADR-057
+> SSOT: `HANDOVER.md` · `OS_CATALOG_V1.md` v**1.6.0** · ADR-059
 
 ### Matriz estricta
 
 | Dimensión | Estado |
 |-----------|--------|
-| VERDE VERIFICADO (internal cores) | ADR-057 Blocks 11–25 · 13 packs+auditor staging · `tsc` **0** · agency **249 PASS** · PWA cert · private-rag 27 tests |
-| PREPARADO OFF | mobile stores · pgvector live · paid observability · private_ai_canary_prep · social oficial |
-| BLOQUEO EXTERNO | Twilio real · ads OAuth/spend · social publish · App Store/Play · multi-region |
+| VERDE VERIFICADO | influencers · ads_attribution (core) · community_publish (sim) · telephony (sim) · oauth (mock) · marketplace · RAG Docker · PWA Chrome · HA single-region · obs local · legacy (0 deletes) · localization UI FULL |
+| PREPARADO OFF | Railway pgvector · private_ai_canary · paid observability · social oficial |
+| PARTIAL | email + PDF locale |
+| BLOQUEO EXTERNO | Twilio real · ads OAuth/spend · social publish · APK SDK · App Store/Play · iOS PWA · multi-region **COST** |
 | BLOQUEO CEO | IA prod canary · OpenClaw prod · OpenAI · payouts · 8 cuentas oficiales |
 | BLOQUEO LEGAL | claimReady · mass-send · Pepito forbidden |
 | COSTES | 0 |
-| Prod | flags **OFF** / **ABSENT** |
+| Prod | flags **OFF** / **ABSENT** · `AUTONOMOUS_ALLOW_OPENAI=0` (staging) |
 
-### ADR-057 — Blocks 11–25
+### Capacidades (2026-07-25)
 
-| Block | Capacidad | Core | Bloqueo |
-|-------|-----------|------|---------|
-| 11 | telephony_core | IMPLEMENTED_VERIFIED (simulator) | real **BLOCKED_EXTERNAL** |
-| 12 | influencers_pr | **IMPLEMENTED_VERIFIED** / available | Staging E2E ALL_PASS tip e81b5034 · catalog v1.5.0 · outreach=false |
-| 13 | ads_attribution_core | IMPLEMENTED_VERIFIED (core) | spend/OAuth **BLOCKED_EXTERNAL** |
-| 14 | community_publish_core | IMPLEMENTED_VERIFIED (simulator) | publish **BLOCKED_EXTERNAL** |
-| 15 | mass-send technical | IMPLEMENTED_VERIFIED (controls) | **BLOCKED_LEGAL** |
-| 16 | oauth_multitenant | IMPLEMENTED_VERIFIED (mock) | real apps **BLOCKED_EXTERNAL** |
-| 17 | integrations_marketplace | IMPLEMENTED_VERIFIED (internal ping) | — |
-| 18 | mobile Capacitor | shell VERIFIED · android local **BLOCKED_EXTERNAL** | stores **BLOCKED_EXTERNAL** |
-| 19 | PWA | IMPLEMENTED_VERIFIED (Chrome/Windows) | iOS **BLOCKED_EXTERNAL** |
-| 20 | localization | IMPLEMENTED_VERIFIED (es/en/fr/de/it/pt UI) | email/PDF ES-only |
-| 21 | HA/DR | IMPLEMENTED_VERIFIED (runbook) | multi-region **BLOCKED_EXTERNAL** |
-| 22 | observability | IMPLEMENTED_VERIFIED (local) | paid **PREPARED_OFF** |
-| 23 | legacy consolidation | IMPLEMENTED_VERIFIED (audit) | zero deletes |
-| 24 | private_vector_rag | IMPLEMENTED_VERIFIED (Docker live) | Railway staging **PREPARED_OFF** |
-| 25 | private_ai_canary_prep | PREPARED_OFF | **BLOCKED_CEO** |
+| Capacidad | Core | Bloqueo |
+|-----------|------|---------|
+| influencers_pr | **VERIFIED** | outreach forbidden |
+| ads_attribution_core | **VERIFIED** (core) | OAuth/spend **BLOCKED_EXTERNAL** |
+| community_publish_core | **VERIFIED** (sim) | publish **BLOCKED_EXTERNAL** |
+| telephony_core | **VERIFIED** (sim) | Twilio **BLOCKED_EXTERNAL** |
+| oauth_multitenant | **VERIFIED** (mock) | real apps **BLOCKED_EXTERNAL** |
+| integrations_marketplace | **VERIFIED** | — |
+| private_vector_rag | Docker **VERIFIED** | Railway **PREPARED_OFF** · P2 minScore |
+| private_ai_canary | **PREPARED_OFF** | **BLOCKED_CEO** |
+| localization UI | **FULL** | email/PDF **PARTIAL** |
+| PWA | Chrome **VERIFIED** | iOS **BLOCKED** |
+| mobile | scaffold present | APK **BLOCKED_EXTERNAL** |
+| HA/DR | single-region **VERIFIED** | multi-region **BLOCKED_EXTERNAL/COST** |
+| observability | local **VERIFIED** | paid **PREPARED_OFF** |
+| legacy | **VERIFIED** | zero deletes |
 
-### Evidencia (2026-07-24)
+### Evidencia
 
-- `tsc --noEmit` **0**
-- `vitest run backend/agency` **249 PASS**
-- influencers pack tests **PASS**
-- `pwa-certify` **PASS** → `pwa.cert_latest.md`
-- private-rag synthetic **ALL_PASS** (27 tests) → `private-rag.synthetic_latest.md`
-- staging https://ideal-victory-staging.up.railway.app
+- Staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS**
+- Catalog **v1.6.0** (local tip post-commit: i18n + obs + mobile scaffold)
+- `claimReady: false` · **NOT READY**
+- Sin OAuth real inventado · sin multi-región activa · Railway pgvector **PREPARED_OFF**
 
 ---
 
@@ -73,34 +71,30 @@ Barrido del monorepo (código, no solo docs) en:
 | Área | Alcance |
 |------|---------|
 | Arquitectura | SaaS / OS / Portal / BFF / FastAPI proxy / Shared Memory / Private AI |
-| Agency cores ADR-057 | Blocks 11–25 · telephony · ads · publish · OAuth · marketplace · mobile · PWA · i18n · HA/DR · observability · legacy · RAG · canary prep |
-| APIs & BFF | `/api/saas/*`, `/api/platform/*`, `/api/v1/*`, `/api/reports/*`, honesty `bffDegraded` |
-| AuthZ | `requireSaasContext`, `requirePlatformClaims`, CSRF Origin, CRON_SECRET |
-| Multi-tenancy / RLS | mig **515** Shared Memory RLS |
-| IA | Router health · OpenClaw SSOT · Private RAG synthetic |
-| Campañas legal gate | `CampaignsLegalTechnicalGate` · mass-send **BLOCKED_LEGAL** |
-| Scripts / CI | staging smokes · verify-all · security-gates |
-| Docs | HANDOVER · CHANGELOG · OS_ELITE_STATE_MATRIX · OS_CATALOG_V1 |
+| Agency cores | Blocks 11–25 · catalog v1.6.0 · ADR-059 |
+| APIs & BFF | `/api/saas/*`, `/api/platform/*`, honesty fail-closed |
+| AuthZ | `requireSaasContext`, `requirePlatformClaims`, CSRF Origin |
+| IA | Router · OpenClaw · Private RAG Docker · canary PREP |
+| Campañas legal gate | mass-send **BLOCKED_LEGAL** |
+| Docs | HANDOVER · CHANGELOG · CTO_FINAL_VERIFY · OS_CATALOG_V1 |
 
 ---
 
 ## Próximo paso EXACTO
 
-1. CEO checklists: telephony · OAuth apps · ads · social publish · mobile stores · Pepito legal · IA prod canary  
-2. Ops: **confirm staging deploy after push**  
-3. **No READY**
+1. Acciones solo Daniel — lista en `HANDOVER.md`  
+2. **No READY** · `claimReady: false`
 
 SSOT: `HANDOVER.md` · `CTO_FINAL_VERIFY.md`
 
 ---
 
-## Histórico (ADR-056 y auditorías previas)
+## Histórico (ADR-056/057 y auditorías previas)
 
-Hallazgos P0/P1 ADR-056, barrido BFF/API multi-tenant, y cierres ADR-054/055 permanecen documentados en:
+Hallazgos P0/P1 ADR-056, Blocks 11–25 ADR-057, y cierres ADR-054/055 permanecen documentados en:
 
-- `docs/DECISIONS.md` (ADR-056 · ADR-055 · ADR-054)
-- `docs/CHANGELOG.md` (entradas 2026-07-24)
-- `scripts/docs/evidence/os-saas-e2e/modules/automations_reputation_e2e_latest.md`
-- `scripts/docs/evidence/os-saas-e2e/modules/auditor.all_packs_e2e_latest.md`
+- `docs/DECISIONS.md` (ADR-059 · ADR-058 · ADR-057 · ADR-056 · ADR-055 · ADR-054)
+- `docs/CHANGELOG.md`
+- evidencias en `scripts/docs/evidence/os-saas-e2e/modules/`
 
-No se elimina historial; esta sección prioriza el estado **ADR-057 Blocks 11–25** como SSOT operativo actual.
+No se elimina historial; esta sección prioriza el **cierre interno 2026-07-25** como SSOT operativo actual.

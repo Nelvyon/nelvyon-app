@@ -3,15 +3,19 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   CRITICAL_MESSAGE_NAMESPACES,
+  KNOWN_SPANISH_LEFTOVER_KEYS,
   LOCALIZATION_FALLBACK_LOCALE,
   LOCALE_CATALOG,
   assertLocalizationCoreIntegrity,
+  computeAllMessageKeyDiffs,
   computeCriticalMessageKeyDiffs,
   computeMessageKeyDiff,
+  findIdenticalToEsLeftovers,
   flattenMessageKeys,
   formatCurrency,
   formatDateInTimezone,
   getLocale,
+  getMessageByPath,
   isSupportedLocale,
   listFullyVerifiedLocales,
   listLocales,
@@ -26,19 +30,22 @@ describe("LocalizationCore", () => {
     expect(assertLocalizationCoreIntegrity()).toEqual({ ok: true, violations: [] });
   });
 
-  it("declares es, en, fr, de, it, pt as FULL_VERIFIED (backed by the real key-parity test below)", () => {
+  it("declares es, en, fr, de, it, pt as FULL_VERIFIED (UI catalogs; email/PDF remain PARTIAL)", () => {
     const full = listFullyVerifiedLocales().map((l) => l.id);
     expect(full.sort()).toEqual(["de", "en", "es", "fr", "it", "pt"]);
   });
 
-  it("every non-baseline FULL_VERIFIED locale documents its key-parity evidence", () => {
+  it("every non-baseline FULL_VERIFIED locale documents key-parity evidence and PARTIAL email/PDF", () => {
     for (const l of listFullyVerifiedLocales()) {
       if (l.id === LOCALIZATION_FALLBACK_LOCALE) continue;
-      expect(l.coverageNote.toLowerCase()).toContain("key parity");
+      const note = l.coverageNote.toLowerCase();
+      expect(note).toContain("key parity");
+      expect(note).toContain("email is partial");
+      expect(note).toContain("pdf is partial");
     }
   });
 
-  it("declares no PARTIAL_NOT_AUDITED locales today (all 6 are verified)", () => {
+  it("declares no PARTIAL_NOT_AUDITED locales today (all 6 UI catalogs are verified)", () => {
     expect(listPartialLocales()).toEqual([]);
   });
 
@@ -118,6 +125,33 @@ describe("LocalizationCore — computeMessageKeyDiff (pure, in-memory fixtures)"
       expect.arrayContaining(["a.b.c", "d"]),
     );
   });
+
+  it("getMessageByPath / findIdenticalToEsLeftovers detect Spanish leaks", () => {
+    expect(getMessageByPath({ auth: { login: { title: "X" } } }, "auth.login.title")).toBe("X");
+    expect(
+      findIdenticalToEsLeftovers(
+        { auth: { login: { title: "ES" } } },
+        { auth: { login: { title: "ES" } } },
+        ["auth.login.title"],
+      ),
+    ).toEqual(["auth.login.title"]);
+    expect(
+      findIdenticalToEsLeftovers(
+        { auth: { login: { title: "ES" } } },
+        { auth: { login: { title: "FR" } } },
+        ["auth.login.title"],
+      ),
+    ).toEqual([]);
+  });
+
+  it("computeAllMessageKeyDiffs covers every top-level namespace", () => {
+    const diffs = computeAllMessageKeyDiffs(
+      { common: { a: 1 }, hero: { t: "x" } },
+      { common: { a: 1 }, hero: { t: "y" } },
+    );
+    expect(diffs.map((d) => d.namespace).sort()).toEqual(["common", "hero"]);
+    expect(diffs.every((d) => d.ok)).toBe(true);
+  });
 });
 
 describe("LocalizationCore — real disk key-parity regression (apps/web/messages/*.json)", () => {
@@ -139,6 +173,12 @@ describe("LocalizationCore — real disk key-parity regression (apps/web/message
     }
   });
 
+  it("KNOWN_SPANISH_LEFTOVER_KEYS all resolve in es.json", () => {
+    for (const key of KNOWN_SPANISH_LEFTOVER_KEYS) {
+      expect(typeof getMessageByPath(esMessages, key), key).toBe("string");
+    }
+  });
+
   for (const locale of locales) {
     it(`${locale}.json has 100% key parity with es.json for every CRITICAL_MESSAGE_NAMESPACES entry`, () => {
       const localeMessages = loadMessages(locale);
@@ -146,12 +186,27 @@ describe("LocalizationCore — real disk key-parity regression (apps/web/message
       const failing = diffs.filter((d) => !d.ok);
       expect(failing, JSON.stringify(failing, null, 2)).toEqual([]);
     });
+
+    it(`${locale}.json has 100% key parity with es.json for ALL namespaces`, () => {
+      const localeMessages = loadMessages(locale);
+      const diffs = computeAllMessageKeyDiffs(esMessages, localeMessages);
+      const failing = diffs.filter((d) => !d.ok);
+      expect(failing, JSON.stringify(failing, null, 2)).toEqual([]);
+    });
   }
 
-  it("FULL_VERIFIED classification in LOCALE_CATALOG is consistent with the real parity result above", () => {
+  for (const locale of ["fr", "de", "it", "pt"] as LocaleId[]) {
+    it(`${locale}.json has no identical-to-es Spanish leftovers on KNOWN_SPANISH_LEFTOVER_KEYS`, () => {
+      const localeMessages = loadMessages(locale);
+      const leaks = findIdenticalToEsLeftovers(esMessages, localeMessages);
+      expect(leaks, `Spanish leftovers still present in ${locale}.json: ${leaks.join(", ")}`).toEqual([]);
+    });
+  }
+
+  it("FULL_VERIFIED classification in LOCALE_CATALOG is consistent with the real ALL-namespace parity result", () => {
     for (const locale of locales) {
       const localeMessages = loadMessages(locale);
-      const diffs = computeCriticalMessageKeyDiffs(esMessages, localeMessages);
+      const diffs = computeAllMessageKeyDiffs(esMessages, localeMessages);
       const allOk = diffs.every((d) => d.ok);
       const catalogEntry = LOCALE_CATALOG.find((l) => l.id === locale);
       expect(catalogEntry).toBeDefined();

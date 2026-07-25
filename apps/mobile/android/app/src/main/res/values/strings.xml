@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Nelvyon</string>
+    <string name="title_activity_main">Nelvyon</string>
+    <string name="package_name">com.nelvyon.saas</string>
+    <string name="custom_url_scheme">com.nelvyon.saas</string>
+</resources>

@@ -6,18 +6,18 @@
     "cta_secondary": "Ver serviços"
   },
   "pricing": {
-    "title": "Planes NELVYON",
+    "title": "Planos NELVYON",
     "starter": "STARTER",
     "pro": "PRO",
     "enterprise": "ENTERPRISE",
-    "monthly": "Mensual",
-    "annual": "Anual (2 meses gratis)",
-    "most_popular": "Más popular"
+    "monthly": "Mensal",
+    "annual": "Anual (2 meses grátis)",
+    "most_popular": "Mais popular"
   },
   "partners": {
-    "title": "Gana vendiendo NELVYON",
-    "subtitle": "30% de comisión mensual por cada cliente que traigas. Sin límite de ganancias. Sin coste de entrada.",
-    "how_it_works": "Cómo funciona"
+    "title": "Ganhe vendendo NELVYON",
+    "subtitle": "30% de comissão mensal por cada cliente que trazer. Ganhos ilimitados. Sem custo de entrada.",
+    "how_it_works": "Como funciona"
   },
   "nav": {
     "services": "Serviços",
@@ -30,19 +30,19 @@
   },
   "auth": {
     "login": {
-      "title": "Entrar a NELVYON OS",
+      "title": "Entrar no NELVYON OS",
       "email": "Email",
-      "password": "Contraseña",
+      "password": "Palavra-passe",
       "submit": "Entrar",
-      "no_account": "¿Sin cuenta?"
+      "no_account": "Ainda sem conta?"
     },
     "register": {
-      "title": "Crear cuenta",
-      "name": "Nombre completo",
+      "title": "Criar conta",
+      "name": "Nome completo",
       "email": "Email",
-      "password": "Contraseña",
-      "submit": "Crear cuenta",
-      "has_account": "¿Ya tienes cuenta?"
+      "password": "Palavra-passe",
+      "submit": "Criar conta",
+      "has_account": "Já tem uma conta?"
     }
   },
   "dashboard": {
@@ -59,41 +59,41 @@
     "title": "CRM integrado",
     "contacts": "Contactos",
     "pipeline": "Pipeline",
-    "new_contact": "Nuevo contacto",
-    "search": "Buscar nombre o email",
+    "new_contact": "Novo contacto",
+    "search": "Pesquisar nome ou email",
     "filter": "Filtro",
-    "no_contacts": "No hay contactos todavía."
+    "no_contacts": "Ainda não há contactos."
   },
   "workflows": {
     "title": "Workflows",
-    "new_workflow": "Nuevo workflow",
-    "no_workflows": "No hay workflows",
+    "new_workflow": "Novo workflow",
+    "no_workflows": "Não há workflows",
     "status": {
-      "draft": "Borrador",
-      "active": "Activo",
-      "paused": "Pausado"
+      "draft": "Rascunho",
+      "active": "Ativo",
+      "paused": "Em pausa"
     }
   },
   "campanias": {
-    "title": "Campañas",
-    "new": "Nueva campaña",
-    "no_campanias": "No hay campañas",
+    "title": "Campanhas",
+    "new": "Nova campanha",
+    "no_campanias": "Não há campanhas",
     "status": {
-      "draft": "Borrador",
-      "running": "En ejecución",
-      "completed": "Completada"
+      "draft": "Rascunho",
+      "running": "Em execução",
+      "completed": "Concluída"
     }
   },
   "admin": {
     "title": "Admin",
     "tenants": "Tenants",
     "jobs": "Jobs",
-    "activity": "Actividad",
+    "activity": "Atividade",
     "stats": {
-      "total_tenants": "Tenants totales",
-      "active_tenants": "Tenants activos",
-      "total_jobs": "Jobs totales",
-      "running_jobs": "Jobs en ejecución"
+      "total_tenants": "Total de tenants",
+      "active_tenants": "Tenants ativos",
+      "total_jobs": "Total de jobs",
+      "running_jobs": "Jobs em execução"
     }
   },
   "common": {
@@ -115,17 +115,17 @@
   },
   "os": {
     "execution": {
-      "title": "Ejecución OS",
-      "no_jobs": "No hay jobs"
+      "title": "Execução OS",
+      "no_jobs": "Não há jobs"
     },
     "intake": {
-      "title": "Intake de servicio"
+      "title": "Intake de serviço"
     },
     "status": {
-      "pending": "Pendiente",
-      "running": "En ejecución",
-      "completed": "Completado",
-      "failed": "Fallido"
+      "pending": "Pendente",
+      "running": "Em execução",
+      "completed": "Concluído",
+      "failed": "Falhado"
     }
   },
   "shell": {

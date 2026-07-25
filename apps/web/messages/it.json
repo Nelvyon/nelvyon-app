@@ -6,18 +6,18 @@
     "cta_secondary": "Vedi servizi"
   },
   "pricing": {
-    "title": "Planes NELVYON",
+    "title": "Piani NELVYON",
     "starter": "STARTER",
     "pro": "PRO",
     "enterprise": "ENTERPRISE",
-    "monthly": "Mensual",
-    "annual": "Anual (2 meses gratis)",
-    "most_popular": "Más popular"
+    "monthly": "Mensile",
+    "annual": "Annuale (2 mesi gratis)",
+    "most_popular": "Più popolare"
   },
   "partners": {
-    "title": "Gana vendiendo NELVYON",
-    "subtitle": "30% de comisión mensual por cada cliente que traigas. Sin límite de ganancias. Sin coste de entrada.",
-    "how_it_works": "Cómo funciona"
+    "title": "Guadagna vendendo NELVYON",
+    "subtitle": "30% di commissione mensile per ogni cliente portato. Guadagni illimitati. Nessun costo di ingresso.",
+    "how_it_works": "Come funziona"
   },
   "nav": {
     "services": "Servizi",
@@ -30,19 +30,19 @@
   },
   "auth": {
     "login": {
-      "title": "Entrar a NELVYON OS",
+      "title": "Accedi a NELVYON OS",
       "email": "Email",
-      "password": "Contraseña",
-      "submit": "Entrar",
-      "no_account": "¿Sin cuenta?"
+      "password": "Password",
+      "submit": "Accedi",
+      "no_account": "Non hai un account?"
     },
     "register": {
-      "title": "Crear cuenta",
-      "name": "Nombre completo",
+      "title": "Crea account",
+      "name": "Nome completo",
       "email": "Email",
-      "password": "Contraseña",
-      "submit": "Crear cuenta",
-      "has_account": "¿Ya tienes cuenta?"
+      "password": "Password",
+      "submit": "Crea account",
+      "has_account": "Hai già un account?"
     }
   },
   "dashboard": {
@@ -56,44 +56,44 @@
     "quick_actions": "Azioni rapide"
   },
   "crm": {
-    "title": "CRM integrado",
-    "contacts": "Contactos",
+    "title": "CRM integrato",
+    "contacts": "Contatti",
     "pipeline": "Pipeline",
-    "new_contact": "Nuevo contacto",
-    "search": "Buscar nombre o email",
+    "new_contact": "Nuovo contatto",
+    "search": "Cerca nome o email",
     "filter": "Filtro",
-    "no_contacts": "No hay contactos todavía."
+    "no_contacts": "Nessun contatto ancora."
   },
   "workflows": {
     "title": "Workflows",
-    "new_workflow": "Nuevo workflow",
-    "no_workflows": "No hay workflows",
+    "new_workflow": "Nuovo workflow",
+    "no_workflows": "Nessun workflow",
     "status": {
-      "draft": "Borrador",
-      "active": "Activo",
-      "paused": "Pausado"
+      "draft": "Bozza",
+      "active": "Attivo",
+      "paused": "In pausa"
     }
   },
   "campanias": {
-    "title": "Campañas",
-    "new": "Nueva campaña",
-    "no_campanias": "No hay campañas",
+    "title": "Campagne",
+    "new": "Nuova campagna",
+    "no_campanias": "Nessuna campagna",
     "status": {
-      "draft": "Borrador",
-      "running": "En ejecución",
-      "completed": "Completada"
+      "draft": "Bozza",
+      "running": "In esecuzione",
+      "completed": "Completata"
     }
   },
   "admin": {
     "title": "Admin",
-    "tenants": "Tenants",
-    "jobs": "Jobs",
-    "activity": "Actividad",
+    "tenants": "Tenant",
+    "jobs": "Job",
+    "activity": "Attività",
     "stats": {
-      "total_tenants": "Tenants totales",
-      "active_tenants": "Tenants activos",
-      "total_jobs": "Jobs totales",
-      "running_jobs": "Jobs en ejecución"
+      "total_tenants": "Tenant totali",
+      "active_tenants": "Tenant attivi",
+      "total_jobs": "Job totali",
+      "running_jobs": "Job in esecuzione"
     }
   },
   "common": {
@@ -115,17 +115,17 @@
   },
   "os": {
     "execution": {
-      "title": "Ejecución OS",
-      "no_jobs": "No hay jobs"
+      "title": "Esecuzione OS",
+      "no_jobs": "Nessun job"
     },
     "intake": {
-      "title": "Intake de servicio"
+      "title": "Intake del servizio"
     },
     "status": {
-      "pending": "Pendiente",
-      "running": "En ejecución",
-      "completed": "Completado",
-      "failed": "Fallido"
+      "pending": "In attesa",
+      "running": "In esecuzione",
+      "completed": "Completato",
+      "failed": "Fallito"
     }
   },
   "shell": {

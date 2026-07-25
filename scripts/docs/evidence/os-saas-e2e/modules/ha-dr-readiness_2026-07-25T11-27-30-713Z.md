@@ -1,0 +1,22 @@
+# HA/DR single-region readiness — smoke
+
+| Campo | Valor |
+|-------|-------|
+| Fecha | 2026-07-25T11:27:30.713Z |
+| Staging base | https://ideal-victory-staging.up.railway.app |
+| Vitest `HaDrReadiness.test.ts` | PASS |
+| Capacity smoke (real network, 5x concurrent / probe) | SKIPPED |
+| Multi-region | **BLOCKED_EXTERNAL** — requiere presupuesto CEO, no activado, no planeado sin aprobación |
+| Single-region resilient | **IMPLEMENTED_VERIFIED** — RPO/RTO, health checks, kill switches, rate-limit presence, degradación gestionada, rollback documentado |
+
+## Detalle capacity smoke
+
+```json
+[]
+```
+
+## Honestidad
+
+- Este smoke NUNCA apunta a producción; usa STAGING_BASE_URL o el staging ya aprobado por defecto.
+- El fallo de red en staging es no-fatal (WARN) — staging Railway free-tier puede tener cold-start; el gate real de calidad es el suite vitest (lógica pura, determinista).
+- No se toca ninguna flag de producción ni se realiza ningún envío/spend.

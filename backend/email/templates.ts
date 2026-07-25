@@ -1,3 +1,5 @@
+import { getCancellationCopy, getPaymentFailedCopy } from "./localeCopy";
+
 export type EmailTemplate =
   | "welcome"
   | "email_verify"
@@ -17,7 +19,11 @@ export interface EmailData {
   text: string;
 }
 
-export function buildEmail(template: EmailTemplate, params: Record<string, string>): EmailData {
+export function buildEmail(
+  template: EmailTemplate,
+  params: Record<string, string>,
+  locale?: string | null,
+): EmailData {
   switch (template) {
     case "welcome":
       return {
@@ -54,20 +60,24 @@ export function buildEmail(template: EmailTemplate, params: Record<string, strin
         html: invoiceHtml(params),
         text: `Factura ${params.invoiceId} por ${params.amount}. Período: ${params.period}.`,
       };
-    case "payment_failed":
+    case "payment_failed": {
+      const copy = getPaymentFailedCopy(locale);
       return {
         to: params.email,
-        subject: "Problema con tu pago — NELVYON",
-        html: paymentFailedHtml(params),
-        text: `Hubo un problema con tu pago. Actualiza tu método de pago en ${params.appUrl}/billing`,
+        subject: copy.subject,
+        html: paymentFailedHtml(params, locale),
+        text: copy.text(params.appUrl),
       };
-    case "cancellation":
+    }
+    case "cancellation": {
+      const copy = getCancellationCopy(locale);
       return {
         to: params.email,
-        subject: "Tu suscripción ha sido cancelada — NELVYON",
-        html: cancellationHtml(params),
-        text: `Tu suscripción ha sido cancelada. Tienes acceso hasta ${params.accessUntil}.`,
+        subject: copy.subject,
+        html: cancellationHtml(params, locale),
+        text: copy.text(params.accessUntil),
       };
+    }
     case "data_export_confirm":
       return {
         to: params.email,
@@ -238,37 +248,38 @@ function invoiceHtml(p: Record<string, string>): string {
 </p>`);
 }
 
-function paymentFailedHtml(p: Record<string, string>): string {
-  return baseHtml("Problema con tu pago", `
+function paymentFailedHtml(p: Record<string, string>, locale?: string | null): string {
+  const copy = getPaymentFailedCopy(locale);
+  return baseHtml(copy.title, `
 <h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">
-  Problema con tu pago
+  ${copy.title}
 </h1>
 <p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 24px;">
-  No hemos podido procesar tu pago. Actualiza tu método de pago para
-  mantener el acceso a NELVYON.
+  ${copy.body}
 </p>
 <a href="${p.appUrl}/billing"
    style="display:inline-block;background:#ef4444;color:#fff;padding:14px 28px;
    border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
-  Actualizar método de pago →
+  ${copy.cta}
 </a>`);
 }
 
-function cancellationHtml(p: Record<string, string>): string {
-  return baseHtml("Suscripción cancelada", `
+function cancellationHtml(p: Record<string, string>, locale?: string | null): string {
+  const copy = getCancellationCopy(locale);
+  return baseHtml(copy.title, `
 <h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">
-  Suscripción cancelada
+  ${copy.title}
 </h1>
 <p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 8px;">
-  Tu suscripción ha sido cancelada correctamente.
+  ${copy.body}
 </p>
 <p style="color:#71717a;font-size:14px;margin:0 0 24px;">
-  Seguirás teniendo acceso hasta: <strong style="color:#f4f4f5;">${p.accessUntil}</strong>
+  ${copy.accessUntil(p.accessUntil)}
 </p>
 <a href="${p.appUrl}/pricing"
    style="display:inline-block;background:#6366f1;color:#fff;padding:14px 28px;
    border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
-  Reactivar plan →
+  ${copy.cta}
 </a>`);
 }
 

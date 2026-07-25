@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-24** (**ADR-057 Blocks 11–25 complete**). Sin secretos.
+> Estado real documentado **2026-07-25** (cierre interno · ADR-059). Sin secretos.
 
 ---
 
@@ -13,17 +13,20 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | ✅ local / 🟡 staging | local-ai/pgvector Docker **IMPLEMENTED_VERIFIED** (Block 24, 2026-07-25) · Railway staging pgvector **PREPARED_OFF** |
+| **Docker** | ✅ local / 🟡 Railway | local-ai/pgvector Docker **VERIFIED** · Railway pgvector **PREPARED_OFF** |
 | **Railway prod** | ✅ | `@nelvyon/web` · flags **OFF** / **ABSENT** · no OpenAI · no credenciales reales |
-| **Railway staging** | ✅ | `ideal-victory` · https://ideal-victory-staging.up.railway.app · **confirm deploy after push** · tip **TBA** |
-| **ADR-057 cores** | ✅ local | Blocks 11–25 internal cores verified · agency **249 PASS** · tsc **0** |
+| **Railway staging** | ✅ | `ideal-victory` · tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` |
+| **HA single-region** | ✅ **VERIFIED** | Runbook + readiness · RPO/RTO documentados |
+| **Multi-region / HA geo** | ❌ **BLOCKED_EXTERNAL/COST** | Sin despliegue multi-región activo · pendiente presupuesto CEO |
 | **OpenClaw** | ✅ staging_mock / ❌ prod | canary doc PENDING_CEO |
 | **Auditor** | ✅ staging / ❌ prod | 13 packs ADR-055 |
 | **SM/MCP synthetic** | ✅ staging | flags ON · productivo 0 |
-| **Telephony (Block 11)** | ✅ simulator | real Twilio **BLOCKED_EXTERNAL** |
-| **Mobile (Block 18)** | 🟡 | Capacitor contract verified · App Store/Play **BLOCKED_EXTERNAL** |
-| **PWA (Block 19)** | ✅ | `pwa-certify` PASS · iOS Safari PARTIAL |
-| **Private RAG (Block 24)** | ✅ local / 🟡 staging | synthetic + Docker pgvector local **IMPLEMENTED_VERIFIED** · Railway staging pgvector **PREPARED_OFF** |
+| **Telephony (Block 11)** | ✅ sim **VERIFIED** | real Twilio **BLOCKED_EXTERNAL** |
+| **Mobile (Block 18)** | 🟡 scaffold present | APK SDK **BLOCKED_EXTERNAL** · stores **BLOCKED_EXTERNAL** |
+| **PWA (Block 19)** | ✅ Chrome **VERIFIED** | iOS **BLOCKED** |
+| **Observability** | ✅ local **VERIFIED** | paid APM **PREPARED_OFF** |
+| **Private RAG (Block 24)** | ✅ Docker / 🟡 Railway | Docker **VERIFIED** · Railway **PREPARED_OFF** |
+| **Private AI canary** | 🟡 | **PREPARED_OFF** + **BLOCKED_CEO** |
 | **Costes** | **0** | |
 
 ---
@@ -98,10 +101,19 @@ GitHub Actions cron → POST /api/cron/* + CRON_SECRET
 
 ---
 
-## ADR-055/056 — flags staging (synthetic SM/MCP + Ollama mesh)
+## HA / DR / escala
+
+| Ítem | Estado | Notas |
+|------|--------|-------|
+| **Single-region HA** | **VERIFIED** | `HA_DR_SCALE_RUNBOOK.md` · `ha-dr-readiness_latest.md` · health live/ready |
+| **Multi-region** | **BLOCKED_EXTERNAL/COST** | `isMultiRegionEnabled()` false · sin presupuesto CEO · no inventar verde geo |
+
+---
+
+## ADR-055/056/059 — flags staging (synthetic SM/MCP + Ollama mesh)
 
 > Staging URL: https://ideal-victory-staging.up.railway.app  
-> **Runtime hoy:** ADR-055 (`53149384`) · deploy **`e514bbd7`** SUCCESS · ADR-056 code fixes **local uncommitted**.  
+> **Runtime tip live:** **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0`.  
 > **Ollama:** `OLLAMA_HOST=http://100.102.207.30:11434` — Tailscale CGNAT private IP (**not public**).
 
 | Flag | Staging live | Prod |

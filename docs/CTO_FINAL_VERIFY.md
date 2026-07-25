@@ -1,56 +1,56 @@
-# CTO Final Verify — 2026-07-24 (ADR-057 Blocks 11–25 complete)
+# CTO Final Verify — 2026-07-25 (cierre interno honestidad)
 
 > **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0 · prod flags **OFF**  
-> Evidencia: `backend/agency` **249 PASS** · `tsc` **0** · `pwa.cert_latest.md` · `private-rag.synthetic_latest.md`
+> Staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0`  
+> Catalog **v1.6.0** (local tip post-commit: i18n + obs + mobile scaffold)
 
 ## Tabla final
 
 | Ítem | Valor |
 |------|--------|
-| SHA (local) | **54d9149a** (parent commit pending) |
+| Staging tip live | **`5adbfcd2`** |
+| Deploy staging | **`d5caafc0` SUCCESS** |
 | Staging URL | https://ideal-victory-staging.up.railway.app |
-| Deploy staging | **confirm after push** |
+| OpenAI | `AUTONOMOUS_ALLOW_OPENAI=0` |
 | Veredicto | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` |
-| Tests | `tsc` **0** · `backend/agency` **249 PASS** · influencers pack **PASS** · `pwa-certify` **PASS** · private-rag synthetic **ALL_PASS** (27 tests) |
-| Catalog | **OsCatalogV1 v1.4.0** (+ `private_vector_rag`, `private_ai_canary_prep`) |
-| 13 packs + auditor (staging) | **ALL_PASS** ADR-055 runtime |
-| Prod flags | **OFF** / **ABSENT** · no OpenAI · no Pepito · no Twilio/ads/publish/OAuth reales · no App Store publish |
+| Catalog | **OsCatalogV1 v1.6.0** |
+| Prod flags | **OFF** / **ABSENT** |
 | Legal | `claimReadyLegal` **false** · mass-send **BLOCKED_LEGAL** · Pepito **forbidden** |
 
-## ADR-057 — Blocks 11–25
+## Capacidades (honestidad)
 
-| Block | Capacidad | Estado | Bloqueo |
-|-------|-----------|--------|---------|
-| 11 | `telephony_core` | **IMPLEMENTED_VERIFIED** (simulator) | real calls **BLOCKED_EXTERNAL** |
-| 12 | `influencers_pr` | **IMPLEMENTED_VERIFIED** / available | Staging E2E ALL_PASS tip e81b5034 · catalog v1.5.0 · outreach=false |
-| 13 | `ads_attribution_core` | **IMPLEMENTED_VERIFIED** (core) | spend/OAuth **BLOCKED_EXTERNAL** |
-| 14 | `community_publish_core` | **IMPLEMENTED_VERIFIED** (simulator) | real publish **BLOCKED_EXTERNAL** |
-| 15 | mass-send technical | **IMPLEMENTED_VERIFIED** (controls) | send **BLOCKED_LEGAL** (`claimReadyLegal` false) |
-| 16 | `oauth_multitenant` | **IMPLEMENTED_VERIFIED** (framework+mock) | real apps **BLOCKED_EXTERNAL** |
-| 17 | `integrations_marketplace` | **IMPLEMENTED_VERIFIED** (internal ping) | — |
-| 18 | mobile Capacitor | **PREPARED_OFF** / contract **VERIFIED** | App Store/Play **BLOCKED_EXTERNAL** |
-| 19 | PWA | **IMPLEMENTED_VERIFIED** (Chrome/Windows) | iOS Safari **PARTIAL** |
-| 20 | `localization` | **IMPLEMENTED_VERIFIED** (es/en/fr/de/it/pt UI crítica) | email/PDF ES-only (fuera de claim) |
-| 21 | HA/DR | **IMPLEMENTED_VERIFIED** (runbook+checks) | multi-region **BLOCKED_EXTERNAL** |
-| 22 | `observability` | **IMPLEMENTED_VERIFIED** (local core) | paid vendors **PREPARED_OFF** |
-| 23 | legacy consolidation | **IMPLEMENTED_VERIFIED** (audit+plan) | zero unsafe deletes |
-| 24 | `private_vector_rag` | **IMPLEMENTED_VERIFIED** (synthetic + Docker pgvector local) | Railway staging pgvector **PREPARED_OFF** |
-| 25 | `private_ai_canary_prep` | **PREPARED_OFF** | **BLOCKED_CEO** |
+| Capacidad | Estado | Bloqueo |
+|-----------|--------|---------|
+| influencers_pr | **VERIFIED** | outreach forbidden |
+| ads_attribution_core | **VERIFIED** (core) | OAuth/spend **BLOCKED_EXTERNAL** |
+| community_publish_core | **VERIFIED** (sim) | publish **BLOCKED_EXTERNAL** |
+| telephony_core | **VERIFIED** (sim) | Twilio **BLOCKED_EXTERNAL** |
+| oauth_multitenant | **VERIFIED** (mock) | real apps **BLOCKED_EXTERNAL** |
+| integrations_marketplace | **VERIFIED** | — |
+| private_vector_rag | Docker **VERIFIED** | Railway **PREPARED_OFF** · P2 minScore |
+| private_ai_canary | **PREPARED_OFF** | **BLOCKED_CEO** |
+| localization UI | **FULL** | — |
+| localization email/PDF | **PARTIAL** | — |
+| PWA | Chrome **VERIFIED** | iOS **BLOCKED** |
+| mobile | scaffold present | APK **BLOCKED_EXTERNAL** |
+| HA single-region | **VERIFIED** | multi-region **BLOCKED_EXTERNAL/COST** |
+| observability | local **VERIFIED** | paid **PREPARED_OFF** |
+| legacy audit | **VERIFIED** | zero deletes |
 
 ## Clasificación
 
-| Verde verificado (internal cores) | Preparado OFF / pending | Bloqueado externo/CEO/legal |
-|-----------------------------------|-------------------------|------------------------------|
-| Blocks 11–25 cores internos (tabla arriba) · 13 packs+auditor staging · PWA cert · private-rag synthetic 27 tests · catalog v1.4.0 |  mobile stores · pgvector live · paid observability · IA prod canary prep | Twilio/ads/publish/OAuth reales · App Store/Play · multi-region · Pepito · mass-send · claimReady |
+| Verde verificado | Preparado OFF | Bloqueado externo/CEO/legal |
+|------------------|---------------|------------------------------|
+| Cores arriba (sim/mock/core) · PWA Chrome · HA single-region · obs local · legacy · RAG Docker | Railway pgvector · private_ai_canary · paid APM · social oficial | Twilio/ads OAuth/publish/OAuth apps · APK SDK · iOS · multi-region COST · Pepito · mass-send · claimReady |
 
 ## Competitive honesty (factual gaps — NOT parity)
 
 | Referente | Gap verificado |
 |-----------|----------------|
-| HubSpot / Meta / Google Ads | **No live OAuth spend path** (core verified · providers OFF) |
-| GoHighLevel (GHL) | **No native telephony dialer parity** (simulator verified · real calls BLOCKED) |
+| HubSpot / Meta / Google Ads | **No live OAuth spend path** |
+| GoHighLevel (GHL) | **No native telephony dialer parity** (sim only) |
 | Odoo | **No full ERP/accounting/manufacturing** |
-| Campañas email | **Mass-send legally blocked** (`claimReadyLegal=false`) |
+| Campañas email | **Mass-send legally blocked** |
 | Social NELVYON | **Official accounts + real publish pending CEO** |
 | Producción multi-tenant | **No proven multi-tenant production customer outcomes** |
 
@@ -58,8 +58,7 @@
 
 ## Next
 
-1. CEO checklists: telephony · OAuth apps · ads · social publish · mobile stores · Pepito legal · IA prod canary  
-2. Ops: **confirm staging deploy after push**  
-3. **No READY**
+1. Acciones solo Daniel — ver `HANDOVER.md`  
+2. **No READY** · `claimReady: false`
 
 Rollback: `HANDOVER.md`

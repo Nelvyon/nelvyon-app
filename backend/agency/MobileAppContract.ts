@@ -67,12 +67,21 @@ export const MOBILE_APP_CAPABILITIES: readonly MobileCapabilityEntry[] = [
   {
     id: "android_local_build",
     title: "Android local debug build (no store, no cost)",
+    status: "IMPLEMENTED_VERIFIED",
+    description:
+      "`apps/mobile/android/` Capacitor scaffold + free JDK 21 + Android SDK 35 → `assembleDebug` BUILD SUCCESSFUL. Debug APK produced (~4.8 MB). Device install/auth smoke still needs emulator or USB device (`adb devices` empty this session).",
+    evidence:
+      "scripts/docs/evidence/os-saas-e2e/modules/mobile.android_build_latest.md · app-debug.apk via assembleDebug",
+    blockedReason: null,
+  },
+  {
+    id: "android_device_smoke",
+    title: "Android device/emulator install + auth smoke",
     status: "BLOCKED_EXTERNAL",
     description:
-      "`pnpm -C apps/mobile sync` must generate `apps/mobile/android/` first; then Android Studio/SDK can build a sideloadable debug APK at zero Play Console cost.",
-    evidence: null,
-    blockedReason:
-      "Android SDK/adb not present; apps/mobile/android/ missing (capacitor sync not run) — see scripts/docs/evidence/os-saas-e2e/modules/mobile.android_blocked.md.",
+      "Sideload APK and exercise login, tenant isolation, CRM, tasks, offline on a real device or AVD.",
+    evidence: "scripts/docs/evidence/os-saas-e2e/modules/mobile.android_build_latest.md (adb devices empty)",
+    blockedReason: "No emulator/USB device attached — adb devices empty. APK exists for sideload when device available.",
   },
   {
     id: "ios_local_build",

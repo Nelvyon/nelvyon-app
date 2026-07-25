@@ -1016,17 +1016,15 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 ### 8.1 Veredicto
 
-**[VERIFICADO]** Fuente: HANDOVER + `OS_CATALOG_V1.md` — **2026-07-24** (**ADR-057 Blocks 11–25 complete**)
+**[VERIFICADO]** Fuente: HANDOVER + `OS_CATALOG_V1.md` — **2026-07-25** (cierre interno · ADR-059)
 
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | tip **TBA** (parent commit pending) · staging https://ideal-victory-staging.up.railway.app · **confirm deploy after push** · prod flags **OFF** |
-| **Tests** | `tsc` **0** · `backend/agency` **249 PASS** · influencers pack **PASS** · `pwa-certify` **PASS** · private-rag synthetic **ALL_PASS** (27 tests) |
-| **OS Catalog v1.4.0** | Blocks 11–25 internal cores + `private_vector_rag` + `private_ai_canary_prep` |
-| **Packs ADR-055 (staging)** | 13 packs+auditor **ALL_PASS** · automations/reputation E2E **ALL_PASS** |
-| **ADR-057 Blocks 11–25** | Ver matriz en `HANDOVER.md` / `OS_ELITE_STATE_MATRIX.md` — cores internos **IMPLEMENTED_VERIFIED** · externos **BLOCKED_EXTERNAL/CEO/LEGAL** |
-| **Competitive honesty** | No live OAuth spend · no GHL telephony parity (simulator only) · no Odoo ERP · mass-send blocked · social/publish pending CEO · no proven multi-tenant prod outcomes |
+| **SHA / deploys** | staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · prod flags **OFF** · local tip post-commit: catalog **v1.6.0** + i18n + obs + mobile scaffold |
+| **OS Catalog v1.6.0** | ads/community cores **VERIFIED** (core/sim) · OAuth/spend/publish **BLOCKED_EXTERNAL** |
+| **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker **VERIFIED** / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile scaffold / APK **BLOCKED_EXTERNAL** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |
+| **Competitive honesty** | No live OAuth spend · no GHL telephony parity (sim only) · no Odoo ERP · mass-send blocked · social/publish pending CEO · no proven multi-tenant prod outcomes |
 | **Blocker claimReady** | Legal Pepito + licencia · mass-send **BLOCKED_LEGAL** |
 | Freezes Router / MCP / prod IA | **intactos** |
 | Producto enterprise completo | **NO** |

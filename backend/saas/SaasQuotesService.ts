@@ -1,6 +1,7 @@
 import { createHmac } from "crypto";
 import { DbClient } from "../db/DbClient";
 import { requireHmacSecret } from "./hmacSecret";
+import { getQuotePdfLabels, resolvePdfLocale } from "./pdfLocaleLabels";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -248,8 +249,12 @@ export class SaasQuotesService {
 
   // ── PDF HTML — HMAC-signed inline render ─────────────────────────────────
 
-  renderQuotePdfHtml(quote: SaasQuote, agencyName = "Nelvyon"): string {
-    const fmt = (n: number) => new Intl.NumberFormat("es-ES", { style: "currency", currency: quote.currency }).format(n);
+  renderQuotePdfHtml(quote: SaasQuote, agencyName = "Nelvyon", locale?: string | null): string {
+    const L = getQuotePdfLabels(locale);
+    const lang = resolvePdfLocale(locale);
+    const intlTag =
+      lang === "en" ? "en-US" : lang === "fr" ? "fr-FR" : lang === "de" ? "de-DE" : lang === "it" ? "it-IT" : lang === "pt" ? "pt-PT" : "es-ES";
+    const fmt = (n: number) => new Intl.NumberFormat(intlTag, { style: "currency", currency: quote.currency }).format(n);
     const rows = quote.items.map(it => `
       <tr>
         <td>${it.description}</td>
@@ -264,9 +269,9 @@ export class SaasQuotesService {
       .slice(0, 16);
 
     return `<!DOCTYPE html>
-<html lang="es">
+<html lang="${lang}">
 <head><meta charset="UTF-8">
-<title>Presupuesto ${quote.quoteNumber}</title>
+<title>${L.documentTitle(quote.quoteNumber)}</title>
 <style>
   body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; color: #111; font-size: 14px; }
   h1 { color: #0084ff; } .meta { color: #666; font-size: 12px; }
@@ -282,9 +287,9 @@ export class SaasQuotesService {
 <div style="display:flex;justify-content:space-between;align-items:flex-start">
   <div><h1>${agencyName}</h1></div>
   <div style="text-align:right">
-    <p class="meta">Nº: <strong>${quote.quoteNumber}</strong></p>
-    <p class="meta">Fecha: ${new Date(quote.createdAt).toLocaleDateString("es-ES")}</p>
-    ${quote.validUntil ? `<p class="meta">Válido hasta: ${new Date(quote.validUntil).toLocaleDateString("es-ES")}</p>` : ""}
+    <p class="meta">${L.number}: <strong>${quote.quoteNumber}</strong></p>
+    <p class="meta">${L.date}: ${new Date(quote.createdAt).toLocaleDateString(intlTag)}</p>
+    ${quote.validUntil ? `<p class="meta">${L.validUntil}: ${new Date(quote.validUntil).toLocaleDateString(intlTag)}</p>` : ""}
     <span class="badge">${quote.status.toUpperCase()}</span>
   </div>
 </div>
@@ -292,17 +297,17 @@ export class SaasQuotesService {
 <h2>${quote.title}</h2>
 <p><strong>${quote.clientName}</strong>${quote.clientEmail ? ` · ${quote.clientEmail}` : ""}${quote.clientAddress ? `<br/><small>${quote.clientAddress}</small>` : ""}</p>
 <table>
-  <thead><tr><th>Descripción</th><th style="text-align:right">Cant.</th><th style="text-align:right">Precio unit.</th><th style="text-align:right">Subtotal</th></tr></thead>
+  <thead><tr><th>${L.description}</th><th style="text-align:right">${L.quantity}</th><th style="text-align:right">${L.unitPrice}</th><th style="text-align:right">${L.subtotal}</th></tr></thead>
   <tbody>${rows}</tbody>
 </table>
 <table class="totals" style="width:300px;margin-left:auto">
-  <tr><td>Subtotal</td><td style="text-align:right">${fmt(quote.subtotal)}</td></tr>
-  ${quote.discountAmount > 0 ? `<tr><td>Descuento (${quote.discountPct}%)</td><td style="text-align:right">-${fmt(quote.discountAmount)}</td></tr>` : ""}
-  <tr><td>IVA (${quote.taxPct}%)</td><td style="text-align:right">${fmt(quote.taxAmount)}</td></tr>
-  <tr class="total-row"><td><strong>TOTAL</strong></td><td style="text-align:right"><strong>${fmt(quote.total)}</strong></td></tr>
+  <tr><td>${L.subtotal}</td><td style="text-align:right">${fmt(quote.subtotal)}</td></tr>
+  ${quote.discountAmount > 0 ? `<tr><td>${L.discount(quote.discountPct)}</td><td style="text-align:right">-${fmt(quote.discountAmount)}</td></tr>` : ""}
+  <tr><td>${L.tax(quote.taxPct)}</td><td style="text-align:right">${fmt(quote.taxAmount)}</td></tr>
+  <tr class="total-row"><td><strong>${L.total}</strong></td><td style="text-align:right"><strong>${fmt(quote.total)}</strong></td></tr>
 </table>
 ${quote.notes ? `<p style="background:#f9f9f9;padding:12px;border-radius:6px;font-size:13px">${quote.notes}</p>` : ""}
-<div class="footer">Generado por ${agencyName} · ref: ${sig}</div>
+<div class="footer">${L.generatedBy(agencyName, sig)}</div>
 </body></html>`;
   }
 }

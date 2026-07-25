@@ -6,12 +6,26 @@
 
 ## Activos
 
+### Ops (no KI) — Email + PDF locale PARTIAL (no FULL_VERIFIED)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Abierto** — **PARTIAL** |
+| **Detalle** | UI catalogs es/en/fr/de/it/pt **FULL**. Email: subset Resend/SES localized; SES catalog restante + `backend/billing/*EmailTemplates.ts` siguen ES. PDF labels **PARTIAL**. No promover a FULL_VERIFIED sin auditoría completa. |
+
+### Ops (no KI) — Android APK build SDK pending
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **BLOCKED_EXTERNAL** |
+| **Detalle** | Scaffold `apps/mobile/android/` **present** (`mobile.android_scaffold.md`) · APK `assembleDebug` requiere JDK/Android SDK · App Store/Play publish sigue **BLOCKED_EXTERNAL** · checklist `MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md` |
+
 ### Ops (no KI) — ADR-057 external integrations pending CEO
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **BLOCKED_EXTERNAL** / **BLOCKED_CEO** |
-| **Detalle** | Blocks 11–25 cores internos verified · rutas externas pendientes: Twilio real (Block 11) · OAuth apps reales (Block 16) · ads spend/OAuth (Block 13) · social publish (Block 14) · App Store/Play (Block 18) · multi-region (Block 21) · IA prod canary (Block 25 · `CEO_IA_PROD_CANARY_REQUEST.md`) — pgvector Docker live (Block 24) **resuelto 2026-07-25**, ver Historial resuelto |
+| **Detalle** | Cores internos verified · rutas externas pendientes: Twilio real (Block 11) · OAuth apps reales (Block 16) · ads spend/OAuth (Block 13) · social publish (Block 14) · App Store/Play + APK SDK (Block 18) · multi-region **COST** (Block 21) · IA prod canary (Block 25 · `CEO_IA_PROD_CANARY_REQUEST.md`) — pgvector Docker live (Block 24) **resuelto 2026-07-25**, Railway **PREPARED_OFF** |
 
 ### Ops (no KI) — Legal checklist campañas + Datos Pepito (claimReady)
 

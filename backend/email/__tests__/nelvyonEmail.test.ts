@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { NelvyonEmailService } from "../NelvyonEmailService";
+import { buildEmail } from "../templates";
 import { invoiceTemplate } from "../templates/invoice";
 import { jobCompletedTemplate } from "../templates/jobCompleted";
 import { onboardingCompleteTemplate } from "../templates/onboardingComplete";
@@ -56,6 +57,21 @@ describe("Email templates", () => {
   it("Template welcome incluye CTA button", () => {
     expect(welcomeTemplate("Ana", "Acme", "https://x")).toContain("Ir al onboarding");
   });
+  it("Template welcome en locale en usa English CTA", () => {
+    expect(welcomeTemplate("Ana", "Acme", "https://x", "en")).toContain("Go to onboarding");
+  });
+  it("Template passwordReset en locale en usa English CTA", () => {
+    expect(passwordResetTemplate("Ana", "https://reset", "en")).toContain("Reset password");
+  });
+  it("Template invoice en locale en usa English CTA", () => {
+    expect(invoiceTemplate("Ana", "pro", 99.5, "https://inv", "en")).toContain("View invoice");
+  });
+  it("Template jobCompleted en locale en usa English CTA", () => {
+    expect(jobCompletedTemplate("Ana", "seo", "j1", "summary", "https://x", "en")).toContain("View result");
+  });
+  it("Template onboardingComplete en locale en usa English CTA", () => {
+    expect(onboardingCompleteTemplate("Ana", "Acme", "https://dash", "en")).toContain("Go to dashboard");
+  });
   it("Template jobCompleted incluye serviceId", () => {
     expect(jobCompletedTemplate("Ana", "seo", "j1", "summary", "https://x")).toContain("seo");
   });
@@ -92,6 +108,37 @@ describe("Email templates", () => {
       onboardingCompleteTemplate("A", "B", "https://x"),
     ];
     for (const t of templates) expect(t).toContain("max-width: 600px");
+  });
+});
+
+describe("SES catalog locale wiring (payment_failed / cancellation)", () => {
+  it("payment_failed en locale en usa English subject + CTA", () => {
+    const email = buildEmail(
+      "payment_failed",
+      { email: "a@test.com", appUrl: "https://app.nelvyon.com" },
+      "en",
+    );
+    expect(email.subject).toContain("Payment problem");
+    expect(email.html).toContain("Update payment method");
+  });
+
+  it("cancellation en locale en usa English subject + CTA", () => {
+    const email = buildEmail(
+      "cancellation",
+      { email: "a@test.com", appUrl: "https://app.nelvyon.com", accessUntil: "2026-08-01" },
+      "en",
+    );
+    expect(email.subject).toContain("cancelled");
+    expect(email.html).toContain("Reactivate plan");
+    expect(email.text).toContain("2026-08-01");
+  });
+
+  it("payment_failed sin locale sigue en español (default)", () => {
+    const email = buildEmail("payment_failed", {
+      email: "a@test.com",
+      appUrl: "https://app.nelvyon.com",
+    });
+    expect(email.subject).toContain("pago");
   });
 });
 

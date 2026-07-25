@@ -9,7 +9,11 @@ did not open, pay for, or configure any Apple Developer Program or Google
 Play Console account. Nothing here should be read as "app is published" or
 "app is in review" — it is not.
 
-Evidencia de bloqueo Android (2026-07-25):
+Evidencia Android scaffold (2026-07-25):
+`scripts/docs/evidence/os-saas-e2e/modules/mobile.android_scaffold.md`
+(scaffold **PASS** · build/smoke still **BLOCKED** without JDK/SDK).
+
+Prior blocked note (pre-scaffold):
 `scripts/docs/evidence/os-saas-e2e/modules/mobile.android_blocked.md`.
 
 ---
@@ -35,13 +39,13 @@ Evidencia de bloqueo Android (2026-07-25):
 
 ---
 
-## Android — BLOCKED_EXTERNAL (this environment)
+## Android — scaffold PASS · build BLOCKED_EXTERNAL
 
 | Step | Status | Blocker |
 |---|---|---|
-| Native project (`apps/mobile/android/`) | BLOCKED_EXTERNAL | Folder **missing** — `capacitor sync` not executed in this environment. |
-| Android SDK / `adb` | BLOCKED_EXTERNAL | **Not installed** on this Windows machine — verified 2026-07-25. |
-| Android local debug build | BLOCKED_EXTERNAL | Requires Android Studio + SDK + generated `android/` project (none present). |
+| Native project (`apps/mobile/android/`) | **PASS** (scaffold) | Capacitor Android project **exists** on disk (sync already run). |
+| Android SDK / JDK / `adb` | BLOCKED_EXTERNAL | **Not installed** (or not on PATH) on this Windows machine — needed for `assembleDebug`. |
+| Android local debug build (APK) | BLOCKED_EXTERNAL | Requires Android Studio + SDK + JDK — **no APK** produced yet. |
 | Local device/emulator install + smoke test | **NOT RUN** | **No PASS claimed** — no APK, no adb, no emulator/device. |
 | Google Play Console registration | BLOCKED_EXTERNAL | **Paid** (one-time $25 registration fee). No budget approved in this session. |
 | Play Store listing + review submission | BLOCKED_EXTERNAL | Depends on the registration above. |
@@ -51,23 +55,40 @@ Evidencia de bloqueo Android (2026-07-25):
 | Capability | Status | Evidence |
 |---|---|---|
 | Capacitor shell config | IMPLEMENTED_VERIFIED | `apps/mobile/capacitor.config.json` + `package.json` |
+| Android native scaffold | scaffold PASS (build still blocked) | `apps/mobile/android/` + `mobile.android_scaffold.md` |
 | Tenant-isolated secure session | IMPLEMENTED_VERIFIED | `MobileSecureSession.ts` + unit tests |
 | Offline action queue (basic) | IMPLEMENTED_VERIFIED | `MobileSecureSession.ts` + unit tests |
 
-### Local Android build steps (when CEO provides Android Studio + SDK)
+### Exact next clicks for Daniel (local debug APK — $0 Play fee)
 
-These steps are **documentation only** — not executed here:
+Do these on the Windows machine that will build (Studio installs SDK under your user profile; paths stay out of git via `local.properties`):
 
-```bash
-pnpm -C apps/web build          # builds the Next.js app the shell points at (or use the remote server.url)
-pnpm -C apps/mobile sync        # capacitor sync — generates android/ + copies web assets
-pnpm -C apps/mobile android     # opens android/ in Android Studio
-# In Android Studio: Build > Build Bundle(s) / APK(s) > Build APK(s)
-# Resulting APK: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
-```
+1. **Install Android Studio** (Hedgehog+ / current stable) from https://developer.android.com/studio  
+   - During setup wizard: accept **Android SDK**, **Android SDK Platform**, **Android Virtual Device** (optional if you use a physical phone).
+2. **Open SDK Manager** (More Actions → SDK Manager, or Tools → SDK Manager):  
+   - SDK Platforms: install a recent API (e.g. **API 34** or whatever `apps/mobile/android/variables.gradle` / Capacitor requires).  
+   - SDK Tools: ensure **Android SDK Build-Tools**, **Platform-Tools** (`adb`), and **Android SDK Command-line Tools** are checked → Apply.
+3. **JDK**: Studio ships a JBR; if CLI build fails, install Temurin JDK 17 and set `JAVA_HOME`.
+4. **Open the project**:  
+   ```bash
+   pnpm -C apps/mobile sync
+   pnpm -C apps/mobile android
+   ```  
+   Or File → Open → `C:\Proyectos\Nelvyon\nelvyon-app\apps\mobile\android`.
+5. **First Gradle sync** in Studio — let it download wrappers/deps. Confirm `local.properties` was created with `sdk.dir=...` (gitignored; do not commit).
+6. **Build debug APK**: Build → Build Bundle(s) / APK(s) → **Build APK(s)**  
+   Or CLI from `apps/mobile/android`:  
+   ```bash
+   .\gradlew.bat assembleDebug
+   ```  
+   Expected artifact: `apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk`
+7. **Install smoke** (only after APK exists):  
+   - Emulator: Device Manager → Create Device → Cold Boot → `adb install -r app-debug.apk`  
+   - Or USB phone with USB debugging: same `adb install`.  
+   - Open app → confirm SaaS webview loads (tenant login). **Do not claim PASS in the contract until this step is done and evidence is written.**
+8. After a real APK + install smoke, update `MobileAppContract.ts` `android_local_build` (status/evidence) and refresh `mobile.android_scaffold.md` / a new smoke evidence file. **Still do not flip Play Store publish** without the $25 Console registration + CEO approval.
 
-A debug APK from the steps above would be sideloadable for internal testing at
-zero Play Console cost — but **this session produced no APK and claims no install PASS**.
+A debug APK is sideloadable for internal testing at **zero Play Console cost** — but **this session produced no APK and claims no install PASS**.
 
 ---
 

@@ -14,7 +14,7 @@
  * Never targets production. Defaults to the already-approved staging deploy;
  * override with STAGING_BASE_URL if needed. No OpenAI, no spend, read-only GETs.
  *
- * Usage: node scripts/staging-smoke-ha-dr-readiness.mjs [--skip-network]
+ * Usage: node scripts/staging-smoke-ha-dr-readiness.mjs [--skip-network|--skip-wait]
  */
 import { spawnSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -24,7 +24,8 @@ import path from "node:path";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 const BASE = (process.env.STAGING_BASE_URL?.trim() || "https://ideal-victory-staging.up.railway.app").replace(/\/$/, "");
-const SKIP_NETWORK = process.argv.includes("--skip-network");
+const SKIP_NETWORK =
+  process.argv.includes("--skip-network") || process.argv.includes("--skip-wait");
 const CONCURRENCY = 5;
 const MAX_LATENCY_MS = 3000;
 
@@ -47,7 +48,7 @@ function fail(check, detail) {
 
 async function runCapacitySmoke() {
   if (SKIP_NETWORK) {
-    warn("capacity_smoke", "skipped via --skip-network");
+    warn("capacity_smoke", "skipped via --skip-network/--skip-wait");
     return { skipped: true, ok: null, results: [] };
   }
   const results = [];
@@ -116,7 +117,10 @@ ${JSON.stringify(smoke.results, null, 2)}
 - No se toca ninguna flag de producción ni se realiza ningún envío/spend.
 `;
   writeFileSync(file, md, "utf8");
+  const latest = path.join(dir, "ha-dr-readiness_latest.md");
+  writeFileSync(latest, md, "utf8");
   console.log(`\nEvidence written: ${file}`);
+  console.log(`Evidence latest: ${latest}`);
   return file;
 }
 

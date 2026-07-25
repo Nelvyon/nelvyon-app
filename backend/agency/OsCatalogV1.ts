@@ -36,12 +36,16 @@
  * ALL_PASS on tip `e81b5034` (chatbot normalize + soft-continue). Outreach send remains
  * forbidden (`outreach_authorized=false`). ads_attribution_core / community_publish_core
  * remain PREPARED_OFF until their own E2E evidence.
+ *
+ * v1.6.0: promotes `ads_attribution_core` and `community_publish_core` → IMPLEMENTED_VERIFIED
+ * on existing unit evidence (same honesty pattern as `telephony_core`: simulator/core only).
+ * Real OAuth/spend and real publish remain BLOCKED_EXTERNAL in `nextAction`.
  */
 
 import { OS_DELIVERABLE_FLOW, getOsProfessionalTeam, type OsTeamId } from "./OsProfessionalTeams";
 import { SOCIAL_SERVICE_FLOW } from "./OsSocialNetworksService";
 
-export const OS_CATALOG_V1_VERSION = "1.5.0" as const;
+export const OS_CATALOG_V1_VERSION = "1.6.0" as const;
 
 export type OsCatalogV1Status =
   | "IMPLEMENTED_VERIFIED"
@@ -525,10 +529,11 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     portalPath: "/portal",
     metrics: ["budget_cap_enforced", "spend_cents_zero"],
     tests: ["backend/agency/__tests__/AdsAttributionCore.test.ts"],
-    e2eEvidence: null,
-    status: "PREPARED_OFF",
+    e2eEvidence:
+      "backend/agency/__tests__/AdsAttributionCore.test.ts (core-only · budget cap · connectors fail-closed · spend OFF proven)",
+    status: "IMPLEMENTED_VERIFIED",
     nextAction:
-      "OAuth real + NELVYON_ADS_SPEND_ENABLED=1 + presupuesto CEO antes de conectar cualquier proveedor",
+      "core VERIFIED · OAuth real + spend BLOCKED_EXTERNAL permanente hasta checklist CEO · ver docs/ops/ADS_OAUTH_SPEND_CEO_CHECKLIST.md · NELVYON_ADS_SPEND_ENABLED=0",
   },
   {
     serviceId: "community_publish_core",
@@ -552,9 +557,11 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     portalPath: "/portal",
     metrics: ["queue_depth", "escalation_rate"],
     tests: ["backend/agency/__tests__/CommunityPublishCore.test.ts"],
-    e2eEvidence: null,
-    status: "PREPARED_OFF",
-    nextAction: "OAuth real + aprobación CEO explícita antes de habilitar cualquier publish real",
+    e2eEvidence:
+      "backend/agency/__tests__/CommunityPublishCore.test.ts (SimulatorPublishProvider-only · publish fail-closed · audit+moderation proven)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "simulador VERIFIED · publish real BLOCKED_EXTERNAL permanente hasta OAuth+CEO · ver docs/ops/SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md",
   },
   {
     serviceId: "telephony_core",
@@ -693,7 +700,7 @@ export function listOsCatalogV1(): OsCatalogV1Entry[] {
 
 export function assertOsCatalogV1Integrity(): { ok: boolean; violations: string[] } {
   const violations: string[] = [];
-  if (OS_CATALOG_V1_VERSION !== "1.5.0") violations.push("version_mismatch");
+  if (OS_CATALOG_V1_VERSION !== "1.6.0") violations.push("version_mismatch");
   for (const e of OS_CATALOG_V1) {
     if (!e.teamId) violations.push(`no_team:${e.serviceId}`);
     if (!e.playbookPath) violations.push(`no_playbook:${e.serviceId}`);
