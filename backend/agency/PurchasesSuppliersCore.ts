@@ -216,6 +216,21 @@ export const DEFAULT_APPROVAL_POLICY_CENTS: Record<ApprovalRole, number> = {
   admin: 1_000_000,
 };
 
+/** JSON-serializable tenant snapshot (Maps → Record / arrays). */
+export type PurchasesTenantSnapshot = {
+  suppliers: Record<string, Supplier>;
+  purchaseRequests: Record<string, PurchaseRequest>;
+  rfqs: Record<string, Rfq>;
+  purchaseOrders: Record<string, PurchaseOrder>;
+  goodsReceipts: Record<string, GoodsReceipt>;
+  returns: Record<string, SupplierReturn>;
+  incidents: Record<string, Incident>;
+  attachments: Record<string, AttachmentMeta>;
+  auditLog: AuditEntry[];
+  approvalPolicy: ApprovalPolicy;
+  idempotency: Record<string, string>;
+};
+
 type IdempotencyBucket = "pr" | "po" | "receipt";
 
 type TenantState = {
@@ -231,6 +246,35 @@ type TenantState = {
   approvalPolicy: ApprovalPolicy;
   idempotency: Map<string, string>;
 };
+
+function mapToRecord<V>(map: Map<string, V>): Record<string, V> {
+  return Object.fromEntries(map.entries());
+}
+
+function recordToMap<V>(record: Record<string, V> | undefined): Map<string, V> {
+  return new Map(Object.entries(record ?? {}));
+}
+
+function emptyPurchasesSnapshot(tenantId: TenantId): PurchasesTenantSnapshot {
+  const empty = emptyTenantState(tenantId);
+  return {
+    suppliers: {},
+    purchaseRequests: {},
+    rfqs: {},
+    purchaseOrders: {},
+    goodsReceipts: {},
+    returns: {},
+    incidents: {},
+    attachments: {},
+    auditLog: [],
+    approvalPolicy: {
+      tenantId: empty.approvalPolicy.tenantId,
+      maxApproveCents: { ...empty.approvalPolicy.maxApproveCents },
+      updatedAt: empty.approvalPolicy.updatedAt,
+    },
+    idempotency: {},
+  };
+}
 
 function emptyTenantState(tenantId: TenantId): TenantState {
   return {
@@ -270,6 +314,66 @@ export class PurchasesSuppliersCore {
 
   reset(): void {
     this.tenants.clear();
+  }
+
+  /**
+   * Serialize one tenant's state to a JSON-safe snapshot.
+   * Missing / empty tenant → empty structure (default approval policy).
+   */
+  exportTenantSnapshot(tenantId: string): PurchasesTenantSnapshot {
+    const id = (tenantId ?? "").trim();
+    if (!id) return emptyPurchasesSnapshot("");
+    const state = this.tenants.get(id);
+    if (!state) return emptyPurchasesSnapshot(id);
+    return {
+      suppliers: mapToRecord(state.suppliers),
+      purchaseRequests: mapToRecord(state.purchaseRequests),
+      rfqs: mapToRecord(state.rfqs),
+      purchaseOrders: mapToRecord(state.purchaseOrders),
+      goodsReceipts: mapToRecord(state.goodsReceipts),
+      returns: mapToRecord(state.returns),
+      incidents: mapToRecord(state.incidents),
+      attachments: mapToRecord(state.attachments),
+      auditLog: state.auditLog.map((e) => ({ ...e })),
+      approvalPolicy: {
+        tenantId: state.approvalPolicy.tenantId,
+        maxApproveCents: { ...state.approvalPolicy.maxApproveCents },
+        updatedAt: state.approvalPolicy.updatedAt,
+      },
+      idempotency: mapToRecord(state.idempotency),
+    };
+  }
+
+  /**
+   * Replace one tenant's state from a snapshot (clear then load). Restores Maps.
+   */
+  importTenantSnapshot(tenantId: string, snapshot: object): void {
+    const id = this.requireTenantId(tenantId);
+    const snap = (snapshot ?? {}) as Partial<PurchasesTenantSnapshot>;
+    const base = emptyTenantState(id);
+    const next: TenantState = {
+      suppliers: recordToMap(snap.suppliers),
+      purchaseRequests: recordToMap(snap.purchaseRequests),
+      rfqs: recordToMap(snap.rfqs),
+      purchaseOrders: recordToMap(snap.purchaseOrders),
+      goodsReceipts: recordToMap(snap.goodsReceipts),
+      returns: recordToMap(snap.returns),
+      incidents: recordToMap(snap.incidents),
+      attachments: recordToMap(snap.attachments),
+      auditLog: Array.isArray(snap.auditLog) ? snap.auditLog.map((e) => ({ ...e })) : [],
+      approvalPolicy: snap.approvalPolicy
+        ? {
+            tenantId: snap.approvalPolicy.tenantId || id,
+            maxApproveCents: {
+              ...DEFAULT_APPROVAL_POLICY_CENTS,
+              ...snap.approvalPolicy.maxApproveCents,
+            },
+            updatedAt: snap.approvalPolicy.updatedAt || base.approvalPolicy.updatedAt,
+          }
+        : base.approvalPolicy,
+      idempotency: recordToMap(snap.idempotency),
+    };
+    this.tenants.set(id, next);
   }
 
   private requireTenantId(tenantId: TenantId): TenantId {

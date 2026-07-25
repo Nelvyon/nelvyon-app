@@ -1016,14 +1016,14 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 ### 8.1 Veredicto
 
-**[VERIFICADO]** Fuente: HANDOVER + `OS_CATALOG_V1.md` — **2026-07-25** (ADR-060 ERP non-financial cores · catalog **v1.7.0**)
+**[VERIFICADO]** Fuente: HANDOVER + `OS_CATALOG_V1.md` — **2026-07-25** (ADR-061 Postgres ERP SSOT · catalog **v1.7.0**)
 
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | staging tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · prod flags **OFF** · local tip **uncommitted**: catalog **v1.7.0** + ERP wire + mig **519** |
-| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** (in-memory process-local, telephony pattern) · ads/community cores **VERIFIED** (core/sim) · OAuth/spend/publish **BLOCKED_EXTERNAL** |
-| **ERP honesty** | API/UI `/saas/erp/*` wired · mig **519** schema reserved · **no** dual-write · payments/accounting **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · health **BLOCKED_LEGAL** · **still no Odoo / no finance GL** |
+| **SHA / deploys** | staging tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · prod flags **OFF** · local tip **uncommitted**: catalog **v1.7.0** + ERP wire + mig **519/520** + `with*Persistence` |
+| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API wired · **ADR-061** Postgres `erp_domain_snapshots` SSOT when `DATABASE_URL` (process-memory **not** SSOT) · ads/community cores **VERIFIED** (core/sim) · OAuth/spend/publish **BLOCKED_EXTERNAL** |
+| **ERP honesty** | API/UI `/saas/erp/*` → `with*Persistence` · mig **519** reserved + **520** persistence+RLS · restart smoke **pending** staging · payments/accounting **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · health **BLOCKED_LEGAL** · **still no Odoo / no finance GL** |
 | **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker **VERIFIED** / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile Android build VERIFIED / device+stores **BLOCKED** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |
 | **Competitive honesty** | No live OAuth spend · no GHL telephony parity (sim only) · **no Odoo ERP/finance** · mass-send blocked · social/publish pending CEO · no proven multi-tenant prod outcomes |
 | **Blocker claimReady** | Legal Pepito + licencia · mass-send **BLOCKED_LEGAL** |

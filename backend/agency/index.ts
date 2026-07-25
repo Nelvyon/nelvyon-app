@@ -563,6 +563,7 @@ export type {
   PurchaseRequest,
   PurchaseRequestStatus,
   PurchasesErrorCode,
+  PurchasesTenantSnapshot,
   QuoteLine,
   Rfq,
   Supplier,
@@ -581,6 +582,7 @@ export {
 export type {
   AuditEntry as InventoryAuditEntry,
   InventoryErrorCode,
+  InventoryTenantSnapshot,
   Location,
   Lot,
   MinStockAlert,
@@ -624,6 +626,7 @@ export type {
   ManufacturingOrder,
   ManufacturingOrderStatus,
   ManufacturingOpsErrorCode,
+  ManufacturingTenantSnapshot,
   NonConformance,
   NonConformanceStatus,
   PlmChangeRequestStatus,
@@ -656,6 +659,7 @@ export type {
   ProjectTask,
   ProjectsFsAuditEntry,
   ProjectsFsErrorCode,
+  ProjectsFsTenantSnapshot,
   SlaBreachCheck,
   SlaTarget,
   TaskStatus,
@@ -664,6 +668,23 @@ export type {
   TimesheetStatus,
   WorkOrderStatus,
 } from "./ProjectsFieldServiceCore";
+export {
+  ErpDomainSnapshotStore,
+  ErpSnapshotConflictError,
+  getErpDomainSnapshotStore,
+  resetErpDomainSnapshotStoreForTests,
+} from "./erp/ErpDomainSnapshotStore";
+export type {
+  ErpAuditEventInput,
+  ErpDomain,
+  ErpSnapshotRow,
+} from "./erp/ErpDomainSnapshotStore";
+export {
+  withInventoryPersistence,
+  withManufacturingPersistence,
+  withProjectsFsPersistence,
+  withPurchasesPersistence,
+} from "./erp/ErpPersistentRuntime";
 export {
   SECTOR_CAPABILITY_TAXONOMY,
   assertSectorTaxonomyIntegrity,

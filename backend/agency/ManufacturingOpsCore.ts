@@ -212,6 +212,24 @@ export type AuditEntry = {
   detail: string;
 };
 
+/** JSON-serializable tenant snapshot (Maps → Record / arrays). */
+export type ManufacturingTenantSnapshot = {
+  boms: Record<string, Bom>;
+  workCenters: Record<string, WorkCenter>;
+  routings: Record<string, Routing>;
+  manufacturingOrders: Record<string, ManufacturingOrder>;
+  qualityPlans: Record<string, QualityPlan>;
+  inspections: Record<string, Inspection>;
+  nonConformances: Record<string, NonConformance>;
+  correctiveActions: Record<string, CorrectiveAction>;
+  assets: Record<string, Asset>;
+  maintenanceOrders: Record<string, MaintenanceOrder>;
+  plmDocuments: Record<string, PlmDocument>;
+  auditLog: AuditEntry[];
+  bomVersionBySku: Record<string, number>;
+  plmVersionBySku: Record<string, number>;
+};
+
 /**
  * IoT adapter stub — PREPARED_OFF. `connect()` ALWAYS throws `BLOCKED_EXTERNAL`.
  * No env flag unlocks this path.
@@ -246,6 +264,33 @@ type TenantState = {
   /** Highest PLM version issued per productSku. */
   plmVersionBySku: Map<string, number>;
 };
+
+function mapToRecord<V>(map: Map<string, V>): Record<string, V> {
+  return Object.fromEntries(map.entries());
+}
+
+function recordToMap<V>(record: Record<string, V> | undefined): Map<string, V> {
+  return new Map(Object.entries(record ?? {}));
+}
+
+function emptyManufacturingSnapshot(): ManufacturingTenantSnapshot {
+  return {
+    boms: {},
+    workCenters: {},
+    routings: {},
+    manufacturingOrders: {},
+    qualityPlans: {},
+    inspections: {},
+    nonConformances: {},
+    correctiveActions: {},
+    assets: {},
+    maintenanceOrders: {},
+    plmDocuments: {},
+    auditLog: [],
+    bomVersionBySku: {},
+    plmVersionBySku: {},
+  };
+}
 
 function emptyTenantState(): TenantState {
   return {
@@ -312,6 +357,61 @@ export class ManufacturingOpsCore {
 
   reset(): void {
     this.tenants.clear();
+  }
+
+  /**
+   * Serialize one tenant's state to a JSON-safe snapshot.
+   * Missing / empty tenant → empty structure.
+   */
+  exportTenantSnapshot(tenantId: string): ManufacturingTenantSnapshot {
+    const id = (tenantId ?? "").trim();
+    if (!id) return emptyManufacturingSnapshot();
+    const state = this.tenants.get(id);
+    if (!state) return emptyManufacturingSnapshot();
+    return {
+      boms: mapToRecord(state.boms),
+      workCenters: mapToRecord(state.workCenters),
+      routings: mapToRecord(state.routings),
+      manufacturingOrders: mapToRecord(state.manufacturingOrders),
+      qualityPlans: mapToRecord(state.qualityPlans),
+      inspections: mapToRecord(state.inspections),
+      nonConformances: mapToRecord(state.nonConformances),
+      correctiveActions: mapToRecord(state.correctiveActions),
+      assets: mapToRecord(state.assets),
+      maintenanceOrders: mapToRecord(state.maintenanceOrders),
+      plmDocuments: mapToRecord(state.plmDocuments),
+      auditLog: state.auditLog.map((e) => ({ ...e })),
+      bomVersionBySku: mapToRecord(state.bomVersionBySku),
+      plmVersionBySku: mapToRecord(state.plmVersionBySku),
+    };
+  }
+
+  /**
+   * Replace one tenant's state from a snapshot (clear then load). Restores Maps.
+   */
+  importTenantSnapshot(tenantId: string, snapshot: object): void {
+    if (!tenantId || !tenantId.trim()) {
+      throw new ManufacturingOpsError("TENANT_MISMATCH", "tenantId is required");
+    }
+    const id = tenantId.trim();
+    const snap = (snapshot ?? {}) as Partial<ManufacturingTenantSnapshot>;
+    const next: TenantState = {
+      boms: recordToMap(snap.boms),
+      workCenters: recordToMap(snap.workCenters),
+      routings: recordToMap(snap.routings),
+      manufacturingOrders: recordToMap(snap.manufacturingOrders),
+      qualityPlans: recordToMap(snap.qualityPlans),
+      inspections: recordToMap(snap.inspections),
+      nonConformances: recordToMap(snap.nonConformances),
+      correctiveActions: recordToMap(snap.correctiveActions),
+      assets: recordToMap(snap.assets),
+      maintenanceOrders: recordToMap(snap.maintenanceOrders),
+      plmDocuments: recordToMap(snap.plmDocuments),
+      auditLog: Array.isArray(snap.auditLog) ? snap.auditLog.map((e) => ({ ...e })) : [],
+      bomVersionBySku: recordToMap(snap.bomVersionBySku),
+      plmVersionBySku: recordToMap(snap.plmVersionBySku),
+    };
+    this.tenants.set(id, next);
   }
 
   // ── BOM ──────────────────────────────────────────────────────────────────

@@ -1,20 +1,29 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-25** — **ADR-060** · última mig repo **`519_erp_non_financial_cores.sql`** (schema reserved · **no** dual-write) · tip **uncommitted** · staging tip **`bd165985`** aún **sin** 519 aplicada
+> Actualizado: **2026-07-25** — **ADR-061** · última mig repo **`520_erp_postgres_persistence.sql`** · API `with*Persistence` · tip **uncommitted** · staging tip **`bd165985`** aún **sin** 519/520
 
 ---
 
-## ADR-060 — ERP non-financial schema (519)
+## ADR-061 — Postgres ERP SSOT (519 reserved + 520 snapshots)
 
 | Campo | Valor |
 |-------|-------|
-| **Migración nueva** | **Sí** — `519_erp_non_financial_cores.sql` |
-| **Alcance** | Tablas reserved: `erp_suppliers`, `erp_purchase_orders`, `erp_inventory_products`, `erp_warehouses`, `erp_stock_moves`, manufacturing MO table(s), `saas_projects_erp` (+ índices tenant) |
-| **Runtime SSOT** | **In-memory** agency cores (`PurchasesSuppliersCore` / `InventoryWarehousesCore` / `ManufacturingOpsCore` / `ProjectsFieldServiceCore`) — **process-local** hasta dual-write explícito |
-| **Dual-write** | **No** implementado · RLS comments only · no claim DB SSOT |
-| **Fuera de alcance** | Payments · bank · tax · GL · cost accounting · IoT · e-signature columns (**BLOCKED_***) |
-| **Deploy** | **Pending** tip commit + migrate on staging/prod · staging live tip **`bd165985`** verified through **518** lineage; **519** not claimed applied |
+| **Migración 519** | `519_erp_non_financial_cores.sql` — companion relational tables **reserved** (not required for first durable path) |
+| **Migración 520** | `520_erp_postgres_persistence.sql` — `erp_domain_snapshots` (tenant+domain PK, JSONB payload, optimistic `version`) + `erp_audit_events` + RLS helpers |
+| **Core API** | `exportTenantSnapshot` / `importTenantSnapshot` on 4 ERP cores · `ErpDomainSnapshotStore` · `with*Persistence` |
+| **Runtime SSOT** | **Postgres** `erp_domain_snapshots` when `DATABASE_URL` set — **process-memory is not SSOT** · without DB → in-memory fallback (dev/tests) · version conflict → HTTP **409** |
+| **API routes** | `/api/saas/erp/{purchases,inventory,manufacturing,projects-fs}` → `with*Persistence` |
+| **Fuera de alcance** | Payments · bank · tax · GL · cost accounting · IoT · e-signature (**BLOCKED_***) |
+| **Deploy** | **Pending** tip commit + migrate · staging live tip **`bd165985`** verified through **518**; **519/520** not claimed applied · restart smoke **pending** |
 | **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` · **untouched** |
+
+## ADR-060 — ERP product surface (catalog v1.7.0 · superseded SSOT by ADR-061)
+
+| Campo | Valor |
+|-------|-------|
+| **Alcance** | Wire Blocks 26–29+35 · OsCatalogV1 **v1.7.0** · API/UI `/saas/erp/*` · mig **519** schema reserved |
+| **SSOT (histórico ADR-060)** | In-memory / process-local — **superseded** by ADR-061 when `DATABASE_URL` set |
+| **Fuera de alcance** | Payments · bank · tax · GL · cost · IoT · e-signature · Odoo |
 
 ## ADR-057/059 — notas schema
 
@@ -49,15 +58,15 @@
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
 | **Total archivos** | 411+ |
-| **Última migración (repo)** | `519_erp_non_financial_cores.sql` (**uncommitted** tip · schema reserved) |
+| **Última migración (repo)** | `520_erp_postgres_persistence.sql` (**uncommitted** tip · snapshots + companions) |
 | **Shared Memory schema** | 514 + RLS 515 · `schema.proposed.sql` referencia histórica |
 | **Runner** | `backend/db/migrate.ts` |
 | **Tracking** | Tabla `_migrations (name, executed_at)` |
 | **Comando** | `pnpm -C apps/web migrate` |
 | **Prod** | Railway `preDeployCommand` migrate en deploy Web |
-| **Prod verified** | **517** + **518** in `_migrations` (2026-07-22 SSOT DB probe) · **519** not yet claimed applied |
+| **Prod verified** | **517** + **518** in `_migrations` (2026-07-22 SSOT DB probe) · **519/520** not yet claimed applied |
 
-**Rango post-elite CI:** 508–518 (`scripts/validate-post-elite-migrations.mjs`) — **519** ERP reserved is post-range until validator updated after commit.  
+**Rango post-elite CI:** 508–518 (`scripts/validate-post-elite-migrations.mjs`) — **519/520** ERP are post-range until validator updated after commit.  
 **SQL SSOT gate:** `scripts/validate-sql-alembic-ssot.mjs` (ADR-002/039) — files + optional DB probe.  
 **Rango elite SaaS CI:** 401–507 (`scripts/validate-saas-migrations.mjs`).
 
@@ -110,7 +119,7 @@
 ### Private AI
 - `504_private_ai_modular.sql`, `503_private_ai_phase2.sql`
 
-### Recientes (508–519)
+### Recientes (508–520)
 - `508_saas_prospecting.sql` — prospecting lists
 - `509_saas_seo_tracked_keywords.sql` — SEO keywords
 - `510_enterprise_performance_indexes.sql` — índices performance
@@ -122,7 +131,8 @@
 - `516_fastapi_rls_repair.sql` — FastAPI RLS dual-plane (KI-026)
 - `517_workspaces_tenant_extension_columns.sql` — `workspaces.timezone` · **prod verified**
 - `518_workflows_list_columns.sql` — `workflows.is_active` · **prod verified**
-- `519_erp_non_financial_cores.sql` — reserved ERP tables (suppliers/PO/inventory/warehouses/stock_moves/MO/`saas_projects_erp`) · **SSOT remains in-memory cores until dual-write** · RLS comments only · **deploy pending** (tip uncommitted)
+- `519_erp_non_financial_cores.sql` — reserved ERP tables (suppliers/PO/inventory/warehouses/stock_moves/MO/`saas_projects_erp`) · RLS comments only · **deploy pending**
+- `520_erp_postgres_persistence.sql` — `erp_domain_snapshots` + companions + `erp_audit_events` + RLS · API routes wired to `with*Persistence` · **deploy pending**
 
 ---
 

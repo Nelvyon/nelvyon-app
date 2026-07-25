@@ -45,7 +45,8 @@
  * `purchases_suppliers_core`, `inventory_warehouses_core`, `manufacturing_ops_core`,
  * `projects_field_service_core`, `sector_capability_taxonomy` → IMPLEMENTED_VERIFIED on
  * unit evidence. Payments/accounting, IoT, e-signature, and regulated health remain
- * BLOCKED_* in `nextAction`. Runtime SSOT is in-memory; migration 519 schema is reserved.
+ * BLOCKED_* in `nextAction`. Runtime SSOT is Postgres `erp_domain_snapshots` (mig 520)
+ * when DATABASE_URL is set; otherwise in-memory fallback. Migration 519 schema reserved.
  */
 
 import { OS_DELIVERABLE_FLOW, getOsProfessionalTeam, type OsTeamId } from "./OsProfessionalTeams";
@@ -697,7 +698,7 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
       "backend/agency/__tests__/PurchasesSuppliersCore.test.ts (in-memory · tenant isolation · recordPayment BLOCKED_SCOPE)",
     status: "IMPLEMENTED_VERIFIED",
     nextAction:
-      "core VERIFIED in-memory · payments/accounting forever BLOCKED_SCOPE until dual-write + legal · schema 519 reserved · 0€",
+      "Postgres SSOT via erp_domain_snapshots (mig 520) when live · payments/accounting forever BLOCKED_SCOPE · schema 519 reserved · 0€",
   },
   {
     serviceId: "inventory_warehouses_core",
@@ -725,7 +726,7 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
       "backend/agency/__tests__/InventoryWarehousesCore.test.ts (in-memory · no cost/GL · move immutability proven)",
     status: "IMPLEMENTED_VERIFIED",
     nextAction:
-      "core VERIFIED in-memory · no cost/GL · dual-write to 519 schema pending · never claim accounting stock valuation",
+      "Postgres SSOT via erp_domain_snapshots (mig 520) when live · no cost/GL · never claim accounting stock valuation",
   },
   {
     serviceId: "manufacturing_ops_core",
@@ -745,7 +746,7 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
       "backend/agency/__tests__/ManufacturingOpsCore.test.ts (in-memory · IoTAdapter.connect BLOCKED_EXTERNAL)",
     status: "IMPLEMENTED_VERIFIED",
     nextAction:
-      "core VERIFIED in-memory · IoT forever BLOCKED_EXTERNAL until CEO ops rewrite · no shop-floor vendor · 0€",
+      "Postgres SSOT via erp_domain_snapshots (mig 520) when live · IoT forever BLOCKED_EXTERNAL until CEO ops rewrite · 0€",
   },
   {
     serviceId: "projects_field_service_core",
@@ -773,7 +774,7 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
       "backend/agency/__tests__/ProjectsFieldServiceCore.test.ts (in-memory · signature BLOCKED_EXTERNAL · margin NON-GL)",
     status: "IMPLEMENTED_VERIFIED",
     nextAction:
-      "core VERIFIED in-memory · e-signature forever BLOCKED_EXTERNAL until consent+provider · margin never posts to GL",
+      "Postgres SSOT via erp_domain_snapshots (mig 520) when live · e-signature forever BLOCKED_EXTERNAL until consent+provider · margin never posts to GL",
   },
   {
     serviceId: "sector_capability_taxonomy",

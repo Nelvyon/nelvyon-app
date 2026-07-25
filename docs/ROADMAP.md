@@ -81,7 +81,8 @@
 | ADR-056 elite absolute audit | ✅ | P0/P1 fixes · NOT READY |
 | **ADR-057 Blocks 11–25 (internal cores)** | ✅ | cores internos VERIFIED · externos BLOCKED_* · **NOT READY** |
 | **ADR-059 catalog v1.6.0 + i18n/mobile honesty** | ✅ | ads/community promote (core/sim) · email locale PARTIAL · Android scaffold · tip live `bd165985` |
-| **ADR-060 ERP non-financial cores (catalog v1.7.0)** | ✅ | Blocks 26–29+35 **IMPLEMENTED_VERIFIED** in-memory · API/UI wired · mig **519** reserved · dual-write pending · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · tip **uncommitted** · **NOT READY** |
+| **ADR-060 ERP non-financial cores (catalog v1.7.0)** | ✅ | Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI wired · mig **519** reserved · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · tip **uncommitted** · **NOT READY** |
+| **ADR-061 Postgres ERP SSOT (mig 520)** | 🟡 | API `with*Persistence` · `erp_domain_snapshots` SSOT when `DATABASE_URL` · process-memory **not** SSOT · mig **519+520** coded · restart smoke **pending** staging deploy · `claimReady: false` |
 | Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |
 | Block 12 influencers_pr | ✅ | **VERIFIED** · outreach forbidden |
 | Block 13 ads_attribution_core | ✅ | **VERIFIED** (core) · spend/OAuth BLOCKED_EXTERNAL · catalog v1.6.0 |
@@ -97,10 +98,10 @@
 | Block 23 legacy consolidation | ✅ | VERIFIED · zero unsafe deletes |
 | Block 24 private_vector_rag | ✅ | Docker VERIFIED · Railway PREPARED_OFF · P2 minScore |
 | Block 25 private_ai_canary_prep | 🟡 | PREPARED_OFF · BLOCKED_CEO |
-| Block 26 purchases_suppliers_core | ✅ | **IMPLEMENTED_VERIFIED** (in-memory) · payments **BLOCKED_SCOPE** · catalog **v1.7.0** + `/saas/erp/purchases` · 519 reserved · no dual-write |
-| Block 27 inventory_warehouses_core | ✅ | **IMPLEMENTED_VERIFIED** (in-memory) · no cost/GL · catalog **v1.7.0** + `/saas/erp/inventory` · 519 reserved |
-| Block 28 manufacturing_ops_core | ✅ | **IMPLEMENTED_VERIFIED** (in-memory) · IoT **BLOCKED_EXTERNAL** · catalog **v1.7.0** + `/saas/erp/manufacturing` |
-| Block 29 projects_field_service_core | ✅ | **IMPLEMENTED_VERIFIED** (in-memory) · signature **BLOCKED_EXTERNAL** · catalog **v1.7.0** + `/saas/erp/projects` |
+| Block 26 purchases_suppliers_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withPurchasesPersistence` · Postgres SSOT when DB · payments **BLOCKED_SCOPE** · catalog **v1.7.0** · 519 reserved |
+| Block 27 inventory_warehouses_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withInventoryPersistence` · no cost/GL · catalog **v1.7.0** · 519 reserved |
+| Block 28 manufacturing_ops_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withManufacturingPersistence` · IoT **BLOCKED_EXTERNAL** · catalog **v1.7.0** |
+| Block 29 projects_field_service_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withProjectsFsPersistence` · signature **BLOCKED_EXTERNAL** · catalog **v1.7.0** |
 | Block 35 sector_capability_taxonomy | ✅ | **IMPLEMENTED_VERIFIED** (inventory) · industry PREPARED_OFF · health **BLOCKED_LEGAL** · catalog **v1.7.0** + `/saas/erp/sectors` · no Odoo/finance |
 
 ---

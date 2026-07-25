@@ -53,6 +53,29 @@ export class DbClient {
     return res.rows as T[];
   }
 
+  /**
+   * Run work inside a single connection transaction (BEGIN/COMMIT/ROLLBACK).
+   * Caller receives a PoolClient bound to that transaction.
+   */
+  async withTransaction<T>(fn: (client: pg.PoolClient) => Promise<T>): Promise<T> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await fn(client);
+      await client.query("COMMIT");
+      return result;
+    } catch (err) {
+      try {
+        await client.query("ROLLBACK");
+      } catch {
+        /* swallow rollback errors; rethrow original */
+      }
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   async end(): Promise<void> {
     await this.pool.end();
     dbClientSingleton = undefined;

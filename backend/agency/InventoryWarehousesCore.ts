@@ -176,6 +176,25 @@ export type AuditEntry = {
   detail: string;
 };
 
+/** JSON-serializable tenant snapshot (Maps → Record / arrays). */
+export type InventoryTenantSnapshot = {
+  products: Record<string, Product>;
+  warehouses: Record<string, Warehouse>;
+  locations: Record<string, Location>;
+  balances: Record<string, StockBalance>;
+  moves: StockMove[];
+  movesByIdempotency: Record<string, string>;
+  movesById: Record<string, StockMove>;
+  lots: Record<string, Lot>;
+  lotsByCode: Record<string, string>;
+  serials: Record<string, Serial>;
+  serialsByCode: Record<string, string>;
+  reservations: Record<string, Reservation>;
+  physicalCounts: Record<string, PhysicalCount>;
+  minStockRules: Record<string, MinStockRule>;
+  auditLog: AuditEntry[];
+};
+
 type BalanceKey = string;
 
 function balanceKey(locationId: string, productSku: string): BalanceKey {
@@ -199,6 +218,44 @@ type TenantState = {
   minStockRules: Map<string, MinStockRule>;
   auditLog: AuditEntry[];
 };
+
+function mapToRecord<V>(map: Map<string, V>): Record<string, V> {
+  return Object.fromEntries(map.entries());
+}
+
+function recordToMap<V>(record: Record<string, V> | undefined): Map<string, V> {
+  return new Map(Object.entries(record ?? {}));
+}
+
+function emptyInventorySnapshot(): InventoryTenantSnapshot {
+  return {
+    products: {},
+    warehouses: {},
+    locations: {},
+    balances: {},
+    moves: [],
+    movesByIdempotency: {},
+    movesById: {},
+    lots: {},
+    lotsByCode: {},
+    serials: {},
+    serialsByCode: {},
+    reservations: {},
+    physicalCounts: {},
+    minStockRules: {},
+    auditLog: [],
+  };
+}
+
+function freezeStockMove(raw: StockMove): StockMove {
+  const move: StockMove = Object.freeze({
+    ...raw,
+    ...(raw.serialIds?.length
+      ? { serialIds: Object.freeze([...raw.serialIds]) as string[] }
+      : {}),
+  });
+  return move;
+}
 
 function emptyTenantState(): TenantState {
   return {
@@ -345,6 +402,92 @@ export class InventoryWarehousesCore {
   reset(): void {
     this.tenants.clear();
     this.entityOwner.clear();
+  }
+
+  /**
+   * Serialize one tenant's state to a JSON-safe snapshot.
+   * Missing / empty tenant → empty structure.
+   */
+  exportTenantSnapshot(tenantId: string): InventoryTenantSnapshot {
+    const id = (tenantId ?? "").trim();
+    if (!id) return emptyInventorySnapshot();
+    const state = this.tenants.get(id);
+    if (!state) return emptyInventorySnapshot();
+    return {
+      products: mapToRecord(state.products),
+      warehouses: mapToRecord(state.warehouses),
+      locations: mapToRecord(state.locations),
+      balances: mapToRecord(state.balances),
+      moves: state.moves.map((m) => ({ ...m, ...(m.serialIds ? { serialIds: [...m.serialIds] } : {}) })),
+      movesByIdempotency: mapToRecord(state.movesByIdempotency),
+      movesById: mapToRecord(state.movesById),
+      lots: mapToRecord(state.lots),
+      lotsByCode: mapToRecord(state.lotsByCode),
+      serials: mapToRecord(state.serials),
+      serialsByCode: mapToRecord(state.serialsByCode),
+      reservations: mapToRecord(state.reservations),
+      physicalCounts: mapToRecord(state.physicalCounts),
+      minStockRules: mapToRecord(state.minStockRules),
+      auditLog: state.auditLog.map((e) => ({ ...e })),
+    };
+  }
+
+  /**
+   * Replace one tenant's state from a snapshot (clear then load). Restores Maps
+   * and rebuilds the entityOwner index for this tenant's entities.
+   */
+  importTenantSnapshot(tenantId: string, snapshot: object): void {
+    if (!tenantId || !tenantId.trim()) {
+      throw new InventoryError("TENANT_MISMATCH", "tenantId is required");
+    }
+    const id = tenantId.trim();
+    const snap = (snapshot ?? {}) as Partial<InventoryTenantSnapshot>;
+
+    // Drop prior ownership entries for this tenant before reload.
+    for (const [entityId, owner] of [...this.entityOwner.entries()]) {
+      if (owner === id) this.entityOwner.delete(entityId);
+    }
+
+    const frozenMoves = (Array.isArray(snap.moves) ? snap.moves : []).map(freezeStockMove);
+    const movesById = new Map<string, StockMove>();
+    for (const move of frozenMoves) {
+      movesById.set(move.id, move);
+    }
+    // Prefer moves array as SSOT; fill any extra keys from movesById payload.
+    for (const [moveId, raw] of Object.entries(snap.movesById ?? {})) {
+      if (!movesById.has(moveId)) {
+        movesById.set(moveId, freezeStockMove(raw));
+      }
+    }
+
+    const next: TenantState = {
+      products: recordToMap(snap.products),
+      warehouses: recordToMap(snap.warehouses),
+      locations: recordToMap(snap.locations),
+      balances: recordToMap(snap.balances),
+      moves: frozenMoves,
+      movesByIdempotency: recordToMap(snap.movesByIdempotency),
+      movesById,
+      lots: recordToMap(snap.lots),
+      lotsByCode: recordToMap(snap.lotsByCode),
+      serials: recordToMap(snap.serials),
+      serialsByCode: recordToMap(snap.serialsByCode),
+      reservations: recordToMap(snap.reservations),
+      physicalCounts: recordToMap(snap.physicalCounts),
+      minStockRules: recordToMap(snap.minStockRules),
+      auditLog: Array.isArray(snap.auditLog) ? snap.auditLog.map((e) => ({ ...e })) : [],
+    };
+
+    this.tenants.set(id, next);
+
+    for (const wh of next.warehouses.values()) this.registerOwner(wh.id, id);
+    for (const loc of next.locations.values()) this.registerOwner(loc.id, id);
+    for (const lot of next.lots.values()) this.registerOwner(lot.id, id);
+    for (const serial of next.serials.values()) this.registerOwner(serial.id, id);
+    for (const move of next.movesById.values()) this.registerOwner(move.id, id);
+    for (const reservation of next.reservations.values()) this.registerOwner(reservation.id, id);
+    for (const count of next.physicalCounts.values()) this.registerOwner(count.id, id);
+    for (const rule of next.minStockRules.values()) this.registerOwner(rule.id, id);
   }
 
   // ─── Master data ─────────────────────────────────────────────────────────

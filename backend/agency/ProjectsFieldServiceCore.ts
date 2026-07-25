@@ -171,6 +171,17 @@ export type ProjectsFsAuditEntry = {
 /** Hardcoded false — there is no runtime path that grants signature consent. */
 export const SIGNATURE_CONSENT_GRANTED = false as const;
 
+/** JSON-serializable tenant snapshot (Maps → Record / arrays). */
+export type ProjectsFsTenantSnapshot = {
+  projects: Record<string, Project>;
+  capacities: Record<string, AssigneeCapacity>;
+  timesheets: Record<string, TimesheetEntry>;
+  workOrders: Record<string, FieldWorkOrder>;
+  deliverables: Record<string, ClientDeliverable>;
+  slas: Record<string, SlaTarget>;
+  auditLog: ProjectsFsAuditEntry[];
+};
+
 type TenantState = {
   projects: Map<string, Project>;
   capacities: Map<string, AssigneeCapacity>;
@@ -180,6 +191,26 @@ type TenantState = {
   slas: Map<string, SlaTarget>;
   auditLog: ProjectsFsAuditEntry[];
 };
+
+function mapToRecord<V>(map: Map<string, V>): Record<string, V> {
+  return Object.fromEntries(map.entries());
+}
+
+function recordToMap<V>(record: Record<string, V> | undefined): Map<string, V> {
+  return new Map(Object.entries(record ?? {}));
+}
+
+function emptyProjectsFsSnapshot(): ProjectsFsTenantSnapshot {
+  return {
+    projects: {},
+    capacities: {},
+    timesheets: {},
+    workOrders: {},
+    deliverables: {},
+    slas: {},
+    auditLog: [],
+  };
+}
 
 function emptyTenantState(): TenantState {
   return {
@@ -231,6 +262,45 @@ export class ProjectsFieldServiceCore {
 
   reset(): void {
     this.tenants.clear();
+  }
+
+  /**
+   * Serialize one tenant's state to a JSON-safe snapshot.
+   * Missing / empty tenant → empty structure.
+   */
+  exportTenantSnapshot(tenantId: string): ProjectsFsTenantSnapshot {
+    const id = (tenantId ?? "").trim();
+    if (!id) return emptyProjectsFsSnapshot();
+    const state = this.tenants.get(id);
+    if (!state) return emptyProjectsFsSnapshot();
+    return {
+      projects: mapToRecord(state.projects),
+      capacities: mapToRecord(state.capacities),
+      timesheets: mapToRecord(state.timesheets),
+      workOrders: mapToRecord(state.workOrders),
+      deliverables: mapToRecord(state.deliverables),
+      slas: mapToRecord(state.slas),
+      auditLog: state.auditLog.map((e) => ({ ...e })),
+    };
+  }
+
+  /**
+   * Replace one tenant's state from a snapshot (clear then load). Restores Maps.
+   */
+  importTenantSnapshot(tenantId: string, snapshot: object): void {
+    if (!tenantId) throw new ProjectsFsError("TENANT_REQUIRED", "tenantId is required");
+    const id = tenantId;
+    const snap = (snapshot ?? {}) as Partial<ProjectsFsTenantSnapshot>;
+    const next: TenantState = {
+      projects: recordToMap(snap.projects),
+      capacities: recordToMap(snap.capacities),
+      timesheets: recordToMap(snap.timesheets),
+      workOrders: recordToMap(snap.workOrders),
+      deliverables: recordToMap(snap.deliverables),
+      slas: recordToMap(snap.slas),
+      auditLog: Array.isArray(snap.auditLog) ? snap.auditLog.map((e) => ({ ...e })) : [],
+    };
+    this.tenants.set(id, next);
   }
 
   createProject(input: {

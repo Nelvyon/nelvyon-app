@@ -1,18 +1,30 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-25** (ADR-060 ERP living docs). No borrar entradas. Añadir al inicio.
+> Registrar cada deploy significativo. Actualizado: **2026-07-25** (ADR-061 Postgres ERP SSOT). No borrar entradas. Añadir al inicio.
 
-## 2026-07-25 — ADR-060 ERP catalog v1.7.0 + mig 519 (local · deploy **pending**)
+## 2026-07-25 — ADR-061 Postgres ERP SSOT · mig 519+520 · API `with*Persistence` (local · deploy **pending**)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | local verified · staging/prod deploy **pending** parent commit |
+| **Tip / live staging** | **`bd165985`** · deploy **`1de7f724` SUCCESS** (catalog **v1.6** lineage — **sin** v1.7.0 / **519–520** aún) |
+| **Local tip** | **uncommitted** · OsCatalogV1 **v1.7.0** · `/saas/erp/*` + `/api/saas/erp/*` → `with*Persistence` · mig **519** reserved + **520** `erp_domain_snapshots`+RLS |
+| **ERP honesty** | **ADR-061:** process-memory **no longer SSOT** when `DATABASE_URL` · Postgres `erp_domain_snapshots` · in-memory fallback without DB · restart smoke **pending** · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** |
+| **Evidence** | `erp.cores_synthetic_latest.md` **ALL_PASS** · `staging-smoke-erp-persistence.mjs` ready (**not run** on staging) |
+| **claimReady** | **false** · **NOT READY** · **CONDITIONAL_READY** |
+| **Próximo** | Parent commit → push → Railway migrate applies **519+520** → restart smoke `--phase=before|after` |
+
+## 2026-07-25 — ADR-060 ERP catalog v1.7.0 + mig 519 (local · deploy **pending** · SSOT superseded by ADR-061)
 
 | Campo | Valor |
 |-------|-------|
 | **Env** | local verified · staging/prod deploy **pending** parent commit |
 | **Tip / live staging** | **`bd165985`** · deploy **`1de7f724` SUCCESS** (catalog **v1.6** lineage — **sin** v1.7.0 / **519** aún) |
 | **Local tip** | **uncommitted** · OsCatalogV1 **v1.7.0** · `/saas/erp/*` + `/api/saas/erp/*` · mig **519** schema reserved |
-| **ERP honesty** | Runtime SSOT **in-memory** · **no** dual-write · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** |
+| **ERP honesty** | (histórico ADR-060) Runtime SSOT **in-memory** — **superseded** by ADR-061 · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** |
 | **Evidence** | `erp.cores_synthetic_latest.md` **ALL_PASS** |
 | **claimReady** | **false** · **NOT READY** · **CONDITIONAL_READY** |
-| **Próximo** | Parent commit → push → Railway migrate applies **519** (schema only) → optional staging smoke ERP |
+| **Próximo** | See ADR-061 entry above |
 
 ## 2026-07-25 — Staging tip confirm (cierre interno / tip `bd165985`)
 
@@ -21,9 +33,9 @@
 | **Env** | staging `ideal-victory` |
 | **Tip / live** | **`bd165985`** · deploy **`1de7f724` SUCCESS** |
 | **Flags** | `AUTONOMOUS_ALLOW_OPENAI=0` · prod canary OFF · ads spend 0 |
-| **Catalog** | Live **v1.6** closure (i18n/obs/mobile) · local ERP **v1.7.0** **uncommitted** (see entry above) |
+| **Catalog** | Live **v1.6** closure (i18n/obs/mobile) · local ERP **v1.7.0** **uncommitted** (see entries above) |
 | **claimReady** | **false** · **NOT READY** · **CONDITIONAL_READY** |
-| **Nota** | No inventar multi-región ni Railway pgvector · no claim 519 applied on staging until redeploy |
+| **Nota** | No inventar multi-región ni Railway pgvector · no claim 519/520 applied on staging until redeploy |
 
 ## 2026-07-24 — ADR-057 Blocks 11–25 complete (local · deploy pending)
 
