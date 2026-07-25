@@ -737,3 +737,35 @@
 | **Evidencia staging** | tip **`9e931f08`** · deploy **`86c93c8c`** + recycle **`794662d7`** · `_migrations` **519+520** · `erp.persistence_restart_latest.md` **ALL_PASS** · DB row purchases v3 · RLS on · vitest ERP **49 PASS / 2 skip** |
 | **Consecuencias** | Staging durable VERIFIED · prod ERP migrate **blocked** until explicit CTO go-ahead · relational dual-write (519 companions) optional · **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` |
 | **Relación** | ADR-060 · `520_erp_postgres_persistence.sql` · `519_erp_non_financial_cores.sql` · `backend/agency/erp/*` · `/api/saas/erp/*` |
+
+---
+
+## ADR-062 — ERP relational dual-write (519 companions) PREPARED_OFF
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-25 |
+| **Estado** | **PREPARED_OFF** — diseño + plan; **no** implementado como SSOT |
+| **Relación** | ADR-061 (Postgres snapshot SSOT) · mig **519** reserved · mig **520** snapshots |
+
+### Decisión
+
+Mantener **`erp_domain_snapshots` (JSONB + version + FOR UPDATE)** como **SSOT runtime** de Blocks 26–29 hasta evidencia de migración relacional correcta (backfill reversible + dual-write + cutover + rollback).
+
+Las tablas companion de **519/520** permanecen **reservadas / aditivas** — no son el path de lectura/escritura de `/api/saas/erp/*` hoy.
+
+### Plan exacto (cuando se active — no hoy)
+
+1. Migración aditiva (`521+`): solo ADD; **no** DROP de `erp_domain_snapshots`.
+2. Dual-write flag `NELVYON_ERP_RELATIONAL_DUAL_WRITE=0` default.
+3. Backfill reversible + checksum por tenant/domain.
+4. Read flip `NELVYON_ERP_RELATIONAL_READ=0` tras checksum 100% + smokes.
+5. Rollback: apagar flags → snapshot-only (ADR-061).
+
+### Criterio
+
+Sin dual-write live + backfill + read flip + smokes relacionales + runbook firmado → **PREPARED_OFF**.
+
+### Consecuencias
+
+Prod migrate 519/520 = runbook listo, ejecución **BLOCKED_CEO** · `claimReady: false`

@@ -110,11 +110,31 @@ export async function POST(req: Request) {
       return NextResponse.json(result, { status: 201 });
     }
 
+    if (action === "reserve") {
+      const result = await withInventoryPersistence(tenantId, (core) => {
+        const out = core.reserve({
+          tenantId,
+          productSku: typeof body.productSku === "string" ? body.productSku : "",
+          locationId: typeof body.locationId === "string" ? body.locationId : "",
+          qty: typeof body.qty === "number" ? body.qty : Number(body.qty),
+          orderRef: typeof body.orderRef === "string" ? body.orderRef : "",
+          actorId,
+          idempotencyKey:
+            typeof body.idempotencyKey === "string" && body.idempotencyKey.trim()
+              ? body.idempotencyKey
+              : `rsv-${Date.now()}`,
+          reason: typeof body.reason === "string" ? body.reason : undefined,
+        });
+        return { ...out, balances: core.listBalances(tenantId) };
+      });
+      return NextResponse.json(result, { status: 201 });
+    }
+
     return NextResponse.json(
       {
         error: "Unknown action",
         code: "INVALID_INPUT",
-        allowed: ["receive", "create_product", "create_warehouse", "create_location"],
+        allowed: ["receive", "reserve", "create_product", "create_warehouse", "create_location"],
       },
       { status: 400 },
     );
