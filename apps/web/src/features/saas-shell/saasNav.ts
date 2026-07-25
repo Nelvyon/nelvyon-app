@@ -65,7 +65,12 @@ export type SaasNavId =
   | "deliverability"
   | "marketplace"
   | "attribution"
-  | "ai";
+  | "ai"
+  | "erp-purchases"
+  | "erp-inventory"
+  | "erp-manufacturing"
+  | "erp-projects"
+  | "erp-sectors";
 
 export type SaasNavItem = {
   id: SaasNavId;
@@ -118,6 +123,11 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "affiliates", label: "🤝 Programa Afiliados",     href: "/saas/affiliates", group: "gestion" },
   { id: "loyalty",    label: "🏆 Fidelización",           href: "/saas/loyalty",    group: "gestion" },
   { id: "memberships", label: "🎫 Membresías", href: "/saas/memberships", group: "gestion" },
+  { id: "erp-purchases", label: "Compras ERP", href: "/saas/erp/purchases", group: "gestion" },
+  { id: "erp-inventory", label: "Inventario ERP", href: "/saas/erp/inventory", group: "gestion" },
+  { id: "erp-manufacturing", label: "Manufactura ERP", href: "/saas/erp/manufacturing", group: "gestion" },
+  { id: "erp-projects", label: "Proyectos ERP", href: "/saas/erp/projects", group: "gestion" },
+  { id: "erp-sectors", label: "Sectores", href: "/saas/erp/sectors", group: "gestion" },
   { id: "pack-store", label: "🛒 Pack Store", href: "/saas/packs", group: "ia" },
   { id: "data-playbooks", label: "📋 Playbooks", href: "/saas/playbooks", group: "ia" },
   { id: "brief-to-launch", label: "🚀 Lanzar Pack", href: "/saas/brief-to-launch", group: "ia" },

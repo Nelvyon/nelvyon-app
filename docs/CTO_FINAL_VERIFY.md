@@ -1,21 +1,23 @@
-# CTO Final Verify — 2026-07-25 (cierre interno honestidad)
+# CTO Final Verify — 2026-07-25 (ADR-060 ERP honesty)
 
 > **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0 · prod flags **OFF**  
-> Staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0`  
-> Catalog **v1.6.0** (local tip post-commit: i18n + obs + mobile scaffold)
+> Staging tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0`  
+> Catalog **v1.7.0** ERP 26–29+35 · **local uncommitted** on tip `bd165985` · mig **519** reserved · **no** dual-write
 
 ## Tabla final
 
 | Ítem | Valor |
 |------|--------|
-| Staging tip live | **`5adbfcd2`** |
-| Deploy staging | **`d5caafc0` SUCCESS** |
+| Staging tip live | **`bd165985`** |
+| Deploy staging | **`1de7f724` SUCCESS** |
 | Staging URL | https://ideal-victory-staging.up.railway.app |
+| Local tip | **uncommitted** · catalog **v1.7.0** + ERP surface + **519** |
 | OpenAI | `AUTONOMOUS_ALLOW_OPENAI=0` |
 | Veredicto | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` |
-| Catalog | **OsCatalogV1 v1.6.0** |
+| Catalog | **OsCatalogV1 v1.7.0** (local) |
 | Prod flags | **OFF** / **ABSENT** |
 | Legal | `claimReadyLegal` **false** · mass-send **BLOCKED_LEGAL** · Pepito **forbidden** |
+| ERP evidence | `erp.cores_synthetic_latest.md` **ALL_PASS** |
 
 ## Capacidades (honestidad)
 
@@ -29,19 +31,24 @@
 | integrations_marketplace | **VERIFIED** | — |
 | private_vector_rag | Docker **VERIFIED** | Railway **PREPARED_OFF** · P2 minScore |
 | private_ai_canary | **PREPARED_OFF** | **BLOCKED_CEO** |
+| purchases_suppliers_core (26) | **IMPLEMENTED_VERIFIED** (in-memory) | payments **BLOCKED_SCOPE** · 519 reserved |
+| inventory_warehouses_core (27) | **IMPLEMENTED_VERIFIED** (in-memory) | no cost/GL · 519 reserved |
+| manufacturing_ops_core (28) | **IMPLEMENTED_VERIFIED** (in-memory) | IoT **BLOCKED_EXTERNAL** |
+| projects_field_service_core (29) | **IMPLEMENTED_VERIFIED** (in-memory) | signature **BLOCKED_EXTERNAL** |
+| sector_capability_taxonomy (35) | **IMPLEMENTED_VERIFIED** (inventory) | industry PREPARED_OFF · health **BLOCKED_LEGAL** |
 | localization UI | **FULL** | — |
 | localization email/PDF | **PARTIAL** | — |
 | PWA | Chrome **VERIFIED** | iOS **BLOCKED** |
-| mobile | scaffold present | APK **BLOCKED_EXTERNAL** |
+| mobile | Android build VERIFIED | device/stores **BLOCKED** |
 | HA single-region | **VERIFIED** | multi-region **BLOCKED_EXTERNAL/COST** |
 | observability | local **VERIFIED** | paid **PREPARED_OFF** |
 | legacy audit | **VERIFIED** | zero deletes |
 
 ## Clasificación
 
-| Verde verificado | Preparado OFF | Bloqueado externo/CEO/legal |
-|------------------|---------------|------------------------------|
-| Cores arriba (sim/mock/core) · PWA Chrome · HA single-region · obs local · legacy · RAG Docker | Railway pgvector · private_ai_canary · paid APM · social oficial | Twilio/ads OAuth/publish/OAuth apps · APK SDK · iOS · multi-region COST · Pepito · mass-send · claimReady |
+| Verde verificado | Preparado OFF | Bloqueado externo/CEO/legal/scope |
+|------------------|---------------|-----------------------------------|
+| Cores arriba (sim/mock/core/in-memory ERP) · PWA Chrome · HA single-region · obs local · legacy · RAG Docker | Railway pgvector · private_ai_canary · paid APM · social oficial · industry pack | Twilio/ads OAuth/publish/OAuth apps · APK device · iOS · multi-region COST · Pepito · mass-send · claimReady · ERP payments/IoT/signature/health · dual-write ERP |
 
 ## Competitive honesty (factual gaps — NOT parity)
 
@@ -49,7 +56,7 @@
 |-----------|----------------|
 | HubSpot / Meta / Google Ads | **No live OAuth spend path** |
 | GoHighLevel (GHL) | **No native telephony dialer parity** (sim only) |
-| Odoo | **No full ERP/accounting/manufacturing** |
+| Odoo | **No Odoo connector · no full ERP/accounting/manufacturing/finance** — only NELVYON non-financial in-memory cores + schema 519 reserved |
 | Campañas email | **Mass-send legally blocked** |
 | Social NELVYON | **Official accounts + real publish pending CEO** |
 | Producción multi-tenant | **No proven multi-tenant production customer outcomes** |
@@ -58,7 +65,9 @@
 
 ## Next
 
-1. Acciones solo Daniel — ver `HANDOVER.md`  
-2. **No READY** · `claimReady: false`
+1. Parent commit tip (v1.7.0 + ERP + 519 + docs) when Daniel asks — **Do NOT commit** in this doc-sync pass  
+2. Optional staging redeploy → confirm **519** in `_migrations` (schema only)  
+3. Acciones solo Daniel — ver `HANDOVER.md`  
+4. **No READY** · `claimReady: false`
 
 Rollback: `HANDOVER.md`

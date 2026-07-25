@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-25** (cierre interno · ADR-059). Sin secretos.
+> Estado real documentado **2026-07-25** (ADR-060 ERP). Sin secretos.
 
 ---
 
@@ -15,14 +15,15 @@
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ local / 🟡 Railway | local-ai/pgvector Docker **VERIFIED** · Railway pgvector **PREPARED_OFF** |
 | **Railway prod** | ✅ | `@nelvyon/web` · flags **OFF** / **ABSENT** · no OpenAI · no credenciales reales |
-| **Railway staging** | ✅ | `ideal-victory` · tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` |
+| **Railway staging** | ✅ | `ideal-victory` · tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · catalog **v1.7.0**/mig **519** **pending** tip commit |
 | **HA single-region** | ✅ **VERIFIED** | Runbook + readiness · RPO/RTO documentados |
 | **Multi-region / HA geo** | ❌ **BLOCKED_EXTERNAL/COST** | Sin despliegue multi-región activo · pendiente presupuesto CEO |
 | **OpenClaw** | ✅ staging_mock / ❌ prod | canary doc PENDING_CEO |
 | **Auditor** | ✅ staging / ❌ prod | 13 packs ADR-055 |
 | **SM/MCP synthetic** | ✅ staging | flags ON · productivo 0 |
 | **Telephony (Block 11)** | ✅ sim **VERIFIED** | real Twilio **BLOCKED_EXTERNAL** |
-| **Mobile (Block 18)** | 🟡 scaffold present | APK SDK **BLOCKED_EXTERNAL** · stores **BLOCKED_EXTERNAL** |
+| **ERP non-financial (26–29+35)** | ✅ in-memory **IMPLEMENTED_VERIFIED** (local) | process-local · mig **519** reserved · dual-write pending · **no Odoo/finance** · deploy tip pending |
+| **Mobile (Block 18)** | 🟡 Android build VERIFIED | device smoke / stores **BLOCKED** |
 | **PWA (Block 19)** | ✅ Chrome **VERIFIED** | iOS **BLOCKED** |
 | **Observability** | ✅ local **VERIFIED** | paid APM **PREPARED_OFF** |
 | **Private RAG (Block 24)** | ✅ Docker / 🟡 Railway | Docker **VERIFIED** · Railway **PREPARED_OFF** |
@@ -110,10 +111,11 @@ GitHub Actions cron → POST /api/cron/* + CRON_SECRET
 
 ---
 
-## ADR-055/056/059 — flags staging (synthetic SM/MCP + Ollama mesh)
+## ADR-055/056/059/060 — flags staging (synthetic SM/MCP + Ollama mesh)
 
 > Staging URL: https://ideal-victory-staging.up.railway.app  
-> **Runtime tip live:** **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0`.  
+> **Runtime tip live:** **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0`.  
+> **Local tip:** catalog **v1.7.0** + ERP + mig **519** **uncommitted** (not yet on staging).  
 > **Ollama:** `OLLAMA_HOST=http://100.102.207.30:11434` — Tailscale CGNAT private IP (**not public**).
 
 | Flag | Staging live | Prod |

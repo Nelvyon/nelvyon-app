@@ -1,23 +1,35 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-25** — cierre interno · **sin migración nueva** · staging tip **`5adbfcd2`**
+> Actualizado: **2026-07-25** — **ADR-060** · última mig repo **`519_erp_non_financial_cores.sql`** (schema reserved · **no** dual-write) · tip **uncommitted** · staging tip **`bd165985`** aún **sin** 519 aplicada
 
 ---
+
+## ADR-060 — ERP non-financial schema (519)
+
+| Campo | Valor |
+|-------|-------|
+| **Migración nueva** | **Sí** — `519_erp_non_financial_cores.sql` |
+| **Alcance** | Tablas reserved: `erp_suppliers`, `erp_purchase_orders`, `erp_inventory_products`, `erp_warehouses`, `erp_stock_moves`, manufacturing MO table(s), `saas_projects_erp` (+ índices tenant) |
+| **Runtime SSOT** | **In-memory** agency cores (`PurchasesSuppliersCore` / `InventoryWarehousesCore` / `ManufacturingOpsCore` / `ProjectsFieldServiceCore`) — **process-local** hasta dual-write explícito |
+| **Dual-write** | **No** implementado · RLS comments only · no claim DB SSOT |
+| **Fuera de alcance** | Payments · bank · tax · GL · cost accounting · IoT · e-signature columns (**BLOCKED_***) |
+| **Deploy** | **Pending** tip commit + migrate on staging/prod · staging live tip **`bd165985`** verified through **518** lineage; **519** not claimed applied |
+| **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` · **untouched** |
 
 ## ADR-057/059 — notas schema
 
 | Campo | Valor |
 |-------|-------|
-| **Migración nueva** | **No** — última sigue `518_workflows_list_columns.sql` |
-| **Cambios código** | Blocks 11–25 agency cores + catalog v1.6.0 — **sin cambios schema** |
-| **Private RAG (Block 24)** | Docker local pgvector path **VERIFIED** (2026-07-25) · **Railway pgvector PREPARED_OFF** (no provisionado en staging/prod Railway) · P2 minScore documentado |
+| **Migración nueva** | **No** (Blocks 11–25 + catalog v1.6.0 — sin cambios schema en esos ADR) |
+| **Cambios código** | Agency cores + catalog v1.6.0 |
+| **Private RAG (Block 24)** | Docker local pgvector path **VERIFIED** (2026-07-25) · **Railway pgvector PREPARED_OFF** · P2 minScore documentado |
 | **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` · **untouched** |
 
 ## ADR-056 — notas schema
 
 | Campo | Valor |
 |-------|-------|
-| **Migración nueva** | **No** — última sigue `518_workflows_list_columns.sql` |
+| **Migración nueva** | **No** |
 | **Cambios código** | P0 campaign launch block · P1 chat/ai-copy OpenAI gate · mcp.write honesty · shared-memory scopes · meta-ads-pack beta — **sin cambios schema** |
 | **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` en código · **untouched** ADR-056 |
 | **E2E verificado (staging runtime)** | tip `53149384` · deploy `e514bbd7` · automations/reputation ALL_PASS · sin cambios schema |
@@ -26,7 +38,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Migración nueva** | **No** — última sigue `518_workflows_list_columns.sql` |
+| **Migración nueva** | **No** |
 | **E2E verificado** | tip `53149384` · deploy `e514bbd7` · automations/reputation ALL_PASS · sin cambios schema |
 | **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` en código |
 | **SM/MCP synthetic harness** | Usa tenants sintéticos in-memory en staging drills — **no** nuevas tablas · no implica SM productiva |
@@ -37,15 +49,15 @@
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
 | **Total archivos** | 411+ |
-| **Última migración** | `518_workflows_list_columns.sql` |
+| **Última migración (repo)** | `519_erp_non_financial_cores.sql` (**uncommitted** tip · schema reserved) |
 | **Shared Memory schema** | 514 + RLS 515 · `schema.proposed.sql` referencia histórica |
 | **Runner** | `backend/db/migrate.ts` |
 | **Tracking** | Tabla `_migrations (name, executed_at)` |
 | **Comando** | `pnpm -C apps/web migrate` |
 | **Prod** | Railway `preDeployCommand` migrate en deploy Web |
-| **Prod verified** | **517** + **518** in `_migrations` (2026-07-22 SSOT DB probe) |
+| **Prod verified** | **517** + **518** in `_migrations` (2026-07-22 SSOT DB probe) · **519** not yet claimed applied |
 
-**Rango post-elite CI:** 508–518 (`scripts/validate-post-elite-migrations.mjs`).  
+**Rango post-elite CI:** 508–518 (`scripts/validate-post-elite-migrations.mjs`) — **519** ERP reserved is post-range until validator updated after commit.  
 **SQL SSOT gate:** `scripts/validate-sql-alembic-ssot.mjs` (ADR-002/039) — files + optional DB probe.  
 **Rango elite SaaS CI:** 401–507 (`scripts/validate-saas-migrations.mjs`).
 
@@ -98,7 +110,7 @@
 ### Private AI
 - `504_private_ai_modular.sql`, `503_private_ai_phase2.sql`
 
-### Recientes (508–518)
+### Recientes (508–519)
 - `508_saas_prospecting.sql` — prospecting lists
 - `509_saas_seo_tracked_keywords.sql` — SEO keywords
 - `510_enterprise_performance_indexes.sql` — índices performance
@@ -110,6 +122,7 @@
 - `516_fastapi_rls_repair.sql` — FastAPI RLS dual-plane (KI-026)
 - `517_workspaces_tenant_extension_columns.sql` — `workspaces.timezone` · **prod verified**
 - `518_workflows_list_columns.sql` — `workflows.is_active` · **prod verified**
+- `519_erp_non_financial_cores.sql` — reserved ERP tables (suppliers/PO/inventory/warehouses/stock_moves/MO/`saas_projects_erp`) · **SSOT remains in-memory cores until dual-write** · RLS comments only · **deploy pending** (tip uncommitted)
 
 ---
 

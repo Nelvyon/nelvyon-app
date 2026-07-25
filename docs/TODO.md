@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-25** — **Cierre interno** · staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · catalog **v1.6.0** · `claimReady: false` · **NOT READY**
+> Actualizado: **2026-07-25** — **ADR-060 ERP wire** · catalog **v1.7.0** (local **uncommitted**) · staging tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · `claimReady: false` · **NOT READY**
 
 ---
 
@@ -20,14 +20,15 @@
 
 ---
 
-> Actualizado: **2026-07-25** — cierre interno honestidad · tip live **`5adbfcd2`** · **NOT READY**
+> Actualizado: **2026-07-25** — ADR-060 ERP Blocks 26–29+35 · tip live **`bd165985`** · local v1.7.0 **uncommitted** · **NOT READY**
 
 ---
 
-## P2 — Post-auditoría / ops (cierre interno 2026-07-25)
+## P2 — Post-auditoría / ops (cierre interno 2026-07-25 + ADR-060)
 
-- [x] Staging tip confirm: **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0`
+- [x] Staging tip confirm: **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` (live **sin** catalog v1.7.0 / mig 519 aún)
 - [x] Catalog **v1.6.0** — `ads_attribution_core` + `community_publish_core` **VERIFIED** (core/sim) · OAuth/spend/publish **BLOCKED_EXTERNAL**
+- [x] Catalog **v1.7.0** (local) — ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** (in-memory) · API/UI `/saas/erp/*` · evidence `erp.cores_synthetic_latest.md` ALL_PASS
 - [x] influencers_pr **VERIFIED** · telephony/oauth mock/marketplace **VERIFIED**
 - [x] private_vector_rag Docker **VERIFIED** · Railway **PREPARED_OFF**
 - [x] private_ai_canary **PREPARED_OFF** + **BLOCKED_CEO**
@@ -36,6 +37,14 @@
 - [x] Mobile Android scaffold present · APK **BLOCKED_EXTERNAL**
 - [x] HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST**
 - [x] Observability local **VERIFIED** · legacy audit **VERIFIED** (zero deletes)
+- [x] **Block 26:** `PurchasesSuppliersCore` · payments `BLOCKED_SCOPE` · **wired** catalog v1.7.0 + API/UI
+- [x] **Block 27:** `InventoryWarehousesCore` · no cost/GL · **wired** catalog v1.7.0 + API/UI
+- [x] **Block 28:** `ManufacturingOpsCore` · IoT `BLOCKED_EXTERNAL` · **wired** catalog v1.7.0 + API/UI
+- [x] **Block 29:** `ProjectsFieldServiceCore` · signature `BLOCKED_EXTERNAL` · **wired** catalog v1.7.0 + API/UI
+- [x] **Block 35:** `SectorCapabilityTaxonomy` · industry PREPARED_OFF · health BLOCKED_LEGAL · **wired** catalog v1.7.0 + API/UI
+- [x] **Wire ERP 26–29+35:** OsCatalogV1 **v1.7.0** · `/api/saas/erp/*` · `/saas/erp/*` · smoke `staging-smoke-erp-cores.mjs` · migration **519** reserved (no dual-write)
+- [ ] **Ops (Daniel/parent):** commit tip local (catalog v1.7.0 + ERP surface + mig 519 + docs ADR-060) when ready · optional redeploy staging
+- [ ] **ERP dual-write:** only when explicitly requested — until then process-local in-memory SSOT (KI ops note)
 - [ ] **P2 (no bloqueante):** RAG minScore corpus-size floor — `docs/KNOWN_ISSUES.md`
 - [ ] **CEO (opcional):** Railway pgvector + mesh Ollama staging — `CEO_IA_STAGING_APPROVAL_REQUEST.md`
 - [ ] **CEO:** telefonía — `TELEPHONY_PROVIDER_CEO_CHECKLIST.md`
@@ -47,7 +56,6 @@
 - [ ] **P2 i18n email/PDF PARTIAL:** SES catalog restante + `backend/billing/*EmailTemplates.ts` + PDF badges; never FULL_VERIFIED without audit
 - [ ] **Legal:** Pepito dossier + licencia — `DATOS_PEPITO_LICENSE_DOSSIER.md`
 - [ ] **CEO:** IA prod canary — `CEO_IA_PROD_CANARY_REQUEST.md`
-- [ ] **Ops (Daniel):** commit tip local (catalog v1.6.0 + i18n + obs + mobile) when ready · optional redeploy staging
 - [ ] No READY · no flags productivos en prod · `claimReady: false`
 
 ---
@@ -76,6 +84,9 @@
 - [x] Ops: E2E staging `automations-ops-pack` + `reputation-ops-pack` → **ALL_PASS** · evidencia `automations_reputation_e2e_latest.md`
 - [x] ADR-057: `PrivateVectorRagCore` (Block 24) — sintético in-process **IMPLEMENTED_VERIFIED** (43 tests) · pgvector productivo **PREPARED_OFF**
 - [x] ADR-057: `PrivateAiCanaryPrep` (Block 25) — checklist 12 ítems + `isProductionCanaryAuthorized()` hardcoded false · `CEO_IA_PROD_CANARY_REQUEST.md` PENDING_CEO
+- [x] Block 27: `InventoryWarehousesCore` — in-memory multi-tenant inventory/warehouses/traceability VERIFIED · playbook `SERVICE_INVENTORY_WAREHOUSES.md` · later wired catalog v1.7.0
+- [x] Block 28: `ManufacturingOpsCore` — in-memory multi-tenant BOM/MO/QC/maintenance/PLM · IoT `BLOCKED_EXTERNAL` · vitest 11/11 · later wired catalog v1.7.0
+- [x] Block 28 follow-up: catalog registration — **done** in ADR-060 / OsCatalogV1 **v1.7.0** (IoT remains BLOCKED_EXTERNAL)
 - [x] Block 18: `MobileSecureSession` + `MobileAppContract` — tenant isolation + offline queue tested; App/Play Store publish honestly `BLOCKED_EXTERNAL` (no Apple paid account, no Play budget) · `MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md`
 - [x] Block 19: `PwaCertification` + `scripts/pwa-certify.mjs` · fixed real gap `manifest-saas.json` (8 non-existent PNG icon paths → existing `icon-base.svg`)
 - [x] Block 20: `LocalizationCore` — es/en `FULL_VERIFIED`, fr/de/it/pt honestly `PARTIAL_NOT_AUDITED`

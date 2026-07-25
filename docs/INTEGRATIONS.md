@@ -1,10 +1,11 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-25** (cierre interno · ADR-059). **✅ = verificado** · **🟡 = código/vars** · **❌ = no implementado**  
-> **Sin OAuth real inventado.** Mock OAuth framework = VERIFIED; apps reales = BLOCKED_EXTERNAL.
+> Actualizado: **2026-07-25** (ADR-060 ERP). **✅ = verificado** · **🟡 = código/vars** · **❌ = no implementado**  
+> **Sin OAuth real inventado.** Mock OAuth framework = VERIFIED; apps reales = BLOCKED_EXTERNAL.  
+> **Sin Odoo** · **sin** full ERP/accounting/finance · ERP non-financial cores = in-memory NELVYON (catalog **v1.7.0** local).
 
-**Bloqueadores go-live:** CEO checklists (telephony · OAuth · ads · publish · mobile · IA canary) · legal Pepito (mass-send **BLOCKED_LEGAL**). Prod flags **OFF**. Staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS**. SSOT: `OS_CATALOG_V1.md` v**1.6.0**.
+**Bloqueadores go-live:** CEO checklists (telephony · OAuth · ads · publish · mobile · IA canary) · legal Pepito (mass-send **BLOCKED_LEGAL**). Prod flags **OFF**. Staging tip **`bd165985`** · deploy **`1de7f724` SUCCESS**. SSOT: `OS_CATALOG_V1.md` v**1.7.0** (local uncommitted).
 
 ### Auth bridge Web ↔ FastAPI
 
@@ -32,6 +33,19 @@
 | 14 | `CommunityPublishCore` | sim **VERIFIED** | publish **BLOCKED_EXTERNAL** · no fake OAuth |
 | 16 | `OAuthMultiTenantFramework` | mock **VERIFIED** | real apps **BLOCKED_EXTERNAL** |
 | 17 | `IntegrationsMarketplaceV1` | **VERIFIED** (internal ping) | external publish rejected |
+| 26 | `PurchasesSuppliersCore` | in-memory **IMPLEMENTED_VERIFIED** | payments/accounting **BLOCKED_SCOPE** · **no Odoo** |
+| 27 | `InventoryWarehousesCore` | in-memory **IMPLEMENTED_VERIFIED** | no cost/GL · **no Odoo** |
+| 28 | `ManufacturingOpsCore` | in-memory **IMPLEMENTED_VERIFIED** | IoT **BLOCKED_EXTERNAL** · **no Odoo** |
+| 29 | `ProjectsFieldServiceCore` | in-memory **IMPLEMENTED_VERIFIED** | e-signature **BLOCKED_EXTERNAL** · margin NON-GL |
+| 35 | `SectorCapabilityTaxonomy` | inventory **IMPLEMENTED_VERIFIED** | industry PREPARED_OFF · health **BLOCKED_LEGAL** |
+
+### ERP / accounting (competitive honesty)
+
+| Integración | Estado | Notas |
+|-------------|--------|-------|
+| **Odoo** | ❌ **no integrado** | No connector · no sync · no claim parity · NELVYON non-financial cores only |
+| Full ERP finance / GL / tax / bank | ❌ **BLOCKED_SCOPE** | Explicit out of scope ADR-060 |
+| NELVYON ERP ops UI | 🟡 local | `/saas/erp/*` wired to in-memory cores · mig **519** reserved · dual-write pending |
 
 ---
 

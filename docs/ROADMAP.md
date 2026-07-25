@@ -68,7 +68,7 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
 | Beta packs → available | ✅ | 5 packs E2E ALL_PASS · ADR-050 · catalog available |
-| Agencia OS unificada élite (ops) | ✅ | ADR-055 E2E PASS staging · ADR-056–059 · tip live **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** |
+| Agencia OS unificada élite (ops) | ✅ | ADR-055 E2E PASS staging · ADR-056–060 · tip live **`bd165985`** · local ERP **v1.7.0** uncommitted |
 | Redes sociales integral por cliente | ✅ | ADR-052/054 |
 | Auditor independiente staging | ✅ | 13 packs E2E + session PASS/REJECT/repair |
 | OpenClaw staging_mock | 🟡 | ADR-055 deepened · prod canary doc PENDING_CEO |
@@ -80,7 +80,8 @@
 | Legal campañas + Pepito dossier | 🟡 | gate reforzado · claimReadyLegal hard-false · LEGAL BLOCKED · ADR-056 P0 campaign launch block |
 | ADR-056 elite absolute audit | ✅ | P0/P1 fixes · NOT READY |
 | **ADR-057 Blocks 11–25 (internal cores)** | ✅ | cores internos VERIFIED · externos BLOCKED_* · **NOT READY** |
-| **ADR-059 catalog v1.6.0 + i18n/mobile honesty** | ✅ | ads/community promote (core/sim) · email locale PARTIAL · Android scaffold · tip live `5adbfcd2` · local tip post-commit |
+| **ADR-059 catalog v1.6.0 + i18n/mobile honesty** | ✅ | ads/community promote (core/sim) · email locale PARTIAL · Android scaffold · tip live `bd165985` |
+| **ADR-060 ERP non-financial cores (catalog v1.7.0)** | ✅ | Blocks 26–29+35 **IMPLEMENTED_VERIFIED** in-memory · API/UI wired · mig **519** reserved · dual-write pending · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · tip **uncommitted** · **NOT READY** |
 | Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |
 | Block 12 influencers_pr | ✅ | **VERIFIED** · outreach forbidden |
 | Block 13 ads_attribution_core | ✅ | **VERIFIED** (core) · spend/OAuth BLOCKED_EXTERNAL · catalog v1.6.0 |
@@ -96,6 +97,11 @@
 | Block 23 legacy consolidation | ✅ | VERIFIED · zero unsafe deletes |
 | Block 24 private_vector_rag | ✅ | Docker VERIFIED · Railway PREPARED_OFF · P2 minScore |
 | Block 25 private_ai_canary_prep | 🟡 | PREPARED_OFF · BLOCKED_CEO |
+| Block 26 purchases_suppliers_core | ✅ | **IMPLEMENTED_VERIFIED** (in-memory) · payments **BLOCKED_SCOPE** · catalog **v1.7.0** + `/saas/erp/purchases` · 519 reserved · no dual-write |
+| Block 27 inventory_warehouses_core | ✅ | **IMPLEMENTED_VERIFIED** (in-memory) · no cost/GL · catalog **v1.7.0** + `/saas/erp/inventory` · 519 reserved |
+| Block 28 manufacturing_ops_core | ✅ | **IMPLEMENTED_VERIFIED** (in-memory) · IoT **BLOCKED_EXTERNAL** · catalog **v1.7.0** + `/saas/erp/manufacturing` |
+| Block 29 projects_field_service_core | ✅ | **IMPLEMENTED_VERIFIED** (in-memory) · signature **BLOCKED_EXTERNAL** · catalog **v1.7.0** + `/saas/erp/projects` |
+| Block 35 sector_capability_taxonomy | ✅ | **IMPLEMENTED_VERIFIED** (inventory) · industry PREPARED_OFF · health **BLOCKED_LEGAL** · catalog **v1.7.0** + `/saas/erp/sectors` · no Odoo/finance |
 
 ---
 

@@ -711,3 +711,16 @@
 | **Evidencia** | Staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · catalog v1.6.0 (local tip post-commit) · `mobile.android_scaffold.md` · `observability.drill_latest.md` · `legacy.consolidation_latest.md` · `ha-dr-readiness_latest.md` · influencers E2E prior VERIFIED · private_vector_rag Docker VERIFIED / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** |
 | **Consecuencias** | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` · email/PDF **PARTIAL** · APK **BLOCKED_EXTERNAL** · multi-region **BLOCKED_EXTERNAL/COST** · próximos pasos = acciones solo Daniel en HANDOVER |
 | **Relación** | ADR-057 · ADR-058 · `OsCatalogV1.ts` · `LocalizationCore` · `MobileAppContract` · `AdsAttributionCore` · `CommunityPublishCore` |
+
+---
+
+## ADR-060 — ERP non-financial cores (catalog v1.7.0 · Blocks 26–29 + 35)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-25 |
+| **Decisión** | (1) Wire `PurchasesSuppliersCore`, `InventoryWarehousesCore`, `ManufacturingOpsCore`, `ProjectsFieldServiceCore`, `SectorCapabilityTaxonomy` into product surface: export from `backend/agency/index.ts`, OsCatalogV1 bump **v1.7.0** with status **IMPLEMENTED_VERIFIED** on unit + synthetic smoke evidence (mismo patrón honestidad que `telephony_core` — in-memory / process-local). (2) API `/api/saas/erp/{purchases,inventory,manufacturing,projects-fs,sectors}` + UI `/saas/erp/*` + sidebar — sin mocks silenciosos. (3) Migration **`519_erp_non_financial_cores.sql`** **reserva schema** durable (suppliers/PO/inventory/warehouses/stock_moves/MO/`saas_projects_erp`); **runtime SSOT permanece in-memory** hasta dual-write explícito — **no** claim DB SSOT. (4) Payments / bank / tax / GL / cost accounting = **BLOCKED_SCOPE**; IoT = **BLOCKED_EXTERNAL**; e-signature = **BLOCKED_EXTERNAL**; regulated health sector = **BLOCKED_LEGAL**; industry sector = **PREPARED_OFF** hasta pack dedicado. (5) **No Odoo**, **no** full ERP/accounting/finance. (6) Tip **uncommitted** hasta commit del parent; staging live tip **`bd165985`** aún sin v1.7.0/519. (7) `claimReady` sigue **false** · **NOT READY**. |
+| **Por qué** | Ampliar OS/SaaS con cores operativos no financieros demostrables sin inventar contabilidad, pagos, IoT, firma electrónica, salud regulada ni paridad Odoo; separar schema reserved de SSOT runtime. |
+| **Evidencia** | `scripts/docs/evidence/os-saas-e2e/modules/erp.cores_synthetic_latest.md` **ALL_PASS** · vitest agency cores PASS · OsCatalogV1Closure espera v1.7.0 · smoke `staging-smoke-erp-cores.mjs` · playbooks `SERVICE_PURCHASES_SUPPLIERS` / `SERVICE_INVENTORY_WAREHOUSES` / `SERVICE_MANUFACTURING_OPS` / `SERVICE_PROJECTS_FIELD_SERVICE` / `SECTOR_TAXONOMY_CANONICAL` |
+| **Consecuencias** | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` · ERP data **process-local** (loss on restart) hasta dual-write · mig 519 deploy pendiente con tip · próximo = parent commit + optional staging redeploy · dual-write solo bajo petición explícita |
+| **Relación** | ADR-057 · ADR-059 · `OsCatalogV1.ts` · `backend/agency/*Core.ts` · `519_erp_non_financial_cores.sql` · `/saas/erp/*` |

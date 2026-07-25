@@ -40,12 +40,18 @@
  * v1.6.0: promotes `ads_attribution_core` and `community_publish_core` → IMPLEMENTED_VERIFIED
  * on existing unit evidence (same honesty pattern as `telephony_core`: simulator/core only).
  * Real OAuth/spend and real publish remain BLOCKED_EXTERNAL in `nextAction`.
+ *
+ * v1.7.0: wires ERP non-financial cores (Blocks 26–29) + sector taxonomy (Block 35) —
+ * `purchases_suppliers_core`, `inventory_warehouses_core`, `manufacturing_ops_core`,
+ * `projects_field_service_core`, `sector_capability_taxonomy` → IMPLEMENTED_VERIFIED on
+ * unit evidence. Payments/accounting, IoT, e-signature, and regulated health remain
+ * BLOCKED_* in `nextAction`. Runtime SSOT is in-memory; migration 519 schema is reserved.
  */
 
 import { OS_DELIVERABLE_FLOW, getOsProfessionalTeam, type OsTeamId } from "./OsProfessionalTeams";
 import { SOCIAL_SERVICE_FLOW } from "./OsSocialNetworksService";
 
-export const OS_CATALOG_V1_VERSION = "1.6.0" as const;
+export const OS_CATALOG_V1_VERSION = "1.7.0" as const;
 
 export type OsCatalogV1Status =
   | "IMPLEMENTED_VERIFIED"
@@ -666,6 +672,129 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
       "CEO: docs/ops/CEO_IA_PROD_CANARY_REQUEST.md · prod OFF hasta autorización escrita · staging drill ahora " +
       "verifica en vivo OLLAMA_HOST contra Tailscale CGNAT/MagicDNS (checkOllamaHostForCanaryDrill, no autodeclarado)",
   },
+  {
+    serviceId: "purchases_suppliers_core",
+    title: "Purchases & suppliers (ERP core, no payments)",
+    teamId: "svc_automations_crm",
+    playbookPath: "docs/agency-playbooks/SERVICE_PURCHASES_SUPPLIERS.md",
+    kickoffPackIds: [],
+    permissions: ["draft", "assisted"],
+    forbidden: [...forbidSpend, "record_payment", "bank_transfer", "accounting_post"],
+    deliverables: [
+      "supplier_registry",
+      "purchase_request",
+      "rfq_quotes",
+      "purchase_order",
+      "goods_receipt",
+      "return_incident_audit",
+    ],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/saas/erp/purchases",
+    metrics: ["tenant_isolation_ok", "idempotency_ok", "payment_blocked"],
+    tests: ["backend/agency/__tests__/PurchasesSuppliersCore.test.ts"],
+    e2eEvidence:
+      "backend/agency/__tests__/PurchasesSuppliersCore.test.ts (in-memory · tenant isolation · recordPayment BLOCKED_SCOPE)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "core VERIFIED in-memory · payments/accounting forever BLOCKED_SCOPE until dual-write + legal · schema 519 reserved · 0€",
+  },
+  {
+    serviceId: "inventory_warehouses_core",
+    title: "Inventory / warehouses / traceability (ERP core)",
+    teamId: "svc_automations_crm",
+    playbookPath: "docs/agency-playbooks/SERVICE_INVENTORY_WAREHOUSES.md",
+    kickoffPackIds: [],
+    permissions: ["draft", "assisted"],
+    forbidden: [...forbidSpend, "cost_accounting", "gl_post"],
+    deliverables: [
+      "product_master",
+      "warehouse_locations",
+      "immutable_stock_moves",
+      "lots_serials",
+      "reservations",
+      "physical_count_adjust",
+      "min_stock_alerts",
+    ],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/saas/erp/inventory",
+    metrics: ["tenant_isolation_ok", "balance_invariant_ok", "move_idempotency_ok"],
+    tests: ["backend/agency/__tests__/InventoryWarehousesCore.test.ts"],
+    e2eEvidence:
+      "backend/agency/__tests__/InventoryWarehousesCore.test.ts (in-memory · no cost/GL · move immutability proven)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "core VERIFIED in-memory · no cost/GL · dual-write to 519 schema pending · never claim accounting stock valuation",
+  },
+  {
+    serviceId: "manufacturing_ops_core",
+    title: "Manufacturing / quality / maintenance (ERP core)",
+    teamId: "svc_analytics_reporting",
+    playbookPath: "docs/agency-playbooks/SERVICE_MANUFACTURING_OPS.md",
+    kickoffPackIds: [],
+    permissions: ["draft", "assisted"],
+    forbidden: [...forbidSpend, "iot_connect", "shop_floor_vendor"],
+    deliverables: ["bom", "routing", "manufacturing_order", "quality_nc_capa", "maintenance", "plm_change"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/saas/erp/manufacturing",
+    metrics: ["tenant_isolation_ok", "mo_release_gate_ok", "iot_blocked"],
+    tests: ["backend/agency/__tests__/ManufacturingOpsCore.test.ts"],
+    e2eEvidence:
+      "backend/agency/__tests__/ManufacturingOpsCore.test.ts (in-memory · IoTAdapter.connect BLOCKED_EXTERNAL)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "core VERIFIED in-memory · IoT forever BLOCKED_EXTERNAL until CEO ops rewrite · no shop-floor vendor · 0€",
+  },
+  {
+    serviceId: "projects_field_service_core",
+    title: "Projects & field service (ops core)",
+    teamId: "svc_automations_crm",
+    playbookPath: "docs/agency-playbooks/SERVICE_PROJECTS_FIELD_SERVICE.md",
+    kickoffPackIds: [],
+    permissions: ["draft", "assisted"],
+    forbidden: [...forbidSpend, "capture_signature", "gl_margin_post"],
+    deliverables: [
+      "project_kanban",
+      "capacity_plan",
+      "timesheet",
+      "field_work_order",
+      "operational_margin_non_gl",
+      "portal_deliverable_stub",
+      "sla_check",
+    ],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/saas/erp/projects",
+    metrics: ["tenant_isolation_ok", "signature_blocked", "margin_non_accounting"],
+    tests: ["backend/agency/__tests__/ProjectsFieldServiceCore.test.ts"],
+    e2eEvidence:
+      "backend/agency/__tests__/ProjectsFieldServiceCore.test.ts (in-memory · signature BLOCKED_EXTERNAL · margin NON-GL)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "core VERIFIED in-memory · e-signature forever BLOCKED_EXTERNAL until consent+provider · margin never posts to GL",
+  },
+  {
+    serviceId: "sector_capability_taxonomy",
+    title: "Sector capability taxonomy (canonical inventory)",
+    teamId: "svc_strategy_brand",
+    playbookPath: "docs/agency-playbooks/SECTOR_TAXONOMY_CANONICAL.md",
+    kickoffPackIds: [],
+    permissions: ["observe"],
+    forbidden: [...forbidSpend, "regulated_health_go_live"],
+    deliverables: ["sector_inventory", "elite_team_refs", "playbook_map", "honest_status"],
+    qaRubric: { min: 85, criticalMin: 90 },
+    independentAuditor: true,
+    portalPath: "/saas/erp/sectors",
+    metrics: ["verified_only_with_real_pack", "health_blocked_legal"],
+    tests: ["backend/agency/__tests__/SectorCapabilityTaxonomy.test.ts"],
+    e2eEvidence:
+      "backend/agency/__tests__/SectorCapabilityTaxonomy.test.ts (8 sectors · health BLOCKED_LEGAL · industry PREPARED_OFF)",
+    status: "IMPLEMENTED_VERIFIED",
+    nextAction:
+      "taxonomy VERIFIED · industry stays PREPARED_OFF until dedicated sector pack · health/education forever BLOCKED_LEGAL without written legal",
+  },
 ] as const;
 
 function buildCertificationCriteria(e: OsCatalogV1RawEntry): string[] {
@@ -700,7 +829,7 @@ export function listOsCatalogV1(): OsCatalogV1Entry[] {
 
 export function assertOsCatalogV1Integrity(): { ok: boolean; violations: string[] } {
   const violations: string[] = [];
-  if (OS_CATALOG_V1_VERSION !== "1.6.0") violations.push("version_mismatch");
+  if (OS_CATALOG_V1_VERSION !== "1.7.0") violations.push("version_mismatch");
   for (const e of OS_CATALOG_V1) {
     if (!e.teamId) violations.push(`no_team:${e.serviceId}`);
     if (!e.playbookPath) violations.push(`no_playbook:${e.serviceId}`);

@@ -6,6 +6,15 @@
 
 ## Activos
 
+### Ops (no KI) — ERP non-financial cores process-local (Blocks 26–29 · until dual-write)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Abierto** — by design · ADR-060 |
+| **Detalle** | `PurchasesSuppliersCore` / `InventoryWarehousesCore` / `ManufacturingOpsCore` / `ProjectsFieldServiceCore` son **IMPLEMENTED_VERIFIED** in-memory (mismo patrón process-local que `telephony_core`). API/UI `/saas/erp/*` leen/escriben el core en memoria del proceso Node — **datos no sobreviven restart** ni se comparten entre réplicas. Migration **519** solo **reserva schema**; **no** hay dual-write. No claim DB SSOT. Payments/accounting **BLOCKED_SCOPE** · IoT **BLOCKED_EXTERNAL** · e-signature **BLOCKED_EXTERNAL** · health regulated **BLOCKED_LEGAL** · **no Odoo**. |
+| **Evidencia** | `erp.cores_synthetic_latest.md` · `519_erp_non_financial_cores.sql` · HANDOVER ADR-060 |
+| **Remediación** | Dual-write explícito a tablas 519 cuando se pida (no automático) |
+
 ### Ops (no KI) — Email + PDF locale PARTIAL (no FULL_VERIFIED)
 
 | Campo | Valor |

@@ -156,12 +156,12 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
   }, 30_000);
 
   it("OS Catalog v1 is versioned and honest", () => {
-    expect(OS_CATALOG_V1_VERSION).toBe("1.6.0");
+    expect(OS_CATALOG_V1_VERSION).toBe("1.7.0");
     const check = assertOsCatalogV1Integrity();
     expect(check.violations).toEqual([]);
-    expect(listOsCatalogV1().length).toBeGreaterThanOrEqual(15);
+    expect(listOsCatalogV1().length).toBeGreaterThanOrEqual(20);
     const summary = osCatalogV1Summary();
-    expect(summary.IMPLEMENTED_VERIFIED).toBeGreaterThanOrEqual(10);
+    expect(summary.IMPLEMENTED_VERIFIED).toBeGreaterThanOrEqual(15);
     expect(summary.NOT_IMPLEMENTED).toBeGreaterThanOrEqual(0);
     expect(summary.PREPARED_OFF + summary.BLOCKED_EXTERNAL).toBeGreaterThanOrEqual(2);
     const ads = listOsCatalogV1().find((e) => e.serviceId === "ads");
@@ -188,6 +188,22 @@ describe("ADR-053 — auditor + OpenClaw staging + catalog v1", () => {
     expect(oauthMt?.status).toBe("IMPLEMENTED_VERIFIED");
     const integrationsMarketplace = listOsCatalogV1().find((e) => e.serviceId === "integrations_marketplace");
     expect(integrationsMarketplace?.status).toBe("IMPLEMENTED_VERIFIED");
+    const purchases = listOsCatalogV1().find((e) => e.serviceId === "purchases_suppliers_core");
+    expect(purchases?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(purchases?.teamId).toBe("svc_automations_crm");
+    expect(purchases?.nextAction).toMatch(/BLOCKED_SCOPE|payments/i);
+    const inventory = listOsCatalogV1().find((e) => e.serviceId === "inventory_warehouses_core");
+    expect(inventory?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(inventory?.e2eEvidence).toMatch(/InventoryWarehousesCore\.test\.ts/);
+    const mfg = listOsCatalogV1().find((e) => e.serviceId === "manufacturing_ops_core");
+    expect(mfg?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(mfg?.nextAction).toMatch(/BLOCKED_EXTERNAL|IoT/i);
+    const projectsFs = listOsCatalogV1().find((e) => e.serviceId === "projects_field_service_core");
+    expect(projectsFs?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(projectsFs?.nextAction).toMatch(/BLOCKED_EXTERNAL|signature/i);
+    const sectors = listOsCatalogV1().find((e) => e.serviceId === "sector_capability_taxonomy");
+    expect(sectors?.status).toBe("IMPLEMENTED_VERIFIED");
+    expect(sectors?.nextAction).toMatch(/BLOCKED_LEGAL|regulated/i);
   });
 
   it("OS Catalog v1.1.0 entries carry roles, flow, and non-empty certificationCriteria", () => {

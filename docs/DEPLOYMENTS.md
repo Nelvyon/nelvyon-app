@@ -1,18 +1,29 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-25** (cierre interno). No borrar entradas. Añadir al inicio.
+> Registrar cada deploy significativo. Actualizado: **2026-07-25** (ADR-060 ERP living docs). No borrar entradas. Añadir al inicio.
 
-## 2026-07-25 — Staging tip confirm (cierre interno)
+## 2026-07-25 — ADR-060 ERP catalog v1.7.0 + mig 519 (local · deploy **pending**)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | local verified · staging/prod deploy **pending** parent commit |
+| **Tip / live staging** | **`bd165985`** · deploy **`1de7f724` SUCCESS** (catalog **v1.6** lineage — **sin** v1.7.0 / **519** aún) |
+| **Local tip** | **uncommitted** · OsCatalogV1 **v1.7.0** · `/saas/erp/*` + `/api/saas/erp/*` · mig **519** schema reserved |
+| **ERP honesty** | Runtime SSOT **in-memory** · **no** dual-write · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** |
+| **Evidence** | `erp.cores_synthetic_latest.md` **ALL_PASS** |
+| **claimReady** | **false** · **NOT READY** · **CONDITIONAL_READY** |
+| **Próximo** | Parent commit → push → Railway migrate applies **519** (schema only) → optional staging smoke ERP |
+
+## 2026-07-25 — Staging tip confirm (cierre interno / tip `bd165985`)
 
 | Campo | Valor |
 |-------|-------|
 | **Env** | staging `ideal-victory` |
-| **Tip / live** | **`5adbfcd2`** · `git_sha=5adbfcd2` |
-| **Deploy** | **`d5caafc0` SUCCESS** |
+| **Tip / live** | **`bd165985`** · deploy **`1de7f724` SUCCESS** |
 | **Flags** | `AUTONOMOUS_ALLOW_OPENAI=0` · prod canary OFF · ads spend 0 |
-| **Catalog** | Live tip may precede local **v1.6.0** tip (catalog/i18n/obs/mobile scaffold post-commit local) |
+| **Catalog** | Live **v1.6** closure (i18n/obs/mobile) · local ERP **v1.7.0** **uncommitted** (see entry above) |
 | **claimReady** | **false** · **NOT READY** · **CONDITIONAL_READY** |
-| **Nota** | Staging tip **confirmado** para cierre interno; no inventar multi-región ni Railway pgvector |
+| **Nota** | No inventar multi-región ni Railway pgvector · no claim 519 applied on staging until redeploy |
 
 ## 2026-07-24 — ADR-057 Blocks 11–25 complete (local · deploy pending)
 
