@@ -1,12 +1,12 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-25** — **Cierre interno honestidad** · staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · catalog **v1.6.0** (local post-commit) · `claimReady: false` · **NOT READY**  
-> Última actualización automática: **2026-07-25 11:42 UTC**
+> Última actualización: **2026-07-25** — **Cierre interno total** · tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · catalog **v1.6.0** · Android APK VERIFIED · `claimReady: false` · **NOT READY**  
+> Última actualización automática: **2026-07-25 12:28 UTC**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `5adbfcd2` — `fix(os): promote influencers_pr to IMPLEMENTED_VERIFIED after staging E2E` |
+| **Último commit** | `bd165985` — `feat(platform): internal closure — catalog v1.6, i18n, Android APK, obs drill` |
 | **Fecha doc** | 2026-07-25 |
 | **Rama** | `main` (sync with origin) |
 
@@ -17,8 +17,8 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** · sin `claimReady` · sin prod IA · sin iOS · sin multi-región · sin APK |
-| **Staging live** | https://ideal-victory-staging.up.railway.app · tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` |
-| **Local tip (post-commit)** | Incluirá catalog **v1.6.0** + i18n honesty + observability drill + Android scaffold (working tree → commit pendiente) |
+| **Staging live** | https://ideal-victory-staging.up.railway.app · tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` |
+| **Local tip** | **`bd165985`** — catalog v1.6.0 + i18n + Android APK + obs drill |
 | **Catalog** | OsCatalogV1 **v1.6.0** · ads/community cores **IMPLEMENTED_VERIFIED** (core/sim; OAuth/spend/publish **BLOCKED_EXTERNAL**) |
 | **Prod** | flags **OFF/ABSENT** · OpenAI=0 · canary prod **BLOCKED_CEO** |
 | **Legal** | `claimReady` **false** · `claimReadyLegal` **false** · Pepito **forbidden** |
@@ -63,15 +63,14 @@ NELVYON_ADS_SPEND_ENABLED=0
 
 ## Próximo paso EXACTO
 
-1. **Commit local** (cuando Daniel lo pida): catalog v1.6.0 + i18n + obs + mobile scaffold → tip local; luego redeploy staging si se quiere alinear live con ese tip.
-2. **CEO:** firmar SÍ/NO en `docs/ops/CEO_IA_PROD_CANARY_REQUEST.md` (**PENDING_CEO**; prod OFF hasta firma + cambio manual).
-3. **CEO/ops:** Safari/iPhone — `docs/ops/PWA_IOS_SAFARI_CEO_CHECKLIST.md`.
-4. **Legal:** licencia Pepito escrita antes de `claimReadyLegal` / `claimReady`.
-5. **Externos (no promover sin CEO):** ads OAuth/spend · social publish real · Twilio · OAuth apps.
-6. **P2 i18n:** localizar SES catalog restante + `backend/billing/*EmailTemplates.ts`; PDF status badges — email/PDF siguen **PARTIAL**.
-7. **P2 RAG:** suelo minScore consciente del tamaño de corpus (`KNOWN_ISSUES.md`) — no tocar default sin re-benchmark.
-8. **Mobile:** conectar AVD/USB → `adb install` APK → smoke auth/CRM (`MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md`). Build local ya VERIFIED.
-9. **Multi-región:** no activar sin presupuesto CEO explícito (**BLOCKED_EXTERNAL/COST**).
+1. **CEO:** firmar SÍ/NO en `docs/ops/CEO_IA_PROD_CANARY_REQUEST.md` (**PENDING_CEO**; prod OFF).
+2. **CEO/ops:** Safari/iPhone — `docs/ops/PWA_IOS_SAFARI_CEO_CHECKLIST.md`.
+3. **Legal:** licencia Pepito escrita antes de `claimReadyLegal` / `claimReady`.
+4. **Mobile:** AVD/USB → `adb install` APK → smoke auth/CRM (build ya VERIFIED).
+5. **Externos:** ads OAuth/spend · social publish · Twilio · OAuth apps (checklists CEO).
+6. **P2 i18n:** SES catalog restante + `backend/billing/*EmailTemplates.ts` (email/PDF PARTIAL).
+7. **P2 RAG:** minScore corpus pequeño · Railway pgvector PREPARED_OFF.
+8. **Multi-región:** no activar sin presupuesto CEO.
 
 ---
 
