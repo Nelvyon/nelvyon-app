@@ -745,30 +745,47 @@
 | Campo | Valor |
 |-------|-------|
 | **Fecha** | 2026-07-25 |
-| **Estado** | **PREPARED_OFF** — diseño + plan; **no** implementado como SSOT |
-| **Relación** | ADR-061 (Postgres snapshot SSOT) · mig **519** reserved · mig **520** snapshots |
+| **Estado** | **PREPARED_OFF** — diseño + plan + flag helpers; dual-write **no** live; read path **no** flipped |
+| **Relación** | ADR-061 (snapshot SSOT) · mig **519** reserved · mig **520** snapshots+companions+RLS · runbook `docs/ops/ERP_DUAL_WRITE_TRANSITION_RUNBOOK.md` |
+| **Flags** | `NELVYON_ERP_RELATIONAL_DUAL_WRITE` / `NELVYON_ERP_RELATIONAL_READ` — default **0** (fail-closed); **cutover REQUIRES CEO** |
 
 ### Decisión
 
-Mantener **`erp_domain_snapshots` (JSONB + version + FOR UPDATE)** como **SSOT runtime** de Blocks 26–29 hasta evidencia de migración relacional correcta (backfill reversible + dual-write + cutover + rollback).
+Mantener **`erp_domain_snapshots` (JSONB + optimistic `version` + `FOR UPDATE`)** como **SSOT runtime** de Blocks 26–29 (`purchases` \| `inventory` \| `manufacturing` \| `projects_fs`) vía `ErpDomainSnapshotStore` / `ErpPersistentRuntime.with*Persistence`.
 
-Las tablas companion de **519/520** permanecen **reservadas / aditivas** — no son el path de lectura/escritura de `/api/saas/erp/*` hoy.
+Tablas companion **519/520** = schema **reservado / aditivo**. **No** son path de lectura/escritura de `/api/saas/erp/*` hoy. **No** afirmar dual-write activo.
 
-### Plan exacto (cuando se active — no hoy)
+### Auditoría del modelo JSONB actual (520)
 
-1. Migración aditiva (`521+`): solo ADD; **no** DROP de `erp_domain_snapshots`.
-2. Dual-write flag `NELVYON_ERP_RELATIONAL_DUAL_WRITE=0` default.
-3. Backfill reversible + checksum por tenant/domain.
-4. Read flip `NELVYON_ERP_RELATIONAL_READ=0` tras checksum 100% + smokes.
-5. Rollback: apagar flags → snapshot-only (ADR-061).
+| Dimensión | Fortaleza | Límite |
+|-----------|-----------|--------|
+| **Durabilidad** | 1 fila/(tenant,domain); overvive restart; ADR-061 VERIFIED staging | Payload crece O(entidades); riesgo tamaño/TOAST/latencia |
+| **Concurrencia** | `FOR UPDATE` + version check → `ErpSnapshotConflictError` → HTTP 409 | Contención **por dominio entero** (no por entidad) |
+| **Multi-réplica app** | SSOT en Postgres: N réplicas OK | Lock row-level serializa mutaciones del dominio |
+| **Queryabilidad** | Export/import core atómico | Sin SQL por SKU/PO/MO; reportes = full deserialize |
+| **Índices** | PK `(tenant_id,domain)` + `updated_at` | No GIN/partial sobre entidades internas |
+| **Integridad** | Version + tx única hydrate→mutate→save | FKs/constraints de negocio **no** en DB |
+| **RLS** | `app.tenant_id` GUC + policies FORCE | Service role bypass → app **debe** filtrar `tenant_id` |
+| **Rollback** | Redeploy tip previo; tablas aditivas inocuas | Corrupción snapshot → PITR |
 
-### Criterio
+### Plan de transición (exacto — no ejecutado)
 
-Sin dual-write live + backfill + read flip + smokes relacionales + runbook firmado → **PREPARED_OFF**.
+| Fase | Acción | Flags | Gate |
+|------|--------|-------|------|
+| **0 PREP** | Helpers fail-closed + tests unit (sin DDL) | ambos `0` | vitest `erpDualWritePrep` PASS · runbook |
+| **1 SCHEMA** | Mig **aditiva `521+`** (solo ADD; **nunca** DROP snapshots) | ambos `0` | migrate staging · CEO **no** cutover |
+| **2 DUAL_WRITE** | Mirror tras `saveSnapshotLocked` | `DUAL_WRITE=1` `READ=0` | 0 drift · 409 · smoke A/B |
+| **3 BACKFILL** | Job idempotente + checksum | `DUAL_WRITE=1` `READ=0` | checksum **100%** |
+| **4 READ_FLIP** | Lecturas relacionales | ambos `1` | smokes + **CEO SÍ escrito** |
+| **5 ROLLBACK** | Flags → `0` | ambos `0` | snapshot-only ADR-061 |
 
-### Consecuencias
+**Cutover (fase 4) = decisión CEO.** Sin firma → **PREPARED_OFF**.
 
-Prod migrate 519/520 = runbook listo, ejecución **BLOCKED_CEO** · `claimReady: false`
+### Criterio / consecuencias
+
+Sin dual-write live + backfill + read flip + smokes + CEO → **PREPARED_OFF**.  
+Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.  
+`claimReady: false` · **NOT READY**.
 
 ---
 

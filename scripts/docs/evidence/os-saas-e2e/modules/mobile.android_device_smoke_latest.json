@@ -1,0 +1,21 @@
+{
+  "date": "2026-07-25T16:31:24.531Z",
+  "apkPath": "C:\\Proyectos\\Nelvyon\\nelvyon-app\\apps\\mobile\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+  "apkExists": true,
+  "sha256": "dd71570440e59366bbbb64b14a5b3e3302ba0c2fa442bf35d1335e5e1393ed30",
+  "sizeBytes": 4795968,
+  "adbDevicesRaw": "List of devices attached",
+  "devicesConnected": 0,
+  "steps": {
+    "1_apk_present": "PASS",
+    "2_adb_device": "BLOCKED_EXTERNAL",
+    "3_install_launch": "BLOCKED_EXTERNAL"
+  },
+  "verdict": "BLOCKED_EXTERNAL",
+  "nextDaniel": [
+    "Connect phone with USB debugging OR start an AVD",
+    "Confirm: adb devices lists the target",
+    "adb install -r C:\\Proyectos\\Nelvyon\\nelvyon-app\\apps\\mobile\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "Open app → SaaS login → confirm tenant isolation visually"
+  ]
+}

@@ -14,8 +14,9 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ local / 🟡 Railway | local-ai/pgvector Docker **VERIFIED** · Railway pgvector **PREPARED_OFF** |
-| **Railway prod** | ✅ | tip **`c2edb2da`** · deploy `a82b55ac` · 519/520 kept · **ADR-064 skip-apply VERIFIED** · migrate.ts also gated · IA keys ABSENT |
-| **Railway staging** | ✅ | tip **`c2edb2da`** · deploy `da6b7a74` · auto-migrate · ERP VERIFIED |
+| **Railway prod** | ✅ | tip **`0a253c7f`** · ADR-064 · IA OpenAI OFF |
+| **Railway staging** | ✅ | tip **`e5cb8c85`** · deploy `f0d3c57c` · pgvector ext VERIFIED · RAG path PREPARED_OFF |
+| **App multi-replica ERP** | 🟡 | **BLOCKED_EXTERNAL/COST** — no 2ª réplica activada · concurrency smoke equivalente |
 | **ERP non-financial (26–29+35)** | ✅ **IMPLEMENTED_VERIFIED** (staging) | Snapshot SSOT · HTTP A/B · concurrency · ADR-062 dual-write **PREPARED_OFF** · prod migrate **BLOCKED_CEO** |
 | **App multi-replica ERP** | 🟡 | FOR UPDATE designed · **2ª réplica no provisionada** (0€ / COST if scaled) |
 | **HA single-region** | ✅ **VERIFIED** | Runbook + readiness · RPO/RTO documentados |

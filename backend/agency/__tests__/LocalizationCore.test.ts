@@ -203,6 +203,21 @@ describe("LocalizationCore — real disk key-parity regression (apps/web/message
     });
   }
 
+  it("saas.audit.title is localized (not an English clone) for fr/de/it/pt", () => {
+    const enTitle = getMessageByPath(loadMessages("en"), "saas.audit.title");
+    for (const locale of ["fr", "de", "it", "pt"] as LocaleId[]) {
+      const title = getMessageByPath(loadMessages(locale), "saas.audit.title");
+      expect(typeof title).toBe("string");
+      expect(title, `${locale} saas.audit.title still equals EN`).not.toBe(enTitle);
+    }
+  });
+
+  it("missing nested key returns undefined (fallback responsibility of next-intl)", () => {
+    const fr = loadMessages("fr");
+    expect(getMessageByPath(fr, "saas.audit.title")).toBeTruthy();
+    expect(getMessageByPath(fr, "saas.does_not_exist.ever")).toBeUndefined();
+  });
+
   it("FULL_VERIFIED classification in LOCALE_CATALOG is consistent with the real ALL-namespace parity result", () => {
     for (const locale of locales) {
       const localeMessages = loadMessages(locale);

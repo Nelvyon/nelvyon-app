@@ -26,7 +26,7 @@
 |-------|-------|
 | **Migración nueva** | **No** (Blocks 11–25 + catalog v1.6.0 — sin cambios schema en esos ADR) |
 | **Cambios código** | Agency cores + catalog v1.6.0 |
-| **Private RAG (Block 24)** | Docker local pgvector path **VERIFIED** (2026-07-25) · **Railway pgvector PREPARED_OFF** · P2 minScore documentado |
+| **Private RAG (Block 24)** | Docker local pgvector path **VERIFIED** · Railway: extension **vector 0.8.0 INSTALLED** on staging · Private RAG path **PREPARED_OFF** (no `local_ai_rag_*`, no vector cols on saas adjunct tables, `LOCAL_AI_DATABASE_URL` ABSENT) · evidence `railway.pgvector_probe_latest.md` |
 | **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` · **untouched** |
 
 ## ADR-056 — notas schema

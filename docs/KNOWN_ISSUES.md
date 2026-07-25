@@ -81,11 +81,27 @@
 | **Impacto real** | Ninguna fuga cross-tenant (verificado a nivel app + RLS, 100% PASS) · ninguna alucinación (las citas devueltas siempre son contenido real del propio tenant) · solo baja precisión en tenants con corpus muy pequeño |
 | **Remediación propuesta (no aplicada)** | Suelo de confianza consciente del tamaño del corpus en `LocalRagRetriever.retrieve` (ej. subir `minScore` efectivo cuando el tenant tiene menos de N chunks ingeridos) — requiere re-benchmark contra `specialization_eval_*` antes de tocar el default compartido |
 
-### Ops (no KI) — pgvector RAG en staging (no aprobado, no bloqueante)
+### Ops (no KI) — Railway pgvector extension VERIFIED · Private RAG path PREPARED_OFF
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **PREPARED_OFF** (staging) |
+| **Estado** | Extension **INSTALLED** (vector 0.8.0) on staging · Private RAG path **PREPARED_OFF** |
+| **Detalle** | Probe 2026-07-25: `local_ai_rag_*` ausente · `nelvyon_rag_chunks`/`saas_tenant_memory_chunks` sin columna vector · `LOCAL_AI_DATABASE_URL` ABSENT · Ollama env SET · Docker RAG path intacto VERIFIED |
+| **Evidencia** | `railway.pgvector_probe_latest.md` |
+| **Pendiente** | CEO/Daniel: migrate `local_ai_rag_*` en staging o DB dedicada + wiring |
+
+### Ops (no KI) — 2ª réplica Railway BLOCKED_EXTERNAL/COST
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **BLOCKED_EXTERNAL/COST** — no activada (`numReplicas=1`) |
+| **Evidencia** | `ha.replica_cost_block_latest.md` · equivalencia: ERP concurrency ALL_PASS |
+
+### Ops (no KI) — pgvector RAG en staging (histórico · supersedido por probe extension)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **PREPARED_OFF** (staging path) — ver Ops Railway pgvector arriba |
 | **Detalle** | Verificación EN VIVO de pgvector RAG (2026-07-25) se hizo contra Docker+Ollama de la máquina local del owner, no contra Railway staging. Extender a staging requeriría: (1) instancia Postgres+pgvector alcanzable desde el servicio de Railway staging (`LOCAL_AI_DATABASE_URL`) — no provisionada; (2) `OLLAMA_HOST` mesh (Tailscale) desde staging al Ollama del owner — ya documentado como **pendiente CEO separado** en `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md`. Ninguno de los dos se activó ni se solicitó en esta sesión. |
 
 ---

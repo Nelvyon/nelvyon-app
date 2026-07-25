@@ -1,6 +1,15 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-25** ADR-064 harden migrate.ts · tip live `c2edb2da`.
+> Actualizado: **2026-07-25** CIERRE 1–7 tip staging `e5cb8c85`.
+
+## 2026-07-25 — CIERRE puntos 1–7
+
+| Campo | Valor |
+|-------|-------|
+| **Staging** | deploy **`f0d3c57c` SUCCESS** · tip **`e5cb8c85`** · live+ready OK |
+| **Prod** | tip **`0a253c7f`** (read-only this batch) |
+| **Evidencias** | `railway.pgvector_probe_latest.md` · `ha.replica_cost_block_latest.md` · `mobile.android_device_smoke_latest.md` · `pwa.cert_latest.md` |
+| **claimReady** | **false** |
 
 ## 2026-07-25 — CIERRE INTERNO ABSOLUTO (audit + harden)
 

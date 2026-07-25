@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| Fecha | 2026-07-25T11:26:15.939Z |
+| Fecha | 2026-07-25T16:27:45.108Z |
 | Host | win32 (Node v24.18.0) |
 | Resultado | PASS |
 | Chrome/Windows (criterios de instalabilidad) | VERIFIED — manifest válido (name/icons/display/start_url) + iconos reales en disco + sw.js con `install`/`fetch` handlers y estrategia cache+offline documentada. Estos son exactamente los criterios que Chrome/Edge (Chromium, Windows) evalúan para marcar el sitio como instalable. |

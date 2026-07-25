@@ -1,35 +1,30 @@
-# CTO Final Verify — 2026-07-25 (CIERRE INTERNO ABSOLUTO)
+# CTO Final Verify — 2026-07-25 (puntos 1–7)
 
-> **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0  
-> Auditoría élite: **0 P0** · P1 corregidos (migrate.ts gate + mobile SSOT + i18n saas shell)
+> **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0
 
-## SHAs / deploys
+## SHAs
 
-| Entorno | Tip live | Deploy gate | Health |
-|---------|----------|-------------|--------|
-| Staging | `c2edb2da` | `da6b7a74` | live+ready OK |
-| Prod | `c2edb2da` | `a82b55ac` | live+ready OK · skip-apply |
+| Entorno | Tip | Deploy |
+|---------|-----|--------|
+| Staging | `e5cb8c85` | `f0d3c57c` SUCCESS · live+ready 200 |
+| Prod | `0a253c7f` | read-only · gate skip-apply prior |
 
-## Gates (esta sesión)
+## Tabla puntos 1–7
 
-| Gate | Resultado |
-|------|-----------|
-| tsc | **0** |
-| vitest prodMigrateGate + LocalizationCore | **63 PASS** |
-| anti-mock | **PASS** |
-| ERP A/B | **ALL_PASS** |
-| ERP concurrency | **ALL_PASS** |
-| Prod migrate logs | gate skip-apply **VERIFIED** (sesión previa) |
+| # | Área | Estado | Evidencia | Bloqueo residual |
+|---|------|--------|-----------|------------------|
+| 1 | Deploy staging | **IMPLEMENTED_VERIFIED** | `f0d3c57c` · SHA `e5cb8c85` · migrate+gate logs · tsc/vitest/anti-mock | — |
+| 2 | Traducciones SaaS | **IMPLEMENTED_VERIFIED** (UI catalogs) | saas nav/common/errors/settings/sso/audit localized · LocalizationCore tests | Email/PDF **PARTIAL** · legal copy = human review |
+| 3 | ERP dual-write | **PREPARED_OFF** | ADR-062 expandido · `erpRelationalFlags` · `erpDualWritePrep` · runbook | **CEO** cutover fase 4 |
+| 4 | Multirréplica | **BLOCKED_EXTERNAL/COST** | `ha.replica_cost_block_latest.md` · no `railway scale` | Coste réplica · equivalencia concurrency ALL_PASS |
+| 5 | RAG/pgvector Railway | Extension **VERIFIED** · path **PREPARED_OFF** | `railway.pgvector_probe_latest.md` · vector 0.8.0 installed · no `local_ai_rag_*` · no vector col on saas tables | Schema/wiring · `LOCAL_AI_DATABASE_URL` · Docker RAG still VERIFIED |
+| 6 | Android | Build **VERIFIED** · device **BLOCKED_EXTERNAL** | APK SHA256 `dd715704…` · smoke script · adb empty | Dispositivo físico/AVD |
+| 7 | PWA iOS/Safari | Chrome **VERIFIED** · iOS **BLOCKED_EXTERNAL** | `pwa-certify` PASS · checklist 3 pasos | iPhone/Safari real |
 
-## P0/P1
+## Gates
 
-| Ítem | Acción |
-|------|--------|
-| P0 | **Ninguno** |
-| P1 migrate bypass | **FIXED** — `migrate.ts` usa `evaluateProdMigrateGate` · +2 tests |
-| P1 mobile SSOT | **FIXED** — checklist/scaffold alineados con assembleDebug VERIFIED · device BLOCKED |
-| P1 i18n saas EN clone | **MITIGADO** — nav/common/errors/settings nativos fr/de/it/pt · note honesty remaining saas.* |
+tsc **0** · vitest gate+i18n+dualWritePrep **70 PASS** · anti-mock **PASS** · pwa-certify **PASS**
 
 ## Veredicto
 
-**CONDITIONAL_READY · NOT READY** — solo quedan bloqueos Daniel/proveedor/legal/mercado.
+**NOT READY** — solo bloqueos Daniel / dispositivo / coste / CEO / legal / mercado.

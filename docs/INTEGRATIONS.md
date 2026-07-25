@@ -108,7 +108,7 @@
 | OpenAI | 🟡 | `OPENAI_API_KEY` + `AUTONOMOUS_ALLOW_OPENAI=1` | **OFF** staging tip (`=0`) · prod ABSENT |
 | Anthropic | 🟡 | `ANTHROPIC_API_KEY` | Private AI provider |
 | Ollama (local) | ✅ | `OLLAMA_HOST` | Staging Tailscale private mesh |
-| Local-ai Postgres/pgvector | ✅ Docker / 🟡 Railway | Compose local | Docker **VERIFIED** · Railway **PREPARED_OFF** |
+| Local-ai Postgres/pgvector | ✅ Docker / 🟡 Railway | Compose local | Docker **VERIFIED** · Railway extension **VERIFIED** · path **PREPARED_OFF** (`railway.pgvector_probe_latest.md`) |
 | **MCP Productivo** | ✅ | flag | CERTIFIED · **OFF** runtime |
 | **MCP Staging synthetic** | ✅ | flag | ON staging · productivo 0 |
 | **OpenClaw** | 🟡 | bridge flags | staging_mock · prod **PENDING_CEO** |
