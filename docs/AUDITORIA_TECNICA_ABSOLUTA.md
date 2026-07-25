@@ -1,6 +1,6 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> **2026-07-25** ADR-064 · tip pre-deploy `5a36809c` · claimReady false  
+> **2026-07-25** ADR-064 **VERIFIED live** · tip `c2edb2da` · claimReady false  
 > Veredicto: **CONDITIONAL_READY** · **NOT READY**
 
 ### Matriz

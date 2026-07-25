@@ -1,8 +1,19 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-25** ADR-064 prod migrate gate.
+> Actualizado: **2026-07-25** ADR-064 VERIFIED live tip `c2edb2da`.
 
-## 2026-07-25 — ADR-064 prod migrate gate (código; deploy pendiente)
+## 2026-07-25 — ADR-064 VERIFIED live (staging + prod)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip** | **`c2edb2da`** |
+| **Staging** | `ideal-victory` deploy **`da6b7a74` SUCCESS** · live/ready OK · logs: `isProduction=false` · apply allowed · 519/520 skip |
+| **Prod** | `@nelvyon/web` deploy **`a82b55ac` SUCCESS** · live/ready OK · logs: `isProduction=true` · `pending_count=0` · **skip apply (gate active)** |
+| **ERP reval** | A/B + concurrency **ALL_PASS** |
+| **Evidencia** | `prod.migrate_gate_latest.md` |
+| **claimReady** | **false** |
+
+## 2026-07-25 — ADR-064 prod migrate gate (código)
 
 | Campo | Valor |
 |-------|-------|

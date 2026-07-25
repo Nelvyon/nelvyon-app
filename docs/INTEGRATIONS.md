@@ -1,7 +1,7 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-25** ADR-064. Staging+prod tip live **`5a36809c`**.  
+> Actualizado: **2026-07-25** ADR-064 **VERIFIED live**. Staging+prod tip **`c2edb2da`**.  
 > ERP ✅ · migrate gate prod ✅ código · dual-write **PREPARED_OFF** · **sin Odoo**.
 
 **Bloqueadores go-live:** CEO ack · OAuth/Twilio/iOS/IA · Pepito legal.

@@ -792,5 +792,5 @@ Prod migrate 519/520 = runbook listo, ejecución **BLOCKED_CEO** · `claimReady:
 | **Decisión** | `migrate:prod` en producción **no aplica** SQL pendientes sin `NELVYON_PROD_MIGRATE_APPROVED=1` + `NELVYON_PROD_MIGRATE_APPROVED_BY`. Pending sin approval → **exit 1** (bloquea deploy). Pending=0 → no-op exit 0. Staging sigue auto-apply. |
 | **Por qué** | Auto-deploy de `main` aplicó ERP 519/520 sin firma CEO (ADR-063). Gate técnico evita repetición. |
 | **Consecuencias** | Runbook `PROD_MIGRATE_GATE_RUNBOOK.md` · vars de aprobación son ventana única y reversibles · 519/520 **no se revierten** · `claimReady: false` |
-| **Evidencia** | `prodMigrateGate.ts` · `migrate-prod.ts` · vitest 13 PASS · railway.toml comentario |
+| **Evidencia** | `prodMigrateGate.ts` · vitest 13 PASS · staging `da6b7a74` apply-allowed · prod `a82b55ac` skip-apply · `prod.migrate_gate_latest.md` · tip `c2edb2da` |
 | **Relación** | ADR-011 · ADR-063 · KI governance prod migrate |

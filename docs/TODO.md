@@ -1,13 +1,13 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-25** — ADR-064 prod migrate gate · tip **`5a36809c`** live · `claimReady: false` · **NOT READY**
+> Actualizado: **2026-07-25** — ADR-064 **VERIFIED live** tip **`c2edb2da`** · `claimReady: false` · **NOT READY**
 
 ---
 
 ## P0 — Bloqueantes producción
 
 - [x] Completado y validado 2026-07-10
-- [x] **ADR-064 prod migrate gate** (código + tests) — deploy tip pendiente verificación logs staging
+- [x] **ADR-064 prod migrate gate** — código + tests + staging apply logs + prod skip-apply logs (`da6b7a74` / `a82b55ac`)
 
 ---
 

@@ -1,7 +1,9 @@
 # Runbook — Gate migraciones productivas (ADR-064)
 
-> **Estado:** IMPLEMENTED_VERIFIED (código) · tip post-deploy staging  
+> **Estado:** **IMPLEMENTED_VERIFIED** (código + staging apply + prod no-op live)  
+> Tip: **`c2edb2da`** · staging deploy **`da6b7a74`** · prod deploy **`a82b55ac`**  
 > **Hecho histórico:** ERP 519/520 ya aplicadas en prod (auto-deploy previo) — **no revertir**.  
+> Evidencia: `scripts/docs/evidence/os-saas-e2e/modules/prod.migrate_gate_latest.md`  
 > Fecha: 2026-07-25
 
 ## Problema
