@@ -1,13 +1,13 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-25** — **CIERRE INTERNO ABSOLUTO** · ADR-064 harden `migrate.ts` · i18n saas nav/common · mobile SSOT · tip pending push · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-25** — **CIERRE INTERNO ABSOLUTO** · ADR-064 harden `migrate.ts` · i18n saas nav/common · mobile SSOT · tip `0a253c7f` · `claimReady: false` · **NOT READY**
 
 > Última actualización automática: **2026-07-25 16:02 UTC**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | pending this push (audit closure) |
+| **Último commit** | 0a253c7f |
 | **Fecha doc** | 2026-07-25 |
 | **Rama** | `main` |
 
