@@ -6,14 +6,14 @@
 
 ## Activos
 
-### Ops (no KI) — ERP Postgres restart smoke pending (ADR-061 · mig 520)
+### Ops (no KI) — ERP prod migrate still gated (ADR-061 staging VERIFIED)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto** — ops verification · **not** a process-memory SSOT risk |
-| **Detalle** | Code: API `/api/saas/erp/{purchases,inventory,manufacturing,projects-fs}` → `with*Persistence` · SSOT `erp_domain_snapshots` when `DATABASE_URL` · in-memory fallback without DB only. **Survival across restart not verified on staging** until tip commit + mig **519+520** applied + `staging-smoke-erp-persistence.mjs --phase=before|after`. Payments/accounting **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · **no Odoo**. |
-| **Evidencia** | routes + `ErpPersistentRuntime` · vitest roundtrip · smoke script · HANDOVER · ADR-061 |
-| **Remediación** | Commit + deploy mig 519+520 · run `--phase=before` → Railway restart → `--phase=after` → `erp.persistence_restart_latest.md` ALL_PASS |
+| **Estado** | **Abierto (prod gate)** — staging restart **ALL_PASS**; prod ERP schema **not** activated |
+| **Detalle** | Staging tip **`9e931f08`** · mig **519+520** · `erp.persistence_restart_latest.md` **ALL_PASS**. Prod: **no** migrate/activate without explicit CTO recommendation. Payments/accounting **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · **no Odoo**. |
+| **Evidencia** | HANDOVER · DEPLOYMENTS · `erp.persistence_restart_latest.md` · ADR-061 |
+| **Remediación** | Explicit CTO go-ahead before prod migrate; optional relational dual-write 519 later |
 
 ### Ops (no KI) — Email + PDF locale PARTIAL (no FULL_VERIFIED)
 
@@ -100,7 +100,7 @@
 | **Causa** | ADR-060: ERP Blocks 26–29 runtime SSOT was process-local in-memory → data lost on process restart |
 | **Fix** | Mig **520** `erp_domain_snapshots` + RLS · `ErpDomainSnapshotStore` · API routes → `with*Persistence` · when `DATABASE_URL` set, **Postgres is SSOT** (process-memory no longer SSOT) · mig **519** remains companion schema reserved |
 | **Evidencia** | `520_erp_postgres_persistence.sql` · `ErpPersistentRuntime` · API erp routes · vitest roundtrip · OsCatalogV1 nextAction · living docs ADR-061 |
-| **Nota** | Staging survival **not yet verified** — see Activos “ERP Postgres restart smoke pending”. Tip **uncommitted**. `claimReady: false`. |
+| **Nota** | Staging survival **VERIFIED** 2026-07-25 (`9e931f08` · `794662d7`). Prod ERP migrate still gated. `claimReady: false`. |
 
 ### Ops — pgvector RAG live e2e (Block 24 "yellow point 7") — Docker+Ollama real, aislamiento app+RLS verificado
 

@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-25** — **ADR-061** · última mig repo **`520_erp_postgres_persistence.sql`** · API `with*Persistence` · tip **uncommitted** · staging tip **`bd165985`** aún **sin** 519/520
+> Actualizado: **2026-07-25** — **ADR-061 VERIFIED staging** · última mig repo **`520_erp_postgres_persistence.sql`** · tip **`9e931f08`** · `_migrations` **519+520** · restart **ALL_PASS**
 
 ---
 
@@ -14,7 +14,8 @@
 | **Runtime SSOT** | **Postgres** `erp_domain_snapshots` when `DATABASE_URL` set — **process-memory is not SSOT** · without DB → in-memory fallback (dev/tests) · version conflict → HTTP **409** |
 | **API routes** | `/api/saas/erp/{purchases,inventory,manufacturing,projects-fs}` → `with*Persistence` |
 | **Fuera de alcance** | Payments · bank · tax · GL · cost accounting · IoT · e-signature (**BLOCKED_***) |
-| **Deploy** | **Pending** tip commit + migrate · staging live tip **`bd165985`** verified through **518**; **519/520** not claimed applied · restart smoke **pending** |
+| **Staging** | tip **`9e931f08`** · **519+520** in `_migrations` · restart smoke **ALL_PASS** · snapshot purchases v3 · RLS on |
+| **Prod** | **519/520 not claimed** · **no** migrate without CTO go-ahead |
 | **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` · **untouched** |
 
 ## ADR-060 — ERP product surface (catalog v1.7.0 · superseded SSOT by ADR-061)
@@ -58,15 +59,17 @@
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
 | **Total archivos** | 411+ |
-| **Última migración (repo)** | `520_erp_postgres_persistence.sql` (**uncommitted** tip · snapshots + companions) |
+| **Última migración (repo)** | `520_erp_postgres_persistence.sql` (tip **`9e931f08`**) |
+| **Staging verified** | **519** + **520** in `_migrations` (2026-07-25) |
+| **Prod verified** | **517** + **518** in `_migrations` (2026-07-22 SSOT DB probe) · **519/520** **not** claimed on prod |
 | **Shared Memory schema** | 514 + RLS 515 · `schema.proposed.sql` referencia histórica |
 | **Runner** | `backend/db/migrate.ts` |
 | **Tracking** | Tabla `_migrations (name, executed_at)` |
 | **Comando** | `pnpm -C apps/web migrate` |
 | **Prod** | Railway `preDeployCommand` migrate en deploy Web |
-| **Prod verified** | **517** + **518** in `_migrations` (2026-07-22 SSOT DB probe) · **519/520** not yet claimed applied |
+| **Nota 519/520** | Staging applied · prod **not** claimed · CI post-elite range still 508–518 until validator bump |
 
-**Rango post-elite CI:** 508–518 (`scripts/validate-post-elite-migrations.mjs`) — **519/520** ERP are post-range until validator updated after commit.  
+**Rango post-elite CI:** 508–518 (`scripts/validate-post-elite-migrations.mjs`) — **519/520** ERP are post-range until validator updated.  
 **SQL SSOT gate:** `scripts/validate-sql-alembic-ssot.mjs` (ADR-002/039) — files + optional DB probe.  
 **Rango elite SaaS CI:** 401–507 (`scripts/validate-saas-migrations.mjs`).
 
@@ -131,8 +134,8 @@
 - `516_fastapi_rls_repair.sql` — FastAPI RLS dual-plane (KI-026)
 - `517_workspaces_tenant_extension_columns.sql` — `workspaces.timezone` · **prod verified**
 - `518_workflows_list_columns.sql` — `workflows.is_active` · **prod verified**
-- `519_erp_non_financial_cores.sql` — reserved ERP tables (suppliers/PO/inventory/warehouses/stock_moves/MO/`saas_projects_erp`) · RLS comments only · **deploy pending**
-- `520_erp_postgres_persistence.sql` — `erp_domain_snapshots` + companions + `erp_audit_events` + RLS · API routes wired to `with*Persistence` · **deploy pending**
+- `519_erp_non_financial_cores.sql` — reserved ERP tables (suppliers/PO/inventory/warehouses/stock_moves/MO/`saas_projects_erp`) · RLS comments only · **staging applied**
+- `520_erp_postgres_persistence.sql` — `erp_domain_snapshots` + companions + `erp_audit_events` + RLS · API `with*Persistence` · **staging applied** · restart **ALL_PASS**
 
 ---
 

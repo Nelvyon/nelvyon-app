@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-25** — **ADR-061** Postgres ERP SSOT · catalog **v1.7.0** (local **uncommitted**) · staging tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · `claimReady: false` · **NOT READY**
+> Actualizado: **2026-07-25** — **ADR-061 VERIFIED staging** · tip **`9e931f08`** · deploy **`794662d7` SUCCESS** · mig **519+520** · restart **ALL_PASS** · `claimReady: false` · **NOT READY**
 
 ---
 
@@ -20,15 +20,15 @@
 
 ---
 
-> Actualizado: **2026-07-25** — ADR-061 Postgres ERP SSOT · tip live **`bd165985`** · local v1.7.0 **uncommitted** · restart smoke **pending** · **NOT READY**
+> Actualizado: **2026-07-25** — ADR-061 VERIFIED · tip **`9e931f08`** · restart **ALL_PASS** · **NOT READY**
 
 ---
 
 ## P2 — Post-auditoría / ops (cierre interno 2026-07-25 + ADR-060/061)
 
-- [x] Staging tip confirm: **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` (live **sin** catalog v1.7.0 / mig 519–520 aún)
+- [x] Staging tip **`9e931f08`** · deploy **`794662d7` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · `_migrations` **519+520**
 - [x] Catalog **v1.6.0** — `ads_attribution_core` + `community_publish_core` **VERIFIED** (core/sim) · OAuth/spend/publish **BLOCKED_EXTERNAL**
-- [x] Catalog **v1.7.0** (local) — ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI `/saas/erp/*` · evidence `erp.cores_synthetic_latest.md` ALL_PASS
+- [x] Catalog **v1.7.0** — ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI `/saas/erp/*` · evidence `erp.cores_synthetic_latest.md` ALL_PASS
 - [x] influencers_pr **VERIFIED** · telephony/oauth mock/marketplace **VERIFIED**
 - [x] private_vector_rag Docker **VERIFIED** · Railway **PREPARED_OFF**
 - [x] private_ai_canary **PREPARED_OFF** + **BLOCKED_CEO**
@@ -45,10 +45,11 @@
 - [x] **Wire ERP 26–29+35:** OsCatalogV1 **v1.7.0** · `/api/saas/erp/*` · `/saas/erp/*` · smoke `staging-smoke-erp-cores.mjs` · migration **519** reserved
 - [x] **ERP snapshot layer (local):** export/import on 4 cores · `ErpDomainSnapshotStore` · `ErpPersistentRuntime` · mig **520** · vitest PASS
 - [x] **ADR-061 ERP API → `with*Persistence`:** purchases/inventory/manufacturing/projects-fs · Postgres SSOT when `DATABASE_URL` · process-memory **not** SSOT · 409 on version conflict · smoke script ready
-- [x] **P0 memory risk closed (code):** process-local SSOT superseded by `erp_domain_snapshots` when DB set (ADR-061) — staging survival still unverified
-- [ ] **Parent/Daniel:** commit tip (v1.7.0 + 519/520 + API persistence + docs ADR-061) · then redeploy staging
-- [ ] **Ops:** staging restart smoke `--phase=before|after` → `erp.persistence_restart_latest.md` ALL_PASS (**pending** until staging deploy)
+- [x] **P0 memory risk closed (staging VERIFIED):** restart/redeploy survival **ALL_PASS** · tip **`9e931f08`**
+- [x] **Ops:** staging restart smoke `--phase=before|after` → `erp.persistence_restart_latest.md` **ALL_PASS**
+- [ ] **CTO/Daniel:** explicit go-ahead before **prod** ERP migrate/activate (staging only today)
 - [ ] **ERP dual-write relational companions (519):** optional later — snapshot store is the first durable path
+- [ ] **Opcional:** staging HTTP multi-tenant A/B (unit A/B + RLS already VERIFIED)
 - [ ] **P2 (no bloqueante):** RAG minScore corpus-size floor — `docs/KNOWN_ISSUES.md`
 - [ ] **CEO (opcional):** Railway pgvector + mesh Ollama staging — `CEO_IA_STAGING_APPROVAL_REQUEST.md`
 - [ ] **CEO:** telefonía — `TELEPHONY_PROVIDER_CEO_CHECKLIST.md`

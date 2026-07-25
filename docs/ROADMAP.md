@@ -68,7 +68,7 @@
 | Quality routing 3b/8b packs | ✅ | ADR-036 opt-in · Router cert intacto |
 | Local AI runtime mesh | ✅ | MESH_JOIN_OK · Pack E2E growth ALL_PASS |
 | Beta packs → available | ✅ | 5 packs E2E ALL_PASS · ADR-050 · catalog available |
-| Agencia OS unificada élite (ops) | ✅ | ADR-055 E2E PASS staging · ADR-056–060 · tip live **`bd165985`** · local ERP **v1.7.0** uncommitted |
+| Agencia OS unificada élite (ops) | ✅ | ADR-055 E2E PASS staging · ADR-056–061 · tip live **`9e931f08`** · ERP Postgres SSOT VERIFIED |
 | Redes sociales integral por cliente | ✅ | ADR-052/054 |
 | Auditor independiente staging | ✅ | 13 packs E2E + session PASS/REJECT/repair |
 | OpenClaw staging_mock | 🟡 | ADR-055 deepened · prod canary doc PENDING_CEO |
@@ -81,8 +81,8 @@
 | ADR-056 elite absolute audit | ✅ | P0/P1 fixes · NOT READY |
 | **ADR-057 Blocks 11–25 (internal cores)** | ✅ | cores internos VERIFIED · externos BLOCKED_* · **NOT READY** |
 | **ADR-059 catalog v1.6.0 + i18n/mobile honesty** | ✅ | ads/community promote (core/sim) · email locale PARTIAL · Android scaffold · tip live `bd165985` |
-| **ADR-060 ERP non-financial cores (catalog v1.7.0)** | ✅ | Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI wired · mig **519** reserved · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · tip **uncommitted** · **NOT READY** |
-| **ADR-061 Postgres ERP SSOT (mig 520)** | 🟡 | API `with*Persistence` · `erp_domain_snapshots` SSOT when `DATABASE_URL` · process-memory **not** SSOT · mig **519+520** coded · restart smoke **pending** staging deploy · `claimReady: false` |
+| **ADR-060 ERP non-financial cores (catalog v1.7.0)** | ✅ | Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI wired · mig **519** reserved · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · **NOT READY** |
+| **ADR-061 Postgres ERP SSOT (mig 520)** | ✅ | Staging tip **`9e931f08`** · mig **519+520** · restart **ALL_PASS** · prod migrate **gated CTO** · `claimReady: false` |
 | Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |
 | Block 12 influencers_pr | ✅ | **VERIFIED** · outreach forbidden |
 | Block 13 ads_attribution_core | ✅ | **VERIFIED** (core) · spend/OAuth BLOCKED_EXTERNAL · catalog v1.6.0 |

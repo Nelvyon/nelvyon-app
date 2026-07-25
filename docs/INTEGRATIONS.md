@@ -1,11 +1,11 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-25** (ADR-061 Postgres ERP SSOT). **✅ = verificado** · **🟡 = código/vars** · **❌ = no implementado**  
+> Actualizado: **2026-07-25** (ADR-061 VERIFIED staging). **✅ = verificado** · **🟡 = código/vars** · **❌ = no implementado**  
 > **Sin OAuth real inventado.** Mock OAuth framework = VERIFIED; apps reales = BLOCKED_EXTERNAL.  
-> **Sin Odoo** · **sin** full ERP/accounting/finance · ERP non-financial cores = NELVYON + Postgres `erp_domain_snapshots` SSOT when `DATABASE_URL` (catalog **v1.7.0** local).
+> **Sin Odoo** · **sin** full ERP/accounting/finance · ERP non-financial cores = NELVYON + Postgres `erp_domain_snapshots` SSOT (catalog **v1.7.0** · staging tip **`9e931f08`**).
 
-**Bloqueadores go-live:** CEO checklists (telephony · OAuth · ads · publish · mobile · IA canary) · legal Pepito (mass-send **BLOCKED_LEGAL**). Prod flags **OFF**. Staging tip **`bd165985`** · deploy **`1de7f724` SUCCESS**. SSOT: `OS_CATALOG_V1.md` v**1.7.0** (local uncommitted).
+**Bloqueadores go-live:** CEO checklists (telephony · OAuth · ads · publish · mobile · IA canary) · legal Pepito (mass-send **BLOCKED_LEGAL**). Prod flags **OFF**. Staging tip **`9e931f08`** · deploy **`794662d7` SUCCESS**. SSOT: `OS_CATALOG_V1.md` v**1.7.0**.
 
 ### Auth bridge Web ↔ FastAPI
 
@@ -45,7 +45,7 @@
 |-------------|--------|-------|
 | **Odoo** | ❌ **no integrado** | No connector · no sync · no claim parity · NELVYON non-financial cores only |
 | Full ERP finance / GL / tax / bank | ❌ **BLOCKED_SCOPE** | Explicit out of scope ADR-060/061 |
-| NELVYON ERP ops UI | 🟡 local | `/saas/erp/*` → `with*Persistence` · **ADR-061** Postgres SSOT when DB · mig **519** reserved + **520** · restart smoke pending staging |
+| NELVYON ERP ops UI | ✅ staging | `/saas/erp/*` → `with*Persistence` · **ADR-061** Postgres SSOT · mig **519+520** · restart **ALL_PASS** · prod migrate gated |
 
 ---
 

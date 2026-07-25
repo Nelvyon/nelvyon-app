@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-25** (ADR-061 Postgres ERP SSOT). Sin secretos.
+> Estado real documentado **2026-07-25** (ADR-061 VERIFIED staging). Sin secretos.
 
 ---
 
@@ -14,15 +14,15 @@
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
 | **Docker** | ✅ local / 🟡 Railway | local-ai/pgvector Docker **VERIFIED** · Railway pgvector **PREPARED_OFF** |
-| **Railway prod** | ✅ | `@nelvyon/web` · flags **OFF** / **ABSENT** · no OpenAI · no credenciales reales |
-| **Railway staging** | ✅ | `ideal-victory` · tip **`bd165985`** · deploy **`1de7f724` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · catalog **v1.7.0**/mig **519–520** **pending** tip commit |
+| **Railway prod** | ✅ | `@nelvyon/web` · flags **OFF** / **ABSENT** · no OpenAI · no credenciales reales · **ERP 519/520 not claimed** |
+| **Railway staging** | ✅ | `ideal-victory` · tip **`9e931f08`** · deploy **`794662d7` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · mig **519–520** · restart **ALL_PASS** |
 | **HA single-region** | ✅ **VERIFIED** | Runbook + readiness · RPO/RTO documentados |
 | **Multi-region / HA geo** | ❌ **BLOCKED_EXTERNAL/COST** | Sin despliegue multi-región activo · pendiente presupuesto CEO |
 | **OpenClaw** | ✅ staging_mock / ❌ prod | canary doc PENDING_CEO |
 | **Auditor** | ✅ staging / ❌ prod | 13 packs ADR-055 |
 | **SM/MCP synthetic** | ✅ staging | flags ON · productivo 0 |
 | **Telephony (Block 11)** | ✅ sim **VERIFIED** | real Twilio **BLOCKED_EXTERNAL** |
-| **ERP non-financial (26–29+35)** | ✅ **IMPLEMENTED_VERIFIED** (local) | **ADR-061:** Postgres `erp_domain_snapshots` SSOT when `DATABASE_URL` · process-memory **not** SSOT · mig **519** reserved + **520** · API `with*Persistence` · restart smoke **pending** staging · **no Odoo/finance** |
+| **ERP non-financial (26–29+35)** | ✅ **IMPLEMENTED_VERIFIED** (staging) | **ADR-061:** Postgres `erp_domain_snapshots` SSOT · restart **ALL_PASS** · **no Odoo/finance** · prod migrate gated |
 | **Mobile (Block 18)** | 🟡 Android build VERIFIED | device smoke / stores **BLOCKED** |
 | **PWA (Block 19)** | ✅ Chrome **VERIFIED** | iOS **BLOCKED** |
 | **Observability** | ✅ local **VERIFIED** | paid APM **PREPARED_OFF** |
