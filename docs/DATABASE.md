@@ -8,9 +8,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Prod** | tip **`5a36809c`** · **519/520 in `_migrations`** (migrate skip 2026-07-25) · CEO formal ack pending · IA keys ABSENT |
-| **Staging** | tip **`5a36809c`** · reval A/B+concurrency+persist **ALL_PASS** |
-| **SSOT** | `erp_domain_snapshots` · dual-write **PREPARED_OFF** (ADR-062) |
+| **Prod** | tip **`5a36809c`** · 519/520 in `_migrations` · **ADR-064 gate** on `migrate:prod` · CEO ack pending |
+| **Staging** | auto-migrate continues · tip live previo `5a36809c` hasta deploy gate |
+| **SSOT ERP** | `erp_domain_snapshots` · dual-write **PREPARED_OFF** |
 
 ## ADR-060 — ERP product surface (catalog v1.7.0 · superseded SSOT by ADR-061)
 

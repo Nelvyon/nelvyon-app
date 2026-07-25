@@ -1,13 +1,13 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-25** — **TOTAL QUALITY / RELEASE-READINESS** · staging tip **`5a36809c`** · reval ERP A/B+concurrency+persist **ALL_PASS** · prod live tip **`5a36809c`** · mig 519/520 prod **already applied** (auto-deploy; CEO formal ack pending) · `claimReady: false` · **NOT READY**  
+> Última actualización: **2026-07-25** — **ADR-064 prod migrate gate** · tip código pending deploy · ERP staging VERIFIED · 519/520 prod **kept** (no revert) · `claimReady: false` · **NOT READY**
 
-> Última actualización automática: **2026-07-25 15:20 UTC**
+> Última actualización automática: **2026-07-25 15:29 UTC**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | docs tip pending this sync · código tip **`5a36809c`** |
+| **Último commit** | pending this push (migrate gate) |
 | **Fecha doc** | 2026-07-25 |
 | **Rama** | `main` (sync with origin) |
 
@@ -17,60 +17,47 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** · **NOT READY** · sin `claimReady` |
-| **Staging** | https://ideal-victory-staging.up.railway.app · tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · health ready OK |
-| **Prod** | https://nelvyon.com · tip **`5a36809c`** · ready OK · OpenAI/MCP/SM keys **ABSENT** · ERP schema 519/520 **present** (`migrate skip`) |
-| **Auditoría código** | **0 P0/P1** demostrables en ERP/saas/auth paths (sesión) |
+| **Estado** | **CONDITIONAL_READY** · **NOT READY** |
+| **Staging** | tip live previo **`5a36809c`** · ERP A/B+concurrency+persist VERIFIED · health OK |
+| **Prod** | tip **`5a36809c`** · 519/520 **applied** (histórico) · **nuevo gate** bloquea migraciones futuras sin CEO · IA keys ABSENT |
+| **P0 gobernanza** | **FIXED (código)** — `migrate:prod` fail-closed en production (ADR-064) |
 | **Legal** | `claimReady` **false** · Pepito **forbidden** |
 | **Coste** | 0 |
 
-### Capacidades (honestidad)
+### Capacidades
 
-| Capacidad | Estado | Matiz |
-|-----------|--------|-------|
-| ERP 26–29+35 staging | **IMPLEMENTED_VERIFIED** | Persist+A/B+concurrency reval **ALL_PASS** |
-| ERP schema prod 519/520 | **IMPLEMENTED** (schema) · product use **CONDITIONAL** | Applied via Railway `preDeployCommand` on main auto-deploy · **CEO formal sign-off still required** for “ERP prod authorized” narrative |
-| Dual-write relacional | **PREPARED_OFF** | ADR-062 |
-| Multirréplica 2+ | **PREPARED_OFF** | 0€ · FOR UPDATE designed |
-| OS packs / influencers / agency cores | **VERIFIED** (staging/core) | Externals **BLOCKED_EXTERNAL** |
-| private_vector_rag | Docker **VERIFIED** | Railway **PREPARED_OFF** |
-| private_ai_canary | **PREPARED_OFF** | **BLOCKED_CEO** |
-| i18n UI / email+PDF | **FULL** / **PARTIAL** | — |
-| PWA / mobile / HA / multi-region | Chrome VERIFIED / Android build / 1-región / multi-region **BLOCKED_EXTERNAL/COST** | — |
-| Mass-send / claimReady | **BLOCKED_LEGAL** | — |
-
-**No READY.** No superioridad de mercado.
-
-## Último trabajo (esta sesión)
-
-- Auditoría scoped: sin P0 código; BFF mocks fail-closed; flags fail-closed
-- Reval staging: HTTP A/B · concurrency · persist after **ALL_PASS**
-- Gates: `tsc` 0 · vitest ERP/legal **70 PASS / 2 skip** · eslint ERP routes 0 · `check-no-mock-production` PASS
-- Prod read-only: live/ready · tip `5a36809c` · sensitive IA keys **ABSENT** · migrate log **skip 519/520** (= already in `_migrations`)
-- Ops finding: pushes a `main` auto-deploy + migrate prod → bypasses CEO gate narrativo (documentado)
+| Capacidad | Estado |
+|-----------|--------|
+| ERP staging (persist/A/B/concurrency) | **IMPLEMENTED_VERIFIED** |
+| ERP schema prod 519/520 | **IMPLEMENTED_VERIFIED** (schema; no revert) |
+| Prod migrate gate ADR-064 | **IMPLEMENTED_VERIFIED** (código + tests; verify on next staging/prod deploy) |
+| Dual-write relacional | **PREPARED_OFF** (ADR-062) |
+| Multirréplica 2+ | **PREPARED_OFF** |
+| OS/agency cores / influencers | **IMPLEMENTED_VERIFIED** (core/staging) |
+| OAuth/Twilio/ads/publish reales | **BLOCKED_EXTERNAL** |
+| IA canary prod / OpenAI | **BLOCKED_CEO** / OFF |
+| Mass-send / Pepito | **BLOCKED_LEGAL** |
+| Pagos/GL/Odoo | **BLOCKED_SCOPE** |
 
 ## Próximo paso EXACTO
 
-1. **Daniel/CEO:** firmar reconocimiento formal en `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` (schema **ya** en prod vía auto-deploy) **o** documentar política: desactivar auto-deploy/migrate en prod.
-2. **CEO:** canary IA prod SÍ/NO · PWA iOS · Pepito legal.
-3. **Opcional:** 2ª réplica staging (coste) · dual-write ADR-062.
+1. **Deploy staging** este tip → confirmar logs `migrate-prod` apply en staging (auto).
+2. **Daniel:** no setear `NELVYON_PROD_MIGRATE_*` en prod salvo ventana migratoria deliberada; firmar ack histórico 519/520 en runbook.
+3. **CEO:** canary IA / iOS / Pepito según checklists.
 
 ## Acciones solo Daniel
 
 | # | Acción | Doc |
 |---|--------|-----|
-| 1 | Ack formal ERP schema prod / política auto-deploy | `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` |
-| 2 | Canary IA prod | `CEO_IA_PROD_CANARY_REQUEST.md` |
-| 3 | PWA iOS Safari | `PWA_IOS_SAFARI_CEO_CHECKLIST.md` |
-| 4 | Licencia Pepito | `DATOS_PEPITO_LICENSE_DOSSIER.md` |
-| 5 | OAuth/Twilio/ads/publish reales | checklists ops |
-| 6 | 2ª réplica (si presupuesto) | Railway |
+| 1 | Ack 519/520 histórico + política auto-deploy | `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` · `PROD_MIGRATE_GATE_RUNBOOK.md` |
+| 2 | Ventana migrate futura: set/unset vars aprobación | `PROD_MIGRATE_GATE_RUNBOOK.md` |
+| 3 | Canary IA prod | `CEO_IA_PROD_CANARY_REQUEST.md` |
+| 4 | PWA iOS / Pepito / OAuth reales | checklists ops |
 
 ### Rollback staging
 
 ```
 AUTONOMOUS_ALLOW_OPENAI=0
-NELVYON_PRIVATE_VECTOR_RAG_DISABLED=1
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
 NELVYON_ADS_SPEND_ENABLED=0
 ```

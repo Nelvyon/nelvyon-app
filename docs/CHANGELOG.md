@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Infra / DB | **ADR-064 prod migrate gate (P0 gobernanza)** | `migrate-prod.ts` fail-closed en production sin `NELVYON_PROD_MIGRATE_APPROVED=1`+`APPROVED_BY`; pending>0 → exit 1; staging auto-apply; vitest 13 PASS; runbook `PROD_MIGRATE_GATE_RUNBOOK.md`; 519/520 **no revertidas**; `claimReady: false` |
 | Docs / Ops | **TOTAL QUALITY release-readiness** | Reval ERP A/B+concurrency+persist **ALL_PASS** · tsc/vitest/eslint/anti-mock PASS · prod tip **`5a36809c`** · IA keys ABSENT · **519/520 prod already applied** (migrate skip; auto-deploy) · CEO formal ack still required · code P0 **none** · `claimReady: false` · **NOT READY** |
 | Staging / ERP | **HTTP A/B + concurrency ALL_PASS · tip `5a36809c`** | Smokes `staging-smoke-erp-http-ab.mjs` / `staging-smoke-erp-concurrency.mjs` · inventory `reserve` API · ADR-062 dual-write **PREPARED_OFF** · prod runbook `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` **BLOCKED_CEO** · deploy **`5965c32b`** · evidencia `erp.http_ab_isolation_latest.md` + `erp.concurrency_latest.md` · `claimReady: false` |
 | Staging / DB | **ADR-061 VERIFIED — ERP Postgres restart survival** | tip **`9e931f08`** · deploys **`86c93c8c`** (mig) + **`794662d7`** (redeploy recycle) · `_migrations` **519+520** · smoke `erp.persistence_restart_latest.md` **ALL_PASS** · snapshot purchases v3 · RLS on · prod ERP **no** migrate sin CTO · `claimReady: false` · **NOT READY** |

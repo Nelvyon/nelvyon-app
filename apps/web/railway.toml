@@ -3,8 +3,8 @@ builder = "DOCKERFILE"
 dockerfilePath = "apps/web/Dockerfile"
 
 [deploy]
-# Kept in sync with root railway.toml for services that point config at apps/web.
-# Official preDeployCommand (array). Prefer root /railway.toml when Root Directory = /.
+# Kept in sync with root railway.toml. ADR-064: migrate:prod gated on production
+# (NELVYON_PROD_MIGRATE_APPROVED=1 + APPROVED_BY). Staging auto-applies.
 preDeployCommand = ["pnpm -C apps/web migrate:prod"]
 healthcheckPath = "/api/health/live"
 healthcheckTimeout = 300

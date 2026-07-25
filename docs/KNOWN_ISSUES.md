@@ -6,14 +6,14 @@
 
 ## Activos
 
-### Ops (no KI) — Prod ERP 519/520 schema live via auto-deploy (CEO formal ack pending)
+### Ops (no KI) — Prod migrate gate ADR-064 (histórico 519/520 kept)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto (governance)** — schema **applied**; formal CEO authorization narrative pending |
-| **Detalle** | Deploy prod `05abdfa7` ran `migrate:prod` and **skipped** 519/520 (already in `_migrations`). Tip prod **`5a36809c`**. Sensitive IA/MCP/SM keys **ABSENT**. Auto-deploy on `main` bypassed “no migrate without CEO” process gate. |
-| **Remediación** | CEO sign runbook acknowledgment · consider disable prod auto-migrate or require manual promote |
-| **Evidencia** | Railway migrate logs · `CTO_FINAL_VERIFY.md` · HANDOVER |
+| **Estado** | **Mitigado (código)** — futuras migs prod requieren approval; 519/520 **no revertidas** |
+| **Detalle** | Gate: `NELVYON_PROD_MIGRATE_APPROVED=1` + `APPROVED_BY`; pending sin approval → deploy fail. Staging auto-migrate intacto. |
+| **Evidencia** | `prodMigrateGate.ts` · vitest · `PROD_MIGRATE_GATE_RUNBOOK.md` · ADR-064 |
+| **Pendiente CEO** | Ack histórico + no dejar vars approval permanentes en prod |
 
 ### Ops (no KI) — Email + PDF locale PARTIAL (no FULL_VERIFIED)
 

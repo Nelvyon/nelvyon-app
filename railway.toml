@@ -9,7 +9,9 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 # Official preDeployCommand (array, max 1). Runs after build, before traffic.
-# Requires runner image to include apps/web/scripts + workspace manifests (see root Dockerfile).
+# ADR-064: migrate:prod is gated — production applies SQL only with
+# NELVYON_PROD_MIGRATE_APPROVED=1 + APPROVED_BY (see docs/ops/PROD_MIGRATE_GATE_RUNBOOK.md).
+# Staging continues to apply automatically when RAILWAY_ENVIRONMENT_NAME=staging.
 preDeployCommand = ["pnpm -C apps/web migrate:prod"]
 healthcheckPath = "/api/health/live"
 healthcheckTimeout = 300

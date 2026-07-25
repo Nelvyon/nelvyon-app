@@ -1,6 +1,17 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-25** TOTAL QUALITY. No borrar.
+> Actualizado: **2026-07-25** ADR-064 prod migrate gate.
+
+## 2026-07-25 — ADR-064 prod migrate gate (código; deploy pendiente)
+
+| Campo | Valor |
+|-------|-------|
+| **Cambio** | `migrate-prod` fail-closed en production sin approval CEO |
+| **Staging** | auto-apply intacto |
+| **Prod** | 519/520 **no revertidas**; futuras migs gated |
+| **Tests** | `prodMigrateGate.test.ts` 13 PASS |
+| **Runbook** | `docs/ops/PROD_MIGRATE_GATE_RUNBOOK.md` |
+| **claimReady** | **false** |
 
 ## 2026-07-25 — TOTAL QUALITY · prod tip `5a36809c` · 519/520 already applied
 
@@ -8,9 +19,7 @@
 |-------|-------|
 | **Staging tip** | **`5a36809c`** · deploy **`5965c32b` SUCCESS** |
 | **Prod tip** | **`5a36809c`** · deploy **`05abdfa7` SUCCESS** |
-| **Prod migrate** | `skip: 519_erp_non_financial_cores.sql` · `skip: 520_erp_postgres_persistence.sql` |
-| **Flags prod** | OpenAI/MCP/SM/canary keys **ABSENT** (filter) |
-| **Reval** | ERP A/B+concurrency+persist **ALL_PASS** |
+| **Prod migrate** | skip 519/520 (already applied) |
 | **claimReady** | **false** |
 
 ## 2026-07-25 — tip `5a36809c` staging · reserve + A/B + concurrency

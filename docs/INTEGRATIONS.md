@@ -1,10 +1,10 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-25** TOTAL QUALITY. Staging+prod tip **`5a36809c`**.  
-> ERP ✅ staging verified · schema prod applied (auto-deploy) · dual-write **PREPARED_OFF** · **sin Odoo**.
+> Actualizado: **2026-07-25** ADR-064. Staging+prod tip live **`5a36809c`**.  
+> ERP ✅ · migrate gate prod ✅ código · dual-write **PREPARED_OFF** · **sin Odoo**.
 
-**Bloqueadores go-live:** CEO ack ERP/auto-deploy · OAuth/Twilio/iOS/IA · Pepito legal.
+**Bloqueadores go-live:** CEO ack · OAuth/Twilio/iOS/IA · Pepito legal.
 
 ### Auth bridge Web ↔ FastAPI
 

@@ -781,3 +781,16 @@ Prod migrate 519/520 = runbook listo, ejecución **BLOCKED_CEO** · `claimReady:
 | **Por qué** | Honestidad operativa: no afirmar “prod sin 519/520” tras skip en logs. |
 | **Consecuencias** | Runbook pasa a **ack CEO / política auto-deploy**; schema aditivo ya live; `claimReady` sigue false; considerar manual promote. |
 | **Evidencia** | deploy `05abdfa7` migrate skip 519/520 · tip prod `5a36809c` |
+
+---
+
+## ADR-064 — Production migrate gate (CEO-auditable, fail-closed)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-25 |
+| **Decisión** | `migrate:prod` en producción **no aplica** SQL pendientes sin `NELVYON_PROD_MIGRATE_APPROVED=1` + `NELVYON_PROD_MIGRATE_APPROVED_BY`. Pending sin approval → **exit 1** (bloquea deploy). Pending=0 → no-op exit 0. Staging sigue auto-apply. |
+| **Por qué** | Auto-deploy de `main` aplicó ERP 519/520 sin firma CEO (ADR-063). Gate técnico evita repetición. |
+| **Consecuencias** | Runbook `PROD_MIGRATE_GATE_RUNBOOK.md` · vars de aprobación son ventana única y reversibles · 519/520 **no se revierten** · `claimReady: false` |
+| **Evidencia** | `prodMigrateGate.ts` · `migrate-prod.ts` · vitest 13 PASS · railway.toml comentario |
+| **Relación** | ADR-011 · ADR-063 · KI governance prod migrate |

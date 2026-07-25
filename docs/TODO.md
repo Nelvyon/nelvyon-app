@@ -1,12 +1,13 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-25** — TOTAL QUALITY · tip **`5a36809c`** · ERP reval **ALL_PASS** · prod 519/520 **applied** · CEO ack pending · `claimReady: false` · **NOT READY**
+> Actualizado: **2026-07-25** — ADR-064 prod migrate gate · tip **`5a36809c`** live · `claimReady: false` · **NOT READY**
 
 ---
 
 ## P0 — Bloqueantes producción
 
 - [x] Completado y validado 2026-07-10
+- [x] **ADR-064 prod migrate gate** (código + tests) — deploy tip pendiente verificación logs staging
 
 ---
 
