@@ -2,11 +2,11 @@
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
 > Última actualización: **2026-07-25** — **ERP Blocks 26–29+35** catalog **v1.7.0** (living docs · ADR-060) · tip **uncommitted** on **`bd165985`** · `claimReady: false` · **NOT READY**  
-> Última actualización automática: **2026-07-25 12:28 UTC**
+> Última actualización automática: **2026-07-25 13:24 UTC**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `bd165985` — `feat(platform): internal closure — catalog v1.6, i18n, Android APK, obs drill` |
+| **Último commit** | `0e7d637c` — `feat(erp): Blocks 26-29+35 non-financial ERP cores + sector taxonomy` |
 | **Fecha doc** | 2026-07-25 |
 | **Rama** | `main` (sync with origin) |
 
