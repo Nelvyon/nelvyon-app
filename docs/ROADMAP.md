@@ -81,15 +81,15 @@
 | ADR-056 elite absolute audit | ✅ | P0/P1 fixes · tip TBA · NOT READY |
 | **ADR-057 Blocks 11–25 (internal cores)** | ✅ | telephony · influencers · ads · publish · mass-send · OAuth · marketplace · mobile · PWA · i18n · HA/DR · observability · legacy · private RAG · AI canary PREP · catalog **v1.4.0** · agency **249 PASS** · tsc **0** · tip TBA · NOT READY |
 | Block 11 telephony_core | ✅ | simulator IMPLEMENTED_VERIFIED · real calls BLOCKED_EXTERNAL |
-| Block 12 influencers_pr | 🟡 | PREPARED_OFF/beta · unit+kickoff wired · staging E2E opcional |
+| Block 12 influencers_pr | 🟡 | PREPARED_OFF · ADR-058 chatbot soft-continue · E2E post-redeploy |
 | Block 13 ads_attribution_core | ✅ | core IMPLEMENTED_VERIFIED · spend/OAuth BLOCKED_EXTERNAL |
 | Block 14 community_publish_core | ✅ | simulator IMPLEMENTED_VERIFIED · publish BLOCKED_EXTERNAL |
 | Block 15 mass-send technical | ✅ | controls IMPLEMENTED_VERIFIED · send BLOCKED_LEGAL |
 | Block 16 oauth_multitenant | ✅ | framework+mock IMPLEMENTED_VERIFIED · real apps BLOCKED_EXTERNAL |
 | Block 17 integrations_marketplace | ✅ | internal ping IMPLEMENTED_VERIFIED |
-| Block 18 mobile Capacitor | 🟡 | PREPARED_OFF · contract VERIFIED · stores BLOCKED_EXTERNAL |
-| Block 19 PWA | ✅ | Chrome/Windows verified · iOS Safari PARTIAL |
-| Block 20 localization | ✅ | es/en verified · fr/de/it/pt PARTIAL |
+| Block 18 mobile Capacitor | 🟡 | shell VERIFIED · android local BLOCKED_EXTERNAL · stores BLOCKED_EXTERNAL |
+| Block 19 PWA | ✅ | Chrome/Windows verified · iOS Safari BLOCKED_EXTERNAL |
+| Block 20 localization | ✅ | es/en/fr/de/it/pt UI FULL_VERIFIED · email/PDF ES-only |
 | Block 21 HA/DR | ✅ | runbook+checks · multi-region BLOCKED_EXTERNAL |
 | Block 22 observability | ✅ | local core · paid vendors PREPARED_OFF |
 | Block 23 legacy consolidation | ✅ | audit+plan · zero unsafe deletes |

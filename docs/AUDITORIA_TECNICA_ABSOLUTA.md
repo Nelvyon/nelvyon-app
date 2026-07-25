@@ -21,19 +21,19 @@
 | Block | Capacidad | Core | Bloqueo |
 |-------|-----------|------|---------|
 | 11 | telephony_core | IMPLEMENTED_VERIFIED (simulator) | real **BLOCKED_EXTERNAL** |
-| 12 | influencers_pr | PREPARED_OFF / beta | staging E2E opcional |
+| 12 | influencers_pr | PREPARED_OFF / beta | ADR-058 fix · E2E post-redeploy pending |
 | 13 | ads_attribution_core | IMPLEMENTED_VERIFIED (core) | spend/OAuth **BLOCKED_EXTERNAL** |
 | 14 | community_publish_core | IMPLEMENTED_VERIFIED (simulator) | publish **BLOCKED_EXTERNAL** |
 | 15 | mass-send technical | IMPLEMENTED_VERIFIED (controls) | **BLOCKED_LEGAL** |
 | 16 | oauth_multitenant | IMPLEMENTED_VERIFIED (mock) | real apps **BLOCKED_EXTERNAL** |
 | 17 | integrations_marketplace | IMPLEMENTED_VERIFIED (internal ping) | — |
-| 18 | mobile Capacitor | PREPARED_OFF / contract VERIFIED | stores **BLOCKED_EXTERNAL** |
-| 19 | PWA | IMPLEMENTED_VERIFIED (Chrome/Windows) | iOS **PARTIAL** |
-| 20 | localization | IMPLEMENTED_VERIFIED (es/en) | fr/de/it/pt **PARTIAL** |
+| 18 | mobile Capacitor | shell VERIFIED · android local **BLOCKED_EXTERNAL** | stores **BLOCKED_EXTERNAL** |
+| 19 | PWA | IMPLEMENTED_VERIFIED (Chrome/Windows) | iOS **BLOCKED_EXTERNAL** |
+| 20 | localization | IMPLEMENTED_VERIFIED (es/en/fr/de/it/pt UI) | email/PDF ES-only |
 | 21 | HA/DR | IMPLEMENTED_VERIFIED (runbook) | multi-region **BLOCKED_EXTERNAL** |
 | 22 | observability | IMPLEMENTED_VERIFIED (local) | paid **PREPARED_OFF** |
 | 23 | legacy consolidation | IMPLEMENTED_VERIFIED (audit) | zero deletes |
-| 24 | private_vector_rag | IMPLEMENTED_VERIFIED (synthetic) | pgvector **PREPARED_OFF** |
+| 24 | private_vector_rag | IMPLEMENTED_VERIFIED (Docker live) | Railway staging **PREPARED_OFF** |
 | 25 | private_ai_canary_prep | PREPARED_OFF | **BLOCKED_CEO** |
 
 ### Evidencia (2026-07-24)

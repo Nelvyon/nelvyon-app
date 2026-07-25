@@ -22,7 +22,7 @@
 | Block | Capacidad | Estado | Bloqueo |
 |-------|-----------|--------|---------|
 | 11 | `telephony_core` | **IMPLEMENTED_VERIFIED** (simulator) | real calls **BLOCKED_EXTERNAL** |
-| 12 | `influencers_pr` | **PREPARED_OFF** / beta | unit+kickoff wired · staging E2E opcional pendiente flag |
+| 12 | `influencers_pr` | **PREPARED_OFF** / beta | ADR-058 chatbot fix committed · staging E2E pending redeploy |
 | 13 | `ads_attribution_core` | **IMPLEMENTED_VERIFIED** (core) | spend/OAuth **BLOCKED_EXTERNAL** |
 | 14 | `community_publish_core` | **IMPLEMENTED_VERIFIED** (simulator) | real publish **BLOCKED_EXTERNAL** |
 | 15 | mass-send technical | **IMPLEMENTED_VERIFIED** (controls) | send **BLOCKED_LEGAL** (`claimReadyLegal` false) |
@@ -30,7 +30,7 @@
 | 17 | `integrations_marketplace` | **IMPLEMENTED_VERIFIED** (internal ping) | — |
 | 18 | mobile Capacitor | **PREPARED_OFF** / contract **VERIFIED** | App Store/Play **BLOCKED_EXTERNAL** |
 | 19 | PWA | **IMPLEMENTED_VERIFIED** (Chrome/Windows) | iOS Safari **PARTIAL** |
-| 20 | `localization` | **IMPLEMENTED_VERIFIED** (es/en) | fr/de/it/pt **PARTIAL** |
+| 20 | `localization` | **IMPLEMENTED_VERIFIED** (es/en/fr/de/it/pt UI crítica) | email/PDF ES-only (fuera de claim) |
 | 21 | HA/DR | **IMPLEMENTED_VERIFIED** (runbook+checks) | multi-region **BLOCKED_EXTERNAL** |
 | 22 | `observability` | **IMPLEMENTED_VERIFIED** (local core) | paid vendors **PREPARED_OFF** |
 | 23 | legacy consolidation | **IMPLEMENTED_VERIFIED** (audit+plan) | zero unsafe deletes |

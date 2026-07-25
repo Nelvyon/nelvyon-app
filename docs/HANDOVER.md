@@ -1,7 +1,7 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-25** — **Cierre 8 puntos amarillos (honestidad)** · chatbot mesh soft-continue (ADR-058) pending staging redeploy · `claimReady: false`
+> Última actualización: **2026-07-25** — **PWA export hotfix** (`SAAS_PWA_DEFAULT_ICONS` re-export) · ADR-058 tip pending staging SUCCESS · `claimReady: false`
 
 ---
 
@@ -67,7 +67,7 @@ NELVYON_MCP_PRODUCTIVE_ENABLED=0
 
 ## Próximo paso EXACTO
 
-1. **Ops (inmediato):** commit+push ADR-058 (chatbot normalize) → Railway staging redeploy **una vez** → `node scripts/staging-smoke-influencers-pr-e2e.mjs` → solo si **ALL_PASS** promover `influencers_pr` a IMPLEMENTED_VERIFIED + evidencia md.
+1. **Ops (inmediato):** push PWA `SAAS_PWA_DEFAULT_ICONS` hotfix → Railway staging SUCCESS → then `node scripts/staging-smoke-influencers-pr-e2e.mjs` → solo si **ALL_PASS** promover `influencers_pr` a IMPLEMENTED_VERIFIED + evidencia md.
 2. **CEO:** IA prod canary — `docs/ops/CEO_IA_PROD_CANARY_REQUEST.md` (**PENDING_CEO**; prod permanece OFF).
 3. **CEO/ops externo:** iPhone Safari 3 pasos — `docs/ops/PWA_IOS_SAFARI_CEO_CHECKLIST.md`.
 4. **CEO:** mobile stores — `docs/ops/MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md` (Android local + iOS BLOCKED).

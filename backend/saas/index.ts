@@ -201,6 +201,7 @@ export {
   type OsRecurringRunLogErrorCode,
 } from "./OsRecurringRunLogService";
 export {
+  DEFAULT_ICONS as SAAS_PWA_DEFAULT_ICONS,
   SaasPwaService,
   SaasPwaError,
   getSaasPwaService,
