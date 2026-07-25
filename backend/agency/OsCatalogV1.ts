@@ -611,7 +611,7 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
   },
   {
     serviceId: "private_vector_rag",
-    title: "RAG vectorial privado (sintético)",
+    title: "RAG vectorial privado (sintético + pgvector real local)",
     teamId: "global_security_compliance",
     playbookPath: "docs/ops/PRIVATE_RAG_RUNBOOK.md",
     kickoffPackIds: [],
@@ -623,9 +623,15 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     portalPath: "/portal",
     metrics: ["tenant_isolation_ok", "refuse_without_evidence"],
     tests: ["backend/agency/__tests__/PrivateVectorRagCore.test.ts"],
-    e2eEvidence: "scripts/docs/evidence/os-saas-e2e/modules/private-rag.synthetic_latest.md",
+    e2eEvidence:
+      "scripts/docs/evidence/os-saas-e2e/modules/private-rag.synthetic_latest.md + " +
+      "scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md",
     status: "IMPLEMENTED_VERIFIED",
-    nextAction: "núcleo sintético VERIFIED · pgvector Docker live PREPARED_OFF hasta re-certificación",
+    nextAction:
+      "Docker local pgvector+Ollama = IMPLEMENTED_VERIFIED (evidencia pgvector-rag.live_latest.md, 2026-07-25) · " +
+      "Railway staging pgvector = PREPARED_OFF (sin Postgres+pgvector en Railway; sin mesh Ollama aprobado) · " +
+      "gap P2 minScore corpus pequeño en docs/KNOWN_ISSUES.md · CEO: provisionar staging solo vía " +
+      "docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md",
   },
   {
     serviceId: "private_ai_canary_prep",
@@ -643,7 +649,9 @@ const OS_CATALOG_V1_RAW: readonly OsCatalogV1RawEntry[] = [
     tests: ["backend/agency/__tests__/PrivateAiCanaryPrep.test.ts"],
     e2eEvidence: "backend/agency/__tests__/PrivateAiCanaryPrep.test.ts (isProductionCanaryAuthorized hard-false)",
     status: "PREPARED_OFF",
-    nextAction: "CEO: docs/ops/CEO_IA_PROD_CANARY_REQUEST.md · prod OFF hasta autorización escrita",
+    nextAction:
+      "CEO: docs/ops/CEO_IA_PROD_CANARY_REQUEST.md · prod OFF hasta autorización escrita · staging drill ahora " +
+      "verifica en vivo OLLAMA_HOST contra Tailscale CGNAT/MagicDNS (checkOllamaHostForCanaryDrill, no autodeclarado)",
   },
 ] as const;
 

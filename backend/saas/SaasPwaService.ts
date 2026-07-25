@@ -81,7 +81,8 @@ const DEFAULT_SHORT = "Nelvyon";
 const SCOPE = "/saas";
 const START_URL = "/saas/dashboard";
 
-const DEFAULT_ICONS: PwaIcon[] = [
+/** Exported so callers can build a safe manifest fallback (e.g. the API route) without an empty `icons: []`, which breaks PWA installability. */
+export const DEFAULT_ICONS: PwaIcon[] = [
   { src: "/icons/icon-72x72.png", sizes: "72x72", type: "image/png" },
   { src: "/icons/icon-96x96.png", sizes: "96x96", type: "image/png" },
   { src: "/icons/icon-128x128.png", sizes: "128x128", type: "image/png" },

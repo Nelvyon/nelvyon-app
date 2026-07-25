@@ -13,6 +13,8 @@
  * No OpenAI. No production activation. No Pepito data anywhere in this file.
  */
 
+import { assertOllamaHostSafeForRuntime } from "../local-ai/OllamaRuntimePrep";
+
 export type PrivateAiCanaryChecklistItemId =
   | "local_models_only"
   | "router_3b_8b_quality_routing"
@@ -180,6 +182,37 @@ export const PRIVATE_AI_CANARY_ROLLBACK_FLAGS: readonly string[] = [
   "NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=0  # this flag does not exist in code yet — reserved name only",
 ];
 
+export type OllamaHostCheckResult = {
+  /** True only when OLLAMA_HOST (or an alias — see OllamaRuntimePrep.readOllamaBaseUrl) is actually set. */
+  applicable: boolean;
+  /** True when not applicable, OR when the configured host is loopback (allowed in non-prod) or a real Tailscale CGNAT/MagicDNS host. Never true for a public host. */
+  ok: boolean;
+  reason: string;
+  host: string | null;
+};
+
+/**
+ * Real, live check of `OLLAMA_HOST` (or its aliases) against
+ * `OllamaRuntimePrep.assertOllamaHostSafeForRuntime()` — the same Tailscale
+ * CGNAT/MagicDNS allowlist used by the mesh Option A staging path. Staging
+ * today runs with no `OLLAMA_HOST` set (see `CEO_IA_STAGING_APPROVAL_REQUEST.md`
+ * — "sin OLLAMA_HOST"), so `applicable=false` is the expected, passing state.
+ * If a future staging/production run ever sets `OLLAMA_HOST` to a public host,
+ * this fails the drill (`ok=false`) instead of silently trusting the
+ * self-reported `tailscaleMeshVerified` checklist boolean.
+ */
+export function checkOllamaHostForCanaryDrill(): OllamaHostCheckResult {
+  // Deliberately explicit (not relying on NODE_ENV/RAILWAY_ENVIRONMENT defaults) —
+  // a staging canary drill must always be strict about the mesh requirement,
+  // regardless of what environment the drill itself happens to run in (e.g. a
+  // developer's laptop running the test suite with NODE_ENV=test).
+  const safety = assertOllamaHostSafeForRuntime({ requirePrivateMesh: true, allowLoopback: false });
+  if (safety.reason === "OLLAMA_HOST_unset") {
+    return { applicable: false, ok: true, reason: safety.reason, host: null };
+  }
+  return { applicable: true, ok: safety.ok, reason: safety.reason, host: safety.host };
+}
+
 export type StagingCanaryDrillResult = {
   ok: boolean;
   prodDangerousFlagsOff: boolean;
@@ -187,6 +220,7 @@ export type StagingCanaryDrillResult = {
   killSwitchEngaged: boolean;
   checklist: PrivateAiCanaryChecklistResult;
   productionCanaryAuthorized: false;
+  ollamaHostCheck: OllamaHostCheckResult;
   loadTestCriteria: typeof LOAD_TEST_MIN_CRITERIA;
   exitCriteria: readonly string[];
   rollbackFlags: readonly string[];
@@ -194,9 +228,11 @@ export type StagingCanaryDrillResult = {
 
 /**
  * Staging drill: evaluates the readiness checklist AND independently verifies that
- * every prod-dangerous flag is OFF in the current environment. `ok` requires the full
- * checklist to pass, no dangerous flag to be set, the kill switch to be disengaged,
- * and — always, structurally — `isProductionCanaryAuthorized() === false`.
+ * every prod-dangerous flag is OFF in the current environment, plus (live, not
+ * self-reported) that any configured `OLLAMA_HOST` is a private Tailscale mesh
+ * host. `ok` requires the full checklist to pass, no dangerous flag to be set,
+ * the kill switch to be disengaged, the live Ollama host check to pass, and —
+ * always, structurally — `isProductionCanaryAuthorized() === false`.
  */
 export function runStagingCanaryDrill(
   checklistInput: PrivateAiCanaryChecklistInput,
@@ -206,14 +242,21 @@ export function runStagingCanaryDrill(
   const prodDangerousFlagsOff = offendingFlags.length === 0;
   const killSwitchEngaged = isCanaryKillSwitchEngaged();
   const productionCanaryAuthorized = isProductionCanaryAuthorized();
+  const ollamaHostCheck = checkOllamaHostForCanaryDrill();
 
   return {
-    ok: checklist.allPass && prodDangerousFlagsOff && !killSwitchEngaged && !productionCanaryAuthorized,
+    ok:
+      checklist.allPass &&
+      prodDangerousFlagsOff &&
+      !killSwitchEngaged &&
+      !productionCanaryAuthorized &&
+      ollamaHostCheck.ok,
     prodDangerousFlagsOff,
     offendingFlags,
     killSwitchEngaged,
     checklist,
     productionCanaryAuthorized,
+    ollamaHostCheck,
     loadTestCriteria: LOAD_TEST_MIN_CRITERIA,
     exitCriteria: EXIT_CRITERIA,
     rollbackFlags: PRIVATE_AI_CANARY_ROLLBACK_FLAGS,
@@ -230,6 +273,7 @@ export function buildStagingCanaryDrillEvidenceMarkdown(result: StagingCanaryDri
     `- offendingFlags: ${result.offendingFlags.length ? result.offendingFlags.join(", ") : "none"}`,
     `- killSwitchEngaged: ${result.killSwitchEngaged}`,
     `- checklist allPass: ${result.checklist.allPass}`,
+    `- ollamaHostCheck: applicable=${result.ollamaHostCheck.applicable} ok=${result.ollamaHostCheck.ok} reason=${result.ollamaHostCheck.reason}`,
     "",
     "## Checklist",
     ...result.checklist.items.map((i) => `- [${i.pass ? "x" : " "}] ${i.label}`),
@@ -288,6 +332,57 @@ export function assertPrivateAiCanaryPrepIntegrity(): { ok: boolean; violations:
 
   if (PRIVATE_AI_CANARY_ROLLBACK_FLAGS.some((f) => f.toLowerCase().includes("pepito"))) {
     violations.push("rollback_flags_must_never_reference_pepito");
+  }
+
+  // Live OLLAMA_HOST check — save/restore every alias so this integrity check
+  // never leaks state into other tests/processes.
+  const OLLAMA_HOST_ALIASES = ["OLLAMA_HOST", "OLLAMA_BASE_URL", "NELVYON_LOCAL_AI_URL", "LOCAL_AI_BASE_URL"];
+  const savedOllama: Record<string, string | undefined> = {};
+  for (const k of OLLAMA_HOST_ALIASES) savedOllama[k] = process.env[k];
+  for (const k of OLLAMA_HOST_ALIASES) delete process.env[k];
+
+  const unsetCheck = checkOllamaHostForCanaryDrill();
+  if (unsetCheck.applicable !== false || unsetCheck.ok !== true) {
+    violations.push("ollama_host_unset_must_be_applicable_false_and_ok_true");
+  }
+
+  process.env.OLLAMA_HOST = "http://198.51.100.7:11434"; // public TEST-NET-2 address, never a real host
+  const publicHostCheck = checkOllamaHostForCanaryDrill();
+  if (publicHostCheck.applicable !== true || publicHostCheck.ok !== false) {
+    violations.push("public_ollama_host_must_be_applicable_true_and_ok_false");
+  }
+
+  process.env.OLLAMA_HOST = "http://foo.ts.net:11434";
+  const meshHostCheck = checkOllamaHostForCanaryDrill();
+  if (meshHostCheck.applicable !== true || meshHostCheck.ok !== true) {
+    violations.push("tailscale_magicdns_ollama_host_must_pass");
+  }
+
+  for (const k of OLLAMA_HOST_ALIASES) {
+    if (savedOllama[k] === undefined) delete process.env[k];
+    else process.env[k] = savedOllama[k];
+  }
+
+  // A staging drill with a public OLLAMA_HOST must never report ok=true, even
+  // if every other checklist item is perfect — the live host check must gate it.
+  process.env.OLLAMA_HOST = "http://198.51.100.7:11434";
+  const drillWithPublicHost = runStagingCanaryDrill({
+    localModelsOnly: true,
+    routerQualityRoutingConfigured: true,
+    failClosedVerified: true,
+    zeroApiBudgetConfirmed: true,
+    privateModeEnforced: true,
+    tailscaleMeshVerified: true,
+    ragEvidenceGateVerified: true,
+    auditLogImplemented: true,
+    rollbackUnder5MinDocumented: true,
+    killSwitchImplemented: true,
+    loadTestCriteriaDefined: true,
+    exitCriteriaDefined: true,
+  });
+  delete process.env.OLLAMA_HOST;
+  if (drillWithPublicHost.ok !== false) {
+    violations.push("staging_drill_must_fail_when_ollama_host_is_public_even_if_checklist_is_perfect");
   }
 
   return { ok: violations.length === 0, violations };

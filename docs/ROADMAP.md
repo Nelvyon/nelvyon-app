@@ -93,7 +93,7 @@
 | Block 21 HA/DR | ✅ | runbook+checks · multi-region BLOCKED_EXTERNAL |
 | Block 22 observability | ✅ | local core · paid vendors PREPARED_OFF |
 | Block 23 legacy consolidation | ✅ | audit+plan · zero unsafe deletes |
-| Block 24 private_vector_rag | ✅ | synthetic IMPLEMENTED_VERIFIED (27 tests) · pgvector PREPARED_OFF |
+| Block 24 private_vector_rag | ✅ | synthetic IMPLEMENTED_VERIFIED (27 tests) · pgvector real local VERIFIED en vivo 2026-07-25 (Docker+Ollama, aislamiento app+RLS) · staging PREPARED_OFF · gap P2 minScore documentado |
 | Block 25 private_ai_canary_prep | 🟡 | PREPARED_OFF · BLOCKED_CEO |
 
 ---

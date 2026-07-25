@@ -11,7 +11,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **BLOCKED_EXTERNAL** / **BLOCKED_CEO** |
-| **Detalle** | Blocks 11–25 cores internos verified · rutas externas pendientes: Twilio real (Block 11) · OAuth apps reales (Block 16) · ads spend/OAuth (Block 13) · social publish (Block 14) · App Store/Play (Block 18) · multi-region (Block 21) · pgvector Docker live (Block 24) · IA prod canary (Block 25 · `CEO_IA_PROD_CANARY_REQUEST.md`) |
+| **Detalle** | Blocks 11–25 cores internos verified · rutas externas pendientes: Twilio real (Block 11) · OAuth apps reales (Block 16) · ads spend/OAuth (Block 13) · social publish (Block 14) · App Store/Play (Block 18) · multi-region (Block 21) · IA prod canary (Block 25 · `CEO_IA_PROD_CANARY_REQUEST.md`) — pgvector Docker live (Block 24) **resuelto 2026-07-25**, ver Historial resuelto |
 
 ### Ops (no KI) — Legal checklist campañas + Datos Pepito (claimReady)
 
@@ -48,9 +48,34 @@
 | **Estado** | **BLOCKED_CEO** |
 | **Detalle** | Staging_mock CERT · `CEO_OPENCLAW_PROD_CANARY_REQUEST.md` **PENDING_CEO** · prod requiere nueva auth CEO |
 
+### KI — pgvector RAG: minScore=0.32 no refusa de forma fiable en corpus de tenant muy pequeño (P2)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Abierto** — **P2** (calidad de ranking, NO seguridad, NO fuga cross-tenant, NO fabricación) |
+| **Detalle** | `LocalRagRetriever.retrieve` usa `minScore=0.32` por defecto. Con embeddings REALES (Ollama `nomic-embed-text`), la similitud coseno entre frases reales no relacionadas no es cercana a 0 (propiedad geométrica del embedding). Este umbral fue calibrado contra el corpus real grande de 18 dominios (`backend/local-ai/benchmarks/specialization_eval_*.json`), donde una query irrelevante compite contra cientos de candidatos y puntúa bajo en términos relativos. Contra un tenant con muy pocos chunks (<10, ej. onboarding inicial), esa relación no se da y puede devolver una cita real pero débilmente relevante en vez de rechazar. |
+| **Evidencia** | `scripts/staging-smoke-pgvector-rag-e2e.mjs` (checks `quality`) · `scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md` · diagnóstico con `minScore=0.55` refusa correctamente sobre la misma query — confirma que es un ajuste de umbral, no un bug estructural |
+| **Impacto real** | Ninguna fuga cross-tenant (verificado a nivel app + RLS, 100% PASS) · ninguna alucinación (las citas devueltas siempre son contenido real del propio tenant) · solo baja precisión en tenants con corpus muy pequeño |
+| **Remediación propuesta (no aplicada)** | Suelo de confianza consciente del tamaño del corpus en `LocalRagRetriever.retrieve` (ej. subir `minScore` efectivo cuando el tenant tiene menos de N chunks ingeridos) — requiere re-benchmark contra `specialization_eval_*` antes de tocar el default compartido |
+
+### Ops (no KI) — pgvector RAG en staging (no aprobado, no bloqueante)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **PREPARED_OFF** (staging) |
+| **Detalle** | Verificación EN VIVO de pgvector RAG (2026-07-25) se hizo contra Docker+Ollama de la máquina local del owner, no contra Railway staging. Extender a staging requeriría: (1) instancia Postgres+pgvector alcanzable desde el servicio de Railway staging (`LOCAL_AI_DATABASE_URL`) — no provisionada; (2) `OLLAMA_HOST` mesh (Tailscale) desde staging al Ollama del owner — ya documentado como **pendiente CEO separado** en `docs/ops/CEO_IA_STAGING_APPROVAL_REQUEST.md`. Ninguno de los dos se activó ni se solicitó en esta sesión. |
+
 ---
 
 ## Historial resuelto (reciente)
+
+### Ops — pgvector RAG live e2e (Block 24 "yellow point 7") — Docker+Ollama real, aislamiento app+RLS verificado
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | 2026-07-25 (verificado EN VIVO en máquina local del owner) |
+| **Evidencia** | `scripts/staging-smoke-pgvector-rag-e2e.mjs` → `scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md` — 11/13 checks críticos+calidad PASS, 2 quality FAIL documentados (ver KI arriba) · Docker `nelvyon-local-ai-postgres` (pgvector/pgvector:pg16) healthy · Ollama `nomic-embed-text` reachable · `backend/agency/__tests__/PrivateVectorRagCore.test.ts` 27 PASS · `tsc --noEmit` 0 errores |
+| **Nota** | `PrivateVectorRagCore.PRIVATE_VECTOR_RAG_STATUS.productionPgvectorPath` promovido de `PREPARED_OFF` → `IMPLEMENTED_VERIFIED` con evidencia + timestamp + gap conocido documentado (nunca oculto) · `OsCatalogV1` `private_vector_rag.nextAction` actualizado · staging sigue **PREPARED_OFF** (ver Ops arriba) |
 
 ### Ops — ADR-057 Blocks 11–25 internal cores (local · deploy pending)
 

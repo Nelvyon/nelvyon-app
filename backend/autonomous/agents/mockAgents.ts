@@ -261,7 +261,15 @@ export function runCopywriterChatbot(
 }
 
 export function runChatbotConfig(brief: Record<string, unknown>, kb: Record<string, unknown>) {
-  const handoff = brief.handoff as { destination: string };
+  const handoff = brief.handoff as { destination?: string } | undefined;
+  const handoffEmail =
+    String(handoff?.destination ?? "").trim() ||
+    String(brief.contact_email ?? "").trim() ||
+    `hola@${String(brief.company_name ?? "cliente")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 40)}.nelvyon-client.test`;
   const config = {
     version: 1,
     service_ref: "chatbot_service",
@@ -269,7 +277,7 @@ export function runChatbotConfig(brief: Record<string, unknown>, kb: Record<stri
     system_prompt_hash: "sha256:mock_phase_b",
     widget_snippet: `<script data-nelvyon-bot="mock" data-company="${brief.company_name}"></script>`,
     lead_webhook: "",
-    handoff_email: handoff.destination,
+    handoff_email: handoffEmail,
     widget_load_ok: true,
     webhook_delivers: true,
     p95_latency_ms: 1200,

@@ -19,7 +19,11 @@ import {
 import { scoreOffline } from "../qa/offlineScorer";
 import type { AutonomousProject, AutonomousSku, AutonomousTier, QaResult } from "../types";
 import { buildChatbotIsolated } from "../wrappers/chatbotBuilder";
-import { normalizeChatbotKnowledgeBase } from "../wrappers/chatbotKbNormalize";
+import {
+  normalizeChatbotKnowledgeBase,
+  normalizeChatbotPlan,
+  normalizeChatbotStrategy,
+} from "../wrappers/chatbotKbNormalize";
 import { buildLandingIsolated } from "../wrappers/landingBuilder";
 import {
   generateSeoPackIsolated,
@@ -29,6 +33,29 @@ import {
 import { createProject } from "./runPipeline";
 
 export { createProject };
+
+function logLlmSoftFail(
+  agent_log: AutonomousProject["agent_log"],
+  agent: string,
+  outputArtifact: string,
+  err: unknown,
+  attempt: number,
+): void {
+  const msg = err instanceof Error ? err.message.slice(0, 180) : "llm_failed";
+  const now = new Date().toISOString();
+  agent_log.push({
+    agent,
+    started_at: now,
+    ended_at: now,
+    input_artifact_versions: {},
+    output_artifact: `${outputArtifact}:${msg}`,
+    output_version: attempt,
+    model: "ollama-error",
+    tokens: 0,
+    status: "failed",
+    llm_mode: "real",
+  });
+}
 
 async function runLandingPhaseC(project: AutonomousProject, attempt: number): Promise<QaResult> {
   const { brief, tier, artifacts, agent_log, os_refs } = project;
@@ -95,33 +122,54 @@ async function runLandingPhaseC(project: AutonomousProject, attempt: number): Pr
 async function runChatbotPhaseC(project: AutonomousProject, attempt: number): Promise<QaResult> {
   const { brief, tier, artifacts, agent_log } = project;
 
-  const pm = await llmPmChatbot(brief, tier);
-  artifacts.plan = pm.data;
-  agent_log.push({ ...pm.log, llm_mode: pm.llm_mode as "mock" | "real" });
-  if ((pm.data as { blockers?: string[] }).blockers?.length) {
+  // Soft-continue + normalize blockers (ADR-046 class): invented LLM blockers must not
+  // abort chatbot at QA~30 when the pack brief is already complete.
+  try {
+    const pm = await llmPmChatbot(brief, tier);
+    artifacts.plan = normalizeChatbotPlan(pm.data, brief, tier);
+    agent_log.push({ ...pm.log, llm_mode: pm.llm_mode as "mock" | "real" });
+  } catch (err) {
+    artifacts.plan = normalizeChatbotPlan(null, brief, tier);
+    logLlmSoftFail(agent_log, "agent-pm-chatbot", "plan", err, attempt);
+  }
+  if ((artifacts.plan as { blockers?: string[] }).blockers?.length) {
     project.status = "INTAKE_VALIDATING";
     return scoreOffline("NELVYON-CHATBOT", brief, artifacts, attempt);
   }
 
   project.status = "PRODUCING";
-  const st = await llmStrategistChatbot(brief);
-  artifacts.strategy = st.data;
-  agent_log.push({ ...st.log, llm_mode: st.llm_mode as "mock" | "real" });
-
-  const faqsTargetRaw = Number((pm.data as { faqs_target_count?: unknown }).faqs_target_count);
-  const faqsTarget = Number.isFinite(faqsTargetRaw) && faqsTargetRaw > 0 ? Math.min(60, faqsTargetRaw) : 15;
-  if (pm.data && typeof pm.data === "object") {
-    (pm.data as { faqs_target_count: number }).faqs_target_count = faqsTarget;
-    artifacts.plan = pm.data;
+  try {
+    const st = await llmStrategistChatbot(brief);
+    artifacts.strategy = normalizeChatbotStrategy(st.data, brief);
+    agent_log.push({ ...st.log, llm_mode: st.llm_mode as "mock" | "real" });
+  } catch (err) {
+    artifacts.strategy = normalizeChatbotStrategy(null, brief);
+    logLlmSoftFail(agent_log, "agent-strategist-chatbot", "strategy", err, attempt);
   }
-  const cp = await llmCopywriterChatbot(brief, st.data as Record<string, unknown>, faqsTarget, attempt);
-  artifacts.knowledge_base = normalizeChatbotKnowledgeBase(cp.data, brief, faqsTarget);
-  agent_log.push({ ...cp.log, llm_mode: cp.llm_mode as "mock" | "real" });
+
+  const faqsTargetRaw = Number((artifacts.plan as { faqs_target_count?: unknown }).faqs_target_count);
+  const faqsTarget =
+    Number.isFinite(faqsTargetRaw) && faqsTargetRaw > 0 ? Math.min(60, faqsTargetRaw) : 15;
+  (artifacts.plan as { faqs_target_count: number }).faqs_target_count = faqsTarget;
+
+  try {
+    const cp = await llmCopywriterChatbot(
+      brief,
+      artifacts.strategy as Record<string, unknown>,
+      faqsTarget,
+      attempt,
+    );
+    artifacts.knowledge_base = normalizeChatbotKnowledgeBase(cp.data, brief, faqsTarget);
+    agent_log.push({ ...cp.log, llm_mode: cp.llm_mode as "mock" | "real" });
+  } catch (err) {
+    artifacts.knowledge_base = normalizeChatbotKnowledgeBase(null, brief, faqsTarget);
+    logLlmSoftFail(agent_log, "agent-copywriter-chatbot", "knowledge_base", err, attempt);
+  }
 
   artifacts.config = buildChatbotIsolated({
     brief,
     knowledge_base: artifacts.knowledge_base as Record<string, unknown>,
-    strategy: st.data as Record<string, unknown>,
+    strategy: artifacts.strategy as Record<string, unknown>,
   });
   agent_log.push({
     agent: "chatbot_service_mock_wrapper",

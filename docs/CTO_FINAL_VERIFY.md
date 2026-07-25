@@ -34,7 +34,7 @@
 | 21 | HA/DR | **IMPLEMENTED_VERIFIED** (runbook+checks) | multi-region **BLOCKED_EXTERNAL** |
 | 22 | `observability` | **IMPLEMENTED_VERIFIED** (local core) | paid vendors **PREPARED_OFF** |
 | 23 | legacy consolidation | **IMPLEMENTED_VERIFIED** (audit+plan) | zero unsafe deletes |
-| 24 | `private_vector_rag` | **IMPLEMENTED_VERIFIED** (synthetic) | pgvector Docker **PREPARED_OFF** |
+| 24 | `private_vector_rag` | **IMPLEMENTED_VERIFIED** (synthetic + Docker pgvector local) | Railway staging pgvector **PREPARED_OFF** |
 | 25 | `private_ai_canary_prep` | **PREPARED_OFF** | **BLOCKED_CEO** |
 
 ## Clasificación

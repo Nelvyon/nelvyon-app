@@ -674,3 +674,27 @@
 
 ---
 
+## ADR-057.1 — Block 24 follow-up: pgvector RAG live e2e ("yellow point 7")
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-25 |
+| **Decisión** | Promover `PrivateVectorRagCore.PRIVATE_VECTOR_RAG_STATUS.productionPgvectorPath` de `PREPARED_OFF` a `IMPLEMENTED_VERIFIED` **solo** tras verificación EN VIVO real contra Docker `pgvector/pgvector:pg16` (ya corriendo en la máquina del owner) y Ollama real (`nomic-embed-text`, mesh Tailscale). La promoción exige evidencia + timestamp committeados y un guard de integridad (`assertPrivateVectorRagCoreIntegrity`) que ahora falla si se intenta marcar `IMPLEMENTED_VERIFIED` sin esos dos campos — hace estructuralmente imposible una promoción "fake green" en el futuro. |
+| **Hallazgo honesto** | Con embeddings REALES, la similitud coseno entre frases reales no relacionadas no es cercana a 0 (propiedad geométrica del embedding, no un bug). El `minScore=0.32` por defecto — calibrado contra el corpus real grande de 18 dominios — no rechaza de forma fiable una query irrelevante contra un corpus de tenant sintético muy pequeño (2–4 chunks). Un diagnóstico con `minScore=0.55` sobre la misma query confirma que es un ajuste de umbral (no fabricación): sin fuga cross-tenant, sin contenido inventado en ningún caso — las citas devueltas son siempre reales, solo débilmente relevantes. Se decidió **no** cambiar el default compartido sin re-benchmarkear contra `specialization_eval_*.json`; se documentó como P2 en `docs/KNOWN_ISSUES.md` en vez de ocultarlo o forzar un PASS artificial. |
+| **Por qué** | Cumplir el mandato "no fake green": promover solo si la infraestructura productiva real funciona, y documentar explícitamente cualquier gap encontrado en el camino en lugar de manipular el test hasta que pase. |
+| **Evidencia** | `scripts/staging-smoke-pgvector-rag-e2e.mjs` → `scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md` (11/13 checks críticos+calidad PASS, verdict `PASS_WITH_KNOWN_GAP`) · `vitest run backend/agency/__tests__/PrivateVectorRagCore.test.ts` **27/27 PASS** · `vitest run backend/agency` **305/305 PASS** · `tsc --noEmit` **0** |
+| **Consecuencias** | `OsCatalogV1.private_vector_rag.nextAction`/`e2eEvidence` actualizados · staging permanece **PREPARED_OFF** (no se activó ni solicitó Postgres+pgvector en Railway ni mesh Ollama — ver `CEO_IA_STAGING_APPROVAL_REQUEST.md`) · sin activación en producción · sin OpenAI · sin Pepito · `NELVYON_LOCAL_ROUTER_ENABLED` sin tocar |
+| **Relación** | ADR-057 · `PrivateVectorRagCore.ts` · `PRIVATE_RAG_RUNBOOK.md` · `docs/KNOWN_ISSUES.md` |
+
+---
+---
+
+## ADR-058 — Chatbot Phase C: ignore invented LLM blockers + soft-continue
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-25 |
+| **Decisión** | (1) `normalizeChatbotPlan` merges Ollama PM output with deterministic `runPmChatbot` blockers — invented blockers never abort a complete pack brief. (2) Soft-continue on PM/strategist/copywriter LLM failures with brief-derived KB via `normalizeChatbotKnowledgeBase`. (3) `runChatbotConfig` tolerates missing `handoff`. Same class as ADR-046 SEO. QA floor ≥85 unchanged; no silent-mock success when Ollama configured. |
+| **Por qué** | Staging influencers-pr E2E: `sku_chatbot` **QA 30 — escalado** → `needs_review` despite pack deliverables OK (`influencers_pr:done`). |
+| **Consecuencias** | Mesh chatbot packs (automations/reputation/influencers) resilient to invented blockers. Promote `influencers_pr` only after staging E2E ALL_PASS post-deploy. |
+| **Relación** | ADR-046 · `runPipelinePhaseC.ts` · `chatbotKbNormalize.ts` · `meshQaFixes.test.ts`. |

@@ -344,9 +344,13 @@ export type {
   PwaManifestLike,
 } from "./PwaCertification";
 export {
+  CRITICAL_MESSAGE_NAMESPACES,
   LOCALE_CATALOG,
   LOCALIZATION_FALLBACK_LOCALE,
   assertLocalizationCoreIntegrity,
+  computeCriticalMessageKeyDiffs,
+  computeMessageKeyDiff,
+  flattenMessageKeys,
   formatCurrency,
   formatDateInTimezone,
   getLocale,
@@ -357,18 +361,38 @@ export {
   resolveLocale,
   resolveTenantLocale,
 } from "./LocalizationCore";
-export type { CurrencyCode, LocaleCatalogEntry, LocaleCoverage, LocaleId } from "./LocalizationCore";
+export type { CurrencyCode, LocaleCatalogEntry, LocaleCoverage, LocaleId, MessageKeyDiff } from "./LocalizationCore";
 export {
+  GRACEFUL_DEGRADATION_MODULE_PATH,
+  GRACEFUL_DEGRADATION_REASON_CODES,
   HA_DR_CHECKLIST,
+  HA_DR_ROLLBACK_CHECKLIST,
   HA_DR_RUNBOOK_PATH,
   HA_DR_STAGING_HEALTH_URL_PATTERN,
+  HA_DR_STATELESS_ASSERTION,
+  RPO_TARGET_HOURS,
+  RTO_TARGET_HOURS,
   assertHaDrReadinessIntegrity,
   buildStagingHealthUrl,
+  evaluateRateLimitPresence,
   getHaDrItem,
+  isGracefulDegradationReasonCode,
   isMultiRegionEnabled,
+  isWellFormedDegradedResponse,
   listHaDrChecklist,
+  runCapacitySmoke,
 } from "./HaDrReadiness";
-export type { HaDrChecklistItem, HaDrItemStatus } from "./HaDrReadiness";
+export type {
+  CapacitySmokeFetcher,
+  CapacitySmokeInput,
+  CapacitySmokeProbeResult,
+  CapacitySmokeResult,
+  GracefulDegradationReasonCode,
+  HaDrChecklistItem,
+  HaDrItemStatus,
+  RateLimitPresenceResult,
+  StatelessAssertionMetadata,
+} from "./HaDrReadiness";
 export {
   INCIDENT_RUNBOOK_PATH,
   assertOpsObservabilityCoreIntegrity,
@@ -495,6 +519,7 @@ export {
   PRIVATE_AI_CANARY_ROLLBACK_FLAGS,
   assertPrivateAiCanaryPrepIntegrity,
   buildStagingCanaryDrillEvidenceMarkdown,
+  checkOllamaHostForCanaryDrill,
   evaluatePrivateAiCanaryChecklist,
   getPrivateAiCanaryExitCriteria,
   getPrivateAiCanaryLoadTestCriteria,
@@ -503,6 +528,7 @@ export {
   runStagingCanaryDrill,
 } from "./PrivateAiCanaryPrep";
 export type {
+  OllamaHostCheckResult,
   PrivateAiCanaryChecklistInput,
   PrivateAiCanaryChecklistItemId,
   PrivateAiCanaryChecklistItemResult,

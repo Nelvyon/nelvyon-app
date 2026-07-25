@@ -3,6 +3,7 @@ import {
   PRIVATE_AI_CANARY_ROLLBACK_FLAGS,
   assertPrivateAiCanaryPrepIntegrity,
   buildStagingCanaryDrillEvidenceMarkdown,
+  checkOllamaHostForCanaryDrill,
   evaluatePrivateAiCanaryChecklist,
   getPrivateAiCanaryExitCriteria,
   getPrivateAiCanaryLoadTestCriteria,
@@ -11,6 +12,11 @@ import {
   runStagingCanaryDrill,
   type PrivateAiCanaryChecklistInput,
 } from "../PrivateAiCanaryPrep";
+
+const OLLAMA_HOST_ALIASES = ["OLLAMA_HOST", "OLLAMA_BASE_URL", "NELVYON_LOCAL_AI_URL", "LOCAL_AI_BASE_URL"];
+function clearOllamaHostAliases(): void {
+  for (const k of OLLAMA_HOST_ALIASES) delete process.env[k];
+}
 
 const ALL_TRUE_CHECKLIST: PrivateAiCanaryChecklistInput = {
   localModelsOnly: true,
@@ -54,6 +60,7 @@ const DANGEROUS_FLAGS = [
 
 function clearDangerousFlags(): void {
   for (const f of DANGEROUS_FLAGS) delete process.env[f];
+  clearOllamaHostAliases();
 }
 
 describe("PrivateAiCanaryPrep — isProductionCanaryAuthorized is always false", () => {
@@ -171,6 +178,83 @@ describe("PrivateAiCanaryPrep — staging drill validates prod-dangerous flags O
     expect(md).toContain("Private AI production canary PREP drill");
     expect(md).toContain("productionCanaryAuthorized: false");
     expect(md).toContain("## Rollback");
+    expect(md).toContain("ollamaHostCheck:");
+  });
+});
+
+describe("PrivateAiCanaryPrep — checkOllamaHostForCanaryDrill (live env check)", () => {
+  afterEach(clearOllamaHostAliases);
+
+  it("is not applicable and passes when OLLAMA_HOST (and aliases) are unset — today's staging state", () => {
+    clearOllamaHostAliases();
+    const result = checkOllamaHostForCanaryDrill();
+    expect(result.applicable).toBe(false);
+    expect(result.ok).toBe(true);
+    expect(result.host).toBeNull();
+  });
+
+  it("fails when OLLAMA_HOST is a public address (never trust a self-reported checklist claim)", () => {
+    clearOllamaHostAliases();
+    process.env.OLLAMA_HOST = "http://198.51.100.7:11434";
+    const result = checkOllamaHostForCanaryDrill();
+    expect(result.applicable).toBe(true);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe("OLLAMA_HOST_not_tailscale_mesh");
+  });
+
+  it("passes when OLLAMA_HOST is a Tailscale MagicDNS host (*.ts.net)", () => {
+    clearOllamaHostAliases();
+    process.env.OLLAMA_HOST = "http://nelvyon-box.ts.net:11434";
+    const result = checkOllamaHostForCanaryDrill();
+    expect(result.applicable).toBe(true);
+    expect(result.ok).toBe(true);
+  });
+
+  it("passes when OLLAMA_HOST is a Tailscale CGNAT IPv4 (100.64.0.0/10)", () => {
+    clearOllamaHostAliases();
+    process.env.OLLAMA_HOST = "http://100.101.102.103:11434";
+    const result = checkOllamaHostForCanaryDrill();
+    expect(result.applicable).toBe(true);
+    expect(result.ok).toBe(true);
+  });
+
+  it("fails for loopback even in a dev-like environment — the drill is deliberately stricter than default dev rules", () => {
+    clearOllamaHostAliases();
+    process.env.OLLAMA_HOST = "http://localhost:11434";
+    const result = checkOllamaHostForCanaryDrill();
+    expect(result.applicable).toBe(true);
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe("PrivateAiCanaryPrep — staging drill is gated by the live Ollama host check", () => {
+  afterEach(() => {
+    clearDangerousFlags();
+  });
+
+  it("a perfect checklist still fails the drill if OLLAMA_HOST points to a public host", () => {
+    clearDangerousFlags();
+    process.env.OLLAMA_HOST = "http://198.51.100.7:11434";
+    const result = runStagingCanaryDrill(ALL_TRUE_CHECKLIST);
+    expect(result.ollamaHostCheck.applicable).toBe(true);
+    expect(result.ollamaHostCheck.ok).toBe(false);
+    expect(result.ok).toBe(false);
+  });
+
+  it("a perfect checklist with no OLLAMA_HOST set still passes (today's real staging state)", () => {
+    clearDangerousFlags();
+    const result = runStagingCanaryDrill(ALL_TRUE_CHECKLIST);
+    expect(result.ollamaHostCheck.applicable).toBe(false);
+    expect(result.ollamaHostCheck.ok).toBe(true);
+    expect(result.ok).toBe(true);
+  });
+
+  it("a perfect checklist with a Tailscale MagicDNS OLLAMA_HOST passes", () => {
+    clearDangerousFlags();
+    process.env.OLLAMA_HOST = "http://nelvyon-box.ts.net:11434";
+    const result = runStagingCanaryDrill(ALL_TRUE_CHECKLIST);
+    expect(result.ollamaHostCheck.ok).toBe(true);
+    expect(result.ok).toBe(true);
   });
 });
 

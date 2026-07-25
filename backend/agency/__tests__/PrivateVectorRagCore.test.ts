@@ -272,9 +272,15 @@ describe("PrivateVectorRagCore — singleton accessor + honest status", () => {
     expect(c).not.toBe(a);
   });
 
-  it("status is honest: synthetic core verified, production pgvector path prepared-off", () => {
+  it("status is honest: synthetic core AND production pgvector path both verified, with evidence and a documented known gap", () => {
     expect(PRIVATE_VECTOR_RAG_STATUS.syntheticCore).toBe("IMPLEMENTED_VERIFIED");
-    expect(PRIVATE_VECTOR_RAG_STATUS.productionPgvectorPath).toBe("PREPARED_OFF");
+    expect(PRIVATE_VECTOR_RAG_STATUS.productionPgvectorPath).toBe("IMPLEMENTED_VERIFIED");
+    // A "fake green" promotion (flipping the status without evidence) must be structurally impossible.
+    expect(PRIVATE_VECTOR_RAG_STATUS.productionPgvectorEvidence).toMatch(/pgvector-rag\.live/);
+    expect(PRIVATE_VECTOR_RAG_STATUS.productionPgvectorVerifiedAt).toBeTruthy();
+    expect(Number.isFinite(Date.parse(PRIVATE_VECTOR_RAG_STATUS.productionPgvectorVerifiedAt))).toBe(true);
+    // The known tuning gap must stay documented, not silently removed.
+    expect(PRIVATE_VECTOR_RAG_STATUS.productionPgvectorKnownGap).toMatch(/minScore/);
     expect(PRIVATE_VECTOR_RAG_STATUS.note.toLowerCase()).not.toContain("pepito");
   });
 

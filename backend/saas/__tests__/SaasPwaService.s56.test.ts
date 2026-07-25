@@ -1,8 +1,11 @@
 /**
  * S56 — SaasPwaService unit tests
  */
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import {
+  DEFAULT_ICONS,
   SaasPwaService,
   type WhiteLabelPwaPort,
   type WhiteLabelBranding,
@@ -135,5 +138,32 @@ describe("SaasPwaService — getStatus", () => {
     expect(s.whiteLabel).toBe(true);
     expect(s.appName).toBe("Acme");
     expect(s.themeColor).toBe("#112233");
+  });
+});
+
+// ── DEFAULT_ICONS — regression: the manifest API route falls back to this list ────
+// when both auth and DB fail, so it must never be empty (empty icons breaks PWA
+// installability) and every icon it declares must exist on disk (see
+// apps/web/scripts/generate-pwa-icons.mjs).
+
+describe("SaasPwaService — DEFAULT_ICONS (manifest route fallback)", () => {
+  const root = join(__dirname, "../../../");
+  const publicDir = join(root, "apps/web/public");
+
+  it("is never empty", () => {
+    expect(DEFAULT_ICONS.length).toBeGreaterThan(0);
+  });
+
+  it("every declared icon file exists on disk", () => {
+    for (const icon of DEFAULT_ICONS) {
+      const rel = icon.src.replace(/^\//, "");
+      expect(existsSync(join(publicDir, rel)), icon.src).toBe(true);
+    }
+  });
+
+  it("declares at least the 192x192 and 512x512 sizes required for installability", () => {
+    const sizes = DEFAULT_ICONS.map((i) => i.sizes);
+    expect(sizes).toContain("192x192");
+    expect(sizes).toContain("512x512");
   });
 });

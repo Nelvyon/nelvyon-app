@@ -6,6 +6,17 @@ for the structured checklist: `backend/agency/HaDrReadiness.ts` (tested —
 no paid WAF/CDN commitment — everything below either already exists or is a
 documented next step gated on CEO budget approval.
 
+## Estado honesto (resumen)
+
+| Ámbito | Estado |
+|---|---|
+| **Single-region resiliente** | **IMPLEMENTED_VERIFIED** — RPO/RTO definidos, health checks reales, capacity smoke, degradación gestionada (`bffDegraded`), rate-limit presence check, stateless assertion (con caveats honestos), rollback checklist, kill switches. |
+| **Multi-region** | **BLOCKED_EXTERNAL / COST** — requiere presupuesto CEO explícito. `isMultiRegionEnabled()` hardcodeado `false`, sin plumbing de env var que lo cambie. |
+
+Opcional, no bloqueante de CI: `node scripts/staging-smoke-ha-dr-readiness.mjs`
+(corre el suite vitest + una capacity smoke real no-fatal contra staging,
+escribe evidencia en `scripts/docs/evidence/os-saas-e2e/modules/`).
+
 ---
 
 ## RPO / RTO targets
@@ -68,6 +79,42 @@ https://{staging-subdomain}.up.railway.app/api/health/deep
   paid tier only with CEO approval) sitting in front of `app.nelvyon.com`.
   **Not configured today** — no DNS/CDN change made by this runbook.
 
+## Capacity smoke (single-region)
+
+`runCapacitySmoke()` in `backend/agency/HaDrReadiness.ts` fires a small burst
+(default 5 concurrent requests) at each of the 4 real `/api/health*` probes
+and fails closed on a non-200 status, a thrown network error, or latency over
+the configured budget (default 3000ms). This is a lightweight smoke, **not**
+a load-testing product — it verifies the app answers correctly under a small
+concurrent burst on the current free/starter-tier Railway plan. Run it for
+real (non-fatal, staging only) with `node scripts/staging-smoke-ha-dr-readiness.mjs`.
+
+## Graceful degradation (implemented today)
+
+`apps/web/src/lib/bffDegraded.ts` already marks BFF responses
+`{ degraded: true, degraded_reason: "upstream_unavailable" | "oauth_not_configured" | "no_live_data" }`
+instead of hard-failing when an upstream integration/OAuth is unavailable —
+consumed today by the ads/ecommerce/social/funnels/automations/reputación BFF
+routes. `HaDrReadiness.ts` validates this contract
+(`isGracefulDegradationReasonCode`, `isWellFormedDegradedResponse`) without
+duplicating the BFF implementation.
+
+## Stateless assertion — honest, with caveats
+
+The app is stateless-safe for the current single Railway instance: JWT
+cookie auth (no server session store), Postgres-backed business data and
+workflow idempotency window. **Known in-memory caveats** that currently
+assume a single instance (documented in `HA_DR_STATELESS_ASSERTION`, never
+silently upgraded to "fully stateless"):
+
+- `MassSendTechnicalControls` suppression list + send-rate-limit window (in-memory `Map`).
+- `OpsObservabilityCore` metrics counters + alert log (in-memory per instance).
+- `PrivateVectorRagCore` / `StagingSharedMemoryMcpHarness` synthetic stores (staging-only, in-memory by design).
+
+If/when horizontal scaling (N Railway replicas) is ever needed, these three
+need a shared store (Redis/Postgres) first — tracked here, not yet required
+at current traffic.
+
 ## Kill switches
 
 Every risky subsystem in this codebase is already gated by an environment
@@ -81,7 +128,16 @@ duplicate the live list to avoid drift; it documents the *pattern*:
 2. Enabling it requires an explicit env var, scoped to staging first.
 3. Disabling is always "unset the var / set to 0" — no code rollback needed.
 
-## Multi-region — BLOCKED_EXTERNAL
+## Rollback checklist
+
+`HA_DR_ROLLBACK_CHECKLIST` in `backend/agency/HaDrReadiness.ts` (6 steps):
+identify last known-good Railway deploy → redeploy/`railway rollback` →
+verify `/api/health/deep` 200 before declaring resolved → prefer flipping a
+feature flag over a full redeploy when the incident is flag-caused → never
+auto-rollback a DB migration (follow `docs/ops/POSTGRES_RESTORE_DRILL.md`
+instead) → log the incident in `docs/KNOWN_ISSUES.md`/`docs/DECISIONS.md`.
+
+## Multi-region — BLOCKED_EXTERNAL / COST
 
 Multi-region deployment (active-active or active-passive across Railway
 regions/providers) is **not implemented and not planned** without an

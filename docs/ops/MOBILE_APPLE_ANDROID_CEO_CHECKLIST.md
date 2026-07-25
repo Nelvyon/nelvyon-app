@@ -9,6 +9,9 @@ did not open, pay for, or configure any Apple Developer Program or Google
 Play Console account. Nothing here should be read as "app is published" or
 "app is in review" — it is not.
 
+Evidencia de bloqueo Android (2026-07-25):
+`scripts/docs/evidence/os-saas-e2e/modules/mobile.android_blocked.md`.
+
 ---
 
 ## Apple (iOS) — BLOCKED_EXTERNAL
@@ -19,6 +22,7 @@ Play Console account. Nothing here should be read as "app is published" or
 | Apple Developer Program enrollment | BLOCKED_EXTERNAL | **Paid** ($99/yr). Explicitly out of scope — no Apple paid account authorized. |
 | App Store Connect app record | BLOCKED_EXTERNAL | Depends on the enrollment above. |
 | TestFlight / App Store submission | BLOCKED_EXTERNAL | Depends on both of the above. |
+| Install smoke (simulator/device) | **NOT RUN** | No PASS claimed without real device evidence. |
 
 ### What the CEO needs to do (when ready to spend)
 
@@ -31,29 +35,39 @@ Play Console account. Nothing here should be read as "app is published" or
 
 ---
 
-## Android — partially achievable at zero cost
+## Android — BLOCKED_EXTERNAL (this environment)
 
-| Step | Status | Notes |
+| Step | Status | Blocker |
 |---|---|---|
-| Android local debug build (`pnpm -C apps/mobile android`) | PREPARED_OFF (not executed this session) | **No cost.** Opens the Capacitor Android project in Android Studio; `./gradlew assembleDebug` produces a sideloadable APK without any Google account. |
-| Local device/emulator install + smoke test | PREPARED_OFF | Free — use `adb install app-debug.apk` or drag the APK onto an emulator. |
+| Native project (`apps/mobile/android/`) | BLOCKED_EXTERNAL | Folder **missing** — `capacitor sync` not executed in this environment. |
+| Android SDK / `adb` | BLOCKED_EXTERNAL | **Not installed** on this Windows machine — verified 2026-07-25. |
+| Android local debug build | BLOCKED_EXTERNAL | Requires Android Studio + SDK + generated `android/` project (none present). |
+| Local device/emulator install + smoke test | **NOT RUN** | **No PASS claimed** — no APK, no adb, no emulator/device. |
 | Google Play Console registration | BLOCKED_EXTERNAL | **Paid** (one-time $25 registration fee). No budget approved in this session. |
 | Play Store listing + review submission | BLOCKED_EXTERNAL | Depends on the registration above. |
 
-### Local Android build steps (no cost, requires Android Studio + JDK installed locally)
+### What remains verified (no native binary)
+
+| Capability | Status | Evidence |
+|---|---|---|
+| Capacitor shell config | IMPLEMENTED_VERIFIED | `apps/mobile/capacitor.config.json` + `package.json` |
+| Tenant-isolated secure session | IMPLEMENTED_VERIFIED | `MobileSecureSession.ts` + unit tests |
+| Offline action queue (basic) | IMPLEMENTED_VERIFIED | `MobileSecureSession.ts` + unit tests |
+
+### Local Android build steps (when CEO provides Android Studio + SDK)
+
+These steps are **documentation only** — not executed here:
 
 ```bash
 pnpm -C apps/web build          # builds the Next.js app the shell points at (or use the remote server.url)
-pnpm -C apps/mobile sync        # capacitor sync — copies web assets + config into native projects
+pnpm -C apps/mobile sync        # capacitor sync — generates android/ + copies web assets
 pnpm -C apps/mobile android     # opens android/ in Android Studio
 # In Android Studio: Build > Build Bundle(s) / APK(s) > Build APK(s)
 # Resulting APK: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-This produces a real, installable debug APK for internal testing (sideload
-only) without touching any paid service. It does **not** produce a
-Play-Store-ready signed release bundle — that requires a release keystore and
-(eventually) the paid Play Console account above.
+A debug APK from the steps above would be sideloadable for internal testing at
+zero Play Console cost — but **this session produced no APK and claims no install PASS**.
 
 ---
 

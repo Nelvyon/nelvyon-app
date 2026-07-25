@@ -1,7 +1,12 @@
 /**
  * Normalize chatbot knowledge_base from Ollama so QA rubrics see complete schema.
  * Pads FAQs with brief-derived content (not lorem/mock://) and computes gold-set metrics.
+ *
+ * Also: `normalizeChatbotPlan` — never trust LLM-invented blockers when the brief is complete
+ * (same class of failure as SEO ADR-046: invented blockers → early abort → QA~30).
  */
+import { runPmChatbot, runStrategistChatbot } from "../agents/mockAgents";
+
 
 export type ChatbotFaq = {
   id: string;
@@ -106,6 +111,57 @@ export function passesHallucinationPriceCheck(
   if (briefHasPrice) return true;
   const invents = faqs.some((f) => /\b\d{2,}\s*[€$]|\b\$\d{2,}\b/.test(f.canonical_answer));
   return !invents;
+}
+
+/**
+ * Merge LLM PM plan with deterministic blockers/faqs_target.
+ * Incomplete briefs keep real blockers; complete briefs never abort on invented LLM blockers.
+ */
+export function normalizeChatbotPlan(
+  raw: unknown,
+  brief: Record<string, unknown>,
+  tier: string,
+): Record<string, unknown> {
+  const deterministic = runPmChatbot(brief, tier).plan as Record<string, unknown>;
+  const incoming = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const faqsTarget = Math.max(
+    15,
+    Math.min(
+      60,
+      Number(incoming.faqs_target_count) || Number(deterministic.faqs_target_count) || 15,
+    ),
+  );
+  return {
+    ...deterministic,
+    flow_template_id: String(
+      incoming.flow_template_id || deterministic.flow_template_id || "faq-general",
+    ),
+    agents_sequence:
+      Array.isArray(incoming.agents_sequence) && (incoming.agents_sequence as unknown[]).length > 0
+        ? incoming.agents_sequence
+        : deterministic.agents_sequence,
+    faqs_target_count: faqsTarget,
+    blockers: Array.isArray(deterministic.blockers) ? deterministic.blockers : [],
+  };
+}
+
+/** Deterministic strategy when strategist LLM fails (soft-continue). */
+export function normalizeChatbotStrategy(
+  raw: unknown,
+  brief: Record<string, unknown>,
+): Record<string, unknown> {
+  const fallback = runStrategistChatbot(brief).strategy as Record<string, unknown>;
+  if (!raw || typeof raw !== "object") return fallback;
+  const incoming = raw as Record<string, unknown>;
+  return {
+    ...fallback,
+    ...incoming,
+    version: Number(incoming.version) || Number(fallback.version) || 1,
+    persona: {
+      ...((fallback.persona as Record<string, unknown>) ?? {}),
+      ...((incoming.persona as Record<string, unknown>) ?? {}),
+    },
+  };
 }
 
 export function normalizeChatbotKnowledgeBase(

@@ -67,6 +67,7 @@ const results = [
 
 const overallOk = results.every((r) => r.ok);
 const timestamp = new Date().toISOString();
+const platform = `${process.platform} (Node ${process.version})`;
 
 const lines = [];
 lines.push("# PWA certification");
@@ -74,8 +75,12 @@ lines.push("");
 lines.push("| Campo | Valor |");
 lines.push("|-------|-------|");
 lines.push(`| Fecha | ${timestamp} |`);
+lines.push(`| Host | ${platform} |`);
 lines.push(`| Resultado | ${overallOk ? "PASS" : "FAIL"} |`);
-lines.push('| iOS Safari "Add to Home Screen" | PARTIAL — no verificado en dispositivo real en esta sesión |');
+lines.push(
+  `| Chrome/Windows (criterios de instalabilidad) | ${overallOk ? "VERIFIED" : "FAIL"} — manifest válido (name/icons/display/start_url) + iconos reales en disco + sw.js con \`install\`/\`fetch\` handlers y estrategia cache+offline documentada. Estos son exactamente los criterios que Chrome/Edge (Chromium, Windows) evalúan para marcar el sitio como instalable. |`,
+);
+lines.push('| iOS Safari "Add to Home Screen" | PARTIAL — no verificado en dispositivo/simulador real en esta sesión |');
 lines.push("");
 
 for (const result of results) {
@@ -99,11 +104,14 @@ for (const result of results) {
 lines.push("## Honestidad");
 lines.push("");
 lines.push(
-  '- No se marca "iOS Safari install" como VERIFIED sin una prueba real en dispositivo/simulador — queda PARTIAL en este documento hasta que ops lo confirme manualmente.',
+  '- "Chrome/Windows VERIFIED" es una auditoría estática y reproducible (este script Node) contra los mismos criterios de instalabilidad que Chrome/Edge (Chromium) evalúan — no es una sesión manual de Chrome DevTools grabada en vivo. Cualquiera puede reproducirla con `node scripts/pwa-certify.mjs`.',
+);
+lines.push(
+  '- No se marca "iOS Safari install" como VERIFIED sin una prueba real en dispositivo/simulador — queda PARTIAL en este documento hasta que ops lo confirme manualmente. Ver `docs/ops/PWA_IOS_SAFARI_CEO_CHECKLIST.md`.',
 );
 lines.push("- Este script solo audita manifest+sw en disco; no publica, despliega ni modifica nada.");
 lines.push(
-  "- Los iconos PWA de manifest-saas.json usan icon-base.svg (existente). Si se quiere un set PNG multi-tamaño, ejecutar `node apps/web/scripts/generate-pwa-icons.mjs` (usa `sharp`, ya en devDependencies) y actualizar el manifest.",
+  "- Los iconos PNG multi-tamaño (72–512px) ya existen en disco (`apps/web/public/icons/icon-*.png`, generados con `node apps/web/scripts/generate-pwa-icons.mjs`, usa `sharp`) y están declarados en `manifest.json`, `manifest-saas.json` y en el manifest dinámico `SaasPwaService.DEFAULT_ICONS` — incluyendo los iconos de push notification que `sw.js` referenciaba (`icon-192x192.png`, `icon-96x96.png`).",
 );
 lines.push("");
 

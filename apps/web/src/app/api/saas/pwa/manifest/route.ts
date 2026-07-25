@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getSaasPwaService, requireSaasContext, type PwaManifest } from "@nelvyon/saas";
+import { SAAS_PWA_DEFAULT_ICONS, getSaasPwaService, requireSaasContext, type PwaManifest } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
     orientation: "portrait-primary",
     theme_color: "#0084ff",
     background_color: "#020817",
-    icons: [],
+    // Never ship an empty icons array — an installable PWA manifest requires at least one icon.
+    icons: SAAS_PWA_DEFAULT_ICONS,
     categories: ["business", "productivity"],
     lang: "es",
   };

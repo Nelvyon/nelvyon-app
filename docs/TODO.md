@@ -40,7 +40,9 @@
 - [x] Block 21: HA/DR runbook+checks IMPLEMENTED_VERIFIED · multi-region **BLOCKED_EXTERNAL**
 - [x] Block 22: `OpsObservabilityCore` local IMPLEMENTED_VERIFIED · paid **PREPARED_OFF**
 - [x] Block 23: legacy audit IMPLEMENTED_VERIFIED · zero unsafe deletes
-- [x] Block 24: `PrivateVectorRagCore` synthetic IMPLEMENTED_VERIFIED (27 tests) · pgvector **PREPARED_OFF**
+- [x] Block 24: `PrivateVectorRagCore` synthetic IMPLEMENTED_VERIFIED (27 tests) · pgvector real local **IMPLEMENTED_VERIFIED en vivo 2026-07-25** (Docker+Ollama, aislamiento app+RLS 2 capas) — evidencia `pgvector-rag.live_latest.md`
+- [ ] **P2 (no bloqueante):** Block 24 — suelo de confianza consciente del tamaño del corpus en `LocalRagRetriever.retrieve` (gap `minScore=0.32` en tenants <10 chunks) — `docs/KNOWN_ISSUES.md`
+- [ ] **CEO (opcional):** Block 24 — llevar pgvector RAG a staging requiere Postgres+pgvector accesible desde Railway + mesh Ollama, ninguno provisionado ni solicitado
 - [x] Block 25: `PrivateAiCanaryPrep` PREPARED_OFF · **BLOCKED_CEO**
 - [ ] **CEO:** telefonía — `TELEPHONY_PROVIDER_CEO_CHECKLIST.md`
 - [ ] **CEO:** OAuth apps — `OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md`
@@ -91,7 +93,8 @@
 - [x] Block 13: `AdsAttributionCore` — campaign draft/audiencias/UTM/conversion events sintéticos, budget cap hard-fail, conectores Google/Meta/LinkedIn Ads fail-closed (`BLOCKED_EXTERNAL`/`SPEND_DISABLED`), `NELVYON_ADS_SPEND_ENABLED` default 0 · `ADS_OAUTH_SPEND_CEO_CHECKLIST.md`; catalog `ads_attribution_core` **PREPARED_OFF**
 - [x] Block 14: `CommunityPublishCore` — inbox/calendario/approval/variantes/cola/moderación/auditoría; `SimulatorPublishProvider` only, `assertPublishDisabled()` bloquea salvo oauth+CEO · `SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md`; catalog `community_publish_core` **PREPARED_OFF**
 - [x] Block 15: `MassSendTechnicalControls` (suppression/unsubscribe proof/rate limit/warming/reputation sintética/template audit) wired como campos informativos en `CampaignsLegalTechnicalGate` sin alterar `technicalComplete`/`sendAuthorized`; `claimReadyLegal` sigue false · `CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md` actualizado
-- [ ] Ops: flag `NELVYON_INFLUENCERS_PR_PACK=1` en staging + smoke E2E antes de promover `influencers-pr-pack` a available
+- [ ] Ops: redeploy ADR-058 → `NELVYON_INFLUENCERS_PR_PACK=1` + `staging-smoke-influencers-pr-e2e.mjs` ALL_PASS → promover `influencers_pr` IMPLEMENTED_VERIFIED
+- [x] Ops: flag `NELVYON_INFLUENCERS_PR_PACK=1` en staging (seteado) · E2E pre-ADR-058 FALLÓ QA30 · fix local listo
 - [ ] CEO: abrir/conectar 8 cuentas sociales oficiales NELVYON (`docs/ops/NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md`)
 - [ ] Legal: dossier Pepito + licencia comercial escrita (`DATOS_PEPITO_LICENSE_DOSSIER.md` + `CAMPAIGNS_LEGAL_TECHNICAL_CHECKLIST.md`) — bloquea claimReady
 - [ ] CEO: OpenClaw **prod canary** (`CEO_OPENCLAW_PROD_CANARY_REQUEST.md` PENDING_CEO) / SM productiva / visual paid (nueva autorización)

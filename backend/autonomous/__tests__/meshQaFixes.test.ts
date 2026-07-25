@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   isUsefulFaq,
   normalizeChatbotKnowledgeBase,
+  normalizeChatbotPlan,
   passesHallucinationPriceCheck,
 } from "../wrappers/chatbotKbNormalize";
 import {
@@ -12,6 +13,7 @@ import {
   normalizeSeoPlan,
 } from "../wrappers/seoGenerator";
 import { scoreOffline } from "../qa/offlineScorer";
+import { buildChatbotIsolated } from "../wrappers/chatbotBuilder";
 
 describe("chatbotKbNormalize", () => {
   const brief = {
@@ -22,6 +24,8 @@ describe("chatbotKbNormalize", () => {
     website_url: "https://example.test",
     primary_cta: "Reservar mesa",
     bot_name: "Asistente QA",
+    openai_cost_bearer: "client",
+    handoff: { destination: "hola@example.test" },
     compliance_flags: { disclaimer_required: true },
   };
 
@@ -49,6 +53,38 @@ describe("chatbotKbNormalize", () => {
     ];
     expect(passesHallucinationPriceCheck(brief, faqs)).toBe(false);
     expect(isUsefulFaq(faqs[0]!)).toBe(true);
+  });
+
+  it("normalizeChatbotPlan ignores invented LLM blockers when brief is complete", () => {
+    const plan = normalizeChatbotPlan(
+      {
+        faqs_target_count: 22,
+        blockers: ["invented-by-llm", "missing:website_url", "openai_cost_bearer_must_be_client"],
+      },
+      brief,
+      "professional",
+    );
+    expect(plan.blockers).toEqual([]);
+    expect(Number(plan.faqs_target_count)).toBe(22);
+  });
+
+  it("normalized chatbot artifacts score ≥85 offline (influencers mesh regression)", () => {
+    const plan = normalizeChatbotPlan(
+      { blockers: ["llm-invented-abort"], faqs_target_count: 30 },
+      brief,
+      "professional",
+    );
+    const kb = normalizeChatbotKnowledgeBase(null, brief, Number(plan.faqs_target_count));
+    const strategy = { version: 1, persona: { name: brief.bot_name } };
+    const config = buildChatbotIsolated({ brief, knowledge_base: kb, strategy });
+    const qa = scoreOffline(
+      "NELVYON-CHATBOT",
+      brief,
+      { plan, strategy, knowledge_base: kb, config },
+      1,
+    );
+    expect(qa.passed).toBe(true);
+    expect(qa.score).toBeGreaterThanOrEqual(85);
   });
 });
 

@@ -67,12 +67,12 @@ export const MOBILE_APP_CAPABILITIES: readonly MobileCapabilityEntry[] = [
   {
     id: "android_local_build",
     title: "Android local debug build (no store, no cost)",
-    status: "PREPARED_OFF",
+    status: "BLOCKED_EXTERNAL",
     description:
-      "`pnpm -C apps/mobile android` opens the Android Studio project; a local debug APK can be built and sideloaded for testing at zero cost — no Play Console account required for this step.",
+      "`pnpm -C apps/mobile sync` must generate `apps/mobile/android/` first; then Android Studio/SDK can build a sideloadable debug APK at zero Play Console cost.",
     evidence: null,
     blockedReason:
-      "Requires a local run of Android Studio/SDK, not available/executed in this environment — see MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md.",
+      "Android SDK/adb not present; apps/mobile/android/ missing (capacitor sync not run) — see scripts/docs/evidence/os-saas-e2e/modules/mobile.android_blocked.md.",
   },
   {
     id: "ios_local_build",

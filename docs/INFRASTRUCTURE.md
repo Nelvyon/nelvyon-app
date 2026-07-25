@@ -13,7 +13,7 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | 🟡 | Desktop often DOWN for restore drill · local-ai/pgvector **PREPARED_OFF** (Block 24) |
+| **Docker** | ✅ local / 🟡 staging | local-ai/pgvector Docker **IMPLEMENTED_VERIFIED** (Block 24, 2026-07-25) · Railway staging pgvector **PREPARED_OFF** |
 | **Railway prod** | ✅ | `@nelvyon/web` · flags **OFF** / **ABSENT** · no OpenAI · no credenciales reales |
 | **Railway staging** | ✅ | `ideal-victory` · https://ideal-victory-staging.up.railway.app · **confirm deploy after push** · tip **TBA** |
 | **ADR-057 cores** | ✅ local | Blocks 11–25 internal cores verified · agency **249 PASS** · tsc **0** |
@@ -23,7 +23,7 @@
 | **Telephony (Block 11)** | ✅ simulator | real Twilio **BLOCKED_EXTERNAL** |
 | **Mobile (Block 18)** | 🟡 | Capacitor contract verified · App Store/Play **BLOCKED_EXTERNAL** |
 | **PWA (Block 19)** | ✅ | `pwa-certify` PASS · iOS Safari PARTIAL |
-| **Private RAG (Block 24)** | ✅ synthetic / 🟡 pgvector | in-process verified · Docker live PREPARED_OFF |
+| **Private RAG (Block 24)** | ✅ local / 🟡 staging | synthetic + Docker pgvector local **IMPLEMENTED_VERIFIED** · Railway staging pgvector **PREPARED_OFF** |
 | **Costes** | **0** | |
 
 ---

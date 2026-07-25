@@ -29,7 +29,7 @@
 | 3 | Fail-closed por defecto | `SecurityGuard` + refuse-on-error verificado |
 | 4 | Presupuesto API = 0 | `AUTONOMOUS_ALLOW_OPENAI=0` confirmado, sin clave de gasto conectada |
 | 5 | Privacidad (`PRIVATE_MODE`) | Egress restringido a localhost/LAN privada/allowlist |
-| 6 | Red privada Tailscale | Host Ollama resuelve a CGNAT/MagicDNS, nunca público |
+| 6 | Red privada Tailscale | Host Ollama resuelve a CGNAT/MagicDNS, nunca público — verificado en vivo por `checkOllamaHostForCanaryDrill()`, no solo autodeclarado |
 | 7 | RAG con evidencia obligatoria | `PrivateVectorRagCore` rechaza sin evidencia (Bloque 24) |
 | 8 | Auditoría | Toda acción del canary queda en un log auditable |
 | 9 | Rollback <5 min | Procedimiento documentado y ensayado |
