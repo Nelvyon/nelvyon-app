@@ -3,9 +3,43 @@ import path from "path";
 
 import { DbClient } from "./DbClient";
 import { loadEnvFiles } from "./loadEnvFiles";
+import {
+  evaluateProdMigrateGate,
+  readProdMigrateApproval,
+  resolveDeployEnvironment,
+} from "./prodMigrateGate";
 import { isTolerableConsolidatedMigrationError, splitSqlStatements } from "./splitSqlStatements";
 
 const CONSOLIDATED_MIGRATION = "507_fastapi_runtime_schemas.sql";
+
+/**
+ * ADR-064: even the low-level `migrate.ts` entrypoint must refuse production
+ * applies without CEO-auditable approval (blocks `pnpm migrate` bypass of migrate:prod).
+ */
+async function assertProdMigrateGate(db: DbClient, files: string[]): Promise<void> {
+  const pending: string[] = [];
+  for (const file of files) {
+    const rows = await db.query<{ name: string }>("SELECT name FROM _migrations WHERE name = $1", [
+      file,
+    ]);
+    if (rows.length === 0) pending.push(file);
+  }
+  const deploy = resolveDeployEnvironment();
+  const approval = readProdMigrateApproval();
+  const decision = evaluateProdMigrateGate({
+    isProduction: deploy.isProduction,
+    approval,
+    pendingCount: pending.length,
+  });
+  console.log(
+    `[migrate] deploy_env=${deploy.label} isProduction=${deploy.isProduction} pending_count=${pending.length}`,
+  );
+  console.log(`[migrate] gate: ${decision.message}`);
+  if (!decision.allowApply) {
+    await db.end();
+    process.exit(decision.exitCode);
+  }
+}
 
 async function runMigrations(): Promise<void> {
   loadEnvFiles();
@@ -21,6 +55,7 @@ async function runMigrations(): Promise<void> {
     .readdirSync(migrationsDir)
     .filter((f) => f.endsWith(".sql"))
     .sort();
+  await assertProdMigrateGate(db, files);
   for (const file of files) {
     const rows = await db.query<{ name: string }>("SELECT name FROM _migrations WHERE name = $1", [file]);
     if (rows.length > 0) {

@@ -1,13 +1,14 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-25** — ADR-064 **VERIFIED live** tip **`c2edb2da`** · `claimReady: false` · **NOT READY**
+> Actualizado: **2026-07-25** — CIERRE INTERNO ABSOLUTO · tip live **`c2edb2da`** · `claimReady: false` · **NOT READY**
 
 ---
 
 ## P0 — Bloqueantes producción
 
 - [x] Completado y validado 2026-07-10
-- [x] **ADR-064 prod migrate gate** — código + tests + staging apply logs + prod skip-apply logs (`da6b7a74` / `a82b55ac`)
+- [x] **ADR-064 prod migrate gate** — migrate:prod + **migrate.ts** · staging/prod logs VERIFIED
+- [x] Audit élite 2026-07-25 — **0 P0** · P1 migrate bypass / mobile SSOT / i18n saas shell cerrados
 
 ---
 

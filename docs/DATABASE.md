@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-25** — tip **`c2edb2da`** · mig **519+520** · ADR-064 **VERIFIED live** · A/B+concurrency VERIFIED · ADR-062 PREPARED_OFF · CEO ack pending
+> Actualizado: **2026-07-25** — tip **`c2edb2da`** · mig **519+520** · ADR-064 **VERIFIED** (+ migrate.ts) · A/B+concurrency VERIFIED · ADR-062 PREPARED_OFF · CEO ack pending
 
 ---
 
@@ -9,7 +9,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Prod** | tip **`c2edb2da`** · 519/520 in `_migrations` · **ADR-064 gate VERIFIED** (skip-apply) · CEO ack pending |
-| **Staging** | tip **`c2edb2da`** · auto-migrate apply-allowed · ERP reval ALL_PASS |
+| **Staging** | tip **`c2edb2da`** · auto-migrate · ERP reval ALL_PASS |
 | **SSOT ERP** | `erp_domain_snapshots` · dual-write **PREPARED_OFF** |
 
 ## ADR-060 — ERP product surface (catalog v1.7.0 · superseded SSOT by ADR-061)

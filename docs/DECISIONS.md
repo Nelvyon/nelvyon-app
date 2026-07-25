@@ -709,7 +709,7 @@
 | **Decisión** | (1) OsCatalogV1 bump **v1.6.0** — promote `ads_attribution_core` + `community_publish_core` to **IMPLEMENTED_VERIFIED** on unit/core evidence (mismo patrón que `telephony_core`); OAuth/spend/publish real permanecen **BLOCKED_EXTERNAL**. (2) Email locale expand (Resend invoice/job/onboarding + SES payment_failed/cancellation es/en/fr/de/it/pt) se documenta como **PARTIAL** — no FULL_VERIFIED hasta auditoría SES catalog restante + `billing/*EmailTemplates`. PDF labels **PARTIAL**. UI catalogs fr/de/it/pt **FULL**. (3) Android Capacitor scaffold en `apps/mobile/android/` documentado como presente; APK `assembleDebug` **BLOCKED_EXTERNAL** hasta JDK/Android SDK. (4) Observability drill + legacy consolidation evidence escritas; HA single-region **VERIFIED**; multi-region **BLOCKED_EXTERNAL/COST**. (5) Sin OAuth real, sin spend, sin publish real, sin App Store/Play green, sin claimReady. |
 | **Por qué** | Cierre interno honestidad: promover solo cores demostrables; separar UI i18n FULL de email/PDF PARTIAL; no inventar verde móvil ni multi-región. |
 | **Evidencia** | Staging tip **`5adbfcd2`** · deploy **`d5caafc0` SUCCESS** · `AUTONOMOUS_ALLOW_OPENAI=0` · catalog v1.6.0 (local tip post-commit) · `mobile.android_scaffold.md` · `observability.drill_latest.md` · `legacy.consolidation_latest.md` · `ha-dr-readiness_latest.md` · influencers E2E prior VERIFIED · private_vector_rag Docker VERIFIED / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** |
-| **Consecuencias** | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` · email/PDF **PARTIAL** · APK **BLOCKED_EXTERNAL** · multi-region **BLOCKED_EXTERNAL/COST** · próximos pasos = acciones solo Daniel en HANDOVER |
+| **Consecuencias** | **CONDITIONAL_READY** · **NOT READY** · `claimReady: false` · email/PDF **PARTIAL** · Android **local build VERIFIED** · device/iOS/Play **BLOCKED_EXTERNAL** · multi-region **BLOCKED_EXTERNAL/COST** · próximos pasos = acciones solo Daniel en HANDOVER |
 | **Relación** | ADR-057 · ADR-058 · `OsCatalogV1.ts` · `LocalizationCore` · `MobileAppContract` · `AdsAttributionCore` · `CommunityPublishCore` |
 
 ---
@@ -789,8 +789,8 @@ Prod migrate 519/520 = runbook listo, ejecución **BLOCKED_CEO** · `claimReady:
 | Campo | Valor |
 |-------|-------|
 | **Fecha** | 2026-07-25 |
-| **Decisión** | `migrate:prod` en producción **no aplica** SQL pendientes sin `NELVYON_PROD_MIGRATE_APPROVED=1` + `NELVYON_PROD_MIGRATE_APPROVED_BY`. Pending sin approval → **exit 1** (bloquea deploy). Pending=0 → no-op exit 0. Staging sigue auto-apply. |
-| **Por qué** | Auto-deploy de `main` aplicó ERP 519/520 sin firma CEO (ADR-063). Gate técnico evita repetición. |
+| **Decisión** | `migrate:prod` **y** `migrate.ts` en producción **no aplican** SQL pendientes sin `NELVYON_PROD_MIGRATE_APPROVED=1` + `NELVYON_PROD_MIGRATE_APPROVED_BY`. Pending sin approval → **exit 1**. Pending=0 → no-op exit 0. Staging sigue auto-apply. |
+| **Por qué** | Auto-deploy de `main` aplicó ERP 519/520 sin firma CEO (ADR-063). Gate técnico evita repetición; harden 2026-07-25 cierra bypass `pnpm migrate`. |
 | **Consecuencias** | Runbook `PROD_MIGRATE_GATE_RUNBOOK.md` · vars de aprobación son ventana única y reversibles · 519/520 **no se revierten** · `claimReady: false` |
-| **Evidencia** | `prodMigrateGate.ts` · vitest 13 PASS · staging `da6b7a74` apply-allowed · prod `a82b55ac` skip-apply · `prod.migrate_gate_latest.md` · tip `c2edb2da` |
+| **Evidencia** | `prodMigrateGate.ts` · `migrate-prod.ts` · `migrate.ts` · vitest gate PASS · staging `da6b7a74` · prod `a82b55ac` · tip `c2edb2da` |
 | **Relación** | ADR-011 · ADR-063 · KI governance prod migrate |

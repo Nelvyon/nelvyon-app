@@ -1,6 +1,15 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-25** ADR-064 VERIFIED live tip `c2edb2da`.
+> Actualizado: **2026-07-25** ADR-064 harden migrate.ts · tip live `c2edb2da`.
+
+## 2026-07-25 — CIERRE INTERNO ABSOLUTO (audit + harden)
+
+| Campo | Valor |
+|-------|-------|
+| **Código** | `migrate.ts` gated · i18n saas shell · mobile SSOT docs |
+| **Gates** | tsc 0 · vitest 63 PASS (gate+i18n) · anti-mock PASS · ERP A/B+conc ALL_PASS |
+| **Staging/Prod tip** | `c2edb2da` (docs deploy pending tip push) |
+| **claimReady** | **false** |
 
 ## 2026-07-25 — ADR-064 VERIFIED live (staging + prod)
 

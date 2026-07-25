@@ -1,15 +1,15 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-25** — **ADR-064 VERIFIED live** · tip **`c2edb2da`** staging+prod · ERP reval ALL_PASS · 519/520 kept · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-25** — **CIERRE INTERNO ABSOLUTO** · ADR-064 harden `migrate.ts` · i18n saas nav/common · mobile SSOT · tip pending push · `claimReady: false` · **NOT READY**
 
-> Última actualización automática: **2026-07-25 15:50 UTC**
+> Última actualización automática: **2026-07-25 16:02 UTC**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | `c2edb2da` |
+| **Último commit** | pending this push (audit closure) |
 | **Fecha doc** | 2026-07-25 |
-| **Rama** | `main` (sync with origin) |
+| **Rama** | `main` |
 
 ---
 
@@ -18,22 +18,24 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** |
-| **Staging** | tip **`c2edb2da`** · deploy **`da6b7a74` SUCCESS** · migrate gate auto-apply · ERP A/B+concurrency **ALL_PASS** · health ready |
-| **Prod** | tip **`c2edb2da`** · deploy **`a82b55ac` SUCCESS** · gate **skip-apply** (`pending_count=0`, isProduction=true) · 519/520 **kept** · IA keys ABSENT |
-| **P0 gobernanza** | **IMPLEMENTED_VERIFIED** — ADR-064 fail-closed prod migrate |
+| **Staging live** | tip **`c2edb2da`** · ERP A/B+concurrency reval **ALL_PASS** · ready OK |
+| **Prod live** | tip **`c2edb2da`** · gate skip-apply VERIFIED · 519/520 kept · IA ABSENT |
+| **P0 gobernanza** | ADR-064 **IMPLEMENTED_VERIFIED** + harden `migrate.ts` (cierra bypass `pnpm migrate`) |
 | **Legal** | `claimReady` **false** · Pepito **forbidden** |
 | **Coste** | 0 |
 
-### Capacidades
+### Capacidades (honestas)
 
 | Capacidad | Estado |
 |-----------|--------|
-| ERP staging (persist/A/B/concurrency) | **IMPLEMENTED_VERIFIED** |
-| ERP schema prod 519/520 | **IMPLEMENTED_VERIFIED** (schema; no revert) |
-| Prod migrate gate ADR-064 | **IMPLEMENTED_VERIFIED** (código + staging apply + prod no-op logs) |
-| Dual-write relacional | **PREPARED_OFF** (ADR-062) |
+| ERP persist/A/B/concurrency | **IMPLEMENTED_VERIFIED** |
+| Prod migrate gate (migrate:prod + migrate.ts) | **IMPLEMENTED_VERIFIED** |
+| Dual-write relacional | **PREPARED_OFF** |
 | Multirréplica 2+ | **PREPARED_OFF** |
-| OS/agency cores / influencers | **IMPLEMENTED_VERIFIED** (core/staging) |
+| i18n UI key parity + saas nav/common/errors/settings | **IMPLEMENTED_VERIFIED** |
+| i18n remaining saas.* pages / email / PDF | **PREPARED_OFF** (PARTIAL content) |
+| Android local assembleDebug | **IMPLEMENTED_VERIFIED** |
+| Android device smoke / iOS / Play | **BLOCKED_EXTERNAL** |
 | OAuth/Twilio/ads/publish reales | **BLOCKED_EXTERNAL** |
 | IA canary prod / OpenAI | **BLOCKED_CEO** / OFF |
 | Mass-send / Pepito | **BLOCKED_LEGAL** |
@@ -41,18 +43,18 @@
 
 ## Próximo paso EXACTO
 
-1. **Daniel:** firmar ack histórico 519/520 + política auto-deploy en `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` / `PROD_MIGRATE_GATE_RUNBOOK.md`.
-2. **Daniel:** no dejar `NELVYON_PROD_MIGRATE_*` permanentes en prod; solo ventana migratoria deliberada.
-3. **CEO:** canary IA / iOS / Pepito / OAuth reales según checklists — **sin declarar READY**.
+1. **Daniel:** ack 519/520 + política auto-deploy · no dejar `NELVYON_PROD_MIGRATE_*` permanentes.
+2. **CEO:** canary IA (`CEO_IA_PROD_CANARY_REQUEST.md`) · iOS · Pepito/legal · OAuth reales.
+3. **Device:** `adb` smoke Android (3 pasos en checklist móvil).
 
 ## Acciones solo Daniel
 
 | # | Acción | Doc |
 |---|--------|-----|
-| 1 | Ack 519/520 histórico + política auto-deploy | `ERP_PROD_MIGRATE_519_520_RUNBOOK.md` · `PROD_MIGRATE_GATE_RUNBOOK.md` |
-| 2 | Ventana migrate futura: set/unset vars aprobación | `PROD_MIGRATE_GATE_RUNBOOK.md` |
-| 3 | Canary IA prod | `CEO_IA_PROD_CANARY_REQUEST.md` |
-| 4 | PWA iOS / Pepito / OAuth reales | checklists ops |
+| 1 | Ack 519/520 + migrate policy | `PROD_MIGRATE_GATE_RUNBOOK.md` |
+| 2 | Ventana migrate futura set/unset | idem |
+| 3 | Canary IA prod SÍ/NO | `CEO_IA_PROD_CANARY_REQUEST.md` |
+| 4 | Android device / iOS / OAuth / Pepito | checklists ops |
 
 ### Rollback staging
 

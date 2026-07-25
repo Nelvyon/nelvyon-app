@@ -1,13 +1,15 @@
-# Mobile Android — Capacitor scaffold PASS · build BLOCKED
+# Mobile Android — Capacitor scaffold PASS · build superseded by assembleDebug VERIFIED
 
 | Campo | Valor |
 |-------|-------|
 | Fecha | 2026-07-25 |
-| Entorno | Windows 10 · sin Android SDK / JDK `assembleDebug` verificado en PATH |
-| Proyecto nativo | **`apps/mobile/android/` EXISTE** — Capacitor Android scaffold presente |
-| Scaffold | **PASS** |
-| Debug APK / install smoke | **BLOCKED_EXTERNAL** (JDK/SDK pending) |
-| Play Store / iOS | **NO reclamados** — siguen BLOCKED_EXTERNAL |
+| Scaffold | **PASS** — `apps/mobile/android/` presente |
+| Local build | **SUPERSEDED** → ver `mobile.android_build_latest.md` (**assembleDebug BUILD SUCCESSFUL**) |
+| Device install smoke | **BLOCKED_EXTERNAL** (sin adb device/AVD) |
+| Play Store / iOS | **BLOCKED_EXTERNAL** |
+
+> Esta nota de scaffold queda histórica. El estado vivo de build es
+> `mobile.android_build_latest.md`. No reclamar device smoke PASS.
 
 ## Checks
 

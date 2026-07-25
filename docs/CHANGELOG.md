@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Audit / Infra / i18n | **CIERRE INTERNO ABSOLUTO** | 0 P0 · harden ADR-064 en `migrate.ts` (cierra bypass `pnpm migrate`) +2 tests · saas nav/common/errors/settings fr/de/it/pt nativos · mobile SSOT (build VERIFIED · device BLOCKED) · CEO canary request actualizado · ERP A/B+concurrency reval **ALL_PASS** · tsc 0 · anti-mock PASS · `claimReady: false` · **NOT READY** |
 | Infra / DB | **ADR-064 VERIFIED live (staging+prod)** | tip **`c2edb2da`** · staging deploy **`da6b7a74`** apply-allowed · prod deploy **`a82b55ac`** `isProduction=true` `pending_count=0` skip-apply · ERP A/B+concurrency **ALL_PASS** · evidencia `prod.migrate_gate_latest.md` · 519/520 **kept** · `claimReady: false` · **NOT READY** |
 | Infra / DB | **ADR-064 prod migrate gate (P0 gobernanza)** | `migrate-prod.ts` fail-closed en production sin `NELVYON_PROD_MIGRATE_APPROVED=1`+`APPROVED_BY`; pending>0 → exit 1; staging auto-apply; vitest 13 PASS; runbook `PROD_MIGRATE_GATE_RUNBOOK.md`; 519/520 **no revertidas**; `claimReady: false` |
 | Docs / Ops | **TOTAL QUALITY release-readiness** | Reval ERP A/B+concurrency+persist **ALL_PASS** · tsc/vitest/eslint/anti-mock PASS · prod tip **`5a36809c`** · IA keys ABSENT · **519/520 prod already applied** (migrate skip; auto-deploy) · CEO formal ack still required · code P0 **none** · `claimReady: false` · **NOT READY** |

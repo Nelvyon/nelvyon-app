@@ -10,9 +10,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Mitigado VERIFIED live** — tip `c2edb2da` · prod logs skip-apply · 519/520 **no revertidas** |
-| **Detalle** | Gate: `NELVYON_PROD_MIGRATE_APPROVED=1` + `APPROVED_BY`; pending sin approval → deploy fail. Staging auto-migrate intacto. |
-| **Evidencia** | `prodMigrateGate.ts` · vitest 13 PASS · staging `da6b7a74` · prod `a82b55ac` · `prod.migrate_gate_latest.md` · ADR-064 |
+| **Estado** | **Mitigado VERIFIED** — tip `c2edb2da` · prod skip-apply · `migrate.ts` también gated · 519/520 **no revertidas** |
+| **Detalle** | Gate: `NELVYON_PROD_MIGRATE_APPROVED=1` + `APPROVED_BY`; pending sin approval → deploy/`pnpm migrate` fail. Staging auto-migrate intacto. |
+| **Evidencia** | `prodMigrateGate.ts` · `migrate.ts` · vitest · staging `da6b7a74` · prod `a82b55ac` · `prod.migrate_gate_latest.md` · ADR-064 |
 | **Pendiente CEO** | Ack histórico + no dejar vars approval permanentes en prod |
 
 ### Ops (no KI) — Email + PDF locale PARTIAL (no FULL_VERIFIED)

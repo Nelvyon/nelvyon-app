@@ -33,6 +33,28 @@ describe("prodMigrateGate — environment resolution", () => {
   });
 });
 
+describe("prodMigrateGate — low-level migrate.ts must share gate semantics", () => {
+  it("blocks production apply when pending>0 without approval (pnpm migrate bypass)", () => {
+    const decision = evaluateProdMigrateGate({
+      isProduction: true,
+      approval: readProdMigrateApproval({}),
+      pendingCount: 2,
+    });
+    expect(decision.allowApply).toBe(false);
+    expect(decision.exitCode).toBe(1);
+  });
+
+  it("allows non-production apply without approval (staging/local migrate.ts)", () => {
+    const decision = evaluateProdMigrateGate({
+      isProduction: false,
+      approval: readProdMigrateApproval({}),
+      pendingCount: 2,
+    });
+    expect(decision.allowApply).toBe(true);
+    expect(decision.exitCode).toBe(0);
+  });
+});
+
 describe("prodMigrateGate — approval", () => {
   it("rejects missing approval flag", () => {
     const a = readProdMigrateApproval({});

@@ -12,13 +12,13 @@
 
 ## Solución
 
-`migrate-prod.ts` + `prodMigrateGate.ts`:
+`migrate-prod.ts` + `prodMigrateGate.ts` + **`migrate.ts`** (low-level entrypoint also gated):
 
 | Entorno | Comportamiento |
 |---------|----------------|
 | Staging / non-prod | Aplica migraciones (como antes) |
 | Production + **sin** aprobación + **0** pending | Exit **0** (no-op; gate activo) |
-| Production + **sin** aprobación + pending **>0** | Exit **1** (bloquea deploy) |
+| Production + **sin** aprobación + pending **>0** | Exit **1** (bloquea deploy **y** `pnpm migrate`) |
 | Production + aprobación CEO | Aplica migraciones |
 
 ### Variables de aprobación (ventana única)

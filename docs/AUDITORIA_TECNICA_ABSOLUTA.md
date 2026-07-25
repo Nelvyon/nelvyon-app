@@ -1,19 +1,19 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> **2026-07-25** ADR-064 **VERIFIED live** · tip `c2edb2da` · claimReady false  
-> Veredicto: **CONDITIONAL_READY** · **NOT READY**
+> **2026-07-25** CIERRE INTERNO ABSOLUTO · tip live `c2edb2da` · claimReady false  
+> Veredicto: **CONDITIONAL_READY** · **NOT READY** · **0 P0 abiertos**
 
 ### Matriz
 
 | Dimensión | Estado |
 |-----------|--------|
-| VERDE | ERP staging · migrate gate código · cores · anti-mock · health |
-| PREPARADO OFF | Dual-write · pgvector Railway · 2ª réplica · IA canary |
+| VERDE | ERP staging · ADR-064 migrate:prod+migrate.ts · cores · anti-mock · health · i18n shell · Android build |
+| PREPARADO OFF | Dual-write · pgvector Railway · 2ª réplica · IA canary · remaining saas.* EN copy · email/PDF PARTIAL |
 | BLOQUEO CEO | Ack 519/520 · ventanas migrate · canary IA |
-| BLOQUEO EXTERNAL/LEGAL/SCOPE | OAuth/Twilio/iOS · Pepito · payments |
-| P0 corregido | Auto-migrate prod sin approval → **ADR-064 gate** |
+| BLOQUEO EXTERNAL/LEGAL/SCOPE | OAuth/Twilio/iOS/device · Pepito · payments |
+| P0 corregido | Auto-migrate prod sin approval → **ADR-064** · bypass `pnpm migrate` cerrado |
 | COSTES | 0 |
 
 ### Próximo
 
-Deploy staging del tip gate · CEO ack · **No READY**
+Solo acciones Daniel / proveedor / legal / mercado · **No READY**

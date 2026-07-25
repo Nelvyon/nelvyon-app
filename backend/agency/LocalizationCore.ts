@@ -88,7 +88,7 @@ export const KNOWN_SPANISH_LEFTOVER_KEYS = [
 ] as const;
 
 const FULL_VERIFIED_NOTE =
-  "UI message catalog (apps/web/messages/{locale}.json) has 100% key parity with es for ALL namespaces — verified by automated disk tests. Email is PARTIAL (Resend welcome/passwordReset/invoice/jobCompleted/onboardingComplete + SES payment_failed/cancellation localized; other SES catalog + billing dunning/offboarding templates Spanish-only). PDF is PARTIAL (quote/invoice label maps for es/en/fr/de/it/pt; not full document localization). Do not claim email/PDF FULL_VERIFIED.";
+  "UI message catalog (apps/web/messages/{locale}.json) has 100% key parity with es for ALL namespaces — verified by automated disk tests. Shell/nav-critical saas.nav + saas.common + saas.errors + saas.settings are natively localized for fr/de/it/pt (2026-07-25). Remaining saas.* module pages may still use English copy (content quality gap; not Spanish leftovers; key parity intact). Email is PARTIAL (Resend welcome/passwordReset/invoice/jobCompleted/onboardingComplete + SES payment_failed/cancellation localized; other SES catalog + billing dunning/offboarding templates Spanish-only). PDF is PARTIAL (quote/invoice label maps for es/en/fr/de/it/pt; not full document localization). Do not claim email/PDF FULL_VERIFIED.";
 
 export const LOCALE_CATALOG: readonly LocaleCatalogEntry[] = [
   {

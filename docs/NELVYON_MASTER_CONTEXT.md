@@ -1021,8 +1021,8 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | tip **`c2edb2da`** staging `da6b7a74` + prod `a82b55ac` · ADR-064 **VERIFIED live** · 519/520 prod kept · ERP staging VERIFIED · IA ABSENT |
-| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-062 dual-write **PREPARED_OFF** · ADR-064 prod migrate gate **VERIFIED** |
+| **SHA / deploys** | tip live **`c2edb2da`** · ADR-064 harden `migrate.ts` (audit closure) · staging `da6b7a74` + prod `a82b55ac` · ERP VERIFIED · IA ABSENT |
+| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-062 dual-write **PREPARED_OFF** · ADR-064 prod migrate gate **VERIFIED** (+ migrate.ts) |
 | **ERP honesty** | Staging full path VERIFIED · prod schema live · futuras migs gated · payments **BLOCKED_SCOPE** · **no Odoo** |
 | **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker **VERIFIED** / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile Android build VERIFIED / device+stores **BLOCKED** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |
 | **Competitive honesty** | No live OAuth spend · no GHL telephony parity (sim only) · **no Odoo ERP/finance** · mass-send blocked · social/publish pending CEO · no proven multi-tenant prod outcomes |

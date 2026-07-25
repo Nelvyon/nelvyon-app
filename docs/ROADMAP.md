@@ -84,7 +84,7 @@
 | **ADR-060 ERP non-financial cores (catalog v1.7.0)** | ✅ | Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI wired · mig **519** reserved · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · **NOT READY** |
 | **ADR-061 Postgres ERP SSOT (mig 520)** | ✅ | Staging+prod tip **`c2edb2da`** · schema prod applied · reval ALL_PASS · CEO formal ack pending |
 | **ADR-062 ERP relational dual-write** | 🟡 | **PREPARED_OFF** |
-| **ADR-064 prod migrate gate** | ✅ | **VERIFIED live** tip `c2edb2da` · staging apply · prod skip-apply · 519/520 kept · CEO window vars |
+| **ADR-064 prod migrate gate** | ✅ | **VERIFIED** tip `c2edb2da` · migrate:prod + migrate.ts · staging apply · prod skip-apply · 519/520 kept |
 | **TOTAL QUALITY 2026-07-25** | ✅ | Gates PASS · 0 code P0 residual · **NOT READY** (legal/CEO/external) |
 | Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |
 | Block 12 influencers_pr | ✅ | **VERIFIED** · outreach forbidden |
