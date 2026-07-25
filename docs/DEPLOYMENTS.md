@@ -1,18 +1,29 @@
 # DEPLOYMENTS — Historial de despliegues
 
-> Registrar cada deploy significativo. Actualizado: **2026-07-25** (ADR-061 VERIFIED staging). No borrar entradas. Añadir al inicio.
+> Actualizado: **2026-07-25** (ERP staging closure A/B+concurrency). No borrar entradas.
+
+## 2026-07-25 — tip `5a36809c` · deploy `5965c32b` · reserve + A/B + concurrency
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | staging `ideal-victory` |
+| **Tip** | **`5a36809c`** |
+| **Deploy** | **`5965c32b` SUCCESS** |
+| **Evidence** | `erp.http_ab_isolation_latest.md` **ALL_PASS** · `erp.concurrency_latest.md` **ALL_PASS** |
+| **ADR-062** | Relational dual-write **PREPARED_OFF** |
+| **Prod** | migrate **not** run · runbook ready · **BLOCKED_CEO** |
+| **claimReady** | **false** |
 
 ## 2026-07-25 — ADR-061 VERIFIED · tip `9e931f08` · mig 519+520 · restart ALL_PASS
 
 | Campo | Valor |
 |-------|-------|
 | **Env** | staging `ideal-victory` |
-| **Tip** | **`9e931f08`** (`/api/health/live` `9e931f087897`) |
-| **Deploy mig** | **`86c93c8c` SUCCESS** (applied **519+520**) |
-| **Deploy recycle** | **`794662d7` SUCCESS** (redeploy = process recycle for survival proof) |
-| **ERP honesty** | Postgres `erp_domain_snapshots` SSOT · smoke **ALL_PASS** · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · **no** prod migrate |
-| **Evidence** | `erp.persistence_restart_latest.md` **ALL_PASS** · DB purchases snapshot v3 · RLS on |
-| **claimReady** | **false** · **NOT READY** · **CONDITIONAL_READY** |
+| **Tip** | **`9e931f08`** |
+| **Deploy mig** | **`86c93c8c` SUCCESS** |
+| **Deploy recycle** | **`794662d7` SUCCESS** |
+| **Evidence** | `erp.persistence_restart_latest.md` **ALL_PASS** |
+| **claimReady** | **false** |
 
 ## 2026-07-25 — ADR-061 Postgres ERP SSOT · mig 519+520 · API `with*Persistence` (código previo a VERIFIED)
 

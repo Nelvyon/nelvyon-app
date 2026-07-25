@@ -6,14 +6,13 @@
 
 ## Activos
 
-### Ops (no KI) — ERP prod migrate still gated (ADR-061 staging VERIFIED)
+### Ops (no KI) — ERP prod migrate still gated (ADR-061/062 · staging VERIFIED)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto (prod gate)** — staging restart **ALL_PASS**; prod ERP schema **not** activated |
-| **Detalle** | Staging tip **`9e931f08`** · mig **519+520** · `erp.persistence_restart_latest.md` **ALL_PASS**. Prod: **no** migrate/activate without explicit CTO recommendation. Payments/accounting **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · **no Odoo**. |
-| **Evidencia** | HANDOVER · DEPLOYMENTS · `erp.persistence_restart_latest.md` · ADR-061 |
-| **Remediación** | Explicit CTO go-ahead before prod migrate; optional relational dual-write 519 later |
+| **Estado** | **Abierto (prod gate)** — staging A/B+concurrency+restart **ALL_PASS**; prod **BLOCKED_CEO** |
+| **Detalle** | tip **`5a36809c`** · runbook `ERP_PROD_MIGRATE_519_520_RUNBOOK.md`. Local prod DB probe via `railway run` → **ENOTFOUND** `postgres.railway.internal` (no migrate). Dual-write relacional **PREPARED_OFF** (ADR-062). 2ª réplica app **no** demostrada (0€). |
+| **Evidencia** | HANDOVER · CTO_FINAL_VERIFY · erp.*_latest.md |
 
 ### Ops (no KI) — Email + PDF locale PARTIAL (no FULL_VERIFIED)
 

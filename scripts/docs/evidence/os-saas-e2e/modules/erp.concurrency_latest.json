@@ -1,0 +1,48 @@
+{
+  "verdict": "ALL_PASS",
+  "base": "https://ideal-victory-staging.up.railway.app",
+  "at": "2026-07-25T15:07:53.572Z",
+  "results": [
+    {
+      "check": "auth",
+      "ok": true,
+      "detail": "userId=920e1939-de70-46ca-a351-cdf3f2b6a90b"
+    },
+    {
+      "check": "saas-tenant",
+      "ok": true,
+      "detail": "dashboard OK"
+    },
+    {
+      "check": "seed.inventory",
+      "ok": true,
+      "detail": "sku=CONC-22112d05 loc=a9f637e3-785c-4525-b77e-86bcc779d9a9"
+    },
+    {
+      "check": "conc.receive.same_key",
+      "ok": true,
+      "detail": "stock=10 statuses=201,201 moveIds=58270e31-6014-492c-931e-99cd7044065b|58270e31-6014-492c-931e-99cd7044065b"
+    },
+    {
+      "check": "conc.receive.distinct",
+      "ok": true,
+      "detail": "+15 stock=25 responses_okish=3"
+    },
+    {
+      "check": "conc.reserve.parallel",
+      "ok": true,
+      "detail": "avail=0 reserved=25 a=201/ok b=400/INSUFFICIENT_STOCK"
+    },
+    {
+      "check": "conc.pr.same_key",
+      "ok": true,
+      "detail": "id=94088b30-cfa3-4458-b27d-2394fb05ea66 a=201 b=201"
+    },
+    {
+      "check": "conc.mo.parallel",
+      "ok": true,
+      "detail": "mos=2 a=201 b=201"
+    }
+  ],
+  "critical": []
+}

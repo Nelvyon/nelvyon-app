@@ -1021,9 +1021,9 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | staging tip **`9e931f08`** · deploy **`794662d7` SUCCESS** · mig **519+520** · `AUTONOMOUS_ALLOW_OPENAI=0` · prod flags **OFF** |
-| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API wired · **ADR-061** Postgres `erp_domain_snapshots` SSOT (process-memory **not** SSOT) · ads/community cores **VERIFIED** (core/sim) · OAuth/spend/publish **BLOCKED_EXTERNAL** |
-| **ERP honesty** | API/UI `/saas/erp/*` → `with*Persistence` · mig **519+520** staging · restart smoke **ALL_PASS** · payments/accounting **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · health **BLOCKED_LEGAL** · **still no Odoo / no finance GL** · prod migrate **gated CTO** |
+| **SHA / deploys** | staging tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · mig **519+520** · A/B+concurrency+restart **ALL_PASS** · prod ERP migrate **BLOCKED_CEO** |
+| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-061 snapshot SSOT · ADR-062 dual-write **PREPARED_OFF** |
+| **ERP honesty** | HTTP A/B VERIFIED · concurrency VERIFIED · restart VERIFIED · payments **BLOCKED_SCOPE** · IoT/signature **BLOCKED_EXTERNAL** · **no Odoo** · prod migrate gated |
 | **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker **VERIFIED** / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile Android build VERIFIED / device+stores **BLOCKED** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |
 | **Competitive honesty** | No live OAuth spend · no GHL telephony parity (sim only) · **no Odoo ERP/finance** · mass-send blocked · social/publish pending CEO · no proven multi-tenant prod outcomes |
 | **Blocker claimReady** | Legal Pepito + licencia · mass-send **BLOCKED_LEGAL** |

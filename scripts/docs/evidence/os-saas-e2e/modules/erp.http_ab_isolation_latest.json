@@ -1,0 +1,108 @@
+{
+  "verdict": "ALL_PASS",
+  "base": "https://ideal-victory-staging.up.railway.app",
+  "at": "2026-07-25T15:07:20.007Z",
+  "results": [
+    {
+      "check": "A.register",
+      "ok": true,
+      "detail": "erp-ab-A-d0bb93e5@nelvyon.test"
+    },
+    {
+      "check": "A.onboard",
+      "ok": true,
+      "detail": "tenant=abd2621a-a0a9-4eb8-8400-649f878f9eca"
+    },
+    {
+      "check": "B.register",
+      "ok": true,
+      "detail": "erp-ab-B-d1558ef7@nelvyon.test"
+    },
+    {
+      "check": "B.onboard",
+      "ok": true,
+      "detail": "tenant=dd878889-2a3a-4928-8b77-61c551012de4"
+    },
+    {
+      "check": "A.seed.supplier",
+      "ok": true,
+      "detail": "231b8031-46d4-4deb-8a1a-8428d1cbdc37"
+    },
+    {
+      "check": "A.seed.inventory",
+      "ok": true,
+      "detail": "sku=SKU-A-9d432ab9 loc=35fbeae2-d9cf-4c15-b2cb-7253f8af59e6 qty=100"
+    },
+    {
+      "check": "A.seed.mfg",
+      "ok": true,
+      "detail": "bom=5c5eca7a-6174-4d37-806b-a85d08a01096 mo=9c7a3616-d52b-44bd-acc0-05866e996204"
+    },
+    {
+      "check": "A.seed.projects",
+      "ok": true,
+      "detail": "3628a06f-fb51-4b4e-be5e-8c94970bf033"
+    },
+    {
+      "check": "B.seed.own_supplier",
+      "ok": true,
+      "detail": "2b480702-4c52-48fb-aa3f-896d2bbce419"
+    },
+    {
+      "check": "B.isolation.purchases.list",
+      "ok": true,
+      "detail": "A supplier absent"
+    },
+    {
+      "check": "B.isolation.inventory.list",
+      "ok": true,
+      "detail": "A inventory absent"
+    },
+    {
+      "check": "B.isolation.mfg.list",
+      "ok": true,
+      "detail": "A mfg absent"
+    },
+    {
+      "check": "B.isolation.projects.list",
+      "ok": true,
+      "detail": "A project absent"
+    },
+    {
+      "check": "B.mutate.receive_A_loc",
+      "ok": true,
+      "detail": "blocked HTTP 404 code=NOT_FOUND"
+    },
+    {
+      "check": "B.mutate.reserve_A_stock",
+      "ok": true,
+      "detail": "blocked HTTP 404 code=NOT_FOUND"
+    },
+    {
+      "check": "B.mutate.create_mo_A_bom",
+      "ok": true,
+      "detail": "blocked HTTP 404 code=NOT_FOUND"
+    },
+    {
+      "check": "B.mutate.approve_A_bom",
+      "ok": true,
+      "detail": "blocked HTTP 404"
+    },
+    {
+      "check": "B.mutate.timesheet_A_project",
+      "ok": true,
+      "detail": "blocked HTTP 404 code=NOT_FOUND"
+    },
+    {
+      "check": "A.intact_after_B_attacks",
+      "ok": true,
+      "detail": "stock available=100 reserved=0"
+    },
+    {
+      "check": "A.isolation.purchases.list",
+      "ok": true,
+      "detail": "B supplier absent from A"
+    }
+  ],
+  "critical": []
+}

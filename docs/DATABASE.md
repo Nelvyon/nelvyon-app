@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-25** — **ADR-061 VERIFIED staging** · última mig repo **`520_erp_postgres_persistence.sql`** · tip **`9e931f08`** · `_migrations` **519+520** · restart **ALL_PASS**
+> Actualizado: **2026-07-25** — tip **`5a36809c`** · mig **519+520** staging · A/B+concurrency VERIFIED · ADR-062 PREPARED_OFF · prod **BLOCKED_CEO**
 
 ---
 
@@ -8,15 +8,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Migración 519** | `519_erp_non_financial_cores.sql` — companion relational tables **reserved** (not required for first durable path) |
-| **Migración 520** | `520_erp_postgres_persistence.sql` — `erp_domain_snapshots` (tenant+domain PK, JSONB payload, optimistic `version`) + `erp_audit_events` + RLS helpers |
-| **Core API** | `exportTenantSnapshot` / `importTenantSnapshot` on 4 ERP cores · `ErpDomainSnapshotStore` · `with*Persistence` |
-| **Runtime SSOT** | **Postgres** `erp_domain_snapshots` when `DATABASE_URL` set — **process-memory is not SSOT** · without DB → in-memory fallback (dev/tests) · version conflict → HTTP **409** |
-| **API routes** | `/api/saas/erp/{purchases,inventory,manufacturing,projects-fs}` → `with*Persistence` |
-| **Fuera de alcance** | Payments · bank · tax · GL · cost accounting · IoT · e-signature (**BLOCKED_***) |
-| **Staging** | tip **`9e931f08`** · **519+520** in `_migrations` · restart smoke **ALL_PASS** · snapshot purchases v3 · RLS on |
-| **Prod** | **519/520 not claimed** · **no** migrate without CTO go-ahead |
-| **Datos Pepito** | **No importados** · `pepitoDbForbidden: true` · **untouched** |
+| **Staging** | tip **`5a36809c`** · **519+520** applied · restart+A/B+concurrency **ALL_PASS** |
+| **Prod** | **519/520 not claimed** · local probe ENOTFOUND internal · runbook **BLOCKED_CEO** |
+| **SSOT** | `erp_domain_snapshots` JSONB · dual-write companions **PREPARED_OFF** (ADR-062) |
 
 ## ADR-060 — ERP product surface (catalog v1.7.0 · superseded SSOT by ADR-061)
 

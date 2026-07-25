@@ -82,7 +82,8 @@
 | **ADR-057 Blocks 11–25 (internal cores)** | ✅ | cores internos VERIFIED · externos BLOCKED_* · **NOT READY** |
 | **ADR-059 catalog v1.6.0 + i18n/mobile honesty** | ✅ | ads/community promote (core/sim) · email locale PARTIAL · Android scaffold · tip live `bd165985` |
 | **ADR-060 ERP non-financial cores (catalog v1.7.0)** | ✅ | Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI wired · mig **519** reserved · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · **NOT READY** |
-| **ADR-061 Postgres ERP SSOT (mig 520)** | ✅ | Staging tip **`9e931f08`** · mig **519+520** · restart **ALL_PASS** · prod migrate **gated CTO** · `claimReady: false` |
+| **ADR-061 Postgres ERP SSOT (mig 520)** | ✅ | Staging tip **`5a36809c`** · A/B+concurrency+restart **ALL_PASS** · prod migrate **BLOCKED_CEO** |
+| **ADR-062 ERP relational dual-write** | 🟡 | **PREPARED_OFF** · plan only · snapshot remains SSOT |
 | Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |
 | Block 12 influencers_pr | ✅ | **VERIFIED** · outreach forbidden |
 | Block 13 ads_attribution_core | ✅ | **VERIFIED** (core) · spend/OAuth BLOCKED_EXTERNAL · catalog v1.6.0 |

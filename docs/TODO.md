@@ -20,7 +20,7 @@
 
 ---
 
-> Actualizado: **2026-07-25** — ADR-061 VERIFIED · tip **`9e931f08`** · restart **ALL_PASS** · **NOT READY**
+> Actualizado: **2026-07-25** — tip **`5a36809c`** · A/B+concurrency **ALL_PASS** · ADR-062 PREPARED_OFF · prod migrate **BLOCKED_CEO** · **NOT READY**
 
 ---
 
@@ -47,9 +47,11 @@
 - [x] **ADR-061 ERP API → `with*Persistence`:** purchases/inventory/manufacturing/projects-fs · Postgres SSOT when `DATABASE_URL` · process-memory **not** SSOT · 409 on version conflict · smoke script ready
 - [x] **P0 memory risk closed (staging VERIFIED):** restart/redeploy survival **ALL_PASS** · tip **`9e931f08`**
 - [x] **Ops:** staging restart smoke `--phase=before|after` → `erp.persistence_restart_latest.md` **ALL_PASS**
-- [ ] **CTO/Daniel:** explicit go-ahead before **prod** ERP migrate/activate (staging only today)
-- [ ] **ERP dual-write relational companions (519):** optional later — snapshot store is the first durable path
-- [ ] **Opcional:** staging HTTP multi-tenant A/B (unit A/B + RLS already VERIFIED)
+- [x] Staging tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · HTTP A/B + concurrency **ALL_PASS**
+- [x] **CTO/Daniel:** runbook prod ERP ready — execution still **BLOCKED_CEO** (`ERP_PROD_MIGRATE_519_520_RUNBOOK.md`)
+- [x] **Opcional HTTP A/B:** **DONE** `erp.http_ab_isolation_latest.md`
+- [ ] **ERP dual-write relational companions (ADR-062):** **PREPARED_OFF**
+- [ ] **2ª réplica staging concurrency:** **PREPARED_OFF** (coste Railway — CEO)
 - [ ] **P2 (no bloqueante):** RAG minScore corpus-size floor — `docs/KNOWN_ISSUES.md`
 - [ ] **CEO (opcional):** Railway pgvector + mesh Ollama staging — `CEO_IA_STAGING_APPROVAL_REQUEST.md`
 - [ ] **CEO:** telefonía — `TELEPHONY_PROVIDER_CEO_CHECKLIST.md`
