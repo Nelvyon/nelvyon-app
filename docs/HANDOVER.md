@@ -3,7 +3,7 @@
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
 > Última actualización: **2026-07-25** — **TOTAL QUALITY / RELEASE-READINESS** · staging tip **`5a36809c`** · reval ERP A/B+concurrency+persist **ALL_PASS** · prod live tip **`5a36809c`** · mig 519/520 prod **already applied** (auto-deploy; CEO formal ack pending) · `claimReady: false` · **NOT READY**  
 
-> Última actualización automática: **2026-07-25 15:19 UTC**
+> Última actualización automática: **2026-07-25 15:20 UTC**
 
 | Campo | Valor |
 |-------|-------|
