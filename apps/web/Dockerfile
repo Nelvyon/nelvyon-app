@@ -48,6 +48,12 @@ COPY --from=builder /app/apps/web/source.config.ts ./apps/web/source.config.ts
 COPY --from=builder /app/apps/web/server.js ./apps/web/server.js
 # next.config.ts imports SSOT headers at process start (runtime require)
 COPY --from=builder /app/apps/web/src/lib/security ./apps/web/src/lib/security
-WORKDIR /app/apps/web
-CMD ["node", "server.js"]
-# release: 2026-07-21 runtime headers COPY for next.config
+# ADR-068: Tailscale Mesh Option A entrypoint (NELVYON_MESH_OPTION_A=1 + TS_AUTHKEY).
+# Without this, TS_AUTHKEY alone cannot join mesh / reach private Ollama.
+COPY scripts/railway-mesh-option-a-entrypoint.sh /app/scripts/railway-mesh-option-a-entrypoint.sh
+RUN chmod +x /app/scripts/railway-mesh-option-a-entrypoint.sh \
+  && (apk add --no-cache wget ca-certificates >/dev/null 2>&1 || true)
+# WORKDIR /app so preDeploy migrate + entrypoint `cd /app/apps/web` stay consistent.
+WORKDIR /app
+CMD ["sh", "/app/scripts/railway-mesh-option-a-entrypoint.sh"]
+# release: 2026-07-26 ADR-068 mesh entrypoint for private AI canary

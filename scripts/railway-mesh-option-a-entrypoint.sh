@@ -1,8 +1,10 @@
 #!/bin/sh
-# Railway staging Mesh Option A — optional Tailscale userspace (cost 0).
+# Railway Mesh Option A — optional Tailscale userspace (cost 0).
 # Activates ONLY when NELVYON_MESH_OPTION_A=1 AND TS_AUTHKEY is set.
-# Forbidden: Funnel, Serve, exit node, subnet routes, production use.
-# Prod without these env vars = identical to plain Next start.
+# Forbidden: Funnel, Serve, exit node, subnet routes, public Ollama bind.
+# Staging: default hostname nelvyon-staging-web.
+# Prod canary (ADR-068 CEO): set NELVYON_MESH_HOSTNAME=nelvyon-prod-web-canary.
+# Without MESH flags = identical to plain Next start (fail-closed).
 
 set -eu
 
@@ -13,7 +15,7 @@ mesh_on="${NELVYON_MESH_OPTION_A:-0}"
 auth="$(printf '%s' "${TS_AUTHKEY:-}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
 
 if [ "$mesh_on" = "1" ] && [ -n "$auth" ]; then
-  echo "[mesh-option-a] enabling Tailscale userspace (staging)"
+  echo "[mesh-option-a] enabling Tailscale userspace hostname=${NELVYON_MESH_HOSTNAME:-nelvyon-staging-web}"
   arch="$(uname -m)"
   case "$arch" in
     x86_64|amd64) ts_arch="amd64" ;;
