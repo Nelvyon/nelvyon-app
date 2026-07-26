@@ -25,13 +25,20 @@ Autorizar (o no) un **futuro** canary productivo de IA propia vía Ollama local 
 
 - OpenAI / APIs de pago · `NELVYON_AI_ENABLED` en prod · MCP/SM/OpenClaw productivo · partner payouts · campañas masivas · Pepito · migraciones prod sin ADR-064 approval
 
-## Rollback inmediato
+## Rollback inmediato (<5 min)
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
 NELVYON_AI_ENABLED=0
+AUTONOMOUS_ALLOW_OPENAI=0
 ```
 
+1. Set kill switch + AI off (Railway prod vars).  
+2. Redeploy/restart web service if needed.  
+3. Verify `/api/health/live` + `/api/health/ready` · confirm inference rejected.  
+4. Unset any temporary canary-only vars.  
+
+Documented target: **&lt;5 minutes** wall-clock from detect → kill.
 ## Firma
 
 | Rol | Decisión | Fecha | Firma |

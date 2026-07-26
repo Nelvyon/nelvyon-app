@@ -1,30 +1,28 @@
-# CTO Final Verify — 2026-07-25 (puntos 1–7)
+# CTO Final Verify — 2026-07-26 (CIERRE TOTAL Cursor)
 
 > **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0
 
-## SHAs
+## SHAs / health
 
-| Entorno | Tip | Deploy |
-|---------|-----|--------|
-| Staging | `e5cb8c85` | `f0d3c57c` SUCCESS · live+ready 200 |
-| Prod | `0a253c7f` | read-only · gate skip-apply prior |
-
-## Tabla puntos 1–7
-
-| # | Área | Estado | Evidencia | Bloqueo residual |
-|---|------|--------|-----------|------------------|
-| 1 | Deploy staging | **IMPLEMENTED_VERIFIED** | `f0d3c57c` · SHA `e5cb8c85` · migrate+gate logs · tsc/vitest/anti-mock | — |
-| 2 | Traducciones SaaS | **IMPLEMENTED_VERIFIED** (UI catalogs) | saas nav/common/errors/settings/sso/audit localized · LocalizationCore tests | Email/PDF **PARTIAL** · legal copy = human review |
-| 3 | ERP dual-write | **PREPARED_OFF** | ADR-062 expandido · `erpRelationalFlags` · `erpDualWritePrep` · runbook | **CEO** cutover fase 4 |
-| 4 | Multirréplica | **BLOCKED_EXTERNAL/COST** | `ha.replica_cost_block_latest.md` · no `railway scale` | Coste réplica · equivalencia concurrency ALL_PASS |
-| 5 | RAG/pgvector Railway | Extension **VERIFIED** · path **PREPARED_OFF** | `railway.pgvector_probe_latest.md` · vector 0.8.0 installed · no `local_ai_rag_*` · no vector col on saas tables | Schema/wiring · `LOCAL_AI_DATABASE_URL` · Docker RAG still VERIFIED |
-| 6 | Android | Build **VERIFIED** · device **BLOCKED_EXTERNAL** | APK SHA256 `dd715704…` · smoke script · adb empty | Dispositivo físico/AVD |
-| 7 | PWA iOS/Safari | Chrome **VERIFIED** · iOS **BLOCKED_EXTERNAL** | `pwa-certify` PASS · checklist 3 pasos | iPhone/Safari real |
+| Entorno | Tip | Deploy | Health |
+|---------|-----|--------|--------|
+| Staging | `d03721c1` | `d0393675` SUCCESS | live+ready 200 |
+| Prod | `d03721c1` | auto | live OK · OpenAI OFF |
 
 ## Gates
 
-tsc **0** · vitest gate+i18n+dualWritePrep **70 PASS** · anti-mock **PASS** · pwa-certify **PASS**
+| Gate | Resultado |
+|------|-----------|
+| tsc | **0** |
+| vitest migrate+i18n+dualWrite+canary+ragPrep | **PASS** |
+| anti-mock | **PASS** |
+| ERP concurrency | **ALL_PASS** |
+| PWA certify | **PASS** |
+| apply-local-ai-schema sin flag | **blocked exit 2** (esperado) |
+| android-one-step | **BLOCKED_EXTERNAL** (sin adb) |
 
-## Veredicto
+## Capacidades (resumen)
 
-**NOT READY** — solo bloqueos Daniel / dispositivo / coste / CEO / legal / mercado.
+Ver tabla informe final en chat + `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` para solo-humano.
+
+**No READY.**

@@ -1021,7 +1021,7 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | staging tip **`e5cb8c85`** deploy **`f0d3c57c`** · prod tip **`0a253c7f`** · CIERRE 1–7 · ADR-064 · ERP VERIFIED · pgvector ext VERIFIED / path PREPARED_OFF · IA OpenAI OFF |
+| **SHA / deploys** | tip **`d03721c1`** staging+prod · CIERRE TOTAL Cursor · RAG prep PREPARED_OFF · master CEO actions · OpenAI OFF |
 | **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-062 dual-write **PREPARED_OFF** · ADR-064 prod migrate gate **VERIFIED** (+ migrate.ts) |
 | **ERP honesty** | Staging full path VERIFIED · prod schema live · futuras migs gated · payments **BLOCKED_SCOPE** · **no Odoo** |
 | **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker **VERIFIED** / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile Android build VERIFIED / device+stores **BLOCKED** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |

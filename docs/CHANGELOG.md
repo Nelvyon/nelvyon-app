@@ -3,6 +3,12 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-26
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Ops / IA / Mobile | **CIERRE TOTAL Cursor** | Staging+prod tip **`d03721c1`** VERIFIED · `railwayRagPrep`+apply script fail-closed · RAG runbook PREPARED_OFF · `android-one-step.mjs` · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` · email/PDF PARTIAL inventory · canary rollback &lt;5min · ERP concurrency ALL_PASS · `claimReady: false` |
+
 ## 2026-07-25
 
 | Área | Cambio | Descripción |

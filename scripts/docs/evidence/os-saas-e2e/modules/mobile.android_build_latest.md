@@ -10,14 +10,19 @@
 | Capacitor | `cap add android` + `cap sync` · `webDir=www` · `server.url=https://nelvyon.com/saas/dashboard` |
 | Log | `mobile.android_assemble_log.txt` |
 
-## Device install / E2E smoke
+## Android — un solo comando (tras conectar dispositivo)
 
-| Check | Result |
-|-------|--------|
-| `adb devices` | **empty** — no emulator / USB device attached |
-| Auth / tenant / CRM / tasks / offline on device | **BLOCKED_EXTERNAL** — requires physical device or AVD |
-| iOS / App Store | **BLOCKED_EXTERNAL** |
-| Play Store publish | **BLOCKED_EXTERNAL** ($25) |
+```bash
+node scripts/android-one-step.mjs
+```
+
+Requisitos: USB debugging o AVD · APK debug ya build (`assembleDebug`).  
+El script instala el APK y lista 3 comprobaciones humanas (login / CRM / offline).  
+Sin dispositivo → `BLOCKED_EXTERNAL` (no PASS falso).
+
+Checklist largo: `MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md` · iOS: `PWA_IOS_SAFARI_CEO_CHECKLIST.md`  
+Master: `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
+
 
 ## Tools installed this session (free)
 

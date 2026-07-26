@@ -1,15 +1,10 @@
-> **2026-07-25** — CIERRE 1–7 · staging `e5cb8c85` · `claimReady: false` · **NOT READY**
+> **2026-07-26** — CIERRE TOTAL Cursor · tip `d03721c1` · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** |
-| **Staging** | `e5cb8c85` / `f0d3c57c` SUCCESS |
-| **1 Deploy** | VERIFIED |
-| **2 i18n SaaS** | VERIFIED (email/PDF PARTIAL) |
-| **3 Dual-write** | PREPARED_OFF |
-| **4 Réplica** | BLOCKED_EXTERNAL/COST |
-| **5 pgvector Railway** | extension VERIFIED · path PREPARED_OFF |
-| **6 Android** | build VERIFIED · device BLOCKED |
-| **7 PWA iOS** | Chrome VERIFIED · iOS BLOCKED |
+| **Staging/Prod tip** | `d03721c1` |
+| **Interno Cursor** | Cerrado (RAG prep, Android one-step, master CEO list, email PARTIAL inventory) |
+| **Pendiente** | Solo Daniel / proveedor / legal / coste / mercado |
 
-SSOT: `HANDOVER.md` · `CTO_FINAL_VERIFY.md`
+SSOT: `HANDOVER.md` · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`

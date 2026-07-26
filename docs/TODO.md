@@ -1,15 +1,14 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-25** — CIERRE 1–7 · staging **`e5cb8c85`** · `claimReady: false` · **NOT READY**
+> Actualizado: **2026-07-26** — CIERRE TOTAL Cursor · tip **`d03721c1`** · `claimReady: false`
 
 ---
 
 ## P0 — Bloqueantes producción
 
 - [x] Completado y validado 2026-07-10
-- [x] **ADR-064 prod migrate gate** — migrate:prod + **migrate.ts** · staging/prod logs VERIFIED
-- [x] Audit élite 2026-07-25 — **0 P0** · P1 migrate bypass / mobile SSOT / i18n saas shell cerrados
-- [x] CIERRE 1–7 — staging deploy · i18n · dual-write prep · réplica cost-block · pgvector probe · Android/PWA honesty
+- [x] ADR-064 · CIERRE 1–7 · CIERRE TOTAL Cursor (RAG prep fail-closed · android-one-step · master CEO list)
+- [ ] **Solo humano:** `docs/ops/CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
 
 ---
 

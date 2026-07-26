@@ -1,6 +1,14 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-25** CIERRE 1–7 tip staging `e5cb8c85`.
+> Actualizado: **2026-07-26** CIERRE TOTAL Cursor tip `d03721c1`.
+
+## 2026-07-26 — CIERRE TOTAL Cursor
+
+| Campo | Valor |
+|-------|-------|
+| **Staging/Prod tip** | **`d03721c1`** · staging deploy **`d0393675` SUCCESS** |
+| **Artefactos** | RAG prep runbook · android-one-step · CEO master actions · email PARTIAL inventory |
+| **claimReady** | **false** |
 
 ## 2026-07-25 — CIERRE puntos 1–7
 
