@@ -7,7 +7,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | pending push (cursor total close) |
+| **Último commit** | 4792d3b9 |
 | **Fecha doc** | 2026-07-26 |
 | **Rama** | `main` |
 

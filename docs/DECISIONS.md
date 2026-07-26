@@ -811,3 +811,15 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Consecuencias** | Runbook `PROD_MIGRATE_GATE_RUNBOOK.md` · vars de aprobación son ventana única y reversibles · 519/520 **no se revierten** · `claimReady: false` |
 | **Evidencia** | `prodMigrateGate.ts` · `migrate-prod.ts` · `migrate.ts` · vitest gate PASS · staging `da6b7a74` · prod `a82b55ac` · tip `c2edb2da` |
 | **Relación** | ADR-011 · ADR-063 · KI governance prod migrate |
+
+---
+
+## ADR-065 — Railway Private RAG schema apply PREPARED_OFF
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-26 |
+| **Decisión** | No añadir `local_ai_*` a migraciones SaaS auto. Apply solo vía `scripts/apply-local-ai-schema.mjs` con `NELVYON_LOCAL_AI_SCHEMA_APPLY=1` (+ `USE_MAIN_DB` o `LOCAL_AI_DATABASE_URL`). |
+| **Por qué** | Extension pgvector ya en staging; path productivo requiere DDL + wiring consciente · evitar pending ADR-064 en prod por mig SaaS |
+| **Evidencia** | `railwayRagPrep.ts` · tests · `RAILWAY_PRIVATE_RAG_PREP_RUNBOOK.md` · apply sin flag → exit 2 |
+| **Estado** | **PREPARED_OFF** · cutover apply **BLOCKED_CEO** |
