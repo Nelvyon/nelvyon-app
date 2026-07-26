@@ -24,9 +24,7 @@ backend/local-ai/.venv
 **/__pycache__
 **/.pytest_cache
 **/.mypy_cache
-# Local WIP API routes (untracked) — not on origin/main; break build:prod typecheck if copied
+# Local WIP API routes — keep out of image until tracked + typecheck-clean on main
 apps/web/src/app/api/saas/mcp
 apps/web/src/app/api/saas/orchestrator
-apps/web/src/app/api/saas/private-ai/inference
-apps/web/src/app/api/saas/private-ai/metrics
-apps/web/src/app/api/saas/private-ai/router-health
+# private-ai inference/router-health/metrics are tracked (ADR-068) — do NOT exclude
