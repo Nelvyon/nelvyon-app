@@ -141,13 +141,17 @@ async function main() {
   });
   if (status.status === 200) {
     const blob = JSON.stringify(status.json);
-    if (/openai|sk-/i.test(blob) && /allow.*true|enabled.*true/i.test(blob)) {
+    const openaiOn =
+      /"openai"[^}]{0,80}"(enabled|allow)"\s*:\s*true/i.test(blob) ||
+      /AUTONOMOUS_ALLOW_OPENAI["']?\s*:\s*["']?1/i.test(blob) ||
+      /sk-[A-Za-z0-9]{20,}/.test(blob);
+    if (openaiOn) {
       fail("status.no_openai", blob.slice(0, 200));
     } else {
-      pass("status.ok", blob.slice(0, 200));
+      pass("status.ok_no_openai_egress", blob.slice(0, 200));
     }
   } else {
-    fail("status.ok", `HTTP ${status.status}`);
+    fail("status.ok_no_openai_egress", `HTTP ${status.status}`);
   }
 
   // Low-risk PM-style prompt → expect 3B path when QR on
