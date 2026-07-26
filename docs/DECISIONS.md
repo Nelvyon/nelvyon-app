@@ -809,8 +809,8 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Decisión** | `migrate:prod` **y** `migrate.ts` en producción **no aplican** SQL pendientes sin `NELVYON_PROD_MIGRATE_APPROVED=1` + `NELVYON_PROD_MIGRATE_APPROVED_BY`. Pending sin approval → **exit 1**. Pending=0 → no-op exit 0. Staging sigue auto-apply. |
 | **Por qué** | Auto-deploy de `main` aplicó ERP 519/520 sin firma CEO (ADR-063). Gate técnico evita repetición; harden 2026-07-25 cierra bypass `pnpm migrate`. |
 | **Consecuencias** | Runbook `PROD_MIGRATE_GATE_RUNBOOK.md` · vars de aprobación son ventana única y reversibles · 519/520 **no se revierten** · `claimReady: false` |
-| **Evidencia** | `prodMigrateGate.ts` · `migrate-prod.ts` · `migrate.ts` · vitest gate PASS · staging `da6b7a74` · prod `a82b55ac` · tip `c2edb2da` |
-| **Relación** | ADR-011 · ADR-063 · KI governance prod migrate |
+| **Evidencia** | `prodMigrateGate.ts` · `migrate-prod.ts` · `migrate.ts` · vitest gate PASS · staging `da6b7a74` · prod `a82b55ac` · tip `c2edb2da` · **CEO-ACK ADR-067 #1 (2026-07-26)** |
+| **Relación** | ADR-011 · ADR-063 · ADR-067 · KI governance prod migrate |
 
 ---
 
@@ -835,3 +835,15 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Por qué** | Pedido CEO: preparar y cerrar sin activar ni costes ni OpenAI. |
 | **Evidencia** | `points_1_4_failclosed_latest.json` · `points_1_4_prep_latest.md` · ERP ALL_PASS · orphan classify 14→0 |
 | **Consecuencias** | `claimReady: false` · activaciones solo tras respuesta CEO |
+
+---
+
+## ADR-067 — CEO decision puntos 1–4 (2026-07-26)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-26 |
+| **Decisión** | **#1 SÍ** — certificar/mantener gate ADR-064 fail-closed (ventana temporal obligatoria); **no** ejecutar migraciones nuevas ahora. **#2 NO todavía** — dual-write ERP PREPARED_OFF / JSONB SSOT. **#3 NO todavía** — RAG Railway apply bloqueado / sin DDL. **#4 NO todavía** — canary IA + OpenAI + OpenClaw + MCP + SM productivo OFF en prod. |
+| **Por qué** | Firma CEO escrita en chat Cursor · política migrate sin abrir activaciones de coste/riesgo. |
+| **Evidencia** | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` · `points_1_4_ceo_decision_latest.md` · vitest gate + soft-flag reject · ERP A/B ALL_PASS · apply exit 2 |
+| **Consecuencias** | Gate policy **CEO-ACK** · cutovers 2–4 siguen **BLOCKED_CEO** · `claimReady: false` · **NOT READY** |

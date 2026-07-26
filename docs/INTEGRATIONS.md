@@ -1,10 +1,10 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-26** — live tip **`d03721c1`** · Puntos 1–4 PREPARED · OAuth/Twilio/ads reales **BLOCKED_EXTERNAL**.  
-> ERP ✅ · migrate gate prod ✅ · dual-write **PREPARED_OFF** · RAG Railway apply **PREPARED_OFF** · canary IA **PREPARED_OFF** · **sin Odoo**.
+> Actualizado: **2026-07-26** — ADR-067 · staging live **`738f8200`** · prod **`d03721c1`**. OAuth/Twilio/ads reales **BLOCKED_EXTERNAL**.  
+> ERP ✅ · migrate gate prod **CEO-ACK** · dual-write **NO** · RAG Railway apply **NO** · canary IA **NO** · **sin Odoo**.
 
-**Bloqueadores go-live:** 4 frases CEO · OAuth/Twilio/iOS/IA · Pepito legal.
+**Bloqueadores go-live:** Legal Pepito · OAuth/Twilio/iOS · mercado · futuros SÍ #2–#4 · coste réplica.
 
 ### Auth bridge Web ↔ FastAPI
 

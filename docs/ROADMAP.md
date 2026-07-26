@@ -85,7 +85,8 @@
 | **ADR-061 Postgres ERP SSOT (mig 520)** | ✅ | Staging+prod tip **`c2edb2da`** · schema prod applied · reval ALL_PASS · CEO formal ack pending |
 | **ADR-062 ERP relational dual-write** | 🟡 | **PREPARED_OFF** · CEO frase en `CEO_POINTS_1_4_APPROVAL_REQUEST.md` |
 | **ADR-065 Railway Private RAG prep** | 🟡 | Fail-closed apply · **PREPARED_OFF** · CEO frase #3 |
-| **ADR-066 Puntos 1–4 prep batch** | ✅ | Prep cerrada 2026-07-26 · **sin activar** · 4 SÍ/NO PENDING_CEO |
+| **ADR-066 Puntos 1–4 prep batch** | ✅ | Prep cerrada 2026-07-26 · tip `43d7c3db` |
+| **ADR-067 CEO 1 SÍ / 2–4 NO** | ✅ | Gate política **CEO-ACK** · dual-write/RAG/canary **NO todavía** · **NOT READY** |
 | **CEO master actions** | 🟡 | `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` — solo humano |
 | **TOTAL QUALITY 2026-07-25** | ✅ | Gates PASS · 0 code P0 residual · **NOT READY** (legal/CEO/external) |
 | Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |

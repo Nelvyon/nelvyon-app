@@ -1,4 +1,4 @@
-# CTO Final Verify — 2026-07-26 (PUNTOS 1–4 PREP COMMITTED)
+# CTO Final Verify — 2026-07-26 (ADR-067 CEO decision)
 
 > **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0 · **0 activaciones**
 
@@ -6,29 +6,27 @@
 
 | Entorno | Tip | Health |
 |---------|-----|--------|
-| Repo | `43d7c3db` | prep commit (docs/classify/evidence) |
-| Staging live | `d03721c1` | live+ready 200 |
+| Staging live | `738f8200` | live+ready 200 |
 | Prod live | `d03721c1` | live OK · OpenAI OFF |
 
-## Gates (esta sesión)
+## CEO matrix
+
+| # | Decision | Status |
+|---|----------|--------|
+| 1 | SÍ gate política | CERTIFIED · no migrate executed |
+| 2 | NO dual-write | PREPARED_OFF |
+| 3 | NO RAG apply | blocked exit 2 |
+| 4 | NO canary IA | authorized false · prod IA OFF |
+
+## Gates esta sesión
 
 | Gate | Resultado |
 |------|-----------|
 | tsc | **0** |
-| vitest P1–P4 cores | **85 PASS / 2 skip** |
-| vitest brain knowledge (orphan fix) | **7 PASS** |
-| ERP A/B · concurrency · persist after | **ALL_PASS** |
-| apply-local-ai-schema sin flag | **blocked exit 2** |
-| fail-closed JSON | `points_1_4_failclosed_latest.json` |
-| CEO frases | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` |
-
-## Activación
-
-| # | Ítem | Estado |
-|---|------|--------|
-| 1 | Prod migrate | Gate ON · **no** migrate nueva |
-| 2 | ERP dual-write | **PREPARED_OFF** |
-| 3 | RAG Railway apply | **PREPARED_OFF** |
-| 4 | IA prod canary | **PREPARED_OFF** · authorized false |
+| vitest prodMigrateGate | **17 PASS** (soft-flag reject) |
+| vitest dualWrite/canary/ragPrep/brain/snapshots | **PASS** |
+| saasRequestContext + localAiSecurityGuard | **17 PASS** |
+| ERP A/B staging | **ALL_PASS** |
+| apply-local-ai-schema sin flag | **exit 2** |
 
 **No READY.**

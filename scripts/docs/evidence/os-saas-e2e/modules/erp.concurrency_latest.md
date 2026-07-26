@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| Fecha | 2026-07-26T13:29:41.298Z |
+| Fecha | 2026-07-26T13:53:48.911Z |
 | Verdict | **ALL_PASS** |
 | Base | https://ideal-victory-staging.up.railway.app |
 | Critical fails | 0 |
@@ -18,9 +18,9 @@
 
 - PASS `auth`: userId=920e1939-de70-46ca-a351-cdf3f2b6a90b
 - PASS `saas-tenant`: dashboard OK
-- PASS `seed.inventory`: sku=CONC-325df8a5 loc=22b0c224-5493-4a30-b705-8892da54d87e
-- PASS `conc.receive.same_key`: stock=10 statuses=201,201 moveIds=8514cac6-f1f8-4f27-9be0-a35a7e5aba75|8514cac6-f1f8-4f27-9be0-a35a7e5aba75
+- PASS `seed.inventory`: sku=CONC-8ee09503 loc=2dc255e5-9369-4519-9608-2af4beac5f1a
+- PASS `conc.receive.same_key`: stock=10 statuses=201,201 moveIds=6fb501bb-e502-4383-8c33-247a344e666d|6fb501bb-e502-4383-8c33-247a344e666d
 - PASS `conc.receive.distinct`: +15 stock=25 responses_okish=3
 - PASS `conc.reserve.parallel`: avail=0 reserved=25 a=201/ok b=400/INSUFFICIENT_STOCK
-- PASS `conc.pr.same_key`: id=367233d3-f1e9-49a5-967b-53de14247362 a=201 b=201
+- PASS `conc.pr.same_key`: id=45715d0e-f008-4442-9b49-a0528301760c a=201 b=201
 - PASS `conc.mo.parallel`: mos=2 a=201 b=201

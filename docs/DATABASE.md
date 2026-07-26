@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-26** — live tip **`d03721c1`** · mig **519+520** · ADR-064 **VERIFIED** · ADR-062 PREPARED_OFF · ADR-065 RAG apply **PREPARED_OFF** · puntos 1–4 CEO PENDING
+> Actualizado: **2026-07-26** — ADR-067 CEO · #1 migrate gate **CEO-ACK** · #2 dual-write **NO** · #3 RAG apply **NO** · mig **519+520** · live staging `738f8200` · live prod `d03721c1`
 
 ---
 

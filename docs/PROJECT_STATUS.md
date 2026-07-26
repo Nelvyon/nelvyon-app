@@ -1,11 +1,13 @@
-> **2026-07-26** — PUNTOS 1–4 PREP COMMITTED `43d7c3db` · live tip `d03721c1` · `claimReady: false` · **NOT READY**
+> **2026-07-26** — ADR-067 CEO 1 SÍ / 2–4 NO · gate migrate CEO-ACK · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** |
-| **Repo tip** | `43d7c3db` (prep docs · sin activación) |
-| **Staging/Prod live** | `d03721c1` |
-| **Puntos 1–4** | Prep **pushed** · activación **OFF** · `CEO_POINTS_1_4_APPROVAL_REQUEST.md` |
-| **Pendiente** | 4 SÍ/NO Daniel · resto `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` · legal/mercado |
+| **Repo** | tip post ADR-067 (docs+gate regression) |
+| **Staging live** | `738f8200` |
+| **Prod live** | `d03721c1` |
+| **#1 Migrate gate** | **CEO SÍ** · fail-closed CERTIFIED · no migrate ahora |
+| **#2–#4** | **NO todavía** · PREPARED_OFF / OFF |
+| **Pendiente** | Legal/mercado · OAuth/Twilio/iOS · coste réplica · futuros SÍ #2–#4 |
 
-SSOT: `HANDOVER.md` · `CEO_POINTS_1_4_APPROVAL_REQUEST.md`
+SSOT: `HANDOVER.md` · `CEO_POINTS_1_4_APPROVAL_REQUEST.md` · ADR-067

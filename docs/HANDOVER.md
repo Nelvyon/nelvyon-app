@@ -1,15 +1,15 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-26** — **PUNTOS 1–4 PREP COMMITTED** · live tip **`d03721c1`** · `claimReady: false` · **NOT READY** · **nada activado**
+> Última actualización: **2026-07-26** — **ADR-067 CEO 1 SÍ / 2–4 NO** · gate migrate **CEO-ACK** · `claimReady: false` · **NOT READY** · **0 activaciones**
 
-> Última actualización automática: **2026-07-26 13:39 UTC**
+> Última actualización automática: **2026-07-26**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | 43d7c3db |
+| **Último commit** | (sync post-commit) |
 | **Fecha doc** | 2026-07-26 |
-| **Rama** | `main` (sync with origin) |
+| **Rama** | `main` |
 
 ---
 
@@ -18,18 +18,20 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** |
-| **Staging** | tip **`d03721c1`** · live+ready OK · ERP A/B+conc+persist **ALL_PASS** |
-| **Prod** | tip **`d03721c1`** · OpenAI OFF · migrate gate ADR-064 activo |
-| **Puntos 1–4** | Prep **commiteada** · activación **OFF** · frases SÍ/NO en `docs/ops/CEO_POINTS_1_4_APPROVAL_REQUEST.md` |
+| **Staging live** | tip **`738f8200`** · live+ready OK |
+| **Prod live** | tip **`d03721c1`** · OpenAI OFF · gate ADR-064 activo |
+| **CEO #1 migrate gate** | **SÍ** — política fail-closed **certificada** · **no** migrate nueva ahora |
+| **CEO #2 dual-write** | **NO todavía** — PREPARED_OFF · JSONB SSOT |
+| **CEO #3 RAG Railway** | **NO todavía** — apply bloqueado · sin DDL |
+| **CEO #4 canary IA prod** | **NO todavía** — IA/OpenAI/OpenClaw/MCP/SM OFF |
 | **Coste** | 0 |
-| **NO hecho** | dual-write · RAG schema apply · canary IA prod · migrate prod nueva · flags productivos |
 
 ## Próximo paso EXACTO
 
-1. Daniel responde **SÍ/NO** a las **4 frases** en `docs/ops/CEO_POINTS_1_4_APPROVAL_REQUEST.md`.
-2. Sin SÍ: no migrate prod · no dual-write · no apply RAG schema · no canary IA.
-3. Resto humano: `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` (Android/iOS/OAuth/legal).
-4. **No READY** sin legal + mercado + clientes.
+1. Continuar refuerzo interno (tests/seguridad/aislamiento) **sin** activar #2–#4 ni migrate prod.
+2. Solo humano / externo: `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` (Android/iOS/OAuth/legal/mercado).
+3. Ventana migrate futura: solo si hay SQL pendiente + set/unset `NELVYON_PROD_MIGRATE_*` (ADR-064).
+4. **No READY** sin legal Pepito + mercado + clientes.
 
 ### Rollback / fail-closed (sin cambio)
 

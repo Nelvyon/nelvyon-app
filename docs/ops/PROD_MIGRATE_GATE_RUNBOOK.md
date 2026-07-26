@@ -1,10 +1,11 @@
 # Runbook — Gate migraciones productivas (ADR-064)
 
-> **Estado:** **IMPLEMENTED_VERIFIED** (código + staging apply + prod no-op live)  
-> Tip: **`c2edb2da`** · staging deploy **`da6b7a74`** · prod deploy **`a82b55ac`**  
-> **Hecho histórico:** ERP 519/520 ya aplicadas en prod (auto-deploy previo) — **no revertir**.  
-> Evidencia: `scripts/docs/evidence/os-saas-e2e/modules/prod.migrate_gate_latest.md`  
-> Fecha: 2026-07-25
+> **Estado:** **IMPLEMENTED_VERIFIED** + **CEO-ACK 2026-07-26 (ADR-067 #1 SÍ)**  
+> Política: ninguna migración futura en prod sin ventana `NELVYON_PROD_MIGRATE_APPROVED=1` + `APPROVED_BY=Daniel`  
+> **No ejecutar migraciones nuevas ahora** (CEO: SÍ = política, no apply).  
+> Tip gate live histórico: **`c2edb2da`** · evidencia `prod.migrate_gate_latest.md` · reval unit 2026-07-26 (17 PASS incl. soft-flag reject)  
+> **Hecho histórico:** ERP 519/520 ya aplicadas en prod — **no revertir**.  
+> Fecha: 2026-07-26
 
 ## Problema
 

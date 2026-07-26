@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-26** (Puntos 1–4 PREPARED · sin activar). Sin secretos.
+> Estado real documentado **2026-07-26** (ADR-067 CEO 1 SÍ / 2–4 NO · 0 activaciones). Sin secretos.
 
 ---
 

@@ -1,6 +1,16 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-26** PUNTOS 1–4 PREPARED · live tip `d03721c1`.
+> Actualizado: **2026-07-26** ADR-067 CEO decision.
+
+## 2026-07-26 — ADR-067 CEO 1 SÍ / 2–4 NO (sin activar)
+
+| Campo | Valor |
+|-------|-------|
+| **Decisión** | Gate migrate **CEO-ACK** · dual-write/RAG/canary **NO** |
+| **Staging live** | `738f8200` |
+| **Prod live** | `d03721c1` |
+| **Ejecutado** | Docs + regresión soft-flag · **no** migrate · **no** DDL · **no** flags |
+| **claimReady** | **false** |
 
 ## 2026-07-26 — PUNTOS 1–4 PREP COMMITTED (sin activar)
 
@@ -9,7 +19,7 @@
 | **Repo tip** | **`43d7c3db`** · docs/classify/evidence only |
 | **Live staging/prod** | tip **`d03721c1`** (sin flags productivos; docs deploy puede SKIP) |
 | **Evidencia** | `points_1_4_prep_latest.md` · ERP reval ALL_PASS · apply schema **no** · canary **no** · migrate prod **no** |
-| **CEO** | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` PENDING |
+| **CEO** | ADR-067 decidido (1 SÍ / 2–4 NO) |
 | **claimReady** | **false** |
 
 ## 2026-07-26 — CIERRE TOTAL Cursor

@@ -66,6 +66,24 @@ describe("prodMigrateGate — approval", () => {
     expect(a.approved).toBe(false);
   });
 
+  it("rejects soft truthy strings — only exact '1' counts (CEO policy 2026-07-26)", () => {
+    for (const flag of ["true", "yes", "YES", "approved", "True", "0", "2", ""]) {
+      const a = readProdMigrateApproval({
+        NELVYON_PROD_MIGRATE_APPROVED: flag,
+        NELVYON_PROD_MIGRATE_APPROVED_BY: "Daniel",
+      });
+      expect(a.approved, `flag=${JSON.stringify(flag)}`).toBe(false);
+    }
+  });
+
+  it("rejects APPROVED_BY shorter than 2 chars", () => {
+    const a = readProdMigrateApproval({
+      NELVYON_PROD_MIGRATE_APPROVED: "1",
+      NELVYON_PROD_MIGRATE_APPROVED_BY: "D",
+    });
+    expect(a.approved).toBe(false);
+  });
+
   it("accepts approval with by-name", () => {
     const a = readProdMigrateApproval({
       NELVYON_PROD_MIGRATE_APPROVED: "1",

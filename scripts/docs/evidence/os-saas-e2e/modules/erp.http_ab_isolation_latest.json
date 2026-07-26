@@ -1,52 +1,52 @@
 {
   "verdict": "ALL_PASS",
   "base": "https://ideal-victory-staging.up.railway.app",
-  "at": "2026-07-26T13:29:42.572Z",
+  "at": "2026-07-26T13:52:22.436Z",
   "results": [
     {
       "check": "A.register",
       "ok": true,
-      "detail": "erp-ab-A-7eb89c66@nelvyon.test"
+      "detail": "erp-ab-A-fc8a8632@nelvyon.test"
     },
     {
       "check": "A.onboard",
       "ok": true,
-      "detail": "tenant=8a5715c2-01e8-4e0c-815f-5619a7a6ee8f"
+      "detail": "tenant=c549055e-952a-4e5a-88d7-440164ad51c0"
     },
     {
       "check": "B.register",
       "ok": true,
-      "detail": "erp-ab-B-6a3f91ae@nelvyon.test"
+      "detail": "erp-ab-B-632794ed@nelvyon.test"
     },
     {
       "check": "B.onboard",
       "ok": true,
-      "detail": "tenant=f3c11ff3-255f-4a97-8a72-e748e65b0447"
+      "detail": "tenant=deed313e-7f1d-44c1-ac66-87995dfb3050"
     },
     {
       "check": "A.seed.supplier",
       "ok": true,
-      "detail": "9236fb4d-db90-4d49-b919-486fc31b2fc3"
+      "detail": "04f7a6bb-7bd2-48ea-8e8b-5f1510452523"
     },
     {
       "check": "A.seed.inventory",
       "ok": true,
-      "detail": "sku=SKU-A-99d7bdac loc=7fb4dada-0517-406e-bdd1-0692124b3d1b qty=100"
+      "detail": "sku=SKU-A-326f7f23 loc=efc0322c-d972-4c44-8347-22e19dd28133 qty=100"
     },
     {
       "check": "A.seed.mfg",
       "ok": true,
-      "detail": "bom=e887c08f-6ee6-4028-b699-269b24b32a4d mo=f584a2fa-7685-416d-81bb-d71a0d3660fb"
+      "detail": "bom=8c1eccfd-a674-48cb-88c4-dcd8b2e1625f mo=eca651ae-1d67-4f84-8bb1-92421912169a"
     },
     {
       "check": "A.seed.projects",
       "ok": true,
-      "detail": "1717499c-38ec-441e-a581-0c4550ce7c4a"
+      "detail": "646e7fc8-4031-4cd3-8907-5498e85b0481"
     },
     {
       "check": "B.seed.own_supplier",
       "ok": true,
-      "detail": "440d6743-43f8-4370-8173-4be5f1d6b1db"
+      "detail": "c3aaa689-044b-451d-829b-e66675389c81"
     },
     {
       "check": "B.isolation.purchases.list",

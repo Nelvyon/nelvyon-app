@@ -7,12 +7,11 @@
 
 | # | Acción | Doc | Tiempo |
 |---|--------|-----|--------|
-| 0 | **Primero:** 4 frases SÍ/NO puntos 1–4 | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` | 5 min |
-| 1 | Ack histórico 519/520 + política migrate | `PROD_MIGRATE_GATE_RUNBOOK.md` | 5 min |
-| 2 | Ventana migrate futura: set/unset `NELVYON_PROD_MIGRATE_*` | idem | por mig |
-| 3 | Dual-write ERP cutover SÍ/NO | `ERP_DUAL_WRITE_TRANSITION_RUNBOOK.md` | decisión |
-| 4 | RAG Railway: apply schema staging (flags) o DB dedicada | `RAILWAY_PRIVATE_RAG_PREP_RUNBOOK.md` | 15–30 min |
-| 5 | Canary IA prod SÍ/NO (no activar hoy) | `CEO_IA_PROD_CANARY_REQUEST.md` | decisión |
+| 0 | ~~4 frases SÍ/NO~~ → **ADR-067 decidido** (1 SÍ / 2–4 NO) | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` | hecho |
+| 1 | Ventana migrate futura (solo cuando haya SQL pendiente) | `PROD_MIGRATE_GATE_RUNBOOK.md` | por mig |
+| 2 | Dual-write ERP — **NO hasta nuevo SÍ** | `ERP_DUAL_WRITE_TRANSITION_RUNBOOK.md` | diferido |
+| 3 | RAG Railway apply — **NO hasta nuevo SÍ** | `RAILWAY_PRIVATE_RAG_PREP_RUNBOOK.md` | diferido |
+| 4 | Canary IA prod — **NO hasta nuevo SÍ** | `CEO_IA_PROD_CANARY_REQUEST.md` | diferido |
 
 ## B — Dispositivos
 

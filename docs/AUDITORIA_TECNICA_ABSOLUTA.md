@@ -1,17 +1,17 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> **2026-07-26** PUNTOS 1–4 PREPARED · live tip `d03721c1` · claimReady false  
-> Veredicto: **CONDITIONAL_READY** · **NOT READY** · **nada activado sin SÍ CEO**
+> **2026-07-26** ADR-067 CEO 1 SÍ / 2–4 NO · claimReady false  
+> Veredicto: **CONDITIONAL_READY** · **NOT READY** · **0 activaciones**
 
 ### Matriz
 
 | Dimensión | Estado |
 |-----------|--------|
-| VERDE | Staging/prod tip · ADR-064 gate · ERP A/B+conc+persist · orphan classify · anti-mock prior · RAG Docker · pgvector extension |
-| PREPARADO OFF | Dual-write · Railway RAG apply · IA canary prod · email/PDF PARTIAL |
-| SOLO HUMANO | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` (4 frases) · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` |
+| VERDE | Health staging/prod · ADR-064 gate **CEO-ACK** · ERP A/B · tenant isolation · security guards · soft-flag migrate reject |
+| PREPARADO OFF | Dual-write · Railway RAG · IA canary · email/PDF PARTIAL |
+| SOLO HUMANO / EXTERNO | Legal Pepito · OAuth/Twilio/iOS · coste réplica · mercado · futuros SÍ #2–#4 |
 | COSTES | 0 |
 
 ### Próximo
 
-Responder 4 SÍ/NO · **No READY**
+Refuerzo interno sin activar · **No READY**

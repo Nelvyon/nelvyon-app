@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-26** — PUNTOS 1–4 PREPARED · tip live **`d03721c1`** · `claimReady: false`
+> Actualizado: **2026-07-26** — ADR-067 CEO 1 SÍ / 2–4 NO · `claimReady: false`
 
 ---
 
@@ -9,8 +9,9 @@
 - [x] Completado y validado 2026-07-10
 - [x] ADR-064 · CIERRE 1–7 · CIERRE TOTAL Cursor (RAG prep fail-closed · android-one-step · master CEO list)
 - [x] Puntos 1–4 **prep** (migrate gate · dual-write OFF · RAG apply blocked · canary OFF) — **sin activar**
-- [ ] **Solo humano:** 4 frases SÍ/NO en `docs/ops/CEO_POINTS_1_4_APPROVAL_REQUEST.md`
-- [ ] **Solo humano:** `docs/ops/CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
+- [x] **ADR-067:** #1 migrate gate política **SÍ** (CEO-ACK) · #2–#4 **NO todavía**
+- [ ] **Solo humano:** `docs/ops/CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` (legal/OAuth/iOS/Android/mercado)
+- [ ] Futuros SÍ escritos para dual-write / RAG apply / canary IA (cuando Daniel decida)
 
 ---
 
