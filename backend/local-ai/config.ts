@@ -24,8 +24,19 @@ export function getLocalAiConfig(): LocalAiConfig {
     process.env.BENCHMARK_STRATEGY_MODEL?.trim() ||
     undefined;
   const strategyNumGpuRaw = process.env.OLLAMA_STRATEGY_NUM_GPU ?? process.env.OLLAMA_NUM_GPU;
+
+  // Prefer LOCAL_AI_DATABASE_URL; optionally reuse shared DATABASE_URL when
+  // NELVYON_LOCAL_AI_USE_MAIN_DB=1 (Railway staging shared-DB path, ADR-065/068).
+  let databaseUrl = process.env.LOCAL_AI_DATABASE_URL?.trim() || "";
+  if (!databaseUrl) {
+    const useMain = (process.env.NELVYON_LOCAL_AI_USE_MAIN_DB ?? "").trim() === "1";
+    const main = (process.env.DATABASE_URL ?? "").trim();
+    if (useMain && main) databaseUrl = main;
+  }
+  if (!databaseUrl) databaseUrl = DEFAULT_DB;
+
   return {
-    databaseUrl: process.env.LOCAL_AI_DATABASE_URL?.trim() || DEFAULT_DB,
+    databaseUrl,
     embeddingDim: Number(process.env.LOCAL_AI_EMBEDDING_DIM ?? 768),
     ollamaBaseUrl: (
       process.env.OLLAMA_HOST?.trim() ||

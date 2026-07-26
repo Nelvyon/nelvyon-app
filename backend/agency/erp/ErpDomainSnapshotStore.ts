@@ -9,6 +9,7 @@ import { randomUUID } from "node:crypto";
 import type pg from "pg";
 
 import { DbClient } from "../../db/DbClient";
+import { mirrorErpDomainToRelational } from "./ErpRelationalMirror";
 
 export type ErpDomain = "purchases" | "inventory" | "manufacturing" | "projects_fs";
 
@@ -204,6 +205,9 @@ export class ErpDomainSnapshotStore {
         [tenantId, domain, payloadJson, nextVersion],
       );
     }
+
+    // ADR-062: optional relational mirror in same TX (fail-closed; default OFF).
+    await mirrorErpDomainToRelational(client, tenantId, domain, payload ?? {});
 
     return nextVersion;
   }

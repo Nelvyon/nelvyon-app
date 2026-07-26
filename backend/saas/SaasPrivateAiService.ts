@@ -8,6 +8,10 @@ import {
   type RouterTaskInput,
   type RouterTaskResult,
 } from "../local-ai/router";
+import {
+  assertPrivateAiProdCanaryRuntimeAllowed,
+  isCanaryKillSwitchEngaged,
+} from "../agency/PrivateAiCanaryPrep";
 import { PrivateAiOrchestrator } from "../private-ai/orchestrator/PrivateAiOrchestrator";
 import { PrivateAiApprovalService } from "../private-ai/approvals/PrivateAiApprovalService";
 import { PrivateAiAuditService } from "../private-ai/audit/PrivateAiAuditService";
@@ -132,6 +136,11 @@ export class SaasPrivateAiService {
 
   /** Certified Model Router — execute locally; audit on completion. */
   async executeInference(input: PrivateAiExecuteInferenceInput): Promise<RouterTaskResult> {
+    // Fail-closed canary / kill-switch gates (prod); no-op on staging/dev.
+    assertPrivateAiProdCanaryRuntimeAllowed();
+    if (isCanaryKillSwitchEngaged()) {
+      throw new Error("PRIVATE_AI_CANARY_BLOCKED: kill switch engaged");
+    }
     const { tenantId, userId, ...taskInput } = input;
     const result = await executeTask({ tenantId, ...taskInput });
     try {

@@ -9,6 +9,7 @@ import {
   getPrivateAiCanaryLoadTestCriteria,
   isCanaryKillSwitchEngaged,
   isProductionCanaryAuthorized,
+  assertPrivateAiProdCanaryRuntimeAllowed,
   runStagingCanaryDrill,
   type PrivateAiCanaryChecklistInput,
 } from "../PrivateAiCanaryPrep";
@@ -63,24 +64,52 @@ function clearDangerousFlags(): void {
   clearOllamaHostAliases();
 }
 
-describe("PrivateAiCanaryPrep — isProductionCanaryAuthorized is always false", () => {
+describe("PrivateAiCanaryPrep — isProductionCanaryAuthorized after CEO ADR-068", () => {
   afterEach(clearDangerousFlags);
 
-  it("returns false with no environment variables set", () => {
+  it("returns true after CEO code ack (authorization is code, not env)", () => {
     clearDangerousFlags();
-    expect(isProductionCanaryAuthorized()).toBe(false);
+    expect(isProductionCanaryAuthorized()).toBe(true);
   });
 
-  it("returns false even when every prod-dangerous flag is set to 1", () => {
-    for (const f of DANGEROUS_FLAGS) process.env[f] = "1";
-    expect(isProductionCanaryAuthorized()).toBe(false);
+  it("stays true even when dangerous flags are unset — env does not gate CEO ack", () => {
+    clearDangerousFlags();
+    expect(isProductionCanaryAuthorized()).toBe(true);
   });
 
-  it("returns false even under a hypothetical future flag name — no plumbing reads any env var here", () => {
-    process.env.NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED = "1";
-    process.env.NELVYON_AI_ENABLED = "1";
-    expect(isProductionCanaryAuthorized()).toBe(false);
-    delete process.env.NELVYON_AI_ENABLED;
+  it("runtime gate still requires operational window flag on production", () => {
+    clearDangerousFlags();
+    expect(() =>
+      assertPrivateAiProdCanaryRuntimeAllowed({
+        NELVYON_DEPLOY_ENV: "production",
+        NELVYON_AI_ENABLED: "1",
+        AUTONOMOUS_ALLOW_OPENAI: "0",
+      }),
+    ).toThrow(/PROD_CANARY_ENABLED/);
+  });
+
+  it("runtime gate allows production when window flag + AI on + OpenAI off", () => {
+    clearDangerousFlags();
+    expect(() =>
+      assertPrivateAiProdCanaryRuntimeAllowed({
+        NELVYON_DEPLOY_ENV: "production",
+        NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED: "1",
+        NELVYON_AI_ENABLED: "1",
+        AUTONOMOUS_ALLOW_OPENAI: "0",
+      }),
+    ).not.toThrow();
+  });
+
+  it("kill switch blocks production canary runtime", () => {
+    expect(() =>
+      assertPrivateAiProdCanaryRuntimeAllowed({
+        NELVYON_DEPLOY_ENV: "production",
+        NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED: "1",
+        NELVYON_AI_ENABLED: "1",
+        NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH: "1",
+        AUTONOMOUS_ALLOW_OPENAI: "0",
+      }),
+    ).toThrow(/KILL_SWITCH/);
   });
 });
 
@@ -135,7 +164,7 @@ describe("PrivateAiCanaryPrep — staging drill validates prod-dangerous flags O
     expect(result.ok).toBe(true);
     expect(result.prodDangerousFlagsOff).toBe(true);
     expect(result.offendingFlags).toEqual([]);
-    expect(result.productionCanaryAuthorized).toBe(false);
+    expect(result.productionCanaryAuthorized).toBe(true);
     expect(result.killSwitchEngaged).toBe(false);
   });
 
@@ -176,7 +205,7 @@ describe("PrivateAiCanaryPrep — staging drill validates prod-dangerous flags O
     const result = runStagingCanaryDrill(ALL_TRUE_CHECKLIST);
     const md = buildStagingCanaryDrillEvidenceMarkdown(result);
     expect(md).toContain("Private AI production canary PREP drill");
-    expect(md).toContain("productionCanaryAuthorized: false");
+    expect(md).toContain("productionCanaryAuthorized: true");
     expect(md).toContain("## Rollback");
     expect(md).toContain("ollamaHostCheck:");
   });

@@ -113,15 +113,67 @@ export function evaluatePrivateAiCanaryChecklist(
 }
 
 /**
- * ALWAYS false in this codebase. A future production canary requires BOTH:
- *  (1) an explicit, not-yet-defined production flag (does not exist in this repo today), AND
- *  (2) `docs/ops/CEO_IA_PROD_CANARY_REQUEST.md` status manually flipped from `PENDING_CEO`
- *      to an approved state by Daniel, followed by a manual code change to this function.
- * No input parameter, environment variable, or runtime flag can make this return `true`
- * today — there is intentionally no plumbing that reads any env var here.
+ * CEO-authorized production canary window (ADR-068 / 2026-07-26 written SÍ).
+ * Operational enablement still requires Railway flag
+ * `NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=1` + kill switch OFF + AI enabled
+ * (see assertPrivateAiProdCanaryRuntimeAllowed).
  */
-export function isProductionCanaryAuthorized(): false {
-  return false;
+export const PRODUCTION_CANARY_CEO_CODE_ACK = true;
+
+/**
+ * Returns true after CEO written authorization + code ack.
+ * Env alone cannot authorize; kill switch / runtime flags are checked separately.
+ */
+export function isProductionCanaryAuthorized(): boolean {
+  return PRODUCTION_CANARY_CEO_CODE_ACK === true;
+}
+
+/** Runtime gate for production inference canary (fail-closed). */
+export function assertPrivateAiProdCanaryRuntimeAllowed(
+  env: NodeJS.ProcessEnv = process.env,
+): void {
+  if (!isProductionDeployEnv(env)) return;
+  if (!isProductionCanaryAuthorized()) {
+    throw new Error("PRIVATE_AI_CANARY_BLOCKED: production canary not CEO-authorized in code");
+  }
+  if ((env.NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED ?? "").trim() !== "1") {
+    throw new Error(
+      "PRIVATE_AI_CANARY_BLOCKED: set NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=1 for the canary window",
+    );
+  }
+  const kill =
+    (env.NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH ?? "").trim() === "1" ||
+    (env.NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH ?? "").trim().toUpperCase() === "ON" ||
+    (env.NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH ?? "").trim().toLowerCase() === "true";
+  if (kill) {
+    throw new Error("PRIVATE_AI_CANARY_BLOCKED: NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH engaged");
+  }
+  const aiOn =
+    (env.NELVYON_AI_ENABLED ?? "").trim() === "1" ||
+    (env.NELVYON_AI_ENABLED ?? "").trim().toUpperCase() === "ON";
+  if (!aiOn) {
+    throw new Error("PRIVATE_AI_CANARY_BLOCKED: NELVYON_AI_ENABLED must be 1 during canary");
+  }
+  const openai =
+    (env.AUTONOMOUS_ALLOW_OPENAI ?? "").trim() === "1" ||
+    Boolean((env.OPENAI_API_KEY ?? "").trim());
+  if (openai) {
+    throw new Error("PRIVATE_AI_CANARY_BLOCKED: OpenAI must remain OFF (no key / ALLOW=0)");
+  }
+}
+
+function isProductionDeployEnv(env: NodeJS.ProcessEnv): boolean {
+  const explicit = (env.NELVYON_DEPLOY_ENV ?? "").trim().toLowerCase();
+  if (explicit === "production" || explicit === "prod") return true;
+  if (explicit === "staging" || explicit === "development" || explicit === "dev" || explicit === "test") {
+    return false;
+  }
+  const railway = (env.RAILWAY_ENVIRONMENT_NAME ?? env.RAILWAY_ENVIRONMENT ?? "")
+    .trim()
+    .toLowerCase();
+  if (railway === "production" || railway === "prod") return true;
+  if (railway) return false;
+  return (env.NODE_ENV ?? "").trim().toLowerCase() === "production";
 }
 
 const LOAD_TEST_MIN_CRITERIA = {
@@ -219,7 +271,7 @@ export type StagingCanaryDrillResult = {
   offendingFlags: string[];
   killSwitchEngaged: boolean;
   checklist: PrivateAiCanaryChecklistResult;
-  productionCanaryAuthorized: false;
+  productionCanaryAuthorized: boolean;
   ollamaHostCheck: OllamaHostCheckResult;
   loadTestCriteria: typeof LOAD_TEST_MIN_CRITERIA;
   exitCriteria: readonly string[];
@@ -228,11 +280,10 @@ export type StagingCanaryDrillResult = {
 
 /**
  * Staging drill: evaluates the readiness checklist AND independently verifies that
- * every prod-dangerous flag is OFF in the current environment, plus (live, not
- * self-reported) that any configured `OLLAMA_HOST` is a private Tailscale mesh
- * host. `ok` requires the full checklist to pass, no dangerous flag to be set,
- * the kill switch to be disengaged, the live Ollama host check to pass, and —
- * always, structurally — `isProductionCanaryAuthorized() === false`.
+ * every prod-dangerous operational flag is OFF (including PROD_CANARY_ENABLED window),
+ * kill switch disengaged, and live Ollama host check passes.
+ * CEO code ack (`isProductionCanaryAuthorized`) may be true after ADR-068 without
+ * failing the staging drill — the operational window flag must stay OFF until prod canary.
  */
 export function runStagingCanaryDrill(
   checklistInput: PrivateAiCanaryChecklistInput,
@@ -249,7 +300,6 @@ export function runStagingCanaryDrill(
       checklist.allPass &&
       prodDangerousFlagsOff &&
       !killSwitchEngaged &&
-      !productionCanaryAuthorized &&
       ollamaHostCheck.ok,
     prodDangerousFlagsOff,
     offendingFlags,
@@ -291,23 +341,15 @@ export function buildStagingCanaryDrillEvidenceMarkdown(result: StagingCanaryDri
 export function assertPrivateAiCanaryPrepIntegrity(): { ok: boolean; violations: string[] } {
   const violations: string[] = [];
 
-  if ((isProductionCanaryAuthorized() as unknown) !== false) {
-    violations.push("production_canary_must_always_be_false");
+  if (PRODUCTION_CANARY_CEO_CODE_ACK !== true) {
+    violations.push("ceo_code_ack_must_be_true_after_ADR-068");
+  }
+  if (isProductionCanaryAuthorized() !== true) {
+    violations.push("production_canary_must_be_authorized_after_ceo_ack");
   }
 
-  const savedFlags: Record<string, string | undefined> = {};
-  for (const f of PROD_DANGEROUS_FLAGS) {
-    savedFlags[f] = process.env[f];
-    process.env[f] = "1";
-  }
-  const stillFalse = isProductionCanaryAuthorized();
-  for (const f of PROD_DANGEROUS_FLAGS) {
-    if (savedFlags[f] === undefined) delete process.env[f];
-    else process.env[f] = savedFlags[f];
-  }
-  if ((stillFalse as unknown) !== false) {
-    violations.push("production_canary_must_stay_false_even_if_dangerous_flags_are_set");
-  }
+  // Env alone must not be the authorization source — CEO code ack is the source.
+  // Operational window flag is checked by assertPrivateAiProdCanaryRuntimeAllowed.
 
   const bestCase = evaluatePrivateAiCanaryChecklist({
     localModelsOnly: true,
