@@ -1016,15 +1016,15 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 ### 8.1 Veredicto
 
-**[VERIFICADO]** Fuente: HANDOVER + `OS_CATALOG_V1.md` — **2026-07-26** (ADR-067 CEO 1 SÍ / 2–4 NO)
+**[VERIFICADO]** Fuente: HANDOVER + `OS_CATALOG_V1.md` — **2026-07-26** (ADR-068 CEO close 2–4)
 
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | staging live **`738f8200`** · prod live **`d03721c1`** · OpenAI OFF · **0 activaciones** |
-| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-062 dual-write **NO todavía** · ADR-064 gate **CEO-ACK (ADR-067 #1)** · ADR-065 RAG apply **NO todavía** |
-| **ERP honesty** | Staging A/B+conc+persist ALL_PASS · prod schema live · futuras migs gated · payments **BLOCKED_SCOPE** · **no Odoo** |
-| **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker **VERIFIED** / Railway **NO apply** · private_ai_canary **NO** · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile Android build VERIFIED / device+stores **BLOCKED** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |
+| **SHA / deploys** | tip/staging live **`428c6c91`** · prod live **`d03721c1`** · OpenAI OFF · coste **0** |
+| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-062/068 dual-write staging **IMPLEMENTED_VERIFIED** (READ=0 · prod OFF) · ADR-064 gate **CEO-ACK** · ADR-065/068 RAG staging **IMPLEMENTED_VERIFIED** (prod DDL OFF) |
+| **ERP honesty** | Staging dual-write equivalence + A/B+conc ALL_PASS · payments **BLOCKED_SCOPE** · **no Odoo** |
+| **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker+Railway staging **VERIFIED** · private_ai_canary **AUTHORIZED**/live **BLOCKED_EXTERNAL** (mesh) · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile Android build VERIFIED / device+stores **BLOCKED** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |
 | **Competitive honesty** | No live OAuth spend · no GHL telephony parity (sim only) · **no Odoo ERP/finance** · mass-send blocked · social/publish pending CEO · no proven multi-tenant prod outcomes |
 | **Blocker claimReady** | Legal Pepito + licencia · mass-send **BLOCKED_LEGAL** · mercado/clientes |
 | Freezes Router / MCP / prod IA | **intactos** |

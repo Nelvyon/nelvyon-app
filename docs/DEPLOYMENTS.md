@@ -1,6 +1,19 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-26** ADR-067 CEO decision.
+> Actualizado: **2026-07-26** ADR-068 CEO close 2–4.
+
+## 2026-07-26 — ADR-068 close puntos 2–4 (staging activate · prod canary stopped)
+
+| Campo | Valor |
+|-------|-------|
+| **Código tip** | **`428c6c91`** (`ErpRelationalMirror` · RAG USE_MAIN_DB · canary gates) |
+| **Staging live** | **`428c6c913c4d`** · deploy SUCCESS `3e6adef5` (+ queued builds) |
+| **Staging flags** | `NELVYON_ERP_RELATIONAL_DUAL_WRITE=1` · `READ=0` · `NELVYON_LOCAL_AI_USE_MAIN_DB=1` · `AUTONOMOUS_ALLOW_OPENAI=0` |
+| **RAG schema** | `local_ai_*` + role `nelvyon_local_ai_app` on **existing** staging DB · **no** new DB · **no** prod DDL |
+| **Prod live** | **`d03721c19916`** · canary **not** enabled · IA flags **ABSENT** · dual-write **ABSENT** |
+| **Evidencia** | `erp.dual_write_adr068_latest.md` · `railway.rag_staging_activated_latest.md` · `private-ai.prod_canary_adr068_latest.md` |
+| **claimReady** | **false** |
+| **Coste** | **0** |
 
 ## 2026-07-26 — ADR-067 CEO 1 SÍ / 2–4 NO (sin activar)
 

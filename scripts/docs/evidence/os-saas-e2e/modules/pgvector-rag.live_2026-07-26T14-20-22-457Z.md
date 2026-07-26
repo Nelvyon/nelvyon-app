@@ -2,15 +2,15 @@
 
 | Campo | Valor |
 |-------|-------|
-| Fecha | 2026-07-26T14:23:37.437Z |
-| Run tag | ms1w1sj9 |
+| Fecha | 2026-07-26T14:20:22.457Z |
+| Run tag | ms1vxjyz |
 | Docker container | `nelvyon-local-ai-postgres` (pgvector/pgvector:pg16) @ postgresql://***:***@***:5432/postgres (REDACTED) |
 | Ollama embedding model | nomic-embed-text |
 | Health check | postgres=true pgvector=true schema=true ollama=true |
 | Pepito DB | nunca referenciada — solo tenants sintéticos A/B/C (UUIDs efímeros, sin datos reales) |
 | OpenAI / paid APIs | ninguno — embeddings 100% locales via Ollama `nomic-embed-text` |
 | Production activation flag | NO tocado (`NELVYON_LOCAL_ROUTER_ENABLED` sigue en su valor actual, sin cambios) |
-| **VERDICT** | **PASS_WITH_KNOWN_GAP** |
+| **VERDICT** | **FAIL** |
 
 ## Checks
 
@@ -21,10 +21,10 @@
 | ingest_tenant_a | critical | PASS | docs=4 chunks=4 |
 | ingest_tenant_b | critical | PASS | docs=4 chunks=4 |
 | real_embeddings_persisted | critical | PASS | pgvector column populated, dim=768, rows=4 |
-| retrieve_tenant_a_own_content | critical | PASS | citations=4 sources=smoke/ms1w1sj9/tenant-a/pricing.md,smoke/ms1w1sj9/tenant-a/onboarding.md,smoke/ms1w1sj9/tenant-a/refunds.md,smoke/ms1w1sj9/tenant-a/team-roles.md confidence=0.507 |
-| isolation_app_layer_a_never_sees_b | critical | PASS | citations=4 sources=smoke/ms1w1sj9/tenant-a/pricing.md,smoke/ms1w1sj9/tenant-a/onboarding.md,smoke/ms1w1sj9/tenant-a/refunds.md,smoke/ms1w1sj9/tenant-a/team-roles.md |
-| isolation_rls_layer_a_cannot_read_b | critical | PASS | 0 rows returned (RLS enforced) |
-| isolation_rls_layer_b_cannot_read_a | critical | PASS | 0 rows returned (RLS enforced) |
+| retrieve_tenant_a_own_content | critical | PASS | citations=4 sources=smoke/ms1vxjyz/tenant-a/pricing.md,smoke/ms1vxjyz/tenant-a/onboarding.md,smoke/ms1vxjyz/tenant-a/refunds.md,smoke/ms1vxjyz/tenant-a/team-roles.md confidence=0.507 |
+| isolation_app_layer_a_never_sees_b | critical | PASS | citations=4 sources=smoke/ms1vxjyz/tenant-a/pricing.md,smoke/ms1vxjyz/tenant-a/onboarding.md,smoke/ms1vxjyz/tenant-a/refunds.md,smoke/ms1vxjyz/tenant-a/team-roles.md |
+| isolation_rls_layer_a_cannot_read_b | critical | FAIL | VIOLATION: tenant A session saw tenant B rows |
+| isolation_rls_layer_b_cannot_read_a | critical | FAIL | VIOLATION: tenant B session saw tenant A rows |
 | refuse_no_evidence_unrelated_query_default_threshold | quality | FAIL | citations=4 confidence=0.400 (default minScore=0.32; real embeddings give unrelated real sentences non-near-0 cosine — known tuning gap for small corpora, see KNOWN_ISSUES.md) |
 | refuse_fallback_text_present | quality | FAIL | N/A — citations were returned, no fallback path exercised (see refuse_no_evidence_unrelated_query_default_threshold) |
 | refuse_no_evidence_unrelated_query_strict_threshold | quality | PASS | citations=0 at minScore=0.55 for the identical query that leaked at default 0.32 |

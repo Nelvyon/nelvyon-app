@@ -11,7 +11,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CEO_DECIDED** · #1 SÍ (política) · #2–#4 **NO todavía** · **0 activaciones** |
-| **Detalle** | Gate migrate fail-closed **CEO-ACK**. Dual-write / RAG apply / canary siguen bloqueados. |
+| **Detalle** | Gate migrate fail-closed **CEO-ACK**. ADR-068: dual-write+RAG staging verified; prod canary live blocked on Tailscale mesh (`TS_AUTHKEY`). |
 | **Evidencia** | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` · `points_1_4_ceo_decision_latest.md` |
 
 ### Ops (no KI) — Prod migrate gate ADR-064 (histórico 519/520 kept)
@@ -89,7 +89,19 @@
 | **Impacto real** | Ninguna fuga cross-tenant (verificado a nivel app + RLS, 100% PASS) · ninguna alucinación (las citas devueltas siempre son contenido real del propio tenant) · solo baja precisión en tenants con corpus muy pequeño |
 | **Remediación propuesta (no aplicada)** | Suelo de confianza consciente del tamaño del corpus en `LocalRagRetriever.retrieve` (ej. subir `minScore` efectivo cuando el tenant tiene menos de N chunks ingeridos) — requiere re-benchmark contra `specialization_eval_*` antes de tocar el default compartido |
 
-### Ops (no KI) — Railway pgvector extension VERIFIED · Private RAG path PREPARED_OFF
+### Ops (no KI) — Private AI prod canary mesh (ADR-068)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **BLOCKED_EXTERNAL** |
+| **Detalle** | CEO authorized code ack + gates on tip `428c6c91`. Prod live `d03721c1` sin tip canary; `TS_AUTHKEY`/`OLLAMA_HOST` **ABSENT**. Canary **not** activated (no degraded prod). |
+| **Evidencia** | `private-ai.prod_canary_adr068_latest.md` |
+
+### Ops (no KI) — Railway pgvector staging ACTIVATED (ADR-068) · prod DDL OFF
+
+> Histórico PREPARED_OFF supersedido en staging 2026-07-26. Prod DDL sigue OFF.
+
+### Ops (no KI) — Railway pgvector extension VERIFIED · Private RAG path PREPARED_OFF (histórico)
 
 | Campo | Valor |
 |-------|-------|

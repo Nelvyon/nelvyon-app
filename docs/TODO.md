@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-26** — ADR-067 CEO 1 SÍ / 2–4 NO · `claimReady: false`
+> Actualizado: **2026-07-26** — ADR-068 close 2–4 · `claimReady: false`
 
 ---
 
@@ -9,9 +9,9 @@
 - [x] Completado y validado 2026-07-10
 - [x] ADR-064 · CIERRE 1–7 · CIERRE TOTAL Cursor (RAG prep fail-closed · android-one-step · master CEO list)
 - [x] Puntos 1–4 **prep** (migrate gate · dual-write OFF · RAG apply blocked · canary OFF) — **sin activar**
-- [x] **ADR-067:** #1 migrate gate política **SÍ** (CEO-ACK) · #2–#4 **NO todavía**
-- [ ] **Solo humano:** `docs/ops/CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` (legal/OAuth/iOS/Android/mercado)
-- [ ] Futuros SÍ escritos para dual-write / RAG apply / canary IA (cuando Daniel decida)
+- [x] **ADR-067:** #1 migrate gate política **SÍ** (CEO-ACK) · #2–#4 **NO todavía** (histórico)
+- [x] **ADR-068:** #2 dual-write staging **IMPLEMENTED_VERIFIED** · #3 RAG staging **IMPLEMENTED_VERIFIED** · #4 canary prod **AUTHORIZED** / live **BLOCKED_EXTERNAL** (mesh)
+- [ ] **Solo humano:** `TS_AUTHKEY` + Ollama mesh prod (si canary live) · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` (legal/OAuth/iOS/Android/mercado)
 
 ---
 
@@ -35,8 +35,8 @@
 - [x] Catalog **v1.6.0** — `ads_attribution_core` + `community_publish_core` **VERIFIED** (core/sim) · OAuth/spend/publish **BLOCKED_EXTERNAL**
 - [x] Catalog **v1.7.0** — ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI `/saas/erp/*` · evidence `erp.cores_synthetic_latest.md` ALL_PASS
 - [x] influencers_pr **VERIFIED** · telephony/oauth mock/marketplace **VERIFIED**
-- [x] private_vector_rag Docker **VERIFIED** · Railway **PREPARED_OFF**
-- [x] private_ai_canary **PREPARED_OFF** + **BLOCKED_CEO**
+- [x] private_vector_rag Docker **VERIFIED** · Railway staging **IMPLEMENTED_VERIFIED** (ADR-068) · prod DDL **OFF**
+- [x] private_ai_canary code ack **true** (ADR-068) · live prod **BLOCKED_EXTERNAL** (mesh)
 - [x] Localization UI **FULL** · email/PDF **PARTIAL** (honest)
 - [x] PWA Chrome **VERIFIED** · iOS **BLOCKED**
 - [x] Mobile Android scaffold present · APK **BLOCKED_EXTERNAL**
@@ -55,7 +55,7 @@
 - [x] Staging tip **`5a36809c`** · deploy **`5965c32b` SUCCESS** · HTTP A/B + concurrency **ALL_PASS** · reval TOTAL QUALITY **ALL_PASS**
 - [ ] **Daniel/CEO:** formal ack ERP schema prod + auto-deploy policy (`ERP_PROD_MIGRATE_519_520_RUNBOOK.md`)
 - [x] **Opcional HTTP A/B:** **DONE** `erp.http_ab_isolation_latest.md`
-- [ ] **ERP dual-write relational companions (ADR-062):** **PREPARED_OFF**
+- [x] **ERP dual-write relational companions (ADR-062/068):** staging **IMPLEMENTED_VERIFIED** · READ=0 · prod **OFF**
 - [ ] **2ª réplica staging concurrency:** **PREPARED_OFF** (coste Railway — CEO)
 - [ ] **P2 (no bloqueante):** RAG minScore corpus-size floor — `docs/KNOWN_ISSUES.md`
 - [ ] **CEO (opcional):** Railway pgvector + mesh Ollama staging — `CEO_IA_STAGING_APPROVAL_REQUEST.md`

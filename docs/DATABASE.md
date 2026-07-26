@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-26** — ADR-067 CEO · #1 migrate gate **CEO-ACK** · #2 dual-write **NO** · #3 RAG apply **NO** · mig **519+520** · live staging `738f8200` · live prod `d03721c1`
+> Actualizado: **2026-07-26** — ADR-068 · #2 dual-write staging **ON** (READ=0) · #3 `local_ai_*` applied staging only · #1 migrate gate **CEO-ACK** · mig **519+520** · staging live `428c6c91` · prod `d03721c1` · prod dual-write/RAG DDL **OFF**
 
 ---
 
@@ -10,7 +10,8 @@
 |-------|-------|
 | **Prod** | tip **`c2edb2da`** · 519/520 in `_migrations` · **ADR-064 gate VERIFIED** (skip-apply) · CEO ack pending |
 | **Staging** | tip **`c2edb2da`** · auto-migrate · ERP reval ALL_PASS |
-| **SSOT ERP** | `erp_domain_snapshots` · dual-write **PREPARED_OFF** |
+| **SSOT ERP** | `erp_domain_snapshots` · dual-write staging **IMPLEMENTED_VERIFIED** (companions mirror) · READ flip **OFF** · prod dual-write **OFF** |
+| **Private RAG staging** | `local_ai_*` + pgvector 0.8.0 on existing shared DB · RLS role `nelvyon_local_ai_app` · prod DDL **not** applied |
 
 ## ADR-060 — ERP product surface (catalog v1.7.0 · superseded SSOT by ADR-061)
 

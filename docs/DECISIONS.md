@@ -745,7 +745,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Fecha** | 2026-07-25 |
-| **Estado** | **PREPARED_OFF** — diseño + plan + flag helpers; dual-write **no** live; read path **no** flipped |
+| **Estado** | **IMPLEMENTED_VERIFIED (staging)** — mirror live when DUAL_WRITE=1 · READ flip **OFF** · prod **OFF** (ADR-068) |
 | **Relación** | ADR-061 (snapshot SSOT) · mig **519** reserved · mig **520** snapshots+companions+RLS · runbook `docs/ops/ERP_DUAL_WRITE_TRANSITION_RUNBOOK.md` |
 | **Flags** | `NELVYON_ERP_RELATIONAL_DUAL_WRITE` / `NELVYON_ERP_RELATIONAL_READ` — default **0** (fail-closed); **cutover REQUIRES CEO** |
 
@@ -847,3 +847,16 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Por qué** | Firma CEO escrita en chat Cursor · política migrate sin abrir activaciones de coste/riesgo. |
 | **Evidencia** | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` · `points_1_4_ceo_decision_latest.md` · vitest gate + soft-flag reject · ERP A/B ALL_PASS · apply exit 2 |
 | **Consecuencias** | Gate policy **CEO-ACK** · cutovers 2–4 siguen **BLOCKED_CEO** · `claimReady: false` · **NOT READY** |
+| **Superseded (parcial)** | #2–#4 superseded by **ADR-068** (2026-07-26) written CEO close; #1 migrate policy **unchanged** |
+
+---
+
+## ADR-068 — CEO close puntos 2–4 sin coste (staging dual-write + RAG · canary prod mínimo)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-26 |
+| **Decisión** | **#2 SÍ staging only** — dual-write ERP ON staging (`DUAL_WRITE=1`, `READ=0`); **no** prod dual-write/read-flip. **#3 SÍ staging DB existente** — apply `local_ai_*` + RLS role + e2e pgvector; **no** prod DDL; **no** OpenAI. **#4 SÍ canary mínimo prod** solo si mesh Tailscale+Ollama reversible; OpenAI OFF; kill switch; sin OpenClaw/MCP/SM/campañas/pagos. |
+| **Por qué** | Autorización CEO escrita «CIERRE COMPLETO PUNTOS 2–4, SIN COSTE». |
+| **Evidencia** | tip **`428c6c91`** · `erp.dual_write_adr068_latest.md` (equivalence PASS) · `railway.rag_staging_activated_latest.md` + `pgvector-rag.live_latest.md` (PASS_WITH_KNOWN_GAP · RLS A/B PASS) · `private-ai.prod_canary_adr068_latest.md` (**BLOCKED_EXTERNAL** mesh/TS_AUTHKEY · canary **not** live) · vitest mirror/canary **PASS** · ERP A/B+conc **ALL_PASS** |
+| **Consecuencias** | Staging #2/#3 **IMPLEMENTED_VERIFIED** (critical) · prod canary **AUTHORIZED in code** but **not activated** (mesh absent) · `claimReady: false` · **NOT READY** · coste incremental **0** |

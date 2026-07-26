@@ -83,10 +83,11 @@
 | **ADR-059 catalog v1.6.0 + i18n/mobile honesty** | ✅ | ads/community promote (core/sim) · email locale PARTIAL · Android scaffold · tip live `bd165985` |
 | **ADR-060 ERP non-financial cores (catalog v1.7.0)** | ✅ | Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · API/UI wired · mig **519** reserved · payments/IoT/signature/health **BLOCKED_*** · **no Odoo** · **NOT READY** |
 | **ADR-061 Postgres ERP SSOT (mig 520)** | ✅ | Staging+prod tip **`c2edb2da`** · schema prod applied · reval ALL_PASS · CEO formal ack pending |
-| **ADR-062 ERP relational dual-write** | 🟡 | **PREPARED_OFF** · CEO frase en `CEO_POINTS_1_4_APPROVAL_REQUEST.md` |
-| **ADR-065 Railway Private RAG prep** | 🟡 | Fail-closed apply · **PREPARED_OFF** · CEO frase #3 |
+| **ADR-062 ERP relational dual-write** | ✅ | Staging **IMPLEMENTED_VERIFIED** (ADR-068) · READ=0 · prod **OFF** |
+| **ADR-065 Railway Private RAG prep** | ✅ | Staging apply+e2e **IMPLEMENTED_VERIFIED** critical (ADR-068) · prod DDL **OFF** |
 | **ADR-066 Puntos 1–4 prep batch** | ✅ | Prep cerrada 2026-07-26 · tip `43d7c3db` |
-| **ADR-067 CEO 1 SÍ / 2–4 NO** | ✅ | Gate política **CEO-ACK** · dual-write/RAG/canary **NO todavía** · **NOT READY** |
+| **ADR-067 CEO 1 SÍ / 2–4 NO** | ✅ | Gate política **CEO-ACK** · #2–#4 supersedidos por ADR-068 · **NOT READY** |
+| **ADR-068 CEO close 2–4 sin coste** | ✅ | Dual-write+RAG staging VERIFIED · canary authorized/not live (mesh) · **NOT READY** |
 | **CEO master actions** | 🟡 | `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` — solo humano |
 | **TOTAL QUALITY 2026-07-25** | ✅ | Gates PASS · 0 code P0 residual · **NOT READY** (legal/CEO/external) |
 | Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |
@@ -102,8 +103,8 @@
 | Block 21 HA/DR | ✅ | single-region VERIFIED · multi-region BLOCKED_EXTERNAL/COST |
 | Block 22 observability | ✅ | local VERIFIED · paid PREPARED_OFF |
 | Block 23 legacy consolidation | ✅ | VERIFIED · zero unsafe deletes |
-| Block 24 private_vector_rag | ✅ | Docker VERIFIED · Railway PREPARED_OFF · P2 minScore |
-| Block 25 private_ai_canary_prep | 🟡 | PREPARED_OFF · BLOCKED_CEO |
+| Block 24 private_vector_rag | ✅ | Docker VERIFIED · Railway staging **IMPLEMENTED_VERIFIED** (ADR-068) · prod DDL OFF · P2 minScore |
+| Block 25 private_ai_canary_prep | 🟡 | Code AUTHORIZED (ADR-068) · live **BLOCKED_EXTERNAL** mesh |
 | Block 26 purchases_suppliers_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withPurchasesPersistence` · Postgres SSOT when DB · payments **BLOCKED_SCOPE** · catalog **v1.7.0** · 519 reserved |
 | Block 27 inventory_warehouses_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withInventoryPersistence` · no cost/GL · catalog **v1.7.0** · 519 reserved |
 | Block 28 manufacturing_ops_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withManufacturingPersistence` · IoT **BLOCKED_EXTERNAL** · catalog **v1.7.0** |
