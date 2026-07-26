@@ -1,4 +1,4 @@
-# CTO Final Verify — 2026-07-26 (PUNTOS 1–4 PREPARED)
+# CTO Final Verify — 2026-07-26 (PUNTOS 1–4 PREP COMMITTED)
 
 > **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste 0 · **0 activaciones**
 
@@ -6,8 +6,9 @@
 
 | Entorno | Tip | Health |
 |---------|-----|--------|
-| Staging | `d03721c1` | live+ready 200 |
-| Prod | `d03721c1` | live OK · OpenAI OFF |
+| Repo | `43d7c3db` | prep commit (docs/classify/evidence) |
+| Staging live | `d03721c1` | live+ready 200 |
+| Prod live | `d03721c1` | live OK · OpenAI OFF |
 
 ## Gates (esta sesión)
 

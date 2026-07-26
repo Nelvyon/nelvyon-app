@@ -3,11 +3,11 @@
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
 > Última actualización: **2026-07-26** — **PUNTOS 1–4 PREP COMMITTED** · live tip **`d03721c1`** · `claimReady: false` · **NOT READY** · **nada activado**
 
-> Última actualización automática: **2026-07-26 13:37 UTC**
+> Última actualización automática: **2026-07-26 13:38 UTC**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | (se sincroniza tras commit prep) |
+| **Último commit** | 43d7c3db |
 | **Fecha doc** | 2026-07-26 |
 | **Rama** | `main` |
 

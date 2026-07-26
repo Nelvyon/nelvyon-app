@@ -2,12 +2,13 @@
 
 > Actualizado: **2026-07-26** PUNTOS 1–4 PREPARED · live tip `d03721c1`.
 
-## 2026-07-26 — PUNTOS 1–4 PREPARED (sin activar)
+## 2026-07-26 — PUNTOS 1–4 PREP COMMITTED (sin activar)
 
 | Campo | Valor |
 |-------|-------|
-| **Live staging/prod** | tip **`d03721c1`** (docs/prep commits pueden ir detrás) |
-| **Evidencia** | `points_1_4_prep_latest.md` · ERP reval ALL_PASS · apply schema **no** ejecutado · canary **no** ejecutado |
+| **Repo tip** | **`43d7c3db`** · docs/classify/evidence only |
+| **Live staging/prod** | tip **`d03721c1`** (sin flags productivos; docs deploy puede SKIP) |
+| **Evidencia** | `points_1_4_prep_latest.md` · ERP reval ALL_PASS · apply schema **no** · canary **no** · migrate prod **no** |
 | **CEO** | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` PENDING |
 | **claimReady** | **false** |
 
