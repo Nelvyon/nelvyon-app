@@ -1,0 +1,60 @@
+{
+  "at": "2026-07-26T13:30:06.747Z",
+  "P1": {
+    "env": {
+      "isProduction": true,
+      "label": "production(explicit)"
+    },
+    "pending1_refuse": {
+      "allowApply": false,
+      "exitCode": 1,
+      "message": "production: BLOCKED 1 pending migration(s) without CEO approval. Set NELVYON_PROD_MIGRATE_APPROVED=1 + NELVYON_PROD_MIGRATE_APPROVED_BY=<name> (optional NELVYON_PROD_MIGRATE_COMMIT_SHA=<tip>) for a single deploy window, then unset. Denial: NELVYON_PROD_MIGRATE_APPROVED must be exactly '1'"
+    },
+    "pending0_noop": {
+      "allowApply": false,
+      "exitCode": 0,
+      "message": "production: no pending migrations; skip apply (gate active, no CEO approval required for no-op)"
+    },
+    "approved": {
+      "allowApply": true,
+      "exitCode": 0,
+      "message": "production: migrate apply allowed (approved_by=Daniel)"
+    },
+    "staging": {
+      "allowApply": true,
+      "exitCode": 0,
+      "message": "non-production: migrate apply allowed"
+    },
+    "approval_empty": {
+      "approved": false,
+      "approvedBy": null,
+      "commitPin": null,
+      "reason": "NELVYON_PROD_MIGRATE_APPROVED must be exactly '1'"
+    }
+  },
+  "P2": {
+    "default": {
+      "dualWrite": false,
+      "read": false,
+      "misconfigured": false
+    },
+    "misconfig": {
+      "dualWrite": false,
+      "read": false,
+      "misconfigured": true
+    }
+  },
+  "P3": {
+    "apply_flag": false,
+    "assert_blocked": "BLOCKED:BLOCKED: NELVYON_LOCAL_AI_SCHEMA_APPLY must be exactly '1' to apply local_ai schema (PREPARED_OFF until CEO)",
+    "db_resolve": {
+      "url": null,
+      "source": "none",
+      "blockedReason": "LOCAL_AI_DATABASE_URL absent; set NELVYON_LOCAL_AI_USE_MAIN_DB=1 only after CEO approve shared-DB RAG schema"
+    }
+  },
+  "P4": {
+    "authorized": false,
+    "kill": true
+  }
+}

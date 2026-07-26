@@ -7,6 +7,8 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Ops / Gobernanza | **PUNTOS 1–4 PREP COMMITTED (sin activar)** | Commit+push docs · orphan classify 14→0 · evidencias `points_1_4_*` · ERP reval ALL_PASS · ADR-066 · **NO** dual-write · **NO** RAG apply · **NO** canary · **NO** migrate prod · `claimReady: false` |
+| Ops / Gobernanza | **PUNTOS 1–4 PREPARED (sin activar)** | ADR-064 reval fail-closed · ERP dual-write PREPARED_OFF + staging A/B/conc/persist **ALL_PASS** · RAG apply blocked exit 2 · canary `authorized===false` · `CEO_POINTS_1_4_APPROVAL_REQUEST.md` (4 frases SÍ/NO) · orphan classify 14→0 · evidence `points_1_4_*` · **0 activaciones** · `claimReady: false` |
 | Ops / IA / Mobile | **CIERRE TOTAL Cursor** | Staging+prod tip **`d03721c1`** VERIFIED · `railwayRagPrep`+apply script fail-closed · RAG runbook PREPARED_OFF · `android-one-step.mjs` · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` · email/PDF PARTIAL inventory · canary rollback &lt;5min · ERP concurrency ALL_PASS · `claimReady: false` |
 
 ## 2026-07-25

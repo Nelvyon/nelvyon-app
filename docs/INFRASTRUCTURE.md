@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-25** (ADR-061 VERIFIED staging). Sin secretos.
+> Estado real documentado **2026-07-26** (Puntos 1–4 PREPARED · sin activar). Sin secretos.
 
 ---
 

@@ -1,10 +1,10 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-25** CIERRE INTERNO ABSOLUTO. Staging+prod tip **`c2edb2da`**. OAuth/Twilio/ads reales **BLOCKED_EXTERNAL**.  
-> ERP ✅ · migrate gate prod ✅ código · dual-write **PREPARED_OFF** · **sin Odoo**.
+> Actualizado: **2026-07-26** — live tip **`d03721c1`** · Puntos 1–4 PREPARED · OAuth/Twilio/ads reales **BLOCKED_EXTERNAL**.  
+> ERP ✅ · migrate gate prod ✅ · dual-write **PREPARED_OFF** · RAG Railway apply **PREPARED_OFF** · canary IA **PREPARED_OFF** · **sin Odoo**.
 
-**Bloqueadores go-live:** CEO ack · OAuth/Twilio/iOS/IA · Pepito legal.
+**Bloqueadores go-live:** 4 frases CEO · OAuth/Twilio/iOS/IA · Pepito legal.
 
 ### Auth bridge Web ↔ FastAPI
 

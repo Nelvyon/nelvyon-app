@@ -6,6 +6,14 @@
 
 ## Activos
 
+### Ops (no KI) — Puntos 1–4 CEO batch (ADR-066)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **PREPARED** · activación **OFF** · PENDING_CEO |
+| **Detalle** | Migrate gate · dual-write · RAG apply · canary IA — todos fail-closed. Frases: `CEO_POINTS_1_4_APPROVAL_REQUEST.md` |
+| **Evidencia** | `points_1_4_prep_latest.md` · `points_1_4_failclosed_latest.json` |
+
 ### Ops (no KI) — Prod migrate gate ADR-064 (histórico 519/520 kept)
 
 | Campo | Valor |

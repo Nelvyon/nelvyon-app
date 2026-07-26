@@ -1016,17 +1016,17 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 
 ### 8.1 Veredicto
 
-**[VERIFICADO]** Fuente: HANDOVER + `OS_CATALOG_V1.md` — **2026-07-25** (ADR-061 Postgres ERP SSOT · catalog **v1.7.0**)
+**[VERIFICADO]** Fuente: HANDOVER + `OS_CATALOG_V1.md` — **2026-07-26** (Puntos 1–4 PREPARED · sin activar)
 
 | Campo | Valor |
 |-------|-------|
 | **Veredicto** | **CONDITIONAL_READY** (**NOT READY** · `claimReady: false`) |
-| **SHA / deploys** | tip **`d03721c1`** staging+prod · CIERRE TOTAL Cursor · RAG prep PREPARED_OFF · master CEO actions · OpenAI OFF |
-| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-062 dual-write **PREPARED_OFF** · ADR-064 prod migrate gate **VERIFIED** (+ migrate.ts) |
-| **ERP honesty** | Staging full path VERIFIED · prod schema live · futuras migs gated · payments **BLOCKED_SCOPE** · **no Odoo** |
+| **SHA / deploys** | live tip **`d03721c1`** staging+prod · Puntos 1–4 prep · OpenAI OFF · **0 activaciones** |
+| **OS Catalog v1.7.0** | ERP Blocks 26–29+35 **IMPLEMENTED_VERIFIED** · ADR-062 dual-write **PREPARED_OFF** · ADR-064 prod migrate gate **VERIFIED** (+ migrate.ts) · ADR-065 RAG apply **PREPARED_OFF** · ADR-066 CEO batch 1–4 |
+| **ERP honesty** | Staging A/B+conc+persist ALL_PASS · prod schema live · futuras migs gated · payments **BLOCKED_SCOPE** · **no Odoo** |
 | **Capacidades (honest)** | influencers/telephony(sim)/oauth(mock)/marketplace **VERIFIED** · RAG Docker **VERIFIED** / Railway **PREPARED_OFF** · private_ai_canary **PREPARED_OFF+BLOCKED_CEO** · i18n UI **FULL** / email+PDF **PARTIAL** · PWA Chrome **VERIFIED** / iOS **BLOCKED** · mobile Android build VERIFIED / device+stores **BLOCKED** · HA single-region **VERIFIED** · multi-region **BLOCKED_EXTERNAL/COST** · obs local **VERIFIED** · legacy **VERIFIED** (0 deletes) |
 | **Competitive honesty** | No live OAuth spend · no GHL telephony parity (sim only) · **no Odoo ERP/finance** · mass-send blocked · social/publish pending CEO · no proven multi-tenant prod outcomes |
-| **Blocker claimReady** | Legal Pepito + licencia · mass-send **BLOCKED_LEGAL** |
+| **Blocker claimReady** | Legal Pepito + licencia · mass-send **BLOCKED_LEGAL** · CEO 4 frases `CEO_POINTS_1_4_APPROVAL_REQUEST.md` |
 | Freezes Router / MCP / prod IA | **intactos** |
 | Producto enterprise completo | **NO** |
 

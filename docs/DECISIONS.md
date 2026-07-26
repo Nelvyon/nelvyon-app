@@ -823,3 +823,15 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Por qué** | Extension pgvector ya en staging; path productivo requiere DDL + wiring consciente · evitar pending ADR-064 en prod por mig SaaS |
 | **Evidencia** | `railwayRagPrep.ts` · tests · `RAILWAY_PRIVATE_RAG_PREP_RUNBOOK.md` · apply sin flag → exit 2 |
 | **Estado** | **PREPARED_OFF** · cutover apply **BLOCKED_CEO** |
+
+---
+
+## ADR-066 — Puntos 1–4 prep close sin activación (CEO batch)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-26 |
+| **Decisión** | Cerrar prep de (1) ADR-064 migrate gate, (2) ADR-062 dual-write, (3) ADR-065 RAG Railway, (4) canary IA prod — todos **PREPARED_OFF** / fail-closed — con **una frase SÍ/NO por punto** en `CEO_POINTS_1_4_APPROVAL_REQUEST.md`. Sin SÍ escrito: **prohibido** migrate prod nueva, dual-write, apply schema, canary. |
+| **Por qué** | Pedido CEO: preparar y cerrar sin activar ni costes ni OpenAI. |
+| **Evidencia** | `points_1_4_failclosed_latest.json` · `points_1_4_prep_latest.md` · ERP ALL_PASS · orphan classify 14→0 |
+| **Consecuencias** | `claimReady: false` · activaciones solo tras respuesta CEO |

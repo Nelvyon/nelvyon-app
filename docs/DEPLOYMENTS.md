@@ -1,6 +1,15 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-26** CIERRE TOTAL Cursor tip `d03721c1`.
+> Actualizado: **2026-07-26** PUNTOS 1–4 PREPARED · live tip `d03721c1`.
+
+## 2026-07-26 — PUNTOS 1–4 PREPARED (sin activar)
+
+| Campo | Valor |
+|-------|-------|
+| **Live staging/prod** | tip **`d03721c1`** (docs/prep commits pueden ir detrás) |
+| **Evidencia** | `points_1_4_prep_latest.md` · ERP reval ALL_PASS · apply schema **no** ejecutado · canary **no** ejecutado |
+| **CEO** | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` PENDING |
+| **claimReady** | **false** |
 
 ## 2026-07-26 — CIERRE TOTAL Cursor
 

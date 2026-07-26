@@ -1,13 +1,13 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-26** — **CIERRE TOTAL Cursor** · staging+prod tip **`d03721c1`** · RAG prep PREPARED_OFF · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-26** — **PUNTOS 1–4 PREP COMMITTED** · live tip **`d03721c1`** · `claimReady: false` · **NOT READY** · **nada activado**
 
-> Última actualización automática: **2026-07-26 13:18 UTC**
+> Última actualización automática: **2026-07-26 13:37 UTC**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit** | 4792d3b9 |
+| **Último commit** | (se sincroniza tras commit prep) |
 | **Fecha doc** | 2026-07-26 |
 | **Rama** | `main` |
 
@@ -18,23 +18,28 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** |
-| **Staging** | tip **`d03721c1`** · deploy **`d0393675` SUCCESS** · live+ready OK |
-| **Prod** | tip **`d03721c1`** · read-only verify · OpenAI OFF |
-| **Solo humano** | `docs/ops/CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` |
+| **Staging** | tip **`d03721c1`** · live+ready OK · ERP A/B+conc+persist **ALL_PASS** |
+| **Prod** | tip **`d03721c1`** · OpenAI OFF · migrate gate ADR-064 activo |
+| **Puntos 1–4** | Prep **commiteada** · activación **OFF** · frases SÍ/NO en `docs/ops/CEO_POINTS_1_4_APPROVAL_REQUEST.md` |
 | **Coste** | 0 |
+| **NO hecho** | dual-write · RAG schema apply · canary IA prod · migrate prod nueva · flags productivos |
 
 ## Próximo paso EXACTO
 
-1. Abrir `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` y ejecutar ítems A–D (ack migrate, Android one-step, iOS, OAuth, legal).
-2. **No READY** sin legal + mercado + clientes.
+1. Daniel responde **SÍ/NO** a las **4 frases** en `docs/ops/CEO_POINTS_1_4_APPROVAL_REQUEST.md`.
+2. Sin SÍ: no migrate prod · no dual-write · no apply RAG schema · no canary IA.
+3. Resto humano: `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` (Android/iOS/OAuth/legal).
+4. **No READY** sin legal + mercado + clientes.
 
-### Rollback staging
+### Rollback / fail-closed (sin cambio)
 
 ```
-AUTONOMOUS_ALLOW_OPENAI=0
-NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
-NELVYON_ADS_SPEND_ENABLED=0
+NELVYON_PROD_MIGRATE_APPROVED unset
 NELVYON_ERP_RELATIONAL_DUAL_WRITE=0
+NELVYON_ERP_RELATIONAL_READ=0
 NELVYON_LOCAL_AI_SCHEMA_APPLY=0
 NELVYON_LOCAL_AI_USE_MAIN_DB=0
+NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
+AUTONOMOUS_ALLOW_OPENAI=0
+NELVYON_AI_ENABLED=0   # prod
 ```

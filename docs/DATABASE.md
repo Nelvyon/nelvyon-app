@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-25** — tip **`c2edb2da`** · mig **519+520** · ADR-064 **VERIFIED** (+ migrate.ts) · A/B+concurrency VERIFIED · ADR-062 PREPARED_OFF · CEO ack pending
+> Actualizado: **2026-07-26** — live tip **`d03721c1`** · mig **519+520** · ADR-064 **VERIFIED** · ADR-062 PREPARED_OFF · ADR-065 RAG apply **PREPARED_OFF** · puntos 1–4 CEO PENDING
 
 ---
 

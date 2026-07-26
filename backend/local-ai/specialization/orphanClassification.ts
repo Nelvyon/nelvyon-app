@@ -63,7 +63,21 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/SPRINT_FINAL_ABSOLUTO.md", disposition: "index", domain: "nelvyon", priority: 0, title: "Sprint Final Absoluto", reason: "CONDITIONAL_READY status" },
   { path: "docs/TEST_SKIPS.md", disposition: "index", domain: "development_tech", priority: 0, title: "Vitest Skipped Tests SSOT", reason: "Skip activation criteria" },
   { path: "docs/CTO_FINAL_VERIFY.md", disposition: "index", domain: "nelvyon", priority: 0, title: "CTO Final Verify", reason: "verify-all CONDITIONAL_READY evidence" },
-
+  // —— Wave 3: points 1–4 prep (2026-07-26) — remaining top-level orphans ——
+  { path: "docs/ARCHITECTURE_LOCAL_AI_RUNTIME.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Architecture Local AI Runtime", reason: "Local AI/runtime SSOT" },
+  { path: "docs/COMPLIANCE_COMPANY_DB_CHECKLIST.md", disposition: "index", domain: "security_privacy", priority: 1, title: "Compliance Company DB Checklist", reason: "Company DB compliance" },
+  { path: "docs/CTO_STRATEGIC_GAPS_MATRIX.md", disposition: "index", domain: "nelvyon", priority: 1, title: "CTO Strategic Gaps Matrix", reason: "Strategic gaps SSOT" },
+  { path: "docs/FREE_TOOLS_EVALUATION.md", disposition: "index", domain: "development_tech", priority: 1, title: "Free Tools Evaluation", reason: "OSS evaluation research (install gated)" },
+  { path: "docs/OPS_QUALITY_AUDIT.md", disposition: "index", domain: "development_tech", priority: 1, title: "Ops Quality Audit", reason: "Ops quality audit" },
+  { path: "docs/OS_AGENT_TEAM_AUDIT.md", disposition: "index", domain: "nelvyon", priority: 1, title: "OS Agent Team Audit", reason: "Agent team audit" },
+  { path: "docs/OS_AUTONOMOUS_OPERATIONS.md", disposition: "index", domain: "nelvyon", priority: 1, title: "OS Autonomous Operations", reason: "Autonomous ops SSOT" },
+  { path: "docs/OS_CATALOG_V1.md", disposition: "index", domain: "nelvyon", priority: 0, title: "OS Catalog V1", reason: "Catalog contract" },
+  { path: "docs/OS_ELITE_STATE_MATRIX.md", disposition: "index", domain: "nelvyon", priority: 1, title: "OS Elite State Matrix", reason: "Elite state matrix" },
+  { path: "docs/OS_NEW_SERVICES_CONTRACTS.md", disposition: "index", domain: "nelvyon", priority: 1, title: "OS New Services Contracts", reason: "New services contracts" },
+  { path: "docs/OS_UNIVERSAL_SERVICE_CATALOG.md", disposition: "index", domain: "nelvyon", priority: 0, title: "OS Universal Service Catalog", reason: "OS status SSOT" },
+  { path: "docs/PROPOSAL_QUALITY_ROUTING_LOCAL.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 1, title: "Proposal Quality Routing Local", reason: "QR local proposal" },
+  { path: "docs/CTO_FINAL_CLOSURE_AUDIT.md", disposition: "archive", reason: "Dated CTO closure audit snapshot" },
+  { path: "docs/OS_FLOW_AUDIT.md", disposition: "archive", reason: "OS flow audit snapshot" },
 
   // —— Archive: historical / superseded / research dumps ——
   { path: "docs/BETA_LAUNCH_AUDIT.md", disposition: "archive", reason: "Pre-beta historical audit" },

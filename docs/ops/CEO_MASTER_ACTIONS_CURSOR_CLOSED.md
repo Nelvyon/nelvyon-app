@@ -7,6 +7,7 @@
 
 | # | Acción | Doc | Tiempo |
 |---|--------|-----|--------|
+| 0 | **Primero:** 4 frases SÍ/NO puntos 1–4 | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` | 5 min |
 | 1 | Ack histórico 519/520 + política migrate | `PROD_MIGRATE_GATE_RUNBOOK.md` | 5 min |
 | 2 | Ventana migrate futura: set/unset `NELVYON_PROD_MIGRATE_*` | idem | por mig |
 | 3 | Dual-write ERP cutover SÍ/NO | `ERP_DUAL_WRITE_TRANSITION_RUNBOOK.md` | decisión |
