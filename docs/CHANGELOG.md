@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Ops / IA | **ADR-069 prod canary attempt (fail-closed)** | CEO `TS_AUTHKEY` · MESH_JOIN_OK · tip **`1eaed9f2`** (dockerignore fix) · smoke route 3B/isolation PASS · inference FAIL `127.0.0.1:5434` · kill ~1.27s · OpenAI OFF · **NOT** IMPLEMENTED_VERIFIED · `claimReady: false` · **NOT READY** |
 | Ops / CEO | **ADR-068 close puntos 2–4 (sin coste)** | Staging dual-write **IMPLEMENTED_VERIFIED** (JSONB↔`erp_suppliers` equivalence) · RAG Railway staging schema+RLS+e2e **IMPLEMENTED_VERIFIED** critical (PASS_WITH_KNOWN_GAP) · prod canary **AUTHORIZED** en tip `428c6c91` pero **NOT activated** (**BLOCKED_EXTERNAL** Tailscale/`TS_AUTHKEY`) · OpenAI OFF · prod dual-write/RAG DDL OFF · tip staging live `428c6c91` · prod live `d03721c1` · `claimReady: false` · coste **0** |
 | Gobernanza / CEO | **ADR-067 CEO 1 SÍ / and 2–4 NO** | #1 gate migrate **CEO-ACK** (sin migrate ahora) · #2 dual-write NO · #3 RAG apply NO · #4 canary IA NO · regresión soft-flag approve · ERP A/B ALL_PASS · `points_1_4_ceo_decision_latest.md` · `claimReady: false` · **parcialmente supersedido por ADR-068** (#2–#4) |
 | Ops / Gobernanza | **PUNTOS 1–4 PREP COMMITTED (sin activar)** | Commit+push docs · orphan classify 14→0 · evidencias `points_1_4_*` · ERP reval ALL_PASS · ADR-066 · **NO** dual-write · **NO** RAG apply · **NO** canary · **NO** migrate prod · `claimReady: false` |

@@ -6,13 +6,22 @@
 
 ## Activos
 
+### Ops (no KI) — Prod private AI canary inference DB (ADR-068 attempt)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Abierto** — canary **ATTEMPTED_FAIL_CLOSED** |
+| **Detalle** | Mesh `MESH_JOIN_OK` + routes tip `1eaed9f2` OK · smoke inference FAIL `ECONNREFUSED 127.0.0.1:5434` because `getLocalAiConfig()` defaults to local Docker Postgres when `NELVYON_LOCAL_AI_USE_MAIN_DB≠1` and prod has no `LOCAL_AI_DATABASE_URL` / no prod `local_ai_*` DDL. Kill ON. Prior false 404: `.dockerignore` excluded routes (fixed). |
+| **Evidencia** | `private-ai.prod_canary_adr068_latest.md` · `private-ai.prod_canary_smoke_latest.md` |
+| **Pendiente** | USE_MAIN_DB+schema (ADR-064) **or** production fail-closed + inference sin Postgres local-AI antes de reabrir |
+
 ### Ops (no KI) — Puntos 1–4 CEO batch (ADR-066 → ADR-067)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CEO_DECIDED** · #1 SÍ (política) · #2–#4 **NO todavía** · **0 activaciones** |
-| **Detalle** | Gate migrate fail-closed **CEO-ACK**. ADR-068: dual-write+RAG staging verified; prod canary live blocked on Tailscale mesh (`TS_AUTHKEY`). |
-| **Evidencia** | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` · `points_1_4_ceo_decision_latest.md` |
+| **Estado** | **CEO_DECIDED** · #1 SÍ (política) · #2–#4 staging verified / prod canary attempted fail-closed |
+| **Detalle** | Gate migrate fail-closed **CEO-ACK**. ADR-068: dual-write+RAG staging verified; prod canary mesh OK but inference blocked on local-AI DB default. |
+| **Evidencia** | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` · `private-ai.prod_canary_adr068_latest.md` |
 
 ### Ops (no KI) — Prod migrate gate ADR-064 (histórico 519/520 kept)
 

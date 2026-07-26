@@ -1,4 +1,4 @@
-# CTO Final Verify — 2026-07-26 (ADR-068 CEO close 2–4)
+# CTO Final Verify — 2026-07-26 (ADR-068 prod canary attempt)
 
 > **CONDITIONAL_READY** · `claimReady: false` · **NOT READY** · coste incremental **0**
 
@@ -6,8 +6,8 @@
 
 | Entorno | Tip | Health |
 |---------|-----|--------|
-| Staging live | `428c6c913c4d` | live OK · DUAL_WRITE=1 · READ=0 · RAG USE_MAIN_DB=1 |
-| Prod live | `d03721c19916` | live OK · OpenAI ABSENT · canary flags ABSENT · dual-write ABSENT |
+| Staging live | `428c6c913c4d` (prior) | live OK · DUAL_WRITE=1 · READ=0 · RAG USE_MAIN_DB=1 |
+| Prod live | **`1eaed9f2d859`** | live/ready **200** · kill **ON** · AI/canary **OFF** · OpenAI **ABSENT** |
 
 ## CEO matrix (ADR-068)
 
@@ -16,19 +16,21 @@
 | 1 | SÍ gate política (ADR-067) | CERTIFIED · no migrate nueva |
 | 2 | Dual-write staging only | **IMPLEMENTED_VERIFIED** · prod OFF |
 | 3 | RAG staging DB existente | **IMPLEMENTED_VERIFIED** critical · prod DDL OFF |
-| 4 | Canary IA prod mínimo | Code **AUTHORIZED** · live **BLOCKED_EXTERNAL** (no TS_AUTHKEY/mesh) · **not activated** |
+| 4 | Canary IA prod mínimo | **ATTEMPTED** · mesh+routes+kill **VERIFIED** · inference **FAIL** (`ECONNREFUSED 127.0.0.1:5434`) · left **fail-closed** · **not** IMPLEMENTED_VERIFIED |
 
-## Gates esta sesión
+## Gates esta sesión (prod canary)
 
 | Gate | Resultado |
 |------|-----------|
-| tsc | **0** |
-| vitest mirror+dualWrite+canary | **34 PASS** |
-| ERP dual-write equivalence | **PASS** (`erp_suppliers` = snapshot) |
-| ERP A/B staging | **ALL_PASS** |
-| ERP concurrency | **ALL_PASS** |
-| RAG e2e staging | **PASS_WITH_KNOWN_GAP** · RLS A/B **PASS** |
-| Prod canary live | **NOT RUN** (mesh absent — stopped per limits) |
-| OpenAI | **OFF** staging+prod |
+| `TS_AUTHKEY` | **SET** |
+| MESH_JOIN_OK | **PASS** |
+| `.dockerignore` routes in image | **PASS** (tip `1eaed9f2`) |
+| live / ready | **PASS** |
+| status · no OpenAI | **PASS** |
+| tenant isolation status A/B | **PASS** |
+| router route → 3B | **PASS** |
+| inference execute | **FAIL** (local-AI default Postgres :5434) |
+| Kill switch | **PASS** (~1.27s vars · deploy healthy) |
+| OpenAI / MCP / SM / OpenClaw | **OFF** |
 
-**No READY.**
+**No READY.** Evidencia: `private-ai.prod_canary_adr068_latest.md` · smoke + kill_dockerignore.

@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-26** (ADR-068 close 2–4 · coste 0). Sin secretos.
+> Estado real documentado **2026-07-26** (ADR-068 prod canary attempt · coste 0). Sin secretos.
 
 ---
 
@@ -13,9 +13,9 @@
 | **Node.js** | ✅ | v20+ prod Docker |
 | **pnpm** | ✅ | 10.33 |
 | **Python** | ✅ | 3.10+; FastAPI |
-| **Docker** | ✅ local / ✅ Railway staging | local-ai/pgvector Docker **VERIFIED** · Railway staging `local_ai_*` **IMPLEMENTED_VERIFIED** · prod DDL **OFF** |
+| **Docker** | ✅ local / ✅ Railway staging | local-ai/pgvector Docker **VERIFIED** · Railway staging `local_ai_*` **IMPLEMENTED_VERIFIED** · prod DDL **OFF** · `.dockerignore` must **not** exclude private-ai inference routes |
 | **Railway staging** | ✅ | tip **`428c6c91`** · dual-write ON · RAG USE_MAIN_DB · OpenAI=0 |
-| **Railway prod** | ✅ | tip **`d03721c1`** · ADR-064 · OpenAI ABSENT · canary **not** live (mesh **BLOCKED_EXTERNAL**) |
+| **Railway prod** | ✅ | tip **`1eaed9f2`** · ADR-064 · OpenAI ABSENT · mesh Option A **JOIN_OK** · canary **KILL ON** (inference not verified) |
 | **App multi-replica ERP** | 🟡 | **BLOCKED_EXTERNAL/COST** — no 2ª réplica activada · concurrency smoke equivalente |
 | **ERP non-financial (26–29+35)** | ✅ **IMPLEMENTED_VERIFIED** (staging) | Snapshot SSOT · dual-write companions **VERIFIED** · READ=0 · HTTP A/B · concurrency · prod dual-write **OFF** |
 | **App multi-replica ERP** | 🟡 | FOR UPDATE designed · **2ª réplica no provisionada** (0€ / COST if scaled) |
@@ -29,7 +29,7 @@
 | **PWA (Block 19)** | ✅ Chrome **VERIFIED** | iOS **BLOCKED** |
 | **Observability** | ✅ local **VERIFIED** | paid APM **PREPARED_OFF** |
 | **Private RAG (Block 24)** | ✅ Docker / 🟡 Railway | Docker **VERIFIED** · Railway **PREPARED_OFF** |
-| **Private AI canary** | 🟡 | **PREPARED_OFF** + **BLOCKED_CEO** |
+| **Private AI canary** | 🟡 | Mesh+routes+kill **VERIFIED** · inference **FAIL** (`127.0.0.1:5434`) · steady **KILL ON** |
 | **Costes** | **0** | |
 
 ---

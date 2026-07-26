@@ -858,5 +858,18 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Fecha** | 2026-07-26 |
 | **Decisión** | **#2 SÍ staging only** — dual-write ERP ON staging (`DUAL_WRITE=1`, `READ=0`); **no** prod dual-write/read-flip. **#3 SÍ staging DB existente** — apply `local_ai_*` + RLS role + e2e pgvector; **no** prod DDL; **no** OpenAI. **#4 SÍ canary mínimo prod** solo si mesh Tailscale+Ollama reversible; OpenAI OFF; kill switch; sin OpenClaw/MCP/SM/campañas/pagos. |
 | **Por qué** | Autorización CEO escrita «CIERRE COMPLETO PUNTOS 2–4, SIN COSTE». |
-| **Evidencia** | tip **`428c6c91`** · `erp.dual_write_adr068_latest.md` (equivalence PASS) · `railway.rag_staging_activated_latest.md` + `pgvector-rag.live_latest.md` (PASS_WITH_KNOWN_GAP · RLS A/B PASS) · `private-ai.prod_canary_adr068_latest.md` (**BLOCKED_EXTERNAL** mesh/TS_AUTHKEY · canary **not** live) · vitest mirror/canary **PASS** · ERP A/B+conc **ALL_PASS** |
-| **Consecuencias** | Staging #2/#3 **IMPLEMENTED_VERIFIED** (critical) · prod canary **AUTHORIZED in code** but **not activated** (mesh absent) · `claimReady: false` · **NOT READY** · coste incremental **0** |
+| **Evidencia** | tip **`428c6c91`** · `erp.dual_write_adr068_latest.md` · `railway.rag_staging_activated_latest.md` · canary attempt tip **`1eaed9f2`** · `private-ai.prod_canary_adr068_latest.md` |
+| **Consecuencias** | Staging #2/#3 **IMPLEMENTED_VERIFIED** · prod canary **ATTEMPTED_FAIL_CLOSED** 2026-07-26 (mesh+kill OK · inference blocked on local-AI `:5434`) · `claimReady: false` · **NOT READY** · coste **0** |
+
+---
+
+## ADR-069 — Prod private AI canary fail-closed (mesh OK · inference DB blocked)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-26 |
+| **Decisión** | Tras CEO `TS_AUTHKEY`: abrir canary mínimo Ollama/Tailscale only; si **cualquier** gate falla → kill inmediato y dejar prod sana. No declarar IMPLEMENTED_VERIFIED ni READY sin inference PASS. |
+| **Hallazgos** | (1) `.dockerignore` excluía rutas inference/router-health → 404 HTML (fix `1eaed9f2`). (2) `getLocalAiConfig()` default `127.0.0.1:5434` sin `NELVYON_LOCAL_AI_USE_MAIN_DB=1` → execute FAIL. (3) Health `ollama:false` puede ser early-return por postgres, no prueba de mesh down. |
+| **Estado steady** | KILL=1 · AI/canary/OLLAMA_CONFIGURED=0 · OpenAI ABSENT · MESH Option A retained |
+| **Evidencia** | `private-ai.prod_canary_adr068_latest.md` · smoke · kill_dockerignore · deploy `f778bed9` / kill `ff843eae` |
+| **Consecuencias** | Próxima reapertura requiere path DB CEO-safe (USE_MAIN_DB+schema ADR-064 **o** fail-closed code sin default :5434) · **NOT READY** |

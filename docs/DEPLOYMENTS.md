@@ -1,6 +1,20 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-26** ADR-068 CEO close 2–4.
+> Actualizado: **2026-07-26** ADR-068 prod canary attempt (fail-closed).
+
+## 2026-07-26 — ADR-068 prod private AI canary attempt (killed)
+
+| Campo | Valor |
+|-------|-------|
+| **Código tip** | **`1eaed9f2`** (`.dockerignore` includes private-ai inference/router-health/metrics) |
+| **Prior tip** | `8856d5dc` (routes present in git but excluded from image) · `5064f1c1` mesh Dockerfile |
+| **Canary deploy** | `f778bed9` SUCCESS · `MESH_JOIN_OK` · tip live `1eaed9f2` |
+| **Smoke** | **FAIL** inference `ECONNREFUSED 127.0.0.1:5434` · route 3B PASS · status/isolation PASS |
+| **Kill** | vars ~**1.27s** · deploy `ff843eae` SUCCESS · KILL=1 · AI/canary/OLLAMA_CONFIGURED=0 |
+| **Steady flags** | OpenAI ABSENT · ALLOW=0 · mesh Option A retained · no MCP/SM/OpenClaw |
+| **Evidencia** | `private-ai.prod_canary_adr068_latest.md` · `private-ai.prod_canary_smoke_latest.md` · `private-ai.prod_canary_kill_dockerignore_latest.md` |
+| **claimReady** | **false** · **NOT READY** |
+| **Coste** | **0** |
 
 ## 2026-07-26 — ADR-068 close puntos 2–4 (staging activate · prod canary stopped)
 
