@@ -3,13 +3,13 @@
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
 > Última actualización: **2026-07-26** — **ADR-067 CEO 1 SÍ / 2–4 NO** · gate migrate **CEO-ACK** · `claimReady: false` · **NOT READY** · **0 activaciones**
 
-> Última actualización automática: **2026-07-26**
+> Última actualización automática: **2026-07-26 13:54 UTC**
 
 | Campo | Valor |
 |-------|-------|
 | **Último commit** | (sync post-commit) |
 | **Fecha doc** | 2026-07-26 |
-| **Rama** | `main` |
+| **Rama** | `main` (ahead 1) |
 
 ---
 
