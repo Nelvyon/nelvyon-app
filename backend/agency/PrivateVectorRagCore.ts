@@ -13,24 +13,19 @@
  *
  * Production pgvector path (`backend/local-ai/LocalVectorStore.ts` +
  * `backend/local-ai/LocalEmbeddingProvider.ts` + `backend/local-ai/LocalRagRetriever.ts`)
- * was **re-verified live** on 2026-07-25 against a real Docker `pgvector/pgvector:pg16`
- * container and a real local Ollama `nomic-embed-text` embedding model — see
- * `scripts/staging-smoke-pgvector-rag-e2e.mjs` and
- * `scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md`. Real chunk +
- * document ingestion, real 768-dim pgvector cosine search, and hard tenant isolation at
- * BOTH the application filter layer and the database RLS layer (non-superuser
- * `nelvyon_local_app` role, `FORCE ROW LEVEL SECURITY`) were all confirmed live — not
- * simulated. A known, non-blocking P2 tuning gap was found and documented (not hidden):
- * with real embeddings, the production default `minScore=0.32` does not reliably refuse
- * an off-topic query against a very small (<10 chunk) tenant corpus — see
- * `PRIVATE_VECTOR_RAG_STATUS.productionPgvectorKnownGap` and `docs/KNOWN_ISSUES.md`.
+ * was **re-verified live** on 2026-07-27 against Railway staging + Ollama `nomic-embed-text`
+ * — see `scripts/staging-smoke-pgvector-rag-e2e.mjs` and
+ * `scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md` (**VERDICT PASS**).
+ * Real chunk + document ingestion, real 768-dim pgvector cosine search, hard tenant isolation
+ * (app + RLS), and refuse-without-evidence on small corpora (ADR-070 corpus-size-aware floor)
+ * were all confirmed live — not simulated.
  *
  * Status: synthetic in-process core → `IMPLEMENTED_VERIFIED` (see
  * `docs/ops/PRIVATE_RAG_RUNBOOK.md`). Production pgvector path → `IMPLEMENTED_VERIFIED`
- * with the documented P2 gap above (see `PRIVATE_VECTOR_RAG_STATUS`).
+ * full PASS (ADR-070 closed the prior P2 quality gap).
  *
- * No OpenAI. No production activation. No Pepito data — synthetic tenant A/B(/C)
- * fixtures only, deleted at the end of every live run.
+ * No OpenAI. No production canary activation without CEO SÍ. No Pepito data — synthetic
+ * tenant A/B(/C) fixtures only, deleted at the end of every live run.
  */
 
 export type PrivateRagTenantId = string;
@@ -94,28 +89,25 @@ export type PrivateRagMetrics = {
 export const PRIVATE_VECTOR_RAG_STATUS = {
   syntheticCore: "IMPLEMENTED_VERIFIED" as const,
   productionPgvectorPath: "IMPLEMENTED_VERIFIED" as const,
-  /** ISO timestamp of the live Docker+Ollama verification run that promoted this status. */
-  productionPgvectorVerifiedAt: "2026-07-25T01:13:45.969Z",
-  /** Must always point at a real, committed evidence file — never promote without this. */
+  /** ISO timestamp of the live verification run that promoted / revalidated this status. */
+  productionPgvectorVerifiedAt: "2026-07-27T16:42:45.027Z",
+  /** Must always point at a real evidence file — never promote without this. */
   productionPgvectorEvidence: "scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md",
-  /** Known, documented, non-blocking gap — see docs/KNOWN_ISSUES.md. Never silently hidden. */
+  /**
+   * Historical P2 gap (ADR-057.1) — CLOSED by ADR-070. Field retained so status stays honest
+   * about the prior finding and the raise-only remediation (never lowered minScore=0.32 for large corpora).
+   */
   productionPgvectorKnownGap:
-    "P2: with REAL Ollama embeddings, cosine similarity between unrelated real sentences is not " +
-    "near 0 (embedding-geometry property). The production default minScore=0.32 (tuned against " +
-    "the large real 18-domain knowledge corpus) does not reliably refuse an off-topic query " +
-    "against a very small (<10 chunk) tenant corpus. Proven tunable, not a fabrication bug: " +
-    "raising minScore to 0.55 for the identical query correctly refuses. No cross-tenant leakage " +
-    "and no hallucinated content occur in any case — citations are always real chunks that exist " +
-    "in that tenant's own corpus. Remediation (not yet applied): corpus-size-aware minimum " +
-    "confidence floor in LocalRagRetriever.retrieve.",
+    "RESOLVED (ADR-070): prior P2 — REAL Ollama embeddings give unrelated sentences non-near-0 " +
+    "cosine, so default minScore=0.32 did not refuse off-topic queries on tiny corpora. Remediation " +
+    "applied: resolveEffectiveRagMinScore raises floor to 0.45 when 0 < activeChunkCount < 48; " +
+    "large corpora keep 0.32 (never lowered). Staging e2e 2026-07-27 VERDICT PASS (critical+quality).",
   note:
     "In-process hashing-trick vector store proven via real cosine retrieval + hard tenant " +
     "isolation in unit tests (no Docker required). Production pgvector path " +
-    "(backend/local-ai/LocalVectorStore.ts + LocalEmbeddingProvider.ts) was re-verified LIVE on " +
-    "2026-07-25 against a real Docker pgvector container + real Ollama embeddings — real " +
-    "ingestion, real 768-dim cosine search, hard tenant isolation at both the app-filter and " +
-    "database RLS layers. A known P2 threshold-tuning gap (see productionPgvectorKnownGap) was " +
-    "found and documented, not fixed or hidden.",
+    "(backend/local-ai/LocalVectorStore.ts + LocalEmbeddingProvider.ts + LocalRagRetriever.ts) " +
+    "re-verified LIVE on 2026-07-27 (Railway staging + Ollama) — ingestion, 768-dim cosine, " +
+    "app+RLS isolation, refuse-without-evidence via corpus-size-aware minScore floor (ADR-070).",
 };
 
 export type PrivateVectorRagRollbackFlag = { flag: string; effect: string };

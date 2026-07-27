@@ -18,7 +18,39 @@ export type RagRetrievalResult = {
   contextBlock: string;
   confidence: number;
   topK: number;
+  /** Effective minScore after corpus-size floor (ADR-069 quality fix). */
+  effectiveMinScore: number;
+  activeChunkCount: number;
 };
+
+/** Default absolute floor for large corpora (unchanged — do not lower). */
+export const DEFAULT_RAG_MIN_SCORE = 0.32;
+
+/**
+ * Tenants with fewer than this many active chunks get a raised absolute floor.
+ * Calibrated on staging smoke: unrelated tops ~0.37, related tops ~0.63.
+ */
+export const SMALL_CORPUS_CHUNK_CEILING = 48;
+
+/**
+ * Raised floor for small corpora only — NEVER below DEFAULT_RAG_MIN_SCORE.
+ * Refuses weak/noise cosine hits without lowering the large-corpus threshold.
+ */
+export const SMALL_CORPUS_MIN_SCORE_FLOOR = 0.45;
+
+/**
+ * Resolve absolute minScore. Small corpora raise the floor; large corpora keep base.
+ * Explicit caller minScore is respected as base, then floored up for small corpora.
+ */
+export function resolveEffectiveRagMinScore(
+  baseMinScore: number,
+  activeChunkCount: number,
+): number {
+  const base = Number.isFinite(baseMinScore) ? baseMinScore : DEFAULT_RAG_MIN_SCORE;
+  if (activeChunkCount <= 0) return base;
+  if (activeChunkCount >= SMALL_CORPUS_CHUNK_CEILING) return base;
+  return Math.max(base, SMALL_CORPUS_MIN_SCORE_FLOOR);
+}
 
 const MAX_CONTEXT_CHARS = 7000;
 
@@ -157,9 +189,11 @@ export class LocalRagRetriever {
     query: string,
     opts?: { limit?: number; domain?: KnowledgeDomainId; minScore?: number; clientId?: string | null },
   ): Promise<RagRetrievalResult> {
-    const minScore = opts?.minScore ?? 0.32;
+    const baseMinScore = opts?.minScore ?? DEFAULT_RAG_MIN_SCORE;
     const expandedQuery = expandQuery(query, opts?.domain);
     const store = getLocalVectorStore();
+    const activeChunkCount = await store.countChunks(tenantId);
+    const minScore = resolveEffectiveRagMinScore(baseMinScore, activeChunkCount);
 
     const probe = await store.hybridSearch({
       tenantId,
@@ -199,7 +233,16 @@ export class LocalRagRetriever {
       citations.length > 0 ? citations.reduce((s, c) => s + c.score, 0) / citations.length : 0;
     const confidence = Math.min(0.95, avgScore * 1.1);
 
-    return { query, expandedQuery, citations, contextBlock, confidence, topK };
+    return {
+      query,
+      expandedQuery,
+      citations,
+      contextBlock,
+      confidence,
+      topK,
+      effectiveMinScore: minScore,
+      activeChunkCount,
+    };
   }
 
   buildAugmentedPrompt(query: string, retrieval: RagRetrievalResult): string {

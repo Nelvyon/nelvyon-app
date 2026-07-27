@@ -41,6 +41,8 @@ const EMPTY_RETRIEVAL: RagRetrievalResult = {
   contextBlock: "",
   confidence: 0,
   topK: 0,
+  effectiveMinScore: 0.32,
+  activeChunkCount: 0,
 };
 
 export function classifyTaskPublic(input: RouterTaskInput) {

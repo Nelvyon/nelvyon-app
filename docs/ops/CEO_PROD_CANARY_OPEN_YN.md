@@ -1,35 +1,30 @@
 # CEO — ¿Abrir canary mínimo de IA en producción?
 
-> **Estado: PENDING_CEO** · preparación Option A **HECHA** · canary **aún OFF** · coste **0**  
-> Fecha: **2026-07-27** · OpenAI OFF · MCP/SM/OpenClaw OFF
+> **Estado: CEO SÍ (2026-07-27)** · staging RAG **PASS completo** · apertura canary **en curso** · coste **0**  
+> OpenAI OFF · MCP/SM/OpenClaw OFF · pagos/campañas/anuncios OFF
 
-## Qué ya está listo (sin canary)
+## Autorización
 
-| Ítem | Estado |
-|------|--------|
-| Staging RAG e2e (ingest/retrieval/citas/A-B RLS) | **PASS_WITH_KNOWN_GAP** (críticos PASS) |
-| Staging carga concurrente (8 retrieves) | **PASS** |
-| Fail-closed código (no localhost/:5434) | **PASS** (tests) |
-| Kill switch | **ON** en prod |
-| Schema `local_ai_*` + pgvector en DB prod | **APPLIED** |
-| Role RLS `nelvyon_local_ai_app` (NOSUPERUSER/NOBYPASSRLS) | **CREATED** · aislamiento A/B **PASS** |
-| `LOCAL_AI_DATABASE_URL` (role RLS) | **SET** (preparado) |
-| `NELVYON_AI_ENABLED` / canary / OLLAMA_CONFIGURED | **0** |
+| Rol | SÍ / NO | Fecha | Firma |
+|-----|---------|-------|-------|
+| CEO | **SÍ** | 2026-07-27 | written authorization (chat) |
 
-## Qué pediría un SÍ (ventana mínima)
+Condiciones obligatorias: Ollama Tailscale only · tráfico mínimo · tenant sintético · kill inmediato si falla gate · no mocks · no bajar umbrales · **no READY**.
+
+## Ventana operativa
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=0
 NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=1
 NELVYON_AI_ENABLED=1
 OLLAMA_CONFIGURED=1
+NELVYON_AI_MODE=local
+PRIVATE_MODE=ON
 AUTONOMOUS_ALLOW_OPENAI=0
-# OpenAI key ABSENT · MCP/SM/OpenClaw off · sin campañas/pagos/ads
+# OpenAI key ABSENT · MCP/SM/OpenClaw=0
 ```
 
-Luego: smoke `prod-smoke-private-ai-canary.mjs` → kill drill &lt;5 min → dejar killed o extensión CEO.
-
-## Rollback &lt;5 min (si SÍ y algo falla)
+## Rollback &lt;5 min
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
@@ -39,14 +34,4 @@ OLLAMA_CONFIGURED=0
 AUTONOMOUS_ALLOW_OPENAI=0
 ```
 
-## Única pregunta
-
-**¿Autorizas abrir ahora el canary mínimo de IA privada en producción (Ollama Tailscale only, 0€)?**
-
-Responde exactamente: **SÍ** o **NO**.
-
-| Rol | SÍ / NO | Fecha | Firma |
-|-----|---------|-------|-------|
-| CEO | ____ | ____-__-__ | ________ |
-
-**claimReady permanece false** aunque digas SÍ (legal/clientes pendientes).
+**claimReady permanece false.**

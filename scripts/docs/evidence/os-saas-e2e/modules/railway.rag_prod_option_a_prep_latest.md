@@ -17,8 +17,8 @@
 | App A/B isolation | PASS |
 | RLS A/B isolation | PASS |
 | Empty tenant refuse | PASS |
-| Quality minScore tiny corpus | known gap (strict 0.55 PASS) |
-| Concurrent load 8× retrieve | PASS (~2s) |
+| Staging RAG e2e | **PASS** (críticos+calidad; gap cerrado ADR-070) |
+| Concurrent load 8× retrieve | **PASS** (~861 ms) |
 | Evidence | `pgvector-rag.live_latest.md` |
 
 ## Production prep

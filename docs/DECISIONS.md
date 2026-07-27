@@ -674,6 +674,19 @@
 
 ---
 
+## ADR-070 — RAG small-corpus minScore floor (raise only · full PASS)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-27 |
+| **Decisión** | Cerrar el gap de calidad `PASS_WITH_KNOWN_GAP` **sin bajar** el default `0.32` de corpus grande. Añadir `resolveEffectiveRagMinScore`: si `0 < activeChunkCount < 48`, suelo efectivo **0.45**; si corpus ≥48 o vacío, conservar base. Calibrado en staging (related tops ~0.63, unrelated tops ~0.37). |
+| **Por qué** | CEO exige PASS completo (ingesta, vector, citas, calidad, A/B) antes de re-preguntar canary; umbrales más bajos o mocks prohibidos. |
+| **Evidencia** | `pgvector-rag.live_latest.md` **PASS** · load 8× PASS · `localRagMinScoreFloor.test.ts` · prod flags read-only KILL=1 / AI OFF |
+| **Consecuencias** | KI P2 → historial · canary sigue OFF hasta SÍ CEO · tip floor fix pendiente commit/deploy · `claimReady: false` |
+| **Relación** | ADR-057.1 · ADR-069 · `LocalRagRetriever.ts` · `CEO_PROD_CANARY_OPEN_YN.md` |
+
+---
+
 ## ADR-057.1 — Block 24 follow-up: pgvector RAG live e2e ("yellow point 7")
 
 | Campo | Valor |

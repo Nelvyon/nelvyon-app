@@ -87,16 +87,6 @@
 | **Estado** | **BLOCKED_CEO** |
 | **Detalle** | Staging_mock CERT · `CEO_OPENCLAW_PROD_CANARY_REQUEST.md` **PENDING_CEO** · prod requiere nueva auth CEO |
 
-### KI — pgvector RAG: minScore=0.32 no refusa de forma fiable en corpus de tenant muy pequeño (P2)
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | **Abierto** — **P2** (calidad de ranking, NO seguridad, NO fuga cross-tenant, NO fabricación) |
-| **Detalle** | `LocalRagRetriever.retrieve` usa `minScore=0.32` por defecto. Con embeddings REALES (Ollama `nomic-embed-text`), la similitud coseno entre frases reales no relacionadas no es cercana a 0 (propiedad geométrica del embedding). Este umbral fue calibrado contra el corpus real grande de 18 dominios (`backend/local-ai/benchmarks/specialization_eval_*.json`), donde una query irrelevante compite contra cientos de candidatos y puntúa bajo en términos relativos. Contra un tenant con muy pocos chunks (<10, ej. onboarding inicial), esa relación no se da y puede devolver una cita real pero débilmente relevante en vez de rechazar. |
-| **Evidencia** | `scripts/staging-smoke-pgvector-rag-e2e.mjs` (checks `quality`) · `scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md` · diagnóstico con `minScore=0.55` refusa correctamente sobre la misma query — confirma que es un ajuste de umbral, no un bug estructural |
-| **Impacto real** | Ninguna fuga cross-tenant (verificado a nivel app + RLS, 100% PASS) · ninguna alucinación (las citas devueltas siempre son contenido real del propio tenant) · solo baja precisión en tenants con corpus muy pequeño |
-| **Remediación propuesta (no aplicada)** | Suelo de confianza consciente del tamaño del corpus en `LocalRagRetriever.retrieve` (ej. subir `minScore` efectivo cuando el tenant tiene menos de N chunks ingeridos) — requiere re-benchmark contra `specialization_eval_*` antes de tocar el default compartido |
-
 ### Ops (no KI) — Private AI prod canary mesh (ADR-068)
 
 | Campo | Valor |
@@ -135,6 +125,15 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### KI — pgvector RAG: minScore=0.32 no refusa en corpus de tenant muy pequeño (P2) → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-27** |
+| **Fix** | `resolveEffectiveRagMinScore` en `LocalRagRetriever.ts` — suelo **0.45** si `0 < activeChunkCount < 48`; corpus grande conserva **0.32** (nunca se bajó el default) |
+| **Evidencia** | `pgvector-rag.live_latest.md` **VERDICT PASS** (críticos+calidad) · `localRagMinScoreFloor.test.ts` · load 8× PASS · calibración staging related~0.63 / unrelated~0.37 |
+| **Nota** | Sin mocks · sin umbrales bajados · canary prod **no** abierto · `claimReady: false` |
 
 ### Ops-R — ERP process-memory as SSOT / loss-on-restart (P0 design risk) → ADR-061
 

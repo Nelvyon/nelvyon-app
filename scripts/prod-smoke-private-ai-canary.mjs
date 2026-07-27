@@ -169,6 +169,7 @@ async function main() {
     fail("router.route", `HTTP ${routeA.status} ${JSON.stringify(routeA.json).slice(0, 220)}`);
   }
 
+  const infStart = Date.now();
   const infA = await req("POST", "/api/saas/private-ai/inference", {
     token: a.token,
     timeoutMs: 180_000,
@@ -177,28 +178,47 @@ async function main() {
       query: "Responde en una frase: que es un KPI operativo basico?",
     },
   });
+  const infLatencyMs = Date.now() - infStart;
   if (infA.status === 200 || infA.status === 201) {
     const text =
       infA.json?.result?.text ||
       infA.json?.result?.output ||
+      infA.json?.result?.content ||
       infA.json?.text ||
       infA.json?.output ||
       "";
     const model =
       infA.json?.result?.model ||
       infA.json?.result?.routedModel ||
+      infA.json?.result?.meta?.finalModel ||
       infA.json?.model ||
       "";
-    if (String(text).trim().length > 0) {
-      pass("inference.A", `model=${model || "n/a"} chars=${String(text).length}`);
+    const content =
+      String(text).trim() ||
+      String(infA.json?.result?.content ?? "").trim();
+    if (content.length > 0 && !/^ERROR:/i.test(content)) {
+      pass("inference.A", `model=${model || "n/a"} chars=${content.length} latencyMs=${infLatencyMs}`);
+      if (infLatencyMs <= 120_000) {
+        pass("inference.latency", `${infLatencyMs}ms (<=120s soft gate)`);
+      } else {
+        fail("inference.latency", `${infLatencyMs}ms >120s`);
+      }
     } else {
-      fail("inference.A", `empty body ${JSON.stringify(infA.json).slice(0, 240)}`);
+      fail("inference.A", `empty/error body ${JSON.stringify(infA.json).slice(0, 240)}`);
     }
   } else {
     fail(
       "inference.A",
       `HTTP ${infA.status} ${JSON.stringify(infA.json || infA.text).slice(0, 300)}`,
     );
+  }
+
+  // Audit log path (synthetic tenant) — must return tenant-scoped rows or empty list, never A data for B later
+  const auditA = await req("GET", "/api/saas/private-ai/audit", { token: a.token, timeoutMs: 30_000 });
+  if (auditA.status === 200) {
+    pass("logs.audit.A", JSON.stringify(auditA.json).slice(0, 180));
+  } else {
+    fail("logs.audit.A", `HTTP ${auditA.status} ${JSON.stringify(auditA.json).slice(0, 160)}`);
   }
 
   // Isolation: B must not see A's tenant in status/audit if present

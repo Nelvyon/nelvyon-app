@@ -1,14 +1,11 @@
 # Private Vector RAG — runbook (Block 24, actualizado "yellow point 7" 2026-07-25)
 
 > **Estado:** núcleo sintético in-process **IMPLEMENTED_VERIFIED** · ruta productiva pgvector
-> **IMPLEMENTED_VERIFIED** (re-verificada EN VIVO 2026-07-25 contra Docker `pgvector/pgvector:pg16`
-> real + Ollama `nomic-embed-text` real, máquina local del owner) — con un gap P2 documentado
-> (no bloqueante, ver abajo). Coste **0**. Sin OpenAI. Sin Pepito. Sin activación en staging/prod.
-> Fuente de verdad en código: `backend/agency/PrivateVectorRagCore.ts` ·
-> Tests: `backend/agency/__tests__/PrivateVectorRagCore.test.ts` ·
-> Smoke sintético: `scripts/staging-smoke-private-rag-synthetic.mjs` ·
-> Smoke pgvector real: `scripts/staging-smoke-pgvector-rag-e2e.mjs` ·
-> Evidencia pgvector real: `scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md`
+> **IMPLEMENTED_VERIFIED** (re-verificada EN VIVO 2026-07-27 contra Railway staging + Ollama
+> `nomic-embed-text`) — **VERDICT PASS** (críticos + calidad). Coste **0**. Sin OpenAI. Sin Pepito.
+> Canary prod **OFF**. Fuente de verdad: `backend/local-ai/LocalRagRetriever.ts` ·
+> Smoke: `scripts/staging-smoke-pgvector-rag-e2e.mjs` ·
+> Evidencia: `scripts/docs/evidence/os-saas-e2e/modules/pgvector-rag.live_latest.md`
 
 ## Qué es esto (y qué NO es)
 
@@ -24,15 +21,11 @@
   (chunk → embed → insert), búsqueda coseno real sobre `vector(768)`, y aislamiento duro por
   tenant en **dos capas independientes** (filtro de aplicación + RLS de base de datos con rol
   no-superusuario `nelvyon_local_app`, `FORCE ROW LEVEL SECURITY`).
-- **Gap conocido (P2, no bloqueante, no oculto):** con embeddings reales, la similitud coseno
-  entre frases reales no relacionadas no es cercana a 0. El `minScore=0.32` por defecto (afinado
-  contra el corpus real grande de 18 dominios) no rechaza de forma fiable una query fuera de tema
-  contra un corpus de tenant muy pequeño (<10 chunks). Un diagnóstico con `minScore=0.55` sobre la
-  misma query rechaza correctamente — confirma que es un ajuste de umbral, no un bug de
-  fabricación. **Nunca hay fuga cross-tenant ni contenido inventado** en ningún caso. Ver
-  `docs/KNOWN_ISSUES.md` y `PRIVATE_VECTOR_RAG_STATUS.productionPgvectorKnownGap`.
-- **Esta verificación se hizo en la máquina local del owner (Docker Desktop + Ollama local),
-  NO en Railway staging.** Ver "Nota de canary IA en staging" más abajo.
+- **Calidad (ADR-070):** suelo corpus-aware en `LocalRagRetriever.resolveEffectiveRagMinScore`
+  — **0.45** si `0 < activeChunkCount < 48`; corpus grande conserva **0.32** (nunca bajado).
+  Staging e2e 2026-07-27: refuse unrelated default path **PASS** · related retrieval **PASS**.
+  Gap P2 histórico cerrado (ver `docs/KNOWN_ISSUES.md` historial · ADR-057.1 hallazgo original).
+- **Nota Railway:** e2e actual corre vía `railway run -e staging` + Ollama mesh; no requiere abrir canary prod.
 
 ## Por qué "hashing-trick" y no un fake por keywords
 

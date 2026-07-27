@@ -42,16 +42,11 @@ const REPO_ROOT = path.resolve(__dirname, "..");
  * isolation at both the application filter AND the database RLS layer. Any critical failure
  * means the live pgvector path is NOT verified.
  *
- * `quality` checks track a known, separately-tracked tuning characteristic (see
- * KNOWN_ISSUES.md): with REAL embeddings (not the deterministic hashing-trick synthetic core),
- * cosine similarity between unrelated real sentences is not near 0, so the production default
- * `minScore=0.32` (tuned against the large real 18-domain knowledge corpus) does not reliably
- * refuse an off-topic query against a very small synthetic tenant corpus (2-4 chunks). The
- * diagnostic below proves this is a threshold-tuning characteristic, not a fabrication bug:
- * raising `minScore` to 0.55 for the identical query correctly refuses, and no cross-tenant
- * leakage or hallucinated content is ever produced (citations are always real chunks that
- * exist in that tenant's own corpus). A `quality` failure does NOT block promotion but MUST be
- * documented, never silently hidden.
+ * `quality` checks assert refuse-without-evidence on unrelated queries under the production
+ * path (no mocks, no lowered thresholds). Small corpora raise the absolute floor via
+ * `resolveEffectiveRagMinScore` (0.45 when activeChunkCount < 48); large corpora keep 0.32.
+ * Explicit `minScore=0.55` remains a diagnostic that the gap is threshold geometry, not
+ * fabrication. Full PASS requires all critical + quality checks green.
  */
 type CheckSeverity = "critical" | "quality";
 type CheckResult = { name: string; severity: CheckSeverity; ok: boolean; detail: string };
@@ -300,7 +295,7 @@ async function main(): Promise<void> {
       bReadsA.visible ? "VIOLATION: tenant B session saw tenant A rows" : "0 rows returned (RLS enforced)",
     );
 
-    // --- Refuse without evidence: unrelated query on an active tenant (quality/tuning, see header comment) ---
+    // --- Refuse without evidence: unrelated query on an active tenant (small-corpus floor raised) ---
     const unrelated = await retriever.retrieve(
       TENANT_A,
       "xyzabc totalmente no relacionado qwerty aardvark blockchain cuantico",
@@ -311,7 +306,7 @@ async function main(): Promise<void> {
       "quality",
       refusedUnrelated,
       `citations=${unrelated.citations.length} confidence=${unrelated.confidence.toFixed(3)} ` +
-        `(default minScore=0.32; real embeddings give unrelated real sentences non-near-0 cosine — known tuning gap for small corpora, see KNOWN_ISSUES.md)`,
+        `effectiveMinScore=${unrelated.effectiveMinScore} activeChunks=${unrelated.activeChunkCount}`,
     );
     const augmentedPrompt = retriever.buildAugmentedPrompt(unrelated.query, unrelated);
     record(
@@ -323,11 +318,7 @@ async function main(): Promise<void> {
         : "N/A — citations were returned, no fallback path exercised (see refuse_no_evidence_unrelated_query_default_threshold)",
     );
 
-    // Diagnostic (non-blocking): does raising minScore restore refusal for the same query?
-    // This characterizes WHETHER the gap above is a threshold-tuning issue (raising minScore
-    // fixes it) vs a structural fabrication bug (it wouldn't). Real cosine similarity between
-    // unrelated real sentences under nomic-embed-text is not near 0 — a known embedding-geometry
-    // property, distinct from the deterministic hashing-trick core's near-0 baseline.
+    // Diagnostic: explicit stricter base still refuses (raise only; never lower defaults).
     const unrelatedStrict = await retriever.retrieve(
       TENANT_A,
       "xyzabc totalmente no relacionado qwerty aardvark blockchain cuantico",
@@ -335,14 +326,14 @@ async function main(): Promise<void> {
     );
     console.log(
       `DIAG [pgvector-rag-e2e] refuse_no_evidence_unrelated_query_strict_minScore_0.55: ` +
-        `citations=${unrelatedStrict.citations.length} (default minScore=0.32 returned ${unrelated.citations.length}) ` +
-        `— proves this is a threshold-tuning gap, not a structural fabrication bug`,
+        `citations=${unrelatedStrict.citations.length} (default path returned ${unrelated.citations.length}, ` +
+        `effectiveMinScore=${unrelated.effectiveMinScore})`,
     );
     record(
       "refuse_no_evidence_unrelated_query_strict_threshold",
       "quality",
       unrelatedStrict.citations.length === 0,
-      `citations=${unrelatedStrict.citations.length} at minScore=0.55 for the identical query that leaked at default 0.32`,
+      `citations=${unrelatedStrict.citations.length} at base minScore=0.55 (effective=${unrelatedStrict.effectiveMinScore})`,
     );
 
     // --- Refuse without evidence: tenant with zero ingested documents ---
