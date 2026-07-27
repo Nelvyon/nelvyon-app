@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { isPgMissingRelation } from "../saasRequestContext";
+import { isPgMissingRelation, saasErrorBody, saasErrorStatus } from "../saasRequestContext";
 import { SaasRbacError } from "../saasRbac";
 
 vi.mock("@nelvyon/auth", () => ({
@@ -66,6 +66,17 @@ describe("saasErrorBody", () => {
     expect(saasErrorBody(new SaasRbacError("Forbidden", "FORBIDDEN"))).toEqual({
       error: "Forbidden",
       code: "FORBIDDEN",
+    });
+  });
+
+  it("surfaces PRIVATE_AI_CANARY_BLOCKED as 403 with code (not opaque 500)", () => {
+    const err = new Error(
+      "PRIVATE_AI_CANARY_BLOCKED: set NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=1 for the canary window",
+    );
+    expect(saasErrorStatus(err)).toBe(403);
+    expect(saasErrorBody(err)).toEqual({
+      error: err.message,
+      code: "PRIVATE_AI_CANARY_BLOCKED",
     });
   });
 });

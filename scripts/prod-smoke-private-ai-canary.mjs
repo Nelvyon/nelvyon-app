@@ -125,6 +125,52 @@ async function main() {
     process.exit(1);
   }
 
+  // Wait until the serving instance has the canary window (Railway env flips rebuild).
+  // Without this, executeInference fail-closes with PRIVATE_AI_CANARY_BLOCKED while BUILDING.
+  let canaryReady = false;
+  const readyDeadline = Date.now() + 15 * 60_000;
+  while (Date.now() < readyDeadline) {
+    const probe = await req("POST", "/api/saas/private-ai/inference", {
+      token: a.token,
+      timeoutMs: 30_000,
+      body: { mode: "route", query: "ping canary readiness" },
+    });
+    const execProbe = await req("POST", "/api/saas/private-ai/inference", {
+      token: a.token,
+      timeoutMs: 45_000,
+      body: { mode: "execute", query: "Responde una palabra: ok" },
+    });
+    const blocked =
+      execProbe.status === 403 &&
+      /PRIVATE_AI_CANARY_BLOCKED/i.test(JSON.stringify(execProbe.json || ""));
+    const internalMasked =
+      execProbe.status === 500 && /Internal error/i.test(JSON.stringify(execProbe.json || ""));
+    if (execProbe.status === 200 || execProbe.status === 201) {
+      canaryReady = true;
+      pass("canary.window_ready", `HTTP ${execProbe.status} after readiness wait`);
+      // Re-use first successful execute as inference.A if content present
+      break;
+    }
+    if (!blocked && !internalMasked && execProbe.status !== 502 && execProbe.status !== 503) {
+      // Unexpected non-ready error — fail fast (do not burn the window)
+      fail(
+        "canary.window_ready",
+        `unexpected HTTP ${execProbe.status} ${JSON.stringify(execProbe.json || execProbe.text).slice(0, 220)}`,
+      );
+      writeEvidence(false);
+      process.exit(1);
+    }
+    console.log(
+      `WAIT [pai-canary] canary window not active yet (route=${probe.status} exec=${execProbe.status}) — sleeping 20s`,
+    );
+    await new Promise((r) => setTimeout(r, 20_000));
+  }
+  if (!canaryReady) {
+    fail("canary.window_ready", "timeout waiting for PROD_CANARY_ENABLED on serving instance");
+    writeEvidence(false);
+    process.exit(1);
+  }
+
   const rh = await req("GET", "/api/saas/private-ai/router-health", {
     token: a.token,
     timeoutMs: 60_000,

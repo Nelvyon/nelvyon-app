@@ -1,30 +1,30 @@
-# CEO — ¿Abrir canary mínimo de IA en producción?
+# CEO — Canary IA prod (estado post SÍ)
 
-> **Estado: CEO SÍ (2026-07-27)** · staging RAG **PASS completo** · apertura canary **en curso** · coste **0**  
-> OpenAI OFF · MCP/SM/OpenClaw OFF · pagos/campañas/anuncios OFF
+> **Estado: KILLED** tras intento CEO SÍ · corrección en código · **no reabierto** · coste **0**  
+> Fecha: **2026-07-27** · OpenAI OFF · MCP/SM/OpenClaw OFF
 
-## Autorización
+## Autorización original
 
-| Rol | SÍ / NO | Fecha | Firma |
-|-----|---------|-------|-------|
-| CEO | **SÍ** | 2026-07-27 | written authorization (chat) |
+| Rol | SÍ / NO | Fecha |
+|-----|---------|-------|
+| CEO | **SÍ** | 2026-07-27 |
 
-Condiciones obligatorias: Ollama Tailscale only · tráfico mínimo · tenant sintético · kill inmediato si falla gate · no mocks · no bajar umbrales · **no READY**.
+## Resultado del intento
 
-## Ventana operativa
+| Gate | Resultado |
+|------|----------|
+| Tip / deploy | `775f7537` / `dd1f9922` |
+| router-health (Ollama+Postgres) | **PASS** (certified) |
+| inference | **FAIL** — race: smoke durante BUILDING post-flags; proceso sin `PROD_CANARY_ENABLED=1` |
+| Kill | **PASS** ~1.3s |
+| Evidencia | `private-ai.prod_canary_ceo_si_fail_kill_latest.md` |
 
-```
-NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=0
-NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=1
-NELVYON_AI_ENABLED=1
-OLLAMA_CONFIGURED=1
-NELVYON_AI_MODE=local
-PRIVATE_MODE=ON
-AUTONOMOUS_ALLOW_OPENAI=0
-# OpenAI key ABSENT · MCP/SM/OpenClaw=0
-```
+## Corrección aplicada (código local)
 
-## Rollback &lt;5 min
+- `PRIVATE_AI_CANARY_BLOCKED` → HTTP **403** + code (no 500 opaco)
+- Smoke espera ventana canary activa antes de puntuar inference
+
+## Steady (prod ahora)
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
@@ -33,5 +33,15 @@ NELVYON_AI_ENABLED=0
 OLLAMA_CONFIGURED=0
 AUTONOMOUS_ALLOW_OPENAI=0
 ```
+
+## Pregunta de reintento
+
+**¿Autorizas REINTENTAR el canary mínimo tras desplegar la corrección?**
+
+Responde exactamente: **SÍ** o **NO**.
+
+| Rol | SÍ / NO | Fecha | Firma |
+|-----|---------|-------|-------|
+| CEO | ____ | ____-__-__ | ________ |
 
 **claimReady permanece false.**

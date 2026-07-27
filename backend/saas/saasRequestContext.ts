@@ -162,6 +162,7 @@ export function saasErrorStatus(e: unknown): number {
   }
   if (e instanceof SaasPlanQuotaError) return 403;
   if (e instanceof OsAgentError && e.message === "Unauthorized") return 401;
+  if (e instanceof Error && /PRIVATE_AI_CANARY_BLOCKED/i.test(e.message)) return 403;
   return 500;
 }
 
@@ -174,6 +175,11 @@ export function saasErrorBody(e: unknown): { error: string; code?: string } {
   }
   if (e instanceof OsAgentError && e.message === "Unauthorized") {
     return { error: "Unauthorized" };
+  }
+  // Canary/kill gates are intentional fail-closed — never hide as opaque 500.
+  if (e instanceof Error && /PRIVATE_AI_CANARY_BLOCKED/i.test(e.message)) {
+    console.error("[saasErrorBody]", e.message);
+    return { error: e.message, code: "PRIVATE_AI_CANARY_BLOCKED" };
   }
   // Do not leak driver/SQL internals to API clients.
   if (e instanceof Error) {

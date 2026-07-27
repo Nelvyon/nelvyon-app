@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Ops / IA | **CEO SÍ canary prod — FAIL→KILL** | Tip `775f7537` · deploy `dd1f9922` · router-health PASS · inference FAIL (race `PROD_CANARY_ENABLED` durante BUILDING) · KILL ~1.3s · OpenAI OFF · corrección 403+smoke wait · `claimReady: false` · **NOT READY** |
 | Ops / IA | **RAG staging PASS completo (suelo corpus pequeño)** | `resolveEffectiveRagMinScore` (0.45 si chunks&lt;48; 0.32 grande) · e2e **PASS** · load 8× PASS · tests 54 PASS · prod KILL=1 / AI OFF sin cambios · KI calidad → historial · SÍ/NO canary · `claimReady: false` · **NOT READY** |
 | Ops / IA | **CEO Option A RAG prep (canary OFF)** | Staging e2e reval PASS_WITH_KNOWN_GAP · prod schema+RLS+LOCAL_AI_DATABASE_URL · kill ON · pregunta SÍ/NO apertura · `claimReady: false` · **NOT READY** |
 | Ops / IA | **ADR-069 fail-closed localhost RAG (sin reactivar)** | Prod prohíbe fallback `:5434`/loopback · assert schema · tests PASS · KILL ON · CEO A/B `CEO_PROD_RAG_DB_OPTIONS.md` · `claimReady: false` · **NOT READY** |
