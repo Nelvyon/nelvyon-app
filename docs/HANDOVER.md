@@ -22,7 +22,7 @@
 
 ## Próximo paso EXACTO
 
-1. CEO decide si **extiende** ventana canary ON (flags abajo) o deja KILLED.
+1. Canary **cerrado** (CEO **NO** extensión 2026-07-27). Nueva apertura = SÍ explícito.
 2. Legal / OAuth / clientes reales siguen pendientes.
 3. **No declarar READY.**
 
