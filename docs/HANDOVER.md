@@ -5,8 +5,8 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit tip** | (pending push ADR-069) |
-| **Fecha doc** | 2026-07-26 |
+| **Último commit tip** | bedb735b |
+| **Fecha doc** | 2026-07-27 |
 | **Rama** | `main` (sync with origin) |
 
 ---
