@@ -29,7 +29,7 @@
 | **PWA (Block 19)** | ✅ Chrome **VERIFIED** | iOS **BLOCKED** |
 | **Observability** | ✅ local **VERIFIED** | paid APM **PREPARED_OFF** |
 | **Private RAG (Block 24)** | ✅ Docker / 🟡 Railway | Docker **VERIFIED** · Railway **PREPARED_OFF** |
-| **Private AI canary** | 🟡 | Fail-closed código ADR-069 · KILL ON · CEO A/B pending · **NOT** live |
+| **Private AI canary** | 🟡 | RAG prod **PREPARED** · canary **OFF** · CEO SÍ/NO pending |
 | **Costes** | **0** | |
 
 ---

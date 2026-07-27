@@ -1,17 +1,17 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> **2026-07-27** ADR-069 fail-closed · claimReady false  
-> Veredicto: **CONDITIONAL_READY** · **NOT READY** · coste **0**
+> **2026-07-27** Option A RAG prep · claimReady false  
+> Veredicto: **CONDITIONAL_READY** · **NOT READY** · canary **not** opened · coste **0**
 
 ### Matriz
 
 | Dimensión | Estado |
 |-----------|--------|
-| VERDE | Health prod · kill ON · OpenAI OFF · fail-closed código localhost RAG |
-| PREPARADO / PARCIAL | Mesh Option A · staging RAG verified · canary routes |
-| SOLO HUMANO | CEO A/B RAG DB · legal Pepito · OAuth/Twilio/iOS · mercado |
-| NO ACTIVADO | Canary window · USE_MAIN_DB prod · SCHEMA_APPLY prod · MCP/SM/OpenClaw |
+| VERDE | Staging RAG reval · prod schema+RLS · kill ON · OpenAI OFF · fail-closed localhost |
+| PREPARADO | Canary window documentada · rollback &lt;5 min |
+| SOLO HUMANO | CEO SÍ/NO apertura canary · legal Pepito · OAuth/iOS/mercado |
+| NO ACTIVADO | Canary · AI inference · MCP/SM/OpenClaw · campañas/pagos |
 
 ### Próximo
 
-CEO `CEO_PROD_RAG_DB_OPTIONS.md` · **No READY** · **no** reabrir canary sin A+staging
+`CEO_PROD_CANARY_OPEN_YN.md` · **No READY**

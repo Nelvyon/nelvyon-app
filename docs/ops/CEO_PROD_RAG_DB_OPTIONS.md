@@ -1,28 +1,23 @@
 # CEO — Opciones seguras post canary IA prod (ADR-069)
 
-> **Estado: PENDING_CEO** · coste **0** · OpenAI OFF · canary **KILL ON** · **NO** reactivar hasta decisión  
-> Fecha: **2026-07-27** · tip fix código (fail-closed localhost) · staging RAG ya verified
+> **Estado: CEO Option A autorizada para PREPARACIÓN** · canary **aún OFF** · coste **0**  
+> Fecha prep: **2026-07-27** · OpenAI OFF · pregunta apertura: `CEO_PROD_CANARY_OPEN_YN.md`
 
 ## Contexto (1 párrafo)
 
-El canary prod falló al intentar Postgres local `127.0.0.1:5434`. Kill switch OK. El código **ya prohíbe** ese fallback en producción. Falta decidir la base RAG antes de cualquier reapertura.
+El canary prod falló al intentar Postgres local `127.0.0.1:5434`. Kill switch OK. Código fail-closed. CEO eligió **Opción A**: preparar schema RAG en DB principal **sin** abrir canary todavía.
 
-## Solo dos opciones
+## Decisión
 
-| # | Opción | Qué implica | Qué NO implica |
-|---|--------|-------------|----------------|
-| **A** | Usar **base principal de producción** con schema RAG `local_ai_*` **explícitamente autorizado** | Tras validar en **staging** (ya IMPLEMENTED_VERIFIED): ADR-064 approval + apply schema en prod + `NELVYON_LOCAL_AI_USE_MAIN_DB=1` solo en ventana canary · luego smoke · kill | OpenAI · MCP · SM · OpenClaw · campañas · pagos · ads · canary auto-on |
-| **B** | Mantener **IA productiva apagada** | KILL=1 · AI=0 · sin USE_MAIN_DB · sin DDL prod · mesh puede quedar preparado | Ningún canary · ningún coste IA |
+| # | Opción | Estado 2026-07-27 |
+|---|--------|-------------------|
+| **A** | Base principal prod + schema RAG autorizado | **PREP DONE** (schema+RLS+URL) · canary **not** opened |
+| **B** | IA productiva apagada | supersedida por A prep |
 
-## Respuesta esperada (una frase)
+## Firma prep
 
-- **A** — «Autorizo schema RAG en DB principal de producción bajo ADR-064, tras revalidar staging.»  
-- **B** — «Mantener IA productiva apagada.»
+| Rol | Decisión | Fecha |
+|-----|----------|-------|
+| CEO | Option A — preparación segura only | 2026-07-27 (chat) |
 
-## Firma
-
-| Rol | Decisión A / B | Fecha | Firma |
-|-----|----------------|-------|-------|
-| CEO | ____ | ____-__-__ | ________ |
-
-**claimReady permanece false.** No reintentar canary sin A validada en staging + approval escrito.
+**claimReady: false.** Apertura canary = solo tras SÍ en `CEO_PROD_CANARY_OPEN_YN.md`.

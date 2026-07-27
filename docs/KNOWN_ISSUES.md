@@ -10,9 +10,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Mitigado en código** — canary **no** reactivado · CEO **PENDING** A/B |
-| **Detalle** | Fallback `127.0.0.1:5434` **prohibido** en prod (`assertLocalAiDatabaseUrlReady` · schema assert). Steady: KILL ON. Reapertura solo tras `CEO_PROD_RAG_DB_OPTIONS.md` opción A + staging reval + ADR-064. |
-| **Evidencia** | `private-ai.adr069_failclosed_latest.md` · `CEO_PROD_RAG_DB_OPTIONS.md` |
+| **Estado** | **PREPARED** schema/RLS · canary **PREPARED_OFF** · CEO SÍ/NO pending |
+| **Detalle** | Option A: `local_ai_*` + role RLS en prod DB · `LOCAL_AI_DATABASE_URL` SET · KILL ON · AI off. Apertura solo tras `CEO_PROD_CANARY_OPEN_YN.md`. |
+| **Evidencia** | `railway.rag_prod_option_a_prep_latest.md` · `CEO_PROD_CANARY_OPEN_YN.md` |
 
 ### Ops (no KI) — Puntos 1–4 CEO batch (ADR-066 → ADR-067)
 

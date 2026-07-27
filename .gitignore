@@ -119,3 +119,4 @@ backend/data/voice_pilot*/
 .claude/agents/
 .envato-browser-profile/
 .edge-envato-download-profile*/
+.tmp-local-ai-db-url.txt

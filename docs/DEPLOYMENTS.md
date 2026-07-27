@@ -2,6 +2,18 @@
 
 > Actualizado: **2026-07-27** ADR-069 fail-closed (código; sin reactivar canary).
 
+## 2026-07-27 — ADR-069 Option A prod RAG prep (canary OFF)
+
+| Campo | Valor |
+|-------|-------|
+| **Staging** | e2e reval **PASS_WITH_KNOWN_GAP** · load 8× PASS |
+| **Prod DDL** | `local_ai_*` + pgvector 0.8.3 · RLS FORCE · role `nelvyon_local_ai_app` |
+| **Prod URL** | `LOCAL_AI_DATABASE_URL` SET (RLS role) · USE_MAIN_DB ABSENT |
+| **Canary/AI** | KILL=1 · AI=0 · canary=0 · OLLAMA_CONFIGURED=0 · OpenAI ABSENT |
+| **Evidencia** | `railway.rag_prod_option_a_prep_latest.md` · `railway.rag_prod_prep_latest.md` · `pgvector-rag.live_latest.md` |
+| **CEO next** | SÍ/NO `CEO_PROD_CANARY_OPEN_YN.md` |
+| **claimReady** | **false** |
+
 ## 2026-07-27 — ADR-069 fail-closed localhost RAG (no canary)
 
 | Campo | Valor |

@@ -1,11 +1,11 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-27** — **ADR-069 fail-closed localhost RAG** · IA prod **KILL ON** · `claimReady: false` · **NOT READY** · coste **0**
+> Última actualización: **2026-07-27** — **CEO Option A RAG prep** · canary **OFF** · `claimReady: false` · **NOT READY** · coste **0**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit tip** | bedb735b |
+| **Último commit tip** | (pending) |
 | **Fecha doc** | 2026-07-27 |
 | **Rama** | `main` (sync with origin) |
 
@@ -15,22 +15,18 @@
 
 | Punto | Entorno | Activado | Pruebas | Rollback | Estado |
 |-------|---------|----------|---------|----------|--------|
-| 2 Dual-write ERP | staging | DUAL_WRITE=1 · READ=0 | equivalence + A/B + conc ALL_PASS | flag→0 | **IMPLEMENTED_VERIFIED** |
-| 2 Dual-write ERP | prod | no | n/a | n/a | **OFF** |
-| 3 RAG/pgvector | staging | schema+RLS+USE_MAIN_DB | e2e + RLS A/B | USE_MAIN_DB=0 | **IMPLEMENTED_VERIFIED** |
-| 3 RAG/pgvector | prod | no DDL | n/a | n/a | **OFF** |
-| 4 IA privada canary | prod | **KILL ON** · AI OFF | smoke FAIL histórico :5434 · fix código fail-closed | kill ON | **FAIL_CLOSED_CODE** (no reabrir) |
+| 3 RAG/pgvector | staging | USE_MAIN_DB + schema | e2e reval PASS_WITH_KNOWN_GAP | USE_MAIN_DB=0 | **IMPLEMENTED_VERIFIED** |
+| 3 RAG/pgvector | prod | schema+RLS role · AI off | prep A/B RLS PASS | kill / unset URL / PITR | **PREPARED** (canary not open) |
+| 4 IA privada canary | prod | **KILL ON** · AI=0 | pending CEO SÍ/NO | kill &lt;5 min | **PREPARED_OFF** |
 
 ## Próximo paso EXACTO
 
-1. Mantener prod: KILL=1 · PROD_CANARY=0 · AI=0 · OLLAMA_CONFIGURED=0 · OpenAI ABSENT · **sin** USE_MAIN_DB / SCHEMA_APPLY.
-2. CEO decide **A o B** en `docs/ops/CEO_PROD_RAG_DB_OPTIONS.md` (única decisión abierta para IA prod).
-3. Si A: revalidar RAG staging → ADR-064 schema prod → flags mínimos → smoke → kill; **no** antes.
-4. Si B: no más acción IA prod.
-5. Legal/mercado/OAuth en `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`.
-6. **No declarar READY. No reintentar canary hasta DB validada (staging) + decisión A.**
+1. CEO responde **SÍ o NO** en `docs/ops/CEO_PROD_CANARY_OPEN_YN.md`.
+2. Si **NO**: no más acción IA prod.
+3. Si **SÍ**: abrir ventana mínima (kill=0 · canary=1 · AI=1 · OLLAMA_CONFIGURED=1 · OpenAI=0) → `prod-smoke-private-ai-canary.mjs` → kill drill → documentar.
+4. Legal/OAuth/mercado siguen pendientes · **No declarar READY.**
 
-### Rollback rápido
+### Rollback rápido (canary)
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
@@ -38,5 +34,4 @@ NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=0
 NELVYON_AI_ENABLED=0
 OLLAMA_CONFIGURED=0
 AUTONOMOUS_ALLOW_OPENAI=0
-# never set NELVYON_LOCAL_AI_USE_MAIN_DB / SCHEMA_APPLY on prod without CEO A
 ```

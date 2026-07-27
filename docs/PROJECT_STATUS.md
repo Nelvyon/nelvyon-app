@@ -1,10 +1,11 @@
-> **2026-07-27** — ADR-069 fail-closed · IA prod KILL ON · `claimReady: false` · **NOT READY**
+> **2026-07-27** — Option A RAG prep · canary OFF · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** |
-| **#4 Canary IA prod** | Código fail-closed localhost · **no** reactivado · CEO A/B pending |
+| **#3 RAG prod** | Schema+RLS **PREPARED** · AI off |
+| **#4 Canary** | **PREPARED_OFF** · awaiting CEO SÍ/NO |
 | **Coste** | **0** |
-| **Pendiente humano** | `CEO_PROD_RAG_DB_OPTIONS.md` · legal/OAuth (`CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`) |
+| **Pendiente humano** | `CEO_PROD_CANARY_OPEN_YN.md` · legal/OAuth |
 
-SSOT: `HANDOVER.md` · `private-ai.adr069_failclosed_latest.md`
+SSOT: `HANDOVER.md` · `railway.rag_prod_option_a_prep_latest.md`

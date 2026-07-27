@@ -45,4 +45,12 @@
 
 Cualquier migrate en `backend/db/migrations` sigue ADR-064. Este schema **no** se añadió a migraciones SaaS automáticas a propósito (evita pending prod).
 
+## Prod Option A (2026-07-27) — schema applied, canary OFF
+
+1. Staging e2e reval **PASS_WITH_KNOWN_GAP**.
+2. Apply via public DB proxy + `NELVYON_PROD_LOCAL_AI_SCHEMA_APPROVED=1` (one-shot; unset after).
+3. RLS role `nelvyon_local_ai_app` · `LOCAL_AI_DATABASE_URL` on `@nelvyon/web`.
+4. Keep KILL=1 · AI=0 · canary=0 · OLLAMA_CONFIGURED=0.
+5. CEO SÍ/NO: `docs/ops/CEO_PROD_CANARY_OPEN_YN.md`.
+
 `claimReady: false`

@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Ops / IA | **CEO Option A RAG prep (canary OFF)** | Staging e2e reval PASS_WITH_KNOWN_GAP · prod schema+RLS+LOCAL_AI_DATABASE_URL · kill ON · pregunta SÍ/NO apertura · `claimReady: false` · **NOT READY** |
 | Ops / IA | **ADR-069 fail-closed localhost RAG (sin reactivar)** | Prod prohíbe fallback `:5434`/loopback · assert schema · tests PASS · KILL ON · CEO A/B `CEO_PROD_RAG_DB_OPTIONS.md` · `claimReady: false` · **NOT READY** |
 
 ## 2026-07-26

@@ -871,6 +871,6 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Decisión** | Tras CEO `TS_AUTHKEY`: abrir canary mínimo Ollama/Tailscale only; si **cualquier** gate falla → kill inmediato. Código **prohíbe** fallback `127.0.0.1:5434`/loopback en producción; sin schema/config RAG → `PRIVATE_AI_RAG_BLOCKED` antes de inferencia. |
 | **Hallazgos** | (1) `.dockerignore` excluía rutas (fix `1eaed9f2`). (2) `getLocalAiConfig` default owner DB en prod → ECONNREFUSED :5434. (3) Fix: `railwayRagPrep` + asserts en pool/`executeTask`/`executeInference`. |
 | **Estado steady** | KILL=1 · AI/canary/OLLAMA_CONFIGURED=0 · OpenAI ABSENT · MESH Option A retained · **no** USE_MAIN_DB/SCHEMA_APPLY |
-| **CEO next** | Solo A (main DB+schema autorizado) o B (IA off) — `CEO_PROD_RAG_DB_OPTIONS.md` |
+| **CEO next** | Solo A (main DB+schema autorizado) o B (IA off) — `CEO_PROD_RAG_DB_OPTIONS.md` → **A prep DONE 2026-07-27**; apertura canary = `CEO_PROD_CANARY_OPEN_YN.md` |
 | **Evidencia** | `private-ai.adr069_failclosed_latest.md` · `private-ai.prod_canary_adr068_latest.md` |
 | **Consecuencias** | No reabrir canary hasta decisión A + staging reval · **NOT READY** |
