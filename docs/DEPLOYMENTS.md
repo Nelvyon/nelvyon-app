@@ -1,6 +1,19 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-27** ADR-069 fail-closed (código; sin reactivar canary).
+> Actualizado: **2026-07-27** canary retry PASS · kill drill · steady KILL ON.
+
+## 2026-07-27 — Private AI canary retry PASS (then KILLED)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip** | `8c5c2768` |
+| **Deploys** | `5ef3b8d8` (fix) · `8f348e61` (canary window) |
+| **HTTP smoke** | **ALL_PASS** (inference 4.7s · audit · A/B) |
+| **RAG prod** | **PASS** (`pgvector-rag.prod_canary_latest.md`) |
+| **Kill drill** | **PASS** ~1.53s |
+| **Steady** | KILL=1 · AI/canary/OLLAMA_CONFIGURED=0 · OpenAI ABSENT |
+| **Evidencia** | `private-ai.prod_canary_retry_pass_latest.md` |
+| **claimReady** | **false** |
 
 ## 2026-07-27 — ADR-069 Option A prod RAG prep (canary OFF)
 

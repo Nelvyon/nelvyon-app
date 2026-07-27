@@ -1,30 +1,26 @@
-# CEO — Canary IA prod (estado post SÍ)
+# CEO — Canary IA prod (post retry PASS)
 
-> **Estado: KILLED** tras intento CEO SÍ · corrección en código · **no reabierto** · coste **0**  
-> Fecha: **2026-07-27** · OpenAI OFF · MCP/SM/OpenClaw OFF
+> **Estado: PASS verificado · steady KILLED** · coste **0** · OpenAI OFF  
+> Fecha: **2026-07-27**
 
-## Autorización original
+## Autorizaciones
 
-| Rol | SÍ / NO | Fecha |
-|-----|---------|-------|
-| CEO | **SÍ** | 2026-07-27 |
+| Evento | Decisión | Fecha |
+|--------|----------|-------|
+| Apertura | **SÍ** | 2026-07-27 |
+| Reintento post-fix | **SÍ** | 2026-07-27 |
 
-## Resultado del intento
+## Resultado
 
 | Gate | Resultado |
 |------|----------|
-| Tip / deploy | `775f7537` / `dd1f9922` |
-| router-health (Ollama+Postgres) | **PASS** (certified) |
-| inference | **FAIL** — race: smoke durante BUILDING post-flags; proceso sin `PROD_CANARY_ENABLED=1` |
-| Kill | **PASS** ~1.3s |
-| Evidencia | `private-ai.prod_canary_ceo_si_fail_kill_latest.md` |
+| Tip / deploys | `8c5c2768` · `5ef3b8d8` · `8f348e61` |
+| Inference + latency + audit + A/B | **PASS** |
+| RAG citas + RLS + calidad | **PASS** (prod DB) |
+| Kill drill | **PASS** ~1.53s |
+| Evidencia | `private-ai.prod_canary_retry_pass_latest.md` |
 
-## Corrección aplicada (código local)
-
-- `PRIVATE_AI_CANARY_BLOCKED` → HTTP **403** + code (no 500 opaco)
-- Smoke espera ventana canary activa antes de puntuar inference
-
-## Steady (prod ahora)
+## Steady ahora
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
@@ -34,11 +30,9 @@ OLLAMA_CONFIGURED=0
 AUTONOMOUS_ALLOW_OPENAI=0
 ```
 
-## Pregunta de reintento
+## ¿Extender ventana canary ON?
 
-**¿Autorizas REINTENTAR el canary mínimo tras desplegar la corrección?**
-
-Responde exactamente: **SÍ** o **NO**.
+Responde **SÍ** o **NO** si quieres dejar el canary activo tras el drill.
 
 | Rol | SÍ / NO | Fecha | Firma |
 |-----|---------|-------|-------|
