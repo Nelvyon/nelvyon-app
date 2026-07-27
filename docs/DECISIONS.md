@@ -867,9 +867,10 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 
 | Campo | Valor |
 |-------|-------|
-| **Fecha** | 2026-07-26 |
-| **Decisión** | Tras CEO `TS_AUTHKEY`: abrir canary mínimo Ollama/Tailscale only; si **cualquier** gate falla → kill inmediato y dejar prod sana. No declarar IMPLEMENTED_VERIFIED ni READY sin inference PASS. |
-| **Hallazgos** | (1) `.dockerignore` excluía rutas inference/router-health → 404 HTML (fix `1eaed9f2`). (2) `getLocalAiConfig()` default `127.0.0.1:5434` sin `NELVYON_LOCAL_AI_USE_MAIN_DB=1` → execute FAIL. (3) Health `ollama:false` puede ser early-return por postgres, no prueba de mesh down. |
-| **Estado steady** | KILL=1 · AI/canary/OLLAMA_CONFIGURED=0 · OpenAI ABSENT · MESH Option A retained |
-| **Evidencia** | `private-ai.prod_canary_adr068_latest.md` · smoke · kill_dockerignore · deploy `f778bed9` / kill `ff843eae` |
-| **Consecuencias** | Próxima reapertura requiere path DB CEO-safe (USE_MAIN_DB+schema ADR-064 **o** fail-closed code sin default :5434) · **NOT READY** |
+| **Fecha** | 2026-07-26 (attempt) · **2026-07-27 (code fix)** |
+| **Decisión** | Tras CEO `TS_AUTHKEY`: abrir canary mínimo Ollama/Tailscale only; si **cualquier** gate falla → kill inmediato. Código **prohíbe** fallback `127.0.0.1:5434`/loopback en producción; sin schema/config RAG → `PRIVATE_AI_RAG_BLOCKED` antes de inferencia. |
+| **Hallazgos** | (1) `.dockerignore` excluía rutas (fix `1eaed9f2`). (2) `getLocalAiConfig` default owner DB en prod → ECONNREFUSED :5434. (3) Fix: `railwayRagPrep` + asserts en pool/`executeTask`/`executeInference`. |
+| **Estado steady** | KILL=1 · AI/canary/OLLAMA_CONFIGURED=0 · OpenAI ABSENT · MESH Option A retained · **no** USE_MAIN_DB/SCHEMA_APPLY |
+| **CEO next** | Solo A (main DB+schema autorizado) o B (IA off) — `CEO_PROD_RAG_DB_OPTIONS.md` |
+| **Evidencia** | `private-ai.adr069_failclosed_latest.md` · `private-ai.prod_canary_adr068_latest.md` |
+| **Consecuencias** | No reabrir canary hasta decisión A + staging reval · **NOT READY** |

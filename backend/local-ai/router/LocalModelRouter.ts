@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 
-import { getPoolStats, healthCheckPool } from "../db";
+import { getPoolStats, healthCheckPool, getLocalAiPool } from "../db";
+import { assertLocalAiDatabaseUrlReady, assertLocalAiRagSchemaPresent } from "../railwayRagPrep";
 import { getLocalRagRetriever } from "../LocalRagRetriever";
 import type { RagRetrievalResult } from "../LocalRagRetriever";
 import { getLocalMemoryStore } from "../LocalMemoryStore";
@@ -118,6 +119,10 @@ export function routeTask(input: RouterTaskInput): RouterDecision {
 }
 
 export async function executeTask(input: RouterTaskInput, requestId?: string): Promise<RouterTaskResult> {
+  // Fail-closed before any RAG/DB/inference work (ADR-069) — never hit localhost Postgres in prod.
+  assertLocalAiDatabaseUrlReady();
+  await assertLocalAiRagSchemaPresent(getLocalAiPool());
+
   const queue = getRouterQueue();
   const queued = queue.enqueue(input, requestId);
   const taskId = queued.taskId;

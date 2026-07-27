@@ -51,4 +51,22 @@ describe("railwayRagPrep — fail-closed (no activation)", () => {
       assertSchemaApplyAllowed({ NELVYON_LOCAL_AI_SCHEMA_APPLY: "1" }),
     ).not.toThrow();
   });
+
+  it("production rejects loopback LOCAL_AI_DATABASE_URL", () => {
+    const r = resolveLocalAiDatabaseUrl({
+      NELVYON_DEPLOY_ENV: "production",
+      LOCAL_AI_DATABASE_URL: "postgresql://nelvyon_local_app:x@127.0.0.1:5434/nelvyon_local_ai",
+    });
+    expect(r.url).toBeNull();
+    expect(r.blockedReason).toMatch(/loopback|localhost/i);
+  });
+
+  it("production without RAG flags fails closed (no owner default)", () => {
+    const r = resolveLocalAiDatabaseUrl({
+      NELVYON_DEPLOY_ENV: "production",
+      DATABASE_URL: "postgresql://u:p@remote:5432/saas",
+    });
+    expect(r.url).toBeNull();
+    expect(r.blockedReason).toMatch(/USE_MAIN_DB|PRIVATE_AI_RAG_BLOCKED/);
+  });
 });

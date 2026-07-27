@@ -1,6 +1,16 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-26** ADR-068 prod canary attempt (fail-closed).
+> Actualizado: **2026-07-27** ADR-069 fail-closed (código; sin reactivar canary).
+
+## 2026-07-27 — ADR-069 fail-closed localhost RAG (no canary)
+
+| Campo | Valor |
+|-------|-------|
+| **Cambio** | Código: prod nunca usa `127.0.0.1:5434`/loopback; schema ausente → `PRIVATE_AI_RAG_BLOCKED` |
+| **Flags prod** | **sin cambio** — KILL=1 · AI/canary off · OpenAI ABSENT · USE_MAIN_DB ABSENT |
+| **DDL prod** | **no** |
+| **Evidencia** | `private-ai.adr069_failclosed_latest.md` · `CEO_PROD_RAG_DB_OPTIONS.md` |
+| **claimReady** | **false** |
 
 ## 2026-07-26 — ADR-068 prod private AI canary attempt (killed)
 

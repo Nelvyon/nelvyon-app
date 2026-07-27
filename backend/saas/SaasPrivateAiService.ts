@@ -12,6 +12,7 @@ import {
   assertPrivateAiProdCanaryRuntimeAllowed,
   isCanaryKillSwitchEngaged,
 } from "../agency/PrivateAiCanaryPrep";
+import { assertLocalAiDatabaseUrlReady } from "../local-ai/railwayRagPrep";
 import { PrivateAiOrchestrator } from "../private-ai/orchestrator/PrivateAiOrchestrator";
 import { PrivateAiApprovalService } from "../private-ai/approvals/PrivateAiApprovalService";
 import { PrivateAiAuditService } from "../private-ai/audit/PrivateAiAuditService";
@@ -141,6 +142,8 @@ export class SaasPrivateAiService {
     if (isCanaryKillSwitchEngaged()) {
       throw new Error("PRIVATE_AI_CANARY_BLOCKED: kill switch engaged");
     }
+    // Fail-closed RAG DB config before any inference attempt (ADR-069).
+    assertLocalAiDatabaseUrlReady();
     const { tenantId, userId, ...taskInput } = input;
     const result = await executeTask({ tenantId, ...taskInput });
     try {

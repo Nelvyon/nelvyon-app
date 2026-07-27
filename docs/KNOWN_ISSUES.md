@@ -6,14 +6,13 @@
 
 ## Activos
 
-### Ops (no KI) — Prod private AI canary inference DB (ADR-068 attempt)
+### Ops (no KI) — Prod private AI canary inference DB (ADR-068/069)
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **Abierto** — canary **ATTEMPTED_FAIL_CLOSED** |
-| **Detalle** | Mesh `MESH_JOIN_OK` + routes tip `1eaed9f2` OK · smoke inference FAIL `ECONNREFUSED 127.0.0.1:5434` because `getLocalAiConfig()` defaults to local Docker Postgres when `NELVYON_LOCAL_AI_USE_MAIN_DB≠1` and prod has no `LOCAL_AI_DATABASE_URL` / no prod `local_ai_*` DDL. Kill ON. Prior false 404: `.dockerignore` excluded routes (fixed). |
-| **Evidencia** | `private-ai.prod_canary_adr068_latest.md` · `private-ai.prod_canary_smoke_latest.md` |
-| **Pendiente** | USE_MAIN_DB+schema (ADR-064) **or** production fail-closed + inference sin Postgres local-AI antes de reabrir |
+| **Estado** | **Mitigado en código** — canary **no** reactivado · CEO **PENDING** A/B |
+| **Detalle** | Fallback `127.0.0.1:5434` **prohibido** en prod (`assertLocalAiDatabaseUrlReady` · schema assert). Steady: KILL ON. Reapertura solo tras `CEO_PROD_RAG_DB_OPTIONS.md` opción A + staging reval + ADR-064. |
+| **Evidencia** | `private-ai.adr069_failclosed_latest.md` · `CEO_PROD_RAG_DB_OPTIONS.md` |
 
 ### Ops (no KI) — Puntos 1–4 CEO batch (ADR-066 → ADR-067)
 

@@ -3,6 +3,12 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-27
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Ops / IA | **ADR-069 fail-closed localhost RAG (sin reactivar)** | Prod prohíbe fallback `:5434`/loopback · assert schema · tests PASS · KILL ON · CEO A/B `CEO_PROD_RAG_DB_OPTIONS.md` · `claimReady: false` · **NOT READY** |
+
 ## 2026-07-26
 
 | Área | Cambio | Descripción |

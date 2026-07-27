@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import pg from "pg";
 
-import { getLocalAiConfig } from "./config";
+import { assertLocalAiDatabaseUrlReady } from "./railwayRagPrep";
 
 export function sha256(text: string): string {
   return crypto.createHash("sha256").update(text, "utf8").digest("hex");
@@ -22,8 +22,9 @@ function poolMaxConnections(): number {
 
 export function getLocalAiPool(): pg.Pool {
   if (!pool) {
+    const connectionString = assertLocalAiDatabaseUrlReady();
     pool = new pg.Pool({
-      connectionString: getLocalAiConfig().databaseUrl,
+      connectionString,
       max: poolMaxConnections(),
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 15_000,
