@@ -1,5 +1,7 @@
 # Módulo: saas.email.campaigns — BLOCKED_EXTERNAL
 
+> **STALE vs KI-R014 SES GRANTED 2026-07-21 — re-run pending ops**
+>
 > 2026-07-17T11:19:00.231Z · http://127.0.0.1:3000
 
 ## Totals

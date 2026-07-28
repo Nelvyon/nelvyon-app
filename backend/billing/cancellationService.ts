@@ -37,6 +37,7 @@ interface UserBillingRow {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   period_end_date: string | null;
+  language: string | null;
 }
 
 export class CancellationService {
@@ -87,9 +88,16 @@ export class CancellationService {
     );
 
     const reactivateUrl = this.settingsUrl();
+    const locale = normalizeProfileLanguage(row.language);
     await this.sendEmail(
       row.email,
-      cancellationScheduledEmail(row.full_name, row.plan, formatDateEs(periodEnd), reactivateUrl),
+      cancellationScheduledEmail(
+        row.full_name,
+        row.plan,
+        formatDateForLocale(periodEnd, locale),
+        reactivateUrl,
+        locale,
+      ),
     );
 
     return { periodEnd };
@@ -122,7 +130,10 @@ export class CancellationService {
     );
 
     const exportUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com"}/dashboard/history`;
-    await this.sendEmail(row.email, offboardingEmail(row.full_name, exportUrl));
+    await this.sendEmail(
+      row.email,
+      offboardingEmail(row.full_name, exportUrl, normalizeProfileLanguage(row.language)),
+    );
   }
 
   async reactivateSubscription(userId: string): Promise<void> {
@@ -197,9 +208,12 @@ export class CancellationService {
               s.status AS subscription_status,
               s.current_period_end::text AS current_period_end,
               u.cancel_at_period_end,
-              u.period_end_date::text AS period_end_date
+              u.period_end_date::text AS period_end_date,
+              p.language
        FROM nelvyon_users u
        LEFT JOIN subscriptions s ON s.user_id = u.user_id
+       LEFT JOIN saas_client_profiles p
+         ON p.tenant_id = u.tenant_id AND p.user_id = u.user_id::text
        WHERE u.user_id = $1::uuid
        LIMIT 1`,
       [userId],
@@ -235,6 +249,27 @@ function addDays(date: Date, days: number): Date {
   return d;
 }
 
-function formatDateEs(date: Date): string {
-  return date.toLocaleDateString("es-ES", { dateStyle: "long" });
+function formatDateForLocale(date: Date, locale: string | null): string {
+  const tag =
+    locale === "en"
+      ? "en-US"
+      : locale === "fr"
+        ? "fr-FR"
+        : locale === "de"
+          ? "de-DE"
+          : locale === "it"
+            ? "it-IT"
+            : locale === "pt"
+              ? "pt-PT"
+              : "es-ES";
+  return date.toLocaleDateString(tag, { dateStyle: "long" });
+}
+
+function normalizeProfileLanguage(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const base = raw.trim().toLowerCase().slice(0, 2);
+  if (base === "en" || base === "fr" || base === "de" || base === "it" || base === "pt" || base === "es") {
+    return base;
+  }
+  return null;
 }

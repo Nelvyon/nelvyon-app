@@ -17,6 +17,12 @@ vi.mock("@aws-sdk/client-ses", () => ({
     return input;
   }),
 }));
+vi.mock("../SaasSequencesService", () => ({
+  getSaasSequencesService: () => ({
+    list: vi.fn().mockResolvedValue([]),
+    enroll: vi.fn().mockResolvedValue({}),
+  }),
+}));
 
 import { SaasWorkflowService, getSaasWorkflowService, resetSaasWorkflowServiceForTests } from "../SaasWorkflowService";
 import { SaasCrmService } from "../SaasCrmService";

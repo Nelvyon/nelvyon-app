@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import {
   getSaasWorkflowService,
   isSesEnvConfigured,
+  isTwilioEnvConfigured,
   requireSaasContext,
   SaasWorkflowError,
   saasErrorBody,
@@ -42,7 +43,8 @@ export async function GET(req: Request) {
     }
     const workflows = await getSaasWorkflowService().getWorkflows(ctx.tenant.id);
     const ses_configured = isSesEnvConfigured();
-    return NextResponse.json({ workflows, ses_configured });
+    const twilio_configured = isTwilioEnvConfigured();
+    return NextResponse.json({ workflows, ses_configured, twilio_configured });
   } catch (e: unknown) {
     if (e instanceof SaasWorkflowError) return mapError(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

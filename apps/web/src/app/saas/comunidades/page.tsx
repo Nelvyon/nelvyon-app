@@ -29,6 +29,35 @@ interface Post {
   createdAt: string;
 }
 
+function mapCommunity(raw: Record<string, unknown>): Community {
+  return {
+    id: String(raw.id),
+    name: String(raw.name),
+    description: String(raw.description ?? ""),
+    icon: String(raw.icon ?? "💬"),
+    color: "#0084ff",
+    memberCount: Number(raw.memberCount ?? raw.membersCount ?? 0),
+    postCount: Number(raw.postCount ?? raw.postsCount ?? 0),
+    private: Boolean(raw.private ?? false),
+    createdAt: String(raw.createdAt ?? ""),
+  };
+}
+
+function mapPost(raw: Record<string, unknown>): Post {
+  const authorName = String(raw.authorName ?? "Usuario");
+  return {
+    id: String(raw.id),
+    communityId: String(raw.communityId),
+    authorName,
+    authorAvatar: authorName.charAt(0).toUpperCase() || "?",
+    content: String(raw.content ?? ""),
+    likes: Number(raw.likes ?? 0),
+    replies: Number(raw.replies ?? raw.repliesCount ?? 0),
+    pinned: Boolean(raw.pinned),
+    createdAt: String(raw.createdAt ?? ""),
+  };
+}
+
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   if (diff < 3600000) return `Hace ${Math.floor(diff / 60000)} min`;
@@ -36,8 +65,7 @@ function timeAgo(iso: string) {
   return `Hace ${Math.floor(diff / 86400000)} días`;
 }
 
-function PostCard({ post }: { post: Post }) {
-  const [liked, setLiked] = useState(false);
+function PostCard({ post, onLike, liking }: { post: Post; onLike: (postId: string) => void; liking: boolean }) {
   return (
     <NelvyonDsCard className={`p-4 ${post.pinned ? "border-primary/30 bg-primary/5" : ""}`}>
       {post.pinned && <p className="mb-2 text-xs font-medium text-primary">📌 Anclado</p>}
@@ -50,11 +78,30 @@ function PostCard({ post }: { post: Post }) {
           </div>
           <p className="mt-1.5 text-sm text-foreground/90 leading-relaxed">{post.content}</p>
           <div className="mt-3 flex gap-4">
-            <button onClick={() => setLiked(l => !l)} className={`flex items-center gap-1.5 text-xs transition-colors ${liked ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}>
-              {liked ? "♥" : "♡"} {post.likes + (liked ? 1 : 0)}
+            <button
+              type="button"
+              onClick={() => onLike(post.id)}
+              disabled={liking}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-primary disabled:opacity-50"
+            >
+              ♡ {post.likes}
             </button>
-            <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">💬 {post.replies} respuestas</button>
-            <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">↗ Compartir</button>
+            <button
+              type="button"
+              disabled
+              title="Respuestas anidadas no disponibles — sin columna parent_post_id en el esquema"
+              className="flex cursor-not-allowed items-center gap-1.5 text-xs text-muted-foreground/50"
+            >
+              💬 {post.replies} respuestas
+            </button>
+            <button
+              type="button"
+              disabled
+              title="Compartir externo no implementado — usa copiar enlace del navegador"
+              className="flex cursor-not-allowed items-center gap-1.5 text-xs text-muted-foreground/50"
+            >
+              ↗ Compartir
+            </button>
           </div>
         </div>
       </div>
@@ -95,7 +142,7 @@ function CreateCommunityModal({ onClose, onCreated }: { onClose: () => void; onC
       <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-lg font-semibold text-foreground">Nueva comunidad</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={save} className="space-y-4 p-6">
           {error && <p className="text-sm text-red-400">{error}</p>}
@@ -139,6 +186,20 @@ export default function SaasComunidadesPage() {
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [newPost, setNewPost] = useState("");
+  const [publishing, setPublishing] = useState(false);
+  const [postError, setPostError] = useState<string | null>(null);
+  const [likingId, setLikingId] = useState<string | null>(null);
+  const [authorName, setAuthorName] = useState("Usuario");
+
+  useEffect(() => {
+    void fetch("/api/saas/profile")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: { profile?: { fullName?: string } } | null) => {
+        const name = d?.profile?.fullName?.trim();
+        if (name) setAuthorName(name);
+      })
+      .catch(() => {});
+  }, []);
 
   const loadCommunities = useCallback(async () => {
     setLoadingCommunities(true);
@@ -146,25 +207,27 @@ export default function SaasComunidadesPage() {
     try {
       const res = await fetch("/api/saas/communities");
       if (!res.ok) throw new Error(`Error ${res.status}`);
-      const d = (await res.json()) as { communities?: Community[] };
-      const list = d.communities ?? [];
+      const d = (await res.json()) as { communities?: Record<string, unknown>[] };
+      const list = (d.communities ?? []).map(mapCommunity);
       setCommunities(list);
-      if (list.length > 0 && !selectedId) setSelectedId(list[0]!.id);
+      if (list.length > 0) {
+        setSelectedId(prev => prev ?? list[0]!.id);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar comunidades");
       setCommunities([]);
     } finally {
       setLoadingCommunities(false);
     }
-  }, []);  
+  }, []);
 
   const loadPosts = useCallback(async (communityId: string) => {
     setLoadingPosts(true);
     try {
       const res = await fetch(`/api/saas/communities?communityId=${communityId}&posts=true`);
       if (!res.ok) throw new Error(`Error ${res.status}`);
-      const d = (await res.json()) as { posts?: Post[] };
-      setPosts(d.posts ?? []);
+      const d = (await res.json()) as { posts?: Record<string, unknown>[] };
+      setPosts((d.posts ?? []).map(mapPost));
     } catch {
       setPosts([]);
     } finally {
@@ -174,6 +237,53 @@ export default function SaasComunidadesPage() {
 
   useEffect(() => { void loadCommunities(); }, [loadCommunities]);
   useEffect(() => { if (selectedId) void loadPosts(selectedId); }, [selectedId, loadPosts]);
+
+  async function publishPost() {
+    if (!selectedId || !newPost.trim()) return;
+    setPublishing(true);
+    setPostError(null);
+    try {
+      const res = await fetch("/api/saas/communities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create_post",
+          communityId: selectedId,
+          content: newPost.trim(),
+          authorName,
+        }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+      }
+      setNewPost("");
+      await loadPosts(selectedId);
+      await loadCommunities();
+    } catch (err) {
+      setPostError(err instanceof Error ? err.message : "Error al publicar");
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  async function likePost(postId: string) {
+    if (!selectedId) return;
+    setLikingId(postId);
+    try {
+      const res = await fetch("/api/saas/communities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "like_post", postId }),
+      });
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      await loadPosts(selectedId);
+    } catch {
+      // silent — count will reconcile on next load
+    } finally {
+      setLikingId(null);
+    }
+  }
 
   const selected = communities.find(c => c.id === selectedId);
   const visiblePosts = posts.filter(p => p.communityId === selectedId).sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
@@ -205,7 +315,6 @@ export default function SaasComunidadesPage() {
               </NelvyonDsCard>
             ) : (
               <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-                {/* Sidebar communities */}
                 <div className="space-y-2">
                   {communities.map(c => (
                     <button key={c.id} onClick={() => setSelectedId(c.id)}
@@ -222,7 +331,6 @@ export default function SaasComunidadesPage() {
                   ))}
                 </div>
 
-                {/* Posts feed */}
                 <div className="space-y-4">
                   {selected && (
                     <NelvyonDsCard className="p-4">
@@ -236,8 +344,15 @@ export default function SaasComunidadesPage() {
                       <textarea value={newPost} onChange={e => setNewPost(e.target.value)} rows={3}
                         placeholder="Escribe algo para la comunidad…"
                         className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+                      {postError && <p className="mt-2 text-sm text-red-400">{postError}</p>}
                       <div className="mt-2 flex justify-end">
-                        <NelvyonDsButton disabled={!newPost.trim()} onClick={() => setNewPost("")} className="text-sm">Publicar</NelvyonDsButton>
+                        <NelvyonDsButton
+                          disabled={!newPost.trim() || publishing}
+                          onClick={() => void publishPost()}
+                          className="text-sm"
+                        >
+                          {publishing ? "Publicando…" : "Publicar"}
+                        </NelvyonDsButton>
                       </div>
                     </NelvyonDsCard>
                   )}
@@ -252,7 +367,14 @@ export default function SaasComunidadesPage() {
                       <p className="mt-2 text-sm text-muted-foreground">Sé el primero en publicar en esta comunidad</p>
                     </NelvyonDsCard>
                   ) : (
-                    visiblePosts.map(p => <PostCard key={p.id} post={p} />)
+                    visiblePosts.map(p => (
+                      <PostCard
+                        key={p.id}
+                        post={p}
+                        onLike={id => void likePost(id)}
+                        liking={likingId === p.id}
+                      />
+                    ))
                   )}
                 </div>
               </div>

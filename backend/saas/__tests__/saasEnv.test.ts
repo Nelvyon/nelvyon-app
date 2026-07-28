@@ -6,6 +6,7 @@ import {
   isPackLlmEnvConfigured,
   isSesEnvConfigured,
   isStripeEnvConfigured,
+  isTwilioEnvConfigured,
   missingEnvKeys,
   missingSesEnvKeys,
   missingStripeEnvKeys,
@@ -59,6 +60,19 @@ describe("saasEnv connector readiness", () => {
     process.env.AWS_SES_SECRET_KEY = "b";
     process.env.SES_FROM_EMAIL = "c@test.com";
     expect(isSesEnvConfigured()).toBe(true);
+  });
+
+  it("isTwilioEnvConfigured requires all TWILIO_* keys", () => {
+    delete process.env.TWILIO_ACCOUNT_SID;
+    delete process.env.TWILIO_AUTH_TOKEN;
+    delete process.env.TWILIO_FROM_NUMBER;
+    expect(isTwilioEnvConfigured()).toBe(false);
+    process.env.TWILIO_ACCOUNT_SID = "AC123";
+    process.env.TWILIO_AUTH_TOKEN = "tok";
+    process.env.TWILIO_FROM_NUMBER = "+15551234567";
+    expect(isTwilioEnvConfigured()).toBe(true);
+    delete process.env.TWILIO_FROM_NUMBER;
+    expect(isTwilioEnvConfigured()).toBe(false);
   });
 
   it("missingEnvKeys lists unset keys", () => {

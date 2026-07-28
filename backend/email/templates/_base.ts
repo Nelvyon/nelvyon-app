@@ -1,19 +1,30 @@
+import { resolveEmailLocale } from "../localeCopy";
+
 export const EMAIL_BASE_STYLES = {
   bg: "#0A0A0F",
   text: "#FFFFFF",
   accent: "#6C63FF",
 };
 
-export function renderBaseEmail(title: string, intro: string, contentHtml: string, ctaLabel?: string, ctaUrl?: string): string {
-  const cta = ctaLabel && ctaUrl
-    ? `<p style="margin: 28px 0 0; text-align:center;">
+export function renderBaseEmail(
+  title: string,
+  intro: string,
+  contentHtml: string,
+  ctaLabel?: string,
+  ctaUrl?: string,
+  locale?: string | null,
+): string {
+  const lang = resolveEmailLocale(locale);
+  const cta =
+    ctaLabel && ctaUrl
+      ? `<p style="margin: 28px 0 0; text-align:center;">
          <a href="${ctaUrl}" style="display:inline-block; background:${EMAIL_BASE_STYLES.accent}; color:${EMAIL_BASE_STYLES.text}; text-decoration:none; padding:12px 20px; border-radius:8px; font-weight:600;">
            ${ctaLabel}
          </a>
        </p>`
-    : "";
+      : "";
   return `<!doctype html>
-<html lang="es">
+<html lang="${lang}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

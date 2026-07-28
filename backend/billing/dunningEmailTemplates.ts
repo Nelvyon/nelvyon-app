@@ -1,11 +1,14 @@
+import { billingHtmlLang, getBillingLifecycleCopy } from "./billingLifecycleLocale";
+
 export interface EmailContent {
   subject: string;
   html: string;
   text: string;
 }
 
-function baseHtml(title: string, body: string): string {
-  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+function baseHtml(title: string, body: string, locale?: string | null): string {
+  const lang = billingHtmlLang(locale);
+  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${title}</title></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:system-ui,sans-serif;">
@@ -28,86 +31,109 @@ function cta(href: string, label: string, color = "#6366f1"): string {
 </a>`;
 }
 
-export function paymentFailedEmail(customerName: string, planName: string, updateUrl: string): EmailContent {
-  const subject = "Tu pago no se ha procesado — NELVYON";
+export function paymentFailedEmail(
+  customerName: string,
+  planName: string,
+  updateUrl: string,
+  locale?: string | null,
+): EmailContent {
+  const c = getBillingLifecycleCopy(locale).paymentFailed;
+  const subject = c.subject;
   const html = baseHtml(
     subject,
     `
-<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">Hola, ${customerName}</h1>
+<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">${c.greeting(customerName)}</h1>
 <p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 16px;">
-  No hemos podido cobrar tu plan <strong style="color:#f4f4f5;">${planName}</strong>.
-  Tu acceso sigue activo durante 7 días mientras actualizas el método de pago.
+  ${c.body(planName)}
 </p>
 <p style="color:#71717a;font-size:14px;margin:0 0 24px;">
-  Paddle reintentará el cobro automáticamente. Si prefieres, puedes actualizar tu tarjeta ahora.
+  ${c.note}
 </p>
-${cta(updateUrl, "Actualizar método de pago", "#f59e0b")}`,
+${cta(updateUrl, c.cta, "#f59e0b")}`,
+    locale,
   );
-  const text = `Hola ${customerName}, no hemos podido cobrar tu plan ${planName}. Tienes 7 días de gracia. Actualiza tu pago: ${updateUrl}`;
-  return { subject, html, text };
+  return { subject, html, text: c.text(customerName, planName, updateUrl) };
 }
 
-export function secondNoticeEmail(customerName: string, daysLeft: number, updateUrl: string): EmailContent {
-  const subject = "Segundo aviso — actualiza tu método de pago — NELVYON";
+export function secondNoticeEmail(
+  customerName: string,
+  daysLeft: number,
+  updateUrl: string,
+  locale?: string | null,
+): EmailContent {
+  const c = getBillingLifecycleCopy(locale).secondNotice;
+  const subject = c.subject;
   const html = baseHtml(
     subject,
     `
-<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">Segundo aviso, ${customerName}</h1>
+<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">${c.greeting(customerName)}</h1>
 <p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 16px;">
-  El segundo intento de cobro no se ha completado. Te quedan
-  <strong style="color:#f59e0b;">${daysLeft} días</strong> antes de que suspendamos el acceso a los agentes.
+  ${c.body(daysLeft)}
 </p>
-${cta(updateUrl, "Actualizar método de pago", "#f97316")}`,
+${cta(updateUrl, c.cta, "#f97316")}`,
+    locale,
   );
-  const text = `Hola ${customerName}, segundo aviso de pago. Quedan ${daysLeft} días. Actualiza: ${updateUrl}`;
-  return { subject, html, text };
+  return { subject, html, text: c.text(customerName, daysLeft, updateUrl) };
 }
 
-export function finalWarningEmail(customerName: string, updateUrl: string): EmailContent {
-  const subject = "Tu cuenta se suspende mañana — NELVYON";
+export function finalWarningEmail(
+  customerName: string,
+  updateUrl: string,
+  locale?: string | null,
+): EmailContent {
+  const c = getBillingLifecycleCopy(locale).finalWarning;
+  const subject = c.subject;
   const html = baseHtml(
     subject,
     `
-<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">Último aviso, ${customerName}</h1>
+<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">${c.greeting(customerName)}</h1>
 <p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 16px;">
-  Mañana suspenderemos el acceso a la ejecución de agentes si no recibimos el pago.
-  Podrás seguir viendo tu dashboard, pero no podrás lanzar agentes hasta reactivar.
+  ${c.body}
 </p>
-${cta(updateUrl, "Actualizar ahora", "#ef4444")}`,
+${cta(updateUrl, c.cta, "#ef4444")}`,
+    locale,
   );
-  const text = `Hola ${customerName}, tu cuenta se suspende mañana si no actualizas el pago: ${updateUrl}`;
-  return { subject, html, text };
+  return { subject, html, text: c.text(customerName, updateUrl) };
 }
 
-export function suspensionEmail(customerName: string, reactivateUrl: string): EmailContent {
-  const subject = "Tu cuenta ha sido suspendida — NELVYON";
+export function suspensionEmail(
+  customerName: string,
+  reactivateUrl: string,
+  locale?: string | null,
+): EmailContent {
+  const c = getBillingLifecycleCopy(locale).suspension;
+  const subject = c.subject;
   const html = baseHtml(
     subject,
     `
-<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">Cuenta suspendida, ${customerName}</h1>
+<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">${c.greeting(customerName)}</h1>
 <p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 16px;">
-  Hemos suspendido el acceso a los agentes por impago. Puedes consultar tu dashboard,
-  pero necesitas reactivar la suscripción para volver a ejecutar agentes.
+  ${c.body}
 </p>
-${cta(reactivateUrl, "Reactivar suscripción", "#6366f1")}`,
+${cta(reactivateUrl, c.cta, "#6366f1")}`,
+    locale,
   );
-  const text = `Hola ${customerName}, tu cuenta está suspendida. Reactiva en: ${reactivateUrl}`;
-  return { subject, html, text };
+  return { subject, html, text: c.text(customerName, reactivateUrl) };
 }
 
-export function reactivationEmail(customerName: string, planName: string): EmailContent {
-  const subject = "Suscripción reactivada — NELVYON";
+export function reactivationEmail(
+  customerName: string,
+  planName: string,
+  locale?: string | null,
+): EmailContent {
+  const c = getBillingLifecycleCopy(locale).reactivation;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com";
+  const dash = `${appUrl}/saas/dashboard`;
+  const subject = c.subject;
   const html = baseHtml(
     subject,
     `
-<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">¡Bienvenido de nuevo, ${customerName}!</h1>
+<h1 style="color:#f4f4f5;font-size:24px;margin:0 0 16px;">${c.greeting(customerName)}</h1>
 <p style="color:#a1a1aa;font-size:16px;line-height:1.6;margin:0 0 16px;">
-  Tu plan <strong style="color:#6366f1;">${planName}</strong> está activo de nuevo.
-  Ya puedes ejecutar todos tus agentes.
+  ${c.body(planName)}
 </p>
-${cta(`${appUrl}/saas/dashboard`, "Ir al dashboard")}`,
+${cta(dash, c.cta)}`,
+    locale,
   );
-  const text = `Hola ${customerName}, tu plan ${planName} está activo de nuevo. Dashboard: ${appUrl}/saas/dashboard`;
-  return { subject, html, text };
+  return { subject, html, text: c.text(customerName, planName, dash) };
 }

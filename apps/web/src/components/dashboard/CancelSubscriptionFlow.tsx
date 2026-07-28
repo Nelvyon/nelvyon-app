@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { NelvyonDsButton } from "@/design-system/components";
 import { cn } from "@/core/ui/utils";
@@ -59,8 +59,54 @@ export function CancelSubscriptionFlow({ plan, onClose, onCompleted }: CancelSub
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [periodEnd, setPeriodEnd] = useState<string | null>(null);
+  const [portalUrl, setPortalUrl] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   const losses = defaultLosses(plan);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/user/payment-method", { credentials: "same-origin" });
+        if (!res.ok) return;
+        const body = (await res.json()) as { updateUrl?: string | null };
+        if (!cancelled && body.updateUrl) setPortalUrl(body.updateUrl);
+      } catch {
+        /* portal optional */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const openStripePortal = async () => {
+    setPortalLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/billing/portal", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      if (res.ok) {
+        const body = (await res.json()) as { url?: string };
+        if (body.url) {
+          window.location.href = body.url;
+          return;
+        }
+      }
+      if (portalUrl) {
+        window.location.href = portalUrl;
+        return;
+      }
+      setError("No hay portal Stripe disponible para esta cuenta.");
+    } catch {
+      setError("No se pudo abrir el portal de facturación.");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const submitCancellation = async () => {
     setError(null);
@@ -116,20 +162,24 @@ export function CancelSubscriptionFlow({ plan, onClose, onCompleted }: CancelSub
             <NelvyonDsButton className="flex-1" onClick={onClose}>
               Mantener mi plan
             </NelvyonDsButton>
-            <NelvyonDsButton
-              variant="secondary"
-              className="flex-1"
-              disabled
-              title="Próximamente"
-              onClick={() => undefined}
-            >
-              Pausar 1 mes
-            </NelvyonDsButton>
             <NelvyonDsButton variant="secondary" className="flex-1" onClick={() => setStep("reason")}>
               Cancelar igualmente
             </NelvyonDsButton>
           </div>
-          <p className="text-xs text-muted-foreground">Pausar 1 mes estará disponible próximamente.</p>
+          <div className="rounded-md border border-muted bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+            <strong className="text-foreground">Pausa no disponible</strong> — Nelvyon no expone pausa de suscripción
+            en la app. Si Stripe lo permite en tu plan, gestiona pausa o cambios desde el portal de facturación.
+            <div className="mt-2">
+              <NelvyonDsButton
+                variant="secondary"
+                size="sm"
+                disabled={portalLoading}
+                onClick={() => void openStripePortal()}
+              >
+                {portalLoading ? "Abriendo portal…" : "Abrir portal Stripe"}
+              </NelvyonDsButton>
+            </div>
+          </div>
         </>
       ) : null}
 

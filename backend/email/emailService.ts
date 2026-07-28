@@ -5,8 +5,12 @@ import { buildEmail, type EmailTemplate } from "./templates";
 
 const FROM = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
 
-export async function sendEmail(template: EmailTemplate, params: Record<string, string>): Promise<void> {
-  const email = buildEmail(template, params);
+export async function sendEmail(
+  template: EmailTemplate,
+  params: Record<string, string>,
+  locale?: string | null,
+): Promise<void> {
+  const email = buildEmail(template, params, locale);
   const client = getSesClient();
   await client.send(
     new SendEmailCommand({

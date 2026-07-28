@@ -14,5 +14,6 @@ export function welcomeTemplate(
     copy.detailHtml,
     copy.cta,
     onboardingUrl,
+    locale,
   );
 }

@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
+import { resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 
 export type OnboardingStep = "welcome_email_sent" | "profile_completed" | "first_agent_used" | "plan_activated";
 
@@ -29,11 +30,16 @@ export async function initOnboarding(userId: string, userEmail: string, userName
     [userId],
   );
   try {
-    await sendEmail("welcome", {
-      email: userEmail,
-      name: userName,
-      appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
-    });
+    const locale = await resolveUserEmailLocale(db, userId);
+    await sendEmail(
+      "welcome",
+      {
+        email: userEmail,
+        name: userName,
+        appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
+      },
+      locale,
+    );
     await db.query(`UPDATE onboarding SET welcome_email_sent=true, updated_at=now() WHERE user_id=$1`, [userId]);
   } catch (err) {
     console.error("[onboarding] welcome email failed:", err);

@@ -54,7 +54,7 @@
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
 | **Total archivos** | 411+ |
-| **Última migración (repo)** | `520_erp_postgres_persistence.sql` (tip **`9e931f08`**) |
+| **Última migración (repo)** | `521_saas_sequence_enrollment_tracking.sql` (email_opened/email_clicked) |
 | **Staging verified** | **519** + **520** in `_migrations` (2026-07-25) |
 | **Prod verified** | **517** + **518** in `_migrations` (2026-07-22 SSOT DB probe) · **519/520** **not** claimed on prod |
 | **Shared Memory schema** | 514 + RLS 515 · `schema.proposed.sql` referencia histórica |

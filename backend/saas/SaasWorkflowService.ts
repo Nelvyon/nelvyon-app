@@ -5,6 +5,7 @@ import { getSesClient } from "../email/sesClient";
 import { getSaasSmsService } from "./SaasSmsService";
 import { getSaasWhatsAppService } from "./SaasWhatsAppService";
 import { getSaasWhatsAppCloudService, isMetaWaConfigured } from "./SaasWhatsAppCloudService";
+import { isSesEnvConfigured } from "./saasEnv";
 import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact, type ActivityType } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
@@ -14,6 +15,11 @@ import type { DealStage } from "./saasDealsDedupe";
 const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
 
 async function dispatchEmail(to: string, subject: string, body: string): Promise<void> {
+  if (!isSesEnvConfigured()) {
+    throw new Error(
+      "SES no configurado: define SES_FROM_EMAIL, SES_ACCESS_KEY_ID y SES_SECRET_ACCESS_KEY en el servidor.",
+    );
+  }
   const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a;">${body}</div>`;
   try {
     const client = getSesClient();

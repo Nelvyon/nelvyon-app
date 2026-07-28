@@ -146,7 +146,7 @@ export default function ErpInventoryPage() {
         <header>
           <h1 className="text-2xl font-semibold text-white">Inventario & almacenes</h1>
           <p className="mt-1 text-sm text-[#94a3b8]">
-            Core in-memory · sin coste/GL · {note || "solo cantidades y trazabilidad"}
+            Persistido vía API (Postgres con DATABASE_URL) · sin coste/GL · {note || "solo cantidades y trazabilidad"}
           </p>
         </header>
 

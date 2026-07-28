@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import {
   getSaasCampaniasService,
   isSesEnvConfigured,
+  isTwilioEnvConfigured,
   requireSaasContext,
   SaasCampaniasError,
   saasErrorBody,
@@ -24,7 +25,8 @@ export async function GET(req: Request) {
     const ctx = await requireSaasContext(req, "campanias.read");
     const campanias = await getSaasCampaniasService().getCampanias(ctx.tenant.id);
     const ses_configured = isSesEnvConfigured();
-    return NextResponse.json({ campanias, ses_configured });
+    const twilio_configured = isTwilioEnvConfigured();
+    return NextResponse.json({ campanias, ses_configured, twilio_configured });
   } catch (e: unknown) {
     if (e instanceof SaasCampaniasError) return mapError(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

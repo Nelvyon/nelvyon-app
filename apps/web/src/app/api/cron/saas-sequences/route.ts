@@ -18,7 +18,9 @@ export async function POST(req: Request) {
     const processed = await runWithCronDeadline("saas-sequences", () =>
       getSaasSequencesService().processDueEnrollments({
         sendEmail: async (to, subject, html) => {
-          if (!process.env.SES_FROM_EMAIL || !process.env.SES_ACCESS_KEY_ID) return;
+          if (!process.env.SES_FROM_EMAIL || !process.env.SES_ACCESS_KEY_ID) {
+            throw new Error("SES not configured");
+          }
           const { getSesClient } = await import("../../../../../../../backend/email/sesClient");
           const { SendEmailCommand } = await import("@aws-sdk/client-ses");
           const from = process.env.SES_FROM_EMAIL;

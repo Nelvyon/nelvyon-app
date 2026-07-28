@@ -181,6 +181,12 @@ function makeDb() {
 }
 
 describe("SaasWorkflowService", () => {
+  const savedEnv = { ...process.env };
+
+  afterEach(() => {
+    process.env = { ...savedEnv };
+  });
+
   it("createWorkflow serializa jsonb con JSON.stringify", async () => {
     const db = makeDb();
     const svc = new SaasWorkflowService(db);
@@ -277,6 +283,9 @@ describe("SaasWorkflowService", () => {
   });
 
   it("executeWorkflow ejecuta action send_email correctamente", async () => {
+    process.env.SES_ACCESS_KEY_ID = "a";
+    process.env.SES_SECRET_ACCESS_KEY = "b";
+    process.env.SES_FROM_EMAIL = "c@test.com";
     const db = makeDb();
     const svc = new SaasWorkflowService(db, new SaasCrmService(db));
     const wf = await svc.createWorkflow("t1", {
@@ -286,6 +295,24 @@ describe("SaasWorkflowService", () => {
     });
     await svc.executeWorkflow(wf.id, "t1", {});
     expect(db.activity[0]?.event_type).toBe("workflow_email");
+  });
+
+  it("executeWorkflow send_email falla con error claro si SES no configurado", async () => {
+    delete process.env.SES_ACCESS_KEY_ID;
+    delete process.env.AWS_SES_ACCESS_KEY;
+    delete process.env.SES_SECRET_ACCESS_KEY;
+    delete process.env.AWS_SES_SECRET_KEY;
+    delete process.env.SES_FROM_EMAIL;
+    const db = makeDb();
+    const svc = new SaasWorkflowService(db, new SaasCrmService(db));
+    const wf = await svc.createWorkflow("t1", {
+      name: "WF",
+      triggerType: "manual",
+      actions: [{ type: "send_email", config: { to: "a@b.com", subject: "Hola", body: "Body" } }] as never[],
+    });
+    const run = await svc.executeWorkflow(wf.id, "t1", {});
+    expect(run.status).toBe("failed");
+    expect(run.error).toMatch(/SES no configurado/i);
   });
 
   it("executeWorkflow ejecuta action change_stage correctamente", async () => {

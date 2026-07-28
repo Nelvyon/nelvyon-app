@@ -6,6 +6,7 @@ import {
   saasErrorStatus,
   requireSaasContext,
   isSesEnvConfigured,
+  isTwilioEnvConfigured,
   type SequenceTrigger,
 } from "@nelvyon/saas";
 
@@ -21,7 +22,11 @@ export async function GET(req: Request) {
   try {
     const ctx = await requireSaasContext(req, "contacts.read");
     const sequences = await getSaasSequencesService().list(ctx.tenant.id);
-    return NextResponse.json({ sequences, ses_configured: isSesEnvConfigured() });
+    return NextResponse.json({
+      sequences,
+      ses_configured: isSesEnvConfigured(),
+      twilio_configured: isTwilioEnvConfigured(),
+    });
   } catch (e: unknown) {
     if (e instanceof SaasSequencesError) return mapError(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });

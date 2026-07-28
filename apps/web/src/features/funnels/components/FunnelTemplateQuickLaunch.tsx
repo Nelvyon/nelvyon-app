@@ -32,7 +32,13 @@ export function FunnelTemplateQuickLaunch({ compact }: { compact?: boolean }) {
     try {
       const payload = buildFunnelCreatePayload(preset);
       const funnel = await createMutation.mutateAsync(payload);
-      if (funnel?.id && funnel.id !== "mock-funnel") {
+      if (funnel?.id === "mock-funnel") {
+        setError(
+          "El backend devolvió un embudo demo (mock-funnel). Configura la API real de embudos para crear y editar funnels.",
+        );
+        return;
+      }
+      if (funnel?.id) {
         router.push(`/funnels/${funnel.id}`);
       }
     } catch {

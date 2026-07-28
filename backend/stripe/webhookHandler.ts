@@ -6,6 +6,7 @@ import { mapStripePriceToNelvyon } from "./stripeApi";
 import { mapBillablePlanToSaasPlan, shouldSyncSaasTenantPlan } from "../saas/saasTenantMapper";
 import type { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
+import { dateLocaleTag, resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 import { completeStep } from "../onboarding";
 
 function getStripe(): Stripe {
@@ -172,11 +173,16 @@ export async function processStripeEvent(event: Stripe.Event, db: DbClient): Pro
       const email = await getUserEmail(db, userId);
       const periodEnd = periodEndFromSubscription(sub);
       if (email) {
-        await sendEmail("cancellation", {
-          email,
-          accessUntil: periodEnd?.toLocaleDateString("es-ES") ?? "—",
-          appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
-        });
+        const locale = await resolveUserEmailLocale(db, userId);
+        await sendEmail(
+          "cancellation",
+          {
+            email,
+            accessUntil: periodEnd?.toLocaleDateString(dateLocaleTag(locale)) ?? "—",
+            appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
+          },
+          locale,
+        );
       }
       logStripeEvent(event, { userId, action: "canceled" });
       break;
@@ -353,12 +359,17 @@ async function notifyPlanActivated(
 ): Promise<void> {
   const email = await getUserEmail(db, userId);
   if (email) {
-    await sendEmail("plan_activated", {
-      email,
-      plan,
-      periodEnd: periodEnd?.toLocaleDateString("es-ES") ?? "—",
-      appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
-    });
+    const locale = await resolveUserEmailLocale(db, userId);
+    await sendEmail(
+      "plan_activated",
+      {
+        email,
+        plan,
+        periodEnd: periodEnd?.toLocaleDateString(dateLocaleTag(locale)) ?? "—",
+        appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
+      },
+      locale,
+    );
   }
   try {
     await completeStep(userId, "plan_activated");

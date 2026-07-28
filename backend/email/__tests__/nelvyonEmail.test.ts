@@ -142,6 +142,143 @@ describe("SES catalog locale wiring (payment_failed / cancellation)", () => {
   });
 });
 
+describe("SES catalog locale wiring (Lote A.2 templates)", () => {
+  const baseParams = {
+    email: "a@test.com",
+    name: "Ana",
+    appUrl: "https://app.nelvyon.com",
+  };
+
+  it("email_verify en locale en usa English subject + CTA", () => {
+    const email = buildEmail(
+      "email_verify",
+      { ...baseParams, verifyUrl: "https://app.nelvyon.com/verify" },
+      "en",
+    );
+    expect(email.subject).toContain("Confirm your email");
+    expect(email.html).toContain("Confirm email");
+    expect(email.html).toContain('lang="en"');
+  });
+
+  it("email_verify sin locale sigue en español (default)", () => {
+    const email = buildEmail("email_verify", {
+      ...baseParams,
+      verifyUrl: "https://app.nelvyon.com/verify",
+    });
+    expect(email.subject).toContain("Confirma");
+    expect(email.html).toContain('lang="es"');
+  });
+
+  it("plan_activated en locale en usa English subject + CTA", () => {
+    const email = buildEmail(
+      "plan_activated",
+      { email: baseParams.email, plan: "pro", periodEnd: "2026-08-01", appUrl: baseParams.appUrl },
+      "en",
+    );
+    expect(email.subject).toContain("plan activated");
+    expect(email.html).toContain("Go to dashboard");
+    expect(email.html).toContain("Complete your profile");
+  });
+
+  it("plan_activated sin locale sigue en español (default)", () => {
+    const email = buildEmail("plan_activated", {
+      email: baseParams.email,
+      plan: "pro",
+      periodEnd: "01/08/2026",
+      appUrl: baseParams.appUrl,
+    });
+    expect(email.subject).toContain("activado");
+    expect(email.html).toContain("Completa tu perfil");
+  });
+
+  it("data_export_confirm en locale en usa English subject", () => {
+    const email = buildEmail(
+      "data_export_confirm",
+      { ...baseParams, exportedAt: "2026-07-28" },
+      "en",
+    );
+    expect(email.subject).toContain("exported your data");
+    expect(email.html).toContain("Export date");
+  });
+
+  it("data_export_confirm sin locale sigue en español (default)", () => {
+    const email = buildEmail("data_export_confirm", {
+      ...baseParams,
+      exportedAt: "28/07/2026",
+    });
+    expect(email.subject).toContain("exportado");
+  });
+
+  it("account_deleted en locale en usa English subject", () => {
+    const email = buildEmail(
+      "account_deleted",
+      { ...baseParams, summary: "All workspaces removed." },
+      "en",
+    );
+    expect(email.subject).toContain("account has been deleted");
+    expect(email.html).toContain("Account scheduled for deletion");
+  });
+
+  it("account_deleted sin locale sigue en español (default)", () => {
+    const email = buildEmail("account_deleted", {
+      ...baseParams,
+      summary: "Datos eliminados.",
+    });
+    expect(email.subject).toContain("eliminada");
+  });
+
+  it("nps_thank_you en locale en usa English subject + CTA", () => {
+    const email = buildEmail(
+      "nps_thank_you",
+      { ...baseParams, score: "9" },
+      "en",
+    );
+    expect(email.subject).toContain("Thanks for your feedback");
+    expect(email.html).toContain("Back to dashboard");
+  });
+
+  it("nps_thank_you sin locale sigue en español (default)", () => {
+    const email = buildEmail("nps_thank_you", {
+      ...baseParams,
+      score: "9",
+    });
+    expect(email.subject).toContain("Gracias");
+    expect(email.html).toContain("Volver al dashboard");
+  });
+
+  it("welcome SES en locale en usa English dashboard CTA", () => {
+    const email = buildEmail("welcome", baseParams, "en");
+    expect(email.subject).toBe("Welcome to NELVYON");
+    expect(email.html).toContain("Go to dashboard");
+  });
+
+  it("password_reset SES en locale en usa English CTA", () => {
+    const email = buildEmail(
+      "password_reset",
+      { ...baseParams, resetUrl: "https://app.nelvyon.com/reset" },
+      "en",
+    );
+    expect(email.html).toContain("Reset password");
+  });
+
+  it("invoice SES en locale en usa English labels", () => {
+    const email = buildEmail(
+      "invoice",
+      {
+        email: baseParams.email,
+        invoiceId: "INV-1",
+        period: "Jul 2026",
+        plan: "pro",
+        amount: "€29.99",
+      },
+      "en",
+    );
+    expect(email.subject).toContain("invoice");
+    expect(email.html).toContain("Invoice no.");
+    expect(email.html).toContain("Amount");
+  });
+});
+
 describe("NelvyonEmailService real client path", () => {
   it("Si Resend lanza error → retorna { success: false, error: mensaje }", async () => {
     const svc = new NelvyonEmailService({

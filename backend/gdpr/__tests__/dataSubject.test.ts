@@ -86,6 +86,7 @@ describe("DataSubjectService", () => {
       expect.objectContaining({
         email: "keep@b.com",
       }),
+      "es",
     );
   });
 

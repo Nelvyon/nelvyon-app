@@ -15,7 +15,7 @@ export function isAnyEnvKeyConfigured(keys: readonly string[]): boolean {
 
 /**
  * SES keys — aligned with `backend/email/sesClient.ts` aliases.
- * Region defaults to us-east-1 in the client; not required for "configured".
+ * Region defaults to eu-west-1 in the client; not required for "configured".
  */
 export function isSesEnvConfigured(): boolean {
   const access =

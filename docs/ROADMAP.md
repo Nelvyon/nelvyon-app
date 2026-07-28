@@ -99,12 +99,12 @@
 | Block 17 integrations_marketplace | ✅ | **VERIFIED** (internal ping) |
 | Block 18 mobile Capacitor | 🟡 | scaffold present · APK BLOCKED_EXTERNAL · stores BLOCKED_EXTERNAL |
 | Block 19 PWA | ✅ | Chrome VERIFIED · iOS BLOCKED |
-| Block 20 localization | 🟡 | UI FULL · email/PDF PARTIAL |
+| Block 20 localization | 🟡 | UI FULL · email transactional **LOCALIZED** (SES+billing+runtime) · PDF legal **HUMAN_REVIEW** · mass-send BLOCKED_LEGAL |
 | Block 21 HA/DR | ✅ | single-region VERIFIED · multi-region BLOCKED_EXTERNAL/COST |
 | Block 22 observability | ✅ | local VERIFIED · paid PREPARED_OFF |
 | Block 23 legacy consolidation | ✅ | VERIFIED · zero unsafe deletes |
-| Block 24 private_vector_rag | ✅ | Docker VERIFIED · Railway staging **IMPLEMENTED_VERIFIED** (ADR-068) · prod DDL OFF · P2 minScore |
-| Block 25 private_ai_canary_prep | 🟡 | Code AUTHORIZED (ADR-068) · live **BLOCKED_EXTERNAL** mesh |
+| Block 24 private_vector_rag | ✅ | Docker VERIFIED · Railway staging **IMPLEMENTED_VERIFIED** (ADR-068) · prod canary probe PASS · P2 minScore ADR-070 |
+| Block 25 private_ai_canary_prep | 🟡 | Live window **IMPLEMENTED_VERIFIED** then **KILLED** (CEO NO extend) · reopen = SÍ · mesh was unblocked for that window |
 | Block 26 purchases_suppliers_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withPurchasesPersistence` · Postgres SSOT when DB · payments **BLOCKED_SCOPE** · catalog **v1.7.0** · 519 reserved |
 | Block 27 inventory_warehouses_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withInventoryPersistence` · no cost/GL · catalog **v1.7.0** · 519 reserved |
 | Block 28 manufacturing_ops_core | ✅ | **IMPLEMENTED_VERIFIED** · API `withManufacturingPersistence` · IoT **BLOCKED_EXTERNAL** · catalog **v1.7.0** |

@@ -54,7 +54,7 @@ const FAQ_ITEMS = [
   {
     question: "¿Cuándo cobro de verdad?",
     answer:
-      "Cuando P2b active suscripciones y packs a tus clientes y tu cuenta de cobro esté en estado Completo.",
+      "Cuando tu Stripe Connect esté completo, haya cobros reales a tus clientes y ops habilite payouts (CEO-gated). El ledger refleja cada línea en cuanto exista cobro.",
   },
   {
     question: "¿Puedo poner mis precios?",
@@ -132,8 +132,8 @@ export function PartnerCommissionFlow({ data, connect, onboarding, onStartConnec
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Paso 1</p>
               <p className="font-medium">Conectar cuenta de cobro</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Nelvyon retiene el COGS wholesale; el resto es tuyo. Sin cuenta conectada no podemos
-                transferirte comisiones cuando actives cobros a clientes (próximamente).
+                Nelvyon retiene el COGS wholesale; el resto es tuyo. Stripe Connect está disponible;
+                los payouts automáticos requieren onboarding completo y cobros activos a clientes (CEO-gated).
               </p>
               <p className="mt-2 text-xs">
                 <span className="rounded-full bg-muted px-2 py-0.5 font-medium">{connectBadge.label}</span>
@@ -204,7 +204,7 @@ export function PartnerCommissionFlow({ data, connect, onboarding, onStartConnec
                 Local, Ecommerce o SaaS B2B. Margen típico €348–€648 según catálogo (venta sugerida − COGS).
               </p>
               <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
-                Cobro automático al cliente — disponible pronto (P2b)
+                Cobro automático al cliente — activación P2b (requiere Connect + aprobación ops)
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {data.metrics.active_packs} pack{data.metrics.active_packs === 1 ? "" : "s"} activo

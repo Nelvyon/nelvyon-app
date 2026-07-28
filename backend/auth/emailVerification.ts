@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 
 import { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
+import { resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 
 const TOKEN_BYTES = 32;
 const EXPIRY_MS = 48 * 60 * 60 * 1000;
@@ -22,12 +23,17 @@ export async function issueEmailVerification(userId: string, email: string, name
   );
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com";
   const verifyUrl = `${appUrl}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
-  await sendEmail("email_verify", {
-    email,
-    name,
-    appUrl,
-    verifyUrl,
-  });
+  const locale = await resolveUserEmailLocale(db, userId);
+  await sendEmail(
+    "email_verify",
+    {
+      email,
+      name,
+      appUrl,
+      verifyUrl,
+    },
+    locale,
+  );
 }
 
 export async function verifyEmailToken(token: string): Promise<VerifyEmailResult> {

@@ -1,6 +1,35 @@
 import type { SaasDeal } from "./SaasDealsService";
 import type { SaasContact } from "./SaasCrmService";
 import type { DealStage } from "./saasDealsDedupe";
+import type { SequenceTrigger } from "./SaasSequencesService";
+
+/** Enroll contact into active sequences matching trigger (non-blocking). */
+export async function dispatchSequenceTriggers(
+  tenantId: string,
+  trigger: SequenceTrigger,
+  contactId: string,
+): Promise<void> {
+  try {
+    const { getSaasSequencesService } = await import("./SaasSequencesService");
+    const sequences = await getSaasSequencesService().list(tenantId);
+    for (const seq of sequences) {
+      if (seq.status !== "active" || seq.triggerType !== trigger) continue;
+      try {
+        await getSaasSequencesService().enroll(tenantId, seq.id, contactId);
+      } catch (e) {
+        console.error("[sequence-dispatch] enroll failed", {
+          tenantId,
+          sequenceId: seq.id,
+          contactId,
+          trigger,
+          err: e,
+        });
+      }
+    }
+  } catch (e) {
+    console.error("[sequence-dispatch] trigger dispatch failed", { tenantId, contactId, trigger, err: e });
+  }
+}
 
 /** Fire active workflows on contact_created (non-blocking). */
 export async function dispatchContactCreated(tenantId: string, contact: SaasContact): Promise<void> {
@@ -19,6 +48,7 @@ export async function dispatchContactCreated(tenantId: string, contact: SaasCont
   } catch (e) {
     console.error("[workflow-dispatch] contact_created failed", { tenantId, contactId: contact.id, err: e });
   }
+  await dispatchSequenceTriggers(tenantId, "contact_created", contact.id);
 }
 
 /** Fire active workflows on contact pipeline_stage change (non-blocking). */
@@ -62,6 +92,9 @@ export async function dispatchFormSubmitted(
   } catch (e) {
     console.error("[workflow-dispatch] form_submitted failed", { tenantId, formId, err: e });
   }
+  if (contactId) {
+    await dispatchSequenceTriggers(tenantId, "form_submitted", contactId);
+  }
 }
 
 /** Fire active workflows on tag added (non-blocking). */
@@ -79,6 +112,7 @@ export async function dispatchTagAdded(
   } catch (e) {
     console.error("[workflow-dispatch] tag_added failed", { tenantId, contactId, err: e });
   }
+  await dispatchSequenceTriggers(tenantId, "tag_added", contactId);
 }
 
 /** Fire active workflows on email open (non-blocking). */

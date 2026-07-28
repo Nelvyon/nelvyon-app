@@ -17,5 +17,6 @@ export function invoiceTemplate(
     copy.detailHtml(plan, amountFormatted, dateFormatted),
     copy.cta,
     invoiceUrl,
+    locale,
   );
 }

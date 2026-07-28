@@ -43,6 +43,149 @@ const TYPE_LABEL: Record<ABType, string> = {
   email_subject: "Asunto de email", email_content: "Contenido email", landing: "Landing page", cta: "Botón CTA",
 };
 
+const UI_TO_API_TYPE: Record<ABType, string> = {
+  email_subject: "subject_line",
+  email_content: "content",
+  landing: "content",
+  cta: "from_name",
+};
+
+const API_TO_UI_TYPE: Record<string, ABType> = {
+  subject_line: "email_subject",
+  send_time: "email_subject",
+  content: "email_content",
+  from_name: "cta",
+};
+
+function mapAbTest(raw: Record<string, unknown>): ABTest {
+  const variants = Array.isArray(raw.variants) ? raw.variants : [];
+  const winnerId = raw.winnerVariantId ?? raw.winner_variant_id;
+  const apiStatus = String(raw.status ?? "running");
+  const status: ABStatus =
+    apiStatus === "completed" ? "winner" : apiStatus === "paused" ? "paused" : apiStatus === "running" ? "running" : "draft";
+
+  return {
+    id: String(raw.id),
+    name: String(raw.name),
+    type: API_TO_UI_TYPE[String(raw.type)] ?? "email_subject",
+    status,
+    variants: variants.map((v: Record<string, unknown>, i: number) => ({
+      id: String(v.id ?? `var_${i}`),
+      name: String.fromCharCode(65 + i),
+      label: String(v.label ?? v.value ?? ""),
+      sent: Number(v.sends ?? v.sent ?? 0),
+      opens: Number(v.opens ?? 0),
+      clicks: Number(v.clicks ?? 0),
+      conversions: 0,
+      winner: winnerId != null && String(v.id) === String(winnerId),
+    })),
+    splitPercent: 50,
+    startedAt: raw.createdAt != null ? String(raw.createdAt) : null,
+    endedAt: null,
+    winnerMetric: "open_rate",
+    confidence: raw.confidence != null ? Number(raw.confidence) : null,
+  };
+}
+
+function CreateAbTestModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [name, setName] = useState("");
+  const [type, setType] = useState<ABType>("email_subject");
+  const [variantA, setVariantA] = useState("");
+  const [variantB, setVariantB] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/ab-testing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          type: UI_TO_API_TYPE[type],
+          variants: [
+            { label: "A", value: variantA.trim() },
+            { label: "B", value: variantB.trim() },
+          ],
+        }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+      }
+      onCreated();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al crear test");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
+      <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="text-lg font-semibold text-foreground">Nuevo test A/B</h2>
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+        </div>
+        <form onSubmit={save} className="space-y-4 p-6">
+          {error && <p className="text-sm text-red-400">{error}</p>}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Ej: Asunto newsletter Q3"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Tipo</label>
+            <select
+              value={type}
+              onChange={e => setType(e.target.value as ABType)}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            >
+              {(Object.keys(TYPE_LABEL) as ABType[]).map(t => (
+                <option key={t} value={t}>{TYPE_LABEL[t]}</option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Variante A *</label>
+              <input
+                value={variantA}
+                onChange={e => setVariantA(e.target.value)}
+                placeholder="Texto variante A"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Variante B *</label>
+              <input
+                value={variantB}
+                onChange={e => setVariantB(e.target.value)}
+                placeholder="Texto variante B"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+              />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving || !name.trim() || !variantA.trim() || !variantB.trim()} className="flex-1">
+              {saving ? "Creando…" : "Crear test"}
+            </NelvyonDsButton>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 function pct(n: number, d: number) { return d > 0 ? `${((n / d) * 100).toFixed(1)}%` : "—"; }
 
@@ -81,13 +224,14 @@ function VariantBar({ variant, metric, total: _total, isWinner }: { variant: ABV
 export default function SaasABTestingPage() {
   const [tests, setTests] = useState<ABTest[]>([]);
   const [filterStatus, setFilterStatus] = useState<ABStatus | "all">("all");
+  const [showModal, setShowModal] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const res = await fetch("/api/saas/ab-testing");
       if (res.ok) {
-        const d = (await res.json()) as { tests?: ABTest[] };
-        setTests(d.tests ?? []);
+        const d = (await res.json()) as { tests?: Record<string, unknown>[] };
+        setTests((d.tests ?? []).map(mapAbTest));
       }
     } catch { /* silencioso */ }
   }, []);
@@ -100,7 +244,7 @@ export default function SaasABTestingPage() {
     <SaasShellLayout sidebar={<SaasSidebar activeId="ab-testing" />}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <NelvyonDsSectionHeader title="A/B Testing" subtitle="Prueba variantes de emails, landings y CTAs para optimizar conversiones" />
-              <NelvyonDsButton>+ Nuevo test</NelvyonDsButton>
+              <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nuevo test</NelvyonDsButton>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -158,6 +302,12 @@ export default function SaasABTestingPage() {
                 );
               })}
             </div>
+      {showModal && (
+        <CreateAbTestModal
+          onClose={() => setShowModal(false)}
+          onCreated={() => void load()}
+        />
+      )}
     </SaasShellLayout>
   );
 }

@@ -1,4 +1,5 @@
 import { DbClient } from "../db/DbClient";
+import { signTrackingToken } from "../email/trackingToken";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type SequenceStatus = "active" | "paused" | "archived";
@@ -54,6 +55,8 @@ export interface SaasSequenceEnrollment {
   currentStep: number;
   status: "active" | "completed" | "unsubscribed" | "failed";
   replyReceived: boolean;
+  emailOpened: boolean;
+  emailClicked: boolean;
   nextSendAt: string | null;
   enrolledAt: string;
   completedAt: string | null;
@@ -108,8 +111,60 @@ type EnrollRow = {
   id: string; sequence_id: string; tenant_id: string; contact_id: string;
   current_step: number | string; status: "active" | "completed" | "unsubscribed" | "failed";
   reply_received: boolean;
+  email_opened: boolean;
+  email_clicked: boolean;
   next_send_at: Date | string | null; enrolled_at: Date | string; completed_at: Date | string | null;
 };
+
+const ENROLL_COLS =
+  "id, sequence_id, tenant_id, contact_id, current_step, status, reply_received, email_opened, email_clicked, next_send_at, enrolled_at, completed_at";
+
+function sequenceAppUrl(): string {
+  return process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "https://nelvyon.com";
+}
+
+/** Wrap http(s) links for click tracking (same token pattern as campañas). */
+export function wrapSequenceEmailLinks(
+  html: string,
+  tenantId: string,
+  sequenceId: string,
+  contactId: string,
+  appUrl: string = sequenceAppUrl(),
+): string {
+  return html.replace(
+    /href\s*=\s*(["'])(https?:\/\/[^"']+)\1/gi,
+    (_match, quote: string, url: string) => {
+      const clickToken = signTrackingToken({ tid: tenantId, cid: sequenceId, rid: contactId, t: "c", url });
+      const clickUrl = `${appUrl}/api/track/email/click/${clickToken}`;
+      return `href=${quote}${clickUrl}${quote}`;
+    },
+  );
+}
+
+/** Inject open pixel + tracked links into sequence email HTML. */
+export function buildTrackedSequenceEmailHtml(
+  tenantId: string,
+  sequenceId: string,
+  contactId: string,
+  bodyHtml: string,
+): string {
+  const appUrl = sequenceAppUrl();
+  const openToken = signTrackingToken({ tid: tenantId, cid: sequenceId, rid: contactId, t: "o" });
+  const pixelUrl = `${appUrl}/api/track/email/open/${openToken}`;
+  const body = wrapSequenceEmailLinks(bodyHtml, tenantId, sequenceId, contactId, appUrl);
+  return `${body}<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;" />`;
+}
+
+function evaluateBranchCondition(
+  cond: BranchCondition | null,
+  flags: { replyReceived: boolean; emailOpened: boolean; emailClicked: boolean },
+): boolean {
+  if (!cond) return false;
+  if (cond.field === "replied") return flags.replyReceived === (cond.value === true);
+  if (cond.field === "opened") return flags.emailOpened === (cond.value === true);
+  if (cond.field === "clicked") return flags.emailClicked === (cond.value === true);
+  return false;
+}
 
 const STEP_COLS = `id, sequence_id, position, step_type, delay_days, delay_hours, subject, body_html,
                    branch_condition, branch_yes_position, branch_no_position, created_at, updated_at`;
@@ -143,6 +198,8 @@ function rowToEnroll(r: EnrollRow): SaasSequenceEnrollment {
     id: r.id, sequenceId: r.sequence_id, tenantId: r.tenant_id, contactId: r.contact_id,
     currentStep: Number(r.current_step), status: r.status,
     replyReceived: r.reply_received ?? false,
+    emailOpened: r.email_opened ?? false,
+    emailClicked: r.email_clicked ?? false,
     nextSendAt: r.next_send_at ? new Date(r.next_send_at).toISOString() : null,
     enrolledAt: new Date(r.enrolled_at).toISOString(),
     completedAt: r.completed_at ? new Date(r.completed_at).toISOString() : null,
@@ -313,8 +370,9 @@ export class SaasSequencesService {
         `INSERT INTO saas_sequence_enrollments (sequence_id, tenant_id, contact_id, next_send_at)
          VALUES ($1,$2,$3,$4)
          ON CONFLICT (sequence_id, contact_id) DO UPDATE
-           SET status='active', current_step=0, next_send_at=$4, completed_at=NULL, reply_received=false
-         RETURNING id, sequence_id, tenant_id, contact_id, current_step, status, reply_received, next_send_at, enrolled_at, completed_at`,
+           SET status='active', current_step=0, next_send_at=$4, completed_at=NULL,
+               reply_received=false, email_opened=false, email_clicked=false
+         RETURNING ${ENROLL_COLS}`,
         [sequenceId, tenantId, contactId, nextSendAt],
       );
       if (!rows[0]) throw new SaasSequencesError("Failed to enroll contact", "CONSTRAINT");
@@ -335,7 +393,7 @@ export class SaasSequencesService {
     const seq = await this.get(tenantId, sequenceId);
     if (!seq) throw new SaasSequencesError("Sequence not found", "NOT_FOUND");
     const rows = await this.db.query<EnrollRow>(
-      `SELECT id, sequence_id, tenant_id, contact_id, current_step, status, reply_received, next_send_at, enrolled_at, completed_at
+      `SELECT ${ENROLL_COLS}
        FROM saas_sequence_enrollments WHERE sequence_id=$1 ORDER BY enrolled_at DESC`,
       [sequenceId],
     );
@@ -359,13 +417,16 @@ export class SaasSequencesService {
     const updated = await this.db.query<EnrollRow>(
       `UPDATE saas_sequence_enrollments SET reply_received=true
        WHERE sequence_id=$1 AND tenant_id=$2 AND contact_id=$3 AND status='active'
-       RETURNING id, sequence_id, tenant_id, contact_id, current_step, status, reply_received, next_send_at, enrolled_at, completed_at`,
+       RETURNING ${ENROLL_COLS}`,
       [sequenceId, tenantId, contactId],
     );
     const enrollment = updated[0];
     if (!enrollment) return;
 
-    // Check if current step is a branch on "replied" — if so, advance immediately to yes branch
+    await this._maybeAdvanceReplyBranch(enrollment, sequenceId);
+  }
+
+  private async _maybeAdvanceReplyBranch(enrollment: EnrollRow, sequenceId: string): Promise<void> {
     const stepRows = await this.db.query<StepRow>(
       `SELECT ${STEP_COLS} FROM saas_sequence_steps
        WHERE sequence_id=$1 AND position=$2 LIMIT 1`,
@@ -376,7 +437,12 @@ export class SaasSequencesService {
     const cond = step.branch_condition;
     if (!cond || cond.field !== "replied") return;
 
-    const nextPos = cond.value === true
+    const condMet = evaluateBranchCondition(cond, {
+      replyReceived: enrollment.reply_received ?? false,
+      emailOpened: enrollment.email_opened ?? false,
+      emailClicked: enrollment.email_clicked ?? false,
+    });
+    const nextPos = condMet
       ? (step.branch_yes_position ?? Number(enrollment.current_step) + 1)
       : (step.branch_no_position ?? Number(enrollment.current_step) + 1);
 
@@ -402,6 +468,7 @@ export class SaasSequencesService {
     const due = await this.db.query<{
       id: string; sequence_id: string; tenant_id: string; contact_id: string;
       current_step: number | string; reply_received: boolean;
+      email_opened: boolean; email_clicked: boolean;
     }>(
       `UPDATE saas_sequence_enrollments AS e
        SET next_send_at = NOW() + INTERVAL '10 minutes'
@@ -412,7 +479,8 @@ export class SaasSequencesService {
          LIMIT 100
          FOR UPDATE SKIP LOCKED
        )
-       RETURNING e.id, e.sequence_id, e.tenant_id, e.contact_id, e.current_step, e.reply_received`,
+       RETURNING e.id, e.sequence_id, e.tenant_id, e.contact_id, e.current_step,
+                 e.reply_received, e.email_opened, e.email_clicked`,
       [],
     );
 
@@ -444,10 +512,12 @@ export class SaasSequencesService {
       const stepType = stepData.step_type ?? "email";
 
       if (stepType === "branch") {
-        // Evaluate branch condition
         const cond = stepData.branch_condition;
-        let condMet = false;
-        if (cond?.field === "replied") condMet = enrollment.reply_received === true;
+        const condMet = evaluateBranchCondition(cond, {
+          replyReceived: enrollment.reply_received === true,
+          emailOpened: enrollment.email_opened === true,
+          emailClicked: enrollment.email_clicked === true,
+        });
 
         const nextPos = condMet
           ? (stepData.branch_yes_position ?? step + 1)
@@ -504,7 +574,13 @@ export class SaasSequencesService {
       }
 
       try {
-        await handlers.sendEmail(stepData.contact_email, stepData.subject, stepData.body_html);
+        const trackedHtml = buildTrackedSequenceEmailHtml(
+          enrollment.tenant_id,
+          enrollment.sequence_id,
+          enrollment.contact_id,
+          stepData.body_html,
+        );
+        await handlers.sendEmail(stepData.contact_email, stepData.subject, trackedHtml);
         processed++;
         await this._advanceToPosition(enrollment.id, enrollment.sequence_id, step + 1, step);
       } catch {

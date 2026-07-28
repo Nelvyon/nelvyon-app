@@ -14,5 +14,6 @@ export function onboardingCompleteTemplate(
     copy.detailHtml,
     copy.cta,
     dashboardUrl,
+    locale,
   );
 }

@@ -38,10 +38,28 @@ export async function GET(req: Request) {
   });
 }
 
+function resolvePortalDecision(
+  tokenAct: "approve" | "reject",
+  body: { decision?: string },
+  req: Request,
+): "approve" | "reject" {
+  if (body.decision === "approve" || body.decision === "reject") {
+    return body.decision;
+  }
+  const queryAct = new URL(req.url).searchParams.get("action");
+  if (queryAct === "reject") return "reject";
+  if (queryAct === "approve") return "approve";
+  return tokenAct;
+}
+
 /** POST /api/public/portal/approve — execute one-click approve/reject */
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as { token?: string; feedback?: string };
+    const body = (await req.json()) as {
+      token?: string;
+      feedback?: string;
+      decision?: "approve" | "reject";
+    };
     const token = String(body.token ?? "");
     const verified = verifyPortalApprovalToken(token);
     if (!verified.ok) {
@@ -63,7 +81,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "token already used or invalid" }, { status: 410 });
     }
 
-    const { did, wid, cid, act } = verified.payload;
+    const { did, wid, cid } = verified.payload;
+    const act = resolvePortalDecision(verified.payload.act, body, req);
 
     const delRows = await db.query<{ client_id: string }>(
       `SELECT client_id::text FROM os_deliverables WHERE id = $1::uuid AND workspace_id = $2 LIMIT 1`,
@@ -75,6 +94,12 @@ export async function POST(req: Request) {
 
     const feedback =
       body.feedback != null ? String(body.feedback).slice(0, 2000) : undefined;
+    if (act === "reject" && (!feedback || feedback.trim().length === 0)) {
+      return NextResponse.json(
+        { error: "feedback is required when rejecting" },
+        { status: 400 },
+      );
+    }
     const portalUserId = "token-approval";
 
     const result =

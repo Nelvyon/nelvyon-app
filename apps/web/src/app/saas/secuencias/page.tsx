@@ -26,6 +26,8 @@ function StepTypeBadge({ type }: { type: string }) {
 
 // ── Enroll Modal ─────────────────────────────────────────────────────────────
 
+type CrmContact = { id: string; name: string; email: string | null; company?: string | null };
+
 function EnrollModal({
   sequence,
   onClose,
@@ -35,18 +37,43 @@ function EnrollModal({
   onClose: () => void;
   onEnrolled: () => void;
 }) {
-  const [contactId, setContactId] = useState("");
+  const [search, setSearch] = useState("");
+  const [contacts, setContacts] = useState<CrmContact[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [selected, setSelected] = useState<CrmContact | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  const loadContacts = useCallback(async (q: string) => {
+    setSearching(true);
+    try {
+      const params = new URLSearchParams();
+      if (q.trim()) params.set("search", q.trim());
+      const res = await fetch(`/api/saas/crm/contacts?${params.toString()}`);
+      if (!res.ok) throw new Error("No se pudieron cargar contactos");
+      const d = await res.json() as { contacts?: CrmContact[] };
+      setContacts(d.contacts ?? []);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Error al buscar contactos");
+      setContacts([]);
+    } finally {
+      setSearching(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => { void loadContacts(search); }, 300);
+    return () => clearTimeout(t);
+  }, [search, loadContacts]);
+
   async function handleEnroll() {
-    if (!contactId.trim()) { setErr("Contact ID requerido"); return; }
+    if (!selected) { setErr("Selecciona un contacto"); return; }
     setLoading(true); setErr(null);
     try {
       const res = await fetch(`/api/saas/sequences/${sequence.id}/enroll`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contact_id: contactId.trim() }),
+        body: JSON.stringify({ contact_id: selected.id }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({})) as { error?: string };
@@ -63,15 +90,42 @@ function EnrollModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#0d1117] border border-white/10 rounded-xl p-6 w-full max-w-sm shadow-2xl">
+      <div className="bg-[#0d1117] border border-white/10 rounded-xl p-6 w-full max-w-md shadow-2xl">
         <h3 className="text-white font-semibold mb-1">Inscribir contacto</h3>
         <p className="text-sm text-white/50 mb-4">Secuencia: <span className="text-white/80">{sequence.name}</span></p>
         <input
           className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/30 mb-3"
-          placeholder="UUID del contacto"
-          value={contactId}
-          onChange={(e) => setContactId(e.target.value)}
+          placeholder="Buscar por nombre, email o empresa…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
+        <div className="max-h-48 overflow-y-auto rounded-lg border border-white/10 mb-3">
+          {searching ? (
+            <p className="px-3 py-4 text-xs text-white/40">Buscando contactos…</p>
+          ) : contacts.length === 0 ? (
+            <p className="px-3 py-4 text-xs text-white/40">Sin contactos — prueba otra búsqueda</p>
+          ) : (
+            contacts.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setSelected(c)}
+                className={`w-full text-left px-3 py-2 text-sm border-b border-white/5 last:border-0 transition ${
+                  selected?.id === c.id ? "bg-[#0084ff]/20 text-white" : "text-white/70 hover:bg-white/5"
+                }`}
+              >
+                <span className="font-medium">{c.name}</span>
+                {c.email && <span className="block text-xs text-white/40">{c.email}</span>}
+              </button>
+            ))
+          )}
+        </div>
+        {selected && (
+          <p className="text-xs text-white/50 mb-3">
+            Seleccionado: <span className="text-white/80">{selected.name}</span>
+            {selected.email ? ` · ${selected.email}` : ""}
+          </p>
+        )}
         {err && <p className="text-red-400 text-xs mb-3">{err}</p>}
         <div className="flex gap-2">
           <button
@@ -82,7 +136,7 @@ function EnrollModal({
           </button>
           <button
             onClick={handleEnroll}
-            disabled={loading}
+            disabled={loading || !selected}
             className="flex-1 py-2 rounded-lg bg-[#0084ff] text-white text-sm font-medium hover:bg-blue-500 transition disabled:opacity-50"
           >
             {loading ? "Inscribiendo…" : "Inscribir"}
@@ -386,6 +440,7 @@ export default function SecuenciasPage() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [sesConfigured, setSesConfigured] = useState<boolean | null>(null);
+  const [twilioConfigured, setTwilioConfigured] = useState<boolean | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [enrollTarget, setEnrollTarget] = useState<SaasSequence | null>(null);
   const [showAddStep, setShowAddStep] = useState(false);
@@ -395,9 +450,10 @@ export default function SecuenciasPage() {
     try {
       const res = await fetch("/api/saas/sequences");
       if (!res.ok) throw new Error("Error al cargar secuencias");
-      const d = await res.json() as { sequences: SaasSequence[]; ses_configured?: boolean };
+      const d = await res.json() as { sequences: SaasSequence[]; ses_configured?: boolean; twilio_configured?: boolean };
       setSequences(d.sequences);
       setSesConfigured(typeof d.ses_configured === "boolean" ? d.ses_configured : null);
+      setTwilioConfigured(typeof d.twilio_configured === "boolean" ? d.twilio_configured : null);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error");
     } finally {
@@ -463,6 +519,15 @@ export default function SecuenciasPage() {
             <code className="text-amber-200">SES_FROM_EMAIL</code> y{" "}
             <code className="text-amber-200">SES_ACCESS_KEY_ID</code> no están definidas en el servidor.
             Los pasos de email en secuencias fallarán hasta configurar SES (y salir de sandbox si aplica).
+          </div>
+        ) : null}
+
+        {twilioConfigured === false ? (
+          <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+            <strong>SMS no configurado:</strong> define{" "}
+            <code className="text-amber-200">TWILIO_ACCOUNT_SID</code>,{" "}
+            <code className="text-amber-200">TWILIO_AUTH_TOKEN</code> y{" "}
+            <code className="text-amber-200">TWILIO_FROM_NUMBER</code>. Los pasos SMS fallarán hasta configurar Twilio.
           </div>
         ) : null}
 

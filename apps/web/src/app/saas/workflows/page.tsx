@@ -722,6 +722,7 @@ export default function SaasWorkflowsPage() {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading]     = useState(true);
   const [sesOk, setSesOk]         = useState<boolean | null>(null);
+  const [twilioOk, setTwilioOk]   = useState<boolean | null>(null);
   const [selected, setSelected]   = useState<Workflow | null>(null);
   const [runs, setRuns]           = useState<WorkflowRun[]>([]);
   const [versions, setVersions]   = useState<Array<{ id: string; versionNum: number; createdAt: string }>>([]);
@@ -748,9 +749,10 @@ export default function SaasWorkflowsPage() {
     try {
       const res = await fetch("/api/saas/workflows");
       if (res.ok) {
-        const d = await res.json() as { workflows?: Workflow[]; ses_configured?: boolean };
+        const d = await res.json() as { workflows?: Workflow[]; ses_configured?: boolean; twilio_configured?: boolean };
         setWorkflows(d.workflows ?? []);
         setSesOk(d.ses_configured ?? false);
+        setTwilioOk(d.twilio_configured ?? false);
       }
     } finally { setLoading(false); }
   }, []);
@@ -816,6 +818,12 @@ export default function SaasWorkflowsPage() {
         {sesOk === false && (
           <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-yellow-400">
             ⚠️ <strong>Email no configurado</strong> — las acciones &quot;Enviar email&quot; fallarán hasta definir <code>SES_FROM_EMAIL</code> + <code>SES_ACCESS_KEY_ID</code> en Railway.
+          </div>
+        )}
+
+        {twilioOk === false && (
+          <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-yellow-400">
+            ⚠️ <strong>SMS no configurado</strong> — las acciones &quot;Enviar SMS&quot; fallarán hasta definir <code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code> y <code>TWILIO_FROM_NUMBER</code>.
           </div>
         )}
 

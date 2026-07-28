@@ -5,7 +5,7 @@ let sesInstance: SESClient | null = null;
 export function getSesClient(): SESClient {
   if (!sesInstance) {
     sesInstance = new SESClient({
-      region: process.env.SES_REGION ?? "us-east-1",
+      region: process.env.SES_REGION ?? "eu-west-1",
       credentials: {
         accessKeyId:
           process.env.SES_ACCESS_KEY_ID ?? process.env.AWS_SES_ACCESS_KEY ?? "",

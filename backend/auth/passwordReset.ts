@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 
 import { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
+import { resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 import { getAuthService } from "./AuthService";
 
 const TOKEN_BYTES = 32;
@@ -42,13 +43,18 @@ export async function requestPasswordReset(email: string): Promise<void> {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com";
   const resetUrl = `${appUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
+  const locale = await resolveUserEmailLocale(db, row.user_id);
 
-  await sendEmail("password_reset", {
-    email: row.email,
-    name: row.full_name,
-    appUrl,
-    resetUrl,
-  });
+  await sendEmail(
+    "password_reset",
+    {
+      email: row.email,
+      name: row.full_name,
+      appUrl,
+      resetUrl,
+    },
+    locale,
+  );
 }
 
 export async function resetPasswordWithToken(token: string, newPassword: string): Promise<ResetPasswordResult> {

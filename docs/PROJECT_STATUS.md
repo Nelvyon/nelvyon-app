@@ -1,11 +1,12 @@
-> **2026-07-27** — Option A RAG prep · canary OFF · `claimReady: false` · **NOT READY**
+> **2026-07-28** — canary retry PASS · CEO NO extensión · steady KILL ON · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **CONDITIONAL_READY** · **NOT READY** |
-| **#3 RAG prod** | Schema+RLS **PREPARED** · AI off |
-| **#4 Canary** | **PREPARED_OFF** · awaiting CEO SÍ/NO |
+| **#3 RAG prod** | Schema+RLS + e2e canary **PASS** · AI off |
+| **#4 Canary** | Window **VERIFIED** · steady **KILLED** (CEO NO) |
 | **Coste** | **0** |
-| **Pendiente humano** | `CEO_PROD_CANARY_OPEN_YN.md` · legal/OAuth |
+| **Brief ChatGPT** | `docs/ops/CHATGPT_PROJECT_BRIEF_NELVYON.md` |
+| **Pendiente humano** | Legal · OAuth · cuentas · clientes · SÍ canary si se reabre |
 
-SSOT: `HANDOVER.md` · `railway.rag_prod_option_a_prep_latest.md`
+SSOT: `HANDOVER.md` · `private-ai.prod_canary_retry_pass_latest.md`

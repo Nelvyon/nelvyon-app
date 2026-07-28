@@ -36,7 +36,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **Abierto** — **PARTIAL** |
-| **Detalle** | UI catalogs es/en/fr/de/it/pt **FULL**. Email: subset Resend/SES localized; SES catalog restante + `backend/billing/*EmailTemplates.ts` siguen ES. PDF labels **PARTIAL**. No promover a FULL_VERIFIED sin auditoría completa. |
+| **Detalle** | UI catalogs es/en/fr/de/it/pt **FULL**. Email transactional SES+billing lifecycle **LOCALIZED** (Lote A 2026-07-28). PDF labels chrome LOCALIZED; **legal/tax body HUMAN_REVIEW**. No FULL_VERIFIED email/PDF sin revisión legal. Inventario: `docs/ops/EMAIL_PDF_LOCALE_PARTIAL.md`. |
 
 ### Ops (no KI) — Android APK build SDK pending
 

@@ -8,6 +8,8 @@ import { useSocialUnifiedReporting } from "@/features/social/hooks";
 import { useFunnelsUnifiedReporting } from "@/features/funnels/hooks";
 import { useEcommerceUnifiedReporting } from "@/features/ecommerce/hooks";
 
+const DEGRADED_VALUE = "—";
+
 function PulseCard({
   href,
   label,
@@ -51,41 +53,59 @@ export function WorkspacePulse() {
         <h2 className="text-lg font-semibold text-foreground">Pulso del workspace</h2>
         {anyMock ? (
           <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
-            Datos demo
+            Sin datos conectados
           </span>
         ) : null}
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
-        Vista ejecutiva de ingresos, tráfico y engagement en tiempo real.
+        {anyMock
+          ? "Conecta ads, social, embudos o tienda para ver el pulso ejecutivo. No se muestran cifras demo."
+          : "Vista ejecutiva de ingresos, tráfico y engagement en tiempo real."}
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <PulseCard
           href="/publicidad"
           label="Inversión ads"
-          loading={ads.isLoading}
-          sub={`ROAS ${(ads.data?.unified?.blended_roas ?? 0).toFixed(2)}x`}
-          value={`${(ads.data?.unified?.total_spend ?? 0).toLocaleString("es-ES")} €`}
+          loading={ads.isLoading && !anyMock}
+          sub={anyMock ? "Integración no conectada" : `ROAS ${(ads.data?.unified?.blended_roas ?? 0).toFixed(2)}x`}
+          value={
+            anyMock ? DEGRADED_VALUE : `${(ads.data?.unified?.total_spend ?? 0).toLocaleString("es-ES")} €`
+          }
         />
         <PulseCard
           href="/social"
           label="Alcance social"
-          loading={social.isLoading}
-          sub={`${social.data?.unified?.total_engagement ?? 0} interacciones`}
-          value={(social.data?.unified?.total_reach ?? 0).toLocaleString("es-ES")}
+          loading={social.isLoading && !anyMock}
+          sub={
+            anyMock
+              ? "Integración no conectada"
+              : `${social.data?.unified?.total_engagement ?? 0} interacciones`
+          }
+          value={
+            anyMock ? DEGRADED_VALUE : (social.data?.unified?.total_reach ?? 0).toLocaleString("es-ES")
+          }
         />
         <PulseCard
           href="/funnels"
           label="Conversiones embudo"
-          loading={funnels.isLoading}
-          sub={`${funnels.data?.unified?.total_visits ?? 0} visitas`}
-          value={String(funnels.data?.unified?.total_conversions ?? 0)}
+          loading={funnels.isLoading && !anyMock}
+          sub={
+            anyMock ? "Integración no conectada" : `${funnels.data?.unified?.total_visits ?? 0} visitas`
+          }
+          value={anyMock ? DEGRADED_VALUE : String(funnels.data?.unified?.total_conversions ?? 0)}
         />
         <PulseCard
           href="/ecommerce"
           label="Ingresos tienda"
-          loading={ecommerce.isLoading}
-          sub={`${ecommerce.data?.unified?.paid_orders ?? 0} pedidos`}
-          value={`€${((ecommerce.data?.unified?.total_revenue_cents ?? 0) / 100).toLocaleString("es-ES")}`}
+          loading={ecommerce.isLoading && !anyMock}
+          sub={
+            anyMock ? "Integración no conectada" : `${ecommerce.data?.unified?.paid_orders ?? 0} pedidos`
+          }
+          value={
+            anyMock
+              ? DEGRADED_VALUE
+              : `€${((ecommerce.data?.unified?.total_revenue_cents ?? 0) / 100).toLocaleString("es-ES")}`
+          }
         />
       </div>
     </section>

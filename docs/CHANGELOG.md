@@ -3,6 +3,15 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-28
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| CTO / Cursor-0€ | **Auditoría v2 — Cursor 0€ vacío** | CTAs A/B+Facturas+Docs · sequences tracking mig 521 · Twilio/SES honesty · analytics fail-closed · portal approve feedback · 73 vitest PASS · email/workflows E2E → ops · `claimReady: false` · **NOT READY** |
+| Email / i18n | **Lote A locale transactional (0€)** | Billing lifecycle es/en/fr/de/it/pt · SES catalog completo · chrome footer/`lang` · `resolveUserEmailLocale` wired · PDF legal HUMAN_REVIEW · `claimReady: false` |
+| SaaS / CRM | **Sequence triggers + cron + CTAs** | Auto-enroll · cron */15 · SES fail-closed · Documentos/Comunidades |
+| Docs / CEO | **Misión CTO + auditoría definitiva** | `CTO_MISSION_YELLOW_TO_GREEN.md` · `CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` v2 |
+
 ## 2026-07-27
 
 | Área | Cambio | Descripción |

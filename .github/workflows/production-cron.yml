@@ -6,10 +6,10 @@ name: Production Cron Executor
 on:
   schedule:
     - cron: "*/5 * * * *"   # saas-workflows (scheduled triggers)
-    - cron: "*/15 * * * *"  # social-publish queue
+    - cron: "*/15 * * * *"  # social-publish queue + saas-sequences (every 15 min)
     - cron: "5 0 * * *"     # workflow-date (00:05 UTC daily)
     - cron: "0 6 * * *"     # saas-dunning (daily 06:00 UTC)
-    - cron: "0 7 * * *"     # saas-sequences + saas-ceo-brief (daily 07:00 UTC)
+    - cron: "0 7 * * *"     # saas-ceo-brief (daily 07:00 UTC)
     - cron: "0 8 1 * *"     # os-recurring-services (1st of month)
     - cron: "0 6 1 * *"     # os-learning-loop (1st of month)
     - cron: "0 9 * * 1"     # os-competitor-gap digest (Mondays 09:00 UTC)
@@ -135,7 +135,7 @@ jobs:
           test "$code" = "200" -o "$code" = "204"
 
   saas-sequences:
-    if: github.event.schedule == '0 7 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'saas-sequences' || github.event.inputs.job == 'all'))
+    if: github.event.schedule == '*/15 * * * *' || github.event.schedule == '0 7 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'saas-sequences' || github.event.inputs.job == 'all'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

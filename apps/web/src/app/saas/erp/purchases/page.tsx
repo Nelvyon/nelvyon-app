@@ -83,7 +83,7 @@ export default function ErpPurchasesPage() {
         <header>
           <h1 className="text-2xl font-semibold text-white">Compras & proveedores</h1>
           <p className="mt-1 text-sm text-[#94a3b8]">
-            Core in-memory · sin pagos ni contabilidad · {note || "payments BLOCKED_SCOPE"}
+            Persistido vía API (Postgres con DATABASE_URL) · sin pagos ni contabilidad · {note || "payments BLOCKED_SCOPE"}
           </p>
         </header>
 

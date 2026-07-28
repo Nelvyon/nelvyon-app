@@ -39,6 +39,53 @@ const STATUS_CONFIG: Record<InvoiceStatus, { label: string; tone: "primary" | "s
 
 function fmt(s: string) { return new Date(s).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" }); }
 
+function mapFactura(raw: Record<string, unknown>): Invoice {
+  const notes = raw.notes != null ? String(raw.notes) : "";
+  let clientName = "";
+  let clientEmail = "";
+  const clientMatch = notes.match(/^Cliente:\s*(.+?)(?:\s*\(([^)]+)\))?\s*(?:\n|$)/);
+  if (clientMatch) {
+    clientName = clientMatch[1]?.trim() ?? "";
+    clientEmail = clientMatch[2]?.trim() ?? "";
+  }
+  const cleanNotes = clientMatch ? notes.replace(clientMatch[0], "").trim() : notes;
+  const lineItems = Array.isArray(raw.lineItems) ? raw.lineItems : (Array.isArray(raw.line_items) ? raw.line_items : []);
+  return {
+    id: String(raw.id),
+    number: String(raw.invoiceNumber ?? raw.invoice_number ?? raw.number ?? ""),
+    clientName,
+    clientEmail,
+    status: String(raw.status) as InvoiceStatus,
+    lines: lineItems.map((l: Record<string, unknown>) => ({
+      description: String(l.description ?? ""),
+      qty: Number(l.quantity ?? l.qty ?? 1),
+      unitPrice: Number(l.unitPrice ?? l.unit_price ?? 0),
+    })),
+    total: Number(raw.total ?? 0),
+    tax: Number(raw.taxAmount ?? raw.tax_amount ?? raw.tax ?? 0),
+    issueDate: String(raw.createdAt ?? raw.created_at ?? raw.issueDate ?? ""),
+    dueDate: raw.dueDate != null ? String(raw.dueDate) : (raw.due_date != null ? String(raw.due_date) : ""),
+    paidAt: raw.paidAt != null ? String(raw.paidAt) : (raw.paid_at != null ? String(raw.paid_at) : null),
+    notes: cleanNotes,
+  };
+}
+
+function buildFacturaPayload(clientName: string, clientEmail: string, dueDate: string, lines: InvoiceLine[], notes: string) {
+  const lineItems = lines
+    .filter(l => l.description.trim())
+    .map(l => ({
+      description: l.description.trim(),
+      quantity: l.qty,
+      unitPrice: l.unitPrice,
+      total: Math.round(l.qty * l.unitPrice * 100) / 100,
+    }));
+  const clientLine = clientName.trim()
+    ? `Cliente: ${clientName.trim()}${clientEmail.trim() ? ` (${clientEmail.trim()})` : ""}`
+    : "";
+  const combinedNotes = [clientLine, notes.trim()].filter(Boolean).join("\n") || undefined;
+  return { lineItems, notes: combinedNotes, dueDate: dueDate || undefined, taxRate: 21 };
+}
+
 function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => void }) {
   const [clientName, setClientName] = useState(invoice?.clientName ?? "");
   const [clientEmail, setClientEmail] = useState(invoice?.clientEmail ?? "");
@@ -46,6 +93,7 @@ function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => 
   const [lines, setLines] = useState<InvoiceLine[]>(invoice?.lines ?? [{ description: "", qty: 1, unitPrice: 0 }]);
   const [notes, setNotes] = useState(invoice?.notes ?? "");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const subtotal = lines.reduce((s, l) => s + l.qty * l.unitPrice, 0);
   const tax = subtotal * 0.21;
@@ -54,16 +102,69 @@ function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => 
   function addLine() { setLines(l => [...l, { description: "", qty: 1, unitPrice: 0 }]); }
   function updateLine(i: number, upd: Partial<InvoiceLine>) { setLines(l => l.map((line, idx) => idx === i ? { ...line, ...upd } : line)); }
 
-  async function save(e: React.FormEvent) {
+  async function persistDraft(): Promise<string | null> {
+    const payload = buildFacturaPayload(clientName, clientEmail, dueDate, lines, notes);
+    if (!payload.lineItems.length) throw new Error("Añade al menos una línea con descripción");
+
+    if (invoice?.id) {
+      const res = await fetch(`/api/saas/facturas/${invoice.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+      }
+      return invoice.id;
+    }
+
+    const res = await fetch("/api/saas/facturas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+      throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+    }
+    const d = (await res.json()) as { factura?: Record<string, unknown> };
+    return d.factura?.id != null ? String(d.factura.id) : null;
+  }
+
+  async function saveDraft(e?: React.FormEvent) {
+    e?.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      await persistDraft();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al guardar borrador");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveAndSend(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setError(null);
     try {
-      await fetch("/api/saas/facturas", {
-        method: "POST",
+      const id = await persistDraft();
+      if (!id) throw new Error("No se pudo guardar la factura");
+      const res = await fetch(`/api/saas/facturas/${id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: invoice?.id, clientName, clientEmail, dueDate, lines, notes }),
+        body: JSON.stringify({ status: "sent" }),
       });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+      }
       onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al enviar factura");
     } finally {
       setSaving(false);
     }
@@ -76,7 +177,8 @@ function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => 
           <h2 className="text-lg font-semibold text-foreground">{invoice ? `Factura ${invoice.number}` : "Nueva factura"}</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
-        <form onSubmit={save} className="space-y-5 p-6">
+        <form onSubmit={saveAndSend} className="space-y-5 p-6">
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Cliente *</label>
@@ -146,7 +248,9 @@ function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => 
 
           <div className="flex gap-3 pt-2">
             <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="button" variant="ghost" disabled={saving} className="flex-1">Guardar borrador</NelvyonDsButton>
+            <NelvyonDsButton type="button" variant="ghost" disabled={saving || !clientName} onClick={() => void saveDraft()} className="flex-1">
+              {saving ? "Guardando…" : "Guardar borrador"}
+            </NelvyonDsButton>
             <NelvyonDsButton type="submit" disabled={saving || !clientName} className="flex-1">{saving ? "Enviando…" : "↗ Enviar"}</NelvyonDsButton>
           </div>
         </form>
@@ -162,6 +266,7 @@ export default function SaasFacturasPage() {
   const [editingInvoice, setEditingInvoice] = useState<Invoice | undefined>();
   const [filterStatus, setFilterStatus] = useState<InvoiceStatus | "all">("all");
   const [dunningSummary, setDunningSummary] = useState<{ overdueCount: number; totalOverdueAmount: number; pendingAttempts: number } | null>(null);
+  const [sendingId, setSendingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -171,8 +276,8 @@ export default function SaasFacturasPage() {
         fetch("/api/saas/facturas/dunning"),
       ]);
       if (res.ok) {
-        const d = (await res.json()) as { facturas?: Invoice[]; invoices?: Invoice[] };
-        setInvoices(d.facturas ?? d.invoices ?? []);
+        const d = (await res.json()) as { facturas?: Record<string, unknown>[]; invoices?: Record<string, unknown>[] };
+        setInvoices((d.facturas ?? d.invoices ?? []).map(mapFactura));
       } else {
         setInvoices([]);
       }
@@ -188,6 +293,26 @@ export default function SaasFacturasPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  async function sendInvoice(id: string) {
+    setSendingId(id);
+    try {
+      const res = await fetch(`/api/saas/facturas/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "sent" }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+      }
+      await load();
+    } catch {
+      /* silencioso — fila permanece en borrador */
+    } finally {
+      setSendingId(null);
+    }
+  }
 
   const filtered = invoices.filter(i => filterStatus === "all" || i.status === filterStatus);
 
@@ -273,7 +398,15 @@ export default function SaasFacturasPage() {
                           <div className="flex gap-1">
                             <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => { setEditingInvoice(inv); setShowModal(true); }}>Ver</NelvyonDsButton>
                             {inv.status !== "paid" && <NelvyonDsButton variant="ghost" className="text-xs">↓ PDF</NelvyonDsButton>}
-                            {inv.status === "draft" && <NelvyonDsButton className="text-xs">↗ Enviar</NelvyonDsButton>}
+                            {inv.status === "draft" && (
+                              <NelvyonDsButton
+                                className="text-xs"
+                                disabled={sendingId === inv.id}
+                                onClick={() => void sendInvoice(inv.id)}
+                              >
+                                {sendingId === inv.id ? "Enviando…" : "↗ Enviar"}
+                              </NelvyonDsButton>
+                            )}
                             {inv.status === "overdue" && (
                               <NelvyonDsButton variant="ghost" className="text-xs text-red-400 hover:text-red-300"
                                 onClick={() => void fetch("/api/saas/facturas/dunning", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoiceId: inv.id }) }).then(() => void load())}>

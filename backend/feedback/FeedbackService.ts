@@ -1,4 +1,5 @@
 import { sendEmail } from "../email/emailService";
+import { resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 import { DbClient } from "../db/DbClient";
 import { createLogger } from "../logger";
 
@@ -138,12 +139,16 @@ export class FeedbackService {
     const user = users[0];
     if (!user?.email) return;
 
-    await sendEmail("nps_thank_you", {
-      email: user.email,
-      name: user.full_name,
-      score: String(score),
-      appUrl: process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "https://nelvyon.com",
-    });
+    await sendEmail(
+      "nps_thank_you",
+      {
+        email: user.email,
+        name: user.full_name,
+        score: String(score),
+        appUrl: process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "https://nelvyon.com",
+      },
+      await resolveUserEmailLocale(this.db, userId),
+    );
   }
 
   async shouldShowNps(userId: string, registeredAt: Date): Promise<boolean> {

@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientSingleton } from "../db/DbClient";
 import { sendEmail } from "../email/emailService";
+import { getAccountDeletedCopy } from "../email/localeCopy";
+import { resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 import { cancelSubscriptionImmediately } from "../stripe/stripeApi";
 
 const EXPORT_COOLDOWN_HOURS = 24;
@@ -258,7 +260,7 @@ export class DataSubjectService {
       userId,
     ]);
 
-    await this.sendDeletionEmail(u.email, u.full_name ?? "Usuario");
+    await this.sendDeletionEmail(userId, u.email, u.full_name ?? "Usuario");
   }
 
   private async tryCancelStripeSubscription(userId: string): Promise<void> {
@@ -280,16 +282,21 @@ export class DataSubjectService {
     }
   }
 
-  private async sendDeletionEmail(originalEmail: string, name: string): Promise<void> {
+  private async sendDeletionEmail(userId: string, originalEmail: string, name: string): Promise<void> {
     try {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "https://nelvyon.com";
-      await sendEmail("account_deleted", {
-        email: originalEmail,
-        name: name || "Usuario",
-        appUrl,
-        summary:
-          "Tu perfil ha sido anonimizado y el acceso desactivado. Los resultados de agentes marcados pasan a retención de 30 días antes de su eliminación. Los datos relativos a facturación se conservan el plazo legal sin vincularse a tu cuenta activa.",
-      });
+      const locale = await resolveUserEmailLocale(this.db, userId);
+      const copy = getAccountDeletedCopy(locale);
+      await sendEmail(
+        "account_deleted",
+        {
+          email: originalEmail,
+          name: name || "Usuario",
+          appUrl,
+          summary: copy.defaultSummary,
+        },
+        locale,
+      );
     } catch (e) {
       console.warn("[DataSubjectService] deletion email skipped:", e);
     }

@@ -1,45 +1,37 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-27** — canary retry **PASS** · kill drill **PASS** · steady **KILL ON** · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-28** — Cursor 0€ **VACÍO** (auditoría v2) · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Último commit tip** | `8c5c2768` |
-| **Prod deploy** | `5ef3b8d8` (fix) · `8f348e61` (canary window) |
-| **Fecha doc** | 2026-07-27 |
+| **Último tip** | ver `git log -1` tras commit Cursor-0€ |
+| **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` **v2** |
+| **Fecha doc** | 2026-07-28 |
 | **Rama** | `main` |
 
 ---
 
 ## Estado actual
 
-| Punto | Entorno | Activado | Pruebas | Rollback | Estado |
-|-------|---------|----------|---------|----------|--------|
-| 3 RAG/pgvector | staging | USE_MAIN_DB + schema | e2e **PASS** | USE_MAIN_DB=0 | **IMPLEMENTED_VERIFIED** |
-| 3 RAG/pgvector | prod | schema+RLS | canary RAG e2e **PASS** | kill | **IMPLEMENTED_VERIFIED** (prep+probe) |
-| 4 IA privada canary | prod | **KILL ON** (post-drill) | HTTP+RAG **ALL_PASS** · kill ~1.5s | kill &lt;5 min | **IMPLEMENTED_VERIFIED** · steady **KILLED** |
+| Punto | Estado |
+|-------|--------|
+| Lote A email locale + runtime | **CLOSED** |
+| Documentos/Comunidades/A/B/Facturas CTAs | **CLOSED** |
+| Sequences triggers + tracking mig 521 | **CLOSED** (apply migrate = ops) |
+| Honesty SES/Twilio/analytics/ERP | **CLOSED** |
+| Portal approve/reject feedback | **CLOSED** |
+| Cursor 0€ backlog | **VACÍO** |
+| IA canary prod | **KILLED** |
+| claimReady | **false** |
 
 ## Próximo paso EXACTO
 
-1. Canary **cerrado** (CEO **NO** extensión 2026-07-27). Nueva apertura = SÍ explícito.
-2. Legal / OAuth / clientes reales siguen pendientes.
-3. **No declarar READY.**
+1. Ops: aplicar migración **521** en staging/prod (`releaseCommand` / migrate).
+2. Ops: reval `saas.workflows` E2E + email certs — `WORKFLOWS_E2E_REVAL_PENDING.md`.
+3. CEO: Pepito/legal o canary — ver auditoría §2–4. **No declarar READY.**
 
-### Reabrir ventana (si CEO extiende)
-
-```
-NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=0
-NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=1
-NELVYON_AI_ENABLED=1
-OLLAMA_CONFIGURED=1
-NELVYON_AI_MODE=local
-PRIVATE_MODE=ON
-AUTONOMOUS_ALLOW_OPENAI=0
-# esperar deploy SUCCESS antes de tráfico
-```
-
-### Rollback rápido
+### Rollback IA
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1

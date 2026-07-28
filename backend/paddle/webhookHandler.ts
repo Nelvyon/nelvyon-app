@@ -4,6 +4,7 @@ import { CancellationService } from "../billing/cancellationService";
 import { DunningService, resolveTenantIdFromUserId } from "../billing/dunningService";
 import type { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
+import { dateLocaleTag, resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 import { completeStep } from "../onboarding";
 
 export type PaddleEventType =
@@ -105,12 +106,17 @@ export async function handlePaddleWebhook(rawBody: string, signatureHeader: stri
       } else {
         const email = await getUserEmail(db, userId);
         if (email) {
-          await sendEmail("plan_activated", {
-            email,
-            plan,
-            periodEnd: periodEnd?.toLocaleDateString("es-ES") ?? "—",
-            appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
-          });
+          const locale = await resolveUserEmailLocale(db, userId);
+          await sendEmail(
+            "plan_activated",
+            {
+              email,
+              plan,
+              periodEnd: periodEnd?.toLocaleDateString(dateLocaleTag(locale)) ?? "—",
+              appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
+            },
+            locale,
+          );
         }
         try {
           await completeStep(userId, "plan_activated");
@@ -137,11 +143,16 @@ export async function handlePaddleWebhook(rawBody: string, signatureHeader: stri
       await db.query(`UPDATE subscriptions SET status='canceled', updated_at=now() WHERE user_id::text=$1`, [userId]);
       const email = await getUserEmail(db, userId);
       if (email) {
-        await sendEmail("cancellation", {
-          email,
-          accessUntil: periodEnd?.toLocaleDateString("es-ES") ?? "—",
-          appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
-        });
+        const locale = await resolveUserEmailLocale(db, userId);
+        await sendEmail(
+          "cancellation",
+          {
+            email,
+            accessUntil: periodEnd?.toLocaleDateString(dateLocaleTag(locale)) ?? "—",
+            appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://nelvyon.com",
+          },
+          locale,
+        );
       }
       break;
     }

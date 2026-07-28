@@ -65,7 +65,7 @@
 - [ ] **CEO:** social publish — `SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md`
 - [ ] **CEO:** mobile stores — `MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md`
 - [ ] **Ops (Daniel):** Android Studio/SDK → `assembleDebug` APK + install smoke (`mobile.android_scaffold.md`)
-- [ ] **P2 i18n email/PDF PARTIAL:** SES catalog restante + `backend/billing/*EmailTemplates.ts` + PDF badges; never FULL_VERIFIED without audit
+- [x] **P2 i18n email transactional LOCALIZED** (Lote A 2026-07-28) · PDF legal body **HUMAN_REVIEW** — `EMAIL_PDF_LOCALE_PARTIAL.md` · never FULL_VERIFIED without legal audit
 - [ ] **Legal:** Pepito dossier + licencia — `DATOS_PEPITO_LICENSE_DOSSIER.md`
 - [ ] **CEO:** IA prod canary — `CEO_IA_PROD_CANARY_REQUEST.md`
 - [ ] No READY · no flags productivos en prod · `claimReady: false`

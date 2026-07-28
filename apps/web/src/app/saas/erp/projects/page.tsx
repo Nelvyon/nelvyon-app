@@ -94,7 +94,7 @@ export default function ErpProjectsPage() {
         <header>
           <h1 className="text-2xl font-semibold text-white">Proyectos & field service</h1>
           <p className="mt-1 text-sm text-[#94a3b8]">
-            Core in-memory · firma bloqueada · margen NON-GL · {note || "ops only"}
+            Persistido vía API (Postgres con DATABASE_URL) · firma bloqueada · margen NON-GL · {note || "ops only"}
           </p>
         </header>
 

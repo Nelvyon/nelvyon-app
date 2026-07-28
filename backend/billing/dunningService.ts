@@ -57,7 +57,7 @@ export class DunningService {
       );
       await this.sendDunningEmail(
         profile.email,
-        paymentFailedEmail(profile.fullName, profile.planLabel, STRIPE_PORTAL_URL),
+        paymentFailedEmail(profile.fullName, profile.planLabel, STRIPE_PORTAL_URL, profile.locale),
       );
       return;
     }
@@ -66,13 +66,16 @@ export class DunningService {
       const { daysLeft } = await this.getGracePeriodStatus(tenantId);
       await this.sendDunningEmail(
         profile.email,
-        secondNoticeEmail(profile.fullName, daysLeft, STRIPE_PORTAL_URL),
+        secondNoticeEmail(profile.fullName, daysLeft, STRIPE_PORTAL_URL, profile.locale),
       );
       return;
     }
 
     if (attemptNumber >= 3) {
-      await this.sendDunningEmail(profile.email, finalWarningEmail(profile.fullName, STRIPE_PORTAL_URL));
+      await this.sendDunningEmail(
+        profile.email,
+        finalWarningEmail(profile.fullName, STRIPE_PORTAL_URL, profile.locale),
+      );
     }
   }
 
@@ -95,7 +98,7 @@ export class DunningService {
     );
     await this.sendDunningEmail(
       profile.email,
-      suspensionEmail(profile.fullName, STRIPE_PORTAL_URL),
+      suspensionEmail(profile.fullName, STRIPE_PORTAL_URL, profile.locale),
     );
   }
 
@@ -127,7 +130,7 @@ export class DunningService {
     );
     await this.sendDunningEmail(
       profile.email,
-      reactivationEmail(profile.fullName, restoredPlan),
+      reactivationEmail(profile.fullName, restoredPlan, profile.locale),
     );
   }
 
@@ -203,16 +206,21 @@ export class DunningService {
     fullName: string;
     planLabel: string;
     previousPlan: string;
+    locale: string | null;
   } | null> {
     const rows = await this.db.query<{
       user_id: string;
       email: string;
       full_name: string;
       plan: string;
+      language: string | null;
     }>(
-      `SELECT u.user_id, u.email, u.full_name, COALESCE(s.plan, u.plan) AS plan
+      `SELECT u.user_id, u.email, u.full_name, COALESCE(s.plan, u.plan) AS plan,
+              p.language
        FROM nelvyon_users u
        LEFT JOIN subscriptions s ON s.user_id = u.user_id
+       LEFT JOIN saas_client_profiles p
+         ON p.tenant_id = u.tenant_id AND p.user_id = u.user_id::text
        WHERE u.tenant_id = $1
        ORDER BY u.created_at ASC
        LIMIT 1`,
@@ -220,13 +228,15 @@ export class DunningService {
     );
     const row = rows[0];
     if (!row) return null;
-    const planLabel = row.plan === "suspended" ? "tu plan" : row.plan;
+    const locale = normalizeProfileLanguage(row.language);
+    const planLabel = row.plan === "suspended" ? suspendedPlanLabel(locale) : row.plan;
     return {
       userId: row.user_id,
       email: row.email,
       fullName: row.full_name,
       planLabel,
       previousPlan: row.plan === "suspended" ? "starter" : row.plan,
+      locale,
     };
   }
 
@@ -254,4 +264,30 @@ export async function resolveTenantIdFromUserId(db: DbClient, userId: string): P
     [userId],
   );
   return rows[0]?.tenant_id ?? null;
+}
+
+function normalizeProfileLanguage(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const base = raw.trim().toLowerCase().slice(0, 2);
+  if (base === "en" || base === "fr" || base === "de" || base === "it" || base === "pt" || base === "es") {
+    return base;
+  }
+  return null;
+}
+
+function suspendedPlanLabel(locale: string | null): string {
+  switch (locale) {
+    case "en":
+      return "your plan";
+    case "fr":
+      return "votre forfait";
+    case "de":
+      return "dein Plan";
+    case "it":
+      return "il tuo piano";
+    case "pt":
+      return "o seu plano";
+    default:
+      return "tu plan";
+  }
 }

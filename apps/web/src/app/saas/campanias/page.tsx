@@ -44,6 +44,7 @@ export default function SaasCampaniasPage() {
   const [tenantCompany, setTenantCompany] = useState("");
   const [campanias, setCampanias] = useState<Campania[]>([]);
   const [sesConfigured, setSesConfigured] = useState<boolean | null>(null);
+  const [twilioConfigured, setTwilioConfigured] = useState<boolean | null>(null);
   const [tab, setTab] = useState<"all" | "active" | "completed" | "draft">("all");
   const [showWizard, setShowWizard] = useState(false);
   const [step, setStep] = useState(1);
@@ -86,9 +87,10 @@ export default function SaasCampaniasPage() {
       return;
     }
     if (!res.ok) throw new Error("No se pudieron cargar campanias");
-    const bodyRes = (await res.json()) as { campanias: Campania[]; ses_configured?: boolean };
+    const bodyRes = (await res.json()) as { campanias: Campania[]; ses_configured?: boolean; twilio_configured?: boolean };
     setCampanias(bodyRes.campanias ?? []);
     setSesConfigured(bodyRes.ses_configured ?? false);
+    setTwilioConfigured(bodyRes.twilio_configured ?? false);
   }
 
   async function refresh() {
@@ -239,6 +241,11 @@ export default function SaasCampaniasPage() {
           {sesConfigured === false ? (
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
               <strong>Email no configurado:</strong> las variables <code className="text-amber-200">SES_FROM_EMAIL</code> y <code className="text-amber-200">SES_ACCESS_KEY_ID</code> no están definidas en el servidor. Los envíos de email fallarán hasta que las configures en Railway.
+            </div>
+          ) : null}
+          {twilioConfigured === false ? (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+              <strong>SMS no configurado:</strong> define <code className="text-amber-200">TWILIO_ACCOUNT_SID</code>, <code className="text-amber-200">TWILIO_AUTH_TOKEN</code> y <code className="text-amber-200">TWILIO_FROM_NUMBER</code> en el servidor. Los envíos SMS fallarán hasta configurar Twilio.
             </div>
           ) : null}
           <CampaniaTemplateQuickLaunch onCreated={() => void loadCampanias()} />

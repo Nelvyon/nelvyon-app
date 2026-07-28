@@ -43,6 +43,7 @@ describe("FeedbackService", () => {
     expect(sendEmail).toHaveBeenCalledWith(
       "nps_thank_you",
       expect.objectContaining({ email: "a@test.com", score: "9" }),
+      "es",
     );
   });
 

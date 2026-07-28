@@ -40,6 +40,13 @@ export async function GET(
     [tid, cid],
   ).catch(() => null);
 
+  await db.query(
+    `UPDATE saas_sequence_enrollments
+     SET email_clicked = true, email_opened = true
+     WHERE tenant_id = $1 AND sequence_id = $2 AND contact_id = $3 AND status = 'active'`,
+    [tid, cid, rid],
+  ).catch(() => null);
+
   // Fire email_clicked workflow trigger (fire-and-forget — must not delay redirect)
   void dispatchEmailClicked(tid, cid, rid, url);
 

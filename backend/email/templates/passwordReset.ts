@@ -7,5 +7,5 @@ export function passwordResetTemplate(
   locale?: string | null,
 ): string {
   const copy = getPasswordResetCopy(locale);
-  return renderBaseEmail(copy.title, copy.body(name), copy.detailHtml, copy.cta, resetUrl);
+  return renderBaseEmail(copy.title, copy.body(name), copy.detailHtml, copy.cta, resetUrl, locale);
 }

@@ -25,5 +25,6 @@ export function jobCompletedTemplate(
      <p style="margin:12px 0 0; color:#9CA3AF; font-size:12px;">${copy.jobIdLabel} ${jobId}</p>`,
     copy.cta,
     jobUrl,
+    locale,
   );
 }

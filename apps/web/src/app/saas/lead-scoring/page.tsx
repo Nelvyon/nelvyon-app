@@ -84,7 +84,7 @@ function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
         {error && <p className="mb-3 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
         <form onSubmit={save} className="space-y-4">
           <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Abri├│ email" className={inp} /></div>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Abrió email" className={inp} /></div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Campo</label>
               <select value={field} onChange={e => { setField(e.target.value as RuleField); setOperator(e.target.value.startsWith("contact.has_") ? "is_true" : "equals"); }} className={inp}>
