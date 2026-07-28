@@ -15,8 +15,9 @@
 
 ## Próximo paso EXACTO
 
-1. CEO: SÍ/NO **prod** migrate 521+522 (ADR-064).
-2. **No** canary · **no** mass-send · **no** READY.
+1. CEO: leer `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` · SÍ/NO **migrate prod 521→522** (luego deploy).
+2. Si hay auto-deploy BUILDING en `@nelvyon/web` **sin** 521: aplicar migrate **antes** de servir tip, o cancelar deploy.
+3. **No** canary · **no** mass-send · **no** READY.
 
 ### Rollback IA
 
