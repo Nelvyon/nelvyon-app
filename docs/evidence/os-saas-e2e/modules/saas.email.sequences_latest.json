@@ -1,8 +1,8 @@
 {
   "module": "saas.email.sequences",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:19:22.017Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:26:32.955Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 0,
     "fail": 1,
@@ -13,10 +13,10 @@
       "flow": "email.sequences",
       "ok": false,
       "error": "Same SES KI-013/014 as campaigns",
-      "at": "2026-07-17T11:19:22.017Z"
+      "at": "2026-07-28T21:26:32.955Z"
     }
   ],
-  "hash": "212ce593c625ba9d",
+  "hash": "01e0dbf9fb9e24c3",
   "decision": "BLOCKED_EXTERNAL",
   "forceBlockedExternal": true,
   "blocker": "KI-013/KI-014 AWS SES — sequences send blocked externally"

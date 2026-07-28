@@ -1,14 +1,44 @@
-# CTO — Auditoría definitiva de pendientes (v3 post cierre técnico seguro)
+# CTO — Auditoría definitiva de pendientes (v3.2 post push/staging)
 
-> **Fecha:** 2026-07-28 · **Versión:** 3.1 (certificación pre-push) · tip **`5579625f`** (ahead 8)  
+> **Fecha:** 2026-07-28 · **Versión:** 3.2 (push + staging deploy + SES align) · tip remoto **`40099898`**  
 > **SSOT:** este archivo  
 > **claimReady: false** · **NOT READY**  
 > **Canary prod:** **KILL ON**  
-> **SAFE_TO_PUSH:** true (tras fix `5579625f`) · **SAFE_TO_MIGRATE_PROD:** false
+> **SAFE_TO_MIGRATE_PROD:** false
 
 ---
 
-## Certificación pre-push 2026-07-28
+## Ops autorizadas 2026-07-28 (ejecutadas)
+
+| Control | Resultado |
+|---------|-----------|
+| Push tip `40099898` (9 commits) | **DONE** → `origin/main` |
+| Staging deploy | `56df6a6e` **SUCCESS** (redeploy `--from-source` tras incident `railway down` que quitó `9d080bd1`) |
+| Health | **200** `status=ok` version `0.1.4` |
+| `SES_REGION` staging | **eu-west-1** (antes `us-east-1`) · AWS account: ProductionAccess **true** · Sending **true** · identity `nelvyon.com` · **sin envío real** |
+| Mig 521/522 | Registradas `executed_at` 17:51Z / 17:56Z · migrate logs **skip** ambas · cols + CHECK `score_threshold` **OK** |
+| Workflows reval | **CERTIFIED** 14/14 · `wf.create` **201** |
+| Honesty | **12/12 PASS** |
+| Sequences smoke | **8/8 PASS** (retry tras timeout transient) |
+| Playwright `saas-secuencias` | **5 PASS** |
+| Logs 5xx | migrate skip 521–522 · `Ready on :8080` · sin 5xx relevantes en sample |
+| Yellow-queue `CERT_FORCE=1` | **EXIT 0** · 11 CERTIFIED · resto BLOCKED_EXTERNAL (Stripe/SES send/OAuth/Twilio/Ads/etc.) · **0 FAIL** |
+| Prod canary flags | KILL=1 · PROD_CANARY=0 · AI=0 |
+
+| Pendiente | Acción | Evidencia | Estado |
+|-----------|--------|-----------|--------|
+| Mig **521** staging | Confirmed post-redeploy | `_migrations` + cols | **CLOSED_STAGING** |
+| Mig **522** staging | Confirmed CHECK incluye `score_threshold` | probe + migrate skip | **CLOSED_STAGING** |
+| `wf.create` | Reval post-deploy CERTIFIED | `docs/evidence/.../saas.workflows_latest.json` | **CLOSED_STAGING** |
+| SES region align staging | `SES_REGION=eu-west-1` | Railway + AWS no-send | **CLOSED_STAGING** |
+| Yellow queue aplicable | Drain force EXIT 0 | `docs/evidence/os-saas-e2e/modules/*_latest.json` | **CLOSED_STAGING** |
+| Comunidades replies | Honest-disabled — no `parent_post_id` | ADR-073 | **DEFERRED_PRODUCT** |
+| Mig 521/522 **prod** | **Not applied** — ADR-064 | — | **BLOCKED_CEO** |
+| Mass-send / canary / READY | Explicitamente no autorizados | — | **BLOCKED** |
+
+---
+
+## Certificación pre-push 2026-07-28 (histórico v3.1)
 
 | Control | Resultado |
 |---------|-----------|
@@ -18,23 +48,8 @@
 | Build apps/web | **PASS** |
 | Playwright secuencias | **5 PASS** |
 | Mig 521/522 staging probe | cols OK · incompatible triggers **0** |
-| SES | prod identities en **eu-west-1** · staging `us-east-1` **sin** identities / **sin** production access |
+| SES (pre-align) | prod identities en **eu-west-1** · staging entonces `us-east-1` |
 | DECISIONS | encoding repaired · ADR-072/073 (no chocar ADR-070 RAG) |
-
-**No push / no deploy / no migrate prod** hasta SÍ CEO.
-
-| Pendiente | Acción | Evidencia | Estado |
-|-----------|--------|-----------|--------|
-| Mig **521** staging | Applied via `pnpm migrate` on shared staging DB | `_migrations` + cols `email_opened`/`email_clicked` | **CLOSED_STAGING** |
-| Mig **522** `score_threshold` CHECK | Additive DROP+ADD constraint | staging applied · CHECK includes `score_threshold` | **CLOSED_STAGING** |
-| `wf.create` 500 | Staging reval CERTIFIED; schema drift fixed | `saas.workflows_latest.json` CERTIFIED · repro 9/9 | **CLOSED_STAGING** |
-| Fail-closed PG errors | `mapWorkflowWriteError` + `SCHEMA_MISMATCH` 503 | vitest 87 PASS focused | **CLOSED_CODE** |
-| Playwright Chromium | Installed + `saas-secuencias.spec.ts` | **5 passed** | **CLOSED_LOCAL** |
-| Honesty HTTP staging | workflows/sequences/campanias/invoices/documents/analytics/funnels | `saas.honesty.staging_reval_latest.json` 12/12 | **CLOSED_STAGING** |
-| SES preflight | Staging keys SET · region `us-east-1`; prod `eu-west-1` · **no mass send** | Railway vars (no secrets) | **PARTIAL** |
-| Comunidades replies | Kept honest-disabled — no `parent_post_id` | UI + ADR-073 | **DEFERRED_PRODUCT** |
-| Mig 521/522 **prod** | **Not applied** — ADR-064 CEO gate | — | **BLOCKED_CEO** |
-| Push tip | Deferred until CEO review | ahead local | **NO_PUSH** |
 
 ---
 

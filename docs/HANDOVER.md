@@ -1,26 +1,25 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-28** — Certificación pre-push · tip **`5579625f`** · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-28** — Push + staging deploy + SES align · tip remoto **`40099898`** · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Último tip** | `5579625f` (cert fix DECISIONS+typecheck) |
-| **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` **v3.1** |
-| **Rama** | `main` (**ahead 8** · **no push**) |
-| **SAFE_TO_PUSH** | **true** (lint preexistente documentado) |
-| **SAFE_TO_DEPLOY_STAGING** | **true** tras push (mig 521/522 ya en staging DB) |
+| **Último tip remoto** | `40099898` (`origin/main`) |
+| **Staging deploy** | `56df6a6e` **SUCCESS** · Online · `https://ideal-victory-staging.up.railway.app` |
+| **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` **v3.2** |
+| **Rama** | `main` · tip remoto `40099898` · docs/evidence v3.2 locales (commit ops si CEO pide push) |
+| **SAFE_TO_PUSH** | n/a (tip ya en remoto) |
+| **SAFE_TO_DEPLOY_STAGING** | **done** (redeploy from-source tras incident `railway down`) |
 | **SAFE_TO_MIGRATE_PROD** | **false** |
 | **claimReady** | **false** |
 | **Canary** | **KILL ON** |
 
 ## Próximo paso EXACTO
 
-1. CEO: SÍ/NO **push** tip `5579625f` (8 commits).
-2. Tras push: redeploy/verify staging `ideal-victory` · health + workflows reval.
-3. CEO: SÍ/NO alinear staging `SES_REGION=eu-west-1` (identities solo allí).
-4. CEO: SÍ/NO **prod** migrate 521+522 (ADR-064) — **no** hasta SÍ explícito.
-5. **No declarar READY.**
+1. CEO: SÍ/NO **prod** migrate 521+522 (ADR-064) — **no** hasta SÍ explícito.
+2. CEO: SÍ/NO commit+push de docs/evidence post-deploy v3.2 (si se pide).
+3. **No** abrir canary · **no** mass-send · **no** declarar READY.
 
 ### Rollback IA
 

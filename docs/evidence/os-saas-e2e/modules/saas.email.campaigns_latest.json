@@ -1,8 +1,8 @@
 {
   "module": "saas.email.campaigns",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:19:00.231Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:26:10.295Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 4,
     "fail": 2,
@@ -13,45 +13,45 @@
       "flow": "email.ses_domain",
       "ok": false,
       "error": "KI-013 SES domain not verified (external)",
-      "at": "2026-07-17T11:18:56.184Z"
+      "at": "2026-07-28T21:25:54.784Z"
     },
     {
       "flow": "email.ses_sandbox",
       "ok": false,
       "error": "KI-014 SES sandbox (external)",
-      "at": "2026-07-17T11:18:56.184Z"
+      "at": "2026-07-28T21:25:54.784Z"
     },
     {
       "flow": "mailA.register",
-      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZjgxZjM4Yi1jYmVjLTRkNTEtYTA3MS0yNTA5MmVkNmY3NjUiLCJlbWFpbCI6ImNlcnQtbWFpbGEtYzhjOTM2NjJAbmVsdnlvbi50ZXN0IiwidGVuYW50SWQiOiI3MGZmMmIzOC00ZjRiLTQ4NWEtOGZhZC1iY2NkYjQ3ZDNmNjYiLCJwbGFuIjoiZnJlZSIsImlhdCI6MTc4NDI4NzEzNiwiZXhwIjoxNzg0ODkxOTM2fQ.XiEugv7W5CFSg0J6LoJfFmChfwHVMMVJRk8qAkHXjt0",
+      "ok": true,
       "status": 200,
-      "ms": 1041,
-      "at": "2026-07-17T11:18:57.225Z"
+      "ms": 1773,
+      "at": "2026-07-28T21:26:04.839Z"
     },
     {
       "flow": "mailA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 211,
-      "at": "2026-07-17T11:18:57.437Z"
+      "ms": 2519,
+      "at": "2026-07-28T21:26:07.357Z"
     },
     {
       "flow": "mailA.onboard_complete",
-      "ok": "ca4a3c00-2123-4321-8c22-2ed994031f8a",
+      "ok": true,
       "status": 200,
-      "ms": 202,
-      "tenantId": "ca4a3c00-2123-4321-8c22-2ed994031f8a",
-      "at": "2026-07-17T11:18:57.639Z"
+      "ms": 2067,
+      "tenantId": "bdd536c5-753b-42ad-9780-d78cea785466",
+      "at": "2026-07-28T21:26:09.424Z"
     },
     {
       "flow": "email.campanias_surface",
       "ok": true,
       "status": 200,
-      "ses_configured": false,
-      "at": "2026-07-17T11:19:00.231Z"
+      "ses_configured": true,
+      "at": "2026-07-28T21:26:10.294Z"
     }
   ],
-  "hash": "93eb9b2498909fdd",
+  "hash": "4fcae095f3e6c1f9",
   "decision": "BLOCKED_EXTERNAL",
   "forceBlockedExternal": true,
   "blocker": "KI-013/KI-014 AWS SES domain + sandbox — cannot certify real send. Degraded ses_configured flag proven."

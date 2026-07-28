@@ -1,6 +1,6 @@
 # Módulo: saas.auth.sso — BLOCKED_EXTERNAL
 
-> 2026-07-17T11:19:21.426Z · http://127.0.0.1:3000
+> 2026-07-28T21:26:31.884Z · https://ideal-victory-staging.up.railway.app
 
 ## Totals
 PASS 1 / FAIL 1 / flows 2

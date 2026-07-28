@@ -1,8 +1,8 @@
 {
   "module": "saas.ads",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:19:11.361Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:26:17.452Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 5,
     "fail": 1,
@@ -13,45 +13,45 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 126,
-      "at": "2026-07-17T11:19:00.358Z"
+      "ms": 275,
+      "at": "2026-07-28T21:26:10.571Z"
     },
     {
       "flow": "adsA.register",
-      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjOTU4N2VmNS1hZDc2LTQ5YjYtYjAzYy1kZDdhMWZmZWJkODEiLCJlbWFpbCI6ImNlcnQtYWRzYS04M2E5ZGQ1ZkBuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6IjYxNDQyZjVmLTZmNzMtNGE4YS04MWQzLTIzOWFiOWU5Y2UyZSIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MTQ3LCJleHAiOjE3ODQ4OTE5NDd9.79Xxggyh0oRuG57GVV2FBCddXxJ-mMELDKRZNqrXiFI",
+      "ok": true,
       "status": 200,
-      "ms": 1030,
-      "at": "2026-07-17T11:19:08.416Z"
+      "ms": 1579,
+      "at": "2026-07-28T21:26:12.152Z"
     },
     {
       "flow": "adsA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 197,
-      "at": "2026-07-17T11:19:08.613Z"
+      "ms": 2361,
+      "at": "2026-07-28T21:26:14.514Z"
     },
     {
       "flow": "adsA.onboard_complete",
-      "ok": "f71c96cb-69e9-4619-95ad-64b469f3f703",
+      "ok": true,
       "status": 200,
-      "ms": 202,
-      "tenantId": "f71c96cb-69e9-4619-95ad-64b469f3f703",
-      "at": "2026-07-17T11:19:08.815Z"
+      "ms": 2070,
+      "tenantId": "c120d3ac-b069-480e-854a-b5cdbea5f5f9",
+      "at": "2026-07-28T21:26:16.585Z"
     },
     {
       "flow": "ads.surface",
       "ok": true,
       "status": 200,
-      "at": "2026-07-17T11:19:11.361Z"
+      "at": "2026-07-28T21:26:17.451Z"
     },
     {
       "flow": "external.dependency",
       "ok": false,
       "error": "OAuth ads providers (Google/Meta) not connected in cert env",
-      "at": "2026-07-17T11:19:11.361Z"
+      "at": "2026-07-28T21:26:17.451Z"
     }
   ],
-  "hash": "69ab57f5806872d2",
+  "hash": "3a7bb7e8b615ccc0",
   "decision": "BLOCKED_EXTERNAL",
   "forceBlockedExternal": true,
   "blocker": "OAuth ads providers (Google/Meta) not connected in cert env"

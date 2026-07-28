@@ -1,8 +1,8 @@
 {
   "module": "saas.social",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:19:13.332Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:26:24.221Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 5,
     "fail": 1,
@@ -13,45 +13,45 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 135,
-      "at": "2026-07-17T11:19:11.498Z"
+      "ms": 293,
+      "at": "2026-07-28T21:26:17.746Z"
     },
     {
       "flow": "socA.register",
-      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YjU2NDM5MS1jODY1LTQyMjYtYTc5OS1iZWYxYWY5YzAyNDQiLCJlbWFpbCI6ImNlcnQtc29jYS1lNzAzMzNkYUBuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6ImNmN2IyMGY1LTg4Y2EtNDZhMC04ODYzLTc0YjBkMTlhYTBlOSIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MTUxLCJleHAiOjE3ODQ4OTE5NTF9.sTR7UZF-T5RMsNaIf07HuT3LBspXjEMjg3FIaTOT6ZE",
+      "ok": true,
       "status": 200,
-      "ms": 1143,
-      "at": "2026-07-17T11:19:12.641Z"
+      "ms": 1571,
+      "at": "2026-07-28T21:26:19.318Z"
     },
     {
       "flow": "socA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 239,
-      "at": "2026-07-17T11:19:12.881Z"
+      "ms": 2361,
+      "at": "2026-07-28T21:26:21.679Z"
     },
     {
       "flow": "socA.onboard_complete",
-      "ok": "3b90a2d2-e769-419a-aeb3-0df04d51c2f7",
+      "ok": true,
       "status": 200,
-      "ms": 214,
-      "tenantId": "3b90a2d2-e769-419a-aeb3-0df04d51c2f7",
-      "at": "2026-07-17T11:19:13.095Z"
+      "ms": 2058,
+      "tenantId": "c0657558-18a1-4e91-8d18-8f22b26e0b1c",
+      "at": "2026-07-28T21:26:23.738Z"
     },
     {
       "flow": "social.surface",
       "ok": true,
       "status": 404,
-      "at": "2026-07-17T11:19:13.332Z"
+      "at": "2026-07-28T21:26:24.221Z"
     },
     {
       "flow": "external.dependency",
       "ok": false,
       "error": "Social OAuth publish not connected in cert env",
-      "at": "2026-07-17T11:19:13.332Z"
+      "at": "2026-07-28T21:26:24.221Z"
     }
   ],
-  "hash": "ad651261fdefdbc2",
+  "hash": "d49acf8133bbfa9c",
   "decision": "BLOCKED_EXTERNAL",
   "forceBlockedExternal": true,
   "blocker": "Social OAuth publish not connected in cert env"

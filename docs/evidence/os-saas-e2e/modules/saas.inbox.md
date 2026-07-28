@@ -1,6 +1,6 @@
 # Módulo: saas.inbox — CERTIFIED
 
-> 2026-07-17T11:18:03.975Z · http://127.0.0.1:3000
+> 2026-07-28T21:25:11.725Z · https://ideal-victory-staging.up.railway.app
 
 ## Totals
 PASS 8 / FAIL 0 / flows 8

@@ -1,6 +1,6 @@
 # Módulo: saas.seo — BLOCKED_EXTERNAL
 
-> 2026-07-17T11:19:16.832Z · http://127.0.0.1:3000
+> 2026-07-28T21:26:31.358Z · https://ideal-victory-staging.up.railway.app
 
 ## Totals
 PASS 5 / FAIL 1 / flows 6

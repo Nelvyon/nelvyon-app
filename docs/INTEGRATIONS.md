@@ -62,7 +62,7 @@
 | Integración | Estado | Variables | Notas |
 |-------------|--------|-----------|-------|
 | **AWS SES** | ✅ | `SES_*` | Production GRANTED 2026-07-21 · locale templates **PARTIAL** |
-| **SES region split** | ⚠ | `SES_REGION` | Staging `us-east-1` · prod/default code `eu-west-1` · align before mass-send |
+| **SES region** | ✅ staging aligned | `SES_REGION` | Staging+prod **eu-west-1** (aligned 2026-07-28) · ProductionAccess true · identity `nelvyon.com` · **mass-send still blocked** |
 | SendGrid | 🟡 | `SENDGRID_API_KEY` | Fallback Python paths |
 
 ---

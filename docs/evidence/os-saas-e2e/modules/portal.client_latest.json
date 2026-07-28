@@ -1,8 +1,8 @@
 {
   "module": "portal.client",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:17:05.284Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:24:42.690Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 7,
     "fail": 0,
@@ -13,51 +13,51 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 126,
-      "at": "2026-07-17T11:16:54.547Z"
+      "ms": 262,
+      "at": "2026-07-28T21:24:34.227Z"
     },
     {
       "flow": "portalA.register",
-      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwODYwY2NmMy03ZTNkLTQ1OGQtYTM5NS04YjhmZTlmNzJhNzYiLCJlbWFpbCI6ImNlcnQtcG9ydGFsYS1mNjliMDUyZkBuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6IjI5NGU1N2EyLTQ5NDItNDM1Mi1iOWZiLWQzZmI1NTk2NDMwMyIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MDE1LCJleHAiOjE3ODQ4OTE4MTV9.uxR4X1OgPJCM6vTt68ILOGdKAxWoWuacJnjXdbjCtbE",
+      "ok": true,
       "status": 200,
-      "ms": 1104,
-      "at": "2026-07-17T11:16:55.651Z"
+      "ms": 1559,
+      "at": "2026-07-28T21:24:35.786Z"
     },
     {
       "flow": "portalA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 324,
-      "at": "2026-07-17T11:16:55.976Z"
+      "ms": 2344,
+      "at": "2026-07-28T21:24:38.130Z"
     },
     {
       "flow": "portalA.onboard_complete",
-      "ok": "d11667b3-7dd7-4c40-9e78-701cadcbacae",
+      "ok": true,
       "status": 200,
-      "ms": 308,
-      "tenantId": "d11667b3-7dd7-4c40-9e78-701cadcbacae",
-      "at": "2026-07-17T11:16:56.284Z"
+      "ms": 2056,
+      "tenantId": "ad70ce1a-ec53-4f1a-aab0-e368a2c01f8b",
+      "at": "2026-07-28T21:24:40.188Z"
     },
     {
       "flow": "portal.entregables_list",
       "ok": true,
       "status": 200,
-      "ms": 2493,
-      "at": "2026-07-17T11:16:58.777Z"
+      "ms": 1906,
+      "at": "2026-07-28T21:24:42.095Z"
     },
     {
       "flow": "portal.401",
       "ok": true,
       "status": 401,
-      "at": "2026-07-17T11:16:58.786Z"
+      "at": "2026-07-28T21:24:42.363Z"
     },
     {
       "flow": "portal.page",
       "ok": true,
       "status": 200,
-      "at": "2026-07-17T11:17:05.284Z"
+      "at": "2026-07-28T21:24:42.690Z"
     }
   ],
-  "hash": "508786f97be136b2",
+  "hash": "7ff864746c56a9a0",
   "decision": "CERTIFIED"
 }

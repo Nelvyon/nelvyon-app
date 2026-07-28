@@ -1,8 +1,8 @@
 {
   "module": "saas.workflows",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:28:27.634Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:23:11.035Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 13,
     "fail": 0,
@@ -13,91 +13,93 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "at": "2026-07-17T11:28:09.101Z"
+      "ms": 267,
+      "at": "2026-07-28T21:22:55.137Z"
     },
     {
-      "flow": "recertWfA.register",
+      "flow": "wfA.register",
       "ok": true,
       "status": 200,
-      "ms": 5395,
-      "at": "2026-07-17T11:28:14.499Z"
+      "ms": 1564,
+      "at": "2026-07-28T21:22:56.703Z"
     },
     {
-      "flow": "recertWfA.onboard_create",
+      "flow": "wfA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 3452,
-      "at": "2026-07-17T11:28:17.951Z"
+      "ms": 2334,
+      "at": "2026-07-28T21:22:59.037Z"
     },
     {
-      "flow": "recertWfA.onboard_complete",
+      "flow": "wfA.onboard_complete",
       "ok": true,
       "status": 200,
-      "ms": 3042,
-      "tenantId": "962c6cd4-6a9b-4ac7-8e8e-7e5609b50357",
-      "at": "2026-07-17T11:28:20.993Z"
+      "ms": 2039,
+      "tenantId": "7673a544-f364-4ed3-9834-9bb34ede773d",
+      "at": "2026-07-28T21:23:01.077Z"
     },
     {
-      "flow": "recertWfB.register",
+      "flow": "wfB.register",
       "ok": true,
       "status": 200,
-      "ms": 1503,
-      "at": "2026-07-17T11:28:22.497Z"
+      "ms": 1568,
+      "at": "2026-07-28T21:23:02.643Z"
     },
     {
-      "flow": "recertWfB.onboard_create",
+      "flow": "wfB.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 486,
-      "at": "2026-07-17T11:28:22.983Z"
+      "ms": 2353,
+      "at": "2026-07-28T21:23:04.997Z"
     },
     {
-      "flow": "recertWfB.onboard_complete",
+      "flow": "wfB.onboard_complete",
       "ok": true,
       "status": 200,
-      "ms": 361,
-      "tenantId": "afad2294-9f47-4cfd-bb32-db2ef6794164",
-      "at": "2026-07-17T11:28:23.346Z"
+      "ms": 2049,
+      "tenantId": "bf884ecc-cbe8-48da-82e0-7838cb7fe0d1",
+      "at": "2026-07-28T21:23:07.047Z"
     },
     {
       "flow": "wf.meta",
       "ok": true,
       "status": 200,
-      "at": "2026-07-17T11:28:26.492Z"
+      "at": "2026-07-28T21:23:07.771Z"
     },
     {
       "flow": "wf.create",
-      "ok": "3b447860-5f56-469b-9f7c-890c695400dd",
+      "ok": true,
       "status": 201,
-      "id": "3b447860-5f56-469b-9f7c-890c695400dd",
-      "at": "2026-07-17T11:28:26.822Z"
+      "ms": 1290,
+      "id": "83d877af-8eca-499c-958d-bcae31fa0c96",
+      "at": "2026-07-28T21:23:09.061Z"
     },
     {
       "flow": "wf.list_a",
       "ok": true,
       "status": 200,
-      "at": "2026-07-17T11:28:27.611Z"
+      "at": "2026-07-28T21:23:10.762Z"
     },
     {
       "flow": "wf.isolation",
       "ok": true,
       "status": 200,
-      "at": "2026-07-17T11:28:27.611Z"
+      "countB": 0,
+      "at": "2026-07-28T21:23:10.762Z"
     },
     {
       "flow": "wf.ses_flag_present",
       "ok": true,
-      "ses_configured": false,
-      "at": "2026-07-17T11:28:27.611Z"
+      "ses_configured": true,
+      "at": "2026-07-28T21:23:10.762Z"
     },
     {
       "flow": "wf.401",
       "ok": true,
       "status": 401,
-      "at": "2026-07-17T11:28:27.634Z"
+      "at": "2026-07-28T21:23:11.035Z"
     }
   ],
-  "hash": "aefbe02a178d4ef6",
-  "decision": "CERTIFIED",
-  "note": "re-certified after jsonb parseJsonField harden"
+  "hash": "a8f57774bac15346",
+  "decision": "CERTIFIED"
 }

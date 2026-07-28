@@ -1,8 +1,8 @@
 {
   "module": "os.packs.growth",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:18:51.945Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:25:45.760Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 4,
     "fail": 0,
@@ -13,32 +13,32 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 111,
-      "at": "2026-07-17T11:18:48.986Z"
+      "ms": 271,
+      "at": "2026-07-28T21:25:44.950Z"
     },
     {
       "flow": "os.kickoff_unauth",
       "ok": true,
       "status": 401,
-      "ms": 28,
-      "at": "2026-07-17T11:18:49.015Z"
+      "ms": 272,
+      "at": "2026-07-28T21:25:45.222Z"
     },
     {
       "flow": "os.surface_api_os_packs",
       "ok": true,
       "status": 401,
-      "ms": 8,
-      "at": "2026-07-17T11:18:49.023Z"
+      "ms": 268,
+      "at": "2026-07-28T21:25:45.497Z"
     },
     {
       "flow": "os.surface_api_platform_pack_report",
       "ok": true,
       "status": 401,
-      "ms": 2930,
-      "at": "2026-07-17T11:18:51.945Z"
+      "ms": 263,
+      "at": "2026-07-28T21:25:45.760Z"
     }
   ],
-  "hash": "736a0763ec04991b",
+  "hash": "83addfda4c677456",
   "decision": "BLOCKED_EXTERNAL",
   "forceBlockedExternal": true,
   "blocker": "Full growth-pack kickoff E2E requires staging credentials / LLM provider (STAGING_* unset). Unauth fail-closed proven locally."

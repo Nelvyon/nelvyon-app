@@ -1,8 +1,8 @@
 {
   "module": "public.api",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:18:34.282Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:25:29.116Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 7,
     "fail": 0,
@@ -13,51 +13,51 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 170,
-      "at": "2026-07-17T11:18:20.463Z"
+      "ms": 268,
+      "at": "2026-07-28T21:25:21.792Z"
     },
     {
       "flow": "public.health",
       "ok": true,
       "status": 200,
-      "at": "2026-07-17T11:18:20.577Z"
+      "at": "2026-07-28T21:25:22.055Z"
     },
     {
       "flow": "public.funnel_missing",
       "ok": true,
       "status": 404,
-      "at": "2026-07-17T11:18:24.138Z"
+      "at": "2026-07-28T21:25:22.488Z"
     },
     {
       "flow": "pubA.register",
-      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiNTk5MzRjMy0yNGVlLTQzNjEtYTRiNC0xMWFlOGRkN2M2NzAiLCJlbWFpbCI6ImNlcnQtcHViYS1mMGIwMmM0N0BuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6IjUyMGQ1ZmU1LTAwOTUtNDQ0MC1iMzJlLWM3OWEyZDA2YjM3ZCIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MTA0LCJleHAiOjE3ODQ4OTE5MDR9.WlMsKyAmrNWMhmM4rL54PCO1BTBSeMtL6F-MOiluOF4",
+      "ok": true,
       "status": 200,
-      "ms": 1132,
-      "at": "2026-07-17T11:18:25.270Z"
+      "ms": 1583,
+      "at": "2026-07-28T21:25:24.072Z"
     },
     {
       "flow": "pubA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 306,
-      "at": "2026-07-17T11:18:25.577Z"
+      "ms": 2371,
+      "at": "2026-07-28T21:25:26.443Z"
     },
     {
       "flow": "pubA.onboard_complete",
-      "ok": "446474f3-5a67-4bc2-8d5d-31817b537728",
+      "ok": true,
       "status": 200,
-      "ms": 303,
-      "tenantId": "446474f3-5a67-4bc2-8d5d-31817b537728",
-      "at": "2026-07-17T11:18:25.880Z"
+      "ms": 2058,
+      "tenantId": "7b28e333-d4aa-46ff-ae87-519a3d41a851",
+      "at": "2026-07-28T21:25:28.502Z"
     },
     {
       "flow": "public.saas_public_api_surface",
       "ok": true,
       "status": 404,
-      "ms": 8393,
-      "at": "2026-07-17T11:18:34.282Z"
+      "ms": 613,
+      "at": "2026-07-28T21:25:29.116Z"
     }
   ],
-  "hash": "fd6516685f077bbc",
+  "hash": "b20d3bb5db22d02b",
   "decision": "CERTIFIED"
 }

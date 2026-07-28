@@ -1,7 +1,7 @@
 {
   "module": "saas.honesty.staging_reval",
   "tag": "read_only_honesty",
-  "timestamp": "2026-07-28T18:04:56.736Z",
+  "timestamp": "2026-07-28T21:19:42.115Z",
   "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 12,
@@ -13,29 +13,29 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "at": "2026-07-28T18:04:43.369Z"
+      "at": "2026-07-28T21:19:29.231Z"
     },
     {
       "flow": "honA.register",
       "ok": true,
       "status": 200,
-      "ms": 2259,
-      "at": "2026-07-28T18:04:45.631Z"
+      "ms": 1774,
+      "at": "2026-07-28T21:19:31.006Z"
     },
     {
       "flow": "honA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 2301,
-      "at": "2026-07-28T18:04:47.933Z"
+      "ms": 2331,
+      "at": "2026-07-28T21:19:33.337Z"
     },
     {
       "flow": "honA.onboard_complete",
       "ok": true,
       "status": 200,
-      "ms": 2007,
-      "tenantId": "816d8418-281f-42b7-a3b4-9852db4e8dd4",
-      "at": "2026-07-28T18:04:49.940Z"
+      "ms": 2041,
+      "tenantId": "89337c2b-c838-4aea-b635-dbf9cebd5825",
+      "at": "2026-07-28T21:19:35.379Z"
     },
     {
       "flow": "honesty.workflows.ses_twilio_keys",
@@ -43,9 +43,10 @@
       "status": 200,
       "snippet": [
         "workflows",
-        "ses_configured"
+        "ses_configured",
+        "twilio_configured"
       ],
-      "at": "2026-07-28T18:04:50.793Z"
+      "at": "2026-07-28T21:19:36.226Z"
     },
     {
       "flow": "honesty.sequences.ses_flag",
@@ -53,9 +54,10 @@
       "status": 200,
       "snippet": [
         "sequences",
-        "ses_configured"
+        "ses_configured",
+        "twilio_configured"
       ],
-      "at": "2026-07-28T18:04:51.689Z"
+      "at": "2026-07-28T21:19:37.120Z"
     },
     {
       "flow": "honesty.campanias.ses_flag",
@@ -63,9 +65,10 @@
       "status": 200,
       "snippet": [
         "campanias",
-        "ses_configured"
+        "ses_configured",
+        "twilio_configured"
       ],
-      "at": "2026-07-28T18:04:52.551Z"
+      "at": "2026-07-28T21:19:37.985Z"
     },
     {
       "flow": "honesty.invoices.list",
@@ -74,7 +77,7 @@
       "snippet": [
         "invoices"
       ],
-      "at": "2026-07-28T18:04:53.428Z"
+      "at": "2026-07-28T21:19:38.863Z"
     },
     {
       "flow": "honesty.documents.list",
@@ -83,7 +86,7 @@
       "snippet": [
         "documents"
       ],
-      "at": "2026-07-28T18:04:54.277Z"
+      "at": "2026-07-28T21:19:39.709Z"
     },
     {
       "flow": "honesty.analytics",
@@ -92,7 +95,7 @@
       "snippet": [
         "analytics"
       ],
-      "at": "2026-07-28T18:04:55.598Z"
+      "at": "2026-07-28T21:19:41.003Z"
     },
     {
       "flow": "honesty.funnels",
@@ -101,13 +104,13 @@
       "snippet": [
         "funnels"
       ],
-      "at": "2026-07-28T18:04:56.469Z"
+      "at": "2026-07-28T21:19:41.857Z"
     },
     {
       "flow": "honesty.campanias.401",
       "ok": true,
       "status": 401,
-      "at": "2026-07-28T18:04:56.736Z"
+      "at": "2026-07-28T21:19:42.115Z"
     }
   ],
   "decision": "PASS",

@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Ops / Staging | **Push + deploy + SES align v3.2** | Tip remoto **`40099898`** · deploy `56df6a6e` SUCCESS · `SES_REGION=eu-west-1` · mig 521–522 confirmed · health/workflows/honesty/seq/PW/yellow **PASS** · **no** prod migrate · canary KILL · `claimReady: false` · **NOT READY** |
 | Ops / Cert | **Pre-push certificación v3.1** | Typecheck PASS · build PASS · vitest 2471 · PW 5 · DECISIONS UTF-8 fix ADR-072/073 · lint erp unused **preexistente** · SES identities **eu-west-1 only** · `SAFE_TO_PUSH=true` · `SAFE_TO_MIGRATE_PROD=false` · canary KILL · `claimReady: false` · **NOT READY** |
 | Ops / DB | **Cierre técnico seguro v3** | Staging mig **521+522** applied · `wf.create` CERTIFIED · Playwright 5 PASS · honesty 12/12 · PG fail-closed SCHEMA_MISMATCH · prod mig **NOT** applied · canary KILL · `claimReady: false` · **NOT READY** |
 | SaaS / Workflows | **score_threshold CHECK align** | Mig 522 · `mapWorkflowWriteError` · staging repro 9/9 PASS |

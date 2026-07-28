@@ -131,8 +131,8 @@
 - `518_workflows_list_columns.sql` — `workflows.is_active` · **prod verified**
 - `519_erp_non_financial_cores.sql` — reserved ERP tables (suppliers/PO/inventory/warehouses/stock_moves/MO/`saas_projects_erp`) · RLS comments only · **staging applied**
 - `520_erp_postgres_persistence.sql` — `erp_domain_snapshots` + companions + `erp_audit_events` + RLS · API `with*Persistence` · **staging applied** · restart **ALL_PASS**
-- `521_saas_sequence_enrollment_tracking.sql` — `email_opened`/`email_clicked` on enrollments · **staging applied 2026-07-28** · prod **NOT**
-- `522_saas_workflows_score_threshold_trigger.sql` — CHECK includes `score_threshold` · **staging applied 2026-07-28** · prod **NOT**
+- `521_saas_sequence_enrollment_tracking.sql` — `email_opened`/`email_clicked` on enrollments · **staging applied 2026-07-28** (`executed_at` 17:51Z) · reconfirmed post-deploy `56df6a6e` · prod **NOT**
+- `522_saas_workflows_score_threshold_trigger.sql` — CHECK includes `score_threshold` · **staging applied 2026-07-28** (`executed_at` 17:56Z) · reconfirmed post-deploy · prod **NOT**
 
 ---
 

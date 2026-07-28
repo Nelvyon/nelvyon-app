@@ -1,6 +1,6 @@
 # Módulo: os.packs.growth — BLOCKED_EXTERNAL
 
-> 2026-07-17T11:18:51.945Z · http://127.0.0.1:3000
+> 2026-07-28T21:25:45.760Z · https://ideal-victory-staging.up.railway.app
 
 ## Totals
 PASS 4 / FAIL 0 / flows 4

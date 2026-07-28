@@ -1,8 +1,8 @@
 {
   "module": "saas.seo",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:19:16.832Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:26:31.358Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 5,
     "fail": 1,
@@ -13,45 +13,45 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 175,
-      "at": "2026-07-17T11:19:13.509Z"
+      "ms": 253,
+      "at": "2026-07-28T21:26:24.476Z"
     },
     {
       "flow": "seoA.register",
-      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiOTc1YjY0Mi0xNGE2LTQzOWUtOTk5MS0xZjJlNTI4MTU5ZDciLCJlbWFpbCI6ImNlcnQtc2VvYS1kZWYwN2JhMEBuZWx2eW9uLnRlc3QiLCJ0ZW5hbnRJZCI6Ijg0ZDE3ZWZiLTU3MjktNDE5Ni1hZTFhLTg2M2MxYTdiOTM4ZSIsInBsYW4iOiJmcmVlIiwiaWF0IjoxNzg0Mjg3MTUzLCJleHAiOjE3ODQ4OTE5NTN9.rKOzjFzsca_Y1PyKtgsnxf6kjlI0mBoNd-7IBZ-1Ayo",
+      "ok": true,
       "status": 200,
-      "ms": 761,
-      "at": "2026-07-17T11:19:14.269Z"
+      "ms": 1564,
+      "at": "2026-07-28T21:26:26.041Z"
     },
     {
       "flow": "seoA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 143,
-      "at": "2026-07-17T11:19:14.412Z"
+      "ms": 2360,
+      "at": "2026-07-28T21:26:28.401Z"
     },
     {
       "flow": "seoA.onboard_complete",
-      "ok": "67a0e924-8c92-4506-8f29-69be1901dd2e",
+      "ok": true,
       "status": 200,
-      "ms": 149,
-      "tenantId": "67a0e924-8c92-4506-8f29-69be1901dd2e",
-      "at": "2026-07-17T11:19:14.561Z"
+      "ms": 2072,
+      "tenantId": "df71e402-3c25-4f44-b5ba-e80bfd7bd2bf",
+      "at": "2026-07-28T21:26:30.473Z"
     },
     {
       "flow": "seo.surface",
       "ok": true,
       "status": 200,
-      "at": "2026-07-17T11:19:16.832Z"
+      "at": "2026-07-28T21:26:31.358Z"
     },
     {
       "flow": "external.dependency",
       "ok": false,
       "error": "Optional Semrush/external SEO providers not configured",
-      "at": "2026-07-17T11:19:16.832Z"
+      "at": "2026-07-28T21:26:31.358Z"
     }
   ],
-  "hash": "17a23c8ba8984180",
+  "hash": "a6cdd9a9d114239c",
   "decision": "BLOCKED_EXTERNAL",
   "forceBlockedExternal": true,
   "blocker": "Optional Semrush/external SEO providers not configured"

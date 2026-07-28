@@ -1,8 +1,8 @@
 {
   "module": "saas.inbox",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:18:03.975Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:25:11.725Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 8,
     "fail": 0,
@@ -13,58 +13,58 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 133,
-      "at": "2026-07-17T11:17:05.419Z"
+      "ms": 255,
+      "at": "2026-07-28T21:24:42.947Z"
     },
     {
       "flow": "inboxA.register",
-      "ok": "nelvyon_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiZjI2YjFiOC0xMDhlLTQ5ZTUtYTllZi0zZDE2ZWMzMDYxMDAiLCJlbWFpbCI6ImNlcnQtaW5ib3hhLWE4MmNlNzFmQG5lbHZ5b24udGVzdCIsInRlbmFudElkIjoiMzQ4NTg5NWMtMjFhMS00Yzk2LWFjNDYtZTkyZGE5YTE3ZDQ1IiwicGxhbiI6ImZyZWUiLCJpYXQiOjE3ODQyODcwNjgsImV4cCI6MTc4NDg5MTg2OH0.84bSxnjYaHrw_HPfNVb7mNDMhploZnTBSsXqwROD6EU",
+      "ok": true,
       "status": 200,
-      "ms": 1762,
-      "at": "2026-07-17T11:17:49.207Z"
+      "ms": 2673,
+      "at": "2026-07-28T21:25:04.874Z"
     },
     {
       "flow": "inboxA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 453,
-      "at": "2026-07-17T11:17:49.660Z"
+      "ms": 2483,
+      "at": "2026-07-28T21:25:07.358Z"
     },
     {
       "flow": "inboxA.onboard_complete",
-      "ok": "f71f7edf-8dc6-4bc1-a326-8cf06acedf12",
+      "ok": true,
       "status": 200,
-      "ms": 319,
-      "tenantId": "f71f7edf-8dc6-4bc1-a326-8cf06acedf12",
-      "at": "2026-07-17T11:17:49.979Z"
+      "ms": 2060,
+      "tenantId": "c0edbbd1-189c-4550-99a8-2d430a98d933",
+      "at": "2026-07-28T21:25:09.418Z"
     },
     {
       "flow": "inbox.get_api_saas_inbox",
       "ok": true,
       "status": 200,
-      "ms": 2392,
-      "at": "2026-07-17T11:17:52.371Z"
+      "ms": 882,
+      "at": "2026-07-28T21:25:10.300Z"
     },
     {
       "flow": "inbox.401_api_saas_inbox",
       "ok": true,
       "status": 401,
-      "at": "2026-07-17T11:17:56.996Z"
+      "at": "2026-07-28T21:25:10.597Z"
     },
     {
       "flow": "inbox.get_api_saas_helpdesk",
       "ok": true,
       "status": 200,
-      "ms": 6960,
-      "at": "2026-07-17T11:18:03.956Z"
+      "ms": 862,
+      "at": "2026-07-28T21:25:11.459Z"
     },
     {
       "flow": "inbox.401_api_saas_helpdesk",
       "ok": true,
       "status": 401,
-      "at": "2026-07-17T11:18:03.975Z"
+      "at": "2026-07-28T21:25:11.724Z"
     }
   ],
-  "hash": "baa1c26bbd684cbd",
+  "hash": "f29a259ad42aabac",
   "decision": "CERTIFIED"
 }

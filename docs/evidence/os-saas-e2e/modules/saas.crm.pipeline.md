@@ -1,6 +1,6 @@
 # Módulo: saas.crm.pipeline — CERTIFIED
 
-> 2026-07-17T11:15:45.247Z · http://127.0.0.1:3000
+> 2026-07-28T21:22:26.570Z · https://ideal-victory-staging.up.railway.app
 
 ## Totals
 PASS 16 / FAIL 0 / flows 16

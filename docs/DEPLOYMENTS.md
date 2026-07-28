@@ -1,6 +1,20 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-28** cierre técnico seguro v3 · staging migrate 521+522 · **no** prod migrate · canary KILL ON.
+> Actualizado: **2026-07-28** push tip `40099898` · staging deploy `56df6a6e` · SES `eu-west-1` · **no** prod migrate · canary KILL ON.
+
+## 2026-07-28 — Push + staging deploy + SES align (v3.2)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip remoto** | `40099898` (9 commits pushed) |
+| **Env** | Railway staging `ideal-victory` |
+| **Deploy** | `56df6a6e` **SUCCESS** (redeploy `--from-source`; prior `9d080bd1` removed by accidental `railway down` during cancel of dirty BUILDING `9a1edd54`) |
+| **SES** | `SES_REGION=eu-west-1` · AWS ProductionAccess true · identity `nelvyon.com` · **no send** |
+| **Mig** | 521+522 still registered · migrate **skip** both · CHECK `score_threshold` OK |
+| **HTTP** | health 200 · workflows CERTIFIED 14/14 · honesty 12/12 · seq smoke 8/8 · yellow EXIT 0 |
+| **Playwright** | `saas-secuencias` **5 PASS** |
+| **Prod** | **NOT migrated** · canary **KILL ON** |
+| **claimReady** | **false** |
 
 ## 2026-07-28 — Staging migrate 521+522 (no prod · no push)
 

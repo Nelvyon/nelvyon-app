@@ -1,0 +1,69 @@
+{
+  "module": "saas.sequences.smoke_staging",
+  "timestamp": "2026-07-28T21:21:31.887Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
+  "totals": {
+    "pass": 8,
+    "fail": 0,
+    "flows": 8
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-28T21:21:22.495Z"
+    },
+    {
+      "flow": "seqSmoke.register",
+      "ok": true,
+      "status": 200,
+      "ms": 2921,
+      "at": "2026-07-28T21:21:25.417Z"
+    },
+    {
+      "flow": "seqSmoke.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2359,
+      "at": "2026-07-28T21:21:27.778Z"
+    },
+    {
+      "flow": "seqSmoke.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 2061,
+      "tenantId": "78a4dff7-bda4-4b8e-b0fa-77fb673c2e16",
+      "at": "2026-07-28T21:21:29.840Z"
+    },
+    {
+      "flow": "seq.list",
+      "ok": true,
+      "status": 200,
+      "ses_configured": true,
+      "count": 0,
+      "at": "2026-07-28T21:21:30.710Z"
+    },
+    {
+      "flow": "seq.ses_flag",
+      "ok": true,
+      "ses_configured": true,
+      "at": "2026-07-28T21:21:30.710Z"
+    },
+    {
+      "flow": "seq.create_draft",
+      "ok": true,
+      "status": 201,
+      "id": "19c2870c-d215-4806-b24c-b6ee187e4fe7",
+      "at": "2026-07-28T21:21:31.603Z"
+    },
+    {
+      "flow": "seq.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-28T21:21:31.887Z"
+    }
+  ],
+  "decision": "PASS",
+  "note": "no mass-send; draft create only"
+}

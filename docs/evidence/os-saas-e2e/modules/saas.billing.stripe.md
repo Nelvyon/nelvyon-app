@@ -1,6 +1,6 @@
 # Módulo: saas.billing.stripe — BLOCKED_EXTERNAL
 
-> 2026-07-17T11:18:56.183Z · http://127.0.0.1:3000
+> 2026-07-28T21:25:54.783Z · https://ideal-victory-staging.up.railway.app
 
 ## Totals
 PASS 5 / FAIL 1 / flows 6

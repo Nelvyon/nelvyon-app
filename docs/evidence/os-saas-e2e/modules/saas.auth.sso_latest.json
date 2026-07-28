@@ -1,8 +1,8 @@
 {
   "module": "saas.auth.sso",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-17T11:19:21.426Z",
-  "baseUrl": "http://127.0.0.1:3000",
+  "timestamp": "2026-07-28T21:26:31.884Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 1,
     "fail": 1,
@@ -13,17 +13,17 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 123,
-      "at": "2026-07-17T11:19:21.425Z"
+      "ms": 260,
+      "at": "2026-07-28T21:26:31.884Z"
     },
     {
       "flow": "external.dependency",
       "ok": false,
       "error": "External IdP (SAML/OIDC) not configured in cert env",
-      "at": "2026-07-17T11:19:21.425Z"
+      "at": "2026-07-28T21:26:31.884Z"
     }
   ],
-  "hash": "e86f36a86919db1a",
+  "hash": "61c6d21f98729fc0",
   "decision": "BLOCKED_EXTERNAL",
   "forceBlockedExternal": true,
   "blocker": "External IdP (SAML/OIDC) not configured in cert env"
