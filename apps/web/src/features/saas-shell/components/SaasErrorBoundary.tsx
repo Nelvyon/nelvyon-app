@@ -10,24 +10,21 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  message: string;
 }
 
 /**
  * Error boundary for SaaS sections. Catches render errors and displays
  * a recovery UI instead of crashing the whole app.
+ * Never surfaces raw exception messages (may leak internals).
  */
 export class SaasErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, message: "" };
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: unknown): State {
-    return {
-      hasError: true,
-      message: error instanceof Error ? error.message : String(error),
-    };
+  static getDerivedStateFromError(): State {
+    return { hasError: true };
   }
 
   override componentDidCatch(error: unknown, info: { componentStack: string }) {
@@ -42,15 +39,15 @@ export class SaasErrorBoundary extends Component<Props, State> {
           role="alert"
           className="rounded-xl border border-red-500/20 bg-red-500/5 p-6 text-center"
         >
-          <p className="text-2xl mb-2">⚠️</p>
           <p className="text-sm font-semibold text-red-400">
             {this.props.section ? `Error en ${this.props.section}` : "Ha ocurrido un error"}
           </p>
-          <p className="mt-1 text-xs text-red-400/70 font-mono max-w-xs mx-auto truncate">
-            {this.state.message}
+          <p className="mt-1 text-xs text-red-400/70 max-w-sm mx-auto">
+            Algo ha fallado al mostrar esta sección. Puedes reintentar sin recargar toda la app.
           </p>
           <button
-            onClick={() => this.setState({ hasError: false, message: "" })}
+            type="button"
+            onClick={() => this.setState({ hasError: false })}
             className="mt-4 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors"
           >
             Reintentar

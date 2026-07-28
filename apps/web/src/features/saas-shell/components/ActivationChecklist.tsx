@@ -27,15 +27,49 @@ export function ActivationChecklist({ onDismiss }: { onDismiss?: () => void }) {
   const [dismissed, setDismissed] = useState(false);
   const [packLoading, setPackLoading] = useState(false);
   const [packDone, setPackDone] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
-    fetch("/api/saas/activation")
-      .then(r => r.json())
-      .then((d: { steps?: Steps }) => { if (d.steps) setSteps(d.steps); })
-      .catch(() => {});
-  }, []);
+    let cancelled = false;
+    setLoadError(false);
+    fetch("/api/saas/activation", { credentials: "same-origin", cache: "no-store" })
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<{ steps?: Steps; error?: string }>;
+      })
+      .then((d) => {
+        if (cancelled) return;
+        if (d.steps) setSteps(d.steps);
+        else setLoadError(true);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [retryTick]);
 
-  if (dismissed || !steps) return null;
+  if (dismissed) return null;
+
+  if (loadError && !steps) {
+    return (
+      <NelvyonDsCard className="p-5 border-amber-500/30 bg-amber-500/5">
+        <p className="text-sm font-semibold text-foreground">No se pudo cargar la guía de activación</p>
+        <p className="mt-1 text-xs text-muted-foreground">Revisa tu sesión o reintenta en unos segundos.</p>
+        <button
+          type="button"
+          onClick={() => setRetryTick((n) => n + 1)}
+          className="mt-3 rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-200 hover:bg-amber-500/20"
+        >
+          Reintentar
+        </button>
+      </NelvyonDsCard>
+    );
+  }
+
+  if (!steps) return null;
 
   const done = Object.values(steps).filter(Boolean).length;
   const total = CHECKLIST.length;
