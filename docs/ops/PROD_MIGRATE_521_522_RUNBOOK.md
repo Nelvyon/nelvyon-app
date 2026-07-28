@@ -1,164 +1,143 @@
 # Runbook — Prod migrate 521–522 + deploy tip (NO ejecutar sin CEO SÍ)
 
-> **Fecha:** 2026-07-28 · tip código `ebfed0c1`  
-> **claimReady: false** · canary **KILL ON**  
-> **Estado probe prod (READ-ONLY):** 521/522 **AUSENTES** · cols enrollment tracking **AUSENTES** · CHECK sin `score_threshold` · volumen enrollments/sequences/workflows = **0** · filas incompatibles `score_threshold` = **0**
+> **Actualizado:** 2026-07-29 · tip repo **`3a7318ac`** · **claimReady: false** · canary **KILL ON**  
+> **Probe prod READ-ONLY (2026-07-28):** 521/522 **AUSENTES** · cols tracking **AUSENTES** · CHECK **sin** `score_threshold` · enrollments/sequences/workflows = **0** · filas incompatibles = **0**  
+> **Staging:** 521+522 **aplicadas y reconfirmadas** · workflows/sequences smokes **PASS**  
+> **Prod live deploy:** último **SUCCESS** `77d9b5f8` (2026-07-27); auto-deploys recientes tip nuevo **FAILED/SKIPPED** (ventana schema gap **evitada** por ahora)
 
 ## Orden seguro (obligatorio)
 
 ```
-1) MIGRATE 521 → validate
-2) MIGRATE 522 → validate
-3) DEPLOY tip ebfed0c1 (o confirmar deploy ya live)
-4) Health + smokes
+1) Backup / snapshot
+2) CEO SÍ + ADR-064 approval env
+3) MIGRATE 521 → validate
+4) MIGRATE 522 → validate   (mismo migrate:prod aplica ambas pendientes en orden)
+5) DEPLOY tip repo (redeploy --from-source)  — solo tras validar 521+522
+6) Health + smokes workflows/sequences (sin mass-send)
+7) Logs / 5xx + confirmar canary KILL ON
 ```
 
-**No** desplegar tip con SELECT/UPDATE `email_opened`/`email_clicked` **antes** de 521.  
-Si un auto-deploy de `main` ya está BUILDING: **pausar/cancelar** o aplicar 521–522 **antes** de que el release sirva tráfico (ventana de riesgo).
+**No** deploy-first. Tip actual **requiere** cols 521 para sequences; 522 para `score_threshold` create.
 
 ---
 
 ## 1. Preflight (lectura)
 
 ```powershell
-git rev-parse HEAD origin/main   # debe ser ebfed0c1 (o tip autorizado)
+git fetch origin
+git rev-parse HEAD origin/main   # tip autorizado (hoy 3a7318ac)
+
 railway variables -s "@nelvyon/web" -e production --kv |
   Select-String "NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH|NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED|NELVYON_AI_ENABLED"
 # Esperado: KILL=1 · PROD_CANARY=0 · AI=0
 
-# Probe READ-ONLY (usa DATABASE_PUBLIC_URL del servicio Postgres)
+# Probe READ-ONLY (Postgres service PUBLIC URL)
 railway run -s Postgres -e production -- node scripts/tmp-prod-mig-521-522-readonly.mjs
-# Esperado pre-migrate: migs_521_522=[] · cols sin email_* · check_includes_score_threshold=false · volumes 0
+# Pre-migrate: migs=[] · sin email_* · score_threshold=false · volumes ~0
 ```
 
-Confirmar entorno: servicio `@nelvyon/web` · environment **production** · DB service **Postgres**.
+Pendientes en prod (tras 520): **solo** `521_*.sql` y `522_*.sql` (no hay 523+ en repo).
 
 ---
 
 ## 2. Backup / snapshot
 
-Antes de ALTER:
-
 ```powershell
-# Opción A — snapshot Railway volume (UI: Postgres → Volume → Snapshot)  [CEO]
-# Opción B — dump lógico (requiere DATABASE_PUBLIC_URL; no loguear secretos)
-# pg_dump "$DATABASE_PUBLIC_URL" --format=custom --file=nelvyon-prod-pre-521-522.dump
+# A) Railway UI: Postgres → Volume → Snapshot  [CEO]
+# B) pg_dump vía DATABASE_PUBLIC_URL (no loguear secretos)
+# pg_dump "$env:DATABASE_PUBLIC_URL" --format=custom --file=nelvyon-prod-pre-521-522.dump
 ```
 
-Retener dump ≥ 7 días o snapshot Railway.
+Retener ≥ 7 días.
 
 ---
 
-## 3. Confirmación entorno production
+## 3. Confirmación entorno + ADR-064
+
+Escritura CEO: **«SÍ migrar producción 521 y 522»**.
+
+Aprobar apply (temporales; quitar tras éxito):
 
 ```powershell
-railway status -e production -s "@nelvyon/web"
-# Online · url https://nelvyon.com
+# En Railway @nelvyon/web production (o shell one-shot):
+# NELVYON_PROD_MIGRATE_APPROVED=1
+# NELVYON_PROD_MIGRATE_APPROVED_BY=<nombre-ceo>
+# NELVYON_PROD_MIGRATE_COMMIT_SHA=3a7318ac   # opcional pero recomendado
 ```
 
-Escritura verbal CEO: **«SÍ migrar producción 521 y 522»**.
+Sin estas vars, `migrate.ts` / `migrate:prod` **rechazan** apply en production (ADR-064).
 
 ---
 
-## 4. Aplicar 521
+## 4–7. Aplicar y validar 521 luego 522
+
+Comando canónico (aplica **todas** las pendientes en orden lexicográfico → 521 luego 522):
 
 ```powershell
-# Desde monorepo, con DATABASE_URL = prod (PUBLIC o railway run interno en release)
-# Preferido: railway run -s "@nelvyon/web" -e production -- pnpm -C apps/web migrate
-# O aplicar SQL único si el migrator soporta one-file — usar el migrator estándar del repo.
-railway run -s "@nelvyon/web" -e production -- pnpm -C apps/web exec tsx ../../backend/db/migrate.ts
-# (ajustar al entrypoint real de migrate del proyecto si difiere)
+# Usar DATABASE_URL alcanzable (PUBLIC del servicio Postgres, o railway run en red interna).
+# Ejemplo one-shot con URL pública del plugin Postgres (no imprimir la URL):
+railway run -s Postgres -e production -- pwsh -Command '
+  $env:DATABASE_URL = $env:DATABASE_PUBLIC_URL
+  $env:NELVYON_DEPLOY_ENV = "production"
+  $env:NELVYON_PROD_MIGRATE_APPROVED = "1"
+  $env:NELVYON_PROD_MIGRATE_APPROVED_BY = "<CEO>"
+  $env:NELVYON_PROD_MIGRATE_COMMIT_SHA = "3a7318ac"
+  pnpm -C apps/web migrate:prod
+'
 ```
 
-SQL (referencia; el migrator aplica el archivo):
+Alternativa equivalente: `pnpm -C apps/web migrate` con el mismo gate/env (entrypoint `backend/db/migrate.ts`).
 
-```sql
--- 521_saas_sequence_enrollment_tracking.sql
-ALTER TABLE saas_sequence_enrollments
-  ADD COLUMN IF NOT EXISTS email_opened BOOLEAN NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS email_clicked BOOLEAN NOT NULL DEFAULT false;
-```
-
----
-
-## 5. Validar 521
+### Validar 521
 
 ```sql
 SELECT name, executed_at FROM _migrations WHERE name LIKE '521%';
 SELECT column_name FROM information_schema.columns
  WHERE table_name='saas_sequence_enrollments'
    AND column_name IN ('email_opened','email_clicked');
--- Esperado: 2 columnas + fila en _migrations
+-- Esperado: 2 columnas + fila _migrations
 ```
 
----
-
-## 6. Aplicar 522
-
-Mismo migrator (siguiente archivo):
-
-```sql
--- 522 — DROP+ADD CHECK incluyendo score_threshold (ver archivo en repo)
-```
-
----
-
-## 7. Validar 522
+### Validar 522
 
 ```sql
 SELECT name FROM _migrations WHERE name LIKE '522%';
-SELECT pg_get_constraintdef(oid)
-  FROM pg_constraint
+SELECT pg_get_constraintdef(oid) FROM pg_constraint
  WHERE conname='saas_workflows_trigger_type_check';
 -- Debe incluir score_threshold
-SELECT count(*) FROM saas_workflows WHERE trigger_type='score_threshold';
--- Debe ser 0 o filas válidas post-CHECK
+SELECT count(*) FROM saas_workflows WHERE trigger_type='score_threshold'; -- 0 OK
 ```
+
+Re-probe: `railway run -s Postgres -e production -- node scripts/tmp-prod-mig-521-522-readonly.mjs`
 
 ---
 
-## 8. Deploy production
+## 8. Deploy production (solo tras migrate OK)
 
 ```powershell
-# Solo tras 521+522 validados
 railway redeploy -s "@nelvyon/web" -e production --from-source -y
-# o dejar que el deploy pendiente termine SI migrate ya aplicado
 ```
+
+Quitar vars de aprobación ADR-064 tras migrate exitoso (evitar applies accidentales).
 
 ---
 
-## 9. Health checks
+## 9–12. Health / smokes / logs
 
 ```powershell
 Invoke-WebRequest https://nelvyon.com/api/health -UseBasicParsing
-# 200 status=ok
-```
-
----
-
-## 10–11. Smoke workflows / sequences (prod, sin mass-send)
-
-```powershell
 $env:CERT_BASE_URL="https://nelvyon.com"
-node scripts/reval-workflows-staging.mjs   # apunta a CERT_BASE_URL
+node scripts/reval-workflows-staging.mjs
 node scripts/smoke-sequences-staging.mjs
-# wf.create score_threshold → 201; seq.create_draft → 201; sin envío SES masivo
-```
-
----
-
-## 12. Logs / 5xx
-
-```powershell
 railway logs -s "@nelvyon/web" -e production
-# Buscar 5xx / SCHEMA_MISMATCH / relation does not exist
+# Sin mass-send · buscar 5xx / SCHEMA_MISMATCH
 ```
 
 ---
 
 ## 13. Rollback exacto
 
-### 522 (CHECK)
+### 522 → CHECK previo (sin score_threshold)
 
 ```sql
 BEGIN;
@@ -170,32 +149,23 @@ ALTER TABLE saas_workflows ADD CONSTRAINT saas_workflows_trigger_type_check
     'email_opened','email_clicked','webhook_in','date_reached',
     'sequence_enrolled','review_received'
   ));
--- Opcional: DELETE FROM _migrations WHERE name='522_saas_workflows_score_threshold_trigger.sql';
 COMMIT;
 ```
 
-### 521 (columnas)
+### 521 → DROP columnas
 
 ```sql
 BEGIN;
 ALTER TABLE saas_sequence_enrollments DROP COLUMN IF EXISTS email_clicked;
 ALTER TABLE saas_sequence_enrollments DROP COLUMN IF EXISTS email_opened;
--- Opcional: DELETE FROM _migrations WHERE name='521_saas_sequence_enrollment_tracking.sql';
 COMMIT;
 ```
 
-**Atención:** si el tip desplegado **lee** esas columnas, rollback 521 **sin** rollback de código provoca 500 en sequences. Orden rollback: **redeploy tip pre-521** → luego DROP columnas → (opcional) revert CHECK.
-
-### Deploy
-
-```powershell
-railway redeploy -s "@nelvyon/web" -e production --yes
-# o redeploy deployment ID conocido pre-cambio
-```
+Si el tip **nuevo** ya está live: **rollback código primero** (redeploy tip pre-521), luego DROP columnas.
 
 ---
 
-## 14. Canary KILL ON (confirmar, no abrir)
+## 14. Canary KILL ON (no abrir)
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1
@@ -207,13 +177,22 @@ AUTONOMOUS_ALLOW_OPENAI=0
 
 ---
 
-## Riesgos (datos reales 2026-07-28)
+## Compatibilidad post-migrate
 
-| Mig | Volumen | Filas incompatibles | Lock | Duración estimada |
-|-----|---------|---------------------|------|-------------------|
-| 521 | 0 enrollments (~40 KB) | N/A | breve ACCESS EXCLUSIVE posible | **&lt; 1 s** |
-| 522 | 0 workflows (~32 KB) | **0** `score_threshold` | ACCESS EXCLUSIVE CHECK | **&lt; 1 s** |
+| Superficie | Tras 521+522 |
+|------------|--------------|
+| Sequences SELECT/INSERT tracking | OK |
+| Track open/click UPDATE | OK |
+| Workflows `score_threshold` create | OK (201) |
+| Resto triggers / CRM | Sin cambio de contrato |
 
-## Prohibido en este runbook
+## Riesgos (datos reales)
 
-Mass-send · canary ON · OAuth/Twilio/Ads/payouts · claimReady true · costes nuevos.
+| Mig | Volumen | Incompatibles | Lock | Duración |
+|-----|---------|---------------|------|----------|
+| 521 | 0 rows | N/A | breve | **&lt;1 s** |
+| 522 | 0 rows | **0** | ACCESS EXCLUSIVE CHECK | **&lt;1 s** |
+
+## Prohibido
+
+Mass-send · canary ON · OAuth/Twilio/Ads/payouts · claimReady true · costes · migrate/deploy sin SÍ CEO.
