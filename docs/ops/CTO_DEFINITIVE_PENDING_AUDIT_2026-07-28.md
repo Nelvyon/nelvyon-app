@@ -1,8 +1,8 @@
 # CTO — Auditoría definitiva de pendientes (v2 post Cursor-0€)
 
-> **Fecha:** 2026-07-28 · **Versión:** 2 (Cursor 0€ vaciado)  
+> **Fecha:** 2026-07-28 · **Versión:** 2 (Cursor 0€ vaciado) · tip **`05791f3b`** / docs tip **`4d810d3b`**  
 > **SSOT:** este archivo (no re-auditar desde cero sin cambio material)  
-> **claimReady: false** · **NOT READY** · tip: ver HANDOVER tras commits Cursor-0€  
+> **claimReady: false** · **NOT READY**  
 > **Regla:** solo pendientes reales · no % inventados
 
 ---
