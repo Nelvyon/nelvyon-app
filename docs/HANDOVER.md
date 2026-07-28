@@ -5,7 +5,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Tip remoto** | *(actualizar tras push de fix Vitest 0 FAIL)* |
+| **Tip remoto** | `70b927aa` (Vitest monorepo **0 FAIL**) |
 | **Staging deploy** | `073949a1` SUCCESS · live `git_sha=b236bba0e12d` (**sin redeploy**: solo tests/vitest.setup) |
 | **Ops SSOT** | `docs/ops/OPERATIONS_INDEX.md` |
 | **SAFE_TO_MIGRATE_PROD** | **true** (técnico; solo SÍ CEO) |
