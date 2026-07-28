@@ -88,7 +88,7 @@
 | **ADR-066 Puntos 1–4 prep batch** | ✅ | Prep cerrada 2026-07-26 · tip `43d7c3db` |
 | **ADR-067 CEO 1 SÍ / 2–4 NO** | ✅ | Gate política **CEO-ACK** · #2–#4 supersedidos por ADR-068 · **NOT READY** |
 | **ADR-068 CEO close 2–4 sin coste** | ✅ | Dual-write+RAG staging VERIFIED · canary authorized/not live (mesh) · **NOT READY** |
-| **ADR-070/071 cierre técnico v3** | 🟡 | Staging 521+522 applied · workflows CERTIFIED · prod migrate **CEO** · **NOT READY** |
+| **ADR-072/073 cierre técnico v3** | 🟡 | Staging 521+522 applied · workflows CERTIFIED · prod migrate **CEO** · **NOT READY** |
 | **CEO master actions** | 🟡 | `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` — solo humano |
 | **TOTAL QUALITY 2026-07-25** | ✅ | Gates PASS · 0 code P0 residual · **NOT READY** (legal/CEO/external) |
 | Block 11 telephony_core | ✅ | **VERIFIED** (sim) · real calls BLOCKED_EXTERNAL |

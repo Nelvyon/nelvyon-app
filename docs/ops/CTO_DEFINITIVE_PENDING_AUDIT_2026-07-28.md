@@ -18,7 +18,7 @@
 | Playwright Chromium | Installed + `saas-secuencias.spec.ts` | **5 passed** | **CLOSED_LOCAL** |
 | Honesty HTTP staging | workflows/sequences/campanias/invoices/documents/analytics/funnels | `saas.honesty.staging_reval_latest.json` 12/12 | **CLOSED_STAGING** |
 | SES preflight | Staging keys SET · region `us-east-1`; prod `eu-west-1` · **no mass send** | Railway vars (no secrets) | **PARTIAL** |
-| Comunidades replies | Kept honest-disabled — no `parent_post_id` | UI + ADR-071 | **DEFERRED_PRODUCT** |
+| Comunidades replies | Kept honest-disabled — no `parent_post_id` | UI + ADR-073 | **DEFERRED_PRODUCT** |
 | Mig 521/522 **prod** | **Not applied** — ADR-064 CEO gate | — | **BLOCKED_CEO** |
 | Push tip | Deferred until CEO review | ahead local | **NO_PUSH** |
 
