@@ -435,6 +435,7 @@ export {
   SaasCrmError,
   getSaasCrmService,
   resetSaasCrmServiceForTests,
+  SAAS_CONTACTS_HARD_MAX,
   type SaasContact,
   type ContactActivity,
   type PipelineSummary,
@@ -703,6 +704,7 @@ export {
 } from "./saasPlanLimits";
 export {
   assertSaasPlanCanCreate,
+  assertSaasPlanCanCreateMany,
   getSaasResourceUsage,
   getSaasTenantPlan,
 } from "./saasPlanQuota";
@@ -716,8 +718,15 @@ export {
   saasErrorStatus,
   saasErrorBody,
   isPgMissingRelation,
+  requestIdFrom,
+  SaasControlPlaneError,
   type SaasRequestContext,
+  type SaasErrorBody,
 } from "./saasRequestContext";
+export {
+  claimWebhookInIdempotency,
+  resetWebhookInIdempotencyForTests,
+} from "./webhookInIdempotency";
 export {
   buildSaasBillingSummary,
   buildSaasSettingsSummary,

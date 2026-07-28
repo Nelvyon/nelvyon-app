@@ -148,7 +148,7 @@ async function getMetrics(tenantId: string) {
 /** GET /api/saas/reports/[reportId]/pdf → returns real PDF binary */
 export async function GET(req: Request, context: RouteContext) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "reports.generate");
     const { reportId } = await context.params;
     if (!reportId?.trim()) return NextResponse.json({ error: "reportId required" }, { status: 400 });
 

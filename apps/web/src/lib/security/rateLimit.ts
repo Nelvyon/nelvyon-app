@@ -68,6 +68,36 @@ const RULES: RateLimitRule[] = [
     limit: 15,
     windowSec: 60,
   },
+  {
+    id: "saas-crm-export",
+    match: (p) => p === "/api/saas/crm/contacts/export" || p === "/api/saas/crm/contacts/import",
+    limit: 10,
+    windowSec: 60,
+  },
+  {
+    id: "saas-gdpr",
+    match: (p) => p.startsWith("/api/saas/compliance/gdpr"),
+    limit: 10,
+    windowSec: 60,
+  },
+  {
+    id: "saas-campania-launch",
+    match: (p) => /^\/api\/saas\/campanias\/[^/]+\/launch$/.test(p),
+    limit: 5,
+    windowSec: 60,
+  },
+  {
+    id: "saas-webhook-in",
+    match: (p) => p === "/api/saas/workflows/webhook-in",
+    limit: 60,
+    windowSec: 60,
+  },
+  {
+    id: "saas-audit",
+    match: (p) => p.startsWith("/api/saas/audit"),
+    limit: 30,
+    windowSec: 60,
+  },
 ];
 
 export function getRateLimitRule(pathname: string): RateLimitRule | null {

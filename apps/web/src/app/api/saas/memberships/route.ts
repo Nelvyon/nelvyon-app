@@ -51,7 +51,7 @@ export async function GET(req: Request) {
 /** POST /api/saas/memberships — create plan or subscribe member */
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "contacts.write");
     const body = (await req.json()) as Record<string, unknown>;
     const action = String(body.action ?? "create_plan");
     const svc = getSaasMembershipService();

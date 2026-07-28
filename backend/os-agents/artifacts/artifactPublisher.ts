@@ -106,8 +106,32 @@ export function getArtifactStorageRoot(kind: OsArtifactKind): string {
   return path.join(process.cwd(), ".data", meta.defaultDir);
 }
 
+/** Path segments for on-disk artifacts — reject traversal / separators. */
+const SAFE_ARTIFACT_SEGMENT = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/;
+
+export function assertSafeArtifactSegment(segment: string, label: string): string {
+  const s = String(segment ?? "").trim();
+  if (!SAFE_ARTIFACT_SEGMENT.test(s)) {
+    throw new Error(`Invalid ${label}`);
+  }
+  return s;
+}
+
+/**
+ * Resolve bundle.zip under tenant/job dirs with containment check.
+ * Prevents `../` path traversal across tenants or outside the artifact root.
+ */
 export function resolveArtifactZipPath(clientId: string, jobId: string, kind: OsArtifactKind): string {
-  return path.join(getArtifactStorageRoot(kind), clientId, jobId, "bundle.zip");
+  const safeClient = assertSafeArtifactSegment(clientId, "clientId");
+  const safeJob = assertSafeArtifactSegment(jobId, "jobId");
+  const root = path.resolve(getArtifactStorageRoot(kind));
+  const tenantRoot = path.resolve(root, safeClient);
+  const resolved = path.resolve(tenantRoot, safeJob, "bundle.zip");
+  const prefix = tenantRoot.endsWith(path.sep) ? tenantRoot : tenantRoot + path.sep;
+  if (resolved !== tenantRoot && !resolved.startsWith(prefix)) {
+    throw new Error("Invalid artifact path");
+  }
+  return resolved;
 }
 
 export function buildArtifactDownloadUrl(kind: OsArtifactKind, jobId: string): string {
@@ -140,9 +164,8 @@ export async function writeArtifactZipFile(
   jobId: string,
   zipBytes: Uint8Array,
 ): Promise<string> {
-  const dir = path.join(getArtifactStorageRoot(kind), clientId, jobId);
-  await mkdir(dir, { recursive: true });
-  const filePath = path.join(dir, "bundle.zip");
+  const filePath = resolveArtifactZipPath(clientId, jobId, kind);
+  await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, Buffer.from(zipBytes));
   return filePath;
 }

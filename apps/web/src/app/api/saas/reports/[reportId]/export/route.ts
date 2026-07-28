@@ -12,7 +12,7 @@ type RouteContext = { params: Promise<{ reportId: string }> };
 
 export async function GET(req: Request, context: RouteContext) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "reports.generate");
     const { reportId } = await context.params;
     if (!reportId?.trim()) {
       return NextResponse.json({ error: "reportId requerido" }, { status: 400 });
@@ -30,7 +30,10 @@ export async function GET(req: Request, context: RouteContext) {
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    if (message.includes("ENOENT")) {
+    if (/Invalid (clientId|jobId|artifact path)/i.test(message)) {
+      return NextResponse.json({ error: "Identificador de informe inválido" }, { status: 400 });
+    }
+    if (message.includes("ENOENT") || (err as NodeJS.ErrnoException)?.code === "ENOENT") {
       return NextResponse.json({ error: "Informe no encontrado" }, { status: 404 });
     }
     return NextResponse.json(saasErrorBody(err), { status: saasErrorStatus(err) });

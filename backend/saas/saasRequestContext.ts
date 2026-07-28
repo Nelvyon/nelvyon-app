@@ -121,11 +121,12 @@ export async function requireSaasContext(req: Request, action: SaasAction): Prom
     if (isPgMissingRelation(e)) {
       /* migration 482 optional — default role RBAC */
     } else {
-      saasCtxLog.warn("custom permissions lookup failed — falling back to role RBAC", {
+      saasCtxLog.warn("custom permissions lookup failed — fail-closed", {
         tenantId: tenant.id,
         operation: "getCustomPermissions",
         error: e instanceof Error ? e.message : String(e),
       });
+      throw new SaasControlPlaneError("Security controls temporarily unavailable");
     }
   }
   if (customPerms && !customPerms.includes(action)) {
@@ -144,15 +145,25 @@ export async function requireSaasContext(req: Request, action: SaasAction): Prom
     if (isPgMissingRelation(e)) {
       /* missing saas_tenant_ip_allowlist — skip until migrate 482 */
     } else {
-      saasCtxLog.warn("IP allowlist lookup failed — skipping check", {
+      saasCtxLog.warn("IP allowlist lookup failed — fail-closed", {
         tenantId: tenant.id,
         operation: "getIpAllowlist",
         error: e instanceof Error ? e.message : String(e),
       });
+      throw new SaasControlPlaneError("Security controls temporarily unavailable");
     }
   }
 
   return { claims, tenant, role };
+}
+
+/** Transient failure reading enterprise security controls (allowlist / custom ACLs). */
+export class SaasControlPlaneError extends Error {
+  readonly code = "SECURITY_UNAVAILABLE" as const;
+  constructor(message = "Security controls temporarily unavailable") {
+    super(message);
+    this.name = "SaasControlPlaneError";
+  }
 }
 
 export function saasErrorStatus(e: unknown): number {
@@ -161,40 +172,59 @@ export function saasErrorStatus(e: unknown): number {
     return e.code === "NOT_FOUND" ? 404 : 403;
   }
   if (e instanceof SaasPlanQuotaError) return 403;
+  if (e instanceof SaasControlPlaneError) return 503;
   if (e instanceof OsAgentError && e.message === "Unauthorized") return 401;
   if (e instanceof Error && /PRIVATE_AI_CANARY_BLOCKED/i.test(e.message)) return 403;
   if (isPgMissingRelation(e)) return 503;
   return 500;
 }
 
-export function saasErrorBody(e: unknown): { error: string; code?: string } {
+export type SaasErrorBody = { error: string; code?: string; requestId?: string };
+
+export function saasErrorBody(
+  e: unknown,
+  opts?: { requestId?: string | null },
+): SaasErrorBody {
+  const requestId = opts?.requestId?.trim() || undefined;
+  const withId = (body: SaasErrorBody): SaasErrorBody =>
+    requestId ? { ...body, requestId } : body;
+
   if (e instanceof SaasRbacError) {
-    return { error: e.message, code: e.code };
+    return withId({ error: e.message, code: e.code });
   }
   if (e instanceof SaasPlanQuotaError) {
-    return { error: e.message, code: "PLAN_LIMIT" };
+    return withId({ error: e.message, code: "PLAN_LIMIT" });
+  }
+  if (e instanceof SaasControlPlaneError) {
+    return withId({ error: e.message, code: e.code });
   }
   if (e instanceof OsAgentError && e.message === "Unauthorized") {
-    return { error: "Unauthorized" };
+    return withId({ error: "Unauthorized" });
   }
   // Canary/kill gates are intentional fail-closed — never hide as opaque 500.
   if (e instanceof Error && /PRIVATE_AI_CANARY_BLOCKED/i.test(e.message)) {
     console.error("[saasErrorBody]", e.message);
-    return { error: e.message, code: "PRIVATE_AI_CANARY_BLOCKED" };
+    return withId({ error: e.message, code: "PRIVATE_AI_CANARY_BLOCKED" });
   }
   // Schema drift (missing table/column) — fail-closed without leaking relation names.
   if (isPgMissingRelation(e)) {
     console.error("[saasErrorBody]", e instanceof Error ? e.message : String(e));
-    return {
+    return withId({
       error: "Database schema incomplete — apply pending migrations",
       code: "SCHEMA_MISMATCH",
-    };
+    });
   }
   // Do not leak driver/SQL internals to API clients.
   if (e instanceof Error) {
     console.error("[saasErrorBody]", e.message);
   }
-  return { error: "Internal error" };
+  return withId({ error: "Internal error" });
+}
+
+/** Prefer middleware `x-request-id` for client↔log correlation. */
+export function requestIdFrom(req: Request): string | undefined {
+  const h = req.headers.get("x-request-id")?.trim();
+  return h || undefined;
 }
 
 /** Postgres 42P01 — table/column not migrated yet. */

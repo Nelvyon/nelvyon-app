@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, beforeEach, vi } from "vitest";
 import { isPgMissingRelation, saasErrorBody, saasErrorStatus } from "../saasRequestContext";
 import { SaasRbacError } from "../saasRbac";
 
@@ -44,8 +44,16 @@ vi.mock("../db/DbClient", () => ({
   },
 }));
 
-import { requireSaasContext, saasErrorBody } from "../saasRequestContext";
+import {
+  requireSaasContext,
+  SaasControlPlaneError,
+  requestIdFrom,
+} from "../saasRequestContext";
 import { SaasSecurityEnterpriseError } from "../SaasSecurityEnterpriseService";
+import {
+  claimWebhookInIdempotency,
+  resetWebhookInIdempotencyForTests,
+} from "../webhookInIdempotency";
 
 describe("isPgMissingRelation", () => {
   it("detects postgres missing relation code", () => {
@@ -88,13 +96,49 @@ describe("saasErrorBody", () => {
       code: "PRIVATE_AI_CANARY_BLOCKED",
     });
   });
+
+  it("attaches requestId when provided", () => {
+    expect(saasErrorBody(new SaasRbacError("Forbidden", "FORBIDDEN"), { requestId: "req-abc" })).toEqual({
+      error: "Forbidden",
+      code: "FORBIDDEN",
+      requestId: "req-abc",
+    });
+  });
+
+  it("maps SaasControlPlaneError to 503 SECURITY_UNAVAILABLE", () => {
+    const err = new SaasControlPlaneError();
+    expect(saasErrorStatus(err)).toBe(503);
+    expect(saasErrorBody(err)).toEqual({
+      error: "Security controls temporarily unavailable",
+      code: "SECURITY_UNAVAILABLE",
+    });
+  });
+});
+
+describe("requestIdFrom", () => {
+  it("reads x-request-id header", () => {
+    const req = new Request("http://localhost", { headers: { "x-request-id": " rid-1 " } });
+    expect(requestIdFrom(req)).toBe("rid-1");
+  });
 });
 
 describe("requireSaasContext enterprise guards", () => {
-  it("falls back to role RBAC when custom permissions lookup fails transiently", async () => {
-    getCustomPermissions.mockRejectedValueOnce(new Error("db connection lost"));
-    getIpAllowlist.mockResolvedValue({ enabled: false, cidrs: [] });
+  beforeEach(() => {
+    getCustomPermissions.mockReset();
+    getIpAllowlist.mockReset();
+    assertIpAllowed.mockReset();
+  });
 
+  it("fail-closes when custom permissions lookup fails transiently", async () => {
+    getCustomPermissions.mockRejectedValueOnce(new Error("db connection lost"));
+    await expect(
+      requireSaasContext(new Request("http://localhost"), "contacts.read"),
+    ).rejects.toBeInstanceOf(SaasControlPlaneError);
+  });
+
+  it("still uses role RBAC when custom permissions table is missing", async () => {
+    getCustomPermissions.mockRejectedValueOnce({ code: "42P01" });
+    getIpAllowlist.mockResolvedValue({ enabled: false, cidrs: [] });
     const ctx = await requireSaasContext(new Request("http://localhost"), "contacts.read");
     expect(ctx.tenant.id).toBe("tenant-1");
     expect(ctx.role).toBe("owner");
@@ -110,5 +154,25 @@ describe("requireSaasContext enterprise guards", () => {
     await expect(
       requireSaasContext(new Request("http://localhost"), "contacts.read"),
     ).rejects.toBeInstanceOf(SaasRbacError);
+  });
+
+  it("fail-closes when IP allowlist lookup fails transiently", async () => {
+    getCustomPermissions.mockResolvedValue(null);
+    getIpAllowlist.mockRejectedValueOnce(new Error("ECONNRESET"));
+    await expect(
+      requireSaasContext(new Request("http://localhost"), "contacts.read"),
+    ).rejects.toBeInstanceOf(SaasControlPlaneError);
+  });
+});
+
+describe("webhookInIdempotency", () => {
+  beforeEach(() => resetWebhookInIdempotencyForTests());
+
+  it("claims first key and detects duplicates", () => {
+    expect(claimWebhookInIdempotency("t1", "stripe", "k1")).toBeNull();
+    const prior = claimWebhookInIdempotency("t1", "stripe", "k1");
+    expect(typeof prior).toBe("string");
+    expect(claimWebhookInIdempotency("t1", "stripe", "k2")).toBeNull();
+    expect(claimWebhookInIdempotency("t2", "stripe", "k1")).toBeNull();
   });
 });

@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 /** Genera informe ZIP del dashboard con métricas reales del cliente y devuelve URL de descarga. */
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "reports.generate");
 
     const report = await getSaasDashboardReportService().generateAndPublish(
       ctx.claims.userId,

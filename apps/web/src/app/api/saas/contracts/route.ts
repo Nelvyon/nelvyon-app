@@ -1,9 +1,27 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getSaasCpqEnterpriseService, SaasCpqEnterpriseError, requireSaasContext } from "@nelvyon/saas";
+import {
+  getSaasCpqEnterpriseService,
+  SaasCpqEnterpriseError,
+  requireSaasContext,
+  requestIdFrom,
+  saasErrorBody,
+  saasErrorStatus,
+} from "@nelvyon/saas";
 import type { CpqContractStatus } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+function jsonErr(req: NextRequest, e: unknown) {
+  const requestId = requestIdFrom(req);
+  if (e instanceof SaasCpqEnterpriseError) {
+    return NextResponse.json(
+      { error: e.message, code: e.code, ...(requestId ? { requestId } : {}) },
+      { status: 400 },
+    );
+  }
+  return NextResponse.json(saasErrorBody(e, { requestId }), { status: saasErrorStatus(e) });
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,16 +32,13 @@ export async function GET(req: NextRequest) {
     const contracts = await svc.listContracts(ctx.tenant.id, status ?? undefined);
     return NextResponse.json({ contracts });
   } catch (e) {
-    if (e instanceof SaasCpqEnterpriseError) return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
-    if ((e as { status?: number }).status === 401) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    console.error("[contracts GET]", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return jsonErr(req, e);
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "contacts.write");
     const body = await req.json() as Record<string, unknown>;
     const svc = getSaasCpqEnterpriseService();
 
@@ -35,9 +50,6 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ contract }, { status: 201 });
   } catch (e) {
-    if (e instanceof SaasCpqEnterpriseError) return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
-    if ((e as { status?: number }).status === 401) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    console.error("[contracts POST]", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    return jsonErr(req, e);
   }
 }

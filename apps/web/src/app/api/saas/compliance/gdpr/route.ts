@@ -11,12 +11,14 @@ import {
 
 export async function GET(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "settings.read");
     const url = new URL(req.url);
     if (url.searchParams.get("scope") === "tenant") {
+      // Full-tenant PII bundle — audit-grade privilege (owner/admin only).
+      const ctx = await requireSaasContext(req, "audit.read");
       const bundle = await saasGdprService.exportTenantBundle(ctx.tenant.id);
       return NextResponse.json(bundle);
     }
+    const ctx = await requireSaasContext(req, "settings.read");
     const data = await saasGdprService.exportUserData(ctx.claims.userId, ctx.tenant.id);
     const requests = await saasGdprService.getRequests(ctx.claims.userId);
     return NextResponse.json({ data, requests });
