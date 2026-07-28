@@ -11,7 +11,7 @@
 | Monorepo pnpm + workspaces | ✅ | |
 | Next.js 15 apps/web producción | ✅ | |
 | FastAPI backend Python | ✅ | Puerto 8000 |
-| Postgres + migraciones SQL | ✅ | Última repo: **518** (`518_workflows_list_columns.sql`) · SSOT SQL+ADR-039 · 517/518 prod verified |
+| Postgres + migraciones SQL | ✅ | Última repo: **522** (`522_saas_workflows_score_threshold_trigger.sql`) · 521/522 staging applied · prod **CEO gate** |
 | Railway deploy + releaseCommand migrate | ✅ | `apps/web/railway.json` |
 | Auth JWT SaaS cookies | ✅ | |
 | SaasShellLayout 41 páginas | ✅ | Jun 2026 |

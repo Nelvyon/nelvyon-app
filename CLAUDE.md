@@ -105,7 +105,7 @@ Sin `SES_FROM_EMAIL` + `SES_ACCESS_KEY_ID`, la UI muestra un banner de advertenc
 ## Migraciones de base de datos
 
 Archivos en `backend/db/migrations/`. Ejecutar en orden numérico.  
-**Última migración en repo:** `518_workflows_list_columns.sql`.
+**Última migración en repo:** `522_saas_workflows_score_threshold_trigger.sql`.
 **Documentación viva:** `docs/DATABASE.md`, `docs/HANDOVER.md`  
 Railway `releaseCommand` aplica todas en deploy.
 

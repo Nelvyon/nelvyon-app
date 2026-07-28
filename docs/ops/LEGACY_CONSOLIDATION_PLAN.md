@@ -25,7 +25,7 @@ scope.
 ## 2. Alembic vs SQL — secondary, not SSOT
 
 - **SSOT**: Node SQL migrations in `backend/db/migrations/*.sql`, applied in
-  numeric order (latest in repo: `518_workflows_list_columns.sql`), per
+  numeric order (latest in repo: `522_saas_workflows_score_threshold_trigger.sql`), per
   ADR-002/039. Prod verified `_migrations` tip: 517+518
   (`docs/DATABASE.md`).
 - **Secondary**: `backend/alembic/versions/` (23 versions, Python/FastAPI).

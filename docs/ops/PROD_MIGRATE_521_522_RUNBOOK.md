@@ -1,6 +1,6 @@
 # Runbook — Prod migrate 521–522 + deploy tip (NO ejecutar sin CEO SÍ)
 
-> **Actualizado:** 2026-07-29 · tip repo **`3a7318ac`** · **claimReady: false** · canary **KILL ON**  
+> **Actualizado:** 2026-07-29 · tip repo ver HANDOVER · **claimReady: false** · canary **KILL ON**  
 > **Probe prod READ-ONLY (2026-07-28):** 521/522 **AUSENTES** · cols tracking **AUSENTES** · CHECK **sin** `score_threshold` · enrollments/sequences/workflows = **0** · filas incompatibles = **0**  
 > **Staging:** 521+522 **aplicadas y reconfirmadas** · workflows/sequences smokes **PASS**  
 > **Prod live deploy:** último **SUCCESS** `77d9b5f8` (2026-07-27); auto-deploys recientes tip nuevo **FAILED/SKIPPED** (ventana schema gap **evitada** por ahora)

@@ -28,7 +28,7 @@
 
 | Tema | Doc envejecido | Doc que gana | Valor correcto |
 |------|----------------|--------------|----------------|
-| Última migración | INFRASTRUCTURE “hasta 514” · ROADMAP “511” | HANDOVER / CLAUDE / DATABASE | **`518_workflows_list_columns.sql`** (517/518 prod verified · ADR-002/039) |
+| Última migración | INFRASTRUCTURE / ROADMAP históricos | HANDOVER / CLAUDE / DATABASE | **`522_saas_workflows_score_threshold_trigger.sql`** (521/522 staging · prod CEO) |
 | Shared Memory staging | PROJECT_STATUS “BLOCKED” | HANDOVER + KI-021 | **verified:true** (flags OFF) |
 | verify-all | AUDITORIA previa “NOT_READY KI-027” | HANDOVER / CTO_FINAL_VERIFY 2026-07-21 | **CONDITIONAL_READY** — KI-027 ✅ |
 | Workforce | PROJECT_STATUS “CONDITIONAL” (si aparece) | HANDOVER + ADR-029 | **PASS** |
