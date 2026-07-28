@@ -21,7 +21,8 @@ describe("onboarding", () => {
   it("initOnboarding hace INSERT y UPDATE cuando email ok", async () => {
     queryMock.mockResolvedValue([]);
     await initOnboarding("user-1", "user@example.com", "Test");
-    expect(queryMock).toHaveBeenCalledTimes(2);
+    // INSERT onboarding + resolveUserEmailLocale SELECT + UPDATE welcome_email_sent
+    expect(queryMock).toHaveBeenCalledTimes(3);
   });
 
   it("completeStep actualiza el paso correcto", async () => {

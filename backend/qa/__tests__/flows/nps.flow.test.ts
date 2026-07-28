@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const queryMock = vi.fn();
 const sendEmailMock = vi.fn().mockResolvedValue(undefined);
@@ -54,7 +54,8 @@ describe("flow: NPS — trigger → submit → email agradecimiento", () => {
   it("submitNps score 9 → category promoter y email enviado", async () => {
     queryMock
       .mockResolvedValueOnce([{ id: "nps-1", category: "promoter" }])
-      .mockResolvedValueOnce([{ email: "a@test.com", full_name: "Ana" }]);
+      .mockResolvedValueOnce([{ email: "a@test.com", full_name: "Ana" }])
+      .mockResolvedValueOnce([{ language: "es" }]); // resolveUserEmailLocale
 
     const out = await FeedbackService.instance().submitNps("user-1", 9, "Excelente");
     expect(out.category).toBe("promoter");
@@ -63,6 +64,7 @@ describe("flow: NPS — trigger → submit → email agradecimiento", () => {
     expect(sendEmailMock).toHaveBeenCalledWith(
       "nps_thank_you",
       expect.objectContaining({ email: "a@test.com", score: "9" }),
+      "es",
     );
   });
 

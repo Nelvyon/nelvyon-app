@@ -68,6 +68,21 @@ process.env.JWT_SECRET ??= "super-secret-key-min-32-chars-change-in-production";
 /** Unit tests only — real launch gate stays fail-closed outside NODE_ENV=test/VITEST. */
 process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS ??= "1";
 
+/**
+ * Developer shells often export OLLAMA_HOST / LOCAL_AI URLs (sometimes host-only, no scheme).
+ * That makes isAutonomousOllamaConfigured / isOsOllamaConfigured true and fail-closes unit
+ * pilots that expect the mock LLM path. Dedicated Ollama/OpenAI tests re-set these in beforeEach.
+ */
+for (const key of [
+  "OLLAMA_HOST",
+  "OLLAMA_BASE_URL",
+  "OLLAMA_CONFIGURED",
+  "NELVYON_LOCAL_AI_URL",
+  "LOCAL_AI_BASE_URL",
+] as const) {
+  delete process.env[key];
+}
+
 /** Fire-and-forget usage metering must not hit real DbClient in unit tests. */
 vi.mock("../../backend/saas/SaasUsageMeterService", () => ({
   getSaasUsageMeterService: () => ({

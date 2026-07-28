@@ -7,7 +7,7 @@ vi.mock("../../../db/DbClient", () => ({
   DbClient: { getInstance: () => ({ query: queryMock }) },
 }));
 
-vi.mock("../../../paddle/paddleApi", () => ({
+vi.mock("../../../stripe/stripeApi", () => ({
   cancelSubscriptionImmediately: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -97,7 +97,12 @@ describe("flow: GDPR — export → deletion → audit trail", () => {
       if (s.includes("SELECT email, full_name, tenant_id FROM nelvyon_users")) {
         return Promise.resolve([{ email: "keep@b.com", full_name: "Ana", tenant_id: "t1" }]);
       }
-      if (s.includes("paddle_subscription_id")) return Promise.resolve([]);
+      if (s.includes("stripe_subscription_id") || s.includes("paddle_subscription_id")) {
+        return Promise.resolve([]);
+      }
+      if (s.includes("FROM saas_client_profiles") || s.includes("p.language")) {
+        return Promise.resolve([{ language: "es" }]);
+      }
       return Promise.resolve(undefined);
     });
 
@@ -108,7 +113,11 @@ describe("flow: GDPR — export → deletion → audit trail", () => {
       ([q]) => typeof q === "string" && String(q).includes("deleted_at"),
     );
     expect(updateUser).toBeDefined();
-    expect(sendEmailMock).toHaveBeenCalledWith("account_deleted", expect.objectContaining({ email: "keep@b.com" }));
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      "account_deleted",
+      expect.objectContaining({ email: "keep@b.com" }),
+      "es",
+    );
   });
 
   it("deletion respeta retención legal: no DELETE en subscriptions", async () => {
@@ -117,7 +126,9 @@ describe("flow: GDPR — export → deletion → audit trail", () => {
       if (s.includes("SELECT email, full_name, tenant_id")) {
         return Promise.resolve([{ email: "e@x.com", full_name: "X", tenant_id: "tx" }]);
       }
-      if (s.includes("paddle_subscription_id")) return Promise.resolve([]);
+      if (s.includes("stripe_subscription_id") || s.includes("paddle_subscription_id")) {
+        return Promise.resolve([]);
+      }
       return Promise.resolve(undefined);
     });
 

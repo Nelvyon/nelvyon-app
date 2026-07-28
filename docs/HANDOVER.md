@@ -1,50 +1,42 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-29** — WIP excellence **pushed** tip `b236bba0` · staging deploy `073949a1` SUCCESS · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-29** — **16 FAIL Vitest cerrados** (tests/harness only) · monorepo **0 FAIL** · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Tip remoto** | `b236bba0` |
-| **Staging deploy** | `073949a1` SUCCESS · live `git_sha=b236bba0e12d` |
+| **Tip remoto** | *(actualizar tras push de fix Vitest 0 FAIL)* |
+| **Staging deploy** | `073949a1` SUCCESS · live `git_sha=b236bba0e12d` (**sin redeploy**: solo tests/vitest.setup) |
 | **Ops SSOT** | `docs/ops/OPERATIONS_INDEX.md` |
 | **SAFE_TO_MIGRATE_PROD** | **true** (técnico; solo SÍ CEO) |
 | **SAFE_TO_DEPLOY_PROD** | **false** hasta migrate 521–522 |
 | **claimReady** | **false** |
 | **Canary** | **KILL ON** |
 
-## Cert local (pre-push)
+## Cert local (cierre 16 FAIL)
 
 | Gate | Resultado |
 |------|-----------|
-| tsc / lint | **0** / **0** |
-| Vitest WIP focused | **49 PASS** |
-| Vitest canónico SaaS | **2482 PASS** |
-| Vitest monorepo completo | 6198 PASS · 16 FAIL **preexistentes** (no WIP) |
+| tsc / lint | **PASS** / **PASS** (0 errores) |
+| Vitest monorepo completo | **6214 PASS** · **0 FAIL** · 8 skipped |
+| Vitest canónico SaaS | **2461 PASS** · 4 skipped |
 | build | **PASS** |
 | Playwright secuencias | **5 PASS** |
+| Staging redeploy | **no** — cambios solo tests + `vitest.setup.ts` (limpia env Ollama en Vitest; no altera runtime prod) |
 
-## Staging post-deploy
+## Staging (último deploy excellence)
 
 | Smoke | Resultado |
 |-------|-----------|
 | health live/ready | **200** · sha `b236bba0` · env.ok |
-| workflows | **CERTIFIED 14/14** |
-| sequences | **8/8 PASS** |
-| honesty | **12/12 PASS** |
-| CRM export | **PASS** |
-| CRM import batch | **CERTIFIED** imported=2 |
-| artifact traversal | **400** (rejected) |
-| webhook idempotency | **duplicate:true** on replay |
-| rate limit export | **429** enforced |
-| unauth export/webhook | **401** |
-
-Evidencia: `scripts/docs/evidence/os-saas-e2e/modules/saas.excellence_wip_*_latest.json`
+| workflows / sequences / honesty | **14/14** · **8/8** · **12/12** |
+| CRM export/import · rate-limit · idempotency | **PASS** |
 
 ## Próximo paso EXACTO
 
-1. CEO: SÍ/NO ejecutar `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy).
-2. Sin SÍ: no migrate · no deploy · no canary · no mass-send.
+1. Push tip con cierre Vitest 0 FAIL (si aún no está en remoto).
+2. CEO: SÍ/NO ejecutar `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy).
+3. Sin SÍ: no migrate · no deploy · no canary · no mass-send.
 
 ### Rollback IA
 

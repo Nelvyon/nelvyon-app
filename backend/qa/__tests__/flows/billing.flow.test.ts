@@ -117,7 +117,11 @@ describe("flow: billing — suscripción → webhook Stripe → dunning → canc
     expect(upsert![1]).toEqual(
       expect.arrayContaining(["user-1", "sub_stripe_1", "cus_1", mapStripePriceToNelvyon("price_pro")]),
     );
-    expect(sendEmailMock).toHaveBeenCalledWith("plan_activated", expect.any(Object));
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      "plan_activated",
+      expect.objectContaining({ email: "a@test.com" }),
+      expect.any(String),
+    );
     expect(grantPackEntitlementsMock).toHaveBeenCalledWith(expect.anything(), "tenant-1");
   });
 

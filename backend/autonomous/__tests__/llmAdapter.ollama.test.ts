@@ -71,20 +71,20 @@ describe("llmAdapter — Ollama-first real path", () => {
     process.env.OLLAMA_CONFIGURED = "1";
     process.env.OPENAI_API_KEY = "sk-test";
     // AUTONOMOUS_ALLOW_OPENAI unset → OpenAI must stay OFF
+    // Product contract: fail-closed (no silent mock) when Ollama is configured and fails.
     chatMock.mockRejectedValue(new Error("ollama down"));
 
     const fetchSpy = vi.fn();
     vi.stubGlobal("fetch", fetchSpy);
 
-    const res = await invokeLlm({
-      agentId: "agent-pm-landing",
-      payload: {},
-      mockGenerator: () => ({ template_id: "from-mock", blockers: [] }),
-    });
+    await expect(
+      invokeLlm({
+        agentId: "agent-pm-landing",
+        payload: {},
+        mockGenerator: () => ({ template_id: "from-mock", blockers: [] }),
+      }),
+    ).rejects.toThrow(/LLM Ollama failed \(no silent mock\)/);
 
-    expect(res.mode).toBe("mock");
-    expect((res.parsed as { template_id: string }).template_id).toBe("from-mock");
-    expect(res.fallbackReason).toMatch(/ollama/i);
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(isAutonomousOpenAiAllowed()).toBe(false);
   });

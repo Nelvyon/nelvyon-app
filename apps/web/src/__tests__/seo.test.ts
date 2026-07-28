@@ -1,6 +1,13 @@
 import type { MetadataRoute } from "next";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+/** Fumadocs collections/server is build-time only — stub blog loader for unit sitemap. */
+vi.mock("@/lib/pa/source", () => ({
+  blog: {
+    getPages: () => [],
+  },
+}));
+
 function pathsFromSitemap(entries: MetadataRoute.Sitemap): string[] {
   return entries.map((e) => new URL(e.url).pathname);
 }
