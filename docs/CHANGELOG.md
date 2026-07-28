@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Ops / Cert | **Pre-push certificación v3.1** | Typecheck PASS · build PASS · vitest 2471 · PW 5 · DECISIONS UTF-8 fix ADR-072/073 · lint erp unused **preexistente** · SES identities **eu-west-1 only** · `SAFE_TO_PUSH=true` · `SAFE_TO_MIGRATE_PROD=false` · canary KILL · `claimReady: false` · **NOT READY** |
 | Ops / DB | **Cierre técnico seguro v3** | Staging mig **521+522** applied · `wf.create` CERTIFIED · Playwright 5 PASS · honesty 12/12 · PG fail-closed SCHEMA_MISMATCH · prod mig **NOT** applied · canary KILL · `claimReady: false` · **NOT READY** |
 | SaaS / Workflows | **score_threshold CHECK align** | Mig 522 · `mapWorkflowWriteError` · staging repro 9/9 PASS |
 | CTO / Cursor-0€ | **Auditoría v2 — Cursor 0€ vacío** | CTAs A/B+Facturas+Docs · sequences tracking mig 521 · Twilio/SES honesty · analytics fail-closed · portal approve feedback · 73 vitest PASS · email/workflows E2E → ops · `claimReady: false` · **NOT READY** |

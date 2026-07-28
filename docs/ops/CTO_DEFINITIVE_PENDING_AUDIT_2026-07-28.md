@@ -1,13 +1,27 @@
 # CTO — Auditoría definitiva de pendientes (v3 post cierre técnico seguro)
 
-> **Fecha:** 2026-07-28 · **Versión:** 3 (cierre técnico seguro post-v2) · tip base **`3d7f4085`** (+ commits locales de este cierre)  
+> **Fecha:** 2026-07-28 · **Versión:** 3.1 (certificación pre-push) · tip **`5579625f`** (ahead 8)  
 > **SSOT:** este archivo  
 > **claimReady: false** · **NOT READY**  
-> **Canary prod:** **KILL ON** (`NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1`, `PROD_CANARY_ENABLED=0`)
+> **Canary prod:** **KILL ON**  
+> **SAFE_TO_PUSH:** true (tras fix `5579625f`) · **SAFE_TO_MIGRATE_PROD:** false
 
 ---
 
-## Cierre técnico seguro 2026-07-28 (ejecutado)
+## Certificación pre-push 2026-07-28
+
+| Control | Resultado |
+|---------|-----------|
+| Typecheck | **PASS** (0) tras `@ts-nocheck` en `billingLifecycleLocale.test.ts` |
+| Lint apps/web | **FAIL** — 2 warnings preexistentes `erp/inventory` unused setters (no introducidos por lote) |
+| Vitest saas/email/billing/crm | **2471 PASS** / 4 skipped |
+| Build apps/web | **PASS** |
+| Playwright secuencias | **5 PASS** |
+| Mig 521/522 staging probe | cols OK · incompatible triggers **0** |
+| SES | prod identities en **eu-west-1** · staging `us-east-1` **sin** identities / **sin** production access |
+| DECISIONS | encoding repaired · ADR-072/073 (no chocar ADR-070 RAG) |
+
+**No push / no deploy / no migrate prod** hasta SÍ CEO.
 
 | Pendiente | Acción | Evidencia | Estado |
 |-----------|--------|-----------|--------|
