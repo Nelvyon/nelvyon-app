@@ -1,11 +1,11 @@
-# HANDOVER — NELVYON
+﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-29** — Cursor backlog técnico agotado · tip pendiente push cleanup final · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-29** — Cursor backlog técnico **AGOTADO** · tip **`01fcb70a`** · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Tip base remoto** | `f0533aff` (+ cleanup final local si aún no pushed) |
+| **Último tip remoto** | `01fcb70a` |
 | **Runbook prod** | `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` |
 | **Staging 521/522** | **CONFIRMADAS** |
 | **Prod 521/522** | **NO** · CEO + ADR-064 |
