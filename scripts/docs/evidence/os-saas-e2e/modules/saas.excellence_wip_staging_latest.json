@@ -1,0 +1,91 @@
+{
+  "module": "saas.excellence_wip_staging",
+  "timestamp": "2026-07-28T23:29:37.516Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
+  "git_sha": "b236bba0",
+  "totals": {
+    "pass": 9,
+    "fail": 2,
+    "flows": 11
+  },
+  "results": [
+    {
+      "flow": "wipCrm2.register",
+      "ok": true,
+      "status": 200,
+      "ms": 2650,
+      "at": "2026-07-28T23:29:26.957Z"
+    },
+    {
+      "flow": "wipCrm2.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2391,
+      "at": "2026-07-28T23:29:29.350Z"
+    },
+    {
+      "flow": "wipCrm2.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 1962,
+      "tenantId": "2780a743-dc8e-4cba-9ab5-17876d82670a",
+      "at": "2026-07-28T23:29:31.312Z"
+    },
+    {
+      "flow": "crm.create",
+      "ok": true,
+      "status": 201,
+      "at": "2026-07-28T23:29:32.419Z"
+    },
+    {
+      "flow": "crm.export",
+      "ok": false,
+      "status": 429,
+      "snippet": "{\"error\":\"Too many requests\",\"retryAfter\":13}",
+      "len": 45,
+      "at": "2026-07-28T23:29:32.689Z"
+    },
+    {
+      "flow": "crm.import",
+      "ok": false,
+      "status": 429,
+      "body": "{\"error\":\"Too many requests\",\"retryAfter\":13}",
+      "at": "2026-07-28T23:29:32.954Z"
+    },
+    {
+      "flow": "reports.generate_owner",
+      "ok": true,
+      "status": 200,
+      "body": "{\"reportId\":\"rpt_16830d73-436a-48eb-9c1b-0795aa0b8417\",\"downloadUrl\":\"http://localhost:3000/api/saas/reports/rpt_16830d73-436a-48eb-9c1b-0795aa0b8417/export\",\"s",
+      "at": "2026-07-28T23:29:35.129Z"
+    },
+    {
+      "flow": "artifact.traversal",
+      "ok": true,
+      "status": 400,
+      "body": "{\"error\":\"Identificador de informe inválido\"}",
+      "at": "2026-07-28T23:29:35.840Z"
+    },
+    {
+      "flow": "webhook.first",
+      "ok": true,
+      "status": 200,
+      "body": "{\"ok\":true,\"source\":\"smoke\",\"duplicate\":false,\"received\":\"2026-07-28T23:29:36.511Z\",\"requestId\":\"573a041c-ae82-4423-8c24-866306eabc9e\"}",
+      "at": "2026-07-28T23:29:37.242Z"
+    },
+    {
+      "flow": "webhook.dup",
+      "ok": true,
+      "status": 200,
+      "body": "{\"ok\":true,\"source\":\"smoke\",\"duplicate\":true,\"received\":\"2026-07-28T23:29:36.511Z\",\"requestId\":\"4fe5621c-9b09-4252-9dd6-64574b7f94ae\"}",
+      "at": "2026-07-28T23:29:37.243Z"
+    },
+    {
+      "flow": "queue.os_health",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-28T23:29:37.515Z"
+    }
+  ],
+  "decision": "FAIL"
+}

@@ -1,8 +1,21 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-28** push tip `40099898` · staging deploy `56df6a6e` · SES `eu-west-1` · **no** prod migrate · canary KILL ON.
+> Actualizado: **2026-07-29** tip `b236bba0` · staging deploy `073949a1` · **no** prod migrate · canary KILL ON.
+
+## 2026-07-29 — Excellence WIP push + staging validate
+
+| Campo | Valor |
+|-------|-------|
+| **Tip remoto** | `b236bba0` (4 commits: security · CRM/queue · UX · docs) |
+| **Env** | Railway staging `ideal-victory` |
+| **Deploy** | `073949a1` **SUCCESS** · live sha `b236bba0e12d` |
+| **Smokes** | health/ready · workflows CERTIFIED 14/14 · seq 8/8 · honesty 12/12 · CRM export/import · artifact 400 · webhook idempotency · rate-limit 429 |
+| **Prod** | **NOT** migrated · **NOT** deployed |
+| **claimReady** | **false** |
+| **Canary** | **KILL ON** |
 
 ## 2026-07-28 — Push + staging deploy + SES align (v3.2)
+
 
 | Campo | Valor |
 |-------|-------|

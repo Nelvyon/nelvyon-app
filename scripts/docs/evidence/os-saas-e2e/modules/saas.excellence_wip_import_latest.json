@@ -1,0 +1,42 @@
+{
+  "module": "saas.excellence_wip_import",
+  "timestamp": "2026-07-28T23:33:51.753Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
+  "totals": {
+    "pass": 4,
+    "fail": 0,
+    "flows": 4
+  },
+  "results": [
+    {
+      "flow": "impOk.register",
+      "ok": true,
+      "status": 200,
+      "ms": 2942,
+      "at": "2026-07-28T23:33:46.120Z"
+    },
+    {
+      "flow": "impOk.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2538,
+      "at": "2026-07-28T23:33:48.659Z"
+    },
+    {
+      "flow": "impOk.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 1969,
+      "tenantId": "a3314c6e-06e3-441e-92b2-5449b0ae28e3",
+      "at": "2026-07-28T23:33:50.628Z"
+    },
+    {
+      "flow": "crm.import",
+      "ok": true,
+      "status": 200,
+      "body": "{\"imported\":2,\"errors\":0,\"errorDetails\":[]}",
+      "at": "2026-07-28T23:33:51.752Z"
+    }
+  ],
+  "decision": "CERTIFIED"
+}

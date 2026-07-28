@@ -1,7 +1,7 @@
 {
   "module": "saas.workflows",
   "tag": "module_cert_http_live",
-  "timestamp": "2026-07-28T21:19:23.480Z",
+  "timestamp": "2026-07-28T23:27:28.808Z",
   "baseUrl": "https://ideal-victory-staging.up.railway.app",
   "totals": {
     "pass": 14,
@@ -13,85 +13,85 @@
       "flow": "http.health",
       "ok": true,
       "status": 200,
-      "ms": 1043,
-      "at": "2026-07-28T21:19:05.896Z"
+      "ms": 665,
+      "at": "2026-07-28T23:27:11.642Z"
     },
     {
       "flow": "wfA.register",
       "ok": true,
       "status": 200,
-      "ms": 3048,
-      "at": "2026-07-28T21:19:08.946Z"
+      "ms": 2984,
+      "at": "2026-07-28T23:27:14.627Z"
     },
     {
       "flow": "wfA.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 2345,
-      "at": "2026-07-28T21:19:11.291Z"
+      "ms": 2321,
+      "at": "2026-07-28T23:27:16.949Z"
     },
     {
       "flow": "wfA.onboard_complete",
       "ok": true,
       "status": 200,
-      "ms": 2048,
-      "tenantId": "fcad2535-f3eb-4cdb-9df1-6f9388749322",
-      "at": "2026-07-28T21:19:13.340Z"
+      "ms": 1969,
+      "tenantId": "5df4b967-0213-453a-b340-c0d04d93fad6",
+      "at": "2026-07-28T23:27:18.918Z"
     },
     {
       "flow": "wfB.register",
       "ok": true,
       "status": 200,
-      "ms": 1564,
-      "at": "2026-07-28T21:19:14.904Z"
+      "ms": 1642,
+      "at": "2026-07-28T23:27:20.561Z"
     },
     {
       "flow": "wfB.onboard_create",
       "ok": true,
       "status": 200,
-      "ms": 2323,
-      "at": "2026-07-28T21:19:17.227Z"
+      "ms": 2224,
+      "at": "2026-07-28T23:27:22.789Z"
     },
     {
       "flow": "wfB.onboard_complete",
       "ok": true,
       "status": 200,
-      "ms": 2024,
-      "tenantId": "189bdfbd-3a06-4d6d-bae6-0db8962cf2b2",
-      "at": "2026-07-28T21:19:19.252Z"
+      "ms": 1955,
+      "tenantId": "4483b46a-ac0c-4a99-b44f-0155ebadba59",
+      "at": "2026-07-28T23:27:24.748Z"
     },
     {
       "flow": "wf.meta",
       "ok": true,
       "status": 200,
-      "at": "2026-07-28T21:19:20.114Z"
+      "at": "2026-07-28T23:27:25.605Z"
     },
     {
       "flow": "wf.create",
       "ok": true,
       "status": 201,
-      "ms": 1341,
-      "id": "b95e4451-d8c5-4f40-87a6-71f4f0699ddf",
-      "at": "2026-07-28T21:19:21.456Z"
+      "ms": 1276,
+      "id": "ebde9966-0147-4694-9d79-7cbf5d982d8b",
+      "at": "2026-07-28T23:27:26.888Z"
     },
     {
       "flow": "wf.list_a",
       "ok": true,
       "status": 200,
-      "at": "2026-07-28T21:19:23.183Z"
+      "at": "2026-07-28T23:27:28.537Z"
     },
     {
       "flow": "wf.isolation",
       "ok": true,
       "status": 200,
       "countB": 0,
-      "at": "2026-07-28T21:19:23.183Z"
+      "at": "2026-07-28T23:27:28.537Z"
     },
     {
       "flow": "wf.ses_flag_present",
       "ok": true,
       "ses_configured": true,
-      "at": "2026-07-28T21:19:23.183Z"
+      "at": "2026-07-28T23:27:28.537Z"
     },
     {
       "flow": "wf.twilio_flag_optional",
@@ -99,16 +99,16 @@
       "twilio_configured": false,
       "present_on_runtime": true,
       "note": "honesty gate live",
-      "at": "2026-07-28T21:19:23.183Z"
+      "at": "2026-07-28T23:27:28.537Z"
     },
     {
       "flow": "wf.401",
       "ok": true,
       "status": 401,
-      "at": "2026-07-28T21:19:23.480Z"
+      "at": "2026-07-28T23:27:28.808Z"
     }
   ],
-  "hash": "0d8048d3f97c4130",
+  "hash": "5bb8aef5f52f7715",
   "decision": "CERTIFIED",
   "note": "2026-07-28 staging reval after mig 522; historical 2026-07-17 localhost FAIL superseded"
 }

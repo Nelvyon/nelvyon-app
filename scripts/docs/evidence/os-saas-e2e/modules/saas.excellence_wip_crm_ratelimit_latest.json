@@ -1,0 +1,55 @@
+{
+  "module": "saas.excellence_wip_crm_ratelimit",
+  "timestamp": "2026-07-28T23:31:17.495Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
+  "totals": {
+    "pass": 5,
+    "fail": 1,
+    "flows": 6
+  },
+  "results": [
+    {
+      "flow": "wipCrm3.register",
+      "ok": true,
+      "status": 200,
+      "ms": 2946,
+      "at": "2026-07-28T23:31:02.658Z"
+    },
+    {
+      "flow": "wipCrm3.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2360,
+      "at": "2026-07-28T23:31:05.019Z"
+    },
+    {
+      "flow": "wipCrm3.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 1932,
+      "tenantId": "9fda5d28-5661-445e-b6b8-a2cd4d456136",
+      "at": "2026-07-28T23:31:06.952Z"
+    },
+    {
+      "flow": "crm.export",
+      "ok": true,
+      "status": 200,
+      "snippet": "id,name,email,phone,company,position,status,pipeline_stage,value,tags,notes,created_at\nceb398ee-7c50",
+      "at": "2026-07-28T23:31:09.772Z"
+    },
+    {
+      "flow": "crm.import",
+      "ok": false,
+      "status": 400,
+      "body": "{\"error\":\"No data rows found in CSV\"}",
+      "at": "2026-07-28T23:31:10.470Z"
+    },
+    {
+      "flow": "ratelimit.export_enforced",
+      "ok": true,
+      "hit429": true,
+      "at": "2026-07-28T23:31:17.495Z"
+    }
+  ],
+  "decision": "PARTIAL"
+}

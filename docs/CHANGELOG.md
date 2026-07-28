@@ -9,6 +9,7 @@
 |------|--------|-------------|
 | Ops / Launch | **Paquete ops mundial** | `OPERATIONS_INDEX` · `WORLD_CLASS_OPS_RUNBOOK` · `LAUNCH_CHECKLIST_DEFINITIVE` · `SECURITY_OPERATIONS` · `DEVELOPER_ONBOARDING` · `OPS.md` + observability SaaS · **no** prod · canary KILL · `claimReady: false` |
 | Security / Perf | **Artifact path + CRM/queue caps** | `resolveArtifactZipPath` containment · CRM list/export LIMIT+413 · `createContactsBatch` · QueueClient memory TTL/cap · tests PASS · `claimReady: false` |
+| Ops / Staging | **WIP excellence push + validate** | Tip **`b236bba0`** · deploy `073949a1` SUCCESS · workflows 14/14 · seq 8/8 · honesty 12/12 · CRM export/import · idempotency · rate-limit 429 · **no** prod · `claimReady: false` |
 
 ## 2026-07-28
 
