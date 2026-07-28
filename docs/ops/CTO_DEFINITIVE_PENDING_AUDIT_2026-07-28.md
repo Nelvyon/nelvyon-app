@@ -1,7 +1,42 @@
+# CTO — Auditoría definitiva de pendientes (v3.3 cleanup seguro)
+
+> **Fecha:** 2026-07-28 · **Versión:** 3.3 (deuda segura post-staging) · tip limpio pendiente push  
+> **SSOT:** este archivo  
+> **claimReady: false** · **NOT READY**  
+> **Canary prod:** **KILL ON**  
+> **SAFE_TO_MIGRATE_PROD:** false
+
+---
+
+## Cleanup seguro v3.3 (ejecutado)
+
+| Acción | Resultado |
+|--------|-----------|
+| Push docs `203d5e02` | **DONE** → `origin/main` |
+| Dashboards huérfanos | **216 eliminados** · keep: DashboardLayout + banners + ApiKeys/Usage/BottomNav |
+| ERP inventory lint | setters muertos → consts · lint repo **0 warnings** |
+| Ads briefing POST | removido literal `mock_briefing` no usado |
+| Deps | `-twilio` `-@radix-ui/react-accordion` · `vite`→devDependencies |
+| Docs | `CANARY_IA_FLAGS` · `ENVIRONMENTS` · CLAUDE SaasSidebar path · evidence SSOT note |
+| Cert | tsc **PASS** · lint **PASS** · build **PASS** · vitest **2471** · PW **5** · staging health **OK** |
+
+| Pendiente restante | Estado |
+|--------------------|--------|
+| Prod migrate 521/522 | **BLOCKED_CEO** |
+| OAuth / Twilio / SES mass-send / Stripe live payouts | **BLOCKED_EXTERNAL** |
+| Comunidades nested replies | **DEFERRED_PRODUCT** (ADR-073) |
+| Dual evidence trees merge | **DEFERRED** (documentado split SSOT) |
+| `@ts-nocheck` masivo en tests saas | **DEFERRED** (higiene; no runtime) |
+| `pages/api/saas` 410 tombstones | **KEEP** (intencional) |
+| Integraciones catalog all-`live` honesty | **DEFERRED_PRODUCT** |
+| claimReady / canary | **false** / **KILL ON** |
+
+---
+
 # CTO — Auditoría definitiva de pendientes (v3.2 post push/staging)
 
 > **Fecha:** 2026-07-28 · **Versión:** 3.2 (push + staging deploy + SES align) · tip remoto **`40099898`**  
-> **SSOT:** este archivo  
+> **SSOT histórico v3.2**  
 > **claimReady: false** · **NOT READY**  
 > **Canary prod:** **KILL ON**  
 > **SAFE_TO_MIGRATE_PROD:** false

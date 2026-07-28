@@ -1,6 +1,6 @@
 # ENVIRONMENTS — Entornos
 
-> Sin secretos. Actualizado: 2026-07-09
+> Sin secretos. Actualizado: **2026-07-28** · tip `203d5e02` · canary prod **KILL ON** · `claimReady: false`
 
 ---
 
@@ -9,16 +9,19 @@
 | Campo | Valor |
 |-------|-------|
 | **Plataforma** | Railway |
-| **App principal** | `apps/web` (Next.js) |
-| **API Python** | `nelvyon-app-production` (FastAPI) — ver `backend/README.md` |
-| **Dominio público** | `https://nelvyon.com` ✅ (health live OK); `app.nelvyon.com` en env examples — DNS no verificado desde agente |
-| **git_sha verificado** | prod `30404800` / staging `636a47bc` (2026-07-10) |
-| **Base de datos** | Supabase Postgres o Railway Postgres via `DATABASE_URL` |
+| **App principal** | `apps/web` (Next.js) · servicio `@nelvyon/web` |
+| **API Python** | FastAPI separado — ver `backend/README.md` |
+| **Dominio público** | `https://nelvyon.com` |
+| **git_sha tip remoto** | `203d5e02` (docs v3.2 + cleanup pendiente si se pushea) |
+| **Base de datos** | Postgres via `DATABASE_URL` |
+| **SES_REGION** | `eu-west-1` |
+| **Canary IA** | **KILL ON** — ver `docs/ops/CANARY_IA_FLAGS.md` |
+| **Mig 521/522** | **NOT applied** (ADR-064 CEO) |
 | **NODE_ENV** | `production` |
 
 **Variables obligatorias:** ver `apps/web/.env.example`, `docs/LAUNCH_READY.md`, `CLAUDE.md`.
 
-**Migraciones:** auto en deploy via `releaseCommand`.
+**Migraciones:** auto en deploy via `releaseCommand` (staging OK; prod gated).
 
 ---
 
@@ -26,12 +29,14 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Web** | `ideal-victory-staging.up.railway.app` |
-| **API Python** | `comfortable-empathy` (staging) / prod FastAPI separado |
-| **Canary IA 2026-07-23** | Router+QR ON · Mesh Option A prep · AI master **0** · OpenAI **0** · WAITING_TS_AUTHKEY |
+| **Web** | `https://ideal-victory-staging.up.railway.app` (`ideal-victory`) |
+| **API Python** | `comfortable-empathy` (staging) |
+| **Deploy verificado** | `56df6a6e` SUCCESS · tip código `40099898`+docs |
+| **SES_REGION** | `eu-west-1` (alineado 2026-07-28) |
+| **Mig 521/522** | Applied · reconfirmed post-deploy |
+| **Canary IA prod flags** | N/A en staging web; prod remains KILL |
 | **Mesh runbook** | `docs/ops/MESH_OPTION_A_STAGING.md` |
-| **Env file ejemplo** | `backend/env.staging.example` |
-| **Smokes** | `scripts/run-staging-p0-smokes.mjs` (nota: workflow P0 apunta a `nelvyon.com` prod host) |
+| **Smokes** | `scripts/run-staging-p0-smokes.mjs` · yellow-queue · honesty/workflows |
 
 `JWT_SECRET` Web staging debe coincidir con API Python del mismo entorno.
 

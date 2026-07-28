@@ -152,7 +152,7 @@ Railway `releaseCommand` aplica todas en deploy.
 | Archivo | Qué hace |
 |---|---|
 | `apps/web/src/features/saas-shell/components/SaasShellLayout.tsx` | Layout dark glass de todas las páginas SaaS |
-| `apps/web/src/components/saas/SaasSidebar.tsx` | Sidebar SaaS con `activeId: SaasNavId` |
+| `apps/web/src/features/saas-shell/components/SaasSidebar.tsx` | Sidebar SaaS con `activeId: SaasNavId` |
 | `backend/saas/SaasCampaniasService.ts` | Envío de campañas, bounce handling |
 | `backend/saas/SaasWorkflowService.ts` | Motor de workflows con idempotencia |
 | `backend/saas/SaasBillingService.ts` | Resumen billing desde `saas_tenants.plan` |

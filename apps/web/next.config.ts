@@ -37,7 +37,6 @@ const nextConfig: NextConfig = {
       "@tabler/icons-react",
       "recharts",
       "framer-motion",
-      "@radix-ui/react-accordion",
     ],
   },
   outputFileTracingIncludes: {

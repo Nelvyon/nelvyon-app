@@ -19,8 +19,8 @@ export default function ErpInventoryPage() {
   const [loading, setLoading] = useState(true);
   const [sku, setSku] = useState("");
   const [productName, setProductName] = useState("");
-  const [whCode, setWhCode] = useState("WH1");
-  const [locCode, setLocCode] = useState("A-01");
+  const whCode = "WH1";
+  const locCode = "A-01";
   const [qty, setQty] = useState("10");
   const [saving, setSaving] = useState(false);
 

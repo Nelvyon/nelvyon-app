@@ -1,25 +1,23 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-28** — Push + staging deploy + SES align · tip remoto **`40099898`** · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-28** — Cleanup seguro v3.3 · tip pendiente push cleanup · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Último tip remoto** | `40099898` (`origin/main`) |
-| **Staging deploy** | `56df6a6e` **SUCCESS** · Online · `https://ideal-victory-staging.up.railway.app` |
-| **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` **v3.2** |
-| **Rama** | `main` · tip remoto `40099898` · docs/evidence v3.2 locales (commit ops si CEO pide push) |
-| **SAFE_TO_PUSH** | n/a (tip ya en remoto) |
-| **SAFE_TO_DEPLOY_STAGING** | **done** (redeploy from-source tras incident `railway down`) |
+| **Último tip remoto (pre-cleanup)** | `203d5e02` |
+| **Staging** | Online `56df6a6e` · health OK |
+| **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` |
 | **SAFE_TO_MIGRATE_PROD** | **false** |
 | **claimReady** | **false** |
 | **Canary** | **KILL ON** |
+| **Cert post-cleanup** | tsc **0** · lint **0** · build **0** · vitest **2471** · PW secuencias **5** |
 
 ## Próximo paso EXACTO
 
-1. CEO: SÍ/NO **prod** migrate 521+522 (ADR-064) — **no** hasta SÍ explícito.
-2. CEO: SÍ/NO commit+push de docs/evidence post-deploy v3.2 (si se pide).
-3. **No** abrir canary · **no** mass-send · **no** declarar READY.
+1. Push commit cleanup v3.3 (si aún no en remoto).
+2. CEO: SÍ/NO **prod** migrate 521+522 (ADR-064).
+3. **No** canary · **no** mass-send · **no** READY.
 
 ### Rollback IA
 
