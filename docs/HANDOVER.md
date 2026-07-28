@@ -5,10 +5,10 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último tip docs** | `3d7f4085` (base) · commits locales pendientes de este cierre |
+| **Último tip docs** | `86701b95` (cierre técnico v3) · base Cursor-0€ `05791f3b` |
 | **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` **v3** |
 | **Fecha doc** | 2026-07-28 |
-| **Rama** | `main` (ahead local · **no push** hasta aprobación) |
+| **Rama** | `main` (ahead 6 · **no push**) |
 | **Railway CLI** | linked **production** / `@nelvyon/web` |
 
 ---
