@@ -5,10 +5,10 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Último tip** | ver `git log -1` tras commit Cursor-0€ |
+| **Último tip** | `05791f3b` (Cursor 0€ vacío · auditoría v2) |
 | **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` **v2** |
 | **Fecha doc** | 2026-07-28 |
-| **Rama** | `main` |
+| **Rama** | `main` (ahead 1) |
 
 ---
 
