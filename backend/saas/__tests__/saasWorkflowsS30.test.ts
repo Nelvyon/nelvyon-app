@@ -130,6 +130,42 @@ describe("SaasWorkflowService — S30", () => {
         actions: [],
       })).rejects.toThrow();
     });
+
+    it("maps PG check_violation (23514) to CONSTRAINT without leaking SQL", async () => {
+      vi.mocked(db.query)
+        .mockResolvedValueOnce([{ plan: "pro" }])
+        .mockResolvedValueOnce([{ count: "0" }])
+        .mockRejectedValueOnce(Object.assign(new Error("violates check constraint"), { code: "23514" }));
+      await expect(
+        svc.createWorkflow(TENANT, {
+          name: "Score Threshold WF",
+          triggerType: "score_threshold",
+          actions: [{ type: "notify", config: { message: "Hot lead!" } }],
+        }),
+      ).rejects.toMatchObject({
+        name: "SaasWorkflowError",
+        code: "CONSTRAINT",
+        message: "Invalid status or trigger_type",
+      });
+    });
+
+    it("maps PG FK violation (23503) to CONSTRAINT", async () => {
+      vi.mocked(db.query)
+        .mockResolvedValueOnce([{ plan: "pro" }])
+        .mockResolvedValueOnce([{ count: "0" }])
+        .mockRejectedValueOnce(Object.assign(new Error("insert or update on table violates foreign key"), { code: "23503" }));
+      await expect(
+        svc.createWorkflow(TENANT, {
+          name: "FK WF",
+          triggerType: "manual",
+          actions: [],
+        }),
+      ).rejects.toMatchObject({
+        name: "SaasWorkflowError",
+        code: "CONSTRAINT",
+        message: "Invalid tenant or related resource",
+      });
+    });
   });
 
   // ── review_received min_rating ────────────────────────────────────────────

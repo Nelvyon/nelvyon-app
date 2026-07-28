@@ -163,6 +163,7 @@ export function saasErrorStatus(e: unknown): number {
   if (e instanceof SaasPlanQuotaError) return 403;
   if (e instanceof OsAgentError && e.message === "Unauthorized") return 401;
   if (e instanceof Error && /PRIVATE_AI_CANARY_BLOCKED/i.test(e.message)) return 403;
+  if (isPgMissingRelation(e)) return 503;
   return 500;
 }
 
@@ -180,6 +181,14 @@ export function saasErrorBody(e: unknown): { error: string; code?: string } {
   if (e instanceof Error && /PRIVATE_AI_CANARY_BLOCKED/i.test(e.message)) {
     console.error("[saasErrorBody]", e.message);
     return { error: e.message, code: "PRIVATE_AI_CANARY_BLOCKED" };
+  }
+  // Schema drift (missing table/column) — fail-closed without leaking relation names.
+  if (isPgMissingRelation(e)) {
+    console.error("[saasErrorBody]", e instanceof Error ? e.message : String(e));
+    return {
+      error: "Database schema incomplete — apply pending migrations",
+      code: "SCHEMA_MISMATCH",
+    };
   }
   // Do not leak driver/SQL internals to API clients.
   if (e instanceof Error) {

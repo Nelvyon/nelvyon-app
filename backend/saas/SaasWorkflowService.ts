@@ -197,6 +197,28 @@ function isCheckViolation(e: unknown): boolean {
   return typeof e === "object" && e !== null && "code" in e && (e as { code: unknown }).code === "23514";
 }
 
+function isFkViolation(e: unknown): boolean {
+  return typeof e === "object" && e !== null && "code" in e && (e as { code: unknown }).code === "23503";
+}
+
+function isMissingRelation(e: unknown): boolean {
+  const code = typeof e === "object" && e !== null && "code" in e ? String((e as { code: unknown }).code) : "";
+  if (code === "42P01" || code === "42703") return true;
+  const msg = e instanceof Error ? e.message : String(e);
+  return /relation .* does not exist|column .* does not exist/i.test(msg);
+}
+
+/** Map Postgres driver errors to fail-closed SaasWorkflowError (no SQL leak). */
+function mapWorkflowWriteError(e: unknown): never {
+  if (e instanceof SaasWorkflowError) throw e;
+  if (isCheckViolation(e)) throw new SaasWorkflowError("Invalid status or trigger_type", "CONSTRAINT");
+  if (isFkViolation(e)) throw new SaasWorkflowError("Invalid tenant or related resource", "CONSTRAINT");
+  if (isMissingRelation(e)) {
+    throw new SaasWorkflowError("Workflows schema incomplete — apply pending migrations", "CONSTRAINT");
+  }
+  throw e;
+}
+
 function assertWorkflowStatus(v: string): WorkflowStatus {
   if ((STATUSES as readonly string[]).includes(v)) return v as WorkflowStatus;
   throw new SaasWorkflowError("Invalid workflow status", "VALIDATION");
@@ -315,8 +337,7 @@ export class SaasWorkflowService {
       await this.saveVersion(tenantId, wf.id, wf).catch(() => void 0);
       return wf;
     } catch (e: unknown) {
-      if (isCheckViolation(e)) throw new SaasWorkflowError("Invalid status or trigger_type", "CONSTRAINT");
-      throw e;
+      mapWorkflowWriteError(e);
     }
   }
 
@@ -369,8 +390,7 @@ export class SaasWorkflowService {
       await this.saveVersion(tenantId, wf.id, wf).catch(() => void 0);
       return wf;
     } catch (e: unknown) {
-      if (isCheckViolation(e)) throw new SaasWorkflowError("Invalid status or trigger_type", "CONSTRAINT");
-      throw e;
+      mapWorkflowWriteError(e);
     }
   }
 

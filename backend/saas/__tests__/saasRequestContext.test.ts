@@ -56,10 +56,19 @@ describe("isPgMissingRelation", () => {
 });
 
 describe("saasErrorBody", () => {
-  it("does not leak arbitrary Error.message to clients", () => {
+  it("maps missing relation to SCHEMA_MISMATCH without leaking table names", () => {
     expect(saasErrorBody(new Error('relation "secret_table" does not exist'))).toEqual({
+      error: "Database schema incomplete — apply pending migrations",
+      code: "SCHEMA_MISMATCH",
+    });
+    expect(saasErrorStatus({ code: "42P01" })).toBe(503);
+  });
+
+  it("keeps opaque Internal error for unknown driver failures", () => {
+    expect(saasErrorBody(new Error("ECONNRESET mysterious socket"))).toEqual({
       error: "Internal error",
     });
+    expect(saasErrorStatus(new Error("ECONNRESET mysterious socket"))).toBe(500);
   });
 
   it("preserves SaasRbacError messages", () => {
