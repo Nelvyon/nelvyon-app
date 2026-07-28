@@ -1,0 +1,114 @@
+{
+  "module": "saas.workflows",
+  "tag": "module_cert_http_live",
+  "timestamp": "2026-07-28T18:03:23.484Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
+  "totals": {
+    "pass": 14,
+    "fail": 0,
+    "flows": 14
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 487,
+      "at": "2026-07-28T18:03:07.440Z"
+    },
+    {
+      "flow": "wfA.register",
+      "ok": true,
+      "status": 200,
+      "ms": 2316,
+      "at": "2026-07-28T18:03:09.759Z"
+    },
+    {
+      "flow": "wfA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2280,
+      "at": "2026-07-28T18:03:12.039Z"
+    },
+    {
+      "flow": "wfA.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 1996,
+      "tenantId": "237261dd-257a-41c1-bc67-260f1ce4bdcf",
+      "at": "2026-07-28T18:03:14.036Z"
+    },
+    {
+      "flow": "wfB.register",
+      "ok": true,
+      "status": 200,
+      "ms": 1192,
+      "at": "2026-07-28T18:03:15.231Z"
+    },
+    {
+      "flow": "wfB.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2300,
+      "at": "2026-07-28T18:03:17.533Z"
+    },
+    {
+      "flow": "wfB.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 1997,
+      "tenantId": "546efbd0-efcb-4bf0-8414-7b7949ba2563",
+      "at": "2026-07-28T18:03:19.530Z"
+    },
+    {
+      "flow": "wf.meta",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-28T18:03:20.241Z"
+    },
+    {
+      "flow": "wf.create",
+      "ok": true,
+      "status": 201,
+      "ms": 1277,
+      "id": "e02b4a62-bd54-4443-9168-225b226501e1",
+      "at": "2026-07-28T18:03:21.519Z"
+    },
+    {
+      "flow": "wf.list_a",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-28T18:03:23.216Z"
+    },
+    {
+      "flow": "wf.isolation",
+      "ok": true,
+      "status": 200,
+      "countB": 0,
+      "at": "2026-07-28T18:03:23.216Z"
+    },
+    {
+      "flow": "wf.ses_flag_present",
+      "ok": true,
+      "ses_configured": true,
+      "at": "2026-07-28T18:03:23.216Z"
+    },
+    {
+      "flow": "wf.twilio_flag_optional",
+      "ok": true,
+      "twilio_configured": null,
+      "present_on_runtime": false,
+      "note": "awaiting staging deploy of tip 05791f3b+",
+      "at": "2026-07-28T18:03:23.216Z"
+    },
+    {
+      "flow": "wf.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-28T18:03:23.483Z"
+    }
+  ],
+  "hash": "29a4ecbc0b35fe8e",
+  "decision": "CERTIFIED",
+  "note": "2026-07-28 staging reval after mig 522; historical 2026-07-17 localhost FAIL superseded"
+}

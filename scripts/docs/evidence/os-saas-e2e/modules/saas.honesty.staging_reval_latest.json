@@ -1,0 +1,120 @@
+{
+  "module": "saas.honesty.staging_reval",
+  "tag": "read_only_honesty",
+  "timestamp": "2026-07-28T18:04:56.736Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
+  "totals": {
+    "pass": 12,
+    "fail": 0,
+    "flows": 12
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-28T18:04:43.369Z"
+    },
+    {
+      "flow": "honA.register",
+      "ok": true,
+      "status": 200,
+      "ms": 2259,
+      "at": "2026-07-28T18:04:45.631Z"
+    },
+    {
+      "flow": "honA.onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2301,
+      "at": "2026-07-28T18:04:47.933Z"
+    },
+    {
+      "flow": "honA.onboard_complete",
+      "ok": true,
+      "status": 200,
+      "ms": 2007,
+      "tenantId": "816d8418-281f-42b7-a3b4-9852db4e8dd4",
+      "at": "2026-07-28T18:04:49.940Z"
+    },
+    {
+      "flow": "honesty.workflows.ses_twilio_keys",
+      "ok": true,
+      "status": 200,
+      "snippet": [
+        "workflows",
+        "ses_configured"
+      ],
+      "at": "2026-07-28T18:04:50.793Z"
+    },
+    {
+      "flow": "honesty.sequences.ses_flag",
+      "ok": true,
+      "status": 200,
+      "snippet": [
+        "sequences",
+        "ses_configured"
+      ],
+      "at": "2026-07-28T18:04:51.689Z"
+    },
+    {
+      "flow": "honesty.campanias.ses_flag",
+      "ok": true,
+      "status": 200,
+      "snippet": [
+        "campanias",
+        "ses_configured"
+      ],
+      "at": "2026-07-28T18:04:52.551Z"
+    },
+    {
+      "flow": "honesty.invoices.list",
+      "ok": true,
+      "status": 200,
+      "snippet": [
+        "invoices"
+      ],
+      "at": "2026-07-28T18:04:53.428Z"
+    },
+    {
+      "flow": "honesty.documents.list",
+      "ok": true,
+      "status": 200,
+      "snippet": [
+        "documents"
+      ],
+      "at": "2026-07-28T18:04:54.277Z"
+    },
+    {
+      "flow": "honesty.analytics",
+      "ok": true,
+      "status": 200,
+      "snippet": [
+        "analytics"
+      ],
+      "at": "2026-07-28T18:04:55.598Z"
+    },
+    {
+      "flow": "honesty.funnels",
+      "ok": true,
+      "status": 200,
+      "snippet": [
+        "funnels"
+      ],
+      "at": "2026-07-28T18:04:56.469Z"
+    },
+    {
+      "flow": "honesty.campanias.401",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-28T18:04:56.736Z"
+    }
+  ],
+  "decision": "PASS",
+  "constraints": [
+    "no mass commercial send",
+    "no OAuth connect",
+    "no Stripe pause/payout mutate",
+    "no AI canary open"
+  ]
+}

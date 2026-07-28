@@ -1,0 +1,82 @@
+{
+  "module": "saas.workflows.wf_create_repro",
+  "tag": "controlled_repro_staging",
+  "timestamp": "2026-07-28T17:57:17.407Z",
+  "baseUrl": "https://ideal-victory-staging.up.railway.app",
+  "totals": {
+    "pass": 9,
+    "fail": 0,
+    "flows": 9
+  },
+  "results": [
+    {
+      "flow": "http.health",
+      "ok": true,
+      "status": 200,
+      "ms": 505,
+      "at": "2026-07-28T17:57:05.509Z"
+    },
+    {
+      "flow": "register",
+      "ok": true,
+      "status": 200,
+      "ms": 2254,
+      "at": "2026-07-28T17:57:07.765Z"
+    },
+    {
+      "flow": "onboard_create",
+      "ok": true,
+      "status": 200,
+      "ms": 2276,
+      "at": "2026-07-28T17:57:10.041Z"
+    },
+    {
+      "flow": "onboard_complete",
+      "ok": true,
+      "status": 200,
+      "tenantId": "f5312309-bc2f-4b93-b4a5-5c7ef0c845e6",
+      "ms": 2006,
+      "at": "2026-07-28T17:57:12.048Z"
+    },
+    {
+      "flow": "wf.meta",
+      "ok": true,
+      "status": 200,
+      "triggers": 16,
+      "at": "2026-07-28T17:57:12.770Z"
+    },
+    {
+      "flow": "wf.create.cert-manual-active",
+      "ok": true,
+      "status": 201,
+      "ms": 1259,
+      "id": "c0bf2d15-1d37-422d-b6ad-585ed70912ba",
+      "at": "2026-07-28T17:57:14.030Z"
+    },
+    {
+      "flow": "wf.create.cert-manual-draft",
+      "ok": true,
+      "status": 201,
+      "ms": 1274,
+      "id": "c6d249e3-1c6e-4458-bc8f-f925ea43630a",
+      "at": "2026-07-28T17:57:15.305Z"
+    },
+    {
+      "flow": "wf.create.cert-score-threshold",
+      "ok": true,
+      "status": 201,
+      "ms": 1248,
+      "id": "91cb520c-e0f0-45ef-9da6-6104e3c57862",
+      "at": "2026-07-28T17:57:16.554Z"
+    },
+    {
+      "flow": "wf.list",
+      "ok": true,
+      "status": 200,
+      "count": 3,
+      "ses_configured": true,
+      "at": "2026-07-28T17:57:17.406Z"
+    }
+  ],
+  "decision": "PASS"
+}
