@@ -52,6 +52,42 @@ function makeDb() {
       return [{ n: contacts.filter((c) => c.tenant_id === tenantId).length }] as T[];
     }
     if (s.startsWith("INSERT INTO saas_contacts")) {
+      // Multi-row batch: VALUES (...),(...),...
+      const valueGroups = s.match(/\([^)]+\)/g)?.filter((g) => g.includes("$")) ?? [];
+      if (valueGroups.length > 1 || (s.includes("RETURNING") && (p.length - 0) > 11 && p.length % 11 === 0)) {
+        const colCount = 11; // tenant..tags (updated_at = NOW())
+        const rowCount = Math.floor(p.length / colCount);
+        const out: ContactRow[] = [];
+        for (let r = 0; r < rowCount; r++) {
+          const base = r * colCount;
+          const status = String(p[base + 6]);
+          const stage = String(p[base + 7]);
+          if (!["lead", "prospect", "client", "churned"].includes(status) || !["new", "contacted", "qualified", "proposal", "won", "lost"].includes(stage)) {
+            const e = new Error("check");
+            (e as { code: string }).code = "23514";
+            throw e;
+          }
+          const row: ContactRow = {
+            id: `c-${contacts.length + 1}`,
+            tenant_id: String(p[base]),
+            name: String(p[base + 1]),
+            email: (p[base + 2] as string | null) ?? null,
+            phone: (p[base + 3] as string | null) ?? null,
+            company: (p[base + 4] as string | null) ?? null,
+            position: (p[base + 5] as string | null) ?? null,
+            status: status as ContactRow["status"],
+            pipeline_stage: stage as ContactRow["pipeline_stage"],
+            value: Number(p[base + 8] ?? 0),
+            notes: (p[base + 9] as string | null) ?? null,
+            tags: (p[base + 10] as string[]) ?? [],
+            created_at: new Date(Date.now() + ++nowTick),
+            updated_at: new Date(Date.now() + nowTick),
+          };
+          contacts.push(row);
+          out.push(row);
+        }
+        return out as unknown as T[];
+      }
       const status = String(p[6]);
       const stage = String(p[7]);
       if (!["lead", "prospect", "client", "churned"].includes(status) || !["new", "contacted", "qualified", "proposal", "won", "lost"].includes(stage)) {
@@ -91,10 +127,15 @@ function makeDb() {
         out = out.filter((c) => c.pipeline_stage === stageVal);
       }
       if (s.includes("ILIKE")) {
-        const term = String(p[p.length - 1]).replace(/%/g, "").toLowerCase();
+        const term = String(p[p.length - (s.includes("LIMIT") ? 2 : 1)]).replace(/%/g, "").toLowerCase();
         out = out.filter((c) => c.name.toLowerCase().includes(term) || (c.email ?? "").toLowerCase().includes(term));
       }
-      return out.sort((a, b) => b.created_at.getTime() - a.created_at.getTime()) as unknown as T[];
+      out = out.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+      if (s.includes("LIMIT")) {
+        const lim = Number(p[p.length - 1]);
+        if (Number.isFinite(lim) && lim > 0) out = out.slice(0, lim);
+      }
+      return out as unknown as T[];
     }
     if (s.startsWith("UPDATE saas_contacts SET")) {
       const row = contacts.find((c) => c.tenant_id === String(p[0]) && c.id === String(p[1]));
@@ -283,6 +324,26 @@ describe("SaasCrmService", () => {
     await svc.addActivity(c.id, "t1", { activityType: "note", description: "1" });
     const out = await svc.getActivities(c.id, "t1");
     expect(out).toHaveLength(1);
+  });
+  it("getContacts aplica LIMIT por defecto (no unbounded)", async () => {
+    const db = makeDb();
+    const svc = new SaasCrmService(db);
+    for (let i = 0; i < 5; i++) await svc.createContact("t1", { name: `N${i}` });
+    const out = await svc.getContacts("t1", { limit: 3 });
+    expect(out).toHaveLength(3);
+  });
+
+  it("createContactsBatch inserta en un round-trip por chunk", async () => {
+    const db = makeDb();
+    const svc = new SaasCrmService(db);
+    const { created, errors } = await svc.createContactsBatch("t1", [
+      { name: "A" },
+      { name: "B" },
+      { name: "" },
+    ]);
+    expect(created).toHaveLength(2);
+    expect(errors.some((e) => e.error.includes("name"))).toBe(true);
+    await expect(svc.getContacts("t1")).resolves.toHaveLength(2);
   });
 });
 

@@ -1,6 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
-import { assertSaasPlanCanCreate } from "./saasPlanQuota";
+import { assertSaasPlanCanCreate, assertSaasPlanCanCreateMany } from "./saasPlanQuota";
 import { dispatchContactCreated, dispatchContactStageChanged } from "./saasWorkflowDispatch";
 
 /** Minimal audit port — injected to avoid circular deps with SaasAuditService. */
@@ -170,7 +170,15 @@ export type ContactFilters = {
   status?: ContactStatus;
   pipeline_stage?: PipelineStage;
   search?: string;
+  /** Soft cap (default 5000, hard max 10000) — prevents unbounded heap on list/export. */
+  limit?: number;
 };
+
+/** Hard ceiling for any contacts list/export in one round-trip. */
+export const SAAS_CONTACTS_HARD_MAX = 10_000;
+/** Allows export route to request HARD_MAX+1 to detect overflow → 413. */
+const SAAS_CONTACTS_ABSOLUTE_FETCH_MAX = SAAS_CONTACTS_HARD_MAX + 1;
+const SAAS_CONTACTS_DEFAULT_LIMIT = 5_000;
 
 export type CreateContactInput = {
   name: string;
@@ -261,14 +269,133 @@ export class SaasCrmService {
       params.push(`%${filters.search.trim()}%`);
       idx += 1;
     }
+    const rawLimit = filters?.limit ?? SAAS_CONTACTS_DEFAULT_LIMIT;
+    const limit = Math.min(
+      SAAS_CONTACTS_ABSOLUTE_FETCH_MAX,
+      Math.max(1, Number.isFinite(rawLimit) ? Math.floor(Number(rawLimit)) : SAAS_CONTACTS_DEFAULT_LIMIT),
+    );
+    params.push(limit);
     const rows = await this.db.query<ContactRow>(
       `SELECT id, tenant_id, name, email, phone, company, position, status, pipeline_stage, value, notes, tags, created_at, updated_at
        FROM saas_contacts
        WHERE ${clauses.join(" AND ")}
-       ORDER BY created_at DESC`,
+       ORDER BY created_at DESC
+       LIMIT $${idx}`,
       params,
     );
     return rows.map(rowToContact);
+  }
+
+  /**
+   * Bulk insert for CSV import — one plan check + chunked multi-row INSERT
+   * (avoids N sequential round-trips / plan checks).
+   */
+  async createContactsBatch(
+    tenantId: string,
+    inputs: CreateContactInput[],
+    opts?: { chunkSize?: number },
+  ): Promise<{ created: SaasContact[]; errors: Array<{ index: number; error: string }> }> {
+    const prepared: Array<{ index: number; data: Required<Pick<CreateContactInput, "name">> & CreateContactInput & {
+      status: ContactStatus;
+      pipeline_stage: PipelineStage;
+      value: number;
+      tags: string[];
+    } }> = [];
+    const errors: Array<{ index: number; error: string }> = [];
+
+    for (let i = 0; i < inputs.length; i++) {
+      const data = inputs[i]!;
+      const name = data.name.trim();
+      if (name.length === 0) {
+        errors.push({ index: i, error: "name is required" });
+        continue;
+      }
+      try {
+        const status = data.status ?? "lead";
+        const stage = data.pipeline_stage ?? "new";
+        assertStatus(status);
+        assertStage(stage);
+        prepared.push({
+          index: i,
+          data: {
+            ...data,
+            name,
+            status,
+            pipeline_stage: stage,
+            value: Number.isFinite(data.value ?? 0) ? Number(data.value ?? 0) : 0,
+            tags: data.tags ?? [],
+          },
+        });
+      } catch (e: unknown) {
+        errors.push({ index: i, error: e instanceof Error ? e.message : "invalid row" });
+      }
+    }
+
+    if (prepared.length === 0) return { created: [], errors };
+
+    await assertSaasPlanCanCreateMany(this.db, tenantId, "contacts", prepared.length);
+
+    const chunkSize = Math.min(500, Math.max(1, opts?.chunkSize ?? 100));
+    const created: SaasContact[] = [];
+
+    for (let offset = 0; offset < prepared.length; offset += chunkSize) {
+      const chunk = prepared.slice(offset, offset + chunkSize);
+      const valuesSql: string[] = [];
+      const params: unknown[] = [];
+      let p = 1;
+      for (const item of chunk) {
+        const d = item.data;
+        valuesSql.push(
+          `($${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},$${p++},NOW())`,
+        );
+        params.push(
+          tenantId,
+          d.name,
+          normalizeOptional(d.email),
+          normalizeOptional(d.phone),
+          normalizeOptional(d.company),
+          normalizeOptional(d.position),
+          d.status,
+          d.pipeline_stage,
+          d.value,
+          normalizeOptional(d.notes),
+          d.tags,
+        );
+      }
+      try {
+        const rows = await this.db.query<ContactRow>(
+          `INSERT INTO saas_contacts
+           (tenant_id, name, email, phone, company, position, status, pipeline_stage, value, notes, tags, updated_at)
+           VALUES ${valuesSql.join(",")}
+           RETURNING id, tenant_id, name, email, phone, company, position, status, pipeline_stage, value, notes, tags, created_at, updated_at`,
+          params,
+        );
+        for (const row of rows) {
+          const contact = rowToContact(row);
+          created.push(contact);
+          void dispatchContactCreated(tenantId, contact);
+          void this.audit?.log(tenantId, {
+            action: "create",
+            module: "crm",
+            resourceId: contact.id,
+            details: { name: contact.name, batch: true },
+          });
+        }
+      } catch (e: unknown) {
+        if (isCheckViolation(e)) {
+          for (const item of chunk) {
+            errors.push({ index: item.index, error: "Invalid status or pipeline_stage" });
+          }
+        } else {
+          const msg = e instanceof Error ? e.message : "batch insert failed";
+          for (const item of chunk) {
+            errors.push({ index: item.index, error: msg });
+          }
+        }
+      }
+    }
+
+    return { created, errors };
   }
 
   async getContact(tenantId: string, contactId: string): Promise<SaasContact | null> {

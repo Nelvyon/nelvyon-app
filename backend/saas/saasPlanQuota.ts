@@ -1,5 +1,10 @@
 import type { SaasPostgresPort, SaasPlan } from "./SaasOnboardingService";
-import { assertBelowPlanLimit, type SaasPlanResource } from "./saasPlanLimits";
+import {
+  assertBelowPlanLimit,
+  getSaasPlanLimit,
+  SaasPlanQuotaError,
+  type SaasPlanResource,
+} from "./saasPlanLimits";
 
 type CountRow = { n: string | number };
 
@@ -71,6 +76,28 @@ export async function assertSaasPlanCanCreate(
   const plan = await getTenantPlan(db, tenantId);
   const current = await countResource(db, tenantId, resource);
   assertBelowPlanLimit(plan, resource, current);
+}
+
+/** Assert tenant has room for `additional` creates in one shot (imports / batches). */
+export async function assertSaasPlanCanCreateMany(
+  db: SaasPostgresPort,
+  tenantId: string,
+  resource: SaasPlanResource,
+  additional: number,
+): Promise<void> {
+  if (additional <= 0) return;
+  const plan = await getTenantPlan(db, tenantId);
+  const current = await countResource(db, tenantId, resource);
+  const limit = getSaasPlanLimit(plan, resource);
+  if (limit === null) return;
+  if (current + additional > limit) {
+    throw new SaasPlanQuotaError(
+      `Plan limit exceeded for ${resource}: ${current}+${additional} > ${limit}`,
+      resource,
+      limit,
+      current,
+    );
+  }
 }
 
 export async function getSaasResourceUsage(

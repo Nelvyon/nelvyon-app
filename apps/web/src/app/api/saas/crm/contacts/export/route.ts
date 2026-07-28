@@ -4,6 +4,7 @@ import {
   saasErrorBody,
   saasErrorStatus,
   requireSaasContext,
+  SAAS_CONTACTS_HARD_MAX,
 } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
@@ -19,12 +20,25 @@ function escapeCSV(val: unknown): string {
 
 export async function GET(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    // CSV dump is data-exfil sensitive — require write (viewers denied).
+    const ctx = await requireSaasContext(req, "contacts.write");
     const url = new URL(req.url);
+    // Fetch hard-max+1 to detect overflow without loading unbounded tables.
     const contacts = await getSaasCrmService().getContacts(ctx.tenant.id, {
       status: (url.searchParams.get("status") as "lead" | undefined) ?? undefined,
       search: url.searchParams.get("search") ?? undefined,
+      limit: SAAS_CONTACTS_HARD_MAX + 1,
     });
+
+    if (contacts.length > SAAS_CONTACTS_HARD_MAX) {
+      return NextResponse.json(
+        {
+          error: `Export exceeds ${SAAS_CONTACTS_HARD_MAX} contacts — narrow filters or split export`,
+          code: "EXPORT_TOO_LARGE",
+        },
+        { status: 413 },
+      );
+    }
 
     const headers = ["id", "name", "email", "phone", "company", "position", "status", "pipeline_stage", "value", "tags", "notes", "created_at"];
     const rows = contacts.map((c) => [

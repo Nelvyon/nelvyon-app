@@ -7,6 +7,9 @@ const QUEUE_LIST_KEY = "os:async:queue";
 const PROCESSING_LIST_KEY = "os:async:processing";
 const JOB_KEY_PREFIX = "os:async:job:";
 const JOB_TTL_SECONDS = 24 * 60 * 60;
+/** In-memory fallback (no Upstash): hard cap + TTL mirror Redis retention. */
+const MEMORY_JOB_CAP = 5_000;
+const MEMORY_JOB_TTL_MS = JOB_TTL_SECONDS * 1000;
 
 function jobKey(jobId: string): string {
   return `${JOB_KEY_PREFIX}${jobId}`;
@@ -185,11 +188,29 @@ export class QueueClient {
     return fromId === safe || fromId === userId;
   }
 
+  private pruneMemoryJobs(now = Date.now()): void {
+    for (const [id, record] of this.memoryJobs) {
+      const updated = Date.parse(record.updatedAt || record.createdAt);
+      if (Number.isFinite(updated) && now - updated > MEMORY_JOB_TTL_MS) {
+        this.memoryJobs.delete(id);
+      }
+    }
+    if (this.memoryJobs.size <= MEMORY_JOB_CAP) return;
+    const oldest = [...this.memoryJobs.entries()].sort(
+      (a, b) => Date.parse(a[1].updatedAt || a[1].createdAt) - Date.parse(b[1].updatedAt || b[1].createdAt),
+    );
+    const drop = this.memoryJobs.size - MEMORY_JOB_CAP;
+    for (let i = 0; i < drop; i++) {
+      this.memoryJobs.delete(oldest[i]![0]);
+    }
+  }
+
   private async saveJobStatus(jobId: string, record: JobStatus): Promise<void> {
     if (this.redis) {
       await this.redis.set(jobKey(jobId), record, { ex: JOB_TTL_SECONDS });
       return;
     }
+    this.pruneMemoryJobs();
     this.memoryJobs.set(jobId, record);
   }
 
@@ -199,6 +220,10 @@ export class QueueClient {
       await this.redis.lpush(QUEUE_LIST_KEY, raw);
       await this.redis.expire(QUEUE_LIST_KEY, JOB_TTL_SECONDS);
       return;
+    }
+    // Cap pending queue length (completed jobs live in memoryJobs with TTL).
+    if (this.memoryQueue.length >= MEMORY_JOB_CAP) {
+      this.memoryQueue.shift();
     }
     this.memoryQueue.push(item);
   }

@@ -82,8 +82,19 @@ export async function POST(req: Request) {
     if (rows.length > 5000) return NextResponse.json({ error: "Max 5000 rows per import" }, { status: 400 });
 
     const crm = getSaasCrmService();
-    const imported: string[] = [];
-    const errors: Array<{ row: number; error: string }> = [];
+    const inputs: Array<{
+      name: string;
+      email: string | null;
+      phone: string | null;
+      company: string | null;
+      position: string | null;
+      status: "lead" | "prospect" | "client" | "churned";
+      pipeline_stage: "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
+      value: number;
+      notes: string | null;
+      tags: string[];
+    }> = [];
+    const preErrors: Array<{ row: number; error: string }> = [];
 
     for (let i = 0; i < rows.length; i++) {
       const raw = rows[i]!;
@@ -93,29 +104,33 @@ export async function POST(req: Request) {
         if (normalized) mapped[normalized] = val;
       }
       const name = mapped.name?.trim();
-      if (!name) { errors.push({ row: i + 2, error: "name/nombre required" }); continue; }
-      try {
-        const contact = await crm.createContact(ctx.tenant.id, {
-          name,
-          email: mapped.email || null,
-          phone: mapped.phone || null,
-          company: mapped.company || null,
-          position: mapped.position || null,
-          status: (mapped.status as "lead" | "prospect" | "client" | "churned") || "lead",
-          pipeline_stage: (mapped.pipeline_stage as "new" | "contacted" | "qualified" | "proposal" | "won" | "lost") || "new",
-          value: mapped.value ? Number(mapped.value) || 0 : 0,
-          notes: mapped.notes || null,
-          tags: mapped.tags ? mapped.tags.split(";").map((t) => t.trim()).filter(Boolean) : [],
-        });
-        imported.push(contact.id);
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : "unknown error";
-        errors.push({ row: i + 2, error: msg });
+      if (!name) {
+        preErrors.push({ row: i + 2, error: "name/nombre required" });
+        continue;
       }
+      inputs.push({
+        name,
+        email: mapped.email || null,
+        phone: mapped.phone || null,
+        company: mapped.company || null,
+        position: mapped.position || null,
+        status: (mapped.status as "lead" | "prospect" | "client" | "churned") || "lead",
+        pipeline_stage: (mapped.pipeline_stage as "new" | "contacted" | "qualified" | "proposal" | "won" | "lost") || "new",
+        value: mapped.value ? Number(mapped.value) || 0 : 0,
+        notes: mapped.notes || null,
+        tags: mapped.tags ? mapped.tags.split(";").map((t) => t.trim()).filter(Boolean) : [],
+      });
     }
 
+    // Chunked multi-row INSERT — avoids up to 5k sequential round-trips.
+    const { created, errors: batchErrors } = await crm.createContactsBatch(ctx.tenant.id, inputs);
+    const errors = [
+      ...preErrors,
+      ...batchErrors.map((e) => ({ row: e.index + 2, error: e.error })),
+    ];
+
     return NextResponse.json({
-      imported: imported.length,
+      imported: created.length,
       errors: errors.length,
       errorDetails: errors.slice(0, 50),
     }, { status: 200 });
