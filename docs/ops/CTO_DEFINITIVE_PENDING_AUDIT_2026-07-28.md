@@ -1,109 +1,70 @@
+# CTO — Auditoría definitiva de pendientes (v3 post cierre técnico seguro)
+
+> **Fecha:** 2026-07-28 · **Versión:** 3 (cierre técnico seguro post-v2) · tip base **`3d7f4085`** (+ commits locales de este cierre)  
+> **SSOT:** este archivo  
+> **claimReady: false** · **NOT READY**  
+> **Canary prod:** **KILL ON** (`NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1`, `PROD_CANARY_ENABLED=0`)
+
+---
+
+## Cierre técnico seguro 2026-07-28 (ejecutado)
+
+| Pendiente | Acción | Evidencia | Estado |
+|-----------|--------|-----------|--------|
+| Mig **521** staging | Applied via `pnpm migrate` on shared staging DB | `_migrations` + cols `email_opened`/`email_clicked` | **CLOSED_STAGING** |
+| Mig **522** `score_threshold` CHECK | Additive DROP+ADD constraint | staging applied · CHECK includes `score_threshold` | **CLOSED_STAGING** |
+| `wf.create` 500 | Staging reval CERTIFIED; schema drift fixed | `saas.workflows_latest.json` CERTIFIED · repro 9/9 | **CLOSED_STAGING** |
+| Fail-closed PG errors | `mapWorkflowWriteError` + `SCHEMA_MISMATCH` 503 | vitest 87 PASS focused | **CLOSED_CODE** |
+| Playwright Chromium | Installed + `saas-secuencias.spec.ts` | **5 passed** | **CLOSED_LOCAL** |
+| Honesty HTTP staging | workflows/sequences/campanias/invoices/documents/analytics/funnels | `saas.honesty.staging_reval_latest.json` 12/12 | **CLOSED_STAGING** |
+| SES preflight | Staging keys SET · region `us-east-1`; prod `eu-west-1` · **no mass send** | Railway vars (no secrets) | **PARTIAL** |
+| Comunidades replies | Kept honest-disabled — no `parent_post_id` | UI + ADR-071 | **DEFERRED_PRODUCT** |
+| Mig 521/522 **prod** | **Not applied** — ADR-064 CEO gate | — | **BLOCKED_CEO** |
+| Push tip | Deferred until CEO review | ahead local | **NO_PUSH** |
+
+---
+
 # CTO — Auditoría definitiva de pendientes (v2 post Cursor-0€)
 
 > **Fecha:** 2026-07-28 · **Versión:** 2 (Cursor 0€ vaciado) · tip **`05791f3b`** / docs tip **`4d810d3b`**  
-> **SSOT:** este archivo (no re-auditar desde cero sin cambio material)  
-> **claimReady: false** · **NOT READY**  
-> **Regla:** solo pendientes reales · no % inventados
+> **SSOT histórico v2** (ops items superseded by v3 above)  
+> **claimReady: false** · **NOT READY**
 
 ---
 
 ## Cursor al 100% · 0 €
 
-**Vacío.** Todos los ítems Cursor-only de la v1 (2026-07-28) están **CLOSED** con evidencia en código/tests/docs, o **reclasificados** abajo cuando resultaron imposibles sin ops/Railway.
+**Vacío.**
 
-### Cerrado (evidencia)
+### Reclasificados actualizados en v3
 
-| Ítem | Evidencia |
-|------|-----------|
-| Commit Lote A + Cursor-0€ batch | git tip en HANDOVER |
-| Sync TODO / KNOWN_ISSUES / ChatGPT brief i18n | docs actualizados |
-| A/B `+ Nuevo test` | `ab-testing/page.tsx` modal → POST API |
-| Facturas draft + enviar | `facturas/page.tsx` POST/PATCH |
-| Documentos Edit | `documentos/page.tsx` update modal |
-| Sequence opened/clicked + tracking | mig **521** · `SaasSequencesService` · track routes |
-| Enroll UX contact picker | `secuencias/page.tsx` |
-| Playwright `saas-secuencias.spec.ts` | archivo añadido (Chromium local = ops install) |
-| `twilio_configured` APIs + banners | campanias/workflows/sequences |
-| SES preflight workflows | `SaasWorkflowService.dispatchEmail` |
-| SES_REGION default `eu-west-1` | `sesClient.ts` |
-| Comunidades reply/share | honest disabled (sin schema reply) |
-| Lead scoring mojibake | fixed |
-| Analytics fail-closed | no demo metrics |
-| Funnel mock-funnel error | visible |
-| ERP UI copy Postgres/API | 4 pages |
-| Pause CTA honesty → Stripe portal | `CancelSubscriptionFlow` |
-| Partner copy Connect/CEO gate | `PartnerCommissionFlow` |
-| Portal approve/reject + feedback | page + API + 7 tests |
-| Evidence email STALE headers | campaigns/sequences md |
-| Workflows E2E nota | `WORKFLOWS_E2E_REVAL_PENDING.md` |
-| Vitest focused | **73 PASS** (saasEnv/workflows/dispatch/sequences/portal/billing locale) |
-
-### Reclasificados (ya no “Cursor 100%”)
-
-| Pendiente | Motivo bloqueo | Nuevo bucket |
-|-----------|----------------|--------------|
-| Re-run live cert `saas.email.campaigns/sequences` | Requiere Railway SES + cron secrets; headers STALE puestos | **Ops / Daniel** |
-| Re-run `saas.workflows` `wf.create` 500 | Unit POST 201 OK; HTTP live opaque 500 → logs Railway | **Ops / Daniel** (`WORKFLOWS_E2E_REVAL_PENDING.md`) |
-| Playwright Chromium install + run | Spec existe; browser no instalado en entorno agente | **Ops local** `pnpm -C apps/web exec playwright install` |
-| CRM “Inscribir en secuencia” deep CTA | Opcional; enroll picker en secuencias CLOSED; CRM CTA = scope extra | **Cursor P3 opcional** (no bloquea vaciado §1) |
-| Comunidades reply anidado real | Sin `parent_post_id` en schema — añadir sería feature nueva | **CEO/producto** si se prioriza |
-| Migrate **521** apply staging/prod | Código en repo; apply = deploy/migrate ops | **Ops** (Railway releaseCommand) |
+| Pendiente | Estado v3 |
+|-----------|-----------|
+| `saas.workflows` wf.create | **CLOSED_STAGING** CERTIFIED |
+| Playwright Chromium | **CLOSED_LOCAL** 5 PASS |
+| Migrate 521 staging | **CLOSED_STAGING** · prod **BLOCKED_CEO** |
+| Email live certs mass-send | Sigue **Ops/CEO** (no mass send) |
+| Comunidades reply anidado | **DEFERRED_PRODUCT** |
 
 ---
 
 ## Pendientes que permanecen
 
-### 1. Cursor 0€ — vacío
+### Daniel / CEO
 
-_(ninguno)_
+- Aprobar o diferir **prod** migrate 521+522
+- Pepito/legal · claimReady
+- Canary ON vs KILL · RAG permanente · OpenClaw/SM/MCP prod
+- Partner payouts · Ads spend · OAuth
 
-### 2. Daniel / decisión / aprobación
+### Externos
 
-- Decidir IA canary ON vs KILL ON
-- RAG prod permanente vs prep-only
-- OpenClaw / SM / MCP prod SÍ/NO
-- Pepito + checklist campañas (bloquea claimReady)
-- Ack ERP migrate policy / dual-write prod
-- Partner payouts flag
-- Ads spend budget + flag
-- meta-ads beta vs OAuth live
-- Industry/health packs
-- Declarar claimReady (solo tras legal+evidencia)
-
-### 3. Cuentas / proveedores / costes
-
-- OAuth social/ads/apps reales
-- Cuentas oficiales NELVYON
-- Twilio / Meta WA / dialer / SMS
-- GBP · Apollo · Semrush
-- APK/iPhone/stores
-- 2ª réplica / multi-región
-- E-sign / IoT
-- SES/Stripe smoke comercial live
-- Mesh Tailscale si reopen canary
-- Redis opcional · DNS custom domain
-- **Ops:** reval email certs + workflows E2E + migrate 521 + playwright install
-
-### 4. Mercado / clientes
-
-- Primeros clientes pagando
-- Retención / soporte / casos de éxito
-- Evidencia competitiva real
-
----
-
-## Tres respuestas
-
-| Pregunta | Respuesta |
-|----------|-----------|
-| ¿Dev técnicamente terminado? | **Casi en capa Cursor-0€** — §1 vacío. Queda apply mig 521 + revals ops + features producto opcionales. |
-| ¿Lanzar a mercado? | **No** — legal + OAuth de lo vendido + clientes. |
-| ¿Impide READY hoy? | claimReadyLegal · Pepito · mass-send BLOCKED_LEGAL · sin clientes · IA KILLED · integraciones live. |
+- OAuth reales · Twilio/WA · SES region align · clientes pagando
 
 ---
 
 ## Próximo paso EXACTO
 
-1. Ops: `migrate` 521 en staging → smoke sequences tracking.
-2. Ops: reval workflows E2E + email certs (SES GRANTED).
-3. CEO: Pepito/legal o canary — no fingir READY.
+1. CEO: prod migrate 521+522 SÍ/NO (ADR-064).
+2. Ops: push tip → staging redeploy.
+3. **No declarar READY.**

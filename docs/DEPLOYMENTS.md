@@ -1,6 +1,18 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-27** canary retry PASS · kill drill · steady KILL ON.
+> Actualizado: **2026-07-28** cierre técnico seguro v3 · staging migrate 521+522 · **no** prod migrate · canary KILL ON.
+
+## 2026-07-28 — Staging migrate 521+522 (no prod · no push)
+
+| Campo | Valor |
+|-------|-------|
+| **Env** | Railway **staging** shared Supabase (`ideal-victory` + `comfortable-empathy`) |
+| **Applied** | `521_saas_sequence_enrollment_tracking.sql` · `522_saas_workflows_score_threshold_trigger.sql` |
+| **Prod** | **NOT applied** (ADR-064 gate) |
+| **HTTP** | `saas.workflows` **CERTIFIED** · honesty 12/12 · canary flags prod reconfirmed KILL |
+| **Playwright** | Chromium install + `saas-secuencias` **5 PASS** (local) |
+| **claimReady** | **false** |
+| **Push** | **deferred** |
 
 ## 2026-07-27 — Private AI canary retry PASS (then KILLED)
 

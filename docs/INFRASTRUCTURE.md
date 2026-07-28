@@ -1,6 +1,6 @@
 # INFRASTRUCTURE — Infraestructura NELVYON
 
-> Estado real documentado **2026-07-26** (ADR-068 prod canary attempt · coste 0). Sin secretos.
+> Estado real documentado **2026-07-28** (cierre técnico v3 · staging mig 521+522 · canary KILL · coste 0). Sin secretos.
 
 ---
 

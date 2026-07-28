@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-26** — ADR-068 close 2–4 · `claimReady: false`
+> Actualizado: **2026-07-28** — cierre técnico v3 · staging 521+522 · `claimReady: false`
 
 ---
 
@@ -11,7 +11,10 @@
 - [x] Puntos 1–4 **prep** (migrate gate · dual-write OFF · RAG apply blocked · canary OFF) — **sin activar**
 - [x] **ADR-067:** #1 migrate gate política **SÍ** (CEO-ACK) · #2–#4 **NO todavía** (histórico)
 - [x] **ADR-068:** #2 dual-write staging **IMPLEMENTED_VERIFIED** · #3 RAG staging **IMPLEMENTED_VERIFIED** · #4 canary prod **AUTHORIZED** / live **BLOCKED_EXTERNAL** (mesh)
-- [ ] **Solo humano:** `TS_AUTHKEY` + Ollama mesh prod (si canary live) · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md` (legal/OAuth/iOS/Android/mercado)
+- [x] **2026-07-28 staging:** mig 521+522 applied · workflows CERTIFIED · Playwright secuencias PASS
+- [ ] **CEO:** aprobar o diferir **prod** migrate 521+522 (ADR-064)
+- [ ] **Ops:** push tip + staging redeploy (honesty `twilio_configured` runtime)
+- [ ] **Solo humano:** Pepito/legal · OAuth · clientes · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
 
 ---
 

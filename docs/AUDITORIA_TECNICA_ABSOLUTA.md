@@ -1,6 +1,7 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> **2026-07-27** Option A RAG prep · claimReady false  
+> **2026-07-28** cierre técnico seguro v3 · staging 521+522 · workflows CERTIFIED · claimReady false · **NOT READY**  
+> SSOT ops: `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` v3
 > Veredicto: **CONDITIONAL_READY** · **NOT READY** · canary **not** opened · coste **0**
 
 ### Matriz

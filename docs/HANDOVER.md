@@ -1,14 +1,15 @@
 # HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-28** — Cursor 0€ **VACÍO** (auditoría v2) · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-28** — Cierre técnico seguro v3 · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Último tip** | `05791f3b` (Cursor 0€ vacío · auditoría v2) |
-| **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` **v2** |
+| **Último tip docs** | `3d7f4085` (base) · commits locales pendientes de este cierre |
+| **Auditoría SSOT** | `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` **v3** |
 | **Fecha doc** | 2026-07-28 |
-| **Rama** | `main` (ahead 1) |
+| **Rama** | `main` (ahead local · **no push** hasta aprobación) |
+| **Railway CLI** | linked **production** / `@nelvyon/web` |
 
 ---
 
@@ -16,20 +17,23 @@
 
 | Punto | Estado |
 |-------|--------|
-| Lote A email locale + runtime | **CLOSED** |
-| Documentos/Comunidades/A/B/Facturas CTAs | **CLOSED** |
-| Sequences triggers + tracking mig 521 | **CLOSED** (apply migrate = ops) |
-| Honesty SES/Twilio/analytics/ERP | **CLOSED** |
-| Portal approve/reject feedback | **CLOSED** |
 | Cursor 0€ backlog | **VACÍO** |
+| Mig **521** staging | **APPLIED** (2026-07-28) |
+| Mig **522** staging | **APPLIED** (score_threshold CHECK) |
+| Mig 521/522 **prod** | **NOT applied** (CEO ADR-064) |
+| `saas.workflows` E2E staging | **CERTIFIED** (wf.create 201) |
+| Playwright secuencias | **5 PASS** (Chromium instalado) |
+| Honesty HTTP staging | **12/12 PASS** |
+| Comunidades replies | **honest disabled** (sin `parent_post_id`) |
 | IA canary prod | **KILLED** |
 | claimReady | **false** |
+| Veredicto | **NOT READY** |
 
 ## Próximo paso EXACTO
 
-1. Ops: aplicar migración **521** en staging/prod (`releaseCommand` / migrate).
-2. Ops: reval `saas.workflows` E2E + email certs — `WORKFLOWS_E2E_REVAL_PENDING.md`.
-3. CEO: Pepito/legal o canary — ver auditoría §2–4. **No declarar READY.**
+1. CEO: aprobar o diferir **prod** migrate `521`+`522` (`NELVYON_PROD_MIGRATE_APPROVED=1` + `APPROVED_BY`, luego unset).
+2. Ops: push tip → redeploy staging → (opcional) yellow-queue drain completo.
+3. CEO: Pepito/legal — **no declarar READY**.
 
 ### Rollback IA
 

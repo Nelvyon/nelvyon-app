@@ -6,6 +6,14 @@
 
 ## Activos
 
+### Historial — wf.create Internal 500 (localhost 2026-07-17) → CLOSED_STAGING 2026-07-28
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Resuelto en staging** · payload cert manual+active **201** · score_threshold fixed via mig 522 |
+| **Detalle** | Fail histórico opaque Internal error en localhost; reval staging CERTIFIED. Prod mig 522 pendiente CEO. |
+| **Evidencia** | `WORKFLOWS_E2E_REVAL_PENDING.md` · `saas.workflows_latest.json` |
+
 ### Ops (no KI) — Prod private AI canary inference DB (ADR-068/069)
 
 | Campo | Valor |

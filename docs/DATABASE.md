@@ -1,6 +1,6 @@
 # DATABASE — PostgreSQL / Supabase
 
-> Actualizado: **2026-07-26** — ADR-068 · #2 dual-write staging **ON** (READ=0) · #3 `local_ai_*` applied staging only · #1 migrate gate **CEO-ACK** · mig **519+520** · staging live `428c6c91` · prod `d03721c1` · prod dual-write/RAG DDL **OFF**
+> Actualizado: **2026-07-28** — mig **521+522 staging applied** · prod **not** applied (ADR-064) · tip base `3d7f4085`
 
 ---
 
@@ -54,9 +54,9 @@
 |-------|-------|
 | **Directorio** | `backend/db/migrations/` |
 | **Total archivos** | 411+ |
-| **Última migración (repo)** | `521_saas_sequence_enrollment_tracking.sql` (email_opened/email_clicked) |
-| **Staging verified** | **519** + **520** in `_migrations` (2026-07-25) |
-| **Prod verified** | **517** + **518** in `_migrations` (2026-07-22 SSOT DB probe) · **519/520** **not** claimed on prod |
+| **Última migración (repo)** | `522_saas_workflows_score_threshold_trigger.sql` |
+| **Staging verified** | **521** + **522** in `_migrations` (2026-07-28) · cols `email_opened`/`email_clicked` · CHECK includes `score_threshold` |
+| **Prod verified** | **519/520** not claimed on prod historically · **521/522 NOT applied** (CEO gate) |
 | **Shared Memory schema** | 514 + RLS 515 · `schema.proposed.sql` referencia histórica |
 | **Runner** | `backend/db/migrate.ts` |
 | **Tracking** | Tabla `_migrations (name, executed_at)` |
@@ -117,7 +117,7 @@
 ### Private AI
 - `504_private_ai_modular.sql`, `503_private_ai_phase2.sql`
 
-### Recientes (508–520)
+### Recientes (508–522)
 - `508_saas_prospecting.sql` — prospecting lists
 - `509_saas_seo_tracked_keywords.sql` — SEO keywords
 - `510_enterprise_performance_indexes.sql` — índices performance
@@ -131,6 +131,8 @@
 - `518_workflows_list_columns.sql` — `workflows.is_active` · **prod verified**
 - `519_erp_non_financial_cores.sql` — reserved ERP tables (suppliers/PO/inventory/warehouses/stock_moves/MO/`saas_projects_erp`) · RLS comments only · **staging applied**
 - `520_erp_postgres_persistence.sql` — `erp_domain_snapshots` + companions + `erp_audit_events` + RLS · API `with*Persistence` · **staging applied** · restart **ALL_PASS**
+- `521_saas_sequence_enrollment_tracking.sql` — `email_opened`/`email_clicked` on enrollments · **staging applied 2026-07-28** · prod **NOT**
+- `522_saas_workflows_score_threshold_trigger.sql` — CHECK includes `score_threshold` · **staging applied 2026-07-28** · prod **NOT**
 
 ---
 

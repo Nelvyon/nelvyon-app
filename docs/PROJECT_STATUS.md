@@ -1,12 +1,14 @@
-> **2026-07-28** — canary retry PASS · CEO NO extensión · steady KILL ON · `claimReady: false` · **NOT READY**
+> **2026-07-28** — cierre técnico seguro v3 · staging 521+522 · workflows CERTIFIED · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** · **NOT READY** |
-| **#3 RAG prod** | Schema+RLS + e2e canary **PASS** · AI off |
-| **#4 Canary** | Window **VERIFIED** · steady **KILLED** (CEO NO) |
+| **Estado** | **CONDITIONAL_READY** (código/staging) · **NOT READY** (prod/legal) |
+| **Mig staging** | **521+522 APPLIED** |
+| **Mig prod** | **521+522 NOT applied** |
+| **Workflows E2E** | staging **CERTIFIED** |
+| **Playwright** | secuencias **5 PASS** |
+| **Canary** | steady **KILLED** |
 | **Coste** | **0** |
-| **Brief ChatGPT** | `docs/ops/CHATGPT_PROJECT_BRIEF_NELVYON.md` |
-| **Pendiente humano** | Legal · OAuth · cuentas · clientes · SÍ canary si se reabre |
+| **Pendiente humano** | CEO prod migrate · legal · OAuth · clientes · push tip |
 
-SSOT: `HANDOVER.md` · `private-ai.prod_canary_retry_pass_latest.md`
+SSOT: `HANDOVER.md` · `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` v3
