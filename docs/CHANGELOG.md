@@ -3,6 +3,13 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-29
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Ops / Launch | **Paquete ops mundial** | `OPERATIONS_INDEX` · `WORLD_CLASS_OPS_RUNBOOK` · `LAUNCH_CHECKLIST_DEFINITIVE` · `SECURITY_OPERATIONS` · `DEVELOPER_ONBOARDING` · `OPS.md` + observability SaaS · **no** prod · canary KILL · `claimReady: false` |
+| Security / Perf | **Artifact path + CRM/queue caps** | `resolveArtifactZipPath` containment · CRM list/export LIMIT+413 · `createContactsBatch` · QueueClient memory TTL/cap · tests PASS · `claimReady: false` |
+
 ## 2026-07-28
 
 | Área | Cambio | Descripción |
@@ -11,6 +18,7 @@
 | Ops / Gate | **Pre-prod 521–522 READ-ONLY** | Prod: migs ausentes · cols ausentes · CHECK sin score_threshold · **0** filas · runbook `PROD_MIGRATE_521_522_RUNBOOK.md` · orden **migrate→deploy** · **no** migrate ejecutado · canary KILL · `claimReady: false` |
 | Ops / Prep | **Runbook final + ADR-064** | Comando canónico `migrate:prod` · approval env documentadas · staging 521/522 reconfirmadas · prod live aún tip viejo (FAILED auto-deploys) · **NOT READY** |
 | Cleanup | **Cursor absolute close** | +26 orphan TSX · premium barrel trim · root junk · docs mig tip **522** · cert PASS esperado · `claimReady: false` |
+| Security / Excelencia | **Fail-closed + least-privilege** | IP allowlist + custom ACLs fail-closed 503 · `requestId` en errores · RBAC export/GDPR/contracts/memberships/reports · rate limits SaaS · webhook-in idempotency · shell error UX · vitest **2480** PASS · tsc 0 · `claimReady: false` |
 | Ops / Staging | **Push + deploy + SES align v3.2** | Tip remoto **`40099898`** · deploy `56df6a6e` SUCCESS · `SES_REGION=eu-west-1` · mig 521–522 confirmed · health/workflows/honesty/seq/PW/yellow **PASS** · **no** prod migrate · canary KILL · `claimReady: false` · **NOT READY** |
 | Ops / Cert | **Pre-push certificación v3.1** | Typecheck PASS · build PASS · vitest 2471 · PW 5 · DECISIONS UTF-8 fix ADR-072/073 · lint erp unused **preexistente** · SES identities **eu-west-1 only** · `SAFE_TO_PUSH=true` · `SAFE_TO_MIGRATE_PROD=false` · canary KILL · `claimReady: false` · **NOT READY** |
 | Ops / DB | **Cierre técnico seguro v3** | Staging mig **521+522** applied · `wf.create` CERTIFIED · Playwright 5 PASS · honesty 12/12 · PG fail-closed SCHEMA_MISMATCH · prod mig **NOT** applied · canary KILL · `claimReady: false` · **NOT READY** |

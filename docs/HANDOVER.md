@@ -1,24 +1,34 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-29** — Cursor backlog técnico **AGOTADO** · tip **`01fcb70a`** · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-29** — WIP excellence cerrado → push staging · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Último tip remoto** | `01fcb70a` |
-| **Runbook prod** | `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` |
-| **Staging 521/522** | **CONFIRMADAS** |
-| **Prod 521/522** | **NO** · CEO + ADR-064 |
+| **Tip base** | (post-push tip) |
+| **Ops SSOT** | `docs/ops/OPERATIONS_INDEX.md` |
 | **SAFE_TO_MIGRATE_PROD** | **true** (técnico; solo SÍ CEO) |
-| **SAFE_TO_DEPLOY_PROD** | **false** hasta migrate |
+| **SAFE_TO_DEPLOY_PROD** | **false** hasta migrate 521–522 |
 | **claimReady** | **false** |
 | **Canary** | **KILL ON** |
-| **Cursor backlog seguro** | **AGOTADO** |
+
+## Cert pre-push (local)
+
+| Gate | Resultado |
+|------|-----------|
+| tsc | **0** |
+| lint | **0** |
+| Vitest WIP (CRM/security/artifact/queue/rateLimit) | **49 PASS** |
+| Vitest canónico SaaS/email/billing/crm/security | **2482 PASS** / 4 skip |
+| Vitest monorepo completo | 6198 PASS · **16 FAIL preexistentes** (packs/autonomous/qa flows — no WIP) |
+| build | **PASS** |
+| Playwright `saas-secuencias` | **5 PASS** |
 
 ## Próximo paso EXACTO
 
-1. CEO: SÍ/NO ejecutar runbook migrate 521→522→deploy.
-2. Sin SÍ: no migrate · no deploy · no canary · no mass-send.
+1. Validar staging post-deploy (health · workflows · sequences · CRM · artifacts).
+2. CEO: SÍ/NO migrate 521→522→deploy prod.
+3. Sin SÍ: no migrate · no deploy · no canary · no mass-send.
 
 ### Rollback IA
 

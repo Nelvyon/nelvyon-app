@@ -1,11 +1,26 @@
 # NELVYON — Observabilidad: qué está **demostrado en este repo** vs qué queda **fuera**
 
 **Audiencia:** operación, SRE, auditoría interna.  
-**Regla:** nada de esta lista sustituye Prometheus/Alertmanager/OTEL desplegados en un clúster real.
+**Regla:** nada de esta lista sustituye Prometheus/Alertmanager/OTEL desplegados en un clúster real.  
+**Ops unificado:** [`OPS.md`](./OPS.md) · [`ops/OPERATIONS_INDEX.md`](./ops/OPERATIONS_INDEX.md) · actualizado **2026-07-29**.
 
 ---
 
-## 1) Comprobado en código + tests (este repositorio)
+## 0) Capa Next.js / SaaS (demostrado en repo)
+
+| Capacidad | Dónde | Notas |
+|-----------|--------|-------|
+| `x-request-id` end-to-end | `apps/web/src/middleware.ts` | Correlación logs |
+| `requestId` en errores SaaS | `saasErrorBody` / `requestIdFrom` | Cliente ↔ logs |
+| Health live/ready/deep | `/api/health/*` | Ready valida env crítico |
+| Rate limits IP + reglas SaaS | `apps/web/src/lib/security/rateLimit.ts` | Upstash opcional |
+| Fail-closed security plane | `saasRequestContext` → 503 | ACL/IP |
+| Sentry (si DSN) | Next instrumentation | No es APM completo |
+| OpsObservabilityCore | `backend/agency/OpsObservabilityCore.ts` | In-memory; no paging |
+
+---
+
+## 1) Comprobado en código + tests (este repositorio) — FastAPI / jobs
 
 | Capacidad | Dónde | Cómo se verifica |
 |-----------|--------|-------------------|

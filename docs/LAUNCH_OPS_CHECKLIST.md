@@ -1,6 +1,9 @@
 # LAUNCH_OPS_CHECKLIST — Nelvyon producción
 
-> Actualizado: 2026-06-30  
+> **Superseded for go-live decisions:** usar [`LAUNCH_CHECKLIST_DEFINITIVE.md`](./LAUNCH_CHECKLIST_DEFINITIVE.md) + [`ops/OPERATIONS_INDEX.md`](./ops/OPERATIONS_INDEX.md).  
+> Este archivo se conserva como checklist histórico de env/curl (jun-2026).
+
+> Actualizado: 2026-06-30 (histórico) · puntero definitivo: 2026-07-29  
 > Prod: https://nelvyon.com  
 > Sprint Claude: leer `docs/CLAUDE_SPRINT_ELITE.md`
 
