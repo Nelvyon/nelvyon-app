@@ -8,7 +8,7 @@
 | # | Acción | Doc | Tiempo |
 |---|--------|-----|--------|
 | 0 | ~~4 frases SÍ/NO~~ → **ADR-067 decidido** (1 SÍ / 2–4 NO) | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` | hecho |
-| **1** | **SÍ/NO migrar prod 521+522 → luego deploy tip `bf1d44f4`** | `PROD_MIGRATE_521_522_RUNBOOK.md` | **AHORA** |
+| **1** | **SÍ/NO migrar prod 521+522 → luego deploy tip `9bbd5808`** | `PROD_MIGRATE_521_522_RUNBOOK.md` | **AHORA** |
 | 2 | Dual-write ERP — **NO hasta nuevo SÍ** | `ERP_DUAL_WRITE_TRANSITION_RUNBOOK.md` | diferido |
 | 3 | RAG Railway apply — **NO hasta nuevo SÍ** | `RAILWAY_PRIVATE_RAG_PREP_RUNBOOK.md` | diferido |
 | 4 | Canary IA prod — **NO hasta nuevo SÍ** | `CEO_IA_PROD_CANARY_REQUEST.md` | diferido |

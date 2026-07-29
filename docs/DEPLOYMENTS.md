@@ -1,6 +1,18 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-29** tip `bf1d44f4` · staging deploy `7ec98f42` · live sha `bf1d44f4eb65` · **no** prod migrate · canary KILL ON.
+> Actualizado: **2026-07-29** tip `9bbd5808` · staging deploy `06520aab` · live sha `9bbd5808376b` · KI020 PASS · **no** prod migrate · canary KILL ON.
+
+## 2026-07-29 — Orchestrator BFF + CSRF staging tip live
+
+| Campo | Valor |
+|-------|-------|
+| **Tip remoto** | `9bbd5808` |
+| **Env** | Railway staging `ideal-victory` |
+| **Deploy** | `06520aab` **SUCCESS** · live sha `9bbd5808376b` |
+| **Smokes** | KI-020 CSRF **PASS** · health/live ok · orchestrator status **401** (auth required, no 404) |
+| **Prod** | **NOT** migrated · **NOT** deployed |
+| **claimReady** | **false** |
+| **Canary** | **KILL ON** |
 
 ## 2026-07-29 — Absolute closure tip live on staging
 

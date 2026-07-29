@@ -1,12 +1,12 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-29** — CSRF staging + BFF orchestrator + smoke URL defaults · tip previo live `bf1d44f4` · canary **KILL ON** · `claimReady: false` · **NOT READY** (humano)
+> Última actualización: **2026-07-29** — tip **`9bbd5808`** live staging · CSRF KI020 **PASS** · orchestrator BFF 401 auth · canary **KILL ON** · `claimReady: false` · **NOT READY** (humano)
 
 | Campo | Valor |
 |-------|-------|
-| **Tip remoto** | `bf1d44f4` (cierre absoluto + hardening E2E) |
-| **Staging deploy** | `7ec98f42` SUCCESS · live `git_sha=bf1d44f4eb65` |
+| **Tip remoto** | `9bbd5808` (orchestrator BFF + CSRF staging + smoke URL defaults) |
+| **Staging deploy** | `06520aab` SUCCESS · live `git_sha=9bbd5808376b` |
 | **Ops SSOT** | `docs/ops/OPERATIONS_INDEX.md` |
 | **SAFE_TO_MIGRATE_PROD** | **true** (técnico; solo SÍ CEO) |
 | **SAFE_TO_DEPLOY_PROD** | **false** hasta migrate 521–522 |
@@ -33,13 +33,14 @@
 | tsc / lint / build | **PASS** |
 | Vitest monorepo | **0 FAIL** |
 | Playwright completo | **386 PASS / 1 skip** |
-| Staging health/live | **ok** · sha `bf1d44f4eb65` |
+| Staging health/live | **ok** · sha `9bbd5808376b` |
+| KI-020 CSRF staging | **PASS** (apex Railway + app.nelvyon.com) |
 
 ## Próximo paso EXACTO
 
-1. Push tip CSRF/orchestrator → esperar staging redeploy → revalidar `node scripts/staging-smoke-ki020-csrf.mjs` (apex staging PASS).
-2. Ops: ejecutar P0 smokes con secreto `STAGING_QA_PASSWORD` (`node scripts/run-staging-p0-smokes.mjs --skip-wait`).
-3. CEO: SÍ/NO `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy tip HANDOVER). Sin SÍ: no migrate · no deploy prod · no canary · no mass-send · no OAuth.
+1. Ops: ejecutar P0 smokes con secreto `STAGING_QA_PASSWORD` (`node scripts/run-staging-p0-smokes.mjs --skip-wait`).
+2. CEO: SÍ/NO `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy tip `9bbd5808`).
+3. Sin SÍ: no migrate · no deploy prod · no canary · no mass-send · no OAuth.
 
 ### Rollback IA
 
