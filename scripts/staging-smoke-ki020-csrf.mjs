@@ -3,11 +3,11 @@
  * Uses a dummy cookie (middleware only checks presence) — no real credentials.
  *
  * Usage: node scripts/staging-smoke-ki020-csrf.mjs
- * Env: STAGING_WEB_URL (default https://nelvyon.com)
+ * Env: STAGING_WEB_URL (default https://ideal-victory-staging.up.railway.app)
  */
 import { finishSmokeGate } from "./lib/smoke-summary.mjs";
 
-const BASE = (process.env.STAGING_WEB_URL || process.env.STAGING_BASE_URL || "https://nelvyon.com").replace(
+const BASE = (process.env.STAGING_WEB_URL || process.env.STAGING_BASE_URL || "https://ideal-victory-staging.up.railway.app").replace(
   /\/$/,
   "",
 );
@@ -71,16 +71,16 @@ async function main() {
     fail("cookie+evil Origin", `expected 403 CSRF_ORIGIN_*; got ${evil.status} ${evil.code || evil.body}`);
   }
 
-  const apex = await post({ Origin: "https://nelvyon.com" });
+  const apex = await post({ Origin: "https://ideal-victory-staging.up.railway.app" });
   if (apex.status === 403 && String(apex.code || "").includes("CSRF_ORIGIN")) {
     fail(
-      "cookie+Origin nelvyon.com",
-      `CSRF blocked apex — check NEXT_PUBLIC_APP_URL / NEXTAUTH_URL / NELVYON_CSRF_ALLOWED_ORIGINS include https://nelvyon.com (${apex.code})`,
+      "cookie+Origin staging apex",
+      `CSRF blocked staging apex — check NEXT_PUBLIC_APP_URL / NEXTAUTH_URL / NELVYON_CSRF_ALLOWED_ORIGINS include https://ideal-victory-staging.up.railway.app (${apex.code})`,
     );
   } else if (apex.status === 403) {
-    warn("cookie+Origin nelvyon.com", `HTTP 403 non-CSRF code=${apex.code || apex.body}`);
+    warn("cookie+Origin staging apex", `HTTP 403 non-CSRF code=${apex.code || apex.body}`);
   } else {
-    pass("cookie+Origin nelvyon.com", `CSRF passed → handler HTTP ${apex.status} (auth may still fail)`);
+    pass("cookie+Origin staging apex", `CSRF passed → handler HTTP ${apex.status} (auth may still fail)`);
   }
 
   const appHost = await post({ Origin: "https://app.nelvyon.com" });

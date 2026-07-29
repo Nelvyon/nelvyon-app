@@ -25,7 +25,7 @@
 
 ```powershell
 git fetch origin
-git rev-parse HEAD origin/main   # tip autorizado (hoy 3a7318ac)
+git rev-parse HEAD origin/main   # tip autorizado (hoy bf1d44f4 — ver HANDOVER)
 
 railway variables -s "@nelvyon/web" -e production --kv |
   Select-String "NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH|NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED|NELVYON_AI_ENABLED"
@@ -62,7 +62,7 @@ Aprobar apply (temporales; quitar tras éxito):
 # En Railway @nelvyon/web production (o shell one-shot):
 # NELVYON_PROD_MIGRATE_APPROVED=1
 # NELVYON_PROD_MIGRATE_APPROVED_BY=<nombre-ceo>
-# NELVYON_PROD_MIGRATE_COMMIT_SHA=3a7318ac   # opcional pero recomendado
+# NELVYON_PROD_MIGRATE_COMMIT_SHA=bf1d44f4   # opcional pero recomendado (tip HANDOVER)
 ```
 
 Sin estas vars, `migrate.ts` / `migrate:prod` **rechazan** apply en production (ADR-064).
@@ -81,7 +81,7 @@ railway run -s Postgres -e production -- pwsh -Command '
   $env:NELVYON_DEPLOY_ENV = "production"
   $env:NELVYON_PROD_MIGRATE_APPROVED = "1"
   $env:NELVYON_PROD_MIGRATE_APPROVED_BY = "<CEO>"
-  $env:NELVYON_PROD_MIGRATE_COMMIT_SHA = "3a7318ac"
+  $env:NELVYON_PROD_MIGRATE_COMMIT_SHA = "bf1d44f4"
   pnpm -C apps/web migrate:prod
 '
 ```

@@ -7,6 +7,8 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| SaaS / AI | **BFF orchestrator + tip sync** | `/api/saas/orchestrator` committed (status/jobs/enqueue · flag OFF) · HANDOVER tip `bf1d44f4` · staging live `bf1d44f4eb65` · migrate runbook SHA pin · `claimReady: false` |
+| Security / CSRF | **Same-origin + staging Railway Origin** | CSRF allowlist accepts deployment `requestOrigin`, `RAILWAY_PUBLIC_DOMAIN` y host staging ideal-victory · smoke scripts default → Railway staging URL |
 | QA / Playwright | **Contratos E2E alineados al UI real** | `auth` / `dashboard` / `marketing` / `pricing` actualizados al copy, rutas y CTAs vigentes; certificación final **386 PASS / 1 skip** en Playwright completo |
 | Security / Cierre | **OS admin + SMS bulk OFF + RL** | OS dashboards `requirePlatformAdmin` · SMS bulk fail-closed · auth/portal/sms rate limits · FastAPI RL fail-closed · CI staging URLs · `claimReady: false` |
 | QA / Vitest | **Cierre 16 FAIL monorepo** | Contratos fail-closed LLM · locale `sendEmail` 3er arg · onboarding locale query · sitemap mock fumadocs · pack portal via `growthPackReport` · `vitest.setup` limpia OLLAMA_* · **6214 PASS / 0 FAIL** · **sin** redeploy · `claimReady: false` |

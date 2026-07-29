@@ -35,4 +35,18 @@ test.describe("SaaS elite APIs", () => {
     const body = (await res.json()) as { layout?: { widgets?: string[] } };
     expect(Array.isArray(body.layout?.widgets)).toBe(true);
   });
+
+  test("GET /api/saas/orchestrator?resource=status returns contract", async ({ request }) => {
+    const res = await request.get("/api/saas/orchestrator?resource=status");
+    if (res.status() === 401) return;
+    expect(res.ok()).toBeTruthy();
+    const body = (await res.json()) as {
+      enabled?: boolean;
+      contractVersion?: string;
+      rollback?: string;
+    };
+    expect(typeof body.enabled).toBe("boolean");
+    expect(typeof body.contractVersion).toBe("string");
+    expect(body.rollback).toBe("NELVYON_ORCHESTRATOR_ENABLED=0");
+  });
 });

@@ -165,6 +165,7 @@ export async function middleware(request: NextRequest) {
         referer: request.headers.get("referer"),
         hasAuthCookie: true,
         hasAuthorizationHeader: Boolean(request.headers.get("authorization")?.trim()),
+        requestOrigin: request.nextUrl.origin,
       });
       if (csrf) {
         return end(

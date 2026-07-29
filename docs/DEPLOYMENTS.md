@@ -1,6 +1,18 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-29** tip `b236bba0` · staging deploy `073949a1` · **no** prod migrate · canary KILL ON.
+> Actualizado: **2026-07-29** tip `bf1d44f4` · staging deploy `7ec98f42` · live sha `bf1d44f4eb65` · **no** prod migrate · canary KILL ON.
+
+## 2026-07-29 — Absolute closure tip live on staging
+
+| Campo | Valor |
+|-------|-------|
+| **Tip remoto** | `bf1d44f4` (security + LMS + webhook + Playwright cert) |
+| **Env** | Railway staging `ideal-victory` |
+| **Deploy** | `7ec98f42` **SUCCESS** · live sha `bf1d44f4eb65` |
+| **Health** | `/api/health` ok · `/api/health/live` ok |
+| **Prod** | **NOT** migrated · **NOT** deployed |
+| **claimReady** | **false** |
+| **Canary** | **KILL ON** |
 
 ## 2026-07-29 — Excellence WIP push + staging validate
 

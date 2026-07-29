@@ -5,7 +5,7 @@
 import { waitForStagingDeploy } from "./lib/wait-for-deploy.mjs";
 import { exitSkipIaOff, isLlmNotConfiguredResponse } from "./lib/p0-llm-skip.mjs";
 
-const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
+const BASE = process.env.STAGING_BASE_URL?.trim() || "https://ideal-victory-staging.up.railway.app";
 const QA_EMAIL = "qa-audit-20260612@nelvyon.test";
 const QA_PASSWORD =
   process.env.STAGING_QA_PASSWORD?.trim() ||

@@ -82,6 +82,29 @@ describe("assertSaasOrigin", () => {
     ).toBeNull();
   });
 
+  it("allows Railway staging host in default allowlist", () => {
+    expect(originAllowed("https://ideal-victory-staging.up.railway.app")).toBe(true);
+  });
+
+  it("allows same-origin requestOrigin even if not in static allowlist", () => {
+    expect(
+      assertSaasCookieMutationOrigin({
+        method: "POST",
+        pathname: "/api/saas/team",
+        origin: "https://custom-preview.example",
+        referer: null,
+        hasAuthCookie: true,
+        hasAuthorizationHeader: false,
+        requestOrigin: "https://custom-preview.example",
+      }),
+    ).toBeNull();
+  });
+
+  it("allows RAILWAY_PUBLIC_DOMAIN when set", () => {
+    process.env.RAILWAY_PUBLIC_DOMAIN = "preview-123.up.railway.app";
+    expect(originAllowed("https://preview-123.up.railway.app")).toBe(true);
+  });
+
   it("skips CSRF when Authorization header present", () => {
     expect(
       assertSaasCookieMutationOrigin({

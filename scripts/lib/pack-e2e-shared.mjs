@@ -2,9 +2,11 @@
  * Shared helpers for pack E2E staging smokes (growth + beta).
  */
 import { smokeFetch } from "./smoke-fetch.mjs";
-export const BASE = process.env.STAGING_BASE_URL?.trim() || "https://nelvyon.com";
+export const BASE = process.env.STAGING_BASE_URL?.trim() || "https://ideal-victory-staging.up.railway.app";
 export const BACKEND_API =
-  process.env.STAGING_BACKEND_API?.trim() || "https://nelvyon-app-production.up.railway.app";
+  process.env.STAGING_BACKEND_API?.trim() ||
+  process.env.STAGING_BASE_URL?.trim() ||
+  "https://ideal-victory-staging.up.railway.app";
 export const QA_EMAIL = process.env.STAGING_QA_EMAIL?.trim() || "qa-audit-20260612@nelvyon.test";
 /**
  * Staging QA password: require STAGING_QA_PASSWORD in CI/ops.

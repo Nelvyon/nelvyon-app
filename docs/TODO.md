@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-28** — cierre técnico v3 · staging 521+522 · `claimReady: false`
+> Actualizado: **2026-07-29** — tip `bf1d44f4` live staging · cierre Cursor · `claimReady: false`
 
 ---
 
@@ -12,8 +12,9 @@
 - [x] **ADR-067:** #1 migrate gate política **SÍ** (CEO-ACK) · #2–#4 **NO todavía** (histórico)
 - [x] **ADR-068:** #2 dual-write staging **IMPLEMENTED_VERIFIED** · #3 RAG staging **IMPLEMENTED_VERIFIED** · #4 canary prod **AUTHORIZED** / live **BLOCKED_EXTERNAL** (mesh)
 - [x] **2026-07-28 staging:** mig 521+522 applied · workflows CERTIFIED · Playwright secuencias PASS
-- [ ] **CEO:** aprobar o diferir **prod** migrate 521+522 (ADR-064)
-- [ ] **Ops:** push tip + staging redeploy (honesty `twilio_configured` runtime)
+- [x] **2026-07-29 tip `bf1d44f4`:** push + staging live sha `bf1d44f4eb65` · cert local PASS
+- [ ] **CEO:** aprobar o diferir **prod** migrate 521+522 (ADR-064) — `PROD_MIGRATE_521_522_RUNBOOK.md`
+- [ ] **Ops:** smokes P0 staging post-`7ec98f42` (si credenciales locales)
 - [ ] **Solo humano:** Pepito/legal · OAuth · clientes · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
 
 ---
@@ -60,7 +61,7 @@
 - [x] **Opcional HTTP A/B:** **DONE** `erp.http_ab_isolation_latest.md`
 - [x] **ERP dual-write relational companions (ADR-062/068):** staging **IMPLEMENTED_VERIFIED** · READ=0 · prod **OFF**
 - [ ] **2ª réplica staging concurrency:** **PREPARED_OFF** (coste Railway — CEO)
-- [ ] **P2 (no bloqueante):** RAG minScore corpus-size floor — `docs/KNOWN_ISSUES.md`
+- [x] **P2 (no bloqueante):** RAG minScore corpus-size floor — **RESUELTO** en `docs/KNOWN_ISSUES.md` historial
 - [ ] **CEO (opcional):** Railway pgvector + mesh Ollama staging — `CEO_IA_STAGING_APPROVAL_REQUEST.md`
 - [ ] **CEO:** telefonía — `TELEPHONY_PROVIDER_CEO_CHECKLIST.md`
 - [ ] **CEO:** OAuth apps — `OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md`
