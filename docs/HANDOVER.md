@@ -5,8 +5,8 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Tip remoto** | *(actualizar tras push cierre absoluto)* |
-| **Staging deploy** | Redeploy tras push de seguridad (código runtime) |
+| **Tip remoto** | `4065635c` (cierre absoluto seguridad+CI+docs) |
+| **Staging deploy** | `6c60272e` SUCCESS · live `git_sha=4065635cd754` |
 | **Ops SSOT** | `docs/ops/OPERATIONS_INDEX.md` |
 | **SAFE_TO_MIGRATE_PROD** | **true** (técnico; solo SÍ CEO) |
 | **SAFE_TO_DEPLOY_PROD** | **false** hasta migrate 521–522 |
