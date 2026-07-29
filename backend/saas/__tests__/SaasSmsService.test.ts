@@ -15,6 +15,7 @@ describe("SaasSmsService", () => {
     delete process.env.TWILIO_ACCOUNT_SID;
     delete process.env.TWILIO_AUTH_TOKEN;
     delete process.env.TWILIO_FROM_NUMBER;
+    delete process.env.NELVYON_SMS_BULK_ENABLED;
   });
 
   it("getStatus returns not configured when env missing", () => {
@@ -78,10 +79,11 @@ describe("SaasSmsService", () => {
     expect(result.error).toContain("Twilio");
   });
 
-  it("sendBulk aggregates results", async () => {
+  it("sendBulk aggregates results when NELVYON_SMS_BULK_ENABLED=1", async () => {
     process.env.TWILIO_ACCOUNT_SID = "AC123";
     process.env.TWILIO_AUTH_TOKEN = "token";
     process.env.TWILIO_FROM_NUMBER = "+15005550006";
+    process.env.NELVYON_SMS_BULK_ENABLED = "1";
     let call = 0;
     const mockFetch = vi.fn().mockImplementation(async () => {
       call++;
@@ -93,5 +95,16 @@ describe("SaasSmsService", () => {
     expect(r.sent).toBe(1);
     expect(r.failed).toBe(1);
     expect(r.results).toHaveLength(2);
+  });
+
+  it("sendBulk blocked by default (mass-send fail-closed)", async () => {
+    process.env.TWILIO_ACCOUNT_SID = "AC123";
+    process.env.TWILIO_AUTH_TOKEN = "token";
+    process.env.TWILIO_FROM_NUMBER = "+15005550006";
+    delete process.env.NELVYON_SMS_BULK_ENABLED;
+    const svc = new SaasSmsService(makeDb(), vi.fn() as unknown as typeof fetch);
+    await expect(svc.sendBulk(TENANT, ["+34600000001"], "Hello")).rejects.toMatchObject({
+      code: "VALIDATION",
+    });
   });
 });

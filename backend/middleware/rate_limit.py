@@ -111,8 +111,8 @@ class IntelligentRateLimitMiddleware(BaseHTTPMiddleware):
         try:
             result = await redis.check_rate_limit(rl_key, limit, window)
         except Exception as exc:
-            logger.warning("Rate limit redis fail-open: %s", sanitize_text(str(exc)))
-            return await call_next(request)
+            logger.warning("Rate limit redis fail-closed: %s", sanitize_text(str(exc)))
+            return self._rate_response(window)
 
         if not result.get("allowed"):
             self._local_blocks[block_key] = now + ABUSE_BLOCK_SECONDS

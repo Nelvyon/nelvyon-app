@@ -70,16 +70,16 @@ class RateLimiter:
             result["backend"] = "redis" if redis_client.is_redis else "memory"
             return result
         except Exception as exc:
-            logger.warning("Rate limiter fail-open: %s", exc)
+            logger.warning("Rate limiter fail-closed: %s", exc)
             return {
-                "allowed": True,
-                "current": 0,
+                "allowed": False,
+                "current": max_requests,
                 "limit": max_requests,
-                "remaining": max_requests,
+                "remaining": 0,
                 "reset_in": window_seconds,
                 "key": key,
                 "window_seconds": window_seconds,
-                "backend": "fail-open",
+                "backend": "fail-closed",
                 "error": str(exc),
             }
 

@@ -27,6 +27,24 @@ const RULES: RateLimitRule[] = [
     windowSec: 60,
   },
   {
+    id: "auth-forgot-password",
+    match: (p) => p === "/api/auth/forgot-password" || p === "/api/auth/reset-password",
+    limit: 5,
+    windowSec: 60,
+  },
+  {
+    id: "portal-auth-login",
+    match: (p) => p === "/api/platform/portal/auth/login",
+    limit: 10,
+    windowSec: 60,
+  },
+  {
+    id: "saas-sms",
+    match: (p) => p === "/api/saas/sms",
+    limit: 10,
+    windowSec: 60,
+  },
+  {
     id: "public-api",
     match: (p) => p.startsWith("/api/public/"),
     limit: 30,

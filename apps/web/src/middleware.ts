@@ -199,6 +199,7 @@ export const config = {
     "/api/contact",
     "/api/waitlist",
     "/api/nelvyon-site/:path*",
+    "/api/platform/:path*",
     "/os/:path*",
     "/api/os/:path*",
     "/saas/:path*",

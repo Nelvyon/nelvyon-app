@@ -97,7 +97,18 @@ export class SaasSmsService {
     }
   }
 
+  /**
+   * Bulk SMS — hard-capped and blocked for mass-send until legal gate opens.
+   * Prefer single `send()`. Callers must not use this as a campaign bypass.
+   */
   async sendBulk(tenantId: string, recipients: string[], body: string): Promise<{ sent: number; failed: number; results: SmsSendResult[] }> {
+    const MAX_BULK = 5;
+    if (recipients.length > MAX_BULK) {
+      throw new SaasSmsError(`SMS bulk capped at ${MAX_BULK} recipients`, "VALIDATION");
+    }
+    if (process.env.NELVYON_SMS_BULK_ENABLED?.trim() !== "1") {
+      throw new SaasSmsError("SMS bulk send is disabled (NELVYON_SMS_BULK_ENABLED!=1)", "VALIDATION");
+    }
     const creds = getEnvCredentials();
     if (!creds) throw new SaasSmsError("Twilio not configured.", "NOT_CONFIGURED");
     const results: SmsSendResult[] = [];

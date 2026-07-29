@@ -37,10 +37,14 @@ export async function POST(req: Request) {
     const svc = getSaasSmsService();
 
     if (Array.isArray(b.recipients)) {
-      const recipients = (b.recipients as unknown[]).filter((r): r is string => typeof r === "string");
-      const message = typeof b.message === "string" ? b.message : "";
-      const result = await svc.sendBulk(ctx.tenant.id, recipients, message);
-      return NextResponse.json(result);
+      // Mass-send alternate path — blocked until legal campaign gate / claimReady (same policy as campanias).
+      return NextResponse.json(
+        {
+          error: "SMS bulk send is disabled until campaign legal gate is ready",
+          code: "BULK_SMS_BLOCKED",
+        },
+        { status: 403 },
+      );
     }
 
     if (typeof b.to === "string" && typeof b.message === "string") {

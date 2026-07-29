@@ -153,9 +153,14 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         try:
             result = await redis.check_rate_limit(rate_key, max_requests, window)
         except Exception as e:
-            # If Redis fails, allow the request (fail-open for availability)
-            logger.warning("Rate limiter error (fail-open): %s", sanitize_text(str(e)))
-            return await call_next(request)
+            # Fail-closed on Redis errors for abuse-sensitive routes
+            logger.warning("Rate limiter error (fail-closed): %s", sanitize_text(str(e)))
+            return self._make_rate_limit_response(
+                client_ip=client_ip,
+                rule_name=rule_name,
+                max_requests=max_requests,
+                reset_in=window,
+            )
 
         if not result["allowed"]:
             return self._make_rate_limit_response(
