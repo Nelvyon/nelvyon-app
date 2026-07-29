@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-test("Click en Empezar con Pro navega a /auth/register?plan=pro", async ({ page }) => {
+test("Click en Empezar con Pro navega a login con next del plan", async ({ page }) => {
   await page.goto("/pricing");
-  await page.getByRole("link", { name: "Empezar con Pro" }).click();
-  await expect(page).toHaveURL(/\/auth\/register\?plan=pro$/);
+  await page.getByRole("button", { name: /Empezar con Pro/i }).first().click();
+  await expect(page).toHaveURL(/\/login\?next=.*plan%3Dpro/);
 });
 
-test("Click en Empezar con Starter navega a /auth/register?plan=starter", async ({ page }) => {
+test("Click en Empezar con Starter navega a login con next del plan", async ({ page }) => {
   await page.goto("/pricing");
-  await page.getByRole("link", { name: "Empezar con Starter" }).click();
-  await expect(page).toHaveURL(/\/auth\/register\?plan=starter$/);
+  await page.getByRole("button", { name: /Empezar con Starter/i }).first().click();
+  await expect(page).toHaveURL(/\/login\?next=.*plan%3Dstarter/);
 });

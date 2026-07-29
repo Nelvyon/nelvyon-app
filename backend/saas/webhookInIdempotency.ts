@@ -47,6 +47,16 @@ export function claimWebhookInIdempotency(
   return null;
 }
 
+export function releaseWebhookInIdempotency(
+  tenantId: string,
+  source: string,
+  idempotencyKey: string,
+): void {
+  const trimmed = idempotencyKey.trim();
+  if (!trimmed) return;
+  store.delete(key(tenantId, source, trimmed));
+}
+
 export function resetWebhookInIdempotencyForTests(): void {
   store.clear();
 }

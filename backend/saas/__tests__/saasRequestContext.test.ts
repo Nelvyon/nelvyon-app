@@ -52,6 +52,7 @@ import {
 import { SaasSecurityEnterpriseError } from "../SaasSecurityEnterpriseService";
 import {
   claimWebhookInIdempotency,
+  releaseWebhookInIdempotency,
   resetWebhookInIdempotencyForTests,
 } from "../webhookInIdempotency";
 
@@ -174,5 +175,11 @@ describe("webhookInIdempotency", () => {
     expect(typeof prior).toBe("string");
     expect(claimWebhookInIdempotency("t1", "stripe", "k2")).toBeNull();
     expect(claimWebhookInIdempotency("t2", "stripe", "k1")).toBeNull();
+  });
+
+  it("releases claims to allow retry after failure", () => {
+    expect(claimWebhookInIdempotency("t1", "stripe", "k1")).toBeNull();
+    releaseWebhookInIdempotency("t1", "stripe", "k1");
+    expect(claimWebhookInIdempotency("t1", "stripe", "k1")).toBeNull();
   });
 });

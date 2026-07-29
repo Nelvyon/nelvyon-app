@@ -47,6 +47,7 @@ export default function PublicCursoPage() {
         .then((en) => {
           if (en.id) {
             localStorage.setItem(`lms_enrollment_${id}`, str(en.id));
+            localStorage.setItem(`lms_access_${id}`, str(en.learner_access_token));
             window.location.href = `/curso/${id}/aprender`;
           }
         })
@@ -76,6 +77,7 @@ export default function PublicCursoPage() {
       if (result.id) {
         localStorage.setItem(`lms_enrollment_${id}`, str(result.id));
         localStorage.setItem(`lms_email_${id}`, email);
+        localStorage.setItem(`lms_access_${id}`, str(result.learner_access_token));
         if (price <= 0) {
           window.location.href = `/curso/${id}/aprender`;
         }

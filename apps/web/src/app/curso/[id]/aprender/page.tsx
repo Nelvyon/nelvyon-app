@@ -27,6 +27,7 @@ export default function AprenderCursoPage() {
   const [certificate, setCertificate] = useState<Record<string, unknown> | null>(null);
   const enrollmentId = typeof window !== "undefined" ? localStorage.getItem(lsKey(courseId, "enrollment")) : null;
   const email = typeof window !== "undefined" ? localStorage.getItem(lsKey(courseId, "email")) : null;
+  const learnerAccessToken = typeof window !== "undefined" ? localStorage.getItem(lsKey(courseId, "access")) : null;
 
   const load = useCallback(async () => {
     const c = await publicLmsApi.course(courseId);
@@ -34,15 +35,15 @@ export default function AprenderCursoPage() {
     const mods = (c.modules as Record<string, unknown>[]) ?? [];
     const firstLesson = mods.flatMap((m) => (m.lessons as Record<string, unknown>[]) ?? [])[0] ?? null;
     setActiveLesson((prev) => prev ?? firstLesson);
-    if (email) {
-      const p = await publicLmsApi.progress(courseId, email);
+    if (email && learnerAccessToken) {
+      const p = await publicLmsApi.progress(courseId, email, learnerAccessToken);
       setProgress(p);
       if (Number(p.progress_percent) >= 100 && p.enrollment_id) {
-        const cert = await publicLmsApi.certificate(str(p.enrollment_id));
+        const cert = await publicLmsApi.certificate(str(p.enrollment_id), courseId, email, learnerAccessToken);
         setCertificate(cert);
       }
     }
-  }, [courseId, email]);
+  }, [courseId, email, learnerAccessToken]);
 
   useEffect(() => {
     load().catch(() => setCourse(null));
@@ -54,11 +55,15 @@ export default function AprenderCursoPage() {
   async function completeLesson() {
     const eid = enrollmentId || str(progress.enrollment_id);
     const lid = str(activeLesson?.id);
-    if (!eid || !lid) return;
-    const p = await publicLmsApi.completeLesson(eid, lid);
+    if (!eid || !lid || !email || !learnerAccessToken) return;
+    const p = await publicLmsApi.completeLesson(eid, lid, {
+      course_id: courseId,
+      contact_email: email,
+      tok: learnerAccessToken,
+    });
     setProgress(p);
     if (Number(p.progress_percent) >= 100) {
-      const cert = await publicLmsApi.certificate(eid);
+      const cert = await publicLmsApi.certificate(eid, courseId, email, learnerAccessToken);
       setCertificate(cert);
     }
   }

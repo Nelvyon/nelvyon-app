@@ -120,3 +120,4 @@
 - Fase 4: agentes autónomos en producción con aprobación humana
 
 Ver playbooks en `docs/autonomous/`, `docs/agency-playbooks/`.
+

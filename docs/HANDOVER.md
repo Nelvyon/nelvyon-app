@@ -1,7 +1,7 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-29** — **CIERRE ABSOLUTO REPO** (seguridad OS admin + SMS bulk OFF + rate limits + CI) · canary **KILL ON** · `claimReady: false` · **NOT READY** (humano)
+> Última actualización: **2026-07-29** — **CIERRE ABSOLUTO REPO** (seguridad OS admin + SMS bulk OFF + rate limits + CI + Playwright full aligned) · canary **KILL ON** · `claimReady: false` · **NOT READY** (humano)
 
 | Campo | Valor |
 |-------|-------|
@@ -29,14 +29,14 @@
 |------|----------|
 | tsc / lint / build | **PASS** |
 | Vitest monorepo | **0 FAIL** |
-| Playwright secuencias | **PASS** |
-| Staging smokes | tras redeploy |
+| Playwright completo | **386 PASS / 1 skip** |
+| Staging smokes | pendiente solo tras push/redeploy |
 
 ## Próximo paso EXACTO
 
-1. Push tip cierre absoluto → staging redeploy → smokes P0.
-2. CEO: SÍ/NO `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy).
-3. Sin SÍ: no migrate · no deploy · no canary · no mass-send · no OAuth.
+1. Push del tip final del cierre absoluto y dejar que staging redeploye con este mismo estado certificado.
+2. Ejecutar smokes P0 de staging tras ese redeploy para revalidar el artefacto exacto que se publique.
+3. CEO: SÍ/NO `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy). Sin SÍ: no migrate · no deploy · no canary · no mass-send · no OAuth.
 
 ### Rollback IA
 

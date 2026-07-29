@@ -164,7 +164,7 @@ El repo tiene migraciones en `backend/db/migrations/`. Ejecutar en orden antes d
 
 ```bash
 # En Railway → Service → Custom start command (o script separado):
-node scripts/run-migrations.js && node server.js
+pnpm -C apps/web migrate:prod && pnpm -C apps/web start
 ```
 
 O manualmente desde Railway shell:
@@ -201,3 +201,4 @@ La migración máxima actual del repo es `507_fastapi_runtime_schemas.sql` (rang
 | Cron workflows no dispara | `CRON_SECRET` no coincide | Comparar env var con header enviado |
 | Stripe webhook 400 | `STRIPE_WEBHOOK_SECRET` de staging en prod | Usar el secret del endpoint de producción en Stripe Dashboard |
 | Email llega a spam | Dominio no verificado en SES / SPF/DKIM faltante | Configurar DNS records que SES indica |
+

@@ -16,12 +16,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const { tenantId } = await getSaasLmsService().resolveCourseTenant(courseId);
-    const enrollment = await getSaasLmsService().enroll(tenantId, {
+    const svc = getSaasLmsService();
+    const enrollment = await svc.enroll(tenantId, {
       courseId,
       contactEmail: email,
       contactName: name,
     });
-    return NextResponse.json(enrollment, { status: 201 });
+    const learnerAccessToken = svc.createLearnerAccessToken({
+      courseId,
+      enrollmentId: enrollment.id,
+      contactEmail: enrollment.contactEmail,
+    });
+    return NextResponse.json({ ...enrollment, learner_access_token: learnerAccessToken }, { status: 201 });
   } catch (e: unknown) {
     if (e instanceof SaasLmsError) {
       const status = e.code === "NOT_FOUND" ? 404 : e.code === "CONFLICT" ? 409 : 400;

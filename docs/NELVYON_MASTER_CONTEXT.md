@@ -556,7 +556,7 @@ flowchart TB
 | Web | `apps/web/Dockerfile` | 3000 |
 | API Python | `backend/Dockerfile` | 8000 |
 
-- `releaseCommand`: `pnpm migrate:prod` / `pnpm -C apps/web migrate:prod`  
+- `preDeployCommand`: `pnpm -C apps/web migrate:prod`  
 - Healthcheck Web: `/api/health/live`  
 - Node 20 + Postgres 16  
 
@@ -677,7 +677,7 @@ flowchart TB
 | **MCP propio** | Tools IA | ADR-016 — sin vendor SDK obligatorio |
 | **Redis (opcional)** | Cache/cola | Fallback in-memory documentado |
 | **Sentry / PostHog (opcionales)** | Observabilidad producto | Opcionales; no confundir con Prometheus scrape live |
-| **Railway** | Deploy | ADR-011 releaseCommand migrate:prod |
+| **Railway** | Deploy | ADR-011 preDeployCommand migrate:prod |
 | **GitHub Actions** | CI/CD | 14 workflows — ver §13 |
 | **Docker Compose** | Local test / local-ai | test.yml + local-ai/docker-compose.yml |
 | **Cloudflare** | DNS/WAF | Ops manual |
@@ -905,7 +905,7 @@ nelvyon-app/
 | Total archivos | **411** |
 | Primera (orden) | `001_os_jobs.sql` (convención documentada) |
 | Última | **`515_shared_memory_rls.sql`** |
-| Deploy | Railway `releaseCommand` aplica migraciones |
+| Deploy | Railway `preDeployCommand` aplica migraciones |
 | Comando local | `pnpm -C apps/web migrate` |
 
 ### 7.2 Multi-tenancy
@@ -1079,7 +1079,7 @@ SELECT name, executed_at FROM _migrations ORDER BY executed_at DESC LIMIT 20;
 | — | ~~KI-026 RLS tenant post-507~~ | ✅ **DONE 2026-07-21** — `516` + **ADR-032** dual-plane (`ok:true`) |
 | 3 | SES Live | `docs/OPS_SES_PROD.md` (KI-014) — **próximo humano #1** |
 | 4 | Stripe Live | `docs/OPS_STRIPE_PROD.md` |
-| 5 | Railway deploy | Deploy + releaseCommand migrate |
+| 5 | Railway deploy | Deploy + preDeployCommand migrate |
 | 6 | Cloudflare DNS/WAF | Ops manual |
 | 7 | OpenClaw URL | `NELVYON_OPENCLAW_BRIDGE_URL` si aplica |
 | 8 | `STAGING_QA_PASSWORD` | Requerido smokes (sin default silencioso) |
@@ -1400,7 +1400,7 @@ Fuente canónica: `docs/DECISIONS.md`. Catálogo **ADR-001 … ADR-032**. Una l�
 
 **[VERIFICADO]** Railway — Web (`apps/web`) + API Python (`backend`) + Postgres 16.
 
-### 14.2 releaseCommand
+### 14.2 preDeployCommand
 
 **[VERIFICADO]** ADR-011: `pnpm migrate:prod` (apps/web); root `pnpm -C apps/web migrate:prod`.
 
@@ -1750,7 +1750,7 @@ cd backend && python -m pytest tests/ -q --tb=short
 | **wired** | Cableado en código con flags; no implica operativo live |
 | **QA ≥ 85** | Umbral auto-approve entregables de pack |
 | **freeze** | Prohibición de invalidar cert/soak en curso |
-| **releaseCommand** | Comando Railway pre-start (migrate:prod) |
+| **preDeployCommand** | Comando Railway pre-traffic (`migrate:prod`) |
 | **force-dynamic** | Next.js dynamic rendering forzado en APIs DB |
 | **dark glass** | Skin SaaS `#020817` / acento `#0084ff` |
 
@@ -1817,3 +1817,4 @@ cd backend && python -m pytest tests/ -q --tb=short
 | SSOT del próximo paso | **`docs/HANDOVER.md`** |
 
 > Fin de `docs/NELVYON_MASTER_CONTEXT.md` — Biblia oficial de contexto NELVYON para cualquier IA.
+

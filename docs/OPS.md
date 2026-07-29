@@ -141,3 +141,4 @@ CEO: confirmar SNS SES si KI abierto.
 Overrides de dependencias: `pnpm-workspace.yaml` (`ws`, `axios`, `vitest`).
 
 RBAC / fail-closed / rate limits: [`ops/SECURITY_OPERATIONS.md`](./ops/SECURITY_OPERATIONS.md).
+

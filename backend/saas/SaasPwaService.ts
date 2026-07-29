@@ -4,6 +4,7 @@
  * install events and reports install stats. White-label config is read through
  * an injectable port so the service stays testable without a live DB.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── White-label port ─────────────────────────────────────────────────────────────
@@ -115,8 +116,6 @@ let _instance: SaasPwaService | null = null;
 
 export function getSaasPwaService(): SaasPwaService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new SaasPwaService(DbClient.getInstance(), defaultWhiteLabelPort);
   }
   return _instance;

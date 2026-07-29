@@ -75,6 +75,18 @@ describe("security rateLimit", () => {
     expect(blocked.allowed).toBe(false);
   });
 
+  it("fail-closes critical rules in production when Upstash is unavailable", async () => {
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    delete process.env.UPSTASH_REDIS_TOKEN;
+    vi.stubEnv("NODE_ENV", "production");
+
+    const rule = getRateLimitRule("/api/auth/login")!;
+    const result = await checkIpRateLimit({ ip: "203.0.113.9", rule });
+    expect(result.allowed).toBe(false);
+  });
+
   it("uses in-memory fallback when Upstash fetch throws", async () => {
     const { resetInMemoryRateLimitForTests } = await import("@/lib/security/inMemoryRateLimit");
     resetInMemoryRateLimitForTests();
@@ -85,6 +97,17 @@ describe("security rateLimit", () => {
     const rule = getRateLimitRule("/api/waitlist")!;
     const first = await checkIpRateLimit({ ip: "203.0.113.2", rule });
     expect(first.allowed).toBe(true);
+  });
+
+  it("fail-closes critical production rules when Upstash errors", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    global.fetch = vi.fn(async () => {
+      throw new Error("network down");
+    }) as typeof fetch;
+
+    const rule = getRateLimitRule("/api/platform/portal/auth/login")!;
+    const result = await checkIpRateLimit({ ip: "203.0.113.2", rule });
+    expect(result.allowed).toBe(false);
   });
 });
 

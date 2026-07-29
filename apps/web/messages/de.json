@@ -278,7 +278,12 @@
         "ab-testing": "A/B-Tests",
         "memberships": "Mitgliedschaften",
         "subcuentas": "Unterkonten / Agentur",
-        "comunidades": "Communities"
+        "comunidades":  "Communities",
+        "erp-purchases": "ERP Einkauf",
+        "erp-inventory": "ERP Inventar",
+        "erp-manufacturing": "ERP Fertigung",
+        "erp-projects": "ERP Projekte",
+        "erp-sectors": "ERP Branchen"
       }
     },
     "common": {
@@ -356,3 +361,5 @@
     }
   }
 }
+
+

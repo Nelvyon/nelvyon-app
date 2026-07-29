@@ -6,6 +6,7 @@ export interface RateLimitRule {
   match: (pathname: string) => boolean;
   limit: number;
   windowSec: number;
+  requireSharedStoreInProduction?: boolean;
 }
 
 export interface RateLimitResult {
@@ -19,29 +20,46 @@ const RULES: RateLimitRule[] = [
     match: (p) => p === "/api/auth/register" || p === "/api/auth/signup",
     limit: 5,
     windowSec: 60,
+    requireSharedStoreInProduction: true,
   },
   {
     id: "auth-login",
     match: (p) => p === "/api/auth/login",
     limit: 10,
     windowSec: 60,
+    requireSharedStoreInProduction: true,
   },
   {
     id: "auth-forgot-password",
     match: (p) => p === "/api/auth/forgot-password" || p === "/api/auth/reset-password",
     limit: 5,
     windowSec: 60,
+    requireSharedStoreInProduction: true,
   },
   {
     id: "portal-auth-login",
     match: (p) => p === "/api/platform/portal/auth/login",
     limit: 10,
     windowSec: 60,
+    requireSharedStoreInProduction: true,
   },
   {
     id: "saas-sms",
     match: (p) => p === "/api/saas/sms",
     limit: 10,
+    windowSec: 60,
+    requireSharedStoreInProduction: true,
+  },
+  {
+    id: "lms-enroll",
+    match: (p) => /^\/api\/lms\/courses\/[^/]+\/enroll$/.test(p),
+    limit: 10,
+    windowSec: 60,
+  },
+  {
+    id: "lms-progress-write",
+    match: (p) => /^\/api\/lms\/progress\/[^/]+\/lesson\/[^/]+$/.test(p),
+    limit: 30,
     windowSec: 60,
   },
   {
@@ -55,6 +73,7 @@ const RULES: RateLimitRule[] = [
     match: (p) => p.startsWith("/api/webhooks/"),
     limit: 200,
     windowSec: 60,
+    requireSharedStoreInProduction: true,
   },
   {
     id: "early-adopter",
@@ -109,6 +128,7 @@ const RULES: RateLimitRule[] = [
     match: (p) => p === "/api/saas/workflows/webhook-in",
     limit: 60,
     windowSec: 60,
+    requireSharedStoreInProduction: true,
   },
   {
     id: "saas-audit",
@@ -169,13 +189,17 @@ async function upstashIncrWithExpire(
 
 /**
  * Fixed-window rate limit per IP.
- * Uses Upstash when configured; falls back to in-memory limits per instance when Redis is down.
+ * Uses Upstash when configured; only non-critical routes may fall back to per-instance memory.
  */
 export async function checkIpRateLimit(params: {
   ip: string;
   rule: RateLimitRule;
 }): Promise<RateLimitResult> {
   const memoryKey = `${params.rule.id}:${params.ip}`;
+  const failClosed = (): RateLimitResult => ({
+    allowed: false,
+    retryAfter: params.rule.windowSec,
+  });
   const memoryFallback = (): RateLimitResult =>
     checkInMemoryRateLimit({
       key: memoryKey,
@@ -185,6 +209,12 @@ export async function checkIpRateLimit(params: {
 
   const config = getUpstashConfig();
   if (!config) {
+    if (process.env.NODE_ENV === "production" && params.rule.requireSharedStoreInProduction) {
+      console.error("[rate-limit] Upstash required for critical production rule", {
+        rule: params.rule.id,
+      });
+      return failClosed();
+    }
     if (process.env.NODE_ENV === "production") {
       console.warn("[rate-limit] Upstash not configured — using in-memory fallback", {
         rule: params.rule.id,
@@ -202,6 +232,13 @@ export async function checkIpRateLimit(params: {
     }
     return { allowed: true, retryAfter: params.rule.windowSec };
   } catch (err) {
+    if (process.env.NODE_ENV === "production" && params.rule.requireSharedStoreInProduction) {
+      console.error("[rate-limit] Upstash error on critical production rule", {
+        rule: params.rule.id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return failClosed();
+    }
     console.warn("[rate-limit] Upstash error — in-memory fallback", {
       rule: params.rule.id,
       error: err instanceof Error ? err.message : String(err),

@@ -5,11 +5,25 @@ import { getSaasLmsService, SaasLmsError } from "@nelvyon/saas";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET(_req: Request, ctx: { params: Promise<{ enrollmentId: string }> }) {
+export async function GET(req: Request, ctx: { params: Promise<{ enrollmentId: string }> }) {
   try {
     const { enrollmentId } = await ctx.params;
-    const tenantId = await getSaasLmsService().resolveEnrollmentTenant(enrollmentId);
-    const cert = await getSaasLmsService().issueCertificate(tenantId, enrollmentId);
+    const svc = getSaasLmsService();
+    const tenantId = await svc.resolveEnrollmentTenant(enrollmentId);
+    const token = new URL(req.url).searchParams.get("tok") ?? "";
+    const courseId = new URL(req.url).searchParams.get("course_id") ?? "";
+    const contactEmail = new URL(req.url).searchParams.get("email") ?? "";
+    if (
+      !svc.verifyLearnerAccessToken({
+        courseId,
+        enrollmentId,
+        contactEmail,
+        token,
+      })
+    ) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const cert = await svc.issueCertificate(tenantId, enrollmentId);
     return NextResponse.json(cert);
   } catch (e: unknown) {
     if (e instanceof SaasLmsError && e.code === "NOT_FOUND") {

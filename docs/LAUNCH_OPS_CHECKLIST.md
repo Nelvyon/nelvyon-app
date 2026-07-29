@@ -143,3 +143,4 @@ node scripts/run-staging-beta-packs-e2e.mjs --skip-wait
 - Paridad GHL/HubSpot: `docs/PARITY_GHL_HUBSPOT.md`
 - Sprint Claude: `docs/CLAUDE_SPRINT_ELITE.md`
 - Código launch: `docs/LAUNCH_READY.md`
+

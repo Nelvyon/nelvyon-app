@@ -4,7 +4,7 @@
  *         saas_lms_enrollments, saas_lms_progress, saas_lms_certificates
  *         (migrations 427 + 434).
  */
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { DbClient } from "../db/DbClient";
 import { requireHmacSecret } from "./hmacSecret";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
@@ -166,8 +166,24 @@ function rowToModule(r: ModuleRow, lessons: LmsLesson[] = []): LmsModule {
   };
 }
 
+function signToken(...parts: string[]): string {
+  return createHmac("sha256", requireHmacSecret())
+    .update(parts.join("::"))
+    .digest("hex")
+    .slice(0, 32);
+}
+
+function safeEqualHexToken(actual: string, expected: string): boolean {
+  if (actual.length !== expected.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(actual), Buffer.from(expected));
+  } catch {
+    return false;
+  }
+}
+
 function signCertId(certId: string): string {
-  return createHmac("sha256", requireHmacSecret()).update(certId).digest("hex").slice(0, 32);
+  return signToken(certId);
 }
 
 function rowToCourse(r: CourseRow): LmsCourse {
@@ -264,6 +280,30 @@ export class SaasLmsService {
     );
     if (!rows[0]) throw new SaasLmsError("Enrollment not found", "NOT_FOUND");
     return rows[0].tenant_id;
+  }
+
+  createLearnerAccessToken(input: { courseId: string; enrollmentId: string; contactEmail: string }): string {
+    return signToken(
+      input.courseId.trim(),
+      input.enrollmentId.trim(),
+      input.contactEmail.trim().toLowerCase(),
+    );
+  }
+
+  verifyLearnerAccessToken(input: {
+    courseId: string;
+    enrollmentId: string;
+    contactEmail: string;
+    token: string;
+  }): boolean {
+    const trimmed = input.token.trim();
+    if (!trimmed) return false;
+    const expected = this.createLearnerAccessToken({
+      courseId: input.courseId,
+      enrollmentId: input.enrollmentId,
+      contactEmail: input.contactEmail,
+    });
+    return safeEqualHexToken(trimmed, expected);
   }
 
   async createCourse(tenantId: string, input: CreateCourseInput): Promise<LmsCourse> {

@@ -174,3 +174,4 @@
 ## Tablas pendientes / ingest
 
 - RAG plataforma: `nelvyon_rag_chunks` (ILIKE adjunct) + LocalVectorStore (pgvector) vía `KnowledgeIngestService`
+

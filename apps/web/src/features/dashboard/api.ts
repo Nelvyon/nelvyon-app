@@ -277,12 +277,19 @@ export const publicLmsApi = {
   course: (id: string) => apiClient.get<Record<string, unknown>>(`/api/lms/public/courses/${id}`),
   enroll: (courseId: string, body: Record<string, unknown>) =>
     apiClient.post<Record<string, unknown>>(`/api/lms/courses/${courseId}/enroll`, { body }),
-  progress: (courseId: string, email: string) =>
-    apiClient.get<Record<string, unknown>>(`/api/lms/courses/${courseId}/progress/${encodeURIComponent(email)}`),
-  completeLesson: (enrollmentId: string, lessonId: string) =>
-    apiClient.post<Record<string, unknown>>(`/api/lms/progress/${enrollmentId}/lesson/${lessonId}`, { body: {} }),
-  certificate: (enrollmentId: string) =>
-    apiClient.get<Record<string, unknown>>(`/api/lms/enrollments/${enrollmentId}/certificate`),
+  progress: (courseId: string, email: string, token: string) =>
+    apiClient.get<Record<string, unknown>>(
+      `/api/lms/courses/${courseId}/progress/${encodeURIComponent(email)}?tok=${encodeURIComponent(token)}`,
+    ),
+  completeLesson: (
+    enrollmentId: string,
+    lessonId: string,
+    body: { course_id: string; contact_email: string; tok: string },
+  ) => apiClient.post<Record<string, unknown>>(`/api/lms/progress/${enrollmentId}/lesson/${lessonId}`, { body }),
+  certificate: (enrollmentId: string, courseId: string, email: string, token: string) =>
+    apiClient.get<Record<string, unknown>>(
+      `/api/lms/enrollments/${enrollmentId}/certificate?course_id=${encodeURIComponent(courseId)}&email=${encodeURIComponent(email)}&tok=${encodeURIComponent(token)}`,
+    ),
 };
 
 export const dashboardAbTestingApi = {

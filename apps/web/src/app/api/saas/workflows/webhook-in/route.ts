@@ -14,6 +14,7 @@ import {
 import { dispatchWebhookIn } from "../../../../../../../../backend/saas/saasWorkflowDispatch";
 import {
   claimWebhookInIdempotency,
+  releaseWebhookInIdempotency,
 } from "../../../../../../../../backend/saas/webhookInIdempotency";
 
 export const dynamic = "force-dynamic";
@@ -45,8 +46,14 @@ export async function POST(req: Request) {
       }
     }
 
-    // Fire-and-forget — acknowledge after idempotency claim, then dispatch
-    void dispatchWebhookIn(ctx.tenant.id, source, payload);
+    try {
+      await dispatchWebhookIn(ctx.tenant.id, source, payload);
+    } catch (err) {
+      if (idem) {
+        releaseWebhookInIdempotency(ctx.tenant.id, source, idem);
+      }
+      throw err;
+    }
 
     return NextResponse.json({
       ok: true,

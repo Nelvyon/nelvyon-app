@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| QA / Playwright | **Contratos E2E alineados al UI real** | `auth` / `dashboard` / `marketing` / `pricing` actualizados al copy, rutas y CTAs vigentes; certificación final **386 PASS / 1 skip** en Playwright completo |
 | Security / Cierre | **OS admin + SMS bulk OFF + RL** | OS dashboards `requirePlatformAdmin` · SMS bulk fail-closed · auth/portal/sms rate limits · FastAPI RL fail-closed · CI staging URLs · `claimReady: false` |
 | QA / Vitest | **Cierre 16 FAIL monorepo** | Contratos fail-closed LLM · locale `sendEmail` 3er arg · onboarding locale query · sitemap mock fumadocs · pack portal via `growthPackReport` · `vitest.setup` limpia OLLAMA_* · **6214 PASS / 0 FAIL** · **sin** redeploy · `claimReady: false` |
 | Ops / Launch | **Paquete ops mundial** | `OPERATIONS_INDEX` · `WORLD_CLASS_OPS_RUNBOOK` · `LAUNCH_CHECKLIST_DEFINITIVE` · `SECURITY_OPERATIONS` · `DEVELOPER_ONBOARDING` · `OPS.md` + observability SaaS · **no** prod · canary KILL · `claimReady: false` |

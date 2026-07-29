@@ -24,6 +24,10 @@ const eslintConfig = [
       "out/**",
       "dist/**",
       "coverage/**",
+      "test-results/**",
+      "playwright-report/**",
+      "playwright-report-saas/**",
+      "blob-report/**",
       "next-env.d.ts",
       /** Marketing landing skeletons — not Nelvyon product surface. */
       "src/components/agenforce/**",

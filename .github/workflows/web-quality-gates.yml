@@ -126,3 +126,4 @@ jobs:
 
       - name: Full regression tests
         run: pnpm test:regression
+

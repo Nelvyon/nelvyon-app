@@ -1,6 +1,6 @@
 # LAUNCH_READY — Nelvyon producción
 
-> Actualizado: 2026-07-04  
+> Actualizado: 2026-07-29  
 > Estado: **CIERRE PRODUCCIÓN — migraciones 401–507 en repo; apply en Railway releaseCommand; P0 smokes ALL_PASS**
 
 ---
@@ -27,7 +27,7 @@
 | Packs: kickoff routes responden (local, ecommerce, saas-b2b) | ✅ | previo | `/api/os/packs/[packId]/kickoff/route.ts` |
 | Packs: CEO metrics dashboard lee datos reales de DB | ✅ | previo | `fetchLocalPackCeoMetrics` + `usePackReportLatest` → `/api/platform/pack-report` |
 | TypeScript: 0 errores (`pnpm exec tsc --noEmit`) | ✅ | `2672dea` | salida vacía = sin errores |
-| Vitest: 0 fallos (52 test files, 489 tests) | ✅ | `2672dea` | `backend/saas backend/email src/features/saas-crm` |
+| Vitest: 0 fallos (monorepo revalidado en docs/HANDOVER) | ✅ | `2672dea` | `backend/saas backend/email src/features/saas-crm` |
 
 ### Restricciones respetadas
 - ❌ No hay UI sin API (todos los estados consumen endpoints reales)
@@ -79,9 +79,9 @@ Ejecutar **en orden numérico** en Railway Postgres antes del primer deploy (o c
 
 | Endpoint | Frecuencia | Header requerido | Función |
 |---|---|---|---|
-| `POST /api/cron/saas-workflows` | Cada 5 min | `Authorization: Bearer $CRON_SECRET` | Ejecuta workflows scheduled + triggers |
-| `POST /api/cron/workflow-date` | Diario 00:05 UTC | `Authorization: Bearer $CRON_SECRET` | Workflows con trigger por fecha |
-| `POST /api/os/cron/pack-status` | Cada 10 min | `Authorization: Bearer $CRON_SECRET` | Actualiza estado packs OS |
+| `POST /api/cron/saas-workflows` | Cada 5 min | `x-cron-secret: $CRON_SECRET` | Ejecuta workflows scheduled + triggers |
+| `POST /api/cron/workflow-date` | Diario 00:05 UTC | `x-cron-secret: $CRON_SECRET` o Bearer flexible | Workflows con trigger por fecha |
+| `POST /api/cron/os-recurring-services` | Mensual | `x-cron-secret: $CRON_SECRET` | Servicios OS recurrentes |
 
 Configurar en Railway → **Cron** o usar servicio externo (cron-job.org, etc.).
 
@@ -193,7 +193,7 @@ Manual local/staging: `pnpm -C apps/web migrate` con `DATABASE_URL` configurada.
 
 Alternativa — script automatizado:
 ```bash
-node scripts/run-migrations.js
+pnpm -C apps/web migrate
 ```
 
 ---
@@ -351,3 +351,4 @@ echo "  /portal             → panel cliente carga"
 | Ejecutar migraciones en prod | Acceso a DB de producción |
 | Aprobar el primer deploy | Revisión humana final |
 | Configurar SPF/DKIM en DNS | Registrador + SES |
+

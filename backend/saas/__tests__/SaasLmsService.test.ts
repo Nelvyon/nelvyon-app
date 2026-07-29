@@ -128,6 +128,33 @@ describe("SaasLmsService.issueCertificate", () => {
   });
 });
 
+describe("SaasLmsService learner access token", () => {
+  it("creates and verifies learner-scoped tokens", () => {
+    const svc = new SaasLmsService(makeDb());
+    const token = svc.createLearnerAccessToken({
+      courseId: "c1",
+      enrollmentId: "e1",
+      contactEmail: "Alumno@Example.com",
+    });
+    expect(
+      svc.verifyLearnerAccessToken({
+        courseId: "c1",
+        enrollmentId: "e1",
+        contactEmail: "alumno@example.com",
+        token,
+      }),
+    ).toBe(true);
+    expect(
+      svc.verifyLearnerAccessToken({
+        courseId: "c1",
+        enrollmentId: "e2",
+        contactEmail: "alumno@example.com",
+        token,
+      }),
+    ).toBe(false);
+  });
+});
+
 describe("SaasLmsService.listCertificates", () => {
   it("returns certificates with course and recipient context", async () => {
     const db = makeDb([

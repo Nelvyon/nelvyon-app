@@ -2,12 +2,14 @@ import { expect, test } from "@playwright/test";
 
 test(" /auth/login carga formulario", async ({ page }) => {
   await page.goto("/auth/login");
-  await expect(page.getByRole("heading", { name: "Entrar a NELVYON OS" })).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("heading", { name: "Bienvenido de nuevo" })).toBeVisible();
 });
 
 test("/auth/register carga formulario", async ({ page }) => {
   await page.goto("/auth/register");
-  await expect(page.getByRole("heading", { name: "Crear cuenta" })).toBeVisible();
+  await expect(page).toHaveURL(/\/register$/);
+  await expect(page.getByRole("heading", { name: "Registro" })).toBeVisible();
 });
 
 test("Login inválido muestra error", async ({ page }) => {
@@ -17,7 +19,7 @@ test("Login inválido muestra error", async ({ page }) => {
   await page.goto("/auth/login");
   await page.getByLabel("Email").fill("bad@test.com");
   await page.getByLabel("Contraseña").fill("wrong");
-  await page.getByRole("button", { name: "Entrar" }).click();
+  await page.getByRole("button", { name: "Acceder al panel" }).click();
   await expect(page.getByText("Invalid credentials")).toBeVisible();
 });
 

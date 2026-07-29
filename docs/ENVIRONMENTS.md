@@ -12,7 +12,7 @@
 | **App principal** | `apps/web` (Next.js) · servicio `@nelvyon/web` |
 | **API Python** | FastAPI separado — ver `backend/README.md` |
 | **Dominio público** | `https://nelvyon.com` |
-| **git_sha tip remoto** | `203d5e02` (docs v3.2 + cleanup pendiente si se pushea) |
+| **git_sha tip remoto** | `23dbe397` (repo cerrado + staging revalidado) |
 | **Base de datos** | Postgres via `DATABASE_URL` |
 | **SES_REGION** | `eu-west-1` |
 | **Canary IA** | **KILL ON** — ver `docs/ops/CANARY_IA_FLAGS.md` |
@@ -21,7 +21,7 @@
 
 **Variables obligatorias:** ver `apps/web/.env.example`, `docs/LAUNCH_READY.md`, `CLAUDE.md`.
 
-**Migraciones:** auto en deploy via `releaseCommand` (staging OK; prod gated).
+**Migraciones:** auto en deploy via `preDeployCommand` (`pnpm -C apps/web migrate:prod`) � staging OK; prod gated.
 
 ---
 
@@ -80,7 +80,7 @@
 | `/api/health/deep` | Prod | `CRON_SECRET` |
 | `/api/platform/ops/summary` | Prod | Platform admin / `CRON_SECRET` |
 | `/api/saas/*` | Prod/dev | JWT cookie |
-| `/api/cron/*` | Prod | `CRON_SECRET` Bearer |
+| `/api/cron/*` | Prod | `x-cron-secret` (algunas rutas tambi�n aceptan Bearer flexible) |
 | `/api/webhooks/stripe` | Prod | Stripe signature |
 | `backend :8000/health` | Dev | Público |
 | `backend :8000/docs` | Dev | OpenAPI |
@@ -104,3 +104,4 @@
 - Project ref en `apps/web/.env.example` (placeholder)
 - `NEXT_PUBLIC_SUPABASE_URL` + `ANON_KEY` — solo browser
 - `DATABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` — servidor
+

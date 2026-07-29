@@ -26,9 +26,19 @@ const SAAS_PUBLIC_API = new Set([
   "/api/saas/campanias/unsubscribe",
 ]);
 
+function isPublicLmsPath(pathname: string): boolean {
+  if (pathname.startsWith("/api/lms/public/")) return true;
+  if (/^\/api\/lms\/courses\/[^/]+\/enroll$/.test(pathname)) return true;
+  if (/^\/api\/lms\/courses\/[^/]+\/progress\/[^/]+$/.test(pathname)) return true;
+  if (/^\/api\/lms\/progress\/[^/]+\/lesson\/[^/]+$/.test(pathname)) return true;
+  if (/^\/api\/lms\/enrollments\/[^/]+\/certificate$/.test(pathname)) return true;
+  return false;
+}
+
 function isProtectedPath(pathname: string): boolean {
   if (SAAS_LEGACY_GONE.has(pathname)) return false;
   if (SAAS_PUBLIC_API.has(pathname)) return false;
+  if (isPublicLmsPath(pathname)) return false;
   // /saas (exact) = public marketing landing; all other /saas/* routes require auth
   if (pathname === "/saas" || pathname === "/saas/") return false;
   if (pathname.startsWith("/saas/")) return true;
@@ -36,6 +46,7 @@ function isProtectedPath(pathname: string): boolean {
     pathname.startsWith("/os/") ||
     pathname === "/os" ||
     pathname.startsWith("/api/os/") ||
+    pathname.startsWith("/api/lms/") ||
     pathname.startsWith("/api/saas/") ||
     pathname.startsWith("/admin/") ||
     pathname === "/admin" ||
@@ -200,6 +211,7 @@ export const config = {
     "/api/waitlist",
     "/api/nelvyon-site/:path*",
     "/api/platform/:path*",
+    "/api/lms/:path*",
     "/os/:path*",
     "/api/os/:path*",
     "/saas/:path*",

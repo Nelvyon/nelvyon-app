@@ -178,3 +178,4 @@ Resumen:
 - No migrate/deploy/canary en prod.
 - No conecta Datadog/PagerDuty/nuevos SaaS de pago.
 - No promete multi-región (bloqueado por coste — ver HA/DR).
+

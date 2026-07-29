@@ -14,6 +14,11 @@ describe("getRateLimitRule SaaS sensitive surfaces", () => {
     expect(getRateLimitRule("/api/saas/audit/unified")?.id).toBe("saas-audit");
   });
 
+  it("matches public LMS write surfaces", () => {
+    expect(getRateLimitRule("/api/lms/courses/course-1/enroll")?.id).toBe("lms-enroll");
+    expect(getRateLimitRule("/api/lms/progress/enroll-1/lesson/lesson-1")?.id).toBe("lms-progress-write");
+  });
+
   it("does not rate-limit ordinary CRM list", () => {
     expect(getRateLimitRule("/api/saas/crm/contacts")).toBeNull();
   });
