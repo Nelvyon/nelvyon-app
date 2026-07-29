@@ -1,42 +1,42 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-29** — **16 FAIL Vitest cerrados** (tests/harness only) · monorepo **0 FAIL** · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> Última actualización: **2026-07-29** — **CIERRE ABSOLUTO REPO** (seguridad OS admin + SMS bulk OFF + rate limits + CI) · canary **KILL ON** · `claimReady: false` · **NOT READY** (humano)
 
 | Campo | Valor |
 |-------|-------|
-| **Tip remoto** | `70b927aa` (Vitest monorepo **0 FAIL**) |
-| **Staging deploy** | `073949a1` SUCCESS · live `git_sha=b236bba0e12d` (**sin redeploy**: solo tests/vitest.setup) |
+| **Tip remoto** | *(actualizar tras push cierre absoluto)* |
+| **Staging deploy** | Redeploy tras push de seguridad (código runtime) |
 | **Ops SSOT** | `docs/ops/OPERATIONS_INDEX.md` |
 | **SAFE_TO_MIGRATE_PROD** | **true** (técnico; solo SÍ CEO) |
 | **SAFE_TO_DEPLOY_PROD** | **false** hasta migrate 521–522 |
 | **claimReady** | **false** |
 | **Canary** | **KILL ON** |
 
-## Cert local (cierre 16 FAIL)
+## Cierre absoluto in-repo (2026-07-29)
 
-| Gate | Resultado |
-|------|-----------|
-| tsc / lint | **PASS** / **PASS** (0 errores) |
-| Vitest monorepo completo | **6214 PASS** · **0 FAIL** · 8 skipped |
-| Vitest canónico SaaS | **2461 PASS** · 4 skipped |
-| build | **PASS** |
-| Playwright secuencias | **5 PASS** |
-| Staging redeploy | **no** — cambios solo tests + `vitest.setup.ts` (limpia env Ollama en Vitest; no altera runtime prod) |
+| Cambio | Detalle |
+|--------|---------|
+| OS isolation | `qa-review` · `certificates` · `truth-guard` · `recurring` · `retainer` · `retainer/sync` → **`requirePlatformAdmin`** |
+| SMS mass-send | Bulk API **403** · service fail-closed (`NELVYON_SMS_BULK_ENABLED!=1`) · cap 5 |
+| Rate limits | forgot/reset-password · portal login · `/api/saas/sms` · middleware `/api/platform/*` |
+| FastAPI RL | Redis errors **fail-closed** |
+| CI | Staging smokes → Railway staging URL · `os-gate` pnpm order · stripe-meter cron schedule · dead envato scripts removed |
 
-## Staging (último deploy excellence)
+## Cert (ejecutar post-cambio)
 
-| Smoke | Resultado |
-|-------|-----------|
-| health live/ready | **200** · sha `b236bba0` · env.ok |
-| workflows / sequences / honesty | **14/14** · **8/8** · **12/12** |
-| CRM export/import · rate-limit · idempotency | **PASS** |
+| Gate | Esperado |
+|------|----------|
+| tsc / lint / build | **PASS** |
+| Vitest monorepo | **0 FAIL** |
+| Playwright secuencias | **PASS** |
+| Staging smokes | tras redeploy |
 
 ## Próximo paso EXACTO
 
-1. Push tip con cierre Vitest 0 FAIL (si aún no está en remoto).
-2. CEO: SÍ/NO ejecutar `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy).
-3. Sin SÍ: no migrate · no deploy · no canary · no mass-send.
+1. Push tip cierre absoluto → staging redeploy → smokes P0.
+2. CEO: SÍ/NO `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy).
+3. Sin SÍ: no migrate · no deploy · no canary · no mass-send · no OAuth.
 
 ### Rollback IA
 
@@ -46,4 +46,5 @@ NELVYON_PRIVATE_AI_PROD_CANARY_ENABLED=0
 NELVYON_AI_ENABLED=0
 OLLAMA_CONFIGURED=0
 AUTONOMOUS_ALLOW_OPENAI=0
+NELVYON_SMS_BULK_ENABLED=0
 ```

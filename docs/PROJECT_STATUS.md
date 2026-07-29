@@ -1,14 +1,12 @@
-> **2026-07-28** — cierre técnico seguro v3 · staging 521+522 · workflows CERTIFIED · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> **2026-07-29** — cierre absoluto repo · OS admin isolation · SMS bulk OFF · rate limits · Vitest **0 FAIL** · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **CONDITIONAL_READY** (código/staging) · **NOT READY** (prod/legal) |
+| **Estado** | **REPO_COMPLETE** (código interno) · **NOT READY** (prod/legal/CEO) |
 | **Mig staging** | **521+522 APPLIED** |
 | **Mig prod** | **521+522 NOT applied** |
-| **Workflows E2E** | staging **CERTIFIED** |
-| **Playwright** | secuencias **5 PASS** |
+| **Vitest monorepo** | **0 FAIL** (cert post-cierre) |
 | **Canary** | steady **KILLED** |
-| **Coste** | **0** |
-| **Pendiente humano** | CEO prod migrate · legal · OAuth · clientes · push tip |
+| **Pendiente humano** | CEO prod migrate · legal Pepito · OAuth · Twilio/SES ops · clientes · stores |
 
-SSOT: `HANDOVER.md` · `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` v3
+SSOT: `HANDOVER.md`

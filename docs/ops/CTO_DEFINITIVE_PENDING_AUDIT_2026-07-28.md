@@ -1,10 +1,10 @@
 # CTO — Auditoría definitiva de pendientes (v3.3 cleanup seguro)
 
 > **Fecha:** 2026-07-28 · **Versión:** 3.3 (deuda segura post-staging) · tip limpio pendiente push  
-> **SSOT:** este archivo  
+> **HISTÓRICO** — supersedido por `docs/HANDOVER.md` (SSOT vivo)  
 > **claimReady: false** · **NOT READY**  
 > **Canary prod:** **KILL ON**  
-> **SAFE_TO_MIGRATE_PROD:** false
+> **SAFE_TO_MIGRATE_PROD (histórico v3.3):** false · **HANDOVER actual:** true (técnico; solo SÍ CEO)
 
 ---
 
