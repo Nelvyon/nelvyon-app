@@ -8,6 +8,7 @@ on:
     - cron: "*/5 * * * *"   # saas-workflows (scheduled triggers)
     - cron: "*/15 * * * *"  # social-publish queue + saas-sequences (every 15 min)
     - cron: "5 0 * * *"     # workflow-date (00:05 UTC daily)
+    - cron: "0 5 * * *"     # stripe-meter-flush (daily 05:00 UTC)
     - cron: "0 6 * * *"     # saas-dunning (daily 06:00 UTC)
     - cron: "0 7 * * *"     # saas-ceo-brief (daily 07:00 UTC)
     - cron: "0 8 1 * *"     # os-recurring-services (1st of month)

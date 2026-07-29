@@ -37,7 +37,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Run elite staging gate
         env:
-          STAGING_BASE_URL: https://nelvyon.com
+          STAGING_BASE_URL: https://ideal-victory-staging.up.railway.app
           # Wait up to 10m for SHA match; then proceed if prod health is OK (scripts-only pushes skip Railway rebuild).
           DEPLOY_WAIT_MAX_ATTEMPTS: 40
           DEPLOY_WAIT_SOFT: "true"
