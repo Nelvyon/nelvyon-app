@@ -1,6 +1,7 @@
 "use client";
 
-import { NelvyonDsCard } from "@/design-system/components";
+import { DarkCard } from "@/features/saas-shell/components/SaasShellLayout";
+import { KpiTile, SaasWidgetHeader } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
 import type { SaasDealsMetrics } from "../types";
 import { formatDealValue } from "../stages";
@@ -8,16 +9,18 @@ import { formatDealValue } from "../stages";
 type KpiItem = {
   label: string;
   value: string;
+  icon: string;
+  accent?: boolean;
 };
 
 function buildKpis(metrics: SaasDealsMetrics): KpiItem[] {
   const currency = metrics.currency || "EUR";
   return [
-    { label: "Deals abiertos", value: String(metrics.openCount) },
-    { label: "Ganados", value: String(metrics.wonCount) },
-    { label: "Perdidos", value: String(metrics.lostCount) },
-    { label: "Pipeline", value: formatDealValue(metrics.pipelineValue, currency) },
-    { label: "Forecast", value: formatDealValue(metrics.forecastValue, currency) },
+    { label: "Deals abiertos", value: String(metrics.openCount), icon: "📋" },
+    { label: "Ganados", value: String(metrics.wonCount), icon: "🏆" },
+    { label: "Perdidos", value: String(metrics.lostCount), icon: "📉" },
+    { label: "Pipeline", value: formatDealValue(metrics.pipelineValue, currency), icon: "💼", accent: true },
+    { label: "Forecast", value: formatDealValue(metrics.forecastValue, currency), icon: "🔮" },
   ];
 }
 
@@ -32,19 +35,21 @@ export function DealsKpiRow({
 }) {
   if (isLoading) {
     return (
-      <NelvyonDsCard title="KPIs de ventas">
-        <p className="text-sm text-muted-foreground">Cargando métricas del pipeline…</p>
-      </NelvyonDsCard>
+      <DarkCard>
+        <SaasWidgetHeader title="KPIs de ventas" />
+        <p className="text-sm text-white/40">Cargando métricas del pipeline…</p>
+      </DarkCard>
     );
   }
 
   if (error) {
     return (
-      <NelvyonDsCard title="KPIs de ventas">
-        <p className="text-sm text-destructive">
+      <DarkCard>
+        <SaasWidgetHeader title="KPIs de ventas" />
+        <p className="text-sm text-red-400">
           {error instanceof Error ? error.message : "No se pudieron cargar las métricas."}
         </p>
-      </NelvyonDsCard>
+      </DarkCard>
     );
   }
 
@@ -55,9 +60,7 @@ export function DealsKpiRow({
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
       {items.map((item) => (
-        <NelvyonDsCard key={item.label} title={item.label}>
-          <p className="text-xl font-semibold text-foreground">{item.value}</p>
-        </NelvyonDsCard>
+        <KpiTile key={item.label} icon={item.icon} label={item.label} value={item.value} accent={item.accent} />
       ))}
     </div>
   );
