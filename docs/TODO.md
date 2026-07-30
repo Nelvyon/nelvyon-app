@@ -28,7 +28,10 @@
 - [x] **2026-07-30 W3CRM Fase 1:** auditoría completa (97 pantallas/13 grupos) + mapa 69 módulos `saasNav.ts` + conflicto de stack documentado + plan `W3CRM_MIGRATION_PLAN.md` · ADR-075 · `.reference/w3crm/` gitignored
 - [x] **2026-07-30 W3CRM §9 resuelto:** usuario confirmó Opción B (reconstrucción nativa + libs puntuales evaluadas caso a caso) · módulo inicial: Dashboard ejecutivo
 - [x] **2026-07-30 W3CRM Fase 2 — Dashboard:** `SaasDashboardWidgets.tsx` (header/KPI-icono/avatar) integrado en `/saas/dashboard` sobre APIs reales · tsc/lint/build/vitest PASS
-- [ ] **W3CRM Fase 2 — siguiente módulo:** CRM/Pipeline o IA NELVYON (a confirmar) · evaluar `@hello-pangea/dnd`/`@fullcalendar/react` solo cuando se abra ese módulo
+- [x] **2026-07-30 W3CRM Fase 2 — CRM/Pipeline:** fix de causa raíz del contraste oscuro en todo `/saas/*` (`.dark` scope + tokens `success/warning/destructive` que faltaban en `@theme inline`) · kanban de deals reactivado en `/saas/pipeline` (`DealsKanban`/`DealFormModal`/`DealDetailPanel`, ya existían sin usar) · `DealsKpiRow`/`CommercialKpiRow` migrados a `KpiTile` · tsc/lint/build/vitest PASS
+- [ ] **P2 — validar visualmente en staging** el fix de contraste oscuro de `/saas/*` con sesión autenticada real (no verificable en local sin `DATABASE_URL`)
+- [ ] **P3 — bug menor pre-existente (no bloqueante):** tono de badge `"default"` inválido en pestaña Contratos de `/saas/pipeline` (`statusTone[c.status] ?? "default"`) — ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §13.4
+- [ ] **W3CRM Fase 2 — siguiente módulo:** IA NELVYON o Comunicación (a confirmar) · evaluar `@fullcalendar/react` solo cuando se abra el módulo `citas`/`calendar`
 - [ ] **W3CRM Fase 3+:** resto de los 69 módulos por commits separados · staging antes de prod
 
 ---

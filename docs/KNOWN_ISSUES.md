@@ -6,6 +6,23 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (fix contraste oscuro `/saas/*`, 2026-07-30)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código, verificado por compilación + mockup estático** · pendiente de captura autenticada real |
+| **Detalle** | `SaasShellLayout` no activaba el scope `.dark`; `globals.css` no registraba `--color-destructive/success/warning`. Corregido (ver ADR-075 §13.1 en `DECISIONS.md` y `docs/ops/W3CRM_MIGRATION_PLAN.md` §13.1). No se pudo tomar captura de `/saas/crm` o `/saas/pipeline` autenticados en local por falta de `DATABASE_URL`. |
+| **Evidencia** | Compilación aislada de `globals.css` con `@tailwindcss/postcss` (antes: "unknown utility class"; después: reglas generadas) + captura de mockup estático con las clases reales de `NelvyonDsCard`/`Badge`/`Button`/`SectionHeader` dentro de `.dark` |
+| **Próximo paso** | Validar visualmente en el primer despliegue a staging con sesión real |
+
+### UI — tono de badge `"default"` inválido en Contratos de `/saas/pipeline` (2026-07-30, pre-existente)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Detectado, no corregido** (fuera de alcance de este módulo) |
+| **Detalle** | `apps/web/src/app/saas/pipeline/page.tsx`, pestaña Contratos: `tone={statusTone[c.status] ?? "default"}` — `"default"` no es un valor válido de `NelvyonDsBadgeProps["tone"]` (`neutral\|primary\|success\|warning\|danger`). Solo compila porque `Record<string, Tone>` no fuerza el tipo del lado derecho de `??`. Efecto real: badge sin color cuando `c.status` no está en el mapa (`draft/sent/signed/active/expired/cancelled` sí están todos cubiertos, por lo que en la práctica actual no se dispara). |
+| **Próximo paso** | Corregir el fallback a un tono válido (`"neutral"`) en una pasada de limpieza de tipos |
+
 ### Historial — wf.create Internal 500 (localhost 2026-07-17) → CLOSED_STAGING 2026-07-28
 
 | Campo | Valor |

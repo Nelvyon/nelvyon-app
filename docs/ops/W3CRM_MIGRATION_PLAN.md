@@ -254,3 +254,52 @@ Auditoría adicional de NELVYON reveló que ya existen **dos** sistemas de compo
 ### 11.3 Próximo módulo a decidir con el usuario
 
 Candidatos siguientes por orden de prioridad del plan (§7): **CRM/Pipeline** (uso diario) o **IA NELVYON** (mejor alineación con `(aikit)`). No iniciar sin confirmación para respetar "trabaja módulo por módulo, no todo de golpe".
+
+**Usuario confirmó CRM/Pipeline como módulo 2** (ver §13).
+
+---
+
+## 13. Módulo 2 — CRM / Pipeline (2026-07-30)
+
+### 13.1 Hallazgo crítico previo a migrar: bug de contraste sistémico (causa raíz, no cosmético)
+
+Auditoría de `/saas/crm`, `/saas/pipeline` y de los componentes `features/saas-deals/*` (usados también por el Dashboard vía `CommercialPipelineSection`) reveló que **todos** los componentes basados en tokens semánticos (`NelvyonDsCard`, `NelvyonDsBadge`, `NelvyonDsButton`, `NelvyonDsSectionHeader`, `core/ui/Badge`, `core/ui/pageStatus`, ...) renderizaban **rotos** dentro del shell oscuro de `/saas/*`:
+
+- `SaasShellLayout` fuerza fondo `#020817` pero **nunca** activa el scope `.dark` de Tailwind; los componentes de `design-system/components` usan variables CSS (`--card`, `--foreground`, `--border`, `--muted-foreground`) que solo tienen valores definidos en `:root` (tema claro) → tarjetas blancas y texto oscuro sobre fondo casi negro, contraste roto en decenas de pantallas.
+- Verificación adicional (compilación aislada con `@tailwindcss/postcss` sobre el `globals.css` real): las clases `text-destructive`, `bg-destructive`, `text-warning`, `bg-warning`, `text-success`, `bg-success` (y sus variantes `-foreground`) **no generaban ninguna regla CSS** — Tailwind v4 las rechaza como "unknown utility class" porque `--color-destructive`/`--color-success`/`--color-warning` nunca se registraron en el bloque `@theme inline`. Estas clases se usan en **~150 archivos** de todo el producto (badges de estado, botones de peligro, banners de error/warning, `core/ui/Badge.tsx`, etc.) — es decir, todos los estados de éxito/aviso/error del SaaS eran invisibles de forma silenciosa, en cualquier página, clara u oscura.
+
+**Corrección aplicada (causa raíz, no parche visual por componente):**
+
+1. `apps/web/src/app/globals.css`: se registran los tokens que faltaban (`--destructive-foreground`, `--success`, `--success-foreground`, `--warning`, `--warning-foreground`) en `:root` y en `@theme inline` (`--color-*`), y se añade un bloque `.dark { ... }` que redefine `--background/--foreground/--card/--card-foreground/--popover/--secondary/--muted/--accent/--border/--input/--ring/--destructive/--success/--warning` con la paleta oscura NELVYON (`#020817`/`#0b1428`/`#0084ff`), activable vía el `@custom-variant dark (&:where(.dark, .dark *))` ya existente en el archivo.
+2. `apps/web/src/features/saas-shell/components/SaasShellLayout.tsx`: se añade la clase `dark` al contenedor raíz del shell SaaS. Efecto: **todas** las páginas `/saas/*` que usan `NelvyonDsCard`/`NelvyonDsBadge`/`NelvyonDsButton`/`NelvyonDsSectionHeader` (no solo CRM/Pipeline) pasan a renderizar con la paleta oscura correcta, sin tocar ni un archivo de componente.
+3. Verificación empírica (no solo razonamiento): compilación real de `globals.css` con `@tailwindcss/postcss` confirmando que `text-destructive`/`text-warning`/`text-success` generan reglas válidas tras el fix, y captura de pantalla de una réplica estática de `NelvyonDsCard` + las 5 variantes de `NelvyonDsBadge` + las 4 variantes de `NelvyonDsButton` + `NelvyonDsSectionHeader` dentro de un contenedor `.dark` — todas legibles con buen contraste (evidencia adjunta en el informe de entrega del chat, no versionada por ser un artefacto temporal de verificación).
+4. Riesgo: cambio de alcance amplio (afecta toda `/saas/*`), pero de naturaleza puramente aditiva en CSS (ninguna clase/valor existente se elimina, solo se registran tokens que antes no generaban ninguna regla) — el "antes" era roto en todos los casos observados, por lo que no hay regresión posible sobre un estado que funcionara.
+5. Pendiente de verificación real (no bloqueante para cerrar este módulo, documentado honestamente): no se hizo una captura de pantalla autenticada de `/saas/crm` o `/saas/pipeline` en vivo porque el entorno local no tiene `DATABASE_URL` configurado (confirmado por warnings de los propios tests). Recomendación: validar visualmente en el primer despliegue a staging.
+
+### 13.2 Migración funcional — Pipeline: kanban real reactivado
+
+`features/saas-deals/components/DealsKanban.tsx`, `DealFormModal.tsx`, `DealDetailPanel.tsx` (drag-and-drop HTML5 nativo, CRUD completo, ya con tests) existían **completos y probados pero sin usar en ninguna pantalla real** (solo referenciados por su propio test). Se decidió **reutilizar y wire-in** en vez de reescribir (evita duplicar la lógica que ya vive en `/saas/pipeline` de forma manual):
+
+- `apps/web/src/app/saas/pipeline/page.tsx`, pestaña **Deals**: sustituida la lista plana por `DealsKanban` (6 columnas por etapa, drag-and-drop, botones ◀/▶ de fallback), con `DealDetailPanel` (ver/editar/eliminar) y `DealFormModal` (crear/editar) cableados a los mismos fetches ya existentes en la página (`/api/saas/deals`, `/api/saas/deals/:id/stage`, `/api/saas/crm/contacts`). No se introduce React Query en esta página (mantiene el patrón `fetch` + `load()` ya usado por el resto de pestañas de este archivo); `DealDetailPanel`/`DealFormModal` sí usan sus hooks React Query internos (`useDeleteSaasDeal`, `useCreateSaasDeal`, `useUpdateSaasDeal`) ya existentes, con `onSuccess`/`onDeleted` refrescando el estado local de la página.
+- No se instala `@hello-pangea/dnd`: el kanban nativo ya cubre el caso de uso sin dependencia nueva.
+- `features/saas-deals/components/DealsKpiRow.tsx` y `CommercialKpiRow.tsx` (esta última usada por el Dashboard vía `CommercialPipelineSection`) se actualizan al mismo patrón de `KpiTile`/`SaasWidgetHeader` que el Dashboard (icono + valor, glow en el KPI principal) en vez de `NelvyonDsCard` plano — consistencia visual con el módulo 1.
+- Resto de componentes `saas-deals` (`StageDistributionPanel`, `CommercialActivityPanels`, `ContactDealsContextPanel`, `CommercialPipelineSection`) y las páginas `/saas/crm`, `/saas/pipeline` (pestañas forecast/playbooks/quotes/contratos) **no requieren cambios de código**: ya usaban `NelvyonDsCard`/`NelvyonDsBadge`/tokens semánticos, y quedan corregidos automáticamente por el fix de §13.1.
+
+### 13.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint <archivos modificados>` | **PASS** (0 errores/warnings en código; 1 warning esperado de ESLint ignorando `.css`) |
+| `pnpm -C apps/web exec vitest run backend/saas src/features/saas-deals` | **PASS** — incluye `DealsKanban.test.tsx` (drag-and-drop, click, fallback de botones) sin modificar — 2449 tests passed, 4 skipped |
+| `pnpm -C apps/web build` | **PASS** — build de producción completo, sin errores |
+| Verificación empírica del fix de tokens | Compilación aislada de `globals.css` con `@tailwindcss/postcss` confirmando generación de reglas para `text-destructive/success/warning` tras el fix (fallaban con "unknown utility class" antes) + captura de pantalla de mockup estático con las clases reales de `NelvyonDsCard`/`Badge`/`Button`/`SectionHeader` dentro de `.dark` |
+| Funcionalidad preservada | CRUD de deals, cambio de etapa, presupuestos, playbooks, contratos, forecast — sin cambios de comportamiento salvo la pestaña Deals (antes lista plana, ahora kanban con las mismas acciones) |
+| Branding/mock data | Cero — mismas APIs reales (`/api/saas/deals`, `/api/saas/crm/contacts`, `/api/saas/playbooks`, `/api/saas/quotes`, `/api/saas/contracts`) |
+| `claimReady` / canary | `false` / `KILL` — sin cambios |
+
+### 13.4 Pendiente / riesgo conocido
+
+- Verificación visual en un entorno con `DATABASE_URL` real (staging) recomendada antes de considerar el módulo 100 % cerrado a nivel de producto, aunque la corrección de CSS está verificada empíricamente a nivel de compilación y con mockup estático.
+- `DealsKpiRow` (fila de KPIs de deals) sigue sin usarse en ninguna pantalla real tras este módulo (se dejó corregida visualmente pero no se forzó su integración en `/saas/pipeline` para no duplicar la banda de KPIs ya existente en esa página) — candidato a consolidación futura si se decide unificar ambas.
+- Bug pre-existente y no relacionado (no corregido, fuera de alcance): `tone={statusTone[c.status] ?? "default"}` en la pestaña Contratos de `/saas/pipeline` usa `"default"` como tono de fallback, que no es un valor válido de `NelvyonDsBadgeProps["tone"]` (solo compila porque `Record<string, Tone>` no fuerza el tipo del operando derecho de `??`); efecto real: badge sin color de tono cuando el status no está en el mapa. Anotado para corrección en una pasada de limpieza específica.
