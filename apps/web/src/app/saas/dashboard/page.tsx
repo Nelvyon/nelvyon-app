@@ -112,6 +112,11 @@ export default function SaasDashboardPage() {
           router.replace(`/auth/login?next=${encodeURIComponent("/saas/dashboard")}`);
           return;
         }
+        // New auth users have JWT but no saas_tenants row until onboarding.
+        if (res.status === 404) {
+          router.replace("/saas/onboarding");
+          return;
+        }
         if (!res.ok) {
           if (!cancelled) setError(t("common.error"));
           return;

@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 
 import { ChatbotWidget } from "@/components/ChatbotWidget";
 import { CookieBanner } from "@/components/CookieBanner";
+import { NativeShellChromeGate } from "@/components/NativeShellChromeGate";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { LocaleProvider } from "@/core/i18n/LocaleProvider";
 import { AppProviders } from "@/core/providers/AppProviders";
@@ -111,8 +112,10 @@ if ('serviceWorker' in navigator) {
                 <main className="min-h-screen bg-white text-[#07122a]">{children}</main>
               </AppProviders>
             </LocaleProvider>
-            <CookieBanner />
-            <ChatbotWidget />
+            <NativeShellChromeGate>
+              <CookieBanner />
+              <ChatbotWidget />
+            </NativeShellChromeGate>
           </PostHogProvider>
         </ThemeProvider>
       </body>
