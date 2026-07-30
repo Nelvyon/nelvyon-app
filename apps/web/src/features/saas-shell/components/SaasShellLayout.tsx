@@ -22,7 +22,7 @@ export function SaasShellLayout({
   return (
     <DashboardLayout>
       <div
-        className="min-h-screen bg-[#020817] text-white"
+        className="dark min-h-screen bg-[#020817] text-white"
         style={{
           backgroundImage: `
             radial-gradient(ellipse 80% 40% at 20% 0%, rgba(0,132,255,0.10) 0%, transparent 60%),
