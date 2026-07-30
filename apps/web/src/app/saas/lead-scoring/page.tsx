@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
@@ -28,27 +28,27 @@ const GRADE_COLOR: Record<LeadGrade, string> = {
   D: "text-red-400 bg-red-500/10 border-red-500/20",
 };
 const CAT_LABEL: Record<RuleCategory, string> = {
-  demographic: "Demogr├ífico", behavioral: "Comportamiento",
-  engagement: "Engagement", firmographic: "Firmogr├ífico",
+  demographic: "Demográfico", behavioral: "Comportamiento",
+  engagement: "Engagement", firmographic: "Firmográfico",
 };
 const CAT_BADGE: Record<LeadCategory, "success" | "warning" | "danger"> = {
   hot: "success", warm: "warning", cold: "danger",
 };
 const FIELD_LABELS: Record<RuleField, string> = {
-  "contact.has_email": "Tiene email", "contact.has_phone": "Tiene tel├®fono",
+  "contact.has_email": "Tiene email", "contact.has_phone": "Tiene teléfono",
   "contact.has_company": "Tiene empresa", "contact.has_notes": "Tiene notas",
   "contact.status": "Estado", "contact.pipeline_stage": "Etapa pipeline",
   "contact.email_opens": "Emails abiertos", "contact.email_clicks": "Clics en email",
   "contact.activity_count": "Actividades totales", "contact.value": "Valor contacto",
 };
 const OP_LABELS: Record<RuleOperator, string> = {
-  equals: "=", not_equals: "Ôëá", greater_than: ">", less_than: "<",
+  equals: "=", not_equals: "≠", greater_than: ">", less_than: "<",
   contains: "contiene", not_contains: "no contiene", is_true: "es verdadero", is_false: "es falso",
 };
 
 const inp = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
 
-// ÔöÇÔöÇ Rule Create Modal ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// --- Rule Create Modal ---
 function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [name, setName] = useState("");
   const [field, setField] = useState<RuleField>("contact.has_email");
@@ -91,7 +91,7 @@ function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
                 {(Object.entries(FIELD_LABELS) as [RuleField, string][]).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
             </div>
-            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Categor├¡a</label>
+            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Categoría</label>
               <select value={category} onChange={e => setCategory(e.target.value as RuleCategory)} className={inp}>
                 {(Object.entries(CAT_LABEL) as [RuleCategory, string][]).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
@@ -104,7 +104,7 @@ function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
                   ? [<option key="is_true" value="is_true">es verdadero</option>, <option key="is_false" value="is_false">es falso</option>]
                   : numericField
                     ? [<option key="gt" value="greater_than">&gt;</option>, <option key="lt" value="less_than">&lt;</option>, <option key="eq" value="equals">=</option>]
-                    : [<option key="eq" value="equals">=</option>, <option key="neq" value="not_equals">Ôëá</option>, <option key="con" value="contains">contiene</option>]
+                    : [<option key="eq" value="equals">=</option>, <option key="neq" value="not_equals">≠</option>, <option key="con" value="contains">contiene</option>]
                 }
               </select>
             </div>
@@ -113,11 +113,11 @@ function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
                 <input value={value} onChange={e => setValue(e.target.value)} placeholder={numericField ? "5" : "qualified"} className={inp} /></div>
             )}
           </div>
-          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Puntos (negativo = penalizaci├│n)</label>
+          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Puntos (negativo = penalización)</label>
             <input type="number" value={points} onChange={e => setPoints(Number(e.target.value))} className={inp} /></div>
           <div className="flex gap-3 pt-2">
             <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "GuardandoÔÇª" : "Crear regla"}</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Crear regla"}</NelvyonDsButton>
           </div>
         </form>
       </div>
@@ -125,7 +125,7 @@ function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
   );
 }
 
-// ÔöÇÔöÇ Main Page ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function SaasLeadScoringPage() {
   const [rules, setRules]    = useState<ScoringRule[]>([]);
   const [scores, setScores]  = useState<LeadScore[]>([]);
@@ -176,7 +176,7 @@ export default function SaasLeadScoringPage() {
     <SaasShellLayout sidebar={<SaasSidebar activeId="lead-scoring" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <NelvyonDsSectionHeader title="Lead Scoring" subtitle="Punt├║a leads autom├íticamente con reglas configurables por campo y comportamiento" />
+          <NelvyonDsSectionHeader title="Lead Scoring" subtitle="Puntúa leads automáticamente con reglas configurables por campo y comportamiento" />
           <div className="flex gap-2">
             {tab === "rules" && <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nueva regla</NelvyonDsButton>}
           </div>
@@ -185,7 +185,7 @@ export default function SaasLeadScoringPage() {
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           <NelvyonDsCard className="p-4">
-            <p className="text-xs text-muted-foreground">Score m├íximo</p>
+            <p className="text-xs text-muted-foreground">Score máximo</p>
             <p className="mt-1 text-2xl font-bold text-foreground">{maxScore}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{activeRules} reglas activas</p>
           </NelvyonDsCard>
@@ -213,7 +213,7 @@ export default function SaasLeadScoringPage() {
           scores.length === 0 ? (
             <NelvyonDsCard className="p-14 text-center">
               <p className="text-3xl">­ƒÄ»</p>
-              <p className="mt-3 text-lg font-semibold text-foreground">Sin scores a├║n</p>
+              <p className="mt-3 text-lg font-semibold text-foreground">Sin scores aún</p>
               <p className="mt-1 text-sm text-muted-foreground">Los contacts se puntúan automáticamente al crearse o al pulsar &quot;Puntuar&quot; en el detalle del CRM.</p>
             </NelvyonDsCard>
           ) : (
@@ -227,7 +227,7 @@ export default function SaasLeadScoringPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-foreground">{lead.contactName || "Sin nombre"}</p>
-                        {lead.contactCompany && <span className="text-xs text-muted-foreground">┬À {lead.contactCompany}</span>}
+                        {lead.contactCompany && <span className="text-xs text-muted-foreground">· {lead.contactCompany}</span>}
                         <NelvyonDsBadge tone={CAT_BADGE[lead.category]}>{lead.category === "hot" ? "­ƒöÑ Hot" : lead.category === "warm" ? "­ƒîí Warm" : "ÔØä Cold"}</NelvyonDsBadge>
                       </div>
                       <p className="text-xs text-muted-foreground">{lead.contactEmail}</p>
@@ -247,7 +247,7 @@ export default function SaasLeadScoringPage() {
                       )}
                       <button onClick={() => void scoreContact(lead.contactId)} disabled={scoringId === lead.contactId}
                         className="mt-1.5 text-xs text-muted-foreground hover:text-primary transition-colors">
-                        {scoringId === lead.contactId ? "PuntuandoÔÇª" : "Ôå╗ Repuntuar"}
+                        {scoringId === lead.contactId ? "Puntuando…" : "Ôå╗ Repuntuar"}
                       </button>
                     </div>
                   </div>
@@ -260,7 +260,7 @@ export default function SaasLeadScoringPage() {
             <NelvyonDsCard className="p-14 text-center">
               <p className="text-3xl">ÔÜÖ´©Å</p>
               <p className="mt-3 text-lg font-semibold text-foreground">Sin reglas configuradas</p>
-              <p className="mt-1 text-sm text-muted-foreground">Las reglas determinan qu├® acciones o datos del contacto suman o restan puntos.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Las reglas determinan qué acciones o datos del contacto suman o restan puntos.</p>
               <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>+ Crear primera regla</NelvyonDsButton>
             </NelvyonDsCard>
           ) : (
@@ -269,8 +269,8 @@ export default function SaasLeadScoringPage() {
                 <thead>
                   <tr className="border-b border-border bg-muted/20">
                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Regla</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Condici├│n</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Categor├¡a</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Condición</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Categoría</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Puntos</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Activa</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground"></th>

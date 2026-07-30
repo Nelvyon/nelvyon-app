@@ -81,7 +81,7 @@ export default function SaasCopywriterPage() {
   }
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="agentes" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="copywriter" />}>
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader
           title="Copywriter IA"

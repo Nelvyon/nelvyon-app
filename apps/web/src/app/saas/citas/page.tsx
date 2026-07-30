@@ -213,7 +213,7 @@ export default function SaasCitasPage() {
   };
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="formularios" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="citas" />}>
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader

@@ -280,8 +280,8 @@
         "subcuentas": "Subcontas / Agência",
         "comunidades":  "Comunidades",
         "erp-purchases": "ERP Compras",
-        "erp-inventory": "ERP Invent�rio",
-        "erp-manufacturing": "ERP Produ��o",
+        "erp-inventory": "ERP Inventário",
+        "erp-manufacturing": "ERP Produção",
         "erp-projects": "ERP Projetos",
         "erp-sectors": "ERP Setores"
       }
@@ -341,7 +341,7 @@
       "disable_enforce": "Desativar SSO obrigatório",
       "callback_url": "URL de callback para o seu IdP",
       "no_permission": "Apenas owner/admin podem configurar SSO.",
-      "saml_coming_soon": "SAML 2.0 disponível. Configure IdP, URL SSO e certificado em Segurança. Também suportado: OIDC.",
+      "saml_available": "SAML 2.0 disponível. Configure IdP, URL SSO e certificado em Segurança. Também suportado: OIDC.",
       "status_optional": "Opcional",
       "status_enforced": "Obrigatório"
     },

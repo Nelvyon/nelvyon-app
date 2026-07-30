@@ -341,7 +341,7 @@
       "disable_enforce": "SSO-Erzwingung deaktivieren",
       "callback_url": "Callback-URL für Ihren IdP",
       "no_permission": "Nur Owner/Admin können SSO konfigurieren.",
-      "saml_coming_soon": "SAML 2.0 verfügbar. Konfigurieren Sie IdP, SSO-URL und Zertifikat unter Sicherheit. Auch unterstützt: OIDC.",
+      "saml_available": "SAML 2.0 verfügbar. Konfigurieren Sie IdP, SSO-URL und Zertifikat unter Sicherheit. Auch unterstützt: OIDC.",
       "status_optional": "Optional",
       "status_enforced": "Erzwungen"
     },

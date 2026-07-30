@@ -57,7 +57,7 @@ export function FeaturedEnvatoTemplateCard({
             unoptimized
           />
           <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
-            Envato #{template.envato_id}
+            Plantilla premium
           </span>
         </div>
         <div className="flex flex-col justify-center p-6">
@@ -72,7 +72,7 @@ export function FeaturedEnvatoTemplateCard({
             </NelvyonDsButton>
           </div>
           <p className="mt-3 text-[10px] text-muted-foreground">
-            Licencia Envato Market · Adaptación oficial Nelvyon · Lista para publicar
+            Licencia comercial incluida · Adaptación oficial Nelvyon · Lista para publicar
           </p>
         </div>
       </div>

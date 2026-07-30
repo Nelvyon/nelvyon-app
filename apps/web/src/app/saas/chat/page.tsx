@@ -84,7 +84,7 @@ export default function SaasChatPage() {
   }
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="agentes" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="chat" />}>
       <div className="flex h-[calc(100vh-80px)] flex-col gap-4">
         <NelvyonDsSectionHeader
           title="Asistente IA"

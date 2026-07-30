@@ -347,7 +347,7 @@ export default function SaasSetupPage() {
           {featuredTemplate && (
             <section>
               <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">
-                Landing premium (Envato)
+                Landing premium Nelvyon
               </p>
               <FeaturedEnvatoTemplateCard template={featuredTemplate} onImported={load} />
             </section>

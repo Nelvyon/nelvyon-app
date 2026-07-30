@@ -70,8 +70,8 @@ describe("i18n — saas namespace ES/EN parity", () => {
     expect(Object.keys(enErrors)).toHaveLength(6);
   });
 
-  it("saas.sso.saml_coming_soon exists", () => {
-    const esVal = (esMessages as Record<string, Record<string, Record<string, string>>>).saas?.sso?.saml_coming_soon;
+  it("saas.sso.saml_available exists", () => {
+    const esVal = (esMessages as Record<string, Record<string, Record<string, string>>>).saas?.sso?.saml_available;
     expect(typeof esVal).toBe("string");
     expect(esVal.length).toBeGreaterThan(5);
   });

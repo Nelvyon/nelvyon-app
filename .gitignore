@@ -24,6 +24,12 @@ pip-wheel-metadata/
 # --- Reference templates (local extract only; never ship) ---
 .reference/
 
+# --- Local audit / scratch outputs ---
+tmp-*.txt
+tmp-*.json
+vitest-out.txt
+.tmp-*.txt
+
 # --- Build / artefactos ---
 dist/
 build/

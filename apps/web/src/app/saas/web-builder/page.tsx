@@ -230,7 +230,7 @@ export default function SaasWebBuilderPage() {
           <NelvyonDsCard className="p-16 text-center">
             <p className="text-5xl">🌐</p>
             <p className="mt-4 text-lg font-semibold text-foreground">Sin páginas propias aún</p>
-            <p className="mt-2 text-sm text-muted-foreground">Importa la plantilla premium Landrick arriba o crea una página desde cero</p>
+            <p className="mt-2 text-sm text-muted-foreground">Importa la plantilla premium oficial arriba o crea una página desde cero</p>
             <NelvyonDsButton className="mt-5" onClick={() => setShowNew(true)}>+ Crear página en blanco</NelvyonDsButton>
           </NelvyonDsCard>
         ) : (

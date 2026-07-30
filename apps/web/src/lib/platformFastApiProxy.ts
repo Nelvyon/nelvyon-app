@@ -16,7 +16,10 @@ export function platformApiBase(): string {
 }
 
 export function stableWorkspaceIdFromTenant(tenantId: string): number {
-  const src = (tenantId ?? "").trim() || "default-tenant";
+  const src = (tenantId ?? "").trim();
+  if (!src) {
+    throw new Error("tenantId is required for workspace id derivation");
+  }
   let hash = 0;
   for (let i = 0; i < src.length; i += 1) {
     hash = (hash * 31 + src.charCodeAt(i)) >>> 0;

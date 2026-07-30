@@ -13,6 +13,11 @@ describe("platformFastApiProxy", () => {
     expect(stableWorkspaceIdFromTenant("a6c069f8-b528-4ecf-8231-09fdd7886106")).toBe(id);
   });
 
+  it("stableWorkspaceIdFromTenant rejects empty tenantId", () => {
+    expect(() => stableWorkspaceIdFromTenant("")).toThrow(/tenantId is required/);
+    expect(() => stableWorkspaceIdFromTenant("   ")).toThrow(/tenantId is required/);
+  });
+
   it("fallbackWorkspaceList returns one workspace row", () => {
     const rows = fallbackWorkspaceList({
       userId: "u-1",

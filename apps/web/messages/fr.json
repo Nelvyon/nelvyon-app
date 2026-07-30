@@ -341,7 +341,7 @@
       "disable_enforce": "Désactiver le SSO imposé",
       "callback_url": "URL de callback pour votre IdP",
       "no_permission": "Seuls owner/admin peuvent configurer le SSO.",
-      "saml_coming_soon": "SAML 2.0 disponible. Configurez IdP, URL SSO et certificat dans Sécurité. Aussi pris en charge : OIDC.",
+      "saml_available": "SAML 2.0 disponible. Configurez IdP, URL SSO et certificat dans Sécurité. Aussi pris en charge : OIDC.",
       "status_optional": "Optionnel",
       "status_enforced": "Imposé"
     },
