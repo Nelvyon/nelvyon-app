@@ -1,9 +1,9 @@
-> **2026-07-30** — tip `7806641b` cierre Cursor · staging live `3c64111bd198` · tsc/lint/build/Vitest/PW **PASS** · KI020 **PASS** · canary **KILL ON** · `claimReady: false` · **NOT READY**
+> **2026-07-30** — tip `0d7d6e90` cierre Cursor · staging live `3c64111bd198` · tsc/lint/build/Vitest/PW **PASS** · KI020 **PASS** · canary **KILL ON** · `claimReady: false` · **NOT READY**
 
 | Campo | Valor |
 |-------|-------|
 | **Estado** | **REPO_COMPLETE** (código interno) · **NOT READY** (prod/legal/CEO) |
-| **Tip** | **`7806641b`** · staging runtime aún `3c64111bd198` |
+| **Tip** | **`0d7d6e90`** · staging runtime aún `3c64111bd198` |
 | **Mig staging** | **521+522 APPLIED** |
 | **Mig prod** | **521+522 NOT applied** |
 | **Vitest monorepo** | **6228 PASS / 0 FAIL** |

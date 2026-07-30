@@ -1,14 +1,14 @@
 # CEO / Daniel — Master actions (solo humano)
 
 > Cursor cerró lo ejecutable. Esta lista es **mínima y exacta**.  
-> Fecha: 2026-07-30 · tip `7806641b` · staging live `3c64111bd198` · KI020 PASS · honesty P0 → `STAGING_QA_PASSWORD` · `claimReady: false`
+> Fecha: 2026-07-30 · tip `0d7d6e90` · staging live `3c64111bd198` · KI020 PASS · honesty P0 → `STAGING_QA_PASSWORD` · `claimReady: false`
 
 ## A — Infra / DB / IA
 
 | # | Acción | Doc | Tiempo |
 |---|--------|-----|--------|
 | 0 | ~~4 frases SÍ/NO~~ → **ADR-067 decidido** (1 SÍ / 2–4 NO) | `CEO_POINTS_1_4_APPROVAL_REQUEST.md` | hecho |
-| **1** | **SÍ/NO migrar prod 521+522 → luego deploy tip `7806641b` (o tip HANDOVER)** | `PROD_MIGRATE_521_522_RUNBOOK.md` | **AHORA** |
+| **1** | **SÍ/NO migrar prod 521+522 → luego deploy tip `0d7d6e90` (o tip HANDOVER)** | `PROD_MIGRATE_521_522_RUNBOOK.md` | **AHORA** |
 | 2 | Dual-write ERP — **NO hasta nuevo SÍ** | `ERP_DUAL_WRITE_TRANSITION_RUNBOOK.md` | diferido |
 | 3 | RAG Railway apply — **NO hasta nuevo SÍ** | `RAILWAY_PRIVATE_RAG_PREP_RUNBOOK.md` | diferido |
 | 4 | Canary IA prod — **NO hasta nuevo SÍ** | `CEO_IA_PROD_CANARY_REQUEST.md` | diferido |

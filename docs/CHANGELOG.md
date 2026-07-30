@@ -7,7 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
-| Ops / Cert | **Fase final Cursor (cierre)** | Tip **`7806641b`** · cert helpers Railway + RL backoff · passwordless gates · OAuth URIs exactas · tsc/lint/build/Vitest/PW **PASS** · KI020 **PASS** · honesty register **429** → Ops `STAGING_QA_PASSWORD` · `claimReady: false` |
+| Ops / Cert | **Fase final Cursor (cierre)** | Tip **`0d7d6e90`** · cert helpers Railway + RL backoff · passwordless gates · OAuth URIs exactas · tsc/lint/build/Vitest/PW **PASS** · KI020 **PASS** · honesty register **429** → Ops `STAGING_QA_PASSWORD` · `claimReady: false` |
 
 ## 2026-07-29
 
