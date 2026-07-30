@@ -1,9 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { DealsKanban } from "@/features/saas-deals/components/DealsKanban";
+import { DealFormModal } from "@/features/saas-deals/components/DealFormModal";
+import { DealDetailPanel } from "@/features/saas-deals/components/DealDetailPanel";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type DealStage = "new" | "contacted" | "qualified" | "proposal" | "won" | "lost";
@@ -38,6 +41,7 @@ interface Contract {
   currency: string; amount: number; status: string;
   createdAt: string; signedAt: string | null;
 }
+interface ContactLite { id: string; name: string; company: string | null }
 
 // ── Quote Create Modal ────────────────────────────────────────────────────────
 function QuoteModal({ deal, onClose, onCreated }: { deal?: Deal; onClose: () => void; onCreated: () => void }) {
@@ -203,17 +207,26 @@ export default function SaasPipelinePage() {
   const [quoteDeal, setQuoteDeal] = useState<Deal | undefined>(undefined);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [contractLoading, setContractLoading] = useState(false);
+  const [contacts, setContacts] = useState<ContactLite[]>([]);
+  const [changingDealId, setChangingDealId] = useState<string | null>(null);
+  const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
+  const [dealModal, setDealModal] = useState<{ open: boolean; mode: "create" | "edit"; deal: Deal | null }>({
+    open: false,
+    mode: "create",
+    deal: null,
+  });
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [dealsRes, forecastRes, playbooksRes, quotesRes, byRepRes, scenRes] = await Promise.all([
+      const [dealsRes, forecastRes, playbooksRes, quotesRes, byRepRes, scenRes, contactsRes] = await Promise.all([
         fetch("/api/saas/deals"),
         fetch("/api/saas/playbooks?resource=forecast"),
         fetch("/api/saas/playbooks"),
         fetch("/api/saas/quotes"),
         fetch("/api/saas/playbooks?resource=forecast-by-rep"),
         fetch("/api/saas/playbooks?resource=forecast-scenarios"),
+        fetch("/api/saas/crm/contacts"),
       ]);
       if (dealsRes.ok) { const d = await dealsRes.json() as { deals?: Deal[] }; setDeals(d.deals ?? []); }
       if (forecastRes.ok) { const d = await forecastRes.json() as { forecast?: Forecast }; setForecast(d.forecast ?? null); }
@@ -224,12 +237,57 @@ export default function SaasPipelinePage() {
       }
       if (playbooksRes.ok) { const d = await playbooksRes.json() as { playbooks?: Playbook[] }; setPlaybooks(d.playbooks ?? []); }
       if (quotesRes.ok) { const d = await quotesRes.json() as { quotes?: Quote[] }; setQuotes(d.quotes ?? []); }
+      if (contactsRes.ok) { const d = await contactsRes.json() as { contacts?: ContactLite[] }; setContacts(d.contacts ?? []); }
       const contractsRes = await fetch("/api/saas/contracts");
       if (contractsRes.ok) { const d = await contractsRes.json() as { contracts?: Contract[] }; setContracts(d.contracts ?? []); }
     } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  const contactsById = useMemo(
+    () => new Map(contacts.map((c) => [c.id, { name: c.name, company: c.company }])),
+    [contacts],
+  );
+
+  const dealsMetrics = useMemo(() => {
+    const byStageMap = new Map<DealStage, { count: number; totalValue: number }>();
+    for (const d of deals) {
+      const cur = byStageMap.get(d.stage) ?? { count: 0, totalValue: 0 };
+      cur.count += 1;
+      cur.totalValue += d.value;
+      byStageMap.set(d.stage, cur);
+    }
+    return {
+      openCount: deals.filter((d) => d.stage !== "won" && d.stage !== "lost").length,
+      wonCount: deals.filter((d) => d.stage === "won").length,
+      lostCount: deals.filter((d) => d.stage === "lost").length,
+      pipelineValue: deals.filter((d) => d.stage !== "won" && d.stage !== "lost").reduce((s, d) => s + d.value, 0),
+      wonValue: deals.filter((d) => d.stage === "won").reduce((s, d) => s + d.value, 0),
+      forecastValue: forecast?.weightedTotal ?? 0,
+      currency: "EUR",
+      byStage: Array.from(byStageMap.entries()).map(([stage, v]) => ({
+        stage,
+        count: v.count,
+        totalValue: v.totalValue,
+        conversionToWonPct: null,
+      })),
+    };
+  }, [deals, forecast?.weightedTotal]);
+
+  async function handleMoveStage(deal: Deal, stage: DealStage) {
+    setChangingDealId(deal.id);
+    try {
+      await fetch(`/api/saas/deals/${deal.id}/stage`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stage }),
+      });
+      await load();
+    } finally {
+      setChangingDealId(null);
+    }
+  }
 
   async function deletePlaybook(id: string) {
     await fetch("/api/saas/playbooks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "delete", id }) });
@@ -251,6 +309,7 @@ export default function SaasPipelinePage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="Sales Hub — Pipeline" subtitle="Forecast ponderado, playbooks por etapa y presupuestos CPQ" />
           <div className="flex gap-2">
+            {tab === "deals" && <NelvyonDsButton onClick={() => setDealModal({ open: true, mode: "create", deal: null })}>+ Nuevo deal</NelvyonDsButton>}
             {tab === "quotes" && <NelvyonDsButton onClick={() => { setQuoteDeal(undefined); setShowQuoteModal(true); }}>+ Presupuesto</NelvyonDsButton>}
           {tab === "contratos" && <NelvyonDsButton onClick={() => { void (async () => { setContractLoading(true); const r = await fetch("/api/saas/contracts"); if (r.ok) { const d = await r.json() as { contracts?: Contract[] }; setContracts(d.contracts ?? []); } setContractLoading(false); })(); }}>↻ Actualizar</NelvyonDsButton>}
             {tab === "playbooks" && <NelvyonDsButton onClick={() => setShowPlaybookModal(true)}>+ Playbook</NelvyonDsButton>}
@@ -369,33 +428,33 @@ export default function SaasPipelinePage() {
               </div>
             )}
 
-            {/* ── DEALS ── */}
+            {/* ── DEALS (kanban) ── */}
             {tab === "deals" && (
-              deals.length === 0 ? (
-                <NelvyonDsCard className="p-12 text-center">
-                  <p className="text-3xl">💼</p>
-                  <p className="mt-3 text-sm text-muted-foreground">Sin deals. Crea deals desde el CRM para verlos aquí.</p>
-                </NelvyonDsCard>
-              ) : (
-                <div className="space-y-2">
-                  {deals.map(deal => (
-                    <NelvyonDsCard key={deal.id} className="flex flex-wrap items-center gap-4 px-4 py-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-medium text-foreground text-sm">{deal.title}</p>
-                          <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[deal.stage]}`}>{STAGE_LABELS[deal.stage]}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">Prob: {deal.probability}% · {deal.expectedCloseDate ? `Cierre: ${new Date(deal.expectedCloseDate).toLocaleDateString("es-ES")}` : "Sin fecha"}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="font-bold text-foreground">{fmt(deal.value, deal.currency)}</p>
-                        <p className="text-xs text-muted-foreground">Forecast: {fmt(deal.value * deal.probability / 100, deal.currency)}</p>
-                      </div>
-                      <NelvyonDsButton variant="ghost" className="text-xs shrink-0" onClick={() => { setQuoteDeal(deal); setShowQuoteModal(true); }}>+ Presupuesto</NelvyonDsButton>
-                    </NelvyonDsCard>
-                  ))}
-                </div>
-              )
+              <div className="space-y-4">
+                <DealsKanban
+                  deals={deals}
+                  metrics={dealsMetrics}
+                  contactsById={contactsById}
+                  changingDealId={changingDealId}
+                  selectedDealId={selectedDeal?.id ?? null}
+                  onSelectDeal={(deal) => setSelectedDeal(deal)}
+                  onMoveStage={(deal, stage) => void handleMoveStage(deal, stage)}
+                />
+                {selectedDeal && (
+                  <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+                    <DealDetailPanel
+                      deal={selectedDeal}
+                      contactsById={contactsById}
+                      onEdit={(deal) => setDealModal({ open: true, mode: "edit", deal })}
+                      onDeleted={() => { setSelectedDeal(null); void load(); }}
+                      onClose={() => setSelectedDeal(null)}
+                    />
+                    <NelvyonDsButton variant="secondary" className="shrink-0" onClick={() => { setQuoteDeal(selectedDeal); setShowQuoteModal(true); }}>
+                      + Presupuesto para este deal
+                    </NelvyonDsButton>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* ── PLAYBOOKS ── */}
@@ -532,6 +591,14 @@ export default function SaasPipelinePage() {
 
       {showQuoteModal && <QuoteModal deal={quoteDeal} onClose={() => { setShowQuoteModal(false); setQuoteDeal(undefined); }} onCreated={() => void load()} />}
       {showPlaybookModal && <PlaybookModal onClose={() => setShowPlaybookModal(false)} onCreated={() => void load()} />}
+      <DealFormModal
+        open={dealModal.open}
+        mode={dealModal.mode}
+        deal={dealModal.deal}
+        contacts={contacts}
+        onClose={() => setDealModal({ open: false, mode: "create", deal: null })}
+        onSuccess={(deal) => { setSelectedDeal(deal); void load(); }}
+      />
     </SaasShellLayout>
   );
 }
