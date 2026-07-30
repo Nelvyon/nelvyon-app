@@ -46,7 +46,7 @@ Evidencia Android (2026-07-30):
 | Android SDK / JDK / `adb` | **VERIFIED** (local machine) | OpenJDK 21 + cmdline-tools + SDK 35 used for assembleDebug. |
 | Android local debug build (APK) | **IMPLEMENTED_VERIFIED** | `assembleDebug` **BUILD SUCCESSFUL** · evidence `mobile.android_build_latest.md`. |
 | Android **release** APK (signed sideload) | **IMPLEMENTED_VERIFIED** | `assembleRelease` via `scripts/build-android-release-apk.mjs` · evidence `mobile.android_release_latest.md`. |
-| Local device/emulator install + smoke test | **BLOCKED_EXTERNAL** | Needs phone/AVD · `adb install` with release APK path in evidence. |
+| Local device/emulator install + smoke test | **PASS (emulator)** | AVD `Nelvyon_API35` · evidence `mobile.android_emulator_phase3_2026-07-30.md` · physical device still **BLOCKED_EXTERNAL** for FCM/OEM/Play. |
 | Google Play Console registration | BLOCKED_EXTERNAL | **Paid** (one-time $25). No budget approved. |
 | Play Store listing + review submission | BLOCKED_EXTERNAL | Depends on the registration above. |
 

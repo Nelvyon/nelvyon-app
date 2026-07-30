@@ -50,8 +50,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | **BLOCKED_EXTERNAL** |
-| **Detalle** | Scaffold `apps/mobile/android/` **present** (`mobile.android_scaffold.md`) · APK `assembleDebug` requiere JDK/Android SDK · App Store/Play publish sigue **BLOCKED_EXTERNAL** · checklist `MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md` |
+| **Estado** | **Mitigado local** · release APK **1.0.0** built + emulator smoke PASS · Play publish **BLOCKED_EXTERNAL** |
+| **Detalle** | Evidence `mobile.android_release_latest.md` · emulator `mobile.android_emulator_phase3_2026-07-30.md` · sideload keystore local ≠ Play App Signing · FCM/OEM físico pendiente |
+| **Checklist** | `MOBILE_APPLE_ANDROID_CEO_CHECKLIST.md` |
 
 ### Ops (no KI) — ADR-057 external integrations pending CEO
 

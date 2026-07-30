@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Quality | **CTO audit P1 fixes** | activeId citas/chat/copywriter · UTF-8 lead-scoring/loyalty · es/pt messages encoding · strip Envato/Landrick SaaS UI · tenantId fail-closed · NativeShellChromeGate + dashboard 404→onboarding · informe `CTO_QUALITY_AUDIT_2026-07-30.md` · tsc/lint/vitest PASS · `claimReady: false` |
 | UI / SaaS | **DashForge Fase 1 AUDIT** | ZIP legal extraído a `.reference/dashforge-ai/` (gitignored) · DF = AI builder (Next 16/Clerk/Supabase) **no** admin multi-módulo · plan + mapa `DASHFORGE_MIGRATION_PLAN.md` · ADR-074 · **sin** UI producto · `claimReady: false` |
 | Mobile | **Fase 3 emulator smoke** | AVD `Nelvyon_API35` · APK install/launch **PASS** · login/nav/dashboard/CRM **PASS** · workflows UI **PARTIAL** · fix local dashboard 404→onboarding + `NativeShellChromeGate` · evidence `mobile.android_emulator_phase3_2026-07-30.md` · `claimReady: false` |
 | Ops / Prod | **Fase 1 producción COMPLETE** | Migrate **521+522** APPLIED · deploy tip **`3f10c272`** SUCCESS (`3d76918b`) · live `3f10c2729502` · workflows 14/14 · sequences 8/8 · CRM 16/16 · KI020 PASS · score_threshold 201 · canary **KILL ON** · `claimReady: false` |

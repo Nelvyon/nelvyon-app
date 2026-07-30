@@ -1,25 +1,22 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-30** — **DashForge Fase 1 AUDIT** · plan `docs/ops/DASHFORGE_MIGRATION_PLAN.md` · ADR-074 · APK emulator smoke · prod tip **`3f10c272`** · canary **KILL ON** · `claimReady: false`
+> Última actualización: **2026-07-30** — **CTO quality P1 fixes** · informe `docs/ops/CTO_QUALITY_AUDIT_2026-07-30.md` · DashForge Fase 1 plan · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
 
 | Campo | Valor |
 |-------|-------|
-| **Tip prod live** | `3f10c272` (`git_sha=3f10c2729502`) |
-| **UI SaaS** | Shell actual `SaasShellLayout` · rediseño DashForge **Fase 1 solo** (sin UI producto aún) |
-| **DashForge** | Extract `.reference/dashforge-ai/` (gitignored) · kit whitelist documentado · **no** Clerk/Supabase/fake-data |
-| **Android** | v1.0.0 APK · emulator smoke evidence · Play **BLOCKED_EXTERNAL** |
-| **Ops SSOT integraciones** | `docs/ops/PHASE2_EXTERNAL_INTEGRATIONS.md` |
-| **Mig prod** | **521+522 APPLIED** |
+| **Tip prod live** | `3f10c272` |
+| **Calidad** | tsc/lint/vitest core **PASS** · P1 UI/encoding/branding/tenant-id **FIXED** · Playwright/build **no** re-ejecutados aquí |
+| **DashForge** | Solo plan ADR-074 · sin UI kit en producto aún |
+| **Android** | APK 1.0.0 + emulator PASS · Play **BLOCKED_EXTERNAL** |
 | **claimReady** | **false** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. **CEO/Daniel OK** al plan `docs/ops/DASHFORGE_MIGRATION_PLAN.md` (hallazgo: DF = builder IA, no admin completo).
-2. Fase 2: importar whitelist → `apps/web/src/features/nelvyon-ui/` + tokens NELVYON (commit separado).
-3. No deploy prod UI hasta staging PASS + autorización expresa.
-4. Fase 2 externa: OAuth/SES/Twilio según checklists (independiente).
+1. Commit(s) de calidad CTO si aún no pusheados · opcional `pnpm -C apps/web build` + Playwright SaaS en staging.
+2. OK humano a DashForge plan → Fase 2 kit `nelvyon-ui`.
+3. No prod deploy UI · no flip claimReady · canary KILL.
 
 ### Rollback IA / spend
 
