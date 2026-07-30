@@ -9,6 +9,7 @@
 |------|--------|-------------|
 | Ops / Prod | **Fase 1 producción COMPLETE** | Migrate **521+522** APPLIED · deploy tip **`3f10c272`** SUCCESS (`3d76918b`) · live `3f10c2729502` · workflows 14/14 · sequences 8/8 · CRM 16/16 · KI020 PASS · score_threshold 201 · canary **KILL ON** · `claimReady: false` |
 | Integrations | **Fase 2 prep COMPLETE (in-repo)** | `oauthEnv` defaults `app.nelvyon.com` · Meta/TikTok aliases · catalog ads/WA/Twilio **beta** · PHASE2 SSOT · WhatsApp checklist · validate + preflight · Stripe KI-R028 docs · dual-path honesty · `claimReady: false` |
+| Mobile | **Fase 3 release APK** | `assembleRelease` **SUCCESS** · v**1.0.0** / code **10000** · 3.61 MB · SHA-256 en `mobile.android_release_latest.md` · sideload keystore local · Play **BLOCKED_EXTERNAL** · `claimReady: false` |
 | Ops / Cert | **Fase final Cursor (cierre)** | Tip **`0d7d6e90`** · cert helpers Railway + RL backoff · passwordless gates · OAuth URIs exactas · tsc/lint/build/Vitest/PW **PASS** · KI020 **PASS** · honesty register **429** → Ops `STAGING_QA_PASSWORD` · `claimReady: false` |
 
 ## 2026-07-29

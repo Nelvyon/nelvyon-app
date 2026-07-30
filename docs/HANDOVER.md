@@ -1,12 +1,12 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-30** — **Fase 2 prep COMPLETE** (in-repo) · prod tip live **`3f10c272`** · migs **521+522** · canary **KILL ON** · `claimReady: false`
+> Última actualización: **2026-07-30** — **Fase 3** release APK **1.0.0** · Fase 2 prep · prod tip live **`3f10c272`** · canary **KILL ON** · `claimReady: false`
 
 | Campo | Valor |
 |-------|-------|
 | **Tip prod live** | `3f10c272` (`git_sha=3f10c2729502`) |
-| **Fase 2 tip** | tip docs/código tras commit Phase 2 (ver `git log -1`) |
+| **Android release** | v**1.0.0** · evidence `mobile.android_release_latest.md` · Play **BLOCKED_EXTERNAL** |
 | **Ops SSOT integraciones** | `docs/ops/PHASE2_EXTERNAL_INTEGRATIONS.md` |
 | **Mig prod** | **521+522 APPLIED** |
 | **claimReady** | **false** |
@@ -24,9 +24,9 @@
 
 ## Próximo paso EXACTO
 
-1. CEO: crear apps OAuth + pegar Client ID/Secret en Railway (`OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md`).
-2. Ops: SNS host único SES · primer envío externo · Twilio/WA solo tras checklists.
-3. CEO: spend/publish/calls — **no** sin SÍ escrito (`ADS_*` / `SOCIAL_*` / `TELEPHONY_*`).
+1. Daniel: instalar APK release en dispositivo (`mobile.android_release_latest.md`) → login SaaS.
+2. CEO: OAuth secrets / SES / Twilio/WA según Fase 2 checklists.
+3. CEO: Play Store solo con cuenta de pago + upload key (no usar el keystore local de sideload).
 4. Legal/comercial: Pepito + clientes — sin flip `claimReady`.
 
 ### Rollback IA / spend

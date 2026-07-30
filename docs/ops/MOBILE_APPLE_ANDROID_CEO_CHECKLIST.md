@@ -9,10 +9,11 @@ did not open, pay for, or configure any Apple Developer Program or Google
 Play Console account. Nothing here should be read as "app is published" or
 "app is in review" — it is not.
 
-Evidencia Android (2026-07-25):
+Evidencia Android (2026-07-30):
 - Scaffold: `scripts/docs/evidence/os-saas-e2e/modules/mobile.android_scaffold.md`
-- Local build: `scripts/docs/evidence/os-saas-e2e/modules/mobile.android_build_latest.md`
-  (**assembleDebug BUILD SUCCESSFUL** · device smoke still **BLOCKED_EXTERNAL**)
+- Debug build: `scripts/docs/evidence/os-saas-e2e/modules/mobile.android_build_latest.md`
+- **Release APK:** `scripts/docs/evidence/os-saas-e2e/modules/mobile.android_release_latest.md`
+  (`assembleRelease` SUCCESS · v1.0.0 · SHA-256 in evidence · device smoke still human)
 
 ---
 
@@ -44,7 +45,8 @@ Evidencia Android (2026-07-25):
 | Native project (`apps/mobile/android/`) | **PASS** (scaffold) | Capacitor Android project **exists** on disk. |
 | Android SDK / JDK / `adb` | **VERIFIED** (local machine) | OpenJDK 21 + cmdline-tools + SDK 35 used for assembleDebug. |
 | Android local debug build (APK) | **IMPLEMENTED_VERIFIED** | `assembleDebug` **BUILD SUCCESSFUL** · evidence `mobile.android_build_latest.md`. |
-| Local device/emulator install + smoke test | **BLOCKED_EXTERNAL** | `adb devices` empty — no physical device / AVD attached. **No PASS**. |
+| Android **release** APK (signed sideload) | **IMPLEMENTED_VERIFIED** | `assembleRelease` via `scripts/build-android-release-apk.mjs` · evidence `mobile.android_release_latest.md`. |
+| Local device/emulator install + smoke test | **BLOCKED_EXTERNAL** | Needs phone/AVD · `adb install` with release APK path in evidence. |
 | Google Play Console registration | BLOCKED_EXTERNAL | **Paid** (one-time $25). No budget approved. |
 | Play Store listing + review submission | BLOCKED_EXTERNAL | Depends on the registration above. |
 
@@ -63,7 +65,8 @@ Evidencia Android (2026-07-25):
 
 1. Connect a phone with USB debugging **or** create an AVD in Android Studio.
 2. Confirm `adb devices` lists the target.
-3. Install: `adb install -r apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk`
+3. Install release: `adb install -r .release-logs/android/nelvyon-saas-1.0.0-*.apk`  
+   (or debug: `apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk`)
 4. Open app → SaaS webview + tenant login. Write evidence before claiming device PASS.
 5. **Still do not flip Play Store publish** without the $25 Console registration + CEO approval.
 
