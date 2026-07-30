@@ -1,12 +1,12 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-30** — cierre absoluto fase final Cursor · tip docs (post-commit) · staging live `3c64111bd198` · canary **KILL ON** · `claimReady: false` · **NOT READY** (humano)
+> Última actualización: **2026-07-30** — tip **`0d7d6e90`** cierre absoluto fase final · staging live aún `3c64111bd198` (scripts/docs no requieren redeploy) · canary **KILL ON** · `claimReady: false` · **NOT READY** (humano)
 
 | Campo | Valor |
 |-------|-------|
-| **Tip remoto** | `3c64111b` (+ working tree cierre: cert helpers + OAuth URIs + passwordless gates — tip nuevo tras commit) |
-| **Staging deploy** | live `git_sha=3c64111bd198` (código CSRF/orchestrator desde `9bbd5808`) |
+| **Tip remoto** | `0d7d6e90` (cert helpers Railway + passwordless gates + OAuth URIs exactas) |
+| **Staging deploy** | live `git_sha=3c64111bd198` (código CSRF/orchestrator desde `9bbd5808`; tip docs/scripts `0d7d6e90` no cambia runtime) |
 | **Ops SSOT** | `docs/ops/OPERATIONS_INDEX.md` |
 | **SAFE_TO_MIGRATE_PROD** | **true** (técnico; solo SÍ CEO) |
 | **SAFE_TO_DEPLOY_PROD** | **false** hasta migrate 521–522 |

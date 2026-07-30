@@ -1,6 +1,6 @@
 # Checklist Daniel — Apps OAuth reales (Google / Meta / LinkedIn / Twilio)
 
-> Actualizado: **2026-07-30** · tip `3c64111b` · `claimReady: false`  
+> Actualizado: **2026-07-30** · tip `0d7d6e90` · `claimReady: false`  
 > Hoy el framework OAuth multi-tenant (`backend/agency/OAuthMultiTenantFramework.ts`) usa
 > **proveedores simulados (mock)** para Google/Meta/LinkedIn/Twilio — genera tokens sintéticos,
 > nunca hace una llamada HTTP real. Sirve para probar el ciclo completo (autorizar, rotar,
