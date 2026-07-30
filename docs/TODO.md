@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-29** — tip `bf1d44f4` live staging · cierre Cursor · `claimReady: false`
+> Actualizado: **2026-07-30** — tip `3c64111b` live staging · cierre fase final Cursor · `claimReady: false`
 
 ---
 
@@ -12,9 +12,11 @@
 - [x] **ADR-067:** #1 migrate gate política **SÍ** (CEO-ACK) · #2–#4 **NO todavía** (histórico)
 - [x] **ADR-068:** #2 dual-write staging **IMPLEMENTED_VERIFIED** · #3 RAG staging **IMPLEMENTED_VERIFIED** · #4 canary prod **AUTHORIZED** / live **BLOCKED_EXTERNAL** (mesh)
 - [x] **2026-07-28 staging:** mig 521+522 applied · workflows CERTIFIED · Playwright secuencias PASS
-- [x] **2026-07-29 tip `bf1d44f4`:** push + staging live sha `bf1d44f4eb65` · cert local PASS
+- [x] **2026-07-29 tip `9bbd5808`:** orchestrator BFF + CSRF staging · KI020 PASS · live sha `9bbd5808376b`
+- [x] **2026-07-30 tip `3c64111b`:** docs pin live · cert helpers Railway default · OAuth callbacks exactos
+- [x] **2026-07-30 passwordless gates:** health/live + KI020 PASS sin secreto · honesty/workflows siguen Ops (register 429)
 - [ ] **CEO:** aprobar o diferir **prod** migrate 521+522 (ADR-064) — `PROD_MIGRATE_521_522_RUNBOOK.md`
-- [ ] **Ops:** smokes P0 staging post-`7ec98f42` (si credenciales locales)
+- [ ] **Ops:** smokes P0 con secreto `STAGING_QA_PASSWORD` (`run-staging-p0-smokes.mjs --skip-wait`) — obligatorio mientras auth-signup IP rate-limited
 - [ ] **Solo humano:** Pepito/legal · OAuth · clientes · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
 
 ---

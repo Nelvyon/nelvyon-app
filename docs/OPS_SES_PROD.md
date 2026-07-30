@@ -6,7 +6,9 @@ Código: `sesClient`, bounce/complaint webhooks con **tenant_id** obligatorio en
 
 **KI-014 cerrado.** AWS SES `ProductionAccessEnabled: true` · Review **GRANTED** · `SendingEnabled: true`.  
 Dominio `nelvyon.com` Verification/DKIM **SUCCESS**. Self-send From=To SES_FROM **OK**.  
-SNS topic `nelvyon-ses-events` → `https://nelvyon.com/api/webhooks/ses` (PendingConfirmation=false).
+SNS topic `nelvyon-ses-events` → `https://nelvyon.com/api/webhooks/ses` (PendingConfirmation=false).  
+Si el host canónico de producto es `app.nelvyon.com`, registra también  
+`https://app.nelvyon.com/api/webhooks/ses` (o fija `NEXT_PUBLIC_APP_URL` y un único endpoint SNS).
 
 ## Variables
 

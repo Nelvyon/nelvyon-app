@@ -3,6 +3,12 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-30
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Ops / Cert | **Fase final Cursor (cierre)** | Cert helpers Railway default + RL backoff · `run-staging-passwordless-gates.mjs` · OAuth redirect URIs exactas · tsc/lint/Vitest **PASS** · Playwright **386 PASS** · KI020 **PASS** · honesty register **429** → Ops `STAGING_QA_PASSWORD` · `claimReady: false` |
+
 ## 2026-07-29
 
 | Área | Cambio | Descripción |
