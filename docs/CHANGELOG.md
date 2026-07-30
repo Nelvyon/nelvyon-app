@@ -7,6 +7,8 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| UI / SaaS | **DashForge Fase 1 AUDIT** | ZIP legal extraído a `.reference/dashforge-ai/` (gitignored) · DF = AI builder (Next 16/Clerk/Supabase) **no** admin multi-módulo · plan + mapa `DASHFORGE_MIGRATION_PLAN.md` · ADR-074 · **sin** UI producto · `claimReady: false` |
+| Mobile | **Fase 3 emulator smoke** | AVD `Nelvyon_API35` · APK install/launch **PASS** · login/nav/dashboard/CRM **PASS** · workflows UI **PARTIAL** · fix local dashboard 404→onboarding + `NativeShellChromeGate` · evidence `mobile.android_emulator_phase3_2026-07-30.md` · `claimReady: false` |
 | Ops / Prod | **Fase 1 producción COMPLETE** | Migrate **521+522** APPLIED · deploy tip **`3f10c272`** SUCCESS (`3d76918b`) · live `3f10c2729502` · workflows 14/14 · sequences 8/8 · CRM 16/16 · KI020 PASS · score_threshold 201 · canary **KILL ON** · `claimReady: false` |
 | Integrations | **Fase 2 prep COMPLETE (in-repo)** | `oauthEnv` defaults `app.nelvyon.com` · Meta/TikTok aliases · catalog ads/WA/Twilio **beta** · PHASE2 SSOT · WhatsApp checklist · validate + preflight · Stripe KI-R028 docs · dual-path honesty · `claimReady: false` |
 | Mobile | **Fase 3 release APK** | `assembleRelease` **SUCCESS** · v**1.0.0** / code **10000** · 3.61 MB · SHA-256 en `mobile.android_release_latest.md` · sideload keystore local · Play **BLOCKED_EXTERNAL** · `claimReady: false` |

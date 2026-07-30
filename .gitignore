@@ -21,6 +21,9 @@ __pycache__/
 .eggs/
 pip-wheel-metadata/
 
+# --- Reference templates (local extract only; never ship) ---
+.reference/
+
 # --- Build / artefactos ---
 dist/
 build/

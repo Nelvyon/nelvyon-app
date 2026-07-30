@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-30** — Fase 1 DONE · Fase 2 prep in-repo DONE · `claimReady: false`
+> Actualizado: **2026-07-30** — DashForge Fase 1 AUDIT · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
 
 ---
 
@@ -21,9 +21,13 @@
 
 ---
 
-## P1 — Estabilidad y CI
+## P1 — Estabilidad y CI / UI SaaS
 
-- [x] Completado y validado 2026-07-10
+- [x] Completado y validado 2026-07-10 (histórico CI)
+- [x] **2026-07-30 DashForge Fase 1:** auditoría + plan `DASHFORGE_MIGRATION_PLAN.md` · ADR-074 · `.reference/` gitignored
+- [ ] **DashForge Fase 2:** import kit → `features/nelvyon-ui` (whitelist; sin Clerk/fake-data)
+- [ ] **DashForge Fase 3–4:** branding NELVYON + shell/nav unificado
+- [ ] **DashForge Fase 5+:** dashboard + módulos por commits separados · staging antes de prod
 
 ---
 

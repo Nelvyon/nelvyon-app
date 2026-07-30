@@ -912,3 +912,15 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Por qué** | Drift API/DB causaba CONSTRAINT en create; replies sin schema romperían compatibilidad. |
 | **Evidencia** | staging CERTIFIED `saas.workflows` · repro 9/9 · Playwright 5 PASS · canary KILL |
 | **Consecuencias** | Prod 522 pendiente CEO · `claimReady: false` · **NOT READY**
+
+---
+
+## ADR-074 — DashForge AI como kit visual SaaS (no sustituye producto)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-30 |
+| **Decisión** | Usar DashForge AI (Codervent / Envato, ZIP legal) **solo** como fuente de UI kit (layout shell, shadcn primitives, widgets KPI/charts/table). **No** adoptar Clerk, Supabase, OpenAI builder, `fake-data`, ni Next 16. Conflicto → gana NELVYON (APIs, auth JWT cookie, RBAC, multi-tenant). Destino código: `apps/web/src/features/nelvyon-ui/` sin branding plantilla. Extract en `.reference/dashforge-ai/` gitignored. |
+| **Por qué** | El producto Envato es un *AI dashboard builder*, no un admin multi-módulo; las ~97 rutas SaaS deben rediseñarse sobre el kit, no “reemplazarse” por páginas inexistentes en la plantilla. |
+| **Plan** | `docs/ops/DASHFORGE_MIGRATION_PLAN.md` |
+| **Consecuencias** | Migración por fases + commits; dual-path legacy opcional; staging antes de prod; `claimReady: false`; canary KILL |
