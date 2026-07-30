@@ -924,3 +924,16 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Por qué** | El producto Envato es un *AI dashboard builder*, no un admin multi-módulo; las ~97 rutas SaaS deben rediseñarse sobre el kit, no “reemplazarse” por páginas inexistentes en la plantilla. |
 | **Plan** | `docs/ops/DASHFORGE_MIGRATION_PLAN.md` |
 | **Consecuencias** | Migración por fases + commits; dual-path legacy opcional; staging antes de prod; `claimReady: false`; canary KILL |
+| **Estado 2026-07-30** | **En pausa** — el usuario redirigió la migración visual hacia W3CRM (ADR-075); este plan queda como referencia histórica, no se descarta ni se borra |
+
+---
+
+## ADR-075 — W3CRM como referencia visual principal (reconstrucción nativa, no import literal)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-30 |
+| **Decisión** | El usuario aporta un segundo ZIP (ThemeForest/Envato, autor Dexignzone, `crm-react-next-js-admin-dashboard-template`) y pide que sea la "base visual definitiva" del SaaS NELVYON. Auditoría Fase 1 detecta conflicto de stack **crítico**: W3CRM = Next 14 / React 18 / JavaScript / Bootstrap 5 + rsuite + SCSS compilado; NELVYON = Next 15.5 / React 19 / TypeScript / Tailwind v4. Importar el código fuente literal de la plantilla exigiría degradar React/Next (prohibido) o convivir con dos sistemas de CSS (prohibido explícitamente por el usuario). **Decisión:** usar W3CRM como referencia de composición visual e inventario de pantallas (97 pantallas en 13 grupos, mapeadas a los 69 ítems de `saasNav.ts`), reconstruyendo cada pantalla nativamente en Tailwind v4 + TypeScript + React 19 dentro de NELVYON. Cero código fuente de la plantilla (`.jsx`, `.scss`, `rsuite`) entra en `apps/web/src`. Extract local en `.reference/w3crm/` (gitignored). |
+| **Por qué** | Es la única estrategia que cumple simultáneamente todas las reglas explícitas del usuario: nunca romper la arquitectura/stack de NELVYON, nunca mantener dos sistemas visuales, y aprovechar al máximo el diseño de la plantilla adquirida legalmente. |
+| **Plan** | `docs/ops/W3CRM_MIGRATION_PLAN.md` — incluye pregunta abierta bloqueante (§9) sobre el criterio exacto de "reutilización" antes de iniciar Fase 2 |
+| **Consecuencias** | Migración por fases + commits; ninguna dependencia de W3CRM (`react-bootstrap`, `rsuite`, `react-table@7`, etc.) se instala sin verificar compatibilidad de peers con React 19/Next 15; `claimReady: false`; canary KILL; sin deploy prod sin autorización CEO |

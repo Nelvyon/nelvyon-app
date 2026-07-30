@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-30** — DashForge Fase 1 AUDIT · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
+> Actualizado: **2026-07-30** — W3CRM Fase 1 AUDIT (bloqueado en pregunta abierta) · DashForge Fase 1 AUDIT (en pausa) · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
 
 ---
 
@@ -24,10 +24,11 @@
 ## P1 — Estabilidad y CI / UI SaaS
 
 - [x] Completado y validado 2026-07-10 (histórico CI)
-- [x] **2026-07-30 DashForge Fase 1:** auditoría + plan `DASHFORGE_MIGRATION_PLAN.md` · ADR-074 · `.reference/` gitignored
-- [ ] **DashForge Fase 2:** import kit → `features/nelvyon-ui` (whitelist; sin Clerk/fake-data)
-- [ ] **DashForge Fase 3–4:** branding NELVYON + shell/nav unificado
-- [ ] **DashForge Fase 5+:** dashboard + módulos por commits separados · staging antes de prod
+- [x] **2026-07-30 DashForge Fase 1:** auditoría + plan `DASHFORGE_MIGRATION_PLAN.md` · ADR-074 · `.reference/` gitignored — **en pausa**, ver ADR-075
+- [x] **2026-07-30 W3CRM Fase 1:** auditoría completa (97 pantallas/13 grupos) + mapa 69 módulos `saasNav.ts` + conflicto de stack documentado + plan `W3CRM_MIGRATION_PLAN.md` · ADR-075 · `.reference/w3crm/` gitignored
+- [ ] **BLOQUEANTE:** respuesta del usuario a §9 de `W3CRM_MIGRATION_PLAN.md` (criterio exacto de reutilización — código literal imposible sin romper NELVYON) antes de tocar cualquier componente
+- [ ] **W3CRM Fase 2:** tras confirmación — `features/nelvyon-ui/` reconstruido en Tailwind v4/TS inspirado en W3CRM · lab `/saas/_ui-lab` no-prod
+- [ ] **W3CRM Fase 3+:** branding NELVYON + módulo IA/Dashboard primero + resto por commits separados · staging antes de prod
 
 ---
 
