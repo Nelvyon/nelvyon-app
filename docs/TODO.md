@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-30** — tip `0d7d6e90` · cierre fase final Cursor · `claimReady: false`
+> Actualizado: **2026-07-30** — tip `7806641b` · cierre fase final Cursor · `claimReady: false`
 
 ---
 
