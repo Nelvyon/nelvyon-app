@@ -1,55 +1,52 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-30** — tip ops **`0d7d6e90`** · tip docs **main HEAD** · staging live `3c64111bd198` · canary **KILL ON** · `claimReady: false` · **NOT READY** (humano)
+> Última actualización: **2026-07-30** — **Fase 1 prod COMPLETE** · tip live **`3f10c272`** · migs **521+522 APPLIED** · canary **KILL ON** · `claimReady: false` · **NOT READY** comercial (legal/OAuth/clientes)
 
 | Campo | Valor |
 |-------|-------|
-| **Tip remoto** | `0d7d6e90` (cert helpers Railway + passwordless gates + OAuth URIs; docs pins posteriores en `main`) |
-| **Staging deploy** | live `git_sha=3c64111bd198` (código CSRF/orchestrator desde `9bbd5808`; tip docs/scripts no cambia runtime SaaS) |
+| **Tip remoto / prod live** | `3f10c272` (`git_sha=3f10c2729502`) · ops mig pin `0d7d6e90` |
+| **Prod deploy** | `3d76918b` **SUCCESS** · URL https://nelvyon.com |
+| **Mig prod** | **521+522 APPLIED** (2026-07-30T08:17Z) |
+| **Staging** | live `3c64111bd198` (histórico CSRF tip) |
 | **Ops SSOT** | `docs/ops/OPERATIONS_INDEX.md` |
-| **SAFE_TO_MIGRATE_PROD** | **true** (técnico; solo SÍ CEO) |
-| **SAFE_TO_DEPLOY_PROD** | **false** hasta migrate 521–522 |
+| **SAFE_TO_MIGRATE_PROD** | **true** (ya aplicado 521–522) |
+| **SAFE_TO_DEPLOY_PROD** | **true** (tip live) |
 | **claimReady** | **false** |
 | **Canary** | **KILL ON** |
 
-## Cierre absoluto in-repo (2026-07-29 → 2026-07-30)
+## Fase 1 producción (2026-07-30)
 
-| Cambio | Detalle |
-|--------|---------|
-| OS isolation | dashboards OS → **`requirePlatformAdmin`** |
-| SMS mass-send | Bulk API **403** · fail-closed · cap 5 |
-| Rate limits | auth/portal/sms/LMS · middleware platform+lms · FastAPI fail-closed |
-| LMS public | learner HMAC access token |
-| CI / E2E | Staging Railway URLs · Playwright **386 PASS / 1 skip / 1 flaky** · Vitest **6228 PASS / 0 FAIL** |
-| Orchestrator BFF | `/api/saas/orchestrator` (flag OFF) |
-| CSRF staging | same-origin + Railway host · KI-020 **PASS** |
-| Cert helpers | `CERT_BASE_URL` default → `ideal-victory-staging.up.railway.app` · register RL backoff |
-| Passwordless gates | `scripts/run-staging-passwordless-gates.mjs` (health + KI-020) |
-| OAuth prep | redirect URIs **exactas** en `OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md` |
+| Paso | Resultado |
+|------|-----------|
+| Preflight | migs ausentes · 0 filas · canary KILL |
+| Migrate 521+522 | **done** vía `scripts/run-prod-migrate-521-522.mjs` · ADR-064 `approved_by=Daniel` |
+| Post-validate | cols `email_opened/clicked` · CHECK `score_threshold` · `_migrations` OK |
+| Deploy | `--from-source` **SUCCESS** · live `3f10c2729502` |
+| Smokes | health/ready · KI020 · workflows **14/14** · sequences **8/8** · CRM **16/16** · `score_threshold` **201** |
+| IA | canary **OFF** · logs `PRIVATE_AI_CANARY_BLOCKED` (esperado) |
 
-## Cert (2026-07-30 local)
+## Cert prod (post-deploy)
 
 | Gate | Resultado |
 |------|----------|
-| tsc | **PASS** (0) |
-| lint | **PASS** (0) |
-| build | **PASS** (clean `.next`, sin race) |
-| Vitest | **6228 PASS / 8 skip / 0 FAIL** |
-| Playwright | **386 PASS / 1 skip / 1 flaky** (Chromium en `%LOCALAPPDATA%\ms-playwright`) |
-| Staging health/live | **ok** · sha `3c64111bd198` |
+| `/api/health` `/live` `/ready` | **200** · DB ok · auth ok |
 | KI-020 CSRF | **PASS** |
-| Honesty / workflows register | **BLOCKED** auth-signup **429** sin `STAGING_QA_PASSWORD` |
+| Workflows | **CERTIFIED** 14/14 |
+| Sequences | **PASS** 8/8 |
+| CRM contacts | **CERTIFIED** 16/16 |
+| score_threshold create | **201** |
+| Canary flags | KILL=1 · PROD_CANARY=0 · AI=0 · OpenAI=0 |
+| ready latency | ~229–245 ms (n=5) |
 
 ## Próximo paso EXACTO
 
-1. Ops: `STAGING_QA_PASSWORD` → `node scripts/run-staging-p0-smokes.mjs --skip-wait` (honesty/workflows/portal-packs; IP rate-limited en register).
-2. CEO: SÍ/NO `docs/ops/PROD_MIGRATE_521_522_RUNBOOK.md` (migrate→deploy tip `0d7d6e90` o `main` HANDOVER).
-3. Sin SÍ: no migrate · no deploy prod · no canary · no mass-send · no OAuth live.
+1. Ops (opcional): snapshot Railway Volume retener ≥7d si aún no hecho en UI.
+2. CEO: OAuth/Twilio/SES primer envío / Stripe STARTER (KI-028) — checklists en `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`.
+3. Legal/comercial: Pepito + clientes — **sin** flip `claimReady`.
+4. **No** abrir canary IA sin SÍ nuevo.
 
-Lista humana mínima: `docs/ops/CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`.
-
-### Rollback IA
+### Rollback IA (mantener)
 
 ```
 NELVYON_PRIVATE_AI_CANARY_KILL_SWITCH=1

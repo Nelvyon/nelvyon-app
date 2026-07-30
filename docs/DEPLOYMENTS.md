@@ -1,6 +1,19 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-29** tip `9bbd5808` · staging deploy `06520aab` · live sha `9bbd5808376b` · KI020 PASS · **no** prod migrate · canary KILL ON.
+> Actualizado: **2026-07-30** tip prod `3f10c272` · deploy `3d76918b` SUCCESS · migs 521+522 APPLIED · canary KILL ON · `claimReady: false`.
+
+## 2026-07-30 — Fase 1 producción (migrate 521–522 + deploy)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip remoto** | `3f10c272` (incluye ops `0d7d6e90`) |
+| **Env** | Railway production `@nelvyon/web` · https://nelvyon.com |
+| **Migrate** | **521+522 APPLIED** · ADR-064 `approved_by=Daniel` · pin `0d7d6e90` |
+| **Deploy** | `3d76918b` **SUCCESS** · live sha `3f10c2729502` |
+| **Smokes** | health/ready **200** · KI020 **PASS** · workflows **14/14 CERTIFIED** · sequences **8/8** · CRM **16/16 CERTIFIED** · score_threshold **201** |
+| **IA** | canary **KILL ON** · AI=0 · OpenAI=0 · logs `PRIVATE_AI_CANARY_BLOCKED` (esperado) |
+| **claimReady** | **false** |
+| **Canary** | **KILL ON** |
 
 ## 2026-07-29 — Orchestrator BFF + CSRF staging tip live
 

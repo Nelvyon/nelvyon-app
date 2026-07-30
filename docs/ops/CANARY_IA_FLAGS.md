@@ -1,6 +1,6 @@
 # Canary IA flags — SSOT ops (prod KILL ON)
 
-> **Actualizado:** 2026-07-30 · tip remoto `0d7d6e90` · **claimReady: false** · **NOT READY**
+> **Actualizado:** 2026-07-30 · tip remoto prod `3f10c272` · **claimReady: false** · **NOT READY** comercial
 > Histórico mesh/Router staging: ver sección inferior · SSOT mesh: `docs/ops/MESH_OPTION_A_STAGING.md`
 
 ## Producción (estado actual — NO abrir)

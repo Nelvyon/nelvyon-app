@@ -1,11 +1,22 @@
-# Runbook — Prod migrate 521–522 + deploy tip (NO ejecutar sin CEO SÍ)
+# Runbook — Prod migrate 521–522 + deploy tip
 
-> **Actualizado:** 2026-07-29 · tip repo ver HANDOVER · **claimReady: false** · canary **KILL ON**  
-> **Probe prod READ-ONLY (2026-07-28):** 521/522 **AUSENTES** · cols tracking **AUSENTES** · CHECK **sin** `score_threshold` · enrollments/sequences/workflows = **0** · filas incompatibles = **0**  
-> **Staging:** 521+522 **aplicadas y reconfirmadas** · workflows/sequences smokes **PASS**  
-> **Prod live deploy:** último **SUCCESS** `77d9b5f8` (2026-07-27); auto-deploys recientes tip nuevo **FAILED/SKIPPED** (ventana schema gap **evitada** por ahora)
+> **Actualizado:** 2026-07-30 · **EJECUTADO** · tip live `3f10c272` · migs **521+522 APPLIED** · `claimReady: false` · canary **KILL ON**  
+> **Histórico probe (2026-07-28):** 521/522 ausentes · 0 filas  
+> **Post-apply (2026-07-30):** `_migrations` 521+522 · cols tracking OK · CHECK incluye `score_threshold` · smokes PASS
 
-## Orden seguro (obligatorio)
+## Estado
+
+| Campo | Valor |
+|-------|-------|
+| Migrate | **DONE** 2026-07-30T08:17Z |
+| Deploy | **DONE** `3d76918b` · live `3f10c2729502` |
+| Script one-shot | `scripts/run-prod-migrate-521-522.mjs` (PUBLIC URL) |
+
+No re-aplicar 521/522 (idempotente / ya en `_migrations`).
+
+---
+
+## Orden seguro (histórico — ya cumplido)
 
 ```
 1) Backup / snapshot

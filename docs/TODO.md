@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-30** — tip `0d7d6e90` · cierre fase final Cursor · `claimReady: false`
+> Actualizado: **2026-07-30** — tip prod live `3f10c272` · Fase 1 migrate+deploy **DONE** · `claimReady: false`
 
 ---
 
@@ -13,11 +13,10 @@
 - [x] **ADR-068:** #2 dual-write staging **IMPLEMENTED_VERIFIED** · #3 RAG staging **IMPLEMENTED_VERIFIED** · #4 canary prod **AUTHORIZED** / live **BLOCKED_EXTERNAL** (mesh)
 - [x] **2026-07-28 staging:** mig 521+522 applied · workflows CERTIFIED · Playwright secuencias PASS
 - [x] **2026-07-29 tip `9bbd5808`:** orchestrator BFF + CSRF staging · KI020 PASS · live sha `9bbd5808376b`
-- [x] **2026-07-30 tip `3c64111b`:** docs pin live · cert helpers Railway default · OAuth callbacks exactos
-- [x] **2026-07-30 passwordless gates:** health/live + KI020 PASS sin secreto · honesty/workflows siguen Ops (register 429)
-- [ ] **CEO:** aprobar o diferir **prod** migrate 521+522 (ADR-064) — `PROD_MIGRATE_521_522_RUNBOOK.md`
-- [ ] **Ops:** smokes P0 con secreto `STAGING_QA_PASSWORD` (`run-staging-p0-smokes.mjs --skip-wait`) — obligatorio mientras auth-signup IP rate-limited
-- [ ] **Solo humano:** Pepito/legal · OAuth · clientes · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
+- [x] **2026-07-30 tip `3c64111b`/`0d7d6e90`:** docs pin · cert helpers Railway · OAuth callbacks · passwordless gates
+- [x] **2026-07-30 Fase 1 PROD:** migrate 521+522 APPLIED · deploy `3f10c272` SUCCESS · smokes workflows/CRM/seq/KI020 PASS · canary KILL · `claimReady: false`
+- [ ] **Ops (opcional):** Railway Volume snapshot UI retener ≥7d
+- [ ] **Solo humano:** Pepito/legal · OAuth · clientes · Stripe KI-028 · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
 
 ---
 
