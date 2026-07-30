@@ -1,13 +1,15 @@
+import { defaultOAuthRedirectUri, metaOAuthAppId, metaOAuthAppSecret } from "./oauthEnv";
+
 function metaAppId(): string {
-  return process.env.META_APP_ID ?? "";
+  return metaOAuthAppId();
 }
 
 function metaAppSecret(): string {
-  return process.env.META_APP_SECRET ?? "";
+  return metaOAuthAppSecret();
 }
 
 function metaRedirectUri(): string {
-  return process.env.META_REDIRECT_URI ?? "https://nelvyon.com/api/oauth/meta/callback";
+  return process.env.META_REDIRECT_URI ?? defaultOAuthRedirectUri("/api/oauth/meta/callback");
 }
 
 const GRAPH_VERSION = "v19.0";

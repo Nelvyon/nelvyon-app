@@ -1,3 +1,5 @@
+import { defaultOAuthRedirectUri } from "./oauthEnv";
+
 function snapchatClientId(): string {
   return process.env.SNAPCHAT_CLIENT_ID ?? "";
 }
@@ -7,7 +9,9 @@ function snapchatClientSecret(): string {
 }
 
 function snapchatRedirectUri(): string {
-  return process.env.SNAPCHAT_REDIRECT_URI ?? "https://app.nelvyon.com/api/oauth/snapchat/callback";
+  return (
+    process.env.SNAPCHAT_REDIRECT_URI ?? defaultOAuthRedirectUri("/api/oauth/snapchat/callback")
+  );
 }
 
 const AUTH_URL = "https://accounts.snapchat.com/login/oauth2/authorize";

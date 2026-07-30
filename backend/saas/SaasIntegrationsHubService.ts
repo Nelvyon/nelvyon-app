@@ -9,6 +9,7 @@ import {
 import { getSaasAdsDashboardService } from "./SaasAdsDashboardService";
 import { getSaasKlaviyoService } from "./SaasKlaviyoService";
 import { loadOAuthSlugStatus, revokeOAuthProvider } from "./integrationHubSync";
+import { isAliasedEnvConfigured, missingAliasedEnvKeys } from "../oauth/oauthEnv";
 
 export { type IntegrationConnector, type IntegrationCatalogStatus };
 export type { IntegrationCategory, IntegrationConnectionType } from "./integrationsCatalog";
@@ -66,7 +67,7 @@ interface DbConnectionRow {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function isEnvConfigured(keys: string[]): boolean {
-  return keys.length === 0 || keys.every((k) => !!process.env[k]);
+  return isAliasedEnvConfigured(keys);
 }
 
 const ADS_PLATFORMS = new Set(["meta", "google", "linkedin", "tiktok", "snapchat"]);
@@ -276,7 +277,7 @@ export class SaasIntegrationsHubService {
         "NOT_OAUTH"
       );
     }
-    const missingEnv = connector.envKeys.filter((k) => !process.env[k]);
+    const missingEnv = missingAliasedEnvKeys(connector.envKeys);
     if (missingEnv.length > 0) {
       throw new SaasIntegrationsHubError(
         `Missing environment variables: ${missingEnv.join(", ")}`,

@@ -1,10 +1,10 @@
 # INTEGRATIONS — Estado de integraciones
 
 > Catálogo código: `backend/saas/integrationsCatalog.ts`  
-> Actualizado: **2026-07-26** — ADR-068 · staging live **`428c6c91`** · prod **`d03721c1`**. OAuth/Twilio/ads reales **BLOCKED_EXTERNAL**.  
-> ERP dual-write staging ✅ · RAG staging ✅ · canary prod code ack / live mesh **BLOCKED_EXTERNAL** · OpenAI OFF · **sin Odoo**.
+> SSOT Fase 2: `docs/ops/PHASE2_EXTERNAL_INTEGRATIONS.md`  
+> Actualizado: **2026-07-30** — Fase 2 prep in-repo · OAuth defaults `app.nelvyon.com` · Meta/TikTok aliases · ads/WA/Twilio hub **beta** · spend/publish **OFF** · `claimReady: false`.
 
-**Bloqueadores go-live:** Legal Pepito · OAuth/Twilio/iOS · mercado · `TS_AUTHKEY` prod canary · coste réplica.
+**Bloqueadores go-live:** Legal Pepito · secrets OAuth/Twilio/WA · spend/publish SÍ CEO · mercado.
 
 ### Auth bridge Web ↔ FastAPI
 

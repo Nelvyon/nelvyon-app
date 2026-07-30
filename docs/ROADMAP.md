@@ -32,7 +32,7 @@
 | P3 consolidación rendimiento/deuda | ✅ | optimizePackageImports, overrides, audit script |
 | P4 hardening seguridad | ✅ | security-gates, Dependabot, Gitleaks, backup fail-fast |
 | Auditoría final Fase 1 (local) | ✅ | `run-phase1-audit.mjs` + build |
-| CEO activaciones externas Fase 1 | 🟡 | SES ✅ 2026-07-21 · Stripe STARTER (KI-028) · Cloudflare app DNS |
+| CEO activaciones externas Fase 1 | 🟡 | SES ✅ · Stripe KI-R028 ✅ · OAuth/Twilio/WA/Ads → Fase 2 checklists |
 | n8n self-hosted | ❌ | Solo blueprint JSON |
 | PC dev estandarizado | 🟡 | README-dev-Windows actualizado |
 

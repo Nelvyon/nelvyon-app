@@ -8,7 +8,10 @@ Código: `sesClient`, bounce/complaint webhooks con **tenant_id** obligatorio en
 Dominio `nelvyon.com` Verification/DKIM **SUCCESS**. Self-send From=To SES_FROM **OK**.  
 SNS topic `nelvyon-ses-events` → `https://nelvyon.com/api/webhooks/ses` (PendingConfirmation=false).  
 Si el host canónico de producto es `app.nelvyon.com`, registra también  
-`https://app.nelvyon.com/api/webhooks/ses` (o fija `NEXT_PUBLIC_APP_URL` y un único endpoint SNS).
+`https://app.nelvyon.com/api/webhooks/ses` (o fija `NEXT_PUBLIC_APP_URL` y un **único** endpoint SNS).
+
+**Fase 2:** SSOT `docs/ops/PHASE2_EXTERNAL_INTEGRATIONS.md` · validar host  
+`node scripts/validate-phase2-integrations.mjs` (imprime `sesWebhook` esperado).
 
 ## Variables
 

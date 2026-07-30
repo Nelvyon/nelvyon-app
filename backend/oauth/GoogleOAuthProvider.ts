@@ -1,7 +1,9 @@
+import { defaultOAuthRedirectUri } from "./oauthEnv";
+
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? "";
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? "";
 const GOOGLE_REDIRECT_URI =
-  process.env.GOOGLE_REDIRECT_URI ?? "https://nelvyon.com/api/oauth/google/callback";
+  process.env.GOOGLE_REDIRECT_URI ?? defaultOAuthRedirectUri("/api/oauth/google/callback");
 
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";

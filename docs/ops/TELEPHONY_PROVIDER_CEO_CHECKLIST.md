@@ -1,38 +1,43 @@
 # Checklist Daniel — Proveedor de telefonía (Twilio) real
 
-> Hoy el dialer es **100% simulador** (síntetico, en memoria, sin red). No se hace ninguna
-> llamada real. Este checklist es para cuando (si) decidas activar un proveedor real —
-> mientras no lo completes y no se avise explícitamente, nada cambia.
+> **2026-07-30** · SSOT Fase 2: `docs/ops/PHASE2_EXTERNAL_INTEGRATIONS.md`
 
-## Qué falta para tener un proveedor real (no técnico)
+## Estado actual (honesto) — dos capas
+
+| Capa | Comportamiento |
+|------|----------------|
+| Agency `TelephonyCore` / `TwilioTelephonyProvider` | Constructor **siempre** `BLOCKED_EXTERNAL` — dialer OS 100% simulador |
+| SaaS `SaasDialerService` / `SaasSmsService` | Si `TWILIO_*` está en Railway, **puede** llamar/SMS reales vía REST |
+
+**No** cargar `TWILIO_*` en prod ni aprobar llamadas/SMS reales hasta completar esta tabla.
+
+## Qué falta para telefonía real (humano)
 
 | # | Qué | Qué hace falta de ti |
 |---|-----|------------------------|
 | 1 | **Cuenta Twilio** | Crear/activar cuenta Twilio de NELVYON con método de pago propio |
-| 2 | **Números de teléfono** | Comprar el/los números que se usarán para llamar (por país si aplica) |
-| 3 | **A2P / regulación de voz** | Confirmar si tu país exige registro de "caller ID"/verificación de negocio para llamadas salientes |
-| 4 | **Consentimiento legal** | Confirmar la base legal para llamar a cada contacto (opt-in explícito, interés legítimo, o exclusión por listas Robinson/DNC según país) |
-| 5 | **Grabación de llamadas** | Decidir si se graban llamadas y confirmar el aviso legal requerido a la persona llamada |
-| 6 | **Horarios permitidos** | Confirmar franjas horarias legales para llamadas comerciales en cada país objetivo |
-| 7 | **Presupuesto** | Aprobar presupuesto de coste por minuto/llamada (Twilio cobra por uso) |
+| 2 | **Números de teléfono** | Comprar el/los números (voz y/o SMS) |
+| 3 | **A2P / regulación** | Registro caller ID / A2P según país |
+| 4 | **Consentimiento legal** | Base legal para llamar/SMS (opt-in, DNC/Robinson) |
+| 5 | **Grabación** | Decidir grabación + aviso legal |
+| 6 | **Horarios** | Franjas legales por país |
+| 7 | **Presupuesto** | Aprobar coste por minuto/SMS |
+| 8 | **Railway secrets** | Pegar `TWILIO_ACCOUNT_SID` · `TWILIO_AUTH_TOKEN` · `TWILIO_FROM_NUMBER` (nunca en git) |
+| 9 | **Primera prueba** | Una llamada/SMS a número propio con SÍ escrito |
 
-## Qué pasa en el código mientras esto no esté
+## Variables
 
-- `TwilioTelephonyProvider` (el proveedor real) **no se puede ni instanciar** — su
-  constructor siempre lanza un error `BLOCKED_EXTERNAL`. No hay ninguna variable de entorno
-  que lo active.
-- Todo el dialer usa `SimulatorTelephonyProvider`: cola, consentimiento, límites de
-  frecuencia y auditoría funcionan de verdad, pero ninguna llamada sale de la memoria del
-  servidor.
-- Activar el proveedor real requiere que el equipo técnico **reescriba manualmente** esa
-  clase — nunca ocurre solo con un cambio de configuración.
+```
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_FROM_NUMBER=
+TWILIO_TWIML_URL=   # opcional
+TWILIO_FROM_WHATSAPP=  # solo si usas WA vía Twilio (preferir Meta Cloud — WHATSAPP_CEO_CHECKLIST)
+```
 
 ## Próximo paso EXACTO
 
-1. Si quieres avanzar hacia llamadas reales, completa la tabla de arriba punto por punto.
-2. Avisa al equipo técnico cuando tengas cuenta Twilio + números + confirmación legal de
-   consentimiento y horarios.
-3. El equipo técnico implementará `TwilioTelephonyProvider` de verdad, con tus credenciales,
-   y lo dejará también apagado hasta que tú apruebes explícitamente la primera llamada de
-   prueba.
-4. Hasta entonces: **simulador únicamente**, sin cambios pendientes de tu parte.
+1. Completar tabla 1–7.
+2. Pegar secrets (8) solo tras SÍ.
+3. Primera prueba (9) — sin bulk (`NELVYON_SMS_BULK_ENABLED=0`).
+4. Agency `TwilioTelephonyProvider` sigue bloqueado hasta reescritura técnica + nuevo SÍ.

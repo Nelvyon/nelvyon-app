@@ -1,13 +1,19 @@
+import {
+  defaultOAuthRedirectUri,
+  tiktokOAuthAppId,
+  tiktokOAuthAppSecret,
+} from "./oauthEnv";
+
 function tiktokAppId(): string {
-  return process.env.TIKTOK_APP_ID ?? "";
+  return tiktokOAuthAppId();
 }
 
 function tiktokAppSecret(): string {
-  return process.env.TIKTOK_APP_SECRET ?? "";
+  return tiktokOAuthAppSecret();
 }
 
 function tiktokRedirectUri(): string {
-  return process.env.TIKTOK_REDIRECT_URI ?? "https://nelvyon.com/api/oauth/tiktok/callback";
+  return process.env.TIKTOK_REDIRECT_URI ?? defaultOAuthRedirectUri("/api/oauth/tiktok/callback");
 }
 
 const AUTH_URL = "https://ads.tiktok.com/marketing_api/auth";

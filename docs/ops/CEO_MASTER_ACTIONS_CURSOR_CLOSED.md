@@ -1,7 +1,7 @@
 # CEO / Daniel — Master actions (solo humano)
 
 > Cursor cerró lo ejecutable. Esta lista es **mínima y exacta**.  
-> Fecha: 2026-07-30 · tip live `3f10c272` · Fase 1 migrate+deploy **DONE** · canary KILL · `claimReady: false`
+> Fecha: 2026-07-30 · Fase 1 DONE · Fase 2 prep in-repo DONE · SSOT `PHASE2_EXTERNAL_INTEGRATIONS.md` · canary KILL · `claimReady: false`
 
 ## A — Infra / DB / IA
 
@@ -27,8 +27,11 @@
 | 8 | Google / Meta / LinkedIn OAuth apps | `OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md` |
 | 9 | Social publish OAuth (sigue publish OFF) | `SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md` |
 | 10 | Ads OAuth (spend OFF) | `ADS_OAUTH_SPEND_CEO_CHECKLIST.md` |
-| 11 | Twilio dialer real | `TELEPHONY_PROVIDER_CEO_CHECKLIST.md` |
+| 11 | Twilio dialer / SMS real | `TELEPHONY_PROVIDER_CEO_CHECKLIST.md` |
+| 11b | WhatsApp Cloud | `WHATSAPP_CEO_CHECKLIST.md` |
 | 12 | Redes oficiales Nelvyon | `NELVYON_OFFICIAL_SOCIAL_CEO_CHECKLIST.md` |
+| 12b | SES primer envío externo + SNS host único | `OPS_SES_PROD.md` |
+| 12c | Stripe Live reval price-audit / pago test | `OPS_STRIPE_PROD.md` |
 
 ## D — Legal / mercado
 

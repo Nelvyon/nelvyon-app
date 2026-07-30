@@ -112,3 +112,11 @@ export function missingStripeConnectWebhookSecret(): string[] {
     ? []
     : ["STRIPE_WEBHOOK_CONNECT_SECRET"];
 }
+
+export {
+  missingGoogleOAuthEnvKeys,
+  missingMetaOAuthEnvKeys,
+  missingLinkedInOAuthEnvKeys,
+  missingWhatsAppCloudEnvKeys,
+  isWhatsAppCloudEnvConfigured,
+} from "../oauth/oauthEnv";

@@ -1,3 +1,5 @@
+import { defaultOAuthRedirectUri } from "./oauthEnv";
+
 function linkedinClientId(): string {
   return process.env.LINKEDIN_CLIENT_ID ?? "";
 }
@@ -7,7 +9,9 @@ function linkedinClientSecret(): string {
 }
 
 function linkedinRedirectUri(): string {
-  return process.env.LINKEDIN_REDIRECT_URI ?? "https://nelvyon.com/api/oauth/linkedin/callback";
+  return (
+    process.env.LINKEDIN_REDIRECT_URI ?? defaultOAuthRedirectUri("/api/oauth/linkedin/callback")
+  );
 }
 
 const AUTH_URL = "https://www.linkedin.com/oauth/v2/authorization";

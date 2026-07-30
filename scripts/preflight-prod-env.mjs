@@ -18,7 +18,7 @@ writeFileSync(
   `import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { validateProductionEnv } from "../backend/config/prodEnvValidation.ts";
-import { missingStripeStoreWebhookSecret, missingStripeConnectWebhookSecret, missingSesEnvKeys, missingStripeEnvKeys } from "../backend/saas/saasEnv.ts";
+import { missingStripeStoreWebhookSecret, missingStripeConnectWebhookSecret, missingSesEnvKeys, missingStripeEnvKeys, missingGoogleOAuthEnvKeys, missingMetaOAuthEnvKeys, missingLinkedInOAuthEnvKeys, missingWhatsAppCloudEnvKeys } from "../backend/saas/saasEnv.ts";
 import { resolveOpenClawRuntimeConfig } from "../backend/openclaw/contracts.ts";
 
 const root = ${JSON.stringify(root)};
@@ -34,11 +34,21 @@ const report = {
     stripeStoreMissing: missingStripeStoreWebhookSecret(),
     stripeConnectMissing: missingStripeConnectWebhookSecret(),
     sesMissing: missingSesEnvKeys(),
+    googleOAuthMissing: missingGoogleOAuthEnvKeys(),
+    metaOAuthMissing: missingMetaOAuthEnvKeys(),
+    linkedinOAuthMissing: missingLinkedInOAuthEnvKeys(),
+    whatsappCloudMissing: missingWhatsAppCloudEnvKeys(),
     openClaw: resolveOpenClawRuntimeConfig(),
   },
   humanChecklists: [
+    "docs/ops/PHASE2_EXTERNAL_INTEGRATIONS.md",
     "docs/OPS_STRIPE_PROD.md",
     "docs/OPS_SES_PROD.md",
+    "docs/ops/OAUTH_PROVIDER_APPS_CEO_CHECKLIST.md",
+    "docs/ops/ADS_OAUTH_SPEND_CEO_CHECKLIST.md",
+    "docs/ops/SOCIAL_PUBLISH_OAUTH_CEO_CHECKLIST.md",
+    "docs/ops/TELEPHONY_PROVIDER_CEO_CHECKLIST.md",
+    "docs/ops/WHATSAPP_CEO_CHECKLIST.md",
     "docs/OPS_SHARED_MEMORY_514.md",
   ],
 };

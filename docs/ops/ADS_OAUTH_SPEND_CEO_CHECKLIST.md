@@ -5,7 +5,14 @@
 
 ## Estado actual (honesto)
 
-`AdsAttributionCore` implementa el **núcleo síntetico** de ads/attribution:
+Hay **dos capas**:
+
+1. **Agency** `AdsAttributionCore` + conectores fail-closed — sin gasto real (tabla abajo).
+2. **SaaS App Router** `/api/oauth/{google,meta,linkedin}` + `GoogleOAuthProvider` / `MetaOAuthProvider` /
+   `LinkedInOAuthProvider` — OAuth HTTP **real** cuando hay Client ID/Secret en Railway.
+   Spend sigue OFF (`NELVYON_ADS_SPEND_ENABLED=0`). Catálogo hub marca ads como **beta**.
+
+`AdsAttributionCore` implementa el **núcleo sintético** de ads/attribution:
 
 - Borrador de campaña (`buildCampaignDraft`) con objetivos, plataforma, presupuesto diario,
   audiencia y creatividades — siempre `status: "draft"`, `oauthConnected: false`,
@@ -20,7 +27,7 @@
 - Gates de aprobación CEO + cliente (`evaluateAdsApprovalGates`).
 - Snapshot de reporting **siempre sintético**: `impressions: 0`, `clicks: 0`, `spendCents: 0`.
 
-Los tres conectores (`GoogleAdsConnector`, `MetaAdsConnector`, `LinkedInAdsConnector`) son
+Los tres conectores agency (`GoogleAdsConnector`, `MetaAdsConnector`, `LinkedInAdsConnector`) son
 **fail-closed por diseño**:
 
 | Método | Comportamiento |

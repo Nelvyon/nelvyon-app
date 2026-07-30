@@ -1,26 +1,27 @@
 # Checklist Daniel — Apps OAuth reales (Google / Meta / LinkedIn / Twilio)
 
-> Actualizado: **2026-07-30** · tip `0d7d6e90` · `claimReady: false`  
+> Actualizado: **2026-07-30** · tip ver HANDOVER · Fase 2 aliases + host `app.nelvyon.com` · `claimReady: false`  
 > Hoy el framework OAuth multi-tenant (`backend/agency/OAuthMultiTenantFramework.ts`) usa
 > **proveedores simulados (mock)** para Google/Meta/LinkedIn/Twilio — genera tokens sintéticos,
 > nunca hace una llamada HTTP real. Sirve para probar el ciclo completo (autorizar, rotar,
-> revocar, reconectar, borrar) sin depender de cuentas reales. Este checklist es para cuando
-> quieras conectar cuentas OAuth de verdad.
+> revocar, reconectar, borrar) sin depender de cuentas reales.  
+> En paralelo, `/api/oauth/{google,meta,linkedin}` usa proveedores **reales** cuando hay secrets.  
+> SSOT: `docs/ops/PHASE2_EXTERNAL_INTEGRATIONS.md`.
 
 ## Redirect URIs exactas (registrar en cada consola)
 
 **Host canónico de producto:** `https://app.nelvyon.com`  
-**Host legacy aún referenciado en defaults de ads OAuth:** `https://nelvyon.com`  
+**Override:** `NEXT_PUBLIC_APP_URL` / `*_REDIRECT_URI`  
 **Staging Railway (solo pruebas):** `https://ideal-victory-staging.up.railway.app`
 
 | Flujo | Path exacto | Env override | Default en código hoy |
 |-------|-------------|--------------|------------------------|
 | Hub SaaS (HubSpot/Slack vía FastAPI) | `/api/saas/oauth/callback` | `NEXT_PUBLIC_APP_URL` | `{appUrl}/api/saas/oauth/callback` |
-| Google Ads/OAuth | `/api/oauth/google/callback` | `GOOGLE_REDIRECT_URI` | `https://nelvyon.com/api/oauth/google/callback` |
-| Meta Ads/OAuth | `/api/oauth/meta/callback` | `META_REDIRECT_URI` | `https://nelvyon.com/api/oauth/meta/callback` |
-| LinkedIn Ads/OAuth | `/api/oauth/linkedin/callback` | `LINKEDIN_REDIRECT_URI` | `https://nelvyon.com/api/oauth/linkedin/callback` |
-| TikTok Ads/OAuth | `/api/oauth/tiktok/callback` | `TIKTOK_REDIRECT_URI` | `https://nelvyon.com/api/oauth/tiktok/callback` |
-| Snapchat Ads/OAuth | `/api/oauth/snapchat/callback` | `SNAPCHAT_REDIRECT_URI` | `https://app.nelvyon.com/api/oauth/snapchat/callback` |
+| Google Ads/OAuth | `/api/oauth/google/callback` | `GOOGLE_REDIRECT_URI` | `{NEXT_PUBLIC_APP_URL\|\|app.nelvyon.com}/api/oauth/google/callback` |
+| Meta Ads/OAuth | `/api/oauth/meta/callback` | `META_REDIRECT_URI` | idem `/api/oauth/meta/callback` |
+| LinkedIn Ads/OAuth | `/api/oauth/linkedin/callback` | `LINKEDIN_REDIRECT_URI` | idem `/api/oauth/linkedin/callback` |
+| TikTok Ads/OAuth | `/api/oauth/tiktok/callback` | `TIKTOK_REDIRECT_URI` | idem `/api/oauth/tiktok/callback` |
+| Snapchat Ads/OAuth | `/api/oauth/snapchat/callback` | `SNAPCHAT_REDIRECT_URI` | idem `/api/oauth/snapchat/callback` |
 
 ### URIs a pegar en producción (recomendado)
 

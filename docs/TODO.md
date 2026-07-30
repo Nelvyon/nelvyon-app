@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-30** — tip prod live `3f10c272` · Fase 1 migrate+deploy **DONE** · `claimReady: false`
+> Actualizado: **2026-07-30** — Fase 1 DONE · Fase 2 prep in-repo DONE · `claimReady: false`
 
 ---
 
@@ -14,9 +14,10 @@
 - [x] **2026-07-28 staging:** mig 521+522 applied · workflows CERTIFIED · Playwright secuencias PASS
 - [x] **2026-07-29 tip `9bbd5808`:** orchestrator BFF + CSRF staging · KI020 PASS · live sha `9bbd5808376b`
 - [x] **2026-07-30 tip `3c64111b`/`0d7d6e90`:** docs pin · cert helpers Railway · OAuth callbacks · passwordless gates
-- [x] **2026-07-30 Fase 1 PROD:** migrate 521+522 APPLIED · deploy `3f10c272` SUCCESS · smokes workflows/CRM/seq/KI020 PASS · canary KILL · `claimReady: false`
+- [x] **2026-07-30 Fase 1 PROD:** migrate 521+522 APPLIED · deploy `3f10c272` SUCCESS · smokes PASS · canary KILL
+- [x] **2026-07-30 Fase 2 prep:** oauthEnv aliases/defaults · catalog beta honesty · PHASE2 SSOT · WA checklist · validate script
 - [ ] **Ops (opcional):** Railway Volume snapshot UI retener ≥7d
-- [ ] **Solo humano:** Pepito/legal · OAuth · clientes · Stripe KI-028 · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
+- [ ] **Solo humano:** OAuth secrets · SES/SNS · Twilio/WA · Ads/Social SÍ · Pepito/legal · clientes · `CEO_MASTER_ACTIONS_CURSOR_CLOSED.md`
 
 ---
 

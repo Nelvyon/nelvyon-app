@@ -5,6 +5,12 @@
 
 ## Estado actual (honesto)
 
+Hay **dos capas**:
+
+1. **Agency** `CommunityPublishCore` + `SimulatorPublishProvider` — sin red (abajo).
+2. **SaaS** `SaasSocialService` + OAuth Meta/LinkedIn — **puede publicar** si hay tokens
+   de conexión en DB. No conectar cuentas ni publicar sin este checklist + SÍ CEO.
+
 `CommunityPublishCore` implementa el **núcleo** de publish/community management:
 
 - Content inbox (`addToContentInbox` / `decideContentInboxItem`) con estado
@@ -21,10 +27,9 @@
 - Plan de rollback (`COMMUNITY_PUBLISH_ROLLBACK_PLAN`) y audit trail completo
   (`listAuditLog`).
 
-`SimulatorPublishProvider` es el **único** proveedor de publish implementado. No hace
+`SimulatorPublishProvider` es el **único** proveedor de publish en la capa agency. No hace
 ninguna llamada de red; `publish()` solo devuelve un registro simulado
-(`{ ok: true, simulated: true, providerId: "simulator" }`). No existe ningún otro
-proveedor en este código — nada puede publicar de verdad ni enviar un DM real.
+(`{ ok: true, simulated: true, providerId: "simulator" }`).
 
 `assertPublishDisabled()` devuelve `disabled: true` (bloqueado) salvo que **ambos**
 `oauthConnected` y `ceoApproved` sean explícitamente `true` (ambos son `false` por

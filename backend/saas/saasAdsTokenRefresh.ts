@@ -2,6 +2,7 @@ import { DbClient } from "../db/DbClient";
 import { decryptSecret, encryptSecret } from "./SaasSsoService";
 import type { AdsPlatform } from "./SaasAdsDashboardService";
 import { fetchWithTimeout } from "../http/fetchWithTimeout";
+import { metaOAuthAppId, metaOAuthAppSecret } from "../oauth/oauthEnv";
 
 type ConnectionRow = {
   id: string; tenant_id: string; platform: string; account_id: string; account_name: string;
@@ -15,8 +16,8 @@ function isExpired(expiresAt: string | null): boolean {
 }
 
 async function refreshMetaToken(refreshToken: string): Promise<{ accessToken: string; expiresAt: string | null } | null> {
-  const clientId = process.env.META_CLIENT_ID?.trim();
-  const clientSecret = process.env.META_CLIENT_SECRET?.trim();
+  const clientId = metaOAuthAppId();
+  const clientSecret = metaOAuthAppSecret();
   if (!clientId || !clientSecret) return null;
   const res = await fetchWithTimeout(
     `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${clientId}&client_secret=${clientSecret}&fb_exchange_token=${encodeURIComponent(refreshToken)}`,

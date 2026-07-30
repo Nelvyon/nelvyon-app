@@ -202,7 +202,7 @@ All crons use header `x-cron-secret: $CRON_SECRET`.
 - [ ] Todas las variables de entorno configuradas en Railway
 - [ ] `DATABASE_URL` apunta a Postgres 16 en Railway
 - [ ] SES email verificado en AWS (sender domain)
-- [ ] Stripe webhook endpoint configurado: `https://app.nelvyon.com/api/billing/webhook`
+- [ ] Stripe webhook endpoint configurado: `https://app.nelvyon.com/api/webhooks/stripe`
 
 ### Deploy
 ```bash
