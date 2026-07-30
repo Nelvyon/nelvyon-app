@@ -90,7 +90,17 @@ Sin cambio de flags: Ads spend OFF · Social publish OFF · Twilio/WA secrets hu
 
 ## 10–11. Archivos / commits
 
-Ver `git log` / diff del bloque de commits de calidad (este informe se actualiza tras commit).
+Commits de este bloque (main, ahead of origin):
+
+| SHA | Mensaje |
+|-----|---------|
+| `88c7145a` | `fix(saas): harden P1 quality gaps in nav, encoding, and branding` |
+| `cbcff8b2` | `fix(saas): hide marketing chrome in Capacitor and route new tenants to onboarding` |
+| `b1eba1f1` | `docs(ops): publish CTO quality audit evidence and Android smoke status` |
+
+(Relacionado previo: `aaf6007c` DashForge Fase 1 plan.)
+
+Archivos principales tocados: SaaS pages (citas/chat/copywriter/lead-scoring/loyalty/setup/web-builder), `FeaturedEnvatoTemplateCard`, `platformFastApiProxy`(+test), messages es/pt/en/de/fr/it, `NativeShellChromeGate`(+test), root layout, dashboard page, `.gitignore`, docs ops/KNOWN_ISSUES/HANDOVER/CHANGELOG.
 
 ## 12. Recomendaciones finales
 
