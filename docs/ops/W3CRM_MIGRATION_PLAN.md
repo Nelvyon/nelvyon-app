@@ -113,7 +113,7 @@ Ninguna dependencia es instalable tal cual en `apps/web` sin romper el árbol de
 
 | Grupo nav | Módulos NELVYON (id) | Pantalla/patrón W3CRM de referencia | Conflicto principal | Estado |
 |---|---|---|---|---|
-| **principal** | dashboard, setup, inbox, crm, pipeline, calendar | `(dashboard)/dashboard` (KPI+tabs+tablas), `(apps)/contacts`+`customer`, `(email)/email-inbox`+`app-calender` | Mock data 100 % en origen → debe sustituirse por `/api/saas/dashboard`, `/api/saas/crm/*` reales; kanban de pipeline no existe en W3CRM tal cual (usa `@hello-pangea/dnd` en Task board) | **PLAN** |
+| **principal** | dashboard, setup, inbox, crm, pipeline, calendar | `(dashboard)/dashboard` (KPI+tabs+tablas), `(apps)/contacts`+`customer`, `(email)/email-inbox`+`app-calender` | Mock data 100 % en origen → debe sustituirse por `/api/saas/dashboard`, `/api/saas/crm/*` reales; kanban de pipeline no existe en W3CRM tal cual (usa `@hello-pangea/dnd` en Task board) | **dashboard: DONE (§12)** · resto **PLAN** |
 | **comunicacion** | campanias, deliverability, sms, social, whatsapp, dialer, secuencias | `(email)/email-compose`+`email-inbox`+`email-read` | No hay pantallas nativas SMS/WhatsApp/dialer/social — solo patrón de lista+detalle de email reutilizable como base compositiva | **PLAN (parcial)** |
 | **captacion** | publicidad, seo, reputacion, funnels, web-builder | `(cms)/content`, `(cms)/menu`, `(aikit)/repurpose`+`rss` | Sin pantallas ads/SEO dedicadas; TipTap ya cubre web-builder, no sustituir por CKEditor | **PLAN (parcial)** |
 | **gestion** | workflows, formularios, citas, helpdesk, prospecting, snippets, countdown, objetos, encuestas, documentos, facturas, qr, ab-testing, lms, store, affiliates, loyalty, memberships, erp-* | `(table)/*`, `(forms)/*`, `(ecommerce)/ecom-*`, `(dashboard)/task`+`task-summary`+`project` | Editor de workflows es XYFlow (isla, no tocar); resto son listados/formularios — buen fit con patrón tabla+wizard de W3CRM | **PLAN** |
@@ -212,19 +212,45 @@ Se recomienda **Opción A + evaluación selectiva bajo Opción B** para casos co
 
 ---
 
-## 10. Rollback
+## 10. Evidencia Fase 2 — Módulo Dashboard ejecutivo (2026-07-30)
 
-- Este commit es solo documentación — revert trivial (`git revert`) sin impacto en producto
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint src/app/saas/dashboard/page.tsx src/features/saas-shell/components/SaasDashboardWidgets.tsx` | **PASS** (0 warnings/errores) |
+| `pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm` | **PASS** — 195 test files (2 skipped) · 2464 tests passed (4 skipped) |
+| `pnpm -C apps/web build` | **PASS** — 312 páginas generadas, incluye `/saas/dashboard`; sin errores de compilación (solo warning preexistente no relacionado de `@opentelemetry/instrumentation`) |
+| Librerías W3CRM evaluadas | `@hello-pangea/dnd@18.0.1` (peer `react ^18\|\|^19` ✅) y `@fullcalendar/react@7.0.2` (peer `react ^17\|\|^18\|\|^19` ✅) — compatibles con React 19 en sus versiones actuales; **no instaladas aún**, reservadas para los módulos `pipeline`/`citas`/`calendar` cuando se aborden |
+| Archivos modificados | `apps/web/src/features/saas-shell/components/SaasDashboardWidgets.tsx` (nuevo) · `apps/web/src/app/saas/dashboard/page.tsx` (solo capa visual: headers, KPI tiles con icono, avatares de actividad) |
+| Funcionalidad preservada | Fetches reales (`/api/saas/dashboard`, `/layout`, `/competitor-gap`, `/geo-visibility`, `/reports/generate`) · drag-reorder de widgets · checklist de activación · pipeline comercial · export ZIP · redirect 401/404→onboarding — **sin cambios de comportamiento** |
+| Branding/mock data | Cero — todo el contenido sigue viniendo de las mismas APIs reales; los iconos añadidos son glifos genéricos, no assets de plantilla |
+| `claimReady` / canary | `false` / `KILL` — sin cambios |
+
+---
+
+## 11. Rollback
+
+- Fase 1 (documentación) — revert trivial (`git revert`) sin impacto en producto
+- Fase 2 (dashboard) — revert del commit de widgets restaura `StatCard`/headers ad-hoc previos; ningún cambio de API/DB que revertir
 - `.reference/w3crm/` puede eliminarse en cualquier momento sin afectar `apps/web`/`backend` (ya gitignored, no forma parte del build)
 - No hay migraciones DB ni cambios de API en esta fase
 
 ---
 
-## 11. Próximo paso EXACTO
+## 12. Próximo paso EXACTO
 
-**Bloqueado hasta respuesta del usuario a §9.** Una vez confirmado el criterio de reutilización:
+**Ya no bloqueado — usuario confirmó §9 Opción B** (reconstrucción nativa + evaluación caso a caso de librerías compatibles con React 19, sin tocar el sistema de estilos base) **y arranque por Dashboard ejecutivo**.
 
-1. Crear `apps/web/src/features/nelvyon-ui/{ui,layout,widgets}/` (mismo patrón de aislamiento que la carpeta DashForge, nombre sin referencia a plantillas)
-2. Página de laboratorio aislada `/saas/_ui-lab` (solo non-prod) para validar el kit reconstruido contra las capturas de referencia de W3CRM, sin tocar páginas de producto
-3. Iniciar por el módulo **IA NELVYON** (mejor alineación con `(aikit)`) o **Dashboard ejecutivo** (mayor visibilidad) — a decidir con el usuario
-4. Commit "integración base visual" tras validar que el kit compila y pasa tsc/lint/build en el monorepo
+### 11.1 Decisión de arquitectura tomada en Fase 2 (dashboard)
+
+Auditoría adicional de NELVYON reveló que ya existen **dos** sistemas de componentes: `design-system/components/` (tokens CSS-var, usado por `/os/*`, no aplicado al shell SaaS) y el propio lenguaje visual hardcoded de `SaasShellLayout.tsx` (`DarkCard`, `StatCard`, `GradientText`, `#020817`/`#0084ff`). Crear una tercera carpeta `features/nelvyon-ui/` habría introducido un **tercer** sistema — contradice la regla del usuario "no mantengas dos sistemas visuales diferentes" (aquí, tres). Decisión: los nuevos primitivos inspirados en W3CRM viven junto al shell SaaS existente, en `apps/web/src/features/saas-shell/components/SaasDashboardWidgets.tsx`, usando el mismo lenguaje de tokens hardcoded ya establecido. Cero carpeta nueva de "kit" aislado; cero código fuente de plantilla importado.
+
+### 11.2 Módulo 1 — Dashboard ejecutivo (COMPLETADO, ver §12)
+
+1. ✅ `SaasDashboardWidgets.tsx`: `SaasWidgetHeader` (header consistente eyebrow+título+acción), `KpiTile` (KPI con icono, inspirado en el patrón de tarjeta de `(dashboard)/dashboard` de W3CRM), `SaasAvatarBubble` (burbuja de iniciales con color determinista, inspirada en las filas de actividad/empleados de W3CRM).
+2. ✅ `/saas/dashboard/page.tsx` reconectado a los mismos widgets/APIs reales (`/api/saas/dashboard`, `/layout`, `/competitor-gap`, `/geo-visibility`, `/reports/generate`) — cero mock data, cero funcionalidad eliminada (drag-reorder de widgets, checklist, pipeline comercial, exportación de informes intactos).
+3. ✅ tsc / ESLint / `pnpm build` (312 páginas) / Vitest (195 files · 2464 tests) — **todo PASS**.
+
+### 11.3 Próximo módulo a decidir con el usuario
+
+Candidatos siguientes por orden de prioridad del plan (§7): **CRM/Pipeline** (uso diario) o **IA NELVYON** (mejor alineación con `(aikit)`). No iniciar sin confirmación para respetar "trabaja módulo por módulo, no todo de golpe".

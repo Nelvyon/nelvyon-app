@@ -12,6 +12,7 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import { SaasShellLayout, DarkCard, StatCard } from "@/features/saas-shell/components/SaasShellLayout";
 import { ActivationChecklist } from "@/features/saas-shell/components/ActivationChecklist";
 import { AccountHealthScore } from "@/features/saas-shell/components/PlatformHealthBanner";
+import { SaasWidgetHeader, SaasAvatarBubble, KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { trackEvent } from "@/lib/analytics";
 import type { SaasTenantDto } from "../onboarding/components/types";
 
@@ -190,10 +191,10 @@ export default function SaasDashboardPage() {
   }
 
   const kpis = [
-    { label: t("dashboard.active_jobs"), value: summary.activeJobs },
-    { label: t("dashboard.completed_jobs"), value: summary.completedJobs },
-    { label: t("dashboard.total_spend"), value: `${summary.totalSpend.toFixed(2)} EUR` },
-    { label: t("dashboard.current_plan"), value: tenant.plan },
+    { label: t("dashboard.active_jobs"), value: summary.activeJobs, icon: "⚙️" },
+    { label: t("dashboard.completed_jobs"), value: summary.completedJobs, icon: "✅" },
+    { label: t("dashboard.total_spend"), value: `${summary.totalSpend.toFixed(2)} EUR`, icon: "💶" },
+    { label: t("dashboard.current_plan"), value: tenant.plan, icon: "📦" },
   ];
 
   const now = new Date().toLocaleDateString("es-ES", { dateStyle: "full" });
@@ -316,17 +317,20 @@ export default function SaasDashboardPage() {
             <section key="activity-quick" className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
               {show("activity") && (
               <DarkCard>
-                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.recent_activity")}</p>
+                <SaasWidgetHeader title={t("dashboard.recent_activity")} />
                 {summary.recentActivity.length === 0 ? (
                   <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Cuando haya jobs o eventos del tenant aparecerán aquí." />
                 ) : (
                   <ul className="space-y-3">
                     {summary.recentActivity.slice(0, 10).map((a) => (
                       <li key={a.id} className="flex items-start gap-3 border-b border-white/[0.05] pb-3 text-sm last:border-none">
-                        <NelvyonDsStatusDot status={activityStatus(a.eventType)} label={a.eventType} />
-                        <div className="min-w-0">
-                          <p className="font-medium text-white/80">{a.description}</p>
-                          <p className="text-white/35">{a.eventType} · {formatDate(a.createdAt)}</p>
+                        <SaasAvatarBubble seed={a.id} label={a.eventType} />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <NelvyonDsStatusDot status={activityStatus(a.eventType)} label={a.eventType} />
+                            <p className="font-medium text-white/80">{a.description}</p>
+                          </div>
+                          <p className="mt-0.5 text-white/35">{a.eventType} · {formatDate(a.createdAt)}</p>
                         </div>
                       </li>
                     ))}
@@ -336,7 +340,7 @@ export default function SaasDashboardPage() {
               )}
               {show("quickActions") && (
               <DarkCard>
-                <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">{t("dashboard.quick_actions")}</p>
+                <SaasWidgetHeader title={t("dashboard.quick_actions")} />
                 <div className="space-y-1.5">
                   {[
                     { label: "🛒 Explorar packs", href: "/saas/packs" },
@@ -392,7 +396,7 @@ export default function SaasDashboardPage() {
         if (id === "competitorGap") {
           return (
             <DarkCard key={id}>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Competitor Gap (semanal)</p>
+              <SaasWidgetHeader title="Competitor Gap (semanal)" />
               {gapSummary ? (
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
@@ -415,7 +419,7 @@ export default function SaasDashboardPage() {
         if (id === "geoVisibility") {
           return (
             <DarkCard key={id}>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">GEO / AI Visibility</p>
+              <SaasWidgetHeader title="GEO / AI Visibility" />
               {geoSummary ? (
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
@@ -467,7 +471,7 @@ export default function SaasDashboardPage() {
         if (id === "modules" && summary.moduleStats) {
           return (
             <section key={id}>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Módulos activos</p>
+              <SaasWidgetHeader title="Módulos activos" />
               <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
                 {[
                   { label: "Contactos CRM", value: summary.moduleStats.contacts, href: "/saas/crm", accent: true },
@@ -486,10 +490,10 @@ export default function SaasDashboardPage() {
         if (id === "kpis") {
           return (
             <section key={id}>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Operaciones</p>
+              <SaasWidgetHeader title="Operaciones" />
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {kpis.map((k, i) => (
-                  <StatCard key={k.label} label={k.label} value={k.value} accent={i === 0} />
+                  <KpiTile key={k.label} icon={k.icon} label={k.label} value={k.value} accent={i === 0} />
                 ))}
               </div>
             </section>

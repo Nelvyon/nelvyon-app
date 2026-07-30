@@ -26,9 +26,10 @@
 - [x] Completado y validado 2026-07-10 (histórico CI)
 - [x] **2026-07-30 DashForge Fase 1:** auditoría + plan `DASHFORGE_MIGRATION_PLAN.md` · ADR-074 · `.reference/` gitignored — **en pausa**, ver ADR-075
 - [x] **2026-07-30 W3CRM Fase 1:** auditoría completa (97 pantallas/13 grupos) + mapa 69 módulos `saasNav.ts` + conflicto de stack documentado + plan `W3CRM_MIGRATION_PLAN.md` · ADR-075 · `.reference/w3crm/` gitignored
-- [ ] **BLOQUEANTE:** respuesta del usuario a §9 de `W3CRM_MIGRATION_PLAN.md` (criterio exacto de reutilización — código literal imposible sin romper NELVYON) antes de tocar cualquier componente
-- [ ] **W3CRM Fase 2:** tras confirmación — `features/nelvyon-ui/` reconstruido en Tailwind v4/TS inspirado en W3CRM · lab `/saas/_ui-lab` no-prod
-- [ ] **W3CRM Fase 3+:** branding NELVYON + módulo IA/Dashboard primero + resto por commits separados · staging antes de prod
+- [x] **2026-07-30 W3CRM §9 resuelto:** usuario confirmó Opción B (reconstrucción nativa + libs puntuales evaluadas caso a caso) · módulo inicial: Dashboard ejecutivo
+- [x] **2026-07-30 W3CRM Fase 2 — Dashboard:** `SaasDashboardWidgets.tsx` (header/KPI-icono/avatar) integrado en `/saas/dashboard` sobre APIs reales · tsc/lint/build/vitest PASS
+- [ ] **W3CRM Fase 2 — siguiente módulo:** CRM/Pipeline o IA NELVYON (a confirmar) · evaluar `@hello-pangea/dnd`/`@fullcalendar/react` solo cuando se abra ese módulo
+- [ ] **W3CRM Fase 3+:** resto de los 69 módulos por commits separados · staging antes de prod
 
 ---
 
