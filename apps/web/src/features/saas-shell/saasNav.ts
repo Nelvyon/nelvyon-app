@@ -17,6 +17,7 @@ export type SaasNavId =
   | "copywriter"
   | "reputacion"
   | "helpdesk"
+  | "knowledge-base"
   | "reportes"
   | "integraciones"
   | "billing"
@@ -106,6 +107,7 @@ export const SAAS_NAV_ITEMS: readonly SaasNavItem[] = [
   { id: "formularios", label: "Formularios", href: "/saas/formularios", group: "gestion" },
   { id: "citas", label: "Agenda / Citas", href: "/saas/citas", group: "gestion" },
   { id: "helpdesk", label: "Helpdesk", href: "/saas/helpdesk", group: "gestion" },
+  { id: "knowledge-base", label: "📚 Base de Conocimiento", href: "/saas/knowledge-base", group: "gestion" },
   { id: "prospecting", label: "Prospección", href: "/saas/prospecting", group: "gestion" },
   { id: "snippets", label: "Snippets", href: "/saas/snippets", group: "gestion" },
   { id: "countdown", label: "Temporizadores", href: "/saas/countdown", group: "gestion" },

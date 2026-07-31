@@ -161,9 +161,12 @@ export default function SaasAgentesPage() {
   const [search, setSearch] = useState("");
   const [activeAgent, setActiveAgent] = useState<(typeof AGENT_CATALOG)[number] | null>(null);
   const [runs, setRuns] = useState<{ agentId: string; status: string; createdAt: string }[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const agentNameById = new Map(AGENT_CATALOG.map((a) => [a.id, a.name]));
 
   useEffect(() => {
-    fetch("/api/saas/agentes/runs?limit=5")
+    fetch("/api/saas/agentes/runs?limit=10")
       .then((r) => r.json())
       .then((d: { runs?: { agentId: string; status: string; createdAt: string }[] }) => setRuns(d.runs ?? []))
       .catch(() => {});
@@ -197,6 +200,40 @@ export default function SaasAgentesPage() {
             </NelvyonDsCard>
           ))}
         </div>
+
+        {/* Run history */}
+        {runs.length > 0 && (
+          <div>
+            <button
+              onClick={() => setShowHistory((v) => !v)}
+              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+            >
+              {showHistory ? "▾" : "▸"} Historial de ejecuciones ({runs.length})
+            </button>
+            {showHistory && (
+              <div className="mt-2 space-y-2">
+                {runs.map((r, i) => {
+                  const statusTone: Record<string, "success" | "warning" | "danger" | "neutral" | "primary"> = {
+                    completed: "success",
+                    running: "primary",
+                    failed: "danger",
+                  };
+                  return (
+                    <NelvyonDsCard key={i} className="flex items-center justify-between gap-3 p-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <NelvyonDsBadge tone={statusTone[r.status] ?? "neutral"}>{r.status}</NelvyonDsBadge>
+                        <p className="truncate text-sm text-foreground">{agentNameById.get(r.agentId) ?? r.agentId}</p>
+                      </div>
+                      <p className="shrink-0 text-xs text-muted-foreground">
+                        {new Date(r.createdAt).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </NelvyonDsCard>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Search + filters */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

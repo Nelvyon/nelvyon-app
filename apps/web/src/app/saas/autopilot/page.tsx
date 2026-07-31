@@ -1,6 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+import {
+  NelvyonDsBadge,
+  NelvyonDsButton,
+  NelvyonDsCard,
+  NelvyonDsSectionHeader,
+} from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import type { AutopilotStatus, AutopilotService } from "@nelvyon/saas";
@@ -88,19 +96,16 @@ function ServiceToggleCard({
   const isRunning = running === card.key;
 
   return (
-    <div
-      className={`rounded-xl border p-5 transition-colors ${
-        enabled
-          ? "border-[#0084ff]/40 bg-[#0084ff]/5"
-          : "border-white/10 bg-white/5"
-      }`}
-    >
+    <NelvyonDsCard className={enabled ? "border-primary/40 bg-primary/5" : undefined}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{card.icon}</span>
+          <span className="text-2xl" aria-hidden="true">{card.icon}</span>
           <div>
-            <p className="text-white font-semibold text-sm">{card.label}</p>
-            <p className="text-white/40 text-xs mt-0.5">{card.description}</p>
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-foreground text-sm">{card.label}</p>
+              <NelvyonDsBadge tone={enabled ? "success" : "neutral"}>{enabled ? "Activo" : "Inactivo"}</NelvyonDsBadge>
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">{card.description}</p>
           </div>
         </div>
         {/* Toggle */}
@@ -108,7 +113,7 @@ function ServiceToggleCard({
           aria-label={`Toggle ${card.label}`}
           onClick={() => onToggle(card.key, !enabled)}
           className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-            enabled ? "bg-[#0084ff]" : "bg-white/20"
+            enabled ? "bg-primary" : "bg-muted"
           }`}
         >
           <span
@@ -120,31 +125,28 @@ function ServiceToggleCard({
       </div>
 
       {/* Last / next run */}
-      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs text-white/40">
-        <span>Última ejecución: <span className="text-white/60">{fmtDate(lastRun)}</span></span>
-        {nextRun && <span>Próxima: <span className="text-white/60">{fmtDate(nextRun)}</span></span>}
+      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted-foreground">
+        <span>Última ejecución: <span className="text-foreground/80">{fmtDate(lastRun)}</span></span>
+        {nextRun && <span>Próxima: <span className="text-foreground/80">{fmtDate(nextRun)}</span></span>}
       </div>
 
       {/* Hint if not connected */}
       {card.hint && !enabled && (
-        <p className="mt-2 text-xs text-yellow-400/70">{card.hint}</p>
+        <p className="mt-2 text-xs text-warning">{card.hint}</p>
       )}
 
       {/* Run now */}
       <div className="mt-4">
-        <button
+        <NelvyonDsButton
+          size="sm"
+          variant={enabled && !isRunning ? "primary" : "secondary"}
           disabled={!enabled || isRunning}
           onClick={() => onRunNow(card.key)}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-            enabled && !isRunning
-              ? "bg-[#0084ff] text-white hover:bg-blue-500"
-              : "cursor-not-allowed bg-white/10 text-white/30"
-          }`}
         >
           {isRunning ? "Ejecutando…" : "Ejecutar ahora"}
-        </button>
+        </NelvyonDsButton>
       </div>
-    </div>
+    </NelvyonDsCard>
   );
 }
 
@@ -177,7 +179,7 @@ export default function AutopilotPage() {
     }
   }
 
-  useEffect(() => { void load(); }, []);  
+  useEffect(() => { void load(); }, []);
 
   async function handleToggle(service: AutopilotService, enabled: boolean) {
     const fieldMap: Record<AutopilotService, string> = {
@@ -247,47 +249,27 @@ export default function AutopilotPage() {
 
   return (
     <SaasShellLayout sidebar={sidebar}>
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 pb-8">
         {/* Header */}
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h1 className="text-2xl font-bold text-white">🤖 Autopilot</h1>
-              <p className="text-sm text-white/50 mt-0.5">
-                Activa los servicios recurrentes de IA que se ejecutan automáticamente cada mes
-              </p>
-            </div>
-            {status && status.activeCount > 0 && (
-              <button
-                type="button"
-                disabled={running !== null}
-                onClick={() => void handleRunAll()}
-                className="rounded-xl bg-[#0084ff] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0070dd] disabled:opacity-50"
-              >
-                {running ? "Ejecutando…" : "▶ Ejecutar todo"}
-              </button>
-            )}
-          </div>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <NelvyonDsSectionHeader
+            title="🤖 Autopilot"
+            subtitle="Activa los servicios recurrentes de IA que se ejecutan automáticamente cada mes"
+          />
+          {status && status.activeCount > 0 && (
+            <NelvyonDsButton disabled={running !== null} onClick={() => void handleRunAll()}>
+              {running ? "Ejecutando…" : "▶ Ejecutar todo"}
+            </NelvyonDsButton>
+          )}
         </div>
 
         {/* KPI strip */}
         {status && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-4">
-              <p className="text-xs text-white/50 mb-1">Servicios activos</p>
-              <p className="text-2xl font-bold text-white">{status.activeCount} / 4</p>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-4">
-              <p className="text-xs text-white/50 mb-1">Entregables este mes</p>
-              <p className="text-2xl font-bold text-white">
-                {entregablesThisMonth !== null ? entregablesThisMonth : "—"}
-              </p>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-4 col-span-2 sm:col-span-1 flex items-center">
-              <a
-                href="/saas/entregables"
-                className="text-[#0084ff] text-sm hover:underline"
-              >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <KpiTile icon="🤖" label="Servicios activos" value={`${status.activeCount} / 4`} accent />
+            <KpiTile icon="📦" label="Entregables este mes" value={entregablesThisMonth !== null ? entregablesThisMonth : "—"} />
+            <div className="col-span-2 flex items-center rounded-xl border border-border bg-card px-5 py-4 sm:col-span-1">
+              <a href="/saas/entregables" className="text-sm text-primary hover:underline">
                 Ver entregables →
               </a>
             </div>
@@ -298,7 +280,7 @@ export default function AutopilotPage() {
         {toast && (
           <div
             className={`rounded-lg px-4 py-2 text-sm font-medium ${
-              toast.ok ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"
+              toast.ok ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"
             }`}
           >
             {toast.msg}
@@ -307,7 +289,11 @@ export default function AutopilotPage() {
 
         {/* Service cards */}
         {loading || !status ? (
-          <div className="text-white/40 text-sm py-12 text-center">Cargando configuración…</div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-40 animate-pulse rounded-xl bg-muted/20" />
+            ))}
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {SERVICES.map((card) => (

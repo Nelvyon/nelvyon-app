@@ -169,7 +169,7 @@ export default function SaasKnowledgeBasePage() {
     : 0;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="herramientas" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId="knowledge-base" />}>
       <div className="flex flex-col gap-6 pb-8">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4">
