@@ -1,20 +1,20 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 15 Membresías** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §26 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
+> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 16 ERP** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §27 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
 
 | Campo | Valor |
 |-------|-------|
 | **Tip prod live** | `3f10c272` |
-| **Calidad** | tsc/lint/build **PASS** · vitest **2480 passed / 4 skipped** · smoke GET 307/401 **PASS** |
-| **W3CRM** | Módulos 1–14 **DONE** · módulo 15 **Memberships DONE**: parse comisiones array, subscribe UI, isActive write, PATCH/DELETE `contacts.write`. Ver §26 |
+| **Calidad** | tsc/lint/build **PASS** · vitest **2480 passed / 4 skipped** · smoke ERP 307/401 **PASS** |
+| **W3CRM** | Módulos 1–15 **DONE** · módulo 16 **ERP DONE**: submit/approve PR HTTP+UI, reserve inventario UI, DS en 5 pantallas. Ver §27 |
 | **claimReady** | **false** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Continuar automáticamente con **módulo 16 — ERP** (`/saas/erp/purchases|inventory|manufacturing|projects|sectors`) — no esperar confirmación salvo irreversible/coste/credenciales.
-2. Validar visualmente en staging módulos 2–15 (`BLOCKED_ENVIRONMENT` en local).
+1. Continuar automáticamente con **módulo 17 — Gestión operativa** (helpdesk, prospecting, snippets, countdown, objetos, encuestas, documentos, qr, ab-testing) — no esperar confirmación salvo irreversible/coste/credenciales.
+2. Validar visualmente en staging módulos 2–16 (`BLOCKED_ENVIRONMENT` en local).
 3. Patrón: auditar → APIs reales → causas raíz → gates → commits → docs.
 4. No prod deploy UI · no flip claimReady · canary KILL.
 

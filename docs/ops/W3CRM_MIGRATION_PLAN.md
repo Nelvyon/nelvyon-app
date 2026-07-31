@@ -817,3 +817,31 @@ Pantalla: `/saas/memberships`. APIs: `GET/POST /api/saas/memberships`, `PATCH/DE
 ### 26.4 Próximo módulo
 
 **ERP** (`/saas/erp/purchases`, `inventory`, `manufacturing`, `projects`, `sectors`).
+
+---
+
+## 27. Módulo 16 — ERP (compras, inventario, manufactura, proyectos, sectores) (2026-07-31)
+
+### 27.1 Alcance real auditado
+
+Pantallas: `/saas/erp/{purchases,inventory,manufacturing,projects,sectors}`. APIs bajo `/api/saas/erp/*` (cores agency + `erp_domain_snapshots` mig 520).
+
+### 27.2 Hallazgos funcionales de causa raíz
+
+- **PRs de compra sin ciclo de vida en producto:** `create_pr` existía en API pero la UI pedía “usar POST”; además `submitPR`/`approvePR` del core **no estaban expuestos** en la ruta HTTP → cualquier PR creada quedaba en `draft` para siempre. **Fix:** actions `submit_pr`/`approve_pr` + UI crear/enviar/aprobar.
+- **`reserve` de inventario sin UI:** API real sin superficie → stock disponible no se podía reservar desde producto.
+- **Sistema visual:** las 5 pantallas usaban hex `#0084ff` / `text-red-300` / `bg-white/5` fuera del DS → migradas a `NelvyonDs*` + `KpiTile` + tokens.
+
+### 27.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| tsc / ESLint | **PASS** |
+| vitest core | **PASS** — **2480 passed / 4 skipped** |
+| build | **PASS** |
+| Smoke (8099) | 5 pages 307 · 5 APIs 401 |
+| Staging | **BLOCKED_ENVIRONMENT** |
+
+### 27.4 Próximo módulo
+
+**Gestión — herramientas operativas** (`helpdesk`, `prospecting`, `snippets`, `countdown`, `objetos`, `encuestas`, `documentos`, `qr`, `ab-testing`) por lotes.
