@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 12 Ecommerce DONE · módulo 11 Administración DONE · … · `claimReady: false`
+> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 13 LMS DONE · módulo 12 Ecommerce DONE · … · `claimReady: false`
 
 ---
 
@@ -46,8 +46,9 @@
 - [x] **2026-07-31 W3CRM Fase 2 — Analítica, informes y exportaciones:** `POST /api/saas/reports/generate` nunca persistía en `saas_reports` → historial vacío; `?tab=attribution` ignorado; tokens + `KpiTile` en `/saas/reportes` · tsc/lint/build/vitest (2468 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §21
 - [x] **2026-07-31 W3CRM Fase 2 — Administración:** team suspend/reactivate + MFA URI + mapper + edit role + auditoría page reset + tokens · tsc/lint/build/vitest (2471 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §22
 - [x] **2026-07-31 W3CRM Fase 2 — Ecommerce / Tienda:** flujo pedidos paid + detalle items + errores visibles + tokens/KpiTile · ver §23
+- [x] **2026-07-31 W3CRM Fase 2 — LMS:** progreso/certificados en listEnrollments + delete curso + publish status · ver §24
 - [ ] **P2 — validar visualmente en staging** el módulo Analítica/informes con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que módulos 2–9)
-- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** LMS — Cursos (`/saas/lms`) → … (orden en `docs/ops/W3CRM_MIGRATION_PLAN.md` §23.4)
+- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Afiliados / Fidelización (`/saas/affiliates`, `/saas/loyalty`) → … (orden en `docs/ops/W3CRM_MIGRATION_PLAN.md` §24.4)
 - [ ] **W3CRM Fase 3+:** resto de los 69 módulos por commits separados · staging antes de prod
 - [ ] **Mejora futura no bloqueante:** `/saas/citas` reutiliza el permiso RBAC `workflows.write` (no existe `citas.*` dedicado) — introducir un permiso propio sería una mejora de higiene de RBAC legítima pero fuera del alcance de esta migración visual (ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §17.5)
 - [ ] **Mejora futura no bloqueante:** `/saas/{social,publicidad,seo,reputacion}` reutilizan `contacts.read/write`/`analytics.read` en vez de permisos `marketing.*`/`ads.*` dedicados — mejora de higiene de RBAC legítima pero fuera del alcance de esta migración visual (ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §18.4)

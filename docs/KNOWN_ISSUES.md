@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 13 LMS, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/lms` — progreso/certs reales + delete. Sin `DATABASE_URL` local. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §24.3 |
+| **Próximo paso** | Validar en staging con sesión real |
+
 ### UI — verificación visual en staging pendiente (módulo 12 Ecommerce/Tienda, 2026-07-31)
 
 | Campo | Valor |

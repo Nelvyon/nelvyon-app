@@ -1,20 +1,20 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 12 Ecommerce/Tienda migrado** (flujo pedidos paid + detalle + tokens) · `docs/ops/W3CRM_MIGRATION_PLAN.md` §23 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
+> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 13 LMS migrado** (progreso/certificados reales + delete curso) · `docs/ops/W3CRM_MIGRATION_PLAN.md` §24 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
 
 | Campo | Valor |
 |-------|-------|
 | **Tip prod live** | `3f10c272` |
-| **Calidad** | tsc/lint/build **PASS** · vitest **2471 passed / 4 skipped** · store 29/29 · smoke sin sesión (307/401) **PASS** |
-| **W3CRM** | Módulos 1–11 **DONE** · módulo 12 **Ecommerce DONE**: flujo de pedidos saltaba/`paid` quedaba sin acciones; `GET orders/[id]` con items no se consumía; settings/errores silenciosos; tokens+KpiTile. Ver §23 |
+| **Calidad** | tsc/lint/build **PASS** · vitest **2472 passed / 4 skipped** · smoke GET 307/401 **PASS** |
+| **W3CRM** | Módulos 1–12 **DONE** · módulo 13 **LMS DONE**: `listEnrollments` no devolvía progreso ni `certificate_url` → barra siempre 0% y certs “perdidos”; DELETE curso + publish status + tokens/KpiTile. Ver §24 |
 | **claimReady** | **false** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Continuar automáticamente con el **módulo 13 (LMS — `/saas/lms`)**, orden confirmado · no esperar confirmación salvo irreversible/coste/credenciales.
-2. Validar visualmente en staging módulos 2–12 (`BLOCKED_ENVIRONMENT` en local).
+1. Continuar automáticamente con **módulo 14 — Afiliados / Fidelización** (`/saas/affiliates`, `/saas/loyalty`) — no esperar confirmación salvo irreversible/coste/credenciales.
+2. Validar visualmente en staging módulos 2–13 (`BLOCKED_ENVIRONMENT` en local).
 3. Patrón: auditar → APIs reales → causas raíz → gates → commits → docs.
 4. No prod deploy UI · no flip claimReady · canary KILL.
 

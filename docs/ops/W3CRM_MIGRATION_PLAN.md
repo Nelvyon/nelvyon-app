@@ -726,3 +726,33 @@ Pantalla: `/saas/store`. APIs: `GET/POST /api/saas/store/products`, `PATCH/DELET
 ### 23.4 Próximo módulo
 
 **LMS — Cursos** (`/saas/lms`).
+
+---
+
+## 24. Módulo 13 — LMS / Cursos (2026-07-31)
+
+### 24.1 Alcance real auditado
+
+Pantalla: `/saas/lms`. APIs: `GET/POST/DELETE /api/saas/lms`, modules/lessons CRUD, `GET/POST /api/saas/lms/progress`, `GET /api/saas/lms/cert/[id]`.
+
+### 24.2 Hallazgos funcionales de causa raíz
+
+- **Progreso siempre 0%:** `listEnrollments` no seleccionaba `progress_pct`/`lessons_*` (columnas reales actualizadas por `completeLesson`) → la UI siempre mostraba 0%.
+- **Certificados emitidos “desaparecían”:** no se hacía JOIN a `saas_lms_certificates`; la URL solo vivía en estado local de sesión.
+- **DELETE curso** existía en API y no en UI.
+- **Publicar** no actualizaba el estado del panel editor (prop stale).
+- Tokens + `KpiTile` + errores visibles en mutaciones.
+
+### 24.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| tsc / ESLint | **PASS** |
+| vitest | **PASS** — 2472 passed / 4 skipped (+1 listEnrollments) |
+| build | **PASS** (pendiente al cerrar docs) |
+| Smoke GET | pages 307 / APIs 401 esperado |
+| Staging | **BLOCKED_ENVIRONMENT** |
+
+### 24.4 Próximo módulo
+
+**Afiliados / Fidelización** (`/saas/affiliates`, `/saas/loyalty`) o el siguiente del grupo gestión según inventario.
