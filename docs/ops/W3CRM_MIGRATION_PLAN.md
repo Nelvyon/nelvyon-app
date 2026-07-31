@@ -1,6 +1,6 @@
 # W3CRM → NELVYON SaaS — Plan de migración (Fase 1)
 
-> **Estado:** Fase 2 en progreso — módulos 1–7 migrados (Dashboard, CRM/Pipeline, IA NELVYON, Comunicación, Automatizaciones/workflows, Calendario/citas, Marketing y redes sociales) · `claimReady: false` · sin canary · sin deploy prod
+> **Estado:** Fase 2 en progreso — módulos 1–8 migrados (Dashboard, CRM/Pipeline, IA NELVYON, Comunicación, Automatizaciones/workflows, Calendario/citas, Marketing y redes sociales, Funnels/formularios/landing pages) · `claimReady: false` · sin canary · sin deploy prod
 > **Fecha:** 2026-07-30 (última actualización de contenido: 2026-07-31)
 > **Origen legal:** ThemeForest / Envato — autor **Dexignzone** — ZIP `crm-react-next-js-admin-dashboard-template-2026-01-09-12-10-44-utc.zip` (nombre interno del paquete: `NextJs-W3CRM-v1.0-04_Dec_2024`)
 > **Extract local (fuera de build):** `.reference/w3crm/` (**gitignored**, dos niveles de ZIP anidado ya descomprimidos: `doc.zip` + `package.zip` → `package/`)
@@ -530,3 +530,54 @@ Las cuatro pantallas usaban de forma consistente utilidades Tailwind literales (
 
 - Verificación visual autenticada en staging (igual que módulos 2–6, no bloqueante para cerrar el módulo a nivel de código).
 - `/saas/social`, `/saas/publicidad` y `/saas/seo/reputation` usan permisos `contacts.read/write`/`analytics.read` en vez de un permiso `marketing.*`/`social.*`/`ads.*` dedicado — convención pre-existente heredada de antes de esta migración (mismo patrón documentado para `citas`/`calendar` con `workflows.*` en §17.5). No es un defecto de seguridad (las rutas están gateadas y aisladas por tenant), es una mejora de higiene de RBAC fuera del alcance de esta migración visual.
+
+## 19. Módulo 8 — Funnels, formularios y landing pages (2026-07-31)
+
+### 19.1 Alcance real auditado
+
+Cuatro pantallas reales: `/saas/formularios` (form builder con campos tipados, plantillas oficiales, embed script vía `/api/saas/formularios/*`), `/saas/funnels` (funnel builder con pasos, A/B testing, analytics de conversión vía `/api/saas/funnels/*`), `/saas/web-builder` (listado de páginas/landing pages) y `/saas/web-builder/[pageId]` (editor visual de secciones con preview en iframe, SEO, dominio custom, historial de versiones vía `/api/saas/web-builder/*`).
+
+### 19.2 Hallazgos funcionales de causa raíz (capacidades del backend nunca expuestas en la UI)
+
+A diferencia del módulo 7, este módulo sí presentaba brechas funcionales reales, coherentes con el patrón ya corregido en los módulos 4–6:
+
+- **`/saas/formularios`**: `saas_forms.is_active` no tenía toggle en la UI (solo se creaba en `true` por defecto y nunca se podía desactivar); `DELETE /api/saas/formularios/[formId]` existía en el backend pero no había botón de eliminar; **no existía ninguna vía para consultar `saas_form_submissions`** — los envíos de formularios públicos (`/api/forms/[formId]/submit`) se guardaban correctamente en base de datos pero eran invisibles para el tenant, sin ningún endpoint autenticado de lectura ni UI de visor de respuestas.
+- **`/saas/funnels`**: `DELETE /api/saas/funnels/[funnelId]` existía en el backend pero no había botón de eliminar en el listado.
+- **`/saas/web-builder`**: la página `/saas/web-builder/[pageId]` (editor visual completo, ya implementado) **no estaba enlazada desde el listado** — no existía ningún botón "Editar" para acceder al editor de secciones. `SaasWebBuilderService.delete()` existía en el servicio backend pero no tenía ruta `DELETE` expuesta ni botón en la UI.
+
+**Corrección — cada causa raíz resuelta en backend + frontend:**
+
+- Nuevo endpoint `GET /api/saas/formularios/[formId]/submissions` (permiso `workflows.read`, verifica ownership de tenant antes de consultar) devolviendo las respuestas más recientes con `LEFT JOIN` a `saas_contacts` para mostrar el contacto vinculado si existe.
+- Nuevo componente `SubmissionsModal` en `/saas/formularios/page.tsx`: visor de respuestas con badge de contacto vinculado y listado de pares campo/valor; botón "N respuestas" en cada tarjeta de formulario abre el modal.
+- Toggle de `isActive` en cada tarjeta de formulario (usa `PATCH` ya existente) + botón de eliminar con confirmación (usa `DELETE` ya existente).
+- Botón de eliminar funnel con confirmación en `/saas/funnels/page.tsx` (usa `DELETE /api/saas/funnels/[funnelId]` ya existente).
+- Nuevo endpoint `DELETE /api/saas/web-builder/[pageId]` (permiso `contacts.write`, llama a `SaasWebBuilderService.delete()` ya existente) + botón "Editar" (enlace a `/saas/web-builder/[pageId]`) y botón de eliminar con confirmación en `/saas/web-builder/page.tsx`.
+
+### 19.3 Hallazgo — violación sistemática de "un solo sistema visual" (mismo patrón que módulo 7, más severo)
+
+`/saas/funnels` y `/saas/web-builder/[pageId]` (el editor de secciones) usaban el patrón `DarkCard`/hex literales heredado de antes de la migración W3CRM en vez del design system semántico: `bg-[#020817]`, `border-white/[0.08]`, `text-white/30`, `text-[#0084ff]`, `text-red-400`, `bg-white/[0.04]`. `/saas/formularios` y `/saas/web-builder/page.tsx` (listado) ya usaban mayoritariamente `NelvyonDs*` con solo colores de error puntuales sin migrar.
+
+**Corrección:**
+
+- `/saas/funnels/page.tsx`: reemplazo íntegro de `DarkCard` → `NelvyonDsCard` (24 usos), KPIs migrados a `KpiTile`, todos los literales de color → tokens semánticos, `inputCls`/`labelCls` migrados.
+- `/saas/web-builder/[pageId]/page.tsx`: mismo tratamiento — toolbar, panel de secciones, panel de props y los 3 modales (Dominio/SEO/Historial) migrados a tokens semánticos. El generador `buildPreviewHtml()` (mini-HTML que se renderiza dentro del iframe de preview, mirror del `renderHtml()` del servidor) se dejó intacto deliberadamente: sus colores hardcodeados representan el diseño de la página publicada final del cliente, no el shell de NELVYON, y deben coincidir exactamente con lo que `SaasWebBuilderService.renderHtml()` genera en producción.
+- `/saas/formularios/page.tsx` y `/saas/web-builder/page.tsx`: literales de error puntuales → `destructive`; KPIs → `KpiTile`.
+
+### 19.4 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint <6 archivos modificados/nuevos>` | **PASS** (0 errores/warnings) |
+| `pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm` | **PASS** — 195 test files, 2467 passed / 4 skipped |
+| `pnpm -C apps/web build` | **PASS** — build de producción completo, incluye `/saas/{formularios,funnels,web-builder,web-builder/[pageId]}` y `/api/saas/formularios/[formId]/submissions` (nueva) |
+| Smoke de rutas (servidor productivo local, puerto 8092, sin `DATABASE_URL`) | `GET /saas/{formularios,funnels,web-builder,web-builder/[id]}` → `307` · `GET /api/saas/{formularios,funnels,web-builder}` y `/api/saas/formularios/[id]/submissions` → `401` (esperado, sin sesión, sin 500) |
+| Verificación visual autenticada en staging | **BLOCKED_ENVIRONMENT** — sin `DATABASE_URL`/sesión local; mismo hallazgo que módulos 2–7 |
+| Funcionalidad preservada | RBAC intacto (`workflows.read/write`, `contacts.read/write` — convención pre-existente), aislamiento multi-tenant verificado en el nuevo endpoint de submissions (`WHERE tenant_id = $2` antes de exponer datos), canary IA apagado, `claimReady=false` |
+| Branding/mock data | Cero — las cuatro pantallas ya eran 100% datos reales; correcciones son de causa raíz funcional + consistencia visual |
+
+### 19.5 Pendiente / riesgo conocido
+
+- Verificación visual autenticada en staging (igual que módulos 2–7, no bloqueante para cerrar el módulo a nivel de código).
+- El editor `/saas/web-builder/[pageId]` no tiene botón de eliminar página propio (solo en el listado) — decisión deliberada para no duplicar la acción destructiva en dos lugares; el listado ya cubre el caso de uso.
+- `/saas/formularios` y `/saas/funnels` usan `workflows.*`/`contacts.*` en vez de un permiso `forms.*`/`funnels.*` dedicado — mismo patrón de RBAC heredado documentado en módulos anteriores (§17.5, §18.4), mejora de higiene fuera de alcance.

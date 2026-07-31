@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 8 Funnels/formularios/landing pages, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/{formularios,funnels,web-builder,web-builder/[pageId]}` — 3 fixes funcionales de causa raíz (ver historial resuelto) + migración visual completa de `/saas/funnels` y el editor `/saas/web-builder/[pageId]` (patrón `DarkCard`/hex literales → tokens semánticos + `KpiTile`). No se pudo tomar captura autenticada en local por falta de `DATABASE_URL`, mismo bloqueo que módulos 2–7. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §19.4 — tsc/ESLint/build PASS, vitest 2467 passed/4 skipped, smoke sin sesión incl. nuevo endpoint de submissions (307/401, sin 500) |
+| **Próximo paso** | Validar visualmente en el primer despliegue a staging con sesión real (agrupar con módulos 2–7 pendientes de la misma validación) |
+
 ### UI — verificación visual en staging pendiente (módulo 7 Marketing y redes sociales, 2026-07-31)
 
 | Campo | Valor |
@@ -179,6 +188,36 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Funcional — respuestas de formularios (`saas_form_submissions`) persistidas pero invisibles para el tenant → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Funnels/formularios/landing pages, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §19.2) |
+| **Causa** | El endpoint público `/api/forms/[formId]/submit` ya insertaba correctamente cada envío en `saas_form_submissions` (con `contact_id` vinculado cuando aplica) desde antes de esta migración, pero no existía ningún endpoint autenticado de lectura ni UI para consultarlos — los datos existían en base de datos pero eran inaccesibles para el cliente del tenant. Adicionalmente, `saas_forms.is_active` (soportado por `PATCH`) y `DELETE` no tenían control en la UI. |
+| **Fix** | Nuevo `GET /api/saas/formularios/[formId]/submissions` (permiso `workflows.read`, verifica ownership de tenant antes de consultar, `LEFT JOIN saas_contacts` para mostrar el contacto vinculado) + componente `SubmissionsModal` en `/saas/formularios`. Toggle de `isActive` y botón de eliminar añadidos a cada tarjeta de formulario (usan `PATCH`/`DELETE` ya existentes). |
+| **Evidencia** | tsc/eslint/build PASS · vitest core 2467 passed/4 skipped · smoke `GET /api/saas/formularios/:id/submissions` → 401 sin sesión (sin 500) |
+| **Nota** | Sin cambios en el esquema `saas_form_submissions` ni en el endpoint público de envío — se expone lectura de datos ya persistidos, mismo patrón que el módulo Comunicación (`SaasSmsService.listRecent`) · canary IA apagado · `claimReady: false` |
+
+### Funcional — funnels sin botón de eliminar pese a soporte backend completo → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Funnels/formularios/landing pages, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §19.2) |
+| **Causa** | `DELETE /api/saas/funnels/[funnelId]` ya existía y funcionaba (borrado real con aislamiento por `tenant_id`), pero `/saas/funnels` no tenía ningún botón que lo invocara — un funnel creado por error no podía eliminarse desde la UI. |
+| **Fix** | Botón de eliminar con confirmación (`window.confirm`) en cada fila del listado de funnels, invoca el `DELETE` ya existente. |
+| **Evidencia** | tsc/eslint/build PASS · vitest core 2467 passed/4 skipped · smoke `DELETE /api/saas/funnels/:id` → 401 sin sesión (sin 500) |
+| **Nota** | Sin cambios en `SaasFunnelService` ni en el esquema — se expone una capacidad ya implementada · canary IA apagado · `claimReady: false` |
+
+### Funcional — editor de páginas web-builder implementado pero inalcanzable desde el listado, sin ruta de borrado → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Funnels/formularios/landing pages, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §19.2) |
+| **Causa** | `/saas/web-builder/[pageId]` (editor visual de secciones completo, con preview en iframe, SEO, dominio custom e historial de versiones) ya estaba implementado, pero el listado `/saas/web-builder` no tenía ningún enlace hacia él — la única forma de editar una página era navegar manualmente a la URL. Además, `SaasWebBuilderService.delete()` existía en el servicio backend pero no tenía ninguna ruta HTTP que lo expusiera. |
+| **Fix** | Botón "Editar" (enlace `<Link>` a `/saas/web-builder/[pageId]`) añadido a cada tarjeta del listado. Nuevo `DELETE /api/saas/web-builder/[pageId]` (permiso `contacts.write`, llama al método de servicio ya existente) + botón de eliminar con confirmación en el listado. |
+| **Evidencia** | tsc/eslint/build PASS · vitest core 2467 passed/4 skipped · smoke `DELETE /api/saas/web-builder/:id` → 401 sin sesión (sin 500) |
+| **Nota** | Sin cambios en `SaasWebBuilderService` — se expone una capacidad de servicio ya implementada y probada · canary IA apagado · `claimReady: false` |
 
 ### Funcional — citas sin forma de confirmar/completar/cancelar/borrar (KPI "Completadas" fijo en 0) → RESUELTO
 
