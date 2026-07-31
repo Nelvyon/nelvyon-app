@@ -357,3 +357,52 @@ Sin mocks, sin datos ficticios, misma tabla/API ya existente y ya cubierta por e
 
 - Verificación visual autenticada en staging (igual que módulo 2, no bloqueante para cerrar el módulo a nivel de código).
 - "Prompts library" y "editor de configuración de modelos" dedicados no existen como funcionalidad real — documentado en §14.1 como decisión consciente (no crear pantallas sin API real detrás), no como trabajo pendiente oculto.
+
+---
+
+## 15. Módulo 4 — Comunicación: inbox, campañas, secuencias, SMS, WhatsApp, dialer, deliverability (2026-07-31)
+
+### 15.1 Alcance real auditado
+
+Grupo `comunicacion` de `saasNav.ts` + `inbox`/`deliverability` (grupo `principal`, canal directo de comunicación). `social` (redes sociales) queda excluido de este módulo por orden explícito del usuario — corresponde al módulo 5 "Marketing y redes sociales".
+
+| Ruta | API real | Estado previo | Acción |
+|---|---|---|---|
+| `/saas/inbox` | `GET/PATCH /api/saas/inbox`, `/[id]/{messages,assign,suggest}`, `/agent` | Ya usaba `NelvyonDs*`+tokens semánticos, estados loading/error/empty completos — el módulo mejor migrado de los 7 auditados | Ajuste menor de coherencia: KPI de SLA (Abiertas/En riesgo/Incumplido) migrado de `NelvyonDsCard` manual a `KpiTile` (mismo patrón que el resto de módulos) |
+| `/saas/whatsapp` | `GET/POST /api/saas/whatsapp`, `/templates`, `/catalog` | Ya usaba `NelvyonDs*`, tabs, sync Meta, estados completos | Sin cambios — auditado, cumple el estándar |
+| `/saas/dialer` | `GET/POST /api/saas/dialer`, `/a2p`, `dialerAdvancedApi` (power/parallel/voicemail) | Ya usaba `NelvyonDs*`, 3 tabs, estados completos | Sin cambios — auditado, cumple el estándar |
+| `/saas/campanias` | `GET/POST /api/saas/campanias`, `/[id]/{launch,pause,stats,recipients}` | Sistema visual propio (`DarkCard`, `text-white`, `bg-[#0084ff]` literal) heredado de antes del fix de contraste del módulo 2; **bug de datos**: `openRate` de cada fila calculado como `(0 / sentCount) * 100` (numerador hardcodeado en `0`) pese a que el backend ya devuelve `openedCount`/`clickedCount` reales | Reescrito con `NelvyonDsCard/Badge/Button/SectionHeader`+`KpiTile`; tipo `Campania` del frontend ampliado con `openedCount`/`clickedCount`; `openRate` real por fila. `CampaniaTemplateQuickLaunch` alineado a tokens semánticos (antes texto blanco hardcodeado dentro de una card ya migrada) |
+| `/saas/sms` | `GET/POST /api/saas/sms` | Visualmente ya usaba `NelvyonDs*`, pero **con datos ficticios**: `load()` descartaba la respuesta real de la API y asignaba `campaigns: []` hardcodeado; el modal "Nueva campaña SMS" llamaba a una acción (`create_campaign`) que el backend nunca implementó (siempre 400); el modal "Enviar SMS único" enviaba `{to, body}` cuando la API espera `{to, message}` (siempre fallaba) | Ver §15.2 — fix de causa raíz de extremo a extremo (backend + API + frontend) |
+| `/saas/secuencias` | `GET/POST /api/saas/sequences`, `/[id]/{steps,enroll,reply-hook}`, `/templates` | Backend 100 % real (`SaasSequencesService`/`SaasSequenceTemplatesService`, sin mocks) pero UI con clases hardcodeadas (`bg-[#0d1117]`, `text-white/40`, etc.) desde antes del fix de contraste | Reescrito con `NelvyonDs*`+`KpiTile` (secuencias/activas/inscritos); lógica y API sin cambios — no había bugs funcionales, solo deuda visual |
+| `/saas/deliverability` | `GET/POST /api/saas/deliverability` | Backend real (`SaasDeliverabilityService`, cálculo de bounce/health score sobre `saas_campania_recipients`) pero UI hardcodeada sin manejo de errores (fallo silencioso = "Cargando métricas…" indefinido) ni feedback de éxito tras guardar IP/avanzar warm-up | Reescrito con `NelvyonDs*`+`KpiTile`; añadido manejo de error explícito y confirmación visual de éxito en ambas acciones |
+
+### 15.2 Fix funcional — historial real de SMS (causa raíz, backend + API + frontend)
+
+`backend/db/migrations/419_sms_log.sql` ya crea `saas_sms_log` (tenant-scoped, con índice por `tenant_id, created_at`) y `SaasSmsService.send()` ya escribe ahí en cada envío (`logSms`) — pero **ningún método leía esa tabla de vuelta** y la página `/saas/sms` sustituía la respuesta real de `GET /api/saas/sms` por un array vacío hardcodeado, mostrando siempre "Sin campañas SMS" sin importar el histórico real. Además existía un "Nueva campaña SMS" que llamaba a `POST /api/saas/sms` con `{action:"create_campaign"}` — acción no soportada por el backend (el `POST` solo entiende `{to, message}` para envío único o `{recipients[]}`, bloqueado) — y el modal de envío único enviaba el campo `body` en vez de `message`, por lo que ese envío tampoco funcionaba nunca.
+
+**Corrección:**
+
+1. `backend/saas/SaasSmsService.ts`: nuevo método `listRecent(tenantId, limit)` — lee `saas_sms_log` ordenado por fecha, límite acotado a `[1, 200]`.
+2. `apps/web/src/app/api/saas/sms/route.ts`: `GET` ahora incluye `messages: SaasSmsLogEntry[]` (mismo contrato de forma que `/api/saas/{whatsapp,dialer}`).
+3. `apps/web/src/app/saas/sms/page.tsx`: reescrita para consumir el historial real (Enviados/Fallidos/Total + lista, igual patrón que WhatsApp/Dialer) en vez de un concepto de "campaña" sin respaldo backend; el modal de envío único corregido a `{to, message}`.
+4. Tests añadidos: `backend/saas/__tests__/SaasSmsService.test.ts` → `listRecent` mapea filas a camelCase y acota el límite a `[1,200]`.
+
+Sin mocks nuevos — al contrario, se elimina el único mock que existía en este módulo (`campaigns: []` hardcodeado) y se expone un dato ya persistido en producción pero nunca leído.
+
+### 15.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint <archivos modificados>` | **PASS** (0 errores/warnings) |
+| `pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm` | **PASS** — 195 test files, 2467 passed / 4 skipped (incluye los 2 tests nuevos de `listRecent`) |
+| `pnpm -C apps/web build` | **PASS** — build de producción completo (312 páginas) |
+| Smoke de rutas (servidor productivo local, sin `DATABASE_URL`) | `GET /saas/{campanias,sms,secuencias,deliverability,whatsapp,dialer,inbox}` → `307` (redirect a login, esperado sin sesión) · `GET /api/saas/{campanias,sms,sequences,deliverability,whatsapp,dialer,inbox}` → `401` (esperado, sin crash 500) |
+| Verificación visual autenticada en staging | **BLOCKED_ENVIRONMENT** — sin `DATABASE_URL`/sesión local; mismo hallazgo que módulos 2 y 3 |
+| Funcionalidad preservada | RBAC (`requireSaasContext`+permiso por endpoint), multi-tenancy (`tenant_id` en cada query), canary IA apagado, `claimReady=false` — sin cambios. `campanias.launch`/`campanias.write`/`isViewer` (`SaasCan`/`SaasPermissionDenied`) intactos |
+| Branding/mock data | Cero — y se elimina el único mock real detectado en el módulo (`campaigns: []` de `/saas/sms`) |
+
+### 15.4 Pendiente / riesgo conocido
+
+- Verificación visual autenticada en staging (igual que módulos 2 y 3, no bloqueante para cerrar el módulo a nivel de código).
+- `SaasSmsService` sigue sin un concepto real de "campaña SMS" (solo envío único + log) — si el negocio necesita campañas masivas de SMS en el futuro, requiere diseño de producto explícito (tabla de campaña, audiencia, límites legales de bulk ya existentes en `sendBulk`), no se ha inventado esa funcionalidad en esta pasada.

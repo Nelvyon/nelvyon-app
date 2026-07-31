@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 4 Comunicación, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/{campanias,secuencias,deliverability}` migrados a `NelvyonDs*`+`KpiTile`; `/saas/sms` corregido de causa raíz (ver historial resuelto). No se pudo tomar captura autenticada en local por falta de `DATABASE_URL`, mismo bloqueo que módulos 2 y 3. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §15.3 — tsc/ESLint/build PASS, vitest 2467 passed/4 skipped, smoke sin sesión (307/401, sin 500) |
+| **Próximo paso** | Validar visualmente en el primer despliegue a staging con sesión real (agrupar con módulos 2 y 3 pendientes de la misma validación) |
+
 ### UI — verificación visual en staging pendiente (fix contraste oscuro `/saas/*`, 2026-07-30)
 
 | Campo | Valor |
@@ -143,6 +152,26 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Funcional — `/saas/sms` mostraba "campañas SMS" con datos descartados y acciones no implementadas → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Comunicación, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §15.2) |
+| **Causa** | (1) `load()` de `/saas/sms` descartaba la respuesta real de `GET /api/saas/sms` y asignaba `campaigns: []` hardcodeado — la lista de "campañas" nunca reflejaba datos reales. (2) El modal "Nueva campaña SMS" llamaba a `POST /api/saas/sms` con `{action:"create_campaign"}`, acción nunca implementada en `SaasSmsService` (el `POST` real solo soporta envío único o `recipients[]`) — siempre fallaba con 400. (3) El modal de envío único enviaba `{to, body}` cuando la API espera `{to, message}` — ese envío tampoco funcionaba nunca. Además, `saas_sms_log` (migración 419) ya persistía cada envío por tenant pero ningún método leía esa tabla de vuelta. |
+| **Fix** | Nuevo `SaasSmsService.listRecent(tenantId, limit)` lee `saas_sms_log`; `GET /api/saas/sms` expone `messages: SaasSmsLogEntry[]`; página reescrita para mostrar el historial real (mismo patrón que WhatsApp/Dialer) en vez del concepto de "campaña" sin respaldo backend; modal de envío único corregido a `{to, message}` |
+| **Evidencia** | `SaasSmsService.test.ts` (+2 tests `listRecent`) · tsc/eslint/build PASS · vitest 2467 passed/4 skipped · smoke `/api/saas/sms` → 401 sin sesión (sin 500) |
+| **Nota** | Sin mocks nuevos — se elimina el único mock real que existía en el módulo (`campaigns: []` hardcodeado) · canary IA apagado · `claimReady: false` |
+
+### Funcional — open rate de `/saas/campanias` siempre mostraba 0% → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Comunicación, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §15.1) |
+| **Causa** | La lista de campañas calculaba `openRate` por fila como `(0 / c.sentCount) * 100` — numerador literal `0` en el frontend, pese a que `SaasCampaniasService.getCampanias` ya devolvía `openedCount`/`clickedCount` reales por campaña; el tipo `Campania` del frontend simplemente no incluía esos campos. |
+| **Fix** | Tipo `Campania` ampliado con `openedCount`/`clickedCount`; cálculo de `openRate` corregido para usar el dato real |
+| **Evidencia** | tsc/eslint/build PASS · vitest 2467 passed/4 skipped |
+| **Nota** | Sin cambios de API — el backend ya devolvía el dato correcto, el bug era puramente de mapeo en el frontend |
 
 ### Funcional — historial de `/saas/chat` no se persistía (GDPR gap) → RESUELTO
 

@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-30** — W3CRM Fase 1 AUDIT (bloqueado en pregunta abierta) · DashForge Fase 1 AUDIT (en pausa) · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
+> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 4 Comunicación DONE (inbox/campañas/secuencias/SMS/WhatsApp/dialer/deliverability) · módulo 3 IA NELVYON DONE · módulo 2 CRM/Pipeline DONE · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
 
 ---
 
@@ -33,7 +33,9 @@
 - [x] **2026-07-31 fix:** tono de badge `"default"` inválido en pestaña Contratos de `/saas/pipeline` corregido a `"neutral"` (commit `8974e873`) — ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §13.4/§14.0
 - [x] **2026-07-31 W3CRM Fase 2 — IA NELVYON:** `/saas/{ai,autopilot}` migrados a `NelvyonDs*`+`KpiTile`; `/saas/agentes` renderiza historial real de ejecuciones; fix de causa raíz: historial de `/saas/chat` no se persistía (`SaasChatService.saveExchange` + `DELETE /api/saas/chat`); `/saas/knowledge-base` (ruta huérfana real) añadida a `saasNav.ts` + 6 locales · tsc/lint/build/vitest (2446 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §14
 - [ ] **P2 — validar visualmente en staging** el módulo IA NELVYON con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que CRM/Pipeline)
-- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Comunicación (inbox/campañas/secuencias) → Automatizaciones/workflows → Calendario/citas → … (orden completo en `docs/ops/W3CRM_MIGRATION_PLAN.md` §7) · evaluar `@fullcalendar/react` solo cuando se abra el módulo `citas`/`calendar`
+- [x] **2026-07-31 W3CRM Fase 2 — Comunicación:** `/saas/{campanias,secuencias,deliverability}` migrados a `NelvyonDs*`+`KpiTile`; `/saas/{inbox,whatsapp,dialer}` auditados y confirmados conformes (solo `inbox` recibe ajuste de coherencia); 3 bugs de causa raíz corregidos (open rate de campañas hardcodeado a 0%, "campañas SMS" con datos descartados + acción no implementada + campo `body`/`message` incorrecto, `deliverability` sin manejo de error) · nuevo `SaasSmsService.listRecent()` expone `saas_sms_log` (ya poblada, nunca leída) · tsc/lint/build/vitest (2467 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §15
+- [ ] **P2 — validar visualmente en staging** el módulo Comunicación con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que módulos 2 y 3)
+- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Automatizaciones/workflows → Calendario/citas → Marketing y redes sociales → … (orden completo en `docs/ops/W3CRM_MIGRATION_PLAN.md` §7) · evaluar `@fullcalendar/react` solo cuando se abra el módulo `citas`/`calendar`
 - [ ] **W3CRM Fase 3+:** resto de los 69 módulos por commits separados · staging antes de prod
 
 ---
