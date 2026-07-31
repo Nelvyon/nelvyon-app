@@ -104,6 +104,13 @@ describe("updatePlan", () => {
     expect(plan.priceAmount).toBe(49.99);
   });
 
+  it("can deactivate a plan via isActive", async () => {
+    const updated = makePlanRow({ is_active: false });
+    const svc = new SaasMembershipService(makeDb([[makePlanRow()], [updated]]));
+    const plan = await svc.updatePlan("t1", "plan-1", { isActive: false });
+    expect(plan.isActive).toBe(false);
+  });
+
   it("throws NOT_FOUND when plan does not exist", async () => {
     const svc = new SaasMembershipService(makeDb([[]]));
     await expect(svc.updatePlan("t1", "bad-id", { name: "x" })).rejects.toMatchObject({ code: "NOT_FOUND" });

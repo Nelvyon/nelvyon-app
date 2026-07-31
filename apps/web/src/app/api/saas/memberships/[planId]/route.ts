@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 /** PATCH /api/saas/memberships/[planId] */
 export async function PATCH(req: Request, { params }: { params: Promise<{ planId: string }> }) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "contacts.write");
     const { planId } = await params;
     const body = (await req.json()) as Record<string, unknown>;
     const svc = getSaasMembershipService();
@@ -23,6 +23,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ planId
       includes: body.includes as { courses?: string[]; communities?: string[]; features?: string[] } | undefined,
       affiliateCommissionPct: body.affiliateCommissionPct != null ? Number(body.affiliateCommissionPct) : undefined,
       stripePriceId: body.stripePriceId !== undefined ? (body.stripePriceId != null ? String(body.stripePriceId) : null) : undefined,
+      isActive: body.isActive !== undefined ? Boolean(body.isActive) : undefined,
     });
     return NextResponse.json({ plan });
   } catch (e: unknown) {
@@ -33,7 +34,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ planId
 /** DELETE /api/saas/memberships/[planId] */
 export async function DELETE(req: Request, { params }: { params: Promise<{ planId: string }> }) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "contacts.write");
     const { planId } = await params;
     await getSaasMembershipService().deletePlan(ctx.tenant.id, planId);
     return NextResponse.json({ ok: true });

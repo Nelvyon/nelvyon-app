@@ -75,6 +75,7 @@ export interface CreatePlanInput {
   includes?: Partial<MembershipPlanIncludes>;
   affiliateCommissionPct?: number;
   stripePriceId?: string | null;
+  isActive?: boolean;
 }
 
 export interface SubscribeMemberInput {
@@ -182,7 +183,11 @@ export class SaasMembershipService {
     return rowToPlan(rows[0]);
   }
 
-  async updatePlan(tenantId: string, planId: string, patch: Partial<CreatePlanInput>): Promise<MembershipPlan> {
+  async updatePlan(
+    tenantId: string,
+    planId: string,
+    patch: Partial<CreatePlanInput> & { isActive?: boolean },
+  ): Promise<MembershipPlan> {
     const existing = await this.db.query<PlanRow>(
       `SELECT * FROM saas_membership_plans WHERE id=$1 AND tenant_id=$2 LIMIT 1`,
       [planId, tenantId]
@@ -202,6 +207,7 @@ export class SaasMembershipService {
          includes                = $6::jsonb,
          affiliate_commission_pct = $7,
          stripe_price_id         = $8,
+         is_active               = $9,
          updated_at              = NOW()
        WHERE id=$1 AND tenant_id=$2
        RETURNING *`,
@@ -213,6 +219,7 @@ export class SaasMembershipService {
         JSON.stringify(includes),
         patch.affiliateCommissionPct ?? current.affiliateCommissionPct,
         patch.stripePriceId !== undefined ? patch.stripePriceId : current.stripePriceId,
+        patch.isActive !== undefined ? patch.isActive : current.isActive,
       ]
     );
     return rowToPlan(rows[0]!);
