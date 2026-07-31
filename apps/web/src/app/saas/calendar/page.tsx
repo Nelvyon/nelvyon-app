@@ -64,7 +64,8 @@ export default function SaasCalendarPage() {
   const [filterType, setFilterType] = useState<EventType | "all">("all");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [events, setEvents] = useState<CalEvent[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<EventType>("appointment");
@@ -74,6 +75,7 @@ export default function SaasCalendarPage() {
 
   const loadEvents = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     const from = `${year}-${String(month + 1).padStart(2, "0")}-01`;
     const last = getDaysInMonth(year, month);
     const to = `${year}-${String(month + 1).padStart(2, "0")}-${String(last).padStart(2, "0")}`;
@@ -82,7 +84,11 @@ export default function SaasCalendarPage() {
       if (res.ok) {
         const d = await res.json() as { events?: ApiCalEvent[] };
         setEvents((d.events ?? []).map(apiToCal));
+      } else {
+        setLoadError("No se pudieron cargar los eventos del calendario");
       }
+    } catch {
+      setLoadError("No se pudieron cargar los eventos del calendario");
     } finally {
       setLoading(false);
     }
@@ -153,6 +159,10 @@ export default function SaasCalendarPage() {
               </div>
             </div>
 
+            {loadError && (
+              <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{loadError}</p>
+            )}
+
             {/* Filters */}
             <div className="flex flex-wrap gap-2">
               <button onClick={() => setFilterType("all")} className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${filterType === "all" ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground"}`}>Todos</button>
@@ -174,7 +184,13 @@ export default function SaasCalendarPage() {
                   <button onClick={nextMonth} className="rounded-lg border border-border p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors">→</button>
                 </div>
 
-                {view === "month" && (
+                {loading ? (
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: 35 }).map((_, i) => (
+                      <div key={i} className="h-24 animate-pulse rounded-lg bg-muted/20" />
+                    ))}
+                  </div>
+                ) : view === "month" && (
                   <NelvyonDsCard className="overflow-hidden p-0">
                     {/* Day headers */}
                     <div className="grid grid-cols-7 border-b border-border bg-muted/20">
@@ -212,7 +228,17 @@ export default function SaasCalendarPage() {
                   </NelvyonDsCard>
                 )}
 
-                {view === "list" && (
+                {!loading && view === "list" && (
+                  filtered.length === 0 ? (
+                    <NelvyonDsCard className="p-16 text-center">
+                      <p className="text-5xl">📅</p>
+                      <p className="mt-4 text-lg font-semibold text-foreground">Sin eventos este mes</p>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Crea una cita, campaña o tarea para verla reflejada aquí.
+                      </p>
+                      <NelvyonDsButton className="mt-5" onClick={() => setShowCreate(true)}>+ Evento</NelvyonDsButton>
+                    </NelvyonDsCard>
+                  ) : (
                   <div className="space-y-2">
                     {filtered.sort((a, b) => a.date.localeCompare(b.date)).map(e => {
                       const cfg = TYPE_CONFIG[e.type];
@@ -238,6 +264,7 @@ export default function SaasCalendarPage() {
                       );
                     })}
                   </div>
+                  )
                 )}
               </div>
 

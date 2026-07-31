@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 6 Calendario/citas, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/citas` (fix de causa raíz — ver historial resuelto) y `/saas/calendar` (fixes de estados loading/empty/error) verificados sin sesión. No se pudo tomar captura autenticada en local por falta de `DATABASE_URL`, mismo bloqueo que módulos 2, 3, 4 y 5. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §17.4 — tsc/ESLint/build PASS, vitest 2467 passed/4 skipped, smoke sin sesión incluyendo PATCH/DELETE (307/401, sin 500) |
+| **Próximo paso** | Validar visualmente en el primer despliegue a staging con sesión real (agrupar con módulos 2, 3, 4 y 5 pendientes de la misma validación) |
+
 ### UI — verificación visual en staging pendiente (módulo 5 Automatizaciones/workflows, 2026-07-31)
 
 | Campo | Valor |
@@ -161,6 +170,16 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Funcional — citas sin forma de confirmar/completar/cancelar/borrar (KPI "Completadas" fijo en 0) → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Calendario/citas, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §17.2) |
+| **Causa** | `saas_appointments` modela 5 estados (`scheduled/confirmed/completed/cancelled/no_show`) y `/saas/citas` ya calculaba y mostraba un KPI "Completadas", pero `/api/saas/citas/route.ts` solo exponía `GET`/`POST` — ninguna cita podía transicionar nunca de `scheduled`, dejando ese KPI matemáticamente fijo en `0` para siempre, y una cita creada por error no podía eliminarse. |
+| **Fix** | Nuevo `PATCH`/`DELETE /api/saas/citas/[id]` (permiso `workflows.write`, mismo ya usado por `POST /api/saas/citas`; scoping por `tenant_id` preservado) — `PATCH` valida `status` contra los 5 valores reales del esquema y permite actualización parcial; `DELETE` es borrado real con aislamiento multi-tenant. `/saas/citas` añade botones de acción por fila (Confirmar/Completar/Cancelar/Eliminar) con manejo de error visible. |
+| **Evidencia** | tsc/eslint/build PASS · vitest core 2467 passed/4 skipped · smoke `PATCH`/`DELETE /api/saas/citas/:id` → 401 sin sesión (sin 500) |
+| **Nota** | Sin cambios en el esquema de `saas_appointments` ni en el email de confirmación SES — se expone un ciclo de vida ya modelado en el esquema, igual que el patrón de los módulos 4 y 5 · canary IA apagado · `claimReady: false` |
 
 ### Funcional — editor visual de workflows siempre publicaba la misma demo fija de 2 nodos → RESUELTO
 

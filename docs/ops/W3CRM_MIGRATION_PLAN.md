@@ -452,3 +452,46 @@ El builder clásico ya usaba en su mayoría `NelvyonDsCard/Badge/Button/SectionH
 - Verificación visual autenticada en staging (igual que módulos 2, 3 y 4, no bloqueante para cerrar el módulo a nivel de código).
 - El editor visual publica siempre en estado `draft` (comportamiento preexistente de `publishAsSaasWorkflow`, sin cambios) — el usuario debe activarlo manualmente desde `/saas/workflows` tras publicar; el mensaje de estado del editor ahora lo indica explícitamente.
 - El catálogo de acciones del editor visual queda limitado a 4 tipos por el motivo explicado en §16.2; ampliar `publishAsSaasWorkflow` para soportar más tipos (p. ej. `send_sms`, `create_task`) sería una mejora de producto legítima pero está fuera del alcance de esta migración visual (requiere decisión de negocio sobre qué configuración por defecto usar para cada tipo nuevo).
+
+## 17. Módulo 6 — Calendario y citas (2026-07-31)
+
+### 17.1 Alcance real auditado
+
+Dos pantallas reales en `saasNav.ts`: `/saas/citas` (agenda de citas 1:1 con contactos, backend `saas_appointments` vía SQL directo en `apps/web/src/app/api/saas/citas/route.ts`, incluye confirmación por email SES) y `/saas/calendar` (vista unificada de eventos: citas, campañas, tareas, deadlines, backend `SaasCalendarService`). Ambas ya eran implementaciones reales sin mocks; ninguna referenciaba directamente componentes W3CRM (`@fullcalendar/react`, reservado en HANDOVER, se evaluó pero **no se adoptó**: la vista de calendario propia con grid CSS nativo ya cubre mes/lista/filtros por tipo sin añadir una dependencia pesada de terceros por una ganancia visual marginal — decisión de no sobre-ingeniería, ver regla de excelencia del workspace).
+
+### 17.2 Hallazgo funcional de causa raíz — citas sin forma de actualizar/cerrar su ciclo de vida
+
+`saas_appointments` define `status` con 5 valores reales (`scheduled`, `confirmed`, `completed`, `cancelled`, `no_show`) y la UI de `/saas/citas` ya calculaba y mostraba un KPI "Completadas", pero:
+
+1. **`/api/saas/citas/route.ts` solo exponía `GET`/`POST`** — no existía ningún endpoint para transicionar el `status` de una cita ni para eliminarla. Como consecuencia, el KPI "Completadas" estaba matemáticamente condenado a mostrar siempre `0` (ninguna cita podía llegar nunca a ese estado desde la UI) y una cita creada por error no podía borrarse.
+2. El componente de citas no tenía ningún control (botón/selector) para invocar esas transiciones, coherente con que el backend no las soportaba.
+
+**Corrección** (defecto real de negocio, no cosmético — cierra el ciclo de vida ya modelado en el esquema pero nunca expuesto):
+
+- Nuevo `PATCH`/`DELETE /api/saas/citas/[id]` (`apps/web/src/app/api/saas/citas/[id]/route.ts`), mismo permiso `workflows.write` que ya usa `POST /api/saas/citas` (no existe un permiso `citas.*` dedicado en `saasRbac.ts`; se mantiene la convención ya establecida por el propio módulo en lugar de introducir un concepto de RBAC nuevo a mitad de una migración visual). `PATCH` valida `status` contra los 5 valores reales del esquema y permite actualización parcial (`notes`, `meetingUrl`, `startAt`, `endAt`); `DELETE` es un borrado real con `WHERE tenant_id = $2` (aislamiento multi-tenant preservado).
+- `/saas/citas` añade botones de acción por fila (Confirmar / Completar / Cancelar / Eliminar) que llaman a los nuevos endpoints, con `disabled` durante la petición en curso y mensaje de error visible ante fallo. Sin cambios en la lógica de creación ni en el email de confirmación SES.
+- Sin cambios en el esquema de `saas_appointments` (migración `505_saas_activation_reports_appointments.sql`) — el fix es 100% de exposición de transiciones de estado ya modeladas, mismo patrón que los módulos 4 (`SaasSmsService.listRecent`) y 5 (`GET/DELETE /api/saas/workflows/visual/[id]`).
+
+### 17.3 Fixes de consistencia visual
+
+- `/saas/citas`: KPIs (`Total`/`Hoy`/`Próximas`/`Completadas`) migrados de `NelvyonDsCard` manual a `KpiTile`; mensaje de error del modal de nueva cita (`bg-red-500/10 text-red-400` literal) → tokens `destructive`.
+- `/saas/calendar`: estado `loading` se recogía (`setLoading`) pero nunca se renderizaba ningún skeleton — añadido skeleton de grid 7×5 durante la carga. Vista "Lista" no mostraba ningún estado vacío cuando el mes filtrado no tenía eventos — añadido empty state con CTA "+ Evento". Fallos de red/API en la carga de eventos se ignoraban en silencio (`if (res.ok)` sin `else`) — añadido estado de error visible. El uso de color por tipo de evento (`style={{ backgroundColor: e.color }}`) en el grid mensual, vista lista y panel lateral **se mantiene intencionalmente**: es codificación de color por categoría de dato (cita/campaña/tarea/deadline), un patrón legítimo de calendarios (Google Calendar, Outlook), no un hardcodeo de tema que deba migrar a tokens semánticos del design system.
+
+### 17.4 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint <archivos modificados>` | **PASS** (0 errores/warnings) |
+| `pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm` | **PASS** — 195 test files, 2467 passed / 4 skipped |
+| `pnpm -C apps/web build` | **PASS** — build de producción completo (312 páginas), incluye `/api/saas/citas/[id]` |
+| Smoke de rutas (servidor productivo local, sin `DATABASE_URL`) | `GET /saas/{citas,calendar}` → `307` · `GET/PATCH/DELETE /api/saas/citas{,/:id}` → `401` · `GET /api/saas/calendar` → `401` (esperado, sin sesión, sin 500) |
+| Verificación visual autenticada en staging | **BLOCKED_ENVIRONMENT** — sin `DATABASE_URL`/sesión local; mismo hallazgo que módulos 2, 3, 4 y 5 |
+| Funcionalidad preservada | RBAC (`workflows.read/write`), scoping por `tenant_id` en `saas_appointments` sin cambios, email de confirmación SES intacto · canary IA apagado · `claimReady=false` |
+| Branding/mock data | Cero — ambas pantallas ya eran 100% datos reales; el fix añade capacidad de escritura real, no visual |
+
+### 17.5 Pendiente / riesgo conocido
+
+- Verificación visual autenticada en staging (igual que módulos 2–5, no bloqueante para cerrar el módulo a nivel de código).
+- No existe un permiso RBAC dedicado `citas.*`; el módulo reutiliza `workflows.read/write` desde su implementación original (antes de esta sesión). Introducir un permiso propio sería una mejora de higiene de RBAC legítima pero excede el alcance de "corregir causas raíz de defectos funcionales" de esta migración — queda documentado como mejora futura, no como defecto bloqueante.
+- `@fullcalendar/react@7.0.2` queda evaluado y descartado para este módulo (ver §17.1); si en el futuro se requiere vista de semana/día con drag-and-drop de eventos, es la librería recomendada por ser React 19-compatible.

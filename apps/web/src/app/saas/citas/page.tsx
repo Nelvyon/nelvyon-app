@@ -8,6 +8,7 @@ import {
   NelvyonDsCard,
   NelvyonDsSectionHeader,
 } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
@@ -114,7 +115,7 @@ function NewApptModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
       <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-5 text-lg font-semibold text-foreground">Nueva cita</h2>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={submit} className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Título *</label>
@@ -182,6 +183,9 @@ export default function SaasCitasPage() {
   const [showNew, setShowNew] = useState(false);
   const [view, setView] = useState<ViewMode>("upcoming");
 
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -194,6 +198,44 @@ export default function SaasCitasPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  async function changeStatus(id: string, status: ApptStatus) {
+    setUpdatingId(id);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/saas/citas/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(j.error ?? "Error al actualizar la cita");
+      }
+      await load();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al actualizar la cita");
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function removeAppointment(id: string) {
+    setUpdatingId(id);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/saas/citas/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(j.error ?? "Error al eliminar la cita");
+      }
+      await load();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al eliminar la cita");
+    } finally {
+      setUpdatingId(null);
+    }
+  }
 
   const now = new Date();
   const todayStr = now.toDateString();
@@ -225,18 +267,15 @@ export default function SaasCitasPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Total", value: stats.total },
-            { label: "Hoy", value: stats.today },
-            { label: "Próximas", value: stats.upcoming },
-            { label: "Completadas", value: stats.completed },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
+          <KpiTile icon="📅" label="Total" value={stats.total} />
+          <KpiTile icon="☀️" label="Hoy" value={stats.today} accent />
+          <KpiTile icon="⏭" label="Próximas" value={stats.upcoming} />
+          <KpiTile icon="✅" label="Completadas" value={stats.completed} />
         </div>
+
+        {actionError && (
+          <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>
+        )}
 
         {/* Filters */}
         <div className="flex gap-2">
@@ -275,7 +314,7 @@ export default function SaasCitasPage() {
           <div className="flex flex-col gap-3">
             {filtered.map((a) => (
               <NelvyonDsCard key={a.id} className="p-4">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-semibold text-foreground">{a.title}</p>
@@ -301,6 +340,49 @@ export default function SaasCitasPage() {
                       )}
                     </div>
                     {a.notes && <p className="mt-1 text-xs text-muted-foreground italic">{a.notes}</p>}
+                  </div>
+
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    {a.status !== "confirmed" && a.status !== "completed" && a.status !== "cancelled" && (
+                      <button
+                        type="button"
+                        disabled={updatingId === a.id}
+                        onClick={() => void changeStatus(a.id, "confirmed")}
+                        className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
+                      >
+                        Confirmar
+                      </button>
+                    )}
+                    {a.status !== "completed" && a.status !== "cancelled" && (
+                      <button
+                        type="button"
+                        disabled={updatingId === a.id}
+                        onClick={() => void changeStatus(a.id, "completed")}
+                        className="rounded-lg border border-success/30 bg-success/10 px-3 py-1 text-xs text-success transition-colors hover:bg-success/20 disabled:opacity-50"
+                      >
+                        ✔ Completar
+                      </button>
+                    )}
+                    {a.status !== "cancelled" && a.status !== "completed" && (
+                      <button
+                        type="button"
+                        disabled={updatingId === a.id}
+                        onClick={() => void changeStatus(a.id, "cancelled")}
+                        className="rounded-lg border border-warning/30 bg-warning/10 px-3 py-1 text-xs text-warning transition-colors hover:bg-warning/20 disabled:opacity-50"
+                      >
+                        Cancelar
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      disabled={updatingId === a.id}
+                      onClick={() => {
+                        if (window.confirm("¿Eliminar esta cita definitivamente?")) void removeAppointment(a.id);
+                      }}
+                      className="rounded-lg border border-destructive/20 px-3 py-1 text-xs text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+                    >
+                      ✕ Eliminar
+                    </button>
                   </div>
                 </div>
               </NelvyonDsCard>
