@@ -1,6 +1,6 @@
 # W3CRM → NELVYON SaaS — Plan de migración (Fase 1)
 
-> **Estado:** Fase 2 en progreso — módulos 1–9 migrados (Dashboard, CRM/Pipeline, IA NELVYON, Comunicación, Automatizaciones/workflows, Calendario/citas, Marketing y redes sociales, Funnels/formularios/landing pages, Facturación/pagos/suscripciones) · `claimReady: false` · sin canary · sin deploy prod
+> **Estado:** Fase 2 en progreso — módulos 1–10 migrados (Dashboard, CRM/Pipeline, IA NELVYON, Comunicación, Automatizaciones/workflows, Calendario/citas, Marketing y redes sociales, Funnels/formularios/landing pages, Facturación/pagos/suscripciones, Analítica/informes/exportaciones) · `claimReady: false` · sin canary · sin deploy prod
 > **Fecha:** 2026-07-30 (última actualización de contenido: 2026-07-31)
 > **Origen legal:** ThemeForest / Envato — autor **Dexignzone** — ZIP `crm-react-next-js-admin-dashboard-template-2026-01-09-12-10-44-utc.zip` (nombre interno del paquete: `NextJs-W3CRM-v1.0-04_Dec_2024`)
 > **Extract local (fuera de build):** `.reference/w3crm/` (**gitignored**, dos niveles de ZIP anidado ya descomprimidos: `doc.zip` + `package.zip` → `package/`)
@@ -628,3 +628,33 @@ Mismo patrón que módulos 4–6 y 8 — tres brechas encadenadas, todas en `/sa
 - Verificación visual autenticada en staging (igual que módulos 2–8, no bloqueante para cerrar el módulo a nivel de código).
 - Las facturas de plataforma (`saas_invoices`/`SaasInvoiceService`) no tienen generación de PDF (`pdf_url` siempre `null` — no existe lógica de generación); el historial nuevo en `/saas/billing` solo lista número/periodo/importe/estado, sin descarga. Añadir generación de PDF para este tipo de factura es una mejora futura, fuera de alcance de esta migración visual (no es una regresión: la capacidad de descarga nunca existió).
 - El botón "Cancelar suscripción" y "Pausar suscripción" actúan siempre sobre `saas_tenants.billing_status` local, independientemente de si Stripe está configurado — es intencional (debe funcionar también sin Stripe), pero si el tenant tiene una suscripción activa en Stripe, la cancelación real de cobro sigue dependiendo del portal de Stripe (botón "Gestionar facturación"); el estado local es informativo/operativo para NELVYON, no sustituye al webhook de Stripe. Documentado en el propio flujo (banner + acción "Reactivar"), no requiere cambio de código adicional en este módulo.
+
+## 21. Módulo 10 — Analítica, informes y exportaciones (2026-07-31)
+
+### 21.1 Alcance real auditado
+
+Pantalla canónica: `/saas/reportes` (también alcanzable como `/saas/reportes?tab=attribution` desde el nav `attribution`). APIs: `GET/POST /api/saas/reportes` (atribución multi-touch), `GET /api/saas/reports` (historial), `POST /api/saas/reports/generate` (ZIP ejecutivo), `GET /api/saas/reports/[reportId]/export` (descarga ZIP), `GET /api/saas/reports/[reportId]/pdf` (PDF), más UTM/`ads/alerts`/`entregables/revenue`.
+
+### 21.2 Hallazgos funcionales de causa raíz
+
+- **Historial siempre vacío:** `POST /api/saas/reports/generate` generaba el ZIP vía `SaasDashboardReportService.generateAndPublish` + artifact publisher, pero **nunca insertaba en `saas_reports`** (tabla real desde migración 505). `GET /api/saas/reports` leía esa tabla → el historial de la UI quedaba permanentemente vacío tras cada generación.
+- **`?tab=attribution` ignorado:** el nav `attribution` apunta a `/saas/reportes?tab=attribution`, pero la página no leía `searchParams` ni hacía scroll a la sección de atribución.
+- **`type` del body ignorado:** la UI ofrecía 6 tipos de informe pero el backend no usaba `type` para nombre/título. Corregido etiquetando el ZIP/historial con el tipo seleccionado; las métricas siguen siendo las reales del dashboard (un solo generador honesto, sin inventar motores por tipo).
+
+**Corrección:** `generateAndPublish` ahora acepta `{ type }`, pone `reportTitle` en el HTML, y hace `INSERT INTO saas_reports` (fail-soft si falla el INSERT: el ZIP sigue disponible). `/saas/reportes` lee `tab=attribution`, hace scroll a `#attribution`, KPIs → `KpiTile`, literales de color → tokens, enlace PDF por fila del historial, manejo de error de carga.
+
+### 21.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `tsc --noEmit` | **PASS** |
+| ESLint (archivos tocados) | **PASS** |
+| `vitest backend/saas-reports` + core | **PASS** — saas-reports 5/5 · core 2468 passed / 4 skipped |
+| `pnpm -C apps/web build` | **PASS** |
+| Smoke (puerto 8093, sin DB) | `GET /saas/reportes` y `?tab=attribution` → 307 · APIs reports/reportes/generate → 401 (sin 500) |
+| Staging autenticado | **BLOCKED_ENVIRONMENT** |
+
+### 21.4 Pendiente
+
+- Verificación visual autenticada en staging (mismo bloqueo que módulos 2–9).
+- Generadores especializados por tipo (email-only, SEO-only, etc.) serían una mejora futura; hoy un ZIP ejecutivo real con etiqueta de tipo es la capacidad honesta existente.

@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 10 Analítica/informes, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/reportes` — historial persistido en `saas_reports`, tab attribution cableado, tokens + KpiTile. Sin `DATABASE_URL` local (mismos módulos 2–9). |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §21.3 |
+| **Próximo paso** | Validar en staging con sesión real |
+
 ### UI — verificación visual en staging pendiente (módulo 9 Facturación/pagos/suscripciones, 2026-07-31)
 
 | Campo | Valor |
@@ -197,6 +206,16 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Funcional — generación de reportes ZIP nunca persistía en `saas_reports` (historial vacío) → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Analítica/informes, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §21.2) |
+| **Causa** | `generateAndPublish` publicaba el artifact ZIP pero no hacía INSERT en `saas_reports`; `GET /api/saas/reports` leía esa tabla → historial UI siempre vacío. Además `?tab=attribution` del nav no se leía. |
+| **Fix** | INSERT en `saas_reports` tras publicar (fail-soft); `type` → nombre/título; scroll a `#attribution` + `activeId` en la página. |
+| **Evidencia** | tsc/eslint/build PASS · vitest saas-reports 5/5 + core 2468 passed · smoke 307/401 |
+| **Nota** | Un solo generador de métricas de dashboard reales; el tipo etiqueta el informe (sin inventar motores por tipo) · `claimReady: false` |
 
 ### Funcional — historial de facturas de plataforma (`saas_invoices`) generado por cron pero sin ninguna UI de consulta → RESUELTO
 
