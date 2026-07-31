@@ -960,3 +960,23 @@ tsc/eslint/build **PASS** · vitest saas **PASS** · `claimReady: false`
 ### 31.4 Próximo
 
 Polish IA SaaS + **auditoría global** del SaaS completo.
+
+---
+
+## 32. Auditoría global SaaS — pasada 1 (2026-07-31)
+
+### 32.1 Hallazgos
+
+Barrido sistemático de `/saas/*`: **0 P0 absolutos**. **12 P1** corregidos:
+
+- `alert()` eliminado de integraciones / api-keys / settings
+- try/catch + feedback en compliance, playbooks, partner, SSO toggle, hubspot sync
+- LMS create: control flow multilínea (evitar regresión latente)
+
+### 32.2 Evidencia
+
+tsc/eslint/build **PASS** · commit `860a2016` · `claimReady: false` · canary **KILL**
+
+### 32.3 Próximo
+
+Pasada 2 de auditoría (duplicados DS, a11y residual, IA polish menor) hasta que no queden mejoras razonables de alto impacto; entonces informe final con evidencia. **No** flip claimReady.
