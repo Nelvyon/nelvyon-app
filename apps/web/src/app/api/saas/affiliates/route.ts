@@ -77,6 +77,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(await svc.approveCommission(tid, id));
     }
 
+    if (action === "set-link-active") {
+      const id = String(body.id ?? "").trim();
+      if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 });
+      if (typeof body.active !== "boolean") {
+        return NextResponse.json({ error: "active (boolean) requerido" }, { status: 400 });
+      }
+      return NextResponse.json(await svc.setLinkActive(tid, id, body.active));
+    }
+
     if (action === "mark-paid") {
       const id = String(body.id ?? "").trim();
       if (!id) return NextResponse.json({ error: "id requerido" }, { status: 400 });

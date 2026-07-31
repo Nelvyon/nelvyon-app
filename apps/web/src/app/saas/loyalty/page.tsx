@@ -1,224 +1,631 @@
 ﻿"use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { useCallback, useEffect, useState } from "react";
 import {
-  NelvyonDsSectionHeader,
-  NelvyonDsCard,
   NelvyonDsBadge,
   NelvyonDsButton,
+  NelvyonDsCard,
+  NelvyonDsSectionHeader,
 } from "@/design-system/components";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
+import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-interface LoyaltyTier { name: string; min_points: number }
-interface LoyaltyProgram { id: string; pointsPerEur: number; tiers: LoyaltyTier[]; active: boolean }
-interface LoyaltyBalance { id: string; contactId: string; points: number; tier: string; updatedAt: string }
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
+interface LoyaltyTier {
+  name: string;
+  min_points: number;
+}
+interface LoyaltyProgram {
+  id: string;
+  pointsPerEur: number;
+  tiers: LoyaltyTier[];
+  active: boolean;
+}
+interface LoyaltyBalance {
+  id: string;
+  contactId: string;
+  points: number;
+  tier: string;
+  updatedAt: string;
+}
+interface LoyaltyTransaction {
+  id: string;
+  contactId: string;
+  type: "earn" | "redeem" | "adjust";
+  points: number;
+  reason: string | null;
+  referenceId: string | null;
+  createdAt: string;
+}
 
 type BadgeTone = "neutral" | "primary" | "success" | "warning" | "danger";
-const TIER_TONE: Record<string, BadgeTone> = { Bronze: "warning", Silver: "neutral", Gold: "success", Platinum: "primary" };
+type Tab = "members" | "earn" | "redeem" | "settings";
+
+const TIER_TONE: Record<string, BadgeTone> = {
+  Bronze: "warning",
+  Silver: "neutral",
+  Gold: "success",
+  Platinum: "primary",
+};
+const TXN_LABEL: Record<string, string> = {
+  earn: "Ganados",
+  redeem: "Canjeados",
+  adjust: "Ajuste",
+};
+const TXN_TONE: Record<string, BadgeTone> = {
+  earn: "success",
+  redeem: "warning",
+  adjust: "primary",
+};
+
+const inputCls =
+  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none";
 
 async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
-  const r = await fetch(url, { ...opts, headers: { "Content-Type": "application/json", ...(opts?.headers ?? {}) } });
-  if (!r.ok) { const e = await r.json().catch(() => ({})) as { error?: string }; throw new Error(String(e.error ?? r.statusText)); }
+  const r = await fetch(url, {
+    ...opts,
+    headers: { "Content-Type": "application/json", ...(opts?.headers ?? {}) },
+  });
+  if (!r.ok) {
+    const e = (await r.json().catch(() => ({}))) as { error?: string };
+    throw new Error(String(e.error ?? r.statusText));
+  }
   return r.json() as Promise<T>;
 }
 
-const inputCls = "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary";
-
-// ── Main Page ────────────────────────────────────────────────────────────────
-
 export default function SaasLoyaltyPage() {
-  const [program, setProgram]   = useState<LoyaltyProgram | null>(null);
+  const [program, setProgram] = useState<LoyaltyProgram | null>(null);
   const [balances, setBalances] = useState<LoyaltyBalance[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState<string | null>(null);
-  const [tab, setTab]           = useState<"members" | "earn" | "settings">("members");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionOk, setActionOk] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>("members");
 
   const [earnContactId, setEarnContactId] = useState("");
-  const [earnAmount, setEarnAmount]       = useState("");
-  const [earnReason, setEarnReason]       = useState("");
-  const [earning, setEarning]             = useState(false);
-  const [cfgPPE, setCfgPPE]   = useState("");
-  const [saving, setSaving]   = useState(false);
+  const [earnAmount, setEarnAmount] = useState("");
+  const [earnReason, setEarnReason] = useState("");
+  const [earning, setEarning] = useState(false);
+
+  const [redeemContactId, setRedeemContactId] = useState("");
+  const [redeemPoints, setRedeemPoints] = useState("");
+  const [redeemReason, setRedeemReason] = useState("");
+  const [adjustMode, setAdjustMode] = useState(false);
+  const [redeeming, setRedeeming] = useState(false);
+
+  const [cfgPPE, setCfgPPE] = useState("");
+  const [cfgActive, setCfgActive] = useState(true);
+  const [cfgTiers, setCfgTiers] = useState<LoyaltyTier[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const [selectedContact, setSelectedContact] = useState<string | null>(null);
+  const [txns, setTxns] = useState<LoyaltyTransaction[]>([]);
+  const [txnsLoading, setTxnsLoading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const [p, b] = await Promise.all([
         apiFetch<LoyaltyProgram>("/api/saas/loyalty?resource=program"),
         apiFetch<LoyaltyBalance[]>("/api/saas/loyalty?resource=balances"),
       ]);
-      setProgram(p); setBalances(b); setCfgPPE(String(p.pointsPerEur));
-    } catch (e) { setError(String((e as Error).message)); }
-    finally { setLoading(false); }
+      setProgram(p);
+      setBalances(b);
+      setCfgPPE(String(p.pointsPerEur));
+      setCfgActive(p.active);
+      setCfgTiers(p.tiers.map((t) => ({ ...t })));
+    } catch (e) {
+      setError(String((e as Error).message));
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
-  const earn = async () => {
+  function flashOk(msg: string) {
+    setActionOk(msg);
+    setActionError(null);
+    window.setTimeout(() => setActionOk(null), 3500);
+  }
+
+  async function openMember(contactId: string) {
+    setSelectedContact(contactId);
+    setTxnsLoading(true);
+    setActionError(null);
+    try {
+      const list = await apiFetch<LoyaltyTransaction[]>(
+        `/api/saas/loyalty?resource=transactions&contactId=${encodeURIComponent(contactId)}`,
+      );
+      setTxns(list);
+    } catch (e) {
+      setActionError(String((e as Error).message));
+      setTxns([]);
+    } finally {
+      setTxnsLoading(false);
+    }
+  }
+
+  async function earn() {
     if (!earnContactId.trim() || !earnAmount.trim()) return;
     setEarning(true);
+    setActionError(null);
     try {
       await apiFetch("/api/saas/loyalty", {
         method: "POST",
-        body: JSON.stringify({ action: "earn", contactId: earnContactId.trim(), eurAmount: Number(earnAmount), reason: earnReason || undefined }),
+        body: JSON.stringify({
+          action: "earn",
+          contactId: earnContactId.trim(),
+          eurAmount: Number(earnAmount),
+          reason: earnReason || undefined,
+        }),
       });
-      setEarnContactId(""); setEarnAmount(""); setEarnReason("");
+      setEarnContactId("");
+      setEarnAmount("");
+      setEarnReason("");
+      flashOk("Puntos otorgados");
       await load();
-    } catch (e) { alert(String((e as Error).message)); }
-    finally { setEarning(false); }
-  };
+    } catch (e) {
+      setActionError(String((e as Error).message));
+    } finally {
+      setEarning(false);
+    }
+  }
 
-  const saveSettings = async () => {
-    setSaving(true);
+  async function redeemOrAdjust() {
+    if (!redeemContactId.trim() || !redeemPoints.trim()) return;
+    const pts = Number(redeemPoints);
+    if (!Number.isFinite(pts) || pts === 0) {
+      setActionError("Indica una cantidad de puntos distinta de cero");
+      return;
+    }
+    setRedeeming(true);
+    setActionError(null);
     try {
-      await apiFetch("/api/saas/loyalty", { method: "POST", body: JSON.stringify({ action: "update-program", pointsPerEur: Number(cfgPPE) }) });
+      const contactId = redeemContactId.trim();
+      if (adjustMode) {
+        await apiFetch("/api/saas/loyalty", {
+          method: "POST",
+          body: JSON.stringify({
+            action: "adjust",
+            contactId,
+            points: pts,
+            reason: redeemReason || undefined,
+          }),
+        });
+        flashOk("Saldo ajustado");
+      } else {
+        if (pts <= 0) {
+          setActionError("Los puntos a canjear deben ser positivos");
+          setRedeeming(false);
+          return;
+        }
+        await apiFetch("/api/saas/loyalty", {
+          method: "POST",
+          body: JSON.stringify({
+            action: "redeem",
+            contactId,
+            points: pts,
+            reason: redeemReason || undefined,
+          }),
+        });
+        flashOk("Puntos canjeados");
+      }
+      setRedeemContactId("");
+      setRedeemPoints("");
+      setRedeemReason("");
       await load();
-    } catch (e) { alert(String((e as Error).message)); }
-    finally { setSaving(false); }
-  };
+      if (selectedContact === contactId) {
+        await openMember(contactId);
+      }
+    } catch (e) {
+      setActionError(String((e as Error).message));
+    } finally {
+      setRedeeming(false);
+    }
+  }
 
-  if (loading) return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="loyalty" />}>
-      <p className="text-muted-foreground text-sm p-8">Cargando programa de fidelización…</p>
-    </SaasShellLayout>
-  );
-  if (error) return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="loyalty" />}>
-      <p className="text-destructive text-sm p-8">{error}</p>
-    </SaasShellLayout>
-  );
+  async function saveSettings() {
+    setSaving(true);
+    setActionError(null);
+    try {
+      const tiers = cfgTiers
+        .map((t) => ({ name: t.name.trim(), min_points: Number(t.min_points) }))
+        .filter((t) => t.name.length > 0);
+      await apiFetch("/api/saas/loyalty", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "update-program",
+          pointsPerEur: Number(cfgPPE),
+          active: cfgActive,
+          tiers,
+        }),
+      });
+      flashOk("Configuración guardada");
+      await load();
+    } catch (e) {
+      setActionError(String((e as Error).message));
+    } finally {
+      setSaving(false);
+    }
+  }
 
-  const p = program!;
+  if (loading) {
+    return (
+      <SaasShellLayout sidebar={<SaasSidebar activeId="loyalty" />}>
+        <p className="p-8 text-sm text-muted-foreground" role="status">
+          Cargando programa de fidelización…
+        </p>
+      </SaasShellLayout>
+    );
+  }
+
+  if (error || !program) {
+    return (
+      <SaasShellLayout sidebar={<SaasSidebar activeId="loyalty" />}>
+        <div className="flex flex-col gap-4 p-8">
+          <p className="text-sm text-destructive" role="alert">
+            {error ?? "No se pudo cargar el programa"}
+          </p>
+          <NelvyonDsButton variant="secondary" onClick={() => void load()}>
+            Reintentar
+          </NelvyonDsButton>
+        </div>
+      </SaasShellLayout>
+    );
+  }
+
+  const p = program;
   const tierCount: Record<string, number> = {};
-  for (const b of balances) { tierCount[b.tier] = (tierCount[b.tier] ?? 0) + 1; }
-  const totalPoints = balances.reduce((s, b) => s + b.points, 0);
+  for (const b of balances) {
+    tierCount[b.tier] = (tierCount[b.tier] ?? 0) + 1;
+  }
+  const totalPoints = balances.reduce((sum, b) => sum + b.points, 0);
+  const goldIdx = p.tiers.findIndex((t) => t.name === "Gold");
+  const goldPlus =
+    goldIdx >= 0
+      ? Object.entries(tierCount)
+          .filter(([t]) => p.tiers.findIndex((x) => x.name === t) >= goldIdx)
+          .reduce((sum, [, n]) => sum + n, 0)
+      : 0;
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="loyalty" />}>
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader
           title="Programa de Fidelización"
-          subtitle={`${p.pointsPerEur} punto(s)/€ · ${p.tiers.length} niveles · ${balances.length} miembros`}
+          subtitle={`${p.pointsPerEur} punto(s)/€ · ${p.tiers.length} niveles · ${balances.length} miembros · ${p.active ? "Activo" : "Pausado"}`}
         />
 
-        {/* KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <NelvyonDsCard className="p-4">
-            <p className="text-xs text-muted-foreground">Total miembros</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{balances.length}</p>
-          </NelvyonDsCard>
-          <NelvyonDsCard className="p-4">
-            <p className="text-xs text-muted-foreground">Puntos emitidos</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{totalPoints.toLocaleString()}</p>
-          </NelvyonDsCard>
-          {p.tiers.slice(1, 3).map(tier => {
-            const minIdx = p.tiers.findIndex(x => x.name === tier.name);
-            const count = Object.entries(tierCount).filter(([t]) => p.tiers.findIndex(x => x.name === t) >= minIdx).reduce((s, [, n]) => s + n, 0);
-            return (
-              <NelvyonDsCard key={tier.name} className="p-4">
-                <p className="text-xs text-muted-foreground">{tier.name}+</p>
-                <p className="text-2xl font-bold text-foreground mt-1">{count}</p>
-              </NelvyonDsCard>
-            );
-          })}
+        {actionError && (
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
+            {actionError}
+          </p>
+        )}
+        {actionOk && (
+          <p className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary" role="status">
+            {actionOk}
+          </p>
+        )}
+
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <KpiTile icon="👥" label="Miembros" value={balances.length} />
+          <KpiTile icon="⭐" label="Puntos emitidos" value={totalPoints.toLocaleString("es-ES")} />
+          <KpiTile icon="🥇" label="Gold+" value={goldPlus} accent />
+          <KpiTile icon="📐" label="Puntos / €" value={p.pointsPerEur} />
         </div>
 
-        {/* Tier legend */}
-        <div className="flex gap-2 flex-wrap">
-          {p.tiers.map(tier => (
-            <NelvyonDsCard key={tier.name} className="p-3 flex items-center gap-2">
+        <div className="flex flex-wrap gap-2">
+          {p.tiers.map((tier) => (
+            <NelvyonDsCard key={tier.name} className="flex items-center gap-2 p-3">
               <NelvyonDsBadge tone={TIER_TONE[tier.name] ?? "neutral"}>{tier.name}</NelvyonDsBadge>
-              <span className="text-xs text-muted-foreground">≥ {tier.min_points.toLocaleString()} pts</span>
-              <span className="text-xs font-semibold text-foreground ml-2">{tierCount[tier.name] ?? 0}</span>
+              <span className="text-xs text-muted-foreground">≥ {tier.min_points.toLocaleString("es-ES")} pts</span>
+              <span className="ml-2 text-xs font-semibold text-foreground">{tierCount[tier.name] ?? 0}</span>
             </NelvyonDsCard>
           ))}
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 border-b border-border">
-          {(["members", "earn", "settings"] as const).map(t => (
-            <button key={t}
+        <div className="flex flex-wrap gap-2 border-b border-border" role="tablist" aria-label="Secciones fidelización">
+          {(["members", "earn", "redeem", "settings"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === t ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+              className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                tab === t
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {t === "members" ? "Miembros" : t === "earn" ? "Dar puntos" : "Configuración"}
+              {t === "members"
+                ? "Miembros"
+                : t === "earn"
+                  ? "Dar puntos"
+                  : t === "redeem"
+                    ? "Canjear / Ajustar"
+                    : "Configuración"}
             </button>
           ))}
         </div>
 
-        {/* MEMBERS */}
         {tab === "members" && (
           <div className="flex flex-col gap-2">
             {balances.length === 0 ? (
-              <NelvyonDsCard className="p-8 text-center text-muted-foreground text-sm">
-                Sin miembros todavía. Usa &quot;Dar puntos&quot; para enrolar el primer contacto.
+              <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">
+                Sin miembros todavía. Usa «Dar puntos» para enrolar el primer contacto.
               </NelvyonDsCard>
             ) : (
-              balances.map(b => (
-                <NelvyonDsCard key={b.id || b.contactId} className="p-4 flex items-center gap-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-mono text-foreground truncate">{b.contactId}</p>
+              balances.map((b) => (
+                <NelvyonDsCard key={b.id || b.contactId} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+                  <button
+                    type="button"
+                    className="min-w-0 flex-1 text-left"
+                    onClick={() => void openMember(b.contactId)}
+                    aria-expanded={selectedContact === b.contactId}
+                  >
+                    <p className="truncate font-mono text-sm text-foreground">{b.contactId}</p>
                     <p className="text-xs text-muted-foreground">
                       Actualizado: {new Date(b.updatedAt).toLocaleDateString("es-ES")}
+                      {" · "}
+                      Ver historial
                     </p>
-                  </div>
+                  </button>
                   <NelvyonDsBadge tone={TIER_TONE[b.tier] ?? "neutral"}>{b.tier}</NelvyonDsBadge>
-                  <span className="text-sm font-semibold text-foreground shrink-0">{b.points.toLocaleString()} pts</span>
+                  <span className="shrink-0 text-sm font-semibold text-foreground">
+                    {b.points.toLocaleString("es-ES")} pts
+                  </span>
                 </NelvyonDsCard>
               ))
+            )}
+
+            {selectedContact && (
+              <NelvyonDsCard className="mt-2 p-4">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Historial · <span className="font-mono text-xs">{selectedContact}</span>
+                  </h3>
+                  <NelvyonDsButton size="sm" variant="ghost" onClick={() => setSelectedContact(null)}>
+                    Cerrar
+                  </NelvyonDsButton>
+                </div>
+                {txnsLoading ? (
+                  <p className="text-sm text-muted-foreground" role="status">
+                    Cargando transacciones…
+                  </p>
+                ) : txns.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Sin transacciones.</p>
+                ) : (
+                  <ul className="flex flex-col gap-2">
+                    {txns.map((t) => (
+                      <li
+                        key={t.id}
+                        className="flex flex-wrap items-center gap-2 rounded-lg border border-border/60 px-3 py-2 text-xs"
+                      >
+                        <NelvyonDsBadge tone={TXN_TONE[t.type] ?? "neutral"}>
+                          {TXN_LABEL[t.type] ?? t.type}
+                        </NelvyonDsBadge>
+                        <span className="font-semibold text-foreground">
+                          {t.points > 0 && t.type !== "redeem" ? "+" : ""}
+                          {t.type === "redeem" ? -Math.abs(t.points) : t.points} pts
+                        </span>
+                        <span className="text-muted-foreground">
+                          {new Date(t.createdAt).toLocaleString("es-ES")}
+                        </span>
+                        {t.reason && <span className="text-muted-foreground">· {t.reason}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </NelvyonDsCard>
             )}
           </div>
         )}
 
-        {/* EARN */}
         {tab === "earn" && (
-          <NelvyonDsCard className="p-6 flex flex-col gap-4 max-w-md">
+          <NelvyonDsCard className="flex max-w-md flex-col gap-4 p-6">
             <p className="text-sm font-medium text-foreground">Dar puntos a un contacto</p>
+            {!p.active && (
+              <p className="text-xs text-muted-foreground">
+                El programa está pausado; puedes seguir otorgando puntos, pero conviene reactivarlo en Configuración.
+              </p>
+            )}
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Contact ID (UUID)</p>
-              <input className={inputCls} value={earnContactId} onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEarnContactId(ev.target.value)} placeholder="uuid-del-contacto" />
+              <label htmlFor="earn-contact" className="mb-1 block text-xs text-muted-foreground">
+                Contact ID (UUID)
+              </label>
+              <input
+                id="earn-contact"
+                className={inputCls}
+                value={earnContactId}
+                onChange={(ev) => setEarnContactId(ev.target.value)}
+                placeholder="uuid-del-contacto"
+              />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Importe en euros (€)</p>
-              <input className={inputCls} type="number" value={earnAmount} onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEarnAmount(ev.target.value)} placeholder="150" min="0.01" step="0.01" />
-              {earnAmount && p && (
-                <p className="text-xs text-muted-foreground mt-1">= {Math.floor(Number(earnAmount) * p.pointsPerEur)} puntos</p>
+              <label htmlFor="earn-amount" className="mb-1 block text-xs text-muted-foreground">
+                Importe en euros (€)
+              </label>
+              <input
+                id="earn-amount"
+                className={inputCls}
+                type="number"
+                value={earnAmount}
+                onChange={(ev) => setEarnAmount(ev.target.value)}
+                placeholder="150"
+                min={0.01}
+                step={0.01}
+              />
+              {earnAmount && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  = {Math.floor(Number(earnAmount) * p.pointsPerEur)} puntos
+                </p>
               )}
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Razón (opcional)</p>
-              <input className={inputCls} value={earnReason} onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEarnReason(ev.target.value)} placeholder="Compra #12345" />
+              <label htmlFor="earn-reason" className="mb-1 block text-xs text-muted-foreground">
+                Razón (opcional)
+              </label>
+              <input
+                id="earn-reason"
+                className={inputCls}
+                value={earnReason}
+                onChange={(ev) => setEarnReason(ev.target.value)}
+                placeholder="Compra #12345"
+              />
             </div>
-            <NelvyonDsButton onClick={earn} disabled={earning || !earnContactId.trim() || !earnAmount.trim()} variant="primary">
+            <NelvyonDsButton
+              onClick={() => void earn()}
+              disabled={earning || !earnContactId.trim() || !earnAmount.trim()}
+              variant="primary"
+            >
               {earning ? "Procesando…" : "Dar puntos"}
             </NelvyonDsButton>
           </NelvyonDsCard>
         )}
 
-        {/* SETTINGS */}
-        {tab === "settings" && (
-          <NelvyonDsCard className="p-6 flex flex-col gap-6 max-w-sm">
+        {tab === "redeem" && (
+          <NelvyonDsCard className="flex max-w-md flex-col gap-4 p-6">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setAdjustMode(false)}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${
+                  !adjustMode
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground"
+                }`}
+              >
+                Canjear
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdjustMode(true)}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${
+                  adjustMode
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground"
+                }`}
+              >
+                Ajuste manual
+              </button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {adjustMode
+                ? "Suma o resta puntos (usa valores negativos para restar). El saldo no baja de 0."
+                : "Resta puntos del saldo del contacto (canje de recompensa)."}
+            </p>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Puntos por euro</p>
-              <input className={inputCls} type="number" value={cfgPPE} onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setCfgPPE(ev.target.value)} min="0.1" step="0.1" />
+              <label htmlFor="rdm-contact" className="mb-1 block text-xs text-muted-foreground">
+                Contact ID (UUID)
+              </label>
+              <input
+                id="rdm-contact"
+                className={inputCls}
+                value={redeemContactId}
+                onChange={(ev) => setRedeemContactId(ev.target.value)}
+                placeholder="uuid-del-contacto"
+              />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground mb-2">Niveles</p>
-              <div className="flex flex-col gap-1">
-                {p.tiers.map(t => (
-                  <div key={t.name} className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <NelvyonDsBadge tone={TIER_TONE[t.name] ?? "neutral"}>{t.name}</NelvyonDsBadge>
-                    <span>desde {t.min_points.toLocaleString()} puntos</span>
+              <label htmlFor="rdm-pts" className="mb-1 block text-xs text-muted-foreground">
+                Puntos {adjustMode ? "(±)" : "a canjear"}
+              </label>
+              <input
+                id="rdm-pts"
+                className={inputCls}
+                type="number"
+                value={redeemPoints}
+                onChange={(ev) => setRedeemPoints(ev.target.value)}
+                placeholder={adjustMode ? "-50" : "100"}
+                step={1}
+              />
+            </div>
+            <div>
+              <label htmlFor="rdm-reason" className="mb-1 block text-xs text-muted-foreground">
+                Razón (opcional)
+              </label>
+              <input
+                id="rdm-reason"
+                className={inputCls}
+                value={redeemReason}
+                onChange={(ev) => setRedeemReason(ev.target.value)}
+                placeholder={adjustMode ? "Corrección inventario" : "Cupón 10€"}
+              />
+            </div>
+            <NelvyonDsButton
+              onClick={() => void redeemOrAdjust()}
+              disabled={redeeming || !redeemContactId.trim() || !redeemPoints.trim()}
+              variant="primary"
+            >
+              {redeeming ? "Procesando…" : adjustMode ? "Aplicar ajuste" : "Canjear puntos"}
+            </NelvyonDsButton>
+          </NelvyonDsCard>
+        )}
+
+        {tab === "settings" && (
+          <NelvyonDsCard className="flex max-w-md flex-col gap-6 p-6">
+            <div>
+              <label htmlFor="cfg-ppe" className="mb-1 block text-xs text-muted-foreground">
+                Puntos por euro
+              </label>
+              <input
+                id="cfg-ppe"
+                className={inputCls}
+                type="number"
+                value={cfgPPE}
+                onChange={(ev) => setCfgPPE(ev.target.value)}
+                min={0.1}
+                step={0.1}
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <input
+                type="checkbox"
+                checked={cfgActive}
+                onChange={(ev) => setCfgActive(ev.target.checked)}
+                className="rounded border-border"
+              />
+              Programa activo
+            </label>
+            <div>
+              <p className="mb-2 text-sm font-medium text-foreground">Niveles</p>
+              <div className="flex flex-col gap-2">
+                {cfgTiers.map((tier, idx) => (
+                  <div key={`${tier.name}-${idx}`} className="flex gap-2">
+                    <input
+                      className={inputCls}
+                      value={tier.name}
+                      onChange={(ev) => {
+                        const next = [...cfgTiers];
+                        next[idx] = { ...tier, name: ev.target.value };
+                        setCfgTiers(next);
+                      }}
+                      aria-label={`Nombre nivel ${idx + 1}`}
+                    />
+                    <input
+                      className={`${inputCls} w-28 shrink-0`}
+                      type="number"
+                      min={0}
+                      value={tier.min_points}
+                      onChange={(ev) => {
+                        const next = [...cfgTiers];
+                        next[idx] = { ...tier, min_points: Number(ev.target.value) || 0 };
+                        setCfgTiers(next);
+                      }}
+                      aria-label={`Mínimo puntos nivel ${idx + 1}`}
+                    />
                   </div>
                 ))}
               </div>
             </div>
-            <NelvyonDsButton onClick={saveSettings} disabled={saving} variant="primary">
+            <NelvyonDsButton onClick={() => void saveSettings()} disabled={saving} variant="primary">
               {saving ? "Guardando…" : "Guardar configuración"}
             </NelvyonDsButton>
           </NelvyonDsCard>

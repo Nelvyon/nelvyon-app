@@ -82,6 +82,29 @@ describe("SaasAffiliateService", () => {
     await expect(svc.generateLink(TENANT, "  ")).rejects.toThrow("affiliateUserId");
   });
 
+  it("rejects invalid commissionPct on updateProgram", async () => {
+    await expect(svc.updateProgram(TENANT, { commissionPct: 150 })).rejects.toMatchObject({ code: "VALIDATION" });
+  });
+
+  it("rejects invalid cookieDays on updateProgram", async () => {
+    await expect(svc.updateProgram(TENANT, { cookieDays: 0 })).rejects.toMatchObject({ code: "VALIDATION" });
+  });
+
+  it("pauses an affiliate link via setLinkActive", async () => {
+    vi.mocked(db.query).mockResolvedValueOnce([makeLink({ active: false })]);
+    const link = await svc.setLinkActive(TENANT, "link-1", false);
+    expect(link.active).toBe(false);
+    expect(vi.mocked(db.query)).toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE saas_affiliate_links SET active"),
+      [TENANT, "link-1", false],
+    );
+  });
+
+  it("throws NOT_FOUND when setLinkActive misses", async () => {
+    vi.mocked(db.query).mockResolvedValueOnce([]);
+    await expect(svc.setLinkActive(TENANT, "ghost", false)).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
   // ── listLinks ─────────────────────────────────────────────────────────────
 
   it("lists links for tenant", async () => {
@@ -197,6 +220,25 @@ describe("SaasLoyaltyService", () => {
       .mockResolvedValueOnce([makeLoyaltyProgram({ points_per_eur: "2.50" })]);  // UPDATE
     const p = await svc.updateProgram(TENANT, { pointsPerEur: 2.5 });
     expect(p.pointsPerEur).toBe(2.5);
+  });
+
+  it("rejects invalid pointsPerEur", async () => {
+    await expect(svc.updateProgram(TENANT, { pointsPerEur: 0 })).rejects.toMatchObject({ code: "VALIDATION" });
+  });
+
+  it("rejects empty tiers array", async () => {
+    await expect(svc.updateProgram(TENANT, { tiers: [] })).rejects.toMatchObject({ code: "VALIDATION" });
+  });
+
+  it("adjusts points with GREATEST floor at zero", async () => {
+    vi.mocked(db.query)
+      .mockResolvedValueOnce([makeLoyaltyProgram()])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([makeBalance(0, "Bronze")])
+      .mockResolvedValueOnce([]);
+    const b = await svc.adjustPoints(TENANT, CONTACT, -999, "corrección");
+    expect(b.points).toBe(0);
   });
 
   // ── earnPoints ────────────────────────────────────────────────────────────

@@ -106,6 +106,16 @@ export class SaasAffiliateService {
   }
 
   async updateProgram(tenantId: string, patch: { commissionPct?: number; cookieDays?: number; active?: boolean }): Promise<AffiliateProgram> {
+    if (patch.commissionPct !== undefined) {
+      if (!Number.isFinite(patch.commissionPct) || patch.commissionPct < 0 || patch.commissionPct > 100) {
+        throw new SaasAffiliateError("commissionPct debe estar entre 0 y 100", "VALIDATION");
+      }
+    }
+    if (patch.cookieDays !== undefined) {
+      if (!Number.isInteger(patch.cookieDays) || patch.cookieDays < 1 || patch.cookieDays > 3650) {
+        throw new SaasAffiliateError("cookieDays debe ser un entero entre 1 y 3650", "VALIDATION");
+      }
+    }
     await this.getOrCreateProgram(tenantId);
     const sets: string[] = ["updated_at=NOW()"];
     const params: unknown[] = [tenantId];
@@ -142,6 +152,17 @@ export class SaasAffiliateService {
       [tenantId],
     );
     return rows.map(mapLink);
+  }
+
+  /** Pause or reactivate an affiliate link (column `active` existed without a write path). */
+  async setLinkActive(tenantId: string, linkId: string, active: boolean): Promise<AffiliateLink> {
+    const rows = await this.db.query<Record<string, unknown>>(
+      `UPDATE saas_affiliate_links SET active=$3
+       WHERE tenant_id=$1 AND id=$2::uuid RETURNING *`,
+      [tenantId, linkId, active],
+    );
+    if (!rows[0]) throw new SaasAffiliateError("Enlace no encontrado", "NOT_FOUND");
+    return mapLink(rows[0]);
   }
 
   // ── Tracking ──────────────────────────────────────────────────────────────

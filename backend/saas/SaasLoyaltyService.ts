@@ -100,6 +100,24 @@ export class SaasLoyaltyService {
   }
 
   async updateProgram(tenantId: string, patch: { pointsPerEur?: number; tiers?: LoyaltyTier[]; active?: boolean }): Promise<LoyaltyProgram> {
+    if (patch.pointsPerEur !== undefined) {
+      if (!Number.isFinite(patch.pointsPerEur) || patch.pointsPerEur <= 0 || patch.pointsPerEur > 1000) {
+        throw new SaasLoyaltyError("pointsPerEur debe ser un número > 0 y ≤ 1000", "VALIDATION");
+      }
+    }
+    if (patch.tiers !== undefined) {
+      if (!Array.isArray(patch.tiers) || patch.tiers.length === 0) {
+        throw new SaasLoyaltyError("tiers debe ser un array no vacío", "VALIDATION");
+      }
+      for (const t of patch.tiers) {
+        if (!t || typeof t.name !== "string" || !t.name.trim()) {
+          throw new SaasLoyaltyError("cada tier requiere name", "VALIDATION");
+        }
+        if (!Number.isFinite(t.min_points) || t.min_points < 0) {
+          throw new SaasLoyaltyError("cada tier requiere min_points ≥ 0", "VALIDATION");
+        }
+      }
+    }
     await this.getOrCreateProgram(tenantId);
     const sets: string[] = ["updated_at=NOW()"];
     const params: unknown[] = [tenantId];
