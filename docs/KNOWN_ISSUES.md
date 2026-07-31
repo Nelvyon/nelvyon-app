@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 11 Administración, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/{team,auditoria,security,subcuentas}` — suspend/reactivate, MFA URI, tokens. Sin `DATABASE_URL` local (mismos módulos 2–10). |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §22.3 |
+| **Próximo paso** | Validar en staging con sesión real |
+
 ### UI — verificación visual en staging pendiente (módulo 10 Analítica/informes, 2026-07-31)
 
 | Campo | Valor |

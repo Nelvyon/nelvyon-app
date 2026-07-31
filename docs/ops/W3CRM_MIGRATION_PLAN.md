@@ -658,3 +658,40 @@ Pantalla canónica: `/saas/reportes` (también alcanzable como `/saas/reportes?t
 
 - Verificación visual autenticada en staging (mismo bloqueo que módulos 2–9).
 - Generadores especializados por tipo (email-only, SEO-only, etc.) serían una mejora futura; hoy un ZIP ejecutivo real con etiqueta de tipo es la capacidad honesta existente.
+
+---
+
+## 22. Módulo 11 — Administración, usuarios, roles, permisos y auditoría (2026-07-31)
+
+### 22.1 Alcance real auditado
+
+Pantallas: `/saas/team`, `/saas/auditoria`, `/saas/security`, `/saas/subcuentas`. (`/saas/settings` queda para el módulo de configuración general posterior.) APIs: `GET/POST/PATCH/DELETE /api/saas/team`, `GET/POST /api/saas/audit` (+ `/unified`), `GET/POST /api/saas/security`, `GET/POST /api/saas/sso`, `GET/POST /api/saas/subcuentas`.
+
+### 22.2 Hallazgos funcionales de causa raíz
+
+- **Suspender/Activar equipo roto:** la UI llamaba `POST /api/saas/team` con `{action:"suspend"|"reactivate"}`, pero `POST` solo invita y `PATCH` solo conocía `suspend` (sin `reactivate`). El optimismo local mentía el estado; al recargar volvía al real. **Fix:** `SaasTeamService.reactivate` (active si `user_id`, invited si no) + `PATCH` action `reactivate` + UI usa `PATCH` y re-carga tras éxito; `suspend` ya no permite owners.
+- **Shape API↔UI desalineado:** el backend devuelve `lastActiveAt`/`name` nullable sin `avatar`; la UI esperaba `lastActive`/`avatar` → iniciales rotas y “última actividad” siempre “Nunca”. **Fix:** mapper `mapApiMember` en la página.
+- **Editar rol era un no-op:** `setSelectedMember` sin modal. **Fix:** modal de rol vía `PATCH {id, role}` (capacidad ya real).
+- **MFA TOTP sin URI:** `mfa-begin` devolvía `provisioningUri` pero la UI lo descartaba y `getMfaStatus` nunca lo reexpone → imposible enrolar. **Fix:** capturar URI de la respuesta POST y mostrarla/copiar.
+- **Auditoría: filtros en página >1:** cambiar filtro recargaba con el `offset` viejo. **Fix:** reset a página 1 al cambiar filtros.
+- **Tokens visuales:** literales `amber/purple/blue/green/#0084ff/white` en team/security/subcuentas → tokens semánticos.
+
+### 22.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `tsc --noEmit` | **PASS** |
+| ESLint (archivos tocados) | **PASS** |
+| `vitest` core + `SaasTeamService` | **PASS** — 2471 passed / 4 skipped (+3 tests reactivate/suspend) |
+| `pnpm -C apps/web build` | **PASS** |
+| Smoke (puerto 8094, sin DB) | pages 307 · APIs 401 · PATCH team / POST security 401 (sin 500) |
+| Staging autenticado | **BLOCKED_ENVIRONMENT** |
+
+### 22.4 Pendiente
+
+- Verificación visual autenticada en staging (mismo bloqueo que módulos 2–10).
+- `/saas/settings` (configuración general) queda fuera de este módulo a propósito.
+
+### 22.5 Próximo módulo
+
+**Ecommerce / Tienda Online** (`/saas/store`) según orden confirmado por el usuario.
