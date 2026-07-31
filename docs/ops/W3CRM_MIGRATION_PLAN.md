@@ -1041,7 +1041,7 @@ Mantener `claimReady: false`. No prod deploy UI. Staging visual opcional con DB.
 | Build producción | **PASS** (warnings webpack preexistentes) |
 | HTTP smoke `:8105` | pages **307** · APIs **401** · health **200** |
 | Playwright SaaS (Chromium, mocked APIs) | **270 passed / 79 failed** (14.6m) — UI contract; no live DB |
-| a11y landmarks | **6/7** PASS; dashboard fallaba por loading bloqueante → fix aplicado (rebuild en curso) |
+| a11y landmarks | **7/7 PASS** post-fix dashboard loading (auth+a11y 14/14) | `docs/evidence/cert-final-a11y-postfix.txt` |
 | Lighthouse `/login` | perf **100** · a11y **88** · best-practices **96** (exit tooling EPERM residual) |
 | Staging autenticado / multi-tenant live | **BLOCKED_ENVIRONMENT** (`DATABASE_URL` / `STAGING_BASE_URL` unset) |
 | claimReady / canary | **false** / **KILL** |
