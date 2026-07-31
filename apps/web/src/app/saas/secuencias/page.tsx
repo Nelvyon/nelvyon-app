@@ -3,7 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { NelvyonDsCard } from "@/design-system/components";
+import {
+  NelvyonDsBadge,
+  NelvyonDsButton,
+  NelvyonDsCard,
+  NelvyonDsSectionHeader,
+} from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+import { SaasEmptyState } from "@/features/saas-shell/components/SaasEmptyState";
 import type { SaasSequence, SaasSequenceStep } from "@nelvyon/saas";
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -12,16 +19,28 @@ type SequenceWithSteps = SaasSequence & { steps?: SaasSequenceStep[] };
 
 // ── Step type badge ──────────────────────────────────────────────────────────
 
+const STEP_TYPE_LABELS: Record<string, string> = {
+  email: "Email",
+  sms: "SMS",
+  whatsapp: "WhatsApp",
+  wait: "Espera",
+  branch: "Bifurcación",
+};
+
+const STEP_TYPE_TONE: Record<string, "primary" | "success" | "warning" | "neutral"> = {
+  email: "primary",
+  sms: "success",
+  whatsapp: "success",
+  wait: "warning",
+  branch: "neutral",
+};
+
 function StepTypeBadge({ type }: { type: string }) {
-  const map: Record<string, { label: string; cls: string }> = {
-    email: { label: "Email", cls: "bg-blue-500/20 text-blue-300" },
-    sms: { label: "SMS", cls: "bg-green-500/20 text-green-300" },
-    whatsapp: { label: "WhatsApp", cls: "bg-emerald-500/20 text-emerald-300" },
-    wait:  { label: "Espera", cls: "bg-yellow-500/20 text-yellow-300" },
-    branch:{ label: "Bifurcación", cls: "bg-purple-500/20 text-purple-300" },
-  };
-  const { label, cls } = map[type] ?? { label: type, cls: "bg-gray-500/20 text-gray-300" };
-  return <span className={`px-2 py-0.5 rounded text-xs font-medium ${cls}`}>{label}</span>;
+  return (
+    <NelvyonDsBadge tone={STEP_TYPE_TONE[type] ?? "neutral"}>
+      {STEP_TYPE_LABELS[type] ?? type}
+    </NelvyonDsBadge>
+  );
 }
 
 // ── Enroll Modal ─────────────────────────────────────────────────────────────
@@ -89,58 +108,51 @@ function EnrollModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#0d1117] border border-white/10 rounded-xl p-6 w-full max-w-md shadow-2xl">
-        <h3 className="text-white font-semibold mb-1">Inscribir contacto</h3>
-        <p className="text-sm text-white/50 mb-4">Secuencia: <span className="text-white/80">{sequence.name}</span></p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        <h3 className="mb-1 font-semibold text-foreground">Inscribir contacto</h3>
+        <p className="mb-4 text-sm text-muted-foreground">Secuencia: <span className="text-foreground">{sequence.name}</span></p>
         <input
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/30 mb-3"
+          className="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
           placeholder="Buscar por nombre, email o empresa…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <div className="max-h-48 overflow-y-auto rounded-lg border border-white/10 mb-3">
+        <div className="mb-3 max-h-48 overflow-y-auto rounded-lg border border-border">
           {searching ? (
-            <p className="px-3 py-4 text-xs text-white/40">Buscando contactos…</p>
+            <p className="px-3 py-4 text-xs text-muted-foreground">Buscando contactos…</p>
           ) : contacts.length === 0 ? (
-            <p className="px-3 py-4 text-xs text-white/40">Sin contactos — prueba otra búsqueda</p>
+            <p className="px-3 py-4 text-xs text-muted-foreground">Sin contactos — prueba otra búsqueda</p>
           ) : (
             contacts.map((c) => (
               <button
                 key={c.id}
                 type="button"
                 onClick={() => setSelected(c)}
-                className={`w-full text-left px-3 py-2 text-sm border-b border-white/5 last:border-0 transition ${
-                  selected?.id === c.id ? "bg-[#0084ff]/20 text-white" : "text-white/70 hover:bg-white/5"
+                className={`w-full border-b border-border/60 px-3 py-2 text-left text-sm last:border-0 transition ${
+                  selected?.id === c.id ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-muted/20"
                 }`}
               >
                 <span className="font-medium">{c.name}</span>
-                {c.email && <span className="block text-xs text-white/40">{c.email}</span>}
+                {c.email && <span className="block text-xs text-muted-foreground">{c.email}</span>}
               </button>
             ))
           )}
         </div>
         {selected && (
-          <p className="text-xs text-white/50 mb-3">
-            Seleccionado: <span className="text-white/80">{selected.name}</span>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Seleccionado: <span className="text-foreground">{selected.name}</span>
             {selected.email ? ` · ${selected.email}` : ""}
           </p>
         )}
-        {err && <p className="text-red-400 text-xs mb-3">{err}</p>}
+        {err && <p className="mb-3 text-xs text-destructive">{err}</p>}
         <div className="flex gap-2">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2 rounded-lg border border-white/10 text-white/60 text-sm hover:bg-white/5 transition"
-          >
+          <NelvyonDsButton type="button" variant="ghost" className="flex-1" onClick={onClose}>
             Cancelar
-          </button>
-          <button
-            onClick={handleEnroll}
-            disabled={loading || !selected}
-            className="flex-1 py-2 rounded-lg bg-[#0084ff] text-white text-sm font-medium hover:bg-blue-500 transition disabled:opacity-50"
-          >
+          </NelvyonDsButton>
+          <NelvyonDsButton type="button" className="flex-1" disabled={loading || !selected} onClick={handleEnroll}>
             {loading ? "Inscribiendo…" : "Inscribir"}
-          </button>
+          </NelvyonDsButton>
         </div>
       </div>
     </div>
@@ -202,17 +214,18 @@ function AddStepModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#0d1117] border border-white/10 rounded-xl p-6 w-full max-w-md shadow-2xl">
-        <h3 className="text-white font-semibold mb-4">Añadir paso</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        <h3 className="mb-4 font-semibold text-foreground">Añadir paso</h3>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="mb-4 flex flex-wrap gap-2">
           {(["email", "sms", "whatsapp", "wait", "branch"] as const).map((t) => (
             <button
               key={t}
+              type="button"
               onClick={() => setStepType(t)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                stepType === t ? "bg-[#0084ff] text-white" : "bg-white/5 text-white/50 hover:bg-white/10"
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                stepType === t ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"
               }`}
             >
               {t === "email" ? "Email" : t === "sms" ? "SMS" : t === "whatsapp" ? "WhatsApp" : t === "wait" ? "Espera" : "Bifurcación"}
@@ -220,14 +233,14 @@ function AddStepModal({
           ))}
         </div>
 
-        <div className="flex gap-2 mb-3">
+        <div className="mb-3 flex gap-2">
           <div className="flex-1">
-            <label className="block text-xs text-white/50 mb-1">Retraso (días)</label>
-            <input className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm" type="number" value={delayDays} onChange={(e) => setDelayDays(e.target.value)} />
+            <label className="mb-1 block text-xs text-muted-foreground">Retraso (días)</label>
+            <input className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground" type="number" value={delayDays} onChange={(e) => setDelayDays(e.target.value)} />
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-white/50 mb-1">Retraso (horas)</label>
-            <input className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm" type="number" value={delayHours} onChange={(e) => setDelayHours(e.target.value)} />
+            <label className="mb-1 block text-xs text-muted-foreground">Retraso (horas)</label>
+            <input className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground" type="number" value={delayHours} onChange={(e) => setDelayHours(e.target.value)} />
           </div>
         </div>
 
@@ -235,14 +248,14 @@ function AddStepModal({
           <>
             {stepType === "email" && (
               <input
-                className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm mb-2 placeholder-white/30"
+                className="mb-2 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground"
                 placeholder="Asunto del email"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
               />
             )}
             <textarea
-              className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm mb-2 placeholder-white/30 h-24 resize-none"
+              className="mb-2 h-24 w-full resize-none rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground"
               placeholder={stepType === "email" ? "Cuerpo HTML del email" : "Mensaje SMS / WhatsApp"}
               value={bodyHtml}
               onChange={(e) => setBodyHtml(e.target.value)}
@@ -251,11 +264,11 @@ function AddStepModal({
         )}
 
         {stepType === "branch" && (
-          <div className="space-y-2 mb-2">
+          <div className="mb-2 space-y-2">
             <div>
-              <label className="block text-xs text-white/50 mb-1">Condición</label>
+              <label className="mb-1 block text-xs text-muted-foreground">Condición</label>
               <select
-                className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm"
+                className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground"
                 value={branchField}
                 onChange={(e) => setBranchField(e.target.value as "replied" | "opened" | "clicked")}
               >
@@ -266,23 +279,23 @@ function AddStepModal({
             </div>
             <div className="flex gap-2">
               <div className="flex-1">
-                <label className="block text-xs text-green-400 mb-1">Sí → posición</label>
-                <input className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm" type="number" placeholder="auto" value={branchYes} onChange={(e) => setBranchYes(e.target.value)} />
+                <label className="mb-1 block text-xs text-success">Sí → posición</label>
+                <input className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground" type="number" placeholder="auto" value={branchYes} onChange={(e) => setBranchYes(e.target.value)} />
               </div>
               <div className="flex-1">
-                <label className="block text-xs text-red-400 mb-1">No → posición</label>
-                <input className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white text-sm" type="number" placeholder="auto" value={branchNo} onChange={(e) => setBranchNo(e.target.value)} />
+                <label className="mb-1 block text-xs text-destructive">No → posición</label>
+                <input className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground" type="number" placeholder="auto" value={branchNo} onChange={(e) => setBranchNo(e.target.value)} />
               </div>
             </div>
           </div>
         )}
 
-        {err && <p className="text-red-400 text-xs mb-3">{err}</p>}
-        <div className="flex gap-2 mt-4">
-          <button onClick={onClose} className="flex-1 py-2 rounded-lg border border-white/10 text-white/60 text-sm hover:bg-white/5 transition">Cancelar</button>
-          <button onClick={handleAdd} disabled={loading} className="flex-1 py-2 rounded-lg bg-[#0084ff] text-white text-sm font-medium hover:bg-blue-500 transition disabled:opacity-50">
+        {err && <p className="mb-3 text-xs text-destructive">{err}</p>}
+        <div className="mt-4 flex gap-2">
+          <NelvyonDsButton type="button" variant="ghost" className="flex-1" onClick={onClose}>Cancelar</NelvyonDsButton>
+          <NelvyonDsButton type="button" className="flex-1" disabled={loading} onClick={handleAdd}>
             {loading ? "Añadiendo…" : "Añadir paso"}
-          </button>
+          </NelvyonDsButton>
         </div>
       </div>
     </div>
@@ -320,23 +333,23 @@ function CreateSequenceModal({ onClose, onCreated }: { onClose: () => void; onCr
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#0d1117] border border-white/10 rounded-xl p-6 w-full max-w-sm shadow-2xl">
-        <h3 className="text-white font-semibold mb-4">Nueva secuencia</h3>
-        <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/30 mb-3" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
-        <input className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/30 mb-3" placeholder="Descripción (opcional)" value={description} onChange={(e) => setDescription(e.target.value)} />
-        <select className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm mb-3" value={trigger} onChange={(e) => setTrigger(e.target.value)}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        <h3 className="mb-4 font-semibold text-foreground">Nueva secuencia</h3>
+        <input className="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
+        <input className="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" placeholder="Descripción (opcional)" value={description} onChange={(e) => setDescription(e.target.value)} />
+        <select className="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" value={trigger} onChange={(e) => setTrigger(e.target.value)}>
           <option value="manual">Manual</option>
           <option value="contact_created">Al crear contacto</option>
           <option value="form_submitted">Al enviar formulario</option>
           <option value="tag_added">Al añadir etiqueta</option>
         </select>
-        {err && <p className="text-red-400 text-xs mb-3">{err}</p>}
+        {err && <p className="mb-3 text-xs text-destructive">{err}</p>}
         <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 py-2 rounded-lg border border-white/10 text-white/60 text-sm hover:bg-white/5 transition">Cancelar</button>
-          <button onClick={handleCreate} disabled={loading} className="flex-1 py-2 rounded-lg bg-[#0084ff] text-white text-sm font-medium hover:bg-blue-500 transition disabled:opacity-50">
+          <NelvyonDsButton type="button" variant="ghost" className="flex-1" onClick={onClose}>Cancelar</NelvyonDsButton>
+          <NelvyonDsButton type="button" className="flex-1" disabled={loading} onClick={handleCreate}>
             {loading ? "Creando…" : "Crear"}
-          </button>
+          </NelvyonDsButton>
         </div>
       </div>
     </div>
@@ -389,39 +402,41 @@ function SequenceTemplateGallery({ onImported }: { onImported: () => void }) {
   }
 
   return (
-    <NelvyonDsCard className="mb-6 overflow-hidden border-[#0084ff]/20">
+    <NelvyonDsCard className="overflow-hidden border-primary/20">
       <button type="button" className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left" onClick={() => setExpanded((v) => !v)}>
         <div>
-          <p className="font-semibold text-white">Plantillas oficiales Nelvyon</p>
-          <p className="text-xs text-white/50">{templates.length} secuencias drip — email, SMS y WhatsApp</p>
+          <p className="font-semibold text-foreground">Plantillas oficiales Nelvyon</p>
+          <p className="text-xs text-muted-foreground">{templates.length} secuencias drip — email, SMS y WhatsApp</p>
         </div>
-        <span className="text-white/40">{expanded ? "▲" : "▼"}</span>
+        <span className="text-muted-foreground">{expanded ? "▲" : "▼"}</span>
       </button>
       {expanded && (
-        <div className="border-t border-white/10 px-5 pb-5 pt-4">
+        <div className="border-t border-border px-5 pb-5 pt-4">
           <div className="mb-4 flex flex-wrap gap-2">
             {(Object.keys(SEQ_CAT_LABELS) as Array<SeqTemplateCategory | "all">).map((c) => (
               <button key={c} type="button" onClick={() => setCategory(c)}
-                className={`rounded-full px-3 py-1 text-xs ${category === c ? "bg-[#0084ff]/30 text-[#0084ff]" : "border border-white/10 text-white/50"}`}>
+                className={`rounded-full px-3 py-1 text-xs ${category === c ? "bg-primary/20 text-primary" : "border border-border text-muted-foreground"}`}>
                 {SEQ_CAT_LABELS[c]}
               </button>
             ))}
           </div>
           {loading ? (
-            <p className="text-white/40 text-sm py-4">Cargando plantillas…</p>
+            <p className="py-4 text-sm text-muted-foreground">Cargando plantillas…</p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
               {templates.map((t) => (
-                <div key={t.id} className="rounded-xl border border-white/10 p-4">
-                  <p className="text-sm font-medium text-white">{t.name}</p>
-                  <p className="mt-1 text-xs text-white/40 line-clamp-2">{t.description}</p>
-                  <button
+                <div key={t.id} className="rounded-xl border border-border p-4">
+                  <p className="text-sm font-medium text-foreground">{t.name}</p>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{t.description}</p>
+                  <NelvyonDsButton
+                    variant="ghost"
+                    size="sm"
+                    className="mt-3 w-full"
                     disabled={importing === t.id}
                     onClick={() => void importTpl(t.id)}
-                    className="mt-3 w-full rounded-lg bg-[#0084ff]/20 py-2 text-xs font-medium text-[#0084ff] hover:bg-[#0084ff]/30 disabled:opacity-50"
                   >
                     {importing === t.id ? "Importando…" : "Importar secuencia"}
-                  </button>
+                  </NelvyonDsButton>
                 </div>
               ))}
             </div>
@@ -493,79 +508,95 @@ export default function SecuenciasPage() {
     form_submitted: "Formulario", tag_added: "Etiqueta",
   };
 
+  const SEQ_STATUS_TONE: Record<string, "success" | "warning" | "neutral"> = {
+    active: "success", paused: "warning", archived: "neutral",
+  };
+  const SEQ_STATUS_LABELS: Record<string, string> = {
+    active: "Activa", paused: "Pausada", archived: "Archivada",
+  };
+
+  const totalEnrollments = sequences.reduce((sum, s) => sum + s.enrollmentsCount, 0);
+  const activeCount = sequences.filter((s) => s.status === "active").length;
+
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="secuencias" />}>
-      <div className="p-6 max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Secuencias</h1>
-            <p className="text-white/50 text-sm mt-1">Secuencias drip multicanal — plantillas oficiales Nelvyon</p>
-          </div>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="px-4 py-2 bg-[#0084ff] text-white rounded-lg text-sm font-medium hover:bg-blue-500 transition"
-          >
-            + Nueva secuencia
-          </button>
+      <div className="flex flex-col gap-6 pb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <NelvyonDsSectionHeader
+            title="Secuencias"
+            subtitle="Secuencias drip multicanal — plantillas oficiales Nelvyon"
+          />
+          <NelvyonDsButton onClick={() => setShowCreate(true)}>+ Nueva secuencia</NelvyonDsButton>
         </div>
 
         {err && (
-          <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{err}</div>
+          <NelvyonDsCard className="border-destructive/30 bg-destructive/5 p-4">
+            <p className="text-sm text-destructive">⚠ {err}</p>
+          </NelvyonDsCard>
         )}
 
-        {sesConfigured === false ? (
-          <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-            <strong>Email no configurado:</strong> las variables{" "}
-            <code className="text-amber-200">SES_FROM_EMAIL</code> y{" "}
-            <code className="text-amber-200">SES_ACCESS_KEY_ID</code> no están definidas en el servidor.
-            Los pasos de email en secuencias fallarán hasta configurar SES (y salir de sandbox si aplica).
-          </div>
-        ) : null}
+        {sesConfigured === false && (
+          <NelvyonDsCard className="border-warning/30 bg-warning/5 p-4">
+            <p className="text-sm text-warning">
+              <strong>Email no configurado:</strong> las variables{" "}
+              <code className="text-xs">SES_FROM_EMAIL</code> y{" "}
+              <code className="text-xs">SES_ACCESS_KEY_ID</code> no están definidas en el servidor.
+              Los pasos de email en secuencias fallarán hasta configurar SES (y salir de sandbox si aplica).
+            </p>
+          </NelvyonDsCard>
+        )}
 
-        {twilioConfigured === false ? (
-          <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-            <strong>SMS no configurado:</strong> define{" "}
-            <code className="text-amber-200">TWILIO_ACCOUNT_SID</code>,{" "}
-            <code className="text-amber-200">TWILIO_AUTH_TOKEN</code> y{" "}
-            <code className="text-amber-200">TWILIO_FROM_NUMBER</code>. Los pasos SMS fallarán hasta configurar Twilio.
-          </div>
-        ) : null}
+        {twilioConfigured === false && (
+          <NelvyonDsCard className="border-warning/30 bg-warning/5 p-4">
+            <p className="text-sm text-warning">
+              <strong>SMS no configurado:</strong> define{" "}
+              <code className="text-xs">TWILIO_ACCOUNT_SID</code>,{" "}
+              <code className="text-xs">TWILIO_AUTH_TOKEN</code> y{" "}
+              <code className="text-xs">TWILIO_FROM_NUMBER</code>. Los pasos SMS fallarán hasta configurar Twilio.
+            </p>
+          </NelvyonDsCard>
+        )}
+
+        {/* KPIs */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <KpiTile icon="🔄" label="Secuencias" value={sequences.length} />
+          <KpiTile icon="⚡" label="Activas" value={activeCount} accent />
+          <KpiTile icon="👥" label="Inscritos" value={totalEnrollments} />
+        </div>
 
         <SequenceTemplateGallery onImported={() => void loadSequences()} />
 
         {loading ? (
-          <div className="text-center py-16 text-white/40">Cargando secuencias…</div>
-        ) : sequences.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-white/40 text-lg">Sin secuencias aún</p>
-            <p className="text-white/30 text-sm mt-2">Crea tu primera secuencia de email drip con branching automático</p>
-            <button onClick={() => setShowCreate(true)} className="mt-4 px-4 py-2 bg-[#0084ff] text-white rounded-lg text-sm font-medium hover:bg-blue-500 transition">
-              Crear secuencia
-            </button>
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/30" />
+            ))}
           </div>
+        ) : sequences.length === 0 ? (
+          <SaasEmptyState
+            title="Sin secuencias aún"
+            description="Crea tu primera secuencia de email drip con branching automático, o importa una plantilla oficial arriba."
+            action={<NelvyonDsButton onClick={() => setShowCreate(true)}>Crear secuencia</NelvyonDsButton>}
+          />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Sequence list */}
             <div className="space-y-3">
               {sequences.map((seq) => (
                 <NelvyonDsCard
                   key={seq.id}
-                  className={`cursor-pointer transition hover:border-white/20 ${selected?.id === seq.id ? "border-[#0084ff]/50 bg-[#0084ff]/5" : ""}`}
+                  className={`cursor-pointer transition hover:border-primary/40 ${selected?.id === seq.id ? "border-primary/50 bg-primary/5" : ""}`}
                   onClick={() => void loadDetail(seq)}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-white font-medium text-sm truncate">{seq.name}</p>
-                      {seq.description && <p className="text-white/40 text-xs mt-0.5 truncate">{seq.description}</p>}
-                      <p className="text-white/30 text-xs mt-1">{TRIGGER_LABELS[seq.triggerType] ?? seq.triggerType} · {seq.enrollmentsCount} inscritos</p>
+                      <p className="truncate text-sm font-medium text-foreground">{seq.name}</p>
+                      {seq.description && <p className="mt-0.5 truncate text-xs text-muted-foreground">{seq.description}</p>}
+                      <p className="mt-1 text-xs text-muted-foreground">{TRIGGER_LABELS[seq.triggerType] ?? seq.triggerType} · {seq.enrollmentsCount} inscritos</p>
                     </div>
-                    <span className={`shrink-0 px-2 py-0.5 rounded text-xs font-medium ${
-                      seq.status === "active" ? "bg-green-500/20 text-green-400"
-                      : seq.status === "paused" ? "bg-yellow-500/20 text-yellow-300"
-                      : "bg-gray-500/20 text-gray-400"
-                    }`}>
-                      {seq.status === "active" ? "Activa" : seq.status === "paused" ? "Pausada" : "Archivada"}
-                    </span>
+                    <NelvyonDsBadge tone={SEQ_STATUS_TONE[seq.status] ?? "neutral"}>
+                      {SEQ_STATUS_LABELS[seq.status] ?? seq.status}
+                    </NelvyonDsBadge>
                   </div>
                 </NelvyonDsCard>
               ))}
@@ -575,57 +606,48 @@ export default function SecuenciasPage() {
             {selected ? (
               <div className="lg:col-span-2">
                 <NelvyonDsCard>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-white font-semibold">{selected.name}</h2>
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="font-semibold text-foreground">{selected.name}</h2>
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => setEnrollTarget(selected)}
-                        className="px-3 py-1.5 bg-[#0084ff]/20 text-[#0084ff] rounded-lg text-xs font-medium hover:bg-[#0084ff]/30 transition"
-                      >
+                      <NelvyonDsButton variant="ghost" size="sm" onClick={() => setEnrollTarget(selected)}>
                         Inscribir contacto
-                      </button>
-                      <button
+                      </NelvyonDsButton>
+                      <NelvyonDsButton
+                        variant={selected.status === "active" ? "secondary" : "primary"}
+                        size="sm"
                         onClick={() => void toggleStatus(selected)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                          selected.status === "active"
-                            ? "bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30"
-                            : "bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                        }`}
                       >
                         {selected.status === "active" ? "Pausar" : "Activar"}
-                      </button>
+                      </NelvyonDsButton>
                     </div>
                   </div>
 
                   {/* Steps */}
-                  <div className="space-y-2 mb-4">
+                  <div className="mb-4 space-y-2">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-white/60 text-xs font-medium uppercase tracking-wide">Pasos ({selected.steps?.length ?? 0})</h3>
-                      <button
-                        onClick={() => setShowAddStep(true)}
-                        className="text-xs text-[#0084ff] hover:underline"
-                      >
+                      <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Pasos ({selected.steps?.length ?? 0})</h3>
+                      <button type="button" onClick={() => setShowAddStep(true)} className="text-xs text-primary hover:underline">
                         + Añadir paso
                       </button>
                     </div>
                     {!selected.steps?.length ? (
-                      <p className="text-white/30 text-sm py-4 text-center">Sin pasos — añade email, espera o bifurcación</p>
+                      <p className="py-4 text-center text-sm text-muted-foreground">Sin pasos — añade email, espera o bifurcación</p>
                     ) : (
                       selected.steps.map((step, i) => (
-                        <div key={step.id} className="flex items-start gap-3 p-3 rounded-lg bg-white/3 border border-white/5">
-                          <div className="shrink-0 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white/50 text-xs">{i}</div>
+                        <div key={step.id} className="flex items-start gap-3 rounded-lg border border-border bg-muted/10 p-3">
+                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">{i}</div>
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="mb-1 flex items-center gap-2">
                               <StepTypeBadge type={step.stepType} />
                               {(step.delayDays > 0 || step.delayHours > 0) && (
-                                <span className="text-white/30 text-xs">+{step.delayDays}d {step.delayHours}h</span>
+                                <span className="text-xs text-muted-foreground">+{step.delayDays}d {step.delayHours}h</span>
                               )}
                             </div>
                             {step.stepType === "email" && (
-                              <p className="text-white/70 text-sm truncate">{step.subject || "(sin asunto)"}</p>
+                              <p className="truncate text-sm text-foreground">{step.subject || "(sin asunto)"}</p>
                             )}
                             {step.stepType === "branch" && step.branchCondition && (
-                              <p className="text-white/50 text-xs">
+                              <p className="text-xs text-muted-foreground">
                                 Si {step.branchCondition.field} → pos {step.branchYesPosition ?? "auto"} | No → pos {step.branchNoPosition ?? "auto"}
                               </p>
                             )}
@@ -637,7 +659,7 @@ export default function SecuenciasPage() {
                 </NelvyonDsCard>
               </div>
             ) : (
-              <div className="lg:col-span-2 flex items-center justify-center text-white/30 text-sm">
+              <div className="flex items-center justify-center text-sm text-muted-foreground lg:col-span-2">
                 Selecciona una secuencia para editar sus pasos
               </div>
             )}

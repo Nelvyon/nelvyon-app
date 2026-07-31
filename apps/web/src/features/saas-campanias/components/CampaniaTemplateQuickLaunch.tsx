@@ -39,29 +39,29 @@ export function CampaniaTemplateQuickLaunch({ onCreated }: { onCreated: () => vo
   }
 
   return (
-    <NelvyonDsCard className="mb-4 overflow-hidden border-[#0084ff]/20">
+    <NelvyonDsCard className="overflow-hidden border-primary/20">
       <button type="button" className="flex w-full items-center justify-between px-4 py-3 text-left" onClick={() => setExpanded((v) => !v)}>
         <div>
-          <p className="text-sm font-semibold text-white">Plantillas campaña Nelvyon</p>
-          <p className="text-xs text-white/50">Importa en 1 clic ({presets.length} plantillas)</p>
+          <p className="text-sm font-semibold text-foreground">Plantillas campaña Nelvyon</p>
+          <p className="text-xs text-muted-foreground">Importa en 1 clic ({presets.length} plantillas)</p>
         </div>
-        <span className="text-white/40">{expanded ? "▲" : "▼"}</span>
+        <span className="text-muted-foreground">{expanded ? "▲" : "▼"}</span>
       </button>
       {expanded && (
-        <div className="border-t border-white/10 px-4 pb-4 pt-3">
+        <div className="border-t border-border px-4 pb-4 pt-3">
           <div className="mb-3 flex flex-wrap gap-2">
             {GROUPS.map((g) => (
               <button key={g.id} type="button" onClick={() => setGroup(g.id)}
-                className={`rounded-full px-3 py-1 text-xs ${group === g.id ? "bg-[#0084ff]/30 text-[#0084ff]" : "text-white/50 border border-white/10"}`}>
+                className={`rounded-full px-3 py-1 text-xs ${group === g.id ? "bg-primary/20 text-primary" : "border border-border text-muted-foreground"}`}>
                 {g.label}
               </button>
             ))}
           </div>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {presets.map((p) => (
-              <div key={p.id} className="rounded-lg border border-white/10 p-3">
-                <p className="text-sm font-medium text-white">{p.label}</p>
-                <p className="text-xs text-white/40 mt-0.5">{p.tagline}</p>
+              <div key={p.id} className="rounded-lg border border-border p-3">
+                <p className="text-sm font-medium text-foreground">{p.label}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{p.tagline}</p>
                 <NelvyonDsButton className="mt-2 w-full" size="sm" disabled={importing === p.id}
                   onClick={() => void importPreset(p)}>
                   {importing === p.id ? "…" : "Usar plantilla"}

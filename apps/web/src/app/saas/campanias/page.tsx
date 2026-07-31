@@ -2,13 +2,20 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { NelvyonDsStatusDot } from "@/design-system/components";
+import {
+  NelvyonDsBadge,
+  NelvyonDsButton,
+  NelvyonDsCard,
+  NelvyonDsSectionHeader,
+  NelvyonDsStatusDot,
+} from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
 import { SaasCan } from "@/features/saas-shell/components/SaasCan";
 import { CampaniaTemplateQuickLaunch } from "@/features/saas-campanias/components/CampaniaTemplateQuickLaunch";
 import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { SaasShellLayout, DarkCard } from "@/features/saas-shell/components/SaasShellLayout";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 import { EmailEditor } from "@/features/email-editor/EmailEditor";
 
@@ -28,9 +35,29 @@ type Campania = {
   scheduledAt: string | null;
   totalRecipients: number;
   sentCount: number;
+  openedCount: number;
+  clickedCount: number;
 };
 type CampaniaStats = { total_recipients: number; sent_count: number; opened_count: number; clicked_count: number; open_rate: number; click_rate: number };
 type Recipient = { id: string; contactId: string; status: "pending" | "sent" | "opened" | "clicked" | "bounced" | "unsubscribed"; sentAt: string | null };
+
+const STATUS_TONE: Record<CampaniaStatus, "neutral" | "primary" | "success" | "warning" | "danger"> = {
+  draft: "neutral",
+  scheduled: "warning",
+  running: "primary",
+  paused: "warning",
+  completed: "success",
+  cancelled: "danger",
+};
+
+const STATUS_LABELS: Record<CampaniaStatus, string> = {
+  draft: "Borrador",
+  scheduled: "Programada",
+  running: "En curso",
+  paused: "Pausada",
+  completed: "Completada",
+  cancelled: "Cancelada",
+};
 
 const CHANNELS: CampaniaChannel[] = ["email", "sms", "notification", "multi"];
 
@@ -228,207 +255,241 @@ export default function SaasCampaniasPage() {
     await loadCampanias();
   }
 
+  const kpis = useMemo(() => {
+    const active = campanias.filter((c) => c.status === "running" || c.status === "scheduled").length;
+    const totalSent = campanias.reduce((sum, c) => sum + c.sentCount, 0);
+    const totalOpened = campanias.reduce((sum, c) => sum + c.openedCount, 0);
+    const avgOpenRate = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0;
+    return { total: campanias.length, active, totalSent, avgOpenRate };
+  }, [campanias]);
+
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="campanias" tenantCompany={tenantCompany || undefined} tenantPlan={tenantPlan} />}>
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">Marketing</p>
-        <h1 className="mt-1 text-2xl font-bold text-white">Campañas</h1>
-        <p className="mt-0.5 text-sm text-white/40">Motor multicanal email, SMS y notificación</p>
-      </div>
-          {isViewer ? (
-            <SaasPermissionDenied message="Tu rol es solo lectura. Puedes ver campañas, pero no crear ni lanzar." />
-          ) : null}
-          {sesConfigured === false ? (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-              <strong>Email no configurado:</strong> las variables <code className="text-amber-200">SES_FROM_EMAIL</code> y <code className="text-amber-200">SES_ACCESS_KEY_ID</code> no están definidas en el servidor. Los envíos de email fallarán hasta que las configures en Railway.
-            </div>
-          ) : null}
-          {twilioConfigured === false ? (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-              <strong>SMS no configurado:</strong> define <code className="text-amber-200">TWILIO_ACCOUNT_SID</code>, <code className="text-amber-200">TWILIO_AUTH_TOKEN</code> y <code className="text-amber-200">TWILIO_FROM_NUMBER</code> en el servidor. Los envíos SMS fallarán hasta configurar Twilio.
-            </div>
-          ) : null}
-          <CampaniaTemplateQuickLaunch onCreated={() => void loadCampanias()} />
-          <div className="flex flex-wrap gap-2">
-            {(["all", "active", "completed", "draft"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${tab === t ? "bg-[#0084ff]/15 text-[#0084ff] ring-1 ring-[#0084ff]/30" : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"}`}
-              >
-                {t === "all" ? "Todas" : t === "active" ? "Activas" : t === "completed" ? "Completadas" : "Borradores"}
-              </button>
+      <div className="flex flex-col gap-6 pb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <NelvyonDsSectionHeader
+            eyebrow="Marketing"
+            title="Campañas"
+            subtitle="Motor multicanal email, SMS y notificación"
+          />
+          <SaasCan action="campanias.write">
+            <NelvyonDsButton onClick={() => setShowWizard(true)}>+ Nueva campaña</NelvyonDsButton>
+          </SaasCan>
+        </div>
+
+        {isViewer && (
+          <SaasPermissionDenied message="Tu rol es solo lectura. Puedes ver campañas, pero no crear ni lanzar." />
+        )}
+        {sesConfigured === false && (
+          <NelvyonDsCard className="border-warning/30 bg-warning/5 p-4">
+            <p className="text-sm text-warning">
+              <strong>Email no configurado:</strong> las variables <code className="text-xs">SES_FROM_EMAIL</code> y <code className="text-xs">SES_ACCESS_KEY_ID</code> no están definidas en el servidor. Los envíos de email fallarán hasta que las configures en Railway.
+            </p>
+          </NelvyonDsCard>
+        )}
+        {twilioConfigured === false && (
+          <NelvyonDsCard className="border-warning/30 bg-warning/5 p-4">
+            <p className="text-sm text-warning">
+              <strong>SMS no configurado:</strong> define <code className="text-xs">TWILIO_ACCOUNT_SID</code>, <code className="text-xs">TWILIO_AUTH_TOKEN</code> y <code className="text-xs">TWILIO_FROM_NUMBER</code> en el servidor. Los envíos SMS fallarán hasta configurar Twilio.
+            </p>
+          </NelvyonDsCard>
+        )}
+        {error && (
+          <NelvyonDsCard className="border-destructive/30 bg-destructive/5 p-4">
+            <p className="text-sm text-destructive">⚠ {error}</p>
+          </NelvyonDsCard>
+        )}
+
+        {/* KPIs */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <KpiTile icon="✉️" label="Campañas" value={kpis.total} />
+          <KpiTile icon="🚀" label="Activas" value={kpis.active} accent />
+          <KpiTile icon="📤" label="Enviados" value={kpis.totalSent.toLocaleString("es-ES")} />
+          <KpiTile icon="👁️" label="Open rate medio" value={`${kpis.avgOpenRate}%`} />
+        </div>
+
+        <CampaniaTemplateQuickLaunch onCreated={() => void loadCampanias()} />
+
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2">
+          {(["all", "active", "completed", "draft"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                tab === t ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t === "all" ? "Todas" : t === "active" ? "Activas" : t === "completed" ? "Completadas" : "Borradores"}
+            </button>
+          ))}
+        </div>
+
+        {/* Campaign list */}
+        {loading ? (
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/30" />
             ))}
-            <SaasCan action="campanias.write">
-              <button onClick={() => setShowWizard(true)} className="rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-3 py-1.5 text-sm font-medium text-white shadow-[0_0_12px_rgba(0,132,255,0.3)] hover:shadow-[0_0_20px_rgba(0,132,255,0.4)] transition-all">
-                Nueva campania
-              </button>
-            </SaasCan>
           </div>
-          {error ? <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400">{error}</div> : null}
-          {loading ? (
-            <DarkCard><p className="text-sm text-white/40">Cargando campañas...</p></DarkCard>
-          ) : filtered.length === 0 ? (
-            <SaasEmptyState
-              title={SAAS_EMPTY_TITLE}
-              description={SAAS_EMPTY_DESCRIPTION}
-              action={
-                canManage ? (
-                  <button onClick={() => setShowWizard(true)} className="rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-4 py-2 text-sm font-medium text-white shadow-[0_0_12px_rgba(0,132,255,0.3)]">Crear primera campania</button>
-                ) : undefined
-              }
-            />
-          ) : (
-            <div className="space-y-3">
-              {filtered.map((c) => {
-                const openRate = c.sentCount > 0 ? ((0 / c.sentCount) * 100).toFixed(0) : "0";
-                return (
-                  <DarkCard key={c.id} className="space-y-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <button className="text-left text-base font-semibold text-white/90 hover:text-[#0084ff] transition-colors" onClick={() => void openDetail(c)}>
-                        {c.name}
-                      </button>
-                      <div className="flex gap-2">
-                        <span className="rounded-md bg-white/5 px-2 py-0.5 text-xs text-white/50">{c.channel}</span>
-                        <span className="rounded-md bg-[#0084ff]/10 px-2 py-0.5 text-xs text-[#0084ff]">{c.status}</span>
-                      </div>
+        ) : filtered.length === 0 ? (
+          <SaasEmptyState
+            title={SAAS_EMPTY_TITLE}
+            description={SAAS_EMPTY_DESCRIPTION}
+            action={canManage ? <NelvyonDsButton onClick={() => setShowWizard(true)}>Crear primera campaña</NelvyonDsButton> : undefined}
+          />
+        ) : (
+          <div className="flex flex-col gap-3">
+            {filtered.map((c) => {
+              const openRate = c.sentCount > 0 ? Math.round((c.openedCount / c.sentCount) * 100) : 0;
+              return (
+                <NelvyonDsCard key={c.id} className="p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <button type="button" className="text-left text-base font-semibold text-foreground hover:text-primary transition-colors" onClick={() => void openDetail(c)}>
+                      {c.name}
+                    </button>
+                    <div className="flex gap-2">
+                      <NelvyonDsBadge tone="neutral">{c.channel}</NelvyonDsBadge>
+                      <NelvyonDsBadge tone={STATUS_TONE[c.status]}>{STATUS_LABELS[c.status]}</NelvyonDsBadge>
                     </div>
-                    <div className="grid gap-2 text-sm text-white/40 sm:grid-cols-4">
-                      <div><span className="text-white/25">Recipients</span> <span className="text-white/70">{c.totalRecipients}</span></div>
-                      <div><span className="text-white/25">Enviados</span> <span className="text-white/70">{c.sentCount}</span></div>
-                      <div><span className="text-white/25">Open rate</span> <span className="text-white/70">{openRate}%</span></div>
-                      <div><span className="text-white/25">Prog.</span> <span className="text-white/70">{c.scheduledAt ? new Date(c.scheduledAt).toLocaleString() : "—"}</span></div>
-                    </div>
-                  </DarkCard>
-                );
-              })}
-            </div>
-          )}
-
-          {showWizard && canManage ? (
-            <DarkCard className="space-y-4">
-              <div className="text-base font-semibold text-white">Nueva campania (Paso {step}/5)</div>
-              {step === 1 ? (
-                <div className="grid gap-2">
-                  <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
-                  <textarea className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="Descripcion" value={description} onChange={(e) => setDescription(e.target.value)} />
-                  <select className="rounded-md border bg-background px-3 py-2 text-sm" value={channel} onChange={(e) => setChannel(e.target.value as CampaniaChannel)}>
-                    {CHANNELS.map((ch) => (
-                      <option key={ch} value={ch}>
-                        {ch}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ) : null}
-              {step === 2 ? (
-                <div className="grid gap-2">
-                  {channel === "email" ? <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} /> : null}
-                  <EmailEditor value={body} onChange={setBody} />
-                  <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="CTA text" value={ctaText} onChange={(e) => setCtaText(e.target.value)} />
-                  <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="CTA url" value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} />
-                </div>
-              ) : null}
-              {step === 3 ? (
-                <div className="grid gap-2">
-                  <select className="rounded-md border bg-background px-3 py-2 text-sm" value={audienceMode} onChange={(e) => setAudienceMode(e.target.value as "all" | "status" | "stage" | "deal_stage" | "deal_open" | "tags")}>
-                    <option value="all">Todos</option>
-                    <option value="status">Por status contacto</option>
-                    <option value="stage">Por stage contacto (legacy)</option>
-                    <option value="deal_stage">Etapa de oportunidad</option>
-                    <option value="deal_open">Pipeline abierto (deals)</option>
-                    <option value="tags">Por tags</option>
-                  </select>
-                  {audienceMode !== "all" && audienceMode !== "deal_open" ? (
-                    <input className="rounded-md border bg-background px-3 py-2 text-sm" placeholder="Valor del filtro" value={audienceValue} onChange={(e) => setAudienceValue(e.target.value)} />
-                  ) : null}
-                </div>
-              ) : null}
-              {step === 4 ? (
-                <div className="grid gap-2">
-                  <select className="rounded-md border bg-background px-3 py-2 text-sm" value={scheduleMode} onChange={(e) => setScheduleMode(e.target.value as "now" | "scheduled")}>
-                    <option value="now">Enviar ahora</option>
-                    <option value="scheduled">Programar</option>
-                  </select>
-                  {scheduleMode === "scheduled" ? (
-                    <input className="rounded-md border bg-background px-3 py-2 text-sm" type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
-                  ) : null}
-                </div>
-              ) : null}
-              {step === 5 ? (
-                <div className="space-y-1 text-sm text-muted-foreground">
-                  <div>Nombre: {name || "(sin nombre)"}</div>
-                  <div>Canal: {channel}</div>
-                  <div>Audiencia: {audienceMode}</div>
-                  <div>Envio: {scheduleMode === "now" ? "ahora" : `programado ${scheduledAt}`}</div>
-                </div>
-              ) : null}
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: "Atrás", action: () => setStep((s) => Math.max(1, s - 1)) },
-                  ...(step < 5 ? [{ label: "Siguiente", action: () => setStep((s) => Math.min(5, s + 1)) }] : []),
-                  ...(step === 5 ? [
-                    { label: "Guardar", action: () => void createCampania(false) },
-                    { label: "Guardar y lanzar", action: () => void createCampania(scheduleMode === "now") },
-                  ] : []),
-                  { label: "Cerrar", action: () => setShowWizard(false) },
-                ].map((btn) => (
-                  <button key={btn.label} onClick={btn.action} className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/70 hover:bg-white/10 hover:text-white transition-all">
-                    {btn.label}
-                  </button>
-                ))}
-              </div>
-            </DarkCard>
-          ) : null}
-
-          {selected ? (
-            <DarkCard glow className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="text-base font-semibold text-white">{selected.name}</div>
-                <span className="rounded-md bg-[#0084ff]/10 px-2 py-0.5 text-xs text-[#0084ff]">{selected.status}</span>
-              </div>
-              <div className="text-sm text-white/40">{selected.description ?? "Sin descripción"}</div>
-              <div className="grid gap-3 sm:grid-cols-5">
-                {[
-                  { label: "Enviados", value: stats?.sent_count ?? 0 },
-                  { label: "Abiertos", value: stats?.opened_count ?? 0 },
-                  { label: "Clicks", value: stats?.clicked_count ?? 0 },
-                  { label: "Open Rate", value: `${stats?.open_rate ?? 0}%` },
-                  { label: "Click Rate", value: `${stats?.click_rate ?? 0}%` },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
-                    <p className="text-[10px] uppercase tracking-wider text-white/30">{s.label}</p>
-                    <p className="mt-1 text-xl font-bold text-white">{s.value}</p>
                   </div>
-                ))}
+                  <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-4">
+                    <div><span className="text-muted-foreground/70">Destinatarios</span> <span className="text-foreground">{c.totalRecipients}</span></div>
+                    <div><span className="text-muted-foreground/70">Enviados</span> <span className="text-foreground">{c.sentCount}</span></div>
+                    <div><span className="text-muted-foreground/70">Open rate</span> <span className="text-foreground">{c.sentCount > 0 ? `${openRate}%` : "—"}</span></div>
+                    <div><span className="text-muted-foreground/70">Prog.</span> <span className="text-foreground">{c.scheduledAt ? new Date(c.scheduledAt).toLocaleString("es-ES") : "—"}</span></div>
+                  </div>
+                </NelvyonDsCard>
+              );
+            })}
+          </div>
+        )}
+
+        {/* New campaign wizard */}
+        {showWizard && canManage && (
+          <NelvyonDsCard className="space-y-4 p-5" title={`Nueva campaña (Paso ${step}/5)`}>
+            {step === 1 && (
+              <div className="grid gap-2">
+                <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
+                <textarea className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" placeholder="Descripción" value={description} onChange={(e) => setDescription(e.target.value)} />
+                <select className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" value={channel} onChange={(e) => setChannel(e.target.value as CampaniaChannel)}>
+                  {CHANNELS.map((ch) => (
+                    <option key={ch} value={ch}>{ch}</option>
+                  ))}
+                </select>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <SaasCan action="campanias.launch">
-                  <button onClick={() => void launchSelected()} className="rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-3 py-1.5 text-sm font-medium text-white shadow-[0_0_12px_rgba(0,132,255,0.3)] hover:shadow-[0_0_20px_rgba(0,132,255,0.4)] transition-all">Lanzar</button>
-                </SaasCan>
-                <SaasCan action="campanias.write">
-                  <button onClick={() => void pauseSelected()} className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/60 hover:text-white transition-all">Pausar</button>
-                  <button onClick={() => void duplicateSelected()} className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/60 hover:text-white transition-all">Duplicar</button>
-                </SaasCan>
+            )}
+            {step === 2 && (
+              <div className="grid gap-2">
+                {channel === "email" && (
+                  <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} />
+                )}
+                <EmailEditor value={body} onChange={setBody} />
+                <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" placeholder="CTA text" value={ctaText} onChange={(e) => setCtaText(e.target.value)} />
+                <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" placeholder="CTA url" value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} />
               </div>
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/30">Recipients</p>
-                {recipients.length === 0 ? (
-                  <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Lanza la campaña para ver destinatarios aquí." className="p-4" />
-                ) : (
-                  recipients.map((r) => (
-                    <div key={r.id} className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm">
-                      <div className="text-white/60">{r.contactId}</div>
-                      <div className="flex items-center gap-2">
-                        <NelvyonDsStatusDot status={r.status === "sent" || r.status === "opened" || r.status === "clicked" ? "ok" : "pending"} />
-                        <span className="text-white/50">{r.status}</span>
-                      </div>
-                    </div>
-                  ))
+            )}
+            {step === 3 && (
+              <div className="grid gap-2">
+                <select className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" value={audienceMode} onChange={(e) => setAudienceMode(e.target.value as "all" | "status" | "stage" | "deal_stage" | "deal_open" | "tags")}>
+                  <option value="all">Todos</option>
+                  <option value="status">Por status contacto</option>
+                  <option value="stage">Por stage contacto (legacy)</option>
+                  <option value="deal_stage">Etapa de oportunidad</option>
+                  <option value="deal_open">Pipeline abierto (deals)</option>
+                  <option value="tags">Por tags</option>
+                </select>
+                {audienceMode !== "all" && audienceMode !== "deal_open" && (
+                  <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" placeholder="Valor del filtro" value={audienceValue} onChange={(e) => setAudienceValue(e.target.value)} />
                 )}
               </div>
-            </DarkCard>
-          ) : null}
+            )}
+            {step === 4 && (
+              <div className="grid gap-2">
+                <select className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" value={scheduleMode} onChange={(e) => setScheduleMode(e.target.value as "now" | "scheduled")}>
+                  <option value="now">Enviar ahora</option>
+                  <option value="scheduled">Programar</option>
+                </select>
+                {scheduleMode === "scheduled" && (
+                  <input className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
+                )}
+              </div>
+            )}
+            {step === 5 && (
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <div>Nombre: {name || "(sin nombre)"}</div>
+                <div>Canal: {channel}</div>
+                <div>Audiencia: {audienceMode}</div>
+                <div>Envío: {scheduleMode === "now" ? "ahora" : `programado ${scheduledAt}`}</div>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: "Atrás", action: () => setStep((s) => Math.max(1, s - 1)) },
+                ...(step < 5 ? [{ label: "Siguiente", action: () => setStep((s) => Math.min(5, s + 1)) }] : []),
+                ...(step === 5 ? [
+                  { label: "Guardar", action: () => void createCampania(false) },
+                  { label: "Guardar y lanzar", action: () => void createCampania(scheduleMode === "now") },
+                ] : []),
+                { label: "Cerrar", action: () => setShowWizard(false) },
+              ].map((btn) => (
+                <NelvyonDsButton key={btn.label} variant="ghost" onClick={btn.action}>{btn.label}</NelvyonDsButton>
+              ))}
+            </div>
+          </NelvyonDsCard>
+        )}
+
+        {/* Detail panel */}
+        {selected && (
+          <NelvyonDsCard className="space-y-4 p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="text-base font-semibold text-foreground">{selected.name}</div>
+              <NelvyonDsBadge tone={STATUS_TONE[selected.status]}>{STATUS_LABELS[selected.status]}</NelvyonDsBadge>
+            </div>
+            <div className="text-sm text-muted-foreground">{selected.description ?? "Sin descripción"}</div>
+            <div className="grid gap-3 sm:grid-cols-5">
+              {[
+                { label: "Enviados", value: stats?.sent_count ?? 0 },
+                { label: "Abiertos", value: stats?.opened_count ?? 0 },
+                { label: "Clicks", value: stats?.clicked_count ?? 0 },
+                { label: "Open Rate", value: `${stats?.open_rate ?? 0}%` },
+                { label: "Click Rate", value: `${stats?.click_rate ?? 0}%` },
+              ].map((s) => (
+                <div key={s.label} className="rounded-lg border border-border bg-muted/10 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{s.label}</p>
+                  <p className="mt-1 text-xl font-bold text-foreground">{s.value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <SaasCan action="campanias.launch">
+                <NelvyonDsButton onClick={() => void launchSelected()}>Lanzar</NelvyonDsButton>
+              </SaasCan>
+              <SaasCan action="campanias.write">
+                <NelvyonDsButton variant="ghost" onClick={() => void pauseSelected()}>Pausar</NelvyonDsButton>
+                <NelvyonDsButton variant="ghost" onClick={() => void duplicateSelected()}>Duplicar</NelvyonDsButton>
+              </SaasCan>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Destinatarios</p>
+              {recipients.length === 0 ? (
+                <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Lanza la campaña para ver destinatarios aquí." className="p-4" />
+              ) : (
+                recipients.map((r) => (
+                  <div key={r.id} className="flex items-center justify-between rounded-lg border border-border bg-muted/10 px-3 py-2 text-sm">
+                    <div className="text-muted-foreground">{r.contactId}</div>
+                    <div className="flex items-center gap-2">
+                      <NelvyonDsStatusDot status={r.status === "sent" || r.status === "opened" || r.status === "clicked" ? "ok" : "pending"} />
+                      <span className="text-muted-foreground">{r.status}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </NelvyonDsCard>
+        )}
+      </div>
     </SaasShellLayout>
   );
 }
