@@ -92,6 +92,19 @@ describe("SaasChatService", () => {
     await expect(svc.sendMessage("u1", "00000000-0000-0000-0000-0000000000aa", "hola")).rejects.toThrow("assistant insert");
   });
 
+  it("saveExchange inserta mensaje user y assistant sin invocar el LLM", async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    const complete = vi.fn();
+    const svc = new SaasChatService({ db: { query }, llm: { complete } });
+    await svc.saveExchange("u1", "t1", "hola", "hola, ¿en qué te ayudo?");
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(String(query.mock.calls[0]?.[0])).toContain("'user'");
+    expect(query.mock.calls[0]?.[1]).toEqual(["u1", "t1", "hola"]);
+    expect(String(query.mock.calls[1]?.[0])).toContain("'assistant'");
+    expect(query.mock.calls[1]?.[1]).toEqual(["u1", "t1", "hola, ¿en qué te ayudo?"]);
+    expect(complete).not.toHaveBeenCalled();
+  });
+
   it("clearHistory elimina todos los mensajes y devuelve count", async () => {
     const query = vi.fn().mockResolvedValue([{ id: "1" }, { id: "2" }]);
     const svc = new SaasChatService({ db: { query }, llm: { complete: vi.fn() } });

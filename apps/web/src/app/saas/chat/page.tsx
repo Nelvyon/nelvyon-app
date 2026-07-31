@@ -20,16 +20,18 @@ const SUGGESTIONS = [
   "Crea un plan de contenido para redes sociales este mes",
 ];
 
+const GREETING: Message = {
+  role: "assistant",
+  content: "Hola 👋 Soy tu asistente de marketing IA. Puedo ayudarte con CRM, campañas, SEO, publicidad, redes sociales, workflows, agentes IA y mucho más. ¿En qué empezamos?",
+};
+
 export default function SaasChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hola 👋 Soy tu asistente de marketing IA. Puedo ayudarte con CRM, campañas, SEO, publicidad, redes sociales, workflows, agentes IA y mucho más. ¿En qué empezamos?",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([GREETING]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [openaiConfigured, setOpenaiConfigured] = useState<boolean | null>(null);
+  const [clearing, setClearing] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,13 +39,32 @@ export default function SaasChatPage() {
       try {
         const res = await fetch("/api/saas/chat", { credentials: "same-origin" });
         if (!res.ok) return;
-        const data = (await res.json()) as { openai_configured?: boolean };
+        const data = (await res.json()) as {
+          openai_configured?: boolean;
+          messages?: { role: "user" | "assistant"; content: string }[];
+        };
         setOpenaiConfigured(data.openai_configured ?? false);
+        if (data.messages && data.messages.length > 0) {
+          setMessages(data.messages.map((m) => ({ role: m.role, content: m.content })));
+        }
       } catch {
         setOpenaiConfigured(false);
+      } finally {
+        setHistoryLoading(false);
       }
     })();
   }, []);
+
+  async function handleNewConversation() {
+    if (!window.confirm("¿Borrar todo el historial de esta conversación? Esta acción no se puede deshacer.")) return;
+    setClearing(true);
+    try {
+      await fetch("/api/saas/chat", { method: "DELETE", credentials: "same-origin" });
+      setMessages([GREETING]);
+    } finally {
+      setClearing(false);
+    }
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -86,10 +107,17 @@ export default function SaasChatPage() {
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="chat" />}>
       <div className="flex h-[calc(100vh-80px)] flex-col gap-4">
-        <NelvyonDsSectionHeader
-          title="Asistente IA"
-          subtitle="Tu experto en marketing digital disponible 24/7"
-        />
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <NelvyonDsSectionHeader
+            title="Asistente IA"
+            subtitle="Tu experto en marketing digital disponible 24/7 — historial guardado por usuario"
+          />
+          {messages.length > 1 && (
+            <NelvyonDsButton variant="ghost" onClick={() => void handleNewConversation()} disabled={clearing}>
+              {clearing ? "Borrando…" : "🗑 Nueva conversación"}
+            </NelvyonDsButton>
+          )}
+        </div>
 
         {openaiConfigured === false && (
           <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
@@ -101,10 +129,13 @@ export default function SaasChatPage() {
         {/* Messages */}
         <NelvyonDsCard className="flex flex-1 flex-col overflow-hidden p-0">
           <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+            {historyLoading && (
+              <p className="text-center text-xs text-muted-foreground">Cargando historial…</p>
+            )}
             {messages.map((m, i) => (
               <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${m.role === "assistant" ? "bg-primary/20 text-primary" : "bg-muted/50 text-foreground"}`}>
-                  {m.role === "assistant" ? "N" : "Tú"[0]}
+                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${m.role === "assistant" ? "bg-primary/20 text-primary" : "bg-muted/50 text-foreground"}`}>
+                  {m.role === "assistant" ? "N" : "Tú"}
                 </div>
                 <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${m.role === "assistant" ? "bg-muted/20 text-foreground" : "bg-primary text-primary-foreground"}`}>
                   <p className="whitespace-pre-wrap">{m.content}</p>

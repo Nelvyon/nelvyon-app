@@ -86,6 +86,23 @@ ${content}`;
     return { userMessage, assistantMessage };
   }
 
+  /**
+   * Persists an already-computed user/assistant exchange without invoking the LLM.
+   * Used by callers (e.g. the marketing assistant route) that generate the reply
+   * with their own prompt/model but must still keep `saas_chat_messages` as the
+   * single source of truth for history + GDPR export/delete.
+   */
+  async saveExchange(userId: string, tenantId: string, userContent: string, assistantContent: string): Promise<void> {
+    await this.db.query(
+      `INSERT INTO saas_chat_messages (user_id, tenant_id, role, content) VALUES ($1, $2, 'user', $3)`,
+      [userId, tenantId, userContent],
+    );
+    await this.db.query(
+      `INSERT INTO saas_chat_messages (user_id, tenant_id, role, content) VALUES ($1, $2, 'assistant', $3)`,
+      [userId, tenantId, assistantContent],
+    );
+  }
+
   async clearHistory(userId: string, tenantId: string): Promise<number> {
     const rows = await this.db.query<{ id: string }>(
       `DELETE FROM saas_chat_messages WHERE user_id = $1 AND tenant_id = $2 RETURNING id`,

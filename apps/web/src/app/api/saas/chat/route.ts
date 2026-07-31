@@ -93,7 +93,22 @@ Plan actual del cliente: ${ctx.tenant.plan ?? "starter"}.`;
     const data = (await oaRes.json()) as { choices?: { message?: { content?: string } }[] };
     const reply = data.choices?.[0]?.message?.content ?? "No pude generar una respuesta.";
 
+    const lastUserMessage = [...body.messages].reverse().find((m) => m.role === "user")?.content ?? "";
+    await saasChatService.saveExchange(ctx.claims.userId, ctx.tenant.id, lastUserMessage, reply).catch((err: unknown) => {
+      console.error("[saas/chat] failed to persist exchange", err);
+    });
+
     return NextResponse.json({ reply, mock: false });
+  } catch (e: unknown) {
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const ctx = await requireSaasContext(req, "contacts.read");
+    const deleted = await saasChatService.clearHistory(ctx.claims.userId, ctx.tenant.id);
+    return NextResponse.json({ deleted });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
