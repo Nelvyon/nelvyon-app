@@ -54,24 +54,52 @@ function NpsGauge({ score }: { score: number }) {
 
 function ShareModal({ survey, onClose }: { survey: Survey; onClose: () => void }) {
   const [enabling, setEnabling] = useState(false);
+  const [disabling, setDisabling] = useState(false);
   const [link, setLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const origin = typeof window !== "undefined" ? window.location.origin : "https://app.nelvyon.com";
 
   async function enable() {
     setEnabling(true);
+    setError(null);
     try {
       const r = await fetch("/api/saas/surveys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "enable_share", id: survey.id }),
       });
-      if (r.ok) {
-        const d = (await r.json()) as { slug: string };
-        setLink(`${origin}/s/${d.slug}`);
+      if (!r.ok) {
+        const d = (await r.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${r.status}`);
       }
+      const d = (await r.json()) as { slug: string };
+      setLink(`${origin}/s/${d.slug}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al generar enlace");
     } finally {
       setEnabling(false);
+    }
+  }
+
+  async function disable() {
+    setDisabling(true);
+    setError(null);
+    try {
+      const r = await fetch("/api/saas/surveys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "disable_share", id: survey.id }),
+      });
+      if (!r.ok) {
+        const d = (await r.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${r.status}`);
+      }
+      setLink(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al revocar enlace");
+    } finally {
+      setDisabling(false);
     }
   }
 
@@ -89,6 +117,7 @@ function ShareModal({ survey, onClose }: { survey: Survey; onClose: () => void }
         <p className="mb-4 text-sm text-muted-foreground">
           Genera un enlace público para que tus clientes completen la encuesta
         </p>
+        {error && <p className="mb-3 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
         {!link ? (
           <NelvyonDsButton onClick={() => void enable()} disabled={enabling}>
             {enabling ? "Generando…" : "Generar enlace público"}
@@ -98,9 +127,12 @@ function ShareModal({ survey, onClose }: { survey: Survey; onClose: () => void }
             <pre className="overflow-x-auto rounded-xl bg-muted/30 p-4 text-xs text-muted-foreground mb-4 whitespace-pre-wrap break-all">
               {link}
             </pre>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <NelvyonDsButton className="flex-1" onClick={() => void copy()}>
                 {copied ? "¡Copiado!" : "Copiar enlace"}
+              </NelvyonDsButton>
+              <NelvyonDsButton variant="ghost" disabled={disabling} onClick={() => void disable()}>
+                {disabling ? "Revocando…" : "Revocar enlace"}
               </NelvyonDsButton>
               <NelvyonDsButton variant="ghost" onClick={onClose}>Cerrar</NelvyonDsButton>
             </div>
@@ -195,6 +227,7 @@ function CreateSurveyModal({ onClose, onSaved }: { onClose: () => void; onSaved:
   const [name, setName] = useState("");
   const [type, setType] = useState<SurveyType>("nps");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { nameRef.current?.focus(); }, []);
@@ -203,13 +236,21 @@ function CreateSurveyModal({ onClose, onSaved }: { onClose: () => void; onSaved:
     e.preventDefault();
     if (!name.trim()) return;
     setSaving(true);
+    setError(null);
     try {
       const r = await fetch("/api/saas/surveys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), type, questions: QUESTION_TEMPLATES[type] }),
       });
-      if (r.ok) { onSaved(); onClose(); }
+      if (!r.ok) {
+        const d = (await r.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${r.status}`);
+      }
+      onSaved();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al crear encuesta");
     } finally {
       setSaving(false);
     }
@@ -229,6 +270,7 @@ function CreateSurveyModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           <h2 className="text-lg font-semibold text-foreground">Nueva encuesta</h2>
         </div>
         <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-5 p-6">
+          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre</label>
             <input
@@ -275,13 +317,17 @@ function CreateSurveyModal({ onClose, onSaved }: { onClose: () => void; onSaved:
 function SurveyCard({
   survey,
   onActivate,
+  onDeactivate,
   onShare,
   onResponses,
+  onDelete,
 }: {
   survey: Survey;
   onActivate: () => void;
+  onDeactivate: () => void;
   onShare: () => void;
   onResponses: () => void;
+  onDelete: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const sc = STATUS[String(survey.active)] ?? STATUS["false"];
@@ -313,9 +359,14 @@ function SurveyCard({
           <NelvyonDsButton variant="ghost" className="text-xs" onClick={onResponses}>
             Ver respuestas
           </NelvyonDsButton>
-          {!survey.active && (
+          {!survey.active ? (
             <NelvyonDsButton className="text-xs" onClick={onActivate}>Activar</NelvyonDsButton>
+          ) : (
+            <NelvyonDsButton variant="ghost" className="text-xs" onClick={onDeactivate}>Desactivar</NelvyonDsButton>
           )}
+          <NelvyonDsButton variant="ghost" className="text-xs text-red-400" onClick={onDelete}>
+            Eliminar
+          </NelvyonDsButton>
         </div>
       </div>
       {expanded && (
@@ -353,6 +404,7 @@ export default function SaasEncuestasPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [shareSurvey, setShareSurvey] = useState<Survey | null>(null);
   const [responsesSurvey, setResponsesSurvey] = useState<Survey | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -371,13 +423,37 @@ export default function SaasEncuestasPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  async function handleActivate(survey: Survey) {
-    await fetch("/api/saas/surveys", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "update", id: survey.id, active: true }),
-    });
-    await load();
+  async function handleActivate(survey: Survey, active: boolean) {
+    setActionError(null);
+    try {
+      const res = await fetch("/api/saas/surveys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", id: survey.id, active }),
+      });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${res.status}`);
+      }
+      await load();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al actualizar encuesta");
+    }
+  }
+
+  async function handleDelete(survey: Survey) {
+    if (!window.confirm(`¿Eliminar la encuesta "${survey.name}"?`)) return;
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/saas/surveys?id=${encodeURIComponent(survey.id)}`, { method: "DELETE" });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${res.status}`);
+      }
+      await load();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al eliminar encuesta");
+    }
   }
 
   const withNps = surveys.filter(s => s.npsScore !== null);
@@ -401,7 +477,7 @@ export default function SaasEncuestasPage() {
           {[
             { label: "Encuestas activas", value: stats.active },
             { label: "Respuestas totales", value: stats.responses },
-            { label: "NPS promedio", value: withNps.length > 0 ? stats.avgNps : "—" },
+            { label: "NPS medio (encuestas)", value: withNps.length > 0 ? stats.avgNps : "—" },
           ].map(({ label, value }) => (
             <NelvyonDsCard key={label} className="p-4">
               <p className="text-xs text-muted-foreground">{label}</p>
@@ -414,6 +490,13 @@ export default function SaasEncuestasPage() {
           <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
             <p className="text-sm text-red-400">{error}</p>
             <button onClick={() => void load()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
+          </NelvyonDsCard>
+        )}
+
+        {actionError && (
+          <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
+            <p className="text-sm text-red-400">{actionError}</p>
+            <button type="button" onClick={() => setActionError(null)} className="mt-2 text-xs text-primary hover:underline">Cerrar</button>
           </NelvyonDsCard>
         )}
 
@@ -436,9 +519,11 @@ export default function SaasEncuestasPage() {
               <SurveyCard
                 key={s.id}
                 survey={s}
-                onActivate={() => void handleActivate(s)}
+                onActivate={() => void handleActivate(s, true)}
+                onDeactivate={() => void handleActivate(s, false)}
                 onShare={() => setShareSurvey(s)}
                 onResponses={() => setResponsesSurvey(s)}
+                onDelete={() => void handleDelete(s)}
               />
             ))}
           </div>

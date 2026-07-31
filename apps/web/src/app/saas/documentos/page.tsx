@@ -8,7 +8,7 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 type DocStatus = "draft" | "sent" | "viewed" | "signed" | "declined" | "expired";
 type ApiDocType = "document" | "contract" | "proposal" | "nda";
 
-interface ApiDocument {
+interface Document {
   id: string;
   name: string;
   type: ApiDocType;
@@ -17,13 +17,6 @@ interface ApiDocument {
   signedAt: string | null;
   expiresAt: string | null;
   createdAt: string;
-}
-
-interface Document extends ApiDocument {
-  clientName: string;
-  clientEmail: string;
-  value: number | null;
-  sentAt: string | null;
 }
 
 const STATUS_CONFIG: Record<DocStatus, { label: string; tone: "primary" | "success" | "warning" | "danger"; icon: string }> = {
@@ -59,11 +52,12 @@ function mapDocument(raw: Record<string, unknown>): Document {
     signedAt: raw.signedAt != null ? String(raw.signedAt) : null,
     expiresAt: raw.expiresAt != null ? String(raw.expiresAt) : null,
     createdAt: String(raw.createdAt),
-    clientName: "—",
-    clientEmail: "—",
-    value: null,
-    sentAt: null,
   };
+}
+
+function shortId(id: string | null): string {
+  if (!id) return "Sin contacto";
+  return id.length > 12 ? `${id.slice(0, 8)}…` : id;
 }
 
 function fmt(iso: string | null) {
@@ -231,6 +225,7 @@ export default function SaasDocumentosPage() {
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
   const [modalPrefill, setModalPrefill] = useState<{ name: string; type: ApiDocType; templateId?: string } | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -277,6 +272,23 @@ export default function SaasDocumentosPage() {
     }
   }
 
+  async function deleteDocument(id: string) {
+    setDeletingId(id);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/saas/documents?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+      }
+      await load();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al eliminar documento");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const filtered = docs.filter(d => {
     if (filterStatus !== "all" && d.status !== filterStatus) return false;
     if (search && !d.name.toLowerCase().includes(search.toLowerCase())) return false;
@@ -287,7 +299,7 @@ export default function SaasDocumentosPage() {
     total: docs.length,
     signed: docs.filter(d => d.status === "signed").length,
     pending: docs.filter(d => ["sent", "viewed"].includes(d.status)).length,
-    valueTotal: docs.filter(d => d.status === "signed").reduce((s, d) => s + (d.value ?? 0), 0),
+    expired: docs.filter(d => d.status === "expired").length,
   };
 
   return (
@@ -305,7 +317,7 @@ export default function SaasDocumentosPage() {
                 { label: "Documentos", value: stats.total },
                 { label: "Firmados", value: stats.signed },
                 { label: "Pendientes firma", value: stats.pending },
-                { label: "Valor firmado", value: stats.valueTotal > 0 ? `€${stats.valueTotal.toLocaleString("es-ES")}` : "—" },
+                { label: "Expirados", value: stats.expired },
               ].map(({ label, value }) => (
                 <NelvyonDsCard key={label} className="p-4">
                   <p className="text-xs text-muted-foreground">{label}</p>
@@ -364,7 +376,7 @@ export default function SaasDocumentosPage() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-border bg-muted/20">
-                          {["Documento", "Cliente", "Tipo", "Estado", "Valor", "Enviado", "Firmado"].map(h => (
+                          {["Documento", "Contacto", "Tipo", "Estado", "Creado", "Firmado"].map(h => (
                             <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
                           ))}
                           <th className="px-4 py-3" />
@@ -373,7 +385,7 @@ export default function SaasDocumentosPage() {
                       <tbody className="divide-y divide-border">
                         {filtered.length === 0 ? (
                           <tr>
-                            <td colSpan={8} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                            <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
                               Sin resultados para los filtros aplicados
                             </td>
                           </tr>
@@ -384,16 +396,12 @@ export default function SaasDocumentosPage() {
                               <td className="px-4 py-3">
                                 <p className="font-medium text-foreground truncate max-w-48">{d.name}</p>
                               </td>
-                              <td className="px-4 py-3">
-                                <p className="text-sm text-foreground">{d.clientName}</p>
-                                <p className="text-xs text-muted-foreground">{d.clientEmail}</p>
+                              <td className="px-4 py-3 text-xs text-muted-foreground font-mono" title={d.contactId ?? undefined}>
+                                {shortId(d.contactId)}
                               </td>
                               <td className="px-4 py-3 text-xs text-muted-foreground">{TYPE_LABEL[d.type] ?? d.type}</td>
                               <td className="px-4 py-3"><NelvyonDsBadge tone={sc.tone}>{sc.icon} {sc.label}</NelvyonDsBadge></td>
-                              <td className="px-4 py-3 text-sm font-medium text-foreground">{d.value != null ? `€${d.value.toLocaleString("es-ES")}` : "—"}</td>
-                              <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
-                                {d.status === "draft" ? "—" : fmt(d.sentAt ?? d.createdAt)}
-                              </td>
+                              <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmt(d.createdAt)}</td>
                               <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmt(d.signedAt)}</td>
                               <td className="px-4 py-3">
                                 <div className="flex gap-1">
@@ -405,14 +413,26 @@ export default function SaasDocumentosPage() {
                                     ✎ Editar
                                   </NelvyonDsButton>
                                   {d.status === "draft" && (
-                                    <NelvyonDsButton
-                                      className="text-xs px-2"
-                                      disabled={sendingId === d.id}
-                                      onClick={() => void sendDocument(d.id)}
-                                      title="Marca el documento como enviado (seguimiento interno)"
-                                    >
-                                      {sendingId === d.id ? "Enviando…" : "↗ Enviar"}
-                                    </NelvyonDsButton>
+                                    <>
+                                      <NelvyonDsButton
+                                        className="text-xs px-2"
+                                        disabled={sendingId === d.id}
+                                        onClick={() => void sendDocument(d.id)}
+                                        title="Marca el documento como enviado (seguimiento interno)"
+                                      >
+                                        {sendingId === d.id ? "Enviando…" : "↗ Enviar"}
+                                      </NelvyonDsButton>
+                                      <NelvyonDsButton
+                                        variant="ghost"
+                                        className="text-xs px-2 text-red-400"
+                                        disabled={deletingId === d.id}
+                                        onClick={() => {
+                                          if (window.confirm("¿Eliminar este borrador?")) void deleteDocument(d.id);
+                                        }}
+                                      >
+                                        {deletingId === d.id ? "…" : "Eliminar"}
+                                      </NelvyonDsButton>
+                                    </>
                                   )}
                                 </div>
                               </td>

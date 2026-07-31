@@ -125,37 +125,101 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
   const [newMsg, setNewMsg] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isInternal, setIsInternal] = useState(false);
+  const [acting, setActing] = useState(false);
 
-  useEffect(() => {
-    void (async () => {
-      setLoading(true);
+  const loadMessages = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const res = await fetch(`/api/saas/helpdesk?id=${ticket.id}`);
+      if (!res.ok) throw new Error(`Error ${res.status}`);
       const d = await res.json() as { messages?: Message[] };
       setMessages(d.messages ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al cargar mensajes");
+      setMessages([]);
+    } finally {
       setLoading(false);
-    })();
+    }
   }, [ticket.id]);
+
+  useEffect(() => { void loadMessages(); }, [loadMessages]);
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
     if (!newMsg.trim()) return;
     setSendingMsg(true);
-    await fetch("/api/saas/helpdesk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "message", ticket_id: ticket.id, body: newMsg.trim() }) });
-    setNewMsg("");
-    setSendingMsg(false);
-    const res = await fetch(`/api/saas/helpdesk?id=${ticket.id}`);
-    const d = await res.json() as { messages?: Message[] };
-    setMessages(d.messages ?? []);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/helpdesk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "message",
+          ticket_id: ticket.id,
+          body: newMsg.trim(),
+          is_internal: isInternal,
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => null) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
+      setNewMsg("");
+      setIsInternal(false);
+      await loadMessages();
+      onUpdated();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al enviar mensaje");
+    } finally {
+      setSendingMsg(false);
+    }
   }
 
   async function changeStatus(status: TicketStatus) {
-    await fetch("/api/saas/helpdesk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "update", id: ticket.id, status }) });
-    onUpdated(); onClose();
+    setActing(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/helpdesk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", id: ticket.id, status }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => null) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
+      onUpdated();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al actualizar estado");
+    } finally {
+      setActing(false);
+    }
   }
 
   async function applyMacro(macroId: string) {
-    await fetch("/api/saas/helpdesk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "apply-macro", ticketId: ticket.id, macroId }) });
-    onUpdated(); onClose();
+    setActing(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/helpdesk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "apply-macro", ticketId: ticket.id, macroId }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => null) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
+      onUpdated();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al aplicar macro");
+    } finally {
+      setActing(false);
+    }
   }
 
   const slaDue = slaStatus(ticket.resolutionDue, ticket.resolvedAt);
@@ -172,6 +236,8 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
         </div>
 
         <div className="p-5 space-y-5">
+          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+
           {/* Status + Priority */}
           <div className="flex flex-wrap gap-2">
             <NelvyonDsBadge tone={STATUS_TONE[ticket.status]}>{STATUS_LABEL[ticket.status]}</NelvyonDsBadge>
@@ -197,7 +263,7 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
           {/* Actions */}
           <div className="flex flex-wrap gap-2">
             {(["open","in_progress","resolved","closed"] as TicketStatus[]).filter(s => s !== ticket.status).map(s => (
-              <button key={s} onClick={() => void changeStatus(s)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+              <button key={s} disabled={acting} onClick={() => void changeStatus(s)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-50">
                 → {STATUS_LABEL[s]}
               </button>
             ))}
@@ -209,7 +275,7 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
               <p className="text-xs font-medium text-muted-foreground mb-2">Macros</p>
               <div className="flex flex-wrap gap-2">
                 {macros.map(m => (
-                  <button key={m.id} onClick={() => void applyMacro(m.id)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                  <button key={m.id} disabled={acting} onClick={() => void applyMacro(m.id)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-50">
                     ⚡ {m.name}
                   </button>
                 ))}
@@ -231,6 +297,7 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
                     <p className="text-foreground whitespace-pre-wrap">{m.body}</p>
                   </div>
                 ))}
+                {messages.length === 0 && <p className="text-sm text-muted-foreground">Sin mensajes todavía</p>}
               </div>
             )}
           </div>
@@ -239,6 +306,10 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
           <form onSubmit={sendMessage} className="space-y-2">
             <textarea value={newMsg} onChange={e => setNewMsg(e.target.value)} rows={3} placeholder="Escribe una respuesta…"
               className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input type="checkbox" checked={isInternal} onChange={e => setIsInternal(e.target.checked)} className="accent-primary" />
+              Nota interna (no visible para el cliente)
+            </label>
             <NelvyonDsButton type="submit" disabled={sendingMsg || !newMsg.trim()} className="w-full">{sendingMsg ? "Enviando…" : "Responder"}</NelvyonDsButton>
           </form>
         </div>
@@ -255,17 +326,29 @@ export default function SaasHelpdeskPage() {
   const [filter, setFilter] = useState<TicketStatus | "all">("all");
   const [showNew, setShowNew] = useState(false);
   const [selected, setSelected] = useState<Ticket | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const [tRes, mRes] = await Promise.all([
         fetch("/api/saas/helpdesk"),
         fetch("/api/saas/helpdesk?resource=macros"),
       ]);
-      if (tRes.ok) { const d = await tRes.json() as { tickets?: Ticket[] }; setTickets(d.tickets ?? []); }
-      if (mRes.ok) { const d = await mRes.json() as { macros?: Macro[] };  setMacros(d.macros ?? []); }
-    } finally { setLoading(false); }
+      if (!tRes.ok) throw new Error(`Error ${tRes.status}`);
+      const tData = await tRes.json() as { tickets?: Ticket[] };
+      setTickets(tData.tickets ?? []);
+      if (mRes.ok) {
+        const d = await mRes.json() as { macros?: Macro[] };
+        setMacros(d.macros ?? []);
+      }
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : "Error al cargar tickets");
+      setTickets([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
@@ -305,6 +388,13 @@ export default function SaasHelpdeskPage() {
             </button>
           ))}
         </div>
+
+        {loadError && (
+          <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
+            <p className="text-sm text-red-400">{loadError}</p>
+            <button type="button" onClick={() => void load()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
+          </NelvyonDsCard>
+        )}
 
         {loading ? (
           <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}</div>

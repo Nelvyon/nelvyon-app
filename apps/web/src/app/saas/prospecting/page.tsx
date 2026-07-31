@@ -40,10 +40,10 @@ interface ProspectingList {
 }
 
 
-const STATUS_CONFIG: Record<ProspectingList["status"], { label: string; color: string; icon: string }> = {
-  running: { label: "Buscando…", color: "text-yellow-400", icon: "⟳" },
-  done: { label: "Completada", color: "text-green-400", icon: "✓" },
-  paused: { label: "Pausada", color: "text-muted-foreground", icon: "‖" },
+const STATUS_CONFIG: Record<ProspectingList["status"], { label: string; tone: "primary" | "success" | "warning"; icon: string }> = {
+  running: { label: "Buscando…", tone: "warning", icon: "⟳" },
+  done: { label: "Completada", tone: "success", icon: "✓" },
+  paused: { label: "Pausada", tone: "primary", icon: "‖" },
 };
 
 const INDUSTRIES = ["Todos", "Tecnología", "Marketing", "Retail", "Finanzas", "Salud", "Educación", "Inmobiliaria", "Turismo"];
@@ -60,40 +60,52 @@ export default function SaasProspectingPage() {
   const [filter, setFilter] = useState<ProspectFilter>({ industry: "Todos", country: "Todos", minEmployees: 1, maxEmployees: 10000, jobTitle: "", keywords: "" });
   const [searching, setSearching] = useState(false);
   const [listName, setListName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/saas/prospecting");
-      if (res.ok) {
-        const d = (await res.json()) as {
-          lists?: ProspectingList[];
-          results?: ProspectingList[];
-          configured?: boolean;
-          message?: string;
-        };
-        setConfigured(d.configured ?? false);
-        setConfigMessage(d.message ?? null);
-        setLists(d.lists ?? d.results ?? []);
-      } else {
-        setLists([]);
+      const d = (await res.json().catch(() => ({}))) as {
+        lists?: ProspectingList[];
+        configured?: boolean;
+        message?: string;
+        error?: string;
+      };
+      if (!res.ok) {
         setConfigured(false);
+        setConfigMessage(d.message ?? d.error ?? `Error ${res.status}`);
+        setLists([]);
+        return;
       }
-    } catch { setLists([]); }
-    finally { setLoading(false); }
+      setConfigured(d.configured ?? false);
+      setConfigMessage(d.message ?? null);
+      setLists(d.lists ?? []);
+    } catch (err) {
+      setLists([]);
+      setConfigured(false);
+      setError(err instanceof Error ? err.message : "Error al cargar prospección");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const loadProspects = useCallback(async (listId: string) => {
+    setActionError(null);
     try {
       const res = await fetch(`/api/saas/prospecting?listId=${encodeURIComponent(listId)}`);
-      if (res.ok) {
-        const d = (await res.json()) as { prospects?: Prospect[] };
-        setProspects(d.prospects ?? []);
-      } else {
-        setProspects([]);
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { message?: string; error?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${res.status}`);
       }
-    } catch {
+      const d = (await res.json()) as { prospects?: Prospect[] };
+      setProspects(d.prospects ?? []);
+    } catch (err) {
       setProspects([]);
+      setActionError(err instanceof Error ? err.message : "Error al cargar prospectos");
     }
   }, []);
 
@@ -105,38 +117,55 @@ export default function SaasProspectingPage() {
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
-    if (!listName.trim() || configured === false) return;
+    if (!listName.trim() || configured !== true) return;
     setSearching(true);
+    setActionError(null);
     try {
       const res = await fetch("/api/saas/prospecting/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: listName, filter }),
       });
-      if (res.ok) {
-        const d = (await res.json()) as { prospects?: Prospect[]; list?: ProspectingList };
-        setProspects(d.prospects ?? []);
-        if (d.list) {
-          setSelectedList(d.list.id);
-          setLists((prev) => [d.list!, ...prev.filter((l) => l.id !== d.list!.id)]);
-        }
-        await load();
-        setTab("lists");
-      } else setProspects([]);
-    } catch { setProspects([]); }
-    finally { setSearching(false); }
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { message?: string; error?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${res.status}`);
+      }
+      const d = (await res.json()) as { prospects?: Prospect[]; list?: ProspectingList };
+      setProspects(d.prospects ?? []);
+      if (d.list) {
+        setSelectedList(d.list.id);
+        setLists((prev) => [d.list!, ...prev.filter((l) => l.id !== d.list!.id)]);
+      }
+      await load();
+      setTab("lists");
+    } catch (err) {
+      setProspects([]);
+      setActionError(err instanceof Error ? err.message : "Error en la búsqueda");
+    } finally {
+      setSearching(false);
+    }
   }
 
   async function addToCrm(ids: string[]) {
     if (ids.length === 0) return;
-    const res = await fetch("/api/saas/prospecting/sync", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prospectIds: ids }),
-    });
-    if (res.ok) {
+    setSyncing(true);
+    setActionError(null);
+    try {
+      const res = await fetch("/api/saas/prospecting/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospectIds: ids }),
+      });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { message?: string; error?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${res.status}`);
+      }
       setProspects((prev) => prev.map((p) => (ids.includes(p.id) ? { ...p, addedToCrm: true } : p)));
       if (selectedList) void loadProspects(selectedList);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al sincronizar con CRM");
+    } finally {
+      setSyncing(false);
     }
   }
 
@@ -152,6 +181,19 @@ export default function SaasProspectingPage() {
                 {configMessage ?? "Define APOLLO_API_KEY en Railway para activar búsqueda B2B real."}
               </div>
             ) : null}
+
+            {(error || actionError) && (
+              <NelvyonDsCard className="border-red-500/30 bg-red-500/5 p-4">
+                <p className="text-sm text-red-400">{error ?? actionError}</p>
+                <button
+                  type="button"
+                  onClick={() => { setError(null); setActionError(null); if (error) void load(); }}
+                  className="mt-2 text-xs text-primary hover:underline"
+                >
+                  {error ? "Reintentar" : "Cerrar"}
+                </button>
+              </NelvyonDsCard>
+            )}
 
             {/* Tabs */}
             <div className="flex gap-2">
@@ -191,7 +233,7 @@ export default function SaasProspectingPage() {
                           <div className="flex-1 min-w-0 space-y-2">
                             <div className="flex flex-wrap items-center gap-2">
                               <h3 className="font-semibold text-foreground">{list.name}</h3>
-                              <span className={`text-xs font-medium ${st.color}`}>{st.icon} {st.label}</span>
+                              <NelvyonDsBadge tone={st.tone}>{st.icon} {st.label}</NelvyonDsBadge>
                             </div>
                             <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                               {list.filter.industry !== "Todos" && <span className="rounded-md bg-muted/30 px-2 py-0.5">{list.filter.industry}</span>}
@@ -218,8 +260,8 @@ export default function SaasProspectingPage() {
                           <div className="mt-4 border-t border-border pt-4">
                             <div className="mb-3 flex items-center justify-between">
                               <p className="text-sm font-medium text-foreground">Prospectos</p>
-                              <NelvyonDsButton className="text-xs" onClick={() => addToCrm(prospects.filter(p => !p.addedToCrm).map(p => p.id))}>
-                                Añadir todos al CRM
+                              <NelvyonDsButton className="text-xs" disabled={syncing} onClick={() => void addToCrm(prospects.filter(p => !p.addedToCrm).map(p => p.id))}>
+                                {syncing ? "Sincronizando…" : "Añadir todos al CRM"}
                               </NelvyonDsButton>
                             </div>
                             <div className="space-y-2">
@@ -237,7 +279,7 @@ export default function SaasProspectingPage() {
                                     {p.addedToCrm ? (
                                       <span className="text-xs text-muted-foreground">En CRM</span>
                                     ) : (
-                                      <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => addToCrm([p.id])}>+ CRM</NelvyonDsButton>
+                                      <NelvyonDsButton variant="ghost" className="text-xs" disabled={syncing} onClick={() => void addToCrm([p.id])}>+ CRM</NelvyonDsButton>
                                     )}
                                   </div>
                                 </div>
@@ -298,8 +340,8 @@ export default function SaasProspectingPage() {
                         <input value={filter.keywords} onChange={e => setFilter(f => ({ ...f, keywords: e.target.value }))} placeholder="SaaS, ecommerce, startup…"
                           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
                       </div>
-                      <NelvyonDsButton type="submit" disabled={searching || !listName.trim()} className="w-full">
-                        {searching ? "Buscando…" : "🔍 Buscar prospectos"}
+                      <NelvyonDsButton type="submit" disabled={searching || !listName.trim() || configured !== true} className="w-full">
+                        {searching ? "Buscando…" : configured !== true ? "Prospección no configurada" : "🔍 Buscar prospectos"}
                       </NelvyonDsButton>
                     </form>
                   </NelvyonDsCard>
@@ -317,8 +359,8 @@ export default function SaasProspectingPage() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <p className="text-sm text-muted-foreground">{prospects.length} prospectos encontrados</p>
-                        <NelvyonDsButton className="text-xs" onClick={() => addToCrm(prospects.filter(p => !p.addedToCrm).map(p => p.id))}>
-                          Añadir todos al CRM
+                        <NelvyonDsButton className="text-xs" disabled={syncing} onClick={() => void addToCrm(prospects.filter(p => !p.addedToCrm).map(p => p.id))}>
+                          {syncing ? "Sincronizando…" : "Añadir todos al CRM"}
                         </NelvyonDsButton>
                       </div>
                       {prospects.map(p => (
@@ -343,7 +385,7 @@ export default function SaasProspectingPage() {
                               {p.addedToCrm ? (
                                 <span className="text-xs text-muted-foreground">✓ En CRM</span>
                               ) : (
-                                <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => addToCrm([p.id])}>+ CRM</NelvyonDsButton>
+                                <NelvyonDsButton variant="ghost" className="text-xs" disabled={syncing} onClick={() => void addToCrm([p.id])}>+ CRM</NelvyonDsButton>
                               )}
                             </div>
                           </div>
