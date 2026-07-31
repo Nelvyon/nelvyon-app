@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
+import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader, NelvyonDsStatusDot } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
@@ -320,12 +321,6 @@ function BuilderModal({
     } finally { setSaving(false); }
   }
 
-  const _panels = [
-    { id: "trigger",     label: "① Trigger",     icon: "⚡" },
-    { id: "conditions",  label: "② Condiciones",  icon: "🔀" },
-    { id: "actions",     label: "③ Acciones",     icon: "🎬" },
-  ] as const;
-
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 pt-8 backdrop-blur-sm">
       <div className="w-full max-w-3xl rounded-2xl border border-border bg-card shadow-2xl">
@@ -365,7 +360,7 @@ function BuilderModal({
         </div>
 
         <div className="p-6">
-          {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+          {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
 
           {/* Trigger panel */}
           {activePanel === "trigger" && (
@@ -417,7 +412,7 @@ function BuilderModal({
                     </select>
                     <input className={`${inp} w-28 shrink-0`} value={String(c.value)}
                       onChange={e => updateCondition(i, { value: e.target.value })} />
-                    <button onClick={() => removeCondition(i)} className="shrink-0 text-muted-foreground hover:text-red-400">✕</button>
+                    <button onClick={() => removeCondition(i)} className="shrink-0 text-muted-foreground hover:text-destructive">✕</button>
                   </div>
                 ))
               )}
@@ -445,7 +440,7 @@ function BuilderModal({
                         <div className="flex gap-1">
                           {i > 0 && <button onClick={() => moveAction(i, -1)} className="rounded p-1 text-xs text-muted-foreground hover:text-foreground">↑</button>}
                           {i < actions.length - 1 && <button onClick={() => moveAction(i, 1)} className="rounded p-1 text-xs text-muted-foreground hover:text-foreground">↓</button>}
-                          <button onClick={() => removeAction(i)} className="rounded p-1 text-xs text-muted-foreground hover:text-red-400">✕</button>
+                          <button onClick={() => removeAction(i)} className="rounded p-1 text-xs text-muted-foreground hover:text-destructive">✕</button>
                         </div>
                       </div>
                       <ActionConfigEditor type={a.type} config={a.config} onChange={cfg => updateAction(i, cfg)} />
@@ -522,7 +517,7 @@ function DetailPanel({
               <NelvyonDsCard key={r.id} className="p-4">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${r.status === "completed" ? "bg-green-400" : r.status === "failed" ? "bg-red-400" : "bg-yellow-400"}`} />
+                    <NelvyonDsStatusDot status={r.status === "completed" ? "ok" : r.status === "failed" ? "crit" : "pending"} />
                     <span className="text-sm font-medium text-foreground capitalize">{r.status}</span>
                   </div>
                   <span className="text-xs text-muted-foreground">{new Date(r.startedAt).toLocaleString("es-ES")}</span>
@@ -532,14 +527,14 @@ function DetailPanel({
                   <div className="mt-2 space-y-1">
                     {r.stepsExecuted.map((s, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
-                        <span className={String(s.ok) === "true" ? "text-green-400" : "text-red-400"}>{String(s.ok) === "true" ? "✓" : "✗"}</span>
+                        <span className={String(s.ok) === "true" ? "text-success" : "text-destructive"}>{String(s.ok) === "true" ? "✓" : "✗"}</span>
                         <span className="text-muted-foreground">{String(s.action)}</span>
-                        {s.error ? <span className="text-red-400 truncate">{String(s.error)}</span> : null}
+                        {s.error ? <span className="truncate text-destructive">{String(s.error)}</span> : null}
                       </div>
                     ))}
                   </div>
                 )}
-                {r.error && <p className="mt-1 text-xs text-red-400">{r.error}</p>}
+                {r.error && <p className="mt-1 text-xs text-destructive">{r.error}</p>}
               </NelvyonDsCard>
             ))}
           </div>
@@ -802,7 +797,7 @@ export default function SaasWorkflowsPage() {
             <NelvyonDsButton variant="ghost" disabled={installingPack} onClick={() => void installStarterPack()}>
               {installingPack ? "Instalando…" : "⚡ Kit arranque Nelvyon"}
             </NelvyonDsButton>
-            <a href="/saas/workflows/editor" className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white">
+            <a href="/saas/workflows/editor" className="rounded-lg border border-border px-4 py-2 text-sm text-foreground transition-colors hover:border-primary/40">
               Editor visual
             </a>
             <NelvyonDsButton onClick={() => { setEditing(null); setShowBuilder(true); }}>+ Nuevo workflow</NelvyonDsButton>
@@ -810,33 +805,46 @@ export default function SaasWorkflowsPage() {
         </div>
 
         {packMsg && (
-          <div className={`rounded-xl border px-4 py-3 text-sm ${packMsg.startsWith("✅") ? "border-green-500/30 bg-green-500/5 text-green-400" : "border-red-500/30 bg-red-500/5 text-red-400"}`}>
-            {packMsg}
-          </div>
+          <NelvyonDsCard className={`p-4 ${packMsg.startsWith("✅") ? "border-success/30 bg-success/5" : "border-destructive/30 bg-destructive/5"}`}>
+            <p className={`text-sm ${packMsg.startsWith("✅") ? "text-success" : "text-destructive"}`}>{packMsg}</p>
+          </NelvyonDsCard>
         )}
 
         {sesOk === false && (
-          <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-yellow-400">
-            ⚠️ <strong>Email no configurado</strong> — las acciones &quot;Enviar email&quot; fallarán hasta definir <code>SES_FROM_EMAIL</code> + <code>SES_ACCESS_KEY_ID</code> en Railway.
-          </div>
+          <NelvyonDsCard className="border-warning/30 bg-warning/5 p-4">
+            <p className="text-sm text-warning">
+              ⚠️ <strong>Email no configurado</strong> — las acciones &quot;Enviar email&quot; fallarán hasta definir <code className="rounded bg-muted px-1 py-0.5 text-xs">SES_FROM_EMAIL</code> + <code className="rounded bg-muted px-1 py-0.5 text-xs">SES_ACCESS_KEY_ID</code> en Railway.
+            </p>
+          </NelvyonDsCard>
         )}
 
         {twilioOk === false && (
-          <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm text-yellow-400">
-            ⚠️ <strong>SMS no configurado</strong> — las acciones &quot;Enviar SMS&quot; fallarán hasta definir <code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code> y <code>TWILIO_FROM_NUMBER</code>.
-          </div>
+          <NelvyonDsCard className="border-warning/30 bg-warning/5 p-4">
+            <p className="text-sm text-warning">
+              ⚠️ <strong>SMS no configurado</strong> — las acciones &quot;Enviar SMS&quot; fallarán hasta definir <code className="rounded bg-muted px-1 py-0.5 text-xs">TWILIO_ACCOUNT_SID</code>, <code className="rounded bg-muted px-1 py-0.5 text-xs">TWILIO_AUTH_TOKEN</code> y <code className="rounded bg-muted px-1 py-0.5 text-xs">TWILIO_FROM_NUMBER</code>.
+            </p>
+          </NelvyonDsCard>
         )}
 
         <RecipeGallery onImported={() => void load()} />
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          {(["all","active","paused","draft","archived"] as const).map(s => (
-            <NelvyonDsCard key={s} onClick={() => setFilter(s)}
-              className={`cursor-pointer p-4 transition-colors ${filter === s ? "border-primary" : ""}`}>
-              <p className="text-xs text-muted-foreground capitalize">{s === "all" ? "Total" : STATUS_LABEL[s as WorkflowStatus]}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{counts[s]}</p>
-            </NelvyonDsCard>
+          {([
+            { s: "all" as const, icon: "⚡" },
+            { s: "active" as const, icon: "▶️" },
+            { s: "paused" as const, icon: "⏸" },
+            { s: "draft" as const, icon: "📝" },
+            { s: "archived" as const, icon: "🗄️" },
+          ]).map(({ s, icon }) => (
+            <button key={s} type="button" onClick={() => setFilter(s)} className="text-left">
+              <KpiTile
+                icon={icon}
+                label={s === "all" ? "Total" : STATUS_LABEL[s as WorkflowStatus]}
+                value={counts[s]}
+                accent={filter === s}
+              />
+            </button>
           ))}
         </div>
 
@@ -871,18 +879,18 @@ export default function SaasWorkflowsPage() {
                 <div className="mt-3 flex flex-wrap gap-2" onClick={e => e.stopPropagation()}>
                   {wf.status !== "active" && (
                     <button onClick={() => void changeStatus(wf, "active")}
-                      className="rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-1 text-xs text-green-400 hover:bg-green-500/20 transition-colors">▶ Activar</button>
+                      className="rounded-lg border border-success/30 bg-success/10 px-3 py-1 text-xs text-success transition-colors hover:bg-success/20">▶ Activar</button>
                   )}
                   {wf.status === "active" && (
                     <button onClick={() => void changeStatus(wf, "paused")}
-                      className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-1 text-xs text-yellow-400 hover:bg-yellow-500/20 transition-colors">⏸ Pausar</button>
+                      className="rounded-lg border border-warning/30 bg-warning/10 px-3 py-1 text-xs text-warning transition-colors hover:bg-warning/20">⏸ Pausar</button>
                   )}
                   <button onClick={() => void runWorkflow(wf)}
                     className="rounded-lg border border-border px-3 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors">▷ Ejecutar</button>
                   <button onClick={() => { setEditing(wf); setShowBuilder(true); }}
                     className="rounded-lg border border-border px-3 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors">✏️ Editar</button>
                   <button onClick={() => void deleteWorkflow(wf)}
-                    className="rounded-lg border border-red-500/20 px-3 py-1 text-xs text-red-400 hover:bg-red-500/10 transition-colors">✕ Eliminar</button>
+                    className="rounded-lg border border-destructive/20 px-3 py-1 text-xs text-destructive transition-colors hover:bg-destructive/10">✕ Eliminar</button>
                 </div>
               </NelvyonDsCard>
             ))}
