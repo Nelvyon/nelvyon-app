@@ -202,7 +202,7 @@ export default function SaasLeadScoringPage() {
           {(["leads","rules"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              {t === "leads" ? `­ƒôè Leads puntuados (${scores.length})` : `ÔÜÖ´©Å Reglas (${activeRules}/${rules.length})`}
+              {t === "leads" ? `Leads puntuados (${scores.length})` : `Reglas (${activeRules}/${rules.length})`}
             </button>
           ))}
         </div>
@@ -212,7 +212,7 @@ export default function SaasLeadScoringPage() {
         ) : tab === "leads" ? (
           scores.length === 0 ? (
             <NelvyonDsCard className="p-14 text-center">
-              <p className="text-3xl">­ƒÄ»</p>
+              <p className="text-3xl">•</p>
               <p className="mt-3 text-lg font-semibold text-foreground">Sin scores aún</p>
               <p className="mt-1 text-sm text-muted-foreground">Los contacts se puntúan automáticamente al crearse o al pulsar &quot;Puntuar&quot; en el detalle del CRM.</p>
             </NelvyonDsCard>
@@ -228,7 +228,7 @@ export default function SaasLeadScoringPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-foreground">{lead.contactName || "Sin nombre"}</p>
                         {lead.contactCompany && <span className="text-xs text-muted-foreground">· {lead.contactCompany}</span>}
-                        <NelvyonDsBadge tone={CAT_BADGE[lead.category]}>{lead.category === "hot" ? "­ƒöÑ Hot" : lead.category === "warm" ? "­ƒîí Warm" : "ÔØä Cold"}</NelvyonDsBadge>
+                        <NelvyonDsBadge tone={CAT_BADGE[lead.category]}>{lead.category === "hot" ? "Hot" : lead.category === "warm" ? "Warm" : "Cold"}</NelvyonDsBadge>
                       </div>
                       <p className="text-xs text-muted-foreground">{lead.contactEmail}</p>
                       {lead.reasons.length > 0 && (
@@ -247,7 +247,7 @@ export default function SaasLeadScoringPage() {
                       )}
                       <button onClick={() => void scoreContact(lead.contactId)} disabled={scoringId === lead.contactId}
                         className="mt-1.5 text-xs text-muted-foreground hover:text-primary transition-colors">
-                        {scoringId === lead.contactId ? "Puntuando…" : "Ôå╗ Repuntuar"}
+                        {scoringId === lead.contactId ? "Puntuando…" : "Repuntuar"}
                       </button>
                     </div>
                   </div>
@@ -258,7 +258,7 @@ export default function SaasLeadScoringPage() {
         ) : (
           rules.length === 0 ? (
             <NelvyonDsCard className="p-14 text-center">
-              <p className="text-3xl">ÔÜÖ´©Å</p>
+              <p className="text-3xl">•</p>
               <p className="mt-3 text-lg font-semibold text-foreground">Sin reglas configuradas</p>
               <p className="mt-1 text-sm text-muted-foreground">Las reglas determinan qué acciones o datos del contacto suman o restan puntos.</p>
               <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>+ Crear primera regla</NelvyonDsButton>
@@ -298,7 +298,7 @@ export default function SaasLeadScoringPage() {
                         </button>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <button onClick={() => void deleteRule(r.id)} className="text-xs text-muted-foreground hover:text-red-400">Ô£ò</button>
+                        <button onClick={() => void deleteRule(r.id)} className="text-xs text-muted-foreground hover:text-red-400">Eliminar</button>
                       </td>
                     </tr>
                   ))}

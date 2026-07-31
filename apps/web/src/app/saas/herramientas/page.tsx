@@ -272,10 +272,10 @@ function ApiKeyCard() {
         <NelvyonDsButton variant="ghost" onClick={() => void handleCreate()} disabled={creating}>
           {creating ? "Generando…" : keys.length === 0 ? "Generar API key" : "Nueva API key"}
         </NelvyonDsButton>
-        <Link href="/docs">
+        <Link href="/saas/developers">
           <NelvyonDsButton variant="ghost">Ver documentación</NelvyonDsButton>
         </Link>
-        <Link href="/saas/settings">
+        <Link href="/saas/webhooks">
           <NelvyonDsButton variant="ghost">Configurar webhooks</NelvyonDsButton>
         </Link>
       </div>

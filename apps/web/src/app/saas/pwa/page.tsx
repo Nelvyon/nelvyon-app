@@ -156,19 +156,29 @@ export default function PwaInstallHub() {
   }
 
   async function unsubscribePush() {
-    if (!pushEndpoint && !("serviceWorker" in navigator)) return;
+    if (!("serviceWorker" in navigator)) {
+      showToast("Este navegador no soporta service workers");
+      return;
+    }
     setPushBusy(true);
     try {
       const reg = await navigator.serviceWorker.getRegistration("/sw.js");
       const sub = await reg?.pushManager.getSubscription();
       const endpoint = sub?.endpoint ?? pushEndpoint;
+      if (!endpoint && !sub) {
+        setPushSubscribed(false);
+        setPushEndpoint(null);
+        showToast("No hay suscripción push activa en este dispositivo");
+        return;
+      }
       if (sub) await sub.unsubscribe();
       if (endpoint) {
-        await fetch("/api/saas/pwa/push", {
+        const res = await fetch("/api/saas/pwa/push", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ endpoint }),
         });
+        if (!res.ok) throw new Error(`Error ${res.status}`);
       }
       setPushSubscribed(false);
       setPushEndpoint(null);

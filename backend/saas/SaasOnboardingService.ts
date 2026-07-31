@@ -220,6 +220,48 @@ export class SaasOnboardingService {
     }
   }
 
+  async updateTenantProfile(
+    tenantId: string,
+    data: Pick<UpdateSaasTenantPatch, "companyName" | "industry" | "website" | "phone">,
+  ): Promise<SaasTenant> {
+    const companyName = data.companyName !== undefined ? data.companyName.trim() : undefined;
+    if (companyName !== undefined && companyName.length === 0) {
+      throw new SaasOnboardingError("companyName cannot be empty", "VALIDATION");
+    }
+    const industry = data.industry !== undefined ? data.industry.trim() : undefined;
+    if (industry !== undefined && industry.length === 0) {
+      throw new SaasOnboardingError("industry cannot be empty", "VALIDATION");
+    }
+
+    const websiteProvided = data.website !== undefined;
+    const phoneProvided = data.phone !== undefined;
+
+    const rows = await this.db.query<SaasTenantRow>(
+      `UPDATE saas_tenants SET
+         company_name = COALESCE($2, company_name),
+         industry = COALESCE($3, industry),
+         website = CASE WHEN $6::boolean THEN $4 ELSE website END,
+         phone = CASE WHEN $7::boolean THEN $5 ELSE phone END,
+         updated_at = NOW()
+       WHERE id = $1::uuid
+       RETURNING ${SAAS_TENANT_SELECT}`,
+      [
+        tenantId,
+        companyName ?? null,
+        industry ?? null,
+        websiteProvided ? data.website : null,
+        phoneProvided ? data.phone : null,
+        websiteProvided,
+        phoneProvided,
+      ],
+    );
+    const row = rows[0];
+    if (!row) {
+      throw new SaasOnboardingError("Tenant not found", "NOT_FOUND");
+    }
+    return saasTenantFromRow(row);
+  }
+
   async completeOnboarding(userId: string): Promise<SaasTenant> {
     const existing = await this.getTenant(userId);
     if (!existing) {

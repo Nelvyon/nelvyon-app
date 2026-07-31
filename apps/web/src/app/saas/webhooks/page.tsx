@@ -158,6 +158,9 @@ export default function SaasWebhooksPage() {
   const [dlqFailures, setDlqFailures] = useState<DlqFailure[]>([]);
   const [loadingDlq, setLoadingDlq] = useState(false);
   const [replayingId, setReplayingId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -165,8 +168,12 @@ export default function SaasWebhooksPage() {
       if (res.ok) {
         const d = (await res.json()) as { webhooks?: Webhook[] };
         setWebhooks(d.webhooks ?? []);
+      } else {
+        setActionError(`Error al cargar webhooks (${res.status})`);
       }
-    } catch { /* silencioso */ }
+    } catch {
+      setActionError("Error al cargar webhooks");
+    }
   }, []);
 
   const loadDlq = useCallback(async () => {
@@ -188,20 +195,61 @@ export default function SaasWebhooksPage() {
     if (showLogs === id) { setShowLogs(null); return; }
     setShowLogs(id);
     setLoadingLogs(true);
+    setActionError(null);
     try {
-      const res = await fetch(`/api/saas/webhooks?id=${id}&logs=true`);
-      if (res.ok) {
-        const d = (await res.json()) as { logs?: WebhookLog[] };
-        setLogs(d.logs ?? []);
-      } else {
-        setLogs([]);
+      const res = await fetch(`/api/saas/webhooks?id=${encodeURIComponent(id)}&logs=true`);
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
       }
-    } catch { setLogs([]); }
-    finally { setLoadingLogs(false); }
+      const d = (await res.json()) as { logs?: WebhookLog[] };
+      setLogs(d.logs ?? []);
+    } catch (err) {
+      setLogs([]);
+      setActionError(err instanceof Error ? err.message : "Error al cargar logs");
+    } finally {
+      setLoadingLogs(false);
+    }
   }
 
-  function toggleActive(id: string) {
-    setWebhooks(prev => prev.map(w => w.id === id ? { ...w, active: !w.active } : w));
+  async function toggleActive(id: string, currentlyActive: boolean) {
+    setTogglingId(id);
+    setActionError(null);
+    try {
+      const res = await fetch("/api/saas/webhooks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, active: !currentlyActive }),
+      });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
+      await load();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al actualizar webhook");
+    } finally {
+      setTogglingId(null);
+    }
+  }
+
+  async function deleteWebhook(id: string) {
+    if (!window.confirm("¿Eliminar este webhook?")) return;
+    setDeletingId(id);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/saas/webhooks?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
+      if (showLogs === id) setShowLogs(null);
+      await load();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al eliminar webhook");
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   function copySecret(id: string, secret: string) {
@@ -212,13 +260,20 @@ export default function SaasWebhooksPage() {
 
   async function replayDlq(id: string) {
     setReplayingId(id);
+    setActionError(null);
     try {
       const res = await fetch("/api/saas/webhooks/dlq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "replay", id }),
       });
-      if (res.ok) void loadDlq();
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
+      void loadDlq();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Error al reintentar entrega");
     } finally {
       setReplayingId(null);
     }
@@ -232,6 +287,13 @@ export default function SaasWebhooksPage() {
               <NelvyonDsSectionHeader title="Webhooks" subtitle="Envía eventos en tiempo real a tus sistemas externos (Slack, Zapier, N8N, Make…)" />
               <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nuevo webhook</NelvyonDsButton>
             </div>
+
+            {actionError && (
+              <NelvyonDsCard className="border-red-500/30 bg-red-500/5 p-4">
+                <p className="text-sm text-red-400">{actionError}</p>
+                <button type="button" onClick={() => setActionError(null)} className="mt-2 text-xs text-primary hover:underline">Cerrar</button>
+              </NelvyonDsCard>
+            )}
 
             <div className="grid grid-cols-3 gap-3">
               {[
@@ -276,14 +338,26 @@ export default function SaasWebhooksPage() {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <button onClick={() => toggleActive(w.id)}
-                          className={`relative inline-flex h-6 w-11 cursor-pointer rounded-full transition-colors ${w.active ? "bg-primary" : "bg-muted"}`}>
+                        <button
+                          type="button"
+                          disabled={togglingId === w.id}
+                          onClick={() => void toggleActive(w.id, w.active)}
+                          aria-label={w.active ? "Desactivar webhook" : "Activar webhook"}
+                          className={`relative inline-flex h-6 w-11 cursor-pointer rounded-full transition-colors disabled:opacity-50 ${w.active ? "bg-primary" : "bg-muted"}`}
+                        >
                           <span className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${w.active ? "translate-x-5" : "translate-x-1"}`} />
                         </button>
-                        <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => openLogs(w.id)}>
+                        <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => void openLogs(w.id)}>
                           {showLogs === w.id ? "Ocultar logs" : "Ver logs"}
                         </NelvyonDsButton>
-                        <NelvyonDsButton variant="ghost" className="text-xs">✉ Test</NelvyonDsButton>
+                        <NelvyonDsButton
+                          variant="ghost"
+                          className="text-xs text-red-400"
+                          disabled={deletingId === w.id}
+                          onClick={() => void deleteWebhook(w.id)}
+                        >
+                          {deletingId === w.id ? "Eliminando…" : "Eliminar"}
+                        </NelvyonDsButton>
                       </div>
                     </div>
                   </div>
@@ -308,7 +382,6 @@ export default function SaasWebhooksPage() {
                                 </div>
                                 <p className="mt-1 text-[11px] text-muted-foreground font-mono truncate">{log.payload}</p>
                               </div>
-                              <button className="text-[11px] text-primary hover:underline shrink-0">Reenviar</button>
                             </div>
                           ))}
                         </div>

@@ -60,6 +60,10 @@ export default function SaasSettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<SettingsSummary | null>(null);
   const [tab, setTab] = useState<Tab>("general");
+  const [profileForm, setProfileForm] = useState({ companyName: "", industry: "", website: "", phone: "" });
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   // SSO state
   const [ssoConfig, setSsoConfig] = useState<SsoConfig | null>(null);
@@ -83,7 +87,14 @@ export default function SaasSettingsPage() {
           return;
         }
         if (!res.ok) throw new Error("No se pudo cargar la configuración");
-        setData((await res.json()) as SettingsSummary);
+        const summary = (await res.json()) as SettingsSummary;
+        setData(summary);
+        setProfileForm({
+          companyName: summary.tenant.companyName,
+          industry: summary.tenant.industry,
+          website: summary.tenant.website ?? "",
+          phone: summary.tenant.phone ?? "",
+        });
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Error");
       } finally {
@@ -190,29 +201,107 @@ export default function SaasSettingsPage() {
         <>
           <DarkCard glow>
             <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/30">Tenant</p>
-            <dl className="grid gap-3 text-sm sm:grid-cols-2">
-              {[
-                { label: "Empresa", value: data.tenant.companyName },
-                { label: "Industria", value: data.tenant.industry },
-                { label: "Web", value: data.tenant.website ?? "—" },
-                { label: "Teléfono", value: data.tenant.phone ?? "—" },
-              ].map((row) => (
-                <div key={row.label}>
-                  <dt className="text-[10px] uppercase tracking-wider text-white/30">{row.label}</dt>
-                  <dd className="mt-0.5 font-medium text-white/80">{row.value}</dd>
+            <form
+              className="space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void (async () => {
+                  setProfileSaving(true);
+                  setProfileError(null);
+                  setProfileSaved(false);
+                  try {
+                    const res = await fetch("/api/saas/settings", {
+                      method: "PATCH",
+                      credentials: "same-origin",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        companyName: profileForm.companyName.trim(),
+                        industry: profileForm.industry.trim(),
+                        website: profileForm.website.trim() || null,
+                        phone: profileForm.phone.trim() || null,
+                      }),
+                    });
+                    if (!res.ok) {
+                      const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+                      throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+                    }
+                    const summary = (await res.json()) as SettingsSummary;
+                    setData(summary);
+                    setProfileForm({
+                      companyName: summary.tenant.companyName,
+                      industry: summary.tenant.industry,
+                      website: summary.tenant.website ?? "",
+                      phone: summary.tenant.phone ?? "",
+                    });
+                    setProfileSaved(true);
+                    setTimeout(() => setProfileSaved(false), 2000);
+                  } catch (err) {
+                    setProfileError(err instanceof Error ? err.message : "Error al guardar");
+                  } finally {
+                    setProfileSaving(false);
+                  }
+                })();
+              }}
+            >
+              {profileError && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">{profileError}</p>}
+              <div className="grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-white/30">Empresa *</label>
+                  <input
+                    value={profileForm.companyName}
+                    onChange={(e) => setProfileForm((f) => ({ ...f, companyName: e.target.value }))}
+                    className={inputCls + " mt-0.5"}
+                    required
+                  />
                 </div>
-              ))}
-              <div>
-                <dt className="text-[10px] uppercase tracking-wider text-white/30">Plan</dt>
-                <dd className="mt-0.5">
-                  <span className={`inline-flex rounded-md px-2 py-0.5 text-xs font-bold uppercase tracking-wider ${
-                    data.tenant.plan === "enterprise" ? "bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/25" :
-                    data.tenant.plan === "pro" ? "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/25" :
-                    "bg-[#0084ff]/15 text-[#0084ff] ring-1 ring-[#0084ff]/25"
-                  }`}>{data.tenant.plan}</span>
-                </dd>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-white/30">Industria *</label>
+                  <input
+                    value={profileForm.industry}
+                    onChange={(e) => setProfileForm((f) => ({ ...f, industry: e.target.value }))}
+                    className={inputCls + " mt-0.5"}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-white/30">Web</label>
+                  <input
+                    value={profileForm.website}
+                    onChange={(e) => setProfileForm((f) => ({ ...f, website: e.target.value }))}
+                    className={inputCls + " mt-0.5"}
+                    placeholder="https://"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-white/30">Teléfono</label>
+                  <input
+                    value={profileForm.phone}
+                    onChange={(e) => setProfileForm((f) => ({ ...f, phone: e.target.value }))}
+                    className={inputCls + " mt-0.5"}
+                  />
+                </div>
+                <div>
+                  <dt className="text-[10px] uppercase tracking-wider text-white/30">Plan</dt>
+                  <dd className="mt-0.5">
+                    <span className={`inline-flex rounded-md px-2 py-0.5 text-xs font-bold uppercase tracking-wider ${
+                      data.tenant.plan === "enterprise" ? "bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/25" :
+                      data.tenant.plan === "pro" ? "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/25" :
+                      "bg-[#0084ff]/15 text-[#0084ff] ring-1 ring-[#0084ff]/25"
+                    }`}>{data.tenant.plan}</span>
+                  </dd>
+                </div>
               </div>
-            </dl>
+              <div className="flex items-center gap-3">
+                <button
+                  type="submit"
+                  disabled={profileSaving || !profileForm.companyName.trim() || !profileForm.industry.trim()}
+                  className="rounded-lg bg-[#0084ff] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {profileSaving ? "Guardando…" : "Guardar cambios"}
+                </button>
+                {profileSaved && <span className="text-xs text-emerald-400">✓ Guardado</span>}
+              </div>
+            </form>
           </DarkCard>
           <DarkCard>
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">Idioma de la interfaz</p>
