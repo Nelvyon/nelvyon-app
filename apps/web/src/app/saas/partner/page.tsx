@@ -91,24 +91,30 @@ export default function PartnerZonePage() {
 
   async function loadLedger() {
     if (ledgerLoaded) return;
-    const res = await fetch("/api/saas/partner/ledger");
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/saas/partner/ledger");
+      if (!res.ok) throw new Error(`Error ${res.status}`);
       const d = (await res.json()) as { entries: LedgerEntry[]; totals: LedgerTotals };
       setLedger(d.entries ?? []);
       setLedgerTotals(d.totals);
+      setLedgerLoaded(true);
+    } catch {
+      // leave unloaded so the tab can retry on next visit
     }
-    setLedgerLoaded(true);
   }
 
   async function loadReferrals() {
     if (referralsLoaded) return;
-    const res = await fetch("/api/saas/partner/referrals");
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/saas/partner/referrals");
+      if (!res.ok) throw new Error(`Error ${res.status}`);
       const d = (await res.json()) as { partner: { referralCode: string }; referrals: Array<Record<string, unknown>> };
       setReferralCode(d.partner?.referralCode ?? null);
       setReferrals(d.referrals ?? []);
+      setReferralsLoaded(true);
+    } catch {
+      // leave unloaded so the tab can retry on next visit
     }
-    setReferralsLoaded(true);
   }
 
   useEffect(() => {

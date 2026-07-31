@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     const result = await getSaasApiKeysService().create(ctx.tenant.id, ctx.claims.userId ?? null, {
       name: typeof b.name === "string" ? b.name : "",
       scopes: Array.isArray(b.scopes) ? b.scopes.filter((x): x is string => typeof x === "string") : undefined,
-      expiresAt: typeof b.expires_at === "string" ? b.expires_at : null,
+      expiresAt: typeof b.expiresAt === "string" ? b.expiresAt : typeof b.expires_at === "string" ? b.expires_at : null,
     });
     void getSaasAuditService().log(ctx.tenant.id, {
       action: "create", module: "api-keys",

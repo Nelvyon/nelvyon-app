@@ -180,10 +180,16 @@ export default function SaasApiKeysPage() {
   useEffect(() => { void load(); }, [load]);
 
   async function revokeKey(id: string) {
-    setKeys(prev => prev.map(k => k.id === id ? { ...k, active: false } : k));
     try {
-      await fetch(`/api/saas/api-keys?id=${id}`, { method: "DELETE" });
-    } catch { /* silencioso */ }
+      const res = await fetch(`/api/saas/api-keys?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
+      setKeys((prev) => prev.map((k) => (k.id === id ? { ...k, active: false } : k)));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "No se pudo revocar la key");
+    }
   }
 
   return (
@@ -286,7 +292,7 @@ export default function SaasApiKeysPage() {
                 </NelvyonDsCard>
               </div>
             )}
-      {showModal && <CreateKeyModal onClose={() => setShowModal(false)} />}
+      {showModal && <CreateKeyModal onClose={() => { setShowModal(false); void load(); }} />}
     </SaasShellLayout>
   );
 }

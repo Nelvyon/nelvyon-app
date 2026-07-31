@@ -116,7 +116,7 @@ export default function SaasDevelopersPage() {
   -H "Content-Type: application/json"`}
           </pre>
           <div className="flex gap-2 text-xs text-muted-foreground">
-            <span>Rate limit: <strong className="text-foreground">60 req/min</strong> por key</span>
+            <span>Rate limit: <strong className="text-foreground">según plan (10–1.000 req/s)</strong> por key</span>
             <span>·</span>
             <span>Header de respuesta: <code className="font-mono">X-RateLimit-Remaining</code></span>
           </div>

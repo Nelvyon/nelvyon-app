@@ -61,11 +61,13 @@ function LinkModal({
   const [utmCampaign, setUtmCampaign] = useState("");
   const [landingUrl, setLandingUrl] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save() {
     setSaving(true);
+    setError(null);
     try {
-      await fetch("/api/saas/entregables/revenue", {
+      const res = await fetch("/api/saas/entregables/revenue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -75,8 +77,14 @@ function LinkModal({
           landingUrl: landingUrl || undefined,
         }),
       });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(d?.message ?? d?.error ?? `Error ${res.status}`);
+      }
       onSaved();
       onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al guardar");
     } finally {
       setSaving(false);
     }
@@ -86,6 +94,7 @@ function LinkModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="rounded-xl border border-white/10 bg-[#0d1929] p-6 w-full max-w-md space-y-4">
         <h2 className="text-white font-semibold">Vincular campaña UTM</h2>
+        {error && <p className="text-sm text-red-400">{error}</p>}
         <div className="space-y-3">
           <div>
             <label className="text-xs text-white/50 block mb-1">UTM Campaign</label>

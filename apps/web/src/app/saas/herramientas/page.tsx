@@ -282,9 +282,9 @@ function ApiKeyCard() {
       <div className="rounded-xl bg-muted/20 p-4">
         <p className="mb-2 text-xs font-semibold text-muted-foreground">Rate limits</p>
         <div className="space-y-1 text-xs text-muted-foreground">
-          <p><span className="text-foreground font-medium">Starter</span> — 1.000 req/día</p>
-          <p><span className="text-foreground font-medium">Pro</span> — 10.000 req/día</p>
-          <p><span className="text-foreground font-medium">Agency</span> — Ilimitado</p>
+          <p><span className="text-foreground font-medium">Starter</span> — 10 req/s</p>
+          <p><span className="text-foreground font-medium">Pro</span> — 100 req/s</p>
+          <p><span className="text-foreground font-medium">Agency</span> — 1.000 req/s</p>
         </div>
       </div>
     </NelvyonDsCard>

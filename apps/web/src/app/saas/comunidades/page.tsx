@@ -89,7 +89,7 @@ function PostCard({ post, onLike, liking }: { post: Post; onLike: (postId: strin
             <button
               type="button"
               disabled
-              title="Respuestas anidadas no disponibles — sin columna parent_post_id en el esquema"
+              title="Respuestas anidadas próximamente"
               className="flex cursor-not-allowed items-center gap-1.5 text-xs text-muted-foreground/50"
             >
               💬 {post.replies} respuestas
@@ -97,7 +97,7 @@ function PostCard({ post, onLike, liking }: { post: Post; onLike: (postId: strin
             <button
               type="button"
               disabled
-              title="Compartir externo no implementado — usa copiar enlace del navegador"
+              title="Comparte el enlace de la página desde el navegador"
               className="flex cursor-not-allowed items-center gap-1.5 text-xs text-muted-foreground/50"
             >
               ↗ Compartir

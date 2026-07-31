@@ -224,8 +224,16 @@ function IntegracionesContent() {
     const conn = connections.find((c) => c.slug === slug);
     if (!conn) return;
     if (!confirm(`¿Desconectar ${conn.displayName}?`)) return;
-    await fetch(`/api/saas/integrations?provider=${encodeURIComponent(slug)}`, { method: "DELETE" }).catch(() => {});
-    void load();
+    try {
+      const res = await fetch(`/api/saas/integrations?provider=${encodeURIComponent(slug)}`, { method: "DELETE" });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
+      void load();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "No se pudo desconectar. Reintenta.");
+    }
   }
 
   async function handleSync(slug: string, direction: "pull" | "push" = "pull") {
