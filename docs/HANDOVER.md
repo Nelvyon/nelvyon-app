@@ -1,22 +1,21 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 16 ERP** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §27 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
+> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 17 P0 countdown/snippets/AB/QR** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §28 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
 
 | Campo | Valor |
 |-------|-------|
 | **Tip prod live** | `3f10c272` |
-| **Calidad** | tsc/lint/build **PASS** · vitest **2480 passed / 4 skipped** · smoke ERP 307/401 **PASS** |
-| **W3CRM** | Módulos 1–15 **DONE** · módulo 16 **ERP DONE**: submit/approve PR HTTP+UI, reserve inventario UI, DS en 5 pantallas. Ver §27 |
+| **Calidad** | tsc/lint/build **PASS** · vitest **2480 passed / 4 skipped** |
+| **W3CRM** | Módulos 1–16 **DONE** · módulo 17 **P0 DONE** (countdown/snippets/ab-testing/qr). P1 pendiente: helpdesk, documentos, encuestas, prospecting, objetos. Ver §28 |
 | **claimReady** | **false** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Continuar automáticamente con **módulo 17 — Gestión operativa** (helpdesk, prospecting, snippets, countdown, objetos, encuestas, documentos, qr, ab-testing) — no esperar confirmación salvo irreversible/coste/credenciales.
-2. Validar visualmente en staging módulos 2–16 (`BLOCKED_ENVIRONMENT` en local).
-3. Patrón: auditar → APIs reales → causas raíz → gates → commits → docs.
-4. No prod deploy UI · no flip claimReady · canary KILL.
+1. Continuar automáticamente con **módulo 17b — Gestión operativa P1** (helpdesk, documentos, encuestas, prospecting, objetos) — no esperar confirmación salvo irreversible/coste/credenciales.
+2. Luego resto cuenta/IA pendientes + auditoría global SaaS.
+3. No prod deploy UI · no flip claimReady · canary KILL.
 
 ### Rollback IA / spend
 

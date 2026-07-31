@@ -845,3 +845,35 @@ Pantallas: `/saas/erp/{purchases,inventory,manufacturing,projects,sectors}`. API
 ### 27.4 Próximo módulo
 
 **Gestión — herramientas operativas** (`helpdesk`, `prospecting`, `snippets`, `countdown`, `objetos`, `encuestas`, `documentos`, `qr`, `ab-testing`) por lotes.
+
+---
+
+## 28. Módulo 17 — Gestión operativa P0 (countdown, snippets, A/B, QR) (2026-07-31)
+
+### 28.1 Alcance
+
+Pantallas P0: `/saas/countdown`, `/saas/snippets`, `/saas/ab-testing`, `/saas/qr`. Auditoría completa de 9 pantallas gestion (ver agent explore); este cierre corrige los **P0 funcionales**.
+
+### 28.2 Causas raíz corregidas
+
+- **Countdown:** UI enviaba `targetDate`/`durationMinutes`/`theme` vs API `targetDatetime`/`durationSeconds`/`actionOnEnd` → create siempre fallaba; listado leía campos inexistentes. **Fix:** payload alineado + display real + DELETE + embed generado.
+- **Snippets:** UI enviaba `type` ignorado; leía `type`/`usageCount` inexistentes. **Fix:** `channels[]` + variables; PUT propaga channels; filtros por canal real.
+- **A/B Testing:** botones Iniciar/Pausar/Editar sin handlers; KPI inventado `+23%`; `declare_winner` sin UI. **Fix:** botón Declarar ganador; KPI confianza real; sin botones muertos; errores visibles.
+- **QR:** canvas hash no escaneable. **Fix:** render real vía QR Server API.
+
+### 28.3 Pendiente (P1 — siguiente lote)
+
+helpdesk (macros CRUD + errores), documentos (contact/value), encuestas (errores + delete), prospecting (errores), objetos (recordsCount + records UI).
+
+### 28.4 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| tsc / ESLint | **PASS** |
+| vitest | **PASS** — **2480 / 4 skipped** |
+| build | **PASS** |
+| Staging | **BLOCKED_ENVIRONMENT** |
+
+### 28.5 Próximo módulo
+
+**Gestión operativa P1** — helpdesk, documentos, encuestas, prospecting, objetos.
