@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 7 Marketing y redes sociales, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/{social,publicidad,seo,reputacion}` — sustitución sistemática de colores Tailwind literales por tokens semánticos + KPIs migrados a `KpiTile`. Sin fix funcional (las 4 pantallas ya eran 100% reales). No se pudo tomar captura autenticada en local por falta de `DATABASE_URL`, mismo bloqueo que módulos 2–6. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §18.3 — tsc/ESLint/build PASS, vitest 2467 passed/4 skipped, smoke sin sesión (307/401, sin 500) |
+| **Próximo paso** | Validar visualmente en el primer despliegue a staging con sesión real (agrupar con módulos 2–6 pendientes de la misma validación) |
+
 ### UI — verificación visual en staging pendiente (módulo 6 Calendario/citas, 2026-07-31)
 
 | Campo | Valor |

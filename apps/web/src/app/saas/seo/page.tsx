@@ -8,6 +8,7 @@ import {
   NelvyonDsCard,
   NelvyonDsSectionHeader,
 } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
@@ -46,7 +47,7 @@ interface SeoSummary {
 
 function KeywordRow({ kw }: { kw: Keyword }) {
   const delta = kw.previousPosition !== null ? kw.previousPosition - kw.position : null;
-  const diffColor = kw.difficulty >= 70 ? "text-red-400" : kw.difficulty >= 40 ? "text-yellow-400" : "text-green-400";
+  const diffColor = kw.difficulty >= 70 ? "text-destructive" : kw.difficulty >= 40 ? "text-warning" : "text-success";
 
   return (
     <div className="grid grid-cols-[minmax(0,2fr)_60px_80px_80px_80px_80px] items-center gap-3 border-b border-border py-3 last:border-none text-sm">
@@ -55,11 +56,11 @@ function KeywordRow({ kw }: { kw: Keyword }) {
         {kw.url && <p className="truncate text-xs text-muted-foreground">{kw.url}</p>}
       </div>
       <div className="text-center">
-        <span className={`font-semibold ${kw.position <= 3 ? "text-green-400" : kw.position <= 10 ? "text-yellow-400" : "text-foreground"}`}>
+        <span className={`font-semibold ${kw.position <= 3 ? "text-success" : kw.position <= 10 ? "text-warning" : "text-foreground"}`}>
           #{kw.position}
         </span>
         {delta !== null && (
-          <p className={`text-xs ${delta > 0 ? "text-green-400" : delta < 0 ? "text-red-400" : "text-muted-foreground"}`}>
+          <p className={`text-xs ${delta > 0 ? "text-success" : delta < 0 ? "text-destructive" : "text-muted-foreground"}`}>
             {delta > 0 ? `▲${delta}` : delta < 0 ? `▼${Math.abs(delta)}` : "—"}
           </p>
         )}
@@ -108,7 +109,7 @@ function AddKeywordModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-5 text-lg font-semibold text-foreground">Añadir keywords</h2>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={submit} className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Keywords (una por línea)</label>
@@ -195,7 +196,7 @@ export default function SaasSeoPage() {
         </div>
 
         {configured === false ? (
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+          <div className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
             <strong>SEMrush no configurado:</strong>{" "}
             {configMessage ?? "Configura SEMRUSH_API_KEY y SEO_DOMAIN en Railway para posiciones en vivo. Puedes añadir keywords manualmente."}
           </div>
@@ -203,26 +204,21 @@ export default function SaasSeoPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-          {[
-            { label: "Keywords rastreadas", value: keywords.length },
-            { label: "Top 3", value: top3 },
-            { label: "Top 10", value: top10 },
-            { label: "Errores SEO", value: errors },
-            ...(summary ? [
-              { label: "Tráfico orgánico", value: summary.organicTraffic.toLocaleString("es-ES") },
-              { label: "Backlinks", value: summary.backlinks.toLocaleString("es-ES") },
-            ] : []),
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
+          <KpiTile icon="🔑" label="Keywords rastreadas" value={keywords.length} />
+          <KpiTile icon="🥇" label="Top 3" value={top3} accent />
+          <KpiTile icon="🏅" label="Top 10" value={top10} />
+          <KpiTile icon="❌" label="Errores SEO" value={errors} />
+          {summary && (
+            <>
+              <KpiTile icon="📈" label="Tráfico orgánico" value={summary.organicTraffic.toLocaleString("es-ES")} />
+              <KpiTile icon="🔗" label="Backlinks" value={summary.backlinks.toLocaleString("es-ES")} />
+            </>
+          )}
         </div>
 
         {/* GSC hint */}
-        <NelvyonDsCard className="border-blue-500/20 bg-blue-500/5 p-4">
-          <p className="text-sm font-medium text-blue-400">💡 Conecta Google Search Console</p>
+        <NelvyonDsCard className="border-primary/20 bg-primary/5 p-4">
+          <p className="text-sm font-medium text-primary">💡 Conecta Google Search Console</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Añade <code className="rounded bg-muted px-1 text-xs">GOOGLE_SEARCH_CONSOLE_*</code> en Railway para importar datos reales de GSC automáticamente.
           </p>

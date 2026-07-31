@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 6 Calendario/citas DONE · módulo 5 Automatizaciones/workflows DONE (builder clásico + editor visual) · módulo 4 Comunicación DONE · módulo 3 IA NELVYON DONE · módulo 2 CRM/Pipeline DONE · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
+> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 7 Marketing/redes sociales DONE · módulo 6 Calendario/citas DONE · módulo 5 Automatizaciones/workflows DONE (builder clásico + editor visual) · módulo 4 Comunicación DONE · módulo 3 IA NELVYON DONE · módulo 2 CRM/Pipeline DONE · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
 
 ---
 
@@ -39,9 +39,12 @@
 - [ ] **P2 — validar visualmente en staging** el módulo Automatizaciones/workflows con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que módulos 2, 3 y 4)
 - [x] **2026-07-31 W3CRM Fase 2 — Calendario/citas:** fix de causa raíz — `/api/saas/citas` solo tenía `GET`/`POST`, ninguna cita podía transicionar de estado ni borrarse (KPI "Completadas" matemáticamente fijo en 0) → nuevo `PATCH`/`DELETE /api/saas/citas/[id]` + botones de acción (Confirmar/Completar/Cancelar/Eliminar) en `/saas/citas`, KPIs migrados a `KpiTile`; `/saas/calendar` gana skeleton de loading, empty state en vista lista y manejo de error de red; `@fullcalendar/react` evaluado y descartado (grid CSS propio ya cubre el caso de uso) · tsc/lint/build/vitest (2467 passed/4 skipped) PASS · smoke incluye PATCH/DELETE sin sesión (401, sin 500) · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §17
 - [ ] **P2 — validar visualmente en staging** el módulo Calendario/citas con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que módulos 2, 3, 4 y 5)
-- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Marketing y redes sociales → Funnels/formularios/landing → … (orden completo en `docs/ops/W3CRM_MIGRATION_PLAN.md` §7)
+- [x] **2026-07-31 W3CRM Fase 2 — Marketing y redes sociales:** sin hallazgo funcional de causa raíz (las 4 pantallas ya tenían CRUD/OAuth/degraded states reales); único hallazgo: colores Tailwind literales (`red-400`, `#0084ff`, etc.) en vez de tokens semánticos en `/saas/{social,publicidad,seo,reputacion}` → sustituidos por `destructive/success/warning/primary` + KPIs migrados a `KpiTile` en las 4 pantallas; colores por plataforma/marca y por tipo de dato se mantienen intencionalmente · tsc/lint/build/vitest (2467 passed/4 skipped) PASS · smoke sin sesión (307/401, sin 500) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §18
+- [ ] **P2 — validar visualmente en staging** el módulo Marketing/redes sociales con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que módulos 2–6)
+- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Funnels, formularios y landing pages → Facturación/pagos/suscripciones → … (orden completo en `docs/ops/W3CRM_MIGRATION_PLAN.md` §7)
 - [ ] **W3CRM Fase 3+:** resto de los 69 módulos por commits separados · staging antes de prod
 - [ ] **Mejora futura no bloqueante:** `/saas/citas` reutiliza el permiso RBAC `workflows.write` (no existe `citas.*` dedicado) — introducir un permiso propio sería una mejora de higiene de RBAC legítima pero fuera del alcance de esta migración visual (ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §17.5)
+- [ ] **Mejora futura no bloqueante:** `/saas/{social,publicidad,seo,reputacion}` reutilizan `contacts.read/write`/`analytics.read` en vez de permisos `marketing.*`/`ads.*` dedicados — mejora de higiene de RBAC legítima pero fuera del alcance de esta migración visual (ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §18.4)
 
 ---
 

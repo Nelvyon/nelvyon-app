@@ -87,7 +87,7 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
           <h2 className="text-lg font-semibold text-foreground">Conectar cuenta publicitaria</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">x</button>
         </div>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={submit} className="space-y-4">
           <div>
             <label className="mb-2 block text-xs font-medium text-muted-foreground">Plataforma</label>
@@ -102,31 +102,31 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
             </div>
           </div>
           {(platform === "meta" || platform === "google" || platform === "linkedin" || platform === "tiktok" || platform === "snapchat") && (
-            <div className="rounded-lg border border-[#0084ff]/20 bg-[#0084ff]/5 px-4 py-3 space-y-2">
+            <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
               <p className="text-xs text-muted-foreground">Conexión recomendada — OAuth oficial:</p>
               <div className="flex flex-wrap gap-2">
                 {platform === "meta" && (
-                  <a href="/api/oauth/meta" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                  <a href="/api/oauth/meta" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
                     Conectar Meta OAuth →
                   </a>
                 )}
                 {platform === "google" && (
-                  <a href="/api/oauth/google" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                  <a href="/api/oauth/google" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
                     Conectar Google OAuth →
                   </a>
                 )}
                 {platform === "linkedin" && (
-                  <a href="/api/oauth/linkedin" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                  <a href="/api/oauth/linkedin" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
                     Conectar LinkedIn OAuth →
                   </a>
                 )}
                 {platform === "tiktok" && (
-                  <a href="/api/oauth/tiktok" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                  <a href="/api/oauth/tiktok" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
                     Conectar TikTok OAuth →
                   </a>
                 )}
                 {platform === "snapchat" && (
-                  <a href="/api/oauth/snapchat" className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25">
+                  <a href="/api/oauth/snapchat" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
                     Conectar Snapchat OAuth →
                   </a>
                 )}
@@ -160,13 +160,13 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
             </div>
           )}
           {(platform === "tiktok" || platform === "snapchat") && (
-            <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 px-4 py-3 text-xs text-blue-400">
+            <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-xs text-primary">
               {platform === "tiktok"
                 ? "TikTok: genera el Access Token desde TikTok for Business → Marketing API → App → Access Token."
                 : "Snapchat: genera el token OAuth desde Snapchat Business → Snap Marketing API → OAuth."}
             </div>
           )}
-          <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 px-4 py-3 text-xs text-yellow-400">
+          <div className="rounded-lg border border-warning/20 bg-warning/5 px-4 py-3 text-xs text-warning">
             El token se almacena cifrado. Necesitas permisos de lectura de metricas.
           </div>
           <div className="flex gap-3">
@@ -219,7 +219,7 @@ function CreateCampaignModal({ platform, onClose, onSaved }: { platform: AdsPlat
           <h2 className="text-lg font-semibold text-foreground">Crear campaña — {platform.toUpperCase()}</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
         </div>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={(e) => void submit(e)} className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre de campaña *</label>
@@ -282,7 +282,7 @@ function EditBudgetModal({ campaign, platform, onClose, onSaved }: { campaign: A
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
         </div>
         <p className="mb-4 text-sm text-muted-foreground truncate">{campaign.name}</p>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={(e) => void submit(e)} className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Presupuesto diario (USD) *</label>
@@ -338,7 +338,7 @@ function CampaignsSection({ platform }: { platform: AdsPlatform }) {
   }
 
   if (loading) return <div className="h-16 animate-pulse rounded-xl bg-muted/30" />;
-  if (error) return <p className="text-sm text-red-400">{error}</p>;
+  if (error) return <p className="text-sm text-destructive">{error}</p>;
 
   return (
     <div className="mt-4">
@@ -415,7 +415,7 @@ function MetricsCard({ platform, dateStart, dateEnd }: { platform: AdsPlatform; 
       {loading ? (
         <div className="h-16 animate-pulse rounded-lg bg-muted/30" />
       ) : error ? (
-        <p className="text-sm text-red-400">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       ) : metrics ? (
         <div className="grid grid-cols-3 gap-4 sm:grid-cols-6 text-sm">
           <div><p className="text-xs text-muted-foreground">Gasto</p><p className="font-semibold text-foreground">{eur(metrics.spend)}</p></div>
@@ -423,7 +423,7 @@ function MetricsCard({ platform, dateStart, dateEnd }: { platform: AdsPlatform; 
           <div><p className="text-xs text-muted-foreground">Clics</p><p className="font-semibold text-foreground">{fmt(metrics.clicks)}</p></div>
           <div><p className="text-xs text-muted-foreground">Conversiones</p><p className="font-semibold text-foreground">{fmt(metrics.conversions)}</p></div>
           <div><p className="text-xs text-muted-foreground">CTR</p><p className="font-semibold text-foreground">{metrics.ctr != null ? `${metrics.ctr.toFixed(2)}%` : "-"}</p></div>
-          <div><p className="text-xs text-muted-foreground">ROAS</p><p className={`font-semibold ${metrics.roas != null && metrics.roas >= 2 ? "text-green-400" : metrics.roas != null && metrics.roas >= 1 ? "text-yellow-400" : "text-foreground"}`}>{metrics.roas != null ? `${metrics.roas.toFixed(2)}x` : "-"}</p></div>
+          <div><p className="text-xs text-muted-foreground">ROAS</p><p className={`font-semibold ${metrics.roas != null && metrics.roas >= 2 ? "text-success" : metrics.roas != null && metrics.roas >= 1 ? "text-warning" : "text-foreground"}`}>{metrics.roas != null ? `${metrics.roas.toFixed(2)}x` : "-"}</p></div>
         </div>
       ) : null}
     </NelvyonDsCard>
@@ -503,7 +503,7 @@ function LinkCampaignModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           <h2 className="text-lg font-semibold text-foreground">Vincular campaña Ads ↔ UTM</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
         </div>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={(e) => void submit(e)} className="space-y-4">
           <div>
             <label className="mb-2 block text-xs font-medium text-muted-foreground">Plataforma</label>
@@ -610,7 +610,7 @@ function AttributionTab() {
       {loading ? (
         <div className="flex flex-col gap-2">{[1,2,3].map(i => <div key={i} className="h-12 animate-pulse rounded-xl bg-muted/30"/>)}</div>
       ) : error ? (
-        <p className="text-sm text-red-400">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       ) : rows.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-12 text-center">
           <p className="text-4xl mb-3">🔗</p>
@@ -649,7 +649,7 @@ function AttributionTab() {
                   <td className="px-4 py-3 text-right text-foreground">{r.attributedConversions > 0 ? fmt(r.attributedConversions) : "—"}</td>
                   <td className="px-4 py-3 text-right">
                     {r.attributedRoas != null ? (
-                      <span className={r.attributedRoas >= 2 ? "font-semibold text-green-400" : r.attributedRoas >= 1 ? "text-yellow-400" : "text-red-400"}>
+                      <span className={r.attributedRoas >= 2 ? "font-semibold text-success" : r.attributedRoas >= 1 ? "text-warning" : "text-destructive"}>
                         {r.attributedRoas.toFixed(2)}x
                       </span>
                     ) : <span className="text-muted-foreground">—</span>}
@@ -721,7 +721,7 @@ export default function SaasPublicidadPage() {
         <div className="flex gap-1 rounded-xl border border-border bg-card/50 p-1 w-fit">
           {([["metricas", "Métricas y campañas"], ["atribucion", "Atribución multi-touch"]] as [PublicidadTab, string][]).map(([id, label]) => (
             <button key={id} onClick={() => setTab(id)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${tab === id ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${tab === id ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
               {label}
             </button>
           ))}

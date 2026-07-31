@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -20,7 +21,7 @@ type Tab = "reviews" | "mentions" | "alerts";
 
 const STAR = "★"; const STAR_EMPTY = "☆";
 function Stars({ n }: { n: number }) {
-  return <span className={n <= 2 ? "text-red-400" : n >= 4 ? "text-yellow-400" : "text-muted-foreground"}>
+  return <span className={n <= 2 ? "text-destructive" : n >= 4 ? "text-warning" : "text-muted-foreground"}>
     {Array.from({ length: 5 }, (_, i) => i < n ? STAR : STAR_EMPTY).join("")}
   </span>;
 }
@@ -49,7 +50,7 @@ function ReplyModal({ review, onClose, onSaved }: { review: GbpReview; onClose: 
           <p className="text-xs text-muted-foreground mb-1"><span className="font-medium text-foreground">{review.authorName}</span> · <Stars n={review.rating} /></p>
           <p className="text-sm text-foreground line-clamp-3">{review.reviewText ?? "Sin comentario"}</p>
         </div>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={save} className="space-y-4">
           <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Tu respuesta *</label>
             <textarea value={comment} onChange={e => setComment(e.target.value)} rows={4} placeholder="Gracias por tu reseña…" className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
@@ -79,7 +80,7 @@ function NewAlertModal({ onClose, onSaved }: { onClose: () => void; onSaved: () 
       <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-4 text-lg font-semibold text-foreground">Verificar alertas</h2>
         <p className="text-sm text-muted-foreground mb-5">Ejecuta el análisis de sentiment para detectar alertas negativas (score 24h &lt; -0.3).</p>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={save} className="flex gap-3">
           <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
           <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Ejecutando…" : "Ejecutar"}</NelvyonDsButton>
@@ -167,9 +168,9 @@ export default function SaasReputacionPage() {
 
         {/* Negative reviews alert banner */}
         {negativeReviews.length > 0 && (
-          <div className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3">
+          <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3">
             <span className="text-xl">⚠️</span>
-            <p className="text-sm text-red-300 font-medium">{negativeReviews.length} reseña{negativeReviews.length > 1 ? "s" : ""} negativa{negativeReviews.length > 1 ? "s" : ""} sin responder</p>
+            <p className="text-sm text-destructive font-medium">{negativeReviews.length} reseña{negativeReviews.length > 1 ? "s" : ""} negativa{negativeReviews.length > 1 ? "s" : ""} sin responder</p>
             <NelvyonDsButton variant="ghost" className="ml-auto text-xs" onClick={() => setTab("reviews")}>Ver reseñas →</NelvyonDsButton>
           </div>
         )}
@@ -178,28 +179,21 @@ export default function SaasReputacionPage() {
         {!loading && !gbpConfig.placesConfigured && (
           <SaasDegradedBanner>
             Conecta Google Business Profile: añade credenciales OAuth y Place IDs en Integraciones
-            (<code className="text-amber-200">GOOGLE_PLACES_API_KEY</code>, <code className="text-amber-200">GBP_PLACE_ID</code>)
+            (<code className="text-warning">GOOGLE_PLACES_API_KEY</code>, <code className="text-warning">GBP_PLACE_ID</code>)
             para sincronizar reseñas en vivo.
           </SaasDegradedBanner>
         )}
 
         {syncMsg && (
-          <p className={`text-sm px-4 py-2 rounded-lg ${syncMsg.startsWith("Error") ? "bg-red-500/10 text-red-400" : "bg-green-500/10 text-green-400"}`}>{syncMsg}</p>
+          <p className={`text-sm px-4 py-2 rounded-lg ${syncMsg.startsWith("Error") ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success"}`}>{syncMsg}</p>
         )}
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Reseñas GBP", value: gbpStats?.total ?? 0 },
-            { label: "Rating promedio", value: gbpStats ? `${gbpStats.avgRating}★` : "—" },
-            { label: "Sin responder", value: gbpStats?.pendingReplies ?? 0 },
-            { label: "Score menciones", value: `${sentScore}%` },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
+          <KpiTile icon="⭐" label="Reseñas GBP" value={gbpStats?.total ?? 0} />
+          <KpiTile icon="📊" label="Rating promedio" value={gbpStats ? `${gbpStats.avgRating}★` : "—"} accent />
+          <KpiTile icon="✉️" label="Sin responder" value={gbpStats?.pendingReplies ?? 0} />
+          <KpiTile icon="👁️" label="Score menciones" value={`${sentScore}%`} />
         </div>
 
         {/* Tabs */}
@@ -225,7 +219,7 @@ export default function SaasReputacionPage() {
           ) : (
             <div className="space-y-3">
               {reviews.map(r => (
-                <NelvyonDsCard key={r.id} className={`p-4 ${r.rating <= 2 && r.replyStatus === "pending" ? "border-red-500/30" : ""}`}>
+                <NelvyonDsCard key={r.id} className={`p-4 ${r.rating <= 2 && r.replyStatus === "pending" ? "border-destructive/30" : ""}`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -304,9 +298,9 @@ export default function SaasReputacionPage() {
           ) : (
             <div className="space-y-2">
               {sentAlerts.map(a => (
-                <NelvyonDsCard key={a.id} className="flex items-center justify-between gap-4 px-5 py-3 border-red-500/30">
+                <NelvyonDsCard key={a.id} className="flex items-center justify-between gap-4 px-5 py-3 border-destructive/30">
                   <div>
-                    <p className="font-medium text-red-400">Alerta de sentiment negativo</p>
+                    <p className="font-medium text-destructive">Alerta de sentiment negativo</p>
                     <p className="text-xs text-muted-foreground">Score promedio {a.avgScore.toFixed(2)} · ventana {a.windowHours}h · {new Date(a.createdAt).toLocaleDateString("es-ES")}</p>
                   </div>
                   <NelvyonDsBadge tone={a.status === "active" ? "warning" : "primary"}>{a.status === "active" ? "Activa" : "Resuelta"}</NelvyonDsBadge>

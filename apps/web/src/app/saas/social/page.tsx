@@ -8,6 +8,7 @@ import {
   NelvyonDsCard,
   NelvyonDsSectionHeader,
 } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -156,7 +157,7 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={submit} className="space-y-5 p-6">
-          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+          {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
 
           <div>
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
@@ -278,6 +279,7 @@ export default function SaasSocialPage() {
   const [filterStatus, setFilterStatus] = useState<SocialPost["status"] | "all">("all");
   const [publishing, setPublishing] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -304,6 +306,7 @@ export default function SaasSocialPage() {
 
   async function handlePublishNow(postId: string) {
     setPublishing(postId);
+    setActionError(null);
     try {
       const r = await fetch("/api/saas/social/posts", {
         method: "POST",
@@ -311,7 +314,7 @@ export default function SaasSocialPage() {
         body: JSON.stringify({ action: "publish", id: postId }),
       });
       const d = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
-      if (!d.ok) alert(d.error ?? "Error al publicar");
+      if (!d.ok) setActionError(d.error ?? "Error al publicar");
       await load();
     } finally {
       setPublishing(null);
@@ -348,6 +351,10 @@ export default function SaasSocialPage() {
           <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo post</NelvyonDsButton>
         </div>
 
+        {actionError && (
+          <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>
+        )}
+
         {/* No-account warning */}
         {!loading && accounts.length === 0 && (
           <SaasDegradedBanner>
@@ -358,13 +365,13 @@ export default function SaasSocialPage() {
               <div className="flex flex-wrap gap-2">
                 <a
                   href="/api/oauth/meta"
-                  className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25"
+                  className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25"
                 >
                   Conectar Meta →
                 </a>
                 <a
                   href="/api/oauth/linkedin"
-                  className="rounded-lg bg-[#0084ff]/15 px-3 py-1.5 text-xs font-semibold text-[#0084ff] hover:bg-[#0084ff]/25"
+                  className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25"
                 >
                   Conectar LinkedIn →
                 </a>
@@ -394,17 +401,10 @@ export default function SaasSocialPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Posts totales", value: stats.total },
-            { label: "Publicados", value: stats.published },
-            { label: "Programados", value: stats.scheduled },
-            { label: "Cuentas activas", value: stats.connected },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
+          <KpiTile icon="📱" label="Posts totales" value={stats.total} />
+          <KpiTile icon="✅" label="Publicados" value={stats.published} accent />
+          <KpiTile icon="📅" label="Programados" value={stats.scheduled} />
+          <KpiTile icon="🔗" label="Cuentas activas" value={stats.connected} />
         </div>
 
         {/* Status filters */}
@@ -452,7 +452,7 @@ export default function SaasSocialPage() {
                       </div>
                       <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.content.replace(/<[^>]+>/g, "")}</p>
                       {p.errorMessage && (
-                        <p className="mt-1.5 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-400">
+                        <p className="mt-1.5 rounded-lg bg-destructive/10 px-3 py-1.5 text-xs text-destructive">
                           ❌ {p.errorMessage}
                         </p>
                       )}
@@ -469,7 +469,7 @@ export default function SaasSocialPage() {
                         )}
                         <NelvyonDsButton
                           variant="ghost"
-                          className="text-xs text-red-400 hover:text-red-300"
+                          className="text-xs text-destructive hover:text-destructive/80"
                           onClick={() => void handleDelete(p.id)}
                           disabled={deleting === p.id}
                         >

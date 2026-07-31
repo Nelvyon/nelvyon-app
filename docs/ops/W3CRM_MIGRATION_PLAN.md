@@ -1,7 +1,7 @@
 # W3CRM → NELVYON SaaS — Plan de migración (Fase 1)
 
-> **Estado:** AUDITORÍA COMPLETA · sin cambios de UI de producto · `claimReady: false` · sin canary · sin deploy prod
-> **Fecha:** 2026-07-30
+> **Estado:** Fase 2 en progreso — módulos 1–7 migrados (Dashboard, CRM/Pipeline, IA NELVYON, Comunicación, Automatizaciones/workflows, Calendario/citas, Marketing y redes sociales) · `claimReady: false` · sin canary · sin deploy prod
+> **Fecha:** 2026-07-30 (última actualización de contenido: 2026-07-31)
 > **Origen legal:** ThemeForest / Envato — autor **Dexignzone** — ZIP `crm-react-next-js-admin-dashboard-template-2026-01-09-12-10-44-utc.zip` (nombre interno del paquete: `NextJs-W3CRM-v1.0-04_Dec_2024`)
 > **Extract local (fuera de build):** `.reference/w3crm/` (**gitignored**, dos niveles de ZIP anidado ya descomprimidos: `doc.zip` + `package.zip` → `package/`)
 > **Supersede parcialmente:** `docs/ops/DASHFORGE_MIGRATION_PLAN.md` (ADR-074) queda **en pausa**; W3CRM pasa a ser la plantilla de referencia visual principal por instrucción explícita del usuario. Ver §0.2.
@@ -495,3 +495,38 @@ Dos pantallas reales en `saasNav.ts`: `/saas/citas` (agenda de citas 1:1 con con
 - Verificación visual autenticada en staging (igual que módulos 2–5, no bloqueante para cerrar el módulo a nivel de código).
 - No existe un permiso RBAC dedicado `citas.*`; el módulo reutiliza `workflows.read/write` desde su implementación original (antes de esta sesión). Introducir un permiso propio sería una mejora de higiene de RBAC legítima pero excede el alcance de "corregir causas raíz de defectos funcionales" de esta migración — queda documentado como mejora futura, no como defecto bloqueante.
 - `@fullcalendar/react@7.0.2` queda evaluado y descartado para este módulo (ver §17.1); si en el futuro se requiere vista de semana/día con drag-and-drop de eventos, es la librería recomendada por ser React 19-compatible.
+
+## 18. Módulo 7 — Marketing y redes sociales (2026-07-31)
+
+### 18.1 Alcance real auditado
+
+Cuatro pantallas reales en `saasNav.ts`: `/saas/social` (posts multi-red, cuentas OAuth, sugerencias IA vía `/api/saas/social/*`), `/saas/publicidad` (métricas y campañas Google/Meta/LinkedIn/TikTok/Snapchat Ads + atribución multi-touch vía `/api/saas/ads/*`), `/saas/seo` (keywords, posiciones, issues on-page vía `/api/saas/seo`, proveedor SEMrush opcional) y `/saas/reputacion` (reseñas Google Business Profile, menciones y alertas de sentiment vía `/api/saas/reputation`). Las cuatro ya eran implementaciones reales sin mocks, con CRUD, OAuth y estados degradados (`SaasDegradedBanner`) ya funcionales antes de esta sesión — a diferencia de los módulos 4/5/6, aquí **no se encontró ningún hallazgo funcional de causa raíz** (ninguna capacidad modelada en el backend y nunca expuesta en la UI).
+
+### 18.2 Hallazgo — violación sistemática de "un solo sistema visual" (colores hardcodeados)
+
+Las cuatro pantallas usaban de forma consistente utilidades Tailwind literales (`text-red-400`, `bg-red-500/10`, `text-green-400`, `text-yellow-400`, `border-amber-500/30`, `#0084ff`, `text-white`) en vez de los tokens semánticos del design system (`destructive`, `success`, `warning`, `primary`, `primary-foreground`) ya establecidos en los módulos 1–6. A diferencia del bug sistémico del módulo 2 (variables CSS de dark mode ausentes, que rompía el render), estos literales renderizaban visualmente correctamente — es una violación de consistencia del sistema de diseño, no un defecto de renderizado, pero incumple igualmente la regla "no mantengas dos sistemas visuales diferentes".
+
+**Corrección** — sustitución sistemática por archivo:
+
+- `/saas/social/page.tsx`: mensajes de error (`bg-destructive/10 text-destructive`), enlaces OAuth Meta/LinkedIn (`bg-primary/15 text-primary`), botón eliminar post (`text-destructive`), `alert()` de error de publicación sustituido por estado `actionError` inline, KPIs migrados a `KpiTile`. Los colores por plataforma (`PLATFORM_CONFIG`: Instagram rosa, Facebook/Meta azul, LinkedIn azul oscuro, TikTok morado) se mantienen intencionalmente — es codificación de marca por categoría, mismo patrón legítimo que los colores de tipo de evento del calendario (§17.3), no theming hardcodeado.
+- `/saas/publicidad/page.tsx`: errores de los 3 modales (Conectar/Crear campaña/Editar presupuesto) → `destructive`; banners OAuth y hints TikTok/Snapchat → `primary`; hint de almacenamiento cifrado de tokens → `warning`; lógica de color ROAS (`>=2` verde / `>=1` amarillo / resto rojo) → `success`/`warning`/`destructive` en `MetricsCard` y en la tabla de atribución; pestaña activa `text-white` → `text-primary-foreground`.
+- `/saas/seo/page.tsx`: dificultad/posición/delta de keyword → `destructive`/`warning`/`success`; banner "SEMrush no configurado" (`amber-500` literal) → `warning`; card de hint de Google Search Console (`blue-500` literal) → `primary`; KPIs migrados a `KpiTile`.
+- `/saas/reputacion/page.tsx`: estrellas de rating, banner de reseñas negativas sin responder, mensajes de sync (éxito/error) → `destructive`/`success`/`warning`; KPIs migrados a `KpiTile`; import de `KpiTile` añadido (faltaba pese a que el resto del módulo ya usaba `NelvyonDs*`).
+
+### 18.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint <4 archivos modificados>` | **PASS** (0 errores/warnings) |
+| `pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm` | **PASS** — 195 test files, 2467 passed / 4 skipped (sin tests nuevos — módulo sin cambios de lógica de backend) |
+| `pnpm -C apps/web build` | **PASS** — build de producción completo (312 páginas), incluye `/saas/{social,publicidad,seo,reputacion}` y sus APIs |
+| Smoke de rutas (servidor productivo local, puerto 8090, sin `DATABASE_URL`) | `GET /saas/{social,publicidad,seo,reputacion}` → `307` · `GET /api/saas/{social/posts,social/accounts,ads,seo,reputation}` → `401` (esperado, sin sesión, sin 500) |
+| Verificación visual autenticada en staging | **BLOCKED_ENVIRONMENT** — sin `DATABASE_URL`/sesión local; mismo hallazgo que módulos 2–6 |
+| Funcionalidad preservada | RBAC intacto (`contacts.read/write`, `analytics.read` — convención pre-existente del módulo, no introducida en esta sesión), aislamiento multi-tenant sin cambios, OAuth/integraciones sin cambios · canary IA apagado · `claimReady=false` |
+| Branding/mock data | Cero — las cuatro pantallas ya eran 100% datos reales; el fix es puramente de consistencia visual, sin tocar lógica de negocio |
+
+### 18.4 Pendiente / riesgo conocido
+
+- Verificación visual autenticada en staging (igual que módulos 2–6, no bloqueante para cerrar el módulo a nivel de código).
+- `/saas/social`, `/saas/publicidad` y `/saas/seo/reputation` usan permisos `contacts.read/write`/`analytics.read` en vez de un permiso `marketing.*`/`social.*`/`ads.*` dedicado — convención pre-existente heredada de antes de esta migración (mismo patrón documentado para `citas`/`calendar` con `workflows.*` en §17.5). No es un defecto de seguridad (las rutas están gateadas y aisladas por tenant), es una mejora de higiene de RBAC fuera del alcance de esta migración visual.
