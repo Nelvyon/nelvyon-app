@@ -16,15 +16,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (!b) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     const product = await getSaasStoreService().updateStoreProduct(ctx.tenant.id, id, {
       name: typeof b.name === "string" ? b.name : undefined,
-      description: typeof b.description === "string" ? b.description : undefined,
+      description: b.description === null ? "" : typeof b.description === "string" ? b.description : undefined,
       price: b.price !== undefined ? Number(b.price) : undefined,
       type: typeof b.type === "string" ? b.type : undefined,
       imageUrl: typeof b.image_url === "string" ? b.image_url : undefined,
       active: typeof b.active === "boolean" ? b.active : undefined,
-      sku: typeof b.sku === "string" ? b.sku : undefined,
+      sku: b.sku === null ? "" : typeof b.sku === "string" ? b.sku : undefined,
       stock: b.stock !== undefined ? Number(b.stock) : undefined,
-      slug: typeof b.slug === "string" ? b.slug : undefined,
-      category: typeof b.category === "string" ? b.category : undefined,
+      slug: b.slug === null ? "" : typeof b.slug === "string" ? b.slug : undefined,
+      category: b.category === null ? "" : typeof b.category === "string" ? b.category : undefined,
       variants: Array.isArray(b.variants) ? b.variants as never : undefined,
     });
     return NextResponse.json({ product });

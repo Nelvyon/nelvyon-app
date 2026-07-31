@@ -4,12 +4,21 @@ import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface StoreVariant { name: string; priceModifier: number; stock: number }
 interface StoreProduct { id: string; name: string; description: string | null; price: number; currency: string; type: string; active: boolean; imageUrl: string | null; sku: string | null; stock: number; slug: string | null; category: string | null; variants: StoreVariant[] | null; salesCount: number; createdAt: string }
 interface StoreSettings { currency: string; vatPct: number; vatIncluded: boolean; shippingFee: number; freeShippingAbove: number | null; storeName: string | null; storeDescription: string | null }
-interface StoreOrder { id: string; orderNumber: string; status: string; customerEmail: string; customerName: string | null; subtotal: number; vatAmount: number; shippingFee: number; total: number; currency: string; paidAt: string | null; createdAt: string }
+interface StoreOrderItem {
+  id: string; productName: string; variantName: string | null; sku: string | null;
+  quantity: number; unitPrice: number; totalPrice: number;
+}
+interface StoreOrder {
+  id: string; orderNumber: string; status: string; customerEmail: string; customerName: string | null;
+  subtotal: number; vatAmount: number; shippingFee: number; total: number; currency: string;
+  paidAt: string | null; createdAt: string; items?: StoreOrderItem[];
+}
 
 type Tab = "productos" | "pedidos" | "configuracion";
 
@@ -17,10 +26,18 @@ const ORDER_STATUS_LABELS: Record<string, string> = {
   pending: "Pendiente", paid: "Pagado", processing: "Procesando",
   shipped: "Enviado", delivered: "Entregado", cancelled: "Cancelado", refunded: "Devuelto",
 };
-const ORDER_STATUS_TONES: Record<string, "primary" | "success" | "warning"> = {
+const ORDER_STATUS_TONES: Record<string, "primary" | "success" | "warning" | "danger" | "neutral"> = {
   pending: "warning", paid: "success", processing: "primary",
-  shipped: "primary", delivered: "success", cancelled: "warning", refunded: "warning",
+  shipped: "primary", delivered: "success", cancelled: "danger", refunded: "neutral",
 };
+
+const STATUS_ACTIONS: Array<{ from: string; to: string; label: string }> = [
+  { from: "pending", to: "paid", label: "→ Marcar pagado" },
+  { from: "pending", to: "cancelled", label: "Cancelar" },
+  { from: "paid", to: "processing", label: "→ Procesar" },
+  { from: "processing", to: "shipped", label: "→ Enviar" },
+  { from: "shipped", to: "delivered", label: "→ Entregado" },
+];
 
 // ── Product Modal ──────────────────────────────────────────────────────────────
 function ProductModal({ product, onClose, onSaved }: { product?: StoreProduct; onClose: () => void; onSaved: () => void }) {
@@ -47,7 +64,7 @@ function ProductModal({ product, onClose, onSaved }: { product?: StoreProduct; o
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-5 text-lg font-semibold text-foreground">{product ? "Editar producto" : "Nuevo producto"}</h2>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={save} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2"><label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label><input value={name} onChange={e => setName(e.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
@@ -78,15 +95,21 @@ function SettingsPanel({ settings, onSaved }: { settings: StoreSettings; onSaved
   const [freeAbove, setFreeAbove] = useState(settings.freeShippingAbove != null ? String(settings.freeShippingAbove) : "");
   const [storeName, setStoreName] = useState(settings.storeName ?? "");
   const [saving, setSaving] = useState(false); const [ok, setOk] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save(e: React.FormEvent) {
-    e.preventDefault(); setSaving(true); setOk(false);
+    e.preventDefault(); setSaving(true); setOk(false); setError(null);
     try {
       const res = await fetch("/api/saas/store/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ currency, vat_pct: parseFloat(vatPct) || 21, vat_included: vatIncluded, shipping_fee: parseFloat(shippingFee) || 0, free_shipping_above: freeAbove ? parseFloat(freeAbove) : null, store_name: storeName || null }) });
-      if (!res.ok) throw new Error("Error al guardar");
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(d.error ?? "Error al guardar");
+      }
       const d = await res.json() as { settings: StoreSettings };
       onSaved(d.settings); setOk(true); setTimeout(() => setOk(false), 3000);
-    } catch { /* ignore */ } finally { setSaving(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al guardar");
+    } finally { setSaving(false); }
   }
 
   return (
@@ -107,9 +130,10 @@ function SettingsPanel({ settings, onSaved }: { settings: StoreSettings; onSaved
         <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Gastos de envío (€)</label><input type="number" min="0" step="0.01" value={shippingFee} onChange={e => setShippingFee(e.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
         <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Envío gratis a partir de (€)</label><input type="number" min="0" step="0.01" value={freeAbove} onChange={e => setFreeAbove(e.target.value)} placeholder="—" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
       </div>
+      {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
       <div className="flex items-center gap-3">
         <NelvyonDsButton type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar configuración"}</NelvyonDsButton>
-        {ok && <span className="text-sm text-green-400">✓ Guardado</span>}
+        {ok && <span className="text-sm text-success">✓ Guardado</span>}
       </div>
       <p className="text-xs text-muted-foreground">Los países de la UE aplican IVA según la directiva EU VAT 2021. Configura el % correcto para tu país de origen (España: 21%, Alemania: 19%, Francia: 20%…).</p>
     </form>
@@ -125,6 +149,9 @@ export default function SaasStorePage() {
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
   const [editProduct, setEditProduct] = useState<StoreProduct | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<StoreOrder | null>(null);
+  const [orderDetailLoading, setOrderDetailLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const loadProducts = useCallback(async () => {
     const res = await fetch("/api/saas/store/products");
@@ -154,22 +181,60 @@ export default function SaasStorePage() {
   }, [tab, loadOrders]);
 
   async function toggleActive(p: StoreProduct) {
-    await fetch(`/api/saas/store/products/${p.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: !p.active }) });
+    setActionError(null);
+    const res = await fetch(`/api/saas/store/products/${p.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: !p.active }) });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({})) as { error?: string };
+      setActionError(d.error ?? "No se pudo actualizar el producto");
+      return;
+    }
     void loadProducts();
   }
 
   async function deleteProduct(id: string) {
     if (!confirm("¿Eliminar producto?")) return;
-    await fetch(`/api/saas/store/products/${id}`, { method: "DELETE" });
+    setActionError(null);
+    const res = await fetch(`/api/saas/store/products/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({})) as { error?: string };
+      setActionError(d.error ?? "No se pudo eliminar el producto");
+      return;
+    }
     void loadProducts();
   }
 
   async function updateOrderStatus(orderId: string, status: string) {
-    await fetch(`/api/saas/store/orders/${orderId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+    setActionError(null);
+    const res = await fetch(`/api/saas/store/orders/${orderId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({})) as { error?: string };
+      setActionError(d.error ?? "No se pudo actualizar el pedido");
+      return;
+    }
     void loadOrders();
+    if (selectedOrder?.id === orderId) void openOrderDetail(orderId);
   }
 
-  const revenue = orders.filter(o => o.status === "paid" || o.status === "delivered").reduce((s, o) => s + o.total, 0);
+  async function openOrderDetail(orderId: string) {
+    setOrderDetailLoading(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/saas/store/orders/${orderId}`);
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({})) as { error?: string };
+        setActionError(d.error ?? "No se pudo cargar el pedido");
+        return;
+      }
+      const d = await res.json() as { order: StoreOrder };
+      setSelectedOrder(d.order);
+    } finally {
+      setOrderDetailLoading(false);
+    }
+  }
+
+  const revenue = orders
+    .filter((o) => o.status === "paid" || o.status === "processing" || o.status === "shipped" || o.status === "delivered")
+    .reduce((s, o) => s + o.total, 0);
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="store" />}>
@@ -182,18 +247,15 @@ export default function SaasStorePage() {
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Productos activos", value: products.filter(p => p.active).length },
-            { label: "Pedidos totales", value: orders.length },
-            { label: "Pedidos pagados", value: orders.filter(o => o.status === "paid" || o.status === "delivered").length },
-            { label: "Revenue", value: `${revenue.toFixed(0)}€` },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
+          <KpiTile icon="📦" label="Productos activos" value={products.filter((p) => p.active).length} />
+          <KpiTile icon="🧾" label="Pedidos totales" value={orders.length} />
+          <KpiTile icon="✅" label="Pedidos cobrados" value={orders.filter((o) => ["paid", "processing", "shipped", "delivered"].includes(o.status)).length} />
+          <KpiTile icon="💶" label="Revenue" value={`${revenue.toFixed(0)}€`} />
         </div>
+
+        {actionError && (
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-1 border-b border-border">
@@ -227,14 +289,14 @@ export default function SaasStorePage() {
                   {p.description && <p className="text-xs text-muted-foreground line-clamp-2">{p.description}</p>}
                   <div className="grid grid-cols-3 gap-2 text-center text-xs">
                     <div><p className="text-muted-foreground">Precio</p><p className="font-semibold text-foreground">{p.price}€</p></div>
-                    <div><p className="text-muted-foreground">Stock</p><p className={`font-semibold ${p.stock === 0 ? "text-red-400" : "text-foreground"}`}>{p.stock}</p></div>
+                    <div><p className="text-muted-foreground">Stock</p><p className={`font-semibold ${p.stock === 0 ? "text-destructive" : "text-foreground"}`}>{p.stock}</p></div>
                     <div><p className="text-muted-foreground">Ventas</p><p className="font-semibold text-foreground">{p.salesCount}</p></div>
                   </div>
                   {p.sku && <p className="text-xs text-muted-foreground">SKU: {p.sku}</p>}
                   <div className="flex gap-2">
                     <NelvyonDsButton variant="ghost" className="flex-1 text-xs" onClick={() => setEditProduct(p)}>Editar</NelvyonDsButton>
                     <NelvyonDsButton variant="ghost" className="flex-1 text-xs" onClick={() => void toggleActive(p)}>{p.active ? "Desactivar" : "Activar"}</NelvyonDsButton>
-                    <button onClick={() => void deleteProduct(p.id)} className="text-xs text-red-400 hover:text-red-300 px-2">×</button>
+                    <button type="button" onClick={() => void deleteProduct(p.id)} className="px-2 text-xs text-destructive hover:text-destructive/80">×</button>
                   </div>
                 </NelvyonDsCard>
               ))}
@@ -260,7 +322,11 @@ export default function SaasStorePage() {
                 <tbody>
                   {orders.map(o => (
                     <tr key={o.id} className="border-b border-border/50 hover:bg-muted/10">
-                      <td className="px-4 py-3 font-mono text-xs text-foreground">{o.orderNumber}</td>
+                      <td className="px-4 py-3">
+                        <button type="button" className="font-mono text-xs text-primary hover:underline" onClick={() => void openOrderDetail(o.id)}>
+                          {o.orderNumber}
+                        </button>
+                      </td>
                       <td className="px-4 py-3"><p className="text-foreground">{o.customerName ?? "—"}</p><p className="text-xs text-muted-foreground">{o.customerEmail}</p></td>
                       <td className="px-4 py-3 font-semibold text-foreground">{o.total.toFixed(2)}€</td>
                       <td className="px-4 py-3 text-muted-foreground">{o.vatAmount.toFixed(2)}€</td>
@@ -268,9 +334,18 @@ export default function SaasStorePage() {
                       <td className="px-4 py-3"><NelvyonDsBadge tone={ORDER_STATUS_TONES[o.status] ?? "primary"}>{ORDER_STATUS_LABELS[o.status] ?? o.status}</NelvyonDsBadge></td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(o.createdAt).toLocaleDateString("es-ES")}</td>
                       <td className="px-4 py-3">
-                        {o.status === "pending" && <button onClick={() => void updateOrderStatus(o.id, "processing")} className="text-xs text-primary hover:underline">→ Procesar</button>}
-                        {o.status === "processing" && <button onClick={() => void updateOrderStatus(o.id, "shipped")} className="text-xs text-primary hover:underline">→ Enviar</button>}
-                        {o.status === "shipped" && <button onClick={() => void updateOrderStatus(o.id, "delivered")} className="text-xs text-primary hover:underline">→ Entregado</button>}
+                        <div className="flex flex-col items-start gap-1">
+                          {STATUS_ACTIONS.filter((a) => a.from === o.status).map((a) => (
+                            <button
+                              key={`${a.from}-${a.to}`}
+                              type="button"
+                              onClick={() => void updateOrderStatus(o.id, a.to)}
+                              className={`text-xs hover:underline ${a.to === "cancelled" ? "text-destructive" : "text-primary"}`}
+                            >
+                              {a.label}
+                            </button>
+                          ))}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -281,16 +356,90 @@ export default function SaasStorePage() {
         )}
 
         {/* Tab: Configuración */}
-        {tab === "configuracion" && settings && (
-          <NelvyonDsCard className="p-6">
-            <h3 className="mb-5 font-semibold text-foreground">Configuración de la tienda</h3>
-            <SettingsPanel settings={settings} onSaved={setSettings} />
-          </NelvyonDsCard>
+        {tab === "configuracion" && (
+          settings ? (
+            <NelvyonDsCard className="p-6">
+              <h3 className="mb-5 font-semibold text-foreground">Configuración de la tienda</h3>
+              <SettingsPanel settings={settings} onSaved={setSettings} />
+            </NelvyonDsCard>
+          ) : (
+            <NelvyonDsCard className="p-8 text-center">
+              <p className="text-sm text-muted-foreground">No se pudo cargar la configuración. Comprueba permisos `settings.read`.</p>
+              <NelvyonDsButton className="mt-4" variant="secondary" onClick={() => void loadSettings()}>Reintentar</NelvyonDsButton>
+            </NelvyonDsCard>
+          )
         )}
       </div>
 
       {showNew && <ProductModal onClose={() => setShowNew(false)} onSaved={loadProducts} />}
       {editProduct && <ProductModal product={editProduct} onClose={() => setEditProduct(null)} onSaved={() => { void loadProducts(); setEditProduct(null); }} />}
+      {(selectedOrder || orderDetailLoading) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-foreground">
+                {orderDetailLoading ? "Cargando pedido…" : `Pedido ${selectedOrder?.orderNumber}`}
+              </h2>
+              <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setSelectedOrder(null)}>✕</button>
+            </div>
+            {selectedOrder && !orderDetailLoading && (
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <NelvyonDsBadge tone={ORDER_STATUS_TONES[selectedOrder.status] ?? "primary"}>
+                    {ORDER_STATUS_LABELS[selectedOrder.status] ?? selectedOrder.status}
+                  </NelvyonDsBadge>
+                  <span className="text-xs text-muted-foreground">{selectedOrder.customerEmail}</span>
+                </div>
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/20 text-xs text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 text-left">Artículo</th>
+                        <th className="px-3 py-2 text-right">Cant.</th>
+                        <th className="px-3 py-2 text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(selectedOrder.items ?? []).length === 0 ? (
+                        <tr><td colSpan={3} className="px-3 py-4 text-center text-xs text-muted-foreground">Sin líneas de pedido</td></tr>
+                      ) : (
+                        selectedOrder.items!.map((it) => (
+                          <tr key={it.id} className="border-t border-border/50">
+                            <td className="px-3 py-2">
+                              <p className="text-foreground">{it.productName}</p>
+                              {it.variantName && <p className="text-xs text-muted-foreground">{it.variantName}</p>}
+                            </td>
+                            <td className="px-3 py-2 text-right text-muted-foreground">{it.quantity}</td>
+                            <td className="px-3 py-2 text-right text-foreground">{it.totalPrice.toFixed(2)}€</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="space-y-1 text-sm">
+                  <p className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{selectedOrder.subtotal.toFixed(2)}€</span></p>
+                  <p className="flex justify-between text-muted-foreground"><span>IVA</span><span>{selectedOrder.vatAmount.toFixed(2)}€</span></p>
+                  <p className="flex justify-between text-muted-foreground"><span>Envío</span><span>{selectedOrder.shippingFee.toFixed(2)}€</span></p>
+                  <p className="flex justify-between font-semibold text-foreground"><span>Total</span><span>{selectedOrder.total.toFixed(2)}€</span></p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {STATUS_ACTIONS.filter((a) => a.from === selectedOrder.status).map((a) => (
+                    <NelvyonDsButton
+                      key={`${a.from}-${a.to}`}
+                      variant={a.to === "cancelled" ? "ghost" : "secondary"}
+                      className="text-xs"
+                      onClick={() => void updateOrderStatus(selectedOrder.id, a.to)}
+                    >
+                      {a.label}
+                    </NelvyonDsButton>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </SaasShellLayout>
   );
 }
