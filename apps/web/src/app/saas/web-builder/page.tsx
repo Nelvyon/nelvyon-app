@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 import {
@@ -61,7 +63,7 @@ function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-5 text-lg font-semibold text-foreground">Nueva página web</h2>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={save} className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Título *</label>
@@ -129,7 +131,7 @@ function DomainModal({ page, onClose, onSaved }: { page: WebPage; onClose: () =>
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-4 text-lg font-semibold text-foreground">Dominio personalizado</h2>
         <p className="mb-4 text-sm text-muted-foreground">Apunta tu dominio con un CNAME a <code className="text-primary">pages.nelvyon.com</code></p>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={save} className="space-y-4">
           <input value={domain} onChange={e => setDomain(e.target.value)} placeholder="landing.miempresa.com"
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
@@ -150,6 +152,7 @@ export default function SaasWebBuilderPage() {
   const [showNew, setShowNew] = useState(false);
   const [domainPage, setDomainPage] = useState<WebPage | null>(null);
   const [publishing, setPublishing] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -179,6 +182,17 @@ export default function SaasWebBuilderPage() {
       });
       void load();
     } finally { setPublishing(null); }
+  }
+
+  async function deletePage(p: WebPage) {
+    if (!window.confirm(`¿Eliminar la página "${p.title}"? Esta acción no se puede deshacer.`)) return;
+    setDeletingId(p.id);
+    try {
+      const res = await fetch(`/api/saas/web-builder/${p.id}`, { method: "DELETE" });
+      if (res.ok) setPages(prev => prev.filter(x => x.id !== p.id));
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   async function previewHtml(pageId: string) {
@@ -211,17 +225,10 @@ export default function SaasWebBuilderPage() {
         )}
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Páginas", value: pages.length },
-            { label: "Publicadas", value: pages.filter(p => p.status === "published").length },
-            { label: "Borradores", value: pages.filter(p => p.status === "draft").length },
-            { label: "Visitas totales", value: pages.reduce((s, p) => s + p.views, 0).toLocaleString() },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
+          <KpiTile icon="🌐" label="Páginas" value={pages.length} />
+          <KpiTile icon="🚀" label="Publicadas" value={pages.filter(p => p.status === "published").length} accent />
+          <KpiTile icon="📝" label="Borradores" value={pages.filter(p => p.status === "draft").length} />
+          <KpiTile icon="👀" label="Visitas totales" value={pages.reduce((s, p) => s + p.views, 0).toLocaleString()} />
         </div>
 
         {loading ? (
@@ -253,7 +260,10 @@ export default function SaasWebBuilderPage() {
                     </NelvyonDsBadge>
                   </div>
                   <p className="text-xs text-muted-foreground">{p.views.toLocaleString()} visitas{p.publishedAt ? ` · publicado ${new Date(p.publishedAt).toLocaleDateString("es-ES")}` : ""}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link href={`/saas/web-builder/${p.id}`}>
+                      <NelvyonDsButton variant="secondary" className="text-xs px-2 py-1">✏️ Editar</NelvyonDsButton>
+                    </Link>
                     <NelvyonDsButton variant="ghost" onClick={() => previewHtml(p.id)} className="text-xs px-2 py-1">👁 Preview</NelvyonDsButton>
                     {p.status === "draft" && (
                       <NelvyonDsButton variant="ghost" onClick={() => publishPage(p.id)} disabled={publishing === p.id} className="text-xs px-2 py-1">
@@ -261,6 +271,14 @@ export default function SaasWebBuilderPage() {
                       </NelvyonDsButton>
                     )}
                     <NelvyonDsButton variant="ghost" onClick={() => setDomainPage(p)} className="text-xs px-2 py-1">🌐 Dominio</NelvyonDsButton>
+                    <button
+                      onClick={() => void deletePage(p)}
+                      disabled={deletingId === p.id}
+                      aria-label={`Eliminar página ${p.title}`}
+                      className="ml-auto rounded-lg p-1.5 text-destructive/60 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40 transition-colors"
+                    >
+                      {deletingId === p.id ? "…" : "🗑"}
+                    </button>
                   </div>
                 </NelvyonDsCard>
               );

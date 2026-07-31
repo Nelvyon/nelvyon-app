@@ -41,8 +41,8 @@ const SECTION_TYPES: { type: SectionType; label: string; icon: string }[] = [
   { type: "video", label: "Video", icon: "🎥" },
 ];
 
-const inputCls = "w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-[#0084ff]/60";
-const labelCls = "block text-[10px] uppercase tracking-wider text-white/30 mb-1";
+const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60";
+const labelCls = "block text-[10px] uppercase tracking-wider text-muted-foreground mb-1";
 
 // ── Section Props Editor ───────────────────────────────────────────────────
 
@@ -93,7 +93,7 @@ function SectionPropsEditor({ section, onChange }: {
             onChange={e => {
               try { onChange({ ...c, items: JSON.parse(e.target.value) as unknown }); } catch { /* ignore */ }
             }} />
-          <p className="text-[10px] text-white/20 mt-1">Formato: [{"{"}icon,title,desc{"}"}]</p>
+          <p className="text-[10px] text-muted-foreground mt-1">Formato: [{"{"}icon,title,desc{"}"}]</p>
         </div>
       </div>
     );
@@ -123,7 +123,7 @@ function SectionPropsEditor({ section, onChange }: {
         {field("src", "URL video")}
       </div>
     );
-    default: return <p className="text-xs text-white/30">Sin props configurables.</p>;
+    default: return <p className="text-xs text-muted-foreground">Sin props configurables.</p>;
   }
 }
 
@@ -169,16 +169,16 @@ function DomainModal({ page, pageId, onClose, onUpdated }: {
     } finally { setVerifying(false); }
   }
 
-  const domainStatusColor = page.domainStatus === "verified" ? "text-emerald-400"
-    : page.domainStatus === "failed" ? "text-red-400"
-    : page.domainStatus === "pending" ? "text-yellow-400" : "text-white/30";
+  const domainStatusColor = page.domainStatus === "verified" ? "text-success"
+    : page.domainStatus === "failed" ? "text-destructive"
+    : page.domainStatus === "pending" ? "text-warning" : "text-muted-foreground";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#020817] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-          <h2 className="text-base font-semibold text-white">Dominio personalizado</h2>
-          <button onClick={onClose} className="text-white/40 hover:text-white">✕</button>
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h2 className="text-base font-semibold text-foreground">Dominio personalizado</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <div className="space-y-4 p-5">
           <div>
@@ -197,18 +197,18 @@ function DomainModal({ page, pageId, onClose, onUpdated }: {
             )}
           </div>
           {status && (
-            <div className={`rounded-lg px-3 py-2 text-sm ${status.ok ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>
+            <div className={`rounded-lg px-3 py-2 text-sm ${status.ok ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
               {status.ok ? "✓ DNS verificado — SSL activo" : `✗ ${status.error ?? "Verificación fallida"}`}
             </div>
           )}
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 text-xs space-y-1">
-            <p className="font-semibold text-white/50">Instrucciones DNS</p>
-            <p className="text-white/40">Añade un registro CNAME en tu DNS:</p>
-            <p className="font-mono text-white/70">CNAME → pages.nelvyon.com</p>
+          <div className="rounded-lg border border-border bg-muted/10 p-3 text-xs space-y-1">
+            <p className="font-semibold text-muted-foreground">Instrucciones DNS</p>
+            <p className="text-muted-foreground">Añade un registro CNAME en tu DNS:</p>
+            <p className="font-mono text-muted-foreground">CNAME → pages.nelvyon.com</p>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-white/30">Estado:</span>
+              <span className="text-muted-foreground">Estado:</span>
               <span className={`font-semibold ${domainStatusColor}`}>{page.domainStatus}</span>
-              {page.sslStatus === "active" && <span className="text-xs text-emerald-400">🔒 SSL activo</span>}
+              {page.sslStatus === "active" && <span className="text-xs text-success">🔒 SSL activo</span>}
             </div>
           </div>
         </div>
@@ -241,21 +241,21 @@ function SeoModal({ page, pageId, onClose, onUpdated }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#020817] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-          <h2 className="text-base font-semibold text-white">SEO</h2>
-          <button onClick={onClose} className="text-white/40 hover:text-white">✕</button>
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h2 className="text-base font-semibold text-foreground">SEO</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <div className="space-y-4 p-5">
           <div>
             <label className={labelCls}>SEO Title</label>
             <input value={form.seoTitle} onChange={e => setForm(f => ({ ...f, seoTitle: e.target.value }))} className={inputCls} placeholder={page.title} />
-            <p className="text-[10px] text-white/20 mt-1">{form.seoTitle.length}/60 chars</p>
+            <p className="text-[10px] text-muted-foreground mt-1">{form.seoTitle.length}/60 chars</p>
           </div>
           <div>
             <label className={labelCls}>Meta description</label>
             <textarea rows={3} value={form.seoDescription} onChange={e => setForm(f => ({ ...f, seoDescription: e.target.value }))} className={inputCls + " resize-none"} placeholder="Descripción para buscadores…" />
-            <p className="text-[10px] text-white/20 mt-1">{form.seoDescription.length}/160 chars</p>
+            <p className="text-[10px] text-muted-foreground mt-1">{form.seoDescription.length}/160 chars</p>
           </div>
           <div className="flex gap-2 pt-1">
             <NelvyonDsButton variant="secondary" onClick={onClose}>Cancelar</NelvyonDsButton>
@@ -302,20 +302,20 @@ function HistoryModal({ pageId, onClose, onRestored }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-sm rounded-2xl border border-white/[0.08] bg-[#020817] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-          <h2 className="text-base font-semibold text-white">Historial de versiones</h2>
-          <button onClick={onClose} className="text-white/40 hover:text-white">✕</button>
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h2 className="text-base font-semibold text-foreground">Historial de versiones</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <div className="p-4 space-y-2 max-h-80 overflow-y-auto">
-          {loading && <p className="text-xs text-white/40">Cargando…</p>}
-          {!loading && !versions.length && <p className="text-xs text-white/40">Sin versiones guardadas.</p>}
+          {loading && <p className="text-xs text-muted-foreground">Cargando…</p>}
+          {!loading && !versions.length && <p className="text-xs text-muted-foreground">Sin versiones guardadas.</p>}
           {versions.map(v => (
-            <div key={v.id} className="flex items-center justify-between rounded-lg border border-white/[0.06] px-3 py-2">
+            <div key={v.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
               <div>
-                <p className="text-sm font-medium text-white">v{v.version}</p>
-                <p className="text-[10px] text-white/30">{new Date(v.createdAt).toLocaleString("es")}</p>
-                <p className="text-[10px] text-white/20">{v.sections.length} secciones</p>
+                <p className="text-sm font-medium text-foreground">v{v.version}</p>
+                <p className="text-[10px] text-muted-foreground">{new Date(v.createdAt).toLocaleString("es")}</p>
+                <p className="text-[10px] text-muted-foreground">{v.sections.length} secciones</p>
               </div>
               <NelvyonDsButton variant="secondary" onClick={() => void restore(v.id)} disabled={restoring === v.id}>
                 {restoring === v.id ? "…" : "Restaurar"}
@@ -496,7 +496,7 @@ export default function WebBuilderEditorPage() {
     return (
       <SaasShellLayout sidebar={<SaasSidebar activeId="web-builder" />}>
         <div className="flex items-center justify-center h-64">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0084ff] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>
       </SaasShellLayout>
     );
@@ -510,9 +510,9 @@ export default function WebBuilderEditorPage() {
     <SaasShellLayout sidebar={<SaasSidebar activeId="web-builder" />}>
       <div className="flex h-[calc(100vh-4rem)] flex-col">
         {/* Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-white/[0.06] bg-[#020817] px-4 py-2">
-          <button onClick={() => router.push("/saas/web-builder")} className="text-sm text-white/40 hover:text-white">← Web Builder</button>
-          <span className="text-white font-semibold text-sm truncate max-w-[200px]">{page.title}</span>
+        <div className="flex flex-wrap items-center gap-2 border-b border-border bg-card px-4 py-2">
+          <button onClick={() => router.push("/saas/web-builder")} className="text-sm text-muted-foreground hover:text-foreground">← Web Builder</button>
+          <span className="text-foreground font-semibold text-sm truncate max-w-[200px]">{page.title}</span>
           <NelvyonDsBadge tone={isPublished ? "success" : "neutral"}>
             {isPublished ? "Publicado" : "Borrador"}
           </NelvyonDsBadge>
@@ -524,7 +524,7 @@ export default function WebBuilderEditorPage() {
             <NelvyonDsButton variant="secondary" onClick={() => void saveSectionAndSnapshot()} disabled={saving}>
               {saving ? "Guardando…" : "Guardar"}
             </NelvyonDsButton>
-            {savedAt && <span className="self-center text-[10px] text-white/30">✓ {savedAt.toLocaleTimeString("es")}</span>}
+            {savedAt && <span className="self-center text-[10px] text-muted-foreground">✓ {savedAt.toLocaleTimeString("es")}</span>}
             {isPublished ? (
               <>
                 <NelvyonDsButton variant="secondary" onClick={() => void unpublishPage()}>Pausar</NelvyonDsButton>
@@ -541,9 +541,9 @@ export default function WebBuilderEditorPage() {
         </div>
 
         {page.cdnUrl && isPublished && (
-          <div className="border-b border-white/[0.04] bg-white/[0.01] px-4 py-1.5">
-            <span className="text-[10px] text-white/25">URL pública: </span>
-            <a href={page.cdnUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#0084ff] hover:underline break-all">
+          <div className="border-b border-border bg-muted/10 px-4 py-1.5">
+            <span className="text-[10px] text-muted-foreground">URL pública: </span>
+            <a href={page.cdnUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline break-all">
               {page.cdnUrl}
             </a>
           </div>
@@ -552,30 +552,30 @@ export default function WebBuilderEditorPage() {
         {/* 3-column editor */}
         <div className="flex flex-1 overflow-hidden">
           {/* Left: sections panel */}
-          <aside className="w-56 flex-shrink-0 border-r border-white/[0.06] overflow-y-auto bg-[#020817]">
+          <aside className="w-56 flex-shrink-0 border-r border-border overflow-y-auto bg-card">
             <div className="p-3">
-              <p className="text-[10px] uppercase tracking-wider text-white/25 mb-2">Secciones ({page.sections.length})</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Secciones ({page.sections.length})</p>
               <div className="space-y-1">
                 {page.sections.map((s, i) => {
                   const cfg = SECTION_TYPES.find(t => t.type === s.type)!;
                   const isSelected = selectedSection?.id === s.id;
                   return (
                     <div key={s.id}
-                      className={`group flex items-center gap-1.5 rounded-lg px-2 py-2 cursor-pointer transition-colors ${isSelected ? "bg-[#0084ff]/15 border border-[#0084ff]/30" : "border border-white/[0.04] hover:bg-white/[0.04]"}`}
+                      className={`group flex items-center gap-1.5 rounded-lg px-2 py-2 cursor-pointer transition-colors ${isSelected ? "bg-primary/15 border border-primary/30" : "border border-border hover:bg-muted/20"}`}
                       onClick={() => setSelectedSection(s)}>
                       <span className="text-sm">{cfg?.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-white truncate">{i + 1}. {cfg?.label}</p>
+                        <p className="text-xs font-medium text-foreground truncate">{i + 1}. {cfg?.label}</p>
                       </div>
                       <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={e => { e.stopPropagation(); void moveSection(s.id, "up"); }}
-                          disabled={i === 0} className="text-white/30 hover:text-white disabled:opacity-20 text-[10px] px-0.5">↑</button>
+                          disabled={i === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-20 text-[10px] px-0.5">↑</button>
                         <button onClick={e => { e.stopPropagation(); void moveSection(s.id, "down"); }}
-                          disabled={i === page.sections.length - 1} className="text-white/30 hover:text-white disabled:opacity-20 text-[10px] px-0.5">↓</button>
+                          disabled={i === page.sections.length - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-20 text-[10px] px-0.5">↓</button>
                         <button onClick={e => { e.stopPropagation(); void duplicateSection(s.id); }}
-                          className="text-white/30 hover:text-white text-[10px] px-0.5">⧉</button>
+                          className="text-muted-foreground hover:text-foreground text-[10px] px-0.5">⧉</button>
                         <button onClick={e => { e.stopPropagation(); void deleteSection(s.id); }}
-                          className="text-red-400/50 hover:text-red-400 text-[10px] px-0.5">✕</button>
+                          className="text-destructive/50 hover:text-destructive text-[10px] px-0.5">✕</button>
                       </div>
                     </div>
                   );
@@ -583,10 +583,10 @@ export default function WebBuilderEditorPage() {
               </div>
               {/* Add section */}
               <div className="mt-3 space-y-1">
-                <p className="text-[10px] text-white/20 mb-1">Añadir sección</p>
+                <p className="text-[10px] text-muted-foreground mb-1">Añadir sección</p>
                 {SECTION_TYPES.map(t => (
                   <button key={t.type} onClick={() => void addSection(t.type)}
-                    className="w-full flex items-center gap-1.5 rounded-md border border-white/[0.04] px-2 py-1 text-[10px] text-white/40 hover:border-[#0084ff]/30 hover:text-white/70 transition-colors text-left">
+                    className="w-full flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[10px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors text-left">
                     <span>{t.icon}</span> {t.label}
                   </button>
                 ))}
@@ -595,7 +595,7 @@ export default function WebBuilderEditorPage() {
           </aside>
 
           {/* Center: live preview iframe */}
-          <div className="flex-1 overflow-hidden bg-[#0a0a0a] relative">
+          <div className="flex-1 overflow-hidden bg-background relative">
             <iframe
               ref={iframeRef}
               title="Preview"
@@ -604,18 +604,18 @@ export default function WebBuilderEditorPage() {
             />
             {!previewHtml && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-white/20 text-sm">Sin secciones — añade una en el panel izquierdo</p>
+                <p className="text-muted-foreground text-sm">Sin secciones — añade una en el panel izquierdo</p>
               </div>
             )}
           </div>
 
           {/* Right: props panel */}
-          <aside className="w-64 flex-shrink-0 border-l border-white/[0.06] overflow-y-auto bg-[#020817] p-4">
+          <aside className="w-64 flex-shrink-0 border-l border-border overflow-y-auto bg-card p-4">
             {selectedSection ? (
               <>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-lg">{SECTION_TYPES.find(t => t.type === selectedSection.type)?.icon}</span>
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-sm font-semibold text-foreground">
                     {SECTION_TYPES.find(t => t.type === selectedSection.type)?.label}
                   </p>
                 </div>
@@ -623,14 +623,14 @@ export default function WebBuilderEditorPage() {
                   section={selectedSection}
                   onChange={updateSelectedSectionContent}
                 />
-                <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                <div className="mt-4 pt-4 border-t border-border">
                   <NelvyonDsButton onClick={() => void savePageSections()} disabled={saving}>
                     {saving ? "Guardando…" : "Aplicar cambios"}
                   </NelvyonDsButton>
                 </div>
               </>
             ) : (
-              <p className="text-xs text-white/30">Selecciona una sección para editar sus propiedades.</p>
+              <p className="text-xs text-muted-foreground">Selecciona una sección para editar sus propiedades.</p>
             )}
           </aside>
         </div>

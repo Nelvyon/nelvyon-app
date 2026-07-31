@@ -1,6 +1,7 @@
 /**
- * GET /api/saas/web-builder/[pageId]  → full page with sections
- * PATCH /api/saas/web-builder/[pageId] → update sections/title/seo
+ * GET /api/saas/web-builder/[pageId]    → full page with sections
+ * PATCH /api/saas/web-builder/[pageId]  → update sections/title/seo
+ * DELETE /api/saas/web-builder/[pageId] → delete page
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -53,6 +54,20 @@ export async function PATCH(req: Request, ctx: RouteCtx) {
       customDomain: typeof body.custom_domain === "string" ? body.custom_domain : (body.custom_domain === null ? null : undefined),
     });
     return NextResponse.json({ page });
+  } catch (e: unknown) {
+    if (e instanceof SaasWebBuilderError) return mapError(e);
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
+  }
+}
+
+export async function DELETE(req: Request, ctx: RouteCtx) {
+  try {
+    const [saasCtx, { pageId }] = await Promise.all([
+      requireSaasContext(req, "contacts.write"),
+      ctx.params,
+    ]);
+    await getSaasWebBuilderService().delete(saasCtx.tenant.id, pageId);
+    return NextResponse.json({ ok: true });
   } catch (e: unknown) {
     if (e instanceof SaasWebBuilderError) return mapError(e);
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
