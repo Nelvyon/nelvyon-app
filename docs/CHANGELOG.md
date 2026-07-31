@@ -3,6 +3,14 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-07-31
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| UI / SaaS | **Fix: badge de tono inválido en Contratos de Pipeline** | `tone={statusTone[c.status] ?? "default"}` en `/saas/pipeline` sustituido por `"neutral"` (único fallback válido de `NelvyonDsBadgeProps["tone"]`). Bug pre-existente documentado en módulo CRM/Pipeline, cerrado antes de iniciar el módulo IA NELVYON. tsc/ESLint/build/Vitest (2449 tests) **PASS**. Commit `8974e873`. `claimReady: false` |
+| UI / SaaS | **W3CRM Fase 2 — módulo 3: IA NELVYON** | `/saas/ai` (Panel IA) y `/saas/autopilot` migrados de divs con clases hardcodeadas a `NelvyonDsCard/Badge/SectionHeader/StatusDot` + `KpiTile` (mismo patrón que Dashboard/CRM), sin tocar ninguna API real. `/saas/agentes` ganó una sección real de "Historial de ejecuciones" con datos de `/api/saas/agentes/runs` que ya se pedían pero nunca se renderizaban. Ruta huérfana `/saas/knowledge-base` (real, con API + RBAC, pero ausente del sidebar y con `activeId` erróneo) añadida a `saasNav.ts` (grupo `gestion`) + traducciones en los 6 locales. Decisión explícita documentada: no se crean pantallas de "Prompts"/"config. de modelos" al no existir API real detrás en el inventario auditado — esa información real ya se expone dentro de Panel IA. tsc/ESLint/build **PASS** · `vitest backend/saas + src/features/saas-shell` **2446 passed / 4 skipped** · smoke sin sesión (307/401, sin 500) **PASS**. Ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §14. `claimReady: false` |
+| SaaS / AI | **Fix causa raíz: historial de `/saas/chat` nunca se persistía** | `POST /api/saas/chat` generaba la respuesta llamando a OpenAI directamente pero nunca escribía en `saas_chat_messages`, mientras `GET` sí leía de esa tabla — el historial de conversación se perdía siempre y esas conversaciones quedaban fuera del export/delete GDPR (`SaasGdprService` ya opera sobre `saas_chat_messages`). Nuevo `SaasChatService.saveExchange(...)` (persiste sin reinvocar el LLM) + `DELETE /api/saas/chat` (expone `clearHistory`, ya existente sin uso) + frontend que carga historial real al montar y ofrece "Nueva conversación". Test añadido en `saasChat.test.ts`. `claimReady: false` |
+
 ## 2026-07-30
 
 | Área | Cambio | Descripción |

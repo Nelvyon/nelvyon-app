@@ -30,8 +30,10 @@
 - [x] **2026-07-30 W3CRM Fase 2 — Dashboard:** `SaasDashboardWidgets.tsx` (header/KPI-icono/avatar) integrado en `/saas/dashboard` sobre APIs reales · tsc/lint/build/vitest PASS
 - [x] **2026-07-30 W3CRM Fase 2 — CRM/Pipeline:** fix de causa raíz del contraste oscuro en todo `/saas/*` (`.dark` scope + tokens `success/warning/destructive` que faltaban en `@theme inline`) · kanban de deals reactivado en `/saas/pipeline` (`DealsKanban`/`DealFormModal`/`DealDetailPanel`, ya existían sin usar) · `DealsKpiRow`/`CommercialKpiRow` migrados a `KpiTile` · tsc/lint/build/vitest PASS
 - [ ] **P2 — validar visualmente en staging** el fix de contraste oscuro de `/saas/*` con sesión autenticada real (no verificable en local sin `DATABASE_URL`)
-- [ ] **P3 — bug menor pre-existente (no bloqueante):** tono de badge `"default"` inválido en pestaña Contratos de `/saas/pipeline` (`statusTone[c.status] ?? "default"`) — ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §13.4
-- [ ] **W3CRM Fase 2 — siguiente módulo:** IA NELVYON o Comunicación (a confirmar) · evaluar `@fullcalendar/react` solo cuando se abra el módulo `citas`/`calendar`
+- [x] **2026-07-31 fix:** tono de badge `"default"` inválido en pestaña Contratos de `/saas/pipeline` corregido a `"neutral"` (commit `8974e873`) — ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §13.4/§14.0
+- [x] **2026-07-31 W3CRM Fase 2 — IA NELVYON:** `/saas/{ai,autopilot}` migrados a `NelvyonDs*`+`KpiTile`; `/saas/agentes` renderiza historial real de ejecuciones; fix de causa raíz: historial de `/saas/chat` no se persistía (`SaasChatService.saveExchange` + `DELETE /api/saas/chat`); `/saas/knowledge-base` (ruta huérfana real) añadida a `saasNav.ts` + 6 locales · tsc/lint/build/vitest (2446 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §14
+- [ ] **P2 — validar visualmente en staging** el módulo IA NELVYON con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que CRM/Pipeline)
+- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Comunicación (inbox/campañas/secuencias) → Automatizaciones/workflows → Calendario/citas → … (orden completo en `docs/ops/W3CRM_MIGRATION_PLAN.md` §7) · evaluar `@fullcalendar/react` solo cuando se abra el módulo `citas`/`calendar`
 - [ ] **W3CRM Fase 3+:** resto de los 69 módulos por commits separados · staging antes de prod
 
 ---

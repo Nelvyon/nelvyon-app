@@ -15,14 +15,6 @@
 | **Evidencia** | Compilación aislada de `globals.css` con `@tailwindcss/postcss` (antes: "unknown utility class"; después: reglas generadas) + captura de mockup estático con las clases reales de `NelvyonDsCard`/`Badge`/`Button`/`SectionHeader` dentro de `.dark` |
 | **Próximo paso** | Validar visualmente en el primer despliegue a staging con sesión real |
 
-### UI — tono de badge `"default"` inválido en Contratos de `/saas/pipeline` (2026-07-30, pre-existente)
-
-| Campo | Valor |
-|-------|-------|
-| **Estado** | **Detectado, no corregido** (fuera de alcance de este módulo) |
-| **Detalle** | `apps/web/src/app/saas/pipeline/page.tsx`, pestaña Contratos: `tone={statusTone[c.status] ?? "default"}` — `"default"` no es un valor válido de `NelvyonDsBadgeProps["tone"]` (`neutral\|primary\|success\|warning\|danger`). Solo compila porque `Record<string, Tone>` no fuerza el tipo del lado derecho de `??`. Efecto real: badge sin color cuando `c.status` no está en el mapa (`draft/sent/signed/active/expired/cancelled` sí están todos cubiertos, por lo que en la práctica actual no se dispara). |
-| **Próximo paso** | Corregir el fallback a un tono válido (`"neutral"`) en una pasada de limpieza de tipos |
-
 ### Historial — wf.create Internal 500 (localhost 2026-07-17) → CLOSED_STAGING 2026-07-28
 
 | Campo | Valor |
@@ -151,6 +143,26 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Funcional — historial de `/saas/chat` no se persistía (GDPR gap) → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo IA NELVYON, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §14.2) |
+| **Causa** | `POST /api/saas/chat` generaba la respuesta llamando a OpenAI directamente pero nunca escribía en `saas_chat_messages`, mientras `GET` sí leía de esa tabla vía `SaasChatService.getHistory`. Efecto: el historial del asistente de marketing se perdía siempre al recargar, y esas conversaciones quedaban fuera del export/delete GDPR (`SaasGdprService` ya opera sobre `saas_chat_messages`). |
+| **Fix** | Nuevo método `SaasChatService.saveExchange(userId, tenantId, userContent, assistantContent)` (persiste sin reinvocar el LLM) llamado desde el `POST` tras obtener la respuesta; nuevo `DELETE /api/saas/chat` (expone `clearHistory`, ya existente sin uso); frontend carga historial real al montar y ofrece "Nueva conversación" |
+| **Evidencia** | `saasChat.test.ts` (+1 test `saveExchange`, 13/13 PASS) · tsc/eslint/build PASS · smoke sin sesión `/api/saas/chat` → 401 (sin 500) |
+| **Nota** | Sin mocks · misma tabla/API ya existente y ya cubierta por GDPR · canary IA apagado · `claimReady: false` |
+
+### UI — tono de badge `"default"` inválido en Contratos de `/saas/pipeline` → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** |
+| **Causa** | `apps/web/src/app/saas/pipeline/page.tsx`, pestaña Contratos: `tone={statusTone[c.status] ?? "default"}` — `"default"` no es un valor válido de `NelvyonDsBadgeProps["tone"]` (`neutral\|primary\|success\|warning\|danger`). Solo compilaba porque `Record<string, Tone>` no fuerza el tipo del lado derecho de `??`. |
+| **Fix** | Fallback cambiado a `"neutral"` (tono válido) |
+| **Evidencia** | tsc PASS · eslint PASS · vitest `backend/saas` + `src/features/saas-deals` 2449 passed/4 skipped · build producción PASS · commit `8974e873` |
+| **Nota** | Sin cambios de comportamiento visible en producción — todos los estados reales (`draft/sent/signed/active/expired/cancelled`) ya estaban cubiertos en el mapa; corrección de tipo/robustez preventiva |
 
 ### KI — pgvector RAG: minScore=0.32 no refusa en corpus de tenant muy pequeño (P2) → RESUELTO
 

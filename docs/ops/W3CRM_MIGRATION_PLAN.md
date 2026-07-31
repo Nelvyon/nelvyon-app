@@ -302,4 +302,58 @@ Auditoría de `/saas/crm`, `/saas/pipeline` y de los componentes `features/saas-
 
 - Verificación visual en un entorno con `DATABASE_URL` real (staging) recomendada antes de considerar el módulo 100 % cerrado a nivel de producto, aunque la corrección de CSS está verificada empíricamente a nivel de compilación y con mockup estático.
 - `DealsKpiRow` (fila de KPIs de deals) sigue sin usarse en ninguna pantalla real tras este módulo (se dejó corregida visualmente pero no se forzó su integración en `/saas/pipeline` para no duplicar la banda de KPIs ya existente en esa página) — candidato a consolidación futura si se decide unificar ambas.
-- Bug pre-existente y no relacionado (no corregido, fuera de alcance): `tone={statusTone[c.status] ?? "default"}` en la pestaña Contratos de `/saas/pipeline` usa `"default"` como tono de fallback, que no es un valor válido de `NelvyonDsBadgeProps["tone"]` (solo compila porque `Record<string, Tone>` no fuerza el tipo del operando derecho de `??`); efecto real: badge sin color de tono cuando el status no está en el mapa. Anotado para corrección en una pasada de limpieza específica.
+- Bug pre-existente y no relacionado (no corregido, fuera de alcance): `tone={statusTone[c.status] ?? "default"}` en la pestaña Contratos de `/saas/pipeline` usa `"default"` como tono de fallback, que no es un valor válido de `NelvyonDsBadgeProps["tone"]` (solo compila porque `Record<string, Tone>` no fuerza el tipo del operando derecho de `??`); efecto real: badge sin color de tono cuando el status no está en el mapa. Anotado para corrección en una pasada de limpieza específica. **→ Corregido 2026-07-31, commit `8974e873`, ver §14.0.**
+
+---
+
+## 14. Módulo 3 — IA NELVYON (2026-07-31)
+
+### 14.0 Deuda previa cerrada antes de iniciar el módulo
+
+Fallback `"default"` inválido en badge de Contratos (§13.4) corregido a `"neutral"` en `apps/web/src/app/saas/pipeline/page.tsx`. Gates: `tsc` PASS, `eslint` PASS, `vitest backend/saas + src/features/saas-deals` 2449 passed/4 skipped, `build` PASS. Commit `8974e873` (separado, antes del módulo 3). Entrada movida a `KNOWN_ISSUES.md` → Historial resuelto.
+
+### 14.1 Alcance real auditado
+
+Inventario real de IA en `saasNav.ts` (grupo `ia`, subconjunto "asistencia conversacional/generativa" pedido explícitamente por el usuario — el resto del grupo `ia` — `pack-store`, `data-playbooks`, `brief-to-launch`, `compliance`, `benchmark` — es un motor de packs/growth distinto y queda para un módulo posterior):
+
+| Ruta | API real | Estado previo | Acción |
+|---|---|---|---|
+| `/saas/ai` (Panel IA) | `private-ai/{router-health,agents,metrics}`, `mcp`, `shared-memory`, `orchestrator`, `ai-agents` (status/workflows/runtime/canaries/leaderboard) | Funcional pero con **sistema visual propio** (divs `border-white/10`, sin `NelvyonDs*`) — inconsistente con el resto de `/saas/*` ya migrado | Reescrito con `NelvyonDsCard/Badge/SectionHeader/StatusDot` + `KpiTile` (mismo patrón que Dashboard/CRM) |
+| `/saas/autopilot` | `GET/PATCH /api/saas/autopilot`, `POST /api/saas/autopilot/run`, `GET /api/saas/entregables` | Funcional, mismo problema: hardcode `white/10`/`#0084ff` en vez de tokens `NelvyonDs*` | Reescrito con `NelvyonDsCard/Badge/Button` + `KpiTile`; lógica y API sin cambios |
+| `/saas/agentes` | `POST /api/saas/agentes/execute`, `GET /api/saas/agentes/runs` | Ya usaba `NelvyonDs*` (correcto); **el historial de ejecuciones se pedía a la API pero nunca se renderizaba** (solo se usaba `runs.length` para un contador) | Añadida sección real "Historial de ejecuciones" (colapsable) con datos reales de `saas_agent_runs`, sin tocar la API |
+| `/saas/chat` | `GET/POST /api/saas/chat` | Ya usaba `NelvyonDs*` (correcto visualmente); **bug funcional real**: `GET` leía historial de `saas_chat_messages` pero `POST` nunca lo persistía → el historial estaba siempre vacío y se perdía al recargar; además esas conversaciones quedaban fuera del export/delete GDPR (`SaasGdprService` sí lee `saas_chat_messages`) | Causa raíz corregida (ver §14.2) — historial real cargado al entrar, botón "Nueva conversación" (`DELETE`) |
+| `/saas/copywriter` | `GET/POST /api/saas/ai-copy` | Ya usaba `NelvyonDs*`, consistente | Sin cambios — auditado, ya cumple el estándar visual y funcional |
+| `/saas/knowledge-base` | `GET/POST/DELETE /api/saas/knowledge-base` | **Ruta huérfana**: página real y funcional (CRUD de artículos/categorías de centro de ayuda), conectada a API real con `requireSaasContext`, pero **ausente de `saasNav.ts`** (inaccesible desde el sidebar) y con `activeId="herramientas"` (bug — resaltaba el ítem equivocado en el menú) | Añadida a `saasNav.ts` (grupo `gestion`, junto a `helpdesk` — es un centro de ayuda para clientes, no un corpus de entrenamiento IA separado) + `activeId` corregido a `"knowledge-base"` + traducciones en los 6 locales |
+
+**Nota de honestidad de alcance:** el usuario pidió incluir "Prompts", "Configuración de modelos" y "Herramientas IA" como áreas de IA NELVYON. Se auditó el inventario real (`saasNav.ts`, `/api/saas/*`) y **no existe** ninguna pantalla ni API real independiente para una librería de prompts, un editor de configuración de modelos, o un catálogo de "herramientas IA" distinto del ya existente `/saas/herramientas` (que es widget/pixel embed, no relacionado con IA). La configuración de modelos y el consumo/analítica IA reales sí existen y se exponen — dentro del **Panel IA** (`router-health` = qué modelo/router está activo y certificado; `private-ai/metrics` = consumo real: `agentRuns`, `openClawDispatches`) — por lo que se integraron ahí en vez de crear pantallas nuevas sin API real detrás (regla no negociable: "no UI sin API real detrás"). No se ha creado ninguna pantalla, tabla ni endpoint ficticio para rellenar hueco.
+
+### 14.2 Fix funcional — historial de chat persistido (causa raíz)
+
+`apps/web/src/app/api/saas/chat/route.ts` POST generaba la respuesta llamando directamente a OpenAI (system prompt de marketing) pero **nunca invocaba `SaasChatService`**, mientras que GET sí leía de `saas_chat_messages` vía `getHistory`. Efecto real: el asistente de marketing nunca guardaba nada, el historial visible en la UI se perdía en cada recarga, y esas conversaciones no eran alcanzables por el export/delete GDPR (`SaasGdprService.exportUserData`/`deleteUserData` sí operan sobre `saas_chat_messages`).
+
+**Corrección:**
+
+1. `backend/saas/SaasChatService.ts`: nuevo método `saveExchange(userId, tenantId, userContent, assistantContent)` — persiste el turno user+assistant ya generado sin volver a invocar el LLM (la ruta ya tiene su propia respuesta de OpenAI con su propio prompt).
+2. `apps/web/src/app/api/saas/chat/route.ts`: POST llama a `saasChatService.saveExchange(...)` tras obtener la respuesta de OpenAI (best-effort, con `catch` que solo loguea — un fallo de persistencia no debe romper la respuesta al usuario); nuevo `DELETE` que expone `clearHistory` (ya existente en el servicio, sin uso previo) para permitir "Nueva conversación".
+3. `apps/web/src/app/saas/chat/page.tsx`: al montar, `GET /api/saas/chat` carga el historial real (si existe) en vez de arrancar siempre con el saludo genérico; botón "🗑 Nueva conversación" llama a `DELETE` y resetea el estado local.
+4. Test añadido: `backend/saas/__tests__/saasChat.test.ts` → `saveExchange inserta mensaje user y assistant sin invocar el LLM`.
+
+Sin mocks, sin datos ficticios, misma tabla/API ya existente y ya cubierta por el flujo GDPR — solo se cierra el hueco entre lo que el `GET` prometía servir y lo que el `POST` realmente guardaba.
+
+### 14.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint <archivos modificados>` | **PASS** (0 errores/warnings) |
+| `pnpm -C apps/web exec vitest run backend/saas src/features/saas-shell` | **PASS** — 2446 tests passed, 4 skipped (incluye el nuevo test de `saveExchange`) |
+| `pnpm -C apps/web build` | **PASS** — build de producción completo |
+| Smoke de rutas (servidor productivo local, sin `DATABASE_URL`) | `GET /saas/{ai,autopilot,agentes,chat,copywriter,knowledge-base}` → `307` (redirect a login, esperado sin sesión) · `GET /api/saas/{chat,autopilot,agentes/runs,knowledge-base,private-ai/router-health}` → `401` (esperado, sin crash 500) |
+| Verificación visual autenticada en staging | **BLOCKED_ENVIRONMENT** — sin `DATABASE_URL`/sesión local; mismo hallazgo que en el módulo 2 (§13.4). Recomendado en el primer despliegue a staging |
+| Funcionalidad preservada | RBAC (`requireSaasContext` + permiso por endpoint), multi-tenancy (`tenant_id`/`ctx.tenant.id` en cada query), canary IA apagado, `claimReady=false` — sin cambios |
+| Branding/mock data | Cero — mismas APIs reales, ninguna pantalla nueva sin backend real |
+
+### 14.4 Pendiente / riesgo conocido
+
+- Verificación visual autenticada en staging (igual que módulo 2, no bloqueante para cerrar el módulo a nivel de código).
+- "Prompts library" y "editor de configuración de modelos" dedicados no existen como funcionalidad real — documentado en §14.1 como decisión consciente (no crear pantallas sin API real detrás), no como trabajo pendiente oculto.
