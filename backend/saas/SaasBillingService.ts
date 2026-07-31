@@ -13,7 +13,7 @@ export type SaasUsageCounts = {
 };
 
 export type SaasBillingSummary = {
-  tenant: Pick<SaasTenant, "id" | "companyName" | "plan" | "onboardingCompleted">;
+  tenant: Pick<SaasTenant, "id" | "companyName" | "plan" | "onboardingCompleted" | "billingStatus">;
   role: SaasRole;
   permissions: ReturnType<typeof listPermissionsForRole>;
   limits: SaasPlanLimits;
@@ -32,6 +32,7 @@ export async function buildSaasBillingSummary(tenant: SaasTenant, role: SaasRole
       companyName: tenant.companyName,
       plan: tenant.plan,
       onboardingCompleted: tenant.onboardingCompleted,
+      billingStatus: tenant.billingStatus,
     },
     role,
     permissions: listPermissionsForRole(role),

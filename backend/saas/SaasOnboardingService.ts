@@ -1,6 +1,12 @@
 import { DbClient } from "../db/DbClient";
 
-import { SAAS_TENANT_SELECT, saasTenantFromRow, type SaasPlan, type SaasTenantRow } from "./saasTenantMapper";
+import {
+  SAAS_TENANT_SELECT,
+  saasTenantFromRow,
+  type SaasBillingStatus,
+  type SaasPlan,
+  type SaasTenantRow,
+} from "./saasTenantMapper";
 
 /** Postgres port for SaaS onboarding (mockable in tests). */
 export interface SaasPostgresPort {
@@ -23,6 +29,7 @@ export interface SaasTenant {
   goals: string[];
   onboardingCompleted: boolean;
   onboardingStep: number;
+  billingStatus: SaasBillingStatus;
   createdAt: string;
   updatedAt: string;
 }

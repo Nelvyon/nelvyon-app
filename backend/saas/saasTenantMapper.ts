@@ -56,6 +56,13 @@ export function shouldSyncSaasTenantPlan(status: string): boolean {
   return isSaasPlanSyncStatus(status);
 }
 
+/** billing_status default 'active' (migration 482); self-service pause/cancel via /api/saas/billing/cancel. */
+export type SaasBillingStatus = "active" | "paused" | "cancel_at_period_end";
+
+export function normalizeSaasBillingStatus(value: string | null | undefined): SaasBillingStatus {
+  return value === "paused" || value === "cancel_at_period_end" ? value : "active";
+}
+
 export type SaasTenantRow = {
   id: string;
   user_id: string;
@@ -69,12 +76,13 @@ export type SaasTenantRow = {
   goals: string[] | null;
   onboarding_completed: boolean;
   onboarding_step: number;
+  billing_status: string | null;
   created_at: Date | string;
   updated_at: Date | string;
 };
 
 export const SAAS_TENANT_SELECT =
-  "id, user_id, workspace_id, company_name, industry, plan, website, phone, employees, goals, onboarding_completed, onboarding_step, created_at, updated_at";
+  "id, user_id, workspace_id, company_name, industry, plan, website, phone, employees, goals, onboarding_completed, onboarding_step, billing_status, created_at, updated_at";
 
 export type SaasTenantMapped = {
   id: string;
@@ -89,6 +97,7 @@ export type SaasTenantMapped = {
   goals: string[];
   onboardingCompleted: boolean;
   onboardingStep: number;
+  billingStatus: SaasBillingStatus;
   createdAt: string;
   updatedAt: string;
 };
@@ -107,6 +116,7 @@ export function saasTenantFromRow(r: SaasTenantRow): SaasTenantMapped {
     goals: r.goals ?? [],
     onboardingCompleted: r.onboarding_completed,
     onboardingStep: r.onboarding_step,
+    billingStatus: normalizeSaasBillingStatus(r.billing_status),
     createdAt: typeof r.created_at === "string" ? r.created_at : r.created_at.toISOString(),
     updatedAt: typeof r.updated_at === "string" ? r.updated_at : r.updated_at.toISOString(),
   };

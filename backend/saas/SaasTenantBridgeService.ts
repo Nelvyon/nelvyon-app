@@ -1,6 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort, SaasTenant } from "./SaasOnboardingService";
-import { saasTenantFromRow, type SaasTenantRow } from "./saasTenantMapper";
+import { SAAS_TENANT_SELECT, saasTenantFromRow, type SaasTenantRow } from "./saasTenantMapper";
 
 export class SaasTenantBridgeError extends Error {
   constructor(
@@ -24,8 +24,7 @@ export class SaasTenantBridgeService {
       throw new SaasTenantBridgeError("workspaceId must be a positive integer", "VALIDATION");
     }
     const rows = await this.db.query<SaasTenantRow>(
-      `SELECT id, user_id, workspace_id, company_name, industry, plan, website, phone, employees, goals,
-              onboarding_completed, onboarding_step, created_at, updated_at
+      `SELECT ${SAAS_TENANT_SELECT}
        FROM saas_tenants
        WHERE workspace_id = $1
        LIMIT 1`,
@@ -93,8 +92,7 @@ export class SaasTenantBridgeService {
         `UPDATE saas_tenants
          SET workspace_id = $2, updated_at = NOW()
          WHERE id = $1::uuid AND user_id = $3::uuid
-         RETURNING id, user_id, workspace_id, company_name, industry, plan, website, phone, employees, goals,
-                   onboarding_completed, onboarding_step, created_at, updated_at`,
+         RETURNING ${SAAS_TENANT_SELECT}`,
         [saasTenantId, workspaceId, userId],
       );
       const row = rows[0];

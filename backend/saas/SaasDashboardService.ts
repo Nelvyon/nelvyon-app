@@ -32,6 +32,7 @@ type TenantRow = {
   goals: string[] | null;
   onboarding_completed: boolean;
   onboarding_step: number;
+  billing_status: string | null;
   created_at: Date | string;
   updated_at: Date | string;
   auth_tenant_id: string;
@@ -90,7 +91,7 @@ export class SaasDashboardService {
   private async fetchTenantWithAuthTenant(tenantId: string): Promise<{ tenant: SaasTenant; authTenantId: string }> {
     const rows = await this.db.query<TenantRow>(
       `SELECT st.id, st.user_id, st.workspace_id, st.company_name, st.industry, st.plan, st.website, st.phone, st.employees, st.goals,
-              st.onboarding_completed, st.onboarding_step, st.created_at, st.updated_at, nu.tenant_id AS auth_tenant_id
+              st.onboarding_completed, st.onboarding_step, st.billing_status, st.created_at, st.updated_at, nu.tenant_id AS auth_tenant_id
        FROM saas_tenants st
        LEFT JOIN nelvyon_users nu ON nu.user_id = st.user_id
        WHERE st.id = $1

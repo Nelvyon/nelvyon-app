@@ -24,6 +24,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, status: "paused" });
     }
 
+    if (action === "resume") {
+      await db.query(
+        `UPDATE saas_tenants SET billing_status='active', updated_at=NOW() WHERE id=$1`,
+        [ctx.tenant.id],
+      );
+      return NextResponse.json({ ok: true, status: "active" });
+    }
+
     await db.query(
       `UPDATE saas_tenants SET billing_status='cancel_at_period_end', updated_at=NOW() WHERE id=$1`,
       [ctx.tenant.id],
