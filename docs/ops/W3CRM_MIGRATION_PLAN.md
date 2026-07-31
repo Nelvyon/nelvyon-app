@@ -787,3 +787,33 @@ Pantallas: `/saas/affiliates`, `/saas/loyalty`. APIs: `GET/POST /api/saas/affili
 ### 25.4 Próximo módulo
 
 **Membresías** (`/saas/memberships`) — siguiente del grupo gestión.
+
+---
+
+## 26. Módulo 15 — Membresías (2026-07-31)
+
+### 26.1 Alcance real auditado
+
+Pantalla: `/saas/memberships`. APIs: `GET/POST /api/saas/memberships`, `PATCH/DELETE /api/saas/memberships/[planId]`. Servicio: `SaasMembershipService` (migración 451).
+
+### 26.2 Hallazgos funcionales de causa raíz
+
+- **Comisiones afiliado siempre vacías:** la pestaña Afiliados parseaba `{ commissions }` pero `GET /api/saas/affiliates?resource=commissions` devuelve el **array** directo → `d.commissions ?? []` siempre `[]`.
+- **`subscribe` sin UI:** la API y el servicio ya enrolaban miembros (con hook afiliado) pero no había forma de suscribir desde producto.
+- **`is_active` sin write path:** columna y badge existían; `updatePlan` no actualizaba `is_active`. **Fix:** campo en UPDATE + toggle Activar/Desactivar.
+- **RBAC:** PATCH/DELETE usaban `contacts.read` para mutaciones → corregido a `contacts.write`.
+- Errores silenciosos en delete/cancel/load; tokens `text-red-400` → `destructive`; KPIs → `KpiTile`.
+
+### 26.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| tsc / ESLint | **PASS** |
+| vitest | **PASS** — **2480 passed / 4 skipped** (memberships 21/21) |
+| build | **PASS** |
+| Smoke (8098) | page 307 · APIs 401 |
+| Staging | **BLOCKED_ENVIRONMENT** |
+
+### 26.4 Próximo módulo
+
+**ERP** (`/saas/erp/purchases`, `inventory`, `manufacturing`, `projects`, `sectors`).
