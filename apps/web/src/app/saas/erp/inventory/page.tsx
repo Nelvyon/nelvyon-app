@@ -1,13 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import {
+  NelvyonDsButton,
+  NelvyonDsCard,
+  NelvyonDsSectionHeader,
+} from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
 type Balance = { productSku: string; locationId: string; available: number; reserved: number; inTransit: number };
 type Location = { id: string; warehouseId: string; code: string };
 type Warehouse = { id: string; code: string; name: string };
 type Product = { sku: string; name: string; uom: string };
+
+const inputCls =
+  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
 
 export default function ErpInventoryPage() {
   const [balances, setBalances] = useState<Balance[]>([]);
@@ -16,12 +25,14 @@ export default function ErpInventoryPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [ok, setOk] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sku, setSku] = useState("");
   const [productName, setProductName] = useState("");
-  const whCode = "WH1";
-  const locCode = "A-01";
   const [qty, setQty] = useState("10");
+  const [reserveSku, setReserveSku] = useState("");
+  const [reserveQty, setReserveQty] = useState("1");
+  const [reserveRef, setReserveRef] = useState("");
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -57,6 +68,12 @@ export default function ErpInventoryPage() {
     void load();
   }, [load]);
 
+  function flash(msg: string) {
+    setOk(msg);
+    setError(null);
+    window.setTimeout(() => setOk(null), 3000);
+  }
+
   async function ensureAndReceive(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -91,7 +108,7 @@ export default function ErpInventoryPage() {
         const r = await fetch("/api/saas/erp/inventory", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "create_warehouse", code: whCode, name: whCode }),
+          body: JSON.stringify({ action: "create_warehouse", code: "WH1", name: "WH1" }),
         });
         const d = (await r.json()) as { warehouse?: Warehouse; error?: string };
         if (!r.ok || !d.warehouse) {
@@ -106,7 +123,7 @@ export default function ErpInventoryPage() {
         const r = await fetch("/api/saas/erp/inventory", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "create_location", warehouseId, code: locCode }),
+          body: JSON.stringify({ action: "create_location", warehouseId, code: "A-01" }),
         });
         const d = (await r.json()) as { location?: Location; error?: string };
         if (!r.ok || !d.location) {
@@ -134,85 +151,129 @@ export default function ErpInventoryPage() {
       }
       setSku("");
       setProductName("");
+      flash("Stock recibido");
       await load();
     } finally {
       setSaving(false);
     }
   }
 
+  async function reserveStock(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      const productSku = reserveSku.trim();
+      const bal = balances.find((b) => b.productSku === productSku && b.available > 0);
+      if (!bal) {
+        setError("No hay saldo disponible para ese SKU");
+        return;
+      }
+      const r = await fetch("/api/saas/erp/inventory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "reserve",
+          productSku,
+          locationId: bal.locationId,
+          qty: Number(reserveQty),
+          orderRef: reserveRef.trim() || `ORD-${Date.now()}`,
+          idempotencyKey: `ui-rsv-${productSku}-${Date.now()}`,
+        }),
+      });
+      const d = (await r.json()) as { error?: string };
+      if (!r.ok) {
+        setError(d.error ?? `reserve HTTP ${r.status}`);
+        return;
+      }
+      setReserveSku("");
+      setReserveRef("");
+      flash("Stock reservado");
+      await load();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const availableTotal = balances.reduce((s, b) => s + b.available, 0);
+  const reservedTotal = balances.reduce((s, b) => s + b.reserved, 0);
+
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="erp-inventory" />}>
-      <div className="mx-auto max-w-5xl space-y-6 p-6">
-        <header>
-          <h1 className="text-2xl font-semibold text-white">Inventario & almacenes</h1>
-          <p className="mt-1 text-sm text-[#94a3b8]">
-            Persistido vía API (Postgres con DATABASE_URL) · sin coste/GL · {note || "solo cantidades y trazabilidad"}
-          </p>
-        </header>
+      <div className="flex flex-col gap-6 pb-8">
+        <NelvyonDsSectionHeader
+          title="Inventario & almacenes"
+          subtitle={note || "Persistido vía API · sin coste/GL"}
+        />
 
         {error && (
-          <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
             {error}
-          </div>
+          </p>
+        )}
+        {ok && (
+          <p className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary" role="status">
+            {ok}
+          </p>
         )}
 
-        <form
-          onSubmit={ensureAndReceive}
-          className="grid gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          <input
-            value={sku}
-            onChange={(e) => setSku(e.target.value)}
-            placeholder="SKU *"
-            className="rounded-lg border border-white/10 bg-[#020817] px-3 py-2 text-sm text-white"
-            required
-          />
-          <input
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            placeholder="Nombre (si nuevo)"
-            className="rounded-lg border border-white/10 bg-[#020817] px-3 py-2 text-sm text-white"
-          />
-          <input
-            value={qty}
-            onChange={(e) => setQty(e.target.value)}
-            type="number"
-            min={1}
-            placeholder="Cantidad"
-            className="rounded-lg border border-white/10 bg-[#020817] px-3 py-2 text-sm text-white"
-            required
-          />
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-lg bg-[#0084ff] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-          >
-            {saving ? "Recibiendo…" : "Recibir stock"}
-          </button>
-        </form>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <KpiTile icon="📦" label="Productos" value={products.length} />
+          <KpiTile icon="📍" label="Ubicaciones" value={locations.length} />
+          <KpiTile icon="✅" label="Disponible" value={availableTotal} accent />
+          <KpiTile icon="🔒" label="Reservado" value={reservedTotal} />
+        </div>
+
+        <NelvyonDsCard className="p-4">
+          <p className="mb-3 text-sm font-medium text-foreground">Recibir stock</p>
+          <form onSubmit={(e) => void ensureAndReceive(e)} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <input className={inputCls} value={sku} onChange={(e) => setSku(e.target.value)} placeholder="SKU *" required />
+            <input className={inputCls} value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Nombre (si nuevo)" />
+            <input className={inputCls} type="number" min={1} value={qty} onChange={(e) => setQty(e.target.value)} required />
+            <NelvyonDsButton type="submit" disabled={saving} variant="primary">
+              {saving ? "Recibiendo…" : "Recibir stock"}
+            </NelvyonDsButton>
+          </form>
+        </NelvyonDsCard>
+
+        <NelvyonDsCard className="p-4">
+          <p className="mb-3 text-sm font-medium text-foreground">Reservar stock</p>
+          <form onSubmit={(e) => void reserveStock(e)} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <input className={inputCls} value={reserveSku} onChange={(e) => setReserveSku(e.target.value)} placeholder="SKU *" required list="inv-skus" />
+            <datalist id="inv-skus">
+              {balances.map((b) => (
+                <option key={`${b.productSku}-${b.locationId}`} value={b.productSku} />
+              ))}
+            </datalist>
+            <input className={inputCls} type="number" min={1} value={reserveQty} onChange={(e) => setReserveQty(e.target.value)} required />
+            <input className={inputCls} value={reserveRef} onChange={(e) => setReserveRef(e.target.value)} placeholder="Ref. pedido" />
+            <NelvyonDsButton type="submit" disabled={saving || balances.length === 0} variant="secondary">
+              Reservar
+            </NelvyonDsButton>
+          </form>
+        </NelvyonDsCard>
 
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-[#94a3b8]">Saldos</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">Saldos</h2>
           {loading ? (
-            <p className="text-sm text-[#64748b]">Cargando…</p>
+            <p className="text-sm text-muted-foreground" role="status">Cargando…</p>
           ) : balances.length === 0 ? (
-            <p className="text-sm text-[#64748b]">Sin saldos. Recibe stock para crear producto/ubicación.</p>
+            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">
+              Sin saldos. Recibe stock para crear producto/ubicación.
+            </NelvyonDsCard>
           ) : (
-            <ul className="divide-y divide-white/5 rounded-xl border border-white/10">
+            <div className="flex flex-col gap-2">
               {balances.map((b) => (
-                <li
-                  key={`${b.locationId}-${b.productSku}`}
-                  className="flex justify-between px-4 py-3 text-sm text-white"
-                >
-                  <span>
+                <NelvyonDsCard key={`${b.locationId}-${b.productSku}`} className="flex justify-between gap-3 p-4">
+                  <span className="text-sm text-foreground">
                     {b.productSku} @ {b.locationId.slice(0, 8)}…
                   </span>
-                  <span className="text-[#94a3b8]">
+                  <span className="text-xs text-muted-foreground">
                     disp {b.available} · res {b.reserved} · tráns {b.inTransit}
                   </span>
-                </li>
+                </NelvyonDsCard>
               ))}
-            </ul>
+            </div>
           )}
         </section>
       </div>

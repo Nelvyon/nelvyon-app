@@ -1,8 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import {
+  NelvyonDsBadge,
+  NelvyonDsButton,
+  NelvyonDsCard,
+  NelvyonDsSectionHeader,
+} from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
 type Bom = {
   id: string;
@@ -19,11 +26,15 @@ type Mo = {
   status: string;
 };
 
+const inputCls =
+  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
+
 export default function ErpManufacturingPage() {
   const [boms, setBoms] = useState<Bom[]>([]);
   const [mos, setMos] = useState<Mo[]>([]);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [ok, setOk] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [productSku, setProductSku] = useState("");
   const [componentSku, setComponentSku] = useState("");
@@ -108,6 +119,8 @@ export default function ErpManufacturingPage() {
 
       setProductSku("");
       setComponentSku("");
+      setOk("BOM aprobada y MO creada");
+      window.setTimeout(() => setOk(null), 3000);
       await load();
     } finally {
       setSaving(false);
@@ -116,101 +129,77 @@ export default function ErpManufacturingPage() {
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="erp-manufacturing" />}>
-      <div className="mx-auto max-w-5xl space-y-6 p-6">
-        <header>
-          <h1 className="text-2xl font-semibold text-white">Manufactura</h1>
-          <p className="mt-1 text-sm text-[#94a3b8]">
-            Persistido vía API (Postgres con DATABASE_URL) · IoT bloqueado · {note || "BOM → approve → MO"}
-          </p>
-        </header>
+      <div className="flex flex-col gap-6 pb-8">
+        <NelvyonDsSectionHeader
+          title="Manufactura"
+          subtitle={note || "BOM → aprobar → orden de fabricación · IoT bloqueado"}
+        />
 
         {error && (
-          <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
             {error}
-          </div>
+          </p>
+        )}
+        {ok && (
+          <p className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary" role="status">
+            {ok}
+          </p>
         )}
 
-        <form
-          onSubmit={createBomFlow}
-          className="grid gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:grid-cols-2 lg:grid-cols-5"
-        >
-          <input
-            value={productSku}
-            onChange={(e) => setProductSku(e.target.value)}
-            placeholder="SKU producto *"
-            className="rounded-lg border border-white/10 bg-[#020817] px-3 py-2 text-sm text-white"
-            required
-          />
-          <input
-            value={componentSku}
-            onChange={(e) => setComponentSku(e.target.value)}
-            placeholder="SKU componente *"
-            className="rounded-lg border border-white/10 bg-[#020817] px-3 py-2 text-sm text-white"
-            required
-          />
-          <input
-            value={compQty}
-            onChange={(e) => setCompQty(e.target.value)}
-            type="number"
-            min={0.0001}
-            step="any"
-            placeholder="Qty componente"
-            className="rounded-lg border border-white/10 bg-[#020817] px-3 py-2 text-sm text-white"
-            required
-          />
-          <input
-            value={moQty}
-            onChange={(e) => setMoQty(e.target.value)}
-            type="number"
-            min={1}
-            placeholder="Qty MO"
-            className="rounded-lg border border-white/10 bg-[#020817] px-3 py-2 text-sm text-white"
-            required
-          />
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-lg bg-[#0084ff] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-          >
-            {saving ? "Creando…" : "BOM + aprobar + MO"}
-          </button>
-        </form>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <KpiTile icon="📋" label="BOMs" value={boms.length} />
+          <KpiTile icon="⚙️" label="Órdenes MO" value={mos.length} accent />
+          <KpiTile icon="✅" label="BOMs aprobadas" value={boms.filter((b) => b.status === "approved").length} />
+        </div>
+
+        <NelvyonDsCard className="p-4">
+          <p className="mb-3 text-sm font-medium text-foreground">Crear BOM + aprobar + MO</p>
+          <form onSubmit={(e) => void createBomFlow(e)} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <input className={inputCls} value={productSku} onChange={(e) => setProductSku(e.target.value)} placeholder="SKU producto *" required />
+            <input className={inputCls} value={componentSku} onChange={(e) => setComponentSku(e.target.value)} placeholder="SKU componente *" required />
+            <input className={inputCls} type="number" min={0.0001} step="any" value={compQty} onChange={(e) => setCompQty(e.target.value)} required />
+            <input className={inputCls} type="number" min={1} value={moQty} onChange={(e) => setMoQty(e.target.value)} required />
+            <NelvyonDsButton type="submit" disabled={saving} variant="primary">
+              {saving ? "Creando…" : "BOM + MO"}
+            </NelvyonDsButton>
+          </form>
+        </NelvyonDsCard>
 
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-[#94a3b8]">Órdenes de fabricación</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">Órdenes de fabricación</h2>
           {loading ? (
-            <p className="text-sm text-[#64748b]">Cargando…</p>
+            <p className="text-sm text-muted-foreground" role="status">Cargando…</p>
           ) : mos.length === 0 ? (
-            <p className="text-sm text-[#64748b]">Sin MOs.</p>
+            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">Sin MOs.</NelvyonDsCard>
           ) : (
-            <ul className="divide-y divide-white/5 rounded-xl border border-white/10">
+            <div className="flex flex-col gap-2">
               {mos.map((mo) => (
-                <li key={mo.id} className="flex justify-between px-4 py-3 text-sm text-white">
-                  <span>
+                <NelvyonDsCard key={mo.id} className="flex justify-between gap-3 p-4">
+                  <span className="text-sm text-foreground">
                     {mo.productSku} · qty {mo.qty}
                   </span>
-                  <span className="text-[#94a3b8]">{mo.status}</span>
-                </li>
+                  <NelvyonDsBadge tone="primary">{mo.status}</NelvyonDsBadge>
+                </NelvyonDsCard>
               ))}
-            </ul>
+            </div>
           )}
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-[#94a3b8]">BOMs</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">BOMs</h2>
           {boms.length === 0 ? (
-            <p className="text-sm text-[#64748b]">Sin BOMs.</p>
+            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">Sin BOMs.</NelvyonDsCard>
           ) : (
-            <ul className="divide-y divide-white/5 rounded-xl border border-white/10">
+            <div className="flex flex-col gap-2">
               {boms.map((b) => (
-                <li key={b.id} className="flex justify-between px-4 py-3 text-sm text-white">
-                  <span>
+                <NelvyonDsCard key={b.id} className="flex justify-between gap-3 p-4">
+                  <span className="text-sm text-foreground">
                     {b.productSku} v{b.version} · {b.lines.length} líneas
                   </span>
-                  <span className="text-[#94a3b8]">{b.status}</span>
-                </li>
+                  <NelvyonDsBadge tone={b.status === "approved" ? "success" : "warning"}>{b.status}</NelvyonDsBadge>
+                </NelvyonDsCard>
               ))}
-            </ul>
+            </div>
           )}
         </section>
       </div>

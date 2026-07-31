@@ -1,8 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import {
+  NelvyonDsBadge,
+  NelvyonDsButton,
+  NelvyonDsCard,
+  NelvyonDsSectionHeader,
+} from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
 type Sector = {
   id: string;
@@ -13,6 +20,13 @@ type Sector = {
   note: string;
   regulatedNote?: string;
 };
+
+function statusTone(s: string): "success" | "warning" | "danger" | "neutral" | "primary" {
+  if (s.includes("READY") || s.includes("LIVE")) return "success";
+  if (s.includes("BLOCKED")) return "danger";
+  if (s.includes("PREPARED") || s.includes("OFF")) return "warning";
+  return "neutral";
+}
 
 export default function ErpSectorsPage() {
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -43,43 +57,58 @@ export default function ErpSectorsPage() {
     void load();
   }, [load]);
 
+  const blocked = sectors.filter((s) => s.status.includes("BLOCKED")).length;
+
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="erp-sectors" />}>
-      <div className="mx-auto max-w-5xl space-y-6 p-6">
-        <header>
-          <h1 className="text-2xl font-semibold text-white">Taxonomía de sectores</h1>
-          <p className="mt-1 text-sm text-[#94a3b8]">{note || "Inventario canónico honesto"}</p>
-        </header>
+      <div className="flex flex-col gap-6 pb-8">
+        <NelvyonDsSectionHeader
+          title="Taxonomía de sectores"
+          subtitle={note || "Inventario canónico honesto"}
+        />
 
         {error && (
-          <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-            {error}
-          </div>
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
+            {error}{" "}
+            <NelvyonDsButton size="sm" variant="ghost" onClick={() => void load()}>
+              Reintentar
+            </NelvyonDsButton>
+          </p>
         )}
 
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <KpiTile icon="🗂️" label="Sectores" value={sectors.length} />
+          <KpiTile icon="🚫" label="Bloqueados" value={blocked} />
+          <KpiTile icon="📌" label="Activos catálogo" value={sectors.length - blocked} accent />
+        </div>
+
         {loading ? (
-          <p className="text-sm text-[#64748b]">Cargando…</p>
+          <p className="text-sm text-muted-foreground" role="status">
+            Cargando…
+          </p>
+        ) : sectors.length === 0 ? (
+          <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">
+            Sin sectores en el catálogo.
+          </NelvyonDsCard>
         ) : (
-          <ul className="space-y-3">
+          <div className="flex flex-col gap-3">
             {sectors.map((s) => (
-              <li key={s.id} className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <NelvyonDsCard key={s.id} className="p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-base font-medium text-white">{s.title}</h2>
-                  <span className="rounded-md bg-white/10 px-2 py-0.5 text-xs text-[#94a3b8]">
-                    {s.status}
-                  </span>
+                  <h2 className="text-base font-medium text-foreground">{s.title}</h2>
+                  <NelvyonDsBadge tone={statusTone(s.status)}>{s.status}</NelvyonDsBadge>
                 </div>
-                <p className="mt-2 text-sm text-[#94a3b8]">{s.note}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{s.note}</p>
                 {s.regulatedNote && (
-                  <p className="mt-1 text-xs text-amber-300/90">{s.regulatedNote}</p>
+                  <p className="mt-1 text-xs text-warning">{s.regulatedNote}</p>
                 )}
-                <p className="mt-2 text-xs text-[#64748b]">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Modules: {s.mappedModules.join(", ") || "—"} · Playbooks:{" "}
                   {s.playbookPaths.join(", ") || "—"}
                 </p>
-              </li>
+              </NelvyonDsCard>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </SaasShellLayout>

@@ -94,8 +94,43 @@ export async function POST(req: Request) {
       return NextResponse.json({ purchaseRequest: pr }, { status: 201 });
     }
 
+    if (action === "submit_pr") {
+      const purchaseRequestId = typeof body.purchaseRequestId === "string" ? body.purchaseRequestId : "";
+      if (!purchaseRequestId) {
+        return NextResponse.json({ error: "purchaseRequestId requerido" }, { status: 400 });
+      }
+      const pr = await withPurchasesPersistence(tenantId, (core) =>
+        core.submitPR({ tenantId, actorId, purchaseRequestId }),
+      );
+      return NextResponse.json({ purchaseRequest: pr });
+    }
+
+    if (action === "approve_pr") {
+      const purchaseRequestId = typeof body.purchaseRequestId === "string" ? body.purchaseRequestId : "";
+      if (!purchaseRequestId) {
+        return NextResponse.json({ error: "purchaseRequestId requerido" }, { status: 400 });
+      }
+      const roleRaw = typeof body.role === "string" ? body.role : "admin";
+      const role =
+        roleRaw === "requester" || roleRaw === "manager" || roleRaw === "admin" ? roleRaw : "admin";
+      const pr = await withPurchasesPersistence(tenantId, (core) =>
+        core.approvePR({
+          tenantId,
+          actorId,
+          purchaseRequestId,
+          role,
+          note: typeof body.note === "string" ? body.note : undefined,
+        }),
+      );
+      return NextResponse.json({ purchaseRequest: pr });
+    }
+
     return NextResponse.json(
-      { error: "Unknown action", code: "INVALID_INPUT", allowed: ["create_supplier", "create_pr"] },
+      {
+        error: "Unknown action",
+        code: "INVALID_INPUT",
+        allowed: ["create_supplier", "create_pr", "submit_pr", "approve_pr"],
+      },
       { status: 400 },
     );
   } catch (e: unknown) {
