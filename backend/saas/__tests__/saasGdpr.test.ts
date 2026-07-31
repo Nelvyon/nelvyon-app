@@ -90,12 +90,13 @@ describe("SaasGdprService", () => {
     expect(sqls.some((s) => s.includes("UPDATE saas_gdpr_requests SET status = 'completed'"))).toBe(true);
   });
 
-  it("getRequests devuelve historial de solicitudes GDPR", async () => {
+  it("getRequests filtra por userId y tenantId", async () => {
     const query = vi.fn().mockResolvedValue([{ ...requestRow }, { ...requestRow, id: "2" }]);
     const svc = new SaasGdprService({ db: { query } });
-    const rows = await svc.getRequests("u1");
+    const rows = await svc.getRequests("u1", "t1");
     expect(rows).toHaveLength(2);
-    expect(String(query.mock.calls[0]?.[0])).toContain("ORDER BY created_at DESC");
+    expect(String(query.mock.calls[0]?.[0])).toContain("tenant_id = $2");
+    expect((query.mock.calls[0]?.[1] as unknown[])[1]).toBe("t1");
   });
 
   it("exportUserData no devuelve datos de otro usuario (usa params userId/tenantId)", async () => {

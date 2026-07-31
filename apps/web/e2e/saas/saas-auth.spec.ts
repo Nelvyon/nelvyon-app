@@ -37,13 +37,12 @@ test.describe("SaaS Auth — autenticado carga dashboard", () => {
   test.beforeEach(async ({ page, context }) => {
     await setAuthCookie(context);
     await mockSaasApis(page);
-    await page.route("**/api/saas/dashboard**", route =>
-      route.fulfill({ json: { contacts: 42, deals: 7, revenue: 15000, workflows: 3, ses_configured: false } }));
   });
 
   test("con token válido /saas/dashboard carga correctamente", async ({ page }) => {
     await page.goto("/saas/dashboard");
     await expect(page).not.toHaveURL(LOGIN_URL);
+    await expect(page.getByTestId("saas-sidebar")).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("body")).toBeVisible();
   });
 });

@@ -53,11 +53,18 @@ const EVENT_GROUPS: Record<string, WebhookEvent[]> = {
 };
 
 
-function CreateWebhookModal({ onClose }: { onClose: () => void }) {
+function CreateWebhookModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: () => void;
+}) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [selectedEvents, setSelectedEvents] = useState<WebhookEvent[]>([]);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   function toggleEvent(ev: WebhookEvent) {
     setSelectedEvents(prev => prev.includes(ev) ? prev.filter(e => e !== ev) : [...prev, ev]);
@@ -71,15 +78,23 @@ function CreateWebhookModal({ onClose }: { onClose: () => void }) {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setFormError(null);
     try {
-      await fetch("/api/saas/webhooks", {
+      const res = await fetch("/api/saas/webhooks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, url, events: selectedEvents }),
       });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
+        throw new Error(body?.message ?? body?.error ?? `Error ${res.status}`);
+      }
+      onCreated();
+      onClose();
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "No se pudo crear el webhook");
     } finally {
       setSaving(false);
-      onClose();
     }
   }
 
@@ -91,6 +106,11 @@ function CreateWebhookModal({ onClose }: { onClose: () => void }) {
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={save} className="space-y-5 p-6">
+          {formError ? (
+            <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400" role="alert">
+              {formError}
+            </p>
+          ) : null}
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Leads a Slack"
@@ -436,7 +456,15 @@ if (sig !== req.headers['x-nelvyon-signature']) {
 }`}
               </pre>
             </NelvyonDsCard>
-      {showModal && <CreateWebhookModal onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <CreateWebhookModal
+          onClose={() => setShowModal(false)}
+          onCreated={() => {
+            setActionError(null);
+            void load();
+          }}
+        />
+      )}
     </SaasShellLayout>
   );
 }

@@ -16,6 +16,37 @@ export interface GdprRequest {
   createdAt: string;
 }
 
+/** Honest scope of user-level DSAR helpers (not a full CRM wipe). */
+export const GDPR_USER_DATA_COVERAGE = {
+  exportTables: [
+    "saas_client_profiles",
+    "saas_invoices",
+    "saas_service_results",
+    "saas_notifications",
+    "saas_chat_messages",
+    "os_assets",
+  ] as const,
+  deleteTables: [
+    "saas_chat_messages",
+    "saas_notifications",
+    "saas_service_results",
+    "saas_invoices",
+    "saas_client_profiles",
+    "os_assets",
+    "os_upsell_suggestions",
+  ] as const,
+  /** Explicitly out of scope for user-level delete/export (use tenant bundle / contact delete). */
+  outOfScope: [
+    "saas_contacts",
+    "saas_deals",
+    "saas_campanias",
+    "saas_campania_recipients",
+    "saas_profile_changelog",
+  ] as const,
+  note:
+    "User-level DSAR covers profile/billing/notifications/chat/assets for the active tenant only. CRM PII uses exportTenantBundle or delete-contact.",
+} as const;
+
 export type SaasGdprServiceDeps = {
   db?: Pick<DbClient, "query">;
 };
@@ -56,6 +87,7 @@ export class SaasGdprService {
       exportedAt: new Date().toISOString(),
       userId,
       tenantId,
+      coverage: GDPR_USER_DATA_COVERAGE,
       profile: profile[0] ?? null,
       invoices,
       serviceResults: results,
@@ -80,30 +112,35 @@ export class SaasGdprService {
     return row;
   }
 
-  async deleteUserData(userId: string, tenantId: string): Promise<void> {
+  async deleteUserData(userId: string, tenantId: string): Promise<{ coverage: typeof GDPR_USER_DATA_COVERAGE }> {
     await this.db.query(`DELETE FROM saas_chat_messages WHERE user_id = $1 AND tenant_id = $2`, [userId, tenantId]);
     await this.db.query(`DELETE FROM saas_notifications WHERE user_id = $1 AND tenant_id = $2`, [userId, tenantId]);
     await this.db.query(`DELETE FROM saas_service_results WHERE user_id = $1 AND tenant_id = $2`, [userId, tenantId]);
     await this.db.query(`DELETE FROM saas_invoices WHERE user_id = $1 AND tenant_id = $2`, [userId, tenantId]);
-    await this.db.query(`DELETE FROM saas_profile_changelog WHERE user_id = $1`, [userId]);
+    // saas_profile_changelog has no tenant_id — do not wipe cross-tenant history here.
     await this.db.query(`DELETE FROM saas_client_profiles WHERE user_id = $1 AND tenant_id = $2`, [userId, tenantId]);
     await this.db.query(`DELETE FROM os_assets WHERE client_id = $1 AND tenant_id = $2`, [userId, tenantId]);
     await this.db.query(`DELETE FROM os_upsell_suggestions WHERE client_id = $1 AND tenant_id = $2`, [userId, tenantId]);
     await this.db.query(
       `UPDATE saas_gdpr_requests SET status = 'completed', completed_at = NOW()
-       WHERE user_id = $1 AND tenant_id = $2 AND type = 'delete' AND status = 'pending'`,
+       WHERE user_id = $1 AND tenant_id = $2 AND type = 'delete' AND status IN ('pending', 'processing')`,
       [userId, tenantId],
     );
-    logger.info(`[GDPR] Datos borrados completamente: ${userId}`);
+    logger.info(
+      `[GDPR] User-scoped delete completed (partial coverage, not full CRM wipe): ${userId} tenant=${tenantId}`,
+    );
+    return { coverage: GDPR_USER_DATA_COVERAGE };
   }
 
-  async getRequests(userId: string): Promise<GdprRequest[]> {
+  async getRequests(userId: string, tenantId: string): Promise<GdprRequest[]> {
     return this.db.query<GdprRequest>(
       `SELECT id, user_id as "userId", tenant_id as "tenantId",
               type, status, data_url as "dataUrl",
               completed_at as "completedAt", created_at as "createdAt"
-       FROM saas_gdpr_requests WHERE user_id = $1 ORDER BY created_at DESC`,
-      [userId],
+       FROM saas_gdpr_requests
+       WHERE user_id = $1 AND tenant_id = $2
+       ORDER BY created_at DESC`,
+      [userId, tenantId],
     );
   }
 

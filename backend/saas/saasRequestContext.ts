@@ -34,7 +34,57 @@ const ST_TENANT_SELECT = SAAS_TENANT_SELECT.split(",")
   .map((c) => `st.${c.trim()}`)
   .join(", ");
 
-async function resolveTenantAccess(userId: string): Promise<{ tenant: SaasTenant; role: SaasRole }> {
+async function resolveMembershipForTenant(
+  userId: string,
+  tenantId: string,
+): Promise<{ tenant: SaasTenant; role: SaasRole } | null> {
+  const db = DbClient.getInstance();
+  const rows = await db.query<MemberTenantRow>(
+    `SELECT wm.role AS member_role, ${ST_TENANT_SELECT}
+     FROM workspace_members wm
+     JOIN saas_tenants st ON st.workspace_id = wm.workspace_id
+     WHERE wm.user_id = $1::text
+       AND wm.status = 'active'
+       AND st.onboarding_completed = true
+       AND st.id = $2::text
+     LIMIT 1`,
+    [userId, tenantId],
+  );
+  const row = rows[0];
+  if (!row) return null;
+  const { member_role, ...tenantRow } = row;
+  return {
+    tenant: saasTenantFromRow(tenantRow),
+    role: mapWorkspaceRoleToSaas(member_role),
+  };
+}
+
+function extractPreferredTenantId(req: Request): string | null {
+  const header = req.headers.get("x-nelvyon-tenant-id")?.trim();
+  if (header) return header;
+  const cookieHeader = req.headers.get("cookie") ?? "";
+  const match = /(?:^|;\s*)nelvyon_saas_tenant_id=([^;]+)/i.exec(cookieHeader);
+  if (!match?.[1]) return null;
+  try {
+    return decodeURIComponent(match[1].trim());
+  } catch {
+    return match[1].trim();
+  }
+}
+
+async function resolveTenantAccess(
+  userId: string,
+  preferredTenantId?: string | null,
+): Promise<{ tenant: SaasTenant; role: SaasRole }> {
+  if (preferredTenantId) {
+    const ownedPreferred = await getSaasOnboardingService().getTenant(userId);
+    if (ownedPreferred && ownedPreferred.id === preferredTenantId) {
+      return { tenant: ownedPreferred, role: "owner" };
+    }
+    const membership = await resolveMembershipForTenant(userId, preferredTenantId);
+    if (membership) return membership;
+  }
+
   const owned = await getSaasOnboardingService().getTenant(userId);
   if (owned) {
     return { tenant: owned, role: "owner" };
@@ -53,7 +103,7 @@ async function resolveTenantAccess(userId: string): Promise<{ tenant: SaasTenant
         AND wm.status = 'active'
        WHERE si.user_id = $1::text
          AND st.onboarding_completed = true
-       ORDER BY st.created_at ASC
+       ORDER BY st.created_at DESC
        LIMIT 1`,
       [userId],
     );
@@ -85,7 +135,7 @@ async function resolveTenantAccess(userId: string): Promise<{ tenant: SaasTenant
      WHERE wm.user_id = $1::text
        AND wm.status = 'active'
        AND st.onboarding_completed = true
-     ORDER BY st.created_at ASC
+     ORDER BY st.created_at DESC
      LIMIT 1`,
     [userId],
   );
@@ -112,7 +162,7 @@ export async function requireSaasContext(req: Request, action: SaasAction): Prom
     throw e;
   }
 
-  const { tenant, role } = await resolveTenantAccess(claims.userId);
+  const { tenant, role } = await resolveTenantAccess(claims.userId, extractPreferredTenantId(req));
 
   let customPerms: SaasAction[] | null = null;
   try {

@@ -33,7 +33,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.write");
+    const ctx = await requireSaasContext(req, "settings.write");
     const body = await req.json() as Record<string, unknown>;
     const action = body.action as string | undefined;
     const svc = getSaasSubcuentasService();
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.write");
+    const ctx = await requireSaasContext(req, "settings.write");
     const url = new URL(req.url);
     const id = url.searchParams.get("id") ?? "";
     const ok = await getSaasSubcuentasService().cancel(ctx.tenant.id, id);

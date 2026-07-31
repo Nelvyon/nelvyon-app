@@ -419,6 +419,7 @@ export default function SaasLmsPage() {
       <div className="flex flex-col gap-6 pb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <NelvyonDsSectionHeader title="LMS — Cursos y Formación" subtitle="Crea y vende cursos online directamente desde Nelvyon" />
+          <a href="/saas/certificados" className="text-sm text-primary hover:underline">Certificados LMS →</a>
           <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo curso</NelvyonDsButton>
         </div>
 

@@ -14,21 +14,20 @@ export const LOGIN_URL = /\/login/;
 export const DUMMY_TOKEN = "e2e-test-token-nelvyon";
 
 /** Injects the platform session cookie that lets middleware pass SaaS pages. */
-export async function setAuthCookie(context: BrowserContext): Promise<void> {
+export async function setAuthCookie(context: BrowserContext, baseURL?: string): Promise<void> {
+  const origin = (baseURL ?? process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
   await context.addCookies([
     {
       name: "nelvyon_token",
       value: DUMMY_TOKEN,
-      domain: "localhost",
-      path: "/",
+      url: origin,
       httpOnly: false,
       secure: false,
     },
     {
       name: "NELVYON_LOCALE",
       value: "es",
-      domain: "localhost",
-      path: "/",
+      url: origin,
       httpOnly: false,
       secure: false,
     },

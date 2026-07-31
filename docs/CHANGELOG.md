@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Cert / SaaS | **Certificación final SaaS** | Inventario 97 pages / 240 APIs / 72 nav. P0 unsubscribe false-success; P1 webhooks create, dashboard degraded+loading, GDPR honesty+UI, tenant header, subcuentas RBAC, certificados, autonomous HTTPS origin. Gates: tsc/eslint/vitest **6253**/build PASS · smoke 307/401 · PW **270/349** · LH a11y **88**. Staging **BLOCKED**. Veredicto **CONDITIONAL_READY**. `claimReady: false`. Ver §34. |
 | UI / SaaS | **Auditoría global SaaS pasada 2** | Sweep residual: 0 `alert`/`console.debug` en `/saas`; 0 onClick vacío; sin P0/P1 nuevos. Ver §33. `claimReady: false` |
 | UI / SaaS | **Auditoría global SaaS pasada 1** | 0 P0; 12 P1: eliminar `alert()`, try/catch en compliance/playbooks/partner/SSO/sync, LMS flow. build **PASS**. Ver §32. `claimReady: false` |
 | UI / SaaS | **W3CRM Fase 2 — módulo 18b: api-keys / white-label / integraciones / partner / comunidades / entregables** | **Causas raíz:** expiresAt vs expires_at; revoke optimista; white-label RBAC `contacts.write`; disconnect silencioso; tooltips con esquema BD; partner loaded tras error. Fix + rate limits unificados. tsc/build **PASS**. Ver §31. `claimReady: false` |

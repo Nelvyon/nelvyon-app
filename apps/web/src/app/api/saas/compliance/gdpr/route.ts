@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     }
     const ctx = await requireSaasContext(req, "settings.read");
     const data = await saasGdprService.exportUserData(ctx.claims.userId, ctx.tenant.id);
-    const requests = await saasGdprService.getRequests(ctx.claims.userId);
+    const requests = await saasGdprService.getRequests(ctx.claims.userId, ctx.tenant.id);
     return NextResponse.json({ data, requests });
   } catch (e) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
@@ -42,8 +42,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ request: reqRow }, { status: 201 });
     }
     if (action === "delete-user-data") {
-      await saasGdprService.deleteUserData(ctx.claims.userId, ctx.tenant.id);
-      return NextResponse.json({ ok: true });
+      // Destructive: require explicit confirm + a pending delete request for this tenant.
+      if (String(body.confirm ?? "") !== "DELETE") {
+        return NextResponse.json(
+          { error: "confirm_required", message: "Envía confirm: \"DELETE\" para ejecutar el borrado acotado." },
+          { status: 400 },
+        );
+      }
+      const pending = await saasGdprService.getRequests(ctx.claims.userId, ctx.tenant.id);
+      const hasPendingDelete = pending.some((r) => r.type === "delete" && r.status === "pending");
+      if (!hasPendingDelete) {
+        return NextResponse.json(
+          {
+            error: "pending_request_required",
+            message: "Primero crea una solicitud request-deletion pendiente para este tenant.",
+          },
+          { status: 400 },
+        );
+      }
+      const result = await saasGdprService.deleteUserData(ctx.claims.userId, ctx.tenant.id);
+      return NextResponse.json({ ok: true, ...result });
     }
     if (action === "delete-contact") {
       await saasGdprService.deleteContactById(ctx.tenant.id, String(body.contactId ?? ""));

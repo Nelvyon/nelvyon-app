@@ -121,3 +121,14 @@
 
 Ver playbooks en `docs/autonomous/`, `docs/agency-playbooks/`.
 
+
+## Certificación final SaaS (2026-07-31)
+
+| Ítem | Estado | Notas |
+|------|--------|-------|
+| Auditoría /saas + /api/saas | ? | 97 pages · 240 APIs · 72 nav |
+| P0/P1 causa raíz (cert final) | ? | unsubscribe · GDPR · dashboard · webhooks · tenant header |
+| Gates locales tsc/eslint/vitest/build/smoke | ? | vitest 6253 |
+| Playwright SaaS mocked | ?? | 270/349 |
+| Staging live autenticado | ? | BLOCKED_ENVIRONMENT |
+| claimReady / prod deploy | ? | false / sin autorización |

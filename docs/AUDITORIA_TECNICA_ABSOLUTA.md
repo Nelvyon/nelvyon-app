@@ -1,18 +1,19 @@
 # AUDITORÍA TÉCNICA ABSOLUTA — NELVYON
 
-> **2026-07-28** cierre técnico seguro v3 · staging 521+522 · workflows CERTIFIED · claimReady false · **NOT READY**  
-> SSOT ops: `docs/ops/CTO_DEFINITIVE_PENDING_AUDIT_2026-07-28.md` v3
-> Veredicto: **CONDITIONAL_READY** · **NOT READY** · canary **not** opened · coste **0**
+> **2026-07-31** certificación final SaaS · inventarios 97/240/72 · claimReady false · canary KILL  
+> SSOT: `docs/ops/W3CRM_MIGRATION_PLAN.md` §34 · `docs/CTO_FINAL_VERIFY.md`  
+> Veredicto: **CONDITIONAL_READY** · staging live **BLOCKED_ENVIRONMENT** · **NOT READY** producción
 
 ### Matriz
 
 | Dimensión | Estado |
 |-----------|--------|
-| VERDE | Staging RAG reval · prod schema+RLS · kill ON · OpenAI OFF · fail-closed localhost |
-| PREPARADO | Canary window documentada · rollback &lt;5 min |
-| SOLO HUMANO | CEO SÍ/NO apertura canary · legal Pepito · OAuth/iOS/mercado |
-| NO ACTIVADO | Canary · AI inference · MCP/SM/OpenClaw · campañas/pagos |
+| VERDE | Auth API 401 · pages 307 · tsc/eslint/vitest/build · GDPR coverage honest · unsubscribe fail-closed |
+| AMARILLO | Playwright 270/349 (UI mocked) · LH a11y 88 · residual UI RBAC coarse · CRM DSAR parcial |
+| BLOQUEADO LOCAL | `DATABASE_URL` · `STAGING_BASE_URL` · visual autenticada staging · 2 tenants live |
+| SOLO HUMANO | Deploy prod · Pepito/legal · OAuth/SES/Twilio secrets · canary open |
+| NO ACTIVADO | claimReady · canary IA · ads spend |
 
 ### Próximo
 
-`CEO_PROD_CANARY_OPEN_YN.md` · **No READY**
+Staging seguro con DB real · re-cert live · **No READY** prod sin autorización escrita.

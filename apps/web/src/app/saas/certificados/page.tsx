@@ -30,12 +30,15 @@ export default function SaasCertificadosPage() {
   const [loading, setLoading] = useState(true);
   const [issuing, setIssuing] = useState(false);
   const [tab, setTab] = useState<"certs" | "pending">("certs");
+  const [error, setError] = useState<string | null>(null);
+  const [issueNotice, setIssueNotice] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/saas/certificados");
-      if (!res.ok) throw new Error("Error al cargar certificados");
+      if (!res.ok) throw new Error(`Error al cargar certificados (${res.status})`);
       const d = (await res.json()) as {
         certificates?: Array<{
           id: string;
@@ -61,9 +64,10 @@ export default function SaasCertificadosPage() {
         })),
       );
       setPending(d.pending ?? []);
-    } catch {
+    } catch (err) {
       setCerts([]);
       setPending([]);
+      setError(err instanceof Error ? err.message : "Error al cargar certificados");
     } finally {
       setLoading(false);
     }
@@ -76,16 +80,27 @@ export default function SaasCertificadosPage() {
   async function issuePending() {
     if (pending.length === 0) return;
     setIssuing(true);
+    setIssueNotice(null);
+    setError(null);
+    let failures = 0;
     try {
       for (const p of pending) {
-        await fetch("/api/saas/certificados", {
+        const res = await fetch("/api/saas/certificados", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ enrollment_id: p.enrollmentId }),
         });
+        if (!res.ok) failures += 1;
       }
       await load();
-      setTab("certs");
+      if (failures > 0) {
+        setIssueNotice(`Emitidos parcialmente: ${failures} de ${pending.length} fallaron.`);
+      } else {
+        setIssueNotice("Certificados pendientes emitidos.");
+        setTab("certs");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al emitir certificados");
     } finally {
       setIssuing(false);
     }
@@ -104,6 +119,17 @@ export default function SaasCertificadosPage() {
           </NelvyonDsButton>
         )}
       </div>
+
+      {error ? (
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400" role="alert">
+          {error}
+        </div>
+      ) : null}
+      {issueNotice ? (
+        <div className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary" role="status">
+          {issueNotice}
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-3 gap-3">
         {[

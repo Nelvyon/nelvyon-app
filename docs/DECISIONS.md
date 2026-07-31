@@ -951,3 +951,14 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Actualización 2026-07-31 (Fase 2, módulo 11 — Administración)** | Alcance: `/saas/{team,auditoria,security,subcuentas}` (settings queda para módulo posterior). Causas raíz: UI suspend/reactivate vía POST incorrecto + sin `reactivate` en servicio; shape API↔UI; edit role no-op; MFA provisioningUri descartado; filtros auditoría con offset viejo. Fix: `SaasTeamService.reactivate` + PATCH, mapper, modal rol, URI TOTP visible, reset página, tokens semánticos. tsc/build/vitest 2471 PASS. Ver W3CRM_MIGRATION_PLAN §22. |
 | **Actualización 2026-07-31 (Fase 2, módulo 12 — Ecommerce / Tienda)** | Alcance: `/saas/store`. Causas raíz: UI de pedidos saltaba `paid` (pedidos cobrados sin acción); `GET orders/[id]` con items no consumido; errores silenciosos; PATCH producto ignoraba `null`. Fix: flujo pending→paid→processing→shipped→delivered, modal detalle, feedback de error, clear nulls, KpiTile/tokens. Ver §23. |
 | **Actualización 2026-07-31 (Fase 2, módulo 13 — LMS)** | Alcance: `/saas/lms`. Causas raíz: `listEnrollments` sin progreso ni certificate_url; DELETE curso sin UI; publish stale. Fix: SELECT+JOIN progress/certs, delete, publish status, tokens/KpiTile. Ver §24. |
+
+---
+
+## ADR-076 � Certificaci�n final SaaS: honestidad GDPR + tenant preferido (2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-07-31 |
+| **Decisi�n** | (1) DSAR user-level documenta `coverage` expl�cita (no CRM wipe); `delete-user-data` exige `confirm=DELETE` + solicitud pending; `getRequests` scoped por tenant. (2) Resoluci�n multi-tenant acepta `X-Nelvyon-Tenant-Id` / cookie `nelvyon_saas_tenant_id` antes del fallback LIMIT 1 (DESC). (3) `claimReady` permanece **false**; canary **KILL**; veredicto certificaci�n **CONDITIONAL_READY** hasta staging live + legal. |
+| **Por qu�** | Certificaci�n sin declarar READY sin evidencia; evitar false-success GDPR y tenant ambiguo. |
+| **Consecuencias** | Settings ? Privacidad; APIs m�s seguras; sin deploy prod impl�cito. Ver `docs/ops/W3CRM_MIGRATION_PLAN.md` �34. |

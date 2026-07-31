@@ -812,3 +812,12 @@
 | Fix | |
 | Estado | |
 ```
+
+### Cert final — staging live BLOCKED (2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Abierto** — `BLOCKED_ENVIRONMENT` |
+| **Detalle** | Sin `DATABASE_URL` / `STAGING_BASE_URL` local. Playwright SaaS 270/349 es contrato UI con mocks, no aislamiento multi-tenant live. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §34 · `docs/CTO_FINAL_VERIFY.md` |
+| **Próximo paso** | Credenciales staging seguras (no prod) + re-cert live |

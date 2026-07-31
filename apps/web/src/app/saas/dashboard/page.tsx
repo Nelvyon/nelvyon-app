@@ -38,6 +38,8 @@ type DashboardSummary = {
   completedJobs: number;
   totalSpend: number;
   recentActivity: ActivityItem[];
+  degraded?: boolean;
+  degraded_reason?: string;
 };
 
 type DashboardWidgetId =
@@ -139,7 +141,16 @@ export default function SaasDashboardPage() {
             sessionStorage.setItem(storageKey, plan);
           }
         }
+      } catch {
+        if (!cancelled) setError(t("common.error"));
+      } finally {
+        // Primary payload only — never leave the shell blocked on secondary widgets.
+        if (!cancelled) setLoading(false);
+      }
 
+      if (cancelled) return;
+
+      try {
         const layoutRes = await fetch("/api/saas/dashboard/layout", { credentials: "same-origin", cache: "no-store" });
         if (layoutRes.ok) {
           const layoutBody = (await layoutRes.json()) as { layout?: { widgets?: DashboardWidgetId[] } };
@@ -147,13 +158,21 @@ export default function SaasDashboardPage() {
             setWidgets(layoutBody.layout.widgets);
           }
         }
+      } catch {
+        /* non-fatal widget layout */
+      }
 
+      try {
         const gapRes = await fetch("/api/saas/competitor-gap", { credentials: "same-origin", cache: "no-store" });
         if (gapRes.ok && !cancelled) {
           const gapBody = (await gapRes.json()) as { summary?: GapSummary };
           setGapSummary(gapBody.summary ?? null);
         }
+      } catch {
+        /* non-fatal */
+      }
 
+      try {
         const geoRes = await fetch("/api/saas/geo-visibility", { credentials: "same-origin", cache: "no-store" });
         if (geoRes.ok && !cancelled) {
           const geoBody = (await geoRes.json()) as { runs?: Array<{ id: string; domain: string; score: number | null }> };
@@ -162,8 +181,8 @@ export default function SaasDashboardPage() {
             setGeoSummary({ id: latest.id, domain: latest.domain, score: latest.score });
           }
         }
-      } finally {
-        if (!cancelled) setLoading(false);
+      } catch {
+        /* non-fatal */
       }
     })();
     return () => {
@@ -173,7 +192,11 @@ export default function SaasDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center px-4 text-sm text-muted-foreground">{t("common.loading")}…</div>
+      <SaasShellLayout sidebar={<SaasSidebar activeId="dashboard" />}>
+        <div className="flex min-h-[50vh] items-center justify-center px-4 text-sm text-muted-foreground" role="status">
+          {t("common.loading")}…
+        </div>
+      </SaasShellLayout>
     );
   }
 
@@ -267,6 +290,16 @@ export default function SaasDashboardPage() {
           {show("health") ? <AccountHealthScore /> : null}
         </div>
       </div>
+
+      {summary.degraded ? (
+        <div
+          className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200"
+          role="status"
+        >
+          Algunas métricas pueden estar incompletas o en cero por un fallo parcial de datos
+          {summary.degraded_reason ? ` (${summary.degraded_reason})` : ""}. No interpretes estos valores como KPIs reales.
+        </div>
+      ) : null}
 
       {showCustomize && (
         <DarkCard>

@@ -294,3 +294,9 @@
 - [x] Backup restore drill â€” `scripts/run-postgres-restore-drill.mjs` Â· KI-R012 Â· 8/8 PASS
 - [ ] CEO: SNS SES production access (KI-014 only)
 - [ ] Declarar **NELVYON OS Y SAAS COMPLETADOS** â€” solo tras criterios verdes
+
+## P0 — Certificación / staging (2026-07-31)
+
+- [ ] Staging real: `DATABASE_URL` + `STAGING_BASE_URL` (no prod) · 2 tenants · roles · GDPR live · billing/webhooks
+- [ ] Re-run Playwright SaaS completo post-fix dashboard loading (a11y dashboard)
+- [ ] Mantener `claimReady: false` hasta gates live + legal Pepito

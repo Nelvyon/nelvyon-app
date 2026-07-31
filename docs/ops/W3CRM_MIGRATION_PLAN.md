@@ -1002,3 +1002,57 @@ Barrido residual en `/saas/*`: **0** `alert(`/`console.log|debug|warn`; **0** on
 ### 33.3 Próximo paso EXACTO
 
 Mantener `claimReady: false`. No prod deploy UI. Staging visual opcional con DB.
+
+---
+
+## 34. Certificación final SaaS (2026-07-31)
+
+### 34.1 Inventario
+
+| Surface | Count |
+|---|---|
+| `apps/web/src/app/saas/**/page.tsx` | **97** |
+| `apps/web/src/app/api/saas/**/route.ts` | **240** |
+| `SAAS_NAV_ITEMS` | **72** |
+
+### 34.2 P0/P1 corregidos en esta pasada
+
+| Sev | Causa raíz | Fix |
+|---|---|---|
+| P0 | Unsubscribe campañas confirmaba HTML 200 aunque fallara el UPDATE | Error HTML 500 si DB falla |
+| P1 | Webhook create cerraba modal sin `res.ok` | Error visible + close solo en éxito + reload |
+| P1 | Dashboard KPIs en 0 sin `degraded` en UI | Propagar `degraded` + banner |
+| P1 | Dashboard `loading` bloqueado por gap/geo secundarios → shell blanco | Loading con shell; secondary non-blocking |
+| P1 | GDPR `getRequests` sin `tenant_id`; overclaim “completamente”; delete one-shot | Scope tenant + coverage honest + confirm+pending |
+| P1 | Changelog wipe sin tenant; Settings sin DSAR UI | No borrar changelog global; tab Privacidad |
+| P1 | Subcuentas mutate con `contacts.write` | `settings.write` |
+| P1 | Tenant ambiguo `ORDER BY created_at ASC LIMIT 1` | Prefer `X-Nelvyon-Tenant-Id` / cookie; fallback DESC |
+| P1 | Certificados silent empty + emit fire-and-forget | Error/notice + count failures; link desde LMS |
+| P1 | `resolveAutonomousAppOrigin` filtraba `http://127.0.0.1` a deliverables “prod” | Forzar origen HTTPS público |
+| P2 | Cookie E2E fijada a `domain=localhost` rompe `127.0.0.1` | `setAuthCookie` usa `url` + `PLAYWRIGHT_BASE_URL` |
+
+### 34.3 Gates (evidencia `docs/evidence/cert-final-*`)
+
+| Gate | Resultado |
+|---|---|
+| tsc `--noEmit` | **PASS** |
+| ESLint `saas`+`api/saas` `--max-warnings=0` | **PASS** |
+| Vitest full | **6253 passed** / 8 skipped (717 files) |
+| Build producción | **PASS** (warnings webpack preexistentes) |
+| HTTP smoke `:8105` | pages **307** · APIs **401** · health **200** |
+| Playwright SaaS (Chromium, mocked APIs) | **270 passed / 79 failed** (14.6m) — UI contract; no live DB |
+| a11y landmarks | **6/7** PASS; dashboard fallaba por loading bloqueante → fix aplicado (rebuild en curso) |
+| Lighthouse `/login` | perf **100** · a11y **88** · best-practices **96** (exit tooling EPERM residual) |
+| Staging autenticado / multi-tenant live | **BLOCKED_ENVIRONMENT** (`DATABASE_URL` / `STAGING_BASE_URL` unset) |
+| claimReady / canary | **false** / **KILL** |
+
+### 34.4 Veredicto
+
+**CONDITIONAL_READY** para seguir hacia staging real. **NOT** `READY_FOR_PRODUCTION`.  
+Bloqueos externos: credenciales staging/DB, OAuth/SES/Twilio ops, legal Pepito, autorización deploy.
+
+### 34.5 Próximo paso EXACTO
+
+1. Rebuild + re-smoke a11y dashboard tras fix loading.  
+2. Conseguir `DATABASE_URL` + `STAGING_BASE_URL` seguros (no prod) y correr CRUD/RBAC/2 tenants.  
+3. Mantener `claimReady: false` hasta gates live + legal.

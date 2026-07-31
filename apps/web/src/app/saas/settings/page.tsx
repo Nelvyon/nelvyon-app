@@ -39,7 +39,7 @@ const tabBtn = (active: boolean) =>
     active ? "bg-[#0084ff]/15 text-[#0084ff]" : "text-white/40 hover:text-white/70"
   }`;
 
-type Tab = "general" | "sso" | "permisos";
+type Tab = "general" | "sso" | "permisos" | "privacidad";
 
 const LOCALE_OPTIONS: { value: AppLocale; label: string }[] = [
   { value: "es", label: "Español" },
@@ -78,6 +78,13 @@ export default function SaasSettingsPage() {
     domains: "",
   });
   const [ssoError, setSsoError] = useState<string | null>(null);
+  const [gdprBusy, setGdprBusy] = useState(false);
+  const [gdprNotice, setGdprNotice] = useState<string | null>(null);
+  const [gdprError, setGdprError] = useState<string | null>(null);
+  const [gdprRequests, setGdprRequests] = useState<
+    Array<{ id: string; type: string; status: string; createdAt: string }>
+  >([]);
+  const [gdprCoverageNote, setGdprCoverageNote] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -106,25 +113,46 @@ export default function SaasSettingsPage() {
 
   useEffect(() => {
     if (tab !== "sso") return;
+    setSsoLoading(true);
     void (async () => {
-      setSsoLoading(true);
       try {
         const res = await fetch("/api/saas/sso", { credentials: "same-origin" });
         if (res.ok) {
-          const json = (await res.json()) as { config: SsoConfig | null };
-          setSsoConfig(json.config);
-          if (json.config) {
-            setSsoForm(f => ({
-              ...f,
-              provider: json.config!.provider,
-              issuer: json.config!.issuer,
-              clientId: json.config!.clientId,
-              domains: json.config!.domains.join(", "),
-            }));
+          const body = (await res.json()) as { config?: SsoConfig | null };
+          const c = body.config ?? null;
+          setSsoConfig(c);
+          if (c) {
+            setSsoForm({
+              provider: c.provider,
+              issuer: c.issuer,
+              clientId: c.clientId,
+              clientSecret: "",
+              metadataUrl: "",
+              domains: c.domains.join(", "),
+            });
           }
         }
       } finally {
         setSsoLoading(false);
+      }
+    })();
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== "privacidad") return;
+    setGdprError(null);
+    void (async () => {
+      try {
+        const res = await fetch("/api/saas/compliance/gdpr", { credentials: "same-origin" });
+        if (!res.ok) throw new Error(`No se pudo cargar GDPR (${res.status})`);
+        const body = (await res.json()) as {
+          data?: { coverage?: { note?: string } };
+          requests?: Array<{ id: string; type: string; status: string; createdAt: string }>;
+        };
+        setGdprRequests(body.requests ?? []);
+        setGdprCoverageNote(body.data?.coverage?.note ?? null);
+      } catch (e) {
+        setGdprError(e instanceof Error ? e.message : "Error GDPR");
       }
     })();
   }, [tab]);
@@ -190,14 +218,20 @@ export default function SaasSettingsPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">Cuenta</p>
         <h1 className="mt-1 text-2xl font-bold text-white">Configuración</h1>
-        <p className="mt-0.5 text-sm text-white/40">Perfil del tenant, SSO y permisos efectivos.</p>
+        <p className="mt-0.5 text-sm text-white/40">Perfil del tenant, SSO, permisos y privacidad (GDPR).</p>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1 w-fit">
-        {(["general", "sso", "permisos"] as Tab[]).map(t => (
+        {(["general", "sso", "permisos", "privacidad"] as Tab[]).map(t => (
           <button key={t} onClick={() => setTab(t)} className={tabBtn(tab === t)}>
-            {t === "general" ? "General" : t === "sso" ? "🔐 SSO Enterprise" : "Permisos"}
+            {t === "general"
+              ? "General"
+              : t === "sso"
+                ? "🔐 SSO Enterprise"
+                : t === "permisos"
+                  ? "Permisos"
+                  : "Privacidad"}
           </button>
         ))}
       </div>
@@ -478,6 +512,147 @@ export default function SaasSettingsPage() {
             <p className="text-[10px] uppercase tracking-wider text-white/25 mb-1">Permisos efectivos</p>
             <p className="text-xs text-white/40 leading-relaxed">{data.permissions.join(", ")}</p>
           </div>
+        </DarkCard>
+      ) : null}
+
+      {/* ── Tab Privacidad / GDPR ── */}
+      {tab === "privacidad" ? (
+        <DarkCard>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-white/30">GDPR / DSAR</p>
+          <p className="mb-4 text-sm text-white/50">
+            Exportación y borrado acotados al perfil de usuario del tenant activo. No es un wipe completo de CRM.
+          </p>
+          {gdprCoverageNote ? <p className="mb-4 text-xs text-white/40">{gdprCoverageNote}</p> : null}
+          {gdprError ? <p className="mb-3 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">{gdprError}</p> : null}
+          {gdprNotice ? <p className="mb-3 rounded-lg bg-[#0084ff]/10 px-3 py-2 text-sm text-[#0084ff]">{gdprNotice}</p> : null}
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={gdprBusy}
+              className="rounded-lg bg-[#0084ff] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+              onClick={() => {
+                void (async () => {
+                  setGdprBusy(true);
+                  setGdprError(null);
+                  setGdprNotice(null);
+                  try {
+                    const res = await fetch("/api/saas/compliance/gdpr", {
+                      method: "POST",
+                      credentials: "same-origin",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "request-export" }),
+                    });
+                    if (!res.ok) throw new Error(`Error ${res.status}`);
+                    setGdprNotice("Solicitud de exportación creada (pending).");
+                    setTab("privacidad");
+                    const reload = await fetch("/api/saas/compliance/gdpr", { credentials: "same-origin" });
+                    if (reload.ok) {
+                      const body = (await reload.json()) as {
+                        requests?: Array<{ id: string; type: string; status: string; createdAt: string }>;
+                      };
+                      setGdprRequests(body.requests ?? []);
+                    }
+                  } catch (e) {
+                    setGdprError(e instanceof Error ? e.message : "Error");
+                  } finally {
+                    setGdprBusy(false);
+                  }
+                })();
+              }}
+            >
+              Solicitar exportación
+            </button>
+            <button
+              type="button"
+              disabled={gdprBusy}
+              className="rounded-lg border border-white/15 px-4 py-2 text-sm text-white/80 disabled:opacity-50"
+              onClick={() => {
+                void (async () => {
+                  setGdprBusy(true);
+                  setGdprError(null);
+                  setGdprNotice(null);
+                  try {
+                    const res = await fetch("/api/saas/compliance/gdpr", {
+                      credentials: "same-origin",
+                    });
+                    if (!res.ok) throw new Error(`Error ${res.status}`);
+                    const body = await res.json();
+                    const blob = new Blob([JSON.stringify(body, null, 2)], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `nelvyon-gdpr-export-${Date.now()}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    setGdprNotice("Exportación descargada (cobertura parcial documentada en coverage).");
+                  } catch (e) {
+                    setGdprError(e instanceof Error ? e.message : "Error");
+                  } finally {
+                    setGdprBusy(false);
+                  }
+                })();
+              }}
+            >
+              Descargar datos ahora
+            </button>
+            <button
+              type="button"
+              disabled={gdprBusy}
+              className="rounded-lg border border-red-500/40 px-4 py-2 text-sm text-red-300 disabled:opacity-50"
+              onClick={() => {
+                void (async () => {
+                  setGdprBusy(true);
+                  setGdprError(null);
+                  setGdprNotice(null);
+                  try {
+                    const reqRes = await fetch("/api/saas/compliance/gdpr", {
+                      method: "POST",
+                      credentials: "same-origin",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "request-deletion" }),
+                    });
+                    if (!reqRes.ok) throw new Error(`request-deletion ${reqRes.status}`);
+                    const delRes = await fetch("/api/saas/compliance/gdpr", {
+                      method: "POST",
+                      credentials: "same-origin",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "delete-user-data", confirm: "DELETE" }),
+                    });
+                    if (!delRes.ok) {
+                      const body = (await delRes.json().catch(() => null)) as { message?: string } | null;
+                      throw new Error(body?.message ?? `delete ${delRes.status}`);
+                    }
+                    setGdprNotice("Borrado acotado de perfil/usuario ejecutado (CRM fuera de alcance).");
+                    const reload = await fetch("/api/saas/compliance/gdpr", { credentials: "same-origin" });
+                    if (reload.ok) {
+                      const body = (await reload.json()) as {
+                        requests?: Array<{ id: string; type: string; status: string; createdAt: string }>;
+                      };
+                      setGdprRequests(body.requests ?? []);
+                    }
+                  } catch (e) {
+                    setGdprError(e instanceof Error ? e.message : "Error");
+                  } finally {
+                    setGdprBusy(false);
+                  }
+                })();
+              }}
+            >
+              Solicitar y ejecutar borrado acotado
+            </button>
+          </div>
+          {gdprRequests.length > 0 ? (
+            <div className="mt-5 space-y-2">
+              <p className="text-[10px] uppercase tracking-wider text-white/25">Historial de solicitudes (tenant)</p>
+              {gdprRequests.map((r) => (
+                <div key={r.id} className="rounded-lg border border-white/[0.06] px-3 py-2 text-xs text-white/60">
+                  {r.type} · {r.status} · {new Date(r.createdAt).toLocaleString("es-ES")}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 text-xs text-white/35">Sin solicitudes GDPR en este tenant.</p>
+          )}
         </DarkCard>
       ) : null}
     </SaasShellLayout>

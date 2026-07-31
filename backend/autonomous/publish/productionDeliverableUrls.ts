@@ -6,14 +6,39 @@ export function isAutonomousProductionPublish(): boolean {
   return process.env.AUTONOMOUS_PRODUCTION === "true";
 }
 
+const DEFAULT_PRODUCTION_ORIGIN = "https://app.nelvyon.com";
+
+/**
+ * Public HTTPS origin for production deliverable URLs.
+ * Never emits mock://, localhost, or plain http — local .env APP_URL must not leak into publish payloads.
+ */
 export function resolveAutonomousAppOrigin(): string {
   const raw =
     process.env.FRONTEND_APP_URL?.trim() ||
     process.env.NEXT_PUBLIC_APP_URL?.trim() ||
     process.env.VERCEL_URL?.trim();
-  if (!raw) return "https://app.nelvyon.com";
-  if (raw.startsWith("http://") || raw.startsWith("https://")) return raw.replace(/\/$/, "");
-  return `https://${raw.replace(/\/$/, "")}`;
+  if (!raw) return DEFAULT_PRODUCTION_ORIGIN;
+
+  const withScheme =
+    raw.startsWith("http://") || raw.startsWith("https://")
+      ? raw.replace(/\/$/, "")
+      : `https://${raw.replace(/\/$/, "")}`;
+
+  try {
+    const u = new URL(withScheme);
+    const host = u.hostname.toLowerCase();
+    const isLoopback =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "::1" ||
+      host.endsWith(".local");
+    if (isLoopback || u.protocol === "http:") {
+      return DEFAULT_PRODUCTION_ORIGIN;
+    }
+    return `https://${u.host}${u.pathname === "/" ? "" : u.pathname}`.replace(/\/$/, "");
+  } catch {
+    return DEFAULT_PRODUCTION_ORIGIN;
+  }
 }
 
 export function productionArtifactUrl(
