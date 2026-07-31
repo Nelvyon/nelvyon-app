@@ -19,6 +19,24 @@ export interface SaasSmsConfigured {
   fromNumber: string | null;
 }
 
+export interface SaasSmsLogEntry {
+  id: string;
+  to: string;
+  body: string;
+  twilioSid: string | null;
+  status: "sent" | "failed" | "queued";
+  createdAt: string;
+}
+
+interface SmsLogRow {
+  id: string;
+  to_number: string;
+  body: string;
+  twilio_sid: string | null;
+  status: "sent" | "failed" | "queued";
+  created_at: Date | string;
+}
+
 export class SaasSmsError extends Error {
   constructor(
     message: string,
@@ -74,6 +92,25 @@ export class SaasSmsService {
   getStatus(): SaasSmsConfigured {
     const creds = getEnvCredentials();
     return { configured: Boolean(creds), fromNumber: creds?.fromNumber ?? null };
+  }
+
+  /** Recent SMS send log for this tenant — backs the SMS Marketing history UI. */
+  async listRecent(tenantId: string, limit = 50): Promise<SaasSmsLogEntry[]> {
+    const cappedLimit = Math.min(200, Math.max(1, limit));
+    const rows = await this.db.query<SmsLogRow>(
+      `SELECT id, to_number, body, twilio_sid, status, created_at
+       FROM saas_sms_log WHERE tenant_id = $1
+       ORDER BY created_at DESC LIMIT $2`,
+      [tenantId, cappedLimit],
+    );
+    return rows.map((r) => ({
+      id: r.id,
+      to: r.to_number,
+      body: r.body,
+      twilioSid: r.twilio_sid,
+      status: r.status,
+      createdAt: new Date(r.created_at).toISOString(),
+    }));
   }
 
   async send(tenantId: string, to: string, body: string): Promise<SmsSendResult> {

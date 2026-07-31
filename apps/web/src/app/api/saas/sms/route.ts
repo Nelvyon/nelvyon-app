@@ -15,12 +15,20 @@ function mapError(e: SaasSmsError): NextResponse {
   return NextResponse.json({ error: e.message, code: e.code }, { status });
 }
 
-/** GET — returns Twilio config status (no secrets exposed) */
+/** GET — returns Twilio config status (no secrets exposed) plus recent send log */
 export async function GET(req: Request) {
   try {
-    await requireSaasContext(req, "contacts.read");
-    const status = getSaasSmsService().getStatus();
-    return NextResponse.json({ sms_configured: status.configured, from_number: status.fromNumber });
+    const ctx = await requireSaasContext(req, "contacts.read");
+    const svc = getSaasSmsService();
+    const status = svc.getStatus();
+    const url = new URL(req.url);
+    const limit = Number(url.searchParams.get("limit") ?? "50");
+    const messages = await svc.listRecent(ctx.tenant.id, Number.isFinite(limit) ? limit : 50);
+    return NextResponse.json({
+      sms_configured: status.configured,
+      from_number: status.fromNumber,
+      messages,
+    });
   } catch (e: unknown) {
     return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }

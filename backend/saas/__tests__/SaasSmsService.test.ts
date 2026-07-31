@@ -107,4 +107,29 @@ describe("SaasSmsService", () => {
       code: "VALIDATION",
     });
   });
+
+  it("listRecent maps log rows to camelCase entries ordered by the DB query", async () => {
+    const db = {
+      query: vi.fn(async () => [
+        { id: "log-2", to_number: "+34600000002", body: "Hi", twilio_sid: "SM2", status: "sent", created_at: "2026-07-01T10:00:00Z" },
+        { id: "log-1", to_number: "+34600000001", body: "Hello", twilio_sid: null, status: "failed", created_at: "2026-06-30T10:00:00Z" },
+      ]),
+    };
+    const svc = new SaasSmsService(db);
+    const rows = await svc.listRecent(TENANT, 10);
+    expect(db.query).toHaveBeenCalledWith(expect.stringContaining("FROM saas_sms_log"), [TENANT, 10]);
+    expect(rows).toEqual([
+      { id: "log-2", to: "+34600000002", body: "Hi", twilioSid: "SM2", status: "sent", createdAt: "2026-07-01T10:00:00.000Z" },
+      { id: "log-1", to: "+34600000001", body: "Hello", twilioSid: null, status: "failed", createdAt: "2026-06-30T10:00:00.000Z" },
+    ]);
+  });
+
+  it("listRecent clamps limit to the [1, 200] range", async () => {
+    const db = makeDb();
+    const svc = new SaasSmsService(db);
+    await svc.listRecent(TENANT, 999);
+    expect(db.query).toHaveBeenCalledWith(expect.any(String), [TENANT, 200]);
+    await svc.listRecent(TENANT, -5);
+    expect(db.query).toHaveBeenCalledWith(expect.any(String), [TENANT, 1]);
+  });
 });
