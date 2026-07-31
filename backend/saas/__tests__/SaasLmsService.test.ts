@@ -110,6 +110,25 @@ describe("SaasLmsService.enroll", () => {
   });
 });
 
+describe("SaasLmsService.listEnrollments", () => {
+  it("returns progress and certificate url from join", async () => {
+    const row = {
+      ...enrollRow,
+      progress_pct: 40,
+      lessons_completed: 2,
+      lessons_total: 5,
+      certificate_url: "https://app.example/api/saas/lms/cert/c1?tok=abc",
+    };
+    const svc = new SaasLmsService(makeDb([[row]]));
+    const list = await svc.listEnrollments(TENANT, "c1");
+    expect(list).toHaveLength(1);
+    expect(list[0]?.progressPct).toBe(40);
+    expect(list[0]?.lessonsCompleted).toBe(2);
+    expect(list[0]?.lessonsTotal).toBe(5);
+    expect(list[0]?.certificateUrl).toContain("/api/saas/lms/cert/");
+  });
+});
+
 describe("SaasLmsService.issueCertificate", () => {
   it("throws NOT_FOUND for missing enrollment", async () => {
     const svc = new SaasLmsService(makeDb([[]]));

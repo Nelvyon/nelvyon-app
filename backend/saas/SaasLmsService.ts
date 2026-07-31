@@ -43,6 +43,10 @@ export type LmsEnrollment = {
   status: "active" | "completed" | "refunded";
   enrolledAt: string;
   completedAt: string | null;
+  progressPct: number;
+  lessonsCompleted: number;
+  lessonsTotal: number;
+  certificateUrl: string | null;
 };
 
 export type LmsCertificate = {
@@ -141,6 +145,10 @@ type EnrollRow = {
   id: string; course_id: string; tenant_id: string; contact_id: string | null;
   contact_email: string; contact_name: string | null; status: string;
   enrolled_at: Date; completed_at: Date | null; created_at: Date;
+  progress_pct?: number | string | null;
+  lessons_completed?: number | string | null;
+  lessons_total?: number | string | null;
+  certificate_url?: string | null;
 };
 
 type CertRow = {
@@ -204,6 +212,10 @@ function rowToEnrollment(r: EnrollRow): LmsEnrollment {
     status: r.status as "active" | "completed" | "refunded",
     enrolledAt: new Date(r.enrolled_at).toISOString(),
     completedAt: r.completed_at ? new Date(r.completed_at).toISOString() : null,
+    progressPct: Number(r.progress_pct ?? 0),
+    lessonsCompleted: Number(r.lessons_completed ?? 0),
+    lessonsTotal: Number(r.lessons_total ?? 0),
+    certificateUrl: r.certificate_url ?? null,
   };
 }
 
@@ -380,8 +392,14 @@ export class SaasLmsService {
 
   async listEnrollments(tenantId: string, courseId: string): Promise<LmsEnrollment[]> {
     const rows = await this.db.query<EnrollRow>(
-      `SELECT id,course_id,tenant_id,contact_id,contact_email,contact_name,status,enrolled_at,completed_at,created_at
-       FROM saas_lms_enrollments WHERE tenant_id=$1 AND course_id=$2 ORDER BY enrolled_at DESC`,
+      `SELECT e.id, e.course_id, e.tenant_id, e.contact_id, e.contact_email, e.contact_name,
+              e.status, e.enrolled_at, e.completed_at, e.created_at,
+              e.progress_pct, e.lessons_completed, e.lessons_total,
+              c.certificate_url
+       FROM saas_lms_enrollments e
+       LEFT JOIN saas_lms_certificates c ON c.enrollment_id = e.id AND c.tenant_id = e.tenant_id
+       WHERE e.tenant_id=$1 AND e.course_id=$2
+       ORDER BY e.enrolled_at DESC`,
       [tenantId, courseId],
     );
     return rows.map(rowToEnrollment);

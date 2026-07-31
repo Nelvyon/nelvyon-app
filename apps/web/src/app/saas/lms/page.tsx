@@ -4,16 +4,23 @@ import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Course { id: string; title: string; description: string | null; status: "draft" | "published" | "archived"; price: number; enrollments: number; modulesCount: number; coverImage: string | null; createdAt: string }
 interface LmsLesson { id: string; moduleId: string; title: string; contentType: "text" | "video" | "quiz"; content: string | null; videoUrl: string | null; durationMinutes: number | null; lessonOrder: number; quizJson: Record<string, unknown> | null }
 interface LmsModule { id: string; courseId: string; title: string; description: string | null; modOrder: number; lessonsCount: number; lessons: LmsLesson[] }
-interface Enrollment { id: string; courseId: string; contactEmail: string; contactName: string | null; status: string; enrolledAt: string; progressPct?: number; lessonsCompleted?: number; lessonsTotal?: number }
+interface Enrollment {
+  id: string; courseId: string; contactEmail: string; contactName: string | null; status: string;
+  enrolledAt: string; progressPct?: number; lessonsCompleted?: number; lessonsTotal?: number;
+  certificateUrl?: string | null;
+}
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
 function statusLabel(s: Course["status"]) { return s === "published" ? "Publicado" : s === "archived" ? "Archivado" : "Borrador" }
-function statusTone(s: Course["status"]): "success" | "primary" { return s === "published" ? "success" : "primary" }
+function statusTone(s: Course["status"]): "success" | "primary" | "neutral" {
+  return s === "published" ? "success" : s === "archived" ? "neutral" : "primary";
+}
 
 // ── New Course Modal ───────────────────────────────────────────────────────────
 function NewCourseModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
@@ -31,7 +38,7 @@ function NewCourseModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-5 text-lg font-semibold text-foreground">Nuevo curso</h2>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={save} className="space-y-4">
           <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Título *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Marketing Digital con IA" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
@@ -71,7 +78,7 @@ function AddLessonModal({ moduleId, onClose, onSaved }: { moduleId: string; onCl
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-5 text-lg font-semibold text-foreground">Nueva lección</h2>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={save} className="space-y-4">
           <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Título *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Introducción al módulo" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
@@ -115,7 +122,7 @@ function EnrollModal({ courseId, onClose, onSaved }: { courseId: string; onClose
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <h2 className="mb-5 text-lg font-semibold text-foreground">Matricular alumno</h2>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
         <form onSubmit={save} className="space-y-4">
           <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Email *</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
           <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre</label><input value={name} onChange={e => setName(e.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
@@ -133,6 +140,10 @@ function CourseEditorPanel({ course, onClose, onRefresh }: { course: Course; onC
   const [newModTitle, setNewModTitle] = useState("");
   const [addLessonModId, setAddLessonModId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [status, setStatus] = useState(course.status);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  useEffect(() => { setStatus(course.status); }, [course.status]);
 
   const loadModules = useCallback(async () => {
     setLoading(true);
@@ -146,23 +157,48 @@ function CourseEditorPanel({ course, onClose, onRefresh }: { course: Course; onC
 
   async function addModule() {
     if (!newModTitle.trim()) return;
-    await fetch("/api/saas/lms/modules", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ course_id: course.id, title: newModTitle.trim() }) });
+    setActionError(null);
+    const res = await fetch("/api/saas/lms/modules", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ course_id: course.id, title: newModTitle.trim() }) });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({})) as { error?: string };
+      setActionError(d.error ?? "No se pudo crear el módulo");
+      return;
+    }
     setNewModTitle(""); void loadModules(); void onRefresh();
   }
 
   async function deleteModule(modId: string) {
     if (!confirm("¿Eliminar módulo y todas sus lecciones?")) return;
-    await fetch(`/api/saas/lms/modules/${modId}`, { method: "DELETE" });
+    setActionError(null);
+    const res = await fetch(`/api/saas/lms/modules/${modId}`, { method: "DELETE" });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({})) as { error?: string };
+      setActionError(d.error ?? "No se pudo eliminar el módulo");
+      return;
+    }
     void loadModules(); void onRefresh();
   }
 
   async function deleteLesson(lessonId: string) {
-    await fetch(`/api/saas/lms/lessons/${lessonId}`, { method: "DELETE" });
+    setActionError(null);
+    const res = await fetch(`/api/saas/lms/lessons/${lessonId}`, { method: "DELETE" });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({})) as { error?: string };
+      setActionError(d.error ?? "No se pudo eliminar la lección");
+      return;
+    }
     void loadModules();
   }
 
   async function publishCourse() {
-    await fetch("/api/saas/lms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "publish", course_id: course.id }) });
+    setActionError(null);
+    const res = await fetch("/api/saas/lms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "publish", course_id: course.id }) });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({})) as { error?: string };
+      setActionError(d.error ?? "No se pudo publicar el curso");
+      return;
+    }
+    setStatus("published");
     void onRefresh();
   }
 
@@ -181,12 +217,14 @@ function CourseEditorPanel({ course, onClose, onRefresh }: { course: Course; onC
             <p className="text-xs text-muted-foreground mt-0.5">Editor de módulos y lecciones</p>
           </div>
           <div className="flex items-center gap-2">
-            {course.status === "draft" && <NelvyonDsButton onClick={publishCourse} className="text-xs px-3 py-1.5">Publicar curso</NelvyonDsButton>}
-            <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">✕</button>
+            <NelvyonDsBadge tone={statusTone(status)}>{statusLabel(status)}</NelvyonDsBadge>
+            {status === "draft" && <NelvyonDsButton onClick={() => void publishCourse()} className="text-xs px-3 py-1.5">Publicar curso</NelvyonDsButton>}
+            <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">✕</button>
           </div>
         </div>
 
         <div className="p-5 flex-1">
+          {actionError && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>}
           {loading ? <div className="text-center py-10 text-muted-foreground text-sm">Cargando…</div> : (
             <div className="space-y-3">
               {modules.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">Sin módulos — añade el primero</p>}
@@ -200,7 +238,7 @@ function CourseEditorPanel({ course, onClose, onRefresh }: { course: Course; onC
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button onClick={e => { e.stopPropagation(); setAddLessonModId(mod.id); }} className="text-xs text-primary hover:underline">+ Lección</button>
-                      <button onClick={e => { e.stopPropagation(); void deleteModule(mod.id); }} className="text-xs text-red-400 hover:text-red-300">Eliminar</button>
+                      <button onClick={e => { e.stopPropagation(); void deleteModule(mod.id); }} className="text-xs text-destructive hover:text-destructive/80">Eliminar</button>
                     </div>
                   </div>
                   {expanded.has(mod.id) && (
@@ -209,7 +247,7 @@ function CourseEditorPanel({ course, onClose, onRefresh }: { course: Course; onC
                       {mod.lessons.map((l) => (
                         <div key={l.id} className="flex items-center justify-between gap-2 rounded-lg bg-muted/20 px-3 py-2">
                           <span className="text-sm">{lessonTypeIcon(l.contentType)} <span className="text-foreground">{l.title}</span>{l.durationMinutes ? <span className="text-xs text-muted-foreground ml-2">{l.durationMinutes} min</span> : null}</span>
-                          <button onClick={() => void deleteLesson(l.id)} className="text-xs text-red-400 hover:text-red-300 shrink-0">×</button>
+                          <button onClick={() => void deleteLesson(l.id)} className="text-xs text-destructive hover:text-destructive/80 shrink-0">×</button>
                         </div>
                       ))}
                     </div>
@@ -237,8 +275,8 @@ function StudentsPanel({ course, onClose }: { course: Course; onClose: () => voi
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [issuingCert, setIssuingCert] = useState<string | null>(null);
-  const [certUrls, setCertUrls] = useState<Record<string, string>>({});
   const [showEnroll, setShowEnroll] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const loadEnrollments = useCallback(async () => {
     setLoading(true);
@@ -252,13 +290,15 @@ function StudentsPanel({ course, onClose }: { course: Course; onClose: () => voi
 
   async function issueCert(enrollmentId: string) {
     setIssuingCert(enrollmentId);
+    setActionError(null);
     try {
       const res = await fetch("/api/saas/lms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "issue_certificate", enrollment_id: enrollmentId }) });
-      const data = await res.json() as { certificate?: { certificateUrl: string } };
-      if (data.certificate?.certificateUrl) {
-        setCertUrls(u => ({ ...u, [enrollmentId]: data.certificate!.certificateUrl }));
-        void loadEnrollments();
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({})) as { error?: string };
+        setActionError(d.error ?? "No se pudo emitir el certificado");
+        return;
       }
+      void loadEnrollments();
     } finally { setIssuingCert(null); }
   }
 
@@ -277,10 +317,11 @@ function StudentsPanel({ course, onClose }: { course: Course; onClose: () => voi
           </div>
           <div className="flex items-center gap-2">
             <NelvyonDsButton onClick={() => setShowEnroll(true)} className="text-xs px-3 py-1.5">+ Matricular</NelvyonDsButton>
-            <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">✕</button>
+            <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">✕</button>
           </div>
         </div>
         <div className="p-5 flex-1">
+          {actionError && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>}
           {loading ? <div className="text-center py-10 text-muted-foreground text-sm">Cargando…</div> : enrollments.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-4xl mb-3">👥</p>
@@ -290,7 +331,7 @@ function StudentsPanel({ course, onClose }: { course: Course; onClose: () => voi
             <div className="space-y-3">
               {enrollments.map((e) => {
                 const pct = e.progressPct ?? 0;
-                const certUrl = certUrls[e.id];
+                const certUrl = e.certificateUrl ?? null;
                 return (
                   <NelvyonDsCard key={e.id} className="p-4 space-y-3">
                     <div className="flex items-start justify-between gap-2">
@@ -302,7 +343,8 @@ function StudentsPanel({ course, onClose }: { course: Course; onClose: () => voi
                     </div>
                     <div>
                       <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                        <span>Progreso</span><span>{pct}%</span>
+                        <span>Progreso{e.lessonsTotal ? ` (${e.lessonsCompleted ?? 0}/${e.lessonsTotal})` : ""}</span>
+                        <span>{pct}%</span>
                       </div>
                       <div className="h-1.5 w-full rounded-full bg-muted/30">
                         <div className="h-1.5 rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
@@ -312,7 +354,7 @@ function StudentsPanel({ course, onClose }: { course: Course; onClose: () => voi
                       {certUrl ? (
                         <a href={certUrl} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline">Ver certificado →</a>
                       ) : (
-                        <button onClick={() => void issueCert(e.id)} disabled={issuingCert === e.id}
+                        <button type="button" onClick={() => void issueCert(e.id)} disabled={issuingCert === e.id}
                           className="text-xs text-primary hover:underline disabled:opacity-50">
                           {issuingCert === e.id ? "Emitiendo…" : "Emitir certificado"}
                         </button>
@@ -338,17 +380,35 @@ export default function SaasLmsPage() {
   const [showNew, setShowNew] = useState(false);
   const [editorCourse, setEditorCourse] = useState<Course | null>(null);
   const [studentsCourse, setStudentsCourse] = useState<Course | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/saas/lms");
       const data = (await res.json().catch(() => ({ courses: [] }))) as { courses: Course[] };
-      setCourses(data.courses ?? []);
+      const list = data.courses ?? [];
+      setCourses(list);
+      setEditorCourse((prev) => (prev ? list.find((c) => c.id === prev.id) ?? prev : null));
+      setStudentsCourse((prev) => (prev ? list.find((c) => c.id === prev.id) ?? prev : null));
     } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  async function deleteCourse(id: string) {
+    if (!confirm("¿Eliminar este curso y todo su contenido?")) return;
+    setActionError(null);
+    const res = await fetch(`/api/saas/lms?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({})) as { error?: string };
+      setActionError(d.error ?? "No se pudo eliminar el curso");
+      return;
+    }
+    if (editorCourse?.id === id) setEditorCourse(null);
+    if (studentsCourse?.id === id) setStudentsCourse(null);
+    void load();
+  }
 
   const totalRevenue = courses.reduce((s, c) => s + c.price * c.enrollments, 0);
 
@@ -360,18 +420,15 @@ export default function SaasLmsPage() {
           <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo curso</NelvyonDsButton>
         </div>
 
+        {actionError && (
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>
+        )}
+
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Cursos", value: courses.length },
-            { label: "Publicados", value: courses.filter(c => c.status === "published").length },
-            { label: "Alumnos totales", value: courses.reduce((s, c) => s + c.enrollments, 0) },
-            { label: "Revenue cursos", value: `${totalRevenue.toFixed(0)}€` },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
+          <KpiTile icon="🎓" label="Cursos" value={courses.length} />
+          <KpiTile icon="📢" label="Publicados" value={courses.filter((c) => c.status === "published").length} />
+          <KpiTile icon="👥" label="Alumnos totales" value={courses.reduce((s, c) => s + c.enrollments, 0)} />
+          <KpiTile icon="💶" label="Revenue cursos" value={`${totalRevenue.toFixed(0)}€`} />
         </div>
 
         {loading ? (
@@ -402,6 +459,7 @@ export default function SaasLmsPage() {
                 <div className="flex gap-2">
                   <NelvyonDsButton variant="ghost" className="flex-1" onClick={() => setEditorCourse(c)}>Módulos</NelvyonDsButton>
                   <NelvyonDsButton variant="ghost" className="flex-1" onClick={() => setStudentsCourse(c)}>Alumnos</NelvyonDsButton>
+                  <button type="button" onClick={() => void deleteCourse(c.id)} className="px-2 text-xs text-destructive hover:text-destructive/80" title="Eliminar curso">×</button>
                 </div>
               </NelvyonDsCard>
             ))}
