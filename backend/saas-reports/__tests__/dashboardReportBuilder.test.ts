@@ -56,6 +56,15 @@ describe("dashboardReportBuilder", () => {
     expect(files["report.html"]).toContain("Mínimo");
   });
 
+  it("usa reportTitle personalizado en el HTML", () => {
+    const files = buildDashboardReportFiles({
+      companyName: "Acme",
+      reportTitle: "Email Marketing",
+    });
+    expect(files["report.html"]).toContain("Email Marketing");
+    expect(files["report.html"]).toContain("Acme");
+  });
+
   it("ZIP incluye report.html y assets/styles.css", () => {
     const files = buildDashboardReportFiles(sampleInput);
     const names = listZipEntryNames(createArtifactZip(files));

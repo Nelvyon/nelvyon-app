@@ -11,5 +11,7 @@ export {
   SaasDashboardReportService,
   getSaasDashboardReportService,
   resetSaasDashboardReportServiceForTests,
+  SAAS_REPORT_TYPE_LABELS,
   type GenerateDashboardReportResult,
+  type GenerateDashboardReportOptions,
 } from "./SaasDashboardReportService";

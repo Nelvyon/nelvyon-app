@@ -37,6 +37,8 @@ export interface DashboardReportInput {
   industry?: string;
   plan?: string;
   generatedAt?: string;
+  /** Display title in the HTML report (defaults to "Informe de dashboard"). */
+  reportTitle?: string;
   activeJobs?: number;
   completedJobs?: number;
   totalSpend?: number;
@@ -375,16 +377,18 @@ th { font-weight:600; color:var(--color-primary); }
 h3 { font-size:1rem; margin:1.25rem 0 0.5rem; color:var(--color-primary); }
 `;
 
+    const title = input.reportTitle?.trim() || "Informe de dashboard";
     return {
-      "report.html": reportShell("Informe de dashboard", brand, body),
+      "report.html": reportShell(title, brand, body),
       "assets/styles.css": `${buildStylesCss(tokens)}${extraCss}`,
     };
   } catch {
     const brand = input.companyName?.trim() || "NELVYON Client";
     const tokens = extractDesignTokens(DEFAULT_TOKENS_JSON, brand);
+    const title = input.reportTitle?.trim() || "Informe de dashboard";
     return {
       "report.html": reportShell(
-        "Informe de dashboard",
+        title,
         brand,
         `<section class="report-section"><p>${escapeHtml("Informe generado con datos parciales del cliente.")}</p></section>`,
       ),
