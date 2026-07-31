@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 9 Facturación/pagos/suscripciones, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/{billing,facturas}` — 3 fixes funcionales de causa raíz (ver historial resuelto) + migración visual completa de `/saas/billing` (patrón `DarkCard`/hex literales → `NelvyonDs*`/tokens semánticos). No se pudo tomar captura autenticada en local por falta de `DATABASE_URL`, mismo bloqueo que módulos 2–8. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §20.4 — tsc/ESLint/build PASS, vitest 2467 passed/4 skipped, smoke sin sesión (307/401, sin 500) |
+| **Próximo paso** | Validar visualmente en el primer despliegue a staging con sesión real (agrupar con módulos 2–8 pendientes de la misma validación) |
+
 ### UI — verificación visual en staging pendiente (módulo 8 Funnels/formularios/landing pages, 2026-07-31)
 
 | Campo | Valor |
@@ -188,6 +197,36 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Funcional — historial de facturas de plataforma (`saas_invoices`) generado por cron pero sin ninguna UI de consulta → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Facturación/pagos/suscripciones, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §20.2) |
+| **Causa** | `SaasInvoiceService.generateMonthlyInvoice` (invocado por `OsCronMaintenance`) genera y persiste facturas reales en `saas_invoices` con numeración `NEL-YYYY-XXXXXX`, y `GET /api/saas/invoices` / `GET /api/saas/invoices/[id]` (permiso `invoices.read`) ya exponían esos datos — pero ningún componente en `/saas/*` ni `/portal/*` los consumía. El tenant no tenía forma de ver su propio historial de facturación de plataforma. |
+| **Fix** | Nueva sección "Historial de facturas" en `/saas/billing` que consume `GET /api/saas/invoices`, con estado vacío profesional cuando no hay facturas emitidas. |
+| **Evidencia** | tsc/eslint/build PASS · vitest core 2467 passed/4 skipped · smoke `GET /api/saas/invoices` → 401 sin sesión (sin 500) |
+| **Nota** | Sin cambios en `SaasInvoiceService` ni en el cron — se expone lectura de datos ya persistidos, mismo patrón que `SaasSmsService.listRecent` (módulo Comunicación) · canary IA apagado · `claimReady: false` |
+
+### Funcional — pausar/cancelar suscripción funcionaba en el backend pero era inalcanzable e invisible en la UI → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Facturación/pagos/suscripciones, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §20.2) |
+| **Causa** | `POST /api/saas/billing/cancel` ya escribía `saas_tenants.billing_status` (`paused`/`cancel_at_period_end`, columna real desde la migración 482), pero `buildSaasBillingSummary` nunca leía ni devolvía ese campo y `/saas/billing` no tenía ningún botón que invocara el endpoint — una capacidad de auto-servicio completa en el backend, 100% inalcanzable e invisible desde la UI. Además, el endpoint no soportaba una acción `resume`, por lo que no había vuelta atrás sin editar la base de datos a mano. |
+| **Fix** | `billingStatus` propagado por toda la cadena de proyección de tenant (`saasTenantMapper.SAAS_TENANT_SELECT`/`saasTenantFromRow`, `SaasOnboardingService.SaasTenant`, `SaasBillingService.buildSaasBillingSummary`, `SaasTenantBridgeService`, `SaasDashboardService`) con normalización fail-safe a `"active"`. Nueva acción `resume` en `POST /api/saas/billing/cancel`. `/saas/billing` gana banner de estado + botones "Pausar suscripción"/"Cancelar suscripción" (confirmación inline)/"Reactivar suscripción". |
+| **Evidencia** | tsc/eslint/build PASS · vitest core 2467 passed/4 skipped (sin regresión por el campo añadido a `SaasTenant`) · smoke `POST /api/saas/billing/cancel` → 401 sin sesión (sin 500) |
+| **Nota** | El botón actúa siempre sobre el estado local, independientemente de si Stripe está configurado (debe funcionar también sin Stripe); si el tenant tiene suscripción activa en Stripe, la cancelación real de cobro sigue dependiendo del portal de Stripe (botón "Gestionar facturación") · canary IA apagado · `claimReady: false` |
+
+### Funcional — botón de descarga de PDF de factura a cliente sin `onClick` → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Facturación/pagos/suscripciones, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §20.2) |
+| **Causa** | `GET /api/saas/facturas/[id]/pdf` ya generaba el HTML imprimible de la factura (usando `SaasFacturasService.generatePdfHtml` + white-label config), pero el botón "↓ PDF" en `/saas/facturas` no tenía ningún `onClick` — no hacía nada al pulsarlo. También se ocultaba para facturas ya pagadas sin razón funcional. |
+| **Fix** | `onClick` conectado a `window.open('/api/saas/facturas/{id}/pdf', '_blank')`; el botón ahora está disponible también para facturas pagadas (un recibo pagado sigue siendo un documento útil de descargar). |
+| **Evidencia** | tsc/eslint/build PASS · vitest core 2467 passed/4 skipped · smoke `GET /api/saas/facturas/:id/pdf` → 401 sin sesión (sin 500) |
+| **Nota** | Sin cambios en `SaasFacturasService` ni en el endpoint — se conecta una capacidad ya implementada · canary IA apagado · `claimReady: false` |
 
 ### Funcional — respuestas de formularios (`saas_form_submissions`) persistidas pero invisibles para el tenant → RESUELTO
 

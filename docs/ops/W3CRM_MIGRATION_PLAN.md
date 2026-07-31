@@ -1,6 +1,6 @@
 # W3CRM → NELVYON SaaS — Plan de migración (Fase 1)
 
-> **Estado:** Fase 2 en progreso — módulos 1–8 migrados (Dashboard, CRM/Pipeline, IA NELVYON, Comunicación, Automatizaciones/workflows, Calendario/citas, Marketing y redes sociales, Funnels/formularios/landing pages) · `claimReady: false` · sin canary · sin deploy prod
+> **Estado:** Fase 2 en progreso — módulos 1–9 migrados (Dashboard, CRM/Pipeline, IA NELVYON, Comunicación, Automatizaciones/workflows, Calendario/citas, Marketing y redes sociales, Funnels/formularios/landing pages, Facturación/pagos/suscripciones) · `claimReady: false` · sin canary · sin deploy prod
 > **Fecha:** 2026-07-30 (última actualización de contenido: 2026-07-31)
 > **Origen legal:** ThemeForest / Envato — autor **Dexignzone** — ZIP `crm-react-next-js-admin-dashboard-template-2026-01-09-12-10-44-utc.zip` (nombre interno del paquete: `NextJs-W3CRM-v1.0-04_Dec_2024`)
 > **Extract local (fuera de build):** `.reference/w3crm/` (**gitignored**, dos niveles de ZIP anidado ya descomprimidos: `doc.zip` + `package.zip` → `package/`)
@@ -581,3 +581,50 @@ A diferencia del módulo 7, este módulo sí presentaba brechas funcionales real
 - Verificación visual autenticada en staging (igual que módulos 2–7, no bloqueante para cerrar el módulo a nivel de código).
 - El editor `/saas/web-builder/[pageId]` no tiene botón de eliminar página propio (solo en el listado) — decisión deliberada para no duplicar la acción destructiva en dos lugares; el listado ya cubre el caso de uso.
 - `/saas/formularios` y `/saas/funnels` usan `workflows.*`/`contacts.*` en vez de un permiso `forms.*`/`funnels.*` dedicado — mismo patrón de RBAC heredado documentado en módulos anteriores (§17.5, §18.4), mejora de higiene fuera de alcance.
+
+## 20. Módulo 9 — Facturación, pagos y suscripciones (2026-07-31)
+
+### 20.1 Alcance real auditado
+
+Dos pantallas: `/saas/billing` (plan actual, uso vs. límites, checkout Stripe, portal de facturación) y `/saas/facturas` (facturación a clientes: crear/enviar/cobrar facturas propias del tenant, dunning de vencidas, generación de PDF). Backend: `SaasBillingService.buildSaasBillingSummary`, `SaasFacturasService`, `SaasInvoiceService` (facturas de plataforma NELVYON→tenant generadas por `OsCronMaintenance` a partir de `os_service_contracts`), Stripe (`/api/billing/checkout`, `/api/saas/billing/portal`, webhook).
+
+### 20.2 Hallazgos funcionales de causa raíz (capacidades del backend nunca expuestas en la UI)
+
+Mismo patrón que módulos 4–6 y 8 — tres brechas encadenadas, todas en `/saas/billing`:
+
+- **Historial de facturas de plataforma invisible.** `SaasInvoiceService` genera y persiste facturas reales (`saas_invoices`, numeración `NEL-YYYY-XXXXXX`) desde `OsCronMaintenance`, y expone `GET /api/saas/invoices` + `GET /api/saas/invoices/[id]` (permiso `invoices.read`) — pero ningún componente en todo el repo (ni `/saas/*` ni `/portal/*`) consumía ese endpoint. El tenant no tenía forma de ver su propio historial de facturación de plataforma.
+- **Pausar/cancelar suscripción sin efecto visible.** `POST /api/saas/billing/cancel` ya escribía `saas_tenants.billing_status` (`paused` / `cancel_at_period_end`, columna real desde la migración 482) — pero `buildSaasBillingSummary` nunca leía ni devolvía ese campo, y no existía ningún botón en `/saas/billing` para invocar el endpoint. Resultado: una capacidad de auto-servicio completamente construida en el backend y 100% inalcanzable desde la UI, sin siquiera un indicador de que la cuenta pudiera estar en pausa.
+- **Sin vía para revertir una cancelación/pausa.** El endpoint solo soportaba `pause` y `cancel_at_period_end`; no había acción `resume`, así que aunque se hubiera invocado manualmente (p. ej. vía soporte), no existía un camino de vuelta a `active` sin tocar la base de datos a mano.
+
+**Corrección — cada causa raíz resuelta en backend + frontend:**
+
+- `billing_status` añadido a la proyección canónica de tenant: `SAAS_TENANT_SELECT`/`saasTenantFromRow` (`saasTenantMapper.ts`), interfaz `SaasTenant` (`SaasOnboardingService.ts`) y los dos `SELECT`/`RETURNING` manuales que aún no usaban la constante compartida (`SaasTenantBridgeService.ts`, ahora unificados en `SAAS_TENANT_SELECT`; `SaasDashboardService.ts`, columna añadida a su proyección con `JOIN`). Tipo nuevo `SaasBillingStatus` con normalización fail-safe (`normalizeSaasBillingStatus`, por defecto `"active"` ante valores nulos o desconocidos).
+- `SaasBillingSummary.tenant.billingStatus` añadido y poblado en `buildSaasBillingSummary`.
+- Nueva acción `resume` en `POST /api/saas/billing/cancel` (`billing_status='active'`), simétrica a `pause`/`cancel_at_period_end`.
+- `/saas/billing/page.tsx`: banner de estado cuando `billingStatus !== "active"` con botón "Reactivar suscripción"; botones "Pausar suscripción" y "Cancelar suscripción" (con confirmación inline, sin `window.confirm`) que se ocultan una vez la cuenta ya está en pausa/cancelación programada; nueva sección "Historial de facturas" que consume `GET /api/saas/invoices` con estado vacío profesional cuando no hay facturas emitidas.
+- `/saas/facturas/page.tsx`: botón "↓ PDF" (presente en el markup desde antes) conectado a `GET /api/saas/facturas/[id]/pdf` (endpoint real ya existente, `window.open` en pestaña nueva) — antes no tenía `onClick` y no hacía nada; disponible también para facturas pagadas (antes se ocultaba, sin razón funcional: un recibo pagado sigue siendo un documento útil de descargar).
+
+### 20.3 Hallazgo — colores hardcodeados (mismo patrón que módulos 7/8)
+
+`/saas/billing` usaba íntegramente `DarkCard` + literales hex/opacidad (`#0084ff`, `#020817`, `text-white/40`, `bg-emerald-500/15`, `border-red-500/20`) pese a que el resto del SaaS ya usa el design system semántico. `/saas/facturas` ya usaba mayoritariamente `NelvyonDs*` con literales de error puntuales sin migrar (`text-red-400`, `bg-red-500/10`, `text-green-400`, `text-yellow-400`).
+
+**Corrección:** `/saas/billing/page.tsx` reescrita íntegramente sobre `NelvyonDsCard`/`NelvyonDsBadge`/`NelvyonDsButton` y tokens semánticos (`primary`, `success`, `warning`, `destructive`, `muted-foreground`, `border`); `/saas/facturas/page.tsx` — KPIs, banner de dunning y botón de recordatorio migrados a `success`/`warning`/`destructive`.
+
+### 20.4 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint <3 archivos modificados>` | **PASS** (0 errores/warnings) |
+| `pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm` | **PASS** — 195 test files, 2467 passed / 4 skipped (sin regresiones por el campo `billingStatus` añadido a `SaasTenant`) |
+| `pnpm -C apps/web build` | **PASS** — build de producción completo, incluye `/saas/{billing,facturas}` |
+| Smoke de rutas (servidor productivo local, puerto 8091, sin `DATABASE_URL`) | `GET /saas/{billing,facturas}` → `307` · `GET /api/saas/{billing,invoices,billing/cancel,facturas,facturas/dunning}` → `401` (esperado, sin sesión, sin 500) |
+| Verificación visual autenticada en staging | **BLOCKED_ENVIRONMENT** — sin `DATABASE_URL`/sesión local; mismo hallazgo que módulos 2–8 |
+| Funcionalidad preservada | RBAC intacto (`billing.read`/`invoices.read`, solo owner/admin — convención pre-existente), aislamiento multi-tenant sin cambios (`WHERE tenant_id = $2` en el nuevo consumo de `/api/saas/invoices`), canary IA apagado, `claimReady=false` |
+| Branding/mock data | Cero — ambas pantallas ya eran 100% datos reales; correcciones son de causa raíz funcional + consistencia visual |
+
+### 20.5 Pendiente / riesgo conocido
+
+- Verificación visual autenticada en staging (igual que módulos 2–8, no bloqueante para cerrar el módulo a nivel de código).
+- Las facturas de plataforma (`saas_invoices`/`SaasInvoiceService`) no tienen generación de PDF (`pdf_url` siempre `null` — no existe lógica de generación); el historial nuevo en `/saas/billing` solo lista número/periodo/importe/estado, sin descarga. Añadir generación de PDF para este tipo de factura es una mejora futura, fuera de alcance de esta migración visual (no es una regresión: la capacidad de descarga nunca existió).
+- El botón "Cancelar suscripción" y "Pausar suscripción" actúan siempre sobre `saas_tenants.billing_status` local, independientemente de si Stripe está configurado — es intencional (debe funcionar también sin Stripe), pero si el tenant tiene una suscripción activa en Stripe, la cancelación real de cobro sigue dependiendo del portal de Stripe (botón "Gestionar facturación"); el estado local es informativo/operativo para NELVYON, no sustituye al webhook de Stripe. Documentado en el propio flujo (banner + acción "Reactivar"), no requiere cambio de código adicional en este módulo.
