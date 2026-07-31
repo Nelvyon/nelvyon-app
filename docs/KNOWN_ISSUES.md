@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 12 Ecommerce/Tienda, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/store` — flujo paid + detalle pedido + tokens. Sin `DATABASE_URL` local. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §23.3 |
+| **Próximo paso** | Validar en staging con sesión real |
+
 ### UI — verificación visual en staging pendiente (módulo 11 Administración, 2026-07-31)
 
 | Campo | Valor |

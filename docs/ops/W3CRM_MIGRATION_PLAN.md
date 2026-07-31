@@ -695,3 +695,34 @@ Pantallas: `/saas/team`, `/saas/auditoria`, `/saas/security`, `/saas/subcuentas`
 ### 22.5 Próximo módulo
 
 **Ecommerce / Tienda Online** (`/saas/store`) según orden confirmado por el usuario.
+
+---
+
+## 23. Módulo 12 — Ecommerce / Tienda Online (2026-07-31)
+
+### 23.1 Alcance real auditado
+
+Pantalla: `/saas/store`. APIs: `GET/POST /api/saas/store/products`, `PATCH/DELETE /api/saas/store/products/[id]`, `GET /api/saas/store/orders`, `GET/PATCH /api/saas/store/orders/[id]`, `GET/PATCH /api/saas/store/settings`.
+
+### 23.2 Hallazgos funcionales de causa raíz
+
+- **Pedidos `paid` bloqueados:** el webhook/Stripe marca `paid`, pero la UI solo actuaba sobre `pending→processing→shipped→delivered`, saltándose `paid` y dejando pedidos cobrados sin acción. **Fix:** flujo honesto `pending→paid|cancelled`, `paid→processing→shipped→delivered`.
+- **Detalle de pedido nunca consumido:** `GET /api/saas/store/orders/[id]` ya devolvía `items` y no se usaba. **Fix:** modal de detalle al clic en el número de pedido.
+- **Settings/errores silenciosos:** fallos de PATCH settings/productos/pedidos sin feedback. **Fix:** mensajes de error visibles.
+- **PATCH producto ignoraba `null`:** limpiar descripción/SKU/slug desde la UI no llegaba al servicio. **Fix:** aceptar `null` como clear.
+- **Tokens + KPIs:** literales `red/green` → tokens; KPIs → `KpiTile`; revenue incluye estados post-pago.
+
+### 23.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `tsc --noEmit` | **PASS** |
+| ESLint (archivos tocados) | **PASS** |
+| `vitest` core + `SaasStoreService` | **PASS** — 2471 / 4 skipped · store 29/29 |
+| `pnpm -C apps/web build` | **PASS** |
+| Smoke (8095) | `/saas/store` 307 · APIs 401 · PATCH order 401 |
+| Staging autenticado | **BLOCKED_ENVIRONMENT** |
+
+### 23.4 Próximo módulo
+
+**LMS — Cursos** (`/saas/lms`).

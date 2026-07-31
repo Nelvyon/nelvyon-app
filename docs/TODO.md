@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 11 Administración DONE · módulo 10 Analítica DONE · … · `claimReady: false`
+> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 12 Ecommerce DONE · módulo 11 Administración DONE · … · `claimReady: false`
 
 ---
 
@@ -45,8 +45,9 @@
 - [x] **2026-07-31 W3CRM Fase 2 — Facturación, pagos y suscripciones:** 3 hallazgos funcionales de causa raíz corregidos, todos en `/saas/billing` — (1) `GET /api/saas/invoices` (facturas de plataforma, `SaasInvoiceService`) existía y no se consumía en ninguna UI → nueva sección "Historial de facturas"; (2) `POST /api/saas/billing/cancel` ya escribía `saas_tenants.billing_status` pero `buildSaasBillingSummary` nunca lo devolvía y no había botón → `billingStatus` propagado por toda la cadena de proyección de tenant + botones Pausar/Cancelar/Reactivar con confirmación inline; (3) sin acción `resume` en el endpoint (sin vuelta atrás sin tocar la DB) → añadida. Además, botón "↓ PDF" de `/saas/facturas` sin `onClick` pese a que `GET /api/saas/facturas/[id]/pdf` ya generaba el HTML → conectado. `/saas/billing` (patrón `DarkCard`) migrada íntegramente a `NelvyonDs*`+tokens; `/saas/facturas` con literales de color puntuales migrados · tsc/lint/build/vitest (2467 passed/4 skipped) PASS · smoke sin sesión (307/401, sin 500) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §20
 - [x] **2026-07-31 W3CRM Fase 2 — Analítica, informes y exportaciones:** `POST /api/saas/reports/generate` nunca persistía en `saas_reports` → historial vacío; `?tab=attribution` ignorado; tokens + `KpiTile` en `/saas/reportes` · tsc/lint/build/vitest (2468 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §21
 - [x] **2026-07-31 W3CRM Fase 2 — Administración:** team suspend/reactivate + MFA URI + mapper + edit role + auditoría page reset + tokens · tsc/lint/build/vitest (2471 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §22
+- [x] **2026-07-31 W3CRM Fase 2 — Ecommerce / Tienda:** flujo pedidos paid + detalle items + errores visibles + tokens/KpiTile · ver §23
 - [ ] **P2 — validar visualmente en staging** el módulo Analítica/informes con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que módulos 2–9)
-- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Ecommerce / Tienda Online (`/saas/store`) → LMS → … (orden en `docs/ops/W3CRM_MIGRATION_PLAN.md` §22.5)
+- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** LMS — Cursos (`/saas/lms`) → … (orden en `docs/ops/W3CRM_MIGRATION_PLAN.md` §23.4)
 - [ ] **W3CRM Fase 3+:** resto de los 69 módulos por commits separados · staging antes de prod
 - [ ] **Mejora futura no bloqueante:** `/saas/citas` reutiliza el permiso RBAC `workflows.write` (no existe `citas.*` dedicado) — introducir un permiso propio sería una mejora de higiene de RBAC legítima pero fuera del alcance de esta migración visual (ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §17.5)
 - [ ] **Mejora futura no bloqueante:** `/saas/{social,publicidad,seo,reputacion}` reutilizan `contacts.read/write`/`analytics.read` en vez de permisos `marketing.*`/`ads.*` dedicados — mejora de higiene de RBAC legítima pero fuera del alcance de esta migración visual (ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §18.4)
