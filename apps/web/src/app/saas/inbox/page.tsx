@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
@@ -327,18 +328,9 @@ export default function SaasInboxPage() {
 
       {/* SLA KPIs */}
       <div className="mb-4 grid grid-cols-3 gap-3">
-        <NelvyonDsCard className="p-3">
-          <p className="text-xs text-muted-foreground">Abiertas</p>
-          <p className="text-2xl font-bold text-foreground">{totalOpen}</p>
-        </NelvyonDsCard>
-        <NelvyonDsCard className="p-3">
-          <p className="text-xs text-muted-foreground">En riesgo SLA</p>
-          <p className={`text-2xl font-bold ${totalAtRisk > 0 ? "text-yellow-400" : "text-foreground"}`}>{totalAtRisk}</p>
-        </NelvyonDsCard>
-        <NelvyonDsCard className="p-3">
-          <p className="text-xs text-muted-foreground">SLA incumplido</p>
-          <p className={`text-2xl font-bold ${totalBreached > 0 ? "text-red-400" : "text-foreground"}`}>{totalBreached}</p>
-        </NelvyonDsCard>
+        <KpiTile icon="💬" label="Abiertas" value={totalOpen} />
+        <KpiTile icon="⏱" label="En riesgo SLA" value={totalAtRisk} accent={totalAtRisk > 0} />
+        <KpiTile icon="❌" label="SLA incumplido" value={totalBreached} accent={totalBreached > 0} />
       </div>
 
       {/* Nelvyon AI Agent (skills nativos — email, WA, redes) */}
