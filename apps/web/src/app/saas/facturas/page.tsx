@@ -36,6 +36,10 @@ const STATUS_CONFIG: Record<InvoiceStatus, { label: string; tone: "primary" | "s
   cancelled: { label: "Cancelada", tone: "danger" },
 };
 
+function openInvoicePdf(id: string) {
+  window.open(`/api/saas/facturas/${id}/pdf`, "_blank", "noopener,noreferrer");
+}
+
 
 function fmt(s: string) { return new Date(s).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" }); }
 
@@ -178,7 +182,7 @@ function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => 
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={saveAndSend} className="space-y-5 p-6">
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Cliente *</label>
@@ -331,18 +335,18 @@ export default function SaasFacturasPage() {
             </div>
 
             {dunningSummary && dunningSummary.overdueCount > 0 && (
-              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex flex-wrap items-center gap-3">
-                <span className="text-red-400 font-medium text-sm">⚠️ Dunning activo</span>
-                <span className="text-red-300/70 text-sm">{dunningSummary.overdueCount} facturas vencidas · €{dunningSummary.totalOverdueAmount.toFixed(0)}</span>
-                <span className="ml-auto text-xs text-red-300/50">{dunningSummary.pendingAttempts} recordatorios pendientes</span>
+              <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 flex flex-wrap items-center gap-3">
+                <span className="text-destructive font-medium text-sm">⚠️ Dunning activo</span>
+                <span className="text-destructive/70 text-sm">{dunningSummary.overdueCount} facturas vencidas · €{dunningSummary.totalOverdueAmount.toFixed(0)}</span>
+                <span className="ml-auto text-xs text-destructive/50">{dunningSummary.pendingAttempts} recordatorios pendientes</span>
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { label: "Cobrado", value: `€${stats.paid.toFixed(0)}`, color: "text-green-400" },
-                { label: "Pendiente cobro", value: `€${stats.pending.toFixed(0)}`, color: "text-yellow-400" },
-                { label: "Vencido", value: `€${stats.overdue.toFixed(0)}`, color: "text-red-400" },
+                { label: "Cobrado", value: `€${stats.paid.toFixed(0)}`, color: "text-success" },
+                { label: "Pendiente cobro", value: `€${stats.pending.toFixed(0)}`, color: "text-warning" },
+                { label: "Vencido", value: `€${stats.overdue.toFixed(0)}`, color: "text-destructive" },
                 { label: "Total emitido", value: `€${stats.total.toFixed(0)}`, color: "text-foreground" },
               ].map(({ label, value, color }) => (
                 <NelvyonDsCard key={label} className="p-4">
@@ -397,7 +401,7 @@ export default function SaasFacturasPage() {
                         <td className="px-4 py-3">
                           <div className="flex gap-1">
                             <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => { setEditingInvoice(inv); setShowModal(true); }}>Ver</NelvyonDsButton>
-                            {inv.status !== "paid" && <NelvyonDsButton variant="ghost" className="text-xs">↓ PDF</NelvyonDsButton>}
+                            <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => openInvoicePdf(inv.id)}>↓ PDF</NelvyonDsButton>
                             {inv.status === "draft" && (
                               <NelvyonDsButton
                                 className="text-xs"
@@ -408,7 +412,7 @@ export default function SaasFacturasPage() {
                               </NelvyonDsButton>
                             )}
                             {inv.status === "overdue" && (
-                              <NelvyonDsButton variant="ghost" className="text-xs text-red-400 hover:text-red-300"
+                              <NelvyonDsButton variant="ghost" className="text-xs text-destructive hover:text-destructive/80"
                                 onClick={() => void fetch("/api/saas/facturas/dunning", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoiceId: inv.id }) }).then(() => void load())}>
                                 🔔 Recordatorio
                               </NelvyonDsButton>
