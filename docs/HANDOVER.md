@@ -1,20 +1,20 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 18 cuenta/plataforma** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §30 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
+> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 18b cuenta restante** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §31 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
 
 | Campo | Valor |
 |-------|-------|
 | **Tip prod live** | `3f10c272` |
-| **Calidad** | tsc/lint/build **PASS** · vitest saas **2437 passed / 4 skipped** · smoke 307/401 |
-| **W3CRM** | Módulos 1–18 **DONE** (gestión + cuenta P0/P1). Siguiente: resto cuenta + IA polish + auditoría global. Ver §30 |
+| **Calidad** | tsc/lint/build **PASS** · vitest saas **PASS** |
+| **W3CRM** | Módulos 1–18b **DONE**. Siguiente: polish IA + **auditoría global SaaS**. Ver §31 |
 | **claimReady** | **false** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Continuar automáticamente con **módulo 18b** — api-keys, white-label, partner, voice, comunidades, entregables, integraciones (P0 primero).
-2. Luego polish IA + **auditoría global SaaS** (bugs, UX, a11y, dupes, arquitectura).
+1. Continuar automáticamente con **polish IA SaaS** (packs, playbooks, brief-to-launch, compliance, benchmark, copywriter) si hay P0/P1, luego **auditoría global** de todo el SaaS.
+2. Corregir hallazgos de la auditoría hasta que no queden mejoras razonables de alto impacto.
 3. No prod deploy UI · no flip claimReady · canary KILL.
 
 ### Rollback IA / spend

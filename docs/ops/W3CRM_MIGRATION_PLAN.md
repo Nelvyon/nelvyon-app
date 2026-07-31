@@ -938,3 +938,25 @@ helpdesk (macros CRUD + errores), documentos (contact/value), encuestas (errores
 ### 30.4 Próximo módulo
 
 Resto cuenta (api-keys, white-label, partner, voice, comunidades, entregables, integraciones) + polish IA + **auditoría global SaaS**.
+
+---
+
+## 31. Módulo 18b — Cuenta restante (2026-07-31)
+
+### 31.1 Alcance
+
+api-keys, white-label, integraciones, comunidades, partner, entregables, developers, herramientas (rate limits).
+
+### 31.2 Causas raíz
+
+- **API keys (P0):** UI enviaba `expiresAt`, route leía `expires_at` → expiración nunca persistía; lista no refrescaba tras create; revoke optimista sin rollback.
+- **White-label (P1 seguridad):** POST/DELETE usaban `contacts.write` → agentes podían cambiar marca/Stripe Connect. Fix: `settings.write`.
+- **Integraciones:** disconnect silencioso. **Comunidades:** tooltips filtraban esquema BD. **Partner:** `loaded=true` tras error bloqueaba retry. **Entregables:** LinkModal sin error. **Developers/herramientas:** rate limits contradictorios.
+
+### 31.3 Evidencia
+
+tsc/eslint/build **PASS** · vitest saas **PASS** · `claimReady: false`
+
+### 31.4 Próximo
+
+Polish IA SaaS + **auditoría global** del SaaS completo.
