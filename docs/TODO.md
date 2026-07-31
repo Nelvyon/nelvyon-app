@@ -1,6 +1,6 @@
 # TODO — NELVYON
 
-> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 4 Comunicación DONE (inbox/campañas/secuencias/SMS/WhatsApp/dialer/deliverability) · módulo 3 IA NELVYON DONE · módulo 2 CRM/Pipeline DONE · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
+> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 5 Automatizaciones/workflows DONE (builder clásico + editor visual) · módulo 4 Comunicación DONE · módulo 3 IA NELVYON DONE · módulo 2 CRM/Pipeline DONE · Fase 1 prod DONE · Fase 2 prep DONE · `claimReady: false`
 
 ---
 
@@ -35,7 +35,9 @@
 - [ ] **P2 — validar visualmente en staging** el módulo IA NELVYON con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que CRM/Pipeline)
 - [x] **2026-07-31 W3CRM Fase 2 — Comunicación:** `/saas/{campanias,secuencias,deliverability}` migrados a `NelvyonDs*`+`KpiTile`; `/saas/{inbox,whatsapp,dialer}` auditados y confirmados conformes (solo `inbox` recibe ajuste de coherencia); 3 bugs de causa raíz corregidos (open rate de campañas hardcodeado a 0%, "campañas SMS" con datos descartados + acción no implementada + campo `body`/`message` incorrecto, `deliverability` sin manejo de error) · nuevo `SaasSmsService.listRecent()` expone `saas_sms_log` (ya poblada, nunca leída) · tsc/lint/build/vitest (2467 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §15
 - [ ] **P2 — validar visualmente en staging** el módulo Comunicación con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que módulos 2 y 3)
-- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Automatizaciones/workflows → Calendario/citas → Marketing y redes sociales → … (orden completo en `docs/ops/W3CRM_MIGRATION_PLAN.md` §7) · evaluar `@fullcalendar/react` solo cuando se abra el módulo `citas`/`calendar`
+- [x] **2026-07-31 W3CRM Fase 2 — Automatizaciones/workflows:** `/saas/workflows` fixes de consistencia visual (KpiTile, tokens semánticos, StatusDot); fix de causa raíz en `/saas/workflows/editor` — nunca leía `GET /api/saas/workflows/visual` (siempre demo fija de 2 nodos) ni permitía añadir nodos ni borrar flujos → nuevo `GET`/`DELETE /api/saas/workflows/visual/[id]` + editor reescrito con panel "Mis flujos" y paleta real de nodos (trigger completo, acciones limitadas a los 4 tipos que `publishAsSaasWorkflow` soporta) · tsc/lint/build/vitest (92 + 2467 passed/4 skipped) PASS · ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §16
+- [ ] **P2 — validar visualmente en staging** el módulo Automatizaciones/workflows con sesión autenticada real (mismo bloqueo de `DATABASE_URL` local que módulos 2, 3 y 4)
+- [ ] **W3CRM Fase 2 — siguiente módulo (automático):** Calendario/citas → Marketing y redes sociales → Funnels/formularios/landing → … (orden completo en `docs/ops/W3CRM_MIGRATION_PLAN.md` §7) · evaluar `@fullcalendar/react` cuando se abra el módulo `citas`/`calendar`
 - [ ] **W3CRM Fase 3+:** resto de los 69 módulos por commits separados · staging antes de prod
 
 ---

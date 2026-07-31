@@ -6,6 +6,15 @@
 
 ## Activos
 
+### UI — verificación visual en staging pendiente (módulo 5 Automatizaciones/workflows, 2026-07-31)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | **Corregido en código y verificado por tsc/lint/build/vitest/smoke** · pendiente de captura autenticada real |
+| **Detalle** | `/saas/workflows` (fixes de consistencia visual) y `/saas/workflows/editor` (fix de causa raíz — ver historial resuelto) verificados sin sesión. No se pudo tomar captura autenticada en local por falta de `DATABASE_URL`, mismo bloqueo que módulos 2, 3 y 4. |
+| **Evidencia** | `docs/ops/W3CRM_MIGRATION_PLAN.md` §16.4 — tsc/ESLint/build PASS, vitest 92+2467 passed/4 skipped, smoke sin sesión (307/401, sin 500) |
+| **Próximo paso** | Validar visualmente en el primer despliegue a staging con sesión real (agrupar con módulos 2, 3 y 4 pendientes de la misma validación) |
+
 ### UI — verificación visual en staging pendiente (módulo 4 Comunicación, 2026-07-31)
 
 | Campo | Valor |
@@ -152,6 +161,16 @@
 ---
 
 ## Historial resuelto (reciente)
+
+### Funcional — editor visual de workflows siempre publicaba la misma demo fija de 2 nodos → RESUELTO
+
+| Campo | Valor |
+|-------|-------|
+| **Resuelto** | **2026-07-31** (módulo Automatizaciones/workflows, ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §16.2) |
+| **Causa** | `/saas/workflows/editor` nunca llamaba a `GET /api/saas/workflows/visual` (ya implementado y funcional) — siempre arrancaba con los mismos 2 nodos hardcodeados (`Trigger: contact_created` → `Action: send_email`) sin ninguna forma de recuperar un flujo guardado anteriormente. Tampoco existía ninguna paleta ni botón para insertar nodos nuevos ni cambiar el tipo de uno existente, por lo que el editor solo podía publicar siempre esa misma combinación fija. `deleteWorkflow` (ya implementado y testeado en `DragDropWorkflowService`) tampoco estaba expuesto por ninguna API — no había forma de borrar un flujo creado por error. |
+| **Fix** | Nuevo `GET`/`DELETE /api/saas/workflows/visual/[id]` (permisos `workflows.read`/`workflows.delete`, ya existentes) expone `getWorkflow`/`deleteWorkflow`; editor reescrito con panel "Mis flujos" (listar/cargar/eliminar flujos reales) y paleta de nodos trigger/acción con selector de tipo — acciones limitadas a los 4 tipos que `publishAsSaasWorkflow` mapea de forma explícita (`send_email`, `notify`, `add_tag`, `webhook_out`) para no introducir una nueva degradación silenciosa a `notify` |
+| **Evidencia** | tsc/eslint/build PASS · vitest `dragDropWorkflow.test.ts` (backend sin cambios, ya cubierto) + core 2467 passed/4 skipped · smoke `/api/saas/workflows/visual/:id` (GET/DELETE) → 401 sin sesión (sin 500) |
+| **Nota** | Sin mocks nuevos ni cambios en `DragDropWorkflowService`/modelo de datos — se expone capacidad de backend ya real y probada, igual que el patrón de `SaasSmsService.listRecent` en el módulo 4 · canary IA apagado · `claimReady: false` |
 
 ### Funcional — `/saas/sms` mostraba "campañas SMS" con datos descartados y acciones no implementadas → RESUELTO
 

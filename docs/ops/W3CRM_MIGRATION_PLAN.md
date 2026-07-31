@@ -406,3 +406,49 @@ Sin mocks nuevos — al contrario, se elimina el único mock que existía en est
 
 - Verificación visual autenticada en staging (igual que módulos 2 y 3, no bloqueante para cerrar el módulo a nivel de código).
 - `SaasSmsService` sigue sin un concepto real de "campaña SMS" (solo envío único + log) — si el negocio necesita campañas masivas de SMS en el futuro, requiere diseño de producto explícito (tabla de campaña, audiencia, límites legales de bulk ya existentes en `sendBulk`), no se ha inventado esa funcionalidad en esta pasada.
+
+---
+
+## 16. Módulo 5 — Automatizaciones y workflows (2026-07-31)
+
+### 16.1 Alcance real auditado
+
+Grupo `gestion` de `saasNav.ts` (ítem `workflows`), con sus dos pantallas reales: `/saas/workflows` (builder clásico trigger→condición→acción, backend `SaasWorkflowService`, 16 triggers/17 acciones/24+ plantillas oficiales) y `/saas/workflows/editor` (editor visual drag-and-drop sobre `@xyflow/react`, backend `DragDropWorkflowService`, tabla `dragdrop_workflows`). El builder clásico ya era una implementación real y extensa (sin mocks, backend completo con runs/versiones/recipes) — el trabajo se centró en homogeneizar tokens visuales y corregir un defecto funcional grave en el editor visual.
+
+### 16.2 Hallazgo funcional de causa raíz — editor visual inutilizable más allá de una demo fija
+
+`DragDropWorkflowService` (backend 100% real, cubierto por `dragDropWorkflow.test.ts`: `createWorkflow`/`updateWorkflow`/`getWorkflow`/`listWorkflows`/`deleteWorkflow`/`attachTenant`/`publishAsSaasWorkflow`/`executeWorkflow`) expone capacidad completa para guardar, listar, recuperar y borrar flujos visuales por usuario, y publicarlos como `SaasWorkflow` real. La página `/saas/workflows/editor` auditada:
+
+1. **Nunca llamaba a `GET /api/saas/workflows/visual`** (ya implementado y funcional en el route handler) — el editor siempre arrancaba con exactamente los mismos 2 nodos hardcodeados (`Trigger: contact_created` → `Action: send_email`), sin ninguna forma de recuperar un flujo guardado anteriormente. Guardar funcionaba (creaba filas reales en `dragdrop_workflows`), pero esas filas eran efectivamente inaccesibles desde la UI salvo reescribiendo la URL/API a mano.
+2. **No existía ninguna forma de añadir nodos** — el lienzo de ReactFlow solo permitía conectar los 2 nodos fijos con una arista; no había paleta ni botón para insertar un nuevo trigger o acción, ni para cambiar el tipo de un nodo existente. En la práctica, el "editor visual de workflows" solo podía publicar siempre la misma combinación fija `contact_created → send_email`, independientemente de lo que el usuario intentara construir.
+3. **`deleteWorkflow` (ya implementado y testeado en el servicio) no estaba expuesto por ninguna API** — no había manera de borrar un flujo visual creado por error.
+
+**Corrección** (usa exclusivamente capacidad de backend ya real y probada, cero funcionalidad de negocio nueva inventada):
+
+- Nuevo `GET`/`DELETE /api/saas/workflows/visual/[id]` (`apps/web/src/app/api/saas/workflows/visual/[id]/route.ts`), permisos `workflows.read`/`workflows.delete` (ya existentes en `saasRbac.ts`), llamando a `getWorkflow`/`deleteWorkflow` del servicio ya testeado.
+- `/saas/workflows/editor` reescrito: panel "Mis flujos" (lista real vía `GET /api/saas/workflows/visual`, cargar/eliminar), botones "+ Nodo trigger" / "+ Nodo acción" que insertan nodos reales en el lienzo, panel de configuración del nodo seleccionado con selector de tipo. El catálogo de acciones del selector se limita deliberadamente a los **4 tipos que `publishAsSaasWorkflow` mapea explícitamente** (`send_email`, `notify`, `add_tag`, `webhook_out`) — el resto de tipos de acción existentes en `WorkflowAction` degradarían en silencio a `notify` al publicar, y ofrecerlos en el editor visual habría sido introducir una nueva mentira funcional, no corregir una. Los 16 triggers se ofrecen completos porque `publishAsSaasWorkflow` los pasa sin remapear.
+- Sin cambios en `DragDropWorkflowService`, `SaasWorkflowService` ni en el modelo de datos — el fix es 100% de exposición/consumo de una capacidad de backend preexistente, igual que el patrón de `SaasSmsService.listRecent` en el módulo 4.
+
+### 16.3 Fixes de consistencia visual (`/saas/workflows`)
+
+El builder clásico ya usaba en su mayoría `NelvyonDsCard/Badge/Button/SectionHeader`, pero conservaba clases Tailwind hardcodeadas heredadas de antes del fix de contraste del módulo 2: KPIs de estado (`all/active/paused/draft/archived`) en `NelvyonDsCard` manual → migrados a `KpiTile`; banners de aviso SES/Twilio y de resultado del "Kit arranque Nelvyon" en `yellow-500`/`green-500`/`red-500` literales → tokens `warning`/`success`/`destructive`; botones de acción por fila (Activar/Pausar/Eliminar) en `green-500`/`yellow-500`/`red-500` literales → mismos tokens semánticos; puntos de estado de los runs en el panel de detalle (`bg-green-400`/`bg-red-400`/`bg-yellow-400`) → `NelvyonDsStatusDot`; enlace "Editor visual" con `border-white/20`/`text-white` hardcodeado → tokens `border-border`/`text-foreground`. Eliminada además una constante `_panels` muerta (definida y nunca usada) detectada durante la auditoría. Cero cambios de comportamiento en el builder clásico — API, RBAC, condiciones, versiones y ejecución de runs intactos.
+
+### 16.4 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `pnpm -C apps/web exec tsc --noEmit` | **PASS** (0 errores) |
+| `pnpm -C apps/web exec eslint <archivos modificados>` | **PASS** (0 errores/warnings) |
+| `pnpm -C apps/web exec vitest run backend/saas/__tests__/dragDropWorkflow.test.ts backend/saas/__tests__/saasWorkflow*` | **PASS** — 8 test files, 92 passed |
+| `pnpm -C apps/web exec vitest run backend/saas backend/email src/features/saas-crm` | **PASS** — 195 test files, 2467 passed / 4 skipped |
+| `pnpm -C apps/web build` | **PASS** — build de producción completo (312 páginas), incluye `/api/saas/workflows/visual/[id]` |
+| Smoke de rutas (servidor productivo local, sin `DATABASE_URL`) | `GET /saas/{workflows,workflows/editor}` → `307` · `GET/DELETE /api/saas/workflows/{,recipes,visual,visual/:id}` → `401` (esperado, sin sesión, sin 500) |
+| Verificación visual autenticada en staging | **BLOCKED_ENVIRONMENT** — sin `DATABASE_URL`/sesión local; mismo hallazgo que módulos 2, 3 y 4 |
+| Funcionalidad preservada | RBAC (`workflows.read/write/delete/execute`), scoping por `user_id` en `dragdrop_workflows` (diseño preexistente: borrador personal hasta `attachTenant`+publish, momento en el que pasa a `saas_workflows` con `tenant_id`) sin cambios · canary IA apagado · `claimReady=false` |
+| Branding/mock data | Cero — el editor visual pasa de un demo fijo de 2 nodos a una herramienta real de construcción de flujos sobre datos 100% del backend |
+
+### 16.5 Pendiente / riesgo conocido
+
+- Verificación visual autenticada en staging (igual que módulos 2, 3 y 4, no bloqueante para cerrar el módulo a nivel de código).
+- El editor visual publica siempre en estado `draft` (comportamiento preexistente de `publishAsSaasWorkflow`, sin cambios) — el usuario debe activarlo manualmente desde `/saas/workflows` tras publicar; el mensaje de estado del editor ahora lo indica explícitamente.
+- El catálogo de acciones del editor visual queda limitado a 4 tipos por el motivo explicado en §16.2; ampliar `publishAsSaasWorkflow` para soportar más tipos (p. ej. `send_sms`, `create_task`) sería una mejora de producto legítima pero está fuera del alcance de esta migración visual (requiere decisión de negocio sobre qué configuración por defecto usar para cada tipo nuevo).
