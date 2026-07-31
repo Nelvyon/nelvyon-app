@@ -1,20 +1,20 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 17b P1 gestión operativa** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §29 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
+> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 18 cuenta/plataforma** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §30 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
 
 | Campo | Valor |
 |-------|-------|
 | **Tip prod live** | `3f10c272` |
-| **Calidad** | tsc/lint/build **PASS** · vitest **2480 passed / 4 skipped** · smoke 307/401 |
-| **W3CRM** | Módulos 1–17b **DONE** (gestión operativa completa P0+P1). Siguiente: cuenta/plataforma SaaS + IA polish + auditoría global. Ver §29 |
+| **Calidad** | tsc/lint/build **PASS** · vitest saas **2437 passed / 4 skipped** · smoke 307/401 |
+| **W3CRM** | Módulos 1–18 **DONE** (gestión + cuenta P0/P1). Siguiente: resto cuenta + IA polish + auditoría global. Ver §30 |
 | **claimReady** | **false** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Continuar automáticamente con **módulo 18 — Cuenta / plataforma** (settings, integraciones, marketplace, api-keys, webhooks, white-label, partner, lead-scoring, voice, PWA, comunidades, herramientas, entregables) — lotes P0 primero.
-2. Luego polish IA (packs, playbooks, brief-to-launch, compliance, benchmark, copywriter) + **auditoría global SaaS**.
+1. Continuar automáticamente con **módulo 18b** — api-keys, white-label, partner, voice, comunidades, entregables, integraciones (P0 primero).
+2. Luego polish IA + **auditoría global SaaS** (bugs, UX, a11y, dupes, arquitectura).
 3. No prod deploy UI · no flip claimReady · canary KILL.
 
 ### Rollback IA / spend

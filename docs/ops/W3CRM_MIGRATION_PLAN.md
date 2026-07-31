@@ -907,3 +907,34 @@ helpdesk (macros CRUD + errores), documentos (contact/value), encuestas (errores
 ### 29.4 Próximo módulo
 
 **Cuenta / plataforma SaaS** — settings, integraciones, marketplace, herramientas, voice, PWA, lead-scoring, comunidades, partner, white-label, webhooks, api-keys, entregables (por lotes priorizados).
+
+---
+
+## 30. Módulo 18 — Cuenta / plataforma P0–P1 (2026-07-31)
+
+### 30.1 Alcance
+
+`/saas/webhooks`, `/saas/settings`, `/saas/lead-scoring`, `/saas/herramientas`, `/saas/marketplace`, `/saas/pwa`.
+
+### 30.2 Causas raíz corregidas
+
+- **Webhooks (P0):** toggle solo mutaba state local; GET ignoraba `?id&logs=true`; sin DELETE/PATCH HTTP pese a métodos en servicio. **Fix:** PATCH/DELETE + GET logs mapeados; UI persistente; eliminados botones muertos Test/Reenviar sin API.
+- **Settings (P0):** tab General read-only sin ruta de escritura. **Fix:** `updateTenantProfile(tenantId)` + `PATCH /api/saas/settings` + formulario Guardar.
+- **Lead scoring (P1):** emojis corruptos por encoding. **Fix:** labels ASCII/UTF-8 limpios.
+- **Herramientas (P1):** links `/docs` (404) y webhooks→settings. **Fix:** `/saas/developers` y `/saas/webhooks`.
+- **Marketplace (P1):** sin loading/error/empty; toggle sin guard. **Fix:** estados + DS + disable durante toggle.
+- **PWA (P1):** unsubscribe podía marcar UI desactivada sin DELETE real. **Fix:** feedback honesto + DELETE con comprobación.
+
+### 30.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| tsc / ESLint | **PASS** |
+| vitest backend/saas | **PASS** — **2437 / 4 skipped** |
+| build | **PASS** |
+| smoke pages/APIs | **307 / 401** |
+| Staging | **BLOCKED_ENVIRONMENT** |
+
+### 30.4 Próximo módulo
+
+Resto cuenta (api-keys, white-label, partner, voice, comunidades, entregables, integraciones) + polish IA + **auditoría global SaaS**.
