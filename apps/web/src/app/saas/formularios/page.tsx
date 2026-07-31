@@ -8,6 +8,7 @@ import {
   NelvyonDsCard,
   NelvyonDsSectionHeader,
 } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
@@ -110,7 +111,7 @@ function FieldRow({
           <button onClick={() => onMove(-1)} disabled={index === 0} className="rounded p-1 text-muted-foreground hover:text-foreground disabled:opacity-30">▲</button>
           <button onClick={() => onMove(1)} disabled={index === total - 1} className="rounded p-1 text-muted-foreground hover:text-foreground disabled:opacity-30">▼</button>
           <button onClick={() => setExpanded((v) => !v)} className="rounded p-1 text-muted-foreground hover:text-foreground">✏️</button>
-          <button onClick={onRemove} className="rounded p-1 text-red-400 hover:text-red-300">✕</button>
+          <button onClick={onRemove} className="rounded p-1 text-destructive/70 hover:text-destructive">✕</button>
         </div>
       </div>
 
@@ -237,7 +238,7 @@ function FormBuilderModal({ form, onClose, onSaved }: { form?: Form; onClose: ()
 
         <form onSubmit={save}>
           <div className="space-y-5 px-6 py-5">
-            {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+            {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -338,6 +339,79 @@ function EmbedModal({ form, onClose }: { form: Form; onClose: () => void }) {
   );
 }
 
+// ─── Submissions viewer modal ─────────────────────────────────────────────────
+
+interface FormSubmission {
+  id: string;
+  data: Record<string, unknown>;
+  ip: string | null;
+  createdAt: string;
+  contactId: string | null;
+  contactName: string | null;
+  contactEmail: string | null;
+}
+
+function SubmissionsModal({ form, onClose }: { form: Form; onClose: () => void }) {
+  const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/saas/formularios/${form.id}/submissions`)
+      .then((r) => r.json())
+      .then((d: { submissions?: FormSubmission[] }) => setSubmissions(d.submissions ?? []))
+      .finally(() => setLoading(false));
+  }, [form.id]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
+      <div className="my-8 w-full max-w-3xl rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Respuestas · {form.name}</h2>
+            <p className="text-xs text-muted-foreground">{form.submissions} respuesta{form.submissions === 1 ? "" : "s"} registradas</p>
+          </div>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+        </div>
+
+        <div className="max-h-[70vh] overflow-y-auto px-6 py-5">
+          {loading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-lg bg-muted/30" />)}
+            </div>
+          ) : submissions.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border py-12 text-center">
+              <p className="text-sm text-muted-foreground">Todavía no hay respuestas para este formulario.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {submissions.map((s) => (
+                <div key={s.id} className="rounded-xl border border-border p-4">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground">{new Date(s.createdAt).toLocaleString("es-ES")}</span>
+                    {s.contactId ? (
+                      <NelvyonDsBadge tone="success">{s.contactName ?? s.contactEmail ?? "Contacto vinculado"}</NelvyonDsBadge>
+                    ) : (
+                      <NelvyonDsBadge tone="neutral">Sin contacto</NelvyonDsBadge>
+                    )}
+                  </div>
+                  <dl className="grid gap-1.5 sm:grid-cols-2">
+                    {Object.entries(s.data).map(([key, value]) => (
+                      <div key={key} className="flex gap-2 text-sm">
+                        <dt className="shrink-0 font-medium text-muted-foreground">{key}:</dt>
+                        <dd className="truncate text-foreground">{String(value)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Template gallery ─────────────────────────────────────────────────────────
 
 function FormTemplateGallery({ onImported }: { onImported: () => void }) {
@@ -394,6 +468,9 @@ export default function SaasFormulariosPage() {
   const [showBuilder, setShowBuilder] = useState(false);
   const [editingForm, setEditingForm] = useState<Form | undefined>(undefined);
   const [embedForm, setEmbedForm] = useState<Form | null>(null);
+  const [submissionsForm, setSubmissionsForm] = useState<Form | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -407,6 +484,31 @@ export default function SaasFormulariosPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  async function toggleActive(f: Form) {
+    setTogglingId(f.id);
+    try {
+      const res = await fetch(`/api/saas/formularios/${f.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !f.isActive }),
+      });
+      if (res.ok) setForms((prev) => prev.map((x) => (x.id === f.id ? { ...x, isActive: !f.isActive } : x)));
+    } finally {
+      setTogglingId(null);
+    }
+  }
+
+  async function deleteForm(f: Form) {
+    if (!window.confirm(`¿Eliminar el formulario "${f.name}"? Esta acción no se puede deshacer.`)) return;
+    setDeletingId(f.id);
+    try {
+      const res = await fetch(`/api/saas/formularios/${f.id}`, { method: "DELETE" });
+      if (res.ok) setForms((prev) => prev.filter((x) => x.id !== f.id));
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const totalSubmissions = forms.reduce((s, f) => s + f.submissions, 0);
 
@@ -423,16 +525,9 @@ export default function SaasFormulariosPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {[
-            { label: "Formularios", value: forms.length },
-            { label: "Activos", value: forms.filter((f) => f.isActive).length },
-            { label: "Respuestas totales", value: totalSubmissions.toLocaleString("es-ES") },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
+          <KpiTile icon="📋" label="Formularios" value={forms.length} />
+          <KpiTile icon="✅" label="Activos" value={forms.filter((f) => f.isActive).length} accent />
+          <KpiTile icon="📨" label="Respuestas totales" value={totalSubmissions.toLocaleString("es-ES")} />
         </div>
 
         <FormTemplateGallery onImported={() => void load()} />
@@ -458,18 +553,28 @@ export default function SaasFormulariosPage() {
             {forms.map((f) => (
               <NelvyonDsCard key={f.id} className="flex flex-col gap-3 p-5">
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-semibold text-foreground">{f.name}</p>
-                    {f.description && <p className="mt-0.5 text-sm text-muted-foreground">{f.description}</p>}
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-foreground">{f.name}</p>
+                    {f.description && <p className="mt-0.5 truncate text-sm text-muted-foreground">{f.description}</p>}
                   </div>
-                  <NelvyonDsBadge tone={f.isActive ? "success" : "primary"}>
-                    {f.isActive ? "Activo" : "Inactivo"}
-                  </NelvyonDsBadge>
+                  <button
+                    onClick={() => void toggleActive(f)}
+                    disabled={togglingId === f.id}
+                    aria-pressed={f.isActive}
+                    aria-label={f.isActive ? "Desactivar formulario" : "Activar formulario"}
+                    className="shrink-0 disabled:opacity-50"
+                  >
+                    <NelvyonDsBadge tone={f.isActive ? "success" : "neutral"}>
+                      {togglingId === f.id ? "…" : f.isActive ? "Activo" : "Inactivo"}
+                    </NelvyonDsBadge>
+                  </button>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <span>{f.fields.length} campos</span>
                   <span>·</span>
-                  <span>{f.submissions} respuestas</span>
+                  <button onClick={() => setSubmissionsForm(f)} className="underline-offset-2 hover:text-foreground hover:underline">
+                    {f.submissions} respuestas
+                  </button>
                 </div>
                 <div className="flex gap-2">
                   <NelvyonDsButton variant="ghost" className="flex-1" onClick={() => setEmbedForm(f)}>
@@ -478,6 +583,14 @@ export default function SaasFormulariosPage() {
                   <NelvyonDsButton variant="ghost" className="flex-1" onClick={() => { setEditingForm(f); setShowBuilder(true); }}>
                     Editar
                   </NelvyonDsButton>
+                  <button
+                    onClick={() => void deleteForm(f)}
+                    disabled={deletingId === f.id}
+                    aria-label={`Eliminar formulario ${f.name}`}
+                    className="rounded-lg p-2 text-destructive/60 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40 transition-colors"
+                  >
+                    {deletingId === f.id ? "…" : "🗑"}
+                  </button>
                 </div>
               </NelvyonDsCard>
             ))}
@@ -493,6 +606,7 @@ export default function SaasFormulariosPage() {
         />
       )}
       {embedForm && <EmbedModal form={embedForm} onClose={() => setEmbedForm(null)} />}
+      {submissionsForm && <SubmissionsModal form={submissionsForm} onClose={() => setSubmissionsForm(null)} />}
     </SaasShellLayout>
   );
 }
