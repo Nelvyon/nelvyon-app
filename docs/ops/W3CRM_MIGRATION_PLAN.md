@@ -756,3 +756,34 @@ Pantalla: `/saas/lms`. APIs: `GET/POST/DELETE /api/saas/lms`, modules/lessons CR
 ### 24.4 Próximo módulo
 
 **Afiliados / Fidelización** (`/saas/affiliates`, `/saas/loyalty`) o el siguiente del grupo gestión según inventario.
+
+---
+
+## 25. Módulo 14 — Afiliados / Fidelización (2026-07-31)
+
+### 25.1 Alcance real auditado
+
+Pantallas: `/saas/affiliates`, `/saas/loyalty`. APIs: `GET/POST /api/saas/affiliates`, `GET/POST /api/saas/loyalty`. Servicios: `SaasAffiliateService`, `SaasLoyaltyService` (migración 442).
+
+### 25.2 Hallazgos funcionales de causa raíz
+
+- **`mark-paid` / CEO gate sin UI:** la API ya exponía `approve-commission`, `mark-paid` y `pay-stripe-connect`, pero la UI solo aprobaba — las comisiones `approved` no podían cerrarse a `paid` desde producto. **Fix:** botón «Marcar pagada» + mensaje honesto cuando `CEO_GATE` bloquea (canary/payouts OFF).
+- **Columna `active` de enlaces sin write path:** el esquema y el tracking (`AND active=true`) existían; no había mutación. **Fix:** `setLinkActive` + action `set-link-active` + Pausar/Reactivar en UI.
+- **Loyalty: `redeem` / `adjust` / `transactions` muertos en UI:** APIs reales sin superficie. **Fix:** pestaña Canjear/Ajustar + historial por miembro al clic.
+- **Config incompleta:** `active` de programa y `tiers` editables en API no llegaban a settings. **Fix:** toggles + edición de umbrales de nivel; validación de `commissionPct`/`cookieDays`/`pointsPerEur`/`tiers` en servicios.
+- **UX:** `alert()` → errores/éxitos inline; KPIs → `KpiTile`; reintento en error de carga; feedback de copiar URL.
+
+### 25.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| `tsc --noEmit` | **PASS** |
+| ESLint (archivos tocados) | **PASS** |
+| `vitest` core + S31 | **PASS** — **2479 passed / 4 skipped** (S31 34/34) |
+| `pnpm -C apps/web build` | **PASS** |
+| Smoke (8097) | pages 307 · GET APIs 401 · POST set-link-active 401 |
+| Staging autenticado | **BLOCKED_ENVIRONMENT** |
+
+### 25.4 Próximo módulo
+
+**Membresías** (`/saas/memberships`) — siguiente del grupo gestión.
