@@ -53,6 +53,7 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
   const [expiry, setExpiry] = useState("");
   const [saving, setSaving] = useState(false);
   const [created, setCreated] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   function toggleScope(s: ApiKeyScope) {
     if (s === "full_access") { setScopes(["full_access"]); return; }
@@ -62,6 +63,7 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
   async function create(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setError(null);
     try {
       const res = await fetch("/api/saas/api-keys", {
         method: "POST",
@@ -77,7 +79,7 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
         throw new Error(err.error ?? "Error creando API key");
       }
     } catch (err) {
-      alert(String((err as Error).message));
+      setError(String((err as Error).message));
     } finally {
       setSaving(false);
     }
@@ -114,6 +116,7 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={create} className="space-y-5 p-6">
+          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre descriptivo *</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Integración Zapier"
@@ -165,6 +168,7 @@ function timeAgo(iso: string) {
 export default function SaasApiKeysPage() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [revokeError, setRevokeError] = useState<string | null>(null);
   const [tab, setTab] = useState<"keys" | "docs">("keys");
 
   const load = useCallback(async () => {
@@ -180,6 +184,7 @@ export default function SaasApiKeysPage() {
   useEffect(() => { void load(); }, [load]);
 
   async function revokeKey(id: string) {
+    setRevokeError(null);
     try {
       const res = await fetch(`/api/saas/api-keys?id=${encodeURIComponent(id)}`, { method: "DELETE" });
       if (!res.ok) {
@@ -188,7 +193,7 @@ export default function SaasApiKeysPage() {
       }
       setKeys((prev) => prev.map((k) => (k.id === id ? { ...k, active: false } : k)));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "No se pudo revocar la key");
+      setRevokeError(err instanceof Error ? err.message : "No se pudo revocar la key");
     }
   }
 
@@ -215,6 +220,12 @@ export default function SaasApiKeysPage() {
 
             {tab === "keys" ? (
               <div className="space-y-4">
+                {revokeError && (
+                  <NelvyonDsCard className="border-red-500/30 bg-red-500/5 p-4">
+                    <p className="text-sm text-red-400">{revokeError}</p>
+                    <button type="button" onClick={() => setRevokeError(null)} className="mt-2 text-xs text-primary hover:underline">Cerrar</button>
+                  </NelvyonDsCard>
+                )}
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { label: "Keys activas", value: keys.filter(k => k.active).length },

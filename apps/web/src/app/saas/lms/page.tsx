@@ -31,7 +31,9 @@ function NewCourseModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
     setSaving(true);
     try {
       const res = await fetch("/api/saas/lms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: title.trim(), description: desc.trim() || null, price: parseFloat(price) || 0 }) });
-      if (!res.ok) throw new Error("Error al crear curso"); onSaved(); onClose();
+      if (!res.ok) throw new Error("Error al crear curso");
+      onSaved();
+      onClose();
     } catch (err) { setError(err instanceof Error ? err.message : "Error"); } finally { setSaving(false); }
   }
   return (

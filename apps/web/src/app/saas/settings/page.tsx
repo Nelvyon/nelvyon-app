@@ -77,6 +77,7 @@ export default function SaasSettingsPage() {
     metadataUrl: "",
     domains: "",
   });
+  const [ssoError, setSsoError] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -152,23 +153,31 @@ export default function SaasSettingsPage() {
       const json = (await res.json()) as { config: SsoConfig };
       setSsoConfig(json.config);
       setSsoSaved(true);
+      setSsoError(null);
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Error al guardar");
+      setSsoError(e instanceof Error ? e.message : "Error al guardar");
     } finally {
       setSsoLoading(false);
     }
   }
 
   async function toggleEnforce(enforced: boolean) {
-    const res = await fetch("/api/saas/sso", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "toggle-enforce", enforced }),
-    });
-    if (res.ok) {
+    setSsoError(null);
+    try {
+      const res = await fetch("/api/saas/sso", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle-enforce", enforced }),
+      });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(d?.error ?? `Error ${res.status}`);
+      }
       const json = (await res.json()) as { config: SsoConfig };
       setSsoConfig(json.config);
+    } catch (e) {
+      setSsoError(e instanceof Error ? e.message : "Error al cambiar enforce SSO");
     }
   }
 
@@ -349,6 +358,7 @@ export default function SaasSettingsPage() {
           )}
 
           {ssoLoading && <p className="text-sm text-white/40">Cargando…</p>}
+          {ssoError && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{ssoError}</p>}
 
           {!ssoLoading && canManageSso && (
             <div className="space-y-4">

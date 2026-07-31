@@ -186,6 +186,7 @@ function IntegracionesContent() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category | "all">("all");
+  const [actionError, setActionError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const oauthSuccess = searchParams?.get("oauth_success") ?? null;
   const oauthError = searchParams?.get("oauth_error") ?? null;
@@ -207,16 +208,17 @@ function IntegracionesContent() {
   useEffect(() => { void load(); }, [load]);
 
   async function handleConnect(slug: string) {
+    setActionError(null);
     try {
       const res = await fetch(`/api/saas/integrations?action=authorize&provider=${encodeURIComponent(slug)}`);
       const data = (await res.json().catch(() => ({}))) as { authorizeUrl?: string; error?: string };
       if (data.authorizeUrl) {
         window.location.href = data.authorizeUrl;
       } else {
-        alert(data.error ?? "Añade las variables de entorno en Railway antes de conectar.");
+        setActionError(data.error ?? "Añade las variables de entorno en Railway antes de conectar.");
       }
     } catch {
-      alert("Añade las variables de entorno en Railway antes de conectar esta integración.");
+      setActionError("Añade las variables de entorno en Railway antes de conectar esta integración.");
     }
   }
 
@@ -224,6 +226,7 @@ function IntegracionesContent() {
     const conn = connections.find((c) => c.slug === slug);
     if (!conn) return;
     if (!confirm(`¿Desconectar ${conn.displayName}?`)) return;
+    setActionError(null);
     try {
       const res = await fetch(`/api/saas/integrations?provider=${encodeURIComponent(slug)}`, { method: "DELETE" });
       if (!res.ok) {
@@ -232,15 +235,20 @@ function IntegracionesContent() {
       }
       void load();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "No se pudo desconectar. Reintenta.");
+      setActionError(err instanceof Error ? err.message : "No se pudo desconectar. Reintenta.");
     }
   }
 
   async function handleSync(slug: string, direction: "pull" | "push" = "pull") {
     if (slug !== "hubspot") return;
-    const res = await fetch(`/api/saas/integrations/hubspot/sync?direction=${direction}`, { method: "POST" });
-    if (res.ok) void load();
-    else alert(`Error al sincronizar (${direction}) — verifica la conexión OAuth`);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/saas/integrations/hubspot/sync?direction=${direction}`, { method: "POST" });
+      if (res.ok) void load();
+      else setActionError(`Error al sincronizar (${direction}) — verifica la conexión OAuth`);
+    } catch {
+      setActionError(`Error de red al sincronizar (${direction})`);
+    }
   }
 
   const filtered = connections.filter((c) => {
@@ -268,6 +276,12 @@ function IntegracionesContent() {
         {oauthError && (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             ❌ Error al conectar: {oauthError}. Asegúrate de haber añadido las variables de entorno en Railway.
+          </div>
+        )}
+        {actionError && (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            {actionError}
+            <button type="button" className="ml-3 text-xs underline" onClick={() => setActionError(null)}>Cerrar</button>
           </div>
         )}
 

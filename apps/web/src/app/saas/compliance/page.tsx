@@ -183,28 +183,34 @@ export default function CompliancePage() {
   }
 
   async function handleVerify(artifactId: string) {
-    const res = await fetch(`/api/saas/compliance/${artifactId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "verify" }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/saas/compliance/${artifactId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify" }),
+      });
+      if (!res.ok) throw new Error(`Error ${res.status}`);
       showToast("Artifact verificado");
       setSelectedArtifact(null);
       void load();
+    } catch {
+      showToast("Error al verificar artifact");
     }
   }
 
   async function handleRevoke(artifactId: string) {
-    const res = await fetch(`/api/saas/compliance/${artifactId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "revoke", reason: "Revocado manualmente" }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/saas/compliance/${artifactId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "revoke", reason: "Revocado manualmente" }),
+      });
+      if (!res.ok) throw new Error(`Error ${res.status}`);
       showToast("Artifact revocado");
       setSelectedArtifact(null);
       void load();
+    } catch {
+      showToast("Error al revocar artifact");
     }
   }
 

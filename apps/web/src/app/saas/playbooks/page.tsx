@@ -217,24 +217,32 @@ export default function PlaybooksPage() {
   }
 
   async function patchPlaybook(id: string, action: "activate" | "dismiss" | "complete") {
-    const res = await fetch(`/api/saas/data-playbooks/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/saas/data-playbooks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      if (!res.ok) throw new Error(`Error ${res.status}`);
       showToast(action === "dismiss" ? "Playbook descartado" : action === "complete" ? "Playbook completado" : "Playbook activado");
       void load();
+    } catch {
+      showToast("Error al actualizar playbook");
     }
   }
 
   async function completeStep(playbookId: string, stepId: string) {
-    const res = await fetch(`/api/saas/data-playbooks/${playbookId}/steps/${stepId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ completed: true }),
-    });
-    if (res.ok) showToast("Paso completado");
+    try {
+      const res = await fetch(`/api/saas/data-playbooks/${playbookId}/steps/${stepId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed: true }),
+      });
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      showToast("Paso completado");
+    } catch {
+      showToast("Error al completar paso");
+    }
   }
 
   return (

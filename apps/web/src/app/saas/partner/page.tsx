@@ -124,40 +124,52 @@ export default function PartnerZonePage() {
   }, [tab]);
 
   async function saveRetail(sku: string, retailEur: number) {
-    const res = await fetch("/api/saas/partner/retail-prices", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sku, retailEur }),
-    });
-    if (res.ok) {
-      const d = (await res.json()) as { item: WholesaleSku };
-      setCatalog((prev) => prev.map((c) => (c.sku === sku ? d.item : c)));
-      showToast("Precio retail actualizado");
-    } else {
-      const d = (await res.json().catch(() => ({}))) as { error?: string };
-      showToast(d.error ?? "No se pudo guardar");
+    try {
+      const res = await fetch("/api/saas/partner/retail-prices", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sku, retailEur }),
+      });
+      if (res.ok) {
+        const d = (await res.json()) as { item: WholesaleSku };
+        setCatalog((prev) => prev.map((c) => (c.sku === sku ? d.item : c)));
+        showToast("Precio retail actualizado");
+      } else {
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        showToast(d.error ?? "No se pudo guardar");
+      }
+    } catch {
+      showToast("Error de red al guardar precio");
     }
   }
 
   async function onboardConnect() {
-    const res = await fetch("/api/saas/partner/connect/onboard", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    });
-    const d = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-    if (res.ok && d.url) window.location.href = d.url;
-    else showToast(d.error ?? "Stripe Connect no disponible");
+    try {
+      const res = await fetch("/api/saas/partner/connect/onboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const d = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+      if (res.ok && d.url) window.location.href = d.url;
+      else showToast(d.error ?? "Stripe Connect no disponible");
+    } catch {
+      showToast("Error de red con Stripe Connect");
+    }
   }
 
   async function registerPartner() {
-    const res = await fetch("/api/saas/partner/register", { method: "POST" });
-    if (res.ok) {
-      showToast("¡Registrado como partner!");
-      setReferralsLoaded(false);
-      void loadReferrals();
-    } else {
-      showToast("No se pudo registrar");
+    try {
+      const res = await fetch("/api/saas/partner/register", { method: "POST" });
+      if (res.ok) {
+        showToast("¡Registrado como partner!");
+        setReferralsLoaded(false);
+        void loadReferrals();
+      } else {
+        showToast("No se pudo registrar");
+      }
+    } catch {
+      showToast("Error de red al registrar partner");
     }
   }
 
