@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { NelvyonDsBadge, NelvyonDsButton } from "@/design-system/components";
-import { SaasShellLayout, DarkCard } from "@/features/saas-shell/components/SaasShellLayout";
+import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -48,8 +49,8 @@ const STEP_TYPES: { type: StepType; label: string; icon: string }[] = [
   { type: "thankyou", label: "Gracias", icon: "✅" },
 ];
 
-const inputCls = "w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-[#0084ff]/60";
-const labelCls = "block text-[10px] uppercase tracking-wider text-white/30 mb-1";
+const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60";
+const labelCls = "block text-[10px] uppercase tracking-wider text-muted-foreground mb-1";
 const statusTone = (s: FunnelStatus) => s === "active" ? "success" : s === "paused" ? "warning" : "neutral";
 
 // ─── New Funnel Modal ─────────────────────────────────────────────────────────
@@ -88,13 +89,13 @@ function NewFunnelModal({ onClose, onSaved }: { onClose(): void; onSaved(id: str
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#020817] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-          <h2 className="text-base font-semibold text-white">Nuevo funnel</h2>
-          <button onClick={onClose} className="text-white/40 hover:text-white">✕</button>
+      <div className="my-8 w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h2 className="text-base font-semibold text-foreground">Nuevo funnel</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={save} className="space-y-4 p-5">
-          {error && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</p>}
+          {error && <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">{error}</p>}
           <div>
             <label className={labelCls}>Nombre *</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="Funnel de captación de leads" className={inputCls} autoFocus />
@@ -151,11 +152,11 @@ function StepEditor({
   const cfg = STEP_TYPES.find(s => s.type === step.type)!;
 
   return (
-    <DarkCard className="space-y-3">
+    <NelvyonDsCard className="space-y-3">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-xl">{cfg.icon}</span>
-        <span className="text-sm font-semibold text-white">{cfg.label}</span>
-        <span className="ml-auto text-[10px] text-white/30">Paso {step.stepOrder + 1}</span>
+        <span className="text-sm font-semibold text-foreground">{cfg.label}</span>
+        <span className="ml-auto text-[10px] text-muted-foreground">Paso {step.stepOrder + 1}</span>
       </div>
       <div>
         <label className={labelCls}>Nombre del paso</label>
@@ -191,9 +192,9 @@ function StepEditor({
         <NelvyonDsButton onClick={() => void saveStep()} disabled={saving}>
           {saving ? "Guardando…" : "Guardar paso"}
         </NelvyonDsButton>
-        {saved && <span className="text-xs text-emerald-400">✓ Guardado</span>}
+        {saved && <span className="text-xs text-success">✓ Guardado</span>}
       </div>
-    </DarkCard>
+    </NelvyonDsCard>
   );
 }
 
@@ -240,42 +241,42 @@ function AbVariantPanel({ step, funnelId }: { step: FunnelStep; funnelId: string
     setVariants(vs => vs.map(v => v.id === variantId ? { ...v, weightPct } : v));
   }
 
-  if (loading) return <DarkCard><p className="text-xs text-white/40">Cargando variantes…</p></DarkCard>;
+  if (loading) return <NelvyonDsCard><p className="text-xs text-muted-foreground">Cargando variantes…</p></NelvyonDsCard>;
 
   if (!variants.length) {
     return (
-      <DarkCard>
-        <p className="text-xs text-white/50 mb-3">A/B testing no activado para este paso.</p>
+      <NelvyonDsCard>
+        <p className="text-xs text-muted-foreground mb-3">A/B testing no activado para este paso.</p>
         <NelvyonDsButton onClick={() => void enableAb()} disabled={saving} variant="secondary">
           {saving ? "Activando…" : "Activar A/B para este paso"}
         </NelvyonDsButton>
-      </DarkCard>
+      </NelvyonDsCard>
     );
   }
 
   return (
-    <DarkCard className="space-y-4">
-      <p className="text-xs font-semibold uppercase tracking-widest text-white/30">A/B Testing activo</p>
+    <NelvyonDsCard className="space-y-4">
+      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">A/B Testing activo</p>
       {variants.map(v => (
         <div key={v.id} className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-white">Variante {v.variantKey}</span>
-            <span className="text-xs text-white/40">{v.visitors} vis · {v.conversions} conv</span>
+            <span className="text-sm font-semibold text-foreground">Variante {v.variantKey}</span>
+            <span className="text-xs text-muted-foreground">{v.visitors} vis · {v.conversions} conv</span>
           </div>
           <div className="flex items-center gap-3">
             <input
               type="range" min={0} max={100} value={v.weightPct}
               onChange={e => void updateWeight(v.id, Number(e.target.value))}
-              className="flex-1 accent-[#0084ff]"
+              className="flex-1 accent-primary"
             />
-            <span className="w-10 text-right text-sm font-semibold text-white">{v.weightPct}%</span>
+            <span className="w-10 text-right text-sm font-semibold text-foreground">{v.weightPct}%</span>
           </div>
         </div>
       ))}
-      <p className="text-[10px] text-white/25">
+      <p className="text-[10px] text-muted-foreground">
         Los pesos determinan la distribución de tráfico. Suma recomendada: 100%.
       </p>
-    </DarkCard>
+    </NelvyonDsCard>
   );
 }
 
@@ -292,44 +293,44 @@ function AnalyticsPanel({ funnelId }: { funnelId: string }) {
       .finally(() => setLoading(false));
   }, [funnelId]);
 
-  if (loading) return <DarkCard><div className="h-24 animate-pulse rounded-lg bg-white/[0.04]" /></DarkCard>;
-  if (!analytics) return <DarkCard><p className="text-sm text-white/40">No hay datos de analytics.</p></DarkCard>;
+  if (loading) return <NelvyonDsCard><div className="h-24 animate-pulse rounded-lg bg-muted/20" /></NelvyonDsCard>;
+  if (!analytics) return <NelvyonDsCard><p className="text-sm text-muted-foreground">No hay datos de analytics.</p></NelvyonDsCard>;
 
   const maxVisitors = Math.max(...analytics.steps.map(s => s.visitors), 1);
 
   return (
-    <DarkCard className="space-y-4">
+    <NelvyonDsCard className="space-y-4">
       <div className="flex gap-6">
         <div>
-          <p className="text-[10px] uppercase text-white/30">Visitas totales</p>
-          <p className="text-xl font-bold text-white">{analytics.totalVisitors.toLocaleString()}</p>
+          <p className="text-[10px] uppercase text-muted-foreground">Visitas totales</p>
+          <p className="text-xl font-bold text-foreground">{analytics.totalVisitors.toLocaleString()}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase text-white/30">Conversiones</p>
-          <p className="text-xl font-bold text-white">{analytics.totalConversions.toLocaleString()}</p>
+          <p className="text-[10px] uppercase text-muted-foreground">Conversiones</p>
+          <p className="text-xl font-bold text-foreground">{analytics.totalConversions.toLocaleString()}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase text-white/30">CVR global</p>
-          <p className="text-xl font-bold text-[#0084ff]">{analytics.overallCvr}%</p>
+          <p className="text-[10px] uppercase text-muted-foreground">CVR global</p>
+          <p className="text-xl font-bold text-primary">{analytics.overallCvr}%</p>
         </div>
       </div>
       <div className="space-y-2">
         {analytics.steps.map(s => (
           <div key={s.id} className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-white/70 font-medium">{s.name}</span>
-              <span className="text-white/40">{s.visitors} · CVR {s.cvr}% {s.dropOff > 0 && <span className="text-red-400">· ↓{s.dropOff}%</span>}</span>
+              <span className="text-muted-foreground font-medium">{s.name}</span>
+              <span className="text-muted-foreground">{s.visitors} · CVR {s.cvr}% {s.dropOff > 0 && <span className="text-destructive">· ↓{s.dropOff}%</span>}</span>
             </div>
-            <div className="h-2 rounded-full bg-white/[0.05] overflow-hidden">
+            <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
               <div
-                className="h-full rounded-full bg-[#0084ff]"
+                className="h-full rounded-full bg-primary"
                 style={{ width: `${(s.visitors / maxVisitors) * 100}%` }}
               />
             </div>
             {s.variants.length > 0 && (
               <div className="flex gap-3 pl-2 mt-0.5">
                 {s.variants.map(v => (
-                  <span key={v.variantKey} className="text-[10px] text-white/30">
+                  <span key={v.variantKey} className="text-[10px] text-muted-foreground">
                     {v.variantKey}: {v.visitors} vis · CVR {v.cvr}%
                   </span>
                 ))}
@@ -338,7 +339,7 @@ function AnalyticsPanel({ funnelId }: { funnelId: string }) {
           </div>
         ))}
       </div>
-    </DarkCard>
+    </NelvyonDsCard>
   );
 }
 
@@ -439,10 +440,10 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <button onClick={onBack} className="text-sm text-white/40 hover:text-white flex items-center gap-1">
+        <button onClick={onBack} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
           ← Funnels
         </button>
-        <h1 className="text-lg font-bold text-white flex-1">{funnel.name}</h1>
+        <h1 className="text-lg font-bold text-foreground flex-1">{funnel.name}</h1>
         <NelvyonDsBadge tone={statusTone(funnel.status)}>
           {funnel.status === "active" ? "Activo" : funnel.status === "paused" ? "Pausado" : "Borrador"}
         </NelvyonDsBadge>
@@ -464,19 +465,19 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
       </div>
 
       {funnel.publicSlug && (
-        <DarkCard className="py-2">
-          <p className="text-[10px] uppercase text-white/25 mb-0.5">URL pública</p>
-          <code className="text-xs text-[#0084ff] break-all">
+        <NelvyonDsCard className="py-2">
+          <p className="text-[10px] uppercase text-muted-foreground mb-0.5">URL pública</p>
+          <code className="text-xs text-primary break-all">
             {typeof window !== "undefined" ? window.location.origin : "https://app.nelvyon.com"}/f/{funnel.publicSlug}
           </code>
-        </DarkCard>
+        </NelvyonDsCard>
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1 w-fit">
+      <div className="flex gap-1 rounded-lg border border-border bg-muted/10 p-1 w-fit">
         {(["steps", "analytics"] as BuilderTab[]).map(t => (
           <button key={t} onClick={() => setBuilderTab(t)}
-            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${builderTab === t ? "bg-[#0084ff]/15 text-[#0084ff]" : "text-white/40 hover:text-white/70"}`}>
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${builderTab === t ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
             {t === "steps" ? "Editor de pasos" : "Analytics"}
           </button>
         ))}
@@ -488,30 +489,30 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
         <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
           {/* Steps sidebar */}
           <div className="space-y-2">
-            <DarkCard>
-              <p className="text-[10px] uppercase tracking-wider text-white/25 mb-3">Pasos ({localSteps.length})</p>
+            <NelvyonDsCard>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Pasos ({localSteps.length})</p>
               {localSteps.length === 0 && (
-                <p className="text-xs text-white/30">Sin pasos — añade el primero abajo.</p>
+                <p className="text-xs text-muted-foreground">Sin pasos — añade el primero abajo.</p>
               )}
               <div className="space-y-1.5">
                 {localSteps.map((s, i) => {
                   const cfg = STEP_TYPES.find(t => t.type === s.type)!;
                   const isSelected = selectedStep?.id === s.id;
                   return (
-                    <div key={s.id} className={`group flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer transition-colors ${isSelected ? "bg-[#0084ff]/15 border border-[#0084ff]/30" : "border border-white/[0.04] hover:bg-white/[0.04]"}`}
+                    <div key={s.id} className={`group flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer transition-colors ${isSelected ? "bg-primary/15 border border-primary/30" : "border border-border hover:bg-muted/20"}`}
                       onClick={() => { setSelectedStep(s); setAbStep(null); }}>
                       <span className="text-base">{cfg.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-white truncate">{i + 1}. {s.name}</p>
-                        <p className="text-[10px] text-white/30">{cfg.label}</p>
+                        <p className="text-xs font-medium text-foreground truncate">{i + 1}. {s.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{cfg.label}</p>
                       </div>
                       <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={e => { e.stopPropagation(); void moveStep(s.id, "up"); }}
-                          disabled={i === 0} className="text-white/40 hover:text-white disabled:opacity-20 text-[10px] px-1">↑</button>
+                          disabled={i === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-20 text-[10px] px-1">↑</button>
                         <button onClick={e => { e.stopPropagation(); void moveStep(s.id, "down"); }}
-                          disabled={i === localSteps.length - 1} className="text-white/40 hover:text-white disabled:opacity-20 text-[10px] px-1">↓</button>
+                          disabled={i === localSteps.length - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-20 text-[10px] px-1">↓</button>
                         <button onClick={e => { e.stopPropagation(); void removeStep(s.id); }}
-                          className="text-red-400/60 hover:text-red-400 text-[10px] px-1">✕</button>
+                          className="text-destructive/60 hover:text-destructive text-[10px] px-1">✕</button>
                       </div>
                     </div>
                   );
@@ -521,12 +522,12 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {STEP_TYPES.map(t => (
                   <button key={t.type} onClick={() => void addStep(t.type)}
-                    className="rounded-md border border-white/[0.06] px-2 py-1 text-[10px] text-white/40 hover:border-[#0084ff]/40 hover:text-white/70 transition-colors">
+                    className="rounded-md border border-border px-2 py-1 text-[10px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors">
                     + {t.icon} {t.label}
                   </button>
                 ))}
               </div>
-            </DarkCard>
+            </NelvyonDsCard>
           </div>
 
           {/* Step editor */}
@@ -545,7 +546,7 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
                 <div>
                   <button
                     onClick={() => setAbStep(prev => prev?.id === selectedStep.id ? null : selectedStep)}
-                    className="mb-2 text-xs text-[#0084ff] hover:underline">
+                    className="mb-2 text-xs text-primary hover:underline">
                     {abStep?.id === selectedStep.id ? "▲ Ocultar A/B" : "▼ Configurar A/B Testing"}
                   </button>
                   {abStep?.id === selectedStep.id && (
@@ -554,9 +555,9 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
                 </div>
               </>
             ) : (
-              <DarkCard>
-                <p className="text-sm text-white/40 text-center py-8">Selecciona un paso para editarlo.</p>
-              </DarkCard>
+              <NelvyonDsCard>
+                <p className="text-sm text-muted-foreground text-center py-8">Selecciona un paso para editarlo.</p>
+              </NelvyonDsCard>
             )}
           </div>
         </div>
@@ -579,6 +580,7 @@ export default function SaasFunnelsPage() {
   const [builderFunnel, setBuilderFunnel] = useState<Funnel | null>(null);
   const [funnelTemplates, setFunnelTemplates] = useState<Array<{ id: string; name: string; description: string }>>([]);
   const [importingFunnelTpl, setImportingFunnelTpl] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -629,6 +631,17 @@ export default function SaasFunnelsPage() {
     router.push("/saas/funnels", { scroll: false });
   }
 
+  async function deleteFunnel(id: string, name: string) {
+    if (!window.confirm(`¿Eliminar el funnel "${name}"? Esta acción no se puede deshacer.`)) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/saas/funnels/${id}`, { method: "DELETE", credentials: "same-origin" });
+      if (res.ok) setFunnels(prev => prev.filter(f => f.id !== id));
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const filtered = statusFilter === "all" ? funnels : funnels.filter(f => f.status === statusFilter);
   const totalVisitors = funnels.reduce((s, f) => s + f.totalVisitors, 0);
   const totalConversions = funnels.reduce((s, f) => s + f.totalConversions, 0);
@@ -650,36 +663,29 @@ export default function SaasFunnelsPage() {
           {/* Header */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">Marketing</p>
-              <h1 className="mt-1 text-2xl font-bold text-white">Funnel Builder</h1>
-              <p className="mt-0.5 text-sm text-white/40">Editor visual de embudos con A/B testing y analytics.</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">Marketing</p>
+              <h1 className="mt-1 text-2xl font-bold text-foreground">Funnel Builder</h1>
+              <p className="mt-0.5 text-sm text-muted-foreground">Editor visual de embudos con A/B testing y analytics.</p>
             </div>
             <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo funnel</NelvyonDsButton>
           </div>
 
           {/* KPIs */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[
-              { label: "Funnels", value: funnels.length },
-              { label: "Activos", value: funnels.filter(f => f.status === "active").length },
-              { label: "Visitas totales", value: totalVisitors.toLocaleString() },
-              { label: "CVR global", value: `${overallCvr}%` },
-            ].map(({ label, value }) => (
-              <DarkCard key={label} className="py-3">
-                <p className="text-[10px] uppercase text-white/30">{label}</p>
-                <p className="mt-1 text-2xl font-bold text-white">{value}</p>
-              </DarkCard>
-            ))}
+            <KpiTile icon="🚀" label="Funnels" value={funnels.length} />
+            <KpiTile icon="✅" label="Activos" value={funnels.filter(f => f.status === "active").length} accent />
+            <KpiTile icon="👀" label="Visitas totales" value={totalVisitors.toLocaleString()} />
+            <KpiTile icon="📈" label="CVR global" value={`${overallCvr}%`} />
           </div>
 
           {funnelTemplates.length > 0 && (
-            <DarkCard className="p-4">
-              <p className="text-sm font-semibold text-white">Plantillas funnel Nelvyon ({funnelTemplates.length})</p>
+            <NelvyonDsCard className="p-4">
+              <p className="text-sm font-semibold text-foreground">Plantillas funnel Nelvyon ({funnelTemplates.length})</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {funnelTemplates.map((t) => (
-                  <div key={t.id} className="rounded-lg border border-white/10 p-3">
-                    <p className="text-sm font-medium text-white">{t.name}</p>
-                    <p className="text-xs text-white/40 mt-0.5">{t.description}</p>
+                  <div key={t.id} className="rounded-lg border border-border p-3">
+                    <p className="text-sm font-medium text-foreground">{t.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>
                     <NelvyonDsButton className="mt-2 w-full" size="sm" disabled={importingFunnelTpl === t.id}
                       onClick={() => void importFunnelTemplate(t.id)}>
                       {importingFunnelTpl === t.id ? "…" : "Importar funnel"}
@@ -687,14 +693,14 @@ export default function SaasFunnelsPage() {
                   </div>
                 ))}
               </div>
-            </DarkCard>
+            </NelvyonDsCard>
           )}
 
           {/* Status filter tabs */}
-          <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1 w-fit">
+          <div className="flex gap-1 rounded-lg border border-border bg-muted/10 p-1 w-fit">
             {(["all", "draft", "active", "paused"] as const).map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md capitalize transition-colors ${statusFilter === s ? "bg-[#0084ff]/15 text-[#0084ff]" : "text-white/40 hover:text-white/70"}`}>
+                className={`px-3 py-1.5 text-xs font-medium rounded-md capitalize transition-colors ${statusFilter === s ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
                 {s === "all" ? "Todos" : s === "draft" ? "Borrador" : s === "active" ? "Activos" : "Pausados"}
               </button>
             ))}
@@ -702,32 +708,32 @@ export default function SaasFunnelsPage() {
 
           {/* List */}
           {loading ? (
-            <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-white/[0.03]" />)}</div>
+            <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/10" />)}</div>
           ) : filtered.length === 0 ? (
-            <DarkCard className="py-16 text-center">
+            <NelvyonDsCard className="py-16 text-center">
               <p className="text-4xl">🚀</p>
-              <p className="mt-3 text-base font-semibold text-white">Sin funnels{statusFilter !== "all" ? ` (${statusFilter})` : ""}</p>
-              <p className="mt-1 text-sm text-white/40">Crea tu primer embudo de ventas o captación de leads</p>
+              <p className="mt-3 text-base font-semibold text-foreground">Sin funnels{statusFilter !== "all" ? ` (${statusFilter})` : ""}</p>
+              <p className="mt-1 text-sm text-muted-foreground">Crea tu primer embudo de ventas o captación de leads</p>
               <div className="mt-5"><NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo funnel</NelvyonDsButton></div>
-            </DarkCard>
+            </NelvyonDsCard>
           ) : (
             <div className="space-y-3">
               {filtered.map(f => (
-                <DarkCard key={f.id} className="flex flex-wrap items-start justify-between gap-4 p-4">
+                <NelvyonDsCard key={f.id} className="flex flex-wrap items-start justify-between gap-4 p-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-white truncate">{f.name}</p>
+                      <p className="font-semibold text-foreground truncate">{f.name}</p>
                       <NelvyonDsBadge tone={statusTone(f.status)}>
                         {f.status === "active" ? "Activo" : f.status === "paused" ? "Pausado" : "Borrador"}
                       </NelvyonDsBadge>
                     </div>
-                    {f.description && <p className="mt-0.5 text-xs text-white/40 truncate">{f.description}</p>}
+                    {f.description && <p className="mt-0.5 text-xs text-muted-foreground truncate">{f.description}</p>}
                     <div className="mt-2 flex flex-wrap gap-1">
                       {f.steps.slice(0, 6).map((s, i) => {
                         const cfg = STEP_TYPES.find(t => t.type === s.type)!;
                         return (
-                          <span key={s.id} className="flex items-center gap-1 rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] text-white/50">
-                            {i > 0 && <span className="text-white/20">→</span>}
+                          <span key={s.id} className="flex items-center gap-1 rounded-md bg-muted/20 px-2 py-0.5 text-[10px] text-muted-foreground">
+                            {i > 0 && <span className="text-foreground/20">→</span>}
                             {cfg.icon} {s.name}
                           </span>
                         );
@@ -735,15 +741,23 @@ export default function SaasFunnelsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-right text-xs text-white/40">
+                    <div className="text-right text-xs text-muted-foreground">
                       <p>{f.totalVisitors.toLocaleString()} visitas</p>
                       <p>{f.totalConversions.toLocaleString()} conv.</p>
                     </div>
                     <NelvyonDsButton variant="secondary" onClick={() => openBuilder(f)}>
                       Abrir builder
                     </NelvyonDsButton>
+                    <button
+                      onClick={() => void deleteFunnel(f.id, f.name)}
+                      disabled={deletingId === f.id}
+                      aria-label={`Eliminar funnel ${f.name}`}
+                      className="rounded-md p-2 text-destructive/60 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40 transition-colors"
+                    >
+                      {deletingId === f.id ? "…" : "🗑"}
+                    </button>
                   </div>
-                </DarkCard>
+                </NelvyonDsCard>
               ))}
             </div>
           )}
