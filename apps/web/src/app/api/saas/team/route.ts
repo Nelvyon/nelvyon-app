@@ -57,6 +57,10 @@ export async function PATCH(req: Request) {
       const member = await svc.suspend(ctx.tenant.id, b.id);
       return NextResponse.json({ member });
     }
+    if (b.action === "reactivate") {
+      const member = await svc.reactivate(ctx.tenant.id, b.id);
+      return NextResponse.json({ member });
+    }
     if (typeof b.role === "string") {
       const member = await svc.updateRole(ctx.tenant.id, b.id, b.role as TeamMemberRole);
       return NextResponse.json({ member });

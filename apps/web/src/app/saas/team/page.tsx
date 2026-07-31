@@ -8,13 +8,6 @@ import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 type Role = "owner" | "admin" | "manager" | "user" | "viewer";
 type MemberStatus = "active" | "invited" | "suspended";
 
-interface Permission {
-  module: string;
-  read: boolean;
-  write: boolean;
-  delete: boolean;
-}
-
 interface TeamMember {
   id: string;
   name: string;
@@ -23,14 +16,23 @@ interface TeamMember {
   status: MemberStatus;
   avatar: string;
   lastActive: string | null;
-  permissions: Permission[];
+}
+
+/** Shape returned by GET /api/saas/team (SaasTeamService). */
+interface ApiTeamMember {
+  id: string;
+  email: string;
+  name: string | null;
+  role: Role;
+  status: MemberStatus;
+  lastActiveAt?: string | null;
 }
 
 const ROLE_CONFIG: Record<Role, { label: string; color: string; description: string }> = {
-  owner: { label: "Propietario", color: "text-amber-400 bg-amber-500/10 border-amber-500/20", description: "Acceso total. No se puede modificar." },
-  admin: { label: "Administrador", color: "text-purple-400 bg-purple-500/10 border-purple-500/20", description: "Acceso completo excepto billing y configuración de cuenta." },
-  manager: { label: "Manager", color: "text-blue-400 bg-blue-500/10 border-blue-500/20", description: "Gestiona CRM, campañas y puede ver reportes." },
-  user: { label: "Usuario", color: "text-green-400 bg-green-500/10 border-green-500/20", description: "Acceso a módulos asignados sin configuración." },
+  owner: { label: "Propietario", color: "text-warning bg-warning/10 border-warning/20", description: "Acceso total. No se puede modificar." },
+  admin: { label: "Administrador", color: "text-primary bg-primary/10 border-primary/20", description: "Acceso completo excepto billing y configuración de cuenta." },
+  manager: { label: "Manager", color: "text-primary bg-primary/10 border-primary/20", description: "Gestiona CRM, campañas y puede ver reportes." },
+  user: { label: "Usuario", color: "text-success bg-success/10 border-success/20", description: "Acceso a módulos asignados sin configuración." },
   viewer: { label: "Solo lectura", color: "text-muted-foreground bg-muted/30 border-border", description: "Puede ver pero no modificar datos." },
 };
 
@@ -40,7 +42,6 @@ const STATUS_CONFIG: Record<MemberStatus, { label: string; tone: "success" | "wa
   suspended: { label: "Suspendido", tone: "danger" },
 };
 
-
 const ROLE_PERMISSIONS: Record<Role, string[]> = {
   owner: ["Todo"],
   admin: ["CRM", "Campañas", "Workflows", "Funnels", "Reportes", "Integraciones", "Equipo"],
@@ -49,21 +50,48 @@ const ROLE_PERMISSIONS: Record<Role, string[]> = {
   viewer: ["Dashboard (solo vista)", "Reportes (solo vista)"],
 };
 
+function initialsFrom(name: string, email: string): string {
+  const base = name.trim() || email;
+  const parts = base.split(/[\s@._-]+/).filter(Boolean);
+  const letters = parts.slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("");
+  return letters || "?";
+}
+
+function mapApiMember(m: ApiTeamMember): TeamMember {
+  const name = (m.name ?? "").trim() || m.email;
+  return {
+    id: m.id,
+    name,
+    email: m.email,
+    role: m.role,
+    status: m.status,
+    avatar: initialsFrom(name, m.email),
+    lastActive: m.lastActiveAt ?? null,
+  };
+}
+
 function InviteMemberModal({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<Role>("user");
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function invite(e: React.FormEvent) {
     e.preventDefault();
     setSending(true);
+    setError(null);
     try {
-      await fetch("/api/saas/team", {
+      const res = await fetch("/api/saas/team", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, role }),
+        body: JSON.stringify({ email, name: name.trim() || null, role }),
       });
+      const d = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(d.error ?? "No se pudo enviar la invitación");
+        return;
+      }
       onClose();
     } finally {
       setSending(false);
@@ -75,25 +103,26 @@ function InviteMemberModal({ onClose }: { onClose: () => void }) {
       <div className="w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-lg font-semibold text-foreground">Invitar miembro</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={invite} className="space-y-4 p-6">
+          {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="Nombre y apellidos"
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre y apellidos"
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Email *</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@empresa.com"
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@empresa.com" required
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
             </div>
           </div>
           <div>
             <label className="mb-2 block text-xs font-medium text-muted-foreground">Rol</label>
             <div className="space-y-2">
-              {(["admin", "manager", "user", "viewer"] as Role[]).map(r => {
+              {(["admin", "manager", "user", "viewer"] as Role[]).map((r) => {
                 const rc = ROLE_CONFIG[r];
                 return (
                   <label key={r} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${role === r ? "border-primary bg-primary/5" : "border-border hover:bg-muted/10"}`}>
@@ -118,6 +147,66 @@ function InviteMemberModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function EditRoleModal({ member, onClose, onSaved }: { member: TeamMember; onClose: () => void; onSaved: () => void }) {
+  const [role, setRole] = useState<Role>(member.role === "owner" ? "admin" : member.role);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/saas/team", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: member.id, role }),
+      });
+      const d = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(d.error ?? "No se pudo actualizar el rol");
+        return;
+      }
+      onSaved();
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="text-lg font-semibold text-foreground">Editar rol — {member.name}</h2>
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+        </div>
+        <form onSubmit={save} className="space-y-4 p-6">
+          {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
+          <div className="space-y-2">
+            {(["admin", "manager", "user", "viewer"] as Role[]).map((r) => {
+              const rc = ROLE_CONFIG[r];
+              return (
+                <label key={r} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${role === r ? "border-primary bg-primary/5" : "border-border"}`}>
+                  <input type="radio" name="edit-role" value={r} checked={role === r} onChange={() => setRole(r)} className="mt-0.5 accent-primary" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{rc.label}</p>
+                    <p className="text-xs text-muted-foreground">{rc.description}</p>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+          <div className="flex gap-3 pt-2">
+            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Guardar rol"}</NelvyonDsButton>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function timeAgo(iso: string) {
   const d = Date.now() - new Date(iso).getTime();
   if (d < 3600000) return `Hace ${Math.floor(d / 60000)}min`;
@@ -129,15 +218,16 @@ export default function SaasTeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInvite, setShowInvite] = useState(false);
-  const [_selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/saas/team");
       if (res.ok) {
-        const d = (await res.json()) as { members?: TeamMember[] };
-        setMembers(d.members ?? []);
+        const d = (await res.json()) as { members?: ApiTeamMember[] };
+        setMembers((d.members ?? []).map(mapApiMember));
       } else {
         setMembers([]);
       }
@@ -151,153 +241,167 @@ export default function SaasTeamPage() {
   useEffect(() => { void load(); }, [load]);
 
   async function suspendMember(id: string) {
-    const member = members.find(m => m.id === id);
+    const member = members.find((m) => m.id === id);
     if (!member) return;
-    const newStatus = member.status === "suspended" ? "active" : "suspended";
-    setMembers(prev => prev.map(m => m.id === id ? { ...m, status: newStatus } : m));
-    await fetch("/api/saas/team", {
-      method: "POST",
+    const action = member.status === "suspended" ? "reactivate" : "suspend";
+    setActionError(null);
+    const res = await fetch("/api/saas/team", {
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, action: newStatus === "suspended" ? "suspend" : "reactivate" }),
+      body: JSON.stringify({ id, action }),
     });
+    if (!res.ok) {
+      const d = (await res.json().catch(() => ({}))) as { error?: string };
+      setActionError(d.error ?? "No se pudo actualizar el estado del miembro");
+      return;
+    }
+    void load();
   }
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="team" />}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader title="Gestión de Equipo" subtitle="Invita colaboradores y controla sus permisos por módulo y rol" />
-              <NelvyonDsButton onClick={() => setShowInvite(true)}>+ Invitar miembro</NelvyonDsButton>
-            </div>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <NelvyonDsSectionHeader title="Gestión de Equipo" subtitle="Invita colaboradores y controla sus permisos por módulo y rol" />
+        <NelvyonDsButton onClick={() => setShowInvite(true)}>+ Invitar miembro</NelvyonDsButton>
+      </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { label: "Total miembros", value: members.length },
-                { label: "Activos", value: members.filter(m => m.status === "active").length },
-                { label: "Invitaciones pendientes", value: members.filter(m => m.status === "invited").length },
-                { label: "Roles distintos", value: new Set(members.map(m => m.role)).size },
-              ].map(({ label, value }) => (
-                <NelvyonDsCard key={label} className="p-4">
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-                </NelvyonDsCard>
+      {actionError && (
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>
+      )}
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: "Total miembros", value: members.length },
+          { label: "Activos", value: members.filter((m) => m.status === "active").length },
+          { label: "Invitaciones pendientes", value: members.filter((m) => m.status === "invited").length },
+          { label: "Roles distintos", value: new Set(members.map((m) => m.role)).size },
+        ].map(({ label, value }) => (
+          <NelvyonDsCard key={label} className="p-4">
+            <p className="text-xs text-muted-foreground">{label}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
+          </NelvyonDsCard>
+        ))}
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {(Object.entries(ROLE_CONFIG) as [Role, typeof ROLE_CONFIG[Role]][]).map(([role, rc]) => {
+          const count = members.filter((m) => m.role === role).length;
+          return (
+            <NelvyonDsCard key={role} className={`border p-3 ${rc.color}`}>
+              <p className="text-xs font-medium">{rc.label}</p>
+              <p className="mt-1 text-2xl font-bold">{count}</p>
+              <p className="mt-1 text-[10px] opacity-70">{rc.description.substring(0, 40)}…</p>
+            </NelvyonDsCard>
+          );
+        })}
+      </div>
+
+      {loading ? (
+        <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-muted/30" />)}</div>
+      ) : members.length === 0 ? (
+        <NelvyonDsCard className="p-16 text-center">
+          <p className="text-5xl">👥</p>
+          <p className="mt-4 text-lg font-semibold text-foreground">Sin miembros de equipo</p>
+          <p className="mt-2 text-sm text-muted-foreground">Invita a tu primer colaborador y asígnale un rol con permisos granulares</p>
+          <NelvyonDsButton className="mt-5" onClick={() => setShowInvite(true)}>+ Invitar miembro</NelvyonDsButton>
+        </NelvyonDsCard>
+      ) : (
+        <NelvyonDsCard className="overflow-hidden p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/20">
+                  {["Miembro", "Rol", "Estado", "Acceso a", "Última actividad", "Acciones"].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {members.map((member) => {
+                  const rc = ROLE_CONFIG[member.role] ?? ROLE_CONFIG.user;
+                  const sc = STATUS_CONFIG[member.status] ?? STATUS_CONFIG.invited;
+                  return (
+                    <tr key={member.id} className="hover:bg-muted/10 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">{member.avatar}</div>
+                          <div>
+                            <p className="font-medium text-foreground">{member.name}</p>
+                            <p className="text-xs text-muted-foreground">{member.email}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`rounded-md border px-2 py-0.5 text-xs font-medium ${rc.color}`}>{rc.label}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <NelvyonDsBadge tone={sc.tone}>{sc.label}</NelvyonDsBadge>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-xs text-muted-foreground max-w-48 truncate">{(ROLE_PERMISSIONS[member.role] ?? []).join(", ")}</p>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                        {member.lastActive ? timeAgo(member.lastActive) : "Nunca (pendiente)"}
+                      </td>
+                      <td className="px-4 py-3">
+                        {member.role !== "owner" && (
+                          <div className="flex gap-1.5">
+                            <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => setSelectedMember(member)}>✎ Editar</NelvyonDsButton>
+                            <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => void suspendMember(member.id)}>
+                              {member.status === "suspended" ? "Activar" : "Suspender"}
+                            </NelvyonDsButton>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </NelvyonDsCard>
+      )}
+
+      <NelvyonDsCard className="p-5">
+        <h3 className="mb-4 text-sm font-semibold text-foreground">Matriz de permisos por rol</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="pb-2 text-left text-muted-foreground">Módulo</th>
+                {(["owner", "admin", "manager", "user", "viewer"] as Role[]).map((r) => (
+                  <th key={r} className={`pb-2 text-center text-[11px] font-medium ${ROLE_CONFIG[r].color.split(" ")[0]}`}>{ROLE_CONFIG[r].label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/50">
+              {["CRM", "Campañas", "Workflows", "Pipeline", "Facturación", "Reportes", "Configuración", "Equipo"].map((mod) => (
+                <tr key={mod}>
+                  <td className="py-2 text-muted-foreground">{mod}</td>
+                  {(["owner", "admin", "manager", "user", "viewer"] as Role[]).map((r) => {
+                    const has = ROLE_PERMISSIONS[r].some((p) => p.toLowerCase().includes(mod.toLowerCase()) || p === "Todo");
+                    const partial = ROLE_PERMISSIONS[r].some((p) => p.includes(mod) && p.includes("vista"));
+                    return (
+                      <td key={r} className="py-2 text-center">
+                        {has && !partial ? <span className="text-success">✓</span> : partial ? <span className="text-warning">◑</span> : <span className="text-muted-foreground/40">–</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
               ))}
-            </div>
+            </tbody>
+          </table>
+        </div>
+      </NelvyonDsCard>
 
-            {/* Roles overview */}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              {(Object.entries(ROLE_CONFIG) as [Role, typeof ROLE_CONFIG[Role]][]).map(([role, rc]) => {
-                const count = members.filter(m => m.role === role).length;
-                return (
-                  <NelvyonDsCard key={role} className={`border p-3 ${rc.color}`}>
-                    <p className="text-xs font-medium">{rc.label}</p>
-                    <p className="mt-1 text-2xl font-bold">{count}</p>
-                    <p className="mt-1 text-[10px] opacity-70">{rc.description.substring(0, 40)}…</p>
-                  </NelvyonDsCard>
-                );
-              })}
-            </div>
-
-            {/* Members table */}
-            {loading ? (
-              <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-muted/30" />)}</div>
-            ) : members.length === 0 ? (
-              <NelvyonDsCard className="p-16 text-center">
-                <p className="text-5xl">👥</p>
-                <p className="mt-4 text-lg font-semibold text-foreground">Sin miembros de equipo</p>
-                <p className="mt-2 text-sm text-muted-foreground">Invita a tu primer colaborador y asígnale un rol con permisos granulares</p>
-                <NelvyonDsButton className="mt-5" onClick={() => setShowInvite(true)}>+ Invitar miembro</NelvyonDsButton>
-              </NelvyonDsCard>
-            ) : (
-            <NelvyonDsCard className="overflow-hidden p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/20">
-                      {["Miembro", "Rol", "Estado", "Acceso a", "Última actividad", "Acciones"].map(h => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {members.map(member => {
-                      const rc = ROLE_CONFIG[member.role];
-                      const sc = STATUS_CONFIG[member.status];
-                      return (
-                        <tr key={member.id} className="hover:bg-muted/10 transition-colors">
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">{member.avatar}</div>
-                              <div>
-                                <p className="font-medium text-foreground">{member.name}</p>
-                                <p className="text-xs text-muted-foreground">{member.email}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`rounded-md border px-2 py-0.5 text-xs font-medium ${rc.color}`}>{rc.label}</span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <NelvyonDsBadge tone={sc.tone}>{sc.label}</NelvyonDsBadge>
-                          </td>
-                          <td className="px-4 py-3">
-                            <p className="text-xs text-muted-foreground max-w-48 truncate">{ROLE_PERMISSIONS[member.role].join(", ")}</p>
-                          </td>
-                          <td className="px-4 py-3 text-xs text-muted-foreground">
-                            {member.lastActive ? timeAgo(member.lastActive) : "Nunca (pendiente)"}
-                          </td>
-                          <td className="px-4 py-3">
-                            {member.role !== "owner" && (
-                              <div className="flex gap-1.5">
-                                <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => setSelectedMember(member)}>✎ Editar</NelvyonDsButton>
-                                <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => suspendMember(member.id)}>
-                                  {member.status === "suspended" ? "Activar" : "Suspender"}
-                                </NelvyonDsButton>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </NelvyonDsCard>
-            )}
-
-            {/* Permissions info */}
-            <NelvyonDsCard className="p-5">
-              <h3 className="mb-4 text-sm font-semibold text-foreground">Matriz de permisos por rol</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="pb-2 text-left text-muted-foreground">Módulo</th>
-                      {(["owner", "admin", "manager", "user", "viewer"] as Role[]).map(r => (
-                        <th key={r} className={`pb-2 text-center text-[11px] font-medium ${ROLE_CONFIG[r].color.split(" ")[0]}`}>{ROLE_CONFIG[r].label}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {["CRM", "Campañas", "Workflows", "Pipeline", "Facturación", "Reportes", "Configuración", "Equipo"].map(mod => (
-                      <tr key={mod}>
-                        <td className="py-2 text-muted-foreground">{mod}</td>
-                        {(["owner", "admin", "manager", "user", "viewer"] as Role[]).map(r => {
-                          const has = ROLE_PERMISSIONS[r].some(p => p.toLowerCase().includes(mod.toLowerCase()) || p === "Todo");
-                          const partial = ROLE_PERMISSIONS[r].some(p => p.includes(mod) && p.includes("vista"));
-                          return (
-                            <td key={r} className="py-2 text-center">
-                              {has && !partial ? <span className="text-green-400">✓</span> : partial ? <span className="text-yellow-400">◑</span> : <span className="text-muted-foreground/40">–</span>}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </NelvyonDsCard>
       {showInvite && <InviteMemberModal onClose={() => { setShowInvite(false); void load(); }} />}
+      {selectedMember && (
+        <EditRoleModal
+          member={selectedMember}
+          onClose={() => setSelectedMember(null)}
+          onSaved={() => void load()}
+        />
+      )}
     </SaasShellLayout>
   );
 }

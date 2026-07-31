@@ -114,11 +114,25 @@ export class SaasTeamService {
   async suspend(tenantId: string, id: string): Promise<SaasTeamMember> {
     const rows = await this.db.query<MemberRow>(
       `UPDATE team_members SET status='suspended', updated_at=NOW()
-       WHERE tenant_id=$1 AND id=$2
+       WHERE tenant_id=$1 AND id=$2 AND role != 'owner'
        RETURNING id, tenant_id, user_id, email, name, role, status, last_active_at, created_at, updated_at`,
       [tenantId, id],
     );
-    if (!rows[0]) throw new SaasTeamError("Member not found", "NOT_FOUND");
+    if (!rows[0]) throw new SaasTeamError("Member not found or cannot suspend owner", "FORBIDDEN");
+    return rowToMember(rows[0]);
+  }
+
+  /** Restaura un miembro suspendido: `active` si ya aceptó, `invited` si aún no. */
+  async reactivate(tenantId: string, id: string): Promise<SaasTeamMember> {
+    const rows = await this.db.query<MemberRow>(
+      `UPDATE team_members
+       SET status = CASE WHEN user_id IS NOT NULL THEN 'active' ELSE 'invited' END,
+           updated_at = NOW()
+       WHERE tenant_id=$1 AND id=$2 AND status='suspended' AND role != 'owner'
+       RETURNING id, tenant_id, user_id, email, name, role, status, last_active_at, created_at, updated_at`,
+      [tenantId, id],
+    );
+    if (!rows[0]) throw new SaasTeamError("Member not found or not suspended", "NOT_FOUND");
     return rowToMember(rows[0]);
   }
 

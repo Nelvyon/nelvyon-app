@@ -33,9 +33,9 @@ interface SubcuentaUsage {
 }
 
 const PLAN_CFG: Record<SubcuentaPlan, { label: string; color: string }> = {
-  starter: { label: "Starter", color: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-  pro:     { label: "Pro",     color: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-  agency:  { label: "Agency",  color: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
+  starter: { label: "Starter", color: "bg-primary/10 text-primary border-primary/20" },
+  pro:     { label: "Pro",     color: "bg-primary/10 text-primary border-primary/20" },
+  agency:  { label: "Agency",  color: "bg-warning/10 text-warning border-warning/20" },
 };
 
 const STATUS_CFG: Record<SubcuentaStatus, { label: string; tone: "success" | "danger" | "warning" }> = {
@@ -77,7 +77,7 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={save} className="space-y-4 p-6">
-          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+          {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre de la cuenta *</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Agencia Cliente SL"
@@ -186,7 +186,7 @@ function TwilioRebillingPanel() {
   useEffect(() => { void load(); }, [load]);
 
   return (
-    <NelvyonDsCard className="p-5 border-amber-500/20 bg-amber-500/5">
+    <NelvyonDsCard className="p-5 border-warning/20 bg-warning/5">
       <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
         <div>
           <p className="font-semibold text-foreground">📱 Twilio rebilling (3× markup)</p>
@@ -350,7 +350,7 @@ export default function SaasSubcuentasPage() {
                           <NelvyonDsButton className="text-xs" disabled={isBusy} onClick={() => void doAction("reactivate", sub.id)}>
                             {isBusy ? "…" : "Reactivar"}
                           </NelvyonDsButton>
-                          <button className="text-xs text-red-400 hover:text-red-300" disabled={isBusy} onClick={() => void doCancel(sub.id)}>
+                          <button className="text-xs text-destructive hover:text-destructive/80" disabled={isBusy} onClick={() => void doCancel(sub.id)}>
                             Cancelar
                           </button>
                         </>

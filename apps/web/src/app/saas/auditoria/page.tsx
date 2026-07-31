@@ -83,8 +83,13 @@ export default function SaasAuditoriaPage() {
   useEffect(() => { void load(); }, [load]);
 
   function applyFilters() {
+    if (page !== 1) setPage(1);
+    else void load();
+  }
+
+  function setFilterAndResetPage(setter: (v: string) => void, value: string) {
     setPage(1);
-    void load();
+    setter(value);
   }
 
   async function exportCsv() {
@@ -144,7 +149,7 @@ export default function SaasAuditoriaPage() {
       <div className="flex flex-wrap gap-3">
         <select
           value={filterModule}
-          onChange={e => setFilterModule(e.target.value)}
+          onChange={(e) => setFilterAndResetPage(setFilterModule, e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
         >
           <option value="">Todos los módulos</option>
@@ -152,7 +157,7 @@ export default function SaasAuditoriaPage() {
         </select>
         <select
           value={filterAction}
-          onChange={e => setFilterAction(e.target.value)}
+          onChange={(e) => setFilterAndResetPage(setFilterAction, e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
         >
           <option value="">Todas las acciones</option>
@@ -161,12 +166,12 @@ export default function SaasAuditoriaPage() {
           ))}
         </select>
         <input
-          type="date" value={from} onChange={e => setFrom(e.target.value)}
+          type="date" value={from} onChange={(e) => setFilterAndResetPage(setFrom, e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
           title="Desde"
         />
         <input
-          type="date" value={to} onChange={e => setTo(e.target.value)}
+          type="date" value={to} onChange={(e) => setFilterAndResetPage(setTo, e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
           title="Hasta"
         />

@@ -55,4 +55,26 @@ describe("SaasTeamService", () => {
     const svc = new SaasTeamService(db);
     await expect(svc.remove(TENANT, "owner-id")).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
+
+  it("suspend marks member suspended", async () => {
+    const db = makeDb([[{ ...memberRow, status: "suspended", user_id: "u1" }]]);
+    const svc = new SaasTeamService(db);
+    const m = await svc.suspend(TENANT, "m1");
+    expect(m.status).toBe("suspended");
+    expect(db.query).toHaveBeenCalled();
+  });
+
+  it("reactivate restores invited when no user_id", async () => {
+    const db = makeDb([[{ ...memberRow, status: "invited", user_id: null }]]);
+    const svc = new SaasTeamService(db);
+    const m = await svc.reactivate(TENANT, "m1");
+    expect(m.status).toBe("invited");
+  });
+
+  it("reactivate restores active when user_id present", async () => {
+    const db = makeDb([[{ ...memberRow, status: "active", user_id: "u1" }]]);
+    const svc = new SaasTeamService(db);
+    const m = await svc.reactivate(TENANT, "m1");
+    expect(m.status).toBe("active");
+  });
 });
