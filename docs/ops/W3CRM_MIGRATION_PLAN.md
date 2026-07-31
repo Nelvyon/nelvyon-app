@@ -980,3 +980,25 @@ tsc/eslint/build **PASS** · commit `860a2016` · `claimReady: false` · canary 
 ### 32.3 Próximo
 
 Pasada 2 de auditoría (duplicados DS, a11y residual, IA polish menor) hasta que no queden mejoras razonables de alto impacto; entonces informe final con evidencia. **No** flip claimReady.
+
+---
+
+## 33. Auditoría global SaaS — pasada 2 (2026-07-31)
+
+### 33.1 Resultado
+
+Barrido residual en `/saas/*`: **0** `alert(`/`console.log|debug|warn`; **0** onClick vacío detectado; **sin P0/P1 nuevos** de alto impacto tras pasada 1.
+
+### 33.2 Evidencia acumulada
+
+| Gate | Estado |
+|---|---|
+| tsc / ESLint / build | **PASS** |
+| vitest | hasta **2480** passed / 4 skipped |
+| smoke | **307 / 401** |
+| Staging visual | **BLOCKED_ENVIRONMENT** |
+| claimReady / canary | **false** / **KILL** |
+
+### 33.3 Próximo paso EXACTO
+
+Mantener `claimReady: false`. No prod deploy UI. Staging visual opcional con DB.
