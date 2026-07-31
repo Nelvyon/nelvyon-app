@@ -877,3 +877,33 @@ helpdesk (macros CRUD + errores), documentos (contact/value), encuestas (errores
 ### 28.5 Próximo módulo
 
 **Gestión operativa P1** — helpdesk, documentos, encuestas, prospecting, objetos.
+
+---
+
+## 29. Módulo 17b — Gestión operativa P1 (2026-07-31)
+
+### 29.1 Alcance
+
+`/saas/objetos`, `/saas/documentos`, `/saas/helpdesk`, `/saas/encuestas`, `/saas/prospecting`.
+
+### 29.2 Causas raíz corregidas
+
+- **Objetos (P0):** botón «Ver registros» sin handler; create sin `res.ok` cierra modal en fallo; UI leía `recordCount` vs API `recordsCount`; tipos `file`/`relation`/`color` no existen en backend. **Fix:** panel registros (list/create/delete), errores visibles, campos alineados al servicio, delete objeto, sin color inventado.
+- **Documentos (P0/P1):** KPI «Valor firmado» y columnas Cliente/Valor/Enviado inventados (`value`/`clientName`/`sentAt` no existen). **Fix:** KPIs reales (incl. expirados); contacto por `contactId`; delete borrador; sin campos fantasma.
+- **Helpdesk (P1):** `sendMessage`/`changeStatus`/`applyMacro` sin comprobar `res.ok`. **Fix:** errores visibles + nota interna `is_internal` + load error.
+- **Encuestas (P1/P2):** activate/create/share silenciosos; sin delete/disable_share. **Fix:** error handling + desactivar + eliminar + revocar enlace.
+- **Prospecting (P1):** search/sync silenciosos; sync optimista; guarda `configured === false` insuficiente. **Fix:** errores visibles; sync solo tras `ok`; search requiere `configured === true`; badges DS.
+
+### 29.3 Evidencia
+
+| Verificación | Resultado |
+|---|---|
+| tsc / ESLint | **PASS** |
+| vitest | **PASS** — **2480 / 4 skipped** |
+| build | **PASS** |
+| smoke pages/APIs | **307 / 401** |
+| Staging | **BLOCKED_ENVIRONMENT** |
+
+### 29.4 Próximo módulo
+
+**Cuenta / plataforma SaaS** — settings, integraciones, marketplace, herramientas, voice, PWA, lead-scoring, comunidades, partner, white-label, webhooks, api-keys, entregables (por lotes priorizados).

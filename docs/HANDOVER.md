@@ -1,20 +1,20 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 17 P0 countdown/snippets/AB/QR** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §28 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
+> Última actualización: **2026-07-31** — **W3CRM Fase 2: módulo 17b P1 gestión operativa** · `docs/ops/W3CRM_MIGRATION_PLAN.md` §29 · prod tip **`3f10c272`** · canary **KILL** · `claimReady: false`
 
 | Campo | Valor |
 |-------|-------|
 | **Tip prod live** | `3f10c272` |
-| **Calidad** | tsc/lint/build **PASS** · vitest **2480 passed / 4 skipped** |
-| **W3CRM** | Módulos 1–16 **DONE** · módulo 17 **P0 DONE** (countdown/snippets/ab-testing/qr). P1 pendiente: helpdesk, documentos, encuestas, prospecting, objetos. Ver §28 |
+| **Calidad** | tsc/lint/build **PASS** · vitest **2480 passed / 4 skipped** · smoke 307/401 |
+| **W3CRM** | Módulos 1–17b **DONE** (gestión operativa completa P0+P1). Siguiente: cuenta/plataforma SaaS + IA polish + auditoría global. Ver §29 |
 | **claimReady** | **false** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Continuar automáticamente con **módulo 17b — Gestión operativa P1** (helpdesk, documentos, encuestas, prospecting, objetos) — no esperar confirmación salvo irreversible/coste/credenciales.
-2. Luego resto cuenta/IA pendientes + auditoría global SaaS.
+1. Continuar automáticamente con **módulo 18 — Cuenta / plataforma** (settings, integraciones, marketplace, api-keys, webhooks, white-label, partner, lead-scoring, voice, PWA, comunidades, herramientas, entregables) — lotes P0 primero.
+2. Luego polish IA (packs, playbooks, brief-to-launch, compliance, benchmark, copywriter) + **auditoría global SaaS**.
 3. No prod deploy UI · no flip claimReady · canary KILL.
 
 ### Rollback IA / spend
