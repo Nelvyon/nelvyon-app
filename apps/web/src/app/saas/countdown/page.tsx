@@ -1,24 +1,30 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
+import {
+  NelvyonDsBadge,
+  NelvyonDsButton,
+  NelvyonDsCard,
+  NelvyonDsSectionHeader,
+} from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
 type TimerType = "datetime" | "duration" | "evergreen";
+type CountdownAction = "hide" | "show_message" | "redirect";
 
 interface CountdownTimer {
   id: string;
   name: string;
   type: TimerType;
-  targetDate: string | null;
-  durationMinutes: number | null;
-  evergreenMinutes: number | null;
-  redirectUrl: string | null;
-  theme: "dark" | "light" | "minimal";
-  embedCode: string;
-  active: boolean;
-  views: number;
+  targetDatetime: string | null;
+  durationSeconds: number | null;
+  evergreenSeconds: number | null;
+  timezone: string;
+  actionOnEnd: CountdownAction;
+  actionValue: string | null;
+  scans: number;
   createdAt: string;
 }
 
@@ -28,56 +34,103 @@ const TYPE_LABEL: Record<TimerType, string> = {
   evergreen: "Evergreen (por visitante)",
 };
 
-const THEMES = ["dark", "light", "minimal"] as const;
+function embedSnippet(id: string): string {
+  const base = typeof window !== "undefined" ? window.location.origin : "https://app.nelvyon.com";
+  return `<div data-nelvyon-countdown="${id}"></div><script src="${base}/embed/countdown.js" async></script>`;
+}
 
-
-function LiveClock({ targetDate }: { targetDate: string }) {
+function LiveClock({ targetDatetime }: { targetDatetime: string }) {
   const [remaining, setRemaining] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
   useEffect(() => {
     function update() {
-      const diff = Math.max(0, new Date(targetDate).getTime() - Date.now());
+      const diff = Math.max(0, new Date(targetDatetime).getTime() - Date.now());
       const s = Math.floor(diff / 1000);
-      setRemaining({ d: Math.floor(s / 86400), h: Math.floor((s % 86400) / 3600), m: Math.floor((s % 3600) / 60), s: s % 60 });
+      setRemaining({
+        d: Math.floor(s / 86400),
+        h: Math.floor((s % 86400) / 3600),
+        m: Math.floor((s % 3600) / 60),
+        s: s % 60,
+      });
     }
     update();
     const iv = setInterval(update, 1000);
     return () => clearInterval(iv);
-  }, [targetDate]);
+  }, [targetDatetime]);
 
   return (
     <div className="flex gap-2 text-center">
-      {[["d", remaining.d], ["h", remaining.h], ["m", remaining.m], ["s", remaining.s]].map(([label, val]) => (
-        <div key={label as string} className="flex flex-col">
+      {(
+        [
+          ["d", remaining.d],
+          ["h", remaining.h],
+          ["m", remaining.m],
+          ["s", remaining.s],
+        ] as const
+      ).map(([label, val]) => (
+        <div key={label} className="flex flex-col">
           <span className="text-xl font-bold tabular-nums text-foreground">{String(val).padStart(2, "0")}</span>
-          <span className="text-[10px] text-muted-foreground uppercase">{label}</span>
+          <span className="text-[10px] uppercase text-muted-foreground">{label}</span>
         </div>
       ))}
     </div>
   );
 }
 
-function CreateModal({ onClose }: { onClose: () => void }) {
+function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState("");
   const [type, setType] = useState<TimerType>("datetime");
-  const [targetDate, setTargetDate] = useState("");
+  const [targetDatetime, setTargetDatetime] = useState("");
   const [durationH, setDurationH] = useState(48);
   const [evergreenMin, setEvergreenMin] = useState(20);
-  const [theme, setTheme] = useState<"dark" | "light" | "minimal">("dark");
   const [redirectUrl, setRedirectUrl] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (!name.trim()) {
+      setError("El nombre es obligatorio");
+      return;
+    }
     setSaving(true);
+    setError(null);
     try {
-      await fetch("/api/saas/countdown", {
+      const body: Record<string, unknown> = {
+        name: name.trim(),
+        type,
+        actionOnEnd: redirectUrl.trim() ? "redirect" : "hide",
+        actionValue: redirectUrl.trim() || null,
+      };
+      if (type === "datetime") {
+        if (!targetDatetime) {
+          setError("Fecha objetivo obligatoria");
+          setSaving(false);
+          return;
+        }
+        body.targetDatetime = new Date(targetDatetime).toISOString();
+      } else if (type === "duration") {
+        body.durationSeconds = Math.max(1, durationH) * 3600;
+      } else {
+        body.evergreenSeconds = Math.max(1, evergreenMin) * 60;
+      }
+
+      const res = await fetch("/api/saas/countdown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, type, targetDate: type === "datetime" ? targetDate : null, durationMinutes: type === "duration" ? durationH * 60 : null, evergreenMinutes: type === "evergreen" ? evergreenMin : null, theme, redirectUrl }),
+        body: JSON.stringify(body),
       });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(d.error ?? `HTTP ${res.status}`);
+      }
+      onCreated();
       onClose();
-    } finally { setSaving(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al crear");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -85,20 +138,40 @@ function CreateModal({ onClose }: { onClose: () => void }) {
       <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-lg font-semibold text-foreground">Nuevo temporizador</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            ✕
+          </button>
         </div>
-        <form onSubmit={save} className="space-y-4 p-6">
+        <form onSubmit={(e) => void save(e)} className="space-y-4 p-6">
+          {error && (
+            <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+              {error}
+            </p>
+          )}
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Black Friday 2026"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ej: Black Friday 2026"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+              required
+            />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Tipo</label>
             <div className="grid grid-cols-3 gap-2">
-              {(Object.keys(TYPE_LABEL) as TimerType[]).map(t => (
-                <button key={t} type="button" onClick={() => setType(t)}
-                  className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${type === t ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
+              {(Object.keys(TYPE_LABEL) as TimerType[]).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setType(t)}
+                  className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                    type === t
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/50"
+                  }`}
+                >
                   {TYPE_LABEL[t]}
                 </button>
               ))}
@@ -107,43 +180,57 @@ function CreateModal({ onClose }: { onClose: () => void }) {
           {type === "datetime" && (
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Fecha y hora objetivo</label>
-              <input type="datetime-local" value={targetDate} onChange={e => setTargetDate(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+              <input
+                type="datetime-local"
+                value={targetDatetime}
+                onChange={(e) => setTargetDatetime(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+                required
+              />
             </div>
           )}
           {type === "duration" && (
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Duración (horas)</label>
-              <input type="number" min={1} max={720} value={durationH} onChange={e => setDurationH(Number(e.target.value))}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+              <input
+                type="number"
+                min={1}
+                max={720}
+                value={durationH}
+                onChange={(e) => setDurationH(Number(e.target.value))}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+              />
             </div>
           )}
           {type === "evergreen" && (
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Minutos por visitante</label>
-              <input type="number" min={1} max={10080} value={evergreenMin} onChange={e => setEvergreenMin(Number(e.target.value))}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+              <input
+                type="number"
+                min={1}
+                max={10080}
+                value={evergreenMin}
+                onChange={(e) => setEvergreenMin(Number(e.target.value))}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+              />
             </div>
           )}
           <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Tema visual</label>
-            <div className="flex gap-2">
-              {THEMES.map(th => (
-                <button key={th} type="button" onClick={() => setTheme(th)}
-                  className={`flex-1 rounded-lg border px-3 py-2 text-xs capitalize font-medium transition-colors ${theme === th ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}>
-                  {th}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">URL de redirección (opcional)</label>
-            <input value={redirectUrl} onChange={e => setRedirectUrl(e.target.value)} placeholder="https://..."
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            <input
+              value={redirectUrl}
+              onChange={(e) => setRedirectUrl(e.target.value)}
+              placeholder="https://..."
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            />
           </div>
           <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Creando…" : "Crear temporizador"}</NelvyonDsButton>
+            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">
+              Cancelar
+            </NelvyonDsButton>
+            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">
+              {saving ? "Creando…" : "Crear temporizador"}
+            </NelvyonDsButton>
           </div>
         </form>
       </div>
@@ -154,102 +241,174 @@ function CreateModal({ onClose }: { onClose: () => void }) {
 export default function SaasCountdownPage() {
   const [timers, setTimers] = useState<CountdownTimer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/saas/countdown");
-      if (res.ok) {
-        const d = (await res.json()) as { timers?: CountdownTimer[] };
-        setTimers(d.timers ?? []);
-      } else setTimers([]);
-    } catch { setTimers([]); }
-    finally { setLoading(false); }
+      if (!res.ok) {
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(d.error ?? `HTTP ${res.status}`);
+      }
+      const d = (await res.json()) as { timers?: CountdownTimer[] };
+      setTimers(d.timers ?? []);
+    } catch (e) {
+      setTimers([]);
+      setError(e instanceof Error ? e.message : "Error al cargar");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   function copyEmbed(timer: CountdownTimer) {
-    void navigator.clipboard.writeText(timer.embedCode);
+    void navigator.clipboard.writeText(embedSnippet(timer.id));
     setCopiedId(timer.id);
     setTimeout(() => setCopiedId(null), 1500);
   }
 
+  async function removeTimer(id: string) {
+    if (!confirm("¿Eliminar este temporizador?")) return;
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/saas/countdown?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(d.error ?? `HTTP ${res.status}`);
+      }
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al eliminar");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  const totalScans = timers.reduce((s, t) => s + t.scans, 0);
+
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="countdown" />}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader title="Temporizadores de Cuenta Atrás" subtitle="Crea urgencia en tus emails, landings y embudos con contadores personalizables" />
-              <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nuevo temporizador</NelvyonDsButton>
-            </div>
+      <div className="flex flex-col gap-6 pb-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <NelvyonDsSectionHeader
+            title="Temporizadores de Cuenta Atrás"
+            subtitle="Crea urgencia en emails, landings y embudos con contadores personalizables"
+          />
+          <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nuevo temporizador</NelvyonDsButton>
+        </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: "Temporizadores activos", value: timers.filter(t => t.active).length },
-                { label: "Total vistas", value: timers.reduce((s, t) => s + t.views, 0).toLocaleString("es-ES") },
-                { label: "Total creados", value: timers.length },
-              ].map(({ label, value }) => (
-                <NelvyonDsCard key={label} className="p-4">
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-                </NelvyonDsCard>
-              ))}
-            </div>
+        {error && (
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
+            {error}
+          </p>
+        )}
 
-            {loading ? (
-              <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-40 animate-pulse rounded-xl bg-muted/30" />)}</div>
-            ) : timers.length === 0 ? (
-              <NelvyonDsCard className="p-16 text-center">
-                <p className="text-5xl">⏱️</p>
-                <p className="mt-4 text-lg font-semibold text-foreground">Sin temporizadores</p>
-                <p className="mt-2 text-sm text-muted-foreground">Los temporizadores crean urgencia y aumentan las conversiones hasta un 27%</p>
-                <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>+ Crear temporizador</NelvyonDsButton>
-              </NelvyonDsCard>
-            ) : (
-              <div className="space-y-4">
-                {timers.map(timer => (
-                  <NelvyonDsCard key={timer.id} className="p-5">
-                    <div className="flex flex-wrap items-start gap-4">
-                      <div className="flex-1 min-w-0 space-y-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold text-foreground">{timer.name}</h3>
-                          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${timer.active ? "bg-green-500/10 text-green-400" : "bg-muted/30 text-muted-foreground"}`}>
-                            {timer.active ? "Activo" : "Inactivo"}
-                          </span>
-                          <span className="rounded-md bg-muted/30 px-2 py-0.5 text-xs text-muted-foreground">{TYPE_LABEL[timer.type]}</span>
-                          <span className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground capitalize">{timer.theme}</span>
-                        </div>
-                        {timer.type === "datetime" && timer.targetDate && (
-                          <div className="flex items-center gap-3">
-                            <LiveClock targetDate={timer.targetDate} />
-                            <span className="text-xs text-muted-foreground">hasta {new Date(timer.targetDate).toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" })}</span>
-                          </div>
-                        )}
-                        {timer.type === "duration" && timer.durationMinutes && (
-                          <p className="text-sm text-muted-foreground">Duración: {timer.durationMinutes / 60}h desde el primer inicio</p>
-                        )}
-                        {timer.type === "evergreen" && timer.evergreenMinutes && (
-                          <p className="text-sm text-muted-foreground">Cuenta regresiva: {timer.evergreenMinutes} min por visitante único</p>
-                        )}
-                        <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/10 px-3 py-2">
-                          <code className="flex-1 truncate text-xs text-muted-foreground">{timer.embedCode}</code>
-                          <button onClick={() => copyEmbed(timer)} className="shrink-0 text-xs text-primary hover:underline">
-                            {copiedId === timer.id ? "✓ Copiado" : "Copiar"}
-                          </button>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-foreground">{timer.views.toLocaleString("es-ES")}</p>
-                        <p className="text-xs text-muted-foreground">vistas</p>
-                      </div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <KpiTile icon="⏱️" label="Temporizadores" value={timers.length} />
+          <KpiTile icon="👁️" label="Escaneos / vistas" value={totalScans.toLocaleString("es-ES")} accent />
+          <KpiTile
+            icon="📅"
+            label="Fecha fija"
+            value={timers.filter((t) => t.type === "datetime").length}
+          />
+        </div>
+
+        {loading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-40 animate-pulse rounded-xl bg-muted/30" />
+            ))}
+          </div>
+        ) : timers.length === 0 ? (
+          <NelvyonDsCard className="p-16 text-center">
+            <p className="text-lg font-semibold text-foreground">Sin temporizadores</p>
+            <p className="mt-2 text-sm text-muted-foreground">Crea el primero para embeberlo en landings o emails.</p>
+            <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>
+              + Crear temporizador
+            </NelvyonDsButton>
+          </NelvyonDsCard>
+        ) : (
+          <div className="space-y-4">
+            {timers.map((timer) => (
+              <NelvyonDsCard key={timer.id} className="p-5">
+                <div className="flex flex-wrap items-start gap-4">
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-semibold text-foreground">{timer.name}</h3>
+                      <NelvyonDsBadge tone="primary">{TYPE_LABEL[timer.type]}</NelvyonDsBadge>
+                      <NelvyonDsBadge tone="neutral">{timer.actionOnEnd}</NelvyonDsBadge>
                     </div>
-                  </NelvyonDsCard>
-                ))}
-              </div>
-            )}
-      {showModal && <CreateModal onClose={() => { setShowModal(false); void load(); }} />}
+                    {timer.type === "datetime" && timer.targetDatetime && (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <LiveClock targetDatetime={timer.targetDatetime} />
+                        <span className="text-xs text-muted-foreground">
+                          hasta{" "}
+                          {new Date(timer.targetDatetime).toLocaleString("es-ES", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    )}
+                    {timer.type === "duration" && timer.durationSeconds != null && (
+                      <p className="text-sm text-muted-foreground">
+                        Duración: {(timer.durationSeconds / 3600).toFixed(1)}h desde el primer inicio
+                      </p>
+                    )}
+                    {timer.type === "evergreen" && timer.evergreenSeconds != null && (
+                      <p className="text-sm text-muted-foreground">
+                        Cuenta regresiva: {Math.round(timer.evergreenSeconds / 60)} min por visitante
+                      </p>
+                    )}
+                    <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/10 px-3 py-2">
+                      <code className="flex-1 truncate text-xs text-muted-foreground">{embedSnippet(timer.id)}</code>
+                      <button
+                        type="button"
+                        onClick={() => copyEmbed(timer)}
+                        className="shrink-0 text-xs text-primary hover:underline"
+                      >
+                        {copiedId === timer.id ? "Copiado" : "Copiar"}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-foreground">{timer.scans.toLocaleString("es-ES")}</p>
+                      <p className="text-xs text-muted-foreground">escaneos</p>
+                    </div>
+                    <NelvyonDsButton
+                      size="sm"
+                      variant="ghost"
+                      disabled={busyId === timer.id}
+                      onClick={() => void removeTimer(timer.id)}
+                    >
+                      Eliminar
+                    </NelvyonDsButton>
+                  </div>
+                </div>
+              </NelvyonDsCard>
+            ))}
+          </div>
+        )}
+
+        {showModal && (
+          <CreateModal
+            onClose={() => setShowModal(false)}
+            onCreated={() => void load()}
+          />
+        )}
+      </div>
     </SaasShellLayout>
   );
 }

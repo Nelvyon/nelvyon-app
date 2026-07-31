@@ -58,6 +58,8 @@ export async function PUT(req: Request) {
       name: typeof b.name === "string" ? b.name : undefined,
       shortcut: typeof b.shortcut === "string" ? b.shortcut : undefined,
       content: typeof b.content === "string" ? b.content : undefined,
+      channels: Array.isArray(b.channels) ? b.channels.filter((x): x is string => typeof x === "string") : undefined,
+      variables: Array.isArray(b.variables) ? b.variables.filter((x): x is string => typeof x === "string") : undefined,
     });
     return NextResponse.json({ snippet });
   } catch (e: unknown) {

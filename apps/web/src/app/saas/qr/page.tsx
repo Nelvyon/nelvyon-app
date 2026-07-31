@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
@@ -19,44 +19,18 @@ interface QrCode {
 const QR_COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#3b82f6", "#ec4899", "#000000"];
 
 function QRCanvas({ url, color, size = 180 }: { url: string; color: string; size?: number }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, size, size);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, size, size);
-    const modules = 21;
-    const cellSize = (size - 20) / modules;
-    const offset = 10;
-    let hash = 0;
-    for (let i = 0; i < url.length; i++) hash = ((hash << 5) - hash + url.charCodeAt(i)) | 0;
-    ctx.fillStyle = color;
-    for (let r = 0; r < modules; r++) {
-      for (let c = 0; c < modules; c++) {
-        const isCorner = (r < 7 && c < 7) || (r < 7 && c >= modules - 7) || (r >= modules - 7 && c < 7);
-        const isCornerInner = (r >= 2 && r <= 4 && c >= 2 && c <= 4) || (r >= 2 && r <= 4 && c >= modules - 5 && c <= modules - 3) || (r >= modules - 5 && r <= modules - 3 && c >= 2 && c <= 4);
-        const isTiming = (r === 6 || c === 6) && !isCorner;
-        let fill = false;
-        if (isCorner) fill = !(r === 1 || r === 5 || c === 1 || c === 5) || isCornerInner;
-        else if (isTiming) fill = (r + c) % 2 === 0;
-        else fill = ((Math.abs(((hash * (r * 31 + c * 37)) >>> 0) % 3)) === 0);
-        if (fill) ctx.fillRect(offset + c * cellSize, offset + r * cellSize, cellSize - 1, cellSize - 1);
-      }
-    }
-    const lx = size / 2 - 12, ly = size / 2 - 12;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(lx - 2, ly - 2, 28, 28);
-    ctx.fillStyle = color;
-    ctx.font = "bold 18px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("N", size / 2, size / 2 + 6);
-  }, [url, color, size]);
-
-  return <canvas ref={canvasRef} width={size} height={size} className="rounded-lg" />;
+  // Real scannable QR via QR Server (no fake hash pattern). Color as hex without '#'.
+  const fg = color.replace("#", "");
+  const src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}&color=${fg}&bgcolor=ffffff&margin=8`;
+  return (
+    <img
+      src={src}
+      alt={`Código QR para ${url}`}
+      width={size}
+      height={size}
+      className="rounded-lg border border-border bg-white"
+    />
+  );
 }
 
 function CreateQRModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
@@ -95,7 +69,7 @@ function CreateQRModal({ onClose, onSaved }: { onClose: () => void; onSaved: () 
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">x</button>
         </div>
         <form onSubmit={save} className="p-6">
-          {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+          {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">{error}</p>}
           <div className="flex gap-6">
             <div className="flex-1 space-y-4">
               <div>
@@ -138,17 +112,25 @@ export default function SaasQrPage() {
   const [qrs, setQrs] = useState<QrCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await fetch("/api/saas/surveys?type=qr");
-      if (res.ok) {
-        const d = (await res.json()) as { qrCodes?: QrCode[] };
-        setQrs(d.qrCodes ?? []);
-      } else setQrs([]);
-    } catch { setQrs([]); }
-    finally { setLoading(false); }
+      if (!res.ok) {
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(d.error ?? `HTTP ${res.status}`);
+      }
+      const d = (await res.json()) as { qrCodes?: QrCode[] };
+      setQrs(d.qrCodes ?? []);
+    } catch (e) {
+      setQrs([]);
+      setLoadError(e instanceof Error ? e.message : "Error al cargar");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
@@ -160,6 +142,12 @@ export default function SaasQrPage() {
           <NelvyonDsSectionHeader title="Codigos QR" subtitle="Genera QR personalizados con tu marca para campanas fisicas y digitales" />
           <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nuevo QR</NelvyonDsButton>
         </div>
+
+        {loadError && (
+          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
+            {loadError}
+          </p>
+        )}
 
         <div className="grid grid-cols-3 gap-3">
           {[

@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
-type ABStatus = "running" | "winner" | "paused" | "draft";
+type ABStatus = "running" | "winner" | "paused";
 type ABType = "email_subject" | "email_content" | "landing" | "cta";
 
 interface ABVariant {
@@ -36,7 +37,6 @@ const STATUS_CONFIG: Record<ABStatus, { label: string; tone: "primary" | "succes
   running: { label: "En ejecución", tone: "success", icon: "▶" },
   winner: { label: "Ganador declarado", tone: "primary", icon: "🏆" },
   paused: { label: "Pausado", tone: "warning", icon: "‖" },
-  draft: { label: "Borrador", tone: "primary", icon: "✎" },
 };
 
 const TYPE_LABEL: Record<ABType, string> = {
@@ -62,7 +62,7 @@ function mapAbTest(raw: Record<string, unknown>): ABTest {
   const winnerId = raw.winnerVariantId ?? raw.winner_variant_id;
   const apiStatus = String(raw.status ?? "running");
   const status: ABStatus =
-    apiStatus === "completed" ? "winner" : apiStatus === "paused" ? "paused" : apiStatus === "running" ? "running" : "draft";
+    apiStatus === "completed" ? "winner" : apiStatus === "paused" ? "paused" : "running";
 
   return {
     id: String(raw.id),
@@ -133,7 +133,7 @@ function CreateAbTestModal({ onClose, onCreated }: { onClose: () => void; onCrea
           <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
         <form onSubmit={save} className="space-y-4 p-6">
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
             <input
@@ -225,53 +225,98 @@ export default function SaasABTestingPage() {
   const [tests, setTests] = useState<ABTest[]>([]);
   const [filterStatus, setFilterStatus] = useState<ABStatus | "all">("all");
   const [showModal, setShowModal] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setLoadError(null);
     try {
       const res = await fetch("/api/saas/ab-testing");
-      if (res.ok) {
-        const d = (await res.json()) as { tests?: Record<string, unknown>[] };
-        setTests((d.tests ?? []).map(mapAbTest));
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? `HTTP ${res.status}`);
       }
-    } catch { /* silencioso */ }
+      const d = (await res.json()) as { tests?: Record<string, unknown>[] };
+      setTests((d.tests ?? []).map(mapAbTest));
+    } catch (e) {
+      setTests([]);
+      setLoadError(e instanceof Error ? e.message : "Error al cargar tests");
+    }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
 
+  async function declareWinner(id: string) {
+    setBusyId(id);
+    setActionError(null);
+    try {
+      const res = await fetch("/api/saas/ab-testing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "declare_winner", id }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? `HTTP ${res.status}`);
+      }
+      await load();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : "Error al declarar ganador");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   const filtered = tests.filter(t => filterStatus === "all" || t.status === filterStatus);
+  const completed = tests.filter(t => t.status === "winner");
+  const avgConfidence =
+    completed.length > 0
+      ? Math.round(
+          completed.reduce((s, t) => s + (t.confidence ?? 0), 0) / completed.length,
+        )
+      : null;
 
   return (
     <SaasShellLayout sidebar={<SaasSidebar activeId="ab-testing" />}>
+      <div className="flex flex-col gap-6 pb-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <NelvyonDsSectionHeader title="A/B Testing" subtitle="Prueba variantes de emails, landings y CTAs para optimizar conversiones" />
               <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nuevo test</NelvyonDsButton>
             </div>
 
+            {(loadError || actionError) && (
+              <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
+                {actionError ?? loadError}
+              </p>
+            )}
+
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { label: "Tests activos", value: tests.filter(t => t.status === "running").length },
-                { label: "Tests completados", value: tests.filter(t => t.status === "winner").length },
-                { label: "Total variantes", value: tests.reduce((s, t) => s + t.variants.length, 0) },
-                { label: "Mejora media", value: "+23%" },
-              ].map(({ label, value }) => (
-                <NelvyonDsCard key={label} className="p-4">
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-                </NelvyonDsCard>
-              ))}
+              <KpiTile icon="▶" label="Tests activos" value={tests.filter(t => t.status === "running").length} accent />
+              <KpiTile icon="🏆" label="Completados" value={completed.length} />
+              <KpiTile icon="🧬" label="Total variantes" value={tests.reduce((s, t) => s + t.variants.length, 0)} />
+              <KpiTile
+                icon="📊"
+                label="Confianza media"
+                value={avgConfidence != null ? `${avgConfidence}%` : "—"}
+              />
             </div>
 
             <div className="flex gap-2 flex-wrap">
-              {(["all", "running", "winner", "paused", "draft"] as const).map(s => (
-                <button key={s} onClick={() => setFilterStatus(s as ABStatus | "all")}
+              {(["all", "running", "winner", "paused"] as const).map(s => (
+                <button key={s} type="button" onClick={() => setFilterStatus(s)}
                   className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${filterStatus === s ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-                  {s === "all" ? "Todos" : STATUS_CONFIG[s as ABStatus].label}
+                  {s === "all" ? "Todos" : STATUS_CONFIG[s].label}
                 </button>
               ))}
             </div>
 
             <div className="space-y-5">
-              {filtered.map(test => {
+              {filtered.length === 0 ? (
+                <NelvyonDsCard className="p-12 text-center text-sm text-muted-foreground">
+                  {tests.length === 0 ? "Sin tests A/B. Crea el primero." : "Ningún test en este filtro."}
+                </NelvyonDsCard>
+              ) : filtered.map(test => {
                 const sc = STATUS_CONFIG[test.status];
                 return (
                   <NelvyonDsCard key={test.id} className="overflow-hidden p-0">
@@ -284,13 +329,19 @@ export default function SaasABTestingPage() {
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
                           Métrica: <strong className="text-foreground">{test.winnerMetric === "open_rate" ? "Tasa apertura" : test.winnerMetric === "click_rate" ? "Tasa clic" : "Tasa conversión"}</strong>
-                          {test.confidence !== null && <> · Confianza estadística: <strong className={test.confidence >= 95 ? "text-green-400" : "text-yellow-400"}>{test.confidence}%</strong></>}
+                          {test.confidence !== null && <> · Confianza: <strong className={test.confidence >= 95 ? "text-success" : "text-warning"}>{test.confidence}%</strong></>}
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        {test.status === "draft" && <NelvyonDsButton className="text-xs">▶ Iniciar</NelvyonDsButton>}
-                        {test.status === "running" && <NelvyonDsButton variant="ghost" className="text-xs">‖ Pausar</NelvyonDsButton>}
-                        <NelvyonDsButton variant="ghost" className="text-xs">✎ Editar</NelvyonDsButton>
+                        {test.status === "running" && (
+                          <NelvyonDsButton
+                            className="text-xs"
+                            disabled={busyId === test.id}
+                            onClick={() => void declareWinner(test.id)}
+                          >
+                            🏆 Declarar ganador
+                          </NelvyonDsButton>
+                        )}
                       </div>
                     </div>
                     <div className="grid gap-3 border-t border-border p-5 sm:grid-cols-2">
@@ -308,6 +359,7 @@ export default function SaasABTestingPage() {
           onCreated={() => void load()}
         />
       )}
+      </div>
     </SaasShellLayout>
   );
 }
