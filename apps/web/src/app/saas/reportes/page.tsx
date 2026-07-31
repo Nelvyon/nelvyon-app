@@ -1,10 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
 import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
 import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+import type { SaasNavId } from "@/features/saas-shell/saasNav";
 
 interface Report {
   id: string; name: string; type: string; status: "ready" | "generating" | "failed";
@@ -36,18 +39,20 @@ const REPORT_TYPES = [
   { id: "seo_ranking", label: "SEO & Posicionamiento", icon: "🔍", desc: "Evolución de keywords, posiciones, tráfico orgánico" },
   { id: "social_engagement", label: "Redes Sociales", icon: "📱", desc: "Engagement, alcance y publicaciones por plataforma" },
   { id: "ad_performance", label: "Publicidad Digital", icon: "💰", desc: "ROAS, CPC, impresiones y gasto por plataforma" },
-];
+] as const;
 
 const DAYS_OPTIONS = [7, 14, 30, 90] as const;
 
 export default function SaasReportesPage() {
+  const searchParams = useSearchParams();
+  const attributionRef = useRef<HTMLDivElement | null>(null);
   const [reports, setReports]               = useState<Report[]>([]);
   const [loading, setLoading]               = useState(true);
   const [generating, setGenerating]         = useState<string | null>(null);
   const [error, setError]                   = useState<string | null>(null);
+  const [loadError, setLoadError]           = useState<string | null>(null);
   const [utmLinks, setUtmLinks]             = useState<UtmLink[]>([]);
   const [roasAlerts, setRoasAlerts]         = useState<RoasAlert[]>([]);
-  // attribution
   const [days, setDays]                     = useState<30 | 7 | 14 | 90>(30);
   const [attrSummary, setAttrSummary]       = useState<AttributionSummary | null>(null);
   const [channels, setChannels]             = useState<ChannelBreakdown[]>([]);
@@ -58,6 +63,9 @@ export default function SaasReportesPage() {
   const [attrLoading, setAttrLoading]       = useState(false);
   const [deliverableRevenue, setDeliverableRevenue] = useState<Array<{ deliverableId: string; packId: string | null; utmCampaign: string | null; conversions: number; adsSpend: number; attributedRevenue: number; roas: number | null }>>([]);
   const [revenueLoading, setRevenueLoading] = useState(false);
+
+  const tabParam = searchParams?.get("tab");
+  const activeNavId: SaasNavId = tabParam === "attribution" ? "attribution" : "reportes";
 
   const loadAttribution = useCallback(async (d: number, model: typeof attrModel = "linear") => {
     setAttrLoading(true);
@@ -80,18 +88,25 @@ export default function SaasReportesPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const [reportsRes, utmRes, alertsRes] = await Promise.all([
         fetch("/api/saas/reports"),
         fetch("/api/saas/utm?limit=5"),
         fetch("/api/saas/ads/alerts"),
       ]);
+      if (!reportsRes.ok && reportsRes.status !== 401) {
+        setLoadError("No se pudo cargar el historial de reportes.");
+      }
       const data = (await reportsRes.json().catch(() => ({ reports: [] }))) as { reports: Report[] };
       setReports(data.reports ?? []);
       const utmData = (await utmRes.json().catch(() => ({ links: [] }))) as { links: UtmLink[] };
       setUtmLinks(utmData.links ?? []);
       const alertsData = (await alertsRes.json().catch(() => ({ alerts: [] }))) as { alerts: RoasAlert[] };
       setRoasAlerts(alertsData.alerts ?? []);
+    } catch {
+      setLoadError("Error de red al cargar reportes.");
+      setReports([]);
     } finally { setLoading(false); }
   }, []);
 
@@ -107,6 +122,13 @@ export default function SaasReportesPage() {
       .catch(() => null)
       .finally(() => setRevenueLoading(false));
   }, [load, loadAttribution]);
+
+  useEffect(() => {
+    if (tabParam !== "attribution") return;
+    const el = attributionRef.current;
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [tabParam, loading, attrLoading]);
 
   async function generateReport(type: string) {
     setGenerating(type); setError(null);
@@ -134,7 +156,7 @@ export default function SaasReportesPage() {
   const maxVisits = Math.max(1, ...channels.map(c => c.visits), ...campaigns.map(c => c.visits));
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="reportes" />}>
+    <SaasShellLayout sidebar={<SaasSidebar activeId={activeNavId} />}>
       <div className="flex flex-col gap-6 pb-8">
         <NelvyonDsSectionHeader title="Reportes" subtitle="Informes ejecutivos y atribución multi-touch por canal y campaña" />
 
@@ -144,43 +166,38 @@ export default function SaasReportesPage() {
           </SaasDegradedBanner>
         )}
 
-        {error && <p className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</p>}
+        {(error || loadError) && (
+          <p className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error ?? loadError}
+          </p>
+        )}
 
         {/* ── Atribución multi-touch ───────────────────────────── */}
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <div ref={attributionRef} id="attribution" className="rounded-2xl border border-border bg-card p-5 scroll-mt-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm font-semibold text-foreground">🔗 Atribución multi-touch</p>
             <div className="flex gap-1">
               {DAYS_OPTIONS.map(d => (
                 <button key={d} onClick={() => { setDays(d as 7|14|30|90); void loadAttribution(d); }}
-                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${days === d ? "bg-primary text-white" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${days === d ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
                   {d}d
                 </button>
               ))}
             </div>
           </div>
 
-          {/* KPIs */}
           {attrSummary && (
             <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {([
-                ["Visitas", attrSummary.totalVisits],
-                ["Formularios", attrSummary.totalFormSubmits],
-                ["Conversiones", attrSummary.totalConversions],
-                ["Contactos únicos", attrSummary.totalContacts],
-              ] as [string, number][]).map(([label, val]) => (
-                <div key={label} className="rounded-xl bg-muted/20 p-3">
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="mt-0.5 text-xl font-bold text-foreground">{val.toLocaleString()}</p>
-                </div>
-              ))}
+              <KpiTile icon="👁" label="Visitas" value={attrSummary.totalVisits.toLocaleString()} />
+              <KpiTile icon="📝" label="Formularios" value={attrSummary.totalFormSubmits.toLocaleString()} />
+              <KpiTile icon="🎯" label="Conversiones" value={attrSummary.totalConversions.toLocaleString()} accent />
+              <KpiTile icon="👤" label="Contactos únicos" value={attrSummary.totalContacts.toLocaleString()} />
             </div>
           )}
           {attrSummary?.topSource && (
             <p className="mb-4 text-xs text-muted-foreground">Fuente principal: <span className="font-medium text-foreground">{attrSummary.topSource}</span></p>
           )}
 
-          {/* Sub-tabs */}
           <div className="mb-3 flex gap-1 border-b border-border">
             {(["channels","campaigns","models"] as const).map(t => (
               <button key={t} onClick={() => setAttrTab(t)}
@@ -274,22 +291,20 @@ export default function SaasReportesPage() {
           )}
         </div>
 
-        {/* ROAS alerts */}
         {roasAlerts.length > 0 && (
-          <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 px-5 py-4">
-            <p className="mb-3 text-sm font-semibold text-yellow-400">⚠️ Alertas ROAS ({roasAlerts.length})</p>
+          <div className="rounded-xl border border-warning/30 bg-warning/5 px-5 py-4">
+            <p className="mb-3 text-sm font-semibold text-warning">⚠️ Alertas ROAS ({roasAlerts.length})</p>
             <div className="flex flex-col gap-2">
               {roasAlerts.map((a, i) => (
                 <div key={i} className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground capitalize">{a.platform}</span>
-                  <span className="text-yellow-400 font-medium">ROAS {a.roas.toFixed(2)}x (umbral: {a.threshold}x) — gasto {a.spend.toFixed(2)} EUR</span>
+                  <span className="text-warning font-medium">ROAS {a.roas.toFixed(2)}x (umbral: {a.threshold}x) — gasto {a.spend.toFixed(2)} EUR</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* UTM attribution */}
         {utmLinks.length > 0 && (
           <div>
             <p className="mb-3 text-sm font-medium text-muted-foreground">Atribución UTM — top enlaces</p>
@@ -310,9 +325,11 @@ export default function SaasReportesPage() {
           </div>
         )}
 
-        {/* Generate report */}
         <div>
           <p className="mb-3 text-sm font-medium text-muted-foreground">Generar nuevo reporte</p>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Cada tipo etiqueta el informe en el historial. El ZIP se genera con las métricas reales del dashboard del tenant (ROI, tráfico, conversiones, MRR).
+          </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {REPORT_TYPES.map(rt => (
               <NelvyonDsCard key={rt.id} className="flex flex-col gap-3 p-4 hover:border-primary/30 transition-colors">
@@ -324,14 +341,13 @@ export default function SaasReportesPage() {
                   </div>
                 </div>
                 <NelvyonDsButton onClick={() => void generateReport(rt.id)} disabled={generating === rt.id} className="w-full">
-                  {generating === rt.id ? "Generando…" : "⬇ Generar PDF"}
+                  {generating === rt.id ? "Generando…" : "⬇ Generar ZIP"}
                 </NelvyonDsButton>
               </NelvyonDsCard>
             ))}
           </div>
         </div>
 
-        {/* History */}
         <div>
           <p className="mb-3 text-sm font-medium text-muted-foreground">Historial de reportes</p>
           {loading ? (
@@ -339,6 +355,7 @@ export default function SaasReportesPage() {
           ) : reports.length === 0 ? (
             <NelvyonDsCard className="p-10 text-center">
               <p className="text-muted-foreground text-sm">Aún no has generado ningún reporte</p>
+              <p className="mt-1 text-xs text-muted-foreground">Genera un informe arriba; quedará listado aquí para volver a descargarlo.</p>
             </NelvyonDsCard>
           ) : (
             <div className="space-y-2">
@@ -357,6 +374,11 @@ export default function SaasReportesPage() {
                         <NelvyonDsButton size="sm" variant="ghost">⬇ Descargar</NelvyonDsButton>
                       </a>
                     )}
+                    {r.status === "ready" && (
+                      <a href={`/api/saas/reports/${r.id}/pdf`} target="_blank" rel="noopener noreferrer">
+                        <NelvyonDsButton size="sm" variant="ghost">PDF</NelvyonDsButton>
+                      </a>
+                    )}
                   </div>
                 </NelvyonDsCard>
               ))}
@@ -364,7 +386,6 @@ export default function SaasReportesPage() {
           )}
         </div>
 
-        {/* Revenue por entregable — top 5 */}
         <div className="space-y-3">
           <NelvyonDsSectionHeader title="Revenue por entregable (últimos 30 días)" />
           {revenueLoading ? (
@@ -378,10 +399,10 @@ export default function SaasReportesPage() {
               </p>
             </NelvyonDsCard>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto rounded-xl border border-border">
               <table className="min-w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/10 text-white/40 text-xs uppercase tracking-wide">
+                  <tr className="border-b border-border bg-muted/20 text-muted-foreground text-xs uppercase tracking-wide">
                     <th className="px-4 py-3 text-left">Entregable / Campaña</th>
                     <th className="px-4 py-3 text-right">Conv.</th>
                     <th className="px-4 py-3 text-right">Spend</th>
@@ -391,20 +412,20 @@ export default function SaasReportesPage() {
                 </thead>
                 <tbody>
                   {deliverableRevenue.map((row) => (
-                    <tr key={row.deliverableId} className="border-b border-white/5 hover:bg-white/5">
+                    <tr key={row.deliverableId} className="border-b border-border hover:bg-muted/10">
                       <td className="px-4 py-3">
-                        <p className="text-white/70 text-xs font-mono truncate max-w-[180px]">{row.deliverableId.slice(0, 8)}…</p>
-                        {row.utmCampaign && <p className="text-white/40 text-xs">{row.utmCampaign}</p>}
+                        <p className="text-muted-foreground text-xs font-mono truncate max-w-[180px]">{row.deliverableId.slice(0, 8)}…</p>
+                        {row.utmCampaign && <p className="text-muted-foreground/70 text-xs">{row.utmCampaign}</p>}
                       </td>
-                      <td className="px-4 py-3 text-right text-white/70">{row.conversions}</td>
-                      <td className="px-4 py-3 text-right text-white/70">€{row.adsSpend.toFixed(0)}</td>
-                      <td className="px-4 py-3 text-right text-white font-semibold">€{row.attributedRevenue.toFixed(0)}</td>
+                      <td className="px-4 py-3 text-right text-muted-foreground">{row.conversions}</td>
+                      <td className="px-4 py-3 text-right text-muted-foreground">€{row.adsSpend.toFixed(0)}</td>
+                      <td className="px-4 py-3 text-right text-foreground font-semibold">€{row.attributedRevenue.toFixed(0)}</td>
                       <td className="px-4 py-3 text-right">
                         {row.roas !== null ? (
-                          <span className={row.roas >= 2 ? "text-green-400 font-semibold" : "text-yellow-400"}>
+                          <span className={row.roas >= 2 ? "text-success font-semibold" : "text-warning"}>
                             {row.roas.toFixed(1)}x
                           </span>
-                        ) : <span className="text-white/30">—</span>}
+                        ) : <span className="text-muted-foreground/50">—</span>}
                       </td>
                     </tr>
                   ))}
