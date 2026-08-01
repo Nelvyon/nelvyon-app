@@ -61,7 +61,7 @@ const nelvyonMetadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // Do not set maximumScale — it fails Lighthouse a11y (disables zoom).
   themeColor: "#0a0a0a",
 };
 

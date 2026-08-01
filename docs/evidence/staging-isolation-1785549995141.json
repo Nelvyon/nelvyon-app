@@ -1,0 +1,38 @@
+{
+  "base": "https://ideal-victory-staging.up.railway.app",
+  "startedAt": "2026-08-01T02:06:30.858Z",
+  "checks": [
+    {
+      "name": "qa_user",
+      "ok": true
+    },
+    {
+      "name": "accessible_tenants_ge_1",
+      "ok": true,
+      "count": 1
+    },
+    {
+      "name": "foreign_tenant_available",
+      "ok": true,
+      "accessible": 1,
+      "all": 20
+    },
+    {
+      "name": "own_sees_marker_A",
+      "ok": true,
+      "status": 200,
+      "ownHasA": true,
+      "ownHasB": false
+    },
+    {
+      "name": "cross_tenant_no_leak",
+      "ok": true,
+      "status": 403,
+      "crossHasB": false
+    }
+  ],
+  "finishedAt": "2026-08-01T02:06:35.141Z",
+  "passed": 5,
+  "failed": 0,
+  "verdict": "ISOLATION_PASS"
+}

@@ -56,11 +56,15 @@ async function gotoPipelineReady(page: import("@playwright/test").Page): Promise
 }
 
 async function openContratosTab(page: import("@playwright/test").Page): Promise<void> {
-  await page.waitForResponse(r => r.url().includes("/api/saas/contracts") && r.ok(), { timeout: 15_000 }).catch(() => null);
   const tab = page.getByTestId("pipeline-tab-contratos");
   await expect(tab).toBeVisible();
-  await tab.click({ force: true });
-  await expect(tab).toHaveAttribute("data-active", "true");
+  const contractsWait = page.waitForResponse(
+    (r) => r.url().includes("/api/saas/contracts") && r.ok(),
+    { timeout: 15_000 },
+  );
+  await tab.click();
+  await contractsWait.catch(() => null);
+  await expect(tab).toHaveAttribute("data-active", "true", { timeout: 10_000 });
 }
 
 test.describe("SaaS CPQ — Pipeline tab Contratos", () => {

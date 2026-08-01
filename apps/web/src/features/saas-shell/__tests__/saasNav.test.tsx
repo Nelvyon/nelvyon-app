@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import esMessages from "../../../../messages/es.json";
 import { SaasSidebar } from "../components/SaasSidebar";
-import { SAAS_NAV_ITEMS, SAAS_HIDDEN_ROUTES, isSaasNavActive } from "../saasNav";
+import { SAAS_NAV_ITEMS, SAAS_HIDDEN_ROUTES, isSaasNavActive, filterSaasNavForPermissions } from "../saasNav";
 import { resetSaasPermissionsCacheForTests } from "../useSaasPermissions";
 
 vi.mock("next/navigation", () => ({
@@ -65,10 +65,64 @@ describe("saasNav", () => {
     expect(isSaasNavActive("crm", "crm")).toBe(true);
     expect(isSaasNavActive("crm", "pipeline")).toBe(false);
   });
+
+  it("filterSaasNavForPermissions hides modules without permission", () => {
+    const viewer = filterSaasNavForPermissions([
+      "contacts.read",
+      "deals.read",
+      "campanias.read",
+      "workflows.read",
+      "settings.read",
+      "analytics.read",
+    ]);
+    const ids = viewer.map((i) => i.id);
+    expect(ids).toContain("crm");
+    expect(ids).toContain("pipeline");
+    expect(ids).toContain("campanias");
+    expect(ids).not.toContain("billing");
+    expect(ids).not.toContain("auditoria");
+    expect(ids).not.toContain("subcuentas");
+
+    const memberNoCampaigns = filterSaasNavForPermissions([
+      "contacts.read",
+      "deals.read",
+      "workflows.read",
+      "settings.read",
+    ]);
+    expect(memberNoCampaigns.map((i) => i.id)).not.toContain("campanias");
+
+    const withBilling = filterSaasNavForPermissions(["contacts.read", "billing.read", "settings.read"]);
+    expect(withBilling.map((i) => i.id)).toContain("billing");
+  });
 });
 
 describe("SaasSidebar", () => {
   it("renders clickable nav links for active modules", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          role: "owner",
+          permissions: [
+            "billing.read",
+            "settings.read",
+            "contacts.read",
+            "deals.read",
+            "campanias.read",
+            "workflows.read",
+            "analytics.read",
+            "reports.generate",
+            "audit.read",
+            "invoices.read",
+            "affiliates.read",
+            "loyalty.read",
+            "settings.write",
+          ],
+          tenant: { companyName: "Acme", plan: "pro" },
+        }),
+      }),
+    );
     // activeId="billing" opens the "cuenta" group so billing/settings links render
     renderSidebar(<SaasSidebar activeId="billing" tenantCompany="Acme" tenantPlan="pro" />);
     expect(screen.getByTestId("saas-sidebar")).toBeInTheDocument();
@@ -77,5 +131,24 @@ describe("SaasSidebar", () => {
     });
     expect(screen.getByRole("link", { name: "Facturación" })).toHaveAttribute("href", "/saas/billing");
     expect(screen.getByRole("link", { name: "Configuración" })).toHaveAttribute("href", "/saas/settings");
+  });
+
+  it("hides billing for viewer without billing.read", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          role: "viewer",
+          permissions: ["contacts.read", "deals.read", "settings.read", "analytics.read"],
+          tenant: { companyName: "Acme", plan: "pro" },
+        }),
+      }),
+    );
+    renderSidebar(<SaasSidebar activeId="crm" tenantCompany="Acme" tenantPlan="pro" />);
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "CRM" })).toBeInTheDocument();
+    });
+    expect(screen.queryByRole("link", { name: "Facturación" })).not.toBeInTheDocument();
   });
 });

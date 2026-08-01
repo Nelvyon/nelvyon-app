@@ -155,6 +155,51 @@ export function getClientIp(request: NextRequest): string {
   return "unknown";
 }
 
+/**
+ * Whether critical auth/webhook rules must fail-closed without Upstash.
+ *
+ * Staging Railway runs `NODE_ENV=production` but `RAILWAY_ENVIRONMENT=staging`.
+ * Treating staging as "strict prod" permanently 429s password login when Upstash
+ * is absent — blocks certification without adding paid Redis. Production and
+ * unknown production-like hosts remain fail-closed.
+ */
+export function isCriticalRateLimitStrictEnvironment(
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  if (env.NODE_ENV !== "production") return false;
+
+  const explicit = (env.NELVYON_DEPLOY_ENV ?? "").trim().toLowerCase();
+  if (
+    explicit === "staging" ||
+    explicit === "development" ||
+    explicit === "dev" ||
+    explicit === "test"
+  ) {
+    return false;
+  }
+  if (explicit === "production" || explicit === "prod") return true;
+
+  const railway = (
+    env.RAILWAY_ENVIRONMENT_NAME ??
+    env.RAILWAY_ENVIRONMENT ??
+    ""
+  )
+    .trim()
+    .toLowerCase();
+  if (
+    railway === "staging" ||
+    railway === "preview" ||
+    railway === "development" ||
+    railway === "dev"
+  ) {
+    return false;
+  }
+  if (railway === "production" || railway === "prod") return true;
+
+  // Bare NODE_ENV=production with no staging markers — keep fail-closed.
+  return true;
+}
+
 function getUpstashConfig(): { url: string; token: string } | null {
   const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.UPSTASH_REDIS_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.UPSTASH_REDIS_TOKEN;
@@ -189,7 +234,8 @@ async function upstashIncrWithExpire(
 
 /**
  * Fixed-window rate limit per IP.
- * Uses Upstash when configured; only non-critical routes may fall back to per-instance memory.
+ * Uses Upstash when configured; only non-critical routes (and staging) may fall back to per-instance memory.
+ * Production critical routes without Upstash remain fail-closed.
  */
 export async function checkIpRateLimit(params: {
   ip: string;
@@ -208,8 +254,9 @@ export async function checkIpRateLimit(params: {
     });
 
   const config = getUpstashConfig();
+  const strict = isCriticalRateLimitStrictEnvironment();
   if (!config) {
-    if (process.env.NODE_ENV === "production" && params.rule.requireSharedStoreInProduction) {
+    if (strict && params.rule.requireSharedStoreInProduction) {
       console.error("[rate-limit] Upstash required for critical production rule", {
         rule: params.rule.id,
       });
@@ -218,6 +265,7 @@ export async function checkIpRateLimit(params: {
     if (process.env.NODE_ENV === "production") {
       console.warn("[rate-limit] Upstash not configured — using in-memory fallback", {
         rule: params.rule.id,
+        strict,
       });
     }
     return memoryFallback();
@@ -232,7 +280,7 @@ export async function checkIpRateLimit(params: {
     }
     return { allowed: true, retryAfter: params.rule.windowSec };
   } catch (err) {
-    if (process.env.NODE_ENV === "production" && params.rule.requireSharedStoreInProduction) {
+    if (strict && params.rule.requireSharedStoreInProduction) {
       console.error("[rate-limit] Upstash error on critical production rule", {
         rule: params.rule.id,
         error: err instanceof Error ? err.message : String(err),

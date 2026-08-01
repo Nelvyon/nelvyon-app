@@ -9,7 +9,7 @@ import { useAuth } from "@/core/auth/AuthContext";
 import { nelvyonPlanToUiRole } from "@/core/auth/nelvyonPlanRole";
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 transition focus:border-[#0066FF] focus:outline-none";
+  "w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 transition focus:border-[#0066FF] focus:outline-none focus:ring-2 focus:ring-[#0066FF]/40";
 
 type LoginSuccess = {
   userId: string;
@@ -98,7 +98,7 @@ export function LoginForm() {
     >
       <form className="space-y-5" noValidate onSubmit={(ev) => void handleSubmit(ev)}>
         <div>
-          <label className="mb-2 block text-sm font-medium text-zinc-400" htmlFor="email">
+          <label className="mb-2 block text-sm font-medium text-zinc-300" htmlFor="email">
             Email
           </label>
           <input
@@ -117,10 +117,10 @@ export function LoginForm() {
 
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <label className="block text-sm font-medium text-zinc-400" htmlFor="password">
+            <label className="block text-sm font-medium text-zinc-300" htmlFor="password">
               Contraseña
             </label>
-            <Link className="text-sm text-[#66a3ff] hover:text-white" href="/forgot-password">
+            <Link className="text-sm text-[#93c5fd] underline-offset-2 hover:text-white hover:underline" href="/forgot-password">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
@@ -153,9 +153,9 @@ export function LoginForm() {
         </button>
       </form>
 
-      <p className="mt-8 text-center text-sm text-zinc-500">
+      <p className="mt-8 text-center text-sm text-zinc-400">
         ¿No tienes cuenta?{" "}
-        <Link className="font-semibold text-[#66a3ff] hover:text-white" href="/register">
+        <Link className="font-semibold text-[#93c5fd] underline-offset-2 hover:text-white hover:underline" href="/register">
           Empieza gratis
         </Link>
       </p>

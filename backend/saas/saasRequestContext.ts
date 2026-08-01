@@ -43,10 +43,10 @@ async function resolveMembershipForTenant(
     `SELECT wm.role AS member_role, ${ST_TENANT_SELECT}
      FROM workspace_members wm
      JOIN saas_tenants st ON st.workspace_id = wm.workspace_id
-     WHERE wm.user_id = $1::text
+     WHERE wm.user_id::text = $1
        AND wm.status = 'active'
        AND st.onboarding_completed = true
-       AND st.id = $2::text
+       AND st.id::text = $2
      LIMIT 1`,
     [userId, tenantId],
   );
@@ -83,6 +83,8 @@ async function resolveTenantAccess(
     }
     const membership = await resolveMembershipForTenant(userId, preferredTenantId);
     if (membership) return membership;
+    // Explicit tenant switch without membership must fail closed (no silent fallback).
+    throw new SaasRbacError("Forbidden", "FORBIDDEN");
   }
 
   const owned = await getSaasOnboardingService().getTenant(userId);
@@ -101,7 +103,7 @@ async function resolveTenantAccess(
          ON wm.workspace_id = st.workspace_id
         AND wm.user_id = si.user_id
         AND wm.status = 'active'
-       WHERE si.user_id = $1::text
+       WHERE si.user_id::text = $1
          AND st.onboarding_completed = true
        ORDER BY st.created_at DESC
        LIMIT 1`,
@@ -132,7 +134,7 @@ async function resolveTenantAccess(
     `SELECT wm.role AS member_role, ${ST_TENANT_SELECT}
      FROM workspace_members wm
      JOIN saas_tenants st ON st.workspace_id = wm.workspace_id
-     WHERE wm.user_id = $1::text
+     WHERE wm.user_id::text = $1
        AND wm.status = 'active'
        AND st.onboarding_completed = true
      ORDER BY st.created_at DESC

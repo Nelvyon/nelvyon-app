@@ -2,7 +2,7 @@
  * E2E — /saas/autopilot (Autopilot Command Center)
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 const FIXTURE_ENTREGABLES = {
   deliverables: [],
@@ -10,7 +10,7 @@ const FIXTURE_ENTREGABLES = {
 };
 
 async function gotoAutopilotReady(page: import("@playwright/test").Page): Promise<void> {
-  await page.goto("/saas/autopilot", { waitUntil: "domcontentloaded" });
+  await gotoAwaitingApi(page, "/saas/autopilot", "/api/saas/autopilot");
   await expect(page.getByText("SEO mensual")).toBeVisible({ timeout: 15_000 });
 }
 

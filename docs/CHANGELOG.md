@@ -3,10 +3,17 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-08-01
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Auth / staging | **Rate-limit auth-login staging verde** | Causa raíz: `requireSharedStoreInProduction` + `NODE_ENV=production` en Railway staging sin Upstash → fail-closed permanente 429. Fix: `isCriticalRateLimitStrictEnvironment()` — staging/preview/`NELVYON_DEPLOY_ENV=staging|test` usa memory fallback con límites reales; producción Railway sigue fail-closed sin Upstash. QA password hash sync a `STAGING_QA_PASSWORD`. A11y login: `role=region` en toasts + quitar `maximumScale:1`. Evidencia: password cert **31/31**, isolation **PASS**, JWT **23/23**, LH a11y **100**, Vitest **6256**, PW SaaS **349/349**, build:prod **PASS**. Deploys staging `4807db54`/`4ed47ae0`. `claimReady: false`. Veredicto **READY_FOR_PRODUCTION** (sin flip claimReady / sin prod deploy). |
+
 ## 2026-07-31
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Cert / SaaS | **Playwright 349/349 + staging access** | Clasificados 79 fallos (`docs/evidence/pw-79-classification.md`). BUG_REAL: public API 401 sin DB · PWA manifest default · tenant header fail-closed + uuid/text cast. GDPR CRM atribuible + nav RBAC. Staging deploy `b2dd3876` · isolation **403** · JWT cert **23/23**. Login password **429** (Upstash). PW **349**. Vitest **6254**. `claimReady: false`. **BLOCKED_EXTERNAL**. |
 | Cert / SaaS | **Certificación final SaaS** | Inventario 97 pages / 240 APIs / 72 nav. P0 unsubscribe false-success; P1 webhooks create, dashboard degraded+loading, GDPR honesty+UI, tenant header, subcuentas RBAC, certificados, autonomous HTTPS origin. Gates: tsc/eslint/vitest **6253**/build PASS · smoke 307/401 · PW **270/349** · LH a11y **88**. Staging **BLOCKED**. Veredicto **CONDITIONAL_READY**. `claimReady: false`. Ver §34. |
 | UI / SaaS | **Auditoría global SaaS pasada 2** | Sweep residual: 0 `alert`/`console.debug` en `/saas`; 0 onClick vacío; sin P0/P1 nuevos. Ver §33. `claimReady: false` |
 | UI / SaaS | **Auditoría global SaaS pasada 1** | 0 P0; 12 P1: eliminar `alert()`, try/catch en compliance/playbooks/partner/SSO/sync, LMS flow. build **PASS**. Ver §32. `claimReady: false` |

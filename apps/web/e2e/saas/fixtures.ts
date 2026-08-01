@@ -71,10 +71,15 @@ export const FIXTURE_SETTINGS = {
   tenant: { companyName: "Nelvyon E2E Corp", industry: "tech", plan: "pro", website: null, phone: null, employees: null },
   role: "owner",
   permissions: [
-    "contacts.read", "contacts.write", "deals.read", "deals.write",
-    "campaigns.read", "campaigns.write", "workflows.read", "workflows.write",
-    "billing.read", "settings.read",
-    "sso.read", "sso.write", "audit.read", "settings.write",
+    "contacts.read", "contacts.write", "contacts.delete",
+    "deals.read", "deals.write", "deals.delete",
+    "campanias.read", "campanias.write", "campanias.delete", "campanias.launch",
+    "workflows.read", "workflows.write", "workflows.delete", "workflows.execute",
+    "billing.read", "settings.read", "settings.write",
+    "reports.generate", "analytics.read",
+    "notifications.read", "notifications.write",
+    "profile.read", "profile.write", "invoices.read",
+    "sso.read", "sso.write", "audit.read",
     "affiliates.read", "affiliates.write", "loyalty.read", "loyalty.write",
   ],
 };
@@ -263,8 +268,34 @@ export const FIXTURE_ADS = {
 };
 
 export const FIXTURE_INTEGRATIONS = {
-  catalog: [], connections: [],
-  summary: { total: 0, connected: 0, envOnly: 0, oauthReady: 0 },
+  catalog: [
+    { id: "meta", slug: "meta", displayName: "Meta Ads", icon: "📘", category: "ads", connectionType: "oauth", status: "live", envConfigured: false },
+    { id: "google", slug: "google", displayName: "Google Ads", icon: "🔍", category: "ads", connectionType: "oauth", status: "live", envConfigured: false },
+    { id: "stripe", slug: "stripe", displayName: "Stripe", icon: "💳", category: "payments", connectionType: "env", status: "live", envConfigured: true },
+    { id: "shopify", slug: "shopify", displayName: "Shopify", icon: "🛒", category: "commerce", connectionType: "manual", status: "live", envConfigured: false },
+  ],
+  connections: [
+    {
+      slug: "stripe",
+      catalogStatus: "live",
+      displayName: "Stripe",
+      icon: "💳",
+      category: "payments",
+      connectionType: "env",
+      envKeys: [],
+      status: "connected",
+      envConfigured: true,
+      connectedAccount: "Nelvyon E2E",
+      lastSyncAt: new Date().toISOString(),
+      errorMessage: null,
+    },
+  ],
+  summary: { total: 4, connected: 1, envOnly: 1, oauthReady: 0 },
+};
+
+export const FIXTURE_SEQUENCES = {
+  sequences: [] as Array<Record<string, unknown>>,
+  ses_configured: false,
 };
 
 export const FIXTURE_MEMBERSHIPS = {
@@ -307,6 +338,30 @@ export const FIXTURE_WHATSAPP = {
 export async function setupAuthedSaas(page: Page, context: BrowserContext): Promise<void> {
   await setAuthCookie(context);
   await mockSaasApis(page);
+}
+
+/**
+ * Register waitForResponse BEFORE goto so the response cannot race past the waiter.
+ * Returns the response (or null on timeout) so callers can assert body if needed.
+ */
+export async function gotoAwaitingApi(
+  page: Page,
+  path: string,
+  urlIncludes: string,
+  opts?: { timeout?: number; method?: string },
+): Promise<import("@playwright/test").Response | null> {
+  const timeout = opts?.timeout ?? 15_000;
+  const method = opts?.method ?? "GET";
+  const pending = page.waitForResponse(
+    (r) => r.url().includes(urlIncludes) && r.request().method() === method,
+    { timeout },
+  );
+  await page.goto(path, { waitUntil: "domcontentloaded" });
+  try {
+    return await pending;
+  } catch {
+    return null;
+  }
 }
 
 export type EntregablesListFixture = {
@@ -362,6 +417,8 @@ export async function mockSaasPwa(page: Page): Promise<void> {
     route.fulfill({ json: { ok: true, id: "inst-1" } }));
   await page.route("**/api/saas/pwa/status**", route =>
     route.fulfill({ json: FIXTURE_PWA_STATUS }));
+  await page.route("**/api/saas/pwa/push**", route =>
+    route.fulfill({ json: { enabled: false, vapidPublicKey: null } }));
   await page.route("**/api/saas/pwa/manifest**", route =>
     route.fulfill({ contentType: "application/manifest+json", body: JSON.stringify({ name: "Nelvyon SaaS", short_name: "Nelvyon", scope: "/saas", start_url: "/saas/dashboard", display: "standalone", theme_color: "#0084ff", background_color: "#020817", icons: [] }) }));
 }
@@ -420,12 +477,16 @@ const FIXTURE_PARTNER_LEDGER = {
 
 /** Intercepts partner-zone endpoints. Call AFTER setupAuthedSaas (LIFO). */
 export async function mockPartnerZone(page: Page): Promise<void> {
-  await page.route("**/api/saas/partner/ledger**", route =>
-    route.fulfill({ json: FIXTURE_PARTNER_LEDGER }));
-  await page.route("**/api/saas/partner/referrals**", route =>
-    route.fulfill({ json: { partner: { id: "p1", referralCode: "AGENCY99" }, referrals: [] } }));
-  await page.route(/\/api\/saas\/partner(\?|$)/, route =>
-    route.fulfill({ json: FIXTURE_PARTNER_ZONE }));
+  await page.route("**/api/saas/partner**", async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.includes("/ledger")) {
+      return route.fulfill({ json: FIXTURE_PARTNER_LEDGER });
+    }
+    if (path.includes("/referrals")) {
+      return route.fulfill({ json: { partner: { id: "p1", referralCode: "AGENCY99" }, referrals: [] } });
+    }
+    return route.fulfill({ json: FIXTURE_PARTNER_ZONE });
+  });
 }
 
 export const FIXTURE_DATA_PLAYBOOKS = {
@@ -461,12 +522,16 @@ export const FIXTURE_DATA_PLAYBOOKS = {
 
 /** Intercepts data-playbooks endpoints. Call AFTER setupAuthedSaas (LIFO). */
 export async function mockDataPlaybooks(page: Page): Promise<void> {
-  await page.route("**/api/saas/data-playbooks/refresh**", route =>
-    route.fulfill({ json: { generated: 2, playbooks: FIXTURE_DATA_PLAYBOOKS.playbooks } }));
-  await page.route(/\/api\/saas\/data-playbooks\/[^/]+$/, route =>
-    route.fulfill({ json: { playbook: FIXTURE_DATA_PLAYBOOKS.playbooks[0] } }));
-  await page.route(/\/api\/saas\/data-playbooks(\?|$)/, route =>
-    route.fulfill({ json: FIXTURE_DATA_PLAYBOOKS }));
+  await page.route("**/api/saas/data-playbooks**", async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.includes("/refresh")) {
+      return route.fulfill({ json: { generated: 2, playbooks: FIXTURE_DATA_PLAYBOOKS.playbooks } });
+    }
+    if (/\/data-playbooks\/[^/]+$/.test(path)) {
+      return route.fulfill({ json: { playbook: FIXTURE_DATA_PLAYBOOKS.playbooks[0] } });
+    }
+    return route.fulfill({ json: FIXTURE_DATA_PLAYBOOKS });
+  });
 }
 
 export const FIXTURE_PACK_STORE = {
@@ -497,10 +562,16 @@ export const FIXTURE_PACK_STORE = {
 
 /** Intercepts pack store endpoints. Call AFTER setupAuthedSaas so it wins (LIFO). */
 export async function mockPackStore(page: Page): Promise<void> {
-  await page.route("**/api/saas/packs/*/purchase**", route =>
-    route.fulfill({ json: { granted: true, source: "plan" } }));
-  await page.route(/\/api\/saas\/packs(\?|$)/, route =>
-    route.fulfill({ json: FIXTURE_PACK_STORE }));
+  await page.route("**/api/saas/packs**", async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.includes("/purchase")) {
+      return route.fulfill({ json: { granted: true, source: "plan" } });
+    }
+    if (/\/packs\/[^/]+$/.test(path)) {
+      return route.fallback();
+    }
+    return route.fulfill({ json: FIXTURE_PACK_STORE });
+  });
 }
 
 export const FIXTURE_BENCHMARK = {
@@ -558,6 +629,8 @@ export async function mockSaasApis(page: Page): Promise<void> {
     route.fulfill({ json: FIXTURE_CAMPANIAS }));
   await page.route("**/api/saas/workflows**", route =>
     route.fulfill({ json: FIXTURE_WORKFLOWS }));
+  await page.route("**/api/saas/sequences**", route =>
+    route.fulfill({ json: FIXTURE_SEQUENCES }));
   await page.route("**/api/saas/billing**", route =>
     route.fulfill({ json: FIXTURE_BILLING }));
   await page.route("**/api/saas/audit**", route =>
@@ -658,6 +731,11 @@ export async function mockSaasApis(page: Page): Promise<void> {
   // Re-register last (Playwright LIFO) so funnels mock always wins over catch-all.
   await page.route("**/api/saas/funnels**", route =>
     route.fulfill({ json: FIXTURE_FUNNELS }));
+  // Module-specific mocks last so catch-all never wins for these routes.
+  await mockDataPlaybooks(page);
+  await mockPackStore(page);
+  await mockPartnerZone(page);
+  await mockSaasPwa(page);
 }
 
 /** Funnels list + optional analytics/variants for depth E2E. Register after mockSaasApis. */

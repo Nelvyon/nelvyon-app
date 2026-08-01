@@ -2,7 +2,7 @@
  * S56 — E2E: SaaS PWA install hub (dynamic manifest + white-label)
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, mockSaasPwa, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setupAuthedSaas, mockSaasPwa, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 test.describe("S56 — /saas/pwa install hub", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -24,12 +24,12 @@ test.describe("S56 — /saas/pwa install hub", () => {
   });
 
   test("status card shows install state", async ({ page }) => {
-    await page.goto("/saas/pwa", { waitUntil: "domcontentloaded" });
+    await gotoAwaitingApi(page, "/saas/pwa", "/api/saas/pwa/status");
     await expect(page.getByText("Estado")).toBeVisible({ timeout: 10_000 });
   });
 
   test("install stats render", async ({ page }) => {
-    await page.goto("/saas/pwa", { waitUntil: "domcontentloaded" });
+    await gotoAwaitingApi(page, "/saas/pwa", "/api/saas/pwa/status");
     await expect(page.getByText("Instalaciones")).toBeVisible({ timeout: 10_000 });
   });
 

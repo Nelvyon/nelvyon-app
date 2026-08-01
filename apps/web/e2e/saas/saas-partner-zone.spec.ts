@@ -2,7 +2,7 @@
  * S54 — E2E: Partner Zone
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, mockPartnerZone, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setupAuthedSaas, mockPartnerZone, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 test.describe("S54 — /saas/partner page", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -40,8 +40,7 @@ test.describe("S54 — /saas/partner page", () => {
   });
 
   test("wholesale tab shows catalog SKUs", async ({ page }) => {
-    await page.goto("/saas/partner", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/partner**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/partner", "/api/saas/partner");
     await page.getByRole("button", { name: "Wholesale" }).click();
     await expect(page.getByText("Plan Pro")).toBeVisible({ timeout: 8000 });
     await expect(page.getByText("Pack Crecimiento Local")).toBeVisible();
@@ -54,15 +53,13 @@ test.describe("S54 — /saas/partner page", () => {
   });
 
   test("referidos tab shows referral code", async ({ page }) => {
-    await page.goto("/saas/partner", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/partner**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/partner", "/api/saas/partner");
     await page.getByRole("button", { name: "Referidos" }).click();
     await expect(page.getByText("AGENCY99")).toBeVisible({ timeout: 8000 });
   });
 
   test("connect tab shows status", async ({ page }) => {
-    await page.goto("/saas/partner", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/partner**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/partner", "/api/saas/partner");
     await page.getByRole("button", { name: "Connect" }).click();
     await expect(page.getByText("Charges habilitados")).toBeVisible({ timeout: 8000 });
   });

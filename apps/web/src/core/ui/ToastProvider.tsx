@@ -25,7 +25,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     mounted && typeof document !== "undefined"
       ? createPortal(
           <div
+            role="region"
             aria-label="Notifications"
+            aria-live="polite"
             className="pointer-events-none fixed bottom-4 right-4 z-[100] flex w-[min(100vw-2rem,22rem)] flex-col gap-2 p-1"
           >
             {toasts.map((t) => (

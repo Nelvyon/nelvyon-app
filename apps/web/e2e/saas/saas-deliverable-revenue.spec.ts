@@ -2,7 +2,7 @@
  * S48 — E2E: Revenue per Deliverable
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, mockEntregablesList, mockEntregablesRevenue } from "./fixtures";
+import { setupAuthedSaas, mockEntregablesList, mockEntregablesRevenue, gotoAwaitingApi } from "./fixtures";
 
 const FIXTURE_ENTREGABLES = {
   deliverables: [
@@ -18,7 +18,7 @@ const FIXTURE_ENTREGABLES = {
 };
 
 async function gotoEntregablesReady(page: import("@playwright/test").Page): Promise<void> {
-  await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
+  await gotoAwaitingApi(page, "/saas/entregables", "/api/saas/entregables");
   await expect(page.getByRole("button", { name: /Revenue €|Lista/i }).first()).toBeVisible({ timeout: 15_000 });
 }
 

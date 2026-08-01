@@ -18,7 +18,21 @@ export type SaasAction =
   | "workflows.execute"
   | "billing.read"
   | "settings.read"
-  | "reports.generate";
+  | "settings.write"
+  | "reports.generate"
+  | "analytics.read"
+  | "notifications.read"
+  | "notifications.write"
+  | "profile.read"
+  | "profile.write"
+  | "invoices.read"
+  | "affiliates.read"
+  | "affiliates.write"
+  | "loyalty.read"
+  | "loyalty.write"
+  | "sso.read"
+  | "sso.write"
+  | "audit.read";
 
 export const SAAS_ROLE_LABELS: Record<SaasRole, string> = {
   owner: "Propietario",
@@ -49,6 +63,8 @@ export function saasForbiddenMessage(action: SaasAction): string {
     "workflows.delete": "eliminar workflows",
     "workflows.execute": "ejecutar workflows",
     "billing.read": "ver facturación",
+    "audit.read": "ver auditoría",
+    "settings.write": "cambiar ajustes sensibles",
   };
   const label = labels[action] ?? action;
   return `Tu rol no permite ${label}. Contacta con un administrador del tenant si necesitas acceso.`;

@@ -2,15 +2,14 @@
  * E2E — /saas/publicidad (attribution tab + ad platform status)
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 async function gotoPublicidadReady(page: import("@playwright/test").Page): Promise<void> {
   await page.route("**/api/saas/ads/attribution**", route =>
     route.fulfill({ json: { roas: [] } }));
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      await page.goto("/saas/publicidad", { waitUntil: "domcontentloaded" });
-      await page.waitForResponse("**/api/saas/ads**", { timeout: 15_000 });
+      await gotoAwaitingApi(page, "/saas/publicidad", "/api/saas/ads");
       await expect(page.getByRole("heading", { name: "Publicidad Digital" })).toBeVisible({ timeout: 15_000 });
       return;
     } catch (err) {
@@ -81,7 +80,7 @@ test.describe("SaaS Publicidad — atribución multi-touch", () => {
 
   test("página carga datos sin 500 tras navegar desde pipeline", async ({ page }) => {
     await page.goto("/saas/pipeline", { waitUntil: "domcontentloaded" });
-    await page.goto("/saas/publicidad", { waitUntil: "domcontentloaded" });
+    await gotoAwaitingApi(page, "/saas/publicidad", "/api/saas/ads");
     await expect(page.getByRole("heading", { name: "Publicidad Digital" })).toBeVisible({ timeout: 15_000 });
     expect(page.url()).not.toContain("500");
   });

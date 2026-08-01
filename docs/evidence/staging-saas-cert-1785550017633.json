@@ -1,0 +1,125 @@
+{
+  "base": "https://ideal-victory-staging.up.railway.app",
+  "startedAt": "2026-08-01T02:06:36.355Z",
+  "checks": [
+    {
+      "name": "qa_user_exists",
+      "ok": true,
+      "rows": 1
+    },
+    {
+      "name": "accessible_tenant",
+      "ok": true,
+      "len": 36
+    },
+    {
+      "name": "tenants_ge_2",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "jwt_minted",
+      "ok": true,
+      "parts": 3
+    },
+    {
+      "name": "health",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "dashboard",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "crm_contacts",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "pipeline_deals",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "workflows",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "sequences",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "billing",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "settings",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "webhooks",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "lms",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "store_products",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "ai_panel",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "cross_tenant_forbidden",
+      "ok": true,
+      "status": 403
+    },
+    {
+      "name": "own_tenant_ok",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "page_/login",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "page_/saas/dashboard",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "page_/saas/crm",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "page_/saas/pipeline",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "name": "page_/saas/billing",
+      "ok": true,
+      "status": 200
+    }
+  ],
+  "finishedAt": "2026-08-01T02:06:57.633Z",
+  "passed": 23,
+  "failed": 0,
+  "verdict": "STAGING_CERT_PASS"
+}

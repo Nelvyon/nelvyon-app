@@ -2,7 +2,11 @@
  * S50 — E2E: Compliance Vault
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, LOGIN_URL } from "./fixtures";
+import { setupAuthedSaas, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
+
+async function gotoComplianceReady(page: import("@playwright/test").Page): Promise<void> {
+  await gotoAwaitingApi(page, "/saas/compliance", "/api/saas/compliance");
+}
 
 test.describe("S50 — /saas/compliance page", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -28,7 +32,7 @@ test.describe("S50 — /saas/compliance page", () => {
   });
 
   test("KPI labels visible once loaded", async ({ page }) => {
-    await page.goto("/saas/compliance", { waitUntil: "domcontentloaded" });
+    await gotoComplianceReady(page);
     await expect(page.getByText("Total")).toBeVisible({ timeout: 10_000 });
   });
 
@@ -38,13 +42,13 @@ test.describe("S50 — /saas/compliance page", () => {
   });
 
   test("empty state shown when no artifacts", async ({ page }) => {
-    await page.goto("/saas/compliance", { waitUntil: "domcontentloaded" });
+    await gotoComplianceReady(page);
     await expect(page).not.toHaveTitle(/Error/);
     await expect(page.getByText(/Sin artifacts/i)).toBeVisible({ timeout: 10_000 });
   });
 
   test("table headers visible when artifacts present", async ({ page }) => {
-    await page.goto("/saas/compliance", { waitUntil: "domcontentloaded" });
+    await gotoComplianceReady(page);
     await expect(page.getByText(/Sin artifacts|Estado/i).first()).toBeVisible({ timeout: 10_000 });
   });
 });

@@ -36,7 +36,7 @@ vi.mock("../SaasSecurityEnterpriseService", () => ({
   extractClientIp: () => "203.0.113.10",
 }));
 
-vi.mock("../db/DbClient", () => ({
+vi.mock("../../db/DbClient", () => ({
   DbClient: {
     getInstance: () => ({
       query: vi.fn(async () => []),
@@ -128,6 +128,15 @@ describe("requireSaasContext enterprise guards", () => {
     getCustomPermissions.mockReset();
     getIpAllowlist.mockReset();
     assertIpAllowed.mockReset();
+  });
+
+  it("rejects preferred tenant when user has no membership (fail-closed)", async () => {
+    getCustomPermissions.mockResolvedValue(null);
+    getIpAllowlist.mockResolvedValue({ enabled: false, cidrs: [] });
+    const req = new Request("http://localhost/api/saas/crm/contacts", {
+      headers: { "x-nelvyon-tenant-id": "tenant-foreign" },
+    });
+    await expect(requireSaasContext(req, "contacts.read")).rejects.toBeInstanceOf(SaasRbacError);
   });
 
   it("fail-closes when custom permissions lookup fails transiently", async () => {

@@ -6,7 +6,6 @@ export const runtime = "nodejs";
 
 /** Per-tenant white-label manifest. Falls back to defaults when unauthenticated. */
 export async function GET(req: NextRequest) {
-  const svc = getSaasPwaService();
   const defaultManifest: PwaManifest = {
     name: "Nelvyon SaaS",
     short_name: "Nelvyon",
@@ -25,14 +24,20 @@ export async function GET(req: NextRequest) {
 
   let manifest: PwaManifest = defaultManifest;
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
-    manifest = await svc.buildManifest(ctx.tenant.id);
-  } catch {
+    // Lazy service init — DbClient throw without DATABASE_URL must not 500 the public manifest.
+    const svc = getSaasPwaService();
     try {
-      manifest = await svc.buildManifest("__default__");
+      const ctx = await requireSaasContext(req, "contacts.read");
+      manifest = await svc.buildManifest(ctx.tenant.id);
     } catch {
-      manifest = defaultManifest;
+      try {
+        manifest = await svc.buildManifest("__default__");
+      } catch {
+        manifest = defaultManifest;
+      }
     }
+  } catch {
+    manifest = defaultManifest;
   }
 
   return new NextResponse(JSON.stringify(manifest), {

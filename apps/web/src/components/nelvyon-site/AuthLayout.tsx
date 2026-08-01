@@ -25,11 +25,11 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
         </Link>
         <div>
           <p className="max-w-md text-3xl font-bold leading-tight text-white">{NELVYON.slogan}</p>
-          <p className="mt-4 max-w-sm text-zinc-500">{NELVYON.tagline}</p>
+          <p className="mt-4 max-w-sm text-zinc-400">{NELVYON.tagline}</p>
         </div>
-        <p className="text-xs text-zinc-600">© {new Date().getFullYear()} NELVYON</p>
+        <p className="text-xs text-zinc-500">© {new Date().getFullYear()} NELVYON</p>
       </div>
-      <div className="relative flex flex-1 items-center justify-center px-4 py-16">
+      <main className="relative flex flex-1 items-center justify-center px-4 py-16">
         <div className="w-full max-w-md rounded-3xl border border-white/[0.08] bg-[#0c0c0e]/80 p-8 shadow-[0_0_80px_rgba(0,102,255,0.08)] backdrop-blur-xl">
           <Link className="mb-8 inline-block text-lg font-bold text-white lg:hidden" href="/">
             {NELVYON.name}
@@ -37,12 +37,12 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
           <NelvyonEnterpriseHeading as="h1" variant="title" className="text-white">
             {title}
           </NelvyonEnterpriseHeading>
-          <NelvyonEnterpriseHeading as="p" variant="subtitle" className="mt-2 text-zinc-500">
+          <NelvyonEnterpriseHeading as="p" variant="subtitle" className="mt-2 text-zinc-400">
             {subtitle}
           </NelvyonEnterpriseHeading>
           <div className="mt-8">{children}</div>
         </div>
-      </div>
+      </main>
       <NelvyonChatbot />
     </div>
   );

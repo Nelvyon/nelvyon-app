@@ -2,7 +2,7 @@
  * E2E — /saas/memberships + /api/saas/memberships
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 const FIXTURE_MEMBERSHIPS = {
   plans: [
@@ -83,19 +83,19 @@ test.describe("SaaS Memberships — página autenticada", () => {
   });
 
   test("tiene al menos un botón o elemento interactivo", async ({ page }) => {
-    await page.goto("/saas/memberships", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/memberships**", { timeout: 15_000 });
-    await expect(page.getByRole("button", { name: "Planes" })).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole("button", { name: "Miembros" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Afiliados" })).toBeVisible();
+    await gotoAwaitingApi(page, "/saas/memberships", "/api/saas/memberships");
+    await expect(page.getByRole("tab", { name: "Planes" })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("tab", { name: "Miembros" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Afiliados" })).toBeVisible();
   });
 
   test("3 tabs visibles (Planes / Miembros / Afiliados)", async ({ page }) => {
-    await page.goto("/saas/memberships");
-    await page.waitForLoadState("domcontentloaded");
-    // Tabs should contain "Planes", "Miembros", "Afiliados"
-    const bodyText = await page.locator("body").textContent() ?? "";
-    expect(bodyText).toMatch(/Planes|Miembros|Afiliados/);
+    await gotoAwaitingApi(page, "/saas/memberships", "/api/saas/memberships");
+    const tablist = page.getByRole("tablist", { name: /Secciones membresías/i });
+    await expect(tablist).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("tab", { name: "Planes" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Miembros" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Afiliados" })).toBeVisible();
   });
 
   test("tab Miembros hace fetch a ?resource=members", async ({ page }) => {

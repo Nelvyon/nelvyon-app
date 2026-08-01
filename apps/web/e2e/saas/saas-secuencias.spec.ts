@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, expectUnauthorizedApi } from "./fixtures";
+import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, gotoAwaitingApi } from "./fixtures";
 
 const FIXTURE_SEQUENCES = {
   sequences: [
@@ -41,8 +41,7 @@ test.describe("SaaS Secuencias", () => {
       body = FIXTURE_SEQUENCES;
       await route.fulfill({ json: FIXTURE_SEQUENCES });
     });
-    await page.goto("/saas/secuencias");
-    await page.waitForTimeout(400);
+    await gotoAwaitingApi(page, "/saas/secuencias", "/api/saas/sequences");
     expect(body).not.toBeNull();
     expect(body!.ses_configured).toBeDefined();
   });
@@ -57,8 +56,7 @@ test.describe("SaaS Secuencias", () => {
   test("banner SES visible cuando ses_configured=false (fixture)", async ({ page }) => {
     await page.route("**/api/saas/sequences**", route =>
       route.fulfill({ json: { ...FIXTURE_SEQUENCES, ses_configured: false } }));
-    await page.goto("/saas/secuencias");
-    await page.waitForTimeout(600);
+    await gotoAwaitingApi(page, "/saas/secuencias", "/api/saas/sequences");
     await expect(page.locator("body")).toBeVisible();
   });
 });

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis } from "./fixtures";
+import { setAuthCookie, mockSaasApis, gotoAwaitingApi } from "./fixtures";
 
 const FIXTURE_MESSAGES = {
   whatsapp_configured: true,
@@ -53,7 +53,7 @@ test.describe("SaaS WhatsApp Depth (S39)", () => {
   });
 
   test("WhatsApp carga sin error con banner Meta configurado y KPIs", async ({ page }) => {
-    await page.goto("/saas/whatsapp", { waitUntil: "domcontentloaded" });
+    await gotoAwaitingApi(page, "/saas/whatsapp", "/api/saas/whatsapp");
     await expect(page).not.toHaveURL(/\/login/);
     await expect(page.getByRole("heading", { name: "WhatsApp Business" })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/WhatsApp activo/i)).toBeVisible();
@@ -62,8 +62,7 @@ test.describe("SaaS WhatsApp Depth (S39)", () => {
   });
 
   test("tab Plantillas muestra plantillas sincronizadas con nombre y estado", async ({ page }) => {
-    await page.goto("/saas/whatsapp", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/whatsapp**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/whatsapp", "/api/saas/whatsapp");
     const templatesResponse = page.waitForResponse("**/api/saas/whatsapp/templates**", { timeout: 15_000 });
     await page.getByRole("button", { name: /Plantillas/i }).click();
     await templatesResponse;
@@ -73,8 +72,7 @@ test.describe("SaaS WhatsApp Depth (S39)", () => {
   });
 
   test("envío template mock dispara POST y muestra confirmación", async ({ page }) => {
-    await page.goto("/saas/whatsapp", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/whatsapp**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/whatsapp", "/api/saas/whatsapp");
     const templatesResponse = page.waitForResponse("**/api/saas/whatsapp/templates**", { timeout: 15_000 });
     await page.getByRole("button", { name: /Plantillas/i }).click();
     await templatesResponse;

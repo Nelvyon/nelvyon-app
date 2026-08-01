@@ -2,20 +2,16 @@
  * S51 — E2E: Sector Benchmark
  */
 import { expect, test } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, mockSectorBenchmark, expectUnauthorizedApi } from "./fixtures";
+import { setAuthCookie, mockSaasApis, mockSectorBenchmark, expectUnauthorizedApi, gotoAwaitingApi } from "./fixtures";
 
 const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 
 async function gotoBenchmark(page: import("@playwright/test").Page): Promise<void> {
   for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      await page.goto("/saas/benchmark", { waitUntil: "domcontentloaded" });
-      await page.waitForResponse("**/api/saas/benchmark**", { timeout: 15_000 });
-      return;
-    } catch (err) {
-      if (attempt === 2) throw err;
-      await page.waitForTimeout(800 * (attempt + 1));
-    }
+    const res = await gotoAwaitingApi(page, "/saas/benchmark", "/api/saas/benchmark");
+    if (res) return;
+    if (attempt === 2) throw new Error("benchmark API response not received");
+    await page.waitForTimeout(800 * (attempt + 1));
   }
 }
 

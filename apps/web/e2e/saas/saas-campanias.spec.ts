@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_CAMPANIAS, expectUnauthorizedApi } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_CAMPANIAS, expectUnauthorizedApi, gotoAwaitingApi } from "./fixtures";
 
 test.describe("SaaS Campanias", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -23,8 +23,7 @@ test.describe("SaaS Campanias", () => {
       body = FIXTURE_CAMPANIAS;
       await route.fulfill({ json: FIXTURE_CAMPANIAS });
     });
-    await page.goto("/saas/campanias");
-    await page.waitForTimeout(400);
+    await gotoAwaitingApi(page, "/saas/campanias", "/api/saas/campanias");
     expect(body).not.toBeNull();
     expect(body!.ses_configured).toBeDefined();
   });
@@ -40,8 +39,7 @@ test.describe("SaaS Campanias", () => {
   test("banner SES visible cuando ses_configured=false (fixture)", async ({ page }) => {
     await page.route("**/api/saas/campanias**", route =>
       route.fulfill({ json: { ...FIXTURE_CAMPANIAS, ses_configured: false } }));
-    await page.goto("/saas/campanias");
-    await page.waitForTimeout(600);
+    await gotoAwaitingApi(page, "/saas/campanias", "/api/saas/campanias");
     await expect(page.locator("body")).toBeVisible();
   });
 });

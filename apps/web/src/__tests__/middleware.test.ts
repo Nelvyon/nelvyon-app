@@ -1,7 +1,12 @@
 import type { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getRateLimitRule, checkIpRateLimit, getClientIp } from "@/lib/security/rateLimit";
+import {
+  getRateLimitRule,
+  checkIpRateLimit,
+  getClientIp,
+  isCriticalRateLimitStrictEnvironment,
+} from "@/lib/security/rateLimit";
 import { REQUEST_ID_HEADER, resolveRequestId, withRequestId } from "@/lib/security/requestId";
 import { NextResponse } from "next/server";
 
@@ -81,10 +86,30 @@ describe("security rateLimit", () => {
     delete process.env.UPSTASH_REDIS_REST_TOKEN;
     delete process.env.UPSTASH_REDIS_TOKEN;
     vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("RAILWAY_ENVIRONMENT_NAME", "production");
+    delete process.env.RAILWAY_ENVIRONMENT;
+    delete process.env.NELVYON_DEPLOY_ENV;
 
     const rule = getRateLimitRule("/api/auth/login")!;
     const result = await checkIpRateLimit({ ip: "203.0.113.9", rule });
     expect(result.allowed).toBe(false);
+  });
+
+  it("staging NODE_ENV=production without Upstash uses in-memory auth-login (not permanent 429)", async () => {
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    delete process.env.UPSTASH_REDIS_TOKEN;
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("RAILWAY_ENVIRONMENT_NAME", "staging");
+    delete process.env.NELVYON_DEPLOY_ENV;
+
+    const { resetInMemoryRateLimitForTests } = await import("@/lib/security/inMemoryRateLimit");
+    resetInMemoryRateLimitForTests();
+    const rule = getRateLimitRule("/api/auth/login")!;
+    const first = await checkIpRateLimit({ ip: "203.0.113.44", rule });
+    expect(first.allowed).toBe(true);
+    expect(isCriticalRateLimitStrictEnvironment()).toBe(false);
   });
 
   it("uses in-memory fallback when Upstash fetch throws", async () => {
@@ -101,6 +126,8 @@ describe("security rateLimit", () => {
 
   it("fail-closes critical production rules when Upstash errors", async () => {
     vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("RAILWAY_ENVIRONMENT_NAME", "production");
+    delete process.env.NELVYON_DEPLOY_ENV;
     global.fetch = vi.fn(async () => {
       throw new Error("network down");
     }) as typeof fetch;
@@ -108,6 +135,21 @@ describe("security rateLimit", () => {
     const rule = getRateLimitRule("/api/platform/portal/auth/login")!;
     const result = await checkIpRateLimit({ ip: "203.0.113.2", rule });
     expect(result.allowed).toBe(false);
+  });
+
+  it("staging uses memory fallback when Upstash errors on auth-login", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("RAILWAY_ENVIRONMENT_NAME", "staging");
+    delete process.env.NELVYON_DEPLOY_ENV;
+    const { resetInMemoryRateLimitForTests } = await import("@/lib/security/inMemoryRateLimit");
+    resetInMemoryRateLimitForTests();
+    global.fetch = vi.fn(async () => {
+      throw new Error("network down");
+    }) as typeof fetch;
+
+    const rule = getRateLimitRule("/api/auth/login")!;
+    const result = await checkIpRateLimit({ ip: "203.0.113.55", rule });
+    expect(result.allowed).toBe(true);
   });
 });
 

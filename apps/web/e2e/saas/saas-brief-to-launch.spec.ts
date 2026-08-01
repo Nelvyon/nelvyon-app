@@ -2,7 +2,7 @@
  * S49 — E2E: Brief-to-Launch wizard
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, LOGIN_URL } from "./fixtures";
+import { setupAuthedSaas, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 test.describe("S49 — /saas/brief-to-launch page", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -77,8 +77,7 @@ test.describe("S49 — Pack selection flow", () => {
   });
 
   test("beta pack shows beta badge and waitlist message on select", async ({ page }) => {
-    await page.goto("/saas/brief-to-launch", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/brief-to-launch**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/brief-to-launch", "/api/saas/brief-to-launch");
     await expect(page.getByRole("button", { name: /Crecimiento Ecommerce/i })).toBeVisible({ timeout: 15_000 });
     await page.getByRole("button", { name: /Crecimiento Ecommerce/i }).click();
     await expect(page.getByText("Pack en beta")).toBeVisible({ timeout: 10_000 });

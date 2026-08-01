@@ -2,7 +2,7 @@
  * S55 — E2E: Voice Command
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, mockSaasVoice, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setupAuthedSaas, mockSaasVoice, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 test.describe("S55 — /saas/voice page", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -30,8 +30,7 @@ test.describe("S55 — /saas/voice page", () => {
   });
 
   test("history shows past transcript", async ({ page }) => {
-    await page.goto("/saas/voice", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/voice**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/voice", "/api/saas/voice");
     await expect(page.getByText("«ir a crm»", { exact: true })).toBeVisible({ timeout: 15_000 });
   });
 

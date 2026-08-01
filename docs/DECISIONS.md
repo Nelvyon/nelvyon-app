@@ -962,3 +962,15 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Decisión** | (1) DSAR user-level documenta `coverage` explícita (no CRM wipe); `delete-user-data` exige `confirm=DELETE` + solicitud pending; `getRequests` scoped por tenant. (2) Resolución multi-tenant acepta `X-Nelvyon-Tenant-Id` / cookie `nelvyon_saas_tenant_id` antes del fallback LIMIT 1 (DESC). (3) `claimReady` permanece **false**; canary **KILL**; veredicto certificación **CONDITIONAL_READY** hasta staging live + legal. |
 | **Por qué** | Certificación sin declarar READY sin evidencia; evitar false-success GDPR y tenant ambiguo. |
 | **Consecuencias** | Settings ? Privacidad; APIs más seguras; sin deploy prod implícito. Ver `docs/ops/W3CRM_MIGRATION_PLAN.md` §34. |
+
+---
+
+## ADR-077 â€” Rate-limit crÃ­tico: staging memory vs prod fail-closed (2026-08-01)
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-08-01 |
+| **DecisiÃ³n** | Sin Upstash, reglas crÃ­ticas (uth-login, etc.) fail-closed solo en entorno estricto (Railway production / NELVYON_DEPLOY_ENV=production). Staging/preview/NELVYON_DEPLOY_ENV=staging|test usan fallback in-memory con los mismos lÃ­mites (no bypass, no fail-open global). ProducciÃ³n exige Upstash antes del go-live auth. |
+| **Por quÃ©** | Staging Railway usa NODE_ENV=production sin Redis â†’ 429 permanente bloqueaba certificaciÃ³n password. AÃ±adir Upstash de pago en staging no autorizado; desactivar RL global prohibido. |
+| **Consecuencias** | Staging certifica login/roles; prod sin Upstash sigue 429 en auth crÃ­tico (intencional). claimReady: false hasta autorizaciÃ³n. |
+

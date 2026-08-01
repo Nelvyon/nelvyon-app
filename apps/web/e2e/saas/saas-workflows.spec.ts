@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_WORKFLOWS, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_WORKFLOWS, LOGIN_URL, expectUnauthorizedApi, gotoAwaitingApi } from "./fixtures";
 
 test.describe("SaaS Workflows", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -23,8 +23,7 @@ test.describe("SaaS Workflows", () => {
       captured = FIXTURE_WORKFLOWS;
       await route.fulfill({ json: FIXTURE_WORKFLOWS });
     });
-    await page.goto("/saas/workflows", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/workflows**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/workflows", "/api/saas/workflows");
     expect(captured).not.toBeNull();
     expect(captured!.ses_configured).toBeDefined();
   });

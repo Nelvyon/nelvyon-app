@@ -2,7 +2,11 @@
  * S52 — E2E: Pack Store
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, mockPackStore, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setupAuthedSaas, mockPackStore, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
+
+async function gotoPacksReady(page: import("@playwright/test").Page): Promise<void> {
+  await gotoAwaitingApi(page, "/saas/packs", "/api/saas/packs");
+}
 
 test.describe("S52 — /saas/packs page", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -24,7 +28,7 @@ test.describe("S52 — /saas/packs page", () => {
   });
 
   test("summary KPIs render", async ({ page }) => {
-    await page.goto("/saas/packs", { waitUntil: "domcontentloaded" });
+    await gotoPacksReady(page);
     await expect(page.getByText("Packs en catálogo")).toBeVisible({ timeout: 10_000 });
   });
 
@@ -34,31 +38,31 @@ test.describe("S52 — /saas/packs page", () => {
   });
 
   test("catalog cards render pack names", async ({ page }) => {
-    await page.goto("/saas/packs", { waitUntil: "domcontentloaded" });
+    await gotoPacksReady(page);
     await expect(page.getByText("Crecimiento Local")).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText("Crecimiento Ecommerce")).toBeVisible();
   });
 
   test("owned pack shows Lanzar ahora CTA", async ({ page }) => {
-    await page.goto("/saas/packs", { waitUntil: "domcontentloaded" });
+    await gotoPacksReady(page);
     await expect(page.getByRole("button", { name: /Lanzar ahora/i }).first()).toBeVisible({ timeout: 10_000 });
   });
 
   test("coming_soon pack shows En desarrollo disabled", async ({ page }) => {
-    await page.goto("/saas/packs", { waitUntil: "domcontentloaded" });
+    await gotoPacksReady(page);
     const btn = page.getByRole("button", { name: /En desarrollo/i });
     await expect(btn).toBeVisible({ timeout: 10_000 });
     await expect(btn).toBeDisabled();
   });
 
   test("Lanzar ahora navigates to brief-to-launch with packId", async ({ page }) => {
-    await page.goto("/saas/packs", { waitUntil: "domcontentloaded" });
+    await gotoPacksReady(page);
     await page.getByRole("button", { name: /Lanzar ahora/i }).first().click();
     await expect(page).toHaveURL(/\/saas\/brief-to-launch\?packId=local-business-growth/);
   });
 
   test("category filter narrows the grid", async ({ page }) => {
-    await page.goto("/saas/packs", { waitUntil: "domcontentloaded" });
+    await gotoPacksReady(page);
     await expect(page.getByText("Crecimiento Local")).toBeVisible({ timeout: 10_000 });
     await page.locator("select").first().selectOption("ads");
     await expect(page.getByText("Crecimiento Local")).toHaveCount(0);

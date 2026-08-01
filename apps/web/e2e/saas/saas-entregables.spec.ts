@@ -2,7 +2,7 @@
  * E2E — /saas/entregables (Deliverables Hub)
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, mockEntregablesList, mockEntregablesRevenue, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, mockEntregablesList, mockEntregablesRevenue, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 const FIXTURE_EMPTY = { deliverables: [], summary: { total: 0, pendingReview: 0, approved: 0, avgQaScore: null, byType: {}, byStatus: {} } };
 
@@ -86,20 +86,17 @@ test.describe("SaaS Entregables — página con datos", () => {
   });
 
   test("título 'Landing ACME E2E' aparece en tabla", async ({ page }) => {
-    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/entregables**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/entregables", "/api/saas/entregables");
     await expect(page.getByText("Landing ACME E2E")).toBeVisible({ timeout: 15_000 });
   });
 
   test("QA score 91% visible en verde", async ({ page }) => {
-    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/entregables**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/entregables", "/api/saas/entregables");
     await expect(page.getByText("91%")).toBeVisible({ timeout: 15_000 });
   });
 
   test("filtro de tipo cambia parámetro en fetch", async ({ page }) => {
-    await page.goto("/saas/entregables", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/entregables**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/entregables", "/api/saas/entregables");
     await expect(page.getByText(/Entregables|entregables/i).first()).toBeVisible({ timeout: 10_000 });
 
     const typeSelect = page.locator("select").filter({ has: page.locator('option[value="seo"]') });

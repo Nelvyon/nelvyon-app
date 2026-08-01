@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, FIXTURE_BILLING, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
+import { setAuthCookie, mockSaasApis, FIXTURE_BILLING, LOGIN_URL, expectUnauthorizedApi, gotoAwaitingApi } from "./fixtures";
 
 test.describe("SaaS Billing", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -20,8 +20,7 @@ test.describe("SaaS Billing", () => {
   test("/saas/billing carga con token y plan visible", async ({ page }) => {
     await page.route("**/api/saas/billing**", route =>
       route.fulfill({ json: FIXTURE_BILLING }));
-    await page.goto("/saas/billing");
-    await page.waitForTimeout(600);
+    await gotoAwaitingApi(page, "/saas/billing", "/api/saas/billing");
     expect(page.url()).not.toMatch(LOGIN_URL);
     await expect(page.locator("body")).toBeVisible();
   });
@@ -32,8 +31,7 @@ test.describe("SaaS Billing", () => {
       plan = FIXTURE_BILLING.plan;
       return route.fulfill({ json: FIXTURE_BILLING });
     });
-    await page.goto("/saas/billing");
-    await page.waitForTimeout(400);
+    await gotoAwaitingApi(page, "/saas/billing", "/api/saas/billing");
     expect(plan).toBe("pro");
   });
 });

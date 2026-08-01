@@ -2,7 +2,7 @@
  * E2E — /saas/integraciones + /api/saas/integrations
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
 
 const FIXTURE_INTEGRATIONS = {
   catalog: [
@@ -80,8 +80,7 @@ test.describe("SaaS Integraciones — página autenticada", () => {
   });
 
   test("filtro de búsqueda existe en DOM", async ({ page }) => {
-    await page.goto("/saas/integraciones", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/integrations**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/integraciones", "/api/saas/integrations");
     await expect(page.getByPlaceholder(/buscar integraci/i)).toBeVisible({ timeout: 15_000 });
   });
 
@@ -114,8 +113,7 @@ test.describe("SaaS Integraciones — interacción de categoría", () => {
       captured = FIXTURE_INTEGRATIONS;
       await route.fulfill({ json: FIXTURE_INTEGRATIONS });
     });
-    await page.goto("/saas/integraciones", { waitUntil: "domcontentloaded" });
-    await page.waitForResponse("**/api/saas/integrations**", { timeout: 15_000 });
+    await gotoAwaitingApi(page, "/saas/integraciones", "/api/saas/integrations");
     await expect(page.locator("body")).toBeVisible({ timeout: 15_000 });
     expect(captured).not.toBeNull();
     expect((captured as typeof FIXTURE_INTEGRATIONS).catalog.length).toBe(4);
