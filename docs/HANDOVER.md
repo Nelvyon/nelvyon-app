@@ -1,20 +1,21 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-08-01** — Foco activo: **biblioteca Envato integrada (parcial P0) + DeviceMockup · NO deploy** · claimReady true · canary **KILL**
+> Última actualización: **2026-08-01** — Foco activo: **web pública NUEVA en producción LIVE** · claimReady true · canary **KILL**
 
 | Campo | Valor |
 |-------|-------|
-| **Tip prod live** | `aa9ec67a` (anterior; **NO redeploy** hasta aprobación visual) |
-| **Web pública WIP** | Zubaz + saas-shots + **library/** (F-01/F-02 WebP+AVIF, I-01…I-05 SVG, DeviceMockup) · tsc **PASS** |
+| **Tip prod live** | deploy `6159c6b8` · commit `ca081d0e` · `@nelvyon/web` **SUCCESS** |
+| **URL prod** | https://app.nelvyon.com · https://nelvyon.com |
+| **Web pública** | DeviceMockup + saas-shots + library F-01/F-02 + I-01…I-05 · post-deploy **PROD_LIVE_PASS** |
 | **claimReady** | **true** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. **Deploy producción web pública en curso / validación post-deploy** en `https://app.nelvyon.com` (gates locales PASS; commit+push+Railway).
-2. Tras tip live confirmado: completar descarga P0 Envato restante (F-03…F-24, V-01…V-03, M extras, I-06) → organize + reintegrar.
-3. Aceternity OBLIGATORIOS (`docs/ops/ACETERNITY_NELVYON_AUDIT.md`) si el CEO lo prioriza tras prod estable.
+1. Completar descarga P0 Envato restante (F-03…F-24, V-01…V-03, M-02/03/05/06/08, I-06) → `.reference/envato-public-assets/` → `node apps/web/scripts/organize-envato-library.mjs` + integrar.
+2. Aceternity OBLIGATORIOS (`docs/ops/ACETERNITY_NELVYON_AUDIT.md`) si el CEO lo prioriza.
+3. Evidencia live: `docs/evidence/public-web-prod-postdeploy_latest.json`.
 
 ### Capturas SaaS (hecho)
 
