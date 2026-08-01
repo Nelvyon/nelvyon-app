@@ -1,0 +1,30 @@
+﻿[
+    {
+        "page":  "/",
+        "performance":  87,
+        "accessibility":  100,
+        "bestPractices":  100,
+        "seo":  92
+    },
+    {
+        "page":  "/precios",
+        "performance":  89,
+        "accessibility":  100,
+        "bestPractices":  100,
+        "seo":  91
+    },
+    {
+        "page":  "/contacto",
+        "performance":  87,
+        "accessibility":  100,
+        "bestPractices":  100,
+        "seo":  92
+    },
+    {
+        "page":  "/plataforma",
+        "performance":  88,
+        "accessibility":  100,
+        "bestPractices":  100,
+        "seo":  92
+    }
+]

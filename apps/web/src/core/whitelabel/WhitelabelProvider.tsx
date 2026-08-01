@@ -78,6 +78,14 @@ export function WhitelabelProvider({
 
   const refresh = useCallback(async () => {
     if (hostConfig) return;
+    const path = typeof window !== "undefined" ? window.location.pathname : "";
+    const isAppSurface =
+      path.startsWith("/saas") ||
+      path.startsWith("/os") ||
+      path.startsWith("/portal") ||
+      path.startsWith("/admin") ||
+      path.startsWith("/dashboard");
+    if (!isAppSurface) return;
     try {
       const applied = await whitelabelApi.apply();
       setWorkspaceConfig(applied);

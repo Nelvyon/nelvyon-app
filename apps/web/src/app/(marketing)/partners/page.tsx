@@ -68,7 +68,7 @@ export default function PartnersPage() {
 
       <section className="flex justify-center">
         <NelvyonDsButton asChild size="lg">
-          <Link href="/saas/partners">Conviértete en Partner</Link>
+          <Link href="/contacto">Conviértete en Partner</Link>
         </NelvyonDsButton>
       </section>
     </main>

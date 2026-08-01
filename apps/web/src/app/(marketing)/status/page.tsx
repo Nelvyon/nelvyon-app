@@ -28,7 +28,7 @@ const SERVICE_LABELS: Record<string, string> = {
   api: "API Principal",
   database: "Base de datos",
   agents: "Agentes IA",
-  payments: "Pagos (Paddle)",
+  payments: "Pagos (Stripe)",
   email: "Email (SES)",
 };
 

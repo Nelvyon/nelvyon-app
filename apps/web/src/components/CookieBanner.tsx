@@ -78,11 +78,11 @@ export function CookieBanner() {
           <p className="text-sm leading-relaxed text-zinc-300">
             Usamos cookies propias y de terceros para el funcionamiento del sitio, analítica y marketing. Puedes
             aceptar todas, solo las necesarias o personalizar tu elección. Más información en nuestra{" "}
-            <Link href="/privacidad" className="text-[#0066FF] underline hover:text-[#66a3ff]">
+            <Link href="/privacidad" className="text-[#4da3ff] underline hover:text-[#7cbcff]">
               política de privacidad
             </Link>{" "}
             y{" "}
-            <Link href="/cookies" className="text-[#0066FF] underline hover:text-[#66a3ff]">
+            <Link href="/cookies" className="text-[#4da3ff] underline hover:text-[#7cbcff]">
               cookies
             </Link>
             .

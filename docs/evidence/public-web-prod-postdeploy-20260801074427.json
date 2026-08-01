@@ -1,0 +1,81 @@
+﻿{
+    "generatedAt":  "2026-08-01T05:44:27.9024881Z",
+    "base":  "https://app.nelvyon.com",
+    "pass":  6,
+    "total":  10,
+    "results":  [
+                    {
+                        "route":  "/",
+                        "status":  200,
+                        "ok":  true,
+                        "hasBrand":  true,
+                        "thirdParty":  false,
+                        "bytes":  72017
+                    },
+                    {
+                        "route":  "/plataforma",
+                        "status":  404,
+                        "ok":  false,
+                        "error":  "Error en el servidor remoto: (404) No se encontró."
+                    },
+                    {
+                        "route":  "/agencia",
+                        "status":  404,
+                        "ok":  false,
+                        "error":  "Error en el servidor remoto: (404) No se encontró."
+                    },
+                    {
+                        "route":  "/precios",
+                        "status":  200,
+                        "ok":  true,
+                        "hasBrand":  true,
+                        "thirdParty":  false,
+                        "bytes":  42710
+                    },
+                    {
+                        "route":  "/contacto",
+                        "status":  200,
+                        "ok":  true,
+                        "hasBrand":  true,
+                        "thirdParty":  false,
+                        "bytes":  89231
+                    },
+                    {
+                        "route":  "/faq",
+                        "status":  404,
+                        "ok":  false,
+                        "error":  "Error en el servidor remoto: (404) No se encontró."
+                    },
+                    {
+                        "route":  "/privacidad",
+                        "status":  200,
+                        "ok":  true,
+                        "hasBrand":  true,
+                        "thirdParty":  false,
+                        "bytes":  46584
+                    },
+                    {
+                        "route":  "/legal/subprocessors",
+                        "status":  404,
+                        "ok":  false,
+                        "error":  "Error en el servidor remoto: (404) No se encontró."
+                    },
+                    {
+                        "route":  "/saas",
+                        "status":  200,
+                        "ok":  true,
+                        "hasBrand":  true,
+                        "thirdParty":  false,
+                        "bytes":  158161
+                    },
+                    {
+                        "route":  "/login",
+                        "status":  200,
+                        "ok":  true,
+                        "hasBrand":  true,
+                        "thirdParty":  false,
+                        "bytes":  34962
+                    }
+                ],
+    "verdict":  "FAIL"
+}

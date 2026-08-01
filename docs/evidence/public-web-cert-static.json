@@ -1,0 +1,191 @@
+{
+  "generatedAt": "2026-08-01T05:23:31.387Z",
+  "routes": {
+    "total": 26,
+    "missing": [],
+    "all": [
+      {
+        "route": "/",
+        "file": "apps/web/src/app/(marketing)/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/plataforma",
+        "file": "apps/web/src/app/(marketing)/plataforma/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/agencia",
+        "file": "apps/web/src/app/(marketing)/agencia/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/automatizaciones-ia",
+        "file": "apps/web/src/app/(marketing)/automatizaciones-ia/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/soluciones",
+        "file": "apps/web/src/app/(marketing)/soluciones/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/servicios",
+        "file": "apps/web/src/app/(marketing)/servicios/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/sectores",
+        "file": "apps/web/src/app/(marketing)/sectores/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/enterprise",
+        "file": "apps/web/src/app/(marketing)/enterprise/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/integraciones",
+        "file": "apps/web/src/app/(marketing)/integraciones/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/precios",
+        "file": "apps/web/src/app/(marketing)/precios/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/casos-de-exito",
+        "file": "apps/web/src/app/(marketing)/casos-de-exito/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/recursos",
+        "file": "apps/web/src/app/(marketing)/recursos/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/blog",
+        "file": "apps/web/src/app/(marketing)/blog/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/faq",
+        "file": "apps/web/src/app/(marketing)/faq/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/contacto",
+        "file": "apps/web/src/app/(marketing)/contacto/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/login",
+        "file": "apps/web/src/app/login/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/saas",
+        "file": "apps/web/src/app/(marketing)/saas/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/aviso-legal",
+        "file": "apps/web/src/app/(marketing)/aviso-legal/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/privacidad",
+        "file": "apps/web/src/app/privacidad/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/cookies",
+        "file": "apps/web/src/app/cookies/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/terminos",
+        "file": "apps/web/src/app/terminos/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/seguridad",
+        "file": "apps/web/src/app/(marketing)/seguridad/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/status",
+        "file": "apps/web/src/app/(marketing)/status/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/legal",
+        "file": "apps/web/src/app/legal/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/legal/dpa",
+        "file": "apps/web/src/app/legal/dpa/page.tsx",
+        "exists": true
+      },
+      {
+        "route": "/legal/subprocessors",
+        "file": "apps/web/src/app/legal/subprocessors/page.tsx",
+        "exists": true
+      }
+    ]
+  },
+  "brandingHits": [],
+  "hrefs": {
+    "total": 17,
+    "bad": []
+  },
+  "images": {
+    "total": 10,
+    "missing": [],
+    "all": [
+      {
+        "src": "/brand/public/enterprise-meeting.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/ops-focus.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/hero-team.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/platform-ui.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/agency-collab.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/automation-ui.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/blog-infra.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/office-banner.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/agency-brand.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/service-ops.webp",
+        "exists": true
+      }
+    ]
+  },
+  "verdict": "PASS"
+}

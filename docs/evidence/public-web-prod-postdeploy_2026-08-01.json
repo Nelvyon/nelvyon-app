@@ -1,0 +1,217 @@
+﻿{
+    "contact_api":  "checked",
+    "base":  "https://app.nelvyon.com",
+    "timestamp":  "2026-08-01T05:46:03.4958330Z",
+    "deployment_id":  "aa9ec67a-5867-4851-8eee-4aa4de4e70a5",
+    "pass":  true,
+    "routes":  [
+                   {
+                       "path":  "/",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  89615
+                   },
+                   {
+                       "path":  "/plataforma",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  54924
+                   },
+                   {
+                       "path":  "/agencia",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  54851
+                   },
+                   {
+                       "path":  "/automatizaciones-ia",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  54918
+                   },
+                   {
+                       "path":  "/soluciones",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  54758
+                   },
+                   {
+                       "path":  "/servicios",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  59402
+                   },
+                   {
+                       "path":  "/sectores",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  65011
+                   },
+                   {
+                       "path":  "/enterprise",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  54877
+                   },
+                   {
+                       "path":  "/integraciones",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  72852
+                   },
+                   {
+                       "path":  "/precios",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  63282
+                   },
+                   {
+                       "path":  "/casos-de-exito",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  67825
+                   },
+                   {
+                       "path":  "/recursos",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  56295
+                   },
+                   {
+                       "path":  "/blog",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  59326
+                   },
+                   {
+                       "path":  "/faq",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  60848
+                   },
+                   {
+                       "path":  "/contacto",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  true,
+                       "len":  54044
+                   },
+                   {
+                       "path":  "/login",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  true,
+                       "len":  35225
+                   },
+                   {
+                       "path":  "/saas",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  57303
+                   },
+                   {
+                       "path":  "/aviso-legal",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  50407
+                   },
+                   {
+                       "path":  "/seguridad",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  54833
+                   },
+                   {
+                       "path":  "/privacidad",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  56719
+                   },
+                   {
+                       "path":  "/cookies",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  54844
+                   },
+                   {
+                       "path":  "/terminos",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  56513
+                   },
+                   {
+                       "path":  "/legal",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  56230
+                   },
+                   {
+                       "path":  "/legal/dpa",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  61307
+                   },
+                   {
+                       "path":  "/legal/subprocessors",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  64351
+                   },
+                   {
+                       "path":  "/partners",
+                       "status":  200,
+                       "ok":  true,
+                       "nelvyon":  true,
+                       "demo":  false,
+                       "len":  49495
+                   }
+               ]
+}

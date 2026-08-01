@@ -1,44 +1,65 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/agenforce/footer";
-import { Navbar } from "@/components/navbar";
-import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
+
+import { LegalPage } from "@/components/legal/LegalPage";
+import { siteBrand } from "@/features/public-web";
+
 export const metadata: Metadata = {
-  title: "Términos de Uso | NELVYON",
-  description: "Términos y condiciones de uso de los servicios de NELVYON.",
+  title: "Términos y condiciones | NELVYON",
+  description: "Términos de uso del sitio y de los servicios NELVYON.",
+  alternates: { canonical: "/terminos" },
 };
+
+const EFFECTIVE_DATE = "1 de agosto de 2026";
+
 export default function TerminosPage() {
   return (
-    <>
-      <Navbar />
-      <main style={{ paddingTop: "68px" }}>
-        <section style={{ backgroundColor: "#07122a", padding: "64px 0 0" }}>
-          <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 48px", textAlign: "center" }}>
-            <h1 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 900, color: "#ffffff", margin: 0 }}>Términos de Uso</h1>
-            <p style={{ fontSize: "16px", color: "#a8c8e8", marginTop: "12px" }}>Última actualización: Mayo 2026</p>
-          </div>
-          <NavyToWhiteTransition />
-        </section>
-        <section style={{ backgroundColor: "#ffffff", padding: "80px 0" }}>
-          <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
-            {[
-              { title: "1. Aceptación de los términos", content: "Al acceder y utilizar los servicios de NELVYON, aceptas estos términos y condiciones en su totalidad. Si no estás de acuerdo con alguno de estos términos, no debes usar nuestros servicios." },
-              { title: "2. Descripción del servicio", content: "NELVYON proporciona una plataforma de marketing digital automatizado que incluye gestión de campañas publicitarias, automatización de comunicaciones y generación de contenido web mediante agentes expertos." },
-              { title: "3. Uso aceptable", content: "Te comprometes a usar nuestros servicios únicamente para fines legales y de acuerdo con estos términos. Queda prohibido el uso de la plataforma para enviar spam, contenido ilegal o actividades fraudulentas." },
-              { title: "4. Propiedad intelectual", content: "Todo el contenido, software y materiales de NELVYON están protegidos por derechos de propiedad intelectual. No puedes copiar, modificar ni distribuir nuestros materiales sin autorización expresa." },
-              { title: "5. Limitación de responsabilidad", content: "NELVYON no será responsable de daños indirectos, incidentales o consecuentes derivados del uso o imposibilidad de uso de nuestros servicios. La responsabilidad máxima se limita al importe pagado en los últimos 3 meses." },
-              { title: "6. Cancelación y reembolsos", content: "Puedes cancelar tu suscripción en cualquier momento sin penalización. Los pagos realizados no son reembolsables salvo en los casos establecidos por la legislación de consumidores aplicable." },
-              { title: "7. Modificaciones del servicio", content: "Nos reservamos el derecho a modificar o interrumpir el servicio con un preaviso mínimo de 30 días. Te notificaremos los cambios significativos por email." },
-              { title: "8. Ley aplicable", content: "Estos términos se rigen por la legislación española. Cualquier disputa será sometida a los juzgados y tribunales de Madrid, España." },
-            ].map((section, i) => (
-              <div key={i} style={{ marginBottom: "40px" }}>
-                <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#07122a", margin: "0 0 12px" }}>{section.title}</h2>
-                <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>{section.content}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </>
+    <LegalPage title="Términos y condiciones" lastUpdated={EFFECTIVE_DATE}>
+      <p>
+        Estos términos regulan el uso del sitio público y, junto con el pedido o contrato aplicable, el acceso a
+        los servicios de {siteBrand.name}. Contacto:{" "}
+        <a href={`mailto:${siteBrand.contactEmail}`}>{siteBrand.contactEmail}</a>.
+      </p>
+      <h2>1. Aceptación</h2>
+      <p>
+        Al acceder al sitio o utilizar la plataforma, usted acepta estos términos y la documentación legal
+        vinculada (privacidad, cookies, DPA cuando proceda).
+      </p>
+      <h2>2. Servicios</h2>
+      <p>
+        {siteBrand.name} ofrece plataforma SaaS B2B, servicios de agencia/packs de marketing operados con IA y
+        funcionalidades asociadas según el plan contratado. Las descripciones comerciales del sitio son informativas.
+      </p>
+      <h2>3. Cuentas y acceso</h2>
+      <p>
+        El cliente es responsable de la confidencialidad de credenciales, del uso conforme por sus usuarios y de la
+        licitud de los datos que introduce en la plataforma.
+      </p>
+      <h2>4. Planes y pagos</h2>
+      <p>
+        Los precios publicados (Starter, Growth, Elite) son orientativos de lista. La facturación se gestiona según
+        el plan activo del tenant y el proveedor de pagos configurado (Stripe).
+      </p>
+      <h2>5. Uso aceptable</h2>
+      <p>
+        Queda prohibido el uso ilícito, abusivo, que comprometa la seguridad o que vulnere derechos de terceros.
+        Véase también la política de uso aceptable en <a href="/legal/acceptable-use">/legal/acceptable-use</a> si
+        aplica a su cuenta.
+      </p>
+      <h2>6. Propiedad intelectual</h2>
+      <p>
+        {siteBrand.name} y sus licenciantes conservan los derechos sobre software, marcas y contenidos propios. El
+        cliente conserva derechos sobre sus datos y contenidos.
+      </p>
+      <h2>7. Limitación de responsabilidad</h2>
+      <p>
+        En la medida permitida por la ley, la responsabilidad de {siteBrand.name} se limita a lo pactado
+        contractualmente para el servicio afectado. El sitio informativo se ofrece «tal cual».
+      </p>
+      <h2>8. Ley aplicable</h2>
+      <p>
+        Salvo norma imperativa en contrario, se aplicará la legislación española y los tribunales competentes
+        correspondientes al domicilio del titular del servicio.
+      </p>
+    </LegalPage>
   );
 }

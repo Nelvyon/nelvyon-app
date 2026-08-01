@@ -94,11 +94,16 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: "/legal/privacy", destination: "/privacy", permanent: true },
-      { source: "/legal/terms", destination: "/terms", permanent: true },
+      { source: "/legal/privacy", destination: "/privacidad", permanent: true },
+      { source: "/legal/terms", destination: "/terminos", permanent: true },
+      { source: "/privacy", destination: "/privacidad", permanent: true },
+      { source: "/terms", destination: "/terminos", permanent: true },
+      { source: "/pricing", destination: "/precios", permanent: true },
+      { source: "/sobre-nosotros", destination: "/nosotros", permanent: true },
       { source: "/forgot-password", destination: "/auth/forgot-password", permanent: false },
       { source: "/work", destination: "/servicios", permanent: true },
       { source: "/products", destination: "/servicios", permanent: true },
+
       { source: "/dashboard/social-scheduler", destination: "/saas/social", permanent: true },
       { source: "/dashboard/social-monitoring", destination: "/saas/social", permanent: true },
       { source: "/dashboard/funnels", destination: "/saas/funnels", permanent: true },

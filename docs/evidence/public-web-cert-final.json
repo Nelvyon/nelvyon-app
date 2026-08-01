@@ -1,0 +1,103 @@
+{
+  "generatedAt": "2026-08-01T05:32:00.000Z",
+  "scope": "NELVYON public website certification",
+  "baseLocal": "http://127.0.0.1:3010",
+  "verdict": "CERTIFIED_WITH_RESIDUALS_AND_PROD_LIVE",
+  "production": {
+    "deploymentId": "aa9ec67a-5867-4851-8eee-4aa4de4e70a5",
+    "status": "SUCCESS",
+    "base": "https://app.nelvyon.com",
+    "routeCrawl": "26/26 PASS",
+    "evidence": "docs/evidence/public-web-prod-postdeploy_latest.json"
+  },
+  "gates": {
+    "tsc": "PASS",
+    "eslintPublicWeb": "PASS",
+    "buildProd": "PASS",
+    "staticInventory": "PASS",
+    "httpCrawl26Routes": "PASS",
+    "contactApiAlive": "PASS (400 without body = alive)",
+    "imagesWebp": "PASS",
+    "noDemoOrThirdPartyBrandingInPublicWeb": "PASS",
+    "browserVisualHome": "PASS",
+    "nestedMainLandmarks": "PASS (1 main)",
+    "prodDeploy": "PASS",
+    "prodRouteCrawl26": "PASS",
+    "lighthouse": {
+      "home": { "performance": 87, "accessibility": 100, "bestPractices": 100, "seo": 92 },
+      "precios": { "performance": 89, "accessibility": 100, "bestPractices": 100, "seo": 91 },
+      "contacto": { "performance": 87, "accessibility": 100, "bestPractices": 100, "seo": 92 },
+      "plataforma": { "performance": 88, "accessibility": 100, "bestPractices": 100, "seo": 92 }
+    }
+  },
+
+  "routesCertifiedHttp200": [
+    "/",
+    "/plataforma",
+    "/agencia",
+    "/automatizaciones-ia",
+    "/soluciones",
+    "/servicios",
+    "/sectores",
+    "/enterprise",
+    "/integraciones",
+    "/precios",
+    "/casos-de-exito",
+    "/recursos",
+    "/blog",
+    "/faq",
+    "/contacto",
+    "/login",
+    "/saas",
+    "/aviso-legal",
+    "/privacidad",
+    "/cookies",
+    "/terminos",
+    "/seguridad",
+    "/status",
+    "/legal",
+    "/legal/dpa",
+    "/legal/subprocessors"
+  ],
+  "defectsFixedDuringCert": [
+    "Broken public href /saas/partners -> /contacto",
+    "Nested <main> landmarks -> PublicShell uses #contenido-principal div",
+    "Nav aria-label mismatch",
+    "Cookie banner link contrast #0066FF -> #4da3ff",
+    "Primary button contrast -> darker #005fcc",
+    "Skip FastAPI region/whitelabel bootstrap on public marketing (CSP console)",
+    "Skip /api/auth/me cookie bootstrap on anonymous public pages (401 console)",
+    "Hero/assets converted to WebP (~25-80KB) for LCP",
+    "Home title absolute (no duplicated | NELVYON)",
+    "UTF-8 corruption from PowerShell rewrites repaired"
+  ],
+  "residuals": [
+    {
+      "id": "perf-below-95",
+      "severity": "Lighthouse performance 87-89 on local prod server",
+      "cause": "Shared Next app shell JS (i18n/providers) still loads on marketing routes",
+      "evidence": "docs/evidence/public-web-lighthouse/summary.json"
+    },
+    {
+      "id": "seo-meta-description-audit",
+      "severity": "Lighthouse SEO meta-description audit score 0",
+      "cause": "False negative: raw HTML and DOM contain meta name=description (verified)",
+      "evidence": "browser CDP + HTTP HTML inspection; SEO overall 91-92"
+    },
+    {
+      "id": "bf-cache",
+      "severity": "Back/forward cache not fully restorable",
+      "cause": "Likely unload/pagehide listeners from global widgets",
+      "severityLevel": "low"
+    }
+  ],
+  "evidenceFiles": [
+    "docs/evidence/public-web-cert-static.json",
+    "docs/evidence/public-web-cert-crawl_latest.json",
+    "docs/evidence/public-web-lighthouse/summary.json",
+    "docs/evidence/public-web-lighthouse/home.json",
+    "docs/evidence/public-web-lighthouse/precios.json",
+    "docs/evidence/public-web-lighthouse/contacto.json",
+    "docs/evidence/public-web-lighthouse/plataforma.json"
+  ]
+}

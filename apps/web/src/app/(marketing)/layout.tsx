@@ -1,36 +1,46 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { DM_Mono, Geist_Mono, Inter } from "next/font/google";
+import { Manrope, Outfit } from "next/font/google";
 
 import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { getAppBaseUrl } from "@/lib/appUrl";
+import { siteBrand } from "@/features/public-web";
 
-import "@/styles/nelvyon-enterprise.css";
-import "@/styles/productized-agency.css";
+import "@/features/public-web/styles/public-web.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
-const dmMono = DM_Mono({ subsets: ["latin"], variable: "--font-dm-mono", weight: ["300", "400", "500"] });
+const sans = Manrope({
+  subsets: ["latin"],
+  variable: "--font-nv-sans",
+  display: "swap",
+});
+
+const display = Outfit({
+  subsets: ["latin"],
+  variable: "--font-nv-display",
+  display: "swap",
+});
 
 const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/opengraph-image`;
 
 export const metadata: Metadata = {
-  title: "NELVYON — OS de marketing + packs autónomos",
-  description:
-    "Plataforma enterprise de marketing autónomo: packs listos para el cliente y un sistema operativo interno que ejecuta SEO, ads, funnels y entregables a escala.",
+  title: {
+    default: `${siteBrand.name} — Agencia IA + SaaS B2B`,
+    template: `%s | ${siteBrand.name}`,
+  },
+  description: siteBrand.description,
+  metadataBase: new URL(canonicalBase),
   openGraph: {
-    title: "NELVYON — SaaS, marketing, automatización e IA",
-    description:
-      "SaaS, marketing, automatización e IA en un sistema operativo para negocios modernos.",
+    title: `${siteBrand.name} — Agencia IA + SaaS B2B`,
+    description: siteBrand.tagline,
     url: canonicalBase,
-    siteName: "NELVYON",
+    siteName: siteBrand.name,
     images: [
       {
         url: ogImageAbs,
         width: 1200,
         height: 630,
-        alt: "NELVYON",
+        alt: siteBrand.name,
       },
     ],
     type: "website",
@@ -38,8 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NELVYON — Plataforma operativa de marketing",
-    description: "SaaS, marketing, automatización e IA para crecer con orden.",
+    title: `${siteBrand.name} — Agencia IA + SaaS B2B`,
+    description: siteBrand.tagline,
     images: [ogImageAbs],
     creator: "@nelvyon",
   },
@@ -53,17 +63,17 @@ export default function MarketingRouteLayout({ children }: { children: ReactNode
   const orgLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "NELVYON",
+    name: siteBrand.name,
     url: canonicalBase,
     logo: `${canonicalBase}/logo.svg`,
-    description:
-      "Agencia de marketing digital con inteligencia artificial y SaaS B2B.",
+    description: siteBrand.description,
+    email: siteBrand.contactEmail,
     sameAs: ["https://twitter.com/nelvyon"],
   };
   const websiteLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "NELVYON",
+    name: siteBrand.name,
     url: canonicalBase,
     potentialAction: {
       "@type": "SearchAction",
@@ -73,16 +83,16 @@ export default function MarketingRouteLayout({ children }: { children: ReactNode
   };
 
   return (
-    <section lang="es" className={`${inter.variable} ${geistMono.variable} ${dmMono.variable} nelvyon-enterprise-theme`}>
+    <section lang="es" className={`${sans.variable} ${display.variable}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
+      <a
+        href="#contenido-principal"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-[var(--nv-accent)] focus:px-4 focus:py-2 focus:text-white"
+      >
+        Saltar al contenido
+      </a>
       <MarketingChrome>{children}</MarketingChrome>
-      <script
-        dangerouslySetInnerHTML={{
-          __html:
-            "document.addEventListener('DOMContentLoaded',function(){const sel='.fade-in,.nv-fade';const els=document.querySelectorAll(sel);const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.08});els.forEach(el=>obs.observe(el))});",
-        }}
-      />
     </section>
   );
 }

@@ -214,7 +214,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (!ok) {
-        ok = await bootstrapFromCookie();
+        const path = typeof window !== "undefined" ? window.location.pathname : "";
+        const isAppSurface =
+          path.startsWith("/saas") ||
+          path.startsWith("/os") ||
+          path.startsWith("/portal") ||
+          path.startsWith("/admin") ||
+          path.startsWith("/dashboard") ||
+          path.startsWith("/login") ||
+          path.startsWith("/auth");
+        // Avoid noisy 401 /api/auth/me on anonymous public marketing pages.
+        if (isAppSurface) {
+          ok = await bootstrapFromCookie();
+        }
       }
 
       if (!cancelled) {

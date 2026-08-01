@@ -1,44 +1,64 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/agenforce/footer";
-import { Navbar } from "@/components/navbar";
-import { NavyToWhiteTransition } from "@/components/agenforce/section-transition";
+
+import { LegalPage } from "@/components/legal/LegalPage";
+import { siteBrand } from "@/features/public-web";
+
 export const metadata: Metadata = {
-  title: "Política de Privacidad | NELVYON",
-  description: "Política de privacidad de NELVYON. Cómo recopilamos, usamos y protegemos tus datos personales conforme al RGPD.",
+  title: "Política de privacidad | NELVYON",
+  description:
+    "Cómo NELVYON recoge, usa y protege datos personales conforme al RGPD.",
+  alternates: { canonical: "/privacidad" },
 };
+
+const EFFECTIVE_DATE = "1 de agosto de 2026";
+
 export default function PrivacidadPage() {
   return (
-    <>
-      <Navbar />
-      <main style={{ paddingTop: "68px" }}>
-        <section style={{ backgroundColor: "#07122a", padding: "64px 0 0" }}>
-          <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px 48px", textAlign: "center" }}>
-            <h1 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 900, color: "#ffffff", margin: 0 }}>Política de Privacidad</h1>
-            <p style={{ fontSize: "16px", color: "#a8c8e8", marginTop: "12px" }}>Última actualización: Mayo 2026</p>
-          </div>
-          <NavyToWhiteTransition />
-        </section>
-        <section style={{ backgroundColor: "#ffffff", padding: "80px 0" }}>
-          <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
-            {[
-              { title: "1. Responsable del tratamiento", content: "NELVYON (en adelante, \"la empresa\") es la responsable del tratamiento de los datos personales recogidos a través de este sitio web (nelvyon.com). Correo de contacto: hola@nelvyon.com." },
-              { title: "2. Datos que recopilamos", content: "Recopilamos los datos que nos proporcionas directamente al rellenar formularios de contacto (nombre, email, teléfono, empresa), así como datos de navegación de forma anónima y agregada para mejorar la experiencia de usuario." },
-              { title: "3. Finalidad del tratamiento", content: "Utilizamos tus datos para: responder a tus consultas y solicitudes, enviarte información sobre nuestros servicios si nos das tu consentimiento, y mejorar nuestros productos y servicios." },
-              { title: "4. Base jurídica", content: "El tratamiento se basa en tu consentimiento explícito al enviar el formulario de contacto, y en el interés legítimo de la empresa para la gestión de la relación comercial." },
-              { title: "5. Conservación de datos", content: "Conservamos tus datos durante el tiempo necesario para cumplir con la finalidad para la que fueron recogidos, y en todo caso durante los plazos establecidos por la legislación aplicable." },
-              { title: "6. Tus derechos", content: "Tienes derecho a acceder, rectificar, suprimir, limitar u oponerte al tratamiento de tus datos, así como a la portabilidad de los mismos. Puedes ejercer estos derechos escribiendo a hola@nelvyon.com." },
-              { title: "7. Transferencias internacionales", content: "Algunos de nuestros proveedores de servicios (como servicios de email o infraestructura cloud) pueden estar ubicados fuera del Espacio Económico Europeo. En estos casos garantizamos que se aplican las salvaguardas adecuadas conforme al RGPD." },
-              { title: "8. Cambios en esta política", content: "Nos reservamos el derecho a actualizar esta política de privacidad. Te notificaremos cualquier cambio significativo por email o mediante aviso en nuestra web." },
-            ].map((section, i) => (
-              <div key={i} style={{ marginBottom: "40px" }}>
-                <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#07122a", margin: "0 0 12px" }}>{section.title}</h2>
-                <p style={{ fontSize: "16px", color: "#5a6a8a", lineHeight: 1.7, margin: 0 }}>{section.content}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </>
+    <LegalPage title="Política de privacidad" lastUpdated={EFFECTIVE_DATE}>
+      <p>
+        <strong>Responsable:</strong> {siteBrand.name}. Contacto:{" "}
+        <a href={`mailto:${siteBrand.contactEmail}`}>{siteBrand.contactEmail}</a>. Soporte:{" "}
+        <a href={`mailto:${siteBrand.supportEmail}`}>{siteBrand.supportEmail}</a>.
+      </p>
+      <h2>1. Datos que tratamos</h2>
+      <p>
+        Datos de contacto y formularios (nombre, email, empresa, teléfono, mensaje), datos de cuenta SaaS,
+        datos de uso de la plataforma necesarios para prestar el servicio, y datos técnicos de seguridad
+        (p. ej. logs y control de acceso).
+      </p>
+      <h2>2. Finalidades</h2>
+      <ul>
+        <li>Responder solicitudes comerciales y de soporte.</li>
+        <li>Prestar, asegurar y mejorar la plataforma SaaS y servicios asociados.</li>
+        <li>Facturación y cumplimiento contractual.</li>
+        <li>Cumplir obligaciones legales y de seguridad.</li>
+      </ul>
+      <h2>3. Base jurídica</h2>
+      <p>
+        Ejecución de contrato o medidas precontractuales, interés legítimo en seguridad y mejora del servicio,
+        cumplimiento legal y, cuando proceda, consentimiento (p. ej. comunicaciones comerciales opcionales).
+      </p>
+      <h2>4. Conservación</h2>
+      <p>
+        Conservamos los datos el tiempo necesario para las finalidades indicadas y los plazos legales aplicables.
+        Los leads de marketing se gestionan conforme a criterios operativos y solicitudes de supresión.
+      </p>
+      <h2>5. Encargados y subprocesadores</h2>
+      <p>
+        Podemos recurrir a encargados del tratamiento. Consulte el <a href="/legal/dpa">DPA</a> y la lista de{" "}
+        <a href="/legal/subprocessors">subprocesadores</a>.
+      </p>
+      <h2>6. Derechos</h2>
+      <p>
+        Puede ejercer acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a{" "}
+        {siteBrand.contactEmail}. También puede reclamar ante la autoridad de control competente.
+      </p>
+      <h2>7. Cookies</h2>
+      <p>
+        El uso de cookies se describe en la <a href="/cookies">Política de cookies</a>.
+      </p>
+      <h2>8. Cambios</h2>
+      <p>Actualizaremos esta política cuando cambien prácticas materiales de tratamiento.</p>
+    </LegalPage>
   );
 }

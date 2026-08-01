@@ -1,39 +1,87 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 
-import { Container } from "@/components/pa/container";
-import { Header } from "@/components/pa/header";
-import { nelvyonBlogCategories } from "@/config/nelvyon-marketing-pages";
+import { blog } from "@/lib/pa/source";
+import { Container, PageHero, CtaBand } from "@/features/public-web/components/ui";
+import { Reveal } from "@/features/public-web/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Blog | NELVYON",
-  description: "Recursos sobre IA, automatización, marketing, ventas, CRM y SaaS operativo.",
+  description:
+    "Articulos sobre plataforma SaaS, automatizacion, packs OS, seguridad y operacion de marketing con IA.",
+  alternates: { canonical: "/blog" },
 };
 
-export default function BlogPage() {
-  return (
-    <section className="w-full py-28 md:py-36">
-      <Container className="flex flex-col gap-12">
-        <Header>Blog NELVYON</Header>
-        <p className="-tracking-xs max-w-2xl text-base leading-6 text-white/75">
-          Recursos por área de operación. Publicamos cuando hay contenido útil; hasta entonces,
-          cada categoría muestra su estado de preparación.
-        </p>
+const COVER_BY_INDEX = [
+  "/brand/public/blog-infra.webp",
+  "/brand/public/blog-cloud.webp",
+  "/brand/public/blog-team.webp",
+] as const;
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {nelvyonBlogCategories.map((cat) => (
-            <div
-              key={cat.id}
-              className="rounded-2xl border border-white/10 bg-[#07111F] p-6"
-            >
-              <h3 className="text-lg font-medium text-[#0084FF]">{cat.label}</h3>
-              <p className="mt-2 text-sm leading-6 text-white/70">{cat.description}</p>
-              <p className="mt-4 rounded-lg border border-white/10 bg-[#020817] px-3 py-2 text-sm text-white/55">
-                Próximamente — estamos preparando contenido en esta categoría.
-              </p>
+export default function BlogPage() {
+  const posts = blog.getPages();
+
+  return (
+    <>
+      <PageHero
+        eyebrow="Recursos"
+        title="Blog NELVYON"
+        description="Contenido util sobre plataforma, automatizacion, seguridad y operacion, sin relleno generico."
+        primaryCta={{ label: "Centro de recursos", href: "/recursos" }}
+        secondaryCta={{ label: "FAQ", href: "/faq" }}
+      />
+      <section className="py-14 md:py-20">
+        <Container>
+          {posts.length === 0 ? (
+            <p className="text-[var(--nv-muted)]">No hay articulos publicados todavia.</p>
+          ) : (
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {posts.map((page, i) => {
+                const slug = page.slugs?.[0];
+                if (!slug) return null;
+                const title = String(page.data.title ?? slug);
+                const description = String(page.data.description ?? "");
+                const cover = COVER_BY_INDEX[i % COVER_BY_INDEX.length];
+                return (
+                  <Reveal key={slug} delayMs={i * 40}>
+                    <Link
+                      href={`/blog/${slug}`}
+                      className="nv-public-panel group flex h-full flex-col overflow-hidden transition-colors hover:border-[rgba(0,132,255,0.4)]"
+                    >
+                      <div className="relative aspect-[16/10] overflow-hidden">
+                        <Image
+                          src={cover}
+                          alt=""
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                      </div>
+                      <div className="flex flex-1 flex-col p-6">
+                        <h2 className="text-lg font-semibold text-white group-hover:text-[var(--nv-accent)]">
+                          {title}
+                        </h2>
+                        {description ? (
+                          <p className="mt-3 flex-1 text-sm leading-relaxed text-[var(--nv-muted)]">
+                            {description}
+                          </p>
+                        ) : null}
+                        <span className="mt-5 text-sm font-medium text-[var(--nv-accent)]">Leer articulo</span>
+                      </div>
+                    </Link>
+                  </Reveal>
+                );
+              })}
             </div>
-          ))}
-        </div>
-      </Container>
-    </section>
+          )}
+        </Container>
+      </section>
+      <CtaBand
+        title="Quiere aplicar esto a su operacion?"
+        body="Hable con el equipo sobre plataforma, packs o enterprise."
+        primaryCta={{ label: "Contactar", href: "/contacto" }}
+      />
+    </>
   );
 }

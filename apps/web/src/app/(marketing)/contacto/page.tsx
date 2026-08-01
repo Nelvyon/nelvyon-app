@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 
-import { ContactFull } from "@/components/pa/marketing/contact-full";
+import { ContactPage, pageContent } from "@/features/public-web";
 
-export const dynamic = "force-static";
+const content = pageContent.contacto;
 
 export const metadata: Metadata = {
-  title: "Contacto | NELVYON",
-  description:
-    "Formulario, email, WhatsApp y calendario. Contacta con NELVYON para servicios o plan SaaS.",
+  title: content.seoTitle,
+  description: content.seoDescription,
+  alternates: { canonical: "/contacto" },
 };
 
-export default function ContactoPage() {
-  return <ContactFull />;
+export default function ContactoRoutePage() {
+  return <ContactPage />;
 }

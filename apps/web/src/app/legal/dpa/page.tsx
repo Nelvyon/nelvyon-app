@@ -46,18 +46,22 @@ export default function DpaPage() {
       </p>
 
       <h2>3. Subencargados autorizados</h2>
-      <p>El cliente autoriza el uso de los siguientes subencargados, sujetos a obligaciones contractuales equivalentes:</p>
+      <p>
+        El cliente autoriza el uso de subencargados necesarios para prestar el servicio, sujetos a obligaciones
+        contractuales equivalentes. El listado actualizado vive en{" "}
+        <a href="/legal/subprocessors">/legal/subprocessors</a>. Categorías habituales:
+      </p>
       <ul>
-        <li>OpenAI — procesamiento de IA y modelos de lenguaje.</li>
-        <li>Supabase — base de datos y almacenamiento gestionado.</li>
         <li>Railway — hosting e infraestructura de aplicación.</li>
-        <li>Paddle — pagos y facturación como Merchant of Record.</li>
-        <li>Amazon SES — envío de correos transaccionales.</li>
-        <li>Upstash — caché y rate limiting.</li>
+        <li>PostgreSQL gestionado — almacenamiento de datos de producto.</li>
+        <li>Amazon SES — correo transaccional y campañas cuando está configurado.</li>
+        <li>Stripe — pagos y facturación de planes SaaS.</li>
+        <li>Upstash — caché y rate limiting cuando está habilitado.</li>
+        <li>Proveedores de IA y comunicaciones — según activación del entorno y del cliente.</li>
       </ul>
       <p>
-        NELVYON notificará cambios materiales en subencargados mediante actualización de esta página o aviso razonable al
-        cliente.
+        NELVYON notificará cambios materiales en subencargados mediante actualización de la página de subprocesadores
+        o aviso razonable al cliente.
       </p>
 
       <h2>4. Medidas de seguridad</h2>

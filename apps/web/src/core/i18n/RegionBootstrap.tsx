@@ -12,6 +12,16 @@ export function RegionBootstrap() {
   const { setTimezone, setDateFormat, setLocale, locale } = useLocaleContext();
 
   useEffect(() => {
+    // Public marketing does not need FastAPI region bootstrap; skip to avoid CSP/console noise.
+    const path = typeof window !== "undefined" ? window.location.pathname : "";
+    const isAppSurface =
+      path.startsWith("/saas") ||
+      path.startsWith("/os") ||
+      path.startsWith("/portal") ||
+      path.startsWith("/admin") ||
+      path.startsWith("/dashboard");
+    if (!isAppSurface) return;
+
     localeSettingsApi
       .getRegion()
       .then((r) => {
