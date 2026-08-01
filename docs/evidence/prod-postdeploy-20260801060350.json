@@ -1,0 +1,106 @@
+﻿{
+    "verdict":  "PROD_POSTDEPLOY_PASS",
+    "checks":  [
+                   {
+                       "detail":  {
+                                      "body":  "{\"status\":\"ok\",\"version\":\"0.1.4\",\"timestamp\":\"2026-08-01T04:03:42.722Z\"}",
+                                      "status":  "200"
+                                  },
+                       "ok":  true,
+                       "name":  "health"
+                   },
+                   {
+                       "detail":  {
+                                      "body":  "{\"status\":\"ready\",\"timestamp\":\"2026-08-01T04:03:43.336Z\",\"database\":{\"status\":\"ok\",\"latencyMs\":47},\"auth\":{\"status\":\"ok\"},\"env\":{\"ok\":true,\"critical\":[]}}",
+                                      "status":  "200"
+                                  },
+                       "ok":  true,
+                       "name":  "ready"
+                   },
+                   {
+                       "detail":  {
+                                      "body":  "{\"error\":\"Credenciales incorrectas\",\"message\":\"Credenciales incorrectas\"}",
+                                      "status":  "401"
+                                  },
+                       "ok":  true,
+                       "name":  "login_invalid_creds"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "200"
+                                  },
+                       "ok":  true,
+                       "name":  "page_login"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "307"
+                                  },
+                       "ok":  true,
+                       "name":  "page_saas_dashboard_redirect"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "401",
+                                      "path":  "/api/saas/dashboard"
+                                  },
+                       "ok":  true,
+                       "name":  "api__api_saas_dashboard"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "401",
+                                      "path":  "/api/saas/crm/contacts"
+                                  },
+                       "ok":  true,
+                       "name":  "api__api_saas_crm_contacts"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "401",
+                                      "path":  "/api/saas/billing"
+                                  },
+                       "ok":  true,
+                       "name":  "api__api_saas_billing"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "401",
+                                      "path":  "/api/saas/store/products"
+                                  },
+                       "ok":  true,
+                       "name":  "api__api_saas_store_products"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "401",
+                                      "path":  "/api/saas/private-ai/router-health"
+                                  },
+                       "ok":  true,
+                       "name":  "api__api_saas_private_ai_router_health"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "401",
+                                      "path":  "/api/saas/settings"
+                                  },
+                       "ok":  true,
+                       "name":  "api__api_saas_settings"
+                   },
+                   {
+                       "detail":  {
+                                      "status":  "401",
+                                      "path":  "/api/saas/workflows"
+                                  },
+                       "ok":  true,
+                       "name":  "api__api_saas_workflows"
+                   }
+               ],
+    "finishedAt":  "2026-08-01T04:03:50.0342635Z",
+    "startedAt":  "2026-08-01T04:03:42.1041759Z",
+    "passed":  12,
+    "base":  "https://app.nelvyon.com",
+    "commit":  "06d9f579",
+    "failed":  0,
+    "deployment":  "7b646df4"
+}

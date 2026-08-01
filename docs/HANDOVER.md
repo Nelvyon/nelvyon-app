@@ -5,7 +5,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Tip prod live** | ver commit desplegado (post-deploy) |
+| **Tip prod live** | `06d9f579` · deploy `7b646df4` SUCCESS |
 | **Staging** | `4ed47ae0` SUCCESS · password cert 31/31 · JWT 23/23 · LH a11y 100 |
 | **Calidad** | tsc/eslint SaaS PASS · Vitest 6256 · PW SaaS 349/349 · build:prod PASS |
 | **claimReady** | **true** |
@@ -31,3 +31,4 @@ NELVYON_ORCHESTRATOR_ENABLED=0
 ```
 
 Upstash Redis obligatorio en prod (`UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`) — fail-closed en auth crítico sin él.
+
