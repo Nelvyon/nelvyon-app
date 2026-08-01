@@ -14,9 +14,9 @@
 
 ## Próximo paso EXACTO
 
-1. Confirmar post-deploy prod: health/ready · login (401 credenciales inválidas, no 429) · APIs SaaS 401 sin sesión · canary flags KILL.
-2. Ops humanos no bloqueantes: OAuth secrets · SES/SNS confirm · Twilio/WA · clientes (ver `docs/TODO.md` «Solo humano»).
-3. No abrir canary IA ni `claimReadyLegal` sin autorización legal/CEO explícita.
+1. Ops humanos no bloqueantes: OAuth secrets · SES/SNS confirm · Twilio/WA · clientes (ver `docs/TODO.md` «Solo humano»).
+2. No abrir canary IA ni `claimReadyLegal` sin autorización legal/CEO explícita.
+3. Opcional: push remoto `main` si el remoto debe reflejar tip `1c7b6dc2` (deploy local `7b646df4` ya live).
 
 ### Seguridad producción (mantener)
 
