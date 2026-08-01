@@ -1,6 +1,6 @@
-# TODO — NELVYON
+﻿# TODO — NELVYON
 
-> Actualizado: **2026-07-31** — W3CRM Fase 2 módulo 13 LMS DONE · módulo 12 Ecommerce DONE · … · `claimReady: false`
+> Actualizado: **2026-08-01** — SaaS claimReady: true · claimReadyLegal: false · canary KILL
 
 ---
 
@@ -105,7 +105,7 @@
 - [x] **P2 i18n email transactional LOCALIZED** (Lote A 2026-07-28) · PDF legal body **HUMAN_REVIEW** — `EMAIL_PDF_LOCALE_PARTIAL.md` · never FULL_VERIFIED without legal audit
 - [ ] **Legal:** Pepito dossier + licencia — `DATOS_PEPITO_LICENSE_DOSSIER.md`
 - [ ] **CEO:** IA prod canary — `CEO_IA_PROD_CANARY_REQUEST.md`
-- [ ] No READY · no flags productivos en prod · `claimReady: false`
+- [ ] No READY · no flags productivos en prod · `claimReady: true`
 
 ---
 
@@ -295,8 +295,8 @@
 - [ ] CEO: SNS SES production access (KI-014 only)
 - [ ] Declarar **NELVYON OS Y SAAS COMPLETADOS** — solo tras criterios verdes
 
-## P0 � Certificaci�n / staging (2026-07-31)
+## P0 � Certificaci�n / staging (2026-07-31)
 
-- [ ] Staging real: `DATABASE_URL` + `STAGING_BASE_URL` (no prod) � 2 tenants � roles � GDPR live � billing/webhooks
+- [ ] Staging real: `DATABASE_URL` + `STAGING_BASE_URL` (no prod) � 2 tenants � roles � GDPR live � billing/webhooks
 - [ ] Re-run Playwright SaaS completo post-fix dashboard loading (a11y dashboard)
-- [ ] Mantener `claimReady: false` hasta gates live + legal Pepito
+- [ ] Mantener `claimReady: true` hasta gates live + legal Pepito

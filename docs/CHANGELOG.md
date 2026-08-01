@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Release / SaaS | **claimReady true + deploy producción** | Preflight: Upstash prod presente · canary KILL · claimReadyLegal false · P0/P1 código cerrados · mig tip 522 · gates verdes. Flip `claimReady: true` (docs/estado). Deploy `@nelvyon/web` production. |
 | Auth / staging | **Rate-limit auth-login staging verde** | Causa raíz: `requireSharedStoreInProduction` + `NODE_ENV=production` en Railway staging sin Upstash → fail-closed permanente 429. Fix: `isCriticalRateLimitStrictEnvironment()` — staging/preview/`NELVYON_DEPLOY_ENV=staging|test` usa memory fallback con límites reales; producción Railway sigue fail-closed sin Upstash. QA password hash sync a `STAGING_QA_PASSWORD`. A11y login: `role=region` en toasts + quitar `maximumScale:1`. Evidencia: password cert **31/31**, isolation **PASS**, JWT **23/23**, LH a11y **100**, Vitest **6256**, PW SaaS **349/349**, build:prod **PASS**. Deploys staging `4807db54`/`4ed47ae0`. `claimReady: false`. Veredicto **READY_FOR_PRODUCTION** (sin flip claimReady / sin prod deploy). |
 
 ## 2026-07-31
